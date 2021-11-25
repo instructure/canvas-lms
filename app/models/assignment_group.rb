@@ -184,8 +184,8 @@ class AssignmentGroup < ActiveRecord::Base
   scope :include_active_assignments, -> { preload(:active_assignments) }
   scope :active, -> { where("assignment_groups.workflow_state<>'deleted'") }
   scope :before, ->(date) { where("assignment_groups.created_at<?", date) }
-  scope :for_context_codes, ->(codes) { active.where(:context_code => codes).ordered }
-  scope :for_course, ->(course) { where(:context_id => course, :context_type => 'Course') }
+  scope :for_context_codes, ->(codes) { active.where(context_code: codes).ordered }
+  scope :for_course, ->(course) { where(context_id: course, context_type: 'Course') }
 
   def course_grading_change
     context.grade_weight_changed! if saved_change_to_group_weight? && context && context.group_weighting_scheme == 'percent'
@@ -206,7 +206,7 @@ class AssignmentGroup < ActiveRecord::Base
     p.to { context.participating_students_by_date }
     p.whenever do |record|
       false &&
-        record.changed_in_state(:available, :fields => :group_weight)
+        record.changed_in_state(:available, fields: :group_weight)
     end
     p.data { course_broadcast_data }
   end
@@ -259,12 +259,12 @@ class AssignmentGroup < ActiveRecord::Base
 
   def self.visible_assignments(user, context, assignment_groups, includes: [], assignment_ids: [])
     scope = if context.grants_any_right?(user, :manage_grades, :read_as_admin, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS)
-              context.active_assignments.where(:assignment_group_id => assignment_groups)
+              context.active_assignments.where(assignment_group_id: assignment_groups)
             elsif user.nil?
-              context.active_assignments.published.where(:assignment_group_id => assignment_groups)
+              context.active_assignments.published.where(assignment_group_id: assignment_groups)
             else
               user.assignments_visible_in_course(context)
-                  .where(:assignment_group_id => assignment_groups).published
+                  .where(assignment_group_id: assignment_groups).published
             end
 
     if assignment_ids&.any?
@@ -279,7 +279,7 @@ class AssignmentGroup < ActiveRecord::Base
     order = new_group.assignments.active.pluck(:id)
     ids_to_change = assignments.active.pluck(:id)
     order += ids_to_change
-    Assignment.where(:id => ids_to_change).update_all(:assignment_group_id => new_group.id, :updated_at => Time.now.utc) unless ids_to_change.empty?
+    Assignment.where(id: ids_to_change).update_all(assignment_group_id: new_group.id, updated_at: Time.now.utc) unless ids_to_change.empty?
     Assignment.where(id: order).first.update_order(order) unless order.empty?
     new_group.touch
     reload

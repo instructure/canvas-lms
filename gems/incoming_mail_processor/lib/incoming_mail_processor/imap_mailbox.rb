@@ -41,7 +41,7 @@ module IncomingMailProcessor
     end
 
     def connect
-      @imap = with_timeout { Net::IMAP.new(@server, :port => @port, :ssl => @ssl) }
+      @imap = with_timeout { Net::IMAP.new(@server, port: @port, ssl: @ssl) }
       wrap_with_timeout(@imap, UsedImapMethods)
       @imap.login(@username, @password)
     end

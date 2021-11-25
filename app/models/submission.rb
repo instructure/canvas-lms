@@ -85,23 +85,23 @@ class Submission < ActiveRecord::Base
   has_many :observer_alerts, as: :context, inverse_of: :context, dependent: :destroy
   belongs_to :user
   alias_method :student, :user
-  belongs_to :grader, :class_name => 'User'
+  belongs_to :grader, class_name: 'User'
   belongs_to :grading_period
   belongs_to :group
   belongs_to :media_object
-  belongs_to :root_account, :class_name => 'Account'
+  belongs_to :root_account, class_name: 'Account'
 
-  belongs_to :quiz_submission, :class_name => 'Quizzes::QuizSubmission'
+  belongs_to :quiz_submission, class_name: 'Quizzes::QuizSubmission'
   has_many :all_submission_comments, -> { order(:created_at) }, class_name: 'SubmissionComment', dependent: :destroy
   has_many :submission_comments, -> { order(:created_at).where(provisional_grade_id: nil) }
   has_many :visible_submission_comments,
            -> { published.visible.for_final_grade.order(:created_at, :id) },
            class_name: 'SubmissionComment'
   has_many :hidden_submission_comments, -> { order('created_at, id').where(provisional_grade_id: nil, hidden: true) }, class_name: 'SubmissionComment'
-  has_many :assessment_requests, :as => :asset
-  has_many :assigned_assessments, :class_name => 'AssessmentRequest', :as => :assessor_asset
-  has_many :rubric_assessments, :as => :artifact
-  has_many :attachment_associations, :as => :context, :inverse_of => :context
+  has_many :assessment_requests, as: :asset
+  has_many :assigned_assessments, class_name: 'AssessmentRequest', as: :assessor_asset
+  has_many :rubric_assessments, as: :artifact
+  has_many :attachment_associations, as: :context, inverse_of: :context
   has_many :provisional_grades, class_name: 'ModeratedGrading::ProvisionalGrade'
   has_many :originality_reports
   has_one :rubric_assessment, lambda {
@@ -115,9 +115,9 @@ class Submission < ActiveRecord::Base
   # we no longer link submission comments and conversations, but we haven't fixed up existing
   # linked conversations so this relation might be useful
   # TODO: remove this when removing the conversationmessage asset columns
-  has_many :conversation_messages, :as => :asset # one message per private conversation
+  has_many :conversation_messages, as: :asset # one message per private conversation
 
-  has_many :content_participations, :as => :content
+  has_many :content_participations, as: :content
 
   has_many :canvadocs_annotation_contexts, inverse_of: :submission, dependent: :destroy
   has_many :canvadocs_submissions
@@ -130,8 +130,8 @@ class Submission < ActiveRecord::Base
   serialize :turnitin_data, Hash
 
   validates :assignment_id, :user_id, presence: true
-  validates :body, length: { :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true }
-  validates :published_grade, length: { :maximum => maximum_string_length, :allow_nil => true, :allow_blank => true }
+  validates :body, length: { maximum: maximum_long_text_length, allow_nil: true, allow_blank: true }
+  validates :published_grade, length: { maximum: maximum_string_length, allow_nil: true, allow_blank: true }
   validates_as_url :url
   validates :points_deducted, numericality: { greater_than_or_equal_to: 0 }, allow_nil: true
   validates :seconds_late_override, numericality: { greater_than_or_equal_to: 0 }, allow_nil: true
@@ -141,7 +141,7 @@ class Submission < ActiveRecord::Base
   validate :ensure_grader_can_grade
   validate :extra_attempts_can_only_be_set_on_online_uploads
   validate :ensure_attempts_are_in_range
-  validate :submission_type_is_valid, :if => :require_submission_type_is_valid
+  validate :submission_type_is_valid, if: :require_submission_type_is_valid
   attr_accessor :require_submission_type_is_valid
 
   scope :active, -> { where("submissions.workflow_state <> 'deleted'") }
@@ -243,7 +243,7 @@ class Submission < ActiveRecord::Base
 
   workflow do
     state :submitted do
-      event :grade_it, :transitions_to => :graded
+      event :grade_it, transitions_to: :graded
     end
     state :unsubmitted
     state :pending_review
@@ -409,10 +409,10 @@ class Submission < ActiveRecord::Base
 
   has_a_broadcast_policy
 
-  simply_versioned :explicit => true,
-                   :when => ->(model) { model.new_version_needed? },
-                   :on_create => ->(_model, version) { SubmissionVersion.index_version(version) },
-                   :on_load => ->(model, version) { model&.cached_due_date = version.versionable&.cached_due_date }
+  simply_versioned explicit: true,
+                   when: ->(model) { model.new_version_needed? },
+                   on_create: ->(_model, version) { SubmissionVersion.index_version(version) },
+                   on_load: ->(model, version) { model&.cached_due_date = version.versionable&.cached_due_date }
 
   # This needs to be after simply_versioned because the grade change audit uses
   # versioning to grab the previous grade.
@@ -1738,7 +1738,7 @@ class Submission < ActiveRecord::Base
     return @versioned_attachments if @versioned_attachments
 
     attachment_ids = attachment_ids_for_version
-    self.versioned_attachments = (attachment_ids.empty? ? [] : Attachment.where(:id => attachment_ids))
+    self.versioned_attachments = (attachment_ids.empty? ? [] : Attachment.where(id: attachment_ids))
     @versioned_attachments
   end
 
@@ -1777,7 +1777,7 @@ class Submission < ActiveRecord::Base
     attachments_by_id = if bulk_attachment_ids.empty?
                           {}
                         else
-                          Attachment.where(:id => bulk_attachment_ids).preload(preloads).group_by(&:id)
+                          Attachment.where(id: bulk_attachment_ids).preload(preloads).group_by(&:id)
                         end
 
     submissions.each_with_index do |s, index|
@@ -1931,7 +1931,7 @@ class Submission < ActiveRecord::Base
   end
 
   def attachments
-    Attachment.where(:id => attachment_associations.pluck(:attachment_id))
+    Attachment.where(id: attachment_associations.pluck(:attachment_id))
   end
 
   def attachments=(attachments)
@@ -1996,9 +1996,9 @@ class Submission < ActiveRecord::Base
 
   scope :graded, -> { where("(submissions.score IS NOT NULL AND submissions.workflow_state = 'graded') or submissions.excused = true") }
 
-  scope :ungraded, -> { where(:grade => nil).preload(:assignment) }
+  scope :ungraded, -> { where(grade: nil).preload(:assignment) }
 
-  scope :in_workflow_state, ->(provided_state) { where(:workflow_state => provided_state) }
+  scope :in_workflow_state, ->(provided_state) { where(workflow_state: provided_state) }
 
   scope :having_submission, -> { where.not(submissions: { submission_type: nil }) }
   scope :without_submission, -> { where(submission_type: nil, workflow_state: "unsubmitted") }
@@ -2012,7 +2012,7 @@ class Submission < ActiveRecord::Base
   scope :include_versions, -> { preload(:versions) }
   scope :include_submission_comments, -> { preload(:submission_comments) }
   scope :speed_grader_includes, -> { preload(:versions, :submission_comments, :attachments, :rubric_assessment) }
-  scope :for_user, ->(user) { where(:user_id => user) }
+  scope :for_user, ->(user) { where(user_id: user) }
   scope :needing_screenshot, -> { where("submissions.submission_type='online_url' AND submissions.attachment_id IS NULL").order(:updated_at) }
 
   def assignment_visible_to_user?(user, opts = {})
@@ -2048,7 +2048,7 @@ class Submission < ActiveRecord::Base
     elsif association(:visible_submission_comments).loaded?
       visible_submission_comments.reverse.detect { |com| com.author_id != user_id }
     else
-      submission_comments.published.where.not(:author_id => user_id).reorder(:created_at => :desc).first
+      submission_comments.published.where.not(author_id: user_id).reorder(created_at: :desc).first
     end
   end
 
@@ -2068,7 +2068,7 @@ class Submission < ActiveRecord::Base
   scope :for, lambda { |obj|
     case obj
     when User
-      where(:user_id => obj)
+      where(user_id: obj)
     else
       all
     end
@@ -2404,8 +2404,8 @@ class Submission < ActiveRecord::Base
       entry.published = created_at
       entry.id        = "tag:#{HostUrl.default_host},#{created_at.strftime('%Y-%m-%d')}:/submissions/#{feed_code}_#{updated_at.strftime('%Y-%m-%d')}"
       entry.content   = Atom::Content::Html.new(body || "")
-      entry.links << Atom::Link.new(:rel => 'alternate', :href => "#{assignment.direct_link}/submissions/#{id}")
-      entry.authors << Atom::Person.new(:name => author_name)
+      entry.links << Atom::Link.new(rel: 'alternate', href: "#{assignment.direct_link}/submissions/#{id}")
+      entry.authors << Atom::Person.new(name: author_name)
       # entry.author    = Atom::Person.new(self.user)
     end
   end
@@ -2430,13 +2430,13 @@ class Submission < ActiveRecord::Base
   end
 
   def self.json_serialization_full_parameters(additional_parameters = {})
-    includes = { :quiz_submission => {} }
+    includes = { quiz_submission: {} }
     methods = %i[submission_history attachments entered_score entered_grade]
     methods << :word_count if Account.site_admin.feature_enabled?(:word_count_in_speed_grader)
     methods << (additional_parameters.delete(:comments) || :submission_comments)
     excepts = additional_parameters.delete :except
 
-    res = { :methods => methods, :include => includes }.merge(additional_parameters)
+    res = { methods: methods, include: includes }.merge(additional_parameters)
     excepts&.each do |key|
       res[:methods].delete key
       res[:include].delete key
@@ -2510,9 +2510,9 @@ class Submission < ActiveRecord::Base
     return unless context.grants_right?(user, :participate_as_student)
 
     ContentParticipation.create_or_update({
-                                            :content => self,
-                                            :user => user,
-                                            :workflow_state => "unread",
+                                            content: self,
+                                            user: user,
+                                            workflow_state: "unread",
                                           })
   end
 
@@ -2589,9 +2589,9 @@ class Submission < ActiveRecord::Base
     PlannerHelper.clear_planner_cache(current_user)
 
     ContentParticipation.create_or_update({
-                                            :content => self,
-                                            :user => current_user,
-                                            :workflow_state => new_state,
+                                            content: self,
+                                            user: current_user,
+                                            workflow_state: new_state,
                                           })
   end
 
@@ -2682,8 +2682,8 @@ class Submission < ActiveRecord::Base
   private :rubric_assessments_for_attempt
 
   def self.queue_bulk_update(context, section, grader, grade_data)
-    progress = Progress.create!(:context => context, :tag => "submissions_update")
-    progress.process_job(self, :process_bulk_update, { :n_strand => ["submissions_bulk_update", context.global_id] }, context, section, grader, grade_data)
+    progress = Progress.create!(context: context, tag: "submissions_update")
+    progress.process_job(self, :process_bulk_update, { n_strand: ["submissions_bulk_update", context.global_id] }, context, section, grader, grade_data)
     progress
   end
 
@@ -2706,11 +2706,11 @@ class Submission < ActiveRecord::Base
 
         scope = assignment.students_with_visibility(context.students_visible_to(grader, include: :inactive))
         if section
-          scope = scope.where(:enrollments => { :course_section_id => section })
+          scope = scope.where(enrollments: { course_section_id: section })
         end
 
         user_ids = user_grades.keys
-        preloaded_users = scope.where(:id => user_ids)
+        preloaded_users = scope.where(id: user_ids)
         preloaded_submissions = assignment.submissions.where(user_id: user_ids).group_by(&:user_id)
 
         Delayed::Batch.serial_batch(priority: Delayed::LOW_PRIORITY, n_strand: ["bulk_update_submissions", context.root_account.global_id]) do
@@ -2725,10 +2725,10 @@ class Submission < ActiveRecord::Base
             submission = preloaded_submissions[user_id.to_i].first if preloaded_submissions[user_id.to_i]
             if !submission || user_data.key?(:posted_grade) || user_data.key?(:excuse)
               submissions =
-                assignment.grade_student(user, :grader => grader,
-                                               :grade => user_data[:posted_grade],
-                                               :excuse => Canvas::Plugin.value_to_boolean(user_data[:excuse]),
-                                               :skip_grade_calc => true, :return_if_score_unchanged => true)
+                assignment.grade_student(user, grader: grader,
+                                               grade: user_data[:posted_grade],
+                                               excuse: Canvas::Plugin.value_to_boolean(user_data[:excuse]),
+                                               skip_grade_calc: true, return_if_score_unchanged: true)
               submissions.each { |s| graded_user_ids << s.user_id unless s.score_unchanged }
               submission = submissions.first
             end
@@ -2742,8 +2742,8 @@ class Submission < ActiveRecord::Base
                 "criterion_#{crit_name}"
               end
               assignment.rubric_association.assess(
-                :assessor => grader, :user => user, :artifact => submission,
-                :assessment => assessment.merge(:assessment_type => 'grading')
+                assessor: grader, user: user, artifact: submission,
+                assessment: assessment.merge(assessment_type: 'grading')
               )
             end
 

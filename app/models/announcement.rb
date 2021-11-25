@@ -67,10 +67,10 @@ class Announcement < DiscussionTopic
 
   def self.lock_from_course(course)
     Announcement.where(
-      :context_type => 'Course',
-      :context_id => course,
-      :workflow_state => 'active'
-    ).update_all(:locked => true)
+      context_type: 'Course',
+      context_id: course,
+      workflow_state: 'active'
+    ).update_all(locked: true)
   end
 
   def course_broadcast_data

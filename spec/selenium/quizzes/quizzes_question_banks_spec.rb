@@ -297,7 +297,7 @@ describe 'quizzes question banks' do
 
     it "lets teachers view question banks in a soft-concluded course (but not edit)", custom_timeout: 30, priority: "2" do
       term = Account.default.enrollment_terms.create!
-      term.set_overrides(Account.default, 'TeacherEnrollment' => { :end_at => 3.days.ago })
+      term.set_overrides(Account.default, 'TeacherEnrollment' => { end_at: 3.days.ago })
       @course.enrollment_term = term
       @course.save!
       @bank = @course.assessment_question_banks.create!(title: 'Test Bank')
@@ -322,9 +322,9 @@ describe 'quizzes question banks' do
     it "lets account admins view question banks without :manage_assignments (but not edit)", custom_timeout: 30, priority: "2" do
       user_factory(active_all: true)
       user_session(@user)
-      @role = custom_account_role 'weakling', :account => @course.account
-      @course.account.role_overrides.create!(:permission => 'read_course_content', :enabled => true, :role => @role)
-      @course.account.role_overrides.create!(:permission => 'read_question_banks', :enabled => true, :role => @role)
+      @role = custom_account_role 'weakling', account: @course.account
+      @course.account.role_overrides.create!(permission: 'read_course_content', enabled: true, role: @role)
+      @course.account.role_overrides.create!(permission: 'read_question_banks', enabled: true, role: @role)
       @course.account.account_users.create!(user: @user, role: @role)
 
       @bank = @course.assessment_question_banks.create!(title: 'Test Bank')
@@ -348,13 +348,13 @@ describe 'quizzes question banks' do
 
     it "locks out teachers when :read_question_banks is disabled", priority: "2" do
       term = Account.default.enrollment_terms.create!
-      term.set_overrides(Account.default, 'TeacherEnrollment' => { :end_at => 3.days.ago })
+      term.set_overrides(Account.default, 'TeacherEnrollment' => { end_at: 3.days.ago })
       @course.enrollment_term = term
       @course.save!
 
       @bank = @course.assessment_question_banks.create!(title: 'Test Bank')
 
-      Account.default.role_overrides.create!(:permission => 'read_question_banks', :role => teacher_role, :enabled => false)
+      Account.default.role_overrides.create!(permission: 'read_question_banks', role: teacher_role, enabled: false)
       Account.default.reload
 
       get "/courses/#{@course.id}/quizzes"
@@ -378,8 +378,8 @@ describe 'quizzes question banks' do
       51.times do |o|
         assessment_question[o] = source_bank.assessment_questions.create!
         @quiz_question.push(@q.quiz_questions.create!(question_data:
-                                                   { name: "question #{o}", question_type: 'multiple_choice_question',
-                                                     'answers' => answers, points_possible: 1 },
+                                                   { :name => "question #{o}", :question_type => 'multiple_choice_question',
+                                                     'answers' => answers, :points_possible => 1 },
                                                       assessment_question: assessment_question[o]))
       end
       get "/courses/#{@course.id}/question_banks/#{source_bank.id}"

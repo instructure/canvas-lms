@@ -22,7 +22,7 @@ require_relative 'messages_helper'
 
 describe 'account_user_notification' do
   before :once do
-    @object = AccountUser.create(:account => account_model)
+    @object = AccountUser.create(account: account_model)
   end
 
   let(:asset) { @object }

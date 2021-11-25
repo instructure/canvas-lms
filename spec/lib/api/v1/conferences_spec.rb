@@ -31,15 +31,15 @@ describe Api::V1::Conferences do
   before :once do
     # these specs need an enabled web conference plugin
     @plugin = PluginSetting.create!(name: 'wimba')
-    @plugin.update_attribute(:settings, { :domain => 'wimba.test' })
+    @plugin.update_attribute(:settings, { domain: 'wimba.test' })
   end
 
   describe '.ui_conferences_json' do
     before do
       course_with_teacher
       @conference = @course.web_conferences.create!(
-        :conference_type => 'Wimba',
-        :user => @teacher
+        conference_type: 'Wimba',
+        user: @teacher
       )
     end
 

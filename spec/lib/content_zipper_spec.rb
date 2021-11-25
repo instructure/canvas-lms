@@ -504,7 +504,7 @@ describe ContentZipper do
         eportfolio = @user.eportfolios.create!(name: 'an name')
         eportfolio.ensure_defaults
         entry = eportfolio.eportfolio_entries.first
-        entry.parse_content({ :section_count => 1, :section_1 => { :section_type => 'rich_text', :content => "/files/#{@attachment.id}/download" } })
+        entry.parse_content({ section_count: 1, section_1: { section_type: 'rich_text', content: "/files/#{@attachment.id}/download" } })
         entry.save!
         eportfolio
       end

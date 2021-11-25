@@ -30,7 +30,7 @@ module Api::V1::AssessmentRequest
       json_attributes.delete('assessor_id')
     end
 
-    hash = api_json(assessment_request, user, session, :only => json_attributes)
+    hash = api_json(assessment_request, user, session, only: json_attributes)
 
     if includes.include?("user")
       hash['user'] = user_display_json(assessment_request.user, @context)

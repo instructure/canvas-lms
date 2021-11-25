@@ -48,7 +48,7 @@ describe "differentiated_assignments" do
 
   def student_in_course_with_adhoc_override(quiz, opts = {})
     @user = opts[:user] || user_model
-    StudentEnrollment.create!(:user => @user, :course => @course)
+    StudentEnrollment.create!(user: @user, course: @course)
     ao = AssignmentOverride.new
     ao.quiz = quiz
     ao.title = "ADHOC OVERRIDE"
@@ -64,19 +64,19 @@ describe "differentiated_assignments" do
 
   def enroller_user_in_section(section, opts = {})
     @user = opts[:user] || user_model
-    StudentEnrollment.create!(:user => @user, :course => @course, :course_section => section)
+    StudentEnrollment.create!(user: @user, course: @course, course_section: section)
   end
 
   def enroller_user_in_both_sections
     @user = user_model
-    StudentEnrollment.create!(:user => @user, :course => @course, :course_section => @section_foo)
-    StudentEnrollment.create!(:user => @user, :course => @course, :course_section => @section_bar)
+    StudentEnrollment.create!(user: @user, course: @course, course_section: @section_foo)
+    StudentEnrollment.create!(user: @user, course: @course, course_section: @section_bar)
   end
 
   def add_multiple_sections
     @default_section = @course.default_section
-    @section_foo = @course.course_sections.create!(:name => 'foo')
-    @section_bar = @course.course_sections.create!(:name => 'bar')
+    @section_foo = @course.course_sections.create!(name: 'foo')
+    @section_bar = @course.course_sections.create!(name: 'bar')
   end
 
   def create_override_for_quiz(quiz)
@@ -230,7 +230,7 @@ describe "differentiated_assignments" do
 
         it "updates when enrollments change" do
           ensure_user_sees_quiz
-          enrollments = StudentEnrollment.where(:user_id => @user.id, :course_id => @course.id, :course_section_id => @section_foo.id)
+          enrollments = StudentEnrollment.where(user_id: @user.id, course_id: @course.id, course_section_id: @section_foo.id)
           Score.where(enrollment_id: enrollments).each(&:destroy_permanently!)
           enrollments.each(&:destroy_permanently!)
           ensure_user_does_not_see_quiz

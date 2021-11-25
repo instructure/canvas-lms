@@ -39,13 +39,13 @@ describe UsersController do
                                                 })
       tool.url = "http://www.example.com/basic_lti?first=john&last=smith"
       tool.resource_selection = {
-        :url => "http://#{HostUrl.default_host}/selection_test",
-        :selection_width => 400,
-        :selection_height => 400
+        url: "http://#{HostUrl.default_host}/selection_test",
+        selection_width: 400,
+        selection_height: 400
       }
       user_navigation = {
-        :text => 'example',
-        :labels => {
+        text: 'example',
+        labels: {
           'en' => 'English Label',
           'sp' => 'Spanish Label'
         }
@@ -165,7 +165,7 @@ describe UsersController do
       expect(response).to redirect_to "http://example.com/redirect"
       json = Canvas::Security.decode_jwt(state)
       expect(session[:oauth_gdrive_nonce]).to eq 'abc123'
-      expect(json['redirect_uri']).to eq oauth_success_url(:service => 'google_drive')
+      expect(json['redirect_uri']).to eq oauth_success_url(service: 'google_drive')
       expect(json['return_to_url']).to eq "http://example.com"
       expect(json['nonce']).to eq session[:oauth_gdrive_nonce]
     end
@@ -175,10 +175,10 @@ describe UsersController do
     it "handles google_drive oauth_success for a logged_in_user" do
       settings_mock = double
       allow(settings_mock).to receive(:settings).and_return({})
-      authorization_mock = double('authorization', :code= => nil, fetch_access_token!: nil, refresh_token: 'refresh_token', access_token: 'access_token')
+      authorization_mock = double('authorization', :code= => nil, :fetch_access_token! => nil, :refresh_token => 'refresh_token', :access_token => 'access_token')
       drive_mock = Google::APIClient::API.new('mock', {})
       allow(drive_mock).to receive(:about).and_return(double(get: nil))
-      client_mock = double("client", discovered_api: drive_mock, :execute! => double('result', status: 200, data: { 'permissionId' => 'permission_id', 'user' => { 'emailAddress' => 'blah@blah.com' } }))
+      client_mock = double("client", discovered_api: drive_mock, execute!: double('result', status: 200, data: { 'permissionId' => 'permission_id', 'user' => { 'emailAddress' => 'blah@blah.com' } }))
       allow(client_mock).to receive(:authorization).and_return(authorization_mock)
       allow(GoogleDrive::Client).to receive(:create).and_return(client_mock)
 
@@ -199,10 +199,10 @@ describe UsersController do
     it "handles google_drive oauth_success for a non logged in user" do
       settings_mock = double
       allow(settings_mock).to receive(:settings).and_return({})
-      authorization_mock = double('authorization', :code= => nil, fetch_access_token!: nil, refresh_token: 'refresh_token', access_token: 'access_token')
+      authorization_mock = double('authorization', :code= => nil, :fetch_access_token! => nil, :refresh_token => 'refresh_token', :access_token => 'access_token')
       drive_mock = Google::APIClient::API.new('mock', {})
       allow(drive_mock).to receive(:about).and_return(double(get: nil))
-      client_mock = double("client", discovered_api: drive_mock, :execute! => double('result', status: 200, data: { 'permissionId' => 'permission_id' }))
+      client_mock = double("client", discovered_api: drive_mock, execute!: double('result', status: 200, data: { 'permissionId' => 'permission_id' }))
       allow(client_mock).to receive(:authorization).and_return(authorization_mock)
       allow(GoogleDrive::Client).to receive(:create).and_return(client_mock)
 
@@ -220,10 +220,10 @@ describe UsersController do
       settings_mock = double
       allow(settings_mock).to receive(:settings).and_return({})
       authorization_mock = double('authorization')
-      allow(authorization_mock).to receive_messages(:code= => nil, fetch_access_token!: nil, refresh_token: 'refresh_token', access_token: 'access_token')
+      allow(authorization_mock).to receive_messages(:code= => nil, :fetch_access_token! => nil, :refresh_token => 'refresh_token', :access_token => 'access_token')
       drive_mock = Google::APIClient::API.new('mock', {})
       allow(drive_mock).to receive(:about).and_return(double(get: nil))
-      client_mock = double("client", discovered_api: drive_mock, :execute! => double('result', status: 200, data: { 'permissionId' => 'permission_id' }))
+      client_mock = double("client", discovered_api: drive_mock, execute!: double('result', status: 200, data: { 'permissionId' => 'permission_id' }))
 
       allow(client_mock).to receive(:authorization).and_return(authorization_mock)
       allow(GoogleDrive::Client).to receive(:create).and_return(client_mock)
@@ -256,13 +256,13 @@ describe UsersController do
 
   context "manageable_courses" do
     it "does not include deleted courses in manageable courses" do
-      course_with_teacher_logged_in(:course_name => "MyCourse1", :active_all => 1)
+      course_with_teacher_logged_in(course_name: "MyCourse1", active_all: 1)
       course1 = @course
       course1.destroy
-      course_with_teacher(:course_name => "MyCourse2", :user => @teacher, :active_all => 1)
+      course_with_teacher(course_name: "MyCourse2", user: @teacher, active_all: 1)
       course2 = @course
 
-      get 'manageable_courses', params: { :user_id => @teacher.id, :term => "MyCourse" }
+      get 'manageable_courses', params: { user_id: @teacher.id, term: "MyCourse" }
       expect(response).to be_successful
 
       courses = json_parse
@@ -270,13 +270,13 @@ describe UsersController do
     end
 
     it "does not include future teacher term courses in manageable courses" do
-      course_with_teacher_logged_in(:course_name => "MyCourse1", :active_all => 1)
+      course_with_teacher_logged_in(course_name: "MyCourse1", active_all: 1)
       term = @course.enrollment_term
       term.enrollment_dates_overrides.create!(
         enrollment_type: "TeacherEnrollment", start_at: 1.week.from_now, end_at: 2.weeks.from_now, context: term.root_account
       )
 
-      get 'manageable_courses', params: { :user_id => @teacher.id, :term => "MyCourse" }
+      get 'manageable_courses', params: { user_id: @teacher.id, term: "MyCourse" }
       expect(response).to be_successful
 
       courses = json_parse
@@ -284,12 +284,12 @@ describe UsersController do
     end
 
     it "sorts the results of manageable_courses by name" do
-      course_with_teacher_logged_in(:course_name => "B", :active_all => 1)
+      course_with_teacher_logged_in(course_name: "B", active_all: 1)
       %w[c d a].each do |name|
-        course_with_teacher(:course_name => name, :user => @teacher, :active_all => 1)
+        course_with_teacher(course_name: name, user: @teacher, active_all: 1)
       end
 
-      get 'manageable_courses', params: { :user_id => @teacher.id }
+      get 'manageable_courses', params: { user_id: @teacher.id }
       expect(response).to be_successful
 
       courses = json_parse
@@ -298,19 +298,19 @@ describe UsersController do
 
     it "sorts the results of manageable_courses by term with default term first then alphabetically" do
       # Default term
-      course_with_teacher_logged_in(:course_name => "E", :active_all => 1)
+      course_with_teacher_logged_in(course_name: "E", active_all: 1)
       future_term = EnrollmentTerm.create(start_at: 1.day.from_now, root_account: @teacher.account)
       past_term = EnrollmentTerm.create(start_at: 1.day.ago, root_account: @teacher.account)
       # Future terms
       %w[b a].each do |name|
-        course_with_teacher(:course_name => name, :user => @teacher, :active_all => 1, :enrollment_term_id => future_term.id)
+        course_with_teacher(course_name: name, user: @teacher, active_all: 1, enrollment_term_id: future_term.id)
       end
       # Past terms
       %w[d c].each do |name|
-        course_with_teacher(:course_name => name, :user => @teacher, :active_all => 1, :enrollment_term_id => past_term.id)
+        course_with_teacher(course_name: name, user: @teacher, active_all: 1, enrollment_term_id: past_term.id)
       end
 
-      get 'manageable_courses', params: { :user_id => @teacher.id }
+      get 'manageable_courses', params: { user_id: @teacher.id }
       expect(response).to be_successful
 
       courses = json_parse
@@ -318,20 +318,20 @@ describe UsersController do
     end
 
     it "does not include courses that an admin can't content-manage" do
-      @role1 = custom_account_role('subadmin', :account => Account.default)
-      account_admin_user_with_role_changes(:role => @role1, :role_changes => {
-                                             :read_course_content => true,
-                                             :read_course_list => true,
-                                             :manage_content => false
+      @role1 = custom_account_role('subadmin', account: Account.default)
+      account_admin_user_with_role_changes(role: @role1, role_changes: {
+                                             read_course_content: true,
+                                             read_course_list: true,
+                                             manage_content: false
                                            })
       user_session(@admin)
 
-      course_with_teacher(:course_name => "A", :active_all => true, :user => @admin)
-      course_with_teacher(:course_name => "B", :active_all => true)
-      course_with_teacher(:course_name => "C", :active_all => true, :user => @admin)
-      course_with_teacher(:course_name => "D", :active_all => true)
+      course_with_teacher(course_name: "A", active_all: true, user: @admin)
+      course_with_teacher(course_name: "B", active_all: true)
+      course_with_teacher(course_name: "C", active_all: true, user: @admin)
+      course_with_teacher(course_name: "D", active_all: true)
 
-      get 'manageable_courses', params: { :user_id => @admin.id }
+      get 'manageable_courses', params: { user_id: @admin.id }
       expect(response).to be_successful
 
       courses = json_parse
@@ -339,16 +339,16 @@ describe UsersController do
     end
 
     it "does not include courses that an admin doesn't have rights to see" do
-      @role1 = custom_account_role('subadmin', :account => Account.default)
-      account_admin_user_with_role_changes(:role => @role1, :role_changes => { :manage_content => true })
+      @role1 = custom_account_role('subadmin', account: Account.default)
+      account_admin_user_with_role_changes(role: @role1, role_changes: { manage_content: true })
       user_session(@admin)
 
-      course_with_teacher(:course_name => "A", :active_all => true, :user => @admin)
-      course_with_teacher(:course_name => "B", :active_all => true)
-      course_with_teacher(:course_name => "C", :active_all => true, :user => @admin)
-      course_with_teacher(:course_name => "D", :active_all => true)
+      course_with_teacher(course_name: "A", active_all: true, user: @admin)
+      course_with_teacher(course_name: "B", active_all: true)
+      course_with_teacher(course_name: "C", active_all: true, user: @admin)
+      course_with_teacher(course_name: "D", active_all: true)
 
-      get 'manageable_courses', params: { :user_id => @admin.id }
+      get 'manageable_courses', params: { user_id: @admin.id }
       expect(response).to be_successful
 
       courses = json_parse
@@ -357,12 +357,12 @@ describe UsersController do
 
     context "query matching" do
       before do
-        course_with_teacher_logged_in(:course_name => "Extra course", :active_all => 1)
+        course_with_teacher_logged_in(course_name: "Extra course", active_all: 1)
       end
 
       it "matches query to course id" do
-        course_with_teacher(:course_name => "Biology", :user => @teacher, :active_all => 1)
-        get 'manageable_courses', params: { :user_id => @teacher.id, :term => @course.id }
+        course_with_teacher(course_name: "Biology", user: @teacher, active_all: 1)
+        get 'manageable_courses', params: { user_id: @teacher.id, term: @course.id }
         expect(response).to be_successful
         courses = json_parse
         expect(courses.map { |c| c['id'] }).to eq [@course.id]
@@ -370,10 +370,10 @@ describe UsersController do
 
       it "matches query to course code" do
         course_code = "BIO 12239"
-        course_with_teacher(:course_name => "Biology", :user => @teacher, :active_all => 1)
+        course_with_teacher(course_name: "Biology", user: @teacher, active_all: 1)
         @course.course_code = course_code
         @course.save
-        get 'manageable_courses', params: { :user_id => @teacher.id, :term => course_code }
+        get 'manageable_courses', params: { user_id: @teacher.id, term: course_code }
         expect(response).to be_successful
         courses = json_parse
         expect(courses.map { |c| c['course_code'] }).to eq [course_code]
@@ -382,21 +382,21 @@ describe UsersController do
 
     context "concluded courses" do
       before do
-        course_with_teacher_logged_in(:course_name => "MyCourse1", :active_all => 1)
+        course_with_teacher_logged_in(course_name: "MyCourse1", active_all: 1)
         course1 = @course
         course1.workflow_state = 'completed'
         course1.save!
 
         past_term = EnrollmentTerm.create(start_at: 14.days.ago, end_at: 7.days.ago, root_account: @teacher.account)
-        course_with_teacher(:course_name => "MyCourse2", :user => @teacher, :active_all => 1, :enrollment_term_id => past_term.id)
+        course_with_teacher(course_name: "MyCourse2", user: @teacher, active_all: 1, enrollment_term_id: past_term.id)
 
-        course_with_teacher(:course_name => "MyOldCourse", :user => @teacher, :active_all => 1, :enrollment_term_id => past_term.id)
+        course_with_teacher(course_name: "MyOldCourse", user: @teacher, active_all: 1, enrollment_term_id: past_term.id)
 
-        course_with_teacher(:course_name => "MyCourse3", :user => @teacher, :active_all => 1)
+        course_with_teacher(course_name: "MyCourse3", user: @teacher, active_all: 1)
       end
 
       it "does not include soft or hard concluded courses for teachers" do
-        get 'manageable_courses', params: { :user_id => @teacher.id, :term => "MyCourse" }
+        get 'manageable_courses', params: { user_id: @teacher.id, term: "MyCourse" }
         expect(response).to be_successful
         courses = json_parse
         expect(courses.map { |c| c['id'] }).to eq [@course.id]
@@ -406,20 +406,20 @@ describe UsersController do
         account_admin_user
         user_session(@admin)
 
-        get 'manageable_courses', params: { :user_id => @admin.id, :term => "MyCourse" }
+        get 'manageable_courses', params: { user_id: @admin.id, term: "MyCourse" }
         expect(response).to be_successful
         courses = json_parse
         expect(courses.map { |c| c['id'] }).to eq [@course.id]
       end
 
       it "does not include courses that an admin doesn't have rights to see when passing include = 'concluded'" do
-        @role1 = custom_account_role('subadmin', :account => Account.default)
-        account_admin_user_with_role_changes(:role => @role1, :role_changes => { :manage_content => true })
+        @role1 = custom_account_role('subadmin', account: Account.default)
+        account_admin_user_with_role_changes(role: @role1, role_changes: { manage_content: true })
         user_session(@admin)
 
-        course_with_teacher(:course_name => "MyAdminCourse", :active_all => true, :user => @admin)
+        course_with_teacher(course_name: "MyAdminCourse", active_all: true, user: @admin)
 
-        get 'manageable_courses', params: { :user_id => @admin.id, :include => 'concluded' }
+        get 'manageable_courses', params: { user_id: @admin.id, include: 'concluded' }
         expect(response).to be_successful
         courses = json_parse
 
@@ -427,7 +427,7 @@ describe UsersController do
       end
 
       it "includes concluded courses for teachers when passing include = 'concluded'" do
-        get 'manageable_courses', params: { :user_id => @teacher.id, :include => 'concluded' }
+        get 'manageable_courses', params: { user_id: @teacher.id, include: 'concluded' }
         expect(response).to be_successful
         courses = json_parse
 
@@ -438,7 +438,7 @@ describe UsersController do
         account_admin_user
         user_session(@admin)
 
-        get 'manageable_courses', params: { :user_id => @admin.id, :include => 'concluded' }
+        get 'manageable_courses', params: { user_id: @admin.id, include: 'concluded' }
         expect(response).to be_successful
         courses = json_parse
 
@@ -452,7 +452,7 @@ describe UsersController do
         my_old_course.conclude_at = 2.weeks.from_now
         my_old_course.save!
 
-        get 'manageable_courses', params: { :user_id => @teacher.id }
+        get 'manageable_courses', params: { user_id: @teacher.id }
         expect(response).to be_successful
         courses = json_parse
         expect(courses.map { |c| c['course_code'] }).to include('MyOldCourse')
@@ -468,7 +468,7 @@ describe UsersController do
         account_admin_user
         user_session(@admin)
 
-        get 'manageable_courses', params: { :user_id => @admin.id }
+        get 'manageable_courses', params: { user_id: @admin.id }
         expect(response).to be_successful
         courses = json_parse
         expect(courses.map { |c| c['course_code'] }).to include('MyOldCourse')
@@ -479,14 +479,14 @@ describe UsersController do
       specs_require_sharding
 
       it "is able to find courses on other shards" do
-        course_with_teacher_logged_in(:course_name => "Blah", :active_all => 1)
+        course_with_teacher_logged_in(course_name: "Blah", active_all: 1)
         @shard1.activate do
           @other_account = Account.create
-          @cs_course = @other_account.courses.create!(:name => "A cross shard course", :workflow_state => "available")
-          @cs_course.enroll_user(@teacher, "TeacherEnrollment", :enrollment_state => "active")
+          @cs_course = @other_account.courses.create!(name: "A cross shard course", workflow_state: "available")
+          @cs_course.enroll_user(@teacher, "TeacherEnrollment", enrollment_state: "active")
         end
 
-        get 'manageable_courses', params: { :user_id => @teacher.id }
+        get 'manageable_courses', params: { user_id: @teacher.id }
         # should sort the cross-shard course before the current shard one
         expect(json_parse.map { |c| c['label'] }).to eq [@cs_course.name, @course.name]
       end
@@ -495,7 +495,7 @@ describe UsersController do
 
   describe "POST 'create'" do
     it "does not allow creating when self_registration is disabled and you're not an admin'" do
-      post 'create', params: { :pseudonym => { :unique_id => 'jacob@instructure.com' }, :user => { :name => 'Jacob Fugal' } }
+      post 'create', params: { pseudonym: { unique_id: 'jacob@instructure.com' }, user: { name: 'Jacob Fugal' } }
       expect(response).not_to be_successful
     end
 
@@ -510,7 +510,7 @@ describe UsersController do
         end
 
         it "does not allow teachers to self register" do
-          post 'create', params: { :pseudonym => { :unique_id => 'jane@example.com' }, :user => { :name => 'Jane Teacher', :terms_of_use => '1', :initial_enrollment_type => 'teacher' } }, format: 'json'
+          post 'create', params: { pseudonym: { unique_id: 'jane@example.com' }, user: { name: 'Jane Teacher', terms_of_use: '1', initial_enrollment_type: 'teacher' } }, format: 'json'
           assert_status(403)
         end
 
@@ -518,16 +518,16 @@ describe UsersController do
           course_factory(active_all: true)
           @course.update_attribute(:self_enrollment, true)
 
-          post 'create', params: { :pseudonym => { :unique_id => 'jane@example.com', :password => 'lolwut12', :password_confirmation => 'lolwut12' }, :user => { :name => 'Jane Student', :terms_of_use => '1', :self_enrollment_code => @course.self_enrollment_code, :initial_enrollment_type => 'student' }, :pseudonym_type => 'username', :self_enrollment => '1' }, format: 'json'
+          post 'create', params: { pseudonym: { unique_id: 'jane@example.com', password: 'lolwut12', password_confirmation: 'lolwut12' }, user: { name: 'Jane Student', terms_of_use: '1', self_enrollment_code: @course.self_enrollment_code, initial_enrollment_type: 'student' }, pseudonym_type: 'username', self_enrollment: '1' }, format: 'json'
           assert_status(403)
         end
 
         it "allows observers to self register" do
-          user_with_pseudonym(:active_all => true, :password => 'lolwut12')
-          course_with_student(:user => @user, :active_all => true)
+          user_with_pseudonym(active_all: true, password: 'lolwut12')
+          course_with_student(user: @user, active_all: true)
           pairing_code = @student.generate_observer_pairing_code
 
-          post 'create', params: { :pseudonym => { :unique_id => 'jane@example.com' }, :pairing_code => { code: pairing_code.code }, :user => { :name => 'Jane Observer', :terms_of_use => '1', :initial_enrollment_type => 'observer' } }, format: 'json'
+          post 'create', params: { pseudonym: { unique_id: 'jane@example.com' }, pairing_code: { code: pairing_code.code }, user: { name: 'Jane Observer', terms_of_use: '1', initial_enrollment_type: 'observer' } }, format: 'json'
           expect(response).to be_successful
           new_pseudo = Pseudonym.where(unique_id: 'jane@example.com').first
           new_user = new_pseudo.user
@@ -611,8 +611,8 @@ describe UsersController do
           allow(redis).to receive(:setex)
           allow(redis).to receive(:hmget)
           allow(redis).to receive(:del)
-          allow(Canvas).to receive_messages(:redis => redis)
-          key = DeveloperKey.create! :redirect_uri => 'https://example.com'
+          allow(Canvas).to receive_messages(redis: redis)
+          key = DeveloperKey.create! redirect_uri: 'https://example.com'
           provider = Canvas::OAuth::Provider.new(key.id, key.redirect_uri, [], nil)
 
           course_with_student
@@ -648,7 +648,7 @@ describe UsersController do
       end
 
       it "creates a pre_registered user" do
-        post 'create', params: { :pseudonym => { :unique_id => 'jacob@instructure.com' }, :user => { :name => 'Jacob Fugal', :terms_of_use => '1' } }
+        post 'create', params: { pseudonym: { unique_id: 'jacob@instructure.com' }, user: { name: 'Jacob Fugal', terms_of_use: '1' } }
         expect(response).to be_successful
 
         p = Pseudonym.where(unique_id: 'jacob@instructure.com').first
@@ -663,7 +663,7 @@ describe UsersController do
       end
 
       it "marks user as having accepted the terms of use if specified" do
-        post 'create', params: { :pseudonym => { :unique_id => 'jacob@instructure.com' }, :user => { :name => 'Jacob Fugal', :terms_of_use => '1' } }
+        post 'create', params: { pseudonym: { unique_id: 'jacob@instructure.com' }, user: { name: 'Jacob Fugal', terms_of_use: '1' } }
         json = JSON.parse(response.body)
         accepted_terms = json["user"]["user"]["preferences"]["accepted_terms"]
         expect(response).to be_successful
@@ -677,9 +677,9 @@ describe UsersController do
           .and_return(true)
 
         post 'create', params: {
-          :pseudonym => { :unique_id => 'jacob@instructure.com' },
-          :user => { :name => 'Jacob Fugal', :terms_of_use => '1' },
-          :communication_channel => { :confirmation_redirect => 'https://benevolent.place' }
+          pseudonym: { unique_id: 'jacob@instructure.com' },
+          user: { name: 'Jacob Fugal', terms_of_use: '1' },
+          communication_channel: { confirmation_redirect: 'https://benevolent.place' }
         }
         expect(response).to be_successful
         expect(CommunicationChannel.last.confirmation_redirect).to eq('https://benevolent.place')
@@ -691,9 +691,9 @@ describe UsersController do
           .and_return(false)
 
         post 'create', params: {
-          :pseudonym => { :unique_id => 'jacob@instructure.com' },
-          :user => { :name => 'Jacob Fugal', :terms_of_use => '1' },
-          :communication_channel => { :confirmation_redirect => 'https://nasty.place' }
+          pseudonym: { unique_id: 'jacob@instructure.com' },
+          user: { name: 'Jacob Fugal', terms_of_use: '1' },
+          communication_channel: { confirmation_redirect: 'https://nasty.place' }
         }
         expect(response).to be_successful
         expect(CommunicationChannel.last.confirmation_redirect).to be_nil
@@ -701,8 +701,8 @@ describe UsersController do
 
       it "creates a registered user if the skip_registration flag is passed in" do
         post('create', params: {
-               :pseudonym => { :unique_id => 'jacob@instructure.com' },
-               :user => { :name => 'Jacob Fugal', :terms_of_use => '1', :skip_registration => '1' }
+               pseudonym: { unique_id: 'jacob@instructure.com' },
+               user: { name: 'Jacob Fugal', terms_of_use: '1', skip_registration: '1' }
              })
         expect(response).to be_successful
 
@@ -718,8 +718,8 @@ describe UsersController do
 
       it "complains about conflicting unique_ids" do
         u = User.create! { |user| user.workflow_state = 'registered' }
-        p = u.pseudonyms.create!(:unique_id => 'jacob@instructure.com')
-        post 'create', params: { :pseudonym => { :unique_id => 'jacob@instructure.com' }, :user => { :name => 'Jacob Fugal', :terms_of_use => '1' } }
+        p = u.pseudonyms.create!(unique_id: 'jacob@instructure.com')
+        post 'create', params: { pseudonym: { unique_id: 'jacob@instructure.com' }, user: { name: 'Jacob Fugal', terms_of_use: '1' } }
         assert_status(400)
         json = JSON.parse(response.body)
         expect(json["errors"]["pseudonym"]["unique_id"]).to be_present
@@ -732,7 +732,7 @@ describe UsersController do
         cc2 = communication_channel(user2, { username: 'jacob@instructure.com', cc_state: 'confirmed' })
         cc3 = communication_channel(user3, { username: 'jacob@instructure.com', cc_state: 'retired' })
 
-        post 'create', params: { :pseudonym => { :unique_id => 'jacob@instructure.com' }, :user => { :name => 'Jacob Fugal', :terms_of_use => '1' } }
+        post 'create', params: { pseudonym: { unique_id: 'jacob@instructure.com' }, user: { name: 'Jacob Fugal', terms_of_use: '1' } }
         expect(response).to be_successful
 
         p = Pseudonym.where(unique_id: 'jacob@instructure.com').first
@@ -747,8 +747,8 @@ describe UsersController do
 
       it "re-uses 'conflicting' unique_ids if it hasn't been fully registered yet" do
         u = User.create!(workflow_state: "creation_pending")
-        p = Pseudonym.create!(:unique_id => 'jacob@instructure.com', :user => u)
-        post 'create', params: { :pseudonym => { :unique_id => 'jacob@instructure.com' }, :user => { :name => 'Jacob Fugal', :terms_of_use => '1' } }
+        p = Pseudonym.create!(unique_id: 'jacob@instructure.com', user: u)
+        post 'create', params: { pseudonym: { unique_id: 'jacob@instructure.com' }, user: { name: 'Jacob Fugal', terms_of_use: '1' } }
         expect(response).to be_successful
 
         expect(Pseudonym.by_unique_id('jacob@instructure.com')).to eq [p]
@@ -760,13 +760,13 @@ describe UsersController do
         expect(p.user.communication_channels.first).to be_unconfirmed
         expect(p.user.communication_channels.first.path).to eq 'jacob@instructure.com'
 
-        post 'create', params: { :pseudonym => { :unique_id => 'jacob@instructure.com' }, :user => { :name => 'Jacob Fugal', :terms_of_use => '1' } }
+        post 'create', params: { pseudonym: { unique_id: 'jacob@instructure.com' }, user: { name: 'Jacob Fugal', terms_of_use: '1' } }
         expect(response).not_to be_successful
       end
 
       it "validates acceptance of the terms" do
         Account.default.create_terms_of_service!(terms_type: "default", passive: false)
-        post 'create', params: { :pseudonym => { :unique_id => 'jacob@instructure.com' }, :user => { :name => 'Jacob Fugal' } }
+        post 'create', params: { pseudonym: { unique_id: 'jacob@instructure.com' }, user: { name: 'Jacob Fugal' } }
         assert_status(400)
         json = JSON.parse(response.body)
         expect(json["errors"]["user"]["terms_of_use"]).to be_present
@@ -774,7 +774,7 @@ describe UsersController do
 
       it "does not validate acceptance of the terms if terms are passive" do
         Account.default.create_terms_of_service!(terms_type: "default")
-        post 'create', params: { :pseudonym => { :unique_id => 'jacob@instructure.com' }, :user => { :name => 'Jacob Fugal' } }
+        post 'create', params: { pseudonym: { unique_id: 'jacob@instructure.com' }, user: { name: 'Jacob Fugal' } }
         expect(response).to be_successful
       end
 
@@ -783,33 +783,33 @@ describe UsersController do
         Account.default.create_terms_of_service!(terms_type: "default")
         default_account.save!
 
-        post 'create', params: { :pseudonym => { :unique_id => 'jacob@instructure.com' }, :user => { :name => 'Jacob Fugal' } }
+        post 'create', params: { pseudonym: { unique_id: 'jacob@instructure.com' }, user: { name: 'Jacob Fugal' } }
         expect(response).to be_successful
       end
 
       it "requires email pseudonyms by default" do
-        post 'create', params: { :pseudonym => { :unique_id => 'jacob' }, :user => { :name => 'Jacob Fugal', :terms_of_use => '1' } }
+        post 'create', params: { pseudonym: { unique_id: 'jacob' }, user: { name: 'Jacob Fugal', terms_of_use: '1' } }
         assert_status(400)
         json = JSON.parse(response.body)
         expect(json["errors"]["pseudonym"]["unique_id"]).to be_present
       end
 
       it "requires email pseudonyms if not self enrolling" do
-        post 'create', params: { :pseudonym => { :unique_id => 'jacob' }, :user => { :name => 'Jacob Fugal', :terms_of_use => '1' }, :pseudonym_type => 'username' }
+        post 'create', params: { pseudonym: { unique_id: 'jacob' }, user: { name: 'Jacob Fugal', terms_of_use: '1' }, pseudonym_type: 'username' }
         assert_status(400)
         json = JSON.parse(response.body)
         expect(json["errors"]["pseudonym"]["unique_id"]).to be_present
       end
 
       it "validates the self enrollment code" do
-        post 'create', params: { :pseudonym => { :unique_id => 'jacob@instructure.com', :password => 'asdfasdf', :password_confirmation => 'asdfasdf' }, :user => { :name => 'Jacob Fugal', :terms_of_use => '1', :self_enrollment_code => 'omg ... not valid', :initial_enrollment_type => 'student' }, :self_enrollment => '1' }
+        post 'create', params: { pseudonym: { unique_id: 'jacob@instructure.com', password: 'asdfasdf', password_confirmation: 'asdfasdf' }, user: { name: 'Jacob Fugal', terms_of_use: '1', self_enrollment_code: 'omg ... not valid', initial_enrollment_type: 'student' }, self_enrollment: '1' }
         assert_status(400)
         json = JSON.parse(response.body)
         expect(json["errors"]["user"]["self_enrollment_code"]).to be_present
       end
 
       it "ignores the password if not self enrolling" do
-        post 'create', params: { :pseudonym => { :unique_id => 'jacob@instructure.com', :password => 'asdfasdf', :password_confirmation => 'asdfasdf' }, :user => { :name => 'Jacob Fugal', :terms_of_use => '1', :initial_enrollment_type => 'student' } }
+        post 'create', params: { pseudonym: { unique_id: 'jacob@instructure.com', password: 'asdfasdf', password_confirmation: 'asdfasdf' }, user: { name: 'Jacob Fugal', terms_of_use: '1', initial_enrollment_type: 'student' } }
         expect(response).to be_successful
         u = User.where(name: 'Jacob Fugal').first
         expect(u).to be_pre_registered
@@ -824,7 +824,7 @@ describe UsersController do
         end
 
         it "strips the self enrollment code before validation" do
-          post 'create', params: { :pseudonym => { :unique_id => 'jacob@instructure.com', :password => 'asdfasdf', :password_confirmation => 'asdfasdf' }, :user => { :name => 'Jacob Fugal', :terms_of_use => '1', :self_enrollment_code => @course.self_enrollment_code + ' ', :initial_enrollment_type => 'student' }, :self_enrollment => '1' }
+          post 'create', params: { pseudonym: { unique_id: 'jacob@instructure.com', password: 'asdfasdf', password_confirmation: 'asdfasdf' }, user: { name: 'Jacob Fugal', terms_of_use: '1', self_enrollment_code: @course.self_enrollment_code + ' ', initial_enrollment_type: 'student' }, self_enrollment: '1' }
           expect(response).to be_successful
         end
 
@@ -838,7 +838,7 @@ describe UsersController do
         end
 
         it "ignores the password if self enrolling with an email pseudonym" do
-          post 'create', params: { :pseudonym => { :unique_id => 'jacob@instructure.com', :password => 'asdfasdf', :password_confirmation => 'asdfasdf' }, :user => { :name => 'Jacob Fugal', :terms_of_use => '1', :self_enrollment_code => @course.self_enrollment_code, :initial_enrollment_type => 'student' }, :pseudonym_type => 'email', :self_enrollment => '1' }
+          post 'create', params: { pseudonym: { unique_id: 'jacob@instructure.com', password: 'asdfasdf', password_confirmation: 'asdfasdf' }, user: { name: 'Jacob Fugal', terms_of_use: '1', self_enrollment_code: @course.self_enrollment_code, initial_enrollment_type: 'student' }, pseudonym_type: 'email', self_enrollment: '1' }
           expect(response).to be_successful
           u = User.where(name: 'Jacob Fugal').first
           expect(u).to be_pre_registered
@@ -846,7 +846,7 @@ describe UsersController do
         end
 
         it "requires a password if self enrolling with a non-email pseudonym" do
-          post 'create', params: { :pseudonym => { :unique_id => 'jacob' }, :user => { :name => 'Jacob Fugal', :terms_of_use => '1', :self_enrollment_code => @course.self_enrollment_code, :initial_enrollment_type => 'student' }, :pseudonym_type => 'username', :self_enrollment => '1' }
+          post 'create', params: { pseudonym: { unique_id: 'jacob' }, user: { name: 'Jacob Fugal', terms_of_use: '1', self_enrollment_code: @course.self_enrollment_code, initial_enrollment_type: 'student' }, pseudonym_type: 'username', self_enrollment: '1' }
           assert_status(400)
           json = JSON.parse(response.body)
           expect(json["errors"]["pseudonym"]["password"]).to be_present
@@ -854,7 +854,7 @@ describe UsersController do
         end
 
         it "auto-registers the user if self enrolling" do
-          post 'create', params: { :pseudonym => { :unique_id => 'jacob', :password => 'asdfasdf', :password_confirmation => 'asdfasdf' }, :user => { :name => 'Jacob Fugal', :terms_of_use => '1', :self_enrollment_code => @course.self_enrollment_code, :initial_enrollment_type => 'student' }, :pseudonym_type => 'username', :self_enrollment => '1' }
+          post 'create', params: { pseudonym: { unique_id: 'jacob', password: 'asdfasdf', password_confirmation: 'asdfasdf' }, user: { name: 'Jacob Fugal', terms_of_use: '1', self_enrollment_code: @course.self_enrollment_code, initial_enrollment_type: 'student' }, pseudonym_type: 'username', self_enrollment: '1' }
           expect(response).to be_successful
           u = User.where(name: 'Jacob Fugal').first
           expect(@course.students).to include(u)
@@ -864,10 +864,10 @@ describe UsersController do
       end
 
       it "links the user to the observee" do
-        user = user_with_pseudonym(:active_all => true, :password => 'lolwut12')
+        user = user_with_pseudonym(active_all: true, password: 'lolwut12')
         pairing_code = user.generate_observer_pairing_code
 
-        post 'create', params: { :pseudonym => { :unique_id => 'jacob@instructure.com' }, :pairing_code => { :code => pairing_code.code }, :user => { :name => 'Jacob Fugal', :terms_of_use => '1', :initial_enrollment_type => 'observer' } }
+        post 'create', params: { pseudonym: { unique_id: 'jacob@instructure.com' }, pairing_code: { code: pairing_code.code }, user: { name: 'Jacob Fugal', terms_of_use: '1', initial_enrollment_type: 'observer' } }
         expect(response).to be_successful
         u = User.where(name: 'Jacob Fugal').first
         expect(u).to be_pre_registered
@@ -881,13 +881,13 @@ describe UsersController do
         let!(:account) { Account.create! }
 
         before do
-          user_with_pseudonym(:account => account)
+          user_with_pseudonym(account: account)
           account.account_users.create!(user: @user)
           user_session(@user, @pseudonym)
         end
 
         it "creates a pre_registered user (in the correct account)" do
-          post 'create', params: { :account_id => account.id, :pseudonym => { :unique_id => 'jacob@instructure.com', :sis_user_id => 'testsisid' }, :user => { :name => 'Jacob Fugal' } }, format: 'json'
+          post 'create', params: { account_id: account.id, pseudonym: { unique_id: 'jacob@instructure.com', sis_user_id: 'testsisid' }, user: { name: 'Jacob Fugal' } }, format: 'json'
           expect(response).to be_successful
           p = Pseudonym.where(unique_id: 'jacob@instructure.com').first
           expect(p.account_id).to eq account.id
@@ -928,12 +928,12 @@ describe UsersController do
         end
 
         it "does not require acceptance of the terms" do
-          post 'create', params: { :account_id => account.id, :pseudonym => { :unique_id => 'jacob@instructure.com' }, :user => { :name => 'Jacob Fugal' } }
+          post 'create', params: { account_id: account.id, pseudonym: { unique_id: 'jacob@instructure.com' }, user: { name: 'Jacob Fugal' } }
           expect(response).to be_successful
         end
 
         it "allows setting a password" do
-          post 'create', params: { :account_id => account.id, :pseudonym => { :unique_id => 'jacob@instructure.com', :password => 'asdfasdf', :password_confirmation => 'asdfasdf' }, :user => { :name => 'Jacob Fugal' } }
+          post 'create', params: { account_id: account.id, pseudonym: { unique_id: 'jacob@instructure.com', password: 'asdfasdf', password_confirmation: 'asdfasdf' }, user: { name: 'Jacob Fugal' } }
           u = User.where(name: 'Jacob Fugal').first
           expect(u).to be_present
           expect(u.pseudonym).not_to be_password_auto_generated
@@ -953,18 +953,18 @@ describe UsersController do
         end
 
         it "does not throw a 500 error without user params'" do
-          post 'create', params: { :pseudonym => { :unique_id => 'jacob@instructure.com' }, account_id: account.id }
+          post 'create', params: { pseudonym: { unique_id: 'jacob@instructure.com' }, account_id: account.id }
           expect(response).to be_successful
         end
 
         it "does not throw a 500 error without pseudonym params'" do
-          post 'create', params: { :user => { :name => 'Jacob Fugal' }, account_id: account.id }
+          post 'create', params: { user: { name: 'Jacob Fugal' }, account_id: account.id }
           assert_status(400)
           expect(response).not_to be_successful
         end
 
         it "strips whitespace from the unique_id" do
-          post 'create', params: { :account_id => account.id, :pseudonym => { :unique_id => 'spaceman@example.com ' }, :user => { :name => 'Spaceman' } }, format: 'json'
+          post 'create', params: { account_id: account.id, pseudonym: { unique_id: 'spaceman@example.com ' }, user: { name: 'Spaceman' } }, format: 'json'
           expect(response).to be_successful
           json = JSON.parse(response.body)
           p = Pseudonym.find(json["pseudonym"]["pseudonym"]["id"])
@@ -975,9 +975,9 @@ describe UsersController do
 
       it "does not allow an admin to set the sis id when creating a user if they don't have privileges to manage sis" do
         account = Account.create!
-        admin = account_admin_user_with_role_changes(:account => account, :role_changes => { 'manage_sis' => false })
+        admin = account_admin_user_with_role_changes(account: account, role_changes: { 'manage_sis' => false })
         user_session(admin)
-        post 'create', params: { :account_id => account.id, :pseudonym => { :unique_id => 'jacob@instructure.com', :sis_user_id => 'testsisid' }, :user => { :name => 'Jacob Fugal' } }, format: 'json'
+        post 'create', params: { account_id: account.id, pseudonym: { unique_id: 'jacob@instructure.com', sis_user_id: 'testsisid' }, user: { name: 'Jacob Fugal' } }, format: 'json'
         expect(response).to be_successful
         p = Pseudonym.where(unique_id: 'jacob@instructure.com').first
         expect(p.account_id).to eq account.id
@@ -988,36 +988,36 @@ describe UsersController do
 
       it "notifies the user if a merge opportunity arises" do
         account = Account.create!
-        user_with_pseudonym(:account => account)
+        user_with_pseudonym(account: account)
         account.account_users.create!(user: @user)
         user_session(@user, @pseudonym)
         @admin = @user
 
         u = User.create! { |user| user.workflow_state = 'registered' }
         communication_channel(u, { username: 'jacob@instructure.com', active_cc: true })
-        u.pseudonyms.create!(:unique_id => 'jon@instructure.com')
-        notification = Notification.create(:name => 'Merge Email Communication Channel', :category => 'Registration')
+        u.pseudonyms.create!(unique_id: 'jon@instructure.com')
+        notification = Notification.create(name: 'Merge Email Communication Channel', category: 'Registration')
 
         post 'create', params: {
-          :account_id => account.id,
-          :pseudonym => {
-            :unique_id => 'jacob@instructure.com',
-            :send_confirmation => '0'
+          account_id: account.id,
+          pseudonym: {
+            unique_id: 'jacob@instructure.com',
+            send_confirmation: '0'
           },
-          :user => {
-            :name => 'Jacob Fugal'
+          user: {
+            name: 'Jacob Fugal'
           }
         }, format: 'json'
         expect(response).to be_successful
         p = Pseudonym.where(unique_id: 'jacob@instructure.com').first
-        expect(Message.where(:communication_channel_id => p.user.email_channel, :notification_id => notification).first).to be_present
+        expect(Message.where(communication_channel_id: p.user.email_channel, notification_id: notification).first).to be_present
       end
 
       it "does not notify the user if the merge opportunity can't log in'" do
-        notification = Notification.create(:name => 'Merge Email Communication Channel', :category => 'Registration')
+        notification = Notification.create(name: 'Merge Email Communication Channel', category: 'Registration')
 
         account = Account.create!
-        user_with_pseudonym(:account => account)
+        user_with_pseudonym(account: account)
         account.account_users.create!(user: @user)
         user_session(@user, @pseudonym)
         @admin = @user
@@ -1025,18 +1025,18 @@ describe UsersController do
         u = User.create! { |user| user.workflow_state = 'registered' }
         communication_channel(u, { username: 'jacob@instructure.com', active_cc: true })
         post 'create', params: {
-          :account_id => account.id,
-          :pseudonym => {
-            :unique_id => 'jacob@instructure.com',
-            :send_confirmation => '0'
+          account_id: account.id,
+          pseudonym: {
+            unique_id: 'jacob@instructure.com',
+            send_confirmation: '0'
           },
-          :user => {
-            :name => 'Jacob Fugal'
+          user: {
+            name: 'Jacob Fugal'
           }
         }, format: 'json'
         expect(response).to be_successful
         p = Pseudonym.where(unique_id: 'jacob@instructure.com').first
-        expect(Message.where(:communication_channel_id => p.user.email_channel, :notification_id => notification).first).to be_nil
+        expect(Message.where(communication_channel_id: p.user.email_channel, notification_id: notification).first).to be_nil
       end
     end
   end
@@ -1062,9 +1062,9 @@ describe UsersController do
                body: { "secret" => "test-token", "response" => "invalid-submit-key" }
              )
              .to_return(status: 200, body: {
-               success: false,
-               challenge_ts: Time.zone.now.to_s,
-               hostname: 'canvas.docker',
+               :success => false,
+               :challenge_ts => Time.zone.now.to_s,
+               :hostname => 'canvas.docker',
                "error-codes" => ['invalid-input-response']
              }.to_json)
 
@@ -1073,9 +1073,9 @@ describe UsersController do
                body: { "secret" => "test-token", "response" => nil }
              )
              .to_return(status: 200, body: {
-               success: false,
-               challenge_ts: Time.zone.now.to_s,
-               hostname: 'canvas.docker',
+               :success => false,
+               :challenge_ts => Time.zone.now.to_s,
+               :hostname => 'canvas.docker',
                "error-codes" => ['missing-input-response']
              }.to_json)
       # Fallback for any dynamicsettings call that isn't mocked below
@@ -1860,7 +1860,7 @@ describe UsersController do
       @course2.enroll_designer(@designer).accept!
 
       user_session(@teacher)
-      get 'grades', params: { :course_id => @course.id }
+      get 'grades', params: { course_id: @course.id }
       expect(response).to be_successful
 
       teacher_enrollments = assigns[:presenter].teacher_enrollments
@@ -1883,25 +1883,25 @@ describe UsersController do
     end
 
     it "does not include student view students in the grade average calculation" do
-      course_with_teacher_logged_in(:active_all => true)
-      course_with_teacher(:active_all => true, :user => @teacher)
-      @s1 = student_in_course(:active_user => true).user
-      @s2 = student_in_course(:active_user => true).user
+      course_with_teacher_logged_in(active_all: true)
+      course_with_teacher(active_all: true, user: @teacher)
+      @s1 = student_in_course(active_user: true).user
+      @s2 = student_in_course(active_user: true).user
       @test_student = @course.student_view_student
-      @assignment = assignment_model(:course => @course, :points_possible => 5)
+      @assignment = assignment_model(course: @course, points_possible: 5)
       @assignment.grade_student(@s1, grade: 3, grader: @teacher)
       @assignment.grade_student(@s2, grade: 4, grader: @teacher)
       @assignment.grade_student(@test_student, grade: 5, grader: @teacher)
 
       get 'grades'
-      expect(assigns[:presenter].course_grade_summaries[@course.id]).to eq({ :score => 70, :students => 2 })
+      expect(assigns[:presenter].course_grade_summaries[@course.id]).to eq({ score: 70, students: 2 })
     end
 
     context 'across shards' do
       specs_require_sharding
 
       it 'loads courses from all shards' do
-        course_with_teacher_logged_in :active_all => true
+        course_with_teacher_logged_in active_all: true
         @shard1.activate do
           account = Account.create!
           course = account.courses.create!
@@ -1919,29 +1919,29 @@ describe UsersController do
 
   describe "GET 'avatar_image'" do
     it "redirects to no-pic if avatars are disabled" do
-      course_with_student_logged_in(:active_all => true)
-      get 'avatar_image', params: { :user_id => @user.id }
+      course_with_student_logged_in(active_all: true)
+      get 'avatar_image', params: { user_id: @user.id }
       expect(response).to redirect_to User.default_avatar_fallback
     end
 
     it "redirects to avatar silhouette if no avatar is set and avatars are enabled" do
-      course_with_student_logged_in(:active_all => true)
+      course_with_student_logged_in(active_all: true)
       @account = Account.default
       @account.enable_service(:avatars)
       @account.settings[:avatars] = 'enabled_pending'
       @account.save!
       expect(@account.service_enabled?(:avatars)).to be_truthy
-      get 'avatar_image', params: { :user_id => @user.id }
+      get 'avatar_image', params: { user_id: @user.id }
       expect(response).to redirect_to User.default_avatar_fallback
     end
 
     it "passes along the default fallback to placeholder image" do
-      course_with_student_logged_in(:active_all => true)
+      course_with_student_logged_in(active_all: true)
       @account = Account.default
       @account.enable_service(:avatars)
       @account.save!
       expect(@account.service_enabled?(:avatars)).to be_truthy
-      get 'avatar_image', params: { :user_id => @user.id }
+      get 'avatar_image', params: { user_id: @user.id }
       expect(response).to redirect_to "http://test.host/images/messages/avatar-50.png"
     end
 
@@ -1950,7 +1950,7 @@ describe UsersController do
       @account.enable_service(:avatars)
       @account.save!
       expect(@account.service_enabled?(:avatars)).to be_truthy
-      get 'avatar_image', params: { :user_id => 'a' }
+      get 'avatar_image', params: { user_id: 'a' }
       expect(response).to redirect_to 'http://test.host/images/messages/avatar-50.png'
     end
 
@@ -1959,26 +1959,26 @@ describe UsersController do
       @account.enable_service(:avatars)
       @account.save!
       expect(@account.service_enabled?(:avatars)).to be_truthy
-      get 'avatar_image', params: { :user_id => 'a-1' }
+      get 'avatar_image', params: { user_id: 'a-1' }
       expect(response).to redirect_to 'http://test.host/images/messages/avatar-50.png'
     end
   end
 
   describe "GET 'public_feed.atom'" do
     before do
-      course_with_student(:active_all => true)
-      @as = assignment_model(:course => @course)
-      @dt = @course.discussion_topics.create!(:title => "hi", :message => "blah", :user => @student)
-      @wp = wiki_page_model(:course => @course)
+      course_with_student(active_all: true)
+      @as = assignment_model(course: @course)
+      @dt = @course.discussion_topics.create!(title: "hi", message: "blah", user: @student)
+      @wp = wiki_page_model(course: @course)
     end
 
     it "requires authorization" do
-      get 'public_feed', params: { :feed_code => @user.feed_code + 'x' }, format: 'atom'
+      get 'public_feed', params: { feed_code: @user.feed_code + 'x' }, format: 'atom'
       expect(assigns[:problem]).to match(/The verification code is invalid/)
     end
 
     it "includes absolute path for rel='self' link" do
-      get 'public_feed', params: { :feed_code => @user.feed_code }, format: 'atom'
+      get 'public_feed', params: { feed_code: @user.feed_code }, format: 'atom'
       feed = Atom::Feed.load_feed(response.body) rescue nil
       expect(feed).not_to be_nil
       expect(feed.links.first.rel).to match(/self/)
@@ -1986,7 +1986,7 @@ describe UsersController do
     end
 
     it "includes an author for each entry" do
-      get 'public_feed', params: { :feed_code => @user.feed_code }, format: 'atom'
+      get 'public_feed', params: { feed_code: @user.feed_code }, format: 'atom'
       feed = Atom::Feed.load_feed(response.body) rescue nil
       expect(feed).not_to be_nil
       expect(feed.entries).not_to be_empty
@@ -1994,7 +1994,7 @@ describe UsersController do
     end
 
     it "excludes unpublished things" do
-      get 'public_feed', params: { :feed_code => @user.feed_code }, format: 'atom'
+      get 'public_feed', params: { feed_code: @user.feed_code }, format: 'atom'
       feed = Atom::Feed.load_feed(response.body) rescue nil
       expect(feed.entries.size).to eq 3
 
@@ -2002,26 +2002,26 @@ describe UsersController do
       @wp.unpublish
       @dt.unpublish! # yes, you really have to shout to unpublish a discussion topic :(
 
-      get 'public_feed', params: { :feed_code => @user.feed_code }, format: 'atom'
+      get 'public_feed', params: { feed_code: @user.feed_code }, format: 'atom'
       feed = Atom::Feed.load_feed(response.body) rescue nil
       expect(feed.entries.size).to eq 0
     end
 
     it "respects overrides" do
-      @other_section = @course.course_sections.create! :name => 'other section'
-      @as2 = assignment_model(:title => 'not for you', :course => @course, :only_visible_to_overrides => true)
+      @other_section = @course.course_sections.create! name: 'other section'
+      @as2 = assignment_model(title: 'not for you', course: @course, only_visible_to_overrides: true)
       create_section_override_for_assignment(@as2, { course_section: @other_section })
       graded_discussion_topic(context: @course)
       create_section_override_for_assignment(@topic.assignment, { course_section: @other_section })
       @topic.assignment.update_attribute :only_visible_to_overrides, true
 
-      get 'public_feed', params: { :feed_code => @user.feed_code }, format: 'atom'
+      get 'public_feed', params: { feed_code: @user.feed_code }, format: 'atom'
       feed = Atom::Feed.load_feed(response.body) rescue nil
       expect(feed.entries.map(&:id).join(" ")).not_to include @as2.asset_string
       expect(feed.entries.map(&:id).join(" ")).not_to include @topic.asset_string
 
       @course.enroll_student(@student, section: @other_section, enrollment_state: 'active', allow_multiple_enrollments: true)
-      get 'public_feed', params: { :feed_code => @user.feed_code }, format: 'atom'
+      get 'public_feed', params: { feed_code: @user.feed_code }, format: 'atom'
       feed = Atom::Feed.load_feed(response.body) rescue nil
       expect(feed.entries.map(&:id).join(" ")).to include @as2.asset_string
       expect(feed.entries.map(&:id).join(" ")).to include @topic.asset_string
@@ -2042,22 +2042,22 @@ describe UsersController do
       it 'warns about merging a user with itself' do
         user = User.create!
         pseudonym(user)
-        get 'admin_merge', params: { :user_id => user.id, :pending_user_id => user.id }
+        get 'admin_merge', params: { user_id: user.id, pending_user_id: user.id }
         expect(flash[:error]).to eq 'You can\'t merge an account with itself.'
       end
 
       it 'does not issue warning if the users are different' do
         user = User.create!
         other_user = User.create!
-        get 'admin_merge', params: { :user_id => user.id, :pending_user_id => other_user.id }
+        get 'admin_merge', params: { user_id: user.id, pending_user_id: other_user.id }
         expect(flash[:error]).to be_nil
       end
     end
 
     it "does not allow you to view any user by id" do
       pseudonym(@admin)
-      user_with_pseudonym(:account => account)
-      get 'admin_merge', params: { :user_id => @admin.id, :pending_user_id => @user.id }
+      user_with_pseudonym(account: account)
+      get 'admin_merge', params: { user_id: @admin.id, pending_user_id: @user.id }
       expect(response).to be_successful
       expect(assigns[:pending_other_user]).to be_nil
     end
@@ -2073,7 +2073,7 @@ describe UsersController do
       user2 = user_with_pseudonym
       UserMerge.from(user2).into user1
       user_session(@admin)
-      get 'admin_split', params: { :user_id => user1.id }
+      get 'admin_split', params: { user_id: user1.id }
       expect(assigns[:js_env][:ADMIN_SPLIT_URL]).to include "/api/v1/users/#{user1.id}/split"
       expect(assigns[:js_env][:ADMIN_SPLIT_USER][:id]).to eq user1.id
       expect(assigns[:js_env][:ADMIN_SPLIT_USERS].pluck(:id)).to eq([user2.id])
@@ -2085,23 +2085,23 @@ describe UsersController do
       specs_require_sharding
 
       it "includes enrollments from all shards for the actual user" do
-        course_with_teacher(:active_all => 1)
+        course_with_teacher(active_all: 1)
         @shard1.activate do
           account = Account.create!
           course = account.courses.create!
           @e2 = course.enroll_teacher(@teacher)
         end
-        account_admin_user(:user => @teacher)
+        account_admin_user(user: @teacher)
         user_session(@teacher)
 
-        get 'show', params: { :id => @teacher.id }
+        get 'show', params: { id: @teacher.id }
         expect(response).to be_successful
         expect(assigns[:enrollments].sort_by(&:id)).to eq [@enrollment, @e2]
       end
 
       it "includes enrollments from all shards for trusted account admins" do
         skip "granting read permissions to trusted accounts"
-        course_with_teacher(:active_all => 1)
+        course_with_teacher(active_all: 1)
         @shard1.activate do
           account = Account.create!
           course = account.courses.create!
@@ -2110,29 +2110,29 @@ describe UsersController do
         account_admin_user
         user_session(@user)
 
-        get 'show', params: { :id => @teacher.id }
+        get 'show', params: { id: @teacher.id }
         expect(response).to be_successful
         expect(assigns[:enrollments].sort_by(&:id)).to eq [@enrollment, @e2]
       end
     end
 
     it "does not let admins see enrollments from other accounts" do
-      @enrollment1 = course_with_teacher(:active_all => 1)
-      @enrollment2 = course_with_teacher(:active_all => 1, :user => @user)
+      @enrollment1 = course_with_teacher(active_all: 1)
+      @enrollment2 = course_with_teacher(active_all: 1, user: @user)
 
-      other_root_account = Account.create!(:name => 'other')
-      @enrollment3 = course_with_teacher(:active_all => 1, :user => @user, :account => other_root_account)
+      other_root_account = Account.create!(name: 'other')
+      @enrollment3 = course_with_teacher(active_all: 1, user: @user, account: other_root_account)
 
       account_admin_user
       user_session(@admin)
 
-      get 'show', params: { :id => @teacher.id }
+      get 'show', params: { id: @teacher.id }
       expect(response).to be_successful
       expect(assigns[:enrollments].sort_by(&:id)).to eq [@enrollment1, @enrollment2]
     end
 
     it "401s on a deleted user" do
-      course_with_teacher(:active_all => 1)
+      course_with_teacher(active_all: 1)
 
       account_admin_user
       user_session(@admin)
@@ -2144,7 +2144,7 @@ describe UsersController do
     end
 
     it "404s, but still shows, on a deleted user for site admins" do
-      course_with_teacher(:active_all => 1)
+      course_with_teacher(active_all: 1)
 
       account_admin_user(account: Account.site_admin)
       user_session(@admin)
@@ -2157,11 +2157,11 @@ describe UsersController do
 
     it "responds to JSON request" do
       account = Account.create!
-      course_with_student(:active_all => true, :account => account)
-      account_admin_user(:account => account)
-      user_with_pseudonym(:user => @admin, :account => account)
+      course_with_student(active_all: true, account: account)
+      account_admin_user(account: account)
+      user_with_pseudonym(user: @admin, account: account)
       user_session(@admin)
-      get 'show', params: { :id => @student.id }, format: 'json'
+      get 'show', params: { id: @student.id }, format: 'json'
       expect(response).to be_successful
       user = json_parse
       expect(user['name']).to eq @student.name
@@ -2198,10 +2198,10 @@ describe UsersController do
 
   describe "PUT 'update'" do
     it "does not leak information about arbitrary users" do
-      other_user = User.create! :name => 'secret'
+      other_user = User.create! name: 'secret'
       user_with_pseudonym
       user_session(@user)
-      put 'update', params: { :id => other_user.id }, format: 'json'
+      put 'update', params: { id: other_user.id }, format: 'json'
       expect(response.body).not_to include 'secret'
       expect(response.status).to eq 401
     end
@@ -2309,7 +2309,7 @@ describe UsersController do
 
     before do
       account = Account.create!
-      course_with_student(:active_all => true, :account => account)
+      course_with_student(active_all: true, account: account)
       user_session(@student)
     end
 
@@ -2385,13 +2385,13 @@ describe UsersController do
     end
 
     it "finds ungraded submissions but not if the assignment is deleted" do
-      course_with_teacher_logged_in(:active_all => true)
-      student_in_course(:active_all => true)
+      course_with_teacher_logged_in(active_all: true)
+      student_in_course(active_all: true)
 
-      a1 = @course.assignments.create!(:title => "a1", :submission_types => "online_text_entry")
-      s1 = a1.submit_homework(@student, :body => "blah1")
-      a2 = @course.assignments.create!(:title => "a2", :submission_types => "online_text_entry")
-      a2.submit_homework(@student, :body => "blah2")
+      a1 = @course.assignments.create!(title: "a1", submission_types: "online_text_entry")
+      s1 = a1.submit_homework(@student, body: "blah1")
+      a2 = @course.assignments.create!(title: "a2", submission_types: "online_text_entry")
+      a2.submit_homework(@student, body: "blah2")
       a2.destroy!
 
       get 'teacher_activity', params: { user_id: @teacher.id, course_id: @course.id }
@@ -2424,12 +2424,12 @@ describe UsersController do
     end
 
     it 'sets the proper user preference on PUT requests' do
-      put :dashboard_view, params: { :dashboard_view => 'cards' }
+      put :dashboard_view, params: { dashboard_view: 'cards' }
       expect(@user.dashboard_view).to eql('cards')
     end
 
     it 'does not allow arbitrary values to be set' do
-      put :dashboard_view, params: { :dashboard_view => 'a non-whitelisted value' }
+      put :dashboard_view, params: { dashboard_view: 'a non-whitelisted value' }
       assert_status(400)
     end
   end
@@ -2440,65 +2440,65 @@ describe UsersController do
         a.settings[:open_registration] = true
         a.save!
       end
-      course_with_student_logged_in(:active_all => true)
+      course_with_student_logged_in(active_all: true)
 
-      post 'invite_users', params: { :course_id => @course.id }
+      post 'invite_users', params: { course_id: @course.id }
 
       assert_unauthorized
     end
 
     it 'does not work without open registration or manage_user_logins rights' do
-      course_with_teacher_logged_in(:active_all => true)
+      course_with_teacher_logged_in(active_all: true)
 
-      post 'invite_users', params: { :course_id => @course.id }
+      post 'invite_users', params: { course_id: @course.id }
 
       assert_unauthorized
     end
 
     it 'works with an admin with manage_login_rights' do
       course_factory
-      account_admin_user(:active_all => true)
+      account_admin_user(active_all: true)
       user_session(@user)
 
-      post 'invite_users', params: { :course_id => @course.id }
+      post 'invite_users', params: { course_id: @course.id }
       expect(response).to be_successful # yes, even though we didn't do anything
     end
 
     it 'works with a teacher with open_registration' do
       allow_any_instantiation_of(Account.default).to receive(:open_registration?).and_return(true)
-      course_with_teacher_logged_in(:active_all => true)
+      course_with_teacher_logged_in(active_all: true)
 
-      post 'invite_users', params: { :course_id => @course.id }
+      post 'invite_users', params: { course_id: @course.id }
       expect(response).to be_successful
     end
 
     it 'invites a bunch of users' do
       allow_any_instantiation_of(Account.default).to receive(:open_registration?).and_return(true)
-      course_with_teacher_logged_in(:active_all => true)
+      course_with_teacher_logged_in(active_all: true)
 
       user_list = [{ 'email' => 'example1@example.com' }, { 'email' => 'example2@example.com', 'name' => 'Hurp Durp' }]
 
-      post 'invite_users', params: { :course_id => @course.id, :users => user_list }
+      post 'invite_users', params: { course_id: @course.id, users: user_list }
       expect(response).to be_successful
       json = JSON.parse(response.body)
       expect(json['invited_users'].count).to eq 2
 
-      new_user1 = User.where(:name => 'example1@example.com').first
-      new_user2 = User.where(:name => 'Hurp Durp').first
+      new_user1 = User.where(name: 'example1@example.com').first
+      new_user2 = User.where(name: 'Hurp Durp').first
       expect([new_user1, new_user2].map(&:root_account_ids)).to match_array([[@course.root_account_id], [@course.root_account_id]])
       expect(json['invited_users'].map { |u| u['id'] }).to match_array([new_user1.id, new_user2.id])
       expect(json['invited_users'].map { |u| u['user_token'] }).to match_array([new_user1.token, new_user2.token])
     end
 
     it 'checks for pre-existing users' do
-      existing_user = user_with_pseudonym(:active_all => true, :username => "example1@example.com")
+      existing_user = user_with_pseudonym(active_all: true, username: "example1@example.com")
 
       allow_any_instantiation_of(Account.default).to receive(:open_registration?).and_return(true)
-      course_with_teacher_logged_in(:active_all => true)
+      course_with_teacher_logged_in(active_all: true)
 
       user_list = [{ 'email' => 'example1@example.com' }]
 
-      post 'invite_users', params: { :course_id => @course.id, :users => user_list }
+      post 'invite_users', params: { course_id: @course.id, users: user_list }
       expect(response).to be_successful
 
       json = JSON.parse(response.body)
@@ -2561,7 +2561,7 @@ describe UsersController do
       it "sets ENV.STUDENT_PLANNER_GROUPS" do
         course_with_student_logged_in(active_all: true)
         @current_user = @user
-        group = @account.groups.create! :name => 'Account group'
+        group = @account.groups.create! name: 'Account group'
         group.add_user(@current_user, 'accepted', true)
         get 'user_dashboard'
         groups = assigns[:js_env][:STUDENT_PLANNER_GROUPS]
@@ -2578,7 +2578,7 @@ describe UsersController do
       end
 
       it "loads favorites" do
-        @user.favorites.where(:context_type => 'Course', :context_id => @course1).first_or_create!
+        @user.favorites.where(context_type: 'Course', context_id: @course1).first_or_create!
         get 'user_dashboard'
         course_data = assigns[:js_env][:STUDENT_PLANNER_COURSES]
         expect(course_data.detect { |h| h[:id] == @course1.id }[:isFavorited]).to eq true

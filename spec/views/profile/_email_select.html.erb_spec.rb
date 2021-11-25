@@ -27,7 +27,7 @@ describe "/profile/_email_select" do
     cc = communication_channel(@user, { username: 'user@example.com' })
     assign(:email_channels, [cc])
 
-    render :partial => "profile/email_select", :object => cc
+    render partial: "profile/email_select", object: cc
     expect(response).not_to be_nil
   end
 end

@@ -42,21 +42,21 @@ describe ImportedHtmlConverter do
 
     it "converts a wiki reference" do
       test_string = %(<a href="%24WIKI_REFERENCE%24/wiki/test-wiki-page?query=blah">Test Wiki Page</a>)
-      @course.wiki_pages.create!(:title => "Test Wiki Page", :body => "stuff")
+      @course.wiki_pages.create!(title: "Test Wiki Page", body: "stuff")
 
       expect(convert_and_replace(test_string)).to eq %(<a href="#{@path}pages/test-wiki-page?query=blah">Test Wiki Page</a>)
     end
 
     it "converts a wiki reference without $ escaped" do
       test_string = %(<a href="$WIKI_REFERENCE$/wiki/test-wiki-page?query=blah">Test Wiki Page</a>)
-      @course.wiki_pages.create!(:title => "Test Wiki Page", :body => "stuff")
+      @course.wiki_pages.create!(title: "Test Wiki Page", body: "stuff")
 
       expect(convert_and_replace(test_string)).to eq %(<a href="#{@path}pages/test-wiki-page?query=blah">Test Wiki Page</a>)
     end
 
     it "converts a wiki reference by migration id" do
       test_string = %(<a href="wiki_page_migration_id=123456677788">Test Wiki Page</a>)
-      wiki = @course.wiki_pages.create(:title => "Test Wiki Page", :body => "stuff")
+      wiki = @course.wiki_pages.create(title: "Test Wiki Page", body: "stuff")
       wiki.migration_id = "123456677788"
       wiki.save!
 
@@ -65,7 +65,7 @@ describe ImportedHtmlConverter do
 
     it "converts a discussion reference by migration id" do
       test_string = %(<a href="discussion_topic_migration_id=123456677788">Test topic</a>)
-      topic = @course.discussion_topics.create(:title => "Test discussion")
+      topic = @course.discussion_topics.create(title: "Test discussion")
       topic.migration_id = "123456677788"
       topic.save!
 
@@ -73,7 +73,7 @@ describe ImportedHtmlConverter do
     end
 
     def make_test_att
-      att = Attachment.create(:filename => 'test.png', :display_name => "test.png", :uploaded_data => StringIO.new('psych!'), :folder => Folder.unfiled_folder(@course), :context => @course)
+      att = Attachment.create(filename: 'test.png', display_name: "test.png", uploaded_data: StringIO.new('psych!'), folder: Folder.unfiled_folder(@course), context: @course)
       att.migration_id = "1768525836051"
       att.save!
       att

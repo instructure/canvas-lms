@@ -67,9 +67,9 @@ describe "student planner" do
 
   it "shows course images", priority: "1" do
     @course_root = Folder.root_folders(@course).first
-    @course_attachment = @course_root.attachments.create!(:context => @course,
-                                                          :uploaded_data => jpeg_data_frd, :filename => 'course.jpg',
-                                                          :display_name => 'course.jpg')
+    @course_attachment = @course_root.attachments.create!(context: @course,
+                                                          uploaded_data: jpeg_data_frd, filename: 'course.jpg',
+                                                          display_name: 'course.jpg')
     @course.image_id = @course_attachment.id
     @course.save!
     @course.announcements.create!(title: 'Hi there!', message: 'Announcement time!')
@@ -156,7 +156,7 @@ describe "student planner" do
 
   context "Peer Reviews" do
     before :once do
-      @reviewee = user_factory(:active_all => true)
+      @reviewee = user_factory(active_all: true)
       @course.enroll_student(@reviewee).accept!
       @assignment = @course.assignments.create({
                                                  name: 'Peer Review Assignment',
@@ -553,7 +553,7 @@ describe "student planner" do
     it "allows account admins with content management rights to add todo dates" do
       @course.root_account.disable_feature!(:granular_permissions_manage_courses)
       @wiki = @course.wiki_pages.create!(title: 'Default Time Wiki Page')
-      admin = account_admin_user_with_role_changes(:role_changes => { :manage_courses => false })
+      admin = account_admin_user_with_role_changes(role_changes: { manage_courses: false })
       user_session(admin)
 
       expect(@course.grants_right?(admin, :manage)).to eq false # sanity check

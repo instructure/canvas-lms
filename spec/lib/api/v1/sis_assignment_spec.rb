@@ -81,7 +81,7 @@ describe Api::V1::SisAssignment do
 
       allow(course_sections).to receive(:loaded?).and_return(true)
       allow(course_sections).to receive(:active_course_sections).and_return(course_sections)
-      allow(course_sections).to receive(:association).and_return(OpenStruct.new(:loaded? => true))
+      allow(course_sections).to receive(:association).and_return(OpenStruct.new(loaded?: true))
     end
 
     it "creates assignment groups that have name and integration_data with proper data" do
@@ -152,7 +152,7 @@ describe Api::V1::SisAssignment do
 
     it "displays all section overrides" do
       course = assignment_1.course
-      new_section = course.course_sections.create!(:name => 'new section')
+      new_section = course.course_sections.create!(name: 'new section')
       create_section_override_for_assignment(assignment_1, course_section: course.default_section)
       create_section_override_for_assignment(assignment_1, course_section: new_section)
 
@@ -240,7 +240,7 @@ describe Api::V1::SisAssignment do
 
         user_overrides = result[0]["user_overrides"]
         expect(user_overrides.size).to eq 1
-        expect(user_overrides.first).to include({ "id" => @override.id, due_at: @override.due_at })
+        expect(user_overrides.first).to include({ "id" => @override.id, :due_at => @override.due_at })
 
         students = user_overrides.first["students"]
         expect(students).to include({ "user_id" => @student1.id, 'sis_user_id' => nil })

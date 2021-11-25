@@ -86,7 +86,7 @@ class ActiveRecord::Base
   # See ActiveModel#serializable_add_includes
   def serializable_add_includes(options = {})
     super(options) do |association, records, opts|
-      yield association, records, opts.reverse_merge(:include_root => options[:include_root])
+      yield association, records, opts.reverse_merge(include_root: options[:include_root])
     end
   end
 
@@ -260,7 +260,7 @@ class ActiveRecord::Base
   def touch_user
     if respond_to?(:user_id) && user_id
       User.connection.after_transaction_commit do
-        User.where(:id => user_id).update_all(:updated_at => Time.now.utc)
+        User.where(id: user_id).update_all(updated_at: Time.now.utc)
       end
     end
     true
@@ -423,13 +423,13 @@ class ActiveRecord::Base
     column = options[:column] || "created_at"
     max_date = (options[:max_date] || Time.zone.now).midnight
     num_days = options[:num_days] || 20
-    min_date = (options[:min_date] || max_date.advance(:days => -(num_days - 1))).midnight
+    min_date = (options[:min_date] || max_date.advance(days: -(num_days - 1))).midnight
 
     expression = "((#{column} || '-00')::TIMESTAMPTZ AT TIME ZONE '#{Time.zone.tzinfo.name}')::DATE"
 
     result = where("#{column} >= ? AND #{column} < ?",
                    min_date,
-                   max_date.advance(:days => 1))
+                   max_date.advance(days: 1))
              .group(expression)
              .order(Arel.sql(expression))
              .count
@@ -474,7 +474,7 @@ class ActiveRecord::Base
                find_by_sql(sql)
              else
                conditions = "#{column} IS NOT NULL" unless include_nil
-               find(:all, :select => "DISTINCT #{column}", :conditions => conditions, :order => column)
+               find(:all, select: "DISTINCT #{column}", conditions: conditions, order: column)
              end
     result.map(&column.to_sym)
   end
@@ -603,14 +603,14 @@ class ActiveRecord::Base
     # transaction. useful for possible race conditions where we don't want to
     # take a lock (e.g. when we create a submission).
     retries.times do |retry_count|
-      result = transaction(:requires_new => true) { uncached { yield(retry_count) } }
+      result = transaction(requires_new: true) { uncached { yield(retry_count) } }
       connection.clear_query_cache
       return result
     rescue ActiveRecord::RecordNotUnique
       next
     end
     GuardRail.activate(:primary) do
-      result = transaction(:requires_new => true) { uncached { yield(retries) } }
+      result = transaction(requires_new: true) { uncached { yield(retries) } }
       connection.clear_query_cache
       result
     end

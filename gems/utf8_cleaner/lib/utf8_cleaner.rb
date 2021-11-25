@@ -29,7 +29,7 @@ module Utf8Cleaner
 
     string = String.new(string, encoding: Encoding::UTF_8) unless string.encoding == Encoding::UTF_8
 
-    string = string.encode("UTF-8", :undef => :replace, :invalid => :replace, :replace => '')
+    string = string.encode("UTF-8", undef: :replace, invalid: :replace, replace: '')
     # Strip ASCII backspace and delete characters
     string.tr("\b\x7F", '')
   end

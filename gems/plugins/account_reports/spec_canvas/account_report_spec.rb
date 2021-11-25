@@ -27,7 +27,7 @@ describe "Account Reports" do
     Notification.where(name: "Report Generated").first_or_create
     Notification.where(name: "Report Generation Failed").first_or_create
     @account = Account.create(name: 'New Account', default_time_zone: 'UTC')
-    @admin = account_admin_user(:account => @account)
+    @admin = account_admin_user(account: @account)
     @course1 = Course.create(name: 'English 101', course_code: 'ENG101')
   end
 

@@ -33,14 +33,14 @@ class Pseudonym < ActiveRecord::Base
            dependent: :destroy,
            inverse_of: :pseudonym
   belongs_to :communication_channel
-  belongs_to :sis_communication_channel, :class_name => 'CommunicationChannel'
+  belongs_to :sis_communication_channel, class_name: 'CommunicationChannel'
   belongs_to :authentication_provider
   MAX_UNIQUE_ID_LENGTH = 100
 
   CAS_TICKET_TTL = 1.day
 
-  validates :unique_id, length: { :maximum => MAX_UNIQUE_ID_LENGTH }
-  validates :sis_user_id, length: { :maximum => maximum_string_length, :allow_blank => true }
+  validates :unique_id, length: { maximum: MAX_UNIQUE_ID_LENGTH }
+  validates :sis_user_id, length: { maximum: maximum_string_length, allow_blank: true }
   validates :account_id, presence: true
   validate :must_be_root_account
   # allows us to validate the user and pseudonym together, before saving either
@@ -104,7 +104,7 @@ class Pseudonym < ActiveRecord::Base
     password_changed? || (send(crypted_password_field).blank? && sis_ssha.blank?) || @require_password
   end
 
-  acts_as_list :scope => :user
+  acts_as_list scope: :user
 
   set_broadcast_policy do |p|
     p.dispatch :confirm_registration
@@ -126,7 +126,7 @@ class Pseudonym < ActiveRecord::Base
     if id_before_last_save.nil?
       return if %w[creation_pending deleted].include?(user.workflow_state)
 
-      user.update_account_associations(:incremental => true, :precalculated_associations => { account_id => 0 })
+      user.update_account_associations(incremental: true, precalculated_associations: { account_id => 0 })
     elsif saved_change_to_account_id?
       user.update_account_associations_later
     end
@@ -250,8 +250,8 @@ class Pseudonym < ActiveRecord::Base
     end
     unless deleted?
       shard.activate do
-        existing_pseudo = Pseudonym.active.by_unique_id(unique_id).where(:account_id => account_id,
-                                                                         :authentication_provider_id => authentication_provider_id).where.not(id: self).exists?
+        existing_pseudo = Pseudonym.active.by_unique_id(unique_id).where(account_id: account_id,
+                                                                         authentication_provider_id: authentication_provider_id).where.not(id: self).exists?
         if existing_pseudo
           errors.add(:unique_id, :taken,
                      message: t("ID already in use for this account and authentication provider"))
@@ -482,7 +482,7 @@ class Pseudonym < ActiveRecord::Base
     if res && res[:mail] && res[:mail][0]
       email = res[:mail][0]
       cc = user.communication_channels.email.by_path(email).first
-      cc ||= user.communication_channels.build(:path => email)
+      cc ||= user.communication_channels.build(path: email)
       cc.workflow_state = 'active'
       cc.user = user
       cc.save if cc.changed?

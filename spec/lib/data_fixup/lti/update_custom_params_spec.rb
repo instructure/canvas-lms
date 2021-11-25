@@ -42,14 +42,14 @@ describe 'UpdateCustomParams' do
     tools = {}
     urls.each do |url|
       launch_url = "https://#{url}/lti/launch"
-      tools[url] = @course.context_external_tools.create!(:name => url,
-                                                          :domain => url,
-                                                          :url => launch_url,
-                                                          :context => @course,
-                                                          :config_type => 'by_xml',
-                                                          :config_xml => generic_lti_config(launch_url),
-                                                          :consumer_key => '12345',
-                                                          :shared_secret => 'secret')
+      tools[url] = @course.context_external_tools.create!(name: url,
+                                                          domain: url,
+                                                          url: launch_url,
+                                                          context: @course,
+                                                          config_type: 'by_xml',
+                                                          config_xml: generic_lti_config(launch_url),
+                                                          consumer_key: '12345',
+                                                          shared_secret: 'secret')
     end
     tools
   end
@@ -63,7 +63,7 @@ describe 'UpdateCustomParams' do
   before(:once) do
     course_model
     @root_account = @course.root_account
-    @account = account_model(:root_account => @root_account, :parent_account => @root_account)
+    @account = account_model(root_account: @root_account, parent_account: @root_account)
     @course.update!(account: @account)
     @to_process_url = 'tool.instructure.com'
     @unprocessed_url = 'some_other_tool.instructure.com'

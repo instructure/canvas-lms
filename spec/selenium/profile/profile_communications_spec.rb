@@ -23,11 +23,11 @@ describe "profile communication settings" do
   include_context "in-process server selenium tests"
 
   before :once do
-    Notification.create(:name => "DiscussionEntry", :category => "DiscussionEntry")
-    Notification.create(:name => "Conversation Message", :category => "Conversation Message")
-    Notification.create(:name => "Conversation Created", :category => "Conversation Created")
-    Notification.create(:name => "GradingStuff1", :category => "Grading")
-    @sub_comment = Notification.create(:name => "Submission Comment1", :category => "Submission Comment")
+    Notification.create(name: "DiscussionEntry", category: "DiscussionEntry")
+    Notification.create(name: "Conversation Message", category: "Conversation Message")
+    Notification.create(name: "Conversation Created", category: "Conversation Created")
+    Notification.create(name: "GradingStuff1", category: "Grading")
+    @sub_comment = Notification.create(name: "Submission Comment1", category: "Submission Comment")
   end
 
   let(:sns_response) { double(data: { endpointarn: 'endpointarn' }) }
@@ -112,7 +112,7 @@ describe "profile communication settings" do
     it "loads an existing frequency setting and save a change" do
       channel = communication_channel(@user, { username: '8011235555@vtext.com', active_cc: true })
       # Create a notification policy entry as an existing setting.
-      policy = NotificationPolicy.new(:communication_channel_id => channel.id, :notification_id => @sub_comment.id)
+      policy = NotificationPolicy.new(communication_channel_id: channel.id, notification_id: @sub_comment.id)
       policy.frequency = Notification::FREQ_DAILY
       policy.save!
       desired_setting = 'Notify immediately'
@@ -140,7 +140,7 @@ describe "profile communication settings" do
   end
 
   it "renders for a user with no enrollments" do
-    user_logged_in(:username => 'somebody@example.com')
+    user_logged_in(username: 'somebody@example.com')
     get "/profile/communication"
     expect(fj("th[scope='col'] span:contains('email')")).to be
     expect(fj("th[scope='col'] span:contains('somebody@example.com')")).to be

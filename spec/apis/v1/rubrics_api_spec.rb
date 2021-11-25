@@ -29,7 +29,7 @@ describe "Rubrics API", type: :request do
   end
 
   def create_rubric(context, opts = {})
-    @rubric = Rubric.new(:context => context)
+    @rubric = Rubric.new(context: context)
     @rubric.data = [rubric_data_hash(opts)]
     @rubric.save!
     @rubric.update_with_association(nil, {}, context, { association_object: context })
@@ -146,7 +146,7 @@ describe "Rubrics API", type: :request do
   def paginate_call(context, type)
     @user = account_admin_user
     7.times { create_rubric(context) }
-    json = rubrics_api_call(context, { :per_page => '3' }, type)
+    json = rubrics_api_call(context, { per_page: '3' }, type)
 
     expect(json.length).to eq 3
     links = response.headers['Link'].split(",")
@@ -156,7 +156,7 @@ describe "Rubrics API", type: :request do
     expect(links.find { |l| l.include?('rel="last"') }).to match(/page=3/)
 
     # get the last page
-    json = rubrics_api_call(context, { :per_page => '3', :page => '3' }, type)
+    json = rubrics_api_call(context, { per_page: '3', page: '3' }, type)
 
     expect(json.length).to eq 2
     links = response.headers['Link'].split(",")
@@ -436,9 +436,9 @@ describe "Rubrics API", type: :request do
       it "updates a rubric with an outcome criterion" do
         account = Account.default
         outcome = account.created_learning_outcomes.create!(
-          :title => "My Outcome",
-          :description => "Description of my outcome",
-          :vendor_guid => "vendorguid9000"
+          title: "My Outcome",
+          description: "Description of my outcome",
+          vendor_guid: "vendorguid9000"
         )
         rating = {
           "0" => { points: 9000, description: 'awesome' },
@@ -508,7 +508,7 @@ describe "Rubrics API", type: :request do
       it "returns account level rubric with course level association" do
         course_with_teacher(active_all: true)
         assignment = @course.assignments.create
-        @rubric.associate_with(assignment, @course, :purpose => 'grading')
+        @rubric.associate_with(assignment, @course, purpose: 'grading')
         response = rubric_api_call(@course, {})
 
         expect(response.keys.sort).to eq allowed_rubric_fields.sort

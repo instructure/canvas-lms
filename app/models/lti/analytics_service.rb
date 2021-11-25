@@ -63,7 +63,7 @@ module Lti
 
       if seconds
 
-        course.all_enrollments.where(:user_id => user)
+        course.all_enrollments.where(user_id: user)
               .update_all(['total_activity_time = COALESCE(total_activity_time, 0) + ?', seconds])
       end
 

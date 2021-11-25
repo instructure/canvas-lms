@@ -48,7 +48,7 @@ module CanvasSanitize # :nodoc:
 
   DEFAULT_PROTOCOLS = ['http', 'https', :relative].freeze
   SANITIZE = {
-    :elements => [
+    elements: [
       'a', 'b', 'blockquote', 'br', 'caption', 'cite', 'code', 'col',
       'hr', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
       'del', 'ins', 'iframe', 'font',
@@ -68,7 +68,7 @@ module CanvasSanitize # :nodoc:
       'munderover', 'none', 'semantics', 'mark'
     ].freeze,
 
-    :attributes => {
+    attributes: {
       :all => ['style',
                'class',
                'id',
@@ -239,7 +239,7 @@ module CanvasSanitize # :nodoc:
       'semantics' => %w[href xref definitionURL encoding].freeze,
     }.freeze,
 
-    :protocols => {
+    protocols: {
       'a' => {
         'href' => ['ftp', 'http', 'https', 'mailto', 'tel', 'skype', :relative].freeze,
         'data-url' => DEFAULT_PROTOCOLS,

@@ -158,17 +158,17 @@ describe "LTI integration tests" do
 
   describe "legacy integration tests" do
     before :once do
-      course_with_teacher(:active_all => true)
-      @tool = @course.context_external_tools.create!(:domain => 'yahoo.com',
-                                                     :consumer_key => '12345', :shared_secret => 'secret', :name => 'tool')
+      course_with_teacher(active_all: true)
+      @tool = @course.context_external_tools.create!(domain: 'yahoo.com',
+                                                     consumer_key: '12345', shared_secret: 'secret', name: 'tool')
     end
 
     it "generates correct parameters" do
-      @user = user_with_managed_pseudonym(:sis_user_id => 'testfun', :name => "A Name")
-      course_with_teacher(:active_all => true, :user => @user, :account => @account)
+      @user = user_with_managed_pseudonym(sis_user_id: 'testfun', name: "A Name")
+      course_with_teacher(active_all: true, user: @user, account: @account)
       @course.sis_source_id = 'coursesis'
       @course.save!
-      @tool = @course.context_external_tools.create!(:domain => 'yahoo.com', :consumer_key => '12345', :shared_secret => 'secret', :name => 'tool', :privacy_level => 'public')
+      @tool = @course.context_external_tools.create!(domain: 'yahoo.com', consumer_key: '12345', shared_secret: 'secret', name: 'tool', privacy_level: 'public')
       adapter = Lti::LtiOutboundAdapter.new(@tool, @user, @course)
       variable_expander = Lti::VariableExpander.new(@account, @course, controller, { current_user: @user })
       adapter.prepare_tool_launch('http://www.google.com', variable_expander, launch_url: 'http://www.yahoo.com', link_code: '123456')
@@ -217,7 +217,7 @@ describe "LTI integration tests" do
 
     it "adds account info in launch data for account navigation" do
       @user = user_with_managed_pseudonym
-      sub_account = Account.create(:parent_account => @account)
+      sub_account = Account.create(parent_account: @account)
       sub_account.sis_source_id = 'accountsis'
       sub_account.save!
       canvas_tool.context = sub_account
@@ -234,11 +234,11 @@ describe "LTI integration tests" do
     end
 
     it "adds account and user info in launch data for user profile launch" do
-      @user = user_with_managed_pseudonym(:sis_user_id => 'testfun')
-      sub_account = Account.create(:parent_account => @account)
+      @user = user_with_managed_pseudonym(sis_user_id: 'testfun')
+      sub_account = Account.create(parent_account: @account)
       sub_account.sis_source_id = 'accountsis'
       sub_account.save!
-      @tool = sub_account.context_external_tools.create!(:domain => 'yahoo.com', :consumer_key => '12345', :shared_secret => 'secret', :name => 'tool', :privacy_level => 'public')
+      @tool = sub_account.context_external_tools.create!(domain: 'yahoo.com', consumer_key: '12345', shared_secret: 'secret', name: 'tool', privacy_level: 'public')
 
       adapter = Lti::LtiOutboundAdapter.new(@tool, @user, @user)
       variable_expander = Lti::VariableExpander.new(root_account, canvas_course, controller)
@@ -273,8 +273,8 @@ describe "LTI integration tests" do
     end
 
     it "includes custom fields" do
-      course_with_teacher(:active_all => true)
-      @tool = @course.context_external_tools.create!(:domain => 'yahoo.com', :consumer_key => '12345', :shared_secret => 'secret', :custom_fields => { 'custom_bob' => 'bob', 'custom_fred' => 'fred', 'john' => 'john', '@$TAA$#$#' => 123 }, :name => 'tool')
+      course_with_teacher(active_all: true)
+      @tool = @course.context_external_tools.create!(domain: 'yahoo.com', consumer_key: '12345', shared_secret: 'secret', custom_fields: { 'custom_bob' => 'bob', 'custom_fred' => 'fred', 'john' => 'john', '@$TAA$#$#' => 123 }, name: 'tool')
 
       adapter = Lti::LtiOutboundAdapter.new(@tool, @user, @course)
       variable_expander = Lti::VariableExpander.new(root_account, canvas_course, controller)
@@ -291,8 +291,8 @@ describe "LTI integration tests" do
     end
 
     it "does not include name and email if anonymous" do
-      course_with_teacher(:active_all => true)
-      @tool = @course.context_external_tools.create!(:domain => 'yahoo.com', :consumer_key => '12345', :shared_secret => 'secret', :privacy_level => 'anonymous', :name => 'tool')
+      course_with_teacher(active_all: true)
+      @tool = @course.context_external_tools.create!(domain: 'yahoo.com', consumer_key: '12345', shared_secret: 'secret', privacy_level: 'anonymous', name: 'tool')
       expect(@tool.include_name?).to eql(false)
       expect(@tool.include_email?).to eql(false)
 
@@ -308,8 +308,8 @@ describe "LTI integration tests" do
     end
 
     it "includes name if name_only" do
-      course_with_teacher(:active_all => true)
-      @tool = @course.context_external_tools.create!(:domain => 'yahoo.com', :consumer_key => '12345', :shared_secret => 'secret', :privacy_level => 'name_only', :name => 'tool')
+      course_with_teacher(active_all: true)
+      @tool = @course.context_external_tools.create!(domain: 'yahoo.com', consumer_key: '12345', shared_secret: 'secret', privacy_level: 'name_only', name: 'tool')
       expect(@tool.include_name?).to eql(true)
       expect(@tool.include_email?).to eql(false)
 
@@ -325,8 +325,8 @@ describe "LTI integration tests" do
     end
 
     it "includes email if email_only" do
-      course_with_teacher(:active_all => true)
-      @tool = @course.context_external_tools.create!(:domain => 'yahoo.com', :consumer_key => '12345', :shared_secret => 'secret', :privacy_level => 'email_only', :name => 'tool')
+      course_with_teacher(active_all: true)
+      @tool = @course.context_external_tools.create!(domain: 'yahoo.com', consumer_key: '12345', shared_secret: 'secret', privacy_level: 'email_only', name: 'tool')
       expect(@tool.include_name?).to eql(false)
       expect(@tool.include_email?).to eql(true)
 
@@ -342,8 +342,8 @@ describe "LTI integration tests" do
     end
 
     it "includes email if public" do
-      course_with_teacher(:active_all => true)
-      @tool = @course.context_external_tools.create!(:domain => 'yahoo.com', :consumer_key => '12345', :shared_secret => 'secret', :privacy_level => 'public', :name => 'tool')
+      course_with_teacher(active_all: true)
+      @tool = @course.context_external_tools.create!(domain: 'yahoo.com', consumer_key: '12345', shared_secret: 'secret', privacy_level: 'public', name: 'tool')
       expect(@tool.include_name?).to eql(true)
       expect(@tool.include_email?).to eql(true)
 
@@ -359,9 +359,9 @@ describe "LTI integration tests" do
     end
 
     it "provides a custom_canvas_user_login_id without an sis id" do
-      user = user_with_pseudonym(:name => "A Name")
-      course_with_teacher(:active_all => true)
-      @tool = @course.context_external_tools.create!(:domain => 'yahoo.com', :consumer_key => '12345', :shared_secret => 'secret', :name => 'tool', :privacy_level => 'public')
+      user = user_with_pseudonym(name: "A Name")
+      course_with_teacher(active_all: true)
+      @tool = @course.context_external_tools.create!(domain: 'yahoo.com', consumer_key: '12345', shared_secret: 'secret', name: 'tool', privacy_level: 'public')
 
       adapter = Lti::LtiOutboundAdapter.new(@tool, user, @course)
       variable_expander = Lti::VariableExpander.new(root_account, canvas_course, controller)
@@ -372,8 +372,8 @@ describe "LTI integration tests" do
     end
 
     it "includes text if set" do
-      course_with_teacher(:active_all => true)
-      @tool = @course.context_external_tools.create!(:domain => 'yahoo.com', :consumer_key => '12345', :shared_secret => 'secret', :privacy_level => 'public', :name => 'tool')
+      course_with_teacher(active_all: true)
+      @tool = @course.context_external_tools.create!(domain: 'yahoo.com', consumer_key: '12345', shared_secret: 'secret', privacy_level: 'public', name: 'tool')
 
       adapter = Lti::LtiOutboundAdapter.new(@tool, @user, @course)
       variable_expander = Lti::VariableExpander.new(root_account, canvas_course, controller)
@@ -393,13 +393,13 @@ describe "LTI integration tests" do
 
     def tool_setup(for_student = true)
       if for_student
-        course_with_student(:active_all => true)
+        course_with_student(active_all: true)
       else
-        course_with_teacher(:active_all => true)
+        course_with_teacher(active_all: true)
       end
 
-      @tool = @course.context_external_tools.create!(:domain => 'yahoo.com', :consumer_key => '12345', :shared_secret => 'secret', :privacy_level => 'public', :name => 'tool')
-      assignment_model(:submission_types => "external_tool", :course => @course, :points_possible => 5, :title => "an assignment")
+      @tool = @course.context_external_tools.create!(domain: 'yahoo.com', consumer_key: '12345', shared_secret: 'secret', privacy_level: 'public', name: 'tool')
+      assignment_model(submission_types: "external_tool", course: @course, points_possible: 5, title: "an assignment")
 
       adapter = Lti::LtiOutboundAdapter.new(@tool, @user, @course)
       variable_expander = Lti::VariableExpander.new(root_account, canvas_course, controller, { current_user: @user, assignment: @assignment })
@@ -434,12 +434,12 @@ describe "LTI integration tests" do
   end
 
   it "gets the correct width and height based on resource type" do
-    @user = user_with_managed_pseudonym(:sis_user_id => 'testfun', :name => "A Name")
-    course_with_teacher(:active_all => true, :user => @user, :account => @account)
+    @user = user_with_managed_pseudonym(sis_user_id: 'testfun', name: "A Name")
+    course_with_teacher(active_all: true, user: @user, account: @account)
     @course.sis_source_id = 'coursesis'
     @course.save!
-    @tool = @course.context_external_tools.create!(:domain => 'yahoo.com', :consumer_key => '12345', :shared_secret => 'secret', :name => 'tool', :privacy_level => 'public')
-    @tool.editor_button = { :selection_width => 1000, :selection_height => 300, :icon_url => 'www.example.com/icon', :url => 'www.example.com' }
+    @tool = @course.context_external_tools.create!(domain: 'yahoo.com', consumer_key: '12345', shared_secret: 'secret', name: 'tool', privacy_level: 'public')
+    @tool.editor_button = { selection_width: 1000, selection_height: 300, icon_url: 'www.example.com/icon', url: 'www.example.com' }
     @tool.save!
 
     adapter = Lti::LtiOutboundAdapter.new(@tool, @user, @course)
@@ -458,10 +458,10 @@ describe "LTI integration tests" do
     it "roundtrips source ids from mixed shards", skip: true do
       @shard1.activate do
         @account = Account.create!
-        course_with_teacher(:active_all => true, :account => @account)
-        @tool = @course.context_external_tools.create!(:domain => 'example.com', :consumer_key => '12345', :shared_secret => 'secret', :privacy_level => 'anonymous', :name => 'tool')
-        assignment_model(:submission_types => "external_tool", :course => @course)
-        tag = @assignment.build_external_tool_tag(:url => "http://example.com/one")
+        course_with_teacher(active_all: true, account: @account)
+        @tool = @course.context_external_tools.create!(domain: 'example.com', consumer_key: '12345', shared_secret: 'secret', privacy_level: 'anonymous', name: 'tool')
+        assignment_model(submission_types: "external_tool", course: @course)
+        tag = @assignment.build_external_tool_tag(url: "http://example.com/one")
         tag.content_type = 'ContextExternalTool'
         tag.save!
       end
@@ -480,15 +480,15 @@ describe "LTI integration tests" do
 
     it "provides different user ids for users with the same local id from different shards" do
       user1 = @shard1.activate do
-        user_with_managed_pseudonym(:sis_user_id => 'testfun', :name => "A Name")
+        user_with_managed_pseudonym(sis_user_id: 'testfun', name: "A Name")
       end
       user2 = @shard2.activate do
-        user_with_managed_pseudonym(:sis_user_id => 'testfun', :name => "A Name", :id => user1.id)
+        user_with_managed_pseudonym(sis_user_id: 'testfun', name: "A Name", id: user1.id)
       end
-      course_with_teacher(:active_all => true, :user => user1, :account => @account)
+      course_with_teacher(active_all: true, user: user1, account: @account)
       @course.sis_source_id = 'coursesis'
       @course.save!
-      @tool = @course.context_external_tools.create!(:domain => 'yahoo.com', :consumer_key => '12345', :shared_secret => 'secret', :name => 'tool', :privacy_level => 'public')
+      @tool = @course.context_external_tools.create!(domain: 'yahoo.com', consumer_key: '12345', shared_secret: 'secret', name: 'tool', privacy_level: 'public')
 
       adapter = Lti::LtiOutboundAdapter.new(@tool, user1, @course)
       variable_expander = Lti::VariableExpander.new(root_account, canvas_course, controller)

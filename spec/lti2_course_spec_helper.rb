@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-RSpec.shared_context "lti2_course_spec_helper", :shared_context => :metadata do
+RSpec.shared_context "lti2_course_spec_helper", shared_context: :metadata do
   let(:account) { Account.create! }
   let(:course) { Course.create!(account: account) }
   let(:developer_key) { DeveloperKey.create!(redirect_uri: 'http://www.example.com/redirect') }

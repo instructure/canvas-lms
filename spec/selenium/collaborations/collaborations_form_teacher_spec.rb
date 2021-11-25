@@ -65,10 +65,10 @@ describe "collaborations" do
       it "does not show inactive students in list" do
         ensure_plugin(type)
 
-        student_in_course(:course => @course)
+        student_in_course(course: @course)
         @student.update_attribute(:name, 'real user')
 
-        enrollment = student_in_course(:course => @course)
+        enrollment = student_in_course(course: @course)
         @student.update_attribute(:name, 'inactive user')
         enrollment.deactivate
 

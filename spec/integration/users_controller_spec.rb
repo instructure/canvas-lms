@@ -23,14 +23,14 @@ require 'nokogiri'
 describe UsersController do
   describe "#teacher_activity" do
     before do
-      course_with_teacher_logged_in(:active_all => true)
+      course_with_teacher_logged_in(active_all: true)
       @course.update_attribute(:name, 'coursename1')
       @enrollment.update_attribute(:limit_privileges_to_course_section, true)
       @et = @enrollment
       @s1 = @course.course_sections.first
-      @s2 = @course.course_sections.create!(:name => 'Section B')
-      @e1 = student_in_course(:active_all => true)
-      @e2 = student_in_course(:active_all => true)
+      @s2 = @course.course_sections.create!(name: 'Section B')
+      @e1 = student_in_course(active_all: true)
+      @e2 = student_in_course(active_all: true)
       @e1.user.update_attribute(:name, 'studentname1')
       @e2.user.update_attribute(:name, 'studentname2')
       @e2.update_attribute(:course_section, @s2)
@@ -48,11 +48,11 @@ describe UsersController do
     end
 
     it "uses conversation message participants when calculating interaction" do
-      other_student = user_factory(:active_all => true)
-      @e1.course.enroll_student(other_student, :enrollment_state => 'active')
+      other_student = user_factory(active_all: true)
+      @e1.course.enroll_student(other_student, enrollment_state: 'active')
 
       @conversation = Conversation.initiate([@e1.user, other_student, @teacher], false)
-      @conversation.add_message(@teacher, "hello", :only_users => [@e1.user]) # only send to one user
+      @conversation.add_message(@teacher, "hello", only_users: [@e1.user]) # only send to one user
 
       get user_student_teacher_activity_url(@teacher, @e1.user)
       expect(Nokogiri::HTML5(response.body).at_css('table.report tbody tr:first td:nth(2)').text).to match(/less than 1 day/)
@@ -80,7 +80,7 @@ describe UsersController do
       @course1 = @course
       @course2 = course_factory(active_course: true)
       @course2.update_attribute(:name, 'coursename2')
-      student_in_course(:course => @course2, :user => @e1.user)
+      student_in_course(course: @course2, user: @e1.user)
       get user_student_teacher_activity_url(@teacher, @e1.user)
       expect(response).to be_successful
       expect(response.body).to match(/studentname1/)
@@ -97,7 +97,7 @@ describe UsersController do
     end
 
     it "is available for concluded courses/enrollments" do
-      account_admin_user(:username => "admin")
+      account_admin_user(username: "admin")
       user_session(@admin)
 
       @course.complete
@@ -130,9 +130,9 @@ describe UsersController do
 
       it "shows activity for students located on another shard" do
         @shard1.activate do
-          @student = user_factory(:name => "im2spoopy4u")
+          @student = user_factory(name: "im2spoopy4u")
         end
-        course_with_student(:course => @course, :user => @student, :active_all => true)
+        course_with_student(course: @course, user: @student, active_all: true)
 
         get user_student_teacher_activity_url(@teacher, @student)
         expect(response).to be_successful
@@ -143,7 +143,7 @@ describe UsersController do
 
   describe "#index" do
     it "renders" do
-      user_with_pseudonym(:active_all => 1)
+      user_with_pseudonym(active_all: 1)
       Account.default.account_users.create!(user: @user)
       user_session(@user, @pseudonym)
       get account_users_url(Account.default)
@@ -157,23 +157,23 @@ describe UsersController do
       user_session(@admin)
 
       course_factory
-      student_in_course(:course => @course)
+      student_in_course(course: @course)
       get "/users/#{@student.id}"
       expect(response).to be_successful
 
-      course_factory(:account => account_model)
-      student_in_course(:course => @course)
+      course_factory(account: account_model)
+      student_in_course(course: @course)
       get "/users/#{@student.id}"
       assert_status(401)
     end
 
     it "shows user to account users that have the read_roster permission" do
       account_model
-      student_in_course(:account => @account)
+      student_in_course(account: @account)
 
-      role = custom_account_role('custom', :account => @account)
-      RoleOverride.create!(:context => @account, :permission => 'read_roster',
-                           :role => role, :enabled => true)
+      role = custom_account_role('custom', account: @account)
+      RoleOverride.create!(context: @account, permission: 'read_roster',
+                           role: role, enabled: true)
       @account.account_users.create!(user: user_factory, role: role)
       user_session(@user)
 
@@ -183,10 +183,10 @@ describe UsersController do
 
     it "shows course user to account users that have the read_roster permission" do
       account_model
-      student_in_course(:account => @account)
-      role = custom_account_role('custom', :account => @account)
-      RoleOverride.create!(:context => @account, :permission => 'read_roster',
-                           :role => role, :enabled => true)
+      student_in_course(account: @account)
+      role = custom_account_role('custom', account: @account)
+      RoleOverride.create!(context: @account, permission: 'read_roster',
+                           role: role, enabled: true)
       @account.account_users.create!(user: user_factory, role: role)
       user_session(@user)
 
@@ -197,7 +197,7 @@ describe UsersController do
 
   describe "#avatar_image_url" do
     before do
-      course_with_student_logged_in(:active_all => true)
+      course_with_student_logged_in(active_all: true)
       @a = Account.default
       enable_avatars!
     end
@@ -271,11 +271,11 @@ describe UsersController do
 
   describe "#grades" do
     it "only lists courses once for multiple enrollments" do
-      course_with_student_logged_in(:active_all => true)
+      course_with_student_logged_in(active_all: true)
       @first_course = @course
       add_section("other section")
       multiple_student_enrollment(@student, @course_section)
-      course_with_student(:user => @student, :active_all => true)
+      course_with_student(user: @student, active_all: true)
 
       get grades_url
       student_grades = Nokogiri::HTML5(response.body).css('.student_grades tr')
@@ -285,11 +285,11 @@ describe UsersController do
     end
 
     it "lets an admin with view_all_grades view" do
-      course_with_student(:active_all => true)
+      course_with_student(active_all: true)
       @first_course = @course
-      course_with_student(:user => @student, :active_all => true)
-      role = custom_account_role('grade viewer', :account => Account.default)
-      account_admin_user_with_role_changes(:role => role, :role_changes => { :view_all_grades => true })
+      course_with_student(user: @student, active_all: true)
+      role = custom_account_role('grade viewer', account: Account.default)
+      account_admin_user_with_role_changes(role: role, role_changes: { view_all_grades: true })
       user_session(@user)
 
       get "/users/#{@student.id}/grades"
@@ -302,23 +302,23 @@ describe UsersController do
 
   describe "admin_merge" do
     it "works for the whole flow" do
-      user_with_pseudonym(:active_all => 1)
+      user_with_pseudonym(active_all: 1)
       Account.default.account_users.create!(user: @user)
       @admin = @user
-      user_with_pseudonym(:active_all => 1, :username => 'user2@instructure.com')
+      user_with_pseudonym(active_all: 1, username: 'user2@instructure.com')
       user_session(@admin)
 
-      get user_admin_merge_url(@user, :pending_user_id => @admin.id)
+      get user_admin_merge_url(@user, pending_user_id: @admin.id)
       expect(response).to be_successful
       expect(assigns['pending_other_user']).to eq @admin
       expect(assigns['other_user']).to be_nil
 
-      get user_admin_merge_url(@user, :new_user_id => @admin.id)
+      get user_admin_merge_url(@user, new_user_id: @admin.id)
       expect(response).to be_successful
       expect(assigns['pending_other_user']).to be_nil
       expect(assigns['other_user']).to eq @admin
 
-      post user_merge_url(@user, :new_user_id => @admin.id)
+      post user_merge_url(@user, new_user_id: @admin.id)
       expect(response).to redirect_to(user_profile_url(@admin))
 
       expect(@user.reload).to be_deleted
@@ -342,7 +342,7 @@ describe UsersController do
 
     before do
       account = Account.create!
-      course_with_student(:active_all => true, :account => account)
+      course_with_student(active_all: true, account: account)
       user_session(@student)
     end
 

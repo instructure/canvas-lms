@@ -78,7 +78,7 @@ module AccountReports
       headers.concat(grading_field_headers)
 
       courses = root_account.all_courses
-      courses = courses.where(:enrollment_term_id => term) if term
+      courses = courses.where(enrollment_term_id: term) if term
       courses = add_course_sub_account_scope(courses)
       courses = courses.active unless @include_deleted
       total = courses.count

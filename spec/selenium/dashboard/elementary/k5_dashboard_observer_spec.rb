@@ -205,7 +205,7 @@ describe "observer k5 dashboard" do
     let(:wiki_page_data) { "Here's where we have content" }
 
     before :once do
-      @subject_course.wiki_pages.create!(:title => "K5 Course Front Page", :body => wiki_page_data).set_as_front_page!
+      @subject_course.wiki_pages.create!(title: "K5 Course Front Page", body: wiki_page_data).set_as_front_page!
     end
 
     it 'has students front page displayed if there is one' do

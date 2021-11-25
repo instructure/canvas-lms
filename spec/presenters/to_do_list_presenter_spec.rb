@@ -94,17 +94,17 @@ describe 'ToDoListPresenter' do
     end
 
     it 'doesnt returns for assignments that need grading for a teacher that isnt a grader' do
-      RoleOverride.create!(:context => course1.account,
-                           :permission => 'manage_grades',
-                           :role => teacher_role,
-                           :enabled => false)
+      RoleOverride.create!(context: course1.account,
+                           permission: 'manage_grades',
+                           role: teacher_role,
+                           enabled: false)
 
       presenter = ToDoListPresenter.new(nil, grader, nil)
       expect(presenter.needs_grading.size).to eq(0)
     end
 
     it 'returns assignments from multiple types' do
-      grading = Assignment.where(:title => 'assignment1').first
+      grading = Assignment.where(title: 'assignment1').first
       grading.grade_student(student, grade: '1', grader: grader, provisional: true)
 
       presenter = ToDoListPresenter.new(nil, grader, nil)

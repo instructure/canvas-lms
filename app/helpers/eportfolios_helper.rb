@@ -29,7 +29,7 @@ module EportfoliosHelper
 
   def delete_icon(png = false)
     if png
-      image_tag("delete.png", :alt => t("Delete"))
+      image_tag("delete.png", alt: t("Delete"))
     else
       raw('&#215;')
     end
@@ -40,11 +40,11 @@ module EportfoliosHelper
   end
 
   def edit_link_text
-    t('#eportfolios.edit_link_text', "%{edit_icon} Edit This Page", :edit_icon => edit_icon)
+    t('#eportfolios.edit_link_text', "%{edit_icon} Edit This Page", edit_icon: edit_icon)
   end
 
   def help_link_text
-    t('#eportfolios.help_link_text', "%{help_icon} How Do I...?", :help_icon => help_icon)
+    t('#eportfolios.help_link_text', "%{help_icon} How Do I...?", help_icon: help_icon)
   end
 
   def manage_pages_link_text

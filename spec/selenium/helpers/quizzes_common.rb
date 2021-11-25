@@ -143,7 +143,7 @@ module QuizzesCommon
 
   def quiz_with_multiple_type_questions(goto_edit = true)
     @context = @course
-    bank = @context.assessment_question_banks.create!(:title => 'Test Bank')
+    bank = @context.assessment_question_banks.create!(title: 'Test Bank')
     @quiz = quiz_model
     a = bank.assessment_questions.create!
     b = bank.assessment_questions.create!
@@ -192,7 +192,7 @@ module QuizzesCommon
   def quiz_with_essay_questions(goto_edit = true)
     # TODO: DRY this up
     @context = @course
-    bank = @context.assessment_question_banks.create!(:title => 'Test Bank')
+    bank = @context.assessment_question_banks.create!(title: 'Test Bank')
     @quiz = quiz_model
     a = bank.assessment_questions.create!
     b = bank.assessment_questions.create!
@@ -599,9 +599,9 @@ module QuizzesCommon
       if el['class'].include?('question_holder')
         id = el.find_element(:css, 'a')['name'].gsub(/question_/, '')
         question = {
-          :id => id.to_i,
-          :el => el,
-          :type => 'question'
+          id: id.to_i,
+          el: el,
+          type: 'question'
         }
 
         if last_group_id
@@ -616,10 +616,10 @@ module QuizzesCommon
       elsif el['class'].include?('group_top')
         last_group_id = el['id'].gsub(/group_top_/, '').to_i
         data << {
-          :id => last_group_id,
-          :questions => [],
-          :type => 'group',
-          :el => el
+          id: last_group_id,
+          questions: [],
+          type: 'group',
+          el: el
         }
 
         # group ended

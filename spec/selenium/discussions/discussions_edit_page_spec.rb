@@ -58,7 +58,7 @@ describe "discussions" do
         let(:topic) { assignment_topic }
 
         it "allows editing the assignment group", priority: "1" do
-          assign_group_2 = course.assignment_groups.create!(:name => "Group 2")
+          assign_group_2 = course.assignment_groups.create!(name: "Group 2")
 
           get url
           wait = Selenium::WebDriver::Wait.new(timeout: 5)
@@ -80,7 +80,7 @@ describe "discussions" do
         end
 
         it "allows editing the group category", priority: "1" do
-          group_cat = course.group_categories.create!(:name => "Groupies")
+          group_cat = course.group_categories.create!(name: "Groupies")
           get url
 
           f("#has_group_category").click
@@ -161,16 +161,16 @@ describe "discussions" do
         let(:graded_topic) { assignment_topic }
 
         before do
-          @gc = GroupCategory.create(:name => "Sharks", :context => @course)
-          @student = student_in_course(:course => @course, :active_all => true).user
-          group = @course.groups.create!(:group_category => @gc)
+          @gc = GroupCategory.create(name: "Sharks", context: @course)
+          @student = student_in_course(course: @course, active_all: true).user
+          group = @course.groups.create!(group_category: @gc)
           group.users << @student
         end
 
         it "group discussions with entries should lock and display the group name", priority: "1" do
           topic.group_category = @gc
           topic.save!
-          topic.child_topics[0].reply_from({ :user => @student, :text => "I feel pretty" })
+          topic.child_topics[0].reply_from({ user: @student, text: "I feel pretty" })
           @gc.destroy
           get url
 
@@ -193,7 +193,7 @@ describe "discussions" do
           it "locks and display the group name", priority: "1" do
             topic.group_category = @gc
             topic.save!
-            topic.reply_from({ :user => @student, :text => "I feel pretty" })
+            topic.reply_from({ user: @student, text: "I feel pretty" })
             @gc.destroy
             get url
 

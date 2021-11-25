@@ -33,9 +33,9 @@ describe LtiApiController, type: :request do
     )
     tool.url = "http://www.example.com/basic_lti"
     tool.resource_selection = {
-      :url => "http://#{HostUrl.default_host}/selection_test",
-      :selection_width => 400,
-      :selection_height => 400
+      url: "http://#{HostUrl.default_host}/selection_test",
+      selection_width: 400,
+      selection_height: 400
     }
     tool.save!
     tool
@@ -64,8 +64,8 @@ describe LtiApiController, type: :request do
   end
 
   def lti_api_call(method, path, body = nil)
-    consumer = OAuth::Consumer.new(tool.consumer_key, tool.shared_secret, :site => "https://www.example.com", :signature_method => "HMAC-SHA1")
-    req = consumer.create_signed_request(:post, path, nil, { :scheme => 'header', :timestamp => Time.now.to_i, :nonce => SecureRandom.hex(32) }, body)
+    consumer = OAuth::Consumer.new(tool.consumer_key, tool.shared_secret, site: "https://www.example.com", signature_method: "HMAC-SHA1")
+    req = consumer.create_signed_request(:post, path, nil, { scheme: 'header', timestamp: Time.now.to_i, nonce: SecureRandom.hex(32) }, body)
     content_type = body.is_a?(Hash) ? 'application/x-www-form-urlencoded' : 'application/json'
     __send__(method, "https://www.example.com#{req.path}", params: req.body,
                                                            headers: { 'CONTENT_TYPE' => content_type, "HTTP_AUTHORIZATION" => req['Authorization'] })

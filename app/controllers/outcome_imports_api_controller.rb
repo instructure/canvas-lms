@@ -111,7 +111,7 @@ class OutcomeImportsApiController < ApplicationController
   end
 
   rescue_from InvalidContentType do
-    render :json => { :error => t('Invalid content type, UTF-8 required') }, :status => :bad_request
+    render json: { error: t('Invalid content type, UTF-8 required') }, status: :bad_request
   end
 
   # @API Import Outcomes

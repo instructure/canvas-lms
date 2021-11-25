@@ -24,7 +24,7 @@ describe "/assignments/text_entry_page" do
   it "renders" do
     course_with_student
     view_context(@course, @user)
-    ass = assign(:assignment, @course.assignments.create!(:title => "some assignment"))
+    ass = assign(:assignment, @course.assignments.create!(title: "some assignment"))
     assign(:submission, ass.submit_homework(@user))
     render 'assignments/text_entry_page'
     expect(response).not_to be_nil

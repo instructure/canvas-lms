@@ -22,7 +22,7 @@ require_relative '../views_helper'
 
 describe "courses/_settings_sidebar.html.erb" do
   before do
-    course_with_teacher(:active_all => true)
+    course_with_teacher(active_all: true)
     @course.sis_source_id = "so_special_sis_id"
     @course.workflow_state = 'claimed'
     @course.save!

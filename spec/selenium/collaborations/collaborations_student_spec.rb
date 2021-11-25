@@ -74,17 +74,17 @@ describe "collaborations" do
 
   context "a student's etherpad collaboration" do
     before do
-      course_with_teacher(:active_all => true, :name => 'teacher@example.com')
-      student_in_course(:course => @course, :name => 'Don Draper')
+      course_with_teacher(active_all: true, name: 'teacher@example.com')
+      student_in_course(course: @course, name: 'Don Draper')
     end
 
     it 'is visible to the student', priority: "1" do
-      PluginSetting.create!(:name => 'etherpad', :settings => {})
+      PluginSetting.create!(name: 'etherpad', settings: {})
 
       @collaboration = Collaboration.typed_collaboration_instance('EtherPad')
       @collaboration.context = @course
-      @collaboration.attributes = { :title => 'My collaboration',
-                                    :user => @teacher }
+      @collaboration.attributes = { title: 'My collaboration',
+                                    user: @teacher }
       @collaboration.update_members([@student])
       @collaboration.save!
 

@@ -19,10 +19,10 @@
 #
 module Csp::AccountHelper
   def self.included(account_class)
-    account_class.has_many :csp_domains, :class_name => "Csp::Domain"
+    account_class.has_many :csp_domains, class_name: "Csp::Domain"
 
     # the setting (and id of the account to search) that will be passed down to sub-accounts e.g. ([true, 2])
-    account_class.add_setting :csp_inherited_data, :inheritable => true
+    account_class.add_setting :csp_inherited_data, inheritable: true
 
     account_class.after_save :unload_csp_data
   end
@@ -104,18 +104,18 @@ module Csp::AccountHelper
   def add_domain!(domain)
     domain = domain.downcase
     Csp::Domain.unique_constraint_retry do |retry_count|
-      if retry_count > 0 && (record = csp_domains.where(:domain => domain).take)
+      if retry_count > 0 && (record = csp_domains.where(domain: domain).take)
         record.undestroy if record.deleted?
         record
       else
-        record = csp_domains.create(:domain => domain)
+        record = csp_domains.create(domain: domain)
         record.valid? && record
       end
     end
   end
 
   def remove_domain!(domain)
-    csp_domains.active.where(:domain => domain.downcase).take&.destroy!
+    csp_domains.active.where(domain: domain.downcase).take&.destroy!
   end
 
   def csp_whitelisted_domains(request = nil, include_files:, include_tools:)
@@ -149,7 +149,7 @@ module Csp::AccountHelper
   end
 
   def csp_tool_scope
-    ContextExternalTool.where(:context_type => "Account", :context_id => account_chain_ids).active
+    ContextExternalTool.where(context_type: "Account", context_id: account_chain_ids).active
   end
 
   def clear_tool_domain_cache

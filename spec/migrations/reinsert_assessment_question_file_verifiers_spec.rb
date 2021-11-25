@@ -25,11 +25,10 @@ describe 'DataFixup::ReinsertAssessmentQuestionFileVerifiers' do
     course_factory
     @att1 = attachment_with_context(@course)
     @att2 = attachment_with_context(@course)
-    bank = @course.assessment_question_banks.create!(:title => 'Test Bank')
-    aq = bank.assessment_questions.create!(:question_data => {
-                                             :question_type => 'essay_question',
-                                             :question_text =>
-        "File refs:
+    bank = @course.assessment_question_banks.create!(title: 'Test Bank')
+    aq = bank.assessment_questions.create!(question_data: {
+                                             question_type: 'essay_question',
+                                             question_text: "File refs:
         <img src=\"/courses/#{@course.id}/files/#{@att1.id}/download\">
         <img src=\"/courses/#{@course.id}/files/#{@att2.id}/download\">"
                                            })
@@ -50,7 +49,7 @@ describe 'DataFixup::ReinsertAssessmentQuestionFileVerifiers' do
     aq.save!
 
     @quiz = @course.quizzes.create!
-    linked_question = @quiz.quiz_questions.create!(:question_data => aq.question_data, :assessment_question_id => aq.id)
+    linked_question = @quiz.quiz_questions.create!(question_data: aq.question_data, assessment_question_id: aq.id)
     @quiz.reload.publish!
     expect(@quiz.reload.quiz_data.first["question_text"]).to eq stripped_text
 
@@ -63,11 +62,10 @@ describe 'DataFixup::ReinsertAssessmentQuestionFileVerifiers' do
   it "is able to fix the broken yaml with another fixup" do
     course_factory
     @att1 = attachment_with_context(@course)
-    bank = @course.assessment_question_banks.create!(:title => 'Test Bank')
-    aq = bank.assessment_questions.create!(:question_data => {
-                                             :question_type => 'essay_question',
-                                             :question_text =>
-        "File refs:
+    bank = @course.assessment_question_banks.create!(title: 'Test Bank')
+    aq = bank.assessment_questions.create!(question_data: {
+                                             question_type: 'essay_question',
+                                             question_text: "File refs:
         <img src=\"/courses/#{@course.id}/files/#{@att1.id}/download\">
         <img src=\"/courses/#{@course.id}/files/#{@att1.id}/download?some_query=1\">
         Here's a whole lot of weird ol' yaml with a whole lot of text\n
@@ -93,7 +91,7 @@ describe 'DataFixup::ReinsertAssessmentQuestionFileVerifiers' do
     aq.save!
 
     @quiz = @course.quizzes.create!
-    linked_question = @quiz.quiz_questions.create!(:question_data => aq.question_data, :assessment_question_id => aq.id)
+    linked_question = @quiz.quiz_questions.create!(question_data: aq.question_data, assessment_question_id: aq.id)
     @quiz.reload.publish!
     expect(@quiz.reload.quiz_data.first["question_text"]).to eq stripped_text
 

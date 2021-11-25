@@ -43,7 +43,7 @@ module Api::V1::UserProfile
     json[:effective_locale] = I18n.locale if user == current_user
 
     if user == current_user
-      json[:calendar] = { :ics => "#{feeds_calendar_url(user.feed_code)}.ics" }
+      json[:calendar] = { ics: "#{feeds_calendar_url(user.feed_code)}.ics" }
       json[:lti_user_id] = user.lti_context_id if user.lti_context_id.present?
       json[:k5_user] = k5_user?
     end
@@ -74,11 +74,11 @@ module Api::V1::UserProfile
 
   def user_service_json(user_service, current_user, session)
     api_json(user_service, current_user, session,
-             :only => %w[service visible],
-             :methods => %(service_user_link))
+             only: %w[service visible],
+             methods: %(service_user_link))
   end
 
   def user_profile_link_json(link, current_user, session)
-    api_json(link, current_user, session, :only => %w[url title])
+    api_json(link, current_user, session, only: %w[url title])
   end
 end

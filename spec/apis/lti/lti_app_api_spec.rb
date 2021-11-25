@@ -50,7 +50,7 @@ module Lti
 
       it 'works for a teacher even without lti_add_edit permissions' do
         course_with_teacher(active_all: true, user: user_with_pseudonym, account: account)
-        account.role_overrides.create!(:permission => "lti_add_edit", :enabled => false, :role => teacher_role)
+        account.role_overrides.create!(permission: "lti_add_edit", enabled: false, role: teacher_role)
         json = api_call(:get, "/api/v1/courses/#{@course.id}/lti_apps/launch_definitions",
                         { controller: 'lti/lti_apps', action: 'launch_definitions', format: 'json', course_id: @course.id.to_s })
         expect(json.count).to eq 1
@@ -152,12 +152,12 @@ module Lti
 
         tool = new_valid_external_tool(@course.root_account)
         tool.global_navigation = {
-          :text => "Global Nav"
+          text: "Global Nav"
         }
         tool.save!
 
         json = api_call(:get, "/api/v1/accounts/#{account.id}/lti_apps/launch_definitions",
-                        { controller: 'lti/lti_apps', action: 'launch_definitions', :account_id => account.id.to_param, format: 'json' },
+                        { controller: 'lti/lti_apps', action: 'launch_definitions', account_id: account.id.to_param, format: 'json' },
                         placements: ['global_navigation'])
 
         expect(response.status).to eq 200
@@ -174,13 +174,13 @@ module Lti
 
         tool = new_valid_external_tool(@course.root_account)
         tool.global_navigation = {
-          :text => "Global Nav",
-          :visibility => "admins"
+          text: "Global Nav",
+          visibility: "admins"
         }
         tool.save!
 
         json = api_call(:get, "/api/v1/accounts/#{account.id}/lti_apps/launch_definitions",
-                        { controller: 'lti/lti_apps', action: 'launch_definitions', :account_id => account.id.to_param, format: 'json' },
+                        { controller: 'lti/lti_apps', action: 'launch_definitions', account_id: account.id.to_param, format: 'json' },
                         placements: ['global_navigation'])
 
         expect(response.status).to eq 200

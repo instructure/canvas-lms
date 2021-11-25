@@ -40,8 +40,8 @@ module Qti
       if read_setting('publishNow') == 'true'
         assessment[:available] = true
         assessment[:assignment] = {
-          :title => assessment[:title],
-          :submission_types => "online_quiz"
+          title: assessment[:title],
+          submission_types: "online_quiz"
         }
       end
 

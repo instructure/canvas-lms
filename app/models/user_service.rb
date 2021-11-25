@@ -44,7 +44,7 @@ class UserService < ActiveRecord::Base
       cc.save!
     end
     if user_id && service
-      UserService.where(:user_id => user_id, :service => service).where("id<>?", self).delete_all
+      UserService.where(user_id: user_id, service: service).where("id<>?", self).delete_all
     end
     true
   end
@@ -65,19 +65,19 @@ class UserService < ActiveRecord::Base
 
   workflow do
     state :active do
-      event :failed_request, :transitions_to => :failed
+      event :failed_request, transitions_to: :failed
     end
 
     state :failed
   end
 
-  scope :of_type, ->(type) { where(:type => type.to_s) }
+  scope :of_type, ->(type) { where(type: type.to_s) }
 
   scope :to_be_polled, -> { where("refresh_at<", Time.now.utc).order(:refresh_at).limit(1) }
-  scope :for_user, ->(user) { where(:user_id => user) }
+  scope :for_user, ->(user) { where(user_id: user) }
   scope :for_service, lambda { |service|
     service = service.service if service.is_a?(UserService)
-    where(:service => service.to_s)
+    where(service: service.to_s)
   }
   scope :visible, -> { where("visible") }
 

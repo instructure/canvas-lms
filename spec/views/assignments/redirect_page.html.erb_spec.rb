@@ -24,7 +24,7 @@ describe "/assignments/redirect_page" do
   it "renders" do
     course_with_student
     view_context(@course, @user)
-    a = @course.assignments.create(:title => "some assignment")
+    a = @course.assignments.create(title: "some assignment")
     s = a.submit_homework(@user)
     assign(:assignment, a)
     assign(:submission, s)

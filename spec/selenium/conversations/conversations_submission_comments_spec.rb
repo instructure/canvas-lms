@@ -30,8 +30,8 @@ describe "conversations new" do
     @s1 = user_factory(name: "first student")
     @s2 = user_factory(name: "second student")
     [@s1, @s2].each { |s| @course.enroll_student(s).update_attribute(:workflow_state, 'active') }
-    cat = @course.group_categories.create(:name => "the groups")
-    @group = cat.groups.create(:name => "the group", :context => @course)
+    cat = @course.group_categories.create(name: "the groups")
+    @group = cat.groups.create(name: "the group", context: @course)
     @group.users = [@s1, @s2]
   end
 
@@ -49,11 +49,11 @@ describe "conversations new" do
         student_in_course(user: @s2, active_all: true, course: @course2)
 
         def assignment_with_submission_comments(title, student, course)
-          assignment = course.assignments.create!(:title => title, :description => 'hai', :points_possible => '14.2', :submission_types => 'online_text_entry')
-          sub = assignment.grade_student(student, { :grade => '12', :grader => @teacher }).first
+          assignment = course.assignments.create!(title: title, description: 'hai', points_possible: '14.2', submission_types: 'online_text_entry')
+          sub = assignment.grade_student(student, { grade: '12', grader: @teacher }).first
           sub.workflow_state = 'submitted'
-          sub.submission_comments.create!(:comment => 'c1', :author => @teacher)
-          sub.submission_comments.create!(:comment => 'c2', :author => student)
+          sub.submission_comments.create!(comment: 'c1', author: @teacher)
+          sub.submission_comments.create!(comment: 'c2', author: student)
           sub.save!
           sub
         end

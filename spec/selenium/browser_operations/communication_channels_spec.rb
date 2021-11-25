@@ -25,7 +25,7 @@ describe "communication channel selenium tests" do
   context "confirm" do
     it "registers the user" do
       Setting.set('terms_required', 'false')
-      u1 = user_with_communication_channel(:user_state => 'creation_pending')
+      u1 = user_with_communication_channel(user_state: 'creation_pending')
       get "/register/#{u1.communication_channel.confirmation_code}"
       set_value f('#pseudonym_password'), "asdfasdf"
       expect_new_page_load do
@@ -36,7 +36,7 @@ describe "communication channel selenium tests" do
 
     it "does not show a mysterious error" do
       Setting.set('terms_required', 'false')
-      u1 = user_with_communication_channel(:user_state => 'creation_pending')
+      u1 = user_with_communication_channel(user_state: 'creation_pending')
       get "/register/#{u1.communication_channel.confirmation_code}"
       f('#registration_confirmation_form').submit
       wait_for_ajaximations
@@ -47,7 +47,7 @@ describe "communication channel selenium tests" do
     end
 
     it "requires the terms if configured to do so" do
-      u1 = user_with_communication_channel(:user_state => 'creation_pending')
+      u1 = user_with_communication_channel(user_state: 'creation_pending')
       get "/register/#{u1.communication_channel.confirmation_code}"
       expect(f('input[name="user[terms_of_use]"]')).to be_present
       f('#registration_confirmation_form').submit
@@ -56,7 +56,7 @@ describe "communication channel selenium tests" do
     end
 
     it "does not require the terms if the user has already accepted them" do
-      u1 = user_with_communication_channel(:user_state => 'creation_pending')
+      u1 = user_with_communication_channel(user_state: 'creation_pending')
       u1.preferences[:accepted_terms] = Time.now.utc
       u1.save
       get "/register/#{u1.communication_channel.confirmation_code}"
@@ -64,11 +64,11 @@ describe "communication channel selenium tests" do
     end
 
     it "allows the user to edit the pseudonym if its already taken" do
-      u1 = user_with_communication_channel(:username => 'asdf@qwerty.com', :user_state => 'creation_pending')
+      u1 = user_with_communication_channel(username: 'asdf@qwerty.com', user_state: 'creation_pending')
       u1.accept_terms
       u1.save
       # d'oh, now it's taken
-      user_with_pseudonym(:username => 'asdf@qwerty.com', :active_user => true)
+      user_with_pseudonym(username: 'asdf@qwerty.com', active_user: true)
 
       get "/register/#{u1.communication_channel.confirmation_code}"
       # they can set it...

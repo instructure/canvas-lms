@@ -20,7 +20,7 @@
 
 describe StreamItemsHelper do
   before :once do
-    Notification.create!(:name => "Assignment Created", :category => "TestImmediately")
+    Notification.create!(name: "Assignment Created", category: "TestImmediately")
     course_with_teacher(active_all: true)
     @reviewee_student = course_with_student(active_all: true, course: @course).user
     @reviewer_student = course_with_student(active_all: true, course: @course).user
@@ -33,7 +33,7 @@ describe StreamItemsHelper do
     entry.mentions.new(user_id: @teacher, root_account_id: @discussion.root_account_id)
     entry.save!
     @announcement = announcement_model
-    @assignment = assignment_model(:course => @course, peer_reviews: true)
+    @assignment = assignment_model(course: @course, peer_reviews: true)
     @assignment.assign_peer_review(@teacher, @student)
     @assignment.assign_peer_review(@reviewer_student, @reviewee_student)
     # this conversation will not be shown, since the teacher is the last author
@@ -73,13 +73,13 @@ describe StreamItemsHelper do
     it "skips items that are not visible to the current user" do
       # this discussion topic will not be shown since it is a graded discussion with a
       # future unlock at date
-      @group_assignment_discussion = group_assignment_discussion({ :course => @course })
+      @group_assignment_discussion = group_assignment_discussion({ course: @course })
       @group_assignment_discussion.update_attribute(:user, @teacher)
       assignment = @group_assignment_discussion.assignment
       assignment.update({
-                          :due_at => 30.days.from_now,
-                          :lock_at => 30.days.from_now,
-                          :unlock_at => 20.days.from_now
+                          due_at: 30.days.from_now,
+                          lock_at: 30.days.from_now,
+                          unlock_at: 20.days.from_now
                         })
       expect(@student.recent_stream_items).not_to include @group_assignment_discussion
       expect(@teacher.recent_stream_items).not_to include @group_assignment_discussion
@@ -101,10 +101,10 @@ describe StreamItemsHelper do
       specs_require_sharding
 
       it "stream item ids should always be relative to the user's shard" do
-        course_with_teacher(:active_all => 1)
+        course_with_teacher(active_all: 1)
         @user2 = @shard1.activate { user_model }
         @course.enroll_student(@user2).accept!
-        @course.discussion_topics.create!(:title => 'title')
+        @course.discussion_topics.create!(title: 'title')
 
         items = @user2.recent_stream_items
         categorized = helper.categorize_stream_items(items, @user2)

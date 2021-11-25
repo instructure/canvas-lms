@@ -59,7 +59,7 @@ module ManageGroupsCommon
     students = []
     student_count.times do |i|
       count = i + 1
-      student = user_model :name => "student #{count}"
+      student = user_model name: "student #{count}"
       students.push student
       if opts[count.to_s].nil?
         @course.enroll_student(student)
@@ -71,12 +71,12 @@ module ManageGroupsCommon
   end
 
   def create_new_set_groups(context, *category_groups)
-    category_groups.each_with_index { |cg, i| context.groups.create(:name => "Group #{i}", :group_category => cg) }
+    category_groups.each_with_index { |cg, i| context.groups.create(name: "Group #{i}", group_category: cg) }
   end
 
   def create_categories(context, i = 3)
     categories = []
-    i.times { |j| categories.push context.group_categories.create(:name => "Group Category #{j}") }
+    i.times { |j| categories.push context.group_categories.create(name: "Group Category #{j}") }
     categories
   end
 
@@ -92,7 +92,7 @@ module ManageGroupsCommon
 
   def add_groups_in_category(category, i = 3)
     groups = []
-    i.times { |j| groups.push category.context.groups.create(:name => "group #{j}", :group_category => category) }
+    i.times { |j| groups.push category.context.groups.create(name: "group #{j}", group_category: category) }
     groups
   end
 

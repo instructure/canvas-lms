@@ -34,7 +34,7 @@ describe "/courses/index" do
 
   it "shows context name in groups table" do
     course_with_student
-    group_with_user(:user => @user, :group_context => @course)
+    group_with_user(user: @user, group_context: @course)
     view_context
     assign(:current_enrollments, [@enrollment])
     assign(:past_enrollments, [])
@@ -46,12 +46,12 @@ describe "/courses/index" do
   end
 
   it "does not show groups for restricted future courses" do
-    term = EnrollmentTerm.new(:name => "term", :start_at => 1.week.from_now, :end_at => 1.month.from_now)
+    term = EnrollmentTerm.new(name: "term", start_at: 1.week.from_now, end_at: 1.month.from_now)
     course_with_student
     @course.restrict_student_future_view = true
-    @course.update!(:enrollment_term => term)
+    @course.update!(enrollment_term: term)
 
-    group_with_user(:user => @user, :group_context => @course)
+    group_with_user(user: @user, group_context: @course)
     view_context
     assign(:current_enrollments, [])
     assign(:past_enrollments, [])

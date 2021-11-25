@@ -21,7 +21,7 @@
 describe FileInContext do
   before do
     course_model
-    folder_model(:name => 'course files')
+    folder_model(name: 'course files')
     @course.folders << @folder
     @course.save!
     @course.reload

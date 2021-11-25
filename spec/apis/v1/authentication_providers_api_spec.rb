@@ -22,8 +22,8 @@ require_relative '../api_spec_helper'
 
 describe "AuthenticationProviders API", type: :request do
   before :once do
-    @account = account_model(:name => 'root')
-    user_with_pseudonym(:active_all => true, :account => @account)
+    @account = account_model(name: 'root')
+    user_with_pseudonym(active_all: true, account: @account)
     @account.authentication_providers.scope.delete_all
     @account.account_users.create!(user: @user)
     @cas_hash = { "auth_type" => "cas",
@@ -48,14 +48,14 @@ describe "AuthenticationProviders API", type: :request do
   context "/index" do
     def call_index(status = 200)
       api_call(:get, "/api/v1/accounts/#{@account.id}/authentication_providers",
-               { :controller => 'authentication_providers', :action => 'index', :account_id => @account.id.to_s, :format => 'json' },
-               {}, {}, :expected_status => status)
+               { controller: 'authentication_providers', action: 'index', account_id: @account.id.to_s, format: 'json' },
+               {}, {}, expected_status: status)
     end
 
     it "returns all aacs in position order" do
-      @account.authentication_providers.create!(@saml_hash.merge(:idp_entity_id => "a"))
-      @account.authentication_providers.create!(@saml_hash.merge(:idp_entity_id => "d"))
-      config3 = @account.authentication_providers.create!(@saml_hash.merge(:idp_entity_id => "r"))
+      @account.authentication_providers.create!(@saml_hash.merge(idp_entity_id: "a"))
+      @account.authentication_providers.create!(@saml_hash.merge(idp_entity_id: "d"))
+      config3 = @account.authentication_providers.create!(@saml_hash.merge(idp_entity_id: "r"))
       config3.move_to_top
       config3.save!
 
@@ -65,7 +65,7 @@ describe "AuthenticationProviders API", type: :request do
     end
 
     it "returns unauthorized error" do
-      course_with_student(:course => @course)
+      course_with_student(course: @course)
       call_index(401)
     end
   end
@@ -75,8 +75,8 @@ describe "AuthenticationProviders API", type: :request do
 
     def call_create(params, status = 200)
       json = api_call(:post, "/api/v1/accounts/#{@account.id}/authentication_providers",
-                      { :controller => 'authentication_providers', :action => 'create', :account_id => @account.id.to_s, :format => 'json' },
-                      params, {}, :expected_status => status)
+                      { controller: 'authentication_providers', action: 'create', account_id: @account.id.to_s, format: 'json' },
+                      params, {}, expected_status: status)
       @account.reload
       json
     end
@@ -110,7 +110,7 @@ describe "AuthenticationProviders API", type: :request do
     end
 
     it "works with rails form style params" do
-      call_create({ :authentication_provider => @saml_hash })
+      call_create({ authentication_provider: @saml_hash })
       aac = @account.authentication_providers.first
       expect(aac.auth_type).to eq 'saml'
       expect(aac.idp_entity_id).to eq 'http://example.com/saml1'
@@ -208,7 +208,7 @@ describe "AuthenticationProviders API", type: :request do
     end
 
     it "returns unauthorized error" do
-      course_with_student(:course => @course)
+      course_with_student(course: @course)
       call_create({}, 401)
     end
 
@@ -256,8 +256,8 @@ describe "AuthenticationProviders API", type: :request do
 
     def call_update(id, params, status = 200)
       json = api_call(:put, "/api/v1/accounts/#{@account.id}/authentication_providers/#{id}",
-                      { :controller => 'authentication_providers', :action => 'update', :account_id => @account.id.to_s, :id => id.to_param, :format => 'json' },
-                      params, {}, :expected_status => status)
+                      { controller: 'authentication_providers', action: 'update', account_id: @account.id.to_s, id: id.to_param, format: 'json' },
+                      params, {}, expected_status: status)
       @account.reload
       json
     end
@@ -292,7 +292,7 @@ describe "AuthenticationProviders API", type: :request do
     it "works with rails form style params" do
       aac = @account.authentication_providers.create!(@saml_hash)
       @saml_hash['idp_entity_id'] = 'hahahaha'
-      call_update(aac.id, { :authentication_provider => @saml_hash })
+      call_update(aac.id, { authentication_provider: @saml_hash })
 
       aac.reload
       expect(aac.idp_entity_id).to eq 'hahahaha'
@@ -337,7 +337,7 @@ describe "AuthenticationProviders API", type: :request do
     end
 
     it "returns unauthorized error" do
-      course_with_student(:course => @course)
+      course_with_student(course: @course)
       call_update(0, {}, 401)
     end
 
@@ -358,8 +358,8 @@ describe "AuthenticationProviders API", type: :request do
   context "/show" do
     def call_show(id, status = 200)
       api_call(:get, "/api/v1/accounts/#{@account.id}/authentication_providers/#{id}",
-               { :controller => 'authentication_providers', :action => 'show', :account_id => @account.id.to_s, :id => id.to_param, :format => 'json' },
-               {}, {}, :expected_status => status)
+               { controller: 'authentication_providers', action: 'show', account_id: @account.id.to_s, id: id.to_param, format: 'json' },
+               {}, {}, expected_status: status)
     end
 
     it "returns saml aac" do
@@ -414,13 +414,13 @@ describe "AuthenticationProviders API", type: :request do
     end
 
     it "returns unauthorized error" do
-      course_with_student(:course => @course)
+      course_with_student(course: @course)
       call_show(0, 401)
     end
 
     it "allows seeing the canvas auth type for any authenticated user" do
       @account.authentication_providers.create!(auth_type: 'canvas')
-      course_with_student(:course => @course)
+      course_with_student(course: @course)
       call_show('canvas')
     end
   end
@@ -428,8 +428,8 @@ describe "AuthenticationProviders API", type: :request do
   context "/destroy" do
     def call_destroy(id, status = 200)
       json = api_call(:delete, "/api/v1/accounts/#{@account.id}/authentication_providers/#{id}",
-                      { :controller => 'authentication_providers', :action => 'destroy', :account_id => @account.id.to_s, :id => id.to_param, :format => 'json' },
-                      {}, {}, :expected_status => status)
+                      { controller: 'authentication_providers', action: 'destroy', account_id: @account.id.to_s, id: id.to_param, format: 'json' },
+                      {}, {}, expected_status: status)
       @account.reload
       json
     end
@@ -471,7 +471,7 @@ describe "AuthenticationProviders API", type: :request do
     end
 
     it "returns unauthorized error" do
-      course_with_student(:course => @course)
+      course_with_student(course: @course)
       call_destroy(0, 401)
     end
   end

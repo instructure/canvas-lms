@@ -95,8 +95,8 @@ require 'csv'
 #     }
 #
 class GroupCategoriesController < ApplicationController
-  before_action :require_context, :only => [:create, :index]
-  before_action :get_category_context, :only => %i[show update destroy groups users assign_unassigned_members import export]
+  before_action :require_context, only: [:create, :index]
+  before_action :get_category_context, only: %i[show update destroy groups users assign_unassigned_members import export]
 
   include Api::V1::Attachment
   include Api::V1::GroupCategory
@@ -125,7 +125,7 @@ class GroupCategoriesController < ApplicationController
           paginated_categories = Api.paginate(@categories, self, path)
           includes = ['progress_url']
           includes.concat(params[:includes]) if params[:includes]
-          render :json => paginated_categories.map { |c| group_category_json(c, @current_user, session, :include => includes) }
+          render json: paginated_categories.map { |c| group_category_json(c, @current_user, session, include: includes) }
         end
       end
     end
@@ -147,7 +147,7 @@ class GroupCategoriesController < ApplicationController
         if authorized_action(@group_category.context, @current_user, [:manage_groups, *RoleOverride::GRANULAR_MANAGE_GROUPS_PERMISSIONS])
           includes = ['progress_url']
           includes.concat(params[:includes]) if params[:includes]
-          render :json => group_category_json(@group_category, @current_user, session, :include => includes)
+          render json: group_category_json(@group_category, @current_user, session, include: includes)
         end
       end
     end
@@ -210,10 +210,10 @@ class GroupCategoriesController < ApplicationController
               return render json: { message: "You must have manage_sis permission to set sis attributes" }, status: :unauthorized
             end
           end
-          render :json => group_category_json(@group_category, @current_user, session, include: includes)
+          render json: group_category_json(@group_category, @current_user, session, include: includes)
         else
           flash[:notice] = t('notices.create_category_success', 'Category was successfully created.')
-          render :json => [@group_category.as_json, @group_category.groups.map { |g| g.as_json(:include => :users) }]
+          render json: [@group_category.as_json, @group_category.groups.map { |g| g.as_json(include: :users) }]
         end
       end
     end
@@ -266,7 +266,7 @@ class GroupCategoriesController < ApplicationController
   # @returns Progress
   def import
     if authorized_action(@context, @current_user, [:manage_groups, :manage_groups_add])
-      return render(:json => { 'status' => 'unauthorized' }, :status => :unauthorized) if @group_category.protected?
+      return render(json: { 'status' => 'unauthorized' }, status: :unauthorized) if @group_category.protected?
 
       file_obj = if params.key?(:attachment)
                    params[:attachment]
@@ -275,7 +275,7 @@ class GroupCategoriesController < ApplicationController
                  end
 
       progress = GroupAndMembershipImporter.create_import_with_attachment(@group_category, file_obj)
-      render(:json => progress_json(progress, @current_user, session))
+      render(json: progress_json(progress, @current_user, session))
     end
   end
 
@@ -329,7 +329,7 @@ class GroupCategoriesController < ApplicationController
         if populate_group_category_from_params
           includes = ['progress_url']
           includes.concat(params[:includes]) if params[:includes]
-          render :json => group_category_json(@group_category, @current_user, session, :include => includes)
+          render json: group_category_json(@group_category, @current_user, session, include: includes)
         end
         if (sis_id = params[:sis_group_category_id])
           if @group_category.root_account.grants_right?(@current_user, :manage_sis)
@@ -343,12 +343,12 @@ class GroupCategoriesController < ApplicationController
           end
         end
       else
-        return render(:json => { 'status' => 'not found' }, :status => :not_found) unless @group_category
-        return render(:json => { 'status' => 'unauthorized' }, :status => :unauthorized) if @group_category.protected?
+        return render(json: { 'status' => 'not found' }, status: :not_found) unless @group_category
+        return render(json: { 'status' => 'unauthorized' }, status: :unauthorized) if @group_category.protected?
 
         if populate_group_category_from_params
           flash[:notice] = t('notices.update_category_success', 'Category was successfully updated.')
-          render :json => @group_category
+          render json: @group_category
         end
       end
     end
@@ -366,20 +366,20 @@ class GroupCategoriesController < ApplicationController
   def destroy
     if authorized_action(@context, @current_user, [:manage_groups, :manage_groups_delete])
       @group_category ||= @context.group_categories.where(id: params[:category_id]).first
-      return render(:json => { 'status' => 'not found' }, :status => :not_found) unless @group_category
-      return render(:json => { 'status' => 'unauthorized' }, :status => :unauthorized) if @group_category.protected?
+      return render(json: { 'status' => 'not found' }, status: :not_found) unless @group_category
+      return render(json: { 'status' => 'unauthorized' }, status: :unauthorized) if @group_category.protected?
 
       if @group_category.destroy
         if api_request?
-          render :json => group_category_json(@group_category, @current_user, session)
+          render json: group_category_json(@group_category, @current_user, session)
         else
           flash[:notice] = t('notices.delete_category_success', "Category successfully deleted")
-          render :json => { :deleted => true }
+          render json: { deleted: true }
         end
       elsif api_request?
-        render :json => @group_category.errors, :status => :bad_request
+        render json: @group_category.errors, status: :bad_request
       else
-        render :json => { :deleted => false }
+        render json: { deleted: false }
       end
     end
   end
@@ -397,7 +397,7 @@ class GroupCategoriesController < ApplicationController
     if authorized_action(@context, @current_user, [:manage_groups, *RoleOverride::GRANULAR_MANAGE_GROUPS_PERMISSIONS])
       @groups = @group_category.groups.active.by_name.preload(:root_account)
       @groups = Api.paginate(@groups, self, api_v1_group_category_groups_url)
-      render :json => @groups.map { |g| group_json(g, @current_user, session) }
+      render json: @groups.map { |g| group_json(g, @current_user, session) }
     end
   end
 
@@ -526,7 +526,7 @@ class GroupCategoriesController < ApplicationController
       end
     end
 
-    render :json => json_users
+    render json: json_users
   end
 
   # @API Assign unassigned members
@@ -624,8 +624,8 @@ class GroupCategoriesController < ApplicationController
 
     # option disabled for student organized groups or section-restricted
     # self-signup groups. (but self-signup is ignored for non-Course groups)
-    return render(:json => {}, :status => :bad_request) if @group_category.student_organized?
-    return render(:json => {}, :status => :bad_request) if @context.is_a?(Course) && @group_category.restricted_self_signup?
+    return render(json: {}, status: :bad_request) if @group_category.student_organized?
+    return render(json: {}, status: :bad_request) if @context.is_a?(Course) && @group_category.restricted_self_signup?
 
     by_section = value_to_boolean(params[:group_by_section])
 
@@ -635,12 +635,12 @@ class GroupCategoriesController < ApplicationController
 
       # render the changes
       json = memberships.group_by(&:group_id).map do |group_id, new_members|
-        { :id => group_id, :new_members => new_members.map { |m| m.user.group_member_json(@context) } }
+        { id: group_id, new_members: new_members.map { |m| m.user.group_member_json(@context) } }
       end
-      render :json => json
+      render json: json
     else
       @group_category.assign_unassigned_members_in_background(by_section, updating_user: @current_user)
-      render :json => progress_json(@group_category.current_progress, @current_user, session)
+      render json: progress_json(@group_category.current_progress, @current_user, session)
     end
   end
 
@@ -650,7 +650,7 @@ class GroupCategoriesController < ApplicationController
 
     DueDateCacher.with_executing_user(@current_user) do
       unless @group_category.save
-        render :json => @group_category.errors, :status => :bad_request
+        render json: @group_category.errors, status: :bad_request
         return false
       end
     end
@@ -669,9 +669,9 @@ class GroupCategoriesController < ApplicationController
             new_group_category.save!
             group_category.clone_groups_and_memberships(new_group_category)
           end
-          render :json => new_group_category
+          render json: new_group_category
         rescue ActiveRecord::RecordInvalid
-          render :json => new_group_category.errors, :status => :bad_request
+          render json: new_group_category.errors, status: :bad_request
         end
       end
     end
@@ -684,7 +684,7 @@ class GroupCategoriesController < ApplicationController
       id = api_request? ? params[:group_category_id] : params[:id]
       @group_category = api_find(GroupCategory.active, id)
     rescue ActiveRecord::RecordNotFound
-      return render(:json => { 'status' => 'not found' }, :status => :not_found) unless @group_category
+      return render(json: { 'status' => 'not found' }, status: :not_found) unless @group_category
     end
     @context = @group_category.context
   end

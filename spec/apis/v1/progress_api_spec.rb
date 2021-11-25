@@ -24,14 +24,14 @@ describe ProgressController, type: :request do
   describe "show" do
     before :once do
       @account = account_model
-      account_admin_user :account => @account
-      @progress = @account.progresses.build :tag => 'course_batch_update', :completion => 55.0, :message => 'hello'
+      account_admin_user account: @account
+      @progress = @account.progresses.build tag: 'course_batch_update', completion: 55.0, message: 'hello'
       @progress.user_id = @user.id
       @progress.start!
       @progress.save!
 
       @path = "/api/v1/progress/#{@progress.id}"
-      @params = { :controller => 'progress', :action => 'show', :id => @progress.id.to_s, :format => 'json' }
+      @params = { controller: 'progress', action: 'show', id: @progress.id.to_s, format: 'json' }
     end
 
     it "shows Progress" do
@@ -49,13 +49,13 @@ describe ProgressController, type: :request do
 
     it "401s if the caller does not have permission to view the context" do
       other_account = account_model
-      account_admin_user :account => other_account
-      api_call(:get, @path, @params, {}, {}, { :expected_status => 401 })
+      account_admin_user account: other_account
+      api_call(:get, @path, @params, {}, {}, { expected_status: 401 })
     end
 
     it "404s if the object doesn't exist" do
       @progress.destroy
-      api_call(:get, @path, @params, {}, {}, { :expected_status => 404 })
+      api_call(:get, @path, @params, {}, {}, { expected_status: 404 })
     end
   end
 end

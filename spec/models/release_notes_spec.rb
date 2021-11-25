@@ -164,7 +164,7 @@ describe ReleaseNote do
     id_3 = note.id
 
     pager = ReleaseNote.paginated
-    page1 = pager.paginate(:per_page => 2)
+    page1 = pager.paginate(per_page: 2)
     expect(page1.length).to eq(2)
     expect(page1.next_page).to be_truthy
     expect(page1[0].id).to eq(id_3)

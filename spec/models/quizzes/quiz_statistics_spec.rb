@@ -22,9 +22,9 @@ require 'csv'
 
 describe Quizzes::QuizStatistics do
   before(:once) do
-    student_in_course(:active_all => true)
+    student_in_course(active_all: true)
     @quiz = @course.quizzes.create!
-    @quiz.quiz_questions.create!(:question_data => { :name => "test 1" })
+    @quiz.quiz_questions.create!(question_data: { name: "test 1" })
     @quiz.generate_quiz_data
     @quiz.published_at = Time.now
     @quiz.save!
@@ -61,7 +61,7 @@ describe Quizzes::QuizStatistics do
     # and one in progress
     @quiz.generate_submission(@student)
 
-    stats = CSV.parse(csv(:include_all_versions => true))
+    stats = CSV.parse(csv(include_all_versions: true))
     expect(stats.first.length).to eq 10
   end
 

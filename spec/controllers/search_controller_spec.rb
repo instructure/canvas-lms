@@ -20,18 +20,18 @@
 describe SearchController do
   describe "GET 'recipients'" do
     it "assigns variables" do
-      course_with_student_logged_in(:active_all => true)
+      course_with_student_logged_in(active_all: true)
       @course.update_attribute(:name, "this_is_a_test_course")
 
-      other = User.create(:name => 'this_is_a_test_user')
+      other = User.create(name: 'this_is_a_test_user')
       enrollment = @course.enroll_student(other)
       enrollment.workflow_state = 'active'
       enrollment.save
 
-      group = @course.groups.create(:name => 'this_is_a_test_group')
+      group = @course.groups.create(name: 'this_is_a_test_group')
       group.users = [@user, other]
 
-      get 'recipients', params: { :search => 'this_is_a_test_' }
+      get 'recipients', params: { search: 'this_is_a_test_' }
       expect(response).to be_successful
       expect(response.body).to include(@course.name)
       expect(response.body).to include(group.name)
@@ -39,27 +39,27 @@ describe SearchController do
     end
 
     it "sorts alphabetically" do
-      course_with_student_logged_in(:active_all => true)
+      course_with_student_logged_in(active_all: true)
       @user.update_attribute(:name, 'bob')
-      other = User.create(:name => 'billy')
+      other = User.create(name: 'billy')
       @course.enroll_student(other).tap do |e|
         e.workflow_state = 'active'
         e.save!
       end
 
-      group = @course.groups.create(:name => 'group')
+      group = @course.groups.create(name: 'group')
       group.users << other
 
-      get 'recipients', params: { :context => @course.asset_string, :per_page => '1', :type => 'user' }
+      get 'recipients', params: { context: @course.asset_string, per_page: '1', type: 'user' }
       expect(response).to be_successful
       expect(response.body).to include('billy')
       expect(response.body).not_to include('bob')
     end
 
     it "optionally shows users who haven't finished registration" do
-      course_with_student_logged_in(:active_all => true)
+      course_with_student_logged_in(active_all: true)
       @user.update_attribute(:name, 'billy')
-      other = User.create(:name => 'bob')
+      other = User.create(name: 'bob')
       other.update_attribute(:workflow_state, 'creation_pending')
       @course.enroll_student(other).tap do |e|
         e.workflow_state = 'invited'
@@ -67,8 +67,8 @@ describe SearchController do
       end
 
       get 'recipients', params: {
-        :search => 'b', :type => 'user', :skip_visibility_checks => true,
-        :synthetic_contexts => true, :context => "course_#{@course.id}_students"
+        search: 'b', type: 'user', skip_visibility_checks: true,
+        synthetic_contexts: true, context: "course_#{@course.id}_students"
       }
       expect(response).to be_successful
       expect(response.body).to include('bob')
@@ -76,30 +76,30 @@ describe SearchController do
     end
 
     it "allows filtering out non-messageable courses" do
-      course_with_student_logged_in(:active_all => true)
+      course_with_student_logged_in(active_all: true)
       @course.update_attribute(:name, "course1")
       @course2 = course_factory(active_all: true)
       @course2.enroll_student(@user).accept
       @course2.update_attribute(:name, "course2")
-      term = @course2.root_account.enrollment_terms.create! :name => "Fall", :end_at => 1.day.ago
-      @course2.update! :enrollment_term => term
-      get 'recipients', params: { search: 'course', :messageable_only => true }
+      term = @course2.root_account.enrollment_terms.create! name: "Fall", end_at: 1.day.ago
+      @course2.update! enrollment_term: term
+      get 'recipients', params: { search: 'course', messageable_only: true }
       expect(response.body).to include('course1')
       expect(response.body).not_to include('course2')
     end
 
     it "returns an empty list when searching in a non-messageable context" do
-      course_with_student_logged_in(:active_all => true)
+      course_with_student_logged_in(active_all: true)
       @enrollment.update(workflow_state: 'deleted')
-      get 'recipients', params: { search: 'foo', :context => @course.asset_string }
+      get 'recipients', params: { search: 'foo', context: @course.asset_string }
       expect(response.body).to match(/\[\]\z/)
     end
 
     it "handles groups in courses without messageable enrollments" do
       course_with_student_logged_in
-      group = @course.groups.create(:name => 'this_is_a_test_group')
+      group = @course.groups.create(name: 'this_is_a_test_group')
       group.users = [@user]
-      get 'recipients', params: { :search => '', :type => 'context' }
+      get 'recipients', params: { search: '', type: 'context' }
       expect(response).to be_successful
       # This is questionable legacy behavior.
       expect(response.body).to include(group.name)
@@ -108,12 +108,12 @@ describe SearchController do
     context "with admin_context" do
       it "returns nothing if the user doesn't have rights" do
         user_session(user_factory)
-        course_factory(active_all: true).course_sections.create(:name => "other section")
+        course_factory(active_all: true).course_sections.create(name: "other section")
         expect(response).to be_successful
 
         get 'recipients', params: {
-          :type => 'section', :skip_visibility_checks => true,
-          :synthetic_contexts => true, :context => "course_#{@course.id}_sections"
+          type: 'section', skip_visibility_checks: true,
+          synthetic_contexts: true, context: "course_#{@course.id}_sections"
         }
         expect(response.body).to match(/\[\]\z/)
       end
@@ -121,11 +121,11 @@ describe SearchController do
       it "returns sub-contexts" do
         account_admin_user
         user_session(@user)
-        course_factory(active_all: true).course_sections.create(:name => "other section")
+        course_factory(active_all: true).course_sections.create(name: "other section")
 
         get 'recipients', params: {
-          :type => 'section', :skip_visibility_checks => true,
-          :synthetic_contexts => true, :context => "course_#{@course.id}_sections"
+          type: 'section', skip_visibility_checks: true,
+          synthetic_contexts: true, context: "course_#{@course.id}_sections"
         }
         expect(response).to be_successful
         expect(response.body).to include('other section')
@@ -135,11 +135,11 @@ describe SearchController do
         account_admin_user
         user_session(@user)
         course_factory(active_all: true)
-        @section = @course.course_sections.create!(:name => 'Section1')
-        @section2 = @course.course_sections.create!(:name => 'Section2')
-        @student1 = user_with_pseudonym(:active_all => true, :name => 'Student1', :username => 'student1@instructure.com')
+        @section = @course.course_sections.create!(name: 'Section1')
+        @section2 = @course.course_sections.create!(name: 'Section2')
+        @student1 = user_with_pseudonym(active_all: true, name: 'Student1', username: 'student1@instructure.com')
         @section.enroll_user(@student1, 'StudentEnrollment', 'active')
-        @student2 = user_with_pseudonym(:active_all => true, :name => 'Student2', :username => 'student2@instructure.com')
+        @student2 = user_with_pseudonym(active_all: true, name: 'Student2', username: 'student2@instructure.com')
         @section2.enroll_user(@student2, 'StudentEnrollment', 'active')
 
         get 'recipients', params: {
@@ -155,12 +155,12 @@ describe SearchController do
       it "returns sub-users" do
         account_admin_user
         user_session(@user)
-        course_factory(active_all: true).course_sections.create(:name => "other section")
-        course_with_student(:active_all => true)
+        course_factory(active_all: true).course_sections.create(name: "other section")
+        course_with_student(active_all: true)
 
         get 'recipients', params: {
-          :type => 'user', :skip_visibility_checks => true,
-          :synthetic_contexts => true, :context => "course_#{@course.id}_all"
+          type: 'user', skip_visibility_checks: true,
+          synthetic_contexts: true, context: "course_#{@course.id}_all"
         }
         expect(response.body).to include(@teacher.name)
         expect(response.body).to include(@student.name)
@@ -169,26 +169,26 @@ describe SearchController do
 
     context "with section privilege limitations" do
       before do
-        course_with_teacher_logged_in(:active_all => true)
-        @section = @course.course_sections.create!(:name => 'Section1')
-        @section2 = @course.course_sections.create!(:name => 'Section2')
+        course_with_teacher_logged_in(active_all: true)
+        @section = @course.course_sections.create!(name: 'Section1')
+        @section2 = @course.course_sections.create!(name: 'Section2')
         @enrollment.update_attribute(:course_section, @section)
         @enrollment.update_attribute(:limit_privileges_to_course_section, true)
-        @student1 = user_with_pseudonym(:active_all => true, :name => 'Student1', :username => 'student1@instructure.com')
+        @student1 = user_with_pseudonym(active_all: true, name: 'Student1', username: 'student1@instructure.com')
         @section.enroll_user(@student1, 'StudentEnrollment', 'active')
-        @student2 = user_with_pseudonym(:active_all => true, :name => 'Student2', :username => 'student2@instructure.com')
+        @student2 = user_with_pseudonym(active_all: true, name: 'Student2', username: 'student2@instructure.com')
         @section2.enroll_user(@student2, 'StudentEnrollment', 'active')
       end
 
       it "excludes non-messageable contexts" do
         get 'recipients', params: {
-          :context => "course_#{@course.id}",
-          :synthetic_contexts => true
+          context: "course_#{@course.id}",
+          synthetic_contexts: true
         }
         expect(response.body).to include('"name":"Course Sections"')
         get 'recipients', params: {
-          :context => "course_#{@course.id}_sections",
-          :synthetic_contexts => true
+          context: "course_#{@course.id}_sections",
+          synthetic_contexts: true
         }
         expect(response.body).to include('Section1')
         expect(response.body).not_to include('Section2')
@@ -196,7 +196,7 @@ describe SearchController do
 
       it "excludes non-messageable users" do
         get 'recipients', params: {
-          :context => "course_#{@course.id}_students"
+          context: "course_#{@course.id}_students"
         }
         expect(response.body).to include('Student1')
         expect(response.body).not_to include('Student2')

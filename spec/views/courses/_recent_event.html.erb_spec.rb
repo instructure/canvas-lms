@@ -23,18 +23,18 @@ require_relative '../views_helper'
 describe "/courses/_recent_event" do
   it "renders" do
     course_with_student
-    assignment = @course.assignments.create!(:title => 'my assignment')
+    assignment = @course.assignments.create!(title: 'my assignment')
     view_context
-    render :partial => "courses/recent_event", :object => assignment, :locals => { :is_hidden => false }
+    render partial: "courses/recent_event", object: assignment, locals: { is_hidden: false }
     expect(response).not_to be_nil
     expect(response.body).to match %r{<b class="event-details__title">my assignment</b>}
   end
 
   it "renders without a user" do
     course_factory
-    assignment = @course.assignments.create!(:title => 'my assignment')
+    assignment = @course.assignments.create!(title: 'my assignment')
     view_context
-    render :partial => "courses/recent_event", :object => assignment, :locals => { :is_hidden => false }
+    render partial: "courses/recent_event", object: assignment, locals: { is_hidden: false }
     expect(response).not_to be_nil
     expect(response.body).to match %r{<b class="event-details__title">my assignment</b>}
   end
@@ -112,17 +112,17 @@ describe "/courses/_recent_event" do
     end
 
     it "shows the grade for a non-muted assignment" do
-      render :partial => "courses/recent_event",
-             :object => @quiz.assignment,
-             :locals => { :is_hidden => false, :submissions => [@submission] }
+      render partial: "courses/recent_event",
+             object: @quiz.assignment,
+             locals: { is_hidden: false, submissions: [@submission] }
       expect(response.body).to match(/1,234,567,890/)
     end
 
     it "does not show the grade for a muted assignment" do
       @quiz.assignment.mute!
-      render :partial => "courses/recent_event",
-             :object => @quiz.assignment,
-             :locals => { :is_hidden => false, :submissions => [@submission] }
+      render partial: "courses/recent_event",
+             object: @quiz.assignment,
+             locals: { is_hidden: false, submissions: [@submission] }
       expect(response.body).not_to match(/1,234,567,890/)
     end
   end

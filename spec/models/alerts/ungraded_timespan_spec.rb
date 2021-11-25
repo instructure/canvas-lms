@@ -24,11 +24,11 @@ module Alerts
   describe UngradedTimespan do
     describe "#should_not_receive_message?" do
       before :once do
-        course_with_teacher(:active_all => 1)
+        course_with_teacher(active_all: 1)
         @teacher = @user
         @user = nil
-        student_in_course(:active_all => 1)
-        @assignment = @course.assignments.new(:title => "some assignment")
+        student_in_course(active_all: 1)
+        @assignment = @course.assignments.new(title: "some assignment")
         @assignment.workflow_state = "published"
         @assignment.save
         @opts = {

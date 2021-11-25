@@ -26,15 +26,15 @@ describe "Standard Common Cartridge importing" do
     before(:once) do
       archive_file_path = File.join(File.dirname(__FILE__) + "/../../../fixtures/migration/asmnt_example.zip")
       unzipped_file_path = create_temp_dir!
-      converter = CC::Importer::Standard::Converter.new(:export_archive_path => archive_file_path, :course_name => 'oi', :base_download_dir => unzipped_file_path)
+      converter = CC::Importer::Standard::Converter.new(export_archive_path: archive_file_path, course_name: 'oi', base_download_dir: unzipped_file_path)
       converter.export
       @course_data = converter.course.with_indifferent_access
       @course_data['all_files_export'] ||= {}
       @course_data['all_files_export']['file_path'] = @course_data['all_files_zip']
 
       @course = course_factory
-      @migration = ContentMigration.create(:context => @course)
-      @migration.migration_settings[:migration_ids_to_import] = { :copy => {} }
+      @migration = ContentMigration.create(context: @course)
+      @migration.migration_settings[:migration_ids_to_import] = { copy: {} }
       Importers::CourseContentImporter.import_content(@course, @course_data, nil, @migration)
     end
 
@@ -55,13 +55,13 @@ describe "Standard Common Cartridge importing" do
     archive_file_path = File.join(File.dirname(__FILE__) + "/../../../fixtures/migration/#{filename}")
     unzipped_file_path = create_temp_dir!
     @course = course_factory
-    @migration = ContentMigration.create(:context => @course)
-    converter = CC::Importer::Standard::Converter.new(:export_archive_path => archive_file_path, :course_name => 'oi',
-                                                      :base_download_dir => unzipped_file_path, :content_migration => @migration)
+    @migration = ContentMigration.create(context: @course)
+    converter = CC::Importer::Standard::Converter.new(export_archive_path: archive_file_path, course_name: 'oi',
+                                                      base_download_dir: unzipped_file_path, content_migration: @migration)
     converter.convert
     @course_data = converter.course.with_indifferent_access
 
-    @migration.migration_settings[:migration_ids_to_import] = { :copy => {} }
+    @migration.migration_settings[:migration_ids_to_import] = { copy: {} }
     Importers::CourseContentImporter.import_content(@course, @course_data, nil, @migration)
   end
 
@@ -156,15 +156,15 @@ describe "Standard Common Cartridge importing" do
 
       archive_file_path = File.join(File.dirname(__FILE__) + "/../../../fixtures/migration/cc_inline_qti.zip")
       unzipped_file_path = create_temp_dir!
-      converter = CC::Importer::Standard::Converter.new(:export_archive_path => archive_file_path, :course_name => 'oi', :base_download_dir => unzipped_file_path)
+      converter = CC::Importer::Standard::Converter.new(export_archive_path: archive_file_path, course_name: 'oi', base_download_dir: unzipped_file_path)
       converter.export
       @course_data = converter.course.with_indifferent_access
       @course_data['all_files_export'] ||= {}
       @course_data['all_files_export']['file_path'] = @course_data['all_files_zip']
 
       @course = course_factory
-      @migration = ContentMigration.create(:context => @course)
-      @migration.migration_settings[:migration_ids_to_import] = { :copy => {} }
+      @migration = ContentMigration.create(context: @course)
+      @migration.migration_settings[:migration_ids_to_import] = { copy: {} }
       Importers::CourseContentImporter.import_content(@course, @course_data, nil, @migration)
     end
 

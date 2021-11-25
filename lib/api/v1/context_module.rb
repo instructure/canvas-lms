@@ -41,7 +41,7 @@ module Api::V1::ContextModule
 
   # optionally pass progression to include 'state', 'completed_at'
   def module_json(context_module, current_user, session, progression = nil, includes = [], opts = {})
-    hash = api_json(context_module, current_user, session, :only => MODULE_JSON_ATTRS)
+    hash = api_json(context_module, current_user, session, only: MODULE_JSON_ATTRS)
     hash['require_sequential_progress'] = !!context_module.require_sequential_progress?
     hash['publish_final_grade'] = context_module.publish_final_grade?
     hash['prerequisite_module_ids'] = context_module.prerequisites.select { |p| p[:type] == 'context_module' }.pluck(:id)
@@ -62,7 +62,7 @@ module Api::V1::ContextModule
       end
       item_includes = includes & ['content_details']
       hash['items'] = tags.map do |tag|
-        module_item_json(tag, current_user, session, context_module, progression, item_includes, :has_update_rights => has_update_rights)
+        module_item_json(tag, current_user, session, context_module, progression, item_includes, has_update_rights: has_update_rights)
       end
     end
     hash
@@ -73,7 +73,7 @@ module Api::V1::ContextModule
   def module_item_json(content_tag, current_user, session, context_module = nil, progression = nil, includes = [], opts = {})
     context_module ||= content_tag.context_module
 
-    hash = api_json(content_tag, current_user, session, :only => MODULE_ITEM_JSON_ATTRS)
+    hash = api_json(content_tag, current_user, session, only: MODULE_ITEM_JSON_ATTRS)
     hash['type'] = Api::API_DATA_TYPE[content_tag.content_type] || content_tag.content_type
     hash['indent'] ||= 0
     hash['module_id'] = content_tag.context_module_id
@@ -84,14 +84,14 @@ module Api::V1::ContextModule
                          when 'ExternalUrl'
                            if value_to_boolean(request.params[:frame_external_urls])
                              # canvas UI wants external links hosted in iframe
-                             course_context_modules_item_redirect_url(:id => content_tag.id, :course_id => context_module.context.id)
+                             course_context_modules_item_redirect_url(id: content_tag.id, course_id: context_module.context.id)
                            else
                              # API prefers to redirect to the external page, rather than host in an iframe
-                             api_v1_course_context_module_item_redirect_url(:id => content_tag.id, :course_id => context_module.context.id)
+                             api_v1_course_context_module_item_redirect_url(id: content_tag.id, course_id: context_module.context.id)
                            end
                          else
                            # otherwise we'll link to the same thing the web UI does
-                           course_context_modules_item_redirect_url(:id => content_tag.id, :course_id => context_module.context.id)
+                           course_context_modules_item_redirect_url(id: content_tag.id, course_id: context_module.context.id)
                          end
     end
 
@@ -117,7 +117,7 @@ module Api::V1::ContextModule
       api_url = polymorphic_url([:api_v1, context_module.context, content_tag.content])
     when 'ContextExternalTool'
       if content_tag.content&.tool_id
-        api_url = sessionless_launch_url(context_module.context, :id => content_tag.content.id, :url => (content_tag.url || content_tag.content.url))
+        api_url = sessionless_launch_url(context_module.context, id: content_tag.content.id, url: (content_tag.url || content_tag.content.url))
       elsif content_tag.content
         if content_tag.content_id
           options = {
@@ -126,10 +126,10 @@ module Api::V1::ContextModule
           }
           api_url = sessionless_launch_url(context_module.context, options)
         else
-          api_url = sessionless_launch_url(context_module.context, :url => (content_tag.url || content_tag.content.url))
+          api_url = sessionless_launch_url(context_module.context, url: (content_tag.url || content_tag.content.url))
         end
       else
-        api_url = sessionless_launch_url(context_module.context, :url => content_tag.url)
+        api_url = sessionless_launch_url(context_module.context, url: content_tag.url)
       end
     end
     hash['url'] = api_url if api_url

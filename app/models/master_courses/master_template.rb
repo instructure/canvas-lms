@@ -27,16 +27,16 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
   # instead of the entire course, but for now that's what we'll roll with
 
   belongs_to :course
-  belongs_to :root_account, :class_name => 'Account'
+  belongs_to :root_account, class_name: 'Account'
 
   # these store which pieces of blueprint content are locked (and how)
-  has_many :master_content_tags, :class_name => "MasterCourses::MasterContentTag", :inverse_of => :master_template
+  has_many :master_content_tags, class_name: "MasterCourses::MasterContentTag", inverse_of: :master_template
   # links the blueprint to its associated courses
-  has_many :child_subscriptions, :class_name => "MasterCourses::ChildSubscription", :inverse_of => :master_template
+  has_many :child_subscriptions, class_name: "MasterCourses::ChildSubscription", inverse_of: :master_template
   # sync events
-  has_many :master_migrations, :class_name => "MasterCourses::MasterMigration", :inverse_of => :master_template
+  has_many :master_migrations, class_name: "MasterCourses::MasterMigration", inverse_of: :master_template
 
-  belongs_to :active_migration, :class_name => "MasterCourses::MasterMigration"
+  belongs_to :active_migration, class_name: "MasterCourses::MasterMigration"
 
   serialize :default_restrictions, Hash
   serialize :default_restrictions_by_type, Hash
@@ -50,7 +50,7 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
   include MasterCourses::TagHelper
   self.content_tag_association = :master_content_tags
 
-  scope :for_full_course, -> { where(:full_course => true) }
+  scope :for_full_course, -> { where(full_course: true) }
 
   before_create :set_defaults
   before_create :set_root_account_id
@@ -62,7 +62,7 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
 
   def set_defaults
     unless default_restrictions.present?
-      self.default_restrictions = { :content => true }
+      self.default_restrictions = { content: true }
     end
   end
 
@@ -81,8 +81,8 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
       if saved_change_to_use_default_restrictions_by_type? || saved_change_to_default_restrictions_by_type?
         MasterCourses::RESTRICTED_OBJECT_TYPES.each do |type|
           new_type_restrictions = default_restrictions_by_type[type] || {}
-          count = master_content_tags.where(:use_default_restrictions => true, :content_type => type)
-                                     .update_all(:restrictions => new_type_restrictions)
+          count = master_content_tags.where(use_default_restrictions: true, content_type: type)
+                                     .update_all(restrictions: new_type_restrictions)
           next unless count > 0
 
           old_type_restrictions = default_restrictions_by_type_before_last_save[type] || {}
@@ -92,8 +92,8 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
         end
       end
     elsif saved_change_to_default_restrictions?
-      count = master_content_tags.where(:use_default_restrictions => true)
-                                 .update_all(:restrictions => default_restrictions)
+      count = master_content_tags.where(use_default_restrictions: true)
+                                 .update_all(restrictions: default_restrictions)
       if count > 0 && default_restrictions.any? { |setting, locked| locked && !default_restrictions_before_last_save[setting] } # tightened restrictions
         touch_all_content_for_tags
       end
@@ -113,12 +113,12 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
     content_types = if only_content_type
                       [only_content_type]
                     else
-                      master_content_tags.where(:use_default_restrictions => true).distinct.pluck(:content_type)
+                      master_content_tags.where(use_default_restrictions: true).distinct.pluck(:content_type)
                     end
     content_types.each do |content_type|
       klass = content_type.constantize
-      klass.where(klass.primary_key => master_content_tags.where(:use_default_restrictions => true,
-                                                                 :content_type => content_type).select(:content_id)).touch_all
+      klass.where(klass.primary_key => master_content_tags.where(use_default_restrictions: true,
+                                                                 content_type: content_type).select(:content_id)).touch_all
     end
   end
 
@@ -155,7 +155,7 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
 
     Rails.cache.fetch(course_cache_key(course_id)) do
       course_id = course_id.id if course_id.is_a?(Course)
-      where(:course_id => course_id).active.exists?
+      where(course_id: course_id).active.exists?
     end
   end
 
@@ -188,9 +188,9 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
   end
 
   def self.preload_index_data(templates)
-    child_counts = MasterCourses::ChildSubscription.active.where(:master_template_id => templates)
-                                                   .joins(:child_course).where.not(:courses => { :workflow_state => "deleted" }).group(:master_template_id).count
-    last_export_times = MasterCourses::MasterMigration.where(:master_template_id => templates, :workflow_state => "completed")
+    child_counts = MasterCourses::ChildSubscription.active.where(master_template_id: templates)
+                                                   .joins(:child_course).where.not(courses: { workflow_state: "deleted" }).group(:master_template_id).count
+    last_export_times = MasterCourses::MasterMigration.where(master_template_id: templates, workflow_state: "completed")
                                                       .order(:master_template_id, id: :desc).pluck(Arel.sql("DISTINCT ON (master_template_id) master_template_id, imports_completed_at")).to_h
 
     templates.each do |template|
@@ -213,7 +213,7 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
 
   def add_child_course!(child_course_or_id)
     MasterCourses::ChildSubscription.unique_constraint_retry do
-      child_sub = child_subscriptions.where(:child_course_id => child_course_or_id).first_or_create!
+      child_sub = child_subscriptions.where(child_course_id: child_course_or_id).first_or_create!
       child_sub.undestroy if child_sub.deleted?
       child_sub
     end
@@ -221,7 +221,7 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
 
   def child_course_scope
     shard.activate do
-      Course.shard(shard).not_deleted.where(:id => child_subscriptions.active.select(:child_course_id))
+      Course.shard(shard).not_deleted.where(id: child_subscriptions.active.select(:child_course_id))
     end
   end
 
@@ -235,14 +235,14 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
 
   def last_export_started_at
     unless defined?(@last_export_started_at)
-      @last_export_started_at = master_migrations.where(:workflow_state => "completed").order("id DESC").limit(1).pluck(:exports_started_at).first
+      @last_export_started_at = master_migrations.where(workflow_state: "completed").order("id DESC").limit(1).pluck(:exports_started_at).first
     end
     @last_export_started_at
   end
 
   def last_export_completed_at
     unless defined?(@last_export_completed_at)
-      @last_export_completed_at = master_migrations.where(:workflow_state => "completed").order("id DESC").limit(1).pluck(:imports_completed_at).first
+      @last_export_completed_at = master_migrations.where(workflow_state: "completed").order("id DESC").limit(1).pluck(:imports_completed_at).first
     end
     @last_export_completed_at
   end
@@ -274,9 +274,9 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
     MasterCourses::CONTENT_TYPES_FOR_DELETIONS.each do |klass|
       item_scope = case klass
                    when 'Attachment'
-                     course.attachments.where(:file_state => 'deleted')
+                     course.attachments.where(file_state: 'deleted')
                    else
-                     klass.constantize.where(:context_id => course, :context_type => 'Course', :workflow_state => 'deleted')
+                     klass.constantize.where(context_id: course, context_type: 'Course', workflow_state: 'deleted')
                    end
       item_scope = item_scope.where('updated_at>?', last_export_started_at).select(:id)
       deleted_mig_ids = content_tags.where(content_type: klass, content_id: item_scope).pluck(:migration_id)
@@ -303,7 +303,7 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
   def self.create_associations_from_sis(root_account, associations, messages, migrating_user = nil)
     associations.keys.each_slice(50) do |master_sis_ids|
       templates = active.for_full_course.joins(:course)
-                        .where(:courses => { :root_account_id => root_account, :sis_source_id => master_sis_ids })
+                        .where(courses: { root_account_id: root_account, sis_source_id: master_sis_ids })
                         .select("#{table_name}.*, courses.sis_source_id AS sis_source_id, courses.account_id AS account_id").to_a
       if templates.count != master_sis_ids.count
         (master_sis_ids - templates.map(&:sis_source_id)).each do |missing_id|
@@ -316,7 +316,7 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
       templates.each do |template|
         needs_migration = false
         associations[template.sis_source_id].each_slice(50) do |associated_sis_ids|
-          data = root_account.all_courses.where(:sis_source_id => associated_sis_ids).not_master_courses
+          data = root_account.all_courses.where(sis_source_id: associated_sis_ids).not_master_courses
                              .joins("LEFT OUTER JOIN #{MasterCourses::ChildSubscription.quoted_table_name} AS mcs ON mcs.child_course_id=courses.id AND mcs.workflow_state<>'deleted'")
                              .joins(sanitize_sql(["LEFT OUTER JOIN #{CourseAccountAssociation.quoted_table_name} AS caa ON
               caa.course_id=courses.id AND caa.account_id = ?", template.account_id]))
@@ -342,7 +342,7 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
         end
 
         if migrating_user && needs_migration
-          MasterCourses::MasterMigration.start_new_migration!(template, migrating_user, :retry_later => true)
+          MasterCourses::MasterMigration.start_new_migration!(template, migrating_user, retry_later: true)
         end
       end
     end

@@ -32,8 +32,8 @@ module CC
     include ToolProfiles
     include LtiResourceLinks
 
-    delegate :add_error, :set_progress, :export_object?, :export_symbol?, :for_course_copy, :add_item_to_export, :add_exported_asset, :create_key, :to => :@manifest
-    delegate :referenced_files, :to => :@html_exporter
+    delegate :add_error, :set_progress, :export_object?, :export_symbol?, :for_course_copy, :add_item_to_export, :add_exported_asset, :create_key, to: :@manifest
+    delegate :referenced_files, to: :@html_exporter
 
     def initialize(manifest, manifest_node, resources = nil)
       @manifest = manifest
@@ -47,11 +47,11 @@ module CC
       # flv files rather than the larger original files.
       @html_exporter = CCHelper::HtmlContentExporter.new(@course,
                                                          @manifest.exporter.user,
-                                                         :key_generator => @manifest,
-                                                         :for_course_copy => for_course_copy,
-                                                         :for_epub_export => @manifest.exporter.epub_export?,
-                                                         :track_referenced_files => true,
-                                                         :media_object_flavor => Setting.get('exporter_media_object_flavor', nil).presence)
+                                                         key_generator: @manifest,
+                                                         for_course_copy: for_course_copy,
+                                                         for_epub_export: @manifest.exporter.epub_export?,
+                                                         track_referenced_files: true,
+                                                         media_object_flavor: Setting.get('exporter_media_object_flavor', nil).presence)
     end
 
     def self.create_resources(manifest, manifest_node)

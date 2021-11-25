@@ -67,7 +67,7 @@ describe ObserverPairingCodesApiController, type: :request do
       course_factory
       course_with_teacher(course: @course)
       course_with_student(course: @course)
-      @course.account.role_overrides.create!(:permission => :generate_observer_pairing_code, :enabled => true, :role => teacher_role)
+      @course.account.role_overrides.create!(permission: :generate_observer_pairing_code, enabled: true, role: teacher_role)
 
       path = "/api/v1/users/#{@student.id}/observer_pairing_codes"
       params = @params.merge(user_id: @student.to_param)

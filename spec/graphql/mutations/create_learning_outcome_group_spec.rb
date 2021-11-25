@@ -27,7 +27,7 @@ describe Mutations::CreateLearningOutcomeGroup do
   before :once do
     @admin = account_admin_user(account: @account)
     course_with_student
-    @parent_group = @course.learning_outcome_groups.create!(:title => 'Parent Outcome Group')
+    @parent_group = @course.learning_outcome_groups.create!(title: 'Parent Outcome Group')
     @global_parent_group = LearningOutcomeGroup.create(title: 'Global Parent Outcome Group')
   end
 

@@ -22,7 +22,7 @@ require_relative "../grades/pages/speedgrader_page"
 
 module SpeedGraderCommon
   def student_submission(options = {})
-    submission_model({ :assignment => @assignment, :body => "first student submission text" }.merge(options))
+    submission_model({ assignment: @assignment, body: "first student submission text" }.merge(options))
   end
 
   def goto_student(student_name)
@@ -45,7 +45,7 @@ module SpeedGraderCommon
   def create_and_enroll_students(num_to_create)
     @students = []
     num_to_create.times do |i|
-      s = User.create!(:name => "student #{i}")
+      s = User.create!(name: "student #{i}")
       @course.enroll_student(s)
       @students << s
     end
@@ -56,7 +56,7 @@ module SpeedGraderCommon
     attachment = student.attachments.new
     attachment.uploaded_data = Rack::Test::UploadedFile.new(path, Attachment.mimetype(path))
     attachment.save!
-    @assignment.submit_homework(student, :submission_type => :online_upload, :attachments => [attachment])
+    @assignment.submit_homework(student, submission_type: :online_upload, attachments: [attachment])
   end
 
   # Creates a dummy rubric and scores its criteria as specified in the parameters (passed as strings)

@@ -23,12 +23,12 @@ module Factories
     account = opts[:account] || Account.default
     account.shard.activate do
       @course = Course.create!(
-        :sis_source_id => opts[:sis_source_id],
-        :name => opts[:course_name],
-        :course_code => opts[:course_code],
-        :account => account,
-        :is_public => !!opts[:is_public],
-        :enrollment_term_id => opts[:enrollment_term_id]
+        sis_source_id: opts[:sis_source_id],
+        name: opts[:course_name],
+        course_code: opts[:course_code],
+        account: account,
+        is_public: !!opts[:is_public],
+        enrollment_term_id: opts[:enrollment_term_id]
       )
       @course.offer! if opts[:active_course] || opts[:active_all]
       if opts[:active_all]
@@ -57,12 +57,12 @@ module Factories
 
   def course_valid_attributes
     {
-      :name => 'value for name',
-      :group_weighting_scheme => 'value for group_weighting_scheme',
-      :start_at => Time.now,
-      :conclude_at => Time.now + 100,
-      :is_public => true,
-      :allow_student_wiki_edits => true,
+      name: 'value for name',
+      group_weighting_scheme: 'value for group_weighting_scheme',
+      start_at: Time.now,
+      conclude_at: Time.now + 100,
+      is_public: true,
+      allow_student_wiki_edits: true,
     }
   end
 
@@ -131,7 +131,7 @@ module Factories
     @course.claim! if opts[:unpublished]
     submission_count = opts[:submissions] || 1
     submission_count.times do |s|
-      assignment = @course.assignments.create!(:title => "test #{s} assignment")
+      assignment = @course.assignments.create!(title: "test #{s} assignment")
       submission = assignment.submissions.find_by!(user: @student)
       submission.update!(score: '5') if opts[:submission_points]
     end

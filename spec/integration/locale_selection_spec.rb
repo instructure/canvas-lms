@@ -28,7 +28,7 @@ describe "locale_selection" do
   end
 
   it "sets the locale when authenticated" do
-    course_with_teacher(:active_all => true, :user => user_with_pseudonym)
+    course_with_teacher(active_all: true, user: user_with_pseudonym)
     user_session(@user, @pseudonym)
     @user.update_attribute :locale, 'es'
     @pseudonym.reload

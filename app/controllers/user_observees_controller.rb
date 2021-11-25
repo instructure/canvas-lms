@@ -342,7 +342,7 @@ class UserObserveesController < ApplicationController
         .group(:account_id)
         .having("count(*) = #{user_ids.length}") # user => account is unique for user_account_associations
         .select(:account_id))
-      scope = scope.where(:id => root_account) if root_account # scope down to a root_account if specified
+      scope = scope.where(id: root_account) if root_account # scope down to a root_account if specified
       scope
     end
   end
@@ -379,15 +379,15 @@ class UserObserveesController < ApplicationController
     user_rows = Array(user_rows)
     ra_id_map = {}
     if ['observers', 'show_observer'].include?(params[:action])
-      scope = student.as_student_observation_links.where(:observer => user_rows.map { |r| r['id'] })
+      scope = student.as_student_observation_links.where(observer: user_rows.map { |r| r['id'] })
       column = :observer_id
     else
-      scope = observer.as_observer_observation_links.where(:student => user_rows.map { |r| r['id'] })
+      scope = observer.as_observer_observation_links.where(student: user_rows.map { |r| r['id'] })
       column = :user_id
     end
 
     if user != @current_user
-      scope = scope.where(:root_account_id => @accounts_with_observer_permissions || common_root_accounts_with_permissions(user))
+      scope = scope.where(root_account_id: @accounts_with_observer_permissions || common_root_accounts_with_permissions(user))
     end
     scope.pluck(column, :root_account_id).each do |user_id, ra_id|
       ra_id_map[user_id] ||= []

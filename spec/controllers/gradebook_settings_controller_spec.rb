@@ -76,7 +76,7 @@ RSpec.describe GradebookSettingsController, type: :controller do
       let(:expected_settings) do
         {
           @course.id => gradebook_settings_massaged.except("colors"),
-          colors: gradebook_settings_massaged.fetch("colors")
+          :colors => gradebook_settings_massaged.fetch("colors")
         }.as_json
       end
 
@@ -135,7 +135,7 @@ RSpec.describe GradebookSettingsController, type: :controller do
         teacher.update!(preferences: {
                           gradebook_settings: {
                             previous_course.id => gradebook_settings_massaged.except("colors"),
-                            colors: gradebook_settings_massaged.fetch("colors")
+                            :colors => gradebook_settings_massaged.fetch("colors")
                           }
                         })
         put :update, params: valid_params

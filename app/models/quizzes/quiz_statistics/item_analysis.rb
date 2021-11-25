@@ -97,7 +97,7 @@ class Quizzes::QuizStatistics::ItemAnalysis < Quizzes::QuizStatistics::Report
         ]
         point_biserial_max_count = stats.map { |item| item.point_biserials.size }.max || 0
         (point_biserial_max_count - 1).times do |i|
-          headers << I18n.t("csv.point.distractor", 'Point Biserial of Distractor %{num}', :num => i + 2)
+          headers << I18n.t("csv.point.distractor", 'Point Biserial of Distractor %{num}', num: i + 2)
         end
         csv << headers
         stats.each_with_index do |item, i|

@@ -25,7 +25,7 @@ describe "lti full width launch view" do
   include_context "lti_layout_spec_helper"
 
   describe "for Quizzes 2 / New Quizzes / Quizzes.Next assignments" do
-    let(:course) { course_factory(:active_course => true) }
+    let(:course) { course_factory(active_course: true) }
     let(:tool) do
       dev_key = DeveloperKey.create
       tool_id = ContextExternalTool::QUIZ_LTI
@@ -54,10 +54,10 @@ describe "lti full width launch view" do
         end
 
         context "with sections" do
-          let(:active_section) { add_section("Section A", { :course => course }) }
+          let(:active_section) { add_section("Section A", { course: course }) }
 
           let(:completed_section) do
-            section = add_section("Section B", { :course => course })
+            section = add_section("Section B", { course: course })
             section.restrict_enrollments_to_section_dates = true
             section.start_at = 3.days.ago
             section.end_at = 1.day.ago

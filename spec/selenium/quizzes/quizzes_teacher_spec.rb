@@ -40,7 +40,7 @@ describe "quizzes" do
     before(:once) do
       course_with_teacher(active_all: true)
       course_with_student(course: @course, active_enrollment: true)
-      @course.update(:name => 'teacher course')
+      @course.update(name: 'teacher course')
       @course.save!
       @course.reload
     end
@@ -231,8 +231,8 @@ describe "quizzes" do
 
     describe "moderation" do
       before :once do
-        @student = user_with_pseudonym(:active_user => true, :username => 'student@example.com', :password => 'qwertyuiop')
-        @course.enroll_user(@student, "StudentEnrollment", :enrollment_state => 'active')
+        @student = user_with_pseudonym(active_user: true, username: 'student@example.com', password: 'qwertyuiop')
+        @course.enroll_user(@student, "StudentEnrollment", enrollment_state: 'active')
         @context = @course
         @quiz = quiz_model
         @quiz.time_limit = 20
@@ -277,7 +277,7 @@ describe "quizzes" do
       skip_if_safari(:alert)
       @quiz = quiz_with_new_questions do |bank, quiz|
         aq = bank.assessment_questions.create!
-        quiz.quiz_questions.create!(:question_data => { :name => "numerical", 'question_type' => 'numerical_question', 'answers' => [], :points_possible => 1 }, :assessment_question => aq)
+        quiz.quiz_questions.create!(question_data: { :name => "numerical", 'question_type' => 'numerical_question', 'answers' => [], :points_possible => 1 }, assessment_question: aq)
       end
       user_session(@student)
       take_quiz do
@@ -306,16 +306,16 @@ describe "quizzes" do
 
     it "gives a student extra time if the time limit is extended", priority: "2" do
       @context = @course
-      bank = @course.assessment_question_banks.create!(:title => 'Test Bank')
+      bank = @course.assessment_question_banks.create!(title: 'Test Bank')
       q = quiz_model
       a = bank.assessment_questions.create!
       answers = [{ id: 1, answer_text: 'A', weight: 100 }, { id: 2, answer_text: 'B', weight: 0 }]
-      question = q.quiz_questions.create!(:question_data => {
+      question = q.quiz_questions.create!(question_data: {
                                             :name => "first question",
                                             'question_type' => 'multiple_choice_question',
                                             'answers' => answers,
                                             :points_possible => 1
-                                          }, :assessment_question => a)
+                                          }, assessment_question: a)
 
       q.generate_quiz_data
       q.time_limit = 10
@@ -371,17 +371,17 @@ describe "quizzes" do
     it "works with file upload questions", priority: "1" do
       skip_if_chrome('issue with upload_attachment_answer')
       @context = @course
-      bank = @course.assessment_question_banks.create!(:title => 'Test Bank')
+      bank = @course.assessment_question_banks.create!(title: 'Test Bank')
       q = quiz_model
       a = bank.assessment_questions.create!
       answers = { 'answer_0' => { 'id' => 1 }, 'answer_1' => { 'id' => 2 } }
-      @question = q.quiz_questions.create!(:question_data => {
+      @question = q.quiz_questions.create!(question_data: {
                                              :name => "first question",
                                              'question_type' => 'file_upload_question',
                                              'question_text' => 'file upload question maaaan',
                                              'answers' => answers,
                                              :points_possible => 1
-                                           }, :assessment_question => a)
+                                           }, assessment_question: a)
       q.generate_quiz_data
       q.save!
       _filename, @fullpath, _data = get_file "testfile1.txt"

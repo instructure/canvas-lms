@@ -26,9 +26,9 @@ describe Canvas::Security::LoginRegistry do
       skip("requires redis config to run") unless Canvas.redis_enabled?
       Setting.set('login_attempts_total', '2')
       Setting.set('login_attempts_per_ip', '1')
-      u = user_with_pseudonym :active_user => true,
-                              :username => "nobody@example.com",
-                              :password => "asdfasdf"
+      u = user_with_pseudonym active_user: true,
+                              username: "nobody@example.com",
+                              password: "asdfasdf"
       u.save!
       @p = u.pseudonym
     end
@@ -66,7 +66,7 @@ describe Canvas::Security::LoginRegistry do
         registry.failed_login!(@p, "5.5.5.5")
         # schools like to NAT hundreds of people to the same IP, so we don't
         # ever block the IP address as a whole
-        u2 = user_with_pseudonym(:active_user => true, :username => "second@example.com", :password => "12341234")
+        u2 = user_with_pseudonym(active_user: true, username: "second@example.com", password: "12341234")
         u2.save!
         expect(registry.allow_login_attempt?(u2.pseudonym, "5.5.5.5")).to eq true
         expect(registry.allow_login_attempt?(u2.pseudonym, "5.5.5.6")).to eq true

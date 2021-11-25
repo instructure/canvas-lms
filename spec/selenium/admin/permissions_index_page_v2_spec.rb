@@ -30,9 +30,9 @@ describe "permissions index" do
   end
 
   def create_role_override(permission_name, role, account, opts)
-    new_role = RoleOverride.create!(:permission => permission_name, :enabled => opts[:enabled],
-                                    :locked => opts[:locked], :context => account, :applies_to_self => true, :applies_to_descendants => true,
-                                    :role_id => role.id, :context_type => 'Account')
+    new_role = RoleOverride.create!(permission: permission_name, enabled: opts[:enabled],
+                                    locked: opts[:locked], context: account, applies_to_self: true, applies_to_descendants: true,
+                                    role_id: role.id, context_type: 'Account')
     new_role.id
   end
 
@@ -116,7 +116,7 @@ describe "permissions index" do
 
       it "permissions unlocks on grid" do
         permission_name = "read_announcements"
-        id = create_role_override(permission_name, student_role, @account, :enabled => false, :locked => true)
+        id = create_role_override(permission_name, student_role, @account, enabled: false, locked: true)
         PermissionsIndex.visit(@account)
         PermissionsIndex.change_permission(permission_name, student_role.id, "lock")
         r = RoleOverride.find(id)
@@ -128,10 +128,10 @@ describe "permissions index" do
 
       it "permissions default on grid works" do
         permission_name = "read_announcements"
-        create_role_override(permission_name, student_role, @account, :enabled => false, :locked => false)
+        create_role_override(permission_name, student_role, @account, enabled: false, locked: false)
         PermissionsIndex.visit(@account)
         PermissionsIndex.change_permission(permission_name, student_role.id, "use_default")
-        r = RoleOverride.where(:id => @account.id, :permission => permission_name, :role_id => student_role.id)
+        r = RoleOverride.where(id: @account.id, permission: permission_name, role_id: student_role.id)
         expect(r).to be_empty
       end
 
@@ -151,7 +151,7 @@ describe "permissions index" do
 
       it "locked permission cannot be edited" do
         permission_name = "read_announcements"
-        create_role_override(permission_name, student_role, @account, :enabled => false, :locked => true)
+        create_role_override(permission_name, student_role, @account, enabled: false, locked: true)
         PermissionsIndex.visit(@subaccount)
         expect(PermissionsIndex.permission_cell(permission_name, student_role.id).find('button')).to be_disabled
       end

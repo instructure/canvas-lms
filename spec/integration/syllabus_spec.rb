@@ -22,7 +22,7 @@ require 'nokogiri'
 
 describe "syllabus" do
   def anonymous_syllabus_access_allowed(property, value = true)
-    course_with_teacher(:course => @course, :active_all => true)
+    course_with_teacher(course: @course, active_all: true)
     @course.send("#{property}=", value)
     @course.save!
 
@@ -149,7 +149,7 @@ describe "syllabus" do
   end
 
   it "displays syllabus description on syllabus course home pages" do
-    course_with_teacher_logged_in(:active_all => true)
+    course_with_teacher_logged_in(active_all: true)
     syllabus_body = "test syllabus body"
     @course.syllabus_body = syllabus_body
     @course.default_view = "syllabus"

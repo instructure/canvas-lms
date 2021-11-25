@@ -28,9 +28,9 @@ class CreateDelayedJobs < ActiveRecord::Migration[4.2]
   def self.up
     create_table :delayed_jobs do |table|
       # Allows some jobs to jump to the front of the queue
-      table.integer  :priority, :default => 0
+      table.integer  :priority, default: 0
       # Provides for retries, but still fail eventually.
-      table.integer  :attempts, :default => 0
+      table.integer  :attempts, default: 0
       # YAML-encoded string of the object that will do work
       table.text     :handler
       # reason for last failure (See Note below)
@@ -52,17 +52,17 @@ class CreateDelayedJobs < ActiveRecord::Migration[4.2]
       table.string   :tag, limit: 255
       table.integer  :max_attempts
       table.string   :strand, limit: 255
-      table.boolean  :next_in_strand, :default => true, :null => false
-      table.integer  :shard_id, :limit => 8
+      table.boolean  :next_in_strand, default: true, null: false
+      table.integer  :shard_id, limit: 8
       table.string   :source, limit: 255
-      table.integer  :max_concurrent, :default => 1, :null => false
+      table.integer  :max_concurrent, default: 1, null: false
       table.datetime :expires_at
     end
 
     connection.execute("CREATE INDEX get_delayed_jobs_index ON #{Delayed::Backend::ActiveRecord::Job.quoted_table_name} (priority, run_at) WHERE locked_at IS NULL AND queue = 'canvas_queue' AND next_in_strand = 't'")
     add_index :delayed_jobs, [:tag]
-    add_index :delayed_jobs, %w[strand id], :name => 'index_delayed_jobs_on_strand'
-    add_index :delayed_jobs, :locked_by, :where => "locked_by IS NOT NULL"
+    add_index :delayed_jobs, %w[strand id], name: 'index_delayed_jobs_on_strand'
+    add_index :delayed_jobs, :locked_by, where: "locked_by IS NOT NULL"
     add_index :delayed_jobs, %w[run_at tag]
     add_index :delayed_jobs, :shard_id
 
@@ -129,9 +129,9 @@ class CreateDelayedJobs < ActiveRecord::Migration[4.2]
     execute("CREATE TRIGGER delayed_jobs_after_delete_row_tr AFTER DELETE ON #{Delayed::Backend::ActiveRecord::Job.quoted_table_name} FOR EACH ROW WHEN (OLD.strand IS NOT NULL AND OLD.next_in_strand = 't') EXECUTE PROCEDURE #{connection.quote_table_name('delayed_jobs_after_delete_row_tr_fn')}()")
 
     create_table :failed_jobs do |t|
-      t.integer  "priority",    :default => 0
-      t.integer  "attempts",    :default => 0
-      t.string   "handler",     :limit => 512_000
+      t.integer  "priority",    default: 0
+      t.integer  "attempts",    default: 0
+      t.string   "handler",     limit: 512_000
       t.text     "last_error"
       t.string   "queue", limit: 255
       t.datetime "run_at"
@@ -143,8 +143,8 @@ class CreateDelayedJobs < ActiveRecord::Migration[4.2]
       t.string   "tag", limit: 255
       t.integer  "max_attempts"
       t.string   "strand", limit: 255
-      t.integer  "shard_id", :limit => 8
-      t.integer  "original_job_id", :limit => 8
+      t.integer  "shard_id", limit: 8
+      t.integer  "original_job_id", limit: 8
       t.string   "source", limit: 255
       t.datetime "expires_at"
     end

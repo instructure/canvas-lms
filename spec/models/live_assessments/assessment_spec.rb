@@ -25,14 +25,14 @@ describe LiveAssessments::Assessment do
   let_once(:another_assessment_user) { course_with_student(course: assessment_context, active_all: true).user }
   let_once(:assessment) { LiveAssessments::Assessment.create!(context: assessment_context, key: 'test key', title: 'test title') }
   let(:outcome) do
-    outcome = assessment_context.created_learning_outcomes.create!(:description => 'this is a test outcome', :short_description => 'test outcome')
+    outcome = assessment_context.created_learning_outcomes.create!(description: 'this is a test outcome', short_description: 'test outcome')
     assessment_context.root_outcome_group.add_outcome(outcome)
     assessment_context.root_outcome_group.save!
     assessment_context.reload
     outcome
   end
   let(:another_outcome) do
-    outcome = assessment_context.created_learning_outcomes.create!(:description => 'this is another test outcome', :short_description => 'test outcome 2')
+    outcome = assessment_context.created_learning_outcomes.create!(description: 'this is another test outcome', short_description: 'test outcome 2')
     assessment_context.root_outcome_group.add_outcome(outcome)
     assessment_context.root_outcome_group.save!
     assessment_context.reload

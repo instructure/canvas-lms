@@ -32,7 +32,7 @@ module Exporters
 
       folder_name = "#{time_zone.today} data export"
       filename = "#{folder_name}.zip"
-      attachment = sub_folder.file_attachments.build(:display_name => filename)
+      attachment = sub_folder.file_attachments.build(display_name: filename)
       attachment.user_id = user.id
       attachment.context = user
       attachment.folder_id = sub_folder.id

@@ -19,18 +19,18 @@
 
 class Profile < ActiveRecord::Base
   belongs_to :context, polymorphic: [:course], exhaustive: false
-  belongs_to :root_account, :class_name => 'Account'
+  belongs_to :root_account, class_name: 'Account'
 
   serialize :data
 
   validates :root_account, presence: true
   validates :context, presence: true
-  validates :title, length: { :within => 0..255 }
-  validates :path, length: { :within => 0..255 }
-  validates :path, format: { :with => /\A[a-z0-9-]+\z/ }
-  validates :path, uniqueness: { :scope => :root_account_id }
-  validates :context_id, uniqueness: { :scope => :context_type }
-  validates :visibility, inclusion: { :in => %w[public unlisted private] }
+  validates :title, length: { within: 0..255 }
+  validates :path, length: { within: 0..255 }
+  validates :path, format: { with: /\A[a-z0-9-]+\z/ }
+  validates :path, uniqueness: { scope: :root_account_id }
+  validates :context_id, uniqueness: { scope: :context_type }
+  validates :visibility, inclusion: { in: %w[public unlisted private] }
 
   def title=(title)
     write_attribute(:title, title)

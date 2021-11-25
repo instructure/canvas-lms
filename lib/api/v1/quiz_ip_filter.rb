@@ -22,7 +22,7 @@ module Api::V1::QuizIpFilter
   include Api::V1::Json
 
   API_ALLOWED_QUIZ_IP_FILTER_OUTPUT_FIELDS = {
-    :only => %w[
+    only: %w[
       name
       account
       filter

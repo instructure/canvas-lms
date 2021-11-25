@@ -39,9 +39,9 @@ describe Pseudonym do
   end
 
   it "allows apostrophes in usernames" do
-    pseudonym = Pseudonym.new(:unique_id => "o'brien@example.com",
-                              :password => 'password',
-                              :password_confirmation => 'password')
+    pseudonym = Pseudonym.new(unique_id: "o'brien@example.com",
+                              password: 'password',
+                              password_confirmation: 'password')
     pseudonym.user_id = 1
     expect(pseudonym).to be_valid
   end
@@ -49,7 +49,7 @@ describe Pseudonym do
   it "validates the presence of user and infer default account" do
     Account.default
     u = User.create!
-    p = Pseudonym.new(:unique_id => 'cody@instructure.com')
+    p = Pseudonym.new(unique_id: 'cody@instructure.com')
     expect(p.save).to be_falsey
 
     p.user_id = u.id
@@ -63,8 +63,8 @@ describe Pseudonym do
 
   it "does not allow active duplicates" do
     u = User.create!
-    p1 = Pseudonym.create!(:unique_id => 'cody@instructure.com', :user => u)
-    p2 = Pseudonym.create(:unique_id => 'cody@instructure.com', :user => u)
+    p1 = Pseudonym.create!(unique_id: 'cody@instructure.com', user: u)
+    p2 = Pseudonym.create(unique_id: 'cody@instructure.com', user: u)
     # Failed; p1 is still active
     expect(p2).to be_new_record
     p2.workflow_state = 'deleted'
@@ -73,16 +73,16 @@ describe Pseudonym do
     p1.workflow_state = 'deleted'
     p1.save!
     # Should allow creating a new active one if the others are deleted
-    Pseudonym.create!(:unique_id => 'cody@instructure.com', :user => u)
+    Pseudonym.create!(unique_id: 'cody@instructure.com', user: u)
   end
 
   it "finds the correct pseudonym for logins" do
     user = User.create!
-    p1 = Pseudonym.create!(:unique_id => 'Cody@instructure.com', :user => user)
-    Pseudonym.create!(:unique_id => 'codY@instructure.com', :user => user) { |p| p.workflow_state = 'deleted' }
+    p1 = Pseudonym.create!(unique_id: 'Cody@instructure.com', user: user)
+    Pseudonym.create!(unique_id: 'codY@instructure.com', user: user) { |p| p.workflow_state = 'deleted' }
     expect(Pseudonym.active.by_unique_id('cody@instructure.com').first).to eq p1
     account = Account.create!
-    p3 = Pseudonym.create!(:unique_id => 'cOdy@instructure.com', :account => account, :user => user)
+    p3 = Pseudonym.create!(unique_id: 'cOdy@instructure.com', account: account, user: user)
     expect(Pseudonym.active.by_unique_id('cody@instructure.com').sort).to eq [p1, p3]
   end
 
@@ -98,9 +98,9 @@ describe Pseudonym do
 
   it "orders by position" do
     user_model
-    p1 = pseudonym_model(:user_id => @user.id)
-    p2 = pseudonym_model(:user_id => @user.id)
-    p3 = pseudonym_model(:user_id => @user.id)
+    p1 = pseudonym_model(user_id: @user.id)
+    p2 = pseudonym_model(user_id: @user.id)
+    p3 = pseudonym_model(user_id: @user.id)
     p1.move_to_bottom
     p3.move_to_top
     expect(Pseudonym.all.sort.map(&:id)).to eql([p3.id, p2.id, p1.id])
@@ -113,7 +113,7 @@ describe Pseudonym do
     account_model
     expect(@user.user_account_associations.length).to eql(0)
 
-    pseudonym_model(:user => @user, :account => account1)
+    pseudonym_model(user: @user, account: account1)
     @user.reload
     expect(@user.user_account_associations.length).to eql(1)
     expect(@user.user_account_associations.first.account).to eql(account1)
@@ -131,16 +131,16 @@ describe Pseudonym do
   end
 
   it "allows deleting pseudonyms" do
-    user_with_pseudonym(:active_all => true)
+    user_with_pseudonym(active_all: true)
     expect(@pseudonym.destroy).to eql(true)
     expect(@pseudonym).to be_deleted
   end
 
   it "allows deleting system-generated pseudonyms" do
-    user_with_pseudonym(:active_all => true)
+    user_with_pseudonym(active_all: true)
     @pseudonym.sis_user_id = 'something_cool'
     @pseudonym.save!
-    @pseudonym.account.authentication_providers.create!(:auth_type => 'ldap')
+    @pseudonym.account.authentication_providers.create!(auth_type: 'ldap')
     expect(@pseudonym.destroy).to eql(true)
     expect(@pseudonym).to be_deleted
   end
@@ -159,15 +159,15 @@ describe Pseudonym do
   context "LDAP errors" do
     before :once do
       require 'net/ldap'
-      user_with_pseudonym(:active_all => true)
+      user_with_pseudonym(active_all: true)
       @aac = @pseudonym.account.authentication_providers.create!(
-        :auth_type => 'ldap',
-        :auth_base => "ou=people,dc=example,dc=com",
-        :auth_host => "ldap.example.com",
-        :auth_username => "cn=query,dc=example,dc=com",
-        :auth_port => 636,
-        :auth_filter => "(uid={{login}})",
-        :auth_over_tls => true
+        auth_type: 'ldap',
+        auth_base: "ou=people,dc=example,dc=com",
+        auth_host: "ldap.example.com",
+        auth_username: "cn=query,dc=example,dc=com",
+        auth_port: 636,
+        auth_filter: "(uid={{login}})",
+        auth_over_tls: true
       )
     end
 
@@ -244,7 +244,7 @@ describe Pseudonym do
     end
 
     it "offers the user sms if there is one" do
-      communication_channel_model(:path_type => 'sms')
+      communication_channel_model(path_type: 'sms')
       @user.communication_channels << @cc
       @user.save!
       expect(@user.sms).to eql(@cc.path)
@@ -285,11 +285,11 @@ describe Pseudonym do
   context "login assertions" do
     it "creates a CC if LDAP gave an e-mail we don't have" do
       account = Account.create!
-      account.authentication_providers.create!(:auth_type => 'ldap')
+      account.authentication_providers.create!(auth_type: 'ldap')
       u = User.create!
       u.register
       pseudonym = u.pseudonyms.create!(unique_id: 'jt', account: account) { |p| p.sis_user_id = 'jt' }
-      pseudonym.instance_variable_set(:@ldap_result, { :mail => ['jt@instructure.com'] })
+      pseudonym.instance_variable_set(:@ldap_result, { mail: ['jt@instructure.com'] })
 
       pseudonym.add_ldap_channel
       u.reload
@@ -314,11 +314,11 @@ describe Pseudonym do
 
     it "does not persist the auth provider if inferred" do
       account = Account.create!
-      ap = account.authentication_providers.create!(:auth_type => 'ldap')
+      ap = account.authentication_providers.create!(auth_type: 'ldap')
       u = User.create!
       u.register
       pseudonym = u.pseudonyms.create!(unique_id: 'jt', account: account) { |p| p.sis_user_id = 'jt' }
-      pseudonym.instance_variable_set(:@ldap_result, { :mail => ['jt@instructure.com'] })
+      pseudonym.instance_variable_set(:@ldap_result, { mail: ['jt@instructure.com'] })
 
       pseudonym.infer_auth_provider(ap)
       pseudonym.add_ldap_channel
@@ -328,14 +328,14 @@ describe Pseudonym do
 
   describe 'valid_arbitrary_credentials?' do
     it "ignores password if canvas authentication is disabled" do
-      user_with_pseudonym(:password => 'qwertyuiop')
+      user_with_pseudonym(password: 'qwertyuiop')
       expect(@pseudonym.valid_arbitrary_credentials?('qwertyuiop')).to be_truthy
       # once auth provider is required, this whole spec can go away, because the situation will
       # not be possible
       @pseudonym.update!(authentication_provider: nil)
 
       Account.default.authentication_providers.scope.delete_all
-      Account.default.authentication_providers.create!(:auth_type => 'ldap')
+      Account.default.authentication_providers.create!(auth_type: 'ldap')
       @pseudonym.reload
 
       allow(@pseudonym).to receive(:valid_ldap_credentials?).and_return(false)
@@ -421,13 +421,13 @@ describe Pseudonym do
       end
 
       it 'returns false if the sis_user_id is already taken' do
-        new_pseudonym = Pseudonym.new(:account => @pseudonym.account)
+        new_pseudonym = Pseudonym.new(account: @pseudonym.account)
         new_pseudonym.sis_user_id = sis_user_id
         expect { new_pseudonym.verify_unique_sis_user_id }.to throw_symbol(:abort)
       end
 
       it 'also can validate if the new sis_user_id is an integer' do
-        new_pseudonym = Pseudonym.new(:account => @pseudonym.account)
+        new_pseudonym = Pseudonym.new(account: @pseudonym.account)
         new_pseudonym.sis_user_id = sis_user_id.to_i
         expect { new_pseudonym.verify_unique_sis_user_id }.to throw_symbol(:abort)
       end

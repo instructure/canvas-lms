@@ -25,7 +25,7 @@ module DiscussionsCommon
   end
 
   def create_and_go_to_topic(title = 'new topic', discussion_type = 'side_comment', is_locked = false)
-    @topic = @course.discussion_topics.create!(:title => title, :discussion_type => discussion_type)
+    @topic = @course.discussion_topics.create!(title: title, discussion_type: discussion_type)
     if is_locked
       @topic.lock
       @topic.reload
@@ -35,7 +35,7 @@ module DiscussionsCommon
   end
 
   def create_discussion(discussion_name, discussion_type)
-    @course.discussion_topics.create!(:title => discussion_name, :discussion_type => discussion_type)
+    @course.discussion_topics.create!(title: discussion_name, discussion_type: discussion_type)
   end
 
   def edit_topic(discussion_name, message)
@@ -145,11 +145,11 @@ module DiscussionsCommon
     f('#searchTerm').send_keys(:return)
     # logic for dealing with options
     case opts
-    when { :only_graded => true }
+    when { only_graded: true }
       set_checkbox('onlyGraded', opts[:only_graded])
-    when { :only_unread => true }
+    when { only_unread: true }
       set_checkbox('onlyUnread', opts[:only_unread])
-    when { :only_unread => true, :only_graded => true }
+    when { only_unread: true, only_graded: true }
       set_checkbox('onlyGraded', opts[:only_graded])
       set_checkbox('onlyUnread', opts[:only_unread])
     end

@@ -20,9 +20,9 @@
 
 describe ContentParticipation do
   before :once do
-    course_with_teacher(:active_all => true)
-    student_in_course(:active_all => true)
-    assignment_model(:course => @course)
+    course_with_teacher(active_all: true)
+    student_in_course(active_all: true)
+    assignment_model(course: @course)
     @content = @assignment.submit_homework(@student)
   end
 
@@ -30,9 +30,9 @@ describe ContentParticipation do
     it "creates if it doesn't exist" do
       expect do
         ContentParticipation.create_or_update({
-                                                :content => @content,
-                                                :user => @student,
-                                                :workflow_state => "read",
+                                                content: @content,
+                                                user: @student,
+                                                workflow_state: "read",
                                               })
       end.to change(ContentParticipation, :count).by 1
     end
@@ -40,21 +40,21 @@ describe ContentParticipation do
     it "updates existing if one already exists" do
       expect do
         ContentParticipation.create_or_update({
-                                                :content => @content,
-                                                :user => @student,
-                                                :workflow_state => "read",
+                                                content: @content,
+                                                user: @student,
+                                                workflow_state: "read",
                                               })
       end.to change(ContentParticipation, :count).by 1
 
       expect do
         ContentParticipation.create_or_update({
-                                                :content => @content,
-                                                :user => @student,
-                                                :workflow_state => "unread",
+                                                content: @content,
+                                                user: @student,
+                                                workflow_state: "unread",
                                               })
       end.to change(ContentParticipation, :count).by 0
 
-      cp = ContentParticipation.where(:user_id => @student).first
+      cp = ContentParticipation.where(user_id: @student).first
       expect(cp.workflow_state).to eq "unread"
     end
   end
@@ -63,36 +63,36 @@ describe ContentParticipation do
     it "updates the participation count automatically when the workflow state changes" do
       expect do
         ContentParticipation.create_or_update({
-                                                :content => @content,
-                                                :user => @student,
-                                                :workflow_state => "read",
+                                                content: @content,
+                                                user: @student,
+                                                workflow_state: "read",
                                               })
       end.to change(ContentParticipationCount, :count).by 1
 
       ContentParticipation.create_or_update({
-                                              :content => @content,
-                                              :user => @student,
-                                              :workflow_state => "unread",
+                                              content: @content,
+                                              user: @student,
+                                              workflow_state: "unread",
                                             })
-      cpc = ContentParticipationCount.where(:user_id => @student).first
+      cpc = ContentParticipationCount.where(user_id: @student).first
       expect(cpc.unread_count).to eq 1
     end
 
     it "does not update participation count if workflow_state doesn't change" do
       expect do
         ContentParticipation.create_or_update({
-                                                :content => @content,
-                                                :user => @student,
-                                                :workflow_state => "read",
+                                                content: @content,
+                                                user: @student,
+                                                workflow_state: "read",
                                               })
       end.to change(ContentParticipationCount, :count).by 1
 
       ContentParticipation.create_or_update({
-                                              :content => @content,
-                                              :user => @student,
-                                              :workflow_state => "read",
+                                              content: @content,
+                                              user: @student,
+                                              workflow_state: "read",
                                             })
-      cpc = ContentParticipationCount.where(:user_id => @student).first
+      cpc = ContentParticipationCount.where(user_id: @student).first
       expect(cpc.unread_count).to eq 0
     end
   end
@@ -100,9 +100,9 @@ describe ContentParticipation do
   describe 'create' do
     it 'sets the root_account_id from the submissions assignment' do
       participant = ContentParticipation.create_or_update({
-                                                            :content => @content,
-                                                            :user => @student,
-                                                            :workflow_state => "unread",
+                                                            content: @content,
+                                                            user: @student,
+                                                            workflow_state: "unread",
                                                           })
       expect(participant.root_account_id).to eq(@assignment.root_account_id)
     end

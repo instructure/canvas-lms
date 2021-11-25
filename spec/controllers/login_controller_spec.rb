@@ -30,8 +30,8 @@ describe LoginController do
 
     it "sets merge params correctly in the session" do
       user_with_pseudonym(active: true)
-      @cc = @user.communication_channels.create!(:path => 'jt+1@instructure.com')
-      get 'new', params: { :confirm => @cc.confirmation_code, :expected_user_id => @user.id }
+      @cc = @user.communication_channels.create!(path: 'jt+1@instructure.com')
+      get 'new', params: { confirm: @cc.confirmation_code, expected_user_id: @user.id }
       expect(response).to be_redirect
       expect(session[:confirm]).to eq @cc.confirmation_code
       expect(session[:expected_user_id]).to eq @user.id
@@ -120,7 +120,7 @@ describe LoginController do
     it "passes pseudonym_session[unique_id] to redirect from current username" do
       user_with_pseudonym(unique_id: 'test', active: 1)
       user_session(@user, @pseudonym)
-      get 'new', params: { "pseudonym_session" => { "unique_id" => "test" }, force_login: 1 }
+      get 'new', params: { "pseudonym_session" => { "unique_id" => "test" }, :force_login => 1 }
       expect(response).to redirect_to(
         controller.url_for(controller: 'login/canvas', action: :new) + '?pseudonym_session%5Bunique_id%5D=test'
       )

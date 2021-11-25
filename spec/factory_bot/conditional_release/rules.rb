@@ -22,7 +22,7 @@ FactoryBot.define do
 
   factory :rule, class: ConditionalRelease::Rule do
     root_account_id { Account.default.id }
-    course :factory => :course
+    course factory: :course
 
     before(:create) do |rule, _evaluator|
       rule.trigger_assignment ||= rule.course.assignments.create!

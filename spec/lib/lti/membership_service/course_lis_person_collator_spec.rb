@@ -174,9 +174,9 @@ module Lti::MembershipService
         @course.enroll_user(@ta, 'TaEnrollment', enrollment_state: 'active')
         @designer = user_model
         @course.enroll_user(@designer, 'DesignerEnrollment', enrollment_state: 'active')
-        @student = user_with_managed_pseudonym(:active_all => true, :account => @account, :name => "John St. Clair",
-                                               :sortable_name => "St. Clair, John", :username => 'john@stclair.com',
-                                               :sis_user_id => user_sis_id, integration_id: 'int1')
+        @student = user_with_managed_pseudonym(active_all: true, account: @account, name: "John St. Clair",
+                                               sortable_name: "St. Clair, John", username: 'john@stclair.com',
+                                               sis_user_id: user_sis_id, integration_id: 'int1')
         @course.enroll_user(@student, 'StudentEnrollment', enrollment_state: 'active')
         @observer = user_model
         @course.enroll_user(@observer, 'ObserverEnrollment', enrollment_state: 'active')

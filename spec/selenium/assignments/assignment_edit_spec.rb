@@ -26,21 +26,21 @@ describe "assignment" do
 
   context "for submission limited attempts" do
     before(:once) do
-      @course1 = Course.create!(:name => "First Course1")
+      @course1 = Course.create!(name: "First Course1")
       @teacher1 = User.create!
-      @teacher1 = User.create!(:name => "First Teacher")
+      @teacher1 = User.create!(name: "First Teacher")
       @teacher1.accept_terms
       @teacher1.register!
-      @course1.enroll_teacher(@teacher1, :enrollment_state => 'active')
+      @course1.enroll_teacher(@teacher1, enrollment_state: 'active')
       @assignment1 = @course1.assignments.create!(
-        :title => 'Existing Assignment',
-        :points_possible => 10,
-        :submission_types => "online_url,online_upload,online_text_entry"
+        title: 'Existing Assignment',
+        points_possible: 10,
+        submission_types: "online_url,online_upload,online_text_entry"
       )
       @assignment2_paper = @course1.assignments.create!(
-        :title => 'Existing Assignment',
-        :points_possible => 10,
-        :submission_types => "on_paper"
+        title: 'Existing Assignment',
+        points_possible: 10,
+        submission_types: "on_paper"
       )
     end
 

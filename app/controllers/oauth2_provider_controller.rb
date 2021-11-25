@@ -100,7 +100,7 @@ class OAuth2ProviderController < ApplicationController
       @provider = Canvas::OAuth::Provider.new(session[:oauth2][:client_id], session[:oauth2][:redirect_uri], session[:oauth2][:scopes], session[:oauth2][:purpose])
 
       if mobile_device?
-        render :layout => 'mobile_auth', :action => 'confirm_mobile'
+        render layout: 'mobile_auth', action: 'confirm_mobile'
       end
     else
       flash[:error] = t("Must submit new OAuth2 request")
@@ -151,7 +151,7 @@ class OAuth2ProviderController < ApplicationController
 
     increment_request_cost(Setting.get("oauth_token_additional_request_cost", "200").to_i)
 
-    render :json => token
+    render json: token
   end
 
   def destroy
@@ -163,7 +163,7 @@ class OAuth2ProviderController < ApplicationController
       end
       logout_current_user
     end
-    return render :json => { :message => "can't delete OAuth access token when not using an OAuth access token" }, :status => :bad_request unless @access_token
+    return render json: { message: "can't delete OAuth access token when not using an OAuth access token" }, status: :bad_request unless @access_token
 
     @access_token.destroy
     response = {}

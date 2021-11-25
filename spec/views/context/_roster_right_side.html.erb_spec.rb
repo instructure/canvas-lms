@@ -22,7 +22,7 @@ require_relative '../views_helper'
 describe "/context/_roster_right_side" do
   it "renders with an account as context" do
     view_context(Account.default)
-    render :partial => "context/roster_right_side"
+    render partial: "context/roster_right_side"
     expect(response).not_to be_nil
   end
 end

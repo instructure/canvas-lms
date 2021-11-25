@@ -24,7 +24,7 @@ describe "sub account grading schemes" do
   include_context "in-process server selenium tests"
   include GradingSchemesCommon
 
-  let(:account) { Account.create(:name => 'sub account from default account', :parent_account => Account.default) }
+  let(:account) { Account.create(name: 'sub account from default account', parent_account: Account.default) }
   let(:url) { "/accounts/#{account.id}/grading_standards" }
 
   before do

@@ -41,7 +41,7 @@ describe Quizzes::OutstandingQuizSubmissionsController, type: :request do
     before :once do
       course_factory
       @student = student_in_course.user
-      @quiz = @course.quizzes.create!(:title => "Outstanding")
+      @quiz = @course.quizzes.create!(title: "Outstanding")
       @submission = Quizzes::SubmissionManager.new(@quiz).find_or_create_submission(@student, false)
       @submission.submission_data = {}
       @submission.end_at = 20.minutes.ago
@@ -55,7 +55,7 @@ describe Quizzes::OutstandingQuizSubmissionsController, type: :request do
 
     context 'with privileged access' do
       before :once do
-        teacher_in_course(:active_all => true)
+        teacher_in_course(active_all: true)
       end
 
       it 'returns all outstanding QS' do
@@ -88,7 +88,7 @@ describe Quizzes::OutstandingQuizSubmissionsController, type: :request do
 
     before :once do
       course_factory
-      @quiz = @course.quizzes.create!(:title => "Outstanding")
+      @quiz = @course.quizzes.create!(title: "Outstanding")
       @quiz.save
       @submission = Quizzes::SubmissionManager.new(@quiz).find_or_create_submission(@user, false)
       @submission.submission_data = {}
@@ -109,7 +109,7 @@ describe Quizzes::OutstandingQuizSubmissionsController, type: :request do
         @submission2.submission_data = {}
         @submission2.end_at = 20.minutes.ago
         @submission2.save!
-        teacher_in_course(:active_all => true)
+        teacher_in_course(active_all: true)
       end
 
       it "grades all outstanding quiz submissions" do

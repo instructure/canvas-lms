@@ -26,10 +26,10 @@ module Api::V1::ContentExport
   include Api::V1::QuizzesNext::Quiz
 
   def content_export_json(export, current_user, session, includes = [])
-    json = api_json(export, current_user, session, :only => %w[id user_id created_at workflow_state export_type])
+    json = api_json(export, current_user, session, only: %w[id user_id created_at workflow_state export_type])
     json['course_id'] = export.context_id if export.context_type == 'Course'
     if export.attachment && !export.for_course_copy? && !export.expired?
-      json[:attachment] = attachment_json(export.attachment, current_user, {}, { :can_view_hidden_files => true })
+      json[:attachment] = attachment_json(export.attachment, current_user, {}, { can_view_hidden_files: true })
     end
     if export.job_progress
       json['progress_url'] = polymorphic_url([:api_v1, export.job_progress])

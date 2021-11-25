@@ -318,12 +318,12 @@ module Lti
                   external_tool_url: tool.url,
                   type: 'external_tool'
                 },
-                id: "http://test.host/api/lti/courses/#{course.id}/line_items/#{item.id}",
-                scoreMaximum: score_max.to_f,
-                label: label,
-                resourceId: resource_id,
-                tag: tag,
-                resourceLinkId: item.resource_link.resource_link_uuid
+                :id => "http://test.host/api/lti/courses/#{course.id}/line_items/#{item.id}",
+                :scoreMaximum => score_max.to_f,
+                :label => label,
+                :resourceId => resource_id,
+                :tag => tag,
+                :resourceLinkId => item.resource_link.resource_link_uuid
               }.with_indifferent_access
 
               expect(parsed_response_body).to eq expected_response

@@ -43,7 +43,7 @@ describe "help dialog" do
 
   context "help as a student" do
     before do
-      course_with_student_logged_in(:active_all => true)
+      course_with_student_logged_in(active_all: true)
     end
 
     it "shows the Help dialog when help is clicked and feedback is enabled" do
@@ -53,7 +53,7 @@ describe "help dialog" do
       expect(f("#content")).not_to contain_css('.help_dialog_trigger')
 
       support_url = 'http://example.com/support'
-      Account.default.update_attribute(:settings, { :support_url => support_url })
+      Account.default.update_attribute(:settings, { support_url: support_url })
 
       get "/dashboard"
       expect(ff('#global_nav_help_link').length).to eq(1)
@@ -69,7 +69,7 @@ describe "help dialog" do
     it "shows the support url link in global nav correctly" do
       # if @domain_root_account or Account.default have settings[:support_url] set there should be a link to that site
       support_url = 'http://example.com/support'
-      Account.default.update_attribute(:settings, { :support_url => support_url })
+      Account.default.update_attribute(:settings, { support_url: support_url })
       get "/dashboard"
       link = f("a[href='#{support_url}']")
       expect(link['id']).to eq 'global_nav_help_link'
@@ -108,7 +108,7 @@ describe "help dialog" do
 
   context "help dialog as a teacher" do
     before do
-      course_with_teacher_logged_in(:active_all => true)
+      course_with_teacher_logged_in(active_all: true)
     end
 
     it "does not show the Message teacher button if not a student" do
@@ -143,11 +143,11 @@ describe "help dialog" do
 
   context "customization link" do
     before do
-      user_logged_in(:active_all => true)
+      user_logged_in(active_all: true)
     end
 
     it "shows the link to root account admins" do
-      Account.default.account_users.create!(:user => @user)
+      Account.default.account_users.create!(user: @user)
       get "/"
       wait_for_ajaximations
       f('#global_nav_help_link').click
@@ -157,7 +157,7 @@ describe "help dialog" do
 
     it "does not show the link to sub account admins" do
       sub = Account.default.sub_accounts.create!
-      sub.account_users.create!(:user => @user)
+      sub.account_users.create!(user: @user)
       get "/"
       wait_for_ajaximations
       f('#global_nav_help_link').click
@@ -168,9 +168,9 @@ describe "help dialog" do
 
   context "featured and new links" do
     before do
-      user_logged_in(:active_all => true)
+      user_logged_in(active_all: true)
       Account.site_admin.enable_feature! :featured_help_links
-      Account.default.account_users.create!(:user => @user)
+      Account.default.account_users.create!(user: @user)
     end
 
     it "has the default link at the top of the tray" do
@@ -239,7 +239,7 @@ describe "help dialog" do
     end
 
     it 'shows the welcome tour for Account Admins' do
-      Account.default.account_users.create!(:user => @user)
+      Account.default.account_users.create!(user: @user)
       get "/"
       driver.local_storage.clear
       wait_for_ajaximations

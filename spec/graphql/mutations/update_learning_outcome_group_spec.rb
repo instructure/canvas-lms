@@ -27,9 +27,9 @@ describe Mutations::UpdateLearningOutcomeGroup do
   before :once do
     @admin = account_admin_user(account: @account)
     course_with_student
-    @old_parent_group = @course.learning_outcome_groups.create!(:title => 'Old Parent Outcome Group')
-    @new_parent_group = @course.learning_outcome_groups.create!(:title => 'New Parent Outcome Group')
-    @group = @course.learning_outcome_groups.create!(:title => 'Outcome Group', :description => 'Description', :vendor_guid => 'vg--0')
+    @old_parent_group = @course.learning_outcome_groups.create!(title: 'Old Parent Outcome Group')
+    @new_parent_group = @course.learning_outcome_groups.create!(title: 'New Parent Outcome Group')
+    @group = @course.learning_outcome_groups.create!(title: 'Outcome Group', description: 'Description', vendor_guid: 'vg--0')
     @global_group = LearningOutcomeGroup.create(title: 'Global Group')
     @new_parent_global_group = LearningOutcomeGroup.create(title: 'New Parent Global Group')
   end

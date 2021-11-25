@@ -58,12 +58,12 @@ class SubmissionVersion < ActiveRecord::Base
       return nil unless model.try(:assignment_id) # model _could_ be false here, so don't use &.
 
       {
-        :context_id => model.course_id,
-        :context_type => 'Course',
-        :user_id => model.user_id,
-        :assignment_id => model.assignment_id,
-        :version_id => version.id,
-        :root_account_id => model.root_account_id
+        context_id: model.course_id,
+        context_type: 'Course',
+        user_id: model.user_id,
+        assignment_id: model.assignment_id,
+        version_id: version.id,
+        root_account_id: model.root_account_id
       }
     end
   end

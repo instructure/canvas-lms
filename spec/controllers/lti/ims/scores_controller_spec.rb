@@ -566,8 +566,8 @@ module Lti::IMS
                                                                                new_submission: false,
                                                                                submission_type: submission_type
                                                                              }),
-                scoreGiven: 10,
-                scoreMaximum: 10
+                :scoreGiven => 10,
+                :scoreMaximum => 10
               )
             end
 
@@ -590,8 +590,8 @@ module Lti::IMS
                                                                                new_submission: true,
                                                                                submission_type: submission_type
                                                                              }),
-                scoreGiven: 10,
-                scoreMaximum: 10
+                :scoreGiven => 10,
+                :scoreMaximum => 10
               )
             end
 
@@ -614,8 +614,8 @@ module Lti::IMS
                                                                                new_submission: true,
                                                                                submission_type: submission_type
                                                                              }),
-                scoreGiven: 10,
-                scoreMaximum: 10
+                :scoreGiven => 10,
+                :scoreMaximum => 10
               )
             end
 
@@ -652,8 +652,8 @@ module Lti::IMS
                                                                                  new_submission: true,
                                                                                  submission_type: submission_type
                                                                                }),
-                  scoreGiven: 10,
-                  scoreMaximum: 10
+                  :scoreGiven => 10,
+                  :scoreMaximum => 10
                 )
               end
 

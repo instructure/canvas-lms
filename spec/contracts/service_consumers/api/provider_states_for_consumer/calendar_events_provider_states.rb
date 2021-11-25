@@ -52,7 +52,7 @@ PactConfig::Consumers::ALL.each do |consumer|
         @event.update!(all_day: true, all_day_date: '2015-09-22', description: "", location_name: "", location_address: "")
         @student1 = @student
         cat = @course.group_categories.create(name: "foo")
-        g = cat.groups.create(:context => @course)
+        g = cat.groups.create(context: @course)
         g.users << @student
         @event.reserve_for(@student1, @student1)
         course_with_student(course: @course, active_all: true)

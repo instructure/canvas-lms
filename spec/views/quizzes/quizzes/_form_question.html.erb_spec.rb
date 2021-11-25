@@ -25,7 +25,7 @@ describe "/quizzes/quizzes/_form_question" do
     course_with_student
     view_context
     assign(:js_env, { quiz_max_combination_count: 200 })
-    render :partial => "quizzes/quizzes/form_question"
+    render partial: "quizzes/quizzes/form_question"
 
     expect(response).not_to be_nil
   end

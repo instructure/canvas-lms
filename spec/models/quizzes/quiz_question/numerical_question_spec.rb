@@ -21,7 +21,7 @@ require_dependency 'quizzes/quiz_question/base'
 
 describe Quizzes::QuizQuestion::NumericalQuestion do
   let(:question_data) do
-    { :answers => [{ :id => 1, :weight => 100, :start => 2, :end => 3 }] }
+    { answers: [{ id: 1, weight: 100, start: 2, end: 3 }] }
   end
 
   let(:question) do
@@ -78,26 +78,26 @@ describe Quizzes::QuizQuestion::NumericalQuestion do
     end
 
     it "does not calculate margin of tolerance for answers if answer text is nil" do
-      answer_data = { :"question_#{question_id}" => nil }
+      answer_data = { "question_#{question_id}": nil }
       user_answer = Quizzes::QuizQuestion::UserAnswer.new(question_id, points_possible, answer_data)
       expect(question.correct_answer_parts(user_answer)).to be_nil
     end
 
     it "does not calculate margin of tolerance for answers if answer text is blank" do
-      answer_data = { :"question_#{question_id}" => "" }
+      answer_data = { "question_#{question_id}": "" }
       user_answer = Quizzes::QuizQuestion::UserAnswer.new(question_id, points_possible, answer_data)
       expect(question.correct_answer_parts(user_answer)).to be_falsey
     end
 
     it "calculates if answer falls within start/end range" do
-      answer_data = { :"question_#{question_id}" => "2.5" }
+      answer_data = { "question_#{question_id}": "2.5" }
       user_answer = Quizzes::QuizQuestion::UserAnswer.new(question_id, points_possible, answer_data)
 
       expect(question.correct_answer_parts(user_answer)).to be_truthy
     end
 
     it "calculates if answer falls out of start/end range" do
-      answer_data = { :"question_#{question_id}" => "4" }
+      answer_data = { "question_#{question_id}": "4" }
       user_answer = Quizzes::QuizQuestion::UserAnswer.new(question_id, points_possible, answer_data)
 
       expect(question.correct_answer_parts(user_answer)).to be_falsey
@@ -111,7 +111,7 @@ describe Quizzes::QuizQuestion::NumericalQuestion do
         ]
 
         it desc do
-          answer_data = { :"question_#{question_id}" => answer.to_s }
+          answer_data = { "question_#{question_id}": answer.to_s }
           question = Quizzes::QuizQuestion::NumericalQuestion.new({
                                                                     answers: [{
                                                                       id: 1,

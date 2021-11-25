@@ -136,8 +136,8 @@ describe AcademicBenchmark::Converter do
                                user_id: content_migration.user_id,
                                migration_options: { points_possible: 10,
                                                     mastery_points: 6,
-                                                    ratings: [{ :description => "Awesome", :points => 10 },
-                                                              { :description => "Not awesome", :points => 0 }] }
+                                                    ratings: [{ description: "Awesome", points: 10 },
+                                                              { description: "Not awesome", points: 0 }] }
                              })
   end
 

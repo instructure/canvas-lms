@@ -58,7 +58,7 @@ module Courses
             event_end_at = time_zone.parse("#{current_date} #{timetable_hash[:end_time]}")
 
             if event_start_at > course_start_at && event_end_at < course_end_at
-              event_hash = { :start_at => event_start_at, :end_at => event_end_at }
+              event_hash = { start_at: event_start_at, end_at: event_end_at }
               event_hash[:location_name] = location_name if location_name
               event_hashes << event_hash
             end
@@ -79,14 +79,14 @@ module Courses
       raise "timetable codes can't be blank" if timetable_codes.any?(&:blank?)
 
       # destroy unused events
-      event_context.calendar_events.active.for_timetable.where.not(:timetable_code => timetable_codes)
-                   .update_all(:workflow_state => 'deleted', :deleted_at => Time.now.utc)
+      event_context.calendar_events.active.for_timetable.where.not(timetable_code: timetable_codes)
+                   .update_all(workflow_state: 'deleted', deleted_at: Time.now.utc)
 
-      existing_events = event_context.calendar_events.where(:timetable_code => timetable_codes).to_a.index_by(&:timetable_code)
+      existing_events = event_context.calendar_events.where(timetable_code: timetable_codes).to_a.index_by(&:timetable_code)
       event_hashes.each do |event_hash|
         CalendarEvent.unique_constraint_retry do |retry_count|
           code = event_hash[:code]
-          event = event_context.calendar_events.where(:timetable_code => code).first if retry_count > 0
+          event = event_context.calendar_events.where(timetable_code: code).first if retry_count > 0
           event ||= existing_events[code] || create_new_event(event_hash)
           sync_event(event, event_hash)
         end

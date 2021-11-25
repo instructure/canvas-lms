@@ -47,7 +47,7 @@ module Importers
           bank[:count] += 1
           q[:question_bank_migration_id] = bank[:migration_id]
         else
-          bank = { :count => 1 }
+          bank = { count: 1 }
           bank[:title] = q[:question_bank_name] if q[:question_bank_name]
           bank[:migration_id] = q[:question_bank_migration_id] if q[:question_bank_migration_id]
           bank[:migration_id] ||= CC::CCHelper.create_key(bank[:title], 'assessment_question_bank') if bank[:title]

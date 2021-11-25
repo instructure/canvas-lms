@@ -34,7 +34,7 @@ module Lti
     end
 
     def oauth_authenticated_request?(secret)
-      !!OAuth::Signature.build(request, :consumer_secret => secret).verify
+      !!OAuth::Signature.build(request, consumer_secret: secret).verify
     end
 
     def oauth_consumer_key
@@ -53,9 +53,9 @@ module Lti
     end
 
     def render_unauthorized_api
-      render json: { :status => I18n.t('lib.auth.lti.api.status_unauthorized', 'unauthorized'),
-                     :errors => [{ :message => I18n.t('lib.auth.lti.api.not_unauthorized', 'unauthorized request') }] },
-             :status => :unauthorized
+      render json: { status: I18n.t('lib.auth.lti.api.status_unauthorized', 'unauthorized'),
+                     errors: [{ message: I18n.t('lib.auth.lti.api.not_unauthorized', 'unauthorized request') }] },
+             status: :unauthorized
     end
   end
 end

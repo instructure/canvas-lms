@@ -29,11 +29,11 @@ describe 'BigBlueButton conferences' do
   bbb_endpoint = 'bbb.blah.com'
   bbb_secret = 'mock-secret'
   bbb_fixtures = {
-    :get_recordings => {
+    get_recordings: {
       'meetingID' => 'instructure_web_conference_3Fn2k10wu0jK7diwJHs2FkDU0oXyX1ErUZCavikc',
       'checksum' => '9f41063382ab155ccf75fe2f212846e3bb103579'
     },
-    :delete_recordings => {
+    delete_recordings: {
       'recordID' => '0225ccf234655ae60658ccac1e272d48781b491c-1511812307014',
       'checksum' => '4aefca80ba80ba3d540295ea3e88215df77cf5cf'
     }
@@ -58,7 +58,7 @@ describe 'BigBlueButton conferences' do
       before(:once) do
         stub_request(:get, /getRecordings/)
           .with(query: bbb_fixtures[:get_recordings])
-          .to_return(:body => big_blue_button_mock_response('get_recordings', 'none'))
+          .to_return(body: big_blue_button_mock_response('get_recordings', 'none'))
         @conference = create_big_blue_button_conference(bbb_fixtures[:get_recordings]['meetingID'])
       end
 
@@ -71,7 +71,7 @@ describe 'BigBlueButton conferences' do
       before(:once) do
         stub_request(:get, /getRecordings/)
           .with(query: bbb_fixtures[:get_recordings])
-          .to_return(:body => big_blue_button_mock_response('get_recordings', 'two'))
+          .to_return(body: big_blue_button_mock_response('get_recordings', 'two'))
         @conference = create_big_blue_button_conference(bbb_fixtures[:get_recordings]['meetingID'])
       end
 
@@ -84,10 +84,10 @@ describe 'BigBlueButton conferences' do
       before(:once) do
         stub_request(:get, /deleteRecordings/)
           .with(query: bbb_fixtures[:delete_recordings])
-          .to_return(:body => big_blue_button_mock_response('delete_recordings'))
+          .to_return(body: big_blue_button_mock_response('delete_recordings'))
         stub_request(:get, /getRecordings/)
           .with(query: bbb_fixtures[:get_recordings])
-          .to_return(:body => big_blue_button_mock_response('get_recordings', 'one'))
+          .to_return(body: big_blue_button_mock_response('get_recordings', 'one'))
         @conference = create_big_blue_button_conference(bbb_fixtures[:get_recordings]['meetingID'])
       end
 
@@ -102,7 +102,7 @@ describe 'BigBlueButton conferences' do
       before(:once) do
         stub_request(:get, /getRecordings/)
           .with(query: bbb_fixtures[:get_recordings])
-          .to_return(:body => big_blue_button_mock_response('get_recordings', 'one'))
+          .to_return(body: big_blue_button_mock_response('get_recordings', 'one'))
         @conference = create_big_blue_button_conference(bbb_fixtures[:get_recordings]['meetingID'])
         @conference.add_user(@student, 'attendee')
       end

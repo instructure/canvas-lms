@@ -132,7 +132,7 @@ describe "settings tabs" do
         wait_for_ajax_requests
         notification = AccountNotification.last
         expect(notification.send_message).to eq true
-        job = Delayed::Job.where(:tag => "AccountNotification#broadcast_messages").last
+        job = Delayed::Job.where(tag: "AccountNotification#broadcast_messages").last
         expect(job.run_at.to_i).to eq notification.start_at.to_i
       end
 
@@ -147,7 +147,7 @@ describe "settings tabs" do
       end
 
       it "is able to send messages for an existing announcement" do
-        notification = account_notification(:start_at => 2.days.from_now, :end_at => 4.days.from_now)
+        notification = account_notification(start_at: 2.days.from_now, end_at: 4.days.from_now)
 
         get "/accounts/#{Account.default.id}/settings"
         wait_for_ajaximations
@@ -161,14 +161,14 @@ describe "settings tabs" do
         wait_for_ajax_requests
         notification.reload
         expect(notification.send_message).to eq true
-        job = Delayed::Job.where(:tag => "AccountNotification#broadcast_messages").last
+        job = Delayed::Job.where(tag: "AccountNotification#broadcast_messages").last
         expect(job.run_at.to_i).to eq notification.start_at.to_i
       end
 
       it "marks the checkbox already for a pending announcement already slated to send messages" do
         old_start_at = 1.day.from_now
-        notification = account_notification(:start_at => old_start_at, :end_at => 5.days.from_now, :send_message => true)
-        job = Delayed::Job.where(:tag => "AccountNotification#broadcast_messages").last
+        notification = account_notification(start_at: old_start_at, end_at: 5.days.from_now, send_message: true)
+        job = Delayed::Job.where(tag: "AccountNotification#broadcast_messages").last
         expect(job.run_at.to_i).to eq old_start_at.to_i
 
         get "/accounts/#{Account.default.id}/settings"
@@ -180,8 +180,8 @@ describe "settings tabs" do
       end
 
       it "is able to re-send messages for an announcement" do
-        notification = account_notification(:start_at => 1.day.from_now, :end_at => 5.days.from_now)
-        AccountNotification.where(:id => notification).update_all(:send_message => true, :messages_sent_at => 1.day.ago)
+        notification = account_notification(start_at: 1.day.from_now, end_at: 5.days.from_now)
+        AccountNotification.where(id: notification).update_all(send_message: true, messages_sent_at: 1.day.ago)
         get "/accounts/#{Account.default.id}/settings"
         wait_for_ajaximations
         f("#tab-announcements-link").click
@@ -194,7 +194,7 @@ describe "settings tabs" do
 
         f("#edit_notification_form_#{notification.id}").submit
         wait_for_ajax_requests
-        expect(AccountNotification.where(:id => notification).last.updated_at).to be > notification.updated_at
+        expect(AccountNotification.where(id: notification).last.updated_at).to be > notification.updated_at
       end
     end
   end

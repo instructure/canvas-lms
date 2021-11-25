@@ -270,7 +270,7 @@ describe Course do
 
       context "Setting is set to On" do
         before do
-          @course.update!(:hide_sections_on_course_users_page => true)
+          @course.update!(hide_sections_on_course_users_page: true)
         end
 
         it "returns true when there is more than one section" do
@@ -297,7 +297,7 @@ describe Course do
 
       context "Setting is set to Off" do
         before do
-          @course.update!(:hide_sections_on_course_users_page => false)
+          @course.update!(hide_sections_on_course_users_page: false)
         end
 
         it "returns false" do
@@ -438,7 +438,7 @@ describe Course do
 
       context "without term end date" do
         it "knows if it has been soft-concluded" do
-          @course.update({ :conclude_at => nil, :restrict_enrollments_to_course_dates => true })
+          @course.update({ conclude_at: nil, restrict_enrollments_to_course_dates: true })
           expect(@course).not_to be_soft_concluded
 
           @course.update_attribute(:conclude_at, 1.week.from_now)
@@ -455,7 +455,7 @@ describe Course do
         end
 
         it "knows if it has been soft-concluded" do
-          @course.update({ :conclude_at => nil, :restrict_enrollments_to_course_dates => true })
+          @course.update({ conclude_at: nil, restrict_enrollments_to_course_dates: true })
           expect(@course).to be_soft_concluded
 
           @course.update_attribute(:conclude_at, 1.week.from_now)
@@ -472,7 +472,7 @@ describe Course do
         end
 
         it "knows if it has been soft-concluded" do
-          @course.update({ :conclude_at => nil, :restrict_enrollments_to_course_dates => true })
+          @course.update({ conclude_at: nil, restrict_enrollments_to_course_dates: true })
           expect(@course).not_to be_soft_concluded
 
           @course.update_attribute(:conclude_at, 1.week.from_now)
@@ -821,10 +821,10 @@ describe Course do
 
       it "follows account chain when looking for generic permissions from AccountUsers" do
         account = Account.create!
-        sub_account = Account.create!(:parent_account => account)
-        sub_sub_account = Account.create!(:parent_account => sub_account)
-        user = account_admin_user(:account => sub_account)
-        course = Course.create!(:account => sub_sub_account)
+        sub_account = Account.create!(parent_account: account)
+        sub_sub_account = Account.create!(parent_account: sub_account)
+        user = account_admin_user(account: sub_account)
+        course = Course.create!(account: sub_sub_account)
         expect(course.grants_right?(user, :manage)).to be_truthy
       end
 
@@ -832,13 +832,13 @@ describe Course do
       # enrollment changes that are applied directly to the db with update_all
       it "grants delete to the proper individuals" do
         @course.root_account.disable_feature!(:granular_permissions_manage_courses)
-        @role1 = custom_account_role('managecourses', :account => Account.default)
-        @role2 = custom_account_role('managesis', :account => Account.default)
-        account_admin_user_with_role_changes(:role => @role1, :role_changes => { :manage_courses => true, :change_course_state => true })
+        @role1 = custom_account_role('managecourses', account: Account.default)
+        @role2 = custom_account_role('managesis', account: Account.default)
+        account_admin_user_with_role_changes(role: @role1, role_changes: { manage_courses: true, change_course_state: true })
         @admin1 = @admin
-        account_admin_user_with_role_changes(:role => @role2, :role_changes => { :manage_sis => true, :change_course_state => true })
+        account_admin_user_with_role_changes(role: @role2, role_changes: { manage_sis: true, change_course_state: true })
         @admin2 = @admin
-        course_with_teacher(:active_all => true)
+        course_with_teacher(active_all: true)
         @designer = user_factory(active_all: true)
         @course.enroll_designer(@designer).accept!
         @ta = user_factory(active_all: true)
@@ -893,13 +893,13 @@ describe Course do
       # enrollment changes that are applied directly to the db with update_all
       it "grants delete to the proper individuals (granular permissions)" do
         @course.root_account.enable_feature!(:granular_permissions_manage_courses)
-        @role1 = custom_account_role('managecourses', :account => Account.default)
-        @role2 = custom_account_role('managesis', :account => Account.default)
+        @role1 = custom_account_role('managecourses', account: Account.default)
+        @role2 = custom_account_role('managesis', account: Account.default)
         account_admin_user_with_role_changes(role: @role1, role_changes: { manage_courses_delete: true })
         @admin1 = @admin
         account_admin_user_with_role_changes(role: @role2, role_changes: { manage_courses_delete: false })
         @admin2 = @admin
-        course_with_teacher(:active_all => true)
+        course_with_teacher(active_all: true)
         @designer = user_factory(active_all: true)
         @course.enroll_designer(@designer).accept!
         @ta = user_factory(active_all: true)
@@ -958,18 +958,18 @@ describe Course do
       # :change_course_state is deprecated
       it "does not grant delete to anyone without :change_course_state rights (non-granular)" do
         @course.root_account.disable_feature!(:granular_permissions_manage_courses)
-        @role1 = custom_account_role('managecourses', :account => Account.default)
-        @role2 = custom_account_role('managesis', :account => Account.default)
-        account_admin_user_with_role_changes(:role => @role1, :role_changes => { :manage_courses => true })
+        @role1 = custom_account_role('managecourses', account: Account.default)
+        @role2 = custom_account_role('managesis', account: Account.default)
+        account_admin_user_with_role_changes(role: @role1, role_changes: { manage_courses: true })
         @admin1 = @admin
-        account_admin_user_with_role_changes(:role => @role2, :role_changes => { :manage_sis => true })
+        account_admin_user_with_role_changes(role: @role2, role_changes: { manage_sis: true })
         @admin2 = @admin
-        course_with_teacher(:active_all => true)
+        course_with_teacher(active_all: true)
         @designer = user_factory(active_all: true)
         @course.enroll_designer(@designer).accept!
 
-        Account.default.role_overrides.create!(:role => teacher_role, :permission => :change_course_state, :enabled => false)
-        Account.default.role_overrides.create!(:role => designer_role, :permission => :change_course_state, :enabled => false)
+        Account.default.role_overrides.create!(role: teacher_role, permission: :change_course_state, enabled: false)
+        Account.default.role_overrides.create!(role: designer_role, permission: :change_course_state, enabled: false)
 
         # active, non-sis course
         expect(@course.grants_right?(@teacher, :delete)).to be_falsey
@@ -1014,13 +1014,13 @@ describe Course do
 
       it "grants reset_content to the proper individuals" do
         @course.root_account.disable_feature!(:granular_permissions_manage_courses)
-        @role1 = custom_account_role('managecourses', :account => Account.default)
-        @role2 = custom_account_role('managesis', :account => Account.default)
-        account_admin_user_with_role_changes(:role => @role1, :role_changes => { :manage_courses => true })
+        @role1 = custom_account_role('managecourses', account: Account.default)
+        @role2 = custom_account_role('managesis', account: Account.default)
+        account_admin_user_with_role_changes(role: @role1, role_changes: { manage_courses: true })
         @admin1 = @admin
-        account_admin_user_with_role_changes(:role => @role2, :role_changes => { :manage_sis => true })
+        account_admin_user_with_role_changes(role: @role2, role_changes: { manage_sis: true })
         @admin2 = @admin
-        course_with_teacher(:active_all => true)
+        course_with_teacher(active_all: true)
         @designer = user_factory(active_all: true)
         @course.enroll_designer(@designer).accept!
         @ta = user_factory(active_all: true)
@@ -1073,13 +1073,13 @@ describe Course do
 
       it "grants reset_content to the proper individuals (granular permissions)" do
         @course.root_account.enable_feature!(:granular_permissions_manage_courses)
-        @role1 = custom_account_role('managecourses', :account => Account.default)
-        @role2 = custom_account_role('managesis', :account => Account.default)
+        @role1 = custom_account_role('managecourses', account: Account.default)
+        @role2 = custom_account_role('managesis', account: Account.default)
         account_admin_user_with_role_changes(role: @role1, role_changes: { manage_courses_reset: true })
         @admin1 = @admin
         account_admin_user_with_role_changes(role: @role2, role_changes: { manage_sis: true })
         @admin2 = @admin
-        course_with_teacher(:active_all => true)
+        course_with_teacher(active_all: true)
         @designer = user_factory(active_all: true)
         @course.enroll_designer(@designer).accept!
         @ta = user_factory(active_all: true)
@@ -1131,7 +1131,7 @@ describe Course do
       end
 
       it "grants create_tool_manually to the proper individuals" do
-        course_with_teacher(:active_all => true)
+        course_with_teacher(active_all: true)
         @teacher = user_factory(active_all: true)
         @course.enroll_teacher(@teacher).accept!
 
@@ -1162,7 +1162,7 @@ describe Course do
 
       context "as a teacher" do
         let_once :c do
-          course_with_teacher(:active_all => 1)
+          course_with_teacher(active_all: 1)
           @course
         end
 
@@ -1232,7 +1232,7 @@ describe Course do
         end
 
         it "grants be able to disable read_roster to date-completed designer" do
-          Account.default.role_overrides.create!(:permission => :read_roster, :role => designer_role, :enabled => false)
+          Account.default.role_overrides.create!(permission: :read_roster, role: designer_role, enabled: false)
           @enrollment.start_at = 4.days.ago
           @enrollment.end_at = 2.days.ago
           @enrollment.save!
@@ -1270,7 +1270,7 @@ describe Course do
 
       context "as a student" do
         let_once :c do
-          course_with_student(:active_user => 1)
+          course_with_student(active_user: 1)
           @course
         end
 
@@ -1283,7 +1283,7 @@ describe Course do
         end
 
         it "does not grant read_forum to date-completed student if disabled by role override" do
-          c.root_account.role_overrides.create!(:role => student_role, :permission => :read_forum, :enabled => false)
+          c.root_account.role_overrides.create!(role: student_role, permission: :read_forum, enabled: false)
           c.offer!
           make_date_completed
           expect(c.prior_enrollments).to eq []
@@ -1327,7 +1327,7 @@ describe Course do
       context "as an admin" do
         it "grants :read_outcomes to account admins" do
           course_factory(active_all: true)
-          account_admin_user(:account => @course.account)
+          account_admin_user(account: @course.account)
           expect(@course.grants_right?(@admin, :read_outcomes)).to be_truthy
         end
       end
@@ -1350,7 +1350,7 @@ describe Course do
         @course.sis_source_id = 'sis_id'
         @course.lti_context_id = 'lti_context_id'
         @course.stuck_sis_fields = [].to_set
-        gs = @course.grading_standards.create!(:title => "Standard eh", :data => [["Eh", 0.93], ["Eff", 0]])
+        gs = @course.grading_standards.create!(title: "Standard eh", data: [["Eh", 0.93], ["Eff", 0]])
         @course.grading_standard = gs
         profile = @course.profile
         profile.description = "description"
@@ -1412,7 +1412,7 @@ describe Course do
       end
 
       it "retains original course profile" do
-        data = { :something => 'special here' }
+        data = { something: 'special here' }
         description = 'simple story'
         expect(@course.profile).not_to be_nil
         @course.profile.tap do |p|
@@ -1461,8 +1461,8 @@ describe Course do
       end
 
       it "transfers favorites with the enrollments" do
-        student_in_course(:course => @course)
-        fav = @student.favorites.create!(:context => @course)
+        student_in_course(course: @course)
+        fav = @student.favorites.create!(context: @course)
 
         @course.reload
 
@@ -1476,8 +1476,8 @@ describe Course do
 
       it "group_categories should not include deleted categories" do
         expect(course.group_categories.count).to eq 0
-        category1 = course.group_categories.create(:name => 'category 1')
-        category2 = course.group_categories.create(:name => 'category 2')
+        category1 = course.group_categories.create(name: 'category 1')
+        category2 = course.group_categories.create(name: 'category 2')
         expect(course.group_categories.count).to eq 2
         category1.destroy
         course.reload
@@ -1487,8 +1487,8 @@ describe Course do
 
       it "all_group_categories should include deleted categories" do
         expect(course.all_group_categories.count).to eq 0
-        category1 = course.group_categories.create(:name => 'category 1')
-        course.group_categories.create(:name => 'category 2')
+        category1 = course.group_categories.create(name: 'category 1')
+        course.group_categories.create(name: 'category 2')
         expect(course.all_group_categories.count).to eq 2
         category1.destroy
         course.reload
@@ -1508,11 +1508,11 @@ describe Course do
       before do
         @course.save!
         @tool = ContextExternalTool.new(
-          :name => 'Quizzes.Next',
-          :consumer_key => 'test_key',
-          :shared_secret => 'test_secret',
-          :tool_id => 'Quizzes 2',
-          :url => 'http://example.com/launch'
+          name: 'Quizzes.Next',
+          consumer_key: 'test_key',
+          shared_secret: 'test_secret',
+          tool_id: 'Quizzes 2',
+          url: 'http://example.com/launch'
         )
       end
 
@@ -1679,13 +1679,13 @@ describe Course do
 
   context "events_for" do
     before :once do
-      course_with_teacher(:active_all => true)
+      course_with_teacher(active_all: true)
       @event1 = @course.calendar_events.create
-      @event2 = @course.calendar_events.build :child_event_data => [{ :start_at => "2012-01-01", :end_at => "2012-01-02", :context_code => @course.default_section.asset_string }]
+      @event2 = @course.calendar_events.build child_event_data: [{ start_at: "2012-01-01", end_at: "2012-01-02", context_code: @course.default_section.asset_string }]
       @event2.updating_user = @teacher
       @event2.save!
       @event3 = @event2.child_events.first
-      @appointment_group = AppointmentGroup.create! :title => "ag", :contexts => [@course]
+      @appointment_group = AppointmentGroup.create! title: "ag", contexts: [@course]
       @appointment_group.publish!
       @assignment = @course.assignments.create!
     end
@@ -1710,7 +1710,7 @@ describe Course do
   end
 
   it "is marshal-able" do
-    c = Course.new(:name => 'c1')
+    c = Course.new(name: 'c1')
     expect { Marshal.dump(c) }.not_to raise_error
     c.save!
     expect { Marshal.dump(c) }.not_to raise_error
@@ -1719,8 +1719,8 @@ describe Course do
   describe "course_section_visibility" do
     before :once do
       @course = Account.default.courses.create!
-      @section1 = @course.course_sections.create!(:name => "Section 1")
-      @section2 = @course.course_sections.create!(:name => "Section 2")
+      @section1 = @course.course_sections.create!(name: "Section 1")
+      @section2 = @course.course_sections.create!(name: "Section 2")
     end
 
     it "returns all for admins" do
@@ -1729,26 +1729,26 @@ describe Course do
     end
 
     it "returns correct sections for students" do
-      student = User.create!(:name => "Student")
-      @course.enroll_student(student, :section => @section1)
+      student = User.create!(name: "Student")
+      @course.enroll_student(student, section: @section1)
       expect(@course.course_section_visibility(student)).to eq [@section1.id]
     end
 
     it "correctly limits visibilities for a limited teacher" do
-      limited_teacher = User.create(:name => "Limited Teacher")
-      @course.enroll_teacher(limited_teacher, :limit_privileges_to_course_section => true,
-                                              :section => @section2)
+      limited_teacher = User.create(name: "Limited Teacher")
+      @course.enroll_teacher(limited_teacher, limit_privileges_to_course_section: true,
+                                              section: @section2)
       expect(@course.course_section_visibility(limited_teacher)).to eq [@section2.id]
     end
 
     it "unlimited teachers can see everything" do
-      unlimited_teacher = User.create(:name => "Unlimited Teacher")
-      @course.enroll_teacher(unlimited_teacher, :section => @section2)
+      unlimited_teacher = User.create(name: "Unlimited Teacher")
+      @course.enroll_teacher(unlimited_teacher, section: @section2)
       expect(@course.course_section_visibility(unlimited_teacher)).to eq :all
     end
 
     it "returns none for a user with no visibility" do
-      user_with_no_visibility = User.create(:name => "Sans Connexion")
+      user_with_no_visibility = User.create(name: "Sans Connexion")
       expect(@course.course_section_visibility(user_with_no_visibility)).to eq []
     end
   end
@@ -1868,10 +1868,10 @@ describe Course do
 
   context "participants" do
     before :once do
-      @course = Course.create(:name => "some_name")
-      se = @course.enroll_student(user_with_pseudonym, :enrollment_state => 'active')
-      tae = @course.enroll_ta(user_with_pseudonym, :enrollment_state => 'active')
-      te = @course.enroll_teacher(user_with_pseudonym, :enrollment_state => 'active')
+      @course = Course.create(name: "some_name")
+      se = @course.enroll_student(user_with_pseudonym, enrollment_state: 'active')
+      tae = @course.enroll_ta(user_with_pseudonym, enrollment_state: 'active')
+      te = @course.enroll_teacher(user_with_pseudonym, enrollment_state: 'active')
       @student, @ta, @teach = [se, tae, te].map(&:user)
     end
 
@@ -1882,7 +1882,7 @@ describe Course do
 
       it "uses date-based logic if requested" do
         expect(@course.participating_students_by_date).to include(@student)
-        expect(@course.participants(:by_date => true)).to include(@student)
+        expect(@course.participants(by_date: true)).to include(@student)
 
         @course.reload
         @course.start_at = 2.days.from_now
@@ -1896,23 +1896,23 @@ describe Course do
         expect(@course.participating_students_by_date).to_not include(@student)
         expect(@course.participating_admins_by_date).to include(@ta)
 
-        by_date = @course.participants(:by_date => true)
+        by_date = @course.participants(by_date: true)
         expect(by_date).to_not include(@student)
         expect(by_date).to include(@ta)
 
         @course.enrollment_term.set_overrides(@course.root_account, 'TaEnrollment' => { start_at: 3.days.ago, end_at: 2.days.ago })
         @course.reload
-        expect(@course.participants(:by_date => true)).to_not include(@ta)
+        expect(@course.participants(by_date: true)).to_not include(@ta)
         expect(@course.participating_admins_by_date).to_not include(@ta)
       end
     end
 
     context "including obervers" do
       before :once do
-        oe = @course.enroll_user(user_with_pseudonym, 'ObserverEnrollment', :enrollment_state => 'active')
+        oe = @course.enroll_user(user_with_pseudonym, 'ObserverEnrollment', enrollment_state: 'active')
         @course_level_observer = oe.user
 
-        oe = @course.enroll_user(user_with_pseudonym, 'ObserverEnrollment', :enrollment_state => 'active')
+        oe = @course.enroll_user(user_with_pseudonym, 'ObserverEnrollment', enrollment_state: 'active')
         oe.associated_user_id = @student.id
         oe.save!
         @student_following_observer = oe.user
@@ -1947,7 +1947,7 @@ describe Course do
 
   describe "enroll" do
     before :once do
-      @course = Course.create(:name => "some_name")
+      @course = Course.create(name: "some_name")
       @user = user_with_pseudonym
     end
 
@@ -1968,7 +1968,7 @@ describe Course do
 
     context "tas" do
       before :once do
-        Notification.create(:name => "Enrollment Registration", :category => "registration")
+        Notification.create(name: "Enrollment Registration", category: "registration")
         @tae = @course.enroll_ta(@user)
       end
 
@@ -1985,7 +1985,7 @@ describe Course do
 
     context "teachers" do
       before :once do
-        Notification.create(:name => "Enrollment Registration", :category => "registration")
+        Notification.create(name: "Enrollment Registration", category: "registration")
         @te = @course.enroll_teacher(@user)
       end
 
@@ -2010,7 +2010,7 @@ describe Course do
     it "scopes correctly when including teachers from course" do
       account = @course.account
       @course.enroll_student(@user)
-      scope = account.associated_courses.active.select([:id, :name]).eager_load(:teachers).joins(:teachers).where(:enrollments => { :workflow_state => 'active' })
+      scope = account.associated_courses.active.select([:id, :name]).eager_load(:teachers).joins(:teachers).where(enrollments: { workflow_state: 'active' })
       sql = scope.to_sql
       expect(sql).to match(/"enrollments"\."type" = 'TeacherEnrollment'/)
     end
@@ -2019,9 +2019,9 @@ describe Course do
   describe '#assignment_groups' do
     it 'orders groups by position' do
       course_model
-      @course.assignment_groups.create!(:name => 'B Group', position: 3)
-      @course.assignment_groups.create!(:name => 'A Group', position: 2)
-      @course.assignment_groups.create!(:name => 'C Group', position: 1)
+      @course.assignment_groups.create!(name: 'B Group', position: 3)
+      @course.assignment_groups.create!(name: 'A Group', position: 2)
+      @course.assignment_groups.create!(name: 'C Group', position: 1)
 
       groups = @course.assignment_groups
 
@@ -2033,10 +2033,10 @@ describe Course do
     it 'orders groups by name when positions are equal' do
       course_model
 
-      @course.assignment_groups.create!(:name => 'B Group', position: 1)
-      @course.assignment_groups.create!(:name => 'A Group', position: 2)
-      @course.assignment_groups.create!(:name => 'D Group', position: 3)
-      @course.assignment_groups.create!(:name => 'C Group', position: 3)
+      @course.assignment_groups.create!(name: 'B Group', position: 1)
+      @course.assignment_groups.create!(name: 'A Group', position: 2)
+      @course.assignment_groups.create!(name: 'D Group', position: 3)
+      @course.assignment_groups.create!(name: 'C Group', position: 3)
 
       @course.reload
       expect(AssignmentGroup).to receive(:best_unicode_collation_key).with('assignment_groups.name').at_least(1).and_call_original
@@ -2095,10 +2095,10 @@ describe Course do
     end
 
     it "generates gradebook csv" do
-      @group = @course.assignment_groups.create!(:name => "Some Assignment Group", :group_weight => 100)
-      @assignment = @course.assignments.create!(:title => "Some Assignment", :points_possible => 10, :assignment_group => @group)
+      @group = @course.assignment_groups.create!(name: "Some Assignment Group", group_weight: 100)
+      @assignment = @course.assignments.create!(title: "Some Assignment", points_possible: 10, assignment_group: @group)
       @assignment.grade_student(@student, grade: "10", grader: @teacher)
-      @assignment2 = @course.assignments.create!(:title => "Some Assignment 2", :points_possible => 10, :assignment_group => @group)
+      @assignment2 = @course.assignments.create!(title: "Some Assignment 2", points_possible: 10, assignment_group: @group)
       @course.recompute_student_scores
       @student.reload
       @course.reload
@@ -2118,25 +2118,25 @@ describe Course do
     end
 
     it "orders assignments and groups by position" do
-      @assignment_group_1, @assignment_group_2 = [@course.assignment_groups.create!(:name => "Some Assignment Group 1", :group_weight => 100), @course.assignment_groups.create!(:name => "Some Assignment Group 2", :group_weight => 100)].sort_by(&:id)
+      @assignment_group_1, @assignment_group_2 = [@course.assignment_groups.create!(name: "Some Assignment Group 1", group_weight: 100), @course.assignment_groups.create!(name: "Some Assignment Group 2", group_weight: 100)].sort_by(&:id)
 
       now = Time.now
 
-      g1a1 = @course.assignments.create!(:title => "Assignment 01", :due_at => now + 1.day, :position => 3, :assignment_group => @assignment_group_1, :points_possible => 10)
-      @course.assignments.create!(:title => "Assignment 02", :due_at => now + 1.day, :position => 1, :assignment_group => @assignment_group_1, :points_possible => 10)
-      @course.assignments.create!(:title => "Assignment 03", :due_at => now + 1.day, :position => 2, :assignment_group => @assignment_group_1)
-      @course.assignments.create!(:title => "Assignment 05", :due_at => now + 4.days, :position => 4, :assignment_group => @assignment_group_1)
-      @course.assignments.create!(:title => "Assignment 04", :due_at => now + 5.days, :position => 5, :assignment_group => @assignment_group_1)
-      @course.assignments.create!(:title => "Assignment 06", :due_at => now + 7.days, :position => 6, :assignment_group => @assignment_group_1)
-      @course.assignments.create!(:title => "Assignment 07", :due_at => now + 6.days, :position => 7, :assignment_group => @assignment_group_1)
-      g2a1 = @course.assignments.create!(:title => "Assignment 08", :due_at => now + 8.days, :position => 1, :assignment_group => @assignment_group_2, :points_possible => 10)
-      @course.assignments.create!(:title => "Assignment 09", :due_at => now + 8.days, :position => 9, :assignment_group => @assignment_group_1)
-      @course.assignments.create!(:title => "Assignment 10", :due_at => now + 8.days, :position => 10, :assignment_group => @assignment_group_2, :points_possible => 10)
-      @course.assignments.create!(:title => "Assignment 12", :due_at => now + 11.days, :position => 11, :assignment_group => @assignment_group_1)
-      @course.assignments.create!(:title => "Assignment 14", :due_at => nil, :position => 14, :assignment_group => @assignment_group_1)
-      @course.assignments.create!(:title => "Assignment 11", :due_at => now + 11.days, :position => 11, :assignment_group => @assignment_group_1)
-      @course.assignments.create!(:title => "Assignment 13", :due_at => now + 11.days, :position => 11, :assignment_group => @assignment_group_1)
-      @course.assignments.create!(:title => "Assignment 99", :position => 1, :assignment_group => @assignment_group_1, :submission_types => 'not_graded')
+      g1a1 = @course.assignments.create!(title: "Assignment 01", due_at: now + 1.day, position: 3, assignment_group: @assignment_group_1, points_possible: 10)
+      @course.assignments.create!(title: "Assignment 02", due_at: now + 1.day, position: 1, assignment_group: @assignment_group_1, points_possible: 10)
+      @course.assignments.create!(title: "Assignment 03", due_at: now + 1.day, position: 2, assignment_group: @assignment_group_1)
+      @course.assignments.create!(title: "Assignment 05", due_at: now + 4.days, position: 4, assignment_group: @assignment_group_1)
+      @course.assignments.create!(title: "Assignment 04", due_at: now + 5.days, position: 5, assignment_group: @assignment_group_1)
+      @course.assignments.create!(title: "Assignment 06", due_at: now + 7.days, position: 6, assignment_group: @assignment_group_1)
+      @course.assignments.create!(title: "Assignment 07", due_at: now + 6.days, position: 7, assignment_group: @assignment_group_1)
+      g2a1 = @course.assignments.create!(title: "Assignment 08", due_at: now + 8.days, position: 1, assignment_group: @assignment_group_2, points_possible: 10)
+      @course.assignments.create!(title: "Assignment 09", due_at: now + 8.days, position: 9, assignment_group: @assignment_group_1)
+      @course.assignments.create!(title: "Assignment 10", due_at: now + 8.days, position: 10, assignment_group: @assignment_group_2, points_possible: 10)
+      @course.assignments.create!(title: "Assignment 12", due_at: now + 11.days, position: 11, assignment_group: @assignment_group_1)
+      @course.assignments.create!(title: "Assignment 14", due_at: nil, position: 14, assignment_group: @assignment_group_1)
+      @course.assignments.create!(title: "Assignment 11", due_at: now + 11.days, position: 11, assignment_group: @assignment_group_1)
+      @course.assignments.create!(title: "Assignment 13", due_at: now + 11.days, position: 11, assignment_group: @assignment_group_1)
+      @course.assignments.create!(title: "Assignment 99", position: 1, assignment_group: @assignment_group_1, submission_types: 'not_graded')
       @course.recompute_student_scores
       @student.reload
       @course.reload
@@ -2176,14 +2176,14 @@ describe Course do
     end
 
     it "handles nil assignment due_dates if the group and position are the same" do
-      course_with_student(:active_all => true)
+      course_with_student(active_all: true)
 
-      assignment_group = @course.assignment_groups.create!(:name => "Some Assignment Group 1")
+      assignment_group = @course.assignment_groups.create!(name: "Some Assignment Group 1")
 
       now = Time.now
 
-      @course.assignments.create!(:title => "Assignment 01", :due_at => now + 1.day, :position => 1, :assignment_group => assignment_group, :points_possible => 10)
-      @course.assignments.create!(:title => "Assignment 02", :due_at => nil, :position => 1, :assignment_group => assignment_group, :points_possible => 10)
+      @course.assignments.create!(title: "Assignment 01", due_at: now + 1.day, position: 1, assignment_group: assignment_group, points_possible: 10)
+      @course.assignments.create!(title: "Assignment 02", due_at: nil, position: 1, assignment_group: assignment_group, points_possible: 10)
 
       @course.recompute_student_scores
       @student.reload
@@ -2204,12 +2204,12 @@ describe Course do
       before :once do
         course_with_teacher active_all: true
         _, zed, _ = ["Ned Ned", "Zed Zed", "Aardvark Aardvark"].map do |name|
-          student_in_course(:name => name)
+          student_in_course(name: name)
           @student
         end
         zed.update_attribute :sortable_name, "aaaaaa zed"
 
-        test_student_enrollment = student_in_course(:name => "Test Student")
+        test_student_enrollment = student_in_course(name: "Test Student")
         test_student_enrollment.type = "StudentViewEnrollment"
         test_student_enrollment.save!
       end
@@ -2240,11 +2240,11 @@ describe Course do
         add_section(section_name)
         sections << @course_section
       end
-      3.times { |i| students << student_in_section(sections[0], :user => user_factory(:name => "Student #{i}")) }
+      3.times { |i| students << student_in_section(sections[0], user: user_factory(name: "Student #{i}")) }
 
-      @course.enroll_user(students[0], 'StudentEnrollment', :section => sections[1], :enrollment_state => 'active', :allow_multiple_enrollments => true)
-      @course.enroll_user(students[2], 'StudentEnrollment', :section => sections[1], :enrollment_state => 'active', :allow_multiple_enrollments => true)
-      @course.enroll_user(students[2], 'StudentEnrollment', :section => sections[2], :enrollment_state => 'active', :allow_multiple_enrollments => true)
+      @course.enroll_user(students[0], 'StudentEnrollment', section: sections[1], enrollment_state: 'active', allow_multiple_enrollments: true)
+      @course.enroll_user(students[2], 'StudentEnrollment', section: sections[1], enrollment_state: 'active', allow_multiple_enrollments: true)
+      @course.enroll_user(students[2], 'StudentEnrollment', section: sections[2], enrollment_state: 'active', allow_multiple_enrollments: true)
 
       csv = GradebookExporter.new(@course, @teacher).to_csv
       expect(csv).not_to be_nil
@@ -2256,13 +2256,13 @@ describe Course do
     end
 
     it "generates csv with final grade if enabled" do
-      course_with_student(:active_all => true)
+      course_with_student(active_all: true)
       @course.grading_standard_id = 0
       @course.save!
-      @group = @course.assignment_groups.create!(:name => "Some Assignment Group", :group_weight => 100)
-      @assignment = @course.assignments.create!(:title => "Some Assignment", :points_possible => 10, :assignment_group => @group)
+      @group = @course.assignment_groups.create!(name: "Some Assignment Group", group_weight: 100)
+      @assignment = @course.assignments.create!(title: "Some Assignment", points_possible: 10, assignment_group: @group)
       @assignment.grade_student(@student, grade: "10", grader: @teacher)
-      @assignment2 = @course.assignments.create!(:title => "Some Assignment 2", :points_possible => 10, :assignment_group => @group)
+      @assignment2 = @course.assignments.create!(title: "Some Assignment 2", points_possible: 10, assignment_group: @group)
       @assignment2.grade_student(@student, grade: "8", grader: @teacher)
       @course.recompute_student_scores
       @student.reload
@@ -2294,25 +2294,25 @@ describe Course do
       before(:once) do
         @account = Account.create!(name: "A new root")
         course_factory(active_all: true, account: @account)
-        @user1 = user_with_managed_pseudonym(:active_all => true, :name => 'Brian', :username => 'brianp@instructure.com',
+        @user1 = user_with_managed_pseudonym(active_all: true, name: 'Brian', username: 'brianp@instructure.com',
                                              account: @account, sis_user_id: "SISUSERID", integration_id: 'int1')
-        student_in_course(:user => @user1)
-        @user2 = user_with_pseudonym(:active_all => true, :name => 'Cody', :username => 'cody@instructure.com', account: @account)
-        student_in_course(:user => @user2)
-        @user3 = user_factory(active_all: true, :name => 'JT')
-        student_in_course(:user => @user3)
-        @group = @course.assignment_groups.create!(:name => "Some Assignment Group", :group_weight => 100)
-        @assignment = @course.assignments.create!(:title => "Some Assignment", :points_possible => 10, :assignment_group => @group)
+        student_in_course(user: @user1)
+        @user2 = user_with_pseudonym(active_all: true, name: 'Cody', username: 'cody@instructure.com', account: @account)
+        student_in_course(user: @user2)
+        @user3 = user_factory(active_all: true, name: 'JT')
+        student_in_course(user: @user3)
+        @group = @course.assignment_groups.create!(name: "Some Assignment Group", group_weight: 100)
+        @assignment = @course.assignments.create!(title: "Some Assignment", points_possible: 10, assignment_group: @group)
         @assignment.grade_student(@user1, grade: "10", grader: @teacher)
         @assignment.grade_student(@user2, grade: "9", grader: @teacher)
         @assignment.grade_student(@user3, grade: "9", grader: @teacher)
-        @assignment2 = @course.assignments.create!(:title => "Some Assignment 2", :points_possible => 10, :assignment_group => @group)
+        @assignment2 = @course.assignments.create!(title: "Some Assignment 2", points_possible: 10, assignment_group: @group)
         @course.recompute_student_scores
         @course.reload
       end
 
       it "includes sis ids if enabled" do
-        csv = GradebookExporter.new(@course, @teacher, :include_sis_id => true).to_csv
+        csv = GradebookExporter.new(@course, @teacher, include_sis_id: true).to_csv
         expect(csv).not_to be_nil
         rows = CSV.parse(csv)
         expect(rows.length).to eq 5
@@ -2339,7 +2339,7 @@ describe Course do
       it "includes integration ids if enabled" do
         @account.settings[:include_integration_ids_in_gradebook_exports] = true
         @account.save!
-        csv = GradebookExporter.new(@course, @teacher, :include_sis_id => true).to_csv
+        csv = GradebookExporter.new(@course, @teacher, include_sis_id: true).to_csv
         rows = CSV.parse(csv)
         expect(rows.first.length).to eq 20
         expect(rows[0][1]).to eq 'ID'
@@ -2354,13 +2354,13 @@ describe Course do
 
     it "includes primary domain if a trust exists" do
       course_factory(active_all: true)
-      @user1 = user_with_pseudonym(:active_all => true, :name => 'Brian', :username => 'brianp@instructure.com')
-      student_in_course(:user => @user1)
+      @user1 = user_with_pseudonym(active_all: true, name: 'Brian', username: 'brianp@instructure.com')
+      student_in_course(user: @user1)
       account2 = account_model
-      @user2 = user_with_pseudonym(:active_all => true, :name => 'Cody', :username => 'cody@instructure.com', :account => account2)
-      student_in_course(:user => @user2)
-      @user3 = user_factory(active_all: true, :name => 'JT')
-      student_in_course(:user => @user3)
+      @user2 = user_with_pseudonym(active_all: true, name: 'Cody', username: 'cody@instructure.com', account: account2)
+      student_in_course(user: @user2)
+      @user3 = user_factory(active_all: true, name: 'JT')
+      student_in_course(user: @user3)
       @user1.pseudonym.sis_user_id = "SISUSERID"
       @user1.pseudonym.save!
       @user2.pseudonym.sis_user_id = "SISUSERID"
@@ -2372,7 +2372,7 @@ describe Course do
       expect(HostUrl).to receive(:context_host).with(@course.root_account).and_return('school1')
       expect(HostUrl).to receive(:context_host).with(account2).and_return('school2')
 
-      csv = GradebookExporter.new(@course, @teacher, :include_sis_id => true).to_csv
+      csv = GradebookExporter.new(@course, @teacher, include_sis_id: true).to_csv
       expect(csv).not_to be_nil
       rows = CSV.parse(csv)
       expect(rows.length).to eq 5
@@ -2417,7 +2417,7 @@ describe Course do
 
     context "accumulated points" do
       before :once do
-        a = @course.assignments.create! :title => "Blah", :points_possible => 10
+        a = @course.assignments.create! title: "Blah", points_possible: 10
         a.grade_student @student, grade: 8, grader: @teacher
       end
 
@@ -2446,40 +2446,40 @@ describe Course do
     it "only includes students once" do
       # students might have multiple enrollments in a course
       course_factory(active_all: true)
-      @user1 = user_with_pseudonym(:active_all => true, :name => 'Brian', :username => 'brianp@instructure.com')
-      student_in_course(:user => @user1)
-      @user2 = user_with_pseudonym(:active_all => true, :name => 'Cody', :username => 'cody@instructure.com')
-      student_in_course(:user => @user2)
-      @s2 = @course.course_sections.create!(:name => 'section2')
-      StudentEnrollment.create!(:user => @user1, :course => @course, :course_section => @s2)
+      @user1 = user_with_pseudonym(active_all: true, name: 'Brian', username: 'brianp@instructure.com')
+      student_in_course(user: @user1)
+      @user2 = user_with_pseudonym(active_all: true, name: 'Cody', username: 'cody@instructure.com')
+      student_in_course(user: @user2)
+      @s2 = @course.course_sections.create!(name: 'section2')
+      StudentEnrollment.create!(user: @user1, course: @course, course_section: @s2)
       @course.reload
-      csv = GradebookExporter.new(@course, @teacher, :include_sis_id => true).to_csv
+      csv = GradebookExporter.new(@course, @teacher, include_sis_id: true).to_csv
       rows = CSV.parse(csv)
       expect(rows.length).to eq 4
     end
 
     it "includes manual posting if any assignments are manually-posted" do
       course_factory(active_all: true)
-      @user1 = user_with_pseudonym(:active_all => true, :name => 'Brian', :username => 'brianp@instructure.com')
-      student_in_course(:user => @user1)
-      @user2 = user_with_pseudonym(:active_all => true, :name => 'Cody', :username => 'cody@instructure.com')
-      student_in_course(:user => @user2)
-      @user3 = user_factory(active_all: true, :name => 'JT')
-      student_in_course(:user => @user3)
+      @user1 = user_with_pseudonym(active_all: true, name: 'Brian', username: 'brianp@instructure.com')
+      student_in_course(user: @user1)
+      @user2 = user_with_pseudonym(active_all: true, name: 'Cody', username: 'cody@instructure.com')
+      student_in_course(user: @user2)
+      @user3 = user_factory(active_all: true, name: 'JT')
+      student_in_course(user: @user3)
       @user1.pseudonym.sis_user_id = "SISUSERID"
       @user1.pseudonym.save!
-      @group = @course.assignment_groups.create!(:name => "Some Assignment Group", :group_weight => 100)
-      @assignment = @course.assignments.create!(:title => "Some Assignment", :points_possible => 10, :assignment_group => @group)
+      @group = @course.assignment_groups.create!(name: "Some Assignment Group", group_weight: 100)
+      @assignment = @course.assignments.create!(title: "Some Assignment", points_possible: 10, assignment_group: @group)
       @assignment.ensure_post_policy(post_manually: true)
       @assignment.grade_student(@user1, grade: "10", grader: @teacher)
       @assignment.grade_student(@user2, grade: "9", grader: @teacher)
       @assignment.grade_student(@user3, grade: "9", grader: @teacher)
-      @assignment2 = @course.assignments.create!(:title => "Some Assignment 2", :points_possible => 10, :assignment_group => @group)
+      @assignment2 = @course.assignments.create!(title: "Some Assignment 2", points_possible: 10, assignment_group: @group)
       @assignment2.ensure_post_policy(post_manually: false)
       @course.recompute_student_scores
       @course.reload
 
-      csv = GradebookExporter.new(@course, @teacher, :include_sis_id => true).to_csv
+      csv = GradebookExporter.new(@course, @teacher, include_sis_id: true).to_csv
       expect(csv).not_to be_nil
       rows = CSV.parse(csv)
       expect(rows.length).to eq 6
@@ -2509,10 +2509,10 @@ describe Course do
       course_factory(active_all: true)
       teacher_in_course(active_all: true)
       @teacher.enrollments.first.update_attribute(:limit_privileges_to_course_section, true)
-      @section = @course.course_sections.create!(:name => 'section 2')
-      @user1 = user_with_pseudonym(:active_all => true, :name => 'Brian', :username => 'brianp@instructure.com')
+      @section = @course.course_sections.create!(name: 'section 2')
+      @user1 = user_with_pseudonym(active_all: true, name: 'Brian', username: 'brianp@instructure.com')
       @section.enroll_user(@user1, 'StudentEnrollment', 'active')
-      @user2 = user_with_pseudonym(:active_all => true, :name => 'Jeremy', :username => 'jeremy@instructure.com')
+      @user2 = user_with_pseudonym(active_all: true, name: 'Jeremy', username: 'jeremy@instructure.com')
       @course.enroll_student(@user2)
 
       csv = GradebookExporter.new(@course, @teacher).to_csv
@@ -2539,7 +2539,7 @@ describe Course do
         user_attrs = [{ name: 'student1' }, { name: 'student2' }, { name: 'student3' }]
         @student1, @student2, @student3 = create_users(user_attrs, return_type: :record)
         @assignment = @course.assignments.create!(title: "a1", only_visible_to_overrides: true)
-        @course.enroll_student(@student3, :enrollment_state => 'active')
+        @course.enroll_student(@student3, enrollment_state: 'active')
         @section = @course.course_sections.create!(name: "section1")
         @section2 = @course.course_sections.create!(name: "section2")
         student_in_section(@section, user: @student1)
@@ -2551,7 +2551,7 @@ describe Course do
       end
 
       before :once do
-        course_with_teacher(:active_all => true)
+        course_with_teacher(active_all: true)
         setup_DA
         @assignment.grade_student(@student1, grade: "3", grader: @teacher)
         @assignment2.grade_student(@student2, grade: "3", grader: @teacher)
@@ -2617,10 +2617,10 @@ describe Course do
 
   describe "#update_account_associations" do
     it "updates account associations correctly" do
-      account1 = Account.create!(:name => 'first')
-      account2 = Account.create!(:name => 'second')
+      account1 = Account.create!(name: 'first')
+      account2 = Account.create!(name: 'second')
 
-      @c = Course.create!(:account => account1)
+      @c = Course.create!(account: account1)
       expect(@c.associated_accounts.length).to eql(1)
       expect(@c.associated_accounts.first).to eql(account1)
 
@@ -2649,7 +2649,7 @@ describe Course do
   describe "#tabs_available" do
     context "teachers" do
       before :once do
-        course_with_teacher(:active_all => true)
+        course_with_teacher(active_all: true)
       end
 
       let_once(:default_tab_ids) { Course.default_tabs.pluck(:id) }
@@ -2659,9 +2659,9 @@ describe Course do
           before do
             allow(WebConference).to receive(:plugins).and_return(
               [
-                web_conference_plugin_mock("big_blue_button", { :domain => "bbb.instructure.com", :secret_dec => "secret" }),
-                web_conference_plugin_mock("wimba", { :domain => "wimba.test" }),
-                web_conference_plugin_mock("broken_plugin", { :foor => :bar })
+                web_conference_plugin_mock("big_blue_button", { domain: "bbb.instructure.com", secret_dec: "secret" }),
+                web_conference_plugin_mock("wimba", { domain: "wimba.test" }),
+                web_conference_plugin_mock("broken_plugin", { foor: :bar })
               ]
             )
           end
@@ -2763,13 +2763,13 @@ describe Course do
       end
 
       it "does not hide tabs for completed teacher enrollments" do
-        @user.enrollments.where(:course_id => @course).first.complete!
+        @user.enrollments.where(course_id: @course).first.complete!
         tab_ids = @course.tabs_available(@user).pluck(:id)
         expect(tab_ids).to eql(default_tab_ids)
       end
 
       it "does not include Announcements without read_announcements rights" do
-        @course.account.role_overrides.create!(:role => teacher_role, :permission => 'read_announcements', :enabled => false)
+        @course.account.role_overrides.create!(role: teacher_role, permission: 'read_announcements', enabled: false)
         tab_ids = @course.uncached_tabs_available(@teacher, include_hidden_unused: true).pluck(:id)
         expect(tab_ids).to_not include(Course::TAB_ANNOUNCEMENTS)
       end
@@ -2808,14 +2808,14 @@ describe Course do
 
       it "includes item banks tab for active external tools" do
         @course.context_external_tools.create!(
-          :url => "http://example.com/ims/lti",
-          :consumer_key => "asdf",
-          :shared_secret => "hjkl",
-          :name => "external tool 1",
-          :course_navigation => {
-            :text => "Item Banks",
-            :url => "http://example.com/ims/lti",
-            :default => false,
+          url: "http://example.com/ims/lti",
+          consumer_key: "asdf",
+          shared_secret: "hjkl",
+          name: "external tool 1",
+          course_navigation: {
+            text: "Item Banks",
+            url: "http://example.com/ims/lti",
+            default: false,
           }
         )
 
@@ -2846,17 +2846,17 @@ describe Course do
 
           it 'hides external tools in nav' do
             @course.context_external_tools.create!(
-              :url => "http://example.com/ims/lti",
-              :consumer_key => "asdf",
-              :shared_secret => "hjkl",
-              :name => "external tool 1",
-              :course_navigation => {
-                :text => "blah",
-                :url => "http://example.com/ims/lti",
-                :default => false,
+              url: "http://example.com/ims/lti",
+              consumer_key: "asdf",
+              shared_secret: "hjkl",
+              name: "external tool 1",
+              course_navigation: {
+                text: "blah",
+                url: "http://example.com/ims/lti",
+                default: false,
               }
             )
-            @course.tab_configuration = [{ :id => Course::TAB_ANNOUNCEMENTS }, { :id => 'context_external_tool_8' }]
+            @course.tab_configuration = [{ id: Course::TAB_ANNOUNCEMENTS }, { id: 'context_external_tool_8' }]
             tab_ids = @course.tabs_available(@user).pluck(:id)
             expect(tab_ids).to eq [Course::TAB_ANNOUNCEMENTS, Course::TAB_SYLLABUS, Course::TAB_PEOPLE, Course::TAB_FILES, Course::TAB_SETTINGS]
           end
@@ -2913,14 +2913,14 @@ describe Course do
               tools = []
               2.times do |n|
                 tools << @course.context_external_tools.create!(
-                  :url => "http://example.com/ims/lti",
-                  :consumer_key => "asdf",
-                  :shared_secret => "hjkl",
-                  :name => "external tool #{n + 1}",
-                  :course_navigation => {
-                    :text => "blah",
-                    :url => "http://example.com/ims/lti",
-                    :default => false,
+                  url: "http://example.com/ims/lti",
+                  consumer_key: "asdf",
+                  shared_secret: "hjkl",
+                  name: "external tool #{n + 1}",
+                  course_navigation: {
+                    text: "blah",
+                    url: "http://example.com/ims/lti",
+                    default: false,
                   }
                 )
               end
@@ -2937,20 +2937,20 @@ describe Course do
             end
 
             it "includes modules tab even if there's no modules" do
-              course_with_student_logged_in(:active_all => true)
+              course_with_student_logged_in(active_all: true)
               tab_ids = @course.tabs_available(@student, course_subject_tabs: true).pluck(:id)
               expect(tab_ids).to eq [Course::TAB_HOME, Course::TAB_SCHEDULE, Course::TAB_MODULES, Course::TAB_GRADES]
             end
 
             it "includes groups if the user is a student and there are active groups" do
-              course_with_student_logged_in(:active_all => true)
+              course_with_student_logged_in(active_all: true)
               @course.groups.create!
               tab_ids = @course.tabs_available(@student, course_subject_tabs: true).pluck(:id)
               expect(tab_ids).to include Course::TAB_GROUPS
             end
 
             it "doesn't include groups if the user is a student and there are no active groups" do
-              course_with_student_logged_in(:active_all => true)
+              course_with_student_logged_in(active_all: true)
               tab_ids = @course.tabs_available(@student, course_subject_tabs: true).pluck(:id)
               expect(tab_ids).not_to include Course::TAB_GROUPS
             end
@@ -3005,7 +3005,7 @@ describe Course do
 
     context "students" do
       before do
-        course_with_student(:active_all => true)
+        course_with_student(active_all: true)
       end
 
       it "returns K-6 tabs if feature flag is enabled for students" do
@@ -3044,14 +3044,14 @@ describe Course do
         tools = []
         2.times do |n|
           tools << @course.context_external_tools.create!(
-            :url => "http://example.com/ims/lti",
-            :consumer_key => "asdf",
-            :shared_secret => "hjkl",
-            :name => "external tool #{n + 1}",
-            :course_navigation => {
-              :text => "blah",
-              :url => "http://example.com/ims/lti",
-              :default => false,
+            url: "http://example.com/ims/lti",
+            consumer_key: "asdf",
+            shared_secret: "hjkl",
+            name: "external tool #{n + 1}",
+            course_navigation: {
+              text: "blah",
+              url: "http://example.com/ims/lti",
+              default: false,
             }
           )
         end
@@ -3068,14 +3068,14 @@ describe Course do
 
       it "does not include item banks tab for active external tools" do
         @course.context_external_tools.create!(
-          :url => "http://example.com/ims/lti",
-          :consumer_key => "asdf",
-          :shared_secret => "hjkl",
-          :name => "external tool 1",
-          :course_navigation => {
-            :text => "Item Banks",
-            :url => "http://example.com/ims/lti",
-            :default => false,
+          url: "http://example.com/ims/lti",
+          consumer_key: "asdf",
+          shared_secret: "hjkl",
+          name: "external tool 1",
+          course_navigation: {
+            text: "Item Banks",
+            url: "http://example.com/ims/lti",
+            default: false,
           }
         )
 
@@ -3087,20 +3087,20 @@ describe Course do
       context "when 'Item Banks' has been added to the course navigation links" do
         let!(:quiz_lti_tool) do
           @course.context_external_tools.create!(
-            :url => "http://example.com/ims/lti",
-            :consumer_key => "asdf",
-            :shared_secret => "hjkl",
-            :name => "external tool 1",
-            :course_navigation => {
-              :text => "Item Banks",
-              :url => "http://example.com/ims/lti",
-              :default => false,
+            url: "http://example.com/ims/lti",
+            consumer_key: "asdf",
+            shared_secret: "hjkl",
+            name: "external tool 1",
+            course_navigation: {
+              text: "Item Banks",
+              url: "http://example.com/ims/lti",
+              default: false,
             }
           )
         end
 
         before do
-          @course.update!(tab_configuration: [{ :id => "context_external_tool_#{quiz_lti_tool.id}" }])
+          @course.update!(tab_configuration: [{ id: "context_external_tool_#{quiz_lti_tool.id}" }])
         end
 
         it "does not make the item banks tab available for students" do
@@ -3114,14 +3114,14 @@ describe Course do
 
       it 'sets the target value on the tab if the external tool has a windowTarget' do
         tool = @course.context_external_tools.create!(
-          :url => "http://example.com/ims/lti",
-          :consumer_key => "asdf",
-          :shared_secret => "hjkl",
-          :name => "external tools",
-          :course_navigation => {
-            :text => "blah",
-            :url => "http://example.com/ims/lti",
-            :default => false,
+          url: "http://example.com/ims/lti",
+          consumer_key: "asdf",
+          shared_secret: "hjkl",
+          name: "external tools",
+          course_navigation: {
+            text: "blah",
+            url: "http://example.com/ims/lti",
+            default: false,
           }
         )
         tool.settings[:windowTarget] = "_blank"
@@ -3133,14 +3133,14 @@ describe Course do
 
       it 'includes in the args "display: borderless" if a target is set' do
         tool = @course.context_external_tools.create!(
-          :url => "http://example.com/ims/lti",
-          :consumer_key => "asdf",
-          :shared_secret => "hjkl",
-          :name => "external tools",
-          :course_navigation => {
-            :text => "blah",
-            :url => "http://example.com/ims/lti",
-            :default => false,
+          url: "http://example.com/ims/lti",
+          consumer_key: "asdf",
+          shared_secret: "hjkl",
+          name: "external tools",
+          course_navigation: {
+            text: "blah",
+            url: "http://example.com/ims/lti",
+            default: false,
           }
         )
         tool.settings[:windowTarget] = "_blank"
@@ -3152,14 +3152,14 @@ describe Course do
 
       it 'does not let value other than "_blank" be set for target' do
         tool = @course.context_external_tools.create!(
-          :url => "http://example.com/ims/lti",
-          :consumer_key => "asdf",
-          :shared_secret => "hjkl",
-          :name => "external tools",
-          :course_navigation => {
-            :text => "blah",
-            :url => "http://example.com/ims/lti",
-            :default => false,
+          url: "http://example.com/ims/lti",
+          consumer_key: "asdf",
+          shared_secret: "hjkl",
+          name: "external tools",
+          course_navigation: {
+            text: "blah",
+            url: "http://example.com/ims/lti",
+            default: false,
           }
         )
         tool.settings[:windowTarget] = "parent"
@@ -3171,35 +3171,35 @@ describe Course do
 
       it "does not include tabs for external tools if opt[:include_external] is false" do
         t1 = @course.context_external_tools.create!(
-          :url => "http://example.com/ims/lti",
-          :consumer_key => "asdf",
-          :shared_secret => "hjkl",
-          :name => "external tool 1",
-          :course_navigation => {
-            :text => "blah",
-            :url => "http://example.com/ims/lti",
-            :default => false,
+          url: "http://example.com/ims/lti",
+          consumer_key: "asdf",
+          shared_secret: "hjkl",
+          name: "external tool 1",
+          course_navigation: {
+            text: "blah",
+            url: "http://example.com/ims/lti",
+            default: false,
           }
         )
 
-        tabs = @course.tabs_available(nil, :include_external => false).pluck(:id)
+        tabs = @course.tabs_available(nil, include_external: false).pluck(:id)
 
         expect(tabs).not_to be_include(t1.asset_string)
       end
 
       it 'includes message handlers if opt[:include_external] is true' do
         mock_tab = {
-          :id => '1234',
-          :label => 'my_label',
-          :css_class => '1234',
-          :href => :launch_path_helper,
-          :visibility => nil,
-          :external => true,
-          :hidden => false,
-          :args => [1, 2]
+          id: '1234',
+          label: 'my_label',
+          css_class: '1234',
+          href: :launch_path_helper,
+          visibility: nil,
+          external: true,
+          hidden: false,
+          args: [1, 2]
         }
         allow(Lti::MessageHandler).to receive(:lti_apps_tabs).and_return([mock_tab])
-        expect(@course.tabs_available(nil, :include_external => true)).to include(mock_tab)
+        expect(@course.tabs_available(nil, include_external: true)).to include(mock_tab)
       end
 
       # no spec for student homeroom because students should never navigate to the homeroom course
@@ -3207,7 +3207,7 @@ describe Course do
 
     context "observers" do
       before :once do
-        course_with_student(:active_all => true)
+        course_with_student(active_all: true)
         @student = @user
         user_factory(active_all: true)
         @oe = @course.enroll_user(@user, 'ObserverEnrollment')
@@ -3236,15 +3236,15 @@ describe Course do
       end
 
       it "does not show discussion tab for observers without read_forum" do
-        RoleOverride.create!(:context => @course.account, :permission => 'read_forum',
-                             :role => observer_role, :enabled => false)
+        RoleOverride.create!(context: @course.account, permission: 'read_forum',
+                             role: observer_role, enabled: false)
         tab_ids = @course.tabs_available(@user).pluck(:id)
         expect(tab_ids).not_to be_include(Course::TAB_DISCUSSIONS)
       end
 
       it "recognizes active_course_level_observers" do
         user = user_with_pseudonym
-        observer_enrollment = @course.enroll_user(user, 'ObserverEnrollment', :enrollment_state => 'active')
+        observer_enrollment = @course.enroll_user(user, 'ObserverEnrollment', enrollment_state: 'active')
         @course_level_observer = observer_enrollment.user
 
         course_observers = @course.active_course_level_observers
@@ -3255,10 +3255,10 @@ describe Course do
 
     context "a public course" do
       before :once do
-        course_factory(active_all: true).update(:is_public => true, :indexed => true)
-        @course.announcements.create!(:title => 'Title', :message => 'Message')
+        course_factory(active_all: true).update(is_public: true, indexed: true)
+        @course.announcements.create!(title: 'Title', message: 'Message')
         default_group = @course.root_outcome_group
-        outcome = @course.created_learning_outcomes.create!(:title => 'outcome')
+        outcome = @course.created_learning_outcomes.create!(title: 'outcome')
         default_group.add_outcome(outcome)
       end
 
@@ -3558,9 +3558,9 @@ describe Course do
           expect(@course).to receive(:expire_pending_grade_publishing_statuses).with(current_time).and_return(nil)
           allow(@plugin).to receive(:enabled?).and_return(true)
           @plugin_settings.merge!({
-                                    :publish_endpoint => "http://localhost/endpoint",
-                                    :success_timeout => "1",
-                                    :wait_for_success => "yes"
+                                    publish_endpoint: "http://localhost/endpoint",
+                                    success_timeout: "1",
+                                    wait_for_success: "yes"
                                   })
           @course.publish_final_grades(@user)
         end
@@ -3574,9 +3574,9 @@ describe Course do
           expect(@course).not_to receive(:delay)
           allow(@plugin).to receive(:enabled?).and_return(true)
           @plugin_settings.merge!({
-                                    :publish_endpoint => "http://localhost/endpoint",
-                                    :success_timeout => "1",
-                                    :wait_for_success => "no"
+                                    publish_endpoint: "http://localhost/endpoint",
+                                    success_timeout: "1",
+                                    wait_for_success: "no"
                                   })
           @course.publish_final_grades(@user)
         end
@@ -3590,9 +3590,9 @@ describe Course do
           expect(@course).not_to receive(:delay)
           allow(@plugin).to receive(:enabled?).and_return(true)
           @plugin_settings.merge!({
-                                    :publish_endpoint => "http://localhost/endpoint",
-                                    :success_timeout => "",
-                                    :wait_for_success => "no"
+                                    publish_endpoint: "http://localhost/endpoint",
+                                    success_timeout: "",
+                                    wait_for_success: "no"
                                   })
           @course.publish_final_grades(@user)
         end
@@ -3606,9 +3606,9 @@ describe Course do
           expect(@course).not_to receive(:delay)
           allow(@plugin).to receive(:enabled?).and_return(true)
           @plugin_settings.merge!({
-                                    :publish_endpoint => "http://localhost/endpoint",
-                                    :success_timeout => "no",
-                                    :wait_for_success => "yes"
+                                    publish_endpoint: "http://localhost/endpoint",
+                                    success_timeout: "no",
+                                    wait_for_success: "yes"
                                   })
           @course.publish_final_grades(@user)
         end
@@ -3662,7 +3662,7 @@ describe Course do
           @ase = @student_enrollments.find_all { |e| e.workflow_state == 'active' }
           allow(Course).to receive(:valid_grade_export_types).and_return({
                                                                            "test_format" => {
-                                                                             :callback => lambda do |course, enrollments, publishing_user, publishing_pseudonym|
+                                                                             callback: lambda do |course, enrollments, publishing_user, publishing_pseudonym|
                                                                                expect(course).to eq @course
                                                                                expect(enrollments.sort_by(&:id)).to eq @ase.sort_by(&:id)
                                                                                expect(publishing_pseudonym).to eq @pseudonym
@@ -3688,7 +3688,7 @@ describe Course do
         it "tries to publish appropriate enrollments" do
           plugin_settings = Course.valid_grade_export_types["instructure_csv"]
           allow(Course).to receive(:valid_grade_export_types).and_return(plugin_settings.merge({
-                                                                                                 "instructure_csv" => { :requires_grading_standard => true, :requires_publishing_pseudonym => true }
+                                                                                                 "instructure_csv" => { requires_grading_standard: true, requires_publishing_pseudonym: true }
                                                                                                }))
           @course.grading_standard_enabled = true
           @course.save!
@@ -3717,7 +3717,7 @@ describe Course do
         it "tries to publish appropriate enrollments (limited users)" do
           plugin_settings = Course.valid_grade_export_types["instructure_csv"]
           allow(Course).to receive(:valid_grade_export_types).and_return(plugin_settings.merge({
-                                                                                                 "instructure_csv" => { :requires_grading_standard => true, :requires_publishing_pseudonym => true }
+                                                                                                 "instructure_csv" => { requires_grading_standard: true, requires_publishing_pseudonym: true }
                                                                                                }))
           @course.grading_standard_enabled = true
           @course.save!
@@ -3727,7 +3727,7 @@ describe Course do
           @checked = false
           allow(Course).to receive(:valid_grade_export_types).and_return({
                                                                            "instructure_csv" => {
-                                                                             :callback => lambda do |course, enrollments, publishing_user, publishing_pseudonym|
+                                                                             callback: lambda do |course, enrollments, publishing_user, publishing_pseudonym|
                                                                                expect(course).to eq @course
                                                                                expect(enrollments).to eq [@student_enrollments.first]
                                                                                expect(publishing_pseudonym).to eq @pseudonym
@@ -3759,7 +3759,7 @@ describe Course do
         it "makes sure the publishing user can publish" do
           plugin_settings = Course.valid_grade_export_types["instructure_csv"]
           allow(Course).to receive(:valid_grade_export_types).and_return(plugin_settings.merge({
-                                                                                                 "instructure_csv" => { :requires_grading_standard => false, :requires_publishing_pseudonym => true }
+                                                                                                 "instructure_csv" => { requires_grading_standard: false, requires_publishing_pseudonym: true }
                                                                                                }))
           @user = user_factory
           allow(@plugin).to receive(:enabled?).and_return(true)
@@ -3772,7 +3772,7 @@ describe Course do
         it "makes sure there's a grading standard" do
           plugin_settings = Course.valid_grade_export_types["instructure_csv"]
           allow(Course).to receive(:valid_grade_export_types).and_return(plugin_settings.merge({
-                                                                                                 "instructure_csv" => { :requires_grading_standard => true, :requires_publishing_pseudonym => false }
+                                                                                                 "instructure_csv" => { requires_grading_standard: true, requires_publishing_pseudonym: false }
                                                                                                }))
           @user = user_factory
           allow(@plugin).to receive(:enabled?).and_return(true)
@@ -3798,7 +3798,7 @@ describe Course do
           @ase = @student_enrollments.find_all { |e| e.workflow_state == 'active' }
           allow(Course).to receive(:valid_grade_export_types).and_return({
                                                                            "test_format" => {
-                                                                             :callback => lambda do |course, enrollments, publishing_user, publishing_pseudonym|
+                                                                             callback: lambda do |course, enrollments, publishing_user, publishing_pseudonym|
                                                                                expect(course).to eq @course
                                                                                expect(enrollments.sort_by(&:id)).to eq @ase.sort_by(&:id)
                                                                                expect(publishing_pseudonym).to eq @pseudonym
@@ -3861,7 +3861,7 @@ describe Course do
           @ase = @student_enrollments.find_all { |e| e.workflow_state == 'active' }
           allow(Course).to receive(:valid_grade_export_types).and_return({
                                                                            "test_format" => {
-                                                                             :callback => lambda do |course, enrollments, publishing_user, publishing_pseudonym|
+                                                                             callback: lambda do |course, enrollments, publishing_user, publishing_pseudonym|
                                                                                expect(course).to eq @course
                                                                                expect(enrollments.sort_by(&:id)).to eq @ase.sort_by(&:id)
                                                                                expect(publishing_pseudonym).to eq @pseudonym
@@ -3895,7 +3895,7 @@ describe Course do
           @ase = @student_enrollments.find_all { |e| e.workflow_state == 'active' }
           allow(Course).to receive(:valid_grade_export_types).and_return({
                                                                            "test_format" => {
-                                                                             :callback => lambda do |course, enrollments, publishing_user, publishing_pseudonym|
+                                                                             callback: lambda do |course, enrollments, publishing_user, publishing_pseudonym|
                                                                                expect(course).to eq @course
                                                                                expect(enrollments.sort_by(&:id)).to eq @ase.sort_by(&:id)
                                                                                expect(publishing_pseudonym).to eq @pseudonym
@@ -3929,7 +3929,7 @@ describe Course do
           @ase = @student_enrollments.find_all { |e| e.workflow_state == 'active' }
           allow(Course).to receive(:valid_grade_export_types).and_return({
                                                                            "test_format" => {
-                                                                             :callback => lambda do |*|
+                                                                             callback: lambda do |*|
                                                                                raise "waaah fail"
                                                                              end
                                                                            }
@@ -3946,7 +3946,7 @@ describe Course do
           @ase = @student_enrollments.find_all { |e| e.workflow_state == 'active' }
           allow(Course).to receive(:valid_grade_export_types).and_return({
                                                                            "test_format" => {
-                                                                             :callback => lambda do |course, enrollments, publishing_user, publishing_pseudonym|
+                                                                             callback: lambda do |course, enrollments, publishing_user, publishing_pseudonym|
                                                                                expect(course).to eq @course
                                                                                expect(enrollments.sort_by(&:id)).to eq @ase.sort_by(&:id)
                                                                                expect(publishing_pseudonym).to eq @pseudonym
@@ -3975,7 +3975,7 @@ describe Course do
           @ase = @student_enrollments.find_all { |e| e.workflow_state == 'active' }
           allow(Course).to receive(:valid_grade_export_types).and_return({
                                                                            "test_format" => {
-                                                                             :callback => lambda do |course, enrollments, publishing_user, publishing_pseudonym|
+                                                                             callback: lambda do |course, enrollments, publishing_user, publishing_pseudonym|
                                                                                expect(course).to eq @course
                                                                                expect(enrollments.sort_by(&:id)).to eq @ase.sort_by(&:id)
                                                                                expect(publishing_pseudonym).to eq @pseudonym
@@ -4002,9 +4002,9 @@ describe Course do
         before :once do
           make_student_enrollments
           grade_publishing_user
-          @course.assignment_groups.create(:name => "Assignments")
-          a1 = @course.assignments.create!(:title => "A1", :points_possible => 10)
-          a2 = @course.assignments.create!(:title => "A2", :points_possible => 10)
+          @course.assignment_groups.create(name: "Assignments")
+          a1 = @course.assignments.create!(title: "A1", points_possible: 10)
+          a2 = @course.assignments.create!(title: "A2", points_possible: 10)
           @course.enroll_teacher(@user).tap { |e| e.update!(workflow_state: 'active') }
           @ase = @course.student_enrollments.active
 
@@ -4018,12 +4018,12 @@ describe Course do
           add_pseudonym(@ase[7], Account.default, "student7a", "student7a")
           add_pseudonym(@ase[7], Account.default, "student7b", "student7b")
 
-          a1.grade_student(@ase[0].user, { :grade => "9", :grader => @user })
-          a2.grade_student(@ase[0].user, { :grade => "10", :grader => @user })
-          a1.grade_student(@ase[1].user, { :grade => "6", :grader => @user })
-          a2.grade_student(@ase[1].user, { :grade => "7", :grader => @user })
-          a1.grade_student(@ase[7].user, { :grade => "8", :grader => @user })
-          a2.grade_student(@ase[7].user, { :grade => "9", :grader => @user })
+          a1.grade_student(@ase[0].user, { grade: "9", grader: @user })
+          a2.grade_student(@ase[0].user, { grade: "10", grader: @user })
+          a1.grade_student(@ase[1].user, { grade: "6", grader: @user })
+          a2.grade_student(@ase[1].user, { grade: "7", grader: @user })
+          a1.grade_student(@ase[7].user, { grade: "8", grader: @user })
+          a2.grade_student(@ase[7].user, { grade: "9", grader: @user })
         end
 
         def add_pseudonym(enrollment, account, unique_id, sis_user_id)
@@ -4312,22 +4312,22 @@ describe Course do
     context 'integration suite' do
       def quick_sanity_check(user, expect_success = true)
         Course.valid_grade_export_types["test_export"] = {
-          :name => "test export",
-          :callback => lambda do |course, _enrollments, publishing_user, publishing_pseudonym|
-                         expect(course).to eq @course
-                         expect(publishing_pseudonym).to eq @pseudonym
-                         expect(publishing_user).to eq @user
-                         return [[[], "test-jt-data", "application/jtmimetype"]]
-                       end,
-          :requires_grading_standard => false, :requires_publishing_pseudonym => true
+          name: "test export",
+          callback: lambda do |course, _enrollments, publishing_user, publishing_pseudonym|
+                      expect(course).to eq @course
+                      expect(publishing_pseudonym).to eq @pseudonym
+                      expect(publishing_user).to eq @user
+                      return [[[], "test-jt-data", "application/jtmimetype"]]
+                    end,
+          requires_grading_standard: false, requires_publishing_pseudonym: true
         }
 
         @plugin = Canvas::Plugin.find!('grade_export')
-        @ps = PluginSetting.new(:name => @plugin.id, :settings => @plugin.default_settings)
+        @ps = PluginSetting.new(name: @plugin.id, settings: @plugin.default_settings)
         @ps.posted_settings = @plugin.default_settings.merge({
-                                                               :format_type => "test_export",
-                                                               :wait_for_success => "no",
-                                                               :publish_endpoint => "http://localhost/endpoint"
+                                                               format_type: "test_export",
+                                                               wait_for_success: "no",
+                                                               publish_endpoint: "http://localhost/endpoint"
                                                              })
         @ps.save!
 
@@ -4376,11 +4376,11 @@ describe Course do
         @pseudonym.save!
 
         @plugin = Canvas::Plugin.find!('grade_export')
-        @ps = PluginSetting.new(:name => @plugin.id, :settings => @plugin.default_settings)
+        @ps = PluginSetting.new(name: @plugin.id, settings: @plugin.default_settings)
         @ps.posted_settings = @plugin.default_settings.merge({
-                                                               :format_type => "instructure_csv",
-                                                               :wait_for_success => "no",
-                                                               :publish_endpoint => "http://localhost/endpoint"
+                                                               format_type: "instructure_csv",
+                                                               wait_for_success: "no",
+                                                               publish_endpoint: "http://localhost/endpoint"
                                                              })
         @ps.save!
 
@@ -4405,7 +4405,7 @@ describe Course do
           "C1,C1,C1,,,active"
         )
         @course = Course.where(sis_source_id: "C1").first
-        @course.assignment_groups.create(:name => "Assignments")
+        @course.assignment_groups.create(name: "Assignments")
         process_csv_data_cleanly(
           "section_id,course_id,name,status,start_date,end_date",
           "S1,C1,S1,active,,",
@@ -4423,8 +4423,8 @@ describe Course do
           ",S5,student,S3,active",
           ",S6,student,S4,active"
         )
-        a1 = @course.assignments.create!(:title => "A1", :points_possible => 10)
-        a2 = @course.assignments.create!(:title => "A2", :points_possible => 10)
+        a1 = @course.assignments.create!(title: "A1", points_possible: 10)
+        a2 = @course.assignments.create!(title: "A2", points_possible: 10)
 
         def getpseudonym(user_sis_id)
           pseudo = Pseudonym.where(sis_user_id: user_sis_id).first
@@ -4450,16 +4450,16 @@ describe Course do
           e
         end
 
-        a1.grade_student(getuser("S1"), { :grade => "6", :grader => getuser("T1") })
-        a1.grade_student(getuser("S2"), { :grade => "6", :grader => getuser("T1") })
-        a1.grade_student(getuser("S3"), { :grade => "7", :grader => getuser("T1") })
-        a1.grade_student(getuser("S5"), { :grade => "7", :grader => getuser("T1") })
-        a1.grade_student(getuser("S6"), { :grade => "8", :grader => getuser("T1") })
-        a2.grade_student(getuser("S1"), { :grade => "8", :grader => getuser("T1") })
-        a2.grade_student(getuser("S2"), { :grade => "9", :grader => getuser("T1") })
-        a2.grade_student(getuser("S3"), { :grade => "9", :grader => getuser("T1") })
-        a2.grade_student(getuser("S5"), { :grade => "10", :grader => getuser("T1") })
-        a2.grade_student(getuser("S6"), { :grade => "10", :grader => getuser("T1") })
+        a1.grade_student(getuser("S1"), { grade: "6", grader: getuser("T1") })
+        a1.grade_student(getuser("S2"), { grade: "6", grader: getuser("T1") })
+        a1.grade_student(getuser("S3"), { grade: "7", grader: getuser("T1") })
+        a1.grade_student(getuser("S5"), { grade: "7", grader: getuser("T1") })
+        a1.grade_student(getuser("S6"), { grade: "8", grader: getuser("T1") })
+        a2.grade_student(getuser("S1"), { grade: "8", grader: getuser("T1") })
+        a2.grade_student(getuser("S2"), { grade: "9", grader: getuser("T1") })
+        a2.grade_student(getuser("S3"), { grade: "9", grader: getuser("T1") })
+        a2.grade_student(getuser("S5"), { grade: "10", grader: getuser("T1") })
+        a2.grade_student(getuser("S6"), { grade: "10", grader: getuser("T1") })
 
         stud5, stud6, sec4 = nil, nil, nil
         Pseudonym.where(sis_user_id: "S5").first.tap do |p|
@@ -4486,11 +4486,11 @@ describe Course do
         expect(teacher).not_to be_nil
 
         @plugin = Canvas::Plugin.find!('grade_export')
-        @ps = PluginSetting.new(:name => @plugin.id, :settings => @plugin.default_settings)
+        @ps = PluginSetting.new(name: @plugin.id, settings: @plugin.default_settings)
         @ps.posted_settings = @plugin.default_settings.merge({
-                                                               :format_type => "instructure_csv",
-                                                               :wait_for_success => "no",
-                                                               :publish_endpoint => "http://localhost/endpoint"
+                                                               format_type: "instructure_csv",
+                                                               wait_for_success: "no",
+                                                               publish_endpoint: "http://localhost/endpoint"
                                                              })
         @ps.save!
 
@@ -4544,12 +4544,12 @@ describe Course do
     end
 
     def new_external_tool(context)
-      context.context_external_tools.new(:name => "bob", :consumer_key => "bob", :shared_secret => "bob", :domain => "example.com")
+      context.context_external_tools.new(name: "bob", consumer_key: "bob", shared_secret: "bob", domain: "example.com")
     end
 
     it "does not include external tools if not configured for course navigation" do
       tool = new_external_tool @course
-      tool.user_navigation = { :url => "http://www.example.com", :text => "Example URL" }
+      tool.user_navigation = { url: "http://www.example.com", text: "Example URL" }
       tool.save!
       expect(tool.has_placement?(:course_navigation)).to eq false
       @teacher = user_model
@@ -4560,7 +4560,7 @@ describe Course do
 
     it "includes external tools if configured on the course" do
       tool = new_external_tool @course
-      tool.course_navigation = { :url => "http://www.example.com", :text => "Example URL" }
+      tool.course_navigation = { url: "http://www.example.com", text: "Example URL" }
       tool.save!
       expect(tool.has_placement?(:course_navigation)).to eq true
       @teacher = user_model
@@ -4574,11 +4574,11 @@ describe Course do
     end
 
     it "includes external tools if configured on the account" do
-      @account = @course.root_account.sub_accounts.create!(:name => "sub-account")
+      @account = @course.root_account.sub_accounts.create!(name: "sub-account")
       @course.account = @account
       @course.save!
       tool = new_external_tool @account
-      tool.course_navigation = { :url => "http://www.example.com", :text => "Example URL" }
+      tool.course_navigation = { url: "http://www.example.com", text: "Example URL" }
       tool.save!
       expect(tool.has_placement?(:course_navigation)).to eq true
       @teacher = user_model
@@ -4592,11 +4592,11 @@ describe Course do
     end
 
     it "includes external tools if configured on the root account" do
-      @account = @course.root_account.sub_accounts.create!(:name => "sub-account")
+      @account = @course.root_account.sub_accounts.create!(name: "sub-account")
       @course.account = @account
       @course.save!
       tool = new_external_tool @account.root_account
-      tool.course_navigation = { :url => "http://www.example.com", :text => "Example URL" }
+      tool.course_navigation = { url: "http://www.example.com", text: "Example URL" }
       tool.save!
       expect(tool.has_placement?(:course_navigation)).to eq true
       @teacher = user_model
@@ -4614,7 +4614,7 @@ describe Course do
       @course.is_public = true
       @course.save!
       tool = new_external_tool @course
-      tool.course_navigation = { :url => "http://www.example.com", :text => "Example URL", :visibility => 'admins' }
+      tool.course_navigation = { url: "http://www.example.com", text: "Example URL", visibility: 'admins' }
       tool.save!
       expect(tool.has_placement?(:course_navigation)).to eq true
       @teacher = user_model
@@ -4639,7 +4639,7 @@ describe Course do
       @course.is_public = true
       @course.save!
       tool = new_external_tool @course
-      tool.course_navigation = { :url => "http://www.example.com", :text => "Example URL", :visibility => 'members' }
+      tool.course_navigation = { url: "http://www.example.com", text: "Example URL", visibility: 'members' }
       tool.save!
       expect(tool.has_placement?(:course_navigation)).to eq true
       @teacher = user_model
@@ -4661,12 +4661,12 @@ describe Course do
 
     it "allows reordering external tool position in course navigation" do
       tool = new_external_tool @course
-      tool.course_navigation = { :url => "http://www.example.com", :text => "Example URL" }
+      tool.course_navigation = { url: "http://www.example.com", text: "Example URL" }
       tool.save!
       expect(tool.has_placement?(:course_navigation)).to eq true
       @teacher = user_model
       @course.enroll_teacher(@teacher).accept
-      @course.tab_configuration = Course.default_tabs.map { |t| { :id => t[:id] } }.insert(1, { :id => tool.asset_string })
+      @course.tab_configuration = Course.default_tabs.map { |t| { id: t[:id] } }.insert(1, { id: tool.asset_string })
       @course.save!
       tabs = @course.tabs_available(@teacher)
       expect(tabs[1][:id]).to eq tool.asset_string
@@ -4674,7 +4674,7 @@ describe Course do
 
     it "does not show external tools that are hidden in course navigation" do
       tool = new_external_tool @course
-      tool.course_navigation = { :url => "http://www.example.com", :text => "Example URL" }
+      tool.course_navigation = { url: "http://www.example.com", text: "Example URL" }
       tool.save!
       expect(tool.has_placement?(:course_navigation)).to eq true
       @teacher = user_model
@@ -4682,13 +4682,13 @@ describe Course do
       tabs = @course.tabs_available(@teacher)
       expect(tabs.pluck(:id)).to be_include(tool.asset_string)
 
-      @course.tab_configuration = Course.default_tabs.map { |t| { :id => t[:id] } }.insert(1, { :id => tool.asset_string, :hidden => true })
+      @course.tab_configuration = Course.default_tabs.map { |t| { id: t[:id] } }.insert(1, { id: tool.asset_string, hidden: true })
       @course.save!
       @course = Course.find(@course.id)
       tabs = @course.tabs_available(@teacher)
       expect(tabs.pluck(:id)).not_to be_include(tool.asset_string)
 
-      tabs = @course.tabs_available(@teacher, :for_reordering => true)
+      tabs = @course.tabs_available(@teacher, for_reordering: true)
       expect(tabs.pluck(:id)).to be_include(tool.asset_string)
     end
 
@@ -4704,13 +4704,13 @@ describe Course do
       expect(tool.has_placement?(:course_navigation)).to eq true
 
       settings = @course.external_tool_tabs({}, User.new).first
-      expect(settings).to include(:visibility => "members")
-      expect(settings).to include(:hidden => true)
+      expect(settings).to include(visibility: "members")
+      expect(settings).to include(hidden: true)
     end
 
     it "prefers extension settings over default values" do
       tool = new_external_tool @course
-      tool.course_navigation = { :url => "http://www.example.com", :visibility => "admins", :default => "active" }
+      tool.course_navigation = { url: "http://www.example.com", visibility: "admins", default: "active" }
       tool.settings[:visibility] = "members"
       tool.settings[:default] = "disabled"
       tool.save!
@@ -4719,8 +4719,8 @@ describe Course do
       expect(tool.has_placement?(:course_navigation)).to eq true
 
       settings = @course.external_tool_tabs({}, User.new).first
-      expect(settings).to include(:visibility => "admins")
-      expect(settings).to include(:hidden => false)
+      expect(settings).to include(visibility: "admins")
+      expect(settings).to include(hidden: false)
     end
 
     it 'hides tabs for feature flagged external tools' do
@@ -4780,10 +4780,10 @@ describe Course do
   describe "#manageable_by_user" do
     it "includes courses associated with the user's active accounts" do
       account = Account.create!
-      sub_account = Account.create!(:parent_account => account)
-      sub_sub_account = Account.create!(:parent_account => sub_account)
-      user = account_admin_user(:account => sub_account)
-      course = Course.create!(:account => sub_sub_account)
+      sub_account = Account.create!(parent_account: account)
+      sub_sub_account = Account.create!(parent_account: sub_account)
+      user = account_admin_user(account: sub_account)
+      course = Course.create!(account: sub_sub_account)
 
       expect(Course.manageable_by_user(user.id).map(&:id)).to be_include(course.id)
 
@@ -4846,11 +4846,11 @@ describe Course do
 
   context "conclusions" do
     it "grants concluded users read but not participate" do
-      enrollment = course_with_student(:active_all => 1)
+      enrollment = course_with_student(active_all: 1)
       @course.reload
 
       # active
-      expect(@course.rights_status(@user, :read, :participate_as_student)).to eq({ :read => true, :participate_as_student => true })
+      expect(@course.rights_status(@user, :read, :participate_as_student)).to eq({ read: true, participate_as_student: true })
       @course.clear_permissions_cache(@user)
 
       # soft conclusion
@@ -4865,7 +4865,7 @@ describe Course do
       expect(enrollment.state_based_on_date).to eq :completed
       expect(enrollment).not_to be_participating_student
 
-      expect(@course.rights_status(@user, :read, :participate_as_student)).to eq({ :read => true, :participate_as_student => false })
+      expect(@course.rights_status(@user, :read, :participate_as_student)).to eq({ read: true, participate_as_student: false })
       @course.clear_permissions_cache(@user)
 
       # hard enrollment conclusion
@@ -4878,7 +4878,7 @@ describe Course do
       expect(enrollment.state).to eq :completed
       expect(enrollment.state_based_on_date).to eq :completed
 
-      expect(@course.rights_status(@user, :read, :participate_as_student)).to eq({ :read => true, :participate_as_student => false })
+      expect(@course.rights_status(@user, :read, :participate_as_student)).to eq({ read: true, participate_as_student: false })
       @course.clear_permissions_cache(@user)
 
       # course conclusion
@@ -4892,13 +4892,13 @@ describe Course do
       expect(enrollment.state).to eq :completed
       expect(enrollment.state_based_on_date).to eq :completed
 
-      expect(@course.rights_status(@user, :read, :participate_as_student)).to eq({ :read => true, :participate_as_student => false })
+      expect(@course.rights_status(@user, :read, :participate_as_student)).to eq({ read: true, participate_as_student: false })
     end
 
     context "appointment cancellation" do
       before :once do
-        course_with_student(:active_all => true)
-        @ag = AppointmentGroup.create!(:title => "test", :contexts => [@course], :new_appointments => [['2010-01-01 13:00:00', '2010-01-01 14:00:00'], ["#{Time.now.year + 1}-01-01 13:00:00", "#{Time.now.year + 1}-01-01 14:00:00"]])
+        course_with_student(active_all: true)
+        @ag = AppointmentGroup.create!(title: "test", contexts: [@course], new_appointments: [['2010-01-01 13:00:00', '2010-01-01 14:00:00'], ["#{Time.now.year + 1}-01-01 13:00:00", "#{Time.now.year + 1}-01-01 14:00:00"]])
         @ag.appointments.each do |a|
           a.reserve_for(@user, @user)
         end
@@ -4927,7 +4927,7 @@ describe Course do
   describe "#inherited_assessment_question_banks" do
     it "includes the course's banks if include_self is true" do
       @account = Account.create
-      @course = Course.create(:account => @account)
+      @course = Course.create(account: @account)
       expect(@course.inherited_assessment_question_banks(true)).to be_empty
 
       bank = @course.assessment_question_banks.create
@@ -4943,7 +4943,7 @@ describe Course do
       @account.save
       account_bank = @account.assessment_question_banks.create
 
-      @course = Course.create(:account => @account)
+      @course = Course.create(account: @account)
       expect(@course.inherited_assessment_question_banks.sort_by(&:id)).to eq [root_bank, account_bank]
     end
 
@@ -4956,7 +4956,7 @@ describe Course do
       @account.save
       account_bank = @account.assessment_question_banks.create
 
-      @course = Course.create(:account => @account)
+      @course = Course.create(account: @account)
       bank = @course.assessment_question_banks.create
 
       banks = @course.inherited_assessment_question_banks(true)
@@ -4977,13 +4977,13 @@ describe Course do
       @course.enroll_teacher(@teacher)
 
       @ta = User.create
-      @course.enroll_user(@ta, "TaEnrollment", :limit_privileges_to_course_section => true)
+      @course.enroll_user(@ta, "TaEnrollment", limit_privileges_to_course_section: true)
 
       @student1 = User.create
-      @course.enroll_user(@student1, "StudentEnrollment", :enrollment_state => 'active')
+      @course.enroll_user(@student1, "StudentEnrollment", enrollment_state: 'active')
 
       @student2 = User.create
-      @course.enroll_user(@student2, "StudentEnrollment", :section => @other_section, :enrollment_state => 'active')
+      @course.enroll_user(@student2, "StudentEnrollment", section: @other_section, enrollment_state: 'active')
 
       @observer = User.create
       @course.enroll_user(@observer, "ObserverEnrollment").update_attribute(:associated_user_id, @student1.id)
@@ -5021,7 +5021,7 @@ describe Course do
       end
 
       it "ignores concluded sections if option is given" do
-        @student1 = student_in_section(@other_section, { :active_all => true })
+        @student1 = student_in_section(@other_section, { active_all: true })
         @student1.enrollments.each(&:conclude)
 
         all_sections = @course.course_sections
@@ -5029,7 +5029,7 @@ describe Course do
       end
 
       it "includes concluded secitions if no options" do
-        @student1 = student_in_section(@other_section, { :active_all => true })
+        @student1 = student_in_section(@other_section, { active_all: true })
         @student1.enrollments.each(&:conclude)
 
         all_sections = @course.course_sections
@@ -5071,16 +5071,16 @@ describe Course do
 
       it "does not return observers to section-restricted students" do
         section2 = @course.course_sections.create!
-        limited_student = user_factory(:active_all => true)
-        @course.enroll_user(limited_student, "StudentEnrollment", :enrollment_state => "active",
-                                                                  :section => section2, :limit_privileges_to_course_section => true)
+        limited_student = user_factory(active_all: true)
+        @course.enroll_user(limited_student, "StudentEnrollment", enrollment_state: "active",
+                                                                  section: section2, limit_privileges_to_course_section: true)
 
-        limited_teacher = user_factory(:active_all => true)
-        @course.enroll_user(limited_teacher, "TeacherEnrollment", :enrollment_state => "active",
-                                                                  :section => section2, :limit_privileges_to_course_section => true)
+        limited_teacher = user_factory(active_all: true)
+        @course.enroll_user(limited_teacher, "TeacherEnrollment", enrollment_state: "active",
+                                                                  section: section2, limit_privileges_to_course_section: true)
 
-        observer = user_factory(:active_all => true)
-        @course.enroll_user(observer, "ObserverEnrollment", :enrollment_state => "active", :section => section2)
+        observer = user_factory(active_all: true)
+        @course.enroll_user(observer, "ObserverEnrollment", enrollment_state: "active", section: section2)
         expect(@course.users_visible_to(limited_student)).not_to include(observer)
         expect(@course.users_visible_to(limited_teacher)).to include(observer)
       end
@@ -5130,15 +5130,15 @@ describe Course do
     context "restricted" do
       it "returns no students except self and the observed" do
         expect(@course.students_visible_to(@observer)).to eq [@student1]
-        RoleOverride.create!(:context => @course.account, :permission => 'read_roster',
-                             :role => student_role, :enabled => false)
+        RoleOverride.create!(context: @course.account, permission: 'read_roster',
+                             role: student_role, enabled: false)
         expect(@course.students_visible_to(@student1)).to eq [@student1]
       end
 
       it "returns student's sections" do
         expect(@course.sections_visible_to(@observer)).to eq [@course.default_section]
-        RoleOverride.create!(:context => @course.account, :permission => 'read_roster',
-                             :role => student_role, :enabled => false)
+        RoleOverride.create!(context: @course.account, permission: 'read_roster',
+                             role: student_role, enabled: false)
         expect(@course.sections_visible_to(@student1)).to eq [@course.default_section]
       end
     end
@@ -5147,8 +5147,8 @@ describe Course do
       it "checks the message permission" do
         expect(@course.enrollment_visibility_level_for(@teacher, @course.section_visibilities_for(@teacher), require_message_permission: true)).to eql :full
         expect(@course.enrollment_visibility_level_for(@observer, @course.section_visibilities_for(@observer), require_message_permission: true)).to eql :restricted
-        RoleOverride.create!(:context => @course.account, :permission => 'send_messages',
-                             :role => student_role, :enabled => false)
+        RoleOverride.create!(context: @course.account, permission: 'send_messages',
+                             role: student_role, enabled: false)
         expect(@course.enrollment_visibility_level_for(@student1, @course.section_visibilities_for(@student1), require_message_permission: true)).to eql :restricted
       end
     end
@@ -5304,7 +5304,7 @@ describe Course do
     end
 
     it "syncs enrollment term from homeroom" do
-      homeroom_term = @homeroom_course.account.enrollment_terms.create!(:end_at => 1.week.ago, :name => 'homeroom term')
+      homeroom_term = @homeroom_course.account.enrollment_terms.create!(end_at: 1.week.ago, name: 'homeroom term')
       @homeroom_course.restrict_enrollments_to_course_dates = false
       @homeroom_course.enrollment_term = homeroom_term
       @homeroom_course.save!
@@ -5361,7 +5361,7 @@ describe Course do
 
   describe "#user_has_been_instructor?" do
     it "is true for teachers, past or present" do
-      e = course_with_teacher(:active_all => true)
+      e = course_with_teacher(active_all: true)
       expect(@course.user_has_been_instructor?(@teacher)).to be_truthy
 
       e.conclude
@@ -5373,14 +5373,14 @@ describe Course do
     end
 
     it "is true for tas" do
-      course_with_ta(:active_all => true)
+      course_with_ta(active_all: true)
       expect(@course.user_has_been_instructor?(@ta)).to be_truthy
     end
   end
 
   describe "#user_has_been_admin?" do
     it "is true for teachers, past or present" do
-      e = course_with_teacher(:active_all => true)
+      e = course_with_teacher(active_all: true)
       expect(@course.user_has_been_admin?(@teacher)).to be_truthy
 
       e.conclude
@@ -5392,19 +5392,19 @@ describe Course do
     end
 
     it "is true for tas" do
-      course_with_ta(:active_all => true)
+      course_with_ta(active_all: true)
       expect(@course.user_has_been_admin?(@ta)).to be_truthy
     end
 
     it "is true for designers" do
-      course_with_designer(:active_all => true)
+      course_with_designer(active_all: true)
       expect(@course.user_has_been_admin?(@designer)).to be_truthy
     end
   end
 
   describe "#user_has_been_student?" do
     it "is true for students, past or present" do
-      e = course_with_student(:active_all => true)
+      e = course_with_student(active_all: true)
       expect(@course.user_has_been_student?(@student)).to be_truthy
 
       e.conclude
@@ -5418,24 +5418,24 @@ describe Course do
 
   describe "#user_has_been_observer?" do
     it "is false for teachers" do
-      course_with_teacher(:active_all => true)
+      course_with_teacher(active_all: true)
       expect(@course.user_has_been_observer?(@teacher)).to be_falsey
     end
 
     it "is false for tas" do
-      course_with_ta(:active_all => true)
+      course_with_ta(active_all: true)
       expect(@course.user_has_been_observer?(@ta)).to be_falsey
     end
 
     it "is true for observers" do
-      course_with_observer(:active_all => true)
+      course_with_observer(active_all: true)
       expect(@course.user_has_been_observer?(@observer)).to be_truthy
     end
   end
 
   describe Course, "#student_view_student" do
     before :once do
-      course_with_teacher(:active_all => true)
+      course_with_teacher(active_all: true)
     end
 
     it "creates a default section when enrolling for student view student" do
@@ -5485,7 +5485,7 @@ describe Course do
     it "allows two different student view users for two different courses" do
       @course1 = @course
       @teacher1 = @teacher
-      course_with_teacher(:active_all => true)
+      course_with_teacher(active_all: true)
       @course2 = @course
       @teacher2 = @teacher
 
@@ -5497,14 +5497,14 @@ describe Course do
     end
 
     it "gives fake student active student permissions even if enrollment wouldn't otherwise be active" do
-      @course.enrollment_term.update(:start_at => 2.days.from_now, :end_at => 4.days.from_now)
+      @course.enrollment_term.update(start_at: 2.days.from_now, end_at: 4.days.from_now)
       @fake_student = @course.student_view_student
       expect(@course.grants_right?(@fake_student, nil, :read_forum)).to be_truthy
     end
 
     it "does not update the fake student's enrollment state to 'invited' in a concluded course" do
       @course.student_view_student
-      @course.enrollment_term.update(:start_at => 4.days.ago, :end_at => 2.days.ago)
+      @course.enrollment_term.update(start_at: 4.days.ago, end_at: 2.days.ago)
       @fake_student = @course.student_view_student
       expect(@fake_student.enrollments.where(course_id: @course).map(&:workflow_state)).to eql(['active'])
     end
@@ -5513,7 +5513,7 @@ describe Course do
   describe "#user_list_search_mode_for" do
     it "is open for anyone if open registration is turned on" do
       account = Account.default
-      account.settings = { :open_registration => true }
+      account.settings = { open_registration: true }
       account.save!
       course_factory
       expect(@course.user_list_search_mode_for(nil)).to eq :open
@@ -5532,7 +5532,7 @@ describe Course do
 
     it "is preferred if delegated authentication is configured" do
       account = Account.create!
-      account.authentication_providers.create!(:auth_type => 'cas')
+      account.authentication_providers.create!(auth_type: 'cas')
       account.authentication_providers.first.move_to_bottom
       account.settings[:open_registration] = true
       account.save!
@@ -5560,7 +5560,7 @@ describe Course do
     end
 
     it "generates a code on demand for existing self enrollment courses" do
-      Course.where(:id => @course).update_all(:self_enrollment => true)
+      Course.where(id: @course).update_all(self_enrollment: true)
       c1.reload
       expect(c1.read_attribute(:self_enrollment_code)).to be_nil
       expect(c1.self_enrollment_code).not_to be_nil
@@ -5603,12 +5603,12 @@ describe Course do
       end
 
       it 'can be read by a prior user' do
-        user.student_enrollments.create!(:workflow_state => 'completed', :course => @course)
+        user.student_enrollments.create!(workflow_state: 'completed', course: @course)
         expect(@course.check_policy(user).sort).to eq %i[read read_announcements read_forum read_grades read_outcomes]
       end
 
       it 'can have its forum read by an observer' do
-        enrollment = user.observer_enrollments.create!(:workflow_state => 'completed', :course => @course)
+        enrollment = user.observer_enrollments.create!(workflow_state: 'completed', course: @course)
         enrollment.update_attribute(:associated_user_id, user.id)
         expect(@course.check_policy(user)).to include :read_forum
       end
@@ -5617,7 +5617,7 @@ describe Course do
         subject { @course.check_policy(instructor) }
 
         let(:instructor) do
-          user.teacher_enrollments.create!(:workflow_state => 'completed', :course => @course)
+          user.teacher_enrollments.create!(workflow_state: 'completed', course: @course)
           user
         end
 
@@ -5644,7 +5644,7 @@ describe Course do
       enable_cache do
         @shard1.activate do
           acct = Account.create!
-          course_with_student(:active_all => 1, :account => acct)
+          course_with_student(active_all: 1, account: acct)
         end
         @site_admin = user_factory
         site_admin = Account.site_admin
@@ -5681,14 +5681,14 @@ describe Course do
     it "grants enrollment-based permissions regardless of shard" do
       @shard1.activate do
         account = Account.create!
-        course_factory(active_course: true, :account => account)
+        course_factory(active_course: true, account: account)
       end
 
       @shard2.activate do
         user_factory(active_user: true)
       end
 
-      student_in_course(:user => @user, :active_all => true)
+      student_in_course(user: @user, active_all: true)
 
       @shard1.activate do
         expect(@course.grants_right?(@user, :send_messages)).to be_truthy
@@ -5705,12 +5705,12 @@ describe Course do
       before :once do
         account_model
         # has enrollments
-        @course1a = course_with_student(:account => @account, :course_name => 'A').course
-        @course1b = course_with_student(:account => @account, :course_name => 'B').course
+        @course1a = course_with_student(account: @account, course_name: 'A').course
+        @course1b = course_with_student(account: @account, course_name: 'B').course
 
         # has no enrollments
-        @course2a = Course.create!(:account => @account, :name => 'A')
-        @course2b = Course.create!(:account => @account, :name => 'B')
+        @course2a = Course.create!(account: @account, name: 'A')
+        @course2b = Course.create!(account: @account, name: 'B')
       end
 
       describe "#with_enrollments" do
@@ -5719,7 +5719,7 @@ describe Course do
         end
 
         it "plays nice with other scopes" do
-          expect(@account.courses.with_enrollments.where(:name => 'A')).to eq [@course1a]
+          expect(@account.courses.with_enrollments.where(name: 'A')).to eq [@course1a]
         end
 
         it "is disjoint with #without_enrollments" do
@@ -5733,7 +5733,7 @@ describe Course do
         end
 
         it "plays nice with other scopes" do
-          expect(@account.courses.without_enrollments.where(:name => 'A')).to eq [@course2a]
+          expect(@account.courses.without_enrollments.where(name: 'A')).to eq [@course2a]
         end
       end
     end
@@ -5742,16 +5742,16 @@ describe Course do
       before :once do
         account_model
         # non-concluded
-        @c1 = Course.create!(:account => @account)
-        @c2 = Course.create!(:account => @account, :conclude_at => 1.week.from_now)
+        @c1 = Course.create!(account: @account)
+        @c2 = Course.create!(account: @account, conclude_at: 1.week.from_now)
 
         # concluded in various ways
-        @c3 = Course.create!(:account => @account, :conclude_at => 1.week.ago)
-        @c4 = Course.create!(:account => @account)
-        term = @c4.account.enrollment_terms.create! :end_at => 2.weeks.ago
+        @c3 = Course.create!(account: @account, conclude_at: 1.week.ago)
+        @c4 = Course.create!(account: @account)
+        term = @c4.account.enrollment_terms.create! end_at: 2.weeks.ago
         @c4.enrollment_term = term
         @c4.save!
-        @c5 = Course.create!(:account => @account)
+        @c5 = Course.create!(account: @account)
         @c5.complete!
       end
 
@@ -5761,7 +5761,7 @@ describe Course do
         end
 
         it "plays nice with other scopes" do
-          expect(@account.courses.completed.where(:conclude_at => nil)).to eq [@c4]
+          expect(@account.courses.completed.where(conclude_at: nil)).to eq [@c4]
         end
 
         it "is disjoint with #not_completed" do
@@ -5775,7 +5775,7 @@ describe Course do
         end
 
         it "plays nice with other scopes" do
-          expect(@account.courses.not_completed.where(:conclude_at => nil)).to eq [@c1]
+          expect(@account.courses.not_completed.where(conclude_at: nil)).to eq [@c1]
         end
       end
     end
@@ -5783,12 +5783,12 @@ describe Course do
     describe "#by_teachers" do
       before :once do
         account_model
-        @course1a = course_with_teacher(:account => @account, :name => "teacher A's first course").course
+        @course1a = course_with_teacher(account: @account, name: "teacher A's first course").course
         @teacherA = @teacher
-        @course1b = course_with_teacher(:account => @account, :name => "teacher A's second course", :user => @teacherA).course
-        @course2 = course_with_teacher(:account => @account, :name => "teacher B's course").course
+        @course1b = course_with_teacher(account: @account, name: "teacher A's second course", user: @teacherA).course
+        @course2 = course_with_teacher(account: @account, name: "teacher B's course").course
         @teacherB = @teacher
-        @course3 = course_with_teacher(:account => @account, :name => "teacher C's course").course
+        @course3 = course_with_teacher(account: @account, name: "teacher C's course").course
         @teacherC = @teacher
       end
 
@@ -5828,14 +5828,14 @@ describe Course do
     describe "#by_associated_accounts" do
       before :once do
         @root_account = account_model
-        @sub = account_model(:name => 'sub', :parent_account => @root_account, :root_account => @root_account)
-        @subA = account_model(:name => 'subA', :parent_account => @sub1, :root_account => @root_account)
-        @courseA1 = course_model(:account => @subA, :name => 'A1')
-        @courseA2 = course_model(:account => @subA, :name => 'A2')
-        @subB = account_model(:name => 'subB', :parent_account => @sub1, :root_account => @root_account)
-        @courseB = course_model(:account => @subB, :name => 'B')
-        @other_root_account = account_model(:name => 'other')
-        @courseC = course_model(:account => @other_root_account)
+        @sub = account_model(name: 'sub', parent_account: @root_account, root_account: @root_account)
+        @subA = account_model(name: 'subA', parent_account: @sub1, root_account: @root_account)
+        @courseA1 = course_model(account: @subA, name: 'A1')
+        @courseA2 = course_model(account: @subA, name: 'A2')
+        @subB = account_model(name: 'subB', parent_account: @sub1, root_account: @root_account)
+        @courseB = course_model(account: @subB, name: 'B')
+        @other_root_account = account_model(name: 'other')
+        @courseC = course_model(account: @other_root_account)
       end
 
       it "filters courses by root account" do
@@ -5866,7 +5866,7 @@ describe Course do
 
     it 'returns true when the provided user is a student' do
       student = user_model
-      student.student_enrollments.create!(:course => course)
+      student.student_enrollments.create!(course: course)
       expect(course.includes_student?(student)).to be_truthy
     end
 
@@ -5917,15 +5917,15 @@ describe Course do
     end
 
     it 'allows deleted enrollments to be resurrected as active' do
-      course_with_student({ :active_enrollment => true })
+      course_with_student({ active_enrollment: true })
       @enrollment.destroy
-      @enrollment = @course.enroll_user(@user, 'StudentEnrollment', { :enrollment_state => 'active' })
+      @enrollment = @course.enroll_user(@user, 'StudentEnrollment', { enrollment_state: 'active' })
       expect(@enrollment.workflow_state).to eql 'active'
     end
 
     context 'SIS re-enrollments' do
       before :once do
-        course_with_student({ :active_enrollment => true })
+        course_with_student({ active_enrollment: true })
         batch = Account.default.sis_batches.create!
         # Both of these need to be defined, as they're both involved in SIS imports
         # and expected manual enrollment behavior
@@ -5993,28 +5993,28 @@ describe Course do
       end
 
       it "re-uses an enrollment with the same role" do
-        enrollment1 = @course.enroll_user(@user, 'StudentEnrollment', :role => @honor_role)
-        enrollment2 = @course.enroll_user(@user, 'StudentEnrollment', :role => @honor_role)
+        enrollment1 = @course.enroll_user(@user, 'StudentEnrollment', role: @honor_role)
+        enrollment2 = @course.enroll_user(@user, 'StudentEnrollment', role: @honor_role)
         expect(@user.enrollments.count).to eql 1
         expect(enrollment1).to eql enrollment2
       end
 
       it "does not re-use an enrollment with a different role" do
-        enrollment1 = @course.enroll_user(@user, 'StudentEnrollment', :role => @lazy_role)
-        enrollment2 = @course.enroll_user(@user, 'StudentEnrollment', :role => @honor_role)
+        enrollment1 = @course.enroll_user(@user, 'StudentEnrollment', role: @lazy_role)
+        enrollment2 = @course.enroll_user(@user, 'StudentEnrollment', role: @honor_role)
         expect(@user.enrollments.count).to eql 2
         expect(enrollment1).to_not eql enrollment2
       end
 
       it "does not re-use an enrollment with no role when enrolling with a role" do
         enrollment1 = @course.enroll_user(@user, 'StudentEnrollment')
-        enrollment2 = @course.enroll_user(@user, 'StudentEnrollment', :role => @honor_role)
+        enrollment2 = @course.enroll_user(@user, 'StudentEnrollment', role: @honor_role)
         expect(@user.enrollments.count).to eql 2
         expect(enrollment1).to_not eql enrollment2
       end
 
       it "does not re-use an enrollment with a role when enrolling with no role" do
-        enrollment1 = @course.enroll_user(@user, 'StudentEnrollment', :role => @lazy_role)
+        enrollment1 = @course.enroll_user(@user, 'StudentEnrollment', role: @lazy_role)
         enrollment2 = @course.enroll_user(@user, 'StudentEnrollment')
         expect(@user.enrollments.count).to eql 2
         expect(enrollment1).not_to eql enrollment2
@@ -6049,33 +6049,33 @@ describe Course do
 
   describe "re_send_invitations!" do
     before :once do
-      @notification = Notification.create!(:name => 'Enrollment Invitation')
+      @notification = Notification.create!(name: 'Enrollment Invitation')
     end
 
     it "sends invitations" do
       course_factory(active_all: true)
-      user1 = user_with_pseudonym(:active_all => true)
-      user2 = user_with_pseudonym(:active_all => true)
+      user1 = user_with_pseudonym(active_all: true)
+      user2 = user_with_pseudonym(active_all: true)
       @course.enroll_student(user1)
       @course.enroll_student(user2).accept!
 
       dm_count = DelayedMessage.count
-      count1 = DelayedMessage.where(:communication_channel_id => user1.communication_channels.first).count
+      count1 = DelayedMessage.where(communication_channel_id: user1.communication_channels.first).count
       @course.re_send_invitations!(@teacher)
 
       expect(DelayedMessage.count).to eq dm_count + 1
-      expect(DelayedMessage.where(:communication_channel_id => user1.communication_channels.first).count).to eq count1 + 1
+      expect(DelayedMessage.where(communication_channel_id: user1.communication_channels.first).count).to eq count1 + 1
     end
 
     it "respects section restrictions" do
       course_factory(active_all: true)
-      section2 = @course.course_sections.create! :name => 'section2'
-      user1 = user_with_pseudonym(:active_all => true)
-      user2 = user_with_pseudonym(:active_all => true)
-      ta = user_with_pseudonym(:active_all => true)
+      section2 = @course.course_sections.create! name: 'section2'
+      user1 = user_with_pseudonym(active_all: true)
+      user2 = user_with_pseudonym(active_all: true)
+      ta = user_with_pseudonym(active_all: true)
       @course.enroll_student(user1)
-      @course.enroll_student(user2, :section => section2)
-      @course.enroll_ta(ta, :active_all => true, :section => section2, :limit_privileges_to_course_section => true)
+      @course.enroll_student(user2, section: section2)
+      @course.enroll_ta(ta, active_all: true, section: section2, limit_privileges_to_course_section: true)
 
       count1 = user1.communication_channel.delayed_messages.where(notification_id: @notification).count
       count2 = user2.communication_channel.delayed_messages.where(notification_id: @notification).count
@@ -6089,10 +6089,10 @@ describe Course do
 
   describe 'grade weight notification' do
     before :once do
-      course_with_student(:active_all => true)
+      course_with_student(active_all: true)
       communication_channel(@student, { username: 'test@example.com', active_cc: true })
       n = Notification.create!(name: 'Grade Weight Changed', category: 'TestImmediately')
-      NotificationPolicy.create!(:notification => n, :communication_channel => @student.communication_channel, :frequency => "immediately")
+      NotificationPolicy.create!(notification: n, communication_channel: @student.communication_channel, frequency: "immediately")
     end
 
     it "sends a notification when the course scheme changes" do
@@ -6118,8 +6118,8 @@ describe Course do
   describe "visibility_limited_to_course_sections?" do
     before :once do
       course_factory
-      @limited = { :limit_privileges_to_course_section => true }
-      @full = { :limit_privileges_to_course_section => false }
+      @limited = { limit_privileges_to_course_section: true }
+      @full = { limit_privileges_to_course_section: false }
     end
 
     it "is true if all visibilities are limited" do
@@ -6141,16 +6141,16 @@ describe Course do
 
   context '#unpublishable?' do
     it "is not unpublishable if there are active graded submissions" do
-      course_with_teacher(:active_all => true)
-      @student = student_in_course(:active_user => true).user
+      course_with_teacher(active_all: true)
+      @student = student_in_course(active_user: true).user
       expect(@course.unpublishable?).to be_truthy
-      @assignment = @course.assignments.new(:title => "some assignment")
+      @assignment = @course.assignments.new(title: "some assignment")
       @assignment.submission_types = "online_text_entry"
       @assignment.workflow_state = "published"
       @assignment.save
-      @submission = @assignment.submit_homework(@student, :body => 'some message')
+      @submission = @assignment.submit_homework(@student, body: 'some message')
       expect(@course.unpublishable?).to be_truthy
-      @assignment.grade_student(@student, { :grader => @teacher, :grade => 1 })
+      @assignment.grade_student(@student, { grader: @teacher, grade: 1 })
       expect(@course.unpublishable?).to be_falsey
       @assignment.destroy
       expect(@course.unpublishable?).to be_truthy
@@ -6159,7 +6159,7 @@ describe Course do
 
   describe "#multiple_sections?" do
     before :once do
-      course_with_teacher(:active_all => true)
+      course_with_teacher(active_all: true)
     end
 
     it "returns false for a class with one section" do
@@ -6265,7 +6265,7 @@ describe Course do
       shared_examples 'inherited setting should inherit' do
         before do
           account_model
-          course_factory(:account => @account)
+          course_factory(account: @account)
         end
 
         def set_value(value)
@@ -6279,7 +6279,7 @@ describe Course do
         it "inherits account values by default" do
           expect(calculated_value).to be_falsey
 
-          @account.settings[setting] = { :locked => false, :value => true }
+          @account.settings[setting] = { locked: false, value: true }
           @account.save!
 
           expect(calculated_value).to be_truthy
@@ -6291,7 +6291,7 @@ describe Course do
         end
 
         it "is overridden by locked values from the account" do
-          @account.settings[setting] = { :locked => true, :value => true }
+          @account.settings[setting] = { locked: true, value: true }
           @account.save!
 
           expect(calculated_value).to be_truthy
@@ -6342,9 +6342,9 @@ describe Course do
   describe '#favorite_for_user?' do
     before :once do
       @courses = []
-      @courses << course_with_student(:active_all => true, :course_name => "Course 0").course
-      @courses << course_with_student(:course_name => "Course 1", :user => @user, :active_all => true).course
-      @user.favorites.build(:context => @courses[0])
+      @courses << course_with_student(active_all: true, course_name: "Course 0").course
+      @courses << course_with_student(course_name: "Course 1", user: @user, active_all: true).course
+      @user.favorites.build(context: @courses[0])
       @user.save
     end
 
@@ -6405,10 +6405,10 @@ describe Course do
     context "with section specific discussions" do
       before :once do
         @other_section = @course.course_sections.create!
-        @other_section_student = user_factory(:active_all => true)
-        @course.enroll_user(@other_section_student, "StudentEnrollment", :section => @other_section, :enrollment_state => "active")
-        @topic = @course.discussion_topics.create!(:course_sections => [@other_section], :is_section_specific => true)
-        @topic_tag = @module.add_item(:type => 'discussion_topic', :id => @topic.id)
+        @other_section_student = user_factory(active_all: true)
+        @course.enroll_user(@other_section_student, "StudentEnrollment", section: @other_section, enrollment_state: "active")
+        @topic = @course.discussion_topics.create!(course_sections: [@other_section], is_section_specific: true)
+        @topic_tag = @module.add_item(type: 'discussion_topic', id: @topic.id)
       end
 
       it "shows to student in section" do
@@ -6442,7 +6442,7 @@ describe Course do
 
   describe '#update_enrolled_users' do
     it "updates user associations when deleted" do
-      course_with_student(:active_all => true)
+      course_with_student(active_all: true)
       expect(@user.associated_accounts).to be_present
       @course.destroy
       @user.reload
@@ -6452,7 +6452,7 @@ describe Course do
 
   describe "#apply_nickname_for!" do
     before(:once) do
-      @course = Course.create! :name => 'some terrible name'
+      @course = Course.create! name: 'some terrible name'
       @user = User.create!
       @user.set_preference(:course_nicknames, @course.id, 'nickname')
     end
@@ -6530,16 +6530,16 @@ describe Course do
   describe "#filter_users_by_permission" do
     it "filters out course users that don't have a permission based on their enrollment roles" do
       permission = :moderate_forum # happens to be true for ta's, but available to students
-      super_student_role = custom_student_role("superstudent", :account => Account.default)
-      Account.default.role_overrides.create!(:role => super_student_role, :permission => permission, :enabled => true)
-      unsuper_ta_role = custom_ta_role("unsuperta", :account => Account.default)
-      Account.default.role_overrides.create!(:role => unsuper_ta_role, :permission => permission, :enabled => false)
+      super_student_role = custom_student_role("superstudent", account: Account.default)
+      Account.default.role_overrides.create!(role: super_student_role, permission: permission, enabled: true)
+      unsuper_ta_role = custom_ta_role("unsuperta", account: Account.default)
+      Account.default.role_overrides.create!(role: unsuper_ta_role, permission: permission, enabled: false)
 
       course_factory(active_all: true)
-      reg_student = student_in_course(:course => @course).user
-      super_student = student_in_course(:course => @course, :role => super_student_role).user
-      reg_ta = ta_in_course(:course => @course).user
-      unsuper_ta = ta_in_course(:course => @course, :role => unsuper_ta_role).user
+      reg_student = student_in_course(course: @course).user
+      super_student = student_in_course(course: @course, role: super_student_role).user
+      reg_ta = ta_in_course(course: @course).user
+      unsuper_ta = ta_in_course(course: @course, role: unsuper_ta_role).user
 
       users = [reg_student, super_student, reg_ta, unsuper_ta]
       expect(@course.filter_users_by_permission(users, :read_forum)).to eq users # should be on by default for all
@@ -6716,13 +6716,13 @@ describe Course do
 
       it "clears if an account user is added to the user" do
         cached_account_users
-        au = AccountUser.create!(:account => Account.default, :user => @user)
+        au = AccountUser.create!(account: Account.default, user: @user)
         expect(cached_account_users).to eq [au]
       end
 
       it "clears if the course is moved to another account" do
         sub_account = Account.default.sub_accounts.create!
-        au = AccountUser.create!(:account => sub_account, :user => @user)
+        au = AccountUser.create!(account: sub_account, user: @user)
         expect(cached_account_users).to eq []
         @course.update_attribute(:account, sub_account)
         expect(cached_account_users).to eq [au]
@@ -6730,7 +6730,7 @@ describe Course do
 
       it "clears if the sub_account is moved" do
         sub_account1 = Account.default.sub_accounts.create!
-        au = AccountUser.create!(:account => sub_account1, :user => @user)
+        au = AccountUser.create!(account: sub_account1, user: @user)
 
         sub_account2 = Account.default.sub_accounts.create!
         @course.update_attribute(:account, sub_account2)

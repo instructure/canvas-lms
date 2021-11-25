@@ -25,7 +25,7 @@ describe LiveAssessments::AssessmentsController, type: :request do
   let_once(:teacher) { assessment_course.teachers.first }
   let_once(:student) { course_with_student(course: assessment_course).user }
   let_once(:outcome) do
-    outcome = assessment_course.created_learning_outcomes.create!(:description => 'this is a test outcome', :short_description => 'test outcome')
+    outcome = assessment_course.created_learning_outcomes.create!(description: 'this is a test outcome', short_description: 'test outcome')
     assessment_course.root_outcome_group.add_outcome(outcome)
     assessment_course.root_outcome_group.save!
     assessment_course.reload

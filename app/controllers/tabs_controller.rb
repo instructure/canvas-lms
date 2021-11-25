@@ -107,7 +107,7 @@ class TabsController < ApplicationController
   #     ]
   def index
     if authorized_action(@context, @current_user, :read)
-      render :json => tabs_available_json(@context, @current_user, session)
+      render json: tabs_available_json(@context, @current_user, session)
     end
   end
 

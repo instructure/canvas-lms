@@ -21,11 +21,11 @@
 describe AssetUserAccess do
   describe "with course context" do
     before :once do
-      @course = Account.default.courses.create!(:name => 'My Course')
-      @assignment = @course.assignments.create!(:title => 'My Assignment')
+      @course = Account.default.courses.create!(name: 'My Course')
+      @assignment = @course.assignments.create!(title: 'My Assignment')
       @user = User.create!
 
-      @asset = factory_with_protected_attributes(AssetUserAccess, :user => @user, :context => @course, :asset_code => @assignment.asset_string)
+      @asset = factory_with_protected_attributes(AssetUserAccess, user: @user, context: @course, asset_code: @assignment.asset_string)
       @asset.display_name = @assignment.asset_string
       @asset.save!
     end
@@ -111,9 +111,9 @@ describe AssetUserAccess do
 
     describe '#icon' do
       it 'works for quizzes' do
-        quiz = @course.quizzes.create!(:title => 'My Quiz')
+        quiz = @course.quizzes.create!(title: 'My Quiz')
 
-        asset = factory_with_protected_attributes(AssetUserAccess, :user => @user, :context => @course, :asset_code => quiz.asset_string)
+        asset = factory_with_protected_attributes(AssetUserAccess, user: @user, context: @course, asset_code: quiz.asset_string)
         asset.log(@course, { category: 'quizzes' })
         asset.save!
 
@@ -130,11 +130,11 @@ describe AssetUserAccess do
 
   describe "with user context" do
     before :once do
-      @course = Account.default.courses.create!(:name => 'My Course')
-      @assignment = @course.assignments.create!(:title => 'My Assignment')
+      @course = Account.default.courses.create!(name: 'My Course')
+      @assignment = @course.assignments.create!(title: 'My Assignment')
       @user = User.create!
 
-      @asset = factory_with_protected_attributes(AssetUserAccess, :user => @user, :context => @user, :asset_code => @assignment.asset_string)
+      @asset = factory_with_protected_attributes(AssetUserAccess, user: @user, context: @user, asset_code: @assignment.asset_string)
       @asset.display_name = @assignment.asset_string
       @asset.save!
     end
@@ -339,7 +339,7 @@ describe AssetUserAccess do
     end
 
     describe 'interally set or calculated attribute values' do
-      before { access.log context, { :level => 'view' } }
+      before { access.log context, { level: 'view' } }
 
       describe '#context' do
         subject { super().context }
@@ -374,25 +374,25 @@ describe AssetUserAccess do
 
     describe 'setting root account id' do
       before :once do
-        @course = Account.default.courses.create!(:name => 'My Course')
+        @course = Account.default.courses.create!(name: 'My Course')
         @user = User.create!
       end
 
       it "loads root account id from context" do
-        assignment = @course.assignments.create!(:title => 'My Assignment2')
+        assignment = @course.assignments.create!(title: 'My Assignment2')
         AssetUserAccess.log @user, @course, { level: 'view', code: assignment.asset_string }
         expect(AssetUserAccess.last.root_account_id).to eq(@course.root_account_id)
       end
 
       it "loads root account id from asset_for_root_account_id when context is a User" do
-        assignment = @course.assignments.create!(:title => 'My Assignment2')
+        assignment = @course.assignments.create!(title: 'My Assignment2')
         AssetUserAccess.log @user, @user, { level: 'view', code: assignment.asset_string, asset_for_root_account_id: assignment }
         expect(AssetUserAccess.last.root_account_id).to eq(@course.root_account_id)
       end
 
       it "loads root account id from asset_for_root_account_id when context is a User and asset has a resolved_root_account_id but not a root_account_id" do
         # Not sure if this really ever happens but handle it on the safe side
-        @course.assignments.create!(:title => 'My Assignment2')
+        @course.assignments.create!(title: 'My Assignment2')
         AssetUserAccess.log @user, @user, { level: 'view', code: @user.asset_string, asset_for_root_account_id: @course.root_account }
         expect(AssetUserAccess.last.root_account_id).to eq(@course.root_account_id)
       end

@@ -21,7 +21,7 @@
 describe OutcomeResultsController do
   def context_outcome(context)
     @outcome_group = context.root_outcome_group
-    @outcome = context.created_learning_outcomes.create!(:title => 'outcome')
+    @outcome = context.created_learning_outcomes.create!(title: 'outcome')
     @outcome_group.add_outcome(@outcome)
   end
 
@@ -109,7 +109,7 @@ describe OutcomeResultsController do
       assessor: outcome_teacher,
       artifact: submission,
       assessment: {
-        assessment_type: 'grading',
+        :assessment_type => 'grading',
         "criterion_#{criterion[:id]}".to_sym => {
           points: points
         }
@@ -157,15 +157,15 @@ describe OutcomeResultsController do
     it "does not have a false failure if an outcome exists in two places within the same context" do
       user_session(@teacher)
       outcome_group = @course.root_outcome_group.child_outcome_groups.build(
-        :title => "Child outcome group", :context => @course
+        title: "Child outcome group", context: @course
       )
       outcome_group.save!
       outcome_group.add_outcome(@outcome)
-      get 'rollups', params: { :context_id => @course.id,
-                               :course_id => @course.id,
-                               :context_type => "Course",
-                               :user_ids => [@student.id],
-                               :outcome_ids => [@outcome.id] },
+      get 'rollups', params: { context_id: @course.id,
+                               course_id: @course.id,
+                               context_type: "Course",
+                               user_ids: [@student.id],
+                               outcome_ids: [@outcome.id] },
                      format: "json"
       expect(response).to be_successful
     end
@@ -189,9 +189,9 @@ describe OutcomeResultsController do
 
     it 'validates aggregate_stat parameter' do
       user_session(@teacher)
-      get 'rollups', params: { :context_id => @course.id,
-                               :course_id => @course.id,
-                               :context_type => "Course",
+      get 'rollups', params: { context_id: @course.id,
+                               course_id: @course.id,
+                               context_type: "Course",
                                aggregate: 'course',
                                aggregate_stat: 'powerlaw' },
                      format: "json"
@@ -205,11 +205,11 @@ describe OutcomeResultsController do
 
       it 'teacher should see result' do
         user_session(@teacher)
-        get 'index', params: { :context_id => @course.id,
-                               :course_id => @course.id,
-                               :context_type => "Course",
-                               :user_ids => [@student.id],
-                               :outcome_ids => [@outcome.id] },
+        get 'index', params: { context_id: @course.id,
+                               course_id: @course.id,
+                               context_type: "Course",
+                               user_ids: [@student.id],
+                               outcome_ids: [@outcome.id] },
                      format: "json"
         json = JSON.parse(response.body)
         expect(json['outcome_results'].length).to eq 1
@@ -217,11 +217,11 @@ describe OutcomeResultsController do
 
       it 'student should not see result' do
         user_session(@student)
-        get 'index', params: { :context_id => @course.id,
-                               :course_id => @course.id,
-                               :context_type => "Course",
-                               :user_ids => [@student.id],
-                               :outcome_ids => [@outcome.id] },
+        get 'index', params: { context_id: @course.id,
+                               course_id: @course.id,
+                               context_type: "Course",
+                               user_ids: [@student.id],
+                               outcome_ids: [@outcome.id] },
                      format: "json"
         json = parse_response(response)
         expect(json['outcome_results'].length).to eq 0
@@ -235,11 +235,11 @@ describe OutcomeResultsController do
 
       it 'teacher should see result' do
         user_session(@teacher)
-        get 'index', params: { :context_id => @course.id,
-                               :course_id => @course.id,
-                               :context_type => "Course",
-                               :user_ids => [@student.id],
-                               :outcome_ids => [@outcome.id] },
+        get 'index', params: { context_id: @course.id,
+                               course_id: @course.id,
+                               context_type: "Course",
+                               user_ids: [@student.id],
+                               outcome_ids: [@outcome.id] },
                      format: "json"
         json = JSON.parse(response.body)
         expect(json['outcome_results'].length).to eq 1
@@ -247,11 +247,11 @@ describe OutcomeResultsController do
 
       it 'student should see result' do
         user_session(@student)
-        get 'index', params: { :context_id => @course.id,
-                               :course_id => @course.id,
-                               :context_type => "Course",
-                               :user_ids => [@student.id],
-                               :outcome_ids => [@outcome.id] },
+        get 'index', params: { context_id: @course.id,
+                               course_id: @course.id,
+                               context_type: "Course",
+                               user_ids: [@student.id],
+                               outcome_ids: [@outcome.id] },
                      format: "json"
         json = parse_response(response)
         expect(json['outcome_results'].length).to eq 1
@@ -264,11 +264,11 @@ describe OutcomeResultsController do
       student1 = @student
       # create a 2nd student that is saved as @student
       student_in_course(active_all: true, course: outcome_course)
-      get 'rollups', params: { :context_id => @course.id,
-                               :course_id => @course.id,
-                               :context_type => "Course",
-                               :user_ids => [student1.id, @student.id],
-                               :outcome_ids => [@outcome.id],
+      get 'rollups', params: { context_id: @course.id,
+                               course_id: @course.id,
+                               context_type: "Course",
+                               user_ids: [student1.id, @student.id],
+                               outcome_ids: [@outcome.id],
                                exclude: ['missing_user_rollups'] },
                      format: "json"
       json = parse_response(response)
@@ -297,9 +297,9 @@ describe OutcomeResultsController do
 
     def get_rollups(params)
       get 'rollups', params: {
-        :context_id => @course.id,
-        :course_id => @course.id,
-        :context_type => "Course",
+        context_id: @course.id,
+        course_id: @course.id,
+        context_type: "Course",
         **params
       },
                      format: "json"
@@ -317,7 +317,7 @@ describe OutcomeResultsController do
         end
 
         it 'uses the default outcome proficiency for points scaling if no outcome proficiency exists' do
-          create_result(@student.id, @outcome, outcome_assignment, 2, { :possible => 5 })
+          create_result(@student.id, @outcome, outcome_assignment, 2, { possible: 5 })
           json = parse_response(get_rollups(sort_by: 'student', sort_order: 'desc', per_page: 1, page: 1))
           points_possible = OutcomeProficiency.find_or_create_default!(@course.account).points_possible
           score = (2.to_f / 5.to_f) * points_possible
@@ -326,7 +326,7 @@ describe OutcomeResultsController do
 
         it 'uses resolved_outcome_proficiency for points scaling if one exists' do
           proficiency = outcome_proficiency_model(@course)
-          create_result(@student.id, @outcome, outcome_assignment, 2, { :possible => 5 })
+          create_result(@student.id, @outcome, outcome_assignment, 2, { possible: 5 })
           json = parse_response(get_rollups(sort_by: 'student', sort_order: 'desc', per_page: 1, page: 1))
           score = (2.to_f / 5.to_f) * proficiency.points_possible
           expect(json['rollups'][0]['scores'][0]['score']).to eq score
@@ -348,7 +348,7 @@ describe OutcomeResultsController do
 
         it 'ignores the outcome proficiency for points scaling' do
           outcome_proficiency_model(@course)
-          create_result(@student.id, @outcome, outcome_assignment, 2, { :possible => 5 })
+          create_result(@student.id, @outcome, outcome_assignment, 2, { possible: 5 })
           json = parse_response(get_rollups(sort_by: 'student', sort_order: 'desc', per_page: 1, page: 1))
           expect(json['rollups'][0]['scores'][0]['score']).to eq 1.2 # ( score of 2 / possible 5) * outcome.points_possible
         end
@@ -367,7 +367,7 @@ describe OutcomeResultsController do
         end
 
         it 'returns outcomes with friendlly_description' do
-          create_result(@student.id, @outcome, outcome_assignment, 2, { :possible => 5 })
+          create_result(@student.id, @outcome, outcome_assignment, 2, { possible: 5 })
           json = parse_response(get_rollups(include: ['outcomes']))
           expect(json['linked']['outcomes'][0]['friendly_description']).to eq 'A friendly description'
         end
@@ -379,7 +379,7 @@ describe OutcomeResultsController do
         end
 
         it 'returns outcomes without friendlly_description' do
-          create_result(@student.id, @outcome, outcome_assignment, 2, { :possible => 5 })
+          create_result(@student.id, @outcome, outcome_assignment, 2, { possible: 5 })
           json = parse_response(get_rollups(include: ['outcomes']))
           expect(json['linked']['outcomes'][0]['friendly_description']).to be_nil
         end
@@ -392,7 +392,7 @@ describe OutcomeResultsController do
         end
 
         it 'returns outcomes without friendlly_description' do
-          create_result(@student.id, @outcome, outcome_assignment, 2, { :possible => 5 })
+          create_result(@student.id, @outcome, outcome_assignment, 2, { possible: 5 })
           json = parse_response(get_rollups(include: ['outcomes']))
           expect(json['linked']['outcomes'][0]['friendly_description']).to be_nil
         end
@@ -595,7 +595,7 @@ describe OutcomeResultsController do
             student_in_section @section1, user: @student1, allow_multiple_enrollments: false
             student_in_section @section2, user: @student2, allow_multiple_enrollments: false
             student_in_section @section3, user: @student3, allow_multiple_enrollments: false
-            @teacher = teacher_in_section(@section2, :limit_privileges_to_course_section => true)
+            @teacher = teacher_in_section(@section2, limit_privileges_to_course_section: true)
             user_session(@teacher)
           end
 

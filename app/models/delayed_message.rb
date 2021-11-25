@@ -40,7 +40,7 @@ class DelayedMessage < ActiveRecord::Base
     ]
   belongs_to :communication_channel
 
-  validates :summary, length: { :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true }
+  validates :summary, length: { maximum: maximum_text_length, allow_nil: true, allow_blank: true }
   validates :link, length: { maximum: maximum_text_length, allow_blank: true }
   validates :communication_channel_id, :workflow_state, presence: true
 
@@ -57,30 +57,30 @@ class DelayedMessage < ActiveRecord::Base
   scope :for, lambda { |context|
     case context
     when :daily
-      where(:frequency => 'daily')
+      where(frequency: 'daily')
     when :weekly
-      where(:frequency => 'weekly')
+      where(frequency: 'weekly')
     when Notification
-      where(:notification_id => context)
+      where(notification_id: context)
     when NotificationPolicy
-      where(:notification_policy_id => context)
+      where(notification_policy_id: context)
     when CommunicationChannel
-      where(:communication_channel_id => context)
+      where(communication_channel_id: context)
     else
-      where(:context_id => context, :context_type => context.class.base_class.to_s)
+      where(context_id: context, context_type: context.class.base_class.to_s)
     end
   }
 
-  scope :in_state, ->(state) { where(:workflow_state => state.to_s) }
+  scope :in_state, ->(state) { where(workflow_state: state.to_s) }
 
   include Workflow
 
   workflow do
     state :pending do
-      event :begin_send, :transitions_to => :sent do
+      event :begin_send, transitions_to: :sent do
         self.batched_at = Time.now
       end
-      event :cancel, :transitions_to => :cancelled
+      event :cancel, transitions_to: :cancelled
     end
 
     state :cancelled
@@ -119,12 +119,12 @@ class DelayedMessage < ActiveRecord::Base
     locale = user.locale || (root_account_id && Account.where(id: root_account_id).first.try(:default_locale))
     I18n.with_locale(locale) do
       message = to.messages.build(
-        :subject => notification.subject,
-        :to => to.path,
-        :notification_name => notification.name,
-        :notification => notification,
-        :from => path,
-        :user => user
+        subject: notification.subject,
+        to: to.path,
+        notification_name: notification.name,
+        notification: notification,
+        from: path,
+        user: user
       )
       message.delayed_messages = delayed_messages
       message.context = context
@@ -156,7 +156,7 @@ class DelayedMessage < ActiveRecord::Base
       # defaulting to mountain. (Should be impossible to not find mountain, but
       # default to system time if necessary.)
       time_zone = communication_channel.user.time_zone || ActiveSupport::TimeZone['America/Denver'] || Time.zone
-      target = time_zone.now.change(:hour => 18)
+      target = time_zone.now.change(hour: 18)
       target += 1.day if target < time_zone.now
     end
 

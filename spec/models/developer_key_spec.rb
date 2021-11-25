@@ -890,16 +890,16 @@ describe DeveloperKey do
   it "returns the correct count of access_tokens" do
     expect(developer_key_saved.access_token_count).to eq 0
 
-    AccessToken.create!(:user => user_model, :developer_key => developer_key_saved)
-    AccessToken.create!(:user => user_model, :developer_key => developer_key_saved)
-    AccessToken.create!(:user => user_model, :developer_key => developer_key_saved)
+    AccessToken.create!(user: user_model, developer_key: developer_key_saved)
+    AccessToken.create!(user: user_model, developer_key: developer_key_saved)
+    AccessToken.create!(user: user_model, developer_key: developer_key_saved)
 
     expect(developer_key_saved.access_token_count).to eq 3
   end
 
   it "returns the last_used_at value for a key" do
     expect(developer_key_saved.last_used_at).to be_nil
-    at = AccessToken.create!(:user => user_model, :developer_key => developer_key_saved)
+    at = AccessToken.create!(user: user_model, developer_key: developer_key_saved)
     at.used!
     expect(developer_key_saved.last_used_at).not_to be_nil
   end
@@ -1030,7 +1030,7 @@ describe DeveloperKey do
         @account = Account.create!
 
         @not_sub_account = Account.create!
-        @key = DeveloperKey.create!(:redirect_uri => "http://example.com/a/b", account: @account)
+        @key = DeveloperKey.create!(redirect_uri: "http://example.com/a/b", account: @account)
         enable_developer_key_account_binding!(@key)
       end
 
@@ -1064,7 +1064,7 @@ describe DeveloperKey do
         @account = Account.create!
 
         @not_sub_account = Account.create!
-        @key = DeveloperKey.create!(:redirect_uri => "http://example.com/a/b", account: @account)
+        @key = DeveloperKey.create!(redirect_uri: "http://example.com/a/b", account: @account)
         enable_developer_key_account_binding!(@key)
       end
 

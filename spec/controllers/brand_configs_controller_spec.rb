@@ -69,7 +69,7 @@ describe BrandConfigsController do
       @account.settings = { global_includes: true, sub_account_includes: true }
       @account.save!
 
-      @subaccount = Account.create!(:parent_account => @account)
+      @subaccount = Account.create!(parent_account: @account)
       @sub_bc = BrandConfig.create(variables: { "ic-brand-global-nav-bgd" => "#123" }, parent_md5: @bc.md5)
       @subaccount.brand_config_md5 = @sub_bc.md5
       @subaccount.save!

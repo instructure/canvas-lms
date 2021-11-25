@@ -44,11 +44,11 @@ module IncomingMail
 
         Rails.cache.fetch(['incoming_mail_reply_from', context, incoming_message.message_id].cache_key, expires_in: 7.days) do
           context.reply_from({
-                               :purpose => 'general',
-                               :user => user,
-                               :subject => IncomingMailProcessor::IncomingMessageProcessor.utf8ify(incoming_message.subject, incoming_message.header[:subject].try(:charset)),
-                               :html => html_body,
-                               :text => body
+                               purpose: 'general',
+                               user: user,
+                               subject: IncomingMailProcessor::IncomingMessageProcessor.utf8ify(incoming_message.subject, incoming_message.header[:subject].try(:charset)),
+                               html: html_body,
+                               text: body
                              })
           true
         end
@@ -68,14 +68,14 @@ module IncomingMail
 
       ndr_subject, ndr_body = bounce_message_strings(incoming_subject, error)
       outgoing_message = Message.new({
-                                       :to => incoming_from,
-                                       :from => outgoing_from_address,
-                                       :subject => ndr_subject,
-                                       :body => ndr_body,
-                                       :delay_for => 0,
-                                       :context => nil,
-                                       :path_type => 'email',
-                                       :from_name => "Instructure",
+                                       to: incoming_from,
+                                       from: outgoing_from_address,
+                                       subject: ndr_subject,
+                                       body: ndr_body,
+                                       delay_for: 0,
+                                       context: nil,
+                                       path_type: 'email',
+                                       from_name: "Instructure",
                                      })
 
       outgoing_message_delivered = false
@@ -105,28 +105,28 @@ module IncomingMail
       ndr_subject = I18n.t("Undelivered message")
       ndr_body = case error
                  when IncomingMail::Errors::ReplyToDeletedDiscussion
-                   I18n.t(<<~TEXT, :subject => subject).gsub(/^ +/, '')
+                   I18n.t(<<~TEXT, subject: subject).gsub(/^ +/, '')
                      The message titled "%{subject}" could not be delivered because the discussion topic has been deleted. If you are trying to contact someone through Canvas you can try logging in to your account and sending them a message using the Inbox tool.
 
                      Thank you,
                      Canvas Support
                    TEXT
                  when IncomingMail::Errors::ReplyToLockedTopic
-                   I18n.t('lib.incoming_message_processor.locked_topic.body', <<~TEXT, :subject => subject).gsub(/^ +/, '')
+                   I18n.t('lib.incoming_message_processor.locked_topic.body', <<~TEXT, subject: subject).gsub(/^ +/, '')
                      The message titled "%{subject}" could not be delivered because the discussion topic is locked. If you are trying to contact someone through Canvas you can try logging in to your account and sending them a message using the Inbox tool.
 
                      Thank you,
                      Canvas Support
                    TEXT
                  when IncomingMail::Errors::UnknownSender
-                   I18n.t(<<~TEXT, :subject => subject, :link => I18n.t(:"community.guides_home")).gsub(/^ +/, '')
+                   I18n.t(<<~TEXT, subject: subject, link: I18n.t(:"community.guides_home")).gsub(/^ +/, '')
                      The message you sent with the subject line "%{subject}" was not delivered. To reply to Canvas messages from this email, it must first be a confirmed communication channel in your Canvas profile. Please visit your profile and resend the confirmation email for this email address. You may also contact this person via the Canvas Inbox. For help, please see the Inbox chapter for your user role in the Canvas Guides. [See %{link}].
 
                      Thank you,
                      Canvas Support
                    TEXT
                  else # including IncomingMessageProcessor::UnknownAddressError
-                   I18n.t('lib.incoming_message_processor.failure_message.body', <<~TEXT, :subject => subject).gsub(/^ +/, '')
+                   I18n.t('lib.incoming_message_processor.failure_message.body', <<~TEXT, subject: subject).gsub(/^ +/, '')
                      The message titled "%{subject}" could not be delivered.  The message was sent to an unknown mailbox address.  If you are trying to contact someone through Canvas you can try logging in to your account and sending them a message using the Inbox tool.
 
                      Thank you,

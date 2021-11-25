@@ -21,8 +21,8 @@ require_relative '../api_spec_helper'
 
 describe MediaObjectsController, type: :request do
   before :once do
-    course_with_teacher(:active_all => true)
-    student_in_course(:active_all => true)
+    course_with_teacher(active_all: true)
+    student_in_course(active_all: true)
   end
 
   describe "POST '/api/v1/media_objects'" do
@@ -33,7 +33,7 @@ describe MediaObjectsController, type: :request do
     end
 
     it "matches the create_media_object api route" do
-      assert_recognizes({ :controller => 'media_objects', :action => 'create_media_object', 'format' => 'json' }, { :path => 'api/v1/media_objects', :method => :post })
+      assert_recognizes({ :controller => 'media_objects', :action => 'create_media_object', 'format' => 'json' }, { path: 'api/v1/media_objects', method: :post })
     end
 
     it "creates the object if it doesn't already exist" do
@@ -41,10 +41,10 @@ describe MediaObjectsController, type: :request do
       allow_any_instance_of(MediaObject).to receive(:media_sources).and_return("stub")
 
       json = api_call(:post, "/api/v1/media_objects",
-                      { :controller => 'media_objects', :action => 'create_media_object', :format => 'json', :context_code => "user_#{@user.id}",
-                        :id => "new_object",
-                        :type => "audio",
-                        :title => "title" })
+                      { controller: 'media_objects', action: 'create_media_object', format: 'json', context_code: "user_#{@user.id}",
+                        id: "new_object",
+                        type: "audio",
+                        title: "title" })
       @user.reload
       expect(@user.media_objects.count).to eq @original_count + 1
       @media_object = @user.media_objects.last

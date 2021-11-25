@@ -19,13 +19,13 @@
 #
 
 class SelfEnrollmentsController < ApplicationController
-  before_action :infer_signup_info, :only => [:new]
+  before_action :infer_signup_info, only: [:new]
 
   include Api::V1::Course
 
   def new
     @domain_root_account.reload
-    js_env :PASSWORD_POLICY => @domain_root_account.password_policy
+    js_env PASSWORD_POLICY: @domain_root_account.password_policy
     @login_label_name = t("email")
     @include_recaptcha = recaptcha_enabled?
 
@@ -41,7 +41,7 @@ class SelfEnrollmentsController < ApplicationController
     end
 
     # Needed for recaptcha info
-    js_env :ACCOUNT => account_json(@domain_root_account, nil, session, ['registration_settings'])
+    js_env ACCOUNT: account_json(@domain_root_account, nil, session, ['registration_settings'])
   end
 
   private

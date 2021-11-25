@@ -35,7 +35,7 @@ module Lti
     end
 
     let(:assignment) do
-      a = course.assignments.new(:title => "some assignment")
+      a = course.assignments.new(title: "some assignment")
       a.workflow_state = "published"
       a.tool_settings_tool = message_handler
       a.save!

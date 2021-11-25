@@ -10,7 +10,7 @@ begin
   DOC_OPTIONS = {
     # turning this on will show all the appendixes of all
     # controllers in the All Resources page
-    :all_resource_appendixes => false
+    all_resource_appendixes: false
   }.freeze
 
   namespace :doc do

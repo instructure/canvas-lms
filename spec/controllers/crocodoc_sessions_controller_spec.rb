@@ -21,12 +21,12 @@
 describe CrocodocSessionsController do
   before :once do
     Setting.set 'crocodoc_counter', 0
-    PluginSetting.create! :name => 'crocodoc',
-                          :settings => { :api_key => "blahblahblahblahblah" }
+    PluginSetting.create! name: 'crocodoc',
+                          settings: { api_key: "blahblahblahblahblah" }
     @student_pseudonym = @pseudonym
-    course_with_teacher(:active_all => true)
-    student_in_course(:active_all => true)
-    attachment_model :content_type => 'application/pdf', :context => @student
+    course_with_teacher(active_all: true)
+    student_in_course(active_all: true)
+    attachment_model content_type: 'application/pdf', context: @student
     @blob = { attachment_id: @attachment.global_id,
               user_id: @student.global_id,
               type: "crocodoc" }.to_json
@@ -115,8 +115,8 @@ describe CrocodocSessionsController do
       allow(Canvadocs).to receive(:hijack_crocodoc_sessions?).and_return false
 
       allow_any_instance_of(Canvadocs::API).to receive(:session).and_return 'id' => 'SESSION'
-      PluginSetting.create! :name => 'canvadocs',
-                            :settings => { "base_url" => "https://canvadocs.instructure.docker" }
+      PluginSetting.create! name: 'canvadocs',
+                            settings: { "base_url" => "https://canvadocs.instructure.docker" }
     end
 
     it "redirects to a canvadocs session instead of crocodoc when enabled" do

@@ -20,7 +20,7 @@
 
 describe ContentExport do
   before :once do
-    course_with_teacher(:active_all => true)
+    course_with_teacher(active_all: true)
     @ce = @course.content_exports.create!
   end
 
@@ -36,7 +36,7 @@ describe ContentExport do
     end
 
     it "returns true for everything if 'everything' is selected" do
-      @ce.selected_content = { :everything => "1" }
+      @ce.selected_content = { everything: "1" }
       expect(@ce.export_object?(@ce)).to eq true
     end
 
@@ -45,30 +45,30 @@ describe ContentExport do
     end
 
     it "returns true for all object types if the all_ option is true" do
-      @ce.selected_content = { :all_content_exports => "1" }
+      @ce.selected_content = { all_content_exports: "1" }
       expect(@ce.export_object?(@ce)).to eq true
     end
 
     it "returns false for objects not selected" do
       @ce.save!
-      @ce.selected_content = { :all_content_exports => "0" }
+      @ce.selected_content = { all_content_exports: "0" }
       expect(@ce.export_object?(@ce)).to eq false
-      @ce.selected_content = { :content_exports => {} }
+      @ce.selected_content = { content_exports: {} }
       expect(@ce.export_object?(@ce)).to eq false
-      @ce.selected_content = { :content_exports => { CC::CCHelper.create_key(@ce) => "0" } }
+      @ce.selected_content = { content_exports: { CC::CCHelper.create_key(@ce) => "0" } }
       expect(@ce.export_object?(@ce)).to eq false
     end
 
     it "returns true for selected objects" do
       @ce.save!
-      @ce.selected_content = { :content_exports => { CC::CCHelper.create_key(@ce) => "1" } }
+      @ce.selected_content = { content_exports: { CC::CCHelper.create_key(@ce) => "1" } }
       expect(@ce.export_object?(@ce)).to eq true
     end
   end
 
   context "Quizzes2 Export" do
     before :once do
-      quiz = @course.quizzes.create!(:title => 'quiz1')
+      quiz = @course.quizzes.create!(title: 'quiz1')
       Account.default.context_external_tools.create!(
         name: 'Quizzes.Next',
         consumer_key: 'test_key',
@@ -77,9 +77,9 @@ describe ContentExport do
         url: 'http://example.com/launch'
       )
       @ce = @course.content_exports.create!(
-        :export_type => ContentExport::QUIZZES2,
-        :selected_content => quiz.id,
-        :user => @user
+        export_type: ContentExport::QUIZZES2,
+        selected_content: quiz.id,
+        user: @user
       )
       @course.root_account.settings[:provision] = { 'lti' => 'lti url' }
       @course.root_account.save!
@@ -212,7 +212,7 @@ describe ContentExport do
       @ce.add_item_to_export("hi")
       expect(@ce.selected_content).to be_empty
 
-      @ce.selected_content = { :assignments => nil }
+      @ce.selected_content = { assignments: nil }
       @ce.save!
 
       assignment_model
@@ -225,7 +225,7 @@ describe ContentExport do
       @ce.add_item_to_export(@assignment)
       expect(@ce.selected_content).to be_empty
 
-      @ce.selected_content = { :everything => 1 }
+      @ce.selected_content = { everything: 1 }
       @ce.save!
 
       @ce.add_item_to_export(@assignment)
@@ -236,8 +236,8 @@ describe ContentExport do
   context "notifications" do
     before :once do
       @ce.update_attribute(:user_id, @user.id)
-      Notification.create!(:name => 'Content Export Finished', :category => 'Migration')
-      Notification.create!(:name => 'Content Export Failed', :category => 'Migration')
+      Notification.create!(name: 'Content Export Finished', category: 'Migration')
+      Notification.create!(name: 'Content Export Failed', category: 'Migration')
     end
 
     it "sends notifications immediately" do
@@ -260,7 +260,7 @@ describe ContentExport do
     end
 
     it "does not send emails as part of a content migration (course copy)" do
-      @cm = ContentMigration.new(:user => @user, :copy_options => { :everything => "1" }, :context => @course)
+      @cm = ContentMigration.new(user: @user, copy_options: { everything: "1" }, context: @course)
       @ce.content_migration = @cm
       @ce.save!
 
@@ -316,26 +316,26 @@ describe ContentExport do
 
   context "global_identifiers" do
     it "is automatically set to true" do
-      cc_export = @course.content_exports.create!(:export_type => ContentExport::COURSE_COPY)
+      cc_export = @course.content_exports.create!(export_type: ContentExport::COURSE_COPY)
       expect(cc_export.global_identifiers).to eq true
     end
 
     it "does not set if there are any other exports in the context that weren't set" do
-      prev_export = @course.content_exports.create!(:export_type => ContentExport::COURSE_COPY)
+      prev_export = @course.content_exports.create!(export_type: ContentExport::COURSE_COPY)
       prev_export.update_attribute(:global_identifiers, false)
-      cc_export = @course.content_exports.create!(:export_type => ContentExport::COURSE_COPY)
+      cc_export = @course.content_exports.create!(export_type: ContentExport::COURSE_COPY)
       expect(cc_export.global_identifiers).to eq false
     end
 
     it "uses global asset strings for keys if set" do
-      export = @course.content_exports.create!(:export_type => ContentExport::COURSE_COPY)
+      export = @course.content_exports.create!(export_type: ContentExport::COURSE_COPY)
       a = @course.assignments.create!
       expect(a).to receive(:global_asset_string).once.and_call_original
       export.create_key(a)
     end
 
     it "uses local asset strings for keys if not set" do
-      export = @course.content_exports.create!(:export_type => ContentExport::COURSE_COPY)
+      export = @course.content_exports.create!(export_type: ContentExport::COURSE_COPY)
       export.update_attribute(:global_identifiers, false)
       a = @course.assignments.create!
       expect(a).to receive(:asset_string).once.and_call_original

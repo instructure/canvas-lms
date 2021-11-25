@@ -58,7 +58,7 @@ module SisGradePassbackCommon
       "C1,C1,C1,,,active"
     )
     @course = Course.where(sis_source_id: "C1").first
-    @course.assignment_groups.create(:name => "Assignments")
+    @course.assignment_groups.create(name: "Assignments")
     @teacher = getuser("T1")
     process_csv_data_cleanly(
       "section_id,course_id,name,status,start_date,end_date",
@@ -77,19 +77,19 @@ module SisGradePassbackCommon
       ",S5,student,S3,active",
       ",S6,student,S4,active"
     )
-    a1 = @course.assignments.create!(:title => "A1", :points_possible => 10)
-    a2 = @course.assignments.create!(:title => "A2", :points_possible => 10)
+    a1 = @course.assignments.create!(title: "A1", points_possible: 10)
+    a2 = @course.assignments.create!(title: "A2", points_possible: 10)
 
-    a1.grade_student(getuser("S1"), { :grade => "6", :grader => @teacher })
-    a1.grade_student(getuser("S2"), { :grade => "6", :grader => @teacher })
-    a1.grade_student(getuser("S3"), { :grade => "7", :grader => @teacher })
-    a1.grade_student(getuser("S5"), { :grade => "7", :grader => @teacher })
-    a1.grade_student(getuser("S6"), { :grade => "8", :grader => @teacher })
-    a2.grade_student(getuser("S1"), { :grade => "8", :grader => @teacher })
-    a2.grade_student(getuser("S2"), { :grade => "9", :grader => @teacher })
-    a2.grade_student(getuser("S3"), { :grade => "9", :grader => @teacher })
-    a2.grade_student(getuser("S5"), { :grade => "10", :grader => @teacher })
-    a2.grade_student(getuser("S6"), { :grade => "10", :grader => @teacher })
+    a1.grade_student(getuser("S1"), { grade: "6", grader: @teacher })
+    a1.grade_student(getuser("S2"), { grade: "6", grader: @teacher })
+    a1.grade_student(getuser("S3"), { grade: "7", grader: @teacher })
+    a1.grade_student(getuser("S5"), { grade: "7", grader: @teacher })
+    a1.grade_student(getuser("S6"), { grade: "8", grader: @teacher })
+    a2.grade_student(getuser("S1"), { grade: "8", grader: @teacher })
+    a2.grade_student(getuser("S2"), { grade: "9", grader: @teacher })
+    a2.grade_student(getuser("S3"), { grade: "9", grader: @teacher })
+    a2.grade_student(getuser("S5"), { grade: "10", grader: @teacher })
+    a2.grade_student(getuser("S6"), { grade: "10", grader: @teacher })
 
     @stud5, @stud6, @sec4 = nil, nil, nil
     Pseudonym.where(sis_user_id: "S5").first.tap do |p|
@@ -116,11 +116,11 @@ module SisGradePassbackCommon
     @course.reload
 
     @plugin = Canvas::Plugin.find!('grade_export')
-    @ps = PluginSetting.new(:name => @plugin.id, :settings => @plugin.default_settings)
+    @ps = PluginSetting.new(name: @plugin.id, settings: @plugin.default_settings)
     @ps.posted_settings = @plugin.default_settings.merge({
-                                                           :format_type => "instructure_csv",
-                                                           :wait_for_success => wait_for_success ? "yes" : "no",
-                                                           :publish_endpoint => "http://localhost/endpoint"
+                                                           format_type: "instructure_csv",
+                                                           wait_for_success: wait_for_success ? "yes" : "no",
+                                                           publish_endpoint: "http://localhost/endpoint"
                                                          })
     @ps.save!
 

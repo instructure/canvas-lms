@@ -31,42 +31,42 @@ describe "Api::V1::RubricAssessment" do
       @course.enroll_student(@student).accept
       def criteria(id)
         {
-          :description => "Some criterion",
-          :points => 10,
-          :id => id,
-          :ratings => [
-            { :description => "Good", :points => 10, :id => 'rat1', :criterion_id => id },
-            { :description => "Medium", :points => 5, :id => 'rat2', :criterion_id => id },
-            { :description => "Bad", :points => 0, :id => 'rat3', :criterion_id => id }
+          description: "Some criterion",
+          points: 10,
+          id: id,
+          ratings: [
+            { description: "Good", points: 10, id: 'rat1', criterion_id: id },
+            { description: "Medium", points: 5, id: 'rat2', criterion_id: id },
+            { description: "Bad", points: 0, id: 'rat3', criterion_id: id }
           ]
         }
       end
       rubric_model(data: %w[crit1 crit2 crit3 crit4].map { |n| criteria(n) })
-      @association = @rubric.associate_with(@assignment, @course, :purpose => 'grading', :use_for_grading => true)
+      @association = @rubric.associate_with(@assignment, @course, purpose: 'grading', use_for_grading: true)
     end
 
     it 'includes rating ids for each criterion' do
       assessment = @association.assess({
-                                         :user => @student,
-                                         :assessor => @teacher,
-                                         :artifact => @assignment.find_or_create_submission(@student),
-                                         :assessment => {
-                                           :assessment_type => 'grading',
-                                           :criterion_crit1 => {
-                                             :points => 8,
-                                             :rating_id => 'rat1'
+                                         user: @student,
+                                         assessor: @teacher,
+                                         artifact: @assignment.find_or_create_submission(@student),
+                                         assessment: {
+                                           assessment_type: 'grading',
+                                           criterion_crit1: {
+                                             points: 8,
+                                             rating_id: 'rat1'
                                            },
-                                           :criterion_crit2 => {
-                                             :points => 8,
-                                             :rating_id => 'rat1'
+                                           criterion_crit2: {
+                                             points: 8,
+                                             rating_id: 'rat1'
                                            },
-                                           :criterion_crit3 => {
-                                             :points => 4,
-                                             :rating_id => 'rat2'
+                                           criterion_crit3: {
+                                             points: 4,
+                                             rating_id: 'rat2'
                                            },
-                                           :criterion_crit4 => {
-                                             :points => 0,
-                                             :rating_id => 'rat3'
+                                           criterion_crit4: {
+                                             points: 0,
+                                             rating_id: 'rat3'
                                            }
                                          }
                                        })

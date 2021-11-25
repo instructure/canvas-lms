@@ -43,7 +43,7 @@ module Lti
     describe "GET #registration" do
       context 'course' do
         it 'initiates a tool proxy registration request' do
-          course_with_teacher_logged_in(:active_all => true)
+          course_with_teacher_logged_in(active_all: true)
           course = @course
           post 'registration', params: { course_id: course.id, tool_consumer_url: 'http://tool.consumer.url' }
           expect(response).to be_successful
@@ -134,7 +134,7 @@ module Lti
 
       context 'course' do
         it 'initiates a tool proxy reregistration request' do
-          course_with_teacher_logged_in(:active_all => true)
+          course_with_teacher_logged_in(active_all: true)
           course = @course
           get 'reregistration', params: { course_id: course.id, tool_proxy_id: tool_proxy.id }
           expect(response.code).to eq "200"
@@ -145,7 +145,7 @@ module Lti
         end
 
         it 'sends the correct version' do
-          course_with_teacher_logged_in(:active_all => true)
+          course_with_teacher_logged_in(active_all: true)
           course = @course
           get 'reregistration', params: { course_id: course.id, tool_proxy_id: tool_proxy.id }
           lti_launch = assigns[:lti_launch]
@@ -154,7 +154,7 @@ module Lti
         end
 
         it 'sends the correct resource_url' do
-          course_with_teacher_logged_in(:active_all => true)
+          course_with_teacher_logged_in(active_all: true)
           course = @course
           get 'reregistration', params: { course_id: course.id, tool_proxy_id: tool_proxy.id }
           lti_launch = assigns[:lti_launch]
@@ -162,7 +162,7 @@ module Lti
         end
 
         it 'sends the correct oauth_consumer_key' do
-          course_with_teacher_logged_in(:active_all => true)
+          course_with_teacher_logged_in(active_all: true)
           course = @course
           get 'reregistration', params: { course_id: course.id, tool_proxy_id: tool_proxy.id }
           lti_launch = assigns[:lti_launch]
@@ -171,7 +171,7 @@ module Lti
         end
 
         it 'sends the correct tc_profile_url' do
-          course_with_teacher_logged_in(:active_all => true)
+          course_with_teacher_logged_in(active_all: true)
           course = @course
           get 'reregistration', params: { course_id: course.id, tool_proxy_id: tool_proxy.id }
           lti_launch = assigns[:lti_launch]
@@ -181,7 +181,7 @@ module Lti
         end
 
         it 'sends the correct launch_presentation_return_url' do
-          course_with_teacher_logged_in(:active_all => true)
+          course_with_teacher_logged_in(active_all: true)
           course = @course
           get 'reregistration', params: { course_id: course.id, tool_proxy_id: tool_proxy.id }
           lti_launch = assigns[:lti_launch]
@@ -192,7 +192,7 @@ module Lti
         end
 
         it 'returns an error if there is not a reregistration handler' do
-          course_with_teacher_logged_in(:active_alll => true)
+          course_with_teacher_logged_in(active_alll: true)
           course = @course
           default_resource_handler.message_handlers.first.destroy
           get 'reregistration', params: { course_id: course.id, tool_proxy_id: tool_proxy.id }

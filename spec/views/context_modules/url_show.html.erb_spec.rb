@@ -24,10 +24,10 @@ describe "/context_modules/url_show" do
   it "renders" do
     course_factory
     view_context(@course, @user)
-    @module = @course.context_modules.create!(:name => 'teh module')
-    @tag = @module.add_item(:type => 'external_url',
-                            :url => 'http://example.com/lolcats',
-                            :title => 'pls view')
+    @module = @course.context_modules.create!(name: 'teh module')
+    @tag = @module.add_item(type: 'external_url',
+                            url: 'http://example.com/lolcats',
+                            title: 'pls view')
     assign(:module, @module)
     assign(:tag, @tag)
     render 'context_modules/url_show'

@@ -50,11 +50,11 @@ describe Rubric do
           @outcome.short_description = 'alpha'
           @outcome.description = 'beta'
           criterion = {
-            :mastery_points => 3,
-            :ratings => [
-              { :points => 7, :description => "Exceeds Expectations" },
-              { :points => 3, :description => "Meets Expectations" },
-              { :points => 0, :description => "Does Not Meet Expectations" }
+            mastery_points: 3,
+            ratings: [
+              { points: 7, description: "Exceeds Expectations" },
+              { points: 3, description: "Meets Expectations" },
+              { points: 0, description: "Does Not Meet Expectations" }
             ]
           }
           @outcome.rubric_criterion = criterion
@@ -186,7 +186,7 @@ describe Rubric do
     end
 
     it "creates learning outcome associations for multiple outcome rows" do
-      outcome2 = @course.created_learning_outcomes.create!(:title => 'outcome2')
+      outcome2 = @course.created_learning_outcomes.create!(title: 'outcome2')
       @rubric.data[1][:learning_outcome_id] = outcome2.id
       @rubric.save!
       expect(@rubric).not_to be_new_record
@@ -200,7 +200,7 @@ describe Rubric do
       expect(@rubric.learning_outcome_alignments.first.learning_outcome_id).to eql(@outcome.id)
       user = user_factory(active_all: true)
       @course.enroll_student(user)
-      a = @rubric.associate_with(@assignment, @course, :purpose => 'grading')
+      a = @rubric.associate_with(@assignment, @course, purpose: 'grading')
       @assignment.reload
       expect(@assignment.learning_outcome_alignments).not_to be_empty
       @submission = @assignment.grade_student(user, grade: "10", grader: @teacher).first
@@ -224,17 +224,17 @@ describe Rubric do
     end
 
     it "destroys an outcome link after the assignment using it is destroyed (if it's not used anywhere else)" do
-      outcome2 = @course.account.created_learning_outcomes.create!(:title => 'outcome')
+      outcome2 = @course.account.created_learning_outcomes.create!(title: 'outcome')
       link = @course.root_outcome_group.add_outcome(outcome2)
       rubric = rubric_model
       rubric.data[0][:learning_outcome_id] = outcome2.id
       rubric.save!
       assignment2 = @course.assignments.create!(assignment_valid_attributes)
-      rubric.associate_with(@assignment, @course, :purpose => 'grading')
-      a2 = rubric.associate_with(assignment2, @course, :purpose => 'grading')
+      rubric.associate_with(@assignment, @course, purpose: 'grading')
+      a2 = rubric.associate_with(assignment2, @course, purpose: 'grading')
 
       assignment2.destroy
-      expect(RubricAssociation.where(:id => a2).first).to be_deleted
+      expect(RubricAssociation.where(id: a2).first).to be_deleted
 
       rubric.reload
       expect(rubric).to be_active
@@ -253,10 +253,10 @@ describe Rubric do
       course_factory
       data = [
         {
-          :points => 0.5,
-          :description => "Fraction row",
-          :id => 1,
-          :ratings => [
+          points: 0.5,
+          description: "Fraction row",
+          id: 1,
+          ratings: [
             { points: 0.5, description: "Rockin'", criterion_id: 1, id: 2 },
             { points: 0, description: "Lame", criterion_id: 1, id: 3 }
           ]
@@ -371,7 +371,7 @@ describe Rubric do
     end
 
     it "does not destroy associations when deleted from an account" do
-      @rubric.associate_with(@assignment, @course, :purpose => 'grading')
+      @rubric.associate_with(@assignment, @course, purpose: 'grading')
       @rubric.destroy_for(@course.account)
       expect(@rubric.rubric_associations).to be_present
     end
@@ -382,8 +382,8 @@ describe Rubric do
       course2 = Course.last
       assignment2 = course2.assignments.create! title: "Assignment 2: Electric Boogaloo",
                                                 points_possible: 20
-      @rubric.associate_with(@assignment, course1, :purpose => 'grading')
-      @rubric.associate_with(assignment2, course2, :purpose => 'grading')
+      @rubric.associate_with(@assignment, course1, purpose: 'grading')
+      @rubric.associate_with(assignment2, course2, purpose: 'grading')
       expect(@rubric.rubric_associations.length).to eq 2
       @rubric.destroy_for(course1)
       @rubric.reload
@@ -501,23 +501,22 @@ describe Rubric do
   end
 
   it "normalizes criteria for comparison" do
-    criteria = [{ :id => "45_392",
-                  :description => "Description of criterion",
-                  :long_description => "",
-                  :points => 5,
-                  :mastery_points => nil,
-                  :ignore_for_scoring => nil,
-                  :learning_outcome_migration_id => nil,
-                  :title => "Description of criterion",
-                  :ratings =>
-        [{ :description => "Full Marks",
-           :id => "blank",
-           :criterion_id => "45_392",
-           :points => 5 },
-         { :description => "No Marks",
-           :id => "blank_2",
-           :criterion_id => "45_392",
-           :points => 0 }] }]
+    criteria = [{ id: "45_392",
+                  description: "Description of criterion",
+                  long_description: "",
+                  points: 5,
+                  mastery_points: nil,
+                  ignore_for_scoring: nil,
+                  learning_outcome_migration_id: nil,
+                  title: "Description of criterion",
+                  ratings: [{ description: "Full Marks",
+                              id: "blank",
+                              criterion_id: "45_392",
+                              points: 5 },
+                            { description: "No Marks",
+                              id: "blank_2",
+                              criterion_id: "45_392",
+                              points: 0 }] }]
     expect(Rubric.normalize(criteria)).to eq(
       [{ "description" => "Description of criterion",
          "points" => 5.0,

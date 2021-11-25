@@ -113,13 +113,13 @@ class RubricAssociationsController < ApplicationController
     association_params[:id] = @association.id if @association
     @association = RubricAssociation.generate(@current_user, @rubric, @context, association_params)
     json_res = {
-      :rubric => @rubric.as_json(:methods => :criteria, :include_root => false, :permissions => { :user => @current_user,
-                                                                                                  :session => session }),
-      :rubric_association => @association.as_json(:include_root => false,
-                                                  :include => %i[rubric_assessments assessment_requests],
-                                                  :permissions => { :user => @current_user, :session => session })
+      rubric: @rubric.as_json(methods: :criteria, include_root: false, permissions: { user: @current_user,
+                                                                                      session: session }),
+      rubric_association: @association.as_json(include_root: false,
+                                               include: %i[rubric_assessments assessment_requests],
+                                               permissions: { user: @current_user, session: session })
     }
-    render :json => json_res
+    render json: json_res
   end
 
   # @API Delete a RubricAssociation
@@ -136,11 +136,11 @@ class RubricAssociationsController < ApplicationController
       # If the rubric wasn't created as a general course rubric,
       # and this was the last place it was being used in the course,
       # go ahead and delete the rubric from the course.
-      association_count = RubricAssociation.active.where(:context_id => @context, :context_type => @context.class.to_s, :rubric_id => @rubric).for_grading.count
+      association_count = RubricAssociation.active.where(context_id: @context, context_type: @context.class.to_s, rubric_id: @rubric).for_grading.count
       if !RubricAssociation.active.for_purpose('bookmark').where(rubric_id: @rubric).first && association_count == 0
         @rubric.destroy_for(@context, current_user: @current_user)
       end
-      render :json => @association
+      render json: @association
     end
   end
 

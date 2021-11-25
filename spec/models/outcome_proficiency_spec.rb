@@ -114,7 +114,7 @@ describe OutcomeProficiency, type: :model do
     end
 
     it 'returns the ratings in a hash with the appropriate values' do
-      expect(@outcome_proficiency.ratings_hash).to eq [{ :description => 'best', :points => 10, :mastery => true, :color => '00ff00' }]
+      expect(@outcome_proficiency.ratings_hash).to eq [{ description: 'best', points: 10, mastery: true, color: '00ff00' }]
     end
   end
 

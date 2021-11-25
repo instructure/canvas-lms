@@ -22,7 +22,7 @@ describe SIS::CSV::AccountImporter do
   before { account_model }
 
   it 'skips bad content' do
-    before_count = Account.where.not(:sis_source_id => nil).count
+    before_count = Account.where.not(sis_source_id: nil).count
     importer = process_csv_data(
       "account_id,parent_account_id,name,status",
       "A001,,Humanities,active",
@@ -31,7 +31,7 @@ describe SIS::CSV::AccountImporter do
       "A003,,English,inactive",
       "A004,,,active"
     )
-    expect(Account.where.not(:sis_source_id => nil).count).to eq before_count + 1
+    expect(Account.where.not(sis_source_id: nil).count).to eq before_count + 1
 
     errors = importer.errors.map(&:last)
     expect(errors).to match_array ["No account_id given for an account",
@@ -41,7 +41,7 @@ describe SIS::CSV::AccountImporter do
   end
 
   it 'creates accounts' do
-    before_count = Account.where.not(:sis_source_id => nil).count
+    before_count = Account.where.not(sis_source_id: nil).count
     process_csv_data_cleanly(
       "account_id,parent_account_id,name,status",
       "A001,,Humanities,active",
@@ -49,7 +49,7 @@ describe SIS::CSV::AccountImporter do
       "A003,A002,English Literature,active",
       "A004,,Awesomeness,active"
     )
-    expect(Account.where.not(:sis_source_id => nil).count).to eq before_count + 4
+    expect(Account.where.not(sis_source_id: nil).count).to eq before_count + 4
 
     a1 = @account.sub_accounts.where(sis_source_id: 'A001').first
     expect(a1).not_to be_nil
@@ -71,7 +71,7 @@ describe SIS::CSV::AccountImporter do
   end
 
   it 'updates the hierarchies of existing accounts' do
-    before_count = Account.where.not(:sis_source_id => nil).count
+    before_count = Account.where.not(sis_source_id: nil).count
     process_csv_data_cleanly(
       "account_id,parent_account_id,name,status",
       "A001,,Humanities,active",
@@ -79,7 +79,7 @@ describe SIS::CSV::AccountImporter do
       "A003,,English Literature,active",
       "A004,,Awesomeness,active"
     )
-    expect(Account.where.not(:sis_source_id => nil).count).to eq before_count + 4
+    expect(Account.where.not(sis_source_id: nil).count).to eq before_count + 4
 
     %w[A001 A002 A003 A004].each do |id|
       expect(Account.where(sis_source_id: id).first.parent_account).to eq @account
@@ -93,7 +93,7 @@ describe SIS::CSV::AccountImporter do
       "A003,A002,,",
       "A004,A002,,"
     )
-    expect(Account.where.not(:sis_source_id => nil).count).to eq before_count + 4
+    expect(Account.where.not(sis_source_id: nil).count).to eq before_count + 4
 
     a1 = Account.where(sis_source_id: 'A001').first
     a2 = Account.where(sis_source_id: 'A002').first
@@ -151,7 +151,7 @@ describe SIS::CSV::AccountImporter do
       "A001,,Math,active",
       "A002,,Humanities,active",
       "S001,A001,Submath,active",
-      { :add_sis_stickiness => true }
+      { add_sis_stickiness: true }
     )
     sub = Account.where(sis_source_id: 'S001').first
     expect(sub.reload.parent_account.sis_source_id).to eq "A001"
@@ -166,18 +166,18 @@ describe SIS::CSV::AccountImporter do
     process_csv_data_cleanly(
       "account_id,parent_account_id,name,status",
       "S001,A002,Submath,active",
-      { :add_sis_stickiness => true }
+      { add_sis_stickiness: true }
     )
     expect(sub.reload.parent_account.sis_source_id).to eq "A002" # should override
   end
 
   it 'matches headers case-insensitively' do
-    before_count = Account.where.not(:sis_source_id => nil).count
+    before_count = Account.where.not(sis_source_id: nil).count
     process_csv_data_cleanly(
       "Account_ID,Parent_Account_ID,Name,Status",
       "A001,,Humanities,active"
     )
-    expect(Account.where.not(:sis_source_id => nil).count).to eq before_count + 1
+    expect(Account.where.not(sis_source_id: nil).count).to eq before_count + 1
 
     a1 = @account.sub_accounts.where(sis_source_id: 'A001').first
     expect(a1).not_to be_nil

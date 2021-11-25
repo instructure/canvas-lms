@@ -26,8 +26,8 @@ describe "/discussion_topics/show" do
     view_context(@course, @user)
     assignment_model(course: @course, submission_types: 'discussion_topic')
     @topic = @assignment.discussion_topic
-    @entry = @topic.discussion_entries.create!(:message => "some message")
-    @topic.discussion_entries.create!(:message => "another message")
+    @entry = @topic.discussion_entries.create!(message: "some message")
+    @topic.discussion_entries.create!(message: "another message")
     @topic.message = nil
     assign(:assignment, @assignment)
     assign(:topic, @topic)
@@ -41,16 +41,16 @@ describe "/discussion_topics/show" do
   end
 
   it "renders in a group context" do
-    assignment_model(:submission_types => 'discussion_topic')
-    rubric_association_model(:association_object => @assignment, :purpose => 'grading')
+    assignment_model(submission_types: 'discussion_topic')
+    rubric_association_model(association_object: @assignment, purpose: 'grading')
     group_model
     view_context(@group, @user)
     @topic = @assignment.discussion_topic
     @topic.message = nil # the assigns for @context don't seem to carry over to the controller helper method
     @topic.user = @user
     @topic.save!
-    @entry = @topic.discussion_entries.create!(:message => "some message")
-    @topic.discussion_entries.create!(:message => "another message")
+    @entry = @topic.discussion_entries.create!(message: "some message")
+    @topic.discussion_entries.create!(message: "another message")
     assign(:topic, @topic)
     assign(:grouped_entries, @topic.discussion_entries.group_by(&:parent_id))
     assign(:entries, @topic.discussion_entries)
@@ -65,8 +65,8 @@ describe "/discussion_topics/show" do
   end
 
   it "renders the student to-do date" do
-    assignment_model(:submission_types => 'discussion_topic')
-    rubric_association_model(:association_object => @assignment, :purpose => 'grading')
+    assignment_model(submission_types: 'discussion_topic')
+    rubric_association_model(association_object: @assignment, purpose: 'grading')
     group_model
     view_context(@group, @user)
     @topic = @assignment.discussion_topic

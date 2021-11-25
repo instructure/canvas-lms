@@ -49,7 +49,7 @@ describe "accounts/settings.html.erb" do
     end
 
     it "does not show to non-sis admin" do
-      admin = account_admin_user_with_role_changes(:role_changes => { 'manage_sis' => false })
+      admin = account_admin_user_with_role_changes(role_changes: { 'manage_sis' => false })
       view_context(@account, admin)
       assign(:current_user, admin)
       render
@@ -77,7 +77,7 @@ describe "accounts/settings.html.erb" do
     end
 
     it "shows warning dialog when a delegated auth config is around" do
-      @account.authentication_providers.create!(:auth_type => 'cas')
+      @account.authentication_providers.create!(auth_type: 'cas')
       @account.authentication_providers.first.move_to_bottom
       render
       expect(response).to have_tag("input#account_settings_open_registration")
@@ -263,7 +263,7 @@ describe "accounts/settings.html.erb" do
 
       before do
         @account = Account.default
-        @subaccount = @account.sub_accounts.create!(:name => 'sub-account')
+        @subaccount = @account.sub_accounts.create!(name: 'sub-account')
 
         assign(:account, @account)
         assign(:root_account, @account)
@@ -407,7 +407,7 @@ describe "accounts/settings.html.erb" do
 
     context "without :manage_storage_quotas" do
       before do
-        admin = account_admin_user_with_role_changes(:account => @account, :role_changes => { 'manage_storage_quotas' => false })
+        admin = account_admin_user_with_role_changes(account: @account, role_changes: { 'manage_storage_quotas' => false })
         view_context(@account, admin)
         assign(:current_user, admin)
       end
@@ -444,7 +444,7 @@ describe "accounts/settings.html.erb" do
 
     context "without :read_reports" do
       it "does not show reports tab link" do
-        admin = account_admin_user_with_role_changes(:account => @account, :role_changes => { 'read_reports' => false })
+        admin = account_admin_user_with_role_changes(account: @account, role_changes: { 'read_reports' => false })
         view_context(@account, admin)
         assign(:current_user, admin)
         render
@@ -455,11 +455,11 @@ describe "accounts/settings.html.erb" do
 
   context "admins" do
     it "does not show add admin button if don't have permission to any roles" do
-      role = custom_account_role('CustomAdmin', :account => Account.site_admin)
+      role = custom_account_role('CustomAdmin', account: Account.site_admin)
       account_admin_user_with_role_changes(
-        :account => Account.site_admin,
-        :role => role,
-        :role_changes => { manage_account_memberships: true }
+        account: Account.site_admin,
+        role: role,
+        role_changes: { manage_account_memberships: true }
       )
       view_context(Account.default, @user)
       assign(:account, Account.default)

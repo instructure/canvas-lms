@@ -159,7 +159,7 @@ end
 module RSpec::Rails
   module ViewExampleGroup
     module ExampleMethods
-      delegate :content_for, :to => :view
+      delegate :content_for, to: :view
     end
   end
 
@@ -297,7 +297,7 @@ module RenderWithHelpers
     # just calling "render 'path/to/view'" by default looks for a partial
     if args.first.is_a?(String)
       file = args.shift
-      args = [{ :template => file }] + args
+      args = [{ template: file }] + args
     end
     super(*args)
   end
@@ -764,7 +764,7 @@ RSpec.configure do |config|
     end
   end
 
-  def s3_storage!(opts = { :stubs => true })
+  def s3_storage!(opts = { stubs: true })
     [Attachment, Thumbnail].each do |model|
       model.include(AttachmentStorageSwitcher) unless model.ancestors.include?(AttachmentStorageSwitcher)
       allow(model).to receive(:current_backend).and_return(AttachmentFu::Backends::S3Backend)

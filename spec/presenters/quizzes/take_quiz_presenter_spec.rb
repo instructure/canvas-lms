@@ -22,9 +22,9 @@ describe Quizzes::TakeQuizPresenter do
   let(:quiz) { Quizzes::Quiz.new }
   let(:submission) { Quizzes::QuizSubmission.new }
   let(:params) { {} }
-  let(:question1) { { :id => 1, :name => "Question 1" } }
-  let(:question2) { { :id => 2, :name => "Question 2" } }
-  let(:question3) { { :id => 3, :name => "Question 3" } }
+  let(:question1) { { id: 1, name: "Question 1" } }
+  let(:question2) { { id: 2, name: "Question 2" } }
+  let(:question3) { { id: 3, name: "Question 3" } }
   let(:all_questions) { [question1, question2, question3] }
 
   let(:presenter) { Quizzes::TakeQuizPresenter.new(quiz, submission, params) }

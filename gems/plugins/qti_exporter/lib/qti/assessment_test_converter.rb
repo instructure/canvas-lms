@@ -36,9 +36,9 @@ module Qti
       @opts = opts
 
       @quiz = {
-        :questions => [],
-        :quiz_type => nil,
-        :question_count => 0
+        questions: [],
+        quiz_type: nil,
+        question_count: 0
       }
     end
 
@@ -105,7 +105,7 @@ module Qti
 
         if @opts[:flavor] == Qti::Flavors::D2L
           if (intro = get_node_att(meta, 'instructureField[name=d2l_intro_message]', 'value'))
-            @quiz[:questions].unshift({ :question_type => 'text_only_question', :question_text => intro, :migration_id => unique_local_id })
+            @quiz[:questions].unshift({ question_type: 'text_only_question', question_text: intro, migration_id: unique_local_id })
           end
           if (html = get_node_att(meta, 'instructureField[name=assessment_rubric_html]', 'value')) &&
              (node = (Nokogiri::HTML5.fragment(html) rescue nil))
@@ -174,7 +174,7 @@ module Qti
         @quiz[:shuffle_answers] = true
       end
       if (select = AssessmentTestConverter.parse_pick_count(section))
-        group = { :questions => [], :pick_count => select, :question_type => 'question_group', :title => section['title'] }
+        group = { questions: [], pick_count: select, question_type: 'question_group', title: section['title'] }
         if (weight = get_node_att(section, 'weight', 'value'))
           group[:question_points] = convert_weight_to_points(weight)
         end
@@ -199,7 +199,7 @@ module Qti
       end
       if section['visible'] && section['visible'] =~ /true/i && (title = section['title'])
         # Create an empty question with a title in it
-        @quiz[:questions] << { :question_type => 'text_only_question', :question_text => title, :migration_id => unique_local_id }
+        @quiz[:questions] << { question_type: 'text_only_question', question_text: title, migration_id: unique_local_id }
       end
 
       section.children.each do |child|
@@ -251,7 +251,7 @@ module Qti
     end
 
     def process_question(item_ref, questions_list)
-      question = { :question_type => 'question_reference' }
+      question = { question_type: 'question_reference' }
       questions_list << question
       @quiz[:question_count] += 1
       # The colons are replaced with dashes in the conversion from QTI 1.2

@@ -30,7 +30,7 @@ module Lti
           app_defs = Api.paginate(collection, self, named_context_url(@context, :api_v1_context_app_definitions_url, include_host: true))
 
           mc_status = setup_master_course_restrictions(app_defs.select { |o| o.is_a?(ContextExternalTool) }, @context)
-          format.json { render json: app_collator.app_definitions(app_defs, :master_course_status => mc_status) }
+          format.json { render json: app_collator.app_definitions(app_defs, master_course_status: mc_status) }
         end
       end
     end
@@ -59,7 +59,7 @@ module Lti
           format.json do
             cancel_cache_buster
             expires_in 10.minutes
-            render :json => AppLaunchCollator.launch_definitions(launch_defs, placements)
+            render json: AppLaunchCollator.launch_definitions(launch_defs, placements)
           end
         end
       end

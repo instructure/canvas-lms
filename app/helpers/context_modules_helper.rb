@@ -110,7 +110,7 @@ module ContextModulesHelper
   end
 
   def preload_modules_content(modules, can_edit)
-    ActiveRecord::Associations::Preloader.new.preload(modules, :content_tags => :content)
+    ActiveRecord::Associations::Preloader.new.preload(modules, content_tags: :content)
     preload_can_unpublish(@context, modules) if can_edit
   end
 

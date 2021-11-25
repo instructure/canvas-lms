@@ -94,7 +94,7 @@ module Canvas::Migration::Worker
     att.context = cm
     att.file_state = 'deleted'
     att.workflow_state = 'unattached'
-    att.clone_url(url, false, true, :quota_context => cm.context)
+    att.clone_url(url, false, true, quota_context: cm.context)
 
     if att.file_state == 'errored'
       raise Canvas::Migration::Error, att.upload_error_message

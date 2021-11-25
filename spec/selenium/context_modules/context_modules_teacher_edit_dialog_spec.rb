@@ -28,16 +28,16 @@ describe "context modules" do
     before(:once) do
       course_with_teacher(active_all: true)
       # have to add quiz and assignment to be able to add them to a new module
-      @quiz = @course.assignments.create!(:title => 'quiz assignment', :submission_types => 'online_quiz')
-      @assignment = @course.assignments.create!(:title => 'assignment 1', :submission_types => 'online_text_entry')
-      @assignment2 = @course.assignments.create!(:title => 'assignment 2',
-                                                 :submission_types => 'online_text_entry',
-                                                 :due_at => 2.days.from_now,
-                                                 :points_possible => 10)
-      @assignment3 = @course.assignments.create!(:title => 'assignment 3', :submission_types => 'online_text_entry')
+      @quiz = @course.assignments.create!(title: 'quiz assignment', submission_types: 'online_quiz')
+      @assignment = @course.assignments.create!(title: 'assignment 1', submission_types: 'online_text_entry')
+      @assignment2 = @course.assignments.create!(title: 'assignment 2',
+                                                 submission_types: 'online_text_entry',
+                                                 due_at: 2.days.from_now,
+                                                 points_possible: 10)
+      @assignment3 = @course.assignments.create!(title: 'assignment 3', submission_types: 'online_text_entry')
 
-      @ag1 = @course.assignment_groups.create!(:name => "Assignment Group 1")
-      @ag2 = @course.assignment_groups.create!(:name => "Assignment Group 2")
+      @ag1 = @course.assignment_groups.create!(name: "Assignment Group 1")
+      @ag2 = @course.assignment_groups.create!(name: "Assignment Group 2")
       @course.reload
     end
 
@@ -150,10 +150,10 @@ describe "context modules" do
 
     it "only displays out-of on an assignment min score restriction when the assignment has a total" do
       ag = @course.assignment_groups.create!
-      a1 = ag.assignments.create!(:context => @course)
+      a1 = ag.assignments.create!(context: @course)
       a1.points_possible = 10
       a1.save
-      a2 = ag.assignments.create!(:context => @course)
+      a2 = ag.assignments.create!(context: @course)
       m = @course.context_modules.create!
 
       make_content_tag = lambda do |assignment|

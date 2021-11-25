@@ -41,7 +41,7 @@ module QuizzesHelper
     I18n.t(
       '*This quiz is unpublished* Only teachers can see the quiz until ' \
       'it is published.',
-      :wrapper => '<strong class=unpublished_quiz_warning>\1</strong>'
+      wrapper: '<strong class=unpublished_quiz_warning>\1</strong>'
     )
   end
 
@@ -50,7 +50,7 @@ module QuizzesHelper
       '*You have made changes to the questions in this quiz.* ' \
       'These changes will not appear for students until you ' \
       'save the quiz.',
-      :wrapper => '<strong class=unsaved_quiz_warning>\1</strong>'
+      wrapper: '<strong class=unsaved_quiz_warning>\1</strong>'
     )
   end
 
@@ -207,19 +207,19 @@ module QuizzesHelper
 
   def submitted_students_quiz_title(student_count)
     I18n.t(
-      { :zero => "Students who have taken the quiz",
-        :one => "Students who have taken the quiz (%{count})",
-        :other => "Students who have taken the quiz (%{count})" },
-      { :count => student_count }
+      { zero: "Students who have taken the quiz",
+        one: "Students who have taken the quiz (%{count})",
+        other: "Students who have taken the quiz (%{count})" },
+      { count: student_count }
     )
   end
 
   def submitted_students_survey_title(student_count)
     I18n.t(
-      { :zero => "Students who have taken the survey",
-        :one => "Students who have taken the survey (%{count})",
-        :other => "Students who have taken the survey (%{count})" },
-      { :count => student_count }
+      { zero: "Students who have taken the survey",
+        one: "Students who have taken the survey (%{count})",
+        other: "Students who have taken the survey (%{count})" },
+      { count: student_count }
     )
   end
 
@@ -241,19 +241,19 @@ module QuizzesHelper
 
   def unsubmitted_students_quiz_title(student_count)
     I18n.t(
-      { :zero => "Student who haven't taken the quiz",
-        :one => "Students who haven't taken the quiz (%{count})",
-        :other => "Students who haven't taken the quiz (%{count})" },
-      { :count => student_count }
+      { zero: "Student who haven't taken the quiz",
+        one: "Students who haven't taken the quiz (%{count})",
+        other: "Students who haven't taken the quiz (%{count})" },
+      { count: student_count }
     )
   end
 
   def unsubmitted_students_survey_title(student_count)
     I18n.t(
-      { :zero => "Student who haven't taken the survey",
-        :one => "Students who haven't taken the survey (%{count})",
-        :other => "Students who haven't taken the survey (%{count})" },
-      { :count => student_count }
+      { zero: "Student who haven't taken the survey",
+        one: "Students who haven't taken the survey (%{count})",
+        other: "Students who haven't taken the survey (%{count})" },
+      { count: student_count }
     )
   end
 
@@ -409,13 +409,13 @@ module QuizzesHelper
                        comment_get(question, :neutral_comments)
                      end
     text = []
-    text << content_tag(:p, correct_text, { :class => 'correct_comments' }) if correct_text.present?
-    text << content_tag(:p, incorrect_text, { :class => 'incorrect_comments' }) if incorrect_text.present?
-    text << content_tag(:p, neutral_text, { :class => 'neutral_comments' }) if neutral_text.present?
+    text << content_tag(:p, correct_text, { class: 'correct_comments' }) if correct_text.present?
+    text << content_tag(:p, incorrect_text, { class: 'incorrect_comments' }) if incorrect_text.present?
+    text << content_tag(:p, neutral_text, { class: 'neutral_comments' }) if neutral_text.present?
     if text.empty?
       ''
     else
-      content_tag(:div, text.join.html_safe, { :class => 'quiz_comment' })
+      content_tag(:div, text.join.html_safe, { class: 'quiz_comment' })
     end
   end
 
@@ -513,15 +513,15 @@ module QuizzesHelper
                          (duration_seconds / 60).round
                        end
     I18n.t(
-      { :zero => "less than 1 minute",
-        :one => "1 minute",
-        :other => "%{count} minutes" },
-      :count => duration_minutes
+      { zero: "less than 1 minute",
+        one: "1 minute",
+        other: "%{count} minutes" },
+      count: duration_minutes
     )
   end
 
   def score_out_of_points_possible(score, points_possible, options = {})
-    options.reverse_merge!({ :precision => 2 })
+    options.reverse_merge!({ precision: 2 })
     score_html = \
       if options[:id] || options[:class] || options[:style]
         content_tag('span',
@@ -531,8 +531,8 @@ module QuizzesHelper
         render_score(score, options[:precision])
       end
     I18n.t("%{score} out of %{points_possible}",
-           :score => score_html,
-           :points_possible => render_score(points_possible, options[:precision]))
+           score: score_html,
+           points_possible: render_score(points_possible, options[:precision]))
   end
 
   def link_to_take_quiz(link_body, opts = {})

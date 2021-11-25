@@ -27,16 +27,16 @@ describe MasterCourses::FolderHelper do
     # master course
     master_root = Folder.root_folders(@copy_from).first
     locked_master_att = attachment_model(context: @copy_from, folder: master_root, filename: 'lockedfile.txt')
-    locked_master_tag = @template.create_content_tag_for!(locked_master_att, :restrictions => { :content => true })
+    locked_master_tag = @template.create_content_tag_for!(locked_master_att, restrictions: { content: true })
     unlocked_master_att = attachment_model(context: @copy_from, folder: master_root, filename: 'unlockedfile.txt')
     unlocked_master_tag = @template.create_content_tag_for!(unlocked_master_att)
 
     # child course
     child_root = Folder.root_folders(@copy_to).first
-    locked_parent_folder = child_root.sub_folders.create!(:name => "locked parent", :context => @copy_to)
-    locked_child_folder = locked_parent_folder.sub_folders.create!(:name => "locked child", :context => @copy_to)
-    unlocked_parent_folder = child_root.sub_folders.create!(:name => "unlocked parent", :context => @copy_to)
-    unlocked_child_folder = unlocked_parent_folder.sub_folders.create!(:name => "unlocked child", :context => @copy_to)
+    locked_parent_folder = child_root.sub_folders.create!(name: "locked parent", context: @copy_to)
+    locked_child_folder = locked_parent_folder.sub_folders.create!(name: "locked child", context: @copy_to)
+    unlocked_parent_folder = child_root.sub_folders.create!(name: "unlocked parent", context: @copy_to)
+    unlocked_child_folder = unlocked_parent_folder.sub_folders.create!(name: "unlocked child", context: @copy_to)
 
     attachment_model(context: @copy_to, folder: locked_child_folder,
                      filename: 'lockedfile.txt', migration_id: locked_master_tag.migration_id)

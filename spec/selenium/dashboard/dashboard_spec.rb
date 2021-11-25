@@ -34,23 +34,23 @@ describe "dashboard" do
 
   context "as a student" do
     before do
-      course_with_student_logged_in(:active_all => true)
+      course_with_student_logged_in(active_all: true)
       @course.default_view = 'feed'
       @course.save!
     end
 
     def create_announcement
       factory_with_protected_attributes(Announcement, {
-                                          :context => @course,
-                                          :title => "hey all read this k",
-                                          :message => "announcement"
+                                          context: @course,
+                                          title: "hey all read this k",
+                                          message: "announcement"
                                         })
     end
 
     it "does not show announcement stream items without permissions" do
-      @course.account.role_overrides.create!(:role => student_role,
-                                             :permission => 'read_announcements',
-                                             :enabled => false)
+      @course.account.role_overrides.create!(role: student_role,
+                                             permission: 'read_announcements',
+                                             enabled: false)
 
       get "/"
       f('#DashboardOptionsMenu_Container button').click
@@ -123,7 +123,7 @@ describe "dashboard" do
 
     it "shows an assignment stream item under Recent Activity in dashboard", priority: "1" do
       setup_notification(@student, name: 'Assignment Created')
-      assignment_model({ :submission_types => ['online_text_entry'], :course => @course })
+      assignment_model({ submission_types: ['online_text_entry'], course: @course })
       get "/"
       f('#DashboardOptionsMenu_Container button').click
       fj('span[role="menuitemradio"]:contains("Recent Activity")').click
@@ -133,16 +133,16 @@ describe "dashboard" do
 
     it "shows account notifications on the dashboard", priority: "1" do
       u = User.create!
-      a1 = @course.account.announcements.create!(:subject => 'test',
-                                                 :message => "hey there",
-                                                 :user => u,
-                                                 :start_at => Time.zone.today - 1.day,
-                                                 :end_at => Time.zone.today + 1.day)
-      a2 = @course.account.announcements.create!(:subject => 'test 2',
-                                                 :message => "another annoucement",
-                                                 :user => u,
-                                                 :start_at => Time.zone.today - 2.days,
-                                                 :end_at => Time.zone.today + 1.day)
+      a1 = @course.account.announcements.create!(subject: 'test',
+                                                 message: "hey there",
+                                                 user: u,
+                                                 start_at: Time.zone.today - 1.day,
+                                                 end_at: Time.zone.today + 1.day)
+      a2 = @course.account.announcements.create!(subject: 'test 2',
+                                                 message: "another annoucement",
+                                                 user: u,
+                                                 start_at: Time.zone.today - 2.days,
+                                                 end_at: Time.zone.today + 1.day)
 
       get "/"
       f('#DashboardOptionsMenu_Container button').click
@@ -154,42 +154,42 @@ describe "dashboard" do
     end
 
     it "interpolates the user's domain in global notifications" do
-      announcement = @course.account.announcements.create!(:message => "blah blah http://random-survey-startup.ly/?some_GET_parameter_by_which_to_differentiate_results={{ACCOUNT_DOMAIN}}",
-                                                           :subject => 'test',
-                                                           :user => User.create!,
-                                                           :start_at => Date.today,
-                                                           :end_at => Date.today + 1.day)
+      announcement = @course.account.announcements.create!(message: "blah blah http://random-survey-startup.ly/?some_GET_parameter_by_which_to_differentiate_results={{ACCOUNT_DOMAIN}}",
+                                                           subject: 'test',
+                                                           user: User.create!,
+                                                           start_at: Date.today,
+                                                           end_at: Date.today + 1.day)
 
       get "/"
       expect(fj("#dashboard .account_notification .notification_message").text).to eq announcement.message.gsub("{{ACCOUNT_DOMAIN}}", @course.account.domain)
     end
 
     it "interpolates the user's id in global notifications" do
-      announcement = @course.account.announcements.create!(:message => "blah blah http://random-survey-startup.ly/?surveys_are_not_really_anonymous={{CANVAS_USER_ID}}",
-                                                           :subject => 'test',
-                                                           :user => User.create!,
-                                                           :start_at => Date.today,
-                                                           :end_at => Date.today + 1.day)
+      announcement = @course.account.announcements.create!(message: "blah blah http://random-survey-startup.ly/?surveys_are_not_really_anonymous={{CANVAS_USER_ID}}",
+                                                           subject: 'test',
+                                                           user: User.create!,
+                                                           start_at: Date.today,
+                                                           end_at: Date.today + 1.day)
       get "/"
       expect(fj("#dashboard .account_notification .notification_message").text).to eq announcement.message.gsub("{{CANVAS_USER_ID}}", @user.global_id.to_s)
     end
 
     it "shows appointment stream items on the dashboard", priority: "2" do
       skip "we need to add this stuff back in"
-      Notification.create(:name => 'Appointment Group Published', :category => "Appointment Availability")
-      Notification.create(:name => 'Appointment Group Updated', :category => "Appointment Availability")
-      Notification.create(:name => 'Appointment Reserved For User', :category => "Appointment Signups")
+      Notification.create(name: 'Appointment Group Published', category: "Appointment Availability")
+      Notification.create(name: 'Appointment Group Updated', category: "Appointment Availability")
+      Notification.create(name: 'Appointment Reserved For User', category: "Appointment Signups")
       @me = @user
-      student_in_course(:active_all => true, :course => @course)
+      student_in_course(active_all: true, course: @course)
       @other_student = @user
       @user = @me
 
       @group = group_category.groups.create(context: @course)
       @group.users << @other_student << @user
       # appointment group publish notification and signup notification
-      appointment_participant_model(:course => @course, :participant => @group, :updating_user => @other_student)
+      appointment_participant_model(course: @course, participant: @group, updating_user: @other_student)
       # appointment group update notification
-      @appointment_group.update(:new_appointments => [[Time.now.utc + 2.hours, Time.now.utc + 3.hours]])
+      @appointment_group.update(new_appointments: [[Time.now.utc + 2.hours, Time.now.utc + 3.hours]])
 
       get "/"
       expect(ffj(".topic_message .communication_message.dashboard_notification").size).to eq 3
@@ -201,8 +201,8 @@ describe "dashboard" do
 
     describe "course menu" do
       before do
-        @course.update(:start_at => 2.days.from_now, :conclude_at => 4.days.from_now, :restrict_enrollments_to_course_dates => false)
-        Enrollment.update_all(:created_at => 1.minute.ago)
+        @course.update(start_at: 2.days.from_now, conclude_at: 4.days.from_now, restrict_enrollments_to_course_dates: false)
+        Enrollment.update_all(created_at: 1.minute.ago)
         get "/"
       end
 
@@ -215,11 +215,11 @@ describe "dashboard" do
       end
 
       it "displays student groups in header nav", priority: "2" do
-        group = Group.create!(:name => "group1", :context => @course)
+        group = Group.create!(name: "group1", context: @course)
         group.add_user(@user)
 
         other_unpublished_course = course_factory
-        other_group = Group.create!(:name => "group2", :context => other_unpublished_course)
+        other_group = Group.create!(name: "group2", context: other_unpublished_course)
         other_group.add_user(@user)
 
         get "/"
@@ -241,11 +241,11 @@ describe "dashboard" do
     end
 
     it "displays scheduled web conference in stream", priority: "1" do
-      PluginSetting.create!(:name => "wimba", :settings => { "domain" => "wimba.instructure.com" })
+      PluginSetting.create!(name: "wimba", settings: { "domain" => "wimba.instructure.com" })
 
       # NOTE: recently changed the behavior here: conferences only display on
       # the course page, and they only display when they are in progress
-      @conference = @course.web_conferences.build({ :title => "my Conference", :conference_type => "Wimba", :duration => 60 })
+      @conference = @course.web_conferences.build({ title: "my Conference", conference_type: "Wimba", duration: 60 })
       @conference.user = @user
       @conference.save!
       @conference.restart
@@ -259,13 +259,13 @@ describe "dashboard" do
 
     it "ends conferences from stream", priority: "1" do
       skip_if_safari(:alert)
-      PluginSetting.create!(:name => "wimba", :settings => { "domain" => "wimba.instructure.com" })
+      PluginSetting.create!(name: "wimba", settings: { "domain" => "wimba.instructure.com" })
 
       course_with_teacher_logged_in
       @course.default_view = 'feed'
       @course.save!
 
-      @conference = @course.web_conferences.build({ :title => "my Conference", :conference_type => "Wimba", :duration => nil })
+      @conference = @course.web_conferences.build({ title: "my Conference", conference_type: "Wimba", duration: nil })
       @conference.user = @user
       @conference.save!
       @conference.restart
@@ -285,8 +285,8 @@ describe "dashboard" do
 
     it "creates an announcement for the first course that is not visible in the second course", priority: "1" do
       @context = @course
-      announcement_model({ :title => "hey all read this k", :message => "announcement" })
-      @second_course = Course.create!(:name => 'second course')
+      announcement_model({ title: "hey all read this k", message: "announcement" })
+      @second_course = Course.create!(name: 'second course')
       @second_course.offer!
       @second_course.default_view = 'feed'
       @second_course.save!
@@ -300,7 +300,7 @@ describe "dashboard" do
       @enrollment.workflow_state = 'active'
       @enrollment.save!
       @second_course.reload
-      Enrollment.update_all(:created_at => 1.minute.ago) # need to make created_at and updated_at different
+      Enrollment.update_all(created_at: 1.minute.ago) # need to make created_at and updated_at different
 
       get "/"
       expect(f("#content")).not_to contain_css('.no_recent_messages')
@@ -310,7 +310,7 @@ describe "dashboard" do
     end
 
     it "validates the functionality of soft concluded courses in dropdown", priority: "1" do
-      course_with_student(:active_all => true, :course_name => "a_soft_concluded_course", :user => @user)
+      course_with_student(active_all: true, course_name: "a_soft_concluded_course", user: @user)
       c1 = @course
       c1.conclude_at = 1.week.ago
       c1.start_at = 1.month.ago
@@ -324,7 +324,7 @@ describe "dashboard" do
     end
 
     it "shows recent feedback and it should work", priority: "1" do
-      assign = @course.assignments.create!(:title => 'hi', :due_at => 1.day.ago, :points_possible => 5)
+      assign = @course.assignments.create!(title: 'hi', due_at: 1.day.ago, points_possible: 5)
       assign.grade_student(@student, grade: '4', grader: @teacher)
 
       get "/"
@@ -339,12 +339,12 @@ describe "dashboard" do
     end
 
     it "validates the functionality of soft concluded courses on courses page", priority: "1" do
-      term = EnrollmentTerm.new(:name => "Super Term", :start_at => 1.month.ago, :end_at => 1.week.ago)
+      term = EnrollmentTerm.new(name: "Super Term", start_at: 1.month.ago, end_at: 1.week.ago)
       term.root_account_id = @course.root_account_id
       term.save!
       c1 = @course
       c1.name = 'a_soft_concluded_course'
-      c1.update!(:enrollment_term => term)
+      c1.update!(enrollment_term: term)
       c1.reload
       get "/courses"
       expect(fj("#past_enrollments_table a[href='/courses/#{@course.id}']")).to include_text(c1.name)
@@ -352,7 +352,7 @@ describe "dashboard" do
 
     context "course menu customization" do
       it "always has a link to the courses page (with customizations)", priority: "1" do
-        course_with_teacher({ :user => @user, :active_course => true, :active_enrollment => true })
+        course_with_teacher({ user: @user, active_course: true, active_enrollment: true })
         get "/"
         f('#global_nav_courses_link').click
         expect(fj('[aria-label="Courses tray"] a:contains("All Courses")')).to be_present
@@ -362,26 +362,26 @@ describe "dashboard" do
 
   context "as a teacher" do
     before do
-      course_with_teacher_logged_in(:active_cc => true)
+      course_with_teacher_logged_in(active_cc: true)
     end
 
     it_behaves_like 'load events list'
 
     context "restricted future courses" do
       before :once do
-        term = EnrollmentTerm.new(:name => "Super Term", :start_at => 1.week.from_now, :end_at => 1.month.from_now)
+        term = EnrollmentTerm.new(name: "Super Term", start_at: 1.week.from_now, end_at: 1.month.from_now)
         term.root_account_id = Account.default.id
         term.save!
-        course_with_student(:active_all => true)
+        course_with_student(active_all: true)
         @c1 = @course
         @c1.name = 'a future course'
-        @c1.update!(:enrollment_term => term)
+        @c1.update!(enrollment_term: term)
 
-        course_with_student(:active_course => true, :user => @student)
+        course_with_student(active_course: true, user: @student)
         @c2 = @course
         @c2.name = "a restricted future course"
         @c2.restrict_student_future_view = true
-        @c2.update!(:enrollment_term => term)
+        @c2.update!(enrollment_term: term)
       end
 
       before do
@@ -398,7 +398,7 @@ describe "dashboard" do
 
       it "does not show restricted future courses to students on courses page if configured on account" do
         a = @c2.account
-        a.settings[:restrict_student_future_listing] = { :value => true }
+        a.settings[:restrict_student_future_listing] = { value: true }
         a.save!
         get "/courses"
         expect(fj("#future_enrollments_table a[href='/courses/#{@c1.id}']")).to include_text(@c1.name)
@@ -407,14 +407,14 @@ describe "dashboard" do
     end
 
     it "displays assignment to grade in to do list for a teacher", priority: "1" do
-      assignment = assignment_model({ :submission_types => 'online_text_entry', :course => @course })
-      student = user_with_pseudonym(:active_user => true, :username => 'student@example.com', :password => 'qwertyuiop')
-      @course.enroll_user(student, "StudentEnrollment", :enrollment_state => 'active')
+      assignment = assignment_model({ submission_types: 'online_text_entry', course: @course })
+      student = user_with_pseudonym(active_user: true, username: 'student@example.com', password: 'qwertyuiop')
+      @course.enroll_user(student, "StudentEnrollment", enrollment_state: 'active')
       assignment.reload
-      assignment.submit_homework(student, { :submission_type => 'online_text_entry', :body => 'ABC' })
+      assignment.submit_homework(student, { submission_type: 'online_text_entry', body: 'ABC' })
       assignment.reload
 
-      User.where(:id => @teacher).update_all(:updated_at => 1.day.ago) # ensure cache refresh
+      User.where(id: @teacher).update_all(updated_at: 1.day.ago) # ensure cache refresh
       enable_cache do
         get "/"
 

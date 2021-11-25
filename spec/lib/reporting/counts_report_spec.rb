@@ -26,15 +26,15 @@ describe Reporting::CountsReport do
   describe "detailed report" do
     describe "courses" do
       it "counts available courses" do
-        course_factory(:account => @account1, :active_all => 1)
+        course_factory(account: @account1, active_all: 1)
         Reporting::CountsReport.process_shard
         @snapshot = @account1.report_snapshots.detailed.first
         expect(@snapshot.data['courses']).to eq 1
       end
 
       it "does not count non-available courses" do
-        @course1 = course_model(:account => @account1)
-        @course2 = course_model(:account => @account1)
+        @course1 = course_model(account: @account1)
+        @course2 = course_model(account: @account1)
         @course2.destroy
 
         expect(@course1.workflow_state).to eq 'claimed'
@@ -82,7 +82,7 @@ describe Reporting::CountsReport do
 
     describe "teachers" do
       before do
-        course_with_teacher(:account => @account1, :user => user_with_pseudonym, :active_course => 1, :active_enrollment => 1)
+        course_with_teacher(account: @account1, user: user_with_pseudonym, active_course: 1, active_enrollment: 1)
         @pseudonym.last_request_at = 1.day.ago
         @pseudonym.save!
       end
@@ -94,7 +94,7 @@ describe Reporting::CountsReport do
 
     describe "students" do
       before do
-        course_with_student(:account => @account1, :user => user_with_pseudonym, :active_course => 1, :active_enrollment => 1)
+        course_with_student(account: @account1, user: user_with_pseudonym, active_course: 1, active_enrollment: 1)
         @pseudonym.last_request_at = 1.day.ago
         @pseudonym.save!
       end
@@ -106,7 +106,7 @@ describe Reporting::CountsReport do
 
     describe "users" do
       before do
-        course_with_ta(:account => @account1, :user => user_with_pseudonym, :active_course => 1, :active_enrollment => 1)
+        course_with_ta(account: @account1, user: user_with_pseudonym, active_course: 1, active_enrollment: 1)
         @pseudonym.last_request_at = 1.day.ago
         @pseudonym.save!
       end
@@ -122,7 +122,7 @@ describe Reporting::CountsReport do
       end
 
       it "includes teachers" do
-        course_with_teacher(:course => @course, :user => user_with_pseudonym, :active_enrollment => 1)
+        course_with_teacher(course: @course, user: user_with_pseudonym, active_enrollment: 1)
         @pseudonym.last_request_at = 1.day.ago
         @pseudonym.save!
 
@@ -132,7 +132,7 @@ describe Reporting::CountsReport do
       end
 
       it "includes students" do
-        course_with_student(:course => @course, :user => user_with_pseudonym, :active_enrollment => 1)
+        course_with_student(course: @course, user: user_with_pseudonym, active_enrollment: 1)
         @pseudonym.last_request_at = 1.day.ago
         @pseudonym.save!
 
@@ -142,7 +142,7 @@ describe Reporting::CountsReport do
       end
 
       it "includes designers" do
-        course_with_designer(:course => @course, :user => user_with_pseudonym, :active_enrollment => 1)
+        course_with_designer(course: @course, user: user_with_pseudonym, active_enrollment: 1)
         @pseudonym.last_request_at = 1.day.ago
         @pseudonym.save!
 
@@ -152,7 +152,7 @@ describe Reporting::CountsReport do
       end
 
       it "includes observers" do
-        course_with_observer(:course => @course, :user => user_with_pseudonym, :active_enrollment => 1)
+        course_with_observer(course: @course, user: user_with_pseudonym, active_enrollment: 1)
         @pseudonym.last_request_at = 1.day.ago
         @pseudonym.save!
 
@@ -162,7 +162,7 @@ describe Reporting::CountsReport do
       end
 
       it "does not include student view users" do
-        course_with_user('StudentViewEnrollment', :course => @course, :user => user_with_pseudonym, :active_enrollment => 1)
+        course_with_user('StudentViewEnrollment', course: @course, user: user_with_pseudonym, active_enrollment: 1)
         @pseudonym.last_request_at = 1.day.ago
         @pseudonym.save!
 

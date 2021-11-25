@@ -85,7 +85,7 @@ module Lti
         end
 
         it 'returns a tool_proxy id object' do
-          course_with_teacher_logged_in(:active_all => true)
+          course_with_teacher_logged_in(active_all: true)
           tool_proxy_fixture = Rails.root.join("spec/fixtures/lti/tool_proxy.json").read
           json = JSON.parse(tool_proxy_fixture)
           json[:format] = 'json'
@@ -97,7 +97,7 @@ module Lti
         end
 
         it 'has the correct content-type' do
-          course_with_teacher_logged_in(:active_all => true)
+          course_with_teacher_logged_in(active_all: true)
           tool_proxy_fixture = Rails.root.join("spec/fixtures/lti/tool_proxy.json").read
           headers = { 'CONTENT_TYPE' => 'application/vnd.ims.lti.v2.toolproxy+json',
                       'ACCEPT' => 'application/vnd.ims.lti.v2.toolproxy.id+json' }.merge(oauth1_header)
@@ -106,7 +106,7 @@ module Lti
         end
 
         it 'returns an error message' do
-          course_with_teacher_logged_in(:active_all => true)
+          course_with_teacher_logged_in(active_all: true)
           tool_proxy_fixture = Rails.root.join("spec/fixtures/lti/tool_proxy.json").read
           tp = ::IMS::LTI::Models::ToolProxy.new.from_json(tool_proxy_fixture)
           tp.tool_profile.resource_handlers.first.messages.first.enabled_capability = ['extra_capability']
@@ -117,7 +117,7 @@ module Lti
         end
 
         it 'accepts split secret' do
-          course_with_teacher_logged_in(:active_all => true)
+          course_with_teacher_logged_in(active_all: true)
           # tool_proxy_fixture = Rails.root.join("spec/fixtures/lti/tool_proxy.json").read
           tool_proxy_fixture = JSON.parse(Rails.root.join("spec/fixtures/lti/tool_proxy.json").read)
           tool_proxy_fixture[:enabled_capability] = ['OAuth.splitSecret']
@@ -153,7 +153,7 @@ module Lti
           before { allow(DeveloperKey).to receive(:find_cached) { dev_key } }
 
           it 'supports using a specified custom TCP' do
-            course_with_teacher_logged_in(:active_all => true)
+            course_with_teacher_logged_in(active_all: true)
             tool_proxy_fixture = Rails.root.join("spec/fixtures/lti/tool_proxy.json").read
             tp = ::IMS::LTI::Models::ToolProxy.new.from_json(tool_proxy_fixture)
             tp.tool_profile.product_instance.product_info.product_family.vendor.code = vendor_code
@@ -177,7 +177,7 @@ module Lti
         let(:request_headers) { { Authorization: "Bearer #{access_token}" } }
 
         it 'accepts valid JWT access tokens' do
-          course_with_teacher_logged_in(:active_all => true)
+          course_with_teacher_logged_in(active_all: true)
           allow(Lti::RegistrationRequestService).to receive(:retrieve_registration_password)
             .with(@course.account, 'reg_key').and_return({
                                                            reg_password: 'password',
@@ -191,7 +191,7 @@ module Lti
         end
 
         it 'returns a 401 if the reg_key is not valid' do
-          course_with_teacher_logged_in(:active_all => true)
+          course_with_teacher_logged_in(active_all: true)
           tool_proxy_fixture = Rails.root.join("spec/fixtures/lti/tool_proxy.json").read
           json = JSON.parse(tool_proxy_fixture)
           json[:format] = 'json'
@@ -209,7 +209,7 @@ module Lti
         end
 
         it "routes to the reregistration action based on header" do
-          course_with_teacher_logged_in(:active_all => true)
+          course_with_teacher_logged_in(active_all: true)
           headers = { 'VND-IMS-CONFIRM-URL' => 'Routing based on arbitrary headers, Barf!' }.merge(oauth1_header)
           post "/api/lti/accounts/#{@course.account.id}/tool_proxy.json", params: 'sad times', headers: headers
           expect(controller.params[:action]).to eq 're_reg'
@@ -219,7 +219,7 @@ module Lti
           mock_siq = double('signature')
           allow(mock_siq).to receive(:verify).and_return(false)
           allow(OAuth::Signature).to receive(:build).and_return(mock_siq)
-          course_with_teacher_logged_in(:active_all => true)
+          course_with_teacher_logged_in(active_all: true)
           headers = { 'VND-IMS-CONFIRM-URL' => 'Routing based on arbitrary headers, Barf!' }.merge(oauth1_header)
           response = post "/api/lti/accounts/#{@course.account.id}/tool_proxy.json", params: 'sad times', headers: headers
           expect(response).to eq 401
@@ -229,7 +229,7 @@ module Lti
           mock_siq = double('signature')
           allow(mock_siq).to receive(:verify).and_return(true)
           allow(OAuth::Signature).to receive(:build).and_return(mock_siq)
-          course_with_teacher_logged_in(:active_all => true)
+          course_with_teacher_logged_in(active_all: true)
 
           fixture_file = Rails.root.join('spec/fixtures/lti/tool_proxy.json')
           tool_proxy_fixture = JSON.parse(fixture_file.read)
@@ -244,8 +244,8 @@ module Lti
 
           tool_proxy.reload
           expect(tool_proxy.update_payload).to eq({
-                                                    :acknowledgement_url => "Routing based on arbitrary headers, Barf!",
-                                                    :payload => tool_proxy_fixture
+                                                    acknowledgement_url: "Routing based on arbitrary headers, Barf!",
+                                                    payload: tool_proxy_fixture
                                                   })
         end
 
@@ -253,7 +253,7 @@ module Lti
           mock_siq = double('signature')
           allow(mock_siq).to receive(:verify).and_return(true)
           allow(OAuth::Signature).to receive(:build).and_return(mock_siq)
-          course_with_teacher_logged_in(:active_all => true)
+          course_with_teacher_logged_in(active_all: true)
           headers = { 'VND-IMS-CONFIRM-URL' => 'Routing based on arbitrary headers, Barf!' }.merge(oauth1_header)
           response = post "/api/lti/accounts/#{@course.account.id}/tool_proxy.json", params: 'sad times', headers: headers
           expect(response).to eq 400

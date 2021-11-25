@@ -26,13 +26,13 @@ describe CoursesHelper do
 
   context "a view with a 'Coming Up' sidebar" do
     before(:once) do
-      course_with_teacher(:active_all => true)
+      course_with_teacher(active_all: true)
       @assignment = factory_with_protected_attributes(@course.assignments,
-                                                      assignment_valid_attributes.merge({ :points_possible => 10,
-                                                                                          :submission_types => "online_text_entry" }))
+                                                      assignment_valid_attributes.merge({ points_possible: 10,
+                                                                                          submission_types: "online_text_entry" }))
       @assignment2 = factory_with_protected_attributes(@course.assignments,
-                                                       assignment_valid_attributes.merge({ :points_possible => 10,
-                                                                                           :submission_types => "none" }))
+                                                       assignment_valid_attributes.merge({ points_possible: 10,
+                                                                                           submission_types: "none" }))
     end
 
     before do
@@ -81,17 +81,17 @@ describe CoursesHelper do
 
       it "returns a needs grading tooltip if assignments have been submitted that aren't graded" do
         expect(self).to receive(:t).with('#courses.recent_event.needs_grading', 'needs grading').and_return('needs grading')
-        @assignment.submit_homework(@student_one, { :submission_type => "online_text_entry", :body => "..." })
+        @assignment.submit_homework(@student_one, { submission_type: "online_text_entry", body: "..." })
         check_icon_data("needs grading", "Assignment", "icon-assignment")
       end
 
       it "returns the submission's readable_state as the tooltip for a student" do
-        submission = @assignment.submit_homework(@student_one, { :submission_type => "online_text_entry", :body => "..." })
+        submission = @assignment.submit_homework(@student_one, { submission_type: "online_text_entry", body: "..." })
         check_icon_data(submission.readable_state, "", "icon-check", current_user: @student_one, submission: submission)
       end
 
       it "returns an assignment icon instead of a check icon if show_assignment_type_icon is set" do
-        submission = @assignment.submit_homework(@student_two, { :submission_type => "online_text_entry", :body => "..." })
+        submission = @assignment.submit_homework(@student_two, { submission_type: "online_text_entry", body: "..." })
         check_icon_data(submission.readable_state,
                         "Assignment",
                         "icon-assignment",
@@ -100,7 +100,7 @@ describe CoursesHelper do
 
       it "returns a no new submissions tooltip if some assignments have been submitted and graded" do
         expect(self).to receive(:t).with('#courses.recent_event.no_new_submissions', 'no new submissions').and_return('no new submissions')
-        @assignment.submit_homework(@student_one, { :submission_type => "online_text_entry", :body => "xyz" })
+        @assignment.submit_homework(@student_one, { submission_type: "online_text_entry", body: "xyz" })
         @assignment.grade_student(@student_one, grade: 5, grader: @teacher)
         check_icon_data("no new submissions", "Assignment", "icon-assignment")
       end
@@ -108,7 +108,7 @@ describe CoursesHelper do
       it "returns an all graded tooltip if all assignments are submitted and graded" do
         expect(self).to receive(:t).with('#courses.recent_event.all_graded', 'all graded').and_return('all graded')
         [@student_one, @student_two].each do |student|
-          @assignment.submit_homework(student, { :submission_type => "online_text_entry", :body => "bod" })
+          @assignment.submit_homework(student, { submission_type: "online_text_entry", body: "bod" })
           @assignment.grade_student(student, grade: 5, grader: @teacher)
         end
         check_icon_data("all graded", "Assignment", "icon-assignment")
@@ -117,11 +117,11 @@ describe CoursesHelper do
 
     def check_icon_data(msg, aria_label, icon, options = {})
       base_options = {
-        :context => @course,
-        :contexts => [@course],
-        :current_user => @teacher,
-        :recent_event => @assignment,
-        :submission => nil
+        context: @course,
+        contexts: [@course],
+        current_user: @teacher,
+        recent_event: @assignment,
+        submission: nil
       }.merge(options)
       @icon_explanation, @icon_aria_label, @icon_class = icon_data(base_options)
       expect(@icon_explanation).to eql msg
@@ -137,8 +137,8 @@ describe CoursesHelper do
     end
 
     it "returns the score if graded" do
-      assignment = Assignment.new(:points_possible => 5, :grading_type => 'points')
-      submission = Submission.new(:grade => 1.33333333, :workflow_state => 'graded', :assignment => assignment)
+      assignment = Assignment.new(points_possible: 5, grading_type: 'points')
+      submission = Submission.new(grade: 1.33333333, workflow_state: 'graded', assignment: assignment)
       expect(readable_grade(submission)).to eq '1.33 out of 5'
     end
 

@@ -35,8 +35,8 @@ module Quizzes::QuizRegrader
       Quizzes::QuizRegradeRun.perform(regrade) do
         submissions.each do |submission|
           Quizzes::QuizRegrader::Submission.new(
-            :submission => submission,
-            :question_regrades => question_regrades
+            submission: submission,
+            question_regrades: question_regrades
           ).regrade!
         end
       end

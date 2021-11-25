@@ -47,8 +47,8 @@ describe ScopesApiController, type: :request do
 
     context "with admin" do
       before do
-        account_admin_user(:account => account)
-        user_with_pseudonym(:user => @admin)
+        account_admin_user(account: account)
+        user_with_pseudonym(user: @admin)
       end
 
       it "returns expected scopes" do
@@ -75,7 +75,7 @@ describe ScopesApiController, type: :request do
 
       it "returns expected scopes when flag is disabled and Setting is set" do
         Setting.set(Setting::SITE_ADMIN_ACCESS_TO_NEW_DEV_KEY_FEATURES, 'true')
-        account_admin_user(:account => Account.site_admin)
+        account_admin_user(account: Account.site_admin)
         allow_any_instance_of(Account).to receive(:feature_enabled?).and_return(false)
         DeveloperKey.default.developer_key_account_bindings.first.update!(workflow_state: 'on')
         json = api_call(

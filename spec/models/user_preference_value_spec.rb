@@ -23,15 +23,15 @@ describe UserPreferenceValue do
   let(:subbed_key) { :course_nicknames }
 
   let(:sample_preferences) do
-    { regular_key => [:arbitrary_data], subbed_key => { :a => 1, :b => [:other_stuff] } }
+    { regular_key => [:arbitrary_data], subbed_key => { a: 1, b: [:other_stuff] } }
   end
 
   let(:preexisting_user) do
-    User.create!(:preferences => sample_preferences)
+    User.create!(preferences: sample_preferences)
   end
 
   let(:migrated_user) do
-    u = User.create!(:preferences => sample_preferences)
+    u = User.create!(preferences: sample_preferences)
     u.migrate_preferences_if_needed
     u.save!
     u
@@ -48,12 +48,12 @@ describe UserPreferenceValue do
   end
 
   it "updates an existing row when setting a new value" do
-    regular_row = migrated_user.user_preference_values.where(:key => regular_key).first
+    regular_row = migrated_user.user_preference_values.where(key: regular_key).first
     migrated_user.set_preference(regular_key, "new data")
     expect(regular_row.reload.value).to eq "new data"
     expect(migrated_user.get_preference(regular_key)).to eq "new data"
 
-    sub_row = migrated_user.user_preference_values.where(:key => subbed_key, :sub_key => :a).first
+    sub_row = migrated_user.user_preference_values.where(key: subbed_key, sub_key: :a).first
     migrated_user.set_preference(subbed_key, :a, "more new data")
     expect(sub_row.reload.value).to eq "more new data"
     expect(migrated_user.get_preference(subbed_key, :a)).to eq "more new data"
@@ -99,7 +99,7 @@ describe UserPreferenceValue do
   it "does not have to query to load preferences if the values are empty for a sub key" do
     migrated_user.clear_all_preferences_for(subbed_key)
     expect(migrated_user.preference_row_exists?(subbed_key, :a)).to eq false
-    expect(migrated_user.user_preference_values.where(:key => subbed_key)).not_to be_any
+    expect(migrated_user.user_preference_values.where(key: subbed_key)).not_to be_any
     expect(migrated_user.preferences[subbed_key]).to eq({})
 
     reloaded_user = User.find(migrated_user.id)
@@ -125,8 +125,8 @@ describe UserPreferenceValue do
     let(:assignment2) { course2.assignments.create! }
     let(:assignment_group1) { course1.assignment_groups.create! }
     let(:assignment_group2) { course2.assignment_groups.create! }
-    let(:column1) { course1.custom_gradebook_columns.create!(:title => "1") }
-    let(:column2) { course2.custom_gradebook_columns.create!(:title => "2") }
+    let(:column1) { course1.custom_gradebook_columns.create!(title: "1") }
+    let(:column2) { course2.custom_gradebook_columns.create!(title: "2") }
 
     let(:old_format) do
       {
@@ -142,7 +142,7 @@ describe UserPreferenceValue do
 
     it "splits the old gradebook column size preference by course" do
       u = User.create!
-      User.where(:id => u).update_all(:preferences => { :gradebook_column_size => old_format })
+      User.where(id: u).update_all(preferences: { gradebook_column_size: old_format })
       u.reload
       u.migrate_preferences_if_needed
       u.save!
@@ -157,7 +157,7 @@ describe UserPreferenceValue do
 
     it "does not attempt to re-migrate when a new non-migrated preference value appears" do
       u = User.create!
-      User.where(:id => u).update_all(:preferences => { :closed_notifications => [], :gradebook_column_size => old_format })
+      User.where(id: u).update_all(preferences: { closed_notifications: [], gradebook_column_size: old_format })
       u.reload
       u.migrate_preferences_if_needed
       u.save!
@@ -172,7 +172,7 @@ describe UserPreferenceValue do
       @shard1.activate do
         u = User.create!
         u.associate_with_shard(Shard.default)
-        User.where(:id => u).update_all(:preferences => { :gradebook_column_size => old_format })
+        User.where(id: u).update_all(preferences: { gradebook_column_size: old_format })
         u.reload
         u.migrate_preferences_if_needed
         u.save!

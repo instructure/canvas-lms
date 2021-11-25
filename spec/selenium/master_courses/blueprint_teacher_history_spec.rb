@@ -35,7 +35,7 @@ describe "master courses - child courses - sync history for teacher" do
   def run_master_migration
     @migration = MasterCourses::MasterMigration.start_new_migration!(@template, @admin)
     run_jobs
-    @cm = @copy_to.content_migrations.where(:child_subscription_id => @sub).last
+    @cm = @copy_to.content_migrations.where(child_subscription_id: @sub).last
   end
 
   before do

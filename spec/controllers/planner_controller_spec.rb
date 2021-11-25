@@ -23,7 +23,7 @@ describe PlannerController do
     Account.find_or_create_by!(id: 0).update(name: 'Dummy Root Account', workflow_state: 'deleted', root_account_id: nil)
     course_with_teacher(active_all: true)
     student_in_course(active_all: true)
-    @group = @course.assignment_groups.create(:name => "some group")
+    @group = @course.assignment_groups.create(name: "some group")
     @assignment = course_assignment
     @assignment2 = course_assignment
     @assignment.unmute!
@@ -32,9 +32,9 @@ describe PlannerController do
 
   def course_assignment
     @course.assignments.create(
-      :title => "some assignment #{@course.assignments.count}",
-      :assignment_group => @group,
-      :due_at => Time.zone.now + 1.week
+      title: "some assignment #{@course.assignments.count}",
+      assignment_group: @group,
+      due_at: Time.zone.now + 1.week
     )
   end
 
@@ -114,10 +114,10 @@ describe PlannerController do
         @student1_enrollment = course_with_student(course: @course1, user: @student1, active_all: true)
         course_with_student(course: @course2, user: @student1, active_all: true)
 
-        @course1_group = @course1.groups.create(:name => "some group")
+        @course1_group = @course1.groups.create(name: "some group")
         @course1_group.add_user(@student1)
 
-        @course2_group = @course2.groups.create(:name => "some other group")
+        @course2_group = @course2.groups.create(name: "some other group")
         @course2_group.add_user(@student1)
 
         course1_event = @course1_group.calendar_events.create!(start_at: 2.days.from_now, title: 'user_event1')
@@ -143,9 +143,8 @@ describe PlannerController do
 
       it "shows the appropriate section-specific event for the user" do
         other_section = @course.course_sections.create!(name: 'Other Section')
-        event = @course.calendar_events.build(:title => 'event', :child_event_data =>
-          { "0" => { :start_at => 1.hour.from_now.iso8601, :end_at => 2.hours.from_now.iso8601, :context_code => @course.default_section.asset_string },
-            "1" => { :start_at => 2.hours.from_now.iso8601, :end_at => 3.hours.from_now.iso8601, :context_code => other_section.asset_string } })
+        event = @course.calendar_events.build(title: 'event', child_event_data:           { "0" => { start_at: 1.hour.from_now.iso8601, end_at: 2.hours.from_now.iso8601, context_code: @course.default_section.asset_string },
+                                                                                            "1" => { start_at: 2.hours.from_now.iso8601, end_at: 3.hours.from_now.iso8601, context_code: other_section.asset_string } })
         event.updating_user = @teacher
         event.save!
 
@@ -176,9 +175,9 @@ describe PlannerController do
       end
 
       it "only shows section specific announcements to students who can view them" do
-        a1 = @course.announcements.create!(:message => "for the defaults", :is_section_specific => true, :course_sections => [@course.default_section])
+        a1 = @course.announcements.create!(message: "for the defaults", is_section_specific: true, course_sections: [@course.default_section])
         sec2 = @course.course_sections.create!
-        @course.announcements.create!(:message => "for my favorites", :is_section_specific => true, :course_sections => [sec2])
+        @course.announcements.create!(message: "for my favorites", is_section_specific: true, course_sections: [sec2])
 
         get :index
         response_json = json_parse(response.body)
@@ -265,14 +264,14 @@ describe PlannerController do
         before :once do
           @u = User.create!
 
-          @c1 = course_with_student(:active_all => true, :user => @u).course
+          @c1 = course_with_student(active_all: true, user: @u).course
           @a1 = course_assignment
-          @pn1 = planner_note_model(:todo_date => 1.day.from_now, :course => @c1)
+          @pn1 = planner_note_model(todo_date: 1.day.from_now, course: @c1)
 
-          @e2 = course_with_student(:active_all => true, :user => @u)
+          @e2 = course_with_student(active_all: true, user: @u)
           @c2 = @e2.course
           @a2 = course_assignment
-          @pn2 = planner_note_model(:todo_date => 1.day.from_now, :course => @c2)
+          @pn2 = planner_note_model(todo_date: 1.day.from_now, course: @c2)
           @e2.conclude
         end
 
@@ -547,16 +546,16 @@ describe PlannerController do
           expect(response_json.length).to eq 5
           expect(response_json.map { |i| i["plannable_id"] }).to eq [@assignment3.id, @page.id, @assignment5.id, @assignment.id, @assignment2.id]
 
-          get :index, params: { :per_page => 2 }
+          get :index, params: { per_page: 2 }
           expect(json_parse(response.body).map { |i| i["plannable_id"] }).to eq [@assignment3.id, @page.id]
 
           link = Api.parse_pagination_links(response.headers['Link']).detect { |p| p[:rel] == "next" }
           expect(link[:uri].path).to include '/api/v1/planner/items'
-          get :index, params: { :per_page => 2, :page => link['page'] }
+          get :index, params: { per_page: 2, page: link['page'] }
           expect(json_parse(response.body).map { |i| i["plannable_id"] }).to eq [@assignment5.id, @assignment.id]
 
           link = Api.parse_pagination_links(response.headers['Link']).detect { |p| p[:rel] == "next" }
-          get :index, params: { :per_page => 2, :page => link['page'] }
+          get :index, params: { per_page: 2, page: link['page'] }
           expect(json_parse(response.body).map { |i| i["plannable_id"] }).to eq [@assignment2.id]
         end
 
@@ -564,19 +563,19 @@ describe PlannerController do
           time = 4.days.from_now
           @assignment.update_attribute(:due_at, time)
           @assignment2.update_attribute(:due_at, time)
-          @course.wiki_pages.create!(:title => "t1", :todo_date => time)
-          planner_note_model(:todo_date => time)
+          @course.wiki_pages.create!(title: "t1", todo_date: time)
+          planner_note_model(todo_date: time)
           discussion_topic_model(context: @course, todo_date: time)
 
           get :index
           response_json = json_parse(response.body)
           original_order = response_json.map { |i| [i["plannable_type"], i["plannable_id"]] }
 
-          get :index, params: { :per_page => 3 }
+          get :index, params: { per_page: 3 }
           expect(json_parse(response.body).map { |i| [i["plannable_type"], i["plannable_id"]] }).to eq original_order[0..2]
 
           next_page = Api.parse_pagination_links(response.headers['Link']).detect { |p| p[:rel] == "next" }['page']
-          get :index, params: { :per_page => 3, :page => next_page }
+          get :index, params: { per_page: 3, page: next_page }
           expect(json_parse(response.body).map { |i| [i["plannable_type"], i["plannable_id"]] }).to eq original_order[3..4]
         end
 
@@ -586,11 +585,11 @@ describe PlannerController do
           @assignment.update_attribute(:due_at, time)
           @assignment2.update_attribute(:due_at, time)
 
-          get :index, params: { :per_page => 1 }
+          get :index, params: { per_page: 1 }
           expect(json_parse(response.body).map { |i| i["plannable_id"] }).to eq [@assignment.id]
 
           next_page = Api.parse_pagination_links(response.headers['Link']).detect { |p| p[:rel] == "next" }['page']
-          get :index, params: { :per_page => 1, :page => next_page }
+          get :index, params: { per_page: 1, page: next_page }
           expect(json_parse(response.body).map { |i| i["plannable_id"] }).to eq [@assignment2.id]
         end
 
@@ -599,26 +598,26 @@ describe PlannerController do
           @assignment3 = course_assignment
           @assignment3.due_at = 1.week.ago
           @assignment3.save!
-          get :index, params: { :order => :desc }
+          get :index, params: { order: :desc }
           response_json = json_parse(response.body)
           expect(response_json.length).to eq 4
           expect(response_json.map { |i| i["plannable_id"] }).to eq [@assignment2.id, @assignment.id, @page.id, @assignment3.id]
 
-          get :index, params: { :order => :desc, :per_page => 2 }
+          get :index, params: { order: :desc, per_page: 2 }
           expect(json_parse(response.body).map { |i| i["plannable_id"] }).to eq [@assignment2.id, @assignment.id]
 
           next_page = Api.parse_pagination_links(response.headers['Link']).detect { |p| p[:rel] == "next" }['page']
-          get :index, params: { :order => :desc, :per_page => 2, :page => next_page }
+          get :index, params: { order: :desc, per_page: 2, page: next_page }
           expect(json_parse(response.body).map { |i| i["plannable_id"] }).to eq [@page.id, @assignment3.id]
         end
 
         it "does not try to compare missing dates" do
-          @assignment3 = @course.assignments.create!(:submission_types => "online_text_entry")
+          @assignment3 = @course.assignments.create!(submission_types: "online_text_entry")
           # doesn't have a due_at, so it should coalesce to the created_at
-          override = @assignment3.assignment_overrides.new(:set => @course.default_section)
+          override = @assignment3.assignment_overrides.new(set: @course.default_section)
           override.override_due_at(2.days.from_now)
           override.save!
-          @assignment3.submit_homework(@student, :submission_type => "online_text_entry", :body => "text")
+          @assignment3.submit_homework(@student, submission_type: "online_text_entry", body: "text")
           @assignment3.grade_student @student, grade: 10, grader: @teacher
           get :index
           response_json = json_parse(response.body)
@@ -630,9 +629,9 @@ describe PlannerController do
           dt = @course.discussion_topics.create!(title: "Yes", message: "Please", user: @teacher, todo_date: 3.days.from_now)
           dt.change_all_read_state("unread", @student)
 
-          @assignment3 = @course.assignments.create!(:submission_types => "online_text_entry")
+          @assignment3 = @course.assignments.create!(submission_types: "online_text_entry")
           @assignment3.unmute!
-          override = @assignment3.assignment_overrides.new(:set => @course.default_section)
+          override = @assignment3.assignment_overrides.new(set: @course.default_section)
           override.override_due_at(2.days.from_now)
           override.save!
 
@@ -775,15 +774,15 @@ describe PlannerController do
 
         it "ignores shards other than the current account's" do
           @shard1.activate do
-            @another_assignment = @another_course.assignments.create!(:title => "title", :due_at => 1.day.from_now)
-            @student = user_with_pseudonym(:active_all => true, :account => @another_account)
-            @another_course.enroll_student(@student, :enrollment_state => 'active')
+            @another_assignment = @another_course.assignments.create!(title: "title", due_at: 1.day.from_now)
+            @student = user_with_pseudonym(active_all: true, account: @another_account)
+            @another_course.enroll_student(@student, enrollment_state: 'active')
             group_with_user(active_all: true, user: @student, context: @another_course)
             @group.announcements.create!(message: 'Hi')
           end
           group_with_user(active_all: true, user: @student, context: @course)
           announcement = @group.announcements.create!(message: 'Hi')
-          @course.enroll_student(@student, :enrollment_state => 'active')
+          @course.enroll_student(@student, enrollment_state: 'active')
           user_session(@student)
 
           get :index
@@ -831,8 +830,8 @@ describe PlannerController do
 
         it "still works with context code if the student is from another shard" do
           @shard1.activate do
-            @cs_student = user_factory(:active_all => true, :account => Account.create!)
-            @original_course.enroll_user(@cs_student, 'StudentEnrollment', :enrollment_state => 'active')
+            @cs_student = user_factory(active_all: true, account: Account.create!)
+            @original_course.enroll_user(@cs_student, 'StudentEnrollment', enrollment_state: 'active')
             planner_note_model(course: @original_course, user: @cs_student)
           end
           group_category(context: @original_course)
@@ -961,7 +960,7 @@ describe PlannerController do
         end
 
         it "shows new activity when a new submission comment has been created" do
-          @assignment.submit_homework(@student, { :url => "http://www.instructure.com/" })
+          @assignment.submit_homework(@student, { url: "http://www.instructure.com/" })
           submission = @assignment.submissions.find_by(user: @student)
           get :index, params: { start_date: @start_date, end_date: @end_date }
           assign_json = json_parse(response.body).find { |j| j['plannable_id'] == @assignment.id && j['plannable_type'] == 'assignment' }
@@ -975,7 +974,7 @@ describe PlannerController do
         end
 
         it "does not show new activity when a new submission comment has been viewed" do
-          @assignment.submit_homework(@student, { :url => "http://www.instructure.com/" })
+          @assignment.submit_homework(@student, { url: "http://www.instructure.com/" })
           submission = @assignment.submissions.find_by(user: @student)
           submission.submission_comments.create!(author: @teacher, comment: 'hi')
           @student.reload
@@ -1018,11 +1017,11 @@ describe PlannerController do
         end
 
         it "marks submitted stuff within start and end dates" do
-          @assignment4 = @course.assignments.create!(:submission_types => "online_text_entry", :due_at => 4.weeks.from_now)
-          @assignment5 = @course.assignments.create!(:submission_types => "online_text_entry", :due_at => 4.weeks.ago)
-          @assignment4.submit_homework(@student, :submission_type => "online_text_entry")
-          @assignment5.submit_homework(@student, :submission_type => "online_text_entry")
-          get :index, params: { :start_date => 5.weeks.ago.to_date.to_s, :end_date => 5.weeks.from_now.to_date.to_s }
+          @assignment4 = @course.assignments.create!(submission_types: "online_text_entry", due_at: 4.weeks.from_now)
+          @assignment5 = @course.assignments.create!(submission_types: "online_text_entry", due_at: 4.weeks.ago)
+          @assignment4.submit_homework(@student, submission_type: "online_text_entry")
+          @assignment5.submit_homework(@student, submission_type: "online_text_entry")
+          get :index, params: { start_date: 5.weeks.ago.to_date.to_s, end_date: 5.weeks.from_now.to_date.to_s }
           response_json = json_parse(response.body)
           found_assignment_4 = false
           found_assignment_5 = false
@@ -1043,7 +1042,7 @@ describe PlannerController do
         end
 
         it "does not return things from other courses" do
-          course_with_student(:active_all => true) # another course
+          course_with_student(active_all: true) # another course
           @course.discussion_topics.create!(title: "srsly", message: "cmon", todo_date: Time.zone.now)
           other_assignment = course_assignment
           other_sub = other_assignment.submit_homework(@student)
@@ -1107,8 +1106,8 @@ describe PlannerController do
 
           it "returns discussion topics with unread replies" do
             expect(@topic.unread_count(@student)).to eq 0
-            @entry = @topic.discussion_entries.create!(:message => "Hello!", :user => @student)
-            @reply = @entry.reply_from(:user => @teacher, :text => "ohai!")
+            @entry = @topic.discussion_entries.create!(message: "Hello!", user: @student)
+            @reply = @entry.reply_from(user: @teacher, text: "ohai!")
             @topic.reload
             expect(@topic.unread?(@student)).to eq true
             expect(@topic.unread_count(@student)).to eq 1
@@ -1124,7 +1123,7 @@ describe PlannerController do
             get :index, params: { filter: "new_activity" }
             expect(json_parse(response.body)).to be_empty
 
-            @reply2 = @entry.reply_from(:user => @teacher, :text => "ohai again...")
+            @reply2 = @entry.reply_from(user: @teacher, text: "ohai again...")
 
             get :index, params: { filter: "new_activity" }
             expect(json_parse(response.body).length).to eq 1
@@ -1139,8 +1138,8 @@ describe PlannerController do
             get :index, params: { filter: "new_activity" }
             expect(json_parse(response.body)).to be_empty
 
-            entry = topic.discussion_entries.create!(:message => "Hello!", :user => @student)
-            reply = entry.reply_from(:user => @teacher, :text => "ohai!")
+            entry = topic.discussion_entries.create!(message: "Hello!", user: @student)
+            reply = entry.reply_from(user: @teacher, text: "ohai!")
             topic.reload
 
             get :index, params: { filter: "new_activity" }
@@ -1200,7 +1199,7 @@ describe PlannerController do
         it "only returns items between (inclusive) the specified dates" do
           pn = planner_note_model(course: @course, todo_date: end_date)
           calendar_event_model(start_at: end_date + 1.second)
-          get :index, params: { :start_date => start_date.iso8601, :end_date => end_date.iso8601 }
+          get :index, params: { start_date: start_date.iso8601, end_date: end_date.iso8601 }
           response_json = json_parse(response.body)
           expect(response_json.length).to eq 1
           note = response_json.detect { |i| i["plannable_type"] == 'planner_note' }

@@ -30,31 +30,31 @@ describe 'Submissions API', type: :request do
     allow(HostUrl).to receive(:file_host_with_shard).and_return(["www.example.com", Shard.default])
   end
 
-  def submit_homework(assignment, student, opts = { :body => "test!" })
+  def submit_homework(assignment, student, opts = { body: "test!" })
     @submit_homework_time ||= Time.zone.at(0)
     @submit_homework_time += 1.hour # each submission in a test is separated by an hour
     sub = assignment.find_or_create_submission(student)
     if sub.versions.size == 1
-      Version.where(:id => sub.versions.first).update_all(:created_at => @submit_homework_time)
+      Version.where(id: sub.versions.first).update_all(created_at: @submit_homework_time)
     end
     sub.workflow_state = 'submitted'
     yield(sub) if block_given?
-    sub.with_versioning(:explicit => true) do
-      update_with_protected_attributes!(sub, { :submitted_at => @submit_homework_time, :created_at => @submit_homework_time }.merge(opts))
+    sub.with_versioning(explicit: true) do
+      update_with_protected_attributes!(sub, { submitted_at: @submit_homework_time, created_at: @submit_homework_time }.merge(opts))
     end
-    sub.versions.reload.each { |v| Version.where(:id => v).update_all(:created_at => v.model.created_at) }
+    sub.versions.reload.each { |v| Version.where(id: v).update_all(created_at: v.model.created_at) }
     sub
   end
 
   describe "using section ids" do
     before :once do
       @student1 = user_factory(active_all: true)
-      course_with_teacher(:active_all => true)
+      course_with_teacher(active_all: true)
       @default_section = @course.default_section
-      @section = factory_with_protected_attributes(@course.course_sections, :sis_source_id => 'my-section-sis-id', :name => 'section2')
-      @course.enroll_user(@student1, 'StudentEnrollment', :section => @section).accept!
+      @section = factory_with_protected_attributes(@course.course_sections, sis_source_id: 'my-section-sis-id', name: 'section2')
+      @course.enroll_user(@student1, 'StudentEnrollment', section: @section).accept!
 
-      quiz = Quizzes::Quiz.create!(:title => 'quiz1', :context => @course)
+      quiz = Quizzes::Quiz.create!(title: 'quiz1', context: @course)
       quiz.did_edit!
       quiz.offer!
       @a1 = quiz.assignment
@@ -67,51 +67,51 @@ describe 'Submissions API', type: :request do
     it "lists submissions" do
       json = api_call(:get,
                       "/api/v1/sections/#{@default_section.id}/assignments/#{@a1.id}/submissions.json",
-                      { :controller => 'submissions_api', :action => 'index',
-                        :format => 'json', :section_id => @default_section.id.to_s,
-                        :assignment_id => @a1.id.to_s },
-                      { :include => %w[submission_history submission_comments rubric_assessment] })
+                      { controller: 'submissions_api', action: 'index',
+                        format: 'json', section_id: @default_section.id.to_s,
+                        assignment_id: @a1.id.to_s },
+                      { include: %w[submission_history submission_comments rubric_assessment] })
       expect(json.size).to eq 0
 
       json = api_call(:get,
                       "/api/v1/sections/sis_section_id:my-section-sis-id/assignments/#{@a1.id}/submissions.json",
-                      { :controller => 'submissions_api', :action => 'index',
-                        :format => 'json', :section_id => 'sis_section_id:my-section-sis-id',
-                        :assignment_id => @a1.id.to_s },
-                      { :include => %w[submission_history submission_comments rubric_assessment] })
+                      { controller: 'submissions_api', action: 'index',
+                        format: 'json', section_id: 'sis_section_id:my-section-sis-id',
+                        assignment_id: @a1.id.to_s },
+                      { include: %w[submission_history submission_comments rubric_assessment] })
       expect(json.size).to eq 1
       expect(json.first['user_id']).to eq @student1.id
 
       api_call(:get,
                "/api/v1/sections/#{@default_section.id}/students/submissions",
-               { :controller => 'submissions_api', :action => 'for_students',
-                 :format => 'json', :section_id => @default_section.id.to_s },
-               { :student_ids => [@student1.id] },
+               { controller: 'submissions_api', action: 'for_students',
+                 format: 'json', section_id: @default_section.id.to_s },
+               { student_ids: [@student1.id] },
                {}, expected_status: 401)
 
       json = api_call(:get,
                       "/api/v1/sections/sis_section_id:my-section-sis-id/students/submissions",
-                      { :controller => 'submissions_api', :action => 'for_students',
-                        :format => 'json', :section_id => 'sis_section_id:my-section-sis-id' },
-                      :student_ids => [@student1.id])
+                      { controller: 'submissions_api', action: 'for_students',
+                        format: 'json', section_id: 'sis_section_id:my-section-sis-id' },
+                      student_ids: [@student1.id])
       expect(json.size).to eq 1
     end
 
     it 'returns submissions based on workflow_state' do
       json = api_call(:get,
                       "/api/v1/sections/sis_section_id:my-section-sis-id/students/submissions",
-                      { :controller => 'submissions_api', :action => 'for_students',
-                        :format => 'json', :section_id => 'sis_section_id:my-section-sis-id' },
-                      :workflow_state => 'submitted',
-                      :student_ids => [@student1.id])
+                      { controller: 'submissions_api', action: 'for_students',
+                        format: 'json', section_id: 'sis_section_id:my-section-sis-id' },
+                      workflow_state: 'submitted',
+                      student_ids: [@student1.id])
       expect(json.size).to eq 1
 
       json = api_call(:get,
                       "/api/v1/sections/sis_section_id:my-section-sis-id/students/submissions",
-                      { :controller => 'submissions_api', :action => 'for_students',
-                        :format => 'json', :section_id => 'sis_section_id:my-section-sis-id' },
-                      :workflow_state => 'unsubmitted',
-                      :student_ids => [@student1.id])
+                      { controller: 'submissions_api', action: 'for_students',
+                        format: 'json', section_id: 'sis_section_id:my-section-sis-id' },
+                      workflow_state: 'unsubmitted',
+                      student_ids: [@student1.id])
       expect(json.size).to eq 0
     end
 
@@ -336,10 +336,10 @@ describe 'Submissions API', type: :request do
     it "includes user" do
       json = api_call(:get,
                       "/api/v1/sections/#{@section.id}/assignments/#{@a1.id}/submissions.json",
-                      { :controller => 'submissions_api', :action => 'index',
-                        :format => 'json', :section_id => @section.id.to_s,
-                        :assignment_id => @a1.id.to_s },
-                      { :include => %w[user] })
+                      { controller: 'submissions_api', action: 'index',
+                        format: 'json', section_id: @section.id.to_s,
+                        assignment_id: @a1.id.to_s },
+                      { include: %w[user] })
       expect(json.size).to eq 1
       expect(json[0]['user']).not_to be_nil
       expect(json[0]['user']['id']).to eq(@student1.id)
@@ -349,30 +349,30 @@ describe 'Submissions API', type: :request do
     it "returns assignment_visible" do
       json = api_call(:get,
                       "/api/v1/sections/#{@section.id}/assignments/#{@a1.id}/submissions.json",
-                      { :controller => 'submissions_api', :action => 'index',
-                        :format => 'json', :section_id => @section.id.to_s,
-                        :assignment_id => @a1.id.to_s },
-                      { :include => %w[visibility], :student_ids => [@student1.id] })
+                      { controller: 'submissions_api', action: 'index',
+                        format: 'json', section_id: @section.id.to_s,
+                        assignment_id: @a1.id.to_s },
+                      { include: %w[visibility], student_ids: [@student1.id] })
       expect(json[0]["assignment_visible"]).to eq true
     end
 
     it "posts to submissions" do
-      @a1 = @course.assignments.create!({ :title => 'assignment1', :grading_type => 'percent', :points_possible => 10 })
+      @a1 = @course.assignments.create!({ title: 'assignment1', grading_type: 'percent', points_possible: 10 })
       json = raw_api_call(:put,
                           "/api/v1/sections/#{@default_section.id}/assignments/#{@a1.id}/submissions/#{@student1.id}",
-                          { :controller => 'submissions_api', :action => 'update',
-                            :format => 'json', :section_id => @default_section.id.to_s,
-                            :assignment_id => @a1.id.to_s, :user_id => @student1.id.to_s },
-                          { :submission => { :posted_grade => '75%' } })
+                          { controller: 'submissions_api', action: 'update',
+                            format: 'json', section_id: @default_section.id.to_s,
+                            assignment_id: @a1.id.to_s, user_id: @student1.id.to_s },
+                          { submission: { posted_grade: '75%' } })
       assert_status(404)
 
       expect do
         json = api_call(:put,
                         "/api/v1/sections/sis_section_id:my-section-sis-id/assignments/#{@a1.id}/submissions/#{@student1.id}",
-                        { :controller => 'submissions_api', :action => 'update',
-                          :format => 'json', :section_id => 'sis_section_id:my-section-sis-id',
-                          :assignment_id => @a1.id.to_s, :user_id => @student1.id.to_s },
-                        { :submission => { :posted_grade => '75%' } })
+                        { controller: 'submissions_api', action: 'update',
+                          format: 'json', section_id: 'sis_section_id:my-section-sis-id',
+                          assignment_id: @a1.id.to_s, user_id: @student1.id.to_s },
+                        { submission: { posted_grade: '75%' } })
         # never more than 1 job added, because it's in a Delayed::Batch
       end.to change { Delayed::Job.jobs_count(:current) }.by(1)
 
@@ -387,10 +387,10 @@ describe 'Submissions API', type: :request do
     it "returns assignment_visible after posting to submissions" do
       json = api_call(:put,
                       "/api/v1/sections/#{@section.id}/assignments/#{@a1.id}/submissions/#{@student1.id}",
-                      { :controller => 'submissions_api', :action => 'update',
-                        :format => 'json', :section_id => @section.id.to_s,
-                        :assignment_id => @a1.id.to_s, :user_id => @student1.id.to_s },
-                      { :submission => { :posted_grade => '75%' }, :include => %w[visibility] })
+                      { controller: 'submissions_api', action: 'update',
+                        format: 'json', section_id: @section.id.to_s,
+                        assignment_id: @a1.id.to_s, user_id: @student1.id.to_s },
+                      { submission: { posted_grade: '75%' }, include: %w[visibility] })
       expect(json["assignment_visible"]).to eq true
       expect(json["all_submissions"][0]["assignment_visible"]).to eq true
     end
@@ -398,10 +398,10 @@ describe 'Submissions API', type: :request do
     it "is able to handle an update without visibility when DA is on" do
       json = api_call(:put,
                       "/api/v1/sections/#{@section.id}/assignments/#{@a1.id}/submissions/#{@student1.id}",
-                      { :controller => 'submissions_api', :action => 'update',
-                        :format => 'json', :section_id => @section.id.to_s,
-                        :assignment_id => @a1.id.to_s, :user_id => @student1.id.to_s },
-                      { :submission => { :posted_grade => '75%' } })
+                      { controller: 'submissions_api', action: 'update',
+                        format: 'json', section_id: @section.id.to_s,
+                        assignment_id: @a1.id.to_s, user_id: @student1.id.to_s },
+                      { submission: { posted_grade: '75%' } })
       expect(json["assignment_visible"]).to be_nil
       expect(json["all_submissions"][0]["assignment_visible"]).to be_nil
       expect(json["assignment_id"]).to eq @a1.id
@@ -410,10 +410,10 @@ describe 'Submissions API', type: :request do
     it "returns submissions for a section" do
       json = api_call(:get,
                       "/api/v1/sections/sis_section_id:my-section-sis-id/assignments/#{@a1.id}/submissions/#{@student1.id}",
-                      { :controller => 'submissions_api', :action => 'show',
-                        :format => 'json', :section_id => 'sis_section_id:my-section-sis-id',
-                        :assignment_id => @a1.id.to_s, :user_id => @student1.id.to_s },
-                      { :include => %w[submission_history submission_comments rubric_assessment] })
+                      { controller: 'submissions_api', action: 'show',
+                        format: 'json', section_id: 'sis_section_id:my-section-sis-id',
+                        assignment_id: @a1.id.to_s, user_id: @student1.id.to_s },
+                      { include: %w[submission_history submission_comments rubric_assessment] })
       expect(json['user_id']).to eq @student1.id
     end
 
@@ -421,16 +421,16 @@ describe 'Submissions API', type: :request do
       @a1.ensure_post_policy(post_manually: true)
       @a1.grade_student(@student1, grade: 5, grader: @teacher)
 
-      @a1.update_submission(@student1, :hidden => false, :comment => "visible comment")
-      @a1.update_submission(@student1, :hidden => true, :comment => "hidden comment")
+      @a1.update_submission(@student1, hidden: false, comment: "visible comment")
+      @a1.update_submission(@student1, hidden: true, comment: "hidden comment")
 
       @user = @student1
       json = api_call(:get,
                       "/api/v1/sections/sis_section_id:my-section-sis-id/assignments/#{@a1.id}/submissions/#{@student1.id}",
-                      { :controller => 'submissions_api', :action => 'show',
-                        :format => 'json', :section_id => 'sis_section_id:my-section-sis-id',
-                        :assignment_id => @a1.id.to_s, :user_id => @student1.id.to_s },
-                      { :include => %w[submission_comments rubric_assessment] })
+                      { controller: 'submissions_api', action: 'show',
+                        format: 'json', section_id: 'sis_section_id:my-section-sis-id',
+                        assignment_id: @a1.id.to_s, user_id: @student1.id.to_s },
+                      { include: %w[submission_comments rubric_assessment] })
 
       %w[score published_grade published_score grade].each do |a|
         expect(json[a]).to be_nil
@@ -443,10 +443,10 @@ describe 'Submissions API', type: :request do
       @user = @teacher
       json = api_call(:get,
                       "/api/v1/sections/sis_section_id:my-section-sis-id/assignments/#{@a1.id}/submissions/#{@student1.id}",
-                      { :controller => 'submissions_api', :action => 'show',
-                        :format => 'json', :section_id => 'sis_section_id:my-section-sis-id',
-                        :assignment_id => @a1.id.to_s, :user_id => @student1.id.to_s },
-                      { :include => %w[submission_comments rubric_assessment] })
+                      { controller: 'submissions_api', action: 'show',
+                        format: 'json', section_id: 'sis_section_id:my-section-sis-id',
+                        assignment_id: @a1.id.to_s, user_id: @student1.id.to_s },
+                      { include: %w[submission_comments rubric_assessment] })
       expect(json["submission_comments"].size).to eq 2
       expect(json["grade"]).to eq "5"
 
@@ -455,10 +455,10 @@ describe 'Submissions API', type: :request do
       expect(@user.enrollments).to be_empty
       json = api_call(:get,
                       "/api/v1/sections/sis_section_id:my-section-sis-id/assignments/#{@a1.id}/submissions/#{@student1.id}",
-                      { :controller => 'submissions_api', :action => 'show',
-                        :format => 'json', :section_id => 'sis_section_id:my-section-sis-id',
-                        :assignment_id => @a1.id.to_s, :user_id => @student1.id.to_s },
-                      { :include => %w[submission_comments rubric_assessment] })
+                      { controller: 'submissions_api', action: 'show',
+                        format: 'json', section_id: 'sis_section_id:my-section-sis-id',
+                        assignment_id: @a1.id.to_s, user_id: @student1.id.to_s },
+                      { include: %w[submission_comments rubric_assessment] })
       expect(json["submission_comments"].size).to eq 2
       expect(json["grade"]).to eq "5"
     end
@@ -474,10 +474,10 @@ describe 'Submissions API', type: :request do
 
         @json = api_call(:get,
                          "/api/v1/sections/sis_section_id:my-section-sis-id/assignments/#{@a1.id}/submissions/#{@student1.id}",
-                         { :controller => 'submissions_api', :action => 'show',
-                           :format => 'json', :section_id => 'sis_section_id:my-section-sis-id',
-                           :assignment_id => @a1.id.to_s, :user_id => @student1.id.to_s },
-                         { :include => %w[submission_comments] })
+                         { controller: 'submissions_api', action: 'show',
+                           format: 'json', section_id: 'sis_section_id:my-section-sis-id',
+                           assignment_id: @a1.id.to_s, user_id: @student1.id.to_s },
+                         { include: %w[submission_comments] })
       end
 
       it 'returns only published comments' do
@@ -496,55 +496,55 @@ describe 'Submissions API', type: :request do
       sub = @a1.grade_student(@student1, grade: 5, grader: @teacher).first
 
       rubric = rubric_model(
-        :user => @teacher,
-        :context => @course,
-        :data => larger_rubric_data
+        user: @teacher,
+        context: @course,
+        data: larger_rubric_data
       )
       @a1.create_rubric_association(
-        :rubric => rubric,
-        :purpose => 'grading',
-        :use_for_grading => true,
-        :context => @course
+        rubric: rubric,
+        purpose: 'grading',
+        use_for_grading: true,
+        context: @course
       )
       @a1.rubric_association.assess(
-        :assessor => @teacher,
-        :user => @student1,
-        :artifact => sub,
-        :assessment => {
-          :assessment_type => 'grading',
-          :criterion_crit1 => { :points => 3 },
-          :criterion_crit2 => { :points => 2, :comments => 'Hmm' }
+        assessor: @teacher,
+        user: @student1,
+        artifact: sub,
+        assessment: {
+          assessment_type: 'grading',
+          criterion_crit1: { points: 3 },
+          criterion_crit2: { points: 2, comments: 'Hmm' }
         }
       )
 
       @user = @student1
       json = api_call(:get,
                       "/api/v1/sections/sis_section_id:my-section-sis-id/assignments/#{@a1.id}/submissions/#{@student1.id}",
-                      { :controller => 'submissions_api', :action => 'show',
-                        :format => 'json', :section_id => 'sis_section_id:my-section-sis-id',
-                        :assignment_id => @a1.id.to_s, :user_id => @student1.id.to_s },
-                      { :include => %w[submission_comments rubric_assessment] })
+                      { controller: 'submissions_api', action: 'show',
+                        format: 'json', section_id: 'sis_section_id:my-section-sis-id',
+                        assignment_id: @a1.id.to_s, user_id: @student1.id.to_s },
+                      { include: %w[submission_comments rubric_assessment] })
 
       expect(json['rubric_assessment']).to be_nil
     end
 
     it "does not find sections in other root accounts" do
-      acct = account_model(:name => 'other root')
+      acct = account_model(name: 'other root')
       @first_course = @course
-      course_factory(active_all: true, :account => acct)
+      course_factory(active_all: true, account: acct)
       @course.default_section.update_attribute('sis_source_id', 'my-section-sis-id')
       json = api_call(:get,
                       "/api/v1/sections/sis_section_id:my-section-sis-id/assignments/#{@a1.id}/submissions",
-                      { :controller => 'submissions_api', :action => 'index',
-                        :format => 'json', :section_id => 'sis_section_id:my-section-sis-id',
-                        :assignment_id => @a1.id.to_s })
+                      { controller: 'submissions_api', action: 'index',
+                        format: 'json', section_id: 'sis_section_id:my-section-sis-id',
+                        assignment_id: @a1.id.to_s })
       expect(json.size).to eq 1 # should find the submission for @first_course
       @course.default_section.update_attribute('sis_source_id', 'section-2')
       raw_api_call(:get,
                    "/api/v1/sections/sis_section_id:section-2/assignments/#{@a1.id}/submissions",
-                   { :controller => 'submissions_api', :action => 'index',
-                     :format => 'json', :section_id => 'sis_section_id:section-2',
-                     :assignment_id => @a1.id.to_s })
+                   { controller: 'submissions_api', action: 'index',
+                     format: 'json', section_id: 'sis_section_id:section-2',
+                     assignment_id: @a1.id.to_s })
       assert_status(404) # rather than 401 unauthorized
     end
 
@@ -586,23 +586,23 @@ describe 'Submissions API', type: :request do
 
   it "returns student discussion entries for discussion_topic assignments" do
     @student = user_factory(active_all: true)
-    course_with_teacher(:active_all => true)
+    course_with_teacher(active_all: true)
     @course.enroll_student(@student).accept!
     @context = @course
-    @assignment = factory_with_protected_attributes(@course.assignments, { :title => 'assignment1', :submission_types => 'discussion_topic', :discussion_topic => discussion_topic_model })
+    @assignment = factory_with_protected_attributes(@course.assignments, { title: 'assignment1', submission_types: 'discussion_topic', discussion_topic: discussion_topic_model })
 
-    e1 = @topic.discussion_entries.create!(:message => 'main entry', :user => @user)
-    se1 = @topic.discussion_entries.create!(:message => 'sub 1', :user => @student, :parent_entry => e1)
-    @assignment.submit_homework(@student, :submission_type => 'discussion_topic')
-    se2 = @topic.discussion_entries.create!(:message => 'student 1', :user => @student)
-    @assignment.submit_homework(@student, :submission_type => 'discussion_topic')
-    @topic.discussion_entries.create!(:message => 'another entry', :user => @user)
+    e1 = @topic.discussion_entries.create!(message: 'main entry', user: @user)
+    se1 = @topic.discussion_entries.create!(message: 'sub 1', user: @student, parent_entry: e1)
+    @assignment.submit_homework(@student, submission_type: 'discussion_topic')
+    se2 = @topic.discussion_entries.create!(message: 'student 1', user: @student)
+    @assignment.submit_homework(@student, submission_type: 'discussion_topic')
+    @topic.discussion_entries.create!(message: 'another entry', user: @user)
 
     json = api_call(:get,
                     "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}.json",
-                    { :controller => 'submissions_api', :action => 'show',
-                      :format => 'json', :course_id => @course.id.to_s,
-                      :assignment_id => @assignment.id.to_s, :user_id => @student.id.to_s })
+                    { controller: 'submissions_api', action: 'show',
+                      format: 'json', course_id: @course.id.to_s,
+                      assignment_id: @assignment.id.to_s, user_id: @student.id.to_s })
 
     expect(json['discussion_entries'].sort_by { |h| h['user_id'] }).to eq(
       [{
@@ -638,45 +638,45 @@ describe 'Submissions API', type: :request do
     # don't include discussion entries if response_fields limits the response
     json = api_call(:get,
                     "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}",
-                    { :controller => 'submissions_api', :action => 'show',
-                      :format => 'json', :course_id => @course.id.to_s,
-                      :assignment_id => @assignment.id.to_s, :user_id => @student.id.to_s },
-                    { :response_fields => SubmissionsApiController::SUBMISSION_JSON_FIELDS })
+                    { controller: 'submissions_api', action: 'show',
+                      format: 'json', course_id: @course.id.to_s,
+                      assignment_id: @assignment.id.to_s, user_id: @student.id.to_s },
+                    { response_fields: SubmissionsApiController::SUBMISSION_JSON_FIELDS })
     expect(json['discussion_entries']).to be_nil
 
     json = api_call(:get,
                     "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}",
-                    { :controller => 'submissions_api', :action => 'show',
-                      :format => 'json', :course_id => @course.id.to_s,
-                      :assignment_id => @assignment.id.to_s, :user_id => @student.id.to_s },
-                    { :exclude_response_fields => %w[discussion_entries] })
+                    { controller: 'submissions_api', action: 'show',
+                      format: 'json', course_id: @course.id.to_s,
+                      assignment_id: @assignment.id.to_s, user_id: @student.id.to_s },
+                    { exclude_response_fields: %w[discussion_entries] })
     expect(json['discussion_entries']).to be_nil
   end
 
   it "returns student discussion entries from child topics for group discussion_topic assignments" do
     @student = user_factory(active_all: true)
-    course_with_teacher(:active_all => true)
+    course_with_teacher(active_all: true)
     @course.enroll_student(@student).accept!
-    group_category = @course.group_categories.create(:name => "Category")
-    @group = @course.groups.create(:name => "Group", :group_category => group_category)
+    group_category = @course.group_categories.create(name: "Category")
+    @group = @course.groups.create(name: "Group", group_category: group_category)
     @group.add_user(@student)
     @context = @course
-    @assignment = factory_with_protected_attributes(@course.assignments, { :title => 'assignment1', :submission_types => 'discussion_topic', :discussion_topic => discussion_topic_model(:group_category => @group.group_category) })
+    @assignment = factory_with_protected_attributes(@course.assignments, { title: 'assignment1', submission_types: 'discussion_topic', discussion_topic: discussion_topic_model(group_category: @group.group_category) })
     @topic.refresh_subtopics # since the DJ won't happen in time
     @child_topic = @group.discussion_topics.where(root_topic_id: @topic).first
 
-    e1 = @child_topic.discussion_entries.create!(:message => 'main entry', :user => @user)
-    se1 = @child_topic.discussion_entries.create!(:message => 'sub 1', :user => @student, :parent_entry => e1)
-    @assignment.submit_homework(@student, :submission_type => 'discussion_topic')
-    se2 = @child_topic.discussion_entries.create!(:message => 'student 1', :user => @student)
-    @assignment.submit_homework(@student, :submission_type => 'discussion_topic')
-    @child_topic.discussion_entries.create!(:message => 'another entry', :user => @user)
+    e1 = @child_topic.discussion_entries.create!(message: 'main entry', user: @user)
+    se1 = @child_topic.discussion_entries.create!(message: 'sub 1', user: @student, parent_entry: e1)
+    @assignment.submit_homework(@student, submission_type: 'discussion_topic')
+    se2 = @child_topic.discussion_entries.create!(message: 'student 1', user: @student)
+    @assignment.submit_homework(@student, submission_type: 'discussion_topic')
+    @child_topic.discussion_entries.create!(message: 'another entry', user: @user)
 
     json = api_call(:get,
                     "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}.json",
-                    { :controller => 'submissions_api', :action => 'show',
-                      :format => 'json', :course_id => @course.id.to_s,
-                      :assignment_id => @assignment.id.to_s, :user_id => @student.id.to_s })
+                    { controller: 'submissions_api', action: 'show',
+                      format: 'json', course_id: @course.id.to_s,
+                      assignment_id: @assignment.id.to_s, user_id: @student.id.to_s })
 
     expect(json['discussion_entries'].sort_by { |h| h['user_id'] }).to eq(
       [{
@@ -712,9 +712,9 @@ describe 'Submissions API', type: :request do
 
   def submission_with_comment
     @student = user_factory(active_all: true)
-    course_with_teacher(:active_all => true)
+    course_with_teacher(active_all: true)
     @course.enroll_student(@student).accept!
-    @quiz = Quizzes::Quiz.create!(:title => 'quiz1', :context => @course)
+    @quiz = Quizzes::Quiz.create!(title: 'quiz1', context: @course)
     @quiz.did_edit!
     @quiz.offer!
     @assignment = @quiz.assignment
@@ -722,7 +722,7 @@ describe 'Submissions API', type: :request do
     @submission.submission_type = 'online_quiz'
     @submission.workflow_state = 'submitted'
     @submission.save!
-    @assignment.update_submission(@student, :comment => "i am a comment")
+    @assignment.update_submission(@student, comment: "i am a comment")
   end
 
   it "returns user display info along with submission comments" do
@@ -730,10 +730,10 @@ describe 'Submissions API', type: :request do
 
     json = api_call(:get,
                     "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions.json",
-                    { :controller => 'submissions_api', :action => 'index',
-                      :format => 'json', :course_id => @course.id.to_s,
-                      :assignment_id => @assignment.id.to_s },
-                    { :include => %w[submission_comments] })
+                    { controller: 'submissions_api', action: 'index',
+                      format: 'json', course_id: @course.id.to_s,
+                      assignment_id: @assignment.id.to_s },
+                    { include: %w[submission_comments] })
 
     expect(json.first["submission_comments"].size).to eq 1
     comment = json.first["submission_comments"].first
@@ -749,11 +749,11 @@ describe 'Submissions API', type: :request do
 
   it 'does not return user display info with anonymous submission comments' do
     reviewed = student_in_course({
-                                   :active_all => true
+                                   active_all: true
                                  }).user
     reviewer = student_in_course({
-                                   :active_all => true,
-                                   :course => @course
+                                   active_all: true,
+                                   course: @course
                                  }).user
     assignment = assignment_model(course: @course)
     assignment.update_attribute(:anonymous_peer_reviews, true)
@@ -770,14 +770,14 @@ describe 'Submissions API', type: :request do
     @user = reviewed
     url = "/api/v1/courses/#{@course.id}/students/submissions.json"
     json = api_call(:get, url, {
-                      :controller => 'submissions_api',
-                      :action => 'for_students',
-                      :format => 'json',
-                      :course_id => @course.to_param,
-                      :assignment_ids => [@assignment.to_param],
-                      :student_ids => [reviewed.to_param]
+                      controller: 'submissions_api',
+                      action: 'for_students',
+                      format: 'json',
+                      course_id: @course.to_param,
+                      assignment_ids: [@assignment.to_param],
+                      student_ids: [reviewed.to_param]
                     }, {
-                      :include => %w[submission_comments]
+                      include: %w[submission_comments]
                     })
 
     comment_json = json.first['submission_comments'].first
@@ -787,7 +787,7 @@ describe 'Submissions API', type: :request do
   end
 
   it 'does not return submitter info when anonymous grading is on' do
-    submitter = student_in_course({ :active_all => true }).user
+    submitter = student_in_course({ active_all: true }).user
 
     assignment = assignment_model(course: @course)
     assignment.update_attribute(:anonymous_grading, true)
@@ -799,14 +799,14 @@ describe 'Submissions API', type: :request do
                              comment: "Anon Comment"
                            })
 
-    @user = teacher_in_course({ :active_all => true }).user
+    @user = teacher_in_course({ active_all: true }).user
     url = "/api/v1/courses/#{@course.id}/assignments/#{assignment.id}/submissions"
     json = api_call(:get, url, {
-                      :controller => 'submissions_api',
-                      :action => 'index',
-                      :format => 'json',
-                      :course_id => @course.to_param,
-                      :assignment_id => assignment.to_param
+                      controller: 'submissions_api',
+                      action: 'index',
+                      format: 'json',
+                      course_id: @course.to_param,
+                      assignment_id: assignment.to_param
                     }, {
                       include: %w[user submission_comments]
                     })
@@ -820,61 +820,61 @@ describe 'Submissions API', type: :request do
 
   it "loads discussion entry data" do
     @student = user_factory(active_all: true)
-    course_with_teacher(:active_all => true)
+    course_with_teacher(active_all: true)
     @course.enroll_student(@student).accept!
     @context = @course
-    @assignment = factory_with_protected_attributes(@course.assignments, { :title => 'assignment1', :submission_types => 'discussion_topic', :discussion_topic => discussion_topic_model })
+    @assignment = factory_with_protected_attributes(@course.assignments, { title: 'assignment1', submission_types: 'discussion_topic', discussion_topic: discussion_topic_model })
 
-    e1 = @topic.discussion_entries.create!(:message => 'main entry', :user => @user)
-    @topic.discussion_entries.create!(:message => 'sub 1', :user => @student, :parent_entry => e1)
-    @assignment.submit_homework(@student, :submission_type => 'discussion_topic')
-    @topic.discussion_entries.create!(:message => 'student 1', :user => @student)
-    @assignment.submit_homework(@student, :submission_type => 'discussion_topic')
-    @topic.discussion_entries.create!(:message => 'another entry', :user => @user)
+    e1 = @topic.discussion_entries.create!(message: 'main entry', user: @user)
+    @topic.discussion_entries.create!(message: 'sub 1', user: @student, parent_entry: e1)
+    @assignment.submit_homework(@student, submission_type: 'discussion_topic')
+    @topic.discussion_entries.create!(message: 'student 1', user: @student)
+    @assignment.submit_homework(@student, submission_type: 'discussion_topic')
+    @topic.discussion_entries.create!(message: 'another entry', user: @user)
 
     json = api_call(:get,
                     "/api/v1/courses/#{@course.id}/students/submissions.json",
-                    { :controller => 'submissions_api', :action => 'for_students',
-                      :format => 'json', :course_id => @course.to_param },
-                    { :student_ids => [@student.to_param] })
+                    { controller: 'submissions_api', action: 'for_students',
+                      format: 'json', course_id: @course.to_param },
+                    { student_ids: [@student.to_param] })
     expect(json.first["discussion_entries"]).to be_present
   end
 
   it "loads quiz submission data" do
-    course_with_teacher(:active_all => true)
+    course_with_teacher(active_all: true)
     quiz_with_submission
     @user = @teacher
 
     # grouped
     json = api_call(:get,
                     "/api/v1/courses/#{@course.id}/students/submissions.json",
-                    { :controller => 'submissions_api', :action => 'for_students',
-                      :format => 'json', :course_id => @course.to_param },
-                    { :student_ids => [@student.to_param], :include => %w[submission_history], :grouped => 1 })
+                    { controller: 'submissions_api', action: 'for_students',
+                      format: 'json', course_id: @course.to_param },
+                    { student_ids: [@student.to_param], include: %w[submission_history], grouped: 1 })
     expect(json.first["submissions"].first["submission_history"]).to be_present
 
     # ungrouped
     json = api_call(:get,
                     "/api/v1/courses/#{@course.id}/students/submissions.json",
-                    { :controller => 'submissions_api', :action => 'for_students',
-                      :format => 'json', :course_id => @course.to_param },
-                    { :student_ids => [@student.to_param], :include => %w[submission_history] })
+                    { controller: 'submissions_api', action: 'for_students',
+                      format: 'json', course_id: @course.to_param },
+                    { student_ids: [@student.to_param], include: %w[submission_history] })
 
     expect(json.first["submission_history"]).to be_present
   end
 
   it "loads attachment data" do
     @student = user_factory(active_all: true)
-    course_with_teacher(:active_all => true)
+    course_with_teacher(active_all: true)
     @course.enroll_student(@student).accept!
-    a1 = @course.assignments.create!(:title => 'assignment1', :grading_type => 'letter_grade', :points_possible => 15)
-    submit_homework(a1, @student) { |s| s.attachments = [attachment_model(:uploaded_data => stub_png_data, :content_type => 'image/png', :context => @student)] }
+    a1 = @course.assignments.create!(title: 'assignment1', grading_type: 'letter_grade', points_possible: 15)
+    submit_homework(a1, @student) { |s| s.attachments = [attachment_model(uploaded_data: stub_png_data, content_type: 'image/png', context: @student)] }
 
     json = api_call(:get,
                     "/api/v1/courses/#{@course.id}/students/submissions.json",
-                    { :controller => 'submissions_api', :action => 'for_students',
-                      :format => 'json', :course_id => @course.to_param },
-                    { :student_ids => [@student.to_param] })
+                    { controller: 'submissions_api', action: 'for_students',
+                      format: 'json', course_id: @course.to_param },
+                    { student_ids: [@student.to_param] })
 
     expect(json.first["attachments"]).to be_present
   end
@@ -884,10 +884,10 @@ describe 'Submissions API', type: :request do
 
     json = api_call(:get,
                     "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions.json",
-                    { :controller => 'submissions_api', :action => 'index',
-                      :format => 'json', :course_id => @course.id.to_s,
-                      :assignment_id => @assignment.id.to_s },
-                    { :include => %w[submission_comments] })
+                    { controller: 'submissions_api', action: 'index',
+                      format: 'json', course_id: @course.id.to_s,
+                      assignment_id: @assignment.id.to_s },
+                    { include: %w[submission_comments] })
 
     expect(json.first["submission_comments"].size).to eq 1
     comment = json.first["submission_comments"].first
@@ -897,7 +897,7 @@ describe 'Submissions API', type: :request do
 
   it "returns a valid preview url for quiz submissions" do
     @student = student1 = user_factory(active_all: true)
-    course_with_teacher_logged_in(:active_all => true) # need to be logged in to view the preview url below
+    course_with_teacher_logged_in(active_all: true) # need to be logged in to view the preview url below
     @course.enroll_student(student1).accept!
     quiz_with_submission
     a1 = @quiz.assignment
@@ -905,10 +905,10 @@ describe 'Submissions API', type: :request do
 
     json = api_call(:get,
                     "/api/v1/courses/#{@course.id}/assignments/#{a1.id}/submissions.json",
-                    { :controller => 'submissions_api', :action => 'index',
-                      :format => 'json', :course_id => @course.id.to_s,
-                      :assignment_id => a1.id.to_s },
-                    { :include => %w[submission_history submission_comments rubric_assessment] })
+                    { controller: 'submissions_api', action: 'index',
+                      format: 'json', course_id: @course.id.to_s,
+                      assignment_id: a1.id.to_s },
+                    { include: %w[submission_history submission_comments rubric_assessment] })
 
     preview_url = json.first['preview_url']
     expect(Rack::Utils.parse_query(URI(preview_url).query)['version'].to_i).to eq sub.quiz_submission_version
@@ -920,9 +920,9 @@ describe 'Submissions API', type: :request do
 
   it "returns a correct submission_history for quiz submissions" do
     student1 = user_factory(active_all: true)
-    course_with_teacher_logged_in(:active_all => true) # need to be logged in to view the preview url below
+    course_with_teacher_logged_in(active_all: true) # need to be logged in to view the preview url below
     @course.enroll_student(student1).accept!
-    quiz = Quizzes::Quiz.create!(:title => 'quiz1', :context => @course)
+    quiz = Quizzes::Quiz.create!(title: 'quiz1', context: @course)
     quiz.did_edit!
     quiz.offer!
     qs = quiz.generate_submission(student1)
@@ -934,10 +934,10 @@ describe 'Submissions API', type: :request do
 
     json = api_call(:get,
                     "/api/v1/courses/#{@course.id}/assignments/#{quiz.assignment.id}/submissions.json",
-                    { :controller => 'submissions_api', :action => 'index',
-                      :format => 'json', :course_id => @course.id.to_s,
-                      :assignment_id => quiz.assignment.id.to_s },
-                    { :include => %w[submission_history] })
+                    { controller: 'submissions_api', action: 'index',
+                      format: 'json', course_id: @course.id.to_s,
+                      assignment_id: quiz.assignment.id.to_s },
+                    { include: %w[submission_history] })
     expect(json.first['submission_history'].count).to eq 2
     expect(json.first['submission_history'].first.include?("submission_data")).to be_truthy
     expect(json.first['submission_history'][0]['preview_url']).to include '&version=2'
@@ -952,13 +952,13 @@ describe 'Submissions API', type: :request do
       qs.mark_completed
       Quizzes::SubmissionGrader.new(qs).grade_submission
     end
-    course_with_teacher_logged_in(:course => @course, :active_all => true)
+    course_with_teacher_logged_in(course: @course, active_all: true)
     json = api_call(:get,
                     "/api/v1/courses/#{@course.id}/assignments/#{@quiz.assignment.id}/submissions.json",
-                    { :controller => 'submissions_api', :action => 'index',
-                      :format => 'json', :course_id => @course.id.to_s,
-                      :assignment_id => @quiz.assignment.id.to_s },
-                    { :include => %w[submission_history] })
+                    { controller: 'submissions_api', action: 'index',
+                      format: 'json', course_id: @course.id.to_s,
+                      assignment_id: @quiz.assignment.id.to_s },
+                    { include: %w[submission_history] })
     submission_dates = json.first['submission_history'].map { |hash| hash['submitted_at'] }
     expect(submission_dates.first).not_to eq(submission_dates.last)
   end
@@ -967,25 +967,25 @@ describe 'Submissions API', type: :request do
     student1 = user_factory(active_all: true)
     student2 = user_factory(active_all: true)
 
-    course_with_teacher(:active_all => true)
+    course_with_teacher(active_all: true)
 
     @course.enroll_student(student1).accept!
     @course.enroll_student(student2).accept!
 
-    a1 = @course.assignments.create!(:title => 'assignment1', :grading_type => 'letter_grade', :points_possible => 15)
+    a1 = @course.assignments.create!(title: 'assignment1', grading_type: 'letter_grade', points_possible: 15)
     submit_homework(a1, student1)
-    media_object(:media_id => "3232", :media_type => "audio")
-    a1.update_submission(student1, { :comment => "Well here's the thing...", :media_comment_id => "3232", :media_comment_type => "audio", :commenter => @teacher })
-    sub1 = a1.grade_student(student1, { :grade => '90%', :grader => @teacher }).first
+    media_object(media_id: "3232", media_type: "audio")
+    a1.update_submission(student1, { comment: "Well here's the thing...", media_comment_id: "3232", media_comment_type: "audio", commenter: @teacher })
+    sub1 = a1.grade_student(student1, { grade: '90%', grader: @teacher }).first
     comment = sub1.submission_comments.first
 
     @user = student1
     json = api_call(:get,
                     "/api/v1/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student1.id}.json",
-                    { :controller => "submissions_api", :action => "show",
-                      :format => "json", :course_id => @course.id.to_s,
-                      :assignment_id => a1.id.to_s, :user_id => student1.id.to_s },
-                    { :include => %w[submission_comments] })
+                    { controller: "submissions_api", action: "show",
+                      format: "json", course_id: @course.id.to_s,
+                      assignment_id: a1.id.to_s, user_id: student1.id.to_s },
+                    { include: %w[submission_comments] })
 
     expect(json).to eql({
                           "id" => sub1.id,
@@ -1042,40 +1042,40 @@ describe 'Submissions API', type: :request do
     @user = student2
     raw_api_call(:get,
                  "/api/v1/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student1.id}.json",
-                 { :controller => "submissions_api", :action => "show",
-                   :format => "json", :course_id => @course.id.to_s,
-                   :assignment_id => a1.id.to_s, :user_id => student1.id.to_s },
-                 { :include => %w[submission_comments] })
+                 { controller: "submissions_api", action: "show",
+                   format: "json", course_id: @course.id.to_s,
+                   assignment_id: a1.id.to_s, user_id: student1.id.to_s },
+                 { include: %w[submission_comments] })
     assert_status(401)
   end
 
   it "returns grading information for observers" do
     @student = user_factory(active_all: true)
-    e = course_with_observer(:active_all => true)
+    e = course_with_observer(active_all: true)
     e.associated_user_id = @student.id
     e.save!
     @course.enroll_student(@student).accept!
-    a1 = @course.assignments.create!(:title => 'assignment1', :points_possible => 15)
+    a1 = @course.assignments.create!(title: 'assignment1', points_possible: 15)
     submit_homework(a1, @student)
     a1.grade_student(@student, grade: 15, grader: @teacher)
     json = api_call(:get, "/api/v1/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{@student.id}.json",
-                    { :controller => "submissions_api", :action => "show",
-                      :format => "json", :course_id => @course.id.to_s,
-                      :assignment_id => a1.id.to_s, :user_id => @student.id.to_s })
+                    { controller: "submissions_api", action: "show",
+                      format: "json", course_id: @course.id.to_s,
+                      assignment_id: a1.id.to_s, user_id: @student.id.to_s })
     expect(json["score"]).to eq 15
   end
 
   it "apis translate online_text_entry submissions" do
     student1 = user_factory(active_all: true)
-    course_with_teacher(:active_all => true)
+    course_with_teacher(active_all: true)
     @course.enroll_student(student1).accept!
-    a1 = @course.assignments.create!(:title => 'assignment1', :grading_type => 'letter_grade', :points_possible => 15)
+    a1 = @course.assignments.create!(title: 'assignment1', grading_type: 'letter_grade', points_possible: 15)
     should_translate_user_content(@course) do |content|
-      submit_homework(a1, student1, :body => content)
+      submit_homework(a1, student1, body: content)
       json = api_call(:get, "/api/v1/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student1.id}.json",
-                      { :controller => "submissions_api", :action => "show",
-                        :format => "json", :course_id => @course.id.to_s,
-                        :assignment_id => a1.id.to_s, :user_id => student1.id.to_s })
+                      { controller: "submissions_api", action: "show",
+                        format: "json", course_id: @course.id.to_s,
+                        assignment_id: a1.id.to_s, user_id: student1.id.to_s })
       json["body"]
     end
   end
@@ -1084,16 +1084,16 @@ describe 'Submissions API', type: :request do
     local_storage!
 
     student1 = user_factory(active_all: true)
-    course_with_teacher(:active_all => true)
+    course_with_teacher(active_all: true)
     @course.enroll_student(student1).accept!
-    a1 = @course.assignments.create!(:title => 'assignment1', :grading_type => 'letter_grade', :points_possible => 15)
-    submit_homework(a1, student1) { |s| s.attachments = [attachment_model(:uploaded_data => stub_png_data, :content_type => 'image/png', :context => student1)] }
+    a1 = @course.assignments.create!(title: 'assignment1', grading_type: 'letter_grade', points_possible: 15)
+    submit_homework(a1, student1) { |s| s.attachments = [attachment_model(uploaded_data: stub_png_data, content_type: 'image/png', context: student1)] }
     json = api_call(:get,
                     "/api/v1/courses/#{@course.id}/assignments/#{a1.id}/submissions.json",
-                    { :controller => 'submissions_api', :action => 'index',
-                      :format => 'json', :course_id => @course.id.to_s,
-                      :assignment_id => a1.id.to_s },
-                    { :include => %w[submission_history submission_comments rubric_assessment] })
+                    { controller: 'submissions_api', action: 'index',
+                      format: 'json', course_id: @course.id.to_s,
+                      assignment_id: a1.id.to_s },
+                    { include: %w[submission_history submission_comments rubric_assessment] })
     url = json[0]['attachments'][0]['url']
     get(url)
     follow_redirect! while response.redirect?
@@ -1103,23 +1103,23 @@ describe 'Submissions API', type: :request do
 
   it "allows retrieving media comments without a session" do
     student1 = user_factory(active_all: true)
-    course_with_teacher(:active_all => true)
+    course_with_teacher(active_all: true)
     @course.enroll_student(student1).accept!
-    a1 = @course.assignments.create!(:title => 'assignment1', :grading_type => 'letter_grade', :points_possible => 15)
-    media_object(:media_id => "54321", :context => student1, :user => student1)
+    a1 = @course.assignments.create!(title: 'assignment1', grading_type: 'letter_grade', points_possible: 15)
+    media_object(media_id: "54321", context: student1, user: student1)
     mock_kaltura = double('CanvasKaltura::ClientV3')
     allow(CanvasKaltura::ClientV3).to receive(:new).and_return(mock_kaltura)
-    expect(mock_kaltura).to receive(:media_sources).and_return([{ :height => "240", :bitrate => "382", :isOriginal => "0", :width => "336", :content_type => "video/mp4",
-                                                                  :containerFormat => "isom", :url => "https://kaltura.example.com/some/url", :size => "204", :fileExt => "mp4" }])
+    expect(mock_kaltura).to receive(:media_sources).and_return([{ height: "240", bitrate: "382", isOriginal: "0", width: "336", content_type: "video/mp4",
+                                                                  containerFormat: "isom", url: "https://kaltura.example.com/some/url", size: "204", fileExt: "mp4" }])
 
     submit_homework(a1, student1, submission_type: 'online_text_entry', media_comment_id: 54_321, media_comment_type: "video")
     stub_kaltura
     json = api_call(:get,
                     "/api/v1/courses/#{@course.id}/assignments/#{a1.id}/submissions.json",
-                    { :controller => 'submissions_api', :action => 'index',
-                      :format => 'json', :course_id => @course.id.to_s,
-                      :assignment_id => a1.id.to_s },
-                    { :include => %w[submission_history submission_comments rubric_assessment] })
+                    { controller: 'submissions_api', action: 'index',
+                      format: 'json', course_id: @course.id.to_s,
+                      assignment_id: a1.id.to_s },
+                    { include: %w[submission_history submission_comments rubric_assessment] })
     url = json[0]['media_comment']['url']
     get(url)
     expect(response).to be_redirect
@@ -1130,43 +1130,43 @@ describe 'Submissions API', type: :request do
     student1 = user_factory(active_all: true)
     student2 = user_factory(active_all: true)
 
-    course_with_teacher(:active_all => true)
+    course_with_teacher(active_all: true)
 
     @course.enroll_student(student1).accept!
     @course.enroll_student(student2).accept!
 
-    a1 = @course.assignments.create!(:title => 'assignment1', :grading_type => 'letter_grade', :points_possible => 15)
-    rubric = rubric_model(:user => @user, :context => @course,
-                          :data => larger_rubric_data)
-    a1.create_rubric_association(:rubric => rubric, :purpose => 'grading', :use_for_grading => true, :context => @course)
+    a1 = @course.assignments.create!(title: 'assignment1', grading_type: 'letter_grade', points_possible: 15)
+    rubric = rubric_model(user: @user, context: @course,
+                          data: larger_rubric_data)
+    a1.create_rubric_association(rubric: rubric, purpose: 'grading', use_for_grading: true, context: @course)
 
     submit_homework(a1, student1)
-    media_object(:media_id => "54321", :context => student1, :user => student1)
-    submit_homework(a1, student1, :media_comment_id => "54321", :media_comment_type => "video")
-    sub1 = submit_homework(a1, student1) { |s| s.attachments = [attachment_model(:context => student1, :folder => nil)] }
+    media_object(media_id: "54321", context: student1, user: student1)
+    submit_homework(a1, student1, media_comment_id: "54321", media_comment_type: "video")
+    sub1 = submit_homework(a1, student1) { |s| s.attachments = [attachment_model(context: student1, folder: nil)] }
 
-    sub2a1 = attachment_model(:context => student2, :filename => 'snapshot.png', :content_type => 'image/png')
-    sub2 = submit_homework(a1, student2, :url => "http://www.instructure.com") do |s|
+    sub2a1 = attachment_model(context: student2, filename: 'snapshot.png', content_type: 'image/png')
+    sub2 = submit_homework(a1, student2, url: "http://www.instructure.com") do |s|
       s.attachment = sub2a1
     end
 
-    media_object(:media_id => "3232", :context => student1, :user => student1, :media_type => "audio")
-    a1.grade_student(student1, { :grade => '90%', :grader => @teacher })
-    a1.update_submission(student1, { :comment => "Well here's the thing...", :media_comment_id => "3232", :media_comment_type => "audio", :commenter => @teacher })
+    media_object(media_id: "3232", context: student1, user: student1, media_type: "audio")
+    a1.grade_student(student1, { grade: '90%', grader: @teacher })
+    a1.update_submission(student1, { comment: "Well here's the thing...", media_comment_id: "3232", media_comment_type: "audio", commenter: @teacher })
     sub1.reload
     expect(sub1.submission_comments.size).to eq 1
     comment = sub1.submission_comments.first
     a1.rubric_association.assess(
-      :assessor => @user, :user => student2, :artifact => sub2,
-      :assessment => { :assessment_type => 'grading', :criterion_crit1 => { :points => 7 }, :criterion_crit2 => { :points => 2, :comments => 'Hmm' } }
+      assessor: @user, user: student2, artifact: sub2,
+      assessment: { assessment_type: 'grading', criterion_crit1: { points: 7 }, criterion_crit2: { points: 2, comments: 'Hmm' } }
     )
 
     json = api_call(:get,
                     "/api/v1/courses/#{@course.id}/assignments/#{a1.id}/submissions.json",
-                    { :controller => 'submissions_api', :action => 'index',
-                      :format => 'json', :course_id => @course.id.to_s,
-                      :assignment_id => a1.id.to_s },
-                    { :include => %w[submission_history submission_comments rubric_assessment] })
+                    { controller: 'submissions_api', action: 'index',
+                      format: 'json', course_id: @course.id.to_s,
+                      assignment_id: a1.id.to_s },
+                    { include: %w[submission_history submission_comments rubric_assessment] })
 
     sub1.reload
     sub2.reload
@@ -1481,27 +1481,27 @@ describe 'Submissions API', type: :request do
 
   it "paginates submissions" do
     student = user_factory(active_all: true)
-    course_with_teacher(:active_all => true)
+    course_with_teacher(active_all: true)
     @course.enroll_student(student).accept!
     @assignment = @course.assignments.create!({
-                                                :title => 'assignment1',
-                                                :grading_type => 'points',
-                                                :points_possible => 12
+                                                title: 'assignment1',
+                                                grading_type: 'points',
+                                                points_possible: 12
                                               })
     api_call(:get, "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions.json", {
-               :controller => 'submissions_api', :action => 'index',
-               :format => 'json', :course_id => @course.to_param,
-               :assignment_id => @assignment.id
+               controller: 'submissions_api', action: 'index',
+               format: 'json', course_id: @course.to_param,
+               assignment_id: @assignment.id
              })
     expect(response.header).to have_key("Link")
   end
 
   it "returns nothing if no assignments in the course" do
     student1 = user_factory(active_all: true)
-    student2 = user_with_pseudonym(:active_all => true)
+    student2 = user_with_pseudonym(active_all: true)
     student2.pseudonym.update_attribute(:sis_user_id, 'my-student-id')
 
-    course_with_teacher(:active_all => true)
+    course_with_teacher(active_all: true)
 
     enrollment1 = @course.enroll_student(student1)
     enrollment1.accept!
@@ -1510,9 +1510,9 @@ describe 'Submissions API', type: :request do
 
     json = api_call(:get,
                     "/api/v1/courses/#{@course.id}/students/submissions.json",
-                    { :controller => 'submissions_api', :action => 'for_students',
-                      :format => 'json', :course_id => @course.to_param },
-                    { :student_ids => [student1.to_param, student2.to_param], :grouped => 1 })
+                    { controller: 'submissions_api', action: 'for_students',
+                      format: 'json', course_id: @course.to_param },
+                    { student_ids: [student1.to_param, student2.to_param], grouped: 1 })
     expect(json.sort_by { |h| h['user_id'] }).to eq [
       {
         'user_id' => student1.id,
@@ -1530,19 +1530,19 @@ describe 'Submissions API', type: :request do
 
     json = api_call(:get,
                     "/api/v1/courses/#{@course.id}/students/submissions.json",
-                    { :controller => 'submissions_api', :action => 'for_students',
-                      :format => 'json', :course_id => @course.to_param },
-                    { :student_ids => [student1.to_param, student2.to_param] })
+                    { controller: 'submissions_api', action: 'for_students',
+                      format: 'json', course_id: @course.to_param },
+                    { student_ids: [student1.to_param, student2.to_param] })
     expect(json).to eq []
   end
 
   it "returns sis_user_id for user when grouped" do
-    student = user_with_pseudonym(:active_all => true)
+    student = user_with_pseudonym(active_all: true)
     batch = SisBatch.create(account_id: Account.default.id, workflow_state: 'imported')
     student.pseudonym.update_attribute(:sis_user_id, 'my-student-id')
     student.pseudonym.update_attribute(:sis_batch_id, batch.id)
 
-    course_with_teacher(:active_all => true)
+    course_with_teacher(active_all: true)
     @course.update_attribute(:sis_batch_id, batch.id)
 
     @course.enroll_student(student).accept!
@@ -1550,39 +1550,39 @@ describe 'Submissions API', type: :request do
     account_admin_user
     json = api_call(:get,
                     "/api/v1/courses/#{@course.id}/students/submissions.json",
-                    { :controller => 'submissions_api', :action => 'for_students',
-                      :format => 'json', :course_id => @course.to_param },
-                    { :student_ids => 'all', :grouped => 'true' })
+                    { controller: 'submissions_api', action: 'for_students',
+                      format: 'json', course_id: @course.to_param },
+                    { student_ids: 'all', grouped: 'true' })
     expect(json.first['sis_user_id']).to eq 'my-student-id'
   end
 
   it "returns integration_id for the user when grouped" do
-    student = user_with_pseudonym(:active_all => true)
+    student = user_with_pseudonym(active_all: true)
     batch = SisBatch.create(account_id: Account.default.id, workflow_state: 'imported')
     student.pseudonym.update_attribute(:integration_id, 'xyz')
     student.pseudonym.update_attribute(:sis_user_id, 'my-student-id')
     student.pseudonym.update_attribute(:sis_batch_id, batch.id)
 
-    course_with_teacher(:active_all => true)
+    course_with_teacher(active_all: true)
     @course.update_attribute(:sis_batch_id, batch.id)
     @course.enroll_student(student).accept!
 
     account_admin_user
     json = api_call(:get,
                     "/api/v1/courses/#{@course.id}/students/submissions.json",
-                    { :controller => 'submissions_api', :action => 'for_students',
-                      :format => 'json', :course_id => @course.to_param },
-                    { :student_ids => 'all', :grouped => 'true' })
+                    { controller: 'submissions_api', action: 'for_students',
+                      format: 'json', course_id: @course.to_param },
+                    { student_ids: 'all', grouped: 'true' })
     expect(json.first['integration_id']).to eq 'xyz'
   end
 
   context 'with plagiarism data' do
     before :once do
       @student = user_factory(active_all: true)
-      course_with_teacher(:active_all => true)
+      course_with_teacher(active_all: true)
       @course.enroll_student(@student).accept!
-      @a1 = @course.assignments.create!(:title => 'assignment1', :grading_type => 'letter_grade', :points_possible => 15, turnitin_enabled: true)
-      @a1.update(turnitin_settings: { :originality_report_visibility => 'after_grading' })
+      @a1 = @course.assignments.create!(title: 'assignment1', grading_type: 'letter_grade', points_possible: 15, turnitin_enabled: true)
+      @a1.update(turnitin_settings: { originality_report_visibility: 'after_grading' })
       @submission = submit_homework(@a1, @student)
     end
 
@@ -1591,23 +1591,23 @@ describe 'Submissions API', type: :request do
       sample_vericite_data = {
         :last_processed_attempt => 1,
         "attachment_504177" => {
-          :web_overlap => 73,
-          :publication_overlap => 0,
-          :error => true,
-          :student_overlap => 100,
-          :state => "failure",
-          :similarity_score => 100,
-          :object_id => "123345"
+          web_overlap: 73,
+          publication_overlap: 0,
+          error: true,
+          student_overlap: 100,
+          state: "failure",
+          similarity_score: 100,
+          object_id: "123345"
         },
-        provider: 'vericite'
+        :provider => 'vericite'
       }
       @submission.update(turnitin_data: sample_vericite_data)
 
       json = api_call(:get,
                       "/api/v1/courses/#{@course.id}/assignments/#{@a1.id}/submissions/#{@student.id}.json",
-                      { :controller => 'submissions_api', :action => 'show',
-                        :format => 'json', :course_id => @course.id.to_s,
-                        :assignment_id => @a1.id.to_s, :user_id => @student.id.to_s })
+                      { controller: 'submissions_api', action: 'show',
+                        format: 'json', course_id: @course.id.to_s,
+                        assignment_id: @a1.id.to_s, user_id: @student.id.to_s })
       expect(json).to have_key 'vericite_data'
       sample_vericite_data.delete :last_processed_attempt
       expect(json['vericite_data']).to eq sample_vericite_data.with_indifferent_access
@@ -1617,13 +1617,13 @@ describe 'Submissions API', type: :request do
       sample_turnitin_data = {
         :last_processed_attempt => 1,
         "attachment_504177" => {
-          :web_overlap => 73,
-          :publication_overlap => 0,
-          :error => true,
-          :student_overlap => 100,
-          :state => "failure",
-          :similarity_score => 100,
-          :object_id => "123345"
+          web_overlap: 73,
+          publication_overlap: 0,
+          error: true,
+          student_overlap: 100,
+          state: "failure",
+          similarity_score: 100,
+          object_id: "123345"
         }
       }
       @submission.update(turnitin_data: sample_turnitin_data)
@@ -1631,9 +1631,9 @@ describe 'Submissions API', type: :request do
       # as teacher
       json = api_call(:get,
                       "/api/v1/courses/#{@course.id}/assignments/#{@a1.id}/submissions/#{@student.id}.json",
-                      { :controller => 'submissions_api', :action => 'show',
-                        :format => 'json', :course_id => @course.id.to_s,
-                        :assignment_id => @a1.id.to_s, :user_id => @student.id.to_s })
+                      { controller: 'submissions_api', action: 'show',
+                        format: 'json', course_id: @course.id.to_s,
+                        assignment_id: @a1.id.to_s, user_id: @student.id.to_s })
       expect(json).to have_key 'turnitin_data'
       sample_turnitin_data.delete :last_processed_attempt
       expect(json['turnitin_data']).to eq sample_turnitin_data.with_indifferent_access
@@ -1685,16 +1685,16 @@ describe 'Submissions API', type: :request do
   describe "#for_students" do
     before(:once) do
       @student1 = user_factory(active_all: true)
-      @student2 = user_with_pseudonym(:active_all => true)
+      @student2 = user_with_pseudonym(active_all: true)
       @student2.pseudonym.update_attribute(:sis_user_id, 'my-student-id')
 
-      course_with_teacher(:active_all => true)
+      course_with_teacher(active_all: true)
 
       @course.enroll_student(@student1).accept!
       @course.enroll_student(@student2).accept!
 
-      @a1 = @course.assignments.create!(:title => 'assignment1', :grading_type => 'letter_grade', :points_possible => 15)
-      @a2 = @course.assignments.create!(:title => 'assignment2', :grading_type => 'letter_grade', :points_possible => 25)
+      @a1 = @course.assignments.create!(title: 'assignment1', grading_type: 'letter_grade', points_possible: 15)
+      @a2 = @course.assignments.create!(title: 'assignment2', grading_type: 'letter_grade', points_possible: 25)
 
       submit_homework(@a1, @student1)
       submit_homework(@a2, @student1)
@@ -1704,27 +1704,27 @@ describe 'Submissions API', type: :request do
     it "returns all submissions for a student", priority: "1" do
       json = api_call(:get,
                       "/api/v1/courses/#{@course.id}/students/submissions.json",
-                      { :controller => 'submissions_api', :action => 'for_students',
-                        :format => 'json', :course_id => @course.to_param },
-                      { :student_ids => [@student1.to_param] })
+                      { controller: 'submissions_api', action: 'for_students',
+                        format: 'json', course_id: @course.to_param },
+                      { student_ids: [@student1.to_param] })
 
       expect(json.size).to eq 2
       json.each { |submission| expect(submission['user_id']).to eq @student1.id }
 
       json = api_call(:get,
                       "/api/v1/courses/#{@course.id}/students/submissions.json",
-                      { :controller => 'submissions_api', :action => 'for_students',
-                        :format => 'json', :course_id => @course.to_param },
-                      { :student_ids => [@student1.to_param, @student2.to_param] })
+                      { controller: 'submissions_api', action: 'for_students',
+                        format: 'json', course_id: @course.to_param },
+                      { student_ids: [@student1.to_param, @student2.to_param] })
 
       expect(json.size).to eq 4
 
       json = api_call(:get,
                       "/api/v1/courses/#{@course.id}/students/submissions.json",
-                      { :controller => 'submissions_api', :action => 'for_students',
-                        :format => 'json', :course_id => @course.to_param },
-                      { :student_ids => [@student1.to_param, @student2.to_param],
-                        :assignment_ids => [@a1.to_param] })
+                      { controller: 'submissions_api', action: 'for_students',
+                        format: 'json', course_id: @course.to_param },
+                      { student_ids: [@student1.to_param, @student2.to_param],
+                        assignment_ids: [@a1.to_param] })
 
       expect(json.size).to eq 2
       expect(json.all? { |submission| expect(submission['assignment_id']).to eq @a1.id }).to be_truthy
@@ -1732,10 +1732,10 @@ describe 'Submissions API', type: :request do
       # by sis user id!
       json = api_call(:get,
                       "/api/v1/courses/#{@course.id}/students/submissions.json",
-                      { :controller => 'submissions_api', :action => 'for_students',
-                        :format => 'json', :course_id => @course.to_param },
-                      { :student_ids => [@student1.to_param, 'sis_user_id:my-student-id'],
-                        :assignment_ids => [@a1.to_param] })
+                      { controller: 'submissions_api', action: 'for_students',
+                        format: 'json', course_id: @course.to_param },
+                      { student_ids: [@student1.to_param, 'sis_user_id:my-student-id'],
+                        assignment_ids: [@a1.to_param] })
 
       expect(json.size).to eq 2
       expect(json.all? { |submission| expect(submission['assignment_id']).to eq @a1.id }).to be_truthy
@@ -1743,10 +1743,10 @@ describe 'Submissions API', type: :request do
       # by sis login id!
       json = api_call(:get,
                       "/api/v1/courses/#{@course.id}/students/submissions.json",
-                      { :controller => 'submissions_api', :action => 'for_students',
-                        :format => 'json', :course_id => @course.to_param },
-                      { :student_ids => [@student1.to_param, "sis_login_id:#{@student2.pseudonym.unique_id}"],
-                        :assignment_ids => [@a1.to_param] })
+                      { controller: 'submissions_api', action: 'for_students',
+                        format: 'json', course_id: @course.to_param },
+                      { student_ids: [@student1.to_param, "sis_login_id:#{@student2.pseudonym.unique_id}"],
+                        assignment_ids: [@a1.to_param] })
 
       expect(json.size).to eq 2
       expect(json.all? { |submission| expect(submission['assignment_id']).to eq @a1.id }).to be_truthy
@@ -1755,10 +1755,10 @@ describe 'Submissions API', type: :request do
       @student2.enrollments.first.conclude
       json = api_call(:get,
                       "/api/v1/courses/#{@course.id}/students/submissions.json",
-                      { :controller => 'submissions_api', :action => 'for_students',
-                        :format => 'json', :course_id => @course.to_param },
-                      { :student_ids => [@student1.to_param, "sis_login_id:#{@student2.pseudonym.unique_id}"],
-                        :assignment_ids => [@a1.to_param] })
+                      { controller: 'submissions_api', action: 'for_students',
+                        format: 'json', course_id: @course.to_param },
+                      { student_ids: [@student1.to_param, "sis_login_id:#{@student2.pseudonym.unique_id}"],
+                        assignment_ids: [@a1.to_param] })
 
       expect(json.size).to eq 2
       expect(json.all? { |submission| expect(submission['assignment_id']).to eq @a1.id }).to be_truthy
@@ -1781,7 +1781,7 @@ describe 'Submissions API', type: :request do
 
     it "errors when asking for assignments in other courses" do
       # second course
-      course_with_teacher(:active_all => true)
+      course_with_teacher(active_all: true)
       @course.enroll_student(@student1).accept!
       @course.enroll_student(@student2).accept!
 
@@ -1869,9 +1869,9 @@ describe 'Submissions API', type: :request do
         user_session(@teacher)
         json = api_call(:get,
                         "/api/v1/courses/#{@course.id}/students/submissions.json",
-                        { :controller => 'submissions_api', :action => 'for_students',
-                          :format => 'json', :course_id => @course.to_param },
-                        { :student_ids => [@student.to_param] })
+                        { controller: 'submissions_api', action: 'for_students',
+                          format: 'json', course_id: @course.to_param },
+                        { student_ids: [@student.to_param] })
 
         expect(json.first).to have_key 'has_originality_report'
       end
@@ -1892,9 +1892,9 @@ describe 'Submissions API', type: :request do
         user_session(@teacher)
         json = api_call(:get,
                         "/api/v1/courses/#{@course.id}/students/submissions.json",
-                        { :controller => 'submissions_api', :action => 'for_students',
-                          :format => 'json', :course_id => @course.to_param },
-                        { :student_ids => [@student.to_param] })
+                        { controller: 'submissions_api', action: 'for_students',
+                          format: 'json', course_id: @course.to_param },
+                        { student_ids: [@student.to_param] })
         expect(json.first).not_to have_key 'has_originality_report'
       end
     end
@@ -1990,11 +1990,11 @@ describe 'Submissions API', type: :request do
       # set up course with DA and submit homework for an assignment
       # that is only visible to overrides for @section1
       @student = user_factory(active_all: true)
-      course_with_teacher(:active_all => true)
+      course_with_teacher(active_all: true)
       @section1 = @course.course_sections.create!(name: "test section")
       @section2 = @course.course_sections.create!(name: "test section")
       student_in_section(@section1, user: @student)
-      @assignment = @course.assignments.create!(:title => 'assignment1', :grading_type => 'letter_grade', :points_possible => 15, :only_visible_to_overrides => true)
+      @assignment = @course.assignments.create!(title: 'assignment1', grading_type: 'letter_grade', points_possible: 15, only_visible_to_overrides: true)
       create_section_override_for_assignment(@assignment, course_section: @section1)
       submit_homework(@assignment, @student)
 
@@ -2011,9 +2011,9 @@ describe 'Submissions API', type: :request do
                       end
       args = helper_method + [:get,
                               "/api/v1/courses/#{@course.id}/students/submissions.json",
-                              { :controller => 'submissions_api', :action => 'for_students',
-                                :format => 'json', :course_id => @course.to_param },
-                              { :student_ids => [@student.to_param] }]
+                              { controller: 'submissions_api', action: 'for_students',
+                                format: 'json', course_id: @course.to_param },
+                              { student_ids: [@student.to_param] }]
       send(*args)
     end
 
@@ -2054,7 +2054,7 @@ describe 'Submissions API', type: :request do
     context "as an observer" do
       before do
         @observer = User.create
-        observer_enrollment = @course.enroll_user(@observer, 'ObserverEnrollment', :section => @section2, :enrollment_state => 'active')
+        observer_enrollment = @course.enroll_user(@observer, 'ObserverEnrollment', section: @section2, enrollment_state: 'active')
         observer_enrollment.update_attribute(:associated_user_id, @student.id)
       end
 
@@ -2183,7 +2183,7 @@ describe 'Submissions API', type: :request do
   describe "#show_anonymous" do
     before do
       @student = user_factory(active_all: true)
-      course_with_teacher(:active_all => true)
+      course_with_teacher(active_all: true)
       section = @course.course_sections.create!(name: "test section")
       student_in_section(section, user: @student)
       @assignment = @course.assignments.create!(anonymous_grading: true)
@@ -2241,7 +2241,7 @@ describe 'Submissions API', type: :request do
   describe "#show" do
     before do
       @student = user_factory(active_all: true)
-      course_with_teacher(:active_all => true)
+      course_with_teacher(active_all: true)
       @section = @course.course_sections.create!(name: "test section")
       student_in_section(@section, user: @student)
     end
@@ -2252,7 +2252,7 @@ describe 'Submissions API', type: :request do
         # that is only visible to overrides for @section
         # move student to a section that cannot see assignment by default
         @section2 = @course.course_sections.create!(name: "test section")
-        @assignment = @course.assignments.create!(:title => 'assignment1', :grading_type => 'letter_grade', :points_possible => 15, :only_visible_to_overrides => true)
+        @assignment = @course.assignments.create!(title: 'assignment1', grading_type: 'letter_grade', points_possible: 15, only_visible_to_overrides: true)
         create_section_override_for_assignment(@assignment, course_section: @section)
         submit_homework(@assignment, @student)
         Score.where(enrollment_id: @student.enrollments).each(&:destroy_permanently!)
@@ -2268,9 +2268,9 @@ describe 'Submissions API', type: :request do
         helper_method = opts[:as_student] ? [:api_call_as_user, @student] : [:api_call]
         args = helper_method + [:get,
                                 "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}.json",
-                                { :controller => 'submissions_api', :action => 'show',
-                                  :format => 'json', :course_id => @course.to_param, :assignment_id => @assignment.id.to_s, :user_id => @student.id.to_s },
-                                { :include => includes }]
+                                { controller: 'submissions_api', action: 'show',
+                                  format: 'json', course_id: @course.to_param, assignment_id: @assignment.id.to_s, user_id: @student.id.to_s },
+                                { include: includes }]
         send(*args)
       end
 
@@ -2294,9 +2294,9 @@ describe 'Submissions API', type: :request do
           it "returns an unauthorized error" do
             api_call_as_user(@student, :get,
                              "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}.json",
-                             { :controller => 'submissions_api', :action => 'show',
-                               :format => 'json', :course_id => @course.to_param, :assignment_id => @assignment.id.to_s, :user_id => @student.id.to_s },
-                             { :include => %w[submission_comments rubric_assessment] }, {}, expected_status: 401)
+                             { controller: 'submissions_api', action: 'show',
+                               format: 'json', course_id: @course.to_param, assignment_id: @assignment.id.to_s, user_id: @student.id.to_s },
+                             { include: %w[submission_comments rubric_assessment] }, {}, expected_status: 401)
           end
 
           it "returns the submission if it is graded" do
@@ -2323,29 +2323,29 @@ describe 'Submissions API', type: :request do
       it "fails when no rubric assessment is present" do
         json = api_call(:get,
                         "/api/v1/courses/#{@course.id}/assignments/#{@assignment1.id}/submissions/#{@student.id}.json",
-                        { :controller => 'submissions_api', :action => 'show',
-                          :format => 'json', :course_id => @course.id.to_s,
-                          :assignment_id => @assignment1.id.to_s, :user_id => @student.id.to_s },
-                        { :include => %w[full_rubric_assessment] })
+                        { controller: 'submissions_api', action: 'show',
+                          format: 'json', course_id: @course.id.to_s,
+                          assignment_id: @assignment1.id.to_s, user_id: @student.id.to_s },
+                        { include: %w[full_rubric_assessment] })
         expect(json).not_to have_key 'full_rubric_assessment'
       end
 
       context "if present" do
         before do
           @assignment2 = assignment_model(context: @course)
-          rubric_assessment_model({ :purpose => "grading",
-                                    :association_object => @assignment2,
-                                    :user => @student,
-                                    :assessment_type => "grading" })
+          rubric_assessment_model({ purpose: "grading",
+                                    association_object: @assignment2,
+                                    user: @student,
+                                    assessment_type: "grading" })
         end
 
         it "returns the correct data" do
           json = api_call_as_user(@teacher, :get,
                                   "/api/v1/courses/#{@course.id}/assignments/#{@assignment2.id}/submissions/#{@student.id}.json",
-                                  { :controller => 'submissions_api', :action => 'show',
-                                    :format => 'json', :course_id => @course.id.to_s,
-                                    :assignment_id => @assignment2.id.to_s, :user_id => @student.id.to_s },
-                                  { :include => %w[full_rubric_assessment] })
+                                  { controller: 'submissions_api', action: 'show',
+                                    format: 'json', course_id: @course.id.to_s,
+                                    assignment_id: @assignment2.id.to_s, user_id: @student.id.to_s },
+                                  { include: %w[full_rubric_assessment] })
           expect(json).to have_key 'full_rubric_assessment'
           expect(json['full_rubric_assessment']).to have_key 'data'
           expect(json['full_rubric_assessment']).to have_key 'assessor_name'
@@ -2355,10 +2355,10 @@ describe 'Submissions API', type: :request do
         it "is visible to student owning the assignment" do
           json = api_call_as_user(@student, :get,
                                   "/api/v1/courses/#{@course.id}/assignments/#{@assignment2.id}/submissions/#{@student.id}.json",
-                                  { :controller => 'submissions_api', :action => 'show',
-                                    :format => 'json', :course_id => @course.id.to_s,
-                                    :assignment_id => @assignment2.id.to_s, :user_id => @student.id.to_s },
-                                  { :include => %w[full_rubric_assessment] })
+                                  { controller: 'submissions_api', action: 'show',
+                                    format: 'json', course_id: @course.id.to_s,
+                                    assignment_id: @assignment2.id.to_s, user_id: @student.id.to_s },
+                                  { include: %w[full_rubric_assessment] })
           expect(json['full_rubric_assessment']).not_to be_nil
         end
 
@@ -2367,10 +2367,10 @@ describe 'Submissions API', type: :request do
           student_in_section(@section, user: @other_student)
           api_call_as_user(@other_student, :get,
                            "/api/v1/courses/#{@course.id}/assignments/#{@assignment2.id}/submissions/#{@student.id}.json",
-                           { :controller => 'submissions_api', :action => 'show',
-                             :format => 'json', :course_id => @course.id.to_s,
-                             :assignment_id => @assignment2.id.to_s, :user_id => @student.id.to_s },
-                           { :include => %w[full_rubric_assessment] }, {}, expected_status: 401)
+                           { controller: 'submissions_api', action: 'show',
+                             format: 'json', course_id: @course.id.to_s,
+                             assignment_id: @assignment2.id.to_s, user_id: @student.id.to_s },
+                           { include: %w[full_rubric_assessment] }, {}, expected_status: 401)
         end
       end
     end
@@ -2379,7 +2379,7 @@ describe 'Submissions API', type: :request do
   context "grouped submissions" do
     before :once do
       @student1 = user_factory(active_all: true)
-      @student2 = user_with_pseudonym(:active_all => true)
+      @student2 = user_with_pseudonym(active_all: true)
 
       course_with_teacher(active_all: true)
       ta_in_course
@@ -2406,9 +2406,9 @@ describe 'Submissions API', type: :request do
     it "returns student submissions grouped by student" do
       json = api_call(:get,
                       "/api/v1/courses/#{@course.id}/students/submissions.json",
-                      { :controller => 'submissions_api', :action => 'for_students',
-                        :format => 'json', :course_id => @course.to_param },
-                      { :student_ids => [@student1.to_param], :grouped => '1' })
+                      { controller: 'submissions_api', action: 'for_students',
+                        format: 'json', course_id: @course.to_param },
+                      { student_ids: [@student1.to_param], grouped: '1' })
 
       expect(json.size).to eq 1
       expect(json.first['submissions'].size).to eq 2
@@ -2416,19 +2416,19 @@ describe 'Submissions API', type: :request do
 
       json = api_call(:get,
                       "/api/v1/courses/#{@course.id}/students/submissions.json",
-                      { :controller => 'submissions_api', :action => 'for_students',
-                        :format => 'json', :course_id => @course.to_param },
-                      { :student_ids => [@student1.to_param, @student2.to_param], :grouped => '1' })
+                      { controller: 'submissions_api', action: 'for_students',
+                        format: 'json', course_id: @course.to_param },
+                      { student_ids: [@student1.to_param, @student2.to_param], grouped: '1' })
 
       expect(json.size).to eq 2
       expect(json.map { |u| u['submissions'] }.flatten.size).to eq 4
 
       json = api_call(:get,
                       "/api/v1/courses/#{@course.id}/students/submissions.json",
-                      { :controller => 'submissions_api', :action => 'for_students',
-                        :format => 'json', :course_id => @course.to_param },
-                      { :student_ids => [@student1.to_param, @student2.to_param],
-                        :assignment_ids => [@a1.to_param], :grouped => '1' })
+                      { controller: 'submissions_api', action: 'for_students',
+                        format: 'json', course_id: @course.to_param },
+                      { student_ids: [@student1.to_param, @student2.to_param],
+                        assignment_ids: [@a1.to_param], grouped: '1' })
 
       expect(json.size).to eq 2
       json.each { |user| user['submissions'].each { |s| expect(s['assignment_id']).to eq @a1.id } }
@@ -2437,16 +2437,16 @@ describe 'Submissions API', type: :request do
     it "paginates" do
       json = api_call(:get,
                       "/api/v1/courses/#{@course.id}/students/submissions.json",
-                      { :controller => 'submissions_api', :action => 'for_students',
-                        :format => 'json', :course_id => @course.to_param },
-                      { :student_ids => ["all"], :grouped => '1', :per_page => '1' })
+                      { controller: 'submissions_api', action: 'for_students',
+                        format: 'json', course_id: @course.to_param },
+                      { student_ids: ["all"], grouped: '1', per_page: '1' })
       expect(json.size).to eq 1
 
       json2 = api_call(:get,
                        "/api/v1/courses/#{@course.id}/students/submissions.json",
-                       { :controller => 'submissions_api', :action => 'for_students',
-                         :format => 'json', :course_id => @course.to_param },
-                       { :student_ids => ["all"], :grouped => '1', :per_page => '1', :page => 2 })
+                       { controller: 'submissions_api', action: 'for_students',
+                         format: 'json', course_id: @course.to_param },
+                       { student_ids: ["all"], grouped: '1', per_page: '1', page: 2 })
       expect(json2.size).to eq 1
       expect((json + json2).map { |r| r["user_id"] }).to match_array([@student1.id, @student2.id])
     end
@@ -2589,9 +2589,9 @@ describe 'Submissions API', type: :request do
   context "with grading periods" do
     before :once do
       @student1 = user_factory(active_all: true)
-      @student2 = user_with_pseudonym(:active_all => true)
+      @student2 = user_with_pseudonym(active_all: true)
 
-      course_with_teacher(:active_all => true)
+      course_with_teacher(active_all: true)
 
       @course.enroll_student(@student1).accept!
       @course.enroll_student(@student2).accept!
@@ -2609,8 +2609,8 @@ describe 'Submissions API', type: :request do
         start_date: 2.days.from_now,
         end_date: 1.month.from_now
       )
-      a1 = @course.assignments.create!(due_at: 1.minute.from_now, :submission_types => 'online_text_entry')
-      a2 = @course.assignments.create!(due_at: 1.week.from_now, :submission_types => 'online_text_entry')
+      a1 = @course.assignments.create!(due_at: 1.minute.from_now, submission_types: 'online_text_entry')
+      a2 = @course.assignments.create!(due_at: 1.week.from_now, submission_types: 'online_text_entry')
 
       submit_homework(a1, @student1)
       submit_homework(a2, @student1) # only one in current grading period
@@ -2620,10 +2620,10 @@ describe 'Submissions API', type: :request do
     it "filters by grading period" do
       json = api_call(:get,
                       "/api/v1/courses/#{@course.id}/students/submissions.json",
-                      { :controller => 'submissions_api', :action => 'for_students',
-                        :format => 'json', :course_id => @course.to_param },
-                      { :student_ids => [@student1.to_param, @student2.to_param], :grouped => '1',
-                        :grading_period_id => @gp2.to_param })
+                      { controller: 'submissions_api', action: 'for_students',
+                        format: 'json', course_id: @course.to_param },
+                      { student_ids: [@student1.to_param, @student2.to_param], grouped: '1',
+                        grading_period_id: @gp2.to_param })
       expect(json.detect { |u| u['user_id'] == @student1.id }['submissions'].size).to eq 1
       expect(json.detect { |u| u['user_id'] == @student2.id }['submissions'].size).to eq 1
     end
@@ -2631,9 +2631,9 @@ describe 'Submissions API', type: :request do
     it "does not return an error when no grading_period_id is provided" do
       api_call(:get,
                "/api/v1/courses/#{@course.id}/students/submissions.json",
-               { :controller => 'submissions_api', :action => 'for_students',
-                 :format => 'json', :course_id => @course.to_param },
-               { :student_ids => [@student1.to_param, @student2.to_param], :grouped => '1' })
+               { controller: 'submissions_api', action: 'for_students',
+                 format: 'json', course_id: @course.to_param },
+               { student_ids: [@student1.to_param, @student2.to_param], grouped: '1' })
       expect(response).to be_ok
     end
   end
@@ -2682,12 +2682,12 @@ describe 'Submissions API', type: :request do
 
   describe "for_students non-admin" do
     before :once do
-      course_with_student :active_all => true
+      course_with_student active_all: true
       @student1 = @student
-      @student2 = student_in_course(:active_all => true).user
-      @student3 = student_in_course(:active_all => true).user
-      @assignment1 = @course.assignments.create! :title => 'assignment1', :grading_type => 'points', :points_possible => 15
-      @assignment2 = @course.assignments.create! :title => 'assignment2', :grading_type => 'points', :points_possible => 25
+      @student2 = student_in_course(active_all: true).user
+      @student3 = student_in_course(active_all: true).user
+      @assignment1 = @course.assignments.create! title: 'assignment1', grading_type: 'points', points_possible: 15
+      @assignment2 = @course.assignments.create! title: 'assignment2', grading_type: 'points', points_possible: 25
 
       @assignment1.unmute!
       @assignment2.unmute!
@@ -2704,9 +2704,9 @@ describe 'Submissions API', type: :request do
         @user = @teacher
         json = api_call(:get,
                         "/api/v1/courses/#{@course.id}/students/submissions",
-                        { :controller => 'submissions_api', :action => 'for_students',
-                          :format => 'json', :course_id => @course.to_param },
-                        { :student_ids => ['all'] })
+                        { controller: 'submissions_api', action: 'for_students',
+                          format: 'json', course_id: @course.to_param },
+                        { student_ids: ['all'] })
         expect(json.map { |entry| entry.slice('user_id', 'assignment_id', 'score') }.sort_by { |entry| [entry['user_id'], entry['assignment_id']] }).to eq [
           { 'user_id' => @student1.id, 'assignment_id' => @assignment1.id, 'score' => 15 },
           { 'user_id' => @student1.id, 'assignment_id' => @assignment2.id, 'score' => 25 },
@@ -2720,9 +2720,9 @@ describe 'Submissions API', type: :request do
       it "does not show submissions for a user outside the course" do
         rando = user_factory
         api_call_as_user(@teacher, :get, "/api/v1/courses/#{@course.id}/students/submissions",
-                         { :controller => 'submissions_api', :action => 'for_students',
-                           :format => 'json', :course_id => @course.to_param },
-                         { :student_ids => [rando.id] }, {}, { :expected_status => 401 })
+                         { controller: 'submissions_api', action: 'for_students',
+                           format: 'json', course_id: @course.to_param },
+                         { student_ids: [rando.id] }, {}, { expected_status: 401 })
       end
     end
 
@@ -2731,9 +2731,9 @@ describe 'Submissions API', type: :request do
         @user = @student1
         json = api_call(:get,
                         "/api/v1/courses/#{@course.id}/students/submissions.json",
-                        { :controller => 'submissions_api', :action => 'for_students',
-                          :format => 'json', :course_id => @course.to_param },
-                        { :student_ids => [@student1.to_param] })
+                        { controller: 'submissions_api', action: 'for_students',
+                          format: 'json', course_id: @course.to_param },
+                        { student_ids: [@student1.to_param] })
         sub_json = json.map { |entry| entry.slice('user_id', 'assignment_id', 'score') }
                        .sort_by { |entry| entry['assignment_id'] }
         expect(sub_json).to eq [
@@ -2746,8 +2746,8 @@ describe 'Submissions API', type: :request do
         @user = @student2
         json = api_call(:get,
                         "/api/v1/courses/#{@course.id}/students/submissions.json",
-                        { :controller => 'submissions_api', :action => 'for_students',
-                          :format => 'json', :course_id => @course.to_param })
+                        { controller: 'submissions_api', action: 'for_students',
+                          format: 'json', course_id: @course.to_param })
         sub_json = json.map { |entry| entry.slice('user_id', 'assignment_id', 'score') }
                        .sort_by { |entry| entry['assignment_id'] }
         expect(sub_json).to eq [
@@ -2760,9 +2760,9 @@ describe 'Submissions API', type: :request do
         @user = @student2
         json = api_call(:get,
                         "/api/v1/courses/#{@course.id}/students/submissions.json",
-                        { :controller => 'submissions_api', :action => 'for_students',
-                          :format => 'json', :course_id => @course.to_param },
-                        { :student_ids => ['all'] })
+                        { controller: 'submissions_api', action: 'for_students',
+                          format: 'json', course_id: @course.to_param },
+                        { student_ids: ['all'] })
         sub_json = json.map { |entry| entry.slice('user_id', 'assignment_id', 'score') }
                        .sort_by { |entry| entry['assignment_id'] }
         expect(sub_json).to eq [
@@ -2775,8 +2775,8 @@ describe 'Submissions API', type: :request do
         @user = @student1
         json = api_call(:get,
                         "/api/v1/courses/#{@course.id}/students/submissions.json?grouped=1",
-                        { :controller => 'submissions_api', :action => 'for_students',
-                          :format => 'json', :course_id => @course.to_param, :grouped => '1' })
+                        { controller: 'submissions_api', action: 'for_students',
+                          format: 'json', course_id: @course.to_param, grouped: '1' })
         expect(json.size).to eq 1
         expect(json[0]['user_id']).to eq @student1.id
         expect(json[0]['submissions'].map { |sub| sub.slice('assignment_id', 'score') }.sort_by { |entry| entry['assignment_id'] }).to eq [
@@ -2789,10 +2789,10 @@ describe 'Submissions API', type: :request do
         @user = @student1
         api_call(:get,
                  "/api/v1/courses/#{@course.id}/students/submissions.json?student_ids[]=#{@student1.id}&student_ids[]=#{@student2.id}",
-                 { :controller => 'submissions_api', :action => 'for_students',
-                   :format => 'json', :course_id => @course.to_param,
-                   :student_ids => [@student1.to_param, @student2.to_param] },
-                 {}, {}, :expected_status => 401)
+                 { controller: 'submissions_api', action: 'for_students',
+                   format: 'json', course_id: @course.to_param,
+                   student_ids: [@student1.to_param, @student2.to_param] },
+                 {}, {}, expected_status: 401)
       end
 
       it "errors if too many students requested" do
@@ -2800,9 +2800,9 @@ describe 'Submissions API', type: :request do
         @user = @student1
         api_call(:get,
                  "/api/v1/courses/#{@course.id}/students/submissions.json",
-                 { :controller => 'submissions_api', :action => 'for_students',
-                   :format => 'json', :course_id => @course.to_param },
-                 { :student_ids => [@student1.to_param] }, {}, expected_status: 400)
+                 { controller: 'submissions_api', action: 'for_students',
+                   format: 'json', course_id: @course.to_param },
+                 { student_ids: [@student1.to_param] }, {}, expected_status: 400)
       end
 
       it "allows concluded students to view their submission" do
@@ -2812,9 +2812,9 @@ describe 'Submissions API', type: :request do
         @user = @student1
         json = api_call(:get,
                         "/api/v1/courses/#{@course.id}/students/submissions.json",
-                        { :controller => 'submissions_api', :action => 'for_students',
-                          :format => 'json', :course_id => @course.to_param },
-                        { :student_ids => [@student1.to_param] })
+                        { controller: 'submissions_api', action: 'for_students',
+                          format: 'json', course_id: @course.to_param },
+                        { student_ids: [@student1.to_param] })
         sub_json = json.map { |entry| entry.slice('user_id', 'assignment_id', 'score') }
                        .sort_by { |entry| entry['assignment_id'] }
         expect(sub_json).to eq [
@@ -2826,18 +2826,18 @@ describe 'Submissions API', type: :request do
 
     context "observers" do
       before :once do
-        @observer = user_factory :active_all => true
-        @course.enroll_user(@observer, 'ObserverEnrollment', :associated_user_id => @student1.id)
-        @course.enroll_user(@observer, 'ObserverEnrollment', :allow_multiple_enrollments => true, :associated_user_id => @student2.id)
+        @observer = user_factory active_all: true
+        @course.enroll_user(@observer, 'ObserverEnrollment', associated_user_id: @student1.id)
+        @course.enroll_user(@observer, 'ObserverEnrollment', allow_multiple_enrollments: true, associated_user_id: @student2.id)
       end
 
       it "allows an observer to view observed students' submissions" do
         @user = @observer
         json = api_call(:get,
                         "/api/v1/courses/#{@course.id}/students/submissions",
-                        { :controller => 'submissions_api', :action => 'for_students',
-                          :format => 'json', :course_id => @course.to_param },
-                        { :student_ids => [@student1.id, @student2.id] })
+                        { controller: 'submissions_api', action: 'for_students',
+                          format: 'json', course_id: @course.to_param },
+                        { student_ids: [@student1.id, @student2.id] })
         expect(json.map { |entry| entry.slice('user_id', 'assignment_id', 'score') }.sort_by { |entry| [entry['user_id'], entry['assignment_id']] }).to eq [
           { 'user_id' => @student1.id, 'assignment_id' => @assignment1.id, 'score' => 15 },
           { 'user_id' => @student1.id, 'assignment_id' => @assignment2.id, 'score' => 25 },
@@ -2850,9 +2850,9 @@ describe 'Submissions API', type: :request do
         @user = @observer
         json = api_call(:get,
                         "/api/v1/courses/#{@course.id}/students/submissions",
-                        { :controller => 'submissions_api', :action => 'for_students',
-                          :format => 'json', :course_id => @course.to_param },
-                        { :student_ids => ['all'] })
+                        { controller: 'submissions_api', action: 'for_students',
+                          format: 'json', course_id: @course.to_param },
+                        { student_ids: ['all'] })
         expect(json.map { |entry| entry.slice('user_id', 'assignment_id', 'score') }.sort_by { |entry| [entry['user_id'], entry['assignment_id']] }).to eq [
           { 'user_id' => @student1.id, 'assignment_id' => @assignment1.id, 'score' => 15 },
           { 'user_id' => @student1.id, 'assignment_id' => @assignment2.id, 'score' => 25 },
@@ -2863,7 +2863,7 @@ describe 'Submissions API', type: :request do
 
       context "observer that is a student" do
         before :once do
-          @course.enroll_student(@observer, :allow_multiple_enrollments => true).accept!
+          @course.enroll_student(@observer, allow_multiple_enrollments: true).accept!
           submit_homework(@assignment1, @observer)
           @assignment1.grade_student(@observer, grade: 5, grader: @teacher)
         end
@@ -2872,9 +2872,9 @@ describe 'Submissions API', type: :request do
           @user = @observer
           json = api_call(:get,
                           "/api/v1/courses/#{@course.id}/students/submissions",
-                          { :controller => 'submissions_api', :action => 'for_students',
-                            :format => 'json', :course_id => @course.to_param },
-                          { :student_ids => [@student1.id, @observer.id] })
+                          { controller: 'submissions_api', action: 'for_students',
+                            format: 'json', course_id: @course.to_param },
+                          { student_ids: [@student1.id, @observer.id] })
           expect(json.map { |entry| entry.slice('user_id', 'assignment_id', 'score') }.sort_by { |entry| [entry['user_id'], entry['assignment_id']] }).to eq [
             { 'user_id' => @student1.id, 'assignment_id' => @assignment1.id, 'score' => 15 },
             { 'user_id' => @student1.id, 'assignment_id' => @assignment2.id, 'score' => 25 },
@@ -2887,9 +2887,9 @@ describe 'Submissions API', type: :request do
           @user = @observer
           json = api_call(:get,
                           "/api/v1/courses/#{@course.id}/students/submissions",
-                          { :controller => 'submissions_api', :action => 'for_students',
-                            :format => 'json', :course_id => @course.to_param },
-                          { :student_ids => ['all'] })
+                          { controller: 'submissions_api', action: 'for_students',
+                            format: 'json', course_id: @course.to_param },
+                          { student_ids: ['all'] })
           expect(json.map { |entry| entry.slice('user_id', 'assignment_id', 'score') }.sort_by { |entry| [entry['user_id'], entry['assignment_id']] }).to eq [
             { 'user_id' => @student1.id, 'assignment_id' => @assignment1.id, 'score' => 15 },
             { 'user_id' => @student1.id, 'assignment_id' => @assignment2.id, 'score' => 25 },
@@ -2905,23 +2905,23 @@ describe 'Submissions API', type: :request do
         @user = @observer
         json = api_call(:get,
                         "/api/v1/courses/#{@course.id}/students/submissions.json?student_ids[]=#{@student1.id}&student_ids[]=#{@student2.id}&grouped=1",
-                        { :controller => 'submissions_api', :action => 'for_students',
-                          :format => 'json', :course_id => @course.to_param,
-                          :student_ids => [@student1.to_param, @student2.to_param],
-                          :grouped => '1' })
+                        { controller: 'submissions_api', action: 'for_students',
+                          format: 'json', course_id: @course.to_param,
+                          student_ids: [@student1.to_param, @student2.to_param],
+                          grouped: '1' })
         expect(json.size).to eq 2
         expect(json.map { |entry| entry['user_id'] }.sort).to eq [@student1.id, @student2.id]
       end
 
       it "does not allow an observer to view non-observed students' submissions" do
-        student3 = student_in_course(:active_all => true).user
+        student3 = student_in_course(active_all: true).user
         @user = @observer
         api_call(:get,
                  "/api/v1/courses/#{@course.id}/students/submissions",
-                 { :controller => 'submissions_api', :action => 'for_students',
-                   :format => 'json', :course_id => @course.to_param },
-                 { :student_ids => [@student1.id, @student2.id, student3.id] },
-                 {}, { :expected_status => 401 })
+                 { controller: 'submissions_api', action: 'for_students',
+                   format: 'json', course_id: @course.to_param },
+                 { student_ids: [@student1.id, @student2.id, student3.id] },
+                 {}, { expected_status: 401 })
       end
 
       it "does not work with a non-active ObserverEnrollment" do
@@ -2929,10 +2929,10 @@ describe 'Submissions API', type: :request do
         @user = @observer
         api_call(:get,
                  "/api/v1/courses/#{@course.id}/students/submissions",
-                 { :controller => 'submissions_api', :action => 'for_students',
-                   :format => 'json', :course_id => @course.to_param },
-                 { :student_ids => [@student1.id, @student2.id] },
-                 {}, { :expected_status => 401 })
+                 { controller: 'submissions_api', action: 'for_students',
+                   format: 'json', course_id: @course.to_param },
+                 { student_ids: [@student1.id, @student2.id] },
+                 {}, { expected_status: 401 })
       end
     end
 
@@ -2941,10 +2941,10 @@ describe 'Submissions API', type: :request do
         @user = nil
         api_call(:get,
                  "/api/v1/courses/#{@course.id}/students/submissions",
-                 { :controller => 'submissions_api', :action => 'for_students',
-                   :format => 'json', :course_id => @course.to_param },
-                 { :student_ids => [@student1.id, @student2.id] },
-                 {}, { :expected_status => 401 })
+                 { controller: 'submissions_api', action: 'for_students',
+                   format: 'json', course_id: @course.to_param },
+                 { student_ids: [@student1.id, @student2.id] },
+                 {}, { expected_status: 401 })
       end
     end
   end
@@ -3016,8 +3016,8 @@ describe 'Submissions API', type: :request do
 
   describe '#update' do
     before :once do
-      student_in_course(:active_all => true)
-      teacher_in_course(:active_all => true)
+      student_in_course(active_all: true)
+      teacher_in_course(active_all: true)
       @assignment = @course.assignments.create!(
         title: 'assignment1',
         grading_type: 'letter_grade',
@@ -3429,7 +3429,7 @@ describe 'Submissions API', type: :request do
       @assignment.grader_count = 2
       @assignment.final_grader = @teacher
       @assignment.save!
-      submission = @assignment.submit_homework(@student, :body => 'what')
+      submission = @assignment.submit_homework(@student, body: 'what')
 
       json = api_call(
         :put,
@@ -3514,10 +3514,10 @@ describe 'Submissions API', type: :request do
       )
       json = api_call(:put,
                       "/api/v1/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{@student.id}.json",
-                      { :controller => 'submissions_api', :action => 'update',
-                        :format => 'json', :course_id => @course.id.to_s,
-                        :assignment_id => a1.id.to_s, :user_id => @student.id.to_s },
-                      { :submission => { :posted_grade => 10 } },
+                      { controller: 'submissions_api', action: 'update',
+                        format: 'json', course_id: @course.id.to_s,
+                        assignment_id: a1.id.to_s, user_id: @student.id.to_s },
+                      { submission: { posted_grade: 10 } },
                       {},
                       { expected_status: 400 })
       expect(json["error"]).not_to be_nil
@@ -3577,19 +3577,19 @@ describe 'Submissions API', type: :request do
   end
 
   it "allows posting grade by sis id" do
-    student = user_with_pseudonym(:active_all => true)
-    course_with_teacher(:active_all => true)
+    student = user_with_pseudonym(active_all: true)
+    course_with_teacher(active_all: true)
     @course.enroll_student(student).accept!
     @course.update_attribute(:sis_source_id, "my-course-id")
     student.pseudonym.update_attribute(:sis_user_id, "my-user-id")
-    a1 = @course.assignments.create!(:title => 'assignment1', :grading_type => 'letter_grade', :points_possible => 15)
+    a1 = @course.assignments.create!(title: 'assignment1', grading_type: 'letter_grade', points_possible: 15)
 
     json = api_call(:put,
                     "/api/v1/courses/sis_course_id:my-course-id/assignments/#{a1.id}/submissions/sis_user_id:my-user-id.json",
-                    { :controller => 'submissions_api', :action => 'update',
-                      :format => 'json', :course_id => 'sis_course_id:my-course-id',
-                      :assignment_id => a1.id.to_s, :user_id => 'sis_user_id:my-user-id' },
-                    { :submission => { :posted_grade => 'B' } })
+                    { controller: 'submissions_api', action: 'update',
+                      format: 'json', course_id: 'sis_course_id:my-course-id',
+                      assignment_id: a1.id.to_s, user_id: 'sis_user_id:my-user-id' },
+                    { submission: { posted_grade: 'B' } })
 
     expect(Submission.count).to eq 1
     @submission = Submission.first
@@ -3599,19 +3599,19 @@ describe 'Submissions API', type: :request do
   end
 
   it "allows commenting by a student without trying to grade" do
-    course_with_teacher(:active_all => true)
+    course_with_teacher(active_all: true)
     student = user_factory(active_all: true)
     @course.enroll_student(student).accept!
-    a1 = @course.assignments.create!(:title => 'assignment1', :grading_type => 'letter_grade', :points_possible => 15)
+    a1 = @course.assignments.create!(title: 'assignment1', grading_type: 'letter_grade', points_possible: 15)
 
     # since student is the most recently created user, @user = student, so this
     # call will happen as student
     api_call(:put,
              "/api/v1/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student.id}.json",
-             { :controller => 'submissions_api', :action => 'update',
-               :format => 'json', :course_id => @course.id.to_s,
-               :assignment_id => a1.id.to_s, :user_id => student.id.to_s },
-             { :comment => { :text_comment => 'witty remark' } })
+             { controller: 'submissions_api', action: 'update',
+               format: 'json', course_id: @course.id.to_s,
+               assignment_id: a1.id.to_s, user_id: student.id.to_s },
+             { comment: { text_comment: 'witty remark' } })
 
     expect(Submission.count).to eq 1
     @submission = Submission.first
@@ -3622,38 +3622,38 @@ describe 'Submissions API', type: :request do
   end
 
   it "does not allow grading by a student" do
-    course_with_teacher(:active_all => true)
+    course_with_teacher(active_all: true)
     student = user_factory(active_all: true)
     @course.enroll_student(student).accept!
-    a1 = @course.assignments.create!(:title => 'assignment1', :grading_type => 'letter_grade', :points_possible => 15)
+    a1 = @course.assignments.create!(title: 'assignment1', grading_type: 'letter_grade', points_possible: 15)
 
     # since student is the most recently created user, @user = student, so this
     # call will happen as student
     raw_api_call(:put,
                  "/api/v1/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student.id}.json",
-                 { :controller => 'submissions_api', :action => 'update',
-                   :format => 'json', :course_id => @course.id.to_s,
-                   :assignment_id => a1.id.to_s, :user_id => student.id.to_s },
-                 { :comment => { :text_comment => 'witty remark' },
-                   :submission => { :posted_grade => 'B' } })
+                 { controller: 'submissions_api', action: 'update',
+                   format: 'json', course_id: @course.id.to_s,
+                   assignment_id: a1.id.to_s, user_id: student.id.to_s },
+                 { comment: { text_comment: 'witty remark' },
+                   submission: { posted_grade: 'B' } })
     assert_status(401)
   end
 
   it "does not allow rubricking by a student" do
-    course_with_teacher(:active_all => true)
+    course_with_teacher(active_all: true)
     student = user_factory(active_all: true)
     @course.enroll_student(student).accept!
-    a1 = @course.assignments.create!(:title => 'assignment1', :grading_type => 'letter_grade', :points_possible => 15)
+    a1 = @course.assignments.create!(title: 'assignment1', grading_type: 'letter_grade', points_possible: 15)
 
     # since student is the most recently created user, @user = student, so this
     # call will happen as student
     raw_api_call(:put,
                  "/api/v1/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student.id}.json",
-                 { :controller => 'submissions_api', :action => 'update',
-                   :format => 'json', :course_id => @course.id.to_s,
-                   :assignment_id => a1.id.to_s, :user_id => student.id.to_s },
-                 { :comment => { :text_comment => 'witty remark' },
-                   :rubric_assessment => { :criteria => { :points => 5 } } })
+                 { controller: 'submissions_api', action: 'update',
+                   format: 'json', course_id: @course.id.to_s,
+                   assignment_id: a1.id.to_s, user_id: student.id.to_s },
+                 { comment: { text_comment: 'witty remark' },
+                   rubric_assessment: { criteria: { points: 5 } } })
     assert_status(401)
   end
 
@@ -3756,34 +3756,34 @@ describe 'Submissions API', type: :request do
 
   it "does not return submissions for no-longer-enrolled students" do
     student = user_factory(active_all: true)
-    course_with_teacher(:active_all => true)
+    course_with_teacher(active_all: true)
     enrollment = @course.enroll_student(student)
     enrollment.accept!
-    assignment = @course.assignments.create!(:title => 'assignment1', :grading_type => 'letter_grade', :points_possible => 15)
+    assignment = @course.assignments.create!(title: 'assignment1', grading_type: 'letter_grade', points_possible: 15)
     submit_homework(assignment, student)
 
     json = api_call(:get,
                     "/api/v1/courses/#{@course.id}/assignments/#{assignment.id}/submissions.json",
-                    { :controller => 'submissions_api', :action => 'index',
-                      :format => 'json', :course_id => @course.id.to_s,
-                      :assignment_id => assignment.id.to_s })
+                    { controller: 'submissions_api', action: 'index',
+                      format: 'json', course_id: @course.id.to_s,
+                      assignment_id: assignment.id.to_s })
     expect(json.length).to eq 1
 
     enrollment.destroy
 
     json = api_call(:get,
                     "/api/v1/courses/#{@course.id}/assignments/#{assignment.id}/submissions.json",
-                    { :controller => 'submissions_api', :action => 'index',
-                      :format => 'json', :course_id => @course.id.to_s,
-                      :assignment_id => assignment.id.to_s })
+                    { controller: 'submissions_api', action: 'index',
+                      format: 'json', course_id: @course.id.to_s,
+                      assignment_id: assignment.id.to_s })
     expect(json.length).to eq 0
   end
 
   it "allows updating the grade for an existing submission" do
     student = user_factory(active_all: true)
-    course_with_teacher(:active_all => true)
+    course_with_teacher(active_all: true)
     @course.enroll_student(student).accept!
-    a1 = @course.assignments.create!(:title => 'assignment1', :grading_type => 'letter_grade', :points_possible => 15)
+    a1 = @course.assignments.create!(title: 'assignment1', grading_type: 'letter_grade', points_possible: 15)
     submission = a1.find_or_create_submission(student)
     expect(submission).not_to be_new_record
     submission.grade = 'A'
@@ -3792,10 +3792,10 @@ describe 'Submissions API', type: :request do
 
     json = api_call(:put,
                     "/api/v1/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student.id}.json",
-                    { :controller => 'submissions_api', :action => 'update',
-                      :format => 'json', :course_id => @course.id.to_s,
-                      :assignment_id => a1.id.to_s, :user_id => student.id.to_s },
-                    { :submission => { :posted_grade => 'B' } })
+                    { controller: 'submissions_api', action: 'update',
+                      format: 'json', course_id: @course.id.to_s,
+                      assignment_id: a1.id.to_s, user_id: student.id.to_s },
+                    { submission: { posted_grade: 'B' } })
 
     expect(Submission.count).to eq 1
     @submission = Submission.first
@@ -3856,101 +3856,101 @@ describe 'Submissions API', type: :request do
   end
 
   it "does not hide student comments on muted assignments" do
-    course_with_teacher(:active_all => true)
+    course_with_teacher(active_all: true)
     student    = user_factory(active_all: true)
-    assignment = @course.assignments.create!(:title => 'assignment')
+    assignment = @course.assignments.create!(title: 'assignment')
     assignment.update_attribute(:muted, true)
     @user = student
     @course.enroll_student(student).accept!
     submission = assignment.find_or_create_submission(student)
     api_call(:put, "/api/v1/courses/#{@course.id}/assignments/#{assignment.id}/submissions/#{student.id}",
-             { :controller => 'submissions_api', :action => 'update', :format => 'json',
-               :course_id => @course.to_param, :assignment_id => assignment.to_param,
-               :user_id => student.to_param },
-             { :comment => { :text_comment => 'hidden comment' } })
+             { controller: 'submissions_api', action: 'update', format: 'json',
+               course_id: @course.to_param, assignment_id: assignment.to_param,
+               user_id: student.to_param },
+             { comment: { text_comment: 'hidden comment' } })
     expect(submission.submission_comments.order("id DESC").first).not_to be_hidden
   end
 
   it "allows submitting points" do
-    submit_with_grade({ :grading_type => 'points', :points_possible => 15 }, '13.2', 13.2, '13.2')
+    submit_with_grade({ grading_type: 'points', points_possible: 15 }, '13.2', 13.2, '13.2')
   end
 
   it "allows submitting points above points_possible (for extra credit)" do
-    submit_with_grade({ :grading_type => 'points', :points_possible => 15 }, '16', 16, '16')
+    submit_with_grade({ grading_type: 'points', points_possible: 15 }, '16', 16, '16')
   end
 
   it "allows submitting percent to a points assignment" do
-    submit_with_grade({ :grading_type => 'points', :points_possible => 15 }, '50%', 7.5, '7.5')
+    submit_with_grade({ grading_type: 'points', points_possible: 15 }, '50%', 7.5, '7.5')
   end
 
   it "allows submitting percent" do
-    submit_with_grade({ :grading_type => 'percent', :points_possible => 10 }, '75%', 7.5, "75%")
+    submit_with_grade({ grading_type: 'percent', points_possible: 10 }, '75%', 7.5, "75%")
   end
 
   it "allows submitting points to a percent assignment" do
-    submit_with_grade({ :grading_type => 'percent', :points_possible => 10 }, '5', 5, "50%")
+    submit_with_grade({ grading_type: 'percent', points_possible: 10 }, '5', 5, "50%")
   end
 
   it "allows submitting percent above points_possible (for extra credit)" do
-    submit_with_grade({ :grading_type => 'percent', :points_possible => 10 }, '105%', 10.5, "105%")
+    submit_with_grade({ grading_type: 'percent', points_possible: 10 }, '105%', 10.5, "105%")
   end
 
   it "allows submitting letter_grade as a letter score" do
-    submit_with_grade({ :grading_type => 'letter_grade', :points_possible => 15 }, 'B', 12.9, 'B')
+    submit_with_grade({ grading_type: 'letter_grade', points_possible: 15 }, 'B', 12.9, 'B')
   end
 
   it "allows submitting letter_grade as a numeric score" do
-    submit_with_grade({ :grading_type => 'letter_grade', :points_possible => 15 }, '11.9', 11.9, 'C+')
+    submit_with_grade({ grading_type: 'letter_grade', points_possible: 15 }, '11.9', 11.9, 'C+')
   end
 
   it "allows submitting letter_grade as a percentage score" do
-    submit_with_grade({ :grading_type => 'letter_grade', :points_possible => 15 }, '70%', 10.5, 'C-')
+    submit_with_grade({ grading_type: 'letter_grade', points_possible: 15 }, '70%', 10.5, 'C-')
   end
 
   it "rejects letter grades sent to a points assignment" do
-    submit_with_grade({ :grading_type => 'points', :points_possible => 15 }, 'B-', nil, nil)
+    submit_with_grade({ grading_type: 'points', points_possible: 15 }, 'B-', nil, nil)
   end
 
   it "allows submitting pass_fail (pass)" do
-    submit_with_grade({ :grading_type => 'pass_fail', :points_possible => 12 }, 'pass', 12, "complete")
+    submit_with_grade({ grading_type: 'pass_fail', points_possible: 12 }, 'pass', 12, "complete")
   end
 
   it "allows submitting pass_fail (fail)" do
-    submit_with_grade({ :grading_type => 'pass_fail', :points_possible => 12 }, 'fail', 0, "incomplete")
+    submit_with_grade({ grading_type: 'pass_fail', points_possible: 12 }, 'fail', 0, "incomplete")
   end
 
   it "allows a points score for pass_fail, at full points" do
-    submit_with_grade({ :grading_type => 'pass_fail', :points_possible => 12 }, '12', 12, "complete")
+    submit_with_grade({ grading_type: 'pass_fail', points_possible: 12 }, '12', 12, "complete")
   end
 
   it "allows a points score for pass_fail, at zero points" do
-    submit_with_grade({ :grading_type => 'pass_fail', :points_possible => 12 }, '0', 0, "incomplete")
+    submit_with_grade({ grading_type: 'pass_fail', points_possible: 12 }, '0', 0, "incomplete")
   end
 
   it "allows a percentage score for pass_fail, at full points" do
-    submit_with_grade({ :grading_type => 'pass_fail', :points_possible => 12 }, '100%', 12, "complete")
+    submit_with_grade({ grading_type: 'pass_fail', points_possible: 12 }, '100%', 12, "complete")
   end
 
   it "rejects any other type of score for a pass_fail assignment" do
-    submit_with_grade({ :grading_type => 'pass_fail', :points_possible => 12 }, '50%', nil, nil)
+    submit_with_grade({ grading_type: 'pass_fail', points_possible: 12 }, '50%', nil, nil)
   end
 
   it "sets complete for zero point assignments" do
-    submit_with_grade({ :grading_type => 'pass_fail', :points_possible => 0 }, 'pass', 0, 'complete')
+    submit_with_grade({ grading_type: 'pass_fail', points_possible: 0 }, 'pass', 0, 'complete')
   end
 
   def submit_with_grade(assignment_opts, param, score, grade)
     student = user_factory(active_all: true)
-    course_with_teacher(:active_all => true)
+    course_with_teacher(active_all: true)
     @course.enroll_student(student).accept!
-    a1 = @course.assignments.create!({ :title => 'assignment1' }.merge(assignment_opts))
+    a1 = @course.assignments.create!({ title: 'assignment1' }.merge(assignment_opts))
 
     json = api_call(:put,
                     "/api/v1/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student.id}.json",
-                    { :controller => 'submissions_api', :action => 'update',
-                      :format => 'json', :course_id => @course.id.to_s,
-                      :assignment_id => a1.id.to_s, :user_id => student.id.to_s },
-                    { :submission => { :posted_grade => param } })
+                    { controller: 'submissions_api', action: 'update',
+                      format: 'json', course_id: @course.id.to_s,
+                      assignment_id: a1.id.to_s, user_id: student.id.to_s },
+                    { submission: { posted_grade: param } })
 
     expect(Submission.count).to eq 1
     @submission = Submission.first
@@ -3962,15 +3962,15 @@ describe 'Submissions API', type: :request do
   context "posting rubric assessments" do
     before(:once) do
       @student = user_factory(active_all: true)
-      course_with_teacher(:active_all => true)
+      course_with_teacher(active_all: true)
       @course.enroll_student(@student).accept!
-      @a1 = @course.assignments.create!(:title => 'assignment1', :grading_type => 'points', :points_possible => 12)
-      rubric = rubric_model(:user => @user, :context => @course, :data => larger_rubric_data)
+      @a1 = @course.assignments.create!(title: 'assignment1', grading_type: 'points', points_possible: 12)
+      rubric = rubric_model(user: @user, context: @course, data: larger_rubric_data)
       @rubric_association = @a1.create_rubric_association(
-        :rubric => rubric,
-        :purpose => 'grading',
-        :use_for_grading => true,
-        :context => @course
+        rubric: rubric,
+        purpose: 'grading',
+        use_for_grading: true,
+        context: @course
       )
     end
 
@@ -3978,12 +3978,11 @@ describe 'Submissions API', type: :request do
       api_call(
         :put,
         "/api/v1/courses/#{@course.id}/assignments/#{@a1.id}/submissions/#{@student.id}.json",
-        { :controller => 'submissions_api', :action => 'update',
-          :format => 'json', :course_id => @course.id.to_s,
-          :assignment_id => @a1.id.to_s, :user_id => @student.id.to_s },
-        { :rubric_assessment =>
-           { :crit1 => { :points => 7 },
-             :crit2 => { :points => 2, :comments => 'Rock on' } } }
+        { controller: 'submissions_api', action: 'update',
+          format: 'json', course_id: @course.id.to_s,
+          assignment_id: @a1.id.to_s, user_id: @student.id.to_s },
+        { rubric_assessment: { crit1: { points: 7 },
+                               crit2: { points: 2, comments: 'Rock on' } } }
       )
 
       expect(Submission.count).to eq 1
@@ -3992,21 +3991,21 @@ describe 'Submissions API', type: :request do
       expect(@submission.score).to eq 9
       expect(@submission.rubric_assessment).not_to be_nil
       expect(@submission.rubric_assessment.data).to eq(
-        [{ :description => "B",
-           :criterion_id => "crit1",
-           :comments_enabled => true,
-           :points => 7,
-           :learning_outcome_id => nil,
-           :id => "rat2",
-           :comments => nil },
-         { :description => "Pass",
-           :criterion_id => "crit2",
-           :comments_enabled => true,
-           :points => 2,
-           :learning_outcome_id => nil,
-           :id => "rat1",
-           :comments => "Rock on",
-           :comments_html => "Rock on" }]
+        [{ description: "B",
+           criterion_id: "crit1",
+           comments_enabled: true,
+           points: 7,
+           learning_outcome_id: nil,
+           id: "rat2",
+           comments: nil },
+         { description: "Pass",
+           criterion_id: "crit2",
+           comments_enabled: true,
+           points: 2,
+           learning_outcome_id: nil,
+           id: "rat1",
+           comments: "Rock on",
+           comments_html: "Rock on" }]
       )
     end
 
@@ -4015,12 +4014,11 @@ describe 'Submissions API', type: :request do
       api_call(
         :put,
         "/api/v1/courses/#{@course.id}/assignments/#{@a1.id}/submissions/#{@student.id}.json",
-        { :controller => 'submissions_api', :action => 'update',
-          :format => 'json', :course_id => @course.id.to_s,
-          :assignment_id => @a1.id.to_s, :user_id => @student.id.to_s },
-        { :rubric_assessment =>
-           { :crit1 => { :points => 7 },
-             :crit2 => { :points => 2, :comments => 'Rock on' } } }
+        { controller: 'submissions_api', action: 'update',
+          format: 'json', course_id: @course.id.to_s,
+          assignment_id: @a1.id.to_s, user_id: @student.id.to_s },
+        { rubric_assessment: { crit1: { points: 7 },
+                               crit2: { points: 2, comments: 'Rock on' } } }
       )
 
       @submission = Submission.first
@@ -4030,38 +4028,37 @@ describe 'Submissions API', type: :request do
 
   it "validates the rubric assessment" do
     student = user_factory(active_all: true)
-    course_with_teacher(:active_all => true)
+    course_with_teacher(active_all: true)
     @course.enroll_student(student).accept!
-    a1 = @course.assignments.create!(:title => 'assignment1', :grading_type => 'points', :points_possible => 12)
-    rubric = rubric_model(:user => @user, :context => @course,
-                          :data => larger_rubric_data)
-    a1.create_rubric_association(:rubric => rubric, :purpose => 'grading', :context => @course)
+    a1 = @course.assignments.create!(title: 'assignment1', grading_type: 'points', points_possible: 12)
+    rubric = rubric_model(user: @user, context: @course,
+                          data: larger_rubric_data)
+    a1.create_rubric_association(rubric: rubric, purpose: 'grading', context: @course)
 
     json = api_call(:put,
                     "/api/v1/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student.id}.json",
-                    { :controller => 'submissions_api', :action => 'update',
-                      :format => 'json', :course_id => @course.id.to_s,
-                      :assignment_id => a1.id.to_s, :user_id => student.id.to_s },
-                    { :rubric_assessment => { :crit42 => { :points => 7 } } },
-                    {}, { :expected_status => 400 })
+                    { controller: 'submissions_api', action: 'update',
+                      format: 'json', course_id: @course.id.to_s,
+                      assignment_id: a1.id.to_s, user_id: student.id.to_s },
+                    { rubric_assessment: { crit42: { points: 7 } } },
+                    {}, { expected_status: 400 })
 
     expect(json['message']).to eq "invalid rubric_assessment"
   end
 
   it "allows posting a comment on a submission" do
     student = user_factory(active_all: true)
-    course_with_teacher(:active_all => true)
+    course_with_teacher(active_all: true)
     @course.enroll_student(student).accept!
-    @assignment = @course.assignments.create!(:title => 'assignment1', :grading_type => 'points', :points_possible => 12)
+    @assignment = @course.assignments.create!(title: 'assignment1', grading_type: 'points', points_possible: 12)
     submit_homework(@assignment, student)
 
     json = api_call(:put,
                     "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{student.id}.json",
-                    { :controller => 'submissions_api', :action => 'update',
-                      :format => 'json', :course_id => @course.id.to_s,
-                      :assignment_id => @assignment.id.to_s, :user_id => student.id.to_s },
-                    { :comment =>
-                      { :text_comment => "ohai!" } })
+                    { controller: 'submissions_api', action: 'update',
+                      format: 'json', course_id: @course.id.to_s,
+                      assignment_id: @assignment.id.to_s, user_id: student.id.to_s },
+                    { comment:                       { text_comment: "ohai!" } })
 
     expect(Submission.count).to eq 1
     @submission = Submission.first
@@ -4072,22 +4069,21 @@ describe 'Submissions API', type: :request do
   it "allows posting a group comment on a submission" do
     student1 = user_factory(active_all: true)
     student2 = user_factory(active_all: true)
-    course_with_teacher(:active_all => true)
+    course_with_teacher(active_all: true)
     @course.enroll_student(student1).accept!
     @course.enroll_student(student2).accept!
-    group_category = @course.group_categories.create(:name => "Category")
-    @group = @course.groups.create(:name => "Group", :group_category => group_category, :context => @course)
+    group_category = @course.group_categories.create(name: "Category")
+    @group = @course.groups.create(name: "Group", group_category: group_category, context: @course)
     @group.users = [student1, student2]
-    @assignment = @course.assignments.create!(:title => 'assignment1', :grading_type => 'points', :points_possible => 12, :group_category => group_category)
+    @assignment = @course.assignments.create!(title: 'assignment1', grading_type: 'points', points_possible: 12, group_category: group_category)
     submit_homework(@assignment, student1)
 
     json = api_call(:put,
                     "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{student1.id}.json",
-                    { :controller => 'submissions_api', :action => 'update',
-                      :format => 'json', :course_id => @course.id.to_s,
-                      :assignment_id => @assignment.id.to_s, :user_id => student1.id.to_s },
-                    { :comment =>
-                      { :text_comment => "ohai!", :group_comment => "1" } })
+                    { controller: 'submissions_api', action: 'update',
+                      format: 'json', course_id: @course.id.to_s,
+                      assignment_id: @assignment.id.to_s, user_id: student1.id.to_s },
+                    { comment:                       { text_comment: "ohai!", group_comment: "1" } })
     expect(json['submission_comments'].size).to eq 1
     expect(json['submission_comments'].first['comment']).to eq 'ohai!'
 
@@ -4100,18 +4096,17 @@ describe 'Submissions API', type: :request do
 
   it "allows posting a media comment on a submission, given a kaltura id" do
     student = user_factory(active_all: true)
-    course_with_teacher(:active_all => true)
+    course_with_teacher(active_all: true)
     @course.enroll_student(student).accept!
-    @assignment = @course.assignments.create!(:title => 'assignment1', :grading_type => 'points', :points_possible => 12)
-    media_object(:media_id => "1234", :media_type => 'audio')
+    @assignment = @course.assignments.create!(title: 'assignment1', grading_type: 'points', points_possible: 12)
+    media_object(media_id: "1234", media_type: 'audio')
 
     json = api_call(:put,
                     "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{student.id}.json",
-                    { :controller => 'submissions_api', :action => 'update',
-                      :format => 'json', :course_id => @course.id.to_s,
-                      :assignment_id => @assignment.id.to_s, :user_id => student.id.to_s },
-                    { :comment =>
-                      { :media_comment_id => '1234', :media_comment_type => 'audio' } })
+                    { controller: 'submissions_api', action: 'update',
+                      format: 'json', course_id: @course.id.to_s,
+                      assignment_id: @assignment.id.to_s, user_id: student.id.to_s },
+                    { comment:                       { media_comment_id: '1234', media_comment_type: 'audio' } })
 
     expect(Submission.count).to eq 1
     @submission = Submission.first
@@ -4124,16 +4119,16 @@ describe 'Submissions API', type: :request do
 
   it "allows commenting on an uncreated submission" do
     student = user_factory(active_all: true)
-    course_with_teacher(:active_all => true)
+    course_with_teacher(active_all: true)
     @course.enroll_student(student).accept!
-    a1 = @course.assignments.create!(:title => 'assignment1', :grading_type => 'letter_grade', :points_possible => 15)
+    a1 = @course.assignments.create!(title: 'assignment1', grading_type: 'letter_grade', points_possible: 15)
 
     api_call(:put,
              "/api/v1/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student.id}.json",
-             { :controller => 'submissions_api', :action => 'update',
-               :format => 'json', :course_id => @course.id.to_s,
-               :assignment_id => a1.id.to_s, :user_id => student.id.to_s },
-             { :comment => { :text_comment => "Why U no submit" } })
+             { controller: 'submissions_api', action: 'update',
+               format: 'json', course_id: @course.id.to_s,
+               assignment_id: a1.id.to_s, user_id: student.id.to_s },
+             { comment: { text_comment: "Why U no submit" } })
 
     expect(Submission.count).to eq 1
     @submission = Submission.first
@@ -4144,9 +4139,9 @@ describe 'Submissions API', type: :request do
 
   it "allows clearing out the current grade with a blank grade" do
     student = user_factory(active_all: true)
-    course_with_teacher(:active_all => true)
+    course_with_teacher(active_all: true)
     @course.enroll_student(student).accept!
-    @assignment = @course.assignments.create!(:title => 'assignment1', :grading_type => 'points', :points_possible => 12)
+    @assignment = @course.assignments.create!(title: 'assignment1', grading_type: 'points', points_possible: 12)
     @assignment.grade_student(student, grade: '10', grader: @teacher)
     expect(Submission.count).to eq 1
     @submission = Submission.first
@@ -4156,10 +4151,10 @@ describe 'Submissions API', type: :request do
 
     api_call(:put,
              "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{student.id}.json",
-             { :controller => 'submissions_api', :action => 'update',
-               :format => 'json', :course_id => @course.id.to_s,
-               :assignment_id => @assignment.id.to_s, :user_id => student.id.to_s },
-             { :submission => { :posted_grade => '' } })
+             { controller: 'submissions_api', action: 'update',
+               format: 'json', course_id: @course.id.to_s,
+               assignment_id: @assignment.id.to_s, user_id: student.id.to_s },
+             { submission: { posted_grade: '' } })
     expect(Submission.count).to eq 1
     @submission = Submission.first
     expect(@submission.grade).to be_nil
@@ -4168,38 +4163,38 @@ describe 'Submissions API', type: :request do
 
   it "allows repeated changes to a submission to accumulate" do
     student = user_factory(active_all: true)
-    course_with_teacher(:active_all => true)
+    course_with_teacher(active_all: true)
     @course.enroll_student(student).accept!
-    @assignment = @course.assignments.create!(:title => 'assignment1', :grading_type => 'points', :points_possible => 12)
+    @assignment = @course.assignments.create!(title: 'assignment1', grading_type: 'points', points_possible: 12)
     submit_homework(@assignment, student)
 
     # post a comment
     api_call(:put,
              "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{student.id}.json",
-             { :controller => 'submissions_api', :action => 'update',
-               :format => 'json', :course_id => @course.id.to_s,
-               :assignment_id => @assignment.id.to_s, :user_id => student.id.to_s },
-             { :comment => { :text_comment => "This works" } })
+             { controller: 'submissions_api', action: 'update',
+               format: 'json', course_id: @course.id.to_s,
+               assignment_id: @assignment.id.to_s, user_id: student.id.to_s },
+             { comment: { text_comment: "This works" } })
     expect(Submission.count).to eq 1
     @submission = Submission.first
 
     # grade the submission
     api_call(:put,
              "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{student.id}.json",
-             { :controller => 'submissions_api', :action => 'update',
-               :format => 'json', :course_id => @course.id.to_s,
-               :assignment_id => @assignment.id.to_s, :user_id => student.id.to_s },
-             { :submission => { :posted_grade => '10' } })
+             { controller: 'submissions_api', action: 'update',
+               format: 'json', course_id: @course.id.to_s,
+               assignment_id: @assignment.id.to_s, user_id: student.id.to_s },
+             { submission: { posted_grade: '10' } })
     expect(Submission.count).to eq 1
     @submission = Submission.first
 
     # post another comment
     json = api_call(:put,
                     "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{student.id}.json",
-                    { :controller => 'submissions_api', :action => 'update',
-                      :format => 'json', :course_id => @course.id.to_s,
-                      :assignment_id => @assignment.id.to_s, :user_id => student.id.to_s },
-                    { :comment => { :text_comment => "10/12 ain't bad" } })
+                    { controller: 'submissions_api', action: 'update',
+                      format: 'json', course_id: @course.id.to_s,
+                      assignment_id: @assignment.id.to_s, user_id: student.id.to_s },
+                    { comment: { text_comment: "10/12 ain't bad" } })
     expect(Submission.count).to eq 1
     @submission = Submission.first
 
@@ -4216,10 +4211,10 @@ describe 'Submissions API', type: :request do
     # post another grade
     json = api_call(:put,
                     "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{student.id}.json",
-                    { :controller => 'submissions_api', :action => 'update',
-                      :format => 'json', :course_id => @course.id.to_s,
-                      :assignment_id => @assignment.id.to_s, :user_id => student.id.to_s },
-                    { :submission => { :posted_grade => '12' } })
+                    { controller: 'submissions_api', action: 'update',
+                      format: 'json', course_id: @course.id.to_s,
+                      assignment_id: @assignment.id.to_s, user_id: student.id.to_s },
+                    { submission: { posted_grade: '12' } })
     expect(Submission.count).to eq 1
     @submission = Submission.first
 
@@ -4235,86 +4230,86 @@ describe 'Submissions API', type: :request do
   end
 
   it "does not allow accessing other sections when limited" do
-    course_with_teacher(:active_all => true)
+    course_with_teacher(active_all: true)
     @enrollment.update_attribute(:limit_privileges_to_course_section, true)
     @teacher = @user
-    s1 = submission_model(:course => @course)
+    s1 = submission_model(course: @course)
     s1.update!(submission_type: 'online_text_entry')
-    section2 = @course.course_sections.create(:name => "another section")
-    s2 = submission_model(:course => @course, :username => 'otherstudent@example.com', :section => section2, :assignment => @assignment)
+    section2 = @course.course_sections.create(name: "another section")
+    s2 = submission_model(course: @course, username: 'otherstudent@example.com', section: section2, assignment: @assignment)
     @user = @teacher
 
     json = api_call(:get,
                     "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions",
-                    { :controller => 'submissions_api', :action => 'index',
-                      :format => 'json', :course_id => @course.id.to_s,
-                      :assignment_id => @assignment.id.to_s })
+                    { controller: 'submissions_api', action: 'index',
+                      format: 'json', course_id: @course.id.to_s,
+                      assignment_id: @assignment.id.to_s })
     expect(json.map { |u| u['user_id'] }).to eq [s1.user_id]
 
     # try querying the other section directly
     json = api_call(:get,
                     "/api/v1/sections/#{section2.id}/assignments/#{@assignment.id}/submissions",
-                    { :controller => 'submissions_api', :action => 'index',
-                      :format => 'json', :section_id => section2.id.to_s,
-                      :assignment_id => @assignment.id.to_s })
+                    { controller: 'submissions_api', action: 'index',
+                      format: 'json', section_id: section2.id.to_s,
+                      assignment_id: @assignment.id.to_s })
     expect(json.size).to eq 0
 
     raw_api_call(:get,
                  "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{s2.user_id}",
-                 { :controller => 'submissions_api', :action => 'show',
-                   :format => 'json', :course_id => @course.id.to_s,
-                   :assignment_id => @assignment.id.to_s, :user_id => s2.user_id.to_s })
+                 { controller: 'submissions_api', action: 'show',
+                   format: 'json', course_id: @course.id.to_s,
+                   assignment_id: @assignment.id.to_s, user_id: s2.user_id.to_s })
     assert_status(404)
 
     # try querying the other section directly
     raw_api_call(:get,
                  "/api/v1/sections/#{section2.id}/assignments/#{@assignment.id}/submissions/#{s2.user_id}",
-                 { :controller => 'submissions_api', :action => 'show',
-                   :format => 'json', :section_id => section2.id.to_s,
-                   :assignment_id => @assignment.id.to_s, :user_id => s2.user_id.to_s })
+                 { controller: 'submissions_api', action: 'show',
+                   format: 'json', section_id: section2.id.to_s,
+                   assignment_id: @assignment.id.to_s, user_id: s2.user_id.to_s })
     assert_status(404)
 
     api_call(:get,
              "/api/v1/courses/#{@course.id}/students/submissions",
-             { :controller => 'submissions_api', :action => 'for_students',
-               :format => 'json', :course_id => @course.id.to_s },
-             { :student_ids => [s1.user_id, s2.user_id], :grouped => 1 },
+             { controller: 'submissions_api', action: 'for_students',
+               format: 'json', course_id: @course.id.to_s },
+             { student_ids: [s1.user_id, s2.user_id], grouped: 1 },
              {}, expected_status: 401)
 
     # try querying the other section directly
     api_call(:get,
              "/api/v1/sections/#{section2.id}/students/submissions",
-             { :controller => 'submissions_api', :action => 'for_students',
-               :format => 'json', :section_id => section2.id.to_s },
-             { :student_ids => [s1.user_id, s2.user_id], :grouped => 1 },
+             { controller: 'submissions_api', action: 'for_students',
+               format: 'json', section_id: section2.id.to_s },
+             { student_ids: [s1.user_id, s2.user_id], grouped: 1 },
              {}, expected_status: 401)
 
     # grade the s1 submission, succeeds because the section is the same
     api_call(:put,
              "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{s1.user_id}",
-             { :controller => 'submissions_api', :action => 'update',
-               :format => 'json', :course_id => @course.id.to_s,
-               :assignment_id => @assignment.id.to_s, :user_id => s1.user_id.to_s },
-             { :submission => { :posted_grade => '10' } })
+             { controller: 'submissions_api', action: 'update',
+               format: 'json', course_id: @course.id.to_s,
+               assignment_id: @assignment.id.to_s, user_id: s1.user_id.to_s },
+             { submission: { posted_grade: '10' } })
     @submission = @assignment.submission_for_student(s1.user)
     expect(@submission.grade).to eq '10'
 
     # grading s2 will fail because the teacher can't manipulate this student's section
     raw_api_call(:put,
                  "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{s2.user_id}",
-                 { :controller => 'submissions_api', :action => 'update',
-                   :format => 'json', :course_id => @course.id.to_s,
-                   :assignment_id => @assignment.id.to_s, :user_id => s2.user_id.to_s },
-                 { :submission => { :posted_grade => '10' } })
+                 { controller: 'submissions_api', action: 'update',
+                   format: 'json', course_id: @course.id.to_s,
+                   assignment_id: @assignment.id.to_s, user_id: s2.user_id.to_s },
+                 { submission: { posted_grade: '10' } })
     assert_status(404)
 
     # try querying the other section directly
     raw_api_call(:put,
                  "/api/v1/sections/#{section2.id}/assignments/#{@assignment.id}/submissions/#{s2.user_id}",
-                 { :controller => 'submissions_api', :action => 'update',
-                   :format => 'json', :section_id => section2.id.to_s,
-                   :assignment_id => @assignment.id.to_s, :user_id => s2.user_id.to_s },
-                 { :submission => { :posted_grade => '10' } })
+                 { controller: 'submissions_api', action: 'update',
+                   format: 'json', section_id: section2.id.to_s,
+                   assignment_id: @assignment.id.to_s, user_id: s2.user_id.to_s },
+                 { submission: { posted_grade: '10' } })
     assert_status(404)
   end
 
@@ -4345,9 +4340,9 @@ describe 'Submissions API', type: :request do
       @pseudonym.sis_user_id = "sisuser1"
       @pseudonym.save!
       @user1 = @user
-      user_with_pseudonym :username => "sisuser2@example.com"
+      user_with_pseudonym username: "sisuser2@example.com"
       @user2 = @user
-      user_with_pseudonym :username => "sisuser3@example.com"
+      user_with_pseudonym username: "sisuser3@example.com"
       @user3 = @user
       expect(@controller.map_user_ids(["sis_user_id:sisuser1", "sis_login_id:sisuser2@example.com",
                                        "hex:sis_login_id:7369737573657233406578616d706c652e636f6d", "sis_user_id:sisuser4",
@@ -4360,54 +4355,54 @@ describe 'Submissions API', type: :request do
       account1 = account_model
       account2 = account_model
       @controller.instance_variable_set :@domain_root_account, account1
-      user1 = user_with_pseudonym :username => "sisuser1@example.com", :account => account1
-      user_with_pseudonym :username => "sisuser2@example.com", :account => account2
-      user3 = user_with_pseudonym :username => "sisuser3@example.com", :account => account1
-      user_with_pseudonym :username => "sisuser3@example.com", :account => account2
-      user5 = user_factory :account => account1
-      user6 = user_factory :account => account2
+      user1 = user_with_pseudonym username: "sisuser1@example.com", account: account1
+      user_with_pseudonym username: "sisuser2@example.com", account: account2
+      user3 = user_with_pseudonym username: "sisuser3@example.com", account: account1
+      user_with_pseudonym username: "sisuser3@example.com", account: account2
+      user5 = user_factory account: account1
+      user6 = user_factory account: account2
       expect(@controller.map_user_ids(["sis_login_id:sisuser1@example.com", "sis_login_id:sisuser2@example.com", "sis_login_id:sisuser3@example.com", user5.id, user6.id]).sort).to eq [user1.id, user3.id, user5.id, user6.id].sort
     end
   end
 
   context "create" do
     before :once do
-      course_with_student(:active_all => true)
-      assignment_model(:course => @course, :submission_types => "online_url", :points_possible => 12)
+      course_with_student(active_all: true)
+      assignment_model(course: @course, submission_types: "online_url", points_possible: 12)
       @url = "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions"
-      @args = { :controller => "submissions", :action => "create", :format => "json", :course_id => @course.id.to_s, :assignment_id => @assignment.id.to_s }
+      @args = { controller: "submissions", action: "create", format: "json", course_id: @course.id.to_s, assignment_id: @assignment.id.to_s }
     end
 
     it "rejects a submission by a non-student" do
-      @user = course_with_teacher(:course => @course).user
-      api_call(:post, @url, @args, { :submission => { :submission_type => "online_url", :url => "www.example.com" } }, {}, :expected_status => 401)
+      @user = course_with_teacher(course: @course).user
+      api_call(:post, @url, @args, { submission: { submission_type: "online_url", url: "www.example.com" } }, {}, expected_status: 401)
     end
 
     it "rejects a request with an invalid submission_type" do
-      json = api_call(:post, @url, @args, { :submission => { :submission_type => "blergh" } }, {}, :expected_status => 400)
+      json = api_call(:post, @url, @args, { submission: { submission_type: "blergh" } }, {}, expected_status: 400)
       expect(json['message']).to eq "Invalid submission[submission_type] given"
     end
 
     it "rejects a submission_type not allowed by the assignment" do
-      json = api_call(:post, @url, @args, { :submission => { :submission_type => "media_recording" } }, {}, :expected_status => 400)
+      json = api_call(:post, @url, @args, { submission: { submission_type: "media_recording" } }, {}, expected_status: 400)
       expect(json['message']).to eq "Invalid submission[submission_type] given"
     end
 
     it "rejects mismatched submission_type and params" do
-      json = api_call(:post, @url, @args, { :submission => { :submission_type => "online_url", :body => "some html text" } }, {}, :expected_status => 400)
+      json = api_call(:post, @url, @args, { submission: { submission_type: "online_url", body: "some html text" } }, {}, expected_status: 400)
       expect(json['message']).to eq "Invalid parameters for submission_type online_url. Required: submission[url]"
     end
 
     it "works with section ids" do
       @section = @course.default_section
-      api_call(:post, "/api/v1/sections/#{@section.id}/assignments/#{@assignment.id}/submissions", { :controller => "submissions", :action => "create", :format => "json", :section_id => @section.id.to_s, :assignment_id => @assignment.id.to_s }, { :submission => { :submission_type => "online_url", :url => "www.example.com/a/b?q=1" } }, {}, expected_status: 201)
+      api_call(:post, "/api/v1/sections/#{@section.id}/assignments/#{@assignment.id}/submissions", { controller: "submissions", action: "create", format: "json", section_id: @section.id.to_s, assignment_id: @assignment.id.to_s }, { submission: { submission_type: "online_url", url: "www.example.com/a/b?q=1" } }, {}, expected_status: 201)
       @submission = @assignment.submissions.find_by!(user: @user)
       expect(@submission.url).to eq 'http://www.example.com/a/b?q=1'
     end
 
     describe "valid submissions" do
       def do_submit(opts)
-        json = api_call(:post, @url, @args, { :submission => opts })
+        json = api_call(:post, @url, @args, { submission: opts })
         expect(response['Location']).to eq "http://www.example.com/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@user.id}"
         @submission = @assignment.submissions.find_by!(user: @user)
         expect(json.slice('user_id', 'assignment_id', 'score', 'grade')).to eq({
@@ -4420,13 +4415,13 @@ describe 'Submissions API', type: :request do
       end
 
       it "creates a url submission" do
-        json = do_submit(:submission_type => "online_url", :url => "www.example.com/a/b?q=1")
+        json = do_submit(submission_type: "online_url", url: "www.example.com/a/b?q=1")
         expect(@submission.url).to eq 'http://www.example.com/a/b?q=1'
         expect(json['url']).to eq @submission.url
       end
 
       it "creates with an initial comment" do
-        json = api_call(:post, @url, @args, { :comment => { :text_comment => "ohai teacher" }, :submission => { :submission_type => "online_url", :url => "http://www.example.com/a/b" } })
+        json = api_call(:post, @url, @args, { comment: { text_comment: "ohai teacher" }, submission: { submission_type: "online_url", url: "http://www.example.com/a/b" } })
         @submission = @assignment.submissions.where(user: @user).first
         expect(@submission.submission_comments.size).to eq 1
         expect(@submission.submission_comments.first.attributes.slice('author_id', 'comment')).to eq({
@@ -4437,8 +4432,8 @@ describe 'Submissions API', type: :request do
       end
 
       it "creates a online text submission" do
-        @assignment.update(:submission_types => 'online_text_entry')
-        json = do_submit(:submission_type => 'online_text_entry', :body => <<~HTML)
+        @assignment.update(submission_types: 'online_text_entry')
+        json = do_submit(submission_type: 'online_text_entry', body: <<~HTML)
           <p>
             This is <i>some</i> text. The <script src='evil.com'></script> sanitization will take effect.
           </p>
@@ -4452,35 +4447,35 @@ describe 'Submissions API', type: :request do
       end
 
       it "creates a student annotation submission" do
-        a1 = attachment_model(:context => @course)
+        a1 = attachment_model(context: @course)
         @assignment.update(submission_types: 'student_annotation', annotatable_attachment_id: a1.id)
-        json = api_call(:post, @url, @args, { :submission => { submission_type: "student_annotation", annotatable_attachment_id: a1.id } }, {}, expected_status: 201)
+        json = api_call(:post, @url, @args, { submission: { submission_type: "student_annotation", annotatable_attachment_id: a1.id } }, {}, expected_status: 201)
         expect(json['workflow_state']).to eq 'submitted'
       end
 
       it "processs html content in body" do
-        @assignment.update(:submission_types => 'online_text_entry')
+        @assignment.update(submission_types: 'online_text_entry')
         should_process_incoming_user_content(@course) do |content|
-          do_submit(:submission_type => 'online_text_entry', :body => content)
+          do_submit(submission_type: 'online_text_entry', body: content)
           @submission.body
         end
       end
 
       it "creates a file upload submission" do
-        @assignment.update(:submission_types => 'online_upload')
-        a1 = attachment_model(:context => @user)
-        a2 = attachment_model(:context => @user)
-        json = do_submit(:submission_type => 'online_upload', :file_ids => [a1.id, a2.id])
-        sub_a1 = Attachment.where(:root_attachment_id => a1).first
-        sub_a2 = Attachment.where(:root_attachment_id => a2).first
-        expect(json['attachments'].map { |a| a['url'] }).to eq [file_download_url(sub_a1, :verifier => sub_a1.uuid, :download => '1', :download_frd => '1'),
-                                                                file_download_url(sub_a2, :verifier => sub_a2.uuid, :download => '1', :download_frd => '1')]
+        @assignment.update(submission_types: 'online_upload')
+        a1 = attachment_model(context: @user)
+        a2 = attachment_model(context: @user)
+        json = do_submit(submission_type: 'online_upload', file_ids: [a1.id, a2.id])
+        sub_a1 = Attachment.where(root_attachment_id: a1).first
+        sub_a2 = Attachment.where(root_attachment_id: a2).first
+        expect(json['attachments'].map { |a| a['url'] }).to eq [file_download_url(sub_a1, verifier: sub_a1.uuid, download: '1', download_frd: '1'),
+                                                                file_download_url(sub_a2, verifier: sub_a2.uuid, download: '1', download_frd: '1')]
       end
 
       it "creates a media comment submission" do
-        @assignment.update(:submission_types => "media_recording")
-        media_object(:media_id => "3232", :media_type => "audio")
-        json = do_submit(:submission_type => "media_recording", :media_comment_id => "3232", :media_comment_type => "audio")
+        @assignment.update(submission_types: "media_recording")
+        media_object(media_id: "3232", media_type: "audio")
+        json = do_submit(submission_type: "media_recording", media_comment_id: "3232", media_comment_type: "audio")
         expect(json['media_comment'].slice('media_id', 'media_type')).to eq({
                                                                               'media_id' => '3232',
                                                                               'media_type' => 'audio',
@@ -4488,10 +4483,10 @@ describe 'Submissions API', type: :request do
       end
 
       it "copies files to the submissions folder if they're not there already" do
-        @assignment.update(:submission_types => 'online_upload')
-        a1 = attachment_model(:context => @user, :folder => @user.submissions_folder)
-        a2 = attachment_model(:context => @user)
-        json = do_submit(:submission_type => 'online_upload', :file_ids => [a1.id, a2.id])
+        @assignment.update(submission_types: 'online_upload')
+        a1 = attachment_model(context: @user, folder: @user.submissions_folder)
+        a2 = attachment_model(context: @user)
+        json = do_submit(submission_type: 'online_upload', file_ids: [a1.id, a2.id])
         submission_attachment_ids = json['attachments'].map { |a| a['id'] }
         expect(submission_attachment_ids.size).to eq 2
         expect(submission_attachment_ids.delete(a1.id)).not_to be_nil
@@ -4503,9 +4498,9 @@ describe 'Submissions API', type: :request do
 
     context "submission file uploads" do
       before :once do
-        @assignment.update(:submission_types => 'online_upload')
+        @assignment.update(submission_types: 'online_upload')
         @student1 = @student
-        course_with_student(:course => @course)
+        course_with_student(course: @course)
         @context = @course
         @student2 = @student
         @user = @student1
@@ -4564,19 +4559,19 @@ describe 'Submissions API', type: :request do
       end
 
       it "rejects uploading files when filetype is not allowed" do
-        @assignment.update(:allowed_extensions => ['doc'])
+        @assignment.update(allowed_extensions: ['doc'])
         preflight(name: 'test.txt', size: 12_345, content_type: 'text/plain')
         assert_status(400)
       end
 
       it "allows filetype when restricted and is correct filetype" do
-        @assignment.update(:allowed_extensions => ['txt'])
+        @assignment.update(allowed_extensions: ['txt'])
         preflight(name: 'test.txt', size: 12_345, content_type: 'text/plain')
         assert_status(200)
       end
 
       it "falls back to parsing the extension when an unknown type" do
-        @assignment.update(:allowed_extensions => ['beepboop'])
+        @assignment.update(allowed_extensions: ['beepboop'])
         preflight(name: 'test.beepboop', size: 12_345)
         assert_status(200)
       end
@@ -4673,28 +4668,28 @@ describe 'Submissions API', type: :request do
     end
 
     it "rejects invalid urls" do
-      api_call(:post, @url, @args, { :submission => { :submission_type => "online_url", :url => "ftp://ftp.example.com/a/b" } }, {}, :expected_status => 400)
+      api_call(:post, @url, @args, { submission: { submission_type: "online_url", url: "ftp://ftp.example.com/a/b" } }, {}, expected_status: 400)
     end
 
     it "rejects attachment ids not belonging to the user" do
-      @assignment.update(:submission_types => 'online_upload')
-      a1 = attachment_model(:context => @course)
-      json = api_call(:post, @url, @args, { :submission => { :submission_type => "online_upload", :file_ids => [a1.id] } }, {}, :expected_status => 400)
+      @assignment.update(submission_types: 'online_upload')
+      a1 = attachment_model(context: @course)
+      json = api_call(:post, @url, @args, { submission: { submission_type: "online_upload", file_ids: [a1.id] } }, {}, expected_status: 400)
       expect(json['message']).to eq 'No valid file ids given'
     end
 
     it "allows a grader to submit for a student and set submitted_at" do
       submitted_at = 1.day.ago.change(usec: 0)
-      @user = course_with_teacher(:course => @course).user
-      api_call(:post, @url, @args, { :submission => { :submission_type => "online_url", :url => "www.example.com", :user_id => @student.id, submitted_at: submitted_at } }, {}, :expected_status => 201)
+      @user = course_with_teacher(course: @course).user
+      api_call(:post, @url, @args, { submission: { submission_type: "online_url", url: "www.example.com", user_id: @student.id, submitted_at: submitted_at } }, {}, expected_status: 201)
       submission = Submission.last
       expect(submission.submitted_at).to eq submitted_at
     end
 
     it "rejects submissions for one student from another" do
       @student1 = @student
-      @user = course_with_student(:course => @course).user
-      api_call(:post, @url, @args, { :submission => { :submission_type => "online_url", :url => "www.example.com", :user_id => @student1.id } }, {}, :expected_status => 401)
+      @user = course_with_student(course: @course).user
+      api_call(:post, @url, @args, { submission: { submission_type: "online_url", url: "www.example.com", user_id: @student1.id } }, {}, expected_status: 401)
     end
 
     it 'prevents a student from sending submitted_at for their own submission' do
@@ -4704,31 +4699,31 @@ describe 'Submissions API', type: :request do
 
   context "draft assignments" do
     before :once do
-      course_with_teacher(:active_all => true)
-      student_in_course(:active_all => true)
-      @a2 = @course.assignments.create!({ :title => 'assignment2' })
+      course_with_teacher(active_all: true)
+      student_in_course(active_all: true)
+      @a2 = @course.assignments.create!({ title: 'assignment2' })
       @a2.workflow_state = "unpublished"
       @a2.save!
     end
 
     it "does not allow comments (teachers)" do
       @user = @teacher
-      draft_assignment_update({ :comment => { :text_comment => 'Tacos are tasty' } })
+      draft_assignment_update({ comment: { text_comment: 'Tacos are tasty' } })
     end
 
     it "does not allow comments (students)" do
       @user = @student
-      draft_assignment_update({ :comment => { :text_comment => 'Tacos are tasty' } })
+      draft_assignment_update({ comment: { text_comment: 'Tacos are tasty' } })
     end
 
     it "does not allow group comments (students)" do
       student2 = user_factory(active_all: true)
       @course.enroll_student(student2).accept!
-      group_category = @course.group_categories.create(:name => "Category")
-      @group = @course.groups.create(:name => "Group", :group_category => group_category, :context => @course)
+      group_category = @course.group_categories.create(name: "Category")
+      @group = @course.groups.create(name: "Group", group_category: group_category, context: @course)
       @group.users = [@student, student2]
-      @a2 = @course.assignments.create!(:title => 'assignment1', :grading_type => 'points', :points_possible => 12, :group_category => group_category)
-      draft_assignment_update({ :comment => { :text_comment => "HEY GIRL HEY!", :group_comment => "1" } })
+      @a2 = @course.assignments.create!(title: 'assignment1', grading_type: 'points', points_possible: 12, group_category: group_category)
+      draft_assignment_update({ comment: { text_comment: "HEY GIRL HEY!", group_comment: "1" } })
     end
 
     it "does not allow grading with points" do
@@ -4737,7 +4732,7 @@ describe 'Submissions API', type: :request do
       @a2.save!
       @user = @teacher
       grade = "13.2"
-      draft_assignment_update({ :submission => { :posted_grade => grade } })
+      draft_assignment_update({ submission: { posted_grade: grade } })
     end
 
     it "does not mark as complete for zero credit assignments" do
@@ -4746,7 +4741,7 @@ describe 'Submissions API', type: :request do
       @a2.save!
       @user = @teacher
       grade = "pass"
-      draft_assignment_update({ :submission => { :posted_grade => grade } })
+      draft_assignment_update({ submission: { posted_grade: grade } })
     end
 
     # Give this a hash of items to update with the API call
@@ -4755,12 +4750,12 @@ describe 'Submissions API', type: :request do
         :put,
         "/api/v1/courses/#{@course.id}/assignments/#{@a2.id}/submissions/#{@student.id}",
         {
-          :controller => 'submissions_api',
-          :action => 'update',
-          :format => 'json',
-          :course_id => @course.id.to_s,
-          :assignment_id => @a2.id.to_s,
-          :user_id => @student.id.to_s
+          controller: 'submissions_api',
+          action: 'update',
+          format: 'json',
+          course_id: @course.id.to_s,
+          assignment_id: @a2.id.to_s,
+          user_id: @student.id.to_s
         },
         opts
       )
@@ -4821,7 +4816,7 @@ describe 'Submissions API', type: :request do
     a = @course.assignments.create!
     a.submit_homework(@student, submission_type: 'online_upload',
                                 attachments: [canvadocable_attachment_model(context: @student)])
-    canvadoc_params = { :attachment_id => a.submissions[0].attachments[0].id, :document_id => 'testing_doc_id' }
+    canvadoc_params = { attachment_id: a.submissions[0].attachments[0].id, document_id: 'testing_doc_id' }
     a.submissions[0].attachments[0].canvadoc = Canvadoc.new(canvadoc_params)
     json = api_call(:get,
                     "/api/v1/courses/#{@course.id}/assignments/#{a.id}/submissions?include[]=canvadoc_document_id",
@@ -4872,18 +4867,18 @@ describe 'Submissions API', type: :request do
   end
 
   def course_with_student_and_submitted_homework
-    course_with_teacher(:active_all => true)
+    course_with_teacher(active_all: true)
     @teacher = @user
     student_in_course
     @student = @user
     @user = @teacher # @user needs to be the user making the api calls later
-    @assignment = @course.assignments.create!(:title => "some assignment", :submission_types => "online_url,online_upload")
+    @assignment = @course.assignments.create!(title: "some assignment", submission_types: "online_url,online_upload")
     @submission = @assignment.submit_homework(@student)
   end
 
   it 'marks as read' do
     course_with_student_and_submitted_homework
-    @submission.add_comment(:author => @student, :comment => "some comment")
+    @submission.add_comment(author: @student, comment: "some comment")
     raw_api_call(:put,
                  "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}/read",
                  { course_id: @course.id.to_s, assignment_id: @assignment.id.to_s, user_id: @student.id.to_s,
@@ -4893,7 +4888,7 @@ describe 'Submissions API', type: :request do
 
   it 'marks as unread' do
     course_with_student_and_submitted_homework
-    @submission.add_comment(:author => @student, :comment => "some comment")
+    @submission.add_comment(author: @student, comment: "some comment")
     @submission.change_read_state('read', @teacher)
     raw_api_call(:delete,
                  "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}/read",
@@ -4998,27 +4993,27 @@ describe 'Submissions API', type: :request do
     before do
       @student1 = user_factory(active_all: true)
       @student2 = user_factory(active_all: true)
-      course_with_teacher(:active_all => true)
+      course_with_teacher(active_all: true)
       @default_section = @course.default_section
-      @section = @course.course_sections.create!(:name => "section2")
-      @course.enroll_user(@student1, 'StudentEnrollment', :section => @section).accept!
+      @section = @course.course_sections.create!(name: "section2")
+      @course.enroll_user(@student1, 'StudentEnrollment', section: @section).accept!
       @course.enroll_user(@student2, 'StudentEnrollment').accept!
-      @a1 = @course.assignments.create!({ :title => 'assignment1', :grading_type => 'percent', :points_possible => 10 })
+      @a1 = @course.assignments.create!({ title: 'assignment1', grading_type: 'percent', points_possible: 10 })
     end
 
     it "queues bulk update through courses" do
       grade_data = {
-        :grade_data => {
-          @student1.id => { :posted_grade => '75%' },
-          @student2.id => { :posted_grade => '95%' }
+        grade_data: {
+          @student1.id => { posted_grade: '75%' },
+          @student2.id => { posted_grade: '95%' }
         }
       }
 
       json = api_call(:post,
                       "/api/v1/courses/#{@course.id}/assignments/#{@a1.id}/submissions/update_grades",
-                      { :controller => 'submissions_api', :action => 'bulk_update',
-                        :format => 'json', :course_id => @course.id.to_s,
-                        :assignment_id => @a1.id.to_s }, grade_data)
+                      { controller: 'submissions_api', action: 'bulk_update',
+                        format: 'json', course_id: @course.id.to_s,
+                        assignment_id: @a1.id.to_s }, grade_data)
 
       run_jobs
       progress = Progress.find(json["id"])
@@ -5032,22 +5027,22 @@ describe 'Submissions API', type: :request do
     end
 
     it "finds users through sis api ids" do
-      student3 = user_with_pseudonym(:active_all => true)
+      student3 = user_with_pseudonym(active_all: true)
       student3.pseudonym.update_attribute(:sis_user_id, 'my-student-id')
       @course.enroll_user(student3, 'StudentEnrollment').accept!
 
       grade_data = {
-        :grade_data => {
-          'sis_user_id:my-student-id' => { :posted_grade => '75%' }
+        grade_data: {
+          'sis_user_id:my-student-id' => { posted_grade: '75%' }
         }
       }
 
       @user = @teacher
       json = api_call(:post,
                       "/api/v1/courses/#{@course.id}/assignments/#{@a1.id}/submissions/update_grades",
-                      { :controller => 'submissions_api', :action => 'bulk_update',
-                        :format => 'json', :course_id => @course.id.to_s,
-                        :assignment_id => @a1.id.to_s }, grade_data)
+                      { controller: 'submissions_api', action: 'bulk_update',
+                        format: 'json', course_id: @course.id.to_s,
+                        assignment_id: @a1.id.to_s }, grade_data)
 
       run_jobs
       progress = Progress.find(json["id"])
@@ -5063,24 +5058,24 @@ describe 'Submissions API', type: :request do
       @a1.save!
       create_section_override_for_assignment(@a1, course_section: @section)
 
-      student3 = user_with_pseudonym(:active_all => true)
+      student3 = user_with_pseudonym(active_all: true)
       student3.pseudonym.update_attribute(:sis_user_id, 'my-student-id')
       @course.enroll_user(student3, 'StudentEnrollment').accept!
 
       grade_data = {
-        :grade_data => {
-          @student1.id => { :posted_grade => '75%' },
-          @student2.id => { :posted_grade => '95%' },
-          'sis_user_id:my-student-id' => { :posted_grade => '85%' },
+        grade_data: {
+          @student1.id => { posted_grade: '75%' },
+          @student2.id => { posted_grade: '95%' },
+          'sis_user_id:my-student-id' => { posted_grade: '85%' },
         }
       }
 
       @user = @teacher
       json = api_call(:post,
                       "/api/v1/courses/#{@course.id}/assignments/#{@a1.id}/submissions/update_grades",
-                      { :controller => 'submissions_api', :action => 'bulk_update',
-                        :format => 'json', :course_id => @course.id.to_s,
-                        :assignment_id => @a1.id.to_s }, grade_data)
+                      { controller: 'submissions_api', action: 'bulk_update',
+                        format: 'json', course_id: @course.id.to_s,
+                        assignment_id: @a1.id.to_s }, grade_data)
 
       run_jobs
       progress = Progress.find(json["id"])
@@ -5090,9 +5085,9 @@ describe 'Submissions API', type: :request do
       create_section_override_for_assignment(@a1, course_section: @course.default_section)
       json = api_call(:post,
                       "/api/v1/courses/#{@course.id}/assignments/#{@a1.id}/submissions/update_grades",
-                      { :controller => 'submissions_api', :action => 'bulk_update',
-                        :format => 'json', :course_id => @course.id.to_s,
-                        :assignment_id => @a1.id.to_s }, grade_data)
+                      { controller: 'submissions_api', action: 'bulk_update',
+                        format: 'json', course_id: @course.id.to_s,
+                        assignment_id: @a1.id.to_s }, grade_data)
 
       run_jobs
       progress = Progress.find(json["id"])
@@ -5109,16 +5104,16 @@ describe 'Submissions API', type: :request do
 
     it "queues bulk update through sections" do
       grade_data = {
-        :grade_data => {
-          @student1.id => { :posted_grade => '75%' }
+        grade_data: {
+          @student1.id => { posted_grade: '75%' }
         }
       }
 
       json = api_call(:post,
                       "/api/v1/sections/#{@section.id}/assignments/#{@a1.id}/submissions/update_grades",
-                      { :controller => 'submissions_api', :action => 'bulk_update',
-                        :format => 'json', :section_id => @section.id.to_s,
-                        :assignment_id => @a1.id.to_s }, grade_data)
+                      { controller: 'submissions_api', action: 'bulk_update',
+                        format: 'json', section_id: @section.id.to_s,
+                        assignment_id: @a1.id.to_s }, grade_data)
 
       run_jobs
       progress = Progress.find(json["id"])
@@ -5130,16 +5125,16 @@ describe 'Submissions API', type: :request do
     end
 
     it "allows bulk grading with rubric assessments" do
-      rubric = rubric_model(:user => @user, :context => @course, :data => larger_rubric_data)
-      @a1.create_rubric_association(:rubric => rubric, :purpose => 'grading', :use_for_grading => true, :context => @course)
+      rubric = rubric_model(user: @user, context: @course, data: larger_rubric_data)
+      @a1.create_rubric_association(rubric: rubric, purpose: 'grading', use_for_grading: true, context: @course)
 
       grade_data = {
-        :grade_data => {
-          @student1.id => { :posted_grade => '75%' },
+        grade_data: {
+          @student1.id => { posted_grade: '75%' },
           @student2.id => {
-            :rubric_assessment => {
-              :crit1 => { :points => 7 },
-              :crit2 => { :points => 2, :comments => 'Rock on' }
+            rubric_assessment: {
+              crit1: { points: 7 },
+              crit2: { points: 2, comments: 'Rock on' }
             }
           }
         }
@@ -5147,9 +5142,9 @@ describe 'Submissions API', type: :request do
 
       json = api_call(:post,
                       "/api/v1/courses/#{@course.id}/assignments/#{@a1.id}/submissions/update_grades",
-                      { :controller => 'submissions_api', :action => 'bulk_update',
-                        :format => 'json', :course_id => @course.id.to_s,
-                        :assignment_id => @a1.id.to_s }, grade_data)
+                      { controller: 'submissions_api', action: 'bulk_update',
+                        format: 'json', course_id: @course.id.to_s,
+                        assignment_id: @a1.id.to_s }, grade_data)
 
       run_jobs
       progress = Progress.find(json["id"])
@@ -5161,21 +5156,21 @@ describe 'Submissions API', type: :request do
       s2 = @student2.submissions.first
       expect(s2.rubric_assessment).not_to be_nil
       expect(s2.rubric_assessment.data).to eq(
-        [{ :description => "B",
-           :criterion_id => "crit1",
-           :comments_enabled => true,
-           :points => 7,
-           :learning_outcome_id => nil,
-           :id => "rat2",
-           :comments => nil },
-         { :description => "Pass",
-           :criterion_id => "crit2",
-           :comments_enabled => true,
-           :points => 2,
-           :learning_outcome_id => nil,
-           :id => "rat1",
-           :comments => "Rock on",
-           :comments_html => "Rock on" }]
+        [{ description: "B",
+           criterion_id: "crit1",
+           comments_enabled: true,
+           points: 7,
+           learning_outcome_id: nil,
+           id: "rat2",
+           comments: nil },
+         { description: "Pass",
+           criterion_id: "crit2",
+           comments_enabled: true,
+           points: 2,
+           learning_outcome_id: nil,
+           id: "rat1",
+           comments: "Rock on",
+           comments_html: "Rock on" }]
       )
     end
 
@@ -5183,9 +5178,9 @@ describe 'Submissions API', type: :request do
       @user = @student1
       raw_api_call(:post,
                    "/api/v1/courses/#{@course.id}/assignments/#{@a1.id}/submissions/update_grades",
-                   { :controller => 'submissions_api', :action => 'bulk_update',
-                     :format => 'json', :course_id => @course.id.to_s,
-                     :assignment_id => @a1.id.to_s, :grade_data => { foo: "bar" } }, {})
+                   { controller: 'submissions_api', action: 'bulk_update',
+                     format: 'json', course_id: @course.id.to_s,
+                     assignment_id: @a1.id.to_s, grade_data: { foo: "bar" } }, {})
       assert_status(401)
     end
 
@@ -5196,9 +5191,9 @@ describe 'Submissions API', type: :request do
 
       api_call(:post,
                "/api/v1/sections/#{@section.id}/assignments/#{@a1.id}/submissions/update_grades",
-               { :controller => 'submissions_api', :action => 'bulk_update',
-                 :format => 'json', :section_id => @section.id.to_s,
-                 :assignment_id => @a1.id.to_s }, grade_data)
+               { controller: 'submissions_api', action: 'bulk_update',
+                 format: 'json', section_id: @section.id.to_s,
+                 assignment_id: @a1.id.to_s }, grade_data)
       run_jobs
 
       expect(@a1.submission_for_student(@student1)).to be_excused
@@ -5206,17 +5201,17 @@ describe 'Submissions API', type: :request do
 
     it "checks user ids for sections" do
       grade_data = {
-        :grade_data => {
-          @student1.id => { :posted_grade => '75%' },
-          @student2.id => { :posted_grade => '95%' }
+        grade_data: {
+          @student1.id => { posted_grade: '75%' },
+          @student2.id => { posted_grade: '95%' }
         }
       }
 
       json = api_call(:post,
                       "/api/v1/sections/#{@section.id}/assignments/#{@a1.id}/submissions/update_grades",
-                      { :controller => 'submissions_api', :action => 'bulk_update',
-                        :format => 'json', :section_id => @section.id.to_s,
-                        :assignment_id => @a1.id.to_s }, grade_data)
+                      { controller: 'submissions_api', action: 'bulk_update',
+                        format: 'json', section_id: @section.id.to_s,
+                        assignment_id: @a1.id.to_s }, grade_data)
 
       run_jobs
       progress = Progress.find(json["id"])
@@ -5228,15 +5223,15 @@ describe 'Submissions API', type: :request do
       @a1.grade_student(@student1, grade: '5%', grader: @teacher)
 
       grade_data = {
-        :grade_data => {
-          @student1.id => { :text_comment => "Awesome comment" }
+        grade_data: {
+          @student1.id => { text_comment: "Awesome comment" }
         }
       }
       api_call(:post,
                "/api/v1/sections/#{@section.id}/assignments/#{@a1.id}/submissions/update_grades",
-               { :controller => 'submissions_api', :action => 'bulk_update',
-                 :format => 'json', :section_id => @section.id.to_s,
-                 :assignment_id => @a1.id.to_s }, grade_data)
+               { controller: 'submissions_api', action: 'bulk_update',
+                 format: 'json', section_id: @section.id.to_s,
+                 assignment_id: @a1.id.to_s }, grade_data)
 
       run_jobs
       s1 = @student1.submissions.first
@@ -5247,15 +5242,15 @@ describe 'Submissions API', type: :request do
       @a1.grade_student(@student1, grade: '5%', grader: @teacher)
 
       grade_data = {
-        :grade_data => {
-          @student1.id => { :posted_grade => nil }
+        grade_data: {
+          @student1.id => { posted_grade: nil }
         }
       }
       api_call(:post,
                "/api/v1/sections/#{@section.id}/assignments/#{@a1.id}/submissions/update_grades",
-               { :controller => 'submissions_api', :action => 'bulk_update',
-                 :format => 'json', :section_id => @section.id.to_s,
-                 :assignment_id => @a1.id.to_s }, grade_data)
+               { controller: 'submissions_api', action: 'bulk_update',
+                 format: 'json', section_id: @section.id.to_s,
+                 assignment_id: @a1.id.to_s }, grade_data)
 
       run_jobs
       s1 = @student1.submissions.first
@@ -5265,17 +5260,17 @@ describe 'Submissions API', type: :request do
     it "will not enqueue jobs for deleted assignments" do
       @a1.destroy
       grade_data = {
-        :grade_data => {
-          @student1.id => { :posted_grade => '75%' },
-          @student2.id => { :posted_grade => '95%' }
+        grade_data: {
+          @student1.id => { posted_grade: '75%' },
+          @student2.id => { posted_grade: '95%' }
         }
       }
 
       api_call(:post,
                "/api/v1/courses/#{@course.id}/assignments/#{@a1.id}/submissions/update_grades",
-               { :controller => 'submissions_api', :action => 'bulk_update',
-                 :format => 'json', :course_id => @course.id.to_s,
-                 :assignment_id => @a1.id.to_s }, grade_data)
+               { controller: 'submissions_api', action: 'bulk_update',
+                 format: 'json', course_id: @course.id.to_s,
+                 assignment_id: @a1.id.to_s }, grade_data)
       assert_status(400)
       run_jobs
       expect(Submission.count).to eq(2)
@@ -5288,22 +5283,22 @@ describe 'Submissions API', type: :request do
 
   describe "list_gradeable_students" do
     before(:once) do
-      course_with_teacher :active_all => true
-      ta_in_course :active_all => true
-      @student1 = student_in_course(:active_all => true).user
-      @student2 = student_in_course(:active_all => true).user
+      course_with_teacher active_all: true
+      ta_in_course active_all: true
+      @student1 = student_in_course(active_all: true).user
+      @student2 = student_in_course(active_all: true).user
       @assignment = @course.assignments.build
       @assignment.moderated_grading = true
       @assignment.grader_count = 1
       @assignment.save!
-      @assignment.submit_homework @student1, :body => 'EHLO'
+      @assignment.submit_homework @student1, body: 'EHLO'
       @path = "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/gradeable_students"
-      @params = { :controller => 'submissions_api', :action => 'gradeable_students',
-                  :format => 'json', :course_id => @course.to_param, :assignment_id => @assignment.to_param }
+      @params = { controller: 'submissions_api', action: 'gradeable_students',
+                  format: 'json', course_id: @course.to_param, assignment_id: @assignment.to_param }
     end
 
     it "requires grading rights" do
-      api_call_as_user(@student1, :get, @path, @params, {}, {}, { :expected_status => 401 })
+      api_call_as_user(@student1, :get, @path, @params, {}, {}, { expected_status: 401 })
     end
 
     it "lists students with and without submissions" do
@@ -5338,7 +5333,7 @@ describe 'Submissions API', type: :request do
     end
 
     it "paginates" do
-      json = api_call_as_user(@teacher, :get, @path + "?per_page=1", @params.merge(:per_page => '1'))
+      json = api_call_as_user(@teacher, :get, @path + "?per_page=1", @params.merge(per_page: '1'))
       expect(json.size).to eq 1
       expect(response.headers).to include 'Link'
       expect(response.headers['Link']).to match(/rel="next"/)
@@ -5349,9 +5344,9 @@ describe 'Submissions API', type: :request do
         @course.root_account.enable_service(:avatars)
         @course.root_account.save!
         @path = "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/gradeable_students?include[]=provisional_grades"
-        @params = { :controller => 'submissions_api', :action => 'gradeable_students',
-                    :format => 'json', :course_id => @course.to_param, :assignment_id => @assignment.to_param,
-                    :include => ['provisional_grades'] }
+        @params = { controller: 'submissions_api', action: 'gradeable_students',
+                    format: 'json', course_id: @course.to_param, assignment_id: @assignment.to_param,
+                    include: ['provisional_grades'] }
       end
 
       it "is unauthorized when the user is not the assigned final grader" do
@@ -5374,7 +5369,7 @@ describe 'Submissions API', type: :request do
 
       it "includes provisional grades with selections" do
         @assignment.update!(final_grader: @teacher)
-        sub = @assignment.grade_student(@student1, :score => 90, :grader => @ta, :provisional => true).first
+        sub = @assignment.grade_student(@student1, score: 90, grader: @ta, provisional: true).first
         pg = sub.provisional_grades.first
         @assignment.moderated_grading_selections
                    .where(student_id: @student1.id).first
@@ -5413,7 +5408,7 @@ describe 'Submissions API', type: :request do
 
       it "anonymizes speedgrader_url if anonymously grading" do
         @assignment.update!(final_grader: @teacher)
-        sub = @assignment.grade_student(@student1, :score => 90, :grader => @ta, :provisional => true).first
+        sub = @assignment.grade_student(@student1, score: 90, grader: @ta, provisional: true).first
         pg = sub.provisional_grades.first
         @assignment.moderated_grading_selections
                    .where(student_id: @student1.id).first
@@ -5430,7 +5425,7 @@ describe 'Submissions API', type: :request do
 
       it "anonymizes scorer id of provisional grade if grading double blind" do
         @assignment.update!(final_grader: @teacher)
-        sub = @assignment.grade_student(@student1, :score => 90, :grader => @ta, :provisional => true).first
+        sub = @assignment.grade_student(@student1, score: 90, grader: @ta, provisional: true).first
         pg = sub.provisional_grades.first
         @assignment.moderated_grading_selections
                    .where(student_id: @student1.id).first
@@ -5447,10 +5442,10 @@ describe 'Submissions API', type: :request do
 
   describe "list_gradeable_students_for_multiple_assignments" do
     before(:once) do
-      course_with_teacher :active_all => true
-      ta_in_course :active_all => true
-      @student1 = student_in_course(:active_all => true).user
-      @student2 = student_in_course(:active_all => true).user
+      course_with_teacher active_all: true
+      ta_in_course active_all: true
+      @student1 = student_in_course(active_all: true).user
+      @student2 = student_in_course(active_all: true).user
       @assignment1 = @course.assignments.build
       @assignment1.moderated_grading = true
       @assignment1.grader_count = 1
@@ -5459,13 +5454,13 @@ describe 'Submissions API', type: :request do
       @assignment2.save!
       @assignment_ids = [@assignment1.id, @assignment2.id]
       @path = "/api/v1/courses/#{@course.id}/assignments/gradeable_students"
-      @params = { :controller => 'submissions_api', :action => 'multiple_gradeable_students',
-                  :format => 'json', :course_id => @course.to_param,
-                  :assignment_ids => [@assignment1.to_param, @assignment2.to_param] }
+      @params = { controller: 'submissions_api', action: 'multiple_gradeable_students',
+                  format: 'json', course_id: @course.to_param,
+                  assignment_ids: [@assignment1.to_param, @assignment2.to_param] }
     end
 
     it "requires grading rights" do
-      api_call_as_user(@student1, :get, @path, @params, {}, {}, { :expected_status => 401 })
+      api_call_as_user(@student1, :get, @path, @params, {}, {}, { expected_status: 401 })
     end
 
     it "lists students" do
@@ -5477,7 +5472,7 @@ describe 'Submissions API', type: :request do
     end
 
     it "paginates" do
-      json = api_call_as_user(@teacher, :get, @path + "?per_page=1", @params.merge(:per_page => '1'))
+      json = api_call_as_user(@teacher, :get, @path + "?per_page=1", @params.merge(per_page: '1'))
       expect(json.size).to eq 1
       expect(response.headers).to include 'Link'
       expect(response.headers['Link']).to match(/rel="next"/)
@@ -5485,8 +5480,8 @@ describe 'Submissions API', type: :request do
 
     it "limits access to sections user is a part of" do
       section = add_section('Test Section')
-      section_teacher = teacher_in_section(section, :active_all => true, :limit_privileges_to_course_section => true)
-      section_student = student_in_section(section, :active_all => true)
+      section_teacher = teacher_in_section(section, active_all: true, limit_privileges_to_course_section: true)
+      section_student = student_in_section(section, active_all: true)
 
       json = api_call_as_user(section_teacher, :get, @path, @params)
 
@@ -5497,13 +5492,13 @@ describe 'Submissions API', type: :request do
     it "respects differentiated assignments" do
       assignment = @course.assignments.build
       section = add_section('Test Section')
-      section_teacher = teacher_in_section(section, :active_all => true)
-      section_student = student_in_section(section, :active_all => true)
-      differentiated_assignment(:assignment => assignment, :course_section => section)
+      section_teacher = teacher_in_section(section, active_all: true)
+      section_student = student_in_section(section, active_all: true)
+      differentiated_assignment(assignment: assignment, course_section: section)
 
-      differentiated_params = { :controller => 'submissions_api', :action => 'multiple_gradeable_students',
-                                :format => 'json', :course_id => @course.to_param,
-                                :assignment_ids => [@assignment.id] }
+      differentiated_params = { controller: 'submissions_api', action: 'multiple_gradeable_students',
+                                format: 'json', course_id: @course.to_param,
+                                assignment_ids: [@assignment.id] }
 
       json = api_call_as_user(section_teacher, :get, @path, differentiated_params)
 
@@ -5644,24 +5639,24 @@ describe 'Submissions API', type: :request do
 
   describe '#submission_summary' do
     before(:once) do
-      course_with_teacher :active_all => true
-      @student1 = student_in_course(:active_all => true).user
-      @student2 = student_in_course(:active_all => true).user
-      @student3 = student_in_course(:active_all => true).user
+      course_with_teacher active_all: true
+      @student1 = student_in_course(active_all: true).user
+      @student2 = student_in_course(active_all: true).user
+      @student3 = student_in_course(active_all: true).user
 
-      @section = @course.course_sections.build(:name => 'Another Section')
+      @section = @course.course_sections.build(name: 'Another Section')
       @section.save
       @section.enroll_user(@student1, 'StudentEnrollment', 'active')
       @section.enroll_user(@student2, 'StudentEnrollment', 'active')
       @section.enroll_user(@student3, 'StudentEnrollment', 'active')
 
       @assignment = @course.assignments.create(points_possible: 100)
-      @assignment.submit_homework @student1, :body => 'EHLO'
-      @assignment.submit_homework @student2, :body => 'EHLO'
+      @assignment.submit_homework @student1, body: 'EHLO'
+      @assignment.submit_homework @student2, body: 'EHLO'
       @assignment.grade_student @student1, score: 99, grader: @teacher
       @path = "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submission_summary"
-      @params = { :controller => 'submissions_api', :action => 'submission_summary',
-                  :format => 'json', :course_id => @course.to_param, :assignment_id => @assignment.to_param }
+      @params = { controller: 'submissions_api', action: 'submission_summary',
+                  format: 'json', course_id: @course.to_param, assignment_id: @assignment.to_param }
     end
 
     it 'summarizes submissions' do
@@ -5672,9 +5667,9 @@ describe 'Submissions API', type: :request do
     end
 
     it 'summarizes submissions with multiple submissions by the same student' do
-      @assignment.submit_homework @student2, :body => 'EHLO2'
-      @assignment.submit_homework @student2, :body => 'EHLO3'
-      @assignment.submit_homework @student2, :body => 'EHLO4'
+      @assignment.submit_homework @student2, body: 'EHLO2'
+      @assignment.submit_homework @student2, body: 'EHLO3'
+      @assignment.submit_homework @student2, body: 'EHLO4'
       json = api_call_as_user(@teacher, :get, @path, @params)
       expect(json['graded']).to eq 1
       expect(json['ungraded']).to eq 1
@@ -5682,7 +5677,7 @@ describe 'Submissions API', type: :request do
     end
 
     it 'summarizes submissions with multiple submissions by the same student but one of them graded' do
-      @assignment.submit_homework @student2, :body => 'EHLO2'
+      @assignment.submit_homework @student2, body: 'EHLO2'
       @assignment.grade_student @student2, score: 98, grader: @teacher
       json = api_call_as_user(@teacher, :get, @path, @params)
       expect(json['graded']).to eq 2
@@ -5691,9 +5686,9 @@ describe 'Submissions API', type: :request do
     end
 
     it 'summarizes submission with multiple submission where latest submission needs grading' do
-      @assignment.submit_homework @student2, :body => 'EHLO2'
+      @assignment.submit_homework @student2, body: 'EHLO2'
       @assignment.grade_student @student2, score: 98, grader: @teacher
-      @assignment.submit_homework @student2, :body => 'EHLO3'
+      @assignment.submit_homework @student2, body: 'EHLO3'
       json = api_call_as_user(@teacher, :get, @path, @params)
       expect(json['graded']).to eq 1
       expect(json['ungraded']).to eq 1
@@ -5701,7 +5696,7 @@ describe 'Submissions API', type: :request do
     end
 
     it 'doesnt count submissions where the grade was removed as graded' do
-      @assignment.submit_homework @student2, :body => 'EHLO2'
+      @assignment.submit_homework @student2, body: 'EHLO2'
       @assignment.grade_student @student2, score: 98, grader: @teacher
       @assignment.grade_student @student2, score: nil, grader: @teacher
       json = api_call_as_user(@teacher, :get, @path, @params)
@@ -5739,8 +5734,8 @@ describe 'Submissions API', type: :request do
       sub1.update_attribute(:score, 1.0)
 
       @path = "/api/v1/courses/#{@course.id}/assignments/#{asg.id}/submission_summary"
-      @params = { :controller => 'submissions_api', :action => 'submission_summary',
-                  :format => 'json', :course_id => @course.to_param, :assignment_id => asg.to_param }
+      @params = { controller: 'submissions_api', action: 'submission_summary',
+                  format: 'json', course_id: @course.to_param, assignment_id: asg.to_param }
 
       json = api_call_as_user(@teacher, :get, @path, @params)
       expect(json['graded']).to eq 0
@@ -5751,8 +5746,8 @@ describe 'Submissions API', type: :request do
     it 'returns a 404' do
       assg_id = @assignment.id + 100
       @path = "/api/v1/courses/#{@course.id}/assignments/#{assg_id}/submission_summary"
-      @params = { :controller => 'submissions_api', :action => 'submission_summary',
-                  :format => 'json', :course_id => @course.to_param, :assignment_id => assg_id.to_s }
+      @params = { controller: 'submissions_api', action: 'submission_summary',
+                  format: 'json', course_id: @course.to_param, assignment_id: assg_id.to_s }
       response = api_call_as_user(@teacher, :get, @path, @params)
       assert_status(404)
       expect(response['errors'][0]['message']).to eq 'The specified resource does not exist.'
@@ -5761,9 +5756,9 @@ describe 'Submissions API', type: :request do
     it 'doesnt show submissions from various inactive types of enrollments' do
       inactive = %w[deleted rejected inactive invited]
 
-      @student4 = student_in_course(:active_all => true).user
+      @student4 = student_in_course(active_all: true).user
       enrollment = @section.enroll_user(@student4, 'StudentEnrollment', 'active')
-      @assignment.submit_homework @student4, :body => 'EHLO'
+      @assignment.submit_homework @student4, body: 'EHLO'
 
       inactive.each do |state|
         enrollment.workflow_state = state
@@ -5787,8 +5782,8 @@ describe 'Submissions API', type: :request do
         group2.users << @student3
 
         assignment = @course.assignments.create(points_possible: 100, group_category: group_category, grade_group_students_individually: false)
-        assignment.submit_homework @student1, :body => 'EHLO'
-        assignment.submit_homework @student3, :body => 'EHLO'
+        assignment.submit_homework @student1, body: 'EHLO'
+        assignment.submit_homework @student3, body: 'EHLO'
         assignment.grade_student @student1, score: 99, grader: @teacher
         path = "/api/v1/courses/#{@course.id}/assignments/#{assignment.id}/submission_summary?grouped=true"
         params = { controller: 'submissions_api', action: 'submission_summary',
@@ -5810,7 +5805,7 @@ describe 'Submissions API', type: :request do
         group2.users << @student3
 
         assignment = @course.assignments.create(points_possible: 100, group_category: group_category, grade_group_students_individually: false)
-        assignment.submit_homework @student1, :body => 'EHLO'
+        assignment.submit_homework @student1, body: 'EHLO'
         assignment.grade_student @student1, score: 99, grader: @teacher
 
         path = "/api/v1/courses/#{@course.id}/assignments/#{assignment.id}/submission_summary"
@@ -5833,7 +5828,7 @@ describe 'Submissions API', type: :request do
         group2.users << @student3
 
         assignment = @course.assignments.create(points_possible: 100, group_category: group_category, grade_group_students_individually: true)
-        assignment.submit_homework @student1, :body => 'EHLO'
+        assignment.submit_homework @student1, body: 'EHLO'
         assignment.grade_student @student1, score: 99, grader: @teacher
 
         path = "/api/v1/courses/#{@course.id}/assignments/#{assignment.id}/submission_summary?grouped=true"
@@ -5856,7 +5851,7 @@ describe 'Submissions API', type: :request do
         group2.users << @student3
 
         assignment = @course.assignments.create(points_possible: 100, group_category: group_category, grade_group_students_individually: true)
-        assignment.submit_homework @student1, :body => 'EHLO'
+        assignment.submit_homework @student1, body: 'EHLO'
         assignment.grade_student @student1, score: 99, grader: @teacher
 
         path = "/api/v1/courses/#{@course.id}/assignments/#{assignment.id}/submission_summary"

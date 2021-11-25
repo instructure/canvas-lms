@@ -31,39 +31,39 @@ describe "context modules" do
     before :once do
       course_with_teacher(active_all: true)
 
-      @module1 = @course.context_modules.create!(:name => "module1")
-      @assignment = @course.assignments.create!(:name => "pls submit", :submission_types => ["online_text_entry"], :points_possible => 42)
+      @module1 = @course.context_modules.create!(name: "module1")
+      @assignment = @course.assignments.create!(name: "pls submit", submission_types: ["online_text_entry"], points_possible: 42)
       @assignment.publish
-      @assignment_tag = @module1.add_item(:id => @assignment.id, :type => 'assignment')
-      @external_url_tag = @module1.add_item(:type => 'external_url', :url => 'http://example.com/lolcats',
-                                            :title => 'pls view', :indent => 1)
+      @assignment_tag = @module1.add_item(id: @assignment.id, type: 'assignment')
+      @external_url_tag = @module1.add_item(type: 'external_url', url: 'http://example.com/lolcats',
+                                            title: 'pls view', indent: 1)
       @external_url_tag.publish
-      @header_tag = @module1.add_item(:type => "sub_header", :title => "silly tag")
+      @header_tag = @module1.add_item(type: "sub_header", title: "silly tag")
 
       @module1.completion_requirements = {
-        @assignment_tag.id => { :type => 'must_submit' },
-        @external_url_tag.id => { :type => 'must_view' }
+        @assignment_tag.id => { type: 'must_submit' },
+        @external_url_tag.id => { type: 'must_view' }
       }
       @module1.save!
 
       @christmas = Time.zone.local(Time.zone.now.year + 1, 12, 25, 7, 0)
-      @module2 = @course.context_modules.create!(:name => "do not open until christmas",
-                                                 :unlock_at => @christmas,
-                                                 :require_sequential_progress => true)
+      @module2 = @course.context_modules.create!(name: "do not open until christmas",
+                                                 unlock_at: @christmas,
+                                                 require_sequential_progress: true)
       @module2.prerequisites = "module_#{@module1.id}"
       @module2.save!
 
-      @module3 = @course.context_modules.create(:name => "module3")
+      @module3 = @course.context_modules.create(name: "module3")
       @module3.workflow_state = 'unpublished'
       @module3.save!
 
       @students = create_users_in_course(@course, 4, return_type: :record)
 
       # complete for student 0
-      @assignment.submit_homework(@students[0], :body => "done!")
+      @assignment.submit_homework(@students[0], body: "done!")
       @external_url_tag.context_module_action(@students[0], :read)
       # in progress for student 1-2
-      @assignment.submit_homework(@students[1], :body => "done!")
+      @assignment.submit_homework(@students[1], body: "done!")
       @external_url_tag.context_module_action(@students[2], :read)
       # unlocked for student 3
     end
@@ -112,10 +112,10 @@ describe "context modules" do
 
     it "shows multiple student progressions to observers" do
       @observer = user_factory
-      @course.enroll_user(@observer, 'ObserverEnrollment', { :allow_multiple_enrollments => true,
-                                                             :associated_user_id => @students[0].id })
-      @course.enroll_user(@observer, 'ObserverEnrollment', { :allow_multiple_enrollments => true,
-                                                             :associated_user_id => @students[2].id })
+      @course.enroll_user(@observer, 'ObserverEnrollment', { allow_multiple_enrollments: true,
+                                                             associated_user_id: @students[0].id })
+      @course.enroll_user(@observer, 'ObserverEnrollment', { allow_multiple_enrollments: true,
+                                                             associated_user_id: @students[2].id })
 
       user_session(@observer)
 
@@ -178,13 +178,13 @@ describe "context modules" do
     end
 
     it "shows progressions link if user has grading permission but not content management" do
-      RoleOverride.create!(:context => Account.default, :permission => 'manage_content', :role => teacher_role, :enabled => false)
+      RoleOverride.create!(context: Account.default, permission: 'manage_content', role: teacher_role, enabled: false)
       get "/courses/#{@course.id}/modules"
       expect(f("#content")).to contain_css('.module_progressions_link')
     end
 
     it "does not show progressions link in modules page if user lacks grading permission" do
-      RoleOverride.create!(:context => Account.default, :permission => 'view_all_grades', :role => teacher_role, :enabled => false)
+      RoleOverride.create!(context: Account.default, permission: 'view_all_grades', role: teacher_role, enabled: false)
       get "/courses/#{@course.id}/modules"
       expect(f("#content")).not_to contain_css('.module_progressions_link')
     end
@@ -225,7 +225,7 @@ describe "context modules" do
     end
 
     it "shows student progress once assignment-view requirement is met", priority: "1" do
-      @assignment_1 = @course.assignments.create!(name: "assignment 1", submission_types: ["online_text_entry"], :points_possible => 20)
+      @assignment_1 = @course.assignments.create!(name: "assignment 1", submission_types: ["online_text_entry"], points_possible: 20)
       tag = @module1.add_item({ id: @assignment_1.id, type: 'assignment' })
       add_requirement({ tag.id => { type: 'must_view' } })
       fln("assignment 1").click
@@ -233,7 +233,7 @@ describe "context modules" do
     end
 
     it "shows student progress once assignment-submit requirement is met", priority: "1" do
-      @assignment_1 = @course.assignments.create!(name: "assignment 1", submission_types: ["online_text_entry"], :points_possible => 20)
+      @assignment_1 = @course.assignments.create!(name: "assignment 1", submission_types: ["online_text_entry"], points_possible: 20)
       tag = @module1.add_item({ id: @assignment_1.id, type: 'assignment' })
       add_requirement({ tag.id => { type: 'must_submit' } })
       @assignment_1.submit_homework(@student, body: "done!")
@@ -241,7 +241,7 @@ describe "context modules" do
     end
 
     it "shows student progress once assignment-score atleast requirement is met", priority: "1" do
-      @assignment_1 = @course.assignments.create!(name: "assignment 1", submission_types: ["online_text_entry"], :points_possible => 20)
+      @assignment_1 = @course.assignments.create!(name: "assignment 1", submission_types: ["online_text_entry"], points_possible: 20)
       tag = @module1.add_item({ id: @assignment_1.id, type: 'assignment' })
       add_requirement({ tag.id => { type: 'min_score', min_score: 10 } })
       @assignment_1.submit_homework(@student, body: "done!")

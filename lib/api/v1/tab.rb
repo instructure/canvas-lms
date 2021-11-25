@@ -51,7 +51,7 @@ module Api::V1::Tab
   def html_url(tab, context, full_url = false)
     if full_url
       method = tab[:href].to_s.sub(/_path$/, '_url').to_sym
-      opts = { :host => HostUrl.context_host(context, request.try(:host_with_port)) }
+      opts = { host: HostUrl.context_host(context, request.try(:host_with_port)) }
     else
       method = tab[:href]
       opts = {}

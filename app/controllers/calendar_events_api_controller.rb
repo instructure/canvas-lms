@@ -284,10 +284,10 @@ class CalendarEventsApiController < ApplicationController
   include Api::V1::CalendarEvent
   include CalendarConferencesHelper
 
-  before_action :require_user, :except => %w[public_feed index]
-  before_action :get_calendar_context, :only => :create
-  before_action :require_user_or_observer, :only => [:user_index]
-  before_action :require_authorization, :only => %w[index user_index]
+  before_action :require_user, except: %w[public_feed index]
+  before_action :get_calendar_context, only: :create
+  before_action :require_user_or_observer, only: [:user_index]
+  before_action :require_authorization, only: %w[index user_index]
 
   RECURRING_EVENT_LIMIT = 200
 
@@ -426,7 +426,7 @@ class CalendarEventsApiController < ApplicationController
           sub = subs.max_by(&:submitted_at) if subs
           event_json(event, user, session, { include: includes, excludes: params[:excludes], submission: sub })
         end
-        render :json => json
+        render json: json
       else
         render json: { errors: @errors.as_json }, status: :bad_request
       end
@@ -515,24 +515,24 @@ class CalendarEventsApiController < ApplicationController
       return unless events.all? { |event| authorize_user_for_conference(@current_user, event.web_conference) }
 
       if dup_options[:count] > RECURRING_EVENT_LIMIT
-        return render :json => {
+        return render json: {
           message: t("only a maximum of %{limit} events can be created",
                      limit: RECURRING_EVENT_LIMIT)
-        }, :status => :bad_request
+        }, status: :bad_request
       end
 
       CalendarEvent.transaction do
         error = events.detect { |event| !event.save }
         if error
-          render :json => error.errors, :status => :bad_request
+          render json: error.errors, status: :bad_request
           raise ActiveRecord::Rollback
         else
           original_event = events.shift
-          render :json => event_json(
+          render json: event_json(
             original_event,
             @current_user,
-            session, { :duplicates => events, include: includes('web_conference') }
-          ), :status => :created
+            session, { duplicates: events, include: includes('web_conference') }
+          ), status: :created
         end
       end
     end
@@ -545,7 +545,7 @@ class CalendarEventsApiController < ApplicationController
   def show
     get_event(true)
     if authorized_action(@event, @current_user, :read)
-      render :json => event_json(@event, @current_user, session, include: includes + [:web_conference])
+      render json: event_json(@event, @current_user, session, include: includes + [:web_conference])
     end
   end
 
@@ -586,16 +586,16 @@ class CalendarEventsApiController < ApplicationController
         reservation = @event.reserve_for(participant, @current_user,
                                          cancel_existing: value_to_boolean(params[:cancel_existing]),
                                          comments: params['comments'])
-        render :json => event_json(reservation, @current_user, session)
+        render json: event_json(reservation, @current_user, session)
       rescue CalendarEvent::ReservationError => e
         reservations = participant ? @event.appointment_group.reservations_for(participant) : []
-        render :json => [{
-          :attribute => 'reservation',
-          :type => 'calendar_event',
-          :message => e.message,
-          :reservations => reservations.map { |r| event_json(r, @current_user, session) }
+        render json: [{
+          attribute: 'reservation',
+          type: 'calendar_event',
+          message: e.message,
+          reservations: reservations.map { |r| event_json(r, @current_user, session) }
         }],
-               :status => :bad_request
+               status: :bad_request
       end
     end
   end
@@ -608,7 +608,7 @@ class CalendarEventsApiController < ApplicationController
       json = participants.map do |user|
         user_display_json(user)
       end
-      render :json => json
+      render json: json
     end
   end
 
@@ -657,7 +657,7 @@ class CalendarEventsApiController < ApplicationController
     if authorized_action(@event, @current_user, :update)
       params_for_update = nil
       if @event.is_a?(Assignment)
-        params_for_update = { :due_at => params[:calendar_event][:start_at] }
+        params_for_update = { due_at: params[:calendar_event][:start_at] }
       else
         params_for_update = calendar_event_params
         @event.validate_context! if @event.context.is_a?(AppointmentGroup)
@@ -670,10 +670,10 @@ class CalendarEventsApiController < ApplicationController
 
         if @event.context != context
           if @event.context.is_a?(AppointmentGroup)
-            return render :json => { :message => 'Cannot move Scheduler appointments between calendars' }, :status => :bad_request
+            return render json: { message: 'Cannot move Scheduler appointments between calendars' }, status: :bad_request
           end
           if @event.parent_calendar_event_id.present? || @event.child_events.any? || @event.effective_context_code.present?
-            return render :json => { :message => 'Cannot move events with section-specific times between calendars' }, :status => :bad_request
+            return render json: { message: 'Cannot move events with section-specific times between calendars' }, status: :bad_request
           end
 
           @event.context = context
@@ -691,9 +691,9 @@ class CalendarEventsApiController < ApplicationController
       end
 
       if @event.update(params_for_update)
-        render :json => event_json(@event, @current_user, session, include: includes('web_conference'))
+        render json: event_json(@event, @current_user, session, include: includes('web_conference'))
       else
-        render :json => @event.errors, :status => :bad_request
+        render json: @event.errors, status: :bad_request
       end
     end
   end
@@ -720,9 +720,9 @@ class CalendarEventsApiController < ApplicationController
         if @event.appointment_group && @event.appointment_group.appointments.count == 0
           @event.appointment_group.destroy(@current_user)
         end
-        render :json => event_json(@event, @current_user, session)
+        render json: event_json(@event, @current_user, session)
       else
-        render :json => @event.errors, :status => :bad_request
+        render json: @event.errors, status: :bad_request
       end
     end
   end
@@ -804,16 +804,16 @@ class CalendarEventsApiController < ApplicationController
 
     respond_to do |format|
       format.ics do
-        name = t('ics_title', "%{course_or_group_name} Calendar (Canvas)", :course_or_group_name => @context.name)
+        name = t('ics_title', "%{course_or_group_name} Calendar (Canvas)", course_or_group_name: @context.name)
         description = case @context
                       when Course
-                        t('ics_description_course', "Calendar events for the course, %{course_name}", :course_name => @context.name)
+                        t('ics_description_course', "Calendar events for the course, %{course_name}", course_name: @context.name)
                       when Group
-                        t('ics_description_group', "Calendar events for the group, %{group_name}", :group_name => @context.name)
+                        t('ics_description_group', "Calendar events for the group, %{group_name}", group_name: @context.name)
                       when User
-                        t('ics_description_user', "Calendar events for the user, %{user_name}", :user_name => @context.name)
+                        t('ics_description_user', "Calendar events for the user, %{user_name}", user_name: @context.name)
                       else
-                        t('ics_description', "Calendar events for %{context_name}", :context_name => @context.name)
+                        t('ics_description', "Calendar events for %{context_name}", context_name: @context.name)
                       end
 
         calendar = Icalendar::Calendar.new
@@ -838,15 +838,15 @@ class CalendarEventsApiController < ApplicationController
       end
       format.atom do
         feed = Atom::Feed.new do |f|
-          f.title = t :feed_title, "%{course_or_group_name} Calendar Feed", :course_or_group_name => @context.name
-          f.links << Atom::Link.new(:href => calendar_url_for(@context), :rel => 'self')
+          f.title = t :feed_title, "%{course_or_group_name} Calendar Feed", course_or_group_name: @context.name
+          f.links << Atom::Link.new(href: calendar_url_for(@context), rel: 'self')
           f.updated = Time.now
           f.id = calendar_url_for(@context)
         end
         @events.each do |e|
           feed.entries << e.to_atom
         end
-        render :plain => feed.to_xml
+        render plain: feed.to_xml
       end
     end
   end
@@ -942,7 +942,7 @@ class CalendarEventsApiController < ApplicationController
 
         builder.process_and_validate_timetables(timetables)
         if builder.errors.present?
-          return render :json => { :errors => builder.errors }, :status => :bad_request
+          return render json: { errors: builder.errors }, status: :bad_request
         end
       end
 
@@ -959,13 +959,13 @@ class CalendarEventsApiController < ApplicationController
       end
 
       # delete timetable events for sections missing here
-      ignored_section_ids = @context.active_course_sections.where.not(:id => updated_section_ids).pluck(:id)
+      ignored_section_ids = @context.active_course_sections.where.not(id: updated_section_ids).pluck(:id)
       if ignored_section_ids.any?
-        CalendarEvent.active.for_timetable.where(:context_type => "CourseSection", :context_id => ignored_section_ids)
-                     .update_all(:workflow_state => 'deleted', :deleted_at => Time.now.utc)
+        CalendarEvent.active.for_timetable.where(context_type: "CourseSection", context_id: ignored_section_ids)
+                     .update_all(workflow_state: 'deleted', deleted_at: Time.now.utc)
       end
 
-      render :json => { :status => 'ok' }
+      render json: { status: 'ok' }
     end
   end
 
@@ -978,7 +978,7 @@ class CalendarEventsApiController < ApplicationController
     get_context
     if authorized_action(@context, @current_user, :manage_calendar)
       timetable_data = @context.timetable_data || {}
-      render :json => timetable_data
+      render json: timetable_data
     end
   end
 
@@ -1026,7 +1026,7 @@ class CalendarEventsApiController < ApplicationController
       end
       builder.process_and_validate_event_hashes(event_hashes)
       if builder.errors.present?
-        return render :json => { :errors => builder.errors }, :status => :bad_request
+        return render json: { errors: builder.errors }, status: :bad_request
       end
 
       builder.delay.create_or_update_events(event_hashes)
@@ -1402,7 +1402,7 @@ class CalendarEventsApiController < ApplicationController
     end
 
     if event_attributes.key?(:web_conference)
-      override_params = { :user_settings => { :scheduled_date => event_attributes[:start_at] } }
+      override_params = { user_settings: { scheduled_date: event_attributes[:start_at] } }
       event_attributes[:web_conference] = find_or_initialize_conference(@context, event_attributes[:web_conference], override_params)
     end
 
@@ -1460,13 +1460,13 @@ class CalendarEventsApiController < ApplicationController
 
   def calendar_event_params
     params.require(:calendar_event)
-          .permit(CalendarEvent.permitted_attributes + [:child_event_data => strong_anything, web_conference: strong_anything])
+          .permit(CalendarEvent.permitted_attributes + [child_event_data: strong_anything, web_conference: strong_anything])
   end
 
   def check_for_past_signup(event)
     if event && event.end_at < Time.now.utc && event.context.is_a?(AppointmentGroup) &&
        !event.context.grants_right?(@current_user, :manage)
-      render :json => { :message => 'Cannot create or change reservation for past appointment' }, :status => :forbidden
+      render json: { message: 'Cannot create or change reservation for past appointment' }, status: :forbidden
       return false
     end
     true

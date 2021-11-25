@@ -62,9 +62,9 @@ class UserList
 
   def as_json(**)
     {
-      :users => addresses.map { |a| a.except(:shard) },
-      :duplicates => duplicate_addresses,
-      :errored_users => errors
+      users: addresses.map { |a| a.except(:shard) },
+      duplicates: duplicate_addresses,
+      errored_users: errors
     }
   end
 
@@ -76,8 +76,8 @@ class UserList
 
     non_existing = @addresses.reject { |a| a[:user_id] }
     non_existing_users = non_existing.map do |a|
-      user = User.new(:name => a[:name] || a[:address])
-      cc = user.communication_channels.build(:path => a[:address], :path_type => 'email')
+      user = User.new(name: a[:name] || a[:address])
+      cc = user.communication_channels.build(path: a[:address], path_type: 'email')
       cc.user = user
       user.workflow_state = 'creation_pending'
       user.root_account_ids = [@root_account.id]
@@ -107,11 +107,11 @@ class UserList
       elsif path&.match?(unique_id_regex)
         type = :pseudonym
       else
-        @errors << { :address => path, :details => :unparseable }
+        @errors << { address: path, details: :unparseable }
         return
       end
 
-      @addresses << { :name => name, :address => path, :type => type }
+      @addresses << { name: name, address: path, type: type }
     end
 
     def parse_email(email)
@@ -227,7 +227,7 @@ class UserList
 
         pseudos = Pseudonym.active
                            .select('path AS address, users.name AS name, communication_channels.user_id AS user_id, communication_channels.workflow_state AS workflow_state')
-                           .joins(:user => :communication_channels)
+                           .joins(user: :communication_channels)
                            .where("LOWER(path) IN (?) AND account_id IN (?)", emails.map { |x| x[:address].downcase }, account_ids)
         pseudos = if @root_account.feature_enabled?(:allow_unconfirmed_users_in_user_list)
                     pseudos.merge(CommunicationChannel.unretired)
@@ -274,10 +274,10 @@ class UserList
     sms_account_ids = @search_method == :closed ? all_account_ids : [@root_account]
     unless smses.empty?
       Shard.partition_by_shard(sms_account_ids) do |account_ids|
-        sms_scope = @search_method == :closed ? Pseudonym.where(:account_id => account_ids) : Pseudonym
+        sms_scope = @search_method == :closed ? Pseudonym.where(account_id: account_ids) : Pseudonym
         sms_scope.active
                  .select('path AS address, users.name AS name, communication_channels.user_id AS user_id')
-                 .joins(:user => :communication_channels)
+                 .joins(user: :communication_channels)
                  .where("communication_channels.workflow_state='active' AND (#{smses.map { |x| "path LIKE '#{x[:address].gsub(/[^\d]/, '')}%'" }.join(" OR ")})")
                  .map { |pseudonym| pseudonym.attributes.symbolize_keys }.each do |sms|
           address = sms.delete(:address)[/\d+/]
@@ -316,7 +316,7 @@ class UserList
         address.delete :user_id
         (@addresses.find { |a| a[:address].casecmp?(address[:address]) } ? @duplicate_addresses : @addresses) << address
       else
-        @errors << { :address => address[:address], :type => address[:type], :details => (address[:details] || :not_found) }
+        @errors << { address: address[:address], type: address[:type], details: (address[:details] || :not_found) }
       end
     end
   end

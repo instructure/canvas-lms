@@ -35,13 +35,13 @@ describe 'course wiki pages' do
     before do
       course_with_teacher_logged_in
       @course.save!
-      @module1 = @course.context_modules.create!(:name => "module 1")
-      @wiki_page1 = @course.wiki_pages.create!(:title => "Here-is-the-first-wiki")
-      @module1.add_item(:id => @wiki_page1.id, :type => 'wiki_page')
+      @module1 = @course.context_modules.create!(name: "module 1")
+      @wiki_page1 = @course.wiki_pages.create!(title: "Here-is-the-first-wiki")
+      @module1.add_item(id: @wiki_page1.id, type: 'wiki_page')
       # a second course
-      @course2 = Course.create!(:name => "Second Course2")
-      @course2.enroll_teacher(@teacher, :enrollment_state => 'active')
-      @module2 = @course2.context_modules.create!(:name => "module 2")
+      @course2 = Course.create!(name: "Second Course2")
+      @course2.enroll_teacher(@teacher, enrollment_state: 'active')
+      @module2 = @course2.context_modules.create!(name: "module 2")
       user_session(@teacher)
     end
 
@@ -90,8 +90,8 @@ describe 'course wiki pages' do
 
   context 'with commons fav FF ON' do
     before do
-      @tool = Account.default.context_external_tools.new(:name => "a", :domain => "google.com", :consumer_key => '12345', :shared_secret => 'secret')
-      @tool.wiki_index_menu = { :url => "http://www.example.com", :text => "Commons Fav" }
+      @tool = Account.default.context_external_tools.new(name: "a", domain: "google.com", consumer_key: '12345', shared_secret: 'secret')
+      @tool.wiki_index_menu = { url: "http://www.example.com", text: "Commons Fav" }
       @tool.save!
       Account.default.enable_feature!(:commons_favorites)
       course_with_teacher_logged_in

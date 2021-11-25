@@ -66,7 +66,7 @@ module DashboardHelper
     # use the "and x more..." phrasing if > max_contexts contexts
     if contexts_count > max_contexts
       contexts = contexts.take(max_contexts)
-      contexts << [I18n.t('helpers.dashboard_helper.x_more', "%{x} more...", :x => contexts_count - max_contexts), nil]
+      contexts << [I18n.t('helpers.dashboard_helper.x_more', "%{x} more...", x: contexts_count - max_contexts), nil]
     end
 
     contexts.map do |name, url|
@@ -113,24 +113,24 @@ module DashboardHelper
     case category
     when "Announcement"
       I18n.t('helpers.dashboard_helper.x_new_in_announcements',
-             { :one => "*1* Announcement", :other => "*%{count}* Announcements" },
-             { :count => items.size, :wrapper => '<b class="count">\1</b>' })
+             { one: "*1* Announcement", other: "*%{count}* Announcements" },
+             { count: items.size, wrapper: '<b class="count">\1</b>' })
     when "Conversation"
       I18n.t('helpers.dashboard_helper.x_new_in_conversations',
-             { :one => "*1* Conversation Message", :other => "*%{count}* Conversation Messages" },
-             { :count => items.size, :wrapper => '<b class="count">\1</b>' })
+             { one: "*1* Conversation Message", other: "*%{count}* Conversation Messages" },
+             { count: items.size, wrapper: '<b class="count">\1</b>' })
     when "Assignment"
       I18n.t('helpers.dashboard_helper.x_new_in_assignments',
-             { :one => "*1* Assignment Notification", :other => "*%{count}* Assignment Notifications" },
-             { :count => items.size, :wrapper => '<b class="count">\1</b>' })
+             { one: "*1* Assignment Notification", other: "*%{count}* Assignment Notifications" },
+             { count: items.size, wrapper: '<b class="count">\1</b>' })
     when "DiscussionEntry", "DiscussionTopic"
       I18n.t('helpers.dashboard_helper.x_new_in_discussions',
-             { :one => "*1* Discussion", :other => "*%{count}* Discussions" },
-             { :count => items.size, :wrapper => '<b class="count">\1</b>' })
+             { one: "*1* Discussion", other: "*%{count}* Discussions" },
+             { count: items.size, wrapper: '<b class="count">\1</b>' })
     when "AssessmentRequest"
       I18n.t('helpers.dashboard_helper.x_new_in_peer_reviews',
-             { :one => "*1* Peer Review", :other => "*%{count}* Peer Reviews" },
-             { :count => items.size, :wrapper => '<b class="count">\1</b>' })
+             { one: "*1* Peer Review", other: "*%{count}* Peer Reviews" },
+             { count: items.size, wrapper: '<b class="count">\1</b>' })
     else
       raise "Unknown activity category"
     end

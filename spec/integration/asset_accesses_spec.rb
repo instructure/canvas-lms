@@ -26,13 +26,13 @@ describe "user asset accesses" do
 
     username = "nobody@example.com"
     password = "asdfasdf"
-    u = user_with_pseudonym :active_user => true,
-                            :username => username,
-                            :password => password
+    u = user_with_pseudonym active_user: true,
+                            username: username,
+                            password: password
     u.save!
-    @e = course_with_teacher :active_course => true,
-                             :user => u,
-                             :active_enrollment => true
+    @e = course_with_teacher active_course: true,
+                             user: u,
+                             active_enrollment: true
     @e.save!
     @teacher = u
     user_session(@user, @pseudonym)
@@ -48,7 +48,7 @@ describe "user asset accesses" do
     now = Time.now.utc
     allow(Time).to receive(:now).and_return(now)
 
-    assignment = @course.assignments.create(:title => 'Assignment 1')
+    assignment = @course.assignments.create(title: 'Assignment 1')
     assignment.workflow_state = 'active'
     assignment.save!
 
@@ -64,13 +64,13 @@ describe "user asset accesses" do
     expect(html.css('#usage_report .access.assignment .readable_name').text.strip).to eq 'Assignment 1'
     expect(html.css('#usage_report .access.assignment .view_score').text.strip).to eq '1'
     expect(html.css('#usage_report .access.assignment .last_viewed').text.strip).to eq datetime_string(now)
-    expect(AssetUserAccess.where(:user_id => @student).first.last_access.to_i).to eq now.to_i
+    expect(AssetUserAccess.where(user_id: @student).first.last_access.to_i).to eq now.to_i
 
     now2 = now + 1.hour
     allow(Time).to receive(:now).and_return(now2)
 
     # make sure that we're not using the uodated_at time as the time of the access
-    AssetUserAccess.where(:user_id => @student).update_all(:updated_at => now2 + 5.hours)
+    AssetUserAccess.where(user_id: @student).update_all(updated_at: now2 + 5.hours)
 
     user_session(@student)
     get "/courses/#{@course.id}/assignments/#{assignment.id}"
@@ -84,12 +84,12 @@ describe "user asset accesses" do
     expect(html.css('#usage_report .access.assignment .readable_name').text.strip).to eq 'Assignment 1'
     expect(html.css('#usage_report .access.assignment .view_score').text.strip).to eq '2'
     expect(html.css('#usage_report .access.assignment .last_viewed').text.strip).to eq datetime_string(now2)
-    expect(AssetUserAccess.where(:user_id => @student).first.last_access.to_i).to eq now2.to_i
+    expect(AssetUserAccess.where(user_id: @student).first.last_access.to_i).to eq now2.to_i
   end
 
   it "records user names when viewing profiles" do
     user_session(@student)
     get "/courses/#{@course.id}/users/#{@teacher.id}"
-    expect(AssetUserAccess.where(:user_id => @student).first.display_name).to eq @teacher.name
+    expect(AssetUserAccess.where(user_id: @student).first.display_name).to eq @teacher.name
   end
 end

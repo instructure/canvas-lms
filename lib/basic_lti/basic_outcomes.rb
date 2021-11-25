@@ -261,7 +261,7 @@ module BasicLTI
         rescue
           new_score = false
           unless text_value.nil?
-            report_failure(:no_parseable_result_score, I18n.t('lib.basic_lti.no_parseable_score.result', <<~TEXT, :grade => text_value))
+            report_failure(:no_parseable_result_score, I18n.t('lib.basic_lti.no_parseable_score.result', <<~TEXT, grade: text_value))
               Unable to parse resultScore: %{grade}
             TEXT
           end
@@ -271,7 +271,7 @@ module BasicLTI
         rescue
           raw_score = false
           unless score_value.nil? || failure?
-            report_failure(:no_parseable_result_total_score, I18n.t('lib.basic_lti.no_parseable_score.result_total', <<~TEXT, :grade => score_value))
+            report_failure(:no_parseable_result_total_score, I18n.t('lib.basic_lti.no_parseable_score.result_total', <<~TEXT, grade: score_value))
               Unable to parse resultTotalScore: %{grade}
             TEXT
           end
@@ -337,10 +337,10 @@ module BasicLTI
 
         if !failure? && assignment.grading_type != "pass_fail" && assignment.points_possible.nil?
           unless (submission = existing_submission)
-            submission = Submission.create!(submission_hash.merge(:user => user,
-                                                                  :assignment => assignment))
+            submission = Submission.create!(submission_hash.merge(user: user,
+                                                                  assignment: assignment))
           end
-          submission.submission_comments.create!(:comment => I18n.t('lib.basic_lti.no_points_comment', <<~TEXT, :grade => submission_hash[:grade]))
+          submission.submission_comments.create!(comment: I18n.t('lib.basic_lti.no_points_comment', <<~TEXT, grade: submission_hash[:grade]))
             An external tool attempted to grade this assignment as %{grade}, but was unable
             to because the assignment has no points possible.
           TEXT
@@ -370,7 +370,7 @@ module BasicLTI
       end
 
       def handle_delete_result(tool, assignment, user)
-        assignment.grade_student(user, :grade => nil, grader_id: -tool.id)
+        assignment.grade_student(user, grade: nil, grader_id: -tool.id)
         self.body = "<deleteResultResponse />"
         true
       end

@@ -22,7 +22,7 @@ require_relative '../api_spec_helper'
 
 describe SisImportsApiController, type: :request do
   before :once do
-    @user = user_with_pseudonym :active_all => true
+    @user = user_with_pseudonym active_all: true
     @account = Account.default
     @account.allow_sis_import = true
     @account.save

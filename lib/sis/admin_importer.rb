@@ -32,7 +32,7 @@ module SIS
       User.update_account_associations(importer.account_users_to_update_associations.to_a)
       user_ids = []
       importer.account_users_to_set_batch_id.to_a.in_groups_of(1000, false) do |admins|
-        user_ids += AccountUser.where(:id => admins).distinct.pluck(:user_id)
+        user_ids += AccountUser.where(id: admins).distinct.pluck(:user_id)
         AccountUser.where(id: admins).update_all(sis_batch_id: @batch.id, updated_at: Time.now.utc)
       end
       User.clear_cache_keys(user_ids, :account_users)

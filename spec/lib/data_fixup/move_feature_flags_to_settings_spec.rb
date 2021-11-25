@@ -20,9 +20,9 @@
 
 describe DataFixup::MoveFeatureFlagsToSettings do
   before :once do
-    Account.add_setting :some_root_only_setting, :boolean => true, :root_only => true, :default => false
-    Account.add_setting :some_course_setting, :boolean => true, :default => false, :inheritable => true
-    Course.add_setting :some_course_setting, :boolean => true, :inherited => true
+    Account.add_setting :some_root_only_setting, boolean: true, root_only: true, default: false
+    Account.add_setting :some_course_setting, boolean: true, default: false, inheritable: true
+    Course.add_setting :some_course_setting, boolean: true, inherited: true
 
     @root_account = account_model
     @teacher = user_with_pseudonym account: @root_account
@@ -49,7 +49,7 @@ describe DataFixup::MoveFeatureFlagsToSettings do
   it "handles unknown ff state gracefully" do
     override = @root_account.feature_flags.build(feature: 'root_account_feature_going_away')
     override.state = "some_invalid_state"
-    override.save!(:validate => false)
+    override.save!(validate: false)
 
     DataFixup::MoveFeatureFlagsToSettings.run(:root_account_feature_going_away, "RootAccount", :some_root_only_setting)
     reload_all

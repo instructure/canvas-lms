@@ -28,7 +28,7 @@ module LinkedIn
         consumer,
         request_token,
         request_secret
-      ).get_access_token(:oauth_verifier => oauth_verifier)
+      ).get_access_token(oauth_verifier: oauth_verifier)
       new(access_token)
     end
 
@@ -58,7 +58,7 @@ module LinkedIn
     end
 
     def self.request_token(oauth_callback)
-      consumer.get_request_token(:oauth_callback => oauth_callback)
+      consumer.get_request_token(oauth_callback: oauth_callback)
     end
 
     def self.consumer(key = nil, secret = nil)
@@ -66,11 +66,11 @@ module LinkedIn
       key ||= config['api_key']
       secret ||= config['secret_key']
       OAuth::Consumer.new(key, secret, {
-                            :site => "https://api.linkedin.com",
-                            :request_token_path => "/uas/oauth/requestToken",
-                            :access_token_path => "/uas/oauth/accessToken",
-                            :authorize_path => "/uas/oauth/authorize",
-                            :signature_method => "HMAC-SHA1"
+                            site: "https://api.linkedin.com",
+                            request_token_path: "/uas/oauth/requestToken",
+                            access_token_path: "/uas/oauth/accessToken",
+                            authorize_path: "/uas/oauth/authorize",
+                            signature_method: "HMAC-SHA1"
                           })
     end
     private_class_method :consumer

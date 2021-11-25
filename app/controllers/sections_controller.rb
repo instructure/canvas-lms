@@ -89,7 +89,7 @@
 #
 class SectionsController < ApplicationController
   before_action :require_context
-  before_action :require_section, :except => [:index, :create]
+  before_action :require_section, except: [:index, :create]
 
   include Api::V1::Section
 
@@ -121,7 +121,7 @@ class SectionsController < ApplicationController
         sections = Api.paginate(sections, self, api_v1_course_sections_url)
       end
 
-      render :json => sections_json(sections, @current_user, session, includes)
+      render json: sections_json(sections, @current_user, session, includes)
     end
   end
 
@@ -157,7 +157,7 @@ class SectionsController < ApplicationController
       can_manage_sis = api_request? && @context.root_account.grants_right?(@current_user, session, :manage_sis)
 
       if can_manage_sis && sis_section_id.present? && value_to_boolean(params[:enable_sis_reactivation])
-        @section = @context.course_sections.where(:sis_source_id => sis_section_id, :workflow_state => 'deleted').first
+        @section = @context.course_sections.where(sis_source_id: sis_section_id, workflow_state: 'deleted').first
         @section.workflow_state = 'active' if @section
       end
       @section ||= @context.course_sections.build(course_section_params)
@@ -171,11 +171,11 @@ class SectionsController < ApplicationController
           @context.touch
           flash[:notice] = t('section_created', "Section successfully created!")
           format.html { redirect_to course_settings_url(@context) }
-          format.json { render :json => (api_request? ? section_json(@section, @current_user, session, []) : @section) }
+          format.json { render json: (api_request? ? section_json(@section, @current_user, session, []) : @section) }
         else
           flash[:error] = t('section_creation_failed', "Section creation failed")
           format.html { redirect_to course_settings_url(@context) }
-          format.json { render :json => @section.errors, :status => :bad_request }
+          format.json { render json: @section.errors, status: :bad_request }
         end
       end
     end
@@ -200,14 +200,14 @@ class SectionsController < ApplicationController
     @new_course = @section.root_account.all_courses.not_deleted.where(id: course_id).first if Api::ID_REGEX.match?(course_id)
     @new_course ||= @section.root_account.all_courses.not_deleted.where(sis_source_id: course_id).first if course_id.present?
     allowed = @new_course && @section.grants_right?(@current_user, session, :update) && @new_course.grants_right?(@current_user, session, :manage)
-    res = { :allowed => !!allowed }
+    res = { allowed: !!allowed }
     if allowed
       @account = @new_course.account
       res[:section] = @section.as_json(include_root: false)
       res[:course] = @new_course.as_json(include_root: false)
       res[:account] = @account.as_json(include_root: false)
     end
-    render :json => res
+    render json: res
   end
 
   # @API Cross-list a Section
@@ -222,7 +222,7 @@ class SectionsController < ApplicationController
       respond_to do |format|
         flash[:notice] = t('section_crosslisted', "Section successfully cross-listed!")
         format.html { redirect_to named_context_url(@new_course, :context_section_url, @section.id) }
-        format.json { render :json => (api_request? ? section_json(@section, @current_user, session, []) : @section) }
+        format.json { render json: (api_request? ? section_json(@section, @current_user, session, []) : @section) }
       end
     end
   end
@@ -233,14 +233,14 @@ class SectionsController < ApplicationController
   # @returns Section
   def uncrosslist
     @new_course = @section.nonxlist_course
-    return render(:json => { :message => "section is not cross-listed" }, :status => :bad_request) if @new_course.nil?
+    return render(json: { message: "section is not cross-listed" }, status: :bad_request) if @new_course.nil?
 
     if authorized_action(@section, @current_user, :update) && authorized_action(@new_course, @current_user, :manage)
       @section.uncrosslist(updating_user: @current_user)
       respond_to do |format|
         flash[:notice] = t('section_decrosslisted', "Section successfully de-cross-listed!")
         format.html { redirect_to named_context_url(@new_course, :context_section_url, @section.id) }
-        format.json { render :json => (api_request? ? section_json(@section, @current_user, session, []) : @section) }
+        format.json { render json: (api_request? ? section_json(@section, @current_user, session, []) : @section) }
       end
     end
   end
@@ -287,11 +287,11 @@ class SectionsController < ApplicationController
           @context.touch
           flash[:notice] = t('section_updated', "Section successfully updated!")
           format.html { redirect_to course_section_url(@context, @section) }
-          format.json { render :json => (api_request? ? section_json(@section, @current_user, session, []) : @section) }
+          format.json { render json: (api_request? ? section_json(@section, @current_user, session, []) : @section) }
         else
           flash[:error] = t('section_update_error', "Section update failed")
           format.html { redirect_to course_section_url(@context, @section) }
-          format.json { render :json => @section.errors, :status => :bad_request }
+          format.json { render json: @section.errors, status: :bad_request }
         end
       end
     end
@@ -316,16 +316,16 @@ class SectionsController < ApplicationController
       respond_to do |format|
         format.html do
           add_crumb(@section.name, named_context_url(@context, :context_section_url, @section))
-          @enrollments_count = @section.enrollments.not_fake.where(:workflow_state => 'active').count
-          @completed_enrollments_count = @section.enrollments.not_fake.where(:workflow_state => 'completed').count
-          @pending_enrollments_count = @section.enrollments.not_fake.where(:workflow_state => %w[invited pending]).count
-          @student_enrollments_count = @section.enrollments.not_fake.where(:type => 'StudentEnrollment').count
+          @enrollments_count = @section.enrollments.not_fake.where(workflow_state: 'active').count
+          @completed_enrollments_count = @section.enrollments.not_fake.where(workflow_state: 'completed').count
+          @pending_enrollments_count = @section.enrollments.not_fake.where(workflow_state: %w[invited pending]).count
+          @student_enrollments_count = @section.enrollments.not_fake.where(type: 'StudentEnrollment').count
           js_env
           if @context.grants_right?(@current_user, session, :manage)
             set_student_context_cards_js_env
           end
         end
-        format.json { render :json => section_json(@section, @current_user, session, Array(params[:include])) }
+        format.json { render json: section_json(@section, @current_user, session, Array(params[:include])) }
       end
     end
   end
@@ -342,11 +342,11 @@ class SectionsController < ApplicationController
           @context.touch
           flash[:notice] = t('section_deleted', "Course section successfully deleted!")
           format.html { redirect_to course_settings_url(@context) }
-          format.json { render :json => (api_request? ? section_json(@section, @current_user, session, []) : @section) }
+          format.json { render json: (api_request? ? section_json(@section, @current_user, session, []) : @section) }
         else
           flash[:error] = t('section_delete_not_allowed', "You can't delete a section that has enrollments")
           format.html { redirect_to course_section_url(@context, @section) }
-          format.json { render :json => (api_request? ? { :message => "You can't delete a section that has enrollments" } : @section), :status => :bad_request }
+          format.json { render json: (api_request? ? { message: "You can't delete a section that has enrollments" } : @section), status: :bad_request }
         end
       end
     end

@@ -547,10 +547,10 @@ describe Outcomes::ResultAnalytics do
 
   describe "handling scores for matching outcomes in results" do
     it "does not create false matches" do
-      o1 = LearningOutcome.new(id: 80, calculation_method: 'decaying_average', calculation_int: 65, rubric_criterion: { :mastery_points => 5.0, points_possible: 5 })
-      o2 = LearningOutcome.new(id: 81, calculation_method: 'decaying_average', calculation_int: 65, rubric_criterion: { :mastery_points => 5.0, points_possible: 5 })
-      o3 = LearningOutcome.new(id: 82, calculation_method: 'decaying_average', calculation_int: 65, rubric_criterion: { :mastery_points => 5.0, points_possible: 5 })
-      o4 = LearningOutcome.new(id: 83, calculation_method: 'decaying_average', calculation_int: 65, rubric_criterion: { :mastery_points => 5.0, points_possible: 5 })
+      o1 = LearningOutcome.new(id: 80, calculation_method: 'decaying_average', calculation_int: 65, rubric_criterion: { mastery_points: 5.0, points_possible: 5 })
+      o2 = LearningOutcome.new(id: 81, calculation_method: 'decaying_average', calculation_int: 65, rubric_criterion: { mastery_points: 5.0, points_possible: 5 })
+      o3 = LearningOutcome.new(id: 82, calculation_method: 'decaying_average', calculation_int: 65, rubric_criterion: { mastery_points: 5.0, points_possible: 5 })
+      o4 = LearningOutcome.new(id: 83, calculation_method: 'decaying_average', calculation_int: 65, rubric_criterion: { mastery_points: 5.0, points_possible: 5 })
       assignment_params = {
         artifact_type: "RubricAssessment",
         association_type: "Assignment"
@@ -574,9 +574,9 @@ describe Outcomes::ResultAnalytics do
     end
 
     it "properly aligns and weights decaying average results for matches" do
-      o1 = LearningOutcome.new(id: 80, calculation_method: 'decaying_average', calculation_int: 65, rubric_criterion: { :mastery_points => 5.0, points_possible: 5 })
-      o2 = LearningOutcome.new(id: 81, calculation_method: 'decaying_average', calculation_int: 65, rubric_criterion: { :mastery_points => 5.0, points_possible: 5 })
-      o3 = LearningOutcome.new(id: 82, calculation_method: 'decaying_average', calculation_int: 65, rubric_criterion: { :mastery_points => 5.0, points_possible: 5 })
+      o1 = LearningOutcome.new(id: 80, calculation_method: 'decaying_average', calculation_int: 65, rubric_criterion: { mastery_points: 5.0, points_possible: 5 })
+      o2 = LearningOutcome.new(id: 81, calculation_method: 'decaying_average', calculation_int: 65, rubric_criterion: { mastery_points: 5.0, points_possible: 5 })
+      o3 = LearningOutcome.new(id: 82, calculation_method: 'decaying_average', calculation_int: 65, rubric_criterion: { mastery_points: 5.0, points_possible: 5 })
 
       # res1 reflects two quizzes. each quiz contain matching outcome alignments
       # each question is equally weighted at 1/3 of total possible (3.0)
@@ -615,8 +615,8 @@ describe Outcomes::ResultAnalytics do
     end
 
     it "properly aligns and weights latest score results for matches" do
-      o1 = LearningOutcome.new(id: 80, calculation_method: 'latest', calculation_int: nil, rubric_criterion: { points_possible: 5, :mastery_points => 5.0 })
-      o2 = LearningOutcome.new(id: 81, calculation_method: 'latest', calculation_int: nil, rubric_criterion: { points_possible: 5, :mastery_points => 5.0 })
+      o1 = LearningOutcome.new(id: 80, calculation_method: 'latest', calculation_int: nil, rubric_criterion: { points_possible: 5, mastery_points: 5.0 })
+      o2 = LearningOutcome.new(id: 81, calculation_method: 'latest', calculation_int: nil, rubric_criterion: { points_possible: 5, mastery_points: 5.0 })
 
       # quiz 1 results should be 2.83 (0.6 * 0.333 * 5) + (0.7 * 0.333 * 5) + (0.4 * 0.333 * 5)
       # quiz 2 result should be 3.17 (0.5 * 0.333 * 5) + (0.8 * 0.333 * 5) + (0.6 * 0.333 * 5)

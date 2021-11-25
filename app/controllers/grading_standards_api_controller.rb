@@ -139,9 +139,9 @@ class GradingStandardsApiController < ApplicationController
       @standard.user = @current_user
       respond_to do |format|
         if @standard.save
-          format.json { render :json => grading_standard_json(@standard, @current_user, session) }
+          format.json { render json: grading_standard_json(@standard, @current_user, session) }
         else
-          format.json { render :json => @standard.errors, :status => :bad_request }
+          format.json { render json: @standard.errors, status: :bad_request }
         end
       end
     end

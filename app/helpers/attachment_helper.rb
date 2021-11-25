@@ -43,7 +43,7 @@ module AttachmentHelper
     context_name = url_helper_context_from_object(attachment.context)
     url_helper = "#{context_name}_file_inline_view_url"
     if respond_to?(url_helper)
-      attrs[:attachment_view_inline_ping_url] = send(url_helper, attachment.context, attachment.id, { :verifier => params[:verifier] })
+      attrs[:attachment_view_inline_ping_url] = send(url_helper, attachment.context, attachment.id, { verifier: params[:verifier] })
     end
     if attachment.pending_upload? || attachment.processing?
       attrs[:attachment_preview_processing] = true
@@ -92,7 +92,7 @@ module AttachmentHelper
                                                    verifier: verifier, download: !inline)
     elsif attachment.stored_locally?
       @headers = false if @files_domain
-      send_file(attachment.full_filename, :type => attachment.content_type_with_encoding, :disposition => (inline ? 'inline' : 'attachment'), :filename => attachment.display_name)
+      send_file(attachment.full_filename, type: attachment.content_type_with_encoding, disposition: (inline ? 'inline' : 'attachment'), filename: attachment.display_name)
     elsif can_proxy
       body = attachment.open.read
       add_csp_for_file if attachment.mime_class == 'html'

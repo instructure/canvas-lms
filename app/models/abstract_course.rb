@@ -21,7 +21,7 @@
 class AbstractCourse < ActiveRecord::Base
   include Workflow
 
-  belongs_to :root_account, :class_name => 'Account'
+  belongs_to :root_account, class_name: 'Account'
   belongs_to :account
   belongs_to :enrollment_term
   has_many :courses

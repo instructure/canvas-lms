@@ -289,7 +289,7 @@ describe Eportfolio do
     end
 
     it "creates an entry in the first category if one doesn't exist" do
-      @category = @portfolio.eportfolio_categories.create!(:name => "Hi")
+      @category = @portfolio.eportfolio_categories.create!(name: "Hi")
       expect(@category.eportfolio_entries).to be_empty
       @portfolio.ensure_defaults
       expect(@category.reload.eportfolio_entries).not_to be_empty

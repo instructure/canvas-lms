@@ -312,23 +312,23 @@ describe "admin settings tab" do
     end
 
     it "unclicks and then click on skype" do
-      check_box_verifier("#account_services_skype", { :allowed_services => :skype }, false)
-      check_box_verifier("#account_services_skype", { :allowed_services => :skype })
+      check_box_verifier("#account_services_skype", { allowed_services: :skype }, false)
+      check_box_verifier("#account_services_skype", { allowed_services: :skype })
     end
 
     it "unclicks and then click on delicious" do
-      check_box_verifier("#account_services_delicious", { :allowed_services => :delicious }, false)
-      check_box_verifier("#account_services_delicious", { :allowed_services => :delicious })
+      check_box_verifier("#account_services_delicious", { allowed_services: :delicious }, false)
+      check_box_verifier("#account_services_delicious", { allowed_services: :delicious })
     end
 
     it "unclicks and click on google docs previews" do
-      check_box_verifier("#account_services_google_docs_previews", { :allowed_services => :google_docs_previews }, false)
-      check_box_verifier("#account_services_google_docs_previews", { :allowed_services => :google_docs_previews })
+      check_box_verifier("#account_services_google_docs_previews", { allowed_services: :google_docs_previews }, false)
+      check_box_verifier("#account_services_google_docs_previews", { allowed_services: :google_docs_previews })
     end
 
     it "clicks on user avatars" do
-      check_box_verifier("#account_services_avatars", { :allowed_services => :avatars })
-      check_box_verifier("#account_services_avatars", { :allowed_services => :avatars }, false)
+      check_box_verifier("#account_services_avatars", { allowed_services: :avatars })
+      check_box_verifier("#account_services_avatars", { allowed_services: :avatars }, false)
     end
 
     it "disables all web services" do
@@ -340,17 +340,17 @@ describe "admin settings tab" do
     end
 
     it "enables and disable a plugin service (setting)" do
-      AccountServices.register_service(:myplugin, { :name => "My Plugin", :description => "", :expose_to_ui => :setting, :default => false })
+      AccountServices.register_service(:myplugin, { name: "My Plugin", description: "", expose_to_ui: :setting, default: false })
       get "/accounts/#{Account.default.id}/settings"
-      check_box_verifier("#account_services_myplugin", { :allowed_services => :myplugin })
-      check_box_verifier("#account_services_myplugin", { :allowed_services => :myplugin }, false)
+      check_box_verifier("#account_services_myplugin", { allowed_services: :myplugin })
+      check_box_verifier("#account_services_myplugin", { allowed_services: :myplugin }, false)
     end
 
     it "enables and disable a plugin service (service)" do
-      AccountServices.register_service(:myplugin, { :name => "My Plugin", :description => "", :expose_to_ui => :service, :default => false })
+      AccountServices.register_service(:myplugin, { name: "My Plugin", description: "", expose_to_ui: :service, default: false })
       get "/accounts/#{Account.default.id}/settings"
-      check_box_verifier("#account_services_myplugin", { :allowed_services => :myplugin })
-      check_box_verifier("#account_services_myplugin", { :allowed_services => :myplugin }, false)
+      check_box_verifier("#account_services_myplugin", { allowed_services: :myplugin })
+      check_box_verifier("#account_services_myplugin", { allowed_services: :myplugin }, false)
     end
   end
 
@@ -422,12 +422,12 @@ describe "admin settings tab" do
     end
 
     it "preserves the default help links if the account hasn't been configured with the new ui yet" do
-      help_link = { :text => "text", :subtext => "subtext", :url => "http://www.example.com/example", :available_to => %w[user student teacher] }
+      help_link = { text: "text", subtext: "subtext", url: "http://www.example.com/example", available_to: %w[user student teacher] }
       Account.default.settings[:custom_help_links] = [help_link]
       Account.default.save!
 
       help_links = Account.default.help_links
-      expect(help_links).to include(help_link.merge(:type => "custom"))
+      expect(help_links).to include(help_link.merge(type: "custom"))
       expect(help_links & Account.default.help_links_builder.instantiate_links(Account.default.help_links_builder.default_links)).to eq(
         Account.default.help_links_builder.instantiate_links(Account.default.help_links_builder.default_links)
       )
@@ -616,7 +616,7 @@ describe "admin settings tab" do
     end
 
     it "is locked and enabled for subaccounts of an account where setting is enabled" do
-      account_admin_user(:account => @account)
+      account_admin_user(account: @account)
       user_session(@admin)
       get "/accounts/#{@account.id}/settings"
       checkbox = "#account_settings_enable_as_k5_account_value"

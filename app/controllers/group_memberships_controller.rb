@@ -73,7 +73,7 @@
 #     }
 #
 class GroupMembershipsController < ApplicationController
-  before_action :find_group, :only => %i[index show create update destroy]
+  before_action :find_group, only: %i[index show create update destroy]
 
   include Api::V1::Group
 
@@ -102,11 +102,11 @@ class GroupMembershipsController < ApplicationController
 
       only_states = ALLOWED_MEMBERSHIP_FILTER
       only_states &= params[:filter_states] if params[:filter_states]
-      scope = scope.where(:workflow_state => only_states)
+      scope = scope.where(workflow_state: only_states)
       scope = scope.preload(group: :root_account)
 
       @memberships = Api.paginate(scope, self, memberships_route)
-      render :json => @memberships.map { |gm| group_membership_json(gm, @current_user, session) }
+      render json: @memberships.map { |gm| group_membership_json(gm, @current_user, session) }
     end
   end
 
@@ -127,7 +127,7 @@ class GroupMembershipsController < ApplicationController
   def show
     find_membership
     if authorized_action(@membership, @current_user, :read)
-      render :json => group_membership_json(@membership, @current_user, session)
+      render json: group_membership_json(@membership, @current_user, session)
     end
   end
 
@@ -149,14 +149,14 @@ class GroupMembershipsController < ApplicationController
   # @returns GroupMembership
   def create
     @user = api_find(User, params[:user_id])
-    if authorized_action(GroupMembership.new(:group => @group, :user => @user), @current_user, :create)
+    if authorized_action(GroupMembership.new(group: @group, user: @user), @current_user, :create)
       DueDateCacher.with_executing_user(@current_user) do
         @membership = @group.add_user(@user)
 
         if @membership.valid?
-          render :json => group_membership_json(@membership, @current_user, session, include: ['just_created'])
+          render json: group_membership_json(@membership, @current_user, session, include: ['just_created'])
         else
-          render :json => @membership.errors, :status => :bad_request
+          render json: @membership.errors, status: :bad_request
         end
       end
     end
@@ -193,9 +193,9 @@ class GroupMembershipsController < ApplicationController
 
       DueDateCacher.with_executing_user(@current_user) do
         if @membership.update(attrs)
-          render :json => group_membership_json(@membership, @current_user, session)
+          render json: group_membership_json(@membership, @current_user, session)
         else
-          render :json => @membership.errors, :status => :bad_request
+          render json: @membership.errors, status: :bad_request
         end
       end
     end
@@ -222,7 +222,7 @@ class GroupMembershipsController < ApplicationController
     if authorized_action(@membership, @current_user, :delete)
       @membership.workflow_state = 'deleted'
       @membership.save
-      render :json => { "ok" => true }
+      render json: { "ok" => true }
     end
   end
 
@@ -234,7 +234,7 @@ class GroupMembershipsController < ApplicationController
 
   def find_membership
     if (params[:membership_id] && params[:membership_id] == 'self') || (params[:user_id] && params[:user_id] == 'self')
-      @membership = @group.group_memberships.where(:user_id => @current_user).first!
+      @membership = @group.group_memberships.where(user_id: @current_user).first!
     elsif params[:membership_id]
       @membership = @group.group_memberships.find(params[:membership_id])
     else

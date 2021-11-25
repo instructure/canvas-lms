@@ -144,7 +144,7 @@ class ConferencesController < ApplicationController
   include Api::V1::Conferences
 
   before_action :require_context, except: :for_user
-  skip_before_action :load_user, :only => [:recording_ready]
+  skip_before_action :load_user, only: [:recording_ready]
 
   add_crumb(proc { t '#crumbs.conferences', "Conferences" }) do |c|
     if c.context.present?
@@ -155,7 +155,7 @@ class ConferencesController < ApplicationController
   before_action { |c| c.active_tab = "conferences" }
   before_action :require_config, except: [:for_user]
   before_action :reject_student_view_student
-  before_action :get_conference, :except => %i[index create for_user]
+  before_action :get_conference, except: %i[index create for_user]
 
   # @API List conferences
   # Retrieve the paginated list of conferences for this context
@@ -294,7 +294,7 @@ class ConferencesController < ApplicationController
           acc[section.id] = section.participants.map { |u| u.id.to_s }
           acc
         end
-        @users = User.where(:id => @context.current_enrollments.not_fake.active_by_date.where.not(:user_id => @current_user).select(:user_id))
+        @users = User.where(id: @context.current_enrollments.not_fake.active_by_date.where.not(user_id: @current_user).select(:user_id))
                      .order(User.sortable_name_order_by_clause).to_a
         @render_alternatives ||= @context.settings[:show_conference_alternatives].present?
       when Group
@@ -311,9 +311,9 @@ class ConferencesController < ApplicationController
       concluded_conferences: ui_conferences_json(@concluded_conferences, @context, @current_user, session),
       default_conference: default_conference_json(@context, @current_user, session),
       conference_type_details: conference_types_json(WebConference.conference_types(@context)),
-      users: @users.map { |u| { :id => u.id, :name => u.last_name_first } },
-      groups: @groups&.map { |g| { :id => g.id, :name => g.full_name } },
-      sections: @sections&.map { |s| { :id => s.id, :name => s.display_name } },
+      users: @users.map { |u| { id: u.id, name: u.last_name_first } },
+      groups: @groups&.map { |g| { id: g.id, name: g.full_name } },
+      sections: @sections&.map { |s| { id: s.id, name: s.display_name } },
       group_user_ids_map: @group_user_ids_map,
       section_user_ids_map: @section_user_ids_map,
       can_create_conferences: @context.grants_right?(@current_user, session, :create_conferences),
@@ -329,19 +329,19 @@ class ConferencesController < ApplicationController
       if params[:external_url]
         urls = @conference.external_url_for(params[:external_url], @current_user, params[:url_id])
         if request.xhr?
-          return render :json => urls
+          return render json: urls
         elsif urls.size == 1
           return redirect_to(urls.first[:url])
         end
       end
-      redirect_to course_conferences_url(@context, :anchor => "conference_#{@conference.id}")
+      redirect_to course_conferences_url(@context, anchor: "conference_#{@conference.id}")
     end
   end
 
   def create
     if authorized_action(@context.web_conferences.temp_record, @current_user, :create)
       @conference = @context.web_conferences.build(conference_params)
-      @conference.settings[:default_return_url] = named_context_url(@context, :context_url, :include_host => true)
+      @conference.settings[:default_return_url] = named_context_url(@context, :context_url, include_host: true)
       @conference.user = @current_user
       respond_to do |format|
         if @conference.save
@@ -350,12 +350,12 @@ class ConferencesController < ApplicationController
           @conference.save
           format.html { redirect_to named_context_url(@context, :context_conference_url, @conference.id) }
           format.json do
-            render :json => WebConference.find(@conference.id).as_json(:permissions => { :user => @current_user, :session => session },
-                                                                       :url => named_context_url(@context, :context_conference_url, @conference))
+            render json: WebConference.find(@conference.id).as_json(permissions: { user: @current_user, session: session },
+                                                                    url: named_context_url(@context, :context_conference_url, @conference))
           end
         else
           format.html { render :index }
-          format.json { render :json => @conference.errors, :status => :bad_request }
+          format.json { render json: @conference.errors, status: :bad_request }
         end
       end
     end
@@ -373,12 +373,12 @@ class ConferencesController < ApplicationController
           @conference.save
           format.html { redirect_to named_context_url(@context, :context_conference_url, @conference.id) }
           format.json do
-            render :json => @conference.as_json(:permissions => { :user => @current_user, :session => session },
-                                                :url => named_context_url(@context, :context_conference_url, @conference))
+            render json: @conference.as_json(permissions: { user: @current_user, session: session },
+                                             url: named_context_url(@context, :context_conference_url, @conference))
           end
         else
           format.html { render :edit }
-          format.json { render :json => @conference.errors, :status => :bad_request }
+          format.json { render json: @conference.errors, status: :bad_request }
         end
       end
     end
@@ -395,7 +395,7 @@ class ConferencesController < ApplicationController
         @conference.add_attendee(@current_user)
         @conference.restart if @conference.ended_at && @conference.grants_right?(@current_user, session, :initiate)
         log_asset_access(@conference, "conferences", "conferences", 'participate')
-        if (url = @conference.craft_url(@current_user, session, named_context_url(@context, :context_url, :include_host => true)))
+        if (url = @conference.craft_url(@current_user, session, named_context_url(@context, :context_url, include_host: true)))
           redirect_to url
         else
           flash[:error] = t(:general_error, "There was an error joining the conference")
@@ -430,14 +430,14 @@ class ConferencesController < ApplicationController
   def close
     if authorized_action(@conference, @current_user, :close)
       unless @conference.active?
-        return render :json => { :message => 'conference is not active', :status => :bad_request }
+        return render json: { message: 'conference is not active', status: :bad_request }
       end
 
       if @conference.close
-        render :json => @conference.as_json(:permissions => { :user => @current_user, :session => session },
-                                            :url => named_context_url(@context, :context_conference_url, @conference))
+        render json: @conference.as_json(permissions: { user: @current_user, session: session },
+                                         url: named_context_url(@context, :context_conference_url, @conference))
       else
-        render :json => @conference.errors
+        render json: @conference.errors
       end
     end
   end
@@ -461,7 +461,7 @@ class ConferencesController < ApplicationController
       end
       respond_to do |format|
         format.html { redirect_to named_context_url(@context, :context_conferences_url) }
-        format.json { render :json => @conference }
+        format.json { render json: @conference }
       end
     end
   end
@@ -471,7 +471,7 @@ class ConferencesController < ApplicationController
       @response = @conference.recording(params[:recording_id]) || {}
       respond_to do |format|
         format.html { redirect_to named_context_url(@context, :context_conferences_url) }
-        format.json { render :json => @response }
+        format.json { render json: @response }
       end
     end
   end
@@ -481,7 +481,7 @@ class ConferencesController < ApplicationController
       @response = @conference.delete_recording(params[:recording_id])
       respond_to do |format|
         format.html { redirect_to named_context_url(@context, :context_conferences_url) }
-        format.json { render :json => @response, :status => :ok }
+        format.json { render json: @response, status: :ok }
       end
     end
   end

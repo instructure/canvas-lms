@@ -38,7 +38,7 @@ describe "assignments" do
   context "as a teacher" do
     before(:once) do
       @teacher = user_with_pseudonym
-      course_with_teacher({ :user => @teacher, :active_course => true, :active_enrollment => true })
+      course_with_teacher({ user: @teacher, active_course: true, active_enrollment: true })
       @course.start_at = nil
       @course.save!
       @course.require_assignment_group
@@ -130,13 +130,13 @@ describe "assignments" do
     it "edits an assignment", priority: "1" do
       assignment_name = 'first test assignment'
       due_date = Time.now.utc + 2.days
-      group = @course.assignment_groups.create!(:name => "default")
-      second_group = @course.assignment_groups.create!(:name => "second default")
+      group = @course.assignment_groups.create!(name: "default")
+      second_group = @course.assignment_groups.create!(name: "second default")
       @assignment = @course.assignments.create!(
-        :name => assignment_name,
-        :due_at => due_date,
-        :assignment_group => group,
-        :unlock_at => due_date - 1.day
+        name: assignment_name,
+        due_at: due_date,
+        assignment_group: group,
+        unlock_at: due_date - 1.day
       )
 
       get "/courses/#{@course.id}/assignments/#{@assignment.id}/edit"
@@ -208,10 +208,10 @@ describe "assignments" do
       middle_number = '15'
       expected_date = (Time.now - 1.month).strftime("%b #{middle_number}")
       @assignment = @course.assignments.create!(
-        :title => "VDD Test Assignment",
-        :due_at => expected_date
+        title: "VDD Test Assignment",
+        due_at: expected_date
       )
-      section = @course.course_sections.create!(:name => "new section")
+      section = @course.course_sections.create!(name: "new section")
       @assignment.assignment_overrides.create! do |override|
         override.set = section
         override.title = "All"
@@ -265,7 +265,7 @@ describe "assignments" do
 
           get "/courses/#{@course.id}/assignments"
           group = @course.assignment_groups.first
-          AssignmentGroup.where(:id => group).update_all(:updated_at => 1.hour.ago)
+          AssignmentGroup.where(id: group).update_all(updated_at: 1.hour.ago)
           first_stamp = group.reload.updated_at.to_i
           f('.add_assignment').click
           wait_for_ajaximations
@@ -293,11 +293,11 @@ describe "assignments" do
         middle_number = '15'
         expected_date = (Time.now - 1.month).strftime("%b #{middle_number}")
         @assignment = @course.assignments.create!(
-          :title => "Test Assignment",
-          :points_possible => 10,
-          :due_at => expected_date
+          title: "Test Assignment",
+          points_possible: 10,
+          due_at: expected_date
         )
-        section = @course.course_sections.create!(:name => "new section")
+        section = @course.course_sections.create!(name: "new section")
         @assignment.assignment_overrides.create! do |override|
           override.set = section
           override.title = "All"
@@ -325,8 +325,8 @@ describe "assignments" do
     it "validates that a group category is selected", priority: "1" do
       assignment_name = 'first test assignment'
       @assignment = @course.assignments.create({
-                                                 :name => assignment_name,
-                                                 :assignment_group => @course.assignment_groups.create!(:name => "default")
+                                                 name: assignment_name,
+                                                 assignment_group: @course.assignment_groups.create!(name: "default")
                                                })
 
       get "/courses/#{@course.id}/assignments/#{@assignment.id}/edit"
@@ -341,8 +341,8 @@ describe "assignments" do
     it "shows assignment details, un-editable, for concluded teachers", priority: "2" do
       @teacher.enrollments.first.conclude
       @assignment = @course.assignments.create({
-                                                 :name => "assignment after concluded",
-                                                 :assignment_group => @course.assignment_groups.create!(:name => "default")
+                                                 name: "assignment after concluded",
+                                                 assignment_group: @course.assignment_groups.create!(name: "default")
                                                })
 
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
@@ -373,9 +373,9 @@ describe "assignments" do
       before(:once) do
         ag = @course.assignment_groups.first
         @assignment1, @assignment2 = [1, 2].map do |i|
-          gc = GroupCategory.create(:name => "gc#{i}", :context => @course)
-          group = @course.groups.create!(:group_category => gc)
-          group.users << student_in_course(:course => @course, :active_all => true).user
+          gc = GroupCategory.create(name: "gc#{i}", context: @course)
+          group = @course.groups.create!(group_category: gc)
+          group.users << student_in_course(course: @course, active_all: true).user
           ag.assignments.create!(
             context: @course,
             name: "assignment#{i}",
@@ -488,7 +488,7 @@ describe "assignments" do
     context "frozen assignment" do
       before do
         stub_freezer_plugin(Assignment::FREEZABLE_ATTRIBUTES.index_with { "true" })
-        default_group = @course.assignment_groups.create!(:name => "default")
+        default_group = @course.assignment_groups.create!(name: "default")
         @frozen_assign = frozen_assignment(default_group)
       end
 
@@ -524,7 +524,7 @@ describe "assignments" do
     it "deletes assignments", priority: "1" do
       skip_if_safari(:alert)
       ag = @course.assignment_groups.first
-      as = @course.assignments.create({ :assignment_group => ag })
+      as = @course.assignments.create({ assignment_group: ag })
 
       get "/courses/#{@course.id}/assignments"
       wait_for_ajaximations
@@ -545,7 +545,7 @@ describe "assignments" do
       ag = @course.assignment_groups.first
       as = []
       4.times do |i|
-        as << @course.assignments.create!(:name => "assignment_#{i}", :assignment_group => ag)
+        as << @course.assignments.create!(name: "assignment_#{i}", assignment_group: ag)
       end
       expect(as.collect(&:position)).to eq [1, 2, 3, 4]
 
@@ -569,7 +569,7 @@ describe "assignments" do
         ag = @course.assignment_groups.first
         as = []
         4.times do |i|
-          as << @course.assignments.create!(:name => "assignment_#{i}", :assignment_group => ag)
+          as << @course.assignments.create!(name: "assignment_#{i}", assignment_group: ag)
         end
         expect(as.collect(&:position)).to eq [1, 2, 3, 4]
 
@@ -587,13 +587,13 @@ describe "assignments" do
 
     context "with modules" do
       before do
-        @module = @course.context_modules.create!(:name => "module 1")
-        @assignment = @course.assignments.create!(:name => 'assignment 1')
-        @a2 = @course.assignments.create!(:name => 'assignment 2')
-        @a3 = @course.assignments.create!(:name => 'assignment 3')
-        @module.add_item :type => 'assignment', :id => @assignment.id
-        @module.add_item :type => 'assignment', :id => @a2.id
-        @module.add_item :type => 'assignment', :id => @a3.id
+        @module = @course.context_modules.create!(name: "module 1")
+        @assignment = @course.assignments.create!(name: 'assignment 1')
+        @a2 = @course.assignments.create!(name: 'assignment 2')
+        @a3 = @course.assignments.create!(name: 'assignment 3')
+        @module.add_item type: 'assignment', id: @assignment.id
+        @module.add_item type: 'assignment', id: @a2.id
+        @module.add_item type: 'assignment', id: @a3.id
       end
 
       it "shows the new modules sequence footer", priority: "2" do
@@ -656,7 +656,7 @@ describe "assignments" do
     context 'publishing' do
       before do
         ag = @course.assignment_groups.first
-        @assignment = ag.assignments.create! :context => @course, :title => 'to publish'
+        @assignment = ag.assignments.create! context: @course, title: 'to publish'
         @assignment.unpublish
       end
 
@@ -709,7 +709,7 @@ describe "assignments" do
 
       context 'with overrides' do
         before do
-          @course.course_sections.create! :name => "HI"
+          @course.course_sections.create! name: "HI"
           @assignment.assignment_overrides.create! do |override|
             override.set = @course.course_sections.first
             override.due_at = 1.day.ago
@@ -796,7 +796,7 @@ describe "assignments" do
     include_context "public course as a logged out user"
 
     it "displays assignments", priority: "1" do
-      public_course.assignments.create!(:name => 'assignment 1')
+      public_course.assignments.create!(name: 'assignment 1')
       get "/courses/#{public_course.id}/assignments"
       validate_selector_displayed('.assignment.search_show')
     end
@@ -833,11 +833,11 @@ describe "assignments" do
     before do
       account_model
       @account.set_feature_flag! 'post_grades', 'on'
-      course_with_teacher_logged_in(:active_all => true, :account => @account)
+      course_with_teacher_logged_in(active_all: true, account: @account)
     end
 
     it "defaults to post grades if account setting is enabled", priority: "2" do
-      @account.settings[:sis_default_grade_export] = { :locked => false, :value => true }
+      @account.settings[:sis_default_grade_export] = { locked: false, value: true }
       @account.save!
 
       get "/courses/#{@course.id}/assignments/new"

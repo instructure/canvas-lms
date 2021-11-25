@@ -119,21 +119,21 @@ describe "Groups API", type: :request do
     @member = user_with_pseudonym
 
     @communities = GroupCategory.communities_for(Account.default)
-    @community = group_model(:name => "Algebra Teachers", :group_category => @communities, :context => Account.default)
+    @community = group_model(name: "Algebra Teachers", group_category: @communities, context: Account.default)
     @community.add_user(@member, 'accepted', false)
     @community.add_user(@moderator, 'accepted', true)
     @community_path = "/api/v1/groups/#{@community.id}"
-    @category_path_options = { :controller => "groups", :format => "json" }
+    @category_path_options = { controller: "groups", format: "json" }
     @context = @community
   end
 
   it "allows listing all a user's groups" do
-    course_with_student(:user => @member)
-    @group = @course.groups.create!(:name => "My Group")
+    course_with_student(user: @member)
+    @group = @course.groups.create!(name: "My Group")
     @group.add_user(@member, 'accepted', true)
 
     @user = @member
-    json = api_call(:get, "/api/v1/users/self/groups", @category_path_options.merge(:action => "index"))
+    json = api_call(:get, "/api/v1/users/self/groups", @category_path_options.merge(action: "index"))
     expect(json).to eq [group_json(@community), group_json(@group)]
     links = response.headers['Link'].split(",")
     expect(links.all? { |l| l.include?('api/v1/users/self/groups') }).to be_truthy
@@ -141,8 +141,8 @@ describe "Groups API", type: :request do
 
   describe "show SIS fields based on manage_sis permissions" do
     before :once do
-      course_with_student(:user => @member)
-      @group = @course.groups.create!(:name => "My Group")
+      course_with_student(user: @member)
+      @group = @course.groups.create!(name: "My Group")
       @group.add_user(@member, 'accepted', true)
       @group.reload
       account = @course.account
@@ -166,45 +166,45 @@ describe "Groups API", type: :request do
   end
 
   it "indicates if the context is deleted" do
-    course_with_student(:user => @member)
-    @group = @course.groups.create!(:name => "My Group")
+    course_with_student(user: @member)
+    @group = @course.groups.create!(name: "My Group")
     @group.add_user(@member, 'accepted', true)
     @course.destroy!
     @group.reload
 
     @user = @member
-    json = api_call(:get, "/api/v1/users/self/groups", @category_path_options.merge(:action => "index"))
+    json = api_call(:get, "/api/v1/users/self/groups", @category_path_options.merge(action: "index"))
     expect(json.detect { |g| g['id'] == @group.id }['concluded']).to be_truthy
   end
 
   it "allows listing all a user's group in a given context_type" do
     @account = Account.default
-    course_with_student(:user => @member)
-    @group = @course.groups.create!(:name => "My Group")
+    course_with_student(user: @member)
+    @group = @course.groups.create!(name: "My Group")
     @group.add_user(@member, 'accepted', true)
 
     @user = @member
-    json = api_call(:get, "/api/v1/users/self/groups?context_type=Course", @category_path_options.merge(:action => "index", :context_type => 'Course'))
+    json = api_call(:get, "/api/v1/users/self/groups?context_type=Course", @category_path_options.merge(action: "index", context_type: 'Course'))
     expect(json).to eq [group_json(@group)]
 
-    json = api_call(:get, "/api/v1/users/self/groups?context_type=Account", @category_path_options.merge(:action => "index", :context_type => 'Account'))
+    json = api_call(:get, "/api/v1/users/self/groups?context_type=Account", @category_path_options.merge(action: "index", context_type: 'Account'))
     expect(json).to eq [group_json(@community)]
   end
 
   it "allows listing all of a course's groups" do
-    course_with_teacher(:active_all => true)
-    @group = @course.groups.create!(:name => 'New group')
+    course_with_teacher(active_all: true)
+    @group = @course.groups.create!(name: 'New group')
 
     json = api_call(:get, "/api/v1/courses/#{@course.to_param}/groups.json",
-                    @category_path_options.merge(:action => 'context_index',
-                                                 :course_id => @course.to_param))
+                    @category_path_options.merge(action: 'context_index',
+                                                 course_id: @course.to_param))
     expect(json.count).to eq 1
     expect(json.first['id']).to eq @group.id
   end
 
   it "does not show inactive users to students" do
-    course_with_teacher(:active_all => true)
-    @group = @course.groups.create!(:name => 'New group')
+    course_with_teacher(active_all: true)
+    @group = @course.groups.create!(name: 'New group')
 
     inactive_user = user_factory
     enrollment = @course.enroll_student(inactive_user)
@@ -215,23 +215,23 @@ describe "Groups API", type: :request do
     @group.add_user(@user, 'accepted')
 
     json = api_call(:get, "/api/v1/courses/#{@course.to_param}/groups.json?include[]=users",
-                    @category_path_options.merge(:action => 'context_index',
-                                                 :course_id => @course.to_param, :include => ['users']))
+                    @category_path_options.merge(action: 'context_index',
+                                                 course_id: @course.to_param, include: ['users']))
 
     expect(json.first['users'].map { |u| u['id'] }).to eq [@user.id]
 
     enrollment.reactivate
 
     json = api_call(:get, "/api/v1/courses/#{@course.to_param}/groups.json?include[]=users",
-                    @category_path_options.merge(:action => 'context_index',
-                                                 :course_id => @course.to_param, :include => ['users']))
+                    @category_path_options.merge(action: 'context_index',
+                                                 course_id: @course.to_param, include: ['users']))
 
     expect(json.first['users'].map { |u| u['id'] }).to match_array [@user.id, inactive_user.id]
   end
 
   it "shows inactive users to admins" do
-    course_with_teacher(:active_all => true)
-    @group = @course.groups.create!(:name => 'New group')
+    course_with_teacher(active_all: true)
+    @group = @course.groups.create!(name: 'New group')
 
     inactive_user = user_factory
     enrollment = @course.enroll_student(inactive_user)
@@ -241,8 +241,8 @@ describe "Groups API", type: :request do
     @user = @teacher
 
     json = api_call(:get, "/api/v1/courses/#{@course.to_param}/groups.json?include[]=users",
-                    @category_path_options.merge(:action => 'context_index',
-                                                 :course_id => @course.to_param, :include => ['users']))
+                    @category_path_options.merge(action: 'context_index',
+                                                 course_id: @course.to_param, include: ['users']))
 
     expect(json.first['users'].map { |u| u['id'] }).to eq [inactive_user.id]
   end
@@ -254,13 +254,13 @@ describe "Groups API", type: :request do
     @community.sis_source_id = 'sis'
     @community.sis_batch_id = sis_batch.id
     @community.save!
-    account_admin_user(:account => @account)
+    account_admin_user(account: @account)
 
     json = api_call(:get, "/api/v1/accounts/#{@account.to_param}/groups.json",
-                    @category_path_options.merge(:action => 'context_index',
-                                                 :account_id => @account.to_param))
+                    @category_path_options.merge(action: 'context_index',
+                                                 account_id: @account.to_param))
     expect(json.count).to eq 1
-    expect(json.first).to eq group_json(@community, :is_admin => true)
+    expect(json.first).to eq group_json(@community, is_admin: true)
 
     expect(json.first['id']).to eq @community.id
     expect(json.first['sis_group_id']).to eq 'sis'
@@ -270,63 +270,63 @@ describe "Groups API", type: :request do
   it "does not allow non-admins to view an account's groups" do
     @account = Account.default
     raw_api_call(:get, "/api/v1/accounts/#{@account.to_param}/groups.json",
-                 @category_path_options.merge(:action => 'context_index',
-                                              :account_id => @account.to_param))
+                 @category_path_options.merge(action: 'context_index',
+                                              account_id: @account.to_param))
     expect(response.code).to eq '401'
   end
 
   it "shows students all groups" do
-    course_with_student(:active_all => true)
-    @group_1 = @course.groups.create!(:name => 'Group 1')
-    @group_2 = @course.groups.create!(:name => 'Group 2')
+    course_with_student(active_all: true)
+    @group_1 = @course.groups.create!(name: 'Group 1')
+    @group_2 = @course.groups.create!(name: 'Group 2')
     @group_1.add_user(@user, 'accepted', false)
 
     json = api_call(:get, "/api/v1/courses/#{@course.to_param}/groups.json",
-                    @category_path_options.merge(:action => 'context_index',
-                                                 :course_id => @course.to_param))
+                    @category_path_options.merge(action: 'context_index',
+                                                 course_id: @course.to_param))
     expect(json.count).to eq 2
     expect(json.first['id']).to eq @group_1.id
   end
 
   it "allows a member to retrieve the group" do
     @user = @member
-    json = api_call(:get, @community_path, @category_path_options.merge(:group_id => @community.to_param, :action => "show"))
+    json = api_call(:get, @community_path, @category_path_options.merge(group_id: @community.to_param, action: "show"))
     expect(json).to eq group_json(@community)
   end
 
   it "allows a member to retrieve a favorite group" do
     @user = @member
     json = api_call(:get, "#{@community_path}.json?include[]=favorites",
-                    @category_path_options.merge(:group_id => @community.to_param, :action => "show",
-                                                 :include => ["favorites"]))
+                    @category_path_options.merge(group_id: @community.to_param, action: "show",
+                                                 include: ["favorites"]))
     expect(json).to have_key("is_favorite")
   end
 
   it "includes the group category" do
     @user = @member
-    json = api_call(:get, "#{@community_path}.json?include[]=group_category", @category_path_options.merge(:group_id => @community.to_param, :action => "show", :include => ["group_category"]))
+    json = api_call(:get, "#{@community_path}.json?include[]=group_category", @category_path_options.merge(group_id: @community.to_param, action: "show", include: ["group_category"]))
     expect(json).to have_key("group_category")
   end
 
   it 'includes permissions' do
     # Make sure it only returns permissions when asked
-    json = api_call(:get, @community_path, @category_path_options.merge(:group_id => @community.to_param, :action => "show", :format => 'json'))
+    json = api_call(:get, @community_path, @category_path_options.merge(group_id: @community.to_param, action: "show", format: 'json'))
     expect(json).not_to have_key("permissions")
 
     # When its asked to return permissions make sure they are there
-    json = api_call(:get, "#{@community_path}.json?include[]=permissions", @category_path_options.merge(:group_id => @community.to_param, :action => "show", :format => 'json', :include => ["permissions"]))
+    json = api_call(:get, "#{@community_path}.json?include[]=permissions", @category_path_options.merge(group_id: @community.to_param, action: "show", format: 'json', include: ["permissions"]))
     expect(json).to have_key("permissions")
   end
 
   it 'includes permission create_discussion_topic' do
-    json = api_call(:get, "#{@community_path}.json?include[]=permissions", @category_path_options.merge(:group_id => @community.to_param, :action => "show", :format => 'json', :include => ["permissions"]))
+    json = api_call(:get, "#{@community_path}.json?include[]=permissions", @category_path_options.merge(group_id: @community.to_param, action: "show", format: 'json', include: ["permissions"]))
 
     expect(json).to have_key("permissions")
     expect(json["permissions"]).to have_key("create_discussion_topic")
   end
 
   it 'includes permission create_student_announcements' do
-    json = api_call(:get, "#{@community_path}.json?include[]=permissions", @category_path_options.merge(:group_id => @community.to_param, :action => "show", :format => 'json', :include => ["permissions"]))
+    json = api_call(:get, "#{@community_path}.json?include[]=permissions", @category_path_options.merge(group_id: @community.to_param, action: "show", format: 'json', include: ["permissions"]))
 
     expect(json).to have_key("permissions")
     expect(json["permissions"]).to have_key("create_announcement")
@@ -334,20 +334,20 @@ describe "Groups API", type: :request do
   end
 
   it 'includes tabs if requested' do
-    json = api_call(:get, "#{@community_path}.json?include[]=tabs", @category_path_options.merge(:group_id => @community.to_param, :action => "show", :format => 'json', :include => ["tabs"]))
+    json = api_call(:get, "#{@community_path}.json?include[]=tabs", @category_path_options.merge(group_id: @community.to_param, action: "show", format: 'json', include: ["tabs"]))
     expect(json).to have_key 'tabs'
     expect(json['tabs'].map { |tab| tab['id'] }).to eq(%w[home announcements pages people discussions files])
   end
 
   it "allows searching by SIS ID" do
     @community.update_attribute(:sis_source_id, 'abc')
-    json = api_call(:get, "/api/v1/groups/sis_group_id:abc", @category_path_options.merge(:group_id => 'sis_group_id:abc', :action => "show"))
+    json = api_call(:get, "/api/v1/groups/sis_group_id:abc", @category_path_options.merge(group_id: 'sis_group_id:abc', action: "show"))
     expect(json).to eq group_json(@community)
   end
 
   it "allows anyone to create a new community" do
     user_model
-    json = api_call(:post, "/api/v1/groups", @category_path_options.merge(:action => "create"), {
+    json = api_call(:post, "/api/v1/groups", @category_path_options.merge(action: "create"), {
                       'name' => "History Teachers",
                       'description' => "Because history is awesome!",
                       'is_public' => false,
@@ -355,7 +355,7 @@ describe "Groups API", type: :request do
                     })
     @community2 = Group.order(:id).last
     expect(@community2.group_category).to be_communities
-    expect(json).to eq group_json(@community2, :include_users => true, :include_permissions => true, :include_category => true)
+    expect(json).to eq group_json(@community2, include_users: true, include_permissions: true, include_category: true)
   end
 
   it "allows a teacher to create a group in a course" do
@@ -364,7 +364,7 @@ describe "Groups API", type: :request do
     project_groups = @course.group_categories.build
     project_groups.name = "Course Project Groups"
     project_groups.save
-    api_call(:post, "/api/v1/group_categories/#{project_groups.id}/groups", @category_path_options.merge(:action => "create", :group_category_id => project_groups.to_param))
+    api_call(:post, "/api/v1/group_categories/#{project_groups.id}/groups", @category_path_options.merge(action: "create", group_category_id: project_groups.to_param))
     expect(project_groups.groups.active.count).to eq 1
   end
 
@@ -374,17 +374,17 @@ describe "Groups API", type: :request do
     project_groups = @course.group_categories.build
     project_groups.name = "Course Project Groups"
     project_groups.save
-    raw_api_call(:post, "/api/v1/group_categories/#{project_groups.id}/groups", @category_path_options.merge(:action => "create", :group_category_id => project_groups.to_param))
+    raw_api_call(:post, "/api/v1/group_categories/#{project_groups.id}/groups", @category_path_options.merge(action: "create", group_category_id: project_groups.to_param))
     expect(response.code).to eq '401'
   end
 
   it "allows an admin to create a group in a account" do
     @account = Account.default
-    account_admin_user(:account => @account)
+    account_admin_user(account: @account)
     project_groups = @account.group_categories.build
     project_groups.name = "test group category"
     project_groups.save
-    api_call(:post, "/api/v1/group_categories/#{project_groups.id}/groups", @category_path_options.merge(:action => "create", :group_category_id => project_groups.to_param))
+    api_call(:post, "/api/v1/group_categories/#{project_groups.id}/groups", @category_path_options.merge(action: "create", group_category_id: project_groups.to_param))
     expect(project_groups.groups.active.count).to eq 1
   end
 
@@ -413,7 +413,7 @@ describe "Groups API", type: :request do
     @account = Account.default
     account_admin_user(account: @account)
     project_groups = @account.group_categories.create(name: 'gc1', sis_source_id: 'gcsis1')
-    project_groups.groups.create!(:sis_source_id => "gsis1", :context => @account)
+    project_groups.groups.create!(sis_source_id: "gsis1", context: @account)
     api_call(:post, "/api/v1/group_categories/sis_group_category_id:gcsis1/groups",
              @category_path_options.merge(action: :create,
                                           group_category_id: 'sis_group_category_id:gcsis1',
@@ -425,12 +425,12 @@ describe "Groups API", type: :request do
     project_groups = @account.group_categories.build
     project_groups.name = "test group category"
     project_groups.save
-    raw_api_call(:post, "/api/v1/group_categories/#{project_groups.id}/groups", @category_path_options.merge(:action => "create", :group_category_id => project_groups.to_param))
+    raw_api_call(:post, "/api/v1/group_categories/#{project_groups.id}/groups", @category_path_options.merge(action: "create", group_category_id: project_groups.to_param))
     expect(response.code).to eq '401'
   end
 
   it "allows a moderator to edit a group" do
-    avatar = attachment_model(:uploaded_data => stub_png_data, :content_type => 'image/png', :context => @community)
+    avatar = attachment_model(uploaded_data: stub_png_data, content_type: 'image/png', context: @community)
     @user = @moderator
     new_attrs = {
       'name' => "Algebra II Teachers",
@@ -439,14 +439,14 @@ describe "Groups API", type: :request do
       'join_level' => "parent_context_auto_join",
       'avatar_id' => avatar.id,
     }
-    json = api_call(:put, @community_path, @category_path_options.merge(:group_id => @community.to_param, :action => "update"), new_attrs)
+    json = api_call(:put, @community_path, @category_path_options.merge(group_id: @community.to_param, action: "update"), new_attrs)
     @community.reload
     expect(@community.name).to eq "Algebra II Teachers"
     expect(@community.description).to eq "Math rocks!"
     expect(@community.is_public).to eq true
     expect(@community.join_level).to eq "parent_context_auto_join"
     expect(@community.avatar_attachment).to eq avatar
-    expect(json).to eq group_json(@community, :include_users => true, :include_permissions => true, :include_category => true)
+    expect(json).to eq group_json(@community, include_users: true, include_permissions: true, include_category: true)
   end
 
   it "only allows updating a group from private to public" do
@@ -454,14 +454,14 @@ describe "Groups API", type: :request do
     new_attrs = {
       'is_public' => true,
     }
-    api_call(:put, @community_path, @category_path_options.merge(:group_id => @community.to_param, :action => "update"), new_attrs)
+    api_call(:put, @community_path, @category_path_options.merge(group_id: @community.to_param, action: "update"), new_attrs)
     @community.reload
     expect(@community.is_public).to eq true
 
     new_attrs = {
       'is_public' => false,
     }
-    api_call(:put, @community_path, @category_path_options.merge(:group_id => @community.to_param, :action => "update"), new_attrs, {}, :expected_status => 400)
+    api_call(:put, @community_path, @category_path_options.merge(group_id: @community.to_param, action: "update"), new_attrs, {}, expected_status: 400)
     @community.reload
     expect(@community.is_public).to eq true
   end
@@ -473,18 +473,18 @@ describe "Groups API", type: :request do
       'is_public' => true,
       'join_level' => "parent_context_auto_join",
     }
-    api_call(:put, @community_path, @category_path_options.merge(:group_id => @community.to_param, :action => "update"), new_attrs, {}, :expected_status => 401)
+    api_call(:put, @community_path, @category_path_options.merge(group_id: @community.to_param, action: "update"), new_attrs, {}, expected_status: 401)
   end
 
   it "allows a moderator to delete a group" do
     @user = @moderator
-    api_call(:delete, @community_path, @category_path_options.merge(:group_id => @community.to_param, :action => "destroy"))
+    api_call(:delete, @community_path, @category_path_options.merge(group_id: @community.to_param, action: "destroy"))
     expect(@community.reload.workflow_state).to eq 'deleted'
   end
 
   it "does not allow a member to delete a group" do
     @user = @member
-    api_call(:delete, @community_path, @category_path_options.merge(:group_id => @community.to_param, :action => "destroy"), {}, {}, :expected_status => 401)
+    api_call(:delete, @community_path, @category_path_options.merge(group_id: @community.to_param, action: "destroy"), {}, {}, expected_status: 401)
   end
 
   describe "quota" do
@@ -495,40 +495,40 @@ describe "Groups API", type: :request do
 
     context "with manage_storage_quotas permission" do
       before :once do
-        account_admin_user :account => @account
+        account_admin_user account: @account
       end
 
       it "sets the quota on create" do
         json = api_call(:post, '/api/v1/groups?name=TehGroup&storage_quota_mb=22',
-                        { :controller => "groups", :action => 'create', :format => "json", :name => 'TehGroup', :storage_quota_mb => '22' })
+                        { controller: "groups", action: 'create', format: "json", name: 'TehGroup', storage_quota_mb: '22' })
         group = @account.groups.find(json['id'])
         expect(group.storage_quota_mb).to eq 22
       end
 
       it "sets the quota on update" do
-        group = @account.groups.create! :name => 'TehGroup'
+        group = @account.groups.create! name: 'TehGroup'
         api_call(:put, "/api/v1/groups/#{group.id}?storage_quota_mb=22",
-                 { :controller => 'groups', :action => 'update', :group_id => group.id.to_s, :format => 'json', :storage_quota_mb => '22' })
+                 { controller: 'groups', action: 'update', group_id: group.id.to_s, format: 'json', storage_quota_mb: '22' })
         expect(group.reload.storage_quota_mb).to eq 22
       end
     end
 
     context "without manage_storage_quotas permission" do
       before :once do
-        account_admin_user_with_role_changes(:role_changes => { :manage_storage_quotas => false })
+        account_admin_user_with_role_changes(role_changes: { manage_storage_quotas: false })
       end
 
       it "ignores the quota on create" do
         json = api_call(:post, '/api/v1/groups?storage_quota_mb=22',
-                        { :controller => 'groups', :action => 'create', :format => 'json', :storage_quota_mb => '22' })
+                        { controller: 'groups', action: 'create', format: 'json', storage_quota_mb: '22' })
         group = @account.groups.find(json['id'])
         expect(group.storage_quota_mb).to eq 11
       end
 
       it "ignores the quota on update" do
-        group = @account.groups.create! :name => 'TehGroup'
+        group = @account.groups.create! name: 'TehGroup'
         api_call(:put, "/api/v1/groups/#{group.id}?storage_quota_mb=22&name=TheGruop",
-                 { :controller => 'groups', :action => 'update', :format => 'json', :group_id => group.id.to_s, :name => 'TheGruop', :storage_quota_mb => '22' })
+                 { controller: 'groups', action: 'update', format: 'json', group_id: group.id.to_s, name: 'TheGruop', storage_quota_mb: '22' })
         group.reload
         expect(group.name).to eq 'TheGruop'
         expect(group.storage_quota_mb).to eq 11
@@ -540,12 +540,12 @@ describe "Groups API", type: :request do
     before do
       @memberships_path = "#{@community_path}/memberships"
       @alternate_memberships_path = "#{@community_path}/users"
-      @memberships_path_options = { :controller => "group_memberships", :format => "json" }
+      @memberships_path_options = { controller: "group_memberships", format: "json" }
     end
 
     it "allows listing the group memberships" do
       @user = @moderator
-      json = api_call(:get, @memberships_path, @memberships_path_options.merge(:group_id => @community.to_param, :action => "index"))
+      json = api_call(:get, @memberships_path, @memberships_path_options.merge(group_id: @community.to_param, action: "index"))
       expect(json.sort_by { |a| a['id'] }).to eq [membership_json(@community.has_member?(@member)), membership_json(@community.has_member?(@moderator))]
     end
 
@@ -553,52 +553,52 @@ describe "Groups API", type: :request do
       user_model
       @community.add_user(@user, 'invited')
       @user = @moderator
-      json = api_call(:get, @memberships_path, @memberships_path_options.merge(:group_id => @community.to_param, :action => "index"), {
-                        :filter_states => ["invited"]
+      json = api_call(:get, @memberships_path, @memberships_path_options.merge(group_id: @community.to_param, action: "index"), {
+                        filter_states: ["invited"]
                       })
       expect(json.count).to eq 1
-      expect(json.first).to eq membership_json(@community.group_memberships.where(:workflow_state => 'invited').first)
+      expect(json.first).to eq membership_json(@community.group_memberships.where(workflow_state: 'invited').first)
     end
 
     context "with a membership" do
       before do
         @membership = @community.has_member?(@member)
-        @membership_path_options = @memberships_path_options.merge(:group_id => @community.to_param, :membership_id => @membership.to_param)
-        @alternate_membership_path_options = @memberships_path_options.merge(:group_id => @community.to_param, :user_id => @member.to_param)
+        @membership_path_options = @memberships_path_options.merge(group_id: @community.to_param, membership_id: @membership.to_param)
+        @alternate_membership_path_options = @memberships_path_options.merge(group_id: @community.to_param, user_id: @member.to_param)
       end
 
       it "allows a member to read their membership by membership id" do
         @user = @member
-        json = api_call(:get, "#{@memberships_path}/#{@membership.id}", @membership_path_options.merge(:action => :show))
+        json = api_call(:get, "#{@memberships_path}/#{@membership.id}", @membership_path_options.merge(action: :show))
         expect(json).to eq membership_json(@membership)
       end
 
       it "allows a moderator to read a membership by membership id" do
         @user = @moderator
-        json = api_call(:get, "#{@memberships_path}/#{@membership.id}", @membership_path_options.merge(:action => :show))
+        json = api_call(:get, "#{@memberships_path}/#{@membership.id}", @membership_path_options.merge(action: :show))
         expect(json).to eq membership_json(@membership)
       end
 
       it "does not allow an unrelated user to read a membership by membership id" do
         @user = user_model
-        api_call(:get, "#{@memberships_path}/#{@membership.id}", @membership_path_options.merge(:action => :show), {}, {}, :expected_status => 401)
+        api_call(:get, "#{@memberships_path}/#{@membership.id}", @membership_path_options.merge(action: :show), {}, {}, expected_status: 401)
       end
 
       it "allows a member to read their membership by user id" do
         @user = @member
-        json = api_call(:get, "#{@alternate_memberships_path}/#{@member.id}", @alternate_membership_path_options.merge(:action => :show))
+        json = api_call(:get, "#{@alternate_memberships_path}/#{@member.id}", @alternate_membership_path_options.merge(action: :show))
         expect(json).to eq membership_json(@membership)
       end
 
       it "allows a moderator to read a membership by user id" do
         @user = @moderator
-        json = api_call(:get, "#{@alternate_memberships_path}/#{@member.id}", @alternate_membership_path_options.merge(:action => :show))
+        json = api_call(:get, "#{@alternate_memberships_path}/#{@member.id}", @alternate_membership_path_options.merge(action: :show))
         expect(json).to eq membership_json(@membership)
       end
 
       it "does not allow an unrelated user to read a membership by user id" do
         @user = user_model
-        api_call(:get, "#{@alternate_memberships_path}/#{@member.id}", @alternate_membership_path_options.merge(:action => :show), {}, {}, :expected_status => 401)
+        api_call(:get, "#{@alternate_memberships_path}/#{@member.id}", @alternate_membership_path_options.merge(action: :show), {}, {}, expected_status: 401)
       end
     end
 
@@ -606,10 +606,10 @@ describe "Groups API", type: :request do
       @user = user_model
       @community.join_level = "parent_context_request"
       @community.save!
-      json = api_call(:post, @memberships_path, @memberships_path_options.merge(:group_id => @community.to_param, :action => "create"), {
-                        :user_id => @user.id
+      json = api_call(:post, @memberships_path, @memberships_path_options.merge(group_id: @community.to_param, action: "create"), {
+                        user_id: @user.id
                       })
-      @membership = GroupMembership.where(:user_id => @user, :group_id => @community).first
+      @membership = GroupMembership.where(user_id: @user, group_id: @community).first
       expect(@membership.workflow_state).to eq "requested"
       expect(json).to eq membership_json(@membership).merge("just_created" => true)
     end
@@ -618,10 +618,10 @@ describe "Groups API", type: :request do
       @user = user_model
       @community.join_level = "parent_context_auto_join"
       @community.save!
-      json = api_call(:post, @memberships_path, @memberships_path_options.merge(:group_id => @community.to_param, :action => "create"), {
-                        :user_id => @user.id
+      json = api_call(:post, @memberships_path, @memberships_path_options.merge(group_id: @community.to_param, action: "create"), {
+                        user_id: @user.id
                       })
-      @membership = GroupMembership.where(:user_id => @user, :group_id => @community).first
+      @membership = GroupMembership.where(user_id: @user, group_id: @community).first
       expect(@membership.workflow_state).to eq "accepted"
       expect(json).to eq membership_json(@membership).merge("just_created" => true)
     end
@@ -631,9 +631,9 @@ describe "Groups API", type: :request do
       @user = @moderator
       @community.join_level = "parent_context_auto_join"
       @community.save!
-      api_call(:post, @memberships_path, @memberships_path_options.merge(:group_id => @community.to_param, :action => "create"), {
-                 :user_id => @new_user.id
-               }, {}, :expected_status => 401)
+      api_call(:post, @memberships_path, @memberships_path_options.merge(group_id: @community.to_param, action: "create"), {
+                 user_id: @new_user.id
+               }, {}, expected_status: 401)
     end
 
     it "allows accepting a join request by a moderator" do
@@ -642,8 +642,8 @@ describe "Groups API", type: :request do
       @community.save!
       @membership = @community.add_user(@user)
       @user = @moderator
-      json = api_call(:put, "#{@memberships_path}/#{@membership.id}", @memberships_path_options.merge(:group_id => @community.to_param, :membership_id => @membership.to_param, :action => "update"), {
-                        :workflow_state => "accepted"
+      json = api_call(:put, "#{@memberships_path}/#{@membership.id}", @memberships_path_options.merge(group_id: @community.to_param, membership_id: @membership.to_param, action: "update"), {
+                        workflow_state: "accepted"
                       })
       expect(@membership.reload).to be_active
       expect(json).to eq membership_json(@membership)
@@ -656,8 +656,8 @@ describe "Groups API", type: :request do
       @community.save!
       @membership = @community.add_user(@user)
       @user = @moderator
-      json = api_call(:put, "#{@alternate_memberships_path}/#{user_id}", @memberships_path_options.merge(:group_id => @community.to_param, :user_id => user_id.to_param, :action => "update"), {
-                        :workflow_state => "accepted"
+      json = api_call(:put, "#{@alternate_memberships_path}/#{user_id}", @memberships_path_options.merge(group_id: @community.to_param, user_id: user_id.to_param, action: "update"), {
+                        workflow_state: "accepted"
                       })
       expect(@membership.reload).to be_active
       expect(json).to eq membership_json(@membership)
@@ -666,18 +666,18 @@ describe "Groups API", type: :request do
     it "does not allow other workflow_state modifications" do
       @user = @moderator
       @membership = @community.group_memberships.where(user_id: @member).first
-      api_call(:put, "#{@memberships_path}/#{@membership.id}", @memberships_path_options.merge(:group_id => @community.to_param, :membership_id => @membership.to_param, :action => "update"), {
-                 :workflow_state => "requested"
+      api_call(:put, "#{@memberships_path}/#{@membership.id}", @memberships_path_options.merge(group_id: @community.to_param, membership_id: @membership.to_param, action: "update"), {
+                 workflow_state: "requested"
                })
       expect(@membership.reload).to be_active
 
-      api_call(:put, "#{@memberships_path}/#{@membership.id}", @memberships_path_options.merge(:group_id => @community.to_param, :membership_id => @membership.to_param, :action => "update"), {
-                 :workflow_state => "invited"
+      api_call(:put, "#{@memberships_path}/#{@membership.id}", @memberships_path_options.merge(group_id: @community.to_param, membership_id: @membership.to_param, action: "update"), {
+                 workflow_state: "invited"
                })
       expect(@membership.reload).to be_active
 
-      api_call(:put, "#{@memberships_path}/#{@membership.id}", @memberships_path_options.merge(:group_id => @community.to_param, :membership_id => @membership.to_param, :action => "update"), {
-                 :workflow_state => "deleted"
+      api_call(:put, "#{@memberships_path}/#{@membership.id}", @memberships_path_options.merge(group_id: @community.to_param, membership_id: @membership.to_param, action: "update"), {
+                 workflow_state: "deleted"
                })
       expect(@membership.reload).to be_active
     end
@@ -685,18 +685,18 @@ describe "Groups API", type: :request do
     it "does not allow other workflow_state modifications using users/:user_id endpoint" do
       @user = @moderator
       @membership = @community.group_memberships.where(user_id: @member).first
-      api_call(:put, "#{@alternate_memberships_path}/#{@user.id}", @memberships_path_options.merge(:group_id => @community.to_param, :user_id => @user.to_param, :action => "update"), {
-                 :workflow_state => "requested"
+      api_call(:put, "#{@alternate_memberships_path}/#{@user.id}", @memberships_path_options.merge(group_id: @community.to_param, user_id: @user.to_param, action: "update"), {
+                 workflow_state: "requested"
                })
       expect(@membership.reload).to be_active
 
-      api_call(:put, "#{@alternate_memberships_path}/#{@user.id}", @memberships_path_options.merge(:group_id => @community.to_param, :user_id => @user.to_param, :action => "update"), {
-                 :workflow_state => "invited"
+      api_call(:put, "#{@alternate_memberships_path}/#{@user.id}", @memberships_path_options.merge(group_id: @community.to_param, user_id: @user.to_param, action: "update"), {
+                 workflow_state: "invited"
                })
       expect(@membership.reload).to be_active
 
-      api_call(:put, "#{@alternate_memberships_path}/#{@user.id}", @memberships_path_options.merge(:group_id => @community.to_param, :user_id => @user.to_param, :action => "update"), {
-                 :workflow_state => "deleted"
+      api_call(:put, "#{@alternate_memberships_path}/#{@user.id}", @memberships_path_options.merge(group_id: @community.to_param, user_id: @user.to_param, action: "update"), {
+                 workflow_state: "deleted"
                })
       expect(@membership.reload).to be_active
     end
@@ -707,9 +707,9 @@ describe "Groups API", type: :request do
       @community.save!
       @membership = @community.add_user(@user)
       @user = @member
-      api_call(:put, "#{@memberships_path}/#{@membership.id}", @memberships_path_options.merge(:group_id => @community.to_param, :membership_id => @membership.to_param, :action => "update"), {
-                 :workflow_state => "accepted"
-               }, {}, :expected_status => 401)
+      api_call(:put, "#{@memberships_path}/#{@membership.id}", @memberships_path_options.merge(group_id: @community.to_param, membership_id: @membership.to_param, action: "update"), {
+                 workflow_state: "accepted"
+               }, {}, expected_status: 401)
       expect(@membership.reload).to be_requested
     end
 
@@ -719,22 +719,22 @@ describe "Groups API", type: :request do
       @community.save!
       @membership = @community.add_user(@user)
       @user = @member
-      api_call(:put, "#{@alternate_memberships_path}/#{@user.id}", @memberships_path_options.merge(:group_id => @community.to_param, :user_id => @user.to_param, :action => "update"), {
-                 :workflow_state => "accepted"
-               }, {}, :expected_status => 401)
+      api_call(:put, "#{@alternate_memberships_path}/#{@user.id}", @memberships_path_options.merge(group_id: @community.to_param, user_id: @user.to_param, action: "update"), {
+                 workflow_state: "accepted"
+               }, {}, expected_status: 401)
       expect(@membership.reload).to be_requested
     end
 
     it "allows changing moderator privileges" do
       @user = @moderator
       @membership = @community.group_memberships.where(user_id: @member).first
-      api_call(:put, "#{@memberships_path}/#{@membership.id}", @memberships_path_options.merge(:group_id => @community.to_param, :membership_id => @membership.to_param, :action => "update"), {
-                 :moderator => true
+      api_call(:put, "#{@memberships_path}/#{@membership.id}", @memberships_path_options.merge(group_id: @community.to_param, membership_id: @membership.to_param, action: "update"), {
+                 moderator: true
                })
       expect(@membership.reload.moderator).to be_truthy
 
-      api_call(:put, "#{@memberships_path}/#{@membership.id}", @memberships_path_options.merge(:group_id => @community.to_param, :membership_id => @membership.to_param, :action => "update"), {
-                 :moderator => false
+      api_call(:put, "#{@memberships_path}/#{@membership.id}", @memberships_path_options.merge(group_id: @community.to_param, membership_id: @membership.to_param, action: "update"), {
+                 moderator: false
                })
       expect(@membership.reload.moderator).to be_falsey
     end
@@ -742,13 +742,13 @@ describe "Groups API", type: :request do
     it "allows changing moderator privileges using users/:user_id endpoint" do
       @user = @moderator
       @membership = @community.group_memberships.where(user_id: @member).first
-      api_call(:put, "#{@alternate_memberships_path}/#{@member.id}", @memberships_path_options.merge(:group_id => @community.to_param, :user_id => @member.to_param, :action => "update"), {
-                 :moderator => true
+      api_call(:put, "#{@alternate_memberships_path}/#{@member.id}", @memberships_path_options.merge(group_id: @community.to_param, user_id: @member.to_param, action: "update"), {
+                 moderator: true
                })
       expect(@membership.reload.moderator).to be_truthy
 
-      api_call(:put, "#{@alternate_memberships_path}/#{@member.id}", @memberships_path_options.merge(:group_id => @community.to_param, :user_id => @member.to_param, :action => "update"), {
-                 :moderator => false
+      api_call(:put, "#{@alternate_memberships_path}/#{@member.id}", @memberships_path_options.merge(group_id: @community.to_param, user_id: @member.to_param, action: "update"), {
+                 moderator: false
                })
       expect(@membership.reload.moderator).to be_falsey
     end
@@ -756,95 +756,95 @@ describe "Groups API", type: :request do
     it "does not allow a member to change moderator privileges" do
       @user = @member
       @membership = @community.group_memberships.where(user_id: @moderator).first
-      api_call(:put, "#{@memberships_path}/#{@membership.id}", @memberships_path_options.merge(:group_id => @community.to_param, :membership_id => @membership.to_param, :action => "update"), {
-                 :moderator => false
-               }, {}, :expected_status => 401)
+      api_call(:put, "#{@memberships_path}/#{@membership.id}", @memberships_path_options.merge(group_id: @community.to_param, membership_id: @membership.to_param, action: "update"), {
+                 moderator: false
+               }, {}, expected_status: 401)
       expect(@membership.reload.moderator).to be_truthy
     end
 
     it "does not allow a member to change moderator privileges using users/:user_id endpoint" do
       @user = @member
       @membership = @community.group_memberships.where(user_id: @moderator).first
-      api_call(:put, "#{@alternate_memberships_path}/#{@user.id}", @memberships_path_options.merge(:group_id => @community.to_param, :user_id => @user.to_param, :action => "update"), {
-                 :moderator => false
-               }, {}, :expected_status => 401)
+      api_call(:put, "#{@alternate_memberships_path}/#{@user.id}", @memberships_path_options.merge(group_id: @community.to_param, user_id: @user.to_param, action: "update"), {
+                 moderator: false
+               }, {}, expected_status: 401)
       expect(@membership.reload.moderator).to be_truthy
     end
 
     it "allows someone to leave a group" do
       @user = @member
-      @gm = @community.group_memberships.where(:user_id => @user).first
-      api_call(:delete, "#{@memberships_path}/#{@gm.id}", @memberships_path_options.merge(:group_id => @community.to_param, :membership_id => @gm.to_param, :action => "destroy"))
-      @membership = GroupMembership.where(:user_id => @user, :group_id => @community).first
+      @gm = @community.group_memberships.where(user_id: @user).first
+      api_call(:delete, "#{@memberships_path}/#{@gm.id}", @memberships_path_options.merge(group_id: @community.to_param, membership_id: @gm.to_param, action: "destroy"))
+      @membership = GroupMembership.where(user_id: @user, group_id: @community).first
       expect(@membership.workflow_state).to eq "deleted"
     end
 
     it "allows someone to leave a group using users/:user_id endpoint" do
       @user = @member
-      @gm = @community.group_memberships.where(:user_id => @user).first
-      api_call(:delete, "#{@alternate_memberships_path}/#{@user.id}", @memberships_path_options.merge(:group_id => @community.to_param, :user_id => @user.to_param, :action => "destroy"))
-      @membership = GroupMembership.where(:user_id => @user, :group_id => @community).first
+      @gm = @community.group_memberships.where(user_id: @user).first
+      api_call(:delete, "#{@alternate_memberships_path}/#{@user.id}", @memberships_path_options.merge(group_id: @community.to_param, user_id: @user.to_param, action: "destroy"))
+      @membership = GroupMembership.where(user_id: @user, group_id: @community).first
       expect(@membership.workflow_state).to eq "deleted"
     end
 
     it "allows leaving a group using 'self'" do
       @user = @member
-      api_call(:delete, "#{@memberships_path}/self", @memberships_path_options.merge(:group_id => @community.to_param, :membership_id => 'self', :action => "destroy"))
-      @membership = GroupMembership.where(:user_id => @user, :group_id => @community).first
+      api_call(:delete, "#{@memberships_path}/self", @memberships_path_options.merge(group_id: @community.to_param, membership_id: 'self', action: "destroy"))
+      @membership = GroupMembership.where(user_id: @user, group_id: @community).first
       expect(@membership.workflow_state).to eq "deleted"
     end
 
     it "allows leaving a group using 'self' using users/:user_id endpoint" do
       @user = @member
-      api_call(:delete, "#{@alternate_memberships_path}/self", @memberships_path_options.merge(:group_id => @community.to_param, :user_id => 'self', :action => "destroy"))
-      @membership = GroupMembership.where(:user_id => @user, :group_id => @community).first
+      api_call(:delete, "#{@alternate_memberships_path}/self", @memberships_path_options.merge(group_id: @community.to_param, user_id: 'self', action: "destroy"))
+      @membership = GroupMembership.where(user_id: @user, group_id: @community).first
       expect(@membership.workflow_state).to eq "deleted"
     end
 
     it "allows leaving a group using sis id using users/:user_id endpoint" do
       @user = @member
       @member.pseudonyms.first.update_attribute(:sis_user_id, 'my_sis_id')
-      api_call(:delete, "#{@alternate_memberships_path}/sis_user_id:my_sis_id", @memberships_path_options.merge(:group_id => @community.to_param, :user_id => 'sis_user_id:my_sis_id', :action => "destroy"))
-      @membership = GroupMembership.where(:user_id => @user, :group_id => @community).first
+      api_call(:delete, "#{@alternate_memberships_path}/sis_user_id:my_sis_id", @memberships_path_options.merge(group_id: @community.to_param, user_id: 'sis_user_id:my_sis_id', action: "destroy"))
+      @membership = GroupMembership.where(user_id: @user, group_id: @community).first
       expect(@membership.workflow_state).to eq "deleted"
     end
 
     it "allows a moderator to invite people to a group" do
       @user = @moderator
-      invitees = { :invitees => ["leonard@example.com", "sheldon@example.com"] }
+      invitees = { invitees: ["leonard@example.com", "sheldon@example.com"] }
       expect do
-        @json = api_call(:post, "#{@community_path}/invite", @category_path_options.merge(:group_id => @community.to_param, :action => "invite"), invitees)
+        @json = api_call(:post, "#{@community_path}/invite", @category_path_options.merge(group_id: @community.to_param, action: "invite"), invitees)
       end.to change(User, :count).by(2)
-      @memberships = @community.reload.group_memberships.where(:workflow_state => "invited").order(:id).to_a
+      @memberships = @community.reload.group_memberships.where(workflow_state: "invited").order(:id).to_a
       expect(@memberships.count).to eq 2
       expect(@json.sort_by { |a| a['id'] }).to eq(@memberships.map { |gm| membership_json(gm) })
     end
 
     it "does not allow a member to invite people to a group" do
       @user = @member
-      invitees = { :invitees => ["leonard@example.com", "sheldon@example.com"] }
-      api_call(:post, "#{@community_path}/invite", @category_path_options.merge(:group_id => @community.to_param, :action => "invite"), invitees, {}, :expected_status => 401)
-      @memberships = expect(@community.reload.group_memberships.where(:workflow_state => "invited").order(:id).count).to eq 0
+      invitees = { invitees: ["leonard@example.com", "sheldon@example.com"] }
+      api_call(:post, "#{@community_path}/invite", @category_path_options.merge(group_id: @community.to_param, action: "invite"), invitees, {}, expected_status: 401)
+      @memberships = expect(@community.reload.group_memberships.where(workflow_state: "invited").order(:id).count).to eq 0
     end
 
     it "finds people when inviting to a group in a non-default account" do
       @account = Account.create!
       @category = @account.group_categories.create!(name: "foo")
-      @group = group_model(:name => "Blah", :group_category => @category, :context => @account)
+      @group = group_model(name: "Blah", group_category: @category, context: @account)
 
       @moderator = user_model
       @group.add_user(@moderator, 'accepted', true)
 
-      @member = user_with_pseudonym(:account => @account)
+      @member = user_with_pseudonym(account: @account)
 
       @user = @moderator
       api_call(
         :post,
         "/api/v1/groups/#{@group.id}/invite",
-        { :controller => "groups", :format => "json", :group_id => @group.to_param, :action => "invite" },
-        { :invitees => [@member.pseudonym.unique_id] },
+        { controller: "groups", format: "json", group_id: @group.to_param, action: "invite" },
+        { invitees: [@member.pseudonym.unique_id] },
         {},
-        { :domain_root_account => @account }
+        { domain_root_account: @account }
       )
 
       expect(@member.group_memberships.count).to eq 1
@@ -853,18 +853,18 @@ describe "Groups API", type: :request do
     it "allows being added to a non-community account group" do
       @account = Account.default
       @category = @account.group_categories.create!(name: "foo")
-      @group = group_model(:group_category => @category, :context => @account)
+      @group = group_model(group_category: @category, context: @account)
 
-      @to_add = user_with_pseudonym(:account => @account, :active_all => true)
-      @user = account_admin_user(:account => @account, :active_all => true)
+      @to_add = user_with_pseudonym(account: @account, active_all: true)
+      @user = account_admin_user(account: @account, active_all: true)
       json = api_call(
         :post,
         "/api/v1/groups/#{@group.id}/memberships",
-        @memberships_path_options.merge(:group_id => @group.to_param, :action => "create"),
-        { :user_id => @to_add.id }
+        @memberships_path_options.merge(group_id: @group.to_param, action: "create"),
+        { user_id: @to_add.id }
       )
 
-      @membership = GroupMembership.where(:user_id => @to_add, :group_id => @group).first
+      @membership = GroupMembership.where(user_id: @to_add, group_id: @group).first
       expect(@membership.workflow_state).to eq "accepted"
       expect(json).to eq membership_json(@membership, true).merge("just_created" => true)
     end
@@ -876,12 +876,12 @@ describe "Groups API", type: :request do
       membership = @community.add_user(@user, 'invited')
       membership.sis_batch_id = sis_batch.id
       membership.save!
-      @user = account_admin_user(:account => @account, :active_all => true)
-      json = api_call(:get, @memberships_path, @memberships_path_options.merge(:group_id => @community.to_param, :action => "index"), {
-                        :filter_states => ["invited"]
+      @user = account_admin_user(account: @account, active_all: true)
+      json = api_call(:get, @memberships_path, @memberships_path_options.merge(group_id: @community.to_param, action: "index"), {
+                        filter_states: ["invited"]
                       })
       expect(json.first['sis_import_id']).to eq sis_batch.id
-      expect(json.first).to eq membership_json(@community.group_memberships.where(:workflow_state => 'invited').first, true)
+      expect(json.first).to eq membership_json(@community.group_memberships.where(workflow_state: 'invited').first, true)
     end
   end
 
@@ -889,17 +889,17 @@ describe "Groups API", type: :request do
     let(:api_url) { "/api/v1/groups/#{@community.id}/users.json" }
     let(:api_route) do
       {
-        :controller => 'groups',
-        :action => 'users',
-        :group_id => @community.to_param,
-        :format => 'json'
+        controller: 'groups',
+        action: 'users',
+        group_id: @community.to_param,
+        format: 'json'
       }
     end
 
     it "returns users in a group" do
       expected_keys = %w[id name sortable_name short_name]
       json = api_call(:get, "/api/v1/groups/#{@community.id}/users",
-                      { :controller => 'groups', :action => 'users', :group_id => @community.to_param, :format => 'json' })
+                      { controller: 'groups', action: 'users', group_id: @community.to_param, format: 'json' })
       expect(json.count).to eq 2
       json.each do |user|
         expect((user.keys & expected_keys).sort).to eq expected_keys.sort
@@ -910,12 +910,12 @@ describe "Groups API", type: :request do
     it "returns 401 for users outside the group" do
       user_factory
       raw_api_call(:get, "/api/v1/groups/#{@community.id}/users",
-                   { :controller => 'groups', :action => 'users', :group_id => @community.to_param, :format => 'json' })
+                   { controller: 'groups', action: 'users', group_id: @community.to_param, format: 'json' })
       expect(response.code).to eq '401'
     end
 
     it "returns an error when search_term is fewer than 2 characters" do
-      json = api_call(:get, api_url, api_route, { :search_term => 'a' }, {}, :expected_status => 400)
+      json = api_call(:get, api_url, api_route, { search_term: 'a' }, {}, expected_status: 400)
       error = json["errors"].first
       verify_json_error(error, "search_term", "invalid", "2 or more characters is required")
     end
@@ -923,7 +923,7 @@ describe "Groups API", type: :request do
     it "returns a list of users" do
       expected_keys = %w[id name sortable_name short_name]
 
-      json = api_call(:get, api_url, api_route, { :search_term => 'value' })
+      json = api_call(:get, api_url, api_route, { search_term: 'value' })
 
       expect(json.count).to eq 1
       json.each do |user|
@@ -946,8 +946,8 @@ describe "Groups API", type: :request do
     end
 
     it "honors the exclude_inactive query parameter" do
-      course_with_teacher(:active_all => true)
-      @group = @course.groups.create!(:name => 'Inactive user group')
+      course_with_teacher(active_all: true)
+      @group = @course.groups.create!(name: 'Inactive user group')
 
       inactive_user = user_factory
       enrollment = @course.enroll_student(inactive_user)
@@ -983,7 +983,7 @@ describe "Groups API", type: :request do
 
     def preflight(preflight_params, opts = {})
       api_call(:post, "/api/v1/groups/#{@community.id}/files",
-               { :controller => "groups", :action => "create_file", :format => "json", :group_id => @community.to_param, },
+               { controller: "groups", action: "create_file", format: "json", group_id: @community.to_param, },
                preflight_params,
                {},
                opts)
@@ -999,8 +999,8 @@ describe "Groups API", type: :request do
   end
 
   it "returns the activity stream" do
-    course_with_teacher(:active_all => true, :user => user_with_pseudonym)
-    @group = @course.groups.create!(:name => 'Group 1')
+    course_with_teacher(active_all: true, user: user_with_pseudonym)
+    @group = @course.groups.create!(name: 'Group 1')
     @group.users << @user
     @context = @group
     @topic1 = discussion_topic_model
@@ -1010,8 +1010,8 @@ describe "Groups API", type: :request do
   end
 
   it "returns the activity stream summary" do
-    course_with_teacher(:active_all => true, :user => user_with_pseudonym)
-    @group = @course.groups.create!(:name => 'Group 1')
+    course_with_teacher(active_all: true, user: user_with_pseudonym)
+    @group = @course.groups.create!(name: 'Group 1')
     @group.users << @user
     @context = @group
     @topic1 = discussion_topic_model
@@ -1022,8 +1022,8 @@ describe "Groups API", type: :request do
 
   describe "/preview_html" do
     before :once do
-      course_with_teacher(:active_all => true)
-      @group = @course.groups.create!(:name => 'Group 1')
+      course_with_teacher(active_all: true)
+      @group = @course.groups.create!(name: 'Group 1')
     end
 
     before do
@@ -1032,11 +1032,11 @@ describe "Groups API", type: :request do
 
     it "sanitizes html and process links" do
       @user = @teacher
-      attachment_model(:context => @group)
+      attachment_model(context: @group)
       html = %(<p><a href="/files/#{@attachment.id}/download?verifier=huehuehuehue">Click!</a><script></script></p>)
       json = api_call(:post, "/api/v1/groups/#{@group.id}/preview_html",
-                      { :controller => 'groups', :action => 'preview_html', :group_id => @group.to_param, :format => 'json' },
-                      { :html => html })
+                      { controller: 'groups', action: 'preview_html', group_id: @group.to_param, format: 'json' },
+                      { html: html })
 
       returned_html = json["html"]
       expect(returned_html).not_to include("<script>")
@@ -1046,29 +1046,29 @@ describe "Groups API", type: :request do
     it "requires permission to preview" do
       @user = user_factory
       api_call(:post, "/api/v1/groups/#{@group.id}/preview_html",
-               { :controller => 'groups', :action => 'preview_html', :group_id => @group.to_param, :format => 'json' },
-               { :html => "" }, {}, { :expected_status => 401 })
+               { controller: 'groups', action: 'preview_html', group_id: @group.to_param, format: 'json' },
+               { html: "" }, {}, { expected_status: 401 })
     end
   end
 
   context "permissions" do
     before :once do
-      course_with_student(:active_all => true)
+      course_with_student(active_all: true)
       @group = @course.groups.create!
     end
 
     it "returns permissions" do
       @group.add_user(@student)
       json = api_call(:get, "/api/v1/groups/#{@group.id}/permissions?permissions[]=send_messages&permissions[]=manage_blarghs",
-                      :controller => 'groups', :action => 'permissions', :group_id => @group.to_param,
-                      :format => 'json', :permissions => %w[send_messages manage_blarghs])
+                      controller: 'groups', action: 'permissions', group_id: @group.to_param,
+                      format: 'json', permissions: %w[send_messages manage_blarghs])
       expect(json).to eq({ "send_messages" => true, "manage_blarghs" => false })
     end
 
     it "requires :read permission on the group" do
       api_call(:get, "/api/v1/groups/#{@group.id}/permissions?permissions[]=send_messages",
-               { :controller => 'groups', :action => 'permissions', :group_id => @group.to_param, :format => 'json',
-                 :permissions => %w[send_messages] }, {}, {}, { :expected_status => 401 })
+               { controller: 'groups', action: 'permissions', group_id: @group.to_param, format: 'json',
+                 permissions: %w[send_messages] }, {}, {}, { expected_status: 401 })
     end
   end
 end

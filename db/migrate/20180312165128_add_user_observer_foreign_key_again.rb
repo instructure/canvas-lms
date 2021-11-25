@@ -5,7 +5,7 @@ class AddUserObserverForeignKeyAgain < ActiveRecord::Migration[5.0]
   disable_ddl_transaction!
 
   def up
-    unless foreign_key_exists?(:user_observers, :column => :observer_id)
+    unless foreign_key_exists?(:user_observers, column: :observer_id)
       UserObservationLink.where("observer_id > ?", Shard::IDS_PER_SHARD).find_in_batches do |uos|
         observer_ids = uos.map(&:observer_id).uniq
         missing_ids = observer_ids - User.where(id: observer_ids).pluck(:id)
@@ -15,11 +15,11 @@ class AddUserObserverForeignKeyAgain < ActiveRecord::Migration[5.0]
           end
         end
       end
-      add_foreign_key :user_observers, :users, :column => :observer_id
+      add_foreign_key :user_observers, :users, column: :observer_id
     end
   end
 
   def down
-    remove_foreign_key :user_observers, :column => :observer_id, if_exists: true
+    remove_foreign_key :user_observers, column: :observer_id, if_exists: true
   end
 end

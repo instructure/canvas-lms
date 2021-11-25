@@ -129,7 +129,7 @@ module Lti
                                 })
 
             stub_request(:put, "http://awesome.dev/face.html")
-              .to_return(:status => 200, :body => "", :headers => {})
+              .to_return(status: 200, body: "", headers: {})
 
             api_call(:put, "/api/v1/courses/#{@course.id}/tool_proxies/#{tp.id}/update",
                      {
@@ -162,7 +162,7 @@ module Lti
                                 })
 
             stub_request(:put, "http://awesome.dev/face.html")
-              .to_return(:status => 406, :body => "", :headers => {})
+              .to_return(status: 406, body: "", headers: {})
 
             tp.reload
             last_updated_at = tp.updated_at
@@ -232,7 +232,7 @@ module Lti
                                 })
 
             stub_request(:delete, "http://awesome.dev/face.html")
-              .to_return(:status => 200, :body => "", :headers => {})
+              .to_return(status: 200, body: "", headers: {})
 
             api_call(:delete, "/api/v1/courses/#{@course.id}/tool_proxies/#{tp.id}/update",
                      {

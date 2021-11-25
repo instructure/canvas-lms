@@ -110,11 +110,11 @@ class Quizzes::QuizQuestion::NumericalQuestion < Quizzes::QuizQuestion::Base
     @question_data.answers.each do |answer|
       answer[:text] = case answer[:numerical_answer_type]
                       when 'exact_answer'
-                        I18n.t("%{exact_value} +/- %{margin}", :exact_value => answer[:exact], :margin => answer[:margin])
+                        I18n.t("%{exact_value} +/- %{margin}", exact_value: answer[:exact], margin: answer[:margin])
                       when 'precision_answer'
-                        I18n.t("%{approximate_value} with precision %{precision}", :approximate_value => answer[:approximate], :precision => answer[:precision])
+                        I18n.t("%{approximate_value} with precision %{precision}", approximate_value: answer[:approximate], precision: answer[:precision])
                       else
-                        I18n.t("%{lower_bound} to %{upper_bound}", :lower_bound => answer[:start], :upper_bound => answer[:end])
+                        I18n.t("%{lower_bound} to %{upper_bound}", lower_bound: answer[:start], upper_bound: answer[:end])
                       end
     end
 

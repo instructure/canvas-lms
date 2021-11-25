@@ -207,7 +207,7 @@ module AccountReports
         )})
       end
 
-      data = data.where(:enrollments => { :course_id => course }) if course
+      data = data.where(enrollments: { course_id: course }) if course
       data = add_term_scope(data, 'c')
       data = add_course_sub_account_scope(data, 'c') unless course
 

@@ -29,30 +29,30 @@ describe AssignmentsController do
 
   def course_assignment(course = nil)
     course ||= @course
-    @group = course.assignment_groups.create(:name => "some group")
+    @group = course.assignment_groups.create(name: "some group")
     @assignment = course.assignments.create(
-      :title => "some assignment",
-      :assignment_group => @group,
-      :due_at => Time.zone.now + 1.week
+      title: "some assignment",
+      assignment_group: @group,
+      due_at: Time.zone.now + 1.week
     )
     @assignment
   end
 
   describe "GET 'index'" do
     it "throws 404 error without a valid context id" do
-      get 'index', params: { :course_id => 'notvalid' }
+      get 'index', params: { course_id: 'notvalid' }
       assert_status(404)
     end
 
     it "returns unauthorized without a valid session" do
-      get 'index', params: { :course_id => @course.id }
+      get 'index', params: { course_id: @course.id }
       assert_unauthorized
     end
 
     it "redirects 'disabled', if disabled by the teacher" do
       user_session(@student)
       @course.update_attribute(:tab_configuration, [{ 'id' => 3, 'hidden' => true }])
-      get 'index', params: { :course_id => @course.id }
+      get 'index', params: { course_id: @course.id }
       expect(response).to be_redirect
       expect(flash[:notice]).to match(/That page has been disabled/)
     end
@@ -66,7 +66,7 @@ describe AssignmentsController do
 
     it "js_env HAS_ASSIGNMENTS is true when the course has assignments" do
       user_session(@teacher)
-      get 'index', params: { :course_id => @course.id }
+      get 'index', params: { course_id: @course.id }
       expect(assigns[:js_env][:HAS_ASSIGNMENTS]).to eq(true)
     end
 
@@ -74,50 +74,50 @@ describe AssignmentsController do
       user_session(@teacher)
       @assignment.workflow_state = 'deleted'
       @assignment.save!
-      get 'index', params: { :course_id => @course.id }
+      get 'index', params: { course_id: @course.id }
       expect(assigns[:js_env][:HAS_ASSIGNMENTS]).to eq(false)
     end
 
     it "js_env DUE_DATE_REQUIRED_FOR_ACCOUNT is true when AssignmentUtil.due_date_required_for_account? == true" do
       user_session(@teacher)
       allow(AssignmentUtil).to receive(:due_date_required_for_account?).and_return(true)
-      get 'index', params: { :course_id => @course.id }
+      get 'index', params: { course_id: @course.id }
       expect(assigns[:js_env][:DUE_DATE_REQUIRED_FOR_ACCOUNT]).to eq(true)
     end
 
     it "js_env SIS_INTEGRATION_SETTINGS_ENABLED is true when AssignmentUtil.sis_integration_settings_enabled? == true" do
       user_session(@teacher)
       allow(AssignmentUtil).to receive(:sis_integration_settings_enabled?).and_return(true)
-      get 'index', params: { :course_id => @course.id }
+      get 'index', params: { course_id: @course.id }
       expect(assigns[:js_env][:SIS_INTEGRATION_SETTINGS_ENABLED]).to eq(true)
     end
 
     it "js_env SIS_INTEGRATION_SETTINGS_ENABLED is false when AssignmentUtil.sis_integration_settings_enabled? == false" do
       user_session(@teacher)
       allow(AssignmentUtil).to receive(:sis_integration_settings_enabled?).and_return(false)
-      get 'index', params: { :course_id => @course.id }
+      get 'index', params: { course_id: @course.id }
       expect(assigns[:js_env][:SIS_INTEGRATION_SETTINGS_ENABLED]).to eq(false)
     end
 
     it "js_env DUE_DATE_REQUIRED_FOR_ACCOUNT is false when AssignmentUtil.due_date_required_for_account? == false" do
       user_session(@teacher)
       allow(AssignmentUtil).to receive(:due_date_required_for_account?).and_return(false)
-      get 'index', params: { :course_id => @course.id }
+      get 'index', params: { course_id: @course.id }
       expect(assigns[:js_env][:DUE_DATE_REQUIRED_FOR_ACCOUNT]).to eq(false)
     end
 
     it "js_env SIS_NAME is SIS when @context does not respond_to assignments" do
       user_session(@teacher)
       allow(@course).to receive(:respond_to?).and_return(false)
-      allow(controller).to receive(:set_js_assignment_data).and_return({ :js_env => {} })
-      get 'index', params: { :course_id => @course.id }
+      allow(controller).to receive(:set_js_assignment_data).and_return({ js_env: {} })
+      get 'index', params: { course_id: @course.id }
       expect(assigns[:js_env][:SIS_NAME]).to eq('SIS')
     end
 
     it "js_env SIS_NAME is Foo Bar when AssignmentUtil.post_to_sis_friendly_name is Foo Bar" do
       user_session(@teacher)
       allow(AssignmentUtil).to receive(:post_to_sis_friendly_name).and_return('Foo Bar')
-      get 'index', params: { :course_id => @course.id }
+      get 'index', params: { course_id: @course.id }
       expect(assigns[:js_env][:SIS_NAME]).to eq('Foo Bar')
     end
 
@@ -126,7 +126,7 @@ describe AssignmentsController do
       a = @course.account
       a.settings[:sis_default_grade_export] = { locked: false, value: false }
       a.save!
-      get 'index', params: { :course_id => @course.id }
+      get 'index', params: { course_id: @course.id }
       expect(assigns[:js_env][:POST_TO_SIS_DEFAULT]).to eq(false)
     end
 
@@ -135,18 +135,18 @@ describe AssignmentsController do
       a = @course.account
       a.settings[:sis_default_grade_export] = { locked: false, value: true }
       a.save!
-      get 'index', params: { :course_id => @course.id }
+      get 'index', params: { course_id: @course.id }
       expect(assigns[:js_env][:POST_TO_SIS_DEFAULT]).to eq(true)
     end
 
     it "sets QUIZ_LTI_ENABLED in js_env if quizzes 2 is available" do
       user_session @teacher
       @course.context_external_tools.create!(
-        :name => 'Quizzes.Next',
-        :consumer_key => 'test_key',
-        :shared_secret => 'test_secret',
-        :tool_id => 'Quizzes 2',
-        :url => 'http://example.com/launch'
+        name: 'Quizzes.Next',
+        consumer_key: 'test_key',
+        shared_secret: 'test_secret',
+        tool_id: 'Quizzes 2',
+        url: 'http://example.com/launch'
       )
       @course.root_account.settings[:provision] = { 'lti' => 'lti url' }
       @course.root_account.save!
@@ -159,11 +159,11 @@ describe AssignmentsController do
     it "does not set QUIZ_LTI_ENABLED in js_env if 'newquizzes_on_quiz_page' is enabled" do
       user_session @teacher
       @course.context_external_tools.create!(
-        :name => 'Quizzes.Next',
-        :consumer_key => 'test_key',
-        :shared_secret => 'test_secret',
-        :tool_id => 'Quizzes 2',
-        :url => 'http://example.com/launch'
+        name: 'Quizzes.Next',
+        consumer_key: 'test_key',
+        shared_secret: 'test_secret',
+        tool_id: 'Quizzes 2',
+        url: 'http://example.com/launch'
       )
       @course.root_account.settings[:provision] = { 'lti' => 'lti url' }
       @course.root_account.save!
@@ -177,11 +177,11 @@ describe AssignmentsController do
     it "does not set QUIZ_LTI_ENABLED in js_env if url is voided" do
       user_session @teacher
       @course.context_external_tools.create!(
-        :name => 'Quizzes.Next',
-        :consumer_key => 'test_key',
-        :shared_secret => 'test_secret',
-        :tool_id => 'Quizzes 2',
-        :url => 'http://void.url.inseng.net'
+        name: 'Quizzes.Next',
+        consumer_key: 'test_key',
+        shared_secret: 'test_secret',
+        tool_id: 'Quizzes 2',
+        url: 'http://void.url.inseng.net'
       )
       @course.root_account.settings[:provision] = { 'lti' => 'lti url' }
       @course.root_account.save!
@@ -200,11 +200,11 @@ describe AssignmentsController do
     it "does not set QUIZ_LTI_ENABLED in js_env if quizzes_next is not enabled" do
       user_session @teacher
       @course.context_external_tools.create!(
-        :name => 'Quizzes.Next',
-        :consumer_key => 'test_key',
-        :shared_secret => 'test_secret',
-        :tool_id => 'Quizzes 2',
-        :url => 'http://example.com/launch'
+        name: 'Quizzes.Next',
+        consumer_key: 'test_key',
+        shared_secret: 'test_secret',
+        tool_id: 'Quizzes 2',
+        url: 'http://example.com/launch'
       )
       get 'index', params: { course_id: @course.id }
       expect(assigns[:js_env][:QUIZ_LTI_ENABLED]).to be false
@@ -213,11 +213,11 @@ describe AssignmentsController do
     it "sets FLAGS/newquizzes_on_quiz_page in js_env if 'newquizzes_on_quiz_page' is enabled" do
       user_session @teacher
       @course.context_external_tools.create!(
-        :name => 'Quizzes.Next',
-        :consumer_key => 'test_key',
-        :shared_secret => 'test_secret',
-        :tool_id => 'Quizzes 2',
-        :url => 'http://example.com/launch'
+        name: 'Quizzes.Next',
+        consumer_key: 'test_key',
+        shared_secret: 'test_secret',
+        tool_id: 'Quizzes 2',
+        url: 'http://example.com/launch'
       )
       @course.root_account.enable_feature! :newquizzes_on_quiz_page
       get 'index', params: { course_id: @course.id }
@@ -227,11 +227,11 @@ describe AssignmentsController do
     it "does not set FLAGS/newquizzes_on_quiz_page in js_env if 'newquizzes_on_quiz_page' is disabled" do
       user_session @teacher
       @course.context_external_tools.create!(
-        :name => 'Quizzes.Next',
-        :consumer_key => 'test_key',
-        :shared_secret => 'test_secret',
-        :tool_id => 'Quizzes 2',
-        :url => 'http://example.com/launch'
+        name: 'Quizzes.Next',
+        consumer_key: 'test_key',
+        shared_secret: 'test_secret',
+        tool_id: 'Quizzes 2',
+        url: 'http://example.com/launch'
       )
       @course.root_account.disable_feature! :newquizzes_on_quiz_page
       get 'index', params: { course_id: @course.id }
@@ -241,49 +241,49 @@ describe AssignmentsController do
     it "sets FLAGS/new_quizzes_modules_support in js_env as true if enabled" do
       user_session(@teacher)
       Account.site_admin.enable_feature!(:new_quizzes_modules_support)
-      get 'index', params: { :course_id => @course.id }
+      get 'index', params: { course_id: @course.id }
       expect(assigns[:js_env][:FLAGS][:new_quizzes_modules_support]).to eq(true)
     end
 
     it "sets FLAGS/new_quizzes_modules_support in js_env as false if disabled" do
       user_session(@teacher)
       Account.site_admin.disable_feature!(:new_quizzes_modules_support)
-      get 'index', params: { :course_id => @course.id }
+      get 'index', params: { course_id: @course.id }
       expect(assigns[:js_env][:FLAGS][:new_quizzes_modules_support]).to eq(false)
     end
 
     it "sets FLAGS/new_quizzes_skip_to_build_module_button in js_env as true if enabled" do
       user_session(@teacher)
       Account.site_admin.enable_feature!(:new_quizzes_skip_to_build_module_button)
-      get 'index', params: { :course_id => @course.id }
+      get 'index', params: { course_id: @course.id }
       expect(assigns[:js_env][:FLAGS][:new_quizzes_skip_to_build_module_button]).to eq(true)
     end
 
     it "sets FLAGS/new_quizzes_skip_to_build_module_button in js_env as false if disabled" do
       user_session(@teacher)
       Account.site_admin.disable_feature!(:new_quizzes_skip_to_build_module_button)
-      get 'index', params: { :course_id => @course.id }
+      get 'index', params: { course_id: @course.id }
       expect(assigns[:js_env][:FLAGS][:new_quizzes_skip_to_build_module_button]).to eq(false)
     end
 
     it "js_env MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT is true when AssignmentUtil.name_length_required_for_account? == true" do
       user_session(@teacher)
       allow(AssignmentUtil).to receive(:name_length_required_for_account?).and_return(true)
-      get 'index', params: { :course_id => @course.id }
+      get 'index', params: { course_id: @course.id }
       expect(assigns[:js_env][:MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT]).to eq(true)
     end
 
     it "js_env MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT is false when AssignmentUtil.name_length_required_for_account? == false" do
       user_session(@teacher)
       allow(AssignmentUtil).to receive(:name_length_required_for_account?).and_return(false)
-      get 'index', params: { :course_id => @course.id }
+      get 'index', params: { course_id: @course.id }
       expect(assigns[:js_env][:MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT]).to eq(false)
     end
 
     it "js_env MAX_NAME_LENGTH is a 15 when AssignmentUtil.assignment_max_name_length returns 15" do
       user_session(@teacher)
       allow(AssignmentUtil).to receive(:assignment_max_name_length).and_return(15)
-      get 'index', params: { :course_id => @course.id }
+      get 'index', params: { course_id: @course.id }
       expect(assigns[:js_env][:MAX_NAME_LENGTH]).to eq(15)
     end
 
@@ -291,7 +291,7 @@ describe AssignmentsController do
       it "creates a default group if none exist" do
         user_session(@student)
 
-        get 'index', params: { :course_id => @course.id }
+        get 'index', params: { course_id: @course.id }
 
         expect(@course.reload.assignment_groups.count).to eq 1
       end
@@ -573,11 +573,11 @@ describe AssignmentsController do
     end
 
     context "with public course" do
-      let(:course) { course_factory(:active_all => true, :is_public => true) }
-      let(:assignment) { assignment_model(:course => course, :submission_types => "online_url") }
+      let(:course) { course_factory(active_all: true, is_public: true) }
+      let(:assignment) { assignment_model(course: course, submission_types: "online_url") }
 
       it "doesn't fail on a public course with a nil user" do
-        get 'show', params: { :course_id => course.id, :id => assignment.id }
+        get 'show', params: { course_id: course.id, id: assignment.id }
         assert_status(200)
       end
 
@@ -585,21 +585,21 @@ describe AssignmentsController do
         course.root_account.enable_feature!(:filter_speed_grader_by_student_group)
         course.update!(filter_speed_grader_by_student_group: true)
         expect(course.reload.filter_speed_grader_by_student_group).to be_truthy
-        get 'show', params: { :course_id => course.id, :id => assignment.id }
+        get 'show', params: { course_id: course.id, id: assignment.id }
         assert_status(200)
       end
     end
 
     it "returns unauthorized if not enrolled" do
-      get 'show', params: { :course_id => @course.id, :id => @assignment.id }
+      get 'show', params: { course_id: @course.id, id: @assignment.id }
       assert_unauthorized
     end
 
     it "assigns variables" do
       user_session(@student)
-      a = @course.assignments.create(:title => "some assignment")
+      a = @course.assignments.create(title: "some assignment")
 
-      get 'show', params: { :course_id => @course.id, :id => a.id }
+      get 'show', params: { course_id: @course.id, id: a.id }
       expect(@course.reload.assignment_groups).not_to be_empty
       expect(assigns[:unlocked]).not_to be_nil
       expect(assigns[:js_env][:media_comment_asset_string]).to eq @student.asset_string
@@ -691,7 +691,7 @@ describe AssignmentsController do
     context 'when the assignment uses the plagiarism platform' do
       include_context 'lti2_spec_helper'
 
-      let(:assignment) { @course.assignments.create(:title => "some assignment") }
+      let(:assignment) { @course.assignments.create(title: "some assignment") }
 
       before do
         allow_any_instance_of(AssignmentConfigurationToolLookup).to receive(:create_subscription).and_return true
@@ -709,43 +709,43 @@ describe AssignmentsController do
       it "assigns 'similarity_pledge'" do
         pledge = 'I made this'
         @course.account.update(turnitin_pledge: pledge)
-        get 'show', params: { :course_id => @course.id, :id => assignment.id }
+        get 'show', params: { course_id: @course.id, id: assignment.id }
         expect(assigns[:similarity_pledge]).to eq pledge
       end
     end
 
     it 'uses the vericite pledge if vericite is enabled' do
       user_session(@student)
-      a = @course.assignments.create(:title => "some assignment")
+      a = @course.assignments.create(title: "some assignment")
       pledge = 'vericite pledge'
       allow_any_instance_of(Assignment).to receive(:vericite_enabled?).and_return(true)
       allow_any_instance_of(Course).to receive(:vericite_pledge).and_return(pledge)
-      get 'show', params: { :course_id => @course.id, :id => a.id }
+      get 'show', params: { course_id: @course.id, id: a.id }
       expect(assigns[:similarity_pledge]).to eq pledge
     end
 
     it 'uses the closest pledge when vericite is enabled but no pledge is set' do
       user_session(@student)
-      a = @course.assignments.create(:title => "some assignment", vericite_enabled: true)
+      a = @course.assignments.create(title: "some assignment", vericite_enabled: true)
       allow(@course).to receive(:vericite_pledge).and_return("")
-      get 'show', params: { :course_id => @course.id, :id => a.id }
+      get 'show', params: { course_id: @course.id, id: a.id }
       expect(assigns[:similarity_pledge]).to eq "This assignment submission is my own, original work"
     end
 
     it 'uses the turnitin pledge if turnitin is enabled' do
       user_session(@student)
-      a = @course.assignments.create(:title => "some assignment")
+      a = @course.assignments.create(title: "some assignment")
       pledge = 'tii pledge'
       allow_any_instance_of(Assignment).to receive(:turnitin_enabled?).and_return(true)
       @course.account.update(turnitin_pledge: pledge)
-      get 'show', params: { :course_id => @course.id, :id => a.id }
+      get 'show', params: { course_id: @course.id, id: a.id }
       expect(assigns[:similarity_pledge]).to eq pledge
     end
 
     it "assigns submission variable if current user and submitted" do
       user_session(@student)
-      @assignment.submit_homework(@student, :submission_type => 'online_url', :url => 'http://www.google.com')
-      get 'show', params: { :course_id => @course.id, :id => @assignment.id }
+      @assignment.submit_homework(@student, submission_type: 'online_url', url: 'http://www.google.com')
+      get 'show', params: { course_id: @course.id, id: @assignment.id }
       expect(response).to be_successful
       expect(assigns[:current_user_submission]).not_to be_nil
       expect(assigns[:assigned_assessments]).to eq []
@@ -753,7 +753,7 @@ describe AssignmentsController do
 
     it "doesn't explode when fielding a JSON request" do
       user_session(@student)
-      get 'show', params: { :course_id => @course.id, :id => @assignment.id }, format: :json
+      get 'show', params: { course_id: @course.id, id: @assignment.id }, format: :json
       expect(response.body).to include("endpoint does not support json")
       expect(response.code.to_i).to eq(400)
     end
@@ -762,15 +762,15 @@ describe AssignmentsController do
       @assignment.peer_reviews = true
       @assignment.save!
       @student1 = @student
-      @student2 = student_in_course(:active_all => true).user
-      @student3 = student_in_course(:enrollment_state => 'inactive').user
-      sub1 = @assignment.submit_homework(@student1, :submission_type => 'online_url', :url => 'http://www.example.com/1')
-      sub2 = @assignment.submit_homework(@student2, :submission_type => 'online_url', :url => 'http://www.example.com/2')
-      sub3 = @assignment.submit_homework(@student3, :submission_type => 'online_url', :url => 'http://www.example.com/3')
+      @student2 = student_in_course(active_all: true).user
+      @student3 = student_in_course(enrollment_state: 'inactive').user
+      sub1 = @assignment.submit_homework(@student1, submission_type: 'online_url', url: 'http://www.example.com/1')
+      sub2 = @assignment.submit_homework(@student2, submission_type: 'online_url', url: 'http://www.example.com/2')
+      sub3 = @assignment.submit_homework(@student3, submission_type: 'online_url', url: 'http://www.example.com/3')
       sub2.assign_assessor(sub1)
       sub3.assign_assessor(sub1)
       user_session(@student1)
-      get 'show', :params => { :course_id => @course.id, :id => @assignment.id }
+      get 'show', params: { course_id: @course.id, id: @assignment.id }
       expect(assigns[:current_user_submission]).to eq sub1
       expect(assigns[:assigned_assessments].map(&:submission)).to eq [sub2]
     end
@@ -781,7 +781,7 @@ describe AssignmentsController do
       @assignment.reload.submission_types = 'wiki_page'
       @assignment.save!
 
-      get 'show', params: { :course_id => @course.id, :id => @assignment.id }
+      get 'show', params: { course_id: @course.id, id: @assignment.id }
       expect(response).to be_redirect
     end
 
@@ -791,7 +791,7 @@ describe AssignmentsController do
       @assignment.submission_types = 'wiki_page'
       @assignment.save!
 
-      get 'show', params: { :course_id => @course.id, :id => @assignment.id }
+      get 'show', params: { course_id: @course.id, id: @assignment.id }
       expect(response).not_to be_redirect
     end
 
@@ -800,20 +800,20 @@ describe AssignmentsController do
       @assignment.submission_types = 'discussion_topic'
       @assignment.save!
 
-      get 'show', params: { :course_id => @course.id, :id => @assignment.id }
+      get 'show', params: { course_id: @course.id, id: @assignment.id }
       expect(response).to be_redirect
     end
 
     it "does not redirect to discussion for observer if assignment is linked to discussion but read_forum is false" do
-      course_with_observer(:active_all => true, :course => @course)
+      course_with_observer(active_all: true, course: @course)
       user_session(@observer)
       @assignment.submission_types = 'discussion_topic'
       @assignment.save!
 
-      RoleOverride.create!(:context => @course.account, :permission => 'read_forum',
-                           :role => observer_role, :enabled => false)
+      RoleOverride.create!(context: @course.account, permission: 'read_forum',
+                           role: observer_role, enabled: false)
 
-      get 'show', params: { :course_id => @course.id, :id => @assignment.id }
+      get 'show', params: { course_id: @course.id, id: @assignment.id }
       expect(response).not_to be_redirect
       expect(response).to be_successful
     end
@@ -945,7 +945,7 @@ describe AssignmentsController do
       # be true here because we aren't redirecting to it.
       allow_any_instance_of(Assignment).to receive(:external_tool_tag).and_return(true)
 
-      get 'show', params: { :course_id => @course.id, :id => @assignment.id }
+      get 'show', params: { course_id: @course.id, id: @assignment.id }
 
       expect(assigns[:locked]).to be_truthy
       # make sure that the show.html.erb template is rendered, because
@@ -956,30 +956,30 @@ describe AssignmentsController do
     it "requires login for external tools in a public course" do
       @course.update_attribute(:is_public, true)
       @course.context_external_tools.create!(
-        :shared_secret => 'test_secret',
-        :consumer_key => 'test_key',
-        :name => 'test tool',
-        :domain => 'example.com'
+        shared_secret: 'test_secret',
+        consumer_key: 'test_key',
+        name: 'test tool',
+        domain: 'example.com'
       )
       @assignment.submission_types = 'external_tool'
-      @assignment.build_external_tool_tag(:url => "http://example.com/test")
+      @assignment.build_external_tool_tag(url: "http://example.com/test")
       @assignment.save!
 
-      get 'show', params: { :course_id => @course.id, :id => @assignment.id }
+      get 'show', params: { course_id: @course.id, id: @assignment.id }
       assert_require_login
     end
 
     it 'sets user_has_google_drive' do
       user_session(@student)
-      a = @course.assignments.create(:title => "some assignment")
+      a = @course.assignments.create(title: "some assignment")
       plugin = Canvas::Plugin.find(:google_drive)
-      plugin_setting = PluginSetting.find_by_name(plugin.id) || PluginSetting.new(:name => plugin.id, :settings => plugin.default_settings)
+      plugin_setting = PluginSetting.find_by_name(plugin.id) || PluginSetting.new(name: plugin.id, settings: plugin.default_settings)
       plugin_setting.posted_settings = {}
       plugin_setting.save!
       google_drive_mock = double('google_drive')
       allow(google_drive_mock).to receive(:authorized?).and_return(true)
       allow(controller).to receive(:google_drive_connection).and_return(google_drive_mock)
-      get 'show', params: { :course_id => @course.id, :id => a.id }
+      get 'show', params: { course_id: @course.id, id: a.id }
 
       expect(response).to be_successful
       expect(assigns(:user_has_google_drive)).to be true
@@ -1040,16 +1040,16 @@ describe AssignmentsController do
       it "logs an AUA as an assignment view for an external tool assignment" do
         user_session(@student)
         @course.context_external_tools.create!(
-          :shared_secret => 'test_secret',
-          :consumer_key => 'test_key',
-          :name => 'test tool',
-          :domain => 'example.com'
+          shared_secret: 'test_secret',
+          consumer_key: 'test_key',
+          name: 'test tool',
+          domain: 'example.com'
         )
         @assignment.submission_types = 'external_tool'
-        @assignment.build_external_tool_tag(:url => "http://example.com/test")
+        @assignment.build_external_tool_tag(url: "http://example.com/test")
         @assignment.save!
 
-        get 'show', params: { :course_id => @course.id, :id => @assignment.id }
+        get 'show', params: { course_id: @course.id, id: @assignment.id }
         expect(response).to be_successful
         aua = AssetUserAccess.where(user_id: @student, context_type: 'Course', context_id: @course).first
         expect(aua.asset_category).to eq 'assignments'
@@ -1434,14 +1434,14 @@ describe AssignmentsController do
   describe "GET 'syllabus'" do
     it "requires authorization" do
       # controller.use_rails_error_handling!
-      get 'syllabus', params: { :course_id => @course.id }
+      get 'syllabus', params: { course_id: @course.id }
       assert_unauthorized
     end
 
     it "redirects 'disabled', if disabled by the teacher" do
       user_session(@student)
       @course.update_attribute(:tab_configuration, [{ 'id' => 1, 'hidden' => true }])
-      get 'syllabus', params: { :course_id => @course.id }
+      get 'syllabus', params: { course_id: @course.id }
       expect(response).to be_redirect
       expect(flash[:notice]).to match(/That page has been disabled/)
     end
@@ -1449,7 +1449,7 @@ describe AssignmentsController do
     it "assigns variables" do
       @course.update_attribute(:syllabus_body, "<p>Here is your syllabus.</p>")
       user_session(@student)
-      get 'syllabus', params: { :course_id => @course.id }
+      get 'syllabus', params: { course_id: @course.id }
       expect(assigns[:syllabus_body]).not_to be_nil
     end
   end
@@ -1531,14 +1531,14 @@ describe AssignmentsController do
   describe "GET 'new'" do
     it "requires authorization" do
       # controller.use_rails_error_handling!
-      get 'new', params: { :course_id => @course.id }
+      get 'new', params: { course_id: @course.id }
       assert_unauthorized
     end
 
     it "defaults to unpublished for draft state" do
       @course.require_assignment_group
 
-      get 'new', params: { :course_id => @course.id }
+      get 'new', params: { course_id: @course.id }
 
       expect(assigns[:assignment].workflow_state).to eq 'unpublished'
     end
@@ -1546,21 +1546,21 @@ describe AssignmentsController do
     it "js_env DUE_DATE_REQUIRED_FOR_ACCOUNT is true when AssignmentUtil.due_date_required_for_account? == true" do
       user_session(@teacher)
       allow(AssignmentUtil).to receive(:due_date_required_for_account?).and_return(true)
-      get 'new', params: { :course_id => @course.id, :id => @assignment.id }
+      get 'new', params: { course_id: @course.id, id: @assignment.id }
       expect(assigns[:js_env][:DUE_DATE_REQUIRED_FOR_ACCOUNT]).to eq(true)
     end
 
     it "js_env DUE_DATE_REQUIRED_FOR_ACCOUNT is false when AssignmentUtil.due_date_required_for_account? == false" do
       user_session(@teacher)
       allow(AssignmentUtil).to receive(:due_date_required_for_account?).and_return(false)
-      get 'new', params: { :course_id => @course.id, :id => @assignment.id }
+      get 'new', params: { course_id: @course.id, id: @assignment.id }
       expect(assigns[:js_env][:DUE_DATE_REQUIRED_FOR_ACCOUNT]).to eq(false)
     end
 
     it "js_env SIS_NAME is Foo Bar when AssignmentUtil.post_to_sis_friendly_name is Foo Bar" do
       user_session(@teacher)
       allow(AssignmentUtil).to receive(:post_to_sis_friendly_name).and_return('Foo Bar')
-      get 'new', params: { :course_id => @course.id, :id => @assignment.id }
+      get 'new', params: { course_id: @course.id, id: @assignment.id }
       expect(assigns[:js_env][:SIS_NAME]).to eq('Foo Bar')
     end
 
@@ -1574,14 +1574,14 @@ describe AssignmentsController do
     context "with ?quiz_lti query param" do
       it "uses quizzes 2 if available" do
         tool = @course.context_external_tools.create!(
-          :name => 'Quizzes.Next',
-          :consumer_key => 'test_key',
-          :shared_secret => 'test_secret',
-          :tool_id => 'Quizzes 2',
-          :url => 'http://example.com/launch'
+          name: 'Quizzes.Next',
+          consumer_key: 'test_key',
+          shared_secret: 'test_secret',
+          tool_id: 'Quizzes 2',
+          url: 'http://example.com/launch'
         )
         user_session(@teacher)
-        get 'new', params: { :course_id => @course.id, :quiz_lti => true }
+        get 'new', params: { course_id: @course.id, quiz_lti: true }
         expect(assigns[:assignment].quiz_lti?).to be true
         expect(assigns[:assignment].external_tool_tag.content).to eq tool
         expect(assigns[:assignment].external_tool_tag.url).to eq tool.url
@@ -1589,24 +1589,24 @@ describe AssignmentsController do
 
       it "falls back to normal behaviour if quizzes 2 is not set up" do
         user_session(@teacher)
-        get 'new', params: { :course_id => @course.id, :quiz => true }
+        get 'new', params: { course_id: @course.id, quiz: true }
         expect(assigns[:assignment].quiz_lti?).to be false
       end
     end
 
     it 'set active_tab to assignments' do
-      get 'new', params: { :course_id => @course.id, :quiz_lti => true }
+      get 'new', params: { course_id: @course.id, quiz_lti: true }
       expect(assigns[:active_tab]).to eq('assignments')
     end
 
     context "when newquizzes_on_quiz_page FF is set" do
       before do
         @course.context_external_tools.create!(
-          :name => 'Quizzes.Next',
-          :consumer_key => 'test_key',
-          :shared_secret => 'test_secret',
-          :tool_id => 'Quizzes 2',
-          :url => 'http://example.com/launch'
+          name: 'Quizzes.Next',
+          consumer_key: 'test_key',
+          shared_secret: 'test_secret',
+          tool_id: 'Quizzes 2',
+          url: 'http://example.com/launch'
         )
         @course.root_account.settings[:provision] = { 'lti' => 'lti url' }
         @course.root_account.save!
@@ -1651,13 +1651,13 @@ describe AssignmentsController do
 
     it "requires authorization" do
       # controller.use_rails_error_handling!
-      post 'create', params: { :course_id => @course.id, :assignment => { :title => "some assignment" } }
+      post 'create', params: { course_id: @course.id, assignment: { title: "some assignment" } }
       assert_unauthorized
     end
 
     it "creates assignment" do
       user_session(@student)
-      post 'create', params: { :course_id => @course.id, :assignment => { :title => "some assignment" } }
+      post 'create', params: { course_id: @course.id, assignment: { title: "some assignment" } }
       expect(assigns[:assignment]).not_to be_nil
       expect(assigns[:assignment].title).to eql("some assignment")
       expect(assigns[:assignment].context_id).to eql(@course.id)
@@ -1665,7 +1665,7 @@ describe AssignmentsController do
 
     it "creates assignment when no groups exist yet" do
       user_session(@student)
-      post 'create', params: { :course_id => @course.id, :assignment => { :title => "some assignment", :assignment_group_id => '' } }
+      post 'create', params: { course_id: @course.id, assignment: { title: "some assignment", assignment_group_id: '' } }
       expect(assigns[:assignment]).not_to be_nil
       expect(assigns[:assignment].title).to eql("some assignment")
       expect(assigns[:assignment].context_id).to eql(@course.id)
@@ -1673,7 +1673,7 @@ describe AssignmentsController do
 
     it "sets updating_user on created assignment" do
       user_session(@teacher)
-      post 'create', params: { :course_id => @course.id, :assignment => { :title => "some assignment", :submission_types => "discussion_topic" } }
+      post 'create', params: { course_id: @course.id, assignment: { title: "some assignment", submission_types: "discussion_topic" } }
       a = assigns[:assignment]
       expect(a).not_to be_nil
       expect(a.discussion_topic).not_to be_nil
@@ -1681,14 +1681,14 @@ describe AssignmentsController do
     end
 
     it "defaults to unpublished if draft state is enabled" do
-      post 'create', params: { :course_id => @course.id, :assignment => { :title => "some assignment" } }
+      post 'create', params: { course_id: @course.id, assignment: { title: "some assignment" } }
       expect(assigns[:assignment]).to be_unpublished
     end
 
     it "assigns to a group" do
       user_session(@student)
       group2 = @course.assignment_groups.create!(name: 'group2')
-      post 'create', params: { :course_id => @course.id, :assignment => { :title => "some assignment", :assignment_group_id => group2.to_param } }
+      post 'create', params: { course_id: @course.id, assignment: { title: "some assignment", assignment_group_id: group2.to_param } }
       expect(assigns[:assignment]).not_to be_nil
       expect(assigns[:assignment].title).to eql("some assignment")
       expect(assigns[:assignment].context_id).to eql(@course.id)
@@ -1707,12 +1707,12 @@ describe AssignmentsController do
       a = @course.account
       a.settings[:sis_default_grade_export] = { locked: false, value: true }
       a.save!
-      post 'create', params: { :course_id => @course.id, :assignment => { :title => "some assignment" } }
+      post 'create', params: { course_id: @course.id, assignment: { title: "some assignment" } }
       expect(assigns[:assignment]).to be_post_to_sis
     end
 
     it "sets important_dates if provided" do
-      post 'create', params: { :course_id => @course.id, :assignment => { :important_dates => true } }
+      post 'create', params: { course_id: @course.id, assignment: { important_dates: true } }
       expect(assigns[:assignment].important_dates).to be true
     end
   end
@@ -1745,48 +1745,48 @@ describe AssignmentsController do
 
     it "js_env CANCEL_TO points to quizzes when quiz_lti? is true" do
       @course.context_external_tools.create!(
-        :name => 'Quizzes.Next',
-        :consumer_key => 'test_key',
-        :shared_secret => 'test_secret',
-        :tool_id => 'Quizzes 2',
-        :url => 'http://example.com/launch'
+        name: 'Quizzes.Next',
+        consumer_key: 'test_key',
+        shared_secret: 'test_secret',
+        tool_id: 'Quizzes 2',
+        url: 'http://example.com/launch'
       )
       @course.root_account.enable_feature! :quizzes_next
       @course.root_account.enable_feature! :newquizzes_on_quiz_page
       @course.enable_feature! :quizzes_next
       user_session(@teacher)
-      get 'new', params: { :course_id => @course.id, :quiz_lti => true }
+      get 'new', params: { course_id: @course.id, quiz_lti: true }
       expect(assigns[:js_env][:CANCEL_TO]).to include('quizzes')
     end
 
     it "js_env CANCEL_TO points to assignments when quiz_lti? is not included" do
       @course.context_external_tools.create!(
-        :name => 'Quizzes.Next',
-        :consumer_key => 'test_key',
-        :shared_secret => 'test_secret',
-        :tool_id => 'Quizzes 2',
-        :url => 'http://example.com/launch'
+        name: 'Quizzes.Next',
+        consumer_key: 'test_key',
+        shared_secret: 'test_secret',
+        tool_id: 'Quizzes 2',
+        url: 'http://example.com/launch'
       )
       @course.root_account.enable_feature! :quizzes_next
       @course.root_account.enable_feature! :newquizzes_on_quiz_page
       @course.enable_feature! :quizzes_next
       user_session(@teacher)
-      get 'new', params: { :course_id => @course.id, id: @assignment.id }
+      get 'new', params: { course_id: @course.id, id: @assignment.id }
       expect(assigns[:js_env][:CANCEL_TO]).to include('assignments')
     end
 
     it "js_env CANCEL_TO points to assignments when newquizzes_on_quiz_page feature flag is off" do
       @course.context_external_tools.create!(
-        :name => 'Quizzes.Next',
-        :consumer_key => 'test_key',
-        :shared_secret => 'test_secret',
-        :tool_id => 'Quizzes 2',
-        :url => 'http://example.com/launch'
+        name: 'Quizzes.Next',
+        consumer_key: 'test_key',
+        shared_secret: 'test_secret',
+        tool_id: 'Quizzes 2',
+        url: 'http://example.com/launch'
       )
       @course.root_account.enable_feature! :quizzes_next
       @course.enable_feature! :quizzes_next
       user_session(@teacher)
-      get 'new', params: { :course_id => @course.id, :quiz_lti => true }
+      get 'new', params: { course_id: @course.id, quiz_lti: true }
       expect(assigns[:js_env][:CANCEL_TO]).to include('assignments')
     end
 
@@ -1805,19 +1805,19 @@ describe AssignmentsController do
 
     it "requires authorization" do
       # controller.use_rails_error_handling!
-      get 'edit', params: { :course_id => @course.id, :id => @assignment.id }
+      get 'edit', params: { course_id: @course.id, id: @assignment.id }
       assert_unauthorized
     end
 
     it "finds assignment" do
       user_session(@student)
-      get 'edit', params: { :course_id => @course.id, :id => @assignment.id }
+      get 'edit', params: { course_id: @course.id, id: @assignment.id }
       expect(assigns[:assignment]).to eql(@assignment)
     end
 
     it "sets 'ROOT_OUTCOME_GROUP' in js_env" do
       user_session @teacher
-      get 'edit', params: { :course_id => @course.id, :id => @assignment.id }
+      get 'edit', params: { course_id: @course.id, id: @assignment.id }
 
       expect(assigns[:js_env][:ROOT_OUTCOME_GROUP]).not_to be_nil
     end
@@ -1827,7 +1827,7 @@ describe AssignmentsController do
       tool = @course.context_external_tools.create!(name: "a", url: "http://www.google.com", consumer_key: '12345', shared_secret: 'secret')
       @assignment.tool_settings_tool = tool
 
-      get 'edit', params: { :course_id => @course.id, :id => @assignment.id }
+      get 'edit', params: { course_id: @course.id, id: @assignment.id }
       expect(assigns[:js_env][:ASSIGNMENT]['id']).to eq @assignment.id
       expect(assigns[:js_env][:ASSIGNMENT_OVERRIDES]).to eq []
       expect(assigns[:js_env][:COURSE_ID]).to eq @course.id
@@ -1837,28 +1837,28 @@ describe AssignmentsController do
 
     it "bootstrap the assignment originality report visibility settings to js_env" do
       user_session(@teacher)
-      get 'edit', params: { :course_id => @course.id, :id => @assignment.id }
+      get 'edit', params: { course_id: @course.id, id: @assignment.id }
       expect(assigns[:js_env][:REPORT_VISIBILITY_SETTING]).to eq('immediate')
     end
 
     it "js_env DUE_DATE_REQUIRED_FOR_ACCOUNT is true when AssignmentUtil.due_date_required_for_account? == true" do
       user_session(@teacher)
       allow(AssignmentUtil).to receive(:due_date_required_for_account?).and_return(true)
-      get 'edit', params: { :course_id => @course.id, :id => @assignment.id }
+      get 'edit', params: { course_id: @course.id, id: @assignment.id }
       expect(assigns[:js_env][:DUE_DATE_REQUIRED_FOR_ACCOUNT]).to eq(true)
     end
 
     it "js_env DUE_DATE_REQUIRED_FOR_ACCOUNT is false when AssignmentUtil.due_date_required_for_account? == false" do
       user_session(@teacher)
       allow(AssignmentUtil).to receive(:due_date_required_for_account?).and_return(false)
-      get 'edit', params: { :course_id => @course.id, :id => @assignment.id }
+      get 'edit', params: { course_id: @course.id, id: @assignment.id }
       expect(assigns[:js_env][:DUE_DATE_REQUIRED_FOR_ACCOUNT]).to eq(false)
     end
 
     it "js_env SIS_NAME is Foo Bar when AssignmentUtil.post_to_sis_friendly_name is Foo Bar" do
       user_session(@teacher)
       allow(AssignmentUtil).to receive(:post_to_sis_friendly_name).and_return('Foo Bar')
-      get 'edit', params: { :course_id => @course.id, :id => @assignment.id }
+      get 'edit', params: { course_id: @course.id, id: @assignment.id }
       expect(assigns[:js_env][:SIS_NAME]).to eq('Foo Bar')
     end
 
@@ -1895,12 +1895,12 @@ describe AssignmentsController do
         }
 
         @tool = factory_with_protected_attributes(@course.context_external_tools,
-                                                  :url => "http://www.justanexamplenotarealwebsite.com/tool1",
-                                                  :shared_secret => 'test123',
-                                                  :consumer_key => 'test123',
-                                                  :name => tool_settings[:base_title],
-                                                  :settings => {
-                                                    :submission_type_selection => tool_settings
+                                                  url: "http://www.justanexamplenotarealwebsite.com/tool1",
+                                                  shared_secret: 'test123',
+                                                  consumer_key: 'test123',
+                                                  name: tool_settings[:base_title],
+                                                  settings: {
+                                                    submission_type_selection: tool_settings
                                                   })
         user_session(@teacher)
 
@@ -2021,7 +2021,7 @@ describe AssignmentsController do
 
       it "bootstraps the correct message_handler id for LTI 2 tools to js_env" do
         user_session(@teacher)
-        get 'edit', params: { :course_id => @course.id, :id => @assignment.id }
+        get 'edit', params: { course_id: @course.id, id: @assignment.id }
         expect(assigns[:js_env][:SELECTED_CONFIG_TOOL_ID]).to eq message_handler.id
       end
 
@@ -2030,7 +2030,7 @@ describe AssignmentsController do
         tool_proxy.save!
 
         user_session(@student)
-        get 'show', params: { :course_id => @course.id, :id => @assignment.id }
+        get 'show', params: { course_id: @course.id, id: @assignment.id }
         expect(assigns[:js_env][:EULA_URL]).to eq service_offered[0]['endpoint']
       end
     end
@@ -2042,26 +2042,26 @@ describe AssignmentsController do
 
       it "to quiz" do
         assignment_quiz [], course: @course
-        get 'edit', params: { :course_id => @course.id, :id => @quiz.assignment.id }
+        get 'edit', params: { course_id: @course.id, id: @quiz.assignment.id }
         expect(response).to redirect_to controller.edit_course_quiz_path(@course, @quiz)
       end
 
       it "to discussion topic" do
         group_assignment_discussion course: @course
-        get 'edit', params: { :course_id => @course.id, :id => @root_topic.assignment.id }
+        get 'edit', params: { course_id: @course.id, id: @root_topic.assignment.id }
         expect(response).to redirect_to controller.edit_course_discussion_topic_path(@course, @root_topic)
       end
 
       it "to wiki page" do
         @course.enable_feature!(:conditional_release)
         wiki_page_assignment_model course: @course
-        get 'edit', params: { :course_id => @course.id, :id => @page.assignment.id }
+        get 'edit', params: { course_id: @course.id, id: @page.assignment.id }
         expect(response).to redirect_to controller.edit_course_wiki_page_path(@course, @page)
       end
 
       it "includes return_to" do
         assignment_quiz [], course: @course
-        get 'edit', params: { :course_id => @course.id, :id => @quiz.assignment.id, :return_to => 'flibberty' }
+        get 'edit', params: { course_id: @course.id, id: @quiz.assignment.id, return_to: 'flibberty' }
         expect(response.redirect_url).to match(/\?return_to=flibberty/)
       end
     end
@@ -2074,14 +2074,14 @@ describe AssignmentsController do
       it "defines env when enabled" do
         allow(ConditionalRelease::Service).to receive(:enabled_in_context?).and_return(true)
         user_session(@teacher)
-        get 'edit', params: { :course_id => @course.id, :id => @assignment.id }
+        get 'edit', params: { course_id: @course.id, id: @assignment.id }
         expect(assigns[:js_env][:dummy]).to eq 'cr-assignment'
       end
 
       it "does not define env when not enabled" do
         allow(ConditionalRelease::Service).to receive(:enabled_in_context?).and_return(false)
         user_session(@teacher)
-        get 'edit', params: { :course_id => @course.id, :id => @assignment.id }
+        get 'edit', params: { course_id: @course.id, id: @assignment.id }
         expect(assigns[:js_env][:dummy]).to be nil
       end
     end
@@ -2157,13 +2157,13 @@ describe AssignmentsController do
 
   describe "DELETE 'destroy'" do
     it "requires authorization" do
-      delete 'destroy', params: { :course_id => @course.id, :id => @assignment.id }
+      delete 'destroy', params: { course_id: @course.id, id: @assignment.id }
       assert_unauthorized
     end
 
     it "deletes assignments if authorized" do
       user_session(@teacher)
-      delete 'destroy', params: { :course_id => @course.id, :id => @assignment.id }
+      delete 'destroy', params: { course_id: @course.id, id: @assignment.id }
       expect(assigns[:assignment]).not_to be_nil
       expect(assigns[:assignment]).not_to be_frozen
       expect(assigns[:assignment]).to be_deleted

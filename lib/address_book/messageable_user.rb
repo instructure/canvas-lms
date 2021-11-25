@@ -21,7 +21,7 @@ module AddressBook
   # implementation of AddressBook interface backed by MessageableUser
   class MessageableUser < AddressBook::Base
     def known_users(users, options = {})
-      options = { :strict_checks => true }.merge(options)
+      options = { strict_checks: true }.merge(options)
       if options[:context]
         user_ids = users.map { |user| Shard.global_id_for(user) }.to_set
         asset_string = options[:context].respond_to?(:asset_string) ? options[:context].asset_string : options[:context]

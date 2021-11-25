@@ -21,7 +21,7 @@ module Api::V1::Quiz
   include Api::V1::Json
 
   API_ALLOWED_QUIZ_INPUT_FIELDS = {
-    :only => (%w[
+    only: (%w[
       access_code
       allowed_attempts
       anonymous_submissions
@@ -53,7 +53,7 @@ module Api::V1::Quiz
       title
       unlock_at
     ] + [{ 'hide_results' => ArbitraryStrongishParams::ANYTHING }] # because sometimes this is a hash :/
-             ).freeze
+          ).freeze
   }.freeze
 
   def quizzes_json(quizzes, context, user, session, options = {})

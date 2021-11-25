@@ -94,65 +94,65 @@ module Api
 
   SIS_MAPPINGS = {
     'courses' =>
-      { :lookups => { 'sis_course_id' => 'sis_source_id',
-                      'id' => 'id',
-                      'sis_integration_id' => 'integration_id',
-                      'lti_context_id' => 'lti_context_id',
-                      'uuid' => 'uuid' }.freeze,
-        :is_not_scoped_to_account => ['id'].freeze,
-        :scope => 'root_account_id' }.freeze,
+      { lookups: { 'sis_course_id' => 'sis_source_id',
+                   'id' => 'id',
+                   'sis_integration_id' => 'integration_id',
+                   'lti_context_id' => 'lti_context_id',
+                   'uuid' => 'uuid' }.freeze,
+        is_not_scoped_to_account: ['id'].freeze,
+        scope: 'root_account_id' }.freeze,
     'enrollment_terms' =>
-      { :lookups => { 'sis_term_id' => 'sis_source_id',
-                      'id' => 'id',
-                      'sis_integration_id' => 'integration_id' }.freeze,
-        :is_not_scoped_to_account => ['id'].freeze,
-        :scope => 'root_account_id' }.freeze,
+      { lookups: { 'sis_term_id' => 'sis_source_id',
+                   'id' => 'id',
+                   'sis_integration_id' => 'integration_id' }.freeze,
+        is_not_scoped_to_account: ['id'].freeze,
+        scope: 'root_account_id' }.freeze,
     'users' =>
-      { :lookups => { 'sis_user_id' => 'pseudonyms.sis_user_id',
-                      'sis_login_id' => {
-                        column: 'LOWER(pseudonyms.unique_id)',
-                        transform: ->(id) { QuotedValue.new("LOWER(#{Pseudonym.connection.quote(id)})") }
-                      },
-                      'id' => 'users.id',
-                      'sis_integration_id' => 'pseudonyms.integration_id',
-                      'lti_context_id' => 'users.lti_context_id', # leaving for legacy reasons
-                      'lti_user_id' => 'users.lti_context_id', # leaving for legacy reasons
-                      'lti_1_1_id' => 'users.lti_context_id',
-                      'lti_1_3_id' => 'users.lti_id',
-                      'uuid' => 'users.uuid' }.freeze,
-        :is_not_scoped_to_account => ['users.id', 'users.lti_context_id', 'users.lti_id', 'users.uuid'].freeze,
-        :scope => 'pseudonyms.account_id',
-        :joins => :pseudonym }.freeze,
+      { lookups: { 'sis_user_id' => 'pseudonyms.sis_user_id',
+                   'sis_login_id' => {
+                     column: 'LOWER(pseudonyms.unique_id)',
+                     transform: ->(id) { QuotedValue.new("LOWER(#{Pseudonym.connection.quote(id)})") }
+                   },
+                   'id' => 'users.id',
+                   'sis_integration_id' => 'pseudonyms.integration_id',
+                   'lti_context_id' => 'users.lti_context_id', # leaving for legacy reasons
+                   'lti_user_id' => 'users.lti_context_id', # leaving for legacy reasons
+                   'lti_1_1_id' => 'users.lti_context_id',
+                   'lti_1_3_id' => 'users.lti_id',
+                   'uuid' => 'users.uuid' }.freeze,
+        is_not_scoped_to_account: ['users.id', 'users.lti_context_id', 'users.lti_id', 'users.uuid'].freeze,
+        scope: 'pseudonyms.account_id',
+        joins: :pseudonym }.freeze,
     'accounts' =>
-      { :lookups => { 'sis_account_id' => 'sis_source_id',
-                      'id' => 'id',
-                      'sis_integration_id' => 'integration_id',
-                      'lti_context_id' => 'lti_context_id',
-                      'uuid' => 'uuid' }.freeze,
-        :is_not_scoped_to_account => %w[id lti_context_id uuid].freeze,
-        :scope => 'root_account_id' }.freeze,
+      { lookups: { 'sis_account_id' => 'sis_source_id',
+                   'id' => 'id',
+                   'sis_integration_id' => 'integration_id',
+                   'lti_context_id' => 'lti_context_id',
+                   'uuid' => 'uuid' }.freeze,
+        is_not_scoped_to_account: %w[id lti_context_id uuid].freeze,
+        scope: 'root_account_id' }.freeze,
     'course_sections' =>
-      { :lookups => { 'sis_section_id' => 'sis_source_id',
-                      'id' => 'id',
-                      'sis_integration_id' => 'integration_id' }.freeze,
-        :is_not_scoped_to_account => ['id'].freeze,
-        :scope => 'root_account_id' }.freeze,
+      { lookups: { 'sis_section_id' => 'sis_source_id',
+                   'id' => 'id',
+                   'sis_integration_id' => 'integration_id' }.freeze,
+        is_not_scoped_to_account: ['id'].freeze,
+        scope: 'root_account_id' }.freeze,
     'groups' =>
-        { :lookups => { 'sis_group_id' => 'sis_source_id',
-                        'id' => 'id' }.freeze,
-          :is_not_scoped_to_account => ['id'].freeze,
-          :scope => 'root_account_id' }.freeze,
+        { lookups: { 'sis_group_id' => 'sis_source_id',
+                     'id' => 'id' }.freeze,
+          is_not_scoped_to_account: ['id'].freeze,
+          scope: 'root_account_id' }.freeze,
     'group_categories' =>
-        { :lookups => { 'sis_group_category_id' => 'sis_source_id',
-                        'id' => 'id' }.freeze,
-          :is_not_scoped_to_account => ['id'].freeze,
-          :scope => 'root_account_id' }.freeze,
+        { lookups: { 'sis_group_category_id' => 'sis_source_id',
+                     'id' => 'id' }.freeze,
+          is_not_scoped_to_account: ['id'].freeze,
+          scope: 'root_account_id' }.freeze,
     'assignments' =>
-        { :lookups => { 'sis_assignment_id' => 'sis_source_id',
-                        'id' => 'id',
-                        'lti_context_id' => 'lti_context_id' }.freeze,
-          :is_not_scoped_to_account => ['id'].freeze,
-          :scope => 'root_account_id' }.freeze,
+        { lookups: { 'sis_assignment_id' => 'sis_source_id',
+                     'id' => 'id',
+                     'lti_context_id' => 'lti_context_id' }.freeze,
+          is_not_scoped_to_account: ['id'].freeze,
+          scope: 'root_account_id' }.freeze,
   }.freeze
 
   MAX_ID = ((2**63) - 1)
@@ -470,7 +470,7 @@ module Api
       uri = URI.parse(url)
       raise(ArgumentError, "pagination url is not an absolute uri: #{url}") unless uri.is_a?(URI::HTTP)
 
-      Rack::Utils.parse_nested_query(uri.query).merge(:uri => uri, :rel => rel)
+      Rack::Utils.parse_nested_query(uri.query).merge(uri: uri, rel: rel)
     end
   end
 
@@ -481,10 +481,10 @@ module Api
       'display_name' => media_object_or_hash.title.presence || media_object_or_hash.user_entered_title,
       'media_id' => media_object_or_hash.media_id,
       'media_type' => media_object_or_hash.media_type,
-      'url' => user_media_download_url(:user_id => @current_user.id,
-                                       :entryId => media_object_or_hash.media_id,
-                                       :type => "mp4",
-                                       :redirect => "1")
+      'url' => user_media_download_url(user_id: @current_user.id,
+                                       entryId: media_object_or_hash.media_id,
+                                       type: "mp4",
+                                       redirect: "1")
     }
   end
 

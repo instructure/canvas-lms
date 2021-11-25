@@ -53,7 +53,7 @@ module CsvDiff
       @output.close
       io = @output_file.tap(&:rewind)
       if options[:return_count]
-        { :file_io => io, :row_count => @row_count }
+        { file_io: io, row_count: @row_count }
       else
         io
       end

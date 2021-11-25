@@ -30,7 +30,7 @@ describe "dashboard" do
       course_with_teacher(active_all: true, new_user: true, user_name: 'Teacher First', course_name: 'Dashboard Course')
 
       @section1 = @course.course_sections.first
-      @section2 = @course.course_sections.create!(:name => 'Section 2')
+      @section2 = @course.course_sections.create!(name: 'Section 2')
 
       @student1 = User.create!(name: 'Student One')
       @course.enroll_student(@student1, section: @section1).accept!
@@ -93,7 +93,7 @@ describe "dashboard" do
       course_with_teacher(active_all: true, new_user: true, user_name: 'Teacher First', course_name: 'Dashboard Course')
 
       @section1 = @course.course_sections.first
-      @section2 = @course.course_sections.create!(:name => 'Section 2')
+      @section2 = @course.course_sections.create!(name: 'Section 2')
 
       @student1 = User.create!(name: 'Student One')
       @course.enroll_student(@student1, section: @section1).accept!

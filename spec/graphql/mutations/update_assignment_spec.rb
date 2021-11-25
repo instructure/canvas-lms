@@ -96,8 +96,8 @@ describe Mutations::UpdateAssignment do
   end
 
   def create_module_and_add_assignment(name)
-    course_module1 = @course.context_modules.create!(:name => name)
-    course_module1.add_item(:id => @assignment_id, :type => 'assignment')
+    course_module1 = @course.context_modules.create!(name: name)
+    course_module1.add_item(id: @assignment_id, type: 'assignment')
     course_module1
   end
 
@@ -388,7 +388,7 @@ describe Mutations::UpdateAssignment do
 
   it "can add and remove itself from a module" do
     expect(Assignment.find(@assignment_id).context_module_tag_ids).to eq([])
-    course_module1 = @course.context_modules.create!(:name => "module-1")
+    course_module1 = @course.context_modules.create!(name: "module-1")
     result = execute_with_input <<~GQL
       id: "#{@assignment_id}"
       moduleIds: ["#{course_module1.id}"]
@@ -429,7 +429,7 @@ describe Mutations::UpdateAssignment do
   it "can add itself from a module when part of more than one" do
     expect(Assignment.find(@assignment_id).context_module_tag_ids).to eq([])
     course_module1 = create_module_and_add_assignment("module-1")
-    course_module2 = @course.context_modules.create!(:name => "module-2")
+    course_module2 = @course.context_modules.create!(name: "module-2")
     course_module3 = create_module_and_add_assignment("module-3")
     expect(get_assignment_module_ids).to eq([course_module1.id, course_module3.id])
     result = execute_with_input <<~GQL
@@ -448,7 +448,7 @@ describe Mutations::UpdateAssignment do
   it "does not remove itself from a module if in same module multiple times" do
     expect(Assignment.find(@assignment_id).context_module_tag_ids).to eq([])
     course_module1 = create_module_and_add_assignment("module-1")
-    course_module1.add_item(:id => @assignment_id, :type => 'assignment')
+    course_module1.add_item(id: @assignment_id, type: 'assignment')
     expect(get_assignment_module_ids).to eq([course_module1.id, course_module1.id])
     result = execute_with_input <<~GQL
       id: "#{@assignment_id}"
@@ -465,7 +465,7 @@ describe Mutations::UpdateAssignment do
   it "does not error when a module is specified multiple times" do
     expect(Assignment.find(@assignment_id).context_module_tag_ids).to eq([])
     course_module1 = create_module_and_add_assignment("module-1")
-    course_module1.add_item(:id => @assignment_id, :type => 'assignment')
+    course_module1.add_item(id: @assignment_id, type: 'assignment')
     expect(get_assignment_module_ids).to eq([course_module1.id, course_module1.id])
     result = execute_with_input <<~GQL
       id: "#{@assignment_id}"

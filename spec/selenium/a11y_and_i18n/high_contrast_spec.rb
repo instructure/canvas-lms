@@ -23,7 +23,7 @@ describe "high_contrast" do
   include_context "in-process server selenium tests"
 
   context "InstUI components" do
-    before { course_with_teacher_logged_in(:active_all => true) }
+    before { course_with_teacher_logged_in(active_all: true) }
 
     context "WITHOUT high_contrast turned on" do
       it 'meets 3.5:1 contrast for buttons' do

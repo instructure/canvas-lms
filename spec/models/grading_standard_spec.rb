@@ -154,12 +154,12 @@ describe GradingStandard do
 
   context "sorted" do
     it "returns used grading standards before unused ones" do
-      gs = grading_standard_for(@course.root_account, :title => "zzz")
-      gs2 = grading_standard_for(@course.root_account, :title => "aaa")
+      gs = grading_standard_for(@course.root_account, title: "zzz")
+      gs2 = grading_standard_for(@course.root_account, title: "aaa")
 
       # Add this grading standard to 3 assignments, triggring the "used" condition
       3.times do
-        @course.assignments.create!(:title => "hi", :grading_standard_id => gs.id)
+        @course.assignments.create!(title: "hi", grading_standard_id: gs.id)
       end
 
       standards = GradingStandard.for(@course).sorted
@@ -168,8 +168,8 @@ describe GradingStandard do
     end
 
     it "returns standards with a title first" do
-      gs = grading_standard_for(@course.root_account, :title => "zzz")
-      gs2 = grading_standard_for(@course.root_account, :title => "aaa")
+      gs = grading_standard_for(@course.root_account, title: "zzz")
+      gs2 = grading_standard_for(@course.root_account, title: "aaa")
       gs2.title = nil
       gs2.save!
 
@@ -303,8 +303,8 @@ describe GradingStandard do
 
     context "with assignment link" do
       before(:once) do
-        @assignment = @course.assignments.create!(:title => "hi",
-                                                  :grading_type => 'letter_grade', :grading_standard_id => @gs.id, :submission_types => ["online_text_entry"])
+        @assignment = @course.assignments.create!(title: "hi",
+                                                  grading_type: 'letter_grade', grading_standard_id: @gs.id, submission_types: ["online_text_entry"])
       end
 
       context "without submissions" do
@@ -315,7 +315,7 @@ describe GradingStandard do
 
       context "with submissions" do
         before(:once) do
-          @submission = @assignment.submit_homework(@student, :body => "done!")
+          @submission = @assignment.submit_homework(@student, body: "done!")
         end
 
         it "is false if no submissions are graded" do

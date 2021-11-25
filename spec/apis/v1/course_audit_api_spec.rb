@@ -40,11 +40,11 @@ describe "CourseAudit API", type: :request do
 
     before do
       @request_id = SecureRandom.uuid
-      allow(RequestContextGenerator).to receive_messages(:request_id => @request_id)
+      allow(RequestContextGenerator).to receive_messages(request_id: @request_id)
 
       @domain_root_account = Account.default
       @viewing_user = user_with_pseudonym(account: @domain_root_account)
-      @account_user = @viewing_user.account_users.create(:account => @domain_root_account)
+      @account_user = @viewing_user.account_users.create(account: @domain_root_account)
 
       course_with_teacher(account: @domain_root_account)
 
@@ -59,7 +59,7 @@ describe "CourseAudit API", type: :request do
       type = context.class.to_s.downcase unless (type = options.delete(:type))
       id ||= context.id.to_s
 
-      arguments = { controller: 'course_audit_api', action: "for_#{type}", :"#{type}_id" => id, format: 'json' }
+      arguments = { controller: 'course_audit_api', action: "for_#{type}", "#{type}_id": id, format: 'json' }
       query_string = []
 
       if (per_page = options.delete(:per_page))
@@ -162,7 +162,7 @@ describe "CourseAudit API", type: :request do
       end
 
       it "does not authorize the endpoints with revoking the :view_course_changes permission" do
-        RoleOverride.manage_role_override(@account_user.account, @account_user.role, :view_course_changes.to_s, :override => false)
+        RoleOverride.manage_role_override(@account_user.account, @account_user.role, :view_course_changes.to_s, override: false)
 
         fetch_for_context(@course, expected_status: 401)
         fetch_for_context(@domain_root_account, expected_status: 401)

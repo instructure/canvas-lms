@@ -329,7 +329,7 @@ class GradebookExporter
     # course_section: used for display_name in csv output
     # user > pseudonyms: used for sis_user_id/unique_id if options[:include_sis_id]
     # user > pseudonyms > account: used in SisPseudonym > works_for_account
-    includes = { :user => { :pseudonyms => :account }, :course_section => [], :scores => [] }
+    includes = { user: { pseudonyms: :account }, course_section: [], scores: [] }
 
     enrollments = scope.preload(includes).eager_load(:user).order_by_sortable_name.to_a
     enrollments.each { |e| e.course = @course }

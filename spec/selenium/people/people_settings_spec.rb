@@ -100,7 +100,7 @@ describe "course people" do
 
     it "removes a user from the course" do
       username = "user@example.com"
-      student_in_course(:name => username, :role => @custom_student_role)
+      student_in_course(name: username, role: @custom_student_role)
       add_section('Section1')
       @enrollment.course_section = @course_section
       @enrollment.save!
@@ -114,7 +114,7 @@ describe "course people" do
 
     def add_user_to_second_section(role = nil, enrollment_state = 'invited')
       role ||= student_role
-      student_in_course(:user => user_with_pseudonym, :role => role, :enrollment_state => enrollment_state)
+      student_in_course(user: user_with_pseudonym, role: role, enrollment_state: enrollment_state)
       section_name = 'Another Section'
       add_section(section_name)
       # open tab
@@ -147,7 +147,7 @@ describe "course people" do
       @course.restrict_enrollments_to_course_dates = true
       @course.save!
 
-      student_in_course(:user => user_with_pseudonym, :role => student_role)
+      student_in_course(user: user_with_pseudonym, role: student_role)
       section_name = 'Another Section'
       add_section(section_name)
 
@@ -173,7 +173,7 @@ describe "course people" do
     it "views the users enrollment details" do
       username = "user@example.com"
       # add_section 'foo'
-      student_in_course(:name => username, :active_all => true)
+      student_in_course(name: username, active_all: true)
 
       go_to_people_page
       # open dialog
@@ -191,7 +191,7 @@ describe "course people" do
 
     it "is able to deactivate and reactivate users" do
       username = "user@example.com"
-      student_in_course(:name => username, :active_all => true)
+      student_in_course(name: username, active_all: true)
 
       go_to_people_page
       cog = open_kyle_menu(@student)
@@ -235,15 +235,15 @@ describe "course people" do
 
     it "deals with observers linked to multiple students" do
       students = []
-      obs = user_with_pseudonym(:name => "The Observer")
+      obs = user_with_pseudonym(name: "The Observer")
       2.times do |i|
-        student_in_course(:name => "Student #{i}")
+        student_in_course(name: "Student #{i}")
         students << @student
-        e = @course.observer_enrollments.create!(:user => obs, :workflow_state => 'active')
+        e = @course.observer_enrollments.create!(user: obs, workflow_state: 'active')
         e.associated_user_id = @student.id
         e.save!
       end
-      student_in_course(:name => "Student 3")
+      student_in_course(name: "Student 3")
       students << @student
 
       go_to_people_page
@@ -269,18 +269,18 @@ describe "course people" do
     it "handles deleted observee enrollments" do
       custom_observer_role = custom_observer_role("obob")
 
-      obs = user_model(:name => "The Observer")
-      student_in_course(:name => "Student 1", :active_all => true, :role => @custom_student_role)
-      @course.enroll_user(obs, 'ObserverEnrollment', :enrollment_state => 'active', :associated_user_id => @student.id, :role => custom_observer_role)
-      student_in_course(:name => "Student 2", :active_all => true, :role => @custom_student_role)
+      obs = user_model(name: "The Observer")
+      student_in_course(name: "Student 1", active_all: true, role: @custom_student_role)
+      @course.enroll_user(obs, 'ObserverEnrollment', enrollment_state: 'active', associated_user_id: @student.id, role: custom_observer_role)
+      student_in_course(name: "Student 2", active_all: true, role: @custom_student_role)
       obs_enrollment =
         @course.enroll_user(
           obs,
           'ObserverEnrollment',
-          :enrollment_state => 'active',
-          :associated_user_id => @student.id,
-          :allow_multiple_enrollments => true,
-          :role => custom_observer_role
+          enrollment_state: 'active',
+          associated_user_id: @student.id,
+          allow_multiple_enrollments: true,
+          role: custom_observer_role
         )
 
       # bye bye Student 2
@@ -303,9 +303,9 @@ describe "course people" do
     %w[ta designer].each do |et|
       it "does not let #{et}s remove admins from the course" do
         send "custom_#{et}_role", "custom"
-        send "course_with_#{et}", :course => @course, :active_all => true, :custom_role => 'custom'
+        send "course_with_#{et}", course: @course, active_all: true, custom_role: 'custom'
         user_session @user
-        student_in_course :user => user_with_pseudonym, :course => @course, :role => @custom_student_role
+        student_in_course user: user_with_pseudonym, course: @course, role: @custom_student_role
 
         go_to_people_page
 
@@ -330,7 +330,7 @@ describe "course people" do
 
       it "removes a user from the course" do
         username = "user@example.com"
-        student_in_course(:name => username, :role => @custom_student_role)
+        student_in_course(name: username, role: @custom_student_role)
         add_section('Section1')
         @enrollment.course_section = @course_section
         @enrollment.save!
@@ -349,9 +349,9 @@ describe "course people" do
 
     context "multiple enrollments" do
       it "links an observer enrollment when other enrollment types exist" do
-        course_with_student :course => @course, :active_all => true, :name => 'teh student'
-        course_with_ta :user => user_with_pseudonym, :course => @course, :active_all => true
-        course_with_observer :course => @course, :active_all => true, :user => @ta
+        course_with_student course: @course, active_all: true, name: 'teh student'
+        course_with_ta user: user_with_pseudonym, course: @course, active_all: true
+        course_with_observer course: @course, active_all: true, user: @ta
 
         go_to_people_page
         use_link_dialog(@observer, 'ObserverEnrollment') do
@@ -366,8 +366,8 @@ describe "course people" do
     context "custom roles" do
       it "creates new observer enrollments as custom type when adding observees" do
         role = custom_observer_role("custom observer")
-        student_in_course :course => @course
-        course_with_observer(:course => @course, :role => role)
+        student_in_course course: @course
+        course_with_observer(course: @course, role: role)
 
         go_to_people_page
 
@@ -393,7 +393,7 @@ describe "course people" do
 
       %w[student teacher ta designer observer].each do |base_type|
         it "allows adding custom #{base_type} enrollments" do
-          user = user_with_pseudonym(:active_all => true, :username => "#{base_type}@example.com", :name => "#{base_type}@example.com")
+          user = user_with_pseudonym(active_all: true, username: "#{base_type}@example.com", name: "#{base_type}@example.com")
           send "custom_#{base_type}_role", "custom"
           add_user(user.name, "custom")
           expect(f("#user_#{user.id} .admin-links")).not_to be_nil
@@ -407,7 +407,7 @@ describe "course people" do
 
         %w[student teacher ta designer observer].each do |base_type|
           it "allows adding custom #{base_type} enrollments" do
-            user = user_with_pseudonym(:active_all => true, :username => "#{base_type}@example.com", :name => "#{base_type}@example.com")
+            user = user_with_pseudonym(active_all: true, username: "#{base_type}@example.com", name: "#{base_type}@example.com")
             send "custom_#{base_type}_role", "custom"
             add_user(user.name, "custom")
             expect(f("#user_#{user.id} .admin-links")).not_to be_nil

@@ -29,8 +29,8 @@ describe "account admin outcomes" do
 
   describe "course outcomes" do
     before do
-      RoleOverride.create!(:context => account, :permission => 'manage_courses',
-                           :role => admin_role, :enabled => false) # should not manage_courses permission
+      RoleOverride.create!(context: account, permission: 'manage_courses',
+                           role: admin_role, enabled: false) # should not manage_courses permission
       course_with_admin_logged_in
     end
 
@@ -126,7 +126,7 @@ describe "account admin outcomes" do
     def setup_fake_state_data(counter)
       root_group = LearningOutcomeGroup.global_root_outcome_group
       1.upto(counter) do |og|
-        root_group = root_group.child_outcome_groups.create!(:title => "Level #{og}")
+        root_group = root_group.child_outcome_groups.create!(title: "Level #{og}")
       end
     end
 

@@ -62,7 +62,7 @@ module Lti
       end
 
       it 'creates the json' do
-        expect(ToolSetting.custom_settings(tool_proxy.id, account, 'abc')).to eq({ link: :setting, a: 1, b: 2, c: 3, :binding => :setting, :d => 4, :proxy => :setting })
+        expect(ToolSetting.custom_settings(tool_proxy.id, account, 'abc')).to eq({ link: :setting, a: 1, b: 2, c: 3, binding: :setting, d: 4, proxy: :setting })
       end
     end
 

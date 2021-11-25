@@ -128,12 +128,12 @@ class SortsAssignments
                          end
 
       sorted_assignments = by_due_date(
-        :course => context,
-        :assignments => overridden_assignments,
-        :user => user_for_sorting,
-        :current_user => current_user,
-        :session => session,
-        :submissions => submissions_for_user
+        course: context,
+        assignments: overridden_assignments,
+        user: user_for_sorting,
+        current_user: current_user,
+        session: session,
+        submissions: submissions_for_user
       )
       filtered_assignment_ids = sorted_assignments.send(bucket).call.map(&:id)
       given_scope.where(id: filtered_assignment_ids)

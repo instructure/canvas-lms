@@ -100,33 +100,33 @@ RSpec.describe SubmissionComment do
       @student_ended = user_model
       @section_ended = @course.course_sections.create!(end_at: Time.zone.now - 1.day)
 
-      Notification.create!(:name => 'Submission Comment', category: 'TestImmediately')
-      Notification.create!(:name => 'Submission Comment For Teacher')
+      Notification.create!(name: 'Submission Comment', category: 'TestImmediately')
+      Notification.create!(name: 'Submission Comment For Teacher')
     end
 
     it "dispatches notifications on create for published assignment" do
-      comment = @submission.add_comment(:author => @teacher, :comment => "some comment")
+      comment = @submission.add_comment(author: @teacher, comment: "some comment")
       expect(comment.messages_sent.keys.sort).to eq ["Submission Comment"]
 
-      comment = @submission.add_comment(:author => @student, :comment => "some comment")
+      comment = @submission.add_comment(author: @student, comment: "some comment")
       expect(comment.messages_sent.keys.sort).to eq ["Submission Comment For Teacher"]
     end
 
     it "dispatches notifications to observers" do
       course_with_observer(active_all: true, active_cc: true, course: @course, associated_user_id: @student.id)
-      @submission.add_comment(:author => @teacher, :comment => "some comment")
+      @submission.add_comment(author: @teacher, comment: "some comment")
       expect(@observer.email_channel.messages.length).to eq 1
     end
 
     it "does not send notifications to users in concluded sections" do
       @submission_ended = @assignment.submit_homework(@student_ended)
-      @comment = @submission_ended.add_comment(:author => @teacher, :comment => "some comment")
+      @comment = @submission_ended.add_comment(author: @teacher, comment: "some comment")
       expect(@comment.messages_sent.keys).not_to be_include('Submission Comment')
     end
 
     it "does not dispatch notification on create if course is unpublished" do
       @course.complete
-      @comment = @submission.add_comment(:author => @teacher, :comment => "some comment")
+      @comment = @submission.add_comment(author: @teacher, comment: "some comment")
       expect(@course).to_not be_available
       expect(@comment.messages_sent.keys).to_not be_include('Submission Comment')
     end
@@ -134,19 +134,19 @@ RSpec.describe SubmissionComment do
     it "does not dispatch notification on create if student is inactive" do
       @student.enrollments.first.deactivate
 
-      @comment = @submission.add_comment(:author => @teacher, :comment => "some comment")
+      @comment = @submission.add_comment(author: @teacher, comment: "some comment")
       expect(@comment.messages_sent.keys).to_not be_include('Submission Comment')
     end
 
     it "does not dispatch notification on create for provisional comments" do
-      @comment = @submission.add_comment(:author => @teacher, :comment => "huttah!", :provisional => true)
+      @comment = @submission.add_comment(author: @teacher, comment: "huttah!", provisional: true)
       expect(@comment.messages_sent).to be_empty
     end
 
     it "dispatches notification on create to teachers even if submission not submitted yet" do
       student_in_course(active_all: true)
       @submission = @assignment.find_or_create_submission(@student)
-      @comment = @submission.add_comment(:author => @student, :comment => "some comment")
+      @comment = @submission.add_comment(author: @student, comment: "some comment")
       expect(@submission).to be_unsubmitted
       expect(@comment.messages_sent).to be_include('Submission Comment For Teacher')
     end
@@ -178,19 +178,19 @@ RSpec.describe SubmissionComment do
   end
 
   it "allows valid attachments" do
-    a = Attachment.create!(:context => @assignment, :uploaded_data => default_uploaded_data)
+    a = Attachment.create!(context: @assignment, uploaded_data: default_uploaded_data)
     @comment = @submission.submission_comments.create!(valid_attributes)
     expect(a.recently_created).to eql(true)
     @comment.reload
-    @comment.update(:attachments => [a])
+    @comment.update(attachments: [a])
     expect(@comment.attachment_ids).to eql(a.id.to_s)
   end
 
   it "rejects invalid attachments" do
-    a = Attachment.create!(:context => @assignment, :uploaded_data => default_uploaded_data)
+    a = Attachment.create!(context: @assignment, uploaded_data: default_uploaded_data)
     a.recently_created = false
     @comment = @submission.submission_comments.create!(valid_attributes)
-    @comment.update(:attachments => [a])
+    @comment.update(attachments: [a])
     expect(@comment.attachment_ids).to eql("")
   end
 
@@ -216,14 +216,14 @@ RSpec.describe SubmissionComment do
     @course.enroll_teacher(user_factory)
     @se = @course.enroll_student(user_factory)
     @assignment.reload
-    @submission = @assignment.submit_homework(@se.user, :body => 'some message')
+    @submission = @assignment.submit_homework(@se.user, body: 'some message')
     @submission.created_at = Time.now - 60
     @submission.save
   end
 
   it "sends the submission to the stream" do
     prepare_test_submission
-    @comment = @submission.add_comment(:author => @se.user, :comment => "some comment")
+    @comment = @submission.add_comment(author: @se.user, comment: "some comment")
     @item = StreamItem.last
     expect(@item).not_to be_nil
     expect(@item.asset).to eq @submission
@@ -235,16 +235,16 @@ RSpec.describe SubmissionComment do
 
   it "marks last_comment_at on the submission" do
     prepare_test_submission
-    @submission.add_comment(:author => @submission.user, :comment => "some comment")
+    @submission.add_comment(author: @submission.user, comment: "some comment")
     expect(@submission.reload.last_comment_at).to be_nil
 
-    draft_comment = @submission.add_comment(:author => @teacher, :comment => "some comment", :draft_comment => true)
+    draft_comment = @submission.add_comment(author: @teacher, comment: "some comment", draft_comment: true)
     expect(@submission.reload.last_comment_at).to be_nil
 
-    frd_comment = @submission.add_comment(:author => @teacher, :comment => "some comment")
+    frd_comment = @submission.add_comment(author: @teacher, comment: "some comment")
     expect(@submission.reload.last_comment_at.to_i).to eq frd_comment.created_at.to_i
 
-    draft_comment.update(:draft => false, :created_at => 2.days.from_now) # should re-run after update
+    draft_comment.update(draft: false, created_at: 2.days.from_now) # should re-run after update
     expect(@submission.reload.last_comment_at.to_i).to eq draft_comment.created_at.to_i
 
     draft_comment.destroy # should re-run after destroy
@@ -254,23 +254,23 @@ RSpec.describe SubmissionComment do
   it "does not create a stream item for a provisional comment" do
     prepare_test_submission
     expect do
-      @submission.add_comment(:author => @teacher, :comment => "some comment", :provisional => true)
+      @submission.add_comment(author: @teacher, comment: "some comment", provisional: true)
     end.to change(StreamItem, :count).by(0)
   end
 
   it "ensures the media object exists" do
     assignment_model
     se = @course.enroll_student(user_factory)
-    @submission = @assignment.submit_homework(se.user, :body => 'some message')
-    expect(MediaObject).to receive(:ensure_media_object).with("fake", { :context => se.user, :user => se.user })
-    @comment = @submission.add_comment(:author => se.user, :media_comment_type => 'audio', :media_comment_id => 'fake')
+    @submission = @assignment.submit_homework(se.user, body: 'some message')
+    expect(MediaObject).to receive(:ensure_media_object).with("fake", { context: se.user, user: se.user })
+    @comment = @submission.add_comment(author: se.user, media_comment_type: 'audio', media_comment_id: 'fake')
   end
 
   describe "peer reviews" do
     before(:once) do
       @student1 = @student
-      @student2 = student_in_course(:active_all => true).user
-      @student3 = student_in_course(:active_all => true).user
+      @student2 = student_in_course(active_all: true).user
+      @student3 = student_in_course(active_all: true).user
 
       @assignment.peer_reviews = true
       @assignment.save!
@@ -279,9 +279,9 @@ RSpec.describe SubmissionComment do
     end
 
     it "prevents peer reviewer from seeing other comments" do
-      @teacher_comment = @submission.add_comment(:author => @teacher, :comment => "some comment from teacher")
-      @reviewer_comment = @submission.add_comment(:author => @student2, :comment => "some comment from peer reviewer")
-      @my_comment = @submission.add_comment(:author => @student3, :comment => "some comment from me")
+      @teacher_comment = @submission.add_comment(author: @teacher, comment: "some comment from teacher")
+      @reviewer_comment = @submission.add_comment(author: @student2, comment: "some comment from peer reviewer")
+      @my_comment = @submission.add_comment(author: @student3, comment: "some comment from me")
 
       expect(@teacher_comment.grants_right?(@student3, :read)).to be_falsey
       expect(@reviewer_comment.grants_right?(@student3, :read)).to be_falsey
@@ -326,30 +326,30 @@ RSpec.describe SubmissionComment do
 
   describe "reply_from" do
     it "ignores replies on deleted accounts" do
-      comment = @submission.add_comment(:user => @teacher, :comment => "some comment")
+      comment = @submission.add_comment(user: @teacher, comment: "some comment")
       Account.default.destroy
       comment.reload
       expect do
-        comment.reply_from(:user => @student, :text => "some reply")
+        comment.reply_from(user: @student, text: "some reply")
       end.to raise_error(IncomingMail::Errors::UnknownAddress)
     end
 
     it "creates reply" do
-      comment = @submission.add_comment(:user => @teacher, :comment => "blah")
-      reply = comment.reply_from(:user => @teacher, :text => "oops I meant blah")
+      comment = @submission.add_comment(user: @teacher, comment: "blah")
+      reply = comment.reply_from(user: @teacher, text: "oops I meant blah")
       expect(reply.provisional_grade).to be_nil
     end
 
     it "does not create reply for observers" do
-      comment = @submission.add_comment(:user => @teacher, :comment => "blah")
+      comment = @submission.add_comment(user: @teacher, comment: "blah")
       expect do
-        comment.reply_from(:user => @observer, :text => "some reply")
+        comment.reply_from(user: @observer, text: "some reply")
       end.to raise_error(IncomingMail::Errors::InvalidParticipant)
     end
 
     it "creates reply in the same provisional grade" do
-      comment = @submission.add_comment(:user => @teacher, :comment => "blah", :provisional => true)
-      reply = comment.reply_from(:user => @teacher, :text => "oops I meant blah")
+      comment = @submission.add_comment(user: @teacher, comment: "blah", provisional: true)
+      reply = comment.reply_from(user: @teacher, text: "oops I meant blah")
       expect(reply.provisional_grade).to eq(comment.provisional_grade)
       expect(reply.provisional_grade.scorer).to eq @teacher
     end
@@ -384,7 +384,7 @@ RSpec.describe SubmissionComment do
 
     it "does not set unread state when a provisional comment is made" do
       expect do
-        @submission.add_comment(:author => @teacher, :comment => 'wat', :provisional => true)
+        @submission.add_comment(author: @teacher, comment: 'wat', provisional: true)
       end.to change(ContentParticipation, :count).by(0)
       expect(@submission.read?(@student)).to eq true
     end

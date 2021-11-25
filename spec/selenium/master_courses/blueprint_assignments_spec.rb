@@ -75,14 +75,14 @@ describe "blueprint courses assignments" do
   context "in the associated course" do
     before :once do
       due_date = format_date_for_view(Time.zone.now - 1.month)
-      @copy_from = course_factory(:active_all => true)
+      @copy_from = course_factory(active_all: true)
       @template = MasterCourses::MasterTemplate.set_as_master_course(@copy_from)
       @original_assmt = @copy_from.assignments.create!(
         title: "blah", description: "bloo", points_possible: 27, due_at: due_date
       )
       @tag = @template.create_content_tag_for!(@original_assmt)
 
-      course_with_teacher(:active_all => true)
+      course_with_teacher(active_all: true)
       @copy_to = @course
       @template.add_child_course!(@copy_to)
       # just create a copy directly instead of doing a real migration

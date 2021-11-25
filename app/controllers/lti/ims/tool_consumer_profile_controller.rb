@@ -40,7 +40,7 @@ module Lti
           tcp_uuid: tcp_uuid,
           developer_key: dev_key
         ).create
-        render json: profile.to_json, :content_type => 'application/vnd.ims.lti.v2.toolconsumerprofile+json'
+        render json: profile.to_json, content_type: 'application/vnd.ims.lti.v2.toolconsumerprofile+json'
       end
 
       def lti2_service_name

@@ -45,7 +45,7 @@ module AppCenter
 
       begin
         cache_key = ['app_center', base_url, endpoint, offset, access_token].cache_key
-        response = Rails.cache.fetch(cache_key, :expires_in => expires) do
+        response = Rails.cache.fetch(cache_key, expires_in: expires) do
           uri = URI.parse("#{base_url}#{endpoint}")
           uri.query = [uri.query, "offset=#{offset}"].compact.join('&')
           CanvasHttp.get(uri.to_s).body

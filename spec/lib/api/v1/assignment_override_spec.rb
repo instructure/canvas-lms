@@ -33,10 +33,10 @@ describe Api::V1::AssignmentOverride do
 
   describe "#interpret_assignment_override_data" do
     it "works even with nil date fields" do
-      override = { :student_ids => [1],
-                   :due_at => nil,
-                   :unlock_at => nil,
-                   :lock_at => nil }
+      override = { student_ids: [1],
+                   due_at: nil,
+                   unlock_at: nil,
+                   lock_at: nil }
       allow(subject).to receive(:api_find_all).and_return []
       assignment = double(context: double(all_students: []))
       result = subject.interpret_assignment_override_data(assignment, override, 'ADHOC')
@@ -55,7 +55,7 @@ describe Api::V1::AssignmentOverride do
         @shard1.activate { @user = User.create!(name: "Shardy McShardface") }
         @course.enroll_student @user
 
-        override = { :student_ids => [@student.global_id] }
+        override = { student_ids: [@student.global_id] }
 
         allow(subject).to receive(:api_find_all).and_return [@student]
         assignment = double(context: double(all_students: []))

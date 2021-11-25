@@ -114,11 +114,11 @@ RSpec.describe AnonymousSubmissionsController do
       @course.account.enable_service(:avatars)
       @assessor = @student
       outcome_with_rubric
-      @association = @rubric.associate_with @assignment, @context, :purpose => 'grading'
+      @association = @rubric.associate_with @assignment, @context, purpose: 'grading'
       @assignment.peer_reviews = true
       @assignment.save!
       @assignment.assign_peer_review(@assessor, @submission.user)
-      @assessment = @association.assess(:assessor => @assessor, :user => @submission.user, :artifact => @submission, :assessment => { :assessment_type => 'grading' })
+      @assessment = @association.assess(assessor: @assessor, user: @submission.user, artifact: @submission, assessment: { assessment_type: 'grading' })
       user_session(@assessor)
 
       get :show, params: { course_id: @context.id, assignment_id: @assignment.id, anonymous_id: @submission.anonymous_id }

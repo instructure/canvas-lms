@@ -21,10 +21,10 @@
 require 'atom'
 
 class Wiki < ActiveRecord::Base
-  has_many :wiki_pages, :dependent => :destroy
+  has_many :wiki_pages, dependent: :destroy
   has_one :course
   has_one :group
-  belongs_to :root_account, :class_name => 'Account'
+  belongs_to :root_account, class_name: 'Account'
 
   before_save :set_has_no_front_page_default
   after_update :set_downstream_change_for_master_courses
@@ -42,7 +42,7 @@ class Wiki < ActiveRecord::Base
   # some hacked up stuff similar to what's in MasterCourses::Restrictor
   def load_tag_for_master_course_import!(child_subscription_id)
     @child_tag_for_import = MasterCourses::ChildContentTag.where(content: self).first ||
-                            MasterCourses::ChildContentTag.create(:content => self, :child_subscription_id => child_subscription_id)
+                            MasterCourses::ChildContentTag.create(content: self, child_subscription_id: child_subscription_id)
   end
 
   def can_update_front_page_for_master_courses?
@@ -68,8 +68,8 @@ class Wiki < ActiveRecord::Base
       entry.title     = title
       entry.updated   = updated_at
       entry.published = created_at
-      entry.links << Atom::Link.new(:rel => 'alternate',
-                                    :href => "/wikis/#{id}")
+      entry.links << Atom::Link.new(rel: 'alternate',
+                                    href: "/wikis/#{id}")
     end
   end
 
@@ -95,7 +95,7 @@ class Wiki < ActiveRecord::Base
     set_front_page_url!(url) if has_no_front_page && page
 
     # return an implicitly created page if a page could not be found
-    page ||= wiki_pages.temp_record(:title => url.titleize, :url => url, :context => context)
+    page ||= wiki_pages.temp_record(title: url.titleize, url: url, context: context)
     page
   end
 
@@ -184,13 +184,13 @@ class Wiki < ActiveRecord::Base
         return context.wiki if context.wiki_id
 
         # TODO: i18n
-        t :default_course_wiki_name, "%{course_name} Wiki", :course_name => nil
-        t :default_group_wiki_name, "%{group_name} Wiki", :group_name => nil
+        t :default_course_wiki_name, "%{course_name} Wiki", course_name: nil
+        t :default_group_wiki_name, "%{group_name} Wiki", group_name: nil
 
         extend TextHelper
-        name = CanvasTextHelper.truncate_text(context.name, { :max_length => 200, :ellipsis => '' })
+        name = CanvasTextHelper.truncate_text(context.name, { max_length: 200, ellipsis: '' })
 
-        context.wiki = wiki = Wiki.create!(:title => "#{name} Wiki", :root_account_id => context.root_account_id)
+        context.wiki = wiki = Wiki.create!(title: "#{name} Wiki", root_account_id: context.root_account_id)
         context.save!
         wiki
       end

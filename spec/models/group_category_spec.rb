@@ -115,10 +115,10 @@ describe GroupCategory do
     it "is true iff the role is 'student_organized', regardless of name" do
       course = @course
       expect(GroupCategory.student_organized_for(course)).to be_student_organized
-      expect(account.group_categories.create(:name => 'Student Groups')).not_to be_student_organized
+      expect(account.group_categories.create(name: 'Student Groups')).not_to be_student_organized
       expect(GroupCategory.imported_for(course)).not_to be_student_organized
       expect(GroupCategory.imported_for(course)).not_to be_student_organized
-      expect(course.group_categories.create(:name => 'Random Category')).not_to be_student_organized
+      expect(course.group_categories.create(name: 'Random Category')).not_to be_student_organized
       expect(GroupCategory.communities_for(account)).not_to be_student_organized
     end
   end
@@ -127,10 +127,10 @@ describe GroupCategory do
     it "is true if the role is 'communities', regardless of name" do
       course = @course
       expect(GroupCategory.student_organized_for(course)).not_to be_communities
-      expect(account.group_categories.create(:name => 'Communities')).not_to be_communities
+      expect(account.group_categories.create(name: 'Communities')).not_to be_communities
       expect(GroupCategory.imported_for(course)).not_to be_communities
       expect(GroupCategory.imported_for(course)).not_to be_communities
-      expect(course.group_categories.create(:name => 'Random Category')).not_to be_communities
+      expect(course.group_categories.create(name: 'Random Category')).not_to be_communities
       expect(GroupCategory.communities_for(account)).to be_communities
     end
   end
@@ -139,10 +139,10 @@ describe GroupCategory do
     it "is true iff the category is student organized or communities" do
       course = @course
       expect(GroupCategory.student_organized_for(course).allows_multiple_memberships?).to be_truthy
-      expect(account.group_categories.create(:name => 'Student Groups').allows_multiple_memberships?).to be_falsey
+      expect(account.group_categories.create(name: 'Student Groups').allows_multiple_memberships?).to be_falsey
       expect(GroupCategory.imported_for(course).allows_multiple_memberships?).to be_falsey
       expect(GroupCategory.imported_for(course).allows_multiple_memberships?).to be_falsey
-      expect(course.group_categories.create(:name => 'Random Category').allows_multiple_memberships?).to be_falsey
+      expect(course.group_categories.create(name: 'Random Category').allows_multiple_memberships?).to be_falsey
       expect(GroupCategory.communities_for(account).allows_multiple_memberships?).to be_truthy
     end
   end
@@ -151,9 +151,9 @@ describe GroupCategory do
     it "is true iff the category has a role other than 'imported'" do
       course = @course
       expect(GroupCategory.student_organized_for(course)).to be_protected
-      expect(account.group_categories.create(:name => 'Student Groups')).not_to be_protected
+      expect(account.group_categories.create(name: 'Student Groups')).not_to be_protected
       expect(GroupCategory.imported_for(course)).not_to be_protected
-      expect(course.group_categories.create(:name => 'Random Category')).not_to be_protected
+      expect(course.group_categories.create(name: 'Random Category')).not_to be_protected
       expect(GroupCategory.communities_for(account)).to be_protected
     end
   end
@@ -175,8 +175,8 @@ describe GroupCategory do
     it "destroys dependent groups" do
       course = @course
       category = group_category
-      category.groups.create(:context => course)
-      category.groups.create(:context => course)
+      category.groups.create(context: course)
+      category.groups.create(context: course)
       course.reload
       expect(course.groups.active.count).to eq 2
       category.destroy
@@ -204,7 +204,7 @@ describe GroupCategory do
   context "has_heterogenous_group?" do
     it "is false for accounts" do
       category = group_category(context: account)
-      category.groups.create(:context => account)
+      category.groups.create(context: account)
       expect(category).not_to have_heterogenous_group
     end
 
@@ -214,7 +214,7 @@ describe GroupCategory do
       user1 = section1.enroll_user(user_model, 'StudentEnrollment').user
       user2 = section2.enroll_user(user_model, 'StudentEnrollment').user
       category = group_category
-      group = category.groups.create(:context => @course)
+      group = category.groups.create(context: @course)
       group.add_user(user1)
       group.add_user(user2)
       expect(category).to have_heterogenous_group
@@ -225,7 +225,7 @@ describe GroupCategory do
       user1 = section1.enroll_user(user_model, 'StudentEnrollment').user
       user2 = section1.enroll_user(user_model, 'StudentEnrollment').user
       category = group_category
-      group = category.groups.create(:context => @course)
+      group = category.groups.create(context: @course)
       group.add_user(user1)
       group.add_user(user2)
       expect(category).not_to have_heterogenous_group
@@ -237,7 +237,7 @@ describe GroupCategory do
       category = group_category
       category.group_limit = 2
       category.save
-      group = category.groups.create(:context => @course)
+      group = category.groups.create(context: @course)
       expect(group.max_membership).to eq 2
       category.group_limit = 4
       category.save
@@ -247,7 +247,7 @@ describe GroupCategory do
 
   describe "group_for" do
     before :once do
-      student_in_course(:active_all => true)
+      student_in_course(active_all: true)
       @category = group_category
     end
 
@@ -256,15 +256,15 @@ describe GroupCategory do
     end
 
     it "returns nil if no active groups in category" do
-      group = @category.groups.create(:context => @course)
+      group = @category.groups.create(context: @course)
       group.add_user(@student)
       group.destroy
       expect(@category.group_for(@student)).to be_nil
     end
 
     it "returns the group the student is in" do
-      @category.groups.create(:context => @course)
-      group2 = @category.groups.create(:context => @course)
+      @category.groups.create(context: @course)
+      group2 = @category.groups.create(context: @course)
       group2.add_user(@student)
       expect(@category.group_for(@student)).to eq group2
     end
@@ -272,9 +272,9 @@ describe GroupCategory do
 
   context "#distribute_members_among_groups" do
     it "prefers groups with fewer users" do
-      category = @course.group_categories.create(:name => "Group Category")
-      group1 = category.groups.create(:name => "Group 1", :context => @course)
-      group2 = category.groups.create(:name => "Group 2", :context => @course)
+      category = @course.group_categories.create(name: "Group Category")
+      group1 = category.groups.create(name: "Group 1", context: @course)
+      group2 = category.groups.create(name: "Group 2", context: @course)
       student1 = @course.enroll_student(user_model).user
       student2 = @course.enroll_student(user_model).user
       student3 = @course.enroll_student(user_model).user
@@ -296,9 +296,9 @@ describe GroupCategory do
     end
 
     it "assigns leaders according to policy" do
-      category = @course.group_categories.create(:name => "Group Category")
+      category = @course.group_categories.create(name: "Group Category")
       category.update_attribute(:auto_leader, 'first')
-      (1..3).each { |n| category.groups.create(:name => "Group #{n}", :context => @course) }
+      (1..3).each { |n| category.groups.create(name: "Group #{n}", context: @course) }
       create_users_in_course(@course, 6)
 
       groups = category.groups.active
@@ -309,10 +309,10 @@ describe GroupCategory do
     end
 
     it "updates cached due dates for affected assignments" do
-      category = @course.group_categories.create(:name => "Group Category")
+      category = @course.group_categories.create(name: "Group Category")
       @course.assignments.create!
       assignment2 = @course.assignments.create! group_category: category
-      group = category.groups.create(:name => "Group 1", :context => @course)
+      group = category.groups.create(name: "Group 1", context: @course)
       student = @course.enroll_student(user_model).user
 
       expect(DueDateCacher).to receive(:recompute_course).with(@course.id, assignments: [assignment2.id])
@@ -322,9 +322,9 @@ describe GroupCategory do
 
   context "#assign_unassigned_members_in_background" do
     it "uses the progress object" do
-      category = @course.group_categories.create(:name => "Group Category")
-      category.groups.create(:name => "Group 1", :context => @course)
-      group2 = category.groups.create(:name => "Group 2", :context => @course)
+      category = @course.group_categories.create(name: "Group Category")
+      category.groups.create(name: "Group 1", context: @course)
+      group2 = category.groups.create(name: "Group 2", context: @course)
       student1, = create_users_in_course(@course, 2, return_type: :record)
       group2.add_user(student1)
 
@@ -339,11 +339,11 @@ describe GroupCategory do
 
   context "#assign_unassigned_members" do
     before(:once) do
-      @category = @course.group_categories.create(:name => "Group Category")
+      @category = @course.group_categories.create(name: "Group Category")
     end
 
     it "does not assign inactive users to groups" do
-      @category.groups.create(:name => "Group 1", :context => @course)
+      @category.groups.create(name: "Group 1", context: @course)
       student1 = @course.enroll_student(user_model).user
       inactive_en = @course.enroll_student(user_model)
       inactive_en.deactivate
@@ -357,8 +357,8 @@ describe GroupCategory do
     end
 
     it "does not assign users to inactive groups" do
-      group1 = @category.groups.create(:name => "Group 1", :context => @course)
-      group2 = @category.groups.create(:name => "Group 2", :context => @course)
+      group1 = @category.groups.create(name: "Group 1", context: @course)
+      group2 = @category.groups.create(name: "Group 2", context: @course)
       student1 = @course.enroll_student(user_model).user
       @course.enroll_student(user_model).user
       group2.add_user(student1)
@@ -373,8 +373,8 @@ describe GroupCategory do
     end
 
     it "does not assign users already in group in the @category" do
-      @category.groups.create(:name => "Group 1", :context => @course)
-      group2 = @category.groups.create(:name => "Group 2", :context => @course)
+      @category.groups.create(name: "Group 1", context: @course)
+      group2 = @category.groups.create(name: "Group 2", context: @course)
       student1 = @course.enroll_student(user_model).user
       @course.enroll_student(user_model).user
       group2.add_user(student1)
@@ -385,8 +385,8 @@ describe GroupCategory do
     end
 
     it "otherwises assign ungrouped users to groups in the @category" do
-      @category.groups.create(:name => "Group 1", :context => @course)
-      group2 = @category.groups.create(:name => "Group 2", :context => @course)
+      @category.groups.create(name: "Group 1", context: @course)
+      group2 = @category.groups.create(name: "Group 2", context: @course)
       student1 = @course.enroll_student(user_model).user
       student2 = @course.enroll_student(user_model).user
       group2.add_user(student1)
@@ -462,7 +462,7 @@ describe GroupCategory do
 
   context "#calculate_group_count_by_membership" do
     before(:once) do
-      @category = @course.group_categories.create(:name => "Group Category")
+      @category = @course.group_categories.create(name: "Group Category")
     end
 
     it "calculates correctly for a clean split" do
@@ -497,7 +497,7 @@ describe GroupCategory do
 
   context "#current_progress" do
     it "returns a new progress if the other progresses are completed" do
-      category = @course.group_categories.create!(:name => "Group Category")
+      category = @course.group_categories.create!(name: "Group Category")
       # given existing completed progress
       expect(category.current_progress).to be_nil
       category.send :start_progress
@@ -513,12 +513,12 @@ describe GroupCategory do
 
   context "#clone_groups_and_memberships" do
     it "does not duplicate wiki ids" do
-      category = @course.group_categories.create!(:name => "Group Category")
+      category = @course.group_categories.create!(name: "Group Category")
       group = category.groups.create!(name: "Group 1", context: @course)
       group.wiki # this creates a wiki for the group
       expect(group.wiki_id).not_to be_nil
 
-      new_category = @course.group_categories.create!(:name => "New Group Category")
+      new_category = @course.group_categories.create!(name: "New Group Category")
       category.clone_groups_and_memberships(new_category)
       new_category.reload
       new_group = new_category.groups.first
@@ -533,11 +533,11 @@ describe GroupCategory do
         calc = GroupCategory::GroupBySectionCalculator.new(nil)
         mock_users_by_section = {}
         section_counts.each_with_index do |u_count, idx|
-          mock_users_by_section[idx] = double(:count => u_count)
+          mock_users_by_section[idx] = double(count: u_count)
         end
         calc.users_by_section_id = mock_users_by_section
         calc.user_count = section_counts.sum
-        calc.groups = double(:count => group_count)
+        calc.groups = double(count: group_count)
         dist = calc.determine_group_distribution
         dist.sort_by(&:first).map(&:last)
       end
@@ -574,22 +574,22 @@ describe GroupCategory do
     end
 
     before :once do
-      @category = @course.group_categories.create!(:name => "category")
+      @category = @course.group_categories.create!(name: "category")
     end
 
     it "requires as many groups as sections" do
       section2 = @course.course_sections.create!
-      student_in_course(:course => @course)
-      student_in_course(:course => @course, :section => section2)
-      @category.groups.create!(:name => "group", :context => @course)
+      student_in_course(course: @course)
+      student_in_course(course: @course, section: section2)
+      @category.groups.create!(name: "group", context: @course)
 
       expect(@category.distribute_members_among_groups_by_section).to be_falsey
       expect(@category.errors.full_messages.first).to include("Must have at least as many groups as sections")
     end
 
     it "requires empty groups" do
-      student_in_course(:course => @course)
-      group = @category.groups.create!(:name => "group", :context => @course)
+      student_in_course(course: @course)
+      group = @category.groups.create!(name: "group", context: @course)
       group.add_user(@student)
 
       expect(@category.distribute_members_among_groups_by_section).to be_falsey
@@ -597,7 +597,7 @@ describe GroupCategory do
     end
 
     it "complains if groups have size restrictions" do
-      group = @category.groups.create!(:name => "group", :context => @course)
+      group = @category.groups.create!(name: "group", context: @course)
       group.max_membership = 2
       group.save!
 
@@ -622,7 +622,7 @@ describe GroupCategory do
       end
 
       groups = []
-      6.times { |i| groups << @category.groups.create(:name => "Group #{i}", :context => @course) }
+      6.times { |i| groups << @category.groups.create(name: "Group #{i}", context: @course) }
 
       expect(@category.distribute_members_among_groups_by_section).to be_truthy
       groups.each do |group|
@@ -645,19 +645,19 @@ describe GroupCategory do
     end
 
     it "does not explode when there are more groups than students" do
-      student_in_course(:course => @course)
+      student_in_course(course: @course)
 
       groups = []
-      2.times { |i| groups << @category.groups.create(:name => "Group #{i}", :context => @course) }
+      2.times { |i| groups << @category.groups.create(name: "Group #{i}", context: @course) }
 
       expect(@category.distribute_members_among_groups_by_section).to be_truthy
       expect(groups.map(&:users).flatten).to eq [@student]
     end
 
     it "auto-assigns leaders if necessary" do
-      student_in_course(:course => @course)
+      student_in_course(course: @course)
 
-      group = @category.groups.create(:name => "Group", :context => @course)
+      group = @category.groups.create(name: "Group", context: @course)
       @category.update_attribute(:auto_leader, 'first')
 
       @category.assign_unassigned_members(true)

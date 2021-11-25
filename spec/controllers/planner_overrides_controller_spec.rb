@@ -22,7 +22,7 @@ describe PlannerOverridesController do
   before :once do
     course_with_teacher(active_all: true)
     student_in_course(active_all: true)
-    @group = @course.assignment_groups.create(:name => "some group")
+    @group = @course.assignment_groups.create(name: "some group")
     @assignment = course_assignment
     @assignment2 = course_assignment
     @planner_override = PlannerOverride.create!(plannable_id: @assignment.id,
@@ -33,9 +33,9 @@ describe PlannerOverridesController do
 
   def course_assignment
     @course.assignments.create(
-      :title => "some assignment #{@course.assignments.count}",
-      :assignment_group => @group,
-      :due_at => Time.zone.now + 1.week
+      title: "some assignment #{@course.assignments.count}",
+      assignment_group: @group,
+      due_at: Time.zone.now + 1.week
     )
   end
 
@@ -44,9 +44,9 @@ describe PlannerOverridesController do
       get :index
       assert_unauthorized
 
-      post :create, params: { :plannable_type => "assignment",
-                              :plannable_id => @assignment.id,
-                              :marked_complete => false }
+      post :create, params: { plannable_type: "assignment",
+                              plannable_id: @assignment.id,
+                              marked_complete: false }
       assert_unauthorized
     end
   end

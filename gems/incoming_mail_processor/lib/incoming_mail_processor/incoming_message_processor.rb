@@ -25,10 +25,10 @@ module IncomingMailProcessor
     extend HtmlTextHelper
 
     MailboxClasses = {
-      :imap => IncomingMailProcessor::ImapMailbox,
-      :directory => IncomingMailProcessor::DirectoryMailbox,
-      :pop3 => IncomingMailProcessor::Pop3Mailbox,
-      :sqs => IncomingMailProcessor::SqsMailbox,
+      imap: IncomingMailProcessor::ImapMailbox,
+      directory: IncomingMailProcessor::DirectoryMailbox,
+      pop3: IncomingMailProcessor::Pop3Mailbox,
+      sqs: IncomingMailProcessor::SqsMailbox,
     }.freeze
 
     ImportantHeaders = %w[To From Subject Content-Type].freeze
@@ -130,10 +130,10 @@ module IncomingMailProcessor
           error_folder = mailbox_config.delete(:error_folder)
           address = mailbox_config[:address] || mailbox_config[:username]
           IncomingMailProcessor::MailboxAccount.new({
-                                                      :protocol => mailbox_protocol.to_sym,
-                                                      :config => mailbox_config,
-                                                      :address => address,
-                                                      :error_folder => error_folder,
+                                                      protocol: mailbox_protocol.to_sym,
+                                                      config: mailbox_config,
+                                                      address: address,
+                                                      error_folder: error_folder,
                                                     })
         end
       end
@@ -302,10 +302,10 @@ module IncomingMailProcessor
           mailbox.move_message(message_id, error_folder)
           if message
             @error_reporter.log_error(self.class.error_report_category, {
-                                        :message => "Error parsing email",
-                                        :backtrace => message.errors.flatten.map(&:to_s).join("\n"),
-                                        :from => message.from.try(:first),
-                                        :to => message.to.to_s,
+                                        message: "Error parsing email",
+                                        backtrace: message.errors.flatten.map(&:to_s).join("\n"),
+                                        from: message.from.try(:first),
+                                        to: message.to.to_s,
                                       })
           end
         end
@@ -346,8 +346,8 @@ module IncomingMailProcessor
       process_single(message, tag, account)
     rescue => e
       @error_reporter.log_exception(self.class.error_report_category, e,
-                                    :from => message.from.try(:first),
-                                    :to => message.to.to_s)
+                                    from: message.from.try(:first),
+                                    to: message.to.to_s)
     end
   end
 end

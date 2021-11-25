@@ -25,12 +25,12 @@ class Quizzes::QuizQuestion::FileUploadQuestion < Quizzes::QuizQuestion::Base
 
   # TODO: remove once new stats is on for everybody
   def stats(responses)
-    stats = { :file_upload_responses => [] }
+    stats = { file_upload_responses: [] }
 
     responses.each do |response|
       stats[:file_upload_responses] << {
         # TODO: what does file upload quiz stats need?
-        :user_id => response[:user_id]
+        user_id: response[:user_id]
         # :filename => response[:text].strip
       }
     end

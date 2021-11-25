@@ -26,9 +26,9 @@ describe WebConference do
   def stub_plugins
     allow(WebConference).to receive(:plugins).and_return(
       [
-        web_conference_plugin_mock("big_blue_button", { :domain => "bbb.instructure.com", :secret_dec => "secret" }),
-        web_conference_plugin_mock("wimba", { :domain => "wimba.test" }),
-        web_conference_plugin_mock("broken_plugin", { :foor => :bar })
+        web_conference_plugin_mock("big_blue_button", { domain: "bbb.instructure.com", secret_dec: "secret" }),
+        web_conference_plugin_mock("wimba", { domain: "wimba.test" }),
+        web_conference_plugin_mock("broken_plugin", { foor: :bar })
       ]
     )
   end
@@ -80,15 +80,15 @@ describe WebConference do
     it "ignores invalid user settings" do
       email = "email@email.com"
       allow(@user).to receive(:email).and_return(email)
-      conference = WimbaConference.create!(:title => "my conference", :user => @user, :user_settings => { :foo => :bar }, :context => course_factory)
+      conference = WimbaConference.create!(title: "my conference", user: @user, user_settings: { foo: :bar }, context: course_factory)
       expect(conference.user_settings).to be_empty
     end
 
     it "does not expose internal settings to users" do
       email = "email@email.com"
       allow(@user).to receive(:email).and_return(email)
-      conference = BigBlueButtonConference.new(:title => "my conference", :user => @user, :context => course_factory)
-      conference.settings = { :record => true, :not => :for_user }
+      conference = BigBlueButtonConference.new(title: "my conference", user: @user, context: course_factory)
+      conference.settings = { record: true, not: :for_user }
       conference.save
       conference.reload
       expect(conference.user_settings).not_to have_key(:not)
@@ -97,7 +97,7 @@ describe WebConference do
     it "does not mark object dirty if settings are unchanged" do
       email = "email@email.com"
       allow(@user).to receive(:email).and_return(email)
-      conference = BigBlueButtonConference.create!(:title => "my conference", :user => @user, :context => course_factory, user_settings: { record: true })
+      conference = BigBlueButtonConference.create!(title: "my conference", user: @user, context: course_factory, user_settings: { record: true })
       user_settings = conference.user_settings.dup
       conference.user_settings = user_settings
       expect(conference).not_to be_changed
@@ -106,7 +106,7 @@ describe WebConference do
     it "marks object dirty if settings are changed" do
       email = "email@email.com"
       allow(@user).to receive(:email).and_return(email)
-      conference = BigBlueButtonConference.create!(:title => "my conference", :user => @user, :context => course_factory, user_settings: { record: true })
+      conference = BigBlueButtonConference.create!(title: "my conference", user: @user, context: course_factory, user_settings: { record: true })
       conference.user_settings = { record: false }
       expect(conference).to be_changed
     end
@@ -118,7 +118,7 @@ describe WebConference do
     end
 
     let!(:conference) do
-      WimbaConference.create!(:title => "my conference", :user => @user, :duration => 60, :context => course_factory)
+      WimbaConference.create!(title: "my conference", user: @user, duration: 60, context: course_factory)
     end
 
     before do
@@ -221,7 +221,7 @@ describe WebConference do
       course = course_factory(active_all: true)
       course.enroll_student(user1).accept!
       course.enroll_student(user2).accept!
-      conference = BigBlueButtonConference.new(:title => "my conference", :user => user1, :context => course)
+      conference = BigBlueButtonConference.new(title: "my conference", user: user1, context: course)
       conference.save
       conference.invite_users_from_context([user2.id])
       expect(conference.invitees.pluck(:user_id)).to match_array([user2.id])
@@ -233,7 +233,7 @@ describe WebConference do
       course = course_factory(active_all: true)
       course.enroll_student(user1).accept!
       course.enroll_student(user2).accept!
-      conference = BigBlueButtonConference.new(:title => "my conference", :user => user1, :context => course)
+      conference = BigBlueButtonConference.new(title: "my conference", user: user1, context: course)
       conference.save
       conference.invite_users_from_context
       expect(conference.invitees.pluck(:user_id)).to match_array(course.user_ids)
@@ -242,10 +242,10 @@ describe WebConference do
 
   context "notifications" do
     before do
-      Notification.create!(:name => 'Web Conference Invitation',
-                           :category => "TestImmediately")
-      Notification.create!(:name => 'Web Conference Recording Ready',
-                           :category => "TestImmediately")
+      Notification.create!(name: 'Web Conference Invitation',
+                           category: "TestImmediately")
+      Notification.create!(name: 'Web Conference Recording Ready',
+                           category: "TestImmediately")
       course_with_teacher(active_all: true)
       @student = user_with_communication_channel(active_all: true)
       student_in_course(user: @student, active_all: true)
@@ -253,9 +253,9 @@ describe WebConference do
 
     it "sends invitation notifications", priority: "1" do
       conference = WimbaConference.create!(
-        :title => "my conference",
-        :user => @teacher,
-        :context => @course
+        title: "my conference",
+        user: @teacher,
+        context: @course
       )
       conference.add_attendee(@student)
       conference.save!
@@ -267,9 +267,9 @@ describe WebConference do
       @course.save!
 
       conference = WimbaConference.create!(
-        :title => "my conference",
-        :user => @teacher,
-        :context => @course
+        title: "my conference",
+        user: @teacher,
+        context: @course
       )
       conference.add_attendee(@student)
       conference.save!
@@ -283,9 +283,9 @@ describe WebConference do
       @course.save!
 
       conference = WimbaConference.create!(
-        :title => "my conference",
-        :user => @teacher,
-        :context => @course
+        title: "my conference",
+        user: @teacher,
+        context: @course
       )
       conference.add_attendee(@student)
       conference.save!
@@ -294,9 +294,9 @@ describe WebConference do
 
     it "sends recording ready notifications, but only once" do
       conference = WimbaConference.create!(
-        :title => "my conference",
-        :user => @student,
-        :context => @course
+        title: "my conference",
+        user: @student,
+        context: @course
       )
       conference.recording_ready!
       expect(conference.messages_sent['Web Conference Recording Ready'].length).to eq(2)
@@ -309,9 +309,9 @@ describe WebConference do
     it "does not send notifications to users that don't belong to the context" do
       non_course_user = user_with_communication_channel(active_all: true)
       conference = WimbaConference.create!(
-        :title => "my conference",
-        :user => @teacher,
-        :context => @course
+        title: "my conference",
+        user: @teacher,
+        context: @course
       )
       conference.add_attendee(non_course_user)
       conference.save!
@@ -321,8 +321,8 @@ describe WebConference do
 
   context "scheduled conferences" do
     before do
-      course_with_student(:active_all => 1)
-      @conference = WimbaConference.create!(:title => "my conference", :user => @user, :duration => 60, :context => @course)
+      course_with_student(active_all: 1)
+      @conference = WimbaConference.create!(title: "my conference", user: @user, duration: 60, context: @course)
     end
 
     it "has a start date" do
@@ -343,36 +343,36 @@ describe WebConference do
 
   context "creation rights" do
     it "lets teachers create conferences" do
-      course_with_teacher(:active_all => true)
+      course_with_teacher(active_all: true)
       expect(@course.web_conferences.temp_record.grants_right?(@teacher, :create)).to be_truthy
 
-      group(:context => @course)
+      group(context: @course)
       expect(@group.web_conferences.temp_record.grants_right?(@teacher, :create)).to be_truthy
     end
 
     it "does not let teachers create conferences if the permission is disabled" do
-      course_with_teacher(:active_all => true)
-      @course.account.role_overrides.create!(:role => teacher_role, :permission => "create_conferences", :enabled => false)
+      course_with_teacher(active_all: true)
+      @course.account.role_overrides.create!(role: teacher_role, permission: "create_conferences", enabled: false)
       expect(@course.web_conferences.temp_record.grants_right?(@teacher, :create)).to be_falsey
 
-      group(:context => @course)
+      group(context: @course)
       expect(@group.web_conferences.temp_record.grants_right?(@teacher, :create)).to be_falsey
     end
 
     it "lets students create conferences" do
-      course_with_student(:active_all => true)
+      course_with_student(active_all: true)
       expect(@course.web_conferences.temp_record.grants_right?(@student, :create)).to be_truthy
 
-      group_with_user(:user => @student, :context => @course)
+      group_with_user(user: @student, context: @course)
       expect(@group.web_conferences.temp_record.grants_right?(@student, :create)).to be_truthy
     end
 
     it "does not let students create conferences if the permission is disabled" do
-      course_with_student(:active_all => true)
-      @course.account.role_overrides.create!(:role => student_role, :permission => "create_conferences", :enabled => false)
+      course_with_student(active_all: true)
+      @course.account.role_overrides.create!(role: student_role, permission: "create_conferences", enabled: false)
       expect(@course.web_conferences.temp_record.grants_right?(@student, :create)).to be_falsey
 
-      group_with_user(:user => @student, :context => @course)
+      group_with_user(user: @student, context: @course)
       expect(@group.web_conferences.temp_record.grants_right?(@student, :create)).to be_falsey
     end
   end

@@ -21,13 +21,13 @@
 describe UserListV2 do
   before do
     @account = Account.default
-    @account.settings = { :open_registration => true }
+    @account.settings = { open_registration: true }
     @account.save!
   end
 
   it "complains about invalid input" do
     ul = UserListV2.new "i\x01nstructure", search_type: 'unique_id'
-    expect(ul.errors).to eq [{ :address => "i\x01nstructure", :details => :unparseable }]
+    expect(ul.errors).to eq [{ address: "i\x01nstructure", details: :unparseable }]
   end
 
   it "responds responsibly to incorrect search type" do
@@ -41,7 +41,7 @@ describe UserListV2 do
   end
 
   it "finds by SMS number" do
-    user_with_pseudonym(:name => "JT", :active_all => 1)
+    user_with_pseudonym(name: "JT", active_all: 1)
     communication_channel(@user, { username: '8015555555@txt.att.net', path_type: 'sms', active_cc: true })
     ul = UserListV2.new('(801) 555-5555', search_type: "cc_path")
     expect(ul.resolved_results.first[:address]).to eq '(801) 555-5555'
@@ -55,11 +55,11 @@ describe UserListV2 do
   end
 
   it "finds duplicates by SMS number" do
-    user_with_pseudonym(:name => "JT", :active_all => 1)
+    user_with_pseudonym(name: "JT", active_all: 1)
     @user1 = @user
     communication_channel(@user, { username: '8015555555@txt.att.net', path_type: 'sms', active_cc: true })
 
-    user_with_pseudonym(:name => "JT2", :active_all => 1)
+    user_with_pseudonym(name: "JT2", active_all: 1)
     communication_channel(@user, { username: '8015555555@txt.fakeplace.net', path_type: 'sms', active_cc: true })
 
     ul = UserListV2.new('(801) 555-5555', search_type: "cc_path")
@@ -70,10 +70,10 @@ describe UserListV2 do
 
   it "ignores unconfirmed emails" do
     # maaaybe we want to preserve the old behavior with this... but whatevr  ¯\_(ツ)_/¯
-    user_with_pseudonym(:name => 'JT', :username => 'jt@instructure.com', :active_all => true)
+    user_with_pseudonym(name: 'JT', username: 'jt@instructure.com', active_all: true)
     communication_channel(@user, { username: 'jt+2@instructure.com', active_cc: true })
     @user1 = @user
-    user_with_pseudonym(:name => 'JT 1', :username => 'jt+1@instructure.com', :active_all => true)
+    user_with_pseudonym(name: 'JT 1', username: 'jt+1@instructure.com', active_all: true)
     communication_channel(@user, { username: 'jt+2@instructure.com' })
     ul = UserListV2.new('jt+2@instructure.com', search_type: 'cc_path')
     expect(ul.resolved_results.length).to eq 1
@@ -84,10 +84,10 @@ describe UserListV2 do
   it "includes in duplicates if there is 1 active CC and 1 unconfirmed" do
     Account.default.enable_feature!(:allow_unconfirmed_users_in_user_list)
     # maaaybe we want to preserve the old behavior with this... but whatevr  ¯\_(ツ)_/¯
-    user_with_pseudonym(:name => 'JT', :username => 'jt@instructure.com', :active_all => true)
+    user_with_pseudonym(name: 'JT', username: 'jt@instructure.com', active_all: true)
     communication_channel(@user, { username: 'jt+2@instructure.com', active_cc: true })
     @user1 = @user
-    user_with_pseudonym(:name => 'JT 1', :username => 'jt+1@instructure.com', :active_all => true)
+    user_with_pseudonym(name: 'JT 1', username: 'jt+1@instructure.com', active_all: true)
     communication_channel(@user, { username: 'jt+2@instructure.com' })
     ul = UserListV2.new('jt+2@instructure.com', search_type: 'cc_path')
     expect(ul.resolved_results).to be_empty
@@ -98,14 +98,14 @@ describe UserListV2 do
 
   it "does not find users from untrusted accounts" do
     account = Account.create!
-    user_with_pseudonym(:name => 'JT', :username => 'jt@instructure.com', :active_all => true, :account => account)
+    user_with_pseudonym(name: 'JT', username: 'jt@instructure.com', active_all: true, account: account)
     ul = UserListV2.new('jt@instructure.com', search_type: 'unique_id')
     expect(ul.resolved_results).to be_empty
     expect(ul.missing_results.first[:address]).to eq 'jt@instructure.com'
   end
 
   it "doesn't find site admins if you're not a site admin" do
-    user_with_pseudonym(:name => 'JT', :username => 'jt@instructure.com', :active_all => true, :account => Account.site_admin)
+    user_with_pseudonym(name: 'JT', username: 'jt@instructure.com', active_all: true, account: Account.site_admin)
     allow(Account.default).to receive(:trusted_account_ids).and_return([Account.site_admin.id])
     jt = @user
     user_with_pseudonym
@@ -123,20 +123,20 @@ describe UserListV2 do
   end
 
   it "finds users from trusted accounts" do
-    account = Account.create!(:name => "naem")
+    account = Account.create!(name: "naem")
     allow(Account.default).to receive(:trusted_account_ids).and_return([account.id])
-    user_with_pseudonym(:name => 'JT', :username => 'jt@instructure.com', :active_all => true, :account => account)
-    ul = UserListV2.new('jt@instructure.com', :search_type => "unique_id")
-    expect(ul.resolved_results).to eq [{ :address => 'jt@instructure.com', :user_id => @user.id, :user_token => @user.token, :user_name => 'JT', :account_id => account.id, :account_name => account.name }]
+    user_with_pseudonym(name: 'JT', username: 'jt@instructure.com', active_all: true, account: account)
+    ul = UserListV2.new('jt@instructure.com', search_type: "unique_id")
+    expect(ul.resolved_results).to eq [{ address: 'jt@instructure.com', user_id: @user.id, user_token: @user.token, user_name: 'JT', account_id: account.id, account_name: account.name }]
   end
 
   it "shows duplicates for two results from the current account and the trusted account" do
-    user_with_pseudonym(:name => 'JT', :username => 'jt@instructure.com', :active_all => true)
+    user_with_pseudonym(name: 'JT', username: 'jt@instructure.com', active_all: true)
     @user1 = @user
     account = Account.create!
     allow(Account.default).to receive(:trusted_account_ids).and_return([account.id])
-    user_with_pseudonym(:name => 'JT', :username => 'jt@instructure.com', :active_all => true, :account => account)
-    ul = UserListV2.new('jt@instructure.com', :search_type => "unique_id")
+    user_with_pseudonym(name: 'JT', username: 'jt@instructure.com', active_all: true, account: account)
+    ul = UserListV2.new('jt@instructure.com', search_type: "unique_id")
 
     expect(ul.resolved_results).to be_empty
     expect(ul.duplicate_results.count).to eq 1
@@ -157,9 +157,9 @@ describe UserListV2 do
       allow(account1).to receive(:trusted_account_ids).and_return([account2.id])
       allow(account1).to receive(:trust_exists?).and_return(true)
 
-      user_with_managed_pseudonym(:name => 'JT', :username => 'jt@instructure.com', :active_all => true, :account => account1, :sis_user_id => "SISID")
+      user_with_managed_pseudonym(name: 'JT', username: 'jt@instructure.com', active_all: true, account: account1, sis_user_id: "SISID")
       @user1 = @user
-      user_with_managed_pseudonym(:name => 'JT', :username => 'jt2@instructure.com', :active_all => true, :account => account2, :sis_user_id => "SISID")
+      user_with_managed_pseudonym(name: 'JT', username: 'jt2@instructure.com', active_all: true, account: account2, sis_user_id: "SISID")
       ul = UserListV2.new('SISID', root_account: account1, search_type: 'sis_user_id', can_read_sis: true)
 
       expect(ul.resolved_results).to be_empty
@@ -180,9 +180,9 @@ describe UserListV2 do
     account2 = Account.create!
     allow(Account.default).to receive(:trusted_account_ids).and_return([account1.id, account2.id])
 
-    user_with_pseudonym(:name => 'JT', :username => 'jt@instructure.com', :active_all => true, :account => account1)
+    user_with_pseudonym(name: 'JT', username: 'jt@instructure.com', active_all: true, account: account1)
     allow_any_instantiation_of(@pseudonym).to receive(:works_for_account?).and_return(true)
-    user_with_pseudonym(:name => 'JT', :username => 'jt@instructure.com', :active_all => true, :account => account2)
+    user_with_pseudonym(name: 'JT', username: 'jt@instructure.com', active_all: true, account: account2)
     allow_any_instantiation_of(@pseudonym).to receive(:works_for_account?).and_return(true)
     ul = UserListV2.new('jt@instructure.com', search_type: 'unique_id')
     expect(ul.resolved_results).to be_empty
@@ -199,8 +199,8 @@ describe UserListV2 do
     account1 = Account.create!
     account2 = Account.create!
     allow(Account.default).to receive(:trusted_account_ids).and_return([account1.id, account2.id])
-    user_with_pseudonym(:name => 'JT', :username => 'jt@instructure.com', :active_all => true, :account => account1)
-    @user.pseudonyms.create!(:unique_id => 'jt@instructure.com', :account => account2)
+    user_with_pseudonym(name: 'JT', username: 'jt@instructure.com', active_all: true, account: account1)
+    @user.pseudonyms.create!(unique_id: 'jt@instructure.com', account: account2)
     ul = UserListV2.new('jt@instructure.com', search_type: 'unique_id')
     expect(ul.duplicate_results).to be_empty
     expect(ul.resolved_results.count).to eq 1
@@ -210,7 +210,7 @@ describe UserListV2 do
 
   it "does not find a user from a different account by SMS" do
     account = Account.create!
-    user_with_pseudonym(:name => "JT", :active_all => 1, :account => account)
+    user_with_pseudonym(name: "JT", active_all: 1, account: account)
     communication_channel(@user, { username: '8015555555@txt.att.net', path_type: 'sms', active_cc: true })
     ul = UserListV2.new('(801) 555-5555', search_type: 'cc_path')
     expect(ul.resolved_results).to eq []
@@ -222,22 +222,22 @@ describe UserListV2 do
 
     it "finds a user from a trusted account in a different shard" do
       @shard1.activate do
-        @account = Account.create!(:name => "accountnaem")
-        user_with_pseudonym(:name => 'JT', :username => 'jt@instructure.com', :active_all => true, :account => @account)
+        @account = Account.create!(name: "accountnaem")
+        user_with_pseudonym(name: 'JT', username: 'jt@instructure.com', active_all: true, account: @account)
       end
       allow(Account.default).to receive(:trusted_account_ids).and_return([@account.id])
       ul1 = UserListV2.new('jt@instructure.com', search_type: 'sis_user_id', can_read_sis: true)
       expect(ul1.missing_results.pluck(:address)).to eq ['jt@instructure.com']
 
       ul2 = UserListV2.new('jt@instructure.com', search_type: 'unique_id')
-      expect(ul2.resolved_results).to eq [{ :address => 'jt@instructure.com', :user_id => @user.id, :user_token => @user.token, :account_id => @account.id, :user_name => 'JT', :account_name => @account.name }]
+      expect(ul2.resolved_results).to eq [{ address: 'jt@instructure.com', user_id: @user.id, user_token: @user.token, account_id: @account.id, user_name: 'JT', account_name: @account.name }]
     end
 
     it "does not get confused when dealing with cross-shard duplicate results that actually point to the same user" do
-      user_with_pseudonym(:name => 'JT', :username => 'jt@instructure.com', :active_all => true)
+      user_with_pseudonym(name: 'JT', username: 'jt@instructure.com', active_all: true)
       @shard1.activate do
-        @account = Account.create!(:name => "accountnaem")
-        ps = @account.pseudonyms.build(:user => @user, :unique_id => 'username', :password => 'password', :password_confirmation => 'password')
+        @account = Account.create!(name: "accountnaem")
+        ps = @account.pseudonyms.build(user: @user, unique_id: 'username', password: 'password', password_confirmation: 'password')
         ps.save_without_session_maintenance
         @user.communication_channels.first.update!(pseudonym: ps)
       end
@@ -277,11 +277,11 @@ describe UserListV2 do
       before do
         @shard1.activate do
           @account1 = Account.create!
-          @user1 = user_with_pseudonym(:name => 'JT', :username => 'jt@instructure.com', :active_all => true, :account => @account1)
+          @user1 = user_with_pseudonym(name: 'JT', username: 'jt@instructure.com', active_all: true, account: @account1)
         end
         @shard2.activate do
           @account2 = Account.create!
-          @user2 = user_with_pseudonym(:name => 'JT', :username => 'jt@instructure.com', :active_all => true, :account => @account2)
+          @user2 = user_with_pseudonym(name: 'JT', username: 'jt@instructure.com', active_all: true, account: @account2)
         end
 
         allow(Account.default).to receive(:trusted_account_ids).and_return([Account.site_admin.id, @account1.id, @account2.id])

@@ -113,7 +113,7 @@ class EpubExport < ActiveRecord::Base
     create_content_export!({
                              user: user,
                              export_type: ContentExport::COMMON_CARTRIDGE,
-                             selected_content: { :everything => true },
+                             selected_content: { everything: true },
                              progress: 0,
                              context: course
                            })

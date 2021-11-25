@@ -69,7 +69,7 @@ module Canvas::Migration::Helpers
 
     # pulls the available items from the overview attachment on the content migration
     def get_content_from_overview(type = nil)
-      course_data = Rails.cache.fetch(['migration_selective_cache', @migration.shard, @migration].cache_key, :expires_in => 5.minutes) do
+      course_data = Rails.cache.fetch(['migration_selective_cache', @migration.shard, @migration].cache_key, expires_in: 5.minutes) do
         att = @migration.overview_attachment.open
         data = JSON.parse(att.read)
         data = separate_announcements(data)
@@ -243,15 +243,15 @@ module Canvas::Migration::Helpers
     def add_linked_resource(type, item, hash)
       if type == 'assignments'
         if (mig_id = item['quiz_migration_id'])
-          hash[:linked_resource] = { :type => 'quizzes', :migration_id => mig_id }
+          hash[:linked_resource] = { type: 'quizzes', migration_id: mig_id }
         elsif (mig_id = item['topic_migration_id'])
-          hash[:linked_resource] = { :type => 'discussion_topics', :migration_id => mig_id }
+          hash[:linked_resource] = { type: 'discussion_topics', migration_id: mig_id }
         elsif (mig_id = item['page_migration_id'])
-          hash[:linked_resource] = { :type => 'wiki_pages', :migration_id => mig_id }
+          hash[:linked_resource] = { type: 'wiki_pages', migration_id: mig_id }
         end
       elsif %w[discussion_topics quizzes wiki_pages].include?(type) &&
             (mig_id = item['assignment_migration_id'])
-        hash[:linked_resource] = { :type => 'assignments', :migration_id => mig_id }
+        hash[:linked_resource] = { type: 'assignments', migration_id: mig_id }
       end
       hash
     end
@@ -404,20 +404,20 @@ module Canvas::Migration::Helpers
         if item.quiz
           lr = course_item_hash('quizzes', item.quiz, false)
           lr[:message] = I18n.t('linked_quiz_message', "linked with Quiz '%{title}'",
-                                :title => item.quiz.title)
+                                title: item.quiz.title)
         elsif item.discussion_topic
           lr = course_item_hash('discussion_topics', item.discussion_topic, false)
           lr[:message] = I18n.t('linked_discussion_topic_message', "linked with Discussion Topic '%{title}'",
-                                :title => item.discussion_topic.title)
+                                title: item.discussion_topic.title)
         elsif item.wiki_page
           lr = course_item_hash('wiki_pages', item.wiki_page, false)
           lr[:message] = I18n.t("linked with Wiki Page '%{title}'",
-                                :title => item.wiki_page.title)
+                                title: item.wiki_page.title)
         end
       elsif [DiscussionTopic, WikiPage, Quizzes::Quiz].any? { |t| item.is_a?(t) } && item.assignment
         lr = course_item_hash('assignments', item.assignment, false)
         lr[:message] = I18n.t('linked_assignment_message', "linked with Assignment '%{title}'",
-                              :title => item.assignment.title)
+                              title: item.assignment.title)
       end
       if lr
         lr.delete(:title)

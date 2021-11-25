@@ -50,7 +50,7 @@ module ActiveRecord
         #   symbols that match associations are expanded to match the foreign key (polymorphic associations
         #   are supported)
         def acts_as_list(options = {})
-          configuration = { :column => "position" }
+          configuration = { column: "position" }
           configuration.update(options) if options.is_a?(Hash)
 
           if configuration[:scope]

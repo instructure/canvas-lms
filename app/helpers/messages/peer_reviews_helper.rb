@@ -39,6 +39,6 @@ module Messages::PeerReviewsHelper
       submission: asset.asset,
       current_user: user,
       assessment_request: asset
-    ).submission_data_url(:only_path => false)
+    ).submission_data_url(only_path: false)
   end
 end

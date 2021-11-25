@@ -161,7 +161,7 @@ describe "Notifications" do
       end
 
       it "shows announcement notifications to student", priority: "1" do
-        @course.announcements.create!(:title => 'Announcement', :message => 'Announcement time!')
+        @course.announcements.create!(title: 'Announcement', message: 'Announcement time!')
         # Checks that the notification is there and has the correct "Notification Name" field
         get "/users/#{@student.id}/messages"
         fj('.ui-tabs-anchor:contains("Meta Data")').click

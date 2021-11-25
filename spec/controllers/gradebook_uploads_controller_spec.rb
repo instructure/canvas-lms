@@ -22,10 +22,10 @@ require 'csv'
 
 describe GradebookUploadsController do
   def course_with_graded_student
-    @group = @course.assignment_groups.create!(:name => "Some Assignment Group", :group_weight => 100)
-    @assignment = @course.assignments.create!(:title => "Some Assignment", :points_possible => 10, :assignment_group => @group)
+    @group = @course.assignment_groups.create!(name: "Some Assignment Group", group_weight: 100)
+    @assignment = @course.assignments.create!(title: "Some Assignment", points_possible: 10, assignment_group: @group)
     @assignment.grade_student(@user, grade: "10", grader: @teacher)
-    @assignment2 = @course.assignments.create!(:title => "Some Assignment 2", :points_possible => 10, :assignment_group => @group)
+    @assignment2 = @course.assignments.create!(title: "Some Assignment 2", points_possible: 10, assignment_group: @group)
     @assignment2.grade_student(@user, grade: "8", grader: @teacher)
     @course.recompute_student_scores
     @user.reload
@@ -34,7 +34,7 @@ describe GradebookUploadsController do
 
   def generate_file(include_sis_id = false)
     file = Tempfile.new("csv.csv")
-    file.puts(GradebookExporter.new(@course, @teacher, :include_sis_id => include_sis_id).to_csv)
+    file.puts(GradebookExporter.new(@course, @teacher, include_sis_id: include_sis_id).to_csv)
     file.close
     file
   end
@@ -55,7 +55,7 @@ describe GradebookUploadsController do
     @student1, @student2, @student3 = create_users(3, return_type: :record)
     @assignment.only_visible_to_overrides = true
     @assignment.save
-    @course.enroll_student(@student3, :enrollment_state => 'active')
+    @course.enroll_student(@student3, enrollment_state: 'active')
     @section = @course.course_sections.create!(name: "test section")
     @section2 = @course.course_sections.create!(name: "second test section")
     student_in_section(@section, user: @student1)
@@ -77,7 +77,7 @@ describe GradebookUploadsController do
 
   describe "POST 'create'" do
     it "requires authorization" do
-      post 'create', params: { :course_id => @course.id }
+      post 'create', params: { course_id: @course.id }
       assert_unauthorized
     end
 

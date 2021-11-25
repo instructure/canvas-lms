@@ -31,8 +31,8 @@ describe Mutations::UpdateAssignment do
     @teacher = @course.enroll_teacher(User.create!, enrollment_state: 'active').user
     @student = @course.enroll_student(User.create!, enrollment_state: 'active').user
     @assignment_group = @course.assignment_groups.first
-    group_category = GroupCategory.create(:name => "Example Group Category", :context => @course)
-    @group = @course.groups.create!(:group_category => group_category)
+    group_category = GroupCategory.create(name: "Example Group Category", context: @course)
+    @group = @course.groups.create!(group_category: group_category)
     @group.users << @student
     @assignment_id = @assignment_group.assignments.create!(context: @course, name: "Example Assignment", group_category: group_category).id
   end

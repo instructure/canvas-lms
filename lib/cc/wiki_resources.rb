@@ -46,7 +46,7 @@ module CC
 
           relative_path = File.join(CCHelper::WIKI_FOLDER, file_name)
           path = File.join(wiki_folder, file_name)
-          meta_fields = { :identifier => migration_id }
+          meta_fields = { identifier: migration_id }
           meta_fields[:editing_roles] = page.editing_roles
           meta_fields[:notify_of_update] = page.notify_of_update
           meta_fields[:workflow_state] = page.workflow_state
@@ -67,11 +67,11 @@ module CC
             "type" => CCHelper::WEBCONTENT,
             :href => relative_path
           ) do |res|
-            res.file(:href => relative_path)
+            res.file(href: relative_path)
           end
         rescue
           title = page.title rescue I18n.t('course_exports.unknown_titles.wiki_page', "Unknown wiki page")
-          add_error(I18n.t('course_exports.errors.wiki_page', "The wiki page \"%{title}\" failed to export", :title => title), $!)
+          add_error(I18n.t('course_exports.errors.wiki_page', "The wiki page \"%{title}\" failed to export", title: title), $!)
         end
       end
     end

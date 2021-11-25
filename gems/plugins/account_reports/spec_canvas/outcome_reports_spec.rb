@@ -30,7 +30,7 @@ describe "Outcome Reports" do
     Notification.where(name: "Report Generation Failed").first_or_create
     @root_account = Account.create(name: 'New Account', default_time_zone: 'UTC')
     @default_term = @root_account.default_enrollment_term
-    @course1 = Course.create(:name => 'English 101', :course_code => 'ENG101', :account => @root_account)
+    @course1 = Course.create(name: 'English 101', course_code: 'ENG101', account: @root_account)
     @course1.sis_source_id = "SIS_COURSE_ID_1"
     @course1.save!
     @course1.offer!
@@ -39,49 +39,49 @@ describe "Outcome Reports" do
     @course1.enroll_teacher(@teacher)
 
     @user1 = user_with_managed_pseudonym(
-      :active_all => true, :account => @root_account, :name => 'John St. Clair',
-      :sortable_name => 'St. Clair, John', :username => 'john@stclair.com',
-      :sis_user_id => 'user_sis_id_01'
+      active_all: true, account: @root_account, name: 'John St. Clair',
+      sortable_name: 'St. Clair, John', username: 'john@stclair.com',
+      sis_user_id: 'user_sis_id_01'
     )
     @user2 = user_with_managed_pseudonym(
-      :active_all => true, :username => 'micheal@michaelbolton.com',
-      :name => 'Michael Bolton', :account => @root_account,
-      :sis_user_id => 'user_sis_id_02'
+      active_all: true, username: 'micheal@michaelbolton.com',
+      name: 'Michael Bolton', account: @root_account,
+      sis_user_id: 'user_sis_id_02'
     )
 
-    @course1.enroll_user(@user1, "StudentEnrollment", :enrollment_state => 'active')
-    @enrollment2 = @course1.enroll_user(@user2, "StudentEnrollment", :enrollment_state => 'active')
+    @course1.enroll_user(@user1, "StudentEnrollment", enrollment_state: 'active')
+    @enrollment2 = @course1.enroll_user(@user2, "StudentEnrollment", enrollment_state: 'active')
 
     @section = @course1.course_sections.first
-    assignment_model(:course => @course1, :title => 'English Assignment')
+    assignment_model(course: @course1, title: 'English Assignment')
     outcome_group = @root_account.root_outcome_group
-    @outcome = outcome_model(context: @root_account, :short_description => 'Spelling')
-    @rubric = Rubric.create!(:context => @course1)
+    @outcome = outcome_model(context: @root_account, short_description: 'Spelling')
+    @rubric = Rubric.create!(context: @course1)
     @rubric.data = [
       {
-        :points => 3.0,
-        :description => "Outcome row",
-        :id => 1,
-        :ratings => [
+        points: 3.0,
+        description: "Outcome row",
+        id: 1,
+        ratings: [
           {
-            :points => 3,
-            :description => "Rockin'",
-            :criterion_id => 1,
-            :id => 2
+            points: 3,
+            description: "Rockin'",
+            criterion_id: 1,
+            id: 2
           },
           {
-            :points => 0,
-            :description => "Lame",
-            :criterion_id => 1,
-            :id => 3
+            points: 0,
+            description: "Lame",
+            criterion_id: 1,
+            id: 3
           }
         ],
-        :learning_outcome_id => @outcome.id
+        learning_outcome_id: @outcome.id
       }
     ]
     @rubric.instance_variable_set('@alignments_changed', true)
     @rubric.save!
-    @a = @rubric.associate_with(@assignment, @course1, :purpose => 'grading')
+    @a = @rubric.associate_with(@assignment, @course1, purpose: 'grading')
     @assignment.reload
     @submission = @assignment.grade_student(@user1, grade: "10", grader: @teacher).first
     @submission.submission_type = 'online_url'
@@ -95,14 +95,14 @@ describe "Outcome Reports" do
 
   before do
     @assessment = @a.assess({
-                              :user => @user1,
-                              :assessor => @user2,
-                              :artifact => @submission,
-                              :assessment => {
-                                :assessment_type => 'grading',
-                                :criterion_1 => {
-                                  :points => user1_rubric_score,
-                                  :comments => "cool, yo"
+                              user: @user1,
+                              assessor: @user2,
+                              artifact: @submission,
+                              assessment: {
+                                assessment_type: 'grading',
+                                criterion_1: {
+                                  points: user1_rubric_score,
+                                  comments: "cool, yo"
                                 }
                               }
                             })
@@ -243,7 +243,7 @@ describe "Outcome Reports" do
 
     context 'with a sub account' do
       before(:once) do
-        @sub_account = Account.create(:parent_account => @root_account, :name => 'English')
+        @sub_account = Account.create(parent_account: @root_account, name: 'English')
       end
 
       let(:report_params) { { account: @sub_account } }
@@ -403,16 +403,16 @@ describe "Outcome Reports" do
     context 'with quiz question results' do
       before(:once) do
         outcome_group = @root_account.root_outcome_group
-        @quiz_outcome = @root_account.created_learning_outcomes.create!(:short_description => 'new outcome')
-        @quiz = @course1.quizzes.create!(:title => "new quiz", :shuffle_answers => true, quiz_type: 'assignment')
-        @q1 = @quiz.quiz_questions.create!(:question_data => true_false_question_data)
-        @q2 = @quiz.quiz_questions.create!(:question_data => multiple_choice_question_data)
+        @quiz_outcome = @root_account.created_learning_outcomes.create!(short_description: 'new outcome')
+        @quiz = @course1.quizzes.create!(title: "new quiz", shuffle_answers: true, quiz_type: 'assignment')
+        @q1 = @quiz.quiz_questions.create!(question_data: true_false_question_data)
+        @q2 = @quiz.quiz_questions.create!(question_data: multiple_choice_question_data)
         bank = @q1.assessment_question.assessment_question_bank
-        bank.assessment_questions.create!(:question_data => true_false_question_data)
-        @quiz_outcome.align(bank, @root_account, :mastery_score => 0.7)
+        bank.assessment_questions.create!(question_data: true_false_question_data)
+        @quiz_outcome.align(bank, @root_account, mastery_score: 0.7)
         answer_1 = @q1.question_data[:answers].detect { |a| a[:weight] == 100 }[:id]
         answer_2 = @q2.question_data[:answers].detect { |a| a[:weight] == 100 }[:id]
-        @quiz.generate_quiz_data(:persist => true)
+        @quiz.generate_quiz_data(persist: true)
         @quiz_submission = @quiz.generate_submission(@user)
         @quiz_submission.submission_data = {}
         @quiz_submission.submission_data["question_#{@q1.id}"] = answer_1

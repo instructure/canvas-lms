@@ -24,12 +24,12 @@ require_relative '../api_spec_helper'
 
 describe LtiApiController, type: :request do
   before :once do
-    course_with_student(:active_all => true)
+    course_with_student(active_all: true)
     @student = @user
-    @course.enroll_teacher(user_with_pseudonym(:active_all => true))
-    @tool = @course.context_external_tools.create!(:shared_secret => 'test_secret', :consumer_key => 'test_key', :name => 'my analytics test tool', :domain => 'example.com')
-    assignment_model(:course => @course, :name => 'tool assignment', :submission_types => 'external_tool', :points_possible => 20, :grading_type => 'points')
-    tag = @assignment.build_external_tool_tag(:url => "http://example.com/one")
+    @course.enroll_teacher(user_with_pseudonym(active_all: true))
+    @tool = @course.context_external_tools.create!(shared_secret: 'test_secret', consumer_key: 'test_key', name: 'my analytics test tool', domain: 'example.com')
+    assignment_model(course: @course, name: 'tool assignment', submission_types: 'external_tool', points_possible: 20, grading_type: 'points')
+    tag = @assignment.build_external_tool_tag(url: "http://example.com/one")
     tag.content_type = 'ContextExternalTool'
     tag.save!
     @token = Lti::AnalyticsService.create_token(@tool, @student, @course)
@@ -40,8 +40,8 @@ describe LtiApiController, type: :request do
     opts['key'] ||= @tool.consumer_key
     opts['secret'] ||= @tool.shared_secret
     opts['content-type'] ||= 'application/json'
-    consumer = OAuth::Consumer.new(opts['key'], opts['secret'], :site => "https://www.example.com", :signature_method => "HMAC-SHA1")
-    req = consumer.create_signed_request(:post, opts['path'], nil, :scheme => 'header', :timestamp => opts['timestamp'], :nonce => opts['nonce'])
+    consumer = OAuth::Consumer.new(opts['key'], opts['secret'], site: "https://www.example.com", signature_method: "HMAC-SHA1")
+    req = consumer.create_signed_request(:post, opts['path'], nil, scheme: 'header', timestamp: opts['timestamp'], nonce: opts['nonce'])
     req.body = JSON.generate(opts['body']) if opts['body']
     post "https://www.example.com#{req.path}",
          params: req.body,

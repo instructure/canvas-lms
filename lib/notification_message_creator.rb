@@ -157,19 +157,19 @@ class NotificationMessageCreator
     user.shard.activate do
       message = user.messages.build(message_options_for(user))
       message.parse!('summary', root_account: @account)
-      delayed_message = policy.delayed_messages.build(:notification => @notification,
-                                                      :frequency => policy.frequency,
+      delayed_message = policy.delayed_messages.build(notification: @notification,
+                                                      frequency: policy.frequency,
                                                       # policy.communication_channel should
                                                       # already be loaded in memory as the
                                                       # inverse association of loading the
                                                       # policy from the channel. passing the
                                                       # object through here lets the delayed
                                                       # message use it without having to re-query.
-                                                      :communication_channel => policy.communication_channel,
-                                                      :root_account_id => message.context_root_account.try(:id),
-                                                      :name_of_topic => message.subject,
-                                                      :link => message.url,
-                                                      :summary => message.body)
+                                                      communication_channel: policy.communication_channel,
+                                                      root_account_id: message.context_root_account.try(:id),
+                                                      name_of_topic: message.subject,
+                                                      link: message.url,
+                                                      summary: message.body)
       delayed_message.context = @asset
       delayed_message.save! if Rails.env.test?
       delayed_message
@@ -209,7 +209,7 @@ class NotificationMessageCreator
     # if a user has never logged in, let's not spam the dashboard for no reason.
     return unless @notification.dashboard? && @notification.show_in_feed? && !user.pre_registered?
 
-    message = user.messages.build(message_options_for(user).merge(:to => 'dashboard'))
+    message = user.messages.build(message_options_for(user).merge(to: 'dashboard'))
     message.parse!(root_account: @account)
     message
   end
@@ -319,11 +319,11 @@ class NotificationMessageCreator
     user_asset = asset_applied_to(user)
 
     message_options = {
-      :subject => @notification.subject,
-      :notification => @notification,
-      :notification_name => @notification.name,
-      :user => user,
-      :context => user_asset,
+      subject: @notification.subject,
+      notification: @notification,
+      notification_name: @notification.name,
+      user: user,
+      context: user_asset,
     }
 
     # can't just merge these because nil values need to be overwritten in a later merge
@@ -363,7 +363,7 @@ class NotificationMessageCreator
       end_time = final_end_time if end_time > final_end_time
       scope = Message
               .in_partition('created_at' => start_time)
-              .where(:notification_id => @notification)
+              .where(notification_id: @notification)
               .for(@asset)
               .by_name(@notification.name)
               .for_user(@to_user_channels.keys)
@@ -381,7 +381,7 @@ class NotificationMessageCreator
         break_this_loop = true
         # else <no conditions; we're addressing the entire partition>
       end
-      scope.update_all(:workflow_state => 'cancelled') if Message.connection.table_exists?(start_partition)
+      scope.update_all(workflow_state: 'cancelled') if Message.connection.table_exists?(start_partition)
 
       break if break_this_loop
 

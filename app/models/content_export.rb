@@ -25,7 +25,7 @@ class ContentExport < ActiveRecord::Base
   belongs_to :user
   belongs_to :attachment
   belongs_to :content_migration
-  has_many :attachments, :as => :context, :inverse_of => :context, :dependent => :destroy
+  has_many :attachments, as: :context, inverse_of: :context, dependent: :destroy
   has_one :sent_content_share
   has_many :received_content_shares
   has_one :epub_export
@@ -36,7 +36,7 @@ class ContentExport < ActiveRecord::Base
 
   validates :context_id, :workflow_state, presence: true
 
-  has_one :job_progress, :class_name => 'Progress', :as => :context, :inverse_of => :context
+  has_one :job_progress, class_name: 'Progress', as: :context, inverse_of: :context
 
   before_create :set_global_identifiers
 
@@ -120,7 +120,7 @@ class ContentExport < ActiveRecord::Base
     # use global identifiers if no other cc export from this course has used local identifiers
     # i.e. all exports from now on should try to use global identifiers
     # unless there's a risk of not matching up with a previous export
-    !context.content_exports.where(:export_type => CC_EXPORT_TYPES, :global_identifiers => false).exists?
+    !context.content_exports.where(export_type: CC_EXPORT_TYPES, global_identifiers: false).exists?
   end
 
   def quizzes_next?
@@ -152,7 +152,7 @@ class ContentExport < ActiveRecord::Base
       end
     end
   end
-  handle_asynchronously :export, :priority => Delayed::LOW_PRIORITY, :max_attempts => 1, :on_permanent_failure => :fail_with_error!
+  handle_asynchronously :export, priority: Delayed::LOW_PRIORITY, max_attempts: 1, on_permanent_failure: :fail_with_error!
 
   def capture_job_id
     job = Delayed::Worker.current_job
@@ -193,7 +193,7 @@ class ContentExport < ActiveRecord::Base
     begin
       reset_and_start_job_progress
 
-      @cc_exporter = CC::CCExporter.new(self, opts.merge({ :for_course_copy => for_course_copy? }))
+      @cc_exporter = CC::CCExporter.new(self, opts.merge({ for_course_copy: for_course_copy? }))
       if @cc_exporter.export
         self.progress = 100
         job_progress.try :complete!
@@ -351,7 +351,7 @@ class ContentExport < ActiveRecord::Base
     if job_progress
       p = job_progress
     else
-      p = Progress.new(:context => self, :tag => "content_export")
+      p = Progress.new(context: self, tag: "content_export")
       self.job_progress = p
     end
     p.workflow_state = 'queued'
@@ -546,7 +546,7 @@ class ContentExport < ActiveRecord::Base
   def fast_update_progress(val)
     content_migration&.update_conversion_progress(val)
     self.progress = val
-    ContentExport.where(:id => self).update_all(:progress => val)
+    ContentExport.where(id: self).update_all(progress: val)
     if EpubExport.where(content_export_id: id).exists?
       epub_export.update_progress_from_content_export!(val)
     end

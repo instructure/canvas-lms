@@ -66,7 +66,7 @@ class RubricAssessmentsController < ApplicationController
     @request = @association.assessment_requests.find(params[:assessment_request_id])
     if authorized_action(@association, @current_user, :manage)
       @request.send_reminder!
-      render :json => @request
+      render json: @request
     end
   end
 
@@ -198,9 +198,9 @@ class RubricAssessmentsController < ApplicationController
     @assessment = @rubric.rubric_assessments.find(params[:id])
     if authorized_action(@assessment, @current_user, :delete)
       if @assessment.destroy
-        render :json => @assessment
+        render json: @assessment
       else
-        render :json => @assessment.errors, :status => :bad_request
+        render json: @assessment.errors, status: :bad_request
       end
     end
   end

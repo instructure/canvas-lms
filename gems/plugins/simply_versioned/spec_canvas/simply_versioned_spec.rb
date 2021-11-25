@@ -22,10 +22,10 @@ require "apis/api_spec_helper"
 describe 'simply_versioned' do
   before :all do
     class Woozel < ActiveRecord::Base # rubocop:disable Lint/ConstantDefinitionInBlock,RSpec/LeakyConstantDeclaration this needs to be a real class
-      simply_versioned :explicit => true
+      simply_versioned explicit: true
     end
 
-    Woozel.connection.create_table :woozels, :force => true do |t|
+    Woozel.connection.create_table :woozels, force: true do |t|
       t.string :name
     end
   end
@@ -38,10 +38,10 @@ describe 'simply_versioned' do
   end
 
   describe "explicit versions" do
-    let(:woozel) { Woozel.create!(:name => 'Eeyore') }
+    let(:woozel) { Woozel.create!(name: 'Eeyore') }
 
     it "creates the first version on save" do
-      woozel = Woozel.new(:name => 'Eeyore')
+      woozel = Woozel.new(name: 'Eeyore')
       expect(woozel).not_to be_versioned
       woozel.save!
       expect(woozel).to be_versioned
@@ -61,7 +61,7 @@ describe 'simply_versioned' do
 
     it "creates a new version when asked to" do
       woozel.name = 'Piglet'
-      woozel.with_versioning(:explicit => true, &:save!)
+      woozel.with_versioning(explicit: true, &:save!)
       expect(woozel.versions.length).to eql(2)
       expect(woozel.versions.first.model.name).to eql('Eeyore')
       expect(woozel.versions.current.model.name).to eql('Piglet')
@@ -103,14 +103,14 @@ describe 'simply_versioned' do
   end
 
   describe "#model=" do
-    let(:woozel) { Woozel.create!(:name => 'Eeyore') }
+    let(:woozel) { Woozel.create!(name: 'Eeyore') }
 
     it "assigns the model for the version" do
       expect(woozel.versions.length).to eql(1)
       expect(woozel.versions.current.model.name).to eql('Eeyore')
 
       woozel.name = 'Piglet'
-      woozel.with_versioning(:explicit => true, &:save!)
+      woozel.with_versioning(explicit: true, &:save!)
 
       expect(woozel.versions.length).to eql(2)
 

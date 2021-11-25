@@ -25,8 +25,8 @@ module Factories
 
   def valid_group_attributes
     {
-      :name => 'value for name',
-      :context => Account.default
+      name: 'value for name',
+      context: Account.default
     }
   end
 

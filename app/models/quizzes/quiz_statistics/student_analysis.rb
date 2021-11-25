@@ -91,7 +91,7 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
       if sub.user_id
         stats[:submission_user_ids] << sub.user_id if sub.user_id > 0
       else
-        temp_user = TemporaryUser.new(sub.temporary_user_code, I18n.t(:logged_out_user, "Logged Out User %{user_counter}", :user_counter => index + 1))
+        temp_user = TemporaryUser.new(sub.temporary_user_code, I18n.t(:logged_out_user, "Logged Out User %{user_counter}", user_counter: index + 1))
         stats[:submission_logged_out_users] << temp_user
         temp_users[sub.temporary_user_code] = temp_user
       end
@@ -128,7 +128,7 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
 
     assessment_questions = if questions_hash.any? { |_, q| q[:assessment_question_id] }
 
-                             AssessmentQuestion.where(:id => questions_hash.keys)
+                             AssessmentQuestion.where(id: questions_hash.keys)
                                                .index_by(&:id)
 
                            else
@@ -170,7 +170,7 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
     ids = submissions.map(&:submission_data).flatten.compact.select do |hash|
       hash[:attachment_ids].present?
     end.pluck(:attachment_ids).flatten
-    @attachments = Attachment.where(:id => ids).index_by(&:id)
+    @attachments = Attachment.where(id: ids).index_by(&:id)
   end
 
   def attachment_csv(answer)
@@ -247,7 +247,7 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
         section_name = []
         section_id = []
         section_sis_id = []
-        context.student_enrollments.active.where(:user_id => submission.user_id).each do |enrollment|
+        context.student_enrollments.active.where(user_id: submission.user_id).each do |enrollment|
           section_name << enrollment.course_section.name
           section_id << enrollment.course_section.id
           section_sis_id << enrollment.course_section.try(:sis_source_id)
@@ -414,11 +414,11 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
 
     question = Quizzes::QuizQuestion::Base.from_question_data(question).stats(responses)
     none = {
-      :responses => question[:responses] - question[:answers].sum { |a| a[:responses] || 0 },
-      :id => "none",
-      :weight => 0,
-      :text => I18n.t('statistics.no_answer', "No Answer"),
-      :user_ids => question[:user_ids] - question[:answers].pluck(:user_ids).flatten
+      responses: question[:responses] - question[:answers].sum { |a| a[:responses] || 0 },
+      id: "none",
+      weight: 0,
+      text: I18n.t('statistics.no_answer', "No Answer"),
+      user_ids: question[:user_ids] - question[:answers].pluck(:user_ids).flatten
     } rescue nil
     question[:answers] << none if none && none[:responses] > 0
     question.to_hash.with_indifferent_access

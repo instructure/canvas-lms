@@ -36,7 +36,7 @@ module Importers
           item ||= LearningOutcomeGroup.global.where(vendor_guid: hash[:vendor_guid]).first if hash[:vendor_guid]
           item ||= LearningOutcomeGroup.new
         else
-          migration.add_warning(t(:no_global_permission, %(You're not allowed to manage global outcomes, can't add "%{title}"), :title => hash[:title]))
+          migration.add_warning(t(:no_global_permission, %(You're not allowed to manage global outcomes, can't add "%{title}"), title: hash[:title]))
           return
         end
       else

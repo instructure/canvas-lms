@@ -18,9 +18,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class ObserverAlert < ActiveRecord::Base
-  belongs_to :student, :class_name => 'User', inverse_of: :as_student_observer_alerts, :foreign_key => :user_id
-  belongs_to :observer, :class_name => 'User', inverse_of: :as_observer_observer_alerts
-  belongs_to :observer_alert_threshold, :inverse_of => :observer_alerts
+  belongs_to :student, class_name: 'User', inverse_of: :as_student_observer_alerts, foreign_key: :user_id
+  belongs_to :observer, class_name: 'User', inverse_of: :as_observer_observer_alerts
+  belongs_to :observer_alert_threshold, inverse_of: :observer_alerts
   belongs_to :context, polymorphic: %i[discussion_topic assignment course account_notification submission]
 
   ALERT_TYPES = %w[

@@ -11,31 +11,31 @@ describe ContentMigration do
       @shard1.activate do
         @other_account = Account.create
         @copy_from = @other_account.courses.create!
-        @copy_from.enroll_user(@user, "TeacherEnrollment", :enrollment_state => "active")
+        @copy_from.enroll_user(@user, "TeacherEnrollment", enrollment_state: "active")
       end
       @cm.update_attribute(:source_course, @copy_from)
     end
 
     it "copies everything" do
-      dt1 = @copy_from.discussion_topics.create!(:message => "hi", :title => "discussion title")
-      cm = @copy_from.context_modules.create!(:name => "some module")
-      att = @copy_from.attachments.create!(:filename => 'first.txt', :uploaded_data => StringIO.new('ohai'), :folder => Folder.unfiled_folder(@copy_from))
-      wiki = @copy_from.wiki_pages.create!(:title => "wiki", :body => "ohai")
+      dt1 = @copy_from.discussion_topics.create!(message: "hi", title: "discussion title")
+      cm = @copy_from.context_modules.create!(name: "some module")
+      att = @copy_from.attachments.create!(filename: 'first.txt', uploaded_data: StringIO.new('ohai'), folder: Folder.unfiled_folder(@copy_from))
+      wiki = @copy_from.wiki_pages.create!(title: "wiki", body: "ohai")
       quiz = @copy_from.quizzes.create! if Qti.qti_enabled?
-      ag = @copy_from.assignment_groups.create!(:name => 'empty group')
-      asmnt = @copy_from.assignments.create!(:title => "some assignment")
-      cal = @copy_from.calendar_events.create!(:title => "haha", :description => "oi")
-      tool = @copy_from.context_external_tools.create!(:name => "new tool", :consumer_key => "key", :shared_secret => "secret",
-                                                       :domain => 'example.com', :custom_fields => { 'a' => '1', 'b' => '2' }, :workflow_state => 'public')
-      data = [{ :points => 3, :description => "Outcome row", :id => 1, :ratings => [{ :points => 3, :description => "Rockin'", :criterion_id => 1, :id => 2 }] }]
-      rub1 = @copy_from.rubrics.create!(:title => "rub1", :data => data)
+      ag = @copy_from.assignment_groups.create!(name: 'empty group')
+      asmnt = @copy_from.assignments.create!(title: "some assignment")
+      cal = @copy_from.calendar_events.create!(title: "haha", description: "oi")
+      tool = @copy_from.context_external_tools.create!(name: "new tool", consumer_key: "key", shared_secret: "secret",
+                                                       domain: 'example.com', custom_fields: { 'a' => '1', 'b' => '2' }, workflow_state: 'public')
+      data = [{ points: 3, description: "Outcome row", id: 1, ratings: [{ points: 3, description: "Rockin'", criterion_id: 1, id: 2 }] }]
+      rub1 = @copy_from.rubrics.create!(title: "rub1", data: data)
       rub1.associate_with(@copy_from, @copy_from)
       default = @copy_from.root_outcome_group
-      lo = @copy_from.created_learning_outcomes.create!(:context => @copy_from, :short_description => "outcome1", :workflow_state => 'active',
-                                                        :data => { :rubric_criterion => { :mastery_points => 2, :ratings => [{ :description => "e", :points => 50 }, { :description => "me", :points => 2 },
-                                                                                                                             { :description => "Does Not Meet Expectations", :points => 0.5 }], :description => "First outcome", :points_possible => 5 } })
+      lo = @copy_from.created_learning_outcomes.create!(context: @copy_from, short_description: "outcome1", workflow_state: 'active',
+                                                        data: { rubric_criterion: { mastery_points: 2, ratings: [{ description: "e", points: 50 }, { description: "me", points: 2 },
+                                                                                                                 { description: "Does Not Meet Expectations", points: 0.5 }], description: "First outcome", points_possible: 5 } })
       default.add_outcome(lo)
-      gs = @copy_from.grading_standards.create!(:title => "Standard eh", :data => [["A", 0.93], ["A-", 0.89], ["F", 0]])
+      gs = @copy_from.grading_standards.create!(title: "Standard eh", data: [["A", 0.93], ["A-", 0.89], ["F", 0]])
 
       run_course_copy
 
@@ -63,10 +63,10 @@ describe ContentMigration do
     end
 
     it "uses local ids if we're possibly re-importing a previously copied course" do
-      prev_export = @copy_from.content_exports.create!(:export_type => ContentExport::COURSE_COPY)
+      prev_export = @copy_from.content_exports.create!(export_type: ContentExport::COURSE_COPY)
       prev_export.update_attribute(:global_identifiers, false)
 
-      dt = @copy_from.discussion_topics.create!(:message => "hi", :title => "discussion title")
+      dt = @copy_from.discussion_topics.create!(message: "hi", title: "discussion title")
 
       run_course_copy
 
@@ -78,8 +78,8 @@ describe ContentMigration do
     end
 
     it "tries to find existing root attachments on destination account" do
-      att = @copy_from.attachments.create!(:filename => 'first.txt', :uploaded_data => StringIO.new('ohai'), :folder => Folder.unfiled_folder(@copy_from))
-      dest_root = @copy_to.attachments.create!(:filename => 'totallydifferentname.txt', :uploaded_data => StringIO.new('ohai'), :folder => Folder.unfiled_folder(@copy_to))
+      att = @copy_from.attachments.create!(filename: 'first.txt', uploaded_data: StringIO.new('ohai'), folder: Folder.unfiled_folder(@copy_from))
+      dest_root = @copy_to.attachments.create!(filename: 'totallydifferentname.txt', uploaded_data: StringIO.new('ohai'), folder: Folder.unfiled_folder(@copy_to))
 
       run_course_copy
 
@@ -89,8 +89,8 @@ describe ContentMigration do
 
     it "does not blow up with usage rights" do
       ur = @copy_from.usage_rights.create! use_justification: 'used_by_permission', legal_copyright: '(C) 2015 Wyndham Systems'
-      att = @copy_from.attachments.create!(:filename => 'first.txt', :uploaded_data => StringIO.new('ohai'),
-                                           :folder => Folder.unfiled_folder(@copy_from), :usage_rights => ur)
+      att = @copy_from.attachments.create!(filename: 'first.txt', uploaded_data: StringIO.new('ohai'),
+                                           folder: Folder.unfiled_folder(@copy_from), usage_rights: ur)
 
       run_course_copy
 

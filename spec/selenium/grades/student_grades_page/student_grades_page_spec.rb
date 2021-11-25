@@ -61,7 +61,7 @@ describe "gradebook - logged in as a student" do
 
   context 'when testing grading periods' do
     before(:once) do
-      account_admin_user({ :active_user => true })
+      account_admin_user({ active_user: true })
       course_with_teacher({ user: @user, active_course: true, active_enrollment: true })
       student_in_course
     end

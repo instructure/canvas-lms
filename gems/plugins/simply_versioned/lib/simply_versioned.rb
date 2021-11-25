@@ -35,15 +35,15 @@ module SimplyVersioned
   end
 
   DEFAULTS = {
-    :keep => nil,
-    :automatic => true,
-    :exclude => [],
-    :explicit => false,
+    keep: nil,
+    automatic: true,
+    exclude: [],
+    explicit: false,
     # callbacks
-    :when => nil,
-    :on_create => nil,
-    :on_update => nil,
-    :on_load => nil
+    when: nil,
+    on_create: nil,
+    on_update: nil,
+    on_load: nil
   }.freeze
 
   module ClassMethods
@@ -128,7 +128,7 @@ module SimplyVersioned
     #
     def revert_to_version(version, options = {})
       options.reverse_merge!({
-                               :except => [:created_at, :updated_at]
+                               except: [:created_at, :updated_at]
                              })
 
       version = case version
@@ -236,7 +236,7 @@ module SimplyVersioned
             simply_versioned_options[:on_update].try(:call, self, version)
           end
         else
-          version = versions.create(:yaml => attributes.except(*simply_versioned_options[:exclude]).to_yaml)
+          version = versions.create(yaml: attributes.except(*simply_versioned_options[:exclude]).to_yaml)
           if version.valid?
             simply_versioned_options[:on_create].try(:call, self, version)
             versions.clean_old_versions(simply_versioned_options[:keep].to_i) if simply_versioned_options[:keep]

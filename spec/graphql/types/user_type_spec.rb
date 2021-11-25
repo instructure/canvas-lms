@@ -367,7 +367,7 @@ describe Types::UserType do
     it 'returns the users notification preferences' do
       Notification.delete_all
       @student.communication_channels.create!(path: 'test@test.com').confirm!
-      notification_model(:name => 'test', :category => 'Announcement')
+      notification_model(name: 'test', category: 'Announcement')
 
       expect(
         user_type.resolve('notificationPreferences { channels { notificationPolicies(contextType: Course) { notification { name } } } }')[0][0]
@@ -378,7 +378,7 @@ describe Types::UserType do
       Notification.delete_all
       communication_channel = @student.communication_channels.create!(path: 'test@test.com')
       communication_channel.confirm!
-      notification_model(:name => 'test', :category => 'Announcement')
+      notification_model(name: 'test', category: 'Announcement')
 
       expect(
         user_type.resolve('notificationPreferences { channels { notificationPolicies(contextType: Course) { notification { name } } } }')[0][0]
@@ -665,15 +665,15 @@ describe Types::UserType do
     before do
       @teacher_with_multiple_roles = user_factory(name: "blah")
       @course.enroll_user(@teacher_with_multiple_roles, "TeacherEnrollment")
-      @course.enroll_user(@teacher_with_multiple_roles, "TaEnrollment", :allow_multiple_enrollments => true)
+      @course.enroll_user(@teacher_with_multiple_roles, "TaEnrollment", allow_multiple_enrollments: true)
 
       @custom_teacher = user_factory(name: "blah")
-      role = custom_teacher_role('CustomTeacher', :account => @course.account)
+      role = custom_teacher_role('CustomTeacher', account: @course.account)
       @course.enroll_user(@custom_teacher, 'TeacherEnrollment', role: role)
 
       @teacher_with_duplicate_roles = user_factory(name: "blah")
       @course.enroll_user(@teacher_with_duplicate_roles, "TeacherEnrollment")
-      @course.enroll_user(@teacher_with_duplicate_roles, "TeacherEnrollment", :allow_multiple_enrollments => true)
+      @course.enroll_user(@teacher_with_duplicate_roles, "TeacherEnrollment", allow_multiple_enrollments: true)
     end
 
     let(:user_ta_type) do

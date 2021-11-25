@@ -27,11 +27,11 @@ module ConditionalRelease
         assignment_ids += rule.assignment_set_associations.pluck(:assignment_id) if include_trend_data
 
         sub_attrs = %i[id user_id assignment_id score]
-        all_submission_data = rule.course.submissions.where(:assignment_id => assignment_ids)
+        all_submission_data = rule.course.submissions.where(assignment_id: assignment_ids)
                                   .pluck(*sub_attrs).map { |r| sub_attrs.zip(r).to_h }.sort_by { |s| s[:user_id] } # turns plucked rows into hashes
 
-        assignments_by_id = rule.course.assignments.where(:id => assignment_ids).to_a.index_by(&:id)
-        users_by_id = User.where(:id => all_submission_data.pluck(:user_id).uniq).to_a.index_by(&:id)
+        assignments_by_id = rule.course.assignments.where(id: assignment_ids).to_a.index_by(&:id)
+        users_by_id = User.where(id: all_submission_data.pluck(:user_id).uniq).to_a.index_by(&:id)
 
         trigger_submissions = all_submission_data.select { |s| s[:assignment_id] == rule.trigger_assignment_id }
 
@@ -68,12 +68,12 @@ module ConditionalRelease
             next unless b[:scoring_range].contains_score score
 
             user_details ||= if assignment.anonymize_students?
-                               { :name => t('Anonymous User') }
+                               { name: t('Anonymous User') }
                              else
                                {
-                                 :id => user.id,
-                                 :name => user.short_name,
-                                 :avatar_image_url => AvatarHelper.avatar_url_for_user(user, nil, root_account: rule.root_account)
+                                 id: user.id,
+                                 name: user.short_name,
+                                 avatar_image_url: AvatarHelper.avatar_url_for_user(user, nil, root_account: rule.root_account)
                                }
                              end
             student_record = {
@@ -103,8 +103,8 @@ module ConditionalRelease
                                    end
         possible_assignment_ids = follow_on_assignment_ids + [rule.trigger_assignment_id]
 
-        submissions_by_assignment_id = rule.course.submissions.where(:assignment_id => possible_assignment_ids, :user_id => student_id).to_a.index_by(&:assignment_id)
-        assignments_by_id = rule.course.assignments.where(:id => possible_assignment_ids).to_a.index_by(&:id)
+        submissions_by_assignment_id = rule.course.submissions.where(assignment_id: possible_assignment_ids, user_id: student_id).to_a.index_by(&:assignment_id)
+        assignments_by_id = rule.course.assignments.where(id: possible_assignment_ids).to_a.index_by(&:id)
 
         trigger_assignment = assignments_by_id[rule.trigger_assignment_id]
         trigger_submission = submissions_by_assignment_id[rule.trigger_assignment_id]

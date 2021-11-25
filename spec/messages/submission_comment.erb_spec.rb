@@ -25,7 +25,7 @@ describe 'submission_comment' do
 
   before :once do
     submission_model
-    @comment = @submission.add_comment(:comment => "new comment")
+    @comment = @submission.add_comment(comment: "new comment")
   end
 
   let(:notification_name) { :submission_comment }

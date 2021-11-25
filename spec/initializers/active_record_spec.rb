@@ -21,7 +21,7 @@ module ActiveRecord
   describe Base do
     describe '.wildcard' do
       it 'produces a useful wildcard sql string' do
-        sql = Base.wildcard('users.name', 'users.short_name', 'Sinatra, Frank', { :delimiter => ',' })
+        sql = Base.wildcard('users.name', 'users.short_name', 'Sinatra, Frank', { delimiter: ',' })
         expect(sql).to eq "(LOWER(',' || users.name || ',') LIKE '%,sinatra, frank,%' OR LOWER(',' || users.short_name || ',') LIKE '%,sinatra, frank,%')"
       end
     end
@@ -38,8 +38,8 @@ module ActiveRecord
       end
 
       it 'bases modulos on either end of the query per the configured type' do
-        { :full => '%somestring%', :left => '%somestring', :right => 'somestring%' }.each do |type, result|
-          expect(Base.wildcard_pattern('somestring', :type => type)).to eq result
+        { full: '%somestring%', left: '%somestring', right: 'somestring%' }.each do |type, result|
+          expect(Base.wildcard_pattern('somestring', type: type)).to eq result
         end
       end
     end

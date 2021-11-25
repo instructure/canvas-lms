@@ -32,7 +32,7 @@ module CC
         lti_file_name = "#{migration_id}.xml"
         lti_path = File.join(@export_dir, lti_file_name)
         lti_file = File.new(lti_path, 'w')
-        lti_doc = Builder::XmlMarkup.new(:target => lti_file, :indent => 2)
+        lti_doc = Builder::XmlMarkup.new(target: lti_file, indent: 2)
 
         create_blti_link(tool, lti_doc)
 
@@ -42,7 +42,7 @@ module CC
           :identifier => migration_id,
           "type" => CCHelper::BASIC_LTI
         ) do |res|
-          res.file(:href => lti_file_name)
+          res.file(href: lti_file_name)
         end
       end
     end
@@ -80,7 +80,7 @@ module CC
           end
         end
 
-        blti_node.blti(:extensions, :platform => CC::CCHelper::CANVAS_PLATFORM) do |ext_node|
+        blti_node.blti(:extensions, platform: CC::CCHelper::CANVAS_PLATFORM) do |ext_node|
           ext_node.lticm(:property, tool.tool_id, 'name' => 'tool_id') if tool.tool_id
           ext_node.lticm :property, tool.workflow_state, 'name' => 'privacy_level'
           ext_node.lticm(:property, tool.domain, 'name' => 'domain') unless tool.domain.blank?
@@ -121,12 +121,12 @@ module CC
           Lti::ResourcePlacement::PLACEMENTS.each do |type|
             next unless tool.settings[type]
 
-            ext_node.lticm(:options, :name => type.to_s) do |type_node|
+            ext_node.lticm(:options, name: type.to_s) do |type_node|
               tool.settings[type].except(:labels, :custom_fields).each do |key, value|
                 type_node.lticm(:property, value, 'name' => key.to_s)
               end
               if tool.settings[type][:labels]
-                type_node.lticm(:options, :name => 'labels') do |labels_node|
+                type_node.lticm(:options, name: 'labels') do |labels_node|
                   tool.settings[type][:labels].each do |lang, text|
                     labels_node.lticm(:property, text, 'name' => lang)
                   end
@@ -144,7 +144,7 @@ module CC
         end
 
         tool.settings[:vendor_extensions]&.each do |extension|
-          blti_node.blti(:extensions, :platform => extension[:platform]) do |ext_node|
+          blti_node.blti(:extensions, platform: extension[:platform]) do |ext_node|
             extension[:custom_fields].each_pair do |key, val|
               ext_node.lticm :property, val, 'name' => key
             end

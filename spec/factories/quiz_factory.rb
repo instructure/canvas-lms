@@ -20,7 +20,7 @@
 
 module Factories
   def quiz_model(opts = {})
-    @context ||= opts.delete(:course) || course_model(:reusable => true)
+    @context ||= opts.delete(:course) || course_model(reusable: true)
     @quiz = @context.quizzes.build(valid_quiz_attributes.merge(opts))
     @quiz.published_at = Time.zone.now
     @quiz.workflow_state = 'available'
@@ -30,13 +30,13 @@ module Factories
 
   def valid_quiz_attributes
     {
-      :title => "Test Quiz",
-      :description => "Test Quiz Description"
+      title: "Test Quiz",
+      description: "Test Quiz Description"
     }
   end
 
   def quiz_with_submission(complete_quiz = true, skip_submission = false)
-    @course ||= course_model(:reusable => true)
+    @course ||= course_model(reusable: true)
     @student ||= user_model
     @course.enroll_student(@student).accept
     @quiz = @course.quizzes.create
@@ -50,7 +50,7 @@ module Factories
     @qsub.started_at = 1.minute.ago
     @qsub.attempt = 1
     if complete_quiz
-      @qsub.submission_data = [{ :points => 0, :text => "7051", :question_id => 128, :correct => false, :answer_id => 7051 }]
+      @qsub.submission_data = [{ points: 0, text: "7051", question_id: 128, correct: false, answer_id: 7051 }]
       @qsub.score = 0
       @qsub.finished_at = Time.now.utc
       @qsub.workflow_state = 'complete'
@@ -372,30 +372,30 @@ module Factories
   end
 
   def fill_in_multiple_blanks_question_data
-    { :position => 1, :name => "Question 1", :correct_comments => "", :question_type => "fill_in_multiple_blanks_question", :assessment_question_id => 7903, :incorrect_comments => "", :neutral_comments => "", :id => 1, :points_possible => 50, :question_name => "Question 1", :answers => [
-      { :comments => "", :text => "control", :weight => 100, :id => 3950, :blank_id => "answer1" },
-      { :comments => "", :text => "controll", :weight => 100, :id => 9177, :blank_id => "answer1" },
-      { :comments => "", :text => "patrol", :weight => 100, :id => 9181, :blank_id => "answer2" },
-      { :comments => "", :text => "soul", :weight => 100, :id => 3733, :blank_id => "answer3" },
-      { :comments => "", :text => "tolls", :weight => 100, :id => 9756, :blank_id => "answer4" },
-      { :comments => "", :text => "toll", :weight => 100, :id => 7829, :blank_id => "answer4" },
-      { :comments => "", :text => "explode", :weight => 100, :id => 3046, :blank_id => "answer5" },
-      { :comments => "", :text => "assplode", :weight => 100, :id => 5301, :blank_id => "answer5" },
-      { :comments => "", :text => "old", :weight => 100, :id => 3367, :blank_id => "answer6" }
-    ], :question_text => "<p><span>Ayo my quality [answer1], captivates your party [answer2]. </span>Your mind, body, and [answer3]. For whom the bell [answer4], let the rhythm [answer5]. Big, bad, and bold b-boys of [answer6].</p>" }.with_indifferent_access
+    { position: 1, name: "Question 1", correct_comments: "", question_type: "fill_in_multiple_blanks_question", assessment_question_id: 7903, incorrect_comments: "", neutral_comments: "", id: 1, points_possible: 50, question_name: "Question 1", answers: [
+      { comments: "", text: "control", weight: 100, id: 3950, blank_id: "answer1" },
+      { comments: "", text: "controll", weight: 100, id: 9177, blank_id: "answer1" },
+      { comments: "", text: "patrol", weight: 100, id: 9181, blank_id: "answer2" },
+      { comments: "", text: "soul", weight: 100, id: 3733, blank_id: "answer3" },
+      { comments: "", text: "tolls", weight: 100, id: 9756, blank_id: "answer4" },
+      { comments: "", text: "toll", weight: 100, id: 7829, blank_id: "answer4" },
+      { comments: "", text: "explode", weight: 100, id: 3046, blank_id: "answer5" },
+      { comments: "", text: "assplode", weight: 100, id: 5301, blank_id: "answer5" },
+      { comments: "", text: "old", weight: 100, id: 3367, blank_id: "answer6" }
+    ], question_text: "<p><span>Ayo my quality [answer1], captivates your party [answer2]. </span>Your mind, body, and [answer3]. For whom the bell [answer4], let the rhythm [answer5]. Big, bad, and bold b-boys of [answer6].</p>" }.with_indifferent_access
   end
 
   def fill_in_multiple_blanks_question_one_blank_data
-    { :name => "Question", :question_type => "fill_in_multiple_blanks_question", :id => 2, :points_possible => 3.75, :answers => [
-      { :text => "stupid", :weight => 100, :id => 1234, :blank_id => "myblank" },
-      { :text => "dumb", :weight => 100, :id => 1235, :blank_id => "myblank" },
-    ], :question_text => "<p>there's no such thing as a [myblank] question</p>" }.with_indifferent_access
+    { name: "Question", question_type: "fill_in_multiple_blanks_question", id: 2, points_possible: 3.75, answers: [
+      { text: "stupid", weight: 100, id: 1234, blank_id: "myblank" },
+      { text: "dumb", weight: 100, id: 1235, blank_id: "myblank" },
+    ], question_text: "<p>there's no such thing as a [myblank] question</p>" }.with_indifferent_access
   end
 
   def assignment_quiz(questions, opts = {})
     course = opts[:course] || course_factory(active_course: true)
-    user = opts[:user] || user_factory(:active_user => true)
-    course.enroll_student(user, :enrollment_state => 'active') unless user.enrollments.any? { |e| e.course_id == course.id }
+    user = opts[:user] || user_factory(active_user: true)
+    course.enroll_student(user, enrollment_state: 'active') unless user.enrollments.any? { |e| e.course_id == course.id }
     @assignment = course.assignments.create(title: opts.fetch(:title, "Test Assignment"))
     @assignment.workflow_state = "published"
     @assignment.submission_types = "online_quiz"
@@ -426,8 +426,8 @@ module Factories
   end
 
   def survey_with_submission(questions)
-    course_with_student(:active_all => true)
-    @assignment = @course.assignments.create(:title => "Test Assignment")
+    course_with_student(active_all: true)
+    @assignment = @course.assignments.create(title: "Test Assignment")
     @assignment.workflow_state = "published"
     @assignment.submission_types = "online_quiz"
     @assignment.save
@@ -443,7 +443,7 @@ module Factories
   end
 
   def practice_quiz_with_submission
-    @course ||= course_model(:reusable => true)
+    @course ||= course_model(reusable: true)
     @student ||= user_model
     @course.enroll_student(@student).accept
 
@@ -457,7 +457,7 @@ module Factories
     @qsub.quiz_data = test_quiz_data
     @qsub.started_at = 1.minute.ago
     @qsub.attempt = 1
-    @qsub.submission_data = [{ :points => 0, :text => "7051", :question_id => 128, :correct => false, :answer_id => 7051 }]
+    @qsub.submission_data = [{ points: 0, text: "7051", question_id: 128, correct: false, answer_id: 7051 }]
     @qsub.score = 0
     @qsub.finished_at = Time.now.utc
     @qsub.workflow_state = 'complete'
@@ -499,12 +499,12 @@ module Factories
 
   def build_course_quiz_questions_and_a_bank(data = {}, opts = {})
     scoring_policy = opts[:scoring_policy] || "keep_highest"
-    course_with_student(:active_all => true)
-    @quiz = @course.quizzes.create!(:title => "new quiz", :shuffle_answers => true, :quiz_type => "assignment", scoring_policy: scoring_policy)
-    @q1 = @quiz.quiz_questions.create!(:question_data => question_data(true, data[:q1] || data))
-    @q2 = @quiz.quiz_questions.create!(:question_data => question_data(false, data[:q2] || data))
-    @outcome = @course.created_learning_outcomes.create!(:short_description => 'new outcome')
+    course_with_student(active_all: true)
+    @quiz = @course.quizzes.create!(title: "new quiz", shuffle_answers: true, quiz_type: "assignment", scoring_policy: scoring_policy)
+    @q1 = @quiz.quiz_questions.create!(question_data: question_data(true, data[:q1] || data))
+    @q2 = @quiz.quiz_questions.create!(question_data: question_data(false, data[:q2] || data))
+    @outcome = @course.created_learning_outcomes.create!(short_description: 'new outcome')
     @bank = @q1.assessment_question.assessment_question_bank
-    @outcome.align(@bank, @bank.context, :mastery_score => 0.7)
+    @outcome.align(@bank, @bank.context, mastery_score: 0.7)
   end
 end

@@ -72,7 +72,7 @@ class ToDoListPresenter
   end
 
   def ungraded_quizzes_needing_submitting
-    @user.ungraded_quizzes(contexts: @contexts, limit: ASSIGNMENT_LIMIT, :needing_submitting => true).map do |quiz|
+    @user.ungraded_quizzes(contexts: @contexts, limit: ASSIGNMENT_LIMIT, needing_submitting: true).map do |quiz|
       AssignmentPresenter.new(@view, quiz, @user, :submitting)
     end
   end
@@ -192,11 +192,11 @@ class ToDoListPresenter
     def ignore_sr_message
       case @type
       when :grading
-        I18n.t('Ignore %{item} until new submission', :item => title)
+        I18n.t('Ignore %{item} until new submission', item: title)
       when :moderation
-        I18n.t('Ignore %{item} until new mark', :item => title)
+        I18n.t('Ignore %{item} until new mark', item: title)
       when :submitting
-        I18n.t('Ignore %{item}', :item => title)
+        I18n.t('Ignore %{item}', item: title)
       end
     end
 
@@ -261,7 +261,7 @@ class ToDoListPresenter
     end
 
     def ignore_sr_message
-      I18n.t('Ignore %{assignment}', :assignment => @assignment.title)
+      I18n.t('Ignore %{assignment}', assignment: @assignment.title)
     end
 
     def ignore_flash_message; end

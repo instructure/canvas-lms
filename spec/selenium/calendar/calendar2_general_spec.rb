@@ -44,7 +44,7 @@ describe "calendar2" do
 
     it "lets me go to the Edit Appointment group page from the appointment group slot dialog" do
       date = Date.today.to_s
-      create_appointment_group :new_appointments => [
+      create_appointment_group new_appointments: [
         ["#{date} 12:00:00", "#{date} 13:00:00"],
         ["#{date} 13:00:00", "#{date} 14:00:00"],
       ]
@@ -60,12 +60,12 @@ describe "calendar2" do
 
     it "lets me message students who have signed up for an appointment" do
       date = Date.today.to_s
-      create_appointment_group :new_appointments => [
+      create_appointment_group new_appointments: [
         ["#{date} 12:00:00", "#{date} 13:00:00"],
         ["#{date} 13:00:00", "#{date} 14:00:00"],
       ]
       student1, student2 = Array.new(2) do
-        student_in_course :course => @course, :active_all => true
+        student_in_course course: @course, active_all: true
         @student
       end
       app1, app2 = AppointmentGroup.first.appointments
@@ -89,10 +89,10 @@ describe "calendar2" do
     end
 
     it "editing an existing assignment should select the correct assignment group" do
-      group1 = @course.assignment_groups.create!(:name => "Assignment Group 1")
-      group2 = @course.assignment_groups.create!(:name => "Assignment Group 2")
-      @course.active_assignments.create(:name => "Assignment 1", :assignment_group => group1, :due_at => Time.zone.now)
-      assignment2 = @course.active_assignments.create(:name => "Assignment 2", :assignment_group => group2, :due_at => Time.zone.now)
+      group1 = @course.assignment_groups.create!(name: "Assignment Group 1")
+      group2 = @course.assignment_groups.create!(name: "Assignment Group 2")
+      @course.active_assignments.create(name: "Assignment 1", assignment_group: group1, due_at: Time.zone.now)
+      assignment2 = @course.active_assignments.create(name: "Assignment 2", assignment_group: group2, due_at: Time.zone.now)
 
       get "/calendar2"
       events = ff('.fc-event')
@@ -126,7 +126,7 @@ describe "calendar2" do
     end
 
     it "editing an existing assignment should preserve more options link", priority: "1" do
-      assignment = @course.active_assignments.create!(:name => "to edit", :due_at => Time.zone.now)
+      assignment = @course.active_assignments.create!(name: "to edit", due_at: Time.zone.now)
       get "/calendar2"
       f('.fc-event').click
       wait_for_ajaximations
@@ -167,7 +167,7 @@ describe "calendar2" do
       it "allows editing appointment events" do
         create_appointment_group
         ag = AppointmentGroup.first
-        student_in_course(:course => @course, :active_all => true)
+        student_in_course(course: @course, active_all: true)
         ag.appointments.first.reserve_for(@user, @user)
 
         get "/calendar2"
@@ -185,7 +185,7 @@ describe "calendar2" do
       end
 
       it "allows moving events between calendars" do
-        event = @user.calendar_events.create! :title => 'blah', :start_at => Date.today
+        event = @user.calendar_events.create! title: 'blah', start_at: Date.today
         get "/calendar2"
         open_edit_event_dialog
         f("option[value=course_#{@course.id}]").click
@@ -205,7 +205,7 @@ describe "calendar2" do
       it "displays popup with correct day on an event" do
         local_now = @user.time_zone.now
         event_start = @user.time_zone.local(local_now.year, local_now.month, 15, 22, 0, 0)
-        make_event(:start => event_start)
+        make_event(start: event_start)
         get "/calendar2"
         f('.fc-event').click
         expect(f('.event-details-timestring').text).to include event_start.strftime("%b %e")
@@ -263,10 +263,10 @@ describe "calendar2" do
 
     it "allows viewing an unenrolled calendar via include_contexts" do
       # also make sure the redirect from calendar -> calendar2 keeps the param
-      unrelated_course = Course.create!(:account => Account.default, :name => "unrelated course")
+      unrelated_course = Course.create!(account: Account.default, name: "unrelated course")
       # make the user an admin so they can view the course's calendar without an enrollment
       Account.default.account_users.create!(user: @user)
-      CalendarEvent.create!(:title => "from unrelated one", :start_at => Time.now, :end_at => 5.hours.from_now) { |c| c.context = unrelated_course }
+      CalendarEvent.create!(title: "from unrelated one", start_at: Time.now, end_at: 5.hours.from_now) { |c| c.context = unrelated_course }
       keep_trying_until { expect(CalendarEvent.last.title).to eq "from unrelated one" }
       get "/courses/#{unrelated_course.id}/settings"
       expect(f('#course_calendar_link')['href']).to match(/course_#{Course.last.id}/)

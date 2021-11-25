@@ -24,7 +24,7 @@ describe UnzipAttachment do
   end
 
   def add_folder_to_course(name)
-    folder_model :name => name
+    folder_model name: name
     @course.folders << @folder
     @course.save!
     @course.reload
@@ -37,7 +37,7 @@ describe UnzipAttachment do
 
   context "unzipping" do
     let(:filename) { fixture_filename('attachments.zip') }
-    let(:unzipper) { UnzipAttachment.new(:course => @course, :filename => filename) }
+    let(:unzipper) { UnzipAttachment.new(course: @course, filename: filename) }
 
     it "stores a course, course_files_folder, and filename" do
       expect(unzipper.course).to eql(@course)
@@ -47,7 +47,7 @@ describe UnzipAttachment do
 
     it "is able to take a root_directory argument" do
       add_folder_to_course('a special folder')
-      root_zipper = UnzipAttachment.new(:course => @course, :filename => filename, :root_directory => @folder)
+      root_zipper = UnzipAttachment.new(course: @course, filename: filename, root_directory: @folder)
       expect(root_zipper.course_files_folder).to eql(@folder)
     end
 
@@ -72,7 +72,7 @@ describe UnzipAttachment do
         # Not overwriting FileInContext.attach, so we're actually attaching the files now.
         # The identical @us.process guarantees that every file attached the second time
         # overwrites a file that was already there if it needs to.
-        Attachment.where(:id => first_attachment).update_all(:md5 => "somethingelse")
+        Attachment.where(id: first_attachment).update_all(md5: "somethingelse")
 
         unzipper.process
         @course.reload
@@ -88,9 +88,9 @@ describe UnzipAttachment do
       end
 
       it "updates attachment items in modules when overwriting their files via zip upload" do
-        context_module = @course.context_modules.create!(:name => "teh module")
-        attachment_tag = context_module.add_item(:id => first_attachment.id, :type => 'attachment')
-        Attachment.where(:id => first_attachment).update_all(:md5 => "somethingelse")
+        context_module = @course.context_modules.create!(name: "teh module")
+        attachment_tag = context_module.add_item(id: first_attachment.id, type: 'attachment')
+        Attachment.where(id: first_attachment).update_all(md5: "somethingelse")
 
         unzipper.process
         first_attachment.reload
@@ -119,7 +119,7 @@ describe UnzipAttachment do
         expect(zip.entries.map(&:name)).to eql(%w[f.txt d/e.txt d/d.txt c.txt b.txt a.txt])
       end
 
-      ua = UnzipAttachment.new(:course => @course, :filename => filename)
+      ua = UnzipAttachment.new(course: @course, filename: filename)
       ua.process
 
       expect(@course.attachments.count).to eq 6
@@ -130,14 +130,14 @@ describe UnzipAttachment do
 
     it "does not fall over when facing a filename starting with ~" do
       filename = fixture_filename('tilde.zip')
-      ua = UnzipAttachment.new(:course => @course, :filename => filename)
+      ua = UnzipAttachment.new(course: @course, filename: filename)
       expect { ua.process }.not_to raise_error
       expect(@course.attachments.map(&:display_name)).to eq ['~tilde']
     end
 
     it "does not fail when dealing with long filenames" do
       filename = fixture_filename("zip_with_long_filename_inside.zip")
-      ua = UnzipAttachment.new(:course => @course, :filename => filename)
+      ua = UnzipAttachment.new(course: @course, filename: filename)
       expect { ua.process }.not_to raise_exception
       expect(@course.attachments.map(&:display_name)).to eq ["entry_#{(1..115).to_a.join}.txt"]
     end
@@ -153,12 +153,12 @@ describe UnzipAttachment do
       end
 
       it 'errors when the file quotas push the context over its quota' do
-        allow(Attachment).to receive(:get_quota).and_return({ :quota => 5000, :quota_used => 0 })
+        allow(Attachment).to receive(:get_quota).and_return({ quota: 5000, quota_used: 0 })
         expect { unzipper.process }.to raise_error(Attachment::OverQuotaError, "Zip file would exceed quota limit")
       end
 
       it 'is able to rescue the file quota error' do
-        allow(Attachment).to receive(:get_quota).and_return({ :quota => 5000, :quota_used => 0 })
+        allow(Attachment).to receive(:get_quota).and_return({ quota: 5000, quota_used: 0 })
         unzipper.process rescue nil
       end
     end
@@ -174,7 +174,7 @@ describe UnzipAttachment do
       let(:filename) { fixture_filename('zipbomb.zip') }
 
       it 'double-checks the extracted file sizes in case the central directory lies' do
-        allow(Attachment).to receive(:get_quota).and_return({ :quota => 5000, :quota_used => 0 })
+        allow(Attachment).to receive(:get_quota).and_return({ quota: 5000, quota_used: 0 })
         expect { unzipper.process }.to raise_error(Attachment::OverQuotaError)
         # a and b should have been attached
         # but we should have bailed once c ate the remaining quota
@@ -182,13 +182,13 @@ describe UnzipAttachment do
       end
 
       it "doesn't interfere when the quota is 0 (unlimited)" do
-        allow(Attachment).to receive(:get_quota).and_return({ :quota => 0, :quota_used => 0 })
+        allow(Attachment).to receive(:get_quota).and_return({ quota: 0, quota_used: 0 })
         expect { unzipper.process }.not_to raise_error
         expect(@course.attachments.count).to eql 4
       end
 
       it "lets incorrect central directory size slide if the quota isn't exceeded" do
-        allow(Attachment).to receive(:get_quota).and_return({ :quota => 15_000, :quota_used => 0 })
+        allow(Attachment).to receive(:get_quota).and_return({ quota: 15_000, quota_used: 0 })
         expect { unzipper.process }.not_to raise_error
         expect(@course.attachments.count).to eql 4
       end

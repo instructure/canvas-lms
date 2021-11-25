@@ -21,7 +21,7 @@
 describe OAuth2ProviderController do
   describe 'GET auth' do
     let_once(:key) do
-      d = DeveloperKey.create! :redirect_uri => 'https://example.com'
+      d = DeveloperKey.create! redirect_uri: 'https://example.com'
       enable_developer_key_account_binding!(d)
       d
     end
@@ -34,7 +34,7 @@ describe OAuth2ProviderController do
     end
 
     it 'renders 400 on a bad redirect_uri' do
-      get :auth, params: { :client_id => key.id }
+      get :auth, params: { client_id: key.id }
       assert_status(400)
       expect(response.body).to match(/redirect_uri does not match/)
     end
@@ -85,12 +85,12 @@ describe OAuth2ProviderController do
                            redirect_uri: Canvas::OAuth::Provider::OAUTH2_OOB_URI,
                            canvas_login: 1,
                            response_type: 'code' }
-      expect(response).to redirect_to(login_url(:canvas_login => 1))
+      expect(response).to redirect_to(login_url(canvas_login: 1))
     end
 
     it 'passes pseudonym_session[unique_id] to login to populate username textbox' do
       get :auth, params: { :client_id => key.id, :redirect_uri => Canvas::OAuth::Provider::OAUTH2_OOB_URI,
-                           "unique_id" => "test", force_login: true, response_type: 'code' }
+                           "unique_id" => "test", :force_login => true, :response_type => 'code' }
       expect(response).to redirect_to(login_url + '?force_login=true&pseudonym_session%5Bunique_id%5D=test')
     end
 
@@ -120,7 +120,7 @@ describe OAuth2ProviderController do
 
     context 'with a user logged in' do
       before :once do
-        user_with_pseudonym(:active_all => 1, :password => 'qwertyuiop')
+        user_with_pseudonym(active_all: 1, password: 'qwertyuiop')
       end
 
       before do
@@ -128,7 +128,7 @@ describe OAuth2ProviderController do
 
         redis = double('Redis')
         allow(redis).to receive(:setex)
-        allow(Canvas).to receive_messages(:redis => redis)
+        allow(Canvas).to receive_messages(redis: redis)
       end
 
       it 'redirects to the confirm url if the user has no token' do
@@ -145,7 +145,7 @@ describe OAuth2ProviderController do
                       redirect_uri: Canvas::OAuth::Provider::OAUTH2_OOB_URI,
                       response_type: 'code',
                       force_login: 1 }
-        expect(response).to redirect_to(login_url(:force_login => 1))
+        expect(response).to redirect_to(login_url(force_login: 1))
       end
 
       it 'redirects to login_url when oauth2 session is nil' do
@@ -155,7 +155,7 @@ describe OAuth2ProviderController do
       end
 
       it 'redirects to the redirect uri if the user already has remember-me token' do
-        @user.access_tokens.create!({ :developer_key => key, :remember_access => true, :scopes => ['/auth/userinfo'], :purpose => nil })
+        @user.access_tokens.create!({ developer_key: key, remember_access: true, scopes: ['/auth/userinfo'], purpose: nil })
         get :auth,
             params: { client_id: key.id,
                       redirect_uri: 'https://example.com',
@@ -166,7 +166,7 @@ describe OAuth2ProviderController do
       end
 
       it 'does not reuse userinfo tokens for other scopes' do
-        @user.access_tokens.create!({ :developer_key => key, :remember_access => true, :scopes => ['/auth/userinfo'], :purpose => nil })
+        @user.access_tokens.create!({ developer_key: key, remember_access: true, scopes: ['/auth/userinfo'], purpose: nil })
         get :auth, params: { client_id: key.id,
                              redirect_uri: 'https://example.com',
                              response_type: 'code' }
@@ -196,7 +196,7 @@ describe OAuth2ProviderController do
         end
 
         it 'redirects to the redirect uri if the user already has remember-me token' do
-          @user.access_tokens.create!({ :developer_key => key, :remember_access => true, :scopes => ['/auth/userinfo'], :purpose => nil })
+          @user.access_tokens.create!({ developer_key: key, remember_access: true, scopes: ['/auth/userinfo'], purpose: nil })
           get :auth, params: params
           expect(response).to be_redirect
           expect(response.location).to match(%r{https://example.com})
@@ -468,7 +468,7 @@ describe OAuth2ProviderController do
         redis
       end
 
-      before { allow(Canvas).to receive_messages(:redis => redis) }
+      before { allow(Canvas).to receive_messages(redis: redis) }
 
       it_behaves_like 'common oauth2 token checks' do
         let(:success_params) { { code: valid_code } }
@@ -485,7 +485,7 @@ describe OAuth2ProviderController do
       end
 
       it 'redirects and has error invalid grant in query' do
-        post :token, params: base_params.merge(:code => "NotALegitCode")
+        post :token, params: base_params.merge(code: "NotALegitCode")
         expect(subject).to redirect_to('https://example.com?error=invalid_grant&error_description=authorization_code+not+found')
       end
 
@@ -720,40 +720,40 @@ describe OAuth2ProviderController do
   describe 'POST accept' do
     let_once(:user) { User.create! }
     let_once(:key) { DeveloperKey.create! }
-    let(:session_hash) { { :oauth2 => { :client_id => key.id, :redirect_uri => Canvas::OAuth::Provider::OAUTH2_OOB_URI } } }
+    let(:session_hash) { { oauth2: { client_id: key.id, redirect_uri: Canvas::OAuth::Provider::OAUTH2_OOB_URI } } }
     let(:oauth_accept) { post :accept, session: session_hash }
 
     before { user_session user }
 
     it 'uses the global id of the user for generating the code' do
-      expect(Canvas::OAuth::Token).to receive(:generate_code_for).with(user.global_id, user.global_id, key.id, { :scopes => nil, :remember_access => nil, :purpose => nil }).and_return('code')
+      expect(Canvas::OAuth::Token).to receive(:generate_code_for).with(user.global_id, user.global_id, key.id, { scopes: nil, remember_access: nil, purpose: nil }).and_return('code')
       oauth_accept
-      expect(response).to redirect_to(oauth2_auth_url(:code => 'code'))
+      expect(response).to redirect_to(oauth2_auth_url(code: 'code'))
     end
 
     it 'saves the requested scopes with the code' do
       scopes = 'userinfo'
       session_hash[:oauth2][:scopes] = scopes
-      expect(Canvas::OAuth::Token).to receive(:generate_code_for).with(user.global_id, user.global_id, key.id, { :scopes => scopes, :remember_access => nil, :purpose => nil }).and_return('code')
+      expect(Canvas::OAuth::Token).to receive(:generate_code_for).with(user.global_id, user.global_id, key.id, { scopes: scopes, remember_access: nil, purpose: nil }).and_return('code')
       oauth_accept
     end
 
     it 'remembers the users access preference with the code' do
-      expect(Canvas::OAuth::Token).to receive(:generate_code_for).with(user.global_id, user.global_id, key.id, { :scopes => nil, :remember_access => '1', :purpose => nil }).and_return('code')
-      post :accept, params: { :remember_access => '1' }, session: session_hash
+      expect(Canvas::OAuth::Token).to receive(:generate_code_for).with(user.global_id, user.global_id, key.id, { scopes: nil, remember_access: '1', purpose: nil }).and_return('code')
+      post :accept, params: { remember_access: '1' }, session: session_hash
     end
 
     it 'removes oauth session info after code generation' do
-      allow(Canvas::OAuth::Token).to receive_messages(:generate_code_for => 'code')
+      allow(Canvas::OAuth::Token).to receive_messages(generate_code_for: 'code')
       oauth_accept
       expect(controller.session[:oauth2]).to be_nil
     end
 
     it 'forwards the oauth state if it was provided' do
       session_hash[:oauth2][:state] = '1234567890'
-      allow(Canvas::OAuth::Token).to receive_messages(:generate_code_for => 'code')
+      allow(Canvas::OAuth::Token).to receive_messages(generate_code_for: 'code')
       oauth_accept
-      expect(response).to redirect_to(oauth2_auth_url(:code => 'code', :state => '1234567890'))
+      expect(response).to redirect_to(oauth2_auth_url(code: 'code', state: '1234567890'))
     end
 
     it "gracefully errors if the session has been destroyed" do
@@ -764,7 +764,7 @@ describe OAuth2ProviderController do
 
   describe 'GET deny' do
     let_once(:key) { DeveloperKey.create! }
-    let(:session_hash) { { :oauth2 => { :client_id => key.id, :redirect_uri => Canvas::OAuth::Provider::OAUTH2_OOB_URI } } }
+    let(:session_hash) { { oauth2: { client_id: key.id, redirect_uri: Canvas::OAuth::Provider::OAUTH2_OOB_URI } } }
 
     it 'forwards the oauth state if it was provided' do
       session_hash[:oauth2][:state] = '1234567890'
@@ -787,11 +787,11 @@ describe OAuth2ProviderController do
 
   describe 'DELETE token' do
     let_once(:key) do
-      d = DeveloperKey.create! :redirect_uri => 'https://example.com'
+      d = DeveloperKey.create! redirect_uri: 'https://example.com'
       enable_developer_key_account_binding!(d)
       d
     end
-    let_once(:user) { user_with_pseudonym(:active_all => 1, :password => 'qwertyuiop') }
+    let_once(:user) { user_with_pseudonym(active_all: 1, password: 'qwertyuiop') }
     let(:token) { user.access_tokens.create!(developer_key: key) }
 
     it "deletes the token" do

@@ -37,12 +37,12 @@ describe "/quizzes/quizzes/_quiz_submission" do
     end
 
     it "renders" do
-      render :partial => "quizzes/quizzes/quiz_submission"
+      render partial: "quizzes/quizzes/quiz_submission"
       expect(response).not_to be_nil
     end
 
     it "sets the IS_SURVEY value in the js env" do
-      render :partial => "quizzes/quizzes/quiz_submission"
+      render partial: "quizzes/quizzes/quiz_submission"
       expect(controller.js_env).to have_key(:IS_SURVEY)
     end
   end
@@ -56,7 +56,7 @@ describe "/quizzes/quizzes/_quiz_submission" do
       assign(:quiz, quiz)
       sub = assign(:submission, quiz.generate_submission(@user))
       Quizzes::SubmissionGrader.new(sub).grade_submission
-      render :partial => "quizzes/quizzes/quiz_submission"
+      render partial: "quizzes/quizzes/quiz_submission"
       expect(response).not_to be_nil
     end
   end
@@ -77,7 +77,7 @@ describe "/quizzes/quizzes/_quiz_submission" do
       assign(:quiz, quiz)
       sub = assign(:submission, quiz.generate_submission(@student))
       Quizzes::SubmissionGrader.new(sub).grade_submission
-      render :partial => "quizzes/quizzes/quiz_submission"
+      render partial: "quizzes/quizzes/quiz_submission"
       expect(response).not_to be_nil
     end
   end

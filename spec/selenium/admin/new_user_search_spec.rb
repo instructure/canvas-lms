@@ -36,7 +36,7 @@ describe "new account user search" do
 
   before :once do
     @account = Account.default
-    account_admin_user(:account => @account, :active_all => true)
+    account_admin_user(account: @account, active_all: true)
   end
 
   before do
@@ -92,7 +92,7 @@ describe "new account user search" do
     end
 
     it "searches by name" do
-      user_with_pseudonym(:account => @account, :name => "diffrient user")
+      user_with_pseudonym(account: @account, name: "diffrient user")
       refresh_page
       user_search_box.send_keys("Test")
       wait_for_loading_to_disappear
@@ -107,7 +107,7 @@ describe "new account user search" do
     end
 
     it "does not show the people tab without permission" do
-      @account.role_overrides.create! :role => admin_role, :permission => 'read_roster', :enabled => false
+      @account.role_overrides.create! role: admin_role, permission: 'read_roster', enabled: false
       visit_users(@account)
       expect(left_navigation).not_to include_text("People")
     end
@@ -127,7 +127,7 @@ describe "new account user search" do
     it "paginates" do
       @user.update_attribute(:sortable_name, "Admin")
       ('A'..'Z').each do |letter|
-        user_with_pseudonym(:account => @account, :name => "Test User#{letter}")
+        user_with_pseudonym(account: @account, name: "Test User#{letter}")
       end
       visit_users(@account)
 
@@ -147,8 +147,8 @@ describe "new account user search" do
     end
 
     it "is able to toggle between 'People' and 'Courses' tabs" do
-      user_with_pseudonym(:account => @account, :name => "Test User")
-      course_factory(:account => @account, :course_name => "Test Course")
+      user_with_pseudonym(account: @account, name: "Test User")
+      course_factory(account: @account, course_name: "Test Course")
 
       visit_courses(@account)
       2.times do
@@ -181,7 +181,7 @@ describe "new account user search" do
 
       click_modal_submit
 
-      new_pseudonym = Pseudonym.where(:unique_id => email).first
+      new_pseudonym = Pseudonym.where(unique_id: email).first
       expect(new_pseudonym.user.name).to eq name
 
       # should refresh the users list
@@ -207,7 +207,7 @@ describe "new account user search" do
       click_email_creation_check
       click_modal_submit
 
-      new_pseudonym = Pseudonym.where(:unique_id => email).first
+      new_pseudonym = Pseudonym.where(unique_id: email).first
       expect(new_pseudonym.user.name).to eq name
     end
   end

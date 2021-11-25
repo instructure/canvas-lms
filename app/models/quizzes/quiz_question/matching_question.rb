@@ -49,7 +49,7 @@ class Quizzes::QuizQuestion::MatchingQuestion < Quizzes::QuizQuestion::Base
 
   # TODO: remove once new stats is on for everybody
   def stats(responses)
-    stats = { :multiple_answers => true }
+    stats = { multiple_answers: true }
 
     answers = @question_data.answers
     matches = @question_data[:matches]
@@ -61,10 +61,10 @@ class Quizzes::QuizQuestion::MatchingQuestion < Quizzes::QuizQuestion::Base
           a[:match_id].to_i == right[:match_id].to_i
         end
         match = {
-          :responses => 0,
-          :text => (right[:right] || right[:text]),
-          :user_ids => [],
-          :id => match_answer ? match_answer[:id] : right[:match_id]
+          responses: 0,
+          text: (right[:right] || right[:text]),
+          user_ids: [],
+          id: match_answer ? match_answer[:id] : right[:match_id]
         }
         answers[i][:answer_matches] << match
       end

@@ -30,13 +30,13 @@ module Alerts
 
     describe '#should_not_receive_message?' do
       before :once do
-        course_with_teacher(:active_all => 1)
+        course_with_teacher(active_all: 1)
         @root_account = @course.root_account
         @root_account.enable_user_notes = true
         @root_account.save!
         @teacher = @user
         @user = nil
-        student_in_course(:active_all => 1)
+        student_in_course(active_all: 1)
       end
 
       it 'validates the length of title' do

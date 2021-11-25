@@ -35,12 +35,12 @@ class Progress < ActiveRecord::Base
   include Workflow
   workflow do
     state :queued do
-      event :start, :transitions_to => :running
-      event :fail, :transitions_to => :failed
+      event :start, transitions_to: :running
+      event :fail, transitions_to: :failed
     end
     state :running do
-      event(:complete, :transitions_to => :completed) { self.completion = 100 }
-      event :fail, :transitions_to => :failed
+      event(:complete, transitions_to: :completed) { self.completion = 100 }
+      event :fail, transitions_to: :failed
     end
     state :completed
     state :failed

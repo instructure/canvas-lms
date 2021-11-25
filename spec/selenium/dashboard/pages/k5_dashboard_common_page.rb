@@ -34,7 +34,7 @@ module K5DashboardCommonPageObject
       artifact: submission,
       assessment: {
         assessment_type: 'grading',
-        :"criterion_#{@rubric.criteria_object.first.id}" => {
+        "criterion_#{@rubric.criteria_object.first.id}": {
           points: 3,
           comments: "a comment",
         }
@@ -46,7 +46,7 @@ module K5DashboardCommonPageObject
   def admin_setup
     feature_setup
     teacher_setup
-    account_admin_user(:account => @account)
+    account_admin_user(account: @account)
   end
 
   def create_and_submit_assignment(course, assignment_title, description, points_possible)
@@ -71,10 +71,10 @@ module K5DashboardCommonPageObject
 
   def create_course_module(workflow_state = 'active')
     @module_title = "Course Module"
-    @course_module = @subject_course.context_modules.create!(:name => @module_title, :workflow_state => workflow_state)
+    @course_module = @subject_course.context_modules.create!(name: @module_title, workflow_state: workflow_state)
     @module_assignment_title = "General Assignment"
     assignment = create_dated_assignment(@subject_course, @module_assignment_title, 1.day.from_now)
-    @course_module.add_item(:id => assignment.id, :type => 'assignment')
+    @course_module.add_item(id: assignment.id, type: 'assignment')
   end
 
   def create_dated_assignment(course, assignment_title, assignment_due_at, points_possible = 100)
@@ -175,7 +175,7 @@ module K5DashboardCommonPageObject
     )
     @subject_course = @course
     @student_enrollment.update!(workflow_state: 'active')
-    @subject_course.enroll_teacher(@homeroom_teacher, :enrollment_state => 'active')
+    @subject_course.enroll_teacher(@homeroom_teacher, enrollment_state: 'active')
   end
 
   def observer_setup

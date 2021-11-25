@@ -89,7 +89,7 @@ module Lti
     belongs_to :resource_handler, class_name: 'Lti::ResourceHandler'
     validates :message_handler, :placement, presence: true
 
-    validates :placement, inclusion: { :in => PLACEMENT_LOOKUP.values }
+    validates :placement, inclusion: { in: PLACEMENT_LOOKUP.values }
 
     def self.valid_placements(_root_account)
       PLACEMENTS.dup.tap do |p|

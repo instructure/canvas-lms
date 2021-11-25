@@ -56,13 +56,13 @@ describe UserService do
 
     it "is able to register a UserService, defaulting to a GoogleDocs service" do
       @registration = UserService.register(
-        :user => user_model,
-        :token => 'some token',
-        :secret => 'some secret',
-        :service_user_id => @user.id,
-        :service_user_name => @user.name,
-        :service_user_url => 'some url',
-        :password => 'password'
+        user: user_model,
+        token: 'some token',
+        secret: 'some secret',
+        service_user_id: @user.id,
+        service_user_name: @user.name,
+        service_user_url: 'some url',
+        password: 'password'
       )
       expect(@registration.token).to eql('some token')
       expect(@registration.secret).to eql('some secret')
@@ -108,13 +108,13 @@ describe UserService do
       @shard1.activate { user.save! }
       @shard2.activate do
         @registration = UserService.register(
-          :user => user,
-          :token => 'some token',
-          :secret => 'some secret',
-          :service_user_id => user.id,
-          :service_user_name => user.name,
-          :service_user_url => 'some url',
-          :password => 'password'
+          user: user,
+          token: 'some token',
+          secret: 'some secret',
+          service_user_id: user.id,
+          service_user_name: user.name,
+          service_user_url: 'some url',
+          password: 'password'
         )
 
         expect(@registration.token).to eql('some token')

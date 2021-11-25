@@ -147,7 +147,7 @@ describe "discussions" do
         end
 
         it "defaults to post grades if account setting is enabled" do
-          @account.settings[:sis_default_grade_export] = { :locked => false, :value => true }
+          @account.settings[:sis_default_grade_export] = { locked: false, value: true }
           @account.save!
 
           get url

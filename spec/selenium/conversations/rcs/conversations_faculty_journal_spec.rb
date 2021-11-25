@@ -36,8 +36,8 @@ describe "conversations new" do
     @s2 = user_factory(name: "second student")
     @s3 = user_factory(name: 'third student')
     [@s1, @s2, @s3].each { |s| @course.enroll_student(s).update_attribute(:workflow_state, 'active') }
-    cat = @course.group_categories.create(:name => "the groups")
-    @group = cat.groups.create(:name => "the group", :context => @course)
+    cat = @course.group_categories.create(name: "the groups")
+    @group = cat.groups.create(name: "the group", context: @course)
     @group.users = [@s1, @s2]
   end
 

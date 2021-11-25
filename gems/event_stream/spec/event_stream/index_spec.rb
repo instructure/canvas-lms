@@ -37,15 +37,15 @@ describe EventStream::Index do
     end
 
     @stream = double('stream',
-                     :database => @database,
-                     :record_type => EventStream::Record,
-                     :ttl_seconds => 1.year,
-                     :read_consistency_level => nil)
+                     database: @database,
+                     record_type: EventStream::Record,
+                     ttl_seconds: 1.year,
+                     read_consistency_level: nil)
   end
 
   context "setup block" do
     before do
-      @table = double(:to_s => double('table'))
+      @table = double(to_s: double('table'))
       @entry_proc = -> { "entry" }
     end
 
@@ -53,10 +53,10 @@ describe EventStream::Index do
       # can't access spec ivars inside instance_exec
       table = @table
       entry_proc = @entry_proc
-      id_column = double(:to_s => double('id_column'))
-      key_column = double(:to_s => double('key_column'))
-      bucket_size = double(:to_i => double('bucket_size'))
-      scrollback_limit = double(:to_i => double('scrollback_limit'))
+      id_column = double(to_s: double('id_column'))
+      key_column = double(to_s: double('key_column'))
+      bucket_size = double(to_i: double('bucket_size'))
+      scrollback_limit = double(to_i: double('scrollback_limit'))
       key_proc = -> { "key" }
 
       index = EventStream::Index.new(@stream) do

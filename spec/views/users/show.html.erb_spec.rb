@@ -36,7 +36,7 @@ describe "/users/show" do
     assign(:upcoming_events, [])
     assign(:enrollments, [enroll])
     assign(:group_memberships, [gm])
-    assign(:page_views, PageView.paginate(:page => 1, :per_page => 20))
+    assign(:page_views, PageView.paginate(page: 1, per_page: 20))
   end
 
   it "renders" do

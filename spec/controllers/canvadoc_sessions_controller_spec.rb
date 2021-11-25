@@ -27,13 +27,13 @@ describe CanvadocSessionsController do
     course_with_teacher(active_all: true)
     student_in_course(active_all: true)
 
-    @attachment1 = attachment_model :content_type => 'application/pdf',
-                                    :context => @student
+    @attachment1 = attachment_model content_type: 'application/pdf',
+                                    context: @student
   end
 
   before do
-    PluginSetting.create! :name => 'canvadocs',
-                          :settings => { "base_url" => "https://example.com" }
+    PluginSetting.create! name: 'canvadocs',
+                          settings: { "base_url" => "https://example.com" }
     allow_any_instance_of(Canvadocs::API).to receive(:upload).and_return "id" => 1234
     allow_any_instance_of(Canvadocs::API).to receive(:session).and_return 'id' => 'SESSION'
     user_session(@teacher)
@@ -239,8 +239,8 @@ describe CanvadocSessionsController do
     it "needs a valid signed blob" do
       hmac = Canvas::Security.hmac_sha1(@blob.to_json)
 
-      attachment2 = attachment_model :content_type => 'application/pdf',
-                                     :context => @course
+      attachment2 = attachment_model content_type: 'application/pdf',
+                                     context: @course
       @blob[:attachment_id] = attachment2.id
 
       get :show, params: { blob: @blob.to_json, hmac: hmac }
@@ -303,7 +303,7 @@ describe CanvadocSessionsController do
     end
 
     it "contains multiple submission_user_ids when group assignment" do
-      group = @course.groups.create(:name => "some group")
+      group = @course.groups.create(name: "some group")
       student2 = User.create
       group.add_user(@student, 'accepted', true)
       group.add_user(student2, 'accepted', true)

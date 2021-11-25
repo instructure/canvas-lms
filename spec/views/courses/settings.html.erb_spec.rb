@@ -22,12 +22,12 @@ require_relative '../views_helper'
 
 describe "courses/settings.html.erb" do
   before :once do
-    @subaccount = account_model(:parent_account => Account.default, name: 'subaccount')
-    @other_subaccount = account_model(:parent_account => Account.default)
-    @sub_subaccount1 = account_model(:parent_account => @subaccount)
-    @sub_subaccount2 = account_model(:parent_account => @subaccount)
+    @subaccount = account_model(parent_account: Account.default, name: 'subaccount')
+    @other_subaccount = account_model(parent_account: Account.default)
+    @sub_subaccount1 = account_model(parent_account: @subaccount)
+    @sub_subaccount2 = account_model(parent_account: @subaccount)
 
-    course_with_teacher(:active_all => true, :account => @subaccount)
+    course_with_teacher(active_all: true, account: @subaccount)
     @course.sis_source_id = "so_special_sis_id"
     @course.workflow_state = 'claimed'
     @course.save!
@@ -64,7 +64,7 @@ describe "courses/settings.html.erb" do
     end
 
     it "shows to sis admin" do
-      admin = account_admin_user(:account => @course.root_account)
+      admin = account_admin_user(account: @course.root_account)
       view_context(@course, admin)
       assign(:current_user, admin)
       render
@@ -72,8 +72,8 @@ describe "courses/settings.html.erb" do
     end
 
     it "does not show to non-sis admin" do
-      role = custom_account_role('NoSissy', :account => @course.root_account)
-      admin = account_admin_user_with_role_changes(:account => @course.root_account, :role_changes => { 'manage_sis' => false }, :role => role)
+      role = custom_account_role('NoSissy', account: @course.root_account)
+      admin = account_admin_user_with_role_changes(account: @course.root_account, role_changes: { 'manage_sis' => false }, role: role)
       view_context(@course, admin)
       assign(:current_user, admin)
       render
@@ -81,8 +81,8 @@ describe "courses/settings.html.erb" do
     end
 
     it "does not show to subaccount admin" do
-      role = custom_account_role('CustomAdmin', :account => @course.root_account)
-      admin = account_admin_user_with_role_changes(:account => @subaccount, :role_changes => { 'manage_sis' => true, 'manage_courses' => true }, :role => role)
+      role = custom_account_role('CustomAdmin', account: @course.root_account)
+      admin = account_admin_user_with_role_changes(account: @subaccount, role_changes: { 'manage_sis' => true, 'manage_courses' => true }, role: role)
       view_context(@course, admin)
       assign(:current_user, admin)
       render
@@ -90,7 +90,7 @@ describe "courses/settings.html.erb" do
     end
 
     it "shows grade export when enabled" do
-      admin = account_admin_user(:account => @course.root_account)
+      admin = account_admin_user(account: @course.root_account)
       view_context(@course, admin)
       assign(:current_user, admin)
       assign(:publishing_enabled, true)
@@ -100,7 +100,7 @@ describe "courses/settings.html.erb" do
     end
 
     it "does not show grade export when disabled" do
-      admin = account_admin_user(:account => @course.root_account)
+      admin = account_admin_user(account: @course.root_account)
       view_context(@course, admin)
       assign(:current_user, admin)
       assign(:publishing_enabled, false)
@@ -186,7 +186,7 @@ describe "courses/settings.html.erb" do
   context "account_id selection" do
     it "lets sub-account admins see other accounts within their sub-account as options" do
       Account.default.disable_feature!(:granular_permissions_manage_courses)
-      @user = account_admin_user(:account => @subaccount, :active_user => true)
+      @user = account_admin_user(account: @subaccount, active_user: true)
       expect(Account.default.grants_right?(@user, :manage_courses)).to be_falsey
       view_context(@course, @user)
 

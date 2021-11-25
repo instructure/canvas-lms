@@ -67,11 +67,11 @@ module VeriCite
 
     def self.default_assignment_vericite_settings
       {
-        :originality_report_visibility => Canvas::Plugin.find(:vericite).settings[:release_to_students] || 'immediate',
-        :exclude_quoted => Canvas::Plugin.find(:vericite).settings[:exclude_quotes],
-        :exclude_self_plag => Canvas::Plugin.find(:vericite).settings[:exclude_self_plag],
-        :store_in_index => Canvas::Plugin.find(:vericite).settings[:store_in_index],
-        :vericite => true
+        originality_report_visibility: Canvas::Plugin.find(:vericite).settings[:release_to_students] || 'immediate',
+        exclude_quoted: Canvas::Plugin.find(:vericite).settings[:exclude_quotes],
+        exclude_self_plag: Canvas::Plugin.find(:vericite).settings[:exclude_self_plag],
+        store_in_index: Canvas::Plugin.find(:vericite).settings[:store_in_index],
+        vericite: true
       }
     end
 
@@ -97,15 +97,15 @@ module VeriCite
       settings = VeriCite::Client.normalize_assignment_vericite_settings(settings)
 
       response = sendRequest(:create_assignment, settings.merge!({
-                                                                   :user => course,
-                                                                   :course => course,
-                                                                   :assignment => assignment,
-                                                                   :utp => '2',
-                                                                   :dtstart => "#{today.strftime} 00:00:00",
-                                                                   :dtdue => "#{today.strftime} 00:00:00",
-                                                                   :dtpost => "#{today.strftime} 00:00:00",
-                                                                   :late_accept_flag => '1',
-                                                                   :post => true
+                                                                   user: course,
+                                                                   course: course,
+                                                                   assignment: assignment,
+                                                                   utp: '2',
+                                                                   dtstart: "#{today.strftime} 00:00:00",
+                                                                   dtdue: "#{today.strftime} 00:00:00",
+                                                                   dtpost: "#{today.strftime} 00:00:00",
+                                                                   late_accept_flag: '1',
+                                                                   post: true
                                                                  }))
 
       is_response_success?(response) ? { assignment_id: response[:assignment_id] } : response_error_hash(response)
@@ -117,13 +117,13 @@ module VeriCite
       assignment = submission.assignment
       course = assignment.context
       opts = {
-        :post => true,
-        :utp => '1',
-        :user => student,
-        :course => course,
-        :assignment => assignment,
-        :tem => email(course),
-        :role => submission.grants_right?(student, :grade) ? "Instructor" : "Learner"
+        post: true,
+        utp: '1',
+        user: student,
+        course: course,
+        assignment: assignment,
+        tem: email(course),
+        role: submission.grants_right?(student, :grade) ? "Instructor" : "Learner"
       }
       responses = {}
       if submission.submission_type == 'online_upload'
@@ -140,7 +140,7 @@ module VeriCite
             paper_ext = ""
           end
           paper_size = 100 # File.size(
-          responses[a.asset_string] = sendRequest(:submit_paper, { :pid => paper_id, :ptl => paper_title, :pext => paper_ext, :ptype => paper_type, :psize => paper_size, :pdata => a.open }.merge!(opts))
+          responses[a.asset_string] = sendRequest(:submit_paper, { pid: paper_id, ptl: paper_title, pext: paper_ext, ptype: paper_type, psize: paper_size, pdata: a.open }.merge!(opts))
         end
       elsif submission.submission_type == 'online_text_entry' && (asset_string.nil? || submission.asset_string == asset_string)
         paper_id = Digest::SHA1.hexdigest submission.plaintext_body
@@ -150,7 +150,7 @@ module VeriCite
         paper_type = "text/html"
         paper_size = plain_text.bytesize
 
-        responses[submission.asset_string] = sendRequest(:submit_paper, { :pid => paper_id, :ptl => paper_title, :pext => paper_ext, :ptype => paper_type, :psize => paper_size, :pdata => plain_text }.merge!(opts))
+        responses[submission.asset_string] = sendRequest(:submit_paper, { pid: paper_id, ptl: paper_title, pext: paper_ext, ptype: paper_type, psize: paper_size, pdata: plain_text }.merge!(opts))
       else
         raise "Unsupported submission type for VeriCite integration: #{submission.submission_type}"
       end
@@ -168,7 +168,7 @@ module VeriCite
       course = assignment.context
       object_id = submission.vericite_data_hash[asset_string][:object_id] rescue nil
       res = nil
-      res = sendRequest(:get_scores, :oid => object_id, :utp => '2', :user => user, :course => course, :assignment => assignment) if object_id
+      res = sendRequest(:get_scores, oid: object_id, utp: '2', user: user, course: course, assignment: assignment) if object_id
       data = {}
       if res
         data[:similarity_score] = res[:similarity_score]
@@ -181,7 +181,7 @@ module VeriCite
       assignment = submission.assignment
       course = assignment.context
       object_id = submission.vericite_data_hash[asset_string][:object_id] rescue nil
-      response = sendRequest(:generate_report, :oid => object_id, :utp => '2', :current_user => current_user, :user => user, :course => course, :assignment => assignment)
+      response = sendRequest(:generate_report, oid: object_id, utp: '2', current_user: current_user, user: user, course: course, assignment: assignment)
       if response.nil?
         nil
       else
@@ -194,7 +194,7 @@ module VeriCite
       assignment = submission.assignment
       course = assignment.context
       object_id = submission.vericite_data_hash[asset_string][:object_id] rescue nil
-      response = sendRequest(:generate_report, :oid => object_id, :utp => '1', :current_user => current_user, :user => user, :course => course, :assignment => assignment, :tem => email(course))
+      response = sendRequest(:generate_report, oid: object_id, utp: '1', current_user: current_user, user: user, course: course, assignment: assignment, tem: email(course))
       if response.nil?
         nil
       else
@@ -293,9 +293,9 @@ module VeriCite
             users_score_map[user_id.to_s] ||= {}
             # we need to look up the user scores in VeriCite for this course
             # @return [Array<ReportScoreReponse>]
-            data, status_code, _headers = vericite_client.reports_scores_context_id_get(context_id, consumer, consumer_secret, { :assignment_id => assignment_id })
+            data, status_code, _headers = vericite_client.reports_scores_context_id_get(context_id, consumer, consumer_secret, { assignment_id: assignment_id })
             # keep track of the assignment lookup api call
-            Rails.cache.write(user_score_cache_key_prefix, true, :expires_in => 5.minutes)
+            Rails.cache.write(user_score_cache_key_prefix, true, expires_in: 5.minutes)
             # check status code
             response[:return_code] = status_code
             unless is_response_success?(response)
@@ -314,7 +314,7 @@ module VeriCite
             end
             # cache the user score map for a short period of time
             users_score_map.each_key do |key|
-              Rails.cache.write("#{user_score_cache_key_prefix}#{key}", users_score_map[key], :expires_in => 5.minutes)
+              Rails.cache.write("#{user_score_cache_key_prefix}#{key}", users_score_map[key], expires_in: 5.minutes)
             end
           else
             # since we didn't have to consult VeriCite, set response status to 200

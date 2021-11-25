@@ -176,7 +176,7 @@ describe Types::AssignmentType do
   end
 
   it "returns needsGradingCount" do
-    assignment.submit_homework(student, { :body => "so cool", :submission_type => "online_text_entry" })
+    assignment.submit_homework(student, { body: "so cool", submission_type: "online_text_entry" })
     expect(assignment_type.resolve("needsGradingCount", current_user: teacher)).to eq 1
   end
 
@@ -279,8 +279,8 @@ describe Types::AssignmentType do
     end
 
     it "returns 'real' submissions from with permissions" do
-      submission1 = assignment.submit_homework(student, { :body => "sub1", :submission_type => "online_text_entry" })
-      submission2 = assignment.submit_homework(other_student, { :body => "sub1", :submission_type => "online_text_entry" })
+      submission1 = assignment.submit_homework(student, { body: "sub1", submission_type: "online_text_entry" })
+      submission2 = assignment.submit_homework(other_student, { body: "sub1", submission_type: "online_text_entry" })
 
       expect(
         assignment_type.resolve(

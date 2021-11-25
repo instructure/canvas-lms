@@ -21,11 +21,11 @@
 describe AssignmentGroup do
   before(:once) do
     @valid_attributes = {
-      :name => "value for name",
-      :rules => "value for rules",
-      :default_assignment_name => "value for default assignment name",
-      :assignment_weighting_scheme => "value for assignment weighting scheme",
-      :group_weight => 1.0
+      name: "value for name",
+      rules: "value for rules",
+      default_assignment_name: "value for default assignment name",
+      assignment_weighting_scheme: "value for assignment weighting scheme",
+      group_weight: 1.0
     }
     course_with_student(active_all: true)
     @course.update_attribute(:group_weighting_scheme, 'percent')
@@ -173,7 +173,7 @@ describe AssignmentGroup do
     expected.each do |val|
       rules += "never_drop:#{val}\n"
     end
-    assignment_group_model :rules => rules
+    assignment_group_model rules: rules
     result = @ag.rules_hash
     expect(result['never_drop']).to eql(expected)
   end
@@ -185,21 +185,21 @@ describe AssignmentGroup do
       rules += "never_drop:#{val}\n"
     end
 
-    assignment_group_model :rules => rules
+    assignment_group_model rules: rules
     result = @ag.rules_hash({ stringify_json_ids: true })
     expect(result['never_drop']).to eql(expected)
   end
 
   it "returns rules that aren't never_drops as ints" do
     rules = "drop_highest:25\n"
-    assignment_group_model :rules => rules
+    assignment_group_model rules: rules
     result = @ag.rules_hash
     expect(result['drop_highest']).to eql(25)
   end
 
   it "returns rules that aren't never_drops as ints when `strigify_json_ids` is true" do
     rules = "drop_lowest:2\n"
-    assignment_group_model :rules => rules
+    assignment_group_model rules: rules
     result = @ag.rules_hash({ stringify_json_ids: true })
     expect(result['drop_lowest']).to eql(2)
   end
@@ -221,7 +221,7 @@ describe AssignmentGroup do
       @quiz.save!
 
       @admin = account_admin_user
-      teacher_in_course(:course => @course)
+      teacher_in_course(course: @course)
       @grading_period_group = @course.root_account.grading_period_groups.create!(title: "Example Group")
       @grading_period_group.enrollment_terms << @course.enrollment_term
       @course.enrollment_term.save!

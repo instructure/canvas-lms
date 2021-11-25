@@ -56,15 +56,15 @@ module LtiSpecHelper
   end
 
   def new_valid_external_tool(context, resource_selection = false)
-    tool = context.context_external_tools.new(:name => (0...8).map { rand(65..90).chr }.join,
-                                              :consumer_key => "key",
-                                              :shared_secret => "secret")
+    tool = context.context_external_tools.new(name: (0...8).map { rand(65..90).chr }.join,
+                                              consumer_key: "key",
+                                              shared_secret: "secret")
     tool.url = "http://www.example.com/basic_lti"
     if resource_selection
       tool.resource_selection = {
-        :url => "http://example.com/selection_test",
-        :selection_width => 400,
-        :selection_height => 400
+        url: "http://example.com/selection_test",
+        selection_width: 400,
+        selection_height: 400
       }
     end
     tool.save!

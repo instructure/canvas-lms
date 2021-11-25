@@ -21,7 +21,7 @@
 require 'lti2_spec_helper'
 require_relative '../../apis/api_spec_helper'
 
-RSpec.shared_context "lti2_api_spec_helper", :shared_context => :metadata do
+RSpec.shared_context "lti2_api_spec_helper", shared_context: :metadata do
   include_context 'lti2_spec_helper'
   let(:developer_key) { DeveloperKey.create! }
   let(:dev_key_access_token) do

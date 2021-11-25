@@ -44,7 +44,7 @@ module Lti
     end
 
     let(:assignment) do
-      a = course.assignments.new(:title => "some assignment")
+      a = course.assignments.new(title: "some assignment")
       a.workflow_state = "published"
       a.tool_settings_tool = message_handler
       a.save!
@@ -216,18 +216,18 @@ module Lti
       end
 
       it "sends back versioned attachments" do
-        attachments = [attachment_model(filename: "submission-a.doc", :context => student)]
+        attachments = [attachment_model(filename: "submission-a.doc", context: student)]
         Timecop.freeze(10.seconds.ago) do
           assignment.submit_homework(student, submission_type: 'online_upload',
                                               attachments: [attachments[0]])
         end
 
-        attachments << attachment_model(filename: "submission-b.doc", :context => student)
+        attachments << attachment_model(filename: "submission-b.doc", context: student)
         Timecop.freeze(5.seconds.ago) do
           assignment.submit_homework student, attachments: [attachments[1]]
         end
 
-        attachments << attachment_model(filename: "submission-c.doc", :context => student)
+        attachments << attachment_model(filename: "submission-c.doc", context: student)
         Timecop.freeze(1.second.ago) do
           assignment.submit_homework student, attachments: [attachments[2]]
         end

@@ -57,7 +57,7 @@ describe "Importing assignments" do
 
     assignment_hash = file_data.find { |h| h['migration_id'] == '4469882339231' }.with_indifferent_access
 
-    rubric = rubric_model(:context => context)
+    rubric = rubric_model(context: context)
     rubric.migration_id = assignment_hash[:grading][:rubric_id]
     rubric.points_possible = 42
     rubric.save!
@@ -241,7 +241,7 @@ describe "Importing assignments" do
       "unlock_at" => nil
     }
     migration = @course.content_migrations.create!
-    assignment = @course.assignments.create! :title => "test", :due_at => Time.now, :unlock_at => 1.day.ago, :lock_at => 1.day.from_now, :peer_reviews_due_at => 2.days.from_now, :migration_id => "ib4834d160d180e2e91572e8b9e3b1bc6"
+    assignment = @course.assignments.create! title: "test", due_at: Time.now, unlock_at: 1.day.ago, lock_at: 1.day.from_now, peer_reviews_due_at: 2.days.from_now, migration_id: "ib4834d160d180e2e91572e8b9e3b1bc6"
     Importers::AssignmentImporter.import_from_migration(assign_hash, @course, migration)
     assignment.reload
     expect(assignment.title).to eq "date clobber or not"
@@ -738,7 +738,7 @@ describe "Importing assignments" do
     it "sets the vendor/product/resource_type codes" do
       course_model
       migration = @course.content_migrations.create!
-      assignment = @course.assignments.create! :title => "test", :due_at => Time.now, :unlock_at => 1.day.ago, :lock_at => 1.day.from_now, :peer_reviews_due_at => 2.days.from_now, :migration_id => migration_id
+      assignment = @course.assignments.create! title: "test", due_at: Time.now, unlock_at: 1.day.ago, lock_at: 1.day.from_now, peer_reviews_due_at: 2.days.from_now, migration_id: migration_id
       Importers::AssignmentImporter.import_from_migration(assign_hash, @course, migration)
       assignment.reload
       tool_lookup = assignment.assignment_configuration_tool_lookups.first
@@ -750,7 +750,7 @@ describe "Importing assignments" do
     it "sets the tool_type to 'LTI::MessageHandler'" do
       course_model
       migration = @course.content_migrations.create!
-      assignment = @course.assignments.create! :title => "test", :due_at => Time.now, :unlock_at => 1.day.ago, :lock_at => 1.day.from_now, :peer_reviews_due_at => 2.days.from_now, :migration_id => migration_id
+      assignment = @course.assignments.create! title: "test", due_at: Time.now, unlock_at: 1.day.ago, lock_at: 1.day.from_now, peer_reviews_due_at: 2.days.from_now, migration_id: migration_id
       Importers::AssignmentImporter.import_from_migration(assign_hash, @course, migration)
       assignment.reload
       tool_lookup = assignment.assignment_configuration_tool_lookups.first
@@ -760,7 +760,7 @@ describe "Importing assignments" do
     it "sets the visibility" do
       course_model
       migration = @course.content_migrations.create!
-      assignment = @course.assignments.create! :title => "test", :due_at => Time.now, :unlock_at => 1.day.ago, :lock_at => 1.day.from_now, :peer_reviews_due_at => 2.days.from_now, :migration_id => migration_id
+      assignment = @course.assignments.create! title: "test", due_at: Time.now, unlock_at: 1.day.ago, lock_at: 1.day.from_now, peer_reviews_due_at: 2.days.from_now, migration_id: migration_id
       Importers::AssignmentImporter.import_from_migration(assign_hash, @course, migration)
       assignment.reload
       expect(assignment.turnitin_settings.with_indifferent_access[:originality_report_visibility]).to eq visibility
@@ -769,7 +769,7 @@ describe "Importing assignments" do
     it 'adds a warning to the migration without an active tool_proxy' do
       course_model
       migration = @course.content_migrations.create!
-      @course.assignments.create! :title => "test", :due_at => Time.now, :unlock_at => 1.day.ago, :lock_at => 1.day.from_now, :peer_reviews_due_at => 2.days.from_now, :migration_id => migration_id
+      @course.assignments.create! title: "test", due_at: Time.now, unlock_at: 1.day.ago, lock_at: 1.day.from_now, peer_reviews_due_at: 2.days.from_now, migration_id: migration_id
       expect(migration).to receive(:add_warning).with("We were unable to find a tool profile match for vendor_code: \"abc\" product_code: \"qrx\".")
       Importers::AssignmentImporter.import_from_migration(assign_hash, @course, migration)
     end
@@ -779,7 +779,7 @@ describe "Importing assignments" do
         .to receive(:find_active_proxies_for_context_by_vendor_code_and_product_code) { [tool_proxy] }
       course_model
       migration = @course.content_migrations.create!
-      @course.assignments.create! :title => "test", :due_at => Time.now, :unlock_at => 1.day.ago, :lock_at => 1.day.from_now, :peer_reviews_due_at => 2.days.from_now, :migration_id => migration_id
+      @course.assignments.create! title: "test", due_at: Time.now, unlock_at: 1.day.ago, lock_at: 1.day.from_now, peer_reviews_due_at: 2.days.from_now, migration_id: migration_id
       expect(migration).to_not receive(:add_warning).with("We were unable to find a tool profile match for vendor_code: \"abc\" product_code: \"qrx\".")
       Importers::AssignmentImporter.import_from_migration(assign_hash, @course, migration)
     end

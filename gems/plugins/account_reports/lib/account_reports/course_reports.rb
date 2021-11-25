@@ -45,7 +45,7 @@ module AccountReports
     end
 
     def unpublished_courses
-      csv(default_courses.where(:workflow_state => ['claimed', 'created']))
+      csv(default_courses.where(workflow_state: ['claimed', 'created']))
     end
 
     def course_storage

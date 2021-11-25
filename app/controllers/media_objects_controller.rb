@@ -75,7 +75,7 @@ class MediaObjectsController < ApplicationController
 
   before_action :load_media_object, only: %i[show iframe_media_player]
   before_action :require_user, only: %i[index update_media_object]
-  protect_from_forgery :only => %i[create_media_object media_object_redirect media_object_inline media_object_thumbnail], with: :exception
+  protect_from_forgery only: %i[create_media_object media_object_redirect media_object_inline media_object_thumbnail], with: :exception
 
   # @{not an}API Show Media Object Details
   # This isn't an API because it needs to work for non-logged in users (video in public course)
@@ -208,14 +208,14 @@ class MediaObjectsController < ApplicationController
           context: @context
         ).first_or_initialize
 
-        @media_object.title = CanvasTextHelper.truncate_text(params[:title], :max_length => 255) if params[:title]
+        @media_object.title = CanvasTextHelper.truncate_text(params[:title], max_length: 255) if params[:title]
         @media_object.user = @current_user
         @media_object.media_type = params[:type]
         @media_object.root_account_id = @domain_root_account.id if @domain_root_account && @media_object.respond_to?(:root_account_id)
-        @media_object.user_entered_title = CanvasTextHelper.truncate_text(params[:user_entered_title], :max_length => 255) if params[:user_entered_title].present?
+        @media_object.user_entered_title = CanvasTextHelper.truncate_text(params[:user_entered_title], max_length: 255) if params[:user_entered_title].present?
         @media_object.save
       end
-      render :json => @media_object.as_json.merge(:embedded_iframe_url => media_object_iframe_url(@media_object.media_id))
+      render json: @media_object.as_json.merge(embedded_iframe_url: media_object_iframe_url(@media_object.media_id))
       # render :json => media_object_api_json(@media_object, @current_user, session, %w[sources tracks])
     end
   end
@@ -237,7 +237,7 @@ class MediaObjectsController < ApplicationController
     if config
       redirect_to CanvasKaltura::ClientV3.new.assetSwfUrl(params[:id])
     else
-      render :plain => t(:media_objects_not_configured, "Media Objects not configured")
+      render plain: t(:media_objects_not_configured, "Media Objects not configured")
     end
   end
 
@@ -254,12 +254,12 @@ class MediaObjectsController < ApplicationController
     config = CanvasKaltura::ClientV3.config
     if config
       redirect_to CanvasKaltura::ClientV3.new.thumbnail_url(mo.try(:media_id) || media_id,
-                                                            :width => width,
-                                                            :height => height,
-                                                            :type => type),
-                  :status => :moved_permanently
+                                                            width: width,
+                                                            height: height,
+                                                            type: type),
+                  status: :moved_permanently
     else
-      render :plain => t(:media_objects_not_configured, "Media Objects not configured")
+      render plain: t(:media_objects_not_configured, "Media Objects not configured")
     end
   end
 

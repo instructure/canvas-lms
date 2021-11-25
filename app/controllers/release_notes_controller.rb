@@ -106,7 +106,7 @@ class ReleaseNotesController < ApplicationController
              release_notes_langs: allowed_langs,
              release_notes_envs: allowed_envs,
            })
-    render :html => "".html_safe, :layout => true
+    render html: "".html_safe, layout: true
   end
 
   private

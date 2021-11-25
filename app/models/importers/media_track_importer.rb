@@ -50,7 +50,7 @@ module Importers
         mt.save!
       rescue => e
         er = Canvas::Errors.capture_exception(:import_media_tracks, e)[:error_report]
-        error_message = t('Subtitles could not be imported from %{file}', :file => file.display_name)
+        error_message = t('Subtitles could not be imported from %{file}', file: file.display_name)
         migration.add_warning(error_message, error_report_id: er)
       end
       # remove temporary file

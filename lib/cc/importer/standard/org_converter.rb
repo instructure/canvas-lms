@@ -33,14 +33,14 @@ module CC::Importer::Standard
           # item points to a single item
           if (item = process_item(item_node, 0))
             unless misc_module
-              misc_module = { :title => "Misc Module", :migration_id => "misc_module_top_level_items", :items => [] }
+              misc_module = { title: "Misc Module", migration_id: "misc_module_top_level_items", items: [] }
               modules << misc_module
             end
             misc_module[:items] << item
           end
         else
           # It's a folder
-          mod = { :items => [] }
+          mod = { items: [] }
           mod[:migration_id] = item_node['identifier']
           add_children(item_node, mod)
           modules << mod
@@ -55,14 +55,14 @@ module CC::Importer::Standard
         if item_node.name == 'title'
           if mod[:title]
             # This is a sub folder, or a "heading" in a canvas module
-            item = { :title => item_node.text, :indent => (indent > 0 ? indent - 1 : 0), :type => 'heading' }
+            item = { title: item_node.text, indent: (indent > 0 ? indent - 1 : 0), type: 'heading' }
             mod[:items] << item
           else
             mod[:title] = item_node.text
           end
         elsif !item_node['identifierref']
           if item_node['identifier']
-            sub_mod = { :items => [], :migration_id => item_node['identifier'], :type => 'submodule' }
+            sub_mod = { items: [], migration_id: item_node['identifier'], type: 'submodule' }
             add_children(item_node, sub_mod, indent)
             mod[:items] << sub_mod
           else
@@ -80,20 +80,20 @@ module CC::Importer::Standard
         case resource[:type]
         when /assessment\z/
           item = {
-            :indent => indent,
-            :linked_resource_type => 'ASSESSMENT',
-            :linked_resource_id => resource[:migration_id],
-            :linked_resource_title => get_node_val(item_node, 'title'),
+            indent: indent,
+            linked_resource_type: 'ASSESSMENT',
+            linked_resource_id: resource[:migration_id],
+            linked_resource_title: get_node_val(item_node, 'title'),
           }
         when /\Aassignment/
           item = {
-            :indent => indent,
-            :linked_resource_type => 'ASSIGNMENT',
-            :linked_resource_id => resource[:migration_id],
-            :linked_resource_title => get_node_val(item_node, 'title'),
+            indent: indent,
+            linked_resource_type: 'ASSIGNMENT',
+            linked_resource_id: resource[:migration_id],
+            linked_resource_title: get_node_val(item_node, 'title'),
           }
         when /\Aimswl/
-          item = { :indent => indent, :linked_resource_type => 'URL' }
+          item = { indent: indent, linked_resource_type: 'URL' }
           item[:linked_resource_title] = get_node_val(item_node, 'title')
           title, item[:url] = get_weblink_title_and_url(resource)
           item[:linked_resource_title] ||= title
@@ -101,29 +101,29 @@ module CC::Importer::Standard
         when /\Aimsbasiclti/
           item = if (asmnt = find_assignment(resource[:migration_id]))
                    {
-                     :indent => indent,
-                     :linked_resource_type => 'ASSIGNMENT',
-                     :linked_resource_id => asmnt[:migration_id],
-                     :linked_resource_title => get_node_val(item_node, 'title')
+                     indent: indent,
+                     linked_resource_type: 'ASSIGNMENT',
+                     linked_resource_id: asmnt[:migration_id],
+                     linked_resource_title: get_node_val(item_node, 'title')
                    }
                  else
                    {
-                     :indent => indent,
-                     :linked_resource_type => 'CONTEXTEXTERNALTOOL',
-                     :linked_resource_id => resource[:migration_id],
-                     :linked_resource_title => get_node_val(item_node, 'title'),
-                     :url => resource[:url]
+                     indent: indent,
+                     linked_resource_type: 'CONTEXTEXTERNALTOOL',
+                     linked_resource_id: resource[:migration_id],
+                     linked_resource_title: get_node_val(item_node, 'title'),
+                     url: resource[:url]
                    }
                  end
         when /\Aimsdt/
           item = {
-            :indent => indent,
-            :linked_resource_type => 'DISCUSSION',
-            :linked_resource_id => resource[:migration_id],
-            :linked_resource_title => get_node_val(item_node, 'title')
+            indent: indent,
+            linked_resource_type: 'DISCUSSION',
+            linked_resource_id: resource[:migration_id],
+            linked_resource_title: get_node_val(item_node, 'title')
           }
         when /webcontent|learning-application-resource\z/
-          item = { :indent => indent }
+          item = { indent: indent }
           item[:linked_resource_id] = item_node['identifierref']
           item[:linked_resource_title] = get_node_val(item_node, 'title')
 

@@ -25,9 +25,9 @@ require_dependency "conditional_release/rules_controller"
 module ConditionalRelease
   describe RulesController, type: :request do
     before(:once) do
-      course_with_teacher(:active_all => true)
+      course_with_teacher(active_all: true)
       @user = @teacher
-      @assignment = @course.assignments.create!(:title => "an assignment")
+      @assignment = @course.assignments.create!(title: "an assignment")
     end
 
     def verify_positions_for(rule)
@@ -58,41 +58,41 @@ module ConditionalRelease
 
         @url = "/api/v1/courses/#{@course.id}/mastery_paths/rules"
         @base_params = {
-          :controller => 'conditional_release/rules',
-          :action => 'index',
-          :format => 'json',
-          :course_id => @course.id.to_s,
+          controller: 'conditional_release/rules',
+          action: 'index',
+          format: 'json',
+          course_id: @course.id.to_s,
         }
       end
 
       it 'requires authorization' do
         @user = user_factory
-        api_call(:get, @url, @base_params, {}, {}, { :expected_status => 401 })
+        api_call(:get, @url, @base_params, {}, {}, { expected_status: 401 })
       end
 
       it 'returns all rules for a course' do
-        json = api_call(:get, @url, @base_params, {}, {}, { :expected_status => 200 })
+        json = api_call(:get, @url, @base_params, {}, {}, { expected_status: 200 })
         expect(json.length).to eq 3
       end
 
       it 'allows students to view' do
-        student_in_course(:course => @course, :active_all => true)
-        json = api_call(:get, @url, @base_params, {}, {}, { :expected_status => 200 })
+        student_in_course(course: @course, active_all: true)
+        json = api_call(:get, @url, @base_params, {}, {}, { expected_status: 200 })
         expect(json.length).to eq 3
       end
 
       it 'filters based on assignment id' do
-        json = api_call(:get, @url, @base_params.merge(trigger_assignment_id: @assignment.id), {}, {}, { :expected_status => 200 })
+        json = api_call(:get, @url, @base_params.merge(trigger_assignment_id: @assignment.id), {}, {}, { expected_status: 200 })
         expect(json.length).to eq 2
       end
 
       it 'does not include scoring ranges by default' do
-        json = api_call(:get, @url, @base_params, {}, {}, { :expected_status => 200 })
+        json = api_call(:get, @url, @base_params, {}, {}, { expected_status: 200 })
         expect(json[0]).not_to have_key 'scoring_ranges'
       end
 
       it 'includes scoring ranges and assignments when requested' do
-        json = api_call(:get, @url, @base_params.merge(include: ['all']), {}, {}, { :expected_status => 200 })
+        json = api_call(:get, @url, @base_params.merge(include: ['all']), {}, {}, { expected_status: 200 })
         ranges_json = json[0]['scoring_ranges']
         expect(ranges_json.length).to eq(2)
         sets_json = ranges_json.last['assignment_sets']
@@ -101,7 +101,7 @@ module ConditionalRelease
       end
 
       it 'includes only rules with assignments when "active" requested' do
-        json = api_call(:get, @url, @base_params.merge(active: true), {}, {}, { :expected_status => 200 })
+        json = api_call(:get, @url, @base_params.merge(active: true), {}, {}, { expected_status: 200 })
         expect(json.length).to eq(2)
       end
     end
@@ -116,26 +116,26 @@ module ConditionalRelease
 
         @url = "/api/v1/courses/#{@course.id}/mastery_paths/rules/#{@rule.id}"
         @base_params = {
-          :controller => 'conditional_release/rules',
-          :action => 'show',
-          :format => 'json',
-          :course_id => @course.id.to_s,
-          :id => @rule.id.to_s
+          controller: 'conditional_release/rules',
+          action: 'show',
+          format: 'json',
+          course_id: @course.id.to_s,
+          id: @rule.id.to_s
         }
       end
 
       it 'fails for deleted rule' do
         @rule.destroy
-        api_call(:get, @url, @base_params, {}, {}, { :expected_status => 404 })
+        api_call(:get, @url, @base_params, {}, {}, { expected_status: 404 })
       end
 
       it 'does not show scoring ranges by default' do
-        json = api_call(:get, @url, @base_params, {}, {}, { :expected_status => 200 })
+        json = api_call(:get, @url, @base_params, {}, {}, { expected_status: 200 })
         expect(json['scoring_ranges']).to be_nil
       end
 
       it 'does show assignments when asked' do
-        json = api_call(:get, @url, @base_params.merge(include: ['all']), {}, {}, { :expected_status => 200 })
+        json = api_call(:get, @url, @base_params.merge(include: ['all']), {}, {}, { expected_status: 200 })
         ranges_json = json['scoring_ranges']
         expect(ranges_json.length).to eq(2)
         sets_json = ranges_json.last['assignment_sets']
@@ -148,7 +148,7 @@ module ConditionalRelease
         last_assoc = @rule.scoring_ranges.last.assignment_sets.last.assignment_set_associations.last
         first_assoc.move_to_bottom
         last_assoc.move_to_top
-        json = api_call(:get, @url, @base_params.merge(include: ['all']), {}, {}, { :expected_status => 200 })
+        json = api_call(:get, @url, @base_params.merge(include: ['all']), {}, {}, { expected_status: 200 })
         expect(json['scoring_ranges'].last['assignment_sets'].last['assignment_set_associations'].first['id']).to eq last_assoc.id
         expect(json['scoring_ranges'].first['assignment_sets'].first['assignment_set_associations'].last['id']).to eq first_assoc.id
         ranges_json = json['scoring_ranges']
@@ -170,22 +170,22 @@ module ConditionalRelease
       before :once do
         @url = "/api/v1/courses/#{@course.id}/mastery_paths/rules"
         @base_params = {
-          :controller => 'conditional_release/rules',
-          :action => 'create',
-          :format => 'json',
-          :course_id => @course.id.to_s,
-          :trigger_assignment_id => @assignment.id
+          controller: 'conditional_release/rules',
+          action: 'create',
+          format: 'json',
+          course_id: @course.id.to_s,
+          trigger_assignment_id: @assignment.id
         }
       end
 
       it 'requires management rights' do
-        student_in_course(:course => @course)
+        student_in_course(course: @course)
         @user = @student
-        api_call(:post, @url, @base_params, {}, {}, { :expected_status => 401 })
+        api_call(:post, @url, @base_params, {}, {}, { expected_status: 401 })
       end
 
       it 'creates successfully' do
-        json = api_call(:post, @url, @base_params, {}, {}, { :expected_status => 200 })
+        json = api_call(:post, @url, @base_params, {}, {}, { expected_status: 200 })
         rule = @course.conditional_release_rules.find(json['id'])
         expect(rule.trigger_assignment).to eq @assignment
       end
@@ -202,7 +202,7 @@ module ConditionalRelease
           { 'position' => range_pos + 1, 'lower_bound' => 65, 'upper_bound' => 95, 'assignment_sets' => assignment_sets }
         end
 
-        json = api_call(:post, @url, @base_params.merge('scoring_ranges' => ranges), {}, {}, { :expected_status => 200 })
+        json = api_call(:post, @url, @base_params.merge('scoring_ranges' => ranges), {}, {}, { expected_status: 200 })
         rule = @course.conditional_release_rules.find(json['id'])
         expect(rule.scoring_ranges.length).to eq(3)
         expect(rule.scoring_ranges.last.assignment_sets.length).to eq(2)
@@ -213,7 +213,7 @@ module ConditionalRelease
 
       it 'does not create with invalid scoring range' do
         expect do
-          api_call(:post, @url, @base_params.merge('scoring_ranges' => [{ foo: 3 }]), {}, {}, { :expected_status => 400 })
+          api_call(:post, @url, @base_params.merge('scoring_ranges' => [{ foo: 3 }]), {}, {}, { expected_status: 400 })
         end.not_to change { Rule.count }
       end
 
@@ -221,7 +221,7 @@ module ConditionalRelease
         sr = { 'lower_bound' => 65, 'upper_bound' => 95 }
         sr['assignment_sets'] = [{ assignment_set_associations: [{ foo: 3 }] }]
         expect do
-          api_call(:post, @url, @base_params.merge('scoring_ranges' => [sr]), {}, {}, { :expected_status => 400 })
+          api_call(:post, @url, @base_params.merge('scoring_ranges' => [sr]), {}, {}, { expected_status: 400 })
         end.not_to change { Rule.count }
       end
 
@@ -230,7 +230,7 @@ module ConditionalRelease
         other_assignment = other_course.assignments.create!
 
         expect do
-          api_call(:post, @url, @base_params.merge(:trigger_assignment_id => other_assignment.id), {}, {}, { :expected_status => 400 })
+          api_call(:post, @url, @base_params.merge(trigger_assignment_id: other_assignment.id), {}, {}, { expected_status: 400 })
         end.not_to change { Rule.count }
       end
 
@@ -241,7 +241,7 @@ module ConditionalRelease
         sr = { 'lower_bound' => 65, 'upper_bound' => 95 }
         sr['assignment_sets'] = [{ assignment_set_associations: [{ assignment_id: other_assignment.id }] }]
         expect do
-          api_call(:post, @url, @base_params.merge('scoring_ranges' => [sr]), {}, {}, { :expected_status => 400 })
+          api_call(:post, @url, @base_params.merge('scoring_ranges' => [sr]), {}, {}, { expected_status: 400 })
         end.not_to change { Rule.count }
       end
     end
@@ -252,34 +252,34 @@ module ConditionalRelease
         @url = "/api/v1/courses/#{@course.id}/mastery_paths/rules/#{@rule.id}"
         @other_assignment = @course.assignments.create!
         @base_params = {
-          :controller => 'conditional_release/rules',
-          :action => 'update',
-          :format => 'json',
-          :course_id => @course.id.to_s,
-          :id => @rule.id.to_s,
-          :trigger_assignment_id => @other_assignment.id
+          controller: 'conditional_release/rules',
+          action: 'update',
+          format: 'json',
+          course_id: @course.id.to_s,
+          id: @rule.id.to_s,
+          trigger_assignment_id: @other_assignment.id
         }
       end
 
       it 'requires management rights' do
-        student_in_course(:course => @course)
+        student_in_course(course: @course)
         @user = @student
-        api_call(:put, @url, @base_params, {}, {}, { :expected_status => 401 })
+        api_call(:put, @url, @base_params, {}, {}, { expected_status: 401 })
       end
 
       it 'fails for deleted rule' do
         @rule.destroy
-        api_call(:put, @url, @base_params, {}, {}, { :expected_status => 404 })
+        api_call(:put, @url, @base_params, {}, {}, { expected_status: 404 })
       end
 
       it 'updates the trigger_assignment' do
-        json = api_call(:put, @url, @base_params, {}, {}, { :expected_status => 200 })
+        json = api_call(:put, @url, @base_params, {}, {}, { expected_status: 200 })
         expect(json['trigger_assignment_id']).to eq @other_assignment.id
         expect(@rule.reload.trigger_assignment).to eq @other_assignment
       end
 
       it 'does not allow invalid rule' do
-        api_call(:put, @url, @base_params.merge(:trigger_assignment_id => 'doh'), {}, {}, { :expected_status => 400 })
+        api_call(:put, @url, @base_params.merge(trigger_assignment_id: 'doh'), {}, {}, { expected_status: 400 })
         expect(@rule.reload.trigger_assignment).to eq @assignment
       end
 
@@ -292,7 +292,7 @@ module ConditionalRelease
         range.upper_bound = 99
         rule_params = rule.as_json(include: :scoring_ranges, include_root: false)
         api_call(:put, "/api/v1/courses/#{@course.id}/mastery_paths/rules/#{rule.id}",
-                 @base_params.with_indifferent_access.merge(rule_params), {}, {}, { :expected_status => 200 })
+                 @base_params.with_indifferent_access.merge(rule_params), {}, {}, { expected_status: 200 })
         rule.reload
         range.reload
         expect(rule.scoring_ranges.count).to eq(2) # didn't add ranges
@@ -309,7 +309,7 @@ module ConditionalRelease
         rule_params['scoring_ranges'].shift
 
         api_call(:put, "/api/v1/courses/#{@course.id}/mastery_paths/rules/#{rule.id}",
-                 @base_params.with_indifferent_access.merge(rule_params), {}, {}, { :expected_status => 200 })
+                 @base_params.with_indifferent_access.merge(rule_params), {}, {}, { expected_status: 200 })
         rule.reload
         expect(rule.scoring_ranges.count).to be(1)
       end
@@ -331,14 +331,14 @@ module ConditionalRelease
         rule_params['scoring_ranges'][0]['assignment_sets'][0]['assignment_set_associations'] = [{ assignment_id: new_assignment.id }]
 
         api_call(:put, "/api/v1/courses/#{@course.id}/mastery_paths/rules/#{rule.id}",
-                 @base_params.with_indifferent_access.merge(rule_params), {}, {}, { :expected_status => 200 })
+                 @base_params.with_indifferent_access.merge(rule_params), {}, {}, { expected_status: 200 })
 
         rule.reload
-        changed_assoc = rule.assignment_set_associations.where(:assignment_id => changed_assignment.id).take
+        changed_assoc = rule.assignment_set_associations.where(assignment_id: changed_assignment.id).take
         expect(changed_assoc).not_to be nil
-        new_assoc = rule.assignment_set_associations.where(:assignment_id => new_assignment.id).take
+        new_assoc = rule.assignment_set_associations.where(assignment_id: new_assignment.id).take
         expect(new_assoc).not_to be nil
-        deleted_assoc = rule.assignment_set_associations.where(:assignment_id => deleted_assignment_id).take
+        deleted_assoc = rule.assignment_set_associations.where(assignment_id: deleted_assignment_id).take
         expect(deleted_assoc).to be nil
         expect(rule.assignment_set_associations.count).to be 4
 
@@ -358,7 +358,7 @@ module ConditionalRelease
         assignments[0], assignments[1], assignments[2] = assignments[2], assignments[0], assignments[1]
 
         api_call(:put, "/api/v1/courses/#{@course.id}/mastery_paths/rules/#{rule.id}",
-                 @base_params.with_indifferent_access.merge(rule_params), {}, {}, { :expected_status => 200 })
+                 @base_params.with_indifferent_access.merge(rule_params), {}, {}, { expected_status: 200 })
 
         # Refresh the Rule and make sure no assignments were added
         rule.reload
@@ -375,29 +375,29 @@ module ConditionalRelease
         @rule = create :rule, course: @course
         @url = "/api/v1/courses/#{@course.id}/mastery_paths/rules/#{@rule.id}"
         @base_params = {
-          :controller => 'conditional_release/rules',
-          :action => 'destroy',
-          :format => 'json',
-          :course_id => @course.id.to_s,
-          :id => @rule.id.to_s
+          controller: 'conditional_release/rules',
+          action: 'destroy',
+          format: 'json',
+          course_id: @course.id.to_s,
+          id: @rule.id.to_s
         }
       end
 
       it 'requires management rights' do
-        student_in_course(:course => @course)
+        student_in_course(course: @course)
         @user = @student
-        api_call(:delete, @url, @base_params, {}, {}, { :expected_status => 401 })
+        api_call(:delete, @url, @base_params, {}, {}, { expected_status: 401 })
       end
 
       it 'deletes a rule' do
-        api_call(:delete, @url, @base_params, {}, {}, { :expected_status => 200 })
+        api_call(:delete, @url, @base_params, {}, {}, { expected_status: 200 })
         expect(@rule.reload.deleted_at).to be_present
-        expect(Rule.active.where(:id => @rule.id).exists?).to eq false
+        expect(Rule.active.where(id: @rule.id).exists?).to eq false
       end
 
       it 'fails for non-existent rule' do
         @rule.destroy
-        api_call(:delete, @url, @base_params, {}, {}, { :expected_status => 404 })
+        api_call(:delete, @url, @base_params, {}, {}, { expected_status: 404 })
       end
     end
   end

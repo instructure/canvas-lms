@@ -28,17 +28,17 @@ describe CanvasQuizStatistics::Util do
     end
 
     it 'symbolizes top-level keys' do
-      expect(described_class.deep_symbolize_keys({ 'a' => 'b', c: 'd' })).to eq({
-                                                                                  a: 'b',
-                                                                                  c: 'd'
-                                                                                })
+      expect(described_class.deep_symbolize_keys({ 'a' => 'b', :c => 'd' })).to eq({
+                                                                                     a: 'b',
+                                                                                     c: 'd'
+                                                                                   })
     end
 
     it 'symbolizes keys of nested hashes' do
       expect(described_class.deep_symbolize_keys({
                                                    'e' => {
                                                      'f' => 'g',
-                                                     h: 'i'
+                                                     :h => 'i'
                                                    }
                                                  })).to eq({
                                                              e: {
@@ -52,7 +52,7 @@ describe CanvasQuizStatistics::Util do
       expect(described_class.deep_symbolize_keys({
                                                    'e' => [{
                                                      'f' => 'g',
-                                                     h: 'i'
+                                                     :h => 'i'
                                                    }]
                                                  })).to eq({
                                                              e: [{
@@ -64,15 +64,15 @@ describe CanvasQuizStatistics::Util do
 
     it 'symbolizes all sorts of things' do
       expect(described_class.deep_symbolize_keys({
-                                                   item1: 'value1',
+                                                   :item1 => 'value1',
                                                    "item2" => 'value2',
-                                                   hash: {
-                                                     item3: 'value3',
+                                                   :hash => {
+                                                     :item3 => 'value3',
                                                      "item4" => 'value4'
                                                    },
                                                    'array' => [{
                                                      "item5" => 'value5',
-                                                     item6: 'value6'
+                                                     :item6 => 'value6'
                                                    }]
                                                  })).to eq({
                                                              item1: 'value1',
@@ -93,8 +93,8 @@ describe CanvasQuizStatistics::Util do
                                                    "1" => "first",
                                                    "2" => "second"
                                                  })).to eq({
-                                                             :"1" => "first",
-                                                             :"2" => "second"
+                                                             "1": "first",
+                                                             "2": "second"
                                                            })
     end
 

@@ -40,7 +40,7 @@ class AssignmentsController < ApplicationController
   ) { |c| c.send :course_assignments_path, c.instance_variable_get("@context") }
   before_action(except: [:new, :edit]) { |c| c.active_tab = "assignments" }
   before_action(only: [:new, :edit]) { |c| setup_active_tab(c) }
-  before_action :normalize_title_param, :only => [:new, :edit]
+  before_action :normalize_title_param, only: [:new, :edit]
 
   def index
     GuardRail.activate(:secondary) do
@@ -199,7 +199,7 @@ class AssignmentsController < ApplicationController
         @assignment = AssignmentOverrideApplicator.assignment_overridden_for(@assignment, @current_user)
         @assignment.ensure_assignment_group
 
-        @locked = @assignment.locked_for?(@current_user, :check_policies => true, :deep_check_if_needed => true)
+        @locked = @assignment.locked_for?(@current_user, check_policies: true, deep_check_if_needed: true)
         @unlocked = !@locked || @assignment.grants_right?(@current_user, session, :update)
 
         unless @assignment.new_record? || (@locked && !@locked[:can_view])
@@ -311,7 +311,7 @@ class AssignmentsController < ApplicationController
         end
 
         @external_tools = if @assignment.submission_types.include?("online_upload") || @assignment.submission_types.include?("online_url")
-                            ContextExternalTool.all_tools_for(@context, :user => @current_user, :placements => :homework_submission)
+                            ContextExternalTool.all_tools_for(@context, user: @current_user, placements: :homework_submission)
                           else
                             []
                           end
@@ -346,7 +346,7 @@ class AssignmentsController < ApplicationController
         @can_grade = @assignment.grants_right?(@current_user, session, :grade)
         if @can_view_grades || @can_grade
           visible_student_ids = @context.apply_enrollment_visibility(@context.all_student_enrollments, @current_user).pluck(:user_id)
-          @current_student_submissions = @assignment.submissions.where.not(submissions: { submission_type: nil }).where(:user_id => visible_student_ids).to_a
+          @current_student_submissions = @assignment.submissions.where.not(submissions: { submission_type: nil }).where(user_id: visible_student_ids).to_a
         end
 
         # this will set @user_has_google_drive
@@ -447,7 +447,7 @@ class AssignmentsController < ApplicationController
     @assignment = @context.assignments.active.find(params[:assignment_id])
     @root_outcome_group = outcome_group_json(@context.root_outcome_group, @current_user, session).to_json
     if authorized_action(@assignment, @current_user, :read)
-      render :partial => 'shared/assignment_rubric_dialog'
+      render partial: 'shared/assignment_rubric_dialog'
     end
   end
 
@@ -472,7 +472,7 @@ class AssignmentsController < ApplicationController
       @request = @assignment.assign_peer_review(@student, @reviewee)
       respond_to do |format|
         format.html { redirect_to named_context_url(@context, :context_assignment_peer_reviews_url, @assignment.id) }
-        format.json { render :json => @request.as_json(:methods => :asset_user_name) }
+        format.json { render json: @request.as_json(methods: :asset_user_name) }
       end
     end
   end
@@ -483,9 +483,9 @@ class AssignmentsController < ApplicationController
       @request = AssessmentRequest.where(id: params[:id]).first if params[:id].present?
       respond_to do |format|
         if @request.asset.assignment == @assignment && @request.send_reminder!
-          format.json { render :json => @request }
+          format.json { render json: @request }
         else
-          format.json { render :json => { :errors => { :base => t('errors.reminder_failed', "Reminder failed") } }, :status => :bad_request }
+          format.json { render json: { errors: { base: t('errors.reminder_failed', "Reminder failed") } }, status: :bad_request }
         end
         format.html { redirect_to named_context_url(@context, :context_assignment_peer_reviews_url) }
       end
@@ -498,9 +498,9 @@ class AssignmentsController < ApplicationController
       @request = AssessmentRequest.where(id: params[:id]).first if params[:id].present?
       respond_to do |format|
         if @request.asset.assignment == @assignment && @request.destroy
-          format.json { render :json => @request }
+          format.json { render json: @request }
         else
-          format.json { render :json => { :errors => { :base => t('errors.delete_reminder_failed', "Delete failed") } }, :status => :bad_request }
+          format.json { render json: { errors: { base: t('errors.delete_reminder_failed', "Delete failed") } }, status: :bad_request }
         end
         format.html { redirect_to named_context_url(@context, :context_assignment_peer_reviews_url) }
       end
@@ -575,7 +575,7 @@ class AssignmentsController < ApplicationController
       if @assignment&.send(method)
         format.json { render json: @assignment.as_json(methods: :anonymize_students) }
       else
-        format.json { render :json => @assignment, :status => :bad_request }
+        format.json { render json: @assignment, status: :bad_request }
       end
     end
   end
@@ -608,10 +608,10 @@ class AssignmentsController < ApplicationController
           if @assignment.save
             flash[:notice] = t 'notices.created', "Assignment was successfully created."
             format.html { redirect_to named_context_url(@context, :context_assignment_url, @assignment.id) }
-            format.json { render :json => @assignment.as_json(:permissions => { :user => @current_user, :session => session }), :status => :created }
+            format.json { render json: @assignment.as_json(permissions: { user: @current_user, session: session }), status: :created }
           else
             format.html { render :new }
-            format.json { render :json => @assignment.errors, :status => :bad_request }
+            format.json { render json: @assignment.errors, status: :bad_request }
           end
         end
       end
@@ -663,13 +663,13 @@ class AssignmentsController < ApplicationController
       assignment_groups = @context.assignment_groups.active
       group_categories = @context.group_categories
                                  .reject(&:student_organized?)
-                                 .map { |c| { :id => c.id, :name => c.name } }
+                                 .map { |c| { id: c.id, name: c.name } }
 
       # if assignment has student submissions and is attached to a deleted group category,
       # add that category to the ENV list so it can be shown on the edit page.
       if @assignment.group_category_deleted_with_submissions?
         locked_category = @assignment.group_category
-        group_categories << { :id => locked_category.id, :name => locked_category.name }
+        group_categories << { id: locked_category.id, name: locked_category.name }
       end
 
       json_for_assignment_groups = assignment_groups.map do |group|
@@ -802,7 +802,7 @@ class AssignmentsController < ApplicationController
 
       respond_to do |format|
         format.html { redirect_to(named_context_url(@context, :context_assignments_url)) }
-        format.json { render :json => assignment_json(@assignment, @current_user, session) }
+        format.json { render json: assignment_json(@assignment, @current_user, session) }
       end
     end
   end
@@ -814,13 +814,13 @@ class AssignmentsController < ApplicationController
       @assignments.each(&:publish!)
 
       flash[:notice] = t('notices.quizzes_published',
-                         { :one => "1 quiz successfully published!",
-                           :other => "%{count} quizzes successfully published!" },
-                         :count => @assignments.length)
+                         { one: "1 quiz successfully published!",
+                           other: "%{count} quizzes successfully published!" },
+                         count: @assignments.length)
 
       respond_to do |format|
         format.html { redirect_to named_context_url(@context, :context_quizzes_url) }
-        format.json { render :json => {}, :status => :ok }
+        format.json { render json: {}, status: :ok }
       end
     end
   end
@@ -832,13 +832,13 @@ class AssignmentsController < ApplicationController
       @assignments.each(&:unpublish!)
 
       flash[:notice] = t('notices.quizzes_unpublished',
-                         { :one => "1 quiz successfully unpublished!",
-                           :other => "%{count} quizzes successfully unpublished!" },
-                         :count => @assignments.length)
+                         { one: "1 quiz successfully unpublished!",
+                           other: "%{count} quizzes successfully unpublished!" },
+                         count: @assignments.length)
 
       respond_to do |format|
         format.html { redirect_to named_context_url(@context, :context_quizzes_url) }
-        format.json { render :json => {}, :status => :ok }
+        format.json { render json: {}, status: :ok }
       end
     end
   end
@@ -908,9 +908,9 @@ class AssignmentsController < ApplicationController
                   :context, :position, :external_tool_tag_attributes, :freeze_on_copy,
                   :only_visible_to_overrides, :post_to_sis, :sis_assignment_id, :integration_id, :moderated_grading,
                   :omit_from_final_grade, :intra_group_peer_reviews, :important_dates,
-                  :allowed_extensions => strong_anything,
-                  :turnitin_settings => strong_anything,
-                  :integration_data => strong_anything)
+                  allowed_extensions: strong_anything,
+                  turnitin_settings: strong_anything,
+                  integration_data: strong_anything)
   end
 
   def get_assignment_group(assignment_params)

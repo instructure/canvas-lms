@@ -52,8 +52,8 @@ class ExternalFeedEntry < ActiveRecord::Base
 
   workflow do
     state :active do
-      event :delete_it, :transitions_to => :deleted
-      event :cancel_it, :transitions_to => :cancelled
+      event :delete_it, transitions_to: :deleted
+      event :cancel_it, transitions_to: :cancelled
     end
 
     state :deleted

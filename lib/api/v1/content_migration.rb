@@ -29,7 +29,7 @@ module Api::V1::ContentMigration
   end
 
   def content_migration_json(migration, current_user, session, attachment_preflight = nil, includes = [])
-    json = api_json(migration, current_user, session, :only => %w[id user_id workflow_state started_at finished_at migration_type])
+    json = api_json(migration, current_user, session, only: %w[id user_id workflow_state started_at finished_at migration_type])
     json[:created_at] = migration.created_at
     if json[:workflow_state] == 'created'
       json[:workflow_state] = 'pre_processing'
@@ -47,7 +47,7 @@ module Api::V1::ContentMigration
     if attachment_preflight
       json[:pre_attachment] = attachment_preflight
     elsif migration.attachment && !migration.expired? && !migration.for_course_copy?
-      json[:attachment] = attachment_json(migration.attachment, current_user, {}, { :can_view_hidden_files => true })
+      json[:attachment] = attachment_json(migration.attachment, current_user, {}, { can_view_hidden_files: true })
     end
 
     if migration.for_course_copy? && (source = migration.source_course ||
@@ -95,7 +95,7 @@ module Api::V1::ContentMigration
   end
 
   def migration_issue_json(issue, migration, current_user, session)
-    json = api_json(issue, current_user, session, :only => %w[id description workflow_state fix_issue_html_url issue_type created_at updated_at])
+    json = api_json(issue, current_user, session, only: %w[id description workflow_state fix_issue_html_url issue_type created_at updated_at])
     json[:content_migration_url] = api_v1_course_content_migration_url(migration.context_id, issue.content_migration_id)
     if issue.grants_right?(current_user, :read_errors)
       json[:error_message] = issue.error_message

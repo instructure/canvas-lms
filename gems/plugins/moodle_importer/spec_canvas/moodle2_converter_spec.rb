@@ -22,13 +22,13 @@ describe Moodle::Converter do
     fixture_dir = File.dirname(__FILE__) + '/fixtures'
     archive_file_path = File.join(fixture_dir, 'moodle_backup_2.zip')
     unzipped_file_path = create_temp_dir!
-    converter = Moodle::Converter.new(:export_archive_path => archive_file_path, :course_name => 'oi', :base_download_dir => unzipped_file_path)
+    converter = Moodle::Converter.new(export_archive_path: archive_file_path, course_name: 'oi', base_download_dir: unzipped_file_path)
     converter.export
     @base_course_data = converter.course.with_indifferent_access
 
     @course_data = Marshal.load(Marshal.dump(@base_course_data))
-    @course = Course.create(:name => "test course")
-    @cm = ContentMigration.create(:context => @course)
+    @course = Course.create(name: "test course")
+    @cm = ContentMigration.create(context: @course)
     Importers::CourseContentImporter.import_content(@course, @course_data, nil, @cm)
   end
 
@@ -107,14 +107,14 @@ describe Moodle::Converter do
       skip 'Requires QtiMigrationTool' unless Qti.qti_enabled?
 
       expect(@course.context_modules.count).to eq 8
-      expect(@course.context_module_tags.where(:content_type => "Assignment", :title => "Assignment Name")).to be_exists
-      expect(@course.context_module_tags.where(:content_type => "WikiPage", :title => "My First Book")).to be_exists
-      expect(@course.context_module_tags.where(:content_type => "WikiPage", :title => "Chapter 1")).to be_exists
-      expect(@course.context_module_tags.where(:content_type => "WikiPage", :title => "My Sample Page")).to be_exists
-      expect(@course.context_module_tags.where(:content_type => "ContextModuleSubHeader", :title => "This is some label text")).to be_exists
-      expect(@course.context_module_tags.where(:content_type => "DiscussionTopic", :title => "Hidden Forum")).to be_exists
-      expect(@course.context_module_tags.where(:content_type => "Quizzes::Quiz", :title => "Quiz Name")).to be_exists
-      expect(@course.context_module_tags.where(:content_type => "ExternalUrl", :title => "my sample url")).to be_exists
+      expect(@course.context_module_tags.where(content_type: "Assignment", title: "Assignment Name")).to be_exists
+      expect(@course.context_module_tags.where(content_type: "WikiPage", title: "My First Book")).to be_exists
+      expect(@course.context_module_tags.where(content_type: "WikiPage", title: "Chapter 1")).to be_exists
+      expect(@course.context_module_tags.where(content_type: "WikiPage", title: "My Sample Page")).to be_exists
+      expect(@course.context_module_tags.where(content_type: "ContextModuleSubHeader", title: "This is some label text")).to be_exists
+      expect(@course.context_module_tags.where(content_type: "DiscussionTopic", title: "Hidden Forum")).to be_exists
+      expect(@course.context_module_tags.where(content_type: "Quizzes::Quiz", title: "Quiz Name")).to be_exists
+      expect(@course.context_module_tags.where(content_type: "ExternalUrl", title: "my sample url")).to be_exists
     end
   end
 end

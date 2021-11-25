@@ -25,7 +25,7 @@ describe QuizzesNext::QuizSerializer do
   end
 
   let(:original_assignment) do
-    group = original_context.assignment_groups.create(:name => "some group 1")
+    group = original_context.assignment_groups.create(name: "some group 1")
     original_context.assignments.create(
       title: 'some assignment 1',
       assignment_group: group,
@@ -39,7 +39,7 @@ describe QuizzesNext::QuizSerializer do
   end
 
   let(:assignment) do
-    group = context.assignment_groups.create(:name => "some group")
+    group = context.assignment_groups.create(name: "some group")
     context.assignments.create(
       title: 'some assignment',
       assignment_group: group,
@@ -169,7 +169,7 @@ describe QuizzesNext::QuizSerializer do
     end
 
     let(:assignment) do
-      group = context.assignment_groups.create(:name => "some group")
+      group = context.assignment_groups.create(name: "some group")
       context.assignments.create(
         title: 'some assignment',
         assignment_group: group,

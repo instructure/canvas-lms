@@ -95,9 +95,9 @@ module Quizzes
 
       user_answer = qq.score_question(params)
       result = {
-        :correct => user_answer.correctness,
-        :points => user_answer.score,
-        :question_id => user_answer.question_id,
+        correct: user_answer.correctness,
+        points: user_answer.score,
+        question_id: user_answer.question_id,
       }
       result[:answer_id] = user_answer.answer_id if user_answer.answer_id
       result.merge!(user_answer.answer_details)
@@ -162,8 +162,8 @@ module Quizzes
 
       # equivalent to AssessmentQuestionBank#learning_outcome_alignments, but for multiple banks at once
       [questions, ContentTag.learning_outcome_alignments.active.where(
-        :content_type => 'AssessmentQuestionBank',
-        :content_id => bank_ids
+        content_type: 'AssessmentQuestionBank',
+        content_id: bank_ids
       )
                             .preload(:learning_outcome, :context).to_a]
     end

@@ -28,7 +28,7 @@ module Canvas::Plugins::Validators::KalturaValidator
       errors = false
       settings.each do |k, v|
         if v.blank? && !CAN_BE_BLANK.member?(k.to_sym)
-          plugin_setting.errors.add(:base, I18n.t('canvas.plugins.errors.fields_required', 'The field "%{field}" is required', :field => k))
+          plugin_setting.errors.add(:base, I18n.t('canvas.plugins.errors.fields_required', 'The field "%{field}" is required', field: k))
           errors = true
         end
       end

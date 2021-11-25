@@ -34,10 +34,10 @@ describe "submissions" do
     before(:once) do
       @due_date = Time.now.utc + 2.days
       course_with_student(active_all: true)
-      @assignment = @course.assignments.create!(:title => 'assignment 1', :name => 'assignment 1', :due_at => @due_date)
-      @second_assignment = @course.assignments.create!(:title => 'assignment 2', :name => 'assignment 2', :due_at => nil)
-      @third_assignment = @course.assignments.create!(:title => 'assignment 3', :name => 'assignment 3', :due_at => nil)
-      @fourth_assignment = @course.assignments.create!(:title => 'assignment 4', :name => 'assignment 4', :due_at => @due_date - 1.day)
+      @assignment = @course.assignments.create!(title: 'assignment 1', name: 'assignment 1', due_at: @due_date)
+      @second_assignment = @course.assignments.create!(title: 'assignment 2', name: 'assignment 2', due_at: nil)
+      @third_assignment = @course.assignments.create!(title: 'assignment 3', name: 'assignment 3', due_at: nil)
+      @fourth_assignment = @course.assignments.create!(title: 'assignment 4', name: 'assignment 4', due_at: @due_date - 1.day)
     end
 
     before do
@@ -221,7 +221,7 @@ describe "submissions" do
       # given
       @teacher = User.create!
       @course.enroll_teacher(@teacher)
-      @assignment.update(:submission_types => "online_text_entry")
+      @assignment.update(submission_types: "online_text_entry")
       @assignment.grade_student(@student, grade: "0", grader: @teacher)
       # when
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
@@ -234,7 +234,7 @@ describe "submissions" do
       # given
       @teacher = User.create!
       @course.enroll_teacher(@teacher)
-      @assignment.update(:submission_types => "on_paper")
+      @assignment.update(submission_types: "on_paper")
       @assignment.grade_student(@student, grade: "0", grader: @teacher)
       # when
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
@@ -261,7 +261,7 @@ describe "submissions" do
     end
 
     it "does not allow blank submissions for text entry", priority: "1" do
-      @assignment.update(:submission_types => "online_text_entry")
+      @assignment.update(submission_types: "online_text_entry")
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
       f('.submit_assignment_link').click
       assignment_form = f('#submit_online_text_entry_form')
@@ -281,7 +281,7 @@ describe "submissions" do
     end
 
     it "does not allow submissions that contain placeholders for unfinished file uploads" do
-      @assignment.update(:submission_types => "online_text_entry")
+      @assignment.update(submission_types: "online_text_entry")
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
       f('.submit_assignment_link').click
       body_html = '<span style="width: 18rem; height: 1rem; vertical-align: middle;" aria-label="Loading" data-placeholder-for="filename">  </span>'
@@ -309,7 +309,7 @@ describe "submissions" do
     it "does not allow a submission with only comments", priority: "1" do
       skip_if_safari(:alert)
       skip('flash alert is fragile, will be addressed in ADMIN-3015')
-      @assignment.update(:submission_types => "online_text_entry")
+      @assignment.update(submission_types: "online_text_entry")
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
       f('.submit_assignment_link').click
 
@@ -341,9 +341,9 @@ describe "submissions" do
       expect_new_page_load { f('#submit_file_button').click }
       @submission = @assignment.reload.submissions.last
 
-      user_logged_in(:username => "assessor@example.com")
+      user_logged_in(username: "assessor@example.com")
       @student2 = @user
-      student_in_course(:active_enrollment => true, :user => @student2)
+      student_in_course(active_enrollment: true, user: @student2)
 
       @assignment.peer_reviews = true
       @assignment.assign_peer_review(@student2, @student1)
@@ -354,13 +354,13 @@ describe "submissions" do
       asset = @submission.turnitin_assets.first.asset_string
       @submission.turnitin_data = {
         asset.to_s => {
-          :object_id => "123456",
-          :publication_overlap => 5,
-          :similarity_score => 100,
-          :state => "failure",
-          :status => "scored",
-          :student_overlap => 44,
-          :web_overlap => 100
+          object_id: "123456",
+          publication_overlap: 5,
+          similarity_score: 100,
+          state: "failure",
+          status: "scored",
+          student_overlap: 44,
+          web_overlap: 100
         },
         :last_processed_attempt => 1
       }
@@ -418,10 +418,10 @@ describe "submissions" do
         add_file(fixture_file_upload('files/html-editing-test.html', 'text/html'),
                  @student, "html-editing-test.html")
         File.read(fixture_file_path("files/html-editing-test.html"))
-        assignment = @course.assignments.create!(:title => 'assignment 1',
-                                                 :name => 'assignment 1',
-                                                 :submission_types => "online_upload",
-                                                 :allowed_extensions => '.html')
+        assignment = @course.assignments.create!(title: 'assignment 1',
+                                                 name: 'assignment 1',
+                                                 submission_types: "online_upload",
+                                                 allowed_extensions: '.html')
         get "/courses/#{@course.id}/assignments/#{assignment.id}"
         f('.submit_assignment_link').click
         f('.toggle_uploaded_files_link').click
@@ -447,10 +447,10 @@ describe "submissions" do
         add_file(fixture_file_upload(fixture_fn, 'application/x-sh'),
                  @student, filename)
         File.read(fixture_file_path(fixture_fn))
-        assignment = @course.assignments.create!(:title => 'assignment 1',
-                                                 :name => 'assignment 1',
-                                                 :submission_types => "online_upload",
-                                                 :allowed_extensions => ['txt'])
+        assignment = @course.assignments.create!(title: 'assignment 1',
+                                                 name: 'assignment 1',
+                                                 submission_types: "online_upload",
+                                                 allowed_extensions: ['txt'])
         get "/courses/#{@course.id}/assignments/#{assignment.id}"
         f('.submit_assignment_link').click
         f('.toggle_uploaded_files_link').click

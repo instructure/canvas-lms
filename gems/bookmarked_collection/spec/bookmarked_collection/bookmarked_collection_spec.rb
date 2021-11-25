@@ -77,7 +77,7 @@ describe "BookmarkedCollection" do
 
     it "uses the provided scope when executing pagination" do
       collection = BookmarkedCollection.wrap(id_bookmarker, @scope)
-      expect(collection.paginate(:per_page => 1)).to eq([@scope.first])
+      expect(collection.paginate(per_page: 1)).to eq([@scope.first])
     end
 
     it "uses the bookmarker's bookmark generator to produce bookmarks" do
@@ -85,7 +85,7 @@ describe "BookmarkedCollection" do
       allow(id_bookmarker).to receive(:bookmark_for) { bookmark }
 
       collection = BookmarkedCollection.wrap(id_bookmarker, @scope)
-      expect(collection.paginate(:per_page => 1).next_bookmark).to eq(bookmark)
+      expect(collection.paginate(per_page: 1).next_bookmark).to eq(bookmark)
     end
 
     it "uses the bookmarker's bookmark applicator to restrict by bookmark" do
@@ -94,18 +94,18 @@ describe "BookmarkedCollection" do
       allow(id_bookmarker).to receive(:restrict_scope) { bookmarked_scope }
 
       collection = BookmarkedCollection.wrap(id_bookmarker, @scope)
-      expect(collection.paginate(:per_page => 1)).to eq([bookmarked_scope.first])
+      expect(collection.paginate(per_page: 1)).to eq([bookmarked_scope.first])
     end
 
     it "applies any restriction block given to the scope" do
       course = @scope.order(:id).last
-      course.update(:name => 'Matching Name')
+      course.update(name: 'Matching Name')
 
       collection = BookmarkedCollection.wrap(id_bookmarker, @scope) do |scope|
-        scope.where(:name => course.name)
+        scope.where(name: course.name)
       end
 
-      expect(collection.paginate(:per_page => 1)).to eq([course])
+      expect(collection.paginate(per_page: 1)).to eq([course])
     end
   end
 
@@ -120,8 +120,8 @@ describe "BookmarkedCollection" do
       @created_course2 = example_class.create!(state: 'created')
       @deleted_course2 = example_class.create!(state: 'deleted')
 
-      @created_scope = example_class.where(:state => 'created')
-      @deleted_scope = example_class.where(:state => 'deleted')
+      @created_scope = example_class.where(state: 'created')
+      @deleted_scope = example_class.where(state: 'deleted')
 
       @created_collection = BookmarkedCollection.wrap(id_bookmarker, @created_scope)
       @deleted_collection = BookmarkedCollection.wrap(id_bookmarker, @deleted_scope)
@@ -136,23 +136,23 @@ describe "BookmarkedCollection" do
     end
 
     it "merges the given collections" do
-      expect(@collection.paginate(:per_page => 2)).to eq([@created_course1, @deleted_course1])
+      expect(@collection.paginate(per_page: 2)).to eq([@created_course1, @deleted_course1])
     end
 
     it "has a next page when there's a non-exhausted collection" do
-      expect(@collection.paginate(:per_page => 3).next_page).not_to be_nil
+      expect(@collection.paginate(per_page: 3).next_page).not_to be_nil
     end
 
     it "does not have a next page when all collections are exhausted" do
-      expect(@collection.paginate(:per_page => 4).next_page).to be_nil
+      expect(@collection.paginate(per_page: 4).next_page).to be_nil
     end
 
     it "picks up in the middle of a collection" do
-      page = @collection.paginate(:per_page => 1)
+      page = @collection.paginate(per_page: 1)
       expect(page).to eq([@created_course1])
       expect(page.next_bookmark).not_to be_nil
 
-      expect(@collection.paginate(:page => page.next_page, :per_page => 2)).to eq([@deleted_course1, @created_course2])
+      expect(@collection.paginate(page: page.next_page, per_page: 2)).to eq([@deleted_course1, @created_course2])
     end
 
     context "with a merge proc" do
@@ -162,8 +162,8 @@ describe "BookmarkedCollection" do
 
         # the name bookmarker will generate the same bookmark for both of the
         # courses.
-        @created_course = @created_scope.create!(:name => "Same Name")
-        @deleted_course = @deleted_scope.create!(:name => "Same Name")
+        @created_course = @created_scope.create!(name: "Same Name")
+        @deleted_course = @deleted_scope.create!(name: "Same Name")
 
         @created_collection = BookmarkedCollection.wrap(name_bookmarker, @created_scope)
         @deleted_collection = BookmarkedCollection.wrap(name_bookmarker, @deleted_scope)
@@ -174,7 +174,7 @@ describe "BookmarkedCollection" do
       end
 
       it "collapses duplicates" do
-        expect(@collection.paginate(:per_page => 2)).to eq([@created_course])
+        expect(@collection.paginate(per_page: 2)).to eq([@created_course])
       end
     end
 
@@ -185,8 +185,8 @@ describe "BookmarkedCollection" do
 
         # the name bookmarker will generate the same bookmark for both of the
         # courses.
-        @created_course = @created_scope.create!(:name => "Same Name")
-        @deleted_course = @deleted_scope.create!(:name => "Same Name")
+        @created_course = @created_scope.create!(name: "Same Name")
+        @deleted_course = @deleted_scope.create!(name: "Same Name")
 
         @created_collection = BookmarkedCollection.wrap(name_bookmarker, @created_scope)
         @deleted_collection = BookmarkedCollection.wrap(name_bookmarker, @deleted_scope)
@@ -197,15 +197,15 @@ describe "BookmarkedCollection" do
       end
 
       it "sorts the ties by collection" do
-        expect(@collection.paginate(:per_page => 2)).to eq([@created_course, @deleted_course])
+        expect(@collection.paginate(per_page: 2)).to eq([@created_course, @deleted_course])
       end
 
       it "picks up at the right place when a page break splits the tie" do
-        page = @collection.paginate(:per_page => 1)
+        page = @collection.paginate(per_page: 1)
         expect(page).to eq([@created_course])
         expect(page.next_bookmark).not_to be_nil
 
-        page = @collection.paginate(:page => page.next_page, :per_page => 1)
+        page = @collection.paginate(page: page.next_page, per_page: 1)
         expect(page).to eq([@deleted_course])
         expect(page.next_bookmark).to be_nil
       end
@@ -218,8 +218,8 @@ describe "BookmarkedCollection" do
         self.table_name = 'examples'
       end
 
-      @created_scope = example_class.where(:state => 'created')
-      @deleted_scope = example_class.where(:state => 'deleted')
+      @created_scope = example_class.where(state: 'created')
+      @deleted_scope = example_class.where(state: 'deleted')
 
       @created_course1 = @created_scope.create!
       @deleted_course1 = @deleted_scope.create!
@@ -239,35 +239,35 @@ describe "BookmarkedCollection" do
     end
 
     it "concatenates the given collections" do
-      expect(@collection.paginate(:per_page => 3)).to eq([@created_course1, @created_course2, @deleted_course1])
+      expect(@collection.paginate(per_page: 3)).to eq([@created_course1, @created_course2, @deleted_course1])
     end
 
     it "has a next page when there's a non-exhausted collection" do
-      expect(@collection.paginate(:per_page => 3).next_page).not_to be_nil
+      expect(@collection.paginate(per_page: 3).next_page).not_to be_nil
     end
 
     it "has a next page on the border between an exhausted collection and a non-exhausted collection" do
-      expect(@collection.paginate(:per_page => 2).next_page).not_to be_nil
+      expect(@collection.paginate(per_page: 2).next_page).not_to be_nil
     end
 
     it "does not have a next page when all collections are exhausted" do
-      expect(@collection.paginate(:per_page => 4).next_page).to be_nil
+      expect(@collection.paginate(per_page: 4).next_page).to be_nil
     end
 
     it "picks up in the middle of a collection" do
-      page = @collection.paginate(:per_page => 1)
+      page = @collection.paginate(per_page: 1)
       expect(page).to eq([@created_course1])
       expect(page.next_bookmark).not_to be_nil
 
-      expect(@collection.paginate(:page => page.next_page, :per_page => 2)).to eq([@created_course2, @deleted_course1])
+      expect(@collection.paginate(page: page.next_page, per_page: 2)).to eq([@created_course2, @deleted_course1])
     end
 
     it "picks up from a break between collections" do
-      page = @collection.paginate(:per_page => 2)
+      page = @collection.paginate(per_page: 2)
       expect(page).to eq([@created_course1, @created_course2])
       expect(page.next_bookmark).not_to be_nil
 
-      expect(@collection.paginate(:page => page.next_page, :per_page => 2)).to eq([@deleted_course1, @deleted_course2])
+      expect(@collection.paginate(page: page.next_page, per_page: 2)).to eq([@deleted_course1, @deleted_course2])
     end
 
     it "doesn't get confused by subcollections that don't respect per_page" do
@@ -320,18 +320,18 @@ describe "BookmarkedCollection" do
         self.table_name = 'users'
       end
 
-      @created_scope = example_class.where(:state => 'created')
-      @deleted_scope = example_class.where(:state => 'deleted')
+      @created_scope = example_class.where(state: 'created')
+      @deleted_scope = example_class.where(state: 'deleted')
 
       # user's names are so it sorts Created X < Creighton < Deanne < Deleted
       # X when using NameBookmarks
-      @user1 = user_class.create!(:name => "Creighton")
-      @user2 = user_class.create!(:name => "Deanne")
+      @user1 = user_class.create!(name: "Creighton")
+      @user2 = user_class.create!(name: "Deanne")
       @user_scope = user_class.where(id: [@user1, @user2])
-      @created_course1 = @created_scope.create!(:name => "Created 1")
-      @deleted_course1 = @deleted_scope.create!(:name => "Deleted 1")
-      @created_course2 = @created_scope.create!(:name => "Created 2")
-      @deleted_course2 = @deleted_scope.create!(:name => "Deleted 2")
+      @created_course1 = @created_scope.create!(name: "Created 1")
+      @deleted_course1 = @deleted_scope.create!(name: "Deleted 1")
+      @created_course2 = @created_scope.create!(name: "Created 2")
+      @deleted_course2 = @deleted_scope.create!(name: "Deleted 2")
     end
 
     it "handles concat(A, merge(B, C))" do
@@ -349,11 +349,11 @@ describe "BookmarkedCollection" do
         ['courses', @course_collection]
       )
 
-      page = @collection.paginate(:per_page => 4)
+      page = @collection.paginate(per_page: 4)
       expect(page).to eq([@user1, @user2, @created_course1, @deleted_course1])
       expect(page.next_page).not_to be_nil
 
-      page = @collection.paginate(:page => page.next_page, :per_page => 2)
+      page = @collection.paginate(page: page.next_page, per_page: 2)
       expect(page).to eq([@created_course2, @deleted_course2])
       expect(page.next_page).to be_nil
     end
@@ -374,11 +374,11 @@ describe "BookmarkedCollection" do
         ['courses', @course_collection]
       )
 
-      page = @collection.paginate(:per_page => 3)
+      page = @collection.paginate(per_page: 3)
       expect(page).to eq([@created_course1, @created_course2, @user1])
       expect(page.next_page).not_to be_nil
 
-      page = @collection.paginate(:page => page.next_page, :per_page => 3)
+      page = @collection.paginate(page: page.next_page, per_page: 3)
       expect(page).to eq([@user2, @deleted_course1, @deleted_course2])
       expect(page.next_page).to be_nil
     end
@@ -398,11 +398,11 @@ describe "BookmarkedCollection" do
         ['courses', @course_collection]
       )
 
-      page = @collection.paginate(:per_page => 3)
+      page = @collection.paginate(per_page: 3)
       expect(page).to eq([@user1, @user2, @created_course1])
       expect(page.next_page).not_to be_nil
 
-      page = @collection.paginate(:page => page.next_page, :per_page => 3)
+      page = @collection.paginate(page: page.next_page, per_page: 3)
       expect(page).to eq([@created_course2, @deleted_course1, @deleted_course2])
       expect(page.next_page).to be_nil
     end

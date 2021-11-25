@@ -50,9 +50,9 @@ module Api
       %r{^/courses/(#{ID})/assignments/(#{ID})$} => ['Assignment', :api_v1_course_assignment_url, :course_id, :id],
 
       # List files
-      %r{^/courses/(#{ID})/files$} => ['Folder', :api_v1_course_folder_url, :course_id, { :id => 'root' }],
-      %r{^/groups/(#{ID})/files$} => ['Folder', :api_v1_group_folder_url, :group_id, { :id => 'root' }],
-      %r{^/users/(#{ID})/files$} => ['Folder', :api_v1_user_folder_url, :user_id, { :id => 'root' }],
+      %r{^/courses/(#{ID})/files$} => ['Folder', :api_v1_course_folder_url, :course_id, { id: 'root' }],
+      %r{^/groups/(#{ID})/files$} => ['Folder', :api_v1_group_folder_url, :group_id, { id: 'root' }],
+      %r{^/users/(#{ID})/files$} => ['Folder', :api_v1_user_folder_url, :user_id, { id: 'root' }],
 
       # Get file
       %r{^/courses/(#{ID})/files/(#{ID})} => ['File', :api_v1_course_attachment_url, :course_id, :id],
@@ -160,7 +160,7 @@ module Api
 
           return_type = api_route[0]
           helper = api_route[1]
-          args = { :protocol => protocol, :host => host }
+          args = { protocol: protocol, host: host }
           args.merge! (api_route.slice(2, match.captures.size).zip match.captures).to_h
           # transpose IDs in the URL
           transpose_ids(args) if context.shard != target_shard

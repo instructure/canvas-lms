@@ -86,13 +86,13 @@
 #     }
 #
 class AssignmentOverridesController < ApplicationController
-  before_action :require_group, :only => :group_alias
-  before_action :require_section, :only => :section_alias
+  before_action :require_group, only: :group_alias
+  before_action :require_section, only: :section_alias
   before_action :require_course
-  before_action :require_assignment, :except => %i[batch_retrieve batch_update batch_create]
-  before_action :require_assignment_edit, :only => %i[create update destroy]
-  before_action :require_all_assignments_edit, :only => [:batch_update, :batch_create]
-  before_action :require_override, :only => %i[show update destroy]
+  before_action :require_assignment, except: %i[batch_retrieve batch_update batch_create]
+  before_action :require_assignment_edit, only: %i[create update destroy]
+  before_action :require_all_assignments_edit, only: [:batch_update, :batch_create]
+  before_action :require_override, only: %i[show update destroy]
 
   include Api::V1::AssignmentOverride
 
@@ -104,7 +104,7 @@ class AssignmentOverridesController < ApplicationController
   # @returns [AssignmentOverride]
   def index
     @overrides = assignment_override_collection(@assignment, true)
-    render :json => assignment_overrides_json(@overrides, @current_user)
+    render json: assignment_overrides_json(@overrides, @current_user)
   end
 
   # @API Get a single assignment override
@@ -113,7 +113,7 @@ class AssignmentOverridesController < ApplicationController
   #
   # @returns AssignmentOverride
   def show
-    render :json => assignment_override_json(@override)
+    render json: assignment_override_json(@override)
   end
 
   # @API Redirect to the assignment override for a group
@@ -125,9 +125,9 @@ class AssignmentOverridesController < ApplicationController
     raise ActiveRecord::RecordNotFound unless @override
 
     redirect_to api_v1_assignment_override_url(
-      :course_id => @course.id,
-      :assignment_id => @assignment.id,
-      :id => @override
+      course_id: @course.id,
+      assignment_id: @assignment.id,
+      id: @override
     )
   end
 
@@ -140,9 +140,9 @@ class AssignmentOverridesController < ApplicationController
     raise ActiveRecord::RecordNotFound unless @override
 
     redirect_to api_v1_assignment_override_url(
-      :course_id => @course.id,
-      :assignment_id => @assignment.id,
-      :id => @override
+      course_id: @course.id,
+      assignment_id: @assignment.id,
+      id: @override
     )
   end
 
@@ -211,10 +211,10 @@ class AssignmentOverridesController < ApplicationController
     @override = @assignment.assignment_overrides.build
 
     data, errors = interpret_assignment_override_data(@assignment, params[:assignment_override])
-    return bad_request(:errors => errors) if errors
+    return bad_request(errors: errors) if errors
 
     if update_assignment_override(@override, data, updating_user: @current_user)
-      render :json => assignment_override_json(@override), :status => :created
+      render json: assignment_override_json(@override), status: :created
     else
       bad_request(@override.errors)
     end
@@ -267,10 +267,10 @@ class AssignmentOverridesController < ApplicationController
   #
   def update
     data, errors = interpret_assignment_override_data(@assignment, params[:assignment_override], @override.set_type)
-    return bad_request(:errors => errors) if errors
+    return bad_request(errors: errors) if errors
 
     if update_assignment_override(@override, data, updating_user: @current_user)
-      render :json => assignment_override_json(@override)
+      render json: assignment_override_json(@override)
     else
       bad_request(@override.errors)
     end
@@ -290,7 +290,7 @@ class AssignmentOverridesController < ApplicationController
   #
   def destroy
     if @override.destroy
-      render :json => assignment_override_json(@override)
+      render json: assignment_override_json(@override)
     else
       bad_request(@override.errors)
     end
@@ -453,7 +453,7 @@ class AssignmentOverridesController < ApplicationController
   end
 
   def bad_request(errors)
-    render :json => errors, :status => :bad_request
+    render json: errors, status: :bad_request
   end
 
   def batch_edit(is_update)

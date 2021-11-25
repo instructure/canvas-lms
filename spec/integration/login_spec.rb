@@ -55,7 +55,7 @@ describe 'login' do
     let(:cas_redirect_url) { Regexp.new(Regexp.escape(@cas_client.add_service_to_login_url(''))) }
 
     it "logs in and log out a user CAS has validated" do
-      user = user_with_pseudonym({ :active_all => true })
+      user = user_with_pseudonym({ active_all: true })
 
       stubby("yes\n#{user.pseudonyms.first.unique_id}\n")
 
@@ -63,7 +63,7 @@ describe 'login' do
       redirect_until(cas_redirect_url)
 
       get '/login/cas', params: { ticket: 'ST-abcd' }
-      expect(response).to redirect_to(dashboard_url(:login_success => 1))
+      expect(response).to redirect_to(dashboard_url(login_success: 1))
       expect(session[:cas_session]).to eq 'ST-abcd'
 
       delete logout_url
@@ -124,7 +124,7 @@ describe 'login' do
     end
 
     it "logins case insensitively" do
-      user = user_with_pseudonym({ :active_all => true })
+      user = user_with_pseudonym({ active_all: true })
 
       stubby("yes\n#{user.pseudonyms.first.unique_id.capitalize}\n")
 
@@ -132,7 +132,7 @@ describe 'login' do
       redirect_until(cas_redirect_url)
 
       get '/login/cas', params: { ticket: 'ST-abcd' }
-      expect(response).to redirect_to(dashboard_url(:login_success => 1))
+      expect(response).to redirect_to(dashboard_url(login_success: 1))
       expect(session[:cas_session]).to eq 'ST-abcd'
     end
 
@@ -142,7 +142,7 @@ describe 'login' do
       end
 
       it "does a single sign out" do
-        user = user_with_pseudonym({ :active_all => true })
+        user = user_with_pseudonym({ active_all: true })
 
         stubby("yes\n#{user.pseudonyms.first.unique_id}\n")
 
@@ -150,12 +150,12 @@ describe 'login' do
         redirect_until(cas_redirect_url)
 
         get '/login/cas', params: { ticket: 'ST-abcd' }
-        expect(response).to redirect_to(dashboard_url(:login_success => 1))
+        expect(response).to redirect_to(dashboard_url(login_success: 1))
         expect(session[:cas_session]).to eq 'ST-abcd'
         expect(Canvas.redis.get("cas_session_slo:ST-abcd")).to eq nil
 
         # single-sign-out from CAS server cannot find key but should store the session is expired
-        post cas_logout_url, params: { :logoutRequest => <<~XML }
+        post cas_logout_url, params: { logoutRequest: <<~XML }
           <samlp:LogoutRequest xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol" xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion" ID="1371236167rDkbdl8FGzbqwBhICvi" Version="2.0" IssueInstant="Fri, 14 Jun 2013 12:56:07 -0600">
           <saml:NameID></saml:NameID>
           <samlp:SessionIndex>ST-abcd</samlp:SessionIndex>
@@ -187,7 +187,7 @@ describe 'login' do
   end
 
   it "redirects back for jobs controller" do
-    user_with_pseudonym(:password => 'qwertyuiop', :active_all => 1)
+    user_with_pseudonym(password: 'qwertyuiop', active_all: 1)
     Account.site_admin.account_users.create!(user: @user)
 
     get jobs_url

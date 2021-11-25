@@ -23,7 +23,7 @@ describe DiscussionEntry do
 
   describe 'callback lifecycle' do
     before(:once) do
-      course_with_teacher(:active_all => true)
+      course_with_teacher(active_all: true)
     end
 
     let(:entry) do
@@ -42,7 +42,7 @@ describe DiscussionEntry do
   end
 
   it "is not marked as deleted when parent is deleted" do
-    course_with_teacher(:active_all => true)
+    course_with_teacher(active_all: true)
     entry = topic.discussion_entries.create!
 
     sub_entry = topic.discussion_entries.build
@@ -91,7 +91,7 @@ describe DiscussionEntry do
     # because :post_to_forum implies :read in about half of discussions, and this is one such place
     @course.account.role_overrides.create!(permission: 'post_to_forum', role: student_role, enabled: false)
 
-    topic = @course.announcements.create!(:user => @teacher, :message => "announcement text")
+    topic = @course.announcements.create!(user: @teacher, message: "announcement text")
     entry = topic.discussion_entries.create!(user: @teacher, message: 'reply text')
 
     expect(entry.grants_right?(@student, :read)).to be(false)
@@ -140,44 +140,44 @@ describe DiscussionEntry do
 
   context "entry notifications" do
     before :once do
-      course_with_teacher(:active_all => true)
-      student_in_course(:active_all => true)
+      course_with_teacher(active_all: true)
+      student_in_course(active_all: true)
       @non_posting_student = @student
-      student_in_course(:active_all => true)
+      student_in_course(active_all: true)
 
       @notification_mention = "New Discussion Mention"
-      n = Notification.create(:name => @notification_mention, :category => "TestImmediately")
-      NotificationPolicy.create(:notification => n, :communication_channel => @student.communication_channel, :frequency => "immediately")
+      n = Notification.create(name: @notification_mention, category: "TestImmediately")
+      NotificationPolicy.create(notification: n, communication_channel: @student.communication_channel, frequency: "immediately")
 
       @notification_name = "New Discussion Entry"
-      n = Notification.create(:name => @notification_name, :category => "TestImmediately")
-      NotificationPolicy.create(:notification => n, :communication_channel => @student.communication_channel, :frequency => "immediately")
+      n = Notification.create(name: @notification_name, category: "TestImmediately")
+      NotificationPolicy.create(notification: n, communication_channel: @student.communication_channel, frequency: "immediately")
 
-      n2 = Notification.create(:name => "Announcement Reply", :category => "TestImmediately")
-      NotificationPolicy.create(:notification => n2, :communication_channel => @teacher.communication_channel, :frequency => "immediately")
+      n2 = Notification.create(name: "Announcement Reply", category: "TestImmediately")
+      NotificationPolicy.create(notification: n2, communication_channel: @teacher.communication_channel, frequency: "immediately")
 
       @notification_reported_entry = "Reported Reply"
-      n = Notification.create(:name => @notification_reported_entry, :category => "TestImmediately")
-      NotificationPolicy.create(:notification => n, :communication_channel => @teacher.communication_channel, :frequency => "immediately")
+      n = Notification.create(name: @notification_reported_entry, category: "TestImmediately")
+      NotificationPolicy.create(notification: n, communication_channel: @teacher.communication_channel, frequency: "immediately")
     end
 
     it "sends them for course discussion topics" do
-      topic = @course.discussion_topics.create!(:user => @teacher, :message => "Hi there")
-      entry = topic.discussion_entries.create!(:user => @student, :message => "Hi I'm a student")
+      topic = @course.discussion_topics.create!(user: @teacher, message: "Hi there")
+      entry = topic.discussion_entries.create!(user: @student, message: "Hi I'm a student")
 
       to_users = entry.messages_sent[@notification_name].map(&:user).map(&:id)
       expect(to_users).to include(@teacher.id) # teacher is auto-subscribed
       expect(to_users).not_to include(@student.id) # posters are auto-subscribed, but student is not notified of his own post
       expect(to_users).not_to include(@non_posting_student.id)
 
-      entry = topic.discussion_entries.create!(:user => @teacher, :message => "Nice to meet you")
+      entry = topic.discussion_entries.create!(user: @teacher, message: "Nice to meet you")
       to_users = entry.messages_sent[@notification_name].map(&:user).map(&:id)
       expect(to_users).not_to include(@teacher.id) # author
       expect(to_users).to include(@student.id)
       expect(to_users).not_to include(@non_posting_student.id)
 
       topic.subscribe(@non_posting_student)
-      entry = topic.discussion_entries.create!(:user => @teacher, :message => "Welcome to the class")
+      entry = topic.discussion_entries.create!(user: @teacher, message: "Welcome to the class")
       # now that the non_posting_student is subscribed, he should get notified of posts
       to_users = entry.messages_sent[@notification_name].map(&:user).map(&:id)
       expect(to_users).not_to include(@teacher.id)
@@ -186,25 +186,25 @@ describe DiscussionEntry do
     end
 
     it "sends them for group discussion topics" do
-      group(:group_context => @course)
+      group(group_context: @course)
 
       s1 = @student
-      student_in_course(:active_user => true)
+      student_in_course(active_user: true)
       s2 = @student
 
       @group.participating_users << s1
       @group.participating_users << s2
       @group.save!
 
-      topic = @group.discussion_topics.create!(:user => @teacher, :message => "Hi there")
-      entry = topic.discussion_entries.create!(:user => s1, :message => "Hi I'm a student")
+      topic = @group.discussion_topics.create!(user: @teacher, message: "Hi there")
+      entry = topic.discussion_entries.create!(user: s1, message: "Hi I'm a student")
       # teacher is subscribed but is not in the "participating_users" for this group
       # s1 is the author, s2 is not subscribed
       expect(entry.messages_sent[@notification_name]).to be_blank
 
       # s1 should be subscribed from posting to the topic
       topic.subscribe(s2)
-      entry = topic.discussion_entries.create!(:user => s2, :message => "Hi I'm a student")
+      entry = topic.discussion_entries.create!(user: s2, message: "Hi I'm a student")
       to_users = entry.messages_sent[@notification_name].map(&:user)
       expect(to_users).not_to include(@teacher)
       expect(to_users).to include(s1)
@@ -223,15 +223,15 @@ describe DiscussionEntry do
       student_in_course
       outsider = @student
 
-      topic = course.discussion_topics.create!(:user => teacher, :message => "Hi there")
+      topic = course.discussion_topics.create!(user: teacher, message: "Hi there")
       # make sure they all subscribed, somehow
       [teacher, student1, quitter, outsider].each { |user| topic.subscribe(user) }
 
-      topic.discussion_entries.create!(:user => quitter, :message => "Hi, I'm going to drop this class")
+      topic.discussion_entries.create!(user: quitter, message: "Hi, I'm going to drop this class")
       quitter.enrollments.each(&:destroy)
 
-      topic.discussion_entries.create!(:user => outsider, :message => "Hi I'm a student from another class")
-      entry = topic.discussion_entries.create!(:user => student1, :message => "Hi I'm a student")
+      topic.discussion_entries.create!(user: outsider, message: "Hi I'm a student from another class")
+      entry = topic.discussion_entries.create!(user: student1, message: "Hi I'm a student")
 
       to_users = entry.messages_sent[@notification_name].map(&:user)
       expect(to_users).to include teacher      # because teacher is subscribed and enrolled
@@ -241,17 +241,17 @@ describe DiscussionEntry do
     end
 
     it "sends relevent notifications on announcements" do
-      topic = @course.announcements.create!(:user => @teacher, :message => "This is an important announcement")
+      topic = @course.announcements.create!(user: @teacher, message: "This is an important announcement")
       topic.subscribe(@student)
-      entry = topic.discussion_entries.create!(:user => @teacher, :message => "Oh, and another thing...")
+      entry = topic.discussion_entries.create!(user: @teacher, message: "Oh, and another thing...")
       expect(entry.messages_sent[@notification_name]).to be_blank
       expect(entry.messages_sent["Announcement Reply"]).not_to be_blank
     end
 
     it "sends one notification to mentioned users" do
-      topic = @course.discussion_topics.create!(:user => @teacher, :message => "This is an important announcement")
+      topic = @course.discussion_topics.create!(user: @teacher, message: "This is an important announcement")
       topic.subscribe(@student)
-      entry = topic.discussion_entries.new(:user => @teacher, :message => "Oh, and another thing...")
+      entry = topic.discussion_entries.new(user: @teacher, message: "Oh, and another thing...")
       mention = entry.mentions.new(user: @student, root_account_id: @course.root_account_id)
       entry.save! # also saves the mention.
       expect(mention.messages_sent[@notification_name]).to be_blank
@@ -261,9 +261,9 @@ describe DiscussionEntry do
 
     it "sends notification to teacher when a reply is reported" do
       allow(Account.site_admin).to receive(:feature_enabled?).with(:discussions_reporting).and_return(true)
-      topic = @course.discussion_topics.create!(:user => @teacher, :message => "This is an important announcement")
+      topic = @course.discussion_topics.create!(user: @teacher, message: "This is an important announcement")
       topic.subscribe(@student)
-      entry = topic.discussion_entries.create!(:user => @teacher, :message => "Oh, and another thing...")
+      entry = topic.discussion_entries.create!(user: @teacher, message: "Oh, and another thing...")
       expect(BroadcastPolicy.notifier).to receive(:send_notification).once
       entry.broadcast_report_notification('hello I have been reported')
     end
@@ -271,20 +271,20 @@ describe DiscussionEntry do
 
   context "sub-topics" do
     it "does not allow students to edit sub-topic entries of other students" do
-      course_with_student(:active_all => true)
+      course_with_student(active_all: true)
       @first_user = @user
       @second_user = user_model
       @course.enroll_student(@second_user).accept
-      @parent_topic = @course.discussion_topics.create!(:title => "parent topic", :message => "msg")
-      @group = @course.groups.create!(:name => "course group")
+      @parent_topic = @course.discussion_topics.create!(title: "parent topic", message: "msg")
+      @group = @course.groups.create!(name: "course group")
       @group.add_user(@first_user)
       @group.add_user(@second_user)
-      @group_topic = @group.discussion_topics.create!(:title => "group topic", :message => "ok to be edited", :user => @first_user)
-      @group_entry = @group_topic.discussion_entries.create!(:message => "entry", :user => @first_user)
-      @sub_topic = @group.discussion_topics.build(:title => "sub topic", :message => "not ok to be edited", :user => @first_user)
+      @group_topic = @group.discussion_topics.create!(title: "group topic", message: "ok to be edited", user: @first_user)
+      @group_entry = @group_topic.discussion_entries.create!(message: "entry", user: @first_user)
+      @sub_topic = @group.discussion_topics.build(title: "sub topic", message: "not ok to be edited", user: @first_user)
       @sub_topic.root_topic_id = @parent_topic.id
       @sub_topic.save!
-      @sub_entry = @sub_topic.discussion_entries.create!(:message => "entry", :user => @first_user)
+      @sub_entry = @sub_topic.discussion_entries.create!(message: "entry", user: @first_user)
       expect(@group_entry.grants_right?(@first_user, :update)).to eql(true)
       expect(@group_entry.grants_right?(@second_user, :update)).to eql(false)
       expect(@sub_entry.grants_right?(@first_user, :update)).to eql(true)
@@ -294,16 +294,16 @@ describe DiscussionEntry do
 
   context "update_topic" do
     before :once do
-      course_with_student(:active_all => true)
+      course_with_student(active_all: true)
       @course.enroll_student(@user).accept
-      @topic = @course.discussion_topics.create!(:title => "title", :message => "message")
+      @topic = @course.discussion_topics.create!(title: "title", message: "message")
 
       # get rid of stupid milliseconds, since mysql won't preserve them
       @original_updated_at = @topic.updated_at = Time.zone.at(1.minute.ago.to_i)
       @original_last_reply_at = @topic.last_reply_at = Time.zone.at(2.minutes.ago.to_i)
       @topic.save
 
-      @entry = @topic.discussion_entries.create!(:message => "entry", :user => @user)
+      @entry = @topic.discussion_entries.create!(message: "entry", user: @user)
     end
 
     it "tickles updated_at on the associated discussion_topic" do
@@ -342,21 +342,21 @@ describe DiscussionEntry do
 
   context "deleting entry" do
     before :once do
-      course_with_student(:active_all => true)
+      course_with_student(active_all: true)
       @author = @user
       @reader = user_factory
       @course.enroll_student(@author)
       @course.enroll_student(@reader)
 
-      @topic = @course.discussion_topics.create!(:title => "title", :message => "message")
+      @topic = @course.discussion_topics.create!(title: "title", message: "message")
 
       # Create 4 entries, first 2 are 'read' by reader.
-      @entry_1 = @topic.discussion_entries.create!(:message => "entry 1", :user => @author)
+      @entry_1 = @topic.discussion_entries.create!(message: "entry 1", user: @author)
       @entry_1.change_read_state('read', @reader)
-      @entry_2 = @topic.discussion_entries.create!(:message => "entry 2", :user => @author)
+      @entry_2 = @topic.discussion_entries.create!(message: "entry 2", user: @author)
       @entry_2.change_read_state('read', @reader)
-      @entry_3 = @topic.discussion_entries.create!(:message => "entry 3", :user => @author)
-      @entry_4 = @topic.discussion_entries.create!(:message => "entry 4", :user => @author)
+      @entry_3 = @topic.discussion_entries.create!(message: "entry 3", user: @author)
+      @entry_4 = @topic.discussion_entries.create!(message: "entry 4", user: @author)
     end
 
     describe "#destroy" do
@@ -390,17 +390,17 @@ describe DiscussionEntry do
   end
 
   it "touches all parent discussion_topics through root_topic_id, on update" do
-    course_with_student(:active_all => true)
-    @topic = @course.discussion_topics.create!(:title => "title", :message => "message")
-    @subtopic = @course.discussion_topics.create!(:title => "subtopic")
+    course_with_student(active_all: true)
+    @topic = @course.discussion_topics.create!(title: "title", message: "message")
+    @subtopic = @course.discussion_topics.create!(title: "subtopic")
     @subtopic.root_topic = @topic
     @subtopic.save!
 
-    DiscussionTopic.where(:id => [@topic, @subtopic]).update_all(:updated_at => 1.hour.ago)
+    DiscussionTopic.where(id: [@topic, @subtopic]).update_all(updated_at: 1.hour.ago)
     @topic_updated_at = @topic.reload.updated_at
     @subtopic_updated_at = @subtopic.reload.updated_at
 
-    @subtopic_entry = @subtopic.discussion_entries.create!(:message => "hello", :user => @user)
+    @subtopic_entry = @subtopic.discussion_entries.create!(message: "hello", user: @user)
 
     expect(@subtopic_updated_at.to_i).not_to eq @subtopic.reload.updated_at.to_i
     expect(@topic_updated_at.to_i).not_to eq @topic.reload.updated_at.to_i
@@ -408,10 +408,10 @@ describe DiscussionEntry do
 
   context "read/unread state" do
     before(:once) do
-      course_with_teacher(:active_all => true)
-      student_in_course(:active_all => true)
-      @topic = @course.discussion_topics.create!(:title => "title", :message => "message", :user => @teacher)
-      @entry = @topic.discussion_entries.create!(:message => "entry", :user => @teacher)
+      course_with_teacher(active_all: true)
+      student_in_course(active_all: true)
+      @topic = @course.discussion_topics.create!(title: "title", message: "message", user: @teacher)
+      @entry = @topic.discussion_entries.create!(message: "entry", user: @teacher)
     end
 
     it "marks a entry you created as read" do
@@ -437,34 +437,34 @@ describe DiscussionEntry do
     end
 
     it "updates counts for an entry without a user" do
-      @other_entry = @topic.discussion_entries.create!(:message => "no user entry")
+      @other_entry = @topic.discussion_entries.create!(message: "no user entry")
       expect(@topic.unread_count(@teacher)).to eq 1
       expect(@topic.unread_count(@student)).to eq 2
     end
 
     it "allows a complex series of read/unread updates" do
       @s1 = @student
-      student_in_course(:active_all => true)
+      student_in_course(active_all: true)
       @s2 = @student
-      student_in_course(:active_all => true)
+      student_in_course(active_all: true)
       @s3 = @student
 
       @topic.change_read_state("read", @s1)
       @entry.change_read_state("read", @s1)
-      @s1entry = @topic.discussion_entries.create!(:message => "s1 entry", :user => @s1)
+      @s1entry = @topic.discussion_entries.create!(message: "s1 entry", user: @s1)
       expect(@topic.unread_count(@s1)).to eq 0
 
       @entry.change_read_state("read", @s2)
       expect(@topic.discussion_topic_participants.where(user_id: @s2).first).not_to be_nil
       @topic.change_read_state("read", @s2)
-      @s2entry = @topic.discussion_entries.create!(:message => "s2 entry", :user => @s2)
+      @s2entry = @topic.discussion_entries.create!(message: "s2 entry", user: @s2)
       @s1entry.change_read_state("read", @s2)
       @s1entry.change_read_state("unread", @s2)
       expect(@topic.unread_count(@s2)).to eq 1
 
       expect(@topic.unread_count(@s3)).to eq 3
       @entry.change_read_state("read", @s3)
-      @s3reply = @entry.discussion_subentries.create!(:discussion_topic => @topic, :message => "s3 reply", :user => @s3)
+      @s3reply = @entry.discussion_subentries.create!(discussion_topic: @topic, message: "s3 reply", user: @s3)
       expect(@topic.unread_count(@s3)).to eq 2
 
       expect(@topic.unread_count(@s1)).to eq 2
@@ -481,29 +481,29 @@ describe DiscussionEntry do
       expect(@topic.read?(@s2)).to be_falsey
       expect(@entry.read?(@s2)).to be_falsey
 
-      student_in_course(:active_all => true)
+      student_in_course(active_all: true)
       @s4 = @student
       expect(@topic.unread_count(@s4)).to eq 4
       @topic.change_all_read_state("unread", @s4)
       expect(@topic.read?(@s4)).to be_falsey
       expect(@entry.read?(@s4)).to be_falsey
 
-      student_in_course(:active_all => true)
+      student_in_course(active_all: true)
       @s5 = @student
       @topic.change_all_read_state("read", @s5)
       expect(@topic.unread_count(@s5)).to eq 0
     end
 
     it "does not increment unread count for students in group topics when posting to the root" do
-      course_with_student(:active_all => true)
+      course_with_student(active_all: true)
       teacher1 = @teacher
-      teacher2 = teacher_in_course(:course => @course, :active_all => true).user
+      teacher2 = teacher_in_course(course: @course, active_all: true).user
 
-      group_category = @course.group_categories.create(:name => "new category")
-      @group = @course.groups.create(:name => "group", :group_category => group_category)
+      group_category = @course.group_categories.create(name: "new category")
+      @group = @course.groups.create(name: "group", group_category: group_category)
       @group.add_user(@student)
 
-      root_topic = @course.discussion_topics.create!(:title => "parent topic", :message => "msg", :group_category => group_category)
+      root_topic = @course.discussion_topics.create!(title: "parent topic", message: "msg", group_category: group_category)
       student_participant = root_topic.discussion_topic_participants.create!(user: @student)
       teacher_participant = root_topic.discussion_topic_participants.create!(user: teacher2)
       root_topic.discussion_entries.create!(message: "message", user: teacher1)
@@ -554,22 +554,22 @@ describe DiscussionEntry do
 
     it "forces a root entry as parent if the discussion isn't threaded" do
       discussion_topic_model
-      root = @topic.reply_from(:user => @teacher, :text => "root entry")
-      sub1 = root.reply_from(:user => @teacher, :html => "sub entry")
+      root = @topic.reply_from(user: @teacher, text: "root entry")
+      sub1 = root.reply_from(user: @teacher, html: "sub entry")
       expect(sub1.parent_entry).to eq root
       expect(sub1.root_entry).to eq root
-      sub2 = sub1.reply_from(:user => @teacher, :html => "sub-sub entry")
+      sub2 = sub1.reply_from(user: @teacher, html: "sub-sub entry")
       expect(sub2.parent_entry).to eq root
       expect(sub2.root_entry).to eq root
     end
 
     it "allows a sub-entry as parent if the discussion is threaded" do
-      discussion_topic_model(:threaded => true)
-      root = @topic.reply_from(:user => @teacher, :text => "root entry")
-      sub1 = root.reply_from(:user => @teacher, :html => "sub entry")
+      discussion_topic_model(threaded: true)
+      root = @topic.reply_from(user: @teacher, text: "root entry")
+      sub1 = root.reply_from(user: @teacher, html: "sub entry")
       expect(sub1.parent_entry).to eq root
       expect(sub1.root_entry).to eq root
-      sub2 = sub1.reply_from(:user => @teacher, :html => "sub-sub entry")
+      sub2 = sub1.reply_from(user: @teacher, html: "sub-sub entry")
       expect(sub2.parent_entry).to eq sub1
       expect(sub2.root_entry).to eq root
     end
@@ -581,8 +581,8 @@ describe DiscussionEntry do
       discussion_topic_model
       @topic.discussion_type = DiscussionTopic::DiscussionTypes::FLAT
       @topic.save!
-      root = @topic.reply_from(:user => @teacher, :text => "root entry")
-      sub1 = root.reply_from(:user => @teacher, :html => "shouldn't really be a subentry")
+      root = @topic.reply_from(user: @teacher, text: "root entry")
+      sub1 = root.reply_from(user: @teacher, html: "shouldn't really be a subentry")
       expect(sub1.reload.parent_entry).to be_nil
     end
   end
@@ -609,12 +609,12 @@ describe DiscussionEntry do
       it "returns the ids of entries that have been marked as force_read_state" do
         marked_entries = [@root2, @reply_reply1, @reply_reply2, @reply3]
         marked_entries.each do |e|
-          e.change_read_state('read', @teacher, :forced => true)
+          e.change_read_state('read', @teacher, forced: true)
         end
         # change back, without :forced parameter, should stay forced
         @reply_reply2.change_read_state('unread', @teacher)
         # change forced to false so it shouldn't be in results
-        @reply3.change_read_state('unread', @teacher, :forced => false)
+        @reply3.change_read_state('unread', @teacher, forced: false)
         marked_entries -= [@reply3]
 
         forced = DiscussionEntryParticipant.forced_read_state_entry_ids(@all_entries.map(&:id), @teacher).sort
@@ -624,7 +624,7 @@ describe DiscussionEntry do
 
     context ".find_existing_participant" do
       it "returns existing data" do
-        @root2.change_read_state('read', @teacher, :forced => true)
+        @root2.change_read_state('read', @teacher, forced: true)
         participant = @root2.find_existing_participant(@teacher)
         expect(participant.id).not_to be_nil
         expect(participant).to be_readonly
@@ -670,38 +670,38 @@ describe DiscussionEntry do
     end
 
     it "ignores replies in deleted accounts" do
-      root = @topic.reply_from(:user => @teacher, :text => "root entry")
+      root = @topic.reply_from(user: @teacher, text: "root entry")
       Account.default.destroy
       root.reload
-      expect { root.reply_from(:user => @teacher, :text => "sub entry") }.to raise_error(IncomingMail::Errors::UnknownAddress)
+      expect { root.reply_from(user: @teacher, text: "sub entry") }.to raise_error(IncomingMail::Errors::UnknownAddress)
     end
 
     it "prefers html to text" do
-      @entry = @topic.reply_from(:user => @teacher, :text => "topic")
-      msg = @entry.reply_from(:user => @teacher, :text => "text body", :html => "<p>html body</p>")
+      @entry = @topic.reply_from(user: @teacher, text: "topic")
+      msg = @entry.reply_from(user: @teacher, text: "text body", html: "<p>html body</p>")
       expect(msg).not_to be_nil
       expect(msg.message).to eq "<p>html body</p>"
     end
 
     it "does not allow students to reply to locked topics" do
-      @entry = @topic.reply_from(:user => @teacher, :text => "topic")
+      @entry = @topic.reply_from(user: @teacher, text: "topic")
       @topic.lock!
-      @entry.reply_from(:user => @teacher, :text => "reply") # should not raise error
-      student_in_course(:course => @course)
-      expect { @entry.reply_from(:user => @student, :text => "reply") }.to raise_error(IncomingMail::Errors::ReplyToLockedTopic)
+      @entry.reply_from(user: @teacher, text: "reply") # should not raise error
+      student_in_course(course: @course)
+      expect { @entry.reply_from(user: @student, text: "reply") }.to raise_error(IncomingMail::Errors::ReplyToLockedTopic)
     end
 
     it "does not allow replies from students to topics locked based on date" do
-      @entry = @topic.reply_from(:user => @teacher, :text => "topic")
+      @entry = @topic.reply_from(user: @teacher, text: "topic")
       @topic.unlock_at = 1.day.from_now
       @topic.save!
-      @entry.reply_from(:user => @teacher, :text => "reply") # should not raise error
-      student_in_course(:course => @course)
-      expect { @entry.reply_from(:user => @student, :text => "reply") }.to raise_error(IncomingMail::Errors::ReplyToLockedTopic)
+      @entry.reply_from(user: @teacher, text: "reply") # should not raise error
+      student_in_course(course: @course)
+      expect { @entry.reply_from(user: @student, text: "reply") }.to raise_error(IncomingMail::Errors::ReplyToLockedTopic)
     end
 
     it 'raises InvalidParticipant for invalid participants' do
-      u = user_with_pseudonym(:active_user => true, :username => 'test1@example.com', :password => 'test1234')
+      u = user_with_pseudonym(active_user: true, username: 'test1@example.com', password: 'test1234')
       expect { @topic.reply_from(user: u, text: "entry 1") }.to raise_error IncomingMail::Errors::InvalidParticipant
     end
   end
@@ -710,7 +710,7 @@ describe DiscussionEntry do
     before(:once) do
       course_with_student active_all: true
       @empty_section = @course.course_sections.create!
-      @topic = @course.discussion_topics.build(:title => "topic")
+      @topic = @course.discussion_topics.build(title: "topic")
       @assignment = @course.assignments.build title: @topic.title,
                                               submission_types: 'discussion_topic',
                                               only_visible_to_overrides: true
@@ -729,7 +729,7 @@ describe DiscussionEntry do
   context 'planner items cache' do
     before(:once) do
       course_with_student active_all: true
-      @topic = @course.discussion_topics.build(:title => "topic")
+      @topic = @course.discussion_topics.build(title: "topic")
       @topic.save
       @topic.discussion_topic_participants.create!(user: @student, subscribed: true)
     end
@@ -760,7 +760,7 @@ describe DiscussionEntry do
     end
 
     it 'is cleared on top level and for graded discussions' do
-      assignment = @course.assignments.build(:submission_types => 'discussion_topic', :title => topic.title, :due_at => 1.day.from_now)
+      assignment = @course.assignments.build(submission_types: 'discussion_topic', title: topic.title, due_at: 1.day.from_now)
       assignment.saved_by = :discussion_topic
       @topic.assignment = assignment
       @topic.save
@@ -772,7 +772,7 @@ describe DiscussionEntry do
     end
 
     it 'is cleared on nested replies for graded discussions' do
-      assignment = @course.assignments.build(:submission_types => 'discussion_topic', :title => topic.title, :due_at => 1.day.from_now)
+      assignment = @course.assignments.build(submission_types: 'discussion_topic', title: topic.title, due_at: 1.day.from_now)
       assignment.saved_by = :discussion_topic
       @topic.assignment = assignment
       @topic.save

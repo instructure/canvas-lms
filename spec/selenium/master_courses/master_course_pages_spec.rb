@@ -23,7 +23,7 @@ describe "master courses - pages locking" do
   include_context "in-process server selenium tests"
 
   before :once do
-    @course = course_factory(:active_all => true)
+    @course = course_factory(active_all: true)
     @template = MasterCourses::MasterTemplate.set_as_master_course(@course)
     @page = @course.wiki_pages.create!(title: 'Page1')
     @tag = @template.create_content_tag_for!(@page)
@@ -40,7 +40,7 @@ describe "master courses - pages locking" do
 
   it "shows locked button on index page for locked page" do
     # restrict something
-    @tag.update_attribute(:restrictions, { :content => true })
+    @tag.update_attribute(:restrictions, { content: true })
 
     get "/courses/#{@course.id}/pages"
     expect(f('.master-content-lock-cell i.icon-blueprint-lock')).to be_displayed

@@ -63,7 +63,7 @@ describe OverrideListPresenter do
   describe "#formatted_date_string" do
     context "due_at" do
       it "returns - if due_at isn't present" do
-        due_date_hash = { :due_at => nil }
+        due_date_hash = { due_at: nil }
         expect(presenter.formatted_date_string(:due_at, due_date_hash)).to eq '-'
         due_date_hash[:due_at] = ""
         expect(presenter.formatted_date_string(:due_at, due_date_hash)).to eq '-'
@@ -71,14 +71,14 @@ describe OverrideListPresenter do
 
       it "returns a shortened version with just the date if time is 11:59" do
         fancy_midnight = CanvasTime.fancy_midnight Time.zone.now
-        due_date_hash = { :due_at => fancy_midnight }
+        due_date_hash = { due_at: fancy_midnight }
         expect(presenter.formatted_date_string(:due_at, due_date_hash)).to eq(
           date_string(fancy_midnight, :no_words)
         )
       end
 
       it "returns returns datetime_string if not all day but date present" do
-        due_date_hash = { :due_at => Time.now }
+        due_date_hash = { due_at: Time.now }
         expect(presenter.formatted_date_string(:due_at, due_date_hash)).to eq(
           datetime_string(Time.now)
         )
@@ -87,7 +87,7 @@ describe OverrideListPresenter do
 
     context "lock_at and unlock_at" do
       it "returns returns datetime_string of not all day but date present" do
-        due_date_hash = { :lock_at => Time.now, :unlock_at => Time.now - 1.day }
+        due_date_hash = { lock_at: Time.now, unlock_at: Time.now - 1.day }
         expect(presenter.formatted_date_string(:lock_at, due_date_hash)).to eq(
           datetime_string(Time.now)
         )
@@ -97,22 +97,22 @@ describe OverrideListPresenter do
       end
 
       it "returns - if due_at isn't present" do
-        due_date_hash = { :lock_at => nil }
+        due_date_hash = { lock_at: nil }
         expect(presenter.formatted_date_string(:lock_at, due_date_hash)).to eq '-'
         due_date_hash[:lock_at] = ""
         expect(presenter.formatted_date_string(:lock_at, due_date_hash)).to eq '-'
-        due_date_hash = { :unlock_at => nil }
+        due_date_hash = { unlock_at: nil }
         expect(presenter.formatted_date_string(:unlock_at, due_date_hash)).to eq '-'
         due_date_hash[:unlock_at] = ""
         expect(presenter.formatted_date_string(:unlock_at, due_date_hash)).to eq '-'
       end
 
       it "never takes all_day into effect" do
-        due_date_hash = { :lock_at => Time.now, :all_day => true }
+        due_date_hash = { lock_at: Time.now, all_day: true }
         expect(presenter.formatted_date_string(:lock_at, due_date_hash)).to eq(
           datetime_string(Time.now)
         )
-        due_date_hash = { :unlock_at => Time.now, :all_day => true }
+        due_date_hash = { unlock_at: Time.now, all_day: true }
         expect(presenter.formatted_date_string(:unlock_at, due_date_hash)).to eq(
           datetime_string(Time.now)
         )
@@ -136,7 +136,7 @@ describe OverrideListPresenter do
 
   describe "#due_for" do
     it "returns the due date's title if it is present?" do
-      due_date = { :title => "default" }
+      due_date = { title: "default" }
       expect(presenter.due_for(due_date)).to eq 'default'
     end
 
@@ -204,10 +204,10 @@ describe OverrideListPresenter do
 
     def dates_visible_to_user
       [
-        { :due_at => "", :lock_at => nil, :unlock_at => nil, :set_type => 'CourseSection' },
-        { :due_at => Time.now + 1.day, :lock_at => nil, :unlock_at => nil, :set_type => 'CourseSection' },
-        { :due_at => Time.now + 2.days, :lock_at => nil, :unlock_at => nil, :set_type => 'CourseSection' },
-        { :due_at => Time.now - 2.days, :lock_at => nil, :unlock_at => nil, :base => true }
+        { due_at: "", lock_at: nil, unlock_at: nil, set_type: 'CourseSection' },
+        { due_at: Time.now + 1.day, lock_at: nil, unlock_at: nil, set_type: 'CourseSection' },
+        { due_at: Time.now + 2.days, lock_at: nil, unlock_at: nil, set_type: 'CourseSection' },
+        { due_at: Time.now - 2.days, lock_at: nil, unlock_at: nil, base: true }
       ]
     end
 

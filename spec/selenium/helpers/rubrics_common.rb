@@ -62,25 +62,25 @@ module RubricsCommon
     @assignment = create_assignment_with_points(points)
     @rubric = @course.rubrics.build
     rubric_params = {
-      :title => title,
-      :hide_score_total => false,
-      :criteria => {
+      title: title,
+      hide_score_total: false,
+      criteria: {
         "0" => {
-          :points => points,
-          :description => "no outcome row",
-          :long_description => 'non outcome criterion',
-          :ratings => {
+          points: points,
+          description: "no outcome row",
+          long_description: 'non outcome criterion',
+          ratings: {
             "0" => {
-              :points => points,
-              :description => "Amazing",
+              points: points,
+              description: "Amazing",
             },
             "1" => {
-              :points => points * 0.30,
-              :description => "Reduced Marks",
+              points: points * 0.30,
+              description: "Reduced Marks",
             },
             "2" => {
-              :points => 0,
-              :description => "No Marks",
+              points: 0,
+              description: "No Marks",
             }
           }
         }

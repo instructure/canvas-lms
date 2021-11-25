@@ -40,17 +40,17 @@ class DiscussionEntryParticipant < ActiveRecord::Base
   end
 
   def self.read_entry_ids(entry_ids, user)
-    where(:user_id => user, :discussion_entry_id => entry_ids, :workflow_state => 'read')
+    where(user_id: user, discussion_entry_id: entry_ids, workflow_state: 'read')
       .pluck(:discussion_entry_id)
   end
 
   def self.forced_read_state_entry_ids(entry_ids, user)
-    where(:user_id => user, :discussion_entry_id => entry_ids, :forced_read_state => true)
+    where(user_id: user, discussion_entry_id: entry_ids, forced_read_state: true)
       .pluck(:discussion_entry_id)
   end
 
   def self.entry_ratings(entry_ids, user)
-    ratings = where(:user_id => user, :discussion_entry_id => entry_ids).where.not(rating: nil)
+    ratings = where(user_id: user, discussion_entry_id: entry_ids).where.not(rating: nil)
     ratings.map { |x| [x.discussion_entry_id, x.rating] }.to_h
   end
 
@@ -189,7 +189,7 @@ class DiscussionEntryParticipant < ActiveRecord::Base
     state :read
   end
 
-  scope :read, -> { where(:workflow_state => 'read') }
+  scope :read, -> { where(workflow_state: 'read') }
   scope :existing_participants, lambda { |user, entry_id|
     select([:id, :discussion_entry_id])
       .where(user_id: user, discussion_entry_id: entry_id)

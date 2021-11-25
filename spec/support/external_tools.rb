@@ -33,9 +33,9 @@ module ExternalToolsSpecHelper
     )
     tool.url = overrides.fetch(:url, "http://www.example.com/basic_lti")
     tool.resource_selection = {
-      :url => "http://#{HostUrl.default_host}/selection_test",
-      :selection_width => 400,
-      :selection_height => 400
+      url: "http://#{HostUrl.default_host}/selection_test",
+      selection_width: 400,
+      selection_height: 400
     }
     tool.settings['post_only'] = true if overrides[:post_only]
     tool.save!

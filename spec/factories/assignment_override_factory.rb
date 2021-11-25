@@ -31,7 +31,7 @@ module Factories
   end
 
   def assignment_override_valid_attributes
-    { :title => "Some Title" }
+    { title: "Some Title" }
   end
 
   def create_section_override_for_assignment(assignment_or_quiz, opts = {})

@@ -67,7 +67,7 @@ describe AdheresToPolicy::Cache do
     it "writes a value to the key provided" do
       expect(Rails.cache).to receive(:write).with(:key, 'value', anything).and_return('value')
       AdheresToPolicy::Cache.write(:key, 'value')
-      expect(cached).to eq({ :key => 'value' })
+      expect(cached).to eq({ key: 'value' })
     end
 
     it 'must not write to the Rails cache when use_rails_cache is passed as false' do
@@ -109,7 +109,7 @@ describe AdheresToPolicy::Cache do
 
     it "clears only the key provided" do
       AdheresToPolicy::Cache.clear(:key1)
-      expect(cached).to eq({ :key2 => 'value2' })
+      expect(cached).to eq({ key2: 'value2' })
     end
   end
 end

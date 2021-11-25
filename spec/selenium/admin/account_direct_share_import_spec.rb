@@ -36,7 +36,7 @@ describe "direct share page" do
     @course_2 = @course
     @teacher_2 = @teacher
     @course_1.require_assignment_group
-    @assignment_1 = @course_1.assignments.create!(:title => 'Assignment First', :points_possible => 10)
+    @assignment_1 = @course_1.assignments.create!(title: 'Assignment First', points_possible: 10)
     assignment_model(course: @course_1, name: 'assignment to share')
 
     @export_1 = @course_1.content_exports.create!(workflow_state: 'exported', settings: { "selected_content" => { "assignments" => { CC::CCHelper.create_key(@assignment_1) => '1' } } })

@@ -28,8 +28,8 @@ describe "calendar2" do
     course_with_teacher(active_all: true, new_user: true)
     @student1 = User.create!(name: 'Student 1')
     @course.enroll_student(@student1).accept!
-    @student1.update!(preferences: { :selected_calendar_contexts => ["user_#{@student1.id}", "course_#{@course.id}"] })
-    @teacher.update!(preferences: { :selected_calendar_contexts => ["user_#{@teacher.id}", "course_#{@course.id}"] })
+    @student1.update!(preferences: { selected_calendar_contexts: ["user_#{@student1.id}", "course_#{@course.id}"] })
+    @teacher.update!(preferences: { selected_calendar_contexts: ["user_#{@teacher.id}", "course_#{@course.id}"] })
   end
 
   context "as the student" do
@@ -233,7 +233,7 @@ describe "calendar2" do
 
     before do
       # or some stuff we need to click is "below the fold"
-      @user.update!(preferences: { :selected_calendar_contexts => ["user_#{@user.id}", "course_#{@course1.id}", "course_#{@course2.id}"] })
+      @user.update!(preferences: { selected_calendar_contexts: ["user_#{@user.id}", "course_#{@course1.id}", "course_#{@course2.id}"] })
       user_session(@user)
     end
 

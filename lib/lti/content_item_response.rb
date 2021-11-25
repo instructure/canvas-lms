@@ -78,7 +78,7 @@ module Lti
       return unless @media_types.include? :files
 
       unless @file
-        @file = Attachment.where(:id => @media_types[:files].first).first
+        @file = Attachment.where(id: @media_types[:files].first).first
         if @context.is_a?(Account)
           raise ActiveRecord::RecordNotFound unless @file.context == @current_user
         elsif @file.context.is_a?(Course)
@@ -117,7 +117,7 @@ module Lti
     end
 
     def url
-      @url ||= @media_types.include?(:files) ? @controller.file_download_url(file, { :verifier => file.uuid, :download => '1', :download_frd => '1' }) : @controller.api_v1_course_content_exports_url(@context) + '?' + query_params.to_query
+      @url ||= @media_types.include?(:files) ? @controller.file_download_url(file, { verifier: file.uuid, download: '1', download_frd: '1' }) : @controller.api_v1_course_content_exports_url(@context) + '?' + query_params.to_query
     end
 
     def as_json(opts = {})
@@ -160,7 +160,7 @@ module Lti
                   @context.quizzes
                 end
 
-        return false if scope.where(:id => ids).count != ids.count
+        return false if scope.where(id: ids).count != ids.count
       end
       true
     end

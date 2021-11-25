@@ -20,8 +20,8 @@
 describe Quizzes::QuizQuestion::MultipleDropdownsQuestion do
   let(:question_data) do
     {
-      :id => "1",
-      :answers => [{ :id => 2, :blank_id => "test_group", :wieght => 100 }]
+      id: "1",
+      answers: [{ id: 2, blank_id: "test_group", wieght: 100 }]
     }
   end
 

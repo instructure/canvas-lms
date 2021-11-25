@@ -27,8 +27,8 @@ describe "API", type: :request do
       obj.extend Api::V1::Json
       course_with_teacher
       session = double
-      expect(@course).to receive(:as_json).with({ :include_root => false, :permissions => { :user => @user, :session => session, :include_permissions => false }, :only => [:name, :sis_source_id] })
-      obj.api_json(@course, @user, session, :only => [:name, :sis_source_id])
+      expect(@course).to receive(:as_json).with({ include_root: false, permissions: { user: @user, session: session, include_permissions: false }, only: [:name, :sis_source_id] })
+      obj.api_json(@course, @user, session, only: [:name, :sis_source_id])
     end
   end
 
@@ -36,7 +36,7 @@ describe "API", type: :request do
     it "skips attribute filtering if obj doesn't respond" do
       course_with_teacher
       expect(@course.respond_to?(:filter_attributes_for_user)).to be_truthy
-      expect(@course.as_json(:include_root => false, :permissions => { :user => @user }, :only => %w[name sis_source_id]).keys.sort).to eq %w[name permissions sis_source_id]
+      expect(@course.as_json(include_root: false, permissions: { user: @user }, only: %w[name sis_source_id]).keys.sort).to eq %w[name permissions sis_source_id]
     end
 
     it "does attribute filtering if obj responds" do
@@ -47,27 +47,27 @@ describe "API", type: :request do
         expect(session).to be_nil
         hash.delete('sis_source_id')
       end
-      expect(@course.as_json(:include_root => false, :permissions => { :user => @user }, :only => %w[name sis_source_id]).keys.sort).to eq %w[name permissions]
+      expect(@course.as_json(include_root: false, permissions: { user: @user }, only: %w[name sis_source_id]).keys.sort).to eq %w[name permissions]
     end
 
     it "does not return the permissions list if include_permissions is false" do
       course_with_teacher
-      expect(@course.as_json(:include_root => false, :permissions => { :user => @user, :include_permissions => false }, :only => %w[name sis_source_id]).keys.sort).to eq %w[name sis_source_id]
+      expect(@course.as_json(include_root: false, permissions: { user: @user, include_permissions: false }, only: %w[name sis_source_id]).keys.sort).to eq %w[name sis_source_id]
     end
 
     it "serializes permissions if obj responds" do
       course_with_teacher
       expect(@course).to receive(:serialize_permissions).once.with(anything, @teacher, nil)
-      json = @course.as_json(:include_root => false, :permissions => { :user => @user, :session => nil, :include_permissions => true, :policies => ["update"] }, :only => %w[name])
+      json = @course.as_json(include_root: false, permissions: { user: @user, session: nil, include_permissions: true, policies: ["update"] }, only: %w[name])
       expect(json.keys.sort).to eq %w[name permissions]
     end
   end
 
   describe "json post format" do
     before :once do
-      course_with_teacher(:user => user_with_pseudonym, :active_all => true)
+      course_with_teacher(user: user_with_pseudonym, active_all: true)
       enable_default_developer_key!
-      @token = @user.access_tokens.create!(:purpose => "specs")
+      @token = @user.access_tokens.create!(purpose: "specs")
     end
 
     it "uses html form encoding by default" do
@@ -94,12 +94,12 @@ describe "API", type: :request do
     end
 
     it "uses array params without the [] on the key" do
-      assignment_model(:course => @course, :submission_types => 'online_upload')
+      assignment_model(course: @course, submission_types: 'online_upload')
       @user = user_with_pseudonym
-      course_with_student(:course => @course, :user => @user, :active_all => true)
-      @token = @user.access_tokens.create!(:purpose => "specs")
-      a1 = attachment_model(:context => @user)
-      a2 = attachment_model(:context => @user)
+      course_with_student(course: @course, user: @user, active_all: true)
+      @token = @user.access_tokens.create!(purpose: "specs")
+      a1 = attachment_model(context: @user)
+      a2 = attachment_model(context: @user)
       json_request = { "comment" => {
         "text_comment" => "yay"
       },
@@ -113,8 +113,8 @@ describe "API", type: :request do
       expect(response.header[content_type_key]).to eq 'application/json; charset=utf-8'
 
       @submission = @assignment.submissions.where(user_id: @user).first
-      sub_a1 = Attachment.where(:root_attachment_id => a1).first
-      sub_a2 = Attachment.where(:root_attachment_id => a2).first
+      sub_a1 = Attachment.where(root_attachment_id: a1).first
+      sub_a2 = Attachment.where(root_attachment_id: a2).first
       expect(@submission.attachments.map(&:id).sort).to eq [sub_a1.id, sub_a2.id]
       expect(@submission.submission_comments.first.comment).to eq "yay"
     end

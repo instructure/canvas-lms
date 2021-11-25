@@ -24,7 +24,7 @@ describe AccountsController do
   context "SAML meta data" do
     before do
       skip("requires SAML extension") unless AuthenticationProvider::SAML.enabled?
-      @account = Account.create!(:name => "test")
+      @account = Account.create!(name: "test")
     end
 
     it 'renders for non SAML configured accounts' do
@@ -35,7 +35,7 @@ describe AccountsController do
 
     it "uses the correct entity_id" do
       allow(HostUrl).to receive(:default_host).and_return('bob.cody.instructure.com')
-      @aac = @account.authentication_providers.create!(:auth_type => "saml")
+      @aac = @account.authentication_providers.create!(auth_type: "saml")
 
       get "/saml2"
       expect(response).to be_successful

@@ -68,7 +68,7 @@ module Importers
         end
 
         unless outcome
-          migration.add_warning(t(:no_context_found, %(The external Learning Outcome couldn't be found for "%{title}", creating a copy.), :title => hash[:title]))
+          migration.add_warning(t(:no_context_found, %(The external Learning Outcome couldn't be found for "%{title}", creating a copy.), title: hash[:title]))
           migration.copied_external_outcome_map[hash[:external_identifier]] = hash[:migration_id]
         end
       end
@@ -96,7 +96,7 @@ module Importers
             item ||= LearningOutcome.global.where(vendor_guid: hash[:vendor_guid]).first if hash[:vendor_guid]
             item ||= LearningOutcome.new
           else
-            migration.add_warning(t(:no_global_permission, %(You're not allowed to manage global outcomes, can't add "%{title}"), :title => hash[:title]))
+            migration.add_warning(t(:no_global_permission, %(You're not allowed to manage global outcomes, can't add "%{title}"), title: hash[:title]))
             return
           end
         else
@@ -123,7 +123,7 @@ module Importers
 
         if hash[:ratings]
           unless assessed
-            item.data = { :rubric_criterion => {} }
+            item.data = { rubric_criterion: {} }
             item.data[:rubric_criterion][:ratings] = hash[:ratings] ? hash[:ratings].map(&:symbolize_keys) : []
             item.data[:rubric_criterion][:mastery_points] = hash[:mastery_points]
             item.data[:rubric_criterion][:points_possible] = hash[:points_possible]

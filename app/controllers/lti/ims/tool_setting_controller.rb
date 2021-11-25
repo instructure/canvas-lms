@@ -28,8 +28,8 @@ module Lti
 
       rescue_from ActiveRecord::RecordNotFound do
         render json: {
-          :status => I18n.t('lib.auth.api.not_found_status', 'not_found'),
-          :errors => [{ :message => I18n.t('lib.auth.api.not_found_message', "not_found") }]
+          status: I18n.t('lib.auth.api.not_found_status', 'not_found'),
+          errors: [{ message: I18n.t('lib.auth.api.not_found_message', "not_found") }]
         }, status: :not_found
       end
 
@@ -207,11 +207,11 @@ module Lti
       end
 
       def render_bad_request
-        render :json => {
-          :status => I18n.t('lib.auth.api.bad_request_status', 'bad_request'),
-          :errors => [{ :message => I18n.t('lib.auth.api.bad_request_message', "bad_request") }]
+        render json: {
+          status: I18n.t('lib.auth.api.bad_request_status', 'bad_request'),
+          errors: [{ message: I18n.t('lib.auth.api.bad_request_message', "bad_request") }]
         },
-               :status => :bad_request
+               status: :bad_request
       end
     end
   end

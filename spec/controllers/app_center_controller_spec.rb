@@ -22,8 +22,8 @@ describe AppCenterController do
   describe "#map_tools_to_apps!" do
     it "maps tools" do
       course_model
-      tool1 = @course.account.context_external_tools.create(:tool_id => 'tool1', :name => "bob", :consumer_key => "bob", :shared_secret => "bob", :domain => "google.com")
-      tool2 = @course.context_external_tools.create(:tool_id => 'tool2', :name => "bob", :consumer_key => "bob", :shared_secret => "bob", :domain => "google.com")
+      tool1 = @course.account.context_external_tools.create(tool_id: 'tool1', name: "bob", consumer_key: "bob", shared_secret: "bob", domain: "google.com")
+      tool2 = @course.context_external_tools.create(tool_id: 'tool2', name: "bob", consumer_key: "bob", shared_secret: "bob", domain: "google.com")
       apps = [
         { 'short_name' => tool1.tool_id },
         { 'short_name' => tool2.tool_id },

@@ -151,7 +151,7 @@ class Quizzes::TakeQuizPresenter
   end
 
   def question_path(id)
-    ps = { :course_id => quiz.context.id, :quiz_id => quiz.id, :question_id => id }
+    ps = { course_id: quiz.context.id, quiz_id: quiz.id, question_id: id }
     ps[:preview] = true if params[:preview]
     course_quiz_question_path(ps)
   end
@@ -171,7 +171,7 @@ class Quizzes::TakeQuizPresenter
   def next_question_form_action(session, user)
     record_answer_course_quiz_quiz_submission_path(
       quiz.context, quiz, submission, form_action_params(session, user).merge({
-                                                                                :next_question_path => next_question_path
+                                                                                next_question_path: next_question_path
                                                                               })
     )
   end
@@ -179,7 +179,7 @@ class Quizzes::TakeQuizPresenter
   def previous_question_form_action(session, user)
     record_answer_course_quiz_quiz_submission_path(
       quiz.context, quiz, submission, form_action_params(session, user).merge({
-                                                                                :next_question_path => previous_question_path
+                                                                                next_question_path: previous_question_path
                                                                               })
     )
   end
@@ -195,7 +195,7 @@ class Quizzes::TakeQuizPresenter
   end
 
   def form_action_params(session, user)
-    url_params = { :user_id => user&.id }
+    url_params = { user_id: user&.id }
     if session['lockdown_browser_popup']
       url_params.merge!(Canvas::LockdownBrowser.plugin.base.quiz_exit_params)
     end

@@ -73,7 +73,7 @@ describe Lti::ContentItemResponse do
     end
 
     it 'returns canvas if more than one canvas media is passed in' do
-      topic = context.discussion_topics.create!(:title => "blah")
+      topic = context.discussion_topics.create!(title: "blah")
       content_item_response = subject({ assignments: [assign1.id, assign2.id], discussion_topics: [topic.id] })
       expect(content_item_response.media_type).to eq 'course'
     end
@@ -82,7 +82,7 @@ describe Lti::ContentItemResponse do
       it 'sets the media_type to "assignment"' do
         context_module = context.context_modules.create!(name: 'a module')
         assignment = context.assignments.create!(name: 'an assignment')
-        tag = context_module.add_item(:id => assignment.id, :type => 'assignment')
+        tag = context_module.add_item(id: assignment.id, type: 'assignment')
         content_item_response = subject({ module_items: [tag.id] })
         expect(content_item_response.media_type).to eq 'assignment'
       end
@@ -90,7 +90,7 @@ describe Lti::ContentItemResponse do
       it 'sets the media_type to "quiz"' do
         context_module = context.context_modules.create!(name: 'a module')
         quiz = context.quizzes.create!(title: 'a quiz')
-        tag = context_module.add_item(:id => quiz.id, :type => 'quiz')
+        tag = context_module.add_item(id: quiz.id, type: 'quiz')
         content_item_response = subject({ module_items: [tag.id] })
         expect(content_item_response.media_type).to eq 'quiz'
       end
@@ -98,15 +98,15 @@ describe Lti::ContentItemResponse do
       it 'sets the media_type to "page"' do
         context_module = context.context_modules.create!(name: 'a module')
         page = context.wiki_pages.create!(title: 'a page')
-        tag = context_module.add_item(:id => page.id, :type => 'page')
+        tag = context_module.add_item(id: page.id, type: 'page')
         content_item_response = subject({ module_items: [tag.id] })
         expect(content_item_response.media_type).to eq 'page'
       end
 
       it 'sets the media_type to "discussion_topic"' do
         context_module = context.context_modules.create!(name: 'a module')
-        topic = context.discussion_topics.create!(:title => "blah")
-        tag = context_module.add_item(:id => topic.id, :type => 'discussion_topic')
+        topic = context.discussion_topics.create!(title: "blah")
+        tag = context_module.add_item(id: topic.id, type: 'discussion_topic')
         content_item_response = subject({ module_items: [tag.id] })
         expect(content_item_response.media_type).to eq 'discussion_topic'
       end
@@ -117,7 +117,7 @@ describe Lti::ContentItemResponse do
     it 'returns back a tag' do
       context_module = context.context_modules.create!(name: 'a module')
       assignment = context.assignments.create!(name: 'an assignment')
-      tag = context_module.add_item(:id => assignment.id, :type => 'assignment')
+      tag = context_module.add_item(id: assignment.id, type: 'assignment')
       content_item_response = subject({ module_items: [tag.id] })
       expect(content_item_response.tag).to eq tag
     end
@@ -145,7 +145,7 @@ describe Lti::ContentItemResponse do
     end
 
     it 'gets the title for a discussion_topic' do
-      topic = context.discussion_topics.create!(:title => "blah")
+      topic = context.discussion_topics.create!(title: "blah")
       content_item_response = subject({ discussion_topics: [topic.id] })
       expect(content_item_response.title).to eq 'blah'
     end
@@ -164,8 +164,8 @@ describe Lti::ContentItemResponse do
 
     it 'gets the title for a module_item' do
       context_module = context.context_modules.create!(name: 'a module')
-      topic = context.discussion_topics.create!(:title => "blah")
-      tag = context_module.add_item(:id => topic.id, :type => 'discussion_topic')
+      topic = context.discussion_topics.create!(title: "blah")
+      tag = context_module.add_item(id: topic.id, type: 'discussion_topic')
       content_item_response = subject({ module_items: [tag.id] })
       expect(content_item_response.title).to eq 'blah'
     end

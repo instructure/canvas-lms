@@ -23,7 +23,7 @@ require_relative '../../../file_upload_helper'
 
 describe QuizzesNext::QuizzesApiController, type: :request do
   describe "GET /courses/:course_id/all_quizzes (index)" do
-    let(:quizzes) { (0..3).map { |i| @course.quizzes.create! :title => "quiz_#{i}" } }
+    let(:quizzes) { (0..3).map { |i| @course.quizzes.create! title: "quiz_#{i}" } }
     let(:assignments) do
       (0..2).map do |i|
         @course.assignments.create! title: "assignment_#{i}", workflow_state: 'unpublished'
@@ -40,15 +40,15 @@ describe QuizzesNext::QuizzesApiController, type: :request do
 
     let(:tool) do
       @course.context_external_tools.create!(
-        :name => 'Quizzes.Next',
-        :consumer_key => 'test_key',
-        :shared_secret => 'test_secret',
-        :tool_id => 'Quizzes 2',
-        :url => 'http://example.com/launch'
+        name: 'Quizzes.Next',
+        consumer_key: 'test_key',
+        shared_secret: 'test_secret',
+        tool_id: 'Quizzes 2',
+        url: 'http://example.com/launch'
       )
     end
 
-    before(:once) { teacher_in_course(:active_all => true) }
+    before(:once) { teacher_in_course(active_all: true) }
 
     before do
       quizzes
@@ -81,13 +81,13 @@ describe QuizzesNext::QuizzesApiController, type: :request do
 
       describe 'search_term query param' do
         let(:search_term) { 'waldo' }
-        let(:quizzes_with_search_term) { (0..2).map { |i| @course.quizzes.create! :title => "#{search_term}_#{i}" } }
+        let(:quizzes_with_search_term) { (0..2).map { |i| @course.quizzes.create! title: "#{search_term}_#{i}" } }
         let(:assignments_with_search_term) do
           (3..5).map do |i|
-            @course.assignments.create! :title => "#{search_term}_#{i}"
+            @course.assignments.create! title: "#{search_term}_#{i}"
           end
         end
-        let(:quizzes_without_search_term) { (0..2).map { |i| @course.quizzes.create! :title => "quiz_#{i}" } }
+        let(:quizzes_without_search_term) { (0..2).map { |i| @course.quizzes.create! title: "quiz_#{i}" } }
         let(:quizzes) { quizzes_with_search_term + quizzes_without_search_term + assignments_with_search_term }
 
         before do
@@ -118,10 +118,10 @@ describe QuizzesNext::QuizzesApiController, type: :request do
 
       context 'quizzes with the same title' do
         let(:quiz_count) { 10 }
-        let(:quizzes) { (0..quiz_count).map { @course.quizzes.create! :title => "the same title" } }
+        let(:quizzes) { (0..quiz_count).map { @course.quizzes.create! title: "the same title" } }
         let(:assignments) do
           (0..quiz_count).map do
-            @course.assignments.create! :title => "the same title"
+            @course.assignments.create! title: "the same title"
           end
         end
 
@@ -193,11 +193,11 @@ describe QuizzesNext::QuizzesApiController, type: :request do
     end
 
     context 'as a student' do
-      before(:once) { student_in_course(:active_all => true) }
+      before(:once) { student_in_course(active_all: true) }
 
       context 'quiz tab is disabled' do
         before do
-          @course.tab_configuration = [{ :id => Course::TAB_QUIZZES, :hidden => true }]
+          @course.tab_configuration = [{ id: Course::TAB_QUIZZES, hidden: true }]
           @course.save!
         end
 

@@ -24,9 +24,9 @@ describe 'appointment_group_deleted' do
   include MessagesCommon
 
   before :once do
-    course_with_student(:active_all => true)
-    @cat = @course.group_categories.create(:name => 'teh category')
-    appointment_group_model(:contexts => [@course], :sub_context => @cat)
+    course_with_student(active_all: true)
+    @cat = @course.group_categories.create(name: 'teh category')
+    appointment_group_model(contexts: [@course], sub_context: @cat)
   end
 
   let(:notification_name) { :appointment_group_updated }

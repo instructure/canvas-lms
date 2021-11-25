@@ -30,7 +30,7 @@ describe "/quizzes/quizzes/show" do
   end
 
   it "renders a notice instead of grades when grades have not been posted" do
-    course_with_student(:active_all => true)
+    course_with_student(active_all: true)
     quiz = @course.quizzes.create
     quiz.workflow_state = "available"
     quiz.save!
@@ -52,7 +52,7 @@ describe "/quizzes/quizzes/show" do
   end
 
   it "doesn't warn students if quiz is published" do
-    course_with_student(:active_all => true)
+    course_with_student(active_all: true)
     quiz = @course.quizzes.build
     quiz.publish!
     assign(:quiz, quiz)
@@ -62,7 +62,7 @@ describe "/quizzes/quizzes/show" do
   end
 
   it "shows header bar and publish button" do
-    course_with_teacher(:active_all => true)
+    course_with_teacher(active_all: true)
     assign(:quiz, @course.quizzes.create!)
 
     view_context
@@ -73,7 +73,7 @@ describe "/quizzes/quizzes/show" do
   end
 
   it "shows unpublished quiz changes to instructors" do
-    course_with_teacher(:active_all => true)
+    course_with_teacher(active_all: true)
     @quiz = @course.quizzes.create!
     @quiz.workflow_state = "available"
     @quiz.save!

@@ -23,7 +23,7 @@
 #
 class DisablePostToSisApiController < ApplicationController
   before_action :require_authorized_user
-  before_action :require_valid_grading_period, :if => :grading_period_exists?
+  before_action :require_valid_grading_period, if: :grading_period_exists?
 
   # @API Disable assignments currently enabled for grade export to SIS
   #

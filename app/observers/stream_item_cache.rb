@@ -58,7 +58,7 @@ class StreamItemCache < ActiveRecord::Observer
   def self.context_stream_item_key(context_type, context_id)
     return unless context_type
 
-    Rails.cache.fetch(["context_stream_item_key", context_type, context_id].cache_key, :use_new_rails => false) do
+    Rails.cache.fetch(["context_stream_item_key", context_type, context_id].cache_key, use_new_rails: false) do
       "#{context_type.underscore}_#{context_id}-#{Time.now.to_i}"
     end
   end

@@ -58,7 +58,7 @@ module SIS
 
           case status
           when /active/i
-            term.set_overrides(@root_account, { date_override_enrollment_type => { :start_at => start_date, :end_at => end_date } })
+            term.set_overrides(@root_account, { date_override_enrollment_type => { start_at: start_date, end_at: end_date } })
           when /deleted/i
             term.enrollment_dates_overrides.where(enrollment_type: date_override_enrollment_type).destroy_all
           end

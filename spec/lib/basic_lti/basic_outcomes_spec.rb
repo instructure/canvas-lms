@@ -29,9 +29,9 @@ describe BasicLTI::BasicOutcomes do
   before do
     course_model.offer
     @root_account = @course.root_account
-    @account = account_model(:root_account => @root_account, :parent_account => @root_account)
+    @account = account_model(root_account: @root_account, parent_account: @root_account)
     @course.update_attribute(:account, @account)
-    @user = factory_with_protected_attributes(User, :name => "some user", :workflow_state => "registered")
+    @user = factory_with_protected_attributes(User, name: "some user", workflow_state: "registered")
     @course.enroll_student(@user)
   end
 
@@ -40,7 +40,7 @@ describe BasicLTI::BasicOutcomes do
   end
 
   let(:tool) do
-    @course.context_external_tools.create(:name => "a", :url => "http://google.com", :consumer_key => '12345', :shared_secret => 'secret')
+    @course.context_external_tools.create(name: "a", url: "http://google.com", consumer_key: '12345', shared_secret: 'secret')
   end
 
   let(:assignment) do
@@ -141,7 +141,7 @@ describe BasicLTI::BasicOutcomes do
 
     it "throws 'Tool is invalid' if the tool doesn't match" do
       t = @course.context_external_tools
-                 .create(:name => "b", :url => "http://google.com", :consumer_key => '12345', :shared_secret => 'secret')
+                 .create(name: "b", url: "http://google.com", consumer_key: '12345', shared_secret: 'secret')
       expect { described_class.decode_source_id(tool, gen_source_id(t: t)) }
         .to raise_error(BasicLTI::Errors::InvalidSourceId, 'Tool is invalid')
     end

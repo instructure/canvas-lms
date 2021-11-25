@@ -39,19 +39,19 @@ describe AccountsController do
     before { user_session(@admin) }
 
     it "confirms deletion of canvas-authenticated users" do
-      user_with_pseudonym :account => @account
-      get 'confirm_delete_user', params: { :account_id => @account.id, :user_id => @user.id }
+      user_with_pseudonym account: @account
+      get 'confirm_delete_user', params: { account_id: @account.id, user_id: @user.id }
       expect(response).to be_successful
     end
 
     it "does not confirm deletion of non-existent users" do
-      get 'confirm_delete_user', params: { :account_id => @account.id, :user_id => (User.all.map(&:id).max + 1) }
+      get 'confirm_delete_user', params: { account_id: @account.id, user_id: (User.all.map(&:id).max + 1) }
       expect(response).to be_not_found
     end
 
     it "confirms deletion of managed password users" do
-      user_with_managed_pseudonym :account => @account
-      get 'confirm_delete_user', params: { :account_id => @account.id, :user_id => @user.id }
+      user_with_managed_pseudonym account: @account
+      get 'confirm_delete_user', params: { account_id: @account.id, user_id: @user.id }
       expect(response).to be_successful
     end
   end
@@ -62,38 +62,38 @@ describe AccountsController do
     before { user_session(@admin) }
 
     it "removes user from the account" do
-      user_with_pseudonym :account => @account
-      post 'remove_user', params: { :account_id => @account.id, :user_id => @user.id }
+      user_with_pseudonym account: @account
+      post 'remove_user', params: { account_id: @account.id, user_id: @user.id }
       expect(flash[:notice]).to match(/successfully deleted/)
       expect(response).to redirect_to(account_users_url(@account))
       expect(@user.associated_accounts.map(&:id)).not_to include(@account.id)
     end
 
     it "404s for non-existent users as html" do
-      post 'remove_user', params: { :account_id => @account.id, :user_id => (User.all.map(&:id).max + 1) }
+      post 'remove_user', params: { account_id: @account.id, user_id: (User.all.map(&:id).max + 1) }
       expect(flash[:notice]).to be_nil
       expect(response).to be_not_found
     end
 
     it "404s for non-existent users as json" do
-      post 'remove_user', params: { :account_id => @account.id, :user_id => (User.all.map(&:id).max + 1) }, :format => "json"
+      post 'remove_user', params: { account_id: @account.id, user_id: (User.all.map(&:id).max + 1) }, format: "json"
       expect(flash[:notice]).to be_nil
       expect(response).to be_not_found
     end
 
     it "only removes user from the account, but not delete them" do
-      user_with_pseudonym :account => @account
+      user_with_pseudonym account: @account
       workflow_state_was = @user.workflow_state
-      post 'remove_user', params: { :account_id => @account.id, :user_id => @user.id }
+      post 'remove_user', params: { account_id: @account.id, user_id: @user.id }
       expect(@user.reload.workflow_state).to eql workflow_state_was
     end
 
     it "only removes users from the specified account" do
       @other_account = account_model
       account_with_admin_logged_in
-      user_with_pseudonym :account => @account, :username => "nobody@example.com"
-      pseudonym @user, :account => @other_account, :username => "nobody2@example.com"
-      post 'remove_user', params: { :account_id => @account.id, :user_id => @user.id }
+      user_with_pseudonym account: @account, username: "nobody@example.com"
+      pseudonym @user, account: @other_account, username: "nobody2@example.com"
+      post 'remove_user', params: { account_id: @account.id, user_id: @user.id }
       expect(flash[:notice]).to match(/successfully deleted/)
       expect(response).to redirect_to(account_users_url(@account))
       expect(@user.associated_accounts.map(&:id)).not_to include(@account.id)
@@ -101,23 +101,23 @@ describe AccountsController do
     end
 
     it "deletes the user's CCs when removed from their last account" do
-      user_with_pseudonym :account => @account
-      post 'remove_user', params: { :account_id => @account.id, :user_id => @user.id }
+      user_with_pseudonym account: @account
+      post 'remove_user', params: { account_id: @account.id, user_id: @user.id }
       expect(@user.communication_channels.unretired).to be_empty
     end
 
     it "does not delete the user's CCs when other accounts remain" do
       @other_account = account_model
       account_with_admin_logged_in
-      user_with_pseudonym :account => @account, :username => "nobody@example.com"
-      pseudonym @user, :account => @other_account, :username => "nobody2@example.com"
-      post 'remove_user', params: { :account_id => @account.id, :user_id => @user.id }
+      user_with_pseudonym account: @account, username: "nobody@example.com"
+      pseudonym @user, account: @other_account, username: "nobody2@example.com"
+      post 'remove_user', params: { account_id: @account.id, user_id: @user.id }
       expect(@user.communication_channels.unretired).not_to be_empty
     end
 
     it "removes users with managed passwords with html" do
-      user_with_managed_pseudonym :account => @account
-      post 'remove_user', params: { :account_id => @account.id, :user_id => @user.id }
+      user_with_managed_pseudonym account: @account
+      post 'remove_user', params: { account_id: @account.id, user_id: @user.id }
       expect(flash[:notice]).to match(/successfully deleted/)
       expect(response).to redirect_to(account_users_url(@account))
       expect(@user.associated_accounts.map(&:id)).not_to include(@account.id)
@@ -125,8 +125,8 @@ describe AccountsController do
 
     it "removes users with managed passwords with json" do
       Timecop.freeze do
-        user_with_managed_pseudonym :account => @account, :name => "John Doe"
-        post 'remove_user', params: { :account_id => @account.id, :user_id => @user.id }, :format => "json"
+        user_with_managed_pseudonym account: @account, name: "John Doe"
+        post 'remove_user', params: { account_id: @account.id, user_id: @user.id }, format: "json"
         expect(flash[:notice]).to match(/successfully deleted/)
         expect(json_parse(response.body)).to eq json_parse(@user.reload.to_json)
         expect(@user.associated_accounts.map(&:id)).to_not include(@account.id)
@@ -193,7 +193,7 @@ describe AccountsController do
     before { user_session(@admin) }
 
     it "allows adding a new account admin" do
-      post 'add_account_user', params: { :account_id => @account.id, :role_id => admin_role.id, :user_list => 'testadmin@example.com' }
+      post 'add_account_user', params: { account_id: @account.id, role_id: admin_role.id, user_list: 'testadmin@example.com' }
       expect(response).to be_successful
 
       new_admin = CommunicationChannel.where(path: 'testadmin@example.com').first.user
@@ -203,8 +203,8 @@ describe AccountsController do
     end
 
     it "allows adding a new custom account admin" do
-      role = custom_account_role('custom', :account => @account)
-      post 'add_account_user', params: { :account_id => @account.id, :role_id => role.id, :user_list => 'testadmin@example.com' }
+      role = custom_account_role('custom', account: @account)
+      post 'add_account_user', params: { account_id: @account.id, role_id: role.id, user_list: 'testadmin@example.com' }
       expect(response).to be_successful
 
       new_admin = CommunicationChannel.find_by(path: 'testadmin@example.com').user
@@ -216,8 +216,8 @@ describe AccountsController do
 
     it "allows adding an existing user to a sub account" do
       @subaccount = @account.sub_accounts.create!
-      @munda = user_with_pseudonym(:account => @account, :active_all => 1, :username => 'munda@instructure.com')
-      post 'add_account_user', params: { :account_id => @subaccount.id, :role_id => admin_role.id, :user_list => 'munda@instructure.com' }
+      @munda = user_with_pseudonym(account: @account, active_all: 1, username: 'munda@instructure.com')
+      post 'add_account_user', params: { account_id: @subaccount.id, role_id: admin_role.id, user_list: 'munda@instructure.com' }
       expect(response).to be_successful
       expect(@subaccount.account_users.map(&:user)).to eq [@munda]
     end
@@ -240,7 +240,7 @@ describe AccountsController do
       user_to_remove = account_admin_user(account: a1)
       au_id = user_to_remove.account_users.first.id
       account_with_admin_logged_in(account: a2)
-      post 'remove_account_user', params: { :account_id => a2.id, :id => au_id }
+      post 'remove_account_user', params: { account_id: a2.id, id: au_id }
       expect(response).to be_not_found
       expect(AccountUser.where(id: au_id).first).not_to be_nil
     end
@@ -264,11 +264,11 @@ describe AccountsController do
     it "updates account with sis_assignment_name_length_input with value less than 255" do
       account_with_admin_logged_in
       @account = @account.sub_accounts.create!
-      post 'update', params: { :id => @account.id,
-                               :account => {
-                                 :settings => {
-                                   :sis_assignment_name_length_input => {
-                                     :value => 5
+      post 'update', params: { id: @account.id,
+                               account: {
+                                 settings: {
+                                   sis_assignment_name_length_input: {
+                                     value: 5
                                    }
                                  }
                                } }
@@ -279,11 +279,11 @@ describe AccountsController do
     it "updates account with sis_assignment_name_length_input with 255 if none is given" do
       account_with_admin_logged_in
       @account = @account.sub_accounts.create!
-      post 'update', params: { :id => @account.id,
-                               :account => {
-                                 :settings => {
-                                   :sis_assignment_name_length_input => {
-                                     :value => nil
+      post 'update', params: { id: @account.id,
+                               account: {
+                                 settings: {
+                                   sis_assignment_name_length_input: {
+                                     value: nil
                                    }
                                  }
                                } }
@@ -294,14 +294,14 @@ describe AccountsController do
     it "allows admins to set the sis_source_id on sub accounts" do
       account_with_admin_logged_in
       @account = @account.sub_accounts.create!
-      post 'update', params: { :id => @account.id, :account => { :sis_source_id => 'abc' } }
+      post 'update', params: { id: @account.id, account: { sis_source_id: 'abc' } }
       @account.reload
       expect(@account.sis_source_id).to eq 'abc'
     end
 
     it "does not allow setting the sis_source_id on root accounts" do
       account_with_admin_logged_in
-      post 'update', params: { :id => @account.id, :account => { :sis_source_id => 'abc' } }
+      post 'update', params: { id: @account.id, account: { sis_source_id: 'abc' } }
       @account.reload
       expect(@account.sis_source_id).to be_nil
     end
@@ -309,8 +309,8 @@ describe AccountsController do
     it "does not allow admins to set the trusted_referers on sub accounts" do
       account_with_admin_logged_in
       @account = @account.sub_accounts.create!
-      post 'update', params: { :id => @account.id, :account => { :settings => {
-        :trusted_referers => 'http://example.com'
+      post 'update', params: { id: @account.id, account: { settings: {
+        trusted_referers: 'http://example.com'
       } } }
       @account.reload
       expect(@account.settings[:trusted_referers]).to be_nil
@@ -318,8 +318,8 @@ describe AccountsController do
 
     it "allows admins to set the trusted_referers on root accounts" do
       account_with_admin_logged_in
-      post 'update', params: { :id => @account.id, :account => { :settings => {
-        :trusted_referers => 'http://example.com'
+      post 'update', params: { id: @account.id, account: { settings: {
+        trusted_referers: 'http://example.com'
       } } }
       @account.reload
       expect(@account.settings[:trusted_referers]).to eq 'http://example.com'
@@ -327,13 +327,13 @@ describe AccountsController do
 
     it "does not allow non-site-admins to update certain settings" do
       account_with_admin_logged_in
-      post 'update', params: { :id => @account.id, :account => { :settings => {
-        :global_includes => true,
-        :enable_profiles => true,
-        :enable_turnitin => true,
-        :admins_can_change_passwords => true,
-        :admins_can_view_notifications => true,
-        :limit_parent_app_web_access => true,
+      post 'update', params: { id: @account.id, account: { settings: {
+        global_includes: true,
+        enable_profiles: true,
+        enable_turnitin: true,
+        admins_can_change_passwords: true,
+        admins_can_view_notifications: true,
+        limit_parent_app_web_access: true,
       } } }
       @account.reload
       expect(@account.global_includes?).to be_falsey
@@ -349,13 +349,13 @@ describe AccountsController do
       user_session(@user)
       @account = Account.create!
       Account.site_admin.account_users.create!(user: @user)
-      post 'update', params: { :id => @account.id, :account => { :settings => {
-        :global_includes => true,
-        :enable_profiles => true,
-        :enable_turnitin => true,
-        :admins_can_change_passwords => true,
-        :admins_can_view_notifications => true,
-        :limit_parent_app_web_access => true,
+      post 'update', params: { id: @account.id, account: { settings: {
+        global_includes: true,
+        enable_profiles: true,
+        enable_turnitin: true,
+        admins_can_change_passwords: true,
+        admins_can_view_notifications: true,
+        limit_parent_app_web_access: true,
       } } }
       @account.reload
       expect(@account.global_includes?).to be_truthy
@@ -371,8 +371,8 @@ describe AccountsController do
       user_session(@user)
       @account = Account.create!
       Account.site_admin.account_users.create!(user: @user)
-      post 'update', params: { :id => @account.id, :account => { :settings => {
-        :product_name => 'blah'
+      post 'update', params: { id: @account.id, account: { settings: {
+        product_name: 'blah'
       } } }
       @account.reload
       expect(@account.settings[:product_name]).to be_nil
@@ -381,14 +381,14 @@ describe AccountsController do
     it "doesn't break I18n by setting the help_link_name unnecessarily" do
       account_with_admin_logged_in
 
-      post 'update', params: { :id => @account.id, :account => { :settings => {
-        :help_link_name => 'Help'
+      post 'update', params: { id: @account.id, account: { settings: {
+        help_link_name: 'Help'
       } } }
       @account.reload
       expect(@account.settings[:help_link_name]).to be_nil
 
-      post 'update', params: { :id => @account.id, :account => { :settings => {
-        :help_link_name => 'Halp'
+      post 'update', params: { id: @account.id, account: { settings: {
+        help_link_name: 'Halp'
       } } }
       @account.reload
       expect(@account.settings[:help_link_name]).to eq 'Halp'
@@ -397,19 +397,19 @@ describe AccountsController do
     it "doesn't break I18n by setting customized text for default help links unnecessarily" do
       Setting.set('show_feedback_link', 'true')
       account_with_admin_logged_in
-      post 'update', params: { :id => @account.id, :account => { :custom_help_links => { '0' =>
-        { :id => 'instructor_question', :text => 'Ask Your Instructor a Question',
-          :subtext => 'Questions are submitted to your instructor', :type => 'default',
-          :url => '#teacher_feedback', :available_to => ['student'] } } } }
+      post 'update', params: { id: @account.id, account: { custom_help_links: { '0' =>
+        { id: 'instructor_question', text: 'Ask Your Instructor a Question',
+          subtext: 'Questions are submitted to your instructor', type: 'default',
+          url: '#teacher_feedback', available_to: ['student'] } } } }
       @account.reload
       link = @account.settings[:custom_help_links].detect { |l| l['id'] == 'instructor_question' }
       expect(link).not_to have_key('text')
       expect(link).not_to have_key('subtext')
       expect(link).not_to have_key('url')
 
-      post 'update', params: { :id => @account.id, :account => { :custom_help_links => { '0' =>
-        { :id => 'instructor_question', :text => 'yo', :subtext => 'wiggity', :type => 'default',
-          :url => '#dawg', :available_to => ['student'] } } } }
+      post 'update', params: { id: @account.id, account: { custom_help_links: { '0' =>
+        { id: 'instructor_question', text: 'yo', subtext: 'wiggity', type: 'default',
+          url: '#dawg', available_to: ['student'] } } } }
       @account.reload
       link = @account.settings[:custom_help_links].detect { |l| l['id'] == 'instructor_question' }
       expect(link['text']).to eq 'yo'
@@ -419,11 +419,11 @@ describe AccountsController do
 
     it "doesn't allow invalid help links" do
       account_with_admin_logged_in
-      post 'update', params: { :id => @account.id, :account => { :custom_help_links => { '0' =>
-        { :id => 'instructor_question', :text => 'Ask Your Instructor a Question',
-          :subtext => 'Questions are submitted to your instructor', :type => 'default',
-          :url => '#teacher_feedback', :available_to => ['student'],
-          :is_featured => true, :is_new => true } } } }
+      post 'update', params: { id: @account.id, account: { custom_help_links: { '0' =>
+        { id: 'instructor_question', text: 'Ask Your Instructor a Question',
+          subtext: 'Questions are submitted to your instructor', type: 'default',
+          url: '#teacher_feedback', available_to: ['student'],
+          is_featured: true, is_new: true } } } }
       expect(flash[:error]).to match(/update failed/)
       expect(@account.reload.settings[:custom_help_links]).to be_nil
     end
@@ -471,8 +471,8 @@ describe AccountsController do
       @subaccount = @account.sub_accounts.create!
       @account.save!
 
-      course_with_teacher(:account => @subaccount, :active_all => true)
-      course_with_student(:account => @subaccount, :active_all => true)
+      course_with_teacher(account: @subaccount, active_all: true)
+      course_with_student(account: @subaccount, active_all: true)
 
       @student.dashboard_view = "activity"
       @student.save!
@@ -498,11 +498,11 @@ describe AccountsController do
 
     describe "k5 settings" do
       def toggle_k5_params(account_id, enable)
-        { :id => account_id,
-          :account => {
-            :settings => {
-              :enable_as_k5_account => {
-                :value => enable
+        { id: account_id,
+          account: {
+            settings: {
+              enable_as_k5_account: {
+                value: enable
               }
             }
           } }
@@ -623,19 +623,19 @@ describe AccountsController do
 
       context "with :manage_storage_quotas" do
         before :once do
-          role = custom_account_role 'quota-setter', :account => @account
-          @account.role_overrides.create! :permission => 'manage_account_settings', :enabled => true,
-                                          :role => role
-          @account.role_overrides.create! :permission => 'manage_storage_quotas', :enabled => true,
-                                          :role => role
+          role = custom_account_role 'quota-setter', account: @account
+          @account.role_overrides.create! permission: 'manage_account_settings', enabled: true,
+                                          role: role
+          @account.role_overrides.create! permission: 'manage_storage_quotas', enabled: true,
+                                          role: role
           @account.account_users.create!(user: @user, role: role)
         end
 
         it "allows setting default quota (mb)" do
-          post 'update', params: { :id => @account.id, :account => {
-            :default_storage_quota_mb => 999,
-            :default_user_storage_quota_mb => 99,
-            :default_group_storage_quota_mb => 9999
+          post 'update', params: { id: @account.id, account: {
+            default_storage_quota_mb: 999,
+            default_user_storage_quota_mb: 99,
+            default_group_storage_quota_mb: 9999
           } }
           @account.reload
           expect(@account.default_storage_quota_mb).to eq 999
@@ -644,16 +644,16 @@ describe AccountsController do
         end
 
         it "allows setting default quota (bytes)" do
-          post 'update', params: { :id => @account.id, :account => {
-            :default_storage_quota => 101.megabytes,
+          post 'update', params: { id: @account.id, account: {
+            default_storage_quota: 101.megabytes,
           } }
           @account.reload
           expect(@account.default_storage_quota).to eq 101.megabytes
         end
 
         it "allows setting storage quota" do
-          post 'update', params: { :id => @account.id, :account => {
-            :storage_quota => 777.megabytes
+          post 'update', params: { id: @account.id, account: {
+            storage_quota: 777.megabytes
           } }
           @account.reload
           expect(@account.storage_quota).to eq 777.megabytes
@@ -662,18 +662,18 @@ describe AccountsController do
 
       context "without :manage_storage_quotas" do
         before :once do
-          role = custom_account_role 'quota-loser', :account => @account
-          @account.role_overrides.create! :permission => 'manage_account_settings', :enabled => true,
-                                          :role => role
+          role = custom_account_role 'quota-loser', account: @account
+          @account.role_overrides.create! permission: 'manage_account_settings', enabled: true,
+                                          role: role
           @account.account_users.create!(user: @user, role: role)
         end
 
         it "disallows setting default quota (mb)" do
-          post 'update', params: { :id => @account.id, :account => {
-            :default_storage_quota => 999,
-            :default_user_storage_quota_mb => 99,
-            :default_group_storage_quota_mb => 9,
-            :default_time_zone => 'Alaska'
+          post 'update', params: { id: @account.id, account: {
+            default_storage_quota: 999,
+            default_user_storage_quota_mb: 99,
+            default_group_storage_quota_mb: 9,
+            default_time_zone: 'Alaska'
           } }
           @account.reload
           expect(@account.default_storage_quota_mb).to eq 123
@@ -683,9 +683,9 @@ describe AccountsController do
         end
 
         it "disallows setting default quota (bytes)" do
-          post 'update', params: { :id => @account.id, :account => {
-            :default_storage_quota => 101.megabytes,
-            :default_time_zone => 'Alaska'
+          post 'update', params: { id: @account.id, account: {
+            default_storage_quota: 101.megabytes,
+            default_time_zone: 'Alaska'
           } }
           @account.reload
           expect(@account.default_storage_quota).to eq 123.megabytes
@@ -693,9 +693,9 @@ describe AccountsController do
         end
 
         it "disallows setting storage quota" do
-          post 'update', params: { :id => @account.id, :account => {
-            :storage_quota => 777.megabytes,
-            :default_time_zone => 'Alaska'
+          post 'update', params: { id: @account.id, account: {
+            storage_quota: 777.megabytes,
+            default_time_zone: 'Alaska'
           } }
           @account.reload
           expect(@account.storage_quota).to eq 555.megabytes
@@ -710,12 +710,12 @@ describe AccountsController do
       before { user_session(@admin) }
 
       it "allows setting turnitin values" do
-        post 'update', params: { :id => @account.id, :account => {
-          :turnitin_account_id => '123456',
-          :turnitin_shared_secret => 'sekret',
-          :turnitin_host => 'secret.turnitin.com',
-          :turnitin_pledge => 'i will do it',
-          :turnitin_comments => 'good work',
+        post 'update', params: { id: @account.id, account: {
+          turnitin_account_id: '123456',
+          turnitin_shared_secret: 'sekret',
+          turnitin_host: 'secret.turnitin.com',
+          turnitin_pledge: 'i will do it',
+          turnitin_comments: 'good work',
         } }
 
         @account.reload
@@ -727,22 +727,22 @@ describe AccountsController do
       end
 
       it "pulls out the host from a valid url" do
-        post 'update', params: { :id => @account.id, :account => {
-          :turnitin_host => 'https://secret.turnitin.com/'
+        post 'update', params: { id: @account.id, account: {
+          turnitin_host: 'https://secret.turnitin.com/'
         } }
         expect(@account.reload.turnitin_host).to eq 'secret.turnitin.com'
       end
 
       it "nils out the host if blank is passed" do
-        post 'update', params: { :id => @account.id, :account => {
-          :turnitin_host => ''
+        post 'update', params: { id: @account.id, account: {
+          turnitin_host: ''
         } }
         expect(@account.reload.turnitin_host).to be_nil
       end
 
       it "errors on an invalid host" do
-        post 'update', params: { :id => @account.id, :account => {
-          :turnitin_host => 'blah'
+        post 'update', params: { id: @account.id, account: {
+          turnitin_host: 'blah'
         } }
         expect(response).not_to be_successful
       end
@@ -754,8 +754,8 @@ describe AccountsController do
       before { user_session(@admin) }
 
       it "is able to set and update a custom terms of service" do
-        post 'update', params: { :id => @account.id, :account => {
-          :terms_of_service => { :terms_type => "custom", :content => "stuff" }
+        post 'update', params: { id: @account.id, account: {
+          terms_of_service: { terms_type: "custom", content: "stuff" }
         } }
         tos = @account.reload.terms_of_service
         expect(tos.terms_type).to eq 'custom'
@@ -763,9 +763,9 @@ describe AccountsController do
       end
 
       it "is able to configure the 'passive' setting" do
-        post 'update', params: { :id => @account.id, :account => { :terms_of_service => { :passive => "0" } } }
+        post 'update', params: { id: @account.id, account: { terms_of_service: { passive: "0" } } }
         expect(@account.reload.terms_of_service.passive).to eq false
-        post 'update', params: { :id => @account.id, :account => { :terms_of_service => { :passive => "1" } } }
+        post 'update', params: { id: @account.id, account: { terms_of_service: { passive: "1" } } }
         expect(@account.reload.terms_of_service.passive).to eq true
       end
     end
@@ -836,12 +836,12 @@ describe AccountsController do
 
     it "is set and unset outgoing email name" do
       account_with_admin_logged_in
-      post 'update', params: { :id => @account.id, :account => {
-        :settings => { :outgoing_email_default_name_option => "custom", :outgoing_email_default_name => "beep" }
+      post 'update', params: { id: @account.id, account: {
+        settings: { outgoing_email_default_name_option: "custom", outgoing_email_default_name: "beep" }
       } }
       expect(@account.reload.settings[:outgoing_email_default_name]).to eq "beep"
-      post 'update', params: { :id => @account.id, :account => {
-        :settings => { :outgoing_email_default_name_option => "default" }
+      post 'update', params: { id: @account.id, account: {
+        settings: { outgoing_email_default_name_option: "default" }
       } }
       expect(@account.reload.settings[:outgoing_email_default_name]).to eq nil
     end
@@ -1006,7 +1006,7 @@ describe AccountsController do
 
       it "creates a new external integration key" do
         key_value = "2142"
-        post 'update', params: { :id => @account.id, :account => { :external_integration_keys => {
+        post 'update', params: { id: @account.id, account: { external_integration_keys: {
           external_key0: "42",
           external_key2: key_value
         } } }
@@ -1018,7 +1018,7 @@ describe AccountsController do
 
       it "updates an existing external integration key" do
         key_value = "2142"
-        post 'update', params: { :id => @account.id, :account => { :external_integration_keys => {
+        post 'update', params: { id: @account.id, account: { external_integration_keys: {
           external_key0: key_value,
           external_key1: key_value,
           external_key2: key_value
@@ -1035,7 +1035,7 @@ describe AccountsController do
       end
 
       it "deletes an external integration key when not provided or the value is blank" do
-        post 'update', params: { :id => @account.id, :account => { :external_integration_keys => {
+        post 'update', params: { id: @account.id, account: { external_integration_keys: {
           external_key0: nil
         } } }
         expect(@account.external_integration_keys.count).to eq 0
@@ -1052,11 +1052,11 @@ describe AccountsController do
   describe "terms of service" do
     before do
       @account = Account.create!
-      course_with_teacher(:account => @account)
+      course_with_teacher(account: @account)
       c1 = @course
-      course_with_teacher(:course => c1)
+      course_with_teacher(course: c1)
       @student = User.create
-      c1.enroll_user(@student, "StudentEnrollment", :enrollment_state => 'active')
+      c1.enroll_user(@student, "StudentEnrollment", enrollment_state: 'active')
       c1.save
     end
 
@@ -1231,7 +1231,7 @@ describe AccountsController do
 
     it "gets a list of courses" do
       admin_logged_in(@account)
-      get 'courses_api', params: { :account_id => @account.id }
+      get 'courses_api', params: { account_id: @account.id }
 
       expect(response).to be_successful
       expect(response.body).to match(/#{@c1.id}/)
@@ -1240,7 +1240,7 @@ describe AccountsController do
 
     it "does not set pagination total_pages/last page link" do
       admin_logged_in(@account)
-      get 'courses_api', params: { :account_id => @account.id, per_page: 1 }
+      get 'courses_api', params: { account_id: @account.id, per_page: 1 }
 
       expect(response).to be_successful
       expect(response.headers.to_a.find { |a| a.first == "Link" }.last).to_not include("last")
@@ -1250,7 +1250,7 @@ describe AccountsController do
       @account.settings[:allow_last_page_on_account_courses] = true
       @account.save!
       admin_logged_in(@account)
-      get 'courses_api', params: { :account_id => @account.id, per_page: 1 }
+      get 'courses_api', params: { account_id: @account.id, per_page: 1 }
 
       expect(response).to be_successful
       expect(response.headers.to_a.find { |a| a.first == "Link" }.last).to include("last")
@@ -1258,10 +1258,10 @@ describe AccountsController do
 
     it "properly removes sections from includes" do
       @s1 = @course.course_sections.create!
-      @course.enroll_student(user_factory(:active_all => true), :section => @s1, :allow_multiple_enrollments => true)
+      @course.enroll_student(user_factory(active_all: true), section: @s1, allow_multiple_enrollments: true)
 
       admin_logged_in(@account)
-      get 'courses_api', params: { :account_id => @account.id, :include => [:sections] }
+      get 'courses_api', params: { account_id: @account.id, include: [:sections] }
 
       expect(response).to be_successful
       expect(response.body).not_to match(/sections/)
@@ -1421,9 +1421,9 @@ describe AccountsController do
       admin_logged_in(@account)
       student1 = user_factory
       student2 = user_factory
-      @c1.enroll_user(student1, "StudentEnrollment", :enrollment_state => 'active')
-      @c1.enroll_user(student2, "StudentEnrollment", :enrollment_state => 'active')
-      @c2.enroll_user(student1, "StudentEnrollment", :enrollment_state => 'active')
+      @c1.enroll_user(student1, "StudentEnrollment", enrollment_state: 'active')
+      @c1.enroll_user(student2, "StudentEnrollment", enrollment_state: 'active')
+      @c2.enroll_user(student1, "StudentEnrollment", enrollment_state: 'active')
       get 'courses_api', params: { account_id: @account.id, include: ['total_students'] }
 
       expect(response).to be_successful
@@ -1674,9 +1674,9 @@ describe AccountsController do
         admin_logged_in(@account)
         student1 = user_factory
         student2 = user_factory
-        @c1.enroll_user(student1, "StudentEnrollment", :enrollment_state => 'active')
-        @c1.enroll_user(student2, "StudentEnrollment", :enrollment_state => 'active')
-        @c2.enroll_user(student1, "StudentEnrollment", :enrollment_state => 'active')
+        @c1.enroll_user(student1, "StudentEnrollment", enrollment_state: 'active')
+        @c1.enroll_user(student2, "StudentEnrollment", enrollment_state: 'active')
+        @c2.enroll_user(student1, "StudentEnrollment", enrollment_state: 'active')
         @shard1.activate { get 'courses_api', params: { account_id: @account.id, include: ['total_students'] } }
 
         expect(response).to be_successful
@@ -1763,12 +1763,12 @@ describe AccountsController do
 
   describe("manageable_accounts") do
     before :once do
-      @account1 = Account.create!(:name => "Account 1", :root_account => Account.default)
-      account_with_admin(:account => @account1)
+      @account1 = Account.create!(name: "Account 1", root_account: Account.default)
+      account_with_admin(account: @account1)
       @admin1 = @admin
-      @account2 = Account.create!(:name => "Account 2", :root_account => Account.default)
-      account_admin_user(:account => @account2, :user => @admin1)
-      @subaccount1 = @account1.sub_accounts.create!(:name => "Subaccount 1")
+      @account2 = Account.create!(name: "Account 2", root_account: Account.default)
+      account_admin_user(account: @account2, user: @admin1)
+      @subaccount1 = @account1.sub_accounts.create!(name: "Subaccount 1")
     end
 
     it "includes all top-level and subaccounts" do
@@ -1782,8 +1782,8 @@ describe AccountsController do
 
     it "does not include accounts where admin doesn't have manage_courses or create_courses permissions" do
       Account.default.disable_feature!(:granular_permissions_manage_courses)
-      account3 = Account.create!(:name => "Account 3", :root_account => Account.default)
-      account_admin_user_with_role_changes(:account => account3, :user => @admin1, :role_changes => { :manage_courses => false, :create_courses => false })
+      account3 = Account.create!(name: "Account 3", root_account: Account.default)
+      account_admin_user_with_role_changes(account: account3, user: @admin1, role_changes: { manage_courses: false, create_courses: false })
       user_session @admin1
       get "manageable_accounts"
       accounts = json_parse(response.body)
@@ -1812,7 +1812,7 @@ describe AccountsController do
     end
 
     it "returns an empty list for students" do
-      student_in_course(:active_all => true, :account => @account1)
+      student_in_course(active_all: true, account: @account1)
       user_session @student
       get "manageable_accounts"
       expect(response).to be_successful

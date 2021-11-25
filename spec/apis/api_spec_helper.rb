@@ -63,7 +63,7 @@ def api_call(method, path, params, body_params = {}, headers = {}, opts = {})
     # The ruby JSON gem allows this, and it's technically valid JSON to have
     # duplicate names in an object ("names SHOULD be unique"), but it's silly
     # and we're not gonna let it slip through again.
-    JSON.parse(body, :object_class => HashWithDupCheck)
+    JSON.parse(body, object_class: HashWithDupCheck)
   else
     raise("Don't know how to handle response format #{params[:format]}")
   end
@@ -80,7 +80,7 @@ def api_call_as_user(user, method, path, params, body_params = {}, headers = {},
   account = opts[:domain_root_account] || Account.default
   user.pseudonyms.reload
   p = SisPseudonym.for(user, account, type: :implicit, require_sis: false)
-  p ||= account.pseudonyms.create!(:unique_id => "#{user.id}@example.com", :user => user)
+  p ||= account.pseudonyms.create!(unique_id: "#{user.id}@example.com", user: user)
   allow_any_instantiation_of(p).to receive(:works_for_account?).and_return(true)
   api_call(method, path, params, body_params, headers, opts)
 end
@@ -90,7 +90,7 @@ $spec_api_tokens = {}
 def access_token_for_user(user)
   enable_developer_key_account_binding!(DeveloperKey.default)
   token = $spec_api_tokens[user]
-  token ||= $spec_api_tokens[user] = user.access_tokens.create!(:purpose => "test").full_token
+  token ||= $spec_api_tokens[user] = user.access_tokens.create!(purpose: "test").full_token
   token
 end
 
@@ -111,7 +111,7 @@ def raw_api_call(method, path, params, body_params = {}, headers = {}, opts = {}
         headers['HTTP_AUTHORIZATION'] = "Bearer #{token}"
         account = opts[:domain_root_account] || Account.default
         p = @user.all_active_pseudonyms(:reload) && SisPseudonym.for(@user, account, type: :implicit, require_sis: false)
-        p ||= account.pseudonyms.create!(:unique_id => "#{@user.id}@example.com", :user => @user)
+        p ||= account.pseudonyms.create!(unique_id: "#{@user.id}@example.com", user: @user)
         allow_any_instantiation_of(p).to receive(:works_for_account?).and_return(true)
       end
     end
@@ -131,12 +131,12 @@ end
 
 def params_from_with_nesting(method, path)
   path, querystring = path.split('?')
-  params = CanvasRails::Application.routes.recognize_path(path, :method => method)
+  params = CanvasRails::Application.routes.recognize_path(path, method: method)
   querystring.blank? ? params : params.merge(Rack::Utils.parse_nested_query(querystring).symbolize_keys!)
 end
 
 def api_json_response(objects, opts = nil)
-  JSON.parse(objects.to_json(opts.merge(:include_root => false)))
+  JSON.parse(objects.to_json(opts.merge(include_root: false)))
 end
 
 def check_document(html, course, attachment, include_verifiers)
@@ -163,7 +163,7 @@ end
 # passes the cb a piece of user content html text. the block should return the
 # response from the api for that field, which will be verified for correctness.
 def should_translate_user_content(course, include_verifiers = true)
-  attachment = attachment_model(:context => course)
+  attachment = attachment_model(context: course)
   content = <<~HTML
     <p>
       Hello, students.<br>
@@ -186,7 +186,7 @@ def should_translate_user_content(course, include_verifiers = true)
 end
 
 def should_process_incoming_user_content(context)
-  attachment_model(:context => context)
+  attachment_model(context: context)
   incoming_content = "<p>content blahblahblah <a href=\"/files/#{@attachment.id}/download?a=1&amp;verifier=2&amp;b=3\">haha</a></p>"
 
   saved_content = yield incoming_content

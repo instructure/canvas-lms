@@ -91,7 +91,7 @@ describe JwtsController do
 
       it "returns a refreshed token for user" do
         real_user = site_admin_user(active_user: true)
-        user_with_pseudonym(:user => other_user, :username => "other@example.com")
+        user_with_pseudonym(user: other_user, username: "other@example.com")
         user_session(real_user)
         services_jwt = class_double(CanvasSecurity::ServicesJwt).as_stubbed_const
         expect(services_jwt).to receive(:refresh_for_user)

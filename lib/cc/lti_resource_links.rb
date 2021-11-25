@@ -82,7 +82,7 @@ module CC
     def add_lti_resource_link(resource_link, tool, document)
       document.instruct!
       document.cartridge_basiclti_link(
-        xmlns: 'http://www.imsglobal.org/xsd/imslticc_v1p3',
+        :xmlns => 'http://www.imsglobal.org/xsd/imslticc_v1p3',
         'xmlns:blti' => 'http://www.imsglobal.org/xsd/imsbasiclti_v1p0',
         'xmlns:lticm' => 'http://www.imsglobal.org/xsd/imslticm_v1p0',
         'xmlns:lticp' => 'http://www.imsglobal.org/xsd/imslticp_v1p0',

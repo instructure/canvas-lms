@@ -97,14 +97,14 @@ describe CommunicationChannel do
     end
 
     it 'is false if the channel is associated with a pseudonym' do
-      user_with_pseudonym(:active_all => true)
+      user_with_pseudonym(active_all: true)
       channel = @pseudonym.communication_channel
 
       expect(channel).not_to be_imported
     end
 
     it "is true if the channel is the sis_communication_channel of a pseudonym" do
-      user_with_pseudonym(:active_all => true)
+      user_with_pseudonym(active_all: true)
       channel = @pseudonym.communication_channel
       @pseudonym.update_attribute(:sis_communication_channel_id, channel.id)
 
@@ -122,7 +122,7 @@ describe CommunicationChannel do
     @cc.re_activate
     expect(@cc.state).to eql(:active)
 
-    communication_channel_model(:path => "another_path@example.com")
+    communication_channel_model(path: "another_path@example.com")
     expect(@cc.state).to eql(:unconfirmed)
     @cc.retire
     expect(@cc.state).to eql(:retired)
@@ -316,15 +316,15 @@ describe CommunicationChannel do
   context "destroy_permanently!" do
     it "does not violate foreign key constraints" do
       communication_channel_model
-      notification_policy_model(:frequency => "daily", :communication_channel => @communication_channel)
-      delayed_message_model(:notification_policy_id => @notification_policy.id)
+      notification_policy_model(frequency: "daily", communication_channel: @communication_channel)
+      delayed_message_model(notification_policy_id: @notification_policy.id)
       @communication_channel.destroy_permanently!
     end
   end
 
   context "notifications" do
     it "forwards the root account to the message" do
-      notification = Notification.create!(:name => 'Confirm Email Communication Channel', :category => 'Registration')
+      notification = Notification.create!(name: 'Confirm Email Communication Channel', category: 'Registration')
       @user = User.create!
       @user.register!
       communication_channel(@user, { username: 'user1@example.com' })
@@ -332,15 +332,15 @@ describe CommunicationChannel do
       allow(HostUrl).to receive(:context_host).with(account, any_args).and_return('someserver.com')
       allow(HostUrl).to receive(:context_host).with(@cc, any_args).and_return('someserver.com')
       @cc.send_confirmation!(account)
-      message = Message.where(:communication_channel_id => @cc, :notification_id => notification).first
+      message = Message.where(communication_channel_id: @cc, notification_id: notification).first
       expect(message).not_to be_nil
       expect(message.body).to match(/someserver.com/)
     end
   end
 
   it "does not allow deleting sms channels that are the otp channel" do
-    user_with_pseudonym(:active_all => 1)
-    @cc = @user.communication_channels.sms.create!(:path => 'bob')
+    user_with_pseudonym(active_all: 1)
+    @cc = @user.communication_channels.sms.create!(path: 'bob')
     @cc.confirm!
     @user.otp_communication_channel = @cc
     @user.save!
@@ -395,7 +395,7 @@ describe CommunicationChannel do
     it "returns users with a matching e-mail address" do
       user2 = User.create!
       communication_channel(user2, { username: 'jt@instructure.com', active_cc: true })
-      Account.default.pseudonyms.create!(:user => user2, :unique_id => 'user2')
+      Account.default.pseudonyms.create!(user: user2, unique_id: 'user2')
 
       expect(cc1.merge_candidates).to eq [user2]
       expect(cc1.has_merge_candidates?).to be_truthy
@@ -412,7 +412,7 @@ describe CommunicationChannel do
     it "does not return users that match on an unconfirmed cc" do
       user2 = User.create!
       communication_channel(user2, { username: 'jt@instructure.com' })
-      Account.default.pseudonyms.create!(:user => user2, :unique_id => 'user2')
+      Account.default.pseudonyms.create!(user: user2, unique_id: 'user2')
 
       expect(cc1.merge_candidates).to eq []
       expect(cc1.has_merge_candidates?).to be_falsey
@@ -421,10 +421,10 @@ describe CommunicationChannel do
     it "only checks one user for boolean result" do
       user2 = User.create!
       communication_channel(user2, { username: 'jt@instructure.com', active_cc: true })
-      Account.default.pseudonyms.create!(:user => user2, :unique_id => 'user2')
+      Account.default.pseudonyms.create!(user: user2, unique_id: 'user2')
       user3 = User.create!
       communication_channel(user3, { username: 'jt@instructure.com', active_cc: true })
-      Account.default.pseudonyms.create!(:user => user3, :unique_id => 'user3')
+      Account.default.pseudonyms.create!(user: user3, unique_id: 'user3')
 
       expect_any_instance_of(User).to receive(:all_active_pseudonyms).once.and_return([true])
       expect(cc1.has_merge_candidates?).to be_truthy
@@ -433,10 +433,10 @@ describe CommunicationChannel do
     it "does not return users for push channels" do
       user2 = User.create!
       communication_channel(user2, { username: 'push', path_type: CommunicationChannel::TYPE_PUSH, active_cc: true })
-      Account.default.pseudonyms.create!(:user => user2, :unique_id => 'user2')
+      Account.default.pseudonyms.create!(user: user2, unique_id: 'user2')
       user3 = User.create!
       communication_channel(user3, { username: 'push', path_type: CommunicationChannel::TYPE_PUSH, active_cc: true })
-      Account.default.pseudonyms.create!(:user => user3, :unique_id => 'user3')
+      Account.default.pseudonyms.create!(user: user3, unique_id: 'user3')
 
       expect(cc1.has_merge_candidates?).to be_falsey
     end
@@ -663,7 +663,7 @@ describe CommunicationChannel do
           @user2 = User.create!
           communication_channel(@user2, { username: 'jt@instructure.com', active_cc: true })
           account = Account.create!
-          account.pseudonyms.create!(:user => @user2, :unique_id => 'user2')
+          account.pseudonyms.create!(user: @user2, unique_id: 'user2')
         end
 
         skip if CommunicationChannel.associated_shards('jt@instructure.com') == [Shard.default]
@@ -675,13 +675,13 @@ describe CommunicationChannel do
       it "searches a non-default shard *only*" do
         allow(Enrollment).to receive(:cross_shard_invitations?).and_return(false)
         cc1.confirm!
-        Account.default.pseudonyms.create!(:user => user1, :unique_id => 'user1')
+        Account.default.pseudonyms.create!(user: user1, unique_id: 'user1')
 
         @shard1.activate do
           @user2 = User.create!
           @cc2 = communication_channel(@user2, { username: 'jt@instructure.com', active_cc: true })
           account = Account.create!
-          account.pseudonyms.create!(:user => @user2, :unique_id => 'user2')
+          account.pseudonyms.create!(user: @user2, unique_id: 'user2')
         end
 
         expect(cc1.merge_candidates).to eq []

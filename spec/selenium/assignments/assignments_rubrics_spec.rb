@@ -95,7 +95,7 @@ describe "assignment rubrics" do
 
     it "verifies existing rubrics", priority: "2" do
       outcome_with_rubric(title: 'Course Rubric')
-      @rubric.associate_with(@course, @course, :purpose => 'grading')
+      @rubric.associate_with(@course, @course, purpose: 'grading')
       assignment_with_rubric(10, 'Assignment Rubric ')
       get "/courses/#{@course.id}/rubrics"
       expect(fln('Course Rubric')).to be_present
@@ -294,9 +294,9 @@ describe "assignment rubrics" do
     end
 
     it "properly manages rubric focus on submission preview page", priority: "2" do
-      student_in_course(:active_all => true)
+      student_in_course(active_all: true)
       outcome_with_rubric
-      @assignment = @course.assignments.create(:name => 'assignment with rubric')
+      @assignment = @course.assignments.create(name: 'assignment with rubric')
       @association = @rubric.associate_with(@assignment, @course, purpose: 'grading', use_for_grading: true)
       @submission = @assignment.submit_homework(@student, { url: "http://www.instructure.com/" })
       get "/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}"
@@ -474,24 +474,24 @@ describe "assignment rubrics" do
 
       it "properly updates the lowest rating range when scaled up" do
         rubric_params = {
-          :criteria => {
+          criteria: {
             "0" => {
-              :criterion_use_range => true,
-              :points => 100,
-              :description => "no outcome row",
-              :long_description => 'non outcome criterion',
-              :ratings => {
+              criterion_use_range: true,
+              points: 100,
+              description: "no outcome row",
+              long_description: 'non outcome criterion',
+              ratings: {
                 "0" => {
-                  :points => 100,
-                  :description => "Amazing",
+                  points: 100,
+                  description: "Amazing",
                 },
                 "1" => {
-                  :points => 50,
-                  :description => "Reduced Marks",
+                  points: 50,
+                  description: "Reduced Marks",
                 },
                 "2" => {
-                  :points => 20,
-                  :description => "Less than twenty percent",
+                  points: 20,
+                  description: "Less than twenty percent",
                 }
               }
             }
@@ -687,7 +687,7 @@ describe "assignment rubrics" do
                          artifact: assignment.find_or_create_submission(@student),
                          assessment: {
                            assessment_type: 'grading',
-                           :"criterion_#{@rubric.criteria_object.first.id}" => {
+                           "criterion_#{@rubric.criteria_object.first.id}": {
                              points: 3,
                              comments: comment,
                            }

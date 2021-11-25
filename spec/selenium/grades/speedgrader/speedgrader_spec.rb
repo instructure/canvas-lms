@@ -636,7 +636,7 @@ describe 'Speedgrader' do
           @students.second, submission_type: 'online_text_entry', body: 'hello!'
         )
 
-        section = @course.course_sections.create!(:name => "new section")
+        section = @course.course_sections.create!(name: "new section")
         student_in_section(section, user: @students.second)
         @assignment_for_course.assignment_overrides.create! do |override|
           override.set = section

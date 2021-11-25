@@ -100,7 +100,7 @@ describe Quizzes::QuizStatistics::ItemAnalysis::Summary do
 
   describe "#add_response" do
     it "does not add unsupported response types" do
-      summary.add_response({ :question_type => "foo", :answers => [] }, 0, 0)
+      summary.add_response({ question_type: "foo", answers: [] }, 0, 0)
       expect(summary.size).to eq 3
     end
   end

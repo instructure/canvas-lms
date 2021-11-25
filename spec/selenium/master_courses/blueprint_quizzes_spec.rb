@@ -77,13 +77,13 @@ describe "blueprint courses quizzes" do
   context "in the associated course" do
     before :once do
       due_date = format_date_for_view(Time.zone.now - 1.month)
-      @copy_from = course_factory(:active_all => true)
+      @copy_from = course_factory(active_all: true)
       @template = MasterCourses::MasterTemplate.set_as_master_course(@copy_from)
       @original_quiz = @copy_from.quizzes.create!(title: "blah", description: "bloo", due_at: due_date)
       @original_quiz.quiz_questions.create! question_data: question_data
       @tag = @template.create_content_tag_for!(@original_quiz)
 
-      course_with_teacher(:active_all => true)
+      course_with_teacher(active_all: true)
       @copy_to = @course
       @template.add_child_course!(@copy_to)
       @quiz_copy = @copy_to.quizzes.new(title: "blah", description: "bloo", due_at: due_date) # just create a copy directly instead of doing a real migration
@@ -212,20 +212,20 @@ describe "blueprint courses quizzes" do
   context "question groups in associated course" do
     before :once do
       due_date = format_date_for_view(Time.zone.now - 1.month)
-      @copy_from = course_factory(:active_all => true)
+      @copy_from = course_factory(active_all: true)
       @template = MasterCourses::MasterTemplate.set_as_master_course(@copy_from)
       @original_quiz = @copy_from.quizzes.create!(title: "blah", description: "bloo", due_at: due_date)
-      original_group = @original_quiz.quiz_groups.create! :name => "Eh", :pick_count => 1, :question_points => 10
+      original_group = @original_quiz.quiz_groups.create! name: "Eh", pick_count: 1, question_points: 10
       original_group.quiz_questions.create! quiz: @original_quiz, question_data: question_data
       @tag = @template.create_content_tag_for!(@original_quiz)
 
-      course_with_teacher(:active_all => true)
+      course_with_teacher(active_all: true)
       @copy_to = @course
       @template.add_child_course!(@copy_to)
       @quiz_copy = @copy_to.quizzes.create!(title: "blah", description: "bloo", due_at: due_date) # just create a copy directly instead of doing a real migration
       @quiz_copy.migration_id = @tag.migration_id
       @quiz_copy.save!
-      copy_group = @quiz_copy.quiz_groups.create! :name => "Eh", :pick_count => 1, :question_points => 10
+      copy_group = @quiz_copy.quiz_groups.create! name: "Eh", pick_count: 1, question_points: 10
       copy_group.quiz_questions.create! quiz: @quiz_copy, question_data: question_data
     end
 

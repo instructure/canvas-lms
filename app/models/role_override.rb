@@ -57,10 +57,10 @@ class RoleOverride < ActiveRecord::Base
 
   ACCOUNT_ADMIN_LABEL = -> { t('roles.account_admin', "Account Admin") }
   def self.account_membership_types(account)
-    res = [{ :id => Role.get_built_in_role("AccountAdmin", root_account_id: account.resolved_root_account_id).id,
-             :name => "AccountAdmin", :base_role_name => Role::DEFAULT_ACCOUNT_TYPE, :label => ACCOUNT_ADMIN_LABEL.call }]
+    res = [{ id: Role.get_built_in_role("AccountAdmin", root_account_id: account.resolved_root_account_id).id,
+             name: "AccountAdmin", base_role_name: Role::DEFAULT_ACCOUNT_TYPE, label: ACCOUNT_ADMIN_LABEL.call }]
     account.available_custom_account_roles.each do |r|
-      res << { :id => r.id, :name => r.name, :base_role_name => Role::DEFAULT_ACCOUNT_TYPE, :label => r.name }
+      res << { id: r.id, name: r.name, base_role_name: Role::DEFAULT_ACCOUNT_TYPE, label: r.name }
     end
     res
   end
@@ -68,11 +68,11 @@ class RoleOverride < ActiveRecord::Base
   ENROLLMENT_TYPE_LABELS =
     [
       # StudentViewEnrollment permissions will mirror StudentPermissions
-      { :base_role_name => 'StudentEnrollment', :name => 'StudentEnrollment', :label => -> { t('roles.student', 'Student') }, :plural_label => -> { t('roles.students', 'Students') } },
-      { :base_role_name => 'TeacherEnrollment', :name => 'TeacherEnrollment', :label => -> { t('roles.teacher', 'Teacher') }, :plural_label => -> { t('roles.teachers', 'Teachers') } },
-      { :base_role_name => 'TaEnrollment', :name => 'TaEnrollment', :label => -> { t('roles.ta', 'TA') }, :plural_label => -> { t('roles.tas', 'TAs') } },
-      { :base_role_name => 'DesignerEnrollment', :name => 'DesignerEnrollment', :label => -> { t('roles.designer', 'Designer') }, :plural_label => -> { t('roles.designers', 'Designers') } },
-      { :base_role_name => 'ObserverEnrollment', :name => 'ObserverEnrollment', :label => -> { t('roles.observer', 'Observer') }, :plural_label => -> { t('roles.observers', 'Observers') } }
+      { base_role_name: 'StudentEnrollment', name: 'StudentEnrollment', label: -> { t('roles.student', 'Student') }, plural_label: -> { t('roles.students', 'Students') } },
+      { base_role_name: 'TeacherEnrollment', name: 'TeacherEnrollment', label: -> { t('roles.teacher', 'Teacher') }, plural_label: -> { t('roles.teachers', 'Teachers') } },
+      { base_role_name: 'TaEnrollment', name: 'TaEnrollment', label: -> { t('roles.ta', 'TA') }, plural_label: -> { t('roles.tas', 'TAs') } },
+      { base_role_name: 'DesignerEnrollment', name: 'DesignerEnrollment', label: -> { t('roles.designer', 'Designer') }, plural_label: -> { t('roles.designers', 'Designers') } },
+      { base_role_name: 'ObserverEnrollment', name: 'ObserverEnrollment', label: -> { t('roles.observer', 'Observer') }, plural_label: -> { t('roles.observers', 'Observers') } }
     ].freeze
   def self.enrollment_type_labels
     ENROLLMENT_TYPE_LABELS
@@ -108,56 +108,56 @@ class RoleOverride < ActiveRecord::Base
   # RoleOverridesController#add_role
   Permissions.register(
     {
-      :become_user => {
-        :label => -> { t('Act as users') },
-        :label_v2 => -> { t("Users - act as") },
-        :account_only => :root,
-        :true_for => %w[AccountAdmin],
-        :available_to => %w[AccountAdmin AccountMembership],
+      become_user: {
+        label: -> { t('Act as users') },
+        label_v2: -> { t("Users - act as") },
+        account_only: :root,
+        true_for: %w[AccountAdmin],
+        available_to: %w[AccountAdmin AccountMembership],
       },
-      :import_sis => {
-        :label => -> { t('Import SIS data') },
-        :label_v2 => -> { t("SIS Data - import") },
-        :account_only => :root,
-        :true_for => %w[AccountAdmin],
-        :available_to => %w[AccountAdmin AccountMembership],
+      import_sis: {
+        label: -> { t('Import SIS data') },
+        label_v2: -> { t("SIS Data - import") },
+        account_only: :root,
+        true_for: %w[AccountAdmin],
+        available_to: %w[AccountAdmin AccountMembership],
       },
-      :manage_account_memberships => {
-        :label => -> { t('permissions.manage_account_memberships', "Add/remove other admins for the account") },
-        :label_v2 => -> { t("Admins - add / remove") },
-        :available_to => [
+      manage_account_memberships: {
+        label: -> { t('permissions.manage_account_memberships', "Add/remove other admins for the account") },
+        label_v2: -> { t("Admins - add / remove") },
+        available_to: [
           'AccountMembership'
         ],
-        :true_for => [
+        true_for: [
           'AccountAdmin'
         ],
-        :account_only => true
+        account_only: true
       },
-      :manage_account_settings => {
-        :label => -> { t('permissions.manage_account_settings', "Manage account-level settings") },
-        :label_v2 => -> { t("Account-level settings - manage") },
-        :available_to => [
+      manage_account_settings: {
+        label: -> { t('permissions.manage_account_settings', "Manage account-level settings") },
+        label_v2: -> { t("Account-level settings - manage") },
+        available_to: [
           'AccountMembership'
         ],
-        :true_for => [
+        true_for: [
           'AccountAdmin'
         ],
-        :account_only => true
+        account_only: true
       },
-      :manage_alerts => {
-        :label => -> { t('permissions.manage_announcements', "Manage global announcements") },
-        :label_v2 => -> { t("Global Announcements - add / edit / delete") },
-        :account_only => true,
-        :true_for => %w[AccountAdmin],
-        :available_to => %w[AccountAdmin AccountMembership],
+      manage_alerts: {
+        label: -> { t('permissions.manage_announcements', "Manage global announcements") },
+        label_v2: -> { t("Global Announcements - add / edit / delete") },
+        account_only: true,
+        true_for: %w[AccountAdmin],
+        available_to: %w[AccountAdmin AccountMembership],
       },
-      :manage_catalog => {
-        :label => -> { t('permissions.manage_catalog', "Manage catalog") },
-        :label_v2 => -> { t("Catalog - manage") },
-        :account_only => true,
-        :true_for => %w[AccountAdmin],
-        :available_to => %w[AccountAdmin AccountMembership],
-        :account_allows => ->(a) { a.settings[:catalog_enabled] }
+      manage_catalog: {
+        label: -> { t('permissions.manage_catalog', "Manage catalog") },
+        label_v2: -> { t("Catalog - manage") },
+        account_only: true,
+        true_for: %w[AccountAdmin],
+        available_to: %w[AccountAdmin AccountMembership],
+        account_allows: ->(a) { a.settings[:catalog_enabled] }
       },
       # deprecated; legacy role override
       manage_courses: {
@@ -246,227 +246,227 @@ class RoleOverride < ActiveRecord::Base
         true_for: %w[AccountAdmin],
         account_allows: ->(a) { a.root_account.feature_enabled?(:granular_permissions_manage_courses) }
       },
-      :manage_data_services => {
-        :label => -> { t('permissions.manage_data_services', "Manage data services") },
-        :label_v2 => -> { t("Data Services - manage ") },
-        :account_only => true,
-        :true_for => %w[AccountAdmin],
-        :available_to => %w[AccountAdmin AccountMembership],
+      manage_data_services: {
+        label: -> { t('permissions.manage_data_services', "Manage data services") },
+        label_v2: -> { t("Data Services - manage ") },
+        account_only: true,
+        true_for: %w[AccountAdmin],
+        available_to: %w[AccountAdmin AccountMembership],
       },
-      :manage_course_visibility => {
-        :label => -> { t("Change course visibility") },
-        :label_v2 => -> { t("Courses - change visibility") },
-        :available_to => %w[
+      manage_course_visibility: {
+        label: -> { t("Change course visibility") },
+        label_v2: -> { t("Courses - change visibility") },
+        available_to: %w[
           AccountAdmin
           AccountMembership
           TeacherEnrollment
           TaEnrollment
           DesignerEnrollment
         ],
-        :true_for => %w[
+        true_for: %w[
           AccountAdmin
           TeacherEnrollment
           TaEnrollment
           DesignerEnrollment
         ]
       },
-      :manage_developer_keys => {
-        :label => -> { t('permissions.manage_developer_keys', "Manage developer keys") },
-        :label_v2 => -> { t("Developer Keys - manage ") },
-        :account_only => true,
-        :true_for => %w[AccountAdmin],
-        :available_to => %w[AccountAdmin AccountMembership],
+      manage_developer_keys: {
+        label: -> { t('permissions.manage_developer_keys', "Manage developer keys") },
+        label_v2: -> { t("Developer Keys - manage ") },
+        account_only: true,
+        true_for: %w[AccountAdmin],
+        available_to: %w[AccountAdmin AccountMembership],
       },
-      :moderate_user_content => {
-        :label => -> { t('permissions.moderate_user_content', "Moderate user content") },
-        :label_v2 => -> { t("Users - moderate content") },
-        :account_only => true,
-        :true_for => %w[AccountAdmin],
-        :available_to => %w[AccountAdmin AccountMembership],
+      moderate_user_content: {
+        label: -> { t('permissions.moderate_user_content', "Moderate user content") },
+        label_v2: -> { t("Users - moderate content") },
+        account_only: true,
+        true_for: %w[AccountAdmin],
+        available_to: %w[AccountAdmin AccountMembership],
       },
-      :view_feature_flags => {
-        :label => -> { t("View feature options at an account level") },
-        :label_v2 => -> { t("Feature Options - view") },
-        :true_for => %w[AccountAdmin],
-        :available_to => %w[AccountAdmin AccountMembership]
+      view_feature_flags: {
+        label: -> { t("View feature options at an account level") },
+        label_v2: -> { t("Feature Options - view") },
+        true_for: %w[AccountAdmin],
+        available_to: %w[AccountAdmin AccountMembership]
       },
-      :manage_feature_flags => {
-        :label => -> { t('permissions.manage_feature_flags', "Enable or disable features at an account level") },
-        :label_v2 => -> { t("Feature Options - enable / disable") },
-        :true_for => %w[AccountAdmin],
-        :available_to => %w[AccountAdmin AccountMembership]
+      manage_feature_flags: {
+        label: -> { t('permissions.manage_feature_flags', "Enable or disable features at an account level") },
+        label_v2: -> { t("Feature Options - enable / disable") },
+        true_for: %w[AccountAdmin],
+        available_to: %w[AccountAdmin AccountMembership]
       },
-      :manage_frozen_assignments => {
-        :label => -> { t('permissions.manage_frozen_assignment', "Manage (edit / delete) frozen assignments") },
-        :true_for => %w[AccountAdmin],
-        :available_to => %w[AccountAdmin AccountMembership],
-        :enabled_for_plugin => :assignment_freezer
+      manage_frozen_assignments: {
+        label: -> { t('permissions.manage_frozen_assignment', "Manage (edit / delete) frozen assignments") },
+        true_for: %w[AccountAdmin],
+        available_to: %w[AccountAdmin AccountMembership],
+        enabled_for_plugin: :assignment_freezer
       },
-      :manage_global_outcomes => {
-        :label => -> { t('permissions.manage_global_outcomes', "Manage global learning outcomes") },
-        :account_only => :site_admin,
-        :true_for => %w[AccountAdmin],
-        :available_to => %w[AccountAdmin AccountMembership],
+      manage_global_outcomes: {
+        label: -> { t('permissions.manage_global_outcomes', "Manage global learning outcomes") },
+        account_only: :site_admin,
+        true_for: %w[AccountAdmin],
+        available_to: %w[AccountAdmin AccountMembership],
       },
-      :manage_jobs => {
-        :label => -> { t('permissions.managed_jobs', "Manage background jobs") },
-        :account_only => :site_admin,
-        :true_for => %w[AccountAdmin],
-        :available_to => %w[AccountAdmin AccountMembership],
+      manage_jobs: {
+        label: -> { t('permissions.managed_jobs', "Manage background jobs") },
+        account_only: :site_admin,
+        true_for: %w[AccountAdmin],
+        available_to: %w[AccountAdmin AccountMembership],
       },
-      :manage_release_notes => {
-        :label => -> { t('Manage release notes') },
-        :account_only => :site_admin,
-        :true_for => %w[AccountAdmin],
-        :available_to => %w[AccountAdmin AccountMembership],
+      manage_release_notes: {
+        label: -> { t('Manage release notes') },
+        account_only: :site_admin,
+        true_for: %w[AccountAdmin],
+        available_to: %w[AccountAdmin AccountMembership],
       },
-      :manage_master_courses => {
-        :label => -> { t('Blueprint Courses (create / edit / associate / delete)') },
-        :label_v2 => -> { t("Blueprint Courses - add / edit / associate / delete") },
-        :available_to => [
+      manage_master_courses: {
+        label: -> { t('Blueprint Courses (create / edit / associate / delete)') },
+        label_v2: -> { t("Blueprint Courses - add / edit / associate / delete") },
+        available_to: [
           'AccountAdmin',
           'AccountMembership'
         ],
-        :account_only => true,
-        :true_for => [
+        account_only: true,
+        true_for: [
           'AccountAdmin'
         ]
       },
-      :manage_role_overrides => {
-        :label => -> { t('permissions.manage_role_overrides', "Manage permissions") },
-        :label_v2 => -> { t("Permissions - manage") },
-        :account_only => true,
-        :true_for => %w[AccountAdmin],
-        :available_to => %w[AccountMembership]
+      manage_role_overrides: {
+        label: -> { t('permissions.manage_role_overrides', "Manage permissions") },
+        label_v2: -> { t("Permissions - manage") },
+        account_only: true,
+        true_for: %w[AccountAdmin],
+        available_to: %w[AccountMembership]
       },
-      :manage_storage_quotas => {
-        :label => -> { t('permissions.manage_storage_quotas', "Manage storage quotas") },
-        :label_v2 => -> { t("Storage Quotas - manage") },
-        :account_only => true,
-        :true_for => %w[AccountAdmin],
-        :available_to => %w[AccountAdmin AccountMembership]
+      manage_storage_quotas: {
+        label: -> { t('permissions.manage_storage_quotas', "Manage storage quotas") },
+        label_v2: -> { t("Storage Quotas - manage") },
+        account_only: true,
+        true_for: %w[AccountAdmin],
+        available_to: %w[AccountAdmin AccountMembership]
       },
-      :manage_sis => {
-        :label => -> { t('permissions.manage_sis', "Manage SIS data") },
-        :label_v2 => -> { t("SIS Data - manage") },
-        :account_only => :root,
-        :true_for => %w[AccountAdmin],
-        :available_to => %w[AccountAdmin AccountMembership],
+      manage_sis: {
+        label: -> { t('permissions.manage_sis', "Manage SIS data") },
+        label_v2: -> { t("SIS Data - manage") },
+        account_only: :root,
+        true_for: %w[AccountAdmin],
+        available_to: %w[AccountAdmin AccountMembership],
       },
-      :manage_site_settings => {
-        :label => -> { t('permissions.manage_site_settings', "Manage site-wide and plugin settings") },
-        :account_only => :site_admin,
-        :true_for => %w[AccountAdmin],
-        :available_to => %w[AccountAdmin AccountMembership],
+      manage_site_settings: {
+        label: -> { t('permissions.manage_site_settings', "Manage site-wide and plugin settings") },
+        account_only: :site_admin,
+        true_for: %w[AccountAdmin],
+        available_to: %w[AccountAdmin AccountMembership],
       },
-      :manage_user_logins => {
-        :label => -> { t('permissions.manage_user_logins', "Modify login details for users") },
-        :label_v2 => -> { t("Users - manage login details") },
-        :available_to => [
+      manage_user_logins: {
+        label: -> { t('permissions.manage_user_logins', "Modify login details for users") },
+        label_v2: -> { t("Users - manage login details") },
+        available_to: [
           'AccountAdmin',
           'AccountMembership'
         ],
-        :account_only => :root,
-        :true_for => [
+        account_only: :root,
+        true_for: [
           'AccountAdmin'
         ]
       },
-      :manage_user_observers => {
-        :label => -> { t('permissions.manage_user_observers', "Manage observers for users") },
-        :label_v2 => -> { t("Users - manage observers") },
-        :account_only => :root,
-        :true_for => %w[AccountAdmin],
-        :available_to => %w[AccountAdmin AccountMembership],
+      manage_user_observers: {
+        label: -> { t('permissions.manage_user_observers', "Manage observers for users") },
+        label_v2: -> { t("Users - manage observers") },
+        account_only: :root,
+        true_for: %w[AccountAdmin],
+        available_to: %w[AccountAdmin AccountMembership],
       },
-      :read_course_content => {
-        :label => -> { t('permissions.read_course_content', "View course content") },
-        :label_v2 => -> { t("Course Content - view") },
-        :true_for => %w[AccountAdmin],
-        :available_to => %w[AccountAdmin AccountMembership]
+      read_course_content: {
+        label: -> { t('permissions.read_course_content', "View course content") },
+        label_v2: -> { t("Course Content - view") },
+        true_for: %w[AccountAdmin],
+        available_to: %w[AccountAdmin AccountMembership]
       },
-      :read_course_list => {
-        :label => -> { t('permissions.read_course_list', "View the list of courses") },
-        :label_v2 => -> { t("Courses - view list") },
-        :account_only => true,
-        :true_for => %w[AccountAdmin],
-        :available_to => %w[AccountAdmin AccountMembership]
+      read_course_list: {
+        label: -> { t('permissions.read_course_list', "View the list of courses") },
+        label_v2: -> { t("Courses - view list") },
+        account_only: true,
+        true_for: %w[AccountAdmin],
+        available_to: %w[AccountAdmin AccountMembership]
       },
-      :read_messages => {
-        :label => -> { t('permissions.read_messages', "View notifications sent to users") },
-        :account_only => :site_admin,
-        :true_for => %w[AccountAdmin],
-        :available_to => %w[AccountAdmin AccountMembership],
+      read_messages: {
+        label: -> { t('permissions.read_messages', "View notifications sent to users") },
+        account_only: :site_admin,
+        true_for: %w[AccountAdmin],
+        available_to: %w[AccountAdmin AccountMembership],
       },
-      :reset_any_mfa => {
-        :label => -> { t('Reset Multi-Factor Authentication') },
-        :account_only => :root,
-        :true_for => %w[AccountAdmin],
-        :available_to => %w[AccountAdmin AccountMembership],
-        :account_allows => ->(a) { a.mfa_settings != :disabled }
+      reset_any_mfa: {
+        label: -> { t('Reset Multi-Factor Authentication') },
+        account_only: :root,
+        true_for: %w[AccountAdmin],
+        available_to: %w[AccountAdmin AccountMembership],
+        account_allows: ->(a) { a.mfa_settings != :disabled }
       },
-      :view_course_changes => {
-        :label => -> { t('permissions.view_course_changes', "View Course Change Logs") },
-        :label_v2 => -> { t("Courses - view change logs") },
-        :admin_tool => true,
-        :account_only => true,
-        :available_to => [
+      view_course_changes: {
+        label: -> { t('permissions.view_course_changes', "View Course Change Logs") },
+        label_v2: -> { t("Courses - view change logs") },
+        admin_tool: true,
+        account_only: true,
+        available_to: [
           'AccountAdmin',
           'AccountMembership'
         ],
-        :true_for => ['AccountAdmin']
+        true_for: ['AccountAdmin']
       },
-      :view_error_reports => {
-        :label => -> { t('permissions.view_error_reports', "View error reports") },
-        :account_only => :site_admin,
-        :true_for => %w[AccountAdmin],
-        :available_to => %w[AccountAdmin AccountMembership],
+      view_error_reports: {
+        label: -> { t('permissions.view_error_reports', "View error reports") },
+        account_only: :site_admin,
+        true_for: %w[AccountAdmin],
+        available_to: %w[AccountAdmin AccountMembership],
       },
-      :view_grade_changes => {
-        :label => -> { t('permissions.view_grade_changes', "View Grade Change Logs") },
-        :label_v2 => -> { t("Grades - view change logs") },
-        :admin_tool => true,
-        :account_only => true,
-        :available_to => [
+      view_grade_changes: {
+        label: -> { t('permissions.view_grade_changes', "View Grade Change Logs") },
+        label_v2: -> { t("Grades - view change logs") },
+        admin_tool: true,
+        account_only: true,
+        available_to: [
           'AccountAdmin',
           'AccountMembership'
         ],
-        :true_for => ['AccountAdmin']
+        true_for: ['AccountAdmin']
       },
-      :view_jobs => {
-        :label => -> { t('permissions.view_jobs', "View background jobs") },
-        :account_only => :site_admin,
-        :true_for => %w[AccountAdmin],
-        :available_to => %w[AccountAdmin AccountMembership],
+      view_jobs: {
+        label: -> { t('permissions.view_jobs', "View background jobs") },
+        account_only: :site_admin,
+        true_for: %w[AccountAdmin],
+        available_to: %w[AccountAdmin AccountMembership],
       },
-      :view_notifications => {
-        :label => -> { t('permissions.view_notifications', "View notifications") },
-        :label_v2 => -> { t("Notifications - view") },
-        :admin_tool => true,
-        :account_only => true,
-        :available_to => [
+      view_notifications: {
+        label: -> { t('permissions.view_notifications', "View notifications") },
+        label_v2: -> { t("Notifications - view") },
+        admin_tool: true,
+        account_only: true,
+        available_to: [
           'AccountAdmin',
           'AccountMembership'
         ],
-        :true_for => [],
-        :account_allows => ->(acct) { acct.settings[:admins_can_view_notifications] }
+        true_for: [],
+        account_allows: ->(acct) { acct.settings[:admins_can_view_notifications] }
       },
-      :view_statistics => {
-        :label => -> { t('permissions.view_statistics', "View statistics") },
-        :label_v2 => -> { t("Statistics - view") },
-        :account_only => true,
-        :true_for => %w[AccountAdmin],
-        :available_to => %w[AccountAdmin AccountMembership]
+      view_statistics: {
+        label: -> { t('permissions.view_statistics', "View statistics") },
+        label_v2: -> { t("Statistics - view") },
+        account_only: true,
+        true_for: %w[AccountAdmin],
+        available_to: %w[AccountAdmin AccountMembership]
       },
-      :undelete_courses => {
-        :label => -> { t('permissions.undelete_courses', "Undelete courses") },
-        :label_v2 => -> { t("Courses - undelete") },
-        :admin_tool => true,
-        :account_only => true,
-        :available_to => [
+      undelete_courses: {
+        label: -> { t('permissions.undelete_courses', "Undelete courses") },
+        label_v2: -> { t("Courses - undelete") },
+        admin_tool: true,
+        account_only: true,
+        available_to: [
           'AccountAdmin',
           'AccountMembership'
         ],
-        :true_for => ['AccountAdmin']
+        true_for: ['AccountAdmin']
       },
       # deprecated
       change_course_state: {
@@ -482,10 +482,10 @@ class RoleOverride < ActiveRecord::Base
         ],
         account_allows: ->(a) { !a.root_account.feature_enabled?(:granular_permissions_manage_courses) }
       },
-      :create_collaborations => {
-        :label => -> { t('permissions.create_collaborations', "Create student collaborations") },
-        :label_v2 => -> { t("Student Collaborations - create") },
-        :available_to => %w[
+      create_collaborations: {
+        label: -> { t('permissions.create_collaborations', "Create student collaborations") },
+        label_v2: -> { t("Student Collaborations - create") },
+        available_to: %w[
           StudentEnrollment
           TaEnrollment
           DesignerEnrollment
@@ -494,7 +494,7 @@ class RoleOverride < ActiveRecord::Base
           AccountAdmin
           AccountMembership
         ],
-        :true_for => %w[
+        true_for: %w[
           StudentEnrollment
           TaEnrollment
           DesignerEnrollment
@@ -502,10 +502,10 @@ class RoleOverride < ActiveRecord::Base
           AccountAdmin
         ]
       },
-      :create_conferences => {
-        :label => -> { t('permissions.create_conferences', "Create web conferences") },
-        :label_v2 => -> { t("Web Conferences - create") },
-        :available_to => %w[
+      create_conferences: {
+        label: -> { t('permissions.create_conferences', "Create web conferences") },
+        label_v2: -> { t("Web Conferences - create") },
+        available_to: %w[
           StudentEnrollment
           TaEnrollment
           DesignerEnrollment
@@ -514,7 +514,7 @@ class RoleOverride < ActiveRecord::Base
           AccountAdmin
           AccountMembership
         ],
-        :true_for => %w[
+        true_for: %w[
           StudentEnrollment
           TaEnrollment
           DesignerEnrollment
@@ -522,10 +522,10 @@ class RoleOverride < ActiveRecord::Base
           AccountAdmin
         ]
       },
-      :create_forum => {
-        :label => -> { t("Create new discussions") },
-        :label_v2 => -> { t("Discussions - create") },
-        :available_to => %w[
+      create_forum: {
+        label: -> { t("Create new discussions") },
+        label_v2: -> { t("Discussions - create") },
+        available_to: %w[
           StudentEnrollment
           TaEnrollment
           DesignerEnrollment
@@ -534,24 +534,24 @@ class RoleOverride < ActiveRecord::Base
           AccountAdmin
           AccountMembership
         ],
-        :true_for => %w[
+        true_for: %w[
           StudentEnrollment
           TaEnrollment
           DesignerEnrollment
           TeacherEnrollment
           AccountAdmin
         ],
-        :restrict_future_enrollments => true
+        restrict_future_enrollments: true
       },
-      :generate_observer_pairing_code => {
-        :label => -> { t('Users - generate observer pairing codes for students') },
-        :true_for => %w[AccountAdmin],
-        :available_to => %w[TeacherEnrollment ObserverEnrollment TaEnrollment AccountAdmin AccountMembership DesignerEnrollment]
+      generate_observer_pairing_code: {
+        label: -> { t('Users - generate observer pairing codes for students') },
+        true_for: %w[AccountAdmin],
+        available_to: %w[TeacherEnrollment ObserverEnrollment TaEnrollment AccountAdmin AccountMembership DesignerEnrollment]
       },
-      :import_outcomes => {
-        :label => -> { t("Import learning outcomes") },
-        :label_v2 => -> { t("Learning Outcomes - import") },
-        :available_to => %w[
+      import_outcomes: {
+        label: -> { t("Import learning outcomes") },
+        label_v2: -> { t("Learning Outcomes - import") },
+        available_to: %w[
           TaEnrollment
           DesignerEnrollment
           TeacherEnrollment
@@ -559,17 +559,17 @@ class RoleOverride < ActiveRecord::Base
           AccountAdmin
           AccountMembership
         ],
-        :true_for => %w[
+        true_for: %w[
           DesignerEnrollment
           TeacherEnrollment
           AccountAdmin
         ]
       },
-      :lti_add_edit => {
-        :label => -> { t('LTI add and edit') },
-        :label_v2 => -> { t('LTI - add / edit / delete') },
-        :true_for => %w[TeacherEnrollment TaEnrollment DesignerEnrollment AccountAdmin],
-        :available_to => %w[TeacherEnrollment TaEnrollment DesignerEnrollment AccountAdmin AccountMembership]
+      lti_add_edit: {
+        label: -> { t('LTI add and edit') },
+        label_v2: -> { t('LTI - add / edit / delete') },
+        true_for: %w[TeacherEnrollment TaEnrollment DesignerEnrollment AccountAdmin],
+        available_to: %w[TeacherEnrollment TaEnrollment DesignerEnrollment AccountAdmin AccountMembership]
       },
       manage_admin_users: {
         label: -> { t("permissions.manage_admin_users", "Add/remove other teachers, course designers or TAs to the course") },
@@ -751,7 +751,7 @@ class RoleOverride < ActiveRecord::Base
         group_label: -> { t("Users - Designers") },
         account_allows: ->(a) { a.root_account.feature_enabled?(:granular_permissions_manage_users) }
       },
-      :manage_assignments => {
+      manage_assignments: {
         label: -> { t('permissions.manage_assignments', "Manage (add / edit / delete) assignments and quizzes") },
         label_v2: -> { t("Assignments and Quizzes - add / edit / delete") },
         available_to: %w[
@@ -815,7 +815,7 @@ class RoleOverride < ActiveRecord::Base
         group_label: -> { t("Manage Assignments and Quizzes") },
         account_allows: ->(a) { a.root_account.feature_enabled?(:granular_permissions_manage_assignments) }
       },
-      :manage_assignments_delete => {
+      manage_assignments_delete: {
         label: -> { t("Delete assignments and quizzes") },
         label_v2: -> { t("Assignments and Quizzes - delete") },
         available_to: %w[
@@ -837,10 +837,10 @@ class RoleOverride < ActiveRecord::Base
         group_label: -> { t("Manage Assignments and Quizzes") },
         account_allows: ->(a) { a.root_account.feature_enabled?(:granular_permissions_manage_assignments) }
       },
-      :manage_calendar => {
-        :label => -> { t('permissions.manage_calendar', "Add, edit and delete events on the course calendar") },
-        :label_v2 => -> { t("Course Calendar - add / edit / delete") },
-        :available_to => %w[
+      manage_calendar: {
+        label: -> { t('permissions.manage_calendar', "Add, edit and delete events on the course calendar") },
+        label_v2: -> { t("Course Calendar - add / edit / delete") },
+        available_to: %w[
           StudentEnrollment
           TaEnrollment
           DesignerEnrollment
@@ -849,17 +849,17 @@ class RoleOverride < ActiveRecord::Base
           AccountAdmin
           AccountMembership
         ],
-        :true_for => %w[
+        true_for: %w[
           TaEnrollment
           DesignerEnrollment
           TeacherEnrollment
           AccountAdmin
         ]
       },
-      :manage_content => {
-        :label => -> { t('permissions.manage_content', "Manage all other course content") },
-        :label_v2 => -> { t("Course Content - add / edit / delete") },
-        :available_to => %w[
+      manage_content: {
+        label: -> { t('permissions.manage_content', "Manage all other course content") },
+        label_v2: -> { t("Course Content - add / edit / delete") },
+        available_to: %w[
           TaEnrollment
           TeacherEnrollment
           DesignerEnrollment
@@ -867,7 +867,7 @@ class RoleOverride < ActiveRecord::Base
           AccountAdmin
           AccountMembership
         ],
-        :true_for => %w[
+        true_for: %w[
           TaEnrollment
           TeacherEnrollment
           DesignerEnrollment
@@ -981,16 +981,16 @@ class RoleOverride < ActiveRecord::Base
         true_for: %w[TaEnrollment DesignerEnrollment TeacherEnrollment AccountAdmin],
         acts_as_access_token_scope: true
       },
-      :manage_grades => {
-        :label => -> { t('permissions.manage_grades', "Edit grades") },
-        :label_v2 => -> { t("Grades - edit") },
-        :available_to => %w[
+      manage_grades: {
+        label: -> { t('permissions.manage_grades', "Edit grades") },
+        label_v2: -> { t("Grades - edit") },
+        available_to: %w[
           TaEnrollment
           TeacherEnrollment
           AccountAdmin
           AccountMembership
         ],
-        :true_for => %w[
+        true_for: %w[
           TaEnrollment
           TeacherEnrollment
           AccountAdmin
@@ -1059,16 +1059,16 @@ class RoleOverride < ActiveRecord::Base
         acts_as_access_token_scope: true,
         account_allows: ->(a) { a.root_account.feature_enabled?(:granular_permissions_manage_groups) }
       },
-      :manage_interaction_alerts => {
-        :label => -> { t('permissions.manage_interaction_alerts', "Manage alerts") },
-        :label_v2 => -> { t("Alerts - add / edit / delete") },
-        :true_for => %w[AccountAdmin TeacherEnrollment],
-        :available_to => %w[AccountAdmin AccountMembership TeacherEnrollment TaEnrollment],
+      manage_interaction_alerts: {
+        label: -> { t('permissions.manage_interaction_alerts', "Manage alerts") },
+        label_v2: -> { t("Alerts - add / edit / delete") },
+        true_for: %w[AccountAdmin TeacherEnrollment],
+        available_to: %w[AccountAdmin AccountMembership TeacherEnrollment TaEnrollment],
       },
-      :manage_outcomes => {
-        :label => -> { t('permissions.manage_outcomes', "Manage learning outcomes") },
-        :label_v2 => -> { t("Learning Outcomes - add / edit / delete") },
-        :available_to => %w[
+      manage_outcomes: {
+        label: -> { t('permissions.manage_outcomes', "Manage learning outcomes") },
+        label_v2: -> { t("Learning Outcomes - add / edit / delete") },
+        available_to: %w[
           StudentEnrollment
           TaEnrollment
           DesignerEnrollment
@@ -1077,35 +1077,35 @@ class RoleOverride < ActiveRecord::Base
           AccountAdmin
           AccountMembership
         ],
-        :true_for => %w[
+        true_for: %w[
           DesignerEnrollment
           TeacherEnrollment
           AccountAdmin
         ]
       },
-      :manage_proficiency_calculations => {
-        :label => -> { t('permissions.manage_proficiency_calculations', "Manage outcome proficiency calculations") },
-        :label_v2 => -> { t("Outcome Proficiency Calculations - add / edit") },
-        :available_to => %w[
+      manage_proficiency_calculations: {
+        label: -> { t('permissions.manage_proficiency_calculations', "Manage outcome proficiency calculations") },
+        label_v2: -> { t("Outcome Proficiency Calculations - add / edit") },
+        available_to: %w[
           DesignerEnrollment
           TeacherEnrollment
           AccountAdmin
           AccountMembership
         ],
-        :true_for => [
+        true_for: [
           'AccountAdmin'
         ]
       },
-      :manage_proficiency_scales => {
-        :label => -> { t('permissions.manage_proficiency_scales', "Manage outcome mastery scales") },
-        :label_v2 => -> { t("Outcome Mastery Scales - add / edit") },
-        :available_to => %w[
+      manage_proficiency_scales: {
+        label: -> { t('permissions.manage_proficiency_scales', "Manage outcome mastery scales") },
+        label_v2: -> { t("Outcome Mastery Scales - add / edit") },
+        available_to: %w[
           DesignerEnrollment
           TeacherEnrollment
           AccountAdmin
           AccountMembership
         ],
-        :true_for => [
+        true_for: [
           'AccountAdmin'
         ]
       },
@@ -1151,29 +1151,29 @@ class RoleOverride < ActiveRecord::Base
         ],
         true_for: %w[AccountAdmin TeacherEnrollment DesignerEnrollment]
       },
-      :manage_students => {
-        :label => lambda do
+      manage_students: {
+        label: lambda do
           if Account.site_admin.feature_enabled?(:granular_permissions_manage_users)
             t("Manage students for the course")
           else
             t('permissions.manage_students', "Add/remove students for the course")
           end
         end,
-        :label_v2 => lambda do
-                       if Account.site_admin.feature_enabled?(:granular_permissions_manage_users)
-                         t("Users - manage students in courses")
-                       else
-                         t("Users - add / remove students in courses")
-                       end
-                     end,
-        :available_to => %w[
+        label_v2: lambda do
+                    if Account.site_admin.feature_enabled?(:granular_permissions_manage_users)
+                      t("Users - manage students in courses")
+                    else
+                      t("Users - add / remove students in courses")
+                    end
+                  end,
+        available_to: %w[
           TaEnrollment
           DesignerEnrollment
           TeacherEnrollment
           AccountAdmin
           AccountMembership
         ],
-        :true_for => %w[
+        true_for: %w[
           TaEnrollment
           DesignerEnrollment
           TeacherEnrollment
@@ -1220,43 +1220,43 @@ class RoleOverride < ActiveRecord::Base
         group_label: -> { t("Users - Students") },
         account_allows: ->(a) { a.root_account.feature_enabled?(:granular_permissions_manage_users) }
       },
-      :manage_user_notes => {
-        :label => -> { t('permissions.manage_user_notes', "Manage faculty journal entries") },
-        :label_v2 => -> { t("Faculty Journal - manage entries") },
-        :available_to => %w[
+      manage_user_notes: {
+        label: -> { t('permissions.manage_user_notes', "Manage faculty journal entries") },
+        label_v2: -> { t("Faculty Journal - manage entries") },
+        available_to: %w[
           TaEnrollment
           TeacherEnrollment
           AccountAdmin
           AccountMembership
         ],
-        :true_for => %w[
+        true_for: %w[
           TaEnrollment
           TeacherEnrollment
           AccountAdmin
         ],
-        :account_allows => ->(a) { a.root_account.enable_user_notes }
+        account_allows: ->(a) { a.root_account.enable_user_notes }
       },
-      :manage_rubrics => {
-        :label => -> { t('permissions.manage_rubrics', "Create and edit assessing rubrics") },
-        :label_v2 => -> { t("Rubrics - add / edit / delete") },
-        :available_to => %w[
+      manage_rubrics: {
+        label: -> { t('permissions.manage_rubrics', "Create and edit assessing rubrics") },
+        label_v2: -> { t("Rubrics - add / edit / delete") },
+        available_to: %w[
           TaEnrollment
           DesignerEnrollment
           TeacherEnrollment
           AccountAdmin
           AccountMembership
         ],
-        :true_for => %w[
+        true_for: %w[
           DesignerEnrollment
           TaEnrollment
           TeacherEnrollment
           AccountAdmin
         ]
       },
-      :manage_wiki_create => {
-        :label => -> { t("Create pages") },
-        :label_v2 => -> { t("Pages - create") },
-        :available_to => %w[
+      manage_wiki_create: {
+        label: -> { t("Create pages") },
+        label_v2: -> { t("Pages - create") },
+        available_to: %w[
           TaEnrollment
           TeacherEnrollment
           DesignerEnrollment
@@ -1264,19 +1264,19 @@ class RoleOverride < ActiveRecord::Base
           AccountAdmin
           AccountMembership
         ],
-        :true_for => %w[
+        true_for: %w[
           TaEnrollment
           TeacherEnrollment
           DesignerEnrollment
           AccountAdmin
         ],
-        :group => 'manage_wiki',
-        :group_label => -> { t('Manage Pages') }
+        group: 'manage_wiki',
+        group_label: -> { t('Manage Pages') }
       },
-      :manage_wiki_update => {
-        :label => -> { t("Update pages") },
-        :label_v2 => -> { t("Pages - update") },
-        :available_to => %w[
+      manage_wiki_update: {
+        label: -> { t("Update pages") },
+        label_v2: -> { t("Pages - update") },
+        available_to: %w[
           TaEnrollment
           TeacherEnrollment
           DesignerEnrollment
@@ -1284,19 +1284,19 @@ class RoleOverride < ActiveRecord::Base
           AccountAdmin
           AccountMembership
         ],
-        :true_for => %w[
+        true_for: %w[
           TaEnrollment
           TeacherEnrollment
           DesignerEnrollment
           AccountAdmin
         ],
-        :group => 'manage_wiki',
-        :group_label => -> { t('Manage Pages') }
+        group: 'manage_wiki',
+        group_label: -> { t('Manage Pages') }
       },
-      :manage_wiki_delete => {
-        :label => -> { t("Delete pages") },
-        :label_v2 => -> { t("Pages - delete") },
-        :available_to => %w[
+      manage_wiki_delete: {
+        label: -> { t("Delete pages") },
+        label_v2: -> { t("Pages - delete") },
+        available_to: %w[
           TaEnrollment
           TeacherEnrollment
           DesignerEnrollment
@@ -1304,19 +1304,19 @@ class RoleOverride < ActiveRecord::Base
           AccountAdmin
           AccountMembership
         ],
-        :true_for => %w[
+        true_for: %w[
           TaEnrollment
           TeacherEnrollment
           DesignerEnrollment
           AccountAdmin
         ],
-        :group => 'manage_wiki',
-        :group_label => -> { t('Manage Pages') }
+        group: 'manage_wiki',
+        group_label: -> { t('Manage Pages') }
       },
-      :moderate_forum => {
-        :label => -> { t('permissions.moderate_form', "Moderate discussions ( delete / edit other's posts, lock topics)") },
-        :label_v2 => -> { t("Discussions - moderate") },
-        :available_to => %w[
+      moderate_forum: {
+        label: -> { t('permissions.moderate_form', "Moderate discussions ( delete / edit other's posts, lock topics)") },
+        label_v2: -> { t("Discussions - moderate") },
+        available_to: %w[
           StudentEnrollment
           TaEnrollment
           DesignerEnrollment
@@ -1325,17 +1325,17 @@ class RoleOverride < ActiveRecord::Base
           AccountAdmin
           AccountMembership
         ],
-        :true_for => %w[
+        true_for: %w[
           TaEnrollment
           DesignerEnrollment
           TeacherEnrollment
           AccountAdmin
         ]
       },
-      :post_to_forum => {
-        :label => -> { t('permissions.post_to_forum', "Post to discussions") },
-        :label_v2 => -> { t("Discussions - post") },
-        :available_to => %w[
+      post_to_forum: {
+        label: -> { t('permissions.post_to_forum', "Post to discussions") },
+        label_v2: -> { t("Discussions - post") },
+        available_to: %w[
           StudentEnrollment
           TaEnrollment
           DesignerEnrollment
@@ -1344,20 +1344,20 @@ class RoleOverride < ActiveRecord::Base
           AccountAdmin
           AccountMembership
         ],
-        :true_for => %w[
+        true_for: %w[
           StudentEnrollment
           TaEnrollment
           DesignerEnrollment
           TeacherEnrollment
           AccountAdmin
         ],
-        :restrict_future_enrollments => true,
-        :applies_to_concluded => ['TeacherEnrollment', 'TaEnrollment']
+        restrict_future_enrollments: true,
+        applies_to_concluded: ['TeacherEnrollment', 'TaEnrollment']
       },
-      :read_announcements => {
-        :label => -> { t('View announcements') },
-        :label_v2 => -> { t("Announcements - view") },
-        :available_to => %w[
+      read_announcements: {
+        label: -> { t('View announcements') },
+        label_v2: -> { t("Announcements - view") },
+        available_to: %w[
           StudentEnrollment
           TaEnrollment
           DesignerEnrollment
@@ -1366,7 +1366,7 @@ class RoleOverride < ActiveRecord::Base
           AccountAdmin
           AccountMembership
         ],
-        :true_for => %w[
+        true_for: %w[
           StudentEnrollment
           TaEnrollment
           DesignerEnrollment
@@ -1374,12 +1374,12 @@ class RoleOverride < ActiveRecord::Base
           TeacherEnrollment
           AccountAdmin
         ],
-        :applies_to_concluded => true
+        applies_to_concluded: true
       },
-      :read_email_addresses => {
-        :label => -> { t("See other users' primary email address") },
-        :label_v2 => -> { t("Users - view primary email address") },
-        :available_to => %w[
+      read_email_addresses: {
+        label: -> { t("See other users' primary email address") },
+        label_v2: -> { t("Users - view primary email address") },
+        available_to: %w[
           StudentEnrollment
           TaEnrollment
           DesignerEnrollment
@@ -1388,17 +1388,17 @@ class RoleOverride < ActiveRecord::Base
           AccountAdmin
           AccountMembership
         ],
-        :true_for => %w[
+        true_for: %w[
           TaEnrollment
           TeacherEnrollment
           AccountAdmin
         ],
-        :applies_to_concluded => ['TeacherEnrollment', 'TaEnrollment']
+        applies_to_concluded: ['TeacherEnrollment', 'TaEnrollment']
       },
-      :read_forum => {
-        :label => -> { t('permissions.read_forum', "View discussions") },
-        :label_v2 => -> { t("Discussions - view") },
-        :available_to => %w[
+      read_forum: {
+        label: -> { t('permissions.read_forum', "View discussions") },
+        label_v2: -> { t("Discussions - view") },
+        available_to: %w[
           StudentEnrollment
           TaEnrollment
           DesignerEnrollment
@@ -1407,7 +1407,7 @@ class RoleOverride < ActiveRecord::Base
           AccountAdmin
           AccountMembership
         ],
-        :true_for => %w[
+        true_for: %w[
           StudentEnrollment
           TaEnrollment
           DesignerEnrollment
@@ -1415,12 +1415,12 @@ class RoleOverride < ActiveRecord::Base
           TeacherEnrollment
           AccountAdmin
         ],
-        :applies_to_concluded => true
+        applies_to_concluded: true
       },
-      :read_question_banks => {
-        :label => -> { t('permissions.read_question_banks', "View and link to question banks") },
-        :label_v2 => -> { t("Question banks - view and link") },
-        :available_to => %w[
+      read_question_banks: {
+        label: -> { t('permissions.read_question_banks', "View and link to question banks") },
+        label_v2: -> { t("Question banks - view and link") },
+        available_to: %w[
           TaEnrollment
           DesignerEnrollment
           TeacherEnrollment
@@ -1428,35 +1428,35 @@ class RoleOverride < ActiveRecord::Base
           AccountAdmin
           AccountMembership
         ],
-        :true_for => %w[
+        true_for: %w[
           TaEnrollment
           DesignerEnrollment
           TeacherEnrollment
           AccountAdmin
         ],
-        :applies_to_concluded => true
+        applies_to_concluded: true
       },
-      :read_reports => {
-        :label => -> { t('permissions.read_reports', "View usage reports for the course") },
-        :label_v2 => -> { t("Courses - view usage reports") },
-        :available_to => %w[
+      read_reports: {
+        label: -> { t('permissions.read_reports', "View usage reports for the course") },
+        label_v2: -> { t("Courses - view usage reports") },
+        available_to: %w[
           TaEnrollment
           DesignerEnrollment
           TeacherEnrollment
           AccountAdmin
           AccountMembership
         ],
-        :true_for => %w[
+        true_for: %w[
           TaEnrollment
           DesignerEnrollment
           TeacherEnrollment
           AccountAdmin
         ]
       },
-      :read_roster => {
-        :label => -> { t('permissions.read_roster', "See the list of users") },
-        :label_v2 => -> { t("Users - view list") },
-        :available_to => %w[
+      read_roster: {
+        label: -> { t('permissions.read_roster', "See the list of users") },
+        label_v2: -> { t("Users - view list") },
+        available_to: %w[
           StudentEnrollment
           TaEnrollment
           DesignerEnrollment
@@ -1465,30 +1465,30 @@ class RoleOverride < ActiveRecord::Base
           AccountAdmin
           AccountMembership
         ],
-        :true_for => %w[
+        true_for: %w[
           StudentEnrollment
           TaEnrollment
           DesignerEnrollment
           TeacherEnrollment
           AccountAdmin
         ],
-        :applies_to_concluded => %w[TeacherEnrollment TaEnrollment DesignerEnrollment]
+        applies_to_concluded: %w[TeacherEnrollment TaEnrollment DesignerEnrollment]
       },
-      :read_sis => {
-        :label => -> { t('permission.read_sis', "Read SIS data") },
-        :label_v2 => -> { t("SIS Data - read") },
-        :true_for => %w[AccountAdmin TeacherEnrollment],
-        :available_to => %w[AccountAdmin AccountMembership TeacherEnrollment TaEnrollment StudentEnrollment]
+      read_sis: {
+        label: -> { t('permission.read_sis', "Read SIS data") },
+        label_v2: -> { t("SIS Data - read") },
+        true_for: %w[AccountAdmin TeacherEnrollment],
+        available_to: %w[AccountAdmin AccountMembership TeacherEnrollment TaEnrollment StudentEnrollment]
       },
-      :select_final_grade => {
-        :label => -> { t('Grades - select final grade for moderation') },
-        :true_for => %w[AccountAdmin TeacherEnrollment TaEnrollment],
-        :available_to => %w[AccountAdmin AccountMembership TeacherEnrollment TaEnrollment]
+      select_final_grade: {
+        label: -> { t('Grades - select final grade for moderation') },
+        true_for: %w[AccountAdmin TeacherEnrollment TaEnrollment],
+        available_to: %w[AccountAdmin AccountMembership TeacherEnrollment TaEnrollment]
       },
-      :send_messages => {
-        :label => -> { t('permissions.send_messages', "Send messages to individual course members") },
-        :label_v2 => -> { t("Conversations - send messages to individual course members") },
-        :available_to => %w[
+      send_messages: {
+        label: -> { t('permissions.send_messages', "Send messages to individual course members") },
+        label_v2: -> { t("Conversations - send messages to individual course members") },
+        available_to: %w[
           StudentEnrollment
           TaEnrollment
           DesignerEnrollment
@@ -1497,7 +1497,7 @@ class RoleOverride < ActiveRecord::Base
           AccountAdmin
           AccountMembership
         ],
-        :true_for => %w[
+        true_for: %w[
           StudentEnrollment
           TaEnrollment
           DesignerEnrollment
@@ -1505,10 +1505,10 @@ class RoleOverride < ActiveRecord::Base
           AccountAdmin
         ]
       },
-      :send_messages_all => {
-        :label => -> { t('permissions.send_messages_all', "Send messages to the entire class") },
-        :label_v2 => -> { t("Conversations - send messages to entire class") },
-        :available_to => %w[
+      send_messages_all: {
+        label: -> { t('permissions.send_messages_all', "Send messages to the entire class") },
+        label_v2: -> { t("Conversations - send messages to entire class") },
+        available_to: %w[
           StudentEnrollment
           TaEnrollment
           DesignerEnrollment
@@ -1517,39 +1517,39 @@ class RoleOverride < ActiveRecord::Base
           AccountAdmin
           AccountMembership
         ],
-        :true_for => %w[
+        true_for: %w[
           TaEnrollment
           DesignerEnrollment
           TeacherEnrollment
           AccountAdmin
         ]
       },
-      :view_audit_trail => {
-        :label => -> { t('Grades - view audit trail') },
-        :true_for => %w[AccountAdmin],
-        :available_to => %w[TeacherEnrollment AccountAdmin AccountMembership]
+      view_audit_trail: {
+        label: -> { t('Grades - view audit trail') },
+        true_for: %w[AccountAdmin],
+        available_to: %w[TeacherEnrollment AccountAdmin AccountMembership]
       },
-      :view_all_grades => {
-        :label => -> { t('permissions.view_all_grades', "View all grades") },
-        :label_v2 => -> { t("Grades - view all grades") },
-        :available_to => %w[
+      view_all_grades: {
+        label: -> { t('permissions.view_all_grades', "View all grades") },
+        label_v2: -> { t("Grades - view all grades") },
+        available_to: %w[
           TaEnrollment
           DesignerEnrollment
           TeacherEnrollment
           AccountAdmin
           AccountMembership
         ],
-        :true_for => %w[
+        true_for: %w[
           TaEnrollment
           TeacherEnrollment
           AccountAdmin
         ],
-        :applies_to_concluded => true
+        applies_to_concluded: true
       },
-      :view_group_pages => {
-        :label => -> { t('permissions.view_group_pages', "View the group pages of all student groups") },
-        :label_v2 => -> { t("Groups - view all student groups") },
-        :available_to => %w[
+      view_group_pages: {
+        label: -> { t('permissions.view_group_pages', "View the group pages of all student groups") },
+        label_v2: -> { t("Groups - view all student groups") },
+        available_to: %w[
           StudentEnrollment
           TaEnrollment
           DesignerEnrollment
@@ -1558,26 +1558,26 @@ class RoleOverride < ActiveRecord::Base
           AccountAdmin
           AccountMembership
         ],
-        :true_for => %w[
+        true_for: %w[
           TaEnrollment
           DesignerEnrollment
           TeacherEnrollment
           AccountAdmin
         ],
-        :applies_to_concluded => true
+        applies_to_concluded: true
       },
-      :view_quiz_answer_audits => {
-        :label => -> { t('permissions.view_quiz_answer_audits', 'View the answer matrix in Quiz Submission Logs') },
-        :label_v2 => -> { t('Quizzes - view submission log') },
-        :true_for => %w[AccountAdmin],
-        :available_to => %w[AccountAdmin AccountMembership],
-        :account_allows => ->(a) { a.feature_allowed?(:quiz_log_auditing) }
+      view_quiz_answer_audits: {
+        label: -> { t('permissions.view_quiz_answer_audits', 'View the answer matrix in Quiz Submission Logs') },
+        label_v2: -> { t('Quizzes - view submission log') },
+        true_for: %w[AccountAdmin],
+        available_to: %w[AccountAdmin AccountMembership],
+        account_allows: ->(a) { a.feature_allowed?(:quiz_log_auditing) }
       },
-      :view_user_logins => {
-        :label => -> { t("View login ids for users") },
-        :label_v2 => -> { t("Users - view login IDs") },
-        :available_to => %w[AccountAdmin AccountMembership TeacherEnrollment TaEnrollment],
-        :true_for => %w[AccountAdmin TeacherEnrollment TaEnrollment]
+      view_user_logins: {
+        label: -> { t("View login ids for users") },
+        label_v2: -> { t("Users - view login IDs") },
+        available_to: %w[AccountAdmin AccountMembership TeacherEnrollment TaEnrollment],
+        true_for: %w[AccountAdmin TeacherEnrollment TaEnrollment]
       }
     }
   )
@@ -1765,15 +1765,15 @@ class RoleOverride < ActiveRecord::Base
     locked = !default_data[:available_to].include?(base_role) || !account_allows
 
     generated_permission = {
-      :account_allows => account_allows,
-      :permission => permission,
-      :enabled => account_allows && (default_data[:true_for].include?(base_role) ? [:self, :descendants] : false),
-      :locked => locked,
-      :readonly => locked,
-      :explicit => false,
-      :base_role_type => base_role,
-      :enrollment_type => role.name,
-      :role_id => role.id,
+      account_allows: account_allows,
+      permission: permission,
+      enabled: account_allows && (default_data[:true_for].include?(base_role) ? [:self, :descendants] : false),
+      locked: locked,
+      readonly: locked,
+      explicit: false,
+      base_role_type: base_role,
+      enrollment_type: role.name,
+      role_id: role.id,
     }
     generated_permission[:group] = default_data[:group] if default_data[:group].present?
 
@@ -1867,11 +1867,11 @@ class RoleOverride < ActiveRecord::Base
   # differentiates nil, false, and truthy as possible values
   def self.manage_role_override(context, role, permission, settings)
     context.shard.activate do
-      role_override = context.role_overrides.where(:permission => permission, :role_id => role.id).first
+      role_override = context.role_overrides.where(permission: permission, role_id: role.id).first
       if !settings[:override].nil? || settings[:locked]
         role_override ||= context.role_overrides.build(
-          :permission => permission,
-          :role => role
+          permission: permission,
+          role: role
         )
         role_override.enabled = settings[:override] unless settings[:override].nil?
         role_override.locked = settings[:locked] unless settings[:locked].nil?

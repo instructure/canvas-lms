@@ -46,13 +46,13 @@ describe EventStream::Stream do
 
   context "setup block" do
     before do
-      double(:to_s => double('table'))
+      double(to_s: double('table'))
     end
 
     it "sets values as expected" do
       # can't access spec ivars inside instance_exec
       database, table = self.database, @table
-      id_column = double(:to_s => double('id_column'))
+      id_column = double(to_s: double('id_column'))
       record_type = double('record_type')
 
       stream = EventStream::Stream.new do
@@ -112,7 +112,7 @@ describe EventStream::Stream do
     it "returns true when available and configured" do
       # can't access spec ivars inside instance_exec
       database, table = self.database, @table
-      id_column = double(:to_s => double('id_column'))
+      id_column = double(to_s: double('id_column'))
       record_type = double('record_type')
 
       stream = EventStream::Stream.new do
@@ -131,7 +131,7 @@ describe EventStream::Stream do
       # can't access spec ivars inside instance_exec
       database, table = self.database, @table
       allow(database).to receive(:available?).and_return(false)
-      id_column = double(:to_s => double('id_column'))
+      id_column = double(to_s: double('id_column'))
       record_type = double('record_type')
 
       stream = EventStream::Stream.new do
@@ -149,7 +149,7 @@ describe EventStream::Stream do
     it "returns false when not configured" do
       # can't access spec ivars inside instance_exec
       table = @table
-      id_column = double(:to_s => double('id_column'))
+      id_column = double(to_s: double('id_column'))
       record_type = double('record_type')
 
       stream = EventStream::Stream.new do
@@ -169,7 +169,7 @@ describe EventStream::Stream do
     it "returns backend db name from AR" do
       # can't access spec ivars inside instance_exec
       table = @table
-      id_column = double(:to_s => double('id_column'))
+      id_column = double(to_s: double('id_column'))
       record_type = double('record_type')
 
       ar_type = Class.new do
@@ -202,7 +202,7 @@ describe EventStream::Stream do
 
   context "usage" do
     before do
-      @table = double(:to_s => "expected_table")
+      @table = double(to_s: "expected_table")
       database, table = self.database, @table
       @stream = EventStream::Stream.new do
         self.database database
@@ -212,7 +212,7 @@ describe EventStream::Stream do
 
     describe "on_insert" do
       before do
-        @record = double(:id => double('id'), :created_at => Time.now, :attributes => double('attributes'))
+        @record = double(id: double('id'), created_at: Time.now, attributes: double('attributes'))
       end
 
       it "registers callback for execution during insert" do
@@ -255,7 +255,7 @@ describe EventStream::Stream do
     describe "insert" do
       before do
         @timestamp = Time.now
-        @record = double(:id => double('id'), :created_at => @timestamp, :attributes => double('attributes'))
+        @record = double(id: double('id'), created_at: @timestamp, attributes: double('attributes'))
       end
 
       it "inserts into the configured database" do
@@ -269,7 +269,7 @@ describe EventStream::Stream do
       end
 
       it "inserts by the record's id into the configured id column" do
-        id_column = double(:to_s => double('id_column'))
+        id_column = double(to_s: double('id_column'))
         @stream.id_column id_column
         expect(database).to receive(:insert_record).with(anything, { id_column.to_s => @record.id }, anything, anything)
         @stream.insert(@record)
@@ -297,7 +297,7 @@ describe EventStream::Stream do
 
     describe "on_update" do
       before do
-        @record = double(:id => double('id'), :created_at => Time.now, :changes => double('changes'))
+        @record = double(id: double('id'), created_at: Time.now, changes: double('changes'))
       end
 
       it "registers callback for execution during update" do
@@ -327,7 +327,7 @@ describe EventStream::Stream do
     describe "update" do
       before do
         @timestamp = Time.now
-        @record = double(:id => double('id'), :created_at => @timestamp, :changes => double('changes'))
+        @record = double(id: double('id'), created_at: @timestamp, changes: double('changes'))
       end
 
       it "updates in the configured database" do
@@ -341,7 +341,7 @@ describe EventStream::Stream do
       end
 
       it "updates by the record's id in the configured id column" do
-        id_column = double(:to_s => double('id_column'))
+        id_column = double(to_s: double('id_column'))
         @stream.id_column id_column
         expect(database).to receive(:update_record).with(anything, { id_column.to_s => @record.id }, anything, anything)
         @stream.update(@record)
@@ -369,7 +369,7 @@ describe EventStream::Stream do
 
     describe "fetch" do
       before do
-        @results = double(:fetch => nil)
+        @results = double(fetch: nil)
       end
 
       it "uses the configured database" do
@@ -383,14 +383,14 @@ describe EventStream::Stream do
       end
 
       it "uses the configured id column" do
-        id_column = double(:to_s => "expected_id_column")
+        id_column = double(to_s: "expected_id_column")
         @stream.id_column id_column
         expect(database).to receive(:execute).once.with(/ WHERE #{id_column}/, anything, anything).and_return(@results)
         @stream.fetch([1])
       end
 
       it "passes the given ids to the execute" do
-        ids = double('ids', :empty? => false)
+        ids = double('ids', empty?: false)
         expect(database).to receive(:execute).once.with(anything, ids, anything).and_return(@results)
         @stream.fetch(ids)
       end
@@ -398,7 +398,7 @@ describe EventStream::Stream do
       it "maps the returned rows to the configured record type" do
         record_type = double('record_type')
         raw_result = double('raw_result')
-        cql_result = double('cql_result', :to_hash => raw_result)
+        cql_result = double('cql_result', to_hash: raw_result)
         typed_result = double('typed_result')
         expect(record_type).to receive(:from_attributes).with(raw_result).and_return(typed_result)
 
@@ -441,17 +441,17 @@ describe EventStream::Stream do
         @index_strategy = @index.strategy_for(:cassandra)
 
         @key = double('key')
-        @entry = double('entry', :key => @key)
+        @entry = double('entry', key: @key)
       end
 
       describe "generated on_insert callback" do
         before do
           @record = double(
-            :id => double('id'),
-            :created_at => Time.now,
-            :attributes => double('attributes'),
-            :changes => double('changes'),
-            :entry => @entry
+            id: double('id'),
+            created_at: Time.now,
+            attributes: double('attributes'),
+            changes: double('changes'),
+            entry: @entry
           )
         end
 
@@ -466,7 +466,7 @@ describe EventStream::Stream do
         end
 
         it "skips insert if entry_proc and_return nil" do
-          @index.entry_proc ->(_record) { }
+          @index.entry_proc ->(_record) {}
           expect(@index_strategy).not_to receive(:insert)
           @stream.insert(@record)
         end
@@ -485,7 +485,7 @@ describe EventStream::Stream do
 
       describe "generated for_thing method" do
         it "forwards argument to index's find_with" do
-          expect(@index).to receive(:find_with).once.with([@entry], { :strategy => :cassandra })
+          expect(@index).to receive(:find_with).once.with([@entry], { strategy: :cassandra })
           @stream.for_thing(@entry)
         end
       end
@@ -499,10 +499,10 @@ describe EventStream::Stream do
         end
         allow(@stream).to receive(:database).and_return(@database)
         @record = double(
-          :id => 'id',
-          :created_at => Time.zone.now,
-          :attributes => { 'attribute' => 'attribute_value' },
-          :changes => { 'changed_attribute' => 'changed_value' }
+          id: 'id',
+          created_at: Time.zone.now,
+          attributes: { 'attribute' => 'attribute_value' },
+          changes: { 'changed_attribute' => 'changed_value' }
         )
         @exception = StandardError.new
       end

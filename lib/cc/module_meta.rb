@@ -28,7 +28,7 @@ module CC
       else
         meta_file = File.new(File.join(@canvas_resource_dir, CCHelper::MODULE_META), 'w')
         rel_path = File.join(CCHelper::COURSE_SETTINGS_DIR, CCHelper::MODULE_META)
-        document = Builder::XmlMarkup.new(:target => meta_file, :indent => 2)
+        document = Builder::XmlMarkup.new(target: meta_file, indent: 2)
       end
 
       module_id_map = {}
@@ -56,7 +56,7 @@ module CC
 
           add_exported_asset(cm)
 
-          mods_node.module(:identifier => mod_migration_id) do |m_node|
+          mods_node.module(identifier: mod_migration_id) do |m_node|
             m_node.title cm.name
             m_node.workflow_state cm.workflow_state
             m_node.position cm.position
@@ -68,7 +68,7 @@ module CC
             if cm.prerequisites.present?
               m_node.prerequisites do |pre_reqs|
                 cm.prerequisites.each do |pre_req|
-                  pre_reqs.prerequisite(:type => pre_req[:type]) do |pr|
+                  pre_reqs.prerequisite(type: pre_req[:type]) do |pr|
                     pr.title pre_req[:name]
                     pr.identifierref module_id_map[pre_req[:id]]
                   end
@@ -81,7 +81,7 @@ module CC
               cm.content_tags.not_deleted.each do |ct|
                 ct_migration_id = create_key(ct)
                 ct_id_map[ct.id] = ct_migration_id
-                items_node.item(:identifier => ct_migration_id) do |item_node|
+                items_node.item(identifier: ct_migration_id) do |item_node|
                   unless ['ContextModuleSubHeader', 'ExternalUrl'].member? ct.content_type
                     add_item_to_export(ct.content)
                   end
@@ -109,7 +109,7 @@ module CC
             if cm.completion_requirements.present?
               m_node.completionRequirements do |crs_node|
                 cm.completion_requirements.each do |c_req|
-                  crs_node.completionRequirement(:type => c_req[:type]) do |cr_node|
+                  crs_node.completionRequirement(type: c_req[:type]) do |cr_node|
                     cr_node.min_score c_req[:min_score] unless c_req[:min_score].blank?
                     cr_node.identifierref ct_id_map[c_req[:id]]
                   end

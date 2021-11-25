@@ -81,9 +81,9 @@ describe AuthenticationMethods do
   describe "#load_user" do
     context "with active session" do
       before do
-        @request = double(:env => { 'encrypted_cookie_store.session_refreshed_at' => 5.minutes.ago },
-                          :format => double(:json? => false),
-                          :host_with_port => "")
+        @request = double(env: { 'encrypted_cookie_store.session_refreshed_at' => 5.minutes.ago },
+                          format: double(json?: false),
+                          host_with_port: "")
         @controller = mock_controller_class.new(request: @request)
         allow(@controller).to receive(:load_pseudonym_from_access_token)
         allow(@controller).to receive(:api_request?).and_return(false)
@@ -157,7 +157,7 @@ describe AuthenticationMethods do
 
       def setup_with_jwt(token)
         request = double(authorization: "Bearer #{token}",
-                         format: double(:json? => true),
+                         format: double(json?: true),
                          host_with_port: "",
                          url: "",
                          method: "GET")
@@ -213,7 +213,7 @@ describe AuthenticationMethods do
 
       def setup_with_token(token)
         request = double(authorization: "Bearer #{token.full_token}",
-                         format: double(:json? => true),
+                         format: double(json?: true),
                          host_with_port: "",
                          url: "",
                          method: "GET")
@@ -342,7 +342,7 @@ describe AuthenticationMethods do
     let(:account) { Account.create! }
     let(:dev_key) { DeveloperKey.create!(account: account) }
     let(:access_token) { AccessToken.create!(developer_key: dev_key) }
-    let(:request) { double(format: double(:json? => false), host_with_port: "") }
+    let(:request) { double(format: double(json?: false), host_with_port: "") }
     let(:controller) { mock_controller_class.new(request: request, root_account: account) }
 
     it "doesn't call '#get_context' if the Dev key is owned by the domain root account" do

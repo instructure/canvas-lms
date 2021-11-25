@@ -79,7 +79,7 @@ describe "Exportable" do
                  end
 
                  def content_export
-                   @content_export ||= @course.content_exports.create!(:export_type => ContentExport::COURSE_COPY)
+                   @content_export ||= @course.content_exports.create!(export_type: ContentExport::COURSE_COPY)
                  end
                end)
   end

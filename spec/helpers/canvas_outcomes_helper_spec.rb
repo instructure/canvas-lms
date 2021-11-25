@@ -22,7 +22,7 @@ describe CanvasOutcomesHelper do
   subject { Object.new.extend CanvasOutcomesHelper }
 
   before do
-    course_with_teacher_logged_in(:active_all => true)
+    course_with_teacher_logged_in(active_all: true)
   end
 
   let(:account) { @course.account }
@@ -92,7 +92,7 @@ describe CanvasOutcomesHelper do
       context 'within a Group' do
         before do
           outcome_model(context: @course)
-          @group = @course.groups.create(:name => "some group")
+          @group = @course.groups.create(name: "some group")
         end
 
         it 'sets js_env with the group.context values' do

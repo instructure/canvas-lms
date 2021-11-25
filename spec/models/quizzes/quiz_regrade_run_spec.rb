@@ -26,10 +26,10 @@ describe Quizzes::QuizRegradeRun do
   describe "#perform" do
     before do
       @course = Course.create!
-      @quiz = Quizzes::Quiz.create!(:context => @course)
+      @quiz = Quizzes::Quiz.create!(context: @course)
       @user = User.create!
 
-      @regrade = Quizzes::QuizRegrade.create(:user_id => @user.id, :quiz_id => @quiz.id, :quiz_version => 1)
+      @regrade = Quizzes::QuizRegrade.create(user_id: @user.id, quiz_id: @quiz.id, quiz_version: 1)
     end
 
     it "creates a new quiz regrade run" do

@@ -22,7 +22,7 @@ require_relative '../api_spec_helper'
 
 describe OutcomeProficiencyApiController, type: :request do
   before :once do
-    @user = user_with_pseudonym :active_all => true
+    @user = user_with_pseudonym active_all: true
   end
 
   shared_examples "update examples" do
@@ -176,7 +176,7 @@ describe OutcomeProficiencyApiController, type: :request do
   end
 
   def revoke_manage_proficiency_scales
-    RoleOverride.manage_role_override(@account, @account_user.role, 'manage_proficiency_scales', :override => false)
+    RoleOverride.manage_role_override(@account, @account_user.role, 'manage_proficiency_scales', override: false)
   end
 
   context "for course" do
@@ -240,8 +240,8 @@ describe OutcomeProficiencyApiController, type: :request do
             :get,
             "/api/v1/courses/#{@course.id}/outcome_proficiency",
             {
-              :controller => 'outcome_proficiency_api', :action => 'show',
-              :format => 'json', :course_id => @course.id.to_s
+              controller: 'outcome_proficiency_api', action: 'show',
+              format: 'json', course_id: @course.id.to_s
             }
           )
         end
@@ -262,8 +262,8 @@ describe OutcomeProficiencyApiController, type: :request do
             :get,
             "/api/v1/courses/#{@course.id}/outcome_proficiency",
             {
-              :controller => 'outcome_proficiency_api', :action => 'show',
-              :format => 'json', :course_id => @course.id.to_s
+              controller: 'outcome_proficiency_api', action: 'show',
+              format: 'json', course_id: @course.id.to_s
             }
           )
           assert_status(404)
@@ -275,8 +275,8 @@ describe OutcomeProficiencyApiController, type: :request do
             :get,
             "/api/v1/courses/#{@course.id}/outcome_proficiency",
             {
-              :controller => 'outcome_proficiency_api', :action => 'show',
-              :format => 'json', :course_id => @course.id.to_s
+              controller: 'outcome_proficiency_api', action: 'show',
+              format: 'json', course_id: @course.id.to_s
             }
           )
           expect(@json).to eq OutcomeProficiency.find_or_create_default!(@account).as_json
@@ -293,8 +293,8 @@ describe OutcomeProficiencyApiController, type: :request do
             :get,
             "/api/v1/courses/#{@course.id}/outcome_proficiency",
             {
-              :controller => 'outcome_proficiency_api', :action => 'show',
-              :format => 'json', :course_id => @course.id.to_s
+              controller: 'outcome_proficiency_api', action: 'show',
+              format: 'json', course_id: @course.id.to_s
             }
           )
         end
@@ -370,8 +370,8 @@ describe OutcomeProficiencyApiController, type: :request do
             :get,
             "/api/v1/accounts/#{@account.id}/outcome_proficiency",
             {
-              :controller => 'outcome_proficiency_api', :action => 'show',
-              :format => 'json', :account_id => @account.id.to_s
+              controller: 'outcome_proficiency_api', action: 'show',
+              format: 'json', account_id: @account.id.to_s
             }
           )
         end
@@ -392,8 +392,8 @@ describe OutcomeProficiencyApiController, type: :request do
             :get,
             "/api/v1/accounts/#{@account.id}/outcome_proficiency",
             {
-              :controller => 'outcome_proficiency_api', :action => 'show',
-              :format => 'json', :account_id => @account.id.to_s
+              controller: 'outcome_proficiency_api', action: 'show',
+              format: 'json', account_id: @account.id.to_s
             }
           )
           assert_status(404)
@@ -405,8 +405,8 @@ describe OutcomeProficiencyApiController, type: :request do
             :get,
             "/api/v1/accounts/#{@account.id}/outcome_proficiency",
             {
-              :controller => 'outcome_proficiency_api', :action => 'show',
-              :format => 'json', :account_id => @account.id.to_s
+              controller: 'outcome_proficiency_api', action: 'show',
+              format: 'json', account_id: @account.id.to_s
             }
           )
           expect(@json).to eq OutcomeProficiency.find_or_create_default!(@account).as_json
@@ -423,8 +423,8 @@ describe OutcomeProficiencyApiController, type: :request do
             :get,
             "/api/v1/accounts/#{@account.id}/outcome_proficiency",
             {
-              :controller => 'outcome_proficiency_api', :action => 'show',
-              :format => 'json', :account_id => @account.id.to_s
+              controller: 'outcome_proficiency_api', action: 'show',
+              format: 'json', account_id: @account.id.to_s
             }
           )
         end

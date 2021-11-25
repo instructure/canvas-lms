@@ -191,12 +191,12 @@ describe CanvasCache::Redis do
           expect(client.nodes.last.id).to eq 'redis://nonexistent:1234/0'
           expect(client.nodes.last._client).to receive(:ensure_connected).and_raise(Redis::TimeoutError).once
 
-          cache.write('1', true, :use_new_rails => false)
-          cache.write(key2, true, :use_new_rails => false)
+          cache.write('1', true, use_new_rails: false)
+          cache.write(key2, true, use_new_rails: false)
           # one returned nil, one returned true; we don't know which one which key ended up on
           expect([
-            cache.fetch('1', :use_new_rails => false),
-            cache.fetch(key2, :use_new_rails => false)
+            cache.fetch('1', use_new_rails: false),
+            cache.fetch(key2, use_new_rails: false)
           ].compact).to eq [true]
         end
 

@@ -44,7 +44,7 @@ describe TurnitinApi::OutcomesResponseTransformer do
   describe 'response' do
     before do
       stub_request(:post, "http://turnitin.com/api/lti/1p0/outcome_tool_data/4321")
-        .to_return(:status => 200, :body => fixture('outcome_detailed_response.json'), :headers => { 'Content-Type' => 'application/json' })
+        .to_return(status: 200, body: fixture('outcome_detailed_response.json'), headers: { 'Content-Type' => 'application/json' })
     end
 
     it 'returns expected json response' do
@@ -55,10 +55,10 @@ describe TurnitinApi::OutcomesResponseTransformer do
   describe 'original_submission' do
     before do
       stub_request(:post, "http://turnitin.com/api/lti/1p0/outcome_tool_data/4321")
-        .to_return(:status => 200, :body => fixture('outcome_detailed_response.json'), :headers => { 'Content-Type' => 'application/json' })
+        .to_return(status: 200, body: fixture('outcome_detailed_response.json'), headers: { 'Content-Type' => 'application/json' })
 
       stub_request(:post, "https://turnitin.com/api/lti/1p0/dow...72874634?lang=")
-        .to_return(:status => 200, :body => "I am an awesome text file", :headers => { 'Content-Type' => 'text/plain', 'Content-Disposition' => 'attachment; filename="myfile.txt"' })
+        .to_return(status: 200, body: "I am an awesome text file", headers: { 'Content-Type' => 'text/plain', 'Content-Disposition' => 'attachment; filename="myfile.txt"' })
     end
 
     it 'returns a File' do
@@ -71,7 +71,7 @@ describe TurnitinApi::OutcomesResponseTransformer do
   describe 'originality report' do
     before do
       stub_request(:post, "http://turnitin.com/api/lti/1p0/outcome_tool_data/4321")
-        .to_return(:status => 200, :body => fixture('outcome_detailed_response.json'), :headers => { 'Content-Type' => 'application/json' })
+        .to_return(status: 200, body: fixture('outcome_detailed_response.json'), headers: { 'Content-Type' => 'application/json' })
     end
 
     it 'returns a url' do
@@ -82,7 +82,7 @@ describe TurnitinApi::OutcomesResponseTransformer do
   describe 'originality data' do
     before do
       stub_request(:post, "http://turnitin.com/api/lti/1p0/outcome_tool_data/4321")
-        .to_return(:status => 200, :body => fixture('outcome_detailed_response.json'), :headers => { 'Content-Type' => 'application/json' })
+        .to_return(status: 200, body: fixture('outcome_detailed_response.json'), headers: { 'Content-Type' => 'application/json' })
     end
 
     it 'returns proper keys' do

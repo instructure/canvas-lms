@@ -20,7 +20,7 @@
 
 describe NotificationEndpoint do
   before :once do
-    @at = AccessToken.create!(:user => user_model, :developer_key => DeveloperKey.default)
+    @at = AccessToken.create!(user: user_model, developer_key: DeveloperKey.default)
   end
 
   before do
@@ -110,7 +110,7 @@ describe NotificationEndpoint do
     expect(@user.notification_endpoints.count).to eq 0
 
     @at.notification_endpoints.create!(token: 'token')
-    AccessToken.where(:id => @at).update_all(:workflow_state => 'deleted')
+    AccessToken.where(id: @at).update_all(workflow_state: 'deleted')
     expect(@user.notification_endpoints.count).to eq 0
   end
 end

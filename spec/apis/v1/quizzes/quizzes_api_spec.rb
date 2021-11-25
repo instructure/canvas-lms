@@ -29,7 +29,7 @@ describe Quizzes::QuizzesApiController, type: :request do
     let(:item_type) { 'quiz' }
 
     let(:locked_item) do
-      quiz = @course.quizzes.create!(:title => 'Locked Quiz')
+      quiz = @course.quizzes.create!(title: 'Locked Quiz')
       quiz.publish!
       quiz
     end
@@ -38,7 +38,7 @@ describe Quizzes::QuizzesApiController, type: :request do
       api_call(
         :get,
         "/api/v1/courses/#{@course.id}/quizzes/#{locked_item.id}",
-        { :controller => 'quizzes/quizzes_api', :action => 'show', :format => 'json', :course_id => @course.id.to_s, :id => locked_item.id.to_s }
+        { controller: 'quizzes/quizzes_api', action: 'show', format: 'json', course_id: @course.id.to_s, id: locked_item.id.to_s }
       )
     end
 
@@ -46,9 +46,9 @@ describe Quizzes::QuizzesApiController, type: :request do
   end
 
   describe "GET /courses/:course_id/quizzes (index)" do
-    let(:quizzes) { (0..3).map { |i| @course.quizzes.create! :title => "quiz_#{i}" } }
+    let(:quizzes) { (0..3).map { |i| @course.quizzes.create! title: "quiz_#{i}" } }
 
-    before(:once) { teacher_in_course(:active_all => true) }
+    before(:once) { teacher_in_course(active_all: true) }
 
     before do
       quizzes
@@ -77,8 +77,8 @@ describe Quizzes::QuizzesApiController, type: :request do
 
       describe 'search_term query param' do
         let(:search_term) { 'waldo' }
-        let(:quizzes_with_search_term) { (0..2).map { |i| @course.quizzes.create! :title => "#{search_term}_#{i}" } }
-        let(:quizzes_without_search_term) { (0..2).map { |i| @course.quizzes.create! :title => "quiz_#{i}" } }
+        let(:quizzes_with_search_term) { (0..2).map { |i| @course.quizzes.create! title: "#{search_term}_#{i}" } }
+        let(:quizzes_without_search_term) { (0..2).map { |i| @course.quizzes.create! title: "quiz_#{i}" } }
         let(:quizzes) { quizzes_with_search_term + quizzes_without_search_term }
 
         it "searches for quizzes by title" do
@@ -98,7 +98,7 @@ describe Quizzes::QuizzesApiController, type: :request do
 
       context 'quizzes with the same title' do
         let(:quiz_count) { 10 }
-        let(:quizzes) { (0..quiz_count).map { @course.quizzes.create! :title => "the same title" } }
+        let(:quizzes) { (0..quiz_count).map { @course.quizzes.create! title: "the same title" } }
 
         it "orders quizzes deterministically for pagination" do
           found_quiz_ids = []
@@ -144,11 +144,11 @@ describe Quizzes::QuizzesApiController, type: :request do
     end
 
     context 'as a student' do
-      before(:once) { student_in_course(:active_all => true) }
+      before(:once) { student_in_course(active_all: true) }
 
       context 'quiz tab is disabled' do
         before do
-          @course.tab_configuration = [{ :id => Course::TAB_QUIZZES, :hidden => true }]
+          @course.tab_configuration = [{ id: Course::TAB_QUIZZES, hidden: true }]
           @course.save!
         end
 
@@ -212,16 +212,16 @@ describe Quizzes::QuizzesApiController, type: :request do
   end
 
   describe "GET /courses/:course_id/quizzes/:id (show)" do
-    before(:once) { course_with_teacher(:active_all => true, :course => @course) }
+    before(:once) { course_with_teacher(active_all: true, course: @course) }
 
     context "unpublished quiz" do
       before do
-        @quiz = @course.quizzes.create! :title => 'title'
-        @quiz.quiz_questions.create!(:question_data => { :name => "test 1", :question_type => "essay_question" })
+        @quiz = @course.quizzes.create! title: 'title'
+        @quiz.quiz_questions.create!(question_data: { name: "test 1", question_type: "essay_question" })
         @quiz.save!
 
         @json = api_call(:get, "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}",
-                         :controller => "quizzes/quizzes_api", :action => "show", :format => "json", :course_id => @course.id.to_s, :id => @quiz.id.to_s)
+                         controller: "quizzes/quizzes_api", action: "show", format: "json", course_id: @course.id.to_s, id: @quiz.id.to_s)
       end
 
       it "includes unpublished questions in question count" do
@@ -233,7 +233,7 @@ describe Quizzes::QuizzesApiController, type: :request do
       it "renders in a jsonapi style" do
         @quiz = @course.quizzes.create! title: 'Test Quiz'
         @json = api_call(:get, "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}",
-                         { :controller => "quizzes/quizzes_api", :action => "show", :format => "json", :course_id => @course.id.to_s, :id => @quiz.id.to_s }, {},
+                         { controller: "quizzes/quizzes_api", action: "show", format: "json", course_id: @course.id.to_s, id: @quiz.id.to_s }, {},
                          'Accept' => 'application/vnd.api+json')
         @json = @json.fetch('quizzes').map(&:with_indifferent_access)
         expect(@json).to match_array [
@@ -247,7 +247,7 @@ describe Quizzes::QuizzesApiController, type: :request do
       let(:quiz) { @course.quizzes.create! title: 'Test Quiz' }
       let(:json) do
         json = api_call(:get, "/api/v1/courses/#{@course.id}/quizzes/#{quiz.id}",
-                        { :controller => "quizzes/quizzes_api", :action => "show", :format => "json", :course_id => @course.id.to_s, :id => quiz.id.to_s }, {})
+                        { controller: "quizzes/quizzes_api", action: "show", format: "json", course_id: @course.id.to_s, id: quiz.id.to_s }, {})
         json.with_indifferent_access
       end
 
@@ -262,8 +262,8 @@ describe Quizzes::QuizzesApiController, type: :request do
     context "non-existent quiz" do
       it "returns a not found error message" do
         json = api_call(:get, "/api/v1/courses/#{@course.id}/quizzes/10101",
-                        { :controller => "quizzes/quizzes_api", :action => "show", :format => "json", :course_id => @course.id.to_s, :id => "10101" },
-                        {}, {}, { :expected_status => 404 })
+                        { controller: "quizzes/quizzes_api", action: "show", format: "json", course_id: @course.id.to_s, id: "10101" },
+                        {}, {}, { expected_status: 404 })
         expect(json.inspect).to include "does not exist"
       end
     end
@@ -272,18 +272,18 @@ describe Quizzes::QuizzesApiController, type: :request do
   describe "POST /courses/:course_id/quizzes (create)" do
     def api_create_quiz(quiz_params, opts = {})
       api_call(:post, "/api/v1/courses/#{@course.id}/quizzes",
-               { :controller => "quizzes/quizzes_api", :action => "create", :format => "json", :course_id => @course.id.to_s },
-               { :quiz => quiz_params }, {}, opts)
+               { controller: "quizzes/quizzes_api", action: "create", format: "json", course_id: @course.id.to_s },
+               { quiz: quiz_params }, {}, opts)
     end
 
-    before(:once) { teacher_in_course(:active_all => true) }
+    before(:once) { teacher_in_course(active_all: true) }
 
     let(:new_quiz) { @course.quizzes.first }
 
     context "jsonapi style request" do
       it "renders in a jsonapi style" do
         @json = api_call(:post, "/api/v1/courses/#{@course.id}/quizzes",
-                         { :controller => "quizzes/quizzes_api", :action => "create", :format => "json", :course_id => @course.id.to_s },
+                         { controller: "quizzes/quizzes_api", action: "create", format: "json", course_id: @course.id.to_s },
                          { quizzes: [{ 'title' => 'blah blah', 'published' => true }] },
                          'Accept' => 'application/vnd.api+json')
         @json = @json.fetch('quizzes').map(&:with_indifferent_access)
@@ -313,16 +313,16 @@ describe Quizzes::QuizzesApiController, type: :request do
 
     it "renders an error when the title is too long" do
       title = ('a' * ActiveRecord::Base.maximum_string_length) + '!'
-      json = api_create_quiz({ 'title' => title }, :expected_status => 400)
+      json = api_create_quiz({ 'title' => title }, expected_status: 400)
       expect(json).to have_key 'errors'
       expect(new_quiz).to be_nil
     end
 
     describe "validations" do
       context "assignment_group_id" do
-        let_once(:my_group) { @course.assignment_groups.create! :name => 'my group' }
-        let_once(:other_course) { Course.create! :name => 'other course' }
-        let_once(:other_group) { other_course.groups.create! :name => 'other group' }
+        let_once(:my_group) { @course.assignment_groups.create! name: 'my group' }
+        let_once(:other_course) { Course.create! name: 'other course' }
+        let_once(:other_group) { other_course.groups.create! name: 'other group' }
 
         it "puts the quiz in a group owned by its course" do
           api_create_quiz({ 'title' => 'test quiz', 'assignment_group_id' => my_group.id })
@@ -563,13 +563,13 @@ describe Quizzes::QuizzesApiController, type: :request do
 
   describe "PUT /courses/:course_id/quizzes/:id (update)" do
     def api_update_quiz(quiz_params, api_params, opts = {})
-      @quiz ||= @course.quizzes.create!({ :title => 'title' }.merge(quiz_params))
+      @quiz ||= @course.quizzes.create!({ title: 'title' }.merge(quiz_params))
       api_call(:put, "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}",
-               { :controller => "quizzes/quizzes_api", :action => "update", :format => "json", :course_id => @course.id.to_s, :id => @quiz.id.to_s },
-               { :quiz => api_params }, {}, opts)
+               { controller: "quizzes/quizzes_api", action: "update", format: "json", course_id: @course.id.to_s, id: @quiz.id.to_s },
+               { quiz: api_params }, {}, opts)
     end
 
-    before { teacher_in_course(:active_all => true) }
+    before { teacher_in_course(active_all: true) }
 
     let(:updated_quiz) { @course.quizzes.first }
     let(:quiz_params) { {} }
@@ -601,7 +601,7 @@ describe Quizzes::QuizzesApiController, type: :request do
       it "renders in a jsonapi style" do
         @quiz = @course.quizzes.create! title: 'Test Quiz'
         @json = raw_api_call(:put, "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}",
-                             { :controller => "quizzes/quizzes_api", :action => "update", :format => "json", :course_id => @course.id.to_s, :id => @quiz.id.to_s },
+                             { controller: "quizzes/quizzes_api", action: "update", format: "json", course_id: @course.id.to_s, id: @quiz.id.to_s },
                              { quizzes: [{ 'id' => @quiz.id, 'title' => 'blah blah' }] },
                              'Accept' => 'application/vnd.api+json')
         expect(response).to be_successful
@@ -615,7 +615,7 @@ describe Quizzes::QuizzesApiController, type: :request do
 
     it "renders an error when the title is too long" do
       long_title = ('a' * ActiveRecord::Base.maximum_string_length) + '!'
-      json = api_update_quiz({}, { 'title' => long_title }, :expected_status => 400)
+      json = api_update_quiz({}, { 'title' => long_title }, expected_status: 400)
       expect(json).to have_key 'errors'
       expect(updated_quiz.title).to eq 'title'
     end
@@ -640,10 +640,10 @@ describe Quizzes::QuizzesApiController, type: :request do
         # require_lockdown_browser_monitor will only return true if the plugin is enabled,
         # so register and enable it for these test
         Canvas::Plugin.register(:example_spec_lockdown_browser, :lockdown_browser, {
-                                  :settings => { :enabled => false }
+                                  settings: { enabled: false }
                                 })
         setting = PluginSetting.create!(name: 'example_spec_lockdown_browser')
-        setting.settings = { :enabled => true }
+        setting.settings = { enabled: true }
         setting.save!
       end
 
@@ -693,7 +693,7 @@ describe Quizzes::QuizzesApiController, type: :request do
       end
 
       it "does not lose quiz question count when publishing with draft state" do
-        @quiz ||= @course.quizzes.create!(:title => 'title')
+        @quiz ||= @course.quizzes.create!(title: 'title')
         @qq1 = @quiz.quiz_questions.create!(
           question_data: multiple_choice_question_data
         )
@@ -1017,20 +1017,20 @@ describe Quizzes::QuizzesApiController, type: :request do
 
   describe "POST /courses/:course_id/quizzes/:id/reorder (reorder)" do
     before :once do
-      teacher_in_course(:active_all => true)
-      @quiz = @course.quizzes.create! :title => 'title'
-      @question1 = @quiz.quiz_questions.create!(:question_data => { 'name' => 'test question 1', 'answers' => [{ 'id' => 1 }, { 'id' => 2 }], :position => 1 })
-      @question2 = @quiz.quiz_questions.create!(:question_data => { 'name' => 'test question 2', 'answers' => [{ 'id' => 3 }, { 'id' => 4 }], :position => 2 })
-      @question3 = @quiz.quiz_questions.create!(:question_data => { 'name' => 'test question 3', 'answers' => [{ 'id' => 5 }, { 'id' => 6 }], :position => 3 })
+      teacher_in_course(active_all: true)
+      @quiz = @course.quizzes.create! title: 'title'
+      @question1 = @quiz.quiz_questions.create!(question_data: { 'name' => 'test question 1', 'answers' => [{ 'id' => 1 }, { 'id' => 2 }], :position => 1 })
+      @question2 = @quiz.quiz_questions.create!(question_data: { 'name' => 'test question 2', 'answers' => [{ 'id' => 3 }, { 'id' => 4 }], :position => 2 })
+      @question3 = @quiz.quiz_questions.create!(question_data: { 'name' => 'test question 3', 'answers' => [{ 'id' => 5 }, { 'id' => 6 }], :position => 3 })
     end
 
     it "requires authorization" do
-      course_with_student_logged_in(:active_all => true)
+      course_with_student_logged_in(active_all: true)
       course_quiz
 
       raw_api_call(:post, "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/reorder",
-                   { :controller => "quizzes/quizzes_api", :action => "reorder", :format => "json", :course_id => @course.id.to_s, :id => @quiz.id.to_s },
-                   { :order => [] },
+                   { controller: "quizzes/quizzes_api", action: "reorder", format: "json", course_id: @course.id.to_s, id: @quiz.id.to_s },
+                   { order: [] },
                    { 'Accept' => 'application/vnd.api+json' })
 
       # should be authorization error
@@ -1039,10 +1039,10 @@ describe Quizzes::QuizzesApiController, type: :request do
 
     it "reorders a quiz's questions" do
       raw_api_call(:post, "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/reorder",
-                   { :controller => "quizzes/quizzes_api", :action => "reorder", :format => "json", :course_id => @course.id.to_s, :id => @quiz.id.to_s },
-                   { :order => [{ "type" => "question", "id" => @question3.id },
-                                { "type" => "question", "id" => @question1.id },
-                                { "type" => "question", "id" => @question2.id }] },
+                   { controller: "quizzes/quizzes_api", action: "reorder", format: "json", course_id: @course.id.to_s, id: @quiz.id.to_s },
+                   { order: [{ "type" => "question", "id" => @question3.id },
+                             { "type" => "question", "id" => @question1.id },
+                             { "type" => "question", "id" => @question2.id }] },
                    { 'Accept' => 'application/vnd.api+json' })
 
       # should reorder the quiz questions
@@ -1051,14 +1051,14 @@ describe Quizzes::QuizzesApiController, type: :request do
     end
 
     it "reorders a quiz's questions and groups" do
-      @group = @quiz.quiz_groups.create :name => 'Test Group'
+      @group = @quiz.quiz_groups.create name: 'Test Group'
 
       raw_api_call(:post, "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/reorder",
-                   { :controller => "quizzes/quizzes_api", :action => "reorder", :format => "json", :course_id => @course.id.to_s, :id => @quiz.id.to_s },
-                   { :order => [{ "type" => "question", "id" => @question3.id },
-                                { "type" => "group",    "id" => @group.id },
-                                { "type" => "question", "id" => @question1.id },
-                                { "type" => "question", "id" => @question2.id }] },
+                   { controller: "quizzes/quizzes_api", action: "reorder", format: "json", course_id: @course.id.to_s, id: @quiz.id.to_s },
+                   { order: [{ "type" => "question", "id" => @question3.id },
+                             { "type" => "group",    "id" => @group.id },
+                             { "type" => "question", "id" => @question1.id },
+                             { "type" => "question", "id" => @question2.id }] },
                    { 'Accept' => 'application/vnd.api+json' })
 
       # should reorder group
@@ -1069,13 +1069,13 @@ describe Quizzes::QuizzesApiController, type: :request do
     end
 
     it "pulls questions out of a group to the root quiz" do
-      @group = @quiz.quiz_groups.create :name => 'Test Group'
+      @group = @quiz.quiz_groups.create name: 'Test Group'
       @group.quiz_questions = [@question1, @question2]
 
       raw_api_call(:post, "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/reorder",
-                   { :controller => "quizzes/quizzes_api", :action => "reorder", :format => "json", :course_id => @course.id.to_s, :id => @quiz.id.to_s },
-                   { :order => [{ "type" => "question", "id" => @question3.id },
-                                { "type" => "question", "id" => @question2.id }] },
+                   { controller: "quizzes/quizzes_api", action: "reorder", format: "json", course_id: @course.id.to_s, id: @quiz.id.to_s },
+                   { order: [{ "type" => "question", "id" => @question3.id },
+                             { "type" => "question", "id" => @question2.id }] },
                    { 'Accept' => 'application/vnd.api+json' })
 
       # should remove items from the group
@@ -1086,19 +1086,19 @@ describe Quizzes::QuizzesApiController, type: :request do
 
   describe "POST /courses/:course_id/quizzes/:id/validate_access_code" do
     before :once do
-      teacher_in_course(:active_all => true)
+      teacher_in_course(active_all: true)
       @quiz = @course.quizzes.create!
     end
 
     it "returns false if no access code" do
       raw_api_call(:post, "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/validate_access_code",
                    {
-                     :controller => "quizzes/quizzes_api",
-                     :action => "validate_access_code",
-                     :format => "json", :course_id => @course.id.to_s,
-                     :id => @quiz.id.to_s
+                     controller: "quizzes/quizzes_api",
+                     action: "validate_access_code",
+                     format: "json", course_id: @course.id.to_s,
+                     id: @quiz.id.to_s
                    },
-                   { :access_code => "TMNT" })
+                   { access_code: "TMNT" })
       expect(response.body).to eq "false"
     end
 
@@ -1107,13 +1107,13 @@ describe Quizzes::QuizzesApiController, type: :request do
       @quiz.save!
       raw_api_call(:post, "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/validate_access_code",
                    {
-                     :controller => "quizzes/quizzes_api",
-                     :action => "validate_access_code",
-                     :format => "json",
-                     :course_id => @course.id.to_s,
-                     :id => @quiz.id.to_s
+                     controller: "quizzes/quizzes_api",
+                     action: "validate_access_code",
+                     format: "json",
+                     course_id: @course.id.to_s,
+                     id: @quiz.id.to_s
                    },
-                   { :access_code => "Leonardo" })
+                   { access_code: "Leonardo" })
       expect(response.body).to eq "false"
     end
 
@@ -1122,13 +1122,13 @@ describe Quizzes::QuizzesApiController, type: :request do
       @quiz.save!
       raw_api_call(:post, "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/validate_access_code",
                    {
-                     :controller => "quizzes/quizzes_api",
-                     :action => "validate_access_code",
-                     :format => "json",
-                     :course_id => @course.id.to_s,
-                     :id => @quiz.id.to_s
+                     controller: "quizzes/quizzes_api",
+                     action: "validate_access_code",
+                     format: "json",
+                     course_id: @course.id.to_s,
+                     id: @quiz.id.to_s
                    },
-                   { :access_code => "TMNT" })
+                   { access_code: "TMNT" })
       expect(response.body).to eq "true"
     end
   end
@@ -1150,15 +1150,15 @@ describe Quizzes::QuizzesApiController, type: :request do
 
     def get_index(course)
       raw_api_call(:get, "/api/v1/courses/#{course.id}/quizzes",
-                   :controller => "quizzes/quizzes_api",
-                   :action => "index",
-                   :format => "json",
-                   :course_id => course.id.to_s)
+                   controller: "quizzes/quizzes_api",
+                   action: "index",
+                   format: "json",
+                   course_id: course.id.to_s)
     end
 
     def get_show(quiz)
       raw_api_call(:get, "/api/v1/courses/#{quiz.context.id}/quizzes/#{quiz.id}",
-                   :controller => "quizzes/quizzes_api", :action => "show", :format => "json", :course_id => quiz.context.id.to_s, :id => quiz.id.to_s)
+                   controller: "quizzes/quizzes_api", action: "show", format: "json", course_id: quiz.context.id.to_s, id: quiz.id.to_s)
     end
 
     def create_quiz_for_da(opts = {})
@@ -1176,19 +1176,19 @@ describe Quizzes::QuizzesApiController, type: :request do
     end
 
     before(:once) do
-      course_with_teacher(:active_all => true, :user => user_with_pseudonym)
+      course_with_teacher(active_all: true, user: user_with_pseudonym)
       @student_with_override, @student_without_override = create_users(2, return_type: :record)
 
       @quiz_with_restricted_access = create_quiz_for_da(title: "only visible to student one", only_visible_to_overrides: true)
       @quiz_visible_to_all = create_quiz_for_da(title: "assigned to all", only_visible_to_overrides: false)
 
-      @course.enroll_student(@student_without_override, :enrollment_state => 'active')
+      @course.enroll_student(@student_without_override, enrollment_state: 'active')
       @section = @course.course_sections.create!(name: "test section")
       student_in_section(@section, user: @student_with_override)
       create_section_override_for_quiz(@quiz_with_restricted_access, { course_section: @section })
 
       @observer = User.create
-      @observer_enrollment = @course.enroll_user(@observer, 'ObserverEnrollment', :section => @course.course_sections.first, :enrollment_state => 'active')
+      @observer_enrollment = @course.enroll_user(@observer, 'ObserverEnrollment', section: @course.course_sections.first, enrollment_state: 'active')
       @observer_enrollment.update_attribute(:associated_user_id, @student_with_override.id)
     end
 

@@ -79,17 +79,17 @@ describe "collaborations" do
 
     context "a students's etherpad collaboration" do
       before do
-        course_with_teacher(:active_all => true, :name => 'teacher@example.com')
-        student_in_course(:course => @course, :name => 'Don Draper')
+        course_with_teacher(active_all: true, name: 'teacher@example.com')
+        student_in_course(course: @course, name: 'Don Draper')
       end
 
       it 'does not show groups the student does not belong to', priority: "1" do
-        PluginSetting.create!(:name => 'etherpad', :settings => {})
+        PluginSetting.create!(name: 'etherpad', settings: {})
         group1 = "grup grup"
 
-        group_model(:context => @course, :name => group1)
+        group_model(context: @course, name: group1)
         @group.add_user(@student)
-        group_model(:context => @course, :name => "other grup")
+        group_model(context: @course, name: "other grup")
 
         user_session(@student)
         get "/courses/#{@course.id}/collaborations"

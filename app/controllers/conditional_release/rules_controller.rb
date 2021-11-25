@@ -83,7 +83,7 @@ module ConditionalRelease
     def destroy
       rule = get_rule
       rule.destroy!
-      render json: { :success => true }
+      render json: { success: true }
     end
 
     private

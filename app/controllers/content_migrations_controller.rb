@@ -153,13 +153,13 @@ class ContentMigrationsController < ApplicationController
     content_migration_json_hash = content_migrations_json(@migrations, @current_user, session)
 
     if api_request?
-      render :json => content_migration_json_hash
+      render json: content_migration_json_hash
     else
       @plugins = ContentMigration.migration_plugins(true).sort_by { |p| [p.metadata(:sort_order) || CanvasSort::Last, p.metadata(:select_text)] }
 
-      options = @plugins.map { |p| { :label => p.metadata(:select_text), :id => p.id } }
+      options = @plugins.map { |p| { label: p.metadata(:select_text), id: p.id } }
 
-      external_tools = ContextExternalTool.all_tools_for(@context, :placements => :migration_selection, :root_account => @domain_root_account, :current_user => @current_user)
+      external_tools = ContextExternalTool.all_tools_for(@context, placements: :migration_selection, root_account: @domain_root_account, current_user: @current_user)
       options.concat(external_tools.map do |et|
         {
           id: et.asset_string,
@@ -167,23 +167,23 @@ class ContentMigrationsController < ApplicationController
         }
       end)
 
-      js_env :EXTERNAL_TOOLS => external_tools_json(external_tools, @context, @current_user, session)
-      js_env :UPLOAD_LIMIT => Attachment.quota_available(@context)
-      js_env :SELECT_OPTIONS => options
-      js_env :QUESTION_BANKS => @context.assessment_question_banks.except(:preload).select([:title, :id]).active
-      js_env :COURSE_ID => @context.id
-      js_env :CONTENT_MIGRATIONS => content_migration_json_hash
-      js_env(:OLD_START_DATE => datetime_string(@context.start_at, :verbose))
-      js_env(:OLD_END_DATE => datetime_string(@context.conclude_at, :verbose))
+      js_env EXTERNAL_TOOLS: external_tools_json(external_tools, @context, @current_user, session)
+      js_env UPLOAD_LIMIT: Attachment.quota_available(@context)
+      js_env SELECT_OPTIONS: options
+      js_env QUESTION_BANKS: @context.assessment_question_banks.except(:preload).select([:title, :id]).active
+      js_env COURSE_ID: @context.id
+      js_env CONTENT_MIGRATIONS: content_migration_json_hash
+      js_env(OLD_START_DATE: datetime_string(@context.start_at, :verbose))
+      js_env(OLD_END_DATE: datetime_string(@context.conclude_at, :verbose))
 
-      js_env(:SHOW_SELECT => should_show_course_copy_dropdown)
-      js_env(:CONTENT_MIGRATIONS_EXPIRE_DAYS => ContentMigration.expire_days)
-      js_env(:QUIZZES_NEXT_ENABLED => new_quizzes_enabled?)
-      js_env(:NEW_QUIZZES_IMPORT => new_quizzes_import_enabled?)
-      js_env(:NEW_QUIZZES_MIGRATION => new_quizzes_migration_enabled?)
-      js_env(:NEW_QUIZZES_IMPORT_THIRD => new_quizzes_import_third_party?)
-      js_env(:NEW_QUIZZES_MIGRATION_DEFAULT => new_quizzes_migration_default)
-      js_env(:SHOW_SELECTABLE_OUTCOMES_IN_IMPORT => @domain_root_account.feature_enabled?('selectable_outcomes_in_course_copy'))
+      js_env(SHOW_SELECT: should_show_course_copy_dropdown)
+      js_env(CONTENT_MIGRATIONS_EXPIRE_DAYS: ContentMigration.expire_days)
+      js_env(QUIZZES_NEXT_ENABLED: new_quizzes_enabled?)
+      js_env(NEW_QUIZZES_IMPORT: new_quizzes_import_enabled?)
+      js_env(NEW_QUIZZES_MIGRATION: new_quizzes_migration_enabled?)
+      js_env(NEW_QUIZZES_IMPORT_THIRD: new_quizzes_import_third_party?)
+      js_env(NEW_QUIZZES_MIGRATION_DEFAULT: new_quizzes_migration_default)
+      js_env(SHOW_SELECTABLE_OUTCOMES_IN_IMPORT: @domain_root_account.feature_enabled?('selectable_outcomes_in_course_copy'))
       set_tutorial_js_env
     end
   end
@@ -201,7 +201,7 @@ class ContentMigrationsController < ApplicationController
   def show
     @content_migration = @context.content_migrations.find(params[:id])
     @content_migration.check_for_pre_processing_timeout
-    render :json => content_migration_json(@content_migration, @current_user, session, nil, params[:include])
+    render json: content_migration_json(@content_migration, @current_user, session, nil, params[:include])
   end
 
   def migration_plugin_supported?(plugin)
@@ -359,10 +359,10 @@ class ContentMigrationsController < ApplicationController
     @plugin = find_migration_plugin params[:migration_type]
 
     unless @plugin
-      return render(:json => { :message => t('bad_migration_type', "Invalid migration_type") }, :status => :bad_request)
+      return render(json: { message: t('bad_migration_type', "Invalid migration_type") }, status: :bad_request)
     end
     unless migration_plugin_supported?(@plugin)
-      return render(:json => { :message => t('unsupported_migration_type', "Unsupported migration_type for context") }, :status => :bad_request)
+      return render(json: { message: t('unsupported_migration_type', "Unsupported migration_type for context") }, status: :bad_request)
     end
 
     settings = @plugin.settings || {}
@@ -370,13 +370,13 @@ class ContentMigrationsController < ApplicationController
        params.dig(:pre_attachment, :name).blank? &&
        params.dig(:settings, :file_url).blank? &&
        params.dig(:settings, :content_export_id).blank?
-      return render(:json => { :message => t("File upload, file_url, or content_export_id is required") }, :status => :bad_request)
+      return render(json: { message: t("File upload, file_url, or content_export_id is required") }, status: :bad_request)
     end
 
     source_course = lookup_sis_source_course
     if (validator = settings[:required_options_validator]) &&
        (res = validator.has_error(params[:settings], @current_user, @context))
-      return render(:json => { :message => res.respond_to?(:call) ? res.call : res }, :status => :bad_request)
+      return render(json: { message: res.respond_to?(:call) ? res.call : res }, status: :bad_request)
     end
 
     @content_migration = @context.content_migrations.build(
@@ -427,14 +427,14 @@ class ContentMigrationsController < ApplicationController
     systems = ContentMigration.migration_plugins(true).select { |sys| migration_plugin_supported?(sys) }
     json = systems.map do |p|
       {
-        :type => p.id,
-        :requires_file_upload => !!p.settings[:requires_file_upload],
-        :name => p.meta['select_text'].call,
-        :required_settings => p.settings[:required_settings] || []
+        type: p.id,
+        requires_file_upload: !!p.settings[:requires_file_upload],
+        name: p.meta['select_text'].call,
+        required_settings: p.settings[:required_settings] || []
       }
     end
 
-    render :json => json
+    render json: json
   end
 
   # @API List items for selective import
@@ -504,10 +504,10 @@ class ContentMigrationsController < ApplicationController
                                                                           global_identifiers: @content_migration.use_global_identifiers?)
 
     unless formatter.valid_type?(params[:type])
-      return render :json => { :message => "unsupported migration type" }, :status => :bad_request
+      return render json: { message: "unsupported migration type" }, status: :bad_request
     end
 
-    render :json => formatter.get_content_list(params[:type])
+    render json: formatter.get_content_list(params[:type])
   end
 
   protected
@@ -555,15 +555,15 @@ class ContentMigrationsController < ApplicationController
       @content_migration.copy_options = copy_options
     else
       @content_migration.migration_settings[:import_immediately] = true
-      @content_migration.copy_options = { :everything => true }
-      @content_migration.migration_settings[:migration_ids_to_import] = { :copy => { :everything => true } }
+      @content_migration.copy_options = { everything: true }
+      @content_migration.migration_settings[:migration_ids_to_import] = { copy: { everything: true } }
     end
 
     if @content_migration.save
       preflight_json = nil
       if params[:pre_attachment]
         @content_migration.workflow_state = 'pre_processing'
-        preflight_json = api_attachment_preflight(@content_migration, request, :params => params[:pre_attachment], :check_quota => true, :return_json => true)
+        preflight_json = api_attachment_preflight(@content_migration, request, params: params[:pre_attachment], check_quota: true, return_json: true)
         if preflight_json[:error]
           @content_migration.workflow_state = 'pre_process_error'
         end
@@ -579,9 +579,9 @@ class ContentMigrationsController < ApplicationController
         end
       end
 
-      render :json => content_migration_json(@content_migration, @current_user, session, preflight_json)
+      render json: content_migration_json(@content_migration, @current_user, session, preflight_json)
     else
-      render :json => @content_migration.errors, :status => :bad_request
+      render json: @content_migration.errors, status: :bad_request
     end
   end
 
@@ -602,10 +602,10 @@ class ContentMigrationsController < ApplicationController
         @content_migration.attachment = export.attachment.clone_for(@content_migration)
         ret = true
       else
-        render(:json => { :message => "content export is incomplete" }, :status => :bad_request)
+        render(json: { message: "content export is incomplete" }, status: :bad_request)
       end
     else
-      render(:json => { :message => "invalid content export" }, :status => :bad_request)
+      render(json: { message: "invalid content export" }, status: :bad_request)
     end
     @content_migration.workflow_state = 'pre_process_error' unless ret
     @content_migration.save!

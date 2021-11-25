@@ -23,8 +23,8 @@ require_relative '../../import_helper'
 describe "Importing Learning Outcomes" do
   before :once do
     @context = course_model
-    @migration = ContentMigration.create!(:context => @context)
-    @migration.migration_ids_to_import = { :copy => {} }
+    @migration = ContentMigration.create!(context: @context)
+    @migration.migration_ids_to_import = { copy: {} }
     @data = get_import_data [], 'outcomes'
     @data = { 'learning_outcomes' => @data }
 
@@ -53,8 +53,8 @@ describe "Importing Learning Outcomes" do
     end
 
     it "imports group" do
-      migration = ContentMigration.create!(:context => @context)
-      migration.migration_ids_to_import = { :copy => {} }
+      migration = ContentMigration.create!(context: @context)
+      migration.migration_ids_to_import = { copy: {} }
       data = [{ type: 'learning_outcome_group', title: 'hey', migration_id: 'x' }.with_indifferent_access]
       data = { 'learning_outcomes' => data }
       expect do
@@ -95,7 +95,7 @@ describe "Importing Learning Outcomes" do
 
   it "creates a new OutcomeFriendlyDescription if the outcome is being imported to a new context" do
     context2 = course_model
-    outcome = context2.created_learning_outcomes.create!({ :title => 'new outcome' })
+    outcome = context2.created_learning_outcomes.create!({ title: 'new outcome' })
     friendly_description = "a friendly description"
     OutcomeFriendlyDescription.create!({
                                          learning_outcome: outcome,
@@ -225,8 +225,8 @@ describe "Importing Learning Outcomes" do
     before(:once) { @context.root_account.enable_feature!(:outcome_alignments_course_migration) }
 
     let(:migration) do
-      ContentMigration.create!(:context => @context).tap do |m|
-        m.migration_ids_to_import = { :copy => {} }
+      ContentMigration.create!(context: @context).tap do |m|
+        m.migration_ids_to_import = { copy: {} }
       end
     end
 

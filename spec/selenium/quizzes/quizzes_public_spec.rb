@@ -28,7 +28,7 @@ describe "quizzes for a public course" do
 
   it "displays quizzes list", priority: "1" do
     course_quiz(:active)
-    @quiz.update(:title => "hey you should see me")
+    @quiz.update(title: "hey you should see me")
 
     get "/courses/#{public_course.id}/quizzes"
     validate_selector_displayed('#assignment-quizzes')

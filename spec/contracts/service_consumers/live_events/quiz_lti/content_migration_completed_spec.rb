@@ -33,13 +33,13 @@ RSpec.describe 'Canvas LMS Live Events', :pact_live_events do
       live_event.emit_with do
         # arrange
         params = {
-          :name => "Quizzes.Next",
-          :url => 'http://example.com/launch',
-          :domain => "example.com",
-          :consumer_key => 'test_key',
-          :shared_secret => 'test_secret',
-          :privacy_level => 'public',
-          :tool_id => 'Quizzes 2'
+          name: "Quizzes.Next",
+          url: 'http://example.com/launch',
+          domain: "example.com",
+          consumer_key: 'test_key',
+          shared_secret: 'test_secret',
+          privacy_level: 'public',
+          tool_id: 'Quizzes 2'
         }
         account = Account.default
         account.context_external_tools.create!(params)

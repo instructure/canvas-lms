@@ -85,7 +85,7 @@ describe SectionTabPresenter do
     end
 
     it 'returns path associated with course and tab when given args as a hash' do
-      assignments_tab[:args] = { message_handler_id: 1, :resource_link_fragment => :nav, course_id: 1 }
+      assignments_tab[:args] = { message_handler_id: 1, resource_link_fragment: :nav, course_id: 1 }
       path = SectionTabPresenter.new(assignments_tab, course).path
       expect(path).to eq "/courses/1/assignments?message_handler_id=1&resource_link_fragment=nav"
     end

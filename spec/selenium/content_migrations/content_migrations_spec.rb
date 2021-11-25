@@ -200,7 +200,7 @@ describe "content migrations", :non_parallel do
 
       expect(ff('.migrationProgressItem').count).to eq 1
 
-      fill_migration_form(:filename => 'cc_ark_test.zip')
+      fill_migration_form(filename: 'cc_ark_test.zip')
 
       ff('[name=selective_import]')[0].click
       submit
@@ -283,14 +283,14 @@ describe "content migrations", :non_parallel do
       @copy_from.update_attribute(:name, 'copy from me')
       data = File.read(File.dirname(__FILE__) + '/../../fixtures/migration/cc_full_test_smaller.zip')
 
-      cm = ContentMigration.new(:context => @copy_from, :migration_type => "common_cartridge_importer")
-      cm.migration_settings = { :import_immediately => true,
-                                :migration_ids_to_import => { :copy => { :everything => true } } }
+      cm = ContentMigration.new(context: @copy_from, migration_type: "common_cartridge_importer")
+      cm.migration_settings = { import_immediately: true,
+                                migration_ids_to_import: { copy: { everything: true } } }
       cm.skip_job_progress = true
       cm.save!
 
-      att = attachment_model(:context => cm, :filename => "cc_full_test_smaller.zip",
-                             :uploaded_data => stub_file_data("cc_full_test_smaller.zip", data, "application/zip"))
+      att = attachment_model(context: cm, filename: "cc_full_test_smaller.zip",
+                             uploaded_data: stub_file_data("cc_full_test_smaller.zip", data, "application/zip"))
       cm.attachment = att
       cm.save!
 
@@ -302,7 +302,7 @@ describe "content migrations", :non_parallel do
     end
 
     before do
-      course_with_teacher_logged_in(:active_all => true)
+      course_with_teacher_logged_in(active_all: true)
       @copy_from.enroll_teacher(@user).accept
     end
 
@@ -356,7 +356,7 @@ describe "content migrations", :non_parallel do
     end
 
     it "only shows courses the user is authorized to see", priority: "1" do
-      new_course = Course.create!(:name => "please don't see me")
+      new_course = Course.create!(name: "please don't see me")
       visit_page
       select_migration_type
       wait_for_ajaximations
@@ -364,9 +364,9 @@ describe "content migrations", :non_parallel do
       expect(f("option[value=\"#{@copy_from.id}\"]")).not_to be_nil
       expect(f("#content")).not_to contain_css("option[value=\"#{new_course.id}\"]")
 
-      user_logged_in(:active_all => true)
-      @course.enroll_teacher(@user, :enrollment_state => "active")
-      new_course.enroll_teacher(@user, :enrollment_state => "active")
+      user_logged_in(active_all: true)
+      @course.enroll_teacher(@user, enrollment_state: "active")
+      new_course.enroll_teacher(@user, enrollment_state: "active")
 
       visit_page
       select_migration_type
@@ -376,7 +376,7 @@ describe "content migrations", :non_parallel do
     end
 
     it "includes completed courses when checked", priority: "1" do
-      new_course = Course.create!(:name => "completed course")
+      new_course = Course.create!(name: "completed course")
       new_course.enroll_teacher(@user).accept
       new_course.complete!
 
@@ -393,12 +393,12 @@ describe "content migrations", :non_parallel do
 
     it "finds courses in other accounts", priority: "1" do
       new_account1 = account_model
-      enrolled_course = Course.create!(:name => "faraway course", :account => new_account1)
+      enrolled_course = Course.create!(name: "faraway course", account: new_account1)
       enrolled_course.enroll_teacher(@user).accept
 
       new_account2 = account_model
-      admin_course = Course.create!(:name => "another course", :account => new_account2)
-      account_admin_user(:user => @user, :account => new_account2)
+      admin_course = Course.create!(name: "another course", account: new_account2)
+      account_admin_user(user: @user, account: new_account2)
 
       visit_page
 
@@ -422,14 +422,14 @@ describe "content migrations", :non_parallel do
       before do
         data = File.read(File.dirname(__FILE__) + '/../../fixtures/migration/cc_full_test.zip')
 
-        cm = ContentMigration.new(:context => @copy_from, :migration_type => "common_cartridge_importer")
-        cm.migration_settings = { :import_immediately => true,
-                                  :migration_ids_to_import => { :copy => { :everything => true } } }
+        cm = ContentMigration.new(context: @copy_from, migration_type: "common_cartridge_importer")
+        cm.migration_settings = { import_immediately: true,
+                                  migration_ids_to_import: { copy: { everything: true } } }
         cm.skip_job_progress = true
         cm.save!
 
-        att = attachment_model(:context => cm, :filename => "cc_full_test.zip",
-                               :uploaded_data => stub_file_data("cc_full_test.zip", data, "application/zip"))
+        att = attachment_model(context: cm, filename: "cc_full_test.zip",
+                               uploaded_data: stub_file_data("cc_full_test.zip", data, "application/zip"))
         cm.attachment = att
         cm.save!
 
@@ -506,7 +506,7 @@ describe "content migrations", :non_parallel do
     end
 
     it "sets day substitution and date adjustment settings", priority: "1" do
-      new_course = Course.create!(:name => "day sub")
+      new_course = Course.create!(name: "day sub")
       new_course.enroll_teacher(@user).accept
 
       visit_page
@@ -551,7 +551,7 @@ describe "content migrations", :non_parallel do
     end
 
     it "sets pre-populate date adjustment settings" do
-      new_course = Course.create!(:name => "date adjust", :start_at => 'Jul 1, 2012', :conclude_at => 'Jul 11, 2012')
+      new_course = Course.create!(name: "date adjust", start_at: 'Jul 1, 2012', conclude_at: 'Jul 11, 2012')
       new_course.enroll_teacher(@user).accept
 
       @course.start_at = 'Aug 5, 2012'
@@ -581,7 +581,7 @@ describe "content migrations", :non_parallel do
     end
 
     it "removes dates", priority: "1" do
-      new_course = Course.create!(:name => "date remove", :start_at => 'Jul 1, 2014', :conclude_at => 'Jul 11, 2014')
+      new_course = Course.create!(name: "date remove", start_at: 'Jul 1, 2014', conclude_at: 'Jul 11, 2014')
       new_course.enroll_teacher(@user).accept
 
       visit_page
@@ -600,7 +600,7 @@ describe "content migrations", :non_parallel do
     end
 
     it "retains announcement content settings after course copy", priority: "2" do
-      @announcement = @copy_from.announcements.create!(:title => 'Migration', :message => 'Here is my message')
+      @announcement = @copy_from.announcements.create!(title: 'Migration', message: 'Here is my message')
       @copy_from.lock_all_announcements = true
       @copy_from.save!
 
@@ -640,7 +640,7 @@ describe "content migrations", :non_parallel do
   context "importing LTI content" do
     let(:import_course) do
       account = account_model
-      course_with_teacher_logged_in(:account => account).course
+      course_with_teacher_logged_in(account: account).course
     end
     let(:import_tool) do
       tool = import_course.context_external_tools.new({
@@ -723,7 +723,7 @@ describe "content migrations", :non_parallel do
 
   it "is able to selectively import common cartridge submodules" do
     course_with_teacher_logged_in
-    cm = ContentMigration.new(:context => @course, :user => @user)
+    cm = ContentMigration.new(context: @course, user: @user)
     cm.migration_type = 'common_cartridge_importer'
     cm.save!
 

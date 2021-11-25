@@ -50,8 +50,8 @@ describe LearningOutcomeGroup do
     end
 
     it "does not let adopt_outcome_group cause disgusting ancestral relations" do
-      group = @course.learning_outcome_groups.create!(:title => 'groupage')
-      group2 = @course.learning_outcome_groups.create!(:title => 'groupage2')
+      group = @course.learning_outcome_groups.create!(title: 'groupage')
+      group2 = @course.learning_outcome_groups.create!(title: 'groupage2')
       @root.adopt_outcome_group(group)
       @root.adopt_outcome_group(group2)
 
@@ -67,13 +67,13 @@ describe LearningOutcomeGroup do
     end
 
     it "allows touching the context to be skipped" do
-      group = @course.learning_outcome_groups.create!(:title => 'groupage')
-      group.add_outcome @course.created_learning_outcomes.create!(:title => 'o1')
-      group.add_outcome @course.created_learning_outcomes.create!(:title => 'o2')
-      group.add_outcome @course.created_learning_outcomes.create!(:title => 'o3')
+      group = @course.learning_outcome_groups.create!(title: 'groupage')
+      group.add_outcome @course.created_learning_outcomes.create!(title: 'o1')
+      group.add_outcome @course.created_learning_outcomes.create!(title: 'o2')
+      group.add_outcome @course.created_learning_outcomes.create!(title: 'o3')
 
       time = 1.hour.ago
-      Course.where(:id => @course).update_all(:updated_at => time)
+      Course.where(id: @course).update_all(updated_at: time)
 
       group.skip_tag_touch = true
       group.destroy
@@ -104,15 +104,15 @@ describe LearningOutcomeGroup do
 
   describe '#parent_ids' do
     it 'returns non-empty array' do
-      group = @course.learning_outcome_groups.create!(:title => 'groupage')
+      group = @course.learning_outcome_groups.create!(title: 'groupage')
 
       expect(group.parent_ids).to be_a_kind_of(Array)
       expect(group.parent_ids).not_to be_empty
     end
 
     it 'correctly references parents' do
-      group1 = @course.learning_outcome_groups.create!(:title => 'group1')
-      group2 = @course.learning_outcome_groups.create!(:title => 'group2')
+      group1 = @course.learning_outcome_groups.create!(title: 'group1')
+      group2 = @course.learning_outcome_groups.create!(title: 'group2')
       child_outcome_group = group1.add_outcome_group(group2)
 
       expect(child_outcome_group.parent_ids).to include(group1.id)
@@ -121,8 +121,8 @@ describe LearningOutcomeGroup do
 
   describe '#add_outcome' do
     it 'creates a link between the group and an outcome' do
-      group = @course.learning_outcome_groups.create!(:title => 'groupage')
-      outcome = @course.created_learning_outcomes.create!(:title => 'o1')
+      group = @course.learning_outcome_groups.create!(title: 'groupage')
+      outcome = @course.created_learning_outcomes.create!(title: 'o1')
 
       expect(group.child_outcome_links.map(&:content_id)).not_to include(outcome.id)
       group.add_outcome(outcome)
@@ -130,20 +130,20 @@ describe LearningOutcomeGroup do
     end
 
     it 'touches context when adding outcome to group' do
-      group = @course.learning_outcome_groups.create!(:title => 'groupage')
-      outcome = @course.created_learning_outcomes.create!(:title => 'o1')
+      group = @course.learning_outcome_groups.create!(title: 'groupage')
+      outcome = @course.created_learning_outcomes.create!(title: 'o1')
       expect { group.add_outcome(outcome) }.to change { group.context.reload.updated_at }
     end
 
     it 'does not touch context if skip_touch is true' do
-      group = @course.learning_outcome_groups.create!(:title => 'groupage')
-      outcome = @course.created_learning_outcomes.create!(:title => 'o1')
+      group = @course.learning_outcome_groups.create!(title: 'groupage')
+      outcome = @course.created_learning_outcomes.create!(title: 'o1')
       expect { group.add_outcome(outcome, skip_touch: true) }.not_to change { group.context.reload.updated_at }
     end
 
     it 'no-ops if a link already exists' do
-      group = @course.learning_outcome_groups.create!(:title => 'groupage')
-      outcome = @course.created_learning_outcomes.create!(:title => 'o1')
+      group = @course.learning_outcome_groups.create!(title: 'groupage')
+      outcome = @course.created_learning_outcomes.create!(title: 'o1')
 
       group.add_outcome(outcome)
       expect(group.child_outcome_links.count).to eq(1)
@@ -155,9 +155,9 @@ describe LearningOutcomeGroup do
 
   describe '#add_outcome_group' do
     before do
-      @group1 = @course.learning_outcome_groups.create!(:title => 'group1')
-      @group2 = @course.learning_outcome_groups.create!(:title => 'group2')
-      @outcome1 = @course.created_learning_outcomes.create!(:title => 'o1')
+      @group1 = @course.learning_outcome_groups.create!(title: 'group1')
+      @group2 = @course.learning_outcome_groups.create!(title: 'group2')
+      @outcome1 = @course.created_learning_outcomes.create!(title: 'o1')
       @group2.add_outcome(@outcome1)
     end
 
@@ -181,9 +181,9 @@ describe LearningOutcomeGroup do
 
   describe '#adopt_outcome_link' do
     it 'moves an existing outcome link from to this group if groups in same context and touchs parent group' do
-      group1 = @course.learning_outcome_groups.create!(:title => 'group1')
-      group2 = @course.learning_outcome_groups.create!(:title => 'group2')
-      outcome = @course.created_learning_outcomes.create!(:title => 'o1')
+      group1 = @course.learning_outcome_groups.create!(title: 'group1')
+      group2 = @course.learning_outcome_groups.create!(title: 'group2')
+      outcome = @course.created_learning_outcomes.create!(title: 'o1')
       outcome_link = group2.add_outcome(outcome)
 
       expect(outcome_link.associated_asset).to eq(group2)
@@ -195,8 +195,8 @@ describe LearningOutcomeGroup do
     end
 
     it 'no-ops if group is already owner' do
-      group1 = @course.learning_outcome_groups.create!(:title => 'group1')
-      outcome = @course.created_learning_outcomes.create!(:title => 'o1')
+      group1 = @course.learning_outcome_groups.create!(title: 'group1')
+      outcome = @course.created_learning_outcomes.create!(title: 'o1')
       outcome_link = group1.add_outcome(outcome)
 
       expect(outcome_link.associated_asset).to eq(group1)
@@ -206,9 +206,9 @@ describe LearningOutcomeGroup do
     end
 
     it "doesn't touch parent group if skip_parent_group_touch is true" do
-      group1 = @course.learning_outcome_groups.create!(:title => 'group1')
-      group2 = @course.learning_outcome_groups.create!(:title => 'group2')
-      outcome = @course.created_learning_outcomes.create!(:title => 'o1')
+      group1 = @course.learning_outcome_groups.create!(title: 'group1')
+      group2 = @course.learning_outcome_groups.create!(title: 'group2')
+      outcome = @course.created_learning_outcomes.create!(title: 'o1')
       outcome_link = group2.add_outcome(outcome)
 
       expect(outcome_link.associated_asset).to eq(group2)
@@ -221,8 +221,8 @@ describe LearningOutcomeGroup do
 
   describe '#adopt_outcome_group' do
     it 'moves an existing outcome link from to this group if groups in same context' do
-      group1 = @course.learning_outcome_groups.create!(:title => 'group1')
-      group2 = @course.learning_outcome_groups.create!(:title => 'group2')
+      group1 = @course.learning_outcome_groups.create!(title: 'group1')
+      group2 = @course.learning_outcome_groups.create!(title: 'group2')
 
       expect(group2.parent_outcome_group).not_to eq(group1)
 
@@ -232,7 +232,7 @@ describe LearningOutcomeGroup do
     end
 
     it 'no-ops if group is already parent' do
-      group1 = @course.learning_outcome_groups.create!(:title => 'group1')
+      group1 = @course.learning_outcome_groups.create!(title: 'group1')
 
       expect { group1.adopt_outcome_group(group1) }
         .not_to change { group1.learning_outcome_group_id }
@@ -241,7 +241,7 @@ describe LearningOutcomeGroup do
 
   describe '.for_context' do
     it 'returns all learning outcome groups for a context' do
-      group1 = @course.learning_outcome_groups.create!(:title => 'group1')
+      group1 = @course.learning_outcome_groups.create!(title: 'group1')
       expect(LearningOutcomeGroup.for_context(@course)).to include(group1)
     end
   end
@@ -275,10 +275,10 @@ describe LearningOutcomeGroup do
 
   describe '#destroy' do
     it 'destroys all children links' do
-      group1 = @course.learning_outcome_groups.create!(:title => 'group1')
-      group2 = @course.learning_outcome_groups.create!(:title => 'group2')
-      outcome1 = @course.created_learning_outcomes.create!(:title => 'o1')
-      outcome2 = @course.created_learning_outcomes.create!(:title => 'o2')
+      group1 = @course.learning_outcome_groups.create!(title: 'group1')
+      group2 = @course.learning_outcome_groups.create!(title: 'group2')
+      outcome1 = @course.created_learning_outcomes.create!(title: 'o1')
+      outcome2 = @course.created_learning_outcomes.create!(title: 'o2')
 
       group1.add_outcome(outcome1)
       group2.add_outcome(outcome2)

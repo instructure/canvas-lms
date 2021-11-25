@@ -81,7 +81,7 @@ class Quizzes::QuizSubmissionZipper < ContentZipper
     ids = submissions.filter_map(&:submission_data).flatten.select do |submission|
       submission[:attachment_ids].present?
     end.pluck(:attachment_ids).flatten
-    Attachment.where(:id => ids).index_by(&:id)
+    Attachment.where(id: ids).index_by(&:id)
   end
 
   def find_submissions
@@ -90,7 +90,7 @@ class Quizzes::QuizSubmissionZipper < ContentZipper
       visible_student_ids = quiz.context.apply_enrollment_visibility(
         quiz.context.student_enrollments, zip_attachment.user
       ).pluck(:user_id)
-      submissions = submissions.where(:user_id => visible_student_ids)
+      submissions = submissions.where(user_id: visible_student_ids)
     end
     @submissions = submissions.reject(&:was_preview).filter_map(&:latest_submitted_attempt)
   end

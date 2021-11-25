@@ -71,10 +71,10 @@ module Login::Shared
 
     if pseudonym.account_id == Account.site_admin.id && Account.site_admin.delegated_authentication?
       cookies['canvas_sa_delegated'] = {
-        :value => '1',
-        :domain => remember_me_cookie_domain,
-        :httponly => true,
-        :secure => CanvasRails::Application.config.session_options[:secure]
+        value: '1',
+        domain: remember_me_cookie_domain,
+        httponly: true,
+        secure: CanvasRails::Application.config.session_options[:secure]
       }
     end
     session[:require_terms] = true if @domain_root_account.require_acceptance_of_terms?(user)
@@ -90,7 +90,7 @@ module Login::Shared
       elsif session[:course_uuid] && user &&
             (course = Course.where(uuid: session[:course_uuid], workflow_state: "created").first)
         claim_session_course(course, user)
-        format.html { redirect_to(course_url(course, :login_success => '1')) }
+        format.html { redirect_to(course_url(course, login_success: '1')) }
       elsif session[:confirm]
         format.html do
           redirect_to(registration_confirmation_path(session.delete(:confirm),
@@ -103,9 +103,9 @@ module Login::Shared
         # assumed that if that URL is found rather than using the default,
         # they must have cookies enabled and we don't need to worry about
         # adding the :login_success param to it.
-        format.html { redirect_to delegated_auth_redirect_uri(redirect_back_or_default(dashboard_url(:login_success => '1'))) }
+        format.html { redirect_to delegated_auth_redirect_uri(redirect_back_or_default(dashboard_url(login_success: '1'))) }
       end
-      format.json { render :json => pseudonym.as_json(:methods => :user_code), :status => :ok }
+      format.json { render json: pseudonym.as_json(methods: :user_code), status: :ok }
     end
   end
 
@@ -120,7 +120,7 @@ module Login::Shared
   def forbid_on_files_domain
     if HostUrl.is_file_host?(request.host_with_port)
       reset_session
-      return redirect_to dashboard_url(:host => HostUrl.default_host)
+      return redirect_to dashboard_url(host: HostUrl.default_host)
     end
     true
   end

@@ -25,9 +25,9 @@ describe "assignments" do
   include_context "in-process server selenium tests"
 
   before(:once) do
-    @user = user_with_pseudonym({ :active_user => true })
+    @user = user_with_pseudonym({ active_user: true })
     @pseudonym = @user.pseudonym
-    @course = course_with_teacher({ :user => @user, :active_course => true, :active_enrollment => true }).course
+    @course = course_with_teacher({ user: @user, active_course: true, active_enrollment: true }).course
   end
 
   before do

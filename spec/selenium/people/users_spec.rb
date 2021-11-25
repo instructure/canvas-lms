@@ -58,7 +58,7 @@ describe "users" do
     end
 
     it "validates a basic page view" do
-      page_view(:user => @student, :course => @course, :url => 'assignments')
+      page_view(user: @student, course: @course, url: 'assignments')
       get "/users/#{@student.id}"
       rows = ff('#page_view_results tr')
       expect(rows.count).to eq 1
@@ -69,7 +69,7 @@ describe "users" do
     end
 
     it "validates page view with a participation" do
-      page_view(:user => @student, :course => @course, :participated => true)
+      page_view(user: @student, course: @course, participated: true)
       get "/users/#{@student.id}"
       expect(f("#page_view_results .icon-check")).to be_displayed
     end
@@ -77,7 +77,7 @@ describe "users" do
     it "validates a page view url" do
       second_student_name = 'test student for page views'
       get "/users/#{@student.id}"
-      page_view(:user => @student, :course => @course, :participated => true, :url => student_in_course(:name => second_student_name).user.id.to_s)
+      page_view(user: @student, course: @course, participated: true, url: student_in_course(name: second_student_name).user.id.to_s)
       refresh_page # in order to get the generated page view
       page_view_url = f('#page_view_results a')
       second_student = User.where(name: second_student_name).first
@@ -89,7 +89,7 @@ describe "users" do
 
     it "validates all page views were loaded" do
       page_views_count = 100
-      page_views_count.times { |i| page_view(:user => @student, :course => @course, :url => ("%03d" % i).to_s) }
+      page_views_count.times { |i| page_view(user: @student, course: @course, url: ("%03d" % i).to_s) }
       get "/users/#{@student.id}"
       wait_for_ajaximations
       scroll_page_to_bottom
@@ -102,8 +102,8 @@ describe "users" do
 
     it "filters by date" do
       old_date = 2.days.ago.beginning_of_day
-      page_view(:user => @student, :course => @course, :url => 'recent', :created_at => 5.minutes.ago)
-      page_view(:user => @student, :course => @course, :url => 'older', :created_at => old_date + 1.minute)
+      page_view(user: @student, course: @course, url: 'recent', created_at: 5.minutes.ago)
+      page_view(user: @student, course: @course, url: 'older', created_at: old_date + 1.minute)
       get "/users/#{@student.id}"
       wait_for_ajaximations
       expect(ff('#page_view_results tr').first.text).to include 'recent'
@@ -141,14 +141,14 @@ describe "users" do
       @student_2_id = 'student2@example.com'
 
       course_with_admin_logged_in
-      @student_1 = User.create!(:name => 'Student One')
+      @student_1 = User.create!(name: 'Student One')
       @student_1.register!
-      @student_1.pseudonyms.create!(:unique_id => @student_1_id, :password => 'asdfasdf', :password_confirmation => 'asdfasdf')
+      @student_1.pseudonyms.create!(unique_id: @student_1_id, password: 'asdfasdf', password_confirmation: 'asdfasdf')
       @course.enroll_user(@student_1).accept!
 
-      @student_2 = User.create!(:name => 'Student Two')
+      @student_2 = User.create!(name: 'Student Two')
       @student_2.register!
-      @student_2.pseudonyms.create!(:unique_id => @student_2_id, :password => 'asdfasdf', :password_confirmation => 'asdfasdf')
+      @student_2.pseudonyms.create!(unique_id: @student_2_id, password: 'asdfasdf', password_confirmation: 'asdfasdf')
       @course.enroll_user(@student_2).accept!
       @users = [@student_1, @student_2]
     end
@@ -334,7 +334,7 @@ describe "users" do
     it "registers an observer" do
       Account.default.terms_of_service&.update(passive: false)
 
-      user = user_with_pseudonym(:active_all => true, :password => 'lolwut12')
+      user = user_with_pseudonym(active_all: true, password: 'lolwut12')
       pairing_code = user.generate_observer_pairing_code
 
       get '/register'
@@ -359,8 +359,8 @@ describe "users" do
 
   context "masquerading" do
     it "masquerades as a user", priority: "1" do
-      site_admin_logged_in(:name => 'The Admin')
-      user_with_pseudonym(:active_user => true, :name => 'The Student')
+      site_admin_logged_in(name: 'The Admin')
+      user_with_pseudonym(active_user: true, name: 'The Student')
 
       masquerade_url = "/users/#{@user.id}/masquerade"
       get masquerade_url

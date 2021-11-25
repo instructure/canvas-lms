@@ -23,7 +23,7 @@ module SendToStream
     def self.extended(klass)
       klass.send(:class_attribute, :send_to_stream_block)
       klass.send(:class_attribute, :send_to_stream_update_block)
-      klass.has_one :stream_item, :as => :asset
+      klass.has_one :stream_item, as: :asset
     end
 
     def on_create_send_to_streams(&block)

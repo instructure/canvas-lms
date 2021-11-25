@@ -73,7 +73,7 @@ describe "CanvasHttp" do
       url = "www.example.com/a"
       body = "abc"
       content_type = "plain/text"
-      stub_request(:post, url).with(body: "abc", :headers => { 'Content-Type' => content_type })
+      stub_request(:post, url).with(body: "abc", headers: { 'Content-Type' => content_type })
                               .to_return(status: 200)
       expect(CanvasHttp.post(url, body: body, content_type: content_type).code).to eq "200"
     end
@@ -89,7 +89,7 @@ describe "CanvasHttp" do
         expect(req.body.lines[2]).to match('Content-Transfer-Encoding: binary')
         expect(req.body.lines[3]).to match('Content-Type: text/plain')
         expect(req.body.lines[5]).to match('file contents')
-      end.to_return(:status => 200)
+      end.to_return(status: 200)
 
       CanvasHttp.post(url, form_data: form_data, multipart: true, streaming: true)
 
@@ -107,7 +107,7 @@ describe "CanvasHttp" do
         expect(req.body.lines[2]).to match('Content-Transfer-Encoding: binary')
         expect(req.body.lines[3]).to match('Content-Type: text/plain')
         expect(req.body.lines[5]).to match('file contents')
-      end.to_return(:status => 200)
+      end.to_return(status: 200)
 
       CanvasHttp.post(url, form_data: form_data, multipart: true, streaming: true)
 

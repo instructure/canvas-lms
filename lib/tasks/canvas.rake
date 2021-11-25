@@ -75,7 +75,7 @@ unless $canvas_tasks_loaded
       batch_times = []
       real_time = Benchmark.realtime do
         batches.each do |tasks|
-          batch_times += Parallel.map(tasks, :in_processes => parallel_processes) do |task|
+          batch_times += Parallel.map(tasks, in_processes: parallel_processes) do |task|
             name, runner = if task.is_a?(Hash)
                              task.values_at(:name, :runner)
                            else
@@ -105,7 +105,7 @@ unless $canvas_tasks_loaded
     end
 
     desc "Load config/dynamic_settings.yml into the configured consul cluster"
-    task :seed_consul => [:environment] do
+    task seed_consul: [:environment] do
       def load_tree(root, tree)
         tree.each do |node, subtree|
           key = [root, node].compact.join('/')
@@ -121,7 +121,7 @@ unless $canvas_tasks_loaded
     end
 
     desc "Initialize vault"
-    task :seed_vault => [:environment] do
+    task seed_vault: [:environment] do
       Canvas::Vault.api_client.sys.mount(Canvas::Vault.kv_mount, 'kv', 'Application secrets for canvas', {
                                            options: { version: 1 },
                                            config: {
@@ -148,7 +148,7 @@ unless $canvas_tasks_loaded
 
   namespace :db do
     desc "Shows pending db migrations."
-    task :pending_migrations => :environment do
+    task pending_migrations: :environment do
       migrations = ActiveRecord::Base.connection.migration_context.migrations
       pending_migrations = ActiveRecord::Migrator.new(:up, migrations, ActiveRecord::Base.connection.schema_migration).pending_migrations
       pending_migrations.each do |pending_migration|
@@ -159,7 +159,7 @@ unless $canvas_tasks_loaded
     end
 
     desc "Shows skipped db migrations."
-    task :skipped_migrations => :environment do
+    task skipped_migrations: :environment do
       migrations = ActiveRecord::Base.connection.migration_context.migrations
       skipped_migrations = ActiveRecord::Migrator.new(:up, migrations, ActiveRecord::Base.connection.schema_migration).skipped_migrations
       skipped_migrations.each do |skipped_migration|
@@ -175,7 +175,7 @@ unless $canvas_tasks_loaded
       # rake db:migrate:tagged[predeploy].
       # When all callsites are migrated, this task
       # definition can be dropped.
-      task :predeploy => [:environment, :load_config] do
+      task predeploy: [:environment, :load_config] do
         migrations = ActiveRecord::Base.connection.migration_context.migrations
         migrations = migrations.select { |m| m.tags.include?(:predeploy) }
         ActiveRecord::Migrator.new(:up, migrations, ActiveRecord::Base.connection.schema_migration).migrate
@@ -184,7 +184,7 @@ unless $canvas_tasks_loaded
 
     namespace :test do
       desc "Drop and regenerate the test db by running migrations"
-      task :reset => [:environment, :load_config] do
+      task reset: [:environment, :load_config] do
         raise "Run with RAILS_ENV=test" unless Rails.env.test?
 
         config = ActiveRecord::Base.configurations['test']

@@ -77,8 +77,8 @@ class ReportSnapshot < ActiveRecord::Base
     write_attribute(:data, data.to_json)
   end
 
-  scope :detailed, -> { where(:report_type => 'counts_detailed') }
-  scope :progressive, -> { where(:report_type => 'counts_progressive_detailed') }
+  scope :detailed, -> { where(report_type: 'counts_detailed') }
+  scope :progressive, -> { where(report_type: 'counts_progressive_detailed') }
 
   def push_to_instructure_if_collection_enabled
     return if report_type != REPORT_TO_SEND

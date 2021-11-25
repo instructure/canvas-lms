@@ -22,9 +22,9 @@ describe SIS::CSV::EnrollmentImporter do
   before { account_model }
 
   it 'skips bad content' do
-    course_model(:account => @account, :sis_source_id => 'C001')
+    course_model(account: @account, sis_source_id: 'C001')
     @course.course_sections.create.update_attribute(:sis_source_id, '1B')
-    user_with_managed_pseudonym(:account => @account, :sis_user_id => 'U001')
+    user_with_managed_pseudonym(account: @account, sis_user_id: 'U001')
     before_count = Enrollment.count
     importer = process_csv_data(
       "course_id,user_id,role,section_id,status,associated_user_id",
@@ -353,7 +353,7 @@ describe SIS::CSV::EnrollmentImporter do
     )
     expect(importer.batch.data[:counts][:enrollments]).to eq 1
     @course = Course.where(sis_source_id: 'test_1').first
-    scope = Enrollment.where(:course_id => @course)
+    scope = Enrollment.where(course_id: @course)
     expect(scope.count).to eq 1
     @enrollment = scope.first
     expect(@enrollment).to be_deleted
@@ -392,8 +392,8 @@ describe SIS::CSV::EnrollmentImporter do
 
   it "counts re-deletions" do
     # because people get confused otherwise
-    course_model(:account => @account, :sis_source_id => 'C001')
-    user_with_managed_pseudonym(:account => @account, :sis_user_id => 'U001')
+    course_model(account: @account, sis_source_id: 'C001')
+    user_with_managed_pseudonym(account: @account, sis_user_id: 'U001')
 
     process_csv_data_cleanly(
       "course_id,user_id,role,status",
@@ -626,7 +626,7 @@ describe SIS::CSV::EnrollmentImporter do
   describe "#persist_errors" do
     it "gracefully handles string errors" do
       batch = Account.default.sis_batches.create!
-      csv = double(root_account: Account.default, batch: batch, :[] => nil)
+      csv = double(:root_account => Account.default, :batch => batch, :[] => nil)
       importer = SIS::CSV::EnrollmentImporter.new(csv)
       importer.persist_errors(csv, ['a string error message'])
       expect(batch.sis_batch_errors.count).to eq(1)
@@ -648,9 +648,9 @@ describe SIS::CSV::EnrollmentImporter do
   describe "custom roles" do
     context "in an account" do
       before do
-        @course = course_model(:account => @account, :sis_source_id => 'TehCourse')
-        @user1 = user_with_managed_pseudonym(:account => @account, :sis_user_id => 'user1')
-        @user2 = user_with_managed_pseudonym(:account => @account, :sis_user_id => 'user2')
+        @course = course_model(account: @account, sis_source_id: 'TehCourse')
+        @user1 = user_with_managed_pseudonym(account: @account, sis_user_id: 'user1')
+        @user2 = user_with_managed_pseudonym(account: @account, sis_user_id: 'user2')
         @role = custom_role('StudentEnrollment', 'cheater')
         @role2 = custom_role('StudentEnrollment', 'insufferable know-it-all')
       end
@@ -715,13 +715,13 @@ describe SIS::CSV::EnrollmentImporter do
 
     context "in a sub-account" do
       before do
-        @role = @account.roles.build :name => 'instruc-TOR'
+        @role = @account.roles.build name: 'instruc-TOR'
         @role.base_role_type = 'TeacherEnrollment'
         @role.save!
-        @user1 = user_with_managed_pseudonym(:name => 'Dolph Hauldhagen', :account => @account, :sis_user_id => 'user1')
-        @user2 = user_with_managed_pseudonym(:name => 'Strong Bad', :account => @account, :sis_user_id => 'user2')
-        @sub_account = @account.sub_accounts.create!(:name => "The Rec Center")
-        @course = course_model(:account => @sub_account, :name => 'Battle Axe Lessons', :sis_source_id => 'TehCourse')
+        @user1 = user_with_managed_pseudonym(name: 'Dolph Hauldhagen', account: @account, sis_user_id: 'user1')
+        @user2 = user_with_managed_pseudonym(name: 'Strong Bad', account: @account, sis_user_id: 'user2')
+        @sub_account = @account.sub_accounts.create!(name: "The Rec Center")
+        @course = course_model(account: @sub_account, name: 'Battle Axe Lessons', sis_source_id: 'TehCourse')
       end
 
       it "enrolls with an inherited custom role" do
@@ -748,7 +748,7 @@ describe SIS::CSV::EnrollmentImporter do
 
       it "enrolls with a custom role that overrides an inactive inherited role" do
         @role.deactivate!
-        sub_role = @sub_account.roles.build :name => 'instruc-TOR'
+        sub_role = @sub_account.roles.build name: 'instruc-TOR'
         sub_role.base_role_type = 'TeacherEnrollment'
         sub_role.save!
         process_csv_data_cleanly(
@@ -762,10 +762,10 @@ describe SIS::CSV::EnrollmentImporter do
 
       it "does not enroll with a custom role defined in a sibling account" do
         other_account = @account.sub_accounts.create!
-        other_role = other_account.roles.build :name => 'Pixel Pusher'
+        other_role = other_account.roles.build name: 'Pixel Pusher'
         other_role.base_role_type = 'DesignerEnrollment'
         other_role.save!
-        course_model(:account => other_account, :sis_source_id => 'OtherCourse')
+        course_model(account: other_account, sis_source_id: 'OtherCourse')
         importer = process_csv_data(
           "course_id,user_id,role,section_id,status,associated_user_id",
           "TehCourse,user1,Pixel Pusher,,active,",
@@ -876,9 +876,9 @@ describe SIS::CSV::EnrollmentImporter do
     course = Course.where(sis_source_id: 'test_1').first
     course.offer!
 
-    student = Pseudonym.where(:unique_id => "user1").first.user
+    student = Pseudonym.where(unique_id: "user1").first.user
 
-    observer = user_with_pseudonym(:account => @account)
+    observer = user_with_pseudonym(account: @account)
     add_linked_observer(student, observer, root_account: @account)
 
     process_csv_data_cleanly(
@@ -914,8 +914,8 @@ describe SIS::CSV::EnrollmentImporter do
       "test_1,observer_user,observer,,active,student_user"
     )
 
-    student = Pseudonym.where(:sis_user_id => "student_user").first.user
-    observer = Pseudonym.where(:sis_user_id => "observer_user").first.user
+    student = Pseudonym.where(sis_user_id: "student_user").first.user
+    observer = Pseudonym.where(sis_user_id: "observer_user").first.user
 
     expect(observer.enrollments.count).to eq 1
     expect(observer.enrollments.first.associated_user_id).to eq student.id
@@ -984,7 +984,7 @@ describe SIS::CSV::EnrollmentImporter do
     errors = importer.errors.map(&:last)
     expect(errors).to eq ["Attempted enrolling of deleted user student_user in course test_1"]
 
-    student = Pseudonym.where(:sis_user_id => "student_user").first.user
+    student = Pseudonym.where(sis_user_id: "student_user").first.user
     expect(student.enrollments.count).to eq 1
     expect(student.enrollments.first).to be_deleted
   end
@@ -1050,7 +1050,7 @@ describe SIS::CSV::EnrollmentImporter do
       "course_id,user_id,role,section_id,status,associated_user_id",
       "test_1,student_user,student,,completed,"
     )
-    student = Pseudonym.where(:sis_user_id => "student_user").first.user
+    student = Pseudonym.where(sis_user_id: "student_user").first.user
     expect(student.enrollments.count).to eq 1
     expect(student.enrollments.first).to be_completed
   end
@@ -1204,9 +1204,9 @@ describe SIS::CSV::EnrollmentImporter do
   end
 
   it "does not enroll students in blueprint courses" do
-    course_factory(:account => @account, :sis_source_id => 'blue')
-    @teacher = user_with_managed_pseudonym(:account => @account, :sis_user_id => 'daba')
-    @student = user_with_managed_pseudonym(:account => @account, :sis_user_id => 'dee')
+    course_factory(account: @account, sis_source_id: 'blue')
+    @teacher = user_with_managed_pseudonym(account: @account, sis_user_id: 'daba')
+    @student = user_with_managed_pseudonym(account: @account, sis_user_id: 'dee')
     MasterCourses::MasterTemplate.set_as_master_course(@course)
     importer = process_csv_data(
       "course_id,user_id,role,section_id,status,associated_user_id",

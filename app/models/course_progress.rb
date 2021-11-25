@@ -117,9 +117,9 @@ class CourseProgress
   def current_requirement_url
     return unless in_progress? && current_content_tag
 
-    course_context_modules_item_redirect_url(:course_id => course.id,
-                                             :id => current_content_tag.id,
-                                             :host => HostUrl.context_host(course))
+    course_context_modules_item_redirect_url(course_id: course.id,
+                                             id: current_content_tag.id,
+                                             host: HostUrl.context_host(course))
   end
 
   def in_progress?
@@ -172,7 +172,7 @@ class CourseProgress
 
   def module_requirements(mod)
     @_module_requirements ||= {}
-    @_module_requirements[mod.id] ||= mod.completion_requirements_visible_to(@user, :is_teacher => false)
+    @_module_requirements[mod.id] ||= mod.completion_requirements_visible_to(@user, is_teacher: false)
   end
 
   def module_requirements_completed(progression)

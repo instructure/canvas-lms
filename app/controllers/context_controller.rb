@@ -22,10 +22,10 @@ class ContextController < ApplicationController
   include SearchHelper
   include CustomSidebarLinksHelper
 
-  before_action :require_context, :except => [:inbox, :object_snippet]
-  before_action :require_user, :only => [:inbox, :report_avatar_image]
-  before_action :reject_student_view_student, :only => [:inbox]
-  protect_from_forgery :except => [:object_snippet], with: :exception
+  before_action :require_context, except: [:inbox, :object_snippet]
+  before_action :require_user, only: [:inbox, :report_avatar_image]
+  before_action :reject_student_view_student, only: [:inbox]
+  protect_from_forgery except: [:object_snippet], with: :exception
 
   include K5Mode
 
@@ -53,11 +53,11 @@ class ContextController < ApplicationController
     # doing it on purpose, so skip the XSS detection.
     response['X-XSS-Protection'] = '0'
     @snippet = Base64.decode64(@snippet)
-    render :layout => false
+    render layout: false
   end
 
   def inbox
-    redirect_to conversations_url, :status => :moved_permanently
+    redirect_to conversations_url, status: :moved_permanently
   end
 
   def roster
@@ -78,7 +78,7 @@ class ContextController < ApplicationController
       end
 
       all_roles = Role.role_data(@context, @current_user)
-      load_all_contexts(:context => @context)
+      load_all_contexts(context: @context)
       manage_students = @context.grants_right?(@current_user, session, :manage_students) && !MasterCourses::MasterTemplate.is_master_course?(@context)
       manage_admins = if @context.root_account.feature_enabled?(:granular_permissions_manage_users)
                         @context.grants_right?(@current_user, session, :allow_course_admin_actions)
@@ -154,12 +154,12 @@ class ContextController < ApplicationController
     if authorized_action(@context, @current_user, [:manage_students, manage_admins, :read_prior_roster])
       @prior_users = @context.prior_users
                              .by_top_enrollment.merge(Enrollment.not_fake)
-                             .paginate(:page => params[:page], :per_page => 20)
+                             .paginate(page: params[:page], per_page: 20)
 
       users = @prior_users.index_by(&:id)
       if users.present?
         # put the relevant prior enrollment on each user
-        @context.prior_enrollments.where({ :user_id => users.keys })
+        @context.prior_enrollments.where({ user_id: users.keys })
                 .top_enrollment_by(:user_id, :student)
                 .each { |e| users[e.user_id].prior_enrollment = e }
       end
@@ -198,12 +198,12 @@ class ContextController < ApplicationController
         respond_to do |format|
           format.html do
             @accesses = @accesses.paginate(page: params[:page], per_page: 50)
-            js_env(context_url: context_url(@context, :context_user_usage_url, @user, :format => :json),
+            js_env(context_url: context_url(@context, :context_user_usage_url, @user, format: :json),
                    accesses_total_pages: @accesses.total_pages)
           end
           format.json do
             @accesses = Api.paginate(@accesses, self, polymorphic_url([@context, :user_usage], user_id: @user), default_per_page: 50)
-            render :json => @accesses.map { |a| a.as_json(methods: %i[readable_name asset_class_name icon]) }
+            render json: @accesses.map { |a| a.as_json(methods: %i[readable_name asset_class_name icon]) }
           end
         end
       end
@@ -218,7 +218,7 @@ class ContextController < ApplicationController
       case @context
       when Course
         is_admin = @context.grants_right?(@current_user, session, :read_as_admin)
-        scope = @context.enrollments_visible_to(@current_user, :include_concluded => is_admin).where(user_id: user_id)
+        scope = @context.enrollments_visible_to(@current_user, include_concluded: is_admin).where(user_id: user_id)
         scope = scope.active_or_pending unless is_admin
         @membership = scope.first
         if @membership
@@ -226,7 +226,7 @@ class ContextController < ApplicationController
           js_env(COURSE_ID: @context.id,
                  USER_ID: user_id,
                  LAST_ATTENDED_DATE: @enrollments.first.last_attended_at,
-                 :course => {
+                 course: {
                    id: @context.id,
                    hideSectionsOnCourseUsersPage: @context.sections_hidden_on_roster_page?(current_user: @current_user)
                  })
@@ -276,12 +276,12 @@ class ContextController < ApplicationController
 
       if @user.grants_right?(@current_user, session, :read_profile)
         # self and instructors
-        @topics = @context.discussion_topics.active.reject { |a| a.locked_for?(@current_user, :check_policies => true) }
+        @topics = @context.discussion_topics.active.reject { |a| a.locked_for?(@current_user, check_policies: true) }
         @messages = []
         @topics.each do |topic|
           @messages << topic if topic.user_id == @user.id
         end
-        @messages += DiscussionEntry.active.where(:discussion_topic_id => @topics, :user_id => @user).to_a
+        @messages += DiscussionEntry.active.where(discussion_topic_id: @topics, user_id: @user).to_a
 
         @messages = @messages.select { |m| m.grants_right?(@current_user, session, :read) }.sort_by(&:created_at).reverse
       end

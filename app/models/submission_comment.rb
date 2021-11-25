@@ -43,15 +43,15 @@ class SubmissionComment < ActiveRecord::Base
 
   belongs_to :root_account, class_name: 'Account'
   belongs_to :submission
-  belongs_to :author, :class_name => 'User'
+  belongs_to :author, class_name: 'User'
   belongs_to :assessment_request
   belongs_to :context, polymorphic: [:course]
-  belongs_to :provisional_grade, :class_name => 'ModeratedGrading::ProvisionalGrade'
-  has_many :messages, :as => :context, :inverse_of => :context, :dependent => :destroy
+  belongs_to :provisional_grade, class_name: 'ModeratedGrading::ProvisionalGrade'
+  has_many :messages, as: :context, inverse_of: :context, dependent: :destroy
   has_many :viewed_submission_comments, dependent: :destroy
 
-  validates :comment, length: { :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true }
-  validates :comment, length: { :minimum => 1, :allow_nil => true, :allow_blank => true }
+  validates :comment, length: { maximum: maximum_text_length, allow_nil: true, allow_blank: true }
+  validates :comment, length: { minimum: 1, allow_nil: true, allow_blank: true }
   validates_each :attempt do |record, attr, value|
     next if value.nil?
 
@@ -80,14 +80,14 @@ class SubmissionComment < ActiveRecord::Base
 
   serialize :cached_attachments
 
-  scope :visible, -> { where(:hidden => false) }
+  scope :visible, -> { where(hidden: false) }
   scope :draft, -> { where(draft: true) }
   scope :published, -> { where(draft: false) }
   scope :after, ->(date) { where("submission_comments.created_at>?", date) }
-  scope :for_final_grade, -> { where(:provisional_grade_id => nil) }
-  scope :for_provisional_grade, ->(id) { where(:provisional_grade_id => id) }
+  scope :for_final_grade, -> { where(provisional_grade_id: nil) }
+  scope :for_provisional_grade, ->(id) { where(provisional_grade_id: id) }
   scope :for_provisional_grades, -> { where.not(provisional_grade_id: nil) }
-  scope :for_assignment_id, ->(assignment_id) { where(:submissions => { :assignment_id => assignment_id }).joins(:submission) }
+  scope :for_assignment_id, ->(assignment_id) { where(submissions: { assignment_id: assignment_id }).joins(:submission) }
   scope :for_groups, -> { where.not(group_comment_id: nil) }
   scope :not_for_groups, -> { where(group_comment_id: nil) }
 
@@ -197,7 +197,7 @@ class SubmissionComment < ActiveRecord::Base
     p.dispatch :submission_comment
     p.to do
       active_participant =
-        Enrollment.where(user_id: submission.user.id, :course_id => submission.course_id).active_by_date.exists?
+        Enrollment.where(user_id: submission.user.id, course_id: submission.course_id).active_by_date.exists?
       if active_participant
         ([submission.user] + User.observing_students_in_course(submission.user, submission.assignment.context)) - [author]
       end
@@ -363,7 +363,7 @@ class SubmissionComment < ActiveRecord::Base
   def self.preload_attachments(comments)
     ActiveRecord::Associations::Preloader.new.preload(comments, [:submission])
     submissions = comments.map(&:submission).uniq
-    ActiveRecord::Associations::Preloader.new.preload(submissions, :assignment => :attachments)
+    ActiveRecord::Associations::Preloader.new.preload(submissions, assignment: :attachments)
   end
 
   def update_submission
@@ -385,7 +385,7 @@ class SubmissionComment < ActiveRecord::Base
     end
 
     res = format_message(comment).first
-    res = truncate_html(res, :max_length => truncate, :words => true) if truncate
+    res = truncate_html(res, max_length: truncate, words: true) if truncate
     res
   end
 
@@ -418,9 +418,9 @@ class SubmissionComment < ActiveRecord::Base
         submission.user.clear_cache_key(:submissions)
 
         ContentParticipation.create_or_update({
-                                                :content => submission,
-                                                :user => submission.user,
-                                                :workflow_state => "unread",
+                                                content: submission,
+                                                user: submission.user,
+                                                workflow_state: "unread",
                                               })
       end
     end

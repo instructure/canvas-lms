@@ -34,15 +34,15 @@ describe CourseSection, "moving to new course" do
   end
 
   it "transfers enrollments to the new root account" do
-    account1 = Account.create!(:name => "1")
-    account2 = Account.create!(:name => "2")
+    account1 = Account.create!(name: "1")
+    account2 = Account.create!(name: "2")
     course1 = account1.courses.create!
     course2 = account2.courses.create!
     course3 = account2.courses.create!
     cs = course1.course_sections.create!
     u = User.create!
     u.register!
-    e = course1.enroll_user(u, 'StudentEnrollment', :section => cs)
+    e = course1.enroll_user(u, 'StudentEnrollment', section: cs)
     e.workflow_state = 'active'
     e.save!
     course1.reload
@@ -110,18 +110,18 @@ describe CourseSection, "moving to new course" do
   end
 
   it "updates user account associations for xlist between subaccounts" do
-    root_account = Account.create!(:name => "root")
-    sub_account1 = Account.create!(:parent_account => root_account, :name => "account1")
-    sub_account2 = Account.create!(:parent_account => root_account, :name => "account2")
-    sub_account3 = Account.create!(:parent_account => root_account, :name => "account3")
-    course1 = sub_account1.courses.create!(:name => "course1")
-    course2 = sub_account2.courses.create!(:name => "course2")
-    course3 = sub_account3.courses.create!(:name => "course3")
+    root_account = Account.create!(name: "root")
+    sub_account1 = Account.create!(parent_account: root_account, name: "account1")
+    sub_account2 = Account.create!(parent_account: root_account, name: "account2")
+    sub_account3 = Account.create!(parent_account: root_account, name: "account3")
+    course1 = sub_account1.courses.create!(name: "course1")
+    course2 = sub_account2.courses.create!(name: "course2")
+    course3 = sub_account3.courses.create!(name: "course3")
     cs = course1.course_sections.create!
     expect(cs.nonxlist_course_id).to be_nil
     u = User.create!
     u.register!
-    course1.enroll_user(u, 'StudentEnrollment', :section => cs)
+    course1.enroll_user(u, 'StudentEnrollment', section: cs)
     u.update_account_associations
 
     expect(course1.associated_accounts.map(&:id).sort).to eq [root_account.id, sub_account1.id].sort
@@ -155,9 +155,9 @@ describe CourseSection, "moving to new course" do
   end
 
   it "crosslists and uncrosslist" do
-    account1 = Account.create!(:name => "1")
-    account2 = Account.create!(:name => "2")
-    account3 = Account.create!(:name => "3")
+    account1 = Account.create!(name: "1")
+    account2 = Account.create!(name: "2")
+    account3 = Account.create!(name: "3")
     course1 = account1.courses.create!
     course2 = account2.courses.create!
     course3 = account3.courses.create!
@@ -169,7 +169,7 @@ describe CourseSection, "moving to new course" do
     e = course2.enroll_user(u, 'StudentEnrollment')
     e.workflow_state = 'active'
     e.save!
-    e = course1.enroll_user(u, 'StudentEnrollment', :section => cs)
+    e = course1.enroll_user(u, 'StudentEnrollment', section: cs)
     e.workflow_state = 'active'
     e.save!
     # should also move deleted enrollments
@@ -242,27 +242,27 @@ describe CourseSection, "moving to new course" do
   end
 
   it "preserves favorites when crosslisting" do
-    account1 = Account.create!(:name => "1")
-    account2 = Account.create!(:name => "2")
+    account1 = Account.create!(name: "1")
+    account2 = Account.create!(name: "2")
     course1 = account1.courses.create!
     course2 = account2.courses.create!
     course2.assert_section
 
     cs = course1.course_sections.create!
-    u = user_factory(:active_all => true)
-    course1.enroll_user(u, 'StudentEnrollment', :section => cs, :enrollment_state => 'active')
-    u.favorites.where(:context_type => 'Course', :context_id => course1).first_or_create!
+    u = user_factory(active_all: true)
+    course1.enroll_user(u, 'StudentEnrollment', section: cs, enrollment_state: 'active')
+    u.favorites.where(context_type: 'Course', context_id: course1).first_or_create!
 
     cs.crosslist_to_course(course2)
-    expect(u.favorites.where(:context_type => "Course", :context_id => course2).exists?).to eq true
+    expect(u.favorites.where(context_type: "Course", context_id: course2).exists?).to eq true
   end
 
   it "removes discussion visibilites on crosslist" do
-    course = course_factory({ :course_name => "Course 1", :active_all => true })
+    course = course_factory({ course_name: "Course 1", active_all: true })
     section = course.course_sections.create!
     course.save!
-    announcement1 = Announcement.create!(:title => "some topic", :message => "blah",
-                                         :context => course, :is_section_specific => true, :course_sections => [section])
+    announcement1 = Announcement.create!(title: "some topic", message: "blah",
+                                         context: course, is_section_specific: true, course_sections: [section])
     visibility = announcement1.reload.discussion_topic_section_visibilities.first
 
     course2 = course_factory
@@ -296,8 +296,8 @@ describe CourseSection, "moving to new course" do
   end
 
   it 'updates course account associations on save' do
-    account1 = Account.create!(:name => "1")
-    account2 = account1.sub_accounts.create!(:name => "2")
+    account1 = Account.create!(name: "1")
+    account2 = account1.sub_accounts.create!(name: "2")
     course1 = account1.courses.create!
     course2 = account2.courses.create!
     cs1 = course1.course_sections.create!
@@ -317,14 +317,14 @@ describe CourseSection, "moving to new course" do
   end
 
   it 'calls DueDateCacher.recompute_users_for_course' do
-    account1 = Account.create!(:name => "1")
-    account2 = Account.create!(:name => "2")
+    account1 = Account.create!(name: "1")
+    account2 = Account.create!(name: "2")
     course1 = account1.courses.create!
     course2 = account2.courses.create!
     cs = course1.course_sections.create!
     u = User.create!
     u.register!
-    e = course1.enroll_user(u, 'StudentEnrollment', :section => cs)
+    e = course1.enroll_user(u, 'StudentEnrollment', section: cs)
     e.workflow_state = 'active'
     e.save!
     course1.reload
@@ -386,34 +386,34 @@ describe CourseSection, "moving to new course" do
     end
 
     it "doesn't associate with deleted discussion topics" do
-      course = course_factory({ :course_name => "Course 1", :active_all => true })
+      course = course_factory({ course_name: "Course 1", active_all: true })
       section = course.course_sections.create!
       course.save!
       announcement1 = Announcement.create!(
-        :title => "some topic",
-        :message => "I announce that i am lying",
-        :user => @teacher,
-        :context => course,
-        :workflow_state => "published"
+        title: "some topic",
+        message: "I announce that i am lying",
+        user: @teacher,
+        context: course,
+        workflow_state: "published"
       )
       announcement1.is_section_specific = true
       announcement2 = Announcement.create!(
-        :title => "some topic 2",
-        :message => "I announce that i am lying again",
-        :user => @teacher,
-        :context => course,
-        :workflow_state => "published"
+        title: "some topic 2",
+        message: "I announce that i am lying again",
+        user: @teacher,
+        context: course,
+        workflow_state: "published"
       )
       announcement2.is_section_specific = true
       announcement1.discussion_topic_section_visibilities <<
         DiscussionTopicSectionVisibility.new(
-          :discussion_topic => announcement1,
-          :course_section => section
+          discussion_topic: announcement1,
+          course_section: section
         )
       announcement2.discussion_topic_section_visibilities <<
         DiscussionTopicSectionVisibility.new(
-          :discussion_topic => announcement2,
-          :course_section => section
+          discussion_topic: announcement2,
+          course_section: section
         )
       announcement1.save!
       announcement2.save!
@@ -436,7 +436,7 @@ describe CourseSection, "moving to new course" do
     end
 
     it 'is not deletable if it has real enrollments' do
-      student_in_course :section => @section
+      student_in_course section: @section
       expect(@section).not_to be_deletable
     end
 
@@ -447,7 +447,7 @@ describe CourseSection, "moving to new course" do
     end
 
     it 'is deletable if it only has rejected enrollments' do
-      student_in_course :section => @section
+      student_in_course section: @section
       @section.enrollments.first.update_attribute(:workflow_state, "rejected")
       expect(@section).to be_deletable
     end
@@ -457,17 +457,17 @@ describe CourseSection, "moving to new course" do
     context ":read and section_visibilities" do
       before do
         RoleOverride.create!({
-                               :context => Account.default,
-                               :permission => 'manage_students',
-                               :role => ta_role,
-                               :enabled => false
+                               context: Account.default,
+                               permission: 'manage_students',
+                               role: ta_role,
+                               enabled: false
                              })
-        course_with_ta(:active_all => true)
-        @other_section = @course.course_sections.create!(:name => "Other Section")
+        course_with_ta(active_all: true)
+        @other_section = @course.course_sections.create!(name: "Other Section")
       end
 
       it "works with section_limited true" do
-        @ta.enrollments.update_all(:limit_privileges_to_course_section => true)
+        @ta.enrollments.update_all(limit_privileges_to_course_section: true)
         @ta.reload
 
         # make sure other ways to get :read are false
@@ -495,7 +495,7 @@ describe CourseSection, "moving to new course" do
     before :once do
       course_factory(active_all: true)
       @section = @course.course_sections.create!
-      @enrollment = @course.enroll_student(user_factory(:active_all => true), :section => @section)
+      @enrollment = @course.enroll_student(user_factory(active_all: true), section: @section)
     end
 
     it "does not invalidate unless something date-related changes" do
@@ -525,12 +525,12 @@ describe CourseSection, "moving to new course" do
     end
 
     it "invalidates access if section is cross-listed" do
-      @course.update(:workflow_state => "available", :restrict_student_future_view => true,
-                     :restrict_enrollments_to_course_dates => true, :start_at => 1.day.from_now)
+      @course.update(workflow_state: "available", restrict_student_future_view: true,
+                     restrict_enrollments_to_course_dates: true, start_at: 1.day.from_now)
       expect(@enrollment.enrollment_state.reload.restricted_access?).to eq true
 
       other_course = course_factory(active_all: true)
-      other_course.update(:restrict_enrollments_to_course_dates => true, :start_at => 1.day.from_now)
+      other_course.update(restrict_enrollments_to_course_dates: true, start_at: 1.day.from_now)
 
       @section.crosslist_to_course(other_course)
 

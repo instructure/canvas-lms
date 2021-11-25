@@ -26,12 +26,12 @@ describe "admin account people profile" do
   before(:once) do
     # set a default account
     @account = Account.default
-    account_admin_user(:account => @account, :active_all => true)
+    account_admin_user(account: @account, active_all: true)
 
     # add two users to account
-    @user1 = user_with_pseudonym(:account => @account, :name => "Test User1")
-    @user2 = user_with_pseudonym(:account => @account, :name => "Test User2")
-    @user3 = user_with_pseudonym(:account => @account, :name => "Random User")
+    @user1 = user_with_pseudonym(account: @account, name: "Test User1")
+    @user2 = user_with_pseudonym(account: @account, name: "Test User2")
+    @user3 = user_with_pseudonym(account: @account, name: "Random User")
   end
 
   context 'in admin merge page' do

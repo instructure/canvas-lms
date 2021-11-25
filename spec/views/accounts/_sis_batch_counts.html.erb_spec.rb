@@ -28,7 +28,7 @@ describe "accounts/_sis_batch_counts.html.erb" do
                        change_sis_ids: 3, logins: 0 } }
     report = double
     expect(report).to receive(:data).and_return(data)
-    render :partial => 'accounts/sis_batch_counts', :object => report
+    render partial: 'accounts/sis_batch_counts', object: report
 
     map = { xlists: "Crosslists", group_memberships: "Group Enrollments",
             user_observers: "User Observers", change_sis_ids: "Change SIS IDs",

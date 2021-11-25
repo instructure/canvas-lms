@@ -74,13 +74,13 @@ describe 'Global Navigation' do
 
         student = user_factory
         2.times do |x|
-          course = course_with_student(:user => student, :active_all => true).course
-          group_with_user(:user => student, :group_context => course, :name => "A Old Group #{x}")
+          course = course_with_student(user: student, active_all: true).course
+          group_with_user(user: student, group_context: course, name: "A Old Group #{x}")
           course.complete!
         end
 
-        course = course_with_student(:user => student, :active_all => true).course
-        group_with_user(:user => student, :group_context => course, :name => "Z Current Group")
+        course = course_with_student(user: student, active_all: true).course
+        group_with_user(user: student, group_context: course, name: "Z Current Group")
 
         user_session(student)
         get "/"
@@ -94,17 +94,17 @@ describe 'Global Navigation' do
     describe 'LTI Tools' do
       it 'shows a custom logo/link for LTI tools' do
         @tool = Account.default.context_external_tools.new({
-                                                             :name => "Commons",
-                                                             :domain => "canvaslms.com",
-                                                             :consumer_key => '12345',
-                                                             :shared_secret => 'secret'
+                                                             name: "Commons",
+                                                             domain: "canvaslms.com",
+                                                             consumer_key: '12345',
+                                                             shared_secret: 'secret'
                                                            })
         @tool.set_extension_setting(:global_navigation, {
-                                      :url => "canvaslms.com",
-                                      :visibility => "admins",
-                                      :display_type => "full_width",
-                                      :text => "Commons",
-                                      :icon_svg_path_64 => 'M100,37L70.1,10.5v17.6H38.6c-4.9,0-8.8,3.9-8.8,8.8s3.9,8.8,8.8,8.8h31.5v17.6L100,37z'
+                                      url: "canvaslms.com",
+                                      visibility: "admins",
+                                      display_type: "full_width",
+                                      text: "Commons",
+                                      icon_svg_path_64: 'M100,37L70.1,10.5v17.6H38.6c-4.9,0-8.8,3.9-8.8,8.8s3.9,8.8,8.8,8.8h31.5v17.6L100,37z'
                                     })
         @tool.save!
         get "/"
@@ -115,8 +115,8 @@ describe 'Global Navigation' do
     describe 'Recent History' do
       before do
         Setting.set('enable_page_views', 'db')
-        @assignment = @course.assignments.create(:name => "another assessment")
-        @quiz = Quizzes::Quiz.create!(:title => 'quiz1', :context => @course)
+        @assignment = @course.assignments.create(name: "another assessment")
+        @quiz = Quizzes::Quiz.create!(title: 'quiz1', context: @course)
         page_view_for url: app_url + "/courses/#{@course.id}/assignments/#{@assignment.id}", context: @course,
                       created_at: 5.minutes.ago, asset_category: 'assignments',
                       asset_code: @assignment.asset_string

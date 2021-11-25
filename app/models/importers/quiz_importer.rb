@@ -333,7 +333,7 @@ module Importers
 
           # remove the quiz groups afterwards so any of their dependent quiz questions are deleted first and we don't run into any Restrictor errors
           importing_qgroup_mig_ids = hash[:questions].select { |q| q[:question_type] == "question_group" }.pluck(:migration_id)
-          item.quiz_groups.where.not(:migration_id => importing_qgroup_mig_ids).destroy_all
+          item.quiz_groups.where.not(migration_id: importing_qgroup_mig_ids).destroy_all
         end
       end
       return unless question_data

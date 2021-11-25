@@ -187,7 +187,7 @@ class ContentZipper
     @submissions_hash = submissions_hash
     av = ActionView::Base.with_view_paths(ActionController::Base.view_paths)
     av.extend TextHelper
-    av.render(:partial => "eportfolios/static_page", :locals => { :page => page, :portfolio => portfolio, :static_attachments => static_attachments, :submissions_hash => submissions_hash })
+    av.render(partial: "eportfolios/static_page", locals: { page: page, portfolio: portfolio, static_attachments: static_attachments, submissions_hash: submissions_hash })
   end
 
   def self.zip_base_folder(*args)
@@ -308,7 +308,7 @@ class ContentZipper
 
     handle = nil
     begin
-      handle = attachment.open(:need_local_file => true)
+      handle = attachment.open(need_local_file: true)
       zipfile.get_output_stream(filename) { |zos| Zip::IOExtras.copy_stream(zos, handle) }
     rescue Attachment::FailedResponse, Net::ReadTimeout, Net::OpenTimeout => e
       Canvas::Errors.capture_exception(:content_export, e, :warn)

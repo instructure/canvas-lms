@@ -226,7 +226,7 @@ class Quizzes::QuizQuestion < ActiveRecord::Base
     end
 
     set = "quiz_group_id=#{group_id}, position=CASE #{updates.join(" ")} ELSE id END"
-    where(:id => questions).update_all(set)
+    where(id: questions).update_all(set)
   end
 
   alias_method :destroy_permanently!, :destroy

@@ -36,7 +36,7 @@ module SIS
 
       Course.update_account_associations(course_ids_to_update_associations.to_a) unless course_ids_to_update_associations.empty?
       courses_to_update_sis_batch_id.in_groups_of(1000, false) do |courses|
-        Course.where(:id => courses).update_all(:sis_batch_id => @batch.id)
+        Course.where(id: courses).update_all(sis_batch_id: @batch.id)
       end
 
       SisBatchRollBackData.bulk_insert_roll_back_data(importer.roll_back_data)

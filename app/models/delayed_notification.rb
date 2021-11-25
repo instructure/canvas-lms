@@ -36,7 +36,7 @@ class DelayedNotification < ActiveRecord::Base
 
   workflow do
     state :to_be_processed do
-      event :do_process, :transitions_to => :processed
+      event :do_process, transitions_to: :processed
     end
     state :processed
     state :errored
@@ -98,12 +98,12 @@ class DelayedNotification < ActiveRecord::Base
                  end
 
       ids.each_slice(100) do |slice|
-        yield klass.where(:id => slice).preload(includes).to_a
+        yield klass.where(id: slice).preload(includes).to_a
       end
     end
   end
 
   scope :to_be_processed, lambda { |limit|
-    where(:workflow_state => 'to_be_processed').limit(limit).order("delayed_notifications.created_at")
+    where(workflow_state: 'to_be_processed').limit(limit).order("delayed_notifications.created_at")
   }
 end

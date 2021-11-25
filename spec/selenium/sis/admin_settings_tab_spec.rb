@@ -22,10 +22,10 @@ require_relative '../common'
 describe "admin settings tab" do
   include_context "in-process server selenium tests"
   let(:account) { Account.default }
-  let(:sub_account) { account.sub_accounts.create!(:name => 'sub-account') }
+  let(:sub_account) { account.sub_accounts.create!(name: 'sub-account') }
 
   before do
-    user_logged_in(:user => site_admin_user(account: account))
+    user_logged_in(user: site_admin_user(account: account))
   end
 
   def get_settings_page(account)

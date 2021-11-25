@@ -119,7 +119,7 @@ describe "calendar2" do
       end
 
       it "is able to create an event for a group" do
-        group(:context => @course)
+        group(context: @course)
 
         get "/groups/#{@group.id}"
         expect_new_page_load { f('.event-list-view-calendar').click }
@@ -158,7 +158,7 @@ describe "calendar2" do
 
       it "creates recurring section-specific events" do
         section1 = @course.course_sections.first
-        section2 = @course.course_sections.create!(:name => "other section")
+        section2 = @course.course_sections.create!(name: "other section")
 
         day1 = 1.day.from_now.to_date
         day2 = 2.days.from_now.to_date
@@ -192,12 +192,12 @@ describe "calendar2" do
         expect_new_page_load { form.submit }
 
         expect(CalendarEvent.count).to eq(6) # 2 parent events each with 2 child events
-        s1_events = CalendarEvent.where(:context_code => section1.asset_string)
-                                 .where.not(:parent_calendar_event_id => nil).order(:start_at).to_a
+        s1_events = CalendarEvent.where(context_code: section1.asset_string)
+                                 .where.not(parent_calendar_event_id: nil).order(:start_at).to_a
         expect(s1_events[1].start_at.to_date).to eq(s1_events[0].start_at.to_date + 1.week)
 
-        s2_events = CalendarEvent.where(:context_code => section2.asset_string)
-                                 .where.not(:parent_calendar_event_id => nil).order(:start_at).to_a
+        s2_events = CalendarEvent.where(context_code: section2.asset_string)
+                                 .where.not(parent_calendar_event_id: nil).order(:start_at).to_a
         expect(s2_events[1].start_at.to_date).to eq(s2_events[0].start_at.to_date + 1.week)
       end
 

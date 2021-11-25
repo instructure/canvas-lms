@@ -117,7 +117,7 @@ module RespondusSoapEndpoint
 
       Authlogic::Session::Base.controller = AuthlogicAdapter.new(self)
       domain_root_account.pseudonyms.scoping do
-        pseudonym_session = PseudonymSession.new(:unique_id => userName, :password => password)
+        pseudonym_session = PseudonymSession.new(unique_id: userName, password: password)
         pseudonym_session.remote_ip = request.remote_ip
         # don't actually want to create a session, so call `valid?` rather than `save`
         if pseudonym_session.valid?
@@ -552,12 +552,12 @@ Implemented for: Canvas LMS)]
       end
 
       settings = {
-        :migration_type => 'qti_converter',
-        :apply_respondus_settings_file => (itemType != 'qdb'),
-        :skip_import_notification => true,
-        :files_import_allow_rename => true,
-        :files_import_root_path => ATTACHMENT_FOLDER_NAME,
-        :flavor => Qti::Flavors::RESPONDUS
+        migration_type: 'qti_converter',
+        apply_respondus_settings_file: (itemType != 'qdb'),
+        skip_import_notification: true,
+        files_import_allow_rename: true,
+        files_import_root_path: ATTACHMENT_FOLDER_NAME,
+        flavor: Qti::Flavors::RESPONDUS
       }
 
       if item
@@ -572,12 +572,12 @@ Implemented for: Canvas LMS)]
         end
       end
 
-      migration = ContentMigration.new(:context => course,
-                                       :user => user)
+      migration = ContentMigration.new(context: course,
+                                       user: user)
       migration.update_migration_settings(settings)
       if itemType == 'qdb'
         # skip creating the quiz, just import the questions into the bank
-        migration.migration_ids_to_import = { :copy => { :all_quizzes => false, :all_assessment_question_banks => true } }
+        migration.migration_ids_to_import = { copy: { all_quizzes: false, all_assessment_question_banks: true } }
       end
       migration.save!
 

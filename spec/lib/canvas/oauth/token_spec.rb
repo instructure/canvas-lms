@@ -28,12 +28,11 @@ module Canvas::OAuth
 
     def stub_out_cache(client_id = nil, scopes = nil)
       if client_id
-        allow(token).to receive_messages(:cached_code_entry =>
-                      '{"client_id": ' + client_id.to_s +
+        allow(token).to receive_messages(cached_code_entry: '{"client_id": ' + client_id.to_s +
                         ', "user": ' + user.id.to_s +
                         (scopes ? ', "scopes": ' + scopes.to_json : '') + '}')
       else
-        allow(token).to receive_messages(:cached_code_entry => '{}')
+        allow(token).to receive_messages(cached_code_entry: '{}')
       end
     end
 
@@ -102,7 +101,7 @@ module Canvas::OAuth
       end
 
       it 'creates a new token if the scopes do not match' do
-        access_token = user.access_tokens.create!(:developer_key => key, :scopes => scopes)
+        access_token = user.access_tokens.create!(developer_key: key, scopes: scopes)
         expect(token.access_token).to be_a AccessToken
         expect(token.access_token).not_to eq access_token
       end
@@ -116,7 +115,7 @@ module Canvas::OAuth
       it 'finds an existing userinfo token if one exists' do
         scope = "#{TokenScopes::OAUTH2_SCOPE_NAMESPACE}userinfo"
         stub_out_cache key.id, [scope]
-        access_token = user.access_tokens.create!(:developer_key => key, :scopes => [scope], :remember_access => true)
+        access_token = user.access_tokens.create!(developer_key: key, scopes: [scope], remember_access: true)
         expect(token.access_token).to eq access_token
         expect(token.access_token.full_token).to be_nil
       end
@@ -124,14 +123,14 @@ module Canvas::OAuth
       it 'ignores existing token if user did not remember access' do
         scope = "#{TokenScopes::OAUTH2_SCOPE_NAMESPACE}userinfo"
         stub_out_cache key.id, [scope]
-        access_token = user.access_tokens.create!(:developer_key => key, :scopes => [scope])
+        access_token = user.access_tokens.create!(developer_key: key, scopes: [scope])
         expect(token.access_token).not_to eq access_token
         expect(token.access_token.full_token).to be_nil
       end
 
       it 'ignores existing tokens by default' do
         stub_out_cache key.id, scopes
-        access_token = user.access_tokens.create!(:developer_key => key, :scopes => scopes)
+        access_token = user.access_tokens.create!(developer_key: key, scopes: scopes)
         expect(token.access_token).to be_a AccessToken
         expect(token.access_token).not_to eq access_token
       end
@@ -145,15 +144,15 @@ module Canvas::OAuth
 
     describe '#create_access_token_if_needed' do
       it 'deletes existing tokens for the same key when requested' do
-        old_token = user.access_tokens.create! :developer_key => key
+        old_token = user.access_tokens.create! developer_key: key
         token.create_access_token_if_needed(true)
-        expect(AccessToken.not_deleted.where(:id => old_token.id).exists?).to be(false)
+        expect(AccessToken.not_deleted.where(id: old_token.id).exists?).to be(false)
       end
 
       it 'does not delete existing tokens for the same key when not requested' do
-        old_token = user.access_tokens.create! :developer_key => key
+        old_token = user.access_tokens.create! developer_key: key
         token.create_access_token_if_needed
-        expect(AccessToken.not_deleted.where(:id => old_token.id).exists?).to be(true)
+        expect(AccessToken.not_deleted.where(id: old_token.id).exists?).to be(true)
       end
     end
 
@@ -225,10 +224,10 @@ module Canvas::OAuth
     describe '.generate_code_for' do
       let(:code) { "brand_new_code" }
 
-      before { allow(SecureRandom).to receive_messages(:hex => code) }
+      before { allow(SecureRandom).to receive_messages(hex: code) }
 
       it 'returns the new code' do
-        allow(Canvas).to receive_messages(:redis => double(:setex => true))
+        allow(Canvas).to receive_messages(redis: double(setex: true))
         expect(Token.generate_code_for(1, 2, 3)).to eq code
       end
 
@@ -237,7 +236,7 @@ module Canvas::OAuth
         code_data = { user: 1, real_user: 2, client_id: 3, scopes: nil, purpose: nil, remember_access: nil }
         # should have 10 min (in seconds) ttl passed as second param
         expect(redis).to receive(:setex).with('oauth2:brand_new_code', 600, code_data.to_json)
-        allow(Canvas).to receive_messages(:redis => redis)
+        allow(Canvas).to receive_messages(redis: redis)
         Token.generate_code_for(1, 2, 3)
       end
 
@@ -247,7 +246,7 @@ module Canvas::OAuth
         # should have 10 sec ttl passed as second param with setting
         Setting.set('oath_token_request_timeout', '10')
         expect(redis).to receive(:setex).with('oauth2:brand_new_code', 10, code_data.to_json)
-        allow(Canvas).to receive_messages(:redis => redis)
+        allow(Canvas).to receive_messages(redis: redis)
         Token.generate_code_for(1, 2, 3)
       end
     end

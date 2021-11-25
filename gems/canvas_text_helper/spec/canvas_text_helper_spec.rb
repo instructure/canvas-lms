@@ -23,27 +23,27 @@ describe CanvasTextHelper do
   describe "#truncate_text" do
     it "does not split if max_length is exact text length" do
       str = "I am an exact length"
-      expect(CanvasTextHelper.truncate_text(str, :max_length => str.length)).to eq(str)
+      expect(CanvasTextHelper.truncate_text(str, max_length: str.length)).to eq(str)
     end
 
     it "splits on multi-byte character boundaries" do
       str = "This\ntext\nhere\n获\nis\nutf-8"
 
-      expect(CanvasTextHelper.truncate_text(str, :max_length => 9)).to eq("This\nt...")
-      expect(CanvasTextHelper.truncate_text(str, :max_length => 18)).to eq("This\ntext\nhere\n...")
-      expect(CanvasTextHelper.truncate_text(str, :max_length => 19)).to eq("This\ntext\nhere\n获...")
-      expect(CanvasTextHelper.truncate_text(str, :max_length => 20)).to eq("This\ntext\nhere\n获\n...")
-      expect(CanvasTextHelper.truncate_text(str, :max_length => 21)).to eq("This\ntext\nhere\n获\ni...")
-      expect(CanvasTextHelper.truncate_text(str, :max_length => 22)).to eq("This\ntext\nhere\n获\nis...")
-      expect(CanvasTextHelper.truncate_text(str, :max_length => 23)).to eq("This\ntext\nhere\n获\nis\n...")
-      expect(CanvasTextHelper.truncate_text(str, :max_length => 80)).to eq(str)
+      expect(CanvasTextHelper.truncate_text(str, max_length: 9)).to eq("This\nt...")
+      expect(CanvasTextHelper.truncate_text(str, max_length: 18)).to eq("This\ntext\nhere\n...")
+      expect(CanvasTextHelper.truncate_text(str, max_length: 19)).to eq("This\ntext\nhere\n获...")
+      expect(CanvasTextHelper.truncate_text(str, max_length: 20)).to eq("This\ntext\nhere\n获\n...")
+      expect(CanvasTextHelper.truncate_text(str, max_length: 21)).to eq("This\ntext\nhere\n获\ni...")
+      expect(CanvasTextHelper.truncate_text(str, max_length: 22)).to eq("This\ntext\nhere\n获\nis...")
+      expect(CanvasTextHelper.truncate_text(str, max_length: 23)).to eq("This\ntext\nhere\n获\nis\n...")
+      expect(CanvasTextHelper.truncate_text(str, max_length: 80)).to eq(str)
     end
 
     it "splits on words if specified" do
       str = "I am a sentence with areallylongwordattheendthatcantbesplit and then a few more words"
-      expect(CanvasTextHelper.truncate_text(str, :max_words => 4, :max_length => 30)).to eq("I am a sentence")
-      expect(CanvasTextHelper.truncate_text(str, :max_words => 6, :max_length => 30)).to eq("I am a sentence with areall...")
-      expect(CanvasTextHelper.truncate_text(str, :max_words => 5, :max_length => 20)).to eq("I am a sentence with")
+      expect(CanvasTextHelper.truncate_text(str, max_words: 4, max_length: 30)).to eq("I am a sentence")
+      expect(CanvasTextHelper.truncate_text(str, max_words: 6, max_length: 30)).to eq("I am a sentence with areall...")
+      expect(CanvasTextHelper.truncate_text(str, max_words: 5, max_length: 20)).to eq("I am a sentence with")
     end
   end
 

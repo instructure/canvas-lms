@@ -28,8 +28,8 @@ describe 'quizzes regressions' do
 
   before do
     course_with_teacher_logged_in(course_name: 'teacher course')
-    @student = user_with_pseudonym(:active_user => true, :username => 'student@example.com', :password => 'qwertyuiop')
-    @course.enroll_user(@student, "StudentEnrollment", :enrollment_state => 'active')
+    @student = user_with_pseudonym(active_user: true, username: 'student@example.com', password: 'qwertyuiop')
+    @course.enroll_user(@student, "StudentEnrollment", enrollment_state: 'active')
   end
 
   it 'calendar pops up on top of #main', priority: "1" do

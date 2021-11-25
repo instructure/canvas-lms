@@ -62,7 +62,7 @@ describe "discussions index" do
 
     def create_course_and_discussion(opts)
       opts.reverse_merge!({ locked: false, pinned: false })
-      course = course_factory(:active_all => true)
+      course = course_factory(active_all: true)
       discussion = course.discussion_topics.create!(
         title: opts[:title],
         message: opts[:message],

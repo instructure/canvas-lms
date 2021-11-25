@@ -50,7 +50,7 @@ module Importers
     end
 
     def add_unresolved_link(link, item_type, mig_id, field)
-      key = { :type => item_type, :migration_id => mig_id }
+      key = { type: item_type, migration_id: mig_id }
       @unresolved_link_map[key] ||= {}
       @unresolved_link_map[key][field] ||= []
       @unresolved_link_map[key][field] << link
@@ -119,26 +119,26 @@ module Importers
     end
 
     def unresolved(type, data = {})
-      { :resolved => false, :link_type => type }.merge(data)
+      { resolved: false, link_type: type }.merge(data)
     end
 
     def resolved(new_url = nil)
-      { :resolved => true, :new_url => new_url }
+      { resolved: true, new_url: new_url }
     end
 
     # returns a hash with resolution status and data to hold onto if unresolved
     def parse_url(url, node, attr)
       if url =~ /wiki_page_migration_id=(.*)/
-        unresolved(:wiki_page, :migration_id => $1)
+        unresolved(:wiki_page, migration_id: $1)
       elsif url =~ /discussion_topic_migration_id=(.*)/
-        unresolved(:discussion_topic, :migration_id => $1)
+        unresolved(:discussion_topic, migration_id: $1)
       elsif url =~ %r{\$CANVAS_COURSE_REFERENCE\$/modules/items/([^?]*)(\?.*)?}
-        unresolved(:module_item, :migration_id => $1, :query => $2)
+        unresolved(:module_item, migration_id: $1, query: $2)
       elsif url =~ %r{\$CANVAS_COURSE_REFERENCE\$/file_ref/([^/?#]+)(.*)}
-        unresolved(:file_ref, :migration_id => $1, :rest => $2,
-                              :in_media_iframe => attr == 'src' && node.name == 'iframe' && node['data-media-id'])
+        unresolved(:file_ref, migration_id: $1, rest: $2,
+                              in_media_iframe: attr == 'src' && node.name == 'iframe' && node['data-media-id'])
       elsif url =~ %r{(?:\$CANVAS_OBJECT_REFERENCE\$|\$WIKI_REFERENCE\$)/([^/]*)/([^?]*)(\?.*)?}
-        unresolved(:object, :type => $1, :migration_id => $2, :query => $3)
+        unresolved(:object, type: $1, migration_id: $2, query: $3)
 
       elsif url =~ %r{\$CANVAS_COURSE_REFERENCE\$/(.*)}
         resolved("#{context_path}/#{$1}")
@@ -147,9 +147,9 @@ module Importers
         rel_path = URI.unescape($1)
         if (attr == 'href' && node['class']&.include?('instructure_inline_media_comment')) ||
            (attr == 'src' && node.name == 'iframe' && node['data-media-id'])
-          unresolved(:media_object, :rel_path => rel_path)
+          unresolved(:media_object, rel_path: rel_path)
         else
-          unresolved(:file, :rel_path => rel_path)
+          unresolved(:file, rel_path: rel_path)
         end
       elsif (attr == 'href' && node['class']&.include?('instructure_inline_media_comment')) ||
             (attr == 'src' && node.name == 'iframe' && node['data-media-id'])
@@ -171,7 +171,7 @@ module Importers
             url.start_with?('#')
         resolved
       elsif relative_url?(url)
-        unresolved(:file, :rel_path => URI.unescape(url))
+        unresolved(:file, rel_path: URI.unescape(url))
       else # rubocop:disable Lint/DuplicateBranch
         resolved
       end

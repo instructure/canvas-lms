@@ -24,7 +24,7 @@ describe Quizzes::SubmissionManager do
 
     before do
       course_factory
-      @quiz = @course.quizzes.create! :title => "hello"
+      @quiz = @course.quizzes.create! title: "hello"
     end
 
     context 'for a masquerading user' do

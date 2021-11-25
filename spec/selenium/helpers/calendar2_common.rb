@@ -47,9 +47,9 @@ module Calendar2Common
   def create_appointment_group(params = {})
     tomorrow = (Time.now.utc.to_date + 1.day).to_s
     default_params = {
-      :title => "new appointment group",
-      :contexts => [@course],
-      :new_appointments => [
+      title: "new appointment group",
+      contexts: [@course],
+      new_appointments: [
         [tomorrow + ' 12:00:00', tomorrow + ' 13:00:00'],
       ]
     }
@@ -61,9 +61,9 @@ module Calendar2Common
   def create_appointment_group_early(params = {})
     tomorrow = (Time.now.utc.to_date + 1.day).to_s
     default_params = {
-      :title => "new appointment group",
-      :contexts => [@course],
-      :new_appointments => [
+      title: "new appointment group",
+      contexts: [@course],
+      new_appointments: [
         [tomorrow + ' 7:00', tomorrow + ' 11:00:00'],
       ]
     }
@@ -81,17 +81,17 @@ module Calendar2Common
 
   def make_event(params = {})
     opts = {
-      :context => @user,
-      :start => Time.zone.now,
-      :description => "Test event"
+      context: @user,
+      start: Time.zone.now,
+      description: "Test event"
     }.with_indifferent_access.merge(params)
-    c = CalendarEvent.new :description => opts[:description],
-                          :start_at => opts[:start],
-                          :end_at => opts[:end],
-                          :title => opts[:title],
-                          :location_name => opts[:location_name],
-                          :location_address => opts[:location_address],
-                          :all_day => opts[:all_day]
+    c = CalendarEvent.new description: opts[:description],
+                          start_at: opts[:start],
+                          end_at: opts[:end],
+                          title: opts[:title],
+                          location_name: opts[:location_name],
+                          location_address: opts[:location_address],
+                          all_day: opts[:all_day]
     c.context = opts[:context]
     c.save!
     c
@@ -115,13 +115,13 @@ module Calendar2Common
 
   def create_graded_discussion
     @assignment = @course.assignments.create!(
-      :title => 'assignment',
-      :points_possible => 10,
-      :due_at => Time.zone.now + 5.minutes,
-      :submission_types => 'online_text_entry',
-      :only_visible_to_overrides => true
+      title: 'assignment',
+      points_possible: 10,
+      due_at: Time.zone.now + 5.minutes,
+      submission_types: 'online_text_entry',
+      only_visible_to_overrides: true
     )
-    @gd = @course.discussion_topics.create!(:title => 'Graded Discussion', :assignment => @assignment)
+    @gd = @course.discussion_topics.create!(title: 'Graded Discussion', assignment: @assignment)
   end
 
   def find_middle_day

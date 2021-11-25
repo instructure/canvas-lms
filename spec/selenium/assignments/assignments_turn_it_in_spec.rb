@@ -77,7 +77,7 @@ describe "assignments turn it in" do
   it "creates turnitin settings" do
     skip_if_chrome('issue with change_turnitin_settings method')
     # although we "saved" the dialog, we haven't actually posted anything yet
-expect do
+    expect do
       get "/courses/#{@course.id}/assignments/new"
       f('#assignment_name').send_keys('test assignment')
       change_turnitin_settings
@@ -89,9 +89,9 @@ expect do
   it "edits turnitin settings" do
     skip_if_chrome('issue with change_turnitin_settings method')
     assignment = @course.assignments.create!(
-      :name => 'test assignment',
-      :due_at => (Time.now.utc + 2.days),
-      :assignment_group => @course.assignment_groups.create!(:name => "default")
+      name: 'test assignment',
+      due_at: (Time.now.utc + 2.days),
+      assignment_group: @course.assignment_groups.create!(name: "default")
     )
 
     get "/courses/#{@course.id}/assignments/#{assignment.id}/edit"

@@ -51,15 +51,15 @@ class CalendarEvent < ActiveRecord::Base
   belongs_to :context, polymorphic: %i[course user group appointment_group course_section],
                        polymorphic_prefix: true
   belongs_to :user
-  belongs_to :parent_event, :class_name => 'CalendarEvent', :foreign_key => :parent_calendar_event_id, :inverse_of => :child_events
+  belongs_to :parent_event, class_name: 'CalendarEvent', foreign_key: :parent_calendar_event_id, inverse_of: :child_events
   has_many :child_events, -> { where("calendar_events.workflow_state <> 'deleted'") }, class_name: 'CalendarEvent', foreign_key: :parent_calendar_event_id, inverse_of: :parent_event
   belongs_to :web_conference, autosave: true
   belongs_to :root_account, class_name: 'Account'
 
   validates :context, :workflow_state, presence: true
-  validates_associated :context, :if => ->(record) { record.validate_context }
-  validates :description, length: { :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true }
-  validates :title, length: { :maximum => maximum_string_length, :allow_nil => true, :allow_blank => true }
+  validates_associated :context, if: ->(record) { record.validate_context }
+  validates :description, length: { maximum: maximum_long_text_length, allow_nil: true, allow_blank: true }
+  validates :title, length: { maximum: maximum_string_length, allow_nil: true, allow_blank: true }
   validates :comments, length: { maximum: 255, allow_blank: true }
   validate :validate_conference_visibility
   before_create :set_root_account
@@ -109,10 +109,10 @@ class CalendarEvent < ActiveRecord::Base
     @child_event_data.each do |data|
       if (event = current_events.delete(data[:context_code])&.first)
         event.updating_user = @updating_user
-        event.update(:start_at => data[:start_at], :end_at => data[:end_at])
+        event.update(start_at: data[:start_at], end_at: data[:end_at])
       else
         context = @child_event_contexts[data[:context_code]][0]
-        event = child_events.build(:start_at => data[:start_at], :end_at => data[:end_at])
+        event = child_events.build(start_at: data[:start_at], end_at: data[:end_at])
         event.updating_user = @updating_user
         event.context = context
         event.skip_sync_parent_event = true
@@ -134,11 +134,11 @@ class CalendarEvent < ActiveRecord::Base
   end
 
   scope :active, -> { where("calendar_events.workflow_state<>'deleted'") }
-  scope :are_locked, -> { where(:workflow_state => 'locked') }
+  scope :are_locked, -> { where(workflow_state: 'locked') }
   scope :are_unlocked, -> { where("calendar_events.workflow_state NOT IN ('deleted', 'locked')") }
 
   # controllers/apis/etc. should generally use for_user_and_context_codes instead
-  scope :for_context_codes, ->(codes) { where(:context_code => codes) }
+  scope :for_context_codes, ->(codes) { where(context_code: codes) }
 
   # appointments and appointment_participants have the appointment_group and
   # the user as the context, respectively. we are actually interested in
@@ -198,9 +198,9 @@ class CalendarEvent < ActiveRecord::Base
     )")
   }
 
-  scope :undated, -> { where(:start_at => nil, :end_at => nil) }
+  scope :undated, -> { where(start_at: nil, end_at: nil) }
 
-  scope :between, ->(start, ending) { where(:start_at => start..ending) }
+  scope :between, ->(start, ending) { where(start_at: start..ending) }
   scope :current, -> { where("calendar_events.end_at>=?", Time.zone.now) }
   scope :updated_after, lambda { |*args|
     if args.first
@@ -213,8 +213,8 @@ class CalendarEvent < ActiveRecord::Base
   scope :events_without_child_events, -> { where("NOT EXISTS (SELECT 1 FROM #{CalendarEvent.quoted_table_name} children WHERE children.parent_calendar_event_id = calendar_events.id AND children.workflow_state<>'deleted')") }
   scope :events_with_child_events, -> { where("EXISTS (SELECT 1 FROM #{CalendarEvent.quoted_table_name} children WHERE children.parent_calendar_event_id = calendar_events.id AND children.workflow_state<>'deleted')") }
 
-  scope :user_created, -> { where(:timetable_code => nil) }
-  scope :for_timetable, -> { where.not(:timetable_code => nil) }
+  scope :user_created, -> { where(timetable_code: nil) }
+  scope :for_timetable, -> { where.not(timetable_code: nil) }
 
   scope :with_important_dates, -> { where(important_dates: true) }
 
@@ -260,9 +260,9 @@ class CalendarEvent < ActiveRecord::Base
     shard.activate do
       # user is set directly, or context is user
       User.where("id IN
-        (#{child_events.where.not(:user_id => nil).select(:user_id).to_sql}
+        (#{child_events.where.not(user_id: nil).select(:user_id).to_sql}
         UNION
-         #{child_events.where(:user_id => nil, :context_type => "User").select(:context_id).to_sql})")
+         #{child_events.where(user_id: nil, context_type: "User").select(:context_id).to_sql})")
     end
   end
 
@@ -379,9 +379,9 @@ class CalendarEvent < ActiveRecord::Base
     events = child_events.reload
 
     if events.present?
-      CalendarEvent.where(:id => self)
-                   .update_all(:start_at => events.filter_map(&:start_at).min,
-                               :end_at => events.filter_map(&:end_at).max)
+      CalendarEvent.where(id: self)
+                   .update_all(start_at: events.filter_map(&:start_at).min,
+                               end_at: events.filter_map(&:end_at).max)
       reload
     end
   end
@@ -389,7 +389,7 @@ class CalendarEvent < ActiveRecord::Base
   workflow do
     state :active
     state :locked do # locked events may only be deleted, they cannot be edited directly
-      event :unlock, :transitions_to => :active
+      event :unlock, transitions_to: :active
     end
     state :deleted
   end
@@ -450,8 +450,8 @@ class CalendarEvent < ActiveRecord::Base
     whenever do
       !appointment_group &&
         context.available? && (
-        changed_in_state(:active, :fields => :start_at) ||
-        changed_in_state(:active, :fields => :end_at)
+        changed_in_state(:active, fields: :start_at) ||
+        changed_in_state(:active, fields: :end_at)
       ) && !hidden?
     end
     data { course_broadcast_data }
@@ -615,13 +615,13 @@ class CalendarEvent < ActiveRecord::Base
   def to_atom(opts = {})
     extend ApplicationHelper
     Atom::Entry.new do |entry|
-      entry.title     = t(:feed_item_title, "Calendar Event: %{event_title}", :event_title => self.title) unless opts[:include_context]
-      entry.title     = t(:feed_item_title_with_context, "Calendar Event, %{course_or_account_name}: %{event_title}", :course_or_account_name => context.name, :event_title => self.title) if opts[:include_context]
-      entry.authors << Atom::Person.new(:name => context.name)
+      entry.title     = t(:feed_item_title, "Calendar Event: %{event_title}", event_title: self.title) unless opts[:include_context]
+      entry.title     = t(:feed_item_title_with_context, "Calendar Event, %{course_or_account_name}: %{event_title}", course_or_account_name: context.name, event_title: self.title) if opts[:include_context]
+      entry.authors << Atom::Person.new(name: context.name)
       entry.updated   = updated_at.utc
       entry.published = created_at.utc
-      entry.links << Atom::Link.new(:rel => 'alternate',
-                                    :href => "http://#{HostUrl.context_host(context)}/#{context_url_prefix}/calendar?month=#{self.start_at.strftime("%m") rescue ""}&year=#{self.start_at.strftime("%Y") rescue ""}#calendar_event_#{id}")
+      entry.links << Atom::Link.new(rel: 'alternate',
+                                    href: "http://#{HostUrl.context_host(context)}/#{context_url_prefix}/calendar?month=#{self.start_at.strftime("%m") rescue ""}&year=#{self.start_at.strftime("%Y") rescue ""}#calendar_event_#{id}")
       entry.id        = "tag:#{HostUrl.default_host},#{created_at.strftime("%Y-%m-%d")}:/calendar_events/#{feed_code}_#{self.start_at.strftime("%Y-%m-%d-%H-%M") rescue "none"}_#{self.end_at.strftime("%Y-%m-%d-%H-%M") rescue "none"}"
       entry.content   = Atom::Content::Html.new("#{datetime_string(self.start_at, self.end_at)}<br/>#{description}")
     end

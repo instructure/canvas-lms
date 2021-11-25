@@ -28,20 +28,20 @@ describe ContentMigration do
       account = @copy_from.account
       lo = create_outcome(account)
 
-      rub = Rubric.new(:context => account)
+      rub = Rubric.new(context: account)
       rub.data = [
         {
-          :points => 3,
-          :description => "Outcome row",
-          :id => 1,
-          :ratings => [{ :points => 3, :description => "Rockin'", :criterion_id => 1, :id => 2 }],
-          :learning_outcome_id => lo.id
+          points: 3,
+          description: "Outcome row",
+          id: 1,
+          ratings: [{ points: 3, description: "Rockin'", criterion_id: 1, id: 2 }],
+          learning_outcome_id: lo.id
         }
       ]
       rub.save!
 
-      from_assign = @copy_from.assignments.create!(:title => "some assignment")
-      rub.associate_with(from_assign, @copy_from, :purpose => "grading")
+      from_assign = @copy_from.assignments.create!(title: "some assignment")
+      rub.associate_with(from_assign, @copy_from, purpose: "grading")
 
       run_course_copy
 
@@ -73,7 +73,7 @@ describe ContentMigration do
       outcome_with_rubric
       from_assign = @copy_from.assignments.create! title: 'some assignment'
       @rubric.associate_with(from_assign, @copy_from, purpose: 'grading')
-      @cm.copy_options = { :assignments => { mig_id(from_assign) => true } }
+      @cm.copy_options = { assignments: { mig_id(from_assign) => true } }
       run_course_copy
       to_assign = @copy_to.assignments.where(migration_id: mig_id(from_assign)).first!
       to_outcomes = to_assign.rubric.learning_outcome_alignments.map(&:learning_outcome).map(&:migration_id)
@@ -82,12 +82,12 @@ describe ContentMigration do
 
     it "copies rubric outcomes (even if in a group) in selective copy" do
       @course = @copy_from
-      outcome_group_model(:context => @copy_from)
+      outcome_group_model(context: @copy_from)
       outcome_with_rubric
       from_assign = @copy_from.assignments.create! title: 'some assignment'
       @rubric.associate_with(from_assign, @copy_from, purpose: 'grading')
 
-      @cm.copy_options = { :assignments => { mig_id(from_assign) => true } }
+      @cm.copy_options = { assignments: { mig_id(from_assign) => true } }
 
       run_course_copy
 
@@ -98,12 +98,12 @@ describe ContentMigration do
 
     it "links account rubric outcomes (even if in a group) in selective copy" do
       @course = @copy_from
-      outcome_group_model(:context => @copy_from)
-      outcome_with_rubric(:outcome_context => @copy_from.account)
+      outcome_group_model(context: @copy_from)
+      outcome_with_rubric(outcome_context: @copy_from.account)
       from_assign = @copy_from.assignments.create! title: 'some assignment'
       @rubric.associate_with(from_assign, @copy_from, purpose: 'grading')
 
-      @cm.copy_options = { :assignments => { mig_id(from_assign) => true } }
+      @cm.copy_options = { assignments: { mig_id(from_assign) => true } }
 
       run_course_copy
 
@@ -113,10 +113,10 @@ describe ContentMigration do
     end
 
     it "links assignments to assignment groups when copying all assignments" do
-      g = @copy_from.assignment_groups.create!(:name => "group")
-      from_assign = @copy_from.assignments.create!(:title => "some assignment", :assignment_group_id => g.id)
+      g = @copy_from.assignment_groups.create!(name: "group")
+      from_assign = @copy_from.assignments.create!(title: "some assignment", assignment_group_id: g.id)
 
-      @cm.copy_options = { :all_assignments => true }
+      @cm.copy_options = { all_assignments: true }
       run_course_copy
 
       to_assign = @copy_to.assignments.where(migration_id: mig_id(from_assign)).first!
@@ -124,10 +124,10 @@ describe ContentMigration do
     end
 
     it "links assignments to assignment groups when copying entire assignment group" do
-      g = @copy_from.assignment_groups.create!(:name => "group")
-      from_assign = @copy_from.assignments.create!(:title => "some assignment", :assignment_group_id => g.id)
+      g = @copy_from.assignment_groups.create!(name: "group")
+      from_assign = @copy_from.assignments.create!(title: "some assignment", assignment_group_id: g.id)
 
-      @cm.copy_options = { :assignment_groups => { mig_id(g) => true }, :assignments => { mig_id(from_assign) => true } }
+      @cm.copy_options = { assignment_groups: { mig_id(g) => true }, assignments: { mig_id(from_assign) => true } }
       run_course_copy
 
       to_assign = @copy_to.assignments.where(migration_id: mig_id(from_assign)).first!
@@ -135,10 +135,10 @@ describe ContentMigration do
     end
 
     it "does not link assignments to assignment groups when copying single assignment" do
-      g = @copy_from.assignment_groups.create!(:name => "group")
-      from_assign = @copy_from.assignments.create!(:title => "some assignment", :assignment_group_id => g.id)
+      g = @copy_from.assignment_groups.create!(name: "group")
+      from_assign = @copy_from.assignments.create!(title: "some assignment", assignment_group_id: g.id)
 
-      @cm.copy_options = { :assignments => { mig_id(from_assign) => true } }
+      @cm.copy_options = { assignments: { mig_id(from_assign) => true } }
       run_course_copy
 
       to_assign = @copy_to.assignments.where(migration_id: mig_id(from_assign)).first!
@@ -147,16 +147,16 @@ describe ContentMigration do
     end
 
     it "links assignments to assignment groups on complete export" do
-      g = @copy_from.assignment_groups.create!(:name => "group")
-      from_assign = @copy_from.assignments.create!(:title => "some assignment", :assignment_group_id => g.id)
+      g = @copy_from.assignment_groups.create!(name: "group")
+      from_assign = @copy_from.assignments.create!(title: "some assignment", assignment_group_id: g.id)
       run_export_and_import
       to_assign = @copy_to.assignments.where(migration_id: mig_id(from_assign)).first!
       expect(to_assign.assignment_group).to eq @copy_to.assignment_groups.where(migration_id: mig_id(g)).first
     end
 
     it "does not link assignments to assignment groups on selective export" do
-      g = @copy_from.assignment_groups.create!(:name => "group")
-      from_assign = @copy_from.assignments.create!(:title => "some assignment", :assignment_group_id => g.id)
+      g = @copy_from.assignment_groups.create!(name: "group")
+      from_assign = @copy_from.assignments.create!(title: "some assignment", assignment_group_id: g.id)
       # test that we neither export nor reference the assignment group
       unrelated_group = @copy_to.assignment_groups.create! name: 'unrelated group with coincidentally matching migration id'
       unrelated_group.update_attribute :migration_id, mig_id(g)
@@ -169,14 +169,14 @@ describe ContentMigration do
     end
 
     it "copies assignment attributes" do
-      assignment_model(:course => @copy_from, :points_possible => 40, :submission_types => 'file_upload', :grading_type => 'points')
+      assignment_model(course: @copy_from, points_possible: 40, submission_types: 'file_upload', grading_type: 'points')
       @assignment.turnitin_enabled = true
       @assignment.vericite_enabled = true
       @assignment.vericite_settings = {
-        :originality_report_visibility => "after_grading",
-        :exclude_quoted => '1',
-        :exclude_self_plag => '0',
-        :store_in_index => '1'
+        originality_report_visibility: "after_grading",
+        exclude_quoted: '1',
+        exclude_self_plag: '0',
+        store_in_index: '1'
       }
       @assignment.peer_reviews = true
       @assignment.peer_review_count = 2
@@ -236,8 +236,8 @@ describe ContentMigration do
     end
 
     it "unsets allowed extensions" do
-      assignment_model(:course => @copy_from, :points_possible => 40, :submission_types => 'file_upload',
-                       :grading_type => 'points', :allowed_extensions => ["txt", "doc"])
+      assignment_model(course: @copy_from, points_possible: 40, submission_types: 'file_upload',
+                       grading_type: 'points', allowed_extensions: ["txt", "doc"])
 
       run_course_copy
 
@@ -263,7 +263,7 @@ describe ContentMigration do
       run_export_and_import do |export|
         export.selected_content = { 'assignments' => { mig_id(assign2) => "1" } }
       end
-      new_group = @copy_to.assignments.where(:migration_id => mig_id(assign2)).first.assignment_group
+      new_group = @copy_to.assignments.where(migration_id: mig_id(assign2)).first.assignment_group
       expect(new_group).to_not eq group
       expect(new_group).to be_available
       expect(new_group.name).to eq "Imported Assignments"
@@ -302,7 +302,7 @@ describe ContentMigration do
     end
 
     it "copies other feature-dependent assignment attributes (if enabled downstream)" do
-      assignment_model(:course => @copy_from)
+      assignment_model(course: @copy_from)
       @assignment.moderated_grading = true
       @assignment.grader_count = 2
       @assignment.grader_comments_visible_to_graders = true
@@ -442,7 +442,7 @@ describe ContentMigration do
     end
 
     it "does not copy turnitin/vericite_enabled if it's not enabled on the copyee's account" do
-      assignment_model(:course => @copy_from, :points_possible => 40, :submission_types => 'file_upload', :grading_type => 'points')
+      assignment_model(course: @copy_from, points_possible: 40, submission_types: 'file_upload', grading_type: 'points')
       @assignment.turnitin_enabled = true
       @assignment.vericite_enabled = true
       @assignment.save!
@@ -458,10 +458,10 @@ describe ContentMigration do
     end
 
     it "copies group assignment setting" do
-      assignment_model(:course => @copy_from, :points_possible => 40,
-                       :submission_types => 'file_upload', :grading_type => 'points')
+      assignment_model(course: @copy_from, points_possible: 40,
+                       submission_types: 'file_upload', grading_type: 'points')
 
-      group_category = @copy_from.group_categories.create!(:name => "category")
+      group_category = @copy_from.group_categories.create!(name: "category")
       @assignment.group_category = group_category
       @assignment.save!
 
@@ -473,7 +473,7 @@ describe ContentMigration do
     end
 
     it "does not copy peer_reviews_assigned" do
-      assignment_model(:course => @copy_from, :points_possible => 40, :submission_types => 'file_upload', :grading_type => 'points')
+      assignment_model(course: @copy_from, points_possible: 40, submission_types: 'file_upload', grading_type: 'points')
       @assignment.peer_reviews_assigned = true
 
       @assignment.save!
@@ -485,35 +485,35 @@ describe ContentMigration do
     end
 
     it "includes implied objects for context modules" do
-      mod1 = @copy_from.context_modules.create!(:name => "some module")
-      asmnt1 = @copy_from.assignments.create!(:title => "some assignment")
-      mod1.add_item({ :id => asmnt1.id, :type => 'assignment', :indent => 1 })
-      page = @copy_from.wiki_pages.create!(:title => "some page")
-      page2 = @copy_from.wiki_pages.create!(:title => "some page 2")
-      mod1.add_item({ :id => page.id, :type => 'wiki_page' })
-      att = Attachment.create!(:filename => 'first.png', :uploaded_data => StringIO.new('ohai'), :folder => Folder.root_folders(@copy_from).first, :context => @copy_from)
-      att2 = Attachment.create!(:filename => 'first.png', :uploaded_data => StringIO.new('ohai'), :folder => Folder.root_folders(@copy_from).first, :context => @copy_from)
-      mod1.add_item({ :id => att.id, :type => 'attachment' })
-      mod1.add_item({ :title => 'Example 1', :type => 'external_url', :url => 'http://a.example.com/' })
-      mod1.add_item :type => 'context_module_sub_header', :title => "Sub Header"
-      tool = @copy_from.context_external_tools.create!(:name => "b", :url => "http://www.google.com", :consumer_key => '12345', :shared_secret => 'secret')
-      tool2 = @copy_from.context_external_tools.create!(:name => "b", :url => "http://www.instructure.com", :consumer_key => '12345', :shared_secret => 'secret')
-      mod1.add_item :type => 'context_external_tool', :id => tool.id, :url => tool.url
-      topic = @copy_from.discussion_topics.create!(:title => "topic")
-      topic2 = @copy_from.discussion_topics.create!(:title => "topic2")
-      mod1.add_item :type => 'discussion_topic', :id => topic.id
-      quiz = @copy_from.quizzes.create!(:title => 'quiz')
-      quiz2 = @copy_from.quizzes.create!(:title => 'quiz2')
-      mod1.add_item :type => 'quiz', :id => quiz.id
+      mod1 = @copy_from.context_modules.create!(name: "some module")
+      asmnt1 = @copy_from.assignments.create!(title: "some assignment")
+      mod1.add_item({ id: asmnt1.id, type: 'assignment', indent: 1 })
+      page = @copy_from.wiki_pages.create!(title: "some page")
+      page2 = @copy_from.wiki_pages.create!(title: "some page 2")
+      mod1.add_item({ id: page.id, type: 'wiki_page' })
+      att = Attachment.create!(filename: 'first.png', uploaded_data: StringIO.new('ohai'), folder: Folder.root_folders(@copy_from).first, context: @copy_from)
+      att2 = Attachment.create!(filename: 'first.png', uploaded_data: StringIO.new('ohai'), folder: Folder.root_folders(@copy_from).first, context: @copy_from)
+      mod1.add_item({ id: att.id, type: 'attachment' })
+      mod1.add_item({ title: 'Example 1', type: 'external_url', url: 'http://a.example.com/' })
+      mod1.add_item type: 'context_module_sub_header', title: "Sub Header"
+      tool = @copy_from.context_external_tools.create!(name: "b", url: "http://www.google.com", consumer_key: '12345', shared_secret: 'secret')
+      tool2 = @copy_from.context_external_tools.create!(name: "b", url: "http://www.instructure.com", consumer_key: '12345', shared_secret: 'secret')
+      mod1.add_item type: 'context_external_tool', id: tool.id, url: tool.url
+      topic = @copy_from.discussion_topics.create!(title: "topic")
+      topic2 = @copy_from.discussion_topics.create!(title: "topic2")
+      mod1.add_item type: 'discussion_topic', id: topic.id
+      quiz = @copy_from.quizzes.create!(title: 'quiz')
+      quiz2 = @copy_from.quizzes.create!(title: 'quiz2')
+      mod1.add_item type: 'quiz', id: quiz.id
       mod1.save!
 
-      mod2 = @copy_from.context_modules.create!(:name => "not copied")
-      asmnt2 = @copy_from.assignments.create!(:title => "some assignment again")
-      mod2.add_item({ :id => asmnt2.id, :type => 'assignment', :indent => 1 })
+      mod2 = @copy_from.context_modules.create!(name: "not copied")
+      asmnt2 = @copy_from.assignments.create!(title: "some assignment again")
+      mod2.add_item({ id: asmnt2.id, type: 'assignment', indent: 1 })
       mod2.save!
 
       @cm.copy_options = {
-        :context_modules => { mig_id(mod1) => "1", mig_id(mod2) => "0" },
+        context_modules: { mig_id(mod1) => "1", mig_id(mod2) => "0" },
       }
       @cm.save!
 
@@ -545,8 +545,8 @@ describe ContentMigration do
 
     it "copies module prerequisites" do
       enable_cache do
-        mod = @copy_from.context_modules.create!(:name => "first module")
-        mod2 = @copy_from.context_modules.create(:name => "next module")
+        mod = @copy_from.context_modules.create!(name: "first module")
+        mod2 = @copy_from.context_modules.create(name: "next module")
         mod2.position = 2
         mod2.prerequisites = "module_#{mod.id}"
         mod2.save!
@@ -561,17 +561,17 @@ describe ContentMigration do
     end
 
     it "does not try to restore deleted assignments to an unpublished state if unable to" do
-      a_from = assignment_model(:course => @copy_from, :points_possible => 40, :submission_types => 'online_text_entry', :grading_type => 'points')
+      a_from = assignment_model(course: @copy_from, points_possible: 40, submission_types: 'online_text_entry', grading_type: 'points')
       a_from.unpublish!
 
       run_course_copy
 
       @copy_to.offer!
-      student_in_course(:course => @copy_to, :active_user => true)
+      student_in_course(course: @copy_to, active_user: true)
 
-      a_to = @copy_to.assignments.where(:migration_id => mig_id(a_from)).first
+      a_to = @copy_to.assignments.where(migration_id: mig_id(a_from)).first
       a_to.publish!
-      a_to.submit_homework(@student, :submission_type => "online_text_entry")
+      a_to.submit_homework(@student, submission_type: "online_text_entry")
       a_to.destroy
 
       run_course_copy
@@ -581,20 +581,20 @@ describe ContentMigration do
 
     context "copying frozen assignments" do
       before :once do
-        @setting = PluginSetting.create!(:name => "assignment_freezer", :settings => { "no_copying" => "yes" })
+        @setting = PluginSetting.create!(name: "assignment_freezer", settings: { "no_copying" => "yes" })
 
-        @asmnt = @copy_from.assignments.create!(:title => 'lock locky')
+        @asmnt = @copy_from.assignments.create!(title: 'lock locky')
         @asmnt.copied = true
         @asmnt.freeze_on_copy = true
         @asmnt.save!
-        @quiz = @copy_from.quizzes.create(:title => "quiz", :quiz_type => "assignment")
+        @quiz = @copy_from.quizzes.create(title: "quiz", quiz_type: "assignment")
         @quiz.workflow_state = 'available'
         @quiz.save!
         @quiz.assignment.copied = true
         @quiz.assignment.freeze_on_copy = true
         @quiz.save!
-        @topic = @copy_from.discussion_topics.build(:title => "topic")
-        assignment = @copy_from.assignments.build(:submission_types => 'discussion_topic', :title => @topic.title)
+        @topic = @copy_from.discussion_topics.build(title: "topic")
+        assignment = @copy_from.assignments.build(submission_types: 'discussion_topic', title: @topic.title)
         assignment.infer_times
         assignment.saved_by = :discussion_topic
         assignment.copied = true
@@ -863,19 +863,19 @@ describe ContentMigration do
 
     it "copies the thing" do
       @t1 = factory_with_protected_attributes(@copy_from.context_external_tools,
-                                              :url => "http://www.justanexamplenotarealwebsite.com/tool1", :shared_secret => 'test123',
-                                              :consumer_key => 'test123', :name => 'tool 1')
+                                              url: "http://www.justanexamplenotarealwebsite.com/tool1", shared_secret: 'test123',
+                                              consumer_key: 'test123', name: 'tool 1')
       ext_data = {
         'key' => "https://canvas.instructure.com/lti/mastery_connect_assessment"
       }
       a = assignment_model(
-        :course => @copy_from,
-        :title => "test1",
-        :submission_types => 'external_tool',
-        :external_tool_tag_attributes => { :content => @t1, :url => @t1.url, :external_data => ext_data.to_json }
+        course: @copy_from,
+        title: "test1",
+        submission_types: 'external_tool',
+        external_tool_tag_attributes: { content: @t1, url: @t1.url, external_data: ext_data.to_json }
       )
       run_course_copy
-      a_to = @copy_to.assignments.where(:migration_id => mig_id(a)).first
+      a_to = @copy_to.assignments.where(migration_id: mig_id(a)).first
       expect(a_to.external_tool_tag.external_data).to eq ext_data
     end
 
@@ -1021,7 +1021,7 @@ describe ContentMigration do
       end
 
       it "does not break trying to copy over an assignment with required due dates but only specified via overrides" do
-        assignment_model(:course => @copy_from, :points_possible => 40, :submission_types => 'file_upload', :grading_type => 'points')
+        assignment_model(course: @copy_from, points_possible: 40, submission_types: 'file_upload', grading_type: 'points')
         assignment_override_model(assignment: @assignment, set_type: 'CourseSection', set_id: @copy_from.default_section.id, due_at: 1.day.from_now)
         @assignment.only_visible_to_overrides = true
         @assignment.post_to_sis = true
@@ -1030,13 +1030,13 @@ describe ContentMigration do
 
         run_course_copy(["The Sync to SIS setting could not be enabled for the assignment \"#{@assignment.title}\" without a due date."])
 
-        a_to = @copy_to.assignments.where(:migration_id => mig_id(@assignment)).first
+        a_to = @copy_to.assignments.where(migration_id: mig_id(@assignment)).first
         expect(a_to.post_to_sis).to eq false
         expect(a_to).to be_valid
       end
 
       it "does not break trying to copy over a graded discussion assignment with required due dates but only specified via overrides" do
-        graded_discussion_topic(:context => @copy_from)
+        graded_discussion_topic(context: @copy_from)
         assignment_override_model(assignment: @assignment, set_type: 'CourseSection', set_id: @copy_from.default_section.id, due_at: 1.day.from_now)
         @assignment.only_visible_to_overrides = true
         @assignment.post_to_sis = true
@@ -1045,20 +1045,20 @@ describe ContentMigration do
 
         run_course_copy(["The Sync to SIS setting could not be enabled for the assignment \"#{@assignment.title}\" without a due date."])
 
-        topic_to = @copy_to.discussion_topics.where(:migration_id => mig_id(@topic)).first
+        topic_to = @copy_to.discussion_topics.where(migration_id: mig_id(@topic)).first
         expect(topic_to).to be_valid
         expect(topic_to.assignment.post_to_sis).to eq false
       end
 
       it "is able to copy post_to_sis" do
-        assignment_model(:course => @copy_from, :points_possible => 40, :submission_types => 'file_upload', :grading_type => 'points')
+        assignment_model(course: @copy_from, points_possible: 40, submission_types: 'file_upload', grading_type: 'points')
         @assignment.post_to_sis = true
         @assignment.due_at = 1.day.from_now
         @assignment.save!
 
         run_course_copy
 
-        a_to = @copy_to.assignments.where(:migration_id => mig_id(@assignment)).first
+        a_to = @copy_to.assignments.where(migration_id: mig_id(@assignment)).first
         expect(a_to.post_to_sis).to eq true
         expect(a_to).to be_valid
       end

@@ -24,7 +24,7 @@ describe AssignmentOverride do
   end
 
   it "soft-deletes" do
-    @override = assignment_override_model(:course => @course)
+    @override = assignment_override_model(course: @course)
     @override_student = @override.assignment_override_students.build
     @override_student.user = @student
     @override_student.save!
@@ -33,7 +33,7 @@ describe AssignmentOverride do
     @override_student.reload
     expect(AssignmentOverride.where(id: @override).first).not_to be_nil
     expect(@override).to be_deleted
-    expect(AssignmentOverrideStudent.where(:id => @override_student).first).not_to be_nil
+    expect(AssignmentOverrideStudent.where(id: @override_student).first).not_to be_nil
     expect(@override_student).to be_deleted
   end
 
@@ -60,7 +60,7 @@ describe AssignmentOverride do
   end
 
   it "returns the students as the set when set_type is adhoc" do
-    @override = assignment_override_model(:course => @course)
+    @override = assignment_override_model(course: @course)
 
     @override_student = @override.assignment_override_students.build
     @override_student.user = @student
@@ -78,7 +78,7 @@ describe AssignmentOverride do
   end
 
   it "removes adhoc associations when an adhoc override is deleted" do
-    @override = assignment_override_model(:course => @course)
+    @override = assignment_override_model(course: @course)
     @override_student = @override.assignment_override_students.build
     @override_student.user = @student
     @override_student.save!
@@ -90,7 +90,7 @@ describe AssignmentOverride do
   end
 
   it "allows reusing students from a deleted adhoc override" do
-    @override = assignment_override_model(:course => @course)
+    @override = assignment_override_model(course: @course)
     @override_student = @override.assignment_override_students.build
     @override_student.user = @student
     @override_student.save!
@@ -98,7 +98,7 @@ describe AssignmentOverride do
     @override.destroy
     expect(@override_student.reload).to be_deleted
 
-    @override2 = assignment_override_model(:assignment => @assignment)
+    @override2 = assignment_override_model(assignment: @assignment)
     @override_student2 = @override2.assignment_override_students.build
     @override_student2.user = @student
 
@@ -413,7 +413,7 @@ describe AssignmentOverride do
     describe "#{field} overrides" do
       before :once do
         @assignment = assignment_model(field.to_sym => value1)
-        @override = assignment_override_model(:assignment => @assignment)
+        @override = assignment_override_model(assignment: @assignment)
       end
 
       it "sets the override when a override_#{field} is called" do
@@ -449,60 +449,60 @@ describe AssignmentOverride do
     end
 
     it "interprets 11:59pm as all day with no prior value" do
-      @override.due_at = fancy_midnight(:zone => 'Alaska')
+      @override.due_at = fancy_midnight(zone: 'Alaska')
       expect(@override.all_day).to eq true
     end
 
     it "interprets 11:59pm as all day with same-tz all-day prior value" do
-      @override.due_at = fancy_midnight(:zone => 'Alaska') + 1.day
-      @override.due_at = fancy_midnight(:zone => 'Alaska')
+      @override.due_at = fancy_midnight(zone: 'Alaska') + 1.day
+      @override.due_at = fancy_midnight(zone: 'Alaska')
       expect(@override.all_day).to eq true
     end
 
     it "interprets 11:59pm as all day with other-tz all-day prior value" do
-      @override.due_at = fancy_midnight(:zone => 'Baghdad')
-      @override.due_at = fancy_midnight(:zone => 'Alaska')
+      @override.due_at = fancy_midnight(zone: 'Baghdad')
+      @override.due_at = fancy_midnight(zone: 'Alaska')
       expect(@override.all_day).to eq true
     end
 
     it "interprets 11:59pm as all day with non-all-day prior value" do
-      @override.due_at = fancy_midnight(:zone => 'Alaska') + 1.hour
-      @override.due_at = fancy_midnight(:zone => 'Alaska')
+      @override.due_at = fancy_midnight(zone: 'Alaska') + 1.hour
+      @override.due_at = fancy_midnight(zone: 'Alaska')
       expect(@override.all_day).to eq true
     end
 
     it "does not interpret non-11:59pm as all day no prior value" do
-      @override.due_at = fancy_midnight(:zone => 'Alaska').in_time_zone('Baghdad')
+      @override.due_at = fancy_midnight(zone: 'Alaska').in_time_zone('Baghdad')
       expect(@override.all_day).to eq false
     end
 
     it "does not interpret non-11:59pm as all day with same-tz all-day prior value" do
-      @override.due_at = fancy_midnight(:zone => 'Alaska')
-      @override.due_at = fancy_midnight(:zone => 'Alaska') + 1.hour
+      @override.due_at = fancy_midnight(zone: 'Alaska')
+      @override.due_at = fancy_midnight(zone: 'Alaska') + 1.hour
       expect(@override.all_day).to eq false
     end
 
     it "does not interpret non-11:59pm as all day with other-tz all-day prior value" do
-      @override.due_at = fancy_midnight(:zone => 'Baghdad')
-      @override.due_at = fancy_midnight(:zone => 'Alaska') + 1.hour
+      @override.due_at = fancy_midnight(zone: 'Baghdad')
+      @override.due_at = fancy_midnight(zone: 'Alaska') + 1.hour
       expect(@override.all_day).to eq false
     end
 
     it "does not interpret non-11:59pm as all day with non-all-day prior value" do
-      @override.due_at = fancy_midnight(:zone => 'Alaska') + 1.hour
-      @override.due_at = fancy_midnight(:zone => 'Alaska') + 2.hours
+      @override.due_at = fancy_midnight(zone: 'Alaska') + 1.hour
+      @override.due_at = fancy_midnight(zone: 'Alaska') + 2.hours
       expect(@override.all_day).to eq false
     end
 
     it "preserves all-day when only changing time zone" do
-      @override.due_at = fancy_midnight(:zone => 'Alaska')
-      @override.due_at = fancy_midnight(:zone => 'Alaska').in_time_zone('Baghdad')
+      @override.due_at = fancy_midnight(zone: 'Alaska')
+      @override.due_at = fancy_midnight(zone: 'Alaska').in_time_zone('Baghdad')
       expect(@override.all_day).to eq true
     end
 
     it "preserves non-all-day when only changing time zone" do
-      @override.due_at = fancy_midnight(:zone => 'Alaska').in_time_zone('Baghdad')
-      @override.due_at = fancy_midnight(:zone => 'Alaska')
+      @override.due_at = fancy_midnight(zone: 'Alaska').in_time_zone('Baghdad')
+      @override.due_at = fancy_midnight(zone: 'Alaska')
       expect(@override.all_day).to eq false
     end
 
@@ -874,14 +874,14 @@ describe AssignmentOverride do
     end
 
     it "returns empty set for noop" do
-      @override = assignment_override_model(:course => @course)
+      @override = assignment_override_model(course: @course)
       @override.set_type = 'Noop'
 
       expect(@override.applies_to_students).to eq []
     end
 
     it "returns the right students for ADHOC" do
-      @override = assignment_override_model(:course => @course)
+      @override = assignment_override_model(course: @course)
       @override.set_type = 'ADHOC'
 
       expect(@override.applies_to_students).to eq []
@@ -894,13 +894,13 @@ describe AssignmentOverride do
     end
 
     it "returns the right students for a section" do
-      @override = assignment_override_model(:course => @course)
+      @override = assignment_override_model(course: @course)
       @override.set = @course.default_section
       @override.save!
 
       expect(@override.applies_to_students).to eq []
 
-      @course.enroll_student(@student, :enrollment_state => 'active', :section => @override.set)
+      @course.enroll_student(@student, enrollment_state: 'active', section: @override.set)
 
       expect(@override.applies_to_students).to eq [@student]
     end

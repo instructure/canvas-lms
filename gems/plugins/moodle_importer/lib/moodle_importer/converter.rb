@@ -72,7 +72,7 @@ module Moodle
             q_hash['import_warnings'] ||= []
             q_hash['import_warnings'] << I18n.t(:moodle_dropdown_many_warning_title,
                                                 "There are %{count} Multiple Dropdowns questions in this bank that may have been imported incorrectly",
-                                                :count => hashes.count)
+                                                count: hashes.count)
           else
             hashes.each do |q_hash2|
               q_hash2['import_warnings'] ||= []
@@ -88,7 +88,7 @@ module Moodle
             q_hash['import_warnings'] ||= []
             q_hash['import_warnings'] << I18n.t(:moodle_formula_many_warning_title,
                                                 "There are %{count} Formula questions in this bank that will need to have their possible answers regenerated",
-                                                :count => hashes.count)
+                                                count: hashes.count)
           else
             hashes.each do |q_hash2|
               q_hash2['import_warnings'] ||= []

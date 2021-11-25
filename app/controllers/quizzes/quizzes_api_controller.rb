@@ -292,8 +292,8 @@ class Quizzes::QuizzesApiController < ApplicationController
   include SubmittablesGradingPeriodProtection
 
   before_action :require_context
-  before_action :require_quiz, :only => %i[show update destroy reorder validate_access_code]
-  before_action :check_differentiated_assignments, :only => [:show]
+  before_action :require_quiz, only: %i[show update destroy reorder validate_access_code]
+  before_action :check_differentiated_assignments, only: [:show]
 
   # @API List quizzes in a course
   #
@@ -545,7 +545,7 @@ class Quizzes::QuizzesApiController < ApplicationController
   # <b>204 No Content</b> response code is returned if the reorder was successful.
   def reorder
     if authorized_action(@quiz, @current_user, :update)
-      Quizzes::QuizSortables.new(:quiz => @quiz, :order => params[:order]).reorder!
+      Quizzes::QuizSortables.new(quiz: @quiz, order: params[:order]).reorder!
 
       head :no_content
     end

@@ -538,8 +538,8 @@ describe SIS::CSV::CourseImporter do
   it "uses the default term if none given" do
     @default_term = @account.default_enrollment_term
     expect(@default_term).to be_present
-    @nil_id_term = @account.enrollment_terms.create!(:name => "nil")
-    @with_id_term = @account.enrollment_terms.create!(:name => "test") { |t| t.sis_source_id = "test" }
+    @nil_id_term = @account.enrollment_terms.create!(name: "nil")
+    @with_id_term = @account.enrollment_terms.create!(name: "test") { |t| t.sis_source_id = "test" }
     process_csv_data_cleanly(
       "course_id,short_name,long_name,status",
       "c1,c1,c1,active"
@@ -713,12 +713,12 @@ describe SIS::CSV::CourseImporter do
   context "blueprint courses" do
     before :once do
       account_model
-      @mc = @account.courses.create!(:sis_source_id => "blahprint")
+      @mc = @account.courses.create!(sis_source_id: "blahprint")
       @template = MasterCourses::MasterTemplate.set_as_master_course(@mc)
     end
 
     it "gives a warning when trying to associate an existing blueprint course" do
-      mc2 = @account.courses.create!(:sis_source_id => "anothermastercourse")
+      mc2 = @account.courses.create!(sis_source_id: "anothermastercourse")
       MasterCourses::MasterTemplate.set_as_master_course(mc2)
       importer = process_csv_data(
         "course_id,short_name,long_name,status,blueprint_course_id",
@@ -728,9 +728,9 @@ describe SIS::CSV::CourseImporter do
     end
 
     it "gives a warning when trying to associate an already associated course" do
-      mc2 = @account.courses.create!(:sis_source_id => "anothermastercourse")
+      mc2 = @account.courses.create!(sis_source_id: "anothermastercourse")
       template2 = MasterCourses::MasterTemplate.set_as_master_course(mc2)
-      ac = @account.courses.create!(:sis_source_id => "anassociatedcourse")
+      ac = @account.courses.create!(sis_source_id: "anassociatedcourse")
       template2.add_child_course!(ac)
       importer = process_csv_data(
         "course_id,short_name,long_name,status,blueprint_course_id",
@@ -741,10 +741,10 @@ describe SIS::CSV::CourseImporter do
 
     it "gives a warning when trying to associate to a course not in the account chain" do
       sub_account = @account.sub_accounts.create!
-      mc2 = sub_account.courses.create!(:sis_source_id => "otheraccountmastercourse")
+      mc2 = sub_account.courses.create!(sis_source_id: "otheraccountmastercourse")
       MasterCourses::MasterTemplate.set_as_master_course(mc2)
 
-      ac = @account.courses.create!(:sis_source_id => "otheraccountcoursetoassociate")
+      ac = @account.courses.create!(sis_source_id: "otheraccountcoursetoassociate")
 
       importer = process_csv_data(
         "course_id,short_name,long_name,status,blueprint_course_id",
@@ -754,7 +754,7 @@ describe SIS::CSV::CourseImporter do
     end
 
     it "does not fail if a course is already associated to the target" do
-      ac = @account.courses.create!(:sis_source_id => "anassociatedcourse")
+      ac = @account.courses.create!(sis_source_id: "anassociatedcourse")
       @template.add_child_course!(ac)
       expect do
         process_csv_data_cleanly(
@@ -765,7 +765,7 @@ describe SIS::CSV::CourseImporter do
     end
 
     it "allows destroying" do
-      ac = @account.courses.create!(:sis_source_id => "anassociatedcourse")
+      ac = @account.courses.create!(sis_source_id: "anassociatedcourse")
       child = @template.add_child_course!(ac)
       process_csv_data_cleanly(
         "course_id,short_name,long_name,status,blueprint_course_id",
@@ -775,11 +775,11 @@ describe SIS::CSV::CourseImporter do
     end
 
     it "is able to associate courses in bulk" do
-      c1 = @account.courses.create!(:sis_source_id => "acourse1")
-      c2 = @account.courses.create!(:sis_source_id => "acourse2")
-      mc2 = @account.courses.create!(:sis_source_id => "anothermastercourse")
+      c1 = @account.courses.create!(sis_source_id: "acourse1")
+      c2 = @account.courses.create!(sis_source_id: "acourse2")
+      mc2 = @account.courses.create!(sis_source_id: "anothermastercourse")
       template2 = MasterCourses::MasterTemplate.set_as_master_course(mc2)
-      c3 = @account.courses.create!(:sis_source_id => "acourse3")
+      c3 = @account.courses.create!(sis_source_id: "acourse3")
       process_csv_data_cleanly(
         "course_id,short_name,long_name,status,blueprint_course_id",
         "#{c1.sis_source_id},shortname,long name,active,#{@mc.sis_source_id}",
@@ -791,7 +791,7 @@ describe SIS::CSV::CourseImporter do
     end
 
     it "gives one warning per row" do
-      courses = (1..3).map { |x| @account.courses.create!(:sis_source_id => "acourse#{x}") }
+      courses = (1..3).map { |x| @account.courses.create!(sis_source_id: "acourse#{x}") }
       rows = ["course_id,short_name,long_name,status,blueprint_course_id"] +
              courses.map { |c| "#{c.sis_source_id},shortname,long name,active,missingid" }
       importer = process_csv_data(*rows)
@@ -800,28 +800,28 @@ describe SIS::CSV::CourseImporter do
     end
 
     it "tries to queue a migration afterwards" do
-      account_admin_user(:active_all => true)
-      c1 = @account.courses.create!(:sis_source_id => "acourse1")
+      account_admin_user(active_all: true)
+      c1 = @account.courses.create!(sis_source_id: "acourse1")
       process_csv_data_cleanly(
         "course_id,short_name,long_name,status,blueprint_course_id",
         "#{c1.sis_source_id},shortname,long name,active,#{@mc.sis_source_id}",
-        :batch => @account.sis_batches.create!(:user => @admin, :data => {})
+        batch: @account.sis_batches.create!(user: @admin, data: {})
       )
       mm = @template.master_migrations.last
       expect(mm).to be_completed # jobs should have kept running now
     end
 
     it "tries to queue the migration in another job if one is already running" do
-      other_mm = @template.master_migrations.create!(:user => @admin)
+      other_mm = @template.master_migrations.create!(user: @admin)
       @template.active_migration = other_mm
       @template.save!
 
-      account_admin_user(:active_all => true)
-      c1 = @account.courses.create!(:sis_source_id => "acourse1")
+      account_admin_user(active_all: true)
+      c1 = @account.courses.create!(sis_source_id: "acourse1")
       process_csv_data_cleanly(
         "course_id,short_name,long_name,status,blueprint_course_id",
         "#{c1.sis_source_id},shortname,long name,active,#{@mc.sis_source_id}",
-        :batch => @account.sis_batches.create!(:user => @admin, :data => {})
+        batch: @account.sis_batches.create!(user: @admin, data: {})
       )
       # should wait to requeue
       job = Delayed::Job.last

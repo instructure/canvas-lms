@@ -44,9 +44,9 @@ describe Api::V1::GradebookHistory do
   let(:course) { double }
   let(:controller) do
     double(
-      :params => {},
-      :request => double(:query_parameters => {}),
-      :response => double(:headers => {})
+      params: {},
+      request: double(query_parameters: {}),
+      response: double(headers: {})
     )
   end
   let(:path) { '' }
@@ -61,7 +61,7 @@ describe Api::V1::GradebookHistory do
   end
 
   def submit(assignment, student, day, grader)
-    bare_submission_model(assignment, student, :graded_at => day, :grader_id => grader.try(:id))
+    bare_submission_model(assignment, student, graded_at: day, grader_id: grader.try(:id))
   end
 
   describe '#days_json' do
@@ -73,10 +73,10 @@ describe Api::V1::GradebookHistory do
         course.enroll_student(student)
         student
       end
-      @grader1 = User.create!(:name => 'grader 1')
-      @grader2 = User.create!(:name => 'grader 2')
-      @assignment1 = course.assignments.create!(:title => "some assignment")
-      @assignment2 = course.assignments.create!(:title => "another assignment")
+      @grader1 = User.create!(name: 'grader 1')
+      @grader2 = User.create!(name: 'grader 2')
+      @assignment1 = course.assignments.create!(title: "some assignment")
+      @assignment2 = course.assignments.create!(title: "another assignment")
       submit(@assignment1, students[0], now, @grader1)
       submit(@assignment1, students[1], now, @grader2)
       submit(@assignment1, students[2], yesterday, @grader2)
@@ -129,9 +129,9 @@ describe Api::V1::GradebookHistory do
       course.enroll_student(student1)
       student2 = User.create!
       course.enroll_student(student2)
-      @grader1 = User.create!(:name => 'grader 1')
-      @grader2 = User.create!(:name => 'grader 2')
-      @assignment = course.assignments.create!(:title => "some assignment")
+      @grader1 = User.create!(name: 'grader 1')
+      @grader2 = User.create!(name: 'grader 2')
+      @assignment = course.assignments.create!(title: "some assignment")
       submit(@assignment, student1, now, @grader1)
       submit(@assignment, student2, now, @grader2)
     end
@@ -154,9 +154,9 @@ describe Api::V1::GradebookHistory do
   end
 
   describe '#versions_json' do
-    let(:grader) { User.create!(:name => 'grader') }
+    let(:grader) { User.create!(name: 'grader') }
     let(:student) { User.create! }
-    let(:assignment) { course.assignments.create!(:title => "some assignment") }
+    let(:assignment) { course.assignments.create!(title: "some assignment") }
     let(:versions) { [Version.create!(versionable: submission, model: submission)] }
     let(:harness) {  GradebookHistoryHarness.new }
     let(:submission) do
@@ -190,10 +190,10 @@ describe Api::V1::GradebookHistory do
       @course = Course.create!
       student1 = User.create!
       @course.enroll_student(student1)
-      @grader1 = User.create!(:name => 'grader 1')
-      @grader2 = User.create!(:name => 'grader 2')
+      @grader1 = User.create!(name: 'grader 1')
+      @grader2 = User.create!(name: 'grader 2')
       @course.enroll_teacher(@grader2)
-      @assignment = @course.assignments.create!(:title => "some assignment")
+      @assignment = @course.assignments.create!(title: "some assignment")
       @submission = @assignment.submit_homework(student1)
       @submission.update(graded_at: now, grader_id: @grader1.id)
       @submission.score = 90
@@ -233,7 +233,7 @@ describe Api::V1::GradebookHistory do
     it 'properly sets pervious_* attributes' do
       # regrade to get a second version
       @submission.score = '80'
-      @submission.with_versioning(:explicit => true) { @submission.save! }
+      @submission.with_versioning(explicit: true) { @submission.save! }
 
       harness = GradebookHistoryHarness.new
       submissions = harness.submissions_for(@course, api_context, now, @grader2.id, @assignment.id)
@@ -246,12 +246,12 @@ describe Api::V1::GradebookHistory do
 
   describe '#day_string_for' do
     it 'builds a formatted date' do
-      submission = double(:graded_at => now)
+      submission = double(graded_at: now)
       expect(gradebook_history.day_string_for(submission)).to match(/\d{4}-\d{2}-\d{2}/)
     end
 
     it 'gives a empty string if there is no time' do
-      submission = double(:graded_at => nil)
+      submission = double(graded_at: nil)
       expect(gradebook_history.day_string_for(submission)).to eq ''
     end
   end
@@ -291,8 +291,8 @@ describe Api::V1::GradebookHistory do
 
       it 'accepts a date option' do
         add_submission
-        expect(gradebook_history.submissions_set(course, api_context, :date => 3.days.ago.in_time_zone)).to be_empty
-        expect(gradebook_history.submissions_set(course, api_context, :date => Time.now.in_time_zone)).not_to be_empty
+        expect(gradebook_history.submissions_set(course, api_context, date: 3.days.ago.in_time_zone)).to be_empty
+        expect(gradebook_history.submissions_set(course, api_context, date: Time.now.in_time_zone)).not_to be_empty
       end
     end
 

@@ -90,7 +90,7 @@ class Enrollment
     end
 
     def all_enrollments_scope
-      Enrollment.where(:course_id => enrollment.course_id, :user_id => enrollment.user_id)
+      Enrollment.where(course_id: enrollment.course_id, user_id: enrollment.user_id)
     end
   end
 end

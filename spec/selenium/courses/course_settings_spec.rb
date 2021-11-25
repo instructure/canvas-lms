@@ -25,7 +25,7 @@ describe "course settings" do
   include CourseSettingsPage
 
   before do
-    course_with_teacher_logged_in :limit_privileges_to_course_section => false
+    course_with_teacher_logged_in limit_privileges_to_course_section: false
     @account = @course.account
   end
 
@@ -218,7 +218,7 @@ describe "course settings" do
       a.courses << @course
       a.settings[:self_enrollment] = 'manually_created'
       a.save!
-      @course.update(:self_enrollment => true)
+      @course.update(self_enrollment: true)
       MasterCourses::MasterTemplate.set_as_master_course(@course)
       get "/courses/#{@course.id}/settings"
       expect(f('.self_enrollment_message')).to_not be_displayed
@@ -451,9 +451,9 @@ describe "course settings" do
       student_role = custom_student_role("weirdo")
 
       custom_ta_role("taaaa")
-      course_with_student(:course => @course, :role => student_role)
+      course_with_student(course: @course, role: student_role)
       student_role.deactivate!
-      course_with_teacher(:course => @course, :role => teacher_role)
+      course_with_teacher(course: @course, role: teacher_role)
       get "/courses/#{@course.id}/settings"
       expect(fj('.summary tr:nth(1)').text).to match(/weirdo \(inactive\):\s*1/)
       expect(fj('.summary tr:nth(3)').text).to match(/teach:\s*1/)
@@ -477,7 +477,7 @@ describe "course settings" do
   end
 
   it "restricts student access inputs be hidden" do
-    @account.settings[:restrict_student_future_view] = { :locked => true, :value => true }
+    @account.settings[:restrict_student_future_view] = { locked: true, value: true }
     @account.save!
 
     get "/courses/#{@course.id}/settings"
@@ -489,10 +489,10 @@ describe "course settings" do
   it "disables editing settings if :manage rights are not granted" do
     user_factory(active_all: true)
     user_session(@user)
-    role = custom_account_role('role', :account => @account)
-    @account.role_overrides.create!(:permission => 'read_course_content', :role => role, :enabled => true)
-    @account.role_overrides.create!(:permission => 'manage_content', :role => role, :enabled => false)
-    @course.account.account_users.create!(:user => @user, :role => role)
+    role = custom_account_role('role', account: @account)
+    @account.role_overrides.create!(permission: 'read_course_content', role: role, enabled: true)
+    @account.role_overrides.create!(permission: 'manage_content', role: role, enabled: false)
+    @course.account.account_users.create!(user: @user, role: role)
 
     get "/courses/#{@course.id}/settings"
 
@@ -503,9 +503,9 @@ describe "course settings" do
   end
 
   it "lets a sub-account admin edit enrollment term" do
-    term = Account.default.enrollment_terms.create!(:name => "some term")
+    term = Account.default.enrollment_terms.create!(name: "some term")
     sub_a = Account.default.sub_accounts.create!
-    account_admin_user(:active_all => true, :account => sub_a)
+    account_admin_user(active_all: true, account: sub_a)
     user_session(@admin)
 
     @course = sub_a.courses.create!
@@ -542,19 +542,19 @@ describe "course settings" do
       @course.syllabus_body = html
       @course.save!
 
-      bank = @course.assessment_question_banks.create!(:title => 'bank')
-      aq = bank.assessment_questions.create!(:question_data => { 'question_name' => 'test question',
-                                                                 'question_text' => html, 'answers' => [{ 'id' => 1 }, { 'id' => 2 }] })
+      bank = @course.assessment_question_banks.create!(title: 'bank')
+      aq = bank.assessment_questions.create!(question_data: { 'question_name' => 'test question',
+                                                              'question_text' => html, 'answers' => [{ 'id' => 1 }, { 'id' => 2 }] })
 
-      assmnt = @course.assignments.create!(:title => 'assignment', :description => html)
-      event = @course.calendar_events.create!(:title => "event", :description => html)
-      topic = @course.discussion_topics.create!(:title => "discussion title", :message => html)
-      mod = @course.context_modules.create!(:name => "some module")
-      mod.add_item(:type => 'external_url', :url => bad_url, :title => 'pls view')
-      page = @course.wiki_pages.create!(:title => "wiki", :body => html)
-      quiz = @course.quizzes.create!(:title => 'quiz1', :description => html)
+      assmnt = @course.assignments.create!(title: 'assignment', description: html)
+      event = @course.calendar_events.create!(title: "event", description: html)
+      topic = @course.discussion_topics.create!(title: "discussion title", message: html)
+      mod = @course.context_modules.create!(name: "some module")
+      mod.add_item(type: 'external_url', url: bad_url, title: 'pls view')
+      page = @course.wiki_pages.create!(title: "wiki", body: html)
+      quiz = @course.quizzes.create!(title: 'quiz1', description: html)
 
-      qq = quiz.quiz_questions.create!(:question_data => aq.question_data.merge('question_name' => 'other test question'))
+      qq = quiz.quiz_questions.create!(question_data: aq.question_data.merge('question_name' => 'other test question'))
 
       get "/courses/#{@course.id}/settings"
 
@@ -586,10 +586,10 @@ describe "course settings" do
     it "is able to filter links to unpublished content" do
       course_with_teacher_logged_in
 
-      active = @course.assignments.create!(:title => "blah")
-      unpublished = @course.assignments.create!(:title => "blah")
+      active = @course.assignments.create!(title: "blah")
+      unpublished = @course.assignments.create!(title: "blah")
       unpublished.unpublish!
-      deleted = @course.assignments.create!(:title => "blah")
+      deleted = @course.assignments.create!(title: "blah")
       deleted.destroy
 
       active_link = "/courses/#{@course.id}/assignments/#{active.id}"
@@ -602,7 +602,7 @@ describe "course settings" do
         <a href='#{deleted_link}'>deleted link</a>
       HTML
       @course.save!
-      page = @course.wiki_pages.create!(:title => "wikiii", :body => %(<a href='#{unpublished_link}'>unpublished link</a>))
+      page = @course.wiki_pages.create!(title: "wikiii", body: %(<a href='#{unpublished_link}'>unpublished link</a>))
 
       get "/courses/#{@course.id}/link_validator"
       wait_for_ajaximations

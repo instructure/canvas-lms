@@ -34,10 +34,10 @@ describe "Conferences API", type: :request do
   before :once do
     # these specs need an enabled web conference plugin
     @plugin = PluginSetting.create!(name: 'wimba')
-    @plugin.update_attribute(:settings, { :domain => 'wimba.test' })
-    @category_path_options = { :controller => "conferences", :format => "json" }
-    course_with_teacher(:active_all => true)
-    student_in_course(:active_all => true)
+    @plugin.update_attribute(:settings, { domain: 'wimba.test' })
+    @category_path_options = { controller: "conferences", format: "json" }
+    course_with_teacher(active_all: true)
+    student_in_course(active_all: true)
     @user = @teacher
   end
 
@@ -51,10 +51,10 @@ describe "Conferences API", type: :request do
 
     it "lists all the conferences" do
       @conferences = (1..2).map do |i|
-        @course.web_conferences.create!(:conference_type => 'Wimba',
-                                        :duration => 60,
-                                        :user => @teacher,
-                                        :title => "Wimba #{i}")
+        @course.web_conferences.create!(conference_type: 'Wimba',
+                                        duration: 60,
+                                        user: @teacher,
+                                        title: "Wimba #{i}")
       end
 
       json = api_call(:get, "/api/v1/courses/#{@course.to_param}/conferences", @category_path_options
@@ -64,12 +64,12 @@ describe "Conferences API", type: :request do
 
     it "does not list conferences for disabled plugins" do
       plugin = PluginSetting.create!(name: 'adobe_connect')
-      plugin.update_attribute(:settings, { :domain => 'adobe_connect.test' })
+      plugin.update_attribute(:settings, { domain: 'adobe_connect.test' })
       @conferences = ['AdobeConnect', 'Wimba'].map do |ct|
-        @course.web_conferences.create!(:conference_type => ct,
-                                        :duration => 60,
-                                        :user => @teacher,
-                                        :title => ct)
+        @course.web_conferences.create!(conference_type: ct,
+                                        duration: 60,
+                                        user: @teacher,
+                                        title: ct)
       end
       plugin.disabled = true
       plugin.save!
@@ -81,10 +81,10 @@ describe "Conferences API", type: :request do
     it "only lists conferences the user is a participant of" do
       @user = @student
       @conferences = (1..2).map do |i|
-        @course.web_conferences.create!(:conference_type => 'Wimba',
-                                        :duration => 60,
-                                        :user => @teacher,
-                                        :title => "Wimba #{i}")
+        @course.web_conferences.create!(conference_type: 'Wimba',
+                                        duration: 60,
+                                        user: @teacher,
+                                        title: "Wimba #{i}")
       end
       @conferences[0].users << @user
       @conferences[0].save!
@@ -95,13 +95,13 @@ describe "Conferences API", type: :request do
 
     it 'gets a conferences for a group' do
       @user = @student
-      @group = @course.groups.create!(:name => "My Group")
+      @group = @course.groups.create!(name: "My Group")
       @group.add_user(@student, 'accepted', true)
       @conferences = (1..2).map do |i|
-        @group.web_conferences.create!(:conference_type => 'Wimba',
-                                       :duration => 60,
-                                       :user => @teacher,
-                                       :title => "Wimba #{i}")
+        @group.web_conferences.create!(conference_type: 'Wimba',
+                                       duration: 60,
+                                       user: @teacher,
+                                       title: "Wimba #{i}")
       end
       json = api_call(:get, "/api/v1/groups/#{@group.to_param}/conferences", @category_path_options
         .merge(action: 'index', group_id: @group.to_param))
@@ -383,8 +383,8 @@ describe "Conferences API", type: :request do
     before do
       allow(WebConference).to receive(:plugins).and_return([
                                                              web_conference_plugin_mock("big_blue_button", {
-                                                                                          :domain => "bbb.instructure.com",
-                                                                                          :secret_dec => "secret",
+                                                                                          domain: "bbb.instructure.com",
+                                                                                          secret_dec: "secret",
                                                                                         })
                                                            ])
     end

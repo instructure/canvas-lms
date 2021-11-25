@@ -329,14 +329,14 @@ class EnrollmentsApiController < ApplicationController
   before_action :require_user
 
   @@errors = {
-    :missing_parameters => 'No parameters given',
-    :missing_user_id => "Can't create an enrollment without a user. Include enrollment[user_id] to create an enrollment",
-    :bad_type => 'Invalid type',
-    :bad_role => 'Invalid role',
-    :inactive_role => 'Cannot create an enrollment with this role because it is inactive.',
-    :base_type_mismatch => 'The specified type must match the base type for the role',
-    :concluded_course => 'Can\'t add an enrollment to a concluded course.',
-    :insufficient_sis_permissions => 'Insufficient permissions to filter by SIS fields'
+    missing_parameters: 'No parameters given',
+    missing_user_id: "Can't create an enrollment without a user. Include enrollment[user_id] to create an enrollment",
+    bad_type: 'Invalid type',
+    bad_role: 'Invalid role',
+    inactive_role: 'Cannot create an enrollment with this role because it is inactive.',
+    base_type_mismatch: 'The specified type must match the base type for the role',
+    concluded_course: 'Can\'t add an enrollment to a concluded course.',
+    insufficient_sis_permissions: 'Insufficient permissions to filter by SIS fields'
   }
 
   include Api::V1::User
@@ -482,7 +482,7 @@ class EnrollmentsApiController < ApplicationController
                          end
 
         unless grading_period
-          render(:json => { error: "invalid grading_period_id" }, :status => :bad_request)
+          render(json: { error: "invalid grading_period_id" }, status: :bad_request)
           return
         end
       end
@@ -491,7 +491,7 @@ class EnrollmentsApiController < ApplicationController
         if use_bookmarking?
           enrollments = enrollments.select("users.sortable_name AS sortable_name")
           bookmarker = BookmarkedCollection::SimpleBookmarker.new(Enrollment,
-                                                                  { :type => { :skip_collation => true }, :sortable_name => { :type => :string, :null => false } }, :id)
+                                                                  { type: { skip_collation: true }, sortable_name: { type: :string, null: false } }, :id)
           ShardedBookmarkedCollection.build(bookmarker, enrollments, always_use_bookmarks: true)
         else
           enrollments.order(:type, User.sortable_name_order_by_clause("users"), :id)
@@ -507,7 +507,7 @@ class EnrollmentsApiController < ApplicationController
       includes = [:user] + Array(params[:include])
       user_json_preloads(enrollments.map(&:user), false, { group_memberships: include_group_ids })
 
-      render :json => enrollments.map { |e|
+      render json: enrollments.map { |e|
         enrollment_json(e, @current_user, session, includes: includes,
                                                    opts: { grading_period: grading_period })
       }
@@ -524,7 +524,7 @@ class EnrollmentsApiController < ApplicationController
     GuardRail.activate(:secondary) do
       enrollment = @context.all_enrollments.find(params[:id])
       if enrollment.user_id == @current_user.id || authorized_action(@context, @current_user, :read_roster)
-        render :json => enrollment_json(enrollment, @current_user, session)
+        render json: enrollment_json(enrollment, @current_user, session)
       end
     end
   end
@@ -680,13 +680,13 @@ class EnrollmentsApiController < ApplicationController
     params[:enrollment].slice!(:enrollment_state, :section, :limit_privileges_to_course_section, :associated_user_id, :role, :start_at, :end_at, :self_enrolled, :no_notify)
 
     DueDateCacher.with_executing_user(@current_user) do
-      @enrollment = @context.enroll_user(user, type, params[:enrollment].merge(:allow_multiple_enrollments => true))
+      @enrollment = @context.enroll_user(user, type, params[:enrollment].merge(allow_multiple_enrollments: true))
     end
 
     if @enrollment.valid?
-      render(:json => enrollment_json(@enrollment, @current_user, session))
+      render(json: enrollment_json(@enrollment, @current_user, session))
     else
-      render(:json => @enrollment.errors, :status => :bad_request)
+      render(json: @enrollment.errors, status: :bad_request)
     end
   end
 
@@ -761,9 +761,9 @@ class EnrollmentsApiController < ApplicationController
     end
 
     if @enrollment.send(action)
-      render :json => enrollment_json(@enrollment, @current_user, session)
+      render json: enrollment_json(@enrollment, @current_user, session)
     else
-      render :json => @enrollment.errors, :status => :bad_request
+      render json: @enrollment.errors, status: :bad_request
     end
   end
 
@@ -836,13 +836,13 @@ class EnrollmentsApiController < ApplicationController
     end
 
     unless @enrollment.workflow_state == 'inactive'
-      return render(:json => { :error => "enrollment not inactive" }, :status => :bad_request)
+      return render(json: { error: "enrollment not inactive" }, status: :bad_request)
     end
 
     if @enrollment.reactivate
-      render :json => enrollment_json(@enrollment, @current_user, session)
+      render json: enrollment_json(@enrollment, @current_user, session)
     else
-      render :json => @enrollment.errors, :status => :bad_request
+      render json: @enrollment.errors, status: :bad_request
     end
   end
 
@@ -859,11 +859,11 @@ class EnrollmentsApiController < ApplicationController
 
     date = Time.zone.parse(params[:date])
     if date
-      enrollments = Enrollment.where(:course_id => params[:course_id], :user_id => params[:user_id])
+      enrollments = Enrollment.where(course_id: params[:course_id], user_id: params[:user_id])
       enrollments.update_all(last_attended_at: date)
-      render :json => { :date => date }
+      render json: { date: date }
     else
-      render :json => { :message => 'Invalid date time input' }, :status => :bad_request
+      render json: { message: 'Invalid date time input' }, status: :bad_request
     end
   end
 

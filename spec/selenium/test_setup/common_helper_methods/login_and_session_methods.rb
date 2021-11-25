@@ -40,39 +40,39 @@ module LoginAndSessionMethods
   end
 
   def user_logged_in(opts = {})
-    user_with_pseudonym({ :active_user => true }.merge(opts))
+    user_with_pseudonym({ active_user: true }.merge(opts))
     create_session(@pseudonym)
   end
 
   def course_with_teacher_logged_in(opts = {})
     user_logged_in(opts)
-    course_with_teacher({ :user => @user, :active_course => true, :active_enrollment => true }.merge(opts))
+    course_with_teacher({ user: @user, active_course: true, active_enrollment: true }.merge(opts))
   end
 
   def course_with_student_logged_in(opts = {})
     user_logged_in(opts)
-    course_with_student({ :user => @user, :active_course => true, :active_enrollment => true }.merge(opts))
+    course_with_student({ user: @user, active_course: true, active_enrollment: true }.merge(opts))
   end
 
   def course_with_observer_logged_in(opts = {})
     user_logged_in(opts)
-    course_with_observer({ :user => @user, :active_course => true, :active_enrollment => true }.merge(opts))
+    course_with_observer({ user: @user, active_course: true, active_enrollment: true }.merge(opts))
   end
 
   def course_with_ta_logged_in(opts = {})
     user_logged_in(opts)
-    course_with_ta({ :user => @user, :active_course => true, :active_enrollment => true }.merge(opts))
+    course_with_ta({ user: @user, active_course: true, active_enrollment: true }.merge(opts))
   end
 
   def course_with_designer_logged_in(opts = {})
     user_logged_in(opts)
-    course_with_designer({ :user => @user, :active_course => true, :active_enrollment => true }.merge(opts))
+    course_with_designer({ user: @user, active_course: true, active_enrollment: true }.merge(opts))
   end
 
   def course_with_admin_logged_in(opts = {})
-    account_admin_user({ :active_user => true }.merge(opts))
-    user_logged_in({ :user => @user }.merge(opts))
-    course_with_teacher({ :user => @user, :active_course => true, :active_enrollment => true }.merge(opts))
+    account_admin_user({ active_user: true }.merge(opts))
+    user_logged_in({ user: @user }.merge(opts))
+    course_with_teacher({ user: @user, active_course: true, active_enrollment: true }.merge(opts))
   end
 
   def provision_quizzes_next(account)
@@ -81,13 +81,13 @@ module LoginAndSessionMethods
   end
 
   def admin_logged_in(opts = {})
-    account_admin_user({ :active_user => true }.merge(opts))
-    user_logged_in({ :user => @user }.merge(opts))
+    account_admin_user({ active_user: true }.merge(opts))
+    user_logged_in({ user: @user }.merge(opts))
   end
 
   def site_admin_logged_in(opts = {})
-    site_admin_user({ :active_user => true }.merge(opts))
-    user_logged_in({ :user => @user }.merge(opts))
+    site_admin_user({ active_user: true }.merge(opts))
+    user_logged_in({ user: @user }.merge(opts))
   end
 
   def enter_student_view(opts = {})

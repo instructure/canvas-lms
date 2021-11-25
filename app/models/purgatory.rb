@@ -38,7 +38,7 @@ class Purgatory < ActiveRecord::Base
           ::Rails.logger.warn("error deleting purgatory from instfs: #{$!.inspect}")
         end
       end
-      Purgatory.where(:id => batch).update_all(:workflow_state => "expired")
+      Purgatory.where(id: batch).update_all(workflow_state: "expired")
     end
   end
 end

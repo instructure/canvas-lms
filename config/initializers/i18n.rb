@@ -151,7 +151,7 @@ module I18nUtilities
       text_or_key = "labels.#{text_or_key}" unless text_or_key.to_s.start_with?('#')
       text_or_key = respond_to?(:t) ? t(text_or_key, default_value, *args) : I18n.t(text_or_key, default_value, *args)
     end
-    I18n.t("#before_label_wrapper", "%{text}:", :text => text_or_key)
+    I18n.t("#before_label_wrapper", "%{text}:", text: text_or_key)
   end
 
   def _label_symbol_translation(method, text, options)
@@ -364,7 +364,7 @@ ActiveRecord::Base.class_eval do
         end
       end
       args.each do |field|
-        validates_inclusion_of field, options.merge(:in => LOCALE_LIST, :if => :"#{field}_changed?")
+        validates_inclusion_of field, options.merge(in: LOCALE_LIST, if: :"#{field}_changed?")
       end
     end
   end
@@ -375,8 +375,8 @@ require 'active_support/core_ext/array/conversions'
 module ToSentenceWithSimpleOr
   def to_sentence(options = {})
     if options == :or
-      super(:two_words_connector => I18n.t('support.array.or.two_words_connector'),
-            :last_word_connector => I18n.t('support.array.or.last_word_connector'))
+      super(two_words_connector: I18n.t('support.array.or.two_words_connector'),
+            last_word_connector: I18n.t('support.array.or.last_word_connector'))
     else
       super
     end

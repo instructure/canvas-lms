@@ -32,7 +32,7 @@ describe "context modules" do
     end
 
     before do
-      course_with_teacher_logged_in(:course => @course, :active_enrollment => true)
+      course_with_teacher_logged_in(course: @course, active_enrollment: true)
     end
 
     it 'adds an unpublished page to a module', priority: "1" do
@@ -208,7 +208,7 @@ describe "context modules" do
     end
 
     before do
-      course_with_teacher_logged_in(:course => @course, :active_enrollment => true)
+      course_with_teacher_logged_in(course: @course, active_enrollment: true)
     end
 
     it 'edit text header module item inline', priority: "2" do
@@ -291,22 +291,22 @@ describe "context modules" do
       @course.usage_rights_required = true
       @course.save!
       # adding file to course
-      @file = @course.attachments.create!(:display_name => file_name, :uploaded_data => default_uploaded_data)
+      @file = @course.attachments.create!(display_name: file_name, uploaded_data: default_uploaded_data)
       @file.context = @course
       @file.save!
 
-      @file2 = @course.attachments.create!(:display_name => "another.txt", :uploaded_data => default_uploaded_data)
+      @file2 = @course.attachments.create!(display_name: "another.txt", uploaded_data: default_uploaded_data)
       @file2.context = @course
       @file2.save!
     end
 
     before do
-      course_with_teacher_logged_in(:course => @course, :active_enrollment => true)
+      course_with_teacher_logged_in(course: @course, active_enrollment: true)
     end
 
     describe "module drag and drop" do
       before(:once) do
-        @mod = @course.context_modules.create!(:name => "files module")
+        @mod = @course.context_modules.create!(name: "files module")
       end
 
       it 'duplicate of an empty module should display a drag and drop area' do
@@ -360,10 +360,10 @@ describe "context modules" do
       it "replaces an existing module item with a replacement uploaded file" do
         # create the existing module item
         filename, fullpath, _data = get_file("a_file.txt")
-        file = @course.attachments.create!(:display_name => filename, :uploaded_data => fixture_file_upload("files/a_file.txt", "text/plain"))
+        file = @course.attachments.create!(display_name: filename, uploaded_data: fixture_file_upload("files/a_file.txt", "text/plain"))
         file.context = @course
         file.save!
-        @mod.add_item({ :id => file.id, :type => 'attachment' })
+        @mod.add_item({ id: file.id, type: 'attachment' })
 
         get "/courses/#{@course.id}/modules"
         upload_file_item_with_selection("div#context_module_#{@mod.id} .add_module_item_link", '#attachments_select', fullpath)
@@ -374,7 +374,7 @@ describe "context modules" do
 
       it "closing the rename dialog should not close the module dialog" do
         filename, fullpath, _data = get_file("a_file.txt")
-        file = @course.attachments.create!(:display_name => filename, :uploaded_data => fixture_file_upload("files/a_file.txt", "text/plain"))
+        file = @course.attachments.create!(display_name: filename, uploaded_data: fixture_file_upload("files/a_file.txt", "text/plain"))
         file.context = @course
         file.save!
 
@@ -404,7 +404,7 @@ describe "context modules" do
 
       it "skipping the only file should not close the add item to module dialog" do
         filename, fullpath, _data = get_file("a_file.txt")
-        file = @course.attachments.create!(:display_name => filename, :uploaded_data => fixture_file_upload("files/a_file.txt", "text/plain"))
+        file = @course.attachments.create!(display_name: filename, uploaded_data: fixture_file_upload("files/a_file.txt", "text/plain"))
         file.context = @course
         file.save!
 
@@ -425,7 +425,7 @@ describe "context modules" do
 
       it "does not ask to rename upload after folder change" do
         filename, fullpath, _data = get_file("a_file.txt")
-        file = @course.attachments.create!(:display_name => filename, :uploaded_data => fixture_file_upload("files/a_file.txt", "text/plain"))
+        file = @course.attachments.create!(display_name: filename, uploaded_data: fixture_file_upload("files/a_file.txt", "text/plain"))
         file.context = @course
         file.save!
 
@@ -455,12 +455,12 @@ describe "context modules" do
       it "creates a module item with a replacement uploaded file if in a different module" do
         # create the existing module item
         filename, fullpath, _data = get_file("a_file.txt")
-        file = @course.attachments.create!(:display_name => filename, :uploaded_data => fixture_file_upload("files/a_file.txt", "text/plain"))
+        file = @course.attachments.create!(display_name: filename, uploaded_data: fixture_file_upload("files/a_file.txt", "text/plain"))
         file.context = @course
         file.save!
-        @mod.add_item({ :id => file.id, :type => 'attachment' })
+        @mod.add_item({ id: file.id, type: 'attachment' })
         # create a new module
-        @mod2 = @course.context_modules.create!(:name => "another module")
+        @mod2 = @course.context_modules.create!(name: "another module")
 
         get "/courses/#{@course.id}/modules"
         upload_file_item_with_selection("div#context_module_#{@mod2.id} .add_module_item_link", '#attachments_select', fullpath)
@@ -509,11 +509,11 @@ describe "context modules" do
 
     it "does not remove the file link in a module when file is overwritten" do
       course_module
-      @module.add_item({ :id => @file.id, :type => 'attachment' })
+      @module.add_item({ id: @file.id, type: 'attachment' })
       get "/courses/#{@course.id}/modules"
 
       expect(f('.context_module_item')).to include_text(file_name)
-      file = @course.attachments.create!(:display_name => file_name, :uploaded_data => default_uploaded_data)
+      file = @course.attachments.create!(display_name: file_name, uploaded_data: default_uploaded_data)
       file.context = @course
       file.save!
       Attachment.last.handle_duplicates(:overwrite)
@@ -564,9 +564,9 @@ describe "context modules" do
     include_context "public course as a logged out user"
 
     it "displays modules list", priority: "1" do
-      @module = public_course.context_modules.create!(:name => "module 1")
-      @assignment = public_course.assignments.create!(:name => 'assignment 1', :assignment_group => @assignment_group)
-      @module.add_item :type => 'assignment', :id => @assignment.id
+      @module = public_course.context_modules.create!(name: "module 1")
+      @assignment = public_course.assignments.create!(name: 'assignment 1', assignment_group: @assignment_group)
+      @module.add_item type: 'assignment', id: @assignment.id
       get "/courses/#{public_course.id}/modules"
       validate_selector_displayed('.item-group-container')
     end

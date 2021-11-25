@@ -158,7 +158,7 @@ describe "Api::V1::Assignment" do
     end
 
     it "includes all assignment overrides fields when an assignment_override exists" do
-      assignment.assignment_overrides.create(:workflow_state => 'active')
+      assignment.assignment_overrides.create(workflow_state: 'active')
       overrides = assignment.assignment_overrides
       json = api.assignment_json(assignment, user, session, { overrides: overrides })
       expect(json).to be_a(Hash)
@@ -546,7 +546,7 @@ describe "Api::V1::Assignment" do
 
     context 'when an assignment with submission type other than "online_quiz" has one student submission' do
       before do
-        assignment.submit_homework(student, :body => "my homework")
+        assignment.submit_homework(student, body: "my homework")
       end
 
       it 'allows updating the submission_types field' do
@@ -562,7 +562,7 @@ describe "Api::V1::Assignment" do
     context 'when an assignment with submission type "online - text entry" has one student submission' do
       before do
         assignment.update!(submission_types: 'online_text_entry')
-        assignment.submit_homework(student, :body => "my homework")
+        assignment.submit_homework(student, body: "my homework")
       end
 
       let(:assignment_update_params) do
@@ -585,7 +585,7 @@ describe "Api::V1::Assignment" do
     context 'when an assignment with submission type "online_quiz" has one student submission' do
       before do
         assignment.update!(submission_types: 'online_quiz')
-        assignment.submit_homework(student, :body => "my homework")
+        assignment.submit_homework(student, body: "my homework")
       end
 
       it 'does not allow updating the submission_types field' do

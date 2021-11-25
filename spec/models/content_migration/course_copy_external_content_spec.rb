@@ -54,7 +54,7 @@ describe ContentMigration do
     it "sends the data from begin_export back later to retrieve_export" do
       expect(klass).to receive(:applies_to_course?).with(@copy_from).and_return(true)
 
-      test_data = { :sometestdata => "something" }
+      test_data = { sometestdata: "something" }
       expect(klass).to receive(:begin_export).with(@copy_from, {}).and_return(test_data)
       expect(klass).to receive(:export_completed?).with(test_data).and_return(true)
       expect(klass).to receive(:retrieve_export).with(test_data).and_return(nil)
@@ -66,12 +66,12 @@ describe ContentMigration do
       skip 'Requires QtiMigrationTool' unless Qti.qti_enabled?
 
       assmt = @copy_from.assignments.create!
-      topic = @copy_from.discussion_topics.create!(:message => "hi", :title => "discussion title")
-      ann = @copy_from.announcements.create!(:message => "goodbye")
-      cm = @copy_from.context_modules.create!(:name => "some module")
-      item = cm.add_item(:id => assmt.id, :type => 'assignment')
-      att = Attachment.create!(:filename => 'first.txt', :uploaded_data => StringIO.new('ohai'), :folder => Folder.unfiled_folder(@copy_from), :context => @copy_from)
-      page = @copy_from.wiki_pages.create!(:title => "wiki", :body => "ohai")
+      topic = @copy_from.discussion_topics.create!(message: "hi", title: "discussion title")
+      ann = @copy_from.announcements.create!(message: "goodbye")
+      cm = @copy_from.context_modules.create!(name: "some module")
+      item = cm.add_item(id: assmt.id, type: 'assignment')
+      att = Attachment.create!(filename: 'first.txt', uploaded_data: StringIO.new('ohai'), folder: Folder.unfiled_folder(@copy_from), context: @copy_from)
+      page = @copy_from.wiki_pages.create!(title: "wiki", body: "ohai")
       quiz = @copy_from.quizzes.create!
 
       allow(klass).to receive(:applies_to_course?).and_return(true)
@@ -92,14 +92,14 @@ describe ContentMigration do
 
       run_course_copy
 
-      copied_assmt = @copy_to.assignments.where(:migration_id => mig_id(assmt)).first
-      copied_topic = @copy_to.discussion_topics.where(:migration_id => mig_id(topic)).first
-      copied_ann = @copy_to.announcements.where(:migration_id => mig_id(ann)).first
-      copied_cm = @copy_to.context_modules.where(:migration_id => mig_id(cm)).first
-      copied_item = @copy_to.context_module_tags.where(:migration_id => mig_id(item)).first
-      copied_att = @copy_to.attachments.where(:migration_id => mig_id(att)).first
-      copied_page = @copy_to.wiki_pages.where(:migration_id => mig_id(page)).first
-      copied_quiz = @copy_to.quizzes.where(:migration_id => mig_id(quiz)).first
+      copied_assmt = @copy_to.assignments.where(migration_id: mig_id(assmt)).first
+      copied_topic = @copy_to.discussion_topics.where(migration_id: mig_id(topic)).first
+      copied_ann = @copy_to.announcements.where(migration_id: mig_id(ann)).first
+      copied_cm = @copy_to.context_modules.where(migration_id: mig_id(cm)).first
+      copied_item = @copy_to.context_module_tags.where(migration_id: mig_id(item)).first
+      copied_att = @copy_to.attachments.where(migration_id: mig_id(att)).first
+      copied_page = @copy_to.wiki_pages.where(migration_id: mig_id(page)).first
+      copied_quiz = @copy_to.quizzes.where(migration_id: mig_id(quiz)).first
 
       expect(klass.course).to eq @copy_to
 
@@ -132,7 +132,7 @@ describe ContentMigration do
 
       run_course_copy
 
-      copied_topic = @copy_to.discussion_topics.where(:migration_id => mig_id(topic)).first
+      copied_topic = @copy_to.discussion_topics.where(migration_id: mig_id(topic)).first
       expected_data = {
         '$canvas_assignment_id' => "$OBJECT_NOT_FOUND",
         '$canvas_discussion_topic_id' => copied_topic.id
@@ -148,20 +148,19 @@ describe ContentMigration do
       graded_quiz.workflow_state = 'available'
       graded_quiz.save!
 
-      cm = @copy_from.context_modules.create!(:name => "some module")
-      cm.add_item(:id => assmt.id, :type => 'assignment')
-      cm.add_item(:id => graded_quiz.id, :type => 'quiz')
+      cm = @copy_from.context_modules.create!(name: "some module")
+      cm.add_item(id: assmt.id, type: 'assignment')
+      cm.add_item(id: graded_quiz.id, type: 'quiz')
 
       allow(klass).to receive(:applies_to_course?).and_return(true)
       allow(klass).to receive(:export_completed?).and_return(true)
       allow(klass).to receive(:retrieve_export).and_return({})
 
-      @cm.copy_options = { :context_modules => { mig_id(cm) => "1" } }
+      @cm.copy_options = { context_modules: { mig_id(cm) => "1" } }
       @cm.save!
 
       expect(klass).to receive(:begin_export).with(@copy_from,
-                                                   { :selective => true, :exported_assets =>
-                                                     ["context_module_#{cm.id}", "assignment_#{assmt.id}", "quiz_#{graded_quiz.id}", "assignment_#{graded_quiz.assignment.id}"] })
+                                                   { selective: true, exported_assets: ["context_module_#{cm.id}", "assignment_#{assmt.id}", "quiz_#{graded_quiz.id}", "assignment_#{graded_quiz.assignment.id}"] })
 
       run_course_copy
     end

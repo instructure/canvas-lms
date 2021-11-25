@@ -23,7 +23,7 @@ describe Quizzes::CourseQuizExtensionsController, type: :request do
   before :once do
     course_factory
     @quizzes = [1, 2].map do |n|
-      quiz = @course.quizzes.create!(:title => "quiz#{n}")
+      quiz = @course.quizzes.create!(title: "quiz#{n}")
       quiz.publish!
       quiz
     end
@@ -33,9 +33,9 @@ describe Quizzes::CourseQuizExtensionsController, type: :request do
   describe "POST /api/v1/courses/:course_id/quiz_extensions (create)" do
     def api_create_quiz_extension(quiz_extension_params, opts = {})
       api_call(:post, "/api/v1/courses/#{@course.id}/quiz_extensions",
-               { :controller => "quizzes/course_quiz_extensions", :action => "create", :format => "json",
-                 :course_id => @course.id.to_s },
-               { :quiz_extensions => quiz_extension_params },
+               { controller: "quizzes/course_quiz_extensions", action: "create", format: "json",
+                 course_id: @course.id.to_s },
+               { quiz_extensions: quiz_extension_params },
                { 'Accept' => 'application/vnd.api+json' }, opts)
     end
 
@@ -45,9 +45,9 @@ describe Quizzes::CourseQuizExtensionsController, type: :request do
           { user_id: @student.id, extra_attempts: 2 }
         ]
         raw_api_call(:post, "/api/v1/courses/#{@course.id}/quiz_extensions",
-                     { :controller => "quizzes/course_quiz_extensions", :action => "create", :format => "json",
-                       :course_id => @course.id.to_s },
-                     { :quiz_extensions => quiz_extension_params },
+                     { controller: "quizzes/course_quiz_extensions", action: "create", format: "json",
+                       course_id: @course.id.to_s },
+                     { quiz_extensions: quiz_extension_params },
                      { 'Accept' => 'application/vnd.api+json' })
         assert_status(403)
       end

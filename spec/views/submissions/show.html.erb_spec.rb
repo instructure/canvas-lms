@@ -31,7 +31,7 @@ describe "/submissions/show" do
 
   it "renders" do
     view_context
-    a = @course.assignments.create!(:title => "some assignment")
+    a = @course.assignments.create!(title: "some assignment")
     assign(:assignment, a)
     assign(:submission, a.submit_homework(@user))
     render "submissions/show"

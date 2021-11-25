@@ -20,11 +20,11 @@
 
 describe EportfoliosController do
   def eportfolio_category
-    @category = @portfolio.eportfolio_categories.create!(:name => "some category")
+    @category = @portfolio.eportfolio_categories.create!(name: "some category")
   end
 
   def category_entry
-    @entry = @category.eportfolio_entries.create!(:name => "some entry", :eportfolio => @portfolio)
+    @entry = @category.eportfolio_entries.create!(name: "some entry", eportfolio: @portfolio)
   end
 
   before :once do
@@ -44,7 +44,7 @@ describe EportfoliosController do
       a = Account.default
       a.settings[:enable_eportfolios] = false
       a.save
-      course_with_student_logged_in(:active_all => true, :user => @user)
+      course_with_student_logged_in(active_all: true, user: @user)
       get 'user_index'
       expect(response).to be_redirect
     end
@@ -86,13 +86,13 @@ describe EportfoliosController do
 
   describe "POST 'create'" do
     it "requires authorization" do
-      post 'create', params: { :eportfolio => { :name => "some portfolio" } }
+      post 'create', params: { eportfolio: { name: "some portfolio" } }
       assert_unauthorized
     end
 
     it "creates portfolio" do
       user_session(@user)
-      post 'create', params: { :eportfolio => { :name => "some portfolio" } }
+      post 'create', params: { eportfolio: { name: "some portfolio" } }
       expect(response).to be_redirect
       expect(assigns[:portfolio]).not_to be_nil
       expect(assigns[:portfolio].name).to eql("some portfolio")
@@ -105,7 +105,7 @@ describe EportfoliosController do
       end
 
       user_session(@user)
-      post 'create', params: { :eportfolio => { :name => "some portfolio" } }
+      post 'create', params: { eportfolio: { name: "some portfolio" } }
 
       expect(response).to be_redirect
       expect(response.location).to eq root_url
@@ -118,7 +118,7 @@ describe EportfoliosController do
 
     describe "without being logged in" do
       it "complains if the eportfolio is not public" do
-        get 'show', params: { :id => @portfolio.id }
+        get 'show', params: { id: @portfolio.id }
         assert_unauthorized
       end
 
@@ -136,8 +136,8 @@ describe EportfoliosController do
         a = Account.default
         a.settings[:enable_eportfolios] = false
         a.save
-        course_with_student_logged_in(:active_all => true, :user => @user)
-        get 'show', params: { :id => @portfolio.id }
+        course_with_student_logged_in(active_all: true, user: @user)
+        get 'show', params: { id: @portfolio.id }
         assert_unauthorized
       end
     end
@@ -146,20 +146,20 @@ describe EportfoliosController do
       before { user_session(@user) }
 
       it "shows portfolio" do
-        get 'show', params: { :id => @portfolio.id }
+        get 'show', params: { id: @portfolio.id }
         expect(response).to be_successful
         expect(assigns[:portfolio]).not_to be_nil
       end
 
       it "creates a category if one doesn't exist" do
-        get 'show', params: { :id => @portfolio.id }
+        get 'show', params: { id: @portfolio.id }
         expect(response).to be_successful
         expect(assigns[:category]).not_to be_nil
       end
 
       it "creates an entry in the first category if one doesn't exist" do
-        @portfolio.eportfolio_categories.create!(:name => "Home")
-        get 'show', params: { :id => @portfolio.id }
+        @portfolio.eportfolio_categories.create!(name: "Home")
+        get 'show', params: { id: @portfolio.id }
         expect(response).to be_successful
         expect(assigns[:page]).not_to be_nil
       end
@@ -180,7 +180,7 @@ describe EportfoliosController do
       end
 
       it "does not get set when not logged in" do
-        get 'show', params: { :id => @portfolio.id }
+        get 'show', params: { id: @portfolio.id }
         expect(assigns[:owner_url]).to be_nil
       end
 
@@ -191,13 +191,13 @@ describe EportfoliosController do
 
         it "is the profile url" do
           user_session(@user)
-          get 'show', params: { :id => @portfolio.id }
+          get 'show', params: { id: @portfolio.id }
           expect(assigns[:owner_url]).to eq user_profile_url(@portfolio.user)
         end
 
         it "does not get set when portfolio owner is not visible to user" do
           user_session user_factory(active_all: true)
-          get 'show', params: { :id => @portfolio.id }
+          get 'show', params: { id: @portfolio.id }
           expect(assigns[:owner_url]).to be_nil
         end
       end
@@ -209,14 +209,14 @@ describe EportfoliosController do
 
         it "is the settings url for the owner" do
           user_session(@user)
-          get 'show', params: { :id => @portfolio.id }
+          get 'show', params: { id: @portfolio.id }
           expect(assigns[:owner_url]).to eq profile_url
         end
 
         it "is the user url for an admin" do
           user_with_pseudonym(user: @portfolio.user)
           user_session(account_admin_user)
-          get 'show', params: { :id => @portfolio.id }
+          get 'show', params: { id: @portfolio.id }
           expect(assigns[:owner_url]).to eq user_url(@portfolio.user)
         end
 
@@ -224,7 +224,7 @@ describe EportfoliosController do
           course_with_teacher(active_all: true)
           student_in_course(course: @course, user: @portfolio.user)
           user_session(@teacher)
-          get 'show', params: { :id => @portfolio.id }
+          get 'show', params: { id: @portfolio.id }
           expect(assigns[:owner_url]).to be_nil
         end
       end
@@ -290,13 +290,13 @@ describe EportfoliosController do
     before(:once) { eportfolio }
 
     it "requires authorization" do
-      put 'update', params: { :id => @portfolio.id, :eportfolio => { :name => "new title" } }
+      put 'update', params: { id: @portfolio.id, eportfolio: { name: "new title" } }
       assert_unauthorized
     end
 
     it "updates portfolio" do
       user_session(@user)
-      put 'update', params: { :id => @portfolio.id, :eportfolio => { :name => "new title" } }
+      put 'update', params: { id: @portfolio.id, eportfolio: { name: "new title" } }
       expect(response).to be_redirect
       expect(assigns[:portfolio]).not_to be_nil
       expect(assigns[:portfolio].name).to eql("new title")
@@ -371,13 +371,13 @@ describe EportfoliosController do
     before(:once) { eportfolio }
 
     it "requires authorization" do
-      delete 'destroy', params: { :id => @portfolio.id }
+      delete 'destroy', params: { id: @portfolio.id }
       assert_unauthorized
     end
 
     it "deletes portfolio" do
       user_session(@user)
-      delete 'destroy', params: { :id => @portfolio.id }
+      delete 'destroy', params: { id: @portfolio.id }
       expect(assigns[:portfolio]).not_to be_nil
       expect(assigns[:portfolio]).not_to be_frozen
       expect(assigns[:portfolio]).to be_deleted
@@ -391,7 +391,7 @@ describe EportfoliosController do
     before(:once) { eportfolio }
 
     it "requires authorization" do
-      post 'reorder_categories', params: { :eportfolio_id => @portfolio.id, :order => '' }
+      post 'reorder_categories', params: { eportfolio_id: @portfolio.id, order: '' }
       assert_unauthorized
     end
 
@@ -403,7 +403,7 @@ describe EportfoliosController do
       expect(c1.position).to eql(1)
       expect(c2.position).to eql(2)
       expect(c3.position).to eql(3)
-      post 'reorder_categories', params: { :eportfolio_id => @portfolio.id, :order => "#{c2.id},#{c3.id},#{c1.id}" }
+      post 'reorder_categories', params: { eportfolio_id: @portfolio.id, order: "#{c2.id},#{c3.id},#{c1.id}" }
       expect(response).to be_successful
       c1.reload
       c2.reload
@@ -444,7 +444,7 @@ describe EportfoliosController do
     before(:once) { eportfolio }
 
     it "requires authorization" do
-      post 'reorder_entries', params: { :eportfolio_id => @portfolio.id, :order => '', :eportfolio_category_id => 1 }
+      post 'reorder_entries', params: { eportfolio_id: @portfolio.id, order: '', eportfolio_category_id: 1 }
       assert_unauthorized
     end
 
@@ -457,7 +457,7 @@ describe EportfoliosController do
       expect(e1.position).to eql(1)
       expect(e2.position).to eql(2)
       expect(e3.position).to eql(3)
-      post 'reorder_entries', params: { :eportfolio_id => @portfolio.id, :eportfolio_category_id => @category.id, :order => "#{e2.id},#{e3.id},#{e1.id}" }
+      post 'reorder_entries', params: { eportfolio_id: @portfolio.id, eportfolio_category_id: @category.id, order: "#{e2.id},#{e3.id},#{e1.id}" }
       e1.reload
       e2.reload
       e3.reload
@@ -477,7 +477,7 @@ describe EportfoliosController do
     end
 
     it "includes absolute path for rel='self' link" do
-      get 'public_feed', params: { :eportfolio_id => @portfolio.id }, :format => 'atom'
+      get 'public_feed', params: { eportfolio_id: @portfolio.id }, format: 'atom'
       feed = Atom::Feed.load_feed(response.body) rescue nil
       expect(feed).not_to be_nil
       expect(feed.links.first.rel).to match(/self/)
@@ -485,7 +485,7 @@ describe EportfoliosController do
     end
 
     it "includes an author for each entry" do
-      get 'public_feed', params: { :eportfolio_id => @portfolio.id }, :format => 'atom'
+      get 'public_feed', params: { eportfolio_id: @portfolio.id }, format: 'atom'
       feed = Atom::Feed.load_feed(response.body) rescue nil
       expect(feed).not_to be_nil
       expect(feed.entries).not_to be_empty
@@ -496,7 +496,7 @@ describe EportfoliosController do
   describe "GET 'export'" do
     before(:once) do
       eportfolio
-      @old_zipfile = @portfolio.attachments.build(:display_name => "eportfolio.zip")
+      @old_zipfile = @portfolio.attachments.build(display_name: "eportfolio.zip")
       @old_zipfile.workflow_state = 'to_be_zipped'
       @old_zipfile.file_state = '0'
       @old_zipfile.user = @user
@@ -509,7 +509,7 @@ describe EportfoliosController do
       expect(@old_zipfile.related_attachments.exists?).to be_falsey
 
       user_session(@user)
-      get 'export', params: { :eportfolio_id => @portfolio.id }
+      get 'export', params: { eportfolio_id: @portfolio.id }
 
       @portfolio.reload
       expect(@portfolio.attachments.count).to eq 1
@@ -525,7 +525,7 @@ describe EportfoliosController do
       expect(@old_zipfile.reload.related_attachments.exists?).to be_truthy
 
       user_session(@user)
-      get 'export', params: { :eportfolio_id => @portfolio.id }
+      get 'export', params: { eportfolio_id: @portfolio.id }
 
       @portfolio.reload
       expect(@portfolio.attachments.count).to eq 1

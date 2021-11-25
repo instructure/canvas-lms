@@ -47,7 +47,7 @@ module Importers
           link[:new_value] = "#{context_path}/discussion_topics/#{linked_topic_id}#{link[:query]}"
         end
       when :module_item
-        if (tag_id = context.context_module_tags.where(:migration_id => link[:migration_id]).limit(1).pluck(:id).first)
+        if (tag_id = context.context_module_tags.where(migration_id: link[:migration_id]).limit(1).pluck(:id).first)
           link[:new_value] = "#{context_path}/modules/items/#{tag_id}#{link[:query]}"
         end
       when :object
@@ -118,7 +118,7 @@ module Importers
 
       original_param = query.sub("?", "").split("&").detect { |p| p.include?("module_item_id=") }
       mig_id = original_param.split("=").last
-      tag = context.context_module_tags.where(:migration_id => mig_id).first
+      tag = context.context_module_tags.where(migration_id: mig_id).first
       return query unless tag
 
       new_param = "module_item_id=#{tag.id}"

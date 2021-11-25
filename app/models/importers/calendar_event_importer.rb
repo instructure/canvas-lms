@@ -86,7 +86,7 @@ module Importers
 
       import_migration_attachment_link(
         attachment_url(context, assignment),
-        ERB::Util.h(t('#calendar_event.see_assignment', "See %{assignment_name}", :assignment_name => assignment.title))
+        ERB::Util.h(t('#calendar_event.see_assignment', "See %{assignment_name}", assignment_name: assignment.title))
       )
     end
 
@@ -95,7 +95,7 @@ module Importers
 
       import_migration_attachment_link(
         attachment_url(context, quiz),
-        ERB::Util.h(t('#calendar_event.see_quiz', "See %{quiz_name}", :quiz_name => quiz.title))
+        ERB::Util.h(t('#calendar_event.see_quiz', "See %{quiz_name}", quiz_name: quiz.title))
       )
     end
 
@@ -104,7 +104,7 @@ module Importers
 
       import_migration_attachment_link(
         attachment_url(context, file),
-        ERB::Util.h(t('#calendar_event.see_file', "See %{file_name}", :file_name => file.display_name))
+        ERB::Util.h(t('#calendar_event.see_file', "See %{file_name}", file_name: file.display_name))
       )
     end
 
@@ -124,7 +124,7 @@ module Importers
 
       import_migration_attachment_link(
         attachment_url(context, topic),
-        ERB::Util.h(t('#calendar_event.see_discussion_topic', "See %{discussion_topic_name}", :discussion_topic_name => topic.title))
+        ERB::Util.h(t('#calendar_event.see_discussion_topic', "See %{discussion_topic_name}", discussion_topic_name: topic.title))
       )
     end
 

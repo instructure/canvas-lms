@@ -22,7 +22,7 @@ class AddRootAccountIdToAssignmentsPre < ActiveRecord::Migration[5.1]
   disable_ddl_transaction!
 
   def up
-    fk = connection.send(:foreign_key_name, "assignments", :column => "root_account_id")
+    fk = connection.send(:foreign_key_name, "assignments", column: "root_account_id")
     execute("ALTER TABLE #{Assignment.quoted_table_name} ADD COLUMN root_account_id bigint CONSTRAINT #{fk} REFERENCES #{Account.quoted_table_name}(id)")
   end
 

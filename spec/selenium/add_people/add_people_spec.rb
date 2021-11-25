@@ -28,8 +28,8 @@ describe "add_people" do
     before do
       course_with_teacher_logged_in
       4.times { |i| add_section("Section #{i}") }
-      user_with_pseudonym(:name => "Foo Foo", :active_user => true, :username => "foo", :account => @account)
-      user_with_pseudonym(:name => "Foo Bar", :active_user => true, :username => "bar", :account => @account)
+      user_with_pseudonym(name: "Foo Foo", active_user: true, username: "foo", account: @account)
+      user_with_pseudonym(name: "Foo Bar", active_user: true, username: "bar", account: @account)
     end
 
     # this is one giant test because it has to walk through the panels of a
@@ -113,9 +113,9 @@ describe "add_people" do
 
     it "includes only manageable roles (non-granular)" do
       @course.root_account.disable_feature!(:granular_permissions_manage_users)
-      @course.account.role_overrides.create! :role => teacher_role,
-                                             :permission => :manage_students,
-                                             :enabled => false
+      @course.account.role_overrides.create! role: teacher_role,
+                                             permission: :manage_students,
+                                             enabled: false
       get "/courses/#{@course.id}/users"
       f('#addUsers').click
       expect(INSTUI_Select_options('#peoplesearch_select_role').map(&:text)).not_to include 'Student'
@@ -123,9 +123,9 @@ describe "add_people" do
 
     it "includes only manageable roles (granular)" do
       @course.root_account.enable_feature!(:granular_permissions_manage_users)
-      @course.account.role_overrides.create! :role => teacher_role,
-                                             :permission => :add_student_to_course,
-                                             :enabled => false
+      @course.account.role_overrides.create! role: teacher_role,
+                                             permission: :add_student_to_course,
+                                             enabled: false
       get "/courses/#{@course.id}/users"
       f('#addUsers').click
       expect(INSTUI_Select_options('#peoplesearch_select_role').map(&:text)).not_to include 'Student'

@@ -938,11 +938,11 @@ describe DataFixup::PopulateRootAccountIdOnModels do
                CalendarEvent, { context: :root_account_id }
              )).to eq(
                {
-                 :context_appointment_group => :root_account_id,
-                 :context_course => :root_account_id,
-                 :context_course_section => :root_account_id,
-                 :context_group => :root_account_id,
-                 :context_user => :root_account_id,
+                 context_appointment_group: :root_account_id,
+                 context_course: :root_account_id,
+                 context_course_section: :root_account_id,
+                 context_group: :root_account_id,
+                 context_user: :root_account_id,
                }
              )
     end
@@ -952,8 +952,8 @@ describe DataFixup::PopulateRootAccountIdOnModels do
                ContextExternalTool, { course: :root_account_id, account: :root_account_id }
              )).to eq(
                {
-                 :account => Account.resolved_root_account_id_sql,
-                 :course => :root_account_id
+                 account: Account.resolved_root_account_id_sql,
+                 course: :root_account_id
                }
              )
     end

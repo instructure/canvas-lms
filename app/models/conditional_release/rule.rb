@@ -24,10 +24,10 @@ module ConditionalRelease
     validates :course_id, presence: true
     validates :trigger_assignment_id, presence: true
     validate :trigger_assignment_in_same_course
-    belongs_to :trigger_assignment, :class_name => "Assignment"
+    belongs_to :trigger_assignment, class_name: "Assignment"
 
     belongs_to :course
-    belongs_to :root_account, :class_name => "Account"
+    belongs_to :root_account, class_name: "Account"
     has_many :scoring_ranges, -> { active.order(position: :asc) }, inverse_of: :rule, dependent: :destroy
     has_many :assignment_sets, -> { active }, through: :scoring_ranges
     has_many :assignment_set_associations, -> { active.order(position: :asc) }, through: :scoring_ranges
@@ -84,7 +84,7 @@ module ConditionalRelease
       # i'm only using the cache key currently for this one case but i figure it can be extended to handle caching around all rule data fetching
       RequestCache.cache('conditional_release_is_trigger', assignment) do
         Rails.cache.fetch_with_batched_keys('conditional_release_is_trigger', batch_object: assignment, batched_keys: :conditional_release) do
-          assignment.shard.activate { active.where(:trigger_assignment_id => assignment).exists? }
+          assignment.shard.activate { active.where(trigger_assignment_id: assignment).exists? }
         end
       end
     end

@@ -27,7 +27,7 @@ class LearningOutcomeQuestionResult < ActiveRecord::Base
   simply_versioned
 
   scope :for_associated_asset, lambda { |associated_asset|
-    where(:associated_asset_type => associated_asset.class.to_s, :associated_asset_id => associated_asset.id)
+    where(associated_asset_type: associated_asset.class.to_s, associated_asset_id: associated_asset.id)
   }
 
   delegate :hide_points, to: :learning_outcome_result

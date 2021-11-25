@@ -28,7 +28,7 @@ describe AppCenter::AppApi do
     default_settings['base_url'] = 'http://www.example.com'
     default_settings['apps_index_endpoint'] = '/apps'
     default_settings['token'] = 'ABCDEFG1234567'
-    PluginSetting.create!(:name => api.app_center.id, :settings => default_settings)
+    PluginSetting.create!(name: api.app_center.id, settings: default_settings)
   end
 
   it "finds the app_center plugin" do

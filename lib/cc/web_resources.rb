@@ -33,12 +33,12 @@ module CC
       end
 
       course_folder = Folder.root_folders(@course).first
-      files_with_metadata = { :folders => [], :files => [] }
+      files_with_metadata = { folders: [], files: [] }
       @added_attachments = {}
 
       zipper = ContentZipper.new
       zipper.user = @user
-      zipper.process_folder(course_folder, @zip_file, [CCHelper::WEB_RESOURCES_FOLDER], :exporter => @manifest.exporter) do |file, folder_names|
+      zipper.process_folder(course_folder, @zip_file, [CCHelper::WEB_RESOURCES_FOLDER], exporter: @manifest.exporter) do |file, folder_names|
         next if file.display_name.blank?
 
         if file.is_a? Folder
@@ -85,11 +85,11 @@ module CC
               end
             end
           end
-          res.file(:href => path)
+          res.file(href: path)
         end
       rescue
         title = file.unencoded_filename rescue I18n.t('course_exports.unknown_titles.file', "Unknown file")
-        add_error(I18n.t('course_exports.errors.file', "The file \"%{file_name}\" failed to export", :file_name => title), $!)
+        add_error(I18n.t('course_exports.errors.file', "The file \"%{file_name}\" failed to export", file_name: title), $!)
       end
 
       add_meta_info_for_files(files_with_metadata)
@@ -102,7 +102,7 @@ module CC
     def add_meta_info_for_files(files)
       files_file = File.new(File.join(@canvas_resource_dir, CCHelper::FILES_META), 'w')
       rel_path = files_meta_path
-      document = Builder::XmlMarkup.new(:target => files_file, :indent => 2)
+      document = Builder::XmlMarkup.new(target: files_file, indent: 2)
 
       document.instruct!
       document.fileMeta(
@@ -113,7 +113,7 @@ module CC
         unless files[:folders].empty?
           root_node.folders do |folders_node|
             files[:folders].each do |folder, path|
-              folders_node.folder(:path => path) do |folder_node|
+              folders_node.folder(path: path) do |folder_node|
                 folder_node.locked "true" if folder.locked
                 folder_node.hidden "true" if folder.hidden?
                 folder_node.lock_at CCHelper.ims_datetime(folder.lock_at) if folder.lock_at
@@ -126,14 +126,14 @@ module CC
         unless files[:files].empty?
           root_node.files do |files_node|
             files[:files].each do |file, migration_id|
-              files_node.file(:identifier => migration_id) do |file_node|
+              files_node.file(identifier: migration_id) do |file_node|
                 file_node.locked "true" if file.locked
                 file_node.hidden "true" if file.hidden?
                 file_node.lock_at CCHelper.ims_datetime(file.lock_at) if file.lock_at
                 file_node.unlock_at CCHelper.ims_datetime(file.unlock_at) if file.unlock_at
                 file_node.display_name file.display_name if file.display_name != file.unencoded_filename
                 if file.usage_rights
-                  file_node.usage_rights(:use_justification => file.usage_rights.use_justification) do |node|
+                  file_node.usage_rights(use_justification: file.usage_rights.use_justification) do |node|
                     node.legal_copyright file.usage_rights.legal_copyright if file.usage_rights.legal_copyright.present?
                     node.license file.usage_rights.license if file.usage_rights.license.present?
                   end
@@ -160,7 +160,7 @@ module CC
           :identifier => track_id,
           :href => mt_path
         ) do |res|
-          res.file(:href => mt_path)
+          res.file(href: mt_path)
         end
         tracks[media_file_migration_id] ||= []
         tracks[media_file_migration_id] << {
@@ -173,7 +173,7 @@ module CC
 
     def add_tracks(track_map)
       tracks_file = File.new(File.join(@canvas_resource_dir, CCHelper::MEDIA_TRACKS), 'w')
-      document = Builder::XmlMarkup.new(:target => tracks_file, :indent => 2)
+      document = Builder::XmlMarkup.new(target: tracks_file, indent: 2)
       document.instruct!
       document.media_tracks(
         "xmlns" => CCHelper::CANVAS_NAMESPACE,
@@ -249,7 +249,7 @@ module CC
             :identifier => migration_id,
             :href => path
           ) do |res|
-            res.file(:href => path)
+            res.file(href: path)
           end
         end
 

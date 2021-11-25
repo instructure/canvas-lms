@@ -214,7 +214,7 @@ class Mutations::AssignmentBase < Mutations::BaseMutation
     module_ids_to_add = (required_module_ids - current_module_ids).to_a
     unless module_ids_to_add.empty?
       ContextModule.find(module_ids_to_add).each do |context_module|
-        context_module.add_item(:id => @working_assignment.id, :type => 'assignment')
+        context_module.add_item(id: @working_assignment.id, type: 'assignment')
       end
     end
 

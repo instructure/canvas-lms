@@ -203,25 +203,25 @@ describe 'Provisional Grades API', type: :request do
 
   describe "select" do
     before(:once) do
-      course_with_student :active_all => true
+      course_with_student active_all: true
       @course.account.enable_service(:avatars)
-      ta_in_course :active_all => true
+      ta_in_course active_all: true
       @assignment = @course.assignments.build
       @assignment.grader_count = 1
       @assignment.moderated_grading = true
       @assignment.final_grader_id = @teacher.id
       @assignment.save!
-      subs = @assignment.grade_student @student, :grader => @ta, :score => 0, :provisional => true
+      subs = @assignment.grade_student @student, grader: @ta, score: 0, provisional: true
       @pg = subs.first.provisional_grade(@ta)
       @path = "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/provisional_grades/#{@pg.id}/select"
-      @params = { :controller => 'provisional_grades', :action => 'select',
-                  :format => 'json', :course_id => @course.to_param, :assignment_id => @assignment.to_param,
-                  :provisional_grade_id => @pg.to_param }
+      @params = { controller: 'provisional_grades', action: 'select',
+                  format: 'json', course_id: @course.to_param, assignment_id: @assignment.to_param,
+                  provisional_grade_id: @pg.to_param }
     end
 
     it "fails if the student isn't in the moderation set" do
       @assignment.moderated_grading_selections.destroy_all
-      json = api_call_as_user(@teacher, :put, @path, @params, {}, {}, { :expected_status => 400 })
+      json = api_call_as_user(@teacher, :put, @path, @params, {}, {}, { expected_status: 400 })
       expect(json['message']).to eq 'student not in moderation set'
     end
 
@@ -257,18 +257,18 @@ describe 'Provisional Grades API', type: :request do
 
   describe "publish" do
     before :once do
-      course_with_student :active_all => true
+      course_with_student active_all: true
       @course.account.enable_service(:avatars)
-      course_with_ta :course => @course, :active_all => true
+      course_with_ta course: @course, active_all: true
       @assignment = @course.assignments.create!
       @path = "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/provisional_grades/publish"
-      @params = { :controller => 'provisional_grades', :action => 'publish',
-                  :format => 'json', :course_id => @course.to_param, :assignment_id => @assignment.to_param }
+      @params = { controller: 'provisional_grades', action: 'publish',
+                  format: 'json', course_id: @course.to_param, assignment_id: @assignment.to_param }
     end
 
     it "requires a moderated assignment" do
       @assignment.update_attribute :final_grader_id, @teacher.id
-      json = api_call_as_user(@teacher, :post, @path, @params, {}, {}, { :expected_status => 400 })
+      json = api_call_as_user(@teacher, :post, @path, @params, {}, {}, { expected_status: 400 })
       expect(json['message']).to eq 'Assignment does not use moderated grading'
     end
 
@@ -294,13 +294,13 @@ describe 'Provisional Grades API', type: :request do
 
       it "fails if grades were already published" do
         @assignment.update_attribute :grades_published_at, Time.now.utc
-        json = api_call_as_user(@teacher, :post, @path, @params, {}, {}, { :expected_status => 400 })
+        json = api_call_as_user(@teacher, :post, @path, @params, {}, {}, { expected_status: 400 })
         expect(json['message']).to eq 'Assignment grades have already been published'
       end
 
       context 'with empty provisional grades (comments only)' do
         before(:once) do
-          @submission = @assignment.submit_homework(@student, :body => "hello")
+          @submission = @assignment.submit_homework(@student, body: "hello")
           @submission.add_comment(author: @ta, provisional: true, comment: 'A provisional comment')
           @provisional_grade = @submission.provisional_grades.first
         end
@@ -335,8 +335,8 @@ describe 'Provisional Grades API', type: :request do
 
       context "with provisional grades" do
         before(:once) do
-          @submission = @assignment.submit_homework(@student, :body => "hello")
-          @assignment.grade_student(@student, { :grader => @ta, :score => 100, :provisional => true })
+          @submission = @assignment.submit_homework(@student, body: "hello")
+          @assignment.grade_student(@student, { grader: @ta, score: 100, provisional: true })
         end
 
         it "publishes provisional grades" do
@@ -359,9 +359,9 @@ describe 'Provisional Grades API', type: :request do
 
           sel = @assignment.moderated_grading_selections.find_by(student: @student)
 
-          @other_ta = user_factory :active_user => true
-          @course.enroll_ta @other_ta, :enrollment_state => 'active'
-          @assignment.grade_student(@student, { :grader => @other_ta, :score => 90, :provisional => true })
+          @other_ta = user_factory active_user: true
+          @course.enroll_ta @other_ta, enrollment_state: 'active'
+          @assignment.grade_student(@student, { grader: @other_ta, score: 90, provisional: true })
 
           sel.selected_provisional_grade_id = @submission.provisional_grade(@other_ta).id
           sel.save!

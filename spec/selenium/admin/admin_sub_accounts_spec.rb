@@ -26,7 +26,7 @@ describe "admin sub accounts" do
   def create_sub_account(name = 'sub account', number_to_create = 1, parent_account = Account.default)
     created_sub_accounts = []
     number_to_create.times do |i|
-      sub_account = Account.create(:name => name + " #{i}", :parent_account => parent_account)
+      sub_account = Account.create(name: name + " #{i}", parent_account: parent_account)
       created_sub_accounts.push(sub_account)
     end
     created_sub_accounts.count == 1 ? created_sub_accounts[0] : created_sub_accounts
@@ -136,7 +136,7 @@ describe "admin sub accounts" do
 
     validate_course_count(default_account_id, '1 Course') # make sure default account was setup correctly
     sub_account = create_sub_account('add courses to me')
-    added_courses_count.times { Course.create!(:account => sub_account) }
+    added_courses_count.times { Course.create!(account: sub_account) }
     refresh_page # to make new account with courses show up
     validate_course_count(sub_account.id, '3 Courses')
   end

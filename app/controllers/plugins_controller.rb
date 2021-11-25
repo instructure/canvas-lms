@@ -32,7 +32,7 @@ class PluginsController < ApplicationController
       end
       @settings = @plugin.settings
     else
-      flash[:notice] = t('errors.plugin_doesnt_exist', "The plugin %{id} doesn't exist.", :id => params[:id])
+      flash[:notice] = t('errors.plugin_doesnt_exist', "The plugin %{id} doesn't exist.", id: params[:id])
       redirect_to plugins_path
     end
   end
@@ -50,7 +50,7 @@ class PluginsController < ApplicationController
         render :show
       end
     else
-      flash[:error] = t('errors.plugin_doesnt_exist', "The plugin %{id} doesn't exist.", :id => params[:id])
+      flash[:error] = t('errors.plugin_doesnt_exist', "The plugin %{id} doesn't exist.", id: params[:id])
       redirect_to plugins_path
     end
   end
@@ -60,7 +60,7 @@ class PluginsController < ApplicationController
   def find_plugin_setting
     if (@plugin = Canvas::Plugin.find(params[:id]))
       @plugin_setting = PluginSetting.find_by_name(@plugin.id)
-      @plugin_setting ||= PluginSetting.new(:name => @plugin.id, :settings => @plugin.default_settings) { |ps| ps.disabled = true }
+      @plugin_setting ||= PluginSetting.new(name: @plugin.id, settings: @plugin.default_settings) { |ps| ps.disabled = true }
       true
     else
       false

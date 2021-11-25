@@ -46,7 +46,7 @@ module Lti
         [TOOL_PROXY_COLLECTION, TOOL_PROXY_ITEM]
       end
 
-      before_action :require_context, :except => [:show]
+      before_action :require_context, except: [:show]
       skip_before_action :load_user, only: %i[create show re_reg]
 
       rescue_from Lti::Errors::InvalidToolProxyError, ::IMS::LTI::Errors::InvalidToolConsumerProfile do |exception|

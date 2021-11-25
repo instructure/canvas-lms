@@ -24,7 +24,7 @@ class SearchController < ApplicationController
   include SearchHelper
   include Api::V1::Conversation
 
-  before_action :require_user, :except => [:all_courses]
+  before_action :require_user, except: [:all_courses]
   before_action :get_context, except: :recipients
 
   def rubrics
@@ -43,7 +43,7 @@ class SearchController < ApplicationController
     end
     res += Rubric.publicly_reusable.matching(params[:q])
     res = res.select { |r| r.title.downcase.match(params[:q].downcase) }
-    render :json => res
+    render json: res
   end
 
   # @API Find recipients
@@ -128,7 +128,7 @@ class SearchController < ApplicationController
 
       permissions = params[:permissions] || []
       permissions << :send_messages if params[:messageable_only]
-      load_all_contexts :context => search_context, :permissions => permissions
+      load_all_contexts context: search_context, permissions: permissions
 
       params[:per_page] = nil if params[:per_page].to_i <= 0
 
@@ -147,7 +147,7 @@ class SearchController < ApplicationController
         recipients = Api.paginate(recipients, self, api_v1_search_recipients_url)
       end
 
-      render :json => conversation_recipients_json(recipients, @current_user, session)
+      render json: conversation_recipients_json(recipients, @current_user, session)
     end
   end
 
@@ -191,7 +191,7 @@ class SearchController < ApplicationController
     @courses = ret[:collection]
 
     if request.format == :json
-      return render :json => @courses.as_json
+      return render json: @courses.as_json
     end
 
     @prevPage = ret[:hash][:prev]
@@ -200,7 +200,7 @@ class SearchController < ApplicationController
 
     if request.xhr?
       set_no_cache_headers
-      render :html => @contentHTML
+      render html: @contentHTML
     end
   end
 end

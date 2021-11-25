@@ -95,7 +95,7 @@ module Api::V1::Attachment
       if options[:thumbnail_url]
         url = thumbnail_url
       else
-        h = { :download => '1', :download_frd => '1' }
+        h = { download: '1', download_frd: '1' }
         h[:verifier] = attachment.uuid unless options[:omit_verifier_in_app] && ((respond_to?(:in_app?, true) && in_app?) || @authenticated_with_jwt)
         url = file_download_url(attachment, h.merge(url_options))
       end
@@ -415,7 +415,7 @@ module Api::V1::Attachment
 
   def api_attachment_preflight_json(context, request, opts = {})
     opts[:return_json] = true
-    { :attachments => [api_attachment_preflight(context, request, opts)] }
+    { attachments: [api_attachment_preflight(context, request, opts)] }
   end
 
   def check_quota_after_attachment

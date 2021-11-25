@@ -27,19 +27,19 @@ describe "/eportfolios/_section_list" do
 
   it "renders" do
     view_portfolio
-    category = assign(:category, @portfolio.eportfolio_categories.create!(:name => "some category"))
+    category = assign(:category, @portfolio.eportfolio_categories.create!(name: "some category"))
     assign(:categories, [category])
-    assign(:page, @portfolio.eportfolio_entries.create!(:name => "some entry", :eportfolio_category => category))
-    render :partial => "eportfolios/section_list"
+    assign(:page, @portfolio.eportfolio_entries.create!(name: "some entry", eportfolio_category: category))
+    render partial: "eportfolios/section_list"
     expect(response).to have_tag("ul#section_list")
   end
 
   it "renders even with a blank category slug" do
     view_portfolio
-    category = assign(:category, @portfolio.eportfolio_categories.create!(:name => "+++"))
+    category = assign(:category, @portfolio.eportfolio_categories.create!(name: "+++"))
     assign(:categories, [category])
-    assign(:page, @portfolio.eportfolio_entries.create!(:name => "some entry", :eportfolio_category => category))
-    render :partial => "eportfolios/section_list"
+    assign(:page, @portfolio.eportfolio_entries.create!(name: "some entry", eportfolio_category: category))
+    render partial: "eportfolios/section_list"
     expect(response).to have_tag("ul#section_list")
   end
 end

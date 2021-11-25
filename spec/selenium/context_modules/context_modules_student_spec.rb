@@ -40,21 +40,21 @@ describe "context modules" do
 
       # initial module setup
       @module_1 = create_context_module('Module One')
-      @assignment_1 = @course.assignments.create!(:title => "assignment 1")
-      @tag_1 = @module_1.add_item({ :id => @assignment_1.id, :type => 'assignment' })
-      @module_1.completion_requirements = { @tag_1.id => { :type => 'must_view' } }
+      @assignment_1 = @course.assignments.create!(title: "assignment 1")
+      @tag_1 = @module_1.add_item({ id: @assignment_1.id, type: 'assignment' })
+      @module_1.completion_requirements = { @tag_1.id => { type: 'must_view' } }
 
       @module_2 = create_context_module('Module Two')
-      @assignment_2 = @course.assignments.create!(:title => "assignment 2")
-      @tag_2 = @module_2.add_item({ :id => @assignment_2.id, :type => 'assignment' })
-      @module_2.completion_requirements = { @tag_2.id => { :type => 'must_view' } }
+      @assignment_2 = @course.assignments.create!(title: "assignment 2")
+      @tag_2 = @module_2.add_item({ id: @assignment_2.id, type: 'assignment' })
+      @module_2.completion_requirements = { @tag_2.id => { type: 'must_view' } }
       @module_2.prerequisites = "module_#{@module_1.id}"
 
       @module_3 = create_context_module('Module Three')
-      @quiz_1 = @course.quizzes.create!(:title => "some quiz")
+      @quiz_1 = @course.quizzes.create!(title: "some quiz")
       @quiz_1.publish!
-      @tag_3 = @module_3.add_item({ :id => @quiz_1.id, :type => 'quiz' })
-      @module_3.completion_requirements = { @tag_3.id => { :type => 'must_view' } }
+      @tag_3 = @module_3.add_item({ id: @quiz_1.id, type: 'quiz' })
+      @module_3.completion_requirements = { @tag_3.id => { type: 'must_view' } }
       @module_3.prerequisites = "module_#{@module_2.id}"
 
       @module_1.save!
@@ -82,7 +82,7 @@ describe "context modules" do
     end
 
     it "does not lock modules for observers" do
-      @course.enroll_user(user_factory, 'ObserverEnrollment', :enrollment_state => 'active', :associated_user_id => @student.id)
+      @course.enroll_user(user_factory, 'ObserverEnrollment', enrollment_state: 'active', associated_user_id: @student.id)
       user_session(@user)
 
       go_to_modules
@@ -99,7 +99,7 @@ describe "context modules" do
     end
 
     it "shows overridden due dates for assignments" do
-      override = assignment_override_model(:assignment => @assignment_2)
+      override = assignment_override_model(assignment: @assignment_2)
       override.override_due_at(4.days.from_now)
       override.save!
       override_student = override.assignment_override_students.build
@@ -123,9 +123,9 @@ describe "context modules" do
     end
 
     it "does not cache a changed module requirement" do
-      other_assmt = @course.assignments.create!(:title => "assignment")
-      other_tag = @module_1.add_item({ :id => other_assmt.id, :type => 'assignment' })
-      @module_1.completion_requirements = { @tag_1.id => { :type => 'must_view' }, other_tag.id => { :type => 'must_view' } }
+      other_assmt = @course.assignments.create!(title: "assignment")
+      other_tag = @module_1.add_item({ id: other_assmt.id, type: 'assignment' })
+      @module_1.completion_requirements = { @tag_1.id => { type: 'must_view' }, other_tag.id => { type: 'must_view' } }
       @module_1.save!
 
       get "/courses/#{@course.id}/assignments/#{@assignment_1.id}"
@@ -135,7 +135,7 @@ describe "context modules" do
       validate_context_module_item_icon(@tag_1.id, @completed_icon)
 
       # change the req
-      @module_1.completion_requirements = { @tag_1.id => { :type => 'must_submit' }, other_tag.id => { :type => 'must_view' } }
+      @module_1.completion_requirements = { @tag_1.id => { type: 'must_submit' }, other_tag.id => { type: 'must_view' } }
       @module_1.save!
 
       go_to_modules
@@ -159,13 +159,13 @@ describe "context modules" do
     end
 
     it "validates that a student can't get to locked external items", priority: "1" do
-      external_tool = @course.context_external_tools.create!(:url => "http://example.com/ims/lti",
-                                                             :consumer_key => "asdf", :shared_secret => "hjkl", :name => "external tool")
+      external_tool = @course.context_external_tools.create!(url: "http://example.com/ims/lti",
+                                                             consumer_key: "asdf", shared_secret: "hjkl", name: "external tool")
 
       @module_2.reload
-      tag_1 = @module_2.add_item(:id => external_tool.id, :type => "external_tool", :url => external_tool.url)
-      tag_2 = @module_2.add_item(:type => 'external_url', :url => 'http://example.com/lolcats',
-                                 :title => 'pls view', :indent => 1)
+      tag_1 = @module_2.add_item(id: external_tool.id, type: "external_tool", url: external_tool.url)
+      tag_2 = @module_2.add_item(type: 'external_url', url: 'http://example.com/lolcats',
+                                 title: 'pls view', indent: 1)
 
       tag_1.publish!
       tag_2.publish!
@@ -192,13 +192,13 @@ describe "context modules" do
       @assignment_2.workflow_state = 'unpublished'
       @assignment_2.save!
 
-      module1_unpublished_tag = @module_1.add_item({ :id => @assignment_2.id, :type => 'assignment' })
-      @module_1.completion_requirements = { @tag_1.id => { :type => 'must_view' }, module1_unpublished_tag.id => { :type => 'must_view' } }
+      module1_unpublished_tag = @module_1.add_item({ id: @assignment_2.id, type: 'assignment' })
+      @module_1.completion_requirements = { @tag_1.id => { type: 'must_view' }, module1_unpublished_tag.id => { type: 'must_view' } }
       @module_1.save!
       expect(@module_1.completion_requirements.pluck(:id)).to include(@tag_1.id)
       expect(@module_1.completion_requirements.pluck(:id)).to include(module1_unpublished_tag.id) # unpublished requirements SHOULD remain
 
-      module2_published_tag = @module_2.add_item({ :id => @quiz_1.id, :type => 'quiz' })
+      module2_published_tag = @module_2.add_item({ id: @quiz_1.id, type: 'quiz' })
       @module_2.save!
 
       go_to_modules
@@ -321,12 +321,12 @@ describe "context modules" do
 
     describe "sequence footer" do
       it "shows the right nav when an item is in modules multiple times" do
-        @assignment = @course.assignments.create!(:title => "some assignment")
-        @atag1 = @module_1.add_item(:id => @assignment.id, :type => "assignment")
-        @after1 = @module_1.add_item(:type => "external_url", :title => "url1", :url => "http://example.com/1")
+        @assignment = @course.assignments.create!(title: "some assignment")
+        @atag1 = @module_1.add_item(id: @assignment.id, type: "assignment")
+        @after1 = @module_1.add_item(type: "external_url", title: "url1", url: "http://example.com/1")
         @after1.publish!
-        @atag2 = @module_2.add_item(:id => @assignment.id, :type => "assignment")
-        @after2 = @module_2.add_item(:type => "external_url", :title => "url2", :url => "http://example.com/2")
+        @atag2 = @module_2.add_item(id: @assignment.id, type: "assignment")
+        @after2 = @module_2.add_item(type: "external_url", title: "url2", url: "http://example.com/2")
         @after2.publish!
         get "/courses/#{@course.id}/modules/items/#{@atag1.id}"
         prev = f('.module-sequence-footer-button--previous a')
@@ -348,9 +348,9 @@ describe "context modules" do
       end
 
       it "shows the nav when going straight to the item if there's only one tag" do
-        @assignment = @course.assignments.create!(:title => "some assignment")
-        @atag1 = @module_1.add_item(:id => @assignment.id, :type => "assignment")
-        @after1 = @module_1.add_item(:type => "external_url", :title => "url1", :url => "http://example.com/1")
+        @assignment = @course.assignments.create!(title: "some assignment")
+        @atag1 = @module_1.add_item(id: @assignment.id, type: "assignment")
+        @after1 = @module_1.add_item(type: "external_url", title: "url1", url: "http://example.com/1")
         @after1.publish!
         get "/courses/#{@course.id}/assignments/#{@assignment.id}"
         prev = f('.module-sequence-footer-button--previous a')
@@ -382,12 +382,12 @@ describe "context modules" do
 
       it "still shows the mark done button when navigating directly" do
         mod = create_context_module('Mark Done Module')
-        page = @course.wiki_pages.create!(:title => "page", :body => 'hi')
-        assmt = @course.assignments.create!(:title => "assmt")
+        page = @course.wiki_pages.create!(title: "page", body: 'hi')
+        assmt = @course.assignments.create!(title: "assmt")
 
-        tag1 = mod.add_item({ :id => page.id, :type => 'wiki_page' })
-        tag2 = mod.add_item({ :id => assmt.id, :type => 'assignment' })
-        mod.completion_requirements = { tag1.id => { :type => 'must_mark_done' }, tag2.id => { :type => 'must_mark_done' } }
+        tag1 = mod.add_item({ id: page.id, type: 'wiki_page' })
+        tag2 = mod.add_item({ id: assmt.id, type: 'assignment' })
+        mod.completion_requirements = { tag1.id => { type: 'must_mark_done' }, tag2.id => { type: 'must_mark_done' } }
         mod.save!
 
         get "/courses/#{@course.id}/pages/#{page.url}"
@@ -410,13 +410,13 @@ describe "context modules" do
 
       it "doesn'ts show the mark done button on locked pages" do
         mod = create_context_module('Mark Done Module')
-        assmt = @course.assignments.create!(:title => "assmt")
-        page = @course.wiki_pages.create!(:title => "page", :body => 'hi')
+        assmt = @course.assignments.create!(title: "assmt")
+        page = @course.wiki_pages.create!(title: "page", body: 'hi')
 
-        tag1 = mod.add_item({ :id => assmt.id, :type => 'assignment' })
-        tag2 = mod.add_item({ :id => page.id, :type => 'wiki_page' })
+        tag1 = mod.add_item({ id: assmt.id, type: 'assignment' })
+        tag2 = mod.add_item({ id: page.id, type: 'wiki_page' })
 
-        mod.completion_requirements = { tag1.id => { :type => 'must_mark_done' }, tag2.id => { :type => 'must_mark_done' } }
+        mod.completion_requirements = { tag1.id => { type: 'must_mark_done' }, tag2.id => { type: 'must_mark_done' } }
         mod.require_sequential_progress = true
         mod.save!
 
@@ -544,13 +544,13 @@ describe "context modules" do
 
       it "shows incomplete for differentiated assignments" do
         @course.course_sections.create!
-        assignment = @course.assignments.create!(:title => "assignmentt")
+        assignment = @course.assignments.create!(title: "assignmentt")
         create_section_override_for_assignment(assignment)
         assignment.only_visible_to_overrides = true
         assignment.save!
 
-        tag = @module_1.add_item({ :id => assignment.id, :type => 'assignment' })
-        @module_1.completion_requirements = { tag.id => { :type => 'min_score', :min_score => 90 } }
+        tag = @module_1.add_item({ id: assignment.id, type: 'assignment' })
+        @module_1.completion_requirements = { tag.id => { type: 'min_score', min_score: 90 } }
         @module_1.require_sequential_progress = false
         @module_1.save!
 
@@ -589,7 +589,7 @@ describe "context modules" do
         it "shows an info icon when module item is a min score requirement that has not yet been graded" do
           @assignment_4.submission_types = 'online_text_entry'
           @assignment_4.save!
-          @assignment_4.submit_homework(@user, :body => "body")
+          @assignment_4.submit_homework(@user, body: "body")
           go_to_modules
           validate_context_module_item_icon(@tag_4.id, 'icon-info')
         end

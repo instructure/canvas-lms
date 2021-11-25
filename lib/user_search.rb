@@ -47,7 +47,7 @@ module UserSearch
 
     def like_string_for(search_term)
       pattern_type = (gist_search_enabled? ? :full : :right)
-      wildcard_pattern(search_term, :type => pattern_type, :case_sensitive => false)
+      wildcard_pattern(search_term, type: pattern_type, case_sensitive: false)
     end
 
     def like_condition(value)
@@ -138,9 +138,9 @@ module UserSearch
           users_scope = users_scope.where("EXISTS (?)", Enrollment.where("enrollments.user_id=users.id").active.where(type: enrollment_types)).distinct
         else
           if context.is_a?(Group) && context.context_type == "Course"
-            users_scope = users_scope.joins(:enrollments).where(:enrollments => { :course_id => context.context_id })
+            users_scope = users_scope.joins(:enrollments).where(enrollments: { course_id: context.context_id })
           end
-          users_scope = users_scope.where(:enrollments => { :type => enrollment_types })
+          users_scope = users_scope.where(enrollments: { type: enrollment_types })
         end
       end
 

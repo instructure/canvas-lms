@@ -30,7 +30,7 @@ module CC::Importer::Standard
         resource_dir = File.dirname(path) if path
         next unless (doc = get_node_or_open_file(res, TOPIC_NODE))
 
-        topic = { :migration_id => res[:migration_id] }
+        topic = { migration_id: res[:migration_id] }
         topic[:description] = get_node_val(doc, 'text')
         topic[:description] = replace_urls(topic[:description])
         topic[:title] = get_node_val(doc, 'title')

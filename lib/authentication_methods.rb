@@ -221,7 +221,7 @@ module AuthenticationMethods
       if params[:login_success] == '1' && !@current_pseudonym
         # they just logged in successfully, but we can't find the pseudonym now?
         # sounds like somebody hates cookies.
-        return redirect_to(login_url(:needs_cookies => '1'))
+        return redirect_to(login_url(needs_cookies: '1'))
       end
 
       @current_user = @current_pseudonym&.user
@@ -281,7 +281,7 @@ module AuthenticationMethods
         if @current_user != user
           # if we're already masquerading from an access token, and now try to
           # masquerade as someone else
-          render :json => { :errors => "Cannot change masquerade" }, :status => :unauthorized
+          render json: { errors: "Cannot change masquerade" }, status: :unauthorized
           return false
           # else: they do match, everything is already set
         end
@@ -387,7 +387,7 @@ module AuthenticationMethods
     else
       render json: {
         status: I18n.t('lib.auth.status_unauthenticated', 'unauthenticated'),
-        errors: [{ :message => I18n.t('lib.auth.authentication_required', "user authorization required") }]
+        errors: [{ message: I18n.t('lib.auth.authentication_required', "user authorization required") }]
       },
              status: :unauthorized
     end

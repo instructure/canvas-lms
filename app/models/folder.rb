@@ -38,14 +38,14 @@ class Folder < ActiveRecord::Base
 
   belongs_to :context, polymorphic: %i[user group account course], optional: false
   belongs_to :cloned_item
-  belongs_to :parent_folder, :class_name => "Folder"
-  has_many :file_attachments, :class_name => "Attachment"
+  belongs_to :parent_folder, class_name: "Folder"
+  has_many :file_attachments, class_name: "Attachment"
   has_many :active_file_attachments, -> { where("attachments.file_state<>'deleted'") }, class_name: 'Attachment'
   has_many :visible_file_attachments, -> { where(file_state: ['available', 'public']) }, class_name: 'Attachment'
-  has_many :sub_folders, :class_name => "Folder", :foreign_key => "parent_folder_id", :dependent => :destroy
+  has_many :sub_folders, class_name: "Folder", foreign_key: "parent_folder_id", dependent: :destroy
   has_many :active_sub_folders, -> { where("folders.workflow_state<>'deleted'") }, class_name: "Folder", foreign_key: "parent_folder_id", dependent: :destroy
 
-  acts_as_list :scope => :parent_folder
+  acts_as_list scope: :parent_folder
 
   before_create :populate_root_account_id
   before_save :infer_full_name
@@ -54,8 +54,8 @@ class Folder < ActiveRecord::Base
   after_save :touch_context
   before_save :infer_hidden_state
   validates :context_id, :context_type, presence: true
-  validates :name, length: { :maximum => maximum_string_length }
-  validate :protect_root_folder_name, :if => :name_changed?
+  validates :name, length: { maximum: maximum_string_length }
+  validate :protect_root_folder_name, if: :name_changed?
   validate :reject_recursive_folder_structures, on: :update
   validate :restrict_submission_folder_context
   after_commit :clear_permissions_cache, if: -> { %i[workflow_state parent_folder_id locked lock_at unlock_at].any? { |k| saved_changes.key?(k) } }
@@ -270,7 +270,7 @@ class Folder < ActiveRecord::Base
 
   def clone_for(context, dup = nil, options = {})
     if !cloned_item && !new_record?
-      self.cloned_item ||= ClonedItem.create(:original_item => self)
+      self.cloned_item ||= ClonedItem.create(original_item: self)
       save!
     end
     existing = context.folders.active.where(id: self).first
@@ -282,7 +282,7 @@ class Folder < ActiveRecord::Base
     attributes.except("id", "full_name", "parent_folder_id").each do |key, val|
       dup.send("#{key}=", val)
     end
-    if unique_type && context.folders.active.where(:unique_type => unique_type).exists?
+    if unique_type && context.folders.active.where(unique_type: unique_type).exists?
       dup.unique_type = nil # we'll just copy the folder as a normal one and leave the existing unique_type'd one alone
     end
     dup.context = context
@@ -332,7 +332,7 @@ class Folder < ActiveRecord::Base
     context.shard.activate do
       Folder.unique_constraint_retry do
         root_folder = context.folders.active.where(parent_folder_id: nil, name: name).first
-        root_folder ||= GuardRail.activate(:primary) { context.folders.create!(:name => name, :full_name => name, :workflow_state => "visible") }
+        root_folder ||= GuardRail.activate(:primary) { context.folders.create!(name: name, full_name: name, workflow_state: "visible") }
         root_folders = [root_folder]
       end
     end
@@ -365,7 +365,7 @@ class Folder < ActiveRecord::Base
 
   def self.is_locked?(folder_id)
     RequestCache.cache('folder_is_locked', folder_id) do
-      folder = Folder.where(:id => folder_id).first
+      folder = Folder.where(id: folder_id).first
       folder&.locked?
     end
   end
@@ -409,7 +409,7 @@ class Folder < ActiveRecord::Base
   def self.unfiled_folder(context)
     folder = context.folders.where(parent_folder_id: Folder.root_folders(context).first, workflow_state: 'visible', name: 'unfiled').first
     unless folder
-      folder = context.folders.build(:parent_folder => Folder.root_folders(context).first, :name => 'unfiled')
+      folder = context.folders.build(parent_folder: Folder.root_folders(context).first, name: 'unfiled')
       folder.workflow_state = 'visible'
       folder.save!
     end

@@ -21,5 +21,5 @@ if ENV['RAILS_DATABASE_ENVIRONMENT']
   GuardRail.activate!(ENV['RAILS_DATABASE_ENVIRONMENT'].to_sym)
 end
 if ENV['RAILS_DATABASE_USER']
-  GuardRail.apply_config!(:username => ENV['RAILS_DATABASE_USER'], :password => nil)
+  GuardRail.apply_config!(username: ENV['RAILS_DATABASE_USER'], password: nil)
 end

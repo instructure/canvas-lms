@@ -29,14 +29,14 @@ module CC
         title = assignment.title || I18n.t('course_exports.unknown_titles.assignment', "Unknown assignment")
 
         unless assignment.can_copy?(@user)
-          add_error(I18n.t('course_exports.errors.assignment_is_locked', "The assignment \"%{title}\" could not be copied because it is locked.", :title => title))
+          add_error(I18n.t('course_exports.errors.assignment_is_locked', "The assignment \"%{title}\" could not be copied because it is locked.", title: title))
           next
         end
 
         begin
           add_assignment(assignment)
         rescue
-          add_error(I18n.t('course_exports.errors.assignment', "The assignment \"%{title}\" failed to export", :title => title), $!)
+          add_error(I18n.t('course_exports.errors.assignment', "The assignment \"%{title}\" failed to export", title: title), $!)
         end
       end
     end
@@ -74,7 +74,7 @@ module CC
 
     def add_cc_assignment(assignment, migration_id, lo_folder, html_path)
       File.open(File.join(lo_folder, CCHelper::ASSIGNMENT_XML), 'w') do |assignment_file|
-        document = Builder::XmlMarkup.new(:target => assignment_file, :indent => 2)
+        document = Builder::XmlMarkup.new(target: assignment_file, indent: 2)
         document.instruct!
 
         document.assignment("identifier" => migration_id,
@@ -86,25 +86,25 @@ module CC
       end
 
       xml_path = File.join(migration_id, CCHelper::ASSIGNMENT_XML)
-      @resources.resource(:identifier => migration_id,
-                          :type => CCHelper::ASSIGNMENT_TYPE,
-                          :href => xml_path) do |res|
-        res.file(:href => xml_path)
+      @resources.resource(identifier: migration_id,
+                          type: CCHelper::ASSIGNMENT_TYPE,
+                          href: xml_path) do |res|
+        res.file(href: xml_path)
       end
 
-      @resources.resource(:identifier => migration_id + "_fallback",
-                          :type => CCHelper::WEBCONTENT) do |res|
-        res.tag!('cpx:variant', :identifier => migration_id + "_variant",
-                                :identifierref => migration_id) do |var|
+      @resources.resource(identifier: migration_id + "_fallback",
+                          type: CCHelper::WEBCONTENT) do |res|
+        res.tag!('cpx:variant', identifier: migration_id + "_variant",
+                                identifierref: migration_id) do |var|
           var.tag!('cpx:metadata')
         end
-        res.file(:href => html_path)
+        res.file(href: html_path)
       end
     end
 
     def add_canvas_assignment(assignment, migration_id, lo_folder, html_path)
       assignment_file = File.new(File.join(lo_folder, CCHelper::ASSIGNMENT_SETTINGS), 'w')
-      document = Builder::XmlMarkup.new(:target => assignment_file, :indent => 2)
+      document = Builder::XmlMarkup.new(target: assignment_file, indent: 2)
       document.instruct!
 
       # Save all the meta-data into a canvas-specific xml schema
@@ -121,8 +121,8 @@ module CC
         "type" => CCHelper::LOR,
         :href => html_path
       ) do |res|
-        res.file(:href => html_path)
-        res.file(:href => File.join(migration_id, CCHelper::ASSIGNMENT_SETTINGS))
+        res.file(href: html_path)
+        res.file(href: File.join(migration_id, CCHelper::ASSIGNMENT_SETTINGS))
       end
     end
 
@@ -143,7 +143,7 @@ module CC
       node.submission_formats do |fmt|
         assignment.submission_types.split(',').each do |st|
           if (cc_type = SUBMISSION_TYPE_MAP[st])
-            fmt.format(:type => cc_type)
+            fmt.format(type: cc_type)
           end
         end
       end
@@ -217,7 +217,7 @@ module CC
           node.saved_rubric_comments do |sc_node|
             assoc.summary_data[:saved_comments].each_pair do |key, vals|
               vals.each do |val|
-                sc_node.comment(:criterion_id => key) { |a| a << val }
+                sc_node.comment(criterion_id: key) { |a| a << val }
               end
             end
           end

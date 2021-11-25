@@ -36,7 +36,7 @@ describe "Wiki Pages" do
 
     before do
       account_model
-      course_with_teacher_logged_in :account => @account
+      course_with_teacher_logged_in account: @account
     end
 
     it "navigates to pages tab with no front page set", priority: "1" do
@@ -83,7 +83,7 @@ describe "Wiki Pages" do
     end
 
     it "navigates to the wiki pages edit page from the show page" do
-      wiki_page = @course.wiki_pages.create!(:title => "Foo")
+      wiki_page = @course.wiki_pages.create!(title: "Foo")
       edit_url = edit_course_wiki_page_url(@course, wiki_page)
       get course_wiki_page_path(@course, wiki_page)
 
@@ -219,7 +219,7 @@ describe "Wiki Pages" do
     end
 
     it "does not show the show all pages link if the pages tab is disabled" do
-      @course.tab_configuration = [{ :id => Course::TAB_PAGES, :hidden => true }]
+      @course.tab_configuration = [{ id: Course::TAB_PAGES, hidden: true }]
       @course.save!
 
       @course.wiki_pages.create! title: 'foo'
@@ -235,14 +235,14 @@ describe "Wiki Pages" do
     end
 
     it "displays public content to unregistered users", priority: "1" do
-      Canvas::Plugin.register(:kaltura, nil, :settings => { 'partner_id' => 1, 'subpartner_id' => 2, 'kaltura_sis' => '1' })
+      Canvas::Plugin.register(:kaltura, nil, settings: { 'partner_id' => 1, 'subpartner_id' => 2, 'kaltura_sis' => '1' })
 
       @course.is_public = true
       @course.workflow_state = 'available'
       @course.save!
 
       title = "foo"
-      @course.wiki_pages.create!(:title => title, :body => "bar")
+      @course.wiki_pages.create!(title: title, body: "bar")
 
       get "/courses/#{@course.id}/pages/#{title}"
       expect(f('#wiki_page_show')).not_to be_nil
@@ -252,8 +252,8 @@ describe "Wiki Pages" do
   context "menu tools" do
     before do
       course_with_teacher_logged_in
-      @tool = Account.default.context_external_tools.new(:name => "a", :domain => "google.com", :consumer_key => '12345', :shared_secret => 'secret')
-      @tool.wiki_page_menu = { :url => "http://www.example.com", :text => "Export Wiki Page" }
+      @tool = Account.default.context_external_tools.new(name: "a", domain: "google.com", consumer_key: '12345', shared_secret: 'secret')
+      @tool.wiki_page_menu = { url: "http://www.example.com", text: "Export Wiki Page" }
       @tool.save!
 
       @course.wiki.set_front_page_url!('front-page')
@@ -293,7 +293,7 @@ describe "Wiki Pages" do
     it "displays wiki content", priority: "1" do
       @coures = public_course
       title = "foo"
-      public_course.wiki_pages.create!(:title => title, :body => "bar")
+      public_course.wiki_pages.create!(title: title, body: "bar")
 
       get "/courses/#{public_course.id}/wiki/#{title}"
       expect(f('.user_content')).not_to be_nil
@@ -302,7 +302,7 @@ describe "Wiki Pages" do
 
   context "embed video in a Page" do
     before do
-      course_with_teacher_logged_in :account => @account, :active_all => true
+      course_with_teacher_logged_in account: @account, active_all: true
       @course.wiki_pages.create!(title: 'Page1')
     end
 

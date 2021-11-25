@@ -38,9 +38,9 @@ describe Collaboration do
         )
         tool.url = "http://www.example.com/basic_lti"
         tool.collaboration = {
-          :url => "http://#{HostUrl.default_host}/selection_test",
-          :selection_width => 400,
-          :selection_height => 400
+          url: "http://#{HostUrl.default_host}/selection_test",
+          selection_width: 400,
+          selection_height: 400
         }
         tool.save!
         expect(Collaboration.any_collaborations_configured?(context)).to eq true
@@ -49,7 +49,7 @@ describe Collaboration do
 
     it "allows google docs collaborations" do
       expect(Collaboration.collaboration_class('GoogleDocs')).to eql(nil)
-      plugin_setting = PluginSetting.new(:name => "google_drive", :settings => {})
+      plugin_setting = PluginSetting.new(name: "google_drive", settings: {})
       plugin_setting.save!
       expect(Collaboration.collaboration_class('GoogleDocs')).to eql(GoogleDocsCollaboration)
       plugin_setting.disabled = true
@@ -59,7 +59,7 @@ describe Collaboration do
 
     it "allows etherpad collaborations" do
       expect(Collaboration.collaboration_class('Etherpad')).to eql(nil)
-      plugin_setting = PluginSetting.new(:name => "etherpad", :settings => {})
+      plugin_setting = PluginSetting.new(name: "etherpad", settings: {})
       plugin_setting.save!
       expect(Collaboration.collaboration_class('Etherpad')).to eql(EtherpadCollaboration)
       plugin_setting.disabled = true
@@ -89,15 +89,15 @@ describe Collaboration do
 
   context "a collaboration with collaborators" do
     before :once do
-      PluginSetting.create!(:name => "etherpad", :settings => {})
-      @other_user = user_with_pseudonym(:active_all => true)
-      @users = (1..4).map { user_with_pseudonym(:active_all => true) }
-      course_factory(:active_all => true)
+      PluginSetting.create!(name: "etherpad", settings: {})
+      @other_user = user_with_pseudonym(active_all: true)
+      @users = (1..4).map { user_with_pseudonym(active_all: true) }
+      course_factory(active_all: true)
       @users.each { |u| @course.enroll_student(u) }
-      @groups = [group_model(:context => @course)]
+      @groups = [group_model(context: @course)]
       @groups.first.add_user(@users.last, 'active')
-      @collaboration = @course.collaborations.new(:title => 'Test collaboration',
-                                                  :user => @users.first)
+      @collaboration = @course.collaborations.new(title: 'Test collaboration',
+                                                  user: @users.first)
       @collaboration.type = 'EtherpadCollaboration'
       @collaboration.save!
     end
@@ -132,7 +132,7 @@ describe Collaboration do
     end
 
     it "doesn't add groups outside the course" do
-      other_group = @course.account.groups.create! :name => 'eh'
+      other_group = @course.account.groups.create! name: 'eh'
       @collaboration.update_members([], [other_group])
       @collaboration.reload
       expect(@collaboration.collaborators.pluck(:group_id)).not_to include other_group.id
@@ -140,7 +140,7 @@ describe Collaboration do
 
     it "allows course admins (and group members) to be added to a group collaboration" do
       @users.each { |u| u.student_enrollments.first.accept! }
-      gc = @groups.first.collaborations.create! :title => 'derp', :user => @teacher
+      gc = @groups.first.collaborations.create! title: 'derp', user: @teacher
       gc.update_members([@teacher, @users.first, @users.last])
       users = gc.reload.collaborators.pluck(:user_id)
       expect(users).to match_array([@teacher.id, @users.last.id])

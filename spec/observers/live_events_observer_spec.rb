@@ -154,7 +154,7 @@ describe LiveEventsObserver do
       course_model
       expect(Canvas::LiveEvents).to receive(:discussion_entry_created).once
       discussion_topic_model(context: @course)
-      @topic.discussion_entries.create!(:message => 'entry')
+      @topic.discussion_entries.create!(message: 'entry')
     end
   end
 
@@ -210,7 +210,7 @@ describe LiveEventsObserver do
 
     it "posts update events" do
       expect(Canvas::LiveEvents).to receive(:assignment_updated).once
-      assignment_model(:title => "original")
+      assignment_model(title: "original")
       @assignment.title = "new title"
       @assignment.save
     end
@@ -224,7 +224,7 @@ describe LiveEventsObserver do
 
     it "posts update events" do
       expect(Canvas::LiveEvents).to receive(:assignment_override_updated).once
-      assignment_override_model(:title => "original")
+      assignment_override_model(title: "original")
       @override.title = "new title"
       @override.save
     end
@@ -338,11 +338,11 @@ describe LiveEventsObserver do
         tool_id: 'Quizzes 2',
         url: 'http://example.com/launch'
       )
-      quiz = course.quizzes.create!(:title => 'quiz1')
+      quiz = course.quizzes.create!(title: 'quiz1')
       ce = course.content_exports.create!(
-        :export_type => ContentExport::QUIZZES2,
-        :selected_content => quiz.id,
-        :user => user_model
+        export_type: ContentExport::QUIZZES2,
+        selected_content: quiz.id,
+        user: user_model
       )
       ce.export(synchronous: true)
     end

@@ -43,12 +43,12 @@ require 'ipaddr'
 
 class CutyCapt
   CUTYCAPT_DEFAULTS = {
-    :delay => 3000,
-    :timeout => 60_000,
-    :ip_blacklist => ['10.0.0.0/8', '172.16.0.0/12', '192.168.0.0/16', '169.254.169.254', '127.0.0.0/8'],
-    :domain_blacklist => [],
-    :allowed_schemes => ['http', 'https'],
-    :lang => 'en,*;q=0.9'
+    delay: 3000,
+    timeout: 60_000,
+    ip_blacklist: ['10.0.0.0/8', '172.16.0.0/12', '192.168.0.0/16', '169.254.169.254', '127.0.0.0/8'],
+    domain_blacklist: [],
+    allowed_schemes: ['http', 'https'],
+    lang: 'en,*;q=0.9'
   }.freeze
 
   cattr_writer :config
@@ -124,7 +124,7 @@ class CutyCapt
 
     format = "png"
 
-    tmp_file = Tempfile.new(['websnappr', ".#{format}"], :encoding => 'ascii-8bit')
+    tmp_file = Tempfile.new(['websnappr', ".#{format}"], encoding: 'ascii-8bit')
     img_file = tmp_file.path
     success = true
 
@@ -182,7 +182,7 @@ class CutyCapt
     snapshot_url(url) do |file_path|
       # this is a really odd way to get Attachment the data it needs, which
       # should probably be remedied at some point
-      attachment = Attachment.new(:uploaded_data => Rack::Test::UploadedFile.new(file_path, "image/png"))
+      attachment = Attachment.new(uploaded_data: Rack::Test::UploadedFile.new(file_path, "image/png"))
     end
     attachment
   end

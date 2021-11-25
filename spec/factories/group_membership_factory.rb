@@ -26,8 +26,8 @@ module Factories
 
   def valid_group_membership_attributes
     {
-      :group => @group,
-      :user => @user
+      group: @group,
+      user: @user
     }
   end
 end

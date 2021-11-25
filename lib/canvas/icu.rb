@@ -97,21 +97,21 @@ module Canvas::ICU
 
         ATTRIBUTE_VALUES = {
           nil => -1,
-          primary: 0,
-          secondary: 1,
-          default_strength: 2,
-          tertiary: 2,
-          quaternary: 3,
-          identical: 15,
+          :primary => 0,
+          :secondary => 1,
+          :default_strength => 2,
+          :tertiary => 2,
+          :quaternary => 3,
+          :identical => 15,
 
           false => 16,
           true => 17,
 
-          shifted: 20,
-          non_ignorable: 21,
+          :shifted => 20,
+          :non_ignorable => 21,
 
-          lower_first: 24,
-          upper_first: 25,
+          :lower_first => 24,
+          :upper_first => 25,
         }.freeze
         ATTRIBUTE_VALUES_INVERSE = ATTRIBUTE_VALUES.map { |k, v| [v, k] }.to_h.freeze
       end

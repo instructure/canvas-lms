@@ -173,7 +173,7 @@ describe SpeedGrader::Assignment do
     assignment_model(course: @course)
     @assignment.submit_homework(@user, { submission_type: 'online_text_entry', body: 'blah' })
     @submission = @assignment.submissions.first
-    @comment = @submission.add_comment(:comment => 'comment')
+    @comment = @submission.add_comment(comment: 'comment')
     json = SpeedGrader::Assignment.new(@assignment, @user).json
     expect(json[:submissions].first[:submission_comments].first[:created_at].to_i).to eql @comment.created_at.to_i
   end
@@ -253,7 +253,7 @@ describe SpeedGrader::Assignment do
       @teacher, @student1, @student2 = (1..3).map { User.create }
       @assignment = Assignment.create!(title: "title", context: @course, only_visible_to_overrides: true)
       @course.enroll_teacher(@teacher)
-      @course.enroll_student(@student2, :enrollment_state => 'active')
+      @course.enroll_student(@student2, enrollment_state: 'active')
       @section1 = @course.course_sections.create!(name: "test section 1")
       @section2 = @course.course_sections.create!(name: "test section 2")
       student_in_section(@section1, user: @student1)
@@ -299,8 +299,8 @@ describe SpeedGrader::Assignment do
       @student_1 = user_with_pseudonym(active_all: true, username: 'student1@example.com')
       @student_2 = user_with_pseudonym(active_all: true, username: 'student2@example.com')
 
-      @course.enroll_student(@student_1, :section => section_1).accept!
-      @course.enroll_student(@student_2, :section => section_2).accept!
+      @course.enroll_student(@student_1, section: section_1).accept!
+      @course.enroll_student(@student_2, section: section_2).accept!
 
       o1 = @assignment.assignment_overrides.build
       o1.due_at = 2.days.ago(now)
@@ -550,9 +550,9 @@ describe SpeedGrader::Assignment do
   end
 
   it "includes inline view pingback url for files" do
-    assignment = @course.assignments.create! :submission_types => ['online_upload']
-    attachment = @student.attachments.create! :uploaded_data => dummy_io, :filename => 'doc.doc', :display_name => 'doc.doc', :context => @student
-    assignment.submit_homework @student, :submission_type => :online_upload, :attachments => [attachment]
+    assignment = @course.assignments.create! submission_types: ['online_upload']
+    attachment = @student.attachments.create! uploaded_data: dummy_io, filename: 'doc.doc', display_name: 'doc.doc', context: @student
+    assignment.submit_homework @student, submission_type: :online_upload, attachments: [attachment]
     json = SpeedGrader::Assignment.new(assignment, @teacher).json
     attachment_json = json['submissions'][0]['submission_history'][0]['submission']['versioned_attachments'][0]['attachment']
     expect(attachment_json['view_inline_ping_url']).to match %r{/assignments/#{assignment.id}/files/#{attachment.id}/inline_view\z}
@@ -560,7 +560,7 @@ describe SpeedGrader::Assignment do
 
   it "includes lti launch url in submission history" do
     assignment_model(course: @course)
-    @assignment.submit_homework(@user, :submission_type => 'basic_lti_launch', :url => 'http://www.example.com')
+    @assignment.submit_homework(@user, submission_type: 'basic_lti_launch', url: 'http://www.example.com')
     json = SpeedGrader::Assignment.new(@assignment, @teacher).json
     url_json = json['submissions'][0]['submission_history'][0]['submission']['external_tool_url']
     expect(url_json).to eql('http://www.example.com')
@@ -913,8 +913,8 @@ describe SpeedGrader::Assignment do
 
   context "quizzes" do
     it "works for quizzes without quiz_submissions" do
-      quiz = @course.quizzes.create! :title => "Final",
-                                     :quiz_type => "assignment"
+      quiz = @course.quizzes.create! title: "Final",
+                                     quiz_type: "assignment"
       quiz.did_edit
       quiz.offer
 
@@ -926,7 +926,7 @@ describe SpeedGrader::Assignment do
 
     context "with quiz_submissions" do
       before :once do
-        @quiz_submission = quiz_with_graded_submission [], :course => @course, :user => @student
+        @quiz_submission = quiz_with_graded_submission [], course: @course, user: @student
       end
 
       it "doesn't include quiz_submissions when there are too many attempts" do
@@ -1020,7 +1020,7 @@ describe SpeedGrader::Assignment do
           submission.submitted_at = i.hours.ago
           submission.url = h[:url]
           submission.grader_id = -1
-          submission.with_versioning(:explicit => true) { submission.save! }
+          submission.with_versioning(explicit: true) { submission.save! }
           i += 1
         end
       end
@@ -1550,7 +1550,7 @@ describe SpeedGrader::Assignment do
 
     let(:assignment) { Assignment.create!(title: "title", context: test_course) }
     let(:attachment) do
-      attachment = test_student.attachments.new :filename => "homework.doc"
+      attachment = test_student.attachments.new filename: "homework.doc"
       attachment.content_type = "foo/bar"
       attachment.size = 10
       attachment.save!

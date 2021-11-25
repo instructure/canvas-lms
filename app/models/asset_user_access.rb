@@ -33,9 +33,9 @@ class AssetUserAccess < ActiveRecord::Base
   before_save :infer_root_account_id
   resolves_root_account through: ->(instance) { instance.infer_root_account_id }
 
-  scope :for_context, ->(context) { where(:context_id => context, :context_type => context.class.to_s) }
-  scope :for_user, ->(user) { where(:user_id => user) }
-  scope :participations, -> { where(:action_level => 'participate') }
+  scope :for_context, ->(context) { where(context_id: context, context_type: context.class.to_s) }
+  scope :for_user, ->(user) { where(user_id: user) }
+  scope :participations, -> { where(action_level: 'participate') }
   scope :most_recent, -> { order('updated_at DESC') }
 
   def infer_root_account_id(asset_for_root_account_id = nil)
@@ -134,26 +134,26 @@ class AssetUserAccess < ActiveRecord::Base
         else
           "Course #{split[0].titleize}"
         end
-      elsif (match = split[1].match(/group_(\d+)/)) && (group = Group.where(:id => match[1]).first)
+      elsif (match = split[1].match(/group_(\d+)/)) && (group = Group.where(id: match[1]).first)
         case split[0]
         when "announcements"
-          include_group_name ? t("%{group_name} - Group Announcements", :group_name => group.name) : t('Group Announcements')
+          include_group_name ? t("%{group_name} - Group Announcements", group_name: group.name) : t('Group Announcements')
         when "calendar_feed"
-          include_group_name ? t("%{group_name} - Group Calendar", :group_name => group.name) : t('Group Calendar')
+          include_group_name ? t("%{group_name} - Group Calendar", group_name: group.name) : t('Group Calendar')
         when "collaborations"
-          include_group_name ? t("%{group_name} - Group Collaborations", :group_name => group.name) : t('Group Collaborations')
+          include_group_name ? t("%{group_name} - Group Collaborations", group_name: group.name) : t('Group Collaborations')
         when "conferences"
-          include_group_name ? t("%{group_name} - Group Conferences", :group_name => group.name) : t('Group Conferences')
+          include_group_name ? t("%{group_name} - Group Conferences", group_name: group.name) : t('Group Conferences')
         when "files"
-          include_group_name ? t("%{group_name} - Group Files", :group_name => group.name) : t('Group Files')
+          include_group_name ? t("%{group_name} - Group Files", group_name: group.name) : t('Group Files')
         when "home"
-          include_group_name ? t("%{group_name} - Group Home", :group_name => group.name) : t('Group Home')
+          include_group_name ? t("%{group_name} - Group Home", group_name: group.name) : t('Group Home')
         when "pages"
-          include_group_name ? t("%{group_name} - Group Pages", :group_name => group.name) : t('Group Pages')
+          include_group_name ? t("%{group_name} - Group Pages", group_name: group.name) : t('Group Pages')
         when "roster"
-          include_group_name ? t("%{group_name} - Group People", :group_name => group.name) : t('Group People')
+          include_group_name ? t("%{group_name} - Group People", group_name: group.name) : t('Group People')
         when "topics"
-          include_group_name ? t("%{group_name} - Group Discussions", :group_name => group.name) : t('Group Discussions')
+          include_group_name ? t("%{group_name} - Group Discussions", group_name: group.name) : t('Group Discussions')
         else
           "#{include_group_name ? "#{group.name} - " : ""}Group #{split[0].titleize}"
         end
@@ -179,7 +179,7 @@ class AssetUserAccess < ActiveRecord::Base
 
       asset_code, = self.asset_code.split(":").reverse
       @asset = Context.find_asset_by_asset_string(asset_code, context)
-      @asset ||= (match = asset_code.match(/enrollment_(\d+)/)) && Enrollment.where(:id => match[1]).first
+      @asset ||= (match = asset_code.match(/enrollment_(\d+)/)) && Enrollment.where(id: match[1]).first
     end
     @asset
   end

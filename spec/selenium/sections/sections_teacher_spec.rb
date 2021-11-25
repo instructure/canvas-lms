@@ -24,9 +24,9 @@ describe "sections" do
 
   context "as a teacher" do
     it "only shows users enrolled in the section on the section page" do
-      course_with_teacher_logged_in(:active_course => true, :active_user => true)
+      course_with_teacher_logged_in(active_course: true, active_user: true)
       @section = @course.course_sections.create!
-      e2 = student_in_course(:active_all => true, :name => "Señor Chang")
+      e2 = student_in_course(active_all: true, name: "Señor Chang")
       e2.course_section = @section
       e2.save!
 
@@ -44,8 +44,8 @@ describe "sections" do
     end
 
     it "does not include X buttons for enrollments that can't be removed" do
-      course_with_teacher_logged_in(:active_all => true)
-      e1 = student_in_course(:active_all => true, :name => "Mr. Bland")
+      course_with_teacher_logged_in(active_all: true)
+      e1 = student_in_course(active_all: true, name: "Mr. Bland")
       e2 = student_in_course(active_all: true, name: "Señor Havin' A Little Trouble")
       sis = e2.course.root_account.sis_batches.create
       e2.sis_batch_id = sis.id

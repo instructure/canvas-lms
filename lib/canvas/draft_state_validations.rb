@@ -21,7 +21,7 @@ module Canvas
   module DraftStateValidations
     def self.included(base)
       base.class_eval do
-        validate :validate_draft_state_change, :if => :workflow_state_changed?
+        validate :validate_draft_state_change, if: :workflow_state_changed?
       end
     end
 

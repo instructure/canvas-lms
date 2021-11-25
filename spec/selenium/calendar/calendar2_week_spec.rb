@@ -73,7 +73,7 @@ describe "calendar2" do
 
       it "shows short events at full height", priority: "2" do
         noon = Time.now.at_beginning_of_day + 12.hours
-        @course.calendar_events.create! :title => "ohai", :start_at => noon, :end_at => noon + 5.minutes
+        @course.calendar_events.create! title: "ohai", start_at: noon, end_at: noon + 5.minutes
 
         load_week_view
 
@@ -92,9 +92,9 @@ describe "calendar2" do
 
       it "staggers pseudo-overlapping short events", priority: "2" do
         noon = Time.zone.now.at_beginning_of_day + 12.hours
-        first_event = @course.calendar_events.create! :title => "ohai", :start_at => noon, :end_at => noon + 5.minutes
+        first_event = @course.calendar_events.create! title: "ohai", start_at: noon, end_at: noon + 5.minutes
         second_start = first_event.start_at + 6.minutes
-        @course.calendar_events.create!(:title => "ohai", :start_at => second_start, :end_at => second_start + 5.minutes)
+        @course.calendar_events.create!(title: "ohai", start_at: second_start, end_at: second_start + 5.minutes)
 
         load_week_view
 
@@ -108,7 +108,7 @@ describe "calendar2" do
       it "does not change duration when dragging a short event", priority: "2" do
         skip("dragging events doesn't seem to work")
         noon = Time.zone.now.at_beginning_of_day + 12.hours
-        event = @course.calendar_events.create! :title => "ohai", :start_at => noon, :end_at => noon + 5.minutes
+        event = @course.calendar_events.create! title: "ohai", start_at: noon, end_at: noon + 5.minutes
         load_week_view
 
         elt = fj('.fc-event:visible')
@@ -146,7 +146,7 @@ describe "calendar2" do
 
       it "shows the right times in the tool tips for short events", priority: "2" do
         noon = Time.zone.now.at_beginning_of_day + 12.hours
-        @course.calendar_events.create! :title => "ohai", :start_at => noon, :end_at => noon + 5.minutes
+        @course.calendar_events.create! title: "ohai", start_at: noon, end_at: noon + 5.minutes
         load_week_view
 
         elt = fj('.fc-event:visible')
@@ -207,7 +207,7 @@ describe "calendar2" do
       location_address = "cottonwood"
 
       # Make it an all day event so it will be visible on the screen/on top
-      make_event(:location_name => location_name, :all_day => true, :location_address => location_address)
+      make_event(location_name: location_name, all_day: true, location_address: location_address)
       load_week_view
 
       # Click calendar item to bring up event summary

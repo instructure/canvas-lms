@@ -24,7 +24,7 @@ describe "/gradebooks/grade_summary" do
   it "renders" do
     course_with_student
     view_context
-    @course.assignments.create!(:title => "some assignment")
+    @course.assignments.create!(title: "some assignment")
     assign(:presenter, GradeSummaryPresenter.new(@course, @user, nil))
     render "gradebooks/grade_summary"
     expect(response).not_to be_nil
@@ -34,7 +34,7 @@ describe "/gradebooks/grade_summary" do
     course_with_student
     @course.hide_final_grades = true
     view_context
-    @course.assignments.create!(:title => "some assignment")
+    @course.assignments.create!(title: "some assignment")
     assign(:presenter, GradeSummaryPresenter.new(@course, @user, nil))
     render "gradebooks/grade_summary"
     expect(response).not_to be_nil
@@ -48,7 +48,7 @@ describe "/gradebooks/grade_summary" do
     @student = @user
     @user = @teacher
     view_context
-    @course.assignments.create!(:title => "some assignment")
+    @course.assignments.create!(title: "some assignment")
     presenter = assign(:presenter, GradeSummaryPresenter.new(@course, @teacher, @student.id))
     expect(presenter.student_enrollment).not_to be_nil
     render "gradebooks/grade_summary"
@@ -61,10 +61,10 @@ describe "/gradebooks/grade_summary" do
     course_with_teacher
     student_in_course(active_all: true)
     view_context
-    a = @course.assignments.create!(:title => 'some assignment', :submission_types => ['online_text_entry'])
-    sub = a.submit_homework @student, :submission_type => "online_text_entry", :body => "o hai"
-    sub.add_comment :author => @teacher, :media_comment_id => '0_abcdefgh', :media_comment_type => 'audio'
-    sub.add_comment :author => @teacher, :media_comment_id => '0_ijklmnop', :media_comment_type => 'video'
+    a = @course.assignments.create!(title: 'some assignment', submission_types: ['online_text_entry'])
+    sub = a.submit_homework @student, submission_type: "online_text_entry", body: "o hai"
+    sub.add_comment author: @teacher, media_comment_id: '0_abcdefgh', media_comment_type: 'audio'
+    sub.add_comment author: @teacher, media_comment_id: '0_ijklmnop', media_comment_type: 'video'
     assign(:presenter, GradeSummaryPresenter.new(@course, @teacher, @student.id))
     render "gradebooks/grade_summary"
     doc = Nokogiri::HTML5.fragment response.body
@@ -89,11 +89,11 @@ describe "/gradebooks/grade_summary" do
   end
 
   it "shows a disabled message for grade stats for the test student" do
-    course_with_teacher(:active_all => true)
+    course_with_teacher(active_all: true)
     @student = @course.student_view_student
     @user = @teacher
     view_context
-    a = @course.assignments.create!(:title => "some assignment", :points_possible => 10)
+    a = @course.assignments.create!(title: "some assignment", points_possible: 10)
     a.grade_student(@student, grade: "10", grader: @teacher)
     assign(:presenter, GradeSummaryPresenter.new(@course, @teacher, @student.id))
     render "gradebooks/grade_summary"
@@ -108,7 +108,7 @@ describe "/gradebooks/grade_summary" do
 
       @assignment = @course.assignments.create!(title: 'Moderated Assignment', anonymous_grading: true)
       @assignment.ensure_post_policy(post_manually: true)
-      @assignment.submit_homework @student, :submission_type => "online_text_entry", :body => "o hai"
+      @assignment.submit_homework @student, submission_type: "online_text_entry", body: "o hai"
       @assignment.grade_student(@student, score: 10, grader: @teacher)
 
       @submission_details_url = context_url(@course, :context_assignment_submission_url, @assignment, @student.id)

@@ -195,7 +195,7 @@ module SIS
         fail_with_error!(e)
       ensure
         @tmp_dirs.each do |tmp_dir|
-          FileUtils.rm_rf(tmp_dir, :secure => true) if File.directory?(tmp_dir)
+          FileUtils.rm_rf(tmp_dir, secure: true) if File.directory?(tmp_dir)
         end
       end
 
@@ -210,7 +210,7 @@ module SIS
       def update_progress
         completed_count = @batch.parallel_importers.where(workflow_state: "completed").count
         current_progress = [(completed_count.to_f * 100 / @parallel_importers.values.sum(&:count)).round, 99].min
-        SisBatch.where(:id => @batch).where("progress IS NULL or progress < ?", current_progress).update_all(progress: current_progress)
+        SisBatch.where(id: @batch).where("progress IS NULL or progress < ?", current_progress).update_all(progress: current_progress)
       end
 
       def run_parallel_importer(id, csv: nil, attempt: 0)
@@ -257,7 +257,7 @@ module SIS
           att = parallel_importer.attachment
           file = att.open
           parallel_importer.start
-          { :fullpath => file.path, :file => att.display_name }
+          { fullpath: file.path, file: att.display_name }
         end
         count = importer_object.process(csv, parallel_importer.index, parallel_importer.batch_size)
         parallel_importer.complete(rows_processed: count)
@@ -325,7 +325,7 @@ module SIS
       end
 
       def job_args(next_importer_type, attempt: nil)
-        enqueue_args = { :priority => Delayed::LOW_PRIORITY, :on_permanent_failure => :fail_with_error!, :max_attempts => 5 }
+        enqueue_args = { priority: Delayed::LOW_PRIORITY, on_permanent_failure: :fail_with_error!, max_attempts: 5 }
         if next_importer_type == :account
           enqueue_args[:strand] = "sis_account_import:#{@root_account.global_id}" # run one at a time
         else
@@ -347,8 +347,8 @@ module SIS
         enqueue_args = job_args(next_importer_type)
 
         importers_to_queue = @parallel_importers[next_importer_type]
-        updated_count = @batch.parallel_importers.where(:id => importers_to_queue, :workflow_state => "pending")
-                              .update_all(:workflow_state => "queued")
+        updated_count = @batch.parallel_importers.where(id: importers_to_queue, workflow_state: "pending")
+                              .update_all(workflow_state: "queued")
         if updated_count != importers_to_queue.count
           raise "state mismatch error queuing parallel import jobs"
         end
@@ -360,15 +360,15 @@ module SIS
 
       def is_last_parallel_importer_of_type?(parallel_importer)
         importer_type = parallel_importer.importer_type.to_sym
-        return false if @batch.parallel_importers.where(:importer_type => importer_type, :workflow_state => %w[queued running retry]).exists?
+        return false if @batch.parallel_importers.where(importer_type: importer_type, workflow_state: %w[queued running retry]).exists?
 
         SisBatch.transaction do
-          @batch.reload(:lock => true)
+          @batch.reload(lock: true)
           if @batch.data[:completed_importers].include?(importer_type)
             false
           else # check for race condition
             @batch.data[:completed_importers] << importer_type
-            @batch.data[:counts][importer_type.to_s.pluralize.to_sym] = @batch.parallel_importers.where(:importer_type => importer_type).sum(:rows_processed).to_i
+            @batch.data[:counts][importer_type.to_s.pluralize.to_sym] = @batch.parallel_importers.where(importer_type: importer_type).sum(:rows_processed).to_i
             @batch.save
             true
           end
@@ -395,7 +395,7 @@ module SIS
             return
           end
           begin
-            ::CSV.foreach(csv[:fullpath], **CSVBaseImporter::PARSE_ARGS.merge(:headers => false)) do |row|
+            ::CSV.foreach(csv[:fullpath], **CSVBaseImporter::PARSE_ARGS.merge(headers: false)) do |row|
               row.each { |header| header&.downcase! }
               importer = IMPORTERS.index do |type|
                 if SIS::CSV.const_get(type.to_s.camelcase + 'Importer').send(type.to_s + '_csv?', row)

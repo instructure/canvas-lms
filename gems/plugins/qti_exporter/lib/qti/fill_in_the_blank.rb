@@ -172,7 +172,7 @@ module Qti
         next unless (blank_id = get_node_att(match, 'variable', 'identifier'))
 
         text = get_node_val(match, 'baseValue')
-        answer = { :id => unique_local_id, :weight => AssessmentItemConverter::DEFAULT_CORRECT_WEIGHT }
+        answer = { id: unique_local_id, weight: AssessmentItemConverter::DEFAULT_CORRECT_WEIGHT }
         answer[:migration_id] = blank_id
         answer[:text] = sanitize_html_string(text, true)
         answer[:blank_id] = blank_id
@@ -186,11 +186,11 @@ module Qti
 
         blank_id = blank_id.sub(/^RESPONSE_-([^-]*)-/, '\1')
         @question[:answers] << {
-          :weight => AssessmentItemConverter::DEFAULT_CORRECT_WEIGHT,
-          :id => unique_local_id,
-          :migration_id => blank_id,
-          :text => sanitize_html_string(val_node.text, true),
-          :blank_id => blank_id,
+          weight: AssessmentItemConverter::DEFAULT_CORRECT_WEIGHT,
+          id: unique_local_id,
+          migration_id: blank_id,
+          text: sanitize_html_string(val_node.text, true),
+          blank_id: blank_id,
         }
       end
     end

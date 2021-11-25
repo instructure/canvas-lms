@@ -325,7 +325,7 @@ describe Polling::PollSessionsController, type: :request do
 
     context "as a student" do
       it "is unauthorized" do
-        student_in_course(:active_all => true, :course => @course)
+        student_in_course(active_all: true, course: @course)
         section = @course.course_sections.create!(name: 'Another Section')
         original_id = @poll_session.course_section.id
 
@@ -384,7 +384,7 @@ describe Polling::PollSessionsController, type: :request do
 
     context "as a student" do
       it "is unauthorized" do
-        student_in_course(:active_all => true, :course => @course)
+        student_in_course(active_all: true, course: @course)
         @poll_session.update_attribute(:is_published, false)
         @poll_session.reload
         expect(@poll_session.is_published).to be_falsey

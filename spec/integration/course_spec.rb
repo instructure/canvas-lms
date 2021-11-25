@@ -74,8 +74,8 @@ describe "course" do
   end
 
   it "uses nicknames in the course index" do
-    course_with_student(:active_all => true, :course_name => "Course 1")
-    course_with_student(:user => @student, :active_all => true, :course_name => "Course 2")
+    course_with_student(active_all: true, course_name: "Course 1")
+    course_with_student(user: @student, active_all: true, course_name: "Course 2")
     @student.set_preference(:course_nicknames, @course.id, 'A nickname or something')
     user_session(@student)
     get "/courses"
@@ -87,10 +87,10 @@ describe "course" do
   end
 
   it "does not show links to unpublished courses in course index" do
-    course_with_student(:course_name => "Course 1")
+    course_with_student(course_name: "Course 1")
     c1 = @course
     @student.enrollments.first.update_attribute(:workflow_state, "active") # force active, like with sis
-    course_with_student(:user => @student, :active_all => true, :course_name => "Course 2")
+    course_with_student(user: @student, active_all: true, course_name: "Course 2")
     c2 = @course
     user_session(@student)
     get "/courses"
@@ -104,7 +104,7 @@ describe "course" do
   end
 
   it "does not show students' nicknames to admins on the student's account profile page" do
-    course_with_student(:active_all => true)
+    course_with_student(active_all: true)
     @student.set_preference(:course_nicknames, @course.id, 'STUDENT_NICKNAME')
     user_session(account_admin_user)
     get "/accounts/#{@course.root_account.id}/users/#{@student.id}"

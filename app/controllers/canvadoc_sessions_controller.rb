@@ -140,20 +140,20 @@ class CanvadocSessionsController < ApplicationController
 
       redirect_to url
     else
-      render :plain => "Not found", :status => :not_found
+      render plain: "Not found", status: :not_found
     end
   rescue HmacHelper::Error => e
     Canvas::Errors.capture_exception(:canvadocs, e, :info)
-    render :plain => 'unauthorized', :status => :unauthorized
+    render plain: 'unauthorized', status: :unauthorized
   rescue Timeout::Error, Canvadocs::BadGateway, Canvadocs::ServerError => e
     Canvas::Errors.capture_exception(:canvadocs, e, :warn)
-    render :plain => "Service is currently unavailable. Try again later.",
-           :status => :service_unavailable
+    render plain: "Service is currently unavailable. Try again later.",
+           status: :service_unavailable
   rescue Canvadocs::BadRequest => e
     Canvas::Errors.capture_exception(:canvadocs, e, :info)
-    render :plain => 'Canvadocs Bad Request', :status => :bad_request
+    render plain: 'Canvadocs Bad Request', status: :bad_request
   rescue Canvadocs::HttpError => e
     Canvas::Errors.capture_exception(:canvadocs, e, :error)
-    render :plain => 'Unknown Canvadocs Error', :status => :service_unavailable
+    render plain: 'Unknown Canvadocs Error', status: :service_unavailable
   end
 end

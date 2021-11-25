@@ -472,7 +472,7 @@ module DataFixup::PopulateRootAccountIdOnModels
       associations.each do |assoc, columns|
         reflection = table.reflections[assoc.to_s]
         account_id_column = create_column_names(reflection, columns)
-        scope = table.where(primary_key_field => batch_min..batch_max, root_account_id: nil)
+        scope = table.where(primary_key_field => batch_min..batch_max, :root_account_id => nil)
         scope.joins(assoc).update_all("root_account_id = #{account_id_column}")
         unless ignore_cross_shard_associations_tables.include?(table)
           fill_cross_shard_associations(table, scope, reflection, account_id_column)

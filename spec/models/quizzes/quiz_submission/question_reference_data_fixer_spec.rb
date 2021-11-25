@@ -25,7 +25,7 @@ describe Quizzes::QuizSubmission::QuestionReferenceDataFixer do
     User.connection.execute "ALTER SEQUENCE public.quiz_questions_id_seq RESTART WITH 2000"
 
     @course = course_model
-    @bank = @course.assessment_question_banks.create!(:title => 'Test Bank')
+    @bank = @course.assessment_question_banks.create!(title: 'Test Bank')
     @aq = assessment_question_model({
                                       bank: @bank,
                                       question_data: {

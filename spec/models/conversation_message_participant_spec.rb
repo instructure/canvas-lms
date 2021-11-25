@@ -42,7 +42,7 @@ describe ConversationMessageParticipant do
       end
 
       it "includes nil workflow_state" do
-        ConversationMessageParticipant.update_all(:workflow_state => nil)
+        ConversationMessageParticipant.update_all(workflow_state: nil)
         expect(ConversationMessageParticipant.active.map(&:workflow_state).sort).to eql [nil, nil, nil]
       end
     end

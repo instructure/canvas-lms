@@ -26,7 +26,7 @@ class EportfolioEntry < ActiveRecord::Base
   belongs_to :eportfolio, touch: true
   belongs_to :eportfolio_category
 
-  acts_as_list :scope => :eportfolio_category
+  acts_as_list scope: :eportfolio_category
   before_save :infer_unique_slug
   before_save :infer_comment_visibility
   after_save :check_for_spam, if: -> { eportfolio.needs_spam_review? }
@@ -34,8 +34,8 @@ class EportfolioEntry < ActiveRecord::Base
   after_save :update_portfolio
   validates :eportfolio_id, presence: true
   validates :eportfolio_category_id, presence: true
-  validates :name, length: { :maximum => maximum_string_length, :allow_nil => false, :allow_blank => true }
-  validates :slug, length: { :maximum => maximum_string_length, :allow_nil => false, :allow_blank => true }
+  validates :name, length: { maximum: maximum_string_length, allow_nil: false, allow_blank: true }
+  validates :slug, length: { maximum: maximum_string_length, allow_nil: false, allow_blank: true }
   has_many :page_comments, -> { preload(:user).order('page_comments.created_at DESC') }, as: :page
 
   serialize :content
@@ -103,7 +103,7 @@ class EportfolioEntry < ActiveRecord::Base
     self.content = []
     cnt.times do |idx|
       obj = params[("section_" + (idx + 1).to_s).to_sym].slice(:section_type, :content, :submission_id, :attachment_id)
-      new_obj = { :section_type => obj[:section_type] }
+      new_obj = { section_type: obj[:section_type] }
       case obj[:section_type]
       when 'rich_text', 'html'
         config = CanvasSanitize::SANITIZE
@@ -143,7 +143,7 @@ class EportfolioEntry < ActiveRecord::Base
     self.name ||= t(:default_name, "Page Name")
     self.slug = self.name.gsub(/\s+/, "_").gsub(/[^\w\d]/, "")
     pages = pages.where("id<>?", self) unless new_record?
-    match_cnt = pages.where(:slug => slug).count
+    match_cnt = pages.where(slug: slug).count
     if match_cnt > 0
       self.slug = slug + "_" + (match_cnt + 1).to_s
     end
@@ -153,12 +153,12 @@ class EportfolioEntry < ActiveRecord::Base
   def to_atom(opts = {})
     Atom::Entry.new do |entry|
       entry.title = self.name.to_s
-      entry.authors << Atom::Person.new(:name => t(:atom_author, "ePortfolio Entry"))
+      entry.authors << Atom::Person.new(name: t(:atom_author, "ePortfolio Entry"))
       entry.updated   = updated_at
       entry.published = created_at
       url = "http://#{HostUrl.default_host}/eportfolios/#{eportfolio_id}/#{eportfolio_category.slug}/#{slug}"
       url += "?verifier=#{eportfolio.uuid}" if opts[:private]
-      entry.links << Atom::Link.new(:rel => 'alternate', :href => url)
+      entry.links << Atom::Link.new(rel: 'alternate', href: url)
       entry.id = "tag:#{HostUrl.default_host},#{created_at.strftime("%Y-%m-%d")}:/eportfoli_entries/#{feed_code}_#{created_at.strftime("%Y-%m-%d-%H-%M") rescue "none"}"
       rendered_content = t(:click_through, "Click to view page content")
       entry.content = Atom::Content::Html.new(rendered_content)

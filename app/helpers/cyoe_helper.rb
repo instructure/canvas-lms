@@ -84,7 +84,7 @@ module CyoeHelper
   def check_if_processing(data)
     if !data[:awaiting_choice] && data[:assignment_sets].length == 1
       set = data[:assignment_sets][0]
-      data[:still_processing] = !ConditionalRelease::AssignmentSetAction.where(:assignment_set_id => set[:id], :student_id => @current_user.id).exists?
+      data[:still_processing] = !ConditionalRelease::AssignmentSetAction.where(assignment_set_id: set[:id], student_id: @current_user.id).exists?
     end
   end
 

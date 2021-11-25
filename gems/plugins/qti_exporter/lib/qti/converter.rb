@@ -61,7 +61,7 @@ module Qti
       path_map = @course[:file_map].values.each_with_object({}) do |v, h|
         h[v[:path_name]] = v[:migration_id]
       end
-      @course[:assessment_questions] = convert_questions(:file_path_map => path_map, :flavor => @flavor)
+      @course[:assessment_questions] = convert_questions(file_path_map: path_map, flavor: @flavor)
       @course[:assessments] = convert_assessments(@course[:assessment_questions][:assessment_questions])
 
       original_manifest_path = @package_root.item_path(MANIFEST_FILE)
@@ -128,7 +128,7 @@ module Qti
 
       begin
         manifest_file = File.join(@dest_dir_2_1, MANIFEST_FILE)
-        @quizzes[:assessments] = Qti.convert_assessments(manifest_file, @settings.merge({ :converted_questions => questions }))
+        @quizzes[:assessments] = Qti.convert_assessments(manifest_file, @settings.merge({ converted_questions: questions }))
       rescue => e
         message = "Error processing assessment QTI data: #{$!}: #{$!.backtrace.join("\n")}"
         add_error "qti_assessments", message, @questions, e
@@ -144,8 +144,8 @@ module Qti
           mig_id = Digest::MD5.hexdigest(attachment)
           mig_id = ::Canvas::Migration::MigratorHelper.prepend_id(mig_id, id_prepender)
           @course[:file_map][mig_id] = {
-            :migration_id => mig_id,
-            :path_name => attachment,
+            migration_id: mig_id,
+            path_name: attachment,
           }
         end
       rescue => e

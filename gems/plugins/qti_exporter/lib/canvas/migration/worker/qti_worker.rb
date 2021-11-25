@@ -61,7 +61,7 @@ module Canvas::Migration
           end
           cm.update_conversion_progress(100)
 
-          cm.migration_settings[:migration_ids_to_import] = { :copy => { :everything => true } }.merge(cm.migration_settings[:migration_ids_to_import] || {})
+          cm.migration_settings[:migration_ids_to_import] = { copy: { everything: true } }.merge(cm.migration_settings[:migration_ids_to_import] || {})
           if (path = converter.course[:files_import_root_path])
             cm.migration_settings[:files_import_root_path] = path
           end
@@ -77,8 +77,8 @@ module Canvas::Migration
 
       def self.enqueue(content_migration)
         Delayed::Job.enqueue(new(content_migration.id),
-                             :priority => Delayed::LOW_PRIORITY,
-                             :max_attempts => 1)
+                             priority: Delayed::LOW_PRIORITY,
+                             max_attempts: 1)
       end
     end
   end

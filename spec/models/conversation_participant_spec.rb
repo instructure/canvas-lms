@@ -37,10 +37,10 @@ describe ConversationParticipant do
     convo = sender.initiate_conversation([recipient])
     convo.add_message('test')
 
-    User.where(:id => recipient).update_all(:unread_conversations_count => 0) # force into the wrong state
+    User.where(id: recipient).update_all(unread_conversations_count: 0) # force into the wrong state
 
     part = recipient.conversations.first
-    part.update_one(:event => 'mark_as_read')
+    part.update_one(event: 'mark_as_read')
 
     recipient.reload
     expect(recipient.unread_conversations_count).to eq 0
@@ -108,12 +108,12 @@ describe ConversationParticipant do
     recipient    = user_factory
     conversation = sender.initiate_conversation([recipient])
 
-    conversation.update(:starred => true)
+    conversation.update(starred: true)
     conversation.save
     conversation.reload
     expect(conversation.starred).to be_truthy
 
-    conversation.update(:starred => false)
+    conversation.update(starred: false)
     conversation.save
     conversation.reload
     expect(conversation.starred).to be_falsey
@@ -151,7 +151,7 @@ describe ConversationParticipant do
     end
 
     it "returns conversations that match all of the given courses" do
-      expect(@me.conversations.tagged("course_1", "course_2", :mode => :and).sort_by(&:id)).to eql [@c2]
+      expect(@me.conversations.tagged("course_1", "course_2", mode: :and).sort_by(&:id)).to eql [@c2]
     end
 
     it "returns conversations that match the given group" do
@@ -167,7 +167,7 @@ describe ConversationParticipant do
     end
 
     it "returns conversations that match all of the given users" do
-      expect(@me.conversations.tagged(@u1.asset_string, @u2.asset_string, :mode => :and).sort_by(&:id)).to eql [@c7]
+      expect(@me.conversations.tagged(@u1.asset_string, @u2.asset_string, mode: :and).sort_by(&:id)).to eql [@c7]
     end
 
     it "returns conversations that match either the given course or user" do
@@ -175,7 +175,7 @@ describe ConversationParticipant do
     end
 
     it "returns conversations that match both the given course and user" do
-      expect(@me.conversations.tagged(@u1.asset_string, "course_1", :mode => :and).sort_by(&:id)).to eql [@c8]
+      expect(@me.conversations.tagged(@u1.asset_string, "course_1", mode: :and).sort_by(&:id)).to eql [@c8]
     end
 
     context "sharding" do
@@ -199,21 +199,21 @@ describe ConversationParticipant do
       @admin_user = user_factory
       @a1.account_users.create!(user: @admin_user)
       @a2.account_users.create!(user: @admin_user)
-      @a3.pseudonyms.create!(:user => @admin_user, :unique_id => 'a3') # in the account, but not an admin
+      @a3.pseudonyms.create!(user: @admin_user, unique_id: 'a3') # in the account, but not an admin
 
       @target_user = user_factory
       # visible to @user
       @c1 = @target_user.initiate_conversation([user_factory])
-      @c1.add_message("hey man", :root_account_id => @a1.id)
+      @c1.add_message("hey man", root_account_id: @a1.id)
       @c2 = @target_user.initiate_conversation([user_factory])
-      @c2.add_message("foo", :root_account_id => @a1.id)
-      @c2.add_message("bar", :root_account_id => @a2.id)
+      @c2.add_message("foo", root_account_id: @a1.id)
+      @c2.add_message("bar", root_account_id: @a2.id)
       # invisible to @user, unless @user is a site admin
       @c3 = @target_user.initiate_conversation([user_factory])
-      @c3.add_message("secret", :root_account_id => @a3.id)
+      @c3.add_message("secret", root_account_id: @a3.id)
       @c4 = @target_user.initiate_conversation([user_factory])
-      @c4.add_message("super", :root_account_id => @a1.id)
-      @c4.add_message("sekrit", :root_account_id => @a3.id)
+      @c4.add_message("super", root_account_id: @a1.id)
+      @c4.add_message("sekrit", root_account_id: @a3.id)
     end
 
     it "lets site admins see everything" do
@@ -233,18 +233,18 @@ describe ConversationParticipant do
 
   context "participants" do
     before :once do
-      @me = course_with_student(:active_all => true).user
-      @u1 = student_in_course(:active_all => true).user
-      @u2 = student_in_course(:active_all => true).user
-      @u3 = student_in_course(:active_all => true).user
+      @me = course_with_student(active_all: true).user
+      @u1 = student_in_course(active_all: true).user
+      @u2 = student_in_course(active_all: true).user
+      @u3 = student_in_course(active_all: true).user
       @convo = @me.initiate_conversation([@u1, @u2, @u3])
       @convo.add_message "ohai"
       @u3.destroy
-      @u4 = student_in_course(:active_all => true).user
+      @u4 = student_in_course(active_all: true).user
 
       other_convo = @u4.initiate_conversation([@me])
       message = other_convo.add_message "just between you and me"
-      @convo.add_message("haha i forwarded it", :forwarded_message_ids => [message.id])
+      @convo.add_message("haha i forwarded it", forwarded_message_ids: [message.id])
     end
 
     matcher :have_same_ids do |expected|
@@ -268,7 +268,7 @@ describe ConversationParticipant do
     end
 
     it "includes shared contexts if requested" do
-      users = @convo.reload.participants(:include_participant_contexts => true)
+      users = @convo.reload.participants(include_participant_contexts: true)
       address_book = @me.address_book
       users.each do |user|
         expect(address_book.cached?(user)).to be_truthy
@@ -284,7 +284,7 @@ describe ConversationParticipant do
     end
 
     it "includes include forwarded participants if requested" do
-      users = @convo.reload.participants(:include_indirect_participants => true)
+      users = @convo.reload.participants(include_indirect_participants: true)
       expect(users).to have_same_ids [@me, @u1, @u2, @u3, @u4]
     end
 
@@ -462,7 +462,7 @@ describe ConversationParticipant do
       c2.add_message("hola")
 
       c.reload
-      ConversationParticipant.where(:user_id => @user1.id).scoping do
+      ConversationParticipant.where(user_id: @user1.id).scoping do
         c.move_to_user @user2
       end
 
@@ -503,7 +503,7 @@ describe ConversationParticipant do
           @a1.account_users.create!(user: @admin_user)
           @target_user = user_factory
           @c1 = @target_user.initiate_conversation([user_factory])
-          @c1.add_message("foo", :root_account_id => @a1.id)
+          @c1.add_message("foo", root_account_id: @a1.id)
 
           # not sure how this happens in prod, but it does
           @c1.update_attribute(:root_account_ids, [@a1.id, @a1.global_id].sort.join(","))

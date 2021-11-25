@@ -232,7 +232,7 @@ class ApplicationController < ActionController::Base
         @js_env[:FEATURES] = cached_features.merge(
           canvas_k6_theme: @context.try(:feature_enabled?, :canvas_k6_theme)
         )
-        @js_env[:current_user] = @current_user ? Rails.cache.fetch(['user_display_json', @current_user].cache_key, :expires_in => 1.hour) { user_display_json(@current_user, :profile, [:avatar_is_fallback]) } : {}
+        @js_env[:current_user] = @current_user ? Rails.cache.fetch(['user_display_json', @current_user].cache_key, expires_in: 1.hour) { user_display_json(@current_user, :profile, [:avatar_is_fallback]) } : {}
         @js_env[:page_view_update_url] = page_view_path(@page_view.id, page_view_token: @page_view.token) if @page_view
         @js_env[:IS_LARGE_ROSTER] = true if !@js_env[:IS_LARGE_ROSTER] && @context.respond_to?(:large_roster?) && @context.large_roster?
         @js_env[:context_asset_string] = @context.try(:asset_string) unless @js_env[:context_asset_string]
@@ -325,7 +325,7 @@ class ApplicationController < ActionController::Base
     )
     if @context.is_a?(Course)
       rce_env_hash[:RICH_CONTENT_FILES_TAB_DISABLED] = !@context.grants_right?(@current_user, session, :read_as_admin) &&
-                                                       !tab_enabled?(@context.class::TAB_FILES, :no_render => true)
+                                                       !tab_enabled?(@context.class::TAB_FILES, no_render: true)
     end
     account = Context.get_account(@context)
     rce_env_hash[:RICH_CONTENT_INST_RECORD_TAB_DISABLED] = account ? account.disable_rce_media_uploads? : false
@@ -363,9 +363,9 @@ class ApplicationController < ActionController::Base
 
     context = context.account if context.is_a?(User)
     tools = GuardRail.activate(:secondary) do
-      ContextExternalTool.all_tools_for(context, { :placements => type,
-                                                   :root_account => @domain_root_account, :current_user => @current_user,
-                                                   :tool_ids => tool_ids }).to_a
+      ContextExternalTool.all_tools_for(context, { placements: type,
+                                                   root_account: @domain_root_account, current_user: @current_user,
+                                                   tool_ids: tool_ids }).to_a
     end
 
     tools.select! do |tool|
@@ -386,9 +386,9 @@ class ApplicationController < ActionController::Base
     }.merge(url_params)
 
     hash = {
-      :id => tool.id,
-      :title => tool.label_for(type, I18n.locale),
-      :base_url => polymorphic_url([context, :external_tool], url_params),
+      id: tool.id,
+      title: tool.label_for(type, I18n.locale),
+      base_url: polymorphic_url([context, :external_tool], url_params),
     }
     hash[:tool_id] = tool.tool_id if tool.tool_id.present?
 
@@ -441,7 +441,7 @@ class ApplicationController < ActionController::Base
     if status == :master
       data[:default_restrictions] = MasterCourses::MasterTemplate.full_template_for(course).default_restrictions_for(object)
     end
-    js_env(:MASTER_COURSE_DATA => data)
+    js_env(MASTER_COURSE_DATA: data)
   end
   helper_method :set_master_course_js_env_data
 
@@ -479,7 +479,7 @@ class ApplicationController < ActionController::Base
         canAutoPublishCourses: can_manage
       )
     end
-    js_env :BLUEPRINT_COURSES_DATA => bc_data
+    js_env BLUEPRINT_COURSES_DATA: bc_data
     if is_master && js_env.key?(:NEW_USER_TUTORIALS)
       js_env[:NEW_USER_TUTORIALS][:is_enabled] = false
     end
@@ -490,7 +490,7 @@ class ApplicationController < ActionController::Base
     if @context.respond_to?(:content_notices)
       notices = @context.content_notices(@current_user)
       if notices.any?
-        js_env :CONTENT_NOTICES => notices.map { |notice|
+        js_env CONTENT_NOTICES: notices.map { |notice|
           {
             tag: notice.tag,
             variant: notice.variant || 'info',
@@ -774,7 +774,7 @@ class ApplicationController < ActionController::Base
         redirect_to named_context_url(@context, :context_url)
       end
       format.json do
-        render :json => { :message => msg }, :status => :not_found
+        render json: { message: msg }, status: :not_found
       end
     end
   end
@@ -867,7 +867,7 @@ class ApplicationController < ActionController::Base
             @unauthorized_message = t('#application.errors.unauthorized.unpublished', "This course has not been published by the instructor yet.")
             @unauthorized_reason = :unpublished
           elsif start_date && start_date > Time.now.utc
-            @unauthorized_message = t('#application.errors.unauthorized.not_started_yet', "The course you are trying to access has not started yet.  It will start %{date}.", :date => TextHelper.date_string(start_date))
+            @unauthorized_message = t('#application.errors.unauthorized.not_started_yet', "The course you are trying to access has not started yet.  It will start %{date}.", date: TextHelper.date_string(start_date))
             @unauthorized_reason = :unpublished
           end
         end
@@ -1021,7 +1021,7 @@ class ApplicationController < ActionController::Base
               elsif count >= MAX_ACCOUNT_LINEAGE_TO_SHOW_IN_CRUMBS && idx > 0 && idx <= count - MAX_ACCOUNT_LINEAGE_TO_SHOW_IN_CRUMBS
                 next
               else
-                add_crumb(a.short_name, account_url(a.id), :id => "crumb_#{a.asset_string}")
+                add_crumb(a.short_name, account_url(a.id), id: "crumb_#{a.asset_string}")
               end
             end
           end
@@ -1063,7 +1063,7 @@ class ApplicationController < ActionController::Base
                          .for_user(@context)
                          .current
                          .active_by_date
-      enrollment_scope = enrollment_scope.where(:course_id => @observed_course_ids) if @observed_course_ids
+      enrollment_scope = enrollment_scope.where(course_id: @observed_course_ids) if @observed_course_ids
       include_groups = !!opts[:include_groups]
       group_ids = nil
 
@@ -1094,10 +1094,10 @@ class ApplicationController < ActionController::Base
       groups = []
       if include_groups
         group_scope = @context.current_groups
-        group_scope = group_scope.where(:context_type => "Course", :context_id => @observed_course_ids) if @observed_course_ids
+        group_scope = group_scope.where(context_type: "Course", context_id: @observed_course_ids) if @observed_course_ids
         if group_ids
           Shard.partition_by_shard(group_ids) do |shard_group_ids|
-            groups += group_scope.shard(Shard.current).where(:id => shard_group_ids).to_a
+            groups += group_scope.shard(Shard.current).where(id: shard_group_ids).to_a
           end
         else
           groups = group_scope.shard(opts[:cross_shard] ? @context.in_region_associated_shards : Shard.current).to_a
@@ -1138,15 +1138,15 @@ class ApplicationController < ActionController::Base
       when :invited
         flash[:html_notice] = if @context_enrollment.available_at
                                 t("You'll need to *accept the enrollment invitation* before you can fully participate in this course, starting on %{date}.",
-                                  :wrapper => view_context.link_to('\1', '#', 'data-method' => 'POST', 'data-url' => course_enrollment_invitation_url(@context, accept: true)),
-                                  :date => datetime_string(@context_enrollment.available_at))
+                                  wrapper: view_context.link_to('\1', '#', 'data-method' => 'POST', 'data-url' => course_enrollment_invitation_url(@context, accept: true)),
+                                  date: datetime_string(@context_enrollment.available_at))
                               else
                                 t("You'll need to *accept the enrollment invitation* before you can fully participate in this course.",
-                                  :wrapper => view_context.link_to('\1', '#', 'data-method' => 'POST', 'data-url' => course_enrollment_invitation_url(@context, accept: true)))
+                                  wrapper: view_context.link_to('\1', '#', 'data-method' => 'POST', 'data-url' => course_enrollment_invitation_url(@context, accept: true)))
                               end
       when :accepted
         flash[:html_notice] = t("This course hasn’t started yet. You will not be able to participate in this course until %{date}.",
-                                :date => datetime_string(@context_enrollment.available_at))
+                                date: datetime_string(@context_enrollment.available_at))
       end
     end
   end
@@ -1156,7 +1156,7 @@ class ApplicationController < ActionController::Base
     return unless context.present? && user.present?
     return unless context.respond_to?(:content_participation_counts) # just Course and Group so far
 
-    js_env(:badge_counts => badge_counts_for(context, user))
+    js_env(badge_counts: badge_counts_for(context, user))
   end
   helper_method :set_badge_counts_for
 
@@ -1164,7 +1164,7 @@ class ApplicationController < ActionController::Base
     badge_counts = {}
     ['Submission'].each do |type|
       participation_count = context.content_participation_counts
-                                   .where(:user_id => user.id, :content_type => type).take
+                                   .where(user_id: user.id, content_type: type).take
       participation_count ||= content_participation_count(context, type, user)
       badge_counts[type.underscore.pluralize] = participation_count.unread_count
     end
@@ -1188,10 +1188,10 @@ class ApplicationController < ActionController::Base
 
     assignments.map! { |a| a.overridden_for(@current_user) }
     sorted = SortsAssignments.by_due_date({
-                                            :assignments => assignments,
-                                            :user => @current_user,
-                                            :session => session,
-                                            :upcoming_limit => 1.week.from_now
+                                            assignments: assignments,
+                                            user: @current_user,
+                                            session: session,
+                                            upcoming_limit: 1.week.from_now
                                           })
 
     sorted.upcoming.call.sort
@@ -1229,8 +1229,8 @@ class ApplicationController < ActionController::Base
       respond_to do |format|
         flash[:error] = error unless request.format.to_s == "text/plain"
         format.html { redirect_to redirect }
-        format.json { render :json => { :errors => { :base => error } }, :status => :bad_request }
-        format.text { render :json => { :errors => { :base => error } }, :status => :bad_request }
+        format.json { render json: { errors: { base: error } }, status: :bad_request }
+        format.text { render json: { errors: { base: error } }, status: :bad_request }
       end
       return true
     end
@@ -1411,7 +1411,7 @@ class ApplicationController < ActionController::Base
   end
 
   def generate_page_view(user = @current_user)
-    attributes = { :user => user, :real_user => @real_current_user }
+    attributes = { user: user, real_user: @real_current_user }
     @page_view = PageView.generate(request, attributes)
     @page_view.user_request = true if params[:user_request] || (user && !request.xhr? && request.get?)
     @page_before_render = Time.now.utc
@@ -1462,14 +1462,14 @@ class ApplicationController < ActionController::Base
 
       if !@accessed_asset || overwrite
         @accessed_asset = {
-          :user => user,
-          :code => code,
-          :asset_for_root_account_id => asset.is_a?(Array) ? asset[1] : asset,
-          :group_code => group_code,
-          :category => asset_category,
-          :membership_type => membership_type,
-          :level => level,
-          :shard => shard
+          user: user,
+          code: code,
+          asset_for_root_account_id: asset.is_a?(Array) ? asset[1] : asset,
+          group_code: group_code,
+          category: asset_category,
+          membership_type: membership_type,
+          level: level,
+          shard: shard
         }
       end
 
@@ -1616,7 +1616,7 @@ class ApplicationController < ActionController::Base
   def render_optional_error_file(status)
     path = "#{Rails.public_path}/#{status.to_s[0, 3]}"
     if File.exist?(path)
-      render :file => path, :status => status, :content_type => Mime::Type.lookup('text/html'), :layout => false, :formats => [:html]
+      render file: path, status: status, content_type: Mime::Type.lookup('text/html'), layout: false, formats: [:html]
     else
       head status
     end
@@ -1709,7 +1709,7 @@ class ApplicationController < ActionController::Base
       data[:error_report_id] = error_report.id
     end
 
-    render :json => data, :status => response_code
+    render json: data, status: response_code
   end
 
   def api_error_json(exception, status_code)
@@ -1804,15 +1804,15 @@ class ApplicationController < ActionController::Base
     unless @page
       if params[:titleize].present? && !value_to_boolean(params[:titleize])
         @page_name = CGI.unescape(@page_name)
-        @page = @wiki.build_wiki_page(@current_user, :title => @page_name)
+        @page = @wiki.build_wiki_page(@current_user, title: @page_name)
       else
-        @page = @wiki.build_wiki_page(@current_user, :url => @page_name)
+        @page = @wiki.build_wiki_page(@current_user, url: @page_name)
       end
     end
   end
 
   def content_tag_redirect(context, tag, error_redirect_symbol, tag_type = nil)
-    url_params = tag.tag_type == 'context_module' ? { :module_item_id => tag.id } : {}
+    url_params = tag.tag_type == 'context_module' ? { module_item_id: tag.id } : {}
     if tag.content_type == 'Assignment'
       use_edit_url = params[:build].nil? &&
                      Account.site_admin.feature_enabled?(:new_quizzes_modules_support) &&
@@ -1897,8 +1897,8 @@ class ApplicationController < ActionController::Base
                           external_content_success_url('external_tool_redirect')
                         end
           @redirect_return = true
-          js_env(:redirect_return_success_url => success_url,
-                 :redirect_return_cancel_url => success_url)
+          js_env(redirect_return_success_url: success_url,
+                 redirect_return_cancel_url: success_url)
         end
 
         opts = {
@@ -2060,13 +2060,13 @@ class ApplicationController < ActionController::Base
     options[:query][:include_contexts] = contexts_to_link_to.map { |c| c.is_a? String ? c : c.asset_string }.join(",") unless contexts_to_link_to.empty?
     url_for(
       options[:query].merge({
-        :controller => 'files',
-        :action => "full_index",
+        controller: 'files',
+        action: "full_index",
       }.merge(if options[:anchor].empty?
                 {}
               else
                 {
-                  :anchor => options[:anchor]
+                  anchor: options[:anchor]
                 }
               end))
     )
@@ -2134,7 +2134,7 @@ class ApplicationController < ActionController::Base
         res += '?' + opts.to_query
       else
         # otherwise, just redirect to /files/:id
-        res += file_download_url(attachment, opts.merge(:only_path => true))
+        res += file_download_url(attachment, opts.merge(only_path: true))
       end
     end
 
@@ -2230,7 +2230,7 @@ class ApplicationController < ActionController::Base
     unless @current_user.registered?
       respond_to do |format|
         format.html { render "shared/registration_incomplete", status: :unauthorized }
-        format.json { render :json => { 'status' => 'unauthorized', 'message' => t('#errors.registration_incomplete', 'You need to confirm your email address before you can view this page') }, :status => :unauthorized }
+        format.json { render json: { 'status' => 'unauthorized', 'message' => t('#errors.registration_incomplete', 'You need to confirm your email address before you can view this page') }, status: :unauthorized }
       end
       false
     end
@@ -2238,7 +2238,7 @@ class ApplicationController < ActionController::Base
 
   def check_incomplete_registration
     if @current_user
-      js_env :INCOMPLETE_REGISTRATION => incomplete_registration?, :USER_EMAIL => @current_user.email
+      js_env INCOMPLETE_REGISTRATION: incomplete_registration?, USER_EMAIL: @current_user.email
     end
   end
 
@@ -2255,7 +2255,7 @@ class ApplicationController < ActionController::Base
   def verified_file_download_url(attachment, context = nil, permission_map_id = nil, *opts)
     verifier = Attachments::Verification.new(attachment).verifier_for_user(@current_user,
                                                                            context: context.try(:asset_string), permission_map_id: permission_map_id)
-    file_download_url(attachment, { :verifier => verifier }, *opts)
+    file_download_url(attachment, { verifier: verifier }, *opts)
   end
   helper_method :verified_file_download_url
 
@@ -2497,19 +2497,19 @@ class ApplicationController < ActionController::Base
     @notices ||= begin
       notices = []
       if !browser_supported? && !@embedded_view && !cookies['unsupported_browser_dismissed']
-        notices << { :type => 'warning', :content => { html: unsupported_browser }, :classes => 'unsupported_browser' }
+        notices << { type: 'warning', content: { html: unsupported_browser }, classes: 'unsupported_browser' }
       end
       if (error = flash[:error])
         flash.delete(:error)
-        notices << { :type => 'error', :content => error, :icon => 'warning' }
+        notices << { type: 'error', content: error, icon: 'warning' }
       end
       if (warning = flash[:warning])
         flash.delete(:warning)
-        notices << { :type => 'warning', :content => warning, :icon => 'warning' }
+        notices << { type: 'warning', content: warning, icon: 'warning' }
       end
       if (info = flash[:info])
         flash.delete(:info)
-        notices << { :type => 'info', :content => info, :icon => 'info' }
+        notices << { type: 'info', content: info, icon: 'info' }
       end
       if (notice = flash[:html_notice] ? { html: flash[:html_notice] } : flash[:notice])
         if flash[:html_notice]
@@ -2517,7 +2517,7 @@ class ApplicationController < ActionController::Base
         else
           flash.delete(:notice)
         end
-        notices << { :type => 'success', :content => notice, :icon => 'check' }
+        notices << { type: 'success', content: notice, icon: 'check' }
       end
       notices
     end
@@ -2525,7 +2525,7 @@ class ApplicationController < ActionController::Base
   helper_method :flash_notices
 
   def unsupported_browser
-    t("Your browser does not meet the minimum requirements for Canvas. Please visit the *Canvas Community* for a complete list of supported browsers.", :wrapper => view_context.link_to('\1', t(:"#community.basics_browser_requirements")))
+    t("Your browser does not meet the minimum requirements for Canvas. Please visit the *Canvas Community* for a complete list of supported browsers.", wrapper: view_context.link_to('\1', t(:"#community.basics_browser_requirements")))
   end
 
   def browser_supported?
@@ -2625,7 +2625,7 @@ class ApplicationController < ActionController::Base
         mc_status = setup_master_course_restrictions(@page, @context, user_can_edit: true)
       end
 
-      hash[:WIKI_PAGE] = wiki_page_json(@page, @current_user, session, true, :deep_check_if_needed => true, :master_course_status => mc_status)
+      hash[:WIKI_PAGE] = wiki_page_json(@page, @current_user, session, true, deep_check_if_needed: true, master_course_status: mc_status)
       version_number = Rails.cache.fetch(['page_version', @page].cache_key) { @page.versions.maximum(:number) }
       hash[:WIKI_PAGE_REVISION] = version_number && StringifyIds.stringify_id(version_number)
       hash[:WIKI_PAGE_SHOW_PATH] = named_context_url(@context, :context_wiki_page_path, @page)
@@ -2678,42 +2678,42 @@ class ApplicationController < ActionController::Base
                  ), id: 'assignment_groups_url')
 
     js_env({
-             :COURSE_ID => @context.id.to_s,
-             :URLS => {
-               :new_assignment_url => new_polymorphic_url([@context, :assignment]),
-               :new_quiz_url => context_url(@context, :context_quizzes_new_url),
-               :course_url => api_v1_course_url(@context),
-               :sort_url => reorder_course_assignment_groups_url(@context),
-               :assignment_sort_base_url => course_assignment_groups_url(@context),
-               :context_modules_url => api_v1_course_context_modules_path(@context),
-               :course_student_submissions_url => api_v1_course_student_submissions_url(@context)
+             COURSE_ID: @context.id.to_s,
+             URLS: {
+               new_assignment_url: new_polymorphic_url([@context, :assignment]),
+               new_quiz_url: context_url(@context, :context_quizzes_new_url),
+               course_url: api_v1_course_url(@context),
+               sort_url: reorder_course_assignment_groups_url(@context),
+               assignment_sort_base_url: course_assignment_groups_url(@context),
+               context_modules_url: api_v1_course_context_modules_path(@context),
+               course_student_submissions_url: api_v1_course_student_submissions_url(@context)
              },
-             :POST_TO_SIS => Assignment.sis_grade_export_enabled?(@context),
-             :PERMISSIONS => permissions,
-             :HAS_GRADING_PERIODS => @context.grading_periods?,
-             :VALID_DATE_RANGE => CourseDateRange.new(@context),
-             :assignment_menu_tools => external_tools_display_hashes(:assignment_menu),
-             :assignment_index_menu_tools => (if @domain_root_account&.feature_enabled?(:commons_favorites)
-                                                external_tools_display_hashes(:assignment_index_menu)
-                                              else
-                                                []
-                                              end),
-             :assignment_group_menu_tools => (if @domain_root_account&.feature_enabled?(:commons_favorites)
-                                                external_tools_display_hashes(:assignment_group_menu)
-                                              else
-                                                []
-                                              end),
-             :discussion_topic_menu_tools => external_tools_display_hashes(:discussion_topic_menu),
-             :quiz_menu_tools => external_tools_display_hashes(:quiz_menu),
-             :current_user_has_been_observer_in_this_course => current_user_has_been_observer_in_this_course,
-             :observed_student_ids => ObserverEnrollment.observed_student_ids(@context, @current_user),
+             POST_TO_SIS: Assignment.sis_grade_export_enabled?(@context),
+             PERMISSIONS: permissions,
+             HAS_GRADING_PERIODS: @context.grading_periods?,
+             VALID_DATE_RANGE: CourseDateRange.new(@context),
+             assignment_menu_tools: external_tools_display_hashes(:assignment_menu),
+             assignment_index_menu_tools: (if @domain_root_account&.feature_enabled?(:commons_favorites)
+                                             external_tools_display_hashes(:assignment_index_menu)
+                                           else
+                                             []
+                                           end),
+             assignment_group_menu_tools: (if @domain_root_account&.feature_enabled?(:commons_favorites)
+                                             external_tools_display_hashes(:assignment_group_menu)
+                                           else
+                                             []
+                                           end),
+             discussion_topic_menu_tools: external_tools_display_hashes(:discussion_topic_menu),
+             quiz_menu_tools: external_tools_display_hashes(:quiz_menu),
+             current_user_has_been_observer_in_this_course: current_user_has_been_observer_in_this_course,
+             observed_student_ids: ObserverEnrollment.observed_student_ids(@context, @current_user),
              apply_assignment_group_weights: @context.apply_group_weights?,
            })
 
     conditional_release_js_env(includes: :active_rules)
 
     if @context.grading_periods?
-      js_env(:active_grading_periods => GradingPeriod.json_for(@context, @current_user))
+      js_env(active_grading_periods: GradingPeriod.json_for(@context, @current_user))
     end
   end
 

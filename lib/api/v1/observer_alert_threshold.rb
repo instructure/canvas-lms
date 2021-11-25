@@ -23,7 +23,7 @@ module Api::V1::ObserverAlertThreshold
   include ApplicationHelper
 
   API_ALLOWED_OUTPUT_FIELDS = {
-    :only => %w[
+    only: %w[
       id
       user_id
       observer_id

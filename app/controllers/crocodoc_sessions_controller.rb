@@ -36,10 +36,10 @@ class CrocodocSessionsController < ApplicationController
                     end
 
       crocodoc = attachment.crocodoc_document
-      url = crocodoc.session_url(:user => @current_user,
-                                 :annotations => annotations,
-                                 :enable_annotations => blob["enable_annotations"],
-                                 :moderated_grading_allow_list => blob["moderated_grading_allow_list"])
+      url = crocodoc.session_url(user: @current_user,
+                                 annotations: annotations,
+                                 enable_annotations: blob["enable_annotations"],
+                                 moderated_grading_allow_list: blob["moderated_grading_allow_list"])
 
       # For the purposes of reporting student viewership, we only
       # care if the original attachment owner is looking
@@ -51,12 +51,12 @@ class CrocodocSessionsController < ApplicationController
 
       redirect_to url
     else
-      render :plain => "Not found", :status => :not_found
+      render plain: "Not found", status: :not_found
     end
   rescue HmacHelper::Error
-    render :plain => 'unauthorized', :status => :unauthorized
+    render plain: 'unauthorized', status: :unauthorized
   rescue Timeout::Error
-    render :plain => "Service is currently unavailable. Try again later.",
-           :status => :service_unavailable
+    render plain: "Service is currently unavailable. Try again later.",
+           status: :service_unavailable
   end
 end

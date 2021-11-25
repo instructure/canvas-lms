@@ -24,7 +24,7 @@ describe Message do
   describe "#get_template" do
     it "gets the template with an existing file path" do
       allow(HostUrl).to receive(:protocol).and_return("https")
-      au = AccountUser.create(:account => account_model)
+      au = AccountUser.create(account: account_model)
       msg = generate_message(:account_user_notification, :email, au)
       template = msg.get_template('alert.email.erb')
       expect(template).to match(/An alert has been triggered/)
@@ -34,8 +34,8 @@ describe Message do
   describe '#populate body' do
     it 'saves an html body if a template exists' do
       expect_any_instance_of(Message).to receive(:apply_html_template).and_return('template')
-      user         = user_factory(:active_all => true)
-      account_user = AccountUser.create!(:account => account_model, :user => user)
+      user         = user_factory(active_all: true)
+      account_user = AccountUser.create!(account: account_model, user: user)
       message      = generate_message(:account_user_notification, :email, account_user)
 
       expect(message.html_body).to eq 'template'
@@ -46,7 +46,7 @@ describe Message do
         <b>Your content</b>: <%= "<script>alert()</script>" %>
       HTML
       user         = user_factory(active_all: true)
-      account_user = AccountUser.create!(:account => account_model, :user => user)
+      account_user = AccountUser.create!(account: account_model, user: user)
       message      = generate_message(:account_user_notification, :email, account_user)
 
       expect(message.html_body).not_to include "<script>"
@@ -57,21 +57,21 @@ describe Message do
   describe "parse!" do
     it "uses https when the domain is configured as ssl" do
       allow(HostUrl).to receive(:protocol).and_return("https")
-      @au = AccountUser.create(:account => account_model)
+      @au = AccountUser.create(account: account_model)
       msg = generate_message(:account_user_notification, :email, @au)
       expect(msg.body).to include('Account Admin')
       expect(msg.html_body).to include('Account Admin')
     end
 
     it "has a sane body" do
-      @au = AccountUser.create(:account => account_model)
+      @au = AccountUser.create(account: account_model)
       msg = generate_message(:account_user_notification, :email, @au)
       expect(msg.html_body.scan(/<html dir="ltr" lang="en">/).length).to eq 1
       expect(msg.html_body.index('<!DOCTYPE')).to eq 0
     end
 
     it "uses slack template if present" do
-      @au = AccountUser.create(:account => account_model)
+      @au = AccountUser.create(account: account_model)
       course_with_student
       alert = @course.alerts.create!(recipients: [:student],
                                      criteria: [
@@ -85,7 +85,7 @@ describe Message do
     end
 
     it "smses template if no slack template present" do
-      @au = AccountUser.create(:account => account_model)
+      @au = AccountUser.create(account: account_model)
       course_with_student
       alert = @course.alerts.create!(recipients: [:student],
                                      criteria: [
@@ -100,7 +100,7 @@ describe Message do
     end
 
     it "does not html escape the subject" do
-      assignment_model(:title => "hey i have weird&<stuff> in my name but that's okay")
+      assignment_model(title: "hey i have weird&<stuff> in my name but that's okay")
       msg = generate_message(:assignment_created, :email, @assignment)
       expect(msg.subject).to include(@assignment.title)
     end
@@ -161,24 +161,24 @@ describe Message do
       account = account_model
       account.settings[:email_logo] = 'awesomelogo.jpg'
       account.save!
-      @au = AccountUser.create!(:account => account, user: user_model)
+      @au = AccountUser.create!(account: account, user: user_model)
       msg = generate_message(:account_user_notification, :email, @au)
       expect(msg.html_body).to include('awesomelogo.jpg')
     end
 
     describe "course nicknames" do
       before(:once) do
-        course_with_student(:active_all => true, :course_name => 'badly-named-course')
+        course_with_student(active_all: true, course_name: 'badly-named-course')
         @student.set_preference(:course_nicknames, @course.id, 'student-course-nick')
       end
 
       def check_message(message, asset)
-        msg = generate_message(message, :email, asset, :user => @student)
+        msg = generate_message(message, :email, asset, user: @student)
         expect(msg.html_body).not_to include 'badly-named-course'
         expect(msg.html_body).to include 'student-course-nick'
         expect(@course.name).to eq 'badly-named-course'
 
-        msg = generate_message(message, :email, asset, :user => @teacher)
+        msg = generate_message(message, :email, asset, user: @teacher)
         expect(msg.html_body).to include 'badly-named-course'
         expect(msg.html_body).not_to include 'student-course-nick'
       end
@@ -204,7 +204,7 @@ describe Message do
   end
 
   it "still sets new attributes defined in workflow transitions" do
-    message_model(:workflow_state => "sending", :user => user_factory)
+    message_model(workflow_state: "sending", user: user_factory)
     @message.complete_dispatch
     expect(@message.reload.workflow_state).to eq "sent"
     expect(@message.sent_at).to be_present
@@ -212,9 +212,9 @@ describe Message do
 
   context "named scopes" do
     it "is able to get messages in any state" do
-      m1 = message_model(:workflow_state => 'bounced', :user => user_factory)
-      m2 = message_model(:workflow_state => 'sent', :user => user_factory)
-      m3 = message_model(:workflow_state => 'sending', :user => user_factory)
+      m1 = message_model(workflow_state: 'bounced', user: user_factory)
+      m2 = message_model(workflow_state: 'sent', user: user_factory)
+      m3 = message_model(workflow_state: 'sending', user: user_factory)
       expect(Message.in_state(:bounced)).to eq [m1]
       expect(Message.in_state([:bounced, :sent]).sort_by(&:id)).to eq [m1, m2].sort_by(&:id)
       expect(Message.in_state([:bounced, :sent])).not_to be_include(m3)
@@ -222,29 +222,29 @@ describe Message do
 
     it "is able to search on its context" do
       user_model
-      message_model(:context => @user)
+      message_model(context: @user)
       expect(Message.for(@user)).to eq [@message]
     end
 
     it "has a list of messages to dispatch" do
-      message_model(:dispatch_at => Time.now - 1, :workflow_state => 'staged', :to => 'somebody', :user => user_factory)
+      message_model(dispatch_at: Time.now - 1, workflow_state: 'staged', to: 'somebody', user: user_factory)
       expect(Message.to_dispatch).to eq [@message]
     end
 
     it "does not have a message to dispatch if the message's delay moves it to the future" do
-      message_model(:dispatch_at => Time.now - 1, :to => 'somebody')
+      message_model(dispatch_at: Time.now - 1, to: 'somebody')
       @message.stage
       expect(Message.to_dispatch).to eq []
     end
 
     it "filters on notification name" do
-      notification_model(:name => 'Some Name')
-      message_model(:notification_id => @notification.id)
+      notification_model(name: 'Some Name')
+      message_model(notification_id: @notification.id)
       expect(Message.by_name('Some Name')).to eq [@message]
     end
 
     it "offers staged messages (waiting to be dispatched)" do
-      message_model(:dispatch_at => Time.now + 100, :user => user_factory)
+      message_model(dispatch_at: Time.now + 100, user: user_factory)
       expect(Message.staged).to eq [@message]
     end
 
@@ -252,7 +252,7 @@ describe Message do
       allow_any_instance_of(Message).to receive(:stage_message)
       Message.workflow_spec.states.each do |state_symbol, state|
         Message.destroy_all
-        message = message_model(:workflow_state => state_symbol.to_s, :user => user_factory, :to => 'nobody')
+        message = message_model(workflow_state: state_symbol.to_s, user: user_factory, to: 'nobody')
         if state.events.any? { |_event_symbol, event| event.transitions_to == :cancelled }
           expect(Message.cancellable).to eq [message]
         else
@@ -263,7 +263,7 @@ describe Message do
   end
 
   it "goes back to the staged state if sending fails" do
-    message_model(:dispatch_at => Time.now - 1, :workflow_state => 'sending', :to => 'somebody', :updated_at => Time.now.utc - 11.minutes, :user => user_factory)
+    message_model(dispatch_at: Time.now - 1, workflow_state: 'sending', to: 'somebody', updated_at: Time.now.utc - 11.minutes, user: user_factory)
     @message.errored_dispatch
     expect(@message.workflow_state).to eq 'staged'
     expect(@message.dispatch_at).to be > Time.now + 4.minutes
@@ -271,7 +271,7 @@ describe Message do
 
   describe "#deliver" do
     it "does not deliver if canceled" do
-      message_model(:dispatch_at => Time.now, :workflow_state => 'staged', :to => 'somebody', :updated_at => Time.now.utc - 11.minutes, :user => user_factory, :path_type => 'email')
+      message_model(dispatch_at: Time.now, workflow_state: 'staged', to: 'somebody', updated_at: Time.now.utc - 11.minutes, user: user_factory, path_type: 'email')
       @message.cancel
       expect(@message).not_to receive(:deliver_via_email)
       expect(Mailer).not_to receive(:create_message)
@@ -280,17 +280,17 @@ describe Message do
     end
 
     it "logs errors and raise based on error type" do
-      message_model(:dispatch_at => Time.now, :workflow_state => 'staged', :to => 'somebody', :updated_at => Time.now.utc - 11.minutes, :user => user_factory, :path_type => 'email')
+      message_model(dispatch_at: Time.now, workflow_state: 'staged', to: 'somebody', updated_at: Time.now.utc - 11.minutes, user: user_factory, path_type: 'email')
       expect(Mailer).to receive(:create_message).and_raise("something went wrong")
       expect(ErrorReport).to receive(:log_exception)
       expect { @message.deliver }.to raise_exception("something went wrong")
 
-      message_model(:dispatch_at => Time.now, :workflow_state => 'staged', :to => 'somebody', :updated_at => Time.now.utc - 11.minutes, :user => user_factory, :path_type => 'email')
+      message_model(dispatch_at: Time.now, workflow_state: 'staged', to: 'somebody', updated_at: Time.now.utc - 11.minutes, user: user_factory, path_type: 'email')
       expect(Mailer).to receive(:create_message).and_raise(Timeout::Error.new)
       expect(ErrorReport).not_to receive(:log_exception)
       expect { @message.deliver }.to raise_exception(Timeout::Error)
 
-      message_model(:dispatch_at => Time.now, :workflow_state => 'staged', :to => 'somebody', :updated_at => Time.now.utc - 11.minutes, :user => user_factory, :path_type => 'email')
+      message_model(dispatch_at: Time.now, workflow_state: 'staged', to: 'somebody', updated_at: Time.now.utc - 11.minutes, user: user_factory, path_type: 'email')
       expect(Mailer).to receive(:create_message).and_raise("450 recipient address rejected")
       expect(ErrorReport).not_to receive(:log_exception)
       expect(@message.deliver).to eq false
@@ -462,7 +462,7 @@ describe Message do
     end
 
     def build_submission
-      assignment = course.assignments.new(:title => "some assignment")
+      assignment = course.assignments.new(title: "some assignment")
       assignment.workflow_state = "published"
       assignment.save
       valid_attributes = {
@@ -491,13 +491,13 @@ describe Message do
 
       it "does not break if the context does not have an account" do
         user_model
-        message = message_model(:context => @user)
+        message = message_model(context: @user)
         expect(message.root_account_id).to be_nil
         expect(message.reply_to_name).to be_nil
       end
 
       it "populates root_account_id if the context can chain back to a root account" do
-        message = message_model(:context => course_model)
+        message = message_model(context: course_model)
         expect(message.root_account).to eq Account.default
       end
 
@@ -514,14 +514,14 @@ describe Message do
       describe ":from_name" do
         it 'pulls from the assets directly, if possible' do
           convo_message = build_conversation_message
-          message = message_model(:context => convo_message, notification_name: "Conversation Message")
+          message = message_model(context: convo_message, notification_name: "Conversation Message")
           expect(message.from_name).to eq user1.short_name
         end
 
         it "pulls from the asset's context, if possible" do
           assign = assignment_model
-          notification = Notification.create(:name => 'Assignment Changed')
-          message = message_model(:context => assign, notification: notification)
+          notification = Notification.create(name: 'Assignment Changed')
+          message = message_model(context: assign, notification: notification)
           expect(message.from_name).to eq assign.context.name
         end
 
@@ -530,7 +530,7 @@ describe Message do
           account.settings[:outgoing_email_default_name] = "OutgoingName"
           account.save!
           expect(account.reload.settings[:outgoing_email_default_name]).to eq "OutgoingName"
-          message = message_model(:context => course_model)
+          message = message_model(context: course_model)
           expect(message.from_name).to eq "OutgoingName"
         end
 
@@ -542,8 +542,8 @@ describe Message do
         it 'uses a course nickname if exists' do
           assign = assignment_model
           user = user_model(preferences: { course_nicknames: { assign.context.id => 'nickname' } })
-          notification = Notification.create(:name => 'Assignment Changed')
-          message = message_model(:context => assign, notification: notification, user: user)
+          notification = Notification.create(name: 'Assignment Changed')
+          message = message_model(context: assign, notification: notification, user: user)
           expect(message.from_name).to eq 'nickname'
         end
 
@@ -551,17 +551,17 @@ describe Message do
           @account = Account.create!
           @account.settings[:allow_invitation_previews] = false
           @account.save!
-          course_with_student(:account => @account, :active_all => true, :name => 'Unnamed Course')
-          cat = @course.group_categories.create(:name => 'teh category')
-          ag = appointment_group_model(:contexts => [@course], :sub_context => cat)
+          course_with_student(account: @account, active_all: true, name: 'Unnamed Course')
+          cat = @course.group_categories.create(name: 'teh category')
+          ag = appointment_group_model(contexts: [@course], sub_context: cat)
           assign = assignment_model
           @course.offer!
           user = user_model(preferences: { course_nicknames: { assign.context.id => 'test_course' } })
           user.register!
           enroll = @course.enroll_user(user)
           enroll.accept!
-          notification = Notification.create(:name => 'Assignment Group Published')
-          message = message_model(:context => ag, notification: notification, user: user)
+          notification = Notification.create(name: 'Assignment Group Published')
+          message = message_model(context: ag, notification: notification, user: user)
           expect(message.from_name).to eq "Unnamed Course"
         end
       end

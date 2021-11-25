@@ -62,7 +62,7 @@ class DiscussionTopicPresenter
   def peer_reviews_for(user)
     reviews = user.assigned_submission_assessments.shard(assignment.shard).for_assignment(assignment.id).to_a
     if reviews.any?
-      valid_student_ids = assignment.context.participating_students.where(:id => reviews.map(&:user_id)).pluck(:id).to_set
+      valid_student_ids = assignment.context.participating_students.where(id: reviews.map(&:user_id)).pluck(:id).to_set
       reviews = reviews.select { |r| valid_student_ids.include?(r.user_id) }
     end
     reviews

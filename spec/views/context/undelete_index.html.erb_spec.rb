@@ -22,7 +22,7 @@ require_relative '../views_helper'
 
 describe "context/undelete_index.html.erb" do
   before do
-    course_with_teacher(:active_all => true)
+    course_with_teacher(active_all: true)
     assign(:context, @course)
   end
 

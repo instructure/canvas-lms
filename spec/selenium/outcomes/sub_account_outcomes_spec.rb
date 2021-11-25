@@ -25,7 +25,7 @@ describe "sub account outcomes" do
   include OutcomeCommon
 
   describe "account outcome specs" do
-    let(:account) { Account.create(:name => 'sub account from default account', :parent_account => Account.default) }
+    let(:account) { Account.create(name: 'sub account from default account', parent_account: Account.default) }
     let(:outcome_url) { "/accounts/#{account.id}/outcomes" }
     let(:who_to_login) { 'admin' }
 

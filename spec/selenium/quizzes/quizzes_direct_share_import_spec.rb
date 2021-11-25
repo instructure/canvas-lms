@@ -28,7 +28,7 @@ describe 'quizzes' do
   before do
     course_with_teacher_logged_in
     @course.save!
-    @quiz1 = @course.quizzes.create!(:title => "Math Quiz!")
+    @quiz1 = @course.quizzes.create!(title: "Math Quiz!")
     user_session(@teacher)
     visit_quizzes_index_page(@course.id)
   end

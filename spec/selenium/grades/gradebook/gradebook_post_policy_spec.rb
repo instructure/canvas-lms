@@ -51,7 +51,7 @@ describe 'Gradebook Post Policy' do
 
     # sections
     @section1 = @course_with_manual_post.course_sections.first
-    @section2 = @course_with_manual_post.course_sections.create!(:name => 'Section 2')
+    @section2 = @course_with_manual_post.course_sections.create!(name: 'Section 2')
     # students
     @section_one_students = create_users_in_course(@course_with_manual_post, 2, return_type: :record, name_prefix: "Purple", section: @section1)
     @section_two_students = create_users_in_course(@course_with_manual_post, 2, return_type: :record, name_prefix: "Indigo", section: @section2)

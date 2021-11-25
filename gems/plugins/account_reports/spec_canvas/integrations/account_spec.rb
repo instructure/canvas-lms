@@ -25,7 +25,7 @@ describe "Account Reports", type: :request do
     # uncommented you can get a better error to work from, try looking at
     # ErrorReport.last.message or
     # puts  ErrorReport.last.backtrace;''
-    account_admin_user :account => Account.site_admin
+    account_admin_user account: Account.site_admin
     @admin = @user
     user_with_pseudonym(user: @admin,
                         username: 'admin@example.com',

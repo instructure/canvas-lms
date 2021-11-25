@@ -52,15 +52,15 @@ describe "duplicate discussion" do
         # other specs elsewhere that mandate that such students can't even
         # see this page.
         before :once do
-          course_with_teacher(:active_all => true)
-          student_in_course(:active_all => true)
-          @course.update(:allow_student_discussion_editing => true,
-                         :allow_student_discussion_topics => true)
-          @group_category = @course.group_categories.create!(:name => "Group Category")
-          @group = @course.groups.create!(:group_category => @group_category, :name => "Group 1")
-          @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active')
+          course_with_teacher(active_all: true)
+          student_in_course(active_all: true)
+          @course.update(allow_student_discussion_editing: true,
+                         allow_student_discussion_topics: true)
+          @group_category = @course.group_categories.create!(name: "Group Category")
+          @group = @course.groups.create!(group_category: @group_category, name: "Group 1")
+          @course.enroll_user(@student, 'StudentEnrollment', enrollment_state: 'active')
           @group.add_user(@student, 'accepted')
-          @course.enroll_user(@teacher, 'TeacherEnrollment', :enrollment_state => 'active')
+          @course.enroll_user(@teacher, 'TeacherEnrollment', enrollment_state: 'active')
           @group.add_user(@teacher)
         end
 

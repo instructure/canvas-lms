@@ -117,7 +117,7 @@ module LocaleSelection
     settings = Canvas::Plugin.find(:i18n).settings || {}
     enabled_custom_locales = settings.select { |_locale, enabled| enabled }.keys.map(&:to_sym)
     I18n.available_locales.each do |locale|
-      name = I18n.send(:t, :locales, :locale => locale)[locale]
+      name = I18n.send(:t, :locales, locale: locale)[locale]
       custom = I18n.send(:t, :custom, locale: locale) == true
       next if custom && !enabled_custom_locales.include?(locale)
 
@@ -127,11 +127,11 @@ module LocaleSelection
   end
 
   def self.custom_locales
-    @custom_locales ||= I18n.available_locales.select { |locale| I18n.send(:t, :custom, :locale => locale) == true }.sort
+    @custom_locales ||= I18n.available_locales.select { |locale| I18n.send(:t, :custom, locale: locale) == true }.sort
   end
 
   def crowdsourced_locales
-    @crowdsourced_locales ||= I18n.available_locales.select { |locale| I18n.send(:t, :crowdsourced, :locale => locale) == true }
+    @crowdsourced_locales ||= I18n.available_locales.select { |locale| I18n.send(:t, :crowdsourced, locale: locale) == true }
   end
 
   def self.locales_with_aliases

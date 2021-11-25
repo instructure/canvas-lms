@@ -133,8 +133,8 @@ class Notification < Switchman::UnshardedRecord
   FREQ_NEVER = 'never'
 
   has_many :messages
-  has_many :notification_policies, :dependent => :destroy
-  has_many :notification_policy_overrides, inverse_of: :notification, :dependent => :destroy
+  has_many :notification_policies, dependent: :destroy
+  has_many :notification_policy_overrides, inverse_of: :notification, dependent: :destroy
   before_save :infer_default_content
 
   scope :to_show_in_feed, -> { where("messages.category='TestImmediately' OR messages.notification_name IN (?)", TYPES_TO_SHOW_IN_FEED) }
@@ -145,11 +145,11 @@ class Notification < Switchman::UnshardedRecord
 
   workflow do
     state :active do
-      event :deactivate, :transitions_to => :inactive
+      event :deactivate, transitions_to: :inactive
     end
 
     state :inactive do
-      event :reactivate, :transitions_to => :active
+      event :reactivate, transitions_to: :active
     end
   end
 
@@ -207,7 +207,7 @@ class Notification < Switchman::UnshardedRecord
   def create_message(asset, to_list, options = {})
     preload_asset_roles_if_needed(asset)
 
-    NotificationMessageCreator.new(self, asset, options.merge(:to_list => to_list)).create_message
+    NotificationMessageCreator.new(self, asset, options.merge(to_list: to_list)).create_message
   end
 
   TYPES_TO_PRELOAD_CONTEXT_ROLES = ["Assignment Created", "Assignment Due Date Changed"].freeze
@@ -546,7 +546,7 @@ class Notification < Switchman::UnshardedRecord
     when 'Account Notification'
       t(:account_notification_display, 'Global Announcements')
     else
-      t(:missing_display_display, "For %{category} notifications", :category => category)
+      t(:missing_display_display, "For %{category} notifications", category: category)
     end
   end
 
@@ -668,7 +668,7 @@ class Notification < Switchman::UnshardedRecord
         Institution-wide announcements (also displayed on Dashboard pages)
       MD
     else
-      t(:missing_description_description, "For %{category} notifications", :category => category)
+      t(:missing_description_description, "For %{category} notifications", category: category)
     end
   end
 

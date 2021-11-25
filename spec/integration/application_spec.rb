@@ -53,7 +53,7 @@ describe "site-wide" do
 
   it "does not set content-security-policy when on a files domain" do
     user_session user_factory(active_all: true)
-    attachment_model(:context => @user)
+    attachment_model(context: @user)
     expect_any_instance_of(FilesController).to receive(:files_domain?).and_return(true)
     get "http://files-test.host/files/#{@attachment.id}/download"
     expect(response[content_security_policy]).to be_nil
@@ -104,11 +104,11 @@ describe "site-wide" do
       course_with_teacher
 
       student_in_course
-      user_with_pseudonym :user => @student, :username => 'student@example.com', :password => 'password'
+      user_with_pseudonym user: @student, username: 'student@example.com', password: 'password'
       @student_pseudonym = @pseudonym
 
-      account_admin_user :account => Account.site_admin
-      user_with_pseudonym :user => @admin, :username => 'admin@example.com', :password => 'password'
+      account_admin_user account: Account.site_admin
+      user_with_pseudonym user: @admin, username: 'admin@example.com', password: 'password'
     end
 
     it "does not set the logged in user headers when no one is logged in" do
@@ -156,8 +156,8 @@ describe "site-wide" do
   it "uses the real user's timezone and locale setting when masquerading as a fake student" do
     @fake_user = course_factory(active_all: true).student_view_student
 
-    user_with_pseudonym(:active_all => true)
-    account_admin_user(:user => @user)
+    user_with_pseudonym(active_all: true)
+    account_admin_user(user: @user)
     @user.time_zone = "Hawaii"
     @user.locale = "es"
     @user.save!
@@ -173,13 +173,13 @@ describe "site-wide" do
   end
 
   it "uses the masqueree's timezone and locale setting when masquerading" do
-    @other_user = user_with_pseudonym(:active_all => true)
+    @other_user = user_with_pseudonym(active_all: true)
     @other_user.time_zone = "Hawaii"
     @other_user.locale = "es"
     @other_user.save!
 
-    user_with_pseudonym(:active_all => true)
-    account_admin_user(:user => @user)
+    user_with_pseudonym(active_all: true)
+    account_admin_user(user: @user)
     user_session(@user)
 
     post "/users/#{@other_user.id}/masquerade"
@@ -195,10 +195,10 @@ describe "site-wide" do
       enable_forgery_protection do
         course_with_teacher
         student_in_course
-        user_with_pseudonym(:user => @student, :username => 'student@example.com', :password => 'password')
+        user_with_pseudonym(user: @student, username: 'student@example.com', password: 'password')
 
-        account_admin_user(:account => Account.site_admin)
-        user_with_pseudonym(:user => @admin, :username => 'admin@example.com', :password => 'password')
+        account_admin_user(account: Account.site_admin)
+        user_with_pseudonym(user: @admin, username: 'admin@example.com', password: 'password')
 
         user_session(@admin, @admin.pseudonyms.first)
         post "/users/#{@student.id}/masquerade"
@@ -218,9 +218,9 @@ describe "site-wide" do
   context "stringifying ids" do
     it "stringifies ids when objects are passed to render" do
       course_with_teacher_logged_in
-      user_with_pseudonym :username => 'blah'
+      user_with_pseudonym username: 'blah'
       post "/courses/#{@course.id}/user_lists.json",
-           params: { :user_list => ['blah'], :search_type => 'unique_id', :v2 => true },
+           params: { user_list: ['blah'], search_type: 'unique_id', v2: true },
            headers: { 'Accept' => 'application/json+canvas-string-ids' }
       json = JSON.parse response.body
       expect(json['users'][0]['user_id']).to be_a String

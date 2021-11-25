@@ -26,7 +26,7 @@ module CC
 
     attr_accessor :course, :user, :export_dir, :manifest, :zip_file, :for_course_copy, :for_master_migration
 
-    delegate :add_error, :add_item_to_export, :to => :@content_export, :allow_nil => true
+    delegate :add_error, :add_item_to_export, to: :@content_export, allow_nil: true
 
     def initialize(content_export, opts = {})
       @content_export = content_export
@@ -40,7 +40,7 @@ module CC
       @zip_name = nil
       @logger = Rails.logger
       @migration_config = ConfigFile.load('external_migration')
-      @migration_config ||= { :keep_after_complete => false }
+      @migration_config ||= { keep_after_complete: false }
       @for_course_copy = opts[:for_course_copy]
       @qti_only_export = @content_export&.qti_export?
       @manifest_opts = opts.slice(:version)
@@ -76,7 +76,7 @@ module CC
             # if it's selective, we have to wait until we've completed the rest of the export
             # before we really know what we exported. because magic
             @pending_exports = Canvas::Migration::ExternalContent::Migrator.begin_exports(@course,
-                                                                                          :selective => true, :exported_assets => @content_export.exported_assets.to_a)
+                                                                                          selective: true, exported_assets: @content_export.exported_assets.to_a)
           end
           external_content = Canvas::Migration::ExternalContent::Migrator.retrieve_exported_content(@content_export, @pending_exports)
           write_external_content(external_content)
@@ -86,7 +86,7 @@ module CC
         if @for_master_migration
           # for efficiency to the max, short-circuit the usual course copy process (i.e. zip up, save, and then unzip again)
           # and instead go straight to the intermediate json
-          converter = CC::Importer::Canvas::Converter.new(:unzipped_file_path => @export_dir, :deletions => @deletions)
+          converter = CC::Importer::Canvas::Converter.new(unzipped_file_path: @export_dir, deletions: @deletions)
           @export_dirs << converter.base_export_dir # make sure we clean this up too afterwards
           converter.export
           @export_path = converter.course["full_export_file_path"] # this is the course_export.json
@@ -203,7 +203,7 @@ module CC
     end
 
     def create_zip_file
-      name = CanvasTextHelper.truncate_text(@course.name.to_url, { :max_length => 200, :ellipsis => '' })
+      name = CanvasTextHelper.truncate_text(@course.name.to_url, { max_length: 200, ellipsis: '' })
       @zip_name = if @qti_only_export
                     "#{name}-quiz-export.zip"
                   else

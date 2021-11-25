@@ -25,7 +25,7 @@ describe 'confirm_sms_communication_channel.sms' do
 
   it "renders" do
     user_factory
-    @pseudonym = @user.pseudonyms.create!(:unique_id => 'unique@example.com', :password => 'password', :password_confirmation => 'password')
+    @pseudonym = @user.pseudonyms.create!(unique_id: 'unique@example.com', password: 'password', password_confirmation: 'password')
     @object = communication_channel(@user, { username: 'bob@example.com' })
     generate_message(:confirm_sms_communication_channel, :sms, @object,
                      data: { root_account_id: @pseudonym.account.global_id,

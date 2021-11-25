@@ -48,7 +48,7 @@ module CanvasCrummy
 
     def crumb_to_html(crumb)
       name, url = crumb
-      span = content_tag(:span, name, :class => 'ellipsible')
+      span = content_tag(:span, name, class: 'ellipsible')
       url ? link_to(span, url) : span
     end
 

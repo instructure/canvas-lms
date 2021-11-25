@@ -109,10 +109,10 @@ describe "better_file_browsing, folders" do
     it "is able to create and view a new folder with uri characters", priority: "2" do
       folder_name = "this#could+be bad? maybe"
       add_folder(folder_name)
-      folder = @course.folders.where(:name => folder_name).first
+      folder = @course.folders.where(name: folder_name).first
       expect(folder).to_not be_nil
       file_name = "some silly file"
-      @course.attachments.create!(:display_name => file_name, :uploaded_data => default_uploaded_data, :folder => folder)
+      @course.attachments.create!(display_name: file_name, uploaded_data: default_uploaded_data, folder: folder)
       folder_link = fln(folder_name, f('.ef-directory'))
       expect(folder_link).to be_present
       folder_link.click

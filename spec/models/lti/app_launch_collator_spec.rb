@@ -108,21 +108,21 @@ module Lti
         expect(definitions.count).to eq 1
         definition = definitions.first
         expect(definition).to eq({
-                                   :definition_type => mh.class.name,
-                                   :definition_id => mh.id,
-                                   :name => rh.name,
-                                   :description => rh.description,
-                                   :domain => "samplelaunch",
-                                   :placements => {
-                                     :link_selection => {
-                                       :message_type => "basic-lti-launch-request",
-                                       :url => "https://samplelaunch/blti",
-                                       :title => rh.name
+                                   definition_type: mh.class.name,
+                                   definition_id: mh.id,
+                                   name: rh.name,
+                                   description: rh.description,
+                                   domain: "samplelaunch",
+                                   placements: {
+                                     link_selection: {
+                                       message_type: "basic-lti-launch-request",
+                                       url: "https://samplelaunch/blti",
+                                       title: rh.name
                                      },
-                                     :assignment_selection => {
-                                       :message_type => "basic-lti-launch-request",
-                                       :url => "https://samplelaunch/blti",
-                                       :title => rh.name
+                                     assignment_selection: {
+                                       message_type: "basic-lti-launch-request",
+                                       url: "https://samplelaunch/blti",
+                                       title: rh.name
                                      }
                                    }
                                  })
@@ -137,34 +137,34 @@ module Lti
         expect(definitions.count).to eq 1
         definition = definitions.first
         expect(definition).to eq({
-                                   :definition_type => tool.class.name,
-                                   :definition_id => tool.id,
-                                   :name => tool.label_for(placements.first, I18n.locale),
-                                   :description => tool.description,
-                                   :domain => nil,
-                                   :placements => {
-                                     :link_selection => {
-                                       :message_type => "basic-lti-launch-request",
-                                       :url => "http://www.example.com/basic_lti",
-                                       :title => tool.name
+                                   definition_type: tool.class.name,
+                                   definition_id: tool.id,
+                                   name: tool.label_for(placements.first, I18n.locale),
+                                   description: tool.description,
+                                   domain: nil,
+                                   placements: {
+                                     link_selection: {
+                                       message_type: "basic-lti-launch-request",
+                                       url: "http://www.example.com/basic_lti",
+                                       title: tool.name
                                      },
-                                     :assignment_selection => {
-                                       :message_type => "basic-lti-launch-request",
-                                       :url => "http://www.example.com/basic_lti",
-                                       :title => tool.name
+                                     assignment_selection: {
+                                       message_type: "basic-lti-launch-request",
+                                       url: "http://www.example.com/basic_lti",
+                                       title: tool.name
                                      }
                                    }
                                  })
       end
 
       it 'uses localized labels' do
-        tool = account.context_external_tools.new(:name => "bob", :consumer_key => "test", :shared_secret => "secret",
-                                                  :url => "http://example.com")
+        tool = account.context_external_tools.new(name: "bob", consumer_key: "test", shared_secret: "secret",
+                                                  url: "http://example.com")
 
         assignment_selection = {
-          :text => 'this should not be the title',
-          :url => 'http://www.example.com',
-          :labels => {
+          text: 'this should not be the title',
+          url: 'http://www.example.com',
+          labels: {
             'en' => 'English Label',
             'sp' => 'Spanish Label'
           }
@@ -190,28 +190,28 @@ module Lti
         expect(definitions.count).to eq 1
         definition = definitions.first
         expect(definition).to eq({
-                                   :definition_type => tool.class.name,
-                                   :definition_id => tool.id,
-                                   :name => tool.name,
-                                   :description => tool.description,
-                                   :domain => nil,
-                                   :placements => {
-                                     :assignment_selection => {
-                                       :message_type => "basic-lti-launch-request",
-                                       :url => "http://www.example.com/basic_lti",
-                                       :title => tool.name
+                                   definition_type: tool.class.name,
+                                   definition_id: tool.id,
+                                   name: tool.name,
+                                   description: tool.description,
+                                   domain: nil,
+                                   placements: {
+                                     assignment_selection: {
+                                       message_type: "basic-lti-launch-request",
+                                       url: "http://www.example.com/basic_lti",
+                                       title: tool.name
                                      },
-                                     :link_selection => {
-                                       :message_type => "basic-lti-launch-request",
-                                       :url => "http://www.example.com/basic_lti",
-                                       :title => tool.name
+                                     link_selection: {
+                                       message_type: "basic-lti-launch-request",
+                                       url: "http://www.example.com/basic_lti",
+                                       title: tool.name
                                      },
-                                     :resource_selection => {
-                                       :message_type => "resource_selection",
-                                       :url => "http://example.com/selection_test",
-                                       :title => tool.name,
-                                       :selection_width => 400,
-                                       :selection_height => 400
+                                     resource_selection: {
+                                       message_type: "resource_selection",
+                                       url: "http://example.com/selection_test",
+                                       title: tool.name,
+                                       selection_width: 400,
+                                       selection_height: 400
                                      }
                                    }
                                  })

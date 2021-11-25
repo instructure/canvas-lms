@@ -28,7 +28,7 @@ module CC::Importer::Standard
         path = res[:href] || (res[:files]&.first && res[:files].first[:href])
         resource_dir = File.dirname(path) if path
 
-        asmnt = { :migration_id => res[:migration_id] }.with_indifferent_access
+        asmnt = { migration_id: res[:migration_id] }.with_indifferent_access
         if res[:intended_user_role] == 'Instructor'
           asmnt[:workflow_state] = 'unpublished'
         end

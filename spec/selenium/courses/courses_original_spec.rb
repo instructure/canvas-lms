@@ -27,7 +27,7 @@ describe "courses" do
   context "as a teacher" do
     before do
       account = Account.default
-      account.settings = { :open_registration => true, :no_enrollments_can_create_courses => true, :teachers_can_create_courses => true }
+      account.settings = { open_registration: true, no_enrollments_can_create_courses: true, teachers_can_create_courses: true }
       account.save!
       allow_any_instance_of(Account).to receive(:feature_enabled?).and_call_original
       allow_any_instance_of(Account).to receive(:feature_enabled?).with(:new_user_tutorial).and_return(false)
@@ -107,8 +107,8 @@ describe "courses" do
 
       it "allows publishing/unpublishing with only change_course_state permission" do
         @course.root_account.disable_feature!(:granular_permissions_manage_courses)
-        @course.account.role_overrides.create!(:permission => :manage_course_content, :role => teacher_role, :enabled => false)
-        @course.account.role_overrides.create!(:permission => :manage_courses, :role => teacher_role, :enabled => false)
+        @course.account.role_overrides.create!(permission: :manage_course_content, role: teacher_role, enabled: false)
+        @course.account.role_overrides.create!(permission: :manage_courses, role: teacher_role, enabled: false)
 
         get "/courses/#{@course.id}"
         expect_new_page_load { ff('#course_status_actions button').first.click }
@@ -139,7 +139,7 @@ describe "courses" do
 
       it "does not allow publishing/unpublishing without change_course_state permission" do
         @course.root_account.disable_feature!(:granular_permissions_manage_courses)
-        @course.account.role_overrides.create!(:permission => :change_course_state, :role => teacher_role, :enabled => false)
+        @course.account.role_overrides.create!(permission: :change_course_state, role: teacher_role, enabled: false)
 
         get "/courses/#{@course.id}"
         expect(f("#content")).not_to contain_css('#course_status_actions')
@@ -185,14 +185,14 @@ describe "courses" do
     end
 
     it "redirects to the gradebook when switching courses when viewing a students grades" do
-      teacher = user_with_pseudonym(:username => 'teacher@example.com', :active_all => 1)
-      student = user_with_pseudonym(:username => 'student@example.com', :active_all => 1)
+      teacher = user_with_pseudonym(username: 'teacher@example.com', active_all: 1)
+      student = user_with_pseudonym(username: 'student@example.com', active_all: 1)
 
-      course1 = course_with_teacher_logged_in(:user => teacher, :active_all => 1, :course_name => 'course1').course
-      student_in_course(:user => student, :active_all => 1)
+      course1 = course_with_teacher_logged_in(user: teacher, active_all: 1, course_name: 'course1').course
+      student_in_course(user: student, active_all: 1)
 
-      course2 = course_with_teacher(:user => teacher, :active_all => 1, :course_name => 'course2').course
-      student_in_course(:user => student, :active_all => 1)
+      course2 = course_with_teacher(user: teacher, active_all: 1, course_name: 'course2').course
+      student_in_course(user: student, active_all: 1)
 
       create_session(student.pseudonyms.first)
 
@@ -211,14 +211,14 @@ describe "courses" do
       # Set up the test
       course_factory(active_course: true)
       %w[One Two].each do |name|
-        section = @course.course_sections.create!(:name => name)
-        @course.enroll_student(user_factory, :section => section).accept!
+        section = @course.course_sections.create!(name: name)
+        @course.enroll_student(user_factory, section: section).accept!
       end
       user_logged_in
       enrollment = @course.enroll_ta(@user)
       enrollment.accept!
-      enrollment.update(:limit_privileges_to_course_section => true,
-                        :course_section => CourseSection.where(name: 'Two').first)
+      enrollment.update(limit_privileges_to_course_section: true,
+                        course_section: CourseSection.where(name: 'Two').first)
 
       # Test that only users in the approved section are displayed.
       get "/courses/#{@course.id}/users"
@@ -227,11 +227,11 @@ describe "courses" do
     end
 
     it "displays users section name" do
-      course_with_teacher_logged_in(:active_all => true)
+      course_with_teacher_logged_in(active_all: true)
       user1, user2 = [user_factory, user_factory]
-      section1 = @course.course_sections.create!(:name => 'One')
-      section2 = @course.course_sections.create!(:name => 'Two')
-      @course.enroll_student(user1, :section => section1).accept!
+      section1 = @course.course_sections.create!(name: 'One')
+      section2 = @course.course_sections.create!(name: 'Two')
+      @course.enroll_student(user1, section: section1).accept!
       [section1, section2].each do |section|
         e = user2.student_enrollments.build
         e.workflow_state = 'active'
@@ -307,14 +307,14 @@ describe "courses" do
     end
 
     before do
-      course_with_teacher(:active_all => true, :name => 'discussion course')
-      @student = user_with_pseudonym(:active_user => true, :username => 'student@example.com', :name => 'student@example.com', :password => 'asdfasdf')
+      course_with_teacher(active_all: true, name: 'discussion course')
+      @student = user_with_pseudonym(active_user: true, username: 'student@example.com', name: 'student@example.com', password: 'asdfasdf')
       Account.default.settings[:allow_invitation_previews] = true
       Account.default.save!
     end
 
     it "displays user groups on courses page" do
-      group = Group.create!(:name => "group1", :context => @course)
+      group = Group.create!(name: "group1", context: @course)
       group.add_user(@student)
       enroll_student(@student, true)
 
@@ -337,7 +337,7 @@ describe "courses" do
 
         user_session(@student)
 
-        User.where(:id => @student).update_all(:updated_at => 5.minutes.ago) # make sure that touching the user resets the cache
+        User.where(id: @student).update_all(updated_at: 5.minutes.ago) # make sure that touching the user resets the cache
 
         get "/courses/#{@course.id}"
 
@@ -345,9 +345,9 @@ describe "courses" do
         expect(f('#unauthorized_message')).to be_displayed
 
         # manually trigger a stale enrollment - should recalculate on visit if it didn't already in the background
-        Course.where(:id => @course).update_all(:start_at => 1.day.ago)
-        Enrollment.where(:id => @student.student_enrollments).update_all(:updated_at => 1.minute.from_now) # because of enrollment date caching
-        EnrollmentState.where(:enrollment_id => @student.student_enrollments).update_all(:state_is_current => false)
+        Course.where(id: @course).update_all(start_at: 1.day.ago)
+        Enrollment.where(id: @student.student_enrollments).update_all(updated_at: 1.minute.from_now) # because of enrollment date caching
+        EnrollmentState.where(enrollment_id: @student.student_enrollments).update_all(state_is_current: false)
 
         refresh_page
         expect(f('#course_home_content')).to be_displayed
@@ -383,13 +383,13 @@ describe "courses" do
 
   context "announcements on course home" do
     before :once do
-      course_with_teacher :active_all => true
+      course_with_teacher active_all: true
 
       @text = "here's some html or whatever"
       @html = "<p>#{@text}</p>"
-      @course.announcements.create!(:title => "something", :message => @html)
+      @course.announcements.create!(title: "something", message: @html)
 
-      @course.wiki_pages.create!(:title => 'blah').set_as_front_page!
+      @course.wiki_pages.create!(title: 'blah').set_as_front_page!
 
       @course.reload
       @course.default_view = "wiki"
@@ -454,7 +454,7 @@ describe "courses" do
     a2.save!
 
     student1, _student2 = create_users(2, return_type: :record)
-    @course.enroll_student(student1, :enrollment_state => 'active')
+    @course.enroll_student(student1, enrollment_state: 'active')
     student_in_section(section1, user: student1)
     user_session student1
     get "/courses/#{@course.id}"

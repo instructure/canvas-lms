@@ -23,10 +23,10 @@ require 'securerandom'
 
 class EportfoliosController < ApplicationController
   include EportfolioPage
-  before_action :require_user, :only => [:index, :user_index]
+  before_action :require_user, only: [:index, :user_index]
   before_action :reject_student_view_student
-  before_action :verified_user_check, :only => %i[index user_index create]
-  before_action :get_eportfolio, :except => %i[index user_index create]
+  before_action :verified_user_check, only: %i[index user_index create]
+  before_action :get_eportfolio, except: %i[index user_index create]
 
   def index
     user_index
@@ -52,13 +52,13 @@ class EportfoliosController < ApplicationController
           @portfolio.ensure_defaults
           flash[:notice] = t('notices.created', "ePortfolio successfully created")
           format.html { redirect_to eportfolio_url(@portfolio) }
-          format.json { render :json => @portfolio.as_json(:permissions => { :user => @current_user, :session => session }) }
+          format.json { render json: @portfolio.as_json(permissions: { user: @current_user, session: session }) }
         else
           format.html do
             rce_js_env
             render :new
           end
-          format.json { render :json => @portfolio.errors, :status => :bad_request }
+          format.json { render json: @portfolio.errors, status: :bad_request }
         end
       end
     end
@@ -103,9 +103,9 @@ class EportfoliosController < ApplicationController
       end
 
       if can_do(@portfolio, @current_user, :update)
-        content_for_head helpers.auto_discovery_link_tag(:atom, feeds_eportfolio_path(@portfolio.id, :atom, :verifier => @portfolio.uuid), { :title => t('titles.feed', "Eportfolio Atom Feed") })
+        content_for_head helpers.auto_discovery_link_tag(:atom, feeds_eportfolio_path(@portfolio.id, :atom, verifier: @portfolio.uuid), { title: t('titles.feed', "Eportfolio Atom Feed") })
       elsif @portfolio.public
-        content_for_head helpers.auto_discovery_link_tag(:atom, feeds_eportfolio_path(@portfolio.id, :atom), { :title => t('titles.feed', "Eportfolio Atom Feed") })
+        content_for_head helpers.auto_discovery_link_tag(:atom, feeds_eportfolio_path(@portfolio.id, :atom), { title: t('titles.feed', "Eportfolio Atom Feed") })
       end
     end
   end
@@ -123,13 +123,13 @@ class EportfoliosController < ApplicationController
           @portfolio.ensure_defaults
           flash[:notice] = t('notices.updated', "ePortfolio successfully updated")
           format.html { redirect_to eportfolio_url(@portfolio) }
-          format.json { render :json => @portfolio.as_json(:permissions => { :user => @current_user, :session => session }) }
+          format.json { render json: @portfolio.as_json(permissions: { user: @current_user, session: session }) }
         else
           format.html do
             rce_js_env
             render :edit
           end
-          format.json { render :json => @portfolio.errors, :status => :bad_request }
+          format.json { render json: @portfolio.errors, status: :bad_request }
         end
       end
     else
@@ -143,10 +143,10 @@ class EportfoliosController < ApplicationController
         if @portfolio.destroy
           flash[:notice] = t('notices.deleted', "ePortfolio successfully deleted")
           format.html { redirect_to user_profile_url(@current_user) }
-          format.json { render :json => @portfolio }
+          format.json { render json: @portfolio }
         else
           format.html { render :delete }
-          format.json { render :json => @portfolio.errors, :status => :bad_request }
+          format.json { render json: @portfolio.errors, status: :bad_request }
         end
       end
     end
@@ -157,7 +157,7 @@ class EportfoliosController < ApplicationController
       order = []
       params[:order].split(",").each { |id| order << Shard.relative_id_for(id, Shard.current, @portfolio.shard) }
       @portfolio.eportfolio_categories.build.update_order(order)
-      render :json => @portfolio.eportfolio_categories.map { |c| [c.id, c.position] }, :status => :ok
+      render json: @portfolio.eportfolio_categories.map { |c| [c.id, c.position] }, status: :ok
     end
   end
 
@@ -167,7 +167,7 @@ class EportfoliosController < ApplicationController
       params[:order].split(",").each { |id| order << Shard.relative_id_for(id, Shard.current, @portfolio.shard) }
       @category = @portfolio.eportfolio_categories.find(params[:eportfolio_category_id])
       @category.eportfolio_entries.build.update_order(order)
-      render :json => @portfolio.eportfolio_entries.map { |c| [c.id, c.position] }, :status => :ok
+      render json: @portfolio.eportfolio_entries.map { |c| [c.id, c.position] }, status: :ok
     end
   end
 
@@ -191,29 +191,29 @@ class EportfoliosController < ApplicationController
           if @attachment.zipped?
             if @attachment.stored_locally?
               cancel_cache_buster
-              format.html { send_file(@attachment.full_filename, :type => @attachment.content_type_with_encoding, :disposition => 'inline') }
-              format.zip { send_file(@attachment.full_filename, :type => @attachment.content_type_with_encoding, :disposition => 'inline') }
+              format.html { send_file(@attachment.full_filename, type: @attachment.content_type_with_encoding, disposition: 'inline') }
+              format.zip { send_file(@attachment.full_filename, type: @attachment.content_type_with_encoding, disposition: 'inline') }
             else
               inline_url = authenticated_inline_url(@attachment)
               format.html { redirect_to inline_url }
               format.zip { redirect_to inline_url }
             end
-            format.json { render :json => @attachment.as_json(:methods => :readable_size) }
+            format.json { render json: @attachment.as_json(methods: :readable_size) }
           else
             flash[:notice] = t('notices.zipping', "File zipping still in process...")
             format.html { redirect_to eportfolio_url(@portfolio.id) }
             format.zip { redirect_to eportfolio_url(@portfolio.id) }
-            format.json { render :json => @attachment }
+            format.json { render json: @attachment }
           end
         end
       else
-        @attachment = @portfolio.attachments.build(:display_name => zip_filename)
+        @attachment = @portfolio.attachments.build(display_name: zip_filename)
         @attachment.workflow_state = 'to_be_zipped'
         @attachment.file_state = '0'
         @attachment.user = @current_user
         @attachment.save!
         ContentZipper.delay(priority: Delayed::LOW_PRIORITY).process_attachment(@attachment)
-        render :json => @attachment
+        render json: @attachment
       end
     end
   end
@@ -222,16 +222,16 @@ class EportfoliosController < ApplicationController
     if @portfolio.public || params[:verifier] == @portfolio.uuid
       @entries = @portfolio.eportfolio_entries.order('eportfolio_entries.created_at DESC').to_a
       feed = Atom::Feed.new do |f|
-        f.title = t(:title, "%{portfolio_name} Feed", :portfolio_name => @portfolio.name)
-        f.links << Atom::Link.new(:href => eportfolio_url(@portfolio.id), :rel => 'self')
+        f.title = t(:title, "%{portfolio_name} Feed", portfolio_name: @portfolio.name)
+        f.links << Atom::Link.new(href: eportfolio_url(@portfolio.id), rel: 'self')
         f.updated = @entries.first.updated_at rescue Time.now
         f.id = eportfolio_url(@portfolio.id)
       end
       @entries.each do |e|
-        feed.entries << e.to_atom(:private => params[:verifier] == @portfolio.uuid)
+        feed.entries << e.to_atom(private: params[:verifier] == @portfolio.uuid)
       end
       respond_to do |format|
-        format.atom { render :plain => feed.to_xml }
+        format.atom { render plain: feed.to_xml }
       end
     else
       authorized_action(nil, nil, :bad_permission)

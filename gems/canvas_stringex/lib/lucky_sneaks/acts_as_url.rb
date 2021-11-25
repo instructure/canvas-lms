@@ -62,7 +62,7 @@ module LuckySneaks
         if options[:sync_url]
           before_validation :ensure_unique_url
         else
-          before_validation(:ensure_unique_url, :on => :create)
+          before_validation(:ensure_unique_url, on: :create)
         end
 
         class_variable_set(:@@attribute_to_urlify, attribute)

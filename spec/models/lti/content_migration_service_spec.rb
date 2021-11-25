@@ -54,7 +54,7 @@ RSpec.describe Lti::ContentMigrationService do
         fetch_url: 'https://lti.example.com/export/42',
       }.to_json
       stub_request(:post, 'https://lti.example.com/begin_export')
-        .to_return(:status => 200, :body => response_body, :headers => {})
+        .to_return(status: 200, body: response_body, headers: {})
       @return_value = Lti::ContentMigrationService.begin_exports(@course)
     end
 

@@ -84,10 +84,10 @@ class ErrorsController < ApplicationController
       @reports = @reports.where("category<>'404'")
     end
     if params[:category].present?
-      @reports = @reports.where(:category => params[:category])
+      @reports = @reports.where(category: params[:category])
     end
 
-    @reports = @reports.order('created_at DESC').paginate(:per_page => PER_PAGE, :page => params[:page], :total_entries => nil)
+    @reports = @reports.order('created_at DESC').paginate(per_page: PER_PAGE, page: params[:page], total_entries: nil)
   end
 
   def show

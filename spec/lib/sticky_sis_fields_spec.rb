@@ -21,11 +21,11 @@
 describe StickySisFields do
   def create_abstract_course
     AbstractCourse.process_as_sis do
-      AbstractCourse.create!(:name => "1",
-                             :short_name => "2",
-                             :account => Account.default,
-                             :root_account => Account.default,
-                             :enrollment_term => Account.default.default_enrollment_term)
+      AbstractCourse.create!(name: "1",
+                             short_name: "2",
+                             account: Account.default,
+                             root_account: Account.default,
+                             enrollment_term: Account.default.default_enrollment_term)
     end
   end
 
@@ -291,7 +291,7 @@ describe StickySisFields do
     ac.name = "ac name"
     ac.save!
     expect(AbstractCourse.find(ac.id).stuck_sis_fields).to eq [:name].to_set
-    AbstractCourse.process_as_sis :override_sis_stickiness => true do
+    AbstractCourse.process_as_sis override_sis_stickiness: true do
       ac = AbstractCourse.find(ac.id)
       expect(ac.stuck_sis_fields).to eq [].to_set
       expect(ac.send(:calculate_currently_stuck_sis_fields)).to eq [:name].to_set
@@ -309,7 +309,7 @@ describe StickySisFields do
     ac.name = "ac name"
     ac.save!
     expect(AbstractCourse.find(ac.id).stuck_sis_fields).to eq [:name].to_set
-    AbstractCourse.process_as_sis :override_sis_stickiness => true, :add_sis_stickiness => true do
+    AbstractCourse.process_as_sis override_sis_stickiness: true, add_sis_stickiness: true do
       ac = AbstractCourse.find(ac.id)
       expect(ac.stuck_sis_fields).to eq [].to_set
       expect(ac.send(:calculate_currently_stuck_sis_fields)).to eq [:name].to_set
@@ -327,7 +327,7 @@ describe StickySisFields do
     ac.name = "ac name"
     ac.save!
     expect(AbstractCourse.find(ac.id).stuck_sis_fields).to eq [:name].to_set
-    AbstractCourse.process_as_sis :override_sis_stickiness => true, :clear_sis_stickiness => true do
+    AbstractCourse.process_as_sis override_sis_stickiness: true, clear_sis_stickiness: true do
       ac = AbstractCourse.find(ac.id)
       expect(ac.stuck_sis_fields).to eq [].to_set
       expect(ac.send(:calculate_currently_stuck_sis_fields)).to eq [:name].to_set
@@ -371,7 +371,7 @@ describe StickySisFields do
       ac.save!
       ac = AbstractCourse.find(ac.id)
       expect(ac.stuck_sis_fields).to eq [:name].to_set
-      AbstractCourse.process_as_sis :clear_sis_stickiness => true do
+      AbstractCourse.process_as_sis clear_sis_stickiness: true do
         AbstractCourse.find(ac.id).save!
       end
       expect(AbstractCourse.find(ac.id).stuck_sis_fields).to eq [].to_set
@@ -385,7 +385,7 @@ describe StickySisFields do
       expect(ac.instance_variable_get(:@sis_fields_to_stick)).to eq [:short_name].to_set
       expect(ac.instance_variable_get(:@sis_fields_to_unstick)).to eq [:name].to_set
       expect(ac.send(:load_stuck_sis_fields_cache)).to eq [:name].to_set
-      AbstractCourse.process_as_sis :clear_sis_stickiness => true do
+      AbstractCourse.process_as_sis clear_sis_stickiness: true do
         ac.save!
       end
       expect(ac.instance_variable_get(:@sis_fields_to_stick)).to eq [].to_set
@@ -487,12 +487,12 @@ describe StickySisFields do
         AbstractCourse.sis_stickiness_options = {}
         AbstractCourse.process_as_sis do
           expect(AbstractCourse.sis_stickiness_options).to eq({})
-          AbstractCourse.process_as_sis :override_sis_stickiness => true do
-            expect(AbstractCourse.sis_stickiness_options).to eq({ :override_sis_stickiness => true })
-            AbstractCourse.process_as_sis :clear_sis_stickiness => true do
-              expect(AbstractCourse.sis_stickiness_options).to eq({ :clear_sis_stickiness => true })
+          AbstractCourse.process_as_sis override_sis_stickiness: true do
+            expect(AbstractCourse.sis_stickiness_options).to eq({ override_sis_stickiness: true })
+            AbstractCourse.process_as_sis clear_sis_stickiness: true do
+              expect(AbstractCourse.sis_stickiness_options).to eq({ clear_sis_stickiness: true })
             end
-            expect(AbstractCourse.sis_stickiness_options).to eq({ :override_sis_stickiness => true })
+            expect(AbstractCourse.sis_stickiness_options).to eq({ override_sis_stickiness: true })
           end
           expect(AbstractCourse.sis_stickiness_options).to eq({})
         end

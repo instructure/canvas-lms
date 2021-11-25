@@ -23,7 +23,7 @@ describe "oauth2 flow" do
   include_context "in-process server selenium tests"
 
   before do
-    @key = DeveloperKey.create!(:name => 'Specs', :redirect_uri => 'http://www.example.com')
+    @key = DeveloperKey.create!(name: 'Specs', redirect_uri: 'http://www.example.com')
     enable_developer_key_account_binding!(@key)
     @client_id = @key.id
     @client_secret = @key.api_key
@@ -41,7 +41,7 @@ describe "oauth2 flow" do
 
     describe "a logged-in user" do
       before do
-        course_with_student_logged_in(:active_all => true)
+        course_with_student_logged_in(active_all: true)
       end
 
       it "shows the confirmation dialog without requiring login" do
@@ -56,7 +56,7 @@ describe "oauth2 flow" do
 
     describe "a non-logged-in user" do
       before do
-        course_with_student(:active_all => true, :user => user_with_pseudonym)
+        course_with_student(active_all: true, user: user_with_pseudonym)
       end
 
       it "shows the terms of use and then confirmation dialog after logging in" do
@@ -80,7 +80,7 @@ describe "oauth2 flow" do
   describe "oauth2 tool icons" do
     include_context "in-process server selenium tests"
     before do
-      course_with_student_logged_in(:active_all => true)
+      course_with_student_logged_in(active_all: true)
     end
 
     it "shows no icon if icon_url is not set on the developer key" do

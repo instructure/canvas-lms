@@ -307,7 +307,7 @@ module Lti
           end
 
           context 'when context_module_id param is included' do
-            let(:context_module) { course.context_modules.create!(:name => 'Test Module') }
+            let(:context_module) { course.context_modules.create!(name: 'Test Module') }
             let(:params) { super().merge({ course_id: course.id, context_module_id: context_module.id }) }
 
             context 'single item' do

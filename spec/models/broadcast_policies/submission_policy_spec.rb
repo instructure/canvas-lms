@@ -187,7 +187,7 @@ module BroadcastPolicies
         allow(submission).to receive(:graded_at).and_return Time.now
         allow(submission).to receive(:assignment_graded_in_the_last_hour?).and_return false
         allow(submission).to receive(:assignment_just_published).and_return true
-        allow(submission).to receive(:changed_in_state).with(:graded, :fields => [:score, :grade]).and_return true
+        allow(submission).to receive(:changed_in_state).with(:graded, fields: [:score, :grade]).and_return true
       end
 
       def wont_send_when

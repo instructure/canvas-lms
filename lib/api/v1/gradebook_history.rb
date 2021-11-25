@@ -24,7 +24,7 @@ module Api::V1
     include Api::V1::Submission
 
     def days_json(course, api_context)
-      day_hash = Hash.new { |hash, date| hash[date] = { :graders => {} } }
+      day_hash = Hash.new { |hash, date| hash[date] = { graders: {} } }
       submissions_set(course, api_context)
         .each_with_object(day_hash) { |submission, day| update_graders_hash(day[day_string_for(submission)][:graders], submission, api_context) }
         .each_value do |date_hash|
@@ -32,11 +32,11 @@ module Api::V1
           date_hash[:graders].each { |grader| compress(grader, :assignments) }
         end
 
-      day_hash.map { |date, hash| hash.merge(:date => date) }.sort_by { |a| a[:date] }.reverse
+      day_hash.map { |date, hash| hash.merge(date: date) }.sort_by { |a| a[:date] }.reverse
     end
 
     def json_for_date(date, course, api_context)
-      submissions_set(course, api_context, :date => date)
+      submissions_set(course, api_context, date: date)
         .each_with_object({}) { |sub, memo| update_graders_hash(memo, sub, api_context) }
         .each_value { |grader| compress(grader, :assignments) }
         .values
@@ -56,12 +56,12 @@ module Api::V1
       grader = (json[:grader_id] && json[:grader_id] > 0 && user_cache[json[:grader_id]]) || default_grader
 
       json.merge(
-        :grader => grader.name,
-        :assignment_name => assignment.title,
-        :user_name => student.name,
-        :current_grade => submission.grade,
-        :current_graded_at => submission.graded_at,
-        :current_grader => current_grader.name
+        grader: grader.name,
+        assignment_name: assignment.title,
+        user_name: student.name,
+        current_grade: submission.grade,
+        current_graded_at: submission.graded_at,
+        current_grader: current_grader.name
       )
     end
 
@@ -97,17 +97,17 @@ module Api::V1
 
     def submissions_for(course, api_context, date, grader_id, assignment_id)
       assignment = ::Assignment.find(assignment_id)
-      options = { :date => date, :assignment_id => assignment_id, :grader_id => grader_id }
+      options = { date: date, assignment_id: assignment_id, grader_id: grader_id }
       submissions = submissions_set(course, api_context, options)
 
       # load all versions for the given submissions and back-populate their
       # versionable associations
       submission_index = submissions.index_by(&:id)
-      versions = Version.where(:versionable_type => 'Submission', :versionable_id => submissions).order(:number)
+      versions = Version.where(versionable_type: 'Submission', versionable_id: submissions).order(:number)
       versions.each { |version| version.versionable = submission_index[version.versionable_id] }
 
       # convert them all to json and then group by submission
-      versions = versions_json(course, versions, api_context, :assignment => assignment)
+      versions = versions_json(course, versions, api_context, assignment: assignment)
       versions_hash = versions.group_by { |version| version[:id] }
 
       # populate previous_* and new_* keys and convert hash to array of objects
@@ -127,7 +127,7 @@ module Api::V1
           prior.merge!(version.slice(:grade, :score, :graded_at, :grader, :id))
         end.reverse
 
-        memo << { :submission_id => submission_id, :versions => filtered_versions }
+        memo << { submission_id: submission_id, versions: filtered_versions }
       end
     end
 
@@ -186,9 +186,9 @@ module Api::V1
     def update_graders_hash(hash, submission, api_context)
       grader = submission.grader || default_grader
       hash[grader.id] ||= {
-        :name => grader.name,
-        :id => grader.id,
-        :assignments => {}
+        name: grader.name,
+        id: grader.id,
+        assignments: {}
       }
 
       hash[grader.id][:assignments][submission.assignment_id] ||= begin

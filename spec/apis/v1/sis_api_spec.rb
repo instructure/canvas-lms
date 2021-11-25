@@ -110,20 +110,20 @@ describe SisApiController, type: :request do
           context.courses.each(&:destroy)
           start_at = 1.week.ago
           course1 = context.courses.create!
-          course2 = context.courses.create!(:start_at => start_at - 1.day)
-          context.courses.create!(:start_at => start_at + 1.day)
+          course2 = context.courses.create!(start_at: start_at - 1.day)
+          context.courses.create!(start_at: start_at + 1.day)
 
-          term1 = context.root_account.enrollment_terms.create!(:start_at => start_at - 1.day)
-          term2 = context.root_account.enrollment_terms.create!(:start_at => start_at + 1.day)
-          course4 = context.courses.create!(:enrollment_term => term1)
-          context.courses.create!(:enrollment_term => term2)
+          term1 = context.root_account.enrollment_terms.create!(start_at: start_at - 1.day)
+          term2 = context.root_account.enrollment_terms.create!(start_at: start_at + 1.day)
+          course4 = context.courses.create!(enrollment_term: term1)
+          context.courses.create!(enrollment_term: term2)
 
           context.courses.not_deleted.each do |c|
             c.update_attribute(:workflow_state, 'available')
-            c.assignments.create!(:post_to_sis => true)
+            c.assignments.create!(post_to_sis: true)
           end
 
-          get "/api/sis/accounts/#{context.id}/assignments?starts_before=#{start_at.iso8601}", params: { :account_id => context.id }
+          get "/api/sis/accounts/#{context.id}/assignments?starts_before=#{start_at.iso8601}", params: { account_id: context.id }
           expect(response).to be_successful
 
           result = json_parse
@@ -134,20 +134,20 @@ describe SisApiController, type: :request do
           context.courses.each(&:destroy)
           end_at = 1.week.from_now
           course1 = context.courses.create!
-          course2 = context.courses.create!(:conclude_at => end_at + 1.day)
-          context.courses.create!(:conclude_at => end_at - 1.day)
+          course2 = context.courses.create!(conclude_at: end_at + 1.day)
+          context.courses.create!(conclude_at: end_at - 1.day)
 
-          term1 = context.root_account.enrollment_terms.create!(:end_at => end_at + 1.day)
-          term2 = context.root_account.enrollment_terms.create!(:end_at => end_at - 1.day)
-          course4 = context.courses.create!(:enrollment_term => term1)
-          context.courses.create!(:enrollment_term => term2)
+          term1 = context.root_account.enrollment_terms.create!(end_at: end_at + 1.day)
+          term2 = context.root_account.enrollment_terms.create!(end_at: end_at - 1.day)
+          course4 = context.courses.create!(enrollment_term: term1)
+          context.courses.create!(enrollment_term: term2)
 
           context.courses.not_deleted.each do |c|
             c.update_attribute(:workflow_state, 'available')
-            c.assignments.create!(:post_to_sis => true)
+            c.assignments.create!(post_to_sis: true)
           end
 
-          get "/api/sis/accounts/#{context.id}/assignments?ends_after=#{end_at.iso8601}", params: { :account_id => context.id }
+          get "/api/sis/accounts/#{context.id}/assignments?ends_after=#{end_at.iso8601}", params: { account_id: context.id }
           expect(response).to be_successful
 
           result = json_parse

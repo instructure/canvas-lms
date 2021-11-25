@@ -42,7 +42,7 @@ class UnreadCommentCountLoader < GraphQL::Batch::Loader
                           'NOT EXISTS (?)',
                           ViewedSubmissionComment
                             .where('viewed_submission_comments.submission_comment_id=submission_comments.id')
-                            .where(:user_id => @current_user)
+                            .where(user_id: @current_user)
                         )
                         .group(:submission_id, 'submission_comments.attempt')
                         .count

@@ -21,11 +21,11 @@
 CC_XML_EXPORT_DIR = File.dirname(__FILE__) + '/../../fixtures/cc/cc_export'
 
 def get_cc_converter
-  CC::Importer::Canvas::Converter.new({ :no_archive_file => true })
+  CC::Importer::Canvas::Converter.new({ no_archive_file: true })
 end
 
 def get_standard_converter
-  CC::Importer::Standard::Converter.new({ :no_archive_file => true })
+  CC::Importer::Standard::Converter.new({ no_archive_file: true })
 end
 
 def get_cc_export_file(rel_path)

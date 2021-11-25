@@ -40,10 +40,10 @@ describe ContentZipper do
 
   context "submission zips" do
     before(:once) do
-      course_with_teacher(:active_all => true)
-      @course.enrollments.where(:user_id => @teacher).update_all(:updated_at => 5.minutes.ago)
-      submission_model(:course => @course)
-      Submission.where(:id => @submission).update_all(:submitted_at => 5.minutes.ago)
+      course_with_teacher(active_all: true)
+      @course.enrollments.where(user_id: @teacher).update_all(updated_at: 5.minutes.ago)
+      submission_model(course: @course)
+      Submission.where(id: @submission).update_all(submitted_at: 5.minutes.ago)
     end
 
     before do
@@ -85,7 +85,7 @@ describe ContentZipper do
         att0 = json_parse['attachment']['id']
       end
 
-      submission_model(:course => @course)
+      submission_model(course: @course)
       get "/courses/#{@course.id}/assignments/#{@assignment.id}/submissions.json?zip=1&compile=1"
       att1 = json_parse['attachment']['id']
 
@@ -112,8 +112,8 @@ describe ContentZipper do
         att0 = json_parse['attachment']['id']
       end
       section = @course.course_sections.create!
-      @course.enroll_user(@teacher, 'TeacherEnrollment', :section => section,
-                                                         :enrollment_state => 'active', :allow_multiple_enrollments => true)
+      @course.enroll_user(@teacher, 'TeacherEnrollment', section: section,
+                                                         enrollment_state: 'active', allow_multiple_enrollments: true)
 
       get "/courses/#{@course.id}/assignments/#{@assignment.id}/submissions.json?zip=1&compile=1"
       att1 = json_parse['attachment']['id']

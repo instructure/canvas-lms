@@ -29,7 +29,7 @@ class AssessmentQuestionBank < ActiveRecord::Base
   has_many :quiz_groups, class_name: 'Quizzes::QuizGroup'
   before_save :infer_defaults
   after_save :update_alignments
-  validates :title, length: { :maximum => maximum_string_length, :allow_nil => true }
+  validates :title, length: { maximum: maximum_string_length, allow_nil: true }
   resolves_root_account through: :context
 
   include MasterCourses::Restrictor
@@ -72,7 +72,7 @@ class AssessmentQuestionBank < ActiveRecord::Base
     given { |user, session| context.grants_right?(user, session, :read_question_banks) }
     can :read
 
-    given { |user| user && assessment_question_bank_users.where(:user_id => user).exists? }
+    given { |user| user && assessment_question_bank_users.where(user_id: user).exists? }
     can :read
   end
 
@@ -103,7 +103,7 @@ class AssessmentQuestionBank < ActiveRecord::Base
   end
 
   def infer_defaults
-    self.title = t(:default_title, "No Name - %{course}", :course => context.name) if title.blank?
+    self.title = t(:default_title, "No Name - %{course}", course: context.name) if title.blank?
   end
 
   def alignments=(alignments)
@@ -116,11 +116,11 @@ class AssessmentQuestionBank < ActiveRecord::Base
 
     # delete alignments that aren't in the list anymore
     if outcomes.empty?
-      learning_outcome_alignments.update_all(:workflow_state => 'deleted')
+      learning_outcome_alignments.update_all(workflow_state: 'deleted')
     else
       learning_outcome_alignments
         .where.not(learning_outcome_id: outcomes)
-        .update_all(:workflow_state => 'deleted')
+        .update_all(workflow_state: 'deleted')
     end
 
     # add/update current alignments
@@ -129,7 +129,7 @@ class AssessmentQuestionBank < ActiveRecord::Base
         matching_outcome = outcomes.detect { |outcome| outcome.id == outcome_id.to_i }
         next unless matching_outcome
 
-        matching_outcome.align(self, context, :mastery_score => mastery_score)
+        matching_outcome.align(self, context, mastery_score: mastery_score)
       end
     end
   end
@@ -144,7 +144,7 @@ class AssessmentQuestionBank < ActiveRecord::Base
     if do_bookmark
       assessment_question_bank_users.where(user: user).first_or_create!
     else
-      AssessmentQuestionBankUser.where(:user_id => user, :assessment_question_bank_id => self).delete_all
+      AssessmentQuestionBankUser.where(user_id: user, assessment_question_bank_id: self).delete_all
     end
   end
 

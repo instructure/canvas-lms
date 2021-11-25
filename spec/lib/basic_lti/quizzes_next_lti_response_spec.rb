@@ -22,9 +22,9 @@ describe BasicLTI::QuizzesNextLtiResponse do
   before do
     course_model.offer
     @root_account = @course.root_account
-    @account = account_model(:root_account => @root_account, :parent_account => @root_account)
+    @account = account_model(root_account: @root_account, parent_account: @root_account)
     @course.update_attribute(:account, @account)
-    @user = factory_with_protected_attributes(User, :name => "some user", :workflow_state => "registered")
+    @user = factory_with_protected_attributes(User, name: "some user", workflow_state: "registered")
     @course.enroll_student(@user)
   end
 
@@ -204,7 +204,7 @@ describe BasicLTI::QuizzesNextLtiResponse do
             submission.submitted_at = Time.zone.now
             submission.url = launch_urls[i]
             submission.grader_id = -1
-            submission.with_versioning(:explicit => true) { submission.save! }
+            submission.with_versioning(explicit: true) { submission.save! }
           end
         end
 

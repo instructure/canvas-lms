@@ -29,7 +29,7 @@ RSpec.describe Mutations::CreateSubmission do
     )
     @attachment1 = attachment_with_context(@student)
     @attachment2 = attachment_with_context(@student)
-    @media_object = factory_with_protected_attributes(MediaObject, :media_id => 'm-123456', title: 'neato-vid')
+    @media_object = factory_with_protected_attributes(MediaObject, media_id: 'm-123456', title: 'neato-vid')
   end
 
   def mutation_str(

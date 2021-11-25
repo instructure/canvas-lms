@@ -22,14 +22,14 @@ describe SIS::CSV::GroupMembershipImporter do
   before { account_model }
 
   before do
-    group_model(:context => @account, :sis_source_id => "G001")
-    @user1 = user_with_pseudonym(:username => 'u1@example.com')
+    group_model(context: @account, sis_source_id: "G001")
+    @user1 = user_with_pseudonym(username: 'u1@example.com')
     @user1.pseudonym.update_attribute(:sis_user_id, 'U001')
     @user1.pseudonym.update_attribute(:account, @account)
-    @user2 = user_with_pseudonym(:username => 'u2@example.com')
+    @user2 = user_with_pseudonym(username: 'u2@example.com')
     @user2.pseudonym.update_attribute(:sis_user_id, 'U002')
     @user2.pseudonym.update_attribute(:account, @account)
-    @user3 = user_with_pseudonym(:username => 'u3@example.com')
+    @user3 = user_with_pseudonym(username: 'u3@example.com')
     @user3.pseudonym.update_attribute(:sis_user_id, 'U003')
     @user3.pseudonym.update_attribute(:account, @account)
   end
@@ -128,7 +128,7 @@ describe SIS::CSV::GroupMembershipImporter do
     )
     group = @account.all_groups.where(sis_source_id: 'G001').take
     deleted_gm = GroupMembership.where(group_id: group, user_id: @user1).take
-    group.group_memberships.create!(:workflow_state => 'accepted', :user => @user1)
+    group.group_memberships.create!(workflow_state: 'accepted', user: @user1)
     batch2.restore_states_for_batch
     expect(batch2.sis_batch_errors.last.message).to include("Couldn't rollback SIS batch data for row")
     expect(batch2.roll_back_data.where(context_type: "GroupMembership", context_id: deleted_gm.id).take.workflow_state).to eq 'failed'

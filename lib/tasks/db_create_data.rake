@@ -2,7 +2,7 @@
 
 namespace :db do
   desc "Create a new user"
-  task :create_user => :environment do
+  task create_user: :environment do
     require 'highline/import'
     create_user_task
   end
@@ -63,9 +63,9 @@ def create_user_task
       )
 
       pseudonym = Pseudonym.create!(
-        :account => account,
-        :unique_id => user_login,
-        :user => user
+        account: account,
+        unique_id: user_login,
+        user: user
       )
 
       user.register

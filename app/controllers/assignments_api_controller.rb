@@ -649,7 +649,7 @@
 #     }
 class AssignmentsApiController < ApplicationController
   before_action :require_context
-  before_action :require_user_visibility, :only => [:user_index]
+  before_action :require_user_visibility, only: [:user_index]
   include Api::V1::Assignment
   include Api::V1::Submission
   include Api::V1::AssignmentOverride
@@ -683,7 +683,7 @@ class AssignmentsApiController < ApplicationController
   # @returns [Assignment]
   def index
     error_or_array = get_assignments(@current_user)
-    render :json => error_or_array unless performed?
+    render json: error_or_array unless performed?
   end
 
   # @API List assignments for user
@@ -692,7 +692,7 @@ class AssignmentsApiController < ApplicationController
   def user_index
     @user.shard.activate do
       error_or_array = get_assignments(@user)
-      render :json => error_or_array unless performed?
+      render json: error_or_array unless performed?
     end
   end
 
@@ -778,7 +778,7 @@ class AssignmentsApiController < ApplicationController
                     end
 
       result_json['new_positions'] = positions_hash
-      render :json => result_json
+      render json: result_json
     else
       render json: { error: t('cannot save new assignment') }, status: :bad_request
     end
@@ -937,7 +937,7 @@ class AssignmentsApiController < ApplicationController
       include_visibility = included_params.include?('assignment_visibility') && @context.grants_any_right?(@current_user, :read_as_admin, :manage_grades, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS)
       include_override_objects = included_params.include?('overrides') && @context.grants_any_right?(@current_user, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS)
 
-      locked = @assignment.locked_for?(@current_user, :check_policies => true)
+      locked = @assignment.locked_for?(@current_user, check_policies: true)
       @assignment.context_module_action(@current_user, :read) unless locked && !locked[:can_view]
       log_api_asset_access(@assignment, "assignments", @assignment.assignment_group)
 
@@ -960,7 +960,7 @@ class AssignmentsApiController < ApplicationController
                       assignment_json(@assignment, @current_user, session, options)
                     end
 
-      render :json => result_json
+      render json: result_json
     end
   end
 
@@ -1396,7 +1396,7 @@ class AssignmentsApiController < ApplicationController
   def bulk_update
     return render_json_unauthorized unless @context.grants_any_right?(@current_user, session, :manage_assignments, :manage_assignments_edit)
 
-    data = params.permit(:_json => [:id, :all_dates => %i[id base due_at unlock_at lock_at]]).to_h[:_json]
+    data = params.permit(_json: [:id, all_dates: %i[id base due_at unlock_at lock_at]]).to_h[:_json]
     return render json: { message: 'expected array' }, status: :bad_request unless data.is_a?(Array)
     return render json: { message: 'missing assignment id' }, status: :bad_request unless data.all? { |a| a.key?('id') }
 
@@ -1438,8 +1438,8 @@ class AssignmentsApiController < ApplicationController
 
   def invalid_bucket_error
     err_msg = t("bucket name must be one of the following: %{bucket_names}", bucket_names: SortsAssignments::VALID_BUCKETS.join(", "))
-    @context.errors.add('bucket', err_msg, :att_name => 'bucket')
-    render :json => @context.errors, :status => :bad_request
+    @context.errors.add('bucket', err_msg, att_name: 'bucket')
+    render json: @context.errors, status: :bad_request
   end
 
   def require_user_visibility

@@ -26,10 +26,10 @@ describe 'Canvadoc' do
   end
 
   before do
-    PluginSetting.create! :name => 'canvadocs',
-                          :settings => { "api_key" => "blahblahblahblahblah",
-                                         "base_url" => "http://example.com",
-                                         "annotations_supported" => true }
+    PluginSetting.create! name: 'canvadocs',
+                          settings: { "api_key" => "blahblahblahblahblah",
+                                      "base_url" => "http://example.com",
+                                      "annotations_supported" => true }
     stub_upload
     allow_any_instance_of(Canvadocs::API).to receive(:session).and_return "id" => "blah",
                                                                           "status" => "pending"

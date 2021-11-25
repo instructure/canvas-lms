@@ -61,8 +61,8 @@ module Lti
              end
 
       consumer = OAuth::Consumer.new(key, secret, {
-                                       :site => "#{uri.scheme}://#{host}",
-                                       :signature_method => 'HMAC-SHA1'
+                                       site: "#{uri.scheme}://#{host}",
+                                       signature_method: 'HMAC-SHA1'
                                      })
 
       path = uri.path
@@ -74,7 +74,7 @@ module Lti
           end
         end
       end
-      options = { :scheme => 'body' }
+      options = { scheme: 'body' }
 
       request = consumer.create_signed_request(:post, path, nil, options, params.stringify_keys)
       # the request is made by a html form in the user's browser, so we

@@ -23,8 +23,8 @@ describe Quizzes::OutstandingQuizSubmissionManager do
     before do
       course_factory
       @user = student_in_course.user
-      @quiz = @course.quizzes.create!(:title => "Outstanding")
-      @quiz.quiz_questions.create!(:question_data => multiple_choice_question_data)
+      @quiz = @course.quizzes.create!(title: "Outstanding")
+      @quiz.quiz_questions.create!(question_data: multiple_choice_question_data)
       @quiz.generate_quiz_data
       @quiz.save
       @submission = Quizzes::SubmissionManager.new(@quiz).find_or_create_submission(@user, false)

@@ -54,17 +54,17 @@ class Role < ActiveRecord::Base
   end
 
   belongs_to :account
-  belongs_to :root_account, :class_name => 'Account'
+  belongs_to :root_account, class_name: 'Account'
   has_many :role_overrides
 
-  before_validation :infer_root_account_id, :if => :belongs_to_account?
+  before_validation :infer_root_account_id, if: :belongs_to_account?
 
-  validate :ensure_unique_name_for_account, :if => :belongs_to_account?
+  validate :ensure_unique_name_for_account, if: :belongs_to_account?
   validates :name, :workflow_state, presence: true
-  validates :account_id, presence: { :if => :belongs_to_account? }
+  validates :account_id, presence: { if: :belongs_to_account? }
 
-  validates :base_role_type, inclusion: { :in => BASE_TYPES, :message => 'is invalid' }
-  validates :name, exclusion: { :in => KNOWN_TYPES, :unless => :built_in?, :message => 'is reserved' }
+  validates :base_role_type, inclusion: { in: BASE_TYPES, message: 'is invalid' }
+  validates :name, exclusion: { in: KNOWN_TYPES, unless: :built_in?, message: 'is reserved' }
   validate :ensure_non_built_in_name
 
   def role_for_root_account_id(target_root_account_id)
@@ -105,10 +105,10 @@ class Role < ActiveRecord::Base
   include Workflow
   workflow do
     state :active do
-      event :deactivate, :transitions_to => :inactive
+      event :deactivate, transitions_to: :inactive
     end
     state :inactive do
-      event :activate, :transitions_to => :active
+      event :activate, transitions_to: :active
     end
     state :built_in # for previously built-in roles
     state :deleted
@@ -125,7 +125,7 @@ class Role < ActiveRecord::Base
     RequestCache.cache('built_in_roles', root_account_id) do
       local_id, shard = Shard.local_id_for(root_account_id)
       (shard || Shard.current).activate do
-        Role.where(:workflow_state => 'built_in', :root_account_id => local_id).order(:id).to_a
+        Role.where(workflow_state: 'built_in', root_account_id: local_id).order(:id).to_a
       end
     end
   end
@@ -142,7 +142,7 @@ class Role < ActiveRecord::Base
     return nil unless id
     return nil if id.is_a?(String) && id !~ Api::ID_REGEX
 
-    Role.where(:id => id).take # giving up on built-in role caching because it's silly now and we should just preload more
+    Role.where(id: id).take # giving up on built-in role caching because it's silly now and we should just preload more
   end
 
   def self.get_built_in_role(name, root_account_id:)
@@ -200,11 +200,11 @@ class Role < ActiveRecord::Base
   end
 
   scope :not_deleted, -> { where("roles.workflow_state IN ('active', 'inactive')") }
-  scope :deleted, -> { where(:workflow_state => 'deleted') }
-  scope :active, -> { where(:workflow_state => 'active') }
-  scope :inactive, -> { where(:workflow_state => 'inactive') }
-  scope :for_courses, -> { where(:base_role_type => ENROLLMENT_TYPES) }
-  scope :for_accounts, -> { where(:base_role_type => ACCOUNT_TYPES) }
+  scope :deleted, -> { where(workflow_state: 'deleted') }
+  scope :active, -> { where(workflow_state: 'active') }
+  scope :inactive, -> { where(workflow_state: 'inactive') }
+  scope :for_courses, -> { where(base_role_type: ENROLLMENT_TYPES) }
+  scope :for_accounts, -> { where(base_role_type: ACCOUNT_TYPES) }
   scope :full_account_admin, -> { where(base_role_type: 'AccountAdmin') }
   scope :custom_account_admin_with_permission, lambda { |permission|
     where(base_role_type: 'AccountMembership')
@@ -237,7 +237,7 @@ class Role < ActiveRecord::Base
       new[:label] = br[:label].call
       new[:plural_label] = br[:plural_label].call
       new[:custom_roles] = custom_roles.select { |cr| cr.base_role_type == new[:base_role_name] }.map do |cr|
-        { :id => cr.id, :base_role_name => cr.base_role_type, :name => cr.name, :label => cr.name, :asset_string => cr.asset_string, :workflow_state => cr.workflow_state }
+        { id: cr.id, base_role_name: cr.base_role_type, name: cr.name, label: cr.name, asset_string: cr.asset_string, workflow_state: cr.workflow_state }
       end
       new
     end

@@ -31,8 +31,8 @@ module AdminSettingsCommon
     account.set_feature_flag! 'post_grades', 'on'
     account.set_feature_flag! :new_sis_integrations, 'on'
     account.allow_sis_import = true
-    account.settings[:sis_syncing] = { :value => true, :locked => false }
-    account.settings[:sis_default_grade_export] = { :value => true }
+    account.settings[:sis_syncing] = { value: true, locked: false }
+    account.settings[:sis_default_grade_export] = { value: true }
     account.save!
   end
 

@@ -23,10 +23,10 @@ describe "courses" do
   include_context "in-process server selenium tests"
 
   before do
-    course_with_student_logged_in(:active_all => true)
-    course_with_teacher(:active_all => true, :course => @course)
+    course_with_student_logged_in(active_all: true)
+    course_with_teacher(active_all: true, course: @course)
 
-    @assignment = @course.assignments.new(:title => "some assignment")
+    @assignment = @course.assignments.new(title: "some assignment")
     @assignment.workflow_state = "published"
     @assignment.save
     @submission = @assignment.grade_student(@student, grade: 3, grader: @teacher).first

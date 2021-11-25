@@ -23,7 +23,7 @@ class LearningOutcomeResult < ActiveRecord::Base
 
   belongs_to :user
   belongs_to :learning_outcome
-  belongs_to :alignment, :class_name => 'ContentTag', :foreign_key => :content_tag_id
+  belongs_to :alignment, class_name: 'ContentTag', foreign_key: :content_tag_id
   belongs_to :association_object, polymorphic:
       [:rubric_association, :assignment,
        { quiz: 'Quizzes::Quiz', assessment: 'LiveAssessments::Assessment' }],
@@ -120,23 +120,23 @@ class LearningOutcomeResult < ActiveRecord::Base
     if codes == 'all'
       all
     else
-      where(:context_code => codes)
+      where(context_code: codes)
     end
   }
-  scope :for_user, ->(user) { where(:user_id => user) }
+  scope :for_user, ->(user) { where(user_id: user) }
   scope :custom_ordering, lambda { |param|
     orders = {
-      'recent' => { :assessed_at => :desc },
-      'highest' => { :score => :desc },
-      'oldest' => { :score => :asc },
-      'default' => { :assessed_at => :desc }
+      'recent' => { assessed_at: :desc },
+      'highest' => { score: :desc },
+      'oldest' => { score: :asc },
+      'default' => { assessed_at: :desc }
     }
     order_clause = orders[param] || orders['default']
     order(order_clause)
   }
-  scope :for_outcome_ids, ->(ids) { where(:learning_outcome_id => ids) }
-  scope :for_association, ->(association) { where(:association_type => association.class.to_s, :association_id => association.id) }
-  scope :for_associated_asset, ->(associated_asset) { where(:associated_asset_type => associated_asset.class.to_s, :associated_asset_id => associated_asset.id) }
+  scope :for_outcome_ids, ->(ids) { where(learning_outcome_id: ids) }
+  scope :for_association, ->(association) { where(association_type: association.class.to_s, association_id: association.id) }
+  scope :for_associated_asset, ->(associated_asset) { where(associated_asset_type: associated_asset.class.to_s, associated_asset_id: associated_asset.id) }
   scope :with_active_link, -> { where("content_tags.workflow_state <> 'deleted'").joins(:alignment) }
   scope :exclude_muted_associations, lambda {
     joins("LEFT JOIN #{RubricAssociation.quoted_table_name} rassoc ON rassoc.id = learning_outcome_results.association_id AND learning_outcome_results.association_type = 'RubricAssociation'")

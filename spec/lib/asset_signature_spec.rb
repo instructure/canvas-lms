@@ -26,19 +26,19 @@ describe AssetSignature do
 
   describe '.generate' do
     it 'produces a combination of id and hmac to use as a url signature' do
-      asset = double(:id => 24)
+      asset = double(id: 24)
       expect(AssetSignature.generate(asset)).to eq "24-#{example_encode(double.class.to_s, 24)}"
     end
 
     it 'produces a different hmac for each asset id' do
-      asset = double(:id => 0)
+      asset = double(id: 0)
       expect(AssetSignature.generate(asset)).to eq "0-#{example_encode(double.class, 0)}"
     end
 
     it 'produces a difference hmac for each asset class' do
       asset = SomeModel.new(24)
       expect(AssetSignature.generate(asset)).to eq "24-#{example_encode('SomeModel', 24)}"
-      expect(AssetSignature.generate(asset)).not_to eq AssetSignature.generate(double(:id => 24))
+      expect(AssetSignature.generate(asset)).not_to eq AssetSignature.generate(double(id: 24))
     end
   end
 

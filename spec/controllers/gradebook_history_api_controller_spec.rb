@@ -27,31 +27,31 @@ describe GradebookHistoryApiController do
   end
 
   before :once do
-    course_with_teacher(:active_all => true)
+    course_with_teacher(active_all: true)
 
-    student = user_with_pseudonym(:username => 'student@example.com', :active_all => 1)
-    student_in_course(:user => student, :active_all => 1)
-    student2 = user_with_pseudonym(:username => 'student2@example.com', :active_all => 1)
-    student_in_course(:user => student2, :active_all => 1)
-    student3 = user_with_pseudonym(:username => 'student3@example.com', :active_all => 1)
-    student_in_course(:user => student3, :active_all => 1)
+    student = user_with_pseudonym(username: 'student@example.com', active_all: 1)
+    student_in_course(user: student, active_all: 1)
+    student2 = user_with_pseudonym(username: 'student2@example.com', active_all: 1)
+    student_in_course(user: student2, active_all: 1)
+    student3 = user_with_pseudonym(username: 'student3@example.com', active_all: 1)
+    student_in_course(user: student3, active_all: 1)
 
-    @grader = user_with_pseudonym(:name => 'Grader', :username => 'grader@example.com', :active_all => 1)
-    @super_grader = user_with_pseudonym(:name => 'SuperGrader', :username => 'super_grader@example.com', :active_all => 1)
-    @other_grader = user_with_pseudonym(:name => 'OtherGrader', :username => 'other_grader@example.com', :active_all => 1)
+    @grader = user_with_pseudonym(name: 'Grader', username: 'grader@example.com', active_all: 1)
+    @super_grader = user_with_pseudonym(name: 'SuperGrader', username: 'super_grader@example.com', active_all: 1)
+    @other_grader = user_with_pseudonym(name: 'OtherGrader', username: 'other_grader@example.com', active_all: 1)
 
-    @assignment1 = @course.assignments.create!(:title => "some assignment")
-    @assignment2 = @course.assignments.create!(:title => "another assignment")
+    @assignment1 = @course.assignments.create!(title: "some assignment")
+    @assignment2 = @course.assignments.create!(title: "another assignment")
 
     @submission1 = @assignment1.submit_homework(student)
     @submission2 = @assignment1.submit_homework(student2)
     @submission3 = @assignment1.submit_homework(student3)
     @submission4 = @assignment2.submit_homework(student)
 
-    @submission1.update!(:graded_at => Time.now, :grader_id => @grader.id, :score => 100)
-    @submission2.update!(:graded_at => Time.now, :grader_id => @super_grader.id, :score => 90)
-    @submission3.update!(:graded_at => (Time.now - 24.hours), :grader_id => @other_grader.id, :score => 80)
-    @submission4.update!(:graded_at => (Time.now - 24.hours), :grader_id => @other_grader.id, :score => 70)
+    @submission1.update!(graded_at: Time.now, grader_id: @grader.id, score: 100)
+    @submission2.update!(graded_at: Time.now, grader_id: @super_grader.id, score: 90)
+    @submission3.update!(graded_at: (Time.now - 24.hours), grader_id: @other_grader.id, score: 80)
+    @submission4.update!(graded_at: (Time.now - 24.hours), grader_id: @other_grader.id, score: 70)
   end
 
   before do
@@ -64,7 +64,7 @@ describe GradebookHistoryApiController do
     end
 
     describe 'default params' do
-      before { get 'days', params: { :course_id => @course.id }, :format => 'json' }
+      before { get 'days', params: { course_id: @course.id }, format: 'json' }
 
       it 'provides an array of the dates where there are submissions' do
         expect(json_body.map { |d| d['date'] }.sort).to eq [date_key(@submission1), date_key(@submission3)].sort
@@ -82,13 +82,13 @@ describe GradebookHistoryApiController do
     end
 
     it 'paginates' do
-      get 'days', params: { :course_id => @course.id, :page => 2, :per_page => 2 }, :format => 'json'
+      get 'days', params: { course_id: @course.id, page: 2, per_page: 2 }, format: 'json'
       expect(json_body.map { |d| d['date'] }).to eq [@submission3.graded_at.to_date.as_json]
     end
   end
 
   describe 'GET day_details' do
-    before { get 'day_details', params: { :course_id => @course.id, :date => @submission1.graded_at.strftime('%Y-%m-%d') }, format: 'json' }
+    before { get 'day_details', params: { course_id: @course.id, date: @submission1.graded_at.strftime('%Y-%m-%d') }, format: 'json' }
 
     it 'has the graders as the top level piece of data' do
       expect(json_body.map { |g| g['id'] }.sort).to eq [@grader.id, @super_grader.id].sort
@@ -101,7 +101,7 @@ describe GradebookHistoryApiController do
 
   describe 'GET assignment' do
     let(:date) { @submission1.graded_at.strftime('%Y-%m-%d') }
-    let(:params) { { :course_id => @course.id, :date => date, :grader_id => @grader.id, :assignment_id => @assignment1.id } }
+    let(:params) { { course_id: @course.id, date: date, grader_id: @grader.id, assignment_id: @assignment1.id } }
 
     before { get('submissions', params: params, format: 'json') }
 

@@ -77,9 +77,9 @@ describe "threaded discussions" do
 
     it "does not allow edits for a concluded student", priority: "2" do
       student_enrollment = course_with_student(
-        :course => @course,
-        :user => @student,
-        :active_enrollment => true
+        course: @course,
+        user: @student,
+        active_enrollment: true
       )
       entry = @topic.discussion_entries.create!(
         user: @student,
@@ -97,9 +97,9 @@ describe "threaded discussions" do
 
     it "does not allow deletes for a concluded student", priority: "2" do
       student_enrollment = course_with_student(
-        :course => @course,
-        :user => @student,
-        :active_enrollment => true
+        course: @course,
+        user: @student,
+        active_enrollment: true
       )
       entry = @topic.discussion_entries.create!(
         user: @student,
@@ -295,9 +295,9 @@ describe "threaded discussions" do
     context 'concluded student' do
       before do
         student_enrollment = course_with_student(
-          :course => @course,
-          :user => @student,
-          :active_enrollment => true
+          course: @course,
+          user: @student,
+          active_enrollment: true
         )
         @topic.discussion_entries.create!(
           user: @student,

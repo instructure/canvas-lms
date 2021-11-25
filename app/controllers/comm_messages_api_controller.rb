@@ -143,6 +143,6 @@ class CommMessagesApiController < ApplicationController
     messages = Api.paginate(query, self, api_v1_comm_messages_url)
 
     messages_json = messages.map { |m| comm_message_json(m) }
-    render :json => messages_json
+    render json: messages_json
   end
 end

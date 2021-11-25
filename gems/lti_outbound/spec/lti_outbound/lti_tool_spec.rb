@@ -81,36 +81,36 @@ describe LtiOutbound::LTITool do
 
   describe '#set_custom_fields' do
     it 'does not change the given input hash if the settings custom fields are empty' do
-      hash = { :a => :b }
+      hash = { a: :b }
 
       subject.settings = {}
       subject.set_custom_fields(hash, nil)
-      expect(hash).to eq({ :a => :b })
+      expect(hash).to eq({ a: :b })
 
-      subject.settings = { :custom_fields => {} }
+      subject.settings = { custom_fields: {} }
       subject.set_custom_fields(hash, nil)
-      expect(hash).to eq({ :a => :b })
+      expect(hash).to eq({ a: :b })
     end
 
     it 'merges fields from the settings custom fields into the given hash prefixing them with custom_' do
-      hash = { :a => :b }
-      subject.settings = { :custom_fields => { :d => :e } }
+      hash = { a: :b }
+      subject.settings = { custom_fields: { d: :e } }
 
       subject.set_custom_fields(hash, nil)
       expect(hash).to eq({ :a => :b, 'custom_d' => :e })
     end
 
     it 'replaces non-word characters from custom field keys' do
-      hash = { :a => :b }
-      subject.settings = { :custom_fields => { :'%$#@d()' => :e } }
+      hash = { a: :b }
+      subject.settings = { custom_fields: { '%$#@d()': :e } }
 
       subject.set_custom_fields(hash, nil)
       expect(hash).to eq({ :a => :b, 'custom_____d__' => :e })
     end
 
     it 'merges fields from the applicable resource type too' do
-      hash = { :a => :b }
-      subject.settings = { :given_resource_type => { :custom_fields => { :'%$#@d()' => :e } } }
+      hash = { a: :b }
+      subject.settings = { given_resource_type: { custom_fields: { '%$#@d()': :e } } }
 
       subject.set_custom_fields(hash, 'given_resource_type')
       expect(hash).to eq({ :a => :b, 'custom_____d__' => :e })
@@ -136,7 +136,7 @@ describe LtiOutbound::LTITool do
 
   describe '#selection_width' do
     it 'returns selection width from settings for a resource type' do
-      subject.settings = { editor_button: { :selection_width => 100 } }
+      subject.settings = { editor_button: { selection_width: 100 } }
       expect(subject.selection_width('editor_button')).to eq 100
     end
 
@@ -152,7 +152,7 @@ describe LtiOutbound::LTITool do
 
   describe '#selection_height' do
     it 'returns selection height from settings for a resource type' do
-      subject.settings = { editor_button: { :selection_height => 100 } }
+      subject.settings = { editor_button: { selection_height: 100 } }
       expect(subject.selection_height('editor_button')).to eq 100
     end
 

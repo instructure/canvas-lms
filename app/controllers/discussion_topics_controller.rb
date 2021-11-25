@@ -244,7 +244,7 @@ require 'atom'
 #     }
 #
 class DiscussionTopicsController < ApplicationController
-  before_action :require_context_and_read_access, :except => :public_feed
+  before_action :require_context_and_read_access, except: :public_feed
   before_action :rce_js_env
 
   include Api::V1::DiscussionTopics
@@ -340,12 +340,12 @@ class DiscussionTopicsController < ApplicationController
     if states.present?
       if (states.include?('pinned') && states.include?('unpinned')) ||
          (states.include?('locked') && states.include?('unlocked'))
-        render json: { errors: { scope: "scope is contradictory" } }, :status => :bad_request
+        render json: { errors: { scope: "scope is contradictory" } }, status: :bad_request
         return
       end
 
       if states.include?('pinned')
-        scope = scope.where(:pinned => true)
+        scope = scope.where(pinned: true)
       elsif states.include?('unpinned')
         scope = scope.where("discussion_topics.pinned IS NOT TRUE")
       end
@@ -440,7 +440,7 @@ class DiscussionTopicsController < ApplicationController
         add_body_class 'hide-content-while-scripts-not-loaded'
         @page_title = join_title(t('#titles.discussions', "Discussions"), @context.name)
 
-        content_for_head helpers.auto_discovery_link_tag(:atom, feeds_forum_format_path(@context.feed_code, :atom), { :title => t(:course_discussions_atom_feed_title, "Course Discussions Atom Feed") })
+        content_for_head helpers.auto_discovery_link_tag(:atom, feeds_forum_format_path(@context.feed_code, :atom), { title: t(:course_discussions_atom_feed_title, "Course Discussions Atom Feed") })
 
         js_bundle :discussion_topics_index
         css_bundle :discussions_index
@@ -458,9 +458,9 @@ class DiscussionTopicsController < ApplicationController
                                                 plain_messages: value_to_boolean(params[:plain_messages]),
                                                 exclude_assignment_description: value_to_boolean(params[:exclude_assignment_descriptions]),
                                                 include_all_dates: include_params.include?('all_dates'),
-                                                :include_sections => include_params.include?('sections'),
-                                                :include_sections_user_count => include_params.include?('sections_user_count'),
-                                                :include_overrides => include_params.include?('overrides'),
+                                                include_sections: include_params.include?('sections'),
+                                                include_sections_user_count: include_params.include?('sections_user_count'),
+                                                include_overrides: include_params.include?('overrides'),
                                                 master_course_status: mc_status,
                                                 root_topic_fields: root_topic_fields)
       end
@@ -640,7 +640,7 @@ class DiscussionTopicsController < ApplicationController
   def show
     @topic = @context.all_discussion_topics.find(params[:id])
     # we still need the lock info even if the current user policies unlock the topic. check the policies manually later if you need to override the lockout.
-    @locked = @topic.locked_for?(@current_user, :check_policies => true, :deep_check_if_needed => true)
+    @locked = @topic.locked_for?(@current_user, check_policies: true, deep_check_if_needed: true)
 
     @context_module_tag = ContextModuleItem.find_tag_with_preferred([@topic, @topic.root_topic, @topic.assignment], params[:module_item_id])
     @sequence_asset = @context_module_tag.try(:content)
@@ -696,9 +696,9 @@ class DiscussionTopicsController < ApplicationController
 
       if @sequence_asset
         js_env({ SEQUENCE: {
-                 :ASSET_TYPE => @sequence_asset.is_a?(Assignment) ? 'Assignment' : 'Discussion',
-                 :ASSET_ID => @sequence_asset.id,
-                 :COURSE_ID => @sequence_asset.context.id,
+                 ASSET_TYPE: @sequence_asset.is_a?(Assignment) ? 'Assignment' : 'Discussion',
+                 ASSET_ID: @sequence_asset.id,
+                 COURSE_ID: @sequence_asset.context.id,
                } })
       end
 
@@ -759,7 +759,7 @@ class DiscussionTopicsController < ApplicationController
       log_asset_access(@topic, 'topics', 'topics')
       respond_to do |format|
         if topics && topics.length == 1 && !@topic.grants_right?(@current_user, session, :update)
-          redirect_params = { :root_discussion_topic_id => @topic.id }
+          redirect_params = { root_discussion_topic_id: @topic.id }
           redirect_params[:module_item_id] = params[:module_item_id] if params[:module_item_id].present?
           format.html { redirect_to named_context_url(topics[0].context, :context_discussion_topics_url, redirect_params) }
         else
@@ -767,11 +767,11 @@ class DiscussionTopicsController < ApplicationController
             @discussion_topic_menu_tools = external_tools_display_hashes(:discussion_topic_menu)
 
             if @context.is_a?(Course) && @topic.is_section_specific
-              user_counts = Enrollment.where(:course_section_id => @topic.course_sections,
+              user_counts = Enrollment.where(course_section_id: @topic.course_sections,
                                              course_id: @context).not_fake.active_or_pending_by_date_ignoring_access
                                       .group(:course_section_id).count
               section_data = @topic.course_sections.map do |cs|
-                cs.attributes.slice(*%w[id name]).merge(:user_count => user_counts[cs.id] || 0)
+                cs.attributes.slice(*%w[id name]).merge(user_count: user_counts[cs.id] || 0)
               end
             end
             api_url = lambda do |endpoint, *params|
@@ -780,55 +780,53 @@ class DiscussionTopicsController < ApplicationController
             end
 
             env_hash = {
-              :APP_URL => named_context_url(@context, :context_discussion_topic_url, @topic),
-              :TOPIC => {
-                :ID => @topic.id,
-                :TITLE => @topic.title,
-                :IS_SUBSCRIBED => @topic.subscribed?(@current_user),
-                :IS_PUBLISHED => @topic.published?,
-                :CAN_UNPUBLISH => @topic.can_unpublish?,
-                :IS_ANNOUNCEMENT => @topic.is_announcement,
-                :COURSE_SECTIONS => @topic.is_section_specific ? section_data : nil,
+              APP_URL: named_context_url(@context, :context_discussion_topic_url, @topic),
+              TOPIC: {
+                ID: @topic.id,
+                TITLE: @topic.title,
+                IS_SUBSCRIBED: @topic.subscribed?(@current_user),
+                IS_PUBLISHED: @topic.published?,
+                CAN_UNPUBLISH: @topic.can_unpublish?,
+                IS_ANNOUNCEMENT: @topic.is_announcement,
+                COURSE_SECTIONS: @topic.is_section_specific ? section_data : nil,
               },
-              :PERMISSIONS => {
+              PERMISSIONS: {
                 # Can reply
-                :CAN_REPLY =>
-                  @topic.grants_right?(@current_user, session, :reply) &&
-                  !@topic.homeroom_announcement?(@context),
+                CAN_REPLY: @topic.grants_right?(@current_user, session, :reply) &&
+                           !@topic.homeroom_announcement?(@context),
                 # Can attach files on replies
-                :CAN_ATTACH => @topic.grants_right?(@current_user, session, :attach),
-                :CAN_RATE => @topic.grants_right?(@current_user, session, :rate),
-                :CAN_READ_REPLIES =>
-                  @topic.grants_right?(@current_user, :read_replies) &&
-                  !@topic.homeroom_announcement?(@context),
+                CAN_ATTACH: @topic.grants_right?(@current_user, session, :attach),
+                CAN_RATE: @topic.grants_right?(@current_user, session, :rate),
+                CAN_READ_REPLIES: @topic.grants_right?(@current_user, :read_replies) &&
+                                  !@topic.homeroom_announcement?(@context),
                 # Can moderate their own topics
-                :CAN_MANAGE_OWN => @context.user_can_manage_own_discussion_posts?(@current_user) &&
-                                   !@topic.locked_for?(@current_user, :check_policies => true),
+                CAN_MANAGE_OWN: @context.user_can_manage_own_discussion_posts?(@current_user) &&
+                                !@topic.locked_for?(@current_user, check_policies: true),
                 # Can moderate any topic
-                :MODERATE => user_can_moderate
+                MODERATE: user_can_moderate
               },
-              :ROOT_URL => "#{api_url.call('topic_view')}?include_new_entries=1&include_enrollment_state=1&include_context_card_info=1",
-              :ENTRY_ROOT_URL => api_url.call('topic_entry_list'),
-              :REPLY_URL => api_url.call('add_reply', ':entry_id'),
-              :ROOT_REPLY_URL => api_url.call('add_entry'),
-              :DELETE_URL => api_url.call('delete_reply', ':id'),
-              :UPDATE_URL => api_url.call('update_reply', ':id'),
-              :MARK_READ_URL => api_url.call('topic_discussion_entry_mark_read', ':id'),
-              :MARK_UNREAD_URL => api_url.call('topic_discussion_entry_mark_unread', ':id'),
-              :RATE_URL => api_url.call('topic_discussion_entry_rate', ':id'),
-              :MARK_ALL_READ_URL => api_url.call('topic_mark_all_read'),
-              :MARK_ALL_UNREAD_URL => api_url.call('topic_mark_all_unread'),
-              :MANUAL_MARK_AS_READ => @current_user.try(:manual_mark_as_read?),
-              :CAN_SUBSCRIBE => !@topic.subscription_hold(@current_user, session),
-              :CURRENT_USER => user_display_json(@current_user),
-              :INITIAL_POST_REQUIRED => @initial_post_required,
-              :THREADED => @topic.threaded?,
-              :ALLOW_RATING => @topic.allow_rating,
-              :SORT_BY_RATING => @topic.sort_by_rating,
-              :TODO_DATE => @topic.todo_date,
-              :IS_ASSIGNMENT => @topic.assignment_id?,
-              :ASSIGNMENT_ID => @topic.assignment_id,
-              :IS_GROUP => @topic.group_category_id?,
+              ROOT_URL: "#{api_url.call('topic_view')}?include_new_entries=1&include_enrollment_state=1&include_context_card_info=1",
+              ENTRY_ROOT_URL: api_url.call('topic_entry_list'),
+              REPLY_URL: api_url.call('add_reply', ':entry_id'),
+              ROOT_REPLY_URL: api_url.call('add_entry'),
+              DELETE_URL: api_url.call('delete_reply', ':id'),
+              UPDATE_URL: api_url.call('update_reply', ':id'),
+              MARK_READ_URL: api_url.call('topic_discussion_entry_mark_read', ':id'),
+              MARK_UNREAD_URL: api_url.call('topic_discussion_entry_mark_unread', ':id'),
+              RATE_URL: api_url.call('topic_discussion_entry_rate', ':id'),
+              MARK_ALL_READ_URL: api_url.call('topic_mark_all_read'),
+              MARK_ALL_UNREAD_URL: api_url.call('topic_mark_all_unread'),
+              MANUAL_MARK_AS_READ: @current_user.try(:manual_mark_as_read?),
+              CAN_SUBSCRIBE: !@topic.subscription_hold(@current_user, session),
+              CURRENT_USER: user_display_json(@current_user),
+              INITIAL_POST_REQUIRED: @initial_post_required,
+              THREADED: @topic.threaded?,
+              ALLOW_RATING: @topic.allow_rating,
+              SORT_BY_RATING: @topic.sort_by_rating,
+              TODO_DATE: @topic.todo_date,
+              IS_ASSIGNMENT: @topic.assignment_id?,
+              ASSIGNMENT_ID: @topic.assignment_id,
+              IS_GROUP: @topic.group_category_id?,
             }
             # will fire off the xhr for this as soon as the page comes back.
             # see ui/features/discussion_topic/backbone/models/Topic#fetch for where it is consumed
@@ -841,9 +839,9 @@ class DiscussionTopicsController < ApplicationController
             end
             if @sequence_asset
               env_hash[:SEQUENCE] = {
-                :ASSET_TYPE => @sequence_asset.is_a?(Assignment) ? 'Assignment' : 'Discussion',
-                :ASSET_ID => @sequence_asset.id,
-                :COURSE_ID => @sequence_asset.context.id,
+                ASSET_TYPE: @sequence_asset.is_a?(Assignment) ? 'Assignment' : 'Discussion',
+                ASSET_ID: @sequence_asset.id,
+                COURSE_ID: @sequence_asset.context.id,
               }
             end
             @assignment_presenter = AssignmentPresenter.new(@topic.assignment)
@@ -855,7 +853,7 @@ class DiscussionTopicsController < ApplicationController
                                                                       student_id: ":student_id")
             end
 
-            js_hash = { :DISCUSSION => env_hash }
+            js_hash = { DISCUSSION: env_hash }
             if @context.is_a?(Course)
               GuardRail.activate(:secondary) do
                 js_hash[:TOTAL_USER_COUNT] = @topic.context.enrollments.not_fake
@@ -1090,10 +1088,10 @@ class DiscussionTopicsController < ApplicationController
       @topic.destroy
       respond_to do |format|
         format.html do
-          flash[:notice] = t :topic_deleted_notice, "%{topic_title} deleted successfully", :topic_title => @topic.title
+          flash[:notice] = t :topic_deleted_notice, "%{topic_title} deleted successfully", topic_title: @topic.title
           redirect_to named_context_url(@context, @topic.is_announcement ? :context_announcements_url : :context_discussion_topics_url)
         end
-        format.json { render :json => @topic.as_json(:include => { :user => { :only => :name } }), :status => :ok }
+        format.json { render json: @topic.as_json(include: { user: { only: :name } }), status: :ok }
       end
     end
   end
@@ -1102,8 +1100,8 @@ class DiscussionTopicsController < ApplicationController
     return unless get_feed_context
 
     feed = Atom::Feed.new do |f|
-      f.title = t :discussion_feed_title, "%{title} Discussion Feed", :title => @context.name
-      f.links << Atom::Link.new(:href => polymorphic_url([@context, :discussion_topics]), :rel => 'self')
+      f.title = t :discussion_feed_title, "%{title} Discussion Feed", title: @context.name
+      f.links << Atom::Link.new(href: polymorphic_url([@context, :discussion_topics]), rel: 'self')
       f.updated = Time.now
       f.id = polymorphic_url([@context, :discussion_topics])
     end
@@ -1116,7 +1114,7 @@ class DiscussionTopicsController < ApplicationController
       feed.entries << entry.to_atom
     end
     respond_to do |format|
-      format.atom { render :plain => feed.to_xml }
+      format.atom { render plain: feed.to_xml }
     end
   end
 
@@ -1137,7 +1135,7 @@ class DiscussionTopicsController < ApplicationController
       reject! "topics not found" unless topics.length == order.length
       topics[0].update_order(order)
       new_order = pinned_topics.by_position.pluck(:id).map(&:to_s)
-      render :json => { :reorder => true, :order => new_order }, :status => :ok
+      render json: { reorder: true, order: new_order }, status: :ok
     end
   end
 
@@ -1289,7 +1287,7 @@ class DiscussionTopicsController < ApplicationController
     process_todo_parameters
 
     if @errors.present?
-      render :json => { errors: @errors }, :status => :bad_request
+      render json: { errors: @errors }, status: :bad_request
     else
       @topic.skip_broadcasts = true
       DiscussionTopic.transaction do
@@ -1327,29 +1325,29 @@ class DiscussionTopicsController < ApplicationController
         include_usage_rights = @context.root_account.feature_enabled?(:usage_rights_discussion_topics) &&
                                @context.try(:usage_rights_required?)
         if @context.is_a?(Course)
-          render :json => discussion_topic_api_json(@topic,
-                                                    @context,
-                                                    @current_user,
-                                                    session,
-                                                    {
-                                                      include_sections: true,
-                                                      include_sections_user_count: true,
-                                                      include_usage_rights: include_usage_rights
-                                                    })
+          render json: discussion_topic_api_json(@topic,
+                                                 @context,
+                                                 @current_user,
+                                                 session,
+                                                 {
+                                                   include_sections: true,
+                                                   include_sections_user_count: true,
+                                                   include_usage_rights: include_usage_rights
+                                                 })
         else
-          render :json => discussion_topic_api_json(@topic,
-                                                    @context,
-                                                    @current_user,
-                                                    session,
-                                                    {
-                                                      include_usage_rights: include_usage_rights
-                                                    })
+          render json: discussion_topic_api_json(@topic,
+                                                 @context,
+                                                 @current_user,
+                                                 session,
+                                                 {
+                                                   include_usage_rights: include_usage_rights
+                                                 })
         end
       else
         errors = @topic.errors.as_json[:errors]
         errors.merge!(@topic.root_topic.errors.as_json[:errors]) if @topic.root_topic
         errors['published'] = errors.delete(:workflow_state) if errors.key?(:workflow_state)
-        render :json => { errors: errors }, :status => :bad_request
+        render json: { errors: errors }, status: :bad_request
       end
     end
   end
@@ -1552,9 +1550,9 @@ class DiscussionTopicsController < ApplicationController
     extra_params = {}
     if params[:headless]
       extra_params.merge(
-        :headless => 1,
-        :hide_student_names => params[:hide_student_names],
-        :student_id => params[:student_id]
+        headless: 1,
+        hide_student_names: params[:hide_student_names],
+        student_id: params[:student_id]
       )
     end
     extra_params[:module_item_id] = params[:module_item_id] if params[:module_item_id].present?

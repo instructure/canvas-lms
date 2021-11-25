@@ -66,7 +66,7 @@ module OutcomeCommon
   def context_outcome(context, num_of_outcomes)
     num_of_outcomes.times do |o|
       @outcome_group ||= context.root_outcome_group
-      @outcome = context.created_learning_outcomes.create!(:title => "outcome #{o}")
+      @outcome = context.created_learning_outcomes.create!(title: "outcome #{o}")
       @outcome.rubric_criterion = valid_outcome_data
       @outcome.save!
       @outcome_group.add_outcome(@outcome)
@@ -77,9 +77,9 @@ module OutcomeCommon
   def create_bulk_outcomes_groups(context, num_of_groups, num_of_outcomes)
     @root = context.root_outcome_group
     num_of_groups.times do |g|
-      @group = context.learning_outcome_groups.create!(:title => "group #{g}")
+      @group = context.learning_outcome_groups.create!(title: "group #{g}")
       num_of_outcomes.times do |o|
-        @outcome = context.created_learning_outcomes.create!(:title => "outcome #{o}")
+        @outcome = context.created_learning_outcomes.create!(title: "outcome #{o}")
         @group.add_outcome(@outcome)
       end
       @root.adopt_outcome_group(@group)
@@ -88,10 +88,10 @@ module OutcomeCommon
 
   def valid_outcome_data
     {
-      :mastery_points => 3,
-      :ratings => [
-        { :points => 3, :description => "Rockin" },
-        { :points => 0, :description => "Lame" }
+      mastery_points: 3,
+      ratings: [
+        { points: 3, description: "Rockin" },
+        { points: 0, description: "Lame" }
       ]
     }
   end

@@ -22,7 +22,7 @@ if Qti.migration_executable
 
   describe Qti::Converter do
     before do
-      course_with_teacher(:active_all => true)
+      course_with_teacher(active_all: true)
     end
 
     let(:respondus_questions) do
@@ -280,7 +280,7 @@ if Qti.migration_executable
           end
         end
         setup_migration(@copy.path)
-        @migration.update_migration_settings(:apply_respondus_settings_file => true)
+        @migration.update_migration_settings(apply_respondus_settings_file: true)
         @migration.save!
       end
 
@@ -298,7 +298,7 @@ if Qti.migration_executable
         do_migration
 
         setup_migration(@copy.path)
-        @migration.update_migration_settings(:apply_respondus_settings_file => true, :quiz_id_to_update => @course.quizzes.last.id)
+        @migration.update_migration_settings(apply_respondus_settings_file: true, quiz_id_to_update: @course.quizzes.last.id)
         @migration.save!
         do_migration
 
@@ -354,7 +354,7 @@ if Qti.migration_executable
 
     it "applies respondus settings" do
       setup_migration(File.expand_path("fixtures/canvas_respondus_question_types.zip", __dir__))
-      @migration.update_migration_settings(:apply_respondus_settings_file => true)
+      @migration.update_migration_settings(apply_respondus_settings_file: true)
       @migration.save!
       do_migration
 
@@ -365,8 +365,7 @@ if Qti.migration_executable
 
     it "is able to import directly into an assessment question bank" do
       setup_migration(File.expand_path("fixtures/canvas_respondus_question_types.zip", __dir__))
-      @migration.update_migration_settings(:migration_ids_to_import =>
-                                               { :copy => { :all_quizzes => false, :all_assessment_question_banks => true } })
+      @migration.update_migration_settings(migration_ids_to_import: { copy: { all_quizzes: false, all_assessment_question_banks: true } })
       @migration.save!
       do_migration
 
@@ -402,11 +401,11 @@ if Qti.migration_executable
     end
 
     def setup_migration(zip_path = fname)
-      @migration = ContentMigration.new(:context => @course,
-                                        :user => @user)
+      @migration = ContentMigration.new(context: @course,
+                                        user: @user)
       @migration.update_migration_settings({
-                                             :migration_type => 'qti_converter',
-                                             :flavor => Qti::Flavors::RESPONDUS
+                                             migration_type: 'qti_converter',
+                                             flavor: Qti::Flavors::RESPONDUS
                                            })
       @migration.save!
 

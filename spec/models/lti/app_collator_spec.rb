@@ -54,8 +54,8 @@ module Lti
       def example_definition(tool, **overrides)
         {
           app_type: tool.class.name,
-          :context => tool.context_type,
-          :context_id => tool.context.id,
+          context: tool.context_type,
+          context_id: tool.context.id,
           app_id: tool.id,
           name: tool.name,
           description: tool.description,

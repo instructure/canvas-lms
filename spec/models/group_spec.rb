@@ -21,7 +21,7 @@
 describe Group do
   before :once do
     course_model
-    group_model(:context => @course)
+    group_model(context: @course)
   end
 
   context "validation" do
@@ -40,7 +40,7 @@ describe Group do
 
   it "allows a private group to be made public" do
     @communities = GroupCategory.communities_for(Account.default)
-    group_model(:group_category => @communities, :is_public => false)
+    group_model(group_category: @communities, is_public: false)
     @group.is_public = true
     @group.save!
     expect(@group.reload.is_public).to be_truthy
@@ -48,7 +48,7 @@ describe Group do
 
   it "does not allow a public group to be made private" do
     @communities = GroupCategory.communities_for(Account.default)
-    group_model(:group_category => @communities, :is_public => true)
+    group_model(group_category: @communities, is_public: true)
     @group.is_public = false
     expect(@group.save).to be_falsey
     expect(@group.reload.is_public).to be_truthy
@@ -61,15 +61,15 @@ describe Group do
   end
 
   it "identifies a group as active correctly" do
-    course_with_student(:active_all => true)
-    group_model(:group_category => @communities, :is_public => true)
+    course_with_student(active_all: true)
+    group_model(group_category: @communities, is_public: true)
     group.add_user(@student)
     expect(@group.inactive?).to eq false
   end
 
   it "identifies a destroyed course as not active" do
-    course_with_student(:active_all => true)
-    group_model(:group_category => @communities, :is_public => true)
+    course_with_student(active_all: true)
+    group_model(group_category: @communities, is_public: true)
     group.add_user(@student)
     @group.context = @course
     @course.destroy!
@@ -77,8 +77,8 @@ describe Group do
   end
 
   it "identifies a concluded course as not active" do
-    course_with_student(:active_all => true)
-    group_model(:group_category => @communities, :is_public => true)
+    course_with_student(active_all: true)
+    group_model(group_category: @communities, is_public: true)
     group.add_user(@student)
     @group.context = @course
     @course.complete!
@@ -87,7 +87,7 @@ describe Group do
 
   it "identifies an account group as not active correctly" do
     @account = account_model
-    group_model(:group_category => @communities, :is_public => true, :context => @account)
+    group_model(group_category: @communities, is_public: true, context: @account)
     group.add_user(@student)
     @group.context.destroy
     expect(@group.inactive?).to eq true
@@ -95,7 +95,7 @@ describe Group do
 
   it "identifies an account group as active" do
     @account = account_model
-    group_model(:group_category => @communities, :is_public => true, :context => @account)
+    group_model(group_category: @communities, is_public: true, context: @account)
     group.add_user(@student)
     expect(@group.inactive?).to eq false
   end
@@ -133,12 +133,12 @@ describe Group do
   context "#peer_groups" do
     it "finds all peer groups" do
       context = course_model
-      group_category = context.group_categories.create(:name => "worldCup")
-      other_category = context.group_categories.create(:name => "other category")
-      group1 = Group.create!(:name => "group1", :group_category => group_category, :context => context)
-      group2 = Group.create!(:name => "group2", :group_category => group_category, :context => context)
-      group3 = Group.create!(:name => "group3", :group_category => group_category, :context => context)
-      group4 = Group.create!(:name => "group4", :group_category => other_category, :context => context)
+      group_category = context.group_categories.create(name: "worldCup")
+      other_category = context.group_categories.create(name: "other category")
+      group1 = Group.create!(name: "group1", group_category: group_category, context: context)
+      group2 = Group.create!(name: "group2", group_category: group_category, context: context)
+      group3 = Group.create!(name: "group3", group_category: group_category, context: context)
+      group4 = Group.create!(name: "group4", group_category: other_category, context: context)
       expect(group1.peer_groups.length).to eq 2
       expect(group1.peer_groups).to be_include(group2)
       expect(group1.peer_groups).to be_include(group3)
@@ -149,15 +149,15 @@ describe Group do
     it "does not find peer groups for student organized groups" do
       context = course_model
       group_category = GroupCategory.student_organized_for(context)
-      group1 = Group.create!(:name => "group1", :group_category => group_category, :context => context)
-      Group.create!(:name => "group2", :group_category => group_category, :context => context)
+      group1 = Group.create!(name: "group1", group_category: group_category, context: context)
+      Group.create!(name: "group2", group_category: group_category, context: context)
       expect(group1.peer_groups).to be_empty
     end
   end
 
   context "atom" do
     it "has an atom name as it's own name" do
-      group_model(:name => 'some unique name')
+      group_model(name: 'some unique name')
       expect(@group.to_atom.title).to eql('some unique name')
     end
 
@@ -170,14 +170,14 @@ describe Group do
   context "add_user" do
     it "is able to add a person to the group" do
       user_model
-      pseudonym_model(:user_id => @user.id)
+      pseudonym_model(user_id: @user.id)
       @group.add_user(@user)
       expect(@group.users).to be_include(@user)
     end
 
     it "is not able to add a person to the group twice" do
       user_model
-      pseudonym_model(:user_id => @user.id)
+      pseudonym_model(user_id: @user.id)
       @group.add_user(@user)
       expect(@group.users).to be_include(@user)
       expect(@group.users.count).to eq 1
@@ -189,11 +189,11 @@ describe Group do
 
     it "removes that user from peer groups" do
       context = course_model
-      group_category = context.group_categories.create!(:name => "worldCup")
-      group1 = Group.create!(:name => "group1", :group_category => group_category, :context => context)
-      group2 = Group.create!(:name => "group2", :group_category => group_category, :context => context)
+      group_category = context.group_categories.create!(name: "worldCup")
+      group1 = Group.create!(name: "group1", group_category: group_category, context: context)
+      group2 = Group.create!(name: "group2", group_category: group_category, context: context)
       user_model
-      pseudonym_model(:user_id => @user.id)
+      pseudonym_model(user_id: @user.id)
       group1.add_user(@user)
       expect(group1.users).to be_include(@user)
 
@@ -211,9 +211,9 @@ describe Group do
         'parent_context_request' => 'requested',
         'parent_context_auto_join' => 'accepted'
       }.each do |join_level, workflow_state|
-        group = group_model(:join_level => join_level, :group_category => @communities)
+        group = group_model(join_level: join_level, group_category: @communities)
         group.add_user(@user)
-        expect(group.group_memberships.where(:workflow_state => workflow_state, :user_id => @user).first).not_to be_nil
+        expect(group.group_memberships.where(workflow_state: workflow_state, user_id: @user).first).not_to be_nil
       end
     end
 
@@ -225,7 +225,7 @@ describe Group do
 
       %w[invited requested accepted].each do |workflow_state|
         @group.add_user(@user, workflow_state)
-        expect(@group.group_memberships.where(:workflow_state => workflow_state, :user_id => @user).first).not_to be_nil
+        expect(@group.group_memberships.where(workflow_state: workflow_state, user_id: @user).first).not_to be_nil
       end
     end
 
@@ -290,7 +290,7 @@ describe Group do
   end
 
   it "does not allow a concluded student to participate" do
-    course_with_student(:active_all => true)
+    course_with_student(active_all: true)
     group = @course.groups.create
     group.add_user(@student)
 
@@ -309,7 +309,7 @@ describe Group do
 
   it "grants messaging rights to students if messaging permissions are enabled" do
     course_with_teacher(active_course: true)
-    student_in_course(:course => @course)
+    student_in_course(course: @course)
     group = @course.groups.create
     group.add_user(@student)
 
@@ -320,10 +320,10 @@ describe Group do
 
   it "does not grant messaging rights to students if messaging permissions are disabled" do
     course_with_teacher(active_course: true)
-    student_in_course(:course => @course)
+    student_in_course(course: @course)
     group = @course.groups.create
     group.add_user(@student)
-    @course.account.role_overrides.create!(:permission => :send_messages, :role => student_role, :enabled => false)
+    @course.account.role_overrides.create!(permission: :send_messages, role: student_role, enabled: false)
 
     expect(group.grants_right?(@teacher, :send_messages)).to be_truthy
     expect(group.grants_right?(@student, :send_messages)).to be_falsey
@@ -339,14 +339,14 @@ describe Group do
     expect(group.grants_right?(@student, :read_roster)).to be_falsey
 
     # join_level allows requesting group membership
-    group = @course.groups.create(:join_level => 'parent_context_request')
+    group = @course.groups.create(join_level: 'parent_context_request')
     expect(group.grants_right?(@student, :read_roster)).to be_truthy
 
     # category is self-signup
     category = @course.group_categories.build(name: 'category name')
     category.self_signup = 'enabled'
     category.save
-    group = @course.groups.create(:group_category => category)
+    group = @course.groups.create(group_category: category)
     expect(group.grants_right?(@student, :read_roster)).to be_truthy
   end
 
@@ -358,7 +358,7 @@ describe Group do
       expect(group.root_account).to eq Account.default
 
       new_root_acct = account_model
-      new_sub_acct = new_root_acct.sub_accounts.create!(:name => 'sub acct')
+      new_sub_acct = new_root_acct.sub_accounts.create!(name: 'sub acct')
       group.context = new_sub_acct
       group.save!
       expect(group.account).to eq new_sub_acct
@@ -371,9 +371,9 @@ describe Group do
       course_with_student
 
       group_category = GroupCategory.student_organized_for(@course)
-      group1 = @course.groups.create(:group_category => group_category, :join_level => 'parent_context_auto_join')
-      group2 = @course.groups.create(:group_category => group_category, :join_level => 'parent_context_request')
-      group3 = @course.groups.create(:group_category => group_category, :join_level => 'invitation_only')
+      group1 = @course.groups.create(group_category: group_category, join_level: 'parent_context_auto_join')
+      group2 = @course.groups.create(group_category: group_category, join_level: 'parent_context_request')
+      group3 = @course.groups.create(group_category: group_category, join_level: 'invitation_only')
       expect([group1, group2, group3].map(&:auto_accept?)).to eq [true, false, false]
     end
 
@@ -382,9 +382,9 @@ describe Group do
       @account = @course.root_account
 
       jl = 'parent_context_auto_join'
-      group1 = @course.groups.create(:group_category => @course.group_categories.create(:name => "random category"), :join_level => jl)
-      group2 = @course.groups.create(:group_category => GroupCategory.student_organized_for(@course), :join_level => jl)
-      group3 = @account.groups.create(:group_category => GroupCategory.communities_for(@account), :join_level => jl)
+      group1 = @course.groups.create(group_category: @course.group_categories.create(name: "random category"), join_level: jl)
+      group2 = @course.groups.create(group_category: GroupCategory.student_organized_for(@course), join_level: jl)
+      group3 = @account.groups.create(group_category: GroupCategory.communities_for(@account), join_level: jl)
       expect([group1, group2, group3].map(&:auto_accept?)).to eq [false, true, true]
     end
   end
@@ -394,9 +394,9 @@ describe Group do
       course_with_student
 
       group_category = GroupCategory.student_organized_for(@course)
-      group1 = @course.groups.create(:group_category => group_category, :join_level => 'parent_context_auto_join')
-      group2 = @course.groups.create(:group_category => group_category, :join_level => 'parent_context_request')
-      group3 = @course.groups.create(:group_category => group_category, :join_level => 'invitation_only')
+      group1 = @course.groups.create(group_category: group_category, join_level: 'parent_context_auto_join')
+      group2 = @course.groups.create(group_category: group_category, join_level: 'parent_context_request')
+      group3 = @course.groups.create(group_category: group_category, join_level: 'invitation_only')
       expect([group1, group2, group3].map(&:allow_join_request?)).to eq [true, true, false]
     end
 
@@ -405,9 +405,9 @@ describe Group do
       @account = @course.root_account
 
       jl = 'parent_context_auto_join'
-      group1 = @course.groups.create(:group_category => @course.group_categories.create(:name => "random category"), :join_level => jl)
-      group2 = @course.groups.create(:group_category => GroupCategory.student_organized_for(@course), :join_level => jl)
-      group3 = @account.groups.create(:group_category => GroupCategory.communities_for(@account), :join_level => jl)
+      group1 = @course.groups.create(group_category: @course.group_categories.create(name: "random category"), join_level: jl)
+      group2 = @course.groups.create(group_category: GroupCategory.student_organized_for(@course), join_level: jl)
+      group3 = @account.groups.create(group_category: GroupCategory.communities_for(@account), join_level: jl)
       expect([group1, group2, group3].map(&:allow_join_request?)).to eq [false, true, true]
     end
   end
@@ -419,29 +419,29 @@ describe Group do
       group_category = GroupCategory.student_organized_for(@course)
       group_category.configure_self_signup(true, false)
       group_category.save!
-      group1 = @course.groups.create(:group_category => group_category)
+      group1 = @course.groups.create(group_category: group_category)
       expect(group1.allow_self_signup?(@student)).to be_truthy
 
       group_category.configure_self_signup(true, true)
       group_category.save!
-      group2 = @course.groups.create(:group_category => group_category)
+      group2 = @course.groups.create(group_category: group_category)
       expect(group2.allow_self_signup?(@student)).to be_truthy
 
       group_category.configure_self_signup(false, false)
       group_category.save!
-      group3 = @course.groups.create(:group_category => group_category)
+      group3 = @course.groups.create(group_category: group_category)
       expect(group3.allow_self_signup?(@student)).to be_falsey
     end
 
     it "handles restricted course sections correctly" do
       course_with_student
-      @other_section = @course.course_sections.create!(:name => "Other Section")
-      @other_student = @course.enroll_student(user_model, { :section => @other_section }).user
+      @other_section = @course.course_sections.create!(name: "Other Section")
+      @other_student = @course.enroll_student(user_model, { section: @other_section }).user
 
       group_category = GroupCategory.student_organized_for(@course)
       group_category.configure_self_signup(true, true)
       group_category.save!
-      group1 = @course.groups.create(:group_category => group_category)
+      group1 = @course.groups.create(group_category: group_category)
       expect(group1.allow_self_signup?(@student)).to be_truthy
       group1.add_user(@student)
       group1.reload
@@ -451,14 +451,14 @@ describe Group do
 
   context "#full?" do
     it "returns true when category group_limit has been met" do
-      @group.group_category = @course.group_categories.build(:name => 'foo')
+      @group.group_category = @course.group_categories.build(name: 'foo')
       @group.group_category.group_limit = 1
       @group.add_user user_model, 'accepted'
       expect(@group).to be_full
     end
 
     it "returns true when max_membership has been met" do
-      @group.group_category = @course.group_categories.build(:name => 'foo')
+      @group.group_category = @course.group_categories.build(name: 'foo')
       @group.group_category.group_limit = 0
       @group.max_membership = 1
       @group.add_user user_model, 'accepted'
@@ -466,7 +466,7 @@ describe Group do
     end
 
     it "returns false when max_membership has not been met" do
-      @group.group_category = @course.group_categories.build(:name => 'foo')
+      @group.group_category = @course.group_categories.build(name: 'foo')
       @group.group_category.group_limit = 0
       @group.max_membership = 2
       @group.add_user user_model, 'accepted'
@@ -477,7 +477,7 @@ describe Group do
       # no category
       expect(@group).not_to be_full
       # not full
-      @group.group_category = @course.group_categories.build(:name => 'foo')
+      @group.group_category = @course.group_categories.build(name: 'foo')
       @group.group_category.group_limit = 2
       @group.add_user user_model, 'accepted'
       expect(@group).not_to be_full
@@ -497,7 +497,7 @@ describe Group do
       @group.add_user(@user3, 'invited')
       @group.add_user(@user4, 'requested')
       @group.add_user(@user5, 'rejected')
-      GroupMembership.where(:group_id => @group, :user_id => @user2).update_all(:moderator => true)
+      GroupMembership.where(group_id: @group, user_id: @user2).update_all(moderator: true)
 
       expect(@group.has_member?(@user1)).to be_truthy
       expect(@group.has_member?(@user2)).to be_truthy
@@ -520,7 +520,7 @@ describe Group do
       @group.add_user(@user3, 'invited')
       @group.add_user(@user4, 'requested')
       @group.add_user(@user5, 'rejected')
-      GroupMembership.where(:group_id => @group, :user_id => [@user2, @user3, @user4, @user5]).update_all(:moderator => true)
+      GroupMembership.where(group_id: @group, user_id: [@user2, @user3, @user4, @user5]).update_all(moderator: true)
 
       expect(@group.has_moderator?(@user1)).to be_falsey
       expect(@group.has_moderator?(@user2)).to be_truthy
@@ -547,11 +547,11 @@ describe Group do
 
   context "invite_user" do
     it "autoes accept invitations" do
-      course_with_student(:active_all => true)
+      course_with_student(active_all: true)
 
       group_category = GroupCategory.student_organized_for(@course)
 
-      group = @course.groups.create!(:group_category => group_category)
+      group = @course.groups.create!(group_category: group_category)
       gm = group.invite_user(@student)
       expect(gm).to be_accepted
     end
@@ -559,11 +559,11 @@ describe Group do
 
   context "request_user" do
     it "autoes accept invitations" do
-      course_with_student(:active_all => true)
+      course_with_student(active_all: true)
 
       group_category = GroupCategory.student_organized_for(@course)
 
-      group = @course.groups.create!(:group_category => group_category, :join_level => 'parent_context_auto_join')
+      group = @course.groups.create!(group_category: group_category, join_level: 'parent_context_auto_join')
       gm = group.request_user(@student)
       expect(gm).to be_accepted
     end
@@ -574,15 +574,15 @@ describe Group do
     group = @course.groups.create
     expect(group.group_category).to eq GroupCategory.student_organized_for(@course)
 
-    group_category = @course.group_categories.create(:name => "random category")
-    group = @course.groups.create(:group_category => group_category)
+    group_category = @course.group_categories.create(name: "random category")
+    group = @course.groups.create(group_category: group_category)
     expect(group.group_category).to eq group_category
   end
 
   it "as_json should include group_category" do
     course_factory
     gc = group_category(name: "Something")
-    group = Group.create(:group_category => gc)
+    group = Group.create(group_category: gc)
     hash = group.as_json
     expect(hash["group"]["group_category"]).to eq "Something"
   end
@@ -592,7 +592,7 @@ describe Group do
     group = course.groups.create
     default_category = GroupCategory.student_organized_for(course)
     expect(group.read_attribute(:category)).to eql(default_category.name)
-    group.group_category = group.context.group_categories.create(:name => "my category")
+    group.group_category = group.context.group_categories.create(name: "my category")
     group.save
     group.reload
     expect(group.read_attribute(:category)).to eql("my category")
@@ -610,7 +610,7 @@ describe Group do
     end
 
     it "is not true if two members don't share a section" do
-      course_with_teacher(:active_all => true)
+      course_with_teacher(active_all: true)
       section1 = @course.course_sections.create
       section2 = @course.course_sections.create
       user1 = section1.enroll_user(user_model, 'StudentEnrollment').user
@@ -622,7 +622,7 @@ describe Group do
     end
 
     it "is true if all members group have a section in common" do
-      course_with_teacher(:active_all => true)
+      course_with_teacher(active_all: true)
       section1 = @course.course_sections.create
       user1 = section1.enroll_user(user_model, 'StudentEnrollment').user
       user2 = section1.enroll_user(user_model, 'StudentEnrollment').user
@@ -641,7 +641,7 @@ describe Group do
     end
 
     it "is not true if the new member does't share a section with an existing member" do
-      course_with_teacher(:active_all => true)
+      course_with_teacher(active_all: true)
       section1 = @course.course_sections.create
       section2 = @course.course_sections.create
       user1 = section1.enroll_user(user_model, 'StudentEnrollment').user
@@ -652,7 +652,7 @@ describe Group do
     end
 
     it "is true if all members group have a section in common with the new user" do
-      course_with_teacher(:active_all => true)
+      course_with_teacher(active_all: true)
       section1 = @course.course_sections.create
       user1 = section1.enroll_user(user_model, 'StudentEnrollment').user
       user2 = section1.enroll_user(user_model, 'StudentEnrollment').user
@@ -662,7 +662,7 @@ describe Group do
     end
 
     it "is true if one member is inactive" do
-      course_with_teacher(:active_all => true)
+      course_with_teacher(active_all: true)
       section1 = @course.course_sections.create
       user1 = section1.enroll_user(user_model, 'StudentEnrollment').user
       user2 = section1.enroll_user(user_model, 'StudentEnrollment').user
@@ -675,7 +675,7 @@ describe Group do
     end
 
     it "is true if one member is completed" do
-      course_with_teacher(:active_all => true)
+      course_with_teacher(active_all: true)
       section1 = @course.course_sections.create
       user1 = section1.enroll_user(user_model, 'StudentEnrollment').user
       user2 = section1.enroll_user(user_model, 'StudentEnrollment').user
@@ -691,8 +691,8 @@ describe Group do
     before :once do
       course_with_teacher(active_course: true)
       @teacher = @user
-      @group = group(:group_context => @course)
-      @group.users << @student = student_in_course(:course => @course).user
+      @group = group(group_context: @course)
+      @group.users << @student = student_in_course(course: @course).user
     end
 
     describe 'TAB_CONFERENCES' do
@@ -700,9 +700,9 @@ describe Group do
         before do
           allow(WebConference).to receive(:plugins).and_return(
             [
-              web_conference_plugin_mock("big_blue_button", { :domain => "bbb.instructure.com", :secret_dec => "secret" }),
-              web_conference_plugin_mock("wimba", { :domain => "wimba.test" }),
-              web_conference_plugin_mock("broken_plugin", { :foor => :bar })
+              web_conference_plugin_mock("big_blue_button", { domain: "bbb.instructure.com", secret_dec: "secret" }),
+              web_conference_plugin_mock("wimba", { domain: "wimba.test" }),
+              web_conference_plugin_mock("broken_plugin", { foor: :bar })
             ]
           )
         end
@@ -776,8 +776,8 @@ describe Group do
         account.default_group_storage_quota = 10.megabytes
         account.save!
 
-        course_factory(:account => subaccount)
-        @group = group(:group_context => @course)
+        course_factory(account: subaccount)
+        @group = group(group_context: @course)
 
         expect(@group.quota).to eq 10.megabytes
 
@@ -793,7 +793,7 @@ describe Group do
 
   describe "#update_max_membership_from_group_category" do
     it "sets max_membership if there is a group category" do
-      @group.group_category = @course.group_categories.build(:name => 'foo')
+      @group.group_category = @course.group_categories.build(name: 'foo')
       @group.group_category.group_limit = 1
       @group.update_max_membership_from_group_category
       expect(@group.max_membership).to eq 1
@@ -832,7 +832,7 @@ describe Group do
   describe 'includes_user?' do
     before do
       user_model
-      pseudonym_model(:user_id => @user.id)
+      pseudonym_model(user_id: @user.id)
     end
 
     it "returns true if a user is in the group" do
@@ -857,11 +857,11 @@ describe Group do
   describe '#favorite_for_user?' do
     before do
       context = course_model
-      @group_fave = Group.create!(:name => "group1", :context => context)
-      @group_not_fave = Group.create!(:name => "group2", :context => context)
+      @group_fave = Group.create!(name: "group1", context: context)
+      @group_not_fave = Group.create!(name: "group2", context: context)
       @group_fave.add_user(@user)
       @group_not_fave.add_user(@user)
-      @user.favorites.build(:context => @group_fave)
+      @user.favorites.build(context: @group_fave)
       @user.save
     end
 
@@ -893,7 +893,7 @@ describe Group do
   describe 'participating_users_in_context' do
     before :once do
       context = course_model
-      @group = Group.create(:name => "group1", :context => context)
+      @group = Group.create(name: "group1", context: context)
       @group.add_user(@user)
       @user.enrollments.first.deactivate
     end

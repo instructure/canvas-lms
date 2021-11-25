@@ -580,7 +580,7 @@ module Api
       end
 
       describe '#description' do
-        let(:course) { double(:public_description => 'an eloquent anecdote') }
+        let(:course) { double(public_description: 'an eloquent anecdote') }
 
         it 'returns the description when its configured for inclusion' do
           includes << :public_description
@@ -598,7 +598,7 @@ module Api
         subject { @json }
 
         let(:enrollments) { double(:enrollments) }
-        let(:hash) { { :a => '1', :b => '2' } }
+        let(:hash) { { a: '1', b: '2' } }
         let(:includes) { %w[these three keys] }
 
         before do
@@ -679,7 +679,7 @@ module Api
         end
 
         it 'uses precalculated permissions if available' do
-          precalculated_permissions = { :read_sis => false, :manage_sis => true }
+          precalculated_permissions = { read_sis: false, manage_sis: true }
           course_json_with_perms = CourseJson.new(sis_course, user, includes, [], precalculated_permissions: precalculated_permissions)
           expect(sis_course).to_not receive(:grants_right?)
           course_json_with_perms.set_sis_course_id(hash)
@@ -688,7 +688,7 @@ module Api
       end
 
       describe '#permissions' do
-        let(:course) { double(:public_description => 'an eloquent anecdote') }
+        let(:course) { double(public_description: 'an eloquent anecdote') }
 
         it 'returns the permissions when its configured for inclusion' do
           includes << :permissions

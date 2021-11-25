@@ -52,7 +52,7 @@ class CanvasLogger < ActiveSupport::Logger
     @log_path = log_path
 
     old_logdev = @logdev
-    @logdev = ::Logger::LogDevice.new(log_path, :shift_age => 0, :shift_size => 1_048_576)
+    @logdev = ::Logger::LogDevice.new(log_path, shift_age: 0, shift_size: 1_048_576)
     old_logdev.close
   end
 

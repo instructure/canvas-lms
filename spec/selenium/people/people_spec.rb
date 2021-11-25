@@ -67,9 +67,9 @@ describe "people" do
   end
 
   def create_user(student_name)
-    user = User.create!(:name => student_name)
+    user = User.create!(name: student_name)
     user.register!
-    user.pseudonyms.create!(:unique_id => student_name, :password => 'qwertyuiop', :password_confirmation => 'qwertyuiop')
+    user.pseudonyms.create!(unique_id: student_name, password: 'qwertyuiop', password_confirmation: 'qwertyuiop')
     @course.reload
     user
   end
@@ -300,7 +300,7 @@ describe "people" do
     end
 
     it "deletes a student group" do
-      group_category = GroupCategory.create(:name => "new student group", :context => @course)
+      group_category = GroupCategory.create(name: "new student group", context: @course)
 
       get "/courses/#{@course.id}/groups#tab-#{group_category.id}"
       fj('.group-category-actions:visible a:visible').click
@@ -322,17 +322,17 @@ describe "people" do
 
     it "deals with observers linked to multiple students" do
       @students = []
-      @obs = user_model(:name => "The Observer")
+      @obs = user_model(name: "The Observer")
       2.times do |i|
-        student_in_course(:name => "Student #{i}")
+        student_in_course(name: "Student #{i}")
         @students << @student
-        e = @course.observer_enrollments.create!(:user => @obs, :workflow_state => 'active')
+        e = @course.observer_enrollments.create!(user: @obs, workflow_state: 'active')
         e.associated_user_id = @student.id
         e.save!
       end
 
       2.times do |i|
-        student_in_course(:name => "Student #{i + 2}")
+        student_in_course(name: "Student #{i + 2}")
         @students << @student
       end
 
@@ -375,7 +375,7 @@ describe "people" do
 
   context "people as a TA" do
     before :once do
-      course_with_ta(:active_all => true)
+      course_with_ta(active_all: true)
     end
 
     before do
@@ -402,7 +402,7 @@ describe "people" do
     it "should validate that a TA cannot rename a teacher"
 
     it "includes login id column if the user has :view_user_logins, even if they don't have :manage_students" do
-      RoleOverride.create!(:context => Account.default, :permission => 'manage_students', :role => ta_role, :enabled => false)
+      RoleOverride.create!(context: Account.default, permission: 'manage_students', role: ta_role, enabled: false)
       get "/courses/#{@course.id}/users"
       index = ff('table.roster th').map(&:text).find_index('Login ID')
       expect(index).not_to be_nil
@@ -411,7 +411,7 @@ describe "people" do
     end
 
     it "does not include login id column if the user does not have :view_user_logins, even if they do have :manage_students" do
-      RoleOverride.create!(:context => Account.default, :permission => 'view_user_logins', :role => ta_role, :enabled => false)
+      RoleOverride.create!(context: Account.default, permission: 'view_user_logins', role: ta_role, enabled: false)
       get "/courses/#{@course.id}/users"
       index = ff('table.roster th').map(&:text).find_index('Login ID')
       expect(index).to be_nil
@@ -459,7 +459,7 @@ describe "people" do
 
   context "people as a student" do
     before :once do
-      course_with_student(:active_all => true)
+      course_with_student(active_all: true)
     end
 
     before do
@@ -540,7 +540,7 @@ describe "people" do
 
     it "edits a designer's sections" do
       designer = create_user("student@example.com")
-      @course.enroll_designer(designer, :enrollment_state => "active")
+      @course.enroll_designer(designer, enrollment_state: "active")
       get "/courses/#{@course.id}/users"
       f(".DesignerEnrollment .icon-more").click
       fln("Edit Sections").click
@@ -607,7 +607,7 @@ describe "people" do
     @student = user_factory
     e1 = @course.enroll_student(@student, section: sec1, allow_multiple_enrollments: true)
     @course.enroll_student(@student, section: sec2, allow_multiple_enrollments: true)
-    Enrollment.where(:id => e1).update_all(:total_activity_time => 900)
+    Enrollment.where(id: e1).update_all(total_activity_time: 900)
     get "/courses/#{@course.id}/users"
     wait_for_ajaximations
     expect(f("#user_#{@student.id} td:nth-child(8)").text.strip).to eq "15:00"
@@ -615,15 +615,15 @@ describe "people" do
 
   it "filters by role ids" do
     account_model
-    course_with_teacher_logged_in(:account => @account)
+    course_with_teacher_logged_in(account: @account)
     old_role = custom_student_role("Role")
     old_role.deactivate!
 
-    new_role = @account.roles.new(:name => old_role.name)
+    new_role = @account.roles.new(name: old_role.name)
     new_role.base_role_type = "StudentEnrollment"
     new_role.save!
 
-    student_in_course(:course => @course, :role => new_role, :name => "number2")
+    student_in_course(course: @course, role: new_role, name: "number2")
 
     get "/courses/#{@course.id}/users"
     click_option("select[name=enrollment_role_id]", new_role.id.to_s, :value)
@@ -636,7 +636,7 @@ describe "people" do
       course_factory
       @section = @course.course_sections.create!(name: "section1")
 
-      @teacher = user_with_pseudonym(:active_all => true)
+      @teacher = user_with_pseudonym(active_all: true)
       @enrollment = @course.enroll_teacher(@teacher, enrollment_state: 'active')
     end
 
@@ -645,7 +645,7 @@ describe "people" do
     end
 
     it "lets observers have their roles changed if they don't have associated users" do
-      @course.enroll_user(@teacher, "ObserverEnrollment", :allow_multiple_enrollments => true)
+      @course.enroll_user(@teacher, "ObserverEnrollment", allow_multiple_enrollments: true)
 
       get "/courses/#{@course.id}/users"
 
@@ -656,7 +656,7 @@ describe "people" do
     it "does not let observers with associated users have their roles changed" do
       student = user_factory
       @course.enroll_student(student)
-      @course.enroll_user(@teacher, "ObserverEnrollment", :allow_multiple_enrollments => true, :associated_user_id => student.id)
+      @course.enroll_user(@teacher, "ObserverEnrollment", allow_multiple_enrollments: true, associated_user_id: student.id)
 
       get "/courses/#{@course.id}/users"
 
@@ -680,7 +680,7 @@ describe "people" do
     end
 
     it "does not let users change to a type they don't have permission to manage" do
-      @course.root_account.role_overrides.create!(:role => admin_role, :permission => 'manage_students', :enabled => false)
+      @course.root_account.role_overrides.create!(role: admin_role, permission: 'manage_students', enabled: false)
 
       get "/courses/#{@course.id}/users"
 
@@ -691,7 +691,7 @@ describe "people" do
 
     it "retains the same enrollment state" do
       role_name = 'Custom Teacher'
-      role = @course.account.roles.create(:name => role_name)
+      role = @course.account.roles.create(name: role_name)
       role.base_role_type = 'TeacherEnrollment'
       role.save!
       @enrollment.deactivate
@@ -714,7 +714,7 @@ describe "people" do
     end
 
     it "works with enrollments in different sections" do
-      enrollment2 = @course.enroll_user(@teacher, "TeacherEnrollment", :allow_multiple_enrollments => true, :section => @section)
+      enrollment2 = @course.enroll_user(@teacher, "TeacherEnrollment", allow_multiple_enrollments: true, section: @section)
 
       get "/courses/#{@course.id}/users"
 
@@ -727,15 +727,15 @@ describe "people" do
       expect(@enrollment.reload).to be_deleted
       expect(enrollment2.reload).to be_deleted
 
-      new_enrollment1 = @teacher.enrollments.not_deleted.where(:course_section_id => @course.default_section).first
-      new_enrollment2 = @teacher.enrollments.not_deleted.where(:course_section_id => @section).first
+      new_enrollment1 = @teacher.enrollments.not_deleted.where(course_section_id: @course.default_section).first
+      new_enrollment2 = @teacher.enrollments.not_deleted.where(course_section_id: @section).first
       expect(new_enrollment1.role).to eq ta_role
       expect(new_enrollment2.role).to eq ta_role
     end
 
     it "works with preexiting enrollments in the destination role" do
       # should not try to overwrite this one
-      enrollment2 = @course.enroll_user(@teacher, "TaEnrollment", :allow_multiple_enrollments => true)
+      enrollment2 = @course.enroll_user(@teacher, "TaEnrollment", allow_multiple_enrollments: true)
 
       get "/courses/#{@course.id}/users"
 
@@ -751,7 +751,7 @@ describe "people" do
 
     it "works with multiple enrollments in one section" do
       # shouldn't conflict with each other - should only add one enrollment for the new role
-      enrollment2 = @course.enroll_user(@teacher, "TaEnrollment", :allow_multiple_enrollments => true)
+      enrollment2 = @course.enroll_user(@teacher, "TaEnrollment", allow_multiple_enrollments: true)
 
       get "/courses/#{@course.id}/users"
 
@@ -781,7 +781,7 @@ describe "people" do
 
     it "does not show the option to edit roles for a SIS imported enrollment" do
       sis = @course.root_account.sis_batches.create
-      student = user_with_pseudonym(:active_all => true)
+      student = user_with_pseudonym(active_all: true)
       enrollment = @course.enroll_teacher(student)
       enrollment.sis_batch_id = sis.id
       enrollment.save!
@@ -828,11 +828,11 @@ describe "people" do
 
       context "student context card tool placement" do
         before :once do
-          @tool = Account.default.context_external_tools.new(:name => "a", :domain => "google.com", :consumer_key => '12345', :shared_secret => 'secret')
+          @tool = Account.default.context_external_tools.new(name: "a", domain: "google.com", consumer_key: '12345', shared_secret: 'secret')
           @tool.student_context_card = {
-            :url => "http://www.example.com",
-            :text => "See data for this student or whatever",
-            :required_permissions => "view_all_grades,manage_grades"
+            url: "http://www.example.com",
+            text: "See data for this student or whatever",
+            required_permissions: "view_all_grades,manage_grades"
           }
           @tool.save!
         end
@@ -847,7 +847,7 @@ describe "people" do
         end
 
         it "does not show link if the user doesn't have the permissions specified by the tool" do
-          @course.account.role_overrides.create!(:permission => "manage_grades", :role => admin_role, :enabled => false)
+          @course.account.role_overrides.create!(permission: "manage_grades", role: admin_role, enabled: false)
           get("/courses/#{@course.id}/users")
           f("a[data-student_id='#{@student.id}']").click
 
@@ -859,15 +859,15 @@ describe "people" do
   end
 
   it "does not show unenroll link to admins without permissions" do
-    account_admin_user(:active_all => true)
+    account_admin_user(active_all: true)
     user_session(@admin)
 
-    course_with_student(:active_all => true)
+    course_with_student(active_all: true)
     get "/users/#{@student.id}"
 
     expect(f("#courses")).to contain_css(".unenroll_link")
 
-    Account.default.role_overrides.create!(:permission => "manage_students", :enabled => false, :role => admin_role)
+    Account.default.role_overrides.create!(permission: "manage_students", enabled: false, role: admin_role)
     refresh_page
 
     expect(f("#courses")).to_not contain_css(".unenroll_link")

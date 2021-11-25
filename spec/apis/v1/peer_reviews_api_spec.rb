@@ -103,7 +103,7 @@ describe PeerReviewsApiController, type: :request do
         student3 = student_in_course(active_all: true).user
         @user = @admin
         api_call(:delete, @resource_path, @resource_params, { user_id: student3.id },
-                 {}, { :expected_status => 400 })
+                 {}, { expected_status: 400 })
       end
     end
 
@@ -117,7 +117,7 @@ describe PeerReviewsApiController, type: :request do
       it "returns 401 unauthorized access" do
         student3 = student_in_course(active_all: true).user
         api_call(:delete, @resource_path, @resource_params, { user_id: student3.id },
-                 {}, { :expected_status => 401 })
+                 {}, { expected_status: 401 })
       end
     end
   end
@@ -153,7 +153,7 @@ describe PeerReviewsApiController, type: :request do
       end
 
       it 'does not create peer review where the reviewer and student are same' do
-        api_call(:post, @resource_path, @resource_params, { user_id: @student1.id }, {}, { :expected_status => 400 })
+        api_call(:post, @resource_path, @resource_params, { user_id: @student1.id }, {}, { expected_status: 400 })
       end
     end
 
@@ -167,7 +167,7 @@ describe PeerReviewsApiController, type: :request do
       it "returns 401 unauthorized access" do
         student3 = student_in_course(active_all: true).user
         api_call(:post, @resource_path, @resource_params, { user_id: student3.id },
-                 {}, { :expected_status => 401 })
+                 {}, { expected_status: 401 })
       end
     end
   end
@@ -261,14 +261,14 @@ describe PeerReviewsApiController, type: :request do
       end
 
       it 'includes user information' do
-        json = api_call(:get, @resource_path, @resource_params, { :include => %w[user] })
+        json = api_call(:get, @resource_path, @resource_params, { include: %w[user] })
         expect(json.count).to eq(1)
         expect(json[0]).to eq(@assessment_with_user)
       end
 
       it 'includes submission comments' do
-        @comment = @submission.add_comment(:author => @student2, :comment => "student2 comment")
-        json = api_call(:get, @resource_path, @resource_params, { :include => %w[submission_comments] })
+        @comment = @submission.add_comment(author: @student2, comment: "student2 comment")
+        json = api_call(:get, @resource_path, @resource_params, { include: %w[submission_comments] })
         expect(json.count).to eq(1)
         expect(json[0]).to eq(assessment_with_comments(@comment))
       end
@@ -298,15 +298,15 @@ describe PeerReviewsApiController, type: :request do
 
       it 'includes user information' do
         @user = @teacher
-        json = api_call(:get, @resource_path, @resource_params, { :include => %w[user] })
+        json = api_call(:get, @resource_path, @resource_params, { include: %w[user] })
         expect(json.count).to eq(1)
         expect(json[0]).to eq(@assessment_with_user)
       end
 
       it 'includes submission comments' do
         @user = @teacher
-        @comment = @submission.add_comment(:author => @student2, :comment => "student2 comment")
-        json = api_call(:get, @resource_path, @resource_params, { :include => %w[submission_comments] })
+        @comment = @submission.add_comment(author: @student2, comment: "student2 comment")
+        json = api_call(:get, @resource_path, @resource_params, { include: %w[submission_comments] })
         expect(json.count).to eq(1)
         expect(json[0]).to eq(assessment_with_comments(@comment))
       end
@@ -344,7 +344,7 @@ describe PeerReviewsApiController, type: :request do
       it 'includes user information' do
         @assignment1.update_attribute(:anonymous_peer_reviews, false)
         @user = @student1
-        json = api_call(:get, @resource_path, @resource_params, { :include => %w[user] })
+        json = api_call(:get, @resource_path, @resource_params, { include: %w[user] })
         expect(json.count).to eq(1)
         expect(json[0]).to eq(@assessment_with_user)
       end
@@ -352,7 +352,7 @@ describe PeerReviewsApiController, type: :request do
       it 'does not include assessor information when peer reviews are enabled' do
         @assignment1.update_attribute(:anonymous_peer_reviews, true)
         @user = @student1
-        json = api_call(:get, @resource_path, @resource_params, { :include => %w[user] })
+        json = api_call(:get, @resource_path, @resource_params, { include: %w[user] })
         expect(json.count).to eq(1)
         expect(json[0]).to eq({ "asset_id" => @submission.id,
                                 "asset_type" => "Submission",
@@ -368,9 +368,9 @@ describe PeerReviewsApiController, type: :request do
 
       it 'includes submission comments' do
         @assignment1.update_attribute(:anonymous_peer_reviews, false)
-        @comment = @submission.add_comment(:author => @student2, :comment => "student2 comment")
+        @comment = @submission.add_comment(author: @student2, comment: "student2 comment")
         @user = @student1
-        json = api_call(:get, @resource_path, @resource_params, { :include => %w[submission_comments] })
+        json = api_call(:get, @resource_path, @resource_params, { include: %w[submission_comments] })
         expect(json.count).to eq(1)
         expect(json[0]).to eq(assessment_with_comments(@comment))
       end
@@ -378,9 +378,9 @@ describe PeerReviewsApiController, type: :request do
       it 'does not include submission comments user information when anonymous peer reviews' do
         @course.root_account.tap { |a| a.enable_service(:avatars) }.save!
         @assignment1.update_attribute(:anonymous_peer_reviews, true)
-        @comment = @submission.add_comment(:author => @student2, :comment => "review comment")
+        @comment = @submission.add_comment(author: @student2, comment: "review comment")
         @user = @student1
-        json = api_call(:get, @resource_path, @resource_params, { :include => %w[submission_comments] })
+        json = api_call(:get, @resource_path, @resource_params, { include: %w[submission_comments] })
         expect(json.count).to eq(1)
         expect(json[0]).to eq(
           {

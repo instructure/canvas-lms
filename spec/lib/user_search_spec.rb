@@ -26,14 +26,14 @@ describe UserSearch do
     let(:student) { User.where(name: search_names.last).first }
 
     before do
-      teacher = User.create!(:name => 'Tyler Teacher')
-      TeacherEnrollment.create!(:user => teacher, :course => course, :workflow_state => 'active')
+      teacher = User.create!(name: 'Tyler Teacher')
+      TeacherEnrollment.create!(user: teacher, course: course, workflow_state: 'active')
       search_names.each do |name|
-        student = User.create!(:name => name)
-        StudentEnrollment.create!(:user => student, :course => course, :workflow_state => 'active')
+        student = User.create!(name: name)
+        StudentEnrollment.create!(user: student, course: course, workflow_state: 'active')
       end
-      User.create!(:name => "admin")
-      TeacherEnrollment.create!(:user => user, :course => course, :workflow_state => 'active')
+      User.create!(name: "admin")
+      TeacherEnrollment.create!(user: user, course: course, workflow_state: 'active')
     end
 
     describe 'with complex search enabled' do
@@ -62,13 +62,13 @@ describe UserSearch do
         end
 
         it 'does not contain users I am not allowed to see' do
-          unenrolled_user = User.create!(:name => 'Unenrolled User')
+          unenrolled_user = User.create!(name: 'Unenrolled User')
           search_results = UserSearch.for_user_in_context('Stewart', course, unenrolled_user).map(&:name)
           expect(search_results).to eq []
         end
 
         it 'will not pickup students outside the course' do
-          User.create!(:name => 'Stewart Stewart')
+          User.create!(name: 'Stewart Stewart')
           # names is evaluated lazily from the 'let' block so ^ user is still being
           # created before the query executes
           expect(names).not_to include('Stewart Stewart')
@@ -90,7 +90,7 @@ describe UserSearch do
           subject { names }
 
           describe 'to a single role' do
-            let(:users) { UserSearch.for_user_in_context('Tyler', course, user, nil, :enrollment_type => 'student').to_a }
+            let(:users) { UserSearch.for_user_in_context('Tyler', course, user, nil, enrollment_type: 'student').to_a }
 
             it { is_expected.to include('Rose Tyler') }
             it { is_expected.to include('Tyler Pickett') }
@@ -98,11 +98,11 @@ describe UserSearch do
           end
 
           describe 'to multiple roles' do
-            let(:users) { UserSearch.for_user_in_context('Tyler', course, student, nil, :enrollment_type => ['ta', 'teacher']).to_a }
+            let(:users) { UserSearch.for_user_in_context('Tyler', course, student, nil, enrollment_type: ['ta', 'teacher']).to_a }
 
             before do
-              ta = User.create!(:name => 'Tyler TA')
-              TaEnrollment.create!(:user => ta, :course => course, :workflow_state => 'active')
+              ta = User.create!(name: 'Tyler TA')
+              TaEnrollment.create!(user: ta, course: course, workflow_state: 'active')
             end
 
             it { is_expected.to include('Tyler TA') }
@@ -111,13 +111,13 @@ describe UserSearch do
           end
 
           describe 'with the broader role parameter' do
-            let(:users) { UserSearch.for_user_in_context('Tyler', course, student, nil, :enrollment_role => 'ObserverEnrollment').to_a }
+            let(:users) { UserSearch.for_user_in_context('Tyler', course, student, nil, enrollment_role: 'ObserverEnrollment').to_a }
 
             before do
-              ta = User.create!(:name => 'Tyler Observer')
-              ObserverEnrollment.create!(:user => ta, :course => course, :workflow_state => 'active')
-              ta2 = User.create!(:name => 'Tyler Observer 2')
-              ObserverEnrollment.create!(:user => ta2, :course => course, :workflow_state => 'active')
+              ta = User.create!(name: 'Tyler Observer')
+              ObserverEnrollment.create!(user: ta, course: course, workflow_state: 'active')
+              ta2 = User.create!(name: 'Tyler Observer 2')
+              ObserverEnrollment.create!(user: ta2, course: course, workflow_state: 'active')
               add_linked_observer(student, ta2)
             end
 
@@ -128,11 +128,11 @@ describe UserSearch do
           end
 
           describe 'with the role name parameter' do
-            let(:users) { UserSearch.for_user_in_context('Tyler', course, user, nil, :enrollment_role => 'StudentEnrollment').to_a }
+            let(:users) { UserSearch.for_user_in_context('Tyler', course, user, nil, enrollment_role: 'StudentEnrollment').to_a }
 
             before do
-              newstudent = User.create!(:name => 'Tyler Student')
-              StudentEnrollment.create!(:user => newstudent, :course => course, :workflow_state => 'active')
+              newstudent = User.create!(name: 'Tyler Student')
+              StudentEnrollment.create!(user: newstudent, course: course, workflow_state: 'active')
             end
 
             it { should include('Rose Tyler') }
@@ -142,11 +142,11 @@ describe UserSearch do
           end
 
           describe 'with the role id parameter' do
-            let(:users) { UserSearch.for_user_in_context('Tyler', course, student, nil, :enrollment_role_id => student_role.id).to_a }
+            let(:users) { UserSearch.for_user_in_context('Tyler', course, student, nil, enrollment_role_id: student_role.id).to_a }
 
             before do
-              newstudent = User.create!(:name => 'Tyler Student')
-              StudentEnrollment.create!(:user => newstudent, :course => course, :workflow_state => 'active')
+              newstudent = User.create!(name: 'Tyler Student')
+              StudentEnrollment.create!(user: newstudent, course: course, workflow_state: 'active')
             end
 
             it { should include('Rose Tyler') }
@@ -257,7 +257,7 @@ describe UserSearch do
           end
 
           it 'will not match channels where the type is not email' do
-            cc.update!(:path_type => CommunicationChannel::TYPE_TWITTER)
+            cc.update!(path_type: CommunicationChannel::TYPE_TWITTER)
             expect(UserSearch.for_user_in_context("the.giver", course, user)).to eq []
           end
 
@@ -326,17 +326,17 @@ describe UserSearch do
 
       before do
         user_names_not_enrolled.each do |name|
-          User.create!(:name => name)
+          User.create!(name: name)
         end
 
         user_names_enrolled_in_course1.each do |name|
-          student = User.create!(:name => name)
-          StudentEnrollment.create!(:user => student, :course => course1, :workflow_state => 'active')
+          student = User.create!(name: name)
+          StudentEnrollment.create!(user: student, course: course1, workflow_state: 'active')
         end
 
         teacher_names_enrolled_in_course1.each do |name|
-          teacher = User.create!(:name => name)
-          TeacherEnrollment.create!(:user => teacher, :course => course1, :workflow_state => 'active')
+          teacher = User.create!(name: name)
+          TeacherEnrollment.create!(user: teacher, course: course1, workflow_state: 'active')
         end
       end
 
@@ -424,8 +424,8 @@ describe UserSearch do
 
     before do
       search_names.each do |name|
-        student = User.create!(:name => name)
-        StudentEnrollment.create!(:user => student, :course => course, :workflow_state => 'active')
+        student = User.create!(name: name)
+        StudentEnrollment.create!(user: student, course: course, workflow_state: 'active')
       end
     end
 
@@ -444,7 +444,7 @@ describe UserSearch do
     it 'raises an error if there is a bad enrollment type' do
       course = Course.create!
       student = User.create!
-      bad_scope = -> { UserSearch.scope_for(course, student, :enrollment_type => 'all') }
+      bad_scope = -> { UserSearch.scope_for(course, student, enrollment_type: 'all') }
       expect(bad_scope).to raise_error(ArgumentError, 'Invalid Enrollment Type')
     end
 
@@ -453,8 +453,8 @@ describe UserSearch do
       group = @course.groups.create!
       group.add_user(@student)
       account_admin_user
-      expect(UserSearch.scope_for(group, @admin, :enrollment_type => ['student'], include_inactive_enrollments: true).to_a).to eq [@student]
-      expect(UserSearch.scope_for(group, @admin, :enrollment_type => ['teacher']).to_a).to be_empty
+      expect(UserSearch.scope_for(group, @admin, enrollment_type: ['student'], include_inactive_enrollments: true).to_a).to eq [@student]
+      expect(UserSearch.scope_for(group, @admin, enrollment_type: ['teacher']).to_a).to be_empty
     end
 
     describe 'account user list filtering by role' do
@@ -470,17 +470,17 @@ describe UserSearch do
 
       before do
         user_names_not_enrolled.each do |name|
-          User.create!(:name => name)
+          User.create!(name: name)
         end
 
         user_names_enrolled_in_course1.each do |name|
-          student = User.create!(:name => name)
-          StudentEnrollment.create!(:user => student, :course => course1, :workflow_state => 'active')
+          student = User.create!(name: name)
+          StudentEnrollment.create!(user: student, course: course1, workflow_state: 'active')
         end
 
         teacher_names_enrolled_in_course1.each do |name|
-          teacher = User.create!(:name => name)
-          TeacherEnrollment.create!(:user => teacher, :course => course1, :workflow_state => 'active')
+          teacher = User.create!(name: name)
+          TeacherEnrollment.create!(user: teacher, course: course1, workflow_state: 'active')
         end
       end
 

@@ -55,10 +55,10 @@ class Attachments::S3Storage
 
   def initialize_ajax_upload_params(_local_upload_url, s3_success_url, options)
     {
-      :upload_url => bucket.url,
-      :file_param => 'file',
-      :success_url => s3_success_url,
-      :upload_params => cred_params(options[:datetime])
+      upload_url: bucket.url,
+      file_param: 'file',
+      success_url: s3_success_url,
+      upload_params: cred_params(options[:datetime])
     }
   end
 

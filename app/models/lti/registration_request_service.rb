@@ -46,7 +46,7 @@ module Lti
                           reg_password: reg_password,
                           registration_url: registration_url,
                         },
-                        :expires_in => 1.hour)
+                        expires_in: 1.hour)
     end
 
     def self.req_cache_key(context, reg_key)

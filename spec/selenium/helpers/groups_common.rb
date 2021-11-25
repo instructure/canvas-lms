@@ -44,10 +44,10 @@ module GroupsCommon
     @group_category = []
     @testgroup = []
     groupset_count.times do |n|
-      @group_category << @course.group_categories.create!(:name => "Test Group Set #{n + 1}")
+      @group_category << @course.group_categories.create!(name: "Test Group Set #{n + 1}")
 
       groups_per_set.times do |i|
-        @testgroup << @course.groups.create!(:name => "Test Group #{i + 1}", :group_category => @group_category[n])
+        @testgroup << @course.groups.create!(name: "Test Group #{i + 1}", group_category: @group_category[n])
       end
     end
   end
@@ -145,14 +145,14 @@ module GroupsCommon
   end
 
   def create_student_group_as_a_teacher(group_name = "Windfury", enroll_student_count = 0)
-    @student = User.create!(:name => "Test Student 1")
+    @student = User.create!(name: "Test Student 1")
     @course.enroll_student(@student).accept!
 
-    group = @course.groups.create!(:name => group_name)
+    group = @course.groups.create!(name: group_name)
     add_user_to_group(@student, group, false)
 
     enroll_student_count.times do |n|
-      @student = User.create!(:name => "Test Student #{n + 2}")
+      @student = User.create!(name: "Test Student #{n + 2}")
       @course.enroll_student(@student).accept!
 
       add_user_to_group(@student, group, false)
@@ -310,8 +310,8 @@ module GroupsCommon
   def create_and_submit_assignment_from_group(student)
     category = @group_category[0]
     assignment = @course.assignments.create({
-                                              :name => "test assignment",
-                                              :group_category => category
+                                              name: "test assignment",
+                                              group_category: category
                                             })
     a = Attachment.create! context: student,
                            filename: "homework.pdf",

@@ -123,9 +123,9 @@ module AttachmentFu # :nodoc:
       end
       attachment_options[:path_prefix] = attachment_options[:path_prefix][1..] if options[:path_prefix].first == '/'
 
-      with_options :foreign_key => 'parent_id' do |m|
-        m.has_many   :thumbnails, :class_name => "::#{attachment_options[:thumbnail_class]}"
-        m.belongs_to :parent, :class_name => "::#{base_class}" unless options[:thumbnails].empty?
+      with_options foreign_key: 'parent_id' do |m|
+        m.has_many   :thumbnails, class_name: "::#{attachment_options[:thumbnail_class]}"
+        m.belongs_to :parent, class_name: "::#{base_class}" unless options[:thumbnails].empty?
       end
 
       storage_mod = AttachmentFu::Backends.const_get("#{options[:storage].to_s.classify}Backend")
@@ -169,7 +169,7 @@ module AttachmentFu # :nodoc:
   end
 
   module ClassMethods
-    delegate :content_types, :to => AttachmentFu
+    delegate :content_types, to: AttachmentFu
 
     # Performs common validations for attachment models.
     def validates_as_attachment
@@ -266,10 +266,10 @@ module AttachmentFu # :nodoc:
       thumbnailable? || raise(ThumbnailError, "Can't create a thumbnail if the content type is not an image or there is no parent_id column")
       find_or_initialize_thumbnail(file_name_suffix).tap do |thumb|
         thumb.attributes = {
-          :content_type => content_type,
-          :filename => thumbnail_name_for(file_name_suffix),
-          :temp_path => temp_file,
-          :thumbnail_resize_options => size
+          content_type: content_type,
+          filename: thumbnail_name_for(file_name_suffix),
+          temp_path: temp_file,
+          thumbnail_resize_options: size
         }
         if thumb.valid?
           thumb.process_attachment

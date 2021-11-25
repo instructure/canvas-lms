@@ -25,16 +25,16 @@ describe "master courses - child courses - quiz locking" do
   before :once do
     qd = { question_type: "text_only_question", id: 1, question_name: 'the hardest question ever' }.with_indifferent_access
     due_date = format_date_for_view(Time.zone.now - 1.month)
-    @copy_from = course_factory(:active_all => true)
+    @copy_from = course_factory(active_all: true)
     @template = MasterCourses::MasterTemplate.set_as_master_course(@copy_from)
-    @original_quiz = @copy_from.quizzes.create!(:title => "blah", :description => "bloo", :due_at => due_date)
+    @original_quiz = @copy_from.quizzes.create!(title: "blah", description: "bloo", due_at: due_date)
     @original_quiz.quiz_questions.create! question_data: qd
     @tag = @template.create_content_tag_for!(@original_quiz)
 
-    course_with_teacher(:active_all => true)
+    course_with_teacher(active_all: true)
     @copy_to = @course
     @template.add_child_course!(@copy_to)
-    @quiz_copy = @copy_to.quizzes.new(:title => "blah", :description => "bloo", :due_at => due_date) # just create a copy directly instead of doing a real migration
+    @quiz_copy = @copy_to.quizzes.new(title: "blah", description: "bloo", due_at: due_date) # just create a copy directly instead of doing a real migration
     @quiz_copy.migration_id = @tag.migration_id
     @quiz_copy.save!
     @quiz_copy.quiz_questions.create! question_data: qd
@@ -50,7 +50,7 @@ describe "master courses - child courses - quiz locking" do
     # this test is here mostly to validate that the previous test is valid,
     # since it's looking "not_to contain_css('.edit_question_link')", I better
     # have a test to prove what's not supposed to be there is there when it's supposed to be
-    @tag.update_attribute(:restrictions, { :content => false, :points => true, :due_dates => true, :availability_dates => true })
+    @tag.update_attribute(:restrictions, { content: false, points: true, due_dates: true, availability_dates: true })
 
     get "/courses/#{@copy_to.id}/quizzes/#{@quiz_copy.id}/edit"
 

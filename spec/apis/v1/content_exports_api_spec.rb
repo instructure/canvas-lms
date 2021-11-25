@@ -250,24 +250,24 @@ describe ContentExportsApiController, type: :request do
 
     context "selective exports" do
       let_once :att_to_copy do
-        Attachment.create!(:context => t_course, :filename => 'hi.txt',
-                           :uploaded_data => StringIO.new("stuff"), :folder => Folder.unfiled_folder(t_course))
+        Attachment.create!(context: t_course, filename: 'hi.txt',
+                           uploaded_data: StringIO.new("stuff"), folder: Folder.unfiled_folder(t_course))
       end
       let_once :att_to_not_copy do
-        Attachment.create!(:context => t_course, :filename => 'derp.txt',
-                           :uploaded_data => StringIO.new("more stuff"), :folder => Folder.unfiled_folder(t_course))
+        Attachment.create!(context: t_course, filename: 'derp.txt',
+                           uploaded_data: StringIO.new("more stuff"), folder: Folder.unfiled_folder(t_course))
       end
       let_once :page_to_copy do
-        page_to_copy = t_course.wiki_pages.create!(:title => "other page")
+        page_to_copy = t_course.wiki_pages.create!(title: "other page")
         page_to_copy.body = "<p><a href=\"/courses/#{t_course.id}/files/#{att_to_copy.id}/preview\">hey look a link</a></p>"
         page_to_copy.save!
         page_to_copy
       end
-      let_once(:page_to_not_copy) { t_course.wiki_pages.create!(:title => "another page") }
+      let_once(:page_to_not_copy) { t_course.wiki_pages.create!(title: "another page") }
       let_once(:mod) do
         # both the wiki page and the referenced attachment should be exported implicitly through the module
-        mod = t_course.context_modules.create!(:name => "who cares")
-        mod.add_item(:id => page_to_copy.id, :type => "wiki_page")
+        mod = t_course.context_modules.create!(name: "who cares")
+        mod.add_item(id: page_to_copy.id, type: "wiki_page")
         mod
       end
       let_once(:quiz_to_copy) do
@@ -280,7 +280,7 @@ describe ContentExportsApiController, type: :request do
       it "creates a selective course export with old migration id format" do
         json = api_call_as_user(t_teacher, :post, "/api/v1/courses/#{t_course.id}/content_exports?export_type=common_cartridge",
                                 { controller: 'content_exports_api', action: 'create', format: 'json', course_id: t_course.to_param, export_type: 'common_cartridge' },
-                                { :select => { :context_modules => { mod.asset_string => "1" } } })
+                                { select: { context_modules: { mod.asset_string => "1" } } })
         export = t_course.content_exports.where(id: json['id']).first
         expect(export).not_to be_nil
         expect(export.workflow_state).to eql 'created'
@@ -320,7 +320,7 @@ describe ContentExportsApiController, type: :request do
       it "creates a selective course export with arrays of ids" do
         json = api_call_as_user(t_teacher, :post, "/api/v1/courses/#{t_course.id}/content_exports?export_type=common_cartridge",
                                 { controller: 'content_exports_api', action: 'create', format: 'json', course_id: t_course.to_param, export_type: 'common_cartridge' },
-                                { :select => { :context_modules => [mod.id] } })
+                                { select: { context_modules: [mod.id] } })
         export = t_course.content_exports.where(id: json['id']).first
         expect(export).not_to be_nil
         expect(export.workflow_state).to eql 'created'
@@ -363,7 +363,7 @@ describe ContentExportsApiController, type: :request do
         it "properly selects content with global ids when asset_strings are used" do
           json = api_call_as_user(t_teacher, :post, "/api/v1/courses/#{t_course.id}/content_exports?export_type=common_cartridge",
                                   { controller: 'content_exports_api', action: 'create', format: 'json', course_id: t_course.to_param, export_type: 'common_cartridge' },
-                                  { :select => { :context_modules => { mod.asset_string => "1" } } })
+                                  { select: { context_modules: { mod.asset_string => "1" } } })
           export = t_course.content_exports.where(id: json['id']).first
           expect(export).not_to be_nil
           expect(export.workflow_state).to eql 'created'
@@ -403,7 +403,7 @@ describe ContentExportsApiController, type: :request do
         it "properly selects content with global ids when arrays of ids are used" do
           json = api_call_as_user(t_teacher, :post, "/api/v1/courses/#{t_course.id}/content_exports?export_type=common_cartridge",
                                   { controller: 'content_exports_api', action: 'create', format: 'json', course_id: t_course.to_param, export_type: 'common_cartridge' },
-                                  { :select => { :context_modules => [mod.id] } })
+                                  { select: { context_modules: [mod.id] } })
           export = t_course.content_exports.where(id: json['id']).first
           expect(export).not_to be_nil
           expect(export.workflow_state).to eql 'created'
@@ -444,7 +444,7 @@ describe ContentExportsApiController, type: :request do
       it "selects quizzes correctly" do
         json = api_call_as_user(t_teacher, :post, "/api/v1/courses/#{t_course.id}/content_exports?export_type=common_cartridge",
                                 { controller: 'content_exports_api', action: 'create', format: 'json', course_id: t_course.to_param, export_type: 'common_cartridge' },
-                                { :select => { :quizzes => [quiz_to_copy.id] } })
+                                { select: { quizzes: [quiz_to_copy.id] } })
         export = t_course.content_exports.where(id: json['id']).first
         expect(export.settings['selected_content']['quizzes']).to eq({ export.create_key(quiz_to_copy) => "1" })
         expect(export.export_object?(quiz_to_copy)).to be_truthy
@@ -453,7 +453,7 @@ describe ContentExportsApiController, type: :request do
       it "selects announcements correctly" do
         json = api_call_as_user(t_teacher, :post, "/api/v1/courses/#{t_course.id}/content_exports?export_type=common_cartridge",
                                 { controller: 'content_exports_api', action: 'create', format: 'json', course_id: t_course.to_param, export_type: 'common_cartridge' },
-                                { :select => { :announcements => [announcement.id] } })
+                                { select: { announcements: [announcement.id] } })
         export = t_course.content_exports.where(id: json['id']).first
         expect(export.settings['selected_content']['announcements']).to eq({ export.create_key(announcement) => "1" })
         expect(export.export_object?(announcement)).to be_truthy
@@ -462,7 +462,7 @@ describe ContentExportsApiController, type: :request do
       it "selects announcements even when specifically called as a discussion topic" do
         json = api_call_as_user(t_teacher, :post, "/api/v1/courses/#{t_course.id}/content_exports?export_type=common_cartridge",
                                 { controller: 'content_exports_api', action: 'create', format: 'json', course_id: t_course.to_param, export_type: 'common_cartridge' },
-                                { :select => { :discussion_topics => [announcement.id] } })
+                                { select: { discussion_topics: [announcement.id] } })
 
         export = t_course.content_exports.where(id: json['id']).first
         expect(export.settings['selected_content']['discussion_topics']).to eq({ export.create_key(announcement) => "1" })
@@ -488,7 +488,7 @@ describe ContentExportsApiController, type: :request do
       it "does not select announcements when selecting all discussion topics" do
         json = api_call_as_user(t_teacher, :post, "/api/v1/courses/#{t_course.id}/content_exports?export_type=common_cartridge",
                                 { controller: 'content_exports_api', action: 'create', format: 'json', course_id: t_course.to_param, export_type: 'common_cartridge' },
-                                { :select => { :all_discussion_topics => "1" } })
+                                { select: { all_discussion_topics: "1" } })
 
         export = t_course.content_exports.where(id: json['id']).first
         expect(export.export_object?(announcement)).to be_falsey
@@ -497,27 +497,27 @@ describe ContentExportsApiController, type: :request do
       it "selects using shortened collection names" do
         json = api_call_as_user(t_teacher, :post, "/api/v1/courses/#{t_course.id}/content_exports?export_type=common_cartridge",
                                 { controller: 'content_exports_api', action: 'create', format: 'json', course_id: t_course.to_param, export_type: 'common_cartridge' },
-                                { :select => { :modules => [mod.id] } })
+                                { select: { modules: [mod.id] } })
         export = t_course.content_exports.where(id: json['id']).first
         expect(export.export_object?(mod)).to be_truthy
 
         tag = mod.content_tags.first
         json2 = api_call_as_user(t_teacher, :post, "/api/v1/courses/#{t_course.id}/content_exports?export_type=common_cartridge",
                                  { controller: 'content_exports_api', action: 'create', format: 'json', course_id: t_course.to_param, export_type: 'common_cartridge' },
-                                 { :select => { :module_items => [tag.id] } })
+                                 { select: { module_items: [tag.id] } })
         export2 = t_course.content_exports.where(id: json2['id']).first
         expect(export2.export_object?(tag)).to be_truthy
 
         json3 = api_call_as_user(t_teacher, :post, "/api/v1/courses/#{t_course.id}/content_exports?export_type=common_cartridge",
                                  { controller: 'content_exports_api', action: 'create', format: 'json', course_id: t_course.to_param, export_type: 'common_cartridge' },
-                                 { :select => { :pages => [page_to_copy.id] } })
+                                 { select: { pages: [page_to_copy.id] } })
         export3 = t_course.content_exports.where(id: json3['id']).first
         expect(export3.export_object?(page_to_copy)).to be_truthy
 
         file = attachment_model(context: t_course)
         json4 = api_call_as_user(t_teacher, :post, "/api/v1/courses/#{t_course.id}/content_exports?export_type=common_cartridge",
                                  { controller: 'content_exports_api', action: 'create', format: 'json', course_id: t_course.to_param, export_type: 'common_cartridge' },
-                                 { :select => { :files => [file.id] } })
+                                 { select: { files: [file.id] } })
         export4 = t_course.content_exports.where(id: json4['id']).first
         expect(export4.export_object?(file)).to be_truthy
       end
@@ -525,7 +525,7 @@ describe ContentExportsApiController, type: :request do
       it "exports by module item id" do
         json = api_call_as_user(t_teacher, :post, "/api/v1/courses/#{t_course.id}/content_exports?export_type=common_cartridge",
                                 { controller: 'content_exports_api', action: 'create', format: 'json', course_id: t_course.to_param, export_type: 'common_cartridge' },
-                                { :select => { :module_items => [mod.content_tags.first.id] } })
+                                { select: { module_items: [mod.content_tags.first.id] } })
         export = t_course.content_exports.where(id: json['id']).first
         run_jobs
 
@@ -548,14 +548,14 @@ describe ContentExportsApiController, type: :request do
       it "exports rubrics attached to discussions" do
         @course = t_course
         outcome_with_rubric
-        assignment_model(:course => @course, :submission_types => 'discussion_topic', :title => 'graded discussion')
+        assignment_model(course: @course, submission_types: 'discussion_topic', title: 'graded discussion')
         @rubric.associate_with(@assignment, @course, purpose: 'grading')
 
         topic = @assignment.discussion_topic
 
         json = api_call_as_user(t_teacher, :post, "/api/v1/courses/#{t_course.id}/content_exports?export_type=common_cartridge",
                                 { controller: 'content_exports_api', action: 'create', format: 'json', course_id: t_course.to_param, export_type: 'common_cartridge' },
-                                { :select => { :discussion_topics => [topic.id] } })
+                                { select: { discussion_topics: [topic.id] } })
         export = t_course.content_exports.where(id: json['id']).first
         run_jobs
 
@@ -635,19 +635,19 @@ describe ContentExportsApiController, type: :request do
 
   describe "#content_list" do
     it "returns a list of exportable content for a course directly" do
-      @dt1 = @course.discussion_topics.create!(:message => "hi", :title => "discussion title")
-      @cm = @course.context_modules.create!(:name => "some module")
-      @att = Attachment.create!(:filename => 'first.txt', :uploaded_data => StringIO.new('ohai'), :folder => Folder.unfiled_folder(@course), :context => @course)
-      @wiki = @course.wiki_pages.create!(:title => "wiki", :body => "ohai")
+      @dt1 = @course.discussion_topics.create!(message: "hi", title: "discussion title")
+      @cm = @course.context_modules.create!(name: "some module")
+      @att = Attachment.create!(filename: 'first.txt', uploaded_data: StringIO.new('ohai'), folder: Folder.unfiled_folder(@course), context: @course)
+      @wiki = @course.wiki_pages.create!(title: "wiki", body: "ohai")
       @course.pace_plans.create!
 
-      @quiz = @course.quizzes.create!(:title => "quizz")
+      @quiz = @course.quizzes.create!(title: "quizz")
       @quiz.did_edit
       @quiz.offer!
       expect(@quiz.assignment).not_to be_nil
 
       list_url = "/api/v1/courses/#{@course.id}/content_list"
-      params = { :controller => 'content_exports_api', :format => 'json', :course_id => @course.id.to_param, :action => 'content_list' }
+      params = { controller: 'content_exports_api', format: 'json', course_id: @course.id.to_param, action: 'content_list' }
       json = api_call_as_user(t_teacher, :get, list_url, params)
       expect(json.sort_by { |h| h['type'] }).to eq [
         { "type" => "assignments", "property" => "select[all_assignments]", "title" => "Assignments", "count" => 1, "sub_items_url" => "http://www.example.com/api/v1/courses/#{@course.id}/content_list?type=assignments" },
@@ -730,7 +730,7 @@ describe ContentExportsApiController, type: :request do
 
     context "with valid quiz" do
       before do
-        @quiz = t_course.quizzes.create!(:title => 'valid_quiz')
+        @quiz = t_course.quizzes.create!(title: 'valid_quiz')
       end
 
       it "creates a quizzes2 export" do
@@ -856,7 +856,7 @@ describe ContentExportsApiController, type: :request do
 
         it "includes files in public-to-institution courses" do
           t_course.update_attribute(:is_public_to_auth_users, true)
-          other_user = user_with_pseudonym(:active_all => true)
+          other_user = user_with_pseudonym(active_all: true)
           json = api_call_as_user(other_user, :post, "/api/v1/courses/#{t_course.id}/content_exports?export_type=zip",
                                   { controller: 'content_exports_api', action: 'create', format: 'json', course_id: t_course.to_param, export_type: 'zip' })
           run_jobs

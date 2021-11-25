@@ -87,14 +87,14 @@ describe ErrorReport do
 
   it "filters params" do
     mock_attrs = {
-      :env => {
+      env: {
         "QUERY_STRING" => "access_token=abcdef&pseudonym[password]=zzz",
         "REQUEST_URI" => "https://www.instructure.example.com?access_token=abcdef&pseudonym[password]=zzz",
       },
-      :remote_ip => "",
-      :path_parameters => { :api_key => "1" },
-      :query_parameters => { "access_token" => "abcdef", "pseudonym[password]" => "zzz" },
-      :request_parameters => { "client_secret" => "xoxo" }
+      remote_ip: "",
+      path_parameters: { api_key: "1" },
+      query_parameters: { "access_token" => "abcdef", "pseudonym[password]" => "zzz" },
+      request_parameters: { "client_secret" => "xoxo" }
     }
     mock_attrs[:url] = mock_attrs[:env]["REQUEST_URI"]
     req = double(mock_attrs)
@@ -105,7 +105,7 @@ describe ErrorReport do
     expected_uri = "https://www.instructure.example.com?"\
                    "access_token=[FILTERED]&pseudonym[password]=[FILTERED]"
     expect(report.data["REQUEST_URI"]).to eq(expected_uri)
-    expect(report.data["path_parameters"]).to eq({ :api_key => "[FILTERED]" }.inspect)
+    expect(report.data["path_parameters"]).to eq({ api_key: "[FILTERED]" }.inspect)
     q_params = { "access_token" => "[FILTERED]", "pseudonym[password]" => "[FILTERED]" }
     expect(report.data["query_parameters"]).to eq(q_params.inspect)
     expect(report.data["request_parameters"]).to eq({ "client_secret" => "[FILTERED]" }.inspect)

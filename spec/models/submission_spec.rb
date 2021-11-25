@@ -735,11 +735,11 @@ describe Submission do
     context 'when the submission is for a new quiz' do
       before do
         @course.context_external_tools.create!(
-          :name => 'Quizzes.Next',
-          :consumer_key => 'test_key',
-          :shared_secret => 'test_secret',
-          :tool_id => 'Quizzes 2',
-          :url => 'http://example.com/launch'
+          name: 'Quizzes.Next',
+          consumer_key: 'test_key',
+          shared_secret: 'test_secret',
+          tool_id: 'Quizzes 2',
+          url: 'http://example.com/launch'
         )
 
         @assignment.quiz_lti!
@@ -1327,7 +1327,7 @@ describe Submission do
 
   it "offers the context, if one is available" do
     @course = Course.new
-    @assignment = Assignment.new(:context => @course)
+    @assignment = Assignment.new(context: @course)
     expect(@assignment).to receive(:context).and_return(@course)
 
     @submission = Submission.new
@@ -1384,7 +1384,7 @@ describe Submission do
     it "creates a SubmissionVersion when a new version is saved" do
       submission_spec_model
       expect do
-        @submission.with_versioning(:explicit => true) { @submission.save }
+        @submission.with_versioning(explicit: true) { @submission.save }
       end.to change(SubmissionVersion, :count)
     end
 
@@ -1401,8 +1401,8 @@ describe Submission do
   it "ensures the media object exists" do
     assignment_model
     se = @course.enroll_student(user_factory)
-    expect(MediaObject).to receive(:ensure_media_object).with("fake", { :context => se.user, :user => se.user })
-    @submission = @assignment.submit_homework(se.user, :media_comment_id => "fake", :media_comment_type => "audio")
+    expect(MediaObject).to receive(:ensure_media_object).with("fake", { context: se.user, user: se.user })
+    @submission = @assignment.submit_homework(se.user, media_comment_id: "fake", media_comment_type: "audio")
   end
 
   describe "#grade_change_audit" do
@@ -1511,35 +1511,35 @@ describe Submission do
 
   context "Discussion Topic" do
     it "submitted_at does not change when a second discussion entry is created" do
-      course_with_student(:active_all => true)
-      @topic = @course.discussion_topics.create(:title => "some topic")
-      @assignment = @course.assignments.create(:title => "some discussion assignment")
+      course_with_student(active_all: true)
+      @topic = @course.discussion_topics.create(title: "some topic")
+      @assignment = @course.assignments.create(title: "some discussion assignment")
       @assignment.submission_types = 'discussion_topic'
       @assignment.save!
-      @entry1 = @topic.discussion_entries.create(:message => "first entry", :user => @user)
+      @entry1 = @topic.discussion_entries.create(message: "first entry", user: @user)
       @topic.assignment_id = @assignment.id
       @topic.save!
 
       Timecop.freeze(30.minutes.from_now) do
         expect do
-          @topic.discussion_entries.create(:message => "second entry", :user => @user)
+          @topic.discussion_entries.create(message: "second entry", user: @user)
         end.not_to(change { @assignment.submissions.find_by(user: @user).submitted_at })
       end
     end
 
     it "does not create multiple versions on submission for discussion topics" do
-      course_with_student(:active_all => true)
-      @topic = @course.discussion_topics.create(:title => "some topic")
-      @assignment = @course.assignments.create(:title => "some discussion assignment")
+      course_with_student(active_all: true)
+      @topic = @course.discussion_topics.create(title: "some topic")
+      @assignment = @course.assignments.create(title: "some discussion assignment")
       @assignment.submission_types = 'discussion_topic'
       @assignment.save!
       @topic.assignment_id = @assignment.id
       @topic.save!
 
       Timecop.freeze(1.second.ago) do
-        @assignment.submit_homework(@student, :submission_type => 'discussion_topic')
+        @assignment.submit_homework(@student, submission_type: 'discussion_topic')
       end
-      @assignment.submit_homework(@student, :submission_type => 'discussion_topic')
+      @assignment.submit_homework(@student, submission_type: 'discussion_topic')
       expect(@student.submissions.first.submission_history.count).to eq 1
     end
   end
@@ -1547,40 +1547,40 @@ describe Submission do
   context "broadcast policy" do
     context "Submission Notifications" do
       before :once do
-        Notification.create(:name => 'Assignment Submitted')
-        Notification.create(:name => 'Assignment Resubmitted')
-        Notification.create(:name => 'Assignment Submitted Late')
-        Notification.create(:name => 'Group Assignment Submitted Late')
+        Notification.create(name: 'Assignment Submitted')
+        Notification.create(name: 'Assignment Resubmitted')
+        Notification.create(name: 'Assignment Submitted Late')
+        Notification.create(name: 'Group Assignment Submitted Late')
 
         course_with_teacher(course: @course, active_all: true)
       end
 
       it "sends the correct message when an assignment is turned in on-time" do
         @assignment.workflow_state = "published"
-        @assignment.update(:due_at => Time.now + 1000)
+        @assignment.update(due_at: Time.now + 1000)
 
         submission_spec_model(user: @student, submit_homework: true)
         expect(@submission.messages_sent.keys).to eq ['Assignment Submitted']
       end
 
       it "does not send a message to a TA without grading rights" do
-        limited_role = custom_ta_role("limitedta", :account => @course.account)
+        limited_role = custom_ta_role("limitedta", account: @course.account)
         [:view_all_grades, :manage_grades].each do |permission|
-          @course.account.role_overrides.create!(:permission => permission, :enabled => false, :role => limited_role)
+          @course.account.role_overrides.create!(permission: permission, enabled: false, role: limited_role)
         end
 
-        limited_ta = user_factory(:active_all => true, :active_cc => true)
-        @course.enroll_user(limited_ta, "TaEnrollment", :role => limited_role, :enrollment_state => "active")
-        normal_ta = user_factory(:active_all => true, :active_cc => true)
-        @course.enroll_user(normal_ta, "TaEnrollment", :enrollment_state => "active")
+        limited_ta = user_factory(active_all: true, active_cc: true)
+        @course.enroll_user(limited_ta, "TaEnrollment", role: limited_role, enrollment_state: "active")
+        normal_ta = user_factory(active_all: true, active_cc: true)
+        @course.enroll_user(normal_ta, "TaEnrollment", enrollment_state: "active")
 
-        n = Notification.where(:name => 'Assignment Submitted').first
-        n.update(:category => "TestImmediately")
+        n = Notification.where(name: 'Assignment Submitted').first
+        n.update(category: "TestImmediately")
         [limited_ta, normal_ta].each do |ta|
-          NotificationPolicy.create(:notification => n, :communication_channel => ta.communication_channel, :frequency => "immediately")
+          NotificationPolicy.create(notification: n, communication_channel: ta.communication_channel, frequency: "immediately")
         end
         @assignment.workflow_state = "published"
-        @assignment.update(:due_at => Time.now + 1000)
+        @assignment.update(due_at: Time.now + 1000)
 
         submission_spec_model(user: @student, submit_homework: true)
         expect(@submission.messages_sent['Assignment Submitted'].map(&:user)).to eq [normal_ta]
@@ -1588,7 +1588,7 @@ describe Submission do
 
       it "sends the correct message when an assignment is turned in late" do
         @assignment.workflow_state = "published"
-        @assignment.update(:due_at => Time.now - 1000)
+        @assignment.update(due_at: Time.now - 1000)
 
         submission_spec_model(user: @student, submit_homework: true)
         expect(@submission.messages_sent.keys).to eq ['Assignment Submitted Late']
@@ -1599,8 +1599,8 @@ describe Submission do
         @assignment.due_at = Time.now + 1000
         @assignment.save!
 
-        @assignment.submit_homework(@student, :body => "lol")
-        resubmission = @assignment.submit_homework(@student, :body => "frd")
+        @assignment.submit_homework(@student, body: "lol")
+        resubmission = @assignment.submit_homework(@student, body: "frd")
         expect(resubmission.messages_sent.keys).to eq ['Assignment Resubmitted']
       end
 
@@ -1609,16 +1609,16 @@ describe Submission do
         @assignment.due_at = Time.now - 1000
         @assignment.save!
 
-        @assignment.submit_homework(@student, :body => "lol")
-        resubmission = @assignment.submit_homework(@student, :body => "frd")
+        @assignment.submit_homework(@student, body: "lol")
+        resubmission = @assignment.submit_homework(@student, body: "frd")
         expect(resubmission.messages_sent.keys).to eq ['Assignment Submitted Late']
       end
 
       it "sends the correct message when a group assignment is submitted late" do
-        @a = assignment_model(:course => @context, :group_category => "Study Groups", :due_at => Time.now - 1000, :submission_types => ["online_text_entry"])
-        @group1 = @a.context.groups.create!(:name => "Study Group 1", :group_category => @a.group_category)
+        @a = assignment_model(course: @context, group_category: "Study Groups", due_at: Time.now - 1000, submission_types: ["online_text_entry"])
+        @group1 = @a.context.groups.create!(name: "Study Group 1", group_category: @a.group_category)
         @group1.add_user(@student)
-        submission = @a.submit_homework @student, :submission_type => "online_text_entry", :body => "blah"
+        submission = @a.submit_homework @student, submission_type: "online_text_entry", body: "blah"
 
         expect(submission.messages_sent.keys).to eq ['Group Assignment Submitted Late']
       end
@@ -1699,7 +1699,7 @@ describe Submission do
       before :once do
         Auditors::ActiveRecord::Partitioner.process
         @assignment.ensure_post_policy(post_manually: false)
-        Notification.create(:name => 'Submission Graded', :category => 'TestImmediately')
+        Notification.create(name: 'Submission Graded', category: 'TestImmediately')
         submission_spec_model(submit_homework: true)
       end
 
@@ -1755,7 +1755,7 @@ describe Submission do
 
       it "does not create a message when this is a quiz submission" do
         communication_channel(@user, { username: 'somewhere@test.com' })
-        @quiz = Quizzes::Quiz.create!(:context => @course)
+        @quiz = Quizzes::Quiz.create!(context: @course)
         @submission.quiz_submission = @quiz.generate_submission(@user)
         @submission.save!
         @submission.reload
@@ -1788,7 +1788,7 @@ describe Submission do
         communication_channel(@user, { username: 'somewhere@test.com' })
         @assignment.ensure_post_policy(post_manually: true)
         expect do
-          @assignment.update_submission(@student, :author => @teacher, :comment => "some comment")
+          @assignment.update_submission(@student, author: @teacher, comment: "some comment")
         end.to change StreamItemInstance, :count
         expect(@submission.submission_comments.last).to be_hidden
         expect(@user.stream_item_instances.last).to be_hidden
@@ -1802,7 +1802,7 @@ describe Submission do
         communication_channel(@teacher, { username: 'somewhere@test.com' })
         @assignment.mute!
         expect do
-          @submission.add_comment(:author => @student, :comment => "some comment")
+          @submission.add_comment(author: @student, comment: "some comment")
         end.to change StreamItemInstance, :count
         expect(@teacher.stream_item_instances.last).to_not be_hidden
       end
@@ -1810,7 +1810,7 @@ describe Submission do
       it "does not hide any existing stream_item_instances for instructors when muted" do
         communication_channel(@teacher, { username: 'somewhere@test.com' })
         expect do
-          @submission.add_comment(:author => @student, :comment => "some comment")
+          @submission.add_comment(author: @student, comment: "some comment")
         end.to change StreamItemInstance, :count
         expect(@teacher.stream_item_instances.last).to_not be_hidden
         @assignment.mute!
@@ -1819,15 +1819,15 @@ describe Submission do
       end
 
       it "does not create a message for admins and teachers with quiz submissions" do
-        course_with_teacher(:active_all => true)
+        course_with_teacher(active_all: true)
         assignment = @course.assignments.create!(
-          :title => 'assignment',
-          :points_possible => 10
+          title: 'assignment',
+          points_possible: 10
         )
         quiz = @course.quizzes.build(
-          :assignment_id => assignment.id,
-          :title => 'test quiz',
-          :points_possible => 10
+          assignment_id: assignment.id,
+          title: 'test quiz',
+          points_possible: 10
         )
         quiz.workflow_state = 'available'
         quiz.save!
@@ -1847,7 +1847,7 @@ describe Submission do
     end
 
     it "creates a stream_item_instance when graded and published" do
-      Notification.create :name => "Submission Graded"
+      Notification.create name: "Submission Graded"
       submission_spec_model
       communication_channel(@user, { username: 'somewhere@test.com' })
       expect do
@@ -1856,7 +1856,7 @@ describe Submission do
     end
 
     it "creates a stream_item_instance when graded, and then made it visible when unmuted" do
-      Notification.create :name => "Submission Graded"
+      Notification.create name: "Submission Graded"
       submission_spec_model
       communication_channel(@user, { username: 'somewhere@test.com' })
       @assignment.mute!
@@ -1865,8 +1865,8 @@ describe Submission do
       end.to change StreamItemInstance, :count
 
       @assignment.unmute!
-      stream_item_ids       = StreamItem.where(:asset_type => 'Submission', :asset_id => @assignment.submissions.all).pluck(:id)
-      stream_item_instances = StreamItemInstance.where(:stream_item_id => stream_item_ids)
+      stream_item_ids       = StreamItem.where(asset_type: 'Submission', asset_id: @assignment.submissions.all).pluck(:id)
+      stream_item_instances = StreamItemInstance.where(stream_item_id: stream_item_ids)
       stream_item_instances.each { |sii| expect(sii).not_to be_hidden }
     end
 
@@ -1877,7 +1877,7 @@ describe Submission do
       end
 
       it "creates a message when the score is changed and the grades were already published" do
-        Notification.create(:name => 'Submission Grade Changed')
+        Notification.create(name: 'Submission Grade Changed')
         allow(@assignment).to receive(:score_to_grade).and_return("10.0")
         allow(@assignment).to receive(:due_at).and_return(Time.zone.now - 100)
         submission_spec_model
@@ -1892,12 +1892,12 @@ describe Submission do
       end
 
       it "does not create a grade changed message when theres a quiz attached" do
-        Notification.create(:name => 'Submission Grade Changed')
+        Notification.create(name: 'Submission Grade Changed')
         allow(@assignment).to receive(:score_to_grade).and_return("10.0")
         allow(@assignment).to receive(:due_at).and_return(Time.now - 100)
         submission_spec_model
 
-        @quiz = Quizzes::Quiz.create!(:context => @course)
+        @quiz = Quizzes::Quiz.create!(context: @course)
         @submission.quiz_submission = @quiz.generate_submission(@user)
         @submission.save!
         communication_channel(@user, { username: 'somewhere@test.com' })
@@ -1911,7 +1911,7 @@ describe Submission do
 
       it "does not create a message when grades were already published for an assignment with hidden grades" do
         @assignment.ensure_post_policy(post_manually: true)
-        Notification.create(:name => 'Submission Grade Changed')
+        Notification.create(name: 'Submission Grade Changed')
         allow(@assignment).to receive(:score_to_grade).and_return("10.0")
         allow(@assignment).to receive(:due_at).and_return(Time.zone.now - 100)
         submission_spec_model
@@ -1926,7 +1926,7 @@ describe Submission do
       end
 
       it "does not create a message when the submission was recently graded" do
-        Notification.create(:name => 'Submission Grade Changed')
+        Notification.create(name: 'Submission Grade Changed')
         allow(@assignment).to receive(:score_to_grade).and_return("10.0")
         allow(@assignment).to receive(:due_at).and_return(Time.zone.now - 100)
         submission_spec_model
@@ -2653,7 +2653,7 @@ describe Submission do
         end
 
         context 'for multiple attachments' do
-          let(:other_attachment) { attachment_model(filename: "submission-b.doc", :context => test_student) }
+          let(:other_attachment) { attachment_model(filename: "submission-b.doc", context: test_student) }
           let(:other_report_url) { 'http://another-report.com' }
           let(:other_report) do
             OriginalityReport.create!(attachment: other_attachment, submission: submission,
@@ -2819,13 +2819,13 @@ describe Submission do
       let(:lti_tii_data) do
         {
           "attachment_42" => {
-            :status => "error",
-            :outcome_response => {
+            status: "error",
+            outcome_response: {
               "outcomes_tool_placement_url" => "https://api.turnitin.com/api/lti/1p0/invalid?lang=en_us",
               "paperid" => "607954245",
               "lis_result_sourcedid" => "10-5-42-8-invalid"
             },
-            :public_error_message => "Turnitin has not returned a score after 11 attempts to retrieve one."
+            public_error_message: "Turnitin has not returned a score after 11 attempts to retrieve one."
           }
         }
       end
@@ -2890,7 +2890,7 @@ describe Submission do
         @assignment.turnitin_enabled = true
         @assignment.turnitin_settings = @assignment.turnitin_settings
         @assignment.save!
-        @submission = @assignment.submit_homework(@user, { :body => "hello there", :submission_type => 'online_text_entry' })
+        @submission = @assignment.submit_homework(@user, { body: "hello there", submission_type: 'online_text_entry' })
       end
 
       it "submits to turnitin after a delay" do
@@ -2901,11 +2901,11 @@ describe Submission do
 
       it "initially sets turnitin submission to pending" do
         init_turnitin_api
-        expect(@turnitin_api).to receive(:createOrUpdateAssignment).with(@assignment, @assignment.turnitin_settings).and_return({ :assignment_id => "1234" })
-        expect(@turnitin_api).to receive(:enrollStudent).with(@context, @user).and_return(double(:success? => true))
+        expect(@turnitin_api).to receive(:createOrUpdateAssignment).with(@assignment, @assignment.turnitin_settings).and_return({ assignment_id: "1234" })
+        expect(@turnitin_api).to receive(:enrollStudent).with(@context, @user).and_return(double(success?: true))
         expect(@turnitin_api).to receive(:submitPaper).and_return({
                                                                     @submission.asset_string => {
-                                                                      :object_id => '12345'
+                                                                      object_id: '12345'
                                                                     }
                                                                   })
         @submission.submit_to_turnitin
@@ -2914,8 +2914,8 @@ describe Submission do
 
       it "schedules a retry if something fails initially" do
         init_turnitin_api
-        expect(@turnitin_api).to receive(:createOrUpdateAssignment).with(@assignment, @assignment.turnitin_settings).and_return({ :assignment_id => "1234" })
-        expect(@turnitin_api).to receive(:enrollStudent).with(@context, @user).and_return(double(:success? => false))
+        expect(@turnitin_api).to receive(:createOrUpdateAssignment).with(@assignment, @assignment.turnitin_settings).and_return({ assignment_id: "1234" })
+        expect(@turnitin_api).to receive(:enrollStudent).with(@context, @user).and_return(double(success?: false))
         @submission.submit_to_turnitin
         expect(Delayed::Job.list_jobs(:future, 100).count { |j| j.tag == 'Submission#submit_to_turnitin' }).to eq 2
       end
@@ -2923,7 +2923,7 @@ describe Submission do
       it "sets status as failed if something fails on a retry" do
         init_turnitin_api
         expect(@assignment).to receive(:create_in_turnitin).and_return(false)
-        expect(@turnitin_api).to receive(:enrollStudent).with(@context, @user).and_return(double(:success? => false, :error? => true, :error_hash => {}))
+        expect(@turnitin_api).to receive(:enrollStudent).with(@context, @user).and_return(double(success?: false, error?: true, error_hash: {}))
         expect(@turnitin_api).not_to receive(:submitPaper)
         @submission.submit_to_turnitin(Submission::TURNITIN_RETRY)
         expect(@submission.reload.turnitin_data[:status]).to eq 'error'
@@ -2933,7 +2933,7 @@ describe Submission do
         init_turnitin_api
         # first a submission, to get us into failed state
         expect(@assignment).to receive(:create_in_turnitin).and_return(false)
-        expect(@turnitin_api).to receive(:enrollStudent).with(@context, @user).and_return(double(:success? => false, :error? => true, :error_hash => {}))
+        expect(@turnitin_api).to receive(:enrollStudent).with(@context, @user).and_return(double(success?: false, error?: true, error_hash: {}))
         expect(@turnitin_api).not_to receive(:submitPaper)
         @submission.submit_to_turnitin(Submission::TURNITIN_RETRY)
         expect(@submission.reload.turnitin_data[:status]).to eq 'error'
@@ -2947,12 +2947,12 @@ describe Submission do
       it "sets status to scored on success" do
         init_turnitin_api
         @submission.turnitin_data ||= {}
-        @submission.turnitin_data[@submission.asset_string] = { :object_id => '1234', :status => 'pending' }
+        @submission.turnitin_data[@submission.asset_string] = { object_id: '1234', status: 'pending' }
         expect(@turnitin_api).to receive(:generateReport).with(@submission, @submission.asset_string).and_return({
-                                                                                                                   :similarity_score => 56,
-                                                                                                                   :web_overlap => 22,
-                                                                                                                   :publication_overlap => 0,
-                                                                                                                   :student_overlap => 33
+                                                                                                                   similarity_score: 56,
+                                                                                                                   web_overlap: 22,
+                                                                                                                   publication_overlap: 0,
+                                                                                                                   student_overlap: 33
                                                                                                                  })
 
         @submission.check_turnitin_status
@@ -2962,7 +2962,7 @@ describe Submission do
       it "sets status as failed if something fails after several attempts" do
         init_turnitin_api
         @submission.turnitin_data ||= {}
-        @submission.turnitin_data[@submission.asset_string] = { :object_id => '1234', :status => 'pending' }
+        @submission.turnitin_data[@submission.asset_string] = { object_id: '1234', status: 'pending' }
         expect(@turnitin_api).to receive(:generateReport).with(@submission, @submission.asset_string).and_return({})
 
         expects_job_with_tag('Submission#check_turnitin_status') do
@@ -2979,12 +2979,12 @@ describe Submission do
       it "checks status for all assets" do
         init_turnitin_api
         @submission.turnitin_data ||= {}
-        @submission.turnitin_data[@submission.asset_string] = { :object_id => '1234', :status => 'pending' }
-        @submission.turnitin_data["other_asset"] = { :object_id => 'xxyy', :status => 'pending' }
+        @submission.turnitin_data[@submission.asset_string] = { object_id: '1234', status: 'pending' }
+        @submission.turnitin_data["other_asset"] = { object_id: 'xxyy', status: 'pending' }
         expect(@turnitin_api).to receive(:generateReport).with(@submission, @submission.asset_string).and_return({
-                                                                                                                   :similarity_score => 56, :web_overlap => 22, :publication_overlap => 0, :student_overlap => 33
+                                                                                                                   similarity_score: 56, web_overlap: 22, publication_overlap: 0, student_overlap: 33
                                                                                                                  })
-        expect(@turnitin_api).to receive(:generateReport).with(@submission, "other_asset").and_return({ :similarity_score => 20 })
+        expect(@turnitin_api).to receive(:generateReport).with(@submission, "other_asset").and_return({ similarity_score: 20 })
 
         @submission.check_turnitin_status
         @submission.reload
@@ -3001,26 +3001,26 @@ describe Submission do
 
     describe "group" do
       before(:once) do
-        @teacher = User.create(:name => "some teacher")
-        @student = User.create(:name => "a student")
-        @student1 = User.create(:name => "student 1")
+        @teacher = User.create(name: "some teacher")
+        @student = User.create(name: "a student")
+        @student1 = User.create(name: "student 1")
         @context.enroll_teacher(@teacher)
         @context.enroll_student(@student)
         @context.enroll_student(@student1)
         setup_account_for_turnitin(@context.account)
 
-        @a = assignment_model(:course => @context, :group_category => "Study Groups")
+        @a = assignment_model(course: @context, group_category: "Study Groups")
         @a.submission_types = "online_upload,online_text_entry"
         @a.turnitin_enabled = true
         @a.save!
 
-        @group1 = @a.context.groups.create!(:name => "Study Group 1", :group_category => @a.group_category)
+        @group1 = @a.context.groups.create!(name: "Study Group 1", group_category: @a.group_category)
         @group1.add_user(@student)
         @group1.add_user(@student1)
       end
 
       it "submits to turnitin for the original submitter" do
-        submission = @a.submit_homework @student, :submission_type => "online_text_entry", :body => "blah"
+        submission = @a.submit_homework @student, submission_type: "online_text_entry", body: "blah"
         Submission.where(assignment_id: @a).each do |s|
           if s.id == submission.id
             expect(s.turnitin_data[:last_processed_attempt]).to be > 0
@@ -3037,16 +3037,16 @@ describe Submission do
         @assignment.turnitin_enabled = true
         @assignment.turnitin_settings = @assignment.turnitin_settings
         @assignment.save!
-        @submission = @assignment.submit_homework(@user, { :body => "hello there", :submission_type => 'online_text_entry' })
+        @submission = @assignment.submit_homework(@user, { body: "hello there", submission_type: 'online_text_entry' })
         @submission.turnitin_data = {
           "submission_#{@submission.id}" => {
-            :web_overlap => 92,
-            :error => true,
-            :publication_overlap => 0,
-            :state => "failure",
-            :object_id => "123456789",
-            :student_overlap => 90,
-            :similarity_score => 92
+            web_overlap: 92,
+            error: true,
+            publication_overlap: 0,
+            state: "failure",
+            object_id: "123456789",
+            student_overlap: 90,
+            similarity_score: 92
           }
         }
         @submission.save!
@@ -3055,7 +3055,7 @@ describe Submission do
       before do
         api = Turnitin::Client.new('test_account', 'sekret')
         expect(Turnitin::Client).to receive(:new).at_least(1).and_return(api)
-        expect(api).to receive(:sendRequest).with(:generate_report, 1, include(:oid => "123456789")).at_least(1).and_return('http://foo.bar')
+        expect(api).to receive(:sendRequest).with(:generate_report, 1, include(oid: "123456789")).at_least(1).and_return('http://foo.bar')
       end
 
       it "lets teachers view the turnitin report" do
@@ -3247,7 +3247,7 @@ describe Submission do
           student_overlap: 90,
           similarity_score: 92
         },
-        provider: 'vericite'
+        :provider => 'vericite'
       }
       @submission.save!
     end
@@ -3293,7 +3293,7 @@ describe Submission do
 
     @assignment.submissions.find_by!(user: @user).update!(quiz_submission_id: quiz_submission.id)
 
-    submission = @assignment.submit_homework @user, :submission_type => 'online_quiz'
+    submission = @assignment.submit_homework @user, submission_type: 'online_quiz'
     submission.quiz_submission_id = quiz_submission.id
 
     # set the microseconds of the submission.submitted_at to be less than the
@@ -3327,17 +3327,17 @@ describe Submission do
   end
 
   it "returns only comments readable by the user" do
-    course_with_teacher(:active_all => true)
+    course_with_teacher(active_all: true)
     @course.default_post_policy.update!(post_manually: false)
-    @student1 = student_in_course(:active_user => true).user
-    @student2 = student_in_course(:active_user => true).user
+    @student1 = student_in_course(active_user: true).user
+    @student2 = student_in_course(active_user: true).user
 
-    @assignment = @course.assignments.new(:title => "some assignment")
+    @assignment = @course.assignments.new(title: "some assignment")
     @assignment.submission_types = "online_text_entry"
     @assignment.workflow_state = "published"
     @assignment.save
 
-    @submission = @assignment.submit_homework(@student1, :body => 'some message')
+    @submission = @assignment.submit_homework(@student1, body: 'some message')
     @submission.add_comment(author: @teacher, comment: "a")
     @submission.add_comment(author: @teacher, comment: "b", hidden: true)
     @submission.add_comment(author: @student1, comment: "c")
@@ -3377,8 +3377,8 @@ describe Submission do
 
     it "is unread after submission is commented on by teacher" do
       @student = @user
-      course_with_teacher(:course => @context, :active_all => true)
-      @submission = @assignment.update_submission(@student, { :commenter => @teacher, :comment => "good!" }).first
+      course_with_teacher(course: @context, active_all: true)
+      @submission = @assignment.update_submission(@student, { commenter: @teacher, comment: "good!" }).first
       expect(@submission.unread?(@user)).to be_truthy
     end
 
@@ -3424,14 +3424,14 @@ describe Submission do
 
   describe "muted_assignment?" do
     it "returns true if assignment is muted" do
-      assignment = double(:muted? => true)
+      assignment = double(muted?: true)
       @submission = Submission.new
       expect(@submission).to receive(:assignment).and_return(assignment)
       expect(@submission.muted_assignment?).to eq true
     end
 
     it "returns false if assignment is not muted" do
-      assignment = double(:muted? => false)
+      assignment = double(muted?: false)
       @submission = Submission.new
       expect(@submission).to receive(:assignment).and_return(assignment)
       expect(@submission.muted_assignment?).to eq false
@@ -3503,8 +3503,8 @@ describe Submission do
       @submission1 = @submission
 
       add_section('overridden section')
-      u2 = student_in_section(@course_section, :active_all => true)
-      submission_spec_model(:user => u2)
+      u2 = student_in_section(@course_section, active_all: true)
+      submission_spec_model(user: u2)
       @submission2 = @submission
 
       @assignment.update_attribute(:due_at, Time.zone.now - 1.day)
@@ -3522,15 +3522,15 @@ describe Submission do
       expect(@submission1).to be_past_due
       expect(@submission2).to be_past_due
 
-      assignment_override_model :assignment => @assignment,
-                                :due_at => Time.zone.now + 1.day,
-                                :set => @course_section
+      assignment_override_model assignment: @assignment,
+                                due_at: Time.zone.now + 1.day,
+                                set: @course_section
       expect(@submission1.reload).to be_past_due
       expect(@submission2.reload).not_to be_past_due
     end
 
     it "gives a quiz submission 30 extra seconds before making it past due" do
-      quiz_with_graded_submission([{ :question_data => { :name => 'question 1', :points_possible => 1, 'question_type' => 'essay_question' } }]) do
+      quiz_with_graded_submission([{ question_data: { :name => 'question 1', :points_possible => 1, 'question_type' => 'essay_question' } }]) do
         {
           "text_after_answers" => "",
           "question_#{@questions[0].id}" => "<p>Lorem ipsum answer.</p>",
@@ -3942,16 +3942,16 @@ describe Submission do
   describe "versioned_attachments" do
     it "includes user attachments" do
       student_in_course(active_all: true)
-      att = attachment_model(filename: "submission.doc", :context => @student)
+      att = attachment_model(filename: "submission.doc", context: @student)
       sub = @assignment.submit_homework(@student, attachments: [att])
       expect(sub.versioned_attachments).to eq [att]
     end
 
     it "does not include attachments with a context of Submission" do
       student_in_course(active_all: true)
-      att = attachment_model(filename: "submission.doc", :context => @student)
+      att = attachment_model(filename: "submission.doc", context: @student)
       sub = @assignment.submit_homework(@student, attachments: [att])
-      sub.attachments.update_all(:context_type => "Submission", :context_id => sub.id)
+      sub.attachments.update_all(context_type: "Submission", context_id: sub.id)
       expect(sub.reload.versioned_attachments).to be_empty
     end
 
@@ -4001,7 +4001,7 @@ describe Submission do
   describe "#versioned_originality_reports" do
     it "loads originality reports for the submission" do
       student_in_course(active_all: true)
-      attachment = attachment_model(filename: "submission.doc", :context => @student)
+      attachment = attachment_model(filename: "submission.doc", context: @student)
       submission = @assignment.submit_homework(@student, attachments: [attachment])
       report = OriginalityReport.create!(attachment: attachment, originality_score: '1', submission: submission)
 
@@ -4010,7 +4010,7 @@ describe Submission do
 
     it "memoizes the loaded originality reports" do
       student_in_course(active_all: true)
-      attachment = attachment_model(filename: "submission.doc", :context => @student)
+      attachment = attachment_model(filename: "submission.doc", context: @student)
       submission = @assignment.submit_homework(@student, attachments: [attachment])
       OriginalityReport.create!(attachment: attachment, originality_score: '1', submission: submission)
 
@@ -4021,7 +4021,7 @@ describe Submission do
 
     it "returns an empty array when there are no reports" do
       student_in_course(active_all: true)
-      attachment = attachment_model(filename: "submission.doc", :context => @student)
+      attachment = attachment_model(filename: "submission.doc", context: @student)
       submission = @assignment.submit_homework(@student, attachments: [attachment])
 
       expect(submission.versioned_originality_reports).to eq []
@@ -4041,8 +4041,8 @@ describe Submission do
       submissions = Array.new(3) do |i|
         student_in_course(active_all: true)
         attachments = [
-          attachment_model(filename: "submission#{i}-a.doc", :context => @student),
-          attachment_model(filename: "submission#{i}-b.doc", :context => @student)
+          attachment_model(filename: "submission#{i}-a.doc", context: @student),
+          attachment_model(filename: "submission#{i}-b.doc", context: @student)
         ]
 
         sub = @assignment.submit_homework(@student, attachments: attachments)
@@ -4060,7 +4060,7 @@ describe Submission do
 
     it "avoids N+1s in the bulk load" do
       student_in_course(active_all: true)
-      attachment = attachment_model(filename: "submission.doc", :context => @student)
+      attachment = attachment_model(filename: "submission.doc", context: @student)
       submission = @assignment.submit_homework(@student, attachments: [attachment])
       OriginalityReport.create!(attachment: attachment, originality_score: '1', submission: submission)
 
@@ -4087,14 +4087,14 @@ describe Submission do
           OriginalityReport.create!(attachment: attachment, originality_score: '1', submission: sub)
       end
 
-      attachment = attachment_model(filename: "submission-b.doc", :context => @student)
+      attachment = attachment_model(filename: "submission-b.doc", context: @student)
       Timecop.freeze(5.seconds.ago) do
         sub = @assignment.submit_homework(@student, attachments: [attachment])
         originality_reports <<
           OriginalityReport.create!(attachment: attachment, originality_score: '1', submission: sub)
       end
 
-      attachment = attachment_model(filename: "submission-c.doc", :context => @student)
+      attachment = attachment_model(filename: "submission-c.doc", context: @student)
       Timecop.freeze(1.second.ago) do
         sub = @assignment.submit_homework(@student, attachments: [attachment])
         originality_reports <<
@@ -4129,8 +4129,8 @@ describe Submission do
         submissions = Array.new(3) do |i|
           student_in_course(active_all: true)
           attachments << [
-            attachment_model(filename: "submission#{i}-a.doc", :context => @student),
-            attachment_model(filename: "submission#{i}-b.doc", :context => @student)
+            attachment_model(filename: "submission#{i}-a.doc", context: @student),
+            attachment_model(filename: "submission#{i}-b.doc", context: @student)
           ]
 
           @assignment.submit_homework @student, attachments: attachments[i]
@@ -4171,18 +4171,18 @@ describe Submission do
 
       it "handles submission histories with different attachments" do
         student_in_course(active_all: true)
-        attachments = [attachment_model(filename: "submission-a.doc", :context => @student)]
+        attachments = [attachment_model(filename: "submission-a.doc", context: @student)]
         Timecop.freeze(10.seconds.ago) do
           @assignment.submit_homework(@student, submission_type: 'online_upload',
                                                 attachments: [attachments[0]])
         end
 
-        attachments << attachment_model(filename: "submission-b.doc", :context => @student)
+        attachments << attachment_model(filename: "submission-b.doc", context: @student)
         Timecop.freeze(5.seconds.ago) do
           @assignment.submit_homework @student, attachments: [attachments[1]]
         end
 
-        attachments << attachment_model(filename: "submission-c.doc", :context => @student)
+        attachments << attachment_model(filename: "submission-c.doc", context: @student)
         Timecop.freeze(1.second.ago) do
           @assignment.submit_homework @student, attachments: [attachments[2]]
         end
@@ -4202,7 +4202,7 @@ describe Submission do
 
         submissions = Array.new(3) do |i|
           student_in_course(active_all: true)
-          attachment = [attachment_model(filename: "submission#{i}.doc", :context => @student)]
+          attachment = [attachment_model(filename: "submission#{i}.doc", context: @student)]
           sub = @assignment.submit_homework @student, attachments: attachment
           expected_attachments_for_submissions[sub] = attachment
           sub
@@ -5715,7 +5715,7 @@ describe Submission do
             qsub.quiz_data = test_quiz_data
             qsub.started_at = 1.minute.ago
             qsub.attempt = 1
-            qsub.submission_data = [{ :points => 0, :text => "7051", :question_id => 128, :correct => false, :answer_id => 7051 }]
+            qsub.submission_data = [{ points: 0, text: "7051", question_id: 128, correct: false, answer_id: 7051 }]
             qsub.score = 0
             qsub.save!
             qsub.finished_at = Time.now.utc
@@ -5915,7 +5915,7 @@ describe Submission do
 
   describe "#submission_history" do
     let!(:student) { student_in_course(active_all: true).user }
-    let(:attachment) { attachment_model(filename: "submission-a.doc", :context => student) }
+    let(:attachment) { attachment_model(filename: "submission-a.doc", context: student) }
     let(:submission) { @assignment.submit_homework(student, submission_type: 'online_upload', attachments: [attachment]) }
 
     it "includes originality data" do
@@ -7672,7 +7672,7 @@ describe Submission do
 
     it "clears key when a submission comment is made" do
       check_cache_clear do
-        @student.submissions.first.add_comment(:author => @teacher, :comment => "some comment")
+        @student.submissions.first.add_comment(author: @teacher, comment: "some comment")
       end
     end
 

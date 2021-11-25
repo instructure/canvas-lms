@@ -25,8 +25,8 @@ describe ContentExportsController do
 
   describe "POST 'create'" do
     it "exports everything explicitly" do
-      course_with_teacher_logged_in(:active_all => true)
-      post 'create', params: { :course_id => @course.id }
+      course_with_teacher_logged_in(active_all: true)
+      post 'create', params: { course_id: @course.id }
       expect(response).to be_successful
 
       expect(ContentExport.last.selected_content[:everything]).to be_present
@@ -61,7 +61,7 @@ describe ContentExportsController do
       let(:filename) { 'cccv1p0' }
       let(:full_path) { Rails.root.join("lib/cc/xsd/#{filename}.xsd") }
 
-      before { get 'xml_schema', params: { :version => filename } }
+      before { get 'xml_schema', params: { version: filename } }
 
       it 'sends in the entire file' do
         expect(response.header['Content-Length'].to_i).to eq File.size?(full_path)
@@ -73,7 +73,7 @@ describe ContentExportsController do
     end
 
     describe 'with a nonexistant file' do
-      before { get 'xml_schema', params: { :version => 'notafile' } }
+      before { get 'xml_schema', params: { version: 'notafile' } }
 
       it 'returns a 404' do
         expect(response).not_to be_successful

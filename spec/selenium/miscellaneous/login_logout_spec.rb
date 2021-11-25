@@ -38,7 +38,7 @@ describe "login logout test" do
   end
 
   it "logins successfully with correct username and password", :xbrowser, priority: "2" do
-    user_with_pseudonym({ :active_user => true })
+    user_with_pseudonym({ active_user: true })
     login_as
     expect(f('[aria-label="Profile tray"] h2').text).to eq @user.primary_pseudonym.unique_id
   end
@@ -78,7 +78,7 @@ describe "login logout test" do
   end
 
   it "validates forgot my password functionality for email account", priority: "1" do
-    user_with_pseudonym({ :active_user => true })
+    user_with_pseudonym({ active_user: true })
     go_to_forgot_password
     f('#pseudonym_session_unique_id_forgot').send_keys(@user.primary_pseudonym.unique_id)
     submit_form('#forgot_password_form')
@@ -93,7 +93,7 @@ describe "login logout test" do
   end
 
   it "fails on an invalid authenticity token", priority: "1" do
-    user_with_pseudonym({ :active_user => true })
+    user_with_pseudonym({ active_user: true })
     get "/login"
     driver.execute_script "$.cookie('_csrf_token', '42')"
     fill_in_login_form("nobody@example.com", 'asdfasdf')

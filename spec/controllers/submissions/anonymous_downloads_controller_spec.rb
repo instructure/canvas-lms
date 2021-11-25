@@ -137,7 +137,7 @@ describe Submissions::AnonymousDownloadsController do
       @course.account.enable_service(:avatars)
       assignment = assignment_model(course: @course)
       student_in_course
-      att = attachment_model(:uploaded_data => stub_file_data('test.txt', 'asdf', 'text/plain'), :context => @student)
+      att = attachment_model(uploaded_data: stub_file_data('test.txt', 'asdf', 'text/plain'), context: @student)
       submission_model(
         course: @course,
         assignment: assignment,

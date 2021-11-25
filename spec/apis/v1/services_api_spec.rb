@@ -22,7 +22,7 @@ require_relative '../api_spec_helper'
 
 describe "Services API", type: :request do
   before :once do
-    user_with_pseudonym(:active_all => true)
+    user_with_pseudonym(active_all: true)
   end
 
   before do
@@ -42,7 +42,7 @@ describe "Services API", type: :request do
 
   it "returns the config information for kaltura" do
     json = api_call(:get, "/api/v1/services/kaltura",
-                    :controller => "services_api", :action => "show_kaltura_config", :format => "json")
+                    controller: "services_api", action: "show_kaltura_config", format: "json")
     expect(json).to eq({
                          'enabled' => true,
                          'domain' => 'kaltura.example.com',
@@ -55,7 +55,7 @@ describe "Services API", type: :request do
   it "degrades gracefully if kaltura is disabled or not configured" do
     allow(CanvasKaltura::ClientV3).to receive(:config).and_return(nil)
     json = api_call(:get, "/api/v1/services/kaltura",
-                    :controller => "services_api", :action => "show_kaltura_config", :format => "json")
+                    controller: "services_api", action: "show_kaltura_config", format: "json")
     expect(json).to eq({
                          'enabled' => false,
                        })
@@ -66,7 +66,7 @@ describe "Services API", type: :request do
     expect(kal).to receive(:startSession).and_return "new_session_id_here"
     allow(CanvasKaltura::ClientV3).to receive(:new).and_return(kal)
     json = api_call(:post, "/api/v1/services/kaltura_session",
-                    :controller => "services_api", :action => "start_kaltura_session", :format => "json")
+                    controller: "services_api", action: "start_kaltura_session", format: "json")
     expect(json.delete_if { |k| %w[serverTime].include?(k) }).to eq({
                                                                       'ks' => "new_session_id_here",
                                                                       'subp_id' => '10000',
@@ -80,8 +80,8 @@ describe "Services API", type: :request do
     expect(kal).to receive(:startSession).and_return "new_session_id_here"
     allow(CanvasKaltura::ClientV3).to receive(:new).and_return(kal)
     json = api_call(:post, "/api/v1/services/kaltura_session",
-                    :controller => "services_api", :action => "start_kaltura_session",
-                    :format => "json", :include_upload_config => 1)
+                    controller: "services_api", action: "start_kaltura_session",
+                    format: "json", include_upload_config: 1)
     expect(json.delete_if { |k| %w[serverTime].include?(k) }).to eq({
                                                                       'ks' => "new_session_id_here",
                                                                       'subp_id' => '10000',

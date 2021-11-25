@@ -147,7 +147,7 @@ module BasicLTI
     end
 
     def save_with_versioning
-      submission.with_versioning(:explicit => true) { submission.save! }
+      submission.with_versioning(explicit: true) { submission.save! }
     end
 
     def clear_cache

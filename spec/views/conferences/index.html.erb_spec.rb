@@ -24,13 +24,13 @@ describe "/conferences/index" do
   before do
     # these specs need an enabled web conference plugin
     @plugin = PluginSetting.create!(name: 'wimba')
-    @plugin.update_attribute(:settings, { :domain => 'www.example.com' })
+    @plugin.update_attribute(:settings, { domain: 'www.example.com' })
   end
 
   it "renders" do
-    course_with_teacher(:active_all => true)
+    course_with_teacher(active_all: true)
     view_context(@course, @user)
-    @conference = @course.web_conferences.build(:conference_type => "Wimba")
+    @conference = @course.web_conferences.build(conference_type: "Wimba")
     @conference.user = @user
     @conference.save!
     @conference.add_initiator(@user)

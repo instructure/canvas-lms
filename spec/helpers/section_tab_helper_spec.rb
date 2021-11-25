@@ -165,20 +165,20 @@ describe SectionTabHelper do
           before do
             tabs = [
               {
-                :id => "context_external_tool_#{quiz_lti_tool.id}",
-                :label => "Quizzes 2",
-                :css_class => "context_external_tool_#{quiz_lti_tool.id}",
-                :visibility => nil,
-                :href => :account_external_tool_path,
-                :external => true,
-                :hidden => false,
-                :args => [context.id, quiz_lti_tool.id]
+                id: "context_external_tool_#{quiz_lti_tool.id}",
+                label: "Quizzes 2",
+                css_class: "context_external_tool_#{quiz_lti_tool.id}",
+                visibility: nil,
+                href: :account_external_tool_path,
+                external: true,
+                hidden: false,
+                args: [context.id, quiz_lti_tool.id]
               },
               {
-                :id => 9,
-                :label => "Settings",
-                :css_class => "settings",
-                :href => :account_settings_path
+                id: 9,
+                label: "Settings",
+                css_class: "settings",
+                href: :account_settings_path
               }
             ]
             allow(context).to receive(:tabs_available).and_return(tabs)
@@ -192,14 +192,14 @@ describe SectionTabHelper do
 
           before do
             course_placement = {
-              :id => "context_external_tool_#{quiz_lti_tool.id}",
-              :label => "Item Banks",
-              :css_class => "context_external_tool_#{quiz_lti_tool.id}",
-              :visibility => nil,
-              :href => :course_external_tool_path,
-              :external => true,
-              :hidden => false,
-              :args => [context.id, quiz_lti_tool.id]
+              id: "context_external_tool_#{quiz_lti_tool.id}",
+              label: "Item Banks",
+              css_class: "context_external_tool_#{quiz_lti_tool.id}",
+              visibility: nil,
+              href: :course_external_tool_path,
+              external: true,
+              hidden: false,
+              args: [context.id, quiz_lti_tool.id]
             }
             tabs = Course.default_tabs + [course_placement]
             allow(context).to receive(:tabs_available).and_return(tabs)
@@ -211,14 +211,14 @@ describe SectionTabHelper do
         context 'the root account has non-Quiz_LTI navigation placements' do
           before do
             non_quiz_lti_course_placement = {
-              :id => "context_external_tool_0",
-              :label => "Other LTI",
-              :css_class => "context_external_tool_0",
-              :visibility => nil,
-              :href => :some_path,
-              :external => true,
-              :hidden => false,
-              :args => [course.id, 0]
+              id: "context_external_tool_0",
+              label: "Other LTI",
+              css_class: "context_external_tool_0",
+              visibility: nil,
+              href: :some_path,
+              external: true,
+              hidden: false,
+              args: [course.id, 0]
             }
             tabs = Course.default_tabs + [non_quiz_lti_course_placement]
             allow(course).to receive(:tabs_available).and_return(tabs)

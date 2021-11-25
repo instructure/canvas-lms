@@ -24,11 +24,11 @@ module Alerts
   describe UngradedCount do
     describe "#should_not_receive_message?" do
       before :once do
-        course_with_teacher(:active_all => 1)
+        course_with_teacher(active_all: 1)
         @teacher = @user
         @user = nil
-        student_in_course(:active_all => 1)
-        @assignment = @course.assignments.new(:title => "some assignment")
+        student_in_course(active_all: 1)
+        @assignment = @course.assignments.new(title: "some assignment")
         @assignment.workflow_state = "published"
         @assignment.save
         @opts = {
@@ -45,7 +45,7 @@ module Alerts
       end
 
       it 'returns false when the student submissions are above or equal to the threshold' do
-        second_assignment = @course.assignments.new(:title => "some assignment")
+        second_assignment = @course.assignments.new(title: "some assignment")
         second_assignment.workflow_state = "published"
         second_assignment.save
 

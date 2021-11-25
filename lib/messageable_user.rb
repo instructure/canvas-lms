@@ -25,9 +25,9 @@ class MessageableUser < User
 
   def self.build_select(options = {})
     options = {
-      :common_course_column => nil,
-      :common_group_column => nil,
-      :common_role_column => nil
+      common_course_column: nil,
+      common_group_column: nil,
+      common_role_column: nil
     }.merge(options)
 
     bookmark_sql = User.sortable_name_order_by_clause
@@ -56,8 +56,8 @@ class MessageableUser < User
 
   def self.prepped(options = {})
     options = {
-      :strict_checks => true,
-      :include_deleted => false
+      strict_checks: true,
+      include_deleted: false
     }.merge(options)
 
     # if either of our common course/group id columns are column names (vs.
@@ -88,11 +88,11 @@ class MessageableUser < User
   end
 
   def self.unfiltered(options = {})
-    prepped(options.merge(:strict_checks => false))
+    prepped(options.merge(strict_checks: false))
   end
 
   def self.available(options = {})
-    prepped(options.merge(:strict_checks => true))
+    prepped(options.merge(strict_checks: true))
   end
 
   def self.context_recipients(recipients)

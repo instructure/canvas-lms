@@ -215,7 +215,7 @@ describe Mutations::CreateAssignment do
   end
 
   it "creates an assignment in a module" do
-    course_module1 = @course.context_modules.create!(:name => "module-1")
+    course_module1 = @course.context_modules.create!(name: "module-1")
     result = execute_with_input <<~GQL
       courseId: "#{@course.to_param}"
       name: "assignment in module"

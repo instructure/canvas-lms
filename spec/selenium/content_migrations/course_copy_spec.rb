@@ -35,7 +35,7 @@ describe "course copy" do
     @course.syllabus_body = "<p>haha</p>"
     @course.tab_configuration = [{ "id" => 0 }, { "id" => 14 }, { "id" => 8 }, { "id" => 5 }, { "id" => 6 }, { "id" => 2 }, { "id" => 3, "hidden" => true }]
     @course.default_view = 'modules'
-    @course.wiki_pages.create!(:title => "hi", :body => "Whatever")
+    @course.wiki_pages.create!(title: "hi", body: "Whatever")
     @course.save!
 
     get "/courses/#{@course.id}/copy"
@@ -115,8 +115,8 @@ describe "course copy" do
 
   it "creates the new course in the same sub-account" do
     account_model
-    subaccount = @account.sub_accounts.create!(:name => "subadubdub")
-    course_with_admin_logged_in(:account => subaccount)
+    subaccount = @account.sub_accounts.create!(name: "subadubdub")
+    course_with_admin_logged_in(account: subaccount)
     @course.syllabus_body = "<p>haha</p>"
     @course.save!
 

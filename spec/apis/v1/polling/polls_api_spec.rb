@@ -116,7 +116,7 @@ describe Polling::PollsController, type: :request do
 
     context "as a student" do
       it "doesn't display the total results of all sessions" do
-        student_in_course(:active_all => true, :course => @course)
+        student_in_course(active_all: true, course: @course)
         @poll.poll_sessions.create!(course: @course)
 
         json = get_show
@@ -125,7 +125,7 @@ describe Polling::PollsController, type: :request do
       end
 
       it "does not return the id of the user that created the poll" do
-        student_in_course(:active_all => true, :course => @course)
+        student_in_course(active_all: true, course: @course)
         session = @poll.poll_sessions.create!(course: @course)
         session.publish!
 
@@ -135,7 +135,7 @@ describe Polling::PollsController, type: :request do
       end
 
       it "is authorized if there are sessions that belong to a course or course section the user is enrolled in" do
-        student_in_course(:active_all => true, :course => @course)
+        student_in_course(active_all: true, course: @course)
         @poll.poll_sessions.create!(course: @course)
 
         get_show(true)
@@ -143,7 +143,7 @@ describe Polling::PollsController, type: :request do
       end
 
       it "is unauthorized if there are no sessions that belong to a course or course section the user is enrolled in" do
-        student_in_course(:active_all => true, :course => @course)
+        student_in_course(active_all: true, course: @course)
         unenrolled = Course.create!(name: 'Unenrolled Course')
         @poll.poll_sessions.create!(course: unenrolled)
         get_show(true)
@@ -171,7 +171,7 @@ describe Polling::PollsController, type: :request do
 
     context "as a student" do
       it "is unauthorized" do
-        student_in_course(:active_all => true, :course => @course)
+        student_in_course(active_all: true, course: @course)
         post_create({ question: 'New Title' }, true)
         expect(response.code).to eq '401'
       end
@@ -202,7 +202,7 @@ describe Polling::PollsController, type: :request do
 
     context "as a student" do
       it "is unauthorized" do
-        student_in_course(:active_all => true, :course => @course)
+        student_in_course(active_all: true, course: @course)
         put_update({ question: 'New Title' }, true)
         expect(response.code).to eq '401'
       end
@@ -255,7 +255,7 @@ describe Polling::PollsController, type: :request do
 
     context "as a student" do
       it "is unauthorized" do
-        student_in_course(:active_all => true, :course => @course)
+        student_in_course(active_all: true, course: @course)
         delete_destroy
         expect(response.code).to eq '401'
         expect(Polling::Poll.where(id: @poll).first).to eq @poll

@@ -30,9 +30,9 @@ class CommunicationChannel < ActiveRecord::Base
   belongs_to :pseudonym
   has_many :pseudonyms
   belongs_to :user, inverse_of: :communication_channels
-  has_many :notification_policies, :dependent => :destroy
+  has_many :notification_policies, dependent: :destroy
   has_many :notification_policy_overrides, inverse_of: :communication_channel, dependent: :destroy
-  has_many :delayed_messages, :dependent => :destroy
+  has_many :delayed_messages, dependent: :destroy
   has_many :messages
 
   # IF ANY CALLBACKS ARE ADDED please check #bounce_for_path to see if it should
@@ -44,11 +44,11 @@ class CommunicationChannel < ActiveRecord::Base
   validate :under_user_cc_limit, if: -> { new_record? }
   validate :uniqueness_of_path
   validate :validate_email, if: ->(cc) { cc.path_type == TYPE_EMAIL && cc.new_record? }
-  validate :not_otp_communication_channel, :if => ->(cc) { cc.path_type == TYPE_SMS && cc.retired? && !cc.new_record? }
+  validate :not_otp_communication_channel, if: ->(cc) { cc.path_type == TYPE_SMS && cc.retired? && !cc.new_record? }
   after_commit :check_if_bouncing_changed
   after_save :clear_user_email_cache, if: -> { workflow_state_before_last_save != workflow_state }
 
-  acts_as_list :scope => :user
+  acts_as_list scope: :user
 
   has_a_broadcast_policy
 
@@ -183,7 +183,7 @@ class CommunicationChannel < ActiveRecord::Base
   end
 
   def pseudonym
-    user.pseudonyms.where(:unique_id => path).first if user
+    user.pseudonyms.where(unique_id: path).first if user
   end
 
   def broadcast_data
@@ -248,7 +248,7 @@ class CommunicationChannel < ActiveRecord::Base
         scope = scope.where("id<>?", id)
       end
       if scope.exists?
-        errors.add(:path, :taken, :value => path)
+        errors.add(:path, :taken, value: path)
       end
     end
   end
@@ -282,7 +282,7 @@ class CommunicationChannel < ActiveRecord::Base
   # Returns a boolean.
   def imported?
     id.present? &&
-      Pseudonym.where(:sis_communication_channel_id => self).shard(user).exists?
+      Pseudonym.where(sis_communication_channel_id: self).shard(user).exists?
   end
 
   # Return the 'path' for simple communication channel types like email and sms.
@@ -341,7 +341,7 @@ class CommunicationChannel < ActiveRecord::Base
   end
 
   def send_otp!(code, account = nil)
-    message = t :body, "Your Canvas verification code is %{verification_code}", :verification_code => code
+    message = t :body, "Your Canvas verification code is %{verification_code}", verification_code: code
     if Setting.get('mfa_via_sms', true) == 'true' && e164_path && account&.feature_enabled?(:notification_service)
       InstStatsd::Statsd.increment("message.deliver.sms.one_time_password",
                                    short_stat: 'message.deliver',
@@ -407,8 +407,8 @@ class CommunicationChannel < ActiveRecord::Base
              .order(Arel.sql("#{rank_sql(rank_order, 'communication_channels.path_type')} ASC, communication_channels.position asc")).to_a
   end
 
-  scope :in_state, ->(state) { where(:workflow_state => state.to_s) }
-  scope :of_type, ->(type) { where(:path_type => type) }
+  scope :in_state, ->(state) { where(workflow_state: state.to_s) }
+  scope :of_type, ->(type) { where(path_type: type) }
 
   # the only way this is used is if a user adds a communication channel in their
   # profile from the default account. In this space, there is currently a
@@ -437,18 +437,18 @@ class CommunicationChannel < ActiveRecord::Base
 
   workflow do
     state :unconfirmed do
-      event :confirm, :transitions_to => :active do
+      event :confirm, transitions_to: :active do
         set_confirmation_code
       end
-      event :retire, :transitions_to => :retired
+      event :retire, transitions_to: :retired
     end
 
     state :active do
-      event :retire, :transitions_to => :retired
+      event :retire, transitions_to: :retired
     end
 
     state :retired do
-      event :re_activate, :transitions_to => :active do
+      event :re_activate, transitions_to: :active do
         # Reset bounce count when we're being reactivated
         reset_bounce_count!
       end

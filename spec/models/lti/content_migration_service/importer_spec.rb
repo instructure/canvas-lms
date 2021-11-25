@@ -81,7 +81,7 @@ RSpec.describe Lti::ContentMigrationService::Importer do
           status_url: 'https://lti.example.com/imports/42/status',
         }.to_json
         stub_request(:post, import_url)
-          .to_return(:status => 200, :body => response_body, :headers => {})
+          .to_return(status: 200, body: response_body, headers: {})
 
         @response = importer.send_imported_content(course, content_migration, content)
       end
@@ -160,7 +160,7 @@ RSpec.describe Lti::ContentMigrationService::Importer do
           status_url: 'https://lti.example.com/imports/42/status',
         }.to_json
         stub_request(:post, import_url)
-          .to_return(:status => 200, :body => response_body, :headers => {})
+          .to_return(status: 200, body: response_body, headers: {})
 
         @response = importer.send_imported_content(course, content_migration, content)
       end
@@ -213,7 +213,7 @@ RSpec.describe Lti::ContentMigrationService::Importer do
         status_url: 'https://lti.example.com/imports/42/status',
       }.to_json
       stub_request(:post, 'https://lti.example.com/begin_import_again')
-        .to_return(:status => 200, :body => response_body, :headers => {})
+        .to_return(status: 200, body: response_body, headers: {})
       importer.send_imported_content(course, content_migration, content)
       assert_requested(:post, 'https://lti.example.com/begin_import_again', {
                          body: hash_including(context_id: Lti::Asset.opaque_identifier_for(course))
@@ -244,7 +244,7 @@ RSpec.describe Lti::ContentMigrationService::Importer do
         status: 'processing',
       }.to_json
       stub_request(:get, 'https://lti.example.com/imports/42/status')
-        .to_return(:status => 200, :body => response_body, :headers => {})
+        .to_return(status: 200, body: response_body, headers: {})
       expect(importer).not_to be_import_completed
     end
 
@@ -253,7 +253,7 @@ RSpec.describe Lti::ContentMigrationService::Importer do
         status: 'completed',
       }.to_json
       stub_request(:get, 'https://lti.example.com/imports/42/status')
-        .to_return(:status => 200, :body => response_body, :headers => {})
+        .to_return(status: 200, body: response_body, headers: {})
       expect(importer).to be_import_completed
     end
   end

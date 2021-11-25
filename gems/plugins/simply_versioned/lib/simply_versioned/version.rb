@@ -36,7 +36,7 @@ module SimplyVersioned
   # this class from your app/models/ folder
   # with app/models/version.rb
   class Version < ActiveRecord::Base # :nodoc:
-    belongs_to :versionable, :polymorphic => true
+    belongs_to :versionable, polymorphic: true
 
     validates_presence_of :versionable_id, :versionable_type
 

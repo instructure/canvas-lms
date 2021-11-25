@@ -24,7 +24,7 @@ IMS::LTI::Models::ContentItems::ContentItem.add_attribute :canvas_url, json_key:
 class ExternalContentController < ApplicationController
   include Lti::Concerns::Oembed
 
-  protect_from_forgery :except => [:selection_test, :success], with: :exception
+  protect_from_forgery except: [:selection_test, :success], with: :exception
 
   before_action :require_user, only: :oembed_retrieve, if: -> { require_oembed_token? }
   before_action :validate_oembed_token!, only: :oembed_retrieve, if: -> { require_oembed_token? }
@@ -104,7 +104,7 @@ class ExternalContentController < ApplicationController
     rescue
       content_item = {}
     end
-    render :json => [content_item]
+    render json: [content_item]
   end
 
   # this is a simple LTI link selection extension example

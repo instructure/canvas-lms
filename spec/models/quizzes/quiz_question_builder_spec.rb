@@ -70,7 +70,7 @@ describe Quizzes::QuizQuestionBuilder do
 
     context 'with a question bank entry' do
       before(:once) do
-        @bank = @course.assessment_question_banks.create!(:title => 'Test Bank')
+        @bank = @course.assessment_question_banks.create!(title: 'Test Bank')
         @quiz = @course.quizzes.create!
       end
 
@@ -175,7 +175,7 @@ describe Quizzes::QuizQuestionBuilder do
 
       context 'linked to a question bank' do
         before(:once) do
-          @bank = @course.assessment_question_banks.create!(:title => 'Test Bank')
+          @bank = @course.assessment_question_banks.create!(title: 'Test Bank')
 
           @group.update_attribute(:assessment_question_bank_id, @bank.id)
         end
@@ -278,7 +278,7 @@ describe Quizzes::QuizQuestionBuilder do
   end
 
   describe '#shuffle_answers' do
-    let(:question) { { :answers => answers } }
+    let(:question) { { answers: answers } }
     let(:answers) { %w[a b c] }
 
     context "on a shuffle answers question" do
@@ -314,7 +314,7 @@ describe Quizzes::QuizQuestionBuilder do
   end
 
   describe '#shuffle_matches' do
-    let(:question) { { :matches => matches } }
+    let(:question) { { matches: matches } }
     let(:matches) { %w[a b c] }
 
     it "shuffles matches for a matching question" do

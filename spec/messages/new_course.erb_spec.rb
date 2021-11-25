@@ -22,7 +22,7 @@ require_relative 'messages_helper'
 
 describe 'new_course' do
   before :once do
-    course_model(:reusable => true)
+    course_model(reusable: true)
   end
 
   let(:asset) { @course }

@@ -28,7 +28,7 @@ describe "page views" do
     course_with_teacher_logged_in(active_all: 1, user: @user)
     @topic = @course.discussion_topics.create!
 
-    post "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries", params: { :message => 'hello' }
+    post "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries", params: { message: 'hello' }
     expect(response).to be_successful
 
     pv = PageView.last
@@ -61,7 +61,7 @@ describe "page views" do
     @topic = @course.discussion_topics.create!
     enable_default_developer_key!
 
-    post "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries", params: { :message => 'hello', access_token: @user.access_tokens.create!.full_token }
+    post "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries", params: { message: 'hello', access_token: @user.access_tokens.create!.full_token }
     expect(response).to be_successful
 
     pv = PageView.last
@@ -73,13 +73,13 @@ describe "page views" do
 
   describe "update" do
     it "sets the canvas meta header on interaction_seconds update" do
-      course_with_teacher_logged_in(:active_all => 1)
+      course_with_teacher_logged_in(active_all: 1)
       page_view = PageView.new
       page_view.request_id = rand(10_000_000).to_s
       page_view.user = @user
       page_view.save
 
-      put "/page_views/#{page_view.id}", params: { :page_view_token => page_view.token, :interaction_seconds => 42 }, xhr: true
+      put "/page_views/#{page_view.id}", params: { page_view_token: page_view.token, interaction_seconds: 42 }, xhr: true
       expect(response).to be_successful
       expect(response['X-Canvas-Meta']).to match(/r=#{page_view.request_id}\|#{page_view.created_at.iso8601(2)}\|42;/)
     end

@@ -51,7 +51,7 @@ module Lti
         render json: external_tool_json(tool, context, @current_user, session), content_type: MIME_TYPE
       else
         tool.destroy if tool.persisted?
-        render :json => tool.errors, :status => :bad_request, content_type: MIME_TYPE
+        render json: tool.errors, status: :bad_request, content_type: MIME_TYPE
       end
     end
 

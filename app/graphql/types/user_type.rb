@@ -178,7 +178,7 @@ module Types
 
           filter_mode = :or
           filters = Array(filter || [])
-          conversations_scope = conversations_scope.tagged(*filters, :mode => filter_mode) if filters.present?
+          conversations_scope = conversations_scope.tagged(*filters, mode: filter_mode) if filters.present?
           conversations_scope
         end
       end

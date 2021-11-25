@@ -29,7 +29,7 @@ describe "root account basic settings" do
   include_examples "settings basic tests"
 
   it "is able to disable enable_gravatar" do
-    account_admin_user(:active_all => true)
+    account_admin_user(active_all: true)
     user_session(@admin)
     get account_settings_url
 
@@ -43,7 +43,7 @@ describe "root account basic settings" do
 
   context 'editing slack API key' do
     before :once do
-      account_admin_user(:account => Account.site_admin)
+      account_admin_user(account: Account.site_admin)
       @account = Account.default
     end
 
@@ -211,7 +211,7 @@ describe "root account basic settings" do
 
   context "course creation settings" do
     before :once do
-      account_admin_user(:active_all => true)
+      account_admin_user(active_all: true)
     end
 
     before do

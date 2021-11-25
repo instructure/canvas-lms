@@ -54,11 +54,11 @@ class PseudonymSession < Authlogic::Session::Base
 
     token = SessionPersistenceToken.generate(record)
     controller.cookies[cookie_key] = {
-      :value => token.pseudonym_credentials,
-      :expires => remember_me_until,
-      :domain => controller.cookie_domain,
-      :httponly => httponly,
-      :secure => secure,
+      value: token.pseudonym_credentials,
+      expires: remember_me_until,
+      domain: controller.cookie_domain,
+      httponly: httponly,
+      secure: secure,
     }
   end
 
@@ -83,7 +83,7 @@ class PseudonymSession < Authlogic::Session::Base
 
   # added behavior: destroy the server-side SessionPersistenceToken as well as the browser cookie
   def destroy_cookie
-    cookie = controller.cookies.delete cookie_key, :domain => controller.cookie_domain
+    cookie = controller.cookies.delete cookie_key, domain: controller.cookie_domain
     return true unless cookie
 
     token = SessionPersistenceToken.find_by_pseudonym_credentials(cookie)

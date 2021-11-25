@@ -28,15 +28,15 @@ describe AppointmentGroupsController do
     student_in_course(active_all: true)
     teacher_in_course(active_all: true)
     @next_year = Time.now.year + 1
-    @ag = AppointmentGroup.create!(:title => "blah", :contexts => [@course, @course2],
-                                   :new_appointments => [
+    @ag = AppointmentGroup.create!(title: "blah", contexts: [@course, @course2],
+                                   new_appointments: [
                                      ["#{@next_year}-01-01 12:00:00", "#{@next_year}-01-01 13:00:00"],
                                      ["#{@next_year}-02-01 12:00:00", "#{@next_year}-02-01 13:00:00"],
                                    ])
     @ag.publish!
 
-    @ag_with_reservation = AppointmentGroup.create!(:title => "blah", :contexts => [@course, @course2],
-                                                    :new_appointments => [
+    @ag_with_reservation = AppointmentGroup.create!(title: "blah", contexts: [@course, @course2],
+                                                    new_appointments: [
                                                       ["#{@next_year}-01-01 14:00:00", "#{@next_year}-01-01 15:00:00"],
                                                       ["#{@next_year}-02-01 14:00:00", "#{@next_year}-02-01 15:00:00"],
                                                     ])
@@ -46,18 +46,18 @@ describe AppointmentGroupsController do
 
     @group_users = [@group_student, @student]
 
-    @group1 = group(:name => "group1", :group_context => @course)
+    @group1 = group(name: "group1", group_context: @course)
     @group1.participating_users << @group_users
     @group1.save!
     @gc = @group1.group_category
-    @group_ag = AppointmentGroup.create!(:title => "test", :contexts => [@course, @course2],
-                                         :participants_per_appointment => 2,
-                                         :new_appointments => [
+    @group_ag = AppointmentGroup.create!(title: "test", contexts: [@course, @course2],
+                                         participants_per_appointment: 2,
+                                         new_appointments: [
                                            ["#{@next_year}-01-01 17:00:00", "#{@next_year}-01-01 18:00:00"],
                                            ["#{@next_year}-02-01 17:00:00", "#{@next_year}-02-01 18:00:00"],
                                          ])
 
-    @group_ag.appointment_group_sub_contexts.create! :sub_context => @gc, :sub_context_code => @gc.asset_string
+    @group_ag.appointment_group_sub_contexts.create! sub_context: @gc, sub_context_code: @gc.asset_string
     @group_ag.appointments.first.reserve_for(@group1, @group_student)
     @group_ag.publish!
   end
@@ -75,36 +75,36 @@ describe AppointmentGroupsController do
 
   describe "GET 'show'" do
     it "without appointment - redirects to the agenda on date of appt. in find_appointment mode" do
-      get 'show', params: { :id => @ag.to_param }
+      get 'show', params: { id: @ag.to_param }
       check_redirect(response, 'view_name' => 'agenda', 'view_start' => "#{@next_year}-01-01",
                                'find_appointment' => @course.asset_string)
     end
 
     it "redirects to a specific event on the month view" do
-      get 'show', params: { :id => @ag.to_param, :event_id => @ag.appointments.last.to_param }
+      get 'show', params: { id: @ag.to_param, event_id: @ag.appointments.last.to_param }
       check_redirect(response, 'view_name' => 'month', 'view_start' => "#{@next_year}-02-01")
     end
 
     it "with appt it redirects to the agenda, starting at the date of appt. group" do
-      get 'show', params: { :id => @ag_with_reservation.to_param }
+      get 'show', params: { id: @ag_with_reservation.to_param }
       check_redirect(response, 'view_name' => 'agenda', 'view_start' => "#{@next_year}-01-01")
     end
 
     it "with appt it redirects to a specific event in month view" do
-      get 'show', params: { :id => @ag_with_reservation.to_param, :event_id => @reservation.to_param }
+      get 'show', params: { id: @ag_with_reservation.to_param, event_id: @reservation.to_param }
       check_redirect(response, { 'view_name' => 'month', 'view_start' => "#{@next_year}-02-01" },
                      "event_id=#{@reservation.id}")
     end
 
     it "with appt it redirects to a specific parent event in month view if requester did not create the event." do
       user_session @teacher
-      get 'show', params: { :id => @ag_with_reservation.to_param, :event_id => @reservation.to_param }
+      get 'show', params: { id: @ag_with_reservation.to_param, event_id: @reservation.to_param }
       check_redirect(response, { 'view_name' => 'month', 'view_start' => "#{@next_year}-02-01" },
                      "event_id=#{@reservation.parent_event.id}")
     end
 
     it "with group appt it redirects to the agenda, starting at the date of appt. group, no find appt. mode." do
-      get 'show', params: { :id => @group_ag.to_param }
+      get 'show', params: { id: @group_ag.to_param }
       check_redirect(response, 'view_name' => 'agenda', 'view_start' => "#{@next_year}-01-01")
     end
   end

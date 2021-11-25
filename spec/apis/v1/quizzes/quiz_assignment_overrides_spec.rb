@@ -23,7 +23,7 @@ require_relative '../../api_spec_helper'
 describe Quizzes::QuizAssignmentOverridesController, type: :request do
   describe '[GET] /courses/:course_id/quizzes/assignment_overrides' do
     before do
-      course_with_teacher(:active_all => true)
+      course_with_teacher(active_all: true)
       @quiz = @course.quizzes.create! title: 'title'
       @quiz.workflow_state = 'available'
       @quiz.build_assignment
@@ -35,8 +35,8 @@ describe Quizzes::QuizAssignmentOverridesController, type: :request do
       user_factory(active_all: true) # not enrolled
 
       raw_api_call(:get, "/api/v1/courses/#{@course.id}/quizzes/assignment_overrides",
-                   { :controller => "quizzes/quiz_assignment_overrides", :action => "index", :format => "json", :course_id => @course.id.to_s },
-                   { :quiz_assignment_overrides => [{ :quiz_ids => [@quiz.id] }] })
+                   { controller: "quizzes/quiz_assignment_overrides", action: "index", format: "json", course_id: @course.id.to_s },
+                   { quiz_assignment_overrides: [{ quiz_ids: [@quiz.id] }] })
 
       expect(response.code).to eq '401'
     end
@@ -53,10 +53,10 @@ describe Quizzes::QuizAssignmentOverridesController, type: :request do
       expect(@quiz.reload.assignment_overrides.count).to eq 1
 
       json = api_call(:get, "/api/v1/courses/#{@course.id}/quizzes/assignment_overrides", {
-                        :controller => 'quizzes/quiz_assignment_overrides',
-                        :action => 'index',
-                        :format => 'json',
-                        :course_id => @course.id.to_s
+                        controller: 'quizzes/quiz_assignment_overrides',
+                        action: 'index',
+                        format: 'json',
+                        course_id: @course.id.to_s
                       }, {
                         quiz_assignment_overrides: [{
                           quiz_ids: [@quiz].map(&:id).map(&:to_s)
@@ -91,10 +91,10 @@ describe Quizzes::QuizAssignmentOverridesController, type: :request do
       expect(@quiz.reload.assignment_overrides.count).to eq 1
 
       json = api_call(:get, "/api/v1/courses/#{@course.id}/quizzes/assignment_overrides", {
-                        :controller => 'quizzes/quiz_assignment_overrides',
-                        :action => 'index',
-                        :format => 'json',
-                        :course_id => @course.id.to_s
+                        controller: 'quizzes/quiz_assignment_overrides',
+                        action: 'index',
+                        format: 'json',
+                        course_id: @course.id.to_s
                       }, {
                         quiz_assignment_overrides: [{
                           quiz_ids: [@quiz].map(&:id).map(&:to_s)
@@ -114,16 +114,16 @@ describe Quizzes::QuizAssignmentOverridesController, type: :request do
 
   describe '[GET] /courses/:course_id/new_quizzes/assignment_overrides' do
     before do
-      course_with_teacher(:active_all => true)
+      course_with_teacher(active_all: true)
       @quiz = @course.assignments.create! submission_types: 'external_tool'
       tool = @course.context_external_tools.create!(
-        :name => 'Quizzes.Next',
-        :consumer_key => 'test_key',
-        :shared_secret => 'test_secret',
-        :tool_id => 'Quizzes 2',
-        :url => 'http://example.com/launch'
+        name: 'Quizzes.Next',
+        consumer_key: 'test_key',
+        shared_secret: 'test_secret',
+        tool_id: 'Quizzes 2',
+        url: 'http://example.com/launch'
       )
-      @quiz.external_tool_tag_attributes = { :content => tool }
+      @quiz.external_tool_tag_attributes = { content: tool }
       @quiz.save!
     end
 
@@ -131,8 +131,8 @@ describe Quizzes::QuizAssignmentOverridesController, type: :request do
       user_factory(active_all: true) # not enrolled
 
       raw_api_call(:get, "/api/v1/courses/#{@course.id}/new_quizzes/assignment_overrides",
-                   { :controller => "quizzes/quiz_assignment_overrides", :action => "new_quizzes", :format => "json", :course_id => @course.id.to_s },
-                   { :quiz_assignment_overrides => [{ :quiz_ids => [@quiz.id] }] })
+                   { controller: "quizzes/quiz_assignment_overrides", action: "new_quizzes", format: "json", course_id: @course.id.to_s },
+                   { quiz_assignment_overrides: [{ quiz_ids: [@quiz.id] }] })
 
       expect(response.code).to eq '401'
     end
@@ -148,10 +148,10 @@ describe Quizzes::QuizAssignmentOverridesController, type: :request do
 
       expect(@quiz.reload.assignment_overrides.count).to eq 1
       json = api_call(:get, "/api/v1/courses/#{@course.id}/new_quizzes/assignment_overrides", {
-                        :controller => 'quizzes/quiz_assignment_overrides',
-                        :action => 'new_quizzes',
-                        :format => 'json',
-                        :course_id => @course.id.to_s
+                        controller: 'quizzes/quiz_assignment_overrides',
+                        action: 'new_quizzes',
+                        format: 'json',
+                        course_id: @course.id.to_s
                       }, {
                         quiz_assignment_overrides: [{
                           quiz_ids: [@quiz].map(&:id).map(&:to_s)

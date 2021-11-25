@@ -25,8 +25,8 @@ describe ExternalToolsController do
   include LtiSpecHelper
 
   before :once do
-    course_with_teacher(:active_all => true)
-    student_in_course(:active_all => true)
+    course_with_teacher(active_all: true)
+    student_in_course(active_all: true)
   end
 
   describe "POST 'create'" do

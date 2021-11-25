@@ -27,7 +27,7 @@ RSpec.describe Mutations::CreateSubmissionDraft do
       attachment_with_context(@student),
       attachment_with_context(@student)
     ]
-    @media_object = factory_with_protected_attributes(MediaObject, :media_id => 'm-123456')
+    @media_object = factory_with_protected_attributes(MediaObject, media_id: 'm-123456')
   end
 
   def mutation_str(

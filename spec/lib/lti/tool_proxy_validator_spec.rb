@@ -60,22 +60,22 @@ module Lti
     describe '#errors' do
       it 'returns invalid_service errors' do
         allow(tp_validator).to receive(:errors).and_return(invalid_services_error_messages)
-        expect(tool_proxy_validator.errors).to eq(invalid_services: [{ :id => "some_content_id", :actions => "PUT" }])
+        expect(tool_proxy_validator.errors).to eq(invalid_services: [{ id: "some_content_id", actions: "PUT" }])
       end
 
       it 'returns invalid_capability errors' do
         allow(tp_validator).to receive(:errors).and_return(invalid_capability_error_messages)
-        expect(tool_proxy_validator.errors).to eq({ :invalid_capabilities => ["error"] })
+        expect(tool_proxy_validator.errors).to eq({ invalid_capabilities: ["error"] })
       end
 
       it 'returns invalid_security_contract errors' do
         allow(tp_validator).to receive(:errors).and_return(invalid_security_contract_error_messages)
-        expect(tool_proxy_validator.errors).to eq({ :invalid_security_contract => ["message"] })
+        expect(tool_proxy_validator.errors).to eq({ invalid_security_contract: ["message"] })
       end
 
       it 'returns invalid_security_profiles errors' do
         allow(tp_validator).to receive(:errors).and_return(invalid_security_profile_error_messages)
-        expect(tool_proxy_validator.errors).to eq({ :invalid_security_profiles => ["error"] })
+        expect(tool_proxy_validator.errors).to eq({ invalid_security_profiles: ["error"] })
       end
     end
 

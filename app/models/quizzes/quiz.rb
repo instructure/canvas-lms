@@ -39,35 +39,35 @@ class Quizzes::Quiz < ActiveRecord::Base
   attr_accessor :notify_of_update
 
   has_many :quiz_questions, -> { order(:position) }, dependent: :destroy, class_name: 'Quizzes::QuizQuestion', inverse_of: :quiz
-  has_many :quiz_submissions, :dependent => :destroy, :class_name => 'Quizzes::QuizSubmission'
+  has_many :quiz_submissions, dependent: :destroy, class_name: 'Quizzes::QuizSubmission'
   has_many :submissions, through: :quiz_submissions
   has_many :quiz_groups, -> { order(:position) }, dependent: :destroy, class_name: 'Quizzes::QuizGroup'
   has_many :quiz_statistics, -> { order(:created_at) }, class_name: 'Quizzes::QuizStatistics'
-  has_many :attachments, :as => :context, :inverse_of => :context, :dependent => :destroy
+  has_many :attachments, as: :context, inverse_of: :context, dependent: :destroy
   has_many :quiz_regrades, class_name: 'Quizzes::QuizRegrade'
   has_many :quiz_student_visibilities
   belongs_to :context, polymorphic: [:course]
   belongs_to :assignment
   belongs_to :assignment_group
   belongs_to :root_account, class_name: 'Account'
-  has_many :ignores, :as => :asset
+  has_many :ignores, as: :asset
 
-  validates :description, length: { :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true }
-  validates :title, length: { :maximum => maximum_string_length, :allow_nil => true }
+  validates :description, length: { maximum: maximum_long_text_length, allow_nil: true, allow_blank: true }
+  validates :title, length: { maximum: maximum_string_length, allow_nil: true }
   validates :context_id, presence: true
   validates :context_type, presence: true
   validates :points_possible, numericality: { less_than_or_equal_to: 2_000_000_000, allow_nil: true }
-  validate :validate_quiz_type, :if => :quiz_type_changed?
-  validate :validate_ip_filter, :if => :ip_filter_changed?
-  validate :validate_hide_results, :if => :hide_results_changed?
-  validate :validate_correct_answer_visibility, :if => lambda { |quiz|
+  validate :validate_quiz_type, if: :quiz_type_changed?
+  validate :validate_ip_filter, if: :ip_filter_changed?
+  validate :validate_hide_results, if: :hide_results_changed?
+  validate :validate_correct_answer_visibility, if: lambda { |quiz|
     quiz.show_correct_answers_at_changed? ||
       quiz.hide_correct_answers_at_changed?
   }
   sanitize_field :description, CanvasSanitize::SANITIZE
   copy_authorized_links(:description) { [context, nil] }
 
-  before_save :generate_quiz_data_on_publish, :if => :workflow_state_changed?
+  before_save :generate_quiz_data_on_publish, if: :workflow_state_changed?
   before_save :build_assignment
   before_save :set_defaults
   after_save :update_assignment
@@ -92,7 +92,7 @@ class Quizzes::Quiz < ActiveRecord::Base
   # method would fire first, meaning that the overrides would reflect the
   # last version of the assignment, because the next callback would be a
   # simply_versioned callback updating the version.
-  after_save :link_assignment_overrides, :if => :new_assignment_id?
+  after_save :link_assignment_overrides, if: :new_assignment_id?
 
   resolves_root_account through: :context
 
@@ -182,7 +182,7 @@ class Quizzes::Quiz < ActiveRecord::Base
   def link_assignment_overrides
     override_students = [assignment_override_students]
     overrides = [assignment_overrides]
-    overrides_params = { :quiz_id => id, :quiz_version => version_number }
+    overrides_params = { quiz_id: id, quiz_version: version_number }
 
     if assignment
       override_students += [assignment.assignment_override_students]
@@ -200,7 +200,7 @@ class Quizzes::Quiz < ActiveRecord::Base
     end
 
     override_students.each do |collection|
-      collection.update_all(:assignment_id => assignment_id, :quiz_id => id)
+      collection.update_all(assignment_id: assignment_id, quiz_id: id)
     end
   end
 
@@ -210,7 +210,7 @@ class Quizzes::Quiz < ActiveRecord::Base
 
     if !assignment_id && graded? && (force || !%i[assignment clone migration].include?(@saved_by))
       assignment = self.assignment
-      assignment ||= context.assignments.build(:title => title, :due_at => due_at, :submission_types => 'online_quiz')
+      assignment ||= context.assignments.build(title: title, due_at: due_at, submission_types: 'online_quiz')
       assignment.assignment_group_id = self.assignment_group_id
       assignment.only_visible_to_overrides = only_visible_to_overrides
       assignment.saved_by = :quiz
@@ -267,7 +267,7 @@ class Quizzes::Quiz < ActiveRecord::Base
     end
 
     # TODO: this is hacky, but we don't want callbacks to run because we're in an after_save. Refactor.
-    Quizzes::Quiz.where(:id => self).update_all(:unpublished_question_count => cnt)
+    Quizzes::Quiz.where(id: self).update_all(unpublished_question_count: cnt)
     self.unpublished_question_count = cnt
   rescue
     # TODO: no idea what we're protecting against here
@@ -440,13 +440,13 @@ class Quizzes::Quiz < ActiveRecord::Base
   def update_assignment
     delay_if_production.set_unpublished_question_count if id
     if !assignment_id && @old_assignment_id
-      context_module_tags.preload(:context_module => :content_tags).each(&:confirm_valid_module_requirements)
+      context_module_tags.preload(context_module: :content_tags).each(&:confirm_valid_module_requirements)
     end
     if !graded? && (@old_assignment_id || last_assignment_id)
       ::Assignment.where(
         id: [@old_assignment_id, last_assignment_id].compact,
         submission_types: 'online_quiz'
-      ).update_all(:workflow_state => 'deleted', :updated_at => Time.now.utc)
+      ).update_all(workflow_state: 'deleted', updated_at: Time.now.utc)
       course.recompute_student_scores
       delay_if_production(priority: Delayed::HIGH_PRIORITY).destroy_related_submissions
       ::ContentTag.delete_for(::Assignment.find(@old_assignment_id)) if @old_assignment_id
@@ -458,7 +458,7 @@ class Quizzes::Quiz < ActiveRecord::Base
        (@assignment_id_set || for_assignment?) &&
        @saved_by != :assignment &&
        (graded? || !@old_assignment_id)
-      Quizzes::Quiz.where("assignment_id=? AND id<>?", assignment_id, self).update_all(:workflow_state => 'deleted', :assignment_id => nil, :updated_at => Time.now.utc) if assignment_id
+      Quizzes::Quiz.where("assignment_id=? AND id<>?", assignment_id, self).update_all(workflow_state: 'deleted', assignment_id: nil, updated_at: Time.now.utc) if assignment_id
       self.assignment = @assignment_to_set if @assignment_to_set && !assignment
       a = assignment
       a.quiz&.clear_changes_information # AR#changes persist in after_saves now - needed to prevent an autosave loop
@@ -529,11 +529,11 @@ class Quizzes::Quiz < ActiveRecord::Base
 
   workflow do
     state :created do
-      event :did_edit, :transitions_to => :edited
+      event :did_edit, transitions_to: :edited
     end
 
     state :edited do
-      event :offer, :transitions_to => :available
+      event :offer, transitions_to: :available
     end
 
     state :available
@@ -649,7 +649,7 @@ class Quizzes::Quiz < ActiveRecord::Base
 
     @stored_questions = begin
       data_set = if preview
-                   generate_quiz_data(:persist => false)
+                   generate_quiz_data(persist: false)
                  else
                    quiz_data || []
                  end
@@ -892,7 +892,7 @@ class Quizzes::Quiz < ActiveRecord::Base
 
       if submissions_to_update.any?
         shard.activate do
-          Quizzes::QuizSubmission.where(:id => submissions_to_update).update_all(:workflow_state => 'pending_review', :updated_at => Time.now.utc)
+          Quizzes::QuizSubmission.where(id: submissions_to_update).update_all(workflow_state: 'pending_review', updated_at: Time.now.utc)
         end
       end
     end
@@ -973,9 +973,9 @@ class Quizzes::Quiz < ActiveRecord::Base
 
   def statistics(include_all_versions = true, includes_sis_ids = true)
     quiz_statistics.build(
-      :report_type => 'student_analysis',
-      :includes_all_versions => include_all_versions,
-      :includes_sis_ids => includes_sis_ids
+      report_type: 'student_analysis',
+      includes_all_versions: include_all_versions,
+      includes_sis_ids: includes_sis_ids
     ).report.generate
   end
 
@@ -990,10 +990,10 @@ class Quizzes::Quiz < ActiveRecord::Base
     options[:includes_sis_ids] = false if report_type == 'item_analysis'
 
     quiz_stats_opts = {
-      :report_type => report_type,
-      :includes_all_versions => !!options[:includes_all_versions],
-      :includes_sis_ids => !!options[:includes_sis_ids],
-      :anonymous => anonymous_submissions?
+      report_type: report_type,
+      includes_all_versions: !!options[:includes_all_versions],
+      includes_sis_ids: !!options[:includes_sis_ids],
+      anonymous: anonymous_submissions?
     }
 
     last_quiz_activity = [
@@ -1147,14 +1147,14 @@ class Quizzes::Quiz < ActiveRecord::Base
   scope :include_assignment, -> { preload(:assignment) }
   scope :before, ->(date) { where("quizzes.created_at<?", date) }
   scope :active, -> { where("quizzes.workflow_state<>'deleted'") }
-  scope :not_for_assignment, -> { where(:assignment_id => nil) }
+  scope :not_for_assignment, -> { where(assignment_id: nil) }
   scope :available, -> { where("quizzes.workflow_state = 'available'") }
-  scope :for_course, ->(course_id) { where(:context_type => 'Course', :context_id => course_id) }
+  scope :for_course, ->(course_id) { where(context_type: 'Course', context_id: course_id) }
 
   # NOTE: only use for courses with differentiated assignments on
   scope :visible_to_students_in_course_with_da, lambda { |student_ids, course_ids|
     joins(:quiz_student_visibilities)
-      .where(:quiz_student_visibilities => { :user_id => student_ids, :course_id => course_ids })
+      .where(quiz_student_visibilities: { user_id: student_ids, course_id: course_ids })
   }
 
   # Return all quizzes and their active overrides where either the
@@ -1221,7 +1221,7 @@ class Quizzes::Quiz < ActiveRecord::Base
 
   scope :not_locked, lambda {
     where("(quizzes.unlock_at IS NULL OR quizzes.unlock_at<:now) AND (quizzes.lock_at IS NULL OR quizzes.lock_at>:now)",
-          :now => Time.zone.now)
+          now: Time.zone.now)
   }
 
   scope :not_ignored_by, lambda { |user, purpose|
@@ -1236,7 +1236,7 @@ class Quizzes::Quiz < ActiveRecord::Base
   end
 
   def submission_action_string
-    t :submission_action_take_quiz, "Take %{title}", :title => title
+    t :submission_action_take_quiz, "Take %{title}", title: title
   end
 
   def teachers
@@ -1357,7 +1357,7 @@ class Quizzes::Quiz < ActiveRecord::Base
   # marks a quiz as having unpublished changes
   def self.mark_quiz_edited(id)
     now = Time.now.utc
-    where(:id => id).update_all(:last_edited_at => now, :updated_at => now)
+    where(id: id).update_all(last_edited_at: now, updated_at: now)
   end
 
   def mark_edited!

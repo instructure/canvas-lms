@@ -119,7 +119,7 @@ class AuthenticationProvider::LDAP < AuthenticationProvider
       end
       return true
     rescue SocketError
-      errors.add(:ldap_connection_test, t(:test_host_unknown, "Unknown host: %{host}", :host => auth_host))
+      errors.add(:ldap_connection_test, t(:test_host_unknown, "Unknown host: %{host}", host: auth_host))
     rescue Timeout::Error
       errors.add(:ldap_connection_test, t(:test_connection_timeout, "Timeout when connecting"))
     rescue => e
@@ -141,7 +141,7 @@ class AuthenticationProvider::LDAP < AuthenticationProvider
     errors.add(:ldap_bind_test, t(:test_bind_timeout, "Timeout when binding"))
     false
   rescue => e
-    errors.add(:ldap_bind_test, t(:test_bind_failed, "Failed to bind with the following error: %{error}", :error => e.message))
+    errors.add(:ldap_bind_test, t(:test_bind_failed, "Failed to bind with the following error: %{error}", error: e.message))
     false
   end
 
@@ -162,7 +162,7 @@ class AuthenticationProvider::LDAP < AuthenticationProvider
   rescue => e
     errors.add(
       :ldap_search_test,
-      t(:test_search_failed, "Search failed with the following error: %{error}", :error => e)
+      t(:test_search_failed, "Search failed with the following error: %{error}", error: e)
     )
     false
   end
@@ -171,7 +171,7 @@ class AuthenticationProvider::LDAP < AuthenticationProvider
     ldap = ldap_connection
     filter = ldap_filter(username)
     begin
-      res = ldap.bind_as(:base => ldap.base, :filter => filter, :password => password)
+      res = ldap.bind_as(base: ldap.base, filter: filter, password: password)
       return true if res
 
       errors.add(
@@ -181,7 +181,7 @@ class AuthenticationProvider::LDAP < AuthenticationProvider
     rescue Net::LDAP::LdapError => e
       errors.add(
         :ldap_login_test,
-        t(:test_login_auth_exception, "Exception on login: %{error}", :error => e)
+        t(:test_login_auth_exception, "Exception on login: %{error}", error: e)
       )
     end
     false
