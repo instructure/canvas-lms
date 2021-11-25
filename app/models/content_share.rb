@@ -20,22 +20,22 @@
 
 class ContentShare < ActiveRecord::Base
   TYPE_TO_CLASS = {
-    'assignment' => Assignment,
-    'attachment' => Attachment,
-    'discussion_topic' => DiscussionTopic,
-    'page' => WikiPage,
-    'quiz' => Quizzes::Quiz,
-    'module' => ContextModule,
-    'module_item' => ContentTag
+    "assignment" => Assignment,
+    "attachment" => Attachment,
+    "discussion_topic" => DiscussionTopic,
+    "page" => WikiPage,
+    "quiz" => Quizzes::Quiz,
+    "module" => ContextModule,
+    "module_item" => ContentTag
   }.freeze
 
   CLASS_NAME_TO_TYPE = TYPE_TO_CLASS.transform_values(&:to_s).invert.freeze
 
   belongs_to :user
   belongs_to :content_export
-  has_one :course, through: :content_export, source: :context, source_type: 'Course'
-  has_one :group, through: :content_export, source: :context, source_type: 'Group'
-  has_one :context_user, through: :content_export, source: :context, source_type: 'User'
+  has_one :course, through: :content_export, source: :context, source_type: "Course"
+  has_one :group, through: :content_export, source: :context, source_type: "Group"
+  has_one :context_user, through: :content_export, source: :context, source_type: "User"
 
   belongs_to :sender, class_name: "User"
   belongs_to :root_account, class_name: "Account"
@@ -50,7 +50,7 @@ class ContentShare < ActiveRecord::Base
     receiver.received_content_shares.create!(sender: user,
                                              content_export: content_export,
                                              name: name,
-                                             read_state: 'unread')
+                                             read_state: "unread")
   end
 
   def set_root_account_id

@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-describe 'Canvadoc' do
+describe "Canvadoc" do
   def stub_upload
     expectation = receive(:upload).and_return "id" => 123_456, "status" => "pending"
     allow_any_instance_of(Canvadocs::API).to expectation
@@ -26,7 +26,7 @@ describe 'Canvadoc' do
   end
 
   before do
-    PluginSetting.create! name: 'canvadocs',
+    PluginSetting.create! name: "canvadocs",
                           settings: { "api_key" => "blahblahblahblahblah",
                                       "base_url" => "http://example.com",
                                       "annotations_supported" => true }
@@ -96,20 +96,20 @@ describe 'Canvadoc' do
       @doc.upload
       @doc.has_annotations = true
       canvadocs_api = @doc.send(:canvadocs_api)
-      expect(canvadocs_api).to receive(:session).with(anything, hash_including(annotation_context: 'default')).and_return({})
+      expect(canvadocs_api).to receive(:session).with(anything, hash_including(annotation_context: "default")).and_return({})
       @doc.session_url(user: @attachment.user, enable_annotations: true)
     end
 
     it "Creates test context for annotation session" do
       allow(ApplicationController).to receive(:test_cluster?).and_return(true)
-      allow(ApplicationController).to receive(:test_cluster_name).and_return('super-secret-testing')
+      allow(ApplicationController).to receive(:test_cluster_name).and_return("super-secret-testing")
 
       @doc.upload
       @doc.has_annotations = true
 
       canvadocs_api = @doc.send(:canvadocs_api)
 
-      expect(canvadocs_api).to receive(:session).with(anything, hash_including(annotation_context: 'default-super-secret-testing')).and_return({})
+      expect(canvadocs_api).to receive(:session).with(anything, hash_including(annotation_context: "default-super-secret-testing")).and_return({})
       @doc.session_url(user: @attachment.user, enable_annotations: true)
     end
 

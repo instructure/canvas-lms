@@ -57,13 +57,13 @@ class DiscussionTopicsApiController < ApplicationController
   #         -H 'Authorization: Bearer <token>'
   def show
     include_params = Array(params[:include])
-    log_asset_access(@topic, 'topics', 'topics')
+    log_asset_access(@topic, "topics", "topics")
     render(json: discussion_topics_api_json([@topic], @context,
                                             @current_user, session,
-                                            include_all_dates: include_params.include?('all_dates'),
-                                            include_sections: include_params.include?('sections'),
-                                            include_sections_user_count: include_params.include?('sections_user_count'),
-                                            include_overrides: include_params.include?('overrides')).first)
+                                            include_all_dates: include_params.include?("all_dates"),
+                                            include_sections: include_params.include?("sections"),
+                                            include_sections_user_count: include_params.include?("sections_user_count"),
+                                            include_overrides: include_params.include?("overrides")).first)
   end
 
   # @API Get the full topic
@@ -124,7 +124,7 @@ class DiscussionTopicsApiController < ApplicationController
   def view
     return unless authorized_action(@topic, @current_user, :read_replies)
 
-    log_asset_access(@topic, 'topics', 'topics')
+    log_asset_access(@topic, "topics", "topics")
 
     mobile_brand_config = !in_app? && @context.account.effective_brand_config
     opts = {
@@ -210,7 +210,7 @@ class DiscussionTopicsApiController < ApplicationController
         new_entries: json_cast(new_entries).to_json,
       }
       fragments = fragments.map { |k, v| %("#{k}": #{v}) }
-      render json: "{ #{fragments.join(', ')} }"
+      render json: "{ #{fragments.join(", ")} }"
     else
       head :service_unavailable
     end
@@ -255,7 +255,7 @@ class DiscussionTopicsApiController < ApplicationController
     # Require topic hook forbids duplicating of child, nonexistent, and deleted topics
     # The only extra check we need is to prevent duplicating announcements.
     if @topic.is_announcement
-      return render json: { error: t('announcements cannot be duplicated') }, status: :bad_request
+      return render json: { error: t("announcements cannot be duplicated") }, status: :bad_request
     end
 
     return unless authorized_action(@topic, @current_user, :duplicate)
@@ -288,7 +288,7 @@ class DiscussionTopicsApiController < ApplicationController
       end
       render json: result
     else
-      render json: { error: t('unable to save new discussion topic') }, status: :bad_request
+      render json: { error: t("unable to save new discussion topic") }, status: :bad_request
     end
   end
 
@@ -553,7 +553,7 @@ class DiscussionTopicsApiController < ApplicationController
   #        -H "Authorization: Bearer <token>" \
   #        -H "Content-Length: 0"
   def mark_all_read
-    change_topic_all_read_state('read')
+    change_topic_all_read_state("read")
   end
 
   # @API Mark all entries as unread
@@ -573,7 +573,7 @@ class DiscussionTopicsApiController < ApplicationController
   #        -X DELETE \
   #        -H "Authorization: Bearer <token>"
   def mark_all_unread
-    change_topic_all_read_state('unread')
+    change_topic_all_read_state("unread")
   end
 
   # @API Mark entry as read
@@ -685,7 +685,7 @@ class DiscussionTopicsApiController < ApplicationController
 
     # neither the current user nor the enrollment user (if any) has posted yet,
     # so give them the forbidden status
-    render json: 'require_initial_post', status: :forbidden
+    render json: "require_initial_post", status: :forbidden
     false
   end
 
@@ -702,7 +702,7 @@ class DiscussionTopicsApiController < ApplicationController
               quota_exceeded(@current_user, named_context_url(@context, :context_discussion_topic_url, @topic.id))
 
     if @entry.save
-      log_asset_access(@topic, 'topics', 'topics', 'participate')
+      log_asset_access(@topic, "topics", "topics", "participate")
 
       assignment_id = @topic.assignment_id
       submission_id = assignment_id && @topic.assignment.submission_for_student_id(@entry.user_id)&.id

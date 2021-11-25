@@ -18,9 +18,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative 'messages_helper'
+require_relative "messages_helper"
 
-describe 'appointment_canceled_by_user.twitter' do
+describe "appointment_canceled_by_user.twitter" do
   include MessagesCommon
 
   it "renders" do
@@ -31,7 +31,7 @@ describe 'appointment_canceled_by_user.twitter' do
                      data: { updating_user_name: user.name,
                              cancel_reason: "just because" })
 
-    expect(@message.body).to include('some title')
+    expect(@message.body).to include("some title")
     expect(@message.body).to include(user.name)
   end
 
@@ -47,7 +47,7 @@ describe 'appointment_canceled_by_user.twitter' do
                      data: { updating_user_name: user.name,
                              cancel_reason: "just because" })
 
-    expect(@message.body).to include('some title')
+    expect(@message.body).to include("some title")
     expect(@message.body).to include(user.name)
   end
 end

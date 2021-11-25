@@ -317,17 +317,17 @@ class AssignmentOverridesController < ApplicationController
     # check request format
     override_params = deserialize_overrides(params[:assignment_overrides])
     if override_params.blank?
-      return bad_request(errors: ['no assignment_overrides values present'])
+      return bad_request(errors: ["no assignment_overrides values present"])
     elsif !override_params.is_a?(Array) ||
-          !override_params.all? { |o| o.is_a?(ActionController::Parameters) && o.key?('assignment_id') && o.key?('id') }
-      return bad_request(errors: ['must specify an array with entry format { id, assignment_id }'])
+          !override_params.all? { |o| o.is_a?(ActionController::Parameters) && o.key?("assignment_id") && o.key?("id") }
+      return bad_request(errors: ["must specify an array with entry format { id, assignment_id }"])
     end
 
-    all_requests = override_params.group_by { |req| req['assignment_id'].to_i }
+    all_requests = override_params.group_by { |req| req["assignment_id"].to_i }
     assignments = @course.active_assignments.where(id: all_requests.keys).preload(:assignment_overrides)
 
     overrides = all_requests.map do |assignment_id, requests|
-      override_ids = requests.map { |r| r['id'].to_i }
+      override_ids = requests.map { |r| r["id"].to_i }
       assignment = assignments.find { |a| a.id == assignment_id }
       next unless assignment
 
@@ -337,7 +337,7 @@ class AssignmentOverridesController < ApplicationController
     # reorder to match request
     sorted = override_params.map do |req|
       overrides.find do |o|
-        o.id == req['id'].to_i
+        o.id == req["id"].to_i
       end
     end
 
@@ -462,7 +462,7 @@ class AssignmentOverridesController < ApplicationController
     return bad_request(errors: all_errors) if all_errors.present?
 
     overrides = all_data.map do |data|
-      is_update ? data['override'] : data['assignment'].assignment_overrides.build
+      is_update ? data["override"] : data["assignment"].assignment_overrides.build
     end
 
     if update_assignment_overrides(overrides, all_data, updating_user: @current_user)
@@ -471,7 +471,7 @@ class AssignmentOverridesController < ApplicationController
       errors = overrides.map do |override|
         override.errors.presence
       end
-      errors = ['unknown error'] unless errors.compact.present?
+      errors = ["unknown error"] unless errors.compact.present?
       bad_request(errors: errors)
     end
   end

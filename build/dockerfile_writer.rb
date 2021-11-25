@@ -31,7 +31,7 @@ class DockerfileWriter
     @compose_files = compose_files
     @in_file = in_file
     @out_file = out_file
-    @out_file_suffix = ''
+    @out_file_suffix = ""
   end
 
   def production?
@@ -50,7 +50,7 @@ class DockerfileWriter
     <<~RUBY
       # GENERATED FILE, DO NOT MODIFY!
       # To update this file please edit the relevant template and run the generation
-      # task `build/dockerfile_writer.rb --env #{env} --compose-file #{compose_files.join(',')} --in #{in_file} --out #{out_file}`
+      # task `build/dockerfile_writer.rb --env #{env} --compose-file #{compose_files.join(",")} --in #{in_file} --out #{out_file}`
     RUBY
   end
 
@@ -68,7 +68,7 @@ class DockerfileWriter
 
     def <<(obj)
       if @contents[parent.out_file_suffix].nil?
-        @contents[parent.out_file_suffix] = +''
+        @contents[parent.out_file_suffix] = +""
       end
 
       @contents[parent.out_file_suffix] << obj
@@ -76,7 +76,7 @@ class DockerfileWriter
   end
 
   def run
-    contents = eval(Erubi::Engine.new(File.read(in_file), { bufval: 'SuffixedStringWriter.new(self)' }).src + ";_buf.contents") # rubocop:disable Security/Eval
+    contents = eval(Erubi::Engine.new(File.read(in_file), { bufval: "SuffixedStringWriter.new(self)" }).src + ";_buf.contents") # rubocop:disable Security/Eval
 
     contents.each do |k, v|
       File.open(k.empty? ? out_file : "#{out_file}.#{k}", "w") do |f|
@@ -100,7 +100,7 @@ class DockerfileWriter
   end
 
   def yarn_packages
-    JSON.parse(File.read('package.json'))['workspaces']['packages']
+    JSON.parse(File.read("package.json"))["workspaces"]["packages"]
   end
 end
 

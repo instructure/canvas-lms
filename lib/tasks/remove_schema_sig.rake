@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-desc 'Removes the schema line in fixtures, models, and specs.'
+desc "Removes the schema line in fixtures, models, and specs."
 task :remove_schema_signature do
   models = Dir.glob(File.join(File.dirname(__FILE__), %w[.. .. app models]) + "/*.rb")
   specs = Dir.glob(File.join(File.dirname(__FILE__), %w[.. .. spec models]) + "/*.rb")
@@ -15,8 +15,8 @@ def remove_signature(filename)
   return false unless File.exist?(filename)
 
   contents = File.read(filename)
-  contents.gsub!(/\A\# Schema version: \d{14}\z/, '# ')
-  fp = File.open(filename, 'w')
+  contents.gsub!(/\A\# Schema version: \d{14}\z/, "# ")
+  fp = File.open(filename, "w")
   fp.puts contents
   fp.close
 end

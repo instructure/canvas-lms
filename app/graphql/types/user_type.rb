@@ -127,8 +127,8 @@ module Types
     end
 
     field :notification_preferences_enabled, Boolean, null: false do
-      argument :account_id, ID, required: false, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func('Account')
-      argument :course_id, ID, required: false, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func('Course')
+      argument :account_id, ID, required: false, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Account")
+      argument :course_id, ID, required: false, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Course")
       argument :context_type, NotificationPreferencesContextType, required: true
     end
     def notification_preferences_enabled(account_id: nil, course_id: nil, context_type: nil)
@@ -137,9 +137,9 @@ module Types
       end
 
       case context_type
-      when 'Account'
+      when "Account"
         enabled_for[Account.find(account_id)]
-      when 'Course'
+      when "Course"
         enabled_for[Course.find(course_id)]
       end
     rescue ActiveRecord::RecordNotFound
@@ -164,13 +164,13 @@ module Types
       if object == context[:current_user]
         load_association(:all_conversations).then do
           conversations_scope = case scope
-                                when 'unread'
+                                when "unread"
                                   object.conversations.unread
-                                when 'starred'
+                                when "starred"
                                   object.starred_conversations
-                                when 'sent'
+                                when "sent"
                                   object.all_conversations.sent
-                                when 'archived'
+                                when "archived"
                                   object.conversations.archived
                                 else
                                   object.conversations.default
@@ -209,7 +209,7 @@ module Types
       )
 
       per_page = 100
-      contexts_collection = collections.select { |c| c[0] == 'contexts' }
+      contexts_collection = collections.select { |c| c[0] == "contexts" }
       contexts = []
       if contexts_collection.count > 0
         batch = contexts_collection[0][1].paginate(per_page: per_page)
@@ -220,7 +220,7 @@ module Types
         end
       end
 
-      users_collection = collections.select { |c| c[0] == 'participants' }
+      users_collection = collections.select { |c| c[0] == "participants" }
       users = []
       if users_collection.count > 0
         batch = users_collection[0][1].paginate(per_page: per_page)
@@ -308,8 +308,8 @@ module Types
 
       Shard.partition_by_shard(stream_item_instances, ->(sii) { sii.stream_item_id }) do |shard_stream_items|
         submission_ids = StreamItem.where(id: shard_stream_items.map(&:stream_item_id),
-                                          asset_type: 'Submission')
-                                   .select('asset_id')
+                                          asset_type: "Submission")
+                                   .select("asset_id")
         submission_comments += SubmissionComment.preload(submission: { assignment: :context })
                                                 .where(submission_id: submission_ids)
       end

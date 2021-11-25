@@ -61,13 +61,13 @@ class AccountReport < ActiveRecord::Base
   end
 
   scope :complete, -> { where(progress: 100) }
-  scope :running, -> { where(workflow_state: 'running') }
+  scope :running, -> { where(workflow_state: "running") }
   scope :most_recent, -> { order(created_at: :desc).limit(1) }
-  scope :active, -> { where.not(workflow_state: 'deleted') }
+  scope :active, -> { where.not(workflow_state: "deleted") }
 
   alias_method :destroy_permanently!, :destroy
   def destroy
-    self.workflow_state = 'deleted'
+    self.workflow_state = "deleted"
     save!
   end
 
@@ -119,7 +119,7 @@ class AccountReport < ActiveRecord::Base
     end
   end
   handle_asynchronously :run_report, priority: Delayed::LOW_PRIORITY,
-                                     n_strand: proc { |ar| ['account_reports', ar.account.root_account.global_id] },
+                                     n_strand: proc { |ar| ["account_reports", ar.account.root_account.global_id] },
                                      on_permanent_failure: :mark_as_errored
 
   def mark_as_errored

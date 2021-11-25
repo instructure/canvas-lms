@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../../cassandra_spec_helper'
+require_relative "../../cassandra_spec_helper"
 
 describe Auditors::Authentication do
   before do
@@ -37,10 +37,10 @@ describe Auditors::Authentication do
     include_examples "cassandra audit logs"
 
     before do
-      allow(Audits).to receive(:config).and_return({ 'write_paths' => ['cassandra'], 'read_path' => 'cassandra' })
+      allow(Audits).to receive(:config).and_return({ "write_paths" => ["cassandra"], "read_path" => "cassandra" })
       @account = Account.default
       user_with_pseudonym(active_all: true)
-      @event = Auditors::Authentication.record(@pseudonym, 'login')
+      @event = Auditors::Authentication.record(@pseudonym, "login")
     end
 
     context "nominal cases" do
@@ -71,7 +71,7 @@ describe Auditors::Authentication do
         allow(Auditors::Authentication::Stream).to receive(:database).and_return(nil)
         expect(CanvasCassandra::DatabaseBuilder).to receive(:configured?).with("auditors").once.and_return(false)
         expect(EventStream::Logger).not_to receive(:error)
-        Auditors::Authentication.record(@pseudonym, 'login')
+        Auditors::Authentication.record(@pseudonym, "login")
       end
     end
 
@@ -122,10 +122,10 @@ describe Auditors::Authentication do
       before do
         @event2 = @pseudonym.shard.activate do
           record = Auditors::Authentication::Record.new(
-            'id' => SecureRandom.uuid,
-            'created_at' => 1.day.ago,
-            'pseudonym' => @pseudonym,
-            'event_type' => 'login'
+            "id" => SecureRandom.uuid,
+            "created_at" => 1.day.ago,
+            "pseudonym" => @pseudonym,
+            "event_type" => "login"
           )
           Auditors::Authentication::Stream.insert(record)
         end
@@ -194,10 +194,10 @@ describe Auditors::Authentication do
           @shard1.activate do
             @account = account_model
             user_with_pseudonym(account: @account, active_all: true)
-            @event1 = Auditors::Authentication.record(@pseudonym, 'login')
+            @event1 = Auditors::Authentication.record(@pseudonym, "login")
           end
           user_with_pseudonym(user: @user, active_all: true)
-          @event2 = Auditors::Authentication.record(@pseudonym, 'login')
+          @event2 = Auditors::Authentication.record(@pseudonym, "login")
         end
 
         it "includes events from the user's native shard" do
@@ -221,10 +221,10 @@ describe Auditors::Authentication do
           @shard2.activate do
             @account = account_model
             user_with_pseudonym(account: @account, active_all: true)
-            @event1 = Auditors::Authentication.record(@pseudonym, 'login')
+            @event1 = Auditors::Authentication.record(@pseudonym, "login")
           end
           user_with_pseudonym(user: @user, active_all: true)
-          @event2 = Auditors::Authentication.record(@pseudonym, 'login')
+          @event2 = Auditors::Authentication.record(@pseudonym, "login")
         end
 
         it "includes events from the user's native shard" do
@@ -247,10 +247,10 @@ describe Auditors::Authentication do
           @shard2.activate do
             @account = account_model
             user_with_pseudonym(account: @account, active_all: true)
-            @event1 = Auditors::Authentication.record(@pseudonym, 'login')
+            @event1 = Auditors::Authentication.record(@pseudonym, "login")
           end
           user_with_pseudonym(user: @user, active_all: true)
-          @event2 = Auditors::Authentication.record(@pseudonym, 'login')
+          @event2 = Auditors::Authentication.record(@pseudonym, "login")
         end
 
         it "includes events from the user's native shard" do
@@ -270,10 +270,10 @@ describe Auditors::Authentication do
 
   describe "with dual writing enabled to postgres" do
     before do
-      allow(Audits).to receive(:config).and_return({ 'write_paths' => ['cassandra', 'active_record'], 'read_path' => 'cassandra' })
+      allow(Audits).to receive(:config).and_return({ "write_paths" => ["cassandra", "active_record"], "read_path" => "cassandra" })
       @account = Account.default
       user_with_pseudonym(active_all: true)
-      @event = Auditors::Authentication.record(@pseudonym, 'login')
+      @event = Auditors::Authentication.record(@pseudonym, "login")
     end
 
     it "writes to cassandra" do
@@ -291,10 +291,10 @@ describe Auditors::Authentication do
 
   describe "with reading from postgres" do
     before do
-      allow(Audits).to receive(:config).and_return({ 'write_paths' => ['cassandra', 'active_record'], 'read_path' => 'active_record' })
+      allow(Audits).to receive(:config).and_return({ "write_paths" => ["cassandra", "active_record"], "read_path" => "active_record" })
       @account = Account.default
       user_with_pseudonym(active_all: true)
-      @event = Auditors::Authentication.record(@pseudonym, 'login')
+      @event = Auditors::Authentication.record(@pseudonym, "login")
     end
 
     it "can be read from postgres" do

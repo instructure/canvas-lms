@@ -26,7 +26,7 @@ module Canvas
           # fail but actually succeded in a way that seems like timeout issues. For a migration we'll just override the
           # statement timeout to be 3 minutes. (It should hopefully never take 3 minutes.)
           @cassandra ||= CanvasCassandra::DatabaseBuilder.from_config(cassandra_cluster,
-                                                                      override_options: { 'timeout' => 180 })
+                                                                      override_options: { "timeout" => 180 })
         end
 
         def runnable?

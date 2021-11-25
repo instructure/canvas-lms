@@ -97,7 +97,7 @@ module I18nTasks
     def fix_plural_keys(flat_hash)
       other_keys = flat_hash.keys.grep(/\.other$/)
       other_keys.each do |other_key|
-        one_key = other_key.gsub(/other$/, 'one')
+        one_key = other_key.gsub(/other$/, "one")
         if flat_hash[one_key].nil?
           flat_hash[one_key] = flat_hash[other_key]
         end
@@ -146,7 +146,7 @@ module I18nTasks
       # only do fancy markdown checks on multi-line strings
       if dashed_str.include?("\n")
         matches.concat(scan_and_report(dashed_str, /^(\#{1,6})\s+[^#]*#*$/).map { |m| "h#{m.first.size}" }) # headings
-               .concat(scan_and_report(dashed_str, /^[^=\-\n]+\n^(=+|-+)$/).map { |m| m.first[0] == '=' ? 'h1' : 'h2' }) # moar headings
+               .concat(scan_and_report(dashed_str, /^[^=\-\n]+\n^(=+|-+)$/).map { |m| m.first[0] == "=" ? "h1" : "h2" }) # moar headings
                .concat(scan_and_report(dashed_str, /^((\s*\*\s*){3,}|(\s*-\s*){3,}|(\s*_\s*){3,})$/).map { "hr" })
                .concat(scan_and_report(dashed_str, LIST_ITEM_PATTERN).map { |m| /\d/.match?(m.first) ? "1." : "*" })
       end
@@ -157,7 +157,7 @@ module I18nTasks
     # "* **ohai** * user, *welcome*!" => ["**-wrap", "*-wrap"]
     def wrappers(str)
       pattern = /\*+|\++|`+/
-      str = str.gsub(LIST_ITEM_PATTERN, '') # ignore markdown lists
+      str = str.gsub(LIST_ITEM_PATTERN, "") # ignore markdown lists
       parts = scan_and_report(str, pattern)
       stack = []
       result = []
@@ -191,16 +191,16 @@ module I18nTasks
     private
 
     def init_source(translations)
-      raise "Source does not have any English strings" unless translations.key?('en')
+      raise "Source does not have any English strings" unless translations.key?("en")
 
-      translations['en'].flatten_keys
+      translations["en"].flatten_keys
     end
 
     def init_language(translations)
       raise "Translation file contains multiple languages" if translations.size > 1
 
       language = translations.keys.first
-      raise "Translation file appears to have only English strings" if language == 'en'
+      raise "Translation file appears to have only English strings" if language == "en"
 
       language
     end

@@ -47,24 +47,24 @@ class Eportfolio < ActiveRecord::Base
   alias_method :destroy_permanently!, :destroy
 
   def destroy
-    self.workflow_state = 'deleted'
+    self.workflow_state = "deleted"
     self.deleted_at = Time.now.utc
     save
   end
 
   def restore
-    self.workflow_state = 'active'
+    self.workflow_state = "active"
     self.deleted_at = nil
     save
   end
 
   def flagged_as_possible_spam?
-    spam_status == 'flagged_as_possible_spam'
+    spam_status == "flagged_as_possible_spam"
   end
 
   def spam?(include_possible_spam: true)
-    spam_status == 'marked_as_spam' ||
-      (include_possible_spam && spam_status == 'flagged_as_possible_spam')
+    spam_status == "marked_as_spam" ||
+      (include_possible_spam && spam_status == "flagged_as_possible_spam")
   end
 
   scope :active, -> { where("eportfolios.workflow_state<>'deleted'") }
@@ -124,11 +124,11 @@ class Eportfolio < ActiveRecord::Base
 
   def ensure_defaults
     cat = eportfolio_categories.first
-    cat ||= eportfolio_categories.create!(name: t(:first_category, 'Home'))
+    cat ||= eportfolio_categories.create!(name: t(:first_category, "Home"))
     if cat && cat.eportfolio_entries.empty?
       entry =
-        cat.eportfolio_entries.build(eportfolio: self, name: t('first_entry.title', 'Welcome'))
-      entry.content = t('first_entry.content', 'Nothing entered yet')
+        cat.eportfolio_entries.build(eportfolio: self, name: t("first_entry.title", "Welcome"))
+      entry.content = t("first_entry.content", "Nothing entered yet")
       entry.save!
     end
     cat
@@ -143,7 +143,7 @@ class Eportfolio < ActiveRecord::Base
   end
 
   def flag_as_possible_spam!
-    update!(spam_status: 'flagged_as_possible_spam')
+    update!(spam_status: "flagged_as_possible_spam")
   end
 
   def needs_spam_review?
@@ -152,8 +152,8 @@ class Eportfolio < ActiveRecord::Base
 
   def self.spam_criteria_regexp(type: :title)
     setting_name =
-      type == :title ? 'eportfolio_title_spam_keywords' : 'eportfolio_content_spam_keywords'
-    spam_keywords = Setting.get(setting_name, '').split(',').map(&:strip).reject(&:empty?)
+      type == :title ? "eportfolio_title_spam_keywords" : "eportfolio_content_spam_keywords"
+    spam_keywords = Setting.get(setting_name, "").split(",").map(&:strip).reject(&:empty?)
     return nil if spam_keywords.blank?
 
     escaped_keywords = spam_keywords.map { |token| Regexp.escape(token) }

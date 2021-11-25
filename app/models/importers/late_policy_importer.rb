@@ -18,14 +18,14 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_dependency 'importers'
+require_dependency "importers"
 
 module Importers
   class LatePolicyImporter < Importer
     self.item_class = LatePolicy
 
     def self.process_migration(data, migration)
-      late_policy_data = data['late_policy']
+      late_policy_data = data["late_policy"]
       return unless late_policy_data
 
       late_policy = migration.context.late_policy || migration.context.build_late_policy

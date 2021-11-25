@@ -28,7 +28,7 @@ describe DataFixup::FixOverwrittenFileModuleItems do
     att2.handle_duplicates(:overwrite)
 
     att1.reload
-    expect(att1.file_state).to eq 'deleted'
+    expect(att1.file_state).to eq "deleted"
     expect(att1.replacement_attachment_id).to eq att2.id
     att1.could_be_locked = true
     att1.save!

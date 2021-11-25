@@ -48,10 +48,10 @@ class HostUrl
     # returns "http" or "https" depending on whether this instance of canvas runs over ssl
     def protocol
       unless @@protocol
-        is_secure = if domain_config.key?('ssl')
-                      domain_config['ssl']
-                    elsif Attachment.file_store_config.key?('secure')
-                      Attachment.file_store_config['secure']
+        is_secure = if domain_config.key?("ssl")
+                      domain_config["ssl"]
+                    elsif Attachment.file_store_config.key?("secure")
+                      Attachment.file_store_config["secure"]
                     else
                       Rails.env.production?
                     end
@@ -75,7 +75,7 @@ class HostUrl
         @@default_host = domain_config[:domain]
       end
       res = @@default_host
-      res ||= ENV['RAILS_HOST_WITH_PORT']
+      res ||= ENV["RAILS_HOST_WITH_PORT"]
       res
     end
 
@@ -96,7 +96,7 @@ class HostUrl
     def cdn_host
       # by default only set it for development. useful so that gravatar can
       # proxy our fallback urls
-      host = ENV['CANVAS_CDN_HOST']
+      host = ENV["CANVAS_CDN_HOST"]
       host ||= "canvas.instructure.com" if Rails.env.development?
       host
     end

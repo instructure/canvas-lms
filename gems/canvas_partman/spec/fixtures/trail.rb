@@ -20,12 +20,12 @@
 class CanvasPartmanTest::Trail < ActiveRecord::Base
   include CanvasPartman::Concerns::Partitioned
   self.partitioning_strategy = :by_id
-  self.partitioning_field = 'zoo_id'
+  self.partitioning_field = "zoo_id"
   self.partition_size = 5
 
-  self.table_name = 'partman_trails'
+  self.table_name = "partman_trails"
 
-  belongs_to :zoo, class_name: 'CanvasPartmanTest::Zoo'
+  belongs_to :zoo, class_name: "CanvasPartmanTest::Zoo"
 
   def self.create_schema
     drop_schema

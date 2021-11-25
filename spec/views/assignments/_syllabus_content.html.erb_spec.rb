@@ -18,10 +18,10 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../views_helper'
+require_relative "../views_helper"
 
 describe "/assignments/_syllabus_content" do
-  context 'js_env CAN_READ' do
+  context "js_env CAN_READ" do
     def setup_and_render_context(type, opts = {})
       case type
       when :anonymous
@@ -41,7 +41,7 @@ describe "/assignments/_syllabus_content" do
       user_session(@user) if @user
       view_context(@course, @user)
 
-      render '/assignments/_syllabus_content'
+      render "/assignments/_syllabus_content"
     end
 
     before do
@@ -50,17 +50,17 @@ describe "/assignments/_syllabus_content" do
       @course.save!
     end
 
-    example 'anonymous user (public course)' do
+    example "anonymous user (public course)" do
       setup_and_render_context :anonymous, is_public: true
       expect(@controller.js_env).to include(CAN_READ: true)
     end
 
-    example 'non-enrolled user (public course)' do
+    example "non-enrolled user (public course)" do
       setup_and_render_context :non_enrolled_user, is_public: true
       expect(@controller.js_env).to include(CAN_READ: true)
     end
 
-    example 'enrolled user (non-public course)' do
+    example "enrolled user (non-public course)" do
       setup_and_render_context :enrolled_user
       expect(@controller.js_env).to include(CAN_READ: true)
     end

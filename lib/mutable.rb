@@ -47,7 +47,7 @@ module Mutable
     if submissions.present?
       submission_ids = submissions.pluck(:id)
       stream_items = StreamItem.select(%i[id context_type context_id])
-                               .where(asset_type: 'Submission', asset_id: submission_ids)
+                               .where(asset_type: "Submission", asset_id: submission_ids)
                                .preload(:context).to_a
       stream_item_contexts = stream_items.map { |si| [si.context_type, si.context_id] }
       user_ids = submissions.map(&:user_id).uniq # hide stream items for submission owners, not instructors
@@ -72,7 +72,7 @@ module Mutable
     if submissions.present?
       submission_ids = submissions.pluck(:id)
       stream_items = StreamItem.select(%i[id context_type context_id])
-                               .where(asset_type: 'Submission', asset_id: submission_ids)
+                               .where(asset_type: "Submission", asset_id: submission_ids)
                                .preload(:context).to_a
       stream_item_contexts = stream_items.map { |si| [si.context_type, si.context_id] }
       associated_shards = stream_items.inject([]) { |result, si| result | si.associated_shards }

@@ -18,8 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'spec_helper'
+require "spec_helper"
 
 describe LtiOutbound::LTIContext do
-  it_behaves_like 'an LTI context'
+  it_behaves_like "an LTI context"
 end

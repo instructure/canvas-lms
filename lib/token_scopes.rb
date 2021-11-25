@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 class TokenScopes
-  OAUTH2_SCOPE_NAMESPACE = '/auth/'
+  OAUTH2_SCOPE_NAMESPACE = "/auth/"
   USER_INFO_SCOPE = {
     resource: :oauth2,
     verb: "GET",
@@ -64,8 +64,8 @@ class TokenScopes
     LTI_LIST_DATA_SERVICE_SUBSCRIPTION_SCOPE => I18n.t("Can list subscriptions to data service data."),
     LTI_DESTROY_DATA_SERVICE_SUBSCRIPTION_SCOPE => I18n.t("Can destroy subscription to data service data."),
     LTI_LIST_EVENT_TYPES_DATA_SERVICE_SUBSCRIPTION_SCOPE => I18n.t("Can list categorized event types."),
-    LTI_SHOW_FEATURE_FLAG_SCOPE => I18n.t('Can view feature flags'),
-    LTI_AGS_SHOW_PROGRESS_SCOPE => I18n.t('Can view Progress records associated with the context the tool is installed in'),
+    LTI_SHOW_FEATURE_FLAG_SCOPE => I18n.t("Can view feature flags"),
+    LTI_AGS_SHOW_PROGRESS_SCOPE => I18n.t("Can view Progress records associated with the context the tool is installed in"),
   }.freeze
   LTI_AGS_SCOPES = [
     LTI_AGS_LINE_ITEM_SCOPE,
@@ -112,7 +112,7 @@ class TokenScopes
         controller: route.defaults[:controller]&.to_sym,
         action: route.defaults[:action]&.to_sym,
         verb: route.verb,
-        path: route.path.spec.to_s.gsub(/\(\.:format\)$/, ''),
+        path: route.path.spec.to_s.gsub(/\(\.:format\)$/, ""),
         scope: TokenScopesHelper.scope_from_route(route).freeze,
       }
     end

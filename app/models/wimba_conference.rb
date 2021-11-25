@@ -18,18 +18,18 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'net/http'
-require 'uri'
+require "net/http"
+require "uri"
 
 class WimbaConference < WebConference
   external_url :archive,
-               name: -> { t('external_urls.archive', "Archive") },
-               link_text: -> { t('external_urls.archive_link', "View archive(s)") },
+               name: -> { t("external_urls.archive", "Archive") },
+               link_text: -> { t("external_urls.archive_link", "View archive(s)") },
                restricted_to: ->(conf) { conf.active? || conf.finished? }
 
   def archive_external_url(user, url_id)
     urls = []
-    if (res = send_request('listClass', { 'filter00' => 'archive_of', 'filter00value' => wimba_id, 'attribute' => 'longname' }))
+    if (res = send_request("listClass", { "filter00" => "archive_of", "filter00value" => wimba_id, "attribute" => "longname" }))
       res.delete_prefix("100 OK\n").split(/\n=END RECORD\n?/).each do |match|
         data = match.split("\n").each_with_object({}) do |line, hash|
           key, hash[key.to_sym] = line.split(/=/, 2)
@@ -44,7 +44,7 @@ class WimbaConference < WebConference
           new_date = nil
 
           Time.use_zone(tz) do
-            new_date = datetime_string(DateTime.strptime(date_info[1], '%m/%d/%Y %H:%M'))
+            new_date = datetime_string(DateTime.strptime(date_info[1], "%m/%d/%Y %H:%M"))
           end
 
           data[:longname].sub!(date_info[1], new_date)
@@ -71,17 +71,17 @@ class WimbaConference < WebConference
 
   def send_request(action, opts = {})
     headers = {}
-    if action.to_s == 'Init'
-      url = craft_api_url('NoOp', {
-                            'AuthType' => 'AuthCookieHandler',
-                            'AuthName' => 'Horizon',
-                            'credential_0' => config[:user],
-                            'credential_1' => config[:password_dec]
+    if action.to_s == "Init"
+      url = craft_api_url("NoOp", {
+                            "AuthType" => "AuthCookieHandler",
+                            "AuthName" => "Horizon",
+                            "credential_0" => config[:user],
+                            "credential_1" => config[:password_dec]
                           })
     else
       init_session or return nil
       url = craft_api_url(action, opts)
-      headers['Cookie'] = @auth_cookie
+      headers["Cookie"] = @auth_cookie
     end
 
     uri = URI.parse(url)
@@ -94,11 +94,11 @@ class WimbaConference < WebConference
         5.times do # follow redirects, but not forever
           logger.debug "wimba api call: #{uri.path}?#{uri.query}"
           res = http.request_get("#{uri.path}?#{uri.query}", headers)
-          if res['Set-Cookie'] && res['Set-Cookie'] =~ /AuthCookieHandler_Horizon=.*;/
-            @auth_cookie = headers['Cookie'] = res['Set-Cookie'].sub(/.*(AuthCookieHandler_Horizon=.*?);.*/, '\\1')
+          if res["Set-Cookie"] && res["Set-Cookie"] =~ /AuthCookieHandler_Horizon=.*;/
+            @auth_cookie = headers["Cookie"] = res["Set-Cookie"].sub(/.*(AuthCookieHandler_Horizon=.*?);.*/, "\\1")
           end
           if res.is_a?(Net::HTTPRedirection)
-            url = res['location']
+            url = res["location"]
             uri = URI.parse(url)
           else
             break
@@ -126,37 +126,37 @@ class WimbaConference < WebConference
   end
 
   def touch_user(user)
-    send_request('modifyUser', {
-                   'target' => wimba_id(user.uuid),
-                   'password_type' => 'A',
-                   'first_name' => user.first_name,
-                   'last_name' => user.last_name
+    send_request("modifyUser", {
+                   "target" => wimba_id(user.uuid),
+                   "password_type" => "A",
+                   "first_name" => user.first_name,
+                   "last_name" => user.last_name
                  }) ||
-      send_request('createUser', {
-                     'target' => wimba_id(user.uuid),
-                     'password_type' => 'A',
-                     'first_name' => user.first_name,
-                     'last_name' => user.last_name
+      send_request("createUser", {
+                     "target" => wimba_id(user.uuid),
+                     "password_type" => "A",
+                     "first_name" => user.first_name,
+                     "last_name" => user.last_name
                    })
   end
 
   def add_user_to_conference(user, role = :participant)
     touch_user(user) &&
-      send_request('createRole', {
-                     'target' => wimba_id,
-                     'user_id' => wimba_id(user.uuid),
-                     'role_id' => case role
-                                  when :presenter then 'Instructor'
-                                  when :admin then 'ClassAdmin'
-                                  else 'Student'
+      send_request("createRole", {
+                     "target" => wimba_id,
+                     "user_id" => wimba_id(user.uuid),
+                     "role_id" => case role
+                                  when :presenter then "Instructor"
+                                  when :admin then "ClassAdmin"
+                                  else "Student"
                                   end
                    })
   end
 
   def remove_user_from_conference(user)
-    send_request('deleteRole', {
-                   'target' => wimba_id,
-                   'user_id' => wimba_id(user.uuid)
+    send_request("deleteRole", {
+                   "target" => wimba_id,
+                   "user_id" => wimba_id(user.uuid)
                  })
   end
 
@@ -171,9 +171,9 @@ class WimbaConference < WebConference
   end
 
   def get_auth_token(user)
-    (res = send_request('getAuthToken', {
-                          'target' => wimba_id(user.uuid),
-                          'nickname' => user.name.gsub(/[^a-zA-Z0-9]/, '')
+    (res = send_request("getAuthToken", {
+                          "target" => wimba_id(user.uuid),
+                          "nickname" => user.name.gsub(/[^a-zA-Z0-9]/, "")
                         })) &&
       (token = res.split("\n").detect { |s| s.match(/^authToken/) }) &&
       token.split(/=/, 2).last.chomp
@@ -199,11 +199,11 @@ class WimbaConference < WebConference
     return conference_key if conference_key
 
     self.conference_key = uuid
-    send_request('createClass', {
-                   'target' => wimba_id,
-                   'longname' => title[0, 50],
-                   'preview' => '0', # we want the room open by default
-                   'auto_open_new_archives' => '1'
+    send_request("createClass", {
+                   "target" => wimba_id,
+                   "longname" => title[0, 50],
+                   "preview" => "0", # we want the room open by default
+                   "auto_open_new_archives" => "1"
                  }) or return nil
     save
     conference_key
@@ -211,7 +211,7 @@ class WimbaConference < WebConference
 
   def init_session
     unless @auth_cookie
-      send_request('Init') or return false
+      send_request("Init") or return false
     end
 
     true
@@ -219,15 +219,15 @@ class WimbaConference < WebConference
 
   def conference_status
     active = nil
-    if (res = send_request('statusClass', { 'target' => wimba_id }))
+    if (res = send_request("statusClass", { "target" => wimba_id }))
       res.split(/\r?\n/).each do |str|
         key, value = str.strip.split(/=/, 2)
-        if key == 'num_users'
+        if key == "num_users"
           return :closed unless value.to_i > 0
 
           active = true
         end
-        next unless key == 'roomlock'
+        next unless key == "roomlock"
         return :closed if value.to_i == 1
 
         active = true

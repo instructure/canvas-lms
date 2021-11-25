@@ -41,12 +41,12 @@ class SubmissionComment < ActiveRecord::Base
   attr_writer :updating_user
   attr_accessor :grade_posting_in_progress
 
-  belongs_to :root_account, class_name: 'Account'
+  belongs_to :root_account, class_name: "Account"
   belongs_to :submission
-  belongs_to :author, class_name: 'User'
+  belongs_to :author, class_name: "User"
   belongs_to :assessment_request
   belongs_to :context, polymorphic: [:course]
-  belongs_to :provisional_grade, class_name: 'ModeratedGrading::ProvisionalGrade'
+  belongs_to :provisional_grade, class_name: "ModeratedGrading::ProvisionalGrade"
   has_many :messages, as: :context, inverse_of: :context, dependent: :destroy
   has_many :viewed_submission_comments, dependent: :destroy
 
@@ -58,7 +58,7 @@ class SubmissionComment < ActiveRecord::Base
     submission_attempt = (record.submission.attempt || 0)
     submission_attempt = 1 if submission_attempt == 0
     if value > submission_attempt
-      record.errors.add(attr, 'attempt must not be larger than number of submission attempts')
+      record.errors.add(attr, "attempt must not be larger than number of submission attempts")
     end
   end
   validates :workflow_state, inclusion: { in: ["active"] }, allow_nil: true
@@ -280,7 +280,7 @@ class SubmissionComment < ActiveRecord::Base
   end
 
   def can_read_author?(user, session)
-    RequestCache.cache('user_can_read_author', self, user, session) do
+    RequestCache.cache("user_can_read_author", self, user, session) do
       return false if user.nil? || (author_id != user.id && submission.assignment.anonymize_students?)
 
       author_id == user.id ||
@@ -338,7 +338,7 @@ class SubmissionComment < ActiveRecord::Base
   def infer_details
     self.anonymous = submission.assignment.anonymous_peer_reviews
     self.author_name ||= author.short_name rescue t(:unknown_author, "Someone")
-    self.cached_attachments = attachments.map { |a| OpenObject.build('attachment', a.attributes) }
+    self.cached_attachments = attachments.map { |a| OpenObject.build("attachment", a.attributes) }
     self.context = read_attribute(:context) || submission.assignment.context rescue nil
 
     self.workflow_state ||= "active"
@@ -349,7 +349,7 @@ class SubmissionComment < ActiveRecord::Base
   end
 
   def force_reload_cached_attachments
-    self.cached_attachments = attachments.map { |a| OpenObject.build('attachment', a.attributes) }
+    self.cached_attachments = attachments.map { |a| OpenObject.build("attachment", a.attributes) }
     save
   end
 

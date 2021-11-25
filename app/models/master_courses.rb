@@ -19,7 +19,7 @@
 
 module MasterCourses
   def self.table_name_prefix
-    'master_courses_'
+    "master_courses_"
   end
 
   # probably not be a comprehensive list but oh well
@@ -28,8 +28,8 @@ module MasterCourses
     ContextExternalTool ContextModule ContentTag LearningOutcome LearningOutcomeGroup Quizzes::Quiz Rubric Wiki WikiPage
   ].freeze
 
-  CONTENT_TYPES_FOR_DELETIONS = (ALLOWED_CONTENT_TYPES - ['Wiki']).freeze
-  CONTENT_TYPES_FOR_UNSYNCED_CHANGES = (ALLOWED_CONTENT_TYPES - ['ContentTag', 'Wiki'] + ['Folder']).freeze
+  CONTENT_TYPES_FOR_DELETIONS = (ALLOWED_CONTENT_TYPES - ["Wiki"]).freeze
+  CONTENT_TYPES_FOR_UNSYNCED_CHANGES = (ALLOWED_CONTENT_TYPES - ["ContentTag", "Wiki"] + ["Folder"]).freeze
 
   MIGRATION_ID_PREFIX = "mastercourse_"
 

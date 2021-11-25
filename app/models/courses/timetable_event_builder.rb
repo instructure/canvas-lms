@@ -80,7 +80,7 @@ module Courses
 
       # destroy unused events
       event_context.calendar_events.active.for_timetable.where.not(timetable_code: timetable_codes)
-                   .update_all(workflow_state: 'deleted', deleted_at: Time.now.utc)
+                   .update_all(workflow_state: "deleted", deleted_at: Time.now.utc)
 
       existing_events = event_context.calendar_events.where(timetable_code: timetable_codes).to_a.index_by(&:timetable_code)
       event_hashes.each do |event_hash|
@@ -130,8 +130,8 @@ module Courses
     protected
 
     WEEKDAY_STR_MAP = {
-      'sunday' => 'Sun', 'monday' => 'Mon', 'tuesday' => 'Tue', 'wednesday' => 'Wed', 'thursday' => 'Thu', 'friday' => 'Fri', 'saturday' => 'Sat',
-      'su' => 'Sun', 'm' => 'Mon', 't' => 'Tue', 'w' => 'Wed', 'th' => 'Thu', 'f' => 'Fri', 's' => 'Sat'
+      "sunday" => "Sun", "monday" => "Mon", "tuesday" => "Tue", "wednesday" => "Wed", "thursday" => "Thu", "friday" => "Fri", "saturday" => "Sat",
+      "su" => "Sun", "m" => "Mon", "t" => "Tue", "w" => "Wed", "th" => "Thu", "f" => "Fri", "s" => "Sat"
     }.freeze
     def standardize_weekdays_string(weekdays_string)
       # turn strings like "M,W" into a standard string "Mon,Wed" (for sending back to the client)
@@ -148,7 +148,7 @@ module Courses
     end
 
     WEEKDAY_TO_INT_MAP = {
-      'Sun' => 0, 'Mon' => 1, 'Tue' => 2, 'Wed' => 3, 'Thu' => 4, 'Fri' => 5, 'Sat' => 6
+      "Sun" => 0, "Mon" => 1, "Tue" => 2, "Wed" => 3, "Thu" => 4, "Fri" => 5, "Sat" => 6
     }.freeze
     def parse_weekdays_string(weekdays_string)
       # turn our standard string (e.g. "Tue,Thu") into an array of our special numbers
@@ -165,7 +165,7 @@ module Courses
     end
 
     def sync_event(event, event_hash)
-      event.workflow_state = 'active'
+      event.workflow_state = "active"
       event.title = event_hash[:title] || course.name
       event.start_at = event_hash[:start_at]
       event.end_at = event_hash[:end_at]

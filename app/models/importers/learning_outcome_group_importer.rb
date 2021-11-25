@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_dependency 'importers'
+require_dependency "importers"
 
 module Importers
   class LearningOutcomeGroupImporter < Importer
@@ -62,7 +62,7 @@ module Importers
         item.context = context
         item.mark_as_importing!(migration)
       end
-      item.workflow_state = 'active' # restore deleted ones
+      item.workflow_state = "active" # restore deleted ones
       item.migration_id = hash[:migration_id]
       item.title = hash[:title]
       item.description = hash[:description]
@@ -113,17 +113,17 @@ module Importers
 
     def self.process_children(hash, item, migration, skip_import = false)
       hash[:outcomes]&.each do |child|
-        if child[:type] == 'learning_outcome_group'
+        if child[:type] == "learning_outcome_group"
           child[:parent_group] = item
           Importers::LearningOutcomeGroupImporter.import_from_migration(
             child,
             migration,
             nil,
-            skip_import && !migration.import_object?('learning_outcome_groups', child['migration_id'])
+            skip_import && !migration.import_object?("learning_outcome_groups", child["migration_id"])
           )
         else
           child[:learning_outcome_group] = item
-          if !skip_import || migration.import_object?('learning_outcomes', child['migration_id'])
+          if !skip_import || migration.import_object?("learning_outcomes", child["migration_id"])
             Importers::LearningOutcomeImporter.import_from_migration(child, migration)
           end
         end

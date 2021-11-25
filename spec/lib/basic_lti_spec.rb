@@ -98,7 +98,7 @@ describe BasicLTI do
   end
 
   it "xml converter should handle urls with semicolons" do
-    url = 'http://example.com/other_url;ID=0;STATUS=1;OTHERSTUFFS=%20Dude%20where%20is%20my%20car'
+    url = "http://example.com/other_url;ID=0;STATUS=1;OTHERSTUFFS=%20Dude%20where%20is%20my%20car"
     xml = <<~XML
       <?xml version="1.0" encoding="UTF-8"?>
       <cartridge_basiclti_link xmlns="http://www.imsglobal.org/xsd/imslticc_v1p0"
@@ -121,7 +121,7 @@ describe BasicLTI do
     expect(lti.convert_blti_xml(xml)[:url]).to eq(url)
   end
 
-  context 'whitespace stripping' do
+  context "whitespace stripping" do
     let(:config_xml) do
       <<~XML
         <?xml version="1.0" encoding="UTF-8"?>
@@ -166,19 +166,19 @@ describe BasicLTI do
     end
 
     it "strips leading and trailing whitespace from title" do
-      expect(tool_hash[:title]).to eq('Attendance')
+      expect(tool_hash[:title]).to eq("Attendance")
     end
 
     it "strips leading and trailing whitespace from description" do
-      expect(tool_hash[:description]).to eq('Provides an interactive seating chart and attendance tool')
+      expect(tool_hash[:description]).to eq("Provides an interactive seating chart and attendance tool")
     end
 
     it "strips leading and trailing whitespace from icon url" do
-      expect(tool_hash[:settings][:icon_url]).to eq('https://www.example.com/myattendance/toolicon.png')
+      expect(tool_hash[:settings][:icon_url]).to eq("https://www.example.com/myattendance/toolicon.png")
     end
 
     it "strips leading/trailing whitespace from settings URLs" do
-      expect(tool_hash[:settings]['course_navigation']['url'] =~ /^\s|\s$/).to be_nil
+      expect(tool_hash[:settings]["course_navigation"]["url"] =~ /^\s|\s$/).to be_nil
     end
   end
 end

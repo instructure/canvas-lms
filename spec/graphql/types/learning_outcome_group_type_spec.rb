@@ -27,7 +27,7 @@ describe Types::LearningOutcomeGroupType do
     @parent_group = outcome_group_model(context: Account.default)
     @child_group = outcome_group_model(context: Account.default)
     @child_group3 = outcome_group_model(context: Account.default)
-    @child_group2 = outcome_group_model(context: Account.default, workflow_state: 'deleted')
+    @child_group2 = outcome_group_model(context: Account.default, workflow_state: "deleted")
     outcome_group_model(context: Account.default, vendor_guid: "vendor_guid")
     @outcome_group.learning_outcome_group = @parent_group
     @outcome_group.save!
@@ -147,16 +147,16 @@ describe Types::LearningOutcomeGroupType do
     end
   end
 
-  describe '#child_groups_count' do
-    it 'returns the total active outcome groups' do
+  describe "#child_groups_count" do
+    it "returns the total active outcome groups" do
       expect(outcome_group_type.resolve("childGroupsCount")).to eq 2
       @child_group.destroy
       expect(outcome_group_type.resolve("childGroupsCount")).to eq 1
     end
   end
 
-  describe '#outcomes_count' do
-    it 'returns the total outcomes at the nested outcome groups' do
+  describe "#outcomes_count" do
+    it "returns the total outcomes at the nested outcome groups" do
       expect(outcome_group_type.resolve("outcomesCount")).to eq 2
     end
 
@@ -165,12 +165,12 @@ describe Types::LearningOutcomeGroupType do
     end
   end
 
-  describe '#not_imported_outcomes_count' do
+  describe "#not_imported_outcomes_count" do
     before(:once) do
-      @course = course_model name: 'course', account: @account, workflow_state: 'created'
-      @parent_course_group = @course.learning_outcome_groups.create!(title: 'parent course group')
-      @child_course_group1 = @course.learning_outcome_groups.create!(title: 'child course group level 1')
-      @child_course_group2 = @course.learning_outcome_groups.create!(title: 'child course group level 2')
+      @course = course_model name: "course", account: @account, workflow_state: "created"
+      @parent_course_group = @course.learning_outcome_groups.create!(title: "parent course group")
+      @child_course_group1 = @course.learning_outcome_groups.create!(title: "child course group level 1")
+      @child_course_group2 = @course.learning_outcome_groups.create!(title: "child course group level 2")
       @child_course_group1.learning_outcome_group = @parent_course_group
       @child_course_group1.save!
       @child_course_group2.learning_outcome_group = @child_course_group1
@@ -179,12 +179,12 @@ describe Types::LearningOutcomeGroupType do
       @child_course_group2.add_outcome @outcome2
     end
 
-    it 'returns the number of not imported outcomes in the targetGroupId' do
+    it "returns the number of not imported outcomes in the targetGroupId" do
       expect(outcome_group_type.resolve("notImportedOutcomesCount(targetGroupId: #{@child_course_group1.id})")).to eq 0
       expect(outcome_group_type.resolve("notImportedOutcomesCount(targetGroupId: #{@child_course_group2.id})")).to eq 1
     end
 
-    it 'returns nil if no targetGroupId provided' do
+    it "returns nil if no targetGroupId provided" do
       expect(outcome_group_type.resolve("notImportedOutcomesCount")).to eq nil
     end
   end
@@ -247,8 +247,8 @@ describe Types::LearningOutcomeGroupType do
     end
   end
 
-  describe 'group' do
-    it 'returns parent group of an outcome' do
+  describe "group" do
+    it "returns parent group of an outcome" do
       expect(outcome_group_type.resolve("outcomes { edges { group { _id } } }")).to match_array([
                                                                                                   @outcome_group.id.to_s, @outcome_group.id.to_s
                                                                                                 ])

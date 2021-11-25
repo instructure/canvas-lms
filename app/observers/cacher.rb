@@ -21,11 +21,11 @@ class Cacher < ActiveRecord::Observer
   observe :user, :account_user
 
   def self.avatar_cache_key(user_id, account_avatar_setting)
-    ['avatar_img', user_id, account_avatar_setting].cache_key
+    ["avatar_img", user_id, account_avatar_setting].cache_key
   end
 
   def self.inline_avatar_cache_key(user_id, account_avatar_setting)
-    ['inline_avatar_img', user_id, account_avatar_setting].cache_key
+    ["inline_avatar_img", user_id, account_avatar_setting].cache_key
   end
 
   def after_update(obj)

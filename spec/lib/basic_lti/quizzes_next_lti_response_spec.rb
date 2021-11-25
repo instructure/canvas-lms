@@ -29,7 +29,7 @@ describe BasicLTI::QuizzesNextLtiResponse do
   end
 
   let(:tool) do
-    @course.context_external_tools.create(name: "a", url: "http://google.com", consumer_key: '12345', shared_secret: 'secret', tool_id: "Quizzes 2")
+    @course.context_external_tools.create(name: "a", url: "http://google.com", consumer_key: "12345", shared_secret: "secret", tool_id: "Quizzes 2")
   end
 
   let(:assignment) do
@@ -39,7 +39,7 @@ describe BasicLTI::QuizzesNextLtiResponse do
         description: "value for description",
         due_at: Time.zone.now,
         points_possible: "1.5",
-        submission_types: 'external_tool',
+        submission_types: "external_tool",
         external_tool_tag_attributes: { url: tool.url }
       }
     )
@@ -47,7 +47,7 @@ describe BasicLTI::QuizzesNextLtiResponse do
 
   let(:source_id) { gen_source_id }
 
-  let(:launch_url) { 'https://abcdef.com/uuurrrlll00' }
+  let(:launch_url) { "https://abcdef.com/uuurrrlll00" }
 
   let(:timestamp) { 1.day.ago.iso8601(3) }
 
@@ -59,7 +59,7 @@ describe BasicLTI::QuizzesNextLtiResponse do
 
   def gen_source_id(t: tool, c: @course, a: assignment, u: @user)
     tool.shard.activate do
-      payload = [t.id, c.id, a.id, u.id].join('-')
+      payload = [t.id, c.id, a.id, u.id].join("-")
       "#{payload}-#{Canvas::Security.hmac_sha1(payload, tool.shard.settings[:encryption_key])}"
     end
   end
@@ -104,51 +104,51 @@ describe BasicLTI::QuizzesNextLtiResponse do
     it "accepts a grade" do
       request = BasicLTI::BasicOutcomes.process_request(tool, xml)
 
-      expect(request.code_major).to eq 'success'
-      expect(request.body).to eq '<replaceResultResponse />'
+      expect(request.code_major).to eq "success"
+      expect(request.body).to eq "<replaceResultResponse />"
       expect(request.handle_request(tool)).to be_truthy
       submission = assignment.submissions.where(user_id: @user.id).first
       expect(submission.grade).to eq((assignment.points_possible * 0.12).to_s)
     end
 
     it "rejects a grade for an assignment with no points possible" do
-      xml.css('resultData').remove
+      xml.css("resultData").remove
       assignment.points_possible = nil
       assignment.save!
       request = BasicLTI::BasicOutcomes.process_request(tool, xml)
 
-      expect(request.code_major).to eq 'failure'
-      expect(request.body).to eq '<replaceResultResponse />'
-      expect(request.description).to eq 'Assignment has no points possible.'
+      expect(request.code_major).to eq "failure"
+      expect(request.body).to eq "<replaceResultResponse />"
+      expect(request.description).to eq "Assignment has no points possible."
     end
 
     it "doesn't explode when an assignment with no points possible receives a grade for an existing submission" do
-      xml.css('resultData').remove
+      xml.css("resultData").remove
       assignment.points_possible = nil
       assignment.save!
       BasicLTI::BasicOutcomes.process_request(tool, xml)
       request = BasicLTI::BasicOutcomes.process_request(tool, xml)
 
-      expect(request.code_major).to eq 'failure'
-      expect(request.body).to eq '<replaceResultResponse />'
-      expect(request.description).to eq 'Assignment has no points possible.'
+      expect(request.code_major).to eq "failure"
+      expect(request.body).to eq "<replaceResultResponse />"
+      expect(request.description).to eq "Assignment has no points possible."
     end
 
-    it 'handles tools that have a url mismatch with the assignment' do
-      assignment.external_tool_tag_attributes = { url: 'http://example.com/foo' }
+    it "handles tools that have a url mismatch with the assignment" do
+      assignment.external_tool_tag_attributes = { url: "http://example.com/foo" }
       assignment.save!
       request = BasicLTI::BasicOutcomes.process_request(tool, xml)
-      expect(request.code_major).to eq 'failure'
-      expect(request.body).to eq '<replaceResultResponse />'
-      expect(request.description).to eq 'Assignment is no longer associated with this tool'
+      expect(request.code_major).to eq "failure"
+      expect(request.body).to eq "<replaceResultResponse />"
+      expect(request.description).to eq "Assignment is no longer associated with this tool"
     end
 
     it "fails if neither result data or a grade is sent" do
-      xml.css('resultData').remove
-      xml.css('resultScore').remove
+      xml.css("resultData").remove
+      xml.css("resultScore").remove
       request = BasicLTI::BasicOutcomes.process_request(tool, xml)
-      expect(request.code_major).to eq 'failure'
-      expect(request.body).to eq '<replaceResultResponse />'
+      expect(request.code_major).to eq "failure"
+      expect(request.body).to eq "<replaceResultResponse />"
     end
 
     it "reads 'submitted_at' from submissionDetails" do
@@ -165,10 +165,10 @@ describe BasicLTI::QuizzesNextLtiResponse do
       end
 
       it "reads the result_data_launch_url when set" do
-        xml.at_css('text').replace('<ltiLaunchUrl>http://example.com/launch</ltiLaunchUrl>')
+        xml.at_css("text").replace("<ltiLaunchUrl>http://example.com/launch</ltiLaunchUrl>")
         BasicLTI::BasicOutcomes.process_request(tool, xml)
         submission = assignment.submissions.where(user_id: @user.id).first
-        expect(submission.url).to eq 'http://example.com/launch'
+        expect(submission.url).to eq "http://example.com/launch"
       end
     end
 
@@ -183,9 +183,9 @@ describe BasicLTI::QuizzesNextLtiResponse do
       context "with previous versions" do
         let(:launch_urls) do
           [
-            'https://abcdef.com/uuurrrlll01',
-            'https://abcdef.com/uuurrrlll02',
-            'https://abcdef.com/uuurrrlll03'
+            "https://abcdef.com/uuurrrlll01",
+            "https://abcdef.com/uuurrrlll02",
+            "https://abcdef.com/uuurrrlll03"
           ]
         end
 
@@ -199,8 +199,8 @@ describe BasicLTI::QuizzesNextLtiResponse do
             grade, score = assignment.compute_grade_and_score(grade, nil)
             submission.grade = grade
             submission.score = score
-            submission.submission_type = 'basic_lti_launch'
-            submission.workflow_state = 'submitted'
+            submission.submission_type = "basic_lti_launch"
+            submission.workflow_state = "submitted"
             submission.submitted_at = Time.zone.now
             submission.url = launch_urls[i]
             submission.grader_id = -1
@@ -246,14 +246,14 @@ describe BasicLTI::QuizzesNextLtiResponse do
       end
     end
 
-    context 'when json is passed back in resultData/text' do
+    context "when json is passed back in resultData/text" do
       let(:quiz_lti_submission) { BasicLTI::QuizzesNextVersionedSubmission.new(assignment, @user) }
 
       before do
         allow(BasicLTI::QuizzesNextVersionedSubmission).to receive(:new).and_return(quiz_lti_submission)
       end
 
-      context 'when submissionDetails passed includes submitted_at' do
+      context "when submissionDetails passed includes submitted_at" do
         let(:timestamp) { 1.day.ago.iso8601(3) }
 
         it "reads 'submitted_at' from submissionDetails" do
@@ -268,13 +268,13 @@ describe BasicLTI::QuizzesNextLtiResponse do
         end
       end
 
-      context 'when json passed includes graded_at' do
+      context "when json passed includes graded_at" do
         let(:graded_at_time) { 5.hours.ago.iso8601(3) }
         let(:text) { "{ \"graded_at\" : \"#{graded_at_time}\" }" }
 
         before do
           submission = Submission.find_or_initialize_by(assignment: assignment, user: @user)
-          submission.grade = '0.67'
+          submission.grade = "0.67"
           submission.score = 0.67
           submission.graded_at = Time.zone.now
           submission.grade_matches_current_submission = true
@@ -295,7 +295,7 @@ describe BasicLTI::QuizzesNextLtiResponse do
         end
       end
 
-      context 'when json passed includes graded_at and reopened (true)' do
+      context "when json passed includes graded_at and reopened (true)" do
         let(:text) { "{ \"graded_at\" : \"#{1.day.ago.iso8601(3)}\", \"reopened\" : true }" }
 
         it "reads 'graded_at' from resultData" do
@@ -304,7 +304,7 @@ describe BasicLTI::QuizzesNextLtiResponse do
         end
       end
 
-      context 'when json passed includes graded_at and reopened (false)' do
+      context "when json passed includes graded_at and reopened (false)" do
         let(:text) { "{ \"submitted_at\" : \"#{1.day.ago.iso8601(3)}\", \"reopened\" : false }" }
 
         it "reads 'graded_at' from submissionDetails" do

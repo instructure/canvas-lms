@@ -22,10 +22,10 @@ class AddWorkflowStateToProficienciesAndRatings < ActiveRecord::Migration[5.2]
 
   def up
     add_column :outcome_proficiencies, :workflow_state, :string
-    change_column_default(:outcome_proficiencies, :workflow_state, 'active')
+    change_column_default(:outcome_proficiencies, :workflow_state, "active")
 
     add_column :outcome_proficiency_ratings, :workflow_state, :string
-    change_column_default(:outcome_proficiency_ratings, :workflow_state, 'active')
+    change_column_default(:outcome_proficiency_ratings, :workflow_state, "active")
   end
 
   def down

@@ -120,7 +120,7 @@ describe "lti full width launch view" do
 
     context "when the user is an observer" do
       it "warns the observer with a concluded enrollment about a New Quizzes being unavailable" do
-        course.enroll_user(current_user, 'ObserverEnrollment', enrollment_state: "completed")
+        course.enroll_user(current_user, "ObserverEnrollment", enrollment_state: "completed")
         ctrl.send(:content_tag_redirect, Account.default, tag, nil)
         expect(ctrl.response.body).to have_text("no longer available")
       end

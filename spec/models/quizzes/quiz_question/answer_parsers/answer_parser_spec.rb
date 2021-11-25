@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'ostruct'
+require "ostruct"
 
 describe Quizzes::QuizQuestion::AnswerParsers::AnswerParser do
   context "#parse" do

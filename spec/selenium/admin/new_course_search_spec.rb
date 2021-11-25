@@ -17,11 +17,11 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../common'
-require_relative 'pages/new_course_search_page'
-require_relative 'pages/new_course_add_people_modal'
-require_relative 'pages/new_course_add_course_modal'
-require_relative 'pages/course_page'
+require_relative "../common"
+require_relative "pages/new_course_search_page"
+require_relative "pages/new_course_add_people_modal"
+require_relative "pages/new_course_add_course_modal"
+require_relative "pages/course_page"
 
 describe "new account course search" do
   include NewCourseSearchPage
@@ -42,7 +42,7 @@ describe "new account course search" do
   end
 
   it "does not show the courses tab without permission" do
-    @account.role_overrides.create! role: admin_role, permission: 'read_course_list', enabled: false
+    @account.role_overrides.create! role: admin_role, permission: "read_course_list", enabled: false
 
     visit_courses(@account)
     expect(left_navigation).not_to include_text("Courses")
@@ -106,12 +106,12 @@ describe "new account course search" do
     end
 
     visit_courses(@account)
-    term_filter = f('#termFilter')
-    set_value(term_filter, 's')
-    option_list_id = term_filter.attribute('aria-controls')
+    term_filter = f("#termFilter")
+    set_value(term_filter, "s")
+    option_list_id = term_filter.attribute("aria-controls")
     expect(ff("##{option_list_id} [role='option']").count).to eq 2
-    set_value(term_filter, 'spring')
-    term = @account.enrollment_terms.where(name: 'Spring').first
+    set_value(term_filter, "spring")
+    term = @account.enrollment_terms.where(name: "Spring").first
     wait_for_spinner { fj("##{option_list_id} [role='option']:contains(#{term.name})").click }
     expect(rows.count).to eq 1
     expect(rows.first).to include_text(term.name)
@@ -130,7 +130,7 @@ describe "new account course search" do
 
   it "brings up course page when clicking name", priority: "1" do
     named_course = course_factory(account: @account, course_name: "named_course")
-    named_course.default_view = 'feed'
+    named_course.default_view = "feed"
     named_course.save
     visit_courses(@account)
 
@@ -139,7 +139,7 @@ describe "new account course search" do
   end
 
   it "searches but not find bogus course", priority: "1" do
-    bogus = 'jtsdumbthing'
+    bogus = "jtsdumbthing"
     visit_courses(@account)
 
     search(bogus)
@@ -156,7 +156,7 @@ describe "new account course search" do
   end
 
   it "shows manageable roles in new enrollment dialog" do
-    custom_name = 'Custom Student role'
+    custom_name = "Custom Student role"
     custom_student_role(custom_name, account: @account)
 
     @account.role_overrides.create!(permission: "manage_admin_users", enabled: false, role: admin_role)
@@ -175,7 +175,7 @@ describe "new account course search" do
 
     # doing this after the page loads to ensure that the frontend loads them dynamically
     # when the "+ users" is clicked and not as part of the page load
-    sections = ('A'..'Z').map { |i| course.course_sections.create!(name: "Test Section #{i}") }
+    sections = ("A".."Z").map { |i| course.course_sections.create!(name: "Test Section #{i}") }
 
     click_add_users_to_course(@course)
     expect(section_options).to eq(sections.map(&:name))
@@ -199,13 +199,13 @@ describe "new account course search" do
     # make sure it got saved to db correctly
     new_course = Course.last
 
-    expect(new_course.name).to eq('Test Course Name')
-    expect(new_course.course_code).to eq('TCN 101')
-    expect(new_course.account.name).to eq('Test Sub Account')
-    expect(new_course.enrollment_term.name).to eq('Test Enrollment Term')
+    expect(new_course.name).to eq("Test Course Name")
+    expect(new_course.course_code).to eq("TCN 101")
+    expect(new_course.account.name).to eq("Test Sub Account")
+    expect(new_course.enrollment_term.name).to eq("Test Enrollment Term")
 
     # make sure it shows up on the page
-    expect(rows.first).to include_text('Test Course Name')
+    expect(rows.first).to include_text("Test Course Name")
   end
 
   it "lists course name at top of add user modal", priority: "1" do
@@ -216,13 +216,13 @@ describe "new account course search" do
     expect(add_people_header).to include_text(named_course.name)
   end
 
-  context 'with granular permissions enabled' do
+  context "with granular permissions enabled" do
     before do
       @account.root_account.enable_feature!(:granular_permissions_manage_users)
     end
 
     it "only shows non-admin manageable roles in new enrollment dialog" do
-      custom_name = 'Custom Student role'
+      custom_name = "Custom Student role"
       custom_student_role(custom_name, account: @account)
 
       @account.role_overrides.create!(permission: "add_ta_to_course", enabled: false, role: admin_role)
@@ -239,7 +239,7 @@ describe "new account course search" do
     end
 
     it "shows all admin manageable roles in new enrollment dialog" do
-      custom_name = 'Custom Student role'
+      custom_name = "Custom Student role"
       custom_student_role(custom_name, account: @account)
 
       course_factory(account: @account)

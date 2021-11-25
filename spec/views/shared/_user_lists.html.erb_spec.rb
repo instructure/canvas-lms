@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../views_helper'
+require_relative "../views_helper"
 
 describe "shared/_user_lists" do
   it "renders as a course" do
@@ -37,7 +37,7 @@ describe "shared/_user_lists" do
   end
 
   it "renders as a root account with customized login handle" do
-    Account.default.login_handle_name = 'Login'
+    Account.default.login_handle_name = "Login"
     Account.default.save!
     assign(:context, Account.default)
     render partial: "shared/user_lists"

@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'mini_magick'
+require "mini_magick"
 
 module AttachmentFu # :nodoc:
   module Processors
@@ -70,27 +70,27 @@ module AttachmentFu # :nodoc:
           commands.limit("disk", "1000MB") # because arbitrary numbers are arbitrary
 
           # gif are not handled correct, this is a hack, but it seems to work.
-          if img[:format].include?('GIF')
+          if img[:format].include?("GIF")
             img.format("png")
           end
 
           if size.is_a?(Integer) || (size.is_a?(Array) && size.first.is_a?(Integer))
             if size.is_a?(Integer)
               size = [size, size]
-              commands.resize(size.join('x'))
+              commands.resize(size.join("x"))
             else
-              commands.resize(size.join('x') + '!')
+              commands.resize(size.join("x") + "!")
             end
           # extend to thumbnail size
           elsif size.is_a?(String) && size =~ /e$/
-            size = size.delete('e')
-            commands.resize(size.to_s + '>')
-            commands.background('#ffffff')
-            commands.gravity('center')
+            size = size.delete("e")
+            commands.resize(size.to_s + ">")
+            commands.background("#ffffff")
+            commands.gravity("center")
             commands.extent(size)
           # crop thumbnail, the smart way
           elsif size.is_a?(String) && size =~ /c$/
-            size = size.delete('c')
+            size = size.delete("c")
 
             # calculate sizes and aspect ratio
             thumb_width, thumb_height = size.split("x")
@@ -111,8 +111,8 @@ module AttachmentFu # :nodoc:
 
             # don not resize if image is not as height or width then thumbnail
             if image_width < thumb_width || image_height < thumb_height
-              commands.background('#ffffff')
-              commands.gravity('center')
+              commands.background("#ffffff")
+              commands.gravity("center")
               commands.extent(size)
             # resize image
             else

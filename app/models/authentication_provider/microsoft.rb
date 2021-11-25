@@ -70,7 +70,7 @@ class AuthenticationProvider::Microsoft < AuthenticationProvider::OpenIDConnect
   end
 
   def login_attribute
-    super || 'id'
+    super || "id"
   end
 
   protected
@@ -85,13 +85,13 @@ class AuthenticationProvider::Microsoft < AuthenticationProvider::OpenIDConnect
 
   def scope
     result = []
-    requested_attributes = [login_attribute] + federated_attributes.values.map { |v| v['attribute'] }
-    result << 'profile' unless (requested_attributes & %w[name oid preferred_username]).empty?
-    result << 'email' if requested_attributes.include?('email')
-    result.join(' ')
+    requested_attributes = [login_attribute] + federated_attributes.values.map { |v| v["attribute"] }
+    result << "profile" unless (requested_attributes & %w[name oid preferred_username]).empty?
+    result << "email" if requested_attributes.include?("email")
+    result.join(" ")
   end
 
   def tenant_value
-    tenant.presence || 'common'
+    tenant.presence || "common"
   end
 end

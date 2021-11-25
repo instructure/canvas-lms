@@ -21,7 +21,7 @@
 module LiveAssessments
   class Submission < ActiveRecord::Base
     belongs_to :user
-    belongs_to :assessment, class_name: 'LiveAssessments::Assessment'
+    belongs_to :assessment, class_name: "LiveAssessments::Assessment"
 
     validates :user, :assessment, presence: true
 

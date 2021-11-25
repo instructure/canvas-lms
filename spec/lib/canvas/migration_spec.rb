@@ -20,32 +20,32 @@
 describe "Migration package importers" do
   context "Detecting content package type" do
     def get_settings(name)
-      unless name.ends_with?('xml')
-        name += '.zip'
+      unless name.ends_with?("xml")
+        name += ".zip"
       end
       path = File.dirname(__FILE__) + "/../../fixtures/migration/package_identifier/#{name}"
       { export_archive_path: path }
     end
 
     supported = {
-      "Old Canvas Cartridge" => ['old_canvas', CC::Importer::Canvas::Converter],
-      "Canvas Cartridge" => ['canvas', CC::Importer::Canvas::Converter],
+      "Old Canvas Cartridge" => ["old_canvas", CC::Importer::Canvas::Converter],
+      "Canvas Cartridge" => ["canvas", CC::Importer::Canvas::Converter],
       "Common Cartridge 1.0" => ["cc1-0", CC::Importer::Standard::Converter],
       "Common Cartridge 1.1" => ["cc1-1", CC::Importer::Standard::Converter],
       "Common Cartridge 1.2" => ["cc1-2", CC::Importer::Standard::Converter],
       "Common Cartridge 1.3" => ["cc1-3", CC::Importer::Standard::Converter],
       "Common Cartridge 1.3 - flat" => ["cc1-3flat.xml", CC::Importer::Standard::Converter],
       "Common Cartridge 1.3 - thin" => ["cc1-3thin.xml", CC::Importer::Standard::Converter],
-      "QTI packages" => ['qti', Qti::Converter],
-      "WebCT exports (as qti packages)" => ['webct', Qti::Converter],
+      "QTI packages" => ["qti", Qti::Converter],
+      "WebCT exports (as qti packages)" => ["webct", Qti::Converter],
     }
 
     unsupported = {
-      "Blackboard packages" => ['bb_learn', :bb_learn],
+      "Blackboard packages" => ["bb_learn", :bb_learn],
       "Angel 7.3 packages" => ["angel7-3", :angel_7_3],
       "Angel 7.4 packages" => ["angel7-4", :angel_7_4],
-      "D2L packages" => ['d2l', :d2l],
-      "Generic IMS Content Package" => ['ims_cp', :unknown_ims_cp_package],
+      "D2L packages" => ["d2l", :d2l],
+      "Generic IMS Content Package" => ["ims_cp", :unknown_ims_cp_package],
       "Moodle 1.9 Package" => ["moodle1-9", :moodle_1_9],
       "Moodle 2 Package" => ["moodle2", :moodle_2],
       "SCORM 1.1 Package" => ["scorm1-1", :scorm_1_1],
@@ -71,7 +71,7 @@ describe "Migration package importers" do
     end
 
     it "raises a traceable error for invalid packages" do
-      settings = get_settings('invalid')
+      settings = get_settings("invalid")
       archive = Canvas::Migration::Archive.new(settings)
       expect do
         Canvas::Migration::PackageIdentifier.new(archive).identify_package
@@ -86,8 +86,8 @@ describe "Migration package importers" do
 
       mig = Canvas::Migration::Migrator.new({ archive_file: file, content_migration: cm }, "test")
       mig.unzip_archive
-      expect(File).to be_exist(mig.package_root.item_path('messaging/why oh why.txt'))
-      expect(File).to be_exist(mig.package_root.item_path('res00175/SR_Epilogue_Frequently_Asked_Questions.html'))
+      expect(File).to be_exist(mig.package_root.item_path("messaging/why oh why.txt"))
+      expect(File).to be_exist(mig.package_root.item_path("res00175/SR_Epilogue_Frequently_Asked_Questions.html"))
     end
 
     it "creates overview assignments for graded discussion topics and quizzes and pages" do
@@ -130,9 +130,9 @@ describe "Migration package importers" do
         }
       }
       overview = mig.overview
-      expect(overview[:assessments][0][:assignment_migration_id]).to eq 'iaa6f6db92ef0a3b7ee11a636858b691e'
-      expect(overview[:discussion_topics][0][:assignment_migration_id]).to eq 'ie088c19c90e7bb4cbc1a1ad1fd5945a0'
-      expect(overview[:wikis][0][:assignment_migration_id]).to eq 'i2102a7fa93b29226774949298626719d'
+      expect(overview[:assessments][0][:assignment_migration_id]).to eq "iaa6f6db92ef0a3b7ee11a636858b691e"
+      expect(overview[:discussion_topics][0][:assignment_migration_id]).to eq "ie088c19c90e7bb4cbc1a1ad1fd5945a0"
+      expect(overview[:wikis][0][:assignment_migration_id]).to eq "i2102a7fa93b29226774949298626719d"
       expect(overview[:assignment_groups]).to eq([{ migration_id: "iee2a87de283cb9290ee8f39330e1cd13",
                                                     title: "ASSIGNMENT GROUP LOL" }])
       expect(overview[:assignments]).to match_array([{ title: "STUPID QUIZ",

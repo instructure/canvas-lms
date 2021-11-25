@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_dependency 'conditional_release/assignment_set_action'
+require_dependency "conditional_release/assignment_set_action"
 
 module ConditionalRelease
   module Stats
@@ -68,7 +68,7 @@ module ConditionalRelease
             next unless b[:scoring_range].contains_score score
 
             user_details ||= if assignment.anonymize_students?
-                               { name: t('Anonymous User') }
+                               { name: t("Anonymous User") }
                              else
                                {
                                  id: user.id,

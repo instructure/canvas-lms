@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../../common'
+require_relative "../../common"
 
 module ImprovedOutcomeManagementPage
   # ---------------------- Elements ----------------------
@@ -54,7 +54,7 @@ module ImprovedOutcomeManagementPage
   end
 
   def rce_iframe
-    'textentry_text_ifr'
+    "textentry_text_ifr"
   end
 
   def edit_outcome_title_input

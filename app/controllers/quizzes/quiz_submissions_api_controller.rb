@@ -280,7 +280,7 @@ class Quizzes::QuizSubmissionsApiController < ApplicationController
                         @service.create(@quiz)
                       end
 
-    log_asset_access(@quiz, 'quizzes', 'quizzes', 'participate')
+    log_asset_access(@quiz, "quizzes", "quizzes", "participate")
 
     serialize_and_render quiz_submission
   end
@@ -343,7 +343,7 @@ class Quizzes::QuizSubmissionsApiController < ApplicationController
     resource_params = params[:quiz_submissions]
 
     unless resource_params.is_a?(Array)
-      reject! 'missing required key :quiz_submissions'
+      reject! "missing required key :quiz_submissions"
     end
 
     if (resource_params = resource_params[0])
@@ -445,7 +445,7 @@ class Quizzes::QuizSubmissionsApiController < ApplicationController
 
   def validate_ldb_status!(quiz = @quiz)
     if quiz.require_lockdown_browser? && !ldb_plugin.authorized?(self)
-      reject! 'this quiz requires the lockdown browser', :forbidden
+      reject! "this quiz requires the lockdown browser", :forbidden
     end
   end
 

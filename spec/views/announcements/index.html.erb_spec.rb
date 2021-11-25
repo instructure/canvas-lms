@@ -18,14 +18,14 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../views_helper'
+require_relative "../views_helper"
 
 describe "/announcements/index" do
   it "renders" do
     course_with_teacher
     view_context(@course, @user)
     assign(:body_classes, [])
-    render 'announcements/index'
+    render "announcements/index"
     expect(response).not_to be_nil
   end
 end

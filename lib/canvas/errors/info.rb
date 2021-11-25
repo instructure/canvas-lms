@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../errors'
+require_relative "../errors"
 module Canvas
   class Errors
     # This is a class for taking the common context
@@ -81,13 +81,13 @@ module Canvas
 
       def self.useful_http_env_stuff_from_request(req)
         stuff = req.env.slice(*USEFUL_ENV)
-        req_stuff = stuff.merge(filtered_request_params(req, stuff['QUERY_STRING']))
+        req_stuff = stuff.merge(filtered_request_params(req, stuff["QUERY_STRING"]))
         Marshal.load(Marshal.dump(req_stuff))
       end
 
       def self.useful_http_headers(req)
         headers = {
-          user_agent: req.headers['User-Agent']
+          user_agent: req.headers["User-Agent"]
         }
 
         # if we have an oauth1 header lets get the appropriate info from it
@@ -102,12 +102,12 @@ module Canvas
         f = LoggingFilter
         {
           # ActionDispatch::Request#remote_ip has proxy smarts
-          'REMOTE_ADDR' => req.remote_ip,
-          'QUERY_STRING' => f.filter_query_string("?" + (query_string || '')),
-          'REQUEST_URI' => f.filter_uri(req.url),
-          'path_parameters' => f.filter_params(req.path_parameters.dup).inspect,
-          'query_parameters' => f.filter_params(req.query_parameters.dup).inspect,
-          'request_parameters' => f.filter_params(req.request_parameters.dup).inspect[0, MAX_DATA_SIZE],
+          "REMOTE_ADDR" => req.remote_ip,
+          "QUERY_STRING" => f.filter_query_string("?" + (query_string || "")),
+          "REQUEST_URI" => f.filter_uri(req.url),
+          "path_parameters" => f.filter_params(req.path_parameters.dup).inspect,
+          "query_parameters" => f.filter_params(req.query_parameters.dup).inspect,
+          "request_parameters" => f.filter_params(req.request_parameters.dup).inspect[0, MAX_DATA_SIZE],
         }
       end
       private_class_method :filtered_request_params

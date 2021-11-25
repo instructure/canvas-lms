@@ -191,7 +191,7 @@ class AssetUserAccessLog
   # we can drop this config information entirely.
   def self.channel_config(shard)
     settings = DynamicSettings.find(tree: :private, cluster: shard.database_server.id)
-    YAML.safe_load(settings['aua.yml'] || '{}')
+    YAML.safe_load(settings["aua.yml"] || "{}")
   end
 
   # TODO: After completing transition to pulsar, we can remove the "max_log_ids" from this
@@ -484,9 +484,9 @@ class AssetUserAccessLog
         #  we can use the same SQL generation in both paths.
         aggregation_results = compaction_map.map do |aua_id_key, aggregation|
           {
-            'aua_id' => aua_id_key,
-            'view_count' => aggregation[:count],
-            'max_updated_at' => aggregation[:max_updated_at]
+            "aua_id" => aua_id_key,
+            "view_count" => aggregation[:count],
+            "max_updated_at" => aggregation[:max_updated_at]
           }
         end
 
@@ -643,7 +643,7 @@ class AssetUserAccessLog
   def self.truncation_enabled?
     # we can flip this setting when we're pretty sure it's safe to start dropping
     # data, the iterator state will keep it healthy^
-    Setting.get('aua_log_truncation_enabled', 'false') == 'true'
+    Setting.get("aua_log_truncation_enabled", "false") == "true"
   end
 
   def self.reschedule!
@@ -719,7 +719,7 @@ class AssetUserAccessLog
           # be more records greater than the batch, so we will choose
           # the minimum ID greater than the current batch top, because it's safe
           # to advance to that point even under replication lag.
-          next_id = partition_model.where('id > ?', log_id_bookmark).minimum(:id)
+          next_id = partition_model.where("id > ?", log_id_bookmark).minimum(:id)
           if use_pulsar_ripcord_iterators
             # In this case, we actually are advancing because we couldn't find any records
             # we hadn't processed
@@ -727,7 +727,7 @@ class AssetUserAccessLog
             # to the top of the batch because we can safely assume replication lag
             # is not in play and that we need to fast forward to the place where
             # we haven't compacted records yet.
-            next_id = partition_model.where('id > ?', batch_upper_boundary).minimum(:id)
+            next_id = partition_model.where("id > ?", batch_upper_boundary).minimum(:id)
           end
           return false unless next_id.present? # can't find any more records for now, do not advance
 
@@ -819,7 +819,7 @@ class AssetUserAccessLog
         ON aua_log.asset_user_access_id = aua.id
       WHERE aua_log.id > #{log_id_bookmark}
         AND aua_log.id <= #{batch_upper_boundary}
-        AND#{' '}
+        AND#{" "}
     SQL
     default_lower_bounds = [log_id_bookmark] * 7
     root_account_conditions = Account.root_accounts.active.pluck(:id).map do |root_account_id|
@@ -849,7 +849,7 @@ class AssetUserAccessLog
   # AUA record
   def self.compaction_sql(aggregation_results)
     values_list = aggregation_results.map do |row|
-      max_updated_at = row['max_updated_at']
+      max_updated_at = row["max_updated_at"]
       max_updated_at = max_updated_at.to_s(:db)
       "(#{row["aua_id"]}, #{row["view_count"]}, '#{max_updated_at}')"
     end.join(", ")

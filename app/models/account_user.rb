@@ -41,7 +41,7 @@ class AccountUser < ActiveRecord::Base
 
   alias_method :context, :account
 
-  scope :active, -> { where.not(workflow_state: 'deleted') }
+  scope :active, -> { where.not(workflow_state: "deleted") }
 
   include Workflow
   workflow do
@@ -63,12 +63,12 @@ class AccountUser < ActiveRecord::Base
   def destroy
     return if new_record?
 
-    self.workflow_state = 'deleted'
+    self.workflow_state = "deleted"
     save!
   end
 
   def update_account_associations_if_changed
-    being_deleted = workflow_state == 'deleted' && workflow_state_before_last_save != 'deleted'
+    being_deleted = workflow_state == "deleted" && workflow_state_before_last_save != "deleted"
     if (saved_change_to_account_id? || saved_change_to_user_id?) || being_deleted
       if new_record?
         return if %w[creation_pending deleted].include?(user.workflow_state)
@@ -86,7 +86,7 @@ class AccountUser < ActiveRecord::Base
   delegate :update_account_associations_later, to: :user
 
   def infer_defaults
-    self.role ||= Role.get_built_in_role('AccountAdmin', root_account_id: account.resolved_root_account_id)
+    self.role ||= Role.get_built_in_role("AccountAdmin", root_account_id: account.resolved_root_account_id)
   end
 
   def valid_role?
@@ -194,8 +194,8 @@ class AccountUser < ActiveRecord::Base
   end
 
   def self.readable_type(type)
-    if type == 'AccountAdmin' || !type || type.empty?
-      t('types.account_admin', "Account Admin")
+    if type == "AccountAdmin" || !type || type.empty?
+      t("types.account_admin", "Account Admin")
     else
       type
     end
@@ -207,7 +207,7 @@ class AccountUser < ActiveRecord::Base
 
   def self.account_ids_for_user(user)
     @account_ids_for ||= {}
-    @account_ids_for[user.id] ||= Rails.cache.fetch(['account_ids_for_user', user].cache_key) do
+    @account_ids_for[user.id] ||= Rails.cache.fetch(["account_ids_for_user", user].cache_key) do
       AccountUser.active.for_user(user).map(&:account_id)
     end
   end

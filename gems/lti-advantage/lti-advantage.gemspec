@@ -8,7 +8,7 @@ Gem::Specification.new do |spec|
   spec.authors       = ["Instructure"]
   spec.email         = ["opensource@instructure.com"]
 
-  spec.summary       = 'Ruby library for creating IMS LTI tool providers and consumers'
+  spec.summary       = "Ruby library for creating IMS LTI tool providers and consumers"
   spec.homepage      = "http://github.com/instructure/lti-advantage"
   spec.license       = "MIT"
 
@@ -27,7 +27,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   spec.add_runtime_dependency "activemodel", ">= 5.1"
-  spec.add_runtime_dependency 'json-jwt', '~> 1.5'
+  spec.add_runtime_dependency "json-jwt", "~> 1.5"
 
   spec.add_development_dependency "bundler", "~> 2.2"
   spec.add_development_dependency "rake", "~> 10.0"

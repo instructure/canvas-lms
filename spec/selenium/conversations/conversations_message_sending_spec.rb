@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../helpers/conversations_common'
+require_relative "../helpers/conversations_common"
 
 describe "conversations new" do
   include_context "in-process server selenium tests"
@@ -27,7 +27,7 @@ describe "conversations new" do
     conversation_setup
     @s1 = user_factory(name: "first student")
     @s2 = user_factory(name: "second student")
-    [@s1, @s2].each { |s| @course.enroll_student(s).update_attribute(:workflow_state, 'active') }
+    [@s1, @s2].each { |s| @course.enroll_student(s).update_attribute(:workflow_state, "active") }
     cat = @course.group_categories.create(name: "the groups")
     @group = cat.groups.create(name: "the group", context: @course)
     @group.users = [@s1, @s2]
@@ -36,30 +36,30 @@ describe "conversations new" do
   describe "message sending" do
     context "when react_inbox feature flag is off" do
       before do
-        Account.default.set_feature_flag! :react_inbox, 'off'
+        Account.default.set_feature_flag! :react_inbox, "off"
       end
 
       it "shows error messages when no recipient is entered", priority: "1" do
-        get '/conversations'
-        move_to_click('.icon-compose')
+        get "/conversations"
+        move_to_click(".icon-compose")
         click_send
-        errors = ff('.error_text')
-        expect(errors[2].text).to include('Invalid recipient name.')
-        expect(errors[1].text).to include('Required field')
+        errors = ff(".error_text")
+        expect(errors[2].text).to include("Invalid recipient name.")
+        expect(errors[1].text).to include("Required field")
       end
 
       it "starts a group conversation when there is only one recipient", priority: "2" do
         conversations
-        compose course: @course, to: [@s1], subject: 'single recipient', body: 'hallo!'
+        compose course: @course, to: [@s1], subject: "single recipient", body: "hallo!"
         c = @s1.conversations.last.conversation
-        expect(c.subject).to eq('single recipient')
+        expect(c.subject).to eq("single recipient")
       end
 
       it "starts a group conversation when there is more than one recipient", priority: "2" do
         conversations
-        compose course: @course, to: [@s1, @s2], subject: 'multiple recipients', body: 'hallo!'
+        compose course: @course, to: [@s1, @s2], subject: "multiple recipients", body: "hallo!"
         c = @s1.conversations.last.conversation
-        expect(c.subject).to eq('multiple recipients')
+        expect(c.subject).to eq("multiple recipients")
         expect(c.conversation_participants.collect(&:user_id).sort).to eq([@teacher, @s1, @s2].collect(&:id).sort)
       end
 
@@ -67,27 +67,27 @@ describe "conversations new" do
         user = account_admin_user
         user_logged_in({ user: user })
         conversations
-        compose to: [@s1], subject: 'context-free', body: 'hallo!'
+        compose to: [@s1], subject: "context-free", body: "hallo!"
         c = @s1.conversations.last.conversation
-        expect(c.subject).to eq 'context-free'
+        expect(c.subject).to eq "context-free"
         expect(c.context).to eq Account.default
       end
 
       it "does not allow admins without read_roster permission to send a message without picking a context", priority: "1" do
         user = account_admin_user
-        RoleOverride.manage_role_override(Account.default, admin_role, 'read_roster', override: false, locked: false)
+        RoleOverride.manage_role_override(Account.default, admin_role, "read_roster", override: false, locked: false)
         user_logged_in({ user: user })
         conversations
-        f('#compose-btn').click
+        f("#compose-btn").click
         wait_for_animations
-        expect(f('#recipient-row')).to have_attribute(:style, 'display: none;')
+        expect(f("#recipient-row")).to have_attribute(:style, "display: none;")
       end
 
       it "does not allow non-admins to send a message without picking a context", priority: "1" do
         conversations
-        f('#compose-btn').click
+        f("#compose-btn").click
         wait_for_animations
-        expect(f('#recipient-row')).to have_attribute(:style, 'display: none;')
+        expect(f("#recipient-row")).to have_attribute(:style, "display: none;")
       end
 
       it "allows non-admins to send a message to an account-level group", priority: "2" do
@@ -97,16 +97,16 @@ describe "conversations new" do
         @group.save
         user_logged_in({ user: @s1 })
         conversations
-        f('#compose-btn').click
+        f("#compose-btn").click
         wait_for_ajaximations
         select_message_course(@group, true)
         add_message_recipient @s2
-        write_message_subject('blah')
-        write_message_body('bluh')
+        write_message_subject("blah")
+        write_message_body("bluh")
         click_send
         run_jobs
         conv = @s2.conversations.last.conversation
-        expect(conv.subject).to eq 'blah'
+        expect(conv.subject).to eq "blah"
       end
 
       it "allows messages to be sent individually for account-level groups", priority: "2" do
@@ -116,17 +116,17 @@ describe "conversations new" do
         @group.save
         user_logged_in({ user: @s1 })
         conversations
-        f('#compose-btn').click
+        f("#compose-btn").click
         wait_for_ajaximations
         select_message_course(@group, true)
         add_message_recipient @s2
         f("#bulk_message").click
-        write_message_subject('blah')
-        write_message_body('bluh')
+        write_message_subject("blah")
+        write_message_body("bluh")
         click_send
         run_jobs
         conv = @s2.conversations.last.conversation
-        expect(conv.subject).to eq 'blah'
+        expect(conv.subject).to eq "blah"
       end
 
       it "allows admins to message users from their profiles", priority: "2" do
@@ -135,27 +135,27 @@ describe "conversations new" do
         get "/accounts/#{Account.default.id}/users"
         fj('[data-automation="users list"] tr a:has([name="IconMessage"])').click
         wait_for_ajaximations
-        expect(f('.ac-token')).not_to be_nil
+        expect(f(".ac-token")).not_to be_nil
       end
 
       it "allows selecting multiple recipients in one search", priority: "2" do
         conversations
-        f('#compose-btn').click
+        f("#compose-btn").click
         wait_for_ajaximations
         select_message_course(@course)
-        message_recipients_input.send_keys('student')
+        message_recipients_input.send_keys("student")
         driver.action.key_down(modifier).perform
         fj(".ac-result:contains('first student')").click
         driver.action.key_up(modifier).perform
         fj(".ac-result:contains('second student')").click
-        expect(ff('.ac-token').count).to eq 2
+        expect(ff(".ac-token").count).to eq 2
       end
 
       it "does not send the message on shift-enter", priority: "1" do
         conversations
-        compose course: @course, to: [@s1], subject: 'context-free', body: 'hallo!', send: false
+        compose course: @course, to: [@s1], subject: "context-free", body: "hallo!", send: false
         message_body_input.send_keys([:shift, :enter])
-        expect(fj('#compose-new-message:visible')).not_to be_nil
+        expect(fj("#compose-new-message:visible")).not_to be_nil
       end
 
       context "with date-restricted course" do
@@ -172,8 +172,8 @@ describe "conversations new" do
           @course.start_at = 1.day.ago
           @course.save!
 
-          get '/conversations'
-          move_to_click('.icon-compose')
+          get "/conversations"
+          move_to_click(".icon-compose")
           expect(fj("#compose-message-course option:contains('#{@course.name}')")).to be
         end
 
@@ -182,8 +182,8 @@ describe "conversations new" do
           @course.start_at = 1.day.from_now
           @course.save!
 
-          get '/conversations'
-          move_to_click('.icon-compose')
+          get "/conversations"
+          move_to_click(".icon-compose")
           expect(f("#compose-message-course")).not_to contain_jqcss("option:contains('#{@course.name}')")
         end
 
@@ -192,8 +192,8 @@ describe "conversations new" do
           @course.start_at = 2.days.ago
           @course.save!
 
-          get '/conversations'
-          move_to_click('.icon-compose')
+          get "/conversations"
+          move_to_click(".icon-compose")
           expect(f("#compose-message-course")).not_to contain_jqcss("option:contains('#{@course.name}')")
         end
       end
@@ -206,7 +206,7 @@ describe "conversations new" do
 
         it "checks and lock the bulk_message checkbox when over the max size", priority: "2" do
           conversations
-          compose course: @course, subject: 'lockme', body: 'hallo!', send: false
+          compose course: @course, subject: "lockme", body: "hallo!", send: false
 
           f("#recipient-search-btn").click
           wait_for_ajaximations
@@ -219,7 +219,7 @@ describe "conversations new" do
           expect(bulk_cb).to be_disabled
           expect(is_checked(selector)).to be_truthy
 
-          hover_and_click('.ac-token-remove-btn') # remove the token
+          hover_and_click(".ac-token-remove-btn") # remove the token
           wait_for_ajaximations
 
           expect(bulk_cb).not_to be_disabled
@@ -228,7 +228,7 @@ describe "conversations new" do
 
         it "leaves the value the same as before after unlocking", priority: "2" do
           conversations
-          compose course: @course, subject: 'lockme', body: 'hallo!', send: false
+          compose course: @course, subject: "lockme", body: "hallo!", send: false
 
           selector = "#bulk_message"
           bulk_cb = f(selector)
@@ -238,7 +238,7 @@ describe "conversations new" do
           wait_for_ajaximations
           f("li.everyone").click # send to everybody in the course
           wait_for_ajaximations
-          hover_and_click('.ac-token-remove-btn') # remove the token
+          hover_and_click(".ac-token-remove-btn") # remove the token
 
           expect(bulk_cb).not_to be_disabled
           expect(is_checked(selector)).to be_truthy # should still be checked
@@ -250,15 +250,15 @@ describe "conversations new" do
           select_message_course(@course)
 
           # check for auto complete to fill in 'first student'
-          f('.ac-input-cell .ac-input').send_keys('first st')
-          expect(f('.result-name')).to include_text('first student')
+          f(".ac-input-cell .ac-input").send_keys("first st")
+          expect(f(".result-name")).to include_text("first student")
 
-          f('.result-name').click
+          f(".result-name").click
 
-          expect(f('.ac-token')).to include_text('first student')
+          expect(f(".ac-token")).to include_text("first student")
 
-          f('#compose-message-subject').send_keys('Hello out there all you happy people')
-          f('.message-body textarea').send_keys("I'll pay you Tuesday for a hamburger today")
+          f("#compose-message-subject").send_keys("Hello out there all you happy people")
+          f(".message-body textarea").send_keys("I'll pay you Tuesday for a hamburger today")
           click_send
 
           expect_flash_message :success, "Message sent!"
@@ -266,8 +266,8 @@ describe "conversations new" do
 
         context "Message Address Book" do
           before do
-            @t1_name = 'teacher1'
-            @t2_name = 'teacher2'
+            @t1_name = "teacher1"
+            @t2_name = "teacher2"
             @t1 = user_factory(name: @t1_name, active_user: true)
             @t2 = user_factory(name: @t2_name, active_user: true)
             [@t1, @t2].each { |s| @course.enroll_teacher(s) }
@@ -276,29 +276,29 @@ describe "conversations new" do
             goto_compose_modal
             select_message_course(@course)
 
-            f('.message-header-input .icon-address-book').click
+            f(".message-header-input .icon-address-book").click
             wait_for_ajaximations
           end
 
           it "contains categories for teachers, students, and groups", priority: "1" do
-            assert_result_names(true, ['Teachers', 'Students', 'Student Groups'])
+            assert_result_names(true, ["Teachers", "Students", "Student Groups"])
           end
 
           it "categorizes enrolled teachers", priority: "1" do
-            assert_categories('Teachers')
+            assert_categories("Teachers")
             assert_result_names(true, [@t1_name, @t2_name])
             assert_result_names(false, [@s1.name, @s2.name])
           end
 
           it "categorizes enrolled students", priority: "1" do
-            assert_categories('Students')
+            assert_categories("Students")
             assert_result_names(false, [@t1_name, @t2_name])
             assert_result_names(true, [@s1.name, @s2.name])
           end
 
           it "categorizes enrolled students in groups", priority: "1" do
-            assert_categories('Student Groups')
-            assert_categories('the group')
+            assert_categories("Student Groups")
+            assert_categories("the group")
             assert_result_names(false, [@t1_name, @t2_name])
             assert_result_names(true, [@s1.name, @s2.name])
           end
@@ -322,9 +322,9 @@ describe "conversations new" do
   end
 
   def goto_compose_modal
-    fln('Inbox').click
+    fln("Inbox").click
     wait_for_ajaximations
-    move_to_click('.icon-compose')
+    move_to_click(".icon-compose")
     wait_for_ajaximations
     f("#compose-new-message")
   end

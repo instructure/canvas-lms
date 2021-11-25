@@ -17,30 +17,30 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../api_pact_helper'
+require_relative "../api_pact_helper"
 
-RSpec.describe 'Outcomes Service - GET Content Export', :pact do
-  describe 'migration service' do
-    let(:outcomes_secret) { 'secret' }
-    let(:outcomes_key) { 'consumer key' }
-    let(:outcomes_host) { 'localhost:1234' }
+RSpec.describe "Outcomes Service - GET Content Export", :pact do
+  describe "migration service" do
+    let(:outcomes_secret) { "secret" }
+    let(:outcomes_key) { "consumer key" }
+    let(:outcomes_host) { "localhost:1234" }
     let(:export_get_payload) do
       {
-        host: outcomes_host.split(':').first,
+        host: outcomes_host.split(":").first,
         consumer_key: outcomes_key,
-        scope: 'content_migration.export',
+        scope: "content_migration.export",
         exp: 100.years.from_now.to_i,
-        context_type: 'course',
-        context_id: '100',
-        id: '*'
+        context_type: "course",
+        context_id: "100",
+        id: "*"
       }
     end
     let(:export_get_token) { JSON::JWT.new(export_get_payload).sign(outcomes_secret, :HS512) }
     let(:export_get_headers) do
       {
-        'Host' => outcomes_host,
-        'Content-Type' => 'application/json, application/x-www-form-urlencoded',
-        'Authorization' => export_get_token.to_s
+        "Host" => outcomes_host,
+        "Content-Type" => "application/json, application/x-www-form-urlencoded",
+        "Authorization" => export_get_token.to_s
       }
     end
     let(:expected_export_get_response_body) do
@@ -74,21 +74,21 @@ RSpec.describe 'Outcomes Service - GET Content Export', :pact do
     let(:export_data) { { export_id: "1" } }
 
     before do
-      outcomes.given('artifacts and an export to retrieve')
-              .upon_receiving('a request to return exported content')
+      outcomes.given("artifacts and an export to retrieve")
+              .upon_receiving("a request to return exported content")
               .with(
                 method: :get,
-                path: '/api/content_exports/1',
+                path: "/api/content_exports/1",
                 headers: export_get_headers
               )
               .will_respond_with(
                 status: 200,
-                headers: { 'Content-Type' => 'application/json; charset=utf-8' },
+                headers: { "Content-Type" => "application/json; charset=utf-8" },
                 body: expected_export_get_response_body
               )
     end
 
-    it 'gets exported content' do
+    it "gets exported content" do
       # CanvasHttp performs several validations that don't make sense to stub before making
       #  the actual call to the desired service, so it's easier to just stub the whole method
       http_double = class_double(CanvasHttp).as_stubbed_const

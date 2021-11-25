@@ -18,13 +18,13 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'set'
+require "set"
 
 class Folder < ActiveRecord::Base
   self.ignored_columns = %i[last_lock_at last_unlock_at]
 
   def self.name_order_by_clause(table = nil)
-    col = table ? "#{table}.name" : 'name'
+    col = table ? "#{table}.name" : "name"
     best_unicode_collation_key(col)
   end
   include Workflow
@@ -40,8 +40,8 @@ class Folder < ActiveRecord::Base
   belongs_to :cloned_item
   belongs_to :parent_folder, class_name: "Folder"
   has_many :file_attachments, class_name: "Attachment"
-  has_many :active_file_attachments, -> { where("attachments.file_state<>'deleted'") }, class_name: 'Attachment'
-  has_many :visible_file_attachments, -> { where(file_state: ['available', 'public']) }, class_name: 'Attachment'
+  has_many :active_file_attachments, -> { where("attachments.file_state<>'deleted'") }, class_name: "Attachment"
+  has_many :visible_file_attachments, -> { where(file_state: ["available", "public"]) }, class_name: "Attachment"
   has_many :sub_folders, class_name: "Folder", foreign_key: "parent_folder_id", dependent: :destroy
   has_many :active_sub_folders, -> { where("folders.workflow_state<>'deleted'") }, class_name: "Folder", foreign_key: "parent_folder_id", dependent: :destroy
 
@@ -72,7 +72,7 @@ class Folder < ActiveRecord::Base
   def populate_root_account_id
     self.root_account_id = if context_type == "User"
                              0
-                           elsif context_type == 'Account' && context.root_account?
+                           elsif context_type == "Account" && context.root_account?
                              context_id
                            else
                              context.root_account_id
@@ -124,7 +124,7 @@ class Folder < ActiveRecord::Base
 
   alias_method :destroy_permanently!, :destroy
   def destroy
-    self.workflow_state = 'deleted'
+    self.workflow_state = "deleted"
     active_file_attachments.each(&:destroy)
     active_sub_folders.each(&:destroy)
     self.deleted_at = Time.now.utc
@@ -138,7 +138,7 @@ class Folder < ActiveRecord::Base
     (folders.lock_at>? OR (folders.unlock_at IS NOT NULL AND folders.unlock_at<?)))", false, Time.now.utc, Time.now.utc)
                      }
   scope :by_position, -> { ordered }
-  scope :by_name, -> { order(name_order_by_clause('folders')) }
+  scope :by_name, -> { order(name_order_by_clause("folders")) }
 
   def display_name
     name
@@ -163,9 +163,9 @@ class Folder < ActiveRecord::Base
 
   def infer_full_name
     # TODO: i18n
-    t :default_folder_name, 'New Folder'
-    self.name = 'New Folder' if name.blank?
-    self.name = name.strip.tr('/', "_")
+    t :default_folder_name, "New Folder"
+    self.name = "New Folder" if name.blank?
+    self.name = name.strip.tr("/", "_")
     @update_sub_folders = false
     self.parent_folder_id = nil if !parent_folder || parent_folder.context != context || parent_folder_id == id
     self.context = parent_folder.context if parent_folder
@@ -181,7 +181,7 @@ class Folder < ActiveRecord::Base
   def prevent_duplicate_name
     return unless parent_folder
 
-    existing_folders = parent_folder.active_sub_folders.where('name ~* ? AND id <> ?', "^#{Regexp.quote(name)}(\\s\\d+)?$", id.to_i).pluck(:name)
+    existing_folders = parent_folder.active_sub_folders.where("name ~* ? AND id <> ?", "^#{Regexp.quote(name)}(\\s\\d+)?$", id.to_i).pluck(:name)
 
     return unless existing_folders.include?(name)
 
@@ -236,7 +236,7 @@ class Folder < ActiveRecord::Base
   def hidden?
     return @hidden if defined?(@hidden)
 
-    @hidden = self.workflow_state == 'hidden' || parent_folder&.hidden?
+    @hidden = self.workflow_state == "hidden" || parent_folder&.hidden?
   end
 
   def hidden
@@ -244,17 +244,17 @@ class Folder < ActiveRecord::Base
   end
 
   def hidden=(val)
-    self.workflow_state = (val == true || val == '1' || val == 'true' ? 'hidden' : 'visible')
+    self.workflow_state = (val == true || val == "1" || val == "true" ? "hidden" : "visible")
   end
 
   def just_hide
-    self.workflow_state == 'hidden'
+    self.workflow_state == "hidden"
   end
 
   def public?
     return @public if defined?(@public)
 
-    @public = self.workflow_state == 'public' || parent_folder&.public?
+    @public = self.workflow_state == "public" || parent_folder&.public?
   end
 
   def mime_class
@@ -348,7 +348,7 @@ class Folder < ActiveRecord::Base
         folder ||= context.folders.create!(unique_type: unique_type,
                                            name: default_name_proc.call,
                                            parent_folder_id: Folder.root_folders(context).first,
-                                           workflow_state: 'hidden')
+                                           workflow_state: "hidden")
       end
     end
     folder
@@ -364,7 +364,7 @@ class Folder < ActiveRecord::Base
   end
 
   def self.is_locked?(folder_id)
-    RequestCache.cache('folder_is_locked', folder_id) do
+    RequestCache.cache("folder_is_locked", folder_id) do
       folder = Folder.where(id: folder_id).first
       folder&.locked?
     end
@@ -378,17 +378,17 @@ class Folder < ActiveRecord::Base
   # method before the folder is saved
   def self.assert_path(path, context)
     @@path_lookups ||= {}
-    key = [context.global_asset_string, path].join('//')
+    key = [context.global_asset_string, path].join("//")
     return @@path_lookups[key] if @@path_lookups[key]
 
-    folders = path.split('/').reject(&:empty?)
+    folders = path.split("/").reject(&:empty?)
     @@root_folders ||= {}
     current_folder = (@@root_folders[context.global_asset_string] ||= Folder.root_folders(context).first)
     if folders[0] == current_folder.name
       folders.shift
     end
     folders.each do |name|
-      sub_folder = @@path_lookups[[context.global_asset_string, current_folder.full_name + '/' + name].join('//')]
+      sub_folder = @@path_lookups[[context.global_asset_string, current_folder.full_name + "/" + name].join("//")]
       sub_folder ||= current_folder.sub_folders.active.where(name: name).first_or_initialize
       current_folder = sub_folder
       if current_folder.new_record?
@@ -396,7 +396,7 @@ class Folder < ActiveRecord::Base
         yield current_folder if block_given?
         current_folder.save!
       end
-      @@path_lookups[[context.global_asset_string, current_folder.full_name].join('//')] ||= current_folder
+      @@path_lookups[[context.global_asset_string, current_folder.full_name].join("//")] ||= current_folder
     end
     @@path_lookups[key] = current_folder
   end
@@ -407,17 +407,17 @@ class Folder < ActiveRecord::Base
   end
 
   def self.unfiled_folder(context)
-    folder = context.folders.where(parent_folder_id: Folder.root_folders(context).first, workflow_state: 'visible', name: 'unfiled').first
+    folder = context.folders.where(parent_folder_id: Folder.root_folders(context).first, workflow_state: "visible", name: "unfiled").first
     unless folder
-      folder = context.folders.build(parent_folder: Folder.root_folders(context).first, name: 'unfiled')
-      folder.workflow_state = 'visible'
+      folder = context.folders.build(parent_folder: Folder.root_folders(context).first, name: "unfiled")
+      folder.workflow_state = "visible"
       folder.save!
     end
     folder
   end
 
   def self.find_attachment_in_context_with_path(context, path)
-    components = path.split('/')
+    components = path.split("/")
     component = components.shift
     context.folders.active.where(parent_folder_id: nil).each do |folder|
       if folder.name == component
@@ -465,7 +465,7 @@ class Folder < ActiveRecord::Base
       when Array
         path
       when String
-        path.split('/')
+        path.split("/")
       else
         []
       end
@@ -495,7 +495,7 @@ class Folder < ActiveRecord::Base
   end
 
   def currently_locked
-    locked || (lock_at && Time.zone.now > lock_at) || (unlock_at && Time.zone.now < unlock_at) || self.workflow_state == 'hidden'
+    locked || (lock_at && Time.zone.now > lock_at) || (unlock_at && Time.zone.now < unlock_at) || self.workflow_state == "hidden"
   end
   alias_method :currently_locked?, :currently_locked
 

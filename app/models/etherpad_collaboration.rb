@@ -24,7 +24,7 @@ class EtherpadCollaboration < Collaboration
   end
 
   def style_class
-    'etherpad'
+    "etherpad"
   end
 
   # Etherpad embed query parameters

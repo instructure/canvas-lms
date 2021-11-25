@@ -87,11 +87,11 @@ class PacePlanPresenter
 
   def context_type
     if pace_plan.user_id
-      'Enrollment'
+      "Enrollment"
     elsif pace_plan.course_section_id
-      'Section'
+      "Section"
     else
-      'Course'
+      "Course"
     end
   end
 
@@ -99,7 +99,7 @@ class PacePlanPresenter
     @pace_plan_module_items ||= if pace_plan.persisted?
                                   pace_plan.pace_plan_module_items.joins(:module_item)
                                            .preload(module_item: [:context_module])
-                                           .order('content_tags.position ASC')
+                                           .order("content_tags.position ASC")
                                 else
                                   pace_plan.pace_plan_module_items.sort do |a, b|
                                     a.module_item.position <=> b.module_item.position

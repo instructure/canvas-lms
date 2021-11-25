@@ -18,11 +18,11 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'spec_helper'
+require "spec_helper"
 
 describe EventStream::IndexStrategy::Cassandra do
   before do
-    @database = double('database')
+    @database = double("database")
 
     def @database.batch
       yield
@@ -33,10 +33,10 @@ describe EventStream::IndexStrategy::Cassandra do
     def @database.update(*); end
 
     def @database.keyspace
-      'test_db'
+      "test_db"
     end
 
-    @stream = double('stream',
+    @stream = double("stream",
                      database: @database,
                      record_type: EventStream::Record,
                      ttl_seconds: 1.year,
@@ -58,7 +58,7 @@ describe EventStream::IndexStrategy::Cassandra do
 
   context "usage" do
     before do
-      @table = double('table', to_s: "expected_table")
+      @table = double("table", to_s: "expected_table")
       table = @table
       base_index = EventStream::Index.new(@stream) do
         self.table table
@@ -77,10 +77,10 @@ describe EventStream::IndexStrategy::Cassandra do
 
     describe "insert" do
       before do
-        @id = double('id', to_s: '1234567890')
+        @id = double("id", to_s: "1234567890")
         @key = "key_value"
-        @timestamp = double('timestamp', to_i: 12_345)
-        @record = double('record', id: @id, created_at: @timestamp)
+        @timestamp = double("timestamp", to_i: 12_345)
+        @record = double("record", id: @id, created_at: @timestamp)
       end
 
       it "uses the stream's database" do
@@ -127,11 +127,11 @@ describe EventStream::IndexStrategy::Cassandra do
       end
 
       it "handle an array for key" do
-        expect(@index.create_key(@bucket, ['42', '21'])).to eq "42/21/#{@bucket}"
+        expect(@index.create_key(@bucket, ["42", "21"])).to eq "42/21/#{@bucket}"
       end
 
       it "handle a single object for key" do
-        expect(@index.create_key(@bucket, '42')).to eq "42/#{@bucket}"
+        expect(@index.create_key(@bucket, "42")).to eq "42/#{@bucket}"
       end
     end
 
@@ -146,11 +146,11 @@ describe EventStream::IndexStrategy::Cassandra do
         # force just one bucket
         @index.index.bucket_size Time.zone.now + 1.minute
         @index.index.scrollback_limit 10.minutes
-        @pager = @index.for_key('key')
+        @pager = @index.for_key("key")
 
         @ids = (1..4).to_a
-        @typed_results = @ids.map { |id| @stream.record_type.new('id' => id, 'created_at' => id.minutes.ago) }
-        @raw_results = @typed_results.map { |record| { 'id' => record.id, 'ordered_id' => "#{record.created_at.to_i}/#{record.id}" } }
+        @typed_results = @ids.map { |id| @stream.record_type.new("id" => id, "created_at" => id.minutes.ago) }
+        @raw_results = @typed_results.map { |record| { "id" => record.id, "ordered_id" => "#{record.created_at.to_i}/#{record.id}" } }
       end
 
       def setup_fetch(start, requested)
@@ -188,8 +188,8 @@ describe EventStream::IndexStrategy::Cassandra do
         @pager.paginate(per_page: 2)
 
         setup_fetch(0, 2)
-        allow(@stream).to receive(:read_consistency_level).and_return('ALL')
-        expect(@database).to receive(:execute).with(/%CONSISTENCY% WHERE/, anything, anything, consistency: 'ALL').and_return(@raw_results)
+        allow(@stream).to receive(:read_consistency_level).and_return("ALL")
+        expect(@database).to receive(:execute).with(/%CONSISTENCY% WHERE/, anything, anything, consistency: "ALL").and_return(@raw_results)
         @pager.paginate(per_page: 2)
       end
 
@@ -244,7 +244,7 @@ describe EventStream::IndexStrategy::Cassandra do
       context "newest parameter" do
         before do
           @newest = @typed_results[2].created_at
-          @pager = @index.for_key('key', newest: @newest)
+          @pager = @index.for_key("key", newest: @newest)
           allow(@stream).to receive(:fetch).and_return([])
           @query = double(fetch: nil)
         end
@@ -282,7 +282,7 @@ describe EventStream::IndexStrategy::Cassandra do
       context "oldest parameter" do
         before do
           @oldest = @typed_results[2].created_at
-          @pager = @index.for_key('key', oldest: @oldest)
+          @pager = @index.for_key("key", oldest: @oldest)
           @query = double(fetch: nil)
           allow(@stream).to receive(:fetch).and_return([])
         end
@@ -321,7 +321,7 @@ describe EventStream::IndexStrategy::Cassandra do
         end
 
         it "handles exclusionary newest/oldest parameters" do
-          @pager = @index.for_key('key', oldest: @oldest, newest: @oldest - 1.day)
+          @pager = @index.for_key("key", oldest: @oldest, newest: @oldest - 1.day)
           expect(@database).not_to receive(:execute)
           @pager.paginate(per_page: 1)
         end
@@ -339,11 +339,11 @@ describe EventStream::IndexStrategy::Cassandra do
         # force just one bucket
         @index.index.bucket_size Time.zone.now + 1.minute
         @index.index.scrollback_limit 10.minutes
-        @pager = @index.ids_for_key('key')
+        @pager = @index.ids_for_key("key")
 
         @ids = (1..4).to_a
-        @typed_results = @ids.map { |id| @stream.record_type.new('id' => id, 'created_at' => id.minutes.ago) }
-        @raw_results = @typed_results.map { |record| { 'id' => record.id, 'ordered_id' => "#{record.created_at.to_i}/#{record.id}", 'bucket' => 0 } }
+        @typed_results = @ids.map { |id| @stream.record_type.new("id" => id, "created_at" => id.minutes.ago) }
+        @raw_results = @typed_results.map { |record| { "id" => record.id, "ordered_id" => "#{record.created_at.to_i}/#{record.id}", "bucket" => 0 } }
       end
 
       def setup_fetch(start, requested)
@@ -417,7 +417,7 @@ describe EventStream::IndexStrategy::Cassandra do
 
   describe "find_with" do
     before do
-      @table = double('table')
+      @table = double("table")
       table = @table
       @stream = EventStream::Stream.new do
         database database
@@ -429,8 +429,8 @@ describe EventStream::IndexStrategy::Cassandra do
       end
       @index = base_index.strategy_for(:cassandra)
 
-      @key = double('key')
-      @entry = double('entry', key: @key)
+      @key = double("key")
+      @entry = double("entry", key: @key)
     end
 
     it "translates argument through key_proc if present" do

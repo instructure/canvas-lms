@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'atom'
+require "atom"
 
 # @API Discussion Topics
 class DiscussionEntriesController < ApplicationController
@@ -56,10 +56,10 @@ class DiscussionEntriesController < ApplicationController
       respond_to do |format|
         if @entry.save
           @entry.update_topic
-          log_asset_access(@topic, 'topics', 'topics', 'participate')
+          log_asset_access(@topic, "topics", "topics", "participate")
           @entry.context_module_action
           save_attachment
-          flash[:notice] = t :created_entry_notice, 'Entry was successfully created.'
+          flash[:notice] = t :created_entry_notice, "Entry was successfully created."
           format.html do
             redirect_to named_context_url(@context, :context_discussion_topic_url, @topic.id)
           end
@@ -73,7 +73,7 @@ class DiscussionEntriesController < ApplicationController
             render(json: json, status: :created)
           end
         else
-          respond_to_bad_request(format, 'new')
+          respond_to_bad_request(format, "new")
         end
       end
     end
@@ -106,7 +106,7 @@ class DiscussionEntriesController < ApplicationController
 
     @topic ||= @entry.discussion_topic
     @entry.current_user = @current_user
-    @entry.attachment_id = nil if @remove_attachment == '1' || params[:attachment].nil?
+    @entry.attachment_id = nil if @remove_attachment == "1" || params[:attachment].nil?
 
     if authorized_action(@entry, @current_user, :update)
       return if context_file_quota_exceeded?
@@ -116,12 +116,12 @@ class DiscussionEntriesController < ApplicationController
         if @entry.update(entry_params)
           save_attachment
           format.html do
-            flash[:notice] = t :updated_entry_notice, 'Entry was successfully updated.'
+            flash[:notice] = t :updated_entry_notice, "Entry was successfully updated."
             redirect_to named_context_url(@context, :context_discussion_topic_url, @entry.discussion_topic_id)
           end
           format.json { render json: discussion_entry_api_json([@entry], @context, @current_user, session, [:user_name]).first }
         else
-          respond_to_bad_request(format, 'edit')
+          respond_to_bad_request(format, "edit")
         end
       end
     end
@@ -168,7 +168,7 @@ class DiscussionEntriesController < ApplicationController
         format.atom do
           feed = Atom::Feed.new do |f|
             f.title = t :posts_feed_title, "%{title} Posts Feed", title: @topic.title
-            f.links << Atom::Link.new(href: polymorphic_url([@context, @topic]), rel: 'self')
+            f.links << Atom::Link.new(href: polymorphic_url([@context, @topic]), rel: "self")
             f.updated = Time.now
             f.id = polymorphic_url([@context, @topic])
           end
@@ -180,7 +180,7 @@ class DiscussionEntriesController < ApplicationController
         end
         format.rss do
           @entries = [@topic] + @discussion_entries
-          require 'rss/2.0'
+          require "rss/2.0"
           rss = RSS::Rss.new("2.0")
           channel = RSS::Rss::Channel.new
           channel.title = t :podcast_feed_title, "%{title} Posts Podcast Feed", title: @topic.title

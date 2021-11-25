@@ -114,8 +114,8 @@ class ApiRouteSet
     opts[:as] ||= opts.delete(:path_name)
     opts[:as] = "#{mapper_prefix}#{opts[:as]}" if opts[:as]
     opts[:constraints] ||= {}
-    opts[:constraints][:format] = 'json' if opts[:constraints].is_a? Hash
-    opts[:format] = 'json'
+    opts[:constraints][:format] = "json" if opts[:constraints].is_a? Hash
+    opts[:format] = "json"
     mapper.send(method, "#{prefix}/#{path}", opts)
   end
 
@@ -138,7 +138,7 @@ class ApiRouteSet
 
     def route(method, path, opts)
       opts[:constraints] ||= {}
-      path.split('/').each { |segment| opts[:constraints][segment[1..].to_sym] = ID_REGEX if segment.match(ID_PARAM) }
+      path.split("/").each { |segment| opts[:constraints][segment[1..].to_sym] = ID_REGEX if segment.match(ID_PARAM) }
       super(method, path, opts)
     end
   end

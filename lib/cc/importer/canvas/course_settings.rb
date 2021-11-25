@@ -28,7 +28,7 @@ module CC::Importer::Canvas
     def settings_doc(file, html = false)
       path = @package_root.item_path(COURSE_SETTINGS_DIR, file)
       return nil unless File.exist? path
-      return nil if File.size(path) > Setting.get('course_settings_import_xml_threshold', 25.megabytes).to_i # totally arbitrary hack to keep some broken exports from killing things
+      return nil if File.size(path) > Setting.get("course_settings_import_xml_threshold", 25.megabytes).to_i # totally arbitrary hack to keep some broken exports from killing things
 
       if html
         open_file path
@@ -58,7 +58,7 @@ module CC::Importer::Canvas
       course = {}
       return course unless doc
 
-      course[:migration_id] = get_node_att(doc, 'course', 'identifier')
+      course[:migration_id] = get_node_att(doc, "course", "identifier")
 
       %w[title course_code default_wiki_editing_roles
          turnitin_comments default_view license locale
@@ -83,16 +83,16 @@ module CC::Importer::Canvas
         val = get_bool_val(doc, bool_val)
         course[bool_val] = val unless val.nil?
       end
-      ['start_at', 'conclude_at'].each do |date_type|
+      ["start_at", "conclude_at"].each do |date_type|
         val = get_time_val(doc, date_type)
         course[date_type] = val
       end
-      ['grading_standard_id', 'home_page_announcement_limit'].each do |int_val|
+      ["grading_standard_id", "home_page_announcement_limit"].each do |int_val|
         if (val = get_int_val(doc, int_val))
           course[int_val] = val
         end
       end
-      if (nav = get_node_val(doc, 'tab_configuration'))
+      if (nav = get_node_val(doc, "tab_configuration"))
         begin
           nav = JSON.parse(nav)
           # Validate the format a little bit
@@ -101,11 +101,11 @@ module CC::Importer::Canvas
             course[:tab_configuration] = nav.select { |i| i.is_a?(Hash) && i["id"] }
           end
         rescue
-          add_warning(I18n.t('errors.bad_navigation_config', "Invalid course tab configuration"), $!)
+          add_warning(I18n.t("errors.bad_navigation_config", "Invalid course tab configuration"), $!)
         end
       end
 
-      post_manually = get_bool_val(doc, 'default_post_policy post_manually')
+      post_manually = get_bool_val(doc, "default_post_policy post_manually")
       course[:default_post_policy] = { post_manually: post_manually } unless post_manually.nil?
 
       course
@@ -119,19 +119,19 @@ module CC::Importer::Canvas
       groups = []
       return groups unless doc
 
-      doc.css('assignmentGroup').each do |node|
+      doc.css("assignmentGroup").each do |node|
         group = {}
-        group['migration_id'] = node['identifier']
-        group['title'] = get_node_val(node, 'title')
-        group['position'] = get_int_val(node, 'position')
-        group['group_weight'] = get_float_val(node, 'group_weight')
-        group['rules'] = []
-        node.css('rules rule').each do |r_node|
+        group["migration_id"] = node["identifier"]
+        group["title"] = get_node_val(node, "title")
+        group["position"] = get_int_val(node, "position")
+        group["group_weight"] = get_float_val(node, "group_weight")
+        group["rules"] = []
+        node.css("rules rule").each do |r_node|
           rule = {}
-          rule['drop_type'] = get_node_val(r_node, 'drop_type')
-          rule['drop_count'] = get_int_val(r_node, 'drop_count')
-          rule['assignment_migration_id'] = get_node_val(r_node, 'identifierref')
-          group['rules'] << rule
+          rule["drop_type"] = get_node_val(r_node, "drop_type")
+          rule["drop_count"] = get_int_val(r_node, "drop_count")
+          rule["assignment_migration_id"] = get_node_val(r_node, "identifierref")
+          group["rules"] << rule
         end
 
         groups << group
@@ -145,14 +145,14 @@ module CC::Importer::Canvas
       tools = []
       return tools unless doc
 
-      doc.css('externalTool').each do |node|
+      doc.css("externalTool").each do |node|
         tool = {}
-        tool['migration_id'] = node['identifier']
-        tool['title'] = get_node_val(node, 'title')
-        tool['description'] = get_node_val(node, 'description')
-        tool['domain'] = get_node_val(node, 'domain')
-        tool['url'] = get_node_val(node, 'url')
-        tool['privacy_level'] = get_node_val(node, 'privacy_level')
+        tool["migration_id"] = node["identifier"]
+        tool["title"] = get_node_val(node, "title")
+        tool["description"] = get_node_val(node, "description")
+        tool["domain"] = get_node_val(node, "domain")
+        tool["url"] = get_node_val(node, "url")
+        tool["privacy_level"] = get_node_val(node, "privacy_level")
 
         tools << tool
       end
@@ -164,13 +164,13 @@ module CC::Importer::Canvas
       feeds = []
       return feeds unless doc
 
-      doc.css('externalFeed').each do |node|
+      doc.css("externalFeed").each do |node|
         feed = {}
-        feed['migration_id'] = node['identifier']
-        feed['title'] = get_node_val(node, 'title')
-        feed['url'] = get_node_val(node, 'url')
-        feed['verbosity'] = get_node_val(node, 'verbosity')
-        feed['header_match'] = get_node_val(node, 'header_match')
+        feed["migration_id"] = node["identifier"]
+        feed["title"] = get_node_val(node, "title")
+        feed["url"] = get_node_val(node, "url")
+        feed["verbosity"] = get_node_val(node, "verbosity")
+        feed["header_match"] = get_node_val(node, "header_match")
 
         feeds << feed
       end
@@ -182,12 +182,12 @@ module CC::Importer::Canvas
       standards = []
       return standards unless doc
 
-      doc.css('gradingStandard').each do |node|
+      doc.css("gradingStandard").each do |node|
         standard = {}
-        standard['migration_id'] = node['identifier']
-        standard['version'] = node['version']
-        standard['title'] = get_node_val(node, 'title')
-        standard['data'] = get_node_val(node, 'data')
+        standard["migration_id"] = node["identifier"]
+        standard["version"] = node["version"]
+        standard["title"] = get_node_val(node, "title")
+        standard["data"] = get_node_val(node, "data")
         standards << standard
       end
 
@@ -198,15 +198,15 @@ module CC::Importer::Canvas
       events = []
       return events unless doc
 
-      doc.css('event').each do |node|
+      doc.css("event").each do |node|
         event = {}
-        event['migration_id'] = node['identifier']
-        event['title'] = get_node_val(node, 'title')
-        event['description'] = get_node_val(node, 'description')
-        event['start_at'] = get_time_val(node, 'start_at')
-        event['end_at'] = get_time_val(node, 'end_at')
-        event['all_day_date'] = get_time_val(node, 'all_day_date')
-        event['all_day'] = get_bool_val(node, 'all_day', false)
+        event["migration_id"] = node["identifier"]
+        event["title"] = get_node_val(node, "title")
+        event["description"] = get_node_val(node, "description")
+        event["start_at"] = get_time_val(node, "start_at")
+        event["end_at"] = get_time_val(node, "end_at")
+        event["all_day_date"] = get_time_val(node, "all_day_date")
+        event["all_day"] = get_bool_val(node, "all_day", false)
         events << event
       end
 
@@ -217,15 +217,15 @@ module CC::Importer::Canvas
       late_policy = {}
       return late_policy unless doc
 
-      late_policy_node = doc.at_css('late_policy')
-      late_policy['migration_id'] = late_policy_node['identifier']
-      late_policy['missing_submission_deduction_enabled'] = get_bool_val(late_policy_node, 'missing_submission_deduction_enabled')
-      late_policy['missing_submission_deduction'] = get_node_val(late_policy_node, 'missing_submission_deduction')
-      late_policy['late_submission_deduction_enabled'] = get_bool_val(late_policy_node, 'late_submission_deduction_enabled')
-      late_policy['late_submission_deduction'] = get_node_val(late_policy_node, 'late_submission_deduction')
-      late_policy['late_submission_interval'] = get_node_val(late_policy_node, 'late_submission_interval')
-      late_policy['late_submission_minimum_percent_enabled'] = get_bool_val(late_policy_node, 'late_submission_minimum_percent_enabled')
-      late_policy['late_submission_minimum_percent'] = get_node_val(late_policy_node, 'late_submission_minimum_percent')
+      late_policy_node = doc.at_css("late_policy")
+      late_policy["migration_id"] = late_policy_node["identifier"]
+      late_policy["missing_submission_deduction_enabled"] = get_bool_val(late_policy_node, "missing_submission_deduction_enabled")
+      late_policy["missing_submission_deduction"] = get_node_val(late_policy_node, "missing_submission_deduction")
+      late_policy["late_submission_deduction_enabled"] = get_bool_val(late_policy_node, "late_submission_deduction_enabled")
+      late_policy["late_submission_deduction"] = get_node_val(late_policy_node, "late_submission_deduction")
+      late_policy["late_submission_interval"] = get_node_val(late_policy_node, "late_submission_interval")
+      late_policy["late_submission_minimum_percent_enabled"] = get_bool_val(late_policy_node, "late_submission_minimum_percent_enabled")
+      late_policy["late_submission_minimum_percent"] = get_node_val(late_policy_node, "late_submission_minimum_percent")
 
       late_policy
     end

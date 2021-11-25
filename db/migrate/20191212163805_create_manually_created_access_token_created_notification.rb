@@ -24,15 +24,15 @@ class CreateManuallyCreatedAccessTokenCreatedNotification < ActiveRecord::Migrat
     return unless Shard.current == Shard.default
 
     Canvas::MessageHelper.create_notification({
-                                                name: 'Manually Created Access Token Created',
+                                                name: "Manually Created Access Token Created",
                                                 delay_for: 0,
-                                                category: 'Registration'
+                                                category: "Registration"
                                               })
   end
 
   def self.down
     return unless Shard.current == Shard.default
 
-    Notification.where(name: 'Manually Created Access Token Created').delete_all
+    Notification.where(name: "Manually Created Access Token Created").delete_all
   end
 end

@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'yaml'
+require "yaml"
 
 module FeatureFlags
   module Loader
@@ -38,7 +38,7 @@ module FeatureFlags
         raise "invalid i18n settings while translating: #{value}" if keys.size != 1
 
         if wrapper
-          -> { I18n.send(:t, keys[0], value[keys[0]], wrapper: { '*' => wrapper }) }
+          -> { I18n.send(:t, keys[0], value[keys[0]], wrapper: { "*" => wrapper }) }
         else
           -> { I18n.send(:t, keys[0], value[keys[0]]) }
         end
@@ -51,7 +51,7 @@ module FeatureFlags
       %i[custom_transition_proc after_state_change_proc visible_on].each do |check|
         definition[check] = wrap_hook_method(definition[check]) if definition[check]
       end
-      definition[:type] ||= 'feature_option'
+      definition[:type] ||= "feature_option"
       [:display_name, :description].each do |field|
         definition[field] = wrap_translate_text(definition[field])
       end
@@ -66,8 +66,8 @@ module FeatureFlags
 
     def self.load_yaml_files
       result = {}
-      (Dir.glob(Rails.root.join('config/feature_flags/*.yml')) +
-        Dir.glob(Rails.root.join('gems/plugins/*/config/feature_flags/*.yml'))).sort.each do |path|
+      (Dir.glob(Rails.root.join("config/feature_flags/*.yml")) +
+        Dir.glob(Rails.root.join("gems/plugins/*/config/feature_flags/*.yml"))).sort.each do |path|
         result.merge!(YAML.load_file(path))
       end
       result.each do |_name, definition|

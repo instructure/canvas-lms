@@ -23,7 +23,7 @@ class EnrollmentTerm < ActiveRecord::Base
 
   include Workflow
 
-  belongs_to :root_account, class_name: 'Account'
+  belongs_to :root_account, class_name: "Account"
   belongs_to :grading_period_group, inverse_of: :enrollment_terms
   has_many :grading_periods, through: :grading_period_group
   has_many :enrollment_dates_overrides
@@ -45,7 +45,7 @@ class EnrollmentTerm < ActiveRecord::Base
 
   def self.ensure_dummy_enrollment_term
     Account.ensure_dummy_root_account
-    create_with(root_account_id: 0, workflow_state: 'deleted').find_or_create_by!(id: 0)
+    create_with(root_account_id: 0, workflow_state: "deleted").find_or_create_by!(id: 0)
   end
 
   def prevent_default_term_name_change
@@ -57,9 +57,9 @@ class EnrollmentTerm < ActiveRecord::Base
   def check_if_deletable
     if workflow_state_changed? && workflow_state == "deleted"
       if default_term?
-        errors.add(:workflow_state, t('errors.delete_default_term', "Cannot delete the default term"))
+        errors.add(:workflow_state, t("errors.delete_default_term", "Cannot delete the default term"))
       elsif courses.active.exists?
-        errors.add(:workflow_state, t('errors.delete_term_with_courses', "Cannot delete a term with active courses"))
+        errors.add(:workflow_state, t("errors.delete_term_with_courses", "Cannot delete a term with active courses"))
       end
     end
   end
@@ -90,7 +90,7 @@ class EnrollmentTerm < ActiveRecord::Base
   end
 
   def self.i18n_default_term_name
-    t '#account.default_term_name', "Default Term"
+    t "#account.default_term_name", "Default Term"
   end
 
   def recompute_course_scores_later(update_all_grading_period_scores: true, strand_identifier: "EnrollmentTerm:#{global_id}")
@@ -147,7 +147,7 @@ class EnrollmentTerm < ActiveRecord::Base
 
     return true unless scope.exists?
 
-    errors.add(:sis_source_id, t('errors.not_unique', "SIS ID \"%{sis_source_id}\" is already in use", sis_source_id: sis_source_id))
+    errors.add(:sis_source_id, t("errors.not_unique", "SIS ID \"%{sis_source_id}\" is already in use", sis_source_id: sis_source_id))
     throw :abort
   end
 
@@ -192,7 +192,7 @@ class EnrollmentTerm < ActiveRecord::Base
 
   alias_method :destroy_permanently!, :destroy
   def destroy
-    self.workflow_state = 'deleted'
+    self.workflow_state = "deleted"
     save!
   end
 
@@ -203,12 +203,12 @@ class EnrollmentTerm < ActiveRecord::Base
   end
 
   scope :active, -> { where("enrollment_terms.workflow_state<>'deleted'") }
-  scope :ended, -> { where('enrollment_terms.end_at < ?', Time.now.utc) }
-  scope :started, -> { where('enrollment_terms.start_at IS NULL OR enrollment_terms.start_at < ?', Time.now.utc) }
-  scope :not_ended, -> { where('enrollment_terms.end_at IS NULL OR enrollment_terms.end_at >= ?', Time.now.utc) }
-  scope :not_started, -> { where('enrollment_terms.start_at IS NOT NULL AND enrollment_terms.start_at > ?', Time.now.utc) }
+  scope :ended, -> { where("enrollment_terms.end_at < ?", Time.now.utc) }
+  scope :started, -> { where("enrollment_terms.start_at IS NULL OR enrollment_terms.start_at < ?", Time.now.utc) }
+  scope :not_ended, -> { where("enrollment_terms.end_at IS NULL OR enrollment_terms.end_at >= ?", Time.now.utc) }
+  scope :not_started, -> { where("enrollment_terms.start_at IS NOT NULL AND enrollment_terms.start_at > ?", Time.now.utc) }
   scope :not_default, -> { where.not(name: EnrollmentTerm::DEFAULT_TERM_NAME) }
-  scope :by_name, -> { order(best_unicode_collation_key('name')) }
+  scope :by_name, -> { order(best_unicode_collation_key("name")) }
 
   private
 

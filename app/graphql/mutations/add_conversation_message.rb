@@ -19,15 +19,15 @@
 #
 
 class Mutations::AddConversationMessage < Mutations::BaseMutation
-  graphql_name 'AddConversationMessage'
+  graphql_name "AddConversationMessage"
 
   include ConversationsHelper
 
-  argument :conversation_id, ID, required: true, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func('Conversation')
+  argument :conversation_id, ID, required: true, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Conversation")
   argument :body, String, required: true
   argument :recipients, [String], required: true
-  argument :included_messages, [ID], required: false, prepare: GraphQLHelpers.relay_or_legacy_ids_prepare_func('ConversationMessage')
-  argument :attachment_ids, [ID], required: false, prepare: GraphQLHelpers.relay_or_legacy_ids_prepare_func('Attachment')
+  argument :included_messages, [ID], required: false, prepare: GraphQLHelpers.relay_or_legacy_ids_prepare_func("ConversationMessage")
+  argument :attachment_ids, [ID], required: false, prepare: GraphQLHelpers.relay_or_legacy_ids_prepare_func("Attachment")
   argument :media_comment_id, ID, required: false
   argument :media_comment_type, String, required: false
   argument :user_note, Boolean, required: false
@@ -55,7 +55,7 @@ class Mutations::AddConversationMessage < Mutations::BaseMutation
 
     { conversation_message: message[:message] }
   rescue ActiveRecord::RecordNotFound
-    raise GraphQL::ExecutionError, 'not found'
+    raise GraphQL::ExecutionError, "not found"
   rescue ActiveRecord::RecordInvalid => e
     errors_for(e.record)
   rescue ConversationsHelper::Error => e

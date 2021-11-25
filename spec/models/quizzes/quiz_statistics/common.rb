@@ -29,7 +29,7 @@ shared_examples_for "Quizzes::QuizStatistics::Report" do
     @quiz.save!
   end
 
-  it 'provides progress updates' do
+  it "provides progress updates" do
     @quiz.statistics_csv(report_type, async: true)
     run_jobs
     progress = @quiz.quiz_statistics.first.progress

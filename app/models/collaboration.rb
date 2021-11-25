@@ -22,7 +22,7 @@ class Collaboration < ActiveRecord::Base
   include Workflow
   include SendToStream
 
-  DEEP_LINKING_EXTENSION = 'https://canvas.instructure.com/lti/collaboration'
+  DEEP_LINKING_EXTENSION = "https://canvas.instructure.com/lti/collaboration"
 
   attr_readonly :collaboration_type
 
@@ -95,7 +95,7 @@ class Collaboration < ActiveRecord::Base
   # These methods should be implemented in child classes.
 
   def service_name
-    'Collaboration'
+    "Collaboration"
   end
 
   def delete_document; end
@@ -139,14 +139,14 @@ class Collaboration < ActiveRecord::Base
   #
   # Returns a collaboration instance or raises an exception if type unknown.
   def self.typed_collaboration_instance(name)
-    class_config = Collaboration.collaboration_types.find { |c| c['name'] == name }
+    class_config = Collaboration.collaboration_types.find { |c| c["name"] == name }
     raise InvalidCollaborationType unless class_config
 
-    klass = collaboration_class(class_config['type'].titleize.gsub(/\s/, ''))
+    klass = collaboration_class(class_config["type"].titleize.gsub(/\s/, ""))
 
     if klass
       collaboration = klass.new
-      collaboration.collaboration_type = class_config['name']
+      collaboration.collaboration_type = class_config["name"]
     else
       raise "Unrecognized collaboration type #{type}."
     end
@@ -161,15 +161,15 @@ class Collaboration < ActiveRecord::Base
     Canvas::Plugin.all_for_tag(:collaborations).select(&:enabled?).map do |plugin|
       # google_drive is really a google_docs_collaboration
       # eventually this will go away. baby steps...
-      if plugin.id == 'google_drive'
-        type = 'google_docs'
-        name = 'Google Docs'
+      if plugin.id == "google_drive"
+        type = "google_docs"
+        name = "Google Docs"
       else
         type = plugin.id
         name = plugin.name
       end
 
-      HashWithIndifferentAccess.new({ 'name' => name, 'type' => type })
+      HashWithIndifferentAccess.new({ "name" => name, "type" => type })
     end
   end
 
@@ -178,7 +178,7 @@ class Collaboration < ActiveRecord::Base
   # Returns true/false.
   def self.any_collaborations_configured?(context)
     plugin_collabs = collaboration_types.any? do |type|
-      collaboration_class(type['type'].titleize.gsub(/\s/, '')).present?
+      collaboration_class(type["type"].titleize.gsub(/\s/, "")).present?
     end
     external_tool_collabs = ContextExternalTool.all_tools_for(context, placements: :collaboration).exists?
     plugin_collabs || external_tool_collabs
@@ -195,7 +195,7 @@ class Collaboration < ActiveRecord::Base
   #
   # Returns true.
   def destroy
-    self.workflow_state = 'deleted'
+    self.workflow_state = "deleted"
     self.deleted_at     = Time.now
 
     save!
@@ -205,7 +205,7 @@ class Collaboration < ActiveRecord::Base
   #
   # Returns a success boolean.
   def restore
-    update_attribute(:workflow_state, 'active')
+    update_attribute(:workflow_state, "active")
   end
 
   # Internal: Add the author of the collaboration to its collaborators.
@@ -238,7 +238,7 @@ class Collaboration < ActiveRecord::Base
   #
   # Returns a comma-seperated list of collaborator user IDs.
   def collaborator_ids
-    collaborators.pluck(:user_id).join(',')
+    collaborators.pluck(:user_id).join(",")
   end
 
   # Internal: Create the collaboration document in the remote service.
@@ -285,7 +285,7 @@ class Collaboration < ActiveRecord::Base
       group_users_to_add = User
                            .distinct
                            .joins(:group_memberships)
-                           .where('group_memberships.group_id' => group_ids).to_a
+                           .where("group_memberships.group_id" => group_ids).to_a
       add_users_to_document((users + group_users_to_add).uniq)
     end
   end
@@ -325,7 +325,7 @@ class Collaboration < ActiveRecord::Base
       end
       # make real user objects, instead of just ids, cause that's what this code expects
       users_to_remove.reject! { |id| id == user.id }
-      users_to_remove = users_to_remove.map { |id| User.send(:instantiate, 'id' => id) }
+      users_to_remove = users_to_remove.map { |id| User.send(:instantiate, "id" => id) }
       remove_users_from_document(users_to_remove)
     end
     remove_users_from_collaborators(users)

@@ -35,10 +35,10 @@ class MediaSourceFetcher
     return nil if media_sources.empty?
 
     source = case media_type
-             when 'video'
-               find_by_file_extension(media_sources, 'mp4')
-             when 'audio'
-               find_by_file_extension(media_sources, 'mp3') || find_by_file_extension(media_sources, 'mp4')
+             when "video"
+               find_by_file_extension(media_sources, "mp4")
+             when "audio"
+               find_by_file_extension(media_sources, "mp3") || find_by_file_extension(media_sources, "mp4")
              else
                find_by_file_extension(media_sources, file_extension)
              end

@@ -21,6 +21,6 @@ class BackfillDevKeyAccountBinding < ActiveRecord::Migration[5.1]
   tag :postdeploy
 
   def up
-    ::DataFixup::BackfillDevKeyAccountBindings.delay_if_production(priority: Delayed::LOW_PRIORITY, n_strand: 'long_datafixups').run
+    ::DataFixup::BackfillDevKeyAccountBindings.delay_if_production(priority: Delayed::LOW_PRIORITY, n_strand: "long_datafixups").run
   end
 end

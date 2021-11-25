@@ -17,8 +17,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../common'
-require_relative '../helpers/assignments_common'
+require_relative "../common"
+require_relative "../helpers/assignments_common"
 
 describe "allowed_attempts feature for assignments" do
   include_context "in-process server selenium tests"
@@ -41,13 +41,13 @@ describe "allowed_attempts feature for assignments" do
           submission.update(attempt: 2, submission_type: "online_text_entry")
           get "/courses/#{@course.id}/assignments/#{@assignment.id}"
           expect(f(".student-assignment-overview")).to include_text("Allowed Attempts")
-          expect(f('.submit_assignment_link')).to be_disabled
+          expect(f(".submit_assignment_link")).to be_disabled
         end
 
         it "allows submitting if the student has not exceeded the max number of attempts" do
           get "/courses/#{@course.id}/assignments/#{@assignment.id}"
           expect(f(".student-assignment-overview")).to include_text("Allowed Attempts")
-          expect(f('.submit_assignment_link')).to_not be_disabled
+          expect(f(".submit_assignment_link")).to_not be_disabled
         end
       end
 
@@ -61,7 +61,7 @@ describe "allowed_attempts feature for assignments" do
         it "does not show the attempt data" do
           get "/courses/#{@course.id}/assignments/#{@assignment.id}"
           expect(f(".student-assignment-overview")).to_not include_text("Allowed Attempts")
-          expect(f('.submit_assignment_link')).to_not be_disabled
+          expect(f(".submit_assignment_link")).to_not be_disabled
         end
       end
     end

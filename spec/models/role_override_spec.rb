@@ -23,7 +23,7 @@ describe RoleOverride do
     @account = account_model(parent_account: Account.default)
 
     role = teacher_role
-    RoleOverride.create!(context: @account, permission: 'moderate_forum',
+    RoleOverride.create!(context: @account, permission: "moderate_forum",
                          role: role, enabled: false)
     permissions = RoleOverride.permission_for(Account.default, :moderate_forum, role)
     expect(permissions[:enabled]).to be_truthy
@@ -42,9 +42,9 @@ describe RoleOverride do
     a3 = account_model(parent_account: a2)
 
     role = teacher_role(root_account_id: a1.id)
-    RoleOverride.create!(context: a1, permission: 'moderate_forum',
+    RoleOverride.create!(context: a1, permission: "moderate_forum",
                          role: role, enabled: false)
-    RoleOverride.create!(context: a2, permission: 'moderate_forum',
+    RoleOverride.create!(context: a2, permission: "moderate_forum",
                          role: role, enabled: true)
 
     permissions = RoleOverride.permission_for(a1, :moderate_forum, role)
@@ -75,9 +75,9 @@ describe RoleOverride do
     u2 = user_factory
     c2.enroll_student(u2, role: role)
 
-    ro = RoleOverride.create!(context: a1, permission: 'moderate_forum',
+    ro = RoleOverride.create!(context: a1, permission: "moderate_forum",
                               role: role, enabled: true)
-    RoleOverride.create!(context: a2, permission: 'moderate_forum',
+    RoleOverride.create!(context: a2, permission: "moderate_forum",
                          role: role, enabled: false)
 
     expect(c1.grants_right?(u1, :moderate_forum)).to be_truthy
@@ -103,7 +103,7 @@ describe RoleOverride do
   it "updates the roles updated_at timestamp on save" do
     account = account_model(parent_account: Account.default)
     role = teacher_role
-    role_override = RoleOverride.create!(context: account, permission: 'moderate_forum',
+    role_override = RoleOverride.create!(context: account, permission: "moderate_forum",
                                          role: role, enabled: false)
     role.update!(updated_at: 1.day.ago)
     old_updated_at = role.updated_at
@@ -125,7 +125,7 @@ describe RoleOverride do
     it "assigns root_account_id if it is not set" do
       override = RoleOverride.create!(
         context: @account,
-        permission: 'moderate_forum',
+        permission: "moderate_forum",
         role: @role,
         enabled: false
       )
@@ -136,7 +136,7 @@ describe RoleOverride do
     it "does not try to reassign it on save if it is already set" do
       override = RoleOverride.create!(
         context: @account,
-        permission: 'moderate_forum',
+        permission: "moderate_forum",
         role: @role,
         enabled: false
       )
@@ -151,7 +151,7 @@ describe RoleOverride do
 
   describe "student view permissions" do
     it "mirrors student permissions" do
-      permission = 'moderate_forum'
+      permission = "moderate_forum"
 
       course_with_teacher(active_all: true)
       student_in_course(active_all: true)
@@ -170,10 +170,10 @@ describe RoleOverride do
   describe "manage_role_override" do
     before :once do
       @account = account_model(parent_account: Account.default)
-      @role = @account.roles.new(name: 'NewRole')
-      @role.base_role_type = 'AccountMembership'
+      @role = @account.roles.new(name: "NewRole")
+      @role.base_role_type = "AccountMembership"
       @role.save!
-      @permission = 'read_reports'
+      @permission = "read_reports"
     end
 
     describe "override already exists" do
@@ -262,8 +262,8 @@ describe RoleOverride do
   describe "#permissions_for" do
     before :once do
       @account = account_model(parent_account: Account.default)
-      @role = @account.roles.new(name: 'NewRole')
-      @role.base_role_type = 'AccountMembership'
+      @role = @account.roles.new(name: "NewRole")
+      @role.base_role_type = "AccountMembership"
       @role.save!
       @permission = :view_group_pages
     end
@@ -276,7 +276,7 @@ describe RoleOverride do
     def create_role(base_role, role_name)
       @role = @account.roles.build(name: role_name.to_s)
       @role.base_role_type = base_role.to_s
-      @role.workflow_state = 'active'
+      @role.workflow_state = "active"
       @role.save!
     end
 
@@ -288,7 +288,7 @@ describe RoleOverride do
     it "does not mark a permission as explicit in a sub account when it's explicit in the root" do
       @sub_account = @account
       @account = Account.default
-      create_role('AccountMembership', 'somerole')
+      create_role("AccountMembership", "somerole")
       create_override(@role, true)
       permission_data = RoleOverride.permission_for(@sub_account, @permission, @role)
       expect(permission_data[:enabled]).to be_truthy
@@ -301,7 +301,7 @@ describe RoleOverride do
       expect(permission_data[:prior_default]).to be_falsey
     end
 
-    context 'using :account_allows' do
+    context "using :account_allows" do
       it "is enabled for account if not specified" do
         permission_data = RoleOverride.permission_for(@account, :undelete_courses, admin_role)
         expect(permission_data[:account_allows]).to be_truthy
@@ -360,7 +360,7 @@ describe RoleOverride do
           before do
             @base_role_name = base_role[:name]
             @base_role = Role.get_built_in_role(@base_role_name, root_account_id: @account.resolved_root_account_id)
-            @role_name = 'course role'
+            @role_name = "course role"
             @default_perm = RoleOverride.permissions[@permission][:true_for].include?(@base_role_name)
             @parent_account = @account
             @sub = account_model(parent_account: @account)
@@ -486,14 +486,14 @@ describe RoleOverride do
       it "finds role overrides on a non-current shard" do
         @shard1.activate do
           @account = Account.create!
-          @account.role_overrides.create!(permission: 'become_user', enabled: false, role: admin_role)
+          @account.role_overrides.create!(permission: "become_user", enabled: false, role: admin_role)
         end
         expect(RoleOverride.permission_for(@account, :become_user, admin_role)[:enabled]).to eq false
       end
 
       it "finds site-admin role overrides on a non-current shard" do
         role = custom_account_role("custom", account: Account.site_admin)
-        Account.site_admin.role_overrides.create!(permission: 'become_user', enabled: true, role: role)
+        Account.site_admin.role_overrides.create!(permission: "become_user", enabled: true, role: role)
         @shard1.activate do
           @account = Account.create!
         end
@@ -504,10 +504,10 @@ describe RoleOverride do
 
   describe "enabled_for?" do
     it "honors applies_to_self" do
-      role = Account.site_admin.roles.build(name: 'role')
-      role.base_role_type = 'AccountMembership'
+      role = Account.site_admin.roles.build(name: "role")
+      role.base_role_type = "AccountMembership"
       role.save!
-      ro = RoleOverride.new(context: Account.site_admin, permission: 'manage_role_overrides',
+      ro = RoleOverride.new(context: Account.site_admin, permission: "manage_role_overrides",
                             role: role, enabled: true)
       ro.applies_to_self = false
       ro.save!
@@ -520,10 +520,10 @@ describe RoleOverride do
     end
 
     it "honors applies_to_descendants" do
-      role = Account.site_admin.roles.build(name: 'role')
-      role.base_role_type = 'AccountMembership'
+      role = Account.site_admin.roles.build(name: "role")
+      role.base_role_type = "AccountMembership"
       role.save!
-      ro = RoleOverride.new(context: Account.site_admin, permission: 'manage_role_overrides',
+      ro = RoleOverride.new(context: Account.site_admin, permission: "manage_role_overrides",
                             role: role, enabled: true)
       ro.applies_to_descendants = false
       ro.save!
@@ -537,10 +537,10 @@ describe RoleOverride do
 
     context "with account allows" do
       before :once do
-        @role = Account.default.roles.build(name: 'role')
-        @role.base_role_type = 'AccountMembership'
+        @role = Account.default.roles.build(name: "role")
+        @role.base_role_type = "AccountMembership"
         @role.save!
-        RoleOverride.create!(context: Account.default, permission: 'manage_user_notes', role: @role, enabled: true)
+        RoleOverride.create!(context: Account.default, permission: "manage_user_notes", role: @role, enabled: true)
       end
 
       it "ignores permissions with account_allows off" do
@@ -589,55 +589,55 @@ describe RoleOverride do
     end
   end
 
-  describe 'specific permissions' do
+  describe "specific permissions" do
     before(:once) do
       account_model
     end
 
-    describe 'manage_proficiency_calculations' do
+    describe "manage_proficiency_calculations" do
       let(:permission) { RoleOverride.permissions[:manage_proficiency_calculations] }
 
-      it 'is enabled by default for account admins' do
+      it "is enabled by default for account admins" do
         expect(permission[:true_for]).to match_array %w[AccountAdmin]
       end
 
-      it 'is available to account admins, account memberships, teachers, and designers' do
+      it "is available to account admins, account memberships, teachers, and designers" do
         expect(permission[:available_to]).to match_array %w[AccountAdmin AccountMembership DesignerEnrollment TeacherEnrollment]
       end
     end
 
-    describe 'manage_proficiency_scales' do
+    describe "manage_proficiency_scales" do
       let(:permission) { RoleOverride.permissions[:manage_proficiency_scales] }
 
-      it 'is enabled by default for account admins' do
+      it "is enabled by default for account admins" do
         expect(permission[:true_for]).to match_array %w[AccountAdmin]
       end
 
-      it 'is available to account admins, account memberships, teachers, and designers' do
+      it "is available to account admins, account memberships, teachers, and designers" do
         expect(permission[:available_to]).to match_array %w[AccountAdmin AccountMembership DesignerEnrollment TeacherEnrollment]
       end
     end
 
-    describe 'select_final_grade' do
+    describe "select_final_grade" do
       let(:permission) { RoleOverride.permissions[:select_final_grade] }
 
-      it 'is enabled by default for account admins, teachers, and TAs' do
+      it "is enabled by default for account admins, teachers, and TAs" do
         expect(permission[:true_for]).to match_array %w[AccountAdmin TeacherEnrollment TaEnrollment]
       end
 
-      it 'is available to account admins, account memberships, teachers, and TAs' do
+      it "is available to account admins, account memberships, teachers, and TAs" do
         expect(permission[:available_to]).to match_array %w[AccountAdmin AccountMembership TeacherEnrollment TaEnrollment]
       end
     end
 
-    describe 'view_audit_trail' do
+    describe "view_audit_trail" do
       let(:permission) { RoleOverride.permissions[:view_audit_trail] }
 
-      it 'is enabled by default for teachers, TAs and admins' do
+      it "is enabled by default for teachers, TAs and admins" do
         expect(permission[:true_for]).to match_array %w[AccountAdmin]
       end
 
-      it 'is available to teachers, TAs, admins and account memberships' do
+      it "is available to teachers, TAs, admins and account memberships" do
         expect(permission[:available_to]).to match_array %w[TeacherEnrollment AccountAdmin AccountMembership]
       end
     end

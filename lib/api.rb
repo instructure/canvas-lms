@@ -32,16 +32,16 @@ module Api
 
   def api_find_all(collection, ids, account: nil)
     if collection.table_name == User.table_name && @current_user
-      ids = ids.map { |id| id == 'self' ? @current_user.id : id }
+      ids = ids.map { |id| id == "self" ? @current_user.id : id }
     end
     if collection.table_name == Account.table_name
       ids = ids.map do |id|
         case id
-        when 'self'
+        when "self"
           @domain_root_account.id
-        when 'default'
+        when "default"
           Account.default.id
-        when 'site_admin'
+        when "site_admin"
           Account.site_admin.id
         else
           id
@@ -52,9 +52,9 @@ module Api
       current_term = nil
       ids = ids.map do |id|
         case id
-        when 'default'
+        when "default"
           @domain_root_account.default_enrollment_term
-        when 'current'
+        when "current"
           unless current_term
             current_terms = @domain_root_account
                             .enrollment_terms
@@ -93,66 +93,66 @@ module Api
   end
 
   SIS_MAPPINGS = {
-    'courses' =>
-      { lookups: { 'sis_course_id' => 'sis_source_id',
-                   'id' => 'id',
-                   'sis_integration_id' => 'integration_id',
-                   'lti_context_id' => 'lti_context_id',
-                   'uuid' => 'uuid' }.freeze,
-        is_not_scoped_to_account: ['id'].freeze,
-        scope: 'root_account_id' }.freeze,
-    'enrollment_terms' =>
-      { lookups: { 'sis_term_id' => 'sis_source_id',
-                   'id' => 'id',
-                   'sis_integration_id' => 'integration_id' }.freeze,
-        is_not_scoped_to_account: ['id'].freeze,
-        scope: 'root_account_id' }.freeze,
-    'users' =>
-      { lookups: { 'sis_user_id' => 'pseudonyms.sis_user_id',
-                   'sis_login_id' => {
-                     column: 'LOWER(pseudonyms.unique_id)',
+    "courses" =>
+      { lookups: { "sis_course_id" => "sis_source_id",
+                   "id" => "id",
+                   "sis_integration_id" => "integration_id",
+                   "lti_context_id" => "lti_context_id",
+                   "uuid" => "uuid" }.freeze,
+        is_not_scoped_to_account: ["id"].freeze,
+        scope: "root_account_id" }.freeze,
+    "enrollment_terms" =>
+      { lookups: { "sis_term_id" => "sis_source_id",
+                   "id" => "id",
+                   "sis_integration_id" => "integration_id" }.freeze,
+        is_not_scoped_to_account: ["id"].freeze,
+        scope: "root_account_id" }.freeze,
+    "users" =>
+      { lookups: { "sis_user_id" => "pseudonyms.sis_user_id",
+                   "sis_login_id" => {
+                     column: "LOWER(pseudonyms.unique_id)",
                      transform: ->(id) { QuotedValue.new("LOWER(#{Pseudonym.connection.quote(id)})") }
                    },
-                   'id' => 'users.id',
-                   'sis_integration_id' => 'pseudonyms.integration_id',
-                   'lti_context_id' => 'users.lti_context_id', # leaving for legacy reasons
-                   'lti_user_id' => 'users.lti_context_id', # leaving for legacy reasons
-                   'lti_1_1_id' => 'users.lti_context_id',
-                   'lti_1_3_id' => 'users.lti_id',
-                   'uuid' => 'users.uuid' }.freeze,
-        is_not_scoped_to_account: ['users.id', 'users.lti_context_id', 'users.lti_id', 'users.uuid'].freeze,
-        scope: 'pseudonyms.account_id',
+                   "id" => "users.id",
+                   "sis_integration_id" => "pseudonyms.integration_id",
+                   "lti_context_id" => "users.lti_context_id", # leaving for legacy reasons
+                   "lti_user_id" => "users.lti_context_id", # leaving for legacy reasons
+                   "lti_1_1_id" => "users.lti_context_id",
+                   "lti_1_3_id" => "users.lti_id",
+                   "uuid" => "users.uuid" }.freeze,
+        is_not_scoped_to_account: ["users.id", "users.lti_context_id", "users.lti_id", "users.uuid"].freeze,
+        scope: "pseudonyms.account_id",
         joins: :pseudonym }.freeze,
-    'accounts' =>
-      { lookups: { 'sis_account_id' => 'sis_source_id',
-                   'id' => 'id',
-                   'sis_integration_id' => 'integration_id',
-                   'lti_context_id' => 'lti_context_id',
-                   'uuid' => 'uuid' }.freeze,
+    "accounts" =>
+      { lookups: { "sis_account_id" => "sis_source_id",
+                   "id" => "id",
+                   "sis_integration_id" => "integration_id",
+                   "lti_context_id" => "lti_context_id",
+                   "uuid" => "uuid" }.freeze,
         is_not_scoped_to_account: %w[id lti_context_id uuid].freeze,
-        scope: 'root_account_id' }.freeze,
-    'course_sections' =>
-      { lookups: { 'sis_section_id' => 'sis_source_id',
-                   'id' => 'id',
-                   'sis_integration_id' => 'integration_id' }.freeze,
-        is_not_scoped_to_account: ['id'].freeze,
-        scope: 'root_account_id' }.freeze,
-    'groups' =>
-        { lookups: { 'sis_group_id' => 'sis_source_id',
-                     'id' => 'id' }.freeze,
-          is_not_scoped_to_account: ['id'].freeze,
-          scope: 'root_account_id' }.freeze,
-    'group_categories' =>
-        { lookups: { 'sis_group_category_id' => 'sis_source_id',
-                     'id' => 'id' }.freeze,
-          is_not_scoped_to_account: ['id'].freeze,
-          scope: 'root_account_id' }.freeze,
-    'assignments' =>
-        { lookups: { 'sis_assignment_id' => 'sis_source_id',
-                     'id' => 'id',
-                     'lti_context_id' => 'lti_context_id' }.freeze,
-          is_not_scoped_to_account: ['id'].freeze,
-          scope: 'root_account_id' }.freeze,
+        scope: "root_account_id" }.freeze,
+    "course_sections" =>
+      { lookups: { "sis_section_id" => "sis_source_id",
+                   "id" => "id",
+                   "sis_integration_id" => "integration_id" }.freeze,
+        is_not_scoped_to_account: ["id"].freeze,
+        scope: "root_account_id" }.freeze,
+    "groups" =>
+        { lookups: { "sis_group_id" => "sis_source_id",
+                     "id" => "id" }.freeze,
+          is_not_scoped_to_account: ["id"].freeze,
+          scope: "root_account_id" }.freeze,
+    "group_categories" =>
+        { lookups: { "sis_group_category_id" => "sis_source_id",
+                     "id" => "id" }.freeze,
+          is_not_scoped_to_account: ["id"].freeze,
+          scope: "root_account_id" }.freeze,
+    "assignments" =>
+        { lookups: { "sis_assignment_id" => "sis_source_id",
+                     "id" => "id",
+                     "lti_context_id" => "lti_context_id" }.freeze,
+          is_not_scoped_to_account: ["id"].freeze,
+          scope: "root_account_id" }.freeze,
   }.freeze
 
   MAX_ID = ((2**63) - 1)
@@ -164,20 +164,20 @@ module Api
   def self.sis_parse_id(id, lookups, _current_user = nil,
                         root_account: nil)
     # returns column_name, column_value
-    return lookups['id'], id if id.is_a?(Numeric) || id.is_a?(ActiveRecord::Base)
+    return lookups["id"], id if id.is_a?(Numeric) || id.is_a?(ActiveRecord::Base)
 
     id = id.to_s.strip
     case id
     when /\Ahex:(lti_[\w_]+|sis_[\w_]+):(([0-9A-Fa-f]{2})+)\z/
       sis_column = $1
-      sis_id = [$2].pack('H*')
+      sis_id = [$2].pack("H*")
     when /\A(lti_[\w_]+|sis_[\w_]+):(.+)\z/
       sis_column = $1
       sis_id = $2
     when ID_REGEX
-      return lookups['id'], (/\A\d+\z/.match?(id) ? id.to_i : id)
+      return lookups["id"], (/\A\d+\z/.match?(id) ? id.to_i : id)
     when UUID_REGEX
-      return lookups['uuid'], $1
+      return lookups["uuid"], $1
     else
       return nil, nil
     end
@@ -306,12 +306,12 @@ module Api
 
   def self.max_per_page(action = nil)
     result = Setting.get("api_max_per_page_#{action}", nil)&.to_i if action
-    result || Setting.get('api_max_per_page', '50').to_i
+    result || Setting.get("api_max_per_page", "50").to_i
   end
 
   def self.per_page(action = nil)
     result = Setting.get("api_per_page_#{action}", nil)&.to_i if action
-    result || Setting.get('api_per_page', '10').to_i
+    result || Setting.get("api_per_page", "10").to_i
   end
 
   def self.per_page_for(controller, options = {})
@@ -329,7 +329,7 @@ module Api
     collection = paginate_collection!(collection, controller, pagination_args)
     hash = build_links_hash(base_url, meta_for_pagination(controller, collection))
     links = build_links_from_hash(hash)
-    controller.response.headers["Link"] = links.join(',') unless links.empty?
+    controller.response.headers["Link"] = links.join(",") unless links.empty?
     if response_args[:enhanced_return]
       { hash: hash, collection: collection }
     else
@@ -351,7 +351,7 @@ module Api
     meta = jsonapi_meta(collection, controller, base_url)
     hash = build_links_hash(base_url, meta_for_pagination(controller, collection))
     links = build_links_from_hash(hash)
-    controller.response.headers["Link"] = links.join(',') unless links.empty?
+    controller.response.headers["Link"] = links.join(",") unless links.empty?
     [collection, meta]
   end
 
@@ -435,14 +435,14 @@ module Api
   end
 
   def self.build_links_hash(base_url, opts = {})
-    base_url += (base_url.include?('?') ? '&' : '?')
+    base_url += (base_url.include?("?") ? "&" : "?")
     qp = opts[:query_parameters] || {}
     qp = qp.with_indifferent_access.except(*EXCLUDE_IN_PAGINATION_LINKS)
     base_url += "#{qp.to_query}&" if qp.present?
 
     # Apache limits the HTTP response headers to 8KB total; with lots of query parameters, link headers can exceed this
     # so prioritize the links we include and don't exceed (by default) 6KB in total
-    max_link_headers_size = Setting.get('pagination_max_link_headers_size', '6144').to_i
+    max_link_headers_size = Setting.get("pagination_max_link_headers_size", "6144").to_i
     link_headers_size = 0
     LINK_PRIORITY.each_with_object({}) do |param, obj|
       next unless opts[param].present?
@@ -456,7 +456,7 @@ module Api
   end
 
   def self.pagination_params(base_url)
-    if base_url.length > Setting.get('pagination_max_base_url_for_links', '1000').to_i
+    if base_url.length > Setting.get("pagination_max_base_url_for_links", "1000").to_i
       # to prevent Link headers from consuming too much of the 8KB Apache allows in response headers
       ESSENTIAL_PAGINATION_PARAMS
     else
@@ -477,11 +477,11 @@ module Api
   def media_comment_json(media_object_or_hash)
     media_object_or_hash = OpenStruct.new(media_object_or_hash) if media_object_or_hash.is_a?(Hash)
     {
-      'content-type' => "#{media_object_or_hash.media_type}/mp4",
-      'display_name' => media_object_or_hash.title.presence || media_object_or_hash.user_entered_title,
-      'media_id' => media_object_or_hash.media_id,
-      'media_type' => media_object_or_hash.media_type,
-      'url' => user_media_download_url(user_id: @current_user.id,
+      "content-type" => "#{media_object_or_hash.media_type}/mp4",
+      "display_name" => media_object_or_hash.title.presence || media_object_or_hash.user_entered_title,
+      "media_id" => media_object_or_hash.media_id,
+      "media_type" => media_object_or_hash.media_type,
+      "url" => user_media_download_url(user_id: @current_user.id,
                                        entryId: media_object_or_hash.media_id,
                                        type: "mp4",
                                        redirect: "1")
@@ -515,11 +515,11 @@ module Api
     Api.api_bulk_load_user_content_attachments(htmls, context)
   end
 
-  PLACEHOLDER_PROTOCOL = 'https'
-  PLACEHOLDER_HOST = 'placeholder.invalid'
+  PLACEHOLDER_PROTOCOL = "https"
+  PLACEHOLDER_HOST = "placeholder.invalid"
 
   def get_host_and_protocol_from_request
-    [request.host_with_port, request.ssl? ? 'https' : 'http']
+    [request.host_with_port, request.ssl? ? "https" : "http"]
   end
 
   def resolve_placeholders(content)
@@ -558,7 +558,7 @@ module Api
 
     html = context.shard.activate do
       rewriter = UserContent::HtmlRewriter.new(context, user)
-      rewriter.set_handler('files') do |match|
+      rewriter.set_handler("files") do |match|
         UserContent::FilesHandler.new(
           match: match,
           context: context,
@@ -599,7 +599,7 @@ module Api
 
   # takes a comma separated string, an array, or nil and returns an array
   def self.value_to_array(value)
-    value.is_a?(String) ? value.split(',') : (value || [])
+    value.is_a?(String) ? value.split(",") : (value || [])
   end
 
   def self.invalid_time_stamp_error(attribute, message)
@@ -607,7 +607,7 @@ module Api
       message: "invalid #{attribute}",
       exception_message: message
     }
-    Canvas::Errors.capture('invalid_date_time', data, :info)
+    Canvas::Errors.capture("invalid_date_time", data, :info)
   end
 
   # regex for valid iso8601 dates
@@ -653,7 +653,7 @@ module Api
   end
 
   def accepts_jsonapi?
-    !!request.headers['Accept'].to_s.include?('application/vnd.api+json')
+    !!request.headers["Accept"].to_s.include?("application/vnd.api+json")
   end
 
   # Return a template url that follows the root links key for the jsonapi.org

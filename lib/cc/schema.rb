@@ -30,7 +30,7 @@ module CC
 
     def self.whitelist
       @whitelist ||= Dir.entries(XSD_DIRECTORY).each_with_object([]) do |entry, memo|
-        memo << entry.gsub(REGEX, '') if REGEX.match?(entry)
+        memo << entry.gsub(REGEX, "") if REGEX.match?(entry)
       end
     end
   end

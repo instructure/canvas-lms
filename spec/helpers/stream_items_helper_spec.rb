@@ -37,7 +37,7 @@ describe StreamItemsHelper do
     @assignment.assign_peer_review(@teacher, @student)
     @assignment.assign_peer_review(@reviewer_student, @reviewee_student)
     # this conversation will not be shown, since the teacher is the last author
-    conversation(@another_user, @teacher).conversation.add_message(@teacher, 'zomg')
+    conversation(@another_user, @teacher).conversation.add_message(@teacher, "zomg")
     # whereas this one will be shown
     @participant = conversation(@other_user, @teacher)
     @conversation = @participant.conversation
@@ -104,7 +104,7 @@ describe StreamItemsHelper do
         course_with_teacher(active_all: 1)
         @user2 = @shard1.activate { user_model }
         @course.enroll_student(@user2).accept!
-        @course.discussion_topics.create!(title: 'title')
+        @course.discussion_topics.create!(title: "title")
 
         items = @user2.recent_stream_items
         categorized = helper.categorize_stream_items(items, @user2)
@@ -119,7 +119,7 @@ describe StreamItemsHelper do
       it "links to stream item assets should be relative to the active shard" do
         @shard1.activate { course_with_teacher(account: Account.create, active_all: 1) }
         @shard2.activate { course_with_teacher(account: Account.create, active_all: 1, user: @teacher) }
-        topic = @course.discussion_topics.create!(title: 'title')
+        topic = @course.discussion_topics.create!(title: "title")
 
         items = @teacher.recent_stream_items
         categorized = helper.categorize_stream_items(items, @teacher)
@@ -133,7 +133,7 @@ describe StreamItemsHelper do
       it "links to stream item contexts should be relative to the active shard" do
         @shard1.activate { course_with_teacher(account: Account.create, active_all: 1) }
         @shard2.activate { course_with_teacher(account: Account.create, active_all: 1, user: @teacher) }
-        @course.discussion_topics.create!(title: 'title')
+        @course.discussion_topics.create!(title: "title")
 
         items = @teacher.recent_stream_items
         categorized = helper.categorize_stream_items(items, @teacher)
@@ -201,7 +201,7 @@ describe StreamItemsHelper do
       expect(@categorized["AssessmentRequest"].first.summary).to include(@assignment.title)
     end
 
-    it 'handles anonymous review for AssessmentRequests' do
+    it "handles anonymous review for AssessmentRequests" do
       @assignment.update_attribute(:anonymous_peer_reviews, true)
       student = @student
       create_enrollments(@course, [@other_user])
@@ -212,14 +212,14 @@ describe StreamItemsHelper do
         user: student,
         assessor_asset: assessor_submission
       )
-      assessment_request.workflow_state = 'assigned'
+      assessment_request.workflow_state = "assigned"
       assessment_request.save
       items = @other_user.recent_stream_items
       @categorized = helper.categorize_stream_items(items, @other_user)
-      expect(@categorized["AssessmentRequest"].first.summary).to include('Anonymous User')
+      expect(@categorized["AssessmentRequest"].first.summary).to include("Anonymous User")
     end
 
-    it 'anonymizes path for anonymous AssessmentRequests' do
+    it "anonymizes path for anonymous AssessmentRequests" do
       @assignment.update_attribute(:anonymous_peer_reviews, true)
       student = @student
       create_enrollments(@course, [@other_user])
@@ -230,11 +230,11 @@ describe StreamItemsHelper do
         user: student,
         assessor_asset: assessor_submission
       )
-      assessment_request.workflow_state = 'assigned'
+      assessment_request.workflow_state = "assigned"
       assessment_request.save
       items = @other_user.recent_stream_items
       @categorized = helper.categorize_stream_items(items, @other_user)
-      expect(@categorized["AssessmentRequest"].first.path).to include('anonymous_submission')
+      expect(@categorized["AssessmentRequest"].first.path).to include("anonymous_submission")
     end
   end
 end

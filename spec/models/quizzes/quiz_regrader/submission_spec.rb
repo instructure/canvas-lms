@@ -17,11 +17,11 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'active_support'
+require "active_support"
 
 describe Quizzes::QuizRegrader::Submission do
   let(:regrade_options) do
-    { 1 => 'no_regrade', 2 => 'full_credit', 3 => 'current_correct_only' }
+    { 1 => "no_regrade", 2 => "full_credit", 3 => "current_correct_only" }
   end
 
   let(:question_group) do
@@ -182,9 +182,9 @@ describe Quizzes::QuizRegrader::Submission do
       question_names = regrade_submission.rescored_submission.questions.pluck(:question_name)
 
       expect(question_names.sort).to eq [
-        'Question 1',
-        'Question 2',
-        'Question 3'
+        "Question 1",
+        "Question 2",
+        "Question 3"
       ]
     end
   end

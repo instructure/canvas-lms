@@ -58,7 +58,7 @@ shared_examples_for "a differentiable_object" do
       before do
         @course_section = @course.course_sections.create
         @student1, @student2, @student3 = create_users(3, return_type: :record)
-        @course.enroll_student(@student2, enrollment_state: 'active')
+        @course.enroll_student(@student2, enrollment_state: "active")
         @section = @course.course_sections.create!(name: "test section")
         @section2 = @course.course_sections.create!(name: "second test section")
         student_in_section(@section, user: @student1)
@@ -69,7 +69,7 @@ shared_examples_for "a differentiable_object" do
 
       context "observing only a section (with or without an override)" do
         before do
-          @observer_enrollment = @course.enroll_user(@observer, 'ObserverEnrollment', section: @section2, enrollment_state: 'active')
+          @observer_enrollment = @course.enroll_user(@observer, "ObserverEnrollment", section: @section2, enrollment_state: "active")
         end
 
         it "is visible" do
@@ -79,7 +79,7 @@ shared_examples_for "a differentiable_object" do
 
       context "observing a student with visibility" do
         before do
-          @observer_enrollment = @course.enroll_user(@observer, 'ObserverEnrollment', section: @section2, enrollment_state: 'active')
+          @observer_enrollment = @course.enroll_user(@observer, "ObserverEnrollment", section: @section2, enrollment_state: "active")
           @observer_enrollment.update_attribute(:associated_user_id, @student1.id)
         end
 
@@ -90,7 +90,7 @@ shared_examples_for "a differentiable_object" do
 
       context "observing a student without visibility" do
         before do
-          @observer_enrollment = @course.enroll_user(@observer, 'ObserverEnrollment', section: @section2, enrollment_state: 'active')
+          @observer_enrollment = @course.enroll_user(@observer, "ObserverEnrollment", section: @section2, enrollment_state: "active")
           @observer_enrollment.update_attribute(:associated_user_id, @student2.id)
         end
 
@@ -101,7 +101,7 @@ shared_examples_for "a differentiable_object" do
 
       context "observing two students, one with visibility" do
         before do
-          @observer_enrollment = @course.enroll_user(@observer, 'ObserverEnrollment', section: @section2, enrollment_state: 'active', associated_user_id: @student1.id)
+          @observer_enrollment = @course.enroll_user(@observer, "ObserverEnrollment", section: @section2, enrollment_state: "active", associated_user_id: @student1.id)
           @course.enroll_user(@observer, "ObserverEnrollment", { allow_multiple_enrollments: true, associated_user_id: @student2.id })
         end
 
@@ -112,7 +112,7 @@ shared_examples_for "a differentiable_object" do
 
       context "observing two students, neither with visibility" do
         before do
-          @observer_enrollment = @course.enroll_user(@observer, 'ObserverEnrollment', section: @section2, enrollment_state: 'active', associated_user_id: @student3.id)
+          @observer_enrollment = @course.enroll_user(@observer, "ObserverEnrollment", section: @section2, enrollment_state: "active", associated_user_id: @student3.id)
           @course.enroll_user(@observer, "ObserverEnrollment", { allow_multiple_enrollments: true, associated_user_id: @student2.id })
         end
 
@@ -143,7 +143,7 @@ shared_examples_for "a differentiable_object" do
     context "observer" do
       before do
         @observer = User.create(name: "observer")
-        @observer_enrollment = @course.enroll_user(@observer, 'ObserverEnrollment', section: @section2, enrollment_state: 'active')
+        @observer_enrollment = @course.enroll_user(@observer, "ObserverEnrollment", section: @section2, enrollment_state: "active")
       end
 
       it "does not filter when no observed students" do

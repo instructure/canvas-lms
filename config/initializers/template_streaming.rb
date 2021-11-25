@@ -15,7 +15,7 @@ module MarkTemplateStreaming
       # The Rack::Chunked middleware will handle it
       headers["Cache-Control"] ||= "no-cache"
       headers["Last-Modified"] ||= Time.now.httpdate
-      headers.delete('Content-Length')
+      headers.delete("Content-Length")
       options[:stream] = stream
     end
   end
@@ -52,7 +52,7 @@ module StreamingViewExtensions
 
   def provide(name, content = nil, &block)
     if block
-      content = capture(&block) || '' # still carry on even if the block doesn't return anything
+      content = capture(&block) || "" # still carry on even if the block doesn't return anything
       provide(name, content)
     else
       super
@@ -62,7 +62,7 @@ module StreamingViewExtensions
   # short-hand to provide blank content for multiple keys at once
   def provide_blank(*keys)
     keys.each do |key|
-      provide(key, '')
+      provide(key, "")
     end
   end
 end
@@ -108,7 +108,7 @@ ActionView::StreamingBuffer.prepend(SkipEmptyTemplateConcats)
 
 module ActivateShardsOnRender
   def render(view, *)
-    if (active_shard = view.request&.env&.[]('canvas.active_shard'))
+    if (active_shard = view.request&.env&.[]("canvas.active_shard"))
       active_shard.activate do
         super
       end

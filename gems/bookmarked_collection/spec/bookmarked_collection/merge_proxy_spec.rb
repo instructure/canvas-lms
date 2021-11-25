@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'spec_helper'
+require "spec_helper"
 
 describe "BookmarkedCollection::MergeProxy" do
   let(:my_bookmarker) do
@@ -33,7 +33,7 @@ describe "BookmarkedCollection::MergeProxy" do
 
       def self.restrict_scope(scope, pager)
         if (bookmark = pager.current_bookmark)
-          comparison = (pager.include_bookmark ? 'id >= ?' : 'id > ?')
+          comparison = (pager.include_bookmark ? "id >= ?" : "id > ?")
           scope = scope.where(comparison, bookmark)
         end
         scope.order("id ASC")
@@ -44,14 +44,14 @@ describe "BookmarkedCollection::MergeProxy" do
   describe "#paginate" do
     before do
       @example_class = Class.new(ActiveRecord::Base) do
-        self.table_name = 'examples'
+        self.table_name = "examples"
       end
 
       @scope = @example_class.order(:id)
 
       3.times { @scope.create! }
       @collection = BookmarkedCollection.wrap(my_bookmarker, @scope)
-      @proxy = BookmarkedCollection::MergeProxy.new([['label', @collection]])
+      @proxy = BookmarkedCollection::MergeProxy.new([["label", @collection]])
     end
 
     it "requires per_page parameter" do
@@ -63,8 +63,8 @@ describe "BookmarkedCollection::MergeProxy" do
     end
 
     it "requires a bookmark-style page parameter" do
-      value1 = 'bookmark'
-      value2 = ['label', 0]
+      value1 = "bookmark"
+      value2 = ["label", 0]
       bookmark1 = 1
       bookmark2 = "bookmark:W1td" # base64 of '[[]' which should fail to parse
       bookmark3 = "bookmark:#{::JSONToken.encode(value1)}"
@@ -85,7 +85,7 @@ describe "BookmarkedCollection::MergeProxy" do
     end
 
     it "sets next_bookmark if the page wasn't the last" do
-      expect(@proxy.paginate(per_page: 1).next_bookmark).to eq(['label', my_bookmarker.bookmark_for(@scope.first)])
+      expect(@proxy.paginate(per_page: 1).next_bookmark).to eq(["label", my_bookmarker.bookmark_for(@scope.first)])
     end
 
     it "does not set next_bookmark if the page was the last" do
@@ -94,8 +94,8 @@ describe "BookmarkedCollection::MergeProxy" do
 
     describe "with multiple collections" do
       before do
-        @created_scope = @example_class.where(state: 'created')
-        @deleted_scope = @example_class.where(state: 'deleted')
+        @created_scope = @example_class.where(state: "created")
+        @deleted_scope = @example_class.where(state: "deleted")
 
         @courses = [
           @created_scope.create!,
@@ -111,8 +111,8 @@ describe "BookmarkedCollection::MergeProxy" do
         @created_collection = BookmarkedCollection.wrap(my_bookmarker, @created_scope)
         @deleted_collection = BookmarkedCollection.wrap(my_bookmarker, @deleted_scope)
         @proxy = BookmarkedCollection::MergeProxy.new([
-                                                        ['created', @created_collection],
-                                                        ['deleted', @deleted_collection]
+                                                        ["created", @created_collection],
+                                                        ["deleted", @deleted_collection]
                                                       ])
       end
 
@@ -132,7 +132,7 @@ describe "BookmarkedCollection::MergeProxy" do
         # indicates we've seen through @courses[2].id up through the 0th
         # collection, but haven't seen it from the 1th collection (the one that
         # has @courses[2]) yet
-        page.next_bookmark = ['created', @courses[2].id]
+        page.next_bookmark = ["created", @courses[2].id]
         expect(@proxy.paginate(page: page.next_page, per_page: 3)).to eq(@courses[2, 3])
       end
 
@@ -167,11 +167,11 @@ describe "BookmarkedCollection::MergeProxy" do
       it "merges when bookmarks have nil values" do
         nil_bookmark = BookmarkedCollection::SimpleBookmarker.new(@example_class, :date, :id)
         course = @created_scope.create!(date: "2017-11-30T00:00:00-06:00")
-        created_collection = BookmarkedCollection.wrap(nil_bookmark, @created_scope.order('date DESC, id'))
-        deleted_collection = BookmarkedCollection.wrap(nil_bookmark, @deleted_scope.order('date DESC, id'))
+        created_collection = BookmarkedCollection.wrap(nil_bookmark, @created_scope.order("date DESC, id"))
+        deleted_collection = BookmarkedCollection.wrap(nil_bookmark, @deleted_scope.order("date DESC, id"))
         proxy = BookmarkedCollection::MergeProxy.new([
-                                                       ['created', created_collection],
-                                                       ['deleted', deleted_collection]
+                                                       ["created", created_collection],
+                                                       ["deleted", deleted_collection]
                                                      ])
 
         expect(proxy.paginate(per_page: 5)).to eq([course] + @courses[0, 4])
@@ -187,7 +187,7 @@ describe "BookmarkedCollection::MergeProxy" do
 
         @collection1 = BookmarkedCollection.wrap(my_bookmarker, @scope1)
         @collection2 = BookmarkedCollection.wrap(my_bookmarker, @scope2)
-        collections = [['1', @collection1], ['2', @collection2]]
+        collections = [["1", @collection1], ["2", @collection2]]
 
         @yield = double(tally: nil)
         @proxy = BookmarkedCollection::MergeProxy.new(collections) do |c1, c2|
@@ -214,7 +214,7 @@ describe "BookmarkedCollection::MergeProxy" do
 
       it "indicates the first collection to provide the last value in the bookmark" do
         results = @proxy.paginate(per_page: 3)
-        expect(results.next_bookmark).to eq(['1', @courses[2].id])
+        expect(results.next_bookmark).to eq(["1", @courses[2].id])
       end
 
       it "does not repeat elements from prior pages regardless of duplicates" do

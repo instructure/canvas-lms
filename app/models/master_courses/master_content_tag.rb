@@ -37,8 +37,8 @@ class MasterCourses::MasterContentTag < ActiveRecord::Base
                                      :learning_outcome,
                                      :rubric,
                                      :wiki_page,
-                                     quiz: 'Quizzes::Quiz']
-  belongs_to :root_account, class_name: 'Account'
+                                     quiz: "Quizzes::Quiz"]
+  belongs_to :root_account, class_name: "Account"
   validates_with MasterCourses::TagValidator
 
   serialize :restrictions, Hash
@@ -89,7 +89,7 @@ class MasterCourses::MasterContentTag < ActiveRecord::Base
           #{MasterCourses::ChildContentTag.table_name}.content_type=#{ContentTag.table_name}.content_type AND
           #{MasterCourses::ChildContentTag.table_name}.content_id=#{ContentTag.table_name}.content_id")
       .where(content_tags: { id: item_ids })
-      .pluck('content_tags.id', :restrictions)
+      .pluck("content_tags.id", :restrictions)
     data.to_h
   end
 
@@ -99,7 +99,7 @@ class MasterCourses::MasterContentTag < ActiveRecord::Base
           #{table_name}.content_type=#{ContentTag.table_name}.content_type AND
           #{table_name}.content_id=#{ContentTag.table_name}.content_id")
       .where(content_tags: { id: item_ids })
-      .pluck('content_tags.id', :restrictions)
+      .pluck("content_tags.id", :restrictions)
     hash = data.to_h
     (item_ids - hash.keys).each do |missing_id| # populate blank restrictions for all items without mastercontenttags created yet
       hash[missing_id] = {}

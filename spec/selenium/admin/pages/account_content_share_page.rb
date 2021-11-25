@@ -17,24 +17,24 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../../common'
+require_relative "../../common"
 
 module AccountContentSharePage
   # ---------------------- Elements ----------------------
   def page_body
-    f('body')
+    f("body")
   end
 
   def content_share_main_content
-    f('#content')
+    f("#content")
   end
 
   def page_application_container
-    f('#application')
+    f("#application")
   end
 
   def received_table_rows
-    ff('table tr')
+    ff("table tr")
   end
 
   def received_item_row(item_name)

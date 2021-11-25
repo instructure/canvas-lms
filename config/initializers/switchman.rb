@@ -41,7 +41,7 @@ Rails.application.config.after_initialize do
       end
 
       def settings
-        return {} unless self.class.columns_hash.key?('settings')
+        return {} unless self.class.columns_hash.key?("settings")
 
         s = super
         if s.nil?
@@ -52,7 +52,7 @@ Rails.application.config.after_initialize do
         secret = s.delete(:encryption_key_enc)
         if secret || salt
           if secret && salt
-            s[:encryption_key] = Canvas::Security.decrypt_password(secret, salt, 'shard_encryption_key')
+            s[:encryption_key] = Canvas::Security.decrypt_password(secret, salt, "shard_encryption_key")
           end
           self.settings = s
         end
@@ -63,7 +63,7 @@ Rails.application.config.after_initialize do
       def encrypt_settings
         s = settings.dup
         if (encryption_key = s.delete(:encryption_key))
-          secret, salt = Canvas::Security.encrypt_password(encryption_key, 'shard_encryption_key')
+          secret, salt = Canvas::Security.encrypt_password(encryption_key, "shard_encryption_key")
           s[:encryption_key_enc] = secret
           s[:encryption_key_salt] = salt
         end
@@ -177,24 +177,24 @@ Rails.application.config.after_initialize do
     end
 
     def maintenance_window_start_hour
-      Setting.get('maintenance_window_start_hour', nil)&.to_i
+      Setting.get("maintenance_window_start_hour", nil)&.to_i
     end
 
     def maintenance_window_offset
-      Setting.get('maintenance_window_offset', '0').to_i
+      Setting.get("maintenance_window_offset", "0").to_i
     end
 
     def maintenance_window_duration
       # ISO 8601 duration
-      ActiveSupport::Duration.parse(Setting.get('maintenance_window_duration', "PT2H"))
+      ActiveSupport::Duration.parse(Setting.get("maintenance_window_duration", "PT2H"))
     end
 
     def maintenance_window_weekday
-      Setting.get('maintenance_window_weekday', 'thursday').downcase
+      Setting.get("maintenance_window_weekday", "thursday").downcase
     end
 
     def maintenance_window_weeks_of_month
-      Setting.get('maintenance_window_weeks_of_month', "1,3").split(',').map(&:to_i)
+      Setting.get("maintenance_window_weeks_of_month", "1,3").split(",").map(&:to_i)
     end
 
     def self.send_in_each_region(klass, method, enqueue_args = {}, *args)
@@ -260,8 +260,8 @@ Rails.application.config.after_initialize do
     end
   end
 
-  if !Shard.default.is_a?(Shard) && Switchman.config[:force_sharding] && !ENV['SKIP_FORCE_SHARDING']
-    raise 'Sharding is supposed to be set up, but is not! Use SKIP_FORCE_SHARDING=1 to ignore'
+  if !Shard.default.is_a?(Shard) && Switchman.config[:force_sharding] && !ENV["SKIP_FORCE_SHARDING"]
+    raise "Sharding is supposed to be set up, but is not! Use SKIP_FORCE_SHARDING=1 to ignore"
   end
 
   if Shard.default.is_a?(Shard)

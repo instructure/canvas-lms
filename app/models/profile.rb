@@ -19,7 +19,7 @@
 
 class Profile < ActiveRecord::Base
   belongs_to :context, polymorphic: [:course], exhaustive: false
-  belongs_to :root_account, class_name: 'Account'
+  belongs_to :root_account, class_name: "Account"
 
   serialize :data
 
@@ -40,7 +40,7 @@ class Profile < ActiveRecord::Base
   def infer_path
     return nil unless title
 
-    path = base_path = title.downcase.gsub(/[^a-z0-9]+/, '-').gsub(/\A-+|-+\z/, '')
+    path = base_path = title.downcase.gsub(/[^a-z0-9]+/, "-").gsub(/\A-+|-+\z/, "")
     count = 0
     while (profile = Profile.where(root_account_id: root_account_id, path: path).first)
       break if profile.id == id
@@ -85,7 +85,7 @@ class Profile < ActiveRecord::Base
   # some tricks to make it behave like STI with a type column
   def self.inherited(klass)
     super
-    context_type = klass.name.delete_suffix('Profile')
+    context_type = klass.name.delete_suffix("Profile")
     klass.class_eval { alias_method context_type.downcase.underscore, :context }
   end
 

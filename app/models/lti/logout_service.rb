@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'net/http'
+require "net/http"
 
 module Lti
   class LogoutService
@@ -25,7 +25,7 @@ module Lti
     TOKEN_EXPIRATION = 600
 
     def self.cache_key(pseudonym)
-      ['logout_service_callbacks_2', pseudonym.id].cache_key
+      ["logout_service_callbacks_2", pseudonym.id].cache_key
     end
 
     def self.get_logout_callbacks(pseudonym)
@@ -43,15 +43,15 @@ module Lti
 
       def serialize
         key = tool.shard.settings[:encryption_key]
-        payload = [tool.id, pseudonym.id, timestamp.to_i, nonce].join('-')
+        payload = [tool.id, pseudonym.id, timestamp.to_i, nonce].join("-")
         "#{payload}-#{Canvas::Security.hmac_sha1(payload, key)}"
       end
 
       def self.parse_and_validate(serialized_token)
-        parts = serialized_token.split('-')
+        parts = serialized_token.split("-")
         tool = ContextExternalTool.find(parts[0].to_i)
         key = tool.shard.settings[:encryption_key]
-        unless parts.size == 5 && Canvas::Security.hmac_sha1(parts[0..-2].join('-'), key) == parts[-1]
+        unless parts.size == 5 && Canvas::Security.hmac_sha1(parts[0..-2].join("-"), key) == parts[-1]
           raise BasicLTI::BasicOutcomes::Unauthorized, "Invalid logout service token"
         end
 
@@ -84,7 +84,7 @@ module Lti
       return unless token.pseudonym&.id && callback.present?
 
       callbacks = get_logout_callbacks(token.pseudonym)
-      raise BasicLTI::BasicOutcomes::Unauthorized, 'Logout service token has already been used' if callbacks.key?(token.nonce)
+      raise BasicLTI::BasicOutcomes::Unauthorized, "Logout service token has already been used" if callbacks.key?(token.nonce)
 
       callbacks[token.nonce] = callback
       Rails.cache.write(cache_key(token.pseudonym), callbacks, expires_in: 1.day)

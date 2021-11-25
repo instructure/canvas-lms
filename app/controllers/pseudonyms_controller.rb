@@ -121,7 +121,7 @@ class PseudonymsController < ApplicationController
       # Whether the email was actually found or not, we display the same
       # message. Otherwise this form could be used to fish for valid
       # email addresses.
-      flash[:notice] = t 'notices.email_sent', "Confirmation email sent to %{email}, make sure to check your spam box", email: email
+      flash[:notice] = t "notices.email_sent", "Confirmation email sent to %{email}, make sure to check your spam box", email: email
       @ccs.each(&:forgot_password!)
       format.html { redirect_to(canvas_login_url) }
       format.json { render json: { requested: true } }
@@ -136,8 +136,8 @@ class PseudonymsController < ApplicationController
     @headers = false
     # Allow unregistered users to change password.  How else can they come back later
     # and finish the registration process?
-    if !@cc || @cc.path_type != 'email'
-      flash[:error] = t 'errors.cant_change_password', "Cannot change the password for that login, or login does not exist"
+    if !@cc || @cc.path_type != "email"
+      flash[:error] = t "errors.cant_change_password", "Cannot change the password for that login, or login does not exist"
       redirect_to canvas_login_url
     else
       if @cc.confirmation_code_expires_at.present? && @cc.confirmation_code_expires_at <= Time.now.utc
@@ -153,7 +153,7 @@ class PseudonymsController < ApplicationController
   def change_password
     @pseudonym = Pseudonym.find(params[:pseudonym][:id] || params[:pseudonym_id])
     if (@cc = @pseudonym.user.communication_channels.where(confirmation_code: params[:nonce])
-                       .where('confirmation_code_expires_at IS NULL OR confirmation_code_expires_at > ?', Time.now.utc).first)
+                       .where("confirmation_code_expires_at IS NULL OR confirmation_code_expires_at > ?", Time.now.utc).first)
       @pseudonym.require_password = true
       @pseudonym.password = params[:pseudonym][:password]
       @pseudonym.password_confirmation = params[:pseudonym][:password_confirmation]
@@ -175,7 +175,7 @@ class PseudonymsController < ApplicationController
         render json: { pseudonym: @pseudonym.errors.as_json[:errors] }, status: :bad_request
       end
     else
-      render json: { errors: { nonce: 'expired' } }, status: :bad_request # -> login url
+      render json: { errors: { nonce: "expired" } }, status: :bad_request # -> login url
     end
   end
 
@@ -265,7 +265,7 @@ class PseudonymsController < ApplicationController
     @pseudonym.generate_temporary_password unless params[:pseudonym][:password]
     if Pseudonym.unique_constraint_retry { @pseudonym.save_without_session_maintenance }
       respond_to do |format|
-        flash[:notice] = t 'notices.account_registered', "Account registered!"
+        flash[:notice] = t "notices.account_registered", "Account registered!"
         format.html { redirect_to user_profile_url(@current_user) }
         format.json { render json: pseudonym_json(@pseudonym, @current_user, session) }
       end
@@ -373,7 +373,7 @@ class PseudonymsController < ApplicationController
     return unless update_pseudonym_from_params
 
     if @pseudonym.save_without_session_maintenance
-      flash[:notice] = t 'notices.account_updated', "Account updated!"
+      flash[:notice] = t "notices.account_updated", "Account updated!"
       respond_to do |format|
         format.html { redirect_to user_profile_url(@current_user) }
         format.json { render json: pseudonym_json(@pseudonym, @current_user, session) }
@@ -410,7 +410,7 @@ class PseudonymsController < ApplicationController
     return unless authorized_action(@pseudonym, @current_user, :delete)
 
     if @user.all_active_pseudonyms.length < 2
-      @pseudonym.errors.add(:base, t('errors.login_required', "Users must have at least one login"))
+      @pseudonym.errors.add(:base, t("errors.login_required", "Users must have at least one login"))
       render json: @pseudonym.errors, status: :bad_request
     elsif @pseudonym.destroy
       if api_request?
@@ -429,7 +429,7 @@ class PseudonymsController < ApplicationController
     if @context.root_account?
       true
     else
-      render(json: { 'message' => 'Action must be called on a root account.' }, status: :bad_request)
+      render(json: { "message" => "Action must be called on a root account." }, status: :bad_request)
       false
     end
   end
@@ -486,9 +486,9 @@ class PseudonymsController < ApplicationController
 
     # give a 400 instead of a 401 if it doesn't make sense to change the password
     if params[:pseudonym].key?(:password) && !@pseudonym.passwordable?
-      @pseudonym.errors.add(:password, 'password can only be set for Canvas authentication')
+      @pseudonym.errors.add(:password, "password can only be set for Canvas authentication")
       respond_to do |format|
-        format.html { render(params[:action] == 'edit' ? :edit : :new) }
+        format.html { render(params[:action] == "edit" ? :edit : :new) }
         format.json { render json: @pseudonym.errors, status: :bad_request }
       end
       return false
@@ -501,9 +501,9 @@ class PseudonymsController < ApplicationController
 
     # give a 400 instead of a 401 if the workflow_state doesn't make sense
     if params[:pseudonym].key?(:workflow_state) && !%w[active suspended].include?(params[:pseudonym][:workflow_state])
-      @pseudonym.errors.add(:workflow_state, 'invalid workflow_state')
+      @pseudonym.errors.add(:workflow_state, "invalid workflow_state")
       respond_to do |format|
-        format.html { render(params[:action] == 'edit' ? :edit : :new) }
+        format.html { render(params[:action] == "edit" ? :edit : :new) }
         format.json { render json: @pseudonym.errors, status: :bad_request }
       end
       return false

@@ -50,8 +50,8 @@ module Api::V1::CommunicationChannel
         last_suppression_bounce_at
       ]
       methods += [
-        'last_bounce_summary',
-        'last_transient_bounce_summary'
+        "last_bounce_summary",
+        "last_transient_bounce_summary"
       ]
     end
 

@@ -20,7 +20,7 @@
 
 module Types
   class RubricCriterionType < ApplicationObjectType
-    description 'Individual criteria for a rubric'
+    description "Individual criteria for a rubric"
 
     implements Interfaces::LegacyIDInterface
 

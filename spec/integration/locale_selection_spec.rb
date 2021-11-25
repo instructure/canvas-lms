@@ -30,7 +30,7 @@ describe "locale_selection" do
   it "sets the locale when authenticated" do
     course_with_teacher(active_all: true, user: user_with_pseudonym)
     user_session(@user, @pseudonym)
-    @user.update_attribute :locale, 'es'
+    @user.update_attribute :locale, "es"
     @pseudonym.reload
     @domain_root_account = Account.default
 
@@ -41,7 +41,7 @@ describe "locale_selection" do
 
   it "sets the locale when not authenticated" do
     account = Account.default
-    account.update_attribute :default_locale, 'fr'
+    account.update_attribute :default_locale, "fr"
     get canvas_login_url
     expect(response).to be_successful
     expect(I18n.locale).to eql(:fr)

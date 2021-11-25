@@ -20,7 +20,7 @@
 
 class Alert < ActiveRecord::Base
   belongs_to :context, polymorphic: [:account, :course]
-  has_many :criteria, class_name: 'AlertCriterion', dependent: :destroy, autosave: true
+  has_many :criteria, class_name: "AlertCriterion", dependent: :destroy, autosave: true
 
   serialize :recipients
 
@@ -59,7 +59,7 @@ class Alert < ActiveRecord::Base
 
     recipients << student_id if include_student
     recipients.concat(Array(teachers)) if teachers.present? && include_teachers
-    if context_type == 'Account' && !admin_role_ids.empty?
+    if context_type == "Account" && !admin_role_ids.empty?
       recipients.concat context.account_users.active.where(role_id: admin_role_ids).distinct.pluck(:user_id)
     end
     recipients.uniq

@@ -22,20 +22,20 @@ describe MediaObject do
   context "loading with legacy support" do
     it "loads by either media_id or old_media_id" do
       course_factory
-      mo = factory_with_protected_attributes(MediaObject, media_id: '0_abcdefgh', old_media_id: '1_01234567', context: @course)
+      mo = factory_with_protected_attributes(MediaObject, media_id: "0_abcdefgh", old_media_id: "1_01234567", context: @course)
 
-      expect(MediaObject.by_media_id('0_abcdefgh').first).to eq mo
-      expect(MediaObject.by_media_id('1_01234567').first).to eq mo
+      expect(MediaObject.by_media_id("0_abcdefgh").first).to eq mo
+      expect(MediaObject.by_media_id("1_01234567").first).to eq mo
     end
 
     it "does not find an arbitrary MediaObject when given a nil id" do
       course_factory
-      factory_with_protected_attributes(MediaObject, media_id: '0_abcdefgh', context: @course)
+      factory_with_protected_attributes(MediaObject, media_id: "0_abcdefgh", context: @course)
       expect(MediaObject.by_media_id(nil).first).to be_nil
     end
 
     it "raises an error if someone tries to use find_by_media_id" do
-      expect { MediaObject.find_by(media_id: 'fjdksl') }.to raise_error('Do not look up MediaObjects by media_id - use the scope by_media_id instead to support migrated content.')
+      expect { MediaObject.find_by(media_id: "fjdksl") }.to raise_error("Do not look up MediaObjects by media_id - use the scope by_media_id instead to support migrated content.")
     end
   end
 
@@ -43,8 +43,8 @@ describe MediaObject do
     it "deletes attachments created temporarily for import" do
       course_factory
       folder = Folder.assert_path(CC::CCHelper::MEDIA_OBJECTS_FOLDER, @course)
-      @a1 = attachment_model(folder: folder, uploaded_data: stub_file_data('video1.mp4', nil, 'video/mp4'))
-      @a2 = attachment_model(context: @course, uploaded_data: stub_file_data('video1.mp4', nil, 'video/mp4'))
+      @a1 = attachment_model(folder: folder, uploaded_data: stub_file_data("video1.mp4", nil, "video/mp4"))
+      @a2 = attachment_model(context: @course, uploaded_data: stub_file_data("video1.mp4", nil, "video/mp4"))
       data = {
         entries: [
           { originalId: @a1.id, },
@@ -52,15 +52,15 @@ describe MediaObject do
         ],
       }
       MediaObject.build_media_objects(data, Account.default.id)
-      expect(@a1.reload.file_state).to eq 'deleted'
-      expect(@a2.reload.file_state).to eq 'available'
+      expect(@a1.reload.file_state).to eq "deleted"
+      expect(@a2.reload.file_state).to eq "available"
     end
 
     it "builds media objects from attachment_id" do
       course_factory
-      @a1 = attachment_model(context: @course, uploaded_data: stub_file_data('video1.mp4', nil, 'video/mp4'))
-      @a3 = attachment_model(context: @course, uploaded_data: stub_file_data('video1.mp4', nil, 'video/mp4'))
-      @a4 = attachment_model(context: @course, uploaded_data: stub_file_data('video1.mp4', nil, 'video/mp4'))
+      @a1 = attachment_model(context: @course, uploaded_data: stub_file_data("video1.mp4", nil, "video/mp4"))
+      @a3 = attachment_model(context: @course, uploaded_data: stub_file_data("video1.mp4", nil, "video/mp4"))
+      @a4 = attachment_model(context: @course, uploaded_data: stub_file_data("video1.mp4", nil, "video/mp4"))
       data = {
         entries: [
           { entryId: "test2", originalId: @a1.id.to_s },
@@ -104,8 +104,8 @@ describe MediaObject do
     end
   end
 
-  describe '#transcoded_details' do
-    it 'returns the mp3 info' do
+  describe "#transcoded_details" do
+    it "returns the mp3 info" do
       mo = MediaObject.create!(context: user_factory, media_id: "test")
       expect(mo.transcoded_details).to be_nil
       mo.data = { extensions: { mov: { id: "t-xxx" } } }
@@ -114,14 +114,14 @@ describe MediaObject do
       expect(mo.transcoded_details).to eq(id: "t-yyy")
     end
 
-    it 'returns the mp4 info' do
+    it "returns the mp4 info" do
       mo = MediaObject.create!(context: user_factory, media_id: "test")
       mo.data = { extensions: { mp4: { id: "t-yyy" } } }
       expect(mo.transcoded_details).to eq(id: "t-yyy")
     end
   end
 
-  describe '#retrieve_details_ensure_codecs' do
+  describe "#retrieve_details_ensure_codecs" do
     it "retries later when the transcode isn't available" do
       Timecop.freeze do
         mo = MediaObject.create!(context: user_factory, media_id: "test")
@@ -193,7 +193,7 @@ describe MediaObject do
 
   describe ".add_media_files" do
     it "delegates to the KalturaMediaFileHandler to make a bulk upload to kaltura" do
-      kaltura_media_file_handler = double('KalturaMediaFileHandler')
+      kaltura_media_file_handler = double("KalturaMediaFileHandler")
       expect(KalturaMediaFileHandler).to receive(:new).and_return(kaltura_media_file_handler)
 
       attachments = [Attachment.new]
@@ -226,7 +226,7 @@ describe MediaObject do
     end
 
     before do
-      mock_kaltura = double('CanvasKaltura::ClientV3')
+      mock_kaltura = double("CanvasKaltura::ClientV3")
       allow(CanvasKaltura::ClientV3).to receive(:new).and_return(mock_kaltura)
       allow(mock_kaltura).to receive(:media_sources).and_return(
         [{ height: "240", bitrate: "382", isOriginal: "0", width: "336", content_type: "video/mp4",
@@ -235,7 +235,7 @@ describe MediaObject do
     end
 
     before do
-      @mock_kaltura = double('CanvasKaltura::ClientV3')
+      @mock_kaltura = double("CanvasKaltura::ClientV3")
       allow(CanvasKaltura::ClientV3).to receive(:new).and_return(@mock_kaltura)
       allow(@mock_kaltura).to receive(:startSession).and_return(nil)
       allow(@mock_kaltura).to receive(:media_sources).and_return(

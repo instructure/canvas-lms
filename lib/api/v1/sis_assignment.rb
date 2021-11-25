@@ -58,7 +58,7 @@ module Api::V1::SisAssignment
   def sis_assignment_json(assignment, includes)
     json = api_json(assignment, nil, nil, API_SIS_ASSIGNMENT_JSON_OPTS)
     json[:due_at] = default_due_date(assignment)
-    json[:course_id] = assignment.context_id if assignment.context_type == 'Course'
+    json[:course_id] = assignment.context_id if assignment.context_type == "Course"
     json[:submission_types] = json.delete(:submission_types_array)
     json[:include_in_final_grade] = include_in_final_grade(assignment)
     add_sis_assignment_group_json(assignment, json)
@@ -122,7 +122,7 @@ module Api::V1::SisAssignment
 
   def sis_assignment_course_sections_json(course_sections, assignment)
     if assignment.only_visible_to_overrides
-      section_ids = active_assignment_overrides_for(assignment).map { |o| o.set_id if o.set_type == 'CourseSection' }
+      section_ids = active_assignment_overrides_for(assignment).map { |o| o.set_id if o.set_type == "CourseSection" }
       section_ids = Set.new(section_ids.compact)
       course_sections = course_sections.select { |section| section_ids.include?(section.id) }
     end
@@ -150,7 +150,7 @@ module Api::V1::SisAssignment
     return unless assignment_overrides
 
     override = assignment_overrides.detect do |assignment_override|
-      assignment_override.set_type == 'CourseSection' && assignment_override.set_id == course_section.id
+      assignment_override.set_type == "CourseSection" && assignment_override.set_id == course_section.id
     end
     return if override.nil?
 
@@ -160,7 +160,7 @@ module Api::V1::SisAssignment
   end
 
   def include_in_final_grade(assignment)
-    !(assignment.omit_from_final_grade? || assignment.grading_type == 'not_graded')
+    !(assignment.omit_from_final_grade? || assignment.grading_type == "not_graded")
   end
 
   def active_course_sections_for(context)

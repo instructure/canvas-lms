@@ -25,10 +25,10 @@ class SpeedUpMaxConcurrentTriggers < ActiveRecord::Migration[5.1]
   end
 
   def up
-    if connection.adapter_name == 'PostgreSQL'
+    if connection.adapter_name == "PostgreSQL"
       search_path = Shard.current.name
       execute(<<~SQL) # rubocop:disable Rails/SquishedSQLHeredocs
-        CREATE OR REPLACE FUNCTION #{connection.quote_table_name('delayed_jobs_after_delete_row_tr_fn')} () RETURNS trigger AS $$
+        CREATE OR REPLACE FUNCTION #{connection.quote_table_name("delayed_jobs_after_delete_row_tr_fn")} () RETURNS trigger AS $$
         DECLARE
           running_count integer;
         BEGIN
@@ -57,7 +57,7 @@ class SpeedUpMaxConcurrentTriggers < ActiveRecord::Migration[5.1]
 
       # don't need the full count on insert
       execute(<<~SQL) # rubocop:disable Rails/SquishedSQLHeredocs
-        CREATE OR REPLACE FUNCTION #{connection.quote_table_name('delayed_jobs_before_insert_row_tr_fn')} () RETURNS trigger AS $$
+        CREATE OR REPLACE FUNCTION #{connection.quote_table_name("delayed_jobs_before_insert_row_tr_fn")} () RETURNS trigger AS $$
         BEGIN
           IF NEW.strand IS NOT NULL THEN
             PERFORM pg_advisory_xact_lock(half_md5_as_bigint(NEW.strand));
@@ -75,10 +75,10 @@ class SpeedUpMaxConcurrentTriggers < ActiveRecord::Migration[5.1]
   end
 
   def down
-    if connection.adapter_name == 'PostgreSQL'
+    if connection.adapter_name == "PostgreSQL"
       search_path = Shard.current.name
       execute(<<~SQL) # rubocop:disable Rails/SquishedSQLHeredocs
-        CREATE OR REPLACE FUNCTION #{connection.quote_table_name('delayed_jobs_after_delete_row_tr_fn')} () RETURNS trigger AS $$
+        CREATE OR REPLACE FUNCTION #{connection.quote_table_name("delayed_jobs_after_delete_row_tr_fn")} () RETURNS trigger AS $$
         DECLARE
           running_count integer;
         BEGIN
@@ -99,7 +99,7 @@ class SpeedUpMaxConcurrentTriggers < ActiveRecord::Migration[5.1]
 
       # don't need the full count on insert
       execute(<<~SQL) # rubocop:disable Rails/SquishedSQLHeredocs
-        CREATE OR REPLACE FUNCTION #{connection.quote_table_name('delayed_jobs_before_insert_row_tr_fn')} () RETURNS trigger AS $$
+        CREATE OR REPLACE FUNCTION #{connection.quote_table_name("delayed_jobs_before_insert_row_tr_fn")} () RETURNS trigger AS $$
         BEGIN
           IF NEW.strand IS NOT NULL THEN
             PERFORM pg_advisory_xact_lock(half_md5_as_bigint(NEW.strand));

@@ -3,7 +3,7 @@
 namespace :db do
   desc "Create a new user"
   task create_user: :environment do
-    require 'highline/import'
+    require "highline/import"
     create_user_task
   end
 end
@@ -40,7 +40,7 @@ def create_user_task
   user_first_name = ask("User's first name: ")
   user_last_name = ask("User's last name: ")
   user_login = ask("User's login: ")
-  user_password = ask("User's password: ") { |q| q.default = 'useruser' }
+  user_password = ask("User's password: ") { |q| q.default = "useruser" }
 
   puts <<~TEXT
 
@@ -52,7 +52,7 @@ def create_user_task
 
   TEXT
 
-  create_user_task unless agree("Does this look correct?") { |q| q.default = 'yes' }
+  create_user_task unless agree("Does this look correct?") { |q| q.default = "yes" }
 
   ActiveRecord::Base.transaction do
     begin
@@ -79,7 +79,7 @@ def create_user_task
     puts "Failed to create User!" unless user.persisted?
   end
 
-  if agree("Would you like to create another user?") { |q| q.default = 'yes' }
+  if agree("Would you like to create another user?") { |q| q.default = "yes" }
     create_user_task
   else
     exit

@@ -170,11 +170,11 @@ class SearchController < ApplicationController
 
     @courses = Course.where(root_account_id: @domain_root_account)
                      .where(indexed: true)
-                     .where(workflow_state: 'available')
-                     .order('created_at')
+                     .where(workflow_state: "available")
+                     .order("created_at")
     @search = params[:search]
     if @search.present?
-      @courses = @courses.where(@courses.wildcard('name', @search.to_s))
+      @courses = @courses.where(@courses.wildcard("name", @search.to_s))
     end
     @public_only = params[:public_only]
     if @public_only
@@ -186,7 +186,7 @@ class SearchController < ApplicationController
     end
     pagination_args = {}
     pagination_args[:per_page] = 12 unless request.format == :json
-    base_url = api_request? ? api_v1_search_all_courses_url : '/search/all_courses/'
+    base_url = api_request? ? api_v1_search_all_courses_url : "/search/all_courses/"
     ret = Api.paginate(@courses, self, base_url, pagination_args, { enhanced_return: true })
     @courses = ret[:collection]
 

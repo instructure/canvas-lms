@@ -45,9 +45,9 @@ describe Mutations::DeleteConversationMessages do
   end
 
   def expect_error(result, message)
-    errors = result['errors'] || result.dig('data', 'deleteConversationMessages', 'errors')
+    errors = result["errors"] || result.dig("data", "deleteConversationMessages", "errors")
     expect(errors).not_to be_nil
-    expect(errors[0]['message']).to match(/#{message}/)
+    expect(errors[0]["message"]).to match(/#{message}/)
   end
 
   it "removes the message from the participant's view" do
@@ -57,9 +57,9 @@ describe Mutations::DeleteConversationMessages do
     GQL
     expect(sender.all_conversations.find_by(conversation: message.conversation).messages.length).to eq 1
     result = execute_with_input(query)
-    expect(result['errors']).to be_nil
-    expect(result.dig('data', 'deleteConversationMessages', 'errors')).to be_nil
-    expect(result.dig('data', 'deleteConversationMessages', 'conversationMessageIds')).to match_array %W[#{message.id}]
+    expect(result["errors"]).to be_nil
+    expect(result.dig("data", "deleteConversationMessages", "errors")).to be_nil
+    expect(result.dig("data", "deleteConversationMessages", "conversationMessageIds")).to match_array %W[#{message.id}]
     expect(sender.all_conversations.find_by(conversation: message.conversation).messages.length).to eq 0
   end
 
@@ -69,7 +69,7 @@ describe Mutations::DeleteConversationMessages do
         ids: [#{ConversationMessage.maximum(:id)&.next || 0}]
       GQL
       result = execute_with_input(query)
-      expect_error(result, 'Unable to find ConversationMessage')
+      expect_error(result, "Unable to find ConversationMessage")
     end
 
     it "fails if the requesting user is not a participant" do
@@ -77,13 +77,13 @@ describe Mutations::DeleteConversationMessages do
         ids: [#{message.id}]
       GQL
       result = execute_with_input(query, user_executing: user_model)
-      expect_error(result, 'Insufficient permissions')
+      expect_error(result, "Insufficient permissions")
     end
   end
 
   context "batching" do
     context "all ids are valid" do
-      let(:message2) { ConversationParticipant.find_by(user: sender, conversation: conv).add_message('test') }
+      let(:message2) { ConversationParticipant.find_by(user: sender, conversation: conv).add_message("test") }
 
       it "removes messages from the view" do
         message.root_account_ids = [sender.account.id]
@@ -93,9 +93,9 @@ describe Mutations::DeleteConversationMessages do
         GQL
         expect(sender.all_conversations.find_by(conversation: message.conversation).messages.length).to eq 2
         result = execute_with_input(query)
-        expect(result['errors']).to be_nil
-        expect(result.dig('data', 'deleteConversationMessages', 'errors')).to be_nil
-        expect(result.dig('data', 'deleteConversationMessages', 'conversationMessageIds')).to match_array %W[#{message.id} #{message2.id}]
+        expect(result["errors"]).to be_nil
+        expect(result.dig("data", "deleteConversationMessages", "errors")).to be_nil
+        expect(result.dig("data", "deleteConversationMessages", "conversationMessageIds")).to match_array %W[#{message.id} #{message2.id}]
         expect(sender.all_conversations.find_by(conversation: message.conversation).messages.length).to eq 0
       end
     end
@@ -109,8 +109,8 @@ describe Mutations::DeleteConversationMessages do
         GQL
         expect(sender.all_conversations.find_by(conversation: message.conversation).messages.length).to eq 1
         result = execute_with_input(query)
-        expect_error(result, 'Unable to find ConversationMessage')
-        expect(result.dig('data', 'deleteConversationMessages', 'conversationMessageIds')).to be_nil
+        expect_error(result, "Unable to find ConversationMessage")
+        expect(result.dig("data", "deleteConversationMessages", "conversationMessageIds")).to be_nil
         expect(sender.all_conversations.find_by(conversation: message.conversation).messages.length).to eq 1
       end
     end
@@ -126,8 +126,8 @@ describe Mutations::DeleteConversationMessages do
         expect(sender.all_conversations.find_by(conversation: message.conversation).messages.length).to eq 1
         expect(sender.all_conversations.find_by(conversation: message2.conversation).messages.length).to eq 1
         result = execute_with_input(query)
-        expect_error(result, 'All ConversationMessages must exist within the same Conversation')
-        expect(result.dig('data', 'deleteConversationMessages', 'conversationMessageIds')).to be_nil
+        expect_error(result, "All ConversationMessages must exist within the same Conversation")
+        expect(result.dig("data", "deleteConversationMessages", "conversationMessageIds")).to be_nil
         expect(sender.all_conversations.find_by(conversation: message.conversation).messages.length).to eq 1
         expect(sender.all_conversations.find_by(conversation: message2.conversation).messages.length).to eq 1
       end

@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'spec_helper'
+require "spec_helper"
 
 module DrDiff
   describe Manager do
@@ -34,14 +34,14 @@ spec/dr_diff_spec.rb)
       end
 
       it "excludes files that do not exist" do
-        git = double('git', files: git_files_output + "\nREADME.md")
+        git = double("git", files: git_files_output + "\nREADME.md")
         subject = described_class.new(git: git)
         allow(File).to receive(:exist?).with("README.md").and_return(false)
         expect(subject.files).to eq(file_list)
       end
 
       context "regex is given" do
-        let(:git) { double('git', files: git_files_output + "\nbuild.js") }
+        let(:git) { double("git", files: git_files_output + "\nbuild.js") }
         let(:subject) { described_class.new(git: git) }
         let(:ruby_regex) { /\.rb$/ }
 
@@ -52,7 +52,7 @@ spec/dr_diff_spec.rb)
 
       context "git_dir is given" do
         let(:git_dir) { "some/path/" }
-        let(:git) { double('git', files: git_files_output) }
+        let(:git) { double("git", files: git_files_output) }
         let(:subject) { described_class.new(git: git, git_dir: git_dir) }
 
         it "prepends the results with the git_dir" do
@@ -66,7 +66,7 @@ spec/dr_diff_spec.rb)
       let(:command) { "rubocop" }
       let(:diff_parser) { double("diff parser") }
       let(:command_capture) { double("command capture") }
-      let(:git) { double('git', diff: "diff") }
+      let(:git) { double("git", diff: "diff") }
       let(:subject) { described_class.new(git: git) }
 
       let(:command_capture_comments) do

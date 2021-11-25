@@ -17,21 +17,21 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative('../../spec_helper')
+require_relative("../../spec_helper")
 
 describe Courses::TimetableEventBuilder do
   describe "#process_and_validate_timetables" do
     let(:builder) { described_class.new(course: course_factory) }
 
     it "requires valid start and end times" do
-      tt_hash = { weekdays: 'monday', start_time: "hoopyfrood", end_time: "42 oclock",
+      tt_hash = { weekdays: "monday", start_time: "hoopyfrood", end_time: "42 oclock",
                   course_start_at: 1.day.from_now, course_end_at: 1.week.from_now }
       builder.process_and_validate_timetables([tt_hash])
       expect(builder.errors).to match_array(["invalid start time(s)", "invalid end time(s)"])
     end
 
     it "requires a start and end date" do
-      tt_hash = { weekdays: 'tuesday', start_time: "11:30 am", end_time: "12:30 pm" }
+      tt_hash = { weekdays: "tuesday", start_time: "11:30 am", end_time: "12:30 pm" }
       builder.process_and_validate_timetables([tt_hash])
       expect(builder.errors).to match_array(["no start date found", "no end date found"])
     end
@@ -42,7 +42,7 @@ describe Courses::TimetableEventBuilder do
         term.end_at = DateTime.parse("2016-05-19 9:00am -0600")
       end
 
-      tt_hash = { weekdays: 'wednesday,humpday', start_time: "11:30 am", end_time: "12:30 pm" }
+      tt_hash = { weekdays: "wednesday,humpday", start_time: "11:30 am", end_time: "12:30 pm" }
       builder.process_and_validate_timetables([tt_hash])
       expect(builder.errors).to match_array(["weekdays are not valid"])
     end
@@ -55,7 +55,7 @@ describe Courses::TimetableEventBuilder do
       builder.course.tap do |c|
         c.start_at = DateTime.parse("2016-05-06 1:00pm -0600") # on a friday - should offset to thursday
         c.conclude_at = DateTime.parse("2016-05-19 9:00am -0600") # on a thursday, but before the course time - shouldn't create an event that day
-        c.time_zone = 'America/Denver'
+        c.time_zone = "America/Denver"
       end
 
       tt_hash = { weekdays: "T,Th", start_time: "3 pm", end_time: "4:30 pm" } # tuesdays and thursdays from 3:00-4:30pm
@@ -75,7 +75,7 @@ describe Courses::TimetableEventBuilder do
         c.start_at = DateTime.parse("2016-03-09 1:00pm -0600") # on a wednesday
         # DST transition happened across March 13, 2016
         c.conclude_at = DateTime.parse("2016-03-18 8:00pm -0600") # on a friday, but after the course time - should create an event that day
-        c.time_zone = 'America/Denver'
+        c.time_zone = "America/Denver"
       end
 
       tt_hash = { weekdays: "Monday,Friday", start_time: "11:30", end_time: "13:00" } # mondays and fridays from 11:30-1:00

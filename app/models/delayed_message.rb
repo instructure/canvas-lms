@@ -31,11 +31,11 @@ class DelayedMessage < ActiveRecord::Base
       :account, :user, :appointment_group, :collaborator, :account_report,
       :alert, :content_migration, :account_notification,
       {
-        context_communication_channel: 'CommunicationChannel',
-        quiz_submission: 'Quizzes::QuizSubmission',
-        quiz_regrade_run: 'Quizzes::QuizRegradeRun',
-        master_migration: 'MasterCourses::MasterMigration',
-        quizzes: 'Quizzes::Quiz'
+        context_communication_channel: "CommunicationChannel",
+        quiz_submission: "Quizzes::QuizSubmission",
+        quiz_regrade_run: "Quizzes::QuizRegradeRun",
+        master_migration: "MasterCourses::MasterMigration",
+        quizzes: "Quizzes::Quiz"
       }
     ]
   belongs_to :communication_channel
@@ -57,9 +57,9 @@ class DelayedMessage < ActiveRecord::Base
   scope :for, lambda { |context|
     case context
     when :daily
-      where(frequency: 'daily')
+      where(frequency: "daily")
     when :weekly
-      where(frequency: 'weekly')
+      where(frequency: "weekly")
     when Notification
       where(notification_id: context)
     when NotificationPolicy
@@ -113,7 +113,7 @@ class DelayedMessage < ActiveRecord::Base
     context = delayed_messages.select(&:context).compact.first.try(:context)
     return nil unless context # the context for this message has already been deleted
 
-    notification = BroadcastPolicy.notification_finder.by_name('Summaries')
+    notification = BroadcastPolicy.notification_finder.by_name("Summaries")
     path = HostUrl.outgoing_email_address
     root_account_id = delayed_messages.first.try(:root_account_id)
     locale = user.locale || (root_account_id && Account.where(id: root_account_id).first.try(:default_locale))
@@ -148,14 +148,14 @@ class DelayedMessage < ActiveRecord::Base
 
     # I got tired of trying to figure out time zones in my head, and I realized
     # if we do it this way, Rails will take care of it all for us!
-    if frequency == 'weekly'
+    if frequency == "weekly"
       target = communication_channel.user.weekly_notification_time
     else
       # Find the appropriate timezone. For weekly notifications, always use
       # Eastern. For other notifications, try and user the user's time zone,
       # defaulting to mountain. (Should be impossible to not find mountain, but
       # default to system time if necessary.)
-      time_zone = communication_channel.user.time_zone || ActiveSupport::TimeZone['America/Denver'] || Time.zone
+      time_zone = communication_channel.user.time_zone || ActiveSupport::TimeZone["America/Denver"] || Time.zone
       target = time_zone.now.change(hour: 18)
       target += 1.day if target < time_zone.now
     end

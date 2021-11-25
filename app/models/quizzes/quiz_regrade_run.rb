@@ -18,9 +18,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class Quizzes::QuizRegradeRun < ActiveRecord::Base
-  self.table_name = 'quiz_regrade_runs'
+  self.table_name = "quiz_regrade_runs"
 
-  belongs_to :quiz_regrade, class_name: 'Quizzes::QuizRegrade'
+  belongs_to :quiz_regrade, class_name: "Quizzes::QuizRegrade"
 
   validates :quiz_regrade_id, presence: true
   delegate :root_account, to: :quiz_regrade
@@ -45,7 +45,7 @@ class Quizzes::QuizRegradeRun < ActiveRecord::Base
   end
 
   def send_messages?
-    old, new = saved_changes['finished_at']
+    old, new = saved_changes["finished_at"]
     !!(new && old.nil?) && Quizzes::QuizRegradeRun.where(quiz_regrade_id: quiz_regrade).count == 1
   end
 

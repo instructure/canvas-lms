@@ -22,7 +22,7 @@ class GradeChangeEventTestHarness
   include Api::V1::GradeChangeEvent
 
   def url_root
-    'http://www.example.com'
+    "http://www.example.com"
   end
 
   def feeds_calendar_url(feed_code)
@@ -67,7 +67,7 @@ describe Api::V1::GradeChangeEvent do
     @page_view = PageView.new do |p|
       p.assign_attributes({
                             request_id: @request_id,
-                            remote_ip: '10.10.10.10'
+                            remote_ip: "10.10.10.10"
                           })
     end
 
@@ -78,7 +78,7 @@ describe Api::V1::GradeChangeEvent do
 
     @events = []
 
-    @assignment = @course.assignments.create!(title: 'Assignment', points_possible: 10)
+    @assignment = @course.assignments.create!(title: "Assignment", points_possible: 10)
     @submission = @assignment.grade_student(@student, grade: 8, grader: @teacher).first
     @events << Auditors::GradeChange.record(submission: @submission)
 
@@ -153,8 +153,8 @@ describe Api::V1::GradeChangeEvent do
     expect(json_hash[:links]).to eq({
                                       "events.assignment" => "#{subject.url_root}/api/v1/courses/{events.course}/assignments/{events.assignment}",
                                       "events.course" => "#{subject.url_root}/api/v1/courses/{events.course}",
-                                      "events.student" => { href: nil, type: 'user' },
-                                      "events.grader" => { href: nil, type: 'user' },
+                                      "events.student" => { href: nil, type: "user" },
+                                      "events.grader" => { href: nil, type: "user" },
                                       "events.page_view" => nil
                                     })
 

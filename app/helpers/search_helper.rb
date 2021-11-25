@@ -33,7 +33,7 @@ module SearchHelper
     include_all_permissions = (permissions == :all)
     permissions = permissions.presence && Array(permissions).map(&:to_sym)
 
-    @contexts = Rails.cache.fetch(['all_conversation_contexts', @current_user, context, permissions].cache_key, expires_in: 10.minutes) do
+    @contexts = Rails.cache.fetch(["all_conversation_contexts", @current_user, context, permissions].cache_key, expires_in: 10.minutes) do
       contexts = { courses: {}, groups: {}, sections: {} }
 
       term_for_course = lambda do |course|
@@ -97,7 +97,7 @@ module SearchHelper
             name: group.name,
             type: :group,
             state: group.active? ? :active : :inactive,
-            parent: group.context_type == 'Course' ? { course: group.context_id } : nil,
+            parent: group.context_type == "Course" ? { course: group.context_id } : nil,
             context_name: (group_context || group.context).name,
             category: group.category
           }.tap do |hash|
@@ -150,9 +150,9 @@ module SearchHelper
 
   def search_contexts_and_users(options = {})
     types = (options[:types] || ([] + [options[:type]])).compact
-    types |= %i[course section group] if types.delete('context')
+    types |= %i[course section group] if types.delete("context")
     types = if types.present?
-              { user: types.delete('user').present?, context: types.present? && types.map(&:to_sym) }
+              { user: types.delete("user").present?, context: types.present? && types.map(&:to_sym) }
             else
               { user: true, context: %i[course section group] }
             end
@@ -161,7 +161,7 @@ module SearchHelper
     exclude_users, exclude_contexts = AddressBook.partition_recipients(options[:exclude] || [])
 
     if types[:context]
-      collections << ['contexts', search_messageable_contexts(
+      collections << ["contexts", search_messageable_contexts(
         search: options[:search],
         context: options[:context],
         synthetic_contexts: options[:synthetic_contexts],
@@ -175,7 +175,7 @@ module SearchHelper
     end
 
     if types[:user] && !@skip_users
-      collections << ['participants', @current_user.address_book.search_users(
+      collections << ["participants", @current_user.address_book.search_users(
         search: options[:search],
         exclude_ids: exclude_users,
         context: options[:context],
@@ -359,10 +359,10 @@ def synthetic_contexts_for(course, context, base_url)
   avatar_url = avatar_url_for_group(base_url: base_url)
   result = []
   synthetic_context = { avatar_url: avatar_url, type: :context, permissions: course[:permissions] }
-  result << synthetic_context.merge({ id: "#{context}_teachers", name: I18n.t(:enrollments_teachers, "Teachers"), user_count: enrollment_counts['TeacherEnrollment'] }) if enrollment_counts['TeacherEnrollment'].to_i > 0
-  result << synthetic_context.merge({ id: "#{context}_tas", name: I18n.t(:enrollments_tas, "Teaching Assistants"), user_count: enrollment_counts['TaEnrollment'] }) if enrollment_counts['TaEnrollment'].to_i > 0
-  result << synthetic_context.merge({ id: "#{context}_students", name: I18n.t(:enrollments_students, "Students"), user_count: enrollment_counts['StudentEnrollment'] }) if enrollment_counts['StudentEnrollment'].to_i > 0
-  result << synthetic_context.merge({ id: "#{context}_observers", name: I18n.t(:enrollments_observers, "Observers"), user_count: enrollment_counts['ObserverEnrollment'] }) if enrollment_counts['ObserverEnrollment'].to_i > 0
+  result << synthetic_context.merge({ id: "#{context}_teachers", name: I18n.t(:enrollments_teachers, "Teachers"), user_count: enrollment_counts["TeacherEnrollment"] }) if enrollment_counts["TeacherEnrollment"].to_i > 0
+  result << synthetic_context.merge({ id: "#{context}_tas", name: I18n.t(:enrollments_tas, "Teaching Assistants"), user_count: enrollment_counts["TaEnrollment"] }) if enrollment_counts["TaEnrollment"].to_i > 0
+  result << synthetic_context.merge({ id: "#{context}_students", name: I18n.t(:enrollments_students, "Students"), user_count: enrollment_counts["StudentEnrollment"] }) if enrollment_counts["StudentEnrollment"].to_i > 0
+  result << synthetic_context.merge({ id: "#{context}_observers", name: I18n.t(:enrollments_observers, "Observers"), user_count: enrollment_counts["ObserverEnrollment"] }) if enrollment_counts["ObserverEnrollment"].to_i > 0
   result
 end
 

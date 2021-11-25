@@ -32,8 +32,8 @@ module Lti
     end
 
     CONTEXT_WHITELIST = {
-      'root_account' => Account,
-      'assignment' => Assignment
+      "root_account" => Account,
+      "assignment" => Assignment
     }.freeze
 
     attr_reader :subscription, :tool_proxy
@@ -50,7 +50,7 @@ module Lti
       subscription[:EventTypes].each do |event_type|
         raise MissingCapability, "EventType #{event_type} is invalid" unless capabilities_hash.key?(event_type.to_sym)
         if (tool_proxy.enabled_capabilities & capabilities_hash[event_type.to_sym]).blank?
-          raise MissingCapability, 'Missing required capability'
+          raise MissingCapability, "Missing required capability"
         end
       end
     end

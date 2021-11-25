@@ -22,12 +22,12 @@ describe AcademicBenchmark do
     @root_account = Account.site_admin
     account_admin_user(account: @root_account, active_all: true)
     @cm = ContentMigration.new(context: @root_account)
-    @plugin = Canvas::Plugin.find('academic_benchmark_importer')
-    @cm.converter_class = @plugin.settings['converter_class']
-    @cm.migration_settings[:migration_type] = 'academic_benchmark_importer'
+    @plugin = Canvas::Plugin.find("academic_benchmark_importer")
+    @cm.converter_class = @plugin.settings["converter_class"]
+    @cm.migration_settings[:migration_type] = "academic_benchmark_importer"
     @cm.migration_settings[:import_immediately] = true
     @cm.migration_settings[:migration_options] = { points_possible: 10, mastery_points: 6,
-                                                   ratings: [{ description: 'Bad', points: 0 }, { description: 'Awesome', points: 10 }] }
+                                                   ratings: [{ description: "Bad", points: 0 }, { description: "Awesome", points: 10 }] }
     @cm.user = @user
     @cm.save!
 
@@ -35,11 +35,11 @@ describe AcademicBenchmark do
     new_settings = current_settings.merge(partner_id: "instructure", partner_key: "secret")
     allow(@plugin).to receive(:settings).and_return(new_settings)
 
-    @florida_standards = File.join(File.dirname(__FILE__) + '/fixtures', 'florida_standards.json')
-    File.open(@florida_standards, 'r') do |file|
+    @florida_standards = File.join(File.dirname(__FILE__) + "/fixtures", "florida_standards.json")
+    File.open(@florida_standards, "r") do |file|
       @att = Attachment.create!(
-        filename: 'standards.json',
-        display_name: 'standards.json',
+        filename: "standards.json",
+        display_name: "standards.json",
         uploaded_data: file,
         context: @cm
       )
@@ -51,8 +51,8 @@ describe AcademicBenchmark do
   def verify_rubric_criterion(outcome)
     expect(outcome.data[:rubric_criterion][:mastery_points]).to eq 6
     expect(outcome.data[:rubric_criterion][:points_possible]).to eq 10
-    expect(outcome.data[:rubric_criterion][:ratings]).to eq [{ description: 'Bad', points: 0 },
-                                                             { description: 'Awesome', points: 10 }]
+    expect(outcome.data[:rubric_criterion][:ratings]).to eq [{ description: "Bad", points: 0 },
+                                                             { description: "Awesome", points: 10 }]
   end
 
   def verify_full_import
@@ -145,7 +145,7 @@ describe AcademicBenchmark do
   end
 
   def check_for_parent_num_duplication(outcome)
-    parent = outcome.instance_variable_get('@parent')
+    parent = outcome.instance_variable_get("@parent")
     if outcome.resolve_number && parent && parent.build_title && outcome.resolve_number.include?(parent.build_title)
       outcome.title == "#{parent.title}.#{outcome.resolve_number}"
     else
@@ -155,7 +155,7 @@ describe AcademicBenchmark do
 
   def check_built_outcome(outcome)
     expect(check_for_parent_num_duplication(outcome)).to be_falsey
-    outcome.instance_variable_get('@children').each { |o| check_built_outcome(o) }
+    outcome.instance_variable_get("@children").each { |o| check_built_outcome(o) }
   end
 
   it "imports the standards successfully" do
@@ -163,7 +163,7 @@ describe AcademicBenchmark do
     run_jobs
     @cm.reload
     expect(@cm.migration_issues.count).to eq 0
-    expect(@cm.workflow_state).to eq 'imported'
+    expect(@cm.workflow_state).to eq "imported"
 
     verify_full_import
   end
@@ -177,7 +177,7 @@ describe AcademicBenchmark do
 
     expect(@cm.migration_issues.count).to eq 1
     expect(@cm.migration_issues.first.description).to eq "User isn't allowed to edit global outcomes"
-    expect(@cm.workflow_state).to eq 'failed'
+    expect(@cm.workflow_state).to eq "failed"
   end
 
   context "using the API" do
@@ -197,7 +197,7 @@ describe AcademicBenchmark do
 
       expect(@cm.migration_issues.count).to eq 1
       expect(@cm.migration_issues.first.description).to eq "A partner ID is required to use Academic Benchmarks"
-      expect(@cm.workflow_state).to eq 'failed'
+      expect(@cm.workflow_state).to eq "failed"
     end
 
     it "fails with an empty string partner ID" do
@@ -210,7 +210,7 @@ describe AcademicBenchmark do
 
       expect(@cm.migration_issues.count).to eq 1
       expect(@cm.migration_issues.first.description).to eq "A partner ID is required to use Academic Benchmarks"
-      expect(@cm.workflow_state).to eq 'failed'
+      expect(@cm.workflow_state).to eq "failed"
     end
   end
 
@@ -253,13 +253,13 @@ describe AcademicBenchmark do
     )
   end
 
-  describe '.queue_migration_for' do
+  describe ".queue_migration_for" do
     before { allow_any_instance_of(ContentMigration).to receive(:export_content) }
 
-    it 'sets context with user' do
+    it "sets context with user" do
       cm = AcademicBenchmark.queue_migration_for(
-        authority: 'authority',
-        publication: 'publication',
+        authority: "authority",
+        publication: "publication",
         user: @user
       )[0]
       expect(cm.root_account_id).to eq 0

@@ -17,10 +17,10 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'json'
+require "json"
 
 module QuestionHelpers
-  FixturePath = File.join(File.dirname(__FILE__), 'fixtures')
+  FixturePath = File.join(File.dirname(__FILE__), "fixtures")
 
   # Loads a question data fixture from support/fixtures/*_data.json, just pass
   # it the type of the question, e.g:

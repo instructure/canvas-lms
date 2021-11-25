@@ -17,10 +17,10 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'active_record_query_trace'
-require_relative '../../config/initializers/active_record_query_trace'
+require "active_record_query_trace"
+require_relative "../../config/initializers/active_record_query_trace"
 
-describe '#configure!' do
+describe "#configure!" do
   subject do
     ActiveRecordQueryTrace.enabled = false
     ActiveRecordQueryTrace.lines = nil
@@ -31,51 +31,51 @@ describe '#configure!' do
   end
 
   before do
-    allow(ENV).to receive(:[]).with('AR_QUERY_TRACE_LINES').and_return(nil)
-    allow(ENV).to receive(:[]).with('AR_QUERY_TRACE_TYPE').and_return(nil)
-    allow(ENV).to receive(:[]).with('AR_QUERY_TRACE_LEVEL').and_return(nil)
+    allow(ENV).to receive(:[]).with("AR_QUERY_TRACE_LINES").and_return(nil)
+    allow(ENV).to receive(:[]).with("AR_QUERY_TRACE_TYPE").and_return(nil)
+    allow(ENV).to receive(:[]).with("AR_QUERY_TRACE_LEVEL").and_return(nil)
   end
 
-  context 'when Rails ENV is test' do
-    before { allow(ENV).to receive(:[]).with('AR_QUERY_TRACE').and_return('true') }
+  context "when Rails ENV is test" do
+    before { allow(ENV).to receive(:[]).with("AR_QUERY_TRACE").and_return("true") }
 
-    it 'enables AR query trace' do
+    it "enables AR query trace" do
       expect(subject.enabled).to eq true
     end
   end
 
-  context 'when Rails ENV is production' do
+  context "when Rails ENV is production" do
     before do
-      allow(ENV).to receive(:[]).with('AR_QUERY_TRACE').and_return('true')
-      allow(Rails).to receive(:env) { 'production'.inquiry }
+      allow(ENV).to receive(:[]).with("AR_QUERY_TRACE").and_return("true")
+      allow(Rails).to receive(:env) { "production".inquiry }
     end
 
-    it 'does not enable AR query trace' do
+    it "does not enable AR query trace" do
       expect(subject.enabled).to eq false
     end
   end
 
-  context 'when Rails ENV is development' do
+  context "when Rails ENV is development" do
     before do
-      allow(Rails).to receive(:env) { 'development'.inquiry }
+      allow(Rails).to receive(:env) { "development".inquiry }
     end
 
-    context 'and AR_QUERY_TRACE is falsy' do
+    context "and AR_QUERY_TRACE is falsy" do
       before do
-        allow(ENV).to receive(:[]).with('AR_QUERY_TRACE').and_return('0')
+        allow(ENV).to receive(:[]).with("AR_QUERY_TRACE").and_return("0")
       end
 
-      it 'disables AR query trace' do
+      it "disables AR query trace" do
         expect(subject.enabled).to eq false
       end
     end
 
-    context 'and AR_QUERY_TRACE is set' do
+    context "and AR_QUERY_TRACE is set" do
       before do
-        allow(ENV).to receive(:[]).with('AR_QUERY_TRACE').and_return('true')
+        allow(ENV).to receive(:[]).with("AR_QUERY_TRACE").and_return("true")
       end
 
-      it 'enables AR query trace' do
+      it "enables AR query trace" do
         expect(subject.enabled).to eq true
       end
 
@@ -87,9 +87,9 @@ describe '#configure!' do
         expect(subject.query_type).to eq :all
       end
 
-      context 'and AR_QUERY_TRACE_LINES is set' do
+      context "and AR_QUERY_TRACE_LINES is set" do
         before do
-          allow(ENV).to receive(:[]).with('AR_QUERY_TRACE_LINES').and_return(25)
+          allow(ENV).to receive(:[]).with("AR_QUERY_TRACE_LINES").and_return(25)
         end
 
         it 'sets "lines" to the provided value' do
@@ -97,18 +97,18 @@ describe '#configure!' do
         end
       end
 
-      context 'and AR_QUERY_TRACE_TYPE is set' do
+      context "and AR_QUERY_TRACE_TYPE is set" do
         before do
-          allow(ENV).to receive(:[]).with('AR_QUERY_TRACE_TYPE').and_return('read')
+          allow(ENV).to receive(:[]).with("AR_QUERY_TRACE_TYPE").and_return("read")
         end
 
         it 'sets "query_type" to the provided value' do
           expect(subject.query_type).to eq :read
         end
 
-        context 'and AR_QUERY_TRACE_TYPE is an invalid value' do
+        context "and AR_QUERY_TRACE_TYPE is an invalid value" do
           before do
-            allow(ENV).to receive(:[]).with('AR_QUERY_TRACE_TYPE').and_return('banana')
+            allow(ENV).to receive(:[]).with("AR_QUERY_TRACE_TYPE").and_return("banana")
           end
 
           it 'sets "query_type" to :all' do
@@ -117,9 +117,9 @@ describe '#configure!' do
         end
       end
 
-      context 'and AR_QUERY_TRACE_LEVEL is set' do
+      context "and AR_QUERY_TRACE_LEVEL is set" do
         before do
-          allow(ENV).to receive(:[]).with('AR_QUERY_TRACE_LEVEL').and_return('full')
+          allow(ENV).to receive(:[]).with("AR_QUERY_TRACE_LEVEL").and_return("full")
         end
 
         it 'sets "level" to the provided value' do

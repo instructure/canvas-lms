@@ -67,18 +67,18 @@ module ConditionalRelease
       rules = active_rules(assignment.context, current_user, session)
       return nil unless rules
 
-      rules.find { |r| r['trigger_assignment'] == assignment.id.to_s || r['trigger_assignment_id'] == assignment.id }
+      rules.find { |r| r["trigger_assignment"] == assignment.id.to_s || r["trigger_assignment_id"] == assignment.id }
     end
 
     def self.active_rules(course, current_user, session)
       return unless enabled_in_context?(course)
       return unless course.grants_any_right?(current_user, session, :read, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS)
 
-      rules_data = Rails.cache.fetch_with_batched_keys('conditional_release_active_rules', batch_object: course, batched_keys: :conditional_release) do
+      rules_data = Rails.cache.fetch_with_batched_keys("conditional_release_active_rules", batch_object: course, batched_keys: :conditional_release) do
         rules = course.conditional_release_rules.active.with_assignments.to_a
         rules.as_json(include: Rule.includes_for_json, include_root: false, except: [:root_account_id, :deleted_at])
       end
-      trigger_ids = rules_data.map { |rule| rule['trigger_assignment_id'] }
+      trigger_ids = rules_data.map { |rule| rule["trigger_assignment_id"] }
       trigger_assgs = course.assignments.preload(:grading_standard).where(id: trigger_ids).each_with_object({}) do |a, assgs|
         assgs[a.id] = {
           points_possible: a.points_possible,
@@ -87,7 +87,7 @@ module ConditionalRelease
         }
       end
       rules_data.each do |rule|
-        rule['trigger_assignment_model'] = trigger_assgs[rule['trigger_assignment_id']]
+        rule["trigger_assignment_model"] = trigger_assgs[rule["trigger_assignment_id"]]
       end
       rules_data
     end
@@ -96,13 +96,13 @@ module ConditionalRelease
       overrides_scope = AssignmentOverride.where(set_type: AssignmentOverride::SET_TYPE_NOOP, set_id: AssignmentOverride::NOOP_MASTERY_PATHS).active
       assignment_ids = overrides_scope.where.not(assignment_id: nil).pluck(:assignment_id)
       assignment_ids.sort.each_slice(100) do |sliced_ids|
-        course.assignments.active.where(id: sliced_ids).where(only_visible_to_overrides: true).where.not(submission_types: 'wiki_page').to_a.each do |assignment|
+        course.assignments.active.where(id: sliced_ids).where(only_visible_to_overrides: true).where.not(submission_types: "wiki_page").to_a.each do |assignment|
           assignment.update_attribute(:only_visible_to_overrides, false)
         end
       end
       wp_assignment_ids = course.wiki_pages.not_deleted.where.not(assignment_id: nil).pluck(:assignment_id)
       wp_assignment_ids.sort.each_slice(100) do |sliced_ids|
-        course.assignments.active.where(id: sliced_ids).where(only_visible_to_overrides: true, submission_types: 'wiki_page').each do |wp_assignment|
+        course.assignments.active.where(id: sliced_ids).where(only_visible_to_overrides: true, submission_types: "wiki_page").each do |wp_assignment|
           wp_assignment.update_attribute(:only_visible_to_overrides, false)
         end
       end
@@ -135,7 +135,7 @@ module ConditionalRelease
         return [] if course.blank? || student.blank?
 
         rules_data =
-          ::Rails.cache.fetch(['conditional_release_rules_for_student2', student.cache_key(:submissions), course.cache_key(:conditional_release)].cache_key) do
+          ::Rails.cache.fetch(["conditional_release_rules_for_student2", student.cache_key(:submissions), course.cache_key(:conditional_release)].cache_key) do
             rules = course.conditional_release_rules.active.preload(Rule.preload_associations).to_a
 
             # ignore functionally empty rules

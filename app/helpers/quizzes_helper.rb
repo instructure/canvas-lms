@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'nokogiri'
+require "nokogiri"
 
 module QuizzesHelper
   RE_EXTRACT_BLANK_ID = /['"]question_\w+_(.*?)['"]/.freeze
@@ -39,17 +39,17 @@ module QuizzesHelper
 
   def unpublished_quiz_warning
     I18n.t(
-      '*This quiz is unpublished* Only teachers can see the quiz until ' \
-      'it is published.',
+      "*This quiz is unpublished* Only teachers can see the quiz until " \
+      "it is published.",
       wrapper: '<strong class=unpublished_quiz_warning>\1</strong>'
     )
   end
 
   def unsaved_changes_warning
     I18n.t(
-      '*You have made changes to the questions in this quiz.* ' \
-      'These changes will not appear for students until you ' \
-      'save the quiz.',
+      "*You have made changes to the questions in this quiz.* " \
+      "These changes will not appear for students until you " \
+      "save the quiz.",
       wrapper: '<strong class=unsaved_quiz_warning>\1</strong>'
     )
   end
@@ -68,10 +68,10 @@ module QuizzesHelper
 
   def render_number(num)
     # if the string representation of this number uses scientific notation,
-    return format('%g', num) if num.to_s.include?('e') # short circuit if scientific notation
+    return format("%g", num) if num.to_s.include?("e") # short circuit if scientific notation
 
-    if num.to_s.include?('%')
-      I18n.n(round_if_whole(num.delete('%'))) + '%'
+    if num.to_s.include?("%")
+      I18n.n(round_if_whole(num.delete("%"))) + "%"
     else
       I18n.n(round_if_whole(num))
     end
@@ -79,7 +79,7 @@ module QuizzesHelper
 
   def render_score(score, precision = 2)
     if score.nil?
-      '_'
+      "_"
     else
       render_number(score.to_f.round(precision))
     end
@@ -101,45 +101,45 @@ module QuizzesHelper
   def render_score_to_keep(quiz_scoring_policy)
     case quiz_scoring_policy
     when "keep_highest"
-      I18n.t('Highest')
+      I18n.t("Highest")
     when "keep_latest"
-      I18n.t('Latest')
+      I18n.t("Latest")
     when "keep_average"
-      I18n.t('Average')
+      I18n.t("Average")
     end
   end
 
   def render_show_correct_answers(quiz)
     unless quiz.show_correct_answers
-      return I18n.t('No')
+      return I18n.t("No")
     end
 
     show_at = quiz.show_correct_answers_at
     hide_at = quiz.hide_correct_answers_at
 
     if show_at && hide_at
-      I18n.t('From %{from} to %{to}', {
+      I18n.t("From %{from} to %{to}", {
                from: datetime_string(quiz.show_correct_answers_at),
                to: datetime_string(quiz.hide_correct_answers_at)
              })
     elsif show_at
-      I18n.t('After %{date}', {
+      I18n.t("After %{date}", {
                date: datetime_string(quiz.show_correct_answers_at)
              })
     elsif hide_at
-      I18n.t('Until %{date}', {
+      I18n.t("Until %{date}", {
                date: datetime_string(quiz.hide_correct_answers_at)
              })
     elsif quiz.show_correct_answers_last_attempt
-      I18n.t('After Last Attempt')
+      I18n.t("After Last Attempt")
     else
-      I18n.t('Immediately')
+      I18n.t("Immediately")
     end
   end
 
   def render_correct_answer_protection(quiz, submission)
     if quiz.show_correct_answers_last_attempt && !submission.last_attempt_completed?
-      return I18n.t('Answers will be shown after your last attempt')
+      return I18n.t("Answers will be shown after your last attempt")
     end
 
     show_at = quiz.show_correct_answers_at
@@ -150,16 +150,16 @@ module QuizzesHelper
     labels = {}
     if hide_at
       labels[:available_until] = I18n.t(
-        'Correct answers are available until %{date}.', {
+        "Correct answers are available until %{date}.", {
           date: datetime_string(quiz.hide_correct_answers_at)
         }
       )
     end
 
     if !quiz.show_correct_answers
-      I18n.t('Correct answers are hidden.')
+      I18n.t("Correct answers are hidden.")
     elsif hide_at.present? && hide_at < now
-      I18n.t('Correct answers are no longer available.')
+      I18n.t("Correct answers are no longer available.")
     elsif show_at.present? && hide_at.present?
       # If the answers are currently visible, there's no need to show the range
       # of availability.
@@ -167,7 +167,7 @@ module QuizzesHelper
         labels[:available_until]
       else
         I18n.t(
-          'Correct answers will be available %{from} - %{to}.', {
+          "Correct answers will be available %{from} - %{to}.", {
             from: datetime_string(show_at),
             to: datetime_string(hide_at)
           }
@@ -175,7 +175,7 @@ module QuizzesHelper
       end
     elsif show_at.present?
       I18n.t(
-        'Correct answers will be available on %{date}.', {
+        "Correct answers will be available on %{date}.", {
           date: datetime_string(show_at)
         }
       )
@@ -268,7 +268,7 @@ module QuizzesHelper
   def render_result_protection(quiz, submission)
     if quiz.one_time_results && submission.has_seen_results?
       I18n.t("Quiz results are protected for this quiz and can be viewed a single time immediately after submission.")
-    elsif quiz.hide_results == 'until_after_last_attempt'
+    elsif quiz.hide_results == "until_after_last_attempt"
       I18n.t("Quiz results are protected for this quiz and are not visible to students until they have submitted their last attempt.")
     else
       I18n.t("Quiz results are protected for this quiz and are not visible to students.")
@@ -409,13 +409,13 @@ module QuizzesHelper
                        comment_get(question, :neutral_comments)
                      end
     text = []
-    text << content_tag(:p, correct_text, { class: 'correct_comments' }) if correct_text.present?
-    text << content_tag(:p, incorrect_text, { class: 'incorrect_comments' }) if incorrect_text.present?
-    text << content_tag(:p, neutral_text, { class: 'neutral_comments' }) if neutral_text.present?
+    text << content_tag(:p, correct_text, { class: "correct_comments" }) if correct_text.present?
+    text << content_tag(:p, incorrect_text, { class: "incorrect_comments" }) if incorrect_text.present?
+    text << content_tag(:p, neutral_text, { class: "neutral_comments" }) if neutral_text.present?
     if text.empty?
-      ''
+      ""
     else
-      content_tag(:div, text.join.html_safe, { class: 'quiz_comment' })
+      content_tag(:div, text.join.html_safe, { class: "quiz_comment" })
     end
   end
 
@@ -446,9 +446,9 @@ module QuizzesHelper
     # Requires mutliline option to be robust
     res.gsub!(/<input.*?name=\\?['"](question_.*?)\\?['"].*?>/m) do |match|
       blank = match.match(RE_EXTRACT_BLANK_ID).to_a[1]
-      blank.delete!('\\')
+      blank.delete!("\\")
       answer = answer_list.detect { |entry| entry[:blank_id] == blank } || {}
-      answer = h(answer[:answer] || '')
+      answer = h(answer[:answer] || "")
 
       # If given answer list, insert the values into the text inputs for displaying user's answers.
       if answer_list.any?
@@ -501,7 +501,7 @@ module QuizzesHelper
         s.swap(span)
       end
 
-      s['aria-label'] = I18n.t("Multiple dropdowns, read surrounding text")
+      s["aria-label"] = I18n.t("Multiple dropdowns, read surrounding text")
     end
     doc.to_s.html_safe
   end
@@ -524,7 +524,7 @@ module QuizzesHelper
     options.reverse_merge!({ precision: 2 })
     score_html = \
       if options[:id] || options[:class] || options[:style]
-        content_tag('span',
+        content_tag("span",
                     render_score(score, options[:precision]),
                     options.slice(:class, :id, :style))
       else
@@ -537,11 +537,11 @@ module QuizzesHelper
 
   def link_to_take_quiz(link_body, opts = {})
     opts = opts.with_indifferent_access
-    class_array = (opts['class'] || "").split
-    class_array << 'element_toggler' if @quiz.cant_go_back?
-    opts['class'] = class_array.compact.join(" ")
-    opts['aria-controls'] = 'js-sequential-warning-dialogue' if @quiz.cant_go_back?
-    opts['data-method'] = 'post' unless @quiz.cant_go_back?
+    class_array = (opts["class"] || "").split
+    class_array << "element_toggler" if @quiz.cant_go_back?
+    opts["class"] = class_array.compact.join(" ")
+    opts["aria-controls"] = "js-sequential-warning-dialogue" if @quiz.cant_go_back?
+    opts["data-method"] = "post" unless @quiz.cant_go_back?
     link_to(link_body, (opts["preview"] == 1) ? preview_quiz_url : take_quiz_url, opts)
   end
 
@@ -584,25 +584,25 @@ module QuizzesHelper
 
   def take_poll_message(quiz = @quiz)
     if quiz.survey?
-      I18n.t('Take the Survey')
+      I18n.t("Take the Survey")
     else
-      I18n.t('Take the Quiz')
+      I18n.t("Take the Quiz")
     end
   end
 
   def retake_poll_message(quiz = @quiz)
     if quiz.survey?
-      I18n.t('Take the Survey Again')
+      I18n.t("Take the Survey Again")
     else
-      I18n.t('Take the Quiz Again')
+      I18n.t("Take the Quiz Again")
     end
   end
 
   def resume_poll_message(quiz = @quiz)
     if quiz.survey?
-      I18n.t('Resume Survey')
+      I18n.t("Resume Survey")
     else
-      I18n.t('Resume Quiz')
+      I18n.t("Resume Quiz")
     end
   end
 
@@ -629,17 +629,17 @@ module QuizzesHelper
 
   def quiz_edit_text(quiz = @quiz)
     if quiz.survey?
-      I18n.t('Edit Survey')
+      I18n.t("Edit Survey")
     else
-      I18n.t('Edit Quiz')
+      I18n.t("Edit Quiz")
     end
   end
 
   def quiz_delete_text(quiz = @quiz)
     if quiz.survey?
-      I18n.t('Delete Survey')
+      I18n.t("Delete Survey")
     else
-      I18n.t('Delete Quiz')
+      I18n.t("Delete Quiz")
     end
   end
 
@@ -667,7 +667,7 @@ module QuizzesHelper
     end
 
     titles = titles.map { |title| h(title) }
-    "title=\"#{titles.join(' ')}\"".html_safe unless titles.empty? # rubocop:disable Rails/OutputSafety
+    "title=\"#{titles.join(" ")}\"".html_safe unless titles.empty? # rubocop:disable Rails/OutputSafety
   end
 
   def matching_answer_title(item_text, did_select_answer, selected_answer_text, is_correct_answer, correct_answer_text, show_correct_answers)
@@ -692,7 +692,7 @@ module QuizzesHelper
     end
 
     titles = titles.map { |title| h(title) }
-    "title=\"#{titles.join(' ')}\"".html_safe unless titles.empty? # rubocop:disable Rails/OutputSafety
+    "title=\"#{titles.join(" ")}\"".html_safe unless titles.empty? # rubocop:disable Rails/OutputSafety
   end
 
   def show_correct_answers?
@@ -703,7 +703,7 @@ module QuizzesHelper
   end
 
   def point_value_for_input(user_answer, question)
-    return user_answer[:points] unless user_answer[:correct] == 'undefined'
+    return user_answer[:points] unless user_answer[:correct] == "undefined"
 
     if ["assignment", "practice_quiz"].include?(@quiz.quiz_type)
       ""
@@ -718,12 +718,12 @@ module QuizzesHelper
 
   def label_for_question_type(question_type)
     case question_type.question_type
-    when 'short_answer_question'
-      I18n.t('Fill in the blank answer')
-    when 'numerical_question', 'calculated_question'
-      I18n.t('Numerical answer')
+    when "short_answer_question"
+      I18n.t("Fill in the blank answer")
+    when "numerical_question", "calculated_question"
+      I18n.t("Numerical answer")
     else
-      I18n.t('Answer field')
+      I18n.t("Answer field")
     end
   end
 end

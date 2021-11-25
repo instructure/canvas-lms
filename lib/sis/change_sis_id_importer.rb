@@ -26,13 +26,13 @@ module SIS
       yield importer
 
       types = {
-        'user' => { scope: @root_account.pseudonyms },
-        'course' => { scope: @root_account.all_courses },
-        'section' => { scope: @root_account.course_sections },
-        'term' => { scope: @root_account.enrollment_terms },
-        'account' => { scope: @root_account.all_accounts },
-        'group' => { scope: @root_account.all_groups },
-        'group_category' => { scope: @root_account.all_group_categories },
+        "user" => { scope: @root_account.pseudonyms },
+        "course" => { scope: @root_account.all_courses },
+        "section" => { scope: @root_account.course_sections },
+        "term" => { scope: @root_account.enrollment_terms },
+        "account" => { scope: @root_account.all_accounts },
+        "group" => { scope: @root_account.all_groups },
+        "group_category" => { scope: @root_account.all_group_categories },
       }
 
       importer.things_to_update_batch_ids.each do |key, value|
@@ -69,13 +69,13 @@ module SIS
         things_to_update_batch_ids[type] ||= Set.new
 
         types = {
-          'user' => { scope: @root_account.pseudonyms, column: :sis_user_id },
-          'course' => { scope: @root_account.all_courses },
-          'section' => { scope: @root_account.course_sections },
-          'term' => { scope: @root_account.enrollment_terms },
-          'account' => { scope: @root_account.all_accounts },
-          'group' => { scope: @root_account.all_groups },
-          'group_category' => { scope: @root_account.all_group_categories },
+          "user" => { scope: @root_account.pseudonyms, column: :sis_user_id },
+          "course" => { scope: @root_account.all_courses },
+          "section" => { scope: @root_account.course_sections },
+          "term" => { scope: @root_account.enrollment_terms },
+          "account" => { scope: @root_account.all_accounts },
+          "group" => { scope: @root_account.all_groups },
+          "group_category" => { scope: @root_account.all_group_categories },
         }
 
         details = types[type]
@@ -100,16 +100,16 @@ module SIS
           updates[column] = data_change.new_id
         end
         if data_change.new_integration_id.present?
-          updates['integration_id'] = data_change.new_integration_id
-          if data_change.new_integration_id == '<delete>'
-            updates['integration_id'] = nil
+          updates["integration_id"] = data_change.new_integration_id
+          if data_change.new_integration_id == "<delete>"
+            updates["integration_id"] = nil
           end
         end
         updates
       end
 
       def check_for_conflicting_ids(column, details, type, data_change)
-        if type == 'group_category' && (data_change.old_integration_id || data_change.new_integration_id)
+        if type == "group_category" && (data_change.old_integration_id || data_change.new_integration_id)
           raise ImportError, "Group categories should not have integration IDs."
         end
 

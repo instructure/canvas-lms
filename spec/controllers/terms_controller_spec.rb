@@ -28,7 +28,7 @@ describe TermsController do
     term = a.default_enrollment_term
     expect_any_instantiation_of(term).to receive(:touch_all_courses).once
 
-    put 'update', params: { account_id: a.id, id: term.id, enrollment_term: { start_at: 1.day.ago, end_at: 1.day.from_now,
+    put "update", params: { account_id: a.id, id: term.id, enrollment_term: { start_at: 1.day.ago, end_at: 1.day.from_now,
                                                                               overrides: {
                                                                                 student_enrollment: { start_at: 1.day.ago, end_at: 1.day.from_now },
                                                                                 teacher_enrollment: { start_at: 1.day.ago, end_at: 1.day.from_now },
@@ -41,7 +41,7 @@ describe TermsController do
     account_admin_user(account: @account)
     user_session(@user)
 
-    put 'update', params: { account_id: @account.id, id: @account.default_enrollment_term.id, enrollment_term: { name: "new name lol" } }
+    put "update", params: { account_id: @account.id, id: @account.default_enrollment_term.id, enrollment_term: { name: "new name lol" } }
 
     expect(response).to_not be_successful
     error = json_parse(response.body)["errors"]["name"].first["message"]
@@ -53,7 +53,7 @@ describe TermsController do
     account_admin_user(account: @account)
     user_session(@user)
 
-    delete 'destroy', params: { account_id: @account.id, id: @account.default_enrollment_term.id }
+    delete "destroy", params: { account_id: @account.id, id: @account.default_enrollment_term.id }
 
     expect(response).to_not be_successful
     error = json_parse(response.body)["errors"]["workflow_state"].first["message"]
@@ -70,7 +70,7 @@ describe TermsController do
     @course.enrollment_term = @term
     @course.save!
 
-    delete 'destroy', params: { account_id: @account.id, id: @term.id }
+    delete "destroy", params: { account_id: @account.id, id: @term.id }
 
     expect(response).to_not be_successful
     error = json_parse(response.body)["errors"]["workflow_state"].first["message"]
@@ -78,7 +78,7 @@ describe TermsController do
 
     @course.destroy
 
-    delete 'destroy', params: { account_id: @account.id, id: @term.id }
+    delete "destroy", params: { account_id: @account.id, id: @term.id }
 
     expect(response).to be_successful
 

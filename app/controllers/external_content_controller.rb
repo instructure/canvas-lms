@@ -17,9 +17,9 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-require 'ims/lti'
+require "ims/lti"
 
-IMS::LTI::Models::ContentItems::ContentItem.add_attribute :canvas_url, json_key: 'canvasURL'
+IMS::LTI::Models::ContentItems::ContentItem.add_attribute :canvas_url, json_key: "canvasURL"
 
 class ExternalContentController < ApplicationController
   include Lti::Concerns::Oembed
@@ -40,23 +40,23 @@ class ExternalContentController < ApplicationController
   def success
     normalize_deprecated_data!
     @retrieved_data = {}
-    if params[:service] == 'equella'
+    if params[:service] == "equella"
       params.each do |key, value|
-        if key.to_s.start_with?('eq_')
-          @retrieved_data[key.to_s.delete_prefix('eq_')] = value
+        if key.to_s.start_with?("eq_")
+          @retrieved_data[key.to_s.delete_prefix("eq_")] = value
         end
       end
-    elsif params[:return_type] == 'oembed'
+    elsif params[:return_type] == "oembed"
       js_env(oembed: { endpoint: params[:endpoint], url: params[:url] })
       @oembed_token = params[:oembed_token]
-    elsif params[:service] == 'external_tool_dialog'
+    elsif params[:service] == "external_tool_dialog"
       get_context
       @retrieved_data = content_items_for_canvas
-    elsif params[:service] == 'external_tool_redirect'
-      @hide_message = true if params[:service] == 'external_tool_redirect'
+    elsif params[:service] == "external_tool_redirect"
+      @hide_message = true if params[:service] == "external_tool_redirect"
       params[:return_type] = nil unless %w[oembed lti_launch_url url image_url iframe file].include?(params[:return_type])
       @retrieved_data = params
-      if @retrieved_data[:url] && ['oembed', 'lti_launch_url'].include?(params[:return_type])
+      if @retrieved_data[:url] && ["oembed", "lti_launch_url"].include?(params[:return_type])
         begin
           uri = URI.parse(@retrieved_data[:url])
           unless uri.scheme
@@ -92,7 +92,7 @@ class ExternalContentController < ApplicationController
   def normalize_deprecated_data!
     params[:return_type] = params[:embed_type] if !params.key?(:return_type) && params.key?(:embed_type)
 
-    return_types = { 'basic_lti' => 'lti_launch_url', 'link' => 'url', 'image' => 'image_url' }
+    return_types = { "basic_lti" => "lti_launch_url", "link" => "url", "image" => "image_url" }
     params[:return_type] = return_types[params[:return_type]] if return_types.key? params[:return_type]
   end
 
@@ -134,7 +134,7 @@ class ExternalContentController < ApplicationController
         launch_url = item.url || json_data[:default_launch_url]
         url_gen_params = { url: launch_url }
 
-        displays = { 'iframe' => 'borderless', 'window' => 'borderless' }
+        displays = { "iframe" => "borderless", "window" => "borderless" }
         url_gen_params[:display] =
           displays[item.placement_advice.presentation_document_target]
 
@@ -184,7 +184,7 @@ class ExternalContentController < ApplicationController
 
   def default_placement_advice
     IMS::LTI::Models::ContentItemPlacement.new(
-      presentation_document_target: 'default',
+      presentation_document_target: "default",
       display_height: 600,
       display_width: 800
     )

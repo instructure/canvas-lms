@@ -51,7 +51,7 @@ class ContextController < ApplicationController
     # same string is rendered in the html response, the browser will refuse to
     # render that part of the content. this header tells the browser that we're
     # doing it on purpose, so skip the XSS detection.
-    response['X-XSS-Protection'] = '0'
+    response["X-XSS-Protection"] = "0"
     @snippet = Base64.decode64(@snippet)
     render layout: false
   end
@@ -63,7 +63,7 @@ class ContextController < ApplicationController
   def roster
     return unless authorized_action(@context, @current_user, :read_roster)
 
-    log_asset_access(["roster", @context], 'roster', 'other')
+    log_asset_access(["roster", @context], "roster", "other")
 
     case @context
     when Course
@@ -135,9 +135,9 @@ class ContextController < ApplicationController
                else
                  @context.participating_users_in_context(sort: true).distinct.order_by_sortable_name
                end
-      @primary_users = { t('roster.group_members', 'Group Members') => @users }
+      @primary_users = { t("roster.group_members", "Group Members") => @users }
       if (course = @context.context.is_a?(Course) && @context.context)
-        @secondary_users = { t('roster.teachers_and_tas', 'Teachers & TAs') => course.participating_instructors.order_by_sortable_name.distinct }
+        @secondary_users = { t("roster.teachers_and_tas", "Teachers & TAs") => course.participating_instructors.order_by_sortable_name.distinct }
       end
     end
 
@@ -242,9 +242,9 @@ class ContextController < ApplicationController
       unless @user
         case @context
         when Course
-          flash[:error] = t('no_user.course', "That user does not exist or is not currently a member of this course")
+          flash[:error] = t("no_user.course", "That user does not exist or is not currently a member of this course")
         when Group
-          flash[:error] = t('no_user.group', "That user does not exist or is not currently a member of this group")
+          flash[:error] = t("no_user.group", "That user does not exist or is not currently a member of this group")
         end
         redirect_to named_context_url(@context, :context_users_url)
         return
@@ -261,13 +261,13 @@ class ContextController < ApplicationController
           @user.profile,
           @current_user,
           session,
-          ['links', 'user_services']
+          ["links", "user_services"]
         )
-        add_body_class 'not-editing'
+        add_body_class "not-editing"
 
-        add_crumb(t('#crumbs.people', 'People'), context_url(@context, :context_users_url))
+        add_crumb(t("#crumbs.people", "People"), context_url(@context, :context_users_url))
         add_crumb(@user.name, context_url(@context, :context_user_url, @user))
-        add_crumb(t('#crumbs.access_report', "Access Report"))
+        add_crumb(t("#crumbs.access_report", "Access Report"))
         set_active_tab "people"
 
         render :new_roster_user, stream: can_stream_template?
@@ -286,7 +286,7 @@ class ContextController < ApplicationController
         @messages = @messages.select { |m| m.grants_right?(@current_user, session, :read) }.sort_by(&:created_at).reverse
       end
 
-      add_crumb(t('#crumbs.people', "People"), context_url(@context, :context_users_url))
+      add_crumb(t("#crumbs.people", "People"), context_url(@context, :context_users_url))
       add_crumb(context_user_name(@context, @user), context_url(@context, :context_user_url, @user))
       set_active_tab "people"
 
@@ -310,9 +310,9 @@ class ContextController < ApplicationController
 
       @deleted_items = []
       @item_types.each do |scope|
-        @deleted_items += scope.where(workflow_state: 'deleted').limit(25).to_a
+        @deleted_items += scope.where(workflow_state: "deleted").limit(25).to_a
       end
-      @deleted_items += @context.attachments.where(file_state: 'deleted').limit(25).to_a
+      @deleted_items += @context.attachments.where(file_state: "deleted").limit(25).to_a
       if @context.grants_any_right?(@current_user, :manage_groups, :manage_groups_delete)
         @deleted_items += @context.all_group_categories.where.not(deleted_at: nil).limit(25).to_a
       end
@@ -322,21 +322,21 @@ class ContextController < ApplicationController
 
   def undelete_item
     if authorized_action(@context, @current_user, :manage_content)
-      type = params[:asset_string].split('_')
+      type = params[:asset_string].split("_")
       id = type.pop
-      type = type.join('_')
+      type = type.join("_")
       scope = @context
-      scope = @context.wiki if type == 'wiki_page'
-      type = 'all_discussion_topic' if type == 'discussion_topic'
-      type = 'all_group_category' if type == 'group_category'
+      scope = @context.wiki if type == "wiki_page"
+      type = "all_discussion_topic" if type == "discussion_topic"
+      type = "all_group_category" if type == "group_category"
       if %w[all_group_category group].include?(type) && !@context.grants_any_right?(@current_user, :manage_groups, :manage_groups_delete)
         return render_unauthorized_action
       end
 
       type = type.pluralize
-      type = 'rubric_associations_with_deleted' if type == 'rubric_associations'
+      type = "rubric_associations_with_deleted" if type == "rubric_associations"
       unless ITEM_TYPES.include?(type.to_sym) && scope.class.reflections.key?(type)
-        raise 'invalid type'
+        raise "invalid type"
       end
 
       @item = scope.association(type).reader.find(id)

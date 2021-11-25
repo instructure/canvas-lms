@@ -32,10 +32,10 @@ module BroadcastPolicies
              published?: true, muted?: false, created_at: 4.hours.ago,
              changed_in_state: true, due_at: Time.zone.now,
              points_possible: 100, assignment_changed: false,
-             just_created: false, workflow_state: 'published',
+             just_created: false, workflow_state: "published",
              due_at_before_last_save: 7.days.ago, saved_change_to_points_possible?: true,
              saved_change_to_workflow_state?: false,
-             workflow_state_before_last_save: 'published')
+             workflow_state_before_last_save: "published")
     end
 
     let(:policy) { AssignmentPolicy.new(assignment) }
@@ -45,13 +45,13 @@ module BroadcastPolicies
         allow(assignment).to receive(:just_created).and_return true
       end
 
-      it 'is true when an assignment is published on creation' do
+      it "is true when an assignment is published on creation" do
         expect(policy.should_dispatch_assignment_created?).to be_truthy
       end
 
-      it 'is true when the prior version was unpublished' do
+      it "is true when the prior version was unpublished" do
         allow(assignment).to receive(:just_created).and_return false
-        allow(assignment).to receive(:workflow_state_before_last_save).and_return 'unpublished'
+        allow(assignment).to receive(:workflow_state_before_last_save).and_return "unpublished"
         allow(assignment).to receive(:saved_change_to_workflow_state?).and_return true
         expect(policy.should_dispatch_assignment_created?).to be_truthy
       end
@@ -64,7 +64,7 @@ module BroadcastPolicies
       specify do
         wont_send_when do
           allow(assignment).to receive(:just_created).and_return false
-          allow(assignment).to receive(:workflow_state_before_last_save).and_return 'published'
+          allow(assignment).to receive(:workflow_state_before_last_save).and_return "published"
           allow(assignment).to receive(:saved_change_to_workflow_state?).and_return false
         end
       end
@@ -73,12 +73,12 @@ module BroadcastPolicies
       specify { wont_send_when { allow(context).to receive(:concluded?).and_return true } }
     end
 
-    describe '#should_dispatch_assignment_due_date_changed?' do
+    describe "#should_dispatch_assignment_due_date_changed?" do
       before do
         allow(assignment).to receive(:saved_change_to_workflow_state?).and_return false
       end
 
-      it 'is true when the dependent inputs are true' do
+      it "is true when the dependent inputs are true" do
         expect(policy.should_dispatch_assignment_due_date_changed?).to be_truthy
       end
 
@@ -94,12 +94,12 @@ module BroadcastPolicies
       specify { wont_send_when { allow(assignment).to receive(:due_at).and_return assignment.due_at_before_last_save } }
     end
 
-    describe '#should_dispatch_assignment_changed?' do
+    describe "#should_dispatch_assignment_changed?" do
       before do
         allow(assignment).to receive(:saved_change_to_workflow_state?).and_return false
       end
 
-      it 'is true when the dependent inputs are true' do
+      it "is true when the dependent inputs are true" do
         expect(policy.should_dispatch_assignment_changed?).to be_truthy
       end
 

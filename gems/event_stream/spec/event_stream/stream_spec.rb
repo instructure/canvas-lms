@@ -18,12 +18,12 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'canvas_cassandra'
-require 'spec_helper'
+require "canvas_cassandra"
+require "spec_helper"
 
 describe EventStream::Stream do
   let(:database) do
-    database = double('database')
+    database = double("database")
     def database.batch
       yield
     end
@@ -39,28 +39,28 @@ describe EventStream::Stream do
     end
 
     def database.keyspace
-      'test_db'
+      "test_db"
     end
     database
   end
 
   context "setup block" do
     before do
-      double(to_s: double('table'))
+      double(to_s: double("table"))
     end
 
     it "sets values as expected" do
       # can't access spec ivars inside instance_exec
       database, table = self.database, @table
-      id_column = double(to_s: double('id_column'))
-      record_type = double('record_type')
+      id_column = double(to_s: double("id_column"))
+      record_type = double("record_type")
 
       stream = EventStream::Stream.new do
         self.database database
         self.table table
         self.id_column id_column
         self.record_type record_type
-        read_consistency_level 'ALL'
+        read_consistency_level "ALL"
       end
 
       expect(stream.database).to eq database
@@ -68,7 +68,7 @@ describe EventStream::Stream do
       expect(stream.table).to eq table.to_s
       expect(stream.id_column).to eq id_column.to_s
       expect(stream.record_type).to eq record_type
-      expect(stream.read_consistency_level).to eq 'ALL'
+      expect(stream.read_consistency_level).to eq "ALL"
     end
 
     it "requires database_name and table" do
@@ -99,7 +99,7 @@ describe EventStream::Stream do
       end
 
       it "defaults id_column to 'id'" do
-        expect(@stream.id_column).to eq 'id'
+        expect(@stream.id_column).to eq "id"
       end
 
       it "defaults record_type to EventStream::Record" do
@@ -112,15 +112,15 @@ describe EventStream::Stream do
     it "returns true when available and configured" do
       # can't access spec ivars inside instance_exec
       database, table = self.database, @table
-      id_column = double(to_s: double('id_column'))
-      record_type = double('record_type')
+      id_column = double(to_s: double("id_column"))
+      record_type = double("record_type")
 
       stream = EventStream::Stream.new do
         self.database -> { database }
         self.table table
         self.id_column id_column
         self.record_type record_type
-        read_consistency_level 'ALL'
+        read_consistency_level "ALL"
       end
 
       expect(stream.database).to be database
@@ -131,15 +131,15 @@ describe EventStream::Stream do
       # can't access spec ivars inside instance_exec
       database, table = self.database, @table
       allow(database).to receive(:available?).and_return(false)
-      id_column = double(to_s: double('id_column'))
-      record_type = double('record_type')
+      id_column = double(to_s: double("id_column"))
+      record_type = double("record_type")
 
       stream = EventStream::Stream.new do
         self.database database
         self.table table
         self.id_column id_column
         self.record_type record_type
-        read_consistency_level 'ALL'
+        read_consistency_level "ALL"
       end
 
       expect(stream.database).to be database
@@ -149,15 +149,15 @@ describe EventStream::Stream do
     it "returns false when not configured" do
       # can't access spec ivars inside instance_exec
       table = @table
-      id_column = double(to_s: double('id_column'))
-      record_type = double('record_type')
+      id_column = double(to_s: double("id_column"))
+      record_type = double("record_type")
 
       stream = EventStream::Stream.new do
         self.database -> {}
         self.table table
         self.id_column id_column
         self.record_type record_type
-        read_consistency_level 'ALL'
+        read_consistency_level "ALL"
       end
 
       expect(stream.database).to be nil
@@ -169,8 +169,8 @@ describe EventStream::Stream do
     it "returns backend db name from AR" do
       # can't access spec ivars inside instance_exec
       table = @table
-      id_column = double(to_s: double('id_column'))
-      record_type = double('record_type')
+      id_column = double(to_s: double("id_column"))
+      record_type = double("record_type")
 
       ar_type = Class.new do
         def self.connection
@@ -192,7 +192,7 @@ describe EventStream::Stream do
         self.table table
         self.id_column id_column
         self.record_type record_type
-        read_consistency_level 'ALL'
+        read_consistency_level "ALL"
         active_record_type ar_type
       end
 
@@ -212,25 +212,25 @@ describe EventStream::Stream do
 
     describe "on_insert" do
       before do
-        @record = double(id: double('id'), created_at: Time.now, attributes: double('attributes'))
+        @record = double(id: double("id"), created_at: Time.now, attributes: double("attributes"))
       end
 
       it "registers callback for execution during insert" do
-        spy = double('spy')
+        spy = double("spy")
         @stream.on_insert { spy.trigger }
         expect(spy).to receive(:trigger).once
         @stream.insert(@record)
       end
 
       it "includes the record in the callback invocation" do
-        spy = double('spy')
+        spy = double("spy")
         @stream.on_insert { |record| spy.trigger(record) }
         expect(spy).to receive(:trigger).once.with(@record)
         @stream.insert(@record)
       end
 
       it "stacks multiple callbacks" do
-        spy = double('spy')
+        spy = double("spy")
         @stream.on_insert { spy.trigger1 }
         @stream.on_insert { spy.trigger2 }
         expect(spy).to receive(:trigger1).once
@@ -255,7 +255,7 @@ describe EventStream::Stream do
     describe "insert" do
       before do
         @timestamp = Time.now
-        @record = double(id: double('id'), created_at: @timestamp, attributes: double('attributes'))
+        @record = double(id: double("id"), created_at: @timestamp, attributes: double("attributes"))
       end
 
       it "inserts into the configured database" do
@@ -269,7 +269,7 @@ describe EventStream::Stream do
       end
 
       it "inserts by the record's id into the configured id column" do
-        id_column = double(to_s: double('id_column'))
+        id_column = double(to_s: double("id_column"))
         @stream.id_column id_column
         expect(database).to receive(:insert_record).with(anything, { id_column.to_s => @record.id }, anything, anything)
         @stream.insert(@record)
@@ -286,7 +286,7 @@ describe EventStream::Stream do
       end
 
       it "executes its commands in a batch" do
-        spy = double('spy')
+        spy = double("spy")
         @stream.on_insert { spy.trigger }
         expect(database).to receive(:batch).once
         expect(database).not_to receive(:insert_record)
@@ -297,25 +297,25 @@ describe EventStream::Stream do
 
     describe "on_update" do
       before do
-        @record = double(id: double('id'), created_at: Time.now, changes: double('changes'))
+        @record = double(id: double("id"), created_at: Time.now, changes: double("changes"))
       end
 
       it "registers callback for execution during update" do
-        spy = double('spy')
+        spy = double("spy")
         @stream.on_update { spy.trigger }
         expect(spy).to receive(:trigger).once
         @stream.update(@record)
       end
 
       it "includes the record in the callback invocation" do
-        spy = double('spy')
+        spy = double("spy")
         @stream.on_update { |record| spy.trigger(record) }
         expect(spy).to receive(:trigger).once.with(@record)
         @stream.update(@record)
       end
 
       it "stacks multiple callbacks" do
-        spy = double('spy')
+        spy = double("spy")
         @stream.on_update { spy.trigger1 }
         @stream.on_update { spy.trigger2 }
         expect(spy).to receive(:trigger1).once
@@ -327,7 +327,7 @@ describe EventStream::Stream do
     describe "update" do
       before do
         @timestamp = Time.now
-        @record = double(id: double('id'), created_at: @timestamp, changes: double('changes'))
+        @record = double(id: double("id"), created_at: @timestamp, changes: double("changes"))
       end
 
       it "updates in the configured database" do
@@ -341,7 +341,7 @@ describe EventStream::Stream do
       end
 
       it "updates by the record's id in the configured id column" do
-        id_column = double(to_s: double('id_column'))
+        id_column = double(to_s: double("id_column"))
         @stream.id_column id_column
         expect(database).to receive(:update_record).with(anything, { id_column.to_s => @record.id }, anything, anything)
         @stream.update(@record)
@@ -358,7 +358,7 @@ describe EventStream::Stream do
       end
 
       it "executes its commands in a batch" do
-        spy = double('spy')
+        spy = double("spy")
         @stream.on_update { spy.trigger }
         expect(database).to receive(:batch).once
         expect(database).not_to receive(:update_record)
@@ -390,16 +390,16 @@ describe EventStream::Stream do
       end
 
       it "passes the given ids to the execute" do
-        ids = double('ids', empty?: false)
+        ids = double("ids", empty?: false)
         expect(database).to receive(:execute).once.with(anything, ids, anything).and_return(@results)
         @stream.fetch(ids)
       end
 
       it "maps the returned rows to the configured record type" do
-        record_type = double('record_type')
-        raw_result = double('raw_result')
-        cql_result = double('cql_result', to_hash: raw_result)
-        typed_result = double('typed_result')
+        record_type = double("record_type")
+        raw_result = double("raw_result")
+        cql_result = double("cql_result", to_hash: raw_result)
+        typed_result = double("typed_result")
         expect(record_type).to receive(:from_attributes).with(raw_result).and_return(typed_result)
 
         @stream.record_type record_type
@@ -419,7 +419,7 @@ describe EventStream::Stream do
         @stream.fetch([1])
 
         @stream.reset_backend!
-        @stream.read_consistency_level 'ALL'
+        @stream.read_consistency_level "ALL"
         expect(database).to receive(:execute).once.with(/%CONSISTENCY% WHERE/, anything, consistency: "ALL").and_return(@results)
         @stream.fetch([1])
       end
@@ -432,7 +432,7 @@ describe EventStream::Stream do
 
     describe "add_index" do
       before do
-        @table = double('table')
+        @table = double("table")
         table = @table
         @index = @stream.add_index :thing do
           self.table table
@@ -440,17 +440,17 @@ describe EventStream::Stream do
         end
         @index_strategy = @index.strategy_for(:cassandra)
 
-        @key = double('key')
-        @entry = double('entry', key: @key)
+        @key = double("key")
+        @entry = double("entry", key: @key)
       end
 
       describe "generated on_insert callback" do
         before do
           @record = double(
-            id: double('id'),
+            id: double("id"),
             created_at: Time.now,
-            attributes: double('attributes'),
-            changes: double('changes'),
+            attributes: double("attributes"),
+            changes: double("changes"),
             entry: @entry
           )
         end
@@ -493,37 +493,37 @@ describe EventStream::Stream do
 
     describe "failure" do
       before do
-        @database = double('database')
+        @database = double("database")
         def @database.available?
           true
         end
         allow(@stream).to receive(:database).and_return(@database)
         @record = double(
-          id: 'id',
+          id: "id",
           created_at: Time.zone.now,
-          attributes: { 'attribute' => 'attribute_value' },
-          changes: { 'changed_attribute' => 'changed_value' }
+          attributes: { "attribute" => "attribute_value" },
+          changes: { "changed_attribute" => "changed_value" }
         )
         @exception = StandardError.new
       end
 
       shared_examples_for "error callbacks" do
         it "triggers callbacks on failed inserts" do
-          spy = double('spy')
+          spy = double("spy")
           @stream.on_error { |*args| spy.capture(*args) }
           expect(spy).to receive(:capture).once.with(:insert, @record, @exception)
           @stream.insert(@record)
         end
 
         it "triggers callbacks on failed updates" do
-          spy = double('spy')
+          spy = double("spy")
           @stream.on_error { |*args| spy.capture(*args) }
           expect(spy).to receive(:capture).once.with(:update, @record, @exception)
           @stream.update(@record)
         end
 
         it "raises error if raises_on_error is true, but still calls callbacks" do
-          spy = double('spy')
+          spy = double("spy")
           @stream.raise_on_error = true
           @stream.on_error { spy.trigger }
           expect(spy).to receive(:trigger).once

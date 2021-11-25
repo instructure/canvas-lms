@@ -395,14 +395,14 @@ shared_examples_for "an object whose dates are overridable" do
       u = User.new
       student1, student2 = [double, double]
 
-      { student1 => '1', student2 => '2' }.each do |student, value|
+      { student1 => "1", student2 => "2" }.each do |student, value|
         expect(a).to receive(:all_dates_visible_to).with(student).and_return({ student: value })
       end
 
       expect(ObserverEnrollment).to receive(:observed_students).and_return({ student1 => [], student2 => [] })
 
       override_hashes = a.observed_student_due_dates(u)
-      expect(override_hashes).to match_array [{ student: '1' }, { student: '2' }]
+      expect(override_hashes).to match_array [{ student: "1" }, { student: "2" }]
     end
   end
 

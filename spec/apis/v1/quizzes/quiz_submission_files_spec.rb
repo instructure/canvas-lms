@@ -18,14 +18,14 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../../api_spec_helper'
-require_relative '../../file_uploads_spec_helper'
+require_relative "../../api_spec_helper"
+require_relative "../../file_uploads_spec_helper"
 
 describe Quizzes::QuizSubmissionFilesController, type: :request do
   context "quiz submissions file uploads" do
     before :once do
       course_with_student active_all: true
-      @quiz = Quizzes::Quiz.create!(title: 'quiz', context: @course)
+      @quiz = Quizzes::Quiz.create!(title: "quiz", context: @course)
       @quiz.did_edit!
       @quiz.offer!
 
@@ -46,7 +46,7 @@ describe Quizzes::QuizSubmissionFilesController, type: :request do
                       },
                       preflight_params
       # account for JSON API style return
-      json['attachments'] ? json['attachments'][0] : json
+      json["attachments"] ? json["attachments"][0] : json
     end
 
     def has_query_exemption?

@@ -22,7 +22,7 @@ class AssessmentQuestion < ActiveRecord::Base
   extend RootAccountResolver
   include Workflow
 
-  has_many :quiz_questions, class_name: 'Quizzes::QuizQuestion'
+  has_many :quiz_questions, class_name: "Quizzes::QuizQuestion"
   has_many :attachments, as: :context, inverse_of: :context
   delegate :context, :context_id, :context_type, to: :assessment_question_bank
   attr_accessor :initial_context
@@ -146,7 +146,7 @@ class AssessmentQuestion < ActiveRecord::Base
       file_substitutions[id_or_path] = new_file
     end
     if (sub = file_substitutions[id_or_path])
-      query_rest = match_data[3] ? "&#{match_data[3]}" : ''
+      query_rest = match_data[3] ? "&#{match_data[3]}" : ""
       "/assessment_questions/#{self.id}/files/#{sub.id}/download?verifier=#{sub.uuid}#{query_rest}"
     else
       link
@@ -230,7 +230,7 @@ class AssessmentQuestion < ActiveRecord::Base
   end
 
   def edited_independent_of_quiz_question
-    self.workflow_state = 'independently_edited'
+    self.workflow_state = "independently_edited"
   end
 
   def editable_by?(question)
@@ -253,13 +253,13 @@ class AssessmentQuestion < ActiveRecord::Base
 
     # prepopulate version_number
     current_versions = Version.shard(Shard.shard_for(quiz_id))
-                              .where(versionable_type: 'AssessmentQuestion', versionable_id: assessment_questions)
+                              .where(versionable_type: "AssessmentQuestion", versionable_id: assessment_questions)
                               .group(:versionable_id)
                               .maximum(:number)
     # cache all the known quiz_questions
     scope = Quizzes::QuizQuestion
             .shard(Shard.shard_for(quiz_id))
-            .where(quiz_id: quiz_id, workflow_state: 'generated')
+            .where(quiz_id: quiz_id, workflow_state: "generated")
     # we search for nil quiz_group_id and duplicate_index to find older questions
     # generated before we added proper race condition checking
     existing_quiz_questions = scope
@@ -296,7 +296,7 @@ class AssessmentQuestion < ActiveRecord::Base
       qq.quiz_id = quiz_id
       qq.quiz_group_id = quiz_group_id
       qq.assessment_question = self
-      qq.workflow_state = 'generated'
+      qq.workflow_state = "generated"
       qq.duplicate_index = duplicate_index
       Quizzes::QuizQuestion.suspend_callbacks(:validate_blank_questions, :infer_defaults, :update_quiz) do
         qq.save!
@@ -314,7 +314,7 @@ class AssessmentQuestion < ActiveRecord::Base
   alias_method :destroy_permanently!, :destroy
   def destroy
     self.assessment_question_bank.touch
-    self.workflow_state = 'deleted'
+    self.workflow_state = "deleted"
     self.deleted_at = Time.now.utc
     save
   end

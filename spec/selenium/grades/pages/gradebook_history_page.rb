@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../../common'
+require_relative "../../common"
 
 class GradeBookHistory
   class << self
@@ -171,15 +171,15 @@ class GradeBookHistory
     end
 
     def student_name_textfield
-      f('#students')
+      f("#students")
     end
 
     def grader_name_textfield
-      f('#graders')
+      f("#graders")
     end
 
     def assignment_name_textfield
-      f('#assignments')
+      f("#assignments")
     end
 
     def final_grade_override_checkbox
@@ -199,11 +199,11 @@ class GradeBookHistory
     end
 
     def filter_button
-      find_button('Filter')
+      find_button("Filter")
     end
 
     def results_table
-      find_table('Grade Changes')
+      find_table("Grade Changes")
     end
 
     def results_table_rows

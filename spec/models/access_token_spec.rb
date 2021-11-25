@@ -209,12 +209,12 @@ describe AccessToken do
     end
 
     it "matches named scopes" do
-      expect(token.scoped_to?(['https://canvas.instructure.com/login/oauth2/auth/user_profile', 'accounts'])).to eq true
+      expect(token.scoped_to?(["https://canvas.instructure.com/login/oauth2/auth/user_profile", "accounts"])).to eq true
     end
 
     it "does not partially match scopes" do
-      expect(token.scoped_to?(['user', 'accounts'])).to eq false
-      expect(token.scoped_to?(['profile', 'accounts'])).to eq false
+      expect(token.scoped_to?(["user", "accounts"])).to eq false
+      expect(token.scoped_to?(["profile", "accounts"])).to eq false
     end
 
     it "does not match if token has more scopes then requested" do
@@ -222,7 +222,7 @@ describe AccessToken do
     end
 
     it "does not match if token has less scopes then requested" do
-      expect(token.scoped_to?(['user_profile'])).to eq false
+      expect(token.scoped_to?(["user_profile"])).to eq false
     end
 
     it "does not validate scopes if the workflow state is deleted" do
@@ -248,27 +248,27 @@ describe AccessToken do
     end
 
     it "returns regexes that correspond to the http method" do
-      expect(token.url_scopes_for_method('GET')).to match_array [%r{^/api/v1/accounts(?:\.[^/]+|)$}]
+      expect(token.url_scopes_for_method("GET")).to match_array [%r{^/api/v1/accounts(?:\.[^/]+|)$}]
     end
 
     it "accounts for format segments" do
       token = AccessToken.new(scopes: %w[url:GET|/blah])
-      expect(token.url_scopes_for_method('GET')).to match_array [%r{^/blah(?:\.[^/]+|)$}]
+      expect(token.url_scopes_for_method("GET")).to match_array [%r{^/blah(?:\.[^/]+|)$}]
     end
 
     it "accounts for glob segments" do
       token = AccessToken.new(scopes: %w[url:GET|/*blah])
-      expect(token.url_scopes_for_method('GET')).to match_array [%r{^/.+(?:\.[^/]+|)$}]
+      expect(token.url_scopes_for_method("GET")).to match_array [%r{^/.+(?:\.[^/]+|)$}]
     end
 
     it "accounts for dynamic segments" do
       token = AccessToken.new(scopes: %w[url:GET|/courses/:id])
-      expect(token.url_scopes_for_method('GET')).to match_array [%r{^/courses/[^/]+(?:\.[^/]+|)$}]
+      expect(token.url_scopes_for_method("GET")).to match_array [%r{^/courses/[^/]+(?:\.[^/]+|)$}]
     end
 
     it "accounts for optional segments" do
       token = AccessToken.new(scopes: %w[url:GET|/courses(/:course_id)(/*blah)])
-      expect(token.url_scopes_for_method('GET')).to match_array [%r{^/courses(?:/[^/]+|)(?:/.+|)(?:\.[^/]+|)$}]
+      expect(token.url_scopes_for_method("GET")).to match_array [%r{^/courses(?:/[^/]+|)(?:/.+|)(?:\.[^/]+|)$}]
     end
   end
 
@@ -310,7 +310,7 @@ describe AccessToken do
       expect(@at_without_account.authorized_for_account?(@foreign_ac)).to be false
     end
 
-    context 'when the developer key new feature flags are on' do
+    context "when the developer key new feature flags are on" do
       let(:root_account) { account_model }
       let(:root_account_key) { DeveloperKey.create!(account: root_account) }
       let(:site_admin_key) { DeveloperKey.create! }
@@ -319,89 +319,89 @@ describe AccessToken do
         account
       end
 
-      shared_examples_for 'an access token that honors developer key bindings' do
-        let(:access_token) { raise 'set in example' }
-        let(:binding) { raise 'set in example' }
-        let(:account) { raise 'set in example' }
+      shared_examples_for "an access token that honors developer key bindings" do
+        let(:access_token) { raise "set in example" }
+        let(:binding) { raise "set in example" }
+        let(:account) { raise "set in example" }
 
-        it 'authorizes if the binding state is on' do
-          binding.update!(workflow_state: 'on')
+        it "authorizes if the binding state is on" do
+          binding.update!(workflow_state: "on")
           expect(access_token.authorized_for_account?(account)).to eq true
         end
 
-        it 'does not authorize if the binding state is off' do
-          binding.update!(workflow_state: 'off')
+        it "does not authorize if the binding state is off" do
+          binding.update!(workflow_state: "off")
           expect(access_token.authorized_for_account?(account)).to eq false
         end
 
-        it 'does not authorize if the binding state is allow' do
-          binding.update!(workflow_state: 'allow')
+        it "does not authorize if the binding state is allow" do
+          binding.update!(workflow_state: "allow")
           expect(access_token.authorized_for_account?(account)).to eq false
         end
       end
 
-      describe 'site admin key' do
-        context 'when target account is site admin' do
-          it_behaves_like 'an access token that honors developer key bindings' do
+      describe "site admin key" do
+        context "when target account is site admin" do
+          it_behaves_like "an access token that honors developer key bindings" do
             let(:access_token) { AccessToken.create!(user: user_model, developer_key: site_admin_key) }
             let(:binding) { site_admin_key.developer_key_account_bindings.find_by(account: Account.site_admin) }
             let(:account) { Account.site_admin }
           end
         end
 
-        context 'when target account is root account' do
+        context "when target account is root account" do
           let(:access_token) { AccessToken.create!(user: user_model, developer_key: site_admin_key) }
           let(:binding) { site_admin_key.developer_key_account_bindings.create!(account: root_account) }
 
           before do
             site_admin_key.developer_key_account_bindings.find_by(account: Account.site_admin).update!(
-              workflow_state: 'allow'
+              workflow_state: "allow"
             )
           end
 
-          it_behaves_like 'an access token that honors developer key bindings' do
+          it_behaves_like "an access token that honors developer key bindings" do
             let(:access_token) { AccessToken.create!(user: user_model, developer_key: site_admin_key) }
             let(:binding) { site_admin_key.developer_key_account_bindings.create!(account: root_account) }
             let(:account) { root_account }
           end
 
-          it 'does not authorize if the root account binding state is on but site admin off' do
-            binding.update!(workflow_state: 'on')
+          it "does not authorize if the root account binding state is on but site admin off" do
+            binding.update!(workflow_state: "on")
             site_admin_key.developer_key_account_bindings.find_by(account: Account.site_admin).update!(
-              workflow_state: 'off'
+              workflow_state: "off"
             )
             expect(access_token.authorized_for_account?(root_account)).to eq false
           end
         end
 
-        context 'when target is a sub account' do
+        context "when target is a sub account" do
           let(:access_token) { AccessToken.create!(user: user_model, developer_key: site_admin_key) }
           let(:binding) { site_admin_key.developer_key_account_bindings.create!(account: root_account) }
 
           before do
             site_admin_key.developer_key_account_bindings.find_by(account: Account.site_admin).update!(
-              workflow_state: 'allow'
+              workflow_state: "allow"
             )
           end
 
-          it_behaves_like 'an access token that honors developer key bindings' do
+          it_behaves_like "an access token that honors developer key bindings" do
             let(:access_token) { AccessToken.create!(user: user_model, developer_key: site_admin_key) }
             let(:binding) { site_admin_key.developer_key_account_bindings.create!(account: root_account) }
             let(:account) { sub_account }
           end
 
-          it 'does not authorize if the root account binding state is on but site admin off' do
-            binding.update!(workflow_state: 'on')
+          it "does not authorize if the root account binding state is on but site admin off" do
+            binding.update!(workflow_state: "on")
             site_admin_key.developer_key_account_bindings.find_by(account: Account.site_admin).update!(
-              workflow_state: 'off'
+              workflow_state: "off"
             )
             expect(access_token.authorized_for_account?(sub_account)).to eq false
           end
         end
       end
 
-      describe 'root acount key' do
-        it_behaves_like 'an access token that honors developer key bindings' do
+      describe "root acount key" do
+        it_behaves_like "an access token that honors developer key bindings" do
           let(:access_token) { AccessToken.create!(user: user_model, developer_key: root_account_key) }
           let(:binding) { root_account_key.developer_key_account_bindings.find_by!(account: root_account) }
           let(:account) { root_account }
@@ -409,7 +409,7 @@ describe AccessToken do
       end
     end
 
-    describe 'adding scopes' do
+    describe "adding scopes" do
       let(:dev_key) { DeveloperKey.create! require_scopes: true, scopes: TokenScopes.all_scopes.slice(0, 10) }
       let(:access_token) { AccessToken.new(user: user_model, developer_key: dev_key, scopes: scopes) }
       let(:scopes) { [TokenScopes.all_scopes[12]] }
@@ -418,31 +418,31 @@ describe AccessToken do
         allow_any_instance_of(Account).to receive(:feature_enabled?).and_return(false)
       end
 
-      it 'is invalid when scopes requested are not included on dev key' do
+      it "is invalid when scopes requested are not included on dev key" do
         expect(access_token).not_to be_valid
       end
 
       context do
         let(:scopes) { [TokenScopes.all_scopes[8], TokenScopes.all_scopes[7]] }
 
-        it 'is valid when scopes requested are included on dev key' do
+        it "is valid when scopes requested are included on dev key" do
           expect(access_token).to be_valid
         end
       end
 
-      context 'with bad scopes' do
-        let(:scopes) { ['bad/scope'] }
+      context "with bad scopes" do
+        let(:scopes) { ["bad/scope"] }
 
-        it 'is invalid' do
+        it "is invalid" do
           expect(access_token).not_to be_valid
         end
 
-        context 'with require_scopes off' do
+        context "with require_scopes off" do
           before do
             dev_key.update! require_scopes: false
           end
 
-          it 'is valid' do
+          it "is valid" do
             expect(access_token).to be_valid
           end
         end
@@ -460,7 +460,7 @@ describe AccessToken do
     end
 
     it "regenerates the token" do
-      allow(Time).to receive(:now).and_return(Time.zone.parse('2015-06-29T23:01:00+00:00'))
+      allow(Time).to receive(:now).and_return(Time.zone.parse("2015-06-29T23:01:00+00:00"))
 
       @at.update!(expires_at: 2.hours.ago)
       @at.regenerate_access_token
@@ -477,41 +477,41 @@ describe AccessToken do
     end
   end
 
-  context 'broadcast policy' do
+  context "broadcast policy" do
     before(:once) do
-      Notification.create!(name: 'Manually Created Access Token Created')
+      Notification.create!(name: "Manually Created Access Token Created")
       user_model
     end
 
-    it 'sends a notification when a new manually created access token is created' do
+    it "sends a notification when a new manually created access token is created" do
       access_token = AccessToken.create!(user: @user)
-      expect(access_token.messages_sent).to include('Manually Created Access Token Created')
+      expect(access_token.messages_sent).to include("Manually Created Access Token Created")
     end
 
-    it 'sends a notification when a manually created access token is regenerated' do
+    it "sends a notification when a manually created access token is regenerated" do
       AccessToken.create!(user: @user)
       access_token = AccessToken.last
       access_token.regenerate_access_token
-      expect(access_token.messages_sent).to include('Manually Created Access Token Created')
+      expect(access_token.messages_sent).to include("Manually Created Access Token Created")
     end
 
-    it 'does not send a notification when a manually created access token is touched' do
+    it "does not send a notification when a manually created access token is touched" do
       AccessToken.create!(user: @user)
       access_token = AccessToken.last
       access_token.touch
-      expect(access_token.messages_sent).not_to include('Manually Created Access Token Created')
+      expect(access_token.messages_sent).not_to include("Manually Created Access Token Created")
     end
 
-    it 'does not send a notification when a new non-manually created access token is created' do
+    it "does not send a notification when a new non-manually created access token is created" do
       developer_key = DeveloperKey.create!
       access_token = AccessToken.create!(user: @user, developer_key: developer_key)
-      expect(access_token.messages_sent).not_to include('Manually Created Access Token Created')
+      expect(access_token.messages_sent).not_to include("Manually Created Access Token Created")
     end
   end
 
-  describe 'root_account_id' do
+  describe "root_account_id" do
     let(:root_account) { account_model }
-    let(:sub_account) { root_account.sub_accounts.create! name: 'sub' }
+    let(:sub_account) { root_account.sub_accounts.create! name: "sub" }
     let(:root_account_key) { DeveloperKey.create!(account: root_account) }
     let(:site_admin_key) { DeveloperKey.create! }
 

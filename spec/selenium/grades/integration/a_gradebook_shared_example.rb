@@ -17,10 +17,10 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative './weight_conditions'
-require_relative './grading_period_conditions'
+require_relative "./weight_conditions"
+require_relative "./grading_period_conditions"
 
-shared_examples_for 'a gradebook' do
+shared_examples_for "a gradebook" do
   expectation_hash = {
     "no grading period or assignment group weighting" => {
       "all grading periods" => ["53.75%", "53.75% (43 / 80 points)"],

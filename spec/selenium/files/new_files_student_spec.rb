@@ -17,8 +17,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../common'
-require_relative '../helpers/files_common'
+require_relative "../common"
+require_relative "../helpers/files_common"
 
 describe "better_file_browsing" do
   include_context "in-process server selenium tests"
@@ -42,7 +42,7 @@ describe "better_file_browsing" do
       before :once do
         txt_files = ["a_file.txt", "b_file.txt", "c_file.txt"]
         @files = txt_files.map do |text_file|
-          add_file(fixture_file_upload("files/#{text_file}", 'text/plain'), @course, text_file)
+          add_file(fixture_file_upload("files/#{text_file}", "text/plain"), @course, text_file)
         end
       end
 
@@ -67,16 +67,16 @@ describe "better_file_browsing" do
       it "does not see upload file, add folder buttons and cloud icon", priority: "1" do
         get "/courses/#{@course.id}/files"
         content = f("#content")
-        expect(content).not_to contain_css('.btn-upload')
-        expect(content).not_to contain_css('.btn-add-folder')
-        expect(content).not_to contain_css('.btn-link.published-status')
+        expect(content).not_to contain_css(".btn-upload")
+        expect(content).not_to contain_css(".btn-add-folder")
+        expect(content).not_to contain_css(".btn-link.published-status")
       end
 
       it "only sees Download option on cog icon", priority: "1" do
         skip_if_safari(:alert)
         get "/courses/#{@course.id}/files"
         content = f("#content")
-        f('.al-trigger-gray').click
+        f(".al-trigger-gray").click
         expect(fln("Download")).to be_displayed
         expect(content).not_to contain_link("Rename")
         expect(content).not_to contain_link("Move")
@@ -86,20 +86,20 @@ describe "better_file_browsing" do
       it "only sees View and Download options on toolbar menu", priority: "1" do
         get "/courses/#{@course.id}/files"
         content = f("#content")
-        f('.ef-item-row').click
-        expect(f('.btn-download')).to be_displayed
-        expect(f('.btn-view')).to be_displayed
-        expect(content).not_to contain_css('.btn-move')
-        expect(content).not_to contain_css('.btn-restrict')
-        expect(content).not_to contain_css('.btn-delete')
+        f(".ef-item-row").click
+        expect(f(".btn-download")).to be_displayed
+        expect(f(".btn-view")).to be_displayed
+        expect(content).not_to contain_css(".btn-move")
+        expect(content).not_to contain_css(".btn-restrict")
+        expect(content).not_to contain_css(".btn-delete")
       end
 
       it "sees calendar icon on restricted files within a given timeframe", priority: "1" do
         @files[0].update unlock_at: Time.zone.now - 1.week,
                          lock_at: Time.zone.now + 1.week
         get "/courses/#{@course.id}/files"
-        expect(f('.icon-calendar-day')).to be_displayed
-        f('.icon-calendar-day').click
+        expect(f(".icon-calendar-day")).to be_displayed
+        f(".icon-calendar-day").click
         wait_for_ajaximations
         expect(f("body")).not_to contain_css("[name=permissions]")
       end
@@ -108,7 +108,7 @@ describe "better_file_browsing" do
     context "in course with folders" do
       before :once do
         @folder = folder_model(name: "restricted_folder", context: @course)
-        @file = add_file(fixture_file_upload('files/example.pdf', 'application/pdf'),
+        @file = add_file(fixture_file_upload("files/example.pdf", "application/pdf"),
                          @course, "example.pdf", @folder)
       end
 
@@ -129,7 +129,7 @@ describe "better_file_browsing" do
 
         get "/courses/#{@course.id}/files/folder/restricted_folder?preview=#{@file.id}"
         refresh_page # the header seriously doesn't show up until you refres ¯\_(ツ)_/¯
-        expect(f('.ef-file-preview-header')).to be_present
+        expect(f(".ef-file-preview-header")).to be_present
       end
     end
   end

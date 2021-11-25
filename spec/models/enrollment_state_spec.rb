@@ -57,7 +57,7 @@ describe EnrollmentState do
 
       @enrollment.reload
       expect(@enrollment.enrollment_state.state_is_current?).to be_truthy
-      expect(@enrollment.enrollment_state.state).to eq 'invited'
+      expect(@enrollment.enrollment_state.state).to eq "invited"
     end
 
     it "reprocesses invalidated accesses" do
@@ -147,7 +147,7 @@ describe EnrollmentState do
       expect(enroll_state.state_is_current?).to be_falsey
 
       enroll_state.ensure_current_state
-      expect(enroll_state.state).to eq 'completed'
+      expect(enroll_state.state).to eq "completed"
       expect(enroll_state.state_started_at).to eq ended_at
     end
 
@@ -173,7 +173,7 @@ describe EnrollmentState do
       expect(enroll_state.state_is_current?).to be_falsey
 
       enroll_state.ensure_current_state
-      expect(enroll_state.state).to eq 'completed'
+      expect(enroll_state.state).to eq "completed"
       expect(enroll_state.state_started_at).to eq ended_at
     end
 
@@ -200,7 +200,7 @@ describe EnrollmentState do
       expect(enroll_state.state_is_current?).to be_falsey
 
       enroll_state.ensure_current_state
-      expect(enroll_state.state).to eq 'pending_invited'
+      expect(enroll_state.state).to eq "pending_invited"
       expect(enroll_state.state_valid_until).to eq start_at
     end
   end
@@ -223,7 +223,7 @@ describe EnrollmentState do
       future_enroll.save!
 
       future_state = future_enroll.enrollment_state
-      expect(future_state.state).to eq 'pending_invited'
+      expect(future_state.state).to eq "pending_invited"
       expect(future_state.state_valid_until).to eq start_at
       expect(future_state.restricted_access?).to be_falsey
 
@@ -257,7 +257,7 @@ describe EnrollmentState do
       past_enroll = student_in_course(course: @course)
 
       past_state = past_enroll.enrollment_state
-      expect(past_state.state).to eq 'completed'
+      expect(past_state.state).to eq "completed"
 
       expect(EnrollmentState).to receive(:update_enrollment).at_least(:once).with(not_eq(other_enroll))
 
@@ -283,7 +283,7 @@ describe EnrollmentState do
       enroll = student_in_course(course: @course)
       enroll_state = enroll.enrollment_state
 
-      expect(enroll_state.state).to eq 'pending_invited'
+      expect(enroll_state.state).to eq "pending_invited"
 
       expect(EnrollmentState).to receive(:update_enrollment).at_least(:once) { |e| expect(e.course).to eq @course }
       @course.restrict_student_future_view = true
@@ -307,7 +307,7 @@ describe EnrollmentState do
       enroll = student_in_course(course: @course)
       enroll_state = enroll.enrollment_state
 
-      expect(enroll_state.state).to eq 'pending_invited'
+      expect(enroll_state.state).to eq "pending_invited"
 
       expect(EnrollmentState).to receive(:update_enrollment).at_least(:once) { |e| expect(e.course).to eq @course }
       @course.start_at = 2.days.from_now
@@ -334,18 +334,18 @@ describe EnrollmentState do
 
       enroll = student_in_course(course: @course)
       enroll_state = enroll.enrollment_state
-      expect(enroll_state.state).to eq 'pending_invited'
+      expect(enroll_state.state).to eq "pending_invited"
 
       Timecop.freeze(4.days.from_now) do
         EnrollmentState.recalculate_expired_states
         enroll_state.reload
-        expect(enroll_state.state).to eq 'invited'
+        expect(enroll_state.state).to eq "invited"
       end
 
       Timecop.freeze(6.days.from_now) do
         EnrollmentState.recalculate_expired_states
         enroll_state.reload
-        expect(enroll_state.state).to eq 'completed'
+        expect(enroll_state.state).to eq "completed"
       end
     end
   end
@@ -355,7 +355,7 @@ describe EnrollmentState do
     e = student_in_course(course: @course)
     e.reject!
     RequestCache.enable do
-      e.workflow_state = 'invited'
+      e.workflow_state = "invited"
       e.save!
       expect(e.invited?).to be_truthy
     end

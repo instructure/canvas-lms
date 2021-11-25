@@ -24,7 +24,7 @@ class CassandraAddAdditionalGradeChangeIndexesForGradebookHistory < ActiveRecord
   include Canvas::Cassandra::Migration
 
   def self.cassandra_cluster
-    'auditors'
+    "auditors"
   end
 
   def self.indexes

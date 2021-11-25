@@ -17,26 +17,26 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../../helpers/discussions_common'
+require_relative "../../helpers/discussions_common"
 
-require 'nokogiri'
+require "nokogiri"
 
 describe "discussions" do
   include_context "in-process server selenium tests"
   include DiscussionsCommon
 
   let(:course) { course_model.tap(&:offer!) }
-  let(:student) { student_in_course(course: course, name: 'student', active_all: true).user }
-  let(:teacher) { teacher_in_course(course: course, name: 'teacher', active_all: true).user }
-  let(:somebody) { student_in_course(course: course, name: 'somebody', active_all: true).user }
-  let(:student_topic) { course.discussion_topics.create!(user: student, title: 'student topic title', message: 'student topic message') }
-  let(:somebody_topic) { course.discussion_topics.create!(user: somebody, title: 'somebody topic title', message: 'somebody topic message') }
+  let(:student) { student_in_course(course: course, name: "student", active_all: true).user }
+  let(:teacher) { teacher_in_course(course: course, name: "teacher", active_all: true).user }
+  let(:somebody) { student_in_course(course: course, name: "somebody", active_all: true).user }
+  let(:student_topic) { course.discussion_topics.create!(user: student, title: "student topic title", message: "student topic message") }
+  let(:somebody_topic) { course.discussion_topics.create!(user: somebody, title: "somebody topic title", message: "somebody topic message") }
   let(:side_comment_topic) do
-    t = course.discussion_topics.create!(user: somebody, title: 'side comment topic title', message: 'side comment topic message')
-    t.discussion_entries.create!(user: somebody, message: 'side comment topic entry message')
+    t = course.discussion_topics.create!(user: somebody, title: "side comment topic title", message: "side comment topic message")
+    t.discussion_entries.create!(user: somebody, message: "side comment topic entry message")
     t
   end
-  let(:entry) { topic.discussion_entries.create!(user: teacher, message: 'teacher entry') }
+  let(:entry) { topic.discussion_entries.create!(user: teacher, message: "teacher entry") }
 
   context "on the show page" do
     let(:url) { "/courses/#{course.id}/discussion_topics/#{topic.id}/" }
@@ -56,9 +56,9 @@ describe "discussions" do
 
           it "updates subscribed button when user posts to a topic", priority: "2" do
             get url
-            expect(f('.topic-subscribe-button')).to be_displayed
+            expect(f(".topic-subscribe-button")).to be_displayed
             add_reply "student posting"
-            expect(f('.topic-unsubscribe-button')).to be_displayed
+            expect(f(".topic-unsubscribe-button")).to be_displayed
           end
         end
       end
@@ -68,20 +68,20 @@ describe "discussions" do
         expect(f("#content")).not_to contain_css("#discussion_subentries .discussion_entry")
         add_reply
         expect(get_all_replies.count).to eq 1
-        expect(@last_entry.find_element(:css, '.author').text).to eq somebody.name
+        expect(@last_entry.find_element(:css, ".author").text).to eq somebody.name
       end
 
       context "side comments" do
         let(:topic) { side_comment_topic }
 
         it "adds a side comment", priority: "1" do
-          side_comment_text = 'new side comment'
+          side_comment_text = "new side comment"
           get url
 
-          f('.discussion-entries .discussion-reply-action').click
+          f(".discussion-entries .discussion-reply-action").click
           wait_for_ajaximations
-          type_in_tiny 'textarea', side_comment_text
-          submit_form('.discussion-entries .discussion-reply-form')
+          type_in_tiny "textarea", side_comment_text
+          submit_form(".discussion-entries .discussion-reply-form")
           wait_for_ajaximations
 
           last_entry = DiscussionEntry.last
@@ -91,7 +91,7 @@ describe "discussions" do
         end
 
         it "edits a side comment", priority: "1" do
-          edit_text = 'this has been edited'
+          edit_text = "this has been edited"
           text = "new side comment from somebody"
           entry = topic.discussion_entries.create!(user: somebody, message: text, parent_entry: entry)
           expect(topic.discussion_entries.last.message).to eq text

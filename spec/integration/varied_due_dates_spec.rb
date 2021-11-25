@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'nokogiri'
+require "nokogiri"
 
 describe "varied due dates" do
   include TextHelper
@@ -83,7 +83,7 @@ describe "varied due dates" do
   def create_recent_feedback(student)
     @assignment.find_or_create_submission(student)
     @assignment.update_submission(student, {
-                                    comment: 'you should turn this in ...',
+                                    comment: "you should turn this in ...",
                                     commenter: @teacher
                                   })
   end
@@ -108,7 +108,7 @@ describe "varied due dates" do
     @student_todo_assignment = @course.assignments.create!(
       title: "Student Todo",
       due_at: @student_todo_course_due_at,
-      submission_types: 'online_text_entry'
+      submission_types: "online_text_entry"
     )
     @student_todo_override = create_override_for(@student_todo_assignment, @student_todo_section_due_at)
   end
@@ -140,14 +140,14 @@ describe "varied due dates" do
     context "as the teacher" do
       it "shows multiple due dates in 'coming up'" do
         user_session(@teacher)
-        get '/dashboard-sidebar'
+        get "/dashboard-sidebar"
         assert_coming_up_due_date wrap_partial(response), multiple_due_dates
       end
 
       it "shows multiple due dates in 'todo'" do
         create_teacher_todo_assignment
         user_session(@teacher)
-        get '/dashboard-sidebar'
+        get "/dashboard-sidebar"
         assert_todo_due_date wrap_partial(response), multiple_due_dates
       end
     end

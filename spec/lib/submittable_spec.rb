@@ -30,7 +30,7 @@ shared_examples_for "submittable" do
 
       @course_section = @course.course_sections.create
       @student1, @student2, @student3 = create_users(3, return_type: :record)
-      @course.enroll_student(@student2, enrollment_state: 'active')
+      @course.enroll_student(@student2, enrollment_state: "active")
       @section = @course.course_sections.create!(name: "test section")
       @section2 = @course.course_sections.create!(name: "second test section")
       student_in_section(@section, user: @student1)
@@ -68,7 +68,7 @@ describe DiscussionTopic do
     def submittable_and_assignment(opts = {})
       assignment = @course.assignments.create!({
         title: "some discussion assignment",
-        submission_types: 'discussion_topic'
+        submission_types: "discussion_topic"
       }.merge(opts))
       [assignment.discussion_topic, assignment]
     end
@@ -86,7 +86,7 @@ describe WikiPage do
     def submittable_and_assignment(opts = {})
       assignment = @course.assignments.create!({
         title: "glorious page assignment",
-        submission_types: 'wiki_page'
+        submission_types: "wiki_page"
       }.merge(opts))
       page = submittable_without_assignment
       page.assignment_id = assignment.id
@@ -103,7 +103,7 @@ describe "section specific topic" do
       DiscussionTopicSectionVisibility.new(
         discussion_topic: topic,
         course_section: section,
-        workflow_state: 'active'
+        workflow_state: "active"
       )
     topic.save!
   end

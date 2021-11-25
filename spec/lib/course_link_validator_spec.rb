@@ -24,7 +24,7 @@ describe CourseLinkValidator do
 
     course_factory
     attachment_model
-    @ua = assignment_model(workflow_state: 'unpublished', name: 'Unpublished assignment eh')
+    @ua = assignment_model(workflow_state: "unpublished", name: "Unpublished assignment eh")
 
     bad_url = "http://www.notarealsitebutitdoesntmattercauseimstubbingitanwyay.com"
     bad_url2 = "/courses/#{@course.id}/file_contents/baaaad"
@@ -41,17 +41,17 @@ describe CourseLinkValidator do
     @course.syllabus_body = html
     @course.save!
 
-    bank = @course.assessment_question_banks.create!(title: 'bank')
-    aq = bank.assessment_questions.create!(question_data: { 'name' => 'test question',
-                                                            'question_text' => html, 'answers' => [{ 'id' => 1 }, { 'id' => 2 }] })
+    bank = @course.assessment_question_banks.create!(title: "bank")
+    aq = bank.assessment_questions.create!(question_data: { "name" => "test question",
+                                                            "question_text" => html, "answers" => [{ "id" => 1 }, { "id" => 2 }] })
 
-    assmnt = @course.assignments.create!(title: 'assignment', description: html)
+    assmnt = @course.assignments.create!(title: "assignment", description: html)
     event = @course.calendar_events.create!(title: "event", description: html)
     topic = @course.discussion_topics.create!(title: "discussion title", message: html)
     mod = @course.context_modules.create!(name: "some module")
-    mod.add_item(type: 'external_url', url: bad_url, title: 'pls view')
+    mod.add_item(type: "external_url", url: bad_url, title: "pls view")
     page = @course.wiki_pages.create!(title: "wiki", body: html)
-    quiz = @course.quizzes.create!(title: 'quiz1', description: html)
+    quiz = @course.quizzes.create!(title: "quiz1", description: html)
 
     qq = quiz.quiz_questions.create!(question_data: aq.question_data)
 
@@ -66,9 +66,9 @@ describe CourseLinkValidator do
         expect(issue[:invalid_links]).to include({ reason: :unreachable, url: bad_url, image: true })
       when :module
         expect(issue[:content_url]).to eq "/courses/#{@course.id}/modules#module_#{mod.id}"
-        expect(issue[:invalid_links]).to include({ reason: :unreachable, link_text: 'pls view', url: bad_url })
+        expect(issue[:invalid_links]).to include({ reason: :unreachable, link_text: "pls view", url: bad_url })
       else
-        expect(issue[:invalid_links]).to include({ reason: :unreachable, url: bad_url, link_text: 'Bad absolute link' })
+        expect(issue[:invalid_links]).to include({ reason: :unreachable, url: bad_url, link_text: "Bad absolute link" })
         expect(issue[:invalid_links]).to include({ reason: :unpublished_item, url: "/courses/#{@course.id}/assignments/#{@ua.id}", link_text: "Unpublished thing" })
         expect(issue[:invalid_links]).to include({ reason: :missing_item, url: bad_url2, image: true })
         expect(issue[:invalid_links]).to include({ reason: :missing_item, url: bad_media_object_url })
@@ -76,8 +76,8 @@ describe CourseLinkValidator do
     end
 
     type_names = {
-      syllabus: 'Course Syllabus',
-      course_card_image: 'Course Card Image',
+      syllabus: "Course Syllabus",
+      course_card_image: "Course Card Image",
       assessment_question: aq.question_data[:question_name],
       quiz_question: qq.question_data[:question_name],
       assignment: assmnt.title,
@@ -98,9 +98,9 @@ describe CourseLinkValidator do
     html = %(<a href='http://www.notarealsitebutitdoesntmattercauseimstubbingitanwyay.com'>linky</a>)
 
     course_factory
-    bank = @course.assessment_question_banks.create!(title: 'bank')
-    bank.assessment_questions.create!(question_data: { 'name' => 'test question',
-                                                       'question_text' => html, 'answers' => [{ 'id' => 1 }, { 'id' => 2 }] })
+    bank = @course.assessment_question_banks.create!(title: "bank")
+    bank.assessment_questions.create!(question_data: { "name" => "test question",
+                                                       "question_text" => html, "answers" => [{ "id" => 1 }, { "id" => 2 }] })
 
     CourseLinkValidator.queue_course(@course)
     run_jobs
@@ -122,9 +122,9 @@ describe CourseLinkValidator do
     html = %(<a href='http://www.notarealsitebutitdoesntmattercauseimstubbingitanwyay.com'>linky</a>)
 
     course_factory
-    quiz = @course.quizzes.create!(title: 'quiz1', description: "desc")
-    qq = quiz.quiz_questions.create!(question_data: { 'name' => 'test question',
-                                                      'question_text' => html, 'answers' => [{ 'id' => 1 }, { 'id' => 2 }] })
+    quiz = @course.quizzes.create!(title: "quiz1", description: "desc")
+    qq = quiz.quiz_questions.create!(question_data: { "name" => "test question",
+                                                      "question_text" => html, "answers" => [{ "id" => 1 }, { "id" => 2 }] })
     qq.destroy!
 
     CourseLinkValidator.queue_course(@course)
@@ -154,15 +154,15 @@ describe CourseLinkValidator do
 
     it "returns false when Setting is absent" do
       link_validator = CourseLinkValidator.new(@course)
-      expect(link_validator.whitelisted?('https://example.com/')).to eq false
+      expect(link_validator.whitelisted?("https://example.com/")).to eq false
     end
 
     it "accepts a comma-separated Setting" do
-      Setting.set('link_validator_whitelisted_hosts', 'foo.com,bar.com')
+      Setting.set("link_validator_whitelisted_hosts", "foo.com,bar.com")
       link_validator = CourseLinkValidator.new(@course)
-      expect(link_validator.whitelisted?('http://foo.com/foo')).to eq true
-      expect(link_validator.whitelisted?('http://bar.com/bar')).to eq true
-      expect(link_validator.whitelisted?('http://baz.com/baz')).to eq false
+      expect(link_validator.whitelisted?("http://foo.com/foo")).to eq true
+      expect(link_validator.whitelisted?("http://bar.com/bar")).to eq true
+      expect(link_validator.whitelisted?("http://baz.com/baz")).to eq false
     end
   end
 
@@ -195,8 +195,8 @@ describe CourseLinkValidator do
 
   it "works more betterer with external_tools/retrieve" do
     course_factory
-    tool = @course.context_external_tools.create!(name: 'blah',
-                                                  url: 'https://blah.example.com', shared_secret: '123', consumer_key: '456')
+    tool = @course.context_external_tools.create!(name: "blah",
+                                                  url: "https://blah.example.com", shared_secret: "123", consumer_key: "456")
 
     active_link = "/courses/#{@course.id}/external_tools/retrieve?url=#{CGI.escape(tool.url)}"
     nonsense_link = "/courses/#{@course.id}/external_tools/retrieve?url=#{CGI.escape("https://lolwut.beep")}"
@@ -379,7 +379,7 @@ describe CourseLinkValidator do
 
   it "does not flag wiki pages with url encoding" do
     course_factory
-    page = @course.wiki_pages.create!(title: "semi;colon", body: 'sutff')
+    page = @course.wiki_pages.create!(title: "semi;colon", body: "sutff")
 
     @course.syllabus_body = %(<a href='/courses/#{@course.id}/pages/#{CGI.escape(page.title)}'>link</a>)
     @course.save!
@@ -391,7 +391,7 @@ describe CourseLinkValidator do
     expect(issues).to be_empty
   end
 
-  context '#check_object_status' do
+  context "#check_object_status" do
     before :once do
       course_model
       @course_link_validator = CourseLinkValidator.new(@course)
@@ -406,11 +406,11 @@ describe CourseLinkValidator do
       expect(@course_link_validator.check_object_status("/media_objects_iframe/junk")).to eq :missing_item
     end
 
-    it 'returns :unpublished_item for unpublished content' do
+    it "returns :unpublished_item for unpublished content" do
       @assignment.unpublish!
       expect(@course_link_validator.check_object_status("/courses/#{@course.id}/assignments/#{@assignment.id}")).to eq :unpublished_item
 
-      quiz_model(course: @course).update(workflow_state: 'created')
+      quiz_model(course: @course).update(workflow_state: "created")
       expect(@course_link_validator.check_object_status("/courses/#{@course.id}/quizzes/#{@quiz.id}")).to eq :unpublished_item
 
       quiz_model(course: @course).unpublish!
@@ -420,7 +420,7 @@ describe CourseLinkValidator do
       expect(@course_link_validator.check_object_status("/courses/#{@course.id}/files/#{@attachment.id}/download")).to eq :unpublished_item
     end
 
-    it 'returns :deleted for deleted content' do
+    it "returns :deleted for deleted content" do
       @assignment.destroy
       expect(@course_link_validator.check_object_status("/courses/#{@course.id}/assignments/#{@assignment.id}")).to eq :deleted
 

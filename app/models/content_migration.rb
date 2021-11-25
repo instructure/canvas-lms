@@ -21,17 +21,17 @@
 class ContentMigration < ActiveRecord::Base
   include Workflow
   include TextHelper
-  belongs_to :context, polymorphic: [:course, :account, :group, { context_user: 'User' }]
+  belongs_to :context, polymorphic: [:course, :account, :group, { context_user: "User" }]
   validate :valid_date_shift_options
   belongs_to :user
   belongs_to :attachment
-  belongs_to :overview_attachment, class_name: 'Attachment'
-  belongs_to :exported_attachment, class_name: 'Attachment'
-  belongs_to :source_course, class_name: 'Course'
-  belongs_to :root_account, class_name: 'Account'
+  belongs_to :overview_attachment, class_name: "Attachment"
+  belongs_to :exported_attachment, class_name: "Attachment"
+  belongs_to :source_course, class_name: "Course"
+  belongs_to :root_account, class_name: "Account"
   has_one :content_export
   has_many :migration_issues
-  has_one :job_progress, class_name: 'Progress', as: :context, inverse_of: :context
+  has_one :job_progress, class_name: "Progress", as: :context, inverse_of: :context
   serialize :migration_settings
   cattr_accessor :export_file_path
   before_save :set_started_at_and_finished_at
@@ -176,7 +176,7 @@ class ContentMigration < ActiveRecord::Base
   end
 
   def question_bank_name=(name)
-    if (name = name&.strip) != ''
+    if (name = name&.strip) != ""
       migration_settings[:question_bank_name] = name
     end
   end
@@ -216,14 +216,14 @@ class ContentMigration < ActiveRecord::Base
   end
 
   def migration_type
-    read_attribute(:migration_type) || migration_settings['migration_type']
+    read_attribute(:migration_type) || migration_settings["migration_type"]
   end
 
   def plugin_type
     if (plugin = Canvas::Plugin.find(migration_type))
       plugin.metadata(:select_text) || plugin.name
     else
-      t(:unknown, 'Unknown')
+      t(:unknown, "Unknown")
     end
   end
 
@@ -306,7 +306,7 @@ class ContentMigration < ActiveRecord::Base
 
   def add_import_warning(item_type, item_name, warning)
     item_name = CanvasTextHelper.truncate_text(item_name || "", max_length: 150)
-    add_warning(t('errors.import_error', "Import Error:") + " #{item_type} - \"#{item_name}\"", warning)
+    add_warning(t("errors.import_error", "Import Error:") + " #{item_type} - \"#{item_name}\"", warning)
   end
 
   def fail_with_error!(exception_or_info, error_message: nil, issue_level: :error)
@@ -321,7 +321,7 @@ class ContentMigration < ActiveRecord::Base
     self.workflow_state = :failed
     job_progress.fail if job_progress && !skip_job_progress
     save
-    update_master_migration('failed') if for_master_course_import?
+    update_master_migration("failed") if for_master_course_import?
     resolve_content_links! # don't leave placeholders
   end
 
@@ -347,7 +347,7 @@ class ContentMigration < ActiveRecord::Base
       queue_migration
     else
       self.workflow_state = :pre_process_error
-      add_warning(t('bad_attachment', "The file was not successfully uploaded."))
+      add_warning(t("bad_attachment", "The file was not successfully uploaded."))
     end
   end
 
@@ -371,7 +371,7 @@ class ContentMigration < ActiveRecord::Base
   def queue_migration(plugin = nil, retry_count: 0, expires_at: nil)
     reset_job_progress unless plugin && plugin.settings[:skip_initial_progress]
 
-    expires_at ||= Setting.get('content_migration_job_expiration_hours', '48').to_i.hours.from_now
+    expires_at ||= Setting.get("content_migration_job_expiration_hours", "48").to_i.hours.from_now
     return if blocked_by_current_migration?(plugin, retry_count, expires_at)
 
     set_default_settings
@@ -386,7 +386,7 @@ class ContentMigration < ActiveRecord::Base
         queue_opts[:n_strand] = n_strand
       end
 
-      if plugin.settings[:import_immediately] || (workflow_state == 'exported' && !plugin.settings[:skip_conversion_step])
+      if plugin.settings[:import_immediately] || (workflow_state == "exported" && !plugin.settings[:skip_conversion_step])
         # it's ready to be imported
         self.workflow_state = :importing
         save
@@ -394,14 +394,14 @@ class ContentMigration < ActiveRecord::Base
       else
         # find worker and queue for conversion
         begin
-          worker_class = Canvas::Migration::Worker.const_get(plugin.settings['worker'])
+          worker_class = Canvas::Migration::Worker.const_get(plugin.settings["worker"])
           self.workflow_state = :exporting
           save
           self.class.connection.after_transaction_commit do
             Delayed::Job.enqueue(worker_class.new(id), queue_opts)
           end
         rescue NameError
-          self.workflow_state = 'failed'
+          self.workflow_state = "failed"
           message = "The migration plugin #{migration_type} doesn't have a worker."
           migration_settings[:last_error] = message
           Canvas::Errors.capture_exception(:content_migration, $ERROR_INFO)
@@ -410,7 +410,7 @@ class ContentMigration < ActiveRecord::Base
         end
       end
     else
-      self.workflow_state = 'failed'
+      self.workflow_state = "failed"
       message = "No migration plugin of type #{migration_type} found."
       migration_settings[:last_error] = message
       logger.error message
@@ -422,7 +422,7 @@ class ContentMigration < ActiveRecord::Base
   def blocked_by_current_migration?(plugin, retry_count, expires_at)
     return false if migration_type == "zip_file_importer"
 
-    running_cutoff = Setting.get('content_migration_job_block_hours', '4').to_i.hours.ago # at some point just let the jobs keep going
+    running_cutoff = Setting.get("content_migration_job_block_hours", "4").to_i.hours.ago # at some point just let the jobs keep going
 
     if context && context.content_migrations
                          .where(workflow_state: %w[created queued pre_processing pre_processed exporting importing]).where("id < ?", id)
@@ -436,7 +436,7 @@ class ContentMigration < ActiveRecord::Base
         self.workflow_state = :queued
         save
 
-        run_at = Setting.get('content_migration_requeue_delay_minutes', '60').to_i.minutes.from_now
+        run_at = Setting.get("content_migration_requeue_delay_minutes", "60").to_i.minutes.from_now
         # if everything goes right, we'll queue it right away after the currently running one finishes
         # but if something goes catastropically wrong, then make sure we recheck it eventually
         job = delay(ignore_transaction: true, run_at: run_at).queue_migration(
@@ -463,9 +463,9 @@ class ContentMigration < ActiveRecord::Base
     end
 
     unless migration_settings.key?(:overwrite_quizzes)
-      migration_settings[:overwrite_quizzes] = for_course_copy? || for_master_course_import? || (migration_type && migration_type == 'canvas_cartridge_importer')
+      migration_settings[:overwrite_quizzes] = for_course_copy? || for_master_course_import? || (migration_type && migration_type == "canvas_cartridge_importer")
     end
-    migration_settings.reverse_merge!(prefer_existing_tools: true) if migration_type == 'common_cartridge_importer' # default to true
+    migration_settings.reverse_merge!(prefer_existing_tools: true) if migration_type == "common_cartridge_importer" # default to true
 
     check_quiz_id_prepender
   end
@@ -533,7 +533,7 @@ class ContentMigration < ActiveRecord::Base
     return if import_everything?
 
     migration_settings[:migration_ids_to_import][:copy][asset_type] ||= {}
-    migration_settings[:migration_ids_to_import][:copy][asset_type][mig_id] = '1'
+    migration_settings[:migration_ids_to_import][:copy][asset_type][mig_id] = "1"
   end
 
   def is_set?(option)
@@ -570,8 +570,8 @@ class ContentMigration < ActiveRecord::Base
         data = prepare_data(data)
 
         # handle deletions before files are copied
-        deletions = data['deletions'].presence
-        process_master_deletions(deletions.except('AssignmentGroup')) if deletions # wait until after the import to do AssignmentGroups
+        deletions = data["deletions"].presence
+        process_master_deletions(deletions.except("AssignmentGroup")) if deletions # wait until after the import to do AssignmentGroups
 
         # copy the attachments
         source_export = ContentExport.find(migration_settings[:master_course_export_id])
@@ -580,9 +580,9 @@ class ContentMigration < ActiveRecord::Base
           file_mig_ids = source_export.settings[:referenced_file_migration_ids]
           if file_mig_ids.present?
             # ripped from copy_attachments_from_course
-            root_folder_name = Folder.root_folders(context).first.name + '/'
+            root_folder_name = Folder.root_folders(context).first.name + "/"
             context.attachments.where(migration_id: file_mig_ids).each do |file|
-              add_attachment_path(file.full_display_path.gsub(/\A#{root_folder_name}/, ''), file.migration_id)
+              add_attachment_path(file.full_display_path.gsub(/\A#{root_folder_name}/, ""), file.migration_id)
             end
           end
         end
@@ -594,16 +594,16 @@ class ContentMigration < ActiveRecord::Base
         @exported_data_zip = download_exported_data
         @zip_file = Zip::File.open(@exported_data_zip.path)
         @exported_data_zip.close
-        data = JSON.parse(@zip_file.read('course_export.json'), max_nesting: 50)
+        data = JSON.parse(@zip_file.read("course_export.json"), max_nesting: 50)
         data = prepare_data(data)
 
-        if @zip_file.find_entry('all_files.zip')
+        if @zip_file.find_entry("all_files.zip")
           # the file importer needs an actual file to process
           all_files_path = create_all_files_path(@exported_data_zip.path)
-          @zip_file.extract('all_files.zip', all_files_path)
-          data['all_files_export']['file_path'] = all_files_path
+          @zip_file.extract("all_files.zip", all_files_path)
+          data["all_files_export"]["file_path"] = all_files_path
         else
-          data['all_files_export']['file_path'] = nil
+          data["all_files_export"]["file_path"] = nil
         end
         @zip_file.close
       end
@@ -612,13 +612,13 @@ class ContentMigration < ActiveRecord::Base
 
       import!(data)
 
-      process_master_deletions(deletions.slice('AssignmentGroup')) if deletions
+      process_master_deletions(deletions.slice("AssignmentGroup")) if deletions
 
       unless import_immediately?
         update_import_progress(100)
       end
       if for_master_course_import?
-        update_master_migration('completed')
+        update_master_migration("completed")
       end
     rescue => e
       self.workflow_state = :failed
@@ -626,7 +626,7 @@ class ContentMigration < ActiveRecord::Base
       migration_settings[:last_error] = "ErrorReport:#{er_id}"
       logger.error e
       save
-      update_master_migration('failed') if for_master_course_import?
+      update_master_migration("failed") if for_master_course_import?
       raise e
     ensure
       File.delete(all_files_path) if all_files_path && File.exist?(all_files_path)
@@ -682,7 +682,7 @@ class ContentMigration < ActiveRecord::Base
   def prepare_data(data)
     data = data.with_indifferent_access if data.is_a? Hash
     Utf8Cleaner.recursively_strip_invalid_utf8!(data, true)
-    data['all_files_export'] ||= {}
+    data["all_files_export"] ||= {}
     data
   end
 
@@ -696,11 +696,11 @@ class ContentMigration < ActiveRecord::Base
   end
 
   def for_course_copy?
-    migration_type == 'course_copy_importer' || for_master_course_import?
+    migration_type == "course_copy_importer" || for_master_course_import?
   end
 
   def for_master_course_import?
-    migration_type == 'master_course_import'
+    migration_type == "master_course_import"
   end
 
   def add_skipped_item(item)
@@ -715,11 +715,11 @@ class ContentMigration < ActiveRecord::Base
 
       mig_ids = deletions[klass]
       item_scope = case klass
-                   when 'Attachment'
+                   when "Attachment"
                      context.attachments.not_deleted.where(migration_id: mig_ids)
                    else
-                     klass.constantize.where(context_id: context, context_type: 'Course', migration_id: mig_ids)
-                          .where.not(workflow_state: 'deleted')
+                     klass.constantize.where(context_id: context, context_type: "Course", migration_id: mig_ids)
+                          .where.not(workflow_state: "deleted")
                    end
       item_scope.each do |content|
         child_tag = master_course_subscription.content_tag_for(content)
@@ -766,16 +766,16 @@ class ContentMigration < ActiveRecord::Base
 
   def valid_date_shift_options
     if date_shift_options && Canvas::Plugin.value_to_boolean(date_shift_options[:shift_dates]) && Canvas::Plugin.value_to_boolean(date_shift_options[:remove_dates])
-      errors.add(:date_shift_options, t('errors.cannot_shift_and_remove', "cannot specify shift_dates and remove_dates simultaneously"))
+      errors.add(:date_shift_options, t("errors.cannot_shift_and_remove", "cannot specify shift_dates and remove_dates simultaneously"))
     end
   end
 
   scope :for_context, ->(context) { where(context_id: context, context_type: context.class.to_s) }
 
-  scope :successful, -> { where(workflow_state: 'imported') }
-  scope :running, -> { where(workflow_state: ['exporting', 'importing']) }
-  scope :waiting, -> { where(workflow_state: 'exported') }
-  scope :failed, -> { where(workflow_state: ['failed', 'pre_process_error']) }
+  scope :successful, -> { where(workflow_state: "imported") }
+  scope :running, -> { where(workflow_state: ["exporting", "importing"]) }
+  scope :waiting, -> { where(workflow_state: "exported") }
+  scope :failed, -> { where(workflow_state: ["failed", "pre_process_error"]) }
 
   def complete?
     %w[imported failed pre_process_error].include?(workflow_state)
@@ -784,7 +784,7 @@ class ContentMigration < ActiveRecord::Base
   def download_exported_data
     raise "No exported data to import" unless exported_attachment
 
-    config = ConfigFile.load('external_migration') || {}
+    config = ConfigFile.load("external_migration") || {}
     @exported_data_zip = exported_attachment.open(
       need_local_file: true,
       temp_folder: config[:data_folder]
@@ -824,7 +824,7 @@ class ContentMigration < ActiveRecord::Base
   end
 
   def progress
-    return nil if workflow_state == 'created'
+    return nil if workflow_state == "created"
 
     mig_prog = read_attribute(:progress) || 0
     if for_course_copy?
@@ -847,7 +847,7 @@ class ContentMigration < ActiveRecord::Base
     unless skip_job_progress
       if val == 100
         job_progress.completion = 100
-        job_progress.workflow_state = 'completed'
+        job_progress.workflow_state = "completed"
         job_progress.save!
       else
         job_progress.update_completion!(val)
@@ -875,7 +875,7 @@ class ContentMigration < ActiveRecord::Base
   def add_warning_for_missing_content_links(type, field, missing_links, fix_issue_url)
     add_warning(t(:missing_content_links_title, "Missing links found in imported content") + " - #{type} #{field}",
                 { error_message: "#{type} #{field} - " + t(:missing_content_links_message,
-                                                           "The following references could not be resolved:") + " " + missing_links.join(', '),
+                                                           "The following references could not be resolved:") + " " + missing_links.join(", "),
                   fix_issue_html_url: fix_issue_url })
   end
 
@@ -893,10 +893,10 @@ class ContentMigration < ActiveRecord::Base
   # (usually it's just .singularize; weird names needing special casing go here :P)
   def self.asset_string_prefix(key)
     case key
-    when 'quizzes'
-      'quizzes:quiz'
-    when 'announcements'
-      'discussion_topic'
+    when "quizzes"
+      "quizzes:quiz"
+    when "announcements"
+      "discussion_topic"
     else
       key.singularize
     end
@@ -905,14 +905,14 @@ class ContentMigration < ActiveRecord::Base
   def self.collection_name(key)
     key = key.to_s
     case key
-    when 'modules'
-      'context_modules'
-    when 'module_items'
-      'content_tags'
-    when 'pages'
-      'wiki_pages'
-    when 'files'
-      'attachments'
+    when "modules"
+      "context_modules"
+    when "module_items"
+      "content_tags"
+    when "pages"
+      "wiki_pages"
+    when "files"
+      "attachments"
     else
       key
     end
@@ -964,11 +964,11 @@ class ContentMigration < ActiveRecord::Base
         if for_content_export
           asset_type = asset_string_prefix(key.to_s)
           value.each do |id|
-            sub_hash[process_key.call("#{asset_type}_#{id}")] = '1'
+            sub_hash[process_key.call("#{asset_type}_#{id}")] = "1"
           end
         else
           value.each do |id|
-            sub_hash[id] = '1'
+            sub_hash[id] = "1"
           end
         end
         new_hash[key] = sub_hash
@@ -1050,7 +1050,7 @@ class ContentMigration < ActiveRecord::Base
     if saved_change_to_workflow_state? &&
        %w[pre_process_error exported imported failed].include?(workflow_state) &&
        context &&
-       (next_cm = context.content_migrations.where(workflow_state: 'queued').order(:id).first) &&
+       (next_cm = context.content_migrations.where(workflow_state: "queued").order(:id).first) &&
        (job_id = next_cm.job_progress.try(:delayed_job_id)) &&
        (job = Delayed::Job.where(id: job_id, locked_at: nil).first)
       job.run_at = Time.now # it's okay to try it again now
@@ -1085,7 +1085,7 @@ class ContentMigration < ActiveRecord::Base
   end
 
   def self.expire_days
-    Setting.get('content_migrations_expire_after_days', '30').to_i
+    Setting.get("content_migrations_expire_after_days", "30").to_i
   end
 
   def self.expire?
@@ -1100,7 +1100,7 @@ class ContentMigration < ActiveRecord::Base
 
   scope :expired, lambda {
     if ContentMigration.expire?
-      where('created_at < ?', ContentMigration.expire_days.days.ago)
+      where("created_at < ?", ContentMigration.expire_days.days.ago)
     else
       none
     end

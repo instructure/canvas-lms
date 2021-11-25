@@ -18,15 +18,15 @@
 #
 
 describe Quizzes::SubmissionGrader do
-  context 'with course and quiz' do
+  context "with course and quiz" do
     before(:once) do
       course_factory
       @quiz = @course.quizzes.create!
-      @user1 = user_with_pseudonym(active_all: true, name: 'Student1', username: 'student1@instructure.com')
+      @user1 = user_with_pseudonym(active_all: true, name: "Student1", username: "student1@instructure.com")
       @course.enroll_student(@user1)
     end
 
-    describe '#track_outcomes' do
+    describe "#track_outcomes" do
       before do
         quiz = generate_quiz(@course)
         quiz.update!(allowed_attempts: 2)
@@ -53,30 +53,30 @@ describe Quizzes::SubmissionGrader do
           end
         )
         @submission.save_with_versioning!
-        @submission.update_column(:workflow_state, 'complete')
+        @submission.update_column(:workflow_state, "complete")
       end
 
-      it 'does not generate results for quiz attempt without outcome alignments' do
+      it "does not generate results for quiz attempt without outcome alignments" do
         subject = described_class.new(@submission)
         subject.track_outcomes(1)
         expect(@outcome.learning_outcome_results).to be_empty
       end
 
-      it 'generates results for quiz attempt with outcome alignments' do
+      it "generates results for quiz attempt with outcome alignments" do
         subject = described_class.new(@submission)
         subject.track_outcomes(2)
         expect(@outcome.learning_outcome_results).not_to be_empty
       end
     end
 
-    describe '#grade_submission' do
+    describe "#grade_submission" do
       let(:submission_data) { { "question_1" => "1658", "question_2" => "1658", "question_3" => "1658" } }
       let(:quiz_data) { multiple_choice_multiple_question_data(3, { "points_possible" => 1.3 }) }
       let(:quiz_submission) { Quizzes::QuizSubmission.new(quiz_id: @quiz.id, user_id: @user1.id, submission_data: submission_data, quiz_data: quiz_data) }
       let(:float_rounding) { 1.3 + 1.3 + 1.3 }
       let(:actual_score) { 3.9 }
 
-      it 'does not have grade rounding issues' do
+      it "does not have grade rounding issues" do
         Quizzes::SubmissionGrader.new(quiz_submission).grade_submission
         expect(quiz_submission.score).to_not eq(float_rounding)
         expect(quiz_submission.score).to eq(actual_score)
@@ -157,7 +157,7 @@ describe Quizzes::SubmissionGrader do
         # student was asked but didn't answer. Can happen when instructor adds question to a quiz that a student has
         # already started or completed.
         expect(Quizzes::SubmissionGrader.score_question(qd, { "undefined_if_blank" => "1" })).to eq(
-          { question_id: 1, correct: 'undefined', points: 0, text: "" }
+          { question_id: 1, correct: "undefined", points: 0, text: "" }
         )
       end
 
@@ -752,10 +752,10 @@ describe Quizzes::SubmissionGrader do
           question_type: "calculated_question",
           answer_tolerance: 2.0,
           formulas: [[0, "2*z"]],
-          variables: [{ scale: 0, min: 1.0, max: 10.0, name: 'z' }],
+          variables: [{ scale: 0, min: 1.0, max: 10.0, name: "z" }],
           answers: [{
             weight: 100,
-            variables: [{ value: 2.0, name: 'z' }],
+            variables: [{ value: 2.0, name: "z" }],
             answer_text: "4.0"
           }],
           question_text: "2 * [z] is ?"
@@ -782,10 +782,10 @@ describe Quizzes::SubmissionGrader do
           question_type: "calculated_question",
           answer_tolerance: "10.0%",
           formulas: [[0, "2*z"]],
-          variables: [{ scale: 0, min: 1.0, max: 10.0, name: 'z' }],
+          variables: [{ scale: 0, min: 1.0, max: 10.0, name: "z" }],
           answers: [{
             weight: 100,
-            variables: [{ value: 2.0, name: 'z' }],
+            variables: [{ value: 2.0, name: "z" }],
             answer_text: "4.0"
           }],
           question_text: "2 * [z] is ?"

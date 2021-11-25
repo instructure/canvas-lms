@@ -16,20 +16,20 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../common'
-require_relative '../helpers/outcome_common'
+require_relative "../common"
+require_relative "../helpers/outcome_common"
 
 describe "account admin outcomes" do
   include_context "in-process server selenium tests"
   include OutcomeCommon
 
   let(:outcome_url) { "/accounts/#{Account.default.id}/outcomes" }
-  let(:who_to_login) { 'admin' }
+  let(:who_to_login) { "admin" }
   let(:account) { Account.default }
 
   describe "course outcomes" do
     before do
-      RoleOverride.create!(context: account, permission: 'manage_courses',
+      RoleOverride.create!(context: account, permission: "manage_courses",
                            role: admin_role, enabled: false) # should not manage_courses permission
       course_with_admin_logged_in
     end
@@ -110,13 +110,13 @@ describe "account admin outcomes" do
         get outcome_url
         wait_for_ajaximations
 
-        f('.find_outcome').click
+        f(".find_outcome").click
         wait_for_ajaximations
-        groups = ff('.outcome-group')
+        groups = ff(".outcome-group")
         expect(groups.size).to eq 2
         groups.each do |g|
           g.click
-          expect(f('.ui-dialog-buttonpane .btn-primary')).not_to be_displayed
+          expect(f(".ui-dialog-buttonpane .btn-primary")).not_to be_displayed
         end
       end
     end
@@ -133,7 +133,7 @@ describe "account admin outcomes" do
     def open_outcomes_find
       get outcome_url
       wait_for_ajaximations
-      f('.find_outcome').click
+      f(".find_outcome").click
       wait_for_ajaximations
     end
 
@@ -144,7 +144,7 @@ describe "account admin outcomes" do
 
     def import_state_standart_into_account
       ffj(".outcome-level:last .outcome-group .ellipsis").first.click
-      f('.ui-dialog-buttonpane .btn-primary').click
+      f(".ui-dialog-buttonpane .btn-primary").click
       expect(driver.switch_to.alert).not_to be nil
       driver.switch_to.alert.accept
       wait_for_ajaximations

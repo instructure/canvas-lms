@@ -17,17 +17,17 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../common'
-require_relative '../helpers/outcome_common'
+require_relative "../common"
+require_relative "../helpers/outcome_common"
 
 describe "sub account outcomes" do
   include_context "in-process server selenium tests"
   include OutcomeCommon
 
   describe "account outcome specs" do
-    let(:account) { Account.create(name: 'sub account from default account', parent_account: Account.default) }
+    let(:account) { Account.create(name: "sub account from default account", parent_account: Account.default) }
     let(:outcome_url) { "/accounts/#{account.id}/outcomes" }
-    let(:who_to_login) { 'admin' }
+    let(:who_to_login) { "admin" }
 
     before do
       course_with_admin_logged_in
@@ -84,13 +84,13 @@ describe "sub account outcomes" do
         get outcome_url
         wait_for_ajaximations
 
-        f('.find_outcome').click
+        f(".find_outcome").click
         wait_for_ajaximations
-        groups = ff('.outcome-group')
+        groups = ff(".outcome-group")
         expect(groups.size).to eq 2
         groups.each do |g|
           g.click
-          expect(f('.ui-dialog-buttonpane .btn-primary')).not_to be_displayed
+          expect(f(".ui-dialog-buttonpane .btn-primary")).not_to be_displayed
         end
       end
     end

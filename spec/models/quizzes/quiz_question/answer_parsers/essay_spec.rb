@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative 'answer_parser_spec_helper'
+require_relative "answer_parser_spec_helper"
 
 describe Quizzes::QuizQuestion::AnswerParsers::Essay do
   describe "#parse" do
@@ -40,8 +40,8 @@ describe Quizzes::QuizQuestion::AnswerParsers::Essay do
       question = Quizzes::QuizQuestion::QuestionData.new({})
       essay.parse(question)
       expect(question[:comments]).to eq raw_answers[0][:answer_comments]
-      expect(question[:comments_html]).to include '<img'
-      expect(question[:comments_html]).not_to include 'onerror'
+      expect(question[:comments_html]).to include "<img"
+      expect(question[:comments_html]).not_to include "onerror"
     end
   end
 end

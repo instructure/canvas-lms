@@ -139,7 +139,7 @@ describe ContentParticipationCount do
 
     it "is not unread if the assignment is unpublished after the submission is graded" do
       @submission = @assignment.grade_student(@student, grade: 3, grader: @teacher).first
-      @assignment.update_attribute(:workflow_state, 'unpublished')
+      @assignment.update_attribute(:workflow_state, "unpublished")
       expect(ContentParticipationCount.unread_submission_count_for(@course, @student)).to eq 0
     end
 
@@ -205,7 +205,7 @@ describe ContentParticipationCount do
 
     it "is read if other submission fields change" do
       @submission = @assignment.submit_homework(@student)
-      @submission.workflow_state = 'graded'
+      @submission.workflow_state = "graded"
       @submission.graded_at = Time.now
       @submission.save!
       expect(ContentParticipationCount.unread_submission_count_for(@course, @student)).to eq 0

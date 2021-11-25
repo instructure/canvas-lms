@@ -21,6 +21,6 @@ class BackfillCovidHelpLink < ActiveRecord::Migration[5.2]
   tag :postdeploy
 
   def up
-    DataFixup::BackfillNewDefaultHelpLink.delay_if_production(priority: Delayed::LOW_PRIORITY, n_strand: 'long_datafixups').run(:covid)
+    DataFixup::BackfillNewDefaultHelpLink.delay_if_production(priority: Delayed::LOW_PRIORITY, n_strand: "long_datafixups").run(:covid)
   end
 end

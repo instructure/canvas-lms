@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'atom'
+require "atom"
 
 # @API Groups
 #
@@ -176,7 +176,7 @@ class GroupsController < ApplicationController
                []
              end
 
-    users = @context.users_not_in_groups(groups, order: User.sortable_name_order_by_clause('users'))
+    users = @context.users_not_in_groups(groups, order: User.sortable_name_order_by_clause("users"))
                     .paginate(page: page, per_page: per_page)
 
     if authorized_action(@context, @current_user, :manage)
@@ -188,7 +188,7 @@ class GroupsController < ApplicationController
         total_entries: users.total_entries,
         users: users.map { |u| u.group_member_json(@context) }
       }
-      json[:pagination_html] = render_to_string(partial: 'user_pagination', locals: { users: users }) unless params[:no_html]
+      json[:pagination_html] = render_to_string(partial: "user_pagination", locals: { users: users }) unless params[:no_html]
       render json: json
     end
   end
@@ -220,12 +220,12 @@ class GroupsController < ApplicationController
         groups_scope = groups_scope.preload(:group_category, :context, :root_account)
 
         groups = groups_scope.shard(@current_user).to_a
-        groups.select! { |group| group.context_type != 'Course' || group.context.grants_right?(@current_user, :read) }
+        groups.select! { |group| group.context_type != "Course" || group.context.grants_right?(@current_user, :read) }
         groups.sort_by! { |group| Canvas::ICU.collation_key(group&.name) }
 
         # Split the groups out into those in concluded courses and those not in concluded courses
         @current_groups, @previous_groups = groups.partition do |group|
-          group.context_type != 'Course' || !group.context.concluded?('StudentEnrollment')
+          group.context_type != "Course" || !group.context.concluded?("StudentEnrollment")
         end
       end
 
@@ -268,12 +268,12 @@ class GroupsController < ApplicationController
       return unless tab_enabled?(Course::TAB_PEOPLE)
 
       if @context.is_a?(Account)
-        user_crumb = t('#crumbs.users', "Users")
+        user_crumb = t("#crumbs.users", "Users")
         set_active_tab "users"
         @group_user_type = "user"
         @allow_self_signup = false
       else
-        user_crumb = t('#crumbs.people', "People")
+        user_crumb = t("#crumbs.people", "People")
         set_active_tab "people"
         @group_user_type = "student"
         @allow_self_signup = true
@@ -283,12 +283,12 @@ class GroupsController < ApplicationController
       end
 
       add_crumb user_crumb, named_context_url(@context, :context_users_url)
-      add_crumb t('#crumbs.groups', "Groups"), named_context_url(@context, :context_groups_url)
+      add_crumb t("#crumbs.groups", "Groups"), named_context_url(@context, :context_groups_url)
     end
 
     respond_to do |format|
       format.html do
-        @categories  = @context.group_categories.order(Arel.sql("role <> 'student_organized'"), GroupCategory.best_unicode_collation_key('name')).preload(:root_account)
+        @categories  = @context.group_categories.order(Arel.sql("role <> 'student_organized'"), GroupCategory.best_unicode_collation_key("name")).preload(:root_account)
         @user_groups = @current_user.group_memberships_for(@context) if @current_user
 
         if @context.grants_any_right?(@current_user, session, :manage_groups, *RoleOverride::GRANULAR_MANAGE_GROUPS_PERMISSIONS)
@@ -377,7 +377,7 @@ class GroupsController < ApplicationController
         @context = @group
         assign_localizer
         if @group.deleted? && @group.context
-          flash[:notice] = t('notices.already_deleted', "That group has been deleted")
+          flash[:notice] = t("notices.already_deleted", "That group has been deleted")
           redirect_to named_context_url(@group.context, :context_url)
           return
         elsif @group.context.concluded? && !@group.context.grants_right?(@current_user, session, :read_roster)
@@ -390,13 +390,13 @@ class GroupsController < ApplicationController
         @stream_items = @current_user.try(:cached_recent_stream_items, { contexts: @context }) || []
         if params[:join] && @group.grants_right?(@current_user, :join)
           if @group.full?
-            flash[:error] = t('errors.group_full', 'The group is full.')
+            flash[:error] = t("errors.group_full", "The group is full.")
             redirect_to course_groups_url(@group.context)
             return
           end
           @group.request_user(@current_user)
           if @group.grants_right?(@current_user, session, :read)
-            flash[:notice] = t('notices.welcome', "Welcome to the group %{group_name}!", group_name: @group.name)
+            flash[:notice] = t("notices.welcome", "Welcome to the group %{group_name}!", group_name: @group.name)
             redirect_to named_context_url(@group.context, :context_groups_url)
           else
             render :membership_pending
@@ -407,7 +407,7 @@ class GroupsController < ApplicationController
           membership = @group.membership_for_user(@current_user)
           if membership
             membership.destroy
-            flash[:notice] = t('notices.goodbye', "You have removed yourself from the group %{group_name}.", group_name: @group.name)
+            flash[:notice] = t("notices.goodbye", "You have removed yourself from the group %{group_name}.", group_name: @group.name)
             redirect_to named_context_url(@group.context, :context_groups_url)
             return
           end
@@ -418,9 +418,9 @@ class GroupsController < ApplicationController
         end
 
         if @context_membership
-          content_for_head helpers.auto_discovery_link_tag(:atom, feeds_group_format_url(@context_membership.feed_code, :atom), { title: t('group_atom_feed', "Group Atom Feed") })
+          content_for_head helpers.auto_discovery_link_tag(:atom, feeds_group_format_url(@context_membership.feed_code, :atom), { title: t("group_atom_feed", "Group Atom Feed") })
         elsif @context.available?
-          content_for_head helpers.auto_discovery_link_tag(:atom, feeds_group_format_url(@context.feed_code, :atom), { title: t('group_atom_feed', "Group Atom Feed") })
+          content_for_head helpers.auto_discovery_link_tag(:atom, feeds_group_format_url(@context.feed_code, :atom), { title: t("group_atom_feed", "Group Atom Feed") })
         end
       end
       format.json do
@@ -512,11 +512,11 @@ class GroupsController < ApplicationController
       respond_to do |format|
         if @group.save
           DueDateCacher.with_executing_user(@current_user) do
-            @group.add_user(@current_user, 'accepted', true) if @group.should_add_creator?(@current_user)
+            @group.add_user(@current_user, "accepted", true) if @group.should_add_creator?(@current_user)
           end
 
           @group.invitees = params[:invitees]
-          flash[:notice] = t('notices.create_success', 'Group was successfully created.')
+          flash[:notice] = t("notices.create_success", "Group was successfully created.")
           format.html { redirect_to group_url(@group) }
           format.json { render json: group_json(@group, @current_user, session, { include: %w[users group_category permissions] }) }
         else
@@ -621,7 +621,7 @@ class GroupsController < ApplicationController
 
         if @group.errors.none?
           @group.users.touch_all
-          flash[:notice] = t('notices.update_success', 'Group was successfully updated.')
+          flash[:notice] = t("notices.update_success", "Group was successfully updated.")
           format.html { redirect_to clean_return_to(params[:return_to]) || group_url(@group) }
           format.json { render json: group_json(@group, @current_user, session, { include: %w[users group_category permissions] }) }
         else
@@ -646,7 +646,7 @@ class GroupsController < ApplicationController
     find_group
     if authorized_action(@group, @current_user, :delete)
       if @group.destroy
-        flash[:notice] = t('notices.delete_success', "Group successfully deleted")
+        flash[:notice] = t("notices.delete_success", "Group successfully deleted")
         respond_to do |format|
           format.html { redirect_to(dashboard_url) }
           format.json { render json: group_json(@group, @current_user, session) }
@@ -694,13 +694,13 @@ class GroupsController < ApplicationController
     @membership = @group.group_memberships.where(uuid: params[:uuid]).first if @group
     @membership.accept! if @membership.try(:invited?)
     if @membership.try(:active?)
-      flash[:notice] = t('notices.welcome', "Welcome to the group %{group_name}!", group_name: @group.name)
+      flash[:notice] = t("notices.welcome", "Welcome to the group %{group_name}!", group_name: @group.name)
       respond_to do |format|
         format.html { redirect_to(group_url(@group)) }
         format.json { render json: group_membership_json(@membership, @current_user, session) }
       end
     else
-      flash[:notice] = t('notices.invalid_invitation', "", group_name: @group.name)
+      flash[:notice] = t("notices.invalid_invitation", "", group_name: @group.name)
       respond_to do |format|
         format.html { redirect_to(dashboard_url) }
         format.json { render json: "Unable to find associated group invitation", status: :bad_request }
@@ -768,17 +768,17 @@ class GroupsController < ApplicationController
 
     includes = Array(params[:include])
     users = Api.paginate(users, self, api_v1_group_users_url)
-    UserPastLtiId.manual_preload_past_lti_ids(users, @context) if ['uuid', 'lti_id'].any? { |id| includes.include? id }
+    UserPastLtiId.manual_preload_past_lti_ids(users, @context) if ["uuid", "lti_id"].any? { |id| includes.include? id }
     json_users = users_json(users, @current_user, session, includes, @context, nil, Array(params[:exclude]))
 
-    if includes.include?('group_submissions') && @context.context_type == "Course"
+    if includes.include?("group_submissions") && @context.context_type == "Course"
       submissions_by_user = @context.group_category.submission_ids_by_user_id(users.map(&:id))
       json_users.each do |user|
         user[:group_submissions] = submissions_by_user[user[:id]]
       end
     end
 
-    if (includes.include? 'active_status') && (@context.context.is_a? Course)
+    if (includes.include? "active_status") && (@context.context.is_a? Course)
       enrollments = Enrollment.where(user_id: json_users.pluck(:id), course_id: @context.context_id)
 
       inactive_students = enrollments.group_by(&:user_id).select { |_id, es| es.all?(&:hard_inactive?) }.map(&:first)
@@ -795,7 +795,7 @@ class GroupsController < ApplicationController
 
     feed = Atom::Feed.new do |f|
       f.title = t(:feed_title, "%{course_or_account_name} Feed", course_or_account_name: @context.full_name)
-      f.links << Atom::Link.new(href: group_url(@context), rel: 'self')
+      f.links << Atom::Link.new(href: group_url(@context), rel: "self")
       f.updated = Time.now
       f.id = group_url(@context)
     end

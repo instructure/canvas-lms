@@ -274,14 +274,14 @@ class OutcomeGroupsApiController < ApplicationController
 
     @outcome_group = context_outcome_groups.find(params[:id])
     if @outcome_group.learning_outcome_group_id.nil?
-      render json: 'error'.to_json, status: :bad_request
+      render json: "error".to_json, status: :bad_request
       return
     end
     @outcome_group.update(params.permit(:title, :description, :vendor_guid))
     if params[:parent_outcome_group_id] && params[:parent_outcome_group_id] != @outcome_group.learning_outcome_group_id
       new_parent = context_outcome_groups.find(params[:parent_outcome_group_id])
       unless new_parent.adopt_outcome_group(@outcome_group)
-        render json: 'error'.to_json, status: :bad_request
+        render json: "error".to_json, status: :bad_request
         return
       end
     end
@@ -315,7 +315,7 @@ class OutcomeGroupsApiController < ApplicationController
 
     @outcome_group = context_outcome_groups.find(params[:id])
     if @outcome_group.learning_outcome_group_id.nil?
-      render json: 'error'.to_json, status: :bad_request
+      render json: "error".to_json, status: :bad_request
       return
     end
     begin
@@ -326,7 +326,7 @@ class OutcomeGroupsApiController < ApplicationController
     rescue ContentTag::LastLinkToOutcomeNotDestroyed => e
       render json: e.to_json, status: :bad_request
     rescue ActiveRecord::RecordNotSaved
-      render json: 'error'.to_json, status: :bad_request
+      render json: "error".to_json, status: :bad_request
     end
   end
 
@@ -389,7 +389,7 @@ class OutcomeGroupsApiController < ApplicationController
       {
         id: a.root_outcome_group.id,
         title: a.name,
-        description: t('account_group_description', 'Account level outcomes group.'),
+        description: t("account_group_description", "Account level outcomes group."),
         dontImport: true,
         url: polymorphic_path([:api_v1, a, :outcome_group], id: a.root_outcome_group.id),
         subgroups_url: polymorphic_path([:api_v1, a, :outcome_group_subgroups], id: a.root_outcome_group.id),
@@ -516,7 +516,7 @@ class OutcomeGroupsApiController < ApplicationController
         old_outcome_group = context_outcome_groups.find(params[:move_from])
         @outcome_link = old_outcome_group.child_outcome_links.active.where(content_id: params[:outcome_id]).first
         unless @outcome_link
-          render json: 'error'.to_json, status: :bad_request
+          render json: "error".to_json, status: :bad_request
           return
         end
 
@@ -527,7 +527,7 @@ class OutcomeGroupsApiController < ApplicationController
 
       @outcome = context_available_outcome(params[:outcome_id])
       unless @outcome
-        render json: 'error'.to_json, status: :bad_request
+        render json: "error".to_json, status: :bad_request
         return
       end
     else
@@ -571,9 +571,9 @@ class OutcomeGroupsApiController < ApplicationController
       @outcome_link.destroy
       render json: outcome_link_json(@outcome_link, @current_user, session)
     rescue ContentTag::LastLinkToOutcomeNotDestroyed => e
-      render json: { 'message' => e.message }, status: :bad_request
+      render json: { "message" => e.message }, status: :bad_request
     rescue ActiveRecord::RecordNotSaved
-      render json: 'error'.to_json, status: :bad_request
+      render json: "error".to_json, status: :bad_request
     end
   end
 
@@ -646,7 +646,7 @@ class OutcomeGroupsApiController < ApplicationController
     if @child_outcome_group.save
       render json: outcome_group_json(@child_outcome_group, @current_user, session)
     else
-      render json: 'error'.to_json, status: :bad_request
+      render json: "error".to_json, status: :bad_request
     end
   end
 
@@ -693,7 +693,7 @@ class OutcomeGroupsApiController < ApplicationController
     # source has to exist
     @source_outcome_group = LearningOutcomeGroup.active.where(id: params[:source_outcome_group_id]).first
     unless @source_outcome_group
-      render json: 'error'.to_json, status: :bad_request
+      render json: "error".to_json, status: :bad_request
       return
     end
 
@@ -701,13 +701,13 @@ class OutcomeGroupsApiController < ApplicationController
     # account
     source_context = @source_outcome_group.context
     unless !source_context || source_context == @context || @context.associated_accounts.include?(source_context)
-      render json: 'error'.to_json, status: :bad_request
+      render json: "error".to_json, status: :bad_request
       return
     end
 
     # source can't be a root group
     unless @source_outcome_group.learning_outcome_group_id
-      render json: 'error'.to_json, status: :bad_request
+      render json: "error".to_json, status: :bad_request
       return
     end
 

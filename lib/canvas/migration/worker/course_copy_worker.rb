@@ -45,15 +45,15 @@ class Canvas::Migration::Worker::CourseCopyWorker < Canvas::Migration::Worker::B
         ce.export(synchronous: true)
       end
 
-      if ce.workflow_state == 'exported_for_course_copy'
+      if ce.workflow_state == "exported_for_course_copy"
         # use the exported attachment as the import archive
         cm.attachment = ce.attachment
         cm.migration_settings[:migration_ids_to_import] ||= { copy: {} }
         cm.migration_settings[:migration_ids_to_import][:copy][:everything] = true
         # set any attachments referenced in html to be copied
-        ce.selected_content['attachments'] ||= {}
+        ce.selected_content["attachments"] ||= {}
         ce.referenced_files.each_value do |att_mig_id|
-          ce.selected_content['attachments'][att_mig_id] = true
+          ce.selected_content["attachments"][att_mig_id] = true
         end
         ce.save
 
@@ -62,7 +62,7 @@ class Canvas::Migration::Worker::CourseCopyWorker < Canvas::Migration::Worker::B
         worker.migration_id = cm.id
         worker.perform
         cm.reload
-        if cm.workflow_state == 'exported'
+        if cm.workflow_state == "exported"
           cm.workflow_state = :pre_processed
           cm.update_import_progress(10)
 

@@ -59,7 +59,7 @@ module Canvas::Migration::Worker
         Dir["#{folder}/**/**"].each do |file|
           next if File.basename(file) == file_name
 
-          file_path = file.sub(folder + '/', '')
+          file_path = file.sub(folder + "/", "")
           zipfile.add(file_path, file)
         end
       end
@@ -81,7 +81,7 @@ module Canvas::Migration::Worker
   end
 
   def self.clear_exported_data(folder)
-    config = ConfigFile.load('external_migration')
+    config = ConfigFile.load("external_migration")
     if (!config || !config[:keep_after_complete]) && File.exist?(folder)
       FileUtils.rm_rf(folder)
     end
@@ -92,11 +92,11 @@ module Canvas::Migration::Worker
   def self.download_attachment(cm, url)
     att = Attachment.new
     att.context = cm
-    att.file_state = 'deleted'
-    att.workflow_state = 'unattached'
+    att.file_state = "deleted"
+    att.workflow_state = "unattached"
     att.clone_url(url, false, true, quota_context: cm.context)
 
-    if att.file_state == 'errored'
+    if att.file_state == "errored"
       raise Canvas::Migration::Error, att.upload_error_message
     end
 

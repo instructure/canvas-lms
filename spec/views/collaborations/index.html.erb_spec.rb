@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../views_helper'
+require_relative "../views_helper"
 
 describe "/collaborations/index" do
   before do
@@ -28,7 +28,7 @@ describe "/collaborations/index" do
   end
 
   it "renders" do
-    render 'collaborations/index'
+    render "collaborations/index"
     expect(response).not_to be_nil
   end
 

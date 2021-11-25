@@ -29,7 +29,7 @@ describe Reporting::CountsReport do
         course_factory(account: @account1, active_all: 1)
         Reporting::CountsReport.process_shard
         @snapshot = @account1.report_snapshots.detailed.first
-        expect(@snapshot.data['courses']).to eq 1
+        expect(@snapshot.data["courses"]).to eq 1
       end
 
       it "does not count non-available courses" do
@@ -37,12 +37,12 @@ describe Reporting::CountsReport do
         @course2 = course_model(account: @account1)
         @course2.destroy
 
-        expect(@course1.workflow_state).to eq 'claimed'
-        expect(@course2.workflow_state).to eq 'deleted'
+        expect(@course1.workflow_state).to eq "claimed"
+        expect(@course2.workflow_state).to eq "deleted"
 
         Reporting::CountsReport.process_shard
         @snapshot = @account1.report_snapshots.detailed.first
-        expect(@snapshot.data['courses']).to eq 0
+        expect(@snapshot.data["courses"]).to eq 0
       end
     end
 
@@ -70,7 +70,7 @@ describe Reporting::CountsReport do
       end
 
       it "does not count users who haven't recently logged in" do
-        Setting.set('recently_logged_in_timespan', 1.day.to_s)
+        Setting.set("recently_logged_in_timespan", 1.day.to_s)
         @pseudonym.last_request_at = 2.days.ago
         @pseudonym.save!
 
@@ -87,7 +87,7 @@ describe Reporting::CountsReport do
         @pseudonym.save!
       end
 
-      let(:datum) { 'teachers' }
+      let(:datum) { "teachers" }
 
       include_examples "user_counts"
     end
@@ -99,7 +99,7 @@ describe Reporting::CountsReport do
         @pseudonym.save!
       end
 
-      let(:datum) { 'students' }
+      let(:datum) { "students" }
 
       include_examples "user_counts"
     end
@@ -111,7 +111,7 @@ describe Reporting::CountsReport do
         @pseudonym.save!
       end
 
-      let(:datum) { 'users' }
+      let(:datum) { "users" }
 
       include_examples "user_counts"
 
@@ -162,7 +162,7 @@ describe Reporting::CountsReport do
       end
 
       it "does not include student view users" do
-        course_with_user('StudentViewEnrollment', course: @course, user: user_with_pseudonym, active_enrollment: 1)
+        course_with_user("StudentViewEnrollment", course: @course, user: user_with_pseudonym, active_enrollment: 1)
         @pseudonym.last_request_at = 1.day.ago
         @pseudonym.save!
 
@@ -182,16 +182,16 @@ describe Reporting::CountsReport do
         attachment_model(namespace: "account_#{@account1.local_id}", size: 5 * 1024)
         Reporting::CountsReport.process_shard
         @snapshot = @account1.report_snapshots.detailed.first
-        expect(@snapshot.data['files']).to eq 1
-        expect(@snapshot.data['files_size']).to eq 5 * 1024
+        expect(@snapshot.data["files"]).to eq 1
+        expect(@snapshot.data["files_size"]).to eq 5 * 1024
       end
 
       it "counts files with the account's global id in the namespace" do
         attachment_model(namespace: "account_#{@account1.global_id}", size: 3 * 1024)
         Reporting::CountsReport.process_shard
         @snapshot = @account1.report_snapshots.detailed.first
-        expect(@snapshot.data['files']).to eq 1
-        expect(@snapshot.data['files_size']).to eq 3 * 1024
+        expect(@snapshot.data["files"]).to eq 1
+        expect(@snapshot.data["files_size"]).to eq 3 * 1024
       end
 
       it "counts with a heterogenous mixture of file namespaces" do
@@ -199,8 +199,8 @@ describe Reporting::CountsReport do
         attachment_model(namespace: "account_#{@account1.global_id}", size: 3 * 1024)
         Reporting::CountsReport.process_shard
         @snapshot = @account1.report_snapshots.detailed.first
-        expect(@snapshot.data['files']).to eq 2
-        expect(@snapshot.data['files_size']).to eq 8 * 1024
+        expect(@snapshot.data["files"]).to eq 2
+        expect(@snapshot.data["files_size"]).to eq 8 * 1024
       end
     end
   end

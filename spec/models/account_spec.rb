@@ -21,10 +21,10 @@
 describe Account do
   include_examples "outcome import context examples"
 
-  describe 'relationships' do
+  describe "relationships" do
     it { is_expected.to have_many(:feature_flags) }
     it { is_expected.to have_one(:outcome_proficiency).dependent(:destroy) }
-    it { is_expected.to have_many(:lti_resource_links).class_name('Lti::ResourceLink') }
+    it { is_expected.to have_many(:lti_resource_links).class_name("Lti::ResourceLink") }
   end
 
   context "BASIC_COLUMNS_FOR_CALLBACKS" do
@@ -38,8 +38,8 @@ describe Account do
   context "domain_method" do
     it "retrieves correct account domain" do
       root_account = Account.create!
-      AccountDomain.create!(host: 'canvas.instructure.com', account: root_account)
-      expect(root_account.domain).to eq 'canvas.instructure.com'
+      AccountDomain.create!(host: "canvas.instructure.com", account: root_account)
+      expect(root_account.domain).to eq "canvas.instructure.com"
     end
   end
 
@@ -62,8 +62,8 @@ describe Account do
       expect(@subaccount.resolved_outcome_proficiency).to eq proficiency
     end
 
-    context 'cache' do
-      it 'uses the cache' do
+    context "cache" do
+      it "uses the cache" do
         enable_cache do
           proficiency = outcome_proficiency_model(@root_account)
 
@@ -71,15 +71,15 @@ describe Account do
           @root_account.resolved_outcome_proficiency
 
           # update without callbacks
-          OutcomeProficiency.where(id: proficiency.id).update_all workflow_state: 'deleted'
+          OutcomeProficiency.where(id: proficiency.id).update_all workflow_state: "deleted"
 
           # verify cached version wins with new AR object
           cached = Account.find(@root_account.id).resolved_outcome_proficiency
-          expect(cached.workflow_state).not_to eq 'deleted'
+          expect(cached.workflow_state).not_to eq "deleted"
         end
       end
 
-      it 'updates when account chain is changed' do
+      it "updates when account chain is changed" do
         enable_cache do
           other_subaccount = @root_account.sub_accounts.create!
           other_proficiency = outcome_proficiency_model(other_subaccount)
@@ -90,7 +90,7 @@ describe Account do
         end
       end
 
-      it 'updates when outcome_proficiency_id cache changed' do
+      it "updates when outcome_proficiency_id cache changed" do
         enable_cache do
           subsubaccount = @subaccount.sub_accounts.create!
 
@@ -105,7 +105,7 @@ describe Account do
         end
       end
 
-      it 'does not conflict with other caches' do
+      it "does not conflict with other caches" do
         enable_cache do
           Timecop.freeze do
             outcome_proficiency_model(@root_account)
@@ -143,7 +143,7 @@ describe Account do
     end
   end
 
-  context 'resolved_outcome_calculation_method' do
+  context "resolved_outcome_calculation_method" do
     before do
       @root_account = Account.create!
       @subaccount = @root_account.sub_accounts.create!
@@ -173,8 +173,8 @@ describe Account do
       expect(@subaccount.resolved_outcome_calculation_method).to eq method
     end
 
-    context 'cache' do
-      it 'uses the cache' do
+    context "cache" do
+      it "uses the cache" do
         enable_cache do
           method = outcome_calculation_method_model(@root_account)
 
@@ -182,15 +182,15 @@ describe Account do
           @root_account.resolved_outcome_calculation_method
 
           # update without callbacks
-          OutcomeCalculationMethod.where(id: method.id).update_all workflow_state: 'deleted'
+          OutcomeCalculationMethod.where(id: method.id).update_all workflow_state: "deleted"
 
           # verify cached version wins with new AR object
           cached = Account.find(@root_account.id).resolved_outcome_calculation_method
-          expect(cached.workflow_state).not_to eq 'deleted'
+          expect(cached.workflow_state).not_to eq "deleted"
         end
       end
 
-      it 'updates when account chain is changed' do
+      it "updates when account chain is changed" do
         enable_cache do
           other_subaccount = @root_account.sub_accounts.create!
           other_method = outcome_calculation_method_model(other_subaccount)
@@ -201,7 +201,7 @@ describe Account do
         end
       end
 
-      it 'updates when outcome_calculation_method_id cache changed' do
+      it "updates when outcome_calculation_method_id cache changed" do
         enable_cache do
           subsubaccount = @subaccount.sub_accounts.create!
 
@@ -458,7 +458,7 @@ describe Account do
     end
 
     it "is able to specify a list of enabled services" do
-      @a.allowed_services = 'twitter'
+      @a.allowed_services = "twitter"
       expect(@a.service_enabled?(:twitter)).to be_truthy
       expect(@a.service_enabled?(:diigo)).to be_falsey
       expect(@a.service_enabled?(:avatars)).to be_falsey
@@ -469,7 +469,7 @@ describe Account do
     end
 
     it "adds and remove services from the defaults" do
-      @a.allowed_services = '+avatars,-twitter'
+      @a.allowed_services = "+avatars,-twitter"
       expect(@a.service_enabled?(:avatars)).to be_truthy
       expect(@a.service_enabled?(:twitter)).to be_falsey
     end
@@ -490,19 +490,19 @@ describe Account do
       expect(@a.allowed_services).to be_nil
 
       @a.disable_service(:twitter)
-      expect(@a.allowed_services).to match('\-twitter')
+      expect(@a.allowed_services).to match("\\-twitter")
 
       @a.disable_service(:avatars)
       expect(@a.service_enabled?(:avatars)).to be_falsey
-      expect(@a.allowed_services).not_to match('avatars')
+      expect(@a.allowed_services).not_to match("avatars")
 
       @a.enable_service(:avatars)
       expect(@a.service_enabled?(:avatars)).to be_truthy
-      expect(@a.allowed_services).to match('\+avatars')
+      expect(@a.allowed_services).to match("\\+avatars")
     end
 
     it "is able to set service availibity for previously hard-coded values" do
-      @a.allowed_services = 'avatars'
+      @a.allowed_services = "avatars"
 
       @a.enable_service(:twitter)
       expect(@a.service_enabled?(:twitter)).to be_truthy
@@ -522,9 +522,9 @@ describe Account do
         }
       )
 
-      @a.disable_service('google_docs_previews')
-      @a.disable_service('google_docs_prev')
-      expect(@a.allowed_services).to eq '-google_docs_previews,-google_docs_prev'
+      @a.disable_service("google_docs_previews")
+      @a.disable_service("google_docs_prev")
+      expect(@a.allowed_services).to eq "-google_docs_previews,-google_docs_prev"
     end
 
     describe "services_exposed_to_ui_hash" do
@@ -587,11 +587,11 @@ describe Account do
   context "settings=" do
     it "filters non-hash hash settings" do
       a = Account.new
-      a.settings = { 'sis_default_grade_export' => 'string' }.with_indifferent_access
+      a.settings = { "sis_default_grade_export" => "string" }.with_indifferent_access
       expect(a.settings[:error_reporting]).to eql(nil)
 
-      a.settings = { 'sis_default_grade_export' => {
-        'value' => true
+      a.settings = { "sis_default_grade_export" => {
+        "value" => true
       } }.with_indifferent_access
       expect(a.settings[:sis_default_grade_export]).to be_is_a(Hash)
       expect(a.settings[:sis_default_grade_export][:value]).to eql true
@@ -606,7 +606,7 @@ describe Account do
     end
 
     it "true if they've checked the box to allow it" do
-      root.settings = { 'global_includes' => true }
+      root.settings = { "global_includes" => true }
       expect(root.allow_global_includes?).to be_truthy
     end
 
@@ -616,15 +616,15 @@ describe Account do
       it "false if root account hasn't checked global_includes AND subaccount branding" do
         expect(sub_account.allow_global_includes?).to be_falsey
 
-        sub_account.root_account.settings = { 'global_includes' => true, 'sub_account_includes' => false }
+        sub_account.root_account.settings = { "global_includes" => true, "sub_account_includes" => false }
         expect(sub_account.allow_global_includes?).to be_falsey
 
-        sub_account.root_account.settings = { 'global_includes' => false, 'sub_account_includes' => true }
+        sub_account.root_account.settings = { "global_includes" => false, "sub_account_includes" => true }
         expect(sub_account.allow_global_includes?).to be_falsey
       end
 
       it "true if root account HAS checked global_includes and turned on subaccount branding" do
-        sub_account.root_account.settings = { 'global_includes' => true, 'sub_account_includes' => true }
+        sub_account.root_account.settings = { "global_includes" => true, "sub_account_includes" => true }
         expect(sub_account.allow_global_includes?).to be_truthy
       end
     end
@@ -643,23 +643,23 @@ describe Account do
   context "closest_turnitin_originality" do
     before do
       @root_account = Account.create!(turnitin_pledge: "root")
-      @root_account.turnitin_originality = 'after_grading'
+      @root_account.turnitin_originality = "after_grading"
       @root_account.save!
     end
 
     it "finds closest_turnitin_originality from root account" do
-      expect(@root_account.closest_turnitin_originality).to eq('after_grading')
+      expect(@root_account.closest_turnitin_originality).to eq("after_grading")
     end
 
     it "finds closest_turnitin_originality from sub account" do
-      sub_account = Account.create(name: 'sub', parent_account: @root_account)
-      sub_account.turnitin_originality = 'never'
-      expect(sub_account.closest_turnitin_originality).to eq('never')
+      sub_account = Account.create(name: "sub", parent_account: @root_account)
+      sub_account.turnitin_originality = "never"
+      expect(sub_account.closest_turnitin_originality).to eq("never")
     end
 
     it "finds closest_turnitin_originality from sub account when set on root account" do
-      sub_account = Account.create(name: 'sub', parent_account: @root_account)
-      expect(sub_account.closest_turnitin_originality).to eq('after_grading')
+      sub_account = Account.create(name: "sub", parent_account: @root_account)
+      expect(sub_account.closest_turnitin_originality).to eq("after_grading")
     end
   end
 
@@ -685,9 +685,9 @@ describe Account do
       expect(sub_account.closest_turnitin_pledge).not_to be_empty
     end
 
-    it 'uses the default message if pledge is nil or empty' do
-      account = Account.create!(turnitin_pledge: '')
-      expect(account.closest_turnitin_pledge).to eq 'This assignment submission is my own, original work'
+    it "uses the default message if pledge is nil or empty" do
+      account = Account.create!(turnitin_pledge: "")
+      expect(account.closest_turnitin_pledge).to eq "This assignment submission is my own, original work"
     end
   end
 
@@ -721,12 +721,12 @@ describe Account do
     # Set up a hierarchy of 4 accounts - a root account, a sub account,
     # a sub sub account, and SiteAdmin account.  Create a 'Restricted Admin'
     # role available for each one, and create an admin user and a user in that restricted role
-    @sa_role = custom_account_role('Restricted SA Admin', account: site_admin)
+    @sa_role = custom_account_role("Restricted SA Admin", account: site_admin)
 
-    site_admin.settings[:mfa_settings] = 'required'
+    site_admin.settings[:mfa_settings] = "required"
     site_admin.save!
     root_account = Account.create
-    @root_role = custom_account_role('Restricted Root Admin', account: root_account)
+    @root_role = custom_account_role("Restricted Root Admin", account: root_account)
 
     sub_account = Account.create(parent_account: root_account)
     sub_sub_account = Account.create(parent_account: sub_account)
@@ -801,8 +801,8 @@ describe Account do
     some_access = [:read_reports] + limited_access
     hash.each do |k, v|
       account = v[:account]
-      account.role_overrides.create!(permission: 'read_reports', role: (k == :site_admin ? @sa_role : @root_role), enabled: true)
-      account.role_overrides.create!(permission: 'reset_any_mfa', role: @sa_role, enabled: true)
+      account.role_overrides.create!(permission: "read_reports", role: (k == :site_admin ? @sa_role : @root_role), enabled: true)
+      account.role_overrides.create!(permission: "reset_any_mfa", role: @sa_role, enabled: true)
       # clear caches
       account.tap do |a|
         a.settings[:mfa_settings] = :optional
@@ -865,10 +865,10 @@ describe Account do
     it "returns sub account ids recursively when another shard is active" do
       a = Account.default
       subs = []
-      sub = Account.create!(name: 'sub', parent_account: a)
-      subs << grand_sub = Account.create!(name: 'grand_sub', parent_account: sub)
-      subs << great_grand_sub = Account.create!(name: 'great_grand_sub', parent_account: grand_sub)
-      subs << Account.create!(name: 'great_great_grand_sub', parent_account: great_grand_sub)
+      sub = Account.create!(name: "sub", parent_account: a)
+      subs << grand_sub = Account.create!(name: "grand_sub", parent_account: sub)
+      subs << great_grand_sub = Account.create!(name: "great_grand_sub", parent_account: grand_sub)
+      subs << Account.create!(name: "great_great_grand_sub", parent_account: great_grand_sub)
       @shard1.activate do
         expect(Account.select(:id).sub_accounts_recursive(sub.id, :pluck).sort).to eq(subs.map(&:id).sort)
         expect(Account.sub_accounts_recursive(sub.id).sort_by(&:id)).to eq(subs.sort_by(&:id))
@@ -946,9 +946,9 @@ describe Account do
 
   it "returns sub-accounts as options correctly" do
     a = Account.default
-    sub = Account.create!(name: 'sub', parent_account: a)
-    sub2 = Account.create!(name: 'sub2', parent_account: a)
-    sub2_1 = Account.create!(name: 'sub2-1', parent_account: sub2)
+    sub = Account.create!(name: "sub", parent_account: a)
+    sub2 = Account.create!(name: "sub2", parent_account: a)
+    sub2_1 = Account.create!(name: "sub2-1", parent_account: sub2)
     options = a.sub_accounts_as_options
     expect(options).to eq(
       [
@@ -963,10 +963,10 @@ describe Account do
   it "correctly returns sub-account_ids recursively" do
     a = Account.default
     subs = []
-    sub = Account.create!(name: 'sub', parent_account: a)
-    subs << grand_sub = Account.create!(name: 'grand_sub', parent_account: sub)
-    subs << great_grand_sub = Account.create!(name: 'great_grand_sub', parent_account: grand_sub)
-    subs << Account.create!(name: 'great_great_grand_sub', parent_account: great_grand_sub)
+    sub = Account.create!(name: "sub", parent_account: a)
+    subs << grand_sub = Account.create!(name: "grand_sub", parent_account: sub)
+    subs << great_grand_sub = Account.create!(name: "great_grand_sub", parent_account: grand_sub)
+    subs << Account.create!(name: "great_great_grand_sub", parent_account: great_grand_sub)
     expect(Account.select(:id).sub_accounts_recursive(sub.id, :pluck).sort).to eq(subs.map(&:id).sort)
     expect(Account.limit(10).sub_accounts_recursive(sub.id).sort).to eq(subs.sort_by(&:id))
   end
@@ -1000,8 +1000,8 @@ describe Account do
   it "group_categories should not include deleted categories" do
     account = Account.default
     expect(account.group_categories.count).to eq 0
-    category1 = account.group_categories.create(name: 'category 1')
-    category2 = account.group_categories.create(name: 'category 2')
+    category1 = account.group_categories.create(name: "category 1")
+    category2 = account.group_categories.create(name: "category 2")
     expect(account.group_categories.count).to eq 2
     category1.destroy
     account.reload
@@ -1012,8 +1012,8 @@ describe Account do
   it "group_categories.active should not include deleted categories" do
     account = Account.default
     expect(account.group_categories.active.count).to eq 0
-    category1 = account.group_categories.create(name: 'category 1')
-    category2 = account.group_categories.create(name: 'category 2')
+    category1 = account.group_categories.create(name: "category 1")
+    category2 = account.group_categories.create(name: "category 2")
     expect(account.group_categories.active.count).to eq 2
     category1.destroy
     account.reload
@@ -1026,17 +1026,17 @@ describe Account do
     account = Account.default
     expect(account.login_handle_name_with_inference).to eq "Email"
 
-    config = account.authentication_providers.create!(auth_type: 'cas')
+    config = account.authentication_providers.create!(auth_type: "cas")
     account.authentication_providers.first.move_to_bottom
     expect(account.login_handle_name_with_inference).to eq "Login"
 
     config.destroy
-    config = account.authentication_providers.create!(auth_type: 'saml')
+    config = account.authentication_providers.create!(auth_type: "saml")
     account.authentication_providers.active.first.move_to_bottom
     expect(account.reload.login_handle_name_with_inference).to eq "Login"
 
     config.destroy
-    account.authentication_providers.create!(auth_type: 'ldap')
+    account.authentication_providers.create!(auth_type: "ldap")
     account.authentication_providers.active.first.move_to_bottom
     expect(account.reload.login_handle_name_with_inference).to eq "Email"
     account.login_handle_name = "LDAP Login"
@@ -1074,13 +1074,13 @@ describe Account do
     end
 
     it "allows ordering by user's sortable name" do
-      @user1.sortable_name = 'jonny'
+      @user1.sortable_name = "jonny"
       @user1.save
-      @user2.sortable_name = 'bob'
+      @user2.sortable_name = "bob"
       @user2.save
-      @user3.sortable_name = 'richard'
+      @user3.sortable_name = "richard"
       @user3.save
-      users = @account.users_not_in_groups([], order: User.sortable_name_order_by_clause('users'))
+      users = @account.users_not_in_groups([], order: User.sortable_name_order_by_clause("users"))
       expect(users.map(&:id)).to eq [@user2.id, @user1.id, @user3.id]
     end
   end
@@ -1187,11 +1187,11 @@ describe Account do
                                                  url: "http://example.com")
 
       account_navigation = {
-        text: 'this should not be the title',
-        url: 'http://www.example.com',
+        text: "this should not be the title",
+        url: "http://www.example.com",
         labels: {
-          'en' => 'English Label',
-          'sp' => 'Spanish Label'
+          "en" => "English Label",
+          "sp" => "Spanish Label"
         }
       }
 
@@ -1203,11 +1203,11 @@ describe Account do
       expect(tabs.first[:label]).to eq "English Label"
     end
 
-    it 'includes message handlers' do
+    it "includes message handlers" do
       mock_tab = {
-        id: '1234',
-        label: 'my_label',
-        css_class: '1234',
+        id: "1234",
+        label: "my_label",
+        css_class: "1234",
         href: :launch_path_helper,
         visibility: nil,
         external: true,
@@ -1218,7 +1218,7 @@ describe Account do
       expect(@account.tabs_available(nil)).to include(mock_tab)
     end
 
-    it 'uses :manage_assignments to determine question bank tab visibility' do
+    it "uses :manage_assignments to determine question bank tab visibility" do
       account_admin_user_with_role_changes(acccount: @account, role_changes: { manage_assignments: true, manage_grades: false })
       tabs = @account.tabs_available(@admin)
       expect(tabs.pluck(:id)).to be_include(Account::TAB_QUESTION_BANKS)
@@ -1258,7 +1258,7 @@ describe Account do
       user_with_pseudonym(active_all: 1)
       @user.update(name: "John St. Clair", sortable_name: "St. Clair, John")
       @johnstclair = @user
-      user_with_pseudonym(active_all: 1, username: 'jt@instructure.com', name: 'JT Olds')
+      user_with_pseudonym(active_all: 1, username: "jt@instructure.com", name: "JT Olds")
       @jtolds = @user
       expect(Account.default.fast_all_users).to eq [@jtolds, @johnstclair]
     end
@@ -1266,7 +1266,7 @@ describe Account do
 
   it "does not allow setting an sis id for a root account" do
     @account = Account.create!
-    @account.sis_source_id = 'abc'
+    @account.sis_source_id = "abc"
     expect(@account.save).to be_falsey
   end
 
@@ -1331,7 +1331,7 @@ describe Account do
 
   describe "authentication_providers.active" do
     let(:account) { Account.default }
-    let!(:aac) { account.authentication_providers.create!(auth_type: 'facebook') }
+    let!(:aac) { account.authentication_providers.create!(auth_type: "facebook") }
 
     it "pulls active AACS" do
       expect(account.authentication_providers.active).to include(aac)
@@ -1351,12 +1351,12 @@ describe Account do
     end
 
     it "is false for LDAP" do
-      account.authentication_providers.create!(auth_type: 'ldap')
+      account.authentication_providers.create!(auth_type: "ldap")
       expect(account.delegated_authentication?).to eq false
     end
 
     it "is true for CAS" do
-      account.authentication_providers.create!(auth_type: 'cas')
+      account.authentication_providers.create!(auth_type: "cas")
       expect(account.delegated_authentication?).to eq true
     end
   end
@@ -1369,31 +1369,31 @@ describe Account do
     end
 
     it "is true for having aacs" do
-      Account.default.authentication_providers.create!(auth_type: 'ldap')
+      Account.default.authentication_providers.create!(auth_type: "ldap")
       expect(account.non_canvas_auth_configured?).to be_truthy
     end
 
     it "is false after aacs deleted" do
-      Account.default.authentication_providers.create!(auth_type: 'ldap')
+      Account.default.authentication_providers.create!(auth_type: "ldap")
       account.authentication_providers.destroy_all
       expect(account.non_canvas_auth_configured?).to be_falsey
     end
   end
 
-  describe '#find_child' do
-    it 'works for root accounts' do
+  describe "#find_child" do
+    it "works for root accounts" do
       sub = Account.default.sub_accounts.create!
       expect(Account.default.find_child(sub.id)).to eq sub
     end
 
-    it 'works for children accounts' do
+    it "works for children accounts" do
       sub = Account.default.sub_accounts.create!
       sub_sub = sub.sub_accounts.create!
       sub_sub_sub = sub_sub.sub_accounts.create!
       expect(sub.find_child(sub_sub_sub.id)).to eq sub_sub_sub
     end
 
-    it 'raises for out-of-tree accounts' do
+    it "raises for out-of-tree accounts" do
       sub = Account.default.sub_accounts.create!
       sub_sub = sub.sub_accounts.create!
       sibling = sub.sub_accounts.create!
@@ -1485,15 +1485,15 @@ describe Account do
   describe "available_custom_course_roles" do
     before :once do
       account_model
-      @roleA = @account.roles.create name: 'A'
-      @roleA.base_role_type = 'StudentEnrollment'
+      @roleA = @account.roles.create name: "A"
+      @roleA.base_role_type = "StudentEnrollment"
       @roleA.save!
-      @roleB = @account.roles.create name: 'B'
-      @roleB.base_role_type = 'StudentEnrollment'
+      @roleB = @account.roles.create name: "B"
+      @roleB.base_role_type = "StudentEnrollment"
       @roleB.save!
       @sub_account = @account.sub_accounts.create!
-      @roleC = @sub_account.roles.create name: 'C'
-      @roleC.base_role_type = 'StudentEnrollment'
+      @roleC = @sub_account.roles.create name: "C"
+      @roleC.base_role_type = "StudentEnrollment"
       @roleC.save!
     end
 
@@ -1614,8 +1614,8 @@ describe Account do
       end
 
       it "uses provided value when set" do
-        @account.default_time_zone = 'America/New_York'
-        expect(@account.default_time_zone).to eq ActiveSupport::TimeZone['Eastern Time (US & Canada)']
+        @account.default_time_zone = "America/New_York"
+        expect(@account.default_time_zone).to eq ActiveSupport::TimeZone["Eastern Time (US & Canada)"]
       end
 
       it "has a sensible default if not set" do
@@ -1631,14 +1631,14 @@ describe Account do
       end
 
       it "uses provided value when set, regardless of root account setting" do
-        @root_account.default_time_zone = 'America/Chicago'
-        @account.default_time_zone = 'America/New_York'
-        expect(@account.default_time_zone).to eq ActiveSupport::TimeZone['Eastern Time (US & Canada)']
+        @root_account.default_time_zone = "America/Chicago"
+        @account.default_time_zone = "America/New_York"
+        expect(@account.default_time_zone).to eq ActiveSupport::TimeZone["Eastern Time (US & Canada)"]
       end
 
       it "defaults to root account value if not set" do
-        @root_account.default_time_zone = 'America/Chicago'
-        expect(@account.default_time_zone).to eq ActiveSupport::TimeZone['Central Time (US & Canada)']
+        @root_account.default_time_zone = "America/Chicago"
+        expect(@account.default_time_zone).to eq ActiveSupport::TimeZone["Central Time (US & Canada)"]
       end
 
       it "has a sensible default if neither is set" do
@@ -1647,7 +1647,7 @@ describe Account do
     end
   end
 
-  it 'sets allow_sis_import if root_account' do
+  it "sets allow_sis_import if root_account" do
     account = Account.create!
     expect(account.allow_sis_import).to eq true
     sub = account.sub_accounts.create!
@@ -1657,16 +1657,16 @@ describe Account do
   describe "#ensure_defaults" do
     it "assigns an lti_guid postfixed by canvas-lms" do
       account = Account.new
-      account.uuid = '12345'
+      account.uuid = "12345"
       account.ensure_defaults
-      expect(account.lti_guid).to eq '12345:canvas-lms'
+      expect(account.lti_guid).to eq "12345:canvas-lms"
     end
 
     it "does not change existing an lti_guid" do
       account = Account.new
-      account.lti_guid = '12345'
+      account.lti_guid = "12345"
       account.ensure_defaults
-      expect(account.lti_guid).to eq '12345'
+      expect(account.lti_guid).to eq "12345"
     end
 
     it "removes carriage returns from the name" do
@@ -1677,66 +1677,66 @@ describe Account do
     end
   end
 
-  it 'formats a referer url' do
+  it "formats a referer url" do
     account = Account.new
     expect(account.format_referer(nil)).to be_nil
-    expect(account.format_referer('')).to be_nil
-    expect(account.format_referer('not a url')).to be_nil
-    expect(account.format_referer('http://example.com/')).to eq 'http://example.com'
-    expect(account.format_referer('http://example.com/index.html')).to eq 'http://example.com'
-    expect(account.format_referer('http://example.com:80')).to eq 'http://example.com'
-    expect(account.format_referer('https://example.com:443')).to eq 'https://example.com'
-    expect(account.format_referer('http://example.com:3000')).to eq 'http://example.com:3000'
+    expect(account.format_referer("")).to be_nil
+    expect(account.format_referer("not a url")).to be_nil
+    expect(account.format_referer("http://example.com/")).to eq "http://example.com"
+    expect(account.format_referer("http://example.com/index.html")).to eq "http://example.com"
+    expect(account.format_referer("http://example.com:80")).to eq "http://example.com"
+    expect(account.format_referer("https://example.com:443")).to eq "https://example.com"
+    expect(account.format_referer("http://example.com:3000")).to eq "http://example.com:3000"
   end
 
-  it 'formats trusted referers when set' do
+  it "formats trusted referers when set" do
     account = Account.new
-    account.trusted_referers = 'https://example.com/,http://example.com:80,http://example.com:3000'
-    expect(account.settings[:trusted_referers]).to eq 'https://example.com,http://example.com,http://example.com:3000'
+    account.trusted_referers = "https://example.com/,http://example.com:80,http://example.com:3000"
+    expect(account.settings[:trusted_referers]).to eq "https://example.com,http://example.com,http://example.com:3000"
 
     account.trusted_referers = nil
     expect(account.settings[:trusted_referers]).to be_nil
 
-    account.trusted_referers = ''
+    account.trusted_referers = ""
     expect(account.settings[:trusted_referers]).to be_nil
   end
 
-  describe 'trusted_referer?' do
+  describe "trusted_referer?" do
     let!(:account) do
       account = Account.new
-      account.settings[:trusted_referers] = 'https://example.com,http://example.com,http://example.com:3000'
+      account.settings[:trusted_referers] = "https://example.com,http://example.com,http://example.com:3000"
       account
     end
 
-    it 'is true when a referer is trusted' do
-      expect(account.trusted_referer?('http://example.com')).to be_truthy
-      expect(account.trusted_referer?('http://example.com:3000')).to be_truthy
-      expect(account.trusted_referer?('http://example.com:80')).to be_truthy
-      expect(account.trusted_referer?('https://example.com:443')).to be_truthy
+    it "is true when a referer is trusted" do
+      expect(account.trusted_referer?("http://example.com")).to be_truthy
+      expect(account.trusted_referer?("http://example.com:3000")).to be_truthy
+      expect(account.trusted_referer?("http://example.com:80")).to be_truthy
+      expect(account.trusted_referer?("https://example.com:443")).to be_truthy
     end
 
-    it 'is false when a referer is not provided' do
+    it "is false when a referer is not provided" do
       expect(account.trusted_referer?(nil)).to be_falsey
-      expect(account.trusted_referer?('')).to be_falsey
+      expect(account.trusted_referer?("")).to be_falsey
     end
 
-    it 'is false when a referer is not trusted' do
-      expect(account.trusted_referer?('https://example.com:5000')).to be_falsey
+    it "is false when a referer is not trusted" do
+      expect(account.trusted_referer?("https://example.com:5000")).to be_falsey
     end
 
-    it 'is false when the account has no trusted referer setting' do
+    it "is false when the account has no trusted referer setting" do
       account.settings.delete(:trusted_referers)
-      expect(account.trusted_referer?('https://example.com')).to be_falsey
+      expect(account.trusted_referer?("https://example.com")).to be_falsey
     end
 
-    it 'is false when the account has nil trusted referer setting' do
+    it "is false when the account has nil trusted referer setting" do
       account.settings[:trusted_referers] = nil
-      expect(account.trusted_referer?('https://example.com')).to be_falsey
+      expect(account.trusted_referer?("https://example.com")).to be_falsey
     end
 
-    it 'is false when the account has empty trusted referer setting' do
-      account.settings[:trusted_referers] = ''
-      expect(account.trusted_referer?('https://example.com')).to be_falsey
+    it "is false when the account has empty trusted referer setting" do
+      account.settings[:trusted_referers] = ""
+      expect(account.trusted_referer?("https://example.com")).to be_falsey
     end
   end
 
@@ -1973,7 +1973,7 @@ describe Account do
   end
 
   describe "#users_name_like" do
-    context 'sharding' do
+    context "sharding" do
       specs_require_sharding
 
       it "works cross-shard" do
@@ -2013,7 +2013,7 @@ describe Account do
     expect(Account.default.settings[:blah]).to eq true
   end
 
-  it_behaves_like 'a learning outcome context'
+  it_behaves_like "a learning outcome context"
 
   describe "#default_dashboard_view" do
     before(:once) do
@@ -2049,24 +2049,24 @@ describe Account do
 
       @user1 = user_factory(active_all: true)
       @account.account_users.create!(user: @user1)
-      @user1.dashboard_view = 'activity'
+      @user1.dashboard_view = "activity"
       @user1.save
 
       @user2 = user_factory(active_all: true)
       @account.account_users.create!(user: @user2)
-      @user2.dashboard_view = 'cards'
+      @user2.dashboard_view = "cards"
       @user2.save
     end
 
     it "adds or overwrite all account users' dashboard_view preference" do
-      @account.default_dashboard_view = 'planner'
+      @account.default_dashboard_view = "planner"
       @account.save!
       @account.reload
 
-      expect([@user1.dashboard_view(@account), @user2.dashboard_view(@account)]).to match_array(['activity', 'cards'])
+      expect([@user1.dashboard_view(@account), @user2.dashboard_view(@account)]).to match_array(["activity", "cards"])
       @account.update_user_dashboards(synchronous: true)
       @account.reload
-      expect([@user1.reload.dashboard_view(@account), @user2.reload.dashboard_view(@account)]).to match_array(Array.new(2, 'planner'))
+      expect([@user1.reload.dashboard_view(@account), @user2.reload.dashboard_view(@account)]).to match_array(Array.new(2, "planner"))
     end
   end
 
@@ -2148,54 +2148,54 @@ describe Account do
     end
   end
 
-  context '#destroy on sub accounts' do
+  context "#destroy on sub accounts" do
     before :once do
       @root_account = Account.create!
       @sub_account = @root_account.sub_accounts.create!
     end
 
-    it 'wont let you destroy if there are active sub accounts' do
+    it "wont let you destroy if there are active sub accounts" do
       @sub_account.sub_accounts.create!
       expect { @sub_account.destroy! }.to raise_error ActiveRecord::RecordInvalid
     end
 
-    it 'wont let you destroy if there are active courses' do
+    it "wont let you destroy if there are active courses" do
       @sub_account.courses.create!
       expect { @sub_account.destroy! }.to raise_error ActiveRecord::RecordInvalid
     end
 
-    it 'destroys associated account users' do
+    it "destroys associated account users" do
       account_user1 = @sub_account.account_users.create!(user: User.create!)
       account_user2 = @sub_account.account_users.create!(user: User.create!)
       @sub_account.destroy!
-      expect(account_user1.reload.workflow_state).to eq 'deleted'
-      expect(account_user2.reload.workflow_state).to eq 'deleted'
+      expect(account_user1.reload.workflow_state).to eq "deleted"
+      expect(account_user2.reload.workflow_state).to eq "deleted"
     end
   end
 
-  context 'custom help link validation' do
+  context "custom help link validation" do
     before do
       account_model
     end
 
-    it 'is valid if custom help links are not present' do
-      @account.settings[:foo] = 'bar'
+    it "is valid if custom help links are not present" do
+      @account.settings[:foo] = "bar"
       expect(@account.valid?).to be true
     end
 
-    it 'is valid if custom help links are valid' do
+    it "is valid if custom help links are valid" do
       @account.settings[:custom_help_links] = [{ is_new: true, is_featured: false }, { is_new: false, is_featured: true }]
       expect(@account.valid?).to be true
     end
 
-    it 'is not valid if custom help links are invalid' do
+    it "is not valid if custom help links are invalid" do
       @account.settings[:custom_help_links] = [{ is_new: true, is_featured: true }]
       expect(@account.valid?).to be false
     end
 
-    it 'does not check custom help links if not changed' do
+    it "does not check custom help links if not changed" do
       @account.update_attribute(:settings, [{ is_new: true, is_featured: true }]) # skips validation
-      @account.name = 'foo'
+      @account.name = "foo"
       expect(@account.valid?).to be true
     end
   end
@@ -2268,7 +2268,7 @@ describe Account do
     end
   end
 
-  context '#roles_with_enabled_permission' do
+  context "#roles_with_enabled_permission" do
     def create_role_override(permission, role, context, enabled = true)
       RoleOverride.create!(
         context: context,
@@ -2279,29 +2279,29 @@ describe Account do
     end
     let(:account) { account_model }
 
-    it 'returns expected roles with the given permission' do
+    it "returns expected roles with the given permission" do
       account.disable_feature!(:granular_permissions_manage_courses)
-      role = account.roles.create name: 'AssistantGrader'
-      role.base_role_type = 'TaEnrollment'
-      role.workflow_state = 'active'
+      role = account.roles.create name: "AssistantGrader"
+      role.base_role_type = "TaEnrollment"
+      role.workflow_state = "active"
       role.save!
-      create_role_override('change_course_state', role, account)
+      create_role_override("change_course_state", role, account)
       expect(
         account.roles_with_enabled_permission(:change_course_state).map(&:name).sort
       ).to eq %w[AccountAdmin AssistantGrader DesignerEnrollment TeacherEnrollment]
     end
 
-    it 'returns expected roles with the given permission (granular permissions)' do
+    it "returns expected roles with the given permission (granular permissions)" do
       account.enable_feature!(:granular_permissions_manage_courses)
-      role = account.roles.create name: 'TeacherAdmin'
-      role.base_role_type = 'TeacherEnrollment'
-      role.workflow_state = 'active'
+      role = account.roles.create name: "TeacherAdmin"
+      role.base_role_type = "TeacherEnrollment"
+      role.workflow_state = "active"
       role.save!
-      create_role_override('manage_courses_add', role, account)
-      create_role_override('manage_courses_publish', role, account)
-      create_role_override('manage_courses_conclude', role, account)
-      create_role_override('manage_courses_reset', role, account)
-      create_role_override('manage_courses_delete', role, account)
+      create_role_override("manage_courses_add", role, account)
+      create_role_override("manage_courses_publish", role, account)
+      create_role_override("manage_courses_conclude", role, account)
+      create_role_override("manage_courses_reset", role, account)
+      create_role_override("manage_courses_delete", role, account)
       expect(
         account.roles_with_enabled_permission(:manage_courses_add).map(&:name).sort
       ).to eq %w[AccountAdmin]
@@ -2320,16 +2320,16 @@ describe Account do
     end
   end
 
-  describe '#invalidate_caches_if_changed' do
-    it 'works for root accounts' do
-      Account.default.name = 'Something new'
+  describe "#invalidate_caches_if_changed" do
+    it "works for root accounts" do
+      Account.default.name = "Something new"
       expect(Account).to receive(:invalidate_cache).with(Account.default.id).at_least(1)
       Account.default.save!
     end
 
-    it 'works for sub accounts' do
+    it "works for sub accounts" do
       a = Account.default.manually_created_courses_account
-      a.name = 'something else'
+      a.name = "something else"
       expect(Rails.cache).to receive(:delete).with("short_name_lookup/account_#{a.id}").ordered
       expect(Rails.cache).to receive(:delete).with(["account2", a.id].cache_key).ordered
       a.save!
@@ -2429,7 +2429,7 @@ describe Account do
     end
   end
 
-  describe '#log_changes_to_app_center_access_token' do
+  describe "#log_changes_to_app_center_access_token" do
     subject { account.update!(settings: after_settings) }
 
     let!(:account) { account_model(settings: before_settings).tap(&:save!) }
@@ -2446,8 +2446,8 @@ describe Account do
       CanvasErrors.send(:registry).compact!
     end
 
-    shared_examples_for 'a change to the token' do |was_present, now_present|
-      it 'triggers a Sentry log' do
+    shared_examples_for "a change to the token" do |was_present, now_present|
+      it "triggers a Sentry log" do
         subject
         expect(calls).to include([
                                    "Account's app_center_access_token changed",
@@ -2457,54 +2457,54 @@ describe Account do
       end
     end
 
-    shared_examples_for 'no change to the token' do
-      it 'does not trigger a Sentry log' do
+    shared_examples_for "no change to the token" do
+      it "does not trigger a Sentry log" do
         subject
         expect(calls.map(&:first)).to_not include("Account's app_center_access_token changed")
       end
     end
 
-    context 'when it changes from empty to non-empty' do
+    context "when it changes from empty to non-empty" do
       let(:before_settings) { {} }
-      let(:after_settings) { { app_center_access_token: 'foo' } }
+      let(:after_settings) { { app_center_access_token: "foo" } }
 
-      it_behaves_like 'a change to the token', false, true
+      it_behaves_like "a change to the token", false, true
     end
 
-    context 'when it changes from non-empty to empty' do
-      let(:before_settings) { { app_center_access_token: 'foo' } }
+    context "when it changes from non-empty to empty" do
+      let(:before_settings) { { app_center_access_token: "foo" } }
       let(:after_settings) { { app_center_access_token: nil } }
 
-      it_behaves_like 'a change to the token', true, false
+      it_behaves_like "a change to the token", true, false
     end
 
-    context 'when it changes from non-empty to something else non-empty' do
-      let(:before_settings) { { app_center_access_token: 'foo' } }
-      let(:after_settings) { { app_center_access_token: 'foo2' } }
+    context "when it changes from non-empty to something else non-empty" do
+      let(:before_settings) { { app_center_access_token: "foo" } }
+      let(:after_settings) { { app_center_access_token: "foo2" } }
 
-      it_behaves_like 'a change to the token', true, true
+      it_behaves_like "a change to the token", true, true
     end
 
-    context 'when it is empty and does not change' do
-      let(:before_settings) { { foo: 'bar' } }
-      let(:after_settings) { { foo: 'waz', app_center_access_token: nil } }
+    context "when it is empty and does not change" do
+      let(:before_settings) { { foo: "bar" } }
+      let(:after_settings) { { foo: "waz", app_center_access_token: nil } }
 
-      it_behaves_like 'no change to the token'
+      it_behaves_like "no change to the token"
     end
 
-    context 'when it is not empty and does not change' do
-      let(:before_settings) { { foo: 'bar', app_center_access_token: 'foo' } }
-      let(:after_settings) { { foo: 'waz', app_center_access_token: 'foo' } }
+    context "when it is not empty and does not change" do
+      let(:before_settings) { { foo: "bar", app_center_access_token: "foo" } }
+      let(:after_settings) { { foo: "waz", app_center_access_token: "foo" } }
 
-      it_behaves_like 'no change to the token'
+      it_behaves_like "no change to the token"
     end
 
-    context 'when settings does not change' do
-      subject { account.update!(name: 'foobar') }
+    context "when settings does not change" do
+      subject { account.update!(name: "foobar") }
 
       let(:before_settings) { {} }
 
-      it_behaves_like 'no change to the token'
+      it_behaves_like "no change to the token"
     end
   end
 end

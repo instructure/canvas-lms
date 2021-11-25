@@ -17,8 +17,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../common'
-require_relative '../helpers/assignment_overrides'
+require_relative "../common"
+require_relative "../helpers/assignment_overrides"
 
 describe "assignment groups" do
   include AssignmentOverridesSeleniumHelper
@@ -37,14 +37,14 @@ describe "assignment groups" do
 
     it "creates an assignment with default dates", priority: "1" do
       visit_new_assignment_page
-      fill_assignment_title 'vdd assignment'
+      fill_assignment_title "vdd assignment"
       fill_assignment_overrides
-      click_option('#assignment_submission_type', 'No Submission')
+      click_option("#assignment_submission_type", "No Submission")
       update_assignment!
       wait_for_ajaximations
       a = nil
       keep_trying_until do
-        a = Assignment.find_by(title: 'vdd assignment')
+        a = Assignment.find_by(title: "vdd assignment")
         expect(a).not_to be_nil
       end
       compare_assignment_times(a)
@@ -63,7 +63,7 @@ describe "assignment groups" do
     end
 
     it "edits a due date", priority: "2" do
-      skip('flaky spec, LA-749')
+      skip("flaky spec, LA-749")
       assignment = create_assignment!
       visit_assignment_edit_page(assignment)
 
@@ -81,7 +81,7 @@ describe "assignment groups" do
       get "/courses/#{@course.id}/assignments/#{assign.id}/edit"
 
       fj(".date_field:first[data-date-type='due_at']").clear
-      expect_new_page_load { submit_form('#edit_assignment_form') }
+      expect_new_page_load { submit_form("#edit_assignment_form") }
 
       expect(assign.reload.due_at).to be_nil
     end
@@ -111,7 +111,7 @@ describe "assignment groups" do
         .send_keys(format_date_for_view(other_section_due, :medium))
 
       # `return_to` is not set, so no redirect happens
-      wait_for_new_page_load { submit_form('#edit_assignment_form') }
+      wait_for_new_page_load { submit_form("#edit_assignment_form") }
 
       overrides = assign.reload.assignment_overrides
       expect(overrides.count).to eq 3
@@ -139,7 +139,7 @@ describe "assignment groups" do
       wait_for_ajaximations
 
       driver.switch_to.default_content
-      fj('.ic-tokeninput-input:last').send_keys('student')
+      fj(".ic-tokeninput-input:last").send_keys("student")
       wait_for_ajaximations
       students = ffj(".ic-tokeninput-option:visible")
       expect(students.length).to eq 1
@@ -164,7 +164,7 @@ describe "assignment groups" do
       first_lock_at_element.clear
       last_due_at_element
         .send_keys(format_date_for_view(due_date, :medium))
-      wait_for_new_page_load { submit_form('#edit_assignment_form') }
+      wait_for_new_page_load { submit_form("#edit_assignment_form") }
       overrides = assign.reload.assignment_overrides
       section_override = overrides.detect { |o| o.set_id == section1.id }
       expect(section_override.due_at.to_date)
@@ -177,11 +177,11 @@ describe "assignment groups" do
       visit_new_assignment_page
       wait_for_ajaximations
 
-      fill_assignment_title 'validation assignment'
+      fill_assignment_title "validation assignment"
       add_override
       select_last_override_section(other_section.name)
       last_due_at_element.send_keys(shared_date)
-      click_option('#assignment_submission_type', 'No Submission')
+      click_option("#assignment_submission_type", "No Submission")
       update_assignment!
       f(".edit_assignment_link").click
       wait_for_ajaximations
@@ -192,17 +192,17 @@ describe "assignment groups" do
     it "shows a vdd tooltip summary on the course assignments page", priority: "2" do
       assignment = create_assignment!
       get "/courses/#{@course.id}/assignments"
-      expect(f('.assignment .assignment-date-due')).not_to include_text "Multiple Dates"
+      expect(f(".assignment .assignment-date-due")).not_to include_text "Multiple Dates"
       add_due_date_override(assignment)
 
       get "/courses/#{@course.id}/assignments"
-      expect(f('.assignment .assignment-date-due')).to include_text "Multiple Dates"
+      expect(f(".assignment .assignment-date-due")).to include_text "Multiple Dates"
       driver.action.move_to(f(".assignment .assignment-date-due a")).perform
       wait_for_ajaximations
 
-      tooltip = fj('.vdd_tooltip_content:visible')
-      expect(tooltip).to include_text 'New Section'
-      expect(tooltip).to include_text 'Everyone else'
+      tooltip = fj(".vdd_tooltip_content:visible")
+      expect(tooltip).to include_text "New Section"
+      expect(tooltip).to include_text "Everyone else"
     end
   end
 
@@ -218,7 +218,7 @@ describe "assignment groups" do
       assign = create_assignment!
       get "/courses/#{@course.id}/assignments/#{assign.id}"
       wait_for_ajaximations
-      expect(f('.student-assignment-overview')).to include_text 'Available'
+      expect(f(".student-assignment-overview")).to include_text "Available"
     end
   end
 end

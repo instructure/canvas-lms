@@ -25,7 +25,7 @@
 module Lti
   module NameBookmarkerBase
     def bookmark_for(_model)
-      raise 'abstract'
+      raise "abstract"
     end
 
     def validate(bookmark)
@@ -36,7 +36,7 @@ module Lti
     end
 
     def restrict_scope(_scope, _pager)
-      raise 'abstract'
+      raise "abstract"
     end
 
     private
@@ -44,10 +44,10 @@ module Lti
     # Helpers to be used by implementations
 
     def collation_key(name)
-      db_sample_collation_key = BookmarkedCollection.best_unicode_collation_key('?').to_s
-      if db_sample_collation_key.include?('collkey') || db_sample_collation_key.include?('COLLATE')
+      db_sample_collation_key = BookmarkedCollection.best_unicode_collation_key("?").to_s
+      if db_sample_collation_key.include?("collkey") || db_sample_collation_key.include?("COLLATE")
         Canvas::ICU.collation_key(name)
-      elsif db_sample_collation_key.include?('LOWER')
+      elsif db_sample_collation_key.include?("LOWER")
         name.downcase
       else
         name # probably non-postgres
@@ -55,7 +55,7 @@ module Lti
     end
 
     def bookmark_for_name_and_id(name, id)
-      name ||= ''
+      name ||= ""
       [collation_key(name), id, name]
     end
 
@@ -65,7 +65,7 @@ module Lti
       name_collation_key = BookmarkedCollection.best_unicode_collation_key(name_field)
 
       if pager.current_bookmark
-        placeholder_collation_key = BookmarkedCollection.best_unicode_collation_key('?')
+        placeholder_collation_key = BookmarkedCollection.best_unicode_collation_key("?")
         bookmark = pager.current_bookmark
         comparison = (pager.include_bookmark ? ">=" : ">")
         scope = scope.where(

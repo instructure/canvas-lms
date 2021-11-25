@@ -17,8 +17,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'nokogiri'
-require 'sanitize'
+require "nokogiri"
+require "sanitize"
 
 module Qti
   class AssessmentItemConverter
@@ -28,7 +28,7 @@ module Qti
     DEFAULT_CORRECT_WEIGHT = 100
     DEFAULT_INCORRECT_WEIGHT = 0
     DEFAULT_POINTS_POSSIBLE = 1
-    UNSUPPORTED_TYPES = ['File Upload', 'Hot Spot', 'Quiz Bowl', 'WCT_JumbledSentence'].freeze
+    UNSUPPORTED_TYPES = ["File Upload", "Hot Spot", "Quiz Bowl", "WCT_JumbledSentence"].freeze
 
     attr_reader :package_root, :identifier, :href, :interaction_type, :title, :question
 
@@ -47,10 +47,10 @@ module Qti
 
       if @manifest_node
         @package_root = PackageRoot.new(opts[:base_dir])
-        @identifier = @manifest_node['identifier']
-        @href = @package_root.item_path(@manifest_node['href'])
-        if (title = @manifest_node.at_css('title langstring') ||
-           @manifest_node.at_css('xmlns|title xmlns|langstring', 'xmlns' => Qti::Converter::IMS_MD))
+        @identifier = @manifest_node["identifier"]
+        @href = @package_root.item_path(@manifest_node["href"])
+        if (title = @manifest_node.at_css("title langstring") ||
+           @manifest_node.at_css("xmlns|title xmlns|langstring", "xmlns" => Qti::Converter::IMS_MD))
           @title = title.text
         end
       else
@@ -86,61 +86,61 @@ module Qti
     def create_instructure_question
       begin
         create_doc
-        @question[:question_name] = @title || get_node_att(@doc, 'assessmentItem', 'title')
+        @question[:question_name] = @title || get_node_att(@doc, "assessmentItem", "title")
         # The colons are replaced with dashes in the conversion from QTI 1.2
-        @question[:migration_id] = get_node_att(@doc, 'assessmentItem', 'identifier')
-        @question[:migration_id] = @question[:migration_id].tr(':', '-').gsub('identifier=', '') if @question[:migration_id]
+        @question[:migration_id] = get_node_att(@doc, "assessmentItem", "identifier")
+        @question[:migration_id] = @question[:migration_id].tr(":", "-").gsub("identifier=", "") if @question[:migration_id]
 
         if @flavor == Qti::Flavors::D2L
           # In D2L-generated QTI the assessments reference the items by the label instead of the identifier
           # also, the identifier is not always unique, so we use the label as the migration id
-          @question[:migration_id] = get_node_att(@doc, 'assessmentItem', 'label')
+          @question[:migration_id] = get_node_att(@doc, "assessmentItem", "label")
         end
 
         @question[:migration_id] = @question[:migration_id].presence
 
-        if @type == 'text_entry_interaction'
-          @doc.css('textEntryInteraction').each do |node|
-            node.inner_html = "[#{node['responseIdentifier']}]"
+        if @type == "text_entry_interaction"
+          @doc.css("textEntryInteraction").each do |node|
+            node.inner_html = "[#{node["responseIdentifier"]}]"
           end
         end
 
         parse_instructure_metadata
 
-        selectors = ['itemBody > div', 'itemBody > p']
+        selectors = ["itemBody > div", "itemBody > p"]
         type = @opts[:custom_type] || @migration_type || @type
         unless %w[fill_in_multiple_blanks_question canvas_matching matching_question
                   multiple_dropdowns_question respondus_matching].include?(type)
-          selectors << 'itemBody choiceInteraction > prompt'
-          selectors << 'itemBody > extendedTextInteraction > prompt'
+          selectors << "itemBody choiceInteraction > prompt"
+          selectors << "itemBody > extendedTextInteraction > prompt"
         end
 
-        text_nodes = @doc.css(selectors.join(','))
+        text_nodes = @doc.css(selectors.join(","))
         text_nodes = text_nodes.reject do |node|
           node.inner_html.strip.empty? ||
-            EXCLUDED_QUESTION_TEXT_CLASSES.any? { |c| c.casecmp(node['class'].to_s) == 0 } ||
-            node.at_css('choiceInteraction') || node.at_css('associateInteraction')
+            EXCLUDED_QUESTION_TEXT_CLASSES.any? { |c| c.casecmp(node["class"].to_s) == 0 } ||
+            node.at_css("choiceInteraction") || node.at_css("associateInteraction")
         end
 
         if !text_nodes.empty?
-          @question[:question_text] = ''
+          @question[:question_text] = ""
           text_nodes.each_with_index do |node, i|
             @question[:question_text] += "\n<br/>\n" if i > 0
-            @question[:question_text] += if node['class'] == 'html'
+            @question[:question_text] += if node["class"] == "html"
                                            sanitize_html_string(node.text)
                                          else
                                            sanitize_html!(node)
                                          end
           end
-        elsif @doc.at_css('itemBody associateInteraction prompt')
+        elsif @doc.at_css("itemBody associateInteraction prompt")
           @question[:question_text] = "" # apparently they deliberately had a blank question?
-        elsif (text = @doc.at_css('itemBody div:first-child') ||
-           @doc.at_css('itemBody p:first-child') ||
-            @doc.at_css('itemBody div') ||
-             @doc.at_css('itemBody p'))
+        elsif (text = @doc.at_css("itemBody div:first-child") ||
+           @doc.at_css("itemBody p:first-child") ||
+            @doc.at_css("itemBody div") ||
+             @doc.at_css("itemBody p"))
           @question[:question_text] = sanitize_html!(text)
-        elsif @doc.at_css('itemBody')
-          if (text = @doc.at_css('itemBody').children.find { |c| c.text.strip != '' })
+        elsif @doc.at_css("itemBody")
+          if (text = @doc.at_css("itemBody").children.find { |c| c.text.strip != "" })
             @question[:question_text] = sanitize_html_string(text.text)
           end
         end
@@ -151,7 +151,7 @@ module Qti
         elsif !%w[text_only_question file_upload_question].include?(@migration_type)
           parse_question_data
         else
-          get_feedback if @migration_type == 'file_upload_question'
+          get_feedback if @migration_type == "file_upload_question"
           @question[:question_type] ||= @migration_type
         end
       rescue => e
@@ -166,57 +166,57 @@ module Qti
     end
 
     def parse_instructure_metadata
-      if (meta = @doc.at_css('instructureMetadata'))
-        if (bank = get_node_att(meta, 'instructureField[name=question_bank]', 'value'))
+      if (meta = @doc.at_css("instructureMetadata"))
+        if (bank = get_node_att(meta, "instructureField[name=question_bank]", "value"))
           @question[:question_bank_name] = bank
         end
-        if (bank = get_node_att(meta, 'instructureField[name=question_bank_iden]', 'value'))
+        if (bank = get_node_att(meta, "instructureField[name=question_bank_iden]", "value"))
           @question[:question_bank_id] = bank
-          if (bb_bank = get_node_att(meta, 'instructureField[name=bb_question_bank_iden]', 'value'))
+          if (bb_bank = get_node_att(meta, "instructureField[name=bb_question_bank_iden]", "value"))
             @question[:bb_question_bank_id] = bb_bank
           end
         end
-        if (score = get_node_att(meta, 'instructureField[name=max_score]', 'value'))
+        if (score = get_node_att(meta, "instructureField[name=max_score]", "value"))
           @question[:points_possible] = [score.to_f, 0.0].max
         end
-        if (score = get_node_att(meta, 'instructureField[name=points_possible]', 'value'))
+        if (score = get_node_att(meta, "instructureField[name=points_possible]", "value"))
           @question[:points_possible] = [score.to_f, 0.0].max
         end
-        if (ref = get_node_att(meta, 'instructureField[name=assessment_question_identifierref]', 'value'))
+        if (ref = get_node_att(meta, "instructureField[name=assessment_question_identifierref]", "value"))
           @question[:assessment_question_migration_id] = ref
         end
-        if (ref = get_node_att(meta, 'instructureField[name=original_answer_ids]', 'value'))
+        if (ref = get_node_att(meta, "instructureField[name=original_answer_ids]", "value"))
           @original_answer_ids = ref.split(",")
         end
-        if get_node_att(meta, 'instructureField[name=cc_profile]', 'value') == 'cc.pattern_match.v0p1'
+        if get_node_att(meta, "instructureField[name=cc_profile]", "value") == "cc.pattern_match.v0p1"
           @question[:is_cc_pattern_match] = true
         end
-        if (type = get_node_att(meta, 'instructureField[name=bb_question_type]', 'value'))
+        if (type = get_node_att(meta, "instructureField[name=bb_question_type]", "value"))
           @migration_type = type
           case @migration_type
-          when 'True/False'
-            @question[:question_type] = 'true_false_question'
-          when 'Short Response', "Essay"
-            @question[:question_type] = 'essay_question'
-          when 'Fill in the Blank Plus'
-            @question[:question_type] = 'fill_in_multiple_blanks_question'
-          when 'WCT_FillInTheBlank'
-            @question[:question_type] = 'fill_in_multiple_blanks_question'
+          when "True/False"
+            @question[:question_type] = "true_false_question"
+          when "Short Response", "Essay"
+            @question[:question_type] = "essay_question"
+          when "Fill in the Blank Plus"
+            @question[:question_type] = "fill_in_multiple_blanks_question"
+          when "WCT_FillInTheBlank"
+            @question[:question_type] = "fill_in_multiple_blanks_question"
             @question[:is_vista_fib] = true
-          when 'WCT_ShortAnswer'
+          when "WCT_ShortAnswer"
             if @doc.css("responseDeclaration[baseType=\"string\"]").count > 1
-              @question[:question_type] = 'fill_in_multiple_blanks_question'
+              @question[:question_type] = "fill_in_multiple_blanks_question"
               @question[:is_vista_fib] = true
             end
-          when 'Jumbled Sentence'
-            @question[:question_type] = 'multiple_dropdowns_question'
+          when "Jumbled Sentence"
+            @question[:question_type] = "multiple_dropdowns_question"
           end
-        elsif (type = get_node_att(meta, 'instructureField[name=question_type]', 'value'))
+        elsif (type = get_node_att(meta, "instructureField[name=question_type]", "value"))
           @migration_type = case type
-                            when /matching/i then 'matching_question'
-                            when /text\s?information/i, /image/i then 'text_only_question'
-                            when 'trueFalse', %r{true/false}i then 'true_false_question'
-                            when 'multiple_dropdowns' then 'multiple_dropdowns_question'
+                            when /matching/i then "matching_question"
+                            when /text\s?information/i, /image/i then "text_only_question"
+                            when "trueFalse", %r{true/false}i then "true_false_question"
+                            when "multiple_dropdowns" then "multiple_dropdowns_question"
                             else type
                             end
           if AssessmentQuestion::ALL_QUESTION_TYPES.member?(@migration_type)
@@ -254,12 +254,12 @@ module Qti
     end
 
     def get_feedback
-      @doc.search('modalFeedback').each do |f|
-        id = f['identifier']
+      @doc.search("modalFeedback").each do |f|
+        id = f["identifier"]
         if /wrong|incorrect|(_IC$)/i.match?(id)
           extract_feedback!(@question, :incorrect_comments, f)
         elsif /correct|(_C$)/i.match?(id)
-          if f.at_css('div.solution')
+          if f.at_css("div.solution")
             @question[:example_solution] = clear_html(f.text.strip.gsub(/\s+/, " "))
           else
             extract_feedback!(@question, :correct_comments, f)
@@ -284,19 +284,19 @@ module Qti
       end
     end
 
-    KNOWN_META_CLASSES = ['FORMATTED_TEXT_BLOCK', 'flow_1'].freeze
+    KNOWN_META_CLASSES = ["FORMATTED_TEXT_BLOCK", "flow_1"].freeze
     def has_known_meta_class(node)
-      return false unless node.attributes['class']
+      return false unless node.attributes["class"]
 
-      KNOWN_META_CLASSES.member?(node.attributes['class'].value)
+      KNOWN_META_CLASSES.member?(node.attributes["class"].value)
     end
 
     def self.get_interaction_type(manifest_node)
-      manifest_node.at_css('interactionType') ||
-        manifest_node.at_css('xmlns|interactionType', 'xmlns' => Qti::Converter::QTI_2_1_URL) ||
-        manifest_node.at_css('xmlns|interactionType', 'xmlns' => Qti::Converter::QTI_2_0_URL) ||
-        manifest_node.at_css('xmlns|interactionType', 'xmlns' => Qti::Converter::QTI_2_1_ITEM_URL) ||
-        manifest_node.at_css('xmlns|interactionType', 'xmlns' => Qti::Converter::QTI_2_0_ITEM_URL)
+      manifest_node.at_css("interactionType") ||
+        manifest_node.at_css("xmlns|interactionType", "xmlns" => Qti::Converter::QTI_2_1_URL) ||
+        manifest_node.at_css("xmlns|interactionType", "xmlns" => Qti::Converter::QTI_2_0_URL) ||
+        manifest_node.at_css("xmlns|interactionType", "xmlns" => Qti::Converter::QTI_2_1_ITEM_URL) ||
+        manifest_node.at_css("xmlns|interactionType", "xmlns" => Qti::Converter::QTI_2_0_ITEM_URL)
     end
 
     def self.create_instructure_question(opts)
@@ -307,22 +307,22 @@ module Qti
         if (type = get_interaction_type(manifest_node))
           opts[:interaction_type] ||= type.text.downcase
         end
-        if (type = get_node_att(manifest_node, 'instructureMetadata instructureField[name=bb_question_type]', 'value'))
+        if (type = get_node_att(manifest_node, "instructureMetadata instructureField[name=bb_question_type]", "value"))
           opts[:custom_type] ||= type.downcase
         end
-        if (type = get_node_att(manifest_node, 'instructureMetadata instructureField[name=question_type]', 'value'))
+        if (type = get_node_att(manifest_node, "instructureMetadata instructureField[name=question_type]", "value"))
           type = type.downcase
           opts[:custom_type] ||= type
           case type
-          when 'matching_question'
-            opts[:interaction_type] = 'choiceinteraction'
-            opts[:custom_type] = 'canvas_matching'
-          when 'matching'
-            opts[:custom_type] = 'respondus_matching'
+          when "matching_question"
+            opts[:interaction_type] = "choiceinteraction"
+            opts[:custom_type] = "canvas_matching"
+          when "matching"
+            opts[:custom_type] = "respondus_matching"
           when /fillInMultiple|fill_in_multiple_blanks_question|fill in the blanks/i
-            opts[:interaction_type] = 'fill_in_multiple_blanks_question'
-          when 'multiple_dropdowns_question'
-            opts[:interaction_type] = 'multiple_dropdowns_question'
+            opts[:interaction_type] = "fill_in_multiple_blanks_question"
+          when "multiple_dropdowns_question"
+            opts[:interaction_type] = "multiple_dropdowns_question"
           else
             opts[:custom_type] = type
           end
@@ -370,9 +370,9 @@ module Qti
     # Sets the actual feedback values and clears the feedback ids
     def attach_feedback_values(answers)
       feedback_hash = {}
-      @doc.search('modalFeedback').each do |feedback|
-        id = feedback['identifier']
-        node = feedback.at_css('p') || feedback.at_css('div')
+      @doc.search("modalFeedback").each do |feedback|
+        id = feedback["identifier"]
+        node = feedback.at_css("p") || feedback.at_css("div")
         feedback_hash[id] = node if node
       end
 
@@ -390,9 +390,9 @@ module Qti
     def get_feedback_id(cond)
       id = nil
 
-      if (feedback = cond.at_css('setOutcomeValue[identifier=FEEDBACK]')) &&
-         feedback.at_css('variable[identifier=FEEDBACK]') &&
-         (feedback = feedback.at_css('baseValue[baseType=identifier]'))
+      if (feedback = cond.at_css("setOutcomeValue[identifier=FEEDBACK]")) &&
+         feedback.at_css("variable[identifier=FEEDBACK]") &&
+         (feedback = feedback.at_css("baseValue[baseType=identifier]"))
         id = feedback.text.strip
       end
       # Sometimes individual answers are assigned general feedback, don't return

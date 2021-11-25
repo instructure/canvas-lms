@@ -18,28 +18,28 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative 'messages_helper'
+require_relative "messages_helper"
 
-describe 'confirm_registration' do
+describe "confirm_registration" do
   before :once do
     user_factory
-    @object = communication_channel(@user, { username: 'bob@example.com' })
+    @object = communication_channel(@user, { username: "bob@example.com" })
   end
 
   let(:asset) { @object }
   let(:notification_name) { :confirm_registration }
 
-  context 'with_pseudonym' do
+  context "with_pseudonym" do
     before :once do
-      @pseudonym = @user.pseudonyms.create!(unique_id: 'unique@example.com',
-                                            password: 'password',
-                                            password_confirmation: 'password')
+      @pseudonym = @user.pseudonyms.create!(unique_id: "unique@example.com",
+                                            password: "password",
+                                            password_confirmation: "password")
     end
 
     include_examples "a message"
   end
 
-  context 'without_pseudonym' do
+  context "without_pseudonym" do
     include_examples "a message"
   end
 end

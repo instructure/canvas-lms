@@ -22,7 +22,7 @@ module CC
   class CCExporter
     include TextHelper
 
-    ZIP_DIR = 'zip_dir'
+    ZIP_DIR = "zip_dir"
 
     attr_accessor :course, :user, :export_dir, :manifest, :zip_file, :for_course_copy, :for_master_migration
 
@@ -39,7 +39,7 @@ module CC
       @zip_file = nil
       @zip_name = nil
       @logger = Rails.logger
-      @migration_config = ConfigFile.load('external_migration')
+      @migration_config = ConfigFile.load("external_migration")
       @migration_config ||= { keep_after_complete: false }
       @for_course_copy = opts[:for_course_copy]
       @qti_only_export = @content_export&.qti_export?
@@ -90,7 +90,7 @@ module CC
           @export_dirs << converter.base_export_dir # make sure we clean this up too afterwards
           converter.export
           @export_path = converter.course["full_export_file_path"] # this is the course_export.json
-          @export_type = 'application/json'
+          @export_type = "application/json"
         else
           copy_all_to_zip
           @zip_file.close
@@ -109,7 +109,7 @@ module CC
           end
         end
       rescue
-        add_error(I18n.t('course_exports.errors.course_export', "Error running course export."), $!)
+        add_error(I18n.t("course_exports.errors.course_export", "Error running course export."), $!)
         @logger.error $!
         return false
       ensure
@@ -179,7 +179,7 @@ module CC
 
     def copy_all_to_zip
       Dir["#{@export_dir}/**/**"].each do |file|
-        file_path = file.sub(@export_dir + '/', '')
+        file_path = file.sub(@export_dir + "/", "")
         next if file_path.starts_with? ZIP_DIR
 
         @zip_file.add(file_path, file)
@@ -203,7 +203,7 @@ module CC
     end
 
     def create_zip_file
-      name = CanvasTextHelper.truncate_text(@course.name.to_url, { max_length: 200, ellipsis: '' })
+      name = CanvasTextHelper.truncate_text(@course.name.to_url, { max_length: 200, ellipsis: "" })
       @zip_name = if @qti_only_export
                     "#{name}-quiz-export.zip"
                   else

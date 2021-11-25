@@ -18,10 +18,10 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../api_spec_helper'
+require_relative "../api_spec_helper"
 
-describe 'Provisional Grades API', type: :request do
-  it_behaves_like 'a provisional grades status action', :provisional_grades
+describe "Provisional Grades API", type: :request do
+  it_behaves_like "a provisional grades status action", :provisional_grades
 
   describe "bulk_select" do
     let_once(:course) do
@@ -62,11 +62,11 @@ describe 'Provisional Grades API', type: :request do
     def bulk_select(provisional_grades, user = teacher)
       path = "/api/v1/courses/#{course.id}/assignments/#{assignment.id}/provisional_grades/bulk_select"
       params = {
-        action: 'bulk_select',
+        action: "bulk_select",
         assignment_id: assignment.to_param,
-        controller: 'provisional_grades',
+        controller: "provisional_grades",
         course_id: course.to_param,
-        format: 'json',
+        format: "json",
         provisional_grade_ids: provisional_grades.map(&:id)
       }
       api_call_as_user(user, :put, path, params)
@@ -99,7 +99,7 @@ describe 'Provisional Grades API', type: :request do
 
     it "returns json including the id of each selected provisional grade" do
       json = bulk_select(grades[0..1])
-      ids = json.map { |grade| grade['selected_provisional_grade_id'] }
+      ids = json.map { |grade| grade["selected_provisional_grade_id"] }
       expect(ids).to match_array(grades[0..1].map(&:id))
     end
 
@@ -138,7 +138,7 @@ describe 'Provisional Grades API', type: :request do
 
       it "excludes the already-selected provisional grade from the returned json" do
         json = bulk_select(grades[0..1])
-        ids = json.map { |grade| grade['selected_provisional_grade_id'] }
+        ids = json.map { |grade| grade["selected_provisional_grade_id"] }
         expect(ids).to match_array([grades[1].id])
       end
 
@@ -165,7 +165,7 @@ describe 'Provisional Grades API', type: :request do
 
       it "excludes the unrelated provisional grade from the returned json" do
         json = bulk_select(grades[0..1] + [other_grade])
-        ids = json.map { |grade| grade['selected_provisional_grade_id'] }
+        ids = json.map { |grade| grade["selected_provisional_grade_id"] }
         expect(ids).to match_array(grades[0..1].map(&:id))
       end
     end
@@ -174,11 +174,11 @@ describe 'Provisional Grades API', type: :request do
       invalid_id = ModeratedGrading::ProvisionalGrade.maximum(:id).next # ensure the id is not used
       invalid_grade = ModeratedGrading::ProvisionalGrade.new(id: invalid_id)
       json = bulk_select(grades[0..1] + [invalid_grade])
-      ids = json.map { |grade| grade['selected_provisional_grade_id'] }
+      ids = json.map { |grade| grade["selected_provisional_grade_id"] }
       expect(ids).to match_array(grades[0..1].map(&:id))
     end
 
-    it 'is unauthorized when the user is not the assigned final grader' do
+    it "is unauthorized when the user is not the assigned final grader" do
       assignment.update_attribute(:final_grader_id, nil)
       bulk_select(grades[0..1])
       assert_status(401)
@@ -190,7 +190,7 @@ describe 'Provisional Grades API', type: :request do
       assert_status(401)
     end
 
-    it 'is authorized when the user is the final grader' do
+    it "is authorized when the user is the final grader" do
       bulk_select(grades[0..1])
       assert_status(200)
     end
@@ -214,23 +214,23 @@ describe 'Provisional Grades API', type: :request do
       subs = @assignment.grade_student @student, grader: @ta, score: 0, provisional: true
       @pg = subs.first.provisional_grade(@ta)
       @path = "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/provisional_grades/#{@pg.id}/select"
-      @params = { controller: 'provisional_grades', action: 'select',
-                  format: 'json', course_id: @course.to_param, assignment_id: @assignment.to_param,
+      @params = { controller: "provisional_grades", action: "select",
+                  format: "json", course_id: @course.to_param, assignment_id: @assignment.to_param,
                   provisional_grade_id: @pg.to_param }
     end
 
     it "fails if the student isn't in the moderation set" do
       @assignment.moderated_grading_selections.destroy_all
       json = api_call_as_user(@teacher, :put, @path, @params, {}, {}, { expected_status: 400 })
-      expect(json['message']).to eq 'student not in moderation set'
+      expect(json["message"]).to eq "student not in moderation set"
     end
 
     it "selects a provisional grade" do
       json = api_call_as_user(@teacher, :put, @path, @params)
       expect(json).to eq({
-                           'assignment_id' => @assignment.id,
-                           'student_id' => @student.id,
-                           'selected_provisional_grade_id' => @pg.id
+                           "assignment_id" => @assignment.id,
+                           "student_id" => @student.id,
+                           "selected_provisional_grade_id" => @pg.id
                          })
       expect(@assignment.moderated_grading_selections.where(student_id: @student.id).first.provisional_grade).to eq(@pg)
     end
@@ -245,14 +245,14 @@ describe 'Provisional Grades API', type: :request do
       allow_any_instance_of(Assignment).to receive(:can_view_student_names?).and_return false
       json = api_call_as_user(@teacher, :put, @path, @params)
       expect(json).to eq({
-                           'assignment_id' => @assignment.id,
-                           'anonymous_id' => @pg.submission.anonymous_id,
-                           'selected_provisional_grade_id' => @pg.id
+                           "assignment_id" => @assignment.id,
+                           "anonymous_id" => @pg.submission.anonymous_id,
+                           "selected_provisional_grade_id" => @pg.id
                          })
       expect(@assignment.moderated_grading_selections.where(student_id: @student.id).first.provisional_grade).to eq(@pg)
     end
 
-    it_behaves_like 'authorization for provisional final grade selection', :put
+    it_behaves_like "authorization for provisional final grade selection", :put
   end
 
   describe "publish" do
@@ -262,14 +262,14 @@ describe 'Provisional Grades API', type: :request do
       course_with_ta course: @course, active_all: true
       @assignment = @course.assignments.create!
       @path = "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/provisional_grades/publish"
-      @params = { controller: 'provisional_grades', action: 'publish',
-                  format: 'json', course_id: @course.to_param, assignment_id: @assignment.to_param }
+      @params = { controller: "provisional_grades", action: "publish",
+                  format: "json", course_id: @course.to_param, assignment_id: @assignment.to_param }
     end
 
     it "requires a moderated assignment" do
       @assignment.update_attribute :final_grader_id, @teacher.id
       json = api_call_as_user(@teacher, :post, @path, @params, {}, {}, { expected_status: 400 })
-      expect(json['message']).to eq 'Assignment does not use moderated grading'
+      expect(json["message"]).to eq "Assignment does not use moderated grading"
     end
 
     context "with moderated assignment" do
@@ -286,7 +286,7 @@ describe 'Provisional Grades API', type: :request do
       it "requires manage_grades permissions" do
         @course.root_account.role_overrides.create!(
           permission: :manage_grades,
-          role: Role.find_by(name: 'TeacherEnrollment'),
+          role: Role.find_by(name: "TeacherEnrollment"),
           enabled: false
         )
         api_call_as_user(@teacher, :post, @path, @params, {}, {}, expected_status: 401)
@@ -295,24 +295,24 @@ describe 'Provisional Grades API', type: :request do
       it "fails if grades were already published" do
         @assignment.update_attribute :grades_published_at, Time.now.utc
         json = api_call_as_user(@teacher, :post, @path, @params, {}, {}, { expected_status: 400 })
-        expect(json['message']).to eq 'Assignment grades have already been published'
+        expect(json["message"]).to eq "Assignment grades have already been published"
       end
 
-      context 'with empty provisional grades (comments only)' do
+      context "with empty provisional grades (comments only)" do
         before(:once) do
           @submission = @assignment.submit_homework(@student, body: "hello")
-          @submission.add_comment(author: @ta, provisional: true, comment: 'A provisional comment')
+          @submission.add_comment(author: @ta, provisional: true, comment: "A provisional comment")
           @provisional_grade = @submission.provisional_grades.first
         end
 
-        it 'publishes an empty provisional grade for an active student' do
+        it "publishes an empty provisional grade for an active student" do
           api_call_as_user(@teacher, :post, @path, @params)
 
           expect(@assignment.reload.grades_published?).to be_truthy
           expect(@submission.reload.grade).to be_nil
         end
 
-        it 'publishes an empty provisional grade for a student with concluded enrollment' do
+        it "publishes an empty provisional grade for a student with concluded enrollment" do
           student_enrollment = @course.enrollments.find_by(user: @student)
           student_enrollment.conclude
 
@@ -322,7 +322,7 @@ describe 'Provisional Grades API', type: :request do
           expect(@submission.reload.grade).to be_nil
         end
 
-        it 'publishes an empty provisional grade for a student with an inactive enrollment' do
+        it "publishes an empty provisional grade for a student with an inactive enrollment" do
           student_enrollment = @course.enrollments.find_by(user: @student)
           student_enrollment.deactivate
 
@@ -340,13 +340,13 @@ describe 'Provisional Grades API', type: :request do
         end
 
         it "publishes provisional grades" do
-          expect(@submission.workflow_state).to eq 'submitted'
+          expect(@submission.workflow_state).to eq "submitted"
           expect(@submission.score).to be_nil
           expect(@student.messages).to be_empty
 
           api_call_as_user(@teacher, :post, @path, @params)
 
-          expect(@submission.reload.workflow_state).to eq 'graded'
+          expect(@submission.reload.workflow_state).to eq "graded"
           expect(@submission.grader).to eq @ta
           expect(@submission.score).to eq 100
 
@@ -360,7 +360,7 @@ describe 'Provisional Grades API', type: :request do
           sel = @assignment.moderated_grading_selections.find_by(student: @student)
 
           @other_ta = user_factory active_user: true
-          @course.enroll_ta @other_ta, enrollment_state: 'active'
+          @course.enroll_ta @other_ta, enrollment_state: "active"
           @assignment.grade_student(@student, { grader: @other_ta, score: 90, provisional: true })
 
           sel.selected_provisional_grade_id = @submission.provisional_grade(@other_ta).id
@@ -368,7 +368,7 @@ describe 'Provisional Grades API', type: :request do
 
           api_call_as_user(@teacher, :post, @path, @params)
 
-          expect(@submission.reload.workflow_state).to eq 'graded'
+          expect(@submission.reload.workflow_state).to eq "graded"
           expect(@submission.grader).to eq @other_ta
           expect(@submission.score).to eq 90
         end
@@ -478,7 +478,7 @@ describe 'Provisional Grades API', type: :request do
         end
       end
 
-      it_behaves_like 'authorization for provisional final grade selection', :post
+      it_behaves_like "authorization for provisional final grade selection", :post
     end
   end
 end

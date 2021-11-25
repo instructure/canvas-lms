@@ -36,7 +36,7 @@ module Api::V1::AuthenticationProvider
     end
 
     if aac.class.recognized_federated_attributes != []
-      result['federated_attributes'] = aac.federated_attributes_for_api
+      result["federated_attributes"] = aac.federated_attributes_for_api
     end
 
     # These settings were moved to the account settings level,

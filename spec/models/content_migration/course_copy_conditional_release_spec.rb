@@ -17,8 +17,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../../conditional_release_spec_helper'
-require_relative 'course_copy_helper'
+require_relative "../../conditional_release_spec_helper"
+require_relative "course_copy_helper"
 
 describe ContentMigration do
   context "course copy with native conditional release data" do

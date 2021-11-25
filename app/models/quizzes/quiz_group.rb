@@ -20,13 +20,13 @@
 
 class Quizzes::QuizGroup < ActiveRecord::Base
   extend RootAccountResolver
-  self.table_name = 'quiz_groups'
+  self.table_name = "quiz_groups"
 
   attr_readonly :quiz_id
 
-  belongs_to :quiz, class_name: 'Quizzes::Quiz'
+  belongs_to :quiz, class_name: "Quizzes::Quiz"
   belongs_to :assessment_question_bank
-  has_many :quiz_questions, class_name: 'Quizzes::QuizQuestion', dependent: :destroy
+  has_many :quiz_questions, class_name: "Quizzes::QuizQuestion", dependent: :destroy
 
   validates :quiz_id, presence: true
   validates :name, length: { maximum: maximum_string_length, allow_nil: true }

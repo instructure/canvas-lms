@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'canvas_http'
+require "canvas_http"
 
 module CanvasPandaPub
   class << self
@@ -37,8 +37,8 @@ module CanvasPandaPub
       @process_interval.call
     end
 
-    require 'canvas_panda_pub/async_worker'
-    require 'canvas_panda_pub/client'
+    require "canvas_panda_pub/async_worker"
+    require "canvas_panda_pub/client"
 
     # Returns true if PandaPub is currently enabled.
 

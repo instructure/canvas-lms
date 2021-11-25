@@ -146,7 +146,7 @@ class ConferencesController < ApplicationController
   before_action :require_context, except: :for_user
   skip_before_action :load_user, only: [:recording_ready]
 
-  add_crumb(proc { t '#crumbs.conferences', "Conferences" }) do |c|
+  add_crumb(proc { t "#crumbs.conferences", "Conferences" }) do |c|
     if c.context.present?
       c.send(:named_context_url, c.context, :context_conferences_url)
     end
@@ -255,8 +255,8 @@ class ConferencesController < ApplicationController
     groups_collection = BookmarkedCollection.wrap(UserConferencesBookmarker, groups_collection) if groups_collection.is_a?(ActiveRecord::Relation)
 
     merged_collection = BookmarkedCollection.merge(
-      ['courses', courses_collection],
-      ['groups', groups_collection]
+      ["courses", courses_collection],
+      ["groups", groups_collection]
     )
 
     results_page = Api.paginate(merged_collection, self, api_v1_conferences_url)
@@ -320,7 +320,7 @@ class ConferencesController < ApplicationController
       render_alternatives: @render_alternatives
     )
     set_tutorial_js_env
-    flash[:error] = t('Some conferences on this page are hidden because of errors while retrieving their status') if @errors
+    flash[:error] = t("Some conferences on this page are hidden because of errors while retrieving their status") if @errors
   end
   protected :web_index
 
@@ -394,7 +394,7 @@ class ConferencesController < ApplicationController
       if @conference.grants_right?(@current_user, session, :initiate) || @conference.grants_right?(@current_user, session, :resume) || @conference.active?(true)
         @conference.add_attendee(@current_user)
         @conference.restart if @conference.ended_at && @conference.grants_right?(@current_user, session, :initiate)
-        log_asset_access(@conference, "conferences", "conferences", 'participate')
+        log_asset_access(@conference, "conferences", "conferences", "participate")
         if (url = @conference.craft_url(@current_user, session, named_context_url(@context, :context_url, include_host: true)))
           redirect_to url
         else
@@ -430,7 +430,7 @@ class ConferencesController < ApplicationController
   def close
     if authorized_action(@conference, @current_user, :close)
       unless @conference.active?
-        return render json: { message: 'conference is not active', status: :bad_request }
+        return render json: { message: "conference is not active", status: :bad_request }
       end
 
       if @conference.close
@@ -490,19 +490,19 @@ class ConferencesController < ApplicationController
 
   def require_config
     unless WebConference.config(context: @context)
-      flash[:error] = t('#conferences.disabled_error', "Web conferencing has not been enabled for this Canvas site")
+      flash[:error] = t("#conferences.disabled_error", "Web conferencing has not been enabled for this Canvas site")
       redirect_to named_context_url(@context, :context_url)
     end
   end
 
   def member_ids
     ids = [@current_user.id]
-    if params[:observers] && params[:observers][:remove] == '1'
+    if params[:observers] && params[:observers][:remove] == "1"
       ids += @context.user_ids - @context.observers.pluck(:id)
-    elsif params[:user] && params[:user][:all] != '1'
+    elsif params[:user] && params[:user][:all] != "1"
       ids = []
       params[:user].each do |id, val|
-        ids << id.to_i if val == '1'
+        ids << id.to_i if val == "1"
       end
     else
       ids = @context.user_ids

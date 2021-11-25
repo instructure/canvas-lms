@@ -17,8 +17,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../common'
-require_relative '../helpers/eportfolios_common'
+require_relative "../common"
+require_relative "../helpers/eportfolios_common"
 
 describe "add content box" do
   include_context "in-process server selenium tests"
@@ -27,7 +27,7 @@ describe "add content box" do
   before do
     course_with_student_logged_in
     stub_rcs_config
-    @assignment = @course.assignments.create(name: 'new assignment')
+    @assignment = @course.assignments.create(name: "new assignment")
     @assignment.submit_homework(@student)
     attachment_model(context: @student)
     eportfolio_model({ user: @user, name: "student content" })
@@ -60,26 +60,26 @@ describe "add content box" do
   end
 
   it "adds a user file" do
-    skip('this only worked with the legacy editor. make it work w/ canvas-rce CORE-2714')
-    expect(f('.add_file_link')).to be_displayed
-    f('.add_file_link').click
+    skip("this only worked with the legacy editor. make it work w/ canvas-rce CORE-2714")
+    expect(f(".add_file_link")).to be_displayed
+    f(".add_file_link").click
     wait_for_ajaximations
-    fj('.file_list:visible .sign:visible').click
+    fj(".file_list:visible .sign:visible").click
     wait_for_ajaximations # my files
-    file = fj('li.file .text:visible')
+    file = fj("li.file .text:visible")
     expect(file).to include_text @attachment.filename
     wait_for_ajaximations
     file.click
-    f('.upload_file_button').click
+    f(".upload_file_button").click
     wait_for_ajaximations
-    download = fj('.eportfolio_download:visible')
+    download = fj(".eportfolio_download:visible")
     expect(download).to be_present
     expect(download).to include_text @attachment.filename
-    submit_form('.form_content')
+    submit_form(".form_content")
     wait_for_ajaximations
-    expect(f('.section.read_only')).to include_text @attachment.filename
+    expect(f(".section.read_only")).to include_text @attachment.filename
     refresh_page
-    expect(f('.section.read_only')).to include_text @attachment.filename
+    expect(f(".section.read_only")).to include_text @attachment.filename
   end
 
   context "adding html content" do

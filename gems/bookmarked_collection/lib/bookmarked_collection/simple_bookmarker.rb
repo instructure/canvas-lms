@@ -151,18 +151,18 @@ module BookmarkedCollection
     def order_by
       @order_by ||= {}
       locale = defined?(Canvas::ICU) ? Canvas::ICU.locale_for_collation : :default
-      @order_by[locale] ||= Arel.sql(columns.map { |col| column_order(col) }.join(', '))
+      @order_by[locale] ||= Arel.sql(columns.map { |col| column_order(col) }.join(", "))
     end
 
     def column_order(col_name)
       order = column_comparand(col_name)
       if column_definitions[col_name][:null]
-        order = "#{column_comparand(col_name, '=')} IS NULL, #{order}"
+        order = "#{column_comparand(col_name, "=")} IS NULL, #{order}"
       end
       order
     end
 
-    def column_comparand(col_name, comparator = '>', placeholder = nil)
+    def column_comparand(col_name, comparator = ">", placeholder = nil)
       definition = column_definitions[col_name]
       col_name = placeholder ||
                  (definition[:custom] ? col_name : "#{@model.table_name}.#{col_name}")
@@ -181,14 +181,14 @@ module BookmarkedCollection
       elsif value.nil?
         # likewise only NULL values in column satisfy 'column = NULL' and
         # 'column >= NULL'
-        ["#{column_comparand(column, '=')} IS NULL"]
+        ["#{column_comparand(column, "=")} IS NULL"]
       else
-        sql = "#{column_comparand(column, comparator)} #{comparator} #{column_comparand(column, comparator, '?')}"
-        if column_definitions[column][:null] && comparator != '='
+        sql = "#{column_comparand(column, comparator)} #{comparator} #{column_comparand(column, comparator, "?")}"
+        if column_definitions[column][:null] && comparator != "="
           # our sort order wants "NULL > ?" to be universally true for non-NULL
           # values (we already handle NULL values above). but it is false in
           # SQL, so we need to include "column IS NULL" with > or >=
-          sql = "(#{sql} OR #{column_comparand(column, '=')} IS NULL)"
+          sql = "(#{sql} OR #{column_comparand(column, "=")} IS NULL)"
         end
         [sql, value]
       end

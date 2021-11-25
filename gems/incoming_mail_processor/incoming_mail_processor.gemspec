@@ -5,7 +5,7 @@ Gem::Specification.new do |spec|
   spec.version       = "0.0.1"
   spec.authors       = ["Jon Willesen"]
   spec.email         = ["jonw@instructure.com"]
-  spec.summary       = 'Read mail from IMAP inbox and process it.'
+  spec.summary       = "Read mail from IMAP inbox and process it."
 
   spec.files         = Dir.glob("{lib,spec}/**/*") + %w[test.sh]
   spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
@@ -24,5 +24,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "bundler", "~> 2.2"
   spec.add_development_dependency "byebug"
   spec.add_development_dependency "rspec", "~> 3.5.0"
-  spec.add_development_dependency 'timecop'
+  spec.add_development_dependency "timecop"
 end

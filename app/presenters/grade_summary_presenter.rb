@@ -23,7 +23,7 @@ class GradeSummaryPresenter
 
   class << self
     def cache_key(context, method)
-      ['grade_summary_presenter', context, method].cache_key
+      ["grade_summary_presenter", context, method].cache_key
     end
   end
 
@@ -179,11 +179,11 @@ class GradeSummaryPresenter
   end
 
   def sort_options
-    options = [[I18n.t('Due Date'), 'due_at'], [I18n.t('Name'), 'title']]
+    options = [[I18n.t("Due Date"), "due_at"], [I18n.t("Name"), "title"]]
     if @context.active_record_types[:assignments] && assignments.uniq(&:assignment_group_id).length > 1
-      options << [I18n.t('Assignment Group'), 'assignment_group']
+      options << [I18n.t("Assignment Group"), "assignment_group"]
     end
-    options << [I18n.t('Module'), 'module'] if @context.active_record_types[:modules]
+    options << [I18n.t("Module"), "module"] if @context.active_record_types[:modules]
     Canvas::ICU.collate_by(options, &:first)
   end
 

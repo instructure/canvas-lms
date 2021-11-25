@@ -119,12 +119,12 @@ module DataFixup::RebuildQuizSubmissionsFromQuizSubmissionEvents
         tally += (user_answer[:points] || 0) if user_answer[:correct]
       end
       qs.score = tally
-      qs.score = qs.quiz.points_possible if qs.quiz && qs.quiz.quiz_type == 'graded_survey'
+      qs.score = qs.quiz.points_possible if qs.quiz && qs.quiz.quiz_type == "graded_survey"
       qs.submission_data = user_answers
       qs.workflow_state = "complete"
       user_answers.each do |answer|
         if answer[:correct] == "undefined" && !qs.quiz.survey?
-          qs.workflow_state = 'pending_review'
+          qs.workflow_state = "pending_review"
         end
       end
       qs.score_before_regrade = nil

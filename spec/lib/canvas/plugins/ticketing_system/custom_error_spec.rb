@@ -27,7 +27,7 @@ module Canvas::Plugins::TicketingSystem
     describe "#to_document" do
       it "translates an error_report to a json-able hash" do
         expect(delegate.to_document).to eq({ subject: nil, description: nil,
-                                             report_type: "ERROR", error_message: nil, perceived_severity: '',
+                                             report_type: "ERROR", error_message: nil, perceived_severity: "",
                                              account_id: nil, account_domain: nil, report_origin_url: nil,
                                              reporter: { canvas_id: "", email: "unknown-unknowndomain-example-com@instructure.example.com",
                                                          name: "Unknown User", role: nil, become_user_uri: nil, environment: nil },
@@ -39,7 +39,7 @@ module Canvas::Plugins::TicketingSystem
       let(:asset_manager) { double }
 
       it "prefixes the account_id with subaccount" do
-        report.data['context_asset_string'] = "42"
+        report.data["context_asset_string"] = "42"
         context = double(account_id: "123")
         allow(asset_manager).to receive(:find_by_asset_string).with("42").and_return(context)
         expect(delegate.sub_account_tag(asset_manager, context.class))
@@ -49,7 +49,7 @@ module Canvas::Plugins::TicketingSystem
       # since Course is the expected type, we just need to NOT send
       # a type override
       it "returns nil if the context isnt the expected type" do
-        report.data['context_asset_string'] = "42"
+        report.data["context_asset_string"] = "42"
         context = double(account_id: "123")
         allow(asset_manager).to receive(:find_by_asset_string).with("42").and_return(context)
         expect(delegate.sub_account_tag(asset_manager)).to be_nil
@@ -79,7 +79,7 @@ module Canvas::Plugins::TicketingSystem
 
     describe "#user_severity" do
       it "passes through the data value" do
-        report.data['user_perceived_severity'] = "bad"
+        report.data["user_perceived_severity"] = "bad"
         expect(delegate.user_severity).to eq("bad")
       end
 
@@ -91,7 +91,7 @@ module Canvas::Plugins::TicketingSystem
 
     describe "#user_roles" do
       it "passes through the data value" do
-        report.data['user_roles'] = "teacher"
+        report.data["user_roles"] = "teacher"
         expect(delegate.user_roles).to eq("teacher")
       end
 

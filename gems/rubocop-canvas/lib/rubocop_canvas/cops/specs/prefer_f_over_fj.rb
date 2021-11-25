@@ -24,8 +24,8 @@ module RuboCop
         include RuboCop::Cop::Consts::JQuerySelectors
 
         SUSPECT_METHOD_NAMES = {
-          fj: 'f',
-          ffj: 'ff'
+          fj: "f",
+          ffj: "ff"
         }.freeze
 
         def on_send(node)

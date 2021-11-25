@@ -20,8 +20,8 @@
 
 describe NotificationPreferencesController do
   before :once do
-    @sms_notification = Notification.create!(name: 'Confirm SMS Communication Channel', category: 'Registration')
-    @discussion_entry_notification = Notification.create!(name: 'New Discussion Entry', category: 'DiscussionEntry')
+    @sms_notification = Notification.create!(name: "Confirm SMS Communication Channel", category: "Registration")
+    @discussion_entry_notification = Notification.create!(name: "New Discussion Entry", category: "DiscussionEntry")
     user_model
     communication_channel_model
     NotificationPolicy.setup_with_default_policies(@user)
@@ -31,21 +31,21 @@ describe NotificationPreferencesController do
     user_session @user
   end
 
-  describe 'update_preferences_by_category' do
-    it 'works for discussionentry' do
+  describe "update_preferences_by_category" do
+    it "works for discussionentry" do
       put :update_preferences_by_category, params: {
-        communication_channel_id: @cc.id, category: 'registration', notification_preferences: { frequency: 'never' }
+        communication_channel_id: @cc.id, category: "registration", notification_preferences: { frequency: "never" }
       }
-      expect(@cc.notification_policies.where(notification: @sms_notification).first.frequency).to eq 'never'
+      expect(@cc.notification_policies.where(notification: @sms_notification).first.frequency).to eq "never"
     end
 
-    it 'works for registration' do
+    it "works for registration" do
       put :update_preferences_by_category, params: {
-        communication_channel_id: @cc.id, category: 'discussionentry', notification_preferences: { frequency: 'never' }
+        communication_channel_id: @cc.id, category: "discussionentry", notification_preferences: { frequency: "never" }
       }
       expect(
         @cc.notification_policies.where(notification: @discussion_entry_notification).first.frequency
-      ).to eq 'never'
+      ).to eq "never"
     end
   end
 end

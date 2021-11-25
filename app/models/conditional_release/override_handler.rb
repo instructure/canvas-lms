@@ -29,7 +29,7 @@ module ConditionalRelease
 
         set_assignment_overrides(submission.user_id, sets_to_assign, sets_to_unassign)
         ConditionalRelease::AssignmentSetAction.create_from_sets(sets_to_assign, sets_to_unassign,
-                                                                 student_id: submission.user_id, actor_id: submission.grader_id, source: 'grade_change')
+                                                                 student_id: submission.user_id, actor_id: submission.grader_id, source: "grade_change")
       end
 
       def handle_assignment_set_selection(student, trigger_assignment, assignment_set_id)
@@ -46,7 +46,7 @@ module ConditionalRelease
 
         set_assignment_overrides(submission.user_id, [assignment_set], sets_to_unassign)
         ConditionalRelease::AssignmentSetAction.create_from_sets([assignment_set], sets_to_unassign,
-                                                                 student_id: submission.user_id, source: 'select_assignment_set')
+                                                                 student_id: submission.user_id, source: "select_assignment_set")
         assignment_set.assignment_set_associations.map(&:assignment_id)
       end
 
@@ -73,7 +73,7 @@ module ConditionalRelease
         assignments_to_unassign = assignments_for_sets(sets_to_unassign) - assignments_to_assign # don't unassign anything we're trying to assign to
 
         existing_overrides = AssignmentOverride.active
-                                               .where(assignment_id: assignments_to_assign + assignments_to_unassign, set_type: 'ADHOC').to_a
+                                               .where(assignment_id: assignments_to_assign + assignments_to_unassign, set_type: "ADHOC").to_a
         ActiveRecord::Associations::Preloader.new.preload(existing_overrides, :assignment_override_students,
                                                           AssignmentOverrideStudent.where(user_id: student_id)) # only care about records for this student
         existing_overrides_map = existing_overrides.group_by(&:assignment_id)
@@ -89,7 +89,7 @@ module ConditionalRelease
           else
             # have to create an override
             new_override = to_assign.assignment_overrides.create!(
-              set_type: 'ADHOC',
+              set_type: "ADHOC",
               assignment_override_students: [
                 AssignmentOverrideStudent.new(assignment: to_assign, user_id: student_id, no_enrollment: false)
               ]

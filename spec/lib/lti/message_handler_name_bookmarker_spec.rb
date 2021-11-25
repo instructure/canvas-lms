@@ -18,15 +18,15 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../../spec_helper'
-require_relative '../../lti_spec_helper'
-require_relative 'name_bookmarker_base_shared_examples'
+require_relative "../../spec_helper"
+require_relative "../../lti_spec_helper"
+require_relative "name_bookmarker_base_shared_examples"
 
 describe Lti::MessageHandlerNameBookmarker do
-  include_context 'name_bookmarker_base_shared_examples'
+  include_context "name_bookmarker_base_shared_examples"
   include LtiSpecHelper
 
-  it_behaves_like 'a bookmarker for models with names' do
+  it_behaves_like "a bookmarker for models with names" do
     let(:model_factory_proc) do
       lambda do |account, model_name|
         rh = create_resource_handler(create_tool_proxy(context: account), name: model_name)

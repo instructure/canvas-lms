@@ -65,7 +65,7 @@ module BroadcastPolicy
     # For 99% of broadcasts this will not change anything.
     def self.slice_size
       if defined?(Setting)
-        Setting.get('broadcast_policy_slice_size', 500).to_i
+        Setting.get("broadcast_policy_slice_size", 500).to_i
       else
         500
       end

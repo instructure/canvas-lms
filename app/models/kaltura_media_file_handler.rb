@@ -31,7 +31,7 @@ class KalturaMediaFileHandler
       files << {
         name: attachment.display_name,
         url: attachment.public_download_url,
-        media_type: attachment.content_type&.start_with?('video') ? 'video' : 'audio',
+        media_type: attachment.content_type&.start_with?("video") ? "video" : "audio",
         partner_data: build_partner_data(attachment)
       }
     end
@@ -73,7 +73,7 @@ class KalturaMediaFileHandler
         bulk_upload_id = res[:id]
         Rails.logger.debug "waiting for bulk upload id: #{bulk_upload_id}"
         started_at = Time.now
-        timeout = Setting.get('media_bulk_upload_timeout', 30.minutes.to_s).to_i
+        timeout = Setting.get("media_bulk_upload_timeout", 30.minutes.to_s).to_i
         until res[:ready]
           if Time.now > started_at + timeout
             refresh_later(res[:id], attachments, root_account_id)
@@ -100,6 +100,6 @@ class KalturaMediaFileHandler
   end
 
   def send_sis_data_to_kaltura?
-    CanvasKaltura::ClientV3.config['kaltura_sis'] == "1"
+    CanvasKaltura::ClientV3.config["kaltura_sis"] == "1"
   end
 end

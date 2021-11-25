@@ -54,7 +54,7 @@ describe Group do
     expect(@group.reload.is_public).to be_truthy
   end
 
-  it 'delegates time_zone through to its context' do
+  it "delegates time_zone through to its context" do
     zone = ActiveSupport::TimeZone["America/Denver"]
     @course.time_zone = zone
     expect(@group.time_zone.to_s).to match(/Mountain Time/)
@@ -109,21 +109,21 @@ describe Group do
     end
   end
 
-  describe '#grading_standard_or_default' do
-    context 'when the Group belongs to a Course' do
-      it 'returns the grading scheme being used by the course, if one exists' do
+  describe "#grading_standard_or_default" do
+    context "when the Group belongs to a Course" do
+      it "returns the grading scheme being used by the course, if one exists" do
         standard = grading_standard_for(@course)
         @course.update!(default_grading_standard: standard)
         expect(@group.grading_standard_or_default).to be standard
       end
 
-      it 'returns the Canvas default grading scheme if the course is not using a grading scheme' do
+      it "returns the Canvas default grading scheme if the course is not using a grading scheme" do
         expect(@group.grading_standard_or_default.data).to eq GradingStandard.default_grading_standard
       end
     end
 
-    context 'Group belonging to an Account' do
-      it 'returns the Canvas default grading scheme' do
+    context "Group belonging to an Account" do
+      it "returns the Canvas default grading scheme" do
         group = group_model(context: Account.default)
         expect(group.grading_standard_or_default.data).to eq GradingStandard.default_grading_standard
       end
@@ -157,8 +157,8 @@ describe Group do
 
   context "atom" do
     it "has an atom name as it's own name" do
-      group_model(name: 'some unique name')
-      expect(@group.to_atom.title).to eql('some unique name')
+      group_model(name: "some unique name")
+      expect(@group.to_atom.title).to eql("some unique name")
     end
 
     it "has a link to itself" do
@@ -207,9 +207,9 @@ describe Group do
       @communities = GroupCategory.communities_for(Account.default)
       user_model
       {
-        'invitation_only' => 'invited',
-        'parent_context_request' => 'requested',
-        'parent_context_auto_join' => 'accepted'
+        "invitation_only" => "invited",
+        "parent_context_request" => "requested",
+        "parent_context_auto_join" => "accepted"
       }.each do |join_level, workflow_state|
         group = group_model(join_level: join_level, group_category: @communities)
         group.add_user(@user)
@@ -231,7 +231,7 @@ describe Group do
 
     it "allows specifying that the user should be a moderator" do
       user_model
-      @membership = @group.add_user(@user, 'accepted', true)
+      @membership = @group.add_user(@user, "accepted", true)
       expect(@membership.moderator).to eq true
     end
 
@@ -240,9 +240,9 @@ describe Group do
       @group.group_category = @communities
       @group.save!
       user_model
-      @group.add_user(@user, 'accepted')
-      @membership = @group.add_user(@user, 'requested')
-      expect(@membership.workflow_state).to eq 'accepted'
+      @group.add_user(@user, "accepted")
+      @membership = @group.add_user(@user, "requested")
+      expect(@membership.workflow_state).to eq "accepted"
     end
   end
 
@@ -264,7 +264,7 @@ describe Group do
     expect(attachment.grants_right?(teacher, :create)).to be_truthy
   end
 
-  context 'with granular permissions enabled' do
+  context "with granular permissions enabled" do
     before do
       @course.root_account.enable_feature!(:granular_permissions_manage_groups)
     end
@@ -339,12 +339,12 @@ describe Group do
     expect(group.grants_right?(@student, :read_roster)).to be_falsey
 
     # join_level allows requesting group membership
-    group = @course.groups.create(join_level: 'parent_context_request')
+    group = @course.groups.create(join_level: "parent_context_request")
     expect(group.grants_right?(@student, :read_roster)).to be_truthy
 
     # category is self-signup
-    category = @course.group_categories.build(name: 'category name')
-    category.self_signup = 'enabled'
+    category = @course.group_categories.build(name: "category name")
+    category.self_signup = "enabled"
     category.save
     group = @course.groups.create(group_category: category)
     expect(group.grants_right?(@student, :read_roster)).to be_truthy
@@ -358,7 +358,7 @@ describe Group do
       expect(group.root_account).to eq Account.default
 
       new_root_acct = account_model
-      new_sub_acct = new_root_acct.sub_accounts.create!(name: 'sub acct')
+      new_sub_acct = new_root_acct.sub_accounts.create!(name: "sub acct")
       group.context = new_sub_acct
       group.save!
       expect(group.account).to eq new_sub_acct
@@ -371,9 +371,9 @@ describe Group do
       course_with_student
 
       group_category = GroupCategory.student_organized_for(@course)
-      group1 = @course.groups.create(group_category: group_category, join_level: 'parent_context_auto_join')
-      group2 = @course.groups.create(group_category: group_category, join_level: 'parent_context_request')
-      group3 = @course.groups.create(group_category: group_category, join_level: 'invitation_only')
+      group1 = @course.groups.create(group_category: group_category, join_level: "parent_context_auto_join")
+      group2 = @course.groups.create(group_category: group_category, join_level: "parent_context_request")
+      group3 = @course.groups.create(group_category: group_category, join_level: "invitation_only")
       expect([group1, group2, group3].map(&:auto_accept?)).to eq [true, false, false]
     end
 
@@ -381,7 +381,7 @@ describe Group do
       course_with_student
       @account = @course.root_account
 
-      jl = 'parent_context_auto_join'
+      jl = "parent_context_auto_join"
       group1 = @course.groups.create(group_category: @course.group_categories.create(name: "random category"), join_level: jl)
       group2 = @course.groups.create(group_category: GroupCategory.student_organized_for(@course), join_level: jl)
       group3 = @account.groups.create(group_category: GroupCategory.communities_for(@account), join_level: jl)
@@ -394,9 +394,9 @@ describe Group do
       course_with_student
 
       group_category = GroupCategory.student_organized_for(@course)
-      group1 = @course.groups.create(group_category: group_category, join_level: 'parent_context_auto_join')
-      group2 = @course.groups.create(group_category: group_category, join_level: 'parent_context_request')
-      group3 = @course.groups.create(group_category: group_category, join_level: 'invitation_only')
+      group1 = @course.groups.create(group_category: group_category, join_level: "parent_context_auto_join")
+      group2 = @course.groups.create(group_category: group_category, join_level: "parent_context_request")
+      group3 = @course.groups.create(group_category: group_category, join_level: "invitation_only")
       expect([group1, group2, group3].map(&:allow_join_request?)).to eq [true, true, false]
     end
 
@@ -404,7 +404,7 @@ describe Group do
       course_with_student
       @account = @course.root_account
 
-      jl = 'parent_context_auto_join'
+      jl = "parent_context_auto_join"
       group1 = @course.groups.create(group_category: @course.group_categories.create(name: "random category"), join_level: jl)
       group2 = @course.groups.create(group_category: GroupCategory.student_organized_for(@course), join_level: jl)
       group3 = @account.groups.create(group_category: GroupCategory.communities_for(@account), join_level: jl)
@@ -451,25 +451,25 @@ describe Group do
 
   context "#full?" do
     it "returns true when category group_limit has been met" do
-      @group.group_category = @course.group_categories.build(name: 'foo')
+      @group.group_category = @course.group_categories.build(name: "foo")
       @group.group_category.group_limit = 1
-      @group.add_user user_model, 'accepted'
+      @group.add_user user_model, "accepted"
       expect(@group).to be_full
     end
 
     it "returns true when max_membership has been met" do
-      @group.group_category = @course.group_categories.build(name: 'foo')
+      @group.group_category = @course.group_categories.build(name: "foo")
       @group.group_category.group_limit = 0
       @group.max_membership = 1
-      @group.add_user user_model, 'accepted'
+      @group.add_user user_model, "accepted"
       expect(@group).to be_full
     end
 
     it "returns false when max_membership has not been met" do
-      @group.group_category = @course.group_categories.build(name: 'foo')
+      @group.group_category = @course.group_categories.build(name: "foo")
       @group.group_category.group_limit = 0
       @group.max_membership = 2
-      @group.add_user user_model, 'accepted'
+      @group.add_user user_model, "accepted"
       expect(@group).not_to be_full
     end
 
@@ -477,9 +477,9 @@ describe Group do
       # no category
       expect(@group).not_to be_full
       # not full
-      @group.group_category = @course.group_categories.build(name: 'foo')
+      @group.group_category = @course.group_categories.build(name: "foo")
       @group.group_category.group_limit = 2
-      @group.add_user user_model, 'accepted'
+      @group.add_user user_model, "accepted"
       expect(@group).not_to be_full
     end
   end
@@ -492,11 +492,11 @@ describe Group do
       @user4 = user_model
       @user5 = user_model
 
-      @group.add_user(@user1, 'accepted')
-      @group.add_user(@user2, 'accepted')
-      @group.add_user(@user3, 'invited')
-      @group.add_user(@user4, 'requested')
-      @group.add_user(@user5, 'rejected')
+      @group.add_user(@user1, "accepted")
+      @group.add_user(@user2, "accepted")
+      @group.add_user(@user3, "invited")
+      @group.add_user(@user4, "requested")
+      @group.add_user(@user5, "rejected")
       GroupMembership.where(group_id: @group, user_id: @user2).update_all(moderator: true)
 
       expect(@group.has_member?(@user1)).to be_truthy
@@ -515,11 +515,11 @@ describe Group do
       @user4 = user_model
       @user5 = user_model
 
-      @group.add_user(@user1, 'accepted')
-      @group.add_user(@user2, 'accepted')
-      @group.add_user(@user3, 'invited')
-      @group.add_user(@user4, 'requested')
-      @group.add_user(@user5, 'rejected')
+      @group.add_user(@user1, "accepted")
+      @group.add_user(@user2, "accepted")
+      @group.add_user(@user3, "invited")
+      @group.add_user(@user4, "requested")
+      @group.add_user(@user5, "rejected")
       GroupMembership.where(group_id: @group, user_id: [@user2, @user3, @user4, @user5]).update_all(moderator: true)
 
       expect(@group.has_moderator?(@user1)).to be_falsey
@@ -563,7 +563,7 @@ describe Group do
 
       group_category = GroupCategory.student_organized_for(@course)
 
-      group = @course.groups.create!(group_category: group_category, join_level: 'parent_context_auto_join')
+      group = @course.groups.create!(group_category: group_category, join_level: "parent_context_auto_join")
       gm = group.request_user(@student)
       expect(gm).to be_accepted
     end
@@ -613,8 +613,8 @@ describe Group do
       course_with_teacher(active_all: true)
       section1 = @course.course_sections.create
       section2 = @course.course_sections.create
-      user1 = section1.enroll_user(user_model, 'StudentEnrollment').user
-      user2 = section2.enroll_user(user_model, 'StudentEnrollment').user
+      user1 = section1.enroll_user(user_model, "StudentEnrollment").user
+      user2 = section2.enroll_user(user_model, "StudentEnrollment").user
       group = @course.groups.create
       group.add_user(user1)
       group.add_user(user2)
@@ -624,8 +624,8 @@ describe Group do
     it "is true if all members group have a section in common" do
       course_with_teacher(active_all: true)
       section1 = @course.course_sections.create
-      user1 = section1.enroll_user(user_model, 'StudentEnrollment').user
-      user2 = section1.enroll_user(user_model, 'StudentEnrollment').user
+      user1 = section1.enroll_user(user_model, "StudentEnrollment").user
+      user2 = section1.enroll_user(user_model, "StudentEnrollment").user
       group = @course.groups.create
       group.add_user(user1)
       group.add_user(user2)
@@ -644,8 +644,8 @@ describe Group do
       course_with_teacher(active_all: true)
       section1 = @course.course_sections.create
       section2 = @course.course_sections.create
-      user1 = section1.enroll_user(user_model, 'StudentEnrollment').user
-      user2 = section2.enroll_user(user_model, 'StudentEnrollment').user
+      user1 = section1.enroll_user(user_model, "StudentEnrollment").user
+      user2 = section2.enroll_user(user_model, "StudentEnrollment").user
       group = @course.groups.create
       group.add_user(user1)
       expect(group).not_to have_common_section_with_user(user2)
@@ -654,8 +654,8 @@ describe Group do
     it "is true if all members group have a section in common with the new user" do
       course_with_teacher(active_all: true)
       section1 = @course.course_sections.create
-      user1 = section1.enroll_user(user_model, 'StudentEnrollment').user
-      user2 = section1.enroll_user(user_model, 'StudentEnrollment').user
+      user1 = section1.enroll_user(user_model, "StudentEnrollment").user
+      user2 = section1.enroll_user(user_model, "StudentEnrollment").user
       group = @course.groups.create
       group.add_user(user1)
       expect(group).to have_common_section_with_user(user2)
@@ -664,12 +664,12 @@ describe Group do
     it "is true if one member is inactive" do
       course_with_teacher(active_all: true)
       section1 = @course.course_sections.create
-      user1 = section1.enroll_user(user_model, 'StudentEnrollment').user
-      user2 = section1.enroll_user(user_model, 'StudentEnrollment').user
+      user1 = section1.enroll_user(user_model, "StudentEnrollment").user
+      user2 = section1.enroll_user(user_model, "StudentEnrollment").user
       group = @course.groups.create
       group.add_user(user1)
       e = Enrollment.where(user_id: user1.id, course_id: @course.id)
-      e.update(workflow_state: 'inactive')
+      e.update(workflow_state: "inactive")
       group.add_user(user2)
       expect(group).to have_common_section_with_user(user2)
     end
@@ -677,11 +677,11 @@ describe Group do
     it "is true if one member is completed" do
       course_with_teacher(active_all: true)
       section1 = @course.course_sections.create
-      user1 = section1.enroll_user(user_model, 'StudentEnrollment').user
-      user2 = section1.enroll_user(user_model, 'StudentEnrollment').user
+      user1 = section1.enroll_user(user_model, "StudentEnrollment").user
+      user2 = section1.enroll_user(user_model, "StudentEnrollment").user
       group = @course.groups.create
       group.add_user(user1)
-      Enrollment.where(user_id: user1.id, course_id: @course.id).update(workflow_state: 'completed')
+      Enrollment.where(user_id: user1.id, course_id: @course.id).update(workflow_state: "completed")
       group.add_user(user2)
       expect(group).to have_common_section_with_user(user2)
     end
@@ -695,8 +695,8 @@ describe Group do
       @group.users << @student = student_in_course(course: @course).user
     end
 
-    describe 'TAB_CONFERENCES' do
-      context 'when WebConferences are enabled' do
+    describe "TAB_CONFERENCES" do
+      context "when WebConferences are enabled" do
         before do
           allow(WebConference).to receive(:plugins).and_return(
             [
@@ -707,16 +707,16 @@ describe Group do
           )
         end
 
-        it 'returns the plugin names' do
+        it "returns the plugin names" do
           tabs = @group.tabs_available(@user)
-          expect(tabs.find { |t| t[:css_class] == 'conferences' }[:label]).to eq("Big blue button Wimba (Conferences)")
+          expect(tabs.find { |t| t[:css_class] == "conferences" }[:label]).to eq("Big blue button Wimba (Conferences)")
         end
       end
 
-      context 'when WebConferences are not enabled' do
+      context "when WebConferences are not enabled" do
         it "returns Conferences" do
           tabs = @group.tabs_available(@user)
-          expect(tabs.find { |t| t[:css_class] == 'conferences' }[:label]).to eq("Conferences")
+          expect(tabs.find { |t| t[:css_class] == "conferences" }[:label]).to eq("Conferences")
         end
       end
     end
@@ -793,7 +793,7 @@ describe Group do
 
   describe "#update_max_membership_from_group_category" do
     it "sets max_membership if there is a group category" do
-      @group.group_category = @course.group_categories.build(name: 'foo')
+      @group.group_category = @course.group_categories.build(name: "foo")
       @group.group_category.group_limit = 1
       @group.update_max_membership_from_group_category
       expect(@group.max_membership).to eq 1
@@ -806,7 +806,7 @@ describe Group do
     end
   end
 
-  describe '#destroy' do
+  describe "#destroy" do
     before :once do
       @gc = GroupCategory.create! name: "groups", course: @course
       @group = @gc.groups.create! name: "group1", context: @course
@@ -829,7 +829,7 @@ describe Group do
     end
   end
 
-  describe 'includes_user?' do
+  describe "includes_user?" do
     before do
       user_model
       pseudonym_model(user_id: @user.id)
@@ -854,7 +854,7 @@ describe Group do
     end
   end
 
-  describe '#favorite_for_user?' do
+  describe "#favorite_for_user?" do
     before do
       context = course_model
       @group_fave = Group.create!(name: "group1", context: context)
@@ -877,20 +877,20 @@ describe Group do
   describe "submissions_folder" do
     it "creates the root submissions folder on demand" do
       f = @group.submissions_folder
-      expect(@group.submissions_folders.where(parent_folder_id: Folder.root_folders(@group).first, name: 'Submissions').first).to eq f
+      expect(@group.submissions_folders.where(parent_folder_id: Folder.root_folders(@group).first, name: "Submissions").first).to eq f
     end
 
     it "finds the existing root submissions folder" do
       f = @group.folders.build
       f.parent_folder_id = Folder.root_folders(@group).first
-      f.name = 'blah'
-      f.submission_context_code = 'root'
+      f.name = "blah"
+      f.submission_context_code = "root"
       f.save!
       expect(@group.submissions_folder).to eq f
     end
   end
 
-  describe 'participating_users_in_context' do
+  describe "participating_users_in_context" do
     before :once do
       context = course_model
       @group = Group.create(name: "group1", context: context)
@@ -910,16 +910,16 @@ describe Group do
     end
   end
 
-  describe 'usage_rights_required' do
-    it 'returns true on course group' do
+  describe "usage_rights_required" do
+    it "returns true on course group" do
       @course.update!(usage_rights_required: true)
       expect(@group.usage_rights_required?).to be true
     end
 
-    it 'returns true on account group' do
+    it "returns true on account group" do
       account = account_model
-      account.settings = { 'usage_rights_required' => {
-        'value' => true
+      account.settings = { "usage_rights_required" => {
+        "value" => true
       } }
       group = group_model(context: account)
       expect(group.usage_rights_required?).to be true

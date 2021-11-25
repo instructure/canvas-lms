@@ -34,12 +34,12 @@ describe CanvasCassandra do
   describe "#tables" do
     before do
       allow(conn).to receive(:use_cql3?).and_return(true)
-      allow(db).to receive(:keyspace).and_return('page_views')
-      allow(conn).to receive(:connection).and_return(double(describe_version: '19'))
+      allow(db).to receive(:keyspace).and_return("page_views")
+      allow(conn).to receive(:connection).and_return(double(describe_version: "19"))
     end
 
-    it 'queries for all column family names in the keyspace' do
-      expect(conn).to receive(:execute).with("SELECT columnfamily_name FROM system.schema_columnfamilies WHERE keyspace_name=?", 'page_views').and_return([])
+    it "queries for all column family names in the keyspace" do
+      expect(conn).to receive(:execute).with("SELECT columnfamily_name FROM system.schema_columnfamilies WHERE keyspace_name=?", "page_views").and_return([])
       db.tables
     end
   end
@@ -58,7 +58,7 @@ describe CanvasCassandra do
 
       it "passes the consistency level as a param" do
         expect(conn).to receive(:execute_with_consistency).with("SELECT a WHERE a = ?", CassandraCQL::Thrift::ConsistencyLevel::ONE, "%CONSISTENCY%")
-        run_query('ONE')
+        run_query("ONE")
       end
 
       it "ignores a nil consistency" do
@@ -74,7 +74,7 @@ describe CanvasCassandra do
 
       it "passes the consistency level in the query string" do
         expect(conn).to receive(:execute).with("SELECT a USING CONSISTENCY ONE WHERE a = ?", "%CONSISTENCY%")
-        run_query('ONE')
+        run_query("ONE")
       end
 
       it "ignores a nil consistency" do
@@ -186,8 +186,8 @@ describe CanvasCassandra do
     end
 
     it "passes consistency params" do
-      expect(db).to receive(:execute).with("UPDATE test_table SET name = ? WHERE id = ?", "test", 5, { consistency: 'LOCAL_QUORUM' })
-      db.update_record("test_table", { id: 5 }, { name: "test" }, execute_options: { consistency: 'LOCAL_QUORUM' })
+      expect(db).to receive(:execute).with("UPDATE test_table SET name = ? WHERE id = ?", "test", 5, { consistency: "LOCAL_QUORUM" })
+      db.update_record("test_table", { id: 5 }, { name: "test" }, execute_options: { consistency: "LOCAL_QUORUM" })
     end
 
     it "does multi-updates" do
@@ -236,7 +236,7 @@ describe CanvasCassandra do
   describe "#insert_record" do
     it "constructs correct queries when the params are strings" do
       expect(db).to receive(:execute).with("UPDATE test_table SET name = ? WHERE id = ?", "test", 5, {})
-      db.insert_record("test_table", { 'id' => 5 }, { 'name' => "test" })
+      db.insert_record("test_table", { "id" => 5 }, { "name" => "test" })
     end
 
     it "constructs correct queries when the params are symbols" do
@@ -256,7 +256,7 @@ describe CanvasCassandra do
   end
 
   describe "#available?" do
-    it 'asks #db.active?' do
+    it "asks #db.active?" do
       expect(db.db).to receive(:active?) { true }
       expect(db.available?).to be_truthy
 
@@ -266,25 +266,25 @@ describe CanvasCassandra do
   end
 
   describe "#keyspace" do
-    it 'asks #db.keyspace' do
-      keyspace_name = 'keyspace'
+    it "asks #db.keyspace" do
+      keyspace_name = "keyspace"
 
       expect(db.db).to receive(:keyspace) { keyspace_name }
       expect(db.keyspace).to eq keyspace_name
     end
 
-    it 'aliases name' do
-      keyspace_name = 'keyspace'
+    it "aliases name" do
+      keyspace_name = "keyspace"
 
       expect(db.db).to receive(:keyspace) { keyspace_name }
       expect(db.name).to eq keyspace_name
     end
 
-    it 'uses utf-8 encoding' do
-      keyspace_name = 'keyspace'
+    it "uses utf-8 encoding" do
+      keyspace_name = "keyspace"
 
       expect(db.db).to receive(:keyspace) { keyspace_name }
-      expect(db.keyspace.encoding.name).to eq 'UTF-8'
+      expect(db.keyspace.encoding.name).to eq "UTF-8"
     end
   end
 

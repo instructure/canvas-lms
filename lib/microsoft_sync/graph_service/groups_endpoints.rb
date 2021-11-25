@@ -21,7 +21,7 @@
 module MicrosoftSync
   class GraphService
     class GroupsEndpoints < EndpointsBase
-      DIRECTORY_OBJECT_PREFIX = 'https://graph.microsoft.com/v1.0/directoryObjects/'
+      DIRECTORY_OBJECT_PREFIX = "https://graph.microsoft.com/v1.0/directoryObjects/"
       USERS_BATCH_SIZE = 20
 
       def update(group_id, params)
@@ -61,12 +61,12 @@ module MicrosoftSync
         check_group_users_args(members, owners)
 
         reqs =
-          group_remove_user_requests(group_id, members, 'members') +
-          group_remove_user_requests(group_id, owners, 'owners')
+          group_remove_user_requests(group_id, members, "members") +
+          group_remove_user_requests(group_id, owners, "owners")
         quota = [reqs.count, reqs.count]
 
         ignored_request_hash = run_batch(
-          'group_remove_users',
+          "group_remove_users",
           reqs,
           quota: quota,
           special_cases: BATCH_REMOVE_USERS_SPECIAL_CASES
@@ -89,7 +89,7 @@ module MicrosoftSync
         ),
         SpecialCase.new(404, result: GroupMembershipChangeResult::NONEXISTENT_USER) do |response|
           # Error message must have user id (see group_add_user_requests) to match.
-          aad_id = response.batch_request_id.gsub(/^members_|^owners_/, '')
+          aad_id = response.batch_request_id.gsub(/^members_|^owners_/, "")
           regex = /#{Regexp.escape aad_id}.* does not exist or one of its queried reference/
           response.body =~ regex
         end,
@@ -98,10 +98,10 @@ module MicrosoftSync
       # Returns a GroupMembershipChangeResult
       def add_users_via_batch(group_id, members, owners)
         reqs =
-          group_add_user_requests(group_id, members, 'members') +
-          group_add_user_requests(group_id, owners, 'owners')
+          group_add_user_requests(group_id, members, "members") +
+          group_add_user_requests(group_id, owners, "owners")
         ignored_request_hash = run_batch(
-          'group_add_users',
+          "group_add_users",
           reqs,
           quota: [reqs.count, reqs.count],
           special_cases: BATCH_ADD_USERS_SPECIAL_CASES
@@ -135,8 +135,8 @@ module MicrosoftSync
         check_group_users_args(members, owners)
 
         body = {
-          'members@odata.bind' => members.map { |m| DIRECTORY_OBJECT_PREFIX + m },
-          'owners@odata.bind' => owners.map { |o| DIRECTORY_OBJECT_PREFIX + o }
+          "members@odata.bind" => members.map { |m| DIRECTORY_OBJECT_PREFIX + m },
+          "owners@odata.bind" => owners.map { |o| DIRECTORY_OBJECT_PREFIX + o }
         }.reject { |_k, users| users.empty? }
 
         # Irregular write cost of adding members, about users_added/3, according to Microsoft.
@@ -183,7 +183,7 @@ module MicrosoftSync
       end
 
       def check_group_users_args(members, owners)
-        raise ArgumentError, 'Missing members/owners' if members.empty? && owners.empty?
+        raise ArgumentError, "Missing members/owners" if members.empty? && owners.empty?
 
         if (n_total_additions = members.length + owners.length) > USERS_BATCH_SIZE
           raise ArgumentError, "Only #{USERS_BATCH_SIZE} users can be batched at " \
@@ -196,9 +196,9 @@ module MicrosoftSync
           {
             id: "#{members_or_owners}_#{aad_id}",
             url: "/groups/#{group_id}/#{members_or_owners}/$ref",
-            method: 'POST',
+            method: "POST",
             body: { "@odata.id": DIRECTORY_OBJECT_PREFIX + aad_id },
-            headers: { 'Content-Type' => 'application/json' }
+            headers: { "Content-Type" => "application/json" }
           }
         end
       end
@@ -208,7 +208,7 @@ module MicrosoftSync
           {
             id: "#{members_or_owners}_#{aad_id}",
             url: "/groups/#{group_id}/#{members_or_owners}/#{aad_id}/$ref",
-            method: 'DELETE'
+            method: "DELETE"
           }
         end
       end

@@ -29,7 +29,7 @@ class EnrollmentsFromUserList
 
   def initialize(course, opts = {})
     @course = course
-    @enrollment_type = opts[:enrollment_type] || 'StudentEnrollment'
+    @enrollment_type = opts[:enrollment_type] || "StudentEnrollment"
     @role = opts[:role]
     @limit = opts[:limit]
     @section = (opts[:course_section_id].present? ? @course.course_sections.active.where(id: opts[:course_section_id].to_i).first : nil) || @course.default_section
@@ -52,7 +52,7 @@ class EnrollmentsFromUserList
         # list of user ids
         User.from_tokens(list)
       end
-    users.each_slice(Setting.get('enrollments_from_user_list_batch_size', 50).to_i) do |users_slice|
+    users.each_slice(Setting.get("enrollments_from_user_list_batch_size", 50).to_i) do |users_slice|
       @course.transaction do
         Enrollment.suspend_callbacks(:set_update_cached_due_dates) do
           users_slice.each { |user| enroll_user(user) }

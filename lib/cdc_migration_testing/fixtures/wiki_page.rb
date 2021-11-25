@@ -25,8 +25,8 @@ module CdcFixtures
 
     WikiPage.new(id: 1,
                  wiki_id: 1,
-                 workflow_state: 'default',
+                 workflow_state: "default",
                  context_id: 1,
-                 context_type: 'Course')
+                 context_type: "Course")
   end
 end

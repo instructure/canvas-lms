@@ -26,7 +26,7 @@ class OverrideTooltipPresenter < OverrideListPresenter
   end
 
   def default_link_text
-    I18n.t('#assignments.multiple_due_dates', 'Multiple Due Dates')
+    I18n.t("#assignments.multiple_due_dates", "Multiple Due Dates")
   end
 
   def link_text
@@ -38,9 +38,9 @@ class OverrideTooltipPresenter < OverrideListPresenter
   end
 
   def more_message
-    return '' unless dates_hidden > 0
+    return "" unless dates_hidden > 0
 
-    I18n.t('#tooltips.vdd.more_message', 'and %{count} more...', count: dates_hidden)
+    I18n.t("#tooltips.vdd.more_message", "and %{count} more...", count: dates_hidden)
   end
 
   # Pass in a :max_dates option to adjust how many dates are shown

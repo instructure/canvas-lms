@@ -25,7 +25,7 @@ class EnsureDummyEnrollmentTerm < ActiveRecord::Migration[6.0]
     # that ID, but we don't want postgres to whine about the broken FK. we'll also
     # fix the FK, but it doesn't happen in the same statement
     fk_name = connection.foreign_key_for(:courses, to_table: :enrollment_terms).name
-    table = connection.quote_table_name('courses')
+    table = connection.quote_table_name("courses")
 
     execute("ALTER TABLE #{table} ALTER CONSTRAINT #{connection.quote_column_name(fk_name)} DEFERRABLE")
     defer_constraints(fk_name) do

@@ -30,7 +30,7 @@ describe Canvas::LockExplanation do
     let(:host) { klass.new }
     let(:result) { host.lock_explanation(hash, type, context) }
     let(:context) { nil }
-    let(:type) { 'page' }
+    let(:type) { "page" }
 
     context "with a :lock_at key in the hash" do
       let(:hash) { { lock_at: DateTime.tomorrow } }
@@ -44,11 +44,11 @@ describe Canvas::LockExplanation do
 
     context "with no :unlock_at or :lock_at in the hash" do
       context "with a context module in the hash" do
-        let(:hash) { { context_module: object, asset_string: 'course_1' } }
+        let(:hash) { { context_module: object, asset_string: "course_1" } }
 
         context "with a published object" do
           let(:object) do
-            cm = ContextModule.new(workflow_state: 'published', name: 'foo')
+            cm = ContextModule.new(workflow_state: "published", name: "foo")
             cm.id = 1
             cm
           end
@@ -69,7 +69,7 @@ describe Canvas::LockExplanation do
               end
 
               it "uses the group's course in the link" do
-                expect(host).to receive(:course_context_modules_url).with(course, { anchor: 'module_1' })
+                expect(host).to receive(:course_context_modules_url).with(course, { anchor: "module_1" })
                 result
               end
 

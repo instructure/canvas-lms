@@ -62,7 +62,7 @@ class SubmissionDraft < ActiveRecord::Base
 
   def media_object_id_matches_media_object
     if media_object_id.present? && media_object.blank?
-      err = I18n.t('the media_object_id must match an existing media object')
+      err = I18n.t("the media_object_id must match an existing media object")
       errors.add(:media_object_id, err)
     end
   end
@@ -72,7 +72,7 @@ class SubmissionDraft < ActiveRecord::Base
     current_submission_attempt = submission&.attempt || 0
     this_submission_attempt = submission_attempt || 0
     if this_submission_attempt > (current_submission_attempt + 1)
-      err = I18n.t('submission draft cannot be more then one attempt ahead of the current submission')
+      err = I18n.t("submission draft cannot be more then one attempt ahead of the current submission")
       errors.add(:submission_draft_attempt, err)
     end
   end
@@ -118,18 +118,18 @@ class SubmissionDraft < ActiveRecord::Base
 
   # this checks if any type on the assignment is drafted
   def meets_assignment_criteria?
-    submission_types = submission.assignment.submission_types.split(',')
+    submission_types = submission.assignment.submission_types.split(",")
     submission_types.each do |type|
       case type
-      when 'media_recording'
+      when "media_recording"
         return true if meets_media_recording_criteria?
-      when 'online_text_entry'
+      when "online_text_entry"
         return true if meets_text_entry_criteria?
-      when 'online_upload'
+      when "online_upload"
         return true if meets_upload_criteria? || meets_basic_lti_launch_criteria?
-      when 'online_url'
+      when "online_url"
         return true if meets_url_criteria?
-      when 'student_annotation'
+      when "student_annotation"
         return true if meets_student_annotation_criteria?
       end
     end

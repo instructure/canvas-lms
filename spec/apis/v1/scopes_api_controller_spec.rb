@@ -18,12 +18,12 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../api_spec_helper'
+require_relative "../api_spec_helper"
 
 describe ScopesApiController, type: :request do
   before do
     # We want to force the usage of the fallback scope mapper here, not the generated version
-    stub_const('ApiScopeMapper', ApiScopeMapperFallback)
+    stub_const("ApiScopeMapper", ApiScopeMapperFallback)
 
     enable_default_developer_key!
   end
@@ -38,9 +38,9 @@ describe ScopesApiController, type: :request do
 
     let(:scope_params) do
       {
-        controller: 'scopes_api',
-        action: 'index',
-        format: 'json',
+        controller: "scopes_api",
+        action: "index",
+        format: "json",
         account_id: account.id.to_s
       }
     end
@@ -74,10 +74,10 @@ describe ScopesApiController, type: :request do
       end
 
       it "returns expected scopes when flag is disabled and Setting is set" do
-        Setting.set(Setting::SITE_ADMIN_ACCESS_TO_NEW_DEV_KEY_FEATURES, 'true')
+        Setting.set(Setting::SITE_ADMIN_ACCESS_TO_NEW_DEV_KEY_FEATURES, "true")
         account_admin_user(account: Account.site_admin)
         allow_any_instance_of(Account).to receive(:feature_enabled?).and_return(false)
-        DeveloperKey.default.developer_key_account_bindings.first.update!(workflow_state: 'on')
+        DeveloperKey.default.developer_key_account_bindings.first.update!(workflow_state: "on")
         json = api_call(
           :get,
           "/api/v1/accounts/#{Account.site_admin.id}/scopes",
@@ -100,7 +100,7 @@ describe ScopesApiController, type: :request do
 
       it "returns a 401" do
         api_call(:get, api_url, scope_params)
-        expect(response.code).to eql '401'
+        expect(response.code).to eql "401"
       end
     end
   end

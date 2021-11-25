@@ -25,7 +25,7 @@ module CsvDiff
   class Diff
     def initialize(key_fields)
       @key_fields = Array(key_fields).map(&:to_s)
-      @db_file = Tempfile.new(['csv_diff', '.sqlite3'])
+      @db_file = Tempfile.new(["csv_diff", ".sqlite3"])
       @db = SQLite3::Database.new(@db_file.path)
       @row_count = 0
       setup_database
@@ -122,8 +122,8 @@ module CsvDiff
     end
 
     def setup_output(headers)
-      @output_file = Tempfile.new(['csv_diff', '.csv'])
-      @output = CSV.open(@output_file, 'wb',
+      @output_file = Tempfile.new(["csv_diff", ".csv"])
+      @output = CSV.open(@output_file, "wb",
                          headers: headers)
       @output << headers
     end

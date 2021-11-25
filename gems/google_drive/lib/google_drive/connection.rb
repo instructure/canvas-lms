@@ -21,7 +21,7 @@
 # See Google Drive API documentation here:
 # https://developers.google.com/drive/v2/web/about-sdk
 
-require 'google/api_client/errors'
+require "google/api_client/errors"
 
 module GoogleDrive
   class Connection
@@ -37,13 +37,13 @@ module GoogleDrive
     end
 
     def service_type
-      'google_drive'
+      "google_drive"
     end
 
     def with_timeout_protection(&block)
       Timeout.timeout(@timeout || 30, &block)
     rescue Timeout::Error
-      raise ConnectionException, 'Google Drive connection timed out'
+      raise ConnectionException, "Google Drive connection timed out"
     end
 
     def client_execute(options)
@@ -79,16 +79,16 @@ module GoogleDrive
 
         case result.status
         when 200
-          file_name = file['title']
+          file_name = file["title"]
           name_extension = file_name[/\.([a-z]+$)/, 1]
           file_extension = name_extension || file_extension_from_header(result.headers, entry)
 
           # file_name should contain the file_extension
           file_name += ".#{file_extension}" unless name_extension
-          content_type = result.headers['Content-Type'].sub(/; charset=[^;]+/, '')
+          content_type = result.headers["Content-Type"].sub(/; charset=[^;]+/, "")
           return [result, file_name, file_extension, content_type]
         when 307
-          @uri = result.response['Location']
+          @uri = result.response["Location"]
           redirect_limit -= 1
         else
           raise ConnectionException, result.error_message
@@ -103,7 +103,7 @@ module GoogleDrive
     def create_doc(name)
       file_data = {
         title: name,
-        mimeType: 'application/vnd.google-apps.document'
+        mimeType: "application/vnd.google-apps.document"
       }
 
       force_token_update
@@ -127,7 +127,7 @@ module GoogleDrive
         api_method: drive.files.delete,
         parameters: { fileId: normalize_document_id(document_id) }
       )
-      if result.error? && !result.error_message.include?('File not found')
+      if result.error? && !result.error_message.include?("File not found")
         raise ConnectionException, result.error_message
       end
     end
@@ -166,8 +166,8 @@ module GoogleDrive
       users.each do |user_id|
         new_permission = drive.permissions.insert.request_schema.new({
                                                                        id: user_id,
-                                                                       type: 'user',
-                                                                       role: 'writer'
+                                                                       type: "user",
+                                                                       role: "writer"
                                                                      })
         result = client_execute(
           api_method: drive.permissions.insert,
@@ -193,7 +193,7 @@ module GoogleDrive
 
     def self.config=(config)
       unless config.is_a?(Proc)
-        raise 'Config must be a Proc'
+        raise "Config must be a Proc"
       end
 
       @config = config
@@ -221,32 +221,32 @@ module GoogleDrive
     def list(extensions)
       client_params = {
         api_method: drive.files.list,
-        parameters: { maxResults: 0, q: 'trashed=false' }
+        parameters: { maxResults: 0, q: "trashed=false" }
       }
       list_data = client_execute!(client_params).data.to_hash
       folderize_list(list_data, extensions)
     end
 
     def normalize_document_id(doc_id)
-      doc_id.gsub(/^.+:/, '')
+      doc_id.gsub(/^.+:/, "")
     end
 
     def folderize_list(documents, extensions)
-      root = GoogleDrive::Folder.new('/')
+      root = GoogleDrive::Folder.new("/")
       folders = { nil => root }
 
-      documents['items'].each do |doc_entry|
-        next unless doc_entry['downloadUrl'] || doc_entry['exportLinks']
+      documents["items"].each do |doc_entry|
+        next unless doc_entry["downloadUrl"] || doc_entry["exportLinks"]
 
         entry = GoogleDrive::Entry.new(doc_entry, extensions)
         if folders.key?(entry.folder)
           folder = folders[entry.folder]
         else
-          folder = GoogleDrive::Folder.new(get_folder_name_by_id(documents['items'], entry.folder))
+          folder = GoogleDrive::Folder.new(get_folder_name_by_id(documents["items"], entry.folder))
           root.add_folder folder
           folders[entry.folder] = folder
         end
-        is_folder = doc_entry['mimeType'] && doc_entry['mimeType'] == 'application/vnd.google-apps.folder'
+        is_folder = doc_entry["mimeType"] && doc_entry["mimeType"] == "application/vnd.google-apps.folder"
         folder.add_file(entry) unless is_folder
       end
 
@@ -259,9 +259,9 @@ module GoogleDrive
 
     def get_folder_name_by_id(entries, folder_id)
       elements = entries.select do |entry|
-        entry['id'] == folder_id
+        entry["id"] == folder_id
       end
-      elements.first ? elements.first['title'] : 'Unknown Folder'
+      elements.first ? elements.first["title"] : "Unknown Folder"
     end
 
     def api_client
@@ -272,15 +272,15 @@ module GoogleDrive
     end
 
     def drive
-      @drive ||= Rails.cache.fetch('google_drive_v2') do
-        api_client.discovered_api('drive', 'v2')
+      @drive ||= Rails.cache.fetch("google_drive_v2") do
+        api_client.discovered_api("drive", "v2")
       end
     end
 
     def file_extension_from_header(headers, entry)
-      file_extension = (entry.extension.present? && entry.extension) || 'unknown'
+      file_extension = (entry.extension.present? && entry.extension) || "unknown"
 
-      if headers['content-disposition']&.match(/filename=["']?[^;"'.]+\.(?<file_extension>[^;"']+)["']?/)
+      if headers["content-disposition"]&.match(/filename=["']?[^;"'.]+\.(?<file_extension>[^;"']+)["']?/)
         file_extension = Regexp.last_match[:file_extension]
       end
 

@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'atom'
+require "atom"
 
 class AnnouncementsController < ApplicationController
   include Api::V1::DiscussionTopics
@@ -53,7 +53,7 @@ class AnnouncementsController < ApplicationController
 
   def index
     return unless authorized_action(@context, @current_user, :read)
-    return if @context.class.const_defined?('TAB_ANNOUNCEMENTS') && !tab_enabled?(@context.class::TAB_ANNOUNCEMENTS)
+    return if @context.class.const_defined?("TAB_ANNOUNCEMENTS") && !tab_enabled?(@context.class::TAB_ANNOUNCEMENTS)
 
     redirect_to named_context_url(@context, :context_url) if @context.is_a?(Course) && @context.elementary_homeroom_course?
 
@@ -104,7 +104,7 @@ class AnnouncementsController < ApplicationController
       format.atom do
         feed = Atom::Feed.new do |f|
           f.title = t(:feed_name, "%{course} Announcements Feed", course: @context.name)
-          f.links << Atom::Link.new(href: polymorphic_url([@context, :announcements]), rel: 'self')
+          f.links << Atom::Link.new(href: polymorphic_url([@context, :announcements]), rel: "self")
           f.updated = Time.now
           f.id = polymorphic_url([@context, :announcements])
         end
@@ -116,7 +116,7 @@ class AnnouncementsController < ApplicationController
 
       format.rss do
         @announcements = announcements
-        require 'rss/2.0'
+        require "rss/2.0"
         rss = RSS::Rss.new("2.0")
         channel = RSS::Rss::Channel.new
         channel.title = t(:podcast_feed_name, "%{course} Announcements Podcast Feed", course: @context.name)

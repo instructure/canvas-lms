@@ -21,7 +21,7 @@ module CustomValidators
   def validate_breadcrumb_link(link_element, breadcrumb_text)
     expect_new_page_load { link_element.click }
     unless breadcrumb_text.nil?
-      breadcrumb = f('#breadcrumbs')
+      breadcrumb = f("#breadcrumbs")
       expect(breadcrumb).to include_text(breadcrumb_text)
     end
     expect(driver.execute_script("return INST.errorCount;")).to eq 0
@@ -34,24 +34,24 @@ module CustomValidators
   end
 
   def check_image(element)
-    require 'open-uri'
+    require "open-uri"
     expect(element).to be_displayed
-    expect(element.tag_name).to eq 'img'
-    temp_file = URI.parse(element.attribute('src')).open
+    expect(element.tag_name).to eq "img"
+    temp_file = URI.parse(element.attribute("src")).open
     expect(temp_file.size).to be > 0
   end
 
   def check_file(element)
-    require 'open-uri'
+    require "open-uri"
     expect(element).to be_displayed
-    expect(element.tag_name).to eq 'a'
-    temp_file = URI.parse(element.attribute('href')).open
+    expect(element.tag_name).to eq "a"
+    temp_file = URI.parse(element.attribute("href")).open
     expect(temp_file.size).to be > 0
     temp_file
   end
 
   def check_element_has_focus(element)
-    active_element = driver.execute_script('return document.activeElement')
+    active_element = driver.execute_script("return document.activeElement")
     expect(active_element).to eq(element)
   end
 
@@ -90,7 +90,7 @@ module CustomValidators
   end
 
   def expect_no_instui_flash_message
-    expect(f('body')).not_to contain_css('#flashalert_message_holder')
+    expect(f("body")).not_to contain_css("#flashalert_message_holder")
   end
 
   def assert_flash_notice_message(okay_message)

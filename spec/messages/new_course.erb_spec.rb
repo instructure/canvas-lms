@@ -18,9 +18,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative 'messages_helper'
+require_relative "messages_helper"
 
-describe 'new_course' do
+describe "new_course" do
   before :once do
     course_model(reusable: true)
   end

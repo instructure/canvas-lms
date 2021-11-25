@@ -38,17 +38,17 @@
 # to the given url with a query param of `url=` and the website to snapshot, and a header
 # X-API-Key with the given key.
 
-require 'resolv'
-require 'ipaddr'
+require "resolv"
+require "ipaddr"
 
 class CutyCapt
   CUTYCAPT_DEFAULTS = {
     delay: 3000,
     timeout: 60_000,
-    ip_blacklist: ['10.0.0.0/8', '172.16.0.0/12', '192.168.0.0/16', '169.254.169.254', '127.0.0.0/8'],
+    ip_blacklist: ["10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16", "169.254.169.254", "127.0.0.0/8"],
     domain_blacklist: [],
-    allowed_schemes: ['http', 'https'],
-    lang: 'en,*;q=0.9'
+    allowed_schemes: ["http", "https"],
+    lang: "en,*;q=0.9"
   }.freeze
 
   cattr_writer :config
@@ -57,8 +57,8 @@ class CutyCapt
     return @@config if defined?(@@config) && @@config
 
     setting = begin
-      consul_config = Canvas::DynamicSettings.find(tree: :private)['cutycapt.yml']
-      (consul_config && YAML.safe_load(consul_config).with_indifferent_access) || ConfigFile.load('cutycapt') || {}
+      consul_config = Canvas::DynamicSettings.find(tree: :private)["cutycapt.yml"]
+      (consul_config && YAML.safe_load(consul_config).with_indifferent_access) || ConfigFile.load("cutycapt") || {}
     end
     setting = setting.symbolize_keys
     @@config = CUTYCAPT_DEFAULTS.merge(setting).with_indifferent_access
@@ -124,7 +124,7 @@ class CutyCapt
 
     format = "png"
 
-    tmp_file = Tempfile.new(['websnappr', ".#{format}"], encoding: 'ascii-8bit')
+    tmp_file = Tempfile.new(["websnappr", ".#{format}"], encoding: "ascii-8bit")
     img_file = tmp_file.path
     success = true
 

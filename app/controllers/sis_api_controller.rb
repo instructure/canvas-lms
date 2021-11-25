@@ -311,13 +311,13 @@ class SisApiController < ApplicationController
   before_action :require_published_course, only: [:sis_assignments]
 
   GRADE_EXPORT_NOT_ENABLED_ERROR = {
-    code: 'not_enabled',
-    error: 'A SIS integration is not configured and the bulk SIS Grade Export feature is not enabled'
+    code: "not_enabled",
+    error: "A SIS integration is not configured and the bulk SIS Grade Export feature is not enabled"
   }.freeze
 
   COURSE_NOT_PUBLISHED_ERROR = {
-    code: 'unpublished_course',
-    error: 'Grade data is not available for non-published courses'
+    code: "unpublished_course",
+    error: "Grade data is not available for non-published courses"
   }.freeze
 
   # @API Retrieve assignments enabled for grade export to SIS
@@ -368,7 +368,7 @@ class SisApiController < ApplicationController
       elsif params[:course_id]
         api_find(Course, params[:course_id])
       else
-        raise ActiveRecord::RecordNotFound, 'unknown context type'
+        raise ActiveRecord::RecordNotFound, "unknown context type"
       end
   end
 
@@ -397,13 +397,13 @@ class SisApiController < ApplicationController
   end
 
   def include_student_overrides?
-    params[:include].to_a.include?('student_overrides')
+    params[:include].to_a.include?("student_overrides")
   end
 
   def published_assignments
     assignments = Assignment.published
                             .where(post_to_sis: true)
-                            .where(context_type: 'Course', context_id: published_course_ids)
+                            .where(context_type: "Course", context_id: published_course_ids)
                             .preload(:assignment_group)
                             .preload(context: { active_course_sections: [:nonxlist_course] })
 

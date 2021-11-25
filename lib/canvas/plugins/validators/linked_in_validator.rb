@@ -23,7 +23,7 @@ module Canvas::Plugins::Validators::LinkedInValidator
     if settings.map(&:last).all?(&:blank?)
       {}
     elsif settings.map(&:last).any?(&:blank?)
-      plugin_setting.errors.add(:base, I18n.t('canvas.plugins.errors.all_fields_required', 'All fields are required'))
+      plugin_setting.errors.add(:base, I18n.t("canvas.plugins.errors.all_fields_required", "All fields are required"))
       false
     else
       res = LinkedIn::Connection.config_check(api_key: settings[:client_id], secret_key: settings[:client_secret])

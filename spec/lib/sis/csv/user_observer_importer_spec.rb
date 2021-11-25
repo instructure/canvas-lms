@@ -21,19 +21,19 @@
 describe SIS::CSV::UserObserverImporter do
   before { account_model }
 
-  it 'skips bad content' do
-    user_with_managed_pseudonym(account: @account, sis_user_id: 'U001')
-    user_with_managed_pseudonym(account: @account, sis_user_id: 'U002')
+  it "skips bad content" do
+    user_with_managed_pseudonym(account: @account, sis_user_id: "U001")
+    user_with_managed_pseudonym(account: @account, sis_user_id: "U002")
     before_count = UserObservationLink.active.count
     importer = process_csv_data(
-      'observer_id,student_id,status',
-      'no_observer,U001,active',
-      'U001,U001,active',
-      'U001,no_student,active',
-      ',U001,active',
-      'U001,,active',
-      'U001,U002,dead',
-      'U001,U002,deleted'
+      "observer_id,student_id,status",
+      "no_observer,U001,active",
+      "U001,U001,active",
+      "U001,no_student,active",
+      ",U001,active",
+      "U001,,active",
+      "U001,U002,dead",
+      "U001,U002,deleted"
     )
     expect(UserObservationLink.active.count).to eq before_count
 
@@ -48,8 +48,8 @@ describe SIS::CSV::UserObserverImporter do
   end
 
   it "adds and remove user_observers" do
-    user_with_managed_pseudonym(account: @account, sis_user_id: 'U001')
-    user_with_managed_pseudonym(account: @account, sis_user_id: 'U002')
+    user_with_managed_pseudonym(account: @account, sis_user_id: "U001")
+    user_with_managed_pseudonym(account: @account, sis_user_id: "U002")
     before_count = UserObservationLink.active.count
     process_csv_data_cleanly(
       "observer_id,student_id,status",
@@ -67,8 +67,8 @@ describe SIS::CSV::UserObserverImporter do
   it "is able to disable notifications by default for observers" do
     @account.settings[:default_notifications_disabled_for_observers] = true
     @account.save!
-    observer = user_with_managed_pseudonym(account: @account, sis_user_id: 'U001')
-    user_with_managed_pseudonym(account: @account, sis_user_id: 'U002')
+    observer = user_with_managed_pseudonym(account: @account, sis_user_id: "U001")
+    user_with_managed_pseudonym(account: @account, sis_user_id: "U002")
     process_csv_data_cleanly(
       "observer_id,student_id,status",
       "U001,U002,ACTIVE"

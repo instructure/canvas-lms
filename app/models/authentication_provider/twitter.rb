@@ -28,7 +28,7 @@ class AuthenticationProvider::Twitter < AuthenticationProvider::OAuth
   end
 
   def self.login_attributes
-    ['user_id', 'screen_name'].freeze
+    ["user_id", "screen_name"].freeze
   end
   validates :login_attribute, inclusion: login_attributes
 
@@ -42,7 +42,7 @@ class AuthenticationProvider::Twitter < AuthenticationProvider::OAuth
   end
 
   def login_attribute
-    super || 'user_id'
+    super || "user_id"
   end
 
   def unique_id(token)
@@ -51,8 +51,8 @@ class AuthenticationProvider::Twitter < AuthenticationProvider::OAuth
 
   def provider_attributes(token)
     result = token.params.dup
-    if federated_attributes.any? { |(_k, v)| ['name', 'time_zone'].include?(v['attribute']) }
-      result.merge!(JSON.parse(token.get('/1.1/account/verify_credentials.json?skip_status=true').body))
+    if federated_attributes.any? { |(_k, v)| ["name", "time_zone"].include?(v["attribute"]) }
+      result.merge!(JSON.parse(token.get("/1.1/account/verify_credentials.json?skip_status=true").body))
     end
     result
   end
@@ -61,8 +61,8 @@ class AuthenticationProvider::Twitter < AuthenticationProvider::OAuth
 
   def consumer_options
     {
-      site: 'https://api.twitter.com',
-      authorize_path: '/oauth/authenticate'
+      site: "https://api.twitter.com",
+      authorize_path: "/oauth/authenticate"
     }
   end
 end

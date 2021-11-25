@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require_relative "../../support/call_stack_utils"
-require_relative 'selenium_driver_setup'
+require_relative "selenium_driver_setup"
 require_relative "common_helper_methods/custom_wait_methods"
 
 module SeleniumExtensions
@@ -163,7 +163,7 @@ module SeleniumExtensions
       ]
   ).each do |method|
       define_method(method) do |*args|
-        raise Error, 'need to do a `get` before you can interact with the page' unless ready_for_interaction
+        raise Error, "need to do a `get` before you can interact with the page" unless ready_for_interaction
 
         super(*args)
       end

@@ -21,10 +21,10 @@
 class Mutations::MoveOutcomeLinks < Mutations::BaseMutation
   graphql_name "MoveOutcomeLinks"
 
-  argument :outcome_link_ids, [ID], <<~MD, required: true, prepare: GraphQLHelpers.relay_or_legacy_ids_prepare_func('ContentTag')
+  argument :outcome_link_ids, [ID], <<~MD, required: true, prepare: GraphQLHelpers.relay_or_legacy_ids_prepare_func("ContentTag")
     A list of ContentTags that will be moved
   MD
-  argument :group_id, ID, <<~MD, required: true, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func('LearningOutcomeGroup')
+  argument :group_id, ID, <<~MD, required: true, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("LearningOutcomeGroup")
     The id of the destination group
   MD
 
@@ -82,7 +82,7 @@ class Mutations::MoveOutcomeLinks < Mutations::BaseMutation
                 id: ids
               )
             else
-              ContentTag.active.learning_outcome_links.where(id: ids, context_type: 'LearningOutcomeGroup')
+              ContentTag.active.learning_outcome_links.where(id: ids, context_type: "LearningOutcomeGroup")
             end
     missing_ids = ids - links.pluck(:id)
     [links, missing_ids]

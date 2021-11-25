@@ -5,7 +5,7 @@ Gem::Specification.new do |spec|
   spec.version       = "1.0.0"
   spec.authors       = ["Brian Palmer"]
   spec.email         = ["brianp@instructure.com"]
-  spec.summary       = 'Canvas HTTP'
+  spec.summary       = "Canvas HTTP"
 
   spec.files         = Dir.glob("{lib,spec}/**/*") + %w[Rakefile test.sh]
   spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }

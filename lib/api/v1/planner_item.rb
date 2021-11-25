@@ -74,7 +74,7 @@ module Api::V1::PlannerItem
         hash[:planner_override] ||= planner_override_json(item.planner_override_for(user), user, session)
       elsif item.is_a?(Announcement)
         ann_hash = item.attributes
-        ann_hash.delete('todo_date')
+        ann_hash.delete("todo_date")
         unread_count, read_state = topics_status_for(user, item.id, opts[:topics_status])[item.id]
         hash[:plannable_date] = item.posted_at || item.created_at
         hash[:plannable] = plannable_json({ unread_count: unread_count, read_state: read_state }.merge(ann_hash))
@@ -233,7 +233,7 @@ module Api::V1::PlannerItem
     if item.is_a?(DiscussionTopic) || item.try(:discussion_topic)
       topic = item.try(:discussion_topic) || item
       unread_count, read_state = opts.dig(:topics_status, topic.id)
-      return (read_state == 'unread' || unread_count > 0) if unread_count && read_state
+      return (read_state == "unread" || unread_count > 0) if unread_count && read_state
       return (topic.unread?(user) || topic.unread_count(user) > 0) if topic
     end
     false
@@ -258,7 +258,7 @@ module Api::V1::PlannerItem
   end
 
   def online_meeting_url(event_description, event_location)
-    config = Canvas::DynamicSettings.find('canvas', tree: 'config', service: 'canvas')
+    config = Canvas::DynamicSettings.find("canvas", tree: "config", service: "canvas")
     default_regex = <<~'REGEX'
       https:\/\/[\w-]+\.zoom\.us\/\d+(\?[\w\/\-=%]*)?
       https:\/\/[\w-]+\.zoom\.us\/my\/[\w.]+(\?[\w\/\-=%]*)?
@@ -270,7 +270,7 @@ module Api::V1::PlannerItem
       https:\/\/meet\.google\.com\/[\w\/\-=%]+(\?[\w\/\-=%]*)?
     REGEX
     url_regex_str = config["online-meeting-url-regex"] || default_regex
-    url_regex_str = url_regex_str.split("\n").join('|')
+    url_regex_str = url_regex_str.split("\n").join("|")
     url_regex = Regexp.new "(#{url_regex_str})"
 
     if event_description

@@ -18,9 +18,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative 'messages_helper'
+require_relative "messages_helper"
 
-describe 'merge_email_communication_channel' do
+describe "merge_email_communication_channel" do
   before :once do
     user_with_pseudonym
     @object = @user.communication_channel

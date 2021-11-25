@@ -31,7 +31,7 @@ describe ActionView::Helpers::FormOptionsHelper do
     end
 
     it "includes non-rails zone when the non-rails zone is selected" do
-      expect(form.time_zone_options_for_select('Africa/Lagos')).to be_include("Africa/Lagos (+")
+      expect(form.time_zone_options_for_select("Africa/Lagos")).to be_include("Africa/Lagos (+")
     end
   end
 end

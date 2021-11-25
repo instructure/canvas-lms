@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'lib/model_cache'
+require "lib/model_cache"
 
 describe ModelCache do
   before do
@@ -35,21 +35,21 @@ describe ModelCache do
       belongs_to :test_model_cache_user, foreign_key: :user_id
       cacheable_method :test_model_cache_user, key_method: :user_id
 
-      belongs_to :test_model_cache_user_copy, class_name: 'TestModelCacheUser', foreign_key: :user_id
+      belongs_to :test_model_cache_user_copy, class_name: "TestModelCacheUser", foreign_key: :user_id
     end
   end
 
   before do
-    user_with_pseudonym(name: 'qwerty')
+    user_with_pseudonym(name: "qwerty")
     @user = TestModelCacheUser.where(id: @user).first
     @pseudonym = TestModelCachePseudonym.where(id: @pseudonym).first
   end
 
   after do
-    ModelCache.keys.delete('TestModelCacheUser')
-    ModelCache.keys.delete('TestModelCachePseudonym')
-    ActiveSupport::Dependencies::Reference.instance_variable_get(:@store).delete('TestModelCacheUser')
-    ActiveSupport::Dependencies::Reference.instance_variable_get(:@store).delete('TestModelCachePseudonym')
+    ModelCache.keys.delete("TestModelCacheUser")
+    ModelCache.keys.delete("TestModelCachePseudonym")
+    ActiveSupport::Dependencies::Reference.instance_variable_get(:@store).delete("TestModelCacheUser")
+    ActiveSupport::Dependencies::Reference.instance_variable_get(:@store).delete("TestModelCachePseudonym")
     Object.send(:remove_const, :TestModelCacheUser)
     Object.send(:remove_const, :TestModelCachePseudonym)
   end

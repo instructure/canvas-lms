@@ -18,27 +18,27 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'spec_helper'
+require "spec_helper"
 
 describe AdheresToPolicy::Condition do
-  describe '#applies?' do
-    it 'returns true if it applies' do
+  describe "#applies?" do
+    it "returns true if it applies" do
       condition = AdheresToPolicy::Condition.new(proc { true })
       expect(condition.applies?(nil, nil, nil)).to be(true)
     end
 
-    it 'returns false if it does not apply' do
+    it "returns false if it does not apply" do
       condition = AdheresToPolicy::Condition.new(proc { false })
       expect(condition.applies?(nil, nil, nil)).to be(false)
     end
 
-    it 'returns false if its parent does not apply' do
+    it "returns false if its parent does not apply" do
       parent = AdheresToPolicy::Condition.new(proc { false })
       condition = AdheresToPolicy::Condition.new(proc { true }, parent)
       expect(condition.applies?(nil, nil, nil)).to be(false)
     end
 
-    it 'evaluates the condition in the context of the object' do
+    it "evaluates the condition in the context of the object" do
       object = double
       thing = double
       expect(thing).to receive(:happened).with(object)
@@ -49,7 +49,7 @@ describe AdheresToPolicy::Condition do
       condition.applies?(object, nil, nil)
     end
 
-    it 'passes in the user and session' do
+    it "passes in the user and session" do
       user = double
       session = double
       thing = double
@@ -61,7 +61,7 @@ describe AdheresToPolicy::Condition do
       condition.applies?(nil, user, session)
     end
 
-    it 'works with lambdas with only one argument' do
+    it "works with lambdas with only one argument" do
       user = double
       thing = double
       expect(thing).to receive(:happened).with(user)

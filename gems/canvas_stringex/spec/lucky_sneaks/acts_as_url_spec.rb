@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'spec_helper'
+require "spec_helper"
 
 # require 'canvas_stringex'
 
@@ -123,19 +123,19 @@ describe "ActsAsUrl" do
   end
 
   it "should_update_url_only_when_blank_if_asked" do
-    @original_url = 'the-url-of-concrete'
+    @original_url = "the-url-of-concrete"
     @blank = Blankument.create!(title: "Stable as Stone", url: @original_url)
     expect(@original_url).to eq @blank.url
     @blank = Blankument.create!(title: "Stable as Stone")
-    expect('stable-as-stone').to eq @blank.url
+    expect("stable-as-stone").to eq @blank.url
   end
 
   it "overrides only_when_blank only for instance (not class level)" do
     @blank = Blankument.new(title: "something Something", url: @original_url)
-    @original_url = 'the-url-of-concrete'
+    @original_url = "the-url-of-concrete"
     @blank.only_when_blank = false
     @blank.save!
-    expect('something-something').to eq @blank.url
+    expect("something-something").to eq @blank.url
 
     @blank2 = Blankument.new
     expect(@blank2.only_when_blank).to eq(true)

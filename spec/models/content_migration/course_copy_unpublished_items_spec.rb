@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative 'course_copy_helper'
+require_relative "course_copy_helper"
 
 describe ContentMigration do
   context "course copy unpublished items" do
@@ -33,16 +33,16 @@ describe ContentMigration do
 
       expect(@copy_to.context_modules.count).to eq 2
       cm_2 = @copy_to.context_modules.where(migration_id: mig_id(cm)).first
-      expect(cm_2.workflow_state).to eq 'active'
+      expect(cm_2.workflow_state).to eq "active"
       cm2_2 = @copy_to.context_modules.where(migration_id: mig_id(cm2)).first
-      expect(cm2_2.workflow_state).to eq 'unpublished'
+      expect(cm2_2.workflow_state).to eq "unpublished"
     end
 
     it "preserves published state of contentless module items" do
       cm = @copy_from.context_modules.create!(name: "eh module")
-      pu = cm.add_item(type: 'external_url', title: 'published', url: 'http://published.example.com')
+      pu = cm.add_item(type: "external_url", title: "published", url: "http://published.example.com")
       pu.publish!
-      uu = cm.add_item(type: 'external_url', title: 'unpublished', url: 'http://unpublished.example.com')
+      uu = cm.add_item(type: "external_url", title: "unpublished", url: "http://unpublished.example.com")
       expect(uu).to be_unpublished
 
       run_course_copy
@@ -58,12 +58,12 @@ describe ContentMigration do
       page = @copy_from.wiki_pages.create(title: "some page")
       page.workflow_state = :unpublished
       page.save!
-      mod1.add_item({ id: page.id, type: 'wiki_page' })
+      mod1.add_item({ id: page.id, type: "wiki_page" })
 
       asmnt1 = @copy_from.assignments.create!(title: "some assignment")
       asmnt1.workflow_state = :unpublished
       asmnt1.save!
-      mod1.add_item({ id: asmnt1.id, type: 'assignment', indent: 1 })
+      mod1.add_item({ id: asmnt1.id, type: "assignment", indent: 1 })
 
       run_course_copy
 
@@ -87,9 +87,9 @@ describe ContentMigration do
       run_course_copy
 
       dt1_copy = @copy_to.discussion_topics.where(migration_id: mig_id(dt1)).first
-      expect(dt1_copy.workflow_state).to eq 'unpublished'
+      expect(dt1_copy.workflow_state).to eq "unpublished"
       dt2_copy = @copy_to.discussion_topics.where(migration_id: mig_id(dt2)).first
-      expect(dt2_copy.workflow_state).to eq 'active'
+      expect(dt2_copy.workflow_state).to eq "active"
     end
 
     it "copies unpublished wiki pages" do
@@ -100,7 +100,7 @@ describe ContentMigration do
       run_course_copy
 
       wiki2 = @copy_to.wiki_pages.where(migration_id: mig_id(wiki)).first
-      expect(wiki2.workflow_state).to eq 'unpublished'
+      expect(wiki2.workflow_state).to eq "unpublished"
     end
 
     it "copies unpublished quiz assignments" do
@@ -127,27 +127,27 @@ describe ContentMigration do
     end
 
     it "does not re-unpublish module items on re-copy" do
-      skip 'Requires QtiMigrationTool' unless Qti.qti_enabled?
+      skip "Requires QtiMigrationTool" unless Qti.qti_enabled?
 
       mod = @copy_from.context_modules.create!(name: "some module")
       tags = []
 
-      tags << mod.add_item({ title: 'Example 1', type: 'external_url', url: 'http://derp.derp/something' })
+      tags << mod.add_item({ title: "Example 1", type: "external_url", url: "http://derp.derp/something" })
 
       asmnt = @copy_from.assignments.create!(title: "some assignment")
-      tags << mod.add_item({ id: asmnt.id, type: 'assignment' })
+      tags << mod.add_item({ id: asmnt.id, type: "assignment" })
 
       quiz = @copy_from.quizzes.create!(title: "some quiz")
-      tags << mod.add_item({ id: quiz.id, type: 'quiz' })
+      tags << mod.add_item({ id: quiz.id, type: "quiz" })
 
       topic = @copy_from.discussion_topics.create!(title: "some topic")
-      tags << mod.add_item({ id: topic.id, type: 'discussion_topic' })
+      tags << mod.add_item({ id: topic.id, type: "discussion_topic" })
 
       page = @copy_from.wiki_pages.create!(title: "some page")
-      tags << mod.add_item({ id: page.id, type: 'wiki_page' })
+      tags << mod.add_item({ id: page.id, type: "wiki_page" })
 
       file = @copy_from.attachments.create!(display_name: "some file", uploaded_data: default_uploaded_data, locked: true)
-      tags << mod.add_item({ id: file.id, type: 'attachment' })
+      tags << mod.add_item({ id: file.id, type: "attachment" })
 
       tags.each do |tag|
         tag.unpublish

@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_dependency 'quizzes/quiz_question/base'
+require_dependency "quizzes/quiz_question/base"
 
 describe Quizzes::QuizQuestion::NumericalQuestion do
   let(:question_data) do
@@ -34,24 +34,24 @@ describe Quizzes::QuizQuestion::NumericalQuestion do
     end
   end
 
-  describe '#i18n_decimal' do
-    it 'works in english' do
-      expect(question.i18n_decimal('1234.56')).to eq BigDecimal('1234.56')
-      expect(question.i18n_decimal('1,234.56')).to eq BigDecimal('1234.56')
+  describe "#i18n_decimal" do
+    it "works in english" do
+      expect(question.i18n_decimal("1234.56")).to eq BigDecimal("1234.56")
+      expect(question.i18n_decimal("1,234.56")).to eq BigDecimal("1234.56")
     end
 
-    it 'works in french' do
-      I18n.locale = 'fr'
-      expect(question.i18n_decimal('1 234,56')).to eq BigDecimal('1234.56')
-      expect(question.i18n_decimal('1234,56')).to eq BigDecimal('1234.56')
+    it "works in french" do
+      I18n.locale = "fr"
+      expect(question.i18n_decimal("1 234,56")).to eq BigDecimal("1234.56")
+      expect(question.i18n_decimal("1234,56")).to eq BigDecimal("1234.56")
     end
 
-    it 'works for inputs of type Integer' do
-      expect(question.i18n_decimal(1234)).to eq BigDecimal('1234')
+    it "works for inputs of type Integer" do
+      expect(question.i18n_decimal(1234)).to eq BigDecimal("1234")
     end
 
-    it 'works for inputs of type Float' do
-      expect(question.i18n_decimal(123_456e-2)).to eq BigDecimal('1234.56')
+    it "works for inputs of type Float" do
+      expect(question.i18n_decimal(123_456e-2)).to eq BigDecimal("1234.56")
     end
   end
 
@@ -103,11 +103,11 @@ describe Quizzes::QuizQuestion::NumericalQuestion do
       expect(question.correct_answer_parts(user_answer)).to be_falsey
     end
 
-    describe 'flexible ranges' do # rubocop:disable RSpec/EmptyExampleGroup
+    describe "flexible ranges" do # rubocop:disable RSpec/EmptyExampleGroup
       # RuboCop can't detect the examples that are dynamically defined
       def self.test_range(range, answer, is_correct)
         desc = "should calculate if %s falls %s (%d,%d)" % [
-          answer, is_correct ? 'within' : 'out of', range[0], range[1]
+          answer, is_correct ? "within" : "out of", range[0], range[1]
         ]
 
         it desc do

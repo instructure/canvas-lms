@@ -18,8 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class PactApiConsumerProxy
-  AUTH_HEADER = 'HTTP_AUTHORIZATION'
-  USER_HEADER = 'HTTP_AUTH_USER'
+  AUTH_HEADER = "HTTP_AUTHORIZATION"
+  USER_HEADER = "HTTP_AUTH_USER"
 
   def call(env)
     # Users calling the API will know the user name of the

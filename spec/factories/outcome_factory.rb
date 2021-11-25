@@ -39,8 +39,8 @@ module Factories
 
   def valid_outcome_attributes
     {
-      title: 'first new outcome',
-      description: '<p>new outcome</p>'
+      title: "first new outcome",
+      description: "<p>new outcome</p>"
     }
   end
 
@@ -69,8 +69,8 @@ module Factories
 
   def valid_outcome_group_attributes
     {
-      title: 'new outcome group',
-      description: '<p>outcome group description</p>'
+      title: "new outcome group",
+      description: "<p>outcome group description</p>"
     }
   end
 
@@ -79,9 +79,9 @@ module Factories
     @outcome_group ||= context.root_outcome_group
     @outcome = opts[:outcome] || outcome_model(context: context,
                                                outcome_context: opts[:outcome_context] || context,
-                                               title: 'new outcome',
-                                               description: '<p>This is <b>awesome</b>.</p>',
-                                               calculation_method: 'highest')
+                                               title: "new outcome",
+                                               description: "<p>This is <b>awesome</b>.</p>",
+                                               calculation_method: "highest")
     [opts[:outcome_context], context].compact.uniq.each do |ctxt|
       root = ctxt.root_outcome_group
       root.add_outcome(@outcome)
@@ -89,7 +89,7 @@ module Factories
     end
 
     rubric_params = {
-      title: opts[:title] || 'My Rubric',
+      title: opts[:title] || "My Rubric",
       hide_score_total: false,
       criteria: {
         "0" => {
@@ -112,7 +112,7 @@ module Factories
         "1" => {
           points: 5,
           description: "no outcome row",
-          long_description: 'non outcome criterion',
+          long_description: "non outcome criterion",
           ratings: {
             "0" => {
               points: 5,

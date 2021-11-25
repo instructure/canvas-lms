@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'broadcast_policy'
+require "broadcast_policy"
 Rails.configuration.to_prepare do
   BroadcastPolicy.notifier = -> { Notifier.new }
   BroadcastPolicy.notification_finder = -> { NotificationFinder.new(Notification.all_cached) }

@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-describe 'PeriodicJobs' do
+describe "PeriodicJobs" do
   describe ".with_each_shard_by_database_in_region" do
     before do
       stub_const("FakeJob", Class.new do
@@ -65,7 +65,7 @@ describe 'PeriodicJobs' do
     it "Schedules jobs in the future when local nighttime is in the future" do
       old_tz = Shard.current.database_server.config[:timezone]
       # Picked because it doesn't have DST
-      Shard.current.database_server.config[:timezone] = 'America/Phoenix'
+      Shard.current.database_server.config[:timezone] = "America/Phoenix"
       Timecop.freeze do
         expect(PeriodicJobs.compute_run_at(jitter: nil, local_offset: true)).to eq(Time.zone.now + 7.hours)
       end
@@ -76,7 +76,7 @@ describe 'PeriodicJobs' do
     it "Schedules jobs in the future when local nighttime is in the past" do
       old_tz = Shard.current.database_server.config[:timezone]
       # Picked because it doesn't have DST
-      Shard.current.database_server.config[:timezone] = 'Africa/Nairobi'
+      Shard.current.database_server.config[:timezone] = "Africa/Nairobi"
       Timecop.freeze do
         expect(PeriodicJobs.compute_run_at(jitter: nil, local_offset: true)).to eq(Time.zone.now + 21.hours)
       end

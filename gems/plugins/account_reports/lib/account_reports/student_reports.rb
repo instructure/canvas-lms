@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'account_reports/report_helper'
+require "account_reports/report_helper"
 
 module AccountReports
   class StudentReports
@@ -72,15 +72,15 @@ module AccountReports
       if @account_report.value_for_param("enrollment_state")
         states = @account_report.parameters["enrollment_state"]
       end
-      states = nil if Array(states).include?('all')
+      states = nil if Array(states).include?("all")
       states
     end
 
     def enrollment_states_string
       if enrollment_states
-        Array(enrollment_states).join(' ')
+        Array(enrollment_states).join(" ")
       else
-        'all'
+        "all"
       end
     end
 
@@ -116,29 +116,29 @@ module AccountReports
 
       no_subs = no_subs.where(e: { workflow_state: enrollment_states }) if enrollment_states
       no_subs = add_term_scope(no_subs)
-      no_subs = add_course_enrollments_scope(no_subs, 'e')
+      no_subs = add_course_enrollments_scope(no_subs, "e")
       no_subs = add_course_sub_account_scope(no_subs) unless course
 
       if include_enrollment_state
-        add_extra_text(I18n.t('account_reports.student.enrollment_state',
-                              'Include Enrollment State: true;'))
+        add_extra_text(I18n.t("account_reports.student.enrollment_state",
+                              "Include Enrollment State: true;"))
       end
 
-      add_extra_text(I18n.t('account_reports.student.enrollment_states',
+      add_extra_text(I18n.t("account_reports.student.enrollment_states",
                             "Enrollment States: %{states};", states: enrollment_states_string))
 
       headers = []
-      headers << I18n.t('#account_reports.report_header_user_id', 'user id')
-      headers << I18n.t('#account_reports.report_header_user_sis_id', 'user sis id')
-      headers << I18n.t('#account_reports.report_header_user_name', 'user name')
-      headers << I18n.t('#account_reports.report_header_section_id', 'section id')
-      headers << I18n.t('#account_reports.report_header_section_sis_id', 'section sis id')
-      headers << I18n.t('#account_reports.report_header_section_name', 'section name')
-      headers << I18n.t('#account_reports.report_header_course_id', 'course id')
-      headers << I18n.t('#account_reports.report_header_course_sis_id', 'course sis id')
-      headers << I18n.t('#account_reports.report_header_course_name', 'course name')
+      headers << I18n.t("#account_reports.report_header_user_id", "user id")
+      headers << I18n.t("#account_reports.report_header_user_sis_id", "user sis id")
+      headers << I18n.t("#account_reports.report_header_user_name", "user name")
+      headers << I18n.t("#account_reports.report_header_section_id", "section id")
+      headers << I18n.t("#account_reports.report_header_section_sis_id", "section sis id")
+      headers << I18n.t("#account_reports.report_header_section_name", "section name")
+      headers << I18n.t("#account_reports.report_header_course_id", "course id")
+      headers << I18n.t("#account_reports.report_header_course_sis_id", "course sis id")
+      headers << I18n.t("#account_reports.report_header_course_name", "course name")
       if include_enrollment_state
-        headers << I18n.t('#account_reports.report_header_enrollment_state', 'enrollment state')
+        headers << I18n.t("#account_reports.report_header_enrollment_state", "enrollment state")
       end
 
       write_report headers do |csv|
@@ -208,32 +208,32 @@ module AccountReports
       end
 
       data = data.where(enrollments: { course_id: course }) if course
-      data = add_term_scope(data, 'c')
-      data = add_course_sub_account_scope(data, 'c') unless course
+      data = add_term_scope(data, "c")
+      data = add_course_sub_account_scope(data, "c") unless course
 
       headers = []
-      headers << I18n.t('#account_reports.report_header_user_id', 'user id')
-      headers << I18n.t('#account_reports.report_header_user_sis_id', 'user sis id')
-      headers << I18n.t('#account_reports.report_header_name', 'name')
-      headers << I18n.t('#account_reports.report_header_section_id', 'section id')
-      headers << I18n.t('#account_reports.report_header_section_sis_id', 'section sis id')
-      headers << I18n.t('#account_reports.report_header_section_name', 'section name')
-      headers << I18n.t('#account_reports.report_header_course_id', 'course id')
-      headers << I18n.t('#account_reports.report_header_course_sis_id', 'course sis id')
-      headers << I18n.t('#account_reports.report_header_course_name', 'course name')
+      headers << I18n.t("#account_reports.report_header_user_id", "user id")
+      headers << I18n.t("#account_reports.report_header_user_sis_id", "user sis id")
+      headers << I18n.t("#account_reports.report_header_name", "name")
+      headers << I18n.t("#account_reports.report_header_section_id", "section id")
+      headers << I18n.t("#account_reports.report_header_section_sis_id", "section sis id")
+      headers << I18n.t("#account_reports.report_header_section_name", "section name")
+      headers << I18n.t("#account_reports.report_header_course_id", "course id")
+      headers << I18n.t("#account_reports.report_header_course_sis_id", "course sis id")
+      headers << I18n.t("#account_reports.report_header_course_name", "course name")
 
       write_report headers do |csv|
         data.find_each do |u|
           row = []
-          row << u['user_id']
-          row << u['sis_user_id']
-          row << u['sortable_name']
-          row << u['section_id']
-          row << u['section_sis_id']
-          row << u['section_name']
-          row << u['course_id']
-          row << u['course_sis_id']
-          row << u['course_name']
+          row << u["user_id"]
+          row << u["sis_user_id"]
+          row << u["sortable_name"]
+          row << u["section_id"]
+          row << u["section_sis_id"]
+          row << u["section_name"]
+          row << u["course_id"]
+          row << u["course_sis_id"]
+          row << u["course_name"]
           csv << row
         end
       end
@@ -257,11 +257,11 @@ module AccountReports
       students = students.active unless @include_deleted
 
       headers = []
-      headers << I18n.t('#account_reports.report_header_user_id', 'user id')
-      headers << I18n.t('#account_reports.report_header_user_sis_id', 'user sis id')
-      headers << I18n.t('#account_reports.report_header_user_name', 'user name')
-      headers << I18n.t('#account_reports.report_header_last_access_at', 'last access at')
-      headers << I18n.t('#account_reports.report_header_last_ip', 'last ip')
+      headers << I18n.t("#account_reports.report_header_user_id", "user id")
+      headers << I18n.t("#account_reports.report_header_user_sis_id", "user sis id")
+      headers << I18n.t("#account_reports.report_header_user_name", "user name")
+      headers << I18n.t("#account_reports.report_header_last_access_at", "last access at")
+      headers << I18n.t("#account_reports.report_header_last_ip", "last ip")
 
       @account_report.update(total_lines: students.count)
 
@@ -289,9 +289,9 @@ module AccountReports
       report_extra_text
 
       headers = []
-      headers << I18n.t('#account_reports.report_header_user_id', 'user id')
-      headers << I18n.t('#account_reports.report_header_user_name', 'user name')
-      headers << I18n.t('#account_reports.report_header_last_activity_at', 'last activity at')
+      headers << I18n.t("#account_reports.report_header_user_id", "user id")
+      headers << I18n.t("#account_reports.report_header_user_name", "user name")
+      headers << I18n.t("#account_reports.report_header_last_activity_at", "last activity at")
 
       write_report headers do |csv|
         students = User.joins(:enrollments)
@@ -321,26 +321,26 @@ module AccountReports
 
     def user_access_tokens
       headers = []
-      headers << I18n.t('#account_reports.report_header_user_id', 'user id')
-      headers << I18n.t('#account_reports.report_header_user_name', 'user name')
-      headers << I18n.t('#account_reports.report_header_token_hint', 'token hint')
-      headers << I18n.t('#account_reports.report_header_expiration', 'expiration')
-      headers << I18n.t('#account_reports.report_header_token_last_used', 'last used')
-      headers << I18n.t('#account_reports.report_header_token_dev_key_id', 'dev key id')
-      headers << I18n.t('#account_reports.report_header_token_dev_key_name', 'dev key name')
+      headers << I18n.t("#account_reports.report_header_user_id", "user id")
+      headers << I18n.t("#account_reports.report_header_user_name", "user name")
+      headers << I18n.t("#account_reports.report_header_token_hint", "token hint")
+      headers << I18n.t("#account_reports.report_header_expiration", "expiration")
+      headers << I18n.t("#account_reports.report_header_token_last_used", "last used")
+      headers << I18n.t("#account_reports.report_header_token_dev_key_id", "dev key id")
+      headers << I18n.t("#account_reports.report_header_token_dev_key_name", "dev key name")
 
       columns = []
-      columns << 'access_tokens.user_id'
-      columns << 'users.sortable_name'
-      columns << 'access_tokens.token_hint'
-      columns << 'access_tokens.permanent_expires_at'
-      columns << 'access_tokens.last_used_at'
-      columns << 'access_tokens.developer_key_id'
+      columns << "access_tokens.user_id"
+      columns << "users.sortable_name"
+      columns << "access_tokens.token_hint"
+      columns << "access_tokens.permanent_expires_at"
+      columns << "access_tokens.last_used_at"
+      columns << "access_tokens.developer_key_id"
 
       user_tokens = root_account.pseudonyms
                                 .select(columns)
                                 .joins(user: :access_tokens).order("users.id, sortable_name, last_used_at DESC")
-      user_tokens = user_tokens.where.not(pseudonyms: { workflow_state: 'deleted' }) unless @include_deleted
+      user_tokens = user_tokens.where.not(pseudonyms: { workflow_state: "deleted" }) unless @include_deleted
 
       user_tokens = add_user_sub_account_scope(user_tokens)
 
@@ -352,8 +352,8 @@ module AccountReports
           row << token[:user_id]
           row << token[:sortable_name]
           row << token[:token_hint]
-          row << (token[:permanent_expires_at] ? default_timezone_format(token[:permanent_expires_at]) : 'never')
-          row << (token[:last_used_at] ? default_timezone_format(token[:last_used_at]) : 'never')
+          row << (token[:permanent_expires_at] ? default_timezone_format(token[:permanent_expires_at]) : "never")
+          row << (token[:last_used_at] ? default_timezone_format(token[:last_used_at]) : "never")
           row << token[:developer_key_id]
           row << dev_key.name
           csv << row

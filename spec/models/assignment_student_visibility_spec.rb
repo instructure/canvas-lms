@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../spec_helper'
+require_relative "../spec_helper"
 
 # need tests for:
 # overrides that arent date related
@@ -35,7 +35,7 @@ describe "differentiated_assignments" do
   def make_assignment(opts = {})
     @assignment = Assignment.create!({
                                        context: @course,
-                                       description: 'descript foo',
+                                       description: "descript foo",
                                        only_visible_to_overrides: opts[:ovto],
                                        points_possible: rand(1000),
                                        submission_types: "online_text_entry",
@@ -88,24 +88,24 @@ describe "differentiated_assignments" do
 
   def enroll_user_in_group(group, opts = {})
     @user = opts[:user] || user_model
-    group.add_user(@user, 'accepted', true)
+    group.add_user(@user, "accepted", true)
   end
 
   def enroller_user_in_both_groups(opts = {})
     @user = opts[:user] || user_model
-    @group_foo.add_user(@user, 'accepted', true)
-    @group_bar.add_user(@user, 'accepted', true)
+    @group_foo.add_user(@user, "accepted", true)
+    @group_bar.add_user(@user, "accepted", true)
   end
 
   def add_multiple_sections
     @default_section = @course.default_section
-    @section_foo = @course.course_sections.create!(name: 'foo')
-    @section_bar = @course.course_sections.create!(name: 'bar')
+    @section_foo = @course.course_sections.create!(name: "foo")
+    @section_bar = @course.course_sections.create!(name: "bar")
   end
 
   def add_multiple_groups
-    @group_foo = @course.groups.create!(name: 'foo group')
-    @group_bar = @course.groups.create!(name: 'bar group')
+    @group_foo = @course.groups.create!(name: "foo group")
+    @group_bar = @course.groups.create!(name: "bar group")
   end
 
   def create_override_for_assignment(assignment)

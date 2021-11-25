@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../spec_components/spec_components_course_module'
+require_relative "../spec_components/spec_components_course_module"
 
 module DifferentiatedAssignments
   module CourseModules
@@ -25,10 +25,10 @@ module DifferentiatedAssignments
       attr_reader :first_module, :second_module, :third_module, :fourth_module
 
       def initialize
-        @first_module  = create_course_module('Module 0')
-        @second_module = create_course_module('Module 1') # TODO: Add prerequisite complete Module 0 first
-        @third_module  = create_course_module('Module 2')
-        @fourth_module = create_course_module('Module 3')
+        @first_module  = create_course_module("Module 0")
+        @second_module = create_course_module("Module 1") # TODO: Add prerequisite complete Module 0 first
+        @third_module  = create_course_module("Module 2")
+        @fourth_module = create_course_module("Module 3")
         add_assignments_to_modules
       end
 

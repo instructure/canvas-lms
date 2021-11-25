@@ -21,15 +21,15 @@ module InstFS
   class << self
     def enabled?
       # true if plugin is enabled AND all settings values are set
-      Canvas::Plugin.find('inst_fs').enabled? && !!app_host && !!jwt_secret
+      Canvas::Plugin.find("inst_fs").enabled? && !!app_host && !!jwt_secret
     end
 
     def check_migration_rate?
-      rand < Canvas::Plugin.find('inst_fs').settings[:migration_rate].to_f / 100.0
+      rand < Canvas::Plugin.find("inst_fs").settings[:migration_rate].to_f / 100.0
     end
 
     def service_worker_enabled?
-      Canvas::Plugin.value_to_boolean(Canvas::Plugin.find('inst_fs').settings[:service_worker])
+      Canvas::Plugin.value_to_boolean(Canvas::Plugin.find("inst_fs").settings[:service_worker])
     end
 
     def migrate_attachment?(attachment)
@@ -56,7 +56,7 @@ module InstFS
     end
 
     def bearer_token(options)
-      expires_in = options[:expires_in] || Setting.get('instfs.session_token.expiration_minutes', '5').to_i.minutes
+      expires_in = options[:expires_in] || Setting.get("instfs.session_token.expiration_minutes", "5").to_i.minutes
       claims = {
         iat: Time.now.utc.to_i,
         user_id: options[:user]&.global_id&.to_s
@@ -148,7 +148,7 @@ module InstFS
       end
 
       {
-        file_param: target_url ? nil : 'file',
+        file_param: target_url ? nil : "file",
         progress: progress_json,
         upload_url: upload_url(token),
         upload_params: upload_params
@@ -204,8 +204,8 @@ module InstFS
       # `attachment.bucket.url`
       s3_client = attachment.bucket.client
       s3_url = s3_client.config.endpoint.dup
-      if s3_client.config.region == 'us-east-1' &&
-         s3_client.config.s3_us_east_1_regional_endpoint == 'legacy'
+      if s3_client.config.region == "us-east-1" &&
+         s3_client.config.s3_us_east_1_regional_endpoint == "legacy"
         s3_url.host = Aws::S3::Plugins::IADRegionalEndpoint.legacy_host(s3_url.host)
       end
 
@@ -367,8 +367,8 @@ module InstFS
     end
 
     def access_jwt(resource, options = {})
-      expires_in = options[:expires_in] || Setting.get('instfs.access_jwt.expiration_hours', '24').to_i.hours
-      iat = if (expires_in >= 1.hour.to_i) && Setting.get('instfs.access_jwt.use_consistent_iat', 'true') == "true"
+      expires_in = options[:expires_in] || Setting.get("instfs.access_jwt.expiration_hours", "24").to_i.hours
+      iat = if (expires_in >= 1.hour.to_i) && Setting.get("instfs.access_jwt.use_consistent_iat", "true") == "true"
               consistent_iat(resource, expires_in)
             else
               Time.now.utc.to_i
@@ -391,7 +391,7 @@ module InstFS
     end
 
     def upload_jwt(user:, acting_as:, access_token:, root_account:, capture_url:, capture_params:)
-      expires_in = Setting.get('instfs.upload_jwt.expiration_minutes', '10').to_i.minutes
+      expires_in = Setting.get("instfs.upload_jwt.expiration_minutes", "10").to_i.minutes
       claims = {
         iat: Time.now.utc.to_i,
         user_id: user.global_id.to_s,
@@ -407,7 +407,7 @@ module InstFS
     end
 
     def direct_upload_jwt
-      expires_in = Setting.get('instfs.upload_jwt.expiration_minutes', '10').to_i.minutes
+      expires_in = Setting.get("instfs.upload_jwt.expiration_minutes", "10").to_i.minutes
       service_jwt({
                     iat: Time.now.utc.to_i,
                     user_id: nil,
@@ -417,34 +417,34 @@ module InstFS
     end
 
     def session_jwt(user, host)
-      expires_in = Setting.get('instfs.session_jwt.expiration_minutes', '5').to_i.minutes
+      expires_in = Setting.get("instfs.session_jwt.expiration_minutes", "5").to_i.minutes
       service_jwt({
                     iat: Time.now.utc.to_i,
                     user_id: user.global_id&.to_s,
                     host: host,
-                    resource: '/session/ensure'
+                    resource: "/session/ensure"
                   }, expires_in)
     end
 
     def logout_jwt(user)
-      expires_in = Setting.get('instfs.logout_jwt.expiration_minutes', '5').to_i.minutes
+      expires_in = Setting.get("instfs.logout_jwt.expiration_minutes", "5").to_i.minutes
       service_jwt({
                     iat: Time.now.utc.to_i,
                     user_id: user.global_id&.to_s,
-                    resource: '/session'
+                    resource: "/session"
                   }, expires_in)
     end
 
     def export_references_jwt
-      expires_in = Setting.get('instfs.logout_jwt.expiration_minutes', '5').to_i.minutes
+      expires_in = Setting.get("instfs.logout_jwt.expiration_minutes", "5").to_i.minutes
       service_jwt({
                     iat: Time.now.utc.to_i,
-                    resource: '/references'
+                    resource: "/references"
                   }, expires_in)
     end
 
     def duplicate_file_jwt(instfs_uuid)
-      expires_in = Setting.get('instfs.duplicate_file_jwt.expiration_minutes', '5').to_i.minutes
+      expires_in = Setting.get("instfs.duplicate_file_jwt.expiration_minutes", "5").to_i.minutes
       service_jwt({
                     iat: Time.now.utc.to_i,
                     resource: "/files/#{instfs_uuid}/duplicate"
@@ -452,7 +452,7 @@ module InstFS
     end
 
     def delete_file_jwt(instfs_uuid)
-      expires_in = Setting.get('instfs.delete_file_jwt.expiration_minutes', '5').to_i.minutes
+      expires_in = Setting.get("instfs.delete_file_jwt.expiration_minutes", "5").to_i.minutes
       service_jwt({
                     iat: Time.now.utc.to_i,
                     resource: "/files/#{instfs_uuid}"
@@ -491,11 +491,11 @@ module InstFS
     def whitelisted_access_token?(access_token)
       if access_token.nil?
         false
-      elsif Setting.get('instfs.whitelist_all_developer_keys', 'false') == 'true'
+      elsif Setting.get("instfs.whitelist_all_developer_keys", "false") == "true"
         true
       else
-        whitelist = Setting.get('instfs.whitelisted_developer_key_global_ids', '')
-        whitelist = whitelist.split(',').map(&:to_i)
+        whitelist = Setting.get("instfs.whitelisted_developer_key_global_ids", "")
+        whitelist = whitelist.split(",").map(&:to_i)
         whitelist.include?(access_token.global_developer_key_id)
       end
     end

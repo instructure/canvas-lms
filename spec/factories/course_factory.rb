@@ -36,7 +36,7 @@ module Factories
         u.register!
         u.enable_feature!(:new_user_tutorial_on_off) if opts[:new_user]
         e = @course.enroll_teacher(u)
-        e.workflow_state = 'active'
+        e.workflow_state = "active"
         e.save!
         @teacher = u
       end
@@ -57,8 +57,8 @@ module Factories
 
   def course_valid_attributes
     {
-      name: 'value for name',
-      group_weighting_scheme: 'value for group_weighting_scheme',
+      name: "value for name",
+      group_weighting_scheme: "value for group_weighting_scheme",
       start_at: Time.now,
       conclude_at: Time.now + 100,
       is_public: true,
@@ -73,7 +73,7 @@ module Factories
     @user.save!
     @enrollment.course = @course # set the reverse association
     if opts[:active_enrollment] || opts[:active_all]
-      @enrollment.workflow_state = 'active'
+      @enrollment.workflow_state = "active"
       @enrollment.save!
     end
     @course.reload
@@ -81,7 +81,7 @@ module Factories
   end
 
   def course_with_student(opts = {})
-    course_with_user('StudentEnrollment', opts)
+    course_with_user("StudentEnrollment", opts)
     @student = @user
     @enrollment
   end
@@ -98,13 +98,13 @@ module Factories
   end
 
   def course_with_teacher(opts = {})
-    course_with_user('TeacherEnrollment', opts)
+    course_with_user("TeacherEnrollment", opts)
     @teacher = @user
     @enrollment
   end
 
   def course_with_designer(opts = {})
-    course_with_user('DesignerEnrollment', opts)
+    course_with_user("DesignerEnrollment", opts)
     @designer = @user
     @enrollment
   end
@@ -115,7 +115,7 @@ module Factories
   end
 
   def course_with_observer(opts = {})
-    course_with_user('ObserverEnrollment', opts)
+    course_with_user("ObserverEnrollment", opts)
     @observer = @user
     @enrollment
   end
@@ -133,7 +133,7 @@ module Factories
     submission_count.times do |s|
       assignment = @course.assignments.create!(title: "test #{s} assignment")
       submission = assignment.submissions.find_by!(user: @student)
-      submission.update!(score: '5') if opts[:submission_points]
+      submission.update!(score: "5") if opts[:submission_points]
     end
   end
 
@@ -149,7 +149,7 @@ module Factories
     account = options[:account] || Account.default
     records = Array.new(records) { |i| { name: "Course #{i}" } } if records.is_a?(Integer)
     now = Time.now.utc
-    records = records.map { |record| course_valid_attributes.merge(account_id: account.id, root_account_id: account.id, workflow_state: 'available', enrollment_term_id: account.default_enrollment_term.id, created_at: now, updated_at: now).merge(record) }
+    records = records.map { |record| course_valid_attributes.merge(account_id: account.id, root_account_id: account.id, workflow_state: "available", enrollment_term_id: account.default_enrollment_term.id, created_at: now, updated_at: now).merge(record) }
     course_data = create_records(Course, records, options[:return_type])
     course_ids = if options[:return_type] == :record
                    course_data.map(&:id)
@@ -164,7 +164,7 @@ module Factories
       section_ids = create_records(CourseSection, course_ids.map { |id| { course_id: id, root_account_id: account.id, name: "Default Section", default_section: true, created_at: now, updated_at: now } })
       type = options[:enrollment_type] || "TeacherEnrollment"
       role_id = Role.get_built_in_role(type, root_account_id: account.resolved_root_account_id).id
-      result = create_records(Enrollment, course_ids.each_with_index.map { |id, i| { course_id: id, user_id: user.id, type: type, course_section_id: section_ids[i], root_account_id: account.id, workflow_state: 'active', role_id: role_id, created_at: now, updated_at: now } })
+      result = create_records(Enrollment, course_ids.each_with_index.map { |id, i| { course_id: id, user_id: user.id, type: type, course_section_id: section_ids[i], root_account_id: account.id, workflow_state: "active", role_id: role_id, created_at: now, updated_at: now } })
       create_enrollment_states(result, { state: "active", root_account_id: account.id })
     end
     course_data

@@ -37,13 +37,13 @@ module Submissions
       prepare_js_env
 
       @assessment_request = @submission.assessment_requests.where(assessor_id: @current_user).first
-      @body_classes << 'is-inside-submission-frame'
+      @body_classes << "is-inside-submission-frame"
 
       # We're re-using the preview view for viewing Student Annotation
       # submissions in SpeedGrader, but the default padding for previews does
       # not work well for SpeedGrader.
       if @submission.submission_type == "student_annotation"
-        @body_classes.push('full-width', 'student-annotation-container')
+        @body_classes.push("full-width", "student-annotation-container")
       end
 
       if @assignment.moderated_grading?
@@ -54,7 +54,7 @@ module Submissions
                                           @assignment.anonymous_instructor_annotations
 
       unless @assignment.visible_to_user?(@current_user)
-        flash[:notice] = t('This assignment will no longer count towards your grade.')
+        flash[:notice] = t("This assignment will no longer count towards your grade.")
       end
 
       @headers = false
@@ -63,7 +63,7 @@ module Submissions
           redirect_to(named_context_url(@context, redirect_path_name, @assignment.quiz.id, redirect_params))
         else
           @anonymize_students = anonymize_students?
-          render template: 'submissions/show_preview', locals: {
+          render template: "submissions/show_preview", locals: {
             anonymize_students: @anonymize_students
           }
         end

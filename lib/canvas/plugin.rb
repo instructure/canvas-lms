@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_dependency 'canvas'
+require_dependency "canvas"
 
 module Canvas
   class NoPluginError < StandardError; end
@@ -56,7 +56,7 @@ module Canvas
     end
 
     def encode_with(coder)
-      coder['id'] = id.to_s
+      coder["id"] = id.to_s
     end
 
     Psych.add_domain_type("ruby/object", "Canvas::Plugin") do |_type, val|
@@ -135,7 +135,7 @@ module Canvas
     end
 
     def translate(key, default, options = {})
-      key = "canvas.plugins.#{@id}.#{key}" unless key.start_with?('#')
+      key = "canvas.plugins.#{@id}.#{key}" unless key.start_with?("#")
       I18n.t(key, default, options)
     end
     alias_method :t, :translate

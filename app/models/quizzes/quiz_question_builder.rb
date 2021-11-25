@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class Quizzes::QuizQuestionBuilder
-  QUIZ_GROUP_ENTRY = 'quiz_group'
+  QUIZ_GROUP_ENTRY = "quiz_group"
   DEFAULT_OPTIONS = {
     shuffle_answers: false
   }.freeze
@@ -131,7 +131,7 @@ class Quizzes::QuizQuestionBuilder
 
   def self.decorate_question_for_submission(q, position)
     question_name = t(
-      '#quizzes.quiz.question_name_counter',
+      "#quizzes.quiz.question_name_counter",
       "Question %{question_number}", {
         question_number: position
       }
@@ -141,7 +141,7 @@ class Quizzes::QuizQuestionBuilder
 
     case q[:question_type]
     when ::Quizzes::QuizQuestion::Q_TEXT_ONLY
-      question_name = t('#quizzes.quiz.default_text_only_question_name', 'Spacer')
+      question_name = t("#quizzes.quiz.default_text_only_question_name", "Spacer")
     when ::Quizzes::QuizQuestion::Q_FILL_IN_MULTIPLE_BLANKS
       text = q[:question_text]
       variables = q[:answers].pluck(:blank_id).uniq
@@ -176,7 +176,7 @@ class Quizzes::QuizQuestionBuilder
         select = <<~HTML
           <select class='question_input' name='question_#{q[:id]}_#{variable_id}'>
             <option value=''>
-              #{ERB::Util.h(t('#quizzes.quiz.default_question_input', "[ Select ]"))}
+              #{ERB::Util.h(t("#quizzes.quiz.default_question_input", "[ Select ]"))}
             </option>
             #{options}
           </select>

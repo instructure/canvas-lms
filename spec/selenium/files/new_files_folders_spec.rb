@@ -17,8 +17,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../common'
-require_relative '../helpers/files_common'
+require_relative "../common"
+require_relative "../helpers/files_common"
 
 describe "better_file_browsing, folders" do
   include_context "in-process server selenium tests"
@@ -45,13 +45,13 @@ describe "better_file_browsing, folders" do
 
     it "displays all cog icon options", priority: "1" do
       expect(fj("a:contains('new test folder')")).to be_present
-      ff('.ef-item-row').first.click # ensure folder item has focus
-      f('button.al-trigger.btn-link').click # toggle cog menu button
+      ff(".ef-item-row").first.click # ensure folder item has focus
+      f("button.al-trigger.btn-link").click # toggle cog menu button
       wait_for_animations
-      expect(fln('Download')).to be_displayed
-      expect(fln('Rename')).to be_displayed
-      expect(fln('Move')).to be_displayed
-      expect(fln('Delete')).to be_displayed
+      expect(fln("Download")).to be_displayed
+      expect(fln("Rename")).to be_displayed
+      expect(fln("Move")).to be_displayed
+      expect(fln("Delete")).to be_displayed
     end
 
     it "edits folder name", priority: "1" do
@@ -64,11 +64,11 @@ describe "better_file_browsing, folders" do
 
     it "validates xss on folder text", priority: "1" do
       add_folder('<script>alert("Hi");</script>')
-      expect(ff('.ef-name-col__text')[0].text).to eq '<script>alert("Hi");<_script>'
+      expect(ff(".ef-name-col__text")[0].text).to eq '<script>alert("Hi");<_script>'
     end
 
     it "moves a folder", priority: "1" do
-      ff('.ef-name-col__text')[0].click
+      ff(".ef-name-col__text")[0].click
       wait_for_ajaximations
       add_folder("test folder")
       move("test folder", 0, :cog_icon)
@@ -85,25 +85,25 @@ describe "better_file_browsing, folders" do
 
     it "unpublishes and publish a folder from cloud icon", priority: "1" do
       set_item_permissions(:unpublish, :cloud_icon)
-      expect(f('.btn-link.published-status.unpublished')).to be_displayed
+      expect(f(".btn-link.published-status.unpublished")).to be_displayed
       set_item_permissions(:publish, :cloud_icon)
-      expect(f('.btn-link.published-status.published')).to be_displayed
+      expect(f(".btn-link.published-status.published")).to be_displayed
     end
 
     it "makes folder available to student with link", priority: "1" do
       set_item_permissions(:restricted_access, :available_with_link, :cloud_icon)
-      expect(f('.btn-link.published-status.hiddenState')).to be_displayed
+      expect(f(".btn-link.published-status.hiddenState")).to be_displayed
     end
 
     it "makes folder available to student within given timeframe", priority: "1" do
       set_item_permissions(:restricted_access, :available_with_timeline, :cloud_icon)
-      expect(f('.btn-link.published-status.restricted')).to be_displayed
+      expect(f(".btn-link.published-status.restricted")).to be_displayed
     end
 
     it "deletes folder from toolbar", priority: "1" do
       skip_if_safari(:alert)
       delete_file(0, :toolbar_menu)
-      expect(f("body")).not_to contain_css('.ef-item-row')
+      expect(f("body")).not_to contain_css(".ef-item-row")
     end
 
     it "is able to create and view a new folder with uri characters", priority: "2" do
@@ -113,12 +113,12 @@ describe "better_file_browsing, folders" do
       expect(folder).to_not be_nil
       file_name = "some silly file"
       @course.attachments.create!(display_name: file_name, uploaded_data: default_uploaded_data, folder: folder)
-      folder_link = fln(folder_name, f('.ef-directory'))
+      folder_link = fln(folder_name, f(".ef-directory"))
       expect(folder_link).to be_present
       folder_link.click
       wait_for_ajaximations
       # we should be viewing the new folders contents
-      file_link = fln(file_name, f('.ef-directory'))
+      file_link = fln(file_name, f(".ef-directory"))
       expect(file_link).to be_present
     end
   end
@@ -142,24 +142,24 @@ describe "better_file_browsing, folders" do
     end
 
     it "displays folders in tree view", priority: "1" do
-      add_file(fixture_file_upload('files/example.pdf', 'application/pdf'),
+      add_file(fixture_file_upload("files/example.pdf", "application/pdf"),
                @course, "example.pdf")
       get "/courses/#{@course.id}/files"
       create_new_folder
       add_folder("New Folder")
-      ff('.ef-name-col__text')[1].click
+      ff(".ef-name-col__text")[1].click
       wait_for_ajaximations
       add_folder("New Folder 1.1")
       ff(".icon-folder")[1].click
-      expect(ff('.ef-name-col__text')[0].text).to eq "New Folder 1.1"
+      expect(ff(".ef-name-col__text")[0].text).to eq "New Folder 1.1"
       get "/courses/#{@course.id}/files"
-      expect(ff('.ef-name-col__text')[0].text).to eq "example.pdf"
-      expect(f('.ef-folder-content')).to be_displayed
+      expect(ff(".ef-name-col__text")[0].text).to eq "example.pdf"
+      expect(f(".ef-folder-content")).to be_displayed
     end
 
     it "creates 15 new child folders and show them in the FolderTree when expanded", priority: "2" do
       create_new_folder
-      f('.ef-name-col > a.ef-name-col__link').click
+      f(".ef-name-col > a.ef-name-col__link").click
       wait_for_ajaximations
       1.upto(15) do |number_of_folders|
         folder_regex = number_of_folders > 1 ? Regexp.new("New Folder\\s#{number_of_folders}") : "New Folder"
@@ -168,9 +168,9 @@ describe "better_file_browsing, folders" do
         expect(all_files_folders.last.text).to match folder_regex
       end
       get "/courses/#{@course.id}/files"
-      f('ul.collectionViewItems > li > a > i.icon-mini-arrow-right').click
+      f("ul.collectionViewItems > li > a > i.icon-mini-arrow-right").click
       wait_for_ajaximations
-      expect(ff('ul.collectionViewItems > li > ul.treeContents > li.subtrees > ul.collectionViewItems li')).to have_size(15)
+      expect(ff("ul.collectionViewItems > li > ul.treeContents > li.subtrees > ul.collectionViewItems li")).to have_size(15)
     end
   end
 end

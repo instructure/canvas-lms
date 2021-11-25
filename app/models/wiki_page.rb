@@ -18,10 +18,10 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'atom'
+require "atom"
 
 # Force loaded so that it will be in ActiveRecord::Base.descendants for switchman to use
-require_dependency 'assignment_student_visibility'
+require_dependency "assignment_student_visibility"
 
 class WikiPage < ActiveRecord::Base
   attr_readonly :wiki_id
@@ -51,7 +51,7 @@ class WikiPage < ActiveRecord::Base
   belongs_to :user
 
   belongs_to :context, polymorphic: [:course, :group]
-  belongs_to :root_account, class_name: 'Account'
+  belongs_to :root_account, class_name: "Account"
 
   acts_as_url :title, sync_url: true
 
@@ -69,11 +69,11 @@ class WikiPage < ActiveRecord::Base
               if: proc { context.try(:feature_enabled?, :conditional_release) }
 
   scope :starting_with_title, lambda { |title|
-    where('title ILIKE ?', "#{title}%")
+    where("title ILIKE ?", "#{title}%")
   }
 
   scope :not_ignored_by, lambda { |user, purpose|
-    where("NOT EXISTS (?)", Ignore.where(asset_type: 'WikiPage', user_id: user, purpose: purpose).where("asset_id=wiki_pages.id"))
+    where("NOT EXISTS (?)", Ignore.where(asset_type: "WikiPage", user_id: user, purpose: purpose).where("asset_id=wiki_pages.id"))
   }
   scope :todo_date_between, ->(starting, ending) { where(todo_date: starting...ending) }
   scope :for_courses_and_groups, lambda { |course_ids, group_ids|
@@ -132,7 +132,7 @@ class WikiPage < ActiveRecord::Base
       end
     end
     if context.wiki_pages.not_deleted.where(title: self.title).where.not(id: id).first
-      real_title = self.title.gsub(/-(\d*)\z/, '') # remove any "-#" at the end
+      real_title = self.title.gsub(/-(\d*)\z/, "") # remove any "-#" at the end
       n = $1 ? $1.to_i + 1 : 2
       new_title = nil
       loop do
@@ -147,7 +147,7 @@ class WikiPage < ActiveRecord::Base
   end
 
   def self.title_order_by_clause
-    best_unicode_collation_key('wiki_pages.title')
+    best_unicode_collation_key("wiki_pages.title")
   end
 
   def ensure_unique_url
@@ -183,18 +183,18 @@ class WikiPage < ActiveRecord::Base
 
   validates_each :title do |record, attr, value|
     if value.blank?
-      record.errors.add(attr, t('errors.blank_title', "Title can't be blank"))
+      record.errors.add(attr, t("errors.blank_title", "Title can't be blank"))
     elsif value.size > maximum_string_length
-      record.errors.add(attr, t('errors.title_too_long', "Title can't exceed %{max_characters} characters", max_characters: maximum_string_length))
+      record.errors.add(attr, t("errors.title_too_long", "Title can't exceed %{max_characters} characters", max_characters: maximum_string_length))
     elsif value.to_url.blank?
-      record.errors.add(attr, t('errors.title_characters', "Title must contain at least one letter or number")) # it's a bit more liberal than this, but let's not complicate things
+      record.errors.add(attr, t("errors.title_characters", "Title must contain at least one letter or number")) # it's a bit more liberal than this, but let's not complicate things
     end
   end
 
   has_a_broadcast_policy
   simply_versioned exclude: SIMPLY_VERSIONED_EXCLUDE_FIELDS, when: proc { |wp|
     # always create a version when restoring a deleted page
-    next true if wp.workflow_state_changed? && wp.workflow_state_was == 'deleted'
+    next true if wp.workflow_state_changed? && wp.workflow_state_was == "deleted"
 
     # :user_id and :updated_at do not merit creating a version, but should be saved
     exclude_fields = [:user_id, :updated_at].concat(SIMPLY_VERSIONED_EXCLUDE_FIELDS).map(&:to_s)
@@ -276,7 +276,7 @@ class WikiPage < ActiveRecord::Base
 
   def set_as_front_page!
     if unpublished?
-      errors.add(:front_page, t(:cannot_set_unpublished_front_page, 'could not set as front page because it is unpublished'))
+      errors.add(:front_page, t(:cannot_set_unpublished_front_page, "could not set as front page because it is unpublished"))
       return false
     end
 
@@ -325,20 +325,20 @@ class WikiPage < ActiveRecord::Base
 
     roles = effective_roles
     # teachers implies all course admins (teachers, TAs, etc)
-    return true if roles.include?('teachers') && context.respond_to?(:admins) && context.admins.include?(user)
+    return true if roles.include?("teachers") && context.respond_to?(:admins) && context.admins.include?(user)
 
     # the page must be available for users of the following roles
     return false unless available_for?(user, session)
-    return true if roles.include?('students') && context.respond_to?(:students) && context.includes_student?(user)
-    return true if roles.include?('members') && context.respond_to?(:users) && context.users.include?(user)
-    return true if roles.include?('public')
+    return true if roles.include?("students") && context.respond_to?(:students) && context.includes_student?(user)
+    return true if roles.include?("members") && context.respond_to?(:users) && context.users.include?(user)
+    return true if roles.include?("public")
 
     false
   end
 
   def effective_roles
     context_roles = context.default_wiki_editing_roles rescue nil
-    roles = (editing_roles || context_roles || default_roles).split(',')
+    roles = (editing_roles || context_roles || default_roles).split(",")
     roles == %w[teachers] ? [] : roles # "Only teachers" option doesn't grant rights excluded by RoleOverrides
   end
 
@@ -353,9 +353,9 @@ class WikiPage < ActiveRecord::Base
 
   def default_roles
     if context.is_a?(Course)
-      'teachers'
+      "teachers"
     else
-      'members'
+      "members"
     end
   end
 
@@ -398,14 +398,14 @@ class WikiPage < ActiveRecord::Base
       entry.updated   = updated_at
       entry.published = created_at
       entry.id        = "tag:#{HostUrl.default_host},#{created_at.strftime("%Y-%m-%d")}:/wiki_pages/#{feed_code}_#{updated_at.strftime("%Y-%m-%d")}"
-      entry.links << Atom::Link.new(rel: 'alternate',
+      entry.links << Atom::Link.new(rel: "alternate",
                                     href: "http://#{HostUrl.context_host(context)}/#{self.context.class.to_s.downcase.pluralize}/#{self.context.id}/pages/#{url}")
-      entry.content = Atom::Content::Html.new(body || t('defaults.no_content', "no content"))
+      entry.content = Atom::Content::Html.new(body || t("defaults.no_content", "no content"))
     end
   end
 
   def user_name
-    user&.name || t('unknown_user_name', "Unknown")
+    user&.name || t("unknown_user_name", "Unknown")
   end
 
   def to_param
@@ -500,10 +500,10 @@ class WikiPage < ActiveRecord::Base
   def initialize_wiki_page(user)
     self.workflow_state = if wiki.grants_right?(user, :publish_page)
                             # Leave the page unpublished if the user is allowed to publish it later
-                            'unpublished'
+                            "unpublished"
                           else
                             # If they aren't, publish it automatically
-                            'active'
+                            "active"
                           end
 
     self.editing_roles = (context.default_wiki_editing_roles rescue nil) || default_roles
@@ -511,7 +511,7 @@ class WikiPage < ActiveRecord::Base
     if is_front_page?
       self.body = t "#application.wiki_front_page_default_content_course", "Welcome to your new course wiki!" if context.is_a?(Course)
       self.body = t "#application.wiki_front_page_default_content_group", "Welcome to your new group wiki!" if context.is_a?(Group)
-      self.workflow_state = 'active'
+      self.workflow_state = "active"
     end
   end
 

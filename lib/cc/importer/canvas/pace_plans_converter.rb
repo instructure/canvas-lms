@@ -25,20 +25,20 @@ module CC::Importer::Canvas
       pace_plans = []
       return pace_plans unless doc
 
-      doc.css('pace_plan').each do |pace_plan_node|
+      doc.css("pace_plan").each do |pace_plan_node|
         pace_plan = {}
-        pace_plan[:migration_id] = pace_plan_node['identifier']
-        pace_plan[:workflow_state] = get_node_val(pace_plan_node, 'workflow_state')
-        pace_plan[:end_date] = get_time_val(pace_plan_node, 'end_date')
-        pace_plan[:published_at] = get_time_val(pace_plan_node, 'published_at')
-        pace_plan[:exclude_weekends] = get_bool_val(pace_plan_node, 'exclude_weekends')
-        pace_plan[:hard_end_dates] = get_bool_val(pace_plan_node, 'hard_end_dates')
+        pace_plan[:migration_id] = pace_plan_node["identifier"]
+        pace_plan[:workflow_state] = get_node_val(pace_plan_node, "workflow_state")
+        pace_plan[:end_date] = get_time_val(pace_plan_node, "end_date")
+        pace_plan[:published_at] = get_time_val(pace_plan_node, "published_at")
+        pace_plan[:exclude_weekends] = get_bool_val(pace_plan_node, "exclude_weekends")
+        pace_plan[:hard_end_dates] = get_bool_val(pace_plan_node, "hard_end_dates")
 
         pace_plan[:module_items] = []
-        pace_plan_node.css('module_item').each do |item_node|
+        pace_plan_node.css("module_item").each do |item_node|
           item = {}
-          item[:duration] = get_int_val(item_node, 'duration')
-          item[:module_item_migration_id] = get_node_val(item_node, 'module_item_identifierref')
+          item[:duration] = get_int_val(item_node, "duration")
+          item[:module_item_migration_id] = get_node_val(item_node, "module_item_identifierref")
           pace_plan[:module_items] << item
         end
 

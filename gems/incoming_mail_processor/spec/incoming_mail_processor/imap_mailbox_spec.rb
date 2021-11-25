@@ -18,10 +18,10 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'spec_helper'
+require "spec_helper"
 
 describe IncomingMailProcessor::ImapMailbox do
-  include_examples 'Mailbox'
+  include_examples "Mailbox"
 
   def default_config
     {
@@ -86,13 +86,13 @@ describe IncomingMailProcessor::ImapMailbox do
     end
   end
 
-  describe '#unprocessed_message_count' do
-    it 'returns zero if there are no messages' do
+  describe "#unprocessed_message_count" do
+    it "returns zero if there are no messages" do
       expect(@imap_mock).to receive(:search).with(["X-GM-RAW", "label:unread"]).once.and_return([])
       expect(@mailbox.unprocessed_message_count).to eql 0
     end
 
-    it 'returns the number of messages if there are any' do
+    it "returns the number of messages if there are any" do
       expect(@imap_mock).to receive(:search).with(["X-GM-RAW", "label:unread"]).once.and_return([1, 2, 3, 58, 42])
       expect(@mailbox.unprocessed_message_count).to eql 5
     end

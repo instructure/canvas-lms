@@ -185,7 +185,7 @@ class MediaTracksController < ApplicationController
       old_track_locales = @media_object.media_tracks.where(user_id: @current_user.id).pluck(:locale)
 
       # delete the tracks that don't exist in the new set
-      removed_track_locales = old_track_locales - new_tracks.pluck('locale')
+      removed_track_locales = old_track_locales - new_tracks.pluck("locale")
       removed_tracks = @media_object.media_tracks.where(user_id: @current_user.id, locale: removed_track_locales)
       removed_tracks.destroy_all
 
@@ -194,7 +194,7 @@ class MediaTracksController < ApplicationController
         # if the new track coming from the client has no content, it hasn't been updated. Leave it alone.
         next if t["content"].blank?
 
-        track = @media_object.media_tracks.where(user_id: @current_user.id, locale: t['locale']).first_or_initialize
+        track = @media_object.media_tracks.where(user_id: @current_user.id, locale: t["locale"]).first_or_initialize
         track.update! ActionController::Parameters.new(t).permit(*TRACK_SETTABLE_ATTRIBUTES)
       end
       index

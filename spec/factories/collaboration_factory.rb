@@ -35,7 +35,7 @@ module Factories
       context: @course || course_model,
       url: "value for url",
       title: "My Collaboration",
-      data: File.read('gems/google_drive/spec/fixtures/google_drive/file_data.json')
+      data: File.read("gems/google_drive/spec/fixtures/google_drive/file_data.json")
     }
   end
 end

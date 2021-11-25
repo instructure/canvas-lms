@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'spec_helper'
+require "spec_helper"
 
 describe "BookmarkedCollection" do
   let(:id_bookmarker) do
@@ -34,7 +34,7 @@ describe "BookmarkedCollection" do
 
       def self.restrict_scope(scope, pager)
         if (bookmark = pager.current_bookmark)
-          comparison = (pager.include_bookmark ? 'id >= ?' : 'id > ?')
+          comparison = (pager.include_bookmark ? "id >= ?" : "id > ?")
           scope = scope.where(comparison, bookmark)
         end
         scope.order("id ASC")
@@ -54,7 +54,7 @@ describe "BookmarkedCollection" do
 
       def self.restrict_scope(scope, pager)
         if (bookmark = pager.current_bookmark)
-          comparison = (pager.include_bookmark ? 'name >= ?' : 'name > ?')
+          comparison = (pager.include_bookmark ? "name >= ?" : "name > ?")
           scope = scope.where(comparison, bookmark)
         end
         scope.order("name ASC")
@@ -65,7 +65,7 @@ describe "BookmarkedCollection" do
   describe ".wrap" do
     before do
       example_class = Class.new(ActiveRecord::Base) do
-        self.table_name = 'examples'
+        self.table_name = "examples"
       end
       3.times { example_class.create! }
       @scope = example_class
@@ -99,7 +99,7 @@ describe "BookmarkedCollection" do
 
     it "applies any restriction block given to the scope" do
       course = @scope.order(:id).last
-      course.update(name: 'Matching Name')
+      course.update(name: "Matching Name")
 
       collection = BookmarkedCollection.wrap(id_bookmarker, @scope) do |scope|
         scope.where(name: course.name)
@@ -112,22 +112,22 @@ describe "BookmarkedCollection" do
   describe ".merge" do
     before do
       example_class = Class.new(ActiveRecord::Base) do
-        self.table_name = 'examples'
+        self.table_name = "examples"
       end
 
-      @created_course1 = example_class.create!(state: 'created')
-      @deleted_course1 = example_class.create!(state: 'deleted')
-      @created_course2 = example_class.create!(state: 'created')
-      @deleted_course2 = example_class.create!(state: 'deleted')
+      @created_course1 = example_class.create!(state: "created")
+      @deleted_course1 = example_class.create!(state: "deleted")
+      @created_course2 = example_class.create!(state: "created")
+      @deleted_course2 = example_class.create!(state: "deleted")
 
-      @created_scope = example_class.where(state: 'created')
-      @deleted_scope = example_class.where(state: 'deleted')
+      @created_scope = example_class.where(state: "created")
+      @deleted_scope = example_class.where(state: "deleted")
 
       @created_collection = BookmarkedCollection.wrap(id_bookmarker, @created_scope)
       @deleted_collection = BookmarkedCollection.wrap(id_bookmarker, @deleted_scope)
       @collection = BookmarkedCollection.merge(
-        ['created', @created_collection],
-        ['deleted', @deleted_collection]
+        ["created", @created_collection],
+        ["deleted", @deleted_collection]
       )
     end
 
@@ -168,8 +168,8 @@ describe "BookmarkedCollection" do
         @created_collection = BookmarkedCollection.wrap(name_bookmarker, @created_scope)
         @deleted_collection = BookmarkedCollection.wrap(name_bookmarker, @deleted_scope)
         @collection = BookmarkedCollection.merge(
-          ['created', @created_collection],
-          ['deleted', @deleted_collection]
+          ["created", @created_collection],
+          ["deleted", @deleted_collection]
         ) { nil }
       end
 
@@ -191,8 +191,8 @@ describe "BookmarkedCollection" do
         @created_collection = BookmarkedCollection.wrap(name_bookmarker, @created_scope)
         @deleted_collection = BookmarkedCollection.wrap(name_bookmarker, @deleted_scope)
         @collection = BookmarkedCollection.merge(
-          ['created', @created_collection],
-          ['deleted', @deleted_collection]
+          ["created", @created_collection],
+          ["deleted", @deleted_collection]
         )
       end
 
@@ -215,11 +215,11 @@ describe "BookmarkedCollection" do
   describe ".concat" do
     before do
       example_class = Class.new(ActiveRecord::Base) do
-        self.table_name = 'examples'
+        self.table_name = "examples"
       end
 
-      @created_scope = example_class.where(state: 'created')
-      @deleted_scope = example_class.where(state: 'deleted')
+      @created_scope = example_class.where(state: "created")
+      @deleted_scope = example_class.where(state: "deleted")
 
       @created_course1 = @created_scope.create!
       @deleted_course1 = @deleted_scope.create!
@@ -229,8 +229,8 @@ describe "BookmarkedCollection" do
       @created_collection = BookmarkedCollection.wrap(id_bookmarker, @created_scope)
       @deleted_collection = BookmarkedCollection.wrap(id_bookmarker, @deleted_scope)
       @collection = BookmarkedCollection.concat(
-        ['created', @created_collection],
-        ['deleted', @deleted_collection]
+        ["created", @created_collection],
+        ["deleted", @deleted_collection]
       )
     end
 
@@ -282,8 +282,8 @@ describe "BookmarkedCollection" do
       end
 
       @collection = BookmarkedCollection.concat(
-        ['created', created_collection],
-        ['deleted', @deleted_collection]
+        ["created", created_collection],
+        ["deleted", @deleted_collection]
       )
       expect(created_collection.paginate(per_page: 3)).to eq([@created_course1])
       expect(@collection.paginate(per_page: 3)).to eq([@created_course1, @created_course2, @deleted_course1])
@@ -301,8 +301,8 @@ describe "BookmarkedCollection" do
       end
 
       @collection = BookmarkedCollection.concat(
-        ['created', created_collection],
-        ['deleted', @deleted_collection]
+        ["created", created_collection],
+        ["deleted", @deleted_collection]
       )
 
       expect(@deleted_collection).not_to receive(:execute_pager)
@@ -313,15 +313,15 @@ describe "BookmarkedCollection" do
   describe "nested compositions" do
     before do
       example_class = Class.new(ActiveRecord::Base) do
-        self.table_name = 'examples'
+        self.table_name = "examples"
       end
 
       user_class = Class.new(ActiveRecord::Base) do
-        self.table_name = 'users'
+        self.table_name = "users"
       end
 
-      @created_scope = example_class.where(state: 'created')
-      @deleted_scope = example_class.where(state: 'deleted')
+      @created_scope = example_class.where(state: "created")
+      @deleted_scope = example_class.where(state: "deleted")
 
       # user's names are so it sorts Created X < Creighton < Deanne < Deleted
       # X when using NameBookmarks
@@ -340,13 +340,13 @@ describe "BookmarkedCollection" do
       @deleted_collection = BookmarkedCollection.wrap(id_bookmarker, @deleted_scope)
 
       @course_collection = BookmarkedCollection.merge(
-        ['created', @created_collection],
-        ['deleted', @deleted_collection]
+        ["created", @created_collection],
+        ["deleted", @deleted_collection]
       )
 
       @collection = BookmarkedCollection.concat(
-        ['users', @user_collection],
-        ['courses', @course_collection]
+        ["users", @user_collection],
+        ["courses", @course_collection]
       )
 
       page = @collection.paginate(per_page: 4)
@@ -365,13 +365,13 @@ describe "BookmarkedCollection" do
       @deleted_collection = BookmarkedCollection.wrap(name_bookmarker, @deleted_scope)
 
       @course_collection = BookmarkedCollection.merge(
-        ['created', @created_collection],
-        ['deleted', @deleted_collection]
+        ["created", @created_collection],
+        ["deleted", @deleted_collection]
       )
 
       @collection = BookmarkedCollection.merge(
-        ['users', @user_collection],
-        ['courses', @course_collection]
+        ["users", @user_collection],
+        ["courses", @course_collection]
       )
 
       page = @collection.paginate(per_page: 3)
@@ -389,13 +389,13 @@ describe "BookmarkedCollection" do
       @deleted_collection = BookmarkedCollection.wrap(id_bookmarker, @deleted_scope)
 
       @course_collection = BookmarkedCollection.concat(
-        ['created', @created_collection],
-        ['deleted', @deleted_collection]
+        ["created", @created_collection],
+        ["deleted", @deleted_collection]
       )
 
       @collection = BookmarkedCollection.concat(
-        ['users', @user_collection],
-        ['courses', @course_collection]
+        ["users", @user_collection],
+        ["courses", @course_collection]
       )
 
       page = @collection.paginate(per_page: 3)
@@ -413,31 +413,31 @@ describe "BookmarkedCollection" do
       @deleted_collection = BookmarkedCollection.wrap(name_bookmarker, @deleted_scope)
 
       @course_collection = BookmarkedCollection.concat(
-        ['created', @created_collection],
-        ['deleted', @deleted_collection]
+        ["created", @created_collection],
+        ["deleted", @deleted_collection]
       )
 
       expect do
         @collection = BookmarkedCollection.merge(
-          ['users', @user_collection],
-          ['courses', @course_collection]
+          ["users", @user_collection],
+          ["courses", @course_collection]
         )
       end.to raise_exception ArgumentError
     end
   end
 
   describe ".best_unicode_collation_key" do
-    it 'returns col if proc is not set' do
+    it "returns col if proc is not set" do
       BookmarkedCollection.best_unicode_collation_key_proc = nil
-      expect(BookmarkedCollection.best_unicode_collation_key('key_name')).to eq('key_name')
+      expect(BookmarkedCollection.best_unicode_collation_key("key_name")).to eq("key_name")
     end
 
-    it 'uses proc to calculate key' do
+    it "uses proc to calculate key" do
       BookmarkedCollection.best_unicode_collation_key_proc = lambda do |col|
         return "lower(#{col})"
       end
 
-      expect(BookmarkedCollection.best_unicode_collation_key('key_name')).to eq('lower(key_name)')
+      expect(BookmarkedCollection.best_unicode_collation_key("key_name")).to eq("lower(key_name)")
     end
   end
 end

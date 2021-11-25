@@ -93,12 +93,12 @@ module Canvadocs
     private :canvadocs_annotation_context
 
     def canvadocs_permissions(user, read_only)
-      return 'read' if read_only
-      return 'readwrite' if submissions.empty?
-      return 'readwritemanage' if managing?(user)
-      return 'read' if observing?(user)
+      return "read" if read_only
+      return "readwrite" if submissions.empty?
+      return "readwritemanage" if managing?(user)
+      return "read" if observing?(user)
 
-      'readwrite'
+      "readwrite"
     end
     private :canvadocs_permissions
 

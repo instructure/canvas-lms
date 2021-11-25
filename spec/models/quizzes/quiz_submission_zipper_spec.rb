@@ -115,9 +115,9 @@ describe Quizzes::QuizSubmissionZipper do
       student = @student
       quiz = course_quiz(true)
       question = quiz.quiz_questions.create! question_data: {
-        name: 'q1', points_possible: 1,
-        question_type: 'file_upload_question',
-        question_text: 'ohai mark'
+        name: "q1", points_possible: 1,
+        question_type: "file_upload_question",
+        question_text: "ohai mark"
       }
       quiz.generate_quiz_data
       quiz.save!
@@ -127,9 +127,9 @@ describe Quizzes::QuizSubmissionZipper do
       submission.save!
       Quizzes::SubmissionGrader.new(submission).grade_submission
       quiz.reload
-      attachment = quiz.attachments.build(filename: 'submissions.zip',
-                                          display_name: 'submissions.zip')
-      attachment.workflow_state = 'to_be_zipped'
+      attachment = quiz.attachments.build(filename: "submissions.zip",
+                                          display_name: "submissions.zip")
+      attachment.workflow_state = "to_be_zipped"
       attachment.save!
       teacher_in_course(course: @course, active_all: true)
 

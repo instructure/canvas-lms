@@ -130,8 +130,8 @@ describe TextHelper do
   end
 
   it "inserts reply to into subject" do
-    expect(TextHelper.make_subject_reply_to('ohai')).to eq 'Re: ohai'
-    expect(TextHelper.make_subject_reply_to('Re: ohai')).to eq 'Re: ohai'
+    expect(TextHelper.make_subject_reply_to("ohai")).to eq "Re: ohai"
+    expect(TextHelper.make_subject_reply_to("Re: ohai")).to eq "Re: ohai"
   end
 
   context "markdown" do
@@ -183,10 +183,10 @@ describe TextHelper do
 Commodo in ham, *short ribs %{name} pastrami* sausage elit sunt dolore eiusmod ut ea proident ribeye.
 
 Ad dolore andouille meatball irure, ham hock tail exercitation minim ribeye sint quis **eu short loin pancetta**.),
-                     name: '<b>test</b>'.html_safe,
+                     name: "<b>test</b>".html_safe,
                      wrapper: {
-                       '*' => '<span>\1</span>',
-                       '**' => '<a>\1</a>',
+                       "*" => '<span>\1</span>',
+                       "**" => '<a>\1</a>',
                      })).to eq "<p>Dolore jerky bacon officia t-bone aute magna. Officia corned beef et ut bacon.</p>\n\n<p>Commodo in ham, <span>short ribs <b>test</b> pastrami</span> sausage elit sunt dolore eiusmod ut ea proident ribeye.</p>\n\n<p>Ad dolore andouille meatball irure, ham hock tail exercitation minim ribeye sint quis <a>eu short loin pancetta</a>.</p>"
       end
 

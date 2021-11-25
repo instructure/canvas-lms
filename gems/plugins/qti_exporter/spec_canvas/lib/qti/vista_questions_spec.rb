@@ -17,13 +17,13 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../../qti_helper'
+require_relative "../../qti_helper"
 if Qti.migration_executable
   describe "Converting Blackboard Vista qti" do
     let(:keys_to_ignore) { %w[is_quiz_question_bank question_bank_migration_id] }
 
     before(:once) do
-      archive_file_path = File.join(BASE_FIXTURE_DIR, 'bb_vista', 'vista_archive.zip')
+      archive_file_path = File.join(BASE_FIXTURE_DIR, "bb_vista", "vista_archive.zip")
       unzipped_file_path = create_temp_dir!
       @export_folder = create_temp_dir!
       converter = Qti::Converter.new(export_archive_path: archive_file_path, base_download_dir: unzipped_file_path, flavor: Qti::Flavors::WEBCT)
@@ -32,8 +32,8 @@ if Qti.migration_executable
       @questions = converter.course[:assessment_questions][:assessment_questions]
 
       @course_data = converter.course.with_indifferent_access
-      @course_data['all_files_export'] ||= {}
-      @course_data['all_files_export']['file_path'] = @course_data['all_files_zip']
+      @course_data["all_files_export"] ||= {}
+      @course_data["all_files_export"]["file_path"] = @course_data["all_files_zip"]
     end
 
     def import_into_course
@@ -56,21 +56,21 @@ if Qti.migration_executable
     end
 
     it "mocks the manifest node correctly" do
-      manifest_node = get_manifest_node('multiple_choice', interaction_type: 'extendedTextInteraction', bb_question_type: 'Calculated')
+      manifest_node = get_manifest_node("multiple_choice", interaction_type: "extendedTextInteraction", bb_question_type: "Calculated")
       expect(manifest_node.at_css("instructureMetadata")).to eq manifest_node
-      expect(manifest_node['identifier']).to eq nil
-      expect(manifest_node['href']).to eq 'multiple_choice.xml'
-      if (title = manifest_node.at_css('title langstring'))
+      expect(manifest_node["identifier"]).to eq nil
+      expect(manifest_node["href"]).to eq "multiple_choice.xml"
+      if (title = manifest_node.at_css("title langstring"))
         expect(title.text).to eq nil
       end
-      if (type = manifest_node.at_css('interactiontype'))
-        expect(type.text.downcase).to eq 'extendedtextinteraction'
+      if (type = manifest_node.at_css("interactiontype"))
+        expect(type.text.downcase).to eq "extendedtextinteraction"
       end
-      if (type = manifest_node.at_css('instructureMetadata instructureField[name=quiz_type]'))
-        expect(type['value'].downcase).to eq 'calculated'
+      if (type = manifest_node.at_css("instructureMetadata instructureField[name=quiz_type]"))
+        expect(type["value"].downcase).to eq "calculated"
       end
-      if (type = manifest_node.at_css('instructureField[name=bb8_assessment_type]'))
-        expect(type['value'].downcase).to eq 'calculated'
+      if (type = manifest_node.at_css("instructureField[name=bb8_assessment_type]"))
+        expect(type["value"].downcase).to eq "calculated"
       end
     end
 
@@ -81,24 +81,24 @@ if Qti.migration_executable
 
     it "does not fail with missing response identifier" do
       expect do
-        get_question_hash(vista_question_dir, 'no_response_id')
+        get_question_hash(vista_question_dir, "no_response_id")
       end.not_to raise_error
     end
 
     it "converts images correctly" do
-      manifest_node = get_manifest_node('true_false', interaction_type: 'choiceInteraction')
+      manifest_node = get_manifest_node("true_false", interaction_type: "choiceInteraction")
       hash = Qti::ChoiceInteraction.create_instructure_question(manifest_node: manifest_node, base_dir: vista_question_dir).with_indifferent_access
       hash[:answers].each { |a| a.delete(:id) }
       expect(hash.except(*keys_to_ignore)).to eq VistaExpected::TRUE_FALSE2
     end
 
     it "converts image reference" do
-      hash = get_question_hash(vista_question_dir, 'mc')
+      hash = get_question_hash(vista_question_dir, "mc")
       expect(hash[:question_text]).to match %r{\$CANVAS_OBJECT_REFERENCE\$/attachments/67320753001}
     end
 
     it "converts short answer questions with multiple required answers to fimb" do
-      hash = get_question_hash(vista_question_dir, 'short_to_fimb')
+      hash = get_question_hash(vista_question_dir, "short_to_fimb")
       expect(hash[:question_type]).to eq "fill_in_multiple_blanks_question"
       expect(hash[:question_text]).to include("[SA01]")
       expect(hash[:question_text]).to include("[SA02]")
@@ -130,7 +130,7 @@ if Qti.migration_executable
       matches = {}
       hash[:matches].each { |m| matches[m[:match_id]] = m[:text] }
       hash[:answers].each do |a|
-        expect(matches[a[:match_id]]).to eq a[:text].sub('left', 'right')
+        expect(matches[a[:match_id]]).to eq a[:text].sub("left", "right")
       end
 
       # compare everything else without the ids
@@ -179,15 +179,15 @@ if Qti.migration_executable
       expect(q.attachments.count).to eq 3
 
       a = q.attachments.where(display_name: "f11g1_r.jpg").first
-      expect(a.file_state).to eq 'available'
+      expect(a.file_state).to eq "available"
       expect(q.question_data[:question_text]).to match %r{/assessment_questions/#{q.id}/files/#{a.id}/download}
 
       a = q.attachments.where(display_name: "f11g2_r.jpg").first
-      expect(a.file_state).to eq 'available'
+      expect(a.file_state).to eq "available"
       expect(q.question_data[:answers][0][:html]).to match %r{/assessment_questions/#{q.id}/files/#{a.id}/download}
 
       a = q.attachments.where(display_name: "f11g3_r.jpg").first
-      expect(a.file_state).to eq 'available'
+      expect(a.file_state).to eq "available"
       expect(q.question_data[:answers][1][:html]).to match %r{/assessment_questions/#{q.id}/files/#{a.id}/download}
     end
   end

@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../../spec_helper'
+require_relative "../../spec_helper"
 require_relative "../graphql_spec_helper"
 
 describe Types::ProficiencyRatingType do
@@ -31,34 +31,34 @@ describe Types::ProficiencyRatingType do
   let(:account) { @course.root_account }
   let(:account_type) { GraphQLTypeTester.new(account, current_user: @teacher) }
 
-  it 'works' do
+  it "works" do
     expect(
-      account_type.resolve('outcomeProficiency { proficiencyRatingsConnection { nodes { _id } } }').sort
+      account_type.resolve("outcomeProficiency { proficiencyRatingsConnection { nodes { _id } } }").sort
     ).to eq @ratings.map { |r| r.id.to_s }.sort
   end
 
-  describe 'works for the field' do
-    it 'color' do
+  describe "works for the field" do
+    it "color" do
       expect(
-        account_type.resolve('outcomeProficiency { proficiencyRatingsConnection { nodes { color } } }').sort
+        account_type.resolve("outcomeProficiency { proficiencyRatingsConnection { nodes { color } } }").sort
       ).to eq @ratings.map(&:color).sort
     end
 
-    it 'description' do
+    it "description" do
       expect(
-        account_type.resolve('outcomeProficiency { proficiencyRatingsConnection { nodes { description } } }').sort
+        account_type.resolve("outcomeProficiency { proficiencyRatingsConnection { nodes { description } } }").sort
       ).to eq @ratings.map(&:description).sort
     end
 
-    it 'mastery' do
+    it "mastery" do
       expect(
-        account_type.resolve('outcomeProficiency { proficiencyRatingsConnection { nodes { mastery } } }')
+        account_type.resolve("outcomeProficiency { proficiencyRatingsConnection { nodes { mastery } } }")
       ).to eq @ratings.map(&:mastery)
     end
 
-    it 'points' do
+    it "points" do
       expect(
-        account_type.resolve('outcomeProficiency { proficiencyRatingsConnection { nodes { points } } }').sort
+        account_type.resolve("outcomeProficiency { proficiencyRatingsConnection { nodes { points } } }").sort
       ).to eq @ratings.map(&:points).sort
     end
   end

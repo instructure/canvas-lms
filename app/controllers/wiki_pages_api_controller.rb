@@ -174,7 +174,7 @@ class WikiPagesApiController < ApplicationController
   def duplicate
     return unless authorized_action(@page, @current_user, :create)
     if @page.deleted?
-      return render json: { error: 'cannot duplicate deleted page' }, status: :bad_request
+      return render json: { error: "cannot duplicate deleted page" }, status: :bad_request
     end
 
     new_page = @page.duplicate
@@ -246,7 +246,7 @@ class WikiPagesApiController < ApplicationController
       log_api_asset_access(["pages", @context], "pages", "other")
       pages_route = polymorphic_url([:api_v1, @context, :wiki_pages])
       # omit body from selection, since it's not included in index results
-      scope = @context.wiki_pages.select(WikiPage.column_names - ['body']).preload(:user)
+      scope = @context.wiki_pages.select(WikiPage.column_names - ["body"]).preload(:user)
       scope = if params.key?(:published)
                 value_to_boolean(params[:published]) ? scope.published : scope.unpublished
               else
@@ -260,19 +260,19 @@ class WikiPagesApiController < ApplicationController
       scope = WikiPage.search_by_attribute(scope, :title, params[:search_term])
 
       order_clause = case params[:sort]
-                     when 'title'
+                     when "title"
                        WikiPage.title_order_by_clause
-                     when 'created_at',
-                       'updated_at',
-                       'todo_date'
+                     when "created_at",
+                       "updated_at",
+                       "todo_date"
                        params[:sort].to_sym
                      end
       if order_clause
-        order_clause = { order_clause => :desc } if params[:order] == 'desc'
+        order_clause = { order_clause => :desc } if params[:order] == "desc"
         scope = scope.order(order_clause)
       end
       id_clause = :id
-      id_clause = { id: :desc } if params[:order] == 'desc'
+      id_clause = { id: :desc } if params[:order] == "desc"
       scope = scope.order(id_clause)
 
       wiki_pages = Api.paginate(scope, self, pages_route)
@@ -329,7 +329,7 @@ class WikiPagesApiController < ApplicationController
       update_params = get_update_params(Set[:title, :body])
       assign_todo_date
       if !update_params.is_a?(Symbol) && @page.update(update_params) && process_front_page
-        log_asset_access(@page, "wiki", @wiki, 'participate')
+        log_asset_access(@page, "wiki", @wiki, "participate")
         apply_assignment_parameters(assignment_params, @page) if @context.feature_enabled?(:conditional_release)
         render json: wiki_page_json(@page, @current_user, session)
       else
@@ -403,7 +403,7 @@ class WikiPagesApiController < ApplicationController
       assign_todo_date
       update_params = get_update_params(allowed_fields)
       if !update_params.is_a?(Symbol) && @page.update(update_params) && process_front_page
-        log_asset_access(@page, "wiki", @wiki, 'participate')
+        log_asset_access(@page, "wiki", @wiki, "participate")
         @page.context_module_action(@current_user, @context, :contributed)
         apply_assignment_parameters(assignment_params, @page) if @context.feature_enabled?(:conditional_release)
         render json: wiki_page_json(@page, @current_user, session)
@@ -427,7 +427,7 @@ class WikiPagesApiController < ApplicationController
       return render_unauthorized_action if editing_restricted?(@page)
 
       if @was_front_page
-        @page.errors.add(:front_page, t(:cannot_delete_front_page, 'The front page cannot be deleted'))
+        @page.errors.add(:front_page, t(:cannot_delete_front_page, "The front page cannot be deleted"))
         render json: @page.errors, status: :bad_request
       else
         @page.destroy
@@ -564,7 +564,7 @@ class WikiPagesApiController < ApplicationController
     unless @page
       @page = @wiki.build_wiki_page(@current_user, url: @url)
       if is_front_page_action?
-        @page.workflow_state = 'active'
+        @page.workflow_state = "active"
         @set_front_page = true
         @set_as_front_page = true
       end
@@ -574,9 +574,9 @@ class WikiPagesApiController < ApplicationController
   def require_wiki_page
     if !@page || @page.new_record?
       if is_front_page_action?
-        render status: :not_found, json: { message: 'No front page has been set' }
+        render status: :not_found, json: { message: "No front page has been set" }
       else
-        render status: :not_found, json: { message: 'page not found' }
+        render status: :not_found, json: { message: "page not found" }
       end
     end
   end
@@ -592,20 +592,20 @@ class WikiPagesApiController < ApplicationController
 
     if page_params.key?(:published)
       published_value = page_params.delete(:published)
-      if published_value != ''
-        workflow_state = value_to_boolean(published_value) ? 'active' : 'unpublished'
+      if published_value != ""
+        workflow_state = value_to_boolean(published_value) ? "active" : "unpublished"
       end
     end
 
     if page_params.key?(:editing_roles)
-      editing_roles = page_params[:editing_roles].split(',').map(&:strip)
+      editing_roles = page_params[:editing_roles].split(",").map(&:strip)
       invalid_roles = editing_roles.reject { |role| %w[teachers students members public].include?(role) }
       unless invalid_roles.empty?
-        @page.errors.add(:editing_roles, t(:invalid_editing_roles, 'The provided editing roles are invalid'))
+        @page.errors.add(:editing_roles, t(:invalid_editing_roles, "The provided editing roles are invalid"))
         return :bad_request
       end
 
-      page_params[:editing_roles] = editing_roles.join(',')
+      page_params[:editing_roles] = editing_roles.join(",")
     end
 
     if page_params.key?(:front_page)
@@ -624,7 +624,7 @@ class WikiPagesApiController < ApplicationController
       end
 
       if editing_roles
-        existing_editing_roles = (@page.editing_roles || '').split(',')
+        existing_editing_roles = (@page.editing_roles || "").split(",")
         editing_roles_changed = existing_editing_roles.count { |role| editing_roles.exclude?(role) } > 0
         editing_roles_changed |= editing_roles.count { |role| existing_editing_roles.exclude?(role) } > 0
         rejected_fields << :editing_roles if editing_roles_changed
@@ -641,10 +641,10 @@ class WikiPagesApiController < ApplicationController
     # check rejected fields
     rejected_fields -= allowed_fields
     unless rejected_fields.empty?
-      @page.errors.add(:published, t(:cannot_update_published, 'You are not allowed to update the published state of this wiki page')) if rejected_fields.include?(:published)
-      @page.errors.add(:title, t(:cannot_update_title, 'You are not allowed to update the title of this wiki page')) if rejected_fields.include?(:title)
-      @page.errors.add(:editing_roles, t(:cannot_update_editing_roles, 'You are not allowed to update the editing roles of this wiki page')) if rejected_fields.include?(:editing_roles)
-      @page.errors.add(:front_page, t(:cannot_update_front_page, 'You are not allowed to change the wiki front page')) if rejected_fields.include?(:front_page)
+      @page.errors.add(:published, t(:cannot_update_published, "You are not allowed to update the published state of this wiki page")) if rejected_fields.include?(:published)
+      @page.errors.add(:title, t(:cannot_update_title, "You are not allowed to update the title of this wiki page")) if rejected_fields.include?(:title)
+      @page.errors.add(:editing_roles, t(:cannot_update_editing_roles, "You are not allowed to update the editing roles of this wiki page")) if rejected_fields.include?(:editing_roles)
+      @page.errors.add(:front_page, t(:cannot_update_front_page, "You are not allowed to change the wiki front page")) if rejected_fields.include?(:front_page)
 
       return :unauthorized
     end
@@ -654,10 +654,10 @@ class WikiPagesApiController < ApplicationController
     if change_front_page || workflow_state
       new_front_page = change_front_page ? @set_as_front_page : @page.is_front_page?
       new_workflow_state = workflow_state || @page.workflow_state
-      valid_front_page = false if new_front_page && new_workflow_state != 'active'
-      if new_front_page && new_workflow_state != 'active'
+      valid_front_page = false if new_front_page && new_workflow_state != "active"
+      if new_front_page && new_workflow_state != "active"
         valid_front_page = false
-        error_message = t(:cannot_have_unpublished_front_page, 'The front page cannot be unpublished')
+        error_message = t(:cannot_have_unpublished_front_page, "The front page cannot be unpublished")
         @page.errors.add(:front_page, error_message) if change_front_page
         @page.errors.add(:published, error_message) if workflow_state
       end

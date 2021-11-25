@@ -29,7 +29,7 @@ module Factories
     @course = opts[:course] ||= course_model
     @course.offer! unless @course.available?
     if participant.is_a?(User)
-      @course.enroll_student(participant).update_attribute(:workflow_state, 'active')
+      @course.enroll_student(participant).update_attribute(:workflow_state, "active")
     else
       opts[:sub_context] ||= participant.group_category
     end

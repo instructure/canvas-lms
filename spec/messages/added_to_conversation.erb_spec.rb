@@ -18,9 +18,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative 'messages_helper'
+require_relative "messages_helper"
 
-describe 'added_to_conversation' do
+describe "added_to_conversation" do
   include MessagesCommon
 
   before :once do

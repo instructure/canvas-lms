@@ -19,9 +19,9 @@
 #
 class Purgatory < ActiveRecord::Base
   belongs_to :attachment
-  belongs_to :deleted_by_user, class_name: 'User'
+  belongs_to :deleted_by_user, class_name: "User"
 
-  scope :active, -> { where(workflow_state: 'active') }
+  scope :active, -> { where(workflow_state: "active") }
 
   def self.days_until_expiration
     Setting.get("purgatory_days_until_expiration", "30").to_i

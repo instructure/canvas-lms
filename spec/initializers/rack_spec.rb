@@ -19,7 +19,7 @@
 
 require_relative "../spec_helper"
 
-describe 'Rack::Utils' do
+describe "Rack::Utils" do
   it "raises an exception if the params are too deep" do
     len = Rack::Utils.param_depth_limit
 

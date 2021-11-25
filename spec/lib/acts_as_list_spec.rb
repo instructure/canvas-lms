@@ -67,9 +67,9 @@ describe "acts_as_list" do
   describe "#fix_position_conflicts" do
     it "orders null positions last" do
       course_factory
-      module_1 = @course.context_modules.create name: 'one'
+      module_1 = @course.context_modules.create name: "one"
       ContextModule.where(id: module_1).update_all(position: nil)
-      module_2 = @course.context_modules.create name: 'two'
+      module_2 = @course.context_modules.create name: "two"
       module_2.position = 1
       module_2.save!
       module_1.fix_position_conflicts
@@ -78,10 +78,10 @@ describe "acts_as_list" do
 
     it "breaks ties by object id" do
       course_factory
-      module_1 = @course.context_modules.create name: 'one'
+      module_1 = @course.context_modules.create name: "one"
       module_1.position = 1
       module_1.save!
-      module_2 = @course.context_modules.create name: 'two'
+      module_2 = @course.context_modules.create name: "two"
       module_2.position = 1
       module_2.save!
       module_1.fix_position_conflicts
@@ -90,10 +90,10 @@ describe "acts_as_list" do
 
     it "consolidates gaps" do
       course_factory
-      module_1 = @course.context_modules.create name: 'one'
+      module_1 = @course.context_modules.create name: "one"
       module_1.position = 1
       module_1.save!
-      module_2 = @course.context_modules.create name: 'two'
+      module_2 = @course.context_modules.create name: "two"
       module_2.position = 3
       module_2.save!
       module_1.fix_position_conflicts

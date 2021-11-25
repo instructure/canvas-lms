@@ -44,7 +44,7 @@ class Quizzes::QuizExtension
       sub_manager = Quizzes::SubmissionManager.new(quiz)
       ext_params.map do |params|
         student    = students.find(params[:user_id])
-        submission = sub_manager.find_or_create_submission(student, nil, 'settings_only')
+        submission = sub_manager.find_or_create_submission(student, nil, "settings_only")
         extension  = new(submission, params)
         yield extension if block_given? # use yielded block to check permissions
         extensions << extension

@@ -36,11 +36,11 @@ module I18nTasks
         if token&.match?(pattern)
           token
         else
-          s = +''
+          s = +""
           token.chars.each_with_index do |c, i|
             s << (i.odd? ? c.upcase : c.downcase)
           end
-          s.gsub!(/\.( |\z)/, '!!?! ')
+          s.gsub!(/\.( |\z)/, "!!?! ")
           s.sub!(/\A(\w+)\z/, '\1!')
           s << " LOL!" if s.length > 2
           s

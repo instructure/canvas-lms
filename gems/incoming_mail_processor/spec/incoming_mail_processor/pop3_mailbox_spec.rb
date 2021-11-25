@@ -18,10 +18,10 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'spec_helper'
+require "spec_helper"
 
 describe IncomingMailProcessor::Pop3Mailbox do
-  include_examples 'Mailbox'
+  include_examples "Mailbox"
 
   def default_config
     {
@@ -97,7 +97,7 @@ describe IncomingMailProcessor::Pop3Mailbox do
     end
   end
 
-  describe '#unprocessed_message_count' do
+  describe "#unprocessed_message_count" do
     it "returns nil" do
       expect(IncomingMailProcessor::Pop3Mailbox.new(default_config).unprocessed_message_count).to be_nil
     end

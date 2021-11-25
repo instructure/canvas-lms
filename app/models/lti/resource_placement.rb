@@ -20,18 +20,18 @@
 
 module Lti
   class ResourcePlacement < ActiveRecord::Base
-    ACCOUNT_NAVIGATION = 'account_navigation'
-    ASSIGNMENT_EDIT = 'assignment_edit'
-    ASSIGNMENT_SELECTION = 'assignment_selection'
-    ASSIGNMENT_VIEW = 'assignment_view'
-    COURSE_NAVIGATION = 'course_navigation'
-    LINK_SELECTION = 'link_selection'
-    POST_GRADES = 'post_grades'
-    RESOURCE_SELECTION = 'resource_selection'
-    SIMILARITY_DETECTION = 'similarity_detection'
-    GLOBAL_NAVIGATION = 'global_navigation'
+    ACCOUNT_NAVIGATION = "account_navigation"
+    ASSIGNMENT_EDIT = "assignment_edit"
+    ASSIGNMENT_SELECTION = "assignment_selection"
+    ASSIGNMENT_VIEW = "assignment_view"
+    COURSE_NAVIGATION = "course_navigation"
+    LINK_SELECTION = "link_selection"
+    POST_GRADES = "post_grades"
+    RESOURCE_SELECTION = "resource_selection"
+    SIMILARITY_DETECTION = "similarity_detection"
+    GLOBAL_NAVIGATION = "global_navigation"
 
-    SIMILARITY_DETECTION_LTI2 = 'Canvas.placements.similarityDetection'
+    SIMILARITY_DETECTION_LTI2 = "Canvas.placements.similarityDetection"
 
     # Default placements for LTI 1 and LTI 2, ignored for LTI 1.3
     LEGACY_DEFAULT_PLACEMENTS = [ASSIGNMENT_SELECTION, LINK_SELECTION].freeze
@@ -75,18 +75,18 @@ module Lti
                     wiki_page_menu].freeze
 
     PLACEMENT_LOOKUP = {
-      'Canvas.placements.accountNavigation' => ACCOUNT_NAVIGATION,
-      'Canvas.placements.assignmentEdit' => ASSIGNMENT_EDIT,
-      'Canvas.placements.assignmentSelection' => ASSIGNMENT_SELECTION,
-      'Canvas.placements.assignmentView' => ASSIGNMENT_VIEW,
-      'Canvas.placements.courseNavigation' => COURSE_NAVIGATION,
-      'Canvas.placements.linkSelection' => LINK_SELECTION,
-      'Canvas.placements.postGrades' => POST_GRADES,
+      "Canvas.placements.accountNavigation" => ACCOUNT_NAVIGATION,
+      "Canvas.placements.assignmentEdit" => ASSIGNMENT_EDIT,
+      "Canvas.placements.assignmentSelection" => ASSIGNMENT_SELECTION,
+      "Canvas.placements.assignmentView" => ASSIGNMENT_VIEW,
+      "Canvas.placements.courseNavigation" => COURSE_NAVIGATION,
+      "Canvas.placements.linkSelection" => LINK_SELECTION,
+      "Canvas.placements.postGrades" => POST_GRADES,
       SIMILARITY_DETECTION_LTI2 => SIMILARITY_DETECTION,
     }.freeze
 
-    belongs_to :message_handler, class_name: 'Lti::MessageHandler'
-    belongs_to :resource_handler, class_name: 'Lti::ResourceHandler'
+    belongs_to :message_handler, class_name: "Lti::MessageHandler"
+    belongs_to :resource_handler, class_name: "Lti::ResourceHandler"
     validates :message_handler, :placement, presence: true
 
     validates :placement, inclusion: { in: PLACEMENT_LOOKUP.values }
@@ -98,9 +98,9 @@ module Lti
     end
 
     def self.update_tabs_and_return_item_banks_tab(tabs, new_label = nil)
-      item_banks_tab = tabs.find { |t| t[:label] == 'Item Banks' }
+      item_banks_tab = tabs.find { |t| t[:label] == "Item Banks" }
       if item_banks_tab
-        item_banks_tab[:label] = new_label || t('#tabs.item_banks', 'Item Banks')
+        item_banks_tab[:label] = new_label || t("#tabs.item_banks", "Item Banks")
       end
       item_banks_tab
     end

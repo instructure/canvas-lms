@@ -63,7 +63,7 @@ class Quizzes::TakeQuizPresenter
     classes << (one_question_at_a_time? ? "one_question_at_a_time" : "all_questions")
     classes << "cant_go_back" if cant_go_back?
     classes << "last_page" if last_page?
-    classes.join(' ')
+    classes.join(" ")
   end
 
   def question_class(q)
@@ -73,7 +73,7 @@ class Quizzes::TakeQuizPresenter
     classes << "seen" if question_seen?(q)
     classes << "current_question" if one_question_at_a_time? && current_question?(q)
     classes << "text_only" if text_only?(q)
-    classes.join(' ')
+    classes.join(" ")
   end
 
   def marked?(q)
@@ -81,24 +81,24 @@ class Quizzes::TakeQuizPresenter
   end
 
   def text_only?(q)
-    q['question_type'] == "text_only_question"
+    q["question_type"] == "text_only_question"
   end
 
   def answered_icon(q)
-    question_answered?(q) ? 'icon-check' : 'icon-question'
+    question_answered?(q) ? "icon-check" : "icon-question"
   end
 
   def answered_text(q)
     if question_answered?(q)
-      I18n.t('question_answered', 'Answered')
+      I18n.t("question_answered", "Answered")
     else
-      I18n.t('question_unanswered', 'Haven\'t Answered Yet')
+      I18n.t("question_unanswered", "Haven't Answered Yet")
     end
   end
 
   def marked_text(q)
     if marked?(q)
-      I18n.t('titles.come_back_later', 'You marked this question to come back to later')
+      I18n.t("titles.come_back_later", "You marked this question to come back to later")
     end
   end
 
@@ -196,7 +196,7 @@ class Quizzes::TakeQuizPresenter
 
   def form_action_params(session, user)
     url_params = { user_id: user&.id }
-    if session['lockdown_browser_popup']
+    if session["lockdown_browser_popup"]
       url_params.merge!(Canvas::LockdownBrowser.plugin.base.quiz_exit_params)
     end
     url_params
@@ -231,7 +231,7 @@ class Quizzes::TakeQuizPresenter
       # an answer must not be falsy/empty
       status_entries.any? { |status| dataset[status].blank? } ||
         # all zeroes for an answer is a no-answer
-        status_entries.all? { |status| dataset[status] == '0' }
+        status_entries.all? { |status| dataset[status] == "0" }
     end
 
     answers

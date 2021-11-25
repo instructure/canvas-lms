@@ -18,13 +18,13 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'uri'
-require 'json'
-require 'time'
+require "uri"
+require "json"
+require "time"
 # the only reason we need 'time' here is because 'json/jwt' requires 'active_support/core_ext',
 # https://github.com/nov/json-jwt/blob/master/lib/json/jwt.rb#L4, which is unsafe until we're
 # on a version of active_support that includes https://github.com/rails/rails/pull/40859
-require 'json/jwt'
+require "json/jwt"
 
 module CanvasPandaPub
   # Public: Used for sending pushes to PandaPub channels and generating PandaPub
@@ -33,19 +33,19 @@ module CanvasPandaPub
   class Client
     def self.config
       res = CanvasPandaPub.plugin_settings.try(:settings)
-      return nil unless res && res['base_url'] && res['application_id'] &&
-                        res['key_id'] && res['key_secret']
+      return nil unless res && res["base_url"] && res["application_id"] &&
+                        res["key_id"] && res["key_secret"]
 
-      res['push_url'] = res['base_url'].chomp("/") + "/push"
+      res["push_url"] = res["base_url"].chomp("/") + "/push"
       res.dup
     end
 
     def initialize
       config = CanvasPandaPub::Client.config
-      @base_url = config['base_url']
-      @application_id = config['application_id']
-      @key_id = config['key_id']
-      @key_secret = config['key_secret']
+      @base_url = config["base_url"]
+      @application_id = config["application_id"]
+      @key_id = config["key_id"]
+      @key_secret = config["key_secret"]
       @logger = CanvasPandaPub.logger
       @worker = CanvasPandaPub.worker
       @uri = URI.parse(@base_url)

@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative 'dr_diff/command_capture'
-require_relative 'dr_diff/diff_parser'
-require_relative 'dr_diff/git_proxy'
-require_relative 'dr_diff/manager'
+require_relative "dr_diff/command_capture"
+require_relative "dr_diff/diff_parser"
+require_relative "dr_diff/git_proxy"
+require_relative "dr_diff/manager"

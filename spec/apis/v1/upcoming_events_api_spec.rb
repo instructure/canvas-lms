@@ -18,13 +18,13 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../api_spec_helper'
+require_relative "../api_spec_helper"
 
 describe UsersController, type: :request do
   include Api
 
   before(:once) do
-    Account.find_or_create_by!(id: 0).update(name: 'Dummy Root Account', workflow_state: 'deleted', root_account_id: nil)
+    Account.find_or_create_by!(id: 0).update(name: "Dummy Root Account", workflow_state: "deleted", root_account_id: nil)
   end
 
   context "without current_user" do
@@ -60,7 +60,7 @@ describe UsersController, type: :request do
         json = api_call(:get, "/api/v1/users/self/upcoming_events",
                         controller: "users", action: "upcoming_events",
                         format: "json")
-        expect(json.map { |e| e['title'] }).to eq ["Upcoming Event"]
+        expect(json.map { |e| e["title"] }).to eq ["Upcoming Event"]
       end
     end
 
@@ -81,7 +81,7 @@ describe UsersController, type: :request do
         json = api_call(:get, "/api/v1/users/self/upcoming_events",
                         controller: "users", action: "upcoming_events",
                         format: "json")
-        expect(json.map { |e| e['title'] }).to eq [
+        expect(json.map { |e| e["title"] }).to eq [
           "Upcoming Course Event",
           "Upcoming Assignment"
         ]
@@ -92,7 +92,7 @@ describe UsersController, type: :request do
         json = api_call(:get, "/api/v1/users/self/upcoming_events",
                         controller: "users", action: "upcoming_events",
                         format: "json")
-        expect(json.map { |e| e['title'] }).to eq [
+        expect(json.map { |e| e["title"] }).to eq [
           "Upcoming Course Event",
           "Upcoming Assignment"
         ]

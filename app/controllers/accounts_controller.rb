@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'csv'
+require "csv"
 
 # @API Accounts
 #
@@ -366,7 +366,7 @@ class AccountsController < ApplicationController
   # @returns [Account]
   def course_accounts
     if @current_user
-      account_ids = Rails.cache.fetch(['admin_enrollment_course_account_ids', @current_user].cache_key) do
+      account_ids = Rails.cache.fetch(["admin_enrollment_course_account_ids", @current_user].cache_key) do
         Account.joins(courses: :enrollments).merge(
           @current_user.enrollments.admin.shard(@current_user).except(:select, :joins)
         ).select("accounts.id").distinct.pluck(:id).map { |id| Shard.global_id_for(id) }
@@ -494,8 +494,8 @@ class AccountsController < ApplicationController
     keys = %w[id terms_type passive account_id]
     tos = @account.root_account.terms_of_service
     res = tos.attributes.slice(*keys)
-    res['content'] = tos.terms_of_service_content&.content
-    res['self_registration_type'] = @account.self_registration_type
+    res["content"] = tos.terms_of_service_content&.content
+    res["self_registration_type"] = @account.self_registration_type
     render json: res
   end
 
@@ -615,21 +615,21 @@ class AccountsController < ApplicationController
     ends_after = CanvasTime.try_parse(params[:ends_after])
 
     params[:state] ||= %w[created claimed available completed]
-    params[:state] = %w[created claimed available completed deleted] if Array(params[:state]).include?('all')
+    params[:state] = %w[created claimed available completed deleted] if Array(params[:state]).include?("all")
     if value_to_boolean(params[:published])
       params[:state] -= %w[created claimed completed deleted]
     elsif !params[:published].nil? && !value_to_boolean(params[:published])
       params[:state] -= %w[available]
     end
 
-    sortable_name_col = User.sortable_name_order_by_clause('users')
+    sortable_name_col = User.sortable_name_order_by_clause("users")
 
     order = case params[:sort]
-            when 'course_name'
-              Course.best_unicode_collation_key('courses.name').to_s
-            when 'sis_course_id'
+            when "course_name"
+              Course.best_unicode_collation_key("courses.name").to_s
+            when "sis_course_id"
               "courses.sis_source_id"
-            when 'teacher'
+            when "teacher"
               "(SELECT #{sortable_name_col} FROM #{User.quoted_table_name}
                 JOIN #{Enrollment.quoted_table_name} on users.id = enrollments.user_id
                 WHERE enrollments.workflow_state <> 'deleted'
@@ -637,11 +637,11 @@ class AccountsController < ApplicationController
                 AND enrollments.course_id = courses.id
                 ORDER BY #{sortable_name_col} LIMIT 1)"
             # leaving subaccount as an option for backwards compatibility
-            when 'subaccount', 'account_name'
-              "(SELECT #{Account.best_unicode_collation_key('accounts.name')} FROM #{Account.quoted_table_name}
+            when "subaccount", "account_name"
+              "(SELECT #{Account.best_unicode_collation_key("accounts.name")} FROM #{Account.quoted_table_name}
                 WHERE accounts.id = courses.account_id)"
-            when 'term'
-              "(SELECT #{EnrollmentTerm.best_unicode_collation_key('enrollment_terms.name')}
+            when "term"
+              "(SELECT #{EnrollmentTerm.best_unicode_collation_key("enrollment_terms.name")}
                 FROM #{EnrollmentTerm.quoted_table_name}
                 WHERE enrollment_terms.id = courses.enrollment_term_id)"
             else
@@ -720,19 +720,19 @@ class AccountsController < ApplicationController
       search_term = params[:search_term]
       SearchTermHelper.validate_search_term(search_term)
 
-      if params[:search_by] == 'teacher'
+      if params[:search_by] == "teacher"
         @courses =
           @courses.where(
-            'EXISTS (?)',
+            "EXISTS (?)",
             TeacherEnrollment.active.joins(:user).where(
-              ActiveRecord::Base.wildcard('users.name', params[:search_term])
+              ActiveRecord::Base.wildcard("users.name", params[:search_term])
             ).where(
               "enrollments.workflow_state NOT IN ('rejected', 'inactive', 'completed', 'deleted') AND enrollments.course_id=courses.id"
             )
           )
       else
-        name = ActiveRecord::Base.wildcard('courses.name', search_term)
-        code = ActiveRecord::Base.wildcard('courses.course_code', search_term)
+        name = ActiveRecord::Base.wildcard("courses.name", search_term)
+        code = ActiveRecord::Base.wildcard("courses.course_code", search_term)
         or_clause = Course.where(code).or(Course.where(name))
 
         if search_term =~ Api::ID_REGEX && Api::MAX_ID_RANGE.cover?(search_term.to_i)
@@ -740,7 +740,7 @@ class AccountsController < ApplicationController
         end
 
         if @account.grants_any_right?(@current_user, :read_sis, :manage_sis)
-          sis_source = ActiveRecord::Base.wildcard('courses.sis_source_id', search_term)
+          sis_source = ActiveRecord::Base.wildcard("courses.sis_source_id", search_term)
           or_clause = or_clause.or(Course.where(sis_source))
         end
 
@@ -766,7 +766,7 @@ class AccountsController < ApplicationController
       ActiveRecord::Associations::Preloader.new.preload(@courses, [:account, :root_account, course_account_associations: :account])
       preload_teachers(@courses) if includes.include?("teachers")
       preload_teachers(@courses) if includes.include?("active_teachers")
-      ActiveRecord::Associations::Preloader.new.preload(@courses, [:enrollment_term]) if includes.include?("term") || includes.include?('concluded')
+      ActiveRecord::Associations::Preloader.new.preload(@courses, [:enrollment_term]) if includes.include?("term") || includes.include?("concluded")
 
       if includes.include?("total_students")
         student_counts = StudentEnrollment.shard(@account.shard).not_fake.where("enrollments.workflow_state NOT IN ('rejected', 'completed', 'deleted', 'inactive')")
@@ -796,9 +796,9 @@ class AccountsController < ApplicationController
           @account.sis_source_id = sis_id.presence
         else
           if @account.root_account?
-            @account.errors.add(:unauthorized, t('Cannot set sis_account_id on a root_account.'))
+            @account.errors.add(:unauthorized, t("Cannot set sis_account_id on a root_account."))
           else
-            @account.errors.add(:unauthorized, t('To change sis_account_id the user must have manage_sis permission.'))
+            @account.errors.add(:unauthorized, t("To change sis_account_id the user must have manage_sis permission."))
           end
           unauthorized = true
         end
@@ -808,7 +808,7 @@ class AccountsController < ApplicationController
         params[:account][:services].slice(*Account.services_exposed_to_ui_hash(nil, @current_user, @account).keys).each do |key, value|
           @account.set_service_availability(key, value_to_boolean(value))
         end
-        includes << 'services'
+        includes << "services"
         params[:account].delete :services
       end
 
@@ -824,10 +824,10 @@ class AccountsController < ApplicationController
             account_settings[:settings].slice!(*permitted_api_account_settings)
             ensure_sis_max_name_length_value!(account_settings)
           end
-          @account.errors.add(:name, t(:account_name_required, 'The account name cannot be blank')) if account_params.key?(:name) && account_params[:name].blank?
+          @account.errors.add(:name, t(:account_name_required, "The account name cannot be blank")) if account_params.key?(:name) && account_params[:name].blank?
           @account.errors.add(:default_time_zone, t(:unrecognized_time_zone, "'%{timezone}' is not a recognized time zone", timezone: account_params[:default_time_zone])) if account_params.key?(:default_time_zone) && ActiveSupport::TimeZone.new(account_params[:default_time_zone]).nil?
         else
-          account_settings.each_key { |k| @account.errors.add(k.to_sym, t(:cannot_manage_account, 'You are not allowed to manage account settings')) }
+          account_settings.each_key { |k| @account.errors.add(k.to_sym, t(:cannot_manage_account, "You are not allowed to manage account settings")) }
           unauthorized = true
         end
       end
@@ -846,14 +846,14 @@ class AccountsController < ApplicationController
 
             quota_value = quota_settings[quota_type].to_s.strip
             if INTEGER_REGEX.match?(quota_value.to_s)
-              @account.errors.add(quota_type, t(:quota_must_be_positive, 'Value must be positive')) if quota_value.to_i < 0
-              @account.errors.add(quota_type, t(:quota_too_large, 'Value too large')) if quota_value.to_i >= (2**62) / 1.megabytes
+              @account.errors.add(quota_type, t(:quota_must_be_positive, "Value must be positive")) if quota_value.to_i < 0
+              @account.errors.add(quota_type, t(:quota_too_large, "Value too large")) if quota_value.to_i >= (2**62) / 1.megabytes
             else
-              @account.errors.add(quota_type, t(:quota_integer_required, 'An integer value is required'))
+              @account.errors.add(quota_type, t(:quota_integer_required, "An integer value is required"))
             end
           end
         else
-          quota_settings.each_key { |k| @account.errors.add(k.to_sym, t(:cannot_manage_quotas, 'You are not allowed to manage quota settings')) }
+          quota_settings.each_key { |k| @account.errors.add(k.to_sym, t(:cannot_manage_quotas, "You are not allowed to manage quota settings")) }
           unauthorized = true
         end
       end
@@ -997,7 +997,7 @@ class AccountsController < ApplicationController
           if @account.feature_enabled?(:slack_notifications)
             slack_api_key = params[:account].dig(:slack, :slack_api_key)
             if slack_api_key.present?
-              encrypted_slack_key, salt = Canvas::Security.encrypt_password(slack_api_key.to_s, 'instructure_slack_encrypted_key')
+              encrypted_slack_key, salt = Canvas::Security.encrypt_password(slack_api_key.to_s, "instructure_slack_encrypted_key")
               @account.settings[:encrypted_slack_key] = encrypted_slack_key
               @account.settings[:encrypted_slack_key_salt] = salt
             end
@@ -1011,10 +1011,10 @@ class AccountsController < ApplicationController
 
         custom_help_links = params[:account].delete :custom_help_links
         if custom_help_links
-          sorted_help_links = custom_help_links.to_unsafe_h.select { |_k, h| h['state'] != 'deleted' && h['state'] != 'new' }.sort_by { |k, _h| k.to_i }
+          sorted_help_links = custom_help_links.to_unsafe_h.select { |_k, h| h["state"] != "deleted" && h["state"] != "new" }.sort_by { |k, _h| k.to_i }
           sorted_help_links.map! do |index_with_hash|
             hash = index_with_hash[1].to_hash.with_indifferent_access
-            hash.delete('state')
+            hash.delete("state")
             hash.assert_valid_keys %w[text subtext url available_to type id is_featured is_new feature_headline]
             hash
           end
@@ -1033,16 +1033,16 @@ class AccountsController < ApplicationController
         end
         if params[:account][:services]
           params[:account][:services].slice(*Account.services_exposed_to_ui_hash(nil, @current_user, @account).keys).each do |key, value|
-            @account.set_service_availability(key, value == '1')
+            @account.set_service_availability(key, value == "1")
           end
           params[:account].delete :services
         end
 
         # If the setting is present (update is called from 2 different settings forms, one for notifications)
         if params[:account][:settings] && params[:account][:settings][:outgoing_email_default_name_option].present? &&
-           params[:account][:settings][:outgoing_email_default_name_option] == 'default'
+           params[:account][:settings][:outgoing_email_default_name_option] == "default"
           # If set to default, remove the custom name so it doesn't get saved
-          params[:account][:settings][:outgoing_email_default_name] = ''
+          params[:account][:settings][:outgoing_email_default_name] = ""
         end
 
         if @account.grants_right?(@current_user, :manage_site_settings)
@@ -1155,12 +1155,12 @@ class AccountsController < ApplicationController
       @root_account = @account.root_account
       @account.shard.activate do
         scope = @account.account_reports.active.where("report_type=name").most_recent
-        @last_complete_reports = AccountReport.from("unnest('{#{@available_reports.keys.join(',')}}'::text[]) report_types (name),
+        @last_complete_reports = AccountReport.from("unnest('{#{@available_reports.keys.join(",")}}'::text[]) report_types (name),
                 LATERAL (#{scope.complete.to_sql}) account_reports ")
                                               .order("report_types.name")
                                               .preload(:attachment)
                                               .index_by(&:report_type)
-        @last_reports = AccountReport.from("unnest('{#{@available_reports.keys.join(',')}}'::text[]) report_types (name),
+        @last_reports = AccountReport.from("unnest('{#{@available_reports.keys.join(",")}}'::text[]) report_types (name),
                 LATERAL (#{scope.to_sql}) account_reports ")
                                      .order("report_types.name")
                                      .index_by(&:report_type)
@@ -1189,7 +1189,7 @@ class AccountsController < ApplicationController
       @account_roles = @account.available_account_roles.sort_by(&:display_sort_index).map { |role| { id: role.id, label: role.label } }
       @course_roles = @account.available_course_roles.sort_by(&:display_sort_index).map { |role| { id: role.id, label: role.label } }
 
-      @announcements = @account.announcements.order(created_at: 'desc').paginate(page: params[:page], per_page: 50)
+      @announcements = @account.announcements.order(created_at: "desc").paginate(page: params[:page], per_page: 50)
       @external_integration_keys = ExternalIntegrationKey.indexed_keys_for(@account)
 
       course_creation_settings = {}
@@ -1207,7 +1207,7 @@ class AccountsController < ApplicationController
                APP_CENTER: { enabled: Canvas::Plugin.find(:app_center).enabled? },
                LTI_LAUNCH_URL: account_tool_proxy_registration_path(@account),
                EXTERNAL_TOOLS_CREATE_URL: url_for(controller: :external_tools, action: :create, account_id: @context.id),
-               TOOL_CONFIGURATION_SHOW_URL: account_show_tool_configuration_url(account_id: @context.id, developer_key_id: ':developer_key_id'),
+               TOOL_CONFIGURATION_SHOW_URL: account_show_tool_configuration_url(account_id: @context.id, developer_key_id: ":developer_key_id"),
                MEMBERSHIP_SERVICE_FEATURE_FLAG_ENABLED: @account.root_account.feature_enabled?(:membership_service_for_lti_tools),
                CONTEXT_BASE_URL: "/accounts/#{@context.id}",
                MASKED_APP_CENTER_ACCESS_TOKEN: @account.settings[:app_center_access_token].try(:[], 0...5),
@@ -1342,12 +1342,12 @@ class AccountsController < ApplicationController
     return render_unauthorized_action unless is_permissible
 
     if @account.pseudonyms.where(user_id: user).active.any? && !user.deleted?
-      return render json: { errors: 'User not deleted' }, status: :bad_request
+      return render json: { errors: "User not deleted" }, status: :bad_request
     end
 
     # this is a no-op if the user was deleted from the account profile page
-    user.update!(workflow_state: 'registered') if user.deleted?
-    pseudonym.update!(workflow_state: 'active')
+    user.update!(workflow_state: "registered") if user.deleted?
+    pseudonym.update!(workflow_state: "active")
     pseudonym.clear_permissions_cache(user)
     user.update_account_associations
     user.clear_caches
@@ -1356,13 +1356,13 @@ class AccountsController < ApplicationController
 
   def eportfolio_moderation
     if authorized_action(@account, @current_user, :moderate_user_content)
-      results_per_page = Setting.get('eportfolio_moderation_results_per_page', 1000)
+      results_per_page = Setting.get("eportfolio_moderation_results_per_page", 1000)
       spam_status_order = "CASE spam_status WHEN 'flagged_as_possible_spam' THEN 0 WHEN 'marked_as_spam' THEN 1 WHEN 'marked_as_safe' THEN 2 ELSE 3 END"
       @eportfolios = Eportfolio.active.preload(:user)
                                .joins(:user)
                                .joins("JOIN #{UserAccountAssociation.quoted_table_name} ON eportfolios.user_id = user_account_associations.user_id AND user_account_associations.account_id = #{@account.id}")
                                .where(spam_status: %w[flagged_as_possible_spam marked_as_spam marked_as_safe])
-                               .where("EXISTS (?)", Eportfolio.where("user_id = users.id").where(spam_status: ['flagged_as_possible_spam', 'marked_as_spam']))
+                               .where("EXISTS (?)", Eportfolio.where("user_id = users.id").where(spam_status: ["flagged_as_possible_spam", "marked_as_spam"]))
                                .merge(User.active)
                                .order(Arel.sql(spam_status_order), Arel.sql("eportfolios.public DESC NULLS LAST"), updated_at: :desc)
                                .paginate(per_page: results_per_page, page: params[:page])
@@ -1409,7 +1409,7 @@ class AccountsController < ApplicationController
         format.json { render json: @items }
         format.csv do
           res = CSV.generate do |csv|
-            csv << ['Timestamp', 'Value']
+            csv << ["Timestamp", "Value"]
             @items.each do |item|
               csv << [item[0] / 1000, item[1]]
             end
@@ -1437,20 +1437,20 @@ class AccountsController < ApplicationController
     if is_authorized
       @users = @account.all_users(nil)
       @avatar_counts = {
-        all: format_avatar_count(@users.with_avatar_state('any').count),
-        reported: format_avatar_count(@users.with_avatar_state('reported').count),
-        re_reported: format_avatar_count(@users.with_avatar_state('re_reported').count),
-        submitted: format_avatar_count(@users.with_avatar_state('submitted').count)
+        all: format_avatar_count(@users.with_avatar_state("any").count),
+        reported: format_avatar_count(@users.with_avatar_state("reported").count),
+        re_reported: format_avatar_count(@users.with_avatar_state("re_reported").count),
+        submitted: format_avatar_count(@users.with_avatar_state("submitted").count)
       }
       if params[:avatar_state]
         @users = @users.with_avatar_state(params[:avatar_state])
         @avatar_state = params[:avatar_state]
-      elsif @domain_root_account && @domain_root_account.settings[:avatars] == 'enabled_pending'
-        @users = @users.with_avatar_state('submitted')
-        @avatar_state = 'submitted'
+      elsif @domain_root_account && @domain_root_account.settings[:avatars] == "enabled_pending"
+        @users = @users.with_avatar_state("submitted")
+        @avatar_state = "submitted"
       else
-        @users = @users.with_avatar_state('reported')
-        @avatar_state = 'reported'
+        @users = @users.with_avatar_state("reported")
+        @avatar_state = "reported"
       end
       @users = Api.paginate(@users, self, account_avatars_url)
     end
@@ -1461,7 +1461,7 @@ class AccountsController < ApplicationController
       return redirect_to account_settings_url(@account) if !@account.allow_sis_import || !@account.root_account?
 
       @current_batch = @account.current_sis_batch
-      @last_batch = @account.sis_batches.order('created_at DESC').first
+      @last_batch = @account.sis_batches.order("created_at DESC").first
       @terms = @account.enrollment_terms.active
       respond_to do |format|
         format.html
@@ -1494,7 +1494,7 @@ class AccountsController < ApplicationController
     js_bundle :account_course_user_search
     css_bundle :addpeople
     @page_title = @account.name
-    add_crumb '', '?' # the text for this will be set by javascript
+    add_crumb "", "?" # the text for this will be set by javascript
     js_permissions = {
       can_read_course_list: can_read_course_list,
       can_read_roster: can_read_roster,
@@ -1527,7 +1527,7 @@ class AccountsController < ApplicationController
              SHOW_SIS_ID_IN_NEW_USER_FORM: @account.root_account.allow_sis_import && @account.root_account.grants_right?(@current_user, session, :manage_sis),
              PERMISSIONS: js_permissions
            })
-    render html: '', layout: true
+    render html: "", layout: true
   end
 
   def users
@@ -1581,7 +1581,7 @@ class AccountsController < ApplicationController
       role = Role.get_role_by_id(role_id)
       raise ActiveRecord::RecordNotFound unless role
     else
-      role = Role.get_built_in_role('AccountAdmin', root_account_id: @context.resolved_root_account_id)
+      role = Role.get_built_in_role("AccountAdmin", root_account_id: @context.resolved_root_account_id)
     end
 
     list = UserList.new(params[:user_list],
@@ -1592,7 +1592,7 @@ class AccountsController < ApplicationController
     admins = users.map do |user|
       admin = @context.account_users.where(user_id: user.id, role_id: role.id).first_or_initialize
       admin.user = user
-      admin.workflow_state = 'active'
+      admin.workflow_state = "active"
       return unless authorized_action(admin, @current_user, :create)
 
       admin
@@ -1613,9 +1613,9 @@ class AccountsController < ApplicationController
         name: admin.user.name,
         role_id: admin.role_id,
         membership_type: AccountUser.readable_type(admin.role.name),
-        workflow_state: 'active',
+        workflow_state: "active",
         user_id: admin.user.id,
-        type: 'admin',
+        type: "admin",
         email: admin.user.email
       } }
     end
@@ -1658,7 +1658,7 @@ class AccountsController < ApplicationController
       return :unauthorized unless @account.grants_any_right?(@current_user, :delete_course_template, :edit_course_template)
 
       @account.course_template_id = nil
-    elsif param.to_s == '0'
+    elsif param.to_s == "0"
       return if @account.course_template_id == 0
       return :unauthorized unless @account.grants_any_right?(@current_user, :delete_course_template, :edit_course_template)
 
@@ -1777,7 +1777,7 @@ class AccountsController < ApplicationController
 
     {
       help_link_name: @account.settings[:help_link_name] || default_help_link_name,
-      help_link_icon: @account.settings[:help_link_icon] || 'help',
+      help_link_icon: @account.settings[:help_link_icon] || "help",
       CUSTOM_HELP_LINKS: @account.help_links || [],
       DEFAULT_HELP_LINKS: @account.help_links_builder.instantiate_links(@account.help_links_builder.default_links)
     }

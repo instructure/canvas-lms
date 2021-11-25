@@ -104,7 +104,7 @@ class UnzipAttachment
         entry_path_array.pop
 
         folder_path_array += entry_path_array
-        folder_name = folder_path_array.join('/')
+        folder_name = folder_path_array.join("/")
         folder = Folder.assert_path(folder_name, @context)
 
         update_progress(zip_stats.percent_complete(index))
@@ -146,7 +146,7 @@ class UnzipAttachment
     end
 
     if updates.any?
-      Attachment.where(id: id_positions.keys).update_all("position=CASE #{updates.join(' ')} ELSE position END")
+      Attachment.where(id: id_positions.keys).update_all("position=CASE #{updates.join(" ")} ELSE position END")
     end
   end
 
@@ -178,13 +178,13 @@ class UnzipAttachment
 
   def should_skip?(entry)
     entry.directory? ||
-      entry.name.split('/').any? { |p| p =~ THINGS_TO_IGNORE_REGEX } ||
+      entry.name.split("/").any? { |p| p =~ THINGS_TO_IGNORE_REGEX } ||
       (@valid_paths && !@valid_paths.include?(entry.name))
   end
 
   def path_elements_for(path)
     list = File.split(path) rescue []
-    list.shift if list[0] == '.'
+    list.shift if list[0] == "."
     list
   end
 
@@ -198,7 +198,7 @@ class UnzipAttachment
 
   # Finds the folder in the database, creating the path if necessary
   def infer_folder(path)
-    list = path.split('/')
+    list = path.split("/")
     current = (@root_directory ||= folders.root_directory)
     # For every directory in the path...
     # (-2 means all entries but the last, which should be a filename)
@@ -248,7 +248,7 @@ class ZipFileStats
   end
 
   def validate_against(context)
-    max = Setting.get('max_zip_file_count', '100000').to_i
+    max = Setting.get("max_zip_file_count", "100000").to_i
     if file_count > max
       raise ArgumentError, "Zip File cannot have more than #{max} entries"
     end

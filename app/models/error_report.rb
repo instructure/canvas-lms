@@ -36,15 +36,15 @@ class ErrorReport < ActiveRecord::Base
   end
 
   def truncate_enormous_fields
-    self.message = message.truncate(1024, omission: '...<truncated>') if message
-    data['exception_message'] = data['exception_message'].truncate(1024, omission: '...<truncated>') if data['exception_message']
+    self.message = message.truncate(1024, omission: "...<truncated>") if message
+    data["exception_message"] = data["exception_message"].truncate(1024, omission: "...<truncated>") if data["exception_message"]
   end
 
   class Reporter
     IGNORED_CATEGORIES = "404,ActionDispatch::RemoteIp::IpSpoofAttackError,Turnitin::Errors::SubmissionNotScoredError"
 
     def ignored_categories
-      Setting.get('ignored_error_report_categories', IGNORED_CATEGORIES).split(',')
+      Setting.get("ignored_error_report_categories", IGNORED_CATEGORIES).split(",")
     end
 
     include ActiveSupport::Callbacks
@@ -57,7 +57,7 @@ class ErrorReport < ActiveRecord::Base
     end
 
     def log_error(category, opts)
-      opts[:category] = category.to_s.presence || 'default'
+      opts[:category] = category.to_s.presence || "default"
       return if ignored_categories.include? category
 
       @opts = opts
@@ -204,7 +204,7 @@ class ErrorReport < ActiveRecord::Base
 
   def safe_url?
     uri = URI.parse(url)
-    ['http', 'https'].include?(uri.scheme)
+    ["http", "https"].include?(uri.scheme)
   rescue
     false
   end
@@ -213,7 +213,7 @@ class ErrorReport < ActiveRecord::Base
     self.email = nil if email && email.empty?
     self.email ||= user.email rescue nil
     unless self.email
-      domain = HostUrl.outgoing_email_domain.gsub(/[^a-zA-Z0-9]/, '-')
+      domain = HostUrl.outgoing_email_domain.gsub(/[^a-zA-Z0-9]/, "-")
       # example.com definitely won't exist
       self.email = "unknown-#{domain}@instructure.example.com"
     end
@@ -227,6 +227,6 @@ class ErrorReport < ActiveRecord::Base
   end
 
   def self.categories
-    distinct_values('category')
+    distinct_values("category")
   end
 end

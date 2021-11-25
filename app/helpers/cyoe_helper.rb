@@ -21,9 +21,9 @@
 module CyoeHelper
   def cyoe_able?(item)
     case item.content_type
-    when 'Assignment'
+    when "Assignment"
       item.graded? && item.content.graded?
-    when 'Quizzes::Quiz'
+    when "Quizzes::Quiz"
       item.graded? && item.content.assignment?
     else
       item.graded?
@@ -90,8 +90,8 @@ module CyoeHelper
 
   def build_path_data(data, tag_id)
     awaiting_choice = data[:selected_set_id].nil? && data[:assignment_sets].present?
-    modules_url = context_url(@context, :context_url) + '/modules'
-    choose_url = modules_url + '/items/' + tag_id + '/choose'
+    modules_url = context_url(@context, :context_url) + "/modules"
+    choose_url = modules_url + "/items/" + tag_id + "/choose"
     modules_disabled = @context.tabs_available(@current_user).select { |tabs| tabs[:label] == "Modules" }.blank?
     data.merge!({
                   awaiting_choice: awaiting_choice,

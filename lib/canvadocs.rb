@@ -17,18 +17,18 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'cgi'
-require 'net/http'
-require 'net/https'
-require 'json'
+require "cgi"
+require "net/http"
+require "net/https"
+require "json"
 
-require_dependency 'canvadocs/session'
+require_dependency "canvadocs/session"
 module Canvadocs
   extend CanvadocsHelper
-  RENDER_O365     = 'office_365'
-  RENDER_BOX      = 'box_view'
-  RENDER_CROCODOC = 'crocodoc'
-  RENDER_PDFJS    = 'pdfjs'
+  RENDER_O365     = "office_365"
+  RENDER_BOX      = "box_view"
+  RENDER_CROCODOC = "crocodoc"
+  RENDER_PDFJS    = "pdfjs"
 
   # Public: A small ruby client that wraps the Box View api.
   #
@@ -228,7 +228,7 @@ module Canvadocs
       return {} if attachment.nil?
 
       submission = Submission.find_by(
-        id: AttachmentAssociation.where(context_type: 'Submission', attachment: attachment).select(:context_id)
+        id: AttachmentAssociation.where(context_type: "Submission", attachment: attachment).select(:context_id)
       )
       return {} if submission.nil?
     end
@@ -365,12 +365,12 @@ module Canvadocs
     def user_filter_entry(user, submission, role:, anonymize:)
       if anonymize
         id = submission.anonymous_identities.dig(user.id, :id).to_s
-        type = 'anonymous'
+        type = "anonymous"
         name = submission.anonymous_identities.dig(user.id, :name)
       else
         filter_user = submission.observer?(user) ? submission.user : user
         id = filter_user.global_id.to_s
-        type = 'real'
+        type = "real"
         name = canvadocs_user_name(filter_user)
       end
 

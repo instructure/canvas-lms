@@ -28,8 +28,8 @@ module ExternalToolsSpecHelper
       name: "bob",
       consumer_key: "bob",
       shared_secret: "bob",
-      tool_id: 'some_tool',
-      privacy_level: 'public'
+      tool_id: "some_tool",
+      privacy_level: "public"
     )
     tool.url = overrides.fetch(:url, "http://www.example.com/basic_lti")
     tool.resource_selection = {
@@ -37,7 +37,7 @@ module ExternalToolsSpecHelper
       selection_width: 400,
       selection_height: 400
     }
-    tool.settings['post_only'] = true if overrides[:post_only]
+    tool.settings["post_only"] = true if overrides[:post_only]
     tool.save!
     tool
   end

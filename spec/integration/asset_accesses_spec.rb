@@ -18,11 +18,11 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'nokogiri'
+require "nokogiri"
 
 describe "user asset accesses" do
   before do
-    Setting.set('enable_page_views', 'db')
+    Setting.set("enable_page_views", "db")
 
     username = "nobody@example.com"
     password = "asdfasdf"
@@ -48,8 +48,8 @@ describe "user asset accesses" do
     now = Time.now.utc
     allow(Time).to receive(:now).and_return(now)
 
-    assignment = @course.assignments.create(title: 'Assignment 1')
-    assignment.workflow_state = 'active'
+    assignment = @course.assignments.create(title: "Assignment 1")
+    assignment.workflow_state = "active"
     assignment.save!
 
     user_session(@student)
@@ -60,10 +60,10 @@ describe "user asset accesses" do
     get "/courses/#{@course.id}/users/#{@student.id}/usage"
     expect(response).to be_successful
     html = Nokogiri::HTML5(response.body)
-    expect(html.css('#usage_report .access.assignment').length).to eq 1
-    expect(html.css('#usage_report .access.assignment .readable_name').text.strip).to eq 'Assignment 1'
-    expect(html.css('#usage_report .access.assignment .view_score').text.strip).to eq '1'
-    expect(html.css('#usage_report .access.assignment .last_viewed').text.strip).to eq datetime_string(now)
+    expect(html.css("#usage_report .access.assignment").length).to eq 1
+    expect(html.css("#usage_report .access.assignment .readable_name").text.strip).to eq "Assignment 1"
+    expect(html.css("#usage_report .access.assignment .view_score").text.strip).to eq "1"
+    expect(html.css("#usage_report .access.assignment .last_viewed").text.strip).to eq datetime_string(now)
     expect(AssetUserAccess.where(user_id: @student).first.last_access.to_i).to eq now.to_i
 
     now2 = now + 1.hour
@@ -80,10 +80,10 @@ describe "user asset accesses" do
     get "/courses/#{@course.id}/users/#{@student.id}/usage"
     expect(response).to be_successful
     html = Nokogiri::HTML5(response.body)
-    expect(html.css('#usage_report .access.assignment').length).to eq 1
-    expect(html.css('#usage_report .access.assignment .readable_name').text.strip).to eq 'Assignment 1'
-    expect(html.css('#usage_report .access.assignment .view_score').text.strip).to eq '2'
-    expect(html.css('#usage_report .access.assignment .last_viewed').text.strip).to eq datetime_string(now2)
+    expect(html.css("#usage_report .access.assignment").length).to eq 1
+    expect(html.css("#usage_report .access.assignment .readable_name").text.strip).to eq "Assignment 1"
+    expect(html.css("#usage_report .access.assignment .view_score").text.strip).to eq "2"
+    expect(html.css("#usage_report .access.assignment .last_viewed").text.strip).to eq datetime_string(now2)
     expect(AssetUserAccess.where(user_id: @student).first.last_access.to_i).to eq now2.to_i
   end
 

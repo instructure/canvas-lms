@@ -40,7 +40,7 @@ class DiscussionEntryParticipant < ActiveRecord::Base
   end
 
   def self.read_entry_ids(entry_ids, user)
-    where(user_id: user, discussion_entry_id: entry_ids, workflow_state: 'read')
+    where(user_id: user, discussion_entry_id: entry_ids, workflow_state: "read")
       .pluck(:discussion_entry_id)
   end
 
@@ -87,13 +87,13 @@ class DiscussionEntryParticipant < ActiveRecord::Base
 
       # need to still set to false when passed as false, so check for not nil.
       unless forced.nil?
-        update_columns << 'forced_read_state'
+        update_columns << "forced_read_state"
         update_values << connection.quote(forced)
       end
 
       # need to still set to 0 when passed as 0, so check for not nil.
       unless rating.nil?
-        update_columns << 'rating'
+        update_columns << "rating"
         update_values << connection.quote(rating)
       end
 
@@ -102,7 +102,7 @@ class DiscussionEntryParticipant < ActiveRecord::Base
           raise(ArgumentError)
         end
 
-        update_columns << 'report_type'
+        update_columns << "report_type"
         update_values << connection.quote(report_type)
       end
 
@@ -110,7 +110,7 @@ class DiscussionEntryParticipant < ActiveRecord::Base
       # workflow_state is a non null column and is required for the insert side.
       # The update side does not require workflow_state. Already exists in the
       # non-null column
-      default_state = new_state || 'unread'
+      default_state = new_state || "unread"
       insert_values = batch.map do |batch_entry|
         row_values(batch_entry, user.id, entry_or_topic.root_account_id, default_state, update_values)
       end
@@ -118,7 +118,7 @@ class DiscussionEntryParticipant < ActiveRecord::Base
       # takes ruby arrays of values into sql arrays ready for insert.
       # [[entry_id, user_id, root_account_id, "'read'"],[...]] =>
       # ["(entry_id,user_id,root_account_id,'read'),(...)"]
-      insert_rows = insert_values.map { |row| "(#{row.join(',')})" }
+      insert_rows = insert_values.map { |row| "(#{row.join(",")})" }
 
       # new_state needs to be handled after the insert_values because we always
       # have workflow_state in the insert, but should only be on the update side
@@ -126,7 +126,7 @@ class DiscussionEntryParticipant < ActiveRecord::Base
       # 'unread', but also don't want to include 'workflow_state' two times in the
       # insert.
       if new_state
-        update_columns << 'workflow_state'
+        update_columns << "workflow_state"
         update_values << connection.quote(new_state)
       end
 
@@ -137,20 +137,20 @@ class DiscussionEntryParticipant < ActiveRecord::Base
       # takes two ruby arrays and makes into a sql update statement.
       # ['workflow_state', 'forced_read_state'], ["'read'", true] =>
       # "workflow_state='read',forced_read_state=true"
-      update_statement = update_columns.zip(update_values).map { |a| a.join('=') }.join(',')
+      update_statement = update_columns.zip(update_values).map { |a| a.join("=") }.join(",")
       # takes the update_arrays and also creates a where clause so we don't update
       # records that wouldn't end up changing.
       # ['workflow_state', 'forced_read_state'], ["'read'", true] =>
       # "(discussion_entry_participants.workflow_state,discussion_entry_participants.forced_read_state)
       #   IS DISTINCT FROM ('read',true)
       where_clause = "(#{quoted_table_name}.#{update_columns.join(",#{quoted_table_name}.")})
-                     IS DISTINCT FROM (#{update_values.join(',')})"
+                     IS DISTINCT FROM (#{update_values.join(",")})"
 
       # actual sql query combined into a statement.
       upsert_sql = <<~SQL.squish
           INSERT INTO #{quoted_table_name}
-                      (#{insert_columns.join(',')})
-               VALUES #{insert_rows.join(',')}
+                      (#{insert_columns.join(",")})
+               VALUES #{insert_rows.join(",")}
           ON CONFLICT (discussion_entry_id,user_id)
         DO UPDATE SET #{update_statement}
                 WHERE #{where_clause}
@@ -189,7 +189,7 @@ class DiscussionEntryParticipant < ActiveRecord::Base
     state :read
   end
 
-  scope :read, -> { where(workflow_state: 'read') }
+  scope :read, -> { where(workflow_state: "read") }
   scope :existing_participants, lambda { |user, entry_id|
     select([:id, :discussion_entry_id])
       .where(user_id: user, discussion_entry_id: entry_id)

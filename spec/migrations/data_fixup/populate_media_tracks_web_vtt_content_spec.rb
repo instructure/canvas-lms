@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../../spec_helper'
+require_relative "../../spec_helper"
 
 RSpec.describe DataFixup::PopulateMediaTracksWebVttContent do
   def webvtt_content
@@ -50,27 +50,27 @@ RSpec.describe DataFixup::PopulateMediaTracksWebVttContent do
     SRT
   end
 
-  it 'converts content of type srt to web_vtt' do
-    mo = MediaObject.create!(media_id: 'm1234')
+  it "converts content of type srt to web_vtt" do
+    mo = MediaObject.create!(media_id: "m1234")
     mt = MediaTrack.create!(content: srt_content, media_object: mo)
     DataFixup::PopulateMediaTracksWebVttContent.run
     expect(mt.read_attribute(:webvtt_content)).not_to be_nil
-    expect(mt.read_attribute(:webvtt_content)).to include('WEBVTT')
+    expect(mt.read_attribute(:webvtt_content)).to include("WEBVTT")
   end
 
-  it 'will not convert content if already webvtt' do
-    mo = MediaObject.create!(media_id: 'm1234')
+  it "will not convert content if already webvtt" do
+    mo = MediaObject.create!(media_id: "m1234")
     mt = MediaTrack.create!(content: webvtt_content, media_object: mo)
     DataFixup::PopulateMediaTracksWebVttContent.run
     expect(mt.read_attribute(:webvtt_content)).to be_nil
-    expect(mt.read_attribute(:content)).to include('WEBVTT')
+    expect(mt.read_attribute(:content)).to include("WEBVTT")
   end
 
-  it 'will attempt to convert bad formatted srt' do
-    mo = MediaObject.create!(media_id: 'm1234')
-    mt = MediaTrack.create!(content: '123$%blah#badmanbad', media_object: mo)
+  it "will attempt to convert bad formatted srt" do
+    mo = MediaObject.create!(media_id: "m1234")
+    mt = MediaTrack.create!(content: "123$%blah#badmanbad", media_object: mo)
     DataFixup::PopulateMediaTracksWebVttContent.run
     expect(mt.read_attribute(:webvtt_content)).not_to be_nil
-    expect(mt.read_attribute(:webvtt_content)).to include('WEBVTT')
+    expect(mt.read_attribute(:webvtt_content)).to include("WEBVTT")
   end
 end

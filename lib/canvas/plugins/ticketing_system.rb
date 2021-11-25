@@ -27,7 +27,7 @@
 module Canvas::Plugins
   module TicketingSystem
     # can use this constant as the "tag" for other connectors
-    PLUGIN_ID = 'ticketing_system'
+    PLUGIN_ID = "ticketing_system"
 
     class << self
       # public, but not for you to use.  this method wraps the registration
@@ -36,13 +36,13 @@ module Canvas::Plugins
       # registration
       def register!
         Canvas::Plugin.register(PLUGIN_ID, nil, {
-                                  name: -> { I18n.t 'Ticketing System' },
-                                  description: -> { I18n.t 'Ticketing system configurations' },
-                                  author: 'Instructure',
-                                  author_website: 'http://www.instructure.com',
-                                  version: '1.0.0',
-                                  settings_partial: 'plugins/ticketing_system_settings',
-                                  validator: 'TicketingSystemValidator'
+                                  name: -> { I18n.t "Ticketing System" },
+                                  description: -> { I18n.t "Ticketing system configurations" },
+                                  author: "Instructure",
+                                  author_website: "http://www.instructure.com",
+                                  version: "1.0.0",
+                                  settings_partial: "plugins/ticketing_system_settings",
+                                  validator: "TicketingSystemValidator"
                                 })
         TicketingSystem::EmailPlugin.new(self).register!
         TicketingSystem::WebPostPlugin.new(self).register!

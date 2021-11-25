@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../../spec_helper'
+require_relative "../../spec_helper"
 
 describe DataFixup::PopulateSubmissionAnonymousIds do
   before do
@@ -27,14 +27,14 @@ describe DataFixup::PopulateSubmissionAnonymousIds do
     @submission_with_anonymous_id = submission_model
   end
 
-  it 'populates anonymous ids' do
+  it "populates anonymous ids" do
     start_at = Course.order(:id).first.id
     end_at = Course.order(:id).last.id
     expect { DataFixup::PopulateSubmissionAnonymousIds.run(start_at, end_at) }
       .to change { @submission_without_anonymous_id.reload.anonymous_id }.from(nil).to(String)
   end
 
-  it 'does not change existing anonymous ids' do
+  it "does not change existing anonymous ids" do
     start_at = Course.order(:id).first.id
     end_at = Course.order(:id).last.id
     expect { DataFixup::PopulateSubmissionAnonymousIds.run(start_at, end_at) }

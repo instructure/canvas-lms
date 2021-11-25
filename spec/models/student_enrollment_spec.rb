@@ -23,7 +23,7 @@ describe StudentEnrollment do
     @student = User.create(name: "some student")
     @course = Course.create(name: "some course")
     @se = @course.enroll_student(@student)
-    @assignment = @course.assignments.create!(title: 'some assignment')
+    @assignment = @course.assignments.create!(title: "some assignment")
     @submission = @assignment.submit_homework(@student)
     @assignment.reload
     @course.save!
@@ -177,7 +177,7 @@ describe StudentEnrollment do
       end
 
       it "doesn't queue an update if the pace plan isn't published" do
-        @pace_plan.update workflow_state: 'unpublished'
+        @pace_plan.update workflow_state: "unpublished"
         student_in_course(active_all: true, user: user_with_pseudonym)
         expect(Delayed::Job.where(singleton: "pace_plan_republish:#{@course.global_id}:")).not_to exist
       end

@@ -18,12 +18,12 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'spec_helper'
+require "spec_helper"
 
 describe LtiOutbound::LTIConsumerInstance do
-  it_behaves_like 'it has a proc attribute setter and getter for', :id
-  it_behaves_like 'it has a proc attribute setter and getter for', :sis_source_id
-  it_behaves_like 'it has a proc attribute setter and getter for', :lti_guid
-  it_behaves_like 'it has a proc attribute setter and getter for', :name
-  it_behaves_like 'it has a proc attribute setter and getter for', :domain
+  it_behaves_like "it has a proc attribute setter and getter for", :id
+  it_behaves_like "it has a proc attribute setter and getter for", :sis_source_id
+  it_behaves_like "it has a proc attribute setter and getter for", :lti_guid
+  it_behaves_like "it has a proc attribute setter and getter for", :name
+  it_behaves_like "it has a proc attribute setter and getter for", :domain
 end

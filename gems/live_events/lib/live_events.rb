@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'inst_statsd'
+require "inst_statsd"
 
 module LiveEvents
   class << self
@@ -51,8 +51,8 @@ module LiveEvents
     end
     # rubocop:enable Style/TrivialAccessors
 
-    require 'live_events/client'
-    require 'live_events/async_worker'
+    require "live_events/client"
+    require "live_events/async_worker"
 
     def get_context
       materialized_context&.clone
@@ -76,7 +76,7 @@ module LiveEvents
     end
 
     def truncate(string)
-      string&.truncate(Setting.get('live_events_text_max_length', 8192).to_i, separator: ' ')
+      string&.truncate(Setting.get("live_events_text_max_length", 8192).to_i, separator: " ")
     end
 
     def worker

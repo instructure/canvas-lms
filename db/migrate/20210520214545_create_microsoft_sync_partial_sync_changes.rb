@@ -31,10 +31,10 @@ class CreateMicrosoftSyncPartialSyncChanges < ActiveRecord::Migration[6.0]
       t.timestamps
 
       t.index %i[course_id user_id enrollment_type], unique: true,
-                                                     name: 'index_microsoft_sync_partial_sync_changes_course_user_enroll'
+                                                     name: "index_microsoft_sync_partial_sync_changes_course_user_enroll"
 
       t.index [:root_account_id, :id], unique: true,
-                                       name: 'index_microsoft_sync_partial_sync_changes_replica_identity'
+                                       name: "index_microsoft_sync_partial_sync_changes_replica_identity"
     end
     set_replica_identity(:microsoft_sync_partial_sync_changes, :index_microsoft_sync_partial_sync_changes_replica_identity)
   end

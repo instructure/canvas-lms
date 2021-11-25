@@ -25,10 +25,10 @@ class EpubExport < ActiveRecord::Base
   belongs_to :content_export
   belongs_to :course
   belongs_to :user
-  has_many :attachments, -> { order('created_at DESC') }, dependent: :destroy, as: :context, inverse_of: :context, class_name: 'Attachment'
-  has_one :epub_attachment, -> { where(content_type: 'application/epub+zip').order('created_at DESC') }, as: :context, inverse_of: :context, class_name: 'Attachment'
-  has_one :zip_attachment, -> { where(content_type: 'application/zip').order('created_at DESC') }, as: :context, inverse_of: :context, class_name: 'Attachment'
-  has_one :job_progress, as: :context, inverse_of: :context, class_name: 'Progress'
+  has_many :attachments, -> { order("created_at DESC") }, dependent: :destroy, as: :context, inverse_of: :context, class_name: "Attachment"
+  has_one :epub_attachment, -> { where(content_type: "application/epub+zip").order("created_at DESC") }, as: :context, inverse_of: :context, class_name: "Attachment"
+  has_one :zip_attachment, -> { where(content_type: "application/zip").order("created_at DESC") }, as: :context, inverse_of: :context, class_name: "Attachment"
+  has_one :job_progress, as: :context, inverse_of: :context, class_name: "Progress"
   validates :course_id, :workflow_state, presence: true
   has_a_broadcast_policy
   alias_attribute :context, :course # context is needed for the content export notification
@@ -103,7 +103,7 @@ class EpubExport < ActiveRecord::Base
     can :download
 
     given do |user|
-      ['generated', 'failed'].include?(workflow_state) &&
+      ["generated", "failed"].include?(workflow_state) &&
         grants_right?(user, :create)
     end
     can :regenerate
@@ -118,7 +118,7 @@ class EpubExport < ActiveRecord::Base
                              context: course
                            })
     job_progress.start
-    update_attribute(:workflow_state, 'exporting')
+    update_attribute(:workflow_state, "exporting")
     content_export.export
     true
   end
@@ -128,7 +128,7 @@ class EpubExport < ActiveRecord::Base
     if content_export.failed?
       mark_as_failed
     else
-      update_attribute(:workflow_state, 'exported')
+      update_attribute(:workflow_state, "exported")
       job_progress.update_attribute(:completion, PERCENTAGE_COMPLETE[:exported])
       generate
     end
@@ -137,14 +137,14 @@ class EpubExport < ActiveRecord::Base
 
   def generate
     job_progress.update_attribute(:completion, PERCENTAGE_COMPLETE[:generating])
-    update_attribute(:workflow_state, 'generating')
+    update_attribute(:workflow_state, "generating")
     convert_to_epub
   end
   handle_asynchronously :generate, priority: Delayed::LOW_PRIORITY, on_permanent_failure: :mark_as_failed
 
   def mark_as_generated
     job_progress.complete! if job_progress.running?
-    update_attribute(:workflow_state, 'generated')
+    update_attribute(:workflow_state, "generated")
   end
 
   def mark_as_failed(error = nil)
@@ -153,7 +153,7 @@ class EpubExport < ActiveRecord::Base
       ::Rails.logger.debug("Created ErrorReport #{out[:error_report]}")
     end
     job_progress.try :fail!
-    update_attribute(:workflow_state, 'failed')
+    update_attribute(:workflow_state, "failed")
   end
 
   # Epub Exportable overrides

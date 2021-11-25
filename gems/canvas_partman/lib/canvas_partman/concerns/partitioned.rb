@@ -147,7 +147,7 @@ module CanvasPartman::Concerns
         partition_table_name = infer_partition_table_name(attributes)
 
         @arel_tables ||= {}
-        @arel_tables[partition_table_name] ||= if ::ActiveRecord.version < Gem::Version.new('5')
+        @arel_tables[partition_table_name] ||= if ::ActiveRecord.version < Gem::Version.new("5")
                                                  Arel::Table.new(partition_table_name, { engine: arel_engine })
                                                else
                                                  Arel::Table.new(partition_table_name, type_caster: type_caster)
@@ -185,15 +185,15 @@ module CanvasPartman::Concerns
           case partitioning_interval
           when :weeks
             date = date.to_date
-            [table_name, date.cwyear, ("%02d" % date.cweek)].join('_')
+            [table_name, date.cwyear, ("%02d" % date.cweek)].join("_")
           when :months
-            [table_name, date.year, date.month].join('_')
+            [table_name, date.year, date.month].join("_")
           when :years
-            [table_name, date.year].join('_')
+            [table_name, date.year].join("_")
           end
         else
           id = attr[1]
-          [table_name, id / partition_size].join('_')
+          [table_name, id / partition_size].join("_")
         end
       end
     end

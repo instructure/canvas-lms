@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'nokogiri'
+require "nokogiri"
 
 module CC::Importer
   class BLTIConverter
@@ -30,10 +30,10 @@ module CC::Importer
 
       manifest.css("resource[type=#{BASIC_LTI}]").each do |r_node|
         res = {}
-        res[:migration_id] = r_node['identifier']
-        res[:href] = r_node['href']
+        res[:migration_id] = r_node["identifier"]
+        res[:href] = r_node["href"]
         res[:files] = []
-        r_node.css('file').each do |file_node|
+        r_node.css("file").each do |file_node|
           res[:files] << { href: file_node[:href] }
         end
 
@@ -81,17 +81,17 @@ module CC::Importer
       doc.css("#{link_css_path} > #{blti}|extensions").each do |extension|
         tool[:extensions] ||= []
         ext = {}
-        ext[:platform] = extension['platform']
+        ext[:platform] = extension["platform"]
         ext[:custom_fields] = get_custom_properties(extension)
 
         if ext[:platform] == CANVAS_PLATFORM
-          tool[:privacy_level] = ext[:custom_fields].delete 'privacy_level'
-          tool[:not_selectable] = ext[:custom_fields].delete 'not_selectable'
-          tool[:domain] = ext[:custom_fields].delete 'domain'
-          tool[:consumer_key] = ext[:custom_fields].delete 'consumer_key'
-          tool[:shared_secret] = ext[:custom_fields].delete 'shared_secret'
-          tool[:tool_id] = ext[:custom_fields].delete 'tool_id'
-          if (tool[:assignment_points_possible] = ext[:custom_fields].delete('outcome'))
+          tool[:privacy_level] = ext[:custom_fields].delete "privacy_level"
+          tool[:not_selectable] = ext[:custom_fields].delete "not_selectable"
+          tool[:domain] = ext[:custom_fields].delete "domain"
+          tool[:consumer_key] = ext[:custom_fields].delete "consumer_key"
+          tool[:shared_secret] = ext[:custom_fields].delete "shared_secret"
+          tool[:tool_id] = ext[:custom_fields].delete "tool_id"
+          if (tool[:assignment_points_possible] = ext[:custom_fields].delete("outcome"))
             tool[:assignment_points_possible] = tool[:assignment_points_possible].to_f
           end
           tool[:settings] = ext[:custom_fields]
@@ -108,7 +108,7 @@ module CC::Importer
 
     def convert_blti_xml(xml)
       doc = create_xml_doc(xml)
-      unless doc.namespaces.to_s.downcase.include? 'imsglobal'
+      unless doc.namespaces.to_s.downcase.include? "imsglobal"
         raise CCImportError, I18n.t("Invalid XML Configuration")
       end
 
@@ -125,7 +125,7 @@ module CC::Importer
       # Recursively look for properties named 'url'
       case obj
       when Hash
-        obj.select { |k, v| k.to_s == 'url' && v.is_a?(String) }
+        obj.select { |k, v| k.to_s == "url" && v.is_a?(String) }
            .each_value { |v| check_for_unescaped_url(v) }
         obj.each_value { |v| check_for_unescaped_url_properties(v) }
       when Array
@@ -150,14 +150,14 @@ module CC::Importer
     def get_custom_properties(node)
       props = {}
       node.children.each do |property|
-        next if property.name == 'text'
+        next if property.name == "text"
 
         case property.name
-        when 'property'
-          props[property['name']] = property.text.strip
-        when 'options'
-          props[property['name']] = get_custom_properties(property)
-        when 'custom'
+        when "property"
+          props[property["name"]] = property.text.strip
+        when "options"
+          props[property["name"]] = get_custom_properties(property)
+        when "custom"
           props[:custom_fields] = get_custom_properties(property)
         end
       end
@@ -167,7 +167,7 @@ module CC::Importer
     def get_blti_namespace(doc)
       doc.namespaces.each_pair do |key, val|
         if val == BLTI_NAMESPACE
-          return key.gsub('xmlns:', '')
+          return key.gsub("xmlns:", "")
         end
       end
       "blti"
@@ -184,7 +184,7 @@ module CC::Importer
         asmnt[:description] = tool[:description]
         asmnt[:submission_format] = "external_tool"
         asmnt[:external_tool_url] = tool[:url]
-        asmnt[:grading_type] = 'points'
+        asmnt[:grading_type] = "points"
         asmnt[:points_possible] = tool[:assignment_points_possible]
         asmnts << asmnt
       end

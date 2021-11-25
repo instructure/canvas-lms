@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_dependency 'importers'
+require_dependency "importers"
 
 module Importers
   class DiscussionTopicImporter < Importer
@@ -26,31 +26,31 @@ module Importers
     attr_accessor :options, :context, :item, :migration
 
     def self.process_migration(data, migration)
-      process_announcements_migration(Array(data['announcements']), migration)
-      process_discussion_topics_migration(Array(data['discussion_topics']), migration)
+      process_announcements_migration(Array(data["announcements"]), migration)
+      process_discussion_topics_migration(Array(data["discussion_topics"]), migration)
     end
 
     def self.process_announcements_migration(announcements, migration)
       announcements.each do |event|
-        next unless migration.import_object?('announcements', event['migration_id'])
+        next unless migration.import_object?("announcements", event["migration_id"])
 
-        event[:type] = 'announcement'
+        event[:type] = "announcement"
 
         begin
           import_from_migration(event, migration.context, migration)
         rescue
-          migration.add_import_warning(t('#migration.announcement_type', "Announcement"), event[:title], $!)
+          migration.add_import_warning(t("#migration.announcement_type", "Announcement"), event[:title], $!)
         end
       end
     end
 
     def self.process_discussion_topics_migration(discussion_topics, migration)
-      topic_entries_to_import = migration.to_import('topic_entries')
+      topic_entries_to_import = migration.to_import("topic_entries")
       discussion_topics.each do |topic|
-        if topic['group_id']
+        if topic["group_id"]
           context = Group.where(context_id: migration.context.id,
                                 context_type: migration.context.class.to_s,
-                                migration_id: topic['group_id']).first
+                                migration_id: topic["group_id"]).first
         end
         context ||= migration.context
         next unless context && can_import_topic?(topic, migration)
@@ -58,14 +58,14 @@ module Importers
         begin
           import_from_migration(topic.merge(topic_entries_to_import: topic_entries_to_import), context, migration)
         rescue
-          migration.add_import_warning(t('#migration.discussion_topic_type', "Discussion Topic"), topic[:title], $!)
+          migration.add_import_warning(t("#migration.discussion_topic_type", "Discussion Topic"), topic[:title], $!)
         end
       end
     end
 
     def self.can_import_topic?(topic, migration)
-      migration.import_object?('discussion_topics', topic['migration_id']) ||
-        migration.import_object?("topics", topic['migration_id'])
+      migration.import_object?("discussion_topics", topic["migration_id"]) ||
+        migration.import_object?("topics", topic["migration_id"])
     end
 
     def self.import_from_migration(hash, context, migration, item = nil)
@@ -86,7 +86,7 @@ module Importers
       return topic if topic.is_a?(DiscussionTopic)
 
       topic = DiscussionTopic.where(context_type: context.class.to_s, context_id: context.id)
-                             .where(['id = ? OR (migration_id IS NOT NULL AND migration_id = ?)', options[:id], options[:migration_id]]).first
+                             .where(["id = ? OR (migration_id IS NOT NULL AND migration_id = ?)", options[:id], options[:migration_id]]).first
       topic ||= if /announcement/i.match?(options[:type])
                   context.announcements.temp_record
                 else
@@ -112,7 +112,7 @@ module Importers
       item.message = if options.message
                        migration.convert_html(options.message, type, options[:migration_id], :message)
                      else
-                       I18n.t('#discussion_topic.empty_message', 'No message')
+                       I18n.t("#discussion_topic.empty_message", "No message")
                      end
 
       item.delayed_post_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(options.delayed_post_at)
@@ -125,13 +125,13 @@ module Importers
       item.last_reply_at   = nil if item.new_record?
 
       if options[:workflow_state].present?
-        if (options[:workflow_state] != 'unpublished') || item.new_record? || item.deleted? || migration.for_master_course_import?
+        if (options[:workflow_state] != "unpublished") || item.new_record? || item.deleted? || migration.for_master_course_import?
           item.workflow_state = options[:workflow_state]
         end
       elsif item.should_not_post_yet
-        item.workflow_state = 'post_delayed'
+        item.workflow_state = "post_delayed"
       else
-        item.workflow_state = 'active'
+        item.workflow_state = "active"
       end
 
       if options[:attachment_migration_id].present?
@@ -184,7 +184,7 @@ module Importers
       elsif options[:grading]
         Importers::AssignmentImporter.import_from_migration({
                                                               grading: options[:grading], migration_id: options[:migration_id],
-                                                              submission_format: 'discussion_topic', due_date: options.due_date,
+                                                              submission_format: "discussion_topic", due_date: options.due_date,
                                                               title: options[:grading][:title]
                                                             }, context, migration)
       end

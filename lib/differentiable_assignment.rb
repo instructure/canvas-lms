@@ -79,8 +79,8 @@ module DifferentiableAssignment
   def self.teacher_or_public_user?(user, context, opts)
     return true if opts[:is_teacher] == true
 
-    RequestCache.cache('teacher_or_public_user', user, context) do
-      Rails.cache.fetch([context, user, 'teacher_or_public_user'].cache_key) do
+    RequestCache.cache("teacher_or_public_user", user, context) do
+      Rails.cache.fetch([context, user, "teacher_or_public_user"].cache_key) do
         if context.includes_user?(user)
           permissions_implying_visibility = [:read_as_admin, :manage_grades, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS]
           permissions_implying_visibility << :manage_content if context.is_a?(Course)

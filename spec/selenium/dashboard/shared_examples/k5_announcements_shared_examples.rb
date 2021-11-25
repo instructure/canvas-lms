@@ -17,25 +17,25 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../../common'
-require_relative '../pages/k5_dashboard_page'
-require_relative '../pages/k5_dashboard_common_page'
-require_relative '../../../helpers/k5_common'
-require_relative '../../helpers/shared_examples_common'
+require_relative "../../common"
+require_relative "../pages/k5_dashboard_page"
+require_relative "../pages/k5_dashboard_common_page"
+require_relative "../../../helpers/k5_common"
+require_relative "../../helpers/shared_examples_common"
 
-shared_examples_for 'k5 homeroom announcements' do
+shared_examples_for "k5 homeroom announcements" do
   include K5DashboardPageObject
   include K5DashboardCommonPageObject
   include K5Common
   include SharedExamplesCommon
 
-  it 'shows navigation buttons and no recent announcements text' do
-    announcement_heading1 = 'K5 Do this'
-    announcement_content1 = 'So happy to see all of you.'
+  it "shows navigation buttons and no recent announcements text" do
+    announcement_heading1 = "K5 Do this"
+    announcement_content1 = "So happy to see all of you."
     announcement1 = new_announcement(@homeroom_course, announcement_heading1, announcement_content1)
     announcement1.update!(posted_at: 15.days.ago)
 
-    get '/'
+    get "/"
 
     expect(no_recent_announcements).to be_displayed
 
@@ -45,11 +45,11 @@ shared_examples_for 'k5 homeroom announcements' do
     expect(announcement_content_text(announcement_content1)).to be_displayed
   end
 
-  context 'k5 single homeroom' do
-    let(:current_announcement_title) { 'CURRENT ANNOUNCEMENT' }
-    let(:stale_announcement_title) { 'STALE ANNOUNCEMENT' }
-    let(:current_announcement_content) { 'CURRENT CONTENT' }
-    let(:stale_announcement_content) { 'STALE CONTENT' }
+  context "k5 single homeroom" do
+    let(:current_announcement_title) { "CURRENT ANNOUNCEMENT" }
+    let(:stale_announcement_title) { "STALE ANNOUNCEMENT" }
+    let(:current_announcement_content) { "CURRENT CONTENT" }
+    let(:stale_announcement_content) { "STALE CONTENT" }
 
     before :once do
       @announcement1 =
@@ -59,16 +59,16 @@ shared_examples_for 'k5 homeroom announcements' do
       @announcement2.update(posted_at: 20.days.ago)
     end
 
-    it 'presents latest homeroom announcements' do
-      get '/'
+    it "presents latest homeroom announcements" do
+      get "/"
 
       expect(homeroom_course_title(@course_name)).to be_displayed
       expect(announcement_title(current_announcement_title)).to be_displayed
       expect(announcement_content_text(current_announcement_content)).to be_displayed
     end
 
-    it 'opens up the announcement when announcement title is clicked' do
-      get '/'
+    it "opens up the announcement when announcement title is clicked" do
+      get "/"
 
       click_announcement_title(current_announcement_title)
       wait_for_ajaximations
@@ -78,29 +78,29 @@ shared_examples_for 'k5 homeroom announcements' do
       )
     end
 
-    it 'shows previous and next buttons when there are multiple non-stale announcements' do
-      get '/'
+    it "shows previous and next buttons when there are multiple non-stale announcements" do
+      get "/"
 
       expect(previous_announcement_button[0]).to be_displayed
       expect(next_announcement_button[0]).to be_displayed
-      expect(element_value_for_attr(next_announcement_button[0], 'cursor')).to eq('not-allowed')
+      expect(element_value_for_attr(next_announcement_button[0], "cursor")).to eq("not-allowed")
     end
 
-    it 'navigates among stale announcements' do
-      announcement_heading = 'Happy Monday!'
-      announcement_content = 'Get to work'
+    it "navigates among stale announcements" do
+      announcement_heading = "Happy Monday!"
+      announcement_content = "Get to work"
       another_old_announcement =
         new_announcement(@homeroom_course, announcement_heading, announcement_content)
       another_old_announcement.update!(posted_at: 90.days.ago)
 
-      get '/'
+      get "/"
 
       click_previous_announcement_button(0)
       click_previous_announcement_button(0)
 
       expect(announcement_title(announcement_heading)).to be_displayed
       expect(announcement_content_text(announcement_content)).to be_displayed
-      expect(element_value_for_attr(next_announcement_button[0], 'cursor')).to eq('pointer')
+      expect(element_value_for_attr(next_announcement_button[0], "cursor")).to eq("pointer")
 
       click_next_announcement_button(0)
 
@@ -109,41 +109,41 @@ shared_examples_for 'k5 homeroom announcements' do
     end
   end
 
-  describe 'announcement attachments' do
+  describe "announcement attachments" do
     before :once do
-      attachment_model(uploaded_data: fixture_file_upload('files/example.pdf', 'application/pdf'))
+      attachment_model(uploaded_data: fixture_file_upload("files/example.pdf", "application/pdf"))
       @homeroom_course.announcements.create!(
-        title: 'Welcome to class',
-        message: 'Hello!',
+        title: "Welcome to class",
+        message: "Hello!",
         attachment: @attachment
       )
     end
 
-    it 'shows download button next to homeroom announcement attachment', custom_timeout: 30 do
-      get '/'
-      wait_for(method: nil, timeout: 20) { f('span.instructure_file_holder').displayed? }
-      expect(f('a.file_download_btn')).to be_displayed
+    it "shows download button next to homeroom announcement attachment", custom_timeout: 30 do
+      get "/"
+      wait_for(method: nil, timeout: 20) { f("span.instructure_file_holder").displayed? }
+      expect(f("a.file_download_btn")).to be_displayed
     end
 
-    it 'opens preview overlay when clicking on homeroom announcement attachment' do
-      get '/'
-      f('a.preview_in_overlay').click
-      expect(f('iframe.ef-file-preview-frame')).to be_displayed
+    it "opens preview overlay when clicking on homeroom announcement attachment" do
+      get "/"
+      f("a.preview_in_overlay").click
+      expect(f("iframe.ef-file-preview-frame")).to be_displayed
     end
   end
 end
 
-shared_examples_for 'k5 homeroom announcements with multiple homerooms' do |context|
+shared_examples_for "k5 homeroom announcements with multiple homerooms" do |context|
   include K5DashboardPageObject
   include K5DashboardCommonPageObject
   include K5Common
   include SharedExamplesCommon
 
-  let(:second_homeroom_course_name) { 'Second Homeroom' }
-  let(:homeroom1_current_announcement_title) { 'HR1 CURRENT ANNOUNCEMENT' }
-  let(:homeroom1_stale_announcement_title) { 'HR1 STALE ANNOUNCEMENT' }
-  let(:homeroom2_current_announcement_title) { 'HR2 CURRENT ANNOUNCEMENT' }
-  let(:homeroom2_stale_announcement_title) { 'HR2 STALE ANNOUNCEMENT' }
+  let(:second_homeroom_course_name) { "Second Homeroom" }
+  let(:homeroom1_current_announcement_title) { "HR1 CURRENT ANNOUNCEMENT" }
+  let(:homeroom1_stale_announcement_title) { "HR1 STALE ANNOUNCEMENT" }
+  let(:homeroom2_current_announcement_title) { "HR2 CURRENT ANNOUNCEMENT" }
+  let(:homeroom2_stale_announcement_title) { "HR2 STALE ANNOUNCEMENT" }
 
   before :once do
     case context
@@ -183,8 +183,8 @@ shared_examples_for 'k5 homeroom announcements with multiple homerooms' do |cont
     end
   end
 
-  it 'shows two different homeroom course announcements two homerooms' do
-    get '/'
+  it "shows two different homeroom course announcements two homerooms" do
+    get "/"
 
     expect(homeroom_course_title(@course_name)).to be_displayed
     expect(announcement_title(homeroom1_current_announcement_title)).to be_displayed
@@ -192,20 +192,20 @@ shared_examples_for 'k5 homeroom announcements with multiple homerooms' do |cont
     expect(announcement_title(homeroom2_current_announcement_title)).to be_displayed
   end
 
-  it 'provides navigation buttons for both homerooms when there are old announcements' do
-    get '/'
+  it "provides navigation buttons for both homerooms when there are old announcements" do
+    get "/"
 
     expect(previous_announcement_button[0]).to be_displayed
     expect(next_announcement_button[0]).to be_displayed
-    expect(element_value_for_attr(next_announcement_button[0], 'cursor')).to eq('not-allowed')
+    expect(element_value_for_attr(next_announcement_button[0], "cursor")).to eq("not-allowed")
 
     expect(previous_announcement_button[1]).to be_displayed
     expect(next_announcement_button[1]).to be_displayed
-    expect(element_value_for_attr(next_announcement_button[1], 'cursor')).to eq('not-allowed')
+    expect(element_value_for_attr(next_announcement_button[1], "cursor")).to eq("not-allowed")
   end
 
-  it 'shows previous announcements when previous button clicked' do
-    get '/'
+  it "shows previous announcements when previous button clicked" do
+    get "/"
 
     click_previous_announcement_button(0)
     click_previous_announcement_button(1)
@@ -219,10 +219,10 @@ shared_examples_for 'k5 homeroom announcements with multiple homerooms' do |cont
   end
 end
 
-shared_examples_for 'K5 Subject Home Tab' do
-  it 'does not display old announcements on the Home tab' do
-    announcement_heading = 'Do science'
-    announcement = new_announcement(@subject_course, announcement_heading, 'it is fun!')
+shared_examples_for "K5 Subject Home Tab" do
+  it "does not display old announcements on the Home tab" do
+    announcement_heading = "Do science"
+    announcement = new_announcement(@subject_course, announcement_heading, "it is fun!")
 
     announcement.posted_at = 15.days.ago
     announcement.save!
@@ -232,11 +232,11 @@ shared_examples_for 'K5 Subject Home Tab' do
     expect(announcement_title_exists?(announcement_heading)).to be_falsey
   end
 
-  context 'multiple subject announcements' do
-    let(:subject_announcement1_title) { 'Happy Monday!' }
-    let(:subject_announcement1_content) { 'We got this!' }
-    let(:subject_announcement2_title) { 'Happy Monday!' }
-    let(:subject_announcement2_content) { 'We got this!' }
+  context "multiple subject announcements" do
+    let(:subject_announcement1_title) { "Happy Monday!" }
+    let(:subject_announcement1_content) { "We got this!" }
+    let(:subject_announcement2_title) { "Happy Monday!" }
+    let(:subject_announcement2_content) { "We got this!" }
 
     before :once do
       @announcement1 =
@@ -254,7 +254,7 @@ shared_examples_for 'K5 Subject Home Tab' do
       @announcement2.update(posted_at: 20.days.ago)
     end
 
-    it 'displays the latest announcement on the Home tab' do
+    it "displays the latest announcement on the Home tab" do
       get "/courses/#{@subject_course.id}"
 
       expect(course_dashboard_title).to include_text(@subject_course_title)
@@ -262,7 +262,7 @@ shared_examples_for 'K5 Subject Home Tab' do
       expect(announcement_content_text(subject_announcement2_title)).to be_displayed
     end
 
-    it 'opens up the announcement when announcement title is clicked' do
+    it "opens up the announcement when announcement title is clicked" do
       get "/courses/#{@subject_course.id}"
 
       click_announcement_title(subject_announcement1_title)
@@ -273,17 +273,17 @@ shared_examples_for 'K5 Subject Home Tab' do
       )
     end
 
-    it 'shows the previous and next buttons when there are multiple announcements' do
+    it "shows the previous and next buttons when there are multiple announcements" do
       get "/courses/#{@subject_course.id}"
 
       expect(previous_announcement_button[0]).to be_displayed
       expect(next_announcement_button[0]).to be_displayed
-      expect(element_value_for_attr(next_announcement_button[0], 'cursor')).to eq('not-allowed')
+      expect(element_value_for_attr(next_announcement_button[0], "cursor")).to eq("not-allowed")
     end
 
-    it 'navigates among current and stale announcements' do
-      announcement_heading = 'Happy Monday!'
-      announcement_content = 'Get to work'
+    it "navigates among current and stale announcements" do
+      announcement_heading = "Happy Monday!"
+      announcement_content = "Get to work"
       another_old_announcement =
         new_announcement(@subject_course, announcement_heading, announcement_content)
       another_old_announcement.update!(posted_at: 90.days.ago)
@@ -295,7 +295,7 @@ shared_examples_for 'K5 Subject Home Tab' do
 
       expect(announcement_title(announcement_heading)).to be_displayed
       expect(announcement_content_text(announcement_content)).to be_displayed
-      expect(element_value_for_attr(next_announcement_button[0], 'cursor')).to eq('pointer')
+      expect(element_value_for_attr(next_announcement_button[0], "cursor")).to eq("pointer")
 
       click_next_announcement_button(0)
 

@@ -26,7 +26,7 @@ module Filters::LiveAssessments
     id = params.key?(:assessment_id) ? params[:assessment_id] : params[:id]
 
     @assessment = LiveAssessments::Assessment.find(id)
-    reject! 'assessment does not belong to the given context' unless @assessment.context == @context
+    reject! "assessment does not belong to the given context" unless @assessment.context == @context
     @assessment
   end
 end

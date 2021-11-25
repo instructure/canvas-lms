@@ -18,8 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'atom'
-require 'sanitize'
+require "atom"
+require "sanitize"
 
 class EportfolioEntry < ActiveRecord::Base
   attr_readonly :eportfolio_id, :eportfolio_category_id
@@ -36,7 +36,7 @@ class EportfolioEntry < ActiveRecord::Base
   validates :eportfolio_category_id, presence: true
   validates :name, length: { maximum: maximum_string_length, allow_blank: true }
   validates :slug, length: { maximum: maximum_string_length, allow_blank: true }
-  has_many :page_comments, -> { preload(:user).order('page_comments.created_at DESC') }, as: :page
+  has_many :page_comments, -> { preload(:user).order("page_comments.created_at DESC") }, as: :page
 
   serialize :content
 
@@ -105,18 +105,18 @@ class EportfolioEntry < ActiveRecord::Base
       obj = params[("section_" + (idx + 1).to_s).to_sym].slice(:section_type, :content, :submission_id, :attachment_id)
       new_obj = { section_type: obj[:section_type] }
       case obj[:section_type]
-      when 'rich_text', 'html'
+      when "rich_text", "html"
         config = CanvasSanitize::SANITIZE
-        new_obj[:content] = Sanitize.clean(obj[:content] || '', config).strip
+        new_obj[:content] = Sanitize.clean(obj[:content] || "", config).strip
         new_obj = nil if new_obj[:content].empty?
-      when 'submission'
+      when "submission"
         submission = eportfolio.user.submissions.where(id: obj[:submission_id]).exists? if obj[:submission_id].present?
         if submission
           new_obj[:submission_id] = obj[:submission_id].to_i
         else
           new_obj = nil
         end
-      when 'attachment'
+      when "attachment"
         attachment = eportfolio.user.attachments.active.where(id: obj[:attachment_id]).exists? if obj[:attachment_id].present?
         if attachment
           new_obj[:attachment_id] = obj[:attachment_id].to_i
@@ -158,7 +158,7 @@ class EportfolioEntry < ActiveRecord::Base
       entry.published = created_at
       url = "http://#{HostUrl.default_host}/eportfolios/#{eportfolio_id}/#{eportfolio_category.slug}/#{slug}"
       url += "?verifier=#{eportfolio.uuid}" if opts[:private]
-      entry.links << Atom::Link.new(rel: 'alternate', href: url)
+      entry.links << Atom::Link.new(rel: "alternate", href: url)
       entry.id = "tag:#{HostUrl.default_host},#{created_at.strftime("%Y-%m-%d")}:/eportfoli_entries/#{feed_code}_#{created_at.strftime("%Y-%m-%d-%H-%M") rescue "none"}"
       rendered_content = t(:click_through, "Click to view page content")
       entry.content = Atom::Content::Html.new(rendered_content)

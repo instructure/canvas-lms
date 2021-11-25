@@ -17,9 +17,9 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative 'messages_helper'
+require_relative "messages_helper"
 
-describe 'report_generated' do
+describe "report_generated" do
   before :once do
     @object = Account.default.account_reports.create!(user: user_factory)
     @object.attachment = attachment_model

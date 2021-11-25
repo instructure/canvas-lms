@@ -22,7 +22,7 @@ describe AssessmentQuestionBank do
   before :once do
     course_factory
     assessment_question_bank_model
-    @bank = @course.assessment_question_banks.create!(title: 'Test Bank')
+    @bank = @course.assessment_question_banks.create!(title: "Test Bank")
   end
 
   describe "#select_for_submission" do
@@ -113,7 +113,7 @@ describe AssessmentQuestionBank do
     expect(@bank.learning_outcome_alignments).to be_empty
   end
 
-  context 'root_account_id' do
+  context "root_account_id" do
     it "uses root_account value from account" do
       expect(@bank.root_account_id).to eq Account.default.id
     end

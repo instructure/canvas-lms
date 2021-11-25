@@ -148,12 +148,12 @@ describe Quizzes::TakeQuizPresenter do
                                                                 })
     end
 
-    it 'returns icon-check for answered questions' do
-      expect(presenter.answered_icon(question1)).to eq 'icon-check'
+    it "returns icon-check for answered questions" do
+      expect(presenter.answered_icon(question1)).to eq "icon-check"
     end
 
-    it 'returns icon-question for unanswered questions' do
-      expect(presenter.answered_icon(question2)).to eq 'icon-question'
+    it "returns icon-question for unanswered questions" do
+      expect(presenter.answered_icon(question2)).to eq "icon-question"
     end
   end
 
@@ -165,12 +165,12 @@ describe Quizzes::TakeQuizPresenter do
                                                                 })
     end
 
-    it 'returns icon-check for answered questions' do
-      expect(presenter.answered_text(question1)).to eq 'Answered'
+    it "returns icon-check for answered questions" do
+      expect(presenter.answered_text(question1)).to eq "Answered"
     end
 
-    it 'returns icon-question for unanswered questions' do
-      expect(presenter.answered_text(question2)).to eq 'Haven\'t Answered Yet'
+    it "returns icon-question for unanswered questions" do
+      expect(presenter.answered_text(question2)).to eq "Haven't Answered Yet"
     end
   end
 
@@ -258,11 +258,11 @@ describe Quizzes::TakeQuizPresenter do
       )
     end
 
-    it 'returns true for answered questions' do
+    it "returns true for answered questions" do
       expect(presenter.question_answered?(question1)).to be_truthy
     end
 
-    it 'returns false for unanswered questions' do
+    it "returns false for unanswered questions" do
       expect(presenter.question_answered?(question2)).to be_falsey
     end
   end
@@ -300,17 +300,17 @@ describe Quizzes::TakeQuizPresenter do
 
     it "adds 'text_only' if the question is a text only question" do
       q2 = question2.dup
-      q2['question_type'] = 'text_only_question'
+      q2["question_type"] = "text_only_question"
 
       expect(presenter.question_class(question1)).not_to match(/text_only/)
       expect(presenter.question_class(q2)).to match(/text_only/)
     end
   end
 
-  describe 'building the answer set' do
-    it 'discards irrelevant entries' do
+  describe "building the answer set" do
+    it "discards irrelevant entries" do
       allow(submission).to receive(:submission_data).and_return({
-                                                                  'foo' => 'bar',
+                                                                  "foo" => "bar",
                                                                   "question_#{question1[:id]}_marked" => true
                                                                 })
 
@@ -318,9 +318,9 @@ describe Quizzes::TakeQuizPresenter do
       expect(p.answers.empty?).to be_truthy
     end
 
-    it 'marks a question as answered' do
+    it "marks a question as answered" do
       allow(submission).to receive(:submission_data).and_return({
-                                                                  "question_#{question1[:id]}" => '123',
+                                                                  "question_#{question1[:id]}" => "123",
                                                                   "question_#{question2[:id]}" => true
                                                                 })
 
@@ -331,9 +331,9 @@ describe Quizzes::TakeQuizPresenter do
       expect(p.answers).not_to have_key(question3[:id])
     end
 
-    it 'rejects zeroes for an answer' do
+    it "rejects zeroes for an answer" do
       allow(submission).to receive(:submission_data).and_return({
-                                                                  "question_#{question1[:id]}" => '0'
+                                                                  "question_#{question1[:id]}" => "0"
                                                                 })
 
       p = Quizzes::TakeQuizPresenter.new(quiz, submission, params)

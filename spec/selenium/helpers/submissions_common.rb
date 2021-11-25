@@ -17,29 +17,29 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../common'
+require_relative "../common"
 
 module SubmissionsCommon
-  def create_assignment(type = 'online_text_entry')
+  def create_assignment(type = "online_text_entry")
     assignment = @course.assignments.build({
-                                             name: 'media assignment',
+                                             name: "media assignment",
                                              submission_types: type
                                            })
-    assignment.workflow_state = 'published'
+    assignment.workflow_state = "published"
     assignment.save!
     assignment
   end
 
-  def create_assignment_and_go_to_page(type = 'online_text_entry')
+  def create_assignment_and_go_to_page(type = "online_text_entry")
     assignment = create_assignment type
     get "/courses/#{@course.id}/assignments/#{assignment.id}"
     assignment
   end
 
   def open_media_comment_dialog
-    move_to_click('.media_comment_link')
+    move_to_click(".media_comment_link")
     # swf and stuff loads, give it a sec to do its thing
-    expect(f('#media_record_tabs')).to be_displayed
+    expect(f("#media_record_tabs")).to be_displayed
   end
 
   def submit_media_comment_1

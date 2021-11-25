@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'spec_helper'
+require "spec_helper"
 
 module DrDiff
   describe DiffParser do
@@ -192,7 +192,7 @@ module DrDiff
       context "for diffs with deletions" do
         let(:parser) { described_class.new(subtractive_diff) }
 
-        it 'respects the boundary of a removed diff set' do
+        it "respects the boundary of a removed diff set" do
           expect(parser.relevant?("some_file.rb", 55, severe: true)).to be(false)
           expect(parser.relevant?("some_file.rb", 56, severe: true)).to be(true)
           expect(parser.relevant?("some_file.rb", 60, severe: true)).to be(true)
@@ -216,20 +216,20 @@ module DrDiff
       it "parses combination diffs correctly" do
         parser = described_class.new(combination_diff)
         diff = parser.diff
-        expect(diff['Gemfile.d/development.rb'][:change]).to eq([7])
-        expect(diff['script/rlint'][:change]).to eq([64] + (68..79).to_a)
+        expect(diff["Gemfile.d/development.rb"][:change]).to eq([7])
+        expect(diff["script/rlint"][:change]).to eq([64] + (68..79).to_a)
       end
 
       it "parses additive diffs correctly" do
         parser = described_class.new(add_diff)
         diff = parser.diff
-        expect(diff['some_file.rb'][:change]).to eq([3, 60, 61, 62])
+        expect(diff["some_file.rb"][:change]).to eq([3, 60, 61, 62])
       end
 
       it "parses subtractive diffs correctly" do
         parser = described_class.new(subtractive_diff)
         diff = parser.diff
-        expect(diff['some_file.rb'][:change]).to eq([])
+        expect(diff["some_file.rb"][:change]).to eq([])
       end
     end
   end

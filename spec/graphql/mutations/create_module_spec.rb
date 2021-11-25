@@ -48,15 +48,15 @@ describe Mutations::CreateModule do
 
   it "works" do
     result = CanvasSchema.execute(mutation_str, context: { current_user: @teacher })
-    expect(result.dig(*%w[data createModule module name])).to eq 'zxcv'
+    expect(result.dig(*%w[data createModule module name])).to eq "zxcv"
     new_module_id = result.dig(*%w[data createModule module _id])
-    expect(@course.context_modules.find(new_module_id).name).to eq 'zxcv'
+    expect(@course.context_modules.find(new_module_id).name).to eq "zxcv"
     expect(result.dig(*%w[data createModule errors])).to be_nil
   end
 
   it "requires non-empty name" do
-    result = CanvasSchema.execute(mutation_str(name: ''), context: { current_user: @teacher })
-    expect(result.dig('data', 'createModule', 'errors')[0]['message']).to eq "can't be blank"
+    result = CanvasSchema.execute(mutation_str(name: ""), context: { current_user: @teacher })
+    expect(result.dig("data", "createModule", "errors")[0]["message"]).to eq "can't be blank"
   end
 
   it "fails gracefully for invalid course id" do

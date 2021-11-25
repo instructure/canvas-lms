@@ -109,9 +109,9 @@ class AccountNotificationsController < ApplicationController
     js_env(global_notifications: html_to_string)
     @show_left_side = true
     @context = @current_user.profile
-    set_active_tab('past_global_announcements')
+    set_active_tab("past_global_announcements")
     js_bundle :past_global_announcements
-    render html: '', layout: true
+    render html: "", layout: true
   end
 
   def html_to_string
@@ -127,7 +127,7 @@ class AccountNotificationsController < ApplicationController
   end
 
   def html_string_from_announcements(announcements)
-    render_to_string(partial: 'shared/account_notification', collection: announcements)
+    render_to_string(partial: "shared/account_notification", collection: announcements)
   end
 
   # @API Show a global notification
@@ -236,12 +236,12 @@ class AccountNotificationsController < ApplicationController
           format.json { render json: account_notification_json(@notification, @current_user, session) }
         else
           flash[:notice] = t("Announcement successfully created")
-          format.html { redirect_to account_settings_path(@account, anchor: 'tab-announcements') }
+          format.html { redirect_to account_settings_path(@account, anchor: "tab-announcements") }
           format.json { render json: @notification }
         end
       else
         flash[:error] = t("Announcement creation failed")
-        format.html { redirect_to account_settings_path(@account, anchor: 'tab-announcements') } unless api_request?
+        format.html { redirect_to account_settings_path(@account, anchor: "tab-announcements") } unless api_request?
         format.json { render json: @notification.errors, status: :bad_request }
       end
     end
@@ -311,17 +311,17 @@ class AccountNotificationsController < ApplicationController
         if updated
           flash[:notice] = t("Announcement successfully updated")
           format.json { render json: account_notification_json(account_notification, @current_user, session) }
-          format.html { redirect_to account_settings_path(@account, anchor: 'tab-announcements') }
+          format.html { redirect_to account_settings_path(@account, anchor: "tab-announcements") }
         else
           flash[:error] = t("Announcement update failed")
-          format.html { redirect_to account_settings_path(@account, anchor: 'tab-announcements') }
+          format.html { redirect_to account_settings_path(@account, anchor: "tab-announcements") }
           format.json { render json: account_notification.errors, status: :bad_request }
         end
       end
     else
       respond_to do |format|
         flash[:error] = t("Announcement not found")
-        format.html { redirect_to account_settings_path(@account, anchor: 'tab-announcements') }
+        format.html { redirect_to account_settings_path(@account, anchor: "tab-announcements") }
         format.json { render json: { message: "announcement not found" } }
       end
     end
@@ -332,7 +332,7 @@ class AccountNotificationsController < ApplicationController
     @notification.destroy
     respond_to do |format|
       flash[:message] = t(:announcement_deleted_notice, "Announcement successfully deleted")
-      format.html { redirect_to account_settings_path(@account, anchor: 'tab-announcements') }
+      format.html { redirect_to account_settings_path(@account, anchor: "tab-announcements") }
       format.json { render json: @notification }
     end
   end

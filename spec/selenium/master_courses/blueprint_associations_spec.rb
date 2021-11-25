@@ -17,8 +17,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../common'
-require_relative '../helpers/blueprint_common'
+require_relative "../common"
+require_relative "../helpers/blueprint_common"
 
 describe "Blueprint association settings" do
   include_context "in-process server selenium tests"
@@ -38,7 +38,7 @@ describe "Blueprint association settings" do
     create_sub_account
   end
 
-  def create_sub_account(name = 'sub account', number_to_create = 1, parent_account = Account.default)
+  def create_sub_account(name = "sub account", number_to_create = 1, parent_account = Account.default)
     created_sub_accounts = []
     number_to_create.times do |i|
       sub_account = Account.create(name: name + " #{i}", parent_account: parent_account)
@@ -57,9 +57,9 @@ describe "Blueprint association settings" do
       open_associations
       open_courses_list
       row = f('tr[data-testid="bca-table__course-row"]')
-      row.find_element(xpath: 'td//label').click
+      row.find_element(xpath: "td//label").click
       expect(fj("span:contains('To be Added')")).to be
-      element = f('.bca-associations-table')
+      element = f(".bca-associations-table")
       element = element.find_element(css: "form[data-course-id=\"#{@minion3.id}\"]")
       expect(element).to be
     end
@@ -67,18 +67,18 @@ describe "Blueprint association settings" do
     it "leaving the search bar shouldn't close the courses tab", priority: "2" do
       open_associations
       open_courses_list
-      element = f('input', f('.bca-course-filter')) # .find_element(css: 'input')
+      element = f("input", f(".bca-course-filter")) # .find_element(css: 'input')
       element.send_keys("Minion")
-      f('h3', f('.bca__wrapper')).click # click away from the search bar
-      expect(f('.bca-table__wrapper')).to be_displayed
+      f("h3", f(".bca__wrapper")).click # click away from the search bar
+      expect(f(".bca-table__wrapper")).to be_displayed
     end
 
     it "course search dropdowns are populated", priority: "2" do
       open_associations
       open_courses_list
 
-      expect(term_options).to include 'Default Term'
-      expect(sub_account_options).to include 'sub account 0'
+      expect(term_options).to include "Default Term"
+      expect(sub_account_options).to include "sub account 0"
     end
   end
 end

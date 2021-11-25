@@ -49,7 +49,7 @@ module DataFixup
       else
         # update all fields in a single query, by assigning the existing non-NULL values
         # over themselves, or the default value if it is NULL
-        updates = fields.map { |(f, v)| "#{f}=COALESCE(#{f},#{klass.connection.quote(v)})" }.join(', ')
+        updates = fields.map { |(f, v)| "#{f}=COALESCE(#{f},#{klass.connection.quote(v)})" }.join(", ")
       end
 
       klass.find_ids_in_ranges(batch_size: batch_size) do |start_id, end_id|

@@ -26,9 +26,9 @@ describe RubricAssessment do
     @student = user_factory(active_all: true)
     @course.enroll_student(@student).accept
     @observer = user_factory(active_all: true)
-    @course.enroll_user(@observer, 'ObserverEnrollment', { associated_user_id: @student.id })
+    @course.enroll_user(@observer, "ObserverEnrollment", { associated_user_id: @student.id })
     rubric_model
-    @association = @rubric.associate_with(@assignment, @course, purpose: 'grading', use_for_grading: true)
+    @association = @rubric.associate_with(@assignment, @course, purpose: "grading", use_for_grading: true)
   end
 
   describe "related_group_submissions_and_assessments" do
@@ -45,7 +45,7 @@ describe RubricAssessment do
                                         assessor: @teacher,
                                         artifact: @assignment.find_or_create_submission(@student),
                                         assessment: {
-                                          assessment_type: 'grading',
+                                          assessment_type: "grading",
                                           criterion_crit1: {
                                             points: 5,
                                             comments: "comments",
@@ -61,7 +61,7 @@ describe RubricAssessment do
                                           assessor: @teacher,
                                           artifact: @assignment.find_or_create_submission(@student),
                                           assessment: {
-                                            assessment_type: 'grading',
+                                            assessment_type: "grading",
                                             criterion_crit1: {
                                               points: 5,
                                               comments: "comments",
@@ -121,7 +121,7 @@ describe RubricAssessment do
                                           assessor: @teacher,
                                           artifact: @assignment.find_or_create_submission(@student),
                                           assessment: {
-                                            assessment_type: 'grading',
+                                            assessment_type: "grading",
                                             criterion_crit1: {
                                               points: 5,
                                               comments: "comments",
@@ -154,7 +154,7 @@ describe RubricAssessment do
                                        assessor: @teacher,
                                        artifact: @assignment.find_or_create_submission(@student),
                                        assessment: {
-                                         assessment_type: 'grading',
+                                         assessment_type: "grading",
                                          criterion_crit1: {
                                            points: 5,
                                            comments: comment,
@@ -176,7 +176,7 @@ describe RubricAssessment do
                                          assessor: @teacher,
                                          artifact: @assignment.find_or_create_submission(@student),
                                          assessment: {
-                                           assessment_type: 'grading',
+                                           assessment_type: "grading",
                                            criterion_crit1: {
                                              points: 5
                                            }
@@ -201,7 +201,7 @@ describe RubricAssessment do
           assessor: @teacher,
           artifact: submission,
           assessment: {
-            assessment_type: 'grading',
+            assessment_type: "grading",
             criterion_crit1: {
               points: 5
             }
@@ -214,14 +214,14 @@ describe RubricAssessment do
 
     it "allows observers the ability to view rubric assessments with account association" do
       submission = @assignment.find_or_create_submission(@student)
-      account_association = @rubric.associate_with(@assignment, @account, purpose: 'grading', use_for_grading: true)
+      account_association = @rubric.associate_with(@assignment, @account, purpose: "grading", use_for_grading: true)
       account_association.assess(
         {
           user: @student,
           assessor: @teacher,
           artifact: submission,
           assessment: {
-            assessment_type: 'grading',
+            assessment_type: "grading",
             criterion_crit1: {
               points: 5
             }
@@ -239,7 +239,7 @@ describe RubricAssessment do
                                          assessor: @teacher,
                                          artifact: @assignment.find_or_create_submission(@student),
                                          assessment: {
-                                           assessment_type: 'grading',
+                                           assessment_type: "grading",
                                            criterion_crit1: { points: 5 }
                                          }
                                        })
@@ -252,7 +252,7 @@ describe RubricAssessment do
                                          assessor: @teacher,
                                          artifact: @assignment.find_or_create_submission(@student),
                                          assessment: {
-                                           assessment_type: 'grading',
+                                           assessment_type: "grading",
                                            criterion_crit1: {
                                              points: ""
                                            }
@@ -268,7 +268,7 @@ describe RubricAssessment do
                                          assessor: @teacher,
                                          artifact: @assignment.find_or_create_submission(@student),
                                          assessment: {
-                                           assessment_type: 'grading',
+                                           assessment_type: "grading",
                                            criterion_crit1: {
                                              points: "11"
                                            }
@@ -278,22 +278,22 @@ describe RubricAssessment do
       expect(assessment.artifact.score).to be 11.0
     end
 
-    it 'rounds the final score to avoid floating-point arithmetic issues' do
+    it "rounds the final score to avoid floating-point arithmetic issues" do
       def criteria(id)
         {
           description: "Some criterion",
           points: 10,
           id: id,
           ratings: [
-            { description: "Good", points: 10, id: 'rat1', criterion_id: id },
-            { description: "Medium", points: 5, id: 'rat2', criterion_id: id },
-            { description: "Bad", points: 0, id: 'rat3', criterion_id: id }
+            { description: "Good", points: 10, id: "rat1", criterion_id: id },
+            { description: "Medium", points: 5, id: "rat2", criterion_id: id },
+            { description: "Bad", points: 0, id: "rat3", criterion_id: id }
           ]
         }
       end
 
       rubric = rubric_model(data: %w[crit1 crit2 crit3 crit4].map { |n| criteria(n) })
-      association = rubric.associate_with(@assignment, @course, purpose: 'grading', use_for_grading: true)
+      association = rubric.associate_with(@assignment, @course, purpose: "grading", use_for_grading: true)
 
       # in an ideal world these would be stored using the DECIMAL type, but we
       # don't live in that world
@@ -302,22 +302,22 @@ describe RubricAssessment do
                                         assessor: @teacher,
                                         artifact: @assignment.find_or_create_submission(@student),
                                         assessment: {
-                                          assessment_type: 'grading',
+                                          assessment_type: "grading",
                                           criterion_crit1: {
                                             points: 1.2,
-                                            rating_id: 'rat2'
+                                            rating_id: "rat2"
                                           },
                                           criterion_crit2: {
                                             points: 1.2,
-                                            rating_id: 'rat2'
+                                            rating_id: "rat2"
                                           },
                                           criterion_crit3: {
                                             points: 1.2,
-                                            rating_id: 'rat2'
+                                            rating_id: "rat2"
                                           },
                                           criterion_crit4: {
                                             points: 0.4,
-                                            rating_id: 'rat2'
+                                            rating_id: "rat2"
                                           }
                                         }
                                       })
@@ -361,11 +361,11 @@ describe RubricAssessment do
       before :once do
         assignment_model
         outcome_with_rubric
-        @association = @rubric.associate_with(@assignment, @course, purpose: 'grading', use_for_grading: true)
+        @association = @rubric.associate_with(@assignment, @course, purpose: "grading", use_for_grading: true)
         @course.enroll_student(@student, enrollment_state: :active)
       end
 
-      it 'assessing a rubric with outcome criterion should increment datadog counter' do
+      it "assessing a rubric with outcome criterion should increment datadog counter" do
         allow(InstStatsd::Statsd).to receive(:increment)
         @outcome.update!(data: nil)
         criterion_id = "criterion_#{@rubric.data[0][:id]}".to_sym
@@ -374,17 +374,17 @@ describe RubricAssessment do
                               assessor: @teacher,
                               artifact: @assignment.find_or_create_submission(@student),
                               assessment: {
-                                :assessment_type => 'grading',
+                                :assessment_type => "grading",
                                 criterion_id => {
-                                  points: '3'
+                                  points: "3"
                                 }
                               }
                             })
         expect(InstStatsd::Statsd).to have_received(:increment).with("feature_flag_check", any_args).at_least(:once)
-        expect(InstStatsd::Statsd).to have_received(:increment).with('learning_outcome_result.create')
+        expect(InstStatsd::Statsd).to have_received(:increment).with("learning_outcome_result.create")
       end
 
-      it 'uses default ratings for scoring' do
+      it "uses default ratings for scoring" do
         @outcome.update!(data: nil)
         criterion_id = "criterion_#{@rubric.data[0][:id]}".to_sym
         assessment = @association.assess({
@@ -392,9 +392,9 @@ describe RubricAssessment do
                                            assessor: @teacher,
                                            artifact: @assignment.find_or_create_submission(@student),
                                            assessment: {
-                                             :assessment_type => 'grading',
+                                             :assessment_type => "grading",
                                              criterion_id => {
-                                               points: '3'
+                                               points: "3"
                                              }
                                            }
                                          })
@@ -409,7 +409,7 @@ describe RubricAssessment do
                                            assessor: @teacher,
                                            artifact: @assignment.find_or_create_submission(@student),
                                            assessment: {
-                                             :assessment_type => 'grading',
+                                             :assessment_type => "grading",
                                              criterion_id => {
                                                points: "5"
                                              }
@@ -427,7 +427,7 @@ describe RubricAssessment do
                                            assessor: @teacher,
                                            artifact: @assignment.find_or_create_submission(@student),
                                            assessment: {
-                                             :assessment_type => 'grading',
+                                             :assessment_type => "grading",
                                              criterion_id => {
                                                points: "5"
                                              }
@@ -445,7 +445,7 @@ describe RubricAssessment do
                                            assessor: @teacher,
                                            artifact: @assignment.find_or_create_submission(@student),
                                            assessment: {
-                                             :assessment_type => 'grading',
+                                             :assessment_type => "grading",
                                              criterion_id => {
                                                points: "3"
                                              }
@@ -456,14 +456,14 @@ describe RubricAssessment do
       end
 
       it "truncates the learning outcome result title to 250 characters" do
-        @association.update!(title: 'a' * 255)
+        @association.update!(title: "a" * 255)
         criterion_id = "criterion_#{@rubric.data[0][:id]}".to_sym
         @association.assess({
                               user: @student,
                               assessor: @teacher,
                               artifact: @assignment.find_or_create_submission(@student),
                               assessment: {
-                                :assessment_type => 'grading',
+                                :assessment_type => "grading",
                                 criterion_id => {
                                   points: "5"
                                 }
@@ -480,7 +480,7 @@ describe RubricAssessment do
                               assessor: @teacher,
                               artifact: @assignment.find_or_create_submission(@student),
                               assessment: {
-                                :assessment_type => 'grading',
+                                :assessment_type => "grading",
                                 criterion_id => {
                                   points: "3"
                                 }
@@ -496,7 +496,7 @@ describe RubricAssessment do
                               assessor: @teacher,
                               artifact: @assignment.find_or_create_submission(@student),
                               assessment: {
-                                :assessment_type => 'grading',
+                                :assessment_type => "grading",
                                 criterion_id => {
                                   points: "3"
                                 }
@@ -510,7 +510,7 @@ describe RubricAssessment do
                               assessor: @teacher,
                               artifact: @assignment.find_or_create_submission(@student),
                               assessment: {
-                                :assessment_type => 'grading',
+                                :assessment_type => "grading",
                                 criterion_id => {
                                   points: "3"
                                 }
@@ -527,7 +527,7 @@ describe RubricAssessment do
                                 assessor: @student,
                                 artifact: @assignment.find_or_create_submission(@student),
                                 assessment: {
-                                  :assessment_type => 'peer_review',
+                                  :assessment_type => "peer_review",
                                   criterion_id => {
                                     points: "3"
                                   }
@@ -546,7 +546,7 @@ describe RubricAssessment do
                                 assessor: @student,
                                 artifact: provisional_grade,
                                 assessment: {
-                                  :assessment_type => 'grading',
+                                  :assessment_type => "grading",
                                   criterion_id => {
                                     points: "3"
                                   }
@@ -558,13 +558,13 @@ describe RubricAssessment do
 
     it "does not update scores if not used for grading" do
       rubric_model
-      @association = @rubric.associate_with(@assignment, @course, purpose: 'grading', use_for_grading: false)
+      @association = @rubric.associate_with(@assignment, @course, purpose: "grading", use_for_grading: false)
       assessment = @association.assess({
                                          user: @student,
                                          assessor: @teacher,
                                          artifact: @assignment.find_or_create_submission(@student),
                                          assessment: {
-                                           assessment_type: 'grading',
+                                           assessment_type: "grading",
                                            criterion_crit1: {
                                              points: 5
                                            }
@@ -588,7 +588,7 @@ describe RubricAssessment do
                                          assessor: @student2,
                                          artifact: @assignment.find_or_create_submission(@student),
                                          assessment: {
-                                           assessment_type: 'grading',
+                                           assessment_type: "grading",
                                            criterion_crit1: {
                                              points: 5
                                            }
@@ -612,11 +612,11 @@ describe RubricAssessment do
                               assessor: @student,
                               artifact: @assignment.find_or_create_submission(@student),
                               assessment: {
-                                :assessment_type => 'grading',
+                                :assessment_type => "grading",
                                 criterion_id => {
                                   points: "3",
                                   comments: "Some comment",
-                                  save_comment: '1'
+                                  save_comment: "1"
                                 }
                               }
                             })
@@ -630,11 +630,11 @@ describe RubricAssessment do
                               assessor: @student,
                               artifact: @assignment.find_or_create_submission(@student),
                               assessment: {
-                                :assessment_type => 'peer_review',
+                                :assessment_type => "peer_review",
                                 criterion_id => {
                                   points: "3",
                                   comments: "Some obscene comment",
-                                  save_comment: '1'
+                                  save_comment: "1"
                                 }
                               }
                             })
@@ -653,7 +653,7 @@ describe RubricAssessment do
                                             assessor: @reviewer,
                                             artifact: @assignment.find_or_create_submission(@reviewed),
                                             assessment: {
-                                              assessment_type: 'peer_review',
+                                              assessment_type: "peer_review",
                                               criterion_crit1: {
                                                 points: 5,
                                                 comments: "Hey, it's a comment."
@@ -665,7 +665,7 @@ describe RubricAssessment do
                                                     assessor: @teacher,
                                                     artifact: @assignment.find_or_create_submission(@student),
                                                     assessment: {
-                                                      assessment_type: 'grading',
+                                                      assessment_type: "grading",
                                                       criterion_crit1: {
                                                         points: 3,
                                                         comments: "Hey, it's a teacher comment."
@@ -695,7 +695,7 @@ describe RubricAssessment do
       let_once(:assessment) do
         RubricAssessment.create!({
                                    artifact: @assignment.find_or_create_submission(@student),
-                                   assessment_type: 'peer_review',
+                                   assessment_type: "peer_review",
                                    assessor: student_in_course(active_all: true).user,
                                    rubric: @rubric,
                                    user: @student
@@ -707,8 +707,8 @@ describe RubricAssessment do
       end
     end
 
-    describe '#update_artifact' do
-      describe 'grade_posting_in_progress' do
+    describe "#update_artifact" do
+      describe "grade_posting_in_progress" do
         subject_once(:ra) do
           RubricAssessment.new(
             score: 2.0,
@@ -730,7 +730,7 @@ describe RubricAssessment do
           )
         end
 
-        it 'is nil by default' do
+        it "is nil by default" do
           expect(@assignment).to receive(:grade_student).with(
             ra.submission.student,
             score: ra.score,
@@ -741,7 +741,7 @@ describe RubricAssessment do
           ra.save!
         end
 
-        it 'passes grade_posting_in_progress from submission' do
+        it "passes grade_posting_in_progress from submission" do
           submission.grade_posting_in_progress = true
 
           expect(@assignment).to receive(:grade_student).with(
@@ -755,7 +755,7 @@ describe RubricAssessment do
         end
       end
 
-      it 'sets group on submission' do
+      it "sets group on submission" do
         group_category = @course.group_categories.create!(name: "Test Group Set")
         group = @course.groups.create!(name: "Group A", group_category: group_category)
         group.add_user @student
@@ -769,14 +769,14 @@ describe RubricAssessment do
         )
         submission = assignment.find_or_create_submission(@student)
         association = @rubric.associate_with(
-          assignment, @course, purpose: 'grading', use_for_grading: true
+          assignment, @course, purpose: "grading", use_for_grading: true
         )
         association.assess({
                              user: @student,
                              assessor: @teacher,
                              artifact: submission,
                              assessment: {
-                               assessment_type: 'grading',
+                               assessment_type: "grading",
                                criterion_crit1: {
                                  points: 5
                                }
@@ -792,7 +792,7 @@ describe RubricAssessment do
             assessor: @teacher,
             artifact: submission,
             assessment: {
-              assessment_type: 'grading',
+              assessment_type: "grading",
               criterion_crit1: {
                 points: 5
               }
@@ -841,7 +841,7 @@ describe RubricAssessment do
                                           assessor: @teacher,
                                           artifact: @assignment.find_or_create_submission(@student),
                                           assessment: {
-                                            assessment_type: 'grading',
+                                            assessment_type: "grading",
                                             criterion_crit1: {
                                               points: 5,
                                               comments: "comments",
@@ -860,24 +860,24 @@ describe RubricAssessment do
 
     it "does not grant :read to an account user without :manage_courses or :view_all_grades" do
       user_factory
-      role = custom_account_role('custom', account: @account)
+      role = custom_account_role("custom", account: @account)
       @account.account_users.create!(user: @user, role: role)
       expect(@assessment.grants_right?(@user, :read)).to eq false
     end
 
-    it 'grants :read to an account user with :view_all_grades but not :manage_courses' do
+    it "grants :read to an account user with :view_all_grades but not :manage_courses" do
       @account.disable_feature!(:granular_permissions_manage_courses)
       user_factory
-      role = custom_account_role('custom', account: @account)
+      role = custom_account_role("custom", account: @account)
       RoleOverride.create!(
         context: @account,
-        permission: 'view_all_grades',
+        permission: "view_all_grades",
         role: role,
         enabled: true
       )
       RoleOverride.create!(
         context: @account,
-        permission: 'manage_courses',
+        permission: "manage_courses",
         role: role,
         enabled: false
       )
@@ -885,19 +885,19 @@ describe RubricAssessment do
       expect(@assessment.grants_right?(@user, :read)).to eq true
     end
 
-    it 'grants :read to an account user with :view_all_grades but not :manage_courses_admin (granular permissions)' do
+    it "grants :read to an account user with :view_all_grades but not :manage_courses_admin (granular permissions)" do
       @account.enable_feature!(:granular_permissions_manage_courses)
       user_factory
-      role = custom_account_role('custom', account: @account)
+      role = custom_account_role("custom", account: @account)
       RoleOverride.create!(
         context: @account,
-        permission: 'view_all_grades',
+        permission: "view_all_grades",
         role: role,
         enabled: true
       )
       RoleOverride.create!(
         context: @account,
-        permission: 'manage_courses_admin',
+        permission: "manage_courses_admin",
         role: role,
         enabled: false
       )
@@ -906,17 +906,17 @@ describe RubricAssessment do
     end
   end
 
-  describe 'create' do
-    it 'sets the root_account_id using rubric' do
+  describe "create" do
+    it "sets the root_account_id using rubric" do
       assessment = @association.assess({
                                          user: @student,
                                          assessor: @teacher,
                                          artifact: @assignment.find_or_create_submission(@student),
                                          assessment: {
-                                           assessment_type: 'grading',
+                                           assessment_type: "grading",
                                            criterion_crit1: {
                                              points: 5,
-                                             comments: 'abcdefg',
+                                             comments: "abcdefg",
                                            }
                                          }
                                        })

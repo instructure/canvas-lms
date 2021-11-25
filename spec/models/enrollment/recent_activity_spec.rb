@@ -23,7 +23,7 @@ require_dependency "enrollment/recent_activity"
 class Enrollment
   describe RecentActivity do
     describe "initialization" do
-      let(:context) { double('enrollment context') }
+      let(:context) { double("enrollment context") }
       let(:enrollment) { double(context: context) }
 
       it "defaults to the enrollments context" do

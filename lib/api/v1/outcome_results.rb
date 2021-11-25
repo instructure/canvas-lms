@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'csv'
+require "csv"
 
 module Api::V1::OutcomeResults
   include Api::V1::Outcome
@@ -235,11 +235,11 @@ module Api::V1::OutcomeResults
     options = CSVWithI18n.csv_i18n_settings(current_user)
     CSVWithI18n.generate(**options) do |csv|
       row = []
-      row << I18n.t(:student_name, 'Student name')
-      row << I18n.t(:student_id, 'Student ID')
+      row << I18n.t(:student_name, "Student name")
+      row << I18n.t(:student_id, "Student ID")
       outcomes.each do |outcome|
         pathParts = outcome_paths.find { |x| x[:id] == outcome.id }[:parts]
-        path = pathParts.pluck(:name).join(' > ')
+        path = pathParts.pluck(:name).join(" > ")
         row << I18n.t(:outcome_path_result, "%{path} result", path: path)
         row << I18n.t(:outcome_path_mastery_points, "%{path} mastery points", path: path)
       end

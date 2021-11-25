@@ -18,19 +18,19 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'atom'
+require "atom"
 
 class Wiki < ActiveRecord::Base
   has_many :wiki_pages, dependent: :destroy
   has_one :course
   has_one :group
-  belongs_to :root_account, class_name: 'Account'
+  belongs_to :root_account, class_name: "Account"
 
   before_save :set_has_no_front_page_default
   after_update :set_downstream_change_for_master_courses
   after_save :update_contexts
 
-  DEFAULT_FRONT_PAGE_URL = 'front-page'
+  DEFAULT_FRONT_PAGE_URL = "front-page"
 
   def set_has_no_front_page_default
     if has_no_front_page.nil?
@@ -68,7 +68,7 @@ class Wiki < ActiveRecord::Base
       entry.title     = title
       entry.updated   = updated_at
       entry.published = created_at
-      entry.links << Atom::Link.new(rel: 'alternate',
+      entry.links << Atom::Link.new(rel: "alternate",
                                     href: "/wikis/#{id}")
     end
   end
@@ -108,7 +108,7 @@ class Wiki < ActiveRecord::Base
   end
 
   def unset_front_page!
-    if context.is_a?(Course) && context.default_view == 'wiki'
+    if context.is_a?(Course) && context.default_view == "wiki"
       context.default_view = nil
       context.save
     end
@@ -188,7 +188,7 @@ class Wiki < ActiveRecord::Base
         t :default_group_wiki_name, "%{group_name} Wiki", group_name: nil
 
         extend TextHelper
-        name = CanvasTextHelper.truncate_text(context.name, { max_length: 200, ellipsis: '' })
+        name = CanvasTextHelper.truncate_text(context.name, { max_length: 200, ellipsis: "" })
 
         context.wiki = wiki = Wiki.create!(title: "#{name} Wiki", root_account_id: context.root_account_id)
         context.save!
@@ -228,6 +228,6 @@ class Wiki < ActiveRecord::Base
 
   def path
     # was a shim for draft state, can be removed
-    'pages'
+    "pages"
   end
 end

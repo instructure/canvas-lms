@@ -82,8 +82,8 @@ module ConditionalRelease
 
     def self.is_trigger_assignment?(assignment)
       # i'm only using the cache key currently for this one case but i figure it can be extended to handle caching around all rule data fetching
-      RequestCache.cache('conditional_release_is_trigger', assignment) do
-        Rails.cache.fetch_with_batched_keys('conditional_release_is_trigger', batch_object: assignment, batched_keys: :conditional_release) do
+      RequestCache.cache("conditional_release_is_trigger", assignment) do
+        Rails.cache.fetch_with_batched_keys("conditional_release_is_trigger", batch_object: assignment, batched_keys: :conditional_release) do
           assignment.shard.activate { active.where(trigger_assignment_id: assignment).exists? }
         end
       end

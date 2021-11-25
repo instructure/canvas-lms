@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../views_helper'
+require_relative "../views_helper"
 
 describe "terms/_term.html.erb" do
   describe "sis_source_id edit box" do
@@ -42,7 +42,7 @@ describe "terms/_term.html.erb" do
     end
 
     it "does not show to non-sis admin" do
-      admin = account_admin_user_with_role_changes(role_changes: { 'manage_sis' => false })
+      admin = account_admin_user_with_role_changes(role_changes: { "manage_sis" => false })
       view_context(@account, admin)
       assign(:current_user, admin)
       render partial: "terms/term.html.erb", locals: { term: @term }

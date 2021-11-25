@@ -23,7 +23,7 @@ class AssignmentOverrideStudent < ActiveRecord::Base
   belongs_to :assignment
   belongs_to :assignment_override
   belongs_to :user
-  belongs_to :quiz, class_name: 'Quizzes::Quiz'
+  belongs_to :quiz, class_name: "Quizzes::Quiz"
 
   before_create :set_root_account_id
   after_save :destroy_override_if_needed
@@ -35,11 +35,11 @@ class AssignmentOverrideStudent < ActiveRecord::Base
 
   validates :assignment_override, :user, presence: true
   validates :user_id, uniqueness: { scope: [:assignment_id, :quiz_id],
-                                    conditions: -> { where.not(workflow_state: 'deleted') },
-                                    message: 'already belongs to an assignment override' }
+                                    conditions: -> { where.not(workflow_state: "deleted") },
+                                    message: "already belongs to an assignment override" }
 
   validate :assignment_override, if: :active? do |record|
-    if record.assignment_override && record.assignment_override.set_type != 'ADHOC'
+    if record.assignment_override && record.assignment_override.set_type != "ADHOC"
       record.errors.add :assignment_override, "is not adhoc"
     end
   end

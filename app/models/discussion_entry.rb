@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'atom'
+require "atom"
 
 class DiscussionEntry < ActiveRecord::Base
   include Workflow
@@ -28,23 +28,23 @@ class DiscussionEntry < ActiveRecord::Base
 
   attr_readonly :discussion_topic_id, :user_id, :parent_id
   has_many :discussion_entry_drafts, inverse_of: :discussion_entry
-  has_many :legacy_subentries, -> { where('legacy=true') }, class_name: 'DiscussionEntry', foreign_key: "parent_id"
-  has_many :root_discussion_replies, -> { where('legacy=false OR legacy=true AND parent_id=root_entry_id') }, class_name: 'DiscussionEntry', foreign_key: "root_entry_id"
-  has_many :discussion_subentries, -> { order(:created_at) }, class_name: 'DiscussionEntry', foreign_key: "parent_id"
-  has_many :unordered_discussion_subentries, class_name: 'DiscussionEntry', foreign_key: "parent_id"
-  has_many :flattened_discussion_subentries, class_name: 'DiscussionEntry', foreign_key: "root_entry_id"
+  has_many :legacy_subentries, -> { where("legacy=true") }, class_name: "DiscussionEntry", foreign_key: "parent_id"
+  has_many :root_discussion_replies, -> { where("legacy=false OR legacy=true AND parent_id=root_entry_id") }, class_name: "DiscussionEntry", foreign_key: "root_entry_id"
+  has_many :discussion_subentries, -> { order(:created_at) }, class_name: "DiscussionEntry", foreign_key: "parent_id"
+  has_many :unordered_discussion_subentries, class_name: "DiscussionEntry", foreign_key: "parent_id"
+  has_many :flattened_discussion_subentries, class_name: "DiscussionEntry", foreign_key: "root_entry_id"
   has_many :discussion_entry_participants
-  has_one :last_discussion_subentry, -> { order(created_at: :desc) }, class_name: 'DiscussionEntry', foreign_key: 'root_entry_id'
+  has_one :last_discussion_subentry, -> { order(created_at: :desc) }, class_name: "DiscussionEntry", foreign_key: "root_entry_id"
   belongs_to :discussion_topic, inverse_of: :discussion_entries
   # null if a root entry
-  belongs_to :parent_entry, class_name: 'DiscussionEntry', foreign_key: :parent_id
+  belongs_to :parent_entry, class_name: "DiscussionEntry", foreign_key: :parent_id
   # also null if a root entry
-  belongs_to :root_entry, class_name: 'DiscussionEntry'
+  belongs_to :root_entry, class_name: "DiscussionEntry"
   belongs_to :user
   has_many :mentions, inverse_of: :discussion_entry
   belongs_to :attachment
-  belongs_to :editor, class_name: 'User'
-  belongs_to :root_account, class_name: 'Account'
+  belongs_to :editor, class_name: "User"
+  belongs_to :root_account, class_name: "Account"
   has_one :external_feed_entry, as: :asset
 
   before_create :infer_root_entry_id
@@ -84,15 +84,15 @@ class DiscussionEntry < ActiveRecord::Base
   end
 
   def parse_and_create_mentions
-    mention_data = Nokogiri::HTML.fragment(message).search('[data-mention]')
-    user_ids = mention_data.map { |l| l['data-mention'] }
+    mention_data = Nokogiri::HTML.fragment(message).search("[data-mention]")
+    user_ids = mention_data.map { |l| l["data-mention"] }
     User.where(id: user_ids).each do |u|
       mentions.find_or_create_by!(user: u, root_account_id: root_account_id)
     end
   end
 
   def mentioned_users
-    User.where("EXISTS (?)", mentions.distinct.select('user_id')).to_a
+    User.where("EXISTS (?)", mentions.distinct.select("user_id")).to_a
   end
 
   def course_broadcast_data
@@ -123,7 +123,7 @@ class DiscussionEntry < ActiveRecord::Base
       # people who have been participating in the topic
       if created_at > discussion_topic.created_at + 2.weeks
         participants.map(&:id) & DiscussionEntry.active
-                                                .where('discussion_topic_id=? AND created_at > ?', discussion_topic_id, 2.weeks.ago)
+                                                .where("discussion_topic_id=? AND created_at > ?", discussion_topic_id, 2.weeks.ago)
                                                 .distinct.pluck(:user_id)
       else
         participants
@@ -135,11 +135,11 @@ class DiscussionEntry < ActiveRecord::Base
 
   # The maximum discussion entry threading depth that is allowed
   def self.max_depth
-    Setting.get('discussion_entry_max_depth', '50').to_i
+    Setting.get("discussion_entry_max_depth", "50").to_i
   end
 
   def self.rating_sums(entry_ids)
-    sums = where(id: entry_ids).where('COALESCE(rating_sum, 0) != 0')
+    sums = where(id: entry_ids).where("COALESCE(rating_sum, 0) != 0")
     sums.map { |x| [x.id, x.rating_sum] }.to_h
   end
 
@@ -210,7 +210,7 @@ class DiscussionEntry < ActiveRecord::Base
 
   alias_method :destroy_permanently!, :destroy
   def destroy
-    self.workflow_state = 'deleted'
+    self.workflow_state = "deleted"
     self.deleted_at = Time.now.utc
     save!
     update_topic_submission
@@ -232,7 +232,7 @@ class DiscussionEntry < ActiveRecord::Base
 
   def update_topic_submission
     if discussion_topic.for_assignment?
-      entries = discussion_topic.discussion_entries.where(user_id: user_id, workflow_state: 'active')
+      entries = discussion_topic.discussion_entries.where(user_id: user_id, workflow_state: "active")
       submission = discussion_topic.assignment.submissions.where(user_id: user_id).take
       return unless submission
 
@@ -243,7 +243,7 @@ class DiscussionEntry < ActiveRecord::Base
           submission.save!
         end
       else
-        submission.workflow_state = 'unsubmitted'
+        submission.workflow_state = "unsubmitted"
         submission.submission_type = nil
         submission.submitted_at = nil
         submission.save!
@@ -260,7 +260,7 @@ class DiscussionEntry < ActiveRecord::Base
       # decrement unread_entry_count for topic participants
       if users.present?
         DiscussionTopicParticipant.where(discussion_topic_id: discussion_topic_id, user_id: users)
-                                  .update_all('unread_entry_count = unread_entry_count - 1')
+                                  .update_all("unread_entry_count = unread_entry_count - 1")
       end
     end
   end
@@ -351,8 +351,8 @@ class DiscussionEntry < ActiveRecord::Base
     can :rate
   end
 
-  scope :active, -> { where.not(workflow_state: 'deleted') }
-  scope :deleted, -> { where(workflow_state: 'deleted') }
+  scope :active, -> { where.not(workflow_state: "deleted") }
+  scope :deleted, -> { where(workflow_state: "deleted") }
   scope :for_user, ->(user) { where(user_id: user).order("discussion_entries.created_at") }
   scope :for_users, ->(users) { where(user_id: users) }
   scope :after, ->(date) { where("created_at>?", date) }
@@ -360,7 +360,7 @@ class DiscussionEntry < ActiveRecord::Base
   scope :all_for_topics, ->(topics) { where(discussion_topic_id: topics) }
   scope :newest_first, -> { order("discussion_entries.created_at DESC, discussion_entries.id DESC") }
   # when there is no discussion_entry_participant for a user, it is considered unread
-  scope :unread_for_user, ->(user) { joins(participant_join_sql(user)).where(discussion_entry_participants: { workflow_state: ['unread', nil] }) }
+  scope :unread_for_user, ->(user) { joins(participant_join_sql(user)).where(discussion_entry_participants: { workflow_state: ["unread", nil] }) }
 
   def self.participant_join_sql(current_user)
     sanitize_sql(["LEFT OUTER JOIN #{DiscussionEntryParticipant.quoted_table_name} ON discussion_entries.id = discussion_entry_participants.discussion_entry_id
@@ -368,7 +368,7 @@ class DiscussionEntry < ActiveRecord::Base
   end
 
   def to_atom(opts = {})
-    author_name = user.present? ? user.name : t('atom_no_author', "No Author")
+    author_name = user.present? ? user.name : t("atom_no_author", "No Author")
     Atom::Entry.new do |entry|
       subject = [discussion_topic.title]
       subject << discussion_topic.context.name if opts[:include_context]
@@ -381,7 +381,7 @@ class DiscussionEntry < ActiveRecord::Base
       entry.updated   = updated_at
       entry.published = created_at
       entry.id        = "tag:#{HostUrl.default_host},#{created_at.strftime("%Y-%m-%d")}:/discussion_entries/#{feed_code}"
-      entry.links << Atom::Link.new(rel: 'alternate',
+      entry.links << Atom::Link.new(rel: "alternate",
                                     href: "http://#{HostUrl.context_host(discussion_topic.context)}/#{discussion_topic.context_prefix}/discussion_topics/#{discussion_topic_id}")
       entry.content = Atom::Content::Html.new(message)
     end
@@ -423,7 +423,7 @@ class DiscussionEntry < ActiveRecord::Base
       scope.update_all("unread_entry_count = unread_entry_count + 1")
 
       if user
-        update_or_create_participant(current_user: user, new_state: 'read')
+        update_or_create_participant(current_user: user, new_state: "read")
 
         existing_topic_participant = nil
         DiscussionTopicParticipant.unique_constraint_retry do

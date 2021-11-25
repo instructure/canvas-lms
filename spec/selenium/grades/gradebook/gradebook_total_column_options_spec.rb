@@ -17,8 +17,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../../helpers/gradebook_common'
-require_relative '../pages/gradebook_page'
+require_relative "../../helpers/gradebook_common"
+require_relative "../pages/gradebook_page"
 
 describe "Gradebook - total column menu options" do
   include_context "in-process server selenium tests"
@@ -72,11 +72,11 @@ describe "Gradebook - total column menu options" do
     it "warns the teacher that studens will see a change" do
       Gradebook.visit(@course)
       Gradebook.open_display_dialog
-      dialog = fj('.ui-dialog:visible')
+      dialog = fj(".ui-dialog:visible")
       expect(dialog).to include_text("Warning")
     end
 
-    it 'allows toggling display by points or percent', priority: "1" do
+    it "allows toggling display by points or percent", priority: "1" do
       should_show_percentages
       Gradebook.toggle_grade_display
 
@@ -88,32 +88,32 @@ describe "Gradebook - total column menu options" do
       should_show_percentages
     end
 
-    it 'changes the text on the toggle option when toggling' do
+    it "changes the text on the toggle option when toggling" do
       dropdown_text = []
 
       Gradebook.select_total_column_option
       dropdown_text << f('[data-menu-item-id="grade-display-switcher"]').text
 
-      Gradebook.select_total_column_option('grade-display-switcher', already_open: true)
+      Gradebook.select_total_column_option("grade-display-switcher", already_open: true)
       Gradebook.close_dialog_and_dont_show_again
 
       Gradebook.select_total_column_option
       dropdown_text << f('[data-menu-item-id="grade-display-switcher"]').text
 
-      Gradebook.select_total_column_option('grade-display-switcher', already_open: true)
+      Gradebook.select_total_column_option("grade-display-switcher", already_open: true)
 
       Gradebook.select_total_column_option
       dropdown_text << f('[data-menu-item-id="grade-display-switcher"]').text
 
-      expect(dropdown_text).to eq ['Display as Points', 'Display as Percentage', 'Display as Points']
+      expect(dropdown_text).to eq ["Display as Points", "Display as Percentage", "Display as Points"]
     end
 
-    it 'does not show the warning once dont show is checked' do
+    it "does not show the warning once dont show is checked" do
       Gradebook.open_display_dialog
       Gradebook.close_dialog_and_dont_show_again
 
       Gradebook.open_display_dialog
-      expect(f("body")).not_to contain_jqcss('.ui-dialog:visible')
+      expect(f("body")).not_to contain_jqcss(".ui-dialog:visible")
     end
   end
 
@@ -122,8 +122,8 @@ describe "Gradebook - total column menu options" do
       Gradebook.visit(@course)
     end
 
-    it 'sort by > Low to High', priority: "1" do
-      Gradebook.click_total_header_sort_by('Grade - Low to High')
+    it "sort by > Low to High", priority: "1" do
+      Gradebook.click_total_header_sort_by("Grade - Low to High")
 
       expect(final_score_for_row(0)).to eq @student_2_total_ignoring_ungraded
       expect(final_score_for_row(1)).to eq @student_3_total_ignoring_ungraded
@@ -136,8 +136,8 @@ describe "Gradebook - total column menu options" do
       Gradebook.visit(@course)
     end
 
-    it 'Moves total column to the front', priority: "1" do
-      Gradebook.click_total_header_menu_option('Move to Front')
+    it "Moves total column to the front", priority: "1" do
+      Gradebook.click_total_header_menu_option("Move to Front")
 
       expect(Gradebook.gradebook_slick_header_columns[1]).to match("Total")
     end

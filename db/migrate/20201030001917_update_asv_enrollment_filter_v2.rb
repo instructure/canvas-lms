@@ -23,7 +23,7 @@ class UpdateAsvEnrollmentFilterV2 < ActiveRecord::Migration[5.2]
 
   def up
     connection.execute(<<~SQL.squish)
-      CREATE OR REPLACE VIEW #{connection.quote_table_name('assignment_student_visibilities')} AS
+      CREATE OR REPLACE VIEW #{connection.quote_table_name("assignment_student_visibilities")} AS
       SELECT DISTINCT a.id as assignment_id,
         e.user_id as user_id,
         e.course_id as course_id
@@ -124,7 +124,7 @@ class UpdateAsvEnrollmentFilterV2 < ActiveRecord::Migration[5.2]
 
   def down
     connection.execute(<<~SQL.squish)
-      CREATE OR REPLACE VIEW #{connection.quote_table_name('assignment_student_visibilities')} AS
+      CREATE OR REPLACE VIEW #{connection.quote_table_name("assignment_student_visibilities")} AS
       SELECT DISTINCT a.id as assignment_id,
         e.user_id as user_id,
         e.course_id as course_id

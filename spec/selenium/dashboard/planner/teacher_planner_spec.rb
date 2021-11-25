@@ -17,16 +17,16 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../../common'
-require_relative '../pages/student_planner_page'
+require_relative "../../common"
+require_relative "../pages/student_planner_page"
 
 describe "teacher planner" do
   include_context "in-process server selenium tests"
   include PlannerPageObject
 
   before :once do
-    course_with_teacher(active_all: true, new_user: true, user_name: 'PlannerTeacher', course_name: 'Planner Course')
-    @student1 = User.create!(name: 'Student 1')
+    course_with_teacher(active_all: true, new_user: true, user_name: "PlannerTeacher", course_name: "Planner Course")
+    @student1 = User.create!(name: "Student 1")
     @course.enroll_student(@student1).accept!
   end
 
@@ -35,7 +35,7 @@ describe "teacher planner" do
       @assignment1 = @course.assignments.create({
                                                   name: "Teacher Assignment",
                                                   due_at: Time.zone.now - 1.day,
-                                                  submission_types: 'online_text_entry'
+                                                  submission_types: "online_text_entry"
                                                 })
       @submission = @assignment1.submit_homework(@student1, body: "here is my submission")
       user_session(@teacher)

@@ -20,6 +20,6 @@
 # See MicrosoftSync::Group (the main model) for more information.
 module MicrosoftSync
   def self.table_name_prefix
-    'microsoft_sync_'
+    "microsoft_sync_"
   end
 end

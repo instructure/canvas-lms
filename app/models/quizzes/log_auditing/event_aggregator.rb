@@ -77,7 +77,7 @@ module Quizzes::LogAuditing
       events.each_with_object({}) do |event, submission_data|
         case event.event_type
         when Quizzes::QuizSubmissionEvent::EVT_QUESTION_FLAGGED
-          submission_data["question_#{event.event_data['quiz_question_id']}_marked"] = event.event_data['flagged']
+          submission_data["question_#{event.event_data["quiz_question_id"]}_marked"] = event.event_data["flagged"]
         end
       end
     end
@@ -106,12 +106,12 @@ module Quizzes::LogAuditing
       events.each do |event|
         case event.event_type
         when Quizzes::QuizSubmissionEvent::EVT_QUESTION_ANSWERED
-          kept_events["#{event.event_type}_#{event.event_data.first['quiz_question_id']}"] = event
+          kept_events["#{event.event_type}_#{event.event_data.first["quiz_question_id"]}"] = event
           event.event_data.each do |answer|
-            kept_answers[answer['quiz_question_id']] = answer["answer"]
+            kept_answers[answer["quiz_question_id"]] = answer["answer"]
           end
         else
-          kept_events["#{event.event_type}_#{event.event_data['quiz_question_id']}"] = event
+          kept_events["#{event.event_type}_#{event.event_data["quiz_question_id"]}"] = event
         end
       end
       [kept_events.values, kept_answers]

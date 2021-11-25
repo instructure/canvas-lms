@@ -63,8 +63,8 @@ module Importers
     def convert_link(node, attr, item_type, mig_id, field)
       return unless node[attr].present?
 
-      if attr == 'value' &&
-         !(node[attr] =~ /IMS(?:-|_)CC(?:-|_)FILEBASE/ || node[attr].include?('CANVAS_COURSE_REFERENCE'))
+      if attr == "value" &&
+         !(node[attr] =~ /IMS(?:-|_)CC(?:-|_)FILEBASE/ || node[attr].include?("CANVAS_COURSE_REFERENCE"))
         return
       end
 
@@ -87,7 +87,7 @@ module Importers
           if (account = @migration&.context&.root_account)
             begin
               uri = URI.parse(new_url)
-              account_hosts = HostUrl.context_hosts(account).map { |h| h.split(':').first }
+              account_hosts = HostUrl.context_hosts(account).map { |h| h.split(":").first }
               if account_hosts.include?(uri.host)
                 uri.scheme = uri.host = uri.port = nil
                 new_url = uri.to_s
@@ -136,7 +136,7 @@ module Importers
         unresolved(:module_item, migration_id: $1, query: $2)
       elsif url =~ %r{\$CANVAS_COURSE_REFERENCE\$/file_ref/([^/?#]+)(.*)}
         unresolved(:file_ref, migration_id: $1, rest: $2,
-                              in_media_iframe: attr == 'src' && node.name == 'iframe' && node['data-media-id'])
+                              in_media_iframe: attr == "src" && node.name == "iframe" && node["data-media-id"])
       elsif url =~ %r{(?:\$CANVAS_OBJECT_REFERENCE\$|\$WIKI_REFERENCE\$)/([^/]*)/([^?]*)(\?.*)?}
         unresolved(:object, type: $1, migration_id: $2, query: $3)
 
@@ -145,21 +145,21 @@ module Importers
 
       elsif url =~ %r{\$IMS(?:-|_)CC(?:-|_)FILEBASE\$/(.*)}
         rel_path = URI.unescape($1)
-        if (attr == 'href' && node['class']&.include?('instructure_inline_media_comment')) ||
-           (attr == 'src' && node.name == 'iframe' && node['data-media-id'])
+        if (attr == "href" && node["class"]&.include?("instructure_inline_media_comment")) ||
+           (attr == "src" && node.name == "iframe" && node["data-media-id"])
           unresolved(:media_object, rel_path: rel_path)
         else
           unresolved(:file, rel_path: rel_path)
         end
-      elsif (attr == 'href' && node['class']&.include?('instructure_inline_media_comment')) ||
-            (attr == 'src' && node.name == 'iframe' && node['data-media-id'])
+      elsif (attr == "href" && node["class"]&.include?("instructure_inline_media_comment")) ||
+            (attr == "src" && node.name == "iframe" && node["data-media-id"])
         # Course copy media reference, leave it alone
         resolved
-      elsif attr == 'src' && (info_match = url.match(%r{\Adata:(?<mime_type>[-\w]+/[-\w+.]+)?;base64,(?<image>.*)}m))
+      elsif attr == "src" && (info_match = url.match(%r{\Adata:(?<mime_type>[-\w]+/[-\w+.]+)?;base64,(?<image>.*)}m))
         link_embedded_image(info_match)
       elsif # rubocop:disable Lint/DuplicateBranch
             # Equation image, leave it alone
-            (attr == 'src' && node['class'] && node['class'].include?("equation_image")) || # rubocop:disable Layout/ConditionPosition
+            (attr == "src" && node["class"] && node["class"].include?("equation_image")) || # rubocop:disable Layout/ConditionPosition
             # The file is in the context of an AQ, leave the link alone
             url =~ %r{\A/assessment_questions/\d+/files/\d+} ||
             # This points to a specific file already, leave it alone
@@ -168,7 +168,7 @@ module Importers
             # correctly alter was changed during the 'export' step
             @migration&.for_course_copy? ||
             # It's just a link to an anchor, leave it alone
-            url.start_with?('#')
+            url.start_with?("#")
         resolved
       elsif relative_url?(url)
         unresolved(:file, rel_path: URI.unescape(url))
@@ -181,9 +181,9 @@ module Importers
       extension = MIME::Types[info_match[:mime_type]]&.first&.extensions&.first
       image_data = Base64.decode64(info_match[:image])
       md5 = Digest::MD5.hexdigest image_data
-      folder_name = I18n.t('embedded_images')
+      folder_name = I18n.t("embedded_images")
       @folder ||= Folder.root_folders(context).first.sub_folders
-                        .where(name: folder_name, workflow_state: 'hidden', context: context).first_or_create!
+                        .where(name: folder_name, workflow_state: "hidden", context: context).first_or_create!
       filename = "#{md5}.#{extension}"
       file = Tempfile.new([md5, ".#{extension}"])
       file.binmode

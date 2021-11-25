@@ -53,7 +53,7 @@ module MicrosoftSync
     # or about 3 extra requests per user added... not too bad.
     MAX_PARTIAL_SYNC_CHANGES = 500
 
-    STATSD_NAME = 'microsoft_sync.syncer_steps'
+    STATSD_NAME = "microsoft_sync.syncer_steps"
     STATSD_NAME_SKIPPED_BATCHES = "#{STATSD_NAME}.skipped_batches"
     STATSD_NAME_SKIPPED_TOTAL = "#{STATSD_NAME}.skipped_total"
     STATSD_NAME_DELETED_MAPPINGS_FOR_MISSING_USERS = \
@@ -62,20 +62,20 @@ module MicrosoftSync
     # Can happen when User disables sync on account-level when jobs are running:
     class TenantMissingOrSyncDisabled < Errors::GracefulCancelError
       def self.public_message
-        I18n.t 'Tenant missing or sync disabled. ' \
-               'Check the Microsoft sync integration settings for the course and account.'
+        I18n.t "Tenant missing or sync disabled. " \
+               "Check the Microsoft sync integration settings for the course and account."
       end
     end
 
     class MultipleEducationClasses < Errors::GracefulCancelError
       def self.public_message
-        I18n.t 'Multiple Microsoft education classes already exist for the course.'
+        I18n.t "Multiple Microsoft education classes already exist for the course."
       end
     end
 
     class MaxMemberEnrollmentsReached < Errors::GracefulCancelError
       def self.public_message
-        I18n.t 'Microsoft 365 allows a maximum of %{max} members in a team.'
+        I18n.t "Microsoft 365 allows a maximum of %{max} members in a team."
       end
 
       def public_interpolated_values
@@ -85,7 +85,7 @@ module MicrosoftSync
 
     class MaxOwnerEnrollmentsReached < Errors::GracefulCancelError
       def self.public_message
-        I18n.t 'Microsoft 365 allows a maximum of %{max} owners in a team.'
+        I18n.t "Microsoft 365 allows a maximum of %{max} owners in a team."
       end
 
       def public_interpolated_values
@@ -126,7 +126,7 @@ module MicrosoftSync
 
     def step_initial(job_type, _job_state_data)
       StateMachineJob::NextStep.new(
-        job_type.to_s == 'partial' ? :step_partial_sync : :step_full_sync_prerequisites
+        job_type.to_s == "partial" ? :step_partial_sync : :step_full_sync_prerequisites
       )
     end
 
@@ -150,7 +150,7 @@ module MicrosoftSync
 
     # Second step of a full sync. Create group on the Microsoft side.
     def step_ensure_class_group_exists(_mem_data, _job_state_data)
-      remote_ids = graph_service_helpers.list_education_classes_for_course(course).map { |c| c['id'] }
+      remote_ids = graph_service_helpers.list_education_classes_for_course(course).map { |c| c["id"] }
 
       # If we've created the group previously, we're good to go
       if group.ms_group_id && remote_ids == [group.ms_group_id]
@@ -164,7 +164,7 @@ module MicrosoftSync
       # data in case it was never done.
       new_group_id = remote_ids.first
 
-      new_group_id ||= graph_service_helpers.create_education_class(course)['id']
+      new_group_id ||= graph_service_helpers.create_education_class(course)["id"]
 
       StateMachineJob::DelayedNextStep.new(
         :step_update_group_with_course_data, DELAY_BEFORE_UPDATE_GROUP, new_group_id
@@ -372,7 +372,7 @@ module MicrosoftSync
       return StateMachineJob::COMPLETE if changes.empty?
 
       # Set sync_type before graph_service used (created) but after we may switch to full sync:
-      self.sync_type = 'partial'
+      self.sync_type = "partial"
 
       # Step 2. ensure users have aad object ids:
       # changes_by_user_id is a hash from user_id ->
@@ -420,7 +420,7 @@ module MicrosoftSync
       # incurring more read quota from getting the list of users in a group
       # (generally, cheaper).
       full_sync_after = e.retry_after_seconds || STANDARD_RETRY_DELAY
-      Rails.logger.info 'MicrosoftSync::SyncerSteps: partial sync throttled, ' \
+      Rails.logger.info "MicrosoftSync::SyncerSteps: partial sync throttled, " \
                         "full sync in #{full_sync_after}"
       InstStatsd::Statsd.increment("#{STATSD_NAME}.partial_into_full_throttled")
       StateMachineJob::DelayedNextStep.new(:step_full_sync_prerequisites, full_sync_after)
@@ -432,7 +432,7 @@ module MicrosoftSync
     # a job. The rest of the instance variables should be reloaded when the job
     # starts again.
     def encode_with(coder)
-      coder['group'] = @group
+      coder["group"] = @group
     end
 
     private
@@ -440,7 +440,7 @@ module MicrosoftSync
     attr_writer :sync_type
 
     def sync_type
-      @sync_type || 'full'
+      @sync_type || "full"
     end
 
     def tenant

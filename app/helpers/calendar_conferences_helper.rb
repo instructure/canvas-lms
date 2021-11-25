@@ -65,7 +65,7 @@ module CalendarConferencesHelper
       end
     end.uniq
     # add contexts at end to preserve object comparison above
-    conference_types.each { |t| t['contexts'] = type_to_contexts_map[t] }
+    conference_types.each { |t| t["contexts"] = type_to_contexts_map[t] }
 
     js_env(
       conferences: {

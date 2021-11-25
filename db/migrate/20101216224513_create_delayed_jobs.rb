@@ -61,7 +61,7 @@ class CreateDelayedJobs < ActiveRecord::Migration[4.2]
 
     connection.execute("CREATE INDEX get_delayed_jobs_index ON #{Delayed::Backend::ActiveRecord::Job.quoted_table_name} (priority, run_at) WHERE locked_at IS NULL AND queue = 'canvas_queue' AND next_in_strand = 't'")
     add_index :delayed_jobs, [:tag]
-    add_index :delayed_jobs, %w[strand id], name: 'index_delayed_jobs_on_strand'
+    add_index :delayed_jobs, %w[strand id], name: "index_delayed_jobs_on_strand"
     add_index :delayed_jobs, :locked_by, where: "locked_by IS NOT NULL"
     add_index :delayed_jobs, %w[run_at tag]
     add_index :delayed_jobs, :shard_id
@@ -73,7 +73,7 @@ class CreateDelayedJobs < ActiveRecord::Migration[4.2]
     # care because that would just be the old behavior, whereas for the most part locking will
     # be much smaller
     execute(<<~SQL) # rubocop:disable Rails/SquishedSQLHeredocs
-      CREATE FUNCTION #{connection.quote_table_name('half_md5_as_bigint')}(strand varchar) RETURNS bigint AS $$
+      CREATE FUNCTION #{connection.quote_table_name("half_md5_as_bigint")}(strand varchar) RETURNS bigint AS $$
         DECLARE
           strand_md5 bytea;
         BEGIN
@@ -92,7 +92,7 @@ class CreateDelayedJobs < ActiveRecord::Migration[4.2]
 
     # create the insert trigger
     execute(<<~SQL) # rubocop:disable Rails/SquishedSQLHeredocs
-      CREATE FUNCTION #{connection.quote_table_name('delayed_jobs_before_insert_row_tr_fn')} () RETURNS trigger AS $$
+      CREATE FUNCTION #{connection.quote_table_name("delayed_jobs_before_insert_row_tr_fn")} () RETURNS trigger AS $$
       BEGIN
         IF NEW.strand IS NOT NULL THEN
           PERFORM pg_advisory_xact_lock(half_md5_as_bigint(NEW.strand));
@@ -104,11 +104,11 @@ class CreateDelayedJobs < ActiveRecord::Migration[4.2]
       END;
       $$ LANGUAGE plpgsql SET search_path TO #{search_path};
     SQL
-    execute("CREATE TRIGGER delayed_jobs_before_insert_row_tr BEFORE INSERT ON #{Delayed::Backend::ActiveRecord::Job.quoted_table_name} FOR EACH ROW WHEN (NEW.strand IS NOT NULL) EXECUTE PROCEDURE #{connection.quote_table_name('delayed_jobs_before_insert_row_tr_fn')}()")
+    execute("CREATE TRIGGER delayed_jobs_before_insert_row_tr BEFORE INSERT ON #{Delayed::Backend::ActiveRecord::Job.quoted_table_name} FOR EACH ROW WHEN (NEW.strand IS NOT NULL) EXECUTE PROCEDURE #{connection.quote_table_name("delayed_jobs_before_insert_row_tr_fn")}()")
 
     # create the delete trigger
     execute(<<~SQL) # rubocop:disable Rails/SquishedSQLHeredocs
-      CREATE FUNCTION #{connection.quote_table_name('delayed_jobs_after_delete_row_tr_fn')} () RETURNS trigger AS $$
+      CREATE FUNCTION #{connection.quote_table_name("delayed_jobs_after_delete_row_tr_fn")} () RETURNS trigger AS $$
       DECLARE
         running_count integer;
       BEGIN
@@ -126,7 +126,7 @@ class CreateDelayedJobs < ActiveRecord::Migration[4.2]
       END;
       $$ LANGUAGE plpgsql SET search_path TO #{search_path};
     SQL
-    execute("CREATE TRIGGER delayed_jobs_after_delete_row_tr AFTER DELETE ON #{Delayed::Backend::ActiveRecord::Job.quoted_table_name} FOR EACH ROW WHEN (OLD.strand IS NOT NULL AND OLD.next_in_strand = 't') EXECUTE PROCEDURE #{connection.quote_table_name('delayed_jobs_after_delete_row_tr_fn')}()")
+    execute("CREATE TRIGGER delayed_jobs_after_delete_row_tr AFTER DELETE ON #{Delayed::Backend::ActiveRecord::Job.quoted_table_name} FOR EACH ROW WHEN (OLD.strand IS NOT NULL AND OLD.next_in_strand = 't') EXECUTE PROCEDURE #{connection.quote_table_name("delayed_jobs_after_delete_row_tr_fn")}()")
 
     create_table :failed_jobs do |t|
       t.integer  "priority",    default: 0

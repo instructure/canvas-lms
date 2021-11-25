@@ -17,8 +17,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'active_record'
-require 'acts_as_list'
+require "active_record"
+require "acts_as_list"
 
 ActiveRecord::Base.establish_connection(adapter: "sqlite3", database: ":memory:")
 
@@ -50,34 +50,34 @@ describe "ListTest" do
       (1..4).each { |counter| ListMixin.create! pos: counter, parent_id: 5 }
     end
 
-    it 'reordering' do
-      expect(ListMixin.where('parent_id = 5').order('pos').pluck(:id)).to eq [1, 2, 3, 4]
+    it "reordering" do
+      expect(ListMixin.where("parent_id = 5").order("pos").pluck(:id)).to eq [1, 2, 3, 4]
 
       ListMixin.find(1).move_to_bottom
-      expect(ListMixin.where('parent_id = 5').order('pos').pluck(:id)).to eq [2, 3, 4, 1]
+      expect(ListMixin.where("parent_id = 5").order("pos").pluck(:id)).to eq [2, 3, 4, 1]
 
       ListMixin.find(1).move_to_top
-      expect(ListMixin.where('parent_id = 5').order('pos').pluck(:id)).to eq [1, 2, 3, 4]
+      expect(ListMixin.where("parent_id = 5").order("pos").pluck(:id)).to eq [1, 2, 3, 4]
 
       ListMixin.find(2).move_to_bottom
-      expect(ListMixin.where('parent_id = 5').order('pos').pluck(:id)).to eq [1, 3, 4, 2]
+      expect(ListMixin.where("parent_id = 5").order("pos").pluck(:id)).to eq [1, 3, 4, 2]
 
       ListMixin.find(4).move_to_top
-      expect(ListMixin.where('parent_id = 5').order('pos').pluck(:id)).to eq [4, 1, 3, 2]
+      expect(ListMixin.where("parent_id = 5").order("pos").pluck(:id)).to eq [4, 1, 3, 2]
     end
 
-    it 'move_to_bottom with next to last' do
+    it "move_to_bottom with next to last" do
       ListMixin.find(3).move_to_bottom
-      expect(ListMixin.where('parent_id = 5').order('pos').pluck(:id)).to eq [1, 2, 4, 3]
+      expect(ListMixin.where("parent_id = 5").order("pos").pluck(:id)).to eq [1, 2, 4, 3]
     end
 
-    it 'injection' do
+    it "injection" do
       item = ListMixin.new(parent_id: 1)
       expect(item.scope_condition).to eq parent_id: 1
       expect(item.class.position_column).to eq "pos"
     end
 
-    it 'insert' do
+    it "insert" do
       new = ListMixin.create(parent_id: 20)
       expect(new.pos).to eq 1
       expect(new).to be_first
@@ -99,7 +99,7 @@ describe "ListTest" do
       expect(new).to be_last
     end
 
-    it 'insert_at' do
+    it "insert_at" do
       new = ListMixin.create(parent_id: 20)
       expect(new.pos).to eq 1
 
@@ -134,40 +134,40 @@ describe "ListTest" do
       expect(new4.pos).to eq 5
     end
 
-    it 'delete middle' do
-      expect(ListMixin.where('parent_id = 5').order('pos').pluck(:id)).to eq [1, 2, 3, 4]
+    it "delete middle" do
+      expect(ListMixin.where("parent_id = 5").order("pos").pluck(:id)).to eq [1, 2, 3, 4]
 
       ListMixin.find(2).destroy
-      expect(ListMixin.where('parent_id = 5').order('pos').pluck(:id)).to eq [1, 3, 4]
+      expect(ListMixin.where("parent_id = 5").order("pos").pluck(:id)).to eq [1, 3, 4]
 
       expect(ListMixin.find(1).pos).to eq 1
       expect(ListMixin.find(3).pos).to eq 2
       expect(ListMixin.find(4).pos).to eq 3
 
       ListMixin.find(1).destroy
-      expect(ListMixin.where('parent_id = 5').order('pos').pluck(:id)).to eq [3, 4]
+      expect(ListMixin.where("parent_id = 5").order("pos").pluck(:id)).to eq [3, 4]
 
       expect(ListMixin.find(3).pos).to eq 1
       expect(ListMixin.find(4).pos).to eq 2
     end
 
-    it 'nil scope' do
+    it "nil scope" do
       new1, new2, new3 = UnscopedListMixin.create, UnscopedListMixin.create, UnscopedListMixin.create
       new2.move_to_top
-      expect(UnscopedListMixin.where(parent_id: nil).order('pos').to_a).to eq [new2, new1, new3]
+      expect(UnscopedListMixin.where(parent_id: nil).order("pos").to_a).to eq [new2, new1, new3]
     end
 
-    it 'remove_from_list should then fail in_list?' do
+    it "remove_from_list should then fail in_list?" do
       expect(ListMixin.find(1)).to be_in_list
       ListMixin.find(1).remove_from_list
       expect(ListMixin.find(1)).to_not be_in_list
     end
 
-    it 'remove_from_list should set position to nil' do
-      expect(ListMixin.where('parent_id = 5').order('pos').pluck(:id)).to eq [1, 2, 3, 4]
+    it "remove_from_list should set position to nil" do
+      expect(ListMixin.where("parent_id = 5").order("pos").pluck(:id)).to eq [1, 2, 3, 4]
 
       ListMixin.find(2).remove_from_list
-      expect(ListMixin.where('parent_id = 5').order('pos').pluck(:id)).to eq [2, 1, 3, 4]
+      expect(ListMixin.where("parent_id = 5").order("pos").pluck(:id)).to eq [2, 1, 3, 4]
 
       expect(ListMixin.find(1).pos).to eq 1
       expect(ListMixin.find(2).pos).to eq nil
@@ -175,12 +175,12 @@ describe "ListTest" do
       expect(ListMixin.find(4).pos).to eq 3
     end
 
-    it 'remove before destroy does not shift lower items twice' do
-      expect(ListMixin.where('parent_id = 5').order('pos').pluck(:id)).to eq [1, 2, 3, 4]
+    it "remove before destroy does not shift lower items twice" do
+      expect(ListMixin.where("parent_id = 5").order("pos").pluck(:id)).to eq [1, 2, 3, 4]
 
       ListMixin.find(2).remove_from_list
       ListMixin.find(2).destroy
-      expect(ListMixin.where('parent_id = 5').order('pos').pluck(:id)).to eq [1, 3, 4]
+      expect(ListMixin.where("parent_id = 5").order("pos").pluck(:id)).to eq [1, 3, 4]
 
       expect(ListMixin.find(1).pos).to eq 1
       expect(ListMixin.find(3).pos).to eq 2
@@ -188,41 +188,41 @@ describe "ListTest" do
     end
   end
 
-  describe 'SubTest' do
+  describe "SubTest" do
     before do
       setup_db
       (1..4).each { |i| (i.odd? ? ListMixinSub1 : ListMixinSub2).create! pos: i, parent_id: 5000 }
     end
 
-    it 'reordering' do
-      expect(ListMixin.where('parent_id = 5000').order('pos').pluck(:id)).to eq [1, 2, 3, 4]
+    it "reordering" do
+      expect(ListMixin.where("parent_id = 5000").order("pos").pluck(:id)).to eq [1, 2, 3, 4]
 
       ListMixin.find(1).move_to_bottom
-      expect(ListMixin.where('parent_id = 5000').order('pos').pluck(:id)).to eq [2, 3, 4, 1]
+      expect(ListMixin.where("parent_id = 5000").order("pos").pluck(:id)).to eq [2, 3, 4, 1]
 
       ListMixin.find(1).move_to_top
-      expect(ListMixin.where('parent_id = 5000').order('pos').pluck(:id)).to eq [1, 2, 3, 4]
+      expect(ListMixin.where("parent_id = 5000").order("pos").pluck(:id)).to eq [1, 2, 3, 4]
 
       ListMixin.find(2).move_to_bottom
-      expect(ListMixin.where('parent_id = 5000').order('pos').pluck(:id)).to eq [1, 3, 4, 2]
+      expect(ListMixin.where("parent_id = 5000").order("pos").pluck(:id)).to eq [1, 3, 4, 2]
 
       ListMixin.find(4).move_to_top
-      expect(ListMixin.where('parent_id = 5000').order('pos').pluck(:id)).to eq [4, 1, 3, 2]
+      expect(ListMixin.where("parent_id = 5000").order("pos").pluck(:id)).to eq [4, 1, 3, 2]
     end
 
-    it 'move_to_bottom with next to last item' do
-      expect(ListMixin.where('parent_id = 5000').order('pos').pluck(:id)).to eq [1, 2, 3, 4]
+    it "move_to_bottom with next to last item" do
+      expect(ListMixin.where("parent_id = 5000").order("pos").pluck(:id)).to eq [1, 2, 3, 4]
       ListMixin.find(3).move_to_bottom
-      expect(ListMixin.where('parent_id = 5000').order('pos').pluck(:id)).to eq [1, 2, 4, 3]
+      expect(ListMixin.where("parent_id = 5000").order("pos").pluck(:id)).to eq [1, 2, 4, 3]
     end
 
-    it 'injection' do
+    it "injection" do
       item = ListMixin.new("parent_id" => 1)
       expect(item.scope_condition).to eq parent_id: 1
       expect(item.class.position_column).to eq "pos"
     end
 
-    it 'insert_at' do
+    it "insert_at" do
       new = ListMixin.create("parent_id" => 20)
       expect(new.pos).to eq 1
 
@@ -257,18 +257,18 @@ describe "ListTest" do
       expect(new4.pos).to eq 5
     end
 
-    it 'delete middle' do
-      expect(ListMixin.where('parent_id = 5000').order('pos').pluck(:id)).to eq [1, 2, 3, 4]
+    it "delete middle" do
+      expect(ListMixin.where("parent_id = 5000").order("pos").pluck(:id)).to eq [1, 2, 3, 4]
 
       ListMixin.find(2).destroy
-      expect(ListMixin.where('parent_id = 5000').order('pos').pluck(:id)).to eq [1, 3, 4]
+      expect(ListMixin.where("parent_id = 5000").order("pos").pluck(:id)).to eq [1, 3, 4]
 
       expect(ListMixin.find(1).pos).to eq 1
       expect(ListMixin.find(3).pos).to eq 2
       expect(ListMixin.find(4).pos).to eq 3
 
       ListMixin.find(1).destroy
-      expect(ListMixin.where('parent_id = 5000').order('pos').pluck(:id)).to eq [3, 4]
+      expect(ListMixin.where("parent_id = 5000").order("pos").pluck(:id)).to eq [3, 4]
 
       expect(ListMixin.find(3).pos).to eq 1
       expect(ListMixin.find(4).pos).to eq 2

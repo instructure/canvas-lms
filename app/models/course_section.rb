@@ -22,17 +22,17 @@ class CourseSection < ActiveRecord::Base
   include Workflow
 
   belongs_to :course
-  belongs_to :nonxlist_course, class_name: 'Course'
-  belongs_to :root_account, class_name: 'Account'
+  belongs_to :nonxlist_course, class_name: "Course"
+  belongs_to :root_account, class_name: "Account"
   belongs_to :enrollment_term
   has_many :enrollments, -> { preload(:user).where("enrollments.workflow_state<>'deleted'") }
-  has_many :all_enrollments, class_name: 'Enrollment'
-  has_many :student_enrollments, -> { where("enrollments.workflow_state NOT IN ('deleted', 'completed', 'rejected', 'inactive')").preload(:user) }, class_name: 'StudentEnrollment'
+  has_many :all_enrollments, class_name: "Enrollment"
+  has_many :student_enrollments, -> { where("enrollments.workflow_state NOT IN ('deleted', 'completed', 'rejected', 'inactive')").preload(:user) }, class_name: "StudentEnrollment"
   has_many :students, through: :student_enrollments, source: :user
-  has_many :all_student_enrollments, -> { where("enrollments.workflow_state<>'deleted'").preload(:user) }, class_name: 'StudentEnrollment'
+  has_many :all_student_enrollments, -> { where("enrollments.workflow_state<>'deleted'").preload(:user) }, class_name: "StudentEnrollment"
   has_many :all_students, through: :all_student_enrollments, source: :user
-  has_many :instructor_enrollments, -> { where(type: ['TaEnrollment', 'TeacherEnrollment']) }, class_name: 'Enrollment'
-  has_many :admin_enrollments, -> { where(type: %w[TaEnrollment TeacherEnrollment DesignerEnrollment]) }, class_name: 'Enrollment'
+  has_many :instructor_enrollments, -> { where(type: ["TaEnrollment", "TeacherEnrollment"]) }, class_name: "Enrollment"
+  has_many :admin_enrollments, -> { where(type: %w[TaEnrollment TeacherEnrollment DesignerEnrollment]) }, class_name: "Enrollment"
   has_many :users, through: :enrollments
   has_many :course_account_associations
   has_many :calendar_events, as: :context, inverse_of: :context
@@ -74,12 +74,12 @@ class CourseSection < ActiveRecord::Base
   end
 
   def delete_enrollments_later_if_deleted
-    delay_if_production.delete_enrollments_if_deleted if workflow_state == 'deleted' && saved_change_to_workflow_state?
+    delay_if_production.delete_enrollments_if_deleted if workflow_state == "deleted" && saved_change_to_workflow_state?
   end
 
   def delete_enrollments_if_deleted
-    if workflow_state == 'deleted'
-      enrollments.where.not(workflow_state: 'deleted').find_in_batches do |batch|
+    if workflow_state == "deleted"
+      enrollments.where.not(workflow_state: "deleted").find_in_batches do |batch|
         Enrollment::BatchStateUpdater.destroy_batch(batch)
       end
     end
@@ -209,7 +209,7 @@ class CourseSection < ActiveRecord::Base
 
     return true unless scope.exists?
 
-    errors.add(:sis_source_id, t('sis_id_taken', "SIS ID \"%{sis_id}\" is already in use", sis_id: sis_source_id))
+    errors.add(:sis_source_id, t("sis_id_taken", "SIS ID \"%{sis_id}\" is already in use", sis_id: sis_source_id))
     throw :abort
   end
 
@@ -222,7 +222,7 @@ class CourseSection < ActiveRecord::Base
 
     return true unless scope.exists?
 
-    errors.add(:integration_id, t('integration_id_taken', "INTEGRATRION ID \"%{integration_id}\" is already in use", integration_id: integration_id))
+    errors.add(:integration_id, t("integration_id_taken", "INTEGRATRION ID \"%{integration_id}\" is already in use", integration_id: integration_id))
     throw :abort
   end
 
@@ -351,10 +351,10 @@ class CourseSection < ActiveRecord::Base
   end
 
   def deletable?
-    !enrollments.where.not(workflow_state: 'rejected').not_fake.exists?
+    !enrollments.where.not(workflow_state: "rejected").not_fake.exists?
   end
 
-  def enroll_user(user, type, state = 'invited')
+  def enroll_user(user, type, state = "invited")
     course.enroll_user(user, type, enrollment_state: state, section: self)
   end
 
@@ -365,7 +365,7 @@ class CourseSection < ActiveRecord::Base
 
   alias_method :destroy_permanently!, :destroy
   def destroy
-    self.workflow_state = 'deleted'
+    self.workflow_state = "deleted"
     enrollments.not_fake.each(&:destroy)
     assignment_overrides.each(&:destroy)
     discussion_topic_section_visibilities&.each(&:destroy)
@@ -373,11 +373,11 @@ class CourseSection < ActiveRecord::Base
   end
 
   def self.destroy_batch(batch, sis_batch: nil, batch_mode: false)
-    raise ArgumentError, 'Cannot call with more than 1000 sections' if batch.count > 1000
+    raise ArgumentError, "Cannot call with more than 1000 sections" if batch.count > 1000
 
     cs = CourseSection.where(id: batch).select(:id, :workflow_state).to_a
-    data = SisBatchRollBackData.build_dependent_data(sis_batch: sis_batch, contexts: cs, updated_state: 'deleted', batch_mode_delete: batch_mode)
-    CourseSection.where(id: cs.map(&:id)).update_all(workflow_state: 'deleted', updated_at: Time.zone.now)
+    data = SisBatchRollBackData.build_dependent_data(sis_batch: sis_batch, contexts: cs, updated_state: "deleted", batch_mode_delete: batch_mode)
+    CourseSection.where(id: cs.map(&:id)).update_all(workflow_state: "deleted", updated_at: Time.zone.now)
     Enrollment.where(course_section_id: cs.map(&:id)).active.find_in_batches do |e_batch|
       GuardRail.activate(:primary) do
         new_data = Enrollment::BatchStateUpdater.destroy_batch(e_batch, sis_batch: sis_batch, batch_mode: batch_mode)
@@ -386,9 +386,9 @@ class CourseSection < ActiveRecord::Base
         data = []
       end
     end
-    AssignmentOverride.where(set_type: 'CourseSection', set_id: cs.map(&:id)).find_each(&:destroy)
+    AssignmentOverride.where(set_type: "CourseSection", set_id: cs.map(&:id)).find_each(&:destroy)
     DiscussionTopicSectionVisibility.where(course_section_id: cs.map(&:id)).find_in_batches do |d_batch|
-      DiscussionTopicSectionVisibility.where(id: d_batch).update_all(workflow_state: 'deleted')
+      DiscussionTopicSectionVisibility.where(id: d_batch).update_all(workflow_state: "deleted")
     end
     cs.count
   end

@@ -35,20 +35,20 @@ class AssignmentGroup < ActiveRecord::Base
   attr_accessor :saved_by
 
   belongs_to :context, polymorphic: [:course]
-  acts_as_list scope: { context: self, workflow_state: 'available' }
+  acts_as_list scope: { context: self, workflow_state: "available" }
   has_a_broadcast_policy
   serialize :integration_data, Hash
 
   has_many :scores, -> { active }
-  has_many :assignments, -> { order('position, due_at, title') }
+  has_many :assignments, -> { order("position, due_at, title") }
 
   has_many :active_assignments, lambda {
-    where("assignments.workflow_state<>'deleted'").order('assignments.position, assignments.due_at, assignments.title')
-  }, class_name: 'Assignment', dependent: :destroy
+    where("assignments.workflow_state<>'deleted'").order("assignments.position, assignments.due_at, assignments.title")
+  }, class_name: "Assignment", dependent: :destroy
 
   has_many :published_assignments, lambda {
-    where(workflow_state: 'published').order('assignments.position, assignments.due_at, assignments.title')
-  }, class_name: 'Assignment'
+    where(workflow_state: "published").order("assignments.position, assignments.due_at, assignments.title")
+  }, class_name: "Assignment"
 
   validates :context_id, :context_type, :workflow_state, presence: true
   validates :rules, length: { maximum: maximum_text_length }, allow_blank: true
@@ -67,7 +67,7 @@ class AssignmentGroup < ActiveRecord::Base
 
   def generate_default_values
     if name.blank?
-      self.name = t 'default_title', "Assignments"
+      self.name = t "default_title", "Assignments"
     end
     if !group_weight || group_weight.nan?
       self.group_weight = 0
@@ -134,9 +134,9 @@ class AssignmentGroup < ActiveRecord::Base
       # time that this group was last modified, that assignment was deleted
       # along with this group. This might help avoid undeleting assignments that
       # were deleted earlier.
-      to_restore = to_restore.where('updated_at >= ?', updated_at.utc)
+      to_restore = to_restore.where("updated_at >= ?", updated_at.utc)
     end
-    undestroy(active_state: 'available')
+    undestroy(active_state: "available")
     restore_scores
     to_restore.each { |assignment| assignment.restore(:assignment_group) }
   end
@@ -148,7 +148,7 @@ class AssignmentGroup < ActiveRecord::Base
     (rules || "").split("\n").each do |rule|
       split = rule.split(":", 2)
       if split.length > 1
-        if split[0] == 'never_drop'
+        if split[0] == "never_drop"
           @rules_hash[split[0]] ||= []
           @rules_hash[split[0]] << (options[:stringify_json_ids] ? split[1].to_s : split[1].to_i)
         else
@@ -169,9 +169,9 @@ class AssignmentGroup < ActiveRecord::Base
   # drop_lowest:2\ndrop_highest:1\nnever_drop:12\nnever_drop:14\n
   def rules_hash=(incoming_hash)
     rule_string = ""
-    rule_string += "drop_lowest:#{incoming_hash['drop_lowest']}\n" if incoming_hash['drop_lowest']
-    rule_string += "drop_highest:#{incoming_hash['drop_highest']}\n" if incoming_hash['drop_highest']
-    incoming_hash['never_drop']&.each do |r|
+    rule_string += "drop_lowest:#{incoming_hash["drop_lowest"]}\n" if incoming_hash["drop_lowest"]
+    rule_string += "drop_highest:#{incoming_hash["drop_highest"]}\n" if incoming_hash["drop_highest"]
+    incoming_hash["never_drop"]&.each do |r|
       rule_string += "never_drop:#{r}\n"
     end
     self.rules = rule_string
@@ -185,16 +185,16 @@ class AssignmentGroup < ActiveRecord::Base
   scope :active, -> { where("assignment_groups.workflow_state<>'deleted'") }
   scope :before, ->(date) { where("assignment_groups.created_at<?", date) }
   scope :for_context_codes, ->(codes) { active.where(context_code: codes).ordered }
-  scope :for_course, ->(course) { where(context_id: course, context_type: 'Course') }
+  scope :for_course, ->(course) { where(context_id: course, context_type: "Course") }
 
   def course_grading_change
-    context.grade_weight_changed! if saved_change_to_group_weight? && context && context.group_weighting_scheme == 'percent'
+    context.grade_weight_changed! if saved_change_to_group_weight? && context && context.group_weighting_scheme == "percent"
     true
   end
 
   # this is just in case we happen to delete the last assignment_group in a course
   def clear_context_has_assignment_group_cache
-    Rails.cache.delete(['has_assignment_group', global_context_id].cache_key) if context_id
+    Rails.cache.delete(["has_assignment_group", global_context_id].cache_key) if context_id
   end
 
   def course_broadcast_data

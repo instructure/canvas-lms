@@ -41,10 +41,10 @@ class OutcomeProficiencyRating < ApplicationRecord
 
   def as_json(_options = {})
     {}.tap do |h|
-      h['description'] = description
-      h['points'] = points
-      h['mastery'] = mastery
-      h['color'] = color
+      h["description"] = description
+      h["points"] = points
+      h["mastery"] = mastery
+      h["color"] = color
     end
   end
 end

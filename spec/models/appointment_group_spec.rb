@@ -34,7 +34,7 @@ describe AppointmentGroup do
     end
 
     it "ensures the group category matches the course" do
-      other_course = Course.create!(name: 'Other')
+      other_course = Course.create!(name: "Other")
       expect(AppointmentGroup.new(
                title: "test",
                contexts: [@course],
@@ -75,8 +75,8 @@ describe AppointmentGroup do
     end
   end
 
-  context 'broadcast_data' do
-    it 'includes course_id if the context is a course' do
+  context "broadcast_data" do
+    it "includes course_id if the context is a course" do
       course_with_student(active_all: true)
       group = AppointmentGroup.new(title: "test")
       group.contexts = [@course]
@@ -85,9 +85,9 @@ describe AppointmentGroup do
       expect(group.broadcast_data).to eql({ root_account_id: @course.root_account_id, course_ids: [@course.id] })
     end
 
-    it 'includes all course_ids' do
+    it "includes all course_ids" do
       course_with_student(active_all: true)
-      course2 = @course.root_account.courses.create!(name: 'course2', workflow_state: 'available')
+      course2 = @course.root_account.courses.create!(name: "course2", workflow_state: "available")
       group = AppointmentGroup.new(title: "test")
       group.contexts = [@course, course2]
       group.save!
@@ -95,7 +95,7 @@ describe AppointmentGroup do
       expect(group.broadcast_data).to eql({ root_account_id: @course.root_account_id, course_ids: [@course.id, course2.id] })
     end
 
-    it 'includes course_id if the context is a section' do
+    it "includes course_id if the context is a section" do
       course_with_student(active_all: true)
       group = AppointmentGroup.new(title: "test")
       group.contexts = [@course.default_section]
@@ -104,9 +104,9 @@ describe AppointmentGroup do
       expect(group.broadcast_data).to eql({ root_account_id: @course.root_account_id, course_ids: [@course.id] })
     end
 
-    it 'includes mixed contexts course_ids' do
+    it "includes mixed contexts course_ids" do
       course_with_student(active_all: true)
-      course2 = @course.root_account.courses.create!(name: 'course2', workflow_state: 'available')
+      course2 = @course.root_account.courses.create!(name: "course2", workflow_state: "available")
       group = AppointmentGroup.new(title: "test")
       group.contexts = [@course.default_section, course2]
       group.save!
@@ -141,7 +141,7 @@ describe AppointmentGroup do
 
     it "does not add contexts when it has a group category" do
       gc = group_category(context: course1)
-      ag = AppointmentGroup.create!(title: 'test',
+      ag = AppointmentGroup.create!(title: "test",
                                     contexts: [course1],
                                     sub_context_codes: [gc.asset_string])
       expect(ag.contexts).to eql [course1]
@@ -158,7 +158,7 @@ describe AppointmentGroup do
       group = AppointmentGroup.create!(
         title: "test",
         contexts: [course1],
-        new_appointments: [['2012-01-01 12:00:00', '2012-01-01 13:00:00']]
+        new_appointments: [["2012-01-01 12:00:00", "2012-01-01 13:00:00"]]
       )
 
       expect(group.appointments.map(&:effective_context_code)).to eql [course1.asset_string]
@@ -180,7 +180,7 @@ describe AppointmentGroup do
     end
 
     it "only adds sub_contexts when first adding a course" do
-      ag = AppointmentGroup.create! title: 'test',
+      ag = AppointmentGroup.create! title: "test",
                                     contexts: [@course1],
                                     sub_context_codes: [@c1section1.asset_string]
       expect(ag.sub_contexts).to eql [@c1section1]
@@ -199,21 +199,21 @@ describe AppointmentGroup do
   context "add_appointment" do
     before :once do
       course_with_student(active_all: true)
-      @ag = AppointmentGroup.create!(title: "test", contexts: [@course], new_appointments: [['2012-01-01 12:00:00', '2012-01-01 13:00:00']])
+      @ag = AppointmentGroup.create!(title: "test", contexts: [@course], new_appointments: [["2012-01-01 12:00:00", "2012-01-01 13:00:00"]])
       @appointment = @ag.appointments.first
     end
 
     it "allows additional appointments" do
-      expect(@ag.update(new_appointments: [['2012-01-01 13:00:00', '2012-01-01 14:00:00']])).to be_truthy
+      expect(@ag.update(new_appointments: [["2012-01-01 13:00:00", "2012-01-01 14:00:00"]])).to be_truthy
       expect(@ag.appointments.size).to eql 2
     end
 
     it "does not allow invalid appointments" do
-      expect(@ag.update(new_appointments: [['2012-01-01 14:00:00', '2012-01-01 13:00:00']])).to be_falsey
+      expect(@ag.update(new_appointments: [["2012-01-01 14:00:00", "2012-01-01 13:00:00"]])).to be_falsey
     end
 
     it "does not allow overlapping appointments" do
-      expect(@ag.update(new_appointments: [['2012-01-01 12:00:00', '2012-01-01 13:00:00']])).to be_falsey
+      expect(@ag.update(new_appointments: [["2012-01-01 12:00:00", "2012-01-01 13:00:00"]])).to be_falsey
     end
 
     it "updates start_at/end_at when adding appointments" do
@@ -221,8 +221,8 @@ describe AppointmentGroup do
       expect(@ag.end_at).to eql @ag.appointments.map(&:end_at).max
 
       expect(@ag.update(new_appointments: [
-                          ['2012-01-01 17:00:00', '2012-01-01 18:00:00'],
-                          ['2012-01-01 07:00:00', '2012-01-01 08:00:00']
+                          ["2012-01-01 17:00:00", "2012-01-01 18:00:00"],
+                          ["2012-01-01 07:00:00", "2012-01-01 08:00:00"]
                         ])).to be_truthy
 
       expect(@ag.appointments.size).to eql 3
@@ -238,8 +238,8 @@ describe AppointmentGroup do
         title: "test",
         description: "hello",
         contexts: [@course],
-        new_appointments: [['2012-01-01 12:00:00', '2012-01-01 13:00:00'],
-                           ['2012-01-01 13:00:00', '2012-01-01 14:00:00']]
+        new_appointments: [["2012-01-01 12:00:00", "2012-01-01 13:00:00"],
+                           ["2012-01-01 13:00:00", "2012-01-01 14:00:00"]]
       )
     end
 
@@ -425,9 +425,9 @@ describe AppointmentGroup do
 
   context "notifications" do
     before :once do
-      Notification.create(name: 'Appointment Group Deleted', category: "TestImmediately")
-      Notification.create(name: 'Appointment Group Published', category: "TestImmediately")
-      Notification.create(name: 'Appointment Group Updated', category: "TestImmediately")
+      Notification.create(name: "Appointment Group Deleted", category: "TestImmediately")
+      Notification.create(name: "Appointment Group Published", category: "TestImmediately")
+      Notification.create(name: "Appointment Group Updated", category: "TestImmediately")
 
       course_with_teacher(active_all: true)
       student_in_course(course: @course, active_all: true)
@@ -437,7 +437,7 @@ describe AppointmentGroup do
         communication_channel(user, { username: "test_channel_email_#{user.id}@test.com", active_cc: true })
       end
 
-      @ag = AppointmentGroup.create!(title: "test", contexts: [@course], new_appointments: [['2012-01-01 13:00:00', '2012-01-01 14:00:00']])
+      @ag = AppointmentGroup.create!(title: "test", contexts: [@course], new_appointments: [["2012-01-01 13:00:00", "2012-01-01 14:00:00"]])
     end
 
     it "notifies all participants when publishing", priority: "1" do
@@ -448,7 +448,7 @@ describe AppointmentGroup do
 
     it "notifies all participants when adding appointments", priority: "1" do
       @ag.publish!
-      @ag.update(new_appointments: [['2012-01-01 12:00:00', '2012-01-01 13:00:00']])
+      @ag.update(new_appointments: [["2012-01-01 12:00:00", "2012-01-01 13:00:00"]])
       expect(@ag.messages_sent).to be_include("Appointment Group Updated")
       expect(@ag.messages_sent["Appointment Group Updated"].map(&:user_id).sort.uniq).to eql [@student.id, @observer.id].sort
     end
@@ -468,13 +468,13 @@ describe AppointmentGroup do
 
     it "does not notify participants in an unpublished course" do
       @unpublished_course = course_factory
-      @unpublished_course.enroll_user(@student, 'StudentEnrollment')
-      @unpublished_course.enroll_user(@teacher, 'TeacherEnrollment')
-      @unpublished_course.enroll_user(@observer, 'ObserverEnrollment')
+      @unpublished_course.enroll_user(@student, "StudentEnrollment")
+      @unpublished_course.enroll_user(@teacher, "TeacherEnrollment")
+      @unpublished_course.enroll_user(@observer, "ObserverEnrollment")
 
       @ag = AppointmentGroup.create!(title: "test",
                                      contexts: [@unpublished_course],
-                                     new_appointments: [['2012-01-01 13:00:00', '2012-01-01 14:00:00']])
+                                     new_appointments: [["2012-01-01 13:00:00", "2012-01-01 14:00:00"]])
       @ag.publish!
       expect(@ag.messages_sent).to be_empty
 
@@ -487,7 +487,7 @@ describe AppointmentGroup do
     course_with_teacher(active_all: true)
     @teacher = @user
 
-    ag = AppointmentGroup.create(title: "test", contexts: [@course], new_appointments: [['2012-01-01 17:00:00', '2012-01-01 18:00:00']])
+    ag = AppointmentGroup.create(title: "test", contexts: [@course], new_appointments: [["2012-01-01 17:00:00", "2012-01-01 18:00:00"]])
     appt = ag.appointments.first
     participants = Array.new(3) do
       student_in_course(course: @course, active_all: true)
@@ -562,7 +562,7 @@ describe AppointmentGroup do
     it "does not cancel a slot for a user if they have another active enrollment" do
       enrollment1 = student_in_course(course: @course, active_all: true)
       cs = @course.course_sections.create!
-      enrollment2 = @course.enroll_student(@student, section: cs, allow_multiple_enrollments: true, enrollment_state: 'active')
+      enrollment2 = @course.enroll_student(@student, section: cs, allow_multiple_enrollments: true, enrollment_state: "active")
 
       @appointment.reserve_for(@student, @teacher)
       expect(@ag.reload.available_slots).to eql 3
@@ -619,16 +619,16 @@ describe AppointmentGroup do
     it "allows filtering on registration status" do
       @ag.appointments.first.reserve_for(@users.first, @users.first)
       expect(@ag.possible_participants).to eql @users
-      expect(@ag.possible_participants(registration_status: 'registered')).to eql [@users.first]
-      expect(@ag.possible_participants(registration_status: 'unregistered')).to eql [@users.last]
+      expect(@ag.possible_participants(registration_status: "registered")).to eql [@users.first]
+      expect(@ag.possible_participants(registration_status: "unregistered")).to eql [@users.last]
     end
 
     it "allows filtering on registration status (for groups)" do
       @ag.appointment_group_sub_contexts.create! sub_context: @gc, sub_context_code: @gc.asset_string
       @ag.appointments.first.reserve_for(@group1, @users.first)
       expect(@ag.possible_participants.sort_by(&:id)).to eql [@group1, @group2].sort_by(&:id)
-      expect(@ag.possible_participants(registration_status: 'registered')).to eql [@group1]
-      expect(@ag.possible_participants(registration_status: 'unregistered')).to eql [@group2]
+      expect(@ag.possible_participants(registration_status: "registered")).to eql [@group1]
+      expect(@ag.possible_participants(registration_status: "unregistered")).to eql [@group2]
     end
   end
 
@@ -636,11 +636,11 @@ describe AppointmentGroup do
     course_factory(active_all: true)
     unrestricted_teacher = @teacher
     limited_teacher1 = user_factory(active_all: true)
-    @course.enroll_teacher(limited_teacher1, limit_privileges_to_course_section: true, enrollment_state: 'active')
+    @course.enroll_teacher(limited_teacher1, limit_privileges_to_course_section: true, enrollment_state: "active")
 
     section2 = @course.course_sections.create!
     limited_teacher2 = user_factory(active_all: true)
-    @course.enroll_teacher(limited_teacher2, section: section2, limit_privileges_to_course_section: true, enrollment_state: 'active')
+    @course.enroll_teacher(limited_teacher2, section: section2, limit_privileges_to_course_section: true, enrollment_state: "active")
 
     @ag = AppointmentGroup.create!(title: "test", contexts: [@course])
     @ag.appointment_group_sub_contexts.create! sub_context: section2

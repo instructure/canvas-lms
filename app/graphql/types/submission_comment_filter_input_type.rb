@@ -20,7 +20,7 @@
 
 module Types
   class SubmissionCommentFilterInputType < Types::BaseInputObject
-    graphql_name 'SubmissionCommentFilterInput'
+    graphql_name "SubmissionCommentFilterInput"
 
     argument :all_comments, Boolean, <<~MD, required: false, default_value: false
       If all of the comments, regardless of the submission attempt, should be returned.

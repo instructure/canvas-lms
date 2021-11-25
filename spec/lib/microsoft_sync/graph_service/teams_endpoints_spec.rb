@@ -18,43 +18,43 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 describe MicrosoftSync::GraphService::TeamsEndpoints do
-  include_context 'microsoft_sync_graph_service_endpoints'
+  include_context "microsoft_sync_graph_service_endpoints"
 
-  describe '#team_exists?' do
-    subject { endpoints.team_exists?('mygroupid') }
+  describe "#team_exists?" do
+    subject { endpoints.team_exists?("mygroupid") }
 
     let(:http_method) { :get }
-    let(:url) { 'https://graph.microsoft.com/v1.0/teams/mygroupid' }
-    let(:url_variables) { ['mygroupid'] }
-    let(:response_body) { { 'foo' => 'bar' } }
+    let(:url) { "https://graph.microsoft.com/v1.0/teams/mygroupid" }
+    let(:url_variables) { ["mygroupid"] }
+    let(:response_body) { { "foo" => "bar" } }
 
-    it_behaves_like 'a graph service endpoint', ignore_404: true
+    it_behaves_like "a graph service endpoint", ignore_404: true
 
-    context 'when the team exists' do
+    context "when the team exists" do
       it { is_expected.to eq(true) }
     end
 
     context "when the team doesn't exist" do
-      let(:response) { json_response(404, error: { code: 'NotFound', message: 'Does not exist' }) }
+      let(:response) { json_response(404, error: { code: "NotFound", message: "Does not exist" }) }
 
       it { is_expected.to eq(false) }
 
       it 'increments an "expected" statsd counter instead of an "notfound" one' do
         subject
         expect(InstStatsd::Statsd).to have_received(:increment)
-          .with('microsoft_sync.graph_service.expected',
-                tags: hash_including(msft_endpoint: 'get_teams'))
+          .with("microsoft_sync.graph_service.expected",
+                tags: hash_including(msft_endpoint: "get_teams"))
         expect(InstStatsd::Statsd).to_not have_received(:increment)
-          .with('microsoft_sync.graph_service.notfound', anything)
+          .with("microsoft_sync.graph_service.notfound", anything)
       end
     end
   end
 
-  describe '#create_for_education_class' do
+  describe "#create_for_education_class" do
     subject { endpoints.create_for_education_class("Evan's group id") }
 
     let(:http_method) { :post }
-    let(:url) { 'https://graph.microsoft.com/v1.0/teams' }
+    let(:url) { "https://graph.microsoft.com/v1.0/teams" }
     let(:req_body) do
       {
         "template@odata.bind" =>
@@ -63,11 +63,11 @@ describe MicrosoftSync::GraphService::TeamsEndpoints do
       }
     end
     let(:with_params) { { body: req_body } }
-    let(:response) { { status: 204, body: '' } }
+    let(:response) { { status: 204, body: "" } }
 
     it { is_expected.to eq(nil) }
 
-    it_behaves_like 'a graph service endpoint'
+    it_behaves_like "a graph service endpoint"
 
     context 'when Microsoft returns a 400 saying "must have one or more owners"' do
       let(:response) do
@@ -82,10 +82,10 @@ describe MicrosoftSync::GraphService::TeamsEndpoints do
         expect { subject }.to raise_error(MicrosoftSync::Errors::GroupHasNoOwners)
 
         expect(InstStatsd::Statsd).to_not have_received(:increment)
-          .with('microsoft_sync.graph_service.error', anything)
+          .with("microsoft_sync.graph_service.error", anything)
         expect(InstStatsd::Statsd).to have_received(:increment)
-          .with('microsoft_sync.graph_service.expected',
-                tags: hash_including(msft_endpoint: 'post_teams'))
+          .with("microsoft_sync.graph_service.expected",
+                tags: hash_including(msft_endpoint: "post_teams"))
       end
     end
 
@@ -101,10 +101,10 @@ describe MicrosoftSync::GraphService::TeamsEndpoints do
         expect { subject }.to raise_error(MicrosoftSync::Errors::TeamAlreadyExists)
 
         expect(InstStatsd::Statsd).to_not have_received(:increment)
-          .with('microsoft_sync.graph_service.error', anything)
+          .with("microsoft_sync.graph_service.error", anything)
         expect(InstStatsd::Statsd).to have_received(:increment)
-          .with('microsoft_sync.graph_service.expected',
-                tags: hash_including(msft_endpoint: 'post_teams'))
+          .with("microsoft_sync.graph_service.expected",
+                tags: hash_including(msft_endpoint: "post_teams"))
       end
     end
   end

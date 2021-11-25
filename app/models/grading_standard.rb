@@ -64,7 +64,7 @@ class GradingStandard < ActiveRecord::Base
   end
 
   scope :active, -> { where("grading_standards.workflow_state<>'deleted'") }
-  scope :sorted, -> { order(Arel.sql("usage_count >= 3 DESC")).order(nulls(:last, best_unicode_collation_key('title'))) }
+  scope :sorted, -> { order(Arel.sql("usage_count >= 3 DESC")).order(nulls(:last, best_unicode_collation_key("title"))) }
 
   VERSION = 2
 
@@ -198,7 +198,7 @@ class GradingStandard < ActiveRecord::Base
 
   alias_method :destroy_permanently!, :destroy
   def destroy
-    self.workflow_state = 'deleted'
+    self.workflow_state = "deleted"
     save
   end
 
@@ -220,14 +220,14 @@ class GradingStandard < ActiveRecord::Base
   end
 
   def valid_grading_scheme_data
-    errors.add(:data, 'grading scheme values cannot be negative') if data.present? && data.any? { |v| v[1] < 0 }
-    errors.add(:data, 'grading scheme cannot contain duplicate values') if data.present? && data.map { |v| v[1] } != data.map { |v| v[1] }.uniq
-    errors.add(:data, 'a grading scheme name is too long') if data.present? && data.any? { |v| v[0].length > self.class.maximum_string_length }
+    errors.add(:data, "grading scheme values cannot be negative") if data.present? && data.any? { |v| v[1] < 0 }
+    errors.add(:data, "grading scheme cannot contain duplicate values") if data.present? && data.map { |v| v[1] } != data.map { |v| v[1] }.uniq
+    errors.add(:data, "a grading scheme name is too long") if data.present? && data.any? { |v| v[0].length > self.class.maximum_string_length }
   end
 
   def full_range_scheme
     if data.present? && data.none? { |datum| datum[1].abs < Float::EPSILON }
-      errors.add(:data, 'grading schemes must have 0% for the lowest grade')
+      errors.add(:data, "grading schemes must have 0% for the lowest grade")
     end
   end
   private :full_range_scheme
@@ -239,7 +239,7 @@ class GradingStandard < ActiveRecord::Base
   def self.default_instance
     gs = GradingStandard.new
     gs.data = default_grading_scheme
-    gs.title = 'Default Grading Scheme'
+    gs.title = "Default Grading Scheme"
     gs.default_standard = true
     gs
   end

@@ -26,17 +26,17 @@ module Canvas::Plugins::TicketingSystem
   # plugin configuration
   class EmailPlugin < BasePlugin
     def plugin_id
-      'canvas_ticketing_by_email'
+      "canvas_ticketing_by_email"
     end
 
     def settings
       {
-        name: -> { I18n.t 'Canvas Ticketing Email Connector' },
-        description: -> { I18n.t 'pick a destination, we\'ll send you errors' },
-        author: 'Instructure',
-        author_website: 'http://www.instructure.com',
-        version: '1.0.0',
-        settings_partial: 'plugins/custom_ticketing_email_settings'
+        name: -> { I18n.t "Canvas Ticketing Email Connector" },
+        description: -> { I18n.t "pick a destination, we'll send you errors" },
+        author: "Instructure",
+        author_website: "http://www.instructure.com",
+        version: "1.0.0",
+        settings_partial: "plugins/custom_ticketing_email_settings"
       }
     end
 
@@ -45,7 +45,7 @@ module Canvas::Plugins::TicketingSystem
         to: conf[:email_address],
         from: error_report.email,
         subject: I18n.t("Canvas Error Report"),
-        body: JSON.pretty_generate(error_report.to_document, space_before: ''),
+        body: JSON.pretty_generate(error_report.to_document, space_before: ""),
         root_account_id: error_report.account_id,
         delay_for: 0,
         context: error_report.raw_report

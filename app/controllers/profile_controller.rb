@@ -173,12 +173,12 @@ class ProfileController < ApplicationController
       @user.profile,
       @current_user,
       session,
-      ['links', 'user_services']
+      ["links", "user_services"]
     )
 
     if @user_data[:known_user] # if you can message them, you can see the profile
       js_env enable_gravatar: @domain_root_account&.enable_gravatar?
-      add_crumb(t('crumbs.settings_frd', "%{user}'s Profile", user: @user.short_name), user_profile_path(@user))
+      add_crumb(t("crumbs.settings_frd", "%{user}'s Profile", user: @user.short_name), user_profile_path(@user))
       render
     else
       render :unauthorized
@@ -205,7 +205,7 @@ class ProfileController < ApplicationController
     @user_data = profile_data(@user.profile, @current_user, session, [])
     @channels = @user.communication_channels.unretired
     @email_channels = @channels.select { |c| c.path_type == "email" }
-    @sms_channels = @channels.select { |c| c.path_type == 'sms' }
+    @sms_channels = @channels.select { |c| c.path_type == "sms" }
     @other_channels = @channels.reject { |c| c.path_type == "email" }
     @default_email_channel = @email_channels.first
     @default_pseudonym = @user.primary_pseudonym
@@ -236,8 +236,8 @@ class ProfileController < ApplicationController
     @user = @current_user
     @current_user.used_feature(:cc_prefs)
     @context = @user.profile
-    @page_title = t('account_notification_settings_title', 'Notification Settings')
-    set_active_tab 'notifications'
+    @page_title = t("account_notification_settings_title", "Notification Settings")
+    set_active_tab "notifications"
 
     add_crumb(@current_user.short_name, profile_path)
     add_crumb(t("Notification Settings"))
@@ -245,18 +245,18 @@ class ProfileController < ApplicationController
       enable_course_selector:
         Account.site_admin.feature_enabled?(:notification_settings_course_selector) || @user&.active_k5_enrollments?,
       allowed_push_categories: Notification.categories_to_send_in_push,
-      send_scores_in_emails_text: Notification.where(category: 'Grading').first&.related_user_setting(@user, @domain_root_account),
-      daily_notification_time: time_string(@current_user.daily_notification_time, nil, @current_user.time_zone || ActiveSupport::TimeZone['America/Denver'] || Time.zone),
+      send_scores_in_emails_text: Notification.where(category: "Grading").first&.related_user_setting(@user, @domain_root_account),
+      daily_notification_time: time_string(@current_user.daily_notification_time, nil, @current_user.time_zone || ActiveSupport::TimeZone["America/Denver"] || Time.zone),
       weekly_notification_range: {
         weekday: I18n.l(@current_user.weekly_notification_range.first.in_time_zone.to_date, format: :weekday),
-        start_time: time_string(@current_user.weekly_notification_range.first, nil, @current_user.time_zone || ActiveSupport::TimeZone['America/Denver'] || Time.zone),
-        end_time: time_string(@current_user.weekly_notification_range.last, nil, @current_user.time_zone || ActiveSupport::TimeZone['America/Denver'] || Time.zone)
+        start_time: time_string(@current_user.weekly_notification_range.first, nil, @current_user.time_zone || ActiveSupport::TimeZone["America/Denver"] || Time.zone),
+        end_time: time_string(@current_user.weekly_notification_range.last, nil, @current_user.time_zone || ActiveSupport::TimeZone["America/Denver"] || Time.zone)
       },
       read_privacy_info: @user.preferences[:read_notification_privacy_info],
       account_privacy_notice: @domain_root_account.settings[:external_notification_warning]
     }
     js_bundle :account_notification_settings
-    render html: '', layout: true
+    render html: "", layout: true
   end
 
   def communication_update
@@ -376,14 +376,14 @@ class ProfileController < ApplicationController
           if params[:pseudonym][:password_id] && change_password
             pseudonym_to_update = @user.pseudonyms.find(params[:pseudonym][:password_id])
           end
-          if change_password == '1' && pseudonym_to_update && !pseudonym_to_update.valid_arbitrary_credentials?(old_password)
-            error_msg = t('errors.invalid_old_passowrd', "Invalid old password for the login %{pseudonym}", pseudonym: pseudonym_to_update.unique_id)
+          if change_password == "1" && pseudonym_to_update && !pseudonym_to_update.valid_arbitrary_credentials?(old_password)
+            error_msg = t("errors.invalid_old_passowrd", "Invalid old password for the login %{pseudonym}", pseudonym: pseudonym_to_update.unique_id)
             pseudonymed = true
             flash[:error] = error_msg
             format.html { redirect_to user_profile_url(@current_user) }
             format.json { render json: { errors: { old_password: error_msg } }, status: :bad_request }
           end
-          if change_password != '1' || !pseudonym_to_update || !pseudonym_to_update.valid_arbitrary_credentials?(old_password)
+          if change_password != "1" || !pseudonym_to_update || !pseudonym_to_update.valid_arbitrary_credentials?(old_password)
             pseudonym_params.delete :password
             pseudonym_params.delete :password_confirmation
           end
@@ -391,13 +391,13 @@ class ProfileController < ApplicationController
           pseudonym_to_update.require_password = true if pseudonym_to_update
           if !pseudonym_params.empty? && pseudonym_to_update && !pseudonym_to_update.update(pseudonym_params)
             pseudonymed = true
-            flash[:error] = t('errors.profile_update_failed', "Login failed to update")
+            flash[:error] = t("errors.profile_update_failed", "Login failed to update")
             format.html { redirect_to user_profile_url(@current_user) }
             format.json { render json: pseudonym_to_update.errors, status: :bad_request }
           end
         end
         unless pseudonymed
-          flash[:notice] = t('notices.updated_profile', "Settings successfully updated")
+          flash[:notice] = t("notices.updated_profile", "Settings successfully updated")
           format.html { redirect_to user_profile_url(@current_user) }
           format.json { render json: @user.as_json(methods: :avatar_url, include: { communication_channel: { only: [:id, :path], include_root: false }, pseudonym: { only: [:id, :unique_id], include_root: false } }) }
         end
@@ -480,29 +480,29 @@ class ProfileController < ApplicationController
 
   def observees
     @user ||= @current_user
-    set_active_tab 'observees'
+    set_active_tab "observees"
     @context = @user.profile if @user == @current_user
 
     add_crumb(@user.short_name, profile_path)
-    add_crumb(t('crumbs.observees', "Observing"))
+    add_crumb(t("crumbs.observees", "Observing"))
 
     @google_analytics_page_title = "Students Being Observed"
-    join_title(t(:page_title, 'Students Being Observed'), @user.name)
+    join_title(t(:page_title, "Students Being Observed"), @user.name)
     js_bundle :user_observees
 
-    render html: '', layout: true
+    render html: "", layout: true
   end
 
   def content_shares
     raise not_found unless @current_user.can_content_share?
 
     @user ||= @current_user
-    set_active_tab 'content_shares'
+    set_active_tab "content_shares"
     @context = @user.profile
 
-    ccv_settings = Canvas::DynamicSettings.find('common_cartridge_viewer') || {}
+    ccv_settings = Canvas::DynamicSettings.find("common_cartridge_viewer") || {}
     js_env({
-             COMMON_CARTRIDGE_VIEWER_URL: ccv_settings['base_url']
+             COMMON_CARTRIDGE_VIEWER_URL: ccv_settings["base_url"]
            })
     render :content_shares
   end
@@ -514,15 +514,15 @@ class ProfileController < ApplicationController
     end
 
     @user ||= @current_user
-    set_active_tab 'qr_mobile_login'
+    set_active_tab "qr_mobile_login"
     @context = @user.profile if @user == @current_user
 
     add_crumb(@user.short_name, profile_path)
-    add_crumb(t('crumbs.mobile_qr_login', "QR for Mobile Login"))
+    add_crumb(t("crumbs.mobile_qr_login", "QR for Mobile Login"))
 
     js_bundle :qr_mobile_login
 
-    render html: '', layout: true
+    render html: "", layout: true
   end
 end
 

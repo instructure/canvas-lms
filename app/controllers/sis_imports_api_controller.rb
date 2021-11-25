@@ -390,7 +390,7 @@ class SisImportsApiController < ApplicationController
   # @returns [SisImport]
   def index
     if authorized_action(@account, @current_user, [:import_sis, :manage_sis])
-      scope = @account.sis_batches.order('created_at DESC')
+      scope = @account.sis_batches.order("created_at DESC")
       if (created_since = CanvasTime.try_parse(params[:created_since]))
         scope = scope.where("created_at > ?", created_since)
       end
@@ -566,7 +566,7 @@ class SisImportsApiController < ApplicationController
   # @returns SisImport
   def create
     if authorized_action(@account, @current_user, :import_sis)
-      params[:import_type] ||= 'instructure_csv'
+      params[:import_type] ||= "instructure_csv"
       raise "invalid import type parameter" unless SisBatch.valid_import_types.key?(params[:import_type])
 
       if !api_request? && @account.current_sis_batch.try(:importing?)
@@ -598,12 +598,12 @@ class SisImportsApiController < ApplicationController
                                        Attachment.mimetype("sis_import.#{params[:extension]}"))
         else
           env = request.env.dup
-          env['CONTENT_TYPE'] = env["ORIGINAL_CONTENT_TYPE"]
+          env["CONTENT_TYPE"] = env["ORIGINAL_CONTENT_TYPE"]
           # copy of request with original content type restored
           request2 = Rack::Request.new(env)
-          charset = request2.media_type_params['charset']
-          if charset.present? && !charset.casecmp?('utf-8')
-            return render json: { error: t('errors.invalid_content_type', "Invalid content type, UTF-8 required") }, status: :bad_request
+          charset = request2.media_type_params["charset"]
+          if charset.present? && !charset.casecmp?("utf-8")
+            return render json: { error: t("errors.invalid_content_type", "Invalid content type, UTF-8 required") }, status: :bad_request
           end
 
           params[:extension] ||= { "application/zip" => "zip",
@@ -658,15 +658,15 @@ class SisImportsApiController < ApplicationController
         end
         if params[:diffing_drop_status].present?
           batch.options[:diffing_drop_status] = (Array(params[:diffing_drop_status]) & SIS::CSV::DiffGenerator::VALID_ENROLLMENT_DROP_STATUS).first
-          return render json: { message: 'Invalid diffing_drop_status' }, status: :bad_request unless batch.options[:diffing_drop_status]
+          return render json: { message: "Invalid diffing_drop_status" }, status: :bad_request unless batch.options[:diffing_drop_status]
         end
         if params[:batch_mode_enrollment_drop_status].present?
           batch.options[:batch_mode_enrollment_drop_status] = (Array(params[:batch_mode_enrollment_drop_status]) & SIS::CSV::DiffGenerator::VALID_ENROLLMENT_DROP_STATUS).first
-          return render json: { message: 'Invalid batch_mode_enrollment_drop_status' }, status: :bad_request unless batch.options[:batch_mode_enrollment_drop_status]
+          return render json: { message: "Invalid batch_mode_enrollment_drop_status" }, status: :bad_request unless batch.options[:batch_mode_enrollment_drop_status]
         end
       end
 
-      unless Setting.get('skip_sis_jobs_account_ids', '').split(',').include?(@account.global_id.to_s)
+      unless Setting.get("skip_sis_jobs_account_ids", "").split(",").include?(@account.global_id.to_s)
         batch.process
       end
 
@@ -691,7 +691,7 @@ class SisImportsApiController < ApplicationController
   def show
     if authorized_action(@account, @current_user, [:import_sis, :manage_sis])
       @batch = @account.sis_batches.find(params[:id])
-      render json: sis_import_json(@batch, @current_user, session, includes: ['errors'])
+      render json: sis_import_json(@batch, @current_user, session, includes: ["errors"])
     end
   end
 
@@ -730,7 +730,7 @@ class SisImportsApiController < ApplicationController
       undelete_only = value_to_boolean(params[:undelete_only])
       unconclude_only = value_to_boolean(params[:unconclude_only])
       if undelete_only && unconclude_only
-        return render json: 'cannot set both undelete_only and unconclude_only', status: :bad_request
+        return render json: "cannot set both undelete_only and unconclude_only", status: :bad_request
       end
 
       progress = @batch.restore_states_later(batch_mode: batch_mode, undelete_only: undelete_only, unconclude_only: unconclude_only)
@@ -757,7 +757,7 @@ class SisImportsApiController < ApplicationController
         @batch = @account.sis_batches.not_completed.lock.find(params[:id])
         @batch.abort_batch
       end
-      render json: sis_import_json(@batch.reload, @current_user, session, includes: ['errors'])
+      render json: sis_import_json(@batch.reload, @current_user, session, includes: ["errors"])
     end
   end
 

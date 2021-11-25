@@ -25,27 +25,27 @@
 # from their use, making things harder to find
 
 begin
-  require 'byebug'
+  require "byebug"
 rescue LoadError
   nil
 end
 
-require 'securerandom'
-require 'tmpdir'
+require "securerandom"
+require "tmpdir"
 
-ENV["RAILS_ENV"] = 'test'
-require_relative '../config/environment'
+ENV["RAILS_ENV"] = "test"
+require_relative "../config/environment"
 
-if ENV['COVERAGE'] == "1"
+if ENV["COVERAGE"] == "1"
   puts "Code Coverage enabled"
-  require_relative 'coverage_tool'
+  require_relative "coverage_tool"
   CoverageTool.start("RSpec:#{Process.pid}")
 end
 
-require 'rspec/rails'
+require "rspec/rails"
 
-require 'webmock'
-require 'webmock/rspec/matchers'
+require "webmock"
+require "webmock/rspec/matchers"
 WebMock.allow_net_connect!
 WebMock.enable!
 # unlike webmock/rspec, only reset in groups that actually do stubbing
@@ -58,7 +58,7 @@ module WebMock::API
 end
 
 Dir[Rails.root.join("spec/support/**/*.rb")].sort.each { |f| require f }
-require 'sharding_spec_helper'
+require "sharding_spec_helper"
 
 # nuke the db (say, if `rake db:migrate RAILS_ENV=test` created records),
 # and then ensure people aren't creating records outside the rspec
@@ -142,16 +142,16 @@ module ActionView::TestCase::Behavior
   end
 end
 
-if ENV['ENABLE_AXE_SELENIUM'] == '1'
-  require 'stormbreaker'
+if ENV["ENABLE_AXE_SELENIUM"] == "1"
+  require "stormbreaker"
   Stormbreaker.install!
   Stormbreaker.configure do |config|
     config.driver = -> { SeleniumDriverSetup.driver }
     config.skip = [:"color-contrast", :"duplicate-id"]
     config.rules = %i[wcag2a wcag2aa section508]
-    if ENV['RSPEC_PROCESSES']
+    if ENV["RSPEC_PROCESSES"]
       config.serialize_output = true
-      config.serialize_prefix = 'log/results/stormbreaker_results'
+      config.serialize_prefix = "log/results/stormbreaker_results"
     end
   end
 end
@@ -172,7 +172,7 @@ module RSpec::Rails
   RSpec::Matchers.define :be_checked do
     match do |node|
       if node.is_a?(Nokogiri::XML::Element)
-        node.attr('checked') == 'checked'
+        node.attr("checked") == "checked"
       elsif node.respond_to?(:checked?)
         node.checked?
       end
@@ -187,7 +187,7 @@ module ReadOnlySecondaryStub
   end
 
   def datbase_username
-    Rails.configuration.database_configuration.dig('test', 'username') ||
+    Rails.configuration.database_configuration.dig("test", "username") ||
       `whoami`.strip
   end
 
@@ -304,11 +304,11 @@ module RenderWithHelpers
 end
 RSpec::Rails::ViewExampleGroup::ExampleMethods.prepend(RenderWithHelpers)
 
-require 'rspec_mock_extensions'
-require 'ams_spec_helper'
+require "rspec_mock_extensions"
+require "ams_spec_helper"
 
-require 'i18n_tasks'
-require 'factories'
+require "i18n_tasks"
+require "factories"
 
 Dir[File.dirname(__FILE__) + "/shared_examples/**/*.rb"].sort.each { |f| require f }
 
@@ -366,21 +366,21 @@ end
 
 RSpec::Expectations.configuration.on_potential_false_positives = :raise
 
-require 'rspec_junit_formatter'
+require "rspec_junit_formatter"
 
 RSpec.configure do |config|
-  config.example_status_persistence_file_path = Rails.root.join("tmp/rspec#{ENV.fetch('PARALLEL_INDEX', '0').to_i}")
+  config.example_status_persistence_file_path = Rails.root.join("tmp/rspec#{ENV.fetch("PARALLEL_INDEX", "0").to_i}")
   config.fail_if_no_examples = true
   config.use_transactional_fixtures = true
   config.use_instantiated_fixtures = false
-  config.fixture_path = Rails.root.join('spec/fixtures')
+  config.fixture_path = Rails.root.join("spec/fixtures")
   config.infer_spec_type_from_file_location!
   config.raise_errors_for_deprecations!
   config.color = true
   config.order = :random
 
   # The Pact specs have prerequisite setup steps so we exclude them by default
-  config.filter_run_excluding :pact_live_events if ENV.fetch('RUN_LIVE_EVENTS_CONTRACT_TESTS', '0') == '0'
+  config.filter_run_excluding :pact_live_events if ENV.fetch("RUN_LIVE_EVENTS_CONTRACT_TESTS", "0") == "0"
 
   config.include Helpers
   config.include Factories
@@ -390,17 +390,17 @@ RSpec.configure do |config|
   config.project_source_dirs << "gems" # so that failures here are reported properly
 
   # RSPEC_PROCESSES is only used on Jenkins and we only care to have RspecJunitFormatter on Jenkins.
-  if ENV['RSPEC_PROCESSES'] && ENV['RSPECQ_ENABLED'] != '1'
-    file = "log/results/results-#{ENV.fetch('PARALLEL_INDEX', '0').to_i}.xml"
+  if ENV["RSPEC_PROCESSES"] && ENV["RSPECQ_ENABLED"] != "1"
+    file = "log/results/results-#{ENV.fetch("PARALLEL_INDEX", "0").to_i}.xml"
     # if file already exists this is a rerun of a failed spec, don't generate new xml.
     config.add_formatter "RspecJunitFormatter", file unless File.file?(file)
   end
 
-  if ENV['RSPEC_LOG']
-    config.add_formatter "ParallelTests::RSpec::RuntimeLogger", "log/parallel_runtime/parallel_runtime_rspec_tests-#{ENV.fetch('PARALLEL_INDEX', '0').to_i}.log"
+  if ENV["RSPEC_LOG"]
+    config.add_formatter "ParallelTests::RSpec::RuntimeLogger", "log/parallel_runtime/parallel_runtime_rspec_tests-#{ENV.fetch("PARALLEL_INDEX", "0").to_i}.log"
   end
 
-  if ENV['RAILS_LOAD_ALL_LOCALES'] && RSpec.configuration.filter.rules[:i18n]
+  if ENV["RAILS_LOAD_ALL_LOCALES"] && RSpec.configuration.filter.rules[:i18n]
     config.around do |example|
       SpecMultipleLocales.run(example)
     end
@@ -416,7 +416,7 @@ RSpec.configure do |config|
   def reset_all_the_things!
     ReadOnlySecondaryStub.reset
     I18n.locale = :en
-    Time.zone = 'UTC'
+    Time.zone = "UTC"
     LoadAccount.force_special_account_reload = true
     Account.clear_special_account_cache!(true)
     PluginSetting.current_account = nil
@@ -444,7 +444,7 @@ RSpec.configure do |config|
   end
 
   # UTC for tests, cuz it's easier :P
-  Account.time_zone_attribute_defaults[:default_time_zone] = 'UTC'
+  Account.time_zone_attribute_defaults[:default_time_zone] = "UTC"
 
   config.before :all do
     raise "all specs need to use transactions" unless using_transactions_properly?
@@ -470,7 +470,7 @@ RSpec.configure do |config|
   end
 
   config.before :suite do
-    if ENV['COVERAGE'] == "1"
+    if ENV["COVERAGE"] == "1"
       simple_cov_cmd = "rspec:#{Process.pid}"
       puts "Starting SimpleCov command: #{simple_cov_cmd}"
       SimpleCov.command_name(simple_cov_cmd)
@@ -558,7 +558,7 @@ RSpec.configure do |config|
   end
 
   def default_uploaded_data
-    fixture_file_upload('docs/doc.doc', 'application/msword', true)
+    fixture_file_upload("docs/doc.doc", "application/msword", true)
   end
 
   def create_temp_dir!
@@ -662,16 +662,16 @@ RSpec.configure do |config|
   def stub_kaltura
     # trick kaltura into being activated
     allow(CanvasKaltura.plugin_settings).to receive(:settings).and_return({
-                                                                            'domain' => 'kaltura.example.com',
-                                                                            'resource_domain' => 'cdn.kaltura.example.com',
-                                                                            'rtmp_domain' => 'rtmp.kaltura.example.com',
-                                                                            'partner_id' => '100',
-                                                                            'subpartner_id' => '10000',
-                                                                            'secret_key' => 'fenwl1n23k4123lk4hl321jh4kl321j4kl32j14kl321',
-                                                                            'user_secret_key' => '1234821hrj3k21hjk4j3kl21j4kl321j4kl3j21kl4j3k2l1',
-                                                                            'player_ui_conf' => '1',
-                                                                            'kcw_ui_conf' => '1',
-                                                                            'upload_ui_conf' => '1'
+                                                                            "domain" => "kaltura.example.com",
+                                                                            "resource_domain" => "cdn.kaltura.example.com",
+                                                                            "rtmp_domain" => "rtmp.kaltura.example.com",
+                                                                            "partner_id" => "100",
+                                                                            "subpartner_id" => "10000",
+                                                                            "secret_key" => "fenwl1n23k4123lk4hl321jh4kl321j4kl32j14kl321",
+                                                                            "user_secret_key" => "1234821hrj3k21hjk4j3kl21j4kl321j4kl3j21kl4j3k2l1",
+                                                                            "player_ui_conf" => "1",
+                                                                            "kcw_ui_conf" => "1",
+                                                                            "upload_ui_conf" => "1"
                                                                           })
   end
 
@@ -719,7 +719,7 @@ RSpec.configure do |config|
         # overridden by Attachment anyway; don't re-overwrite it
         next if base.instance_method(method).owner == base
 
-        if method.to_s[-1..] == '='
+        if method.to_s[-1..] == "="
           base.class_eval <<~RUBY, __FILE__, __LINE__ + 1
             def #{method}(arg)
               self.as(self.class.current_backend).#{method} arg
@@ -746,11 +746,11 @@ RSpec.configure do |config|
 
   module StubS3
     AWS_CONFIG = {
-      access_key_id: 'stub_id',
-      secret_access_key: 'stub_key',
-      region: 'us-east-1',
+      access_key_id: "stub_id",
+      secret_access_key: "stub_key",
+      region: "us-east-1",
       stub_responses: true,
-      bucket_name: 'no-bucket'
+      bucket_name: "no-bucket"
     }.freeze
 
     def self.stubbed?
@@ -758,7 +758,7 @@ RSpec.configure do |config|
     end
 
     def load(file, *args)
-      return AWS_CONFIG.dup if StubS3.stubbed? && file == 'amazon_s3'
+      return AWS_CONFIG.dup if StubS3.stubbed? && file == "amazon_s3"
 
       super
     end
@@ -776,7 +776,7 @@ RSpec.configure do |config|
     if opts[:stubs]
       ConfigFile.singleton_class.prepend(StubS3)
       allow(StubS3).to receive(:stubbed?).and_return(true)
-    elsif Attachment.s3_config.blank? || Attachment.s3_config[:access_key_id] == 'access_key'
+    elsif Attachment.s3_config.blank? || Attachment.s3_config[:access_key_id] == "access_key"
       skip "Please put valid S3 credentials in config/amazon_s3.yml"
     end
   end
@@ -797,7 +797,7 @@ RSpec.configure do |config|
 
   def run_jobs
     while (job = Delayed::Job.get_and_lock_next_available(
-      'spec run_jobs',
+      "spec run_jobs",
       Delayed::Settings.queue,
       0,
       Delayed::MAX_PRIORITY
@@ -820,7 +820,7 @@ RSpec.configure do |config|
   end
 
   def content_type_key
-    'Content-Type'
+    "Content-Type"
   end
 
   class FakeHttpResponse
@@ -846,7 +846,7 @@ RSpec.configure do |config|
     end
 
     def content_type
-      self['content-type']
+      self["content-type"]
     end
   end
 
@@ -879,7 +879,7 @@ RSpec.configure do |config|
   end
 
   def dummy_io
-    fixture_file_upload('docs/doc.doc', 'application/msword', true)
+    fixture_file_upload("docs/doc.doc", "application/msword", true)
   end
 
   def consider_all_requests_local(value)
@@ -892,16 +892,16 @@ RSpec.configure do |config|
 
   def skip_if_prepended_class_method_stubs_broken
     versions = [
-      '2.4.6',
-      '2.4.9',
-      '2.5.1',
-      '2.5.3'
+      "2.4.6",
+      "2.4.9",
+      "2.5.1",
+      "2.5.3"
     ]
     skip("stubbing prepended class methods is broken in this version of ruby") if versions.include?(RUBY_VERSION) || RUBY_VERSION >= "2.6"
   end
 end
 
-require_dependency 'lazy_presumptuous_i18n_backend'
+require_dependency "lazy_presumptuous_i18n_backend"
 
 module I18nStubs
   def stub(translations)
@@ -936,7 +936,7 @@ module I18nStubs
 end
 LazyPresumptuousI18nBackend.prepend(I18nStubs)
 
-Dir[Rails.root.join('{gems,vendor}/plugins/*/spec_canvas/spec_helper.rb')].sort.each { |file| require file }
+Dir[Rails.root.join("{gems,vendor}/plugins/*/spec_canvas/spec_helper.rb")].sort.each { |file| require file }
 
 Shoulda::Matchers.configure do |config|
   config.integrate do |with|
@@ -952,7 +952,7 @@ end
 
 def enable_developer_key_account_binding!(developer_key)
   developer_key.developer_key_account_bindings.first.update!(
-    workflow_state: 'on'
+    workflow_state: "on"
   )
 end
 

@@ -80,7 +80,7 @@ class CanvadocSessionsController < ApplicationController
     if attachment.canvadocable?
       opts = {
         preferred_plugins: [Canvadocs::RENDER_PDFJS, Canvadocs::RENDER_BOX, Canvadocs::RENDER_CROCODOC],
-        enable_annotations: blob['enable_annotations'],
+        enable_annotations: blob["enable_annotations"],
         use_cloudfront: Account.site_admin.feature_enabled?(:use_cloudfront_for_docviewer)
       }
 
@@ -97,7 +97,7 @@ class CanvadocSessionsController < ApplicationController
         opts[:enrollment_type] = blob["enrollment_type"]
         opts[:disable_annotation_notifications] = blob["disable_annotation_notifications"] || false
         # If we STILL don't have a role, something went way wrong so let's be unauthorized.
-        return render(plain: 'unauthorized', status: :unauthorized) if opts[:enrollment_type].blank?
+        return render(plain: "unauthorized", status: :unauthorized) if opts[:enrollment_type].blank?
 
         assignment = submission.assignment
         # If we're doing annotations, DocViewer needs additional information to send notifications
@@ -144,16 +144,16 @@ class CanvadocSessionsController < ApplicationController
     end
   rescue HmacHelper::Error => e
     Canvas::Errors.capture_exception(:canvadocs, e, :info)
-    render plain: 'unauthorized', status: :unauthorized
+    render plain: "unauthorized", status: :unauthorized
   rescue Timeout::Error, Canvadocs::BadGateway, Canvadocs::ServerError => e
     Canvas::Errors.capture_exception(:canvadocs, e, :warn)
     render plain: "Service is currently unavailable. Try again later.",
            status: :service_unavailable
   rescue Canvadocs::BadRequest => e
     Canvas::Errors.capture_exception(:canvadocs, e, :info)
-    render plain: 'Canvadocs Bad Request', status: :bad_request
+    render plain: "Canvadocs Bad Request", status: :bad_request
   rescue Canvadocs::HttpError => e
     Canvas::Errors.capture_exception(:canvadocs, e, :error)
-    render plain: 'Unknown Canvadocs Error', status: :service_unavailable
+    render plain: "Unknown Canvadocs Error", status: :service_unavailable
   end
 end

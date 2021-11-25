@@ -50,7 +50,7 @@ module CC::Importer::Canvas
       else
         make_export_dir
         qti_error_file = File.join(@base_export_dir, "qti_conversion_error.log")
-        File.open(qti_error_file, 'w') { |f| f << python_std_out }
+        File.open(qti_error_file, "w") { |f| f << python_std_out }
         raise "Couldn't convert QTI 1.2 to 2.1, see error log: #{qti_error_file}"
       end
     end

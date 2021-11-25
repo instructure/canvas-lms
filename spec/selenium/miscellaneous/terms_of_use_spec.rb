@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../common'
+require_relative "../common"
 
 def login
   get "/login"
@@ -32,7 +32,7 @@ describe "terms of use test" do
 
   it "does not require a user to accept the terms if they haven't changed", priority: "1" do
     login
-    expect(f("#content")).not_to contain_css('.reaccept_terms')
+    expect(f("#content")).not_to contain_css(".reaccept_terms")
   end
 
   it "does not require a user to accept the terms if already logged in when they change", priority: "2" do
@@ -41,7 +41,7 @@ describe "terms of use test" do
     account.settings[:terms_changed_at] = Time.now.utc
     account.save!
     get "/"
-    expect(f("#content")).not_to contain_css('.reaccept_terms')
+    expect(f("#content")).not_to contain_css(".reaccept_terms")
   end
 
   context "editing terms_of_use" do
@@ -62,7 +62,7 @@ describe "terms of use test" do
       type_in_tiny("textarea", "stuff")
       submit_form("#account_settings")
 
-      expect(@account.terms_of_service.terms_of_service_content.content).to include('stuff')
+      expect(@account.terms_of_service.terms_of_service_content.content).to include("stuff")
     end
 
     it "populates the custom terms in the text area" do
@@ -72,7 +72,7 @@ describe "terms of use test" do
 
       wait_for_tiny(f("#custom_tos_rce_container textarea"))
       expect_new_page_load { submit_form("#account_settings") }
-      expect(@account.reload.terms_of_service.terms_of_service_content.content).to include('other stuff') # should be unchanged
+      expect(@account.reload.terms_of_service.terms_of_service_content.content).to include("other stuff") # should be unchanged
     end
   end
 
@@ -81,13 +81,13 @@ describe "terms of use test" do
     account.settings[:terms_changed_at] = Time.now.utc
     account.save!
     login
-    form = f('.reaccept_terms')
+    form = f(".reaccept_terms")
     expect(form).to be_present
     expect_new_page_load do
       f('[name="user[terms_of_use]"]').click
       submit_form form
     end
-    expect(f("#content")).not_to contain_css('.reaccept_terms')
+    expect(f("#content")).not_to contain_css(".reaccept_terms")
   end
 
   it "requires users to check the box" do
@@ -97,12 +97,12 @@ describe "terms of use test" do
 
     login
 
-    form = f('.reaccept_terms')
+    form = f(".reaccept_terms")
     expect(form).to be_present
     submit_form form
     wait_for_ajaximations
 
-    expect(ff('.error_box').any?(&:displayed?)).to be_truthy
+    expect(ff(".error_box").any?(&:displayed?)).to be_truthy
     expect(account.require_acceptance_of_terms?(@user.reload)).to be_truthy
 
     expect_new_page_load do
@@ -119,7 +119,7 @@ describe "terms of use test" do
     login
     # try to view a different page
     get "/profile/settings"
-    expect(f('.reaccept_terms')).to be_present
+    expect(f(".reaccept_terms")).to be_present
   end
 end
 
@@ -128,7 +128,7 @@ describe "terms of use SOC2 compliance test" do
 
   it "prevents a user from accessing canvas if they are newly registered/imported after the SOC2 start date and have not yet accepted the terms" do
     # Create a user after SOC2 implemented
-    after_soc2_start_date = Setting.get('SOC2_start_date', Time.new(2015, 5, 16, 0, 0, 0).utc).to_datetime + 10.days
+    after_soc2_start_date = Setting.get("SOC2_start_date", Time.new(2015, 5, 16, 0, 0, 0).utc).to_datetime + 10.days
 
     Timecop.freeze(after_soc2_start_date) do
       user_with_pseudonym
@@ -138,11 +138,11 @@ describe "terms of use SOC2 compliance test" do
     login
 
     # terms page should be displayed
-    expect(f('.reaccept_terms')).to be_present
+    expect(f(".reaccept_terms")).to be_present
 
     # try to view a different page, terms page should remain
     get "/profile/settings"
-    form = f('.reaccept_terms')
+    form = f(".reaccept_terms")
     expect(form).to be_present
 
     # accept the terms
@@ -151,12 +151,12 @@ describe "terms of use SOC2 compliance test" do
       submit_form form
     end
 
-    expect(f("#content")).not_to contain_css('.reaccept_terms')
+    expect(f("#content")).not_to contain_css(".reaccept_terms")
   end
 
   it "grandfathers in previously registered users without prompting them to reaccept the terms", priority: "1" do
     # Create a user before SOC2 implemented
-    before_soc2_start_date = Setting.get('SOC2_start_date', Time.new(2015, 5, 16, 0, 0, 0).utc).to_datetime - 10.days
+    before_soc2_start_date = Setting.get("SOC2_start_date", Time.new(2015, 5, 16, 0, 0, 0).utc).to_datetime - 10.days
 
     Timecop.freeze(before_soc2_start_date) do
       user_with_pseudonym
@@ -166,10 +166,10 @@ describe "terms of use SOC2 compliance test" do
     login
 
     # terms page shouldn't be visible
-    expect(f("#content")).not_to contain_css('.reaccept_terms')
+    expect(f("#content")).not_to contain_css(".reaccept_terms")
 
     # view a different page, verify terms page isn't displayed
     get "/profile/settings"
-    expect(f("#content")).not_to contain_css('.reaccept_terms')
+    expect(f("#content")).not_to contain_css(".reaccept_terms")
   end
 end

@@ -26,7 +26,7 @@ class AssessmentRequest < ActiveRecord::Base
   belongs_to :user
   belongs_to :asset, polymorphic: [:submission]
   belongs_to :assessor_asset, polymorphic: [:submission], polymorphic_prefix: true
-  belongs_to :assessor, class_name: 'User'
+  belongs_to :assessor, class_name: "User"
   belongs_to :rubric_association
   has_many :submission_comments, -> { published }
   has_many :ignores, dependent: :destroy, as: :asset
@@ -44,7 +44,7 @@ class AssessmentRequest < ActiveRecord::Base
   protected :infer_uuid
 
   def delete_ignores
-    if workflow_state == 'completed'
+    if workflow_state == "completed"
       Ignore.where(asset: self, user: assessor).delete_all
     end
     true
@@ -70,8 +70,8 @@ class AssessmentRequest < ActiveRecord::Base
     p.data { course_broadcast_data }
   end
 
-  scope :incomplete, -> { where(workflow_state: 'assigned') }
-  scope :complete, -> { where(workflow_state: 'completed') }
+  scope :incomplete, -> { where(workflow_state: "assigned") }
+  scope :complete, -> { where(workflow_state: "completed") }
   scope :for_assessee, ->(user_id) { where(user_id: user_id) }
   scope :for_assessor, ->(assessor_id) { where(assessor_id: assessor_id) }
   scope :for_asset, ->(asset_id) { where(asset_id: asset_id) }
@@ -81,7 +81,7 @@ class AssessmentRequest < ActiveRecord::Base
   scope :not_ignored_by, lambda { |user, purpose|
     where("NOT EXISTS (?)",
           Ignore.where("asset_id=assessment_requests.id")
-              .where(asset_type: 'AssessmentRequest', user_id: user, purpose: purpose))
+              .where(asset_type: "AssessmentRequest", user_id: user, purpose: purpose))
   }
 
   set_policy do
@@ -128,7 +128,7 @@ class AssessmentRequest < ActiveRecord::Base
   end
 
   def incomplete?
-    workflow_state == 'assigned'
+    workflow_state == "assigned"
   end
 
   on_create_send_to_streams do
@@ -164,8 +164,8 @@ class AssessmentRequest < ActiveRecord::Base
   end
 
   def update_planner_override
-    if saved_change_to_workflow_state? && workflow_state_before_last_save == 'assigned' && workflow_state == 'completed'
-      override = PlannerOverride.find_by(plannable_id: id, plannable_type: 'AssessmentRequest', user: assessor)
+    if saved_change_to_workflow_state? && workflow_state_before_last_save == "assigned" && workflow_state == "completed"
+      override = PlannerOverride.find_by(plannable_id: id, plannable_type: "AssessmentRequest", user: assessor)
       override.update(marked_complete: true) if override.present?
     end
   end

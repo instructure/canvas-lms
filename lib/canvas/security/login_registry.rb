@@ -66,10 +66,10 @@ module Canvas::Security
     def self.allow_login_attempt?(pseudonym, ip)
       return true unless Canvas.redis_enabled? && pseudonym
 
-      ip.present? || ip = 'no_ip'
-      total_allowed = Setting.get('login_attempts_total', '20').to_i
-      ip_allowed = Setting.get('login_attempts_per_ip', '10').to_i
-      total, from_this_ip = Canvas.redis.hmget(login_attempts_key(pseudonym), 'total', ip)
+      ip.present? || ip = "no_ip"
+      total_allowed = Setting.get("login_attempts_total", "20").to_i
+      ip_allowed = Setting.get("login_attempts_per_ip", "10").to_i
+      total, from_this_ip = Canvas.redis.hmget(login_attempts_key(pseudonym), "total", ip)
       (!total || total.to_i < total_allowed) && (!from_this_ip || from_this_ip.to_i < ip_allowed)
     end
 
@@ -86,10 +86,10 @@ module Canvas::Security
       return unless Canvas.redis_enabled? && pseudonym
 
       key = login_attempts_key(pseudonym)
-      exptime = Setting.get('login_attempts_ttl', 5.minutes.to_s).to_i
+      exptime = Setting.get("login_attempts_ttl", 5.minutes.to_s).to_i
       redis = Canvas.redis
-      redis.hset(key, 'unique_id', pseudonym.unique_id)
-      redis.hincrby(key, 'total', 1)
+      redis.hset(key, "unique_id", pseudonym.unique_id)
+      redis.hincrby(key, "total", 1)
       redis.hincrby(key, ip, 1) if ip.present?
       redis.expire(key, exptime)
       nil

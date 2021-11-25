@@ -18,11 +18,11 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'sanitize'
+require "sanitize"
 
 class Quizzes::QuizSubmission < ActiveRecord::Base
   extend RootAccountResolver
-  self.table_name = 'quiz_submissions'
+  self.table_name = "quiz_submissions"
 
   include Workflow
 
@@ -43,7 +43,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
 
   before_validation :update_quiz_points_possible
   before_validation :rectify_finished_at_drift, if: :end_at?
-  belongs_to :quiz, class_name: 'Quizzes::Quiz'
+  belongs_to :quiz, class_name: "Quizzes::Quiz"
   belongs_to :user
   belongs_to :submission, touch: true
   before_save :update_kept_score
@@ -55,7 +55,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   after_save :delete_ignores
 
   has_many :attachments, as: :context, inverse_of: :context, dependent: :destroy
-  has_many :events, class_name: 'Quizzes::QuizSubmissionEvent'
+  has_many :events, class_name: "Quizzes::QuizSubmissionEvent"
 
   resolves_root_account through: :quiz
 
@@ -127,7 +127,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
 
     given do |user|
       user &&
-        quiz.context.observer_enrollments.where(user_id: user, associated_user_id: user_id, workflow_state: 'active').exists?
+        quiz.context.observer_enrollments.where(user_id: user, associated_user_id: user_id, workflow_state: "active").exists?
     end
     can :read
 
@@ -141,8 +141,8 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   end
 
   def sanitize_responses
-    questions.select { |q| q['question_type'] == 'essay_question' }.each do |q|
-      question_id = q['id']
+    questions.select { |q| q["question_type"] == "essay_question" }.each do |q|
+      question_id = q["id"]
       if graded?
         submission = submission_data.find { |s| s[:question_id] == question_id }
         submission[:text] = Sanitize.clean(submission[:text] || "", CanvasSanitize::SANITIZE) if submission
@@ -179,7 +179,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
 
     if keys.present?
       all_present = keys.all? { |key| temporary_data[key].present? }
-      all_zeroes = keys.length > 1 && keys.all? { |key| temporary_data[key] == '0' }
+      all_zeroes = keys.length > 1 && keys.all? { |key| temporary_data[key] == "0" }
 
       all_present && !all_zeroes # all zeroes applies to multiple answer questions
     end
@@ -197,13 +197,13 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
     return true if quiz.grants_right?(user, :review_grades)
     return false if quiz.restrict_answers_for_concluded_course?(user: user)
     return false if quiz.one_time_results && has_seen_results?
-    return false if quiz.hide_results == 'always'
+    return false if quiz.hide_results == "always"
 
     results_visible_for_attempt?
   end
 
   def results_visible_for_attempt?
-    return true unless quiz.hide_results == 'until_after_last_attempt'
+    return true unless quiz.hide_results == "until_after_last_attempt"
 
     # Visible if quiz has unlimited attempts (no way to get to last
     # attempts), if this attempt is higher than the allowed attempts
@@ -629,7 +629,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
 
   def mark_completed
     Quizzes::QuizSubmission.where(id: self).update_all({
-                                                         workflow_state: 'complete',
+                                                         workflow_state: "complete",
                                                          has_seen_results: false
                                                        })
   end
@@ -663,7 +663,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   def update_submission_version(version, attrs)
     version_data = YAML.load(version.yaml)
     version_data["submission_data"] = submission_data if attrs.include?(:submission_data)
-    version_data["temporary_user_code"] = "was #{version_data['score']} until #{Time.now}"
+    version_data["temporary_user_code"] = "was #{version_data["score"]} until #{Time.now}"
     version_data["score"] = score if attrs.include?(:score)
     version_data["fudge_points"] = fudge_points if attrs.include?(:fudge_points)
     version_data["workflow_state"] = workflow_state if attrs.include?(:workflow_state)
@@ -806,7 +806,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   # You may still have to deal with StudentView submissions if you want
   # submissions made by students for real, which you can do by using the
   # for_user_ids scope and pass in quiz.context.all_real_student_ids.
-  scope :not_preview, -> { where('was_preview IS NULL OR NOT was_preview') }
+  scope :not_preview, -> { where("was_preview IS NULL OR NOT was_preview") }
 
   # Excludes teacher preview and Student View submissions.
   scope :for_students, ->(quiz) { not_preview.for_user_ids(quiz.context.all_real_student_ids) }
@@ -856,7 +856,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
 
   def delete_ignores
     if completed?
-      Ignore.where(asset_type: 'Quizzes::Quiz', asset_id: quiz_id, user_id: user_id, purpose: 'submitting').delete_all
+      Ignore.where(asset_type: "Quizzes::Quiz", asset_id: quiz_id, user_id: user_id, purpose: "submitting").delete_all
     end
     true
   end
@@ -938,8 +938,8 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   # same as the instance method, but with a hash of attributes, instead
   # of an instance, so that you can avoid instantiating
   def self.late_from_attributes?(attributes, quiz, submission)
-    return submission.late_policy_status == 'late' if submission&.late_policy_status.present?
-    return false if attributes['finished_at'].blank?
+    return submission.late_policy_status == "late" if submission&.late_policy_status.present?
+    return false if attributes["finished_at"].blank?
 
     due_at = if submission.blank?
                quiz.due_at
@@ -948,7 +948,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
              end
     return false if due_at.blank?
 
-    check_time = attributes['finished_at'] - 60.seconds
+    check_time = attributes["finished_at"] - 60.seconds
     check_time > due_at
   end
 

@@ -121,13 +121,13 @@ module BasicLTI
     end
 
     def submit_submission
-      submission.submission_type = params[:submission_type] || 'basic_lti_launch'
+      submission.submission_type = params[:submission_type] || "basic_lti_launch"
       submission.submitted_at = params[:submitted_at] || Time.zone.now
       submission.graded_at = params[:graded_at] || Time.zone.now
       submission.grade_matches_current_submission = false
       # this step is important, to send user notifications
       # see SubmissionPolicy
-      submission.workflow_state = 'submitted'
+      submission.workflow_state = "submitted"
       submission.without_versioning(&:save!)
     end
 

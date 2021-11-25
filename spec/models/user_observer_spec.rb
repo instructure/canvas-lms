@@ -21,9 +21,9 @@
 describe UserObservationLink do
   let_once(:student) { user_factory }
 
-  it 'fails when there is not observer or observee' do
+  it "fails when there is not observer or observee" do
     expect { UserObservationLink.create_or_restore(student: nil, observer: student, root_account: Account.default) }
-      .to raise_error(ArgumentError, 'student, observer and root_account are required')
+      .to raise_error(ArgumentError, "student, observer and root_account are required")
   end
 
   it "does not allow a user to observe oneself" do
@@ -32,7 +32,7 @@ describe UserObservationLink do
     end.to raise_error(ActiveRecord::RecordInvalid)
   end
 
-  it 'restores deleted observees instead of creating a new one' do
+  it "restores deleted observees instead of creating a new one" do
     observer = user_with_pseudonym
     UserObservationLink.create_or_restore(observer: observer, student: student, root_account: Account.default)
     observee = observer.as_observer_observation_links.first
@@ -40,7 +40,7 @@ describe UserObservationLink do
 
     re_observee = UserObservationLink.create_or_restore(observer: observer, student: student, root_account: Account.default)
     expect(observee.id).to eq re_observee.id
-    expect(re_observee.workflow_state).to eq 'active'
+    expect(re_observee.workflow_state).to eq "active"
   end
 
   it 'restores deleted observer enrollments on "restore" (even if nothing about the observee changed)' do
@@ -56,19 +56,19 @@ describe UserObservationLink do
     expect(observer_enroll.reload).to_not be_deleted
   end
 
-  it 'creates an observees when one does not exist' do
+  it "creates an observees when one does not exist" do
     observer = user_with_pseudonym
     re_observee = UserObservationLink.create_or_restore(observer: observer, student: student, root_account: Account.default)
     expect(re_observee).to eq student.as_student_observation_links.first
   end
 
-  it 'creates an observees when there is bad data' do
+  it "creates an observees when there is bad data" do
     observer = user_with_pseudonym
     course1 = course_factory
     course2 = course_factory
-    section = course1.course_sections.create!(name: 'x-list')
+    section = course1.course_sections.create!(name: "x-list")
     section.crosslist_to_course(course2)
-    student_enroll = section.enroll_user(student, 'StudentEnrollment', 'active')
+    student_enroll = section.enroll_user(student, "StudentEnrollment", "active")
     UserObservationLink.create_or_restore(observer: observer, student: student, root_account: Account.default)
     # make some bad data
     Enrollment.where(id: student_enroll.id).update_all(course_id: course1.id)
@@ -94,10 +94,10 @@ describe UserObservationLink do
     expect(enrollments.map(&:workflow_state)).to eql ["active", "active"]
     observer.destroy
     expect(enrollments.reload.map(&:workflow_state)).to eql ["deleted", "deleted"]
-    observer.workflow_state = 'registered'
+    observer.workflow_state = "registered"
     observer.save!
     p = observer.pseudonyms.first
-    p.workflow_state = 'active'
+    p.workflow_state = "active"
     p.save!
     UserObservationLink.create_or_restore(observer: observer, student: student, root_account: Account.default)
     observer.reload
@@ -156,7 +156,7 @@ describe UserObservationLink do
 
   it "does not enroll the observer in institutions where they lack a login" do
     unless has_sharding?
-      skip 'Sharding specs fail without additional support from a multi-tenancy plugin'
+      skip "Sharding specs fail without additional support from a multi-tenancy plugin"
     end
 
     a1 = account_model
@@ -179,14 +179,14 @@ describe UserObservationLink do
     expect(enrollments.map(&:course_id)).to eql [c2.id]
   end
 
-  describe 'when adding a custom (second) student enrollment' do
+  describe "when adding a custom (second) student enrollment" do
     before(:once) do
-      @custom_student_role = custom_student_role('CustomStudent', account: Account.default)
+      @custom_student_role = custom_student_role("CustomStudent", account: Account.default)
       @course = course_factory active_all: true
       @student_enrollment = student_in_course(course: @course, user: student, active_all: true)
       @observer = user_with_pseudonym
       UserObservationLink.create_or_restore(observer: @observer, student: student, root_account: Account.default)
-      @observer_enrollment = @observer.enrollments.where(type: 'ObserverEnrollment', course_id: @course, associated_user_id: student).first
+      @observer_enrollment = @observer.enrollments.where(type: "ObserverEnrollment", course_id: @course, associated_user_id: student).first
     end
 
     it "does not attempt to add a duplicate observer enrollment" do

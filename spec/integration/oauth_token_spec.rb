@@ -93,7 +93,7 @@
 
         if integration == "Twitter"
           expect(Twitter::Connection).to receive(:from_request_token).and_return(double("TwitterConnection",
-                                                                                        access_token: double("AccessToken", token: 'test_token', secret: 'test_secret'),
+                                                                                        access_token: double("AccessToken", token: "test_token", secret: "test_secret"),
                                                                                         service_user_id: "test_user_id",
                                                                                         service_user_name: "test_user_name"))
         end

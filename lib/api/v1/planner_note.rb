@@ -21,11 +21,11 @@ module Api::V1::PlannerNote
   include Api::V1::Json
 
   LINKED_OBJECT_TYPES = {
-    'announcement' => 'Announcement',
-    'assignment' => 'Assignment',
-    'discussion_topic' => 'DiscussionTopic',
-    'wiki_page' => 'WikiPage',
-    'quiz' => 'Quizzes::Quiz'
+    "announcement" => "Announcement",
+    "assignment" => "Assignment",
+    "discussion_topic" => "DiscussionTopic",
+    "wiki_page" => "WikiPage",
+    "quiz" => "Quizzes::Quiz"
   }.freeze
 
   API_JSON_OPTS = {
@@ -35,9 +35,9 @@ module Api::V1::PlannerNote
   def planner_note_json(note, user, session, opts = {})
     api_json(note, user, session, opts.merge(API_JSON_OPTS)).tap do |json|
       if note.linked_object_type.present?
-        json['linked_object_id'] = note.linked_object_id
-        json['linked_object_type'] = LINKED_OBJECT_TYPES.key(note.linked_object_type)
-        json['linked_object_url'], json['linked_object_html_url'] = linked_object_urls(note)
+        json["linked_object_id"] = note.linked_object_id
+        json["linked_object_type"] = LINKED_OBJECT_TYPES.key(note.linked_object_type)
+        json["linked_object_url"], json["linked_object_html_url"] = linked_object_urls(note)
       end
     end
   end

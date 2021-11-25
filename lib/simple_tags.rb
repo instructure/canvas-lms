@@ -20,11 +20,11 @@
 module SimpleTags
   module ReaderInstanceMethods
     def tags
-      @tag_array ||= read_attribute(:tags)&.split(',') || []
+      @tag_array ||= read_attribute(:tags)&.split(",") || []
     end
 
     def serialized_tags(tags = self.tags)
-      SimpleTags.normalize_tags(tags).join(',')
+      SimpleTags.normalize_tags(tags).join(",")
     end
 
     def self.included(klass)
@@ -38,7 +38,7 @@ module SimpleTags
       options[:mode] ||= :or
       conditions = handle_tags(tags, options) +
                    tags.map do |tag|
-                     wildcard(quoted_table_name + '.tags', tag, delimiter: ',')
+                     wildcard(quoted_table_name + ".tags", tag, delimiter: ",")
                    end
       if conditions.empty?
         none

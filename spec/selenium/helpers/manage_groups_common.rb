@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../common'
+require_relative "../common"
 
 module ManageGroupsCommon
   def add_category(course, name, opts = {})
@@ -27,22 +27,22 @@ module ManageGroupsCommon
     input = form.find_element(:css, "input[type=text]")
     replace_content input, name
     enable_self_signup = form.find_element(:css, "#category_enable_self_signup")
-    enable_self_signup.click unless !!enable_self_signup.attribute('checked') == !!opts[:enable_self_signup]
+    enable_self_signup.click unless !!enable_self_signup.attribute("checked") == !!opts[:enable_self_signup]
 
     if opts[:enable_self_signup] && opts[:group_limit]
-      replace_content f('#category_group_limit', form), opts[:group_limit]
+      replace_content f("#category_group_limit", form), opts[:group_limit]
     end
 
     restrict_self_signup = form.find_element(:css, "#category_restrict_self_signup")
-    restrict_self_signup.click unless !!restrict_self_signup.attribute('checked') == !!opts[:restrict_self_signup]
+    restrict_self_signup.click unless !!restrict_self_signup.attribute("checked") == !!opts[:restrict_self_signup]
     if opts[:group_count]
-      if enable_self_signup.attribute('checked')
+      if enable_self_signup.attribute("checked")
         replace_content form.find_element(:css, "#category_create_group_count"), opts[:group_count].to_s
       else
         form.find_element(:css, "#category_split_groups").click
         replace_content form.find_element(:css, "#category_split_group_count"), opts[:group_count].to_s
       end
-    elsif enable_self_signup.attribute('checked')
+    elsif enable_self_signup.attribute("checked")
       form.find_element(:css, "#category_create_group_count").clear
     else
       form.find_element(:css, "#category_no_groups").click
@@ -109,7 +109,7 @@ module ManageGroupsCommon
 
   def expand_group(group_id)
     group_selector = (group_id == "unassigned" ? ".unassigned-students" : ".group[data-id=\"#{group_id}\"]")
-    return if group_selector == ".unassigned-students" || f(group_selector).attribute(:class).include?('group-expanded')
+    return if group_selector == ".unassigned-students" || f(group_selector).attribute(:class).include?("group-expanded")
 
     fj("#{group_selector} .toggle-group").click
     wait_for_ajax_requests

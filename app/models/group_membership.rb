@@ -49,7 +49,7 @@ class GroupMembership < ActiveRecord::Base
   scope :active, -> { where("group_memberships.workflow_state<>'deleted'") }
   scope :moderators, -> { where(moderator: true) }
   scope :active_for_context_and_users, lambda { |context, users|
-    joins(:group).active.where(user_id: users, groups: { context_id: context, workflow_state: 'available' })
+    joins(:group).active.where(user_id: users, groups: { context_id: context, workflow_state: "available" })
   }
 
   resolves_root_account through: :group
@@ -118,7 +118,7 @@ class GroupMembership < ActiveRecord::Base
   def auto_join
     return true if group.try(:group_category).try(:communities?)
 
-    self.workflow_state = 'accepted' if group && (requested? || invited?)
+    self.workflow_state = "accepted" if group && (requested? || invited?)
     true
   end
   protected :auto_join
@@ -147,7 +147,7 @@ class GroupMembership < ActiveRecord::Base
 
   def verify_section_homogeneity_if_necessary
     if new_record? && restricted_self_signup? && !has_common_section_with_me?
-      errors.add(:user_id, t('errors.not_in_group_section', "%{student} does not share a section with the other members of %{group}.", student: user.name, group: group.name))
+      errors.add(:user_id, t("errors.not_in_group_section", "%{student} does not share a section with the other members of %{group}.", student: user.name, group: group.name))
       throw :abort
     end
   end
@@ -155,7 +155,7 @@ class GroupMembership < ActiveRecord::Base
 
   def validate_within_group_limit
     if new_record? && group.full?
-      errors.add(:group_id, t('errors.group_full', 'The group is full.'))
+      errors.add(:group_id, t("errors.group_full", "The group is full."))
     end
   end
   protected :validate_within_group_limit
@@ -172,7 +172,7 @@ class GroupMembership < ActiveRecord::Base
   def update_cached_due_dates?
     workflow_state_changed = previous_changes.key?(:workflow_state)
 
-    workflow_state_changed && group.group_category_id && group.context_type == 'Course'
+    workflow_state_changed && group.group_category_id && group.context_type == "Course"
   end
   private :update_cached_due_dates?
 
@@ -223,7 +223,7 @@ class GroupMembership < ActiveRecord::Base
 
   alias_method :destroy_permanently!, :destroy
   def destroy
-    self.workflow_state = 'deleted'
+    self.workflow_state = "deleted"
     save!
   end
 

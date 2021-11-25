@@ -62,19 +62,19 @@ module Lti
 
       consumer = OAuth::Consumer.new(key, secret, {
                                        site: "#{uri.scheme}://#{host}",
-                                       signature_method: 'HMAC-SHA1'
+                                       signature_method: "HMAC-SHA1"
                                      })
 
       path = uri.path
-      path = '/' if path.empty?
-      if uri.query && uri.query != ''
+      path = "/" if path.empty?
+      if uri.query && uri.query != ""
         CGI.parse(uri.query).each do |query_key, query_values|
           unless params[query_key]
             params[query_key] = query_values.first
           end
         end
       end
-      options = { scheme: 'body' }
+      options = { scheme: "body" }
 
       request = consumer.create_signed_request(:post, path, nil, options, params.stringify_keys)
       # the request is made by a html form in the user's browser, so we
@@ -116,11 +116,11 @@ module Lti
     #  |---nonce_age---Time.now---timestamp---| INVALID
     #
     def self.check_and_store_nonce(cache_key, timestamp, nonce_age)
-      allowed_future_skew = Setting.get('oauth.allowed_timestamp_future_skew', 1.minute.to_s).to_i.seconds
+      allowed_future_skew = Setting.get("oauth.allowed_timestamp_future_skew", 1.minute.to_s).to_i.seconds
       valid = timestamp.to_i > nonce_age.ago.to_i
       valid &&= timestamp.to_i <= (Time.zone.now + allowed_future_skew).to_i
       valid &&= !Rails.cache.exist?(cache_key)
-      Rails.cache.write(cache_key, 'OK', expires_in: nonce_age + allowed_future_skew) if valid
+      Rails.cache.write(cache_key, "OK", expires_in: nonce_age + allowed_future_skew) if valid
       valid
     end
 

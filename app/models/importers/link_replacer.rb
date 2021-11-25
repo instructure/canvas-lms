@@ -195,16 +195,16 @@ module Importers
       # we have to do a little bit more here because the question_data can get copied all over
       quiz_ids = []
       Quizzes::QuizQuestion.where(assessment_question_id: aq.id).find_each do |qq|
-        if recursively_sub_placeholders!(qq['question_data'], links)
-          Quizzes::QuizQuestion.where(id: qq.id).update_all(question_data: qq['question_data'])
+        if recursively_sub_placeholders!(qq["question_data"], links)
+          Quizzes::QuizQuestion.where(id: qq.id).update_all(question_data: qq["question_data"])
           quiz_ids << qq.quiz_id
         end
       end
 
       if quiz_ids.any?
         Quizzes::Quiz.where(id: quiz_ids.uniq).where.not(quiz_data: nil).find_each do |quiz|
-          if recursively_sub_placeholders!(quiz['quiz_data'], links)
-            Quizzes::Quiz.where(id: quiz.id).update_all(quiz_data: quiz['quiz_data'])
+          if recursively_sub_placeholders!(quiz["quiz_data"], links)
+            Quizzes::Quiz.where(id: quiz.id).update_all(quiz_data: quiz["quiz_data"])
           end
         end
       end
@@ -218,19 +218,19 @@ module Importers
         link[:new_value] = aq.translate_file_link(link[:new_value])
       end
 
-      if recursively_sub_placeholders!(aq['question_data'], links)
-        AssessmentQuestion.where(id: aq.id).update_all(question_data: aq['question_data'])
+      if recursively_sub_placeholders!(aq["question_data"], links)
+        AssessmentQuestion.where(id: aq.id).update_all(question_data: aq["question_data"])
       end
     end
 
     def process_quiz_question!(qq, links)
-      if recursively_sub_placeholders!(qq['question_data'], links)
-        Quizzes::QuizQuestion.where(id: qq.id).update_all(question_data: qq['question_data'])
+      if recursively_sub_placeholders!(qq["question_data"], links)
+        Quizzes::QuizQuestion.where(id: qq.id).update_all(question_data: qq["question_data"])
       end
 
       quiz = Quizzes::Quiz.where(id: qq.quiz_id).where.not(quiz_data: nil).first
-      if quiz && recursively_sub_placeholders!(quiz['quiz_data'], links)
-        Quizzes::Quiz.where(id: quiz.id).update_all(quiz_data: quiz['quiz_data'])
+      if quiz && recursively_sub_placeholders!(quiz["quiz_data"], links)
+        Quizzes::Quiz.where(id: quiz.id).update_all(quiz_data: quiz["quiz_data"])
       end
     end
   end

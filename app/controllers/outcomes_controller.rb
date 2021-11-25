@@ -233,7 +233,7 @@ class OutcomesController < ApplicationController
                             else
                               @submission.submitted_attempts.detect { |s| s.attempt >= @result.attempt }
                             end
-      if @asset.is_a?(Quizzes::Quiz) && @result.alignment && @result.alignment.content_type == 'AssessmentQuestionBank'
+      if @asset.is_a?(Quizzes::Quiz) && @result.alignment && @result.alignment.content_type == "AssessmentQuestionBank"
         # anchor to first question in aligned bank
         question_bank_id = @result.alignment.content_id
         first_aligned_question = Quizzes::QuizQuestion.where(quiz_id: @asset.id)
@@ -242,8 +242,8 @@ class OutcomesController < ApplicationController
                                                       .order(:position).first
         anchor = first_aligned_question ? "question_#{first_aligned_question.id}" : nil
       elsif @asset.is_a? AssessmentQuestion
-        question = @submission.quiz_data.detect { |q| q['assessment_question_id'] == @asset.data[:id] }
-        question_id = (question && question['id']) || @asset.data[:id]
+        question = @submission.quiz_data.detect { |q| q["assessment_question_id"] == @asset.data[:id] }
+        question_id = (question && question["id"]) || @asset.data[:id]
         anchor = "question_#{question_id}"
       end
       redirect_to named_context_url(
@@ -253,7 +253,7 @@ class OutcomesController < ApplicationController
         anchor: anchor
       )
     else
-      flash[:error] = "Unrecognized artifact type: #{@result.try(:artifact_type) || 'nil'}"
+      flash[:error] = "Unrecognized artifact type: #{@result.try(:artifact_type) || "nil"}"
       redirect_to named_context_url(@context, :context_outcome_url, @outcome.id)
     end
   end

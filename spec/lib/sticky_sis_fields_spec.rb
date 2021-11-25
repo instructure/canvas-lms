@@ -29,7 +29,7 @@ describe StickySisFields do
     end
   end
 
-  it 'sets sis stickiness for changed fields' do
+  it "sets sis stickiness for changed fields" do
     ac = create_abstract_course
     expect(ac.stuck_sis_fields).to eq [].to_set
     ac.name = "3"
@@ -76,7 +76,7 @@ describe StickySisFields do
     expect(ac.stuck_sis_fields).to eq [:name, :short_name].to_set
   end
 
-  it 'sets sis stickiness for changed fields without reloading' do
+  it "sets sis stickiness for changed fields without reloading" do
     ac = create_abstract_course
     expect(ac.stuck_sis_fields).to eq [].to_set
     ac.name = "3"
@@ -114,7 +114,7 @@ describe StickySisFields do
     expect(ac.stuck_sis_fields).to eq [:name, :short_name].to_set
   end
 
-  it 'sets sis stickiness for changed fields with new models' do
+  it "sets sis stickiness for changed fields with new models" do
     ac = create_abstract_course
     expect(ac.stuck_sis_fields).to eq [].to_set
     ac.name = "3"
@@ -161,8 +161,8 @@ describe StickySisFields do
     expect(ac.stuck_sis_fields).to eq [:name, :short_name].to_set
   end
 
-  context 'clear_sis_stickiness' do
-    it 'clears out fields that are in the saved list' do
+  context "clear_sis_stickiness" do
+    it "clears out fields that are in the saved list" do
       ac = create_abstract_course
       expect(ac.stuck_sis_fields).to eq [].to_set
       ac.name = "ac name"
@@ -176,7 +176,7 @@ describe StickySisFields do
       expect(ac.stuck_sis_fields).to eq [].to_set
     end
 
-    it 'clears out fields that are in the stuck list' do
+    it "clears out fields that are in the stuck list" do
       ac = create_abstract_course
       expect(ac.stuck_sis_fields).to eq [].to_set
       ac.add_sis_stickiness(:name)
@@ -188,7 +188,7 @@ describe StickySisFields do
       expect(ac.stuck_sis_fields).to eq [].to_set
     end
 
-    it 'ignores fields that already unstuck' do
+    it "ignores fields that already unstuck" do
       ac = create_abstract_course
       expect(ac.stuck_sis_fields).to eq [].to_set
       ac.name = "ac name"
@@ -210,8 +210,8 @@ describe StickySisFields do
     end
   end
 
-  context 'add_sis_stickiness' do
-    it 'ignores fields that are in the saved list' do
+  context "add_sis_stickiness" do
+    it "ignores fields that are in the saved list" do
       ac = create_abstract_course
       expect(ac.stuck_sis_fields).to eq [].to_set
       ac.name = "ac name"
@@ -225,7 +225,7 @@ describe StickySisFields do
       expect(ac.stuck_sis_fields).to eq [:name].to_set
     end
 
-    it 'ignores fields that are in the stuck list' do
+    it "ignores fields that are in the stuck list" do
       ac = create_abstract_course
       expect(ac.stuck_sis_fields).to eq [].to_set
       ac.add_sis_stickiness(:name)
@@ -237,7 +237,7 @@ describe StickySisFields do
       expect(ac.stuck_sis_fields).to eq [:name].to_set
     end
 
-    it 'adds fields that are in the unstuck list' do
+    it "adds fields that are in the unstuck list" do
       ac = create_abstract_course
       expect(ac.stuck_sis_fields).to eq [].to_set
       ac.name = "ac name"
@@ -277,11 +277,11 @@ describe StickySisFields do
   it "writes to the database when there's a change" do
     ac = create_abstract_course
     ac.add_sis_stickiness(:name)
-    expect(ac).to receive(:write_attribute).with(:workflow_state, 'active').ordered
-    expect(ac).to receive(:write_attribute).with('root_account_id', Account.default.id).ordered
-    expect(ac).to receive(:write_attribute).with('account_id', Account.default.id).ordered
-    expect(ac).to receive(:write_attribute).with('enrollment_term_id', Account.default.default_enrollment_term.id).ordered
-    expect(ac).to receive(:write_attribute).with(:stuck_sis_fields, 'name').ordered
+    expect(ac).to receive(:write_attribute).with(:workflow_state, "active").ordered
+    expect(ac).to receive(:write_attribute).with("root_account_id", Account.default.id).ordered
+    expect(ac).to receive(:write_attribute).with("account_id", Account.default.id).ordered
+    expect(ac).to receive(:write_attribute).with("enrollment_term_id", Account.default.default_enrollment_term.id).ordered
+    expect(ac).to receive(:write_attribute).with(:stuck_sis_fields, "name").ordered
     ac.save!
   end
 

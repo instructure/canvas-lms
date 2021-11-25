@@ -21,14 +21,14 @@
 describe AssessmentQuestion do
   before :once do
     course_factory
-    @bank = @course.assessment_question_banks.create!(title: 'Test Bank')
+    @bank = @course.assessment_question_banks.create!(title: "Test Bank")
   end
 
   def attachment_in_course(course)
     Attachment.create!(
-      filename: 'test.jpg',
+      filename: "test.jpg",
       display_name: "test.jpg",
-      uploaded_data: StringIO.new('psych!'),
+      uploaded_data: StringIO.new("psych!"),
       folder: Folder.unfiled_folder(course),
       context: course
     )
@@ -52,45 +52,45 @@ describe AssessmentQuestion do
 
   it "translates links to be readable when creating the assessment question" do
     @attachment = attachment_in_course(@course)
-    data = { 'name' => "Hi", 'question_text' => "Translate this: <img src='/courses/#{@course.id}/files/#{@attachment.id}/download'>", 'answers' => [{ 'id' => 1 }, { 'id' => 2 }] }
+    data = { "name" => "Hi", "question_text" => "Translate this: <img src='/courses/#{@course.id}/files/#{@attachment.id}/download'>", "answers" => [{ "id" => 1 }, { "id" => 2 }] }
     @question = @bank.assessment_questions.create!(question_data: data)
 
     @clone = @question.attachments.where(root_attachment: @attachment).first
 
-    expect(@question.reload.question_data['question_text']).to eq "Translate this: <img src='/assessment_questions/#{@question.id}/files/#{@clone.id}/download?verifier=#{@clone.uuid}'>"
+    expect(@question.reload.question_data["question_text"]).to eq "Translate this: <img src='/assessment_questions/#{@question.id}/files/#{@clone.id}/download?verifier=#{@clone.uuid}'>"
   end
 
   it "translates links relative path url" do
     @attachment = attachment_in_course(@course)
-    data = { 'name' => "Hi", 'question_text' => "Translate this: <img src='/courses/#{@course.id}/file_contents/course%20files/unfiled/test.jpg'>", 'answers' => [{ 'id' => 1 }, { 'id' => 2 }] }
+    data = { "name" => "Hi", "question_text" => "Translate this: <img src='/courses/#{@course.id}/file_contents/course%20files/unfiled/test.jpg'>", "answers" => [{ "id" => 1 }, { "id" => 2 }] }
     @question = @bank.assessment_questions.create!(question_data: data)
 
     @clone = @question.attachments.where(root_attachment: @attachment).first
 
-    expect(@question.reload.question_data['question_text']).to eq "Translate this: <img src='/assessment_questions/#{@question.id}/files/#{@clone.id}/download?verifier=#{@clone.uuid}'>"
+    expect(@question.reload.question_data["question_text"]).to eq "Translate this: <img src='/assessment_questions/#{@question.id}/files/#{@clone.id}/download?verifier=#{@clone.uuid}'>"
   end
 
   it "handles existing query string parameters" do
     @attachment = attachment_in_course(@course)
-    data = { 'name' => "Hi",
-             'question_text' => "Translate this: <img src='/courses/#{@course.id}/files/#{@attachment.id}/download?wrap=1'> and this: <img src='/courses/#{@course.id}/file_contents/course%20files/unfiled/test.jpg?wrap=1'>",
-             'answers' => [{ 'id' => 1 }, { 'id' => 2 }] }
+    data = { "name" => "Hi",
+             "question_text" => "Translate this: <img src='/courses/#{@course.id}/files/#{@attachment.id}/download?wrap=1'> and this: <img src='/courses/#{@course.id}/file_contents/course%20files/unfiled/test.jpg?wrap=1'>",
+             "answers" => [{ "id" => 1 }, { "id" => 2 }] }
     @question = @bank.assessment_questions.create!(question_data: data)
 
     @clone = @question.attachments.where(root_attachment: @attachment).first
 
-    expect(@question.reload.question_data['question_text']).to eq "Translate this: <img src='/assessment_questions/#{@question.id}/files/#{@clone.id}/download?verifier=#{@clone.uuid}&wrap=1'> and this: <img src='/assessment_questions/#{@question.id}/files/#{@clone.id}/download?verifier=#{@clone.uuid}&wrap=1'>"
+    expect(@question.reload.question_data["question_text"]).to eq "Translate this: <img src='/assessment_questions/#{@question.id}/files/#{@clone.id}/download?verifier=#{@clone.uuid}&wrap=1'> and this: <img src='/assessment_questions/#{@question.id}/files/#{@clone.id}/download?verifier=#{@clone.uuid}&wrap=1'>"
   end
 
   it "translates multiple links in same body" do
     @attachment = attachment_in_course(@course)
 
-    data = { 'name' => "Hi", 'question_text' => "Translate this: <img src='/courses/#{@course.id}/files/#{@attachment.id}/download'> and this: <img src='/courses/#{@course.id}/file_contents/course%20files/unfiled/test.jpg'>", 'answers' => [{ 'id' => 1 }, { 'id' => 2 }] }
+    data = { "name" => "Hi", "question_text" => "Translate this: <img src='/courses/#{@course.id}/files/#{@attachment.id}/download'> and this: <img src='/courses/#{@course.id}/file_contents/course%20files/unfiled/test.jpg'>", "answers" => [{ "id" => 1 }, { "id" => 2 }] }
     @question = @bank.assessment_questions.create!(question_data: data)
 
     @clone = @question.attachments.where(root_attachment: @attachment).first
 
-    expect(@question.reload.question_data['question_text']).to eq "Translate this: <img src='/assessment_questions/#{@question.id}/files/#{@clone.id}/download?verifier=#{@clone.uuid}'> and this: <img src='/assessment_questions/#{@question.id}/files/#{@clone.id}/download?verifier=#{@clone.uuid}'>"
+    expect(@question.reload.question_data["question_text"]).to eq "Translate this: <img src='/assessment_questions/#{@question.id}/files/#{@clone.id}/download?verifier=#{@clone.uuid}'> and this: <img src='/assessment_questions/#{@question.id}/files/#{@clone.id}/download?verifier=#{@clone.uuid}'>"
   end
 
   it "translates links to be readable w/ verifier" do
@@ -98,14 +98,14 @@ describe AssessmentQuestion do
     attachment_tag = lambda do |key|
       @attachments[key] ||= []
       a = @course.attachments.build(filename: "foo-#{key}.gif")
-      a.content_type = 'image/gif'
+      a.content_type = "image/gif"
       a.save!
       @attachments[key] << a
       "<img src=\"/courses/#{@course.id}/files/#{a.id}/download\">"
     end
     data = {
-      name: 'test question',
-      question_type: 'multiple_choice_question',
+      name: "test question",
+      question_type: "multiple_choice_question",
       question_text: "which ones are like this one? #{attachment_tag.call([:question_text])} what about: #{attachment_tag.call([:question_text])}",
       correct_comments: "yay! #{attachment_tag.call([:correct_comments])}",
       incorrect_comments: "boo! #{attachment_tag.call([:incorrect_comments])}",
@@ -143,11 +143,11 @@ describe AssessmentQuestion do
   end
 
   it "does not drop non-string/array/hash data types when translate links" do
-    bank = @course.assessment_question_banks.create!(title: 'Test Bank')
+    bank = @course.assessment_question_banks.create!(title: "Test Bank")
 
     data = {
-      name: 'mc question',
-      question_type: 'multiple_choice_question',
+      name: "mc question",
+      question_type: "multiple_choice_question",
       question_text: "text text text",
       points_possible: "10",
       correct_comments: "",
@@ -171,8 +171,8 @@ describe AssessmentQuestion do
 
   it "always returns a HashWithIndifferentAccess and allow editing" do
     data = {
-      name: 'mc question',
-      question_type: 'multiple_choice_question',
+      name: "mc question",
+      question_type: "multiple_choice_question",
       question_text: "text text text",
       points_possible: "10",
       answers: {
@@ -193,17 +193,17 @@ describe AssessmentQuestion do
     expect(data.object_id).to eq question.question_data.object_id
   end
 
-  describe '.find_or_create_quiz_questions' do
+  describe ".find_or_create_quiz_questions" do
     let(:assessment_question) { assessment_question_model(bank: AssessmentQuestionBank.create!(context: Course.create!)) }
     let(:quiz) { quiz_model }
 
-    it 'creates a quiz_question when one does not exist' do
+    it "creates a quiz_question when one does not exist" do
       expect do
         AssessmentQuestion.find_or_create_quiz_questions([assessment_question], quiz.id, nil)
       end.to change { Quizzes::QuizQuestion.count }.by(1)
     end
 
-    it 'finds an existing quiz_question' do
+    it "finds an existing quiz_question" do
       qq = AssessmentQuestion.find_or_create_quiz_questions([assessment_question], quiz.id, nil).first
 
       expect do
@@ -212,12 +212,12 @@ describe AssessmentQuestion do
       end.to_not change { AssessmentQuestion.count }
     end
 
-    it 'finds and update an out of date quiz_question' do
+    it "finds and update an out of date quiz_question" do
       aq = assessment_question
       qq = AssessmentQuestion.find_or_create_quiz_questions([aq], quiz.id, nil).first
 
       aq = AssessmentQuestion.find(aq.id)
-      aq.name = 'changed'
+      aq.name = "changed"
       aq.with_versioning(&:save!)
 
       expect(qq.assessment_question_version).to_not eql(aq.version_number)
@@ -238,7 +238,7 @@ describe AssessmentQuestion do
     end
   end
 
-  context 'root_account_id' do
+  context "root_account_id" do
     it "uses root_account value from account" do
       question = assessment_question_model(bank: AssessmentQuestionBank.create!(context: Course.create!))
 

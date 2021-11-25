@@ -24,7 +24,7 @@ module CC
         # the CC Web Link
         link_file_name = "#{tag[:migration_id]}.xml"
         link_path = File.join(@export_dir, link_file_name)
-        link_file = File.new(link_path, 'w')
+        link_file = File.new(link_path, "w")
         link_doc = Builder::XmlMarkup.new(target: link_file, indent: 2)
         link_doc.instruct!
 

@@ -29,7 +29,7 @@ module CC
         rubrics_file = nil
         rel_path = nil
       else
-        rubrics_file = File.new(File.join(@canvas_resource_dir, CCHelper::RUBRICS), 'w')
+        rubrics_file = File.new(File.join(@canvas_resource_dir, CCHelper::RUBRICS), "w")
         rel_path = File.join(CCHelper::COURSE_SETTINGS_DIR, CCHelper::RUBRICS)
         document = Builder::XmlMarkup.new(target: rubrics_file, indent: 2)
       end
@@ -52,7 +52,7 @@ module CC
           end
           imported_rubrics[rubric.id] = true
           rubric.learning_outcome_alignments.each do |align|
-            add_item_to_export(align.learning_outcome, 'learning_outcomes')
+            add_item_to_export(align.learning_outcome, "learning_outcomes")
           end
 
           add_exported_asset(rubric)

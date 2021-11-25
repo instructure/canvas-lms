@@ -22,7 +22,7 @@ describe GroupCategory do
   let_once(:account) { Account.default }
   before(:once) { course_with_teacher(active_all: true) }
 
-  it 'delegates time_zone through to its context' do
+  it "delegates time_zone through to its context" do
     zone = ActiveSupport::TimeZone["America/Denver"]
     course = Course.new(time_zone: zone)
     category = GroupCategory.new(context: course)
@@ -31,19 +31,19 @@ describe GroupCategory do
 
   context "protected_name_for_context?" do
     it "is false for 'Student Groups' in accounts" do
-      is_protected = GroupCategory.protected_name_for_context?('Student Groups', account)
+      is_protected = GroupCategory.protected_name_for_context?("Student Groups", account)
       expect(is_protected).to be_falsey
     end
 
     it "is true for 'Student Groups' in courses" do
       course = @course
-      expect(GroupCategory.protected_name_for_context?('Student Groups', course)).to be_truthy
+      expect(GroupCategory.protected_name_for_context?("Student Groups", course)).to be_truthy
     end
 
     it "is true for 'Imported Groups' in both accounts and courses" do
       course = @course
-      expect(GroupCategory.protected_name_for_context?('Imported Groups', account)).to be_truthy
-      expect(GroupCategory.protected_name_for_context?('Imported Groups', course)).to be_truthy
+      expect(GroupCategory.protected_name_for_context?("Imported Groups", account)).to be_truthy
+      expect(GroupCategory.protected_name_for_context?("Imported Groups", course)).to be_truthy
     end
   end
 
@@ -56,7 +56,7 @@ describe GroupCategory do
       course = @course
       category = GroupCategory.student_organized_for(course)
       expect(category).not_to be_nil
-      expect(category.role).to eql('student_organized')
+      expect(category.role).to eql("student_organized")
       expect(category.context).to eql(course)
     end
 
@@ -76,7 +76,7 @@ describe GroupCategory do
     it "is a category belonging to the account with role 'communities'" do
       category = GroupCategory.communities_for(account)
       expect(category).not_to be_nil
-      expect(category.role).to eql('communities')
+      expect(category.role).to eql("communities")
       expect(category.context).to eql(account)
     end
 
@@ -91,7 +91,7 @@ describe GroupCategory do
     it "is a category belonging to the account with role 'imported' in accounts" do
       category = GroupCategory.imported_for(account)
       expect(category).not_to be_nil
-      expect(category.role).to eql('imported')
+      expect(category.role).to eql("imported")
       expect(category.context).to eql(account)
     end
 
@@ -99,7 +99,7 @@ describe GroupCategory do
       course = @course
       category = GroupCategory.imported_for(course)
       expect(category).not_to be_nil
-      expect(category.role).to eql('imported')
+      expect(category.role).to eql("imported")
       expect(category.context).to eql(course)
     end
 
@@ -111,54 +111,54 @@ describe GroupCategory do
     end
   end
 
-  context 'student_organized?' do
+  context "student_organized?" do
     it "is true iff the role is 'student_organized', regardless of name" do
       course = @course
       expect(GroupCategory.student_organized_for(course)).to be_student_organized
-      expect(account.group_categories.create(name: 'Student Groups')).not_to be_student_organized
+      expect(account.group_categories.create(name: "Student Groups")).not_to be_student_organized
       expect(GroupCategory.imported_for(course)).not_to be_student_organized
       expect(GroupCategory.imported_for(course)).not_to be_student_organized
-      expect(course.group_categories.create(name: 'Random Category')).not_to be_student_organized
+      expect(course.group_categories.create(name: "Random Category")).not_to be_student_organized
       expect(GroupCategory.communities_for(account)).not_to be_student_organized
     end
   end
 
-  context 'communities?' do
+  context "communities?" do
     it "is true if the role is 'communities', regardless of name" do
       course = @course
       expect(GroupCategory.student_organized_for(course)).not_to be_communities
-      expect(account.group_categories.create(name: 'Communities')).not_to be_communities
+      expect(account.group_categories.create(name: "Communities")).not_to be_communities
       expect(GroupCategory.imported_for(course)).not_to be_communities
       expect(GroupCategory.imported_for(course)).not_to be_communities
-      expect(course.group_categories.create(name: 'Random Category')).not_to be_communities
+      expect(course.group_categories.create(name: "Random Category")).not_to be_communities
       expect(GroupCategory.communities_for(account)).to be_communities
     end
   end
 
-  context 'allows_multiple_memberships?' do
+  context "allows_multiple_memberships?" do
     it "is true iff the category is student organized or communities" do
       course = @course
       expect(GroupCategory.student_organized_for(course).allows_multiple_memberships?).to be_truthy
-      expect(account.group_categories.create(name: 'Student Groups').allows_multiple_memberships?).to be_falsey
+      expect(account.group_categories.create(name: "Student Groups").allows_multiple_memberships?).to be_falsey
       expect(GroupCategory.imported_for(course).allows_multiple_memberships?).to be_falsey
       expect(GroupCategory.imported_for(course).allows_multiple_memberships?).to be_falsey
-      expect(course.group_categories.create(name: 'Random Category').allows_multiple_memberships?).to be_falsey
+      expect(course.group_categories.create(name: "Random Category").allows_multiple_memberships?).to be_falsey
       expect(GroupCategory.communities_for(account).allows_multiple_memberships?).to be_truthy
     end
   end
 
-  context 'protected?' do
+  context "protected?" do
     it "is true iff the category has a role other than 'imported'" do
       course = @course
       expect(GroupCategory.student_organized_for(course)).to be_protected
-      expect(account.group_categories.create(name: 'Student Groups')).not_to be_protected
+      expect(account.group_categories.create(name: "Student Groups")).not_to be_protected
       expect(GroupCategory.imported_for(course)).not_to be_protected
-      expect(course.group_categories.create(name: 'Random Category')).not_to be_protected
+      expect(course.group_categories.create(name: "Random Category")).not_to be_protected
       expect(GroupCategory.communities_for(account)).to be_protected
     end
   end
 
-  context 'destroy' do
+  context "destroy" do
     it "does not remove the database row" do
       category = GroupCategory.create(name: "foo", course: @course)
       category.destroy
@@ -190,7 +190,7 @@ describe GroupCategory do
     @category = GroupCategory.new
     @category.name = "foo"
     @category.context = course_factory
-    @category.self_signup = 'enabled'
+    @category.self_signup = "enabled"
     expect(@category.self_signup?).to be_truthy
     expect(@category.unrestricted_self_signup?).to be_truthy
   end
@@ -211,8 +211,8 @@ describe GroupCategory do
     it "is true if two students that don't share a section are in the same group" do
       section1 = @course.course_sections.create
       section2 = @course.course_sections.create
-      user1 = section1.enroll_user(user_model, 'StudentEnrollment').user
-      user2 = section2.enroll_user(user_model, 'StudentEnrollment').user
+      user1 = section1.enroll_user(user_model, "StudentEnrollment").user
+      user2 = section2.enroll_user(user_model, "StudentEnrollment").user
       category = group_category
       group = category.groups.create(context: @course)
       group.add_user(user1)
@@ -222,8 +222,8 @@ describe GroupCategory do
 
     it "is false if all students in each group have a section in common" do
       section1 = @course.course_sections.create
-      user1 = section1.enroll_user(user_model, 'StudentEnrollment').user
-      user2 = section1.enroll_user(user_model, 'StudentEnrollment').user
+      user1 = section1.enroll_user(user_model, "StudentEnrollment").user
+      user2 = section1.enroll_user(user_model, "StudentEnrollment").user
       category = group_category
       group = category.groups.create(context: @course)
       group.add_user(user1)
@@ -297,7 +297,7 @@ describe GroupCategory do
 
     it "assigns leaders according to policy" do
       category = @course.group_categories.create(name: "Group Category")
-      category.update_attribute(:auto_leader, 'first')
+      category.update_attribute(:auto_leader, "first")
       (1..3).each { |n| category.groups.create(name: "Group #{n}", context: @course) }
       create_users_in_course(@course, 6)
 
@@ -485,9 +485,9 @@ describe GroupCategory do
       expect(@category.create_group_count).to eq 3
     end
 
-    it 'calculates correctly for same section groups' do
-      section1 = @course.course_sections.create!(name: 'one')
-      section2 = @course.course_sections.create!(name: 'two')
+    it "calculates correctly for same section groups" do
+      section1 = @course.course_sections.create!(name: "one")
+      section2 = @course.course_sections.create!(name: "two")
       [section1, section2].each { |section| create_users_in_course(@course, 3, section: section) }
       @category.create_group_member_count = 2
       @category.calculate_group_count_by_membership(by_section: true)
@@ -658,7 +658,7 @@ describe GroupCategory do
       student_in_course(course: @course)
 
       group = @category.groups.create(name: "Group", context: @course)
-      @category.update_attribute(:auto_leader, 'first')
+      @category.update_attribute(:auto_leader, "first")
 
       @category.assign_unassigned_members(true)
       expect(group.reload.users).to eq [@student]
@@ -666,44 +666,44 @@ describe GroupCategory do
     end
   end
 
-  it 'sets root_account_id when created' do
-    group_category = GroupCategory.create!(name: 'Test', account: account)
-    group_category_course = GroupCategory.create!(name: 'Test', course: @course)
+  it "sets root_account_id when created" do
+    group_category = GroupCategory.create!(name: "Test", account: account)
+    group_category_course = GroupCategory.create!(name: "Test", course: @course)
 
     expect(group_category.root_account_id).to eq(account.id)
     expect(group_category_course.root_account_id).to eq(account.id)
   end
 
-  it 'requires a group category to belong to an account or course' do
+  it "requires a group category to belong to an account or course" do
     expect do
-      GroupCategory.create!(name: 'Test') # don't provide an account or course; should fail
+      GroupCategory.create!(name: "Test") # don't provide an account or course; should fail
     end.to raise_error(ActiveRecord::RecordInvalid)
 
-    gc = GroupCategory.create(name: 'Test')
-    expect(gc.errors.full_messages).to include('Context Must have an account or course ID')
-    expect(gc.errors.full_messages).to include('Context type Must belong to an account or course')
+    gc = GroupCategory.create(name: "Test")
+    expect(gc.errors.full_messages).to include("Context Must have an account or course ID")
+    expect(gc.errors.full_messages).to include("Context type Must belong to an account or course")
   end
 
-  it 'makes sure sis_batch_id is valid' do
+  it "makes sure sis_batch_id is valid" do
     expect do
-      GroupCategory.create!(name: 'Test', account: account, sis_batch_id: 1)
+      GroupCategory.create!(name: "Test", account: account, sis_batch_id: 1)
     end.to raise_error(ActiveRecord::InvalidForeignKey)
 
     sis_batch = SisBatch.create!(account: account)
-    gc = GroupCategory.create!(name: 'Test2', account: account, sis_batch: sis_batch)
+    gc = GroupCategory.create!(name: "Test2", account: account, sis_batch: sis_batch)
     expect(gc.sis_batch_id).to eq(sis_batch.id)
   end
 
-  it 'makes sure sis_source_id is unique per root_account' do
-    GroupCategory.create!(name: 'Test', account: account, sis_source_id: '1')
+  it "makes sure sis_source_id is unique per root_account" do
+    GroupCategory.create!(name: "Test", account: account, sis_source_id: "1")
 
     expect do
-      GroupCategory.create!(name: 'Test2', account: account, sis_source_id: '1')
+      GroupCategory.create!(name: "Test2", account: account, sis_source_id: "1")
     end.to raise_error(ActiveRecord::RecordInvalid)
 
     new_account = Account.create
-    gc = GroupCategory.create!(name: 'Test3', account: new_account, sis_source_id: 1)
-    expect(gc.sis_source_id).to eq('1')
+    gc = GroupCategory.create!(name: "Test3", account: new_account, sis_source_id: 1)
+    expect(gc.sis_source_id).to eq("1")
   end
 end
 
@@ -733,7 +733,7 @@ def assert_random_group_assignment(category, course, initial_spread, result_spre
   # set up initial spread
   initial_memberships = []
   category.groups.each_with_index do |group, group_index|
-    initial_spread[group_index].times { initial_memberships << group.add_user(course_users.pop, 'accepted') }
+    initial_spread[group_index].times { initial_memberships << group.add_user(course_users.pop, "accepted") }
   end
 
   # perform random assignment

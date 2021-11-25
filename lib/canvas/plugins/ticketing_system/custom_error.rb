@@ -64,7 +64,7 @@ module Canvas::Plugins::TicketingSystem
     end
 
     def sub_account_tag(asset_manager = ::Context, expected_type = Course)
-      if (context_string = data['context_asset_string'])
+      if (context_string = data["context_asset_string"])
         context = asset_manager.find_by_asset_string(context_string)
         if context.is_a? expected_type
           "subaccount_#{context.account_id}"
@@ -76,7 +76,7 @@ module Canvas::Plugins::TicketingSystem
     # report from the "Posted as _ERROR_" portion of our
     # error report backtrace attribute, but if there's nothing
     # recognizable there it will just assume it's an ERROR
-    def report_type(default_value = 'ERROR')
+    def report_type(default_value = "ERROR")
       return default_value unless backtrace.present?
 
       first_line = backtrace.split("\n").first
@@ -85,11 +85,11 @@ module Canvas::Plugins::TicketingSystem
     end
 
     def user_severity
-      (data.is_a?(Hash) && data['user_perceived_severity']) || ''
+      (data.is_a?(Hash) && data["user_perceived_severity"]) || ""
     end
 
     def user_roles
-      data.is_a?(Hash) ? data['user_roles'] : nil
+      data.is_a?(Hash) ? data["user_roles"] : nil
     end
 
     def account_domain_value
@@ -104,9 +104,9 @@ module Canvas::Plugins::TicketingSystem
       if url && user_id
         begin
           become_user_uri = URI.parse(url)
-          become_user_uri.query = (Hash[*(become_user_uri.query || '')
-                          .split('&').map { |part| part.split('=') }.flatten])
-                                  .merge({ 'become_user_id' => user_id }).to_query
+          become_user_uri.query = (Hash[*(become_user_uri.query || "")
+                          .split("&").map { |part| part.split("=") }.flatten])
+                                  .merge({ "become_user_id" => user_id }).to_query
         rescue URI::Error
           become_user_uri = "unable to parse uri: #{url}"
         end

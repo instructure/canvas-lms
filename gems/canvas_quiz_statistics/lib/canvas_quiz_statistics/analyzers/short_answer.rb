@@ -18,8 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 module CanvasQuizStatistics::Analyzers
-  require 'canvas_quiz_statistics/analyzers/multiple_choice'
-  require 'canvas_quiz_statistics/analyzers/fill_in_multiple_blanks'
+  require "canvas_quiz_statistics/analyzers/multiple_choice"
+  require "canvas_quiz_statistics/analyzers/fill_in_multiple_blanks"
 
   # Generates statistics for a set of student responses to a short answer,
   # aka Fill in the Blank, question.

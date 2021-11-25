@@ -18,9 +18,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'aws-sdk-s3'
-require 'aws-sdk-sqs'
-require_relative 'configurable_timeout'
+require "aws-sdk-s3"
+require "aws-sdk-sqs"
+require_relative "configurable_timeout"
 
 module IncomingMailProcessor
   class SqsMailbox
@@ -87,10 +87,10 @@ module IncomingMailProcessor
 
     def raw_contents(msg)
       sqs_body = JSON.parse(msg.body)
-      sns_body = JSON.parse(sqs_body['Message'])
-      key = sns_body['mail']['messageId']
+      sns_body = JSON.parse(sqs_body["Message"])
+      key = sns_body["mail"]["messageId"]
       s3 = Aws::S3::Resource.new(access_key_id: config[:access_key_id], secret_access_key: config[:secret_access_key],
-                                 region: config[:region] || 'us-east-1')
+                                 region: config[:region] || "us-east-1")
       obj = s3.bucket(config[:incoming_mail_bucket]).object(key)
       obj.get.body.read
     end

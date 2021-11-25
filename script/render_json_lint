@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
-require 'ruby_parser'
+require "ruby_parser"
 
 def deep_inspect(expr, &block)
   return unless expr.is_a?(Sexp)

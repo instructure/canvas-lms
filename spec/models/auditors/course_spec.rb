@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../../cassandra_spec_helper'
+require_relative "../../cassandra_spec_helper"
 
 describe Auditors::Course do
   let(:request_id) { 42 }
@@ -39,7 +39,7 @@ describe Auditors::Course do
 
   describe "with cassandra backend" do
     before do
-      allow(Audits).to receive(:config).and_return({ 'write_paths' => ['cassandra'], 'read_path' => 'cassandra' })
+      allow(Audits).to receive(:config).and_return({ "write_paths" => ["cassandra"], "read_path" => "cassandra" })
     end
 
     include_examples "cassandra audit logs"
@@ -164,13 +164,13 @@ describe Auditors::Course do
         @event = Auditors::Course.record_updated(@course, @teacher, @course.changes)
 
         record = Auditors::Course::Record.new(
-          'course' => @course,
-          'user' => @teacher,
-          'event_type' => 'updated',
-          'event_data' => @course.changes,
-          'event_source' => 'manual',
-          'sis_batch_id' => nil,
-          'created_at' => 1.day.ago
+          "course" => @course,
+          "user" => @teacher,
+          "event_type" => "updated",
+          "event_data" => @course.changes,
+          "event_source" => "manual",
+          "sis_batch_id" => nil,
+          "created_at" => 1.day.ago
         )
         @event2 = Auditors::Course::Stream.insert(record)
       end
@@ -199,7 +199,7 @@ describe Auditors::Course do
 
   describe "with dual writing enabled to postgres" do
     before do
-      allow(Audits).to receive(:config).and_return({ 'write_paths' => ['cassandra', 'active_record'], 'read_path' => 'cassandra' })
+      allow(Audits).to receive(:config).and_return({ "write_paths" => ["cassandra", "active_record"], "read_path" => "cassandra" })
     end
 
     it "writes to cassandra" do

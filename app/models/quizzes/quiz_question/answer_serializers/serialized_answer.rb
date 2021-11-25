@@ -55,12 +55,12 @@ module Quizzes::QuizQuestion::AnswerSerializers
 
     ERROR_CODES = {
       invalid_type: lambda do |param_name, expected_type|
-        '%s must be of type %s' % [param_name, expected_type.to_s]
+        "%s must be of type %s" % [param_name, expected_type.to_s]
       end,
       unknown_answer: ->(id) { "Unknown answer '#{id}'" },
       unknown_match: ->(id) { "Unknown match '#{id}'" },
       unknown_blank: ->(id) { "Unknown blank '#{id}'" },
-      text_too_long: 'Text is too long.'
+      text_too_long: "Text is too long."
     }.freeze
     private_constant :ERROR_CODES
   end

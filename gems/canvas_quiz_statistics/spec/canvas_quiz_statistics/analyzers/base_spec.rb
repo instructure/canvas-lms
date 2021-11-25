@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'spec_helper'
+require "spec_helper"
 
 # rubocop:disable Lint/ConstantDefinitionInBlock, RSpec/LeakyConstantDeclaration
 # these specs needs to work with real constants, because they inherit from a class
@@ -26,7 +26,7 @@ describe CanvasQuizStatistics::Analyzers::Base do
   Base = CanvasQuizStatistics::Analyzers::Base
   subject { described_class.new({}) }
 
-  describe 'DSL' do
+  describe "DSL" do
     def unset(*klasses)
       klasses.each do |klass|
         Object.send(:remove_const, klass.name.demodulize)
@@ -34,8 +34,8 @@ describe CanvasQuizStatistics::Analyzers::Base do
       end
     end
 
-    describe '#metric' do
-      it 'defines a metric calculator' do
+    describe "#metric" do
+      it "defines a metric calculator" do
         class Apple < Base
           metric :something, &:size
         end
@@ -45,7 +45,7 @@ describe CanvasQuizStatistics::Analyzers::Base do
         unset Apple
       end
 
-      it 'does not conflict with other analyzer metrics' do
+      it "does not conflict with other analyzer metrics" do
         class Apple < Base
           metric :something, &:size
         end
@@ -60,29 +60,29 @@ describe CanvasQuizStatistics::Analyzers::Base do
         unset Apple, Orange
       end
 
-      describe 'with context dependencies' do
-        it 'invokes the context builder and parse dependency' do
+      describe "with context dependencies" do
+        it "invokes the context builder and parse dependency" do
           class Apple < Base
             def build_context(responses)
               { colors: responses.pluck(:color) }
             end
 
             metric something: [:colors] do |_responses, colors|
-              colors.join(', ')
+              colors.join(", ")
             end
           end
 
-          responses = [{ color: 'Red' }, { color: 'Green' }]
+          responses = [{ color: "Red" }, { color: "Green" }]
 
-          expect(Apple.new({}).run(responses)).to eq({ something: 'Red, Green' })
+          expect(Apple.new({}).run(responses)).to eq({ something: "Red, Green" })
 
           unset Apple
         end
       end
     end
 
-    describe '#inherit_metrics' do
-      it 'inherits a parent class metrics' do
+    describe "#inherit_metrics" do
+      it "inherits a parent class metrics" do
         class Apple < Base
           metric :something, &:size
         end
@@ -100,8 +100,8 @@ describe CanvasQuizStatistics::Analyzers::Base do
       end
     end
 
-    describe '#inherit' do
-      it 'inherits a metric from another question type' do
+    describe "#inherit" do
+      it "inherits a metric from another question type" do
         class Apple < Base
           metric :something, &:size
         end

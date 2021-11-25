@@ -18,12 +18,12 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class Quizzes::QuizRegrade < ActiveRecord::Base
-  self.table_name = 'quiz_regrades'
+  self.table_name = "quiz_regrades"
 
-  belongs_to :quiz, class_name: 'Quizzes::Quiz'
+  belongs_to :quiz, class_name: "Quizzes::Quiz"
   belongs_to :user
-  has_many :quiz_regrade_runs, class_name: 'Quizzes::QuizRegradeRun'
-  has_many :quiz_question_regrades, class_name: 'Quizzes::QuizQuestionRegrade'
+  has_many :quiz_regrade_runs, class_name: "Quizzes::QuizRegradeRun"
+  has_many :quiz_question_regrades, class_name: "Quizzes::QuizQuestionRegrade"
 
   validates :quiz_version, presence: true
   validates :quiz_id, presence: true

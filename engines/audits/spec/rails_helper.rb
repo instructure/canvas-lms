@@ -19,15 +19,15 @@
 #
 
 # This file is copied to spec/ when you run 'rails generate rspec:install'
-require 'spec_helper'
-require 'rails'
-ENV['RAILS_ENV'] ||= 'test'
-Rails.env = 'test'
-require_relative 'dummy/config/environment'
+require "spec_helper"
+require "rails"
+ENV["RAILS_ENV"] ||= "test"
+Rails.env = "test"
+require_relative "dummy/config/environment"
 
 # Prevent database truncation if the environment is production
 abort("The Rails environment is running in production mode!") if Rails.env.production?
-require 'rspec/rails'
+require "rspec/rails"
 # Add additional requires below this line. Rails is not loaded until this point!
 
 # Requires supporting ruby files with custom matchers and macros, etc, in

@@ -17,37 +17,37 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_dependency 'quizzes/quiz_question/base'
+require_dependency "quizzes/quiz_question/base"
 
 describe Quizzes::QuizQuestion::FillInMultipleBlanksQuestion do
-  let(:answer1) { { id: 1, blank_id: 'blank1', text: 'First', weight: 100 } }
-  let(:answer2) { { id: 2, blank_id: 'blank2', text: 'Second', weight: 100 } }
+  let(:answer1) { { id: 1, blank_id: "blank1", text: "First", weight: 100 } }
+  let(:answer2) { { id: 2, blank_id: "blank2", text: "Second", weight: 100 } }
   let(:question) { Quizzes::QuizQuestion::FillInMultipleBlanksQuestion.new(answers: [answer1, answer2]) }
 
   describe "#find_chosen_answer" do
     it "compares answers in downcase" do
-      expect(question.find_chosen_answer('blank1', 'FIRST')[:id]).to eq answer1[:id]
+      expect(question.find_chosen_answer("blank1", "FIRST")[:id]).to eq answer1[:id]
     end
 
     it "only considers answers for the same blank" do
-      expect(question.find_chosen_answer('blank1', 'Second')[:id]).to be_nil
+      expect(question.find_chosen_answer("blank1", "Second")[:id]).to be_nil
     end
 
     it "retains the casing in the provided response for correct answers" do
-      expect(question.find_chosen_answer('blank1', 'FIRST')[:text]).to eq 'FIRST'
+      expect(question.find_chosen_answer("blank1", "FIRST")[:text]).to eq "FIRST"
     end
 
     it "does not alter the answer object's casing in correct answers" do
-      question.find_chosen_answer('blank1', 'FIRST')
-      expect(answer1[:text]).to eq 'First'
+      question.find_chosen_answer("blank1", "FIRST")
+      expect(answer1[:text]).to eq "First"
     end
 
     it "retains the casing in the provided response for incorrect answers" do
-      expect(question.find_chosen_answer('blank1', 'Wrong')[:text]).to eq 'Wrong'
+      expect(question.find_chosen_answer("blank1", "Wrong")[:text]).to eq "Wrong"
     end
 
     it "replaces nil with an empty string" do
-      expect(question.find_chosen_answer('blank1', nil)[:text]).to eq ''
+      expect(question.find_chosen_answer("blank1", nil)[:text]).to eq ""
     end
   end
 end

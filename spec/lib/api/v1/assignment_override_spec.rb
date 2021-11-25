@@ -39,7 +39,7 @@ describe Api::V1::AssignmentOverride do
                    lock_at: nil }
       allow(subject).to receive(:api_find_all).and_return []
       assignment = double(context: double(all_students: []))
-      result = subject.interpret_assignment_override_data(assignment, override, 'ADHOC')
+      result = subject.interpret_assignment_override_data(assignment, override, "ADHOC")
       expect(result.first[:due_at]).to eq nil
       expect(result.first[:unlock_at]).to eq nil
       expect(result.first[:lock_at]).to eq nil
@@ -59,7 +59,7 @@ describe Api::V1::AssignmentOverride do
 
         allow(subject).to receive(:api_find_all).and_return [@student]
         assignment = double(context: double(all_students: []))
-        result = subject.interpret_assignment_override_data(assignment, override, 'ADHOC')
+        result = subject.interpret_assignment_override_data(assignment, override, "ADHOC")
         expect(result[1]).to be_nil
         expect(result.first[:students]).to eq [@student]
       end
@@ -75,8 +75,8 @@ describe Api::V1::AssignmentOverride do
 
     before(:once) do
       course_with_teacher(active_all: true)
-      @a = assignment_model(course: @course, group_category: 'category1')
-      @b = assignment_model(course: @course, group_category: 'category2')
+      @a = assignment_model(course: @course, group_category: "category1")
+      @b = assignment_model(course: @course, group_category: "category2")
       @a1, @a2 = Array.new(2) do
         create_section_override_for_assignment @a, course_section: @course.course_sections.create!
       end
@@ -87,7 +87,7 @@ describe Api::V1::AssignmentOverride do
 
     it "has error if no updates requested" do
       _data, errors = subject.interpret_batch_assignment_overrides_data(@course, [], true)
-      expect(errors[0]).to eq 'no assignment override data present'
+      expect(errors[0]).to eq "no assignment override data present"
     end
 
     it "has error if assignments are malformed" do
@@ -102,15 +102,15 @@ describe Api::V1::AssignmentOverride do
     it "fails if list of overrides is malformed" do
       _data, errors = subject.interpret_batch_assignment_overrides_data(@course, [
                                                                           { assignment_id: @a.id, override: @a1.id }.with_indifferent_access,
-                                                                          { title: 'foo' }.with_indifferent_access
+                                                                          { title: "foo" }.with_indifferent_access
                                                                         ], true)
-      expect(errors[0]).to eq ['must specify an override id']
-      expect(errors[1]).to eq ['must specify an assignment id', 'must specify an override id']
+      expect(errors[0]).to eq ["must specify an override id"]
+      expect(errors[1]).to eq ["must specify an assignment id", "must specify an override id"]
     end
 
     it "fails if individual overrides are malformed" do
       _data, errors = subject.interpret_batch_assignment_overrides_data(@course, [
-                                                                          { assignment_id: @a.id, id: @a1.id, due_at: 'foo' }.with_indifferent_access
+                                                                          { assignment_id: @a.id, id: @a1.id, due_at: "foo" }.with_indifferent_access
                                                                         ], true)
       expect(errors[0]).to eq ['invalid due_at "foo"']
     end
@@ -118,17 +118,17 @@ describe Api::V1::AssignmentOverride do
     it "fails if assignment not found" do
       @a.destroy!
       _data, errors = subject.interpret_batch_assignment_overrides_data(@course, [
-                                                                          { assignment_id: @a.id, id: @a1.id, title: 'foo' }.with_indifferent_access
+                                                                          { assignment_id: @a.id, id: @a1.id, title: "foo" }.with_indifferent_access
                                                                         ], true)
-      expect(errors[0]).to eq ['assignment not found']
+      expect(errors[0]).to eq ["assignment not found"]
     end
 
     it "fails if override not found" do
       @a1.destroy!
       _data, errors = subject.interpret_batch_assignment_overrides_data(@course, [
-                                                                          { assignment_id: @a.id, id: @a1.id, title: 'foo' }.with_indifferent_access
+                                                                          { assignment_id: @a.id, id: @a1.id, title: "foo" }.with_indifferent_access
                                                                         ], true)
-      expect(errors[0]).to eq ['override not found']
+      expect(errors[0]).to eq ["override not found"]
     end
 
     it "succeeds if formatted correctly" do
@@ -145,13 +145,13 @@ describe Api::V1::AssignmentOverride do
     end
   end
 
-  describe 'overrides retrieved for teacher' do
+  describe "overrides retrieved for teacher" do
     before :once do
       course_model
       @override = assignment_override_model
     end
 
-    context 'in restricted course section' do
+    context "in restricted course section" do
       before do
         2.times { @course.course_sections.create! }
         @section_invisible = @course.active_course_sections[2]
@@ -166,7 +166,7 @@ describe Api::V1::AssignmentOverride do
         enrollment.save!
       end
 
-      context '#invisble_users_and_overrides_for_user' do
+      context "#invisble_users_and_overrides_for_user" do
         before do
           @override.set_type = "ADHOC"
           @override_student = @override.assignment_override_students.build
@@ -200,7 +200,7 @@ describe Api::V1::AssignmentOverride do
       end
     end
 
-    context 'with no restrictions' do
+    context "with no restrictions" do
       before do
         2.times { @course.course_sections.create! }
         @section_invisible = @course.active_course_sections[2]
@@ -210,7 +210,7 @@ describe Api::V1::AssignmentOverride do
         @student_visible = student_in_section(@section_visible, user: user_factory)
       end
 
-      context '#invisble_users_and_overrides_for_user' do
+      context "#invisble_users_and_overrides_for_user" do
         before do
           @override.set_type = "ADHOC"
           @override_student = @override.assignment_override_students.build
@@ -245,7 +245,7 @@ describe Api::V1::AssignmentOverride do
     end
   end
 
-  describe '#assignment_overrides_json' do
+  describe "#assignment_overrides_json" do
     subject(:assignment_overrides_json) { test_class.new.assignment_overrides_json([@override], @student) }
 
     before :once do
@@ -255,7 +255,7 @@ describe Api::V1::AssignmentOverride do
       @override = create_section_override_for_assignment(@quiz)
     end
 
-    it 'delegates to AssignmentOverride.visible_enrollments_for' do
+    it "delegates to AssignmentOverride.visible_enrollments_for" do
       expect(AssignmentOverride).to receive(:visible_enrollments_for).once.and_return(Enrollment.none)
       assignment_overrides_json
     end

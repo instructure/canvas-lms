@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../common'
+require_relative "../common"
 
 module ColorCommon
   def convert_hex_to_rgb_color(hex_color)
@@ -27,7 +27,7 @@ module ColorCommon
   end
 
   def rgba_to_hex(rgba)
-    r_g_b_a = rgba.sub('rgba(', '').sub(')', '').split(',').map(&:strip)
+    r_g_b_a = rgba.sub("rgba(", "").sub(")", "").split(",").map(&:strip)
 
     r_g_b = r_g_b_a[0..2]
     r_g_b.map { |num| format("%02X", num.to_i) }.join

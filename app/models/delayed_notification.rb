@@ -24,7 +24,7 @@ class DelayedNotification < ActiveRecord::Base
   belongs_to :asset, polymorphic:
     [:assessment_request, :attachment, :content_migration, :content_export, :collaborator, :submission,
      :assignment, :communication_channel, :calendar_event, :conversation_message, :discussion_entry,
-     :submission_comment, { quiz_submission: 'Quizzes::QuizSubmission' }, :discussion_topic, :course, :enrollment,
+     :submission_comment, { quiz_submission: "Quizzes::QuizSubmission" }, :discussion_topic, :course, :enrollment,
      :wiki_page, :group_membership, :web_conference], polymorphic_prefix: true, exhaustive: false
   include NotificationPreloader
 
@@ -69,7 +69,7 @@ class DelayedNotification < ActiveRecord::Base
   rescue => e
     Canvas::Errors.capture(e, message: "Delayed Notification processing failed")
     logger.error "delayed notification processing failed: #{e.message}\n#{e.backtrace.join "\n"}"
-    self.workflow_state = 'errored'
+    self.workflow_state = "errored"
     save
     []
   end
@@ -77,9 +77,9 @@ class DelayedNotification < ActiveRecord::Base
   def iterate_to_list
     lookups = {}
     (recipient_keys || []).each do |key|
-      pieces = key.split('_')
+      pieces = key.split("_")
       id = pieces.pop
-      klass = pieces.join('_').classify.constantize
+      klass = pieces.join("_").classify.constantize
       lookups[klass] ||= []
       lookups[klass] << id
     end
@@ -104,6 +104,6 @@ class DelayedNotification < ActiveRecord::Base
   end
 
   scope :to_be_processed, lambda { |limit|
-    where(workflow_state: 'to_be_processed').limit(limit).order("delayed_notifications.created_at")
+    where(workflow_state: "to_be_processed").limit(limit).order("delayed_notifications.created_at")
   }
 end

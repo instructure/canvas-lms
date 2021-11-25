@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'datadog/statsd'
+require "datadog/statsd"
 
 module Tracers
   class DatadogTracer

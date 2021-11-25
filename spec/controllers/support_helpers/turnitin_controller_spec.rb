@@ -18,20 +18,20 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 describe SupportHelpers::TurnitinController do
-  describe 'require_site_admin' do
-    it 'redirects to root url if current user is not a site admin' do
+  describe "require_site_admin" do
+    it "redirects to root url if current user is not a site admin" do
       account_admin_user
       user_session(@user)
       get :shard
       assert_unauthorized
     end
 
-    it 'redirects to login if current user is not logged in' do
+    it "redirects to login if current user is not logged in" do
       get :shard
       assert_unauthorized
     end
 
-    it 'renders 200 if current user is a site admin' do
+    it "renders 200 if current user is a site admin" do
       site_admin_user
       user_session(@user)
       get :shard
@@ -39,13 +39,13 @@ describe SupportHelpers::TurnitinController do
     end
   end
 
-  describe 'helper action' do
+  describe "helper action" do
     before do
       site_admin_user
       user_session(@user)
     end
 
-    context 'md5' do
+    context "md5" do
       it "creates a new MD5Fixer" do
         fixer(SupportHelpers::Tii::MD5Fixer)
         get :md5
@@ -53,7 +53,7 @@ describe SupportHelpers::TurnitinController do
       end
     end
 
-    context 'error2305' do
+    context "error2305" do
       it "creates a new Error2305Fixer" do
         fixer(SupportHelpers::Tii::Error2305Fixer)
         get :error2305
@@ -61,7 +61,7 @@ describe SupportHelpers::TurnitinController do
       end
     end
 
-    context 'shard' do
+    context "shard" do
       it "creates a new ShardFixer" do
         fixer(SupportHelpers::Tii::ShardFixer)
         get :shard
@@ -69,16 +69,16 @@ describe SupportHelpers::TurnitinController do
       end
 
       it "creates a new ShardFixer with after_time" do
-        fixer = SupportHelpers::Tii::ShardFixer.new(@user.email, '2016-05-01')
+        fixer = SupportHelpers::Tii::ShardFixer.new(@user.email, "2016-05-01")
         expect(SupportHelpers::Tii::ShardFixer).to receive(:new)
-          .with(@user.email, Time.zone.parse('2016-05-01')).and_return(fixer)
+          .with(@user.email, Time.zone.parse("2016-05-01")).and_return(fixer)
         expect(fixer).to receive(:monitor_and_fix)
-        get :shard, params: { after_time: '2016-05-01' }
+        get :shard, params: { after_time: "2016-05-01" }
         expect(response.body).to eq("Enqueued TurnItIn ShardFixer ##{fixer.job_id}...")
       end
     end
 
-    context 'assignment' do
+    context "assignment" do
       it "creates a new AssignmentFixer with id" do
         assignment_model
         fixer = SupportHelpers::Tii::AssignmentFixer.new(@user.email, nil, @assignment.id)
@@ -91,12 +91,12 @@ describe SupportHelpers::TurnitinController do
       it "returns 400 status without id" do
         expect(SupportHelpers::Tii::AssignmentFixer).not_to receive(:new)
         get :assignment
-        expect(response.body).to eq('Missing assignment `id` parameter')
+        expect(response.body).to eq("Missing assignment `id` parameter")
         assert_status(400)
       end
     end
 
-    context 'refresh_lti_attachment' do
+    context "refresh_lti_attachment" do
       it "creates a new RefreshLtiAttachmentFixter" do
         submission_model
         attachment_model
@@ -109,7 +109,7 @@ describe SupportHelpers::TurnitinController do
       end
     end
 
-    context 'pending' do
+    context "pending" do
       it "creates a new StuckInPendingFixer" do
         fixer(SupportHelpers::Tii::StuckInPendingFixer)
         get :pending
@@ -117,7 +117,7 @@ describe SupportHelpers::TurnitinController do
       end
     end
 
-    context 'expired' do
+    context "expired" do
       it "creates a new ExpiredAccountFixer" do
         fixer(SupportHelpers::Tii::ExpiredAccountFixer)
         get :expired

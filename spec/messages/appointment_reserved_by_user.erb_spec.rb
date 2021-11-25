@@ -18,9 +18,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative 'messages_helper'
+require_relative "messages_helper"
 
-describe 'appointment_reserved_by_user.twitter' do
+describe "appointment_reserved_by_user.twitter" do
   include MessagesCommon
 
   before :once do
@@ -54,8 +54,8 @@ describe 'appointment_reserved_by_user.twitter' do
 
     it "renders" do
       msg = generate_message(notification_name, path_type, asset, message_data)
-      expect(msg.subject).to include('some title')
-      expect(msg.body).to include('some title')
+      expect(msg.subject).to include("some title")
+      expect(msg.body).to include("some title")
       expect(msg.body).to include(@user.name)
       expect(msg.body).to include(@course.name)
       expect(msg.body).to include("/appointment_groups/#{@appointment_group.id}")
@@ -72,7 +72,7 @@ describe 'appointment_reserved_by_user.twitter' do
 
     it "renders" do
       msg = generate_message(notification_name, path_type, asset, message_data)
-      expect(msg.body).to include('some title')
+      expect(msg.body).to include("some title")
       expect(msg.body).to include(@user.name)
     end
   end
@@ -82,7 +82,7 @@ describe 'appointment_reserved_by_user.twitter' do
 
     it "renders" do
       msg = generate_message(notification_name, path_type, asset, message_data)
-      expect(msg.body).to include('some title')
+      expect(msg.body).to include("some title")
       expect(msg.body).to include(@user.name)
     end
   end

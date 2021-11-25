@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'oauth'
+require "oauth"
 
 module Twitter
   class Connection
@@ -55,13 +55,13 @@ module Twitter
     end
 
     def service_user
-      url = '/1.1/account/verify_credentials.json'
+      url = "/1.1/account/verify_credentials.json"
       @service_user ||= JSON.parse(access_token.get(url).body)
     end
 
     # public (to gem)
     def send_direct_message(user_name, user_id, message)
-      url = '/1.1/direct_messages/new.json'
+      url = "/1.1/direct_messages/new.json"
       response = access_token.post(url, {
                                      screen_name: user_name,
                                      user_id: user_id,
@@ -76,11 +76,11 @@ module Twitter
     end
 
     def self.twitter_consumer(key = nil, secret = nil)
-      require 'oauth'
-      require 'oauth/consumer'
+      require "oauth"
+      require "oauth/consumer"
       twitter_config = Twitter::Connection.config
-      key ||= twitter_config['api_key']
-      secret ||= twitter_config['secret_key']
+      key ||= twitter_config["api_key"]
+      secret ||= twitter_config["secret_key"]
       OAuth::Consumer.new(key, secret, {
                             site: "https://api.twitter.com",
                             request_token_path: "/oauth/request_token",

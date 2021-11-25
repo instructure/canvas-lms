@@ -18,13 +18,13 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'hash_view'
-require 'json'
+require "hash_view"
+require "json"
 
 class ModelView < HashView
   attr_reader :name, :properties, :description, :required
 
-  def initialize(name, properties, description = "", required = [], deprecated: false, deprecation_description: '')
+  def initialize(name, properties, description = "", required = [], deprecated: false, deprecation_description: "")
     super()
     @name = name
     @properties = properties

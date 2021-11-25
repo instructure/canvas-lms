@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative 'course_copy_helper'
+require_relative "course_copy_helper"
 
 describe ContentMigration do
   context "course copy for external content" do
@@ -38,7 +38,7 @@ describe ContentMigration do
     end
 
     before do
-      allow(Canvas::Migration::ExternalContent::Migrator).to receive(:registered_services).and_return({ 'test_service' => klass })
+      allow(Canvas::Migration::ExternalContent::Migrator).to receive(:registered_services).and_return({ "test_service" => klass })
     end
 
     it "skips everything if #applies_to_course? returns false" do
@@ -63,14 +63,14 @@ describe ContentMigration do
     end
 
     it "translates ids for copied course content" do
-      skip 'Requires QtiMigrationTool' unless Qti.qti_enabled?
+      skip "Requires QtiMigrationTool" unless Qti.qti_enabled?
 
       assmt = @copy_from.assignments.create!
       topic = @copy_from.discussion_topics.create!(message: "hi", title: "discussion title")
       ann = @copy_from.announcements.create!(message: "goodbye")
       cm = @copy_from.context_modules.create!(name: "some module")
-      item = cm.add_item(id: assmt.id, type: 'assignment')
-      att = Attachment.create!(filename: 'first.txt', uploaded_data: StringIO.new('ohai'), folder: Folder.unfiled_folder(@copy_from), context: @copy_from)
+      item = cm.add_item(id: assmt.id, type: "assignment")
+      att = Attachment.create!(filename: "first.txt", uploaded_data: StringIO.new("ohai"), folder: Folder.unfiled_folder(@copy_from), context: @copy_from)
       page = @copy_from.wiki_pages.create!(title: "wiki", body: "ohai")
       quiz = @copy_from.quizzes.create!
 
@@ -78,14 +78,14 @@ describe ContentMigration do
       allow(klass).to receive(:begin_export).and_return(true)
 
       data = {
-        '$canvas_assignment_id' => assmt.id,
-        '$canvas_discussion_topic_id' => topic.id,
-        '$canvas_announcement_id' => ann.id,
-        '$canvas_context_module_id' => cm.id,
-        '$canvas_context_module_item_id' => item.id,
-        '$canvas_file_id' => att.id, # $canvas_attachment_id works too
-        '$canvas_page_id' => page.id,
-        '$canvas_quiz_id' => quiz.id
+        "$canvas_assignment_id" => assmt.id,
+        "$canvas_discussion_topic_id" => topic.id,
+        "$canvas_announcement_id" => ann.id,
+        "$canvas_context_module_id" => cm.id,
+        "$canvas_context_module_item_id" => item.id,
+        "$canvas_file_id" => att.id, # $canvas_attachment_id works too
+        "$canvas_page_id" => page.id,
+        "$canvas_quiz_id" => quiz.id
       }
       allow(klass).to receive(:export_completed?).and_return(true)
       allow(klass).to receive(:retrieve_export).and_return(data)
@@ -104,14 +104,14 @@ describe ContentMigration do
       expect(klass.course).to eq @copy_to
 
       expected_data = {
-        '$canvas_assignment_id' => copied_assmt.id,
-        '$canvas_discussion_topic_id' => copied_topic.id,
-        '$canvas_announcement_id' => copied_ann.id,
-        '$canvas_context_module_id' => copied_cm.id,
-        '$canvas_context_module_item_id' => copied_item.id,
-        '$canvas_file_id' => copied_att.id, # $canvas_attachment_id works too
-        '$canvas_page_id' => copied_page.id,
-        '$canvas_quiz_id' => copied_quiz.id
+        "$canvas_assignment_id" => copied_assmt.id,
+        "$canvas_discussion_topic_id" => copied_topic.id,
+        "$canvas_announcement_id" => copied_ann.id,
+        "$canvas_context_module_id" => copied_cm.id,
+        "$canvas_context_module_item_id" => copied_item.id,
+        "$canvas_file_id" => copied_att.id, # $canvas_attachment_id works too
+        "$canvas_page_id" => copied_page.id,
+        "$canvas_quiz_id" => copied_quiz.id
       }
       expect(klass.imported_content).to eq expected_data
     end
@@ -124,18 +124,18 @@ describe ContentMigration do
       allow(klass).to receive(:begin_export).and_return(true)
       allow(klass).to receive(:export_completed?).and_return(true)
       allow(klass).to receive(:retrieve_export).and_return(
-        { '$canvas_assignment_id' => assmt.id, '$canvas_discussion_topic_id' => topic.id }
+        { "$canvas_assignment_id" => assmt.id, "$canvas_discussion_topic_id" => topic.id }
       )
 
-      @cm.copy_options = { 'all_discussion_topics' => '1' }
+      @cm.copy_options = { "all_discussion_topics" => "1" }
       @cm.save!
 
       run_course_copy
 
       copied_topic = @copy_to.discussion_topics.where(migration_id: mig_id(topic)).first
       expected_data = {
-        '$canvas_assignment_id' => "$OBJECT_NOT_FOUND",
-        '$canvas_discussion_topic_id' => copied_topic.id
+        "$canvas_assignment_id" => "$OBJECT_NOT_FOUND",
+        "$canvas_discussion_topic_id" => copied_topic.id
       }
       expect(klass.imported_content).to eq expected_data
     end
@@ -145,12 +145,12 @@ describe ContentMigration do
       @copy_from.assignments.create!
       graded_quiz = @copy_from.quizzes.create!
       graded_quiz.generate_quiz_data
-      graded_quiz.workflow_state = 'available'
+      graded_quiz.workflow_state = "available"
       graded_quiz.save!
 
       cm = @copy_from.context_modules.create!(name: "some module")
-      cm.add_item(id: assmt.id, type: 'assignment')
-      cm.add_item(id: graded_quiz.id, type: 'quiz')
+      cm.add_item(id: assmt.id, type: "assignment")
+      cm.add_item(id: graded_quiz.id, type: "quiz")
 
       allow(klass).to receive(:applies_to_course?).and_return(true)
       allow(klass).to receive(:export_completed?).and_return(true)

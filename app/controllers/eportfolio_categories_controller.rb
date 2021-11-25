@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'securerandom'
+require "securerandom"
 
 class EportfolioCategoriesController < ApplicationController
   include EportfolioPage
@@ -79,7 +79,7 @@ class EportfolioCategoriesController < ApplicationController
       render "eportfolios/show", stream: can_stream_template?
     end
   rescue ActiveRecord::RecordNotFound
-    flash[:notice] = t('errors.missing_page', "Couldn't find that page")
+    flash[:notice] = t("errors.missing_page", "Couldn't find that page")
     redirect_to eportfolio_url(@portfolio.id)
   end
 

@@ -17,12 +17,12 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative 'support/answer_serializers_specs'
+require_relative "support/answer_serializers_specs"
 
 describe Quizzes::QuizQuestion::AnswerSerializers::Numerical do
-  context 'English' do
+  context "English" do
     let :inputs do
-      [25.3, 25e-6, '0.12', '3', '17,000', '6,200,000.13']
+      [25.3, 25e-6, "0.12", "3", "17,000", "6,200,000.13"]
     end
 
     let :outputs do
@@ -36,15 +36,15 @@ describe Quizzes::QuizQuestion::AnswerSerializers::Numerical do
       ]
     end
 
-    include_examples 'Answer Serializers'
+    include_examples "Answer Serializers"
 
-    it 'returns nil when un-answered' do
+    it "returns nil when un-answered" do
       expect(subject.deserialize({})).to eq nil
     end
 
-    context 'validations' do
-      it 'turns garbage into 0.0' do
-        ['foobar', nil, { foo: 'bar' }, "25 00012"].each do |garbage|
+    context "validations" do
+      it "turns garbage into 0.0" do
+        ["foobar", nil, { foo: "bar" }, "25 00012"].each do |garbage|
           rc = subject.serialize(garbage)
           expect(rc.error).to be_nil
           expect(rc.answer).to eq({
@@ -55,13 +55,13 @@ describe Quizzes::QuizQuestion::AnswerSerializers::Numerical do
     end
   end
 
-  context 'Italian' do
-    before { I18n.locale = 'it' }
+  context "Italian" do
+    before { I18n.locale = "it" }
 
     after { I18n.locale = I18n.default_locale }
 
     let :inputs do
-      [25.3, 25e-6, '0,12', '3', '17.000', '6.200.000,13']
+      [25.3, 25e-6, "0,12", "3", "17.000", "6.200.000,13"]
     end
 
     let :outputs do
@@ -75,16 +75,16 @@ describe Quizzes::QuizQuestion::AnswerSerializers::Numerical do
       ]
     end
 
-    include_examples 'Answer Serializers'
+    include_examples "Answer Serializers"
   end
 
-  context 'French' do
+  context "French" do
     before { I18n.locale = :fr }
 
     after { I18n.locale = I18n.default_locale }
 
     let :inputs do
-      [25.3, 25e-6, '0,12', '3', '17 000', '6 200 000,13']
+      [25.3, 25e-6, "0,12", "3", "17 000", "6 200 000,13"]
     end
 
     let :outputs do
@@ -98,7 +98,7 @@ describe Quizzes::QuizQuestion::AnswerSerializers::Numerical do
       ]
     end
 
-    include_examples 'Answer Serializers'
+    include_examples "Answer Serializers"
   end
 
   def sanitize(value)

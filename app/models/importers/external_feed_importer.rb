@@ -17,22 +17,22 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_dependency 'importers'
+require_dependency "importers"
 
 module Importers
   class ExternalFeedImporter < Importer
     self.item_class = ExternalFeed
 
     def self.process_migration(data, migration)
-      tools = data['external_feeds'] || []
-      to_import = migration.to_import 'external_feeds'
+      tools = data["external_feeds"] || []
+      to_import = migration.to_import "external_feeds"
       tools.each do |tool|
-        next unless tool['migration_id'] && (!to_import || to_import[tool['migration_id']])
+        next unless tool["migration_id"] && (!to_import || to_import[tool["migration_id"]])
 
         begin
           import_from_migration(tool, migration.context, migration)
         rescue
-          migration.add_import_warning(t('#migration.external_feed_type', "External Feed"), tool[:title], $!)
+          migration.add_import_warning(t("#migration.external_feed_type", "External Feed"), tool[:title], $!)
         end
       end
     end

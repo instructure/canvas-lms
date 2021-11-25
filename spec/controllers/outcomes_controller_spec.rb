@@ -21,7 +21,7 @@
 describe OutcomesController do
   def context_outcome(context)
     @outcome_group ||= context.root_outcome_group
-    @outcome = context.created_learning_outcomes.create!(title: 'outcome')
+    @outcome = context.created_learning_outcomes.create!(title: "outcome")
     @outcome_group.add_outcome(@outcome)
   end
 
@@ -42,41 +42,41 @@ describe OutcomesController do
 
   describe "GET 'index'" do
     it "requires authorization" do
-      get 'index', params: { course_id: @course.id }
+      get "index", params: { course_id: @course.id }
       assert_unauthorized
     end
 
     it "redirects 'disabled', if disabled by the teacher" do
       user_session(@student)
-      @course.update_attribute(:tab_configuration, [{ 'id' => 15, 'hidden' => true }])
-      get 'index', params: { course_id: @course.id }
+      @course.update_attribute(:tab_configuration, [{ "id" => 15, "hidden" => true }])
+      get "index", params: { course_id: @course.id }
       expect(response).to be_redirect
       expect(flash[:notice]).to match(/That page has been disabled/)
     end
 
     it "assigns variables" do
       user_session(@teacher)
-      get 'index', params: { course_id: @course.id }
+      get "index", params: { course_id: @course.id }
       expect(response).to be_successful
     end
 
     it "works in accounts" do
       user_session(@admin)
       account_outcome
-      get 'index', params: { account_id: @account.id }
+      get "index", params: { account_id: @account.id }
     end
 
     it "does not find a common core group from settings" do
       user_session(@admin)
       account_outcome
       allow(Shard.current).to receive(:settings).and_return({ common_core_outcome_group_id: @outcome_group.id })
-      get 'index', params: { account_id: @account.id }
+      get "index", params: { account_id: @account.id }
       expect(assigns[:js_env]).not_to have_key(:COMMON_CORE_GROUP_ID)
     end
 
     it "passes along permissions" do
       user_session(@admin)
-      get 'index', params: { account_id: @account.id }
+      get "index", params: { account_id: @account.id }
       permissions = assigns[:js_env][:PERMISSIONS]
       %i[
         manage_outcomes manage_rubrics can_manage_courses import_outcomes manage_proficiency_scales
@@ -86,19 +86,19 @@ describe OutcomesController do
       end
     end
 
-    context 'account_level_mastery_scales feature flag enabled' do
+    context "account_level_mastery_scales feature flag enabled" do
       before(:once) do
         @account.root_account.enable_feature! :account_level_mastery_scales
       end
 
-      it 'includes proficiency roles' do
+      it "includes proficiency roles" do
         user_session(@admin)
-        get 'index', params: { account_id: @account.id }
+        get "index", params: { account_id: @account.id }
 
         %i[PROFICIENCY_CALCULATION_METHOD_ENABLED_ROLES PROFICIENCY_SCALES_ENABLED_ROLES].each do |key|
           roles = controller.js_env[key]
           expect(roles.length).to eq 1
-          expect(roles.dig(0, :role)).to eq 'AccountAdmin'
+          expect(roles.dig(0, :role)).to eq "AccountAdmin"
         end
       end
     end
@@ -107,13 +107,13 @@ describe OutcomesController do
       it "returns the global root group id for an account" do
         global_id = LearningOutcomeGroup.global_root_outcome_group.id
         user_session(@admin)
-        get 'index', params: { account_id: @account.id }
+        get "index", params: { account_id: @account.id }
         expect(assigns[:js_env][:GLOBAL_ROOT_OUTCOME_GROUP_ID]).to eq global_id
       end
 
       it "does not return the global root id for a course" do
         user_session(@admin)
-        get 'index', params: { course_id: @course.id }
+        get "index", params: { course_id: @course.id }
         expect(assigns[:js_env][:GLOBAL_ROOT_OUTCOME_GROUP_ID]).to eq nil
       end
     end
@@ -122,14 +122,14 @@ describe OutcomesController do
       it "returns true if outcomes_friendly_description feature flag is enabled" do
         Account.site_admin.enable_feature!(:outcomes_friendly_description)
         user_session(@admin)
-        get 'index', params: { account_id: @account.id }
+        get "index", params: { account_id: @account.id }
         expect(assigns[:js_env][:OUTCOMES_FRIENDLY_DESCRIPTION]).to eq true
       end
 
       it "returns false if outcomes_friendly_description feature flag is disabled" do
         Account.site_admin.disable_feature!(:outcomes_friendly_description)
         user_session(@admin)
-        get 'index', params: { account_id: @account.id }
+        get "index", params: { account_id: @account.id }
         expect(assigns[:js_env][:OUTCOMES_FRIENDLY_DESCRIPTION]).to eq false
       end
     end
@@ -138,14 +138,14 @@ describe OutcomesController do
       it "returns true if individual_outcome_rating_and_calculation feature flag is enabled" do
         @account.root_account.enable_feature!(:individual_outcome_rating_and_calculation)
         user_session(@admin)
-        get 'index', params: { account_id: @account.id }
+        get "index", params: { account_id: @account.id }
         expect(assigns[:js_env][:INDIVIDUAL_OUTCOME_RATING_AND_CALCULATION]).to eq true
       end
 
       it "returns false if individual_outcome_rating_and_calculation feature flag is disabled" do
         @account.root_account.disable_feature!(:individual_outcome_rating_and_calculation)
         user_session(@admin)
-        get 'index', params: { account_id: @account.id }
+        get "index", params: { account_id: @account.id }
         expect(assigns[:js_env][:INDIVIDUAL_OUTCOME_RATING_AND_CALCULATION]).to eq false
       end
     end
@@ -154,28 +154,28 @@ describe OutcomesController do
   describe "GET 'show'" do
     it "requires authorization" do
       course_outcome
-      get 'show', params: { course_id: @course.id, id: @outcome.id }
+      get "show", params: { course_id: @course.id, id: @outcome.id }
       assert_unauthorized
     end
 
     it "does not allow students to view outcomes" do
       user_session(@student)
       course_outcome
-      get 'show', params: { course_id: @course.id, id: @outcome.id }
+      get "show", params: { course_id: @course.id, id: @outcome.id }
       assert_unauthorized
     end
 
     it "assigns variables" do
       user_session(@teacher)
       course_outcome
-      get 'show', params: { course_id: @course.id, id: @outcome.id }
+      get "show", params: { course_id: @course.id, id: @outcome.id }
       expect(response).to be_successful
     end
 
     it "works in accounts" do
       user_session(@admin)
       account_outcome
-      get 'show', params: { account_id: @account.id, id: @outcome.id }
+      get "show", params: { account_id: @account.id, id: @outcome.id }
       expect(response).to be_successful
     end
 
@@ -186,7 +186,7 @@ describe OutcomesController do
       alignment = @outcome.align(quiz, @course)
 
       user_session(@admin)
-      get 'show', params: { account_id: @account.id, id: @outcome.id }
+      get "show", params: { account_id: @account.id, id: @outcome.id }
 
       expect(assigns[:alignments].any? { |a| a.id == alignment.id }).to be_truthy
     end
@@ -197,7 +197,7 @@ describe OutcomesController do
       @course.large_roster = true
       @course.save!
 
-      get 'show', params: { course_id: @course.id, id: @outcome.id }
+      get "show", params: { course_id: @course.id, id: @outcome.id }
       expect(response).to be_redirect
     end
   end
@@ -205,40 +205,40 @@ describe OutcomesController do
   describe "GET 'details'" do
     it "requires authorization" do
       course_outcome
-      get 'details', params: { course_id: @course.id, outcome_id: @outcome.id }
+      get "details", params: { course_id: @course.id, outcome_id: @outcome.id }
       assert_unauthorized
     end
 
     it "assigns variables" do
       user_session(@student)
       course_outcome
-      get 'details', params: { course_id: @course.id, outcome_id: @outcome.id }
+      get "details", params: { course_id: @course.id, outcome_id: @outcome.id }
       expect(response).to be_successful
     end
 
     it "works in accounts" do
       user_session(@admin)
       account_outcome
-      get 'details', params: { account_id: @account.id, outcome_id: @outcome.id }
+      get "details", params: { account_id: @account.id, outcome_id: @outcome.id }
     end
   end
 
   describe "GET 'user_outcome_results'" do
     it "requires authorization" do
       account_outcome
-      get 'user_outcome_results', params: { account_id: @account.id, user_id: @student.id }
+      get "user_outcome_results", params: { account_id: @account.id, user_id: @student.id }
       assert_unauthorized
     end
 
     it "returns outcomes for the given user" do
       account_outcome
       user_session(@admin)
-      get 'user_outcome_results', params: { account_id: @account.id, user_id: @student.id }
+      get "user_outcome_results", params: { account_id: @account.id, user_id: @student.id }
       expect(response).to be_successful
-      expect(response).to render_template('user_outcome_results')
+      expect(response).to render_template("user_outcome_results")
     end
 
-    context 'deleted results' do
+    context "deleted results" do
       before(:once) do
         account_outcome
         assessment_question_bank_with_questions
@@ -253,19 +253,19 @@ describe OutcomesController do
         Quizzes::SubmissionGrader.new(@submission).grade_submission
       end
 
-      it 'returns existing results' do
+      it "returns existing results" do
         user_session(@admin)
 
-        get 'user_outcome_results', params: { account_id: @account.id, user_id: @student.id }
+        get "user_outcome_results", params: { account_id: @account.id, user_id: @student.id }
         expect(response).to be_successful
         expect(assigns[:results]).not_to be_empty
       end
 
-      it 'does not return deleted results' do
+      it "does not return deleted results" do
         user_session(@admin)
         LearningOutcomeResult.find_by!(artifact: @submission, user: @student).destroy
 
-        get 'user_outcome_results', params: { account_id: @account.id, user_id: @student.id }
+        get "user_outcome_results", params: { account_id: @account.id, user_id: @student.id }
         expect(response).to be_successful
         expect(assigns[:results]).to be_empty
       end
@@ -277,7 +277,7 @@ describe OutcomesController do
       account_outcome
 
       user_session(@admin)
-      get 'list', params: { account_id: @account.id }
+      get "list", params: { account_id: @account.id }
       expect(response).to be_successful
       data = json_parse
       expect(data).not_to be_empty
@@ -288,7 +288,7 @@ describe OutcomesController do
       sub_account_1 = @account.sub_accounts.create!
 
       user_session(@admin)
-      get 'list', params: { account_id: sub_account_1.id }
+      get "list", params: { account_id: sub_account_1.id }
       expect(response).to be_successful
       data = json_parse
       expect(data).not_to be_empty
@@ -298,7 +298,7 @@ describe OutcomesController do
       account_outcome
 
       user_session(@teacher)
-      get 'list', params: { course_id: @course.id }
+      get "list", params: { course_id: @course.id }
       expect(response).to be_successful
       data = json_parse
       expect(data).not_to be_empty
@@ -315,20 +315,20 @@ describe OutcomesController do
 
     it "requires authorization" do
       course_outcome
-      post 'create', params: { course_id: @course.id }
+      post "create", params: { course_id: @course.id }
       assert_unauthorized
     end
 
     it "does not let a student create a outcome" do
       user_session(@student)
-      post 'create', params: { course_id: @course.id,
+      post "create", params: { course_id: @course.id,
                                learning_outcome: { short_description: "a" } }
       assert_unauthorized
     end
 
     it "allows creating a new outcome with the root group" do
       user_session(@teacher)
-      post 'create', params: { course_id: @course.id, learning_outcome: outcome_params }
+      post "create", params: { course_id: @course.id, learning_outcome: outcome_params }
       expect(response).to be_redirect
       expect(assigns[:outcome]).not_to be_nil
       expect(assigns[:outcome][:description]).to eql("A long description")
@@ -353,7 +353,7 @@ describe OutcomesController do
       expect(outcome_group.id).not_to be_nil
       expect(outcome_group).not_to be_nil
 
-      post 'create', params: { course_id: @course.id, learning_outcome_group_id: outcome_group.id,
+      post "create", params: { course_id: @course.id, learning_outcome_group_id: outcome_group.id,
                                learning_outcome: outcome_params }
       expect(response).to be_redirect
       expect(assigns[:outcome]).not_to be_nil
@@ -377,21 +377,21 @@ describe OutcomesController do
     end
 
     it "requires authorization" do
-      put 'update', params: { course_id: @course.id, id: @outcome.id,
+      put "update", params: { course_id: @course.id, id: @outcome.id,
                               learning_outcome: { short_description: test_string } }
       assert_unauthorized
     end
 
     it "does not let a student update the outcome" do
       user_session(@student)
-      put 'update', params: { course_id: @course.id, id: @outcome.id,
+      put "update", params: { course_id: @course.id, id: @outcome.id,
                               learning_outcome: { short_description: test_string } }
       assert_unauthorized
     end
 
     it "allows updating the outcome" do
       user_session(@teacher)
-      put 'update', params: { course_id: @course.id, id: @outcome.id,
+      put "update", params: { course_id: @course.id, id: @outcome.id,
                               learning_outcome: { short_description: test_string } }
       @outcome.reload
       expect(@outcome[:short_description]).to eql test_string
@@ -404,19 +404,19 @@ describe OutcomesController do
     end
 
     it "requires authorization" do
-      delete 'destroy', params: { course_id: @course.id, id: @outcome.id }
+      delete "destroy", params: { course_id: @course.id, id: @outcome.id }
       assert_unauthorized
     end
 
     it "does not let a student delete the outcome" do
       user_session(@student)
-      delete 'destroy', params: { course_id: @course.id, id: @outcome.id }
+      delete "destroy", params: { course_id: @course.id, id: @outcome.id }
       assert_unauthorized
     end
 
     it "deletes the outcome from the database" do
       user_session(@teacher)
-      delete 'destroy', params: { course_id: @course.id, id: @outcome.id }
+      delete "destroy", params: { course_id: @course.id, id: @outcome.id }
       @outcome.reload
       expect(@outcome).to be_deleted
     end
@@ -443,7 +443,7 @@ describe OutcomesController do
 
       it "requires teacher authorization" do
         user_session(@student)
-        get 'outcome_result',
+        get "outcome_result",
             params: { course_id: @course.id,
                       outcome_id: @outcome.id,
                       id: @outcome.learning_outcome_results.last }
@@ -451,10 +451,10 @@ describe OutcomesController do
       end
 
       it "does not return deleted results" do
-        skip('skip due to flakiness, resolve with OUT-4368')
+        skip("skip due to flakiness, resolve with OUT-4368")
         @outcome.learning_outcome_results.last.destroy
         user_session(@teacher)
-        get 'outcome_result',
+        get "outcome_result",
             params: { course_id: @course.id,
                       outcome_id: @outcome.id,
                       id: @outcome.learning_outcome_results.last }
@@ -463,7 +463,7 @@ describe OutcomesController do
 
       it "redirects to show quiz when result is a quiz" do
         user_session(@teacher)
-        get 'outcome_result',
+        get "outcome_result",
             params: { course_id: @course.id,
                       outcome_id: @outcome.id,
                       id: @outcome.learning_outcome_results.last }

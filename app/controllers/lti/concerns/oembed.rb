@@ -47,7 +47,7 @@ module Lti::Concerns
     def jwt_validator
       @jwt_validator ||= Canvas::Security::JwtValidator.new(
         jwt: verified_jwt,
-        expected_aud: Canvas::Security.config['lti_iss'],
+        expected_aud: Canvas::Security.config["lti_iss"],
         require_iss: true
       )
     end
@@ -61,7 +61,7 @@ module Lti::Concerns
     end
 
     def oembed_object_uri
-      URI.parse(oembed_endpoint + (oembed_endpoint.include?('?') ? '&url=' : '?url=') + CGI.escape(oembed_url) + '&format=json')
+      URI.parse(oembed_endpoint + (oembed_endpoint.include?("?") ? "&url=" : "?url=") + CGI.escape(oembed_url) + "&format=json")
     end
 
     def uri_source
@@ -110,7 +110,7 @@ module Lti::Concerns
           associated_tool.shared_secret
         )
       rescue JSON::JWS::VerificationFailed, JSON::JWS::UnexpectedAlgorithm
-        raise OembedAuthorizationError, 'Error validating oembed_token signature'
+        raise OembedAuthorizationError, "Error validating oembed_token signature"
       end
     end
 

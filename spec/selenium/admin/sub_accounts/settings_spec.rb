@@ -17,11 +17,11 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../../common'
-require_relative '../../helpers/basic/settings_specs'
+require_relative "../../common"
+require_relative "../../helpers/basic/settings_specs"
 
 describe "sub account basic settings" do
-  let(:account) { Account.create(name: 'sub account from default account', parent_account: Account.default) }
+  let(:account) { Account.create(name: "sub account from default account", parent_account: Account.default) }
   let(:account_settings_url) { "/accounts/#{account.id}/settings" }
   let(:admin_tab_url) { "/accounts/#{account.id}/settings#tab-users" }
 
@@ -34,12 +34,12 @@ describe "sub account basic settings" do
 
     get account_settings_url
 
-    expect(f('#account_settings_restrict_student_past_view_value')).not_to be_disabled
-    expect(f('#account_settings_restrict_student_past_view_locked')).not_to be_nil
+    expect(f("#account_settings_restrict_student_past_view_value")).not_to be_disabled
+    expect(f("#account_settings_restrict_student_past_view_locked")).not_to be_nil
 
-    expect(f('#account_settings_restrict_student_future_view_value')).to be_disabled
-    expect(f("#account_settings")).not_to contain_css('#account_settings_restrict_student_future_view_locked') # don't even show the locked checkbox
+    expect(f("#account_settings_restrict_student_future_view_value")).to be_disabled
+    expect(f("#account_settings")).not_to contain_css("#account_settings_restrict_student_future_view_locked") # don't even show the locked checkbox
 
-    expect(is_checked('#account_settings_restrict_student_future_view_value')).to be_truthy
+    expect(is_checked("#account_settings_restrict_student_future_view_value")).to be_truthy
   end
 end

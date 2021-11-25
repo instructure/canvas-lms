@@ -29,16 +29,16 @@ module CC
         lock_info = topic.locked_for?(@user, check_policies: true)
         next if @user && lock_info && !lock_info[:can_view]
 
-        title = topic.title || I18n.t('course_exports.unknown_titles.topic', "Unknown topic")
+        title = topic.title || I18n.t("course_exports.unknown_titles.topic", "Unknown topic")
 
         if topic.assignment && !topic.assignment.can_copy?(@user)
-          add_error(I18n.t('course_exports.errors.topic_is_locked', "The topic \"%{title}\" could not be copied because it is locked.", title: title))
+          add_error(I18n.t("course_exports.errors.topic_is_locked", "The topic \"%{title}\" could not be copied because it is locked.", title: title))
           next
         end
         begin
           add_topic(topic)
         rescue
-          add_error(I18n.t('course_exports.errors.topic', "The discussion topic \"%{title}\" failed to export", title: title), $!)
+          add_error(I18n.t("course_exports.errors.topic", "The discussion topic \"%{title}\" failed to export", title: title), $!)
         end
       end
     end
@@ -52,7 +52,7 @@ module CC
       # the CC Discussion Topic
       topic_file_name = "#{migration_id}.xml"
       topic_path = File.join(@export_dir, topic_file_name)
-      topic_file = File.new(topic_path, 'w')
+      topic_file = File.new(topic_path, "w")
       topic_doc = Builder::XmlMarkup.new(target: topic_file, indent: 2)
       topic_doc.instruct!
 
@@ -67,7 +67,7 @@ module CC
       meta_migration_id = create_key(topic, "meta")
       meta_file_name = "#{meta_migration_id}.xml"
       meta_path = File.join(@export_dir, meta_file_name)
-      meta_file = File.new(meta_path, 'w')
+      meta_file = File.new(meta_path, "w")
       meta_doc = Builder::XmlMarkup.new(target: meta_file, indent: 2)
       meta_doc.instruct!
       meta_doc.topicMeta("identifier" => meta_migration_id,
@@ -96,8 +96,8 @@ module CC
 
     def create_cc_topic(doc, topic)
       doc.title topic.title
-      html = @html_exporter.html_content(topic.message || '')
-      doc.text(html, texttype: 'text/html')
+      html = @html_exporter.html_content(topic.message || "")
+      doc.text(html, texttype: "text/html")
       if topic.attachment
         doc.attachments do |atts|
           folder = topic.attachment.folder.full_name.sub("course files", CCHelper::WEB_CONTENT_TOKEN)
@@ -116,13 +116,13 @@ module CC
       doc.external_feed_identifierref create_key(topic.external_feed) if topic.external_feed
       doc.attachment_identifierref create_key(topic.attachment) if topic.attachment
       if topic.is_announcement
-        doc.tag!('type', 'announcement')
+        doc.tag!("type", "announcement")
       else
-        doc.tag!('type', 'topic')
+        doc.tag!("type", "topic")
       end
       doc.discussion_type topic.discussion_type
-      doc.pinned 'true' if topic.pinned
-      doc.require_initial_post 'true' if topic.require_initial_post
+      doc.pinned "true" if topic.pinned
+      doc.require_initial_post "true" if topic.require_initial_post
       doc.has_group_category topic.has_group_category?
       doc.group_category topic.group_category.name if topic.group_category
       doc.workflow_state topic.workflow_state
@@ -131,7 +131,7 @@ module CC
       doc.only_graders_can_rate topic.only_graders_can_rate
       doc.sort_by_rating topic.sort_by_rating
       doc.todo_date topic.todo_date
-      doc.locked 'true' if topic.locked
+      doc.locked "true" if topic.locked
       if topic.assignment && !topic.assignment.deleted?
         assignment_migration_id = create_key(topic.assignment)
         doc.assignment(identifier: assignment_migration_id) do |a|

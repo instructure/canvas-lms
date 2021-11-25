@@ -47,6 +47,6 @@ module ObserverEnrollmentsHelper
     observed_user_cookie_name = "#{OBSERVER_COOKIE_PREFIX}#{user.id}"
     @selected_observed_user = users.detect { |u| u.id.to_s == cookies[observed_user_cookie_name] } || users.first
     cookies.delete(observed_user_cookie_name) if @selected_observed_user == users.first
-    users.map { |u| user_json(u, @current_user, session, ['avatar_url'], @context, nil, ['pseudonym']) }
+    users.map { |u| user_json(u, @current_user, session, ["avatar_url"], @context, nil, ["pseudonym"]) }
   end
 end

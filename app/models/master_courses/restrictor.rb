@@ -193,7 +193,7 @@ module MasterCourses::Restrictor
 
     if columns_to_restore.any?
       @importing_migration.add_skipped_item(child_tag)
-      Rails.logger.debug("Undoing imported changes to #{self.class} #{id} because changed downstream - #{columns_to_restore.join(', ')}")
+      Rails.logger.debug("Undoing imported changes to #{self.class} #{id} because changed downstream - #{columns_to_restore.join(", ")}")
       restore_attributes(columns_to_restore)
     end
   end
@@ -229,15 +229,15 @@ module MasterCourses::Restrictor
   def master_course_api_restriction_data(course_status)
     hash = {}
     if course_status == :child && is_child_content?
-      hash['is_master_course_child_content'] = true
+      hash["is_master_course_child_content"] = true
       is_restricted = editing_restricted?(:any)
-      hash['restricted_by_master_course'] = is_restricted
-      hash['master_course_restrictions'] = child_content_restrictions if is_restricted
+      hash["restricted_by_master_course"] = is_restricted
+      hash["master_course_restrictions"] = child_content_restrictions if is_restricted
     elsif course_status == :master && current_master_template_restrictions
-      hash['is_master_course_master_content'] = true
+      hash["is_master_course_master_content"] = true
       is_restricted = current_master_template_restrictions.values.any? { |v| v }
-      hash['restricted_by_master_course'] = is_restricted
-      hash['master_course_restrictions'] = current_master_template_restrictions if is_restricted
+      hash["restricted_by_master_course"] = is_restricted
+      hash["master_course_restrictions"] = current_master_template_restrictions if is_restricted
     end
     hash
   end

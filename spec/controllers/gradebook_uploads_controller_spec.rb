@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'csv'
+require "csv"
 
 describe GradebookUploadsController do
   def course_with_graded_student
@@ -40,8 +40,8 @@ describe GradebookUploadsController do
   end
 
   def upload_gradebook_import(course, file)
-    data = Rack::Test::UploadedFile.new(file.path, 'text/csv', true)
-    post 'create', params: { course_id: course.id, gradebook_upload: { uploaded_data: data } }
+    data = Rack::Test::UploadedFile.new(file.path, "text/csv", true)
+    post "create", params: { course_id: course.id, gradebook_upload: { uploaded_data: data } }
   end
 
   def check_create_response(include_sis_id = false)
@@ -55,7 +55,7 @@ describe GradebookUploadsController do
     @student1, @student2, @student3 = create_users(3, return_type: :record)
     @assignment.only_visible_to_overrides = true
     @assignment.save
-    @course.enroll_student(@student3, enrollment_state: 'active')
+    @course.enroll_student(@student3, enrollment_state: "active")
     @section = @course.course_sections.create!(name: "test section")
     @section2 = @course.course_sections.create!(name: "second test section")
     student_in_section(@section, user: @student1)
@@ -77,7 +77,7 @@ describe GradebookUploadsController do
 
   describe "POST 'create'" do
     it "requires authorization" do
-      post 'create', params: { course_id: @course.id }
+      post "create", params: { course_id: @course.id }
       assert_unauthorized
     end
 
@@ -114,7 +114,7 @@ describe GradebookUploadsController do
 
   describe "GET 'data'" do
     it "requires authorization" do
-      get 'data', params: { course_id: @course.id }
+      get "data", params: { course_id: @course.id }
       assert_unauthorized
     end
 
@@ -122,10 +122,10 @@ describe GradebookUploadsController do
       user_session(@teacher)
       progress = Progress.create!(tag: "test", context: @teacher)
 
-      @gb_upload = GradebookUpload.new course: @course, user: @teacher, progress: progress, gradebook: { foo: 'bar' }
+      @gb_upload = GradebookUpload.new course: @course, user: @teacher, progress: progress, gradebook: { foo: "bar" }
       @gb_upload.save
 
-      get 'data', params: { course_id: @course.id }
+      get "data", params: { course_id: @course.id }
       expect(response).to be_successful
       expect(response.body).to eq("{\"foo\":\"bar\"}")
     end
@@ -133,9 +133,9 @@ describe GradebookUploadsController do
     it "destroys an uploaded gradebook after retrieval" do
       user_session(@teacher)
       progress = Progress.create!(tag: "test", context: @teacher)
-      @gb_upload = GradebookUpload.new course: @course, user: @teacher, progress: progress, gradebook: { foo: 'bar' }
+      @gb_upload = GradebookUpload.new course: @course, user: @teacher, progress: progress, gradebook: { foo: "bar" }
       @gb_upload.save
-      get 'data', params: { course_id: @course.id }
+      get "data", params: { course_id: @course.id }
       expect { GradebookUpload.find(@gb_upload.id) }.to raise_error(ActiveRecord::RecordNotFound)
       expect(response).to be_successful
     end
@@ -143,7 +143,7 @@ describe GradebookUploadsController do
 
   describe "GET 'show'" do
     it "requires authorization" do
-      get 'data', params: { course_id: @course.id }
+      get "data", params: { course_id: @course.id }
       assert_unauthorized
     end
 
@@ -154,10 +154,10 @@ describe GradebookUploadsController do
         user_session(@teacher)
         progress = Progress.create!(tag: "test", context: @teacher)
 
-        @gb_upload = GradebookUpload.new course: @course, user: @teacher, progress: progress, gradebook: { foo: 'bar' }
+        @gb_upload = GradebookUpload.new course: @course, user: @teacher, progress: progress, gradebook: { foo: "bar" }
         @gb_upload.save
 
-        get 'show', params: { course_id: @course.id }
+        get "show", params: { course_id: @course.id }
         expect(assigns[:js_env]).to have_key(:bulk_update_override_scores_path)
       end
 
@@ -165,10 +165,10 @@ describe GradebookUploadsController do
         user_session(@teacher)
         progress = Progress.create!(tag: "test", context: @teacher)
 
-        @gb_upload = GradebookUpload.new course: @course, user: @teacher, progress: progress, gradebook: { foo: 'bar' }
+        @gb_upload = GradebookUpload.new course: @course, user: @teacher, progress: progress, gradebook: { foo: "bar" }
         @gb_upload.save
 
-        get 'show', params: { course_id: @course.id }
+        get "show", params: { course_id: @course.id }
         expect(assigns[:js_env]).not_to have_key(:bulk_update_override_scores_path)
       end
     end

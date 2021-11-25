@@ -18,27 +18,27 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../views_helper'
+require_relative "../views_helper"
 
 describe "assignments list sidebar" do
   before(:once) do
     course_with_teacher(active_all: true)
-    g = @course.assignment_groups.create!(name: 'some group')
-    a = @course.assignments.create!(title: 'some assignment')
+    g = @course.assignment_groups.create!(name: "some group")
+    a = @course.assignments.create!(title: "some assignment")
     a.assignment_group_id = g.id
     a.save!
   end
 
   it "renders for non-students" do
     view_context(@course, @teacher)
-    render 'assignments/_assignments_list_right_side'
+    render "assignments/_assignments_list_right_side"
     expect(response).to have_tag("div.events_list")
   end
 
   it "does not render anything for students" do
     course_with_student(active_all: true)
     view_context(@course, @student)
-    render 'assignments/_assignments_list_right_side'
-    expect(response).to_not have_tag('div')
+    render "assignments/_assignments_list_right_side"
+    expect(response).to_not have_tag("div")
   end
 end

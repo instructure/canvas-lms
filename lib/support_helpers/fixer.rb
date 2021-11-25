@@ -45,7 +45,7 @@ module SupportHelpers
     end
 
     def fixer_name
-      [@prefix, self.class.name.demodulize, "##{job_id}"].compact.join(' ')
+      [@prefix, self.class.name.demodulize, "##{job_id}"].compact.join(" ")
     end
 
     private
@@ -78,7 +78,7 @@ module SupportHelpers
     end
 
     def mail_from
-      'supporthelperscript@instructure.com'
+      "supporthelperscript@instructure.com"
     end
 
     def mail_subject(status)

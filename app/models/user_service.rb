@@ -39,7 +39,7 @@ class UserService < ActiveRecord::Base
     if should_have_communication_channel?
       cc = user.communication_channels.where(path_type: service).first_or_initialize
       cc.path_type = service
-      cc.workflow_state = 'active'
+      cc.workflow_state = "active"
       cc.path = "#{service_user_id}@#{service}.com"
       cc.save!
     end
@@ -86,13 +86,13 @@ class UserService < ActiveRecord::Base
   end
 
   def password=(password)
-    self.crypted_password, self.password_salt = Canvas::Security.encrypt_password(password, 'instructure_user_service')
+    self.crypted_password, self.password_salt = Canvas::Security.encrypt_password(password, "instructure_user_service")
   end
 
   def decrypted_password
     return nil unless password_salt && crypted_password
 
-    Canvas::Security.decrypt_password(crypted_password, password_salt, 'instructure_user_service')
+    Canvas::Security.decrypt_password(crypted_password, password_salt, "instructure_user_service")
   end
 
   def self.register(opts = {})
@@ -124,19 +124,19 @@ class UserService < ActiveRecord::Base
     opts[:secret] = nil
     opts[:service] = params[:service]
     case opts[:service]
-    when 'delicious'
+    when "delicious"
       opts[:service_domain] = "delicious.com"
       opts[:protocol] = "http-auth"
       opts[:service_user_id] = params[:user_name]
       opts[:service_user_name] = params[:user_name]
       opts[:password] = params[:password]
-    when 'diigo'
+    when "diigo"
       opts[:service_domain] = "diigo.com"
       opts[:protocol] = "http-auth"
       opts[:service_user_id] = params[:user_name]
       opts[:service_user_name] = params[:user_name]
       opts[:password] = params[:password]
-    when 'skype'
+    when "skype"
       opts[:service_domain] = "skype.com"
       opts[:service_user_id] = params[:user_name]
       opts[:service_user_name] = params[:user_name]
@@ -152,20 +152,20 @@ class UserService < ActiveRecord::Base
   end
 
   def has_readable_user_name?
-    service == 'google_drive'
+    service == "google_drive"
   end
 
   def self.sort_position(type)
     case type
-    when 'google_drive'
+    when "google_drive"
       2
-    when 'skype'
+    when "skype"
       3
     when CommunicationChannel::TYPE_TWITTER
       4
-    when 'delicious'
+    when "delicious"
       7
-    when 'diigo'
+    when "diigo"
       8
     else
       999
@@ -174,35 +174,35 @@ class UserService < ActiveRecord::Base
 
   def self.short_description(type)
     case type
-    when 'google_drive'
-      t '#user_service.descriptions.google_drive', 'Students can use Google Drive to collaborate on group projects.  Google Drive allows for real-time collaborative editing of documents, spreadsheets and presentations.'
+    when "google_drive"
+      t "#user_service.descriptions.google_drive", "Students can use Google Drive to collaborate on group projects.  Google Drive allows for real-time collaborative editing of documents, spreadsheets and presentations."
     when CommunicationChannel::TYPE_TWITTER
-      t '#user_service.descriptions.twitter', 'Twitter is a great resource for out-of-class communication.'
-    when 'delicious'
-      t '#user_service.descriptions.delicious', 'Delicious is a collaborative link-sharing tool.  You can tag any page on the Internet for later reference.  You can also link to other users\' Delicious accounts to share links of similar interest.'
-    when 'diigo'
-      t '#user_service.descriptions.diigo', 'Diigo is a collaborative link-sharing tool.  You can tag any page on the Internet for later reference.  You can also link to other users\' Diigo accounts to share links of similar interest.'
-    when 'skype'
-      t '#user_service.descriptions.skype', 'Skype is a free tool for online voice and video calls.'
+      t "#user_service.descriptions.twitter", "Twitter is a great resource for out-of-class communication."
+    when "delicious"
+      t "#user_service.descriptions.delicious", "Delicious is a collaborative link-sharing tool.  You can tag any page on the Internet for later reference.  You can also link to other users' Delicious accounts to share links of similar interest."
+    when "diigo"
+      t "#user_service.descriptions.diigo", "Diigo is a collaborative link-sharing tool.  You can tag any page on the Internet for later reference.  You can also link to other users' Diigo accounts to share links of similar interest."
+    when "skype"
+      t "#user_service.descriptions.skype", "Skype is a free tool for online voice and video calls."
     else # 'google_calendar'
-      ''
+      ""
     end
   end
 
   def self.registration_url(type)
     case type
-    when 'google_drive'
-      'https://www.google.com/drive/'
-    when 'google_calendar'
-      'http://calendar.google.com'
+    when "google_drive"
+      "https://www.google.com/drive/"
+    when "google_calendar"
+      "http://calendar.google.com"
     when CommunicationChannel::TYPE_TWITTER
-      'http://twitter.com/signup'
-    when 'delicious'
-      'http://delicious.com/'
-    when 'diigo'
-      'https://www.diigo.com/sign-up'
-    when 'skype'
-      'http://www.skype.com/go/register'
+      "http://twitter.com/signup"
+    when "delicious"
+      "http://delicious.com/"
+    when "diigo"
+      "https://www.diigo.com/sign-up"
+    when "skype"
+      "http://www.skype.com/go/register"
     else
       nil
     end
@@ -210,31 +210,31 @@ class UserService < ActiveRecord::Base
 
   def service_user_link
     case service
-    when 'google_drive'
-      'https://myaccount.google.com/?pli=1'
-    when 'google_calendar'
-      'http://calendar.google.com'
+    when "google_drive"
+      "https://myaccount.google.com/?pli=1"
+    when "google_calendar"
+      "http://calendar.google.com"
     when CommunicationChannel::TYPE_TWITTER
       "http://www.twitter.com/#{service_user_name}"
-    when 'delicious'
+    when "delicious"
       "http://www.delicious.com/#{service_user_name}"
-    when 'diigo'
+    when "diigo"
       "http://www.diigo.com/user/#{service_user_name}"
-    when 'skype'
+    when "skype"
       "skype:#{service_user_name}?add"
     else
-      'http://www.instructure.com'
+      "http://www.instructure.com"
     end
   end
 
   def self.service_type(type)
     case type
-    when 'google_docs', 'google_drive'
-      'DocumentService'
-    when 'delicious', 'diigo'
-      'BookmarkService'
+    when "google_docs", "google_drive"
+      "DocumentService"
+    when "delicious", "diigo"
+      "BookmarkService"
     else
-      'UserService'
+      "UserService"
     end
   end
 

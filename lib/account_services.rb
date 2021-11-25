@@ -20,7 +20,7 @@
 module AccountServices
   class AllowedServicesHash < Hash
     def _dump(*)
-      ''
+      ""
     end
 
     def self._load(*); end

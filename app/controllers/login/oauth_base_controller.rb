@@ -29,7 +29,7 @@ class Login::OAuthBaseController < ApplicationController
     # it from the URL
     return if @aac
 
-    auth_type = params[:controller].sub(%r{^login/}, '')
+    auth_type = params[:controller].sub(%r{^login/}, "")
     # ActionController::TestCase can't deal with aliased controllers, so we have to
     # explicitly specify this
     auth_type = params[:auth_type] if Rails.env.test?
@@ -44,7 +44,7 @@ class Login::OAuthBaseController < ApplicationController
   protected
 
   def timeout_protection
-    default_timeout = Setting.get('oauth_timelimit', 10.seconds.to_s).to_f
+    default_timeout = Setting.get("oauth_timelimit", 10.seconds.to_s).to_f
 
     timeout_options = { raise_on_timeout: true, fallback_timeout_length: default_timeout }
 

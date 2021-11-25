@@ -130,10 +130,10 @@ class ContentSharesController < ApplicationController
     create_params = params.permit(:content_type, :content_id)
     allowed_types = %w[assignment attachment discussion_topic page quiz module module_item]
     unless create_params[:content_type] && create_params[:content_id]
-      return render(json: { message: 'Content type and id required' }, status: :bad_request)
+      return render(json: { message: "Content type and id required" }, status: :bad_request)
     end
     unless allowed_types.include?(create_params[:content_type])
-      return render(json: { message: "Content type not allowed. Allowed types: #{allowed_types.join(',')}" }, status: :bad_request)
+      return render(json: { message: "Content type not allowed. Allowed types: #{allowed_types.join(",")}" }, status: :bad_request)
     end
 
     content_type = ContentShare::TYPE_TO_CLASS[create_params[:content_type]]
@@ -143,19 +143,19 @@ class ContentSharesController < ApplicationController
               elsif content_type.respond_to? :active
                 content&.active
               end
-    content = content&.where(tag_type: 'context_module') if content_type == ContentTag
+    content = content&.where(tag_type: "context_module") if content_type == ContentTag
     content = content&.take
-    return render(json: { message: 'Requested share content not found' }, status: :bad_request) unless content
+    return render(json: { message: "Requested share content not found" }, status: :bad_request) unless content
 
     export_params = ActionController::Parameters.new(skip_notifications: true,
                                                      select: { create_params[:content_type].pluralize => [create_params[:content_id]] },
                                                      export_type: ContentExport::COMMON_CARTRIDGE)
     export = create_content_export_from_api(export_params, content.context, @current_user)
     return unless export.instance_of?(ContentExport)
-    return render(json: { message: 'Unable to export content' }, status: :bad_request) unless export.id
+    return render(json: { message: "Unable to export content" }, status: :bad_request) unless export.id
 
     name = Context.asset_name(content)
-    sender_share = @current_user.sent_content_shares.create(content_export: export, name: name, read_state: 'read')
+    sender_share = @current_user.sent_content_shares.create(content_export: export, name: name, read_state: "read")
     create_receiver_shares(sender_share, @receivers)
     render json: content_share_json(sender_share, @current_user, session), status: :created
   end
@@ -172,7 +172,7 @@ class ContentSharesController < ApplicationController
   # @returns [ContentShare]
   def index
     if authorized_action(@user, @current_user, :read)
-      if params[:list] == 'received'
+      if params[:list] == "received"
         shares = Api.paginate(@user.received_content_shares.by_date, self, api_v1_user_received_content_shares_url)
         render json: received_content_shares_json(shares, @current_user, session)
       else
@@ -224,7 +224,7 @@ class ContentSharesController < ApplicationController
   def destroy
     @content_share = @current_user.content_shares.find(params[:id])
     @content_share.destroy
-    render json: { message: 'content share deleted' }
+    render json: { message: "content share deleted" }
   end
 
   # @API Add users to content share
@@ -240,7 +240,7 @@ class ContentSharesController < ApplicationController
   # @returns ContentShare
   def add_users
     @content_share = @current_user.content_shares.find(params[:id])
-    reject!('Content share not owned by you') unless @content_share.is_a?(SentContentShare)
+    reject!("Content share not owned by you") unless @content_share.is_a?(SentContentShare)
 
     create_receiver_shares(@content_share, @receivers - @content_share.receivers)
     @content_share.reload
@@ -275,7 +275,7 @@ class ContentSharesController < ApplicationController
     @receivers = api_find_all(User, Array(receiver_ids))
 
     unless @receivers.any?
-      render(json: { message: 'No valid receiving users found' }, status: :bad_request)
+      render(json: { message: "No valid receiving users found" }, status: :bad_request)
       false
     end
 

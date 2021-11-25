@@ -18,10 +18,10 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative('web_conference_spec_helper')
+require_relative("web_conference_spec_helper")
 
 describe WimbaConference do
-  include_examples 'WebConference'
+  include_examples "WebConference"
 
   # implements this WebConference option:
   it { is_expected.to respond_to :admin_settings_url }
@@ -31,29 +31,29 @@ describe WimbaConference do
       # set up a simple double that mimics basic API functionality
       def send_request(action, opts = {})
         @mocked_users ||= { added: [], admins: [], joined: [] }
-        extra = ''
-        if action == 'Init'
-          @auth_cookie = 'authcookie=secret'
+        extra = ""
+        if action == "Init"
+          @auth_cookie = "authcookie=secret"
         else
           return nil unless init_session
-          return nil unless @auth_cookie == 'authcookie=secret'
+          return nil unless @auth_cookie == "authcookie=secret"
 
           case action
-          when 'modifyUser'
-            return nil unless @mocked_users[:added].include?(opts['target'])
-          when 'createUser'
-            @mocked_users[:added] << opts['target']
-          when 'createRole'
-            @mocked_users[:admins] << opts['user_id'] if opts['role_id'] == 'Instructor'
-          when 'getAuthToken'
-            return nil unless @mocked_users[:added].include?(opts['target'])
-            return nil if @mocked_users[:joined].empty? && !@mocked_users[:admins].include?(opts['target'])
+          when "modifyUser"
+            return nil unless @mocked_users[:added].include?(opts["target"])
+          when "createUser"
+            @mocked_users[:added] << opts["target"]
+          when "createRole"
+            @mocked_users[:admins] << opts["user_id"] if opts["role_id"] == "Instructor"
+          when "getAuthToken"
+            return nil unless @mocked_users[:added].include?(opts["target"])
+            return nil if @mocked_users[:joined].empty? && !@mocked_users[:admins].include?(opts["target"])
 
-            @mocked_users[:joined] << opts['target']
-            extra = "\nauthToken=s3kr1tfor#{opts['target']}\nuser_id=#{opts['target']}\n=END RECORD"
-          when 'statusClass'
+            @mocked_users[:joined] << opts["target"]
+            extra = "\nauthToken=s3kr1tfor#{opts["target"]}\nuser_id=#{opts["target"]}\n=END RECORD"
+          when "statusClass"
             extra = "\nnum_users=#{@mocked_users[:joined].size}\nroomlock=\n=END RECORD"
-          when 'listClass'
+          when "listClass"
             extra = "\nclass_id=abc123\nlongname=ABC 123\n=END RECORD\nlongname=DEF 456\nclass_id=def456\n=END RECORD"
           end
         end
@@ -76,8 +76,8 @@ describe WimbaConference do
     conference = WimbaConference.new
     config = conference.config
     expect(config).not_to be_nil
-    expect(config[:conference_type]).to eql('Wimba')
-    expect(config[:class_name]).to eql('WimbaConference')
+    expect(config[:conference_type]).to eql("Wimba")
+    expect(config[:class_name]).to eql("WimbaConference")
   end
 
   it "confirms valid config" do

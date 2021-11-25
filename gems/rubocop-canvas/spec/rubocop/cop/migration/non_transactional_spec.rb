@@ -20,7 +20,7 @@
 describe RuboCop::Cop::Migration::NonTransactional do
   subject(:cop) { described_class.new }
 
-  it 'complains about concurrent indexes in ddl transaction' do
+  it "complains about concurrent indexes in ddl transaction" do
     inspect_source(<<~RUBY)
       class TestMigration < ActiveRecord::Migration
 
@@ -34,7 +34,7 @@ describe RuboCop::Cop::Migration::NonTransactional do
     expect(cop.offenses.first.severity.name).to eq(:warning)
   end
 
-  it 'ignores non-concurrent indexes' do
+  it "ignores non-concurrent indexes" do
     inspect_source(<<~RUBY)
       class TestMigration < ActiveRecord::Migration
 
@@ -46,7 +46,7 @@ describe RuboCop::Cop::Migration::NonTransactional do
     expect(cop.offenses.size).to eq(0)
   end
 
-  it 'is ok with concurrent indexes added non-transactionally' do
+  it "is ok with concurrent indexes added non-transactionally" do
     inspect_source(<<~RUBY)
       class TestMigration < ActiveRecord::Migration
         disable_ddl_transaction!
@@ -59,7 +59,7 @@ describe RuboCop::Cop::Migration::NonTransactional do
     expect(cop.offenses.size).to eq(0)
   end
 
-  it 'complains about missing if_not_exists for add_index' do
+  it "complains about missing if_not_exists for add_index" do
     inspect_source(<<~RUBY)
       class TestMigration < ActiveRecord::Migration
         disable_ddl_transaction!
@@ -74,7 +74,7 @@ describe RuboCop::Cop::Migration::NonTransactional do
     expect(cop.offenses.first.severity.name).to eq(:warning)
   end
 
-  it 'complains about missing if_not_exists for add_column' do
+  it "complains about missing if_not_exists for add_column" do
     inspect_source(<<~RUBY)
       class TestMigration < ActiveRecord::Migration
         disable_ddl_transaction!
@@ -89,7 +89,7 @@ describe RuboCop::Cop::Migration::NonTransactional do
     expect(cop.offenses.first.severity.name).to eq(:warning)
   end
 
-  it 'is ok about missing if_not_exists for add_index when transactional' do
+  it "is ok about missing if_not_exists for add_index when transactional" do
     inspect_source(<<~RUBY)
       class TestMigration < ActiveRecord::Migration
         def up
@@ -100,7 +100,7 @@ describe RuboCop::Cop::Migration::NonTransactional do
     expect(cop.offenses.size).to eq(0)
   end
 
-  it 'is ok about missing if_not_exists for add_column when transactional' do
+  it "is ok about missing if_not_exists for add_column when transactional" do
     inspect_source(<<~RUBY)
       class TestMigration < ActiveRecord::Migration
         def up
@@ -111,7 +111,7 @@ describe RuboCop::Cop::Migration::NonTransactional do
     expect(cop.offenses.size).to eq(0)
   end
 
-  it 'is ok about if_not_exists for add_index' do
+  it "is ok about if_not_exists for add_index" do
     inspect_source(<<~RUBY)
       class TestMigration < ActiveRecord::Migration
         disable_ddl_transaction!
@@ -124,7 +124,7 @@ describe RuboCop::Cop::Migration::NonTransactional do
     expect(cop.offenses.size).to eq(0)
   end
 
-  it 'is ok about if_not_exists for add_column' do
+  it "is ok about if_not_exists for add_column" do
     inspect_source(<<~RUBY)
       class TestMigration < ActiveRecord::Migration
         disable_ddl_transaction!
@@ -137,7 +137,7 @@ describe RuboCop::Cop::Migration::NonTransactional do
     expect(cop.offenses.size).to eq(0)
   end
 
-  it 'complains about missing if_exists on remove_foreign_key' do
+  it "complains about missing if_exists on remove_foreign_key" do
     inspect_source(<<~RUBY)
       class TestMigration < ActiveRecord::Migration
         disable_ddl_transaction!

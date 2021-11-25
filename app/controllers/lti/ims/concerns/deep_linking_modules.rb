@@ -91,7 +91,7 @@ module Lti::IMS::Concerns
 
     def create_module
       @context_module =
-        @context.context_modules.create!(name: 'New Content From App', workflow_state: 'unpublished')
+        @context.context_modules.create!(name: "New Content From App", workflow_state: "unpublished")
     end
 
     def add_module_items
@@ -100,7 +100,7 @@ module Lti::IMS::Concerns
       content_items_for_modules.each do |content_item|
         context_module.add_item(
           {
-            type: 'context_external_tool',
+            type: "context_external_tool",
             id: tool.id,
             new_tab: 0,
             indent: 0,
@@ -121,7 +121,7 @@ module Lti::IMS::Concerns
 
       content_items_for_assignments.each do |content_item|
         unless content_item.dig(:lineItem, :scoreMaximum)
-          content_item[:errors] = 'lineItem.scoreMaximum is a required field'
+          content_item[:errors] = "lineItem.scoreMaximum is a required field"
           next
         end
 
@@ -129,7 +129,7 @@ module Lti::IMS::Concerns
           assignment =
             @context.assignments.create!(
               {
-                submission_types: 'external_tool',
+                submission_types: "external_tool",
                 title: content_item.dig(:lineItem, :label) || content_item[:title],
                 description: content_item[:text],
                 points_possible: content_item.dig(:lineItem, :scoreMaximum),
@@ -137,7 +137,7 @@ module Lti::IMS::Concerns
                 lock_at: content_item.dig(:available, :endDateTime),
                 due_at: content_item.dig(:submission, :endDateTime),
                 external_tool_tag_attributes: {
-                  content_type: 'ContextExternalTool',
+                  content_type: "ContextExternalTool",
                   content_id: tool.id,
                   new_tab: 0,
                   url: content_item[:url]

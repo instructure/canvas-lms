@@ -20,7 +20,7 @@
 
 module Canvas::MessageHelper
   def self.default_message_path(filename)
-    Rails.root.join('app/messages', filename).to_s
+    Rails.root.join("app/messages", filename).to_s
   end
 
   def self.add_message_path(path)
@@ -76,7 +76,7 @@ module Canvas::MessageHelper
       split_txt = args[4].strip.split("\n").map(&:strip)
       using[:name] ||= split_txt[0]
     end
-    raise 'Name is required' unless using[:name]
+    raise "Name is required" unless using[:name]
 
     n = Notification.where(name: using[:name]).first_or_initialize
     begin

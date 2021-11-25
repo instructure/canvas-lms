@@ -22,13 +22,13 @@ class AddReplicaIdentityForAssetUserAccesses < ActiveRecord::Migration[6.0]
   disable_ddl_transaction!
 
   def up
-    add_replica_identity 'AssetUserAccess', :root_account_id, 0
+    add_replica_identity "AssetUserAccess", :root_account_id, 0
     remove_index :asset_user_accesses, column: :root_account_id, if_exists: true
   end
 
   def down
     add_index :asset_user_accesses, :root_account_id, algorithm: :concurrently, if_not_exists: true
-    remove_replica_identity 'AssetUserAccess'
+    remove_replica_identity "AssetUserAccess"
     change_column_null :asset_user_accesses, :root_account_id, true
   end
 end

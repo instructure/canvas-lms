@@ -36,7 +36,7 @@ module Factories
     @context = opts[:context] || @course || course_factory(opts)
 
     @request_id = opts[:request_id] || SecureRandom.uuid
-    Setting.set('enable_page_views', 'db')
+    Setting.set("enable_page_views", "db")
 
     @page_view = PageView.new do |p|
       p.assign_attributes({
@@ -44,16 +44,16 @@ module Factories
                             url: opts[:url] || "http://test.one/",
                             session_id: "phony",
                             context: @context,
-                            controller: opts[:controller] || 'courses',
-                            action: opts[:action] || 'show',
+                            controller: opts[:controller] || "courses",
+                            action: opts[:action] || "show",
                             user_request: true,
                             render_time: 0.01,
-                            user_agent: 'None',
+                            user_agent: "None",
                             account_id: @account.id,
                             request_id: @request_id,
                             interaction_seconds: 5,
                             user: @user,
-                            remote_ip: '192.168.0.42'
+                            remote_ip: "192.168.0.42"
                           })
     end
     @page_view.assign_attributes(created_at: opts[:created_at]) if opts[:created_at]

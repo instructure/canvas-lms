@@ -17,8 +17,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../helpers/assignments_common'
-require_relative '../helpers/differentiated_assignments'
+require_relative "../helpers/assignments_common"
+require_relative "../helpers/differentiated_assignments"
 
 describe "interaction with differentiated assignments/quizzes/discusssions in modules" do
   include_context "in-process server selenium tests"
@@ -66,9 +66,9 @@ describe "interaction with differentiated assignments/quizzes/discusssions in mo
       create_section_override_for_assignment(@da_discussion.assignment)
       create_section_override_for_assignment(@da_quiz)
       create_section_override_for_assignment(@da_assignment, course_section: @section1)
-      @module.completion_requirements = { @tag_assignment.id => { type: 'must_view' },
-                                          @tag_discussion.id => { type: 'must_view' },
-                                          @tag_quiz.id => { type: 'must_view' } }
+      @module.completion_requirements = { @tag_assignment.id => { type: "must_view" },
+                                          @tag_discussion.id => { type: "must_view" },
+                                          @tag_quiz.id => { type: "must_view" } }
       @module.save
       expect(@module.evaluate_for(@student).workflow_state).to include("unlocked")
       get "/courses/#{@course.id}/modules/items/#{@tag_discussion.id}"

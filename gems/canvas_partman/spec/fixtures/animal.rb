@@ -20,9 +20,9 @@
 class CanvasPartmanTest::Animal < ActiveRecord::Base
   include CanvasPartman::Concerns::Partitioned
 
-  self.table_name = 'partman_animals'
+  self.table_name = "partman_animals"
 
-  belongs_to :zoo, class_name: 'CanvasPartmanTest::Zoo'
+  belongs_to :zoo, class_name: "CanvasPartmanTest::Zoo"
 
   def self.create_schema
     drop_schema

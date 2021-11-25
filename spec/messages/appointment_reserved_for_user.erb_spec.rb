@@ -18,9 +18,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative 'messages_helper'
+require_relative "messages_helper"
 
-describe 'appointment_reserved_for_user' do
+describe "appointment_reserved_for_user" do
   include MessagesCommon
 
   before :once do
@@ -41,8 +41,8 @@ describe 'appointment_reserved_for_user' do
 
     it "renders" do
       msg = generate_message(notification_name, path_type, asset, message_options)
-      expect(msg.subject).to include('some title')
-      expect(msg.body).to include('some title')
+      expect(msg.subject).to include("some title")
+      expect(msg.body).to include("some title")
       expect(msg.body).to include(@teacher.name)
       expect(msg.body).to include(@user.name)
       expect(msg.body).to include(@course.name)
@@ -63,7 +63,7 @@ describe 'appointment_reserved_for_user' do
 
     it "renders" do
       msg = generate_message(notification_name, path_type, asset, message_options)
-      expect(msg.body).to include('some title')
+      expect(msg.body).to include("some title")
     end
   end
 
@@ -72,8 +72,8 @@ describe 'appointment_reserved_for_user' do
 
     it "renders" do
       msg = generate_message(notification_name, path_type, asset, message_options)
-      expect(msg.subject).to include('some title')
-      expect(msg.body).to include('some title')
+      expect(msg.subject).to include("some title")
+      expect(msg.body).to include("some title")
       expect(msg.body).to include(@teacher.name)
     end
   end
@@ -83,7 +83,7 @@ describe 'appointment_reserved_for_user' do
 
     it "renders" do
       msg = generate_message(notification_name, path_type, asset, message_options)
-      expect(msg.body).to include('some title')
+      expect(msg.body).to include("some title")
     end
   end
 end

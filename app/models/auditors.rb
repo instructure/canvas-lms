@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-require 'audits'
+require "audits"
 
 module Auditors
   # TODO: this module is currently being extracted to the

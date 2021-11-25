@@ -69,7 +69,7 @@ module SIS
         raise ImportError, "Improper status \"#{status}\" for course #{course_id}" unless /\A(active|deleted|completed|unpublished|published)/i.match?(status)
         raise ImportError, "Invalid course_format \"#{course_format}\" for course #{course_id}" unless course_format.blank? || course_format =~ /\A(online|on_campus|blended|not_set)/i
 
-        valid_grade_passback_settings = (Setting.get('valid_grade_passback_settings', 'nightly_sync,disabled').split(',') << 'not_set')
+        valid_grade_passback_settings = (Setting.get("valid_grade_passback_settings", "nightly_sync,disabled").split(",") << "not_set")
         raise ImportError, "Invalid grade_passback_setting \"#{grade_passback_setting}\" for course #{course_id}" unless grade_passback_setting.blank? || valid_grade_passback_settings.include?(grade_passback_setting.downcase.strip)
         return if @batch.skip_deletes? && status =~ /deleted/i
 
@@ -105,41 +105,41 @@ module SIS
 
           course.integration_id = integration_id
           course.sis_source_id = course_id
-          active_state = status.casecmp?('published') ? 'available' : 'claimed'
+          active_state = status.casecmp?("published") ? "available" : "claimed"
           unless course.stuck_sis_fields.include?(:workflow_state)
             if %w[active unpublished published].include?(status.downcase)
               case course.workflow_state
-              when 'completed'
+              when "completed"
                 # not using active state here, because it has always been set to available
                 # and customers have used this as a workaround to publishing courses. conclude, then restore.
-                course.workflow_state = 'available'
+                course.workflow_state = "available"
                 state_changes << :unconcluded
-              when 'deleted'
+              when "deleted"
                 course.workflow_state = active_state
                 state_changes << :restored
-              when 'created', 'claimed', nil
+              when "created", "claimed", nil
                 course.workflow_state = active_state
-                state_changes << :published if active_state == 'available'
+                state_changes << :published if active_state == "available"
               end
             elsif /deleted/i.match?(status)
-              course.workflow_state = 'deleted'
+              course.workflow_state = "deleted"
               state_changes << :deleted
             elsif /completed/i.match?(status)
-              course.workflow_state = 'completed'
+              course.workflow_state = "completed"
               state_changes << :concluded
             end
           end
 
           course_dates_stuck = !(course.stuck_sis_fields & [:start_at, :conclude_at]).empty?
           unless course_dates_stuck
-            if start_date == '<delete>' && end_date == '<delete>'
+            if start_date == "<delete>" && end_date == "<delete>"
               course.restrict_enrollments_to_course_dates = false
             end
-            course.start_at = start_date unless start_date == 'not_present'
-            course.start_at = nil if start_date == '<delete>'
-            course.conclude_at = end_date unless end_date == 'not_present'
-            course.conclude_at = nil if end_date == '<delete>'
-            if !course.stuck_sis_fields.include?(:restrict_enrollments_to_course_dates) && !(start_date == 'not_present' && end_date == 'not_present')
+            course.start_at = start_date unless start_date == "not_present"
+            course.start_at = nil if start_date == "<delete>"
+            course.conclude_at = end_date unless end_date == "not_present"
+            course.conclude_at = nil if end_date == "<delete>"
+            if !course.stuck_sis_fields.include?(:restrict_enrollments_to_course_dates) && !(start_date == "not_present" && end_date == "not_present")
               course.restrict_enrollments_to_course_dates = (start_date.present? || end_date.present?)
             end
           end
@@ -184,7 +184,7 @@ module SIS
           update_enrollments = !course.new_record? && !(course.changes.keys & %w[workflow_state name course_code]).empty?
 
           if course_format
-            course_format = nil if course_format == 'not_set'
+            course_format = nil if course_format == "not_set"
             if course_format != course.course_format
               course.settings_will_change!
               course.course_format = course_format
@@ -194,7 +194,7 @@ module SIS
           if grade_passback_setting
             grade_passback_setting_stuck = course.stuck_sis_fields.include?(:grade_passback_setting)
             unless grade_passback_setting_stuck
-              grade_passback_setting = nil if grade_passback_setting == 'not_set'
+              grade_passback_setting = nil if grade_passback_setting == "not_set"
               course.grade_passback_setting = grade_passback_setting
             end
           end
@@ -224,7 +224,7 @@ module SIS
               else
                 msg = "A (templated) course did not pass validation " \
                       "(course: #{course_id} / #{short_name}, error: " \
-                      "#{templated_course.errors.full_messages.join(',')})"
+                      "#{templated_course.errors.full_messages.join(",")})"
                 raise ImportError, msg
               end
             end
@@ -238,7 +238,7 @@ module SIS
             else
               msg = "A course did not pass validation " \
                     "(course: #{course_id} / #{short_name}, error: " \
-                    "#{course.errors.full_messages.join(',')})"
+                    "#{course.errors.full_messages.join(",")})"
               raise ImportError, msg
             end
             @course_ids_to_update_associations.add(course.id) if update_account_associations
@@ -248,7 +248,7 @@ module SIS
 
           if blueprint_course_id && !course.deleted?
             case blueprint_course_id
-            when 'dissociate'
+            when "dissociate"
               MasterCourses::ChildSubscription.active.where(child_course_id: course.id).take&.destroy
             else
               @blueprint_associations[blueprint_course_id] ||= []

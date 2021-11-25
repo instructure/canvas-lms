@@ -26,13 +26,13 @@ module QuizMathDataFixup
                 else
                   quiz_or_bank.quiz_questions
                 end
-    questions = questions.where('updated_at>?', check_date) if check_date
+    questions = questions.where("updated_at>?", check_date) if check_date
     questions.find_each do |quiz_question|
       old_data = quiz_question.question_data.to_hash
       new_data = fixup_question_data(quiz_question.question_data.to_hash.symbolize_keys)
       quiz_question.write_attribute(:question_data, new_data) if new_data != old_data
       if quiz_question.changed?
-        stat = question_bank ? 'updated_math_qb_question' : 'updated_math_question'
+        stat = question_bank ? "updated_math_qb_question" : "updated_math_question"
         InstStatsd::Statsd.increment(stat)
         changed = true
         quiz_question.save!
@@ -40,7 +40,7 @@ module QuizMathDataFixup
     rescue => e
       Canvas::Errors.capture(e)
     end
-    qstat = question_bank ? 'updated_math_question_bank' : 'updated_math_quiz'
+    qstat = question_bank ? "updated_math_question_bank" : "updated_math_quiz"
     InstStatsd::Statsd.increment(qstat) if changed
     quiz_or_bank
   end
@@ -74,8 +74,8 @@ module QuizMathDataFixup
 
         answer[key] = fixup_html(answer[key])
 
-        text_key = key.to_s.sub(/html/, 'text')
-        answer[text_key] = '' if answer[text_key].present?
+        text_key = key.to_s.sub(/html/, "text")
+        answer[text_key] = "" if answer[text_key].present?
       end
       data[:answers][index] = answer
     end
@@ -109,15 +109,15 @@ module QuizMathDataFixup
       html.search('[id^="MathJax"]').each(&:remove)
       return html.to_s
     end
-    html.search('.math_equation_latex').each do |latex|
+    html.search(".math_equation_latex").each do |latex|
       # find MathJax generated children, extract the eq's mathml
       # incase we need it later, then remove them
       mjnodes =
         html.search('[class^="MathJax"]')
 
       unless mjnodes.empty?
-        n = mjnodes.filter('[data-mathml]')[0]
-        mml = n.attribute('data-mathml') if n
+        n = mjnodes.filter("[data-mathml]")[0]
+        mml = n.attribute("data-mathml") if n
         mjnodes.each(&:remove)
       end
       if !latex.content.empty?
@@ -126,10 +126,10 @@ module QuizMathDataFixup
           # and doesn't even _look like_ latex
           # remove math_equation_latex from the class then leave it alone
 
-          latex.attribute('class').value =
-            latex.attribute('class').value.sub('math_equation_latex', '').strip
+          latex.attribute("class").value =
+            latex.attribute("class").value.sub("math_equation_latex", "").strip
         else
-          code = latex.content.gsub(/(^\\\(|\\\)$)/, '')
+          code = latex.content.gsub(/(^\\\(|\\\)$)/, "")
           escaped = URI.escape(URI.escape(code))
           latex.replace(
             "<img class='equation_image' src='/equation_images/#{escaped}' alt='LaTeX: #{
@@ -147,9 +147,9 @@ module QuizMathDataFixup
     end
 
     html.search('[id^="MathJax"]').each(&:remove)
-    html.search('span.hidden-readable').each(&:remove)
+    html.search("span.hidden-readable").each(&:remove)
 
-    return html_str if html.content.empty? && html.search('img.equation_image').empty?
+    return html_str if html.content.empty? && html.search("img.equation_image").empty?
 
     html.to_s
   end

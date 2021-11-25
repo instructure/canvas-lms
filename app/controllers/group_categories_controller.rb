@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'csv'
+require "csv"
 
 # @API Group Categories
 #
@@ -123,7 +123,7 @@ class GroupCategoriesController < ApplicationController
         if authorized_action(@context, @current_user, [:manage_groups, *RoleOverride::GRANULAR_MANAGE_GROUPS_PERMISSIONS])
           path = send("api_v1_#{@context.class.to_s.downcase}_group_categories_url")
           paginated_categories = Api.paginate(@categories, self, path)
-          includes = ['progress_url']
+          includes = ["progress_url"]
           includes.concat(params[:includes]) if params[:includes]
           render json: paginated_categories.map { |c| group_category_json(c, @current_user, session, include: includes) }
         end
@@ -145,7 +145,7 @@ class GroupCategoriesController < ApplicationController
     respond_to do |format|
       format.json do
         if authorized_action(@group_category.context, @current_user, [:manage_groups, *RoleOverride::GRANULAR_MANAGE_GROUPS_PERMISSIONS])
-          includes = ['progress_url']
+          includes = ["progress_url"]
           includes.concat(params[:includes]) if params[:includes]
           render json: group_category_json(@group_category, @current_user, session, include: includes)
         end
@@ -212,7 +212,7 @@ class GroupCategoriesController < ApplicationController
           end
           render json: group_category_json(@group_category, @current_user, session, include: includes)
         else
-          flash[:notice] = t('notices.create_category_success', 'Category was successfully created.')
+          flash[:notice] = t("notices.create_category_success", "Category was successfully created.")
           render json: [@group_category.as_json, @group_category.groups.map { |g| g.as_json(include: :users) }]
         end
       end
@@ -266,7 +266,7 @@ class GroupCategoriesController < ApplicationController
   # @returns Progress
   def import
     if authorized_action(@context, @current_user, [:manage_groups, :manage_groups_add])
-      return render(json: { 'status' => 'unauthorized' }, status: :unauthorized) if @group_category.protected?
+      return render(json: { "status" => "unauthorized" }, status: :unauthorized) if @group_category.protected?
 
       file_obj = if params.key?(:attachment)
                    params[:attachment]
@@ -327,7 +327,7 @@ class GroupCategoriesController < ApplicationController
       @group_category ||= @context.group_categories.where(id: params[:category_id]).first
       if api_request?
         if populate_group_category_from_params
-          includes = ['progress_url']
+          includes = ["progress_url"]
           includes.concat(params[:includes]) if params[:includes]
           render json: group_category_json(@group_category, @current_user, session, include: includes)
         end
@@ -343,11 +343,11 @@ class GroupCategoriesController < ApplicationController
           end
         end
       else
-        return render(json: { 'status' => 'not found' }, status: :not_found) unless @group_category
-        return render(json: { 'status' => 'unauthorized' }, status: :unauthorized) if @group_category.protected?
+        return render(json: { "status" => "not found" }, status: :not_found) unless @group_category
+        return render(json: { "status" => "unauthorized" }, status: :unauthorized) if @group_category.protected?
 
         if populate_group_category_from_params
-          flash[:notice] = t('notices.update_category_success', 'Category was successfully updated.')
+          flash[:notice] = t("notices.update_category_success", "Category was successfully updated.")
           render json: @group_category
         end
       end
@@ -366,14 +366,14 @@ class GroupCategoriesController < ApplicationController
   def destroy
     if authorized_action(@context, @current_user, [:manage_groups, :manage_groups_delete])
       @group_category ||= @context.group_categories.where(id: params[:category_id]).first
-      return render(json: { 'status' => 'not found' }, status: :not_found) unless @group_category
-      return render(json: { 'status' => 'unauthorized' }, status: :unauthorized) if @group_category.protected?
+      return render(json: { "status" => "not found" }, status: :not_found) unless @group_category
+      return render(json: { "status" => "unauthorized" }, status: :unauthorized) if @group_category.protected?
 
       if @group_category.destroy
         if api_request?
           render json: group_category_json(@group_category, @current_user, session)
         else
-          flash[:notice] = t('notices.delete_category_success', "Category successfully deleted")
+          flash[:notice] = t("notices.delete_category_success", "Category successfully deleted")
           render json: { deleted: true }
         end
       elsif api_request?
@@ -433,7 +433,7 @@ class GroupCategoriesController < ApplicationController
         # keep inside authorized_action block to avoid
         # double render error if user is not authorized
         respond_to do |format|
-          format.csv { send_data csv_string, type: 'text/csv', filename: "#{@group_category.name}.csv", disposition: 'attachment' }
+          format.csv { send_data csv_string, type: "text/csv", filename: "#{@group_category.name}.csv", disposition: "attachment" }
         end
       end
     end
@@ -515,11 +515,11 @@ class GroupCategoriesController < ApplicationController
 
     includes = Array(params[:include])
     users = Api.paginate(users, self, api_v1_group_category_users_url)
-    UserPastLtiId.manual_preload_past_lti_ids(users, @group_category.groups) if ['uuid', 'lti_id'].any? { |id| includes.include? id }
+    UserPastLtiId.manual_preload_past_lti_ids(users, @group_category.groups) if ["uuid", "lti_id"].any? { |id| includes.include? id }
     user_json_preloads(users, false, { profile: true })
     json_users = users_json(users, @current_user, session, includes, @context, nil, Array(params[:exclude]))
 
-    if includes.include?('group_submissions') && @group_category.context_type == "Course"
+    if includes.include?("group_submissions") && @group_category.context_type == "Course"
       submissions_by_user = @group_category.submission_ids_by_user_id(users.map(&:id))
       json_users.each do |user|
         user[:group_submissions] = submissions_by_user[user[:id]]
@@ -684,7 +684,7 @@ class GroupCategoriesController < ApplicationController
       id = api_request? ? params[:group_category_id] : params[:id]
       @group_category = api_find(GroupCategory.active, id)
     rescue ActiveRecord::RecordNotFound
-      return render(json: { 'status' => 'not found' }, status: :not_found) unless @group_category
+      return render(json: { "status" => "not found" }, status: :not_found) unless @group_category
     end
     @context = @group_category.context
   end
@@ -716,11 +716,11 @@ class GroupCategoriesController < ApplicationController
                                    Attachment.mimetype("course_group_import.#{params[:extension]}"))
     else
       env = request.env.dup
-      env['CONTENT_TYPE'] = env["ORIGINAL_CONTENT_TYPE"]
+      env["CONTENT_TYPE"] = env["ORIGINAL_CONTENT_TYPE"]
       # copy of request with original content type restored
       request2 = Rack::Request.new(env)
-      charset = request2.media_type_params['charset']
-      if charset.present? && charset.casecmp('utf-8') != 0
+      charset = request2.media_type_params["charset"]
+      if charset.present? && charset.casecmp("utf-8") != 0
         raise InvalidContentType
       end
 

@@ -20,16 +20,16 @@
 
 describe "SummaryMessageConsolidator" do
   it "processes in batches" do
-    Setting.set('summary_message_consolidator_batch_size', '2')
+    Setting.set("summary_message_consolidator_batch_size", "2")
     users = (0..3).map { user_with_communication_channel }
     messages = []
     users.each { |u| 3.times { messages << delayed_message_model(cc: u.communication_channels.first, send_at: 1.day.ago) } }
 
-    expects_job_with_tag('Delayed::Batch.serial', 2) do
+    expects_job_with_tag("Delayed::Batch.serial", 2) do
       SummaryMessageConsolidator.process
     end
     messages.each do |m|
-      expect(m.reload.workflow_state).to eq 'sent'
+      expect(m.reload.workflow_state).to eq "sent"
       expect(m.batched_at).to be_present
     end
     queued = created_jobs.map { |j| j.payload_object.jobs.map { |j2| j2.payload_object.args } }.flatten

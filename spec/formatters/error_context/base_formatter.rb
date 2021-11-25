@@ -186,7 +186,7 @@ module ErrorContext
     end
 
     def page_html
-      example.metadata[:page_html] || 'Page HTML was not captured.'
+      example.metadata[:page_html] || "Page HTML was not captured."
     end
 
     def capture_screenshot?

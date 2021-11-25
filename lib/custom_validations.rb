@@ -26,7 +26,7 @@ module CustomValidations
 
         record.send("#{attr}=", value)
       rescue CanvasHttp::Error, URI::Error, ArgumentError
-        record.errors.add attr, 'is not a valid URL'
+        record.errors.add attr, "is not a valid URL"
       end
     end
 

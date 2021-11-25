@@ -17,10 +17,10 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'ddtrace'
-require 'digest/sha1'
+require "ddtrace"
+require "digest/sha1"
 
-require_dependency 'canvas/dynamic_settings'
+require_dependency "canvas/dynamic_settings"
 
 module Canvas
   # This module is currently a wrapper for managing connecting with ddtrace
@@ -68,25 +68,25 @@ module Canvas
         if canvas_cluster.present?
           dynamic_settings = Canvas::DynamicSettings.find(tree: :private, cluster: canvas_cluster)
         end
-        @_config = YAML.safe_load(dynamic_settings['datadog_apm.yml'] || '{}')
+        @_config = YAML.safe_load(dynamic_settings["datadog_apm.yml"] || "{}")
       end
 
       def sample_rate
         return @_sample_rate if @_sample_rate.present?
 
-        @_sample_rate = config.fetch('sample_rate', 0.0).to_f
+        @_sample_rate = config.fetch("sample_rate", 0.0).to_f
       end
 
       def host_sample_rate
         return @_host_sample_rate if @_host_sample_rate.present?
 
-        @_host_sample_rate = config.fetch('host_sample_rate', 0.0).to_f
+        @_host_sample_rate = config.fetch("host_sample_rate", 0.0).to_f
       end
 
       def analytics_enabled?
         return @_app_analytics_enabled unless @_app_analytics_enabled.nil?
 
-        @_app_analytics_enabled = config.fetch('app_analytics_enabled', false)
+        @_app_analytics_enabled = config.fetch("app_analytics_enabled", false)
       end
 
       def configured?
@@ -148,11 +148,11 @@ module Canvas
         apm_root_span = tracer.active_root_span
         return if apm_root_span.blank?
 
-        apm_root_span.set_tag('request_context_id', request_context_id.to_s) if request_context_id.present?
-        apm_root_span.set_tag('shard', shard.id.to_s) if shard.try(:id).present?
+        apm_root_span.set_tag("request_context_id", request_context_id.to_s) if request_context_id.present?
+        apm_root_span.set_tag("shard", shard.id.to_s) if shard.try(:id).present?
         act_global_id = root_account.try(:global_id)
-        apm_root_span.set_tag('root_account', act_global_id.to_s) if act_global_id.present?
-        apm_root_span.set_tag('current_user', current_user.global_id.to_s) if current_user
+        apm_root_span.set_tag("root_account", act_global_id.to_s) if act_global_id.present?
+        apm_root_span.set_tag("current_user", current_user.global_id.to_s) if current_user
       end
 
       # use this to wrap arbitrary code in traces
@@ -186,9 +186,9 @@ module Canvas
       # see available "Options" to be passed on here:
       # http://gems.datadoghq.com/trace/docs/#Manual_Instrumentation
       def trace(resource_name, opts = {}, &block)
-        opts[:service] = opts.fetch(:service, 'canvas_custom')
+        opts[:service] = opts.fetch(:service, "canvas_custom")
         opts[:resource] = resource_name
-        opts[:span_type] = opts.fetch(:span_type, 'canvas_ruby')
+        opts[:span_type] = opts.fetch(:span_type, "canvas_ruby")
         tracer.trace("application.code", opts, &block)
       end
     end

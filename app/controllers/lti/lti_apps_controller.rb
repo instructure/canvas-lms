@@ -36,11 +36,11 @@ module Lti
     end
 
     def launch_definitions
-      placements = params['placements'] || []
+      placements = params["placements"] || []
       if authorized_for_launch_definitions(@context, @current_user, placements)
         # only_visible requires that specific placements are requested.  If a user is not read_admin, and they request only_visible
         # without placements, an empty array will be returned.
-        collection = if placements == ['global_navigation']
+        collection = if placements == ["global_navigation"]
                        # We allow global_navigation to pull all the launch_definitions, even if they are not explicitly visible to user.
                        AppLaunchCollator.bookmarked_collection(@context, placements, { current_user: @current_user, session: session, only_visible: false })
                      else
@@ -100,7 +100,7 @@ module Lti
       # have any account-level permissions. So instead, just ensure that the user
       # is associated with the current account (not sure how it could be otherwise?)
       return true if context.is_a?(Account) && \
-                     placements == ['global_navigation'] && \
+                     placements == ["global_navigation"] && \
                      user_in_account?(user, context)
 
       authorized_action(context, user, :read)

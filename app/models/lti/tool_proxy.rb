@@ -20,18 +20,18 @@
 
 module Lti
   class ToolProxy < ActiveRecord::Base
-    has_many :bindings, class_name: 'Lti::ToolProxyBinding', dependent: :destroy
-    has_many :resources, class_name: 'Lti::ResourceHandler', dependent: :destroy
-    has_many :tool_settings, class_name: 'Lti::ToolSetting', dependent: :destroy
-    has_many :message_handlers, class_name: 'Lti::MessageHandler'
+    has_many :bindings, class_name: "Lti::ToolProxyBinding", dependent: :destroy
+    has_many :resources, class_name: "Lti::ResourceHandler", dependent: :destroy
+    has_many :tool_settings, class_name: "Lti::ToolSetting", dependent: :destroy
+    has_many :message_handlers, class_name: "Lti::MessageHandler"
 
     belongs_to :context, polymorphic: [:course, :account]
-    belongs_to :product_family, class_name: 'Lti::ProductFamily'
+    belongs_to :product_family, class_name: "Lti::ProductFamily"
 
     after_save :manage_subscription
     before_destroy :delete_subscription
 
-    scope :active, -> { where(lti_tool_proxies: { workflow_state: 'active' }) }
+    scope :active, -> { where(lti_tool_proxies: { workflow_state: "active" }) }
 
     serialize :raw_data
     serialize :update_payload
@@ -47,55 +47,55 @@ module Lti
     def self.find_active_proxies_for_context_by_vendor_code_and_product_code(context:, vendor_code:, product_code:)
       find_active_proxies_for_context(context)
         .eager_load(:product_family)
-        .where('lti_product_families.vendor_code = ? AND lti_product_families.product_code = ?', vendor_code, product_code)
+        .where("lti_product_families.vendor_code = ? AND lti_product_families.product_code = ?", vendor_code, product_code)
     end
 
     def self.find_active_proxies_for_context(context)
-      find_all_proxies_for_context(context).where(lti_tool_proxies: { workflow_state: 'active' })
+      find_all_proxies_for_context(context).where(lti_tool_proxies: { workflow_state: "active" })
     end
 
     def self.find_installed_proxies_for_context(context)
-      find_all_proxies_for_context(context).where.not(lti_tool_proxies: { workflow_state: 'deleted' })
+      find_all_proxies_for_context(context).where.not(lti_tool_proxies: { workflow_state: "deleted" })
     end
 
     def self.find_all_proxies_for_context(context)
       account_ids = context.account_chain.map(&:id)
 
-      account_sql_string = account_ids.each_with_index.map { |x, i| "('Account',#{x},#{i})" }.unshift("('#{context.class.name}',#{context.id},0)").join(',')
+      account_sql_string = account_ids.each_with_index.map { |x, i| "('Account',#{x},#{i})" }.unshift("('#{context.class.name}',#{context.id},0)").join(",")
 
-      subquery = ToolProxyBinding.select('DISTINCT ON (lti_tool_proxies.id) lti_tool_proxy_bindings.*').joins(:tool_proxy)
+      subquery = ToolProxyBinding.select("DISTINCT ON (lti_tool_proxies.id) lti_tool_proxy_bindings.*").joins(:tool_proxy)
                                  .joins("INNER JOIN ( VALUES #{account_sql_string}) as x(context_type, context_id, ordering) ON lti_tool_proxy_bindings.context_type = x.context_type AND lti_tool_proxy_bindings.context_id = x.context_id")
-                                 .where('(lti_tool_proxy_bindings.context_type = ? AND lti_tool_proxy_bindings.context_id = ?) OR (lti_tool_proxy_bindings.context_type = ? AND lti_tool_proxy_bindings.context_id IN (?))', context.class.name, context.id, 'Account', account_ids)
-                                 .order('lti_tool_proxies.id, x.ordering').to_sql
-      ToolProxy.joins("JOIN (#{subquery}) bindings on lti_tool_proxies.id = bindings.tool_proxy_id").where('bindings.enabled = true')
+                                 .where("(lti_tool_proxy_bindings.context_type = ? AND lti_tool_proxy_bindings.context_id = ?) OR (lti_tool_proxy_bindings.context_type = ? AND lti_tool_proxy_bindings.context_id IN (?))", context.class.name, context.id, "Account", account_ids)
+                                 .order("lti_tool_proxies.id, x.ordering").to_sql
+      ToolProxy.joins("JOIN (#{subquery}) bindings on lti_tool_proxies.id = bindings.tool_proxy_id").where("bindings.enabled = true")
     end
 
     def self.proxies_in_order_by_codes(context:, vendor_code:, product_code:, resource_type_code:)
       account_ids = context.account_chain.map(&:id)
 
       # Added i+1 on this to ensure that the x.ordering later doesn't have 2 0's
-      account_sql_string = account_ids.each_with_index.map { |x, i| "('Account',#{x},#{i + 1})" }.unshift("('#{context.class.name}',#{context.id},0)").join(',')
+      account_sql_string = account_ids.each_with_index.map { |x, i| "('Account',#{x},#{i + 1})" }.unshift("('#{context.class.name}',#{context.id},0)").join(",")
 
       subquery = ToolProxyBinding
-                 .select('DISTINCT ON (x.ordering, lti_tool_proxy_bindings.tool_proxy_id) lti_tool_proxy_bindings.*, x.ordering')
+                 .select("DISTINCT ON (x.ordering, lti_tool_proxy_bindings.tool_proxy_id) lti_tool_proxy_bindings.*, x.ordering")
                  .joins("INNER JOIN (
             VALUES #{account_sql_string}) as x(context_type, context_id, ordering
           ) ON lti_tool_proxy_bindings.context_type = x.context_type
             AND lti_tool_proxy_bindings.context_id = x.context_id")
                  .where('(lti_tool_proxy_bindings.context_type = ? AND lti_tool_proxy_bindings.context_id = ?)
           OR (lti_tool_proxy_bindings.context_type = ? AND lti_tool_proxy_bindings.context_id IN (?))',
-                        context.class.name, context.id, 'Account', account_ids)
+                        context.class.name, context.id, "Account", account_ids)
                  .order("lti_tool_proxy_bindings.tool_proxy_id, x.ordering").to_sql
       tools = joins("JOIN (#{subquery}) bindings on lti_tool_proxies.id = bindings.tool_proxy_id")
-              .select('lti_tool_proxies.*, bindings.enabled AS binding_enabled').
+              .select("lti_tool_proxies.*, bindings.enabled AS binding_enabled").
               # changed this from eager_load, because eager_load likes to wipe out custom select attributes
               joins(:product_family)
               .joins(:resources).
               # changed the order to go from the special ordering set up (to make sure we're going from the course to the
               # root account in order of parent accounts) and then takes the most recently installed tool
-              order('ordering, lti_tool_proxies.id DESC')
-              .where(lti_tool_proxies: { workflow_state: 'active' })
-              .where('lti_product_families.vendor_code = ? AND lti_product_families.product_code = ?', vendor_code, product_code)
+              order("ordering, lti_tool_proxies.id DESC")
+              .where(lti_tool_proxies: { workflow_state: "active" })
+              .where("lti_product_families.vendor_code = ? AND lti_product_families.product_code = ?", vendor_code, product_code)
               .where(lti_resource_handlers: { resource_type_code: resource_type_code })
       # You can disable a tool_binding somewhere in the account chain, and anything below that that reenables it should be
       # available, but nothing above it, so we're getting rid of anything that is disabled and above
@@ -121,7 +121,7 @@ module Lti
     end
 
     def default_resource_handler
-      @default_resource_handler ||= resources.where(resource_type_code: 'instructure.com:default').first
+      @default_resource_handler ||= resources.where(resource_type_code: "instructure.com:default").first
     end
 
     def update?
@@ -139,19 +139,19 @@ module Lti
     delegate :enabled_capabilities, to: :ims_tool_proxy
 
     def matching_tool_profile?(other_profile)
-      profile = raw_data['tool_profile']
+      profile = raw_data["tool_profile"]
 
-      return false if profile.dig('product_instance', 'product_info', 'product_family', 'vendor', 'code') !=
-                      other_profile.dig('product_instance', 'product_info', 'product_family', 'vendor', 'code')
+      return false if profile.dig("product_instance", "product_info", "product_family", "vendor", "code") !=
+                      other_profile.dig("product_instance", "product_info", "product_family", "vendor", "code")
 
-      return false if profile.dig('product_instance', 'product_info', 'product_family', 'code') !=
-                      other_profile.dig('product_instance', 'product_info', 'product_family', 'code')
+      return false if profile.dig("product_instance", "product_info", "product_family", "code") !=
+                      other_profile.dig("product_instance", "product_info", "product_family", "code")
 
-      resource_handlers = profile['resource_handler']
-      other_resource_handlers = other_profile['resource_handler']
+      resource_handlers = profile["resource_handler"]
+      other_resource_handlers = other_profile["resource_handler"]
 
-      rh_names = resource_handlers.map { |rh| rh.dig('resource_type', 'code') }
-      other_rh_names = other_resource_handlers.map { |rh| rh.dig('resource_type', 'code') }
+      rh_names = resource_handlers.map { |rh| rh.dig("resource_type", "code") }
+      other_rh_names = other_resource_handlers.map { |rh| rh.dig("resource_type", "code") }
       return false if rh_names.sort != other_rh_names.sort
 
       true
@@ -185,10 +185,10 @@ module Lti
       # new subscriptions will get all events for the whole root account, and are
       # filtered by the associatedIntegrationId (tool guid) inside the live events
       # publish tool.
-      if subscription_id.blank? && workflow_state == 'active' && plagiarism_tool?
+      if subscription_id.blank? && workflow_state == "active" && plagiarism_tool?
         subscription_id = Lti::PlagiarismSubscriptionsHelper.new(self)&.create_subscription
         update_columns(subscription_id: subscription_id)
-      elsif self.subscription_id.present? && workflow_state != 'active'
+      elsif self.subscription_id.present? && workflow_state != "active"
         delete_subscription
       end
     end
@@ -201,13 +201,13 @@ module Lti
     end
 
     def plagiarism_tool?
-      raw_data.try(:dig, 'enabled_capability')&.include?(Lti::ResourcePlacement::SIMILARITY_DETECTION_LTI2)
+      raw_data.try(:dig, "enabled_capability")&.include?(Lti::ResourcePlacement::SIMILARITY_DETECTION_LTI2)
     end
 
     def event_endpoint
-      raw_data.try(:dig, 'tool_profile', 'service_offered')&.find do |service|
-        service['@id'].include?('#vnd.Canvas.SubmissionEvent')
-      end&.dig('endpoint')
+      raw_data.try(:dig, "tool_profile", "service_offered")&.find do |service|
+        service["@id"].include?("#vnd.Canvas.SubmissionEvent")
+      end&.dig("endpoint")
     end
   end
 end

@@ -93,7 +93,7 @@ class AnonymousOrModerationEvent < ApplicationRecord
     validates :canvadoc_id, absence: true
   end
 
-  with_options if: ->(e) { e.event_type&.start_with?('docviewer') } do
+  with_options if: ->(e) { e.event_type&.start_with?("docviewer") } do
     validates :canvadoc_id, presence: true
     validates :submission_id, presence: true
     validate :payload_annotation_body_present

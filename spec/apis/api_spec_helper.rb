@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'nokogiri'
+require "nokogiri"
 
 class HashWithDupCheck < Hash
   def []=(k, v)
@@ -41,14 +41,14 @@ def api_call(method, path, params, body_params = {}, headers = {}, opts = {})
     assert_status(opts[:expected_status])
   end
 
-  if response.headers['Link']
+  if response.headers["Link"]
     # make sure that the link header is properly formed
-    Api.parse_pagination_links(response.headers['Link'])
+    Api.parse_pagination_links(response.headers["Link"])
   end
 
   case params[:format]
-  when 'json', :json
-    raise "got non-json" unless response.header[content_type_key] == 'application/json; charset=utf-8'
+  when "json", :json
+    raise "got non-json" unless response.header[content_type_key] == "application/json; charset=utf-8"
 
     body = response.body
     if body.respond_to?(:call)
@@ -70,13 +70,13 @@ def api_call(method, path, params, body_params = {}, headers = {}, opts = {})
 end
 
 def jsonapi_call?(headers)
-  headers['Accept'] == 'application/vnd.api+json'
+  headers["Accept"] == "application/vnd.api+json"
 end
 
 # like api_call, but performed by the specified user instead of @user
 def api_call_as_user(user, method, path, params, body_params = {}, headers = {}, opts = {})
   token = access_token_for_user(user)
-  headers['Authorization'] = "Bearer #{token}"
+  headers["Authorization"] = "Bearer #{token}"
   account = opts[:domain_root_account] || Account.default
   user.pseudonyms.reload
   p = SisPseudonym.for(user, account, type: :implicit, require_sis: false)
@@ -96,7 +96,7 @@ end
 
 # like api_call, but don't assume success and a json response.
 def raw_api_call(method, path, params, body_params = {}, headers = {}, opts = {})
-  path = path.sub(%r{\Ahttps?://[^/]+}, '') # remove protocol+host
+  path = path.sub(%r{\Ahttps?://[^/]+}, "") # remove protocol+host
   enable_forgery_protection do
     route_params = params_from_with_nesting(method, path)
     route_params.each do |key, value|
@@ -105,10 +105,10 @@ def raw_api_call(method, path, params, body_params = {}, headers = {}, opts = {}
     if @use_basic_auth
       user_session(@user)
     else
-      headers['HTTP_AUTHORIZATION'] = headers['Authorization'] if headers.key?('Authorization')
-      if !params.key?(:api_key) && !params.key?(:access_token) && !headers.key?('HTTP_AUTHORIZATION') && @user
+      headers["HTTP_AUTHORIZATION"] = headers["Authorization"] if headers.key?("Authorization")
+      if !params.key?(:api_key) && !params.key?(:access_token) && !headers.key?("HTTP_AUTHORIZATION") && @user
         token = access_token_for_user(@user)
-        headers['HTTP_AUTHORIZATION'] = "Bearer #{token}"
+        headers["HTTP_AUTHORIZATION"] = "Bearer #{token}"
         account = opts[:domain_root_account] || Account.default
         p = @user.all_active_pseudonyms(:reload) && SisPseudonym.for(@user, account, type: :implicit, require_sis: false)
         p ||= account.pseudonyms.create!(unique_id: "#{@user.id}@example.com", user: @user)
@@ -121,7 +121,7 @@ def raw_api_call(method, path, params, body_params = {}, headers = {}, opts = {}
 end
 
 def follow_pagination_link(rel, params = {})
-  links = Api.parse_pagination_links(response.headers['Link'])
+  links = Api.parse_pagination_links(response.headers["Link"])
   link = links.find { |l| l[:rel] == rel }
   link.delete(:rel)
   uri = link.delete(:uri).to_s
@@ -130,7 +130,7 @@ def follow_pagination_link(rel, params = {})
 end
 
 def params_from_with_nesting(method, path)
-  path, querystring = path.split('?')
+  path, querystring = path.split("?")
   params = CanvasRails::Application.routes.recognize_path(path, method: method)
   querystring.blank? ? params : params.merge(Rack::Utils.parse_nested_query(querystring).symbolize_keys!)
 end
@@ -141,23 +141,23 @@ end
 
 def check_document(html, course, attachment, include_verifiers)
   doc = Nokogiri::HTML5.fragment(html)
-  img1 = doc.at_css('img#1')
+  img1 = doc.at_css("img#1")
   expect(img1).to be_present
   params = include_verifiers ? "?verifier=#{attachment.uuid}" : ""
-  expect(img1['src']).to eq "http://www.example.com/courses/#{course.id}/files/#{attachment.id}/preview#{params}"
-  img2 = doc.at_css('img#2')
+  expect(img1["src"]).to eq "http://www.example.com/courses/#{course.id}/files/#{attachment.id}/preview#{params}"
+  img2 = doc.at_css("img#2")
   expect(img2).to be_present
-  expect(img2['src']).to eq "http://www.example.com/courses/#{course.id}/files/#{attachment.id}/download#{params}"
-  img3 = doc.at_css('img#3')
+  expect(img2["src"]).to eq "http://www.example.com/courses/#{course.id}/files/#{attachment.id}/download#{params}"
+  img3 = doc.at_css("img#3")
   expect(img3).to be_present
-  expect(img3['src']).to eq "http://www.example.com/courses/#{course.id}/files/#{attachment.id}#{params}"
-  video = doc.at_css('video')
+  expect(img3["src"]).to eq "http://www.example.com/courses/#{course.id}/files/#{attachment.id}#{params}"
+  video = doc.at_css("video")
   expect(video).to be_present
-  expect(video['poster']).to match(%r{http://www.example.com/media_objects/qwerty/thumbnail})
-  expect(video['src']).to match(%r{http://www.example.com/courses/#{course.id}/media_download})
-  expect(video['src']).to match(/entryId=qwerty/)
-  expect(doc.css('a').last['data-api-endpoint']).to match(%r{http://www.example.com/api/v1/courses/#{course.id}/pages/awesome-page})
-  expect(doc.css('a').last['data-api-returntype']).to eq 'Page'
+  expect(video["poster"]).to match(%r{http://www.example.com/media_objects/qwerty/thumbnail})
+  expect(video["src"]).to match(%r{http://www.example.com/courses/#{course.id}/media_download})
+  expect(video["src"]).to match(/entryId=qwerty/)
+  expect(doc.css("a").last["data-api-endpoint"]).to match(%r{http://www.example.com/api/v1/courses/#{course.id}/pages/awesome-page})
+  expect(doc.css("a").last["data-api-returntype"]).to eq "Page"
 end
 
 # passes the cb a piece of user content html text. the block should return the
@@ -245,7 +245,7 @@ def assert_jsonapi_compliance(json, primary_set, associations = [])
 
   if associations.any?
     required_keys.concat(associations.map(&:pluralize))
-    required_keys << 'meta'
+    required_keys << "meta"
   end
 
   # test key values instead of nr. of keys so we get meaningful failures
@@ -253,14 +253,14 @@ def assert_jsonapi_compliance(json, primary_set, associations = [])
 
   required_keys.each do |key|
     expect(json).to be_has_key(key)
-    expect(json[key].is_a?(Array)).to be_truthy unless key == 'meta'
+    expect(json[key].is_a?(Array)).to be_truthy unless key == "meta"
   end
 
   if associations.any?
-    expect(json['meta']['primaryCollection']).to eq primary_set
+    expect(json["meta"]["primaryCollection"]).to eq primary_set
   end
 end
 
 def redirect_params
-  Rack::Utils.parse_nested_query(URI(response.headers['Location']).query)
+  Rack::Utils.parse_nested_query(URI(response.headers["Location"]).query)
 end

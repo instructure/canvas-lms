@@ -35,10 +35,10 @@ class ConversationParticipant < ActiveRecord::Base
   after_destroy :destroy_conversation_message_participants
 
   scope :visible, -> { where.not(last_message_at: nil) }
-  scope :default, -> { where(workflow_state: ['read', 'unread']) }
-  scope :unread, -> { where(workflow_state: 'unread') }
-  scope :archived, -> { where(workflow_state: 'archived') }
-  scope :starred, -> { where(label: 'starred') }
+  scope :default, -> { where(workflow_state: ["read", "unread"]) }
+  scope :unread, -> { where(workflow_state: "unread") }
+  scope :archived, -> { where(workflow_state: "archived") }
+  scope :starred, -> { where(label: "starred") }
   scope :sent, -> { where.not(visible_last_authored_at: nil).order("visible_last_authored_at DESC, conversation_id DESC") }
   scope :for_masquerading_user, lambda { |masquerading_user, user_being_viewed|
     # site admins can see everything
@@ -71,7 +71,7 @@ class ConversationParticipant < ActiveRecord::Base
     own_root_account_ids.sort!.uniq!
     id_string = "[" + own_root_account_ids.join("][") + "]"
     root_account_id_matcher = "'%[' || REPLACE(conversation_participants.root_account_ids, ',', ']%[') || ']%'"
-    where("conversation_participants.root_account_ids <> '' AND " + like_condition('?', root_account_id_matcher, false), id_string)
+    where("conversation_participants.root_account_ids <> '' AND " + like_condition("?", root_account_id_matcher, false), id_string)
   }
 
   # Produces a subscope for conversations in which the given users are
@@ -98,7 +98,7 @@ class ConversationParticipant < ActiveRecord::Base
       scope_shard = s
     end
     scope_shard ||= Shard.current
-    exterior_user_ids = tags.map { |t| t.delete_prefix('user_').to_i }
+    exterior_user_ids = tags.map { |t| t.delete_prefix("user_").to_i }
 
     # which users have conversations on which shards?
     users_by_conversation_shard =
@@ -156,7 +156,7 @@ class ConversationParticipant < ActiveRecord::Base
           conversation_ids = ConversationParticipant.where(shard_conditions).pluck(:conversation_id).map do |id|
             Shard.relative_id_for(id, Shard.current, scope_shard)
           end
-          ["conversation_id IN (#{conversation_ids.join(',')})"]
+          ["conversation_id IN (#{conversation_ids.join(",")})"]
         end
       end
     end
@@ -167,7 +167,7 @@ class ConversationParticipant < ActiveRecord::Base
     # options[:mode], since they're results per shard that we want to combine;
     # each individual condition already takes options[:mode] into account)
     if conditions.size > 1
-      "(#{conditions.join(' OR ')})"
+      "(#{conditions.join(" OR ")})"
     else
       conditions
     end
@@ -180,7 +180,7 @@ class ConversationParticipant < ActiveRecord::Base
       # cast to an id relative to the default shard before use in queries.
       type, id = ActiveRecord::Base.parse_asset_string(tag)
       id = Shard.relative_id_for(id, Shard.current, Shard.birth)
-      wildcard('conversation_participants.tags', "#{type.underscore}_#{id}", delimiter: ',')
+      wildcard("conversation_participants.tags", "#{type.underscore}_#{id}", delimiter: ",")
     end
   end
 
@@ -196,7 +196,7 @@ class ConversationParticipant < ActiveRecord::Base
   before_destroy :update_unread_count_for_destroy
 
   validates :conversation_id, :user_id, :workflow_state, presence: true
-  validates :label, inclusion: { in: ['starred'], allow_nil: true }
+  validates :label, inclusion: { in: ["starred"], allow_nil: true }
 
   def as_json(options = {})
     latest = last_message
@@ -230,15 +230,15 @@ class ConversationParticipant < ActiveRecord::Base
   end
 
   def messages
-    all_messages.where("(workflow_state <> ? OR workflow_state IS NULL)", 'deleted')
+    all_messages.where("(workflow_state <> ? OR workflow_state IS NULL)", "deleted")
   end
 
   def participants(options = {})
     participants = shard.activate do
-      key = [conversation, 'participants'].cache_key
+      key = [conversation, "participants"].cache_key
       participants = Rails.cache.fetch(key) { conversation.participants }
       if options[:include_indirect_participants]
-        indirect_key = [conversation, user, 'indirect_participants'].cache_key
+        indirect_key = [conversation, user, "indirect_participants"].cache_key
         participants += Rails.cache.fetch(indirect_key) do
           user_ids = messages.map(&:all_forwarded_messages).flatten.map(&:author_id)
           user_ids -= participants.map(&:id)
@@ -257,9 +257,9 @@ class ConversationParticipant < ActiveRecord::Base
 
   def clear_participants_cache
     shard.activate do
-      key = [conversation, 'participants'].cache_key
+      key = [conversation, "participants"].cache_key
       Rails.cache.delete(key)
-      indirect_key = [conversation, user, 'indirect_participants'].cache_key
+      indirect_key = [conversation, user, "indirect_participants"].cache_key
       Rails.cache.delete(indirect_key)
     end
   end
@@ -304,7 +304,7 @@ class ConversationParticipant < ActiveRecord::Base
 
   # if this is false, should queue a job to add the message, don't wait
   def should_process_immediately?
-    conversation.conversation_participants.count < Setting.get('max_immediate_conversation_participants', 100).to_i
+    conversation.conversation_participants.count < Setting.get("max_immediate_conversation_participants", 100).to_i
   end
 
   # Public: soft deletes the message participants for this conversation
@@ -350,13 +350,13 @@ class ConversationParticipant < ActiveRecord::Base
         if operation == :delete
           scope.delete_all
         else
-          scope.update_all(workflow_state: 'deleted', deleted_at: Time.now)
+          scope.update_all(workflow_state: "deleted", deleted_at: Time.now)
         end
       else
         if operation == :delete
           scope.where(conversation_message_id: to_delete).delete_all
         else
-          scope.where(conversation_message_id: to_delete).update_all(workflow_state: 'deleted', deleted_at: Time.now)
+          scope.where(conversation_message_id: to_delete).update_all(workflow_state: "deleted", deleted_at: Time.now)
         end
         # if the only messages left are generated ones, e.g. "added
         # bob to the conversation", delete those too
@@ -374,7 +374,7 @@ class ConversationParticipant < ActiveRecord::Base
   def update(hash)
     # subscribed= can update the workflow_state, but an explicit
     # workflow_state should trump that. so we do this first
-    subscribed = (hash.key?(:subscribed) ? hash.delete(:subscribed) : hash.delete('subscribed'))
+    subscribed = (hash.key?(:subscribed) ? hash.delete(:subscribed) : hash.delete("subscribed"))
     self.subscribed = subscribed unless subscribed.nil?
     super
   end
@@ -388,16 +388,16 @@ class ConversationParticipant < ActiveRecord::Base
     if subscribed_changed?
       if subscribed?
         update_cached_data(recalculate_count: false, set_last_message_at: false, regenerate_tags: false)
-        self.workflow_state = 'unread' if last_message_at_changed? && last_message_at > last_message_at_was
+        self.workflow_state = "unread" if last_message_at_changed? && last_message_at > last_message_at_was
       elsif unread?
-        self.workflow_state = 'read'
+        self.workflow_state = "read"
       end
     end
     subscribed?
   end
 
   def starred
-    read_attribute(:label) == 'starred'
+    read_attribute(:label) == "starred"
   end
   alias_method :starred?, :starred
 
@@ -406,7 +406,7 @@ class ConversationParticipant < ActiveRecord::Base
     # be used to convert strings to appropriate boolean values (e.g. 'true' =>
     # true and 'false' => false)
     val = Canvas::Plugin.value_to_boolean(val)
-    write_attribute(:label, val ? 'starred' : nil)
+    write_attribute(:label, val ? "starred" : nil)
   end
 
   def one_on_one?
@@ -453,7 +453,7 @@ class ConversationParticipant < ActiveRecord::Base
                                       end
     else
       self.tags = nil
-      self.workflow_state = 'read' if unread?
+      self.workflow_state = "read" if unread?
       self.message_count = 0
       self.last_message_at = nil
       self.has_attachments = false
@@ -542,13 +542,13 @@ class ConversationParticipant < ActiveRecord::Base
     where_predicates = all.where_clause.instance_variable_get(:@predicates)
     raise "conversation_ids needs to be scoped to a user" unless where_predicates.any? do |v|
       if v.is_a?(Arel::Nodes::Binary) && v.left.is_a?(Arel::Attributes::Attribute)
-        v.left.name == 'user_id'
+        v.left.name == "user_id"
       else
         v =~ /user_id (?:= |IN \()\d+/
       end
     end
 
-    order = 'last_message_at DESC' unless all.order_values.present?
+    order = "last_message_at DESC" unless all.order_values.present?
     self.order(order).pluck(:conversation_id)
   end
 
@@ -559,19 +559,19 @@ class ConversationParticipant < ActiveRecord::Base
   def update_one(update_params)
     case update_params[:event]
 
-    when 'mark_as_read'
-      self.workflow_state = 'read'
-    when 'mark_as_unread'
-      self.workflow_state = 'unread'
-    when 'archive'
-      self.workflow_state = 'archived'
+    when "mark_as_read"
+      self.workflow_state = "read"
+    when "mark_as_unread"
+      self.workflow_state = "unread"
+    when "archive"
+      self.workflow_state = "archived"
 
-    when 'star'
+    when "star"
       self.starred = true
-    when 'unstar'
+    when "unstar"
       self.starred = false
 
-    when 'destroy'
+    when "destroy"
       remove_messages(:all)
 
     end
@@ -581,7 +581,7 @@ class ConversationParticipant < ActiveRecord::Base
   def self.do_batch_update(progress, user, conversation_ids, update_params)
     progress_runner = ProgressRunner.new(progress)
     progress_runner.completed_message do |completed_count|
-      t('batch_update_message', {
+      t("batch_update_message", {
           one: "1 conversation processed",
           other: "%{count} conversations processed"
         },
@@ -590,7 +590,7 @@ class ConversationParticipant < ActiveRecord::Base
 
     progress_runner.do_batch_update(conversation_ids) do |conversation_id|
       participant = user.all_conversations.where(conversation_id: conversation_id).first
-      raise t('not_participating', 'The user is not participating in this conversation') unless participant
+      raise t("not_participating", "The user is not participating in this conversation") unless participant
 
       participant.update_one(update_params)
     end
@@ -627,9 +627,9 @@ class ConversationParticipant < ActiveRecord::Base
   def update_unread_count_for_update
     if user_id_changed?
       update_unread_count(:up) if unread?
-      update_unread_count(:down, user_id_was) if workflow_state_was == 'unread'
-    elsif workflow_state_changed? && [workflow_state, workflow_state_was].include?('unread')
-      update_unread_count(workflow_state == 'unread' ? :up : :down)
+      update_unread_count(:down, user_id_was) if workflow_state_was == "unread"
+    elsif workflow_state_changed? && [workflow_state, workflow_state_was].include?("unread")
+      update_unread_count(workflow_state == "unread" ? :up : :down)
     end
   end
 

@@ -28,7 +28,7 @@ module DataFixup
           if uid_batch.present?
             GuardRail.activate(:primary) do
               Eportfolio.where(user_id: uid_batch, spam_status: nil)
-                        .update_all(spam_status: 'flagged_as_possible_spam')
+                        .update_all(spam_status: "flagged_as_possible_spam")
             end
           end
         end

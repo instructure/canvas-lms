@@ -18,11 +18,11 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 describe MicrosoftSync::GraphService do
-  subject { described_class.new('mytenant', foo: 'bar') }
+  subject { described_class.new("mytenant", foo: "bar") }
 
   it "passes the initialize parameters on to the GraphService::Http" do
-    expect(subject.http.tenant).to eq('mytenant')
-    expect(subject.http.extra_statsd_tags).to eq(foo: 'bar')
+    expect(subject.http.tenant).to eq("mytenant")
+    expect(subject.http.extra_statsd_tags).to eq(foo: "bar")
   end
 
   %i[education_classes groups teams users].each do |met|
@@ -35,8 +35,8 @@ describe MicrosoftSync::GraphService do
 
       it "passes the initialize parameters on to the endpoints' GraphService::Http" do
         expect(endpoints.http).to be_a(MicrosoftSync::GraphService::Http)
-        expect(endpoints.http.tenant).to eq('mytenant')
-        expect(endpoints.http.extra_statsd_tags).to eq(foo: 'bar')
+        expect(endpoints.http.tenant).to eq("mytenant")
+        expect(endpoints.http.extra_statsd_tags).to eq(foo: "bar")
       end
     end
   end

@@ -17,8 +17,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-require 'tmpdir'
-require 'shellwords'
+require "tmpdir"
+require "shellwords"
 module Canvas::Migration
   module MigratorHelper
     include Canvas::Migration
@@ -70,7 +70,7 @@ module Canvas::Migration
     def unique_quiz_dir
       key = if content_migration
               if (a = content_migration.attachment)
-                "#{a.filename.gsub(/\..*/, '')}_#{content_migration.id}"
+                "#{a.filename.gsub(/\..*/, "")}_#{content_migration.id}"
               else
                 content_migration.id.to_s
               end
@@ -84,7 +84,7 @@ module Canvas::Migration
       @settings[:content_migration]
     end
 
-    def add_warning(user_message, exception_or_info = '')
+    def add_warning(user_message, exception_or_info = "")
       if content_migration.respond_to?(:add_warning)
         content_migration.add_warning(user_message, exception_or_info)
       end
@@ -118,7 +118,7 @@ module Canvas::Migration
     end
 
     def create_export_dir(slug)
-      config = ConfigFile.load('external_migration')
+      config = ConfigFile.load("external_migration")
       folder = if config && config[:data_folder]
                  config[:data_folder]
                else
@@ -144,7 +144,7 @@ module Canvas::Migration
       save_errors_to_file
       save_overview_to_file
       logger.debug "Writing the full course json file to: #{file_name}"
-      File.open(file_name, 'w') { |file| file << @course.to_json }
+      File.open(file_name, "w") { |file| file << @course.to_json }
       file_name
     end
 
@@ -229,7 +229,7 @@ module Canvas::Migration
       file_name = File.expand_path(file_name)
       @course[:overview_file_path] = file_name
       logger.debug "Writing the overview course json file to: #{file_name}"
-      File.open(file_name, 'w') { |file| file << overview.to_json }
+      File.open(file_name, "w") { |file| file << overview.to_json }
       file_name
     end
 
@@ -239,7 +239,7 @@ module Canvas::Migration
         file_name = File.expand_path(file_name)
         @course[:error_file_path] = file_name
         logger.debug "Writing the error json file to: #{file_name}"
-        File.open(file_name, 'w') { |file| file << @errors.to_json }
+        File.open(file_name, "w") { |file| file << @errors.to_json }
         file_name
       end
     end
@@ -446,11 +446,11 @@ module Canvas::Migration
       if @course[:tool_profiles]
         @overview[:tool_profiles] = []
         @course[:tool_profiles].each do |tool_profile|
-          title = tool_profile.dig('tool_profile', 'product_instance', 'product_info', 'product_name', 'default_value')
+          title = tool_profile.dig("tool_profile", "product_instance", "product_info", "product_name", "default_value")
           next unless title
 
           profile = {
-            migration_id: tool_profile['migration_id'],
+            migration_id: tool_profile["migration_id"],
             title: title
           }
           @overview[:tool_profiles] << profile

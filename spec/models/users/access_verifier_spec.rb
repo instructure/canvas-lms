@@ -82,7 +82,7 @@ module Users
       end
 
       it "returns verified oauth host claim on success" do
-        host = 'oauth-host'
+        host = "oauth-host"
         verifier = Users::AccessVerifier.generate(user: user, oauth_host: host)
         verified = Users::AccessVerifier.validate(verifier)
         expect(verified).to have_key(:oauth_host)
@@ -98,7 +98,7 @@ module Users
 
       it "raises InvalidVerifier if tampered with user" do
         verifier = Users::AccessVerifier.generate(user: user)
-        tampered = verifier.merge(sf_verifier: 'tampered')
+        tampered = verifier.merge(sf_verifier: "tampered")
         expect { Users::AccessVerifier.validate(tampered) }.to raise_exception(Users::AccessVerifier::InvalidVerifier)
       end
     end

@@ -22,7 +22,7 @@ describe Api::V1::CourseEvent do
   include Api::V1::CourseEvent
 
   def url_root
-    'http://www.example.com'
+    "http://www.example.com"
   end
 
   def api_v1_course_url(course)
@@ -50,7 +50,7 @@ describe Api::V1::CourseEvent do
     @page_view = PageView.new do |p|
       p.assign_attributes({
                             request_id: @request_id,
-                            remote_ip: '10.10.10.10'
+                            remote_ip: "10.10.10.10"
                           })
     end
 

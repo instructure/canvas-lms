@@ -19,6 +19,6 @@
 
 class DataFixup::BackfillDummyRootAccountIdOnFolders
   def self.run
-    while Folder.where(context_type: 'User', root_account_id: nil).limit(1000).update_all(root_account_id: 0) > 0; end
+    while Folder.where(context_type: "User", root_account_id: nil).limit(1000).update_all(root_account_id: 0) > 0; end
   end
 end

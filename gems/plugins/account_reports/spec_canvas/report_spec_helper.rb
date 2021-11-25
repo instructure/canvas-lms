@@ -18,17 +18,17 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'csv'
+require "csv"
 
 module ReportSpecHelper
   def read_report(type = @type, options = {})
     account_report = run_report(type, options)
-    if account_report.workflow_state == 'error' || !account_report.attachment_id
+    if account_report.workflow_state == "error" || !account_report.attachment_id
       error_report = ErrorReport.last
       # using the cerror_class was often leading to different args needed or other
       # failures that made attempting to use the class less helpful
       error_class = error_report&.category&.constantize
-      error = ReportSpecHelperError.new([error_class, error_report&.message].join('_'))
+      error = ReportSpecHelperError.new([error_class, error_report&.message].join("_"))
       error.set_backtrace(error_report&.backtrace&.split("\n") || caller)
       raise error
     end
@@ -42,7 +42,7 @@ module ReportSpecHelper
                                        account: account,
                                        report_type: type)
     parameters ||= {}
-    account_report.parameters = parameters.merge({ 'skip_message' => true })
+    account_report.parameters = parameters.merge({ "skip_message" => true })
     account_report.save!
     if AccountReport.available_reports[type]
       AccountReports.generate_report(account_report)
@@ -55,7 +55,7 @@ module ReportSpecHelper
 
   def parse_report(report, options = {})
     a = report.attachment
-    if a.content_type == 'application/zip'
+    if a.content_type == "application/zip"
       parsed = {}
       Zip::InputStream.open(a.open) do |io|
         while (entry = io.get_next_entry)
@@ -70,14 +70,14 @@ module ReportSpecHelper
 
   def parse_csv(csv, options = {})
     csv_parse_opts = {
-      col_sep: options[:col_sep] || ',',
+      col_sep: options[:col_sep] || ",",
       headers: options[:parse_header] || false,
       return_headers: true,
     }
-    skip_order = true if options[:order] == 'skip'
+    skip_order = true if options[:order] == "skip"
     order = Array(options[:order]).presence || [0, 1]
     all_parsed = CSV.parse(csv, **csv_parse_opts).map.to_a
-    raise 'Must order report results to avoid brittle specs' unless options[:order].present? || all_parsed.count < 3
+    raise "Must order report results to avoid brittle specs" unless options[:order].present? || all_parsed.count < 3
 
     header = all_parsed.shift
     if all_parsed.present? && !skip_order

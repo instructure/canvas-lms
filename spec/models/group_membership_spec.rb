@@ -54,10 +54,10 @@ describe GroupMembership do
     category.save!
     group = category.groups.create!(context: @course)
     # when the group is full
-    group.group_memberships.create!(user: user_model, workflow_state: 'accepted')
-    group.group_memberships.create!(user: user_model, workflow_state: 'accepted')
+    group.group_memberships.create!(user: user_model, workflow_state: "accepted")
+    group.group_memberships.create!(user: user_model, workflow_state: "accepted")
     # expect
-    membership = group.group_memberships.build(user: user_model, workflow_state: 'accepted')
+    membership = group.group_memberships.build(user: user_model, workflow_state: "accepted")
     expect(membership).not_to be_valid
     expect(membership.errors[:group_id]).to eq ["The group is full."]
   end
@@ -79,8 +79,8 @@ describe GroupMembership do
 
     it "has a validation error on new record" do
       membership = GroupMembership.new
-      allow(membership).to receive(:user).and_return(double(name: 'test user'))
-      allow(membership).to receive(:group).and_return(double(name: 'test group'))
+      allow(membership).to receive(:user).and_return(double(name: "test user"))
+      allow(membership).to receive(:group).and_return(double(name: "test group"))
       allow(membership).to receive(:restricted_self_signup?).and_return(true)
       allow(membership).to receive(:has_common_section_with_me?).and_return(false)
       expect(membership.save).not_to be_truthy
@@ -104,26 +104,26 @@ describe GroupMembership do
       end
 
       it "sends message if the first membership in a student organized group", priority: "1" do
-        Notification.create(name: 'New Student Organized Group', category: 'TestImmediately')
+        Notification.create(name: "New Student Organized Group", category: "TestImmediately")
         communication_channel(@teacher, { username: "test_channel_email_#{@teacher.id}@test.com", active_cc: true })
 
         group_membership = @group1.group_memberships.create(user: @student1)
-        expect(group_membership.messages_sent['New Student Organized Group']).not_to be_empty
+        expect(group_membership.messages_sent["New Student Organized Group"]).not_to be_empty
       end
 
       it "sends message when a new student is invited to group and auto-joins", priority: "1" do
-        Notification.create!(name: 'New Context Group Membership', category: 'TestImmediately')
+        Notification.create!(name: "New Context Group Membership", category: "TestImmediately")
         student2 = student_in_course(active_all: true).user
         communication_channel(student2, { username: "test_channel_email_#{student2.id}@test.com", active_cc: true })
         group_membership = @group1.group_memberships.create(user: @student1)
         @group1.add_user(student2)
-        expect(group_membership.messages_sent['New Context Group Membership']).not_to be_empty
+        expect(group_membership.messages_sent["New Context Group Membership"]).not_to be_empty
       end
 
       it "does not dispatch a message if the membership has been created with SIS" do
         membership = @group1.group_memberships.build(user: @student1)
-        Notification.create!(name: 'New Context Group Membership', category: 'TestImmediately')
-        Notification.create!(name: 'New Context Group Membership Invitation', category: 'TestImmediately')
+        Notification.create!(name: "New Context Group Membership", category: "TestImmediately")
+        Notification.create!(name: "New Context Group Membership Invitation", category: "TestImmediately")
         batch = @course.root_account.sis_batches.create!
         membership.sis_batch_id = batch.id
         membership.save!
@@ -132,9 +132,9 @@ describe GroupMembership do
 
       it "dispatches a message if the course is available and has started" do
         membership = @group1.group_memberships.build(user: @student1)
-        Notification.create!(name: 'New Context Group Membership', category: 'TestImmediately')
+        Notification.create!(name: "New Context Group Membership", category: "TestImmediately")
         membership.save!
-        expect(membership.messages_sent['New Context Group Membership']).not_to be_empty
+        expect(membership.messages_sent["New Context Group Membership"]).not_to be_empty
       end
 
       it "does not dispatch a message if the course is available and has not started yet" do
@@ -145,8 +145,8 @@ describe GroupMembership do
         student_in_course(active_all: true, course: course)
         group1 = course.groups.create(group_category: GroupCategory.student_organized_for(course))
         membership = group1.group_memberships.build(user: @student)
-        Notification.create!(name: 'New Context Group Membership', category: 'TestImmediately')
-        Notification.create!(name: 'New Context Group Membership Invitation', category: 'TestImmediately')
+        Notification.create!(name: "New Context Group Membership", category: "TestImmediately")
+        Notification.create!(name: "New Context Group Membership Invitation", category: "TestImmediately")
         membership.save!
         expect(membership.messages_sent).to be_empty
       end
@@ -158,7 +158,7 @@ describe GroupMembership do
       group = @course.groups.create(group_category: GroupCategory.student_organized_for(@course))
       membership = group.group_memberships.build(user: student)
       @course.enroll_student(student)
-      Notification.create!(name: 'New Context Group Membership', category: 'TestImmediately')
+      Notification.create!(name: "New Context Group Membership", category: "TestImmediately")
       membership.save!
       expect(membership.messages_sent).to be_empty
     end
@@ -171,7 +171,7 @@ describe GroupMembership do
       group = @course.groups.create(group_category: GroupCategory.student_organized_for(@course))
       membership = group.group_memberships.build(user: student)
       @course.enroll_student(student)
-      Notification.create!(name: 'New Context Group Membership', category: 'TestImmediately')
+      Notification.create!(name: "New Context Group Membership", category: "TestImmediately")
       membership.save!
       expect(membership.messages_sent).to be_empty
     end
@@ -181,8 +181,8 @@ describe GroupMembership do
     course_with_teacher(active_all: true)
     section1 = @course.course_sections.create
     section2 = @course.course_sections.create
-    user1 = section1.enroll_user(user_model, 'StudentEnrollment').user
-    user2 = section2.enroll_user(user_model, 'StudentEnrollment').user
+    user1 = section1.enroll_user(user_model, "StudentEnrollment").user
+    user2 = section2.enroll_user(user_model, "StudentEnrollment").user
     group_category = @course.group_categories.build(name: "My Category")
     group_category.configure_self_signup(true, true)
     group_category.save
@@ -193,47 +193,47 @@ describe GroupMembership do
     expect(membership.errors[:user_id]).not_to be_nil
   end
 
-  context 'active_given_enrollments?' do
+  context "active_given_enrollments?" do
     before :once do
       @enrollment = course_with_student(active_all: true)
       @course_group = @course.groups.create!
       @membership = @course_group.add_user(@student)
     end
 
-    it 'is false if the membership is pending (requested)' do
-      @membership.workflow_state = 'requested'
+    it "is false if the membership is pending (requested)" do
+      @membership.workflow_state = "requested"
       expect(@membership.active_given_enrollments?([@enrollment])).to be_falsey
     end
 
-    it 'is false if the membership is terminated (deleted)' do
-      @membership.workflow_state = 'deleted'
+    it "is false if the membership is terminated (deleted)" do
+      @membership.workflow_state = "deleted"
       expect(@membership.active_given_enrollments?([@enrollment])).to be_falsey
     end
 
-    it 'is false given a course group without an enrollment in the list' do
+    it "is false given a course group without an enrollment in the list" do
       expect(@membership.active_given_enrollments?([])).to be_falsey
     end
 
-    it 'is true for other course groups' do
+    it "is true for other course groups" do
       expect(@membership.active_given_enrollments?([@enrollment])).to be_truthy
     end
 
-    it 'is true for account groups regardless of enrollments' do
+    it "is true for account groups regardless of enrollments" do
       @account_group = Account.default.groups.create!
       @membership = @account_group.add_user(@student)
       expect(@membership.active_given_enrollments?([])).to be_truthy
     end
 
-    it 'is not deleted when the enrollment is destroyed' do
+    it "is not deleted when the enrollment is destroyed" do
       @enrollment.destroy
       @membership.reload
-      expect(@membership.workflow_state).to eq 'deleted'
+      expect(@membership.workflow_state).to eq "deleted"
     end
 
-    it 'softs delete when membership destroyed' do
+    it "softs delete when membership destroyed" do
       @membership.destroy
       @membership.reload
-      expect(@membership.workflow_state).to eq 'deleted'
+      expect(@membership.workflow_state).to eq "deleted"
     end
   end
 
@@ -252,7 +252,7 @@ describe GroupMembership do
     expect(@group_membership.workflow_state).to eq "requested"
   end
 
-  context 'permissions' do
+  context "permissions" do
     before :once do
       course_with_teacher(active_all: true)
     end
@@ -283,7 +283,7 @@ describe GroupMembership do
       expect(GroupMembership.new(user: @student, group: account_group).grants_right?(@admin, :create)).to be_truthy
     end
 
-    it 'allows a teacher to join a student to a group in an unpublished course' do
+    it "allows a teacher to join a student to a group in an unpublished course" do
       @course.claim!
       student_in_course(active_all: true)
       course_groups = group_category
@@ -311,13 +311,13 @@ describe GroupMembership do
       account_admin_user(active_all: true, account: @account)
       community_groups = GroupCategory.communities_for(@account)
       community_group = community_groups.groups.create!(context: @account, join_level: "parent_context_auto_join")
-      community_group.add_user(@admin, 'accepted', true)
-      community_group.add_user(@teacher, 'accepted', false)
+      community_group.add_user(@admin, "accepted", true)
+      community_group.add_user(@teacher, "accepted", false)
       expect(GroupMembership.where(group_id: community_group.id, user_id: @teacher.id).first.grants_right?(@admin, :delete)).to be_truthy
     end
   end
 
-  it 'updates group leadership as membership changes' do
+  it "updates group leadership as membership changes" do
     course_factory
     @category = @course.group_categories.build(name: "category 1")
     @category.save!
@@ -325,7 +325,7 @@ describe GroupMembership do
     @category.auto_leader = "first"
     @category.save!
     leader = user_model
-    @group.group_memberships.create!(user: leader, workflow_state: 'accepted')
+    @group.group_memberships.create!(user: leader, workflow_state: "accepted")
     expect(@group.reload.leader).to eq leader
   end
 
@@ -376,7 +376,7 @@ describe GroupMembership do
     it "does not trigger when it's an account group" do
       expect(DueDateCacher).not_to receive(:recompute)
       expect(DueDateCacher).not_to receive(:recompute_course)
-      @group = Account.default.groups.create!(name: 'Group!')
+      @group = Account.default.groups.create!(name: "Group!")
       @group.group_memberships.create!(user: user_factory)
     end
   end
@@ -392,17 +392,17 @@ describe GroupMembership do
     expect(sub).to be_submitted
     membership.destroy
     expect(sub.reload).to be_deleted # no longer part of the group so the assignment no longer applies to them
-    membership.update_attribute(:workflow_state, 'accepted')
+    membership.update_attribute(:workflow_state, "accepted")
     expect(sub.reload).to be_submitted # back to the way it was
   end
 
   describe "root_account_id" do
-    let(:category) { course.group_categories.create!(name: 'category 1') }
+    let(:category) { course.group_categories.create!(name: "category 1") }
     let(:course) { course_factory && @course }
     let(:group) { category.groups.create!(context: course) }
     let(:user) { user_model }
 
-    it 'assigns it on save if it is not set' do
+    it "assigns it on save if it is not set" do
       membership = group.group_memberships.create!(user: user)
       membership.root_account_id = nil
 
@@ -413,7 +413,7 @@ describe GroupMembership do
       }.from(nil).to(group.root_account_id)
     end
 
-    it 'preserves it on save if it was already set' do
+    it "preserves it on save if it was already set" do
       membership = group.group_memberships.create!(user: user)
 
       expect(membership.group).not_to receive(:root_account_id)

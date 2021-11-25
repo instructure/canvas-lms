@@ -724,11 +724,11 @@ class AssignmentsApiController < ApplicationController
     target_course = target_course_for_duplicate
 
     if !old_assignment || old_assignment.workflow_state == "deleted"
-      return render json: { error: t('assignment does not exist') }, status: :bad_request
+      return render json: { error: t("assignment does not exist") }, status: :bad_request
     end
 
     if old_assignment.quiz
-      return render json: { error: t('quiz duplication not implemented') }, status: :bad_request
+      return render json: { error: t("quiz duplication not implemented") }, status: :bad_request
     end
 
     return unless authorized_action(old_assignment, @current_user, :create)
@@ -777,10 +777,10 @@ class AssignmentsApiController < ApplicationController
                       assignment_json(new_assignment, @current_user, session)
                     end
 
-      result_json['new_positions'] = positions_hash
+      result_json["new_positions"] = positions_hash
       render json: result_json
     else
-      render json: { error: t('cannot save new assignment') }, status: :bad_request
+      render json: { error: t("cannot save new assignment") }, status: :bad_request
     end
   end
 
@@ -814,13 +814,13 @@ class AssignmentsApiController < ApplicationController
         scope = scope.where(id: params[:assignment_ids])
       end
       case params[:order_by]
-      when 'name'
-        scope = scope.reorder(Arel.sql("#{Assignment.best_unicode_collation_key('assignments.title')}, assignment_groups.position, assignments.position, assignments.id"))
-      when 'due_at'
+      when "name"
+        scope = scope.reorder(Arel.sql("#{Assignment.best_unicode_collation_key("assignments.title")}, assignment_groups.position, assignments.position, assignments.id"))
+      when "due_at"
         scope = if @context.grants_right?(user, :read_as_admin)
-                  scope.with_latest_due_date.reorder(Arel.sql("latest_due_date, #{Assignment.best_unicode_collation_key('assignments.title')}, assignment_groups.position, assignments.position, assignments.id"))
+                  scope.with_latest_due_date.reorder(Arel.sql("latest_due_date, #{Assignment.best_unicode_collation_key("assignments.title")}, assignment_groups.position, assignments.position, assignments.id"))
                 else
-                  scope.with_user_due_date(user).reorder(Arel.sql("user_due_date, #{Assignment.best_unicode_collation_key('assignments.title')}, assignment_groups.position, assignments.position, assignments.id"))
+                  scope.with_user_due_date(user).reorder(Arel.sql("user_due_date, #{Assignment.best_unicode_collation_key("assignments.title")}, assignment_groups.position, assignments.position, assignments.id"))
                 end
       end
 
@@ -834,13 +834,13 @@ class AssignmentsApiController < ApplicationController
 
       if params[:assignment_ids] && assignments.length != params[:assignment_ids].length
         invalid_ids = params[:assignment_ids] - assignments.map(&:id).map(&:to_s)
-        return render json: { message: "Invalid assignment_ids: #{invalid_ids.join(',')}" }, status: :bad_request
+        return render json: { message: "Invalid assignment_ids: #{invalid_ids.join(",")}" }, status: :bad_request
       end
 
       submissions = submissions_hash(include_params, assignments, submissions_for_user)
 
-      include_all_dates = include_params.include?('all_dates')
-      include_override_objects = include_params.include?('overrides') && @context.grants_any_right?(user, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS)
+      include_all_dates = include_params.include?("all_dates")
+      include_override_objects = include_params.include?("overrides") && @context.grants_any_right?(user, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS)
 
       override_param = params[:override_assignment_dates] || true
       override_dates = value_to_boolean(override_param)
@@ -854,7 +854,7 @@ class AssignmentsApiController < ApplicationController
         end
       end
 
-      include_visibility = include_params.include?('assignment_visibility') && @context.grants_any_right?(user, :read_as_admin, :manage_grades, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS)
+      include_visibility = include_params.include?("assignment_visibility") && @context.grants_any_right?(user, :read_as_admin, :manage_grades, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS)
 
       if include_visibility
         assignment_visibilities = AssignmentStudentVisibility.users_with_visibility_by_assignment(course_id: @context.id, assignment_id: assignments.map(&:id))
@@ -873,7 +873,7 @@ class AssignmentsApiController < ApplicationController
 
       preloaded_attachments = api_bulk_load_user_content_attachments(assignments.map(&:description), @context)
 
-      if include_params.include?('score_statistics')
+      if include_params.include?("score_statistics")
         ActiveRecord::Associations::Preloader.new.preload(assignments, :score_statistic)
       end
 
@@ -898,8 +898,8 @@ class AssignmentsApiController < ApplicationController
                         bucket: params[:bucket],
                         include_overrides: include_override_objects,
                         preloaded_user_content_attachments: preloaded_attachments,
-                        include_can_edit: include_params.include?('can_edit'),
-                        include_score_statistics: include_params.include?('score_statistics'),
+                        include_can_edit: include_params.include?("can_edit"),
+                        include_score_statistics: include_params.include?("score_statistics"),
                         master_course_status: mc_status)
       end
     end
@@ -925,17 +925,17 @@ class AssignmentsApiController < ApplicationController
       return render_unauthorized_action unless @assignment.visible_to_user?(@current_user)
 
       included_params = Array(params[:include])
-      if included_params.include?('can_submit')
-        included_params.push 'submission'
+      if included_params.include?("can_submit")
+        included_params.push "submission"
       end
 
-      if included_params.include?('submission')
+      if included_params.include?("submission")
         submissions =
           submissions_hash(included_params, [@assignment])[@assignment.id]
       end
 
-      include_visibility = included_params.include?('assignment_visibility') && @context.grants_any_right?(@current_user, :read_as_admin, :manage_grades, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS)
-      include_override_objects = included_params.include?('overrides') && @context.grants_any_right?(@current_user, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS)
+      include_visibility = included_params.include?("assignment_visibility") && @context.grants_any_right?(@current_user, :read_as_admin, :manage_grades, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS)
+      include_override_objects = included_params.include?("overrides") && @context.grants_any_right?(@current_user, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS)
 
       locked = @assignment.locked_for?(@current_user, check_policies: true)
       @assignment.context_module_action(@current_user, :read) unless locked && !locked[:can_view]
@@ -948,10 +948,10 @@ class AssignmentsApiController < ApplicationController
         needs_grading_count_by_section: value_to_boolean(params[:needs_grading_count_by_section]),
         include_all_dates: value_to_boolean(params[:all_dates]),
         include_overrides: include_override_objects,
-        include_can_edit: included_params.include?('can_edit'),
-        include_score_statistics: included_params.include?('score_statistics'),
-        include_can_submit: included_params.include?('can_submit'),
-        include_webhook_info: included_params.include?('webhook_info')
+        include_can_edit: included_params.include?("can_edit"),
+        include_score_statistics: included_params.include?("score_statistics"),
+        include_can_submit: included_params.include?("can_submit"),
+        include_webhook_info: included_params.include?("webhook_info")
       }
 
       result_json = if use_quiz_json?
@@ -1144,7 +1144,7 @@ class AssignmentsApiController < ApplicationController
   # @returns Assignment
   def create
     @assignment = @context.assignments.build
-    @assignment.workflow_state = 'unpublished'
+    @assignment.workflow_state = "unpublished"
     if authorized_action(@assignment, @current_user, :create)
       @assignment.content_being_saved_by(@current_user)
       result = create_api_assignment(@assignment, params.require(:assignment), @current_user, @context,
@@ -1346,7 +1346,7 @@ class AssignmentsApiController < ApplicationController
 
     if authorized_action(@assignment, @current_user, :update)
       # Giving us the option to increment the request cost here if need be. Remove with LS-2614.
-      increment_request_cost(Setting.get('assignments_api_update_request_cost', '0').to_i)
+      increment_request_cost(Setting.get("assignments_api_update_request_cost", "0").to_i)
       @assignment.content_being_saved_by(@current_user)
       @assignment.updating_user = @current_user
       # update_api_assignment mutates params so this has to be done here
@@ -1397,10 +1397,10 @@ class AssignmentsApiController < ApplicationController
     return render_json_unauthorized unless @context.grants_any_right?(@current_user, session, :manage_assignments, :manage_assignments_edit)
 
     data = params.permit(_json: [:id, all_dates: %i[id base due_at unlock_at lock_at]]).to_h[:_json]
-    return render json: { message: 'expected array' }, status: :bad_request unless data.is_a?(Array)
-    return render json: { message: 'missing assignment id' }, status: :bad_request unless data.all? { |a| a.key?('id') }
+    return render json: { message: "expected array" }, status: :bad_request unless data.is_a?(Array)
+    return render json: { message: "missing assignment id" }, status: :bad_request unless data.all? { |a| a.key?("id") }
 
-    assignments = @context.assignments.active.where(id: data.map { |a| a['id'] }).to_a
+    assignments = @context.assignments.active.where(id: data.map { |a| a["id"] }).to_a
     raise ActiveRecord::RecordNotFound unless assignments.size == data.size
 
     assignments.each do |assignment|
@@ -1431,14 +1431,14 @@ class AssignmentsApiController < ApplicationController
     else
       status = result == :forbidden ? :forbidden : :bad_request
       errors = @assignment.errors.as_json[:errors]
-      errors['published'] = errors.delete(:workflow_state) if errors.key?(:workflow_state)
+      errors["published"] = errors.delete(:workflow_state) if errors.key?(:workflow_state)
       render json: { errors: errors }, status: status
     end
   end
 
   def invalid_bucket_error
     err_msg = t("bucket name must be one of the following: %{bucket_names}", bucket_names: SortsAssignments::VALID_BUCKETS.join(", "))
-    @context.errors.add('bucket', err_msg, att_name: 'bucket')
+    @context.errors.add("bucket", err_msg, att_name: "bucket")
     render json: @context.errors, status: :bad_request
   end
 
@@ -1509,6 +1509,6 @@ class AssignmentsApiController < ApplicationController
   end
 
   def use_quiz_json?
-    params[:result_type] == 'Quiz' && @context.root_account.feature_enabled?(:newquizzes_on_quiz_page)
+    params[:result_type] == "Quiz" && @context.root_account.feature_enabled?(:newquizzes_on_quiz_page)
   end
 end

@@ -18,10 +18,10 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-describe 'MessageDispatcher' do
+describe "MessageDispatcher" do
   describe ".dispatch" do
     before do
-      message_model(dispatch_at: Time.now, workflow_state: 'staged', to: 'somebody', updated_at: Time.now.utc - 11.minutes, user: user_factory, path_type: 'email')
+      message_model(dispatch_at: Time.now, workflow_state: "staged", to: "somebody", updated_at: Time.now.utc - 11.minutes, user: user_factory, path_type: "email")
     end
 
     it "reschedules on Mailer delivery error" do
@@ -48,7 +48,7 @@ describe 'MessageDispatcher' do
 
   describe ".batch_dispatch" do
     before do
-      @messages = (0...3).map { message_model(dispatch_at: Time.now, workflow_state: 'staged', to: 'somebody', updated_at: Time.now.utc - 11.minutes, user: user_factory, path_type: 'email') }
+      @messages = (0...3).map { message_model(dispatch_at: Time.now, workflow_state: "staged", to: "somebody", updated_at: Time.now.utc - 11.minutes, user: user_factory, path_type: "email") }
     end
 
     it "reschedules on Mailer delivery error, but not on canceled Message" do
@@ -71,7 +71,7 @@ describe 'MessageDispatcher' do
       # the original job is complete, but the individual message gets re-scheduled in its own job
       expect { job.reload }.to raise_error(ActiveRecord::RecordNotFound)
 
-      expect(job2.tag).to eq 'Message::Queued#deliver'
+      expect(job2.tag).to eq "Message::Queued#deliver"
       expect(job2.payload_object.object.message).to eq @messages[1]
       expect(job2.run_at.to_i).to eq @messages[1].dispatch_at.to_i
     end

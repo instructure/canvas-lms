@@ -30,17 +30,17 @@ module Api::V1::Conferences
 
   def api_conferences_json(conferences, user, session)
     json = conferences.map { |c| api_conference_json(c, user, session) }
-    { 'conferences' => json }
+    { "conferences" => json }
   end
 
   def api_conference_json(conference, user, session)
     api_json(conference, user, session, API_CONFERENCE_JSON_OPTS).tap do |j|
-      j['lti_settings'] = conference.lti_settings if Account.site_admin.feature_enabled?(:conference_selection_lti_placement)
-      j['has_advanced_settings'] = value_to_boolean(j['has_advanced_settings'])
-      j['long_running'] = value_to_boolean(j['long_running'])
-      j['duration'] = j['duration'].to_i if j['duration']
-      j['users'] = Array(j.delete('user_ids'))
-      j['url'] = named_context_url(conference.context, :context_conference_url, conference)
+      j["lti_settings"] = conference.lti_settings if Account.site_admin.feature_enabled?(:conference_selection_lti_placement)
+      j["has_advanced_settings"] = value_to_boolean(j["has_advanced_settings"])
+      j["long_running"] = value_to_boolean(j["long_running"])
+      j["duration"] = j["duration"].to_i if j["duration"]
+      j["users"] = Array(j.delete("user_ids"))
+      j["url"] = named_context_url(conference.context, :context_conference_url, conference)
     end
   end
 
@@ -113,12 +113,12 @@ module Api::V1::Conferences
   end
 
   def signed_id_invalid_json
-    { status: I18n.t(:unprocessable_entity, 'unprocessable entity'),
-      errors: [{ message: I18n.t(:unprocessable_entity_message, 'Signed meeting id invalid') }] }.to_json
+    { status: I18n.t(:unprocessable_entity, "unprocessable entity"),
+      errors: [{ message: I18n.t(:unprocessable_entity_message, "Signed meeting id invalid") }] }.to_json
   end
 
   def invalid_jwt_token_json
-    { status: I18n.t(:unauthorized, 'unauthorized'),
-      errors: [{ message: I18n.t(:unauthorized_message, 'JWT signature invalid') }] }.to_json
+    { status: I18n.t(:unauthorized, "unauthorized"),
+      errors: [{ message: I18n.t(:unauthorized_message, "JWT signature invalid") }] }.to_json
   end
 end

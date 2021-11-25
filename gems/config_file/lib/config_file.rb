@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'rails'
+require "rails"
 
 module ConfigFile
   class << self

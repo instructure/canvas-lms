@@ -35,7 +35,7 @@ module Quizzes::QuizQuestion::AnswerSerializers
       rc = SerializedAnswer.new
 
       if !answer_text.is_a?(String)
-        return rc.reject :invalid_type, 'answer', String
+        return rc.reject :invalid_type, "answer", String
       elsif Util.text_too_long? answer_text
         return rc.reject :text_too_long
       end

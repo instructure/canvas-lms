@@ -43,7 +43,7 @@ class RubricsController < ApplicationController
     @rubric_associations = @context.rubric_associations.bookmarked.include_rubric.to_a
     @rubric_associations = Canvas::ICU.collate_by(@rubric_associations.select(&:rubric_id).uniq(&:rubric_id)) { |r| r.rubric.title }
     @rubrics = @rubric_associations.map(&:rubric)
-    @context.is_a?(User) ? render(action: 'user_index') : render
+    @context.is_a?(User) ? render(action: "user_index") : render
   end
 
   def show
@@ -157,7 +157,7 @@ class RubricsController < ApplicationController
       @association = @context.rubric_associations.where(id: params[:rubric_association_id]).first if params[:rubric_association_id].present?
       @association_object ||= @association.association_object if @association
       association_params[:association_object] = @association_object
-      association_params[:update_if_existing] = params[:action] == 'update'
+      association_params[:update_if_existing] = params[:action] == "update"
       skip_points_update = !!(params[:skip_updating_points_possible] =~ /true/i)
       association_params[:skip_updating_points_possible] = skip_points_update
       @rubric = @association.rubric if params[:id] && @association && (@association.rubric_id == params[:id].to_i || (@association.rubric && @association.rubric.migration_id == "cloned_from_#{params[:id]}"))

@@ -85,7 +85,7 @@ module QuizQuestionsCommon
   end
 
   def it_should_show_cant_go_back_warning
-    expect(f('body')).to include_text \
+    expect(f("body")).to include_text \
       "Once you have submitted an answer, you will not be able to change it later"
   end
 
@@ -97,17 +97,17 @@ module QuizQuestionsCommon
   end
 
   def it_should_be_on_first_question
-    it_should_be_on_question 'first question'
+    it_should_be_on_question "first question"
   end
 
   def it_should_be_on_second_question
-    it_should_be_on_question 'second question'
+    it_should_be_on_question "second question"
   end
 
   def it_should_be_on_question(which_question)
-    body = f('body')
+    body = f("body")
     expect(body).to include_text which_question
-    questions = ['first question', 'second question'] - [which_question]
+    questions = ["first question", "second question"] - [which_question]
     questions.each do |question|
       expect(body).not_to include_text question
     end
@@ -194,7 +194,7 @@ module QuizQuestionsCommon
   end
 
   def it_should_show_one_correct_answer
-    expect(f('body')).to include_text "Score for this quiz: 1"
+    expect(f("body")).to include_text "Score for this quiz: 1"
   end
 
   def back_and_forth_flow

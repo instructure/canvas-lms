@@ -24,7 +24,7 @@ module MicrosoftSync
       # Yields (results, next_link) for each page, or returns first page of results if no block given.
       def list(options = {}, &blk)
         get_paginated_list(
-          'education/classes',
+          "education/classes",
           quota: [1, 0],
           special_cases: [
             SpecialCase.new(
@@ -37,7 +37,7 @@ module MicrosoftSync
       end
 
       def create(params)
-        request(:post, 'education/classes', quota: [1, 1], body: params)
+        request(:post, "education/classes", quota: [1, 1], body: params)
       end
     end
   end

@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-require_relative '../spec_helper'
+require_relative "../spec_helper"
 
 describe GradebookCSV do
   it { is_expected.to validate_presence_of(:progress) }
@@ -25,8 +25,8 @@ describe GradebookCSV do
   context "given a course with a teacher" do
     def csv(course:, user:, force_failure: false)
       attachment = course.attachments.create!(uploaded_data: default_uploaded_data)
-      progress = @course.progresses.new(tag: 'gradebook_export')
-      progress.workflow_state = 'failed' if force_failure
+      progress = @course.progresses.new(tag: "gradebook_export")
+      progress.workflow_state = "failed" if force_failure
       progress.save!
       course.gradebook_csvs.create!(user: user, progress: progress, attachment: attachment)
     end

@@ -26,7 +26,7 @@ module Canvas::Plugins::Validators::InstFsValidator
                        settings[:migration_rate].to_f rescue nil
                      end
     if migration_rate.nil? || migration_rate < 0 || migration_rate > 100
-      plugin_setting.errors.add(:base, I18n.t('Please enter a number between 0 and 100 for the migration rate'))
+      plugin_setting.errors.add(:base, I18n.t("Please enter a number between 0 and 100 for the migration rate"))
       return false
     end
     settings[:migration] = migration_rate

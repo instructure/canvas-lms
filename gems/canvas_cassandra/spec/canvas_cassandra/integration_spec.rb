@@ -28,7 +28,7 @@ end
 # live in the parent app, not here in the gem...
 describe "execute and update" do
   before do
-    target_location = Pathname.new(File.expand_path('../../../..', __dir__))
+    target_location = Pathname.new(File.expand_path("../../../..", __dir__))
     allow(Rails).to receive(:root).and_return(target_location)
   end
 
@@ -37,7 +37,7 @@ describe "execute and update" do
   end
   let(:db) do
     test_config = ConfigFile.load("page_views", "test")
-    CanvasCassandra::Database.new("test_conn", test_config['servers'], { keyspace: test_config['keyspace'], cql_version: '3.0.0' }, TestLogger.new)
+    CanvasCassandra::Database.new("test_conn", test_config["servers"], { keyspace: test_config["keyspace"], cql_version: "3.0.0" }, TestLogger.new)
   end
 
   before do
@@ -56,7 +56,7 @@ describe "execute and update" do
   end
 
   it "returns the result from execute" do
-    expect(db.execute("select count(*) from page_views").fetch['count']).to eq 0
+    expect(db.execute("select count(*) from page_views").fetch["count"]).to eq 0
     expect(db.select_value("select count(*) from page_views")).to eq 0
     expect(db.execute("insert into page_views (request_id, user_id) values (?, ?)", "test", 0)).to eq nil
   end

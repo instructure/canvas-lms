@@ -25,13 +25,13 @@ module Factories
 
     unless pseudonym
       pseudonym = double(
-        'Pseudonym',
+        "Pseudonym",
         record: user,
         user_id: user.id,
         user: user,
         login_count: 1,
-        global_account_id: '10000000000001',
-        sis_user_id: 'U001',
+        global_account_id: "10000000000001",
+        sis_user_id: "U001",
         shard: Shard.default,
         works_for_account?: true,
         suspended?: false
@@ -40,11 +40,11 @@ module Factories
       # object_id should make it unique (but obviously things will fail if
       # it tries to load it from the db.)
       allow(pseudonym).to receive(:id).and_return(pseudonym.object_id)
-      allow(pseudonym).to receive(:unique_id).and_return('unique_id')
+      allow(pseudonym).to receive(:unique_id).and_return("unique_id")
       allow(pseudonym).to receive(:global_id).and_return(10_000_000_000_001)
     end
 
-    session = double('PseudonymSession',
+    session = double("PseudonymSession",
                      record: pseudonym)
     allow(session).to receive(:[]).with(anything).and_return(nil)
 

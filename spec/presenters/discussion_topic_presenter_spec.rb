@@ -19,16 +19,16 @@
 #
 
 describe DiscussionTopicPresenter do
-  let(:topic)      { DiscussionTopic.new(title: 'Test Topic', assignment: assignment) }
+  let(:topic)      { DiscussionTopic.new(title: "Test Topic", assignment: assignment) }
   let(:user)       { user_model }
   let(:presenter)  { DiscussionTopicPresenter.new(topic, user) }
   let(:course)     { course_model }
   let(:assignment) do
-    Assignment.new(title: 'Test Topic',
+    Assignment.new(title: "Test Topic",
                    due_at: Time.now,
                    lock_at: Time.now + 1.week,
                    unlock_at: Time.now - 1.week,
-                   submission_types: 'discussion_topic')
+                   submission_types: "discussion_topic")
   end
 
   before do
@@ -154,14 +154,14 @@ describe DiscussionTopicPresenter do
 
   describe "#allows_speed_grader?" do
     it "returns false when course is large roster" do
-      topic.context = Course.new(name: 'Canvas')
+      topic.context = Course.new(name: "Canvas")
       topic.context.large_roster = true
       expect(presenter.allows_speed_grader?).to eq false
     end
 
     context "with assignment" do
       before do
-        course = topic.context = Course.create!(name: 'Canvas')
+        course = topic.context = Course.create!(name: "Canvas")
         assignment.context = course
         assignment.save!
         topic.assignment = assignment
@@ -188,7 +188,7 @@ describe DiscussionTopicPresenter do
       assignment.peer_reviews = true
       assignment.save!
       [user, user2, user3].map do |u|
-        course.enroll_student(u, { enrollment_state: 'active' })
+        course.enroll_student(u, { enrollment_state: "active" })
       end
       assignment.assign_peer_review(user, user2)
     end

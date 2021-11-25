@@ -18,18 +18,18 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'nokogiri'
+require "nokogiri"
 
 describe "External Tools" do
   describe "Assignments" do
     before do
-      allow(BasicLTI::Sourcedid).to receive(:encryption_secret) { 'encryption-secret-5T14NjaTbcYjc4' }
-      allow(BasicLTI::Sourcedid).to receive(:signing_secret) { 'signing-secret-vp04BNqApwdwUYPUI' }
+      allow(BasicLTI::Sourcedid).to receive(:encryption_secret) { "encryption-secret-5T14NjaTbcYjc4" }
+      allow(BasicLTI::Sourcedid).to receive(:signing_secret) { "signing-secret-vp04BNqApwdwUYPUI" }
       course_factory(active_all: true)
       assignment_model(course: @course, submission_types: "external_tool", points_possible: 25)
-      @tool = @course.context_external_tools.create!(shared_secret: 'test_secret', consumer_key: 'test_key', name: 'my grade passback test tool', domain: 'example.com')
+      @tool = @course.context_external_tools.create!(shared_secret: "test_secret", consumer_key: "test_key", name: "my grade passback test tool", domain: "example.com")
       @tag = @assignment.build_external_tool_tag(url: "http://example.com/one")
-      @tag.content_type = 'ContextExternalTool'
+      @tag.content_type = "ContextExternalTool"
       @tag.save!
     end
 
@@ -39,22 +39,22 @@ describe "External Tools" do
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
       expect(response).to be_successful
       doc = Nokogiri::HTML5(response.body)
-      form = doc.at_css('form#tool_form')
+      form = doc.at_css("form#tool_form")
 
-      expect(form.at_css('input#launch_presentation_locale')['value']).to eq 'en'
-      expect(form.at_css('input#oauth_callback')['value']).to eq 'about:blank'
-      expect(form.at_css('input#oauth_signature_method')['value']).to eq 'HMAC-SHA1'
-      expect(form.at_css('input#launch_presentation_return_url')['value']).to eq "http://www.example.com/courses/#{@course.id}/external_content/success/external_tool_redirect"
-      expect(form.at_css('input#lti_message_type')['value']).to eq "basic-lti-launch-request"
-      expect(form.at_css('input#lti_version')['value']).to eq "LTI-1p0"
-      expect(form.at_css('input#oauth_version')['value']).to eq "1.0"
-      expect(form.at_css('input#roles')['value']).to eq "Learner"
+      expect(form.at_css("input#launch_presentation_locale")["value"]).to eq "en"
+      expect(form.at_css("input#oauth_callback")["value"]).to eq "about:blank"
+      expect(form.at_css("input#oauth_signature_method")["value"]).to eq "HMAC-SHA1"
+      expect(form.at_css("input#launch_presentation_return_url")["value"]).to eq "http://www.example.com/courses/#{@course.id}/external_content/success/external_tool_redirect"
+      expect(form.at_css("input#lti_message_type")["value"]).to eq "basic-lti-launch-request"
+      expect(form.at_css("input#lti_version")["value"]).to eq "LTI-1p0"
+      expect(form.at_css("input#oauth_version")["value"]).to eq "1.0"
+      expect(form.at_css("input#roles")["value"]).to eq "Learner"
     end
 
     it "includes outcome service params when viewing as student" do
       allow_any_instance_of(Account).to receive(:feature_enabled?) { false }
       allow_any_instance_of(Account).to receive(:feature_enabled?).with(:encrypted_sourcedids).and_return(true)
-      allow(CanvasSecurity).to receive(:create_encrypted_jwt) { 'an.encrypted.jwt' }
+      allow(CanvasSecurity).to receive(:create_encrypted_jwt) { "an.encrypted.jwt" }
       student_in_course(course: @course, active_all: true)
       user_session(@user)
 
@@ -62,9 +62,9 @@ describe "External Tools" do
       expect(response).to be_successful
       doc = Nokogiri::HTML5(response.body)
 
-      expect(doc.at_css('form#tool_form input#lis_result_sourcedid')['value']).to eq BasicLTI::Sourcedid.new(@tool, @course, @assignment, @user).to_s
-      expect(doc.at_css('form#tool_form input#lis_outcome_service_url')['value']).to eq lti_grade_passback_api_url(@tool)
-      expect(doc.at_css('form#tool_form input#ext_ims_lis_basic_outcome_url')['value']).to eq blti_legacy_grade_passback_api_url(@tool)
+      expect(doc.at_css("form#tool_form input#lis_result_sourcedid")["value"]).to eq BasicLTI::Sourcedid.new(@tool, @course, @assignment, @user).to_s
+      expect(doc.at_css("form#tool_form input#lis_outcome_service_url")["value"]).to eq lti_grade_passback_api_url(@tool)
+      expect(doc.at_css("form#tool_form input#ext_ims_lis_basic_outcome_url")["value"]).to eq blti_legacy_grade_passback_api_url(@tool)
     end
 
     it "does not include outcome service sourcedid when viewing as teacher" do
@@ -73,8 +73,8 @@ describe "External Tools" do
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
       expect(response).to be_successful
       doc = Nokogiri::HTML5(response.body)
-      expect(doc.at_css('form#tool_form input#lis_result_sourcedid')).to be_nil
-      expect(doc.at_css('form#tool_form input#lis_outcome_service_url')).not_to be_nil
+      expect(doc.at_css("form#tool_form input#lis_result_sourcedid")).to be_nil
+      expect(doc.at_css("form#tool_form input#lis_outcome_service_url")).not_to be_nil
     end
 
     it "includes time zone in LTI paramaters if included in custom fields" do
@@ -86,13 +86,13 @@ describe "External Tools" do
       user_session(@user)
 
       account = @course.root_account
-      account.default_time_zone = 'Alaska'
+      account.default_time_zone = "Alaska"
       account.save!
 
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
       expect(response).to be_successful
       doc = Nokogiri::HTML5(response.body)
-      expect(doc.at_css('form#tool_form input#custom_time_zone')['value']).to eq "America/Juneau"
+      expect(doc.at_css("form#tool_form input#custom_time_zone")["value"]).to eq "America/Juneau"
 
       @user.time_zone = "Hawaii"
       @user.save!
@@ -100,7 +100,7 @@ describe "External Tools" do
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
       expect(response).to be_successful
       doc = Nokogiri::HTML5(response.body)
-      expect(doc.at_css('form#tool_form input#custom_time_zone')['value']).to eq "Pacific/Honolulu"
+      expect(doc.at_css("form#tool_form input#custom_time_zone")["value"]).to eq "Pacific/Honolulu"
     end
 
     it "redirects if the tool can't be configured" do
@@ -119,12 +119,12 @@ describe "External Tools" do
       get "/courses/#{@course.id}/external_tools/retrieve?url=#{CGI.escape(@tag.url)}"
       expect(response).to be_successful
       doc = Nokogiri::HTML5(response.body)
-      expect(doc.at_css('#tool_form')).not_to be_nil
-      expect(doc.at_css("input[name='launch_presentation_return_url']")['value']).to match(/^http/)
+      expect(doc.at_css("#tool_form")).not_to be_nil
+      expect(doc.at_css("input[name='launch_presentation_return_url']")["value"]).to match(/^http/)
     end
 
     it "renders user navigation tools with a full return url" do
-      tool = @course.root_account.context_external_tools.build(shared_secret: 'test_secret', consumer_key: 'test_key', name: 'my grade passback test tool', domain: 'example.com', privacy_level: 'public')
+      tool = @course.root_account.context_external_tools.build(shared_secret: "test_secret", consumer_key: "test_key", name: "my grade passback test tool", domain: "example.com", privacy_level: "public")
       tool.user_navigation = { url: "http://www.example.com", text: "Example URL" }
       tool.save!
 
@@ -133,15 +133,15 @@ describe "External Tools" do
       get "/users/#{@user.id}/external_tools/#{tool.id}"
       expect(response).to be_successful
       doc = Nokogiri::HTML5(response.body)
-      expect(doc.at_css('#tool_form')).not_to be_nil
-      expect(doc.at_css("input[name='launch_presentation_return_url']")['value']).to match(/^http/)
+      expect(doc.at_css("#tool_form")).not_to be_nil
+      expect(doc.at_css("input[name='launch_presentation_return_url']")["value"]).to match(/^http/)
     end
   end
 
   it "highlights the navigation tab when using an external tool" do
     course_with_teacher_logged_in(active_all: true)
 
-    @tool = @course.context_external_tools.create!(shared_secret: 'test_secret', consumer_key: 'test_key', name: 'my grade passback test tool', domain: 'example.com')
+    @tool = @course.context_external_tools.create!(shared_secret: "test_secret", consumer_key: "test_key", name: "my grade passback test tool", domain: "example.com")
     @tool.course_navigation = { url: "http://www.example.com", text: "Example URL" }
     @tool.save!
 
@@ -150,13 +150,13 @@ describe "External Tools" do
     doc = Nokogiri::HTML5(response.body)
     tab = doc.at_css("a.#{@tool.asset_string}")
     expect(tab).not_to be_nil
-    expect(tab['class'].split).to include("active")
+    expect(tab["class"].split).to include("active")
   end
 
   it "prevents access for unverified users if account requires it" do
     course_with_teacher_logged_in(active_all: true)
 
-    @tool = @course.context_external_tools.create!(shared_secret: 'test_secret', consumer_key: 'test_key', name: 'my grade passback test tool', domain: 'example.com')
+    @tool = @course.context_external_tools.create!(shared_secret: "test_secret", consumer_key: "test_key", name: "my grade passback test tool", domain: "example.com")
     @tool.course_navigation = { url: "http://www.example.com", text: "Example URL" }
     @tool.save!
 
@@ -170,15 +170,15 @@ describe "External Tools" do
     expect(flash[:warning]).to include("Complete registration")
   end
 
-  context 'global navigation' do
+  context "global navigation" do
     before :once do
-      @admin_tool = Account.default.context_external_tools.new(name: "a", domain: "google.com", consumer_key: '12345', shared_secret: 'secret')
-      @admin_tool.global_navigation = { visibility: 'admins', url: "http://www.example.com", text: "Example URL" }
+      @admin_tool = Account.default.context_external_tools.new(name: "a", domain: "google.com", consumer_key: "12345", shared_secret: "secret")
+      @admin_tool.global_navigation = { visibility: "admins", url: "http://www.example.com", text: "Example URL" }
       @admin_tool.save!
-      @member_tool = Account.default.context_external_tools.new(name: "b", domain: "google.com", consumer_key: '12345', shared_secret: 'secret')
+      @member_tool = Account.default.context_external_tools.new(name: "b", domain: "google.com", consumer_key: "12345", shared_secret: "secret")
       @member_tool.global_navigation = { url: "http://www.example.com", text: "Example URL 2" }
       @member_tool.save!
-      @permissiony_tool = Account.default.context_external_tools.new(name: "b", domain: "google.com", consumer_key: '12345', shared_secret: 'secret')
+      @permissiony_tool = Account.default.context_external_tools.new(name: "b", domain: "google.com", consumer_key: "12345", shared_secret: "secret")
       @permissiony_tool.global_navigation = { required_permissions: "manage_assignments,manage_calendar",
                                               url: "http://www.example.com", text: "Example URL 3" }
       @permissiony_tool.save!
@@ -192,12 +192,12 @@ describe "External Tools" do
 
       menu_link1 = doc.at_css("##{@admin_tool.asset_string}_menu_item a")
       expect(menu_link1).not_to be_nil
-      expect(menu_link1['href']).to eq account_external_tool_path(Account.default, @admin_tool, launch_type: 'global_navigation')
+      expect(menu_link1["href"]).to eq account_external_tool_path(Account.default, @admin_tool, launch_type: "global_navigation")
       expect(menu_link1.text).to match_ignoring_whitespace(@admin_tool.label_for(:global_navigation))
 
       menu_link2 = doc.at_css("##{@member_tool.asset_string}_menu_item a")
       expect(menu_link2).not_to be_nil
-      expect(menu_link2['href']).to eq account_external_tool_path(Account.default, @member_tool, launch_type: 'global_navigation')
+      expect(menu_link2["href"]).to eq account_external_tool_path(Account.default, @member_tool, launch_type: "global_navigation")
       expect(menu_link2.text).to match_ignoring_whitespace(@member_tool.label_for(:global_navigation))
     end
 
@@ -212,7 +212,7 @@ describe "External Tools" do
 
       menu_link2 = doc.at_css("##{@member_tool.asset_string}_menu_item a")
       expect(menu_link2).not_to be_nil
-      expect(menu_link2['href']).to eq account_external_tool_path(Account.default, @member_tool, launch_type: 'global_navigation')
+      expect(menu_link2["href"]).to eq account_external_tool_path(Account.default, @member_tool, launch_type: "global_navigation")
       expect(menu_link2.text).to match_ignoring_whitespace(@member_tool.label_for(:global_navigation))
     end
 
@@ -258,7 +258,7 @@ describe "External Tools" do
       end
 
       it "caches the template over courses if permissions are same" do
-        skip('Fails in RSpecQ') if ENV['RSPECQ_REDIS_URL']
+        skip("Fails in RSpecQ") if ENV["RSPECQ_REDIS_URL"]
         course_with_teacher_logged_in(account: @account, active_all: true)
         get "/courses/#{@course.id}"
         doc = Nokogiri::HTML5(response.body)
@@ -303,7 +303,7 @@ describe "External Tools" do
       end
 
       it "doesn't rebuild the html unless it detects a global_nav root account tool change" do
-        skip('Fails in RSpecQ') if ENV['RSPECQ_REDIS_URL']
+        skip("Fails in RSpecQ") if ENV["RSPECQ_REDIS_URL"]
         course_with_teacher_logged_in(account: @account, active_all: true)
         get "/courses/#{@course.id}"
         doc = Nokogiri::HTML5(response.body)
@@ -311,7 +311,7 @@ describe "External Tools" do
 
         # trigger the global_nav cache register clearing in a callback
         Account.default.context_external_tools.new(name: "b", domain: "google.com",
-                                                   consumer_key: '12345', shared_secret: 'secret')
+                                                   consumer_key: "12345", shared_secret: "secret")
         new_secret_settings = @admin_tool.settings
         new_secret_settings[:global_navigation][:text] = "new text"
         # update the url secretly in the db but don't update the cache_key (updated_at)

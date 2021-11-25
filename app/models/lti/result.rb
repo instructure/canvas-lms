@@ -25,7 +25,7 @@ class Lti::Result < ApplicationRecord
   ACCEPT_GIVEN_SCORE_TYPES = %w[FullyGraded PendingManual].freeze
   ACTIVITY_PROGRESS_TYPES = %w[Initialized Started InProgress Submitted Completed].freeze
 
-  AGS_EXT_SUBMISSION = 'https://canvas.instructure.com/lti/submission'
+  AGS_EXT_SUBMISSION = "https://canvas.instructure.com/lti/submission"
 
   self.record_timestamps = false
 
@@ -48,8 +48,8 @@ class Lti::Result < ApplicationRecord
 
   belongs_to :submission, inverse_of: :lti_result
   belongs_to :user, inverse_of: :lti_results
-  belongs_to :line_item, inverse_of: :results, foreign_key: :lti_line_item_id, class_name: 'Lti::LineItem'
-  belongs_to :root_account, class_name: 'Account'
+  belongs_to :line_item, inverse_of: :results, foreign_key: :lti_line_item_id, class_name: "Lti::LineItem"
+  belongs_to :root_account, class_name: "Account"
   has_one :assignment, through: :submission
 
   before_save :set_root_account

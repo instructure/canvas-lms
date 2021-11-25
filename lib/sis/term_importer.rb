@@ -75,9 +75,9 @@ module SIS
 
           case status
           when /active/i
-            term.workflow_state = 'active'
+            term.workflow_state = "active"
           when /deleted/i
-            term.workflow_state = 'deleted'
+            term.workflow_state = "deleted"
           end
           if (term.stuck_sis_fields & [:start_at, :end_at]).empty?
             term.start_at = start_date

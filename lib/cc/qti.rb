@@ -22,4 +22,4 @@ module Canvas::CC
   end
 end
 
-require_dependency 'cc/qti/qti_generator'
+require_dependency "cc/qti/qti_generator"

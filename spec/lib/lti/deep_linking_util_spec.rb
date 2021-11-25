@@ -19,41 +19,41 @@
 #
 
 describe Lti::DeepLinkingUtil do
-  describe '.validate_custom_params' do
-    it 'returns nil if not a hash or JSON string of a hash' do
-      [123, 'foo', '123', 'null', 'true', 'undefined', 1.0, 1, true, false, nil].each do |input|
+  describe ".validate_custom_params" do
+    it "returns nil if not a hash or JSON string of a hash" do
+      [123, "foo", "123", "null", "true", "undefined", 1.0, 1, true, false, nil].each do |input|
         expect(described_class.validate_custom_params(input)).to eq(nil)
       end
     end
 
-    it 'parses JSON if necessary' do
-      val = { 'foo' => 'bar' }
+    it "parses JSON if necessary" do
+      val = { "foo" => "bar" }
       expect(described_class.validate_custom_params(val)).to eq(val)
       expect(described_class.validate_custom_params(val.to_json)).to eq(val)
     end
 
-    it 'removes non-string keys and non-string/number/boolean/nil values' do
+    it "removes non-string keys and non-string/number/boolean/nil values" do
       val = {
-        'foo' => 'bar',
-        'bool1' => true, 'bool2' => false,
-        'abc' => {}, 'def' => { 'ghi' => 'jkl' },
-        'mno' => nil, 'pqr' => 1, 1 => 'one',
-        'badscalar' => Object.new
+        "foo" => "bar",
+        "bool1" => true, "bool2" => false,
+        "abc" => {}, "def" => { "ghi" => "jkl" },
+        "mno" => nil, "pqr" => 1, 1 => "one",
+        "badscalar" => Object.new
       }
 
       expected = {
-        'foo' => 'bar', 'mno' => nil, 'pqr' => 1, 'bool1' => true, 'bool2' => false
+        "foo" => "bar", "mno" => nil, "pqr" => 1, "bool1" => true, "bool2" => false
       }
       expect(described_class.validate_custom_params(val)).to eq(expected)
       expect(described_class.validate_custom_params(val.to_json)).to eq(
-        expected.merge('1' => 'one')
+        expected.merge("1" => "one")
       )
     end
 
-    it 'stringifies keys' do
+    it "stringifies keys" do
       # Not 100% sure necessary, but safer
-      val = { foo: 'bar' }
-      expect(described_class.validate_custom_params(val)).to eq('foo' => 'bar')
+      val = { foo: "bar" }
+      expect(described_class.validate_custom_params(val)).to eq("foo" => "bar")
     end
   end
 end

@@ -18,14 +18,14 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../../import_helper'
+require_relative "../../import_helper"
 
 describe "Importing Groups" do
   SYSTEMS.each do |system|
-    next unless import_data_exists? system, 'group'
+    next unless import_data_exists? system, "group"
 
     it "imports from #{system}" do
-      data = get_import_data(system, 'group')
+      data = get_import_data(system, "group")
       context = get_import_context(system)
       migration = context.content_migrations.create!
 
@@ -44,18 +44,18 @@ describe "Importing Groups" do
   end
 
   it "attaches to a discussion" do
-    data = get_import_data('bb8', 'group')
-    context = get_import_context('bb8')
+    data = get_import_data("bb8", "group")
+    context = get_import_context("bb8")
     migration = context.content_migrations.create!
 
     Importers::GroupImporter.import_from_migration(data, context, migration)
     expect(context.groups.count).to eq 1
 
-    category = get_import_data('bb8', 'group_discussion')
+    category = get_import_data("bb8", "group_discussion")
 
-    category['topics'].each do |topic|
-      topic['group_id'] = category['group_id']
-      group = Group.where(context_id: context, context_type: context.class.to_s, migration_id: topic['group_id']).first
+    category["topics"].each do |topic|
+      topic["group_id"] = category["group_id"]
+      group = Group.where(context_id: context, context_type: context.class.to_s, migration_id: topic["group_id"]).first
       if group
         Importers::DiscussionTopicImporter.import_from_migration(topic, group, migration)
       end

@@ -49,7 +49,7 @@ class LatePolicy < ActiveRecord::Base
   end
 
   def missing_points_deducted(points_possible, grading_type)
-    return points_possible.to_f if grading_type == 'pass_fail'
+    return points_possible.to_f if grading_type == "pass_fail"
 
     points_possible.to_f * missing_submission_deduction.to_f / 100
   end
@@ -65,7 +65,7 @@ class LatePolicy < ActiveRecord::Base
   end
 
   def interval_seconds
-    { 'hour' => 1.hour, 'day' => 1.day }[late_submission_interval].to_f
+    { "hour" => 1.hour, "day" => 1.day }[late_submission_interval].to_f
   end
 
   def update_late_submissions

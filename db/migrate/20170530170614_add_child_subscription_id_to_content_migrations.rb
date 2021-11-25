@@ -22,6 +22,6 @@ class AddChildSubscriptionIdToContentMigrations < ActiveRecord::Migration[4.2]
 
   def change
     add_column :content_migrations, :child_subscription_id, :integer, limit: 8
-    add_foreign_key :content_migrations, :master_courses_child_subscriptions, column: 'child_subscription_id'
+    add_foreign_key :content_migrations, :master_courses_child_subscriptions, column: "child_subscription_id"
   end
 end

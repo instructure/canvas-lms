@@ -74,7 +74,7 @@ class SisPseudonym
   private
 
   def exclude_deleted?(result)
-    result&.workflow_state == 'deleted' && !@include_deleted
+    result&.workflow_state == "deleted" && !@include_deleted
   end
 
   def find_on_enrollment_for_context
@@ -86,7 +86,7 @@ class SisPseudonym
       # but if the sis_user_id got moved to another pseudonym
       # it will grab that one instead.
       return nil if pseudonym&.sis_user_id.nil?
-      return nil if pseudonym&.workflow_state == 'deleted' && !@include_deleted
+      return nil if pseudonym&.workflow_state == "deleted" && !@include_deleted
 
       pseudonym
     end
@@ -209,7 +209,7 @@ class SisPseudonym
         next if !account_ids && !p.works_for_account?(root_account, type == :implicit)
         next if require_sis && !p.sis_user_id
 
-        include_deleted || p.workflow_state != 'deleted'
+        include_deleted || p.workflow_state != "deleted"
       end
     end
   end

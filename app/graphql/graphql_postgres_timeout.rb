@@ -28,7 +28,7 @@ module GraphQLPostgresTimeout
       yield
     else
       ActiveRecord::Base.transaction do
-        statement_timeout = Integer(Setting.get('graphql_statement_timeout', '60_000'))
+        statement_timeout = Integer(Setting.get("graphql_statement_timeout", "60_000"))
         ActiveRecord::Base.connection.execute "SET statement_timeout = #{statement_timeout}"
         yield
       rescue ActiveRecord::StatementInvalid => e

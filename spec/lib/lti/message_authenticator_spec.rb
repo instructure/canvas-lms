@@ -23,15 +23,15 @@ module Lti
   describe MessageAuthenticator do
     subject { described_class.new(launch_url, message.signed_post_params(tool.shared_secret)) }
 
-    let(:launch_url) { 'http://test.com/test' }
+    let(:launch_url) { "http://test.com/test" }
     let(:course) { Course.create! }
     let!(:tool) do
       course.context_external_tools.create!(
         {
-          name: 'test tool',
-          domain: 'test.com',
-          consumer_key: 'key',
-          shared_secret: 'secret'
+          name: "test tool",
+          domain: "test.com",
+          consumer_key: "key",
+          shared_secret: "secret"
         }
       )
     end
@@ -39,14 +39,14 @@ module Lti
     let(:message) do
       m = ::IMS::LTI::Models::Messages::ContentItemSelection.new(
         {
-          lti_message_type: 'ContentItemSelection',
-          lti_version: 'LTI-1p0',
-          content_items: Rails.root.join('spec/fixtures/lti/content_items.json').read,
+          lti_message_type: "ContentItemSelection",
+          lti_version: "LTI-1p0",
+          content_items: Rails.root.join("spec/fixtures/lti/content_items.json").read,
           data: Canvas::Security.create_jwt({ content_item_id: "3" }),
-          lti_msg: '',
-          lti_log: '',
-          lti_errormsg: '',
-          lti_errorlog: ''
+          lti_msg: "",
+          lti_log: "",
+          lti_errormsg: "",
+          lti_errorlog: ""
         }
       )
       m.launch_url = launch_url
@@ -54,18 +54,18 @@ module Lti
       m
     end
 
-    it 'creates a message from the signed_params' do
+    it "creates a message from the signed_params" do
       expect(subject.message.oauth_consumer_key).to eq tool.consumer_key
     end
 
     describe "#valid?" do
-      it 'validates a message' do
+      it "validates a message" do
         expect(subject.valid?).to be true
       end
 
-      context 'content-item unique json serialization' do
+      context "content-item unique json serialization" do
         let(:launch_url) { "http://test.com/test" }
-        let(:secret) { 'secret' }
+        let(:secret) { "secret" }
         let(:signed_params) do
           {
             :oauth_callback => "about:blank",
@@ -107,12 +107,12 @@ module Lti
         end
       end
 
-      it 'rejects an invalid secret' do
-        validator = described_class.new(launch_url, message.signed_post_params('invalid'))
+      it "rejects an invalid secret" do
+        validator = described_class.new(launch_url, message.signed_post_params("invalid"))
         expect(validator.valid?).to be false
       end
 
-      it 'rejects a used nonce' do
+      it "rejects a used nonce" do
         enable_cache do
           signed_params = message.signed_post_params(tool.shared_secret)
           validator1 = described_class.new(launch_url, signed_params)
@@ -122,7 +122,7 @@ module Lti
         end
       end
 
-      it 'rejects a message older than the NONCE_EXPIRATION' do
+      it "rejects a message older than the NONCE_EXPIRATION" do
         enable_cache do
           validator = nil
           Timecop.freeze((described_class::NONCE_EXPIRATION + 1.minute).ago) do
@@ -134,7 +134,7 @@ module Lti
 
       it "doesn't store the nonce if the signature is invalid" do
         enable_cache do
-          validator = described_class.new(launch_url, message.signed_post_params('invalid'))
+          validator = described_class.new(launch_url, message.signed_post_params("invalid"))
           expect(validator.valid?).to be false
           expect(Rails.cache.exist?(validator.send(:cache_key))).to be_falsey
         end

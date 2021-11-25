@@ -72,26 +72,26 @@ describe Wiki do
     end
   end
 
-  context 'set policy' do
+  context "set policy" do
     before :once do
       @course.offer!
       user_factory active_all: true
     end
 
-    it 'gives read rights to public courses' do
+    it "gives read rights to public courses" do
       @course.is_public = true
       @course.save!
       expect(@course.wiki.grants_right?(@user, :read)).to be_truthy
     end
 
-    it 'does not give read rights to unpublished public courses' do
-      @course.workflow_state = 'claimed'
+    it "does not give read rights to unpublished public courses" do
+      @course.workflow_state = "claimed"
       @course.is_public = true
       @course.save!
       expect(@course.wiki.grants_right?(@user, :read)).to be_falsey
     end
 
-    context 'default permissions' do
+    context "default permissions" do
       %i[update create_page delete_page update_page view_unpublished_items].each do |perm|
         it "gives #{perm} rights to teachers" do
           course_with_teacher
@@ -105,54 +105,54 @@ describe Wiki do
       end
     end
 
-    it 'gives publish page rights to admins' do
+    it "gives publish page rights to admins" do
       account_admin_user
       expect(@course.wiki.grants_right?(@admin, :publish_page)).to be_truthy
     end
 
-    it 'does not give publish page rights to admins when the context is a group' do
+    it "does not give publish page rights to admins when the context is a group" do
       account_admin_user
       group
       expect(@group.wiki.grants_right?(@admin, :publish_page)).to be_falsey
     end
 
-    context 'allow student wiki edits' do
+    context "allow student wiki edits" do
       before :once do
         course_with_student course: @course, user: @user, active_all: true
-        @course.default_wiki_editing_roles = 'teachers,students'
+        @course.default_wiki_editing_roles = "teachers,students"
         @course.save!
       end
 
-      it 'does not give manage rights to students' do
+      it "does not give manage rights to students" do
         expect(@course.wiki.grants_right?(@user, :manage)).to be_falsey
       end
 
-      it 'does not give update rights to students' do
+      it "does not give update rights to students" do
         expect(@course.wiki.grants_right?(@user, :update)).to be_falsey
       end
 
-      it 'gives read rights to students' do
+      it "gives read rights to students" do
         expect(@course.wiki.grants_right?(@user, :read)).to be_truthy
       end
 
-      it 'gives create_page rights to students' do
+      it "gives create_page rights to students" do
         expect(@course.wiki.grants_right?(@user, :create_page)).to be_truthy
       end
 
-      it 'does not give publish page rights to students' do
+      it "does not give publish page rights to students" do
         expect(@course.wiki.grants_right?(@user, :publish_page)).to be_falsey
       end
 
-      it 'does not give publish page rights to students when the context is a group' do
+      it "does not give publish page rights to students when the context is a group" do
         group
         expect(@group.wiki.grants_right?(@user, :publish_page)).to be_falsey
       end
 
-      it 'does not give delete_page rights to students' do
+      it "does not give delete_page rights to students" do
         expect(@course.wiki.grants_right?(@user, :delete_page)).to be_falsey
       end
 
-      it 'gives update_page rights to students' do
+      it "gives update_page rights to students" do
         expect(@course.wiki.grants_right?(@user, :update_page)).to be_truthy
       end
     end
@@ -160,16 +160,16 @@ describe Wiki do
 
   context "find_page" do
     before :once do
-      @page1 = @course.wiki_pages.create!(title: 'Some Page')
+      @page1 = @course.wiki_pages.create!(title: "Some Page")
       @pageN = @course.wiki_pages.create!(title: @page1.id.to_s)
     end
 
     it "finds page by URL" do
-      expect(@wiki.find_page('some-page')).to eq @page1
+      expect(@wiki.find_page("some-page")).to eq @page1
     end
 
     it "finds page by title" do
-      expect(@wiki.find_page('Some Page')).to eq @page1
+      expect(@wiki.find_page("Some Page")).to eq @page1
     end
 
     it "falls back to ID if url/title don't match" do
@@ -182,7 +182,7 @@ describe Wiki do
     end
   end
 
-  it '#context_loaded?' do
+  it "#context_loaded?" do
     group
     wiki = @group.wiki
     expect(wiki.reload.context_loaded?).to be_falsey
@@ -198,9 +198,9 @@ describe Wiki do
     end
   end
 
-  context 'before save' do
-    describe 'set_root_account_id' do
-      it 'sets root_account_id using context' do
+  context "before save" do
+    describe "set_root_account_id" do
+      it "sets root_account_id using context" do
         expect(@wiki.root_account_id).to eq @course.root_account_id
       end
     end

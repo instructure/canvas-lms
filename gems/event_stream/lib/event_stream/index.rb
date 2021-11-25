@@ -17,8 +17,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-require 'event_stream/index_strategy/active_record'
-require 'event_stream/index_strategy/cassandra'
+require "event_stream/index_strategy/active_record"
+require "event_stream/index_strategy/cassandra"
 
 class EventStream::Index
   include EventStream::AttrConfig
@@ -26,8 +26,8 @@ class EventStream::Index
   attr_reader :event_stream
 
   attr_config :table, type: String
-  attr_config :id_column, type: String, default: 'id'
-  attr_config :key_column, type: String, default: 'key'
+  attr_config :id_column, type: String, default: "id"
+  attr_config :key_column, type: String, default: "key"
   attr_config :bucket_size, type: Integer, default: 1.week
   attr_config :scrollback_limit, type: Integer, default: 52.weeks
   attr_config :entry_proc, type: Proc

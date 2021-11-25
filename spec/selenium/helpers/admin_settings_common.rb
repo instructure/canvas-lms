@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../common'
+require_relative "../common"
 
 module AdminSettingsCommon
   SIS_SYNC_ID = "#account_settings_sis_syncing_value"
@@ -28,8 +28,8 @@ module AdminSettingsCommon
   DEFAULT_SIS = "#account_settings_sis_default_grade_export_value"
 
   def turn_on_sis_settings(account)
-    account.set_feature_flag! 'post_grades', 'on'
-    account.set_feature_flag! :new_sis_integrations, 'on'
+    account.set_feature_flag! "post_grades", "on"
+    account.set_feature_flag! :new_sis_integrations, "on"
     account.allow_sis_import = true
     account.settings[:sis_syncing] = { value: true, locked: false }
     account.settings[:sis_default_grade_export] = { value: true }

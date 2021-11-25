@@ -45,7 +45,7 @@ module Lti::Concerns
       )
 
       Canvas.timeout_protection("cross-shard LTI launch", raise_on_timeout: true) do
-        HTTParty.get url, headers: { 'Authorization' => request.headers['Authorization'] }
+        HTTParty.get url, headers: { "Authorization" => request.headers["Authorization"] }
       end
     end
 

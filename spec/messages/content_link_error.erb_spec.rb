@@ -18,9 +18,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative './messages_helper'
+require_relative "./messages_helper"
 
-describe 'content_link_error' do
+describe "content_link_error" do
   before :once do
     @course = course_model
     @course2 = course_model

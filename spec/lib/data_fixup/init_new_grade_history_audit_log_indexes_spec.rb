@@ -22,8 +22,8 @@ describe DataFixup::InitNewGradeHistoryAuditLogIndexes do
   def insert_cql(use_grader: false)
     %{
       INSERT INTO grade_changes (id, created_at, context_id, assignment_id,
-                                 #{'grader_id, ' if use_grader} student_id)
-             VALUES (?, ?, ?, ?, #{'?,' if use_grader} ?) USING TTL ?
+                                 #{"grader_id, " if use_grader} student_id)
+             VALUES (?, ?, ?, ?, #{"?," if use_grader} ?) USING TTL ?
     }
   end
 
@@ -56,7 +56,7 @@ describe DataFixup::InitNewGradeHistoryAuditLogIndexes do
 
     @values = [
       [
-        '08d87bfc-a679-4f5d-9315-470a5fc7d7d0',
+        "08d87bfc-a679-4f5d-9315-470a5fc7d7d0",
         2.months.ago,
         10_000_000_000_018,
         10_000_000_000_116,
@@ -65,7 +65,7 @@ describe DataFixup::InitNewGradeHistoryAuditLogIndexes do
         1.year
       ],
       [
-        'fc85afda-538e-4fcb-a7fb-45697c551b71',
+        "fc85afda-538e-4fcb-a7fb-45697c551b71",
         1.month.ago,
         10_000_000_000_028,
         10_000_000_000_144,
@@ -79,28 +79,28 @@ describe DataFixup::InitNewGradeHistoryAuditLogIndexes do
     end
   end
 
-  it 'creates all the new indexes for records with grader ids' do
+  it "creates all the new indexes for records with grader ids" do
     DataFixup::InitNewGradeHistoryAuditLogIndexes.run
 
     index_tables.each do |table_name|
       cql = search_table_cql(table_name)
       ids = []
       @database.execute(cql).fetch do |row|
-        ids << row['id']
+        ids << row["id"]
       end
 
       expect(ids).to include(@values.first.first)
     end
   end
 
-  it 'creates the expected subset of indexes for records without grader ids' do
+  it "creates the expected subset of indexes for records without grader ids" do
     DataFixup::InitNewGradeHistoryAuditLogIndexes.run
 
     index_tables.each do |table_name|
       cql = search_table_cql(table_name)
       ids = []
       @database.execute(cql).fetch do |row|
-        ids << row['id']
+        ids << row["id"]
       end
 
       if grader_required_tables.include?(table_name)

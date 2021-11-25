@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../../common'
+require_relative "../../common"
 
 module PacePlansPageObject
   #------------------------- Selectors -------------------------------
@@ -62,7 +62,7 @@ module PacePlansPageObject
   end
 
   def pace_plan_table_module_selector
-    'h2'
+    "h2"
   end
 
   def publish_button_selector
@@ -321,7 +321,7 @@ module PacePlansPageObject
   end
 
   def required_end_date_value
-    element_value_for_attr(required_end_date_input, 'value')
+    element_value_for_attr(required_end_date_input, "value")
   end
 
   def show_hide_pace_plans_button_text
@@ -341,7 +341,7 @@ module PacePlansPageObject
   end
 
   def update_module_item_duration(duration)
-    duration_field.send_keys([:control, 'a'], :backspace, duration, :tab)
+    duration_field.send_keys([:control, "a"], :backspace, duration, :tab)
   end
 
   def unpublished_changes_tray_exists?

@@ -17,8 +17,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../../helpers/k5_common'
-require_relative './pages/course_index_page'
+require_relative "../../helpers/k5_common"
+require_relative "./pages/course_index_page"
 
 describe "course index" do
   include_context "in-process server selenium tests"
@@ -50,7 +50,7 @@ describe "course index" do
       c.save!
       c.offer!
     end
-    @user.enrollments.where(course: @future_courses).update_all(workflow_state: 'active')
+    @user.enrollments.where(course: @future_courses).update_all(workflow_state: "active")
   end
 
   before do
@@ -117,7 +117,7 @@ describe "course index" do
       @teacher.account.save!
 
       get "/courses"
-      add_course_button = f('#start_new_course')
+      add_course_button = f("#start_new_course")
       expect(add_course_button).to include_text("Subject")
       add_course_button.click
       expect(fj('h2:contains("Create Subject")')).to be_displayed
@@ -129,7 +129,7 @@ describe "course index" do
       @teacher.account.save!
 
       get "/courses"
-      add_course_button = f('#start_new_course')
+      add_course_button = f("#start_new_course")
       expect(add_course_button).to include_text("Course")
       add_course_button.click
       expect(fj('.ui-dialog-title:contains("Start a New Course")')).to be_displayed
@@ -142,7 +142,7 @@ describe "course index" do
       @teacher.account.save!
 
       get "/courses"
-      add_course_button = f('#start_new_course')
+      add_course_button = f("#start_new_course")
       expect(add_course_button).to include_text("Course")
       add_course_button.click
       expect(fj('h2:contains("Create Course")')).to be_displayed

@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative 'course_copy_helper'
+require_relative "course_copy_helper"
 
 describe ContentMigration do
   context "course copy wiki" do
@@ -73,7 +73,7 @@ describe ContentMigration do
       # simulating what happens when the user clicks "link to new page" and enters a title that isn't
       # urlified the same way by the client vs. the server.  this doesn't break navigation because
       # ApplicationController#get_wiki_page can match by urlified title, but it broke import (see #9945)
-      @copy_from.wiki.set_front_page_url!('front-page')
+      @copy_from.wiki.set_front_page_url!("front-page")
       main_page = @copy_from.wiki.front_page
       main_page.body = %(<a href="/courses/#{@copy_from.id}/wiki/online:-unit-pages">wut</a>)
       main_page.save!
@@ -114,13 +114,13 @@ describe ContentMigration do
       page_to = @copy_to.wiki_pages.where(migration_id: mig_id(page)).first
       page_to.destroy
 
-      page.body = '<p>updated</p>'
+      page.body = "<p>updated</p>"
       page.save!
 
       run_course_copy
 
       page_to.reload
-      expect(page_to.workflow_state).to eq 'active'
+      expect(page_to.workflow_state).to eq "active"
       expect(page_to.body).to eq page.body
     end
 
@@ -164,13 +164,13 @@ describe ContentMigration do
         copy_to_front_page = @copy_to.wiki_pages.create!(title: "stuff and stuff and even more stuf")
         @copy_to.wiki.set_front_page_url!(copy_to_front_page.url)
 
-        @copy_from.update_attribute(:default_view, 'wiki')
-        @copy_to.update_attribute(:default_view, 'feed')
+        @copy_from.update_attribute(:default_view, "wiki")
+        @copy_to.update_attribute(:default_view, "feed")
 
         run_course_copy
 
         @copy_to.reload
-        expect(@copy_to.default_view).to eq 'wiki'
+        expect(@copy_to.default_view).to eq "wiki"
         new_front_page = @copy_to.wiki_pages.where(migration_id: mig_id(copy_from_front_page)).first
         expect(@copy_to.wiki.front_page).to eq new_front_page
       end
@@ -195,13 +195,13 @@ describe ContentMigration do
       end
 
       it "sets default view to modules if wiki front page is missing" do
-        @copy_from.wiki.set_front_page_url!('haha not here')
-        @copy_from.default_view = 'wiki'
+        @copy_from.wiki.set_front_page_url!("haha not here")
+        @copy_from.default_view = "wiki"
         @copy_from.save!
 
         run_course_copy
 
-        expect(@copy_to.default_view).to eq 'modules'
+        expect(@copy_to.default_view).to eq "modules"
         expect(@copy_to.wiki.has_front_page?).to eq false
       end
     end

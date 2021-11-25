@@ -34,15 +34,15 @@ describe GroupLeadership do
 
       it "assigns the first student to join as the leader" do
         leader = user_model
-        @group.group_memberships.create!(user: leader, workflow_state: 'accepted')
+        @group.group_memberships.create!(user: leader, workflow_state: "accepted")
         expect(@group.reload.leader).to eq leader
       end
 
       it "picks a new leader if the leader leaves" do
         leader = user_model
         follower = user_model
-        leader_membership = @group.group_memberships.create!(user: leader, workflow_state: 'accepted')
-        @group.group_memberships.create!(user: follower, workflow_state: 'accepted')
+        leader_membership = @group.group_memberships.create!(user: leader, workflow_state: "accepted")
+        @group.group_memberships.create!(user: follower, workflow_state: "accepted")
         expect(@group.reload.leader).to eq leader
         leader_membership.destroy
         expect(@group.reload.leader).to eq follower
@@ -52,10 +52,10 @@ describe GroupLeadership do
     describe "revocation without auto leader assignment" do
       before(:once) do
         @leader = user_model
-        @leader_membership = @group.group_memberships.create!(user: @leader, workflow_state: 'accepted')
+        @leader_membership = @group.group_memberships.create!(user: @leader, workflow_state: "accepted")
         @group.leader = @leader
         @group.save!
-        @membership = @group.group_memberships.create!(user: user_model, workflow_state: 'accepted')
+        @membership = @group.group_memberships.create!(user: user_model, workflow_state: "accepted")
         @group.reload
         @leader_membership.reload
       end

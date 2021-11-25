@@ -17,9 +17,9 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-require 'zip'
-require 'tmpdir'
-require 'set'
+require "zip"
+require "tmpdir"
+require "set"
 
 class ContentZipper
   def initialize(options = {})
@@ -42,7 +42,7 @@ class ContentZipper
   def process_attachment(attachment, user = nil)
     raise "No attachment provided to ContentZipper.process_attachment" unless attachment
 
-    attachment.update_attribute(:workflow_state, 'zipping')
+    attachment.update_attribute(:workflow_state, "zipping")
     @user = user
     @logger.debug("file found: #{attachment.id} zipping files...")
 
@@ -55,7 +55,7 @@ class ContentZipper
       end
     rescue => e
       Canvas::Errors.capture(e, { message: "Content zipping failed" }, :warn)
-      attachment.update_attribute(:workflow_state, 'to_be_zipped')
+      attachment.update_attribute(:workflow_state, "to_be_zipped")
     end
   end
 
@@ -145,7 +145,7 @@ class ContentZipper
     submissions_hash = {}
     submissions.each do |s|
       submissions_hash[s.id] = s
-      if s.submission_type == 'online_upload'
+      if s.submission_type == "online_upload"
         static_attachments += s.attachments
       end
     end
@@ -173,7 +173,7 @@ class ContentZipper
           add_attachment_to_zip(a.attachment, zipfile, a.unencoded_filename)
           update_progress(zip_attachment, index, count)
         end
-        content = Rails.root.join('public/images/logo.png').read rescue nil
+        content = Rails.root.join("public/images/logo.png").read rescue nil
         zipfile.get_output_stream("logo.png") { |f| f.write content } if content
       end
       mark_successful!
@@ -201,7 +201,7 @@ class ContentZipper
     @file_count = folder.context.attachments.not_deleted.count
     @files_added = nil
     @logger.debug("zipping into attachment: #{zip_attachment.id}")
-    zip_attachment.workflow_state = 'zipping' # !(:workflow_state => 'zipping')
+    zip_attachment.workflow_state = "zipping" # !(:workflow_state => 'zipping')
     zip_attachment.save!
     filename = "#{folder.context.short_name}-#{folder.name} files"
     make_zip_tmpdir(filename) do |zip_name|
@@ -226,7 +226,7 @@ class ContentZipper
   # make a tmp directory and yield a filename under that directory to the block
   # given. the tmp directory is deleted when the block returns.
   def make_zip_tmpdir(filename)
-    filename = File.basename(filename.tr(' ', "_").gsub(/[^\w-]/, ""))
+    filename = File.basename(filename.tr(" ", "_").gsub(/[^\w-]/, ""))
     Dir.mktmpdir do |dirname|
       zip_name = File.join(dirname, "#{filename}.zip")
       yield zip_name
@@ -278,7 +278,7 @@ class ContentZipper
   end
 
   def mark_attachment_as_zipping!(zip_attachment)
-    zip_attachment.workflow_state = 'zipping'
+    zip_attachment.workflow_state = "zipping"
     zip_attachment.save!
   end
 
@@ -338,12 +338,12 @@ class ContentZipper
   def complete_attachment!(zip_attachment, zip_name)
     if zipped_successfully?
       @logger.debug("data zipped! uploading to external store...")
-      uploaded_data = Rack::Test::UploadedFile.new(zip_name, 'application/zip')
+      uploaded_data = Rack::Test::UploadedFile.new(zip_name, "application/zip")
       Attachments::Storage.store_for_attachment(zip_attachment, uploaded_data)
-      zip_attachment.workflow_state = 'zipped'
-      zip_attachment.file_state = 'available'
+      zip_attachment.workflow_state = "zipped"
+      zip_attachment.file_state = "available"
     else
-      zip_attachment.workflow_state = 'errored'
+      zip_attachment.workflow_state = "errored"
     end
     zip_attachment.save!
   end
@@ -437,7 +437,7 @@ class ContentZipper
 
   def get_filename(users_name, submission)
     id = @assignment.anonymize_students? ? "anon_#{submission.anonymous_id}" : submission.user_id
-    filename = [users_name, submission.late? ? 'LATE' : nil, id].compact.join('_')
+    filename = [users_name, submission.late? ? "LATE" : nil, id].compact.join("_")
     sanitize_file_name(filename)
   end
 
@@ -457,11 +457,11 @@ class ContentZipper
   end
 
   def sanitize_file_name(filename)
-    filename.gsub(/[^[[:word:]]]/, '')
+    filename.gsub(/[^[[:word:]]]/, "")
   end
 
   def sanitize_attachment_filename(filename)
-    filename.gsub(%r{[\x00/\\:*?"<>|]+}, '_')
+    filename.gsub(%r{[\x00/\\:*?"<>|]+}, "_")
   end
 
   def sanitize_user_name(user_name)

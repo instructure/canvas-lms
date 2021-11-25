@@ -19,56 +19,56 @@
 
 describe MicrosoftSync::GraphService::GroupMembershipChangeResult do
   before do
-    subject.add_issue 'members', 'abc', :reason1
-    subject.add_issue 'members', 'def', :reason2
-    subject.add_issue 'owners', 'abc', :reason2
+    subject.add_issue "members", "abc", :reason1
+    subject.add_issue "members", "def", :reason2
+    subject.add_issue "owners", "abc", :reason2
   end
 
-  describe '#issues_by_member_type' do
-    it 'describes all the issues added' do
+  describe "#issues_by_member_type" do
+    it "describes all the issues added" do
       expect(subject.issues_by_member_type).to eq(
-        'members' => {
-          'abc' => :reason1,
-          'def' => :reason2,
+        "members" => {
+          "abc" => :reason1,
+          "def" => :reason2,
         },
-        'owners' => {
-          'abc' => :reason2,
+        "owners" => {
+          "abc" => :reason2,
         }
       )
     end
   end
 
-  describe '#to_json' do
-    it 'is based off issues_by_member_type' do
+  describe "#to_json" do
+    it "is based off issues_by_member_type" do
       expect(JSON.parse(subject.to_json)).to eq(JSON.parse(subject.issues_by_member_type.to_json))
     end
   end
 
-  describe '#blank?' do
-    it 'returns true when no issues have been added' do
+  describe "#blank?" do
+    it "returns true when no issues have been added" do
       expect(described_class.new.blank?).to eq(true)
     end
 
-    it 'returns false when issues have been added' do
+    it "returns false when issues have been added" do
       expect(subject.blank?).to eq(false)
     end
   end
 
-  describe '#total_unsuccessful' do
-    it 'returns the total number of issues added' do
+  describe "#total_unsuccessful" do
+    it "returns the total number of issues added" do
       expect(subject.total_unsuccessful).to eq(3)
     end
   end
 
-  describe '#nonexistent_user_ids' do
+  describe "#nonexistent_user_ids" do
     before do
-      subject.add_issue 'members', 'ghi', described_class::NONEXISTENT_USER
-      subject.add_issue 'owners', 'def', described_class::NONEXISTENT_USER
-      subject.add_issue 'owners', 'ghi', described_class::NONEXISTENT_USER
+      subject.add_issue "members", "ghi", described_class::NONEXISTENT_USER
+      subject.add_issue "owners", "def", described_class::NONEXISTENT_USER
+      subject.add_issue "owners", "ghi", described_class::NONEXISTENT_USER
     end
 
-    it 'returns any users with any issue reason NONEXISTENT_USER' do
-      expect(subject.nonexistent_user_ids.sort).to eq(['def', 'ghi'])
+    it "returns any users with any issue reason NONEXISTENT_USER" do
+      expect(subject.nonexistent_user_ids.sort).to eq(["def", "ghi"])
     end
   end
 end

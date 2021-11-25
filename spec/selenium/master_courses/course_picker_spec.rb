@@ -17,8 +17,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../common'
-require_relative '../helpers/blueprint_common'
+require_relative "../common"
+require_relative "../helpers/blueprint_common"
 
 describe "master courses - course picker" do
   include_context "in-process server selenium tests"
@@ -68,10 +68,10 @@ describe "master courses - course picker" do
   end
 
   let(:course_search_input) { '.bca-course-filter input[type="search"]' }
-  let(:filter_output) { '.bca-course-details__wrapper' }
-  let(:loading) { '.bca-course-picker__loading' }
-  let(:term_filter) { '#termsFilter' }
-  let(:sub_account_filter) { '#subAccountsFilter' }
+  let(:filter_output) { ".bca-course-details__wrapper" }
+  let(:loading) { ".bca-course-picker__loading" }
+  let(:term_filter) { "#termsFilter" }
+  let(:sub_account_filter) { "#subAccountsFilter" }
 
   def wait_for_spinner(&block)
     wait_for_transient_element(loading, &block)
@@ -100,23 +100,23 @@ describe "master courses - course picker" do
   end
 
   it "filters the course list by name", priority: "1" do
-    matches = test_filter('Alpha')
+    matches = test_filter("Alpha")
     expect(matches.length).to eq(3)
   end
 
   it "filters the course list by short name", priority: "1" do
-    matches = test_filter('CCC')
+    matches = test_filter("CCC")
     expect(matches.length).to eq(3)
   end
 
   it "filters the course list by SIS ID", priority: "1" do
-    matches = test_filter('SIS_B')
+    matches = test_filter("SIS_B")
     expect(matches.length).to eq(2)
   end
 
   it "course search doesn't work with nicknames", priority: "2" do
-    @user.set_preference(:course_nicknames, @course.id, 'nickname')
-    matches = test_filter('nickname')
+    @user.set_preference(:course_nicknames, @course.id, "nickname")
+    matches = test_filter("nickname")
     expect(matches.length).to eq(0)
   end
 
@@ -124,7 +124,7 @@ describe "master courses - course picker" do
     get "/courses/#{@master.id}"
     open_associations
     open_courses_list
-    wait_for_spinner { click_INSTUI_Select_option(term_filter, 'fall term') }
+    wait_for_spinner { click_INSTUI_Select_option(term_filter, "fall term") }
     expect(available_courses.length).to eq(4)
   end
 
@@ -132,7 +132,7 @@ describe "master courses - course picker" do
     get "/courses/#{@master.id}"
     open_associations
     open_courses_list
-    wait_for_spinner { click_INSTUI_Select_option(sub_account_filter, 'sub-account 1') }
+    wait_for_spinner { click_INSTUI_Select_option(sub_account_filter, "sub-account 1") }
     expect(available_courses.length).to eq(1)
   end
 end

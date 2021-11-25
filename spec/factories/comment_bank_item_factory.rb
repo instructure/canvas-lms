@@ -21,7 +21,7 @@
 module Factories
   def comment_bank_item_model(opts = {})
     course = opts.delete(:course) || @course || course_model(reusable: true)
-    comment = opts.delete(:comment) || 'my assignment comment'
+    comment = opts.delete(:comment) || "my assignment comment"
     user = opts.delete(:user) || @user || user_model
 
     CommentBankItem.create!(course: course, user: user, comment: comment)

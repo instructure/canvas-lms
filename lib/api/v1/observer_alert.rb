@@ -41,20 +41,20 @@ module Api::V1::ObserverAlert
     hash = api_json(alert, user, session, API_ALLOWED_OUTPUT_FIELDS)
 
     url = case alert.context_type
-          when 'DiscussionTopic'
+          when "DiscussionTopic"
             course_discussion_topic_url(alert.context.context_id, alert.context)
-          when 'Assignment'
+          when "Assignment"
             course_assignment_url(alert.context.context_id, alert.context)
-          when 'Course'
+          when "Course"
             course_url(alert.context)
-          when 'Submission'
+          when "Submission"
             assignment = alert.context.assignment
             course_assignment_url(assignment.context_id, assignment)
           end
 
-    hash['locked_for_user'] = !(alert.context.nil? || alert.context_type == 'AccountNotification' || alert.context.grants_right?(user, session, :read))
+    hash["locked_for_user"] = !(alert.context.nil? || alert.context_type == "AccountNotification" || alert.context.grants_right?(user, session, :read))
 
-    hash['html_url'] = url
+    hash["html_url"] = url
     hash
   end
 end

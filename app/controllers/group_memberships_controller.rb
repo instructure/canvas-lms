@@ -154,7 +154,7 @@ class GroupMembershipsController < ApplicationController
         @membership = @group.add_user(@user)
 
         if @membership.valid?
-          render json: group_membership_json(@membership, @current_user, session, include: ['just_created'])
+          render json: group_membership_json(@membership, @current_user, session, include: ["just_created"])
         else
           render json: @membership.errors, status: :bad_request
         end
@@ -189,7 +189,7 @@ class GroupMembershipsController < ApplicationController
     find_membership
     if authorized_action(@membership, @current_user, :update)
       attrs = params.permit(*UPDATABLE_MEMBERSHIP_ATTRIBUTES)
-      attrs.delete(:workflow_state) unless attrs[:workflow_state] == 'accepted'
+      attrs.delete(:workflow_state) unless attrs[:workflow_state] == "accepted"
 
       DueDateCacher.with_executing_user(@current_user) do
         if @membership.update(attrs)
@@ -220,7 +220,7 @@ class GroupMembershipsController < ApplicationController
   def destroy
     find_membership
     if authorized_action(@membership, @current_user, :delete)
-      @membership.workflow_state = 'deleted'
+      @membership.workflow_state = "deleted"
       @membership.save
       render json: { "ok" => true }
     end
@@ -233,7 +233,7 @@ class GroupMembershipsController < ApplicationController
   end
 
   def find_membership
-    if (params[:membership_id] && params[:membership_id] == 'self') || (params[:user_id] && params[:user_id] == 'self')
+    if (params[:membership_id] && params[:membership_id] == "self") || (params[:user_id] && params[:user_id] == "self")
       @membership = @group.group_memberships.where(user_id: @current_user).first!
     elsif params[:membership_id]
       @membership = @group.group_memberships.find(params[:membership_id])

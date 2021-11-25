@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../common'
+require_relative "../common"
 
 describe "Sessions Timeout" do
   include_context "in-process server selenium tests"
@@ -39,9 +39,9 @@ describe "Sessions Timeout" do
           f(".copy_settings_button").click
         end
         f("#plugin_setting_disabled").click
-        f('#settings_session_timeout').clear
-        f('#settings_session_timeout').send_keys('19')
-        expect_new_page_load { f('.save_button').click }
+        f("#settings_session_timeout").clear
+        f("#settings_session_timeout").send_keys("19")
+        expect_new_page_load { f(".save_button").click }
         assert_flash_error_message "There was an error saving the plugin settings"
       end
     end

@@ -25,8 +25,8 @@ module UserNotesHelper
       url: url,
       loaderHtml: '
 <div id="pageless-loader" style="display:none;text-align:center;width:100%;">
-  <div class="msg" style="color: #666;font-size:2em">' + t('#user_notes.messages.loading_more', "Loading more entries") + '</div>
-  <img src="/images/load.gif" title="load" alt="' + t('#user_notes.tooltips.loading_more', "loading more results") + '" style="margin: 10px auto" />
+  <div class="msg" style="color: #666;font-size:2em">' + t("#user_notes.messages.loading_more", "Loading more entries") + '</div>
+  <img src="/images/load.gif" title="load" alt="' + t("#user_notes.tooltips.loading_more", "loading more results") + '" style="margin: 10px auto" />
 </div>'
     }
   end

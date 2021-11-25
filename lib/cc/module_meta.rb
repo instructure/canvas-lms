@@ -26,7 +26,7 @@ module CC
         meta_file = nil
         rel_path = nil
       else
-        meta_file = File.new(File.join(@canvas_resource_dir, CCHelper::MODULE_META), 'w')
+        meta_file = File.new(File.join(@canvas_resource_dir, CCHelper::MODULE_META), "w")
         rel_path = File.join(CCHelper::COURSE_SETTINGS_DIR, CCHelper::MODULE_META)
         document = Builder::XmlMarkup.new(target: meta_file, indent: 2)
       end
@@ -47,7 +47,7 @@ module CC
           unless export_object?(cm)
             # if the whole module isn't selected, check to see if a specific item is selected, and make sure that item gets exported
             cm.content_tags.not_deleted.each do |ct|
-              if export_object?(ct) && !['ContextModuleSubHeader', 'ExternalUrl'].member?(ct.content_type) && ct.content
+              if export_object?(ct) && !["ContextModuleSubHeader", "ExternalUrl"].member?(ct.content_type) && ct.content
                 add_item_to_export(ct.content)
               end
             end
@@ -82,13 +82,13 @@ module CC
                 ct_migration_id = create_key(ct)
                 ct_id_map[ct.id] = ct_migration_id
                 items_node.item(identifier: ct_migration_id) do |item_node|
-                  unless ['ContextModuleSubHeader', 'ExternalUrl'].member? ct.content_type
+                  unless ["ContextModuleSubHeader", "ExternalUrl"].member? ct.content_type
                     add_item_to_export(ct.content)
                   end
                   item_node.content_type ct.content_type
                   item_node.workflow_state ct.workflow_state
                   item_node.title ct.title
-                  item_node.identifierref create_key(ct.content_or_self) unless ct.content_type == 'ContextModuleSubHeader'
+                  item_node.identifierref create_key(ct.content_or_self) unless ct.content_type == "ContextModuleSubHeader"
                   if ct.content_type == "ContextExternalTool"
                     item_node.url ct.url
                     if ct.content && ct.content.context != @course
@@ -98,7 +98,7 @@ module CC
                       item_node.lti_resource_link_lookup_uuid ct.associated_asset.lookup_uuid
                     end
                   end
-                  item_node.url ct.url if ct.content_type == 'ExternalUrl'
+                  item_node.url ct.url if ct.content_type == "ExternalUrl"
                   item_node.position ct.position
                   item_node.new_tab ct.new_tab
                   item_node.indent ct.indent

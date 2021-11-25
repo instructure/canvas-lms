@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'csv'
+require "csv"
 
 class GradebookImporter
   ASSIGNMENT_PRELOADED_FIELDS = %i[
@@ -96,7 +96,7 @@ class GradebookImporter
       if number_parts.empty?
         last_number_part
       else
-        [number_parts.join, last_number_part].join('.')
+        [number_parts.join, last_number_part].join(".")
       end
     else
       field
@@ -116,7 +116,7 @@ class GradebookImporter
     Assignment.preload_unposted_anonymous_submissions(@all_assignments)
     @all_assignments = @all_assignments.index_by(&:id)
     @all_students = @context.all_students
-                            .select(['users.id', :name, :sortable_name, 'users.updated_at'])
+                            .select(["users.id", :name, :sortable_name, "users.updated_at"])
                             .index_by(&:id)
 
     @assignments = nil
@@ -169,7 +169,7 @@ class GradebookImporter
 
     @original_submissions = @context.submissions
                                     .preload(:grading_period, assignment: { context: :account })
-                                    .select(['submissions.id', :assignment_id, :user_id, :grading_period_id, :score, :excused, :cached_due_date, :course_id, 'submissions.updated_at'])
+                                    .select(["submissions.id", :assignment_id, :user_id, :grading_period_id, :score, :excused, :cached_due_date, :course_id, "submissions.updated_at"])
                                     .where(assignment_id: assignment_ids, user_id: user_ids)
                                     .map do |submission|
       is_gradeable = gradeable?(submission: submission, is_admin: is_admin)
@@ -192,23 +192,23 @@ class GradebookImporter
 
     @students.each do |student|
       @gradebook_importer_assignments[student.id].each do |submission|
-        submission_assignment_id = submission.fetch('assignment_id').to_i
+        submission_assignment_id = submission.fetch("assignment_id").to_i
         assignment = original_submissions_by_student
                      .fetch(student.id, {})
                      .fetch(submission_assignment_id, {})
-        submission['original_grade'] = assignment.fetch(:score, nil)
-        submission['gradeable'] = assignment.fetch(:gradable, nil)
+        submission["original_grade"] = assignment.fetch(:score, nil)
+        submission["gradeable"] = assignment.fetch(:gradable, nil)
 
-        next unless submission.fetch('gradeable').nil?
+        next unless submission.fetch("gradeable").nil?
 
-        assignment = @all_assignments[submission['assignment_id']] || @context.assignments.build
+        assignment = @all_assignments[submission["assignment_id"]] || @context.assignments.build
         new_submission = Submission.new
         new_submission.user = student
         new_submission.assignment = assignment
         edd = effective_due_dates.find_effective_due_date(student.id, assignment.id)
         new_submission.cached_due_date = edd.fetch(:due_at, nil)
         new_submission.grading_period_id = edd.fetch(:grading_period_id, nil)
-        submission['gradeable'] = !edd.fetch(:in_closed_grading_period, false) && gradeable?(
+        submission["gradeable"] = !edd.fetch(:in_closed_grading_period, false) && gradeable?(
           submission: new_submission,
           is_admin: is_admin
         )
@@ -216,7 +216,7 @@ class GradebookImporter
       @gradebook_importer_custom_columns[student.id].each do |column_id, student_custom_column_cell|
         custom_column = custom_gradebook_columns.detect { |custom_col| custom_col.id == column_id }
         datum = custom_column.custom_gradebook_column_data.detect { |custom_column_datum| custom_column_datum.user_id == student.id }
-        student_custom_column_cell['current_content'] = datum&.content
+        student_custom_column_cell["current_content"] = datum&.content
       end
     end
 
@@ -234,12 +234,12 @@ class GradebookImporter
 
           # Have potentially mixed case excused in grade match case
           # expectations for the compare so it doesn't look changed
-          submission['grade'] = 'EX' if submission['grade'].to_s.casecmp('EX') == 0
+          submission["grade"] = "EX" if submission["grade"].to_s.casecmp("EX") == 0
           no_change = no_change_to_submission?(submission)
 
-          @warning_messages[:prevented_grading_ungradeable_submission] = true if !submission['gradeable'] && !no_change
+          @warning_messages[:prevented_grading_ungradeable_submission] = true if !submission["gradeable"] && !no_change
 
-          no_change || !submission['gradeable']
+          no_change || !submission["gradeable"]
         end
       end
 
@@ -272,7 +272,7 @@ class GradebookImporter
       end
 
       @students.each do |student|
-        @gradebook_importer_assignments[student.id].select! { |sub| sub['gradeable'] }
+        @gradebook_importer_assignments[student.id].select! { |sub| sub["gradeable"] }
       end
 
       @unchanged_assignments = !indexes_to_delete.empty?
@@ -310,16 +310,16 @@ class GradebookImporter
 
       students.each do |student|
         submission = gradebook_importer_assignments.fetch(student.id)[idx]
-        if submission['grade'].present? && (submission['grade'].to_s.casecmp('EX') != 0)
-          gradebook_importer_assignments.fetch(student.id)[idx]['grade'] = assignment.score_to_grade(submission['grade'], \
-                                                                                                     submission['grade'])
+        if submission["grade"].present? && (submission["grade"].to_s.casecmp("EX") != 0)
+          gradebook_importer_assignments.fetch(student.id)[idx]["grade"] = assignment.score_to_grade(submission["grade"], \
+                                                                                                     submission["grade"])
         end
-        if submission['original_grade'].present? && (submission['original_grade'] != 'EX')
-          gradebook_importer_assignments.fetch(student.id)[idx]['original_grade'] = assignment.score_to_grade(submission['original_grade'],\
-                                                                                                              submission['original_grade'])
+        if submission["original_grade"].present? && (submission["original_grade"] != "EX")
+          gradebook_importer_assignments.fetch(student.id)[idx]["original_grade"] = assignment.score_to_grade(submission["original_grade"],\
+                                                                                                              submission["original_grade"])
         end
-        if submission['grade'].to_s.casecmp('EX') == 0
-          submission['grade'] = 'EX'
+        if submission["grade"].to_s.casecmp("EX") == 0
+          submission["grade"] = "EX"
         end
       end
     end
@@ -450,7 +450,7 @@ class GradebookImporter
 
     # This regexp will also include columns for unposted scores, which
     # will be one of these values with "Unposted" prepended.
-    non_assignment_regex = Regexp.new(NON_ASSIGNMENT_COLUMN_HEADERS.join('|'))
+    non_assignment_regex = Regexp.new(NON_ASSIGNMENT_COLUMN_HEADERS.join("|"))
     stripped_row.grep_v(non_assignment_regex)
   end
 
@@ -560,11 +560,11 @@ class GradebookImporter
       assignment_index = @assignment_indices[assignment.id]
       grade = row[assignment_index]&.strip
       unless assignment_visible_to_student(student, assignment, assignment_id, @visible_assignments)
-        grade = ''
+        grade = ""
       end
       new_submission = {
-        'grade' => grade,
-        'assignment_id' => assignment_id,
+        "grade" => grade,
+        "assignment_id" => assignment_id,
       }
       importer_submissions << new_submission
     end
@@ -575,8 +575,8 @@ class GradebookImporter
     @parsed_custom_column_data.each do |id, custom_column|
       column_index = custom_column[:index]
       new_custom_column_data = {
-        'new_content' => row[column_index],
-        'column_id' => id
+        "new_content" => row[column_index],
+        "column_id" => id
       }
       importer_custom_columns[id] = new_custom_column_data
     end
@@ -654,7 +654,7 @@ class GradebookImporter
       nil
     end
 
-    field_counts[';'] > field_counts[','] ? :semicolon : :comma
+    field_counts[";"] > field_counts[","] ? :semicolon : :comma
   end
 
   def semicolon_delimited?(csv_file)
@@ -677,7 +677,7 @@ class GradebookImporter
       return true
     end
 
-    if row[0]&.include?('Points Possible')
+    if row[0]&.include?("Points Possible")
       # this row is describing the assignment, has no student data
       process_pp(row)
       return true
@@ -782,9 +782,9 @@ class GradebookImporter
     @students.all? do |student|
       custom_column_datum = @gradebook_importer_custom_columns[student.id][column_id]
 
-      return true if custom_column_datum['current_content'].blank? && custom_column_datum['new_content'].blank?
+      return true if custom_column_datum["current_content"].blank? && custom_column_datum["new_content"].blank?
 
-      custom_column_datum['current_content'] == custom_column_datum['new_content']
+      custom_column_datum["current_content"] == custom_column_datum["new_content"]
     end
   end
 
@@ -798,7 +798,7 @@ class GradebookImporter
 
     return false unless current_value.present? && new_value.present?
 
-    return false if consider_excused && (new_value.to_s.casecmp?('EX') || current_value.casecmp?('EX'))
+    return false if consider_excused && (new_value.to_s.casecmp?("EX") || current_value.casecmp?("EX"))
 
     # The exporter exports scores rounded to two decimal places (which is also
     # the maximum level of precision shown in the gradebook), so 123.456 will
@@ -809,7 +809,7 @@ class GradebookImporter
   end
 
   def no_change_to_submission?(submission)
-    no_change_to_value?(new_value: submission['grade'], current_value: submission['original_grade'], consider_excused: true)
+    no_change_to_value?(new_value: submission["grade"], current_value: submission["original_grade"], consider_excused: true)
   end
 
   def set_current_override_scores

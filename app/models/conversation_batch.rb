@@ -22,8 +22,8 @@ class ConversationBatch < ActiveRecord::Base
   include Workflow
 
   belongs_to :user
-  belongs_to :root_conversation_message, class_name: 'ConversationMessage'
-  belongs_to :context, polymorphic: [:account, :course, { context_group: 'Group' }]
+  belongs_to :root_conversation_message, class_name: "ConversationMessage"
+  belongs_to :context, polymorphic: [:account, :course, { context_group: "Group" }]
 
   before_save :serialize_conversation_message_ids
   after_create :queue_delivery
@@ -31,7 +31,7 @@ class ConversationBatch < ActiveRecord::Base
   validates :user_id, :workflow_state, :root_conversation_message_id, presence: true
   validates :subject, length: { maximum: maximum_string_length, allow_nil: true }
 
-  scope :in_progress, -> { where(workflow_state: ['created', 'sending']) }
+  scope :in_progress, -> { where(workflow_state: ["created", "sending"]) }
 
   attr_accessor :mode
 
@@ -45,7 +45,7 @@ class ConversationBatch < ActiveRecord::Base
       self.user = user_map[user_id]
       existing_conversations = Conversation.find_all_private_conversations(user, recipient_ids.map { |id| user_map[id] },
                                                                            context_type: context_type, context_id: context_id)
-      update_attribute :workflow_state, 'sending'
+      update_attribute :workflow_state, "sending"
 
       ModelCache.with_cache(conversations: existing_conversations, users: { id: user_map }) do
         should_cc_author = true
@@ -68,10 +68,10 @@ class ConversationBatch < ActiveRecord::Base
         end
       end
 
-      update_attribute :workflow_state, 'sent'
+      update_attribute :workflow_state, "sent"
     end
   rescue
-    self.workflow_state = 'error'
+    self.workflow_state = "error"
     save!
   end
 
@@ -82,9 +82,9 @@ class ConversationBatch < ActiveRecord::Base
     job_start_factor = 20.0 / (recipient_ids.size + 20)
 
     case workflow_state
-    when 'sent'
+    when "sent"
       1
-    when 'created'
+    when "created"
       # the first part of the progress bar is while we wait for the job
       # to start. ideally this will just take a couple seconds. if jobs
       # are backed up, we still want to make it seem like we are making
@@ -105,11 +105,11 @@ class ConversationBatch < ActiveRecord::Base
   end
 
   def recipient_ids
-    @recipient_ids ||= read_attribute(:recipient_ids).split(',').map(&:to_i)
+    @recipient_ids ||= read_attribute(:recipient_ids).split(",").map(&:to_i)
   end
 
   def recipient_ids=(ids)
-    write_attribute(:recipient_ids, ids.join(','))
+    write_attribute(:recipient_ids, ids.join(","))
   end
 
   def recipient_count
@@ -117,11 +117,11 @@ class ConversationBatch < ActiveRecord::Base
   end
 
   def conversation_message_ids
-    @conversation_message_ids ||= (read_attribute(:conversation_message_ids) || '').split(',').map(&:to_i)
+    @conversation_message_ids ||= (read_attribute(:conversation_message_ids) || "").split(",").map(&:to_i)
   end
 
   def serialize_conversation_message_ids
-    write_attribute :conversation_message_ids, conversation_message_ids.join(',')
+    write_attribute :conversation_message_ids, conversation_message_ids.join(",")
   end
 
   def queue_delivery

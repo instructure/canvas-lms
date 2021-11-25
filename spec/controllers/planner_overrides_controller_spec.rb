@@ -99,9 +99,9 @@ describe PlannerOverridesController do
 
       it "saves announcement overrides with a plannable_type of announcement" do
         announcement_model(context: @course)
-        post :create, params: { plannable_type: 'announcement', plannable_id: @a.id, user_id: @student.id, marked_complete: true }
+        post :create, params: { plannable_type: "announcement", plannable_id: @a.id, user_id: @student.id, marked_complete: true }
         json = json_parse(response.body)
-        expect(json["plannable_type"]).to eq 'announcement'
+        expect(json["plannable_type"]).to eq "announcement"
       end
 
       it "gracefully handles duplicate request race condition" do

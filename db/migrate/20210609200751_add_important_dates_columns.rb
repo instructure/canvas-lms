@@ -27,8 +27,8 @@ class AddImportantDatesColumns < ActiveRecord::Migration[6.0]
     add_column :assignments, :important_dates, :boolean, if_not_exists: true, **defaults
     add_column :calendar_events, :important_dates, :boolean, if_not_exists: true, **defaults
 
-    add_index :assignments, :important_dates, where: 'important_dates', algorithm: :concurrently, if_not_exists: true
-    add_index :calendar_events, :important_dates, where: 'important_dates', algorithm: :concurrently, if_not_exists: true
+    add_index :assignments, :important_dates, where: "important_dates", algorithm: :concurrently, if_not_exists: true
+    add_index :calendar_events, :important_dates, where: "important_dates", algorithm: :concurrently, if_not_exists: true
 
     unless new_pg
       change_column_default :assignments, :important_dates, false

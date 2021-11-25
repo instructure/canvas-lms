@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../views_helper'
+require_relative "../views_helper"
 
 describe "/profile/profile" do
   it "renders" do
@@ -49,13 +49,13 @@ describe "/profile/profile" do
     assign(:notification_categories, Notification.dashboard_categories)
     assign(:policies, NotificationPolicy.for(@user))
     default_pseudonym = assign(:default_pseudonym, @user.pseudonyms.create!(unique_id: "unique@example.com", password: "asdfaabb", password_confirmation: "asdfaabb"))
-    sis_pseudonym = @user.pseudonyms.create!(unique_id: 'sis_unique@example.com') { |p| p.sis_user_id = 'sis_id' }
+    sis_pseudonym = @user.pseudonyms.create!(unique_id: "sis_unique@example.com") { |p| p.sis_user_id = "sis_id" }
     assign(:pseudonyms, @user.pseudonyms)
     assign(:password_pseudonyms, [])
     render "profile/profile"
-    page = Nokogiri('<document>' + response.body + '</document>')
-    expect(page.css("#pseudonym_#{default_pseudonym.id} .delete_pseudonym_link").first['style']).to eq ''
-    expect(page.css("#pseudonym_#{sis_pseudonym.id} .delete_pseudonym_link").first['style']).to eq 'display: none;'
+    page = Nokogiri("<document>" + response.body + "</document>")
+    expect(page.css("#pseudonym_#{default_pseudonym.id} .delete_pseudonym_link").first["style"]).to eq ""
+    expect(page.css("#pseudonym_#{sis_pseudonym.id} .delete_pseudonym_link").first["style"]).to eq "display: none;"
   end
 
   it "does not show the pseudonym delete link to non-admins" do
@@ -72,7 +72,7 @@ describe "/profile/profile" do
     assign(:pseudonyms, @user.pseudonyms)
     assign(:password_pseudonyms, [])
     render "profile/profile"
-    page = Nokogiri('<document>' + response.body + '</document>')
-    expect(page.css("#pseudonym_#{default_pseudonym.id} .delete_pseudonym_link").first['style']).to eq 'display: none;'
+    page = Nokogiri("<document>" + response.body + "</document>")
+    expect(page.css("#pseudonym_#{default_pseudonym.id} .delete_pseudonym_link").first["style"]).to eq "display: none;"
   end
 end

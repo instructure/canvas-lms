@@ -90,7 +90,7 @@ describe "Enrollment::QueryBuilder" do
           create_enrollments(
             [state.to_s, "available", "StudentEnrollment"]
           )
-          options[:course_workflow_state] = 'unknown'
+          options[:course_workflow_state] = "unknown"
           options[:enforce_course_workflow_state] = true
 
           result = enrollments.where(conditions)
@@ -125,8 +125,8 @@ describe "Enrollment::QueryBuilder" do
         end
 
         it "returns active enrollments in available courses" do
-          options[:course_workflow_state] = 'available'
-          result = enrollments('available').where(conditions)
+          options[:course_workflow_state] = "available"
+          result = enrollments("available").where(conditions)
           expect(matches_for(result)).to eq [
             %w[active available StudentEnrollment],
             %w[active available TeacherEnrollment]
@@ -134,15 +134,15 @@ describe "Enrollment::QueryBuilder" do
         end
 
         it "returns visible enrollments in unpublished courses" do
-          options[:course_workflow_state] = 'claimed'
-          result = enrollments('claimed').where(conditions)
+          options[:course_workflow_state] = "claimed"
+          result = enrollments("claimed").where(conditions)
           expect(matches_for(result)).to eq [
             %w[active claimed TeacherEnrollment]
           ]
         end
 
         it "returns nothing for other course workflow states" do
-          options[:course_workflow_state] = 'deleted'
+          options[:course_workflow_state] = "deleted"
           expect(conditions).to be_nil
         end
       end
@@ -161,12 +161,12 @@ describe "Enrollment::QueryBuilder" do
         end
 
         it "does not return anything if the course is deleted" do
-          options[:course_workflow_state] = 'deleted'
+          options[:course_workflow_state] = "deleted"
           expect(conditions).to be_nil
         end
 
         it "returns all active enrollments in non-deleted courses" do
-          options[:course_workflow_state] = 'claimed' # not enforcing state, so we get both claimed and available
+          options[:course_workflow_state] = "claimed" # not enforcing state, so we get both claimed and available
           result = enrollments.where(conditions)
           expect(matches_for(result)).to eq [
             %w[active available StudentEnrollment],
@@ -210,8 +210,8 @@ describe "Enrollment::QueryBuilder" do
         end
 
         it "returns invitations in published courses" do
-          options[:course_workflow_state] = 'available'
-          result = enrollments('available').where(conditions)
+          options[:course_workflow_state] = "available"
+          result = enrollments("available").where(conditions)
           expect(matches_for(result)).to eq [
             %w[invited available StudentEnrollment],
             %w[invited available TeacherEnrollment]
@@ -219,15 +219,15 @@ describe "Enrollment::QueryBuilder" do
         end
 
         it "returns invitations for admins in unpublished courses" do
-          options[:course_workflow_state] = 'claimed'
-          result = enrollments('claimed').where(conditions)
+          options[:course_workflow_state] = "claimed"
+          result = enrollments("claimed").where(conditions)
           expect(matches_for(result)).to eq [
             %w[invited claimed TeacherEnrollment]
           ]
         end
 
         it "does not return anything if the course is deleted" do
-          options[:course_workflow_state] = 'deleted'
+          options[:course_workflow_state] = "deleted"
           expect(conditions).to be_nil
         end
       end
@@ -236,7 +236,7 @@ describe "Enrollment::QueryBuilder" do
         let(:options) { { strict_checks: false } }
 
         it "returns sensible defaults" do
-          options[:course_workflow_state] = 'available'
+          options[:course_workflow_state] = "available"
           result = enrollments.where(conditions)
           expect(matches_for(result)).to eq [
             %w[creation_pending available StudentEnrollment],
@@ -251,7 +251,7 @@ describe "Enrollment::QueryBuilder" do
         end
 
         it "does not return anything if the course is deleted" do
-          options[:course_workflow_state] = 'deleted'
+          options[:course_workflow_state] = "deleted"
           expect(conditions).to be_nil
         end
       end

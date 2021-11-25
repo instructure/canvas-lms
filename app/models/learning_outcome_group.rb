@@ -27,10 +27,10 @@ class LearningOutcomeGroup < ActiveRecord::Base
   self.ignored_columns = %i[migration_id_2 vendor_guid_2]
 
   belongs_to :learning_outcome_group
-  belongs_to :source_outcome_group, class_name: 'LearningOutcomeGroup', inverse_of: :destination_outcome_groups
-  has_many :destination_outcome_groups, class_name: 'LearningOutcomeGroup', inverse_of: :source_outcome_group, dependent: :nullify
-  has_many :child_outcome_groups, class_name: 'LearningOutcomeGroup'
-  has_many :child_outcome_links, -> { where(tag_type: 'learning_outcome_association', content_type: 'LearningOutcome') }, class_name: 'ContentTag', as: :associated_asset
+  belongs_to :source_outcome_group, class_name: "LearningOutcomeGroup", inverse_of: :destination_outcome_groups
+  has_many :destination_outcome_groups, class_name: "LearningOutcomeGroup", inverse_of: :source_outcome_group, dependent: :nullify
+  has_many :child_outcome_groups, class_name: "LearningOutcomeGroup"
+  has_many :child_outcome_links, -> { where(tag_type: "learning_outcome_association", content_type: "LearningOutcome") }, class_name: "ContentTag", as: :associated_asset
   belongs_to :context, polymorphic: [:account, :course]
 
   before_save :infer_defaults
@@ -159,7 +159,7 @@ class LearningOutcomeGroup < ActiveRecord::Base
   def adopt_outcome_link(outcome_link, opts = {})
     return if context && context != outcome_link.context
     # no-op if the group is global and the link isn't
-    return if context.nil? && outcome_link.context_type != 'LearningOutcomeGroup'
+    return if context.nil? && outcome_link.context_type != "LearningOutcomeGroup"
     # no-op if we're already the parent
     return outcome_link if outcome_link.associated_asset == self
 
@@ -204,7 +204,7 @@ class LearningOutcomeGroup < ActiveRecord::Base
         outcome_group.destroy
       end
 
-      self.workflow_state = 'deleted'
+      self.workflow_state = "deleted"
       save!
     end
   end
@@ -227,7 +227,7 @@ class LearningOutcomeGroup < ActiveRecord::Base
     transaction do
       group = scope.active.root.take
       if !group && force
-        group = scope.build title: context.try(:name) || 'ROOT'
+        group = scope.build title: context.try(:name) || "ROOT"
         group.building_default = true
         GuardRail.activate(:primary) do
           # during course copies/imports, observe may be disabled but import job will

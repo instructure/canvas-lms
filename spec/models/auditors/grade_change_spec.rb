@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../../cassandra_spec_helper'
+require_relative "../../cassandra_spec_helper"
 
 describe Auditors::GradeChange do
   before(:all) do
@@ -45,7 +45,7 @@ describe Auditors::GradeChange do
     course_with_teacher(account: @sub_sub_account)
     student_in_course
 
-    @assignment = @course.assignments.create!(title: 'Assignment', points_possible: 10)
+    @assignment = @course.assignments.create!(title: "Assignment", points_possible: 10)
     @submission = @assignment.grade_student(@student, grade: 8, grader: @teacher).first
     @event_time = Time.zone.at(1.hour.ago.to_i) # cassandra doesn't remember microseconds
   end
@@ -53,7 +53,7 @@ describe Auditors::GradeChange do
   describe "with cassandra backend" do
     include_examples "cassandra audit logs"
     before do
-      allow(Audits).to receive(:config).and_return({ 'write_paths' => ['cassandra'], 'read_path' => 'cassandra' })
+      allow(Audits).to receive(:config).and_return({ "write_paths" => ["cassandra"], "read_path" => "cassandra" })
       Timecop.freeze(@event_time) { @event = Auditors::GradeChange.record(submission: @submission) }
     end
 
@@ -249,8 +249,8 @@ describe Auditors::GradeChange do
     describe "options forwarding" do
       before do
         record = Auditors::GradeChange::Record.new(
-          'submission' => @submission,
-          'created_at' => 1.day.ago
+          "submission" => @submission,
+          "created_at" => 1.day.ago
         )
         @event2 = Auditors::GradeChange::Stream.insert(record)
       end
@@ -339,7 +339,7 @@ describe Auditors::GradeChange do
     end
 
     before do
-      allow(Audits).to receive(:config).and_return({ 'write_paths' => ['active_record'], 'read_path' => 'active_record' })
+      allow(Audits).to receive(:config).and_return({ "write_paths" => ["active_record"], "read_path" => "active_record" })
     end
 
     it "inserts submission grade change records" do
@@ -463,19 +463,19 @@ describe Auditors::GradeChange do
           root_account_id: @account.id,
           student_id: @student.id,
           context_id: @course.id,
-          context_type: 'Course',
+          context_type: "Course",
           excused_after: false,
           excused_before: false,
-          event_type: 'grade'
+          event_type: "grade"
         }
         r1 = Auditors::ActiveRecord::GradeChangeRecord.create!(attributes.merge({
-                                                                                  uuid: 'asdf',
-                                                                                  request_id: 'asdf'
+                                                                                  uuid: "asdf",
+                                                                                  request_id: "asdf"
                                                                                 }))
         r2 = Auditors::ActiveRecord::GradeChangeRecord.create!(attributes.merge({
                                                                                   assignment_id: nil,
-                                                                                  uuid: 'fdsa',
-                                                                                  request_id: 'fdsa'
+                                                                                  uuid: "fdsa",
+                                                                                  request_id: "fdsa"
                                                                                 }))
         scope1 = Auditors::ActiveRecord::GradeChangeRecord.where(assignment_id: @assignment.id)
         scope2 = Auditors::ActiveRecord::GradeChangeRecord.where(assignment_id: Auditors::GradeChange::NULL_PLACEHOLDER)
@@ -492,7 +492,7 @@ describe Auditors::GradeChange do
 
   describe "with dual writing enabled to postgres" do
     before do
-      allow(Audits).to receive(:config).and_return({ 'write_paths' => ['cassandra', 'active_record'], 'read_path' => 'cassandra' })
+      allow(Audits).to receive(:config).and_return({ "write_paths" => ["cassandra", "active_record"], "read_path" => "cassandra" })
     end
 
     it "writes to cassandra" do

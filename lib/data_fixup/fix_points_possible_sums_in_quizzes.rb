@@ -31,7 +31,7 @@ module DataFixup
     end
 
     def self.affected_quizzes
-      Quizzes::Quiz.where('CHAR_LENGTH(CAST(points_possible AS text)) > 8')
+      Quizzes::Quiz.where("CHAR_LENGTH(CAST(points_possible AS text)) > 8")
     end
   end
 end

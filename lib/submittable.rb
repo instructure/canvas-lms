@@ -20,7 +20,7 @@
 module Submittable
   def self.included(klass)
     klass.belongs_to :assignment
-    klass.belongs_to :old_assignment, class_name: 'Assignment'
+    klass.belongs_to :old_assignment, class_name: "Assignment"
     klass.has_many :assignment_student_visibilities, through: :assignment
 
     klass.scope :visible_to_students_in_course_with_da, lambda { |user_ids, course_ids|
@@ -93,7 +93,7 @@ module Submittable
   end
 
   def restore(from = nil)
-    self.workflow_state = 'unpublished'
+    self.workflow_state = "unpublished"
     save
 
     if from != :assignment && for_assignment? && assignment.deleted?
@@ -111,7 +111,7 @@ module Submittable
   def restore_old_assignment
     return nil unless old_assignment&.deleted?
 
-    old_assignment.workflow_state = 'published'
+    old_assignment.workflow_state = "published"
     name = self.class.name.underscore
     old_assignment.saved_by = name.to_sym
     old_assignment.save(validate: false)
@@ -133,8 +133,8 @@ module Submittable
         Assignment.where(
           id: @old_assignment_id,
           context: context,
-          submission_types: 'wiki_page'
-        ).update_all(workflow_state: 'deleted', updated_at: Time.now.utc)
+          submission_types: "wiki_page"
+        ).update_all(workflow_state: "deleted", updated_at: Time.now.utc)
       elsif assignment && @saved_by != :assignment
         # let the stack unwind before we sync this, so that we're not nesting callbacks
         self.class.connection.after_transaction_commit do

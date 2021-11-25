@@ -46,7 +46,7 @@ module CanvasCassandra
         consistency = CanvasCassandra.consistency_level(consistency_text) if consistency_text
 
         if @db.use_cql3? || !consistency
-          query = query.sub(CONSISTENCY_CLAUSE, '')
+          query = query.sub(CONSISTENCY_CLAUSE, "")
         elsif !@db.use_cql3?
           query = query.sub(CONSISTENCY_CLAUSE, "USING CONSISTENCY #{consistency_text} ")
         end
@@ -85,7 +85,7 @@ module CanvasCassandra
           # http://www.datastax.com/docs/1.1/references/cql/BATCH
           # note there's no semicolons between statements in the batch
           cql = []
-          cql << "BEGIN #{'COUNTER ' if field == 'counter_'}BATCH"
+          cql << "BEGIN #{"COUNTER " if field == "counter_"}BATCH"
           cql.concat statements
           cql << "APPLY BATCH"
           # join with spaces rather than newlines, because cassandra doesn't care
@@ -181,13 +181,13 @@ module CanvasCassandra
     end
 
     def tables
-      if @db.connection.describe_version >= '20.1.0' && @db.execute("SELECT cql_version FROM system.local").first['cql_version'] >= '3.4.4'
+      if @db.connection.describe_version >= "20.1.0" && @db.execute("SELECT cql_version FROM system.local").first["cql_version"] >= "3.4.4"
         @db.execute("SELECT table_name FROM system_schema.tables WHERE keyspace_name=?", keyspace).map do |row|
-          row['table_name']
+          row["table_name"]
         end
       elsif @db.use_cql3?
         @db.execute("SELECT columnfamily_name FROM system.schema_columnfamilies WHERE keyspace_name=?", keyspace).map do |row|
-          row['columnfamily_name']
+          row["columnfamily_name"]
         end
       else
         @db.schema.tables
@@ -212,7 +212,7 @@ module CanvasCassandra
     end
 
     def keyspace
-      db.keyspace.to_s.dup.force_encoding('UTF-8')
+      db.keyspace.to_s.dup.force_encoding("UTF-8")
     end
     alias_method :name, :keyspace
 

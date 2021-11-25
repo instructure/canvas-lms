@@ -18,14 +18,14 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 describe MicrosoftSync::GraphService::UsersEndpoints do
-  include_context 'microsoft_sync_graph_service_endpoints'
+  include_context "microsoft_sync_graph_service_endpoints"
 
-  describe '#list' do
+  describe "#list" do
     let(:http_method) { :get }
-    let(:url) { 'https://graph.microsoft.com/v1.0/users' }
+    let(:url) { "https://graph.microsoft.com/v1.0/users" }
     let(:method_name) { :list }
     let(:method_args) { [] }
 
-    it_behaves_like 'a paginated list endpoint'
+    it_behaves_like "a paginated list endpoint"
   end
 end

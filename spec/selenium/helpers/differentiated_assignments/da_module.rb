@@ -17,10 +17,10 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative 'da_sections_module'
-require_relative 'da_users_module'
-require_relative 'da_homework_module'
-require_relative 'da_course_modules_module'
+require_relative "da_sections_module"
+require_relative "da_users_module"
+require_relative "da_homework_module"
+require_relative "da_course_modules_module"
 
 # Differentiated Assignments is AKA Selective Release
 module DifferentiatedAssignments
@@ -47,7 +47,7 @@ module DifferentiatedAssignments
     include Factories
 
     def create_course(opts = {})
-      course_name = opts.fetch(:name, 'Selective Release Course')
+      course_name = opts.fetch(:name, "Selective Release Course")
       course_factory(
         course_name: course_name,
         active_course: true

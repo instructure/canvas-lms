@@ -19,7 +19,7 @@
 #
 
 describe CourseProgress do
-  let(:progress_error) { { error: { message: 'no progress available because this course is not module based (has modules and module completion requirements) or the user is not enrolled as a student in this course' } } }
+  let(:progress_error) { { error: { message: "no progress available because this course is not module based (has modules and module completion requirements) or the user is not enrolled as a student in this course" } } }
 
   before do
     allow_any_instance_of(CourseProgress).to receive(:course_context_modules_item_redirect_url) do |_, opts = {}|
@@ -33,7 +33,7 @@ describe CourseProgress do
 
   def submit_homework(assignment, user = nil)
     user ||= @user
-    assignment.submit_homework(user, submission_type: 'online_text_entry', body: '42')
+    assignment.submit_homework(user, submission_type: "online_text_entry", body: "42")
   end
 
   it "returns nil for non module_based courses" do
@@ -61,19 +61,19 @@ describe CourseProgress do
       @assignment4 = @course.assignments.create!(title: "some assignment4")
       @assignment5 = @course.assignments.create!(title: "some assignment5")
 
-      @tag = @module.add_item({ id: @assignment.id, type: 'assignment' })
-      @tag2 = @module.add_item({ id: @assignment2.id, type: 'assignment' })
+      @tag = @module.add_item({ id: @assignment.id, type: "assignment" })
+      @tag2 = @module.add_item({ id: @assignment2.id, type: "assignment" })
 
-      @tag3 = @module2.add_item({ id: @assignment3.id, type: 'assignment' })
-      @tag4 = @module2.add_item({ id: @assignment4.id, type: 'assignment' })
+      @tag3 = @module2.add_item({ id: @assignment3.id, type: "assignment" })
+      @tag4 = @module2.add_item({ id: @assignment4.id, type: "assignment" })
 
-      @tag5 = @module3.add_item({ id: @assignment5.id, type: 'assignment' })
+      @tag5 = @module3.add_item({ id: @assignment5.id, type: "assignment" })
 
-      @module.completion_requirements = { @tag.id => { type: 'must_submit' },
-                                          @tag2.id => { type: 'must_submit' } }
-      @module2.completion_requirements = { @tag3.id => { type: 'must_submit' },
-                                           @tag4.id => { type: 'must_submit' } }
-      @module3.completion_requirements = { @tag5.id => { type: 'must_submit' } }
+      @module.completion_requirements = { @tag.id => { type: "must_submit" },
+                                          @tag2.id => { type: "must_submit" } }
+      @module2.completion_requirements = { @tag3.id => { type: "must_submit" },
+                                           @tag4.id => { type: "must_submit" } }
+      @module3.completion_requirements = { @tag5.id => { type: "must_submit" } }
 
       [@module, @module2, @module3].each do |m|
         m.require_sequential_progress = true
@@ -167,7 +167,7 @@ describe CourseProgress do
       submit_homework(@assignment2)
 
       # remove assignment 2 from the list of requirements
-      @module.completion_requirements = [{ id: @tag.id, type: 'must_submit' }]
+      @module.completion_requirements = [{ id: @tag.id, type: "must_submit" }]
       @module.save
 
       progress = CourseProgress.new(@course, @user).to_json
@@ -209,7 +209,7 @@ describe CourseProgress do
       # move the requirement to module 2
       @tag.context_module = @module2
       @tag.save!
-      @module2.completion_requirements = { @tag.id => { type: 'must_submit' } }
+      @module2.completion_requirements = { @tag.id => { type: "must_submit" } }
       @module2.save
 
       # check progress
@@ -255,7 +255,7 @@ describe CourseProgress do
       specs_require_sharding
 
       it "can return correct progress" do
-        @shard1.activate { @shard_user = User.create!(name: 'outofshard') }
+        @shard1.activate { @shard_user = User.create!(name: "outofshard") }
         @course.enroll_student(@shard_user).accept!
 
         submit_homework(@assignment, @shard_user)
@@ -267,7 +267,7 @@ describe CourseProgress do
   end
 
   context "module that requires only one item completed" do
-    it 'returns the correct course progress when completing one of the requirements' do
+    it "returns the correct course progress when completing one of the requirements" do
       @module1 = @course.context_modules.create!(name: "module 01", requirement_count: nil)
       @module2 = @course.context_modules.create!(name: "module 02", requirement_count: 1)
 
@@ -277,21 +277,21 @@ describe CourseProgress do
       @assignment4 = @course.assignments.create!(title: "some assignment4")
       @assignment5 = @course.assignments.create!(title: "some assignment5")
 
-      @tag1 = @module1.add_item({ id: @assignment1.id, type: 'assignment' })
-      @tag2 = @module1.add_item({ id: @assignment2.id, type: 'assignment' })
-      @tag3 = @module1.add_item({ id: @assignment3.id, type: 'assignment' })
+      @tag1 = @module1.add_item({ id: @assignment1.id, type: "assignment" })
+      @tag2 = @module1.add_item({ id: @assignment2.id, type: "assignment" })
+      @tag3 = @module1.add_item({ id: @assignment3.id, type: "assignment" })
 
-      @tag4 = @module2.add_item({ id: @assignment4.id, type: 'assignment' })
-      @tag5 = @module2.add_item({ id: @assignment5.id, type: 'assignment' })
+      @tag4 = @module2.add_item({ id: @assignment4.id, type: "assignment" })
+      @tag5 = @module2.add_item({ id: @assignment5.id, type: "assignment" })
 
       @module1.completion_requirements = {
-        @tag1.id => { type: 'must_submit' },
-        @tag2.id => { type: 'must_submit' },
-        @tag3.id => { type: 'must_submit' }
+        @tag1.id => { type: "must_submit" },
+        @tag2.id => { type: "must_submit" },
+        @tag3.id => { type: "must_submit" }
       }
       @module2.completion_requirements = {
-        @tag4.id => { type: 'must_submit' },
-        @tag5.id => { type: 'must_submit' }
+        @tag4.id => { type: "must_submit" },
+        @tag5.id => { type: "must_submit" }
       }
 
       [@module1, @module2].each do |m|
@@ -316,14 +316,14 @@ describe CourseProgress do
                              })
     end
 
-    it 'still counts as complete if the module has no requirements to speak of' do
+    it "still counts as complete if the module has no requirements to speak of" do
       @module1 = @course.context_modules.create!(name: "module 01", requirement_count: 1)
       @module2 = @course.context_modules.create!(name: "module 02", requirement_count: nil)
 
       @assignment1 = @course.assignments.create!(title: "some assignment1")
-      @tag1 = @module2.add_item({ id: @assignment1.id, type: 'assignment' })
+      @tag1 = @module2.add_item({ id: @assignment1.id, type: "assignment" })
       @module2.completion_requirements = {
-        @tag1.id => { type: 'must_submit' },
+        @tag1.id => { type: "must_submit" },
       }
 
       [@module1, @module2].each do |m|
@@ -344,7 +344,7 @@ describe CourseProgress do
                              })
     end
 
-    it 'is not complete if not each module complete' do
+    it "is not complete if not each module complete" do
       @module1 = @course.context_modules.create!(name: "module 01", requirement_count: 1)
       @module2 = @course.context_modules.create!(name: "module 02", requirement_count: 1)
       @module3 = @course.context_modules.create!(name: "module 03", requirement_count: 1)
@@ -355,22 +355,22 @@ describe CourseProgress do
       @assignment4 = @course.assignments.create!(title: "some assignment4")
       @assignment5 = @course.assignments.create!(title: "some assignment5")
 
-      @tag1 = @module1.add_item({ id: @assignment1.id, type: 'assignment' })
-      @tag2 = @module1.add_item({ id: @assignment2.id, type: 'assignment' })
-      @tag3 = @module1.add_item({ id: @assignment3.id, type: 'assignment' })
-      @tag4 = @module2.add_item({ id: @assignment4.id, type: 'assignment' })
-      @tag5 = @module3.add_item({ id: @assignment5.id, type: 'assignment' })
+      @tag1 = @module1.add_item({ id: @assignment1.id, type: "assignment" })
+      @tag2 = @module1.add_item({ id: @assignment2.id, type: "assignment" })
+      @tag3 = @module1.add_item({ id: @assignment3.id, type: "assignment" })
+      @tag4 = @module2.add_item({ id: @assignment4.id, type: "assignment" })
+      @tag5 = @module3.add_item({ id: @assignment5.id, type: "assignment" })
 
       @module1.completion_requirements = {
-        @tag1.id => { type: 'must_submit' },
-        @tag2.id => { type: 'must_submit' },
-        @tag3.id => { type: 'must_submit' }
+        @tag1.id => { type: "must_submit" },
+        @tag2.id => { type: "must_submit" },
+        @tag3.id => { type: "must_submit" }
       }
       @module2.completion_requirements = {
-        @tag4.id => { type: 'must_submit' }
+        @tag4.id => { type: "must_submit" }
       }
       @module3.completion_requirements = {
-        @tag5.id => { type: 'must_submit' }
+        @tag5.id => { type: "must_submit" }
       }
 
       [@module1, @module2, @module3].each do |m|

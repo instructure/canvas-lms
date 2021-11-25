@@ -26,13 +26,13 @@ class WebConference < ActiveRecord::Base
   has_one :calendar_event, inverse_of: :web_conference, dependent: :nullify
   has_many :web_conference_participants
   has_many :users, through: :web_conference_participants
-  has_many :invitees, -> { where(web_conference_participants: { participation_type: 'invitee' }) }, through: :web_conference_participants, source: :user
-  has_many :attendees, -> { where(web_conference_participants: { participation_type: 'attendee' }) }, through: :web_conference_participants, source: :user
+  has_many :invitees, -> { where(web_conference_participants: { participation_type: "invitee" }) }, through: :web_conference_participants, source: :user
+  has_many :attendees, -> { where(web_conference_participants: { participation_type: "attendee" }) }, through: :web_conference_participants, source: :user
   belongs_to :user
 
   validates :description, length: { maximum: maximum_text_length, allow_blank: true }
   validates :conference_type, :title, :context_id, :context_type, :user_id, presence: true
-  validate :lti_tool_valid, if: -> { conference_type == 'LtiConference' }
+  validate :lti_tool_valid, if: -> { conference_type == "LtiConference" }
 
   MAX_DURATION = 99_999_999
   validates :duration, numericality: { less_than_or_equal_to: MAX_DURATION, allow_nil: true }
@@ -47,7 +47,7 @@ class WebConference < ActiveRecord::Base
 
   scope :for_context_codes, ->(context_codes) { where(context_code: context_codes) }
 
-  scope :with_config_for, ->(context:) { where(conference_type: WebConference.conference_types(context).map { |ct| ct['conference_type'] }) }
+  scope :with_config_for, ->(context:) { where(conference_type: WebConference.conference_types(context).map { |ct| ct["conference_type"] }) }
 
   scope :live, -> { where("web_conferences.started_at BETWEEN (NOW() - interval '1 day') AND NOW() AND (web_conferences.ended_at IS NULL OR web_conferences.ended_at > NOW())") }
 
@@ -100,16 +100,16 @@ class WebConference < ActiveRecord::Base
   def lti_tool_valid
     tool_id = settings.dig(:lti_settings, :tool_id)
     if tool_id.blank?
-      errors.add(:settings, 'settings[lti_settings][tool_id] must exist for LtiConference')
+      errors.add(:settings, "settings[lti_settings][tool_id] must exist for LtiConference")
       return
     end
     tool = ContextExternalTool.find_external_tool_by_id(tool_id, context)
     if tool.blank?
-      errors.add(:settings, 'settings[lti_settings][tool_id] must be a ContextExternalTool instance visible in context')
+      errors.add(:settings, "settings[lti_settings][tool_id] must be a ContextExternalTool instance visible in context")
       return
     end
     unless tool.has_placement?(:conference_selection)
-      errors.add(:settings, 'settings[lti_settings][tool_id] must be a ContextExternalTool instance with conference_selection placement')
+      errors.add(:settings, "settings[lti_settings][tool_id] must be a ContextExternalTool instance with conference_selection placement")
     end
   end
 
@@ -132,9 +132,9 @@ class WebConference < ActiveRecord::Base
   def friendly_setting(value)
     case value
     when true
-      t('#web_conference.settings.boolean.true', "On")
+      t("#web_conference.settings.boolean.true", "On")
     when false
-      t('#web_conference.settings.boolean.false', "Off")
+      t("#web_conference.settings.boolean.false", "Off")
     else value.to_s
     end
   end
@@ -239,10 +239,10 @@ class WebConference < ActiveRecord::Base
 
     p = web_conference_participants.where(user_id: user).first
     p ||= web_conference_participants.build(user: user)
-    p.participation_type = type unless type == 'attendee' && p.participation_type == 'initiator'
+    p.participation_type = type unless type == "attendee" && p.participation_type == "initiator"
     (@new_participants ||= []) << user if p.new_record?
     # Once anyone starts attending the conference, mark it as started.
-    if type == 'attendee'
+    if type == "attendee"
       self.started_at ||= Time.now
       save
     end
@@ -271,15 +271,15 @@ class WebConference < ActiveRecord::Base
   end
 
   def add_initiator(user)
-    add_user(user, 'initiator')
+    add_user(user, "initiator")
   end
 
   def add_invitee(user)
-    add_user(user, 'invitee')
+    add_user(user, "invitee")
   end
 
   def add_attendee(user)
-    add_user(user, 'attendee')
+    add_user(user, "attendee")
   end
 
   def context_code
@@ -289,8 +289,8 @@ class WebConference < ActiveRecord::Base
   def infer_conference_settings; end
 
   def conference_type=(val)
-    conf_type = if val == 'LtiConference'
-                  { conference_type: 'LtiConference', class_name: 'LtiConference' }
+    conf_type = if val == "LtiConference"
+                  { conference_type: "LtiConference", class_name: "LtiConference" }
                 else
                   WebConference.conference_types(context).detect { |t| t[:conference_type] == val }
                 end
@@ -308,7 +308,7 @@ class WebConference < ActiveRecord::Base
     self.conference_type ||= config && config[:conference_type]
     self.context_code = "#{context_type.underscore}_#{context_id}" rescue nil
     self.added_user_ids ||= ""
-    self.title ||= context.is_a?(Course) ? t('#web_conference.default_name_for_courses', "Course Web Conference") : t('#web_conference.default_name_for_groups', "Group Web Conference")
+    self.title ||= context.is_a?(Course) ? t("#web_conference.default_name_for_courses", "Course Web Conference") : t("#web_conference.default_name_for_groups", "Group Web Conference")
     self.start_at ||= self.started_at
     self.end_at ||= ended_at
     self.end_at ||= self.start_at + duration.minutes if self.start_at && duration
@@ -500,8 +500,8 @@ class WebConference < ActiveRecord::Base
     join_url = options.delete(:join_url)
     options.reverse_merge!(only: %w[id title description conference_type duration started_at ended_at user_ids context_id context_type context_code])
     result = super(options.merge(include_root: false, methods: %i[has_advanced_settings long_running user_settings recordings]))
-    result['url'] = url
-    result['join_url'] = join_url
+    result["url"] = url
+    result["join_url"] = join_url
     result
   end
 
@@ -519,8 +519,8 @@ class WebConference < ActiveRecord::Base
     lti_tools(context).map do |tool|
       {
         name: tool.name,
-        class_name: 'LtiConference',
-        conference_type: 'LtiConference',
+        class_name: "LtiConference",
+        conference_type: "LtiConference",
         user_setting_fields: {},
         lti_settings: tool.conference_selection.merge(tool_id: tool.id)
       }.with_indifferent_access
@@ -543,7 +543,7 @@ class WebConference < ActiveRecord::Base
     if (names = WebConference.enabled_plugin_conference_names).any?
       t("%{conference_type_names} (Conferences)", conference_type_names: names.join(" "))
     else
-      t('#tabs.conferences', "Conferences")
+      t("#tabs.conferences", "Conferences")
     end
   end
 

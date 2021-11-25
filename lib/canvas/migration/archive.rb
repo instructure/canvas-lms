@@ -47,7 +47,7 @@ module Canvas::Migration
         @nested_dir = nil
         base_entries = zip_file.glob("*")
         unless base_entries.any? { |e| !e.directory? }
-          root_dirs = base_entries.reject { |e| e.name.split('/').any? { |p| p =~ UnzipAttachment::THINGS_TO_IGNORE_REGEX } }
+          root_dirs = base_entries.reject { |e| e.name.split("/").any? { |p| p =~ UnzipAttachment::THINGS_TO_IGNORE_REGEX } }
           @nested_dir = root_dirs.first.name if root_dirs.count == 1
         end
       end
@@ -80,9 +80,9 @@ module Canvas::Migration
     end
 
     def download_archive
-      config = ConfigFile.load('external_migration') || {}
+      config = ConfigFile.load("external_migration") || {}
       if @settings[:export_archive_path]
-        File.open(@settings[:export_archive_path], 'rb')
+        File.open(@settings[:export_archive_path], "rb")
       elsif @settings[:course_archive_download_url].present?
         _, uri = CanvasHttp.validate_url(@settings[:course_archive_download_url], check_host: true)
         CanvasHttp.get(@settings[:course_archive_download_url]) do |http_response|
@@ -105,7 +105,7 @@ module Canvas::Migration
 
     def unzipped_file_path
       unless @unzipped_file_path
-        config = ConfigFile.load('external_migration') || {}
+        config = ConfigFile.load("external_migration") || {}
         @unzipped_file_path = Dir.mktmpdir(nil, config[:data_folder].presence)
       end
       @unzipped_file_path
@@ -127,7 +127,7 @@ module Canvas::Migration
       warnings = CanvasUnzip.extract_archive(path, unzipped_file_path, nested_dir: nested_dir)
       @unzipped = true
       unless warnings.empty?
-        diagnostic_text = ''
+        diagnostic_text = ""
         warnings.each do |tag, files|
           message = translate_error(tag)
           diagnostic_text += I18n.t("Extract error, %{error}: %{file_names}", error: message, file_names: files.to_sentence) + "\n"
@@ -141,13 +141,13 @@ module Canvas::Migration
     def translate_error(error)
       case error
       when :already_exists
-        I18n.t('file already exists')
+        I18n.t("file already exists")
       when :unknown_compression_method
-        I18n.t('unknown compression method')
+        I18n.t("unknown compression method")
       when :filename_too_long
-        I18n.t('file name too long')
+        I18n.t("file name too long")
       when :unsafe
-        I18n.t('unsafe file link')
+        I18n.t("unsafe file link")
       end
     end
 
@@ -159,8 +159,8 @@ module Canvas::Migration
 
     # If the file is a zip file, unzip it, if it's an xml file, copy
     # it into the directory with the given file name
-    def prepare_cartridge_file(file_name = 'imsmanifest.xml')
-      if path.ends_with?('xml')
+    def prepare_cartridge_file(file_name = "imsmanifest.xml")
+      if path.ends_with?("xml")
         FileUtils.cp(path, package_root.item_path(file_name))
       else
         unzip_archive

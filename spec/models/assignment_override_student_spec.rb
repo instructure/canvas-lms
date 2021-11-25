@@ -66,7 +66,7 @@ describe AssignmentOverrideStudent do
     end
   end
 
-  describe 'recalculation of cached due dates' do
+  describe "recalculation of cached due dates" do
     before(:once) do
       course = Course.create!
       @student = User.create!
@@ -75,12 +75,12 @@ describe AssignmentOverrideStudent do
       @assignment_override = @assignment.assignment_overrides.create!
     end
 
-    it 'on creation, recalculates cached due dates on the assignment' do
+    it "on creation, recalculates cached due dates on the assignment" do
       expect(DueDateCacher).to receive(:recompute_users_for_course).with(@student.id, @assignment.context, [@assignment]).once
       @assignment_override.assignment_override_students.create!(user: @student)
     end
 
-    it 'on destroy, recalculates cached due dates on the assignment' do
+    it "on destroy, recalculates cached due dates on the assignment" do
       override_student = @assignment_override.assignment_override_students.create!(user: @student)
 
       # Expect DueDateCacher to be called once from AssignmentOverrideStudent after it's destroyed and another time
@@ -100,7 +100,7 @@ describe AssignmentOverrideStudent do
         account = Account.create!
         course = account.courses.create!
         e2 = course.enroll_student(@student)
-        e2.update_attribute(:workflow_state, 'active')
+        e2.update_attribute(:workflow_state, "active")
         override = assignment_override_model(course: course)
         override_student = override.assignment_override_students.build
         override_student.user = @student
@@ -248,8 +248,8 @@ describe AssignmentOverrideStudent do
     end
   end
 
-  describe 'create' do
-    it 'sets the root_account_id using assignment' do
+  describe "create" do
+    it "sets the root_account_id using assignment" do
       adhoc_override_with_student
       expect(@override_student.root_account_id).to eq @assignment.root_account_id
     end

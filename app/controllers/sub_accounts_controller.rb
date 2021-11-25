@@ -28,7 +28,7 @@ class SubAccountsController < ApplicationController
 
   def sub_accounts_of(account, current_depth = 0)
     account_data = @accounts[account.id] = { account: account, course_count: 0 }
-    sub_accounts = account.sub_accounts.active.order(Account.best_unicode_collation_key('name')).limit(101) unless current_depth == 2
+    sub_accounts = account.sub_accounts.active.order(Account.best_unicode_collation_key("name")).limit(101) unless current_depth == 2
     sub_account_ids = (sub_accounts || []).map(&:id)
     if current_depth == 2 || sub_accounts.length > 100
       account_data[:sub_account_ids] = []
@@ -89,7 +89,7 @@ class SubAccountsController < ApplicationController
     end
     counts = Course
              .joins(:course_account_associations)
-             .group('course_account_associations.account_id')
+             .group("course_account_associations.account_id")
              .where("course_account_associations.account_id IN (?) AND course_account_associations.course_section_id IS NULL AND
                  course_account_associations.depth=0 AND courses.workflow_state<>'deleted'", @accounts[:all_account_ids])
              .distinct.count(:id)
@@ -102,7 +102,7 @@ class SubAccountsController < ApplicationController
     @sub_account = subaccount_or_self(params[:id])
     ActiveRecord::Associations::Preloader.new.preload(@sub_account, [{ sub_accounts: [:parent_account, :root_account] }])
     sub_account_json = @sub_account.as_json(only: [:id, :name], methods: [:course_count, :sub_account_count])
-    sort_key = Account.best_unicode_collation_key('accounts.name')
+    sort_key = Account.best_unicode_collation_key("accounts.name")
     sub_accounts = @sub_account.sub_accounts.order(sort_key).as_json(only: [:id, :name], methods: [:course_count, :sub_account_count])
     sub_account_json[:account][:sub_accounts] = sub_accounts
     render json: sub_account_json

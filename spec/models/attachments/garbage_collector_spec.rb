@@ -18,7 +18,7 @@
 #
 
 describe Attachments::GarbageCollector do
-  describe 'FolderContextType' do
+  describe "FolderContextType" do
     let_once(:course) { Account.default.courses.create! }
     let_once(:folder) { Folder.root_folders(course).first }
     let(:att) do
@@ -108,7 +108,7 @@ describe Attachments::GarbageCollector do
     end
   end
 
-  describe 'ContentExportContextType' do
+  describe "ContentExportContextType" do
     let_once(:course) { Account.default.courses.create! }
     let_once(:export) { course.content_exports.create! }
     let(:att) do
@@ -178,7 +178,7 @@ describe Attachments::GarbageCollector do
       export.attachment = att
       export.save
       Attachment.where(id: att.id).update_all(created_at: 1.year.ago)
-      SentContentShare.create!(name: 'content export', read_state: 'read', user: user_model, content_export: export)
+      SentContentShare.create!(name: "content export", read_state: "read", user: user_model, content_export: export)
 
       gc.delete_content
       expect(att.reload).not_to be_deleted

@@ -17,10 +17,10 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'atom'
+require "atom"
 
 # Force loaded so that it will be in ActiveRecord::Base.descendants for switchman to use
-require_dependency 'assignment_student_visibility'
+require_dependency "assignment_student_visibility"
 
 class DiscussionTopic < ActiveRecord::Base
   include Workflow
@@ -47,9 +47,9 @@ class DiscussionTopic < ActiveRecord::Base
   attr_accessor :user_has_posted, :saved_by, :total_root_discussion_entries
 
   module DiscussionTypes
-    SIDE_COMMENT = 'side_comment'
-    THREADED     = 'threaded'
-    FLAT         = 'flat'
+    SIDE_COMMENT = "side_comment"
+    THREADED     = "threaded"
+    FLAT         = "flat"
     TYPES        = DiscussionTypes.constants.map { |c| DiscussionTypes.const_get(c) }
   end
 
@@ -63,19 +63,19 @@ class DiscussionTopic < ActiveRecord::Base
   has_many :discussion_entry_drafts, dependent: :destroy, inverse_of: :discussion_topic
   has_many :rated_discussion_entries, lambda {
                                         order(
-                                          Arel.sql('COALESCE(parent_id, 0)'), Arel.sql('COALESCE(rating_sum, 0) DESC'), :created_at
+                                          Arel.sql("COALESCE(parent_id, 0)"), Arel.sql("COALESCE(rating_sum, 0) DESC"), :created_at
                                         )
-                                      }, class_name: 'DiscussionEntry'
-  has_many :root_discussion_entries, -> { preload(:user).where("discussion_entries.parent_id IS NULL AND discussion_entries.workflow_state<>'deleted'") }, class_name: 'DiscussionEntry'
+                                      }, class_name: "DiscussionEntry"
+  has_many :root_discussion_entries, -> { preload(:user).where("discussion_entries.parent_id IS NULL AND discussion_entries.workflow_state<>'deleted'") }, class_name: "DiscussionEntry"
   has_one :external_feed_entry, as: :asset
-  belongs_to :root_account, class_name: 'Account'
+  belongs_to :root_account, class_name: "Account"
   belongs_to :external_feed
   belongs_to :context, polymorphic: [:course, :group]
   belongs_to :attachment
-  belongs_to :editor, class_name: 'User'
-  belongs_to :root_topic, class_name: 'DiscussionTopic'
+  belongs_to :editor, class_name: "User"
+  belongs_to :root_topic, class_name: "DiscussionTopic"
   belongs_to :group_category
-  has_many :child_topics, class_name: 'DiscussionTopic', foreign_key: :root_topic_id, dependent: :destroy
+  has_many :child_topics, class_name: "DiscussionTopic", foreign_key: :root_topic_id, dependent: :destroy
   has_many :discussion_topic_participants, dependent: :destroy
   has_many :discussion_entry_participants, through: :discussion_entries
   has_many :discussion_topic_section_visibilities, lambda {
@@ -177,11 +177,11 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def validate_draft_state_change
-    old_draft_state, new_draft_state = changes['workflow_state']
+    old_draft_state, new_draft_state = changes["workflow_state"]
     return if old_draft_state == new_draft_state
 
-    if new_draft_state == 'unpublished' && !can_unpublish?
-      errors.add :workflow_state, I18n.t('#discussion_topics.error_draft_state_with_posts',
+    if new_draft_state == "unpublished" && !can_unpublish?
+      errors.add :workflow_state, I18n.t("#discussion_topics.error_draft_state_with_posts",
                                          "This topic cannot be set to draft state because it contains posts.")
     end
   end
@@ -190,7 +190,7 @@ class DiscussionTopic < ActiveRecord::Base
     self.context_code = "#{context_type.underscore}_#{context_id}"
 
     if title.blank?
-      self.title = t('#discussion_topic.default_title', "No Title")
+      self.title = t("#discussion_topic.default_title", "No Title")
     end
 
     d_type = read_attribute(:discussion_type)
@@ -222,7 +222,7 @@ class DiscussionTopic < ActiveRecord::Base
     @delayed_post_at_changed = delayed_post_at_changed?
     if delayed_post_at? && @delayed_post_at_changed
       @should_schedule_delayed_post = true
-      self.workflow_state = 'post_delayed' if [:migration, :after_migration].include?(saved_by) && delayed_post_at > Time.now
+      self.workflow_state = "post_delayed" if [:migration, :after_migration].include?(saved_by) && delayed_post_at > Time.now
     end
     if lock_at && lock_at_changed?
       @should_schedule_lock_at = true
@@ -257,7 +257,7 @@ class DiscussionTopic < ActiveRecord::Base
   def schedule_delayed_transitions
     return if saved_by == :migration
 
-    bp = true if @importing_migration&.migration_type == 'master_course_import'
+    bp = true if @importing_migration&.migration_type == "master_course_import"
     delay(run_at: delayed_post_at).update_based_on_date(for_blueprint: bp) if @should_schedule_delayed_post
     delay(run_at: lock_at).update_based_on_date(for_blueprint: bp) if @should_schedule_lock_at
     # need to clear these in case we do a save whilst saving (e.g.
@@ -300,7 +300,7 @@ class DiscussionTopic < ActiveRecord::Base
   def ensure_child_topic_for(group)
     group.shard.activate do
       DiscussionTopic.unique_constraint_retry do
-        topic = DiscussionTopic.where(context_id: group, context_type: 'Group', root_topic_id: self).first
+        topic = DiscussionTopic.where(context_id: group, context_type: "Group", root_topic_id: self).first
         topic ||= group.discussion_topics.build { |dt| dt.root_topic = self }
         topic.message = message
         topic.title = CanvasTextHelper.truncate_text("#{title} - #{group.name}", { max_length: 250 }) # because of course people do this
@@ -326,14 +326,14 @@ class DiscussionTopic < ActiveRecord::Base
       context_module_tags.each(&:confirm_valid_module_requirements)
     end
     if @old_assignment_id
-      Assignment.where(id: @old_assignment_id, context_id: context_id, context_type: context_type, submission_types: 'discussion_topic').update_all(workflow_state: 'deleted', updated_at: Time.now.utc)
+      Assignment.where(id: @old_assignment_id, context_id: context_id, context_type: context_type, submission_types: "discussion_topic").update_all(workflow_state: "deleted", updated_at: Time.now.utc)
       old_assignment = Assignment.find(@old_assignment_id)
       ContentTag.delete_for(old_assignment)
       # prevent future syncs from recreating the deleted assignment
       if is_child_content?
-        old_assignment.submission_types = 'none'
+        old_assignment.submission_types = "none"
         own_tag = MasterCourses::ChildContentTag.where(content: self).take
-        own_tag&.child_subscription&.create_content_tag_for!(old_assignment, downstream_changes: ['workflow_state'])
+        own_tag&.child_subscription&.create_content_tag_for!(old_assignment, downstream_changes: ["workflow_state"])
       end
     elsif assignment && @saved_by != :assignment && !root_topic_id
       deleted_assignment = assignment.deleted?
@@ -521,7 +521,7 @@ class DiscussionTopic < ActiveRecord::Base
     current_user ||= self.current_user
     return nil unless current_user
 
-    context_module_action(current_user, :read) if new_state == 'read'
+    context_module_action(current_user, :read) if new_state == "read"
 
     return true if new_state == read_state(current_user)
 
@@ -543,7 +543,7 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def update_stream_item_state(current_user, new_state)
-    context_module_action(current_user, :read) if new_state == 'read'
+    context_module_action(current_user, :read) if new_state == "read"
     StreamItem.update_read_state_for_asset(self, new_state, current_user.id)
   end
   protected :update_stream_item_state
@@ -552,7 +552,7 @@ class DiscussionTopic < ActiveRecord::Base
     # if workflow_state is unread, and force_read_state is not provided then
     # mark everything as unread but use the defaults, or allow other entries to
     # be implicitly unread, but still update any existing records.
-    if new_state == 'unread' && !update_fields.key?(:forced_read_state)
+    if new_state == "unread" && !update_fields.key?(:forced_read_state)
       DiscussionEntryParticipant.where(discussion_entry_id: discussion_entries.select(:id), user: current_user)
                                 .where.not(workflow_state: new_state)
                                 .in_batches.update_all(update_fields)
@@ -564,7 +564,7 @@ class DiscussionTopic < ActiveRecord::Base
 
     update_or_create_participant(current_user: current_user,
                                  new_state: new_state,
-                                 new_count: new_state == 'unread' ? default_unread_count : 0)
+                                 new_count: new_state == "unread" ? default_unread_count : 0)
   end
   protected :update_participants_read_state
 
@@ -662,7 +662,7 @@ class DiscussionTopic < ActiveRecord::Base
 
     group_ids = user.group_memberships.active.pluck(:group_id) &
                 context.groups.active.pluck(:id)
-    child_topics.active.where(context_id: group_ids, context_type: 'Group').first
+    child_topics.active.where(context_id: group_ids, context_type: "Group").first
   end
 
   def change_child_topic_subscribed_state(new_state, current_user)
@@ -696,7 +696,7 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   scope :not_ignored_by, lambda { |user, purpose|
-    where("NOT EXISTS (?)", Ignore.where(asset_type: 'DiscussionTopic', user_id: user, purpose: purpose)
+    where("NOT EXISTS (?)", Ignore.where(asset_type: "DiscussionTopic", user_id: user, purpose: purpose)
       .where("asset_id=discussion_topics.id"))
   }
 
@@ -792,7 +792,7 @@ class DiscussionTopic < ActiveRecord::Base
   # TODO: this scope is appearing in a few models now with identical code.
   # Can this be extracted somewhere?
   scope :starting_with_title, lambda { |title|
-    where('title ILIKE ?', "#{title}%")
+    where("title ILIKE ?", "#{title}%")
   }
 
   alias_attribute :available_from, :delayed_post_at
@@ -846,7 +846,7 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def publish
-    self.workflow_state = 'active'
+    self.workflow_state = "active"
     self.last_reply_at = Time.now
     self.posted_at = Time.now
   end
@@ -857,7 +857,7 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def unpublish
-    self.workflow_state = 'unpublished'
+    self.workflow_state = "unpublished"
   end
 
   def unpublish!
@@ -885,14 +885,14 @@ class DiscussionTopic < ActiveRecord::Base
 
   def unlock(opts = {})
     self.locked = false
-    self.workflow_state = 'active' if workflow_state == 'locked'
+    self.workflow_state = "active" if workflow_state == "locked"
     save! unless opts[:without_save]
   end
   alias_method :unlock!, :unlock
 
   def published?
-    return false if workflow_state == 'unpublished'
-    return false if workflow_state == 'post_delayed' && is_announcement
+    return false if workflow_state == "unpublished"
+    return false if workflow_state == "post_delayed" && is_announcement
 
     true
   end
@@ -953,8 +953,8 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   on_update_send_to_streams do
-    check_state = is_announcement ? 'post_delayed' : 'unpublished'
-    became_active = workflow_state_before_last_save == check_state && workflow_state == 'active'
+    check_state = is_announcement ? "post_delayed" : "unpublished"
+    became_active = workflow_state_before_last_save == check_state && workflow_state == "active"
     if should_send_to_stream && (@content_changed || became_active)
       active_participants_with_visibility
     end
@@ -970,7 +970,7 @@ class DiscussionTopic < ActiveRecord::Base
   def in_unpublished_module?
     return true if ContentTag.where(content_type: "DiscussionTopic", content_id: self, workflow_state: "unpublished").exists?
 
-    ContextModule.joins(:content_tags).where(content_tags: { content_type: "DiscussionTopic", content_id: self }, workflow_state: 'unpublished').exists?
+    ContextModule.joins(:content_tags).where(content_tags: { content_type: "DiscussionTopic", content_id: self }, workflow_state: "unpublished").exists?
   end
 
   def locked_by_module?
@@ -1073,7 +1073,7 @@ class DiscussionTopic < ActiveRecord::Base
   alias_method :destroy_permanently!, :destroy
   def destroy
     ContentTag.delete_for(self)
-    self.workflow_state = 'deleted'
+    self.workflow_state = "deleted"
     self.deleted_at = Time.now.utc
     discussion_topic_section_visibilities&.update_all(workflow_state: "deleted")
     save
@@ -1088,11 +1088,11 @@ class DiscussionTopic < ActiveRecord::Base
   def restore(from = nil)
     if is_section_specific?
       DiscussionTopicSectionVisibility.where(discussion_topic_id: id).to_a.uniq(&:course_section_id).each do |dtsv|
-        dtsv.workflow_state = 'active'
+        dtsv.workflow_state = "active"
         dtsv.save
       end
     end
-    self.workflow_state = can_unpublish? ? 'unpublished' : 'active'
+    self.workflow_state = can_unpublish? ? "unpublished" : "active"
     save
 
     if from != :assignment && for_assignment? && root_topic_id.blank?
@@ -1218,8 +1218,8 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def to_atom(opts = {})
-    author_name = user.present? ? user.name : t('#discussion_topic.atom_no_author', "No Author")
-    prefix = [is_announcement ? t('#titles.announcement', "Announcement") : t('#titles.discussion', "Discussion")]
+    author_name = user.present? ? user.name : t("#discussion_topic.atom_no_author", "No Author")
+    prefix = [is_announcement ? t("#titles.announcement", "Announcement") : t("#titles.discussion", "Discussion")]
     prefix << context.name if opts[:include_context]
     Atom::Entry.new do |entry|
       entry.title = [before_label(prefix.to_sentence), title].join(" ")
@@ -1227,7 +1227,7 @@ class DiscussionTopic < ActiveRecord::Base
       entry.updated   = updated_at
       entry.published = created_at
       entry.id        = "tag:#{HostUrl.default_host},#{created_at.strftime("%Y-%m-%d")}:/discussion_topics/#{feed_code}"
-      entry.links << Atom::Link.new(rel: 'alternate',
+      entry.links << Atom::Link.new(rel: "alternate",
                                     href: "http://#{HostUrl.context_host(context)}/#{context_url_prefix}/discussion_topics/#{id}")
       entry.content   = Atom::Content::Html.new(message || "")
     end
@@ -1257,8 +1257,8 @@ class DiscussionTopic < ActiveRecord::Base
     topic = (root_topic? && child_topic_for(user)) || self
 
     submission = Submission.active.where(assignment_id: assignment_id, user_id: user).first
-    unless only_update || (submission && submission.submission_type == 'discussion_topic' && submission.workflow_state != 'unsubmitted')
-      submission = assignment.submit_homework(user, submission_type: 'discussion_topic',
+    unless only_update || (submission && submission.submission_type == "discussion_topic" && submission.workflow_state != "unsubmitted")
+      submission = assignment.submit_homework(user, submission_type: "discussion_topic",
                                                     submitted_at: topic && topic.discussion_entries.active.where(user_id: user).minimum(:created_at))
     end
     return unless submission
@@ -1449,7 +1449,7 @@ class DiscussionTopic < ActiveRecord::Base
   #
   # Returns a boolean.
   def visible_for?(user = nil)
-    RequestCache.cache('discussion_visible_for', self, is_announcement, user) do
+    RequestCache.cache("discussion_visible_for", self, is_announcement, user) do
       # user is the topic's author
       next true if user && user.id == user_id
 
@@ -1600,7 +1600,7 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def self.to_podcast(elements)
-    require 'rss/2.0'
+    require "rss/2.0"
     elements.filter_map do |elem|
       asset = elem.podcast_associated_asset
       next unless asset
@@ -1629,8 +1629,8 @@ class DiscussionTopic < ActiveRecord::Base
       when MediaObject
         item.guid.content = link + "/#{elem.media_id}"
         details = elem.podcast_format_details
-        content_type = 'video/mpeg'
-        content_type = 'audio/mpeg' if elem.media_type == 'audio'
+        content_type = "video/mpeg"
+        content_type = "audio/mpeg" if elem.media_type == "audio"
         size = details[:size].to_i.kilobytes
         ext = details[:extension] || details[:fileExt]
         url = "http://#{HostUrl.context_host(elem.context)}/#{elem.context_url_prefix}"\

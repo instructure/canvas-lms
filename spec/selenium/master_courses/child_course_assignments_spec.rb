@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../common'
+require_relative "../common"
 
 describe "master courses - child courses - assignment locking" do
   include_context "in-process server selenium tests"
@@ -50,8 +50,8 @@ describe "master courses - child courses - assignment locking" do
   it "shows the delete cog-menu options on the edit when not locked" do
     get "/courses/#{@copy_to.id}/assignments/#{@assmt_copy.id}/edit"
 
-    f('.al-trigger').click
-    expect(f('#edit_assignment_header')).not_to contain_css('a.delete_assignment_link.disabled')
-    expect(f('#edit_assignment_header')).to contain_css('a.delete_assignment_link')
+    f(".al-trigger").click
+    expect(f("#edit_assignment_header")).not_to contain_css("a.delete_assignment_link.disabled")
+    expect(f("#edit_assignment_header")).to contain_css("a.delete_assignment_link")
   end
 end

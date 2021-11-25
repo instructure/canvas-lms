@@ -23,7 +23,7 @@ describe ConversationParticipant do
     sender = user_factory
     recipient = user_factory
     convo = sender.initiate_conversation([recipient])
-    convo.add_message('test')
+    convo.add_message("test")
 
     expect(sender.conversations).to eq [convo]
     expect(convo.participants.size).to eq 2
@@ -35,12 +35,12 @@ describe ConversationParticipant do
     sender = user_factory
     recipient = user_factory
     convo = sender.initiate_conversation([recipient])
-    convo.add_message('test')
+    convo.add_message("test")
 
     User.where(id: recipient).update_all(unread_conversations_count: 0) # force into the wrong state
 
     part = recipient.conversations.first
-    part.update_one(event: 'mark_as_read')
+    part.update_one(event: "mark_as_read")
 
     recipient.reload
     expect(recipient.unread_conversations_count).to eq 0
@@ -50,8 +50,8 @@ describe ConversationParticipant do
     sender = user_factory
     recipient = user_factory
     convo = sender.initiate_conversation([recipient])
-    convo.add_message('test')
-    convo.add_message('another')
+    convo.add_message("test")
+    convo.add_message("another")
     rconvo = recipient.conversations.first
     expect(convo.messages.size).to eq 2
     expect(rconvo.messages.size).to eq 2
@@ -83,7 +83,7 @@ describe ConversationParticipant do
     recipient    = user_factory
     updated_at   = sender.updated_at
     conversation = sender.initiate_conversation([recipient])
-    conversation.update_attribute(:workflow_state, 'unread')
+    conversation.update_attribute(:workflow_state, "unread")
     expect(sender.reload.updated_at).not_to eql updated_at
   end
 
@@ -199,7 +199,7 @@ describe ConversationParticipant do
       @admin_user = user_factory
       @a1.account_users.create!(user: @admin_user)
       @a2.account_users.create!(user: @admin_user)
-      @a3.pseudonyms.create!(user: @admin_user, unique_id: 'a3') # in the account, but not an admin
+      @a3.pseudonyms.create!(user: @admin_user, unique_id: "a3") # in the account, but not an admin
 
       @target_user = user_factory
       # visible to @user
@@ -290,17 +290,17 @@ describe ConversationParticipant do
 
     it "caches participants per conversation" do
       allow(Rails.cache).to receive(:fetch) do |key, &block|
-        expect(key).to eq([@convo.conversation, 'participants'].cache_key)
+        expect(key).to eq([@convo.conversation, "participants"].cache_key)
         expect(block.call).to have_same_ids([@me, @u1, @u2, @u3])
       end
       @convo.participants
     end
 
     it "caches indirect participants per conversation and user" do
-      expect(Rails.cache).to receive(:fetch).with([@convo.conversation, @convo.user, 'indirect_participants'].cache_key)
+      expect(Rails.cache).to receive(:fetch).with([@convo.conversation, @convo.user, "indirect_participants"].cache_key)
       allow(Rails.cache).to receive(:fetch) do |key, &block; users|
         users = block.call
-        if key == [@convo.conversation, @convo.user, 'indirect_participants'].cache_key
+        if key == [@convo.conversation, @convo.user, "indirect_participants"].cache_key
           expect(users).to have_same_ids([@u4])
         end
         users
@@ -319,7 +319,7 @@ describe ConversationParticipant do
       enable_cache do
         c = @user1.initiate_conversation([user_factory, user_factory])
         c.add_message("hello")
-        c.update_attribute(:workflow_state, 'unread')
+        c.update_attribute(:workflow_state, "unread")
 
         # populates the cache
         expect(c.participants.map(&:id)).to include(@user1.id)
@@ -336,7 +336,7 @@ describe ConversationParticipant do
     it "cleans up group conversations having both users" do
       c = @user1.initiate_conversation([@user2, user_factory, user_factory])
       c.add_message("hello")
-      c.update_attribute(:workflow_state, 'unread')
+      c.update_attribute(:workflow_state, "unread")
       rconvo = c.conversation
       expect(rconvo.participants.size).to eql 4
 
@@ -355,7 +355,7 @@ describe ConversationParticipant do
     it "moves a private conversation to the new user" do
       c = @user1.initiate_conversation([user_factory])
       c.add_message("hello")
-      c.update_attribute(:workflow_state, 'unread')
+      c.update_attribute(:workflow_state, "unread")
       rconvo = c.conversation
       old_hash = rconvo.private_hash
 
@@ -373,7 +373,7 @@ describe ConversationParticipant do
       other_guy = user_factory
       c = @user1.initiate_conversation([other_guy])
       c.add_message("hello")
-      c.update_attribute(:workflow_state, 'unread')
+      c.update_attribute(:workflow_state, "unread")
       c2 = @user2.initiate_conversation([other_guy])
       c2.add_message("hola")
 
@@ -395,7 +395,7 @@ describe ConversationParticipant do
     it "changes a private conversation between the two users into a monologue" do
       c = @user1.initiate_conversation([@user2])
       c.add_message("hello self")
-      c.update_attribute(:workflow_state, 'unread')
+      c.update_attribute(:workflow_state, "unread")
       @user2.mark_all_conversations_as_read!
       rconvo = c.conversation
       old_hash = rconvo.private_hash
@@ -413,7 +413,7 @@ describe ConversationParticipant do
     it "merges a private conversations between the two users into the existing monologue" do
       c = @user1.initiate_conversation([@user2])
       c.add_message("hello self")
-      c.update_attribute(:workflow_state, 'unread')
+      c.update_attribute(:workflow_state, "unread")
       c2 = @user2.initiate_conversation([@user2])
       c2.add_message("monologue!")
       @user2.mark_all_conversations_as_read!
@@ -435,7 +435,7 @@ describe ConversationParticipant do
     it "merges a monologue into the existing monologue" do
       c = @user1.initiate_conversation([@user1])
       c.add_message("monologue 1")
-      c.update_attribute(:workflow_state, 'unread')
+      c.update_attribute(:workflow_state, "unread")
       c2 = @user2.initiate_conversation([@user2])
       c2.add_message("monologue 2")
 
@@ -457,7 +457,7 @@ describe ConversationParticipant do
       other_guy = user_factory
       c = @user1.initiate_conversation([other_guy])
       c.add_message("hello")
-      c.update_attribute(:workflow_state, 'unread')
+      c.update_attribute(:workflow_state, "unread")
       c2 = @user2.initiate_conversation([other_guy])
       c2.add_message("hola")
 

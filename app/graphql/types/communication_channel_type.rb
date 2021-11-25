@@ -40,8 +40,8 @@ module Types
     end
 
     field :notification_policy_overrides, [NotificationPolicyType], null: true do
-      argument :account_id, ID, required: false, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func('Account')
-      argument :course_id, ID, required: false, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func('Course')
+      argument :account_id, ID, required: false, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Account")
+      argument :course_id, ID, required: false, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Course")
       argument :context_type, NotificationPreferencesContextType, required: true
     end
     def notification_policy_overrides(account_id: nil, course_id: nil, context_type: nil)
@@ -50,9 +50,9 @@ module Types
       end
 
       case context_type
-      when 'Account'
+      when "Account"
         overrides_for[Account.find(account_id)]
-      when 'Course'
+      when "Course"
         overrides_for[Course.find(course_id)]
       end
     rescue ActiveRecord::RecordNotFound

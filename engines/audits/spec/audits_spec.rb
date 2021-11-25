@@ -17,8 +17,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'rails_helper'
-require 'audits'
+require "rails_helper"
+require "audits"
 
 RSpec.describe Audits do
   after do
@@ -90,16 +90,16 @@ RSpec.describe Audits do
     it "depends on cass db config for cassandra backend" do
       inject_auditors_settings("write_paths:\n  - cassandra\nread_path: cassandra")
       expect(Audits.backend_strategy).to eq(:cassandra)
-      expect(CanvasCassandra::DatabaseBuilder).to receive(:configured?).with('auditors').and_return(true)
+      expect(CanvasCassandra::DatabaseBuilder).to receive(:configured?).with("auditors").and_return(true)
       expect(Audits.configured?).to eq(true)
-      expect(CanvasCassandra::DatabaseBuilder).to receive(:configured?).with('auditors').and_return(false)
+      expect(CanvasCassandra::DatabaseBuilder).to receive(:configured?).with("auditors").and_return(false)
       expect(Audits.configured?).to eq(false)
     end
 
     it "depends on AR connection for AR backend" do
       inject_auditors_settings("write_paths:\n  - active_record\nread_path: active_record")
       expect(Audits.backend_strategy).to eq(:active_record)
-      expect(Rails.configuration).to receive(:database_configuration).and_return({ 'test' => { "foo" => "bar" } })
+      expect(Rails.configuration).to receive(:database_configuration).and_return({ "test" => { "foo" => "bar" } })
       expect(Audits.configured?).to eq(true)
       expect(Rails.configuration).to receive(:database_configuration).and_return({})
       expect(Audits.configured?).to eq(false)

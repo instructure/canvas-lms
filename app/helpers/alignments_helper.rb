@@ -56,7 +56,7 @@ module AlignmentsHelper
       [
         context_prefix(alignment.context_code), "outcomes",
         outcome.id, "alignments", alignment.id
-      ].join('/')
+      ].join("/")
     elsif !context.is_a?(Account)
       context_url(
         context, :context_outcome_alignment_redirect_url,

@@ -24,7 +24,7 @@ describe ScoreMetadata do
   it { is_expected.to validate_presence_of(:calculation_details) }
   it { is_expected.to validate_uniqueness_of(:score_id) }
 
-  include_examples 'has_one soft deletion' do
+  include_examples "has_one soft deletion" do
     subject { score.create_score_metadata!(calculation_details: calculation_details) }
 
     let(:course) { Course.create! }

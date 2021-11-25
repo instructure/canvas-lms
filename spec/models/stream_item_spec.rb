@@ -31,11 +31,11 @@ describe StreamItem do
   end
 
   it "prefers a Context for Message stream item context" do
-    notification_model(name: 'Assignment Created')
+    notification_model(name: "Assignment Created")
     course_with_student(active_all: true)
     assignment_model(course: @course)
     item = @user.stream_item_instances.first.stream_item
-    expect(item.data.notification_name).to eq 'Assignment Created'
+    expect(item.data.notification_name).to eq "Assignment Created"
     expect(item.context).to eq @course
 
     course_items = @user.recent_stream_items(contexts: [@course])
@@ -72,9 +72,9 @@ describe StreamItem do
 
   describe "destroy_stream_items_using_setting" do
     it "has a default ttl" do
-      StreamItem.create!(asset_type: 'Message', data: { notification_id: nil })
+      StreamItem.create!(asset_type: "Message", data: { notification_id: nil })
       si2 = StreamItem.create! do |si|
-        si.asset_type = 'Message'
+        si.asset_type = "Message"
         si.data = { notification_id: nil }
       end
       StreamItem.where(id: si2).update_all(updated_at: 1.year.ago)
@@ -94,7 +94,7 @@ describe StreamItem do
       @user2 = @shard1.activate { user_model }
       @course.enroll_student(@user2).accept!
 
-      dt = @course.discussion_topics.create!(title: 'title')
+      dt = @course.discussion_topics.create!(title: "title")
       expect(@user2.reload.recent_stream_items).to eq [dt.stream_item]
       expect(dt.stream_item.associated_shards).to eq [Shard.current, @shard1]
       dt.stream_item.destroy
@@ -126,7 +126,7 @@ describe StreamItem do
       @user2 = @shard1.activate { user_model }
       @course.enroll_student(@user2).accept!
 
-      dt = @course.discussion_topics.create!(title: 'title')
+      dt = @course.discussion_topics.create!(title: "title")
       enable_cache do
         expect(@user2).to receive(:recent_stream_items).once.and_call_original
         items = @user2.cached_recent_stream_items
@@ -184,8 +184,8 @@ describe StreamItem do
   end
 
   describe ".generate_all" do
-    context 'when there is no item generated' do
-      it 'does not cause error when item is not generated' do
+    context "when there is no item generated" do
+      it "does not cause error when item is not generated" do
         allow(StreamItem).to receive(:generate_or_update).and_return(nil)
         expect(StreamItem.generate_all(double, [1])).to eq []
       end

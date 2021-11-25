@@ -35,7 +35,7 @@ describe IncomingMail::MessageHandler do
   end
   let_once(:user) do
     user_model
-    communication_channel(@user, { username: 'lucy@example.com', active_cc: true })
+    communication_channel(@user, { username: "lucy@example.com", active_cc: true })
     @user
   end
   let(:context) { double("context", reply_from: nil) }
@@ -138,12 +138,12 @@ describe IncomingMail::MessageHandler do
           expect(Account.site_admin).to receive(:feature_enabled?).with(:notification_service).and_return(false)
           expect(original_message.context).not_to receive(:reply_from)
           message = double("incoming message with bad from",
-                           incoming_message_attributes.merge(from: ['not_lucy@example.com'],
-                                                             reply_to: ['also_not_lucy@example.com']))
+                           incoming_message_attributes.merge(from: ["not_lucy@example.com"],
+                                                             reply_to: ["also_not_lucy@example.com"]))
           subject.handle(outgoing_from_address, body, html_body, message, tag)
         end
 
-        it 'raises BlankMessage for empty message' do
+        it "raises BlankMessage for empty message" do
           message = double("original message without notification id", original_message_attributes)
           allow(subject).to receive(:get_original_message).with(original_message_id, timestamp).and_return(message)
           expect(original_message.context).not_to receive(:reply_from)
@@ -277,8 +277,8 @@ describe IncomingMail::MessageHandler do
             expect(Mailer).to receive(:create_message)
 
             message = double("incoming message with bad from",
-                             incoming_message_attributes.merge(from: ['not_lucy@example.com'],
-                                                               reply_to: ['also_not_lucy@example.com']))
+                             incoming_message_attributes.merge(from: ["not_lucy@example.com"],
+                                                               reply_to: ["also_not_lucy@example.com"]))
             subject.handle(outgoing_from_address, body, html_body, message, tag)
           end
         end

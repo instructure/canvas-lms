@@ -111,7 +111,7 @@ class OutcomeImportsApiController < ApplicationController
   end
 
   rescue_from InvalidContentType do
-    render json: { error: t('Invalid content type, UTF-8 required') }, status: :bad_request
+    render json: { error: t("Invalid content type, UTF-8 required") }, status: :bad_request
   end
 
   # @API Import Outcomes
@@ -164,7 +164,7 @@ class OutcomeImportsApiController < ApplicationController
   # @returns OutcomeImport
   def create
     if authorized_action(@context, @current_user, :import_outcomes)
-      params[:import_type] ||= 'instructure_csv'
+      params[:import_type] ||= "instructure_csv"
       raise "invalid import type parameter" unless OutcomeImport.valid_import_type?(params[:import_type])
 
       file_obj = if params.key?(:attachment)
@@ -197,7 +197,7 @@ class OutcomeImportsApiController < ApplicationController
   def show
     if authorized_action(@context, @current_user, %i[import_outcomes manage_outcomes])
       begin
-        @import = if params[:id] == 'latest'
+        @import = if params[:id] == "latest"
                     @context.latest_outcome_import or raise ActiveRecord::RecordNotFound
                   else
                     @context.outcome_imports.find(params[:id])
@@ -236,11 +236,11 @@ class OutcomeImportsApiController < ApplicationController
                                    Attachment.mimetype("outcome_import.#{params[:extension]}"))
     else
       env = request.env.dup
-      env['CONTENT_TYPE'] = env["ORIGINAL_CONTENT_TYPE"]
+      env["CONTENT_TYPE"] = env["ORIGINAL_CONTENT_TYPE"]
       # copy of request with original content type restored
       request2 = Rack::Request.new(env)
-      charset = request2.media_type_params['charset']
-      if charset.present? && charset.casecmp('utf-8') != 0
+      charset = request2.media_type_params["charset"]
+      if charset.present? && charset.casecmp("utf-8") != 0
         raise InvalidContentType
       end
 

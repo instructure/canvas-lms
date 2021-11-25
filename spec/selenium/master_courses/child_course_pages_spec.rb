@@ -17,8 +17,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../common'
-require_relative '../helpers/blueprint_common'
+require_relative "../common"
+require_relative "../helpers/blueprint_common"
 
 describe "master courses - child courses - wiki page locking" do
   include_context "in-process server selenium tests"
@@ -44,11 +44,11 @@ describe "master courses - child courses - wiki page locking" do
 
   describe "on index page" do
     def options_panel
-      f('tbody .al-options')
+      f("tbody .al-options")
     end
 
     def options_button
-      f('tbody .al-trigger')
+      f("tbody .al-trigger")
     end
 
     it "does not show the edit/delete cog-menu options on the index when locked" do
@@ -56,21 +56,21 @@ describe "master courses - child courses - wiki page locking" do
 
       get "/courses/#{@copy_to.id}/pages"
 
-      expect(f('.master-content-lock-cell .icon-blueprint-lock')).to be_displayed
+      expect(f(".master-content-lock-cell .icon-blueprint-lock")).to be_displayed
 
       options_button.click
-      expect(options_panel).not_to contain_css('.edit-menu-item')
-      expect(options_panel).not_to contain_css('.delete-menu-item')
+      expect(options_panel).not_to contain_css(".edit-menu-item")
+      expect(options_panel).not_to contain_css(".delete-menu-item")
     end
 
     it "shows the edit/delete cog-menu options on the index when not locked" do
       get "/courses/#{@copy_to.id}/pages"
 
-      expect(f('.master-content-lock-cell .icon-blueprint')).to be_displayed
+      expect(f(".master-content-lock-cell .icon-blueprint")).to be_displayed
 
       options_button.click
-      expect(options_panel).to contain_css('.edit-menu-item')
-      expect(options_panel).to contain_css('.delete-menu-item')
+      expect(options_panel).to contain_css(".edit-menu-item")
+      expect(options_panel).to contain_css(".delete-menu-item")
     end
   end
 
@@ -81,15 +81,15 @@ describe "master courses - child courses - wiki page locking" do
       get "/courses/#{@copy_to.id}/pages/#{@page_copy.url}"
 
       options_button.click
-      expect(options_panel).not_to contain_css('.delete_page')
+      expect(options_panel).not_to contain_css(".delete_page")
     end
 
     it "shows the edit/delete cog-menu options when not locked" do
       get "/courses/#{@copy_to.id}/pages/#{@page_copy.url}"
 
-      expect(f('#content')).to contain_css('.edit-wiki')
+      expect(f("#content")).to contain_css(".edit-wiki")
       options_button.click
-      expect(options_panel).to contain_css('.delete_page')
+      expect(options_panel).to contain_css(".delete_page")
     end
   end
 end

@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-describe 'login' do
+describe "login" do
   def redirect_until(uri)
     count = 0
     loop do
@@ -52,7 +52,7 @@ describe 'login' do
       allow_any_instance_of(Login::CasController).to receive(:client).and_return(@cas_client)
     end
 
-    let(:cas_redirect_url) { Regexp.new(Regexp.escape(@cas_client.add_service_to_login_url(''))) }
+    let(:cas_redirect_url) { Regexp.new(Regexp.escape(@cas_client.add_service_to_login_url(""))) }
 
     it "logs in and log out a user CAS has validated" do
       user = user_with_pseudonym({ active_all: true })
@@ -62,9 +62,9 @@ describe 'login' do
       get login_url
       redirect_until(cas_redirect_url)
 
-      get '/login/cas', params: { ticket: 'ST-abcd' }
+      get "/login/cas", params: { ticket: "ST-abcd" }
       expect(response).to redirect_to(dashboard_url(login_success: 1))
-      expect(session[:cas_session]).to eq 'ST-abcd'
+      expect(session[:cas_session]).to eq "ST-abcd"
 
       delete logout_url
       expect(response).to be_redirect
@@ -78,13 +78,13 @@ describe 'login' do
       get login_url
       redirect_until(cas_redirect_url)
 
-      get '/login/cas', params: { ticket: 'ST-abcd' }
+      get "/login/cas", params: { ticket: "ST-abcd" }
       expect(response).to redirect_to(login_url)
       expect(flash[:delegated_message]).to match(/There was a problem logging in/)
     end
 
     it "informs the user CAS validation failed" do
-      stubby('')
+      stubby("")
       def @cas_client.validate_service_ticket(_)
         raise "Nope"
       end
@@ -92,7 +92,7 @@ describe 'login' do
       get login_url
       redirect_until(cas_redirect_url)
 
-      get '/login/cas', params: { ticket: 'ST-abcd' }
+      get "/login/cas", params: { ticket: "ST-abcd" }
       expect(response).to redirect_to(login_url)
       expect(flash[:delegated_message]).to match(/There was a problem logging in/)
     end
@@ -103,14 +103,14 @@ describe 'login' do
       get login_url
       redirect_until(cas_redirect_url)
 
-      get '/login/cas', params: { ticket: 'ST-abcd' }
+      get "/login/cas", params: { ticket: "ST-abcd" }
       expect(response).to redirect_to(login_url)
       get login_url
       expect(flash[:delegated_message]).to match(/Canvas doesn't have an account for user/)
     end
 
     it "redirects to a custom url if the user CAS account doesn't exist" do
-      redirect_url = 'http://google.com/'
+      redirect_url = "http://google.com/"
       Account.default.unknown_user_url = redirect_url
       Account.default.save!
 
@@ -119,7 +119,7 @@ describe 'login' do
       get login_url
       redirect_until(cas_redirect_url)
 
-      get '/login/cas', params: { ticket: 'ST-abcd' }
+      get "/login/cas", params: { ticket: "ST-abcd" }
       expect(response).to redirect_to(redirect_url)
     end
 
@@ -131,9 +131,9 @@ describe 'login' do
       get login_url
       redirect_until(cas_redirect_url)
 
-      get '/login/cas', params: { ticket: 'ST-abcd' }
+      get "/login/cas", params: { ticket: "ST-abcd" }
       expect(response).to redirect_to(dashboard_url(login_success: 1))
-      expect(session[:cas_session]).to eq 'ST-abcd'
+      expect(session[:cas_session]).to eq "ST-abcd"
     end
 
     context "single sign out" do
@@ -149,9 +149,9 @@ describe 'login' do
         get login_url
         redirect_until(cas_redirect_url)
 
-        get '/login/cas', params: { ticket: 'ST-abcd' }
+        get "/login/cas", params: { ticket: "ST-abcd" }
         expect(response).to redirect_to(dashboard_url(login_success: 1))
-        expect(session[:cas_session]).to eq 'ST-abcd'
+        expect(session[:cas_session]).to eq "ST-abcd"
         expect(Canvas.redis.get("cas_session_slo:ST-abcd")).to eq nil
 
         # single-sign-out from CAS server cannot find key but should store the session is expired
@@ -175,9 +175,9 @@ describe 'login' do
       skip("requires SAML extension") unless AuthenticationProvider::SAML.enabled?
     end
 
-    it 'redirects to the discovery page when hitting a deep link while unauthenticated' do
+    it "redirects to the discovery page when hitting a deep link while unauthenticated" do
       account = account_with_saml(account: Account.default)
-      discovery_url = 'http://discovery-url.example.com'
+      discovery_url = "http://discovery-url.example.com"
       account.auth_discovery_url = discovery_url
       account.save!
 
@@ -187,13 +187,13 @@ describe 'login' do
   end
 
   it "redirects back for jobs controller" do
-    user_with_pseudonym(password: 'qwertyuiop', active_all: 1)
+    user_with_pseudonym(password: "qwertyuiop", active_all: 1)
     Account.site_admin.account_users.create!(user: @user)
 
     get jobs_url
     expect(response).to redirect_to login_url
 
-    post canvas_login_url, params: { pseudonym_session: { unique_id: @pseudonym.unique_id, password: 'qwertyuiop' } }
+    post canvas_login_url, params: { pseudonym_session: { unique_id: @pseudonym.unique_id, password: "qwertyuiop" } }
     expect(response).to redirect_to jobs_url
   end
 end

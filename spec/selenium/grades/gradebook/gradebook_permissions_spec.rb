@@ -17,8 +17,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../../helpers/gradebook_common'
-require_relative '../pages/gradebook_page'
+require_relative "../../helpers/gradebook_common"
+require_relative "../pages/gradebook_page"
 
 describe "Gradebook - permissions" do
   include_context "in-process server selenium tests"
@@ -38,7 +38,7 @@ describe "Gradebook - permissions" do
   context "as a ta" do
     def disable_view_all_grades
       RoleOverride.create!(role: ta_role,
-                           permission: 'view_all_grades',
+                           permission: "view_all_grades",
                            context: Account.default,
                            enabled: false)
     end
@@ -48,7 +48,7 @@ describe "Gradebook - permissions" do
       concluded_course = course_with_ta_logged_in
       concluded_course.conclude
       Gradebook.visit(@course)
-      expect(f('#unauthorized_message')).to be_displayed
+      expect(f("#unauthorized_message")).to be_displayed
     end
   end
 end
