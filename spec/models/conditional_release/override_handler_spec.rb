@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../../conditional_release_spec_helper'
+require_relative "../../conditional_release_spec_helper"
 require_dependency "conditional_release/override_handler"
 
 module ConditionalRelease
@@ -27,7 +27,7 @@ module ConditionalRelease
       setup_course_with_native_conditional_release
     end
 
-    context 'handle_grade_change' do
+    context "handle_grade_change" do
       it "checks that the assignment is actually a trigger assignment" do
         @rule.destroy!
         expect(ConditionalRelease::OverrideHandler).to_not receive(:handle_grade_change)
@@ -84,7 +84,7 @@ module ConditionalRelease
       end
     end
 
-    context 'handle_assignment_set_selection' do
+    context "handle_assignment_set_selection" do
       before :once do
         @trigger_assmt.grade_student(@student, grade: 2, grader: @teacher) # set up the choice
         @set_a = @set3a_assmt.conditional_release_associations.first.assignment_set

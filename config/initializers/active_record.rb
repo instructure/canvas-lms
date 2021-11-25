@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'active_support/callbacks/suspension'
+require "active_support/callbacks/suspension"
 
 class ActiveRecord::Base
   self.cache_timestamp_format = :usec
@@ -146,15 +146,15 @@ class ActiveRecord::Base
   end
 
   def self.asset_string_components(str)
-    components = str.split('_', -1)
+    components = str.split("_", -1)
     id = components.pop
-    [components.join('_'), id.presence]
+    [components.join("_"), id.presence]
   end
 
   def self.convert_class_name(str)
-    namespaces = str.split(':')
+    namespaces = str.split(":")
     class_name = namespaces.pop
-    (namespaces.map(&:camelize) + [class_name.try(:classify)]).join('::')
+    (namespaces.map(&:camelize) + [class_name.try(:classify)]).join("::")
   end
 
   def self.asset_string(id)
@@ -193,8 +193,8 @@ class ActiveRecord::Base
         # the db doesn't exist yet; no need to bother with backcompat methods anyway
         return
       end
-      define_asset_string_backcompat_method(string_version_name, association_version_name, 'id')
-      define_asset_string_backcompat_method(string_version_name, association_version_name, 'type')
+      define_asset_string_backcompat_method(string_version_name, association_version_name, "id")
+      define_asset_string_backcompat_method(string_version_name, association_version_name, "type")
       return
     end
 
@@ -227,7 +227,7 @@ class ActiveRecord::Base
   def cached_context_short_name
     if respond_to?(:context)
       code = respond_to?(:context_code) ? context_code : context.asset_string
-      @cached_context_name ||= Rails.cache.fetch(['short_name_lookup', code].cache_key) do
+      @cached_context_name ||= Rails.cache.fetch(["short_name_lookup", code].cache_key) do
         context.short_name rescue ""
       end
     else
@@ -356,16 +356,16 @@ class ActiveRecord::Base
     end
 
     value = wildcard_pattern(value, case_sensitive: case_sensitive, type: type)
-    cols = args.map { |col| like_condition(col, '?', !case_sensitive) }
-    sanitize_sql_array ["(#{cols.join(' OR ')})", *([value] * cols.size)]
+    cols = args.map { |col| like_condition(col, "?", !case_sensitive) }
+    sanitize_sql_array ["(#{cols.join(" OR ")})", *([value] * cols.size)]
   end
 
   def self.wildcard_pattern(value, case_sensitive: false, type: :full)
     value = value.to_s
     value = value.downcase unless case_sensitive
-    value = value.gsub('\\', '\\\\\\\\').gsub('%', '\\%').gsub('_', '\\_')
+    value = value.gsub("\\", "\\\\\\\\").gsub("%", "\\%").gsub("_", "\\_")
     value = "%#{value}" unless type == :right
-    value += '%' unless type == :left
+    value += "%" unless type == :left
     value
   end
 
@@ -373,7 +373,7 @@ class ActiveRecord::Base
     value = args.pop
     value = wildcard_pattern(value)
     cols = coalesce_chain(args)
-    sanitize_sql_array ["(#{like_condition(cols, '?', false)})", value]
+    sanitize_sql_array ["(#{like_condition(cols, "?", false)})", value]
   end
 
   def self.coalesce_chain(cols)
@@ -384,13 +384,13 @@ class ActiveRecord::Base
     "COALESCE(LOWER(#{column}), '')"
   end
 
-  def self.like_condition(value, pattern = '?', downcase = true)
+  def self.like_condition(value, pattern = "?", downcase = true)
     value = "LOWER(#{value})" if downcase
     "#{value} LIKE #{pattern}"
   end
 
   def self.best_unicode_collation_key(col)
-    val = if ActiveRecord::Base.configurations[Rails.env]['adapter'] == 'postgresql'
+    val = if ActiveRecord::Base.configurations[Rails.env]["adapter"] == "postgresql"
             # For PostgreSQL, we can't trust a simple LOWER(column), with any collation, since
             # Postgres just defers to the C library which is different for each platform. The best
             # choice is the collkey function from pg_collkey which uses ICU to get a full unicode sort.
@@ -442,8 +442,8 @@ class ActiveRecord::Base
   end
 
   def self.rank_sql(ary, col)
-    sql = ary.each_with_index.inject(+'CASE ') do |string, (values, i)|
-      string << "WHEN #{col} IN (" << Array(values).map { |value| connection.quote(value) }.join(', ') << ") THEN #{i} "
+    sql = ary.each_with_index.inject(+"CASE ") do |string, (values, i)|
+      string << "WHEN #{col} IN (" << Array(values).map { |value| connection.quote(value) }.join(", ") << ") THEN #{i} "
     end << "ELSE #{ary.size} END"
     Arel.sql(sql)
   end
@@ -457,8 +457,8 @@ class ActiveRecord::Base
   def self.distinct_values(column, include_nil: false)
     column = column.to_s
 
-    result = if ActiveRecord::Base.configurations[Rails.env]['adapter'] == 'postgresql'
-               sql = +''
+    result = if ActiveRecord::Base.configurations[Rails.env]["adapter"] == "postgresql"
+               sql = +""
                sql << "SELECT NULL AS #{column} WHERE EXISTS (SELECT * FROM #{quoted_table_name} WHERE #{column} IS NULL) UNION ALL (" if include_nil
                sql << <<~SQL.squish
                  WITH RECURSIVE t AS (
@@ -481,7 +481,7 @@ class ActiveRecord::Base
 
   # direction is nil, :asc, or :desc
   def self.nulls(first_or_last, column, direction = nil)
-    if connection.adapter_name == 'PostgreSQL'
+    if connection.adapter_name == "PostgreSQL"
       clause = if first_or_last == :first && direction != :desc
                  " NULLS FIRST"
                elsif first_or_last == :last && direction == :desc
@@ -506,7 +506,7 @@ class ActiveRecord::Base
 
     reflection = super[name.to_s]
 
-    if name.to_s == 'developer_key'
+    if name.to_s == "developer_key"
       reflection.instance_eval do
         def association_class
           DeveloperKey::CacheOnAssociation
@@ -514,7 +514,7 @@ class ActiveRecord::Base
       end
     end
 
-    include Canvas::RootAccountCacher if name.to_s == 'root_account'
+    include Canvas::RootAccountCacher if name.to_s == "root_account"
     Canvas::AccountCacher.apply_to_reflections(self)
 
     if reflection.options[:polymorphic].is_a?(Array) ||
@@ -552,8 +552,8 @@ class ActiveRecord::Base
 
       @polymorph_module.class_eval <<~RUBY, __FILE__, __LINE__ + 1
         def #{reflection.name}=(record)
-          if record && [#{specific_classes.join(', ')}].none? { |klass| record.is_a?(klass) }
-            message = "one of #{specific_classes.join(', ')} expected, got \#{record.class}"
+          if record && [#{specific_classes.join(", ")}].none? { |klass| record.is_a?(klass) }
+            message = "one of #{specific_classes.join(", ")} expected, got \#{record.class}"
             raise ActiveRecord::AssociationTypeMismatch, message
           end
           super
@@ -645,13 +645,13 @@ class ActiveRecord::Base
     true
   end
 
-  def self.bulk_insert_objects(objects, excluded_columns: ['primary_key'])
+  def self.bulk_insert_objects(objects, excluded_columns: ["primary_key"])
     return if objects.empty?
 
     hashed_objects = []
-    excluded_columns << objects.first.class.primary_key if excluded_columns.delete('primary_key')
+    excluded_columns << objects.first.class.primary_key if excluded_columns.delete("primary_key")
     objects.each do |object|
-      hashed_objects << object.attributes.except(excluded_columns.join(',')).map do |(name, value)|
+      hashed_objects << object.attributes.except(excluded_columns.join(",")).map do |(name, value)|
         if (type = object.class.attribute_types[name]).is_a?(ActiveRecord::Type::Serialized)
           value = type.serialize(value)
         end
@@ -981,7 +981,7 @@ module UsefulFindInBatches
                       primary_key.to_s
                     else
                       connection.execute "ALTER TABLE #{table} ADD temp_primary_key SERIAL PRIMARY KEY"
-                      'temp_primary_key'
+                      "temp_primary_key"
                     end
           ensure
             connection.raw_connection.set_notice_processor(&old_proc) if old_proc
@@ -1152,7 +1152,7 @@ end
 
 module LockForNoKeyUpdate
   def lock(lock_type = true)
-    lock_type = 'FOR NO KEY UPDATE' if lock_type == :no_key_update
+    lock_type = "FOR NO KEY UPDATE" if lock_type == :no_key_update
     super(lock_type)
   end
 end
@@ -1173,7 +1173,7 @@ ActiveRecord::Relation.class_eval do
 
   def not_recently_touched
     scope = self
-    if (personal_space = Setting.get('touch_personal_space', 0).to_i) != 0
+    if (personal_space = Setting.get("touch_personal_space", 0).to_i) != 0
       personal_space -= 1
       # truncate to seconds
       bound = Time.at(Time.now.to_i - personal_space).utc
@@ -1211,10 +1211,10 @@ ActiveRecord::Relation.class_eval do
 
     relation = clone
     old_select = relation.select_values
-    relation.select_values = [+"DISTINCT ON (#{args.join(', ')}) "]
+    relation.select_values = [+"DISTINCT ON (#{args.join(", ")}) "]
     relation.distinct_value = false
 
-    relation.select_values.first << (old_select.empty? ? "*" : old_select.uniq.join(', '))
+    relation.select_values.first << (old_select.empty? ? "*" : old_select.uniq.join(", "))
 
     relation
   end
@@ -1267,7 +1267,7 @@ ActiveRecord::Relation.class_eval do
     values = loose_mode ? "MIN(id)" : "MIN(id), MAX(id)"
 
     quoted_primary_key = "#{klass.connection.quote_local_table_name(table_name)}.#{klass.connection.quote_column_name(primary_key)}"
-    as_id = " AS id" unless primary_key == 'id'
+    as_id = " AS id" unless primary_key == "id"
     subquery_scope = except(:select).select("#{quoted_primary_key}#{as_id}").reorder(primary_key.to_sym).limit(loose_mode ? 1 : batch_size)
     subquery_scope = subquery_scope.where("#{quoted_primary_key} <= ?", end_at) if end_at
 
@@ -1290,12 +1290,12 @@ end
 module UpdateAndDeleteWithJoins
   def deconstruct_joins(joins_sql = nil)
     unless joins_sql
-      joins_sql = ''
+      joins_sql = ""
       add_joins!(joins_sql, nil)
     end
     tables = []
     join_conditions = []
-    joins_sql.strip.split('INNER JOIN')[1..].each do |join|
+    joins_sql.strip.split("INNER JOIN")[1..].each do |join|
       # this could probably be improved
       raise "PostgreSQL update_all/delete_all only supports INNER JOIN" unless join.strip =~ /([a-zA-Z0-9'"_.]+(?:(?:\s+[aA][sS])?\s+[a-zA-Z0-9'"_]+)?)\s+ON\s+(.*)/m
 
@@ -1333,9 +1333,9 @@ module UpdateAndDeleteWithJoins
     tables, join_conditions = deconstruct_joins(join_sql)
 
     unless tables.empty?
-      sql.concat(' FROM ')
-      sql.concat(tables.join(', '))
-      sql.concat(' ')
+      sql.concat(" FROM ")
+      sql.concat(tables.join(", "))
+      sql.concat(" ")
     end
 
     scope = self
@@ -1347,7 +1347,7 @@ module UpdateAndDeleteWithJoins
       connection.visitor.accept(node, collector)
     end
     where_sql = collector.value
-    sql.concat('WHERE ' + where_sql)
+    sql.concat("WHERE " + where_sql)
     if ::GuardRail.environment == db.guard_rail_environment
       connection.update(sql, "#{name} Update")
     else
@@ -1363,9 +1363,9 @@ module UpdateAndDeleteWithJoins
     join_sql = arel.join_sources.map(&:to_sql).join(" ")
     tables, join_conditions = deconstruct_joins(join_sql)
 
-    sql.concat('USING ')
-    sql.concat(tables.join(', '))
-    sql.concat(' ')
+    sql.concat("USING ")
+    sql.concat(tables.join(", "))
+    sql.concat(" ")
 
     scope = self
     join_conditions.each { |join| scope = scope.where(join) }
@@ -1375,7 +1375,7 @@ module UpdateAndDeleteWithJoins
       connection.visitor.accept(node, collector)
     end
     where_sql = collector.value
-    sql.concat('WHERE ' + where_sql)
+    sql.concat("WHERE " + where_sql)
 
     connection.delete(sql, "SQL", [])
   end
@@ -1403,7 +1403,7 @@ ActiveRecord::Relation.prepend(UpdateAndDeleteAllWithLimit)
 
 ActiveRecord::Associations::CollectionProxy.class_eval do
   def respond_to?(name, include_private = false)
-    return super if [:marshal_dump, :_dump, 'marshal_dump', '_dump'].include?(name)
+    return super if [:marshal_dump, :_dump, "marshal_dump", "_dump"].include?(name)
 
     super ||
       (load_target && target.respond_to?(name, include_private)) ||
@@ -1421,13 +1421,13 @@ end
 ActiveRecord::ConnectionAdapters::AbstractAdapter.class_eval do
   def bulk_insert(table_name, records)
     keys = records.first.keys
-    quoted_keys = keys.map { |k| quote_column_name(k) }.join(', ')
+    quoted_keys = keys.map { |k| quote_column_name(k) }.join(", ")
     records.each do |record|
       execute <<~SQL.squish
         INSERT INTO #{quote_table_name(table_name)}
           (#{quoted_keys})
         VALUES
-          (#{keys.map { |k| quote(record[k]) }.join(', ')})
+          (#{keys.map { |k| quote(record[k]) }.join(", ")})
       SQL
     end
   end
@@ -1443,7 +1443,7 @@ class ActiveRecord::ConnectionAdapters::AbstractAdapter
   #     string_agg(name::text, '|')       (postgres)
 
   def func(name, *args)
-    "#{name}(#{args.map { |arg| func_arg_esc(arg) }.join(', ')})"
+    "#{name}(#{args.map { |arg| func_arg_esc(arg) }.join(", ")})"
   end
 
   def func_arg_esc(arg)
@@ -1485,7 +1485,7 @@ class ActiveRecord::Migration
 
   class << self
     def is_postgres?
-      connection.adapter_name == 'PostgreSQL'
+      connection.adapter_name == "PostgreSQL"
     end
 
     def has_postgres_proc?(procname)
@@ -1562,12 +1562,12 @@ module Migrator
       old_migration_name, Marginalia::Comment.migration = Marginalia::Comment.migration, migration.name
     end
     if down? && !Rails.env.test? && !$confirmed_migrate_down
-      require 'highline'
+      require "highline"
       if HighLine.new.ask("Revert migration #{migration.name} (#{migration.version}) ? [y/N/a] > ") !~ /^([ya])/i
         raise("Revert not confirmed")
       end
 
-      $confirmed_migrate_down = true if $1.casecmp?('a')
+      $confirmed_migrate_down = true if $1.casecmp?("a")
     end
 
     super
@@ -1578,7 +1578,7 @@ module Migrator
 end
 ActiveRecord::Migrator.prepend(Migrator)
 
-ActiveRecord::Migrator.migrations_paths.concat Dir[Rails.root.join('gems/plugins/*/db/migrate')]
+ActiveRecord::Migrator.migrations_paths.concat Dir[Rails.root.join("gems/plugins/*/db/migrate")]
 
 ActiveRecord::Tasks::DatabaseTasks.migrations_paths = ActiveRecord::Migrator.migrations_paths
 
@@ -1868,7 +1868,7 @@ ActiveRecord::Relation.prepend(ExplainAnalyze)
 
 # fake Rails into grabbing correct column information for a table rename in-progress
 module TableRename
-  RENAMES = { 'authentication_providers' => 'account_authorization_configs' }.freeze
+  RENAMES = { "authentication_providers" => "account_authorization_configs" }.freeze
 
   def columns(table_name)
     if (old_name = RENAMES[table_name]) && connection.table_exists?(old_name)

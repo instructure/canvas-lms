@@ -31,19 +31,19 @@
 # @see AssessmentQuestionBank#select_for_submission()
 class Quizzes::QuizQuestion < ActiveRecord::Base
   extend RootAccountResolver
-  self.table_name = 'quiz_questions'
+  self.table_name = "quiz_questions"
 
   include Workflow
 
   attr_readonly :quiz_id
-  belongs_to :quiz, class_name: 'Quizzes::Quiz', inverse_of: :quiz_questions
+  belongs_to :quiz, class_name: "Quizzes::Quiz", inverse_of: :quiz_questions
   belongs_to :assessment_question
-  belongs_to :quiz_group, class_name: 'Quizzes::QuizGroup'
+  belongs_to :quiz_group, class_name: "Quizzes::QuizGroup"
 
-  Q_TEXT_ONLY = 'text_only_question'
-  Q_FILL_IN_MULTIPLE_BLANKS = 'fill_in_multiple_blanks_question'
-  Q_MULTIPLE_DROPDOWNS = 'multiple_dropdowns_question'
-  Q_CALCULATED = 'calculated_question'
+  Q_TEXT_ONLY = "text_only_question"
+  Q_FILL_IN_MULTIPLE_BLANKS = "fill_in_multiple_blanks_question"
+  Q_MULTIPLE_DROPDOWNS = "multiple_dropdowns_question"
+  Q_CALCULATED = "calculated_question"
 
   before_save :validate_blank_questions
   before_save :infer_defaults
@@ -68,8 +68,8 @@ class Quizzes::QuizQuestion < ActiveRecord::Base
   end
 
   scope :active, -> { where("workflow_state='active' OR workflow_state IS NULL") }
-  scope :generated, -> { where(workflow_state: 'generated') }
-  scope :not_deleted, -> { where.not(workflow_state: 'deleted').or(where(workflow_state: nil)) }
+  scope :generated, -> { where(workflow_state: "generated") }
+  scope :not_deleted, -> { where.not(workflow_state: "deleted").or(where(workflow_state: nil)) }
 
   def infer_defaults
     if !position && quiz
@@ -180,7 +180,7 @@ class Quizzes::QuizQuestion < ActiveRecord::Base
     return if question_data && !(question_data.is_type?(:fill_in_multiple_blanks) || question_data.is_type?(:short_answer))
 
     qd = question_data
-    qd.answers = qd.answers.reject { |answer| answer['text'].empty? }
+    qd.answers = qd.answers.reject { |answer| answer["text"].empty? }
     self.question_data = qd
     question_data_will_change!
     true
@@ -209,7 +209,7 @@ class Quizzes::QuizQuestion < ActiveRecord::Base
   def data
     res = (question_data || assessment_question.question_data) rescue Quizzes::QuizQuestion::QuestionData.new(HashWithIndifferentAccess.new)
     res[:assessment_question_id] = assessment_question_id
-    res[:question_name] = t('#quizzes.quiz_question.defaults.question_name', "Question") if res[:question_name].blank?
+    res[:question_name] = t("#quizzes.quiz_question.defaults.question_name", "Question") if res[:question_name].blank?
     res[:id] = id
 
     res.to_hash
@@ -220,7 +220,7 @@ class Quizzes::QuizQuestion < ActiveRecord::Base
   def self.update_all_positions!(questions, quiz_group = nil)
     return if questions.empty?
 
-    group_id = quiz_group ? quiz_group.id : 'NULL'
+    group_id = quiz_group ? quiz_group.id : "NULL"
     updates = questions.map do |q|
       "WHEN id=#{q.id.to_i} THEN #{q.position.to_i}"
     end
@@ -232,7 +232,7 @@ class Quizzes::QuizQuestion < ActiveRecord::Base
   alias_method :destroy_permanently!, :destroy
 
   def destroy
-    self.workflow_state = 'deleted'
+    self.workflow_state = "deleted"
     save
   end
 

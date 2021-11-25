@@ -72,7 +72,7 @@ module Api::V1::GradeChangeEvent
   def links_json
     # This should include users and page_views.  There is no end point
     # for returning single json objects for those models.
-    user = { href: nil, type: 'user' }
+    user = { href: nil, type: "user" }
     {
       "events.assignment" => templated_url(:api_v1_course_assignment_url, "{events.course}", "{events.assignment}"),
       "events.course" => templated_url(:api_v1_course_url, "{events.course}"),

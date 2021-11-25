@@ -71,9 +71,9 @@ module SIS
 
         case status
         when /accepted/i
-          group_membership.workflow_state = 'accepted'
+          group_membership.workflow_state = "accepted"
         when /deleted/i
-          group_membership.workflow_state = 'deleted'
+          group_membership.workflow_state = "deleted"
         end
 
         if group_membership.valid?

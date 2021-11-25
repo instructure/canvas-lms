@@ -18,9 +18,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-$LOAD_PATH.push File.expand_path('../gems/dr_diff/lib', __dir__)
-require 'dr_diff'
-require 'json'
+$LOAD_PATH.push File.expand_path("../gems/dr_diff/lib", __dir__)
+require "dr_diff"
+require "json"
 
 class Linter
   DEFAULT_OPTIONS = {
@@ -31,15 +31,15 @@ class Linter
     command: nil,
     comment_post_processing: proc { |comments| comments },
     custom_comment_generation: false,
-    env_sha: ENV['SHA'] || ENV['GERRIT_PATCHSET_REVISION'],
+    env_sha: ENV["SHA"] || ENV["GERRIT_PATCHSET_REVISION"],
     format: nil,
     file_regex: /./,
     generate_comment_proc: proc {},
-    gerrit_patchset: !!ENV['GERRIT_PATCHSET_REVISION'],
+    gerrit_patchset: !!ENV["GERRIT_PATCHSET_REVISION"],
     heavy_mode: false,
-    include_git_dir_in_output: !!!ENV['GERRIT_PATCHSET_REVISION'],
+    include_git_dir_in_output: !!!ENV["GERRIT_PATCHSET_REVISION"],
     linter_name: nil,
-    plugin: ENV['GERRIT_PROJECT'],
+    plugin: ENV["GERRIT_PROJECT"],
     skip_file_size_check: false,
     skip_wips: false,
     base_dir: nil,
@@ -49,7 +49,7 @@ class Linter
   def initialize(options = {})
     options = DEFAULT_OPTIONS.merge(options)
 
-    if options[:plugin] == 'canvas-lms'
+    if options[:plugin] == "canvas-lms"
       options[:plugin] = nil
     end
 
@@ -118,7 +118,7 @@ class Linter
 
   def full_command
     if append_files_to_command
-      "#{command} #{files.join(' ')}"
+      "#{command} #{files.join(" ")}"
     else
       command
     end
@@ -152,7 +152,7 @@ class Linter
     if gerrit_patchset
       if boyscout_mode
         processed_comments.each do |comment|
-          comment[:severity] = 'error'
+          comment[:severity] = "error"
         end
       end
       publish_gergich_comments(processed_comments)
@@ -191,7 +191,7 @@ class Linter
   end
 
   def publish_local_comments(comments)
-    require 'colorize'
+    require "colorize"
     comments.each { |comment| pretty_comment(comment) }
   end
 

@@ -36,7 +36,7 @@ module Canvas::Security
     end
 
     def error_message
-      errors.full_messages.join(' | ')
+      errors.full_messages.join(" | ")
     end
 
     private
@@ -47,9 +47,9 @@ module Canvas::Security
 
     def assertions
       missing_assertions = (REQUIRED_ASSERTIONS - @assertions)
-      missing_assertions << 'iss' if @require_iss && @assertions.delete?('iss').nil?
+      missing_assertions << "iss" if @require_iss && @assertions.delete?("iss").nil?
       unless missing_assertions.empty?
-        errors.add(:base, "the following assertions are missing: #{missing_assertions.to_a.join(',')}")
+        errors.add(:base, "the following assertions are missing: #{missing_assertions.to_a.join(",")}")
         @full_errors = false
       end
     end

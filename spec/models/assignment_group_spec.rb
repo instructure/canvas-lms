@@ -28,7 +28,7 @@ describe AssignmentGroup do
       group_weight: 1.0
     }
     course_with_student(active_all: true)
-    @course.update_attribute(:group_weighting_scheme, 'percent')
+    @course.update_attribute(:group_weighting_scheme, "percent")
   end
 
   it "acts as list" do
@@ -145,19 +145,19 @@ describe AssignmentGroup do
   context "broadcast policy" do
     context "grade weight changed" do
       before(:once) do
-        Notification.create!(name: 'Grade Weight Changed', category: 'TestImmediately')
+        Notification.create!(name: "Grade Weight Changed", category: "TestImmediately")
         assignment_group_model
       end
 
       it "sends a notification when the grade weight changes" do
         @ag.update_attribute(:group_weight, 0.2)
-        expect(@ag.context.messages_sent['Grade Weight Changed'].any? { |m| m.user_id == @student.id }).to be_truthy
+        expect(@ag.context.messages_sent["Grade Weight Changed"].any? { |m| m.user_id == @student.id }).to be_truthy
       end
 
       it "sends a notification to observers when the grade weight changes" do
         course_with_observer(course: @course, associated_user_id: @student.id, active_all: true)
         @ag.reload.update_attribute(:group_weight, 0.2)
-        expect(@ag.context.messages_sent['Grade Weight Changed'].any? { |m| m.user_id == @observer.id }).to be_truthy
+        expect(@ag.context.messages_sent["Grade Weight Changed"].any? { |m| m.user_id == @observer.id }).to be_truthy
       end
     end
   end
@@ -175,7 +175,7 @@ describe AssignmentGroup do
     end
     assignment_group_model rules: rules
     result = @ag.rules_hash
-    expect(result['never_drop']).to eql(expected)
+    expect(result["never_drop"]).to eql(expected)
   end
 
   it "returns never_drop list as strings if `stringify_json_ids` is true" do
@@ -187,21 +187,21 @@ describe AssignmentGroup do
 
     assignment_group_model rules: rules
     result = @ag.rules_hash({ stringify_json_ids: true })
-    expect(result['never_drop']).to eql(expected)
+    expect(result["never_drop"]).to eql(expected)
   end
 
   it "returns rules that aren't never_drops as ints" do
     rules = "drop_highest:25\n"
     assignment_group_model rules: rules
     result = @ag.rules_hash
-    expect(result['drop_highest']).to eql(25)
+    expect(result["drop_highest"]).to eql(25)
   end
 
   it "returns rules that aren't never_drops as ints when `strigify_json_ids` is true" do
     rules = "drop_lowest:2\n"
     assignment_group_model rules: rules
     result = @ag.rules_hash({ stringify_json_ids: true })
-    expect(result['drop_lowest']).to eql(2)
+    expect(result["drop_lowest"]).to eql(2)
   end
 
   describe "#grants_right?" do
@@ -496,8 +496,8 @@ describe AssignmentGroup do
     end
   end
 
-  describe '#any_assignment_in_closed_grading_period?' do
-    it 'calls EffectiveDueDates#in_closed_grading_period?' do
+  describe "#any_assignment_in_closed_grading_period?" do
+    it "calls EffectiveDueDates#in_closed_grading_period?" do
       assignment_group_model
       edd = EffectiveDueDates.for_course(@ag.context, @ag.published_assignments)
       expect(EffectiveDueDates).to receive(:for_course).with(@ag.context, @ag.published_assignments).and_return(edd)
@@ -525,19 +525,19 @@ describe AssignmentGroup do
       expect { @group.destroy }.not_to change { student_score.reload.state }
     end
 
-    it 'destroys active assignments belonging to the group' do
+    it "destroys active assignments belonging to the group" do
       assignment = @course.assignments.create!
       @group.destroy
       expect(assignment.reload).to be_deleted
     end
 
-    it 'does not run validations on soft-deleted assignments belonging to the group' do
+    it "does not run validations on soft-deleted assignments belonging to the group" do
       now = Time.zone.now
       assignment = @course.assignments.create!(
         unlock_at: 3.days.ago(now),
         due_at: now,
         lock_at: 3.days.from_now(now),
-        workflow_state: 'deleted'
+        workflow_state: "deleted"
       )
       # update the assignment to be invalid, so that if validations are run
       # we'll get an error
@@ -576,8 +576,8 @@ describe AssignmentGroup do
     end
   end
 
-  describe '#create' do
-    it 'sets the root_account_id using context' do
+  describe "#create" do
+    it "sets the root_account_id using context" do
       group = @course.assignment_groups.create!(@valid_attributes)
       expect(group.root_account_id).to eq @course.root_account_id
     end

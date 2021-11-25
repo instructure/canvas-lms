@@ -87,7 +87,7 @@ module SendToStream
     attr_reader :generated_stream_items, :stream_item_recipient_ids
 
     def stream_item_inactive?
-      (respond_to?(:workflow_state) && workflow_state == 'deleted') || (respond_to?(:deleted?) && deleted?)
+      (respond_to?(:workflow_state) && workflow_state == "deleted") || (respond_to?(:deleted?) && deleted?)
     end
 
     def clear_stream_items_on_destroy

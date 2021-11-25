@@ -16,21 +16,21 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../common'
-require_relative '../helpers/blueprint_common'
-require_relative '../../apis/api_spec_helper'
+require_relative "../common"
+require_relative "../helpers/blueprint_common"
+require_relative "../../apis/api_spec_helper"
 
 shared_context "blueprint lock context" do
   def blueprint_lock_icon_label
-    f('.bpc-lock-toggle__label')
+    f(".bpc-lock-toggle__label")
   end
 
   def blueprint_lock_icon_button
-    blueprint_lock_icon_label.find_element(:xpath, '../../parent::button')
+    blueprint_lock_icon_label.find_element(:xpath, "../../parent::button")
   end
 
   def associated_index_lock_icon
-    f('#content-wrapper.ic-Layout-contentWrapper')
+    f("#content-wrapper.ic-Layout-contentWrapper")
   end
 
   def blueprint_index_assignment_icon
@@ -38,11 +38,11 @@ shared_context "blueprint lock context" do
   end
 
   def blueprint_index_discussions_icon
-    f('.discussion-content')
+    f(".discussion-content")
   end
 
   def blueprint_index_pages_icon
-    f('.master-content-lock-cell')
+    f(".master-content-lock-cell")
   end
 
   def blueprint_index_quizzes_icon
@@ -50,7 +50,7 @@ shared_context "blueprint lock context" do
   end
 
   def blueprint_index_quizzes_search_bar
-    f('input#searchTerm')
+    f("input#searchTerm")
   end
 
   def verify_index_locked
@@ -101,10 +101,10 @@ describe "master courses - locked items" do
     @minion = @template.add_child_course!(course_factory(name: "Minion", active_all: true)).child_course
 
     # setup some stuff
-    @assignment = @master.assignments.create!(title: 'Blah', points_possible: 10)
-    @page = @master.wiki_pages.create!(title: 'Unicorn')
-    @quiz = @master.quizzes.create!(title: 'TestQuiz')
-    @discussion = @master.discussion_topics.create!(title: 'My discussion')
+    @assignment = @master.assignments.create!(title: "Blah", points_possible: 10)
+    @page = @master.wiki_pages.create!(title: "Unicorn")
+    @quiz = @master.quizzes.create!(title: "TestQuiz")
+    @discussion = @master.discussion_topics.create!(title: "My discussion")
 
     run_master_course_migration(@master)
     @quiz_copy = @minion.quizzes.last
@@ -161,7 +161,7 @@ describe "master courses - locked items" do
         lock_index_tag
 
         get "/courses/#{@minion.id}/quizzes/#{@quiz_copy.id}/edit"
-        expect(f('#right-side')).not_to contain_css('#editor_tabs')
+        expect(f("#right-side")).not_to contain_css("#editor_tabs")
       end
     end
 
@@ -169,14 +169,14 @@ describe "master courses - locked items" do
       it "assignments show a working lock button on the index page", priority: "2" do
         get "/courses/#{@master.id}/assignments"
         element = blueprint_index_assignment_icon
-        escape = f('input#search_term.ic-Input')
+        escape = f("input#search_term.ic-Input")
 
         element.find_element(:css, @unlocked_button_css).click
         escape.click # click away from the button due to firefox functionality
         refresh_page # refresh the page to retrieve info from backend
 
         element = blueprint_index_assignment_icon
-        escape = f('input#search_term.ic-Input')
+        escape = f("input#search_term.ic-Input")
 
         verify_unlocked(element)
         element.find_element(:css, @locked_button_css).click
@@ -190,14 +190,14 @@ describe "master courses - locked items" do
       it "pages show a working lock button on the index page", priority: "2" do
         get "/courses/#{@master.id}/pages"
         element = blueprint_index_pages_icon
-        escape = f('.header-bar-outer-container')
+        escape = f(".header-bar-outer-container")
 
         element.find_element(:css, @unlocked_button_css).click
         escape.click # click away from the button due to firefox functionality
         refresh_page # refresh the page to retrieve info from backend
 
         element = blueprint_index_pages_icon
-        escape = f('.header-bar-outer-container')
+        escape = f(".header-bar-outer-container")
 
         verify_unlocked(element)
         element.find_element(:css, @locked_button_css).click

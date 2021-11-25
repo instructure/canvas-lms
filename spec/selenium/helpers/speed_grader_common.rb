@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../common'
+require_relative "../common"
 require_relative "../grades/pages/speedgrader_page"
 
 module SpeedGraderCommon
@@ -67,7 +67,7 @@ module SpeedGraderCommon
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
     wait_for_ajaximations
 
-    f('.toggle_full_rubric').click
+    f(".toggle_full_rubric").click
     wait_for_ajaximations
 
     rubric_inputs = ff('td[data-testid="criterion-points"] input')
@@ -76,13 +76,13 @@ module SpeedGraderCommon
   end
 
   def clear_grade_and_validate
-    @assignment.grade_student @students[0], grade: '', grader: @teacher
-    @assignment.grade_student @students[1], grade: '', grader: @teacher
+    @assignment.grade_student @students[0], grade: "", grader: @teacher
+    @assignment.grade_student @students[1], grade: "", grader: @teacher
 
     refresh_page
-    expect(f('#grading-box-extended')).to have_value ''
-    f('#next-student-button').click
-    expect(f('#grading-box-extended')).to have_value ''
+    expect(f("#grading-box-extended")).to have_value ""
+    f("#next-student-button").click
+    expect(f("#grading-box-extended")).to have_value ""
   end
 
   def expand_right_pane
@@ -93,14 +93,14 @@ module SpeedGraderCommon
   end
 
   def submit_comment(text)
-    f('#speed_grader_comment_textarea').send_keys(text)
+    f("#speed_grader_comment_textarea").send_keys(text)
     f('#add_a_comment button[type="submit"]').click
     wait_for_ajaximations
   end
 
   # returns a list of comment strings from right pane
   def comment_list
-    ff('span.comment').map(&:text)
+    ff("span.comment").map(&:text)
   end
 
   def update_submission(submission, text)

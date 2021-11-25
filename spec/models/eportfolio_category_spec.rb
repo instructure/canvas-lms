@@ -28,7 +28,7 @@ describe EportfolioCategory do
     describe "#check_for_spam" do
       context "when the setting has a value" do
         before do
-          Setting.set('eportfolio_title_spam_keywords', 'bad, verybad, worse')
+          Setting.set("eportfolio_title_spam_keywords", "bad, verybad, worse")
         end
 
         it "marks the owning portfolio as possible spam when the title matches one or more keywords" do

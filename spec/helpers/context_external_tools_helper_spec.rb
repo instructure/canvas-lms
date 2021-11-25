@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'nokogiri'
+require "nokogiri"
 
 describe ContextExternalToolsHelper do
   include ContextExternalToolsHelper
@@ -121,8 +121,8 @@ describe ContextExternalToolsHelper do
       tool_1 = @course.context_external_tools.create(
         name: "Awesome Tool with Icon Class",
         domain: "example.dev",
-        consumer_key: '12345',
-        shared_secret: 'secret'
+        consumer_key: "12345",
+        shared_secret: "secret"
       )
 
       tool_1_settings = tool_settings(:course_home_sub_navigation, true)
@@ -133,8 +133,8 @@ describe ContextExternalToolsHelper do
       tool_2 = @course.context_external_tools.create(
         name: "Awesome Tool with Icon Class",
         domain: "example.dev",
-        consumer_key: '12345',
-        shared_secret: 'secret'
+        consumer_key: "12345",
+        shared_secret: "secret"
       )
 
       tool_2.course_home_sub_navigation = tool_settings(:course_home_sub_navigation)
@@ -145,8 +145,8 @@ describe ContextExternalToolsHelper do
       tool_3 = @course.context_external_tools.create(
         name: "Awesome Tool with Icon Class",
         domain: "example.dev",
-        consumer_key: '12345',
-        shared_secret: 'secret'
+        consumer_key: "12345",
+        shared_secret: "secret"
       )
 
       tool_3.course_home_sub_navigation = tool_settings(:course_home_sub_navigation, true)

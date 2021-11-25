@@ -24,7 +24,7 @@ module Canvas
   mattr_accessor :protected_attribute_error
 
   def self.active_record_foreign_key_check(name, type, options)
-    if name.to_s.end_with?('_id') && type.to_s == 'integer' && options[:limit].to_i < 8
+    if name.to_s.end_with?("_id") && type.to_s == "integer" && options[:limit].to_i < 8
       raise ArgumentError, <<~TEXT
         All foreign keys need to be at least 8-byte integers. #{name}
         looks like a foreign key, please add this option: `:limit => 8`
@@ -57,31 +57,31 @@ module Canvas
   end
 
   def self.lookup_cache_store(config, cluster)
-    config = { 'cache_store' => 'nil_store' }.merge(config)
-    if config['cache_store'] == 'redis_store'
+    config = { "cache_store" => "nil_store" }.merge(config)
+    if config["cache_store"] == "redis_store"
       ActiveSupport::Deprecation.warn("`redis_store` is no longer supported. Please change to `redis_cache_store`, and change `servers` to `url`.")
-      config['cache_store'] = 'redis_cache_store'
-      config['url'] = config['servers'] if config['servers']
+      config["cache_store"] = "redis_cache_store"
+      config["url"] = config["servers"] if config["servers"]
     end
 
-    case config.delete('cache_store')
-    when 'redis_cache_store'
+    case config.delete("cache_store")
+    when "redis_cache_store"
       Canvas::Redis.patch
       # if cache and redis data are configured identically, we want to share connections
-      if config.except('expires_in') == {} && cluster == Rails.env && Canvas.redis_enabled?
+      if config.except("expires_in") == {} && cluster == Rails.env && Canvas.redis_enabled?
         ActiveSupport::Cache.lookup_store(:redis_cache_store, redis: Canvas.redis)
       else
         # merge in redis.yml, but give precedence to cache_store.yml
-        redis_config = (ConfigFile.load('redis', cluster) || {})
+        redis_config = (ConfigFile.load("redis", cluster) || {})
         config = redis_config.merge(config) if redis_config.is_a?(Hash)
         # back compat
         config[:url] = config[:servers] if config[:servers]
         # config has to be a vanilla hash, with symbol keys, to auto-convert to kwargs
         ActiveSupport::Cache.lookup_store(:redis_cache_store, config.to_h.symbolize_keys)
       end
-    when 'memory_store'
+    when "memory_store"
       ActiveSupport::Cache.lookup_store(:memory_store)
-    when 'nil_store', 'null_store'
+    when "nil_store", "null_store"
       ActiveSupport::Cache.lookup_store(:null_store)
     end
   end
@@ -117,7 +117,7 @@ module Canvas
     return unless Rails.env.development?
 
     base_path = File.expand_path(dirname)
-    base_path.gsub(%r{/lib/[^/]*$}, '')
+    base_path.gsub(%r{/lib/[^/]*$}, "")
     ActiveSupport::Dependencies.autoload_once_paths.reject! do |p|
       p[0, base_path.length] == base_path
     end
@@ -323,7 +323,7 @@ module Canvas
   # pseudonyms that share their username, this will look up their associated user record.
   # Otherwise it's still safe, it will just return a nil user.
   def self.infer_user(username = nil)
-    unix_user = username || ENV['SUDO_USER'] || ENV['USER']
+    unix_user = username || ENV["SUDO_USER"] || ENV["USER"]
     Account.site_admin.pseudonyms.active.by_unique_id(unix_user).first&.user
   end
 end

@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-CC_XML_EXPORT_DIR = File.dirname(__FILE__) + '/../../fixtures/cc/cc_export'
+CC_XML_EXPORT_DIR = File.dirname(__FILE__) + "/../../fixtures/cc/cc_export"
 
 def get_cc_converter
   CC::Importer::Canvas::Converter.new({ no_archive_file: true })
@@ -33,6 +33,6 @@ def get_cc_export_file(rel_path)
 end
 
 def get_ccc_schema
-  xsd_filename = File.join(__dir__, '../../../lib/cc/xsd/cccv1p0.xsd')
+  xsd_filename = File.join(__dir__, "../../../lib/cc/xsd/cccv1p0.xsd")
   Nokogiri::XML::Schema(File.read(xsd_filename))
 end

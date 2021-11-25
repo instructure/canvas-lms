@@ -42,8 +42,8 @@ describe CourseSection, "moving to new course" do
     cs = course1.course_sections.create!
     u = User.create!
     u.register!
-    e = course1.enroll_user(u, 'StudentEnrollment', section: cs)
-    e.workflow_state = 'active'
+    e = course1.enroll_user(u, "StudentEnrollment", section: cs)
+    e.workflow_state = "active"
     e.save!
     course1.reload
 
@@ -121,7 +121,7 @@ describe CourseSection, "moving to new course" do
     expect(cs.nonxlist_course_id).to be_nil
     u = User.create!
     u.register!
-    course1.enroll_user(u, 'StudentEnrollment', section: cs)
+    course1.enroll_user(u, "StudentEnrollment", section: cs)
     u.update_account_associations
 
     expect(course1.associated_accounts.map(&:id).sort).to eq [root_account.id, sub_account1.id].sort
@@ -166,17 +166,17 @@ describe CourseSection, "moving to new course" do
     cs = course1.course_sections.create!
     u = User.create!
     u.register!
-    e = course2.enroll_user(u, 'StudentEnrollment')
-    e.workflow_state = 'active'
+    e = course2.enroll_user(u, "StudentEnrollment")
+    e.workflow_state = "active"
     e.save!
-    e = course1.enroll_user(u, 'StudentEnrollment', section: cs)
-    e.workflow_state = 'active'
+    e = course1.enroll_user(u, "StudentEnrollment", section: cs)
+    e.workflow_state = "active"
     e.save!
     # should also move deleted enrollments
     e.destroy
     course1.reload
     course2.reload
-    course3.workflow_state = 'active'
+    course3.workflow_state = "active"
     course3.save
     e.reload
 
@@ -186,9 +186,9 @@ describe CourseSection, "moving to new course" do
     expect(cs.nonxlist_course).to be_nil
     expect(e.root_account).to eql(account1)
     expect(cs.crosslisted?).to be_falsey
-    expect(course1.workflow_state).to eq 'created'
-    expect(course2.workflow_state).to eq 'created'
-    expect(course3.workflow_state).to eq 'created'
+    expect(course1.workflow_state).to eq "created"
+    expect(course2.workflow_state).to eq "created"
+    expect(course3.workflow_state).to eq "created"
 
     cs.crosslist_to_course(course2)
     course1.reload
@@ -202,9 +202,9 @@ describe CourseSection, "moving to new course" do
     expect(cs.nonxlist_course).to eql(course1)
     expect(e.root_account).to eql(account2)
     expect(cs.crosslisted?).to be_truthy
-    expect(course1.workflow_state).to eq 'created'
-    expect(course2.workflow_state).to eq 'created'
-    expect(course3.workflow_state).to eq 'created'
+    expect(course1.workflow_state).to eq "created"
+    expect(course2.workflow_state).to eq "created"
+    expect(course3.workflow_state).to eq "created"
 
     cs.crosslist_to_course(course3)
     course1.reload
@@ -219,9 +219,9 @@ describe CourseSection, "moving to new course" do
     expect(cs.nonxlist_course).to eql(course1)
     expect(e.root_account).to eql(account3)
     expect(cs.crosslisted?).to be_truthy
-    expect(course1.workflow_state).to eq 'created'
-    expect(course2.workflow_state).to eq 'created'
-    expect(course3.workflow_state).to eq 'created'
+    expect(course1.workflow_state).to eq "created"
+    expect(course2.workflow_state).to eq "created"
+    expect(course3.workflow_state).to eq "created"
 
     cs.uncrosslist
     course1.reload
@@ -236,9 +236,9 @@ describe CourseSection, "moving to new course" do
     expect(cs.nonxlist_course).to be_nil
     expect(e.root_account).to eql(account1)
     expect(cs.crosslisted?).to be_falsey
-    expect(course1.workflow_state).to eq 'created'
-    expect(course2.workflow_state).to eq 'created'
-    expect(course3.workflow_state).to eq 'created'
+    expect(course1.workflow_state).to eq "created"
+    expect(course2.workflow_state).to eq "created"
+    expect(course3.workflow_state).to eq "created"
   end
 
   it "preserves favorites when crosslisting" do
@@ -250,8 +250,8 @@ describe CourseSection, "moving to new course" do
 
     cs = course1.course_sections.create!
     u = user_factory(active_all: true)
-    course1.enroll_user(u, 'StudentEnrollment', section: cs, enrollment_state: 'active')
-    u.favorites.where(context_type: 'Course', context_id: course1).first_or_create!
+    course1.enroll_user(u, "StudentEnrollment", section: cs, enrollment_state: "active")
+    u.favorites.where(context_type: "Course", context_id: course1).first_or_create!
 
     cs.crosslist_to_course(course2)
     expect(u.favorites.where(context_type: "Course", context_id: course2).exists?).to eq true
@@ -272,10 +272,10 @@ describe CourseSection, "moving to new course" do
     expect(section.reload).to be_valid
   end
 
-  describe '#delete_enrollments_if_deleted' do
-    let(:account) { Account.create!(name: '1') }
+  describe "#delete_enrollments_if_deleted" do
+    let(:account) { Account.create!(name: "1") }
     let(:course) { account.courses.create! }
-    let(:section) { course.course_sections.create!(workflow_state: 'active') }
+    let(:section) { course.course_sections.create!(workflow_state: "active") }
 
     before do
       student_in_section(section)
@@ -284,18 +284,18 @@ describe CourseSection, "moving to new course" do
     it "must not have any effect when the section's workflow_state is not 'deleted'" do
       section.delete_enrollments_if_deleted
       enrollment_states = section.enrollments.pluck(:workflow_state)
-      expect(enrollment_states).to_not include 'deleted'
+      expect(enrollment_states).to_not include "deleted"
     end
 
     it "must mark the enrollments as deleted if the section's workflow_state is 'deleted'" do
-      section.workflow_state = 'deleted'
+      section.workflow_state = "deleted"
       section.delete_enrollments_if_deleted
       enrollment_states = Enrollment.where(course_section_id: section.id).pluck(:workflow_state)
-      expect(enrollment_states.uniq).to contain_exactly 'deleted'
+      expect(enrollment_states.uniq).to contain_exactly "deleted"
     end
   end
 
-  it 'updates course account associations on save' do
+  it "updates course account associations on save" do
     account1 = Account.create!(name: "1")
     account2 = account1.sub_accounts.create!(name: "2")
     course1 = account1.courses.create!
@@ -316,7 +316,7 @@ describe CourseSection, "moving to new course" do
     expect(CourseAccountAssociation.where(course_id: course2).distinct.order(:account_id).pluck(:account_id)).to eq [account1.id, account2.id].sort
   end
 
-  it 'calls DueDateCacher.recompute_users_for_course' do
+  it "calls DueDateCacher.recompute_users_for_course" do
     account1 = Account.create!(name: "1")
     account2 = Account.create!(name: "2")
     course1 = account1.courses.create!
@@ -324,8 +324,8 @@ describe CourseSection, "moving to new course" do
     cs = course1.course_sections.create!
     u = User.create!
     u.register!
-    e = course1.enroll_user(u, 'StudentEnrollment', section: cs)
-    e.workflow_state = 'active'
+    e = course1.enroll_user(u, "StudentEnrollment", section: cs)
+    e.workflow_state = "active"
     e.save!
     course1.reload
 
@@ -334,11 +334,11 @@ describe CourseSection, "moving to new course" do
     cs.move_to_course(course2)
   end
 
-  describe 'validation' do
+  describe "validation" do
     before :once do
       course = Course.create_unique
       @section = CourseSection.create(course: course)
-      @long_string = 'qwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnm'
+      @long_string = "qwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnm"
     end
 
     it "validates the length of attributes" do
@@ -358,7 +358,7 @@ describe CourseSection, "moving to new course" do
     end
   end
 
-  describe 'dependent destroys' do
+  describe "dependent destroys" do
     before :once do
       course_with_teacher
       @course.assignments.build
@@ -367,7 +367,7 @@ describe CourseSection, "moving to new course" do
       @section = @course.course_sections.create!
     end
 
-    it 'softs destroy overrides when destroyed' do
+    it "softs destroy overrides when destroyed" do
       @override = @assignment.assignment_overrides.build
       @override.set = @section
       @override.save!
@@ -377,7 +377,7 @@ describe CourseSection, "moving to new course" do
       expect(@override.workflow_state).to eq("deleted")
     end
 
-    it 'softs destroy enrollments when destroyed' do
+    it "softs destroy enrollments when destroyed" do
       @enrollment = @course.enroll_student(User.create, { section: @section })
       expect(@enrollment.workflow_state).to eq("creation_pending")
       @section.destroy
@@ -425,40 +425,40 @@ describe CourseSection, "moving to new course" do
     end
   end
 
-  describe 'deletable?' do
+  describe "deletable?" do
     before :once do
       course_with_teacher
       @section = @course.course_sections.create!
     end
 
-    it 'is deletable if empty' do
+    it "is deletable if empty" do
       expect(@section).to be_deletable
     end
 
-    it 'is not deletable if it has real enrollments' do
+    it "is not deletable if it has real enrollments" do
       student_in_course section: @section
       expect(@section).not_to be_deletable
     end
 
-    it 'is deletable if it only has a student view enrollment' do
+    it "is deletable if it only has a student view enrollment" do
       @course.student_view_student
-      expect(@section.enrollments.map(&:type)).to eql ['StudentViewEnrollment']
+      expect(@section.enrollments.map(&:type)).to eql ["StudentViewEnrollment"]
       expect(@section).to be_deletable
     end
 
-    it 'is deletable if it only has rejected enrollments' do
+    it "is deletable if it only has rejected enrollments" do
       student_in_course section: @section
       @section.enrollments.first.update_attribute(:workflow_state, "rejected")
       expect(@section).to be_deletable
     end
   end
 
-  context 'permissions' do
+  context "permissions" do
     context ":read and section_visibilities" do
       before do
         RoleOverride.create!({
                                context: Account.default,
-                               permission: 'manage_students',
+                               permission: "manage_students",
                                role: ta_role,
                                enabled: false
                              })
@@ -491,7 +491,7 @@ describe CourseSection, "moving to new course" do
     end
   end
 
-  context 'enrollment state invalidation' do
+  context "enrollment state invalidation" do
     before :once do
       course_factory(active_all: true)
       @section = @course.course_sections.create!

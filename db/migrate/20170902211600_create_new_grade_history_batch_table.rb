@@ -25,7 +25,7 @@ class CreateNewGradeHistoryBatchTable < ActiveRecord::Migration[4.2]
   LAST_BATCH_TABLE = DataFixup::InitNewGradeHistoryAuditLogIndexes::LAST_BATCH_TABLE
 
   def self.cassandra_cluster
-    'auditors'
+    "auditors"
   end
 
   def self.up

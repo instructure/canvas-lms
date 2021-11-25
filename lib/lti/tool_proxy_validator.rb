@@ -42,13 +42,13 @@ module Lti
     def validate!
       if errors.present?
         messages = []
-        messages << 'Invalid Capabilities' if errors[:invalid_capabilities].present?
-        messages << 'Invalid Services' if errors[:invalid_services].present?
-        messages << 'Invalid SecurityContract' if errors[:invalid_security_contract].present?
-        messages << 'Invalid SecurityProfiles' if errors[:invalid_security_profiles].present?
-        messages << 'Restricted SecurityProfiles' if errors[:restricted_security_profiles].present?
+        messages << "Invalid Capabilities" if errors[:invalid_capabilities].present?
+        messages << "Invalid Services" if errors[:invalid_services].present?
+        messages << "Invalid SecurityContract" if errors[:invalid_security_contract].present?
+        messages << "Invalid SecurityProfiles" if errors[:invalid_security_profiles].present?
+        messages << "Restricted SecurityProfiles" if errors[:restricted_security_profiles].present?
         last_message = messages.pop if messages.size > 1
-        message = messages.join(', ')
+        message = messages.join(", ")
         message + " and #{last_message}" if last_message
         raise Lti::Errors::InvalidToolProxyError.new message, errors
       end
@@ -101,8 +101,8 @@ module Lti
       messages = {}
       profiles = %w[oauth2_access_token_ws_security lti_jwt_ws_security]
       if tool_proxy.tool_profile.security_profiles.select { |s| profiles.include?(s.security_profile_name) }.present? &&
-         !tool_proxy.enabled_capabilities.include?('Security.splitSecret')
-        messages[:restricted_security_profiles] = ['Security.splitSecret is required']
+         !tool_proxy.enabled_capabilities.include?("Security.splitSecret")
+        messages[:restricted_security_profiles] = ["Security.splitSecret is required"]
       end
       messages
     end

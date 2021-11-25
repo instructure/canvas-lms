@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'mail'
+require "mail"
 
 module IncomingMailProcessor
   class IncomingMessageProcessor
@@ -53,15 +53,15 @@ module IncomingMailProcessor
       def bounce_message?(mail)
         mail.header.fields.any? do |field|
           case field.name
-          when 'Auto-Submitted' # RFC-3834
-            field.value != 'no'
-          when 'Precedence' # old kludgey stuff uses this
+          when "Auto-Submitted" # RFC-3834
+            field.value != "no"
+          when "Precedence" # old kludgey stuff uses this
             BULK_PRECEDENCE_VALUES.include?(field.value)
-          when 'X-Auto-Response-Suppress', # Exchange sets this
+          when "X-Auto-Response-Suppress", # Exchange sets this
               # some other random headers I found that are easy to check
-              'X-Autoreply',
-              'X-Autorespond',
-              'X-Autoresponder'
+              "X-Autoreply",
+              "X-Autorespond",
+              "X-Autoresponder"
             true
           else
             # not a bounce header we care about
@@ -71,7 +71,7 @@ module IncomingMailProcessor
       end
 
       def utf8ify(string, encoding)
-        encoding ||= 'UTF-8'
+        encoding ||= "UTF-8"
         encoding = encoding.upcase
         encoding = "UTF-8" if encoding == "UTF8"
 
@@ -148,8 +148,8 @@ module IncomingMailProcessor
       end
 
       def flatten_mailbox_overrides(mailbox_config)
-        mailbox_defaults = mailbox_config.except('accounts')
-        mailbox_overrides = mailbox_config['accounts'] || [{}]
+        mailbox_defaults = mailbox_config.except("accounts")
+        mailbox_overrides = mailbox_config["accounts"] || [{}]
         mailbox_overrides.map do |override_config|
           mailbox_defaults.merge(override_config).symbolize_keys
         end
@@ -252,9 +252,9 @@ module IncomingMailProcessor
         text_body = self.class.utf8ify(text_part.body.decoded, text_part.charset) if text_part
       else
         case incoming_message.mime_type
-        when 'text/plain', nil
+        when "text/plain", nil
           text_body = self.class.utf8ify(incoming_message.body.decoded, incoming_message.charset)
-        when 'text/html'
+        when "text/html"
           html_body = self.class.utf8ify(incoming_message.body.decoded, incoming_message.charset)
         else
           raise "Unrecognized Content-Type: #{incoming_message.mime_type.inspect}"
@@ -274,13 +274,13 @@ module IncomingMailProcessor
 
     def report_stats(incoming_message, mailbox_account)
       InstStatsd::Statsd.increment("incoming_mail_processor.incoming_message_processed.#{mailbox_account.escaped_address}",
-                                   short_stat: 'incoming_mail_processor.incoming_message_processed',
+                                   short_stat: "incoming_mail_processor.incoming_message_processed",
                                    tags: { mailbox: mailbox_account.escaped_address })
       age = age(incoming_message)
       if age
         stat_name = "incoming_mail_processor.message_age.#{mailbox_account.escaped_address}"
         InstStatsd::Statsd.timing(stat_name, age,
-                                  short_stat: 'incoming_mail_processor.message_age',
+                                  short_stat: "incoming_mail_processor.message_age",
                                   tags: { mailbox: mailbox_account.escaped_address })
       end
     end

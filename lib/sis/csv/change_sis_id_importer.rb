@@ -22,7 +22,7 @@ module SIS
   module CSV
     class ChangeSisIdImporter < CSVBaseImporter
       def self.change_sis_id_csv?(row)
-        row.include?('old_id') || row.include?('old_integration_id')
+        row.include?("old_id") || row.include?("old_integration_id")
       end
 
       def self.identifying_fields
@@ -36,7 +36,7 @@ module SIS
           csv_rows(csv, index, count) do |row|
             i.process_change_sis_id(create_change_data(row))
           rescue ImportError => e
-            SisBatch.add_error(csv, e.to_s, sis_batch: @batch, row: row['lineno'], row_info: row)
+            SisBatch.add_error(csv, e.to_s, sis_batch: @batch, row: row["lineno"], row_info: row)
           end
         end
       end
@@ -45,11 +45,11 @@ module SIS
 
       def create_change_data(row)
         SIS::Models::DataChange.new(
-          old_id: row['old_id'],
-          new_id: row['new_id'],
-          old_integration_id: row['old_integration_id'],
-          new_integration_id: row['new_integration_id'],
-          type: row['type']
+          old_id: row["old_id"],
+          new_id: row["new_id"],
+          old_integration_id: row["old_integration_id"],
+          new_integration_id: row["new_integration_id"],
+          type: row["type"]
         )
       end
     end

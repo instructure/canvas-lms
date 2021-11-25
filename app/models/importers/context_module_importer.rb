@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_dependency 'importers'
+require_dependency "importers"
 
 module Importers
   class ContextModuleImporter < Importer
@@ -45,24 +45,24 @@ module Importers
     def self.select_all_linked_module_items(data, migration)
       return if migration.import_everything?
 
-      (data['modules'] || []).each do |mod|
+      (data["modules"] || []).each do |mod|
         select_linked_module_items(mod, migration)
       end
     end
 
     def self.select_linked_module_items(mod, migration, select_all = false)
-      if select_all || migration.import_object?("context_modules", mod['migration_id']) || migration.import_object?("modules", mod['migration_id'])
-        (mod['items'] || []).each do |item|
-          if item['type'] == 'submodule'
+      if select_all || migration.import_object?("context_modules", mod["migration_id"]) || migration.import_object?("modules", mod["migration_id"])
+        (mod["items"] || []).each do |item|
+          if item["type"] == "submodule"
             # recursively select content in submodules
             select_linked_module_items(item, migration, true)
-          elsif (resource_class = linked_resource_type_class(item['linked_resource_type']))
-            migration.import_object!(resource_class.table_name, item['linked_resource_id'])
+          elsif (resource_class = linked_resource_type_class(item["linked_resource_type"]))
+            migration.import_object!(resource_class.table_name, item["linked_resource_id"])
           end
         end
       else
-        (mod['items'] || []).each do |item|
-          if item['type'] == 'submodule'
+        (mod["items"] || []).each do |item|
+          if item["type"] == "submodule"
             select_linked_module_items(item, migration) # the parent may not be selected, but a sub-module may be
           end
         end
@@ -70,7 +70,7 @@ module Importers
     end
 
     def self.process_migration(data, migration)
-      modules = data['modules'] || []
+      modules = data["modules"] || []
       migration.last_module_position = migration.context.context_modules.maximum(:position) if migration.is_a?(ContentMigration)
 
       modules.each do |mod|
@@ -81,16 +81,16 @@ module Importers
     end
 
     def self.process_module(mod, migration)
-      if migration.import_object?("context_modules", mod['migration_id']) || migration.import_object?("modules", mod['migration_id'])
+      if migration.import_object?("context_modules", mod["migration_id"]) || migration.import_object?("modules", mod["migration_id"])
         begin
           import_from_migration(mod, migration.context, migration)
         rescue
-          migration.add_import_warning(t('#migration.module_type', "Module"), mod[:title], $!)
+          migration.add_import_warning(t("#migration.module_type", "Module"), mod[:title], $!)
         end
       else
         # recursively find sub modules
-        (mod['items'] || []).each do |item|
-          next unless item['type'] == 'submodule'
+        (mod["items"] || []).each do |item|
+          next unless item["type"] == "submodule"
 
           process_module(item, migration)
         end
@@ -98,10 +98,10 @@ module Importers
     end
 
     def self.flatten_item(item, indent)
-      if item['type'] == 'submodule'
+      if item["type"] == "submodule"
         sub_items = []
-        sub_items << { type: 'heading', title: item['title'], indent: indent, migration_id: item['migration_id'] }.with_indifferent_access
-        sub_items += (item['items'] || []).map { |i| flatten_item(i, indent + 1) }
+        sub_items << { type: "heading", title: item["title"], indent: indent, migration_id: item["migration_id"] }.with_indifferent_access
+        sub_items += (item["items"] || []).map { |i| flatten_item(i, indent + 1) }
         sub_items
       else
         item[:indent] = (item[:indent] || 0) + indent
@@ -126,14 +126,14 @@ module Importers
         return # it's been deleted downstream, just leave it (and any imported items) alone and return
       end
 
-      if hash[:workflow_state] == 'unpublished'
-        item.workflow_state = 'unpublished' if item.new_record? || item.deleted? || migration.for_master_course_import? # otherwise leave it alone
+      if hash[:workflow_state] == "unpublished"
+        item.workflow_state = "unpublished" if item.new_record? || item.deleted? || migration.for_master_course_import? # otherwise leave it alone
       else
-        item.workflow_state = 'active'
+        item.workflow_state = "active"
       end
 
       position = (hash[:position] || hash[:order])&.to_i
-      if (item.new_record? || item.workflow_state_was == 'deleted') && migration.try(:last_module_position) # try to import new modules after current ones instead of interweaving positions
+      if (item.new_record? || item.workflow_state_was == "deleted") && migration.try(:last_module_position) # try to import new modules after current ones instead of interweaving positions
         position = migration.last_module_position + (position || 1)
       end
       item.position = position
@@ -219,7 +219,7 @@ module Importers
         if wiki
           item = context_module.add_item({
                                            title: wiki.title.presence || hash[:title] || hash[:linked_resource_title],
-                                           type: 'wiki_page',
+                                           type: "wiki_page",
                                            id: wiki.id,
                                            indent: hash[:indent].to_i
                                          }, existing_item, wiki_page: wiki, position: context_module.migration_position)
@@ -230,7 +230,7 @@ module Importers
           title = hash[:title] || hash[:linked_resource_title]
           item = context_module.add_item({
                                            title: title,
-                                           type: 'attachment',
+                                           type: "attachment",
                                            id: file.id,
                                            indent: hash[:indent].to_i
                                          }, existing_item, attachment: file, position: context_module.migration_position)
@@ -240,7 +240,7 @@ module Importers
         if ass
           item = context_module.add_item({
                                            title: ass.title.presence || hash[:title] || hash[:linked_resource_title],
-                                           type: 'assignment',
+                                           type: "assignment",
                                            id: ass.id,
                                            indent: hash[:indent].to_i
                                          }, existing_item, assignment: ass, position: context_module.migration_position)
@@ -249,7 +249,7 @@ module Importers
         # just a snippet of text
         item = context_module.add_item({
                                          title: hash[:title] || hash[:linked_resource_title],
-                                         type: 'context_module_sub_header',
+                                         type: "context_module_sub_header",
                                          indent: hash[:indent].to_i
                                        }, existing_item, position: context_module.migration_position)
       elsif /url/i.match?(hash[:linked_resource_type])
@@ -259,8 +259,8 @@ module Importers
             url = migration.process_domain_substitutions(url)
 
             item = context_module.add_item({
-                                             title: hash[:title] || hash[:linked_resource_title] || hash['description'],
-                                             type: 'external_url',
+                                             title: hash[:title] || hash[:linked_resource_title] || hash["description"],
+                                             type: "external_url",
                                              indent: hash[:indent].to_i,
                                              url: url
                                            }, existing_item, position: context_module.migration_position)
@@ -286,7 +286,7 @@ module Importers
         end
 
         if external_tool_url
-          title = hash[:title] || hash[:linked_resource_title] || hash['description']
+          title = hash[:title] || hash[:linked_resource_title] || hash["description"]
 
           external_tool_url = migration.process_domain_substitutions(external_tool_url)
           if external_tool_id.nil?
@@ -297,7 +297,7 @@ module Importers
 
           item = context_module.add_item({
                                            title: title,
-                                           type: 'context_external_tool',
+                                           type: "context_external_tool",
                                            indent: hash[:indent].to_i,
                                            url: external_tool_url,
                                            id: external_tool_id,
@@ -306,7 +306,7 @@ module Importers
           if item.associated_asset && item.associated_asset_id.nil?
             migration.add_warning(
               t(
-                'The External Tool resource link (including any possible custom ' \
+                "The External Tool resource link (including any possible custom " \
                 'parameters) could not be set for module item "%{title}"',
                 title: title
               )
@@ -318,7 +318,7 @@ module Importers
         if quiz
           item = context_module.add_item({
                                            title: quiz.title.presence || hash[:title] || hash[:linked_resource_title],
-                                           type: 'quiz',
+                                           type: "quiz",
                                            indent: hash[:indent].to_i,
                                            id: quiz.id
                                          }, existing_item, quiz: quiz, position: context_module.migration_position)
@@ -330,12 +330,12 @@ module Importers
         elsif topic
           item = context_module.add_item({
                                            title: topic.title.presence || hash[:title] || hash[:linked_resource_title],
-                                           type: 'discussion_topic',
+                                           type: "discussion_topic",
                                            indent: hash[:indent].to_i,
                                            id: topic.id
                                          }, existing_item, discussion_topic: topic, position: context_module.migration_position)
         end
-      elsif hash[:linked_resource_type] == 'UNSUPPORTED_TYPE'
+      elsif hash[:linked_resource_type] == "UNSUPPORTED_TYPE"
         # We know what this is and that we don't support it
       else
         nil # We don't know what this is
@@ -357,8 +357,8 @@ module Importers
         item.mark_as_importing!(migration)
         if hash[:workflow_state]
           if item.sync_workflow_state_to_asset?
-            item.workflow_state = item.asset_workflow_state if item.deleted? && hash[:workflow_state] != 'deleted'
-          elsif !['active', 'published'].include?(item.workflow_state) || migration.for_master_course_import?
+            item.workflow_state = item.asset_workflow_state if item.deleted? && hash[:workflow_state] != "deleted"
+          elsif !["active", "published"].include?(item.workflow_state) || migration.for_master_course_import?
             item.workflow_state = hash[:workflow_state]
           end
         end

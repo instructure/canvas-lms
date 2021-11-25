@@ -25,19 +25,19 @@ module CC::Importer::Canvas
     def convert_canvas_assignments
       assignments = convert_cc_assignments
 
-      @manifest.css('resource[type$=learning-application-resource]').each do |res|
+      @manifest.css("resource[type$=learning-application-resource]").each do |res|
         next unless (meta_path = res.at_css('file[href$="assignment_settings.xml"]'))
 
-        meta_path = @package_root.item_path meta_path['href']
-        html_path = @package_root.item_path res.at_css('file[href$="html"]')['href']
+        meta_path = @package_root.item_path meta_path["href"]
+        html_path = @package_root.item_path res.at_css('file[href$="html"]')["href"]
 
         meta_node = open_file_xml(meta_path)
         html_node = open_file(html_path)
 
-        mig_id = get_node_att(meta_node, 'assignment', 'identifier') || meta_node['identifier']
-        assignment = assignments.detect { |a| a['migration_id'] && a['migration_id'] == mig_id }
+        mig_id = get_node_att(meta_node, "assignment", "identifier") || meta_node["identifier"]
+        assignment = assignments.detect { |a| a["migration_id"] && a["migration_id"] == mig_id }
         unless assignment
-          assignment = { 'migration_id' => mig_id }.with_indifferent_access
+          assignment = { "migration_id" => mig_id }.with_indifferent_access
           assignments << assignment
         end
 

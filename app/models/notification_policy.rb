@@ -55,7 +55,7 @@ class NotificationPolicy < ActiveRecord::Base
     # If have user preference settings and this is a root account, check further to see if settings can be changed
     if user_prefs && params[:root_account]
       user_prefs.each_pair do |key, value|
-        bool_val = (value == 'true')
+        bool_val = (value == "true")
         # save the preference as a symbol (convert from string)
         case key.to_sym
         when :send_scores_in_emails
@@ -72,7 +72,7 @@ class NotificationPolicy < ActiveRecord::Base
       # User preference change not being made. Make a notification policy change.
 
       # Using the category name, fetch all Notifications for the category. Will set the desired value on them.
-      notifications = Notification.all_cached.select { |n| (n.category&.underscore&.gsub(/\s/, '_')) == params[:category] }.map(&:id)
+      notifications = Notification.all_cached.select { |n| (n.category&.underscore&.gsub(/\s/, "_")) == params[:category] }.map(&:id)
       frequency = params[:frequency]
       cc = user.communication_channels.find(params[:channel_id])
 
@@ -130,7 +130,7 @@ class NotificationPolicy < ActiveRecord::Base
   # and/or updates it
   def self.find_or_update_for(communication_channel, notification_name, frequency = nil)
     # Titlize changes SMS to Sms :sadlol:
-    notification_name = notification_name.titleize unless notification_name == 'Confirm SMS Communication Channel'
+    notification_name = notification_name.titleize unless notification_name == "Confirm SMS Communication Channel"
     notification = BroadcastPolicy.notification_finder.by_name(notification_name)
     raise ActiveRecord::RecordNotFound unless notification
 
@@ -142,7 +142,7 @@ class NotificationPolicy < ActiveRecord::Base
           frequency ||= if communication_channel == communication_channel.user.communication_channel
                           notification.default_frequency(communication_channel.user)
                         else
-                          'never'
+                          "never"
                         end
 
         end
@@ -177,7 +177,7 @@ class NotificationPolicy < ActiveRecord::Base
                          elsif communication_channel == communication_channel.user.communication_channel
                            notification.default_frequency(communication_channel.user)
                          else
-                           'never'
+                           "never"
                          end
           np.save!
         rescue ActiveRecord::RecordNotUnique
@@ -187,7 +187,7 @@ class NotificationPolicy < ActiveRecord::Base
         np ||= communication_channel.notification_policies.where(notification_id: notification).first
         policies << np
       end
-      policies = policies.select { |np| np.notification&.is_course_type? } if context_type == 'Course'
+      policies = policies.select { |np| np.notification&.is_course_type? } if context_type == "Course"
       policies
     end
   end

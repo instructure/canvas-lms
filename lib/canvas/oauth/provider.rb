@@ -19,7 +19,7 @@
 
 module Canvas::OAuth
   class Provider
-    OAUTH2_OOB_URI = 'urn:ietf:wg:oauth:2.0:oob'
+    OAUTH2_OOB_URI = "urn:ietf:wg:oauth:2.0:oob"
 
     attr_reader :client_id, :scopes, :purpose
 
@@ -136,7 +136,7 @@ module Canvas::OAuth
       if is_oob?(redirect_uri)
         controller.oauth2_auth_url(opts)
       else
-        has_params = redirect_uri.include?('?')
+        has_params = redirect_uri.include?("?")
         redirect_uri + (has_params ? "&" : "?") + opts.to_query
       end
     end
@@ -144,7 +144,7 @@ module Canvas::OAuth
     private
 
     def default_app_name
-      I18n.t('pseudonym_sessions.default_app_name', 'Third-Party Application')
+      I18n.t("pseudonym_sessions.default_app_name", "Third-Party Application")
     end
   end
 end

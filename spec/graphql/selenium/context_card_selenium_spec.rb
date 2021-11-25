@@ -17,14 +17,14 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../../selenium/common'
+require_relative "../../selenium/common"
 
 describe "graphql student context cards" do
   include_context "in-process server selenium tests"
 
   def add_enrollment(enrollment_state, section)
     enrollment = student_in_course(workflow_state: enrollment_state, course_section: section)
-    enrollment.accept! if ['active', 'completed'].include? enrollment_state
+    enrollment.accept! if ["active", "completed"].include? enrollment_state
   end
 
   def grade_assignment(course, student, grader)
@@ -39,11 +39,11 @@ describe "graphql student context cards" do
     @ass.grade_student(student, grade: 5, grader: grader)
   end
 
-  context 'with graphql enabled as a teacher' do
+  context "with graphql enabled as a teacher" do
     before do
       course_with_teacher_logged_in
       @section = @course.default_section
-      add_enrollment('active', @section)
+      add_enrollment("active", @section)
       grade_assignment(@course, @student, @teacher)
     end
 
@@ -78,11 +78,11 @@ describe "graphql student context cards" do
     end
   end
 
-  context 'with graphql enabled as an admin' do
+  context "with graphql enabled as an admin" do
     before do
       course_with_admin_logged_in
       @section = @course.default_section
-      add_enrollment('active', @section)
+      add_enrollment("active", @section)
       grade_assignment(@course, @student, @admin)
     end
 

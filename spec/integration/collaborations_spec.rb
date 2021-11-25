@@ -18,11 +18,11 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'nokogiri'
+require "nokogiri"
 
 describe CollaborationsController, type: :request do
-  it 'properly links to the user who posted the collaboration' do
-    PluginSetting.create!(name: 'etherpad', settings: {})
+  it "properly links to the user who posted the collaboration" do
+    PluginSetting.create!(name: "etherpad", settings: {})
     course_with_teacher_logged_in active_all: true, name: "teacher 1"
 
     UserService.register(

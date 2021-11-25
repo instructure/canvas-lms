@@ -19,7 +19,7 @@
 #
 
 # It seems like it sometimes gets confused and misses the table prefix without this...
-require_dependency 'microsoft_sync'
+require_dependency "microsoft_sync"
 
 #
 # MicrosoftSync contains models used to sync course enrollments to Microsoft
@@ -53,11 +53,11 @@ class MicrosoftSync::Group < ActiveRecord::Base
   ].freeze
 
   belongs_to :course
-  belongs_to :last_error_report, class_name: 'ErrorReport'
+  belongs_to :last_error_report, class_name: "ErrorReport"
   validates :course, presence: true
   validates :course_id, uniqueness: true
 
-  scope :not_deleted, -> { where.not(workflow_state: 'deleted') }
+  scope :not_deleted, -> { where.not(workflow_state: "deleted") }
 
   workflow do
     state :pending # Initial state, before first sync
@@ -75,14 +75,14 @@ class MicrosoftSync::Group < ActiveRecord::Base
   resolves_root_account through: :course
 
   def self.manual_sync_cooldown
-    Setting.get('msft_sync.manual_sync_cooldown', 90.minutes.to_s).to_i
+    Setting.get("msft_sync.manual_sync_cooldown", 90.minutes.to_s).to_i
   end
 
   alias_method :destroy_permanently!, :destroy
   def destroy
     return true if deleted?
 
-    self.workflow_state = 'deleted'
+    self.workflow_state = "deleted"
     run_callbacks(:destroy) { save! }
   end
 
@@ -90,7 +90,7 @@ class MicrosoftSync::Group < ActiveRecord::Base
     return unless deleted?
 
     update!(
-      workflow_state: 'pending',
+      workflow_state: "pending",
       job_state: { restored: true },
       last_error: nil
     )
@@ -105,11 +105,11 @@ class MicrosoftSync::Group < ActiveRecord::Base
   # Returns true if the record was updated (i.e. record exists and is not deleted).
   def update_unless_deleted(attrs = {})
     records_updated = self.class
-                          .where(id: id).where.not(workflow_state: 'deleted').update_all(attrs)
+                          .where(id: id).where.not(workflow_state: "deleted").update_all(attrs)
     if records_updated == 0
       # It could actually be that the record was hard-deleted and not
       # workflow_state=deleted, but whatever
-      self.workflow_state = 'deleted'
+      self.workflow_state = "deleted"
       false
     else
       assign_attributes(attrs)
@@ -126,7 +126,7 @@ class MicrosoftSync::Group < ActiveRecord::Base
 
     syncer_job.delay(
       singleton: "#{self.class.name}:#{global_id}:enqueue_future_sync",
-      run_at: Setting.get('microsoft_group_enrollments_syncing_debounce_minutes', '10')
+      run_at: Setting.get("microsoft_group_enrollments_syncing_debounce_minutes", "10")
               .to_i.minutes.from_now,
       on_conflict: :overwrite
     ).run_later
@@ -139,7 +139,7 @@ class MicrosoftSync::Group < ActiveRecord::Base
 
     syncer_job.delay(
       singleton: "#{self.class.name}:#{global_id}:enqueue_future_partial_sync",
-      run_at: Setting.get('microsoft_group_enrollments_partial_syncing_debounce_minutes', '10')
+      run_at: Setting.get("microsoft_group_enrollments_partial_syncing_debounce_minutes", "10")
               .to_f.minutes.from_now,
       on_conflict: :overwrite
     ).run_later(:partial)

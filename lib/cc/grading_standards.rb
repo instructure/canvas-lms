@@ -26,7 +26,7 @@ module CC
                     (assignment.discussion_topic && export_object?(assignment.discussion_topic))
 
         gs = assignment.grading_standard
-        add_item_to_export(gs) if gs && gs.context_type == 'Course' && gs.context_id == @course.id
+        add_item_to_export(gs) if gs && gs.context_type == "Course" && gs.context_id == @course.id
       end
     end
 
@@ -39,7 +39,7 @@ module CC
         standards_file = nil
         rel_path = nil
       else
-        standards_file = File.new(File.join(@canvas_resource_dir, CCHelper::GRADING_STANDARDS), 'w')
+        standards_file = File.new(File.join(@canvas_resource_dir, CCHelper::GRADING_STANDARDS), "w")
         rel_path = File.join(CCHelper::COURSE_SETTINGS_DIR, CCHelper::GRADING_STANDARDS)
         document = Builder::XmlMarkup.new(target: standards_file, indent: 2)
       end

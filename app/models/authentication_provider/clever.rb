@@ -44,17 +44,17 @@ class AuthenticationProvider::Clever < AuthenticationProvider::OAuth2
   alias_attribute :district_id, :auth_filter
 
   def login_attribute
-    super || 'id'
+    super || "id"
   end
 
   def unique_id(token)
     data = me(token)
 
-    if district_id.present? && data['district'] != district_id
+    if district_id.present? && data["district"] != district_id
       # didn't make a "nice" exception for this, cause it should never happen.
       # either we got MITM'ed (on the server side), or Clever's docs lied;
       # this check is just an extra precaution
-      raise "Non-matching district: #{data['district'].inspect}"
+      raise "Non-matching district: #{data["district"].inspect}"
     end
 
     data[login_attribute]
@@ -69,21 +69,21 @@ class AuthenticationProvider::Clever < AuthenticationProvider::OAuth2
   def me(token)
     token.options[:me] ||= begin
       raw_data = token.get("/v2.1/me").parsed
-      data = raw_data['data'].dup
-      data = data.merge(token.get("/v2.1/#{raw_data['type']}s/#{data['id']}").parsed['data'])
-      data['first_name'] = data.dig('name', 'first')
-      data['last_name'] = data.dig('name', 'last')
-      data['district_username'] = data.dig('credentials', 'district_username')
-      data.slice!(*(self.class.recognized_federated_attributes + ['district']))
+      data = raw_data["data"].dup
+      data = data.merge(token.get("/v2.1/#{raw_data["type"]}s/#{data["id"]}").parsed["data"])
+      data["first_name"] = data.dig("name", "first")
+      data["last_name"] = data.dig("name", "last")
+      data["district_username"] = data.dig("credentials", "district_username")
+      data.slice!(*(self.class.recognized_federated_attributes + ["district"]))
       data
     end
   end
 
   def client_options
     {
-      site: 'https://api.clever.com',
-      authorize_url: 'https://clever.com/oauth/authorize',
-      token_url: 'https://clever.com/oauth/tokens',
+      site: "https://api.clever.com",
+      authorize_url: "https://clever.com/oauth/authorize",
+      token_url: "https://clever.com/oauth/tokens",
       auth_scheme: :basic_auth,
     }
   end
@@ -95,6 +95,6 @@ class AuthenticationProvider::Clever < AuthenticationProvider::OAuth2
   end
 
   def scope
-    'read:user_id'
+    "read:user_id"
   end
 end

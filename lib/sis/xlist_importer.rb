@@ -74,7 +74,7 @@ module SIS
             @course.restrict_enrollments_to_course_dates = section.course.restrict_enrollments_to_course_dates
             @course.sis_source_id = xlist_course_id
             @course.sis_batch_id = @batch.id
-            @course.workflow_state = 'claimed'
+            @course.workflow_state = "claimed"
             @course.template_course = section.course
             @course.save_without_broadcasting!
             @course_ids_to_update_associations.add @course.id
@@ -86,7 +86,7 @@ module SIS
           when /\Aactive\z/i
 
             if @course.deleted?
-              @course.workflow_state = 'claimed'
+              @course.workflow_state = "claimed"
               @course.save_without_broadcasting!
               @course.update_enrolled_users
               @course_ids_to_update_associations.add @course.id

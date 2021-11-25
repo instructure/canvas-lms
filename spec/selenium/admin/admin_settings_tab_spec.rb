@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../common'
+require_relative "../common"
 
 describe "admin settings tab" do
   include_context "in-process server selenium tests"
@@ -128,8 +128,8 @@ describe "admin settings tab" do
     end
 
     describe "allow self-enrollment" do
-      def enrollment_helper(value = '')
-        if value == ''
+      def enrollment_helper(value = "")
+        if value == ""
           f("#account_settings_self_enrollment option[value='']").click
         else
           f("#account_settings_self_enrollment option[value=#{value}]").click
@@ -165,16 +165,16 @@ describe "admin settings tab" do
     end
 
     it "sets trusted referers for account" do
-      trusted_referers = 'https://example.com,http://example.com'
+      trusted_referers = "https://example.com,http://example.com"
       set_value f("#account_settings_trusted_referers"), trusted_referers
       click_submit
       expect(Account.default[:settings][:trusted_referers]).to eq trusted_referers
       expect(f("#account_settings_trusted_referers")).to have_value trusted_referers
 
-      set_value f("#account_settings_trusted_referers"), ''
+      set_value f("#account_settings_trusted_referers"), ""
       click_submit
       expect(Account.default[:settings][:trusted_referers]).to be_nil
-      expect(f("#account_settings_trusted_referers")).to have_value ''
+      expect(f("#account_settings_trusted_referers")).to have_value ""
     end
   end
 
@@ -380,13 +380,13 @@ describe "admin settings tab" do
 
   context "custom help links" do
     def set_checkbox(checkbox, checked)
-      selector = "##{checkbox['id']}"
+      selector = "##{checkbox["id"]}"
       checkbox.click if is_checked(selector) != checked
     end
 
     it "sets custom help link text and icon" do
-      link_name = 'Links'
-      icon = 'cog'
+      link_name = "Links"
+      icon = "cog"
       help_link_name_input = '[name="account[settings][help_link_name]"]'
       help_link_icon_option = '[data-icon-value="cog"]'
 
@@ -434,8 +434,8 @@ describe "admin settings tab" do
 
       get "/accounts/#{Account.default.id}/settings"
 
-      top = f('#custom_help_link_settings .ic-Sortable-item')
-      top.find_elements(:css, 'button').last.click
+      top = f("#custom_help_link_settings .ic-Sortable-item")
+      top.find_elements(:css, "button").last.click
       wait_for_ajaximations
 
       click_submit
@@ -449,17 +449,17 @@ describe "admin settings tab" do
     it "adds a custom link" do
       Account.site_admin.enable_feature! :featured_help_links
       get "/accounts/#{Account.default.id}/settings"
-      f('.HelpMenuOptions__Container button').click
+      f(".HelpMenuOptions__Container button").click
       fj('[role="menuitemradio"] span:contains("Add Custom Link")').click
-      replace_content fj('#custom_help_link_settings input[name$="[text]"]:visible'), 'text'
-      replace_content fj('#custom_help_link_settings textarea[name$="[subtext]"]:visible'), 'subtext'
-      replace_content fj('#custom_help_link_settings input[name$="[url]"]:visible'), 'https://url.example.com'
+      replace_content fj('#custom_help_link_settings input[name$="[text]"]:visible'), "text"
+      replace_content fj('#custom_help_link_settings textarea[name$="[subtext]"]:visible'), "subtext"
+      replace_content fj('#custom_help_link_settings input[name$="[url]"]:visible'), "https://url.example.com"
       fj('#custom_help_link_settings fieldset .ic-Label:contains("Featured"):visible').click
       f('#custom_help_link_settings button[type="submit"]').click
-      expect(fj('.ic-Sortable-item:first .ic-Sortable-item__Text')).to include_text('text')
-      form = f('#account_settings')
+      expect(fj(".ic-Sortable-item:first .ic-Sortable-item__Text")).to include_text("text")
+      form = f("#account_settings")
       form.submit
-      cl = Account.default.help_links.detect { |hl| hl['url'] == 'https://url.example.com' }
+      cl = Account.default.help_links.detect { |hl| hl["url"] == "https://url.example.com" }
       expect(cl).to include(
         {
           "text" => "text",
@@ -476,16 +476,16 @@ describe "admin settings tab" do
     it "adds a custom link with New designation" do
       Account.site_admin.enable_feature! :featured_help_links
       get "/accounts/#{Account.default.id}/settings"
-      f('.HelpMenuOptions__Container button').click
+      f(".HelpMenuOptions__Container button").click
       fj('[role="menuitemradio"] span:contains("Add Custom Link")').click
-      replace_content fj('#custom_help_link_settings input[name$="[text]"]:visible'), 'text'
-      replace_content fj('#custom_help_link_settings textarea[name$="[subtext]"]:visible'), 'subtext'
-      replace_content fj('#custom_help_link_settings input[name$="[url]"]:visible'), 'https://newurl.example.com'
+      replace_content fj('#custom_help_link_settings input[name$="[text]"]:visible'), "text"
+      replace_content fj('#custom_help_link_settings textarea[name$="[subtext]"]:visible'), "subtext"
+      replace_content fj('#custom_help_link_settings input[name$="[url]"]:visible'), "https://newurl.example.com"
       fj('#custom_help_link_settings fieldset .ic-Label:contains("New"):visible').click
       f('#custom_help_link_settings button[type="submit"]').click
-      form = f('#account_settings')
+      form = f("#account_settings")
       form.submit
-      cl = Account.default.help_links.detect { |hl| hl['url'] == 'https://newurl.example.com' }
+      cl = Account.default.help_links.detect { |hl| hl["url"] == "https://newurl.example.com" }
       expect(cl).to include(
         {
           "is_featured" => false,
@@ -499,40 +499,40 @@ describe "admin settings tab" do
       a.settings[:custom_help_links] = [{ "text" => "custom-link-text-frd", "subtext" => "subtext", "url" => "https://url.example.com", "type" => "custom", "available_to" => %w[user student teacher admin] }]
       a.save!
       get "/accounts/#{Account.default.id}/settings"
-      fj('#custom_help_link_settings span:contains("Edit custom-link-text-frd")').find_element(:xpath, '..').click
-      replace_content fj('#custom_help_link_settings input[name$="[url]"]:visible'), 'https://whatever.example.com'
+      fj('#custom_help_link_settings span:contains("Edit custom-link-text-frd")').find_element(:xpath, "..").click
+      replace_content fj('#custom_help_link_settings input[name$="[url]"]:visible'), "https://whatever.example.com"
       f('#custom_help_link_settings button[type="submit"]').click
-      expect(fj('.ic-Sortable-item:last .ic-Sortable-item__Text')).to include_text('custom-link-text-frd')
-      form = f('#account_settings')
+      expect(fj(".ic-Sortable-item:last .ic-Sortable-item__Text")).to include_text("custom-link-text-frd")
+      form = f("#account_settings")
       form.submit
-      cl = Account.default.help_links.detect { |hl| hl['url'] == 'https://whatever.example.com' }
+      cl = Account.default.help_links.detect { |hl| hl["url"] == "https://whatever.example.com" }
       expect(cl).not_to be_blank
     end
 
     it "edits a default link" do
-      Setting.set('show_feedback_link', 'true')
+      Setting.set("show_feedback_link", "true")
 
       get "/accounts/#{Account.default.id}/settings"
-      fj('#custom_help_link_settings span:contains("Edit Report a Problem")').find_element(:xpath, '..').click
+      fj('#custom_help_link_settings span:contains("Edit Report a Problem")').find_element(:xpath, "..").click
       url = fj('#custom_help_link_settings input[name$="[url]"]:visible')
       expect(url).to be_disabled
       fj('#custom_help_link_settings fieldset .ic-Label:contains("Teachers"):visible').click
       f('#custom_help_link_settings button[type="submit"]').click
-      expect(f('.ic-Sortable-item:nth-of-type(3) .ic-Sortable-item__Text')).to include_text('Report a Problem')
-      form = f('#account_settings')
+      expect(f(".ic-Sortable-item:nth-of-type(3) .ic-Sortable-item__Text")).to include_text("Report a Problem")
+      form = f("#account_settings")
       form.submit
-      cl = Account.default.help_links.detect { |hl| hl['url'] == '#create_ticket' }
-      expect(cl['available_to']).not_to include('teacher')
+      cl = Account.default.help_links.detect { |hl| hl["url"] == "#create_ticket" }
+      expect(cl["available_to"]).not_to include("teacher")
     end
   end
 
   context "external integration keys" do
-    let!(:key_value) { '42' }
+    let!(:key_value) { "42" }
 
     before(:once) do
-      ExternalIntegrationKey.key_type :external_key0, label: 'External Key 0', rights: { read: proc { true }, write: true }
-      ExternalIntegrationKey.key_type :external_key1, label: proc { 'External Key 1' }, rights: { read: true, write: false }
-      ExternalIntegrationKey.key_type :external_key2, label: 'External Key 2', rights: { read: proc { false }, write: false }
+      ExternalIntegrationKey.key_type :external_key0, label: "External Key 0", rights: { read: proc { true }, write: true }
+      ExternalIntegrationKey.key_type :external_key1, label: proc { "External Key 1" }, rights: { read: true, write: false }
+      ExternalIntegrationKey.key_type :external_key2, label: "External Key 2", rights: { read: proc { false }, write: false }
     end
 
     it "does not display external integration keys if no key types exist" do
@@ -552,20 +552,20 @@ describe "admin settings tab" do
 
       eik = ExternalIntegrationKey.new
       eik.context = Account.default
-      eik.key_type = 'external_key0'
+      eik.key_type = "external_key0"
       eik.key_value = key_value
       eik.save
 
       eik = ExternalIntegrationKey.new
       eik.context = Account.default
-      eik.key_type = 'external_key1'
+      eik.key_type = "external_key1"
       eik.key_value = key_value
       eik.save
 
       get "/accounts/#{Account.default.id}/settings"
 
-      expect(f("label[for='account_external_integration_keys_external_key0']").text).to eq 'External Key 0:'
-      expect(f("label[for='account_external_integration_keys_external_key1']").text).to eq 'External Key 1:'
+      expect(f("label[for='account_external_integration_keys_external_key0']").text).to eq "External Key 0:"
+      expect(f("label[for='account_external_integration_keys_external_key1']").text).to eq "External Key 1:"
       expect(f("#account_settings")).not_to contain_css("label[for='account_external_integration_keys_external_key2']")
 
       expect(f("#account_external_integration_keys_external_key0")).to have_value key_value
@@ -581,10 +581,10 @@ describe "admin settings tab" do
 
       expect(f("#account_external_integration_keys_external_key0")).to have_value key_value
 
-      set_value f("#account_external_integration_keys_external_key0"), ''
+      set_value f("#account_external_integration_keys_external_key0"), ""
       click_submit
 
-      expect(f("#account_external_integration_keys_external_key0")).to have_value ''
+      expect(f("#account_external_integration_keys_external_key0")).to have_value ""
     end
   end
 

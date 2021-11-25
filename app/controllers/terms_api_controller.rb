@@ -137,11 +137,11 @@ class TermsApiController < ApplicationController
   #
   # @returns EnrollmentTermsList
   def index
-    terms = @context.enrollment_terms.order('start_at DESC, end_at DESC, id ASC')
+    terms = @context.enrollment_terms.order("start_at DESC, end_at DESC, id ASC")
 
     state = Array(params[:workflow_state]) & %w[all active deleted]
-    state = 'active' if state == []
-    state = nil if Array(state).include?('all')
+    state = "active" if state == []
+    state = nil if Array(state).include?("all")
     terms = terms.where(workflow_state: state) if state.present?
 
     terms = Api.paginate(terms, self, api_v1_enrollment_terms_url)
@@ -166,7 +166,7 @@ class TermsApiController < ApplicationController
 
   def require_root_account
     unless @context.root_account?
-      render json: { message: 'Terms only belong to root_accounts.' }, status: :bad_request
+      render json: { message: "Terms only belong to root_accounts." }, status: :bad_request
       false
     end
   end

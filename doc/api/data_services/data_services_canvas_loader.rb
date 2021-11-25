@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 class DataServicesCanvasLoader
-  JSON_BASE_PATH = 'doc/api/data_services/json/canvas'
+  JSON_BASE_PATH = "doc/api/data_services/json/canvas"
 
   def self.data
     @@data ||= DataServicesEventsLoader.new(JSON_BASE_PATH).data

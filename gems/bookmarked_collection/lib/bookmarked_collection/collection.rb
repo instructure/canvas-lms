@@ -87,7 +87,7 @@ class BookmarkedCollection::Collection < Array
       nil
     elsif page.is_a?(String) && page =~ /^bookmark:/
       begin
-        ::JSONToken.decode(page.gsub(/^bookmark:/, ''))
+        ::JSONToken.decode(page.gsub(/^bookmark:/, ""))
       rescue
         # bookmark value could not be decoded
         nil

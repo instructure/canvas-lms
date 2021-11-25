@@ -22,8 +22,8 @@ module Api::V1
     BASE_ATTRIBUTES = %w[id name course_code account_id created_at start_at default_view enrollment_term_id is_public
                          grading_standard_id root_account_id uuid license grade_passback_setting].freeze
 
-    INCLUDE_CHECKERS = { grading: 'needs_grading_count', syllabus: 'syllabus_body',
-                         url: 'html_url', description: 'public_description', permissions: 'permissions' }.freeze
+    INCLUDE_CHECKERS = { grading: "needs_grading_count", syllabus: "syllabus_body",
+                         url: "html_url", description: "public_description", permissions: "permissions" }.freeze
 
     OPTIONAL_FIELDS = %w[needs_grading_count public_description enrollments].freeze
 
@@ -48,29 +48,29 @@ module Api::V1
 
     def methods_to_send
       methods = %w[end_at public_syllabus public_syllabus_to_auth storage_quota_mb is_public_to_auth_users homeroom_course course_color friendly_name]
-      methods << 'hide_final_grades' if @includes.include?(:hide_final_grades)
-      methods << 'storage_quota_used_mb' if @includes.include?(:storage_quota_used_mb)
-      methods << 'account_name' if @includes.include?(:account_name)
+      methods << "hide_final_grades" if @includes.include?(:hide_final_grades)
+      methods << "storage_quota_used_mb" if @includes.include?(:storage_quota_used_mb)
+      methods << "account_name" if @includes.include?(:account_name)
       methods
     end
 
     def to_hash
       set_sis_course_id(@hash)
       set_integration_id(@hash)
-      @hash['enrollments'] = extract_enrollments(@enrollments)
-      @hash['needs_grading_count'] = needs_grading_count(@enrollments, @course)
-      @hash['public_description'] = description(@course)
-      @hash['hide_final_grades'] = @course.hide_final_grades?
-      @hash['workflow_state'] = @course.api_state
-      @hash['course_format'] = @course.course_format if @course.course_format.present?
-      @hash['restrict_enrollments_to_course_dates'] = !!@course.restrict_enrollments_to_course_dates
+      @hash["enrollments"] = extract_enrollments(@enrollments)
+      @hash["needs_grading_count"] = needs_grading_count(@enrollments, @course)
+      @hash["public_description"] = description(@course)
+      @hash["hide_final_grades"] = @course.hide_final_grades?
+      @hash["workflow_state"] = @course.api_state
+      @hash["course_format"] = @course.course_format if @course.course_format.present?
+      @hash["restrict_enrollments_to_course_dates"] = !!@course.restrict_enrollments_to_course_dates
       if (visibility = @course.overridden_course_visibility)
-        @hash['overridden_course_visibility'] = visibility
+        @hash["overridden_course_visibility"] = visibility
       end
       if @includes.include?(:current_grading_period_scores)
-        @hash['has_grading_periods'] = @course.grading_periods?
-        @hash['multiple_grading_periods_enabled'] = @hash['has_grading_periods'] # for backwards compatibility
-        @hash['has_weighted_grading_periods'] = @course.weighted_grading_periods?
+        @hash["has_grading_periods"] = @course.grading_periods?
+        @hash["multiple_grading_periods_enabled"] = @hash["has_grading_periods"] # for backwards compatibility
+        @hash["has_weighted_grading_periods"] = @course.weighted_grading_periods?
       end
       clear_unneeded_fields(@hash)
     end
@@ -99,16 +99,16 @@ module Api::V1
 
     def set_sis_course_id(hash)
       if has_permission?(:read_sis, :manage_sis)
-        hash['sis_course_id'] = @course.sis_source_id
+        hash["sis_course_id"] = @course.sis_source_id
       end
       if has_permission?(:manage_sis)
-        hash['sis_import_id'] = @course.sis_batch_id
+        hash["sis_import_id"] = @course.sis_batch_id
       end
     end
 
     def set_integration_id(hash)
       if has_permission?(:read_sis, :manage_sis)
-        hash['integration_id'] = @course.integration_id
+        hash["integration_id"] = @course.integration_id
       end
     end
 

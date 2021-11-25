@@ -69,9 +69,9 @@ class Loaders::DiscussionEntryCountsLoader < GraphQL::Batch::Loader
   def object_id_string(object)
     case object
     when DiscussionTopic
-      'discussion_topic_id'
+      "discussion_topic_id"
     when DiscussionEntry
-      'root_entry_id'
+      "root_entry_id"
     end
   end
 end

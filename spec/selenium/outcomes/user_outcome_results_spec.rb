@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../helpers/outcome_common'
+require_relative "../helpers/outcome_common"
 
 describe "user outcome results page as a teacher" do
   include_context "in-process server selenium tests"
@@ -36,7 +36,7 @@ describe "user outcome results page as a teacher" do
   end
 
   it "toggles show all artifacts after clicking button" do
-    btn = f('#show_all_artifacts_link')
+    btn = f("#show_all_artifacts_link")
     expect(btn.text).to eq "Show All Artifacts"
     btn.click
     expect(btn.text).to eq "Hide All Artifacts"

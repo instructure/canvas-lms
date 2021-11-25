@@ -90,9 +90,9 @@ class SubmissionSearch
       when "excused"
         search_scope = search_scope.where(excused: true)
       when "needs_review"
-        search_scope = search_scope.where(workflow_state: 'pending_review')
+        search_scope = search_scope.where(workflow_state: "pending_review")
       when "graded"
-        search_scope = search_scope.where(workflow_state: 'graded')
+        search_scope = search_scope.where(workflow_state: "graded")
       end
     end
 
@@ -106,12 +106,12 @@ class SubmissionSearch
       direction = order_field_direction[:direction] == "descending" ? "DESC NULLS LAST" : "ASC"
       search_scope =
         case field
-        when 'username'
-          order_clause = User.sortable_name_order_by_clause('users')
+        when "username"
+          order_clause = User.sortable_name_order_by_clause("users")
           search_scope.joins(:user).order(Arel.sql("#{order_clause} #{direction}"))
-        when 'score'
+        when "score"
           search_scope.order(Arel.sql("submissions.score #{direction}"))
-        when 'submitted_at'
+        when "submitted_at"
           search_scope.order(Arel.sql("submissions.submitted_at #{direction}"))
         else
           raise "submission search field '#{field}' is not supported"

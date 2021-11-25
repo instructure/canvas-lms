@@ -17,8 +17,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../common'
-require_relative 'page_objects/assignment_create_edit_page'
+require_relative "../common"
+require_relative "page_objects/assignment_create_edit_page"
 
 describe "moderated grading assignments" do
   include_context "in-process server selenium tests"
@@ -27,10 +27,10 @@ describe "moderated grading assignments" do
     Account.default.enable_feature!(:moderated_grading)
     @course = course_model
     @course.offer!
-    @assignment = @course.assignments.create!(submission_types: 'online_text_entry', title: 'Test Assignment')
+    @assignment = @course.assignments.create!(submission_types: "online_text_entry", title: "Test Assignment")
     @assignment.update_attribute :moderated_grading, true
     @assignment.update_attribute :grader_count, 2
-    @assignment.update_attribute :workflow_state, 'published'
+    @assignment.update_attribute :workflow_state, "published"
     @student = User.create!
     @course.enroll_student(@student)
     @user = User.create!
@@ -43,8 +43,8 @@ describe "moderated grading assignments" do
       Account.default.enable_feature!(:anonymous_marking)
       Account.default.enable_feature!(:moderated_grading)
       @moderated_assignment = @course.assignments.create!(
-        title: 'Moderated Assignment',
-        submission_types: 'online_text_entry',
+        title: "Moderated Assignment",
+        submission_types: "online_text_entry",
         points_possible: 10
       )
 
@@ -55,7 +55,7 @@ describe "moderated grading assignments" do
       @course.enroll_teacher(
         @teacher_two,
         section: @section2,
-        enrollment_state: 'active'
+        enrollment_state: "active"
       )
 
       # visit assignment edit page as first teacher
@@ -89,18 +89,18 @@ describe "moderated grading assignments" do
       @teacher_two = user_factory(active_all: true)
       @course.enroll_teacher(
         @teacher_two,
-        enrollment_state: 'active'
+        enrollment_state: "active"
       )
       @teacher_three = user_factory(active_all: true)
       @course.enroll_teacher(
         @teacher_three,
-        enrollment_state: 'active'
+        enrollment_state: "active"
       )
 
       # assign a moderator (teacher 2)
       @moderated_assignment = @course.assignments.create!(
-        title: 'Moderated Assignment',
-        submission_types: 'online_text_entry',
+        title: "Moderated Assignment",
+        submission_types: "online_text_entry",
         grader_count: 2,
         final_grader: @teacher_two,
         moderated_grading: true,

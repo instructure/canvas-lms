@@ -18,71 +18,71 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative 'report_spec_helper'
+require_relative "report_spec_helper"
 
-describe 'Eportfolio Reports' do
+describe "Eportfolio Reports" do
   include ReportSpecHelper
 
   before(:once) do
-    @type = 'eportfolio_report_csv'
+    @type = "eportfolio_report_csv"
     @account1 = Account.default
-    @account2 = Account.create(name: 'Root Account 2')
-    @sub_account = Account.create(parent_account: @account1, name: 'Sub Account')
-    user_with_pseudonym1 = user_with_pseudonym(account: @account2, active_user: true, sis_user_id: 'user1_eportfolio_sis_id')
+    @account2 = Account.create(name: "Root Account 2")
+    @sub_account = Account.create(parent_account: @account1, name: "Sub Account")
+    user_with_pseudonym1 = user_with_pseudonym(account: @account2, active_user: true, sis_user_id: "user1_eportfolio_sis_id")
     user_with_pseudonym2 = user_with_pseudonym(active_user: true)
     user_with_enrollment = course_with_student(active_all: true).user
     pseudonym(user_with_enrollment, account: @account1)
-    @eportfolio = Eportfolio.create!(user: user_with_pseudonym2, name: 'some spammy title')
-    Eportfolio.create!(user: user_with_enrollment, name: 'My ePortfolio')
-    Eportfolio.create!(user: user_with_pseudonym1, name: 'Root Account 2 ePortfolio')
+    @eportfolio = Eportfolio.create!(user: user_with_pseudonym2, name: "some spammy title")
+    Eportfolio.create!(user: user_with_enrollment, name: "My ePortfolio")
+    Eportfolio.create!(user: user_with_pseudonym1, name: "Root Account 2 ePortfolio")
   end
 
-  it 'is scoped to proper root account' do
+  it "is scoped to proper root account" do
     parsed = read_report(@type, { order: 1, account: @account2 })
     expect(parsed.length).to eq 1
   end
 
-  it 'includes login info' do
+  it "includes login info" do
     parsed = read_report(@type, { order: 1, account: @account2 })
-    expect(parsed.first).to include('user1_eportfolio_sis_id')
+    expect(parsed.first).to include("user1_eportfolio_sis_id")
   end
 
-  it 'does not raise error when login is deleted' do
-    Pseudonym.where(sis_user_id: 'user1_eportfolio_sis_id').update_all(workflow_state: 'deleted')
+  it "does not raise error when login is deleted" do
+    Pseudonym.where(sis_user_id: "user1_eportfolio_sis_id").update_all(workflow_state: "deleted")
     parsed = read_report(@type, { order: 1, account: @account2 })
-    expect(parsed.first).to include('user1_eportfolio_sis_id')
+    expect(parsed.first).to include("user1_eportfolio_sis_id")
   end
 
-  it 'runs on a sub account' do
+  it "runs on a sub account" do
     parsed = read_report(@type, { order: 2, account: @sub_account })
     expect(parsed.length).to eq 2
   end
 
-  it 'defaults to reporting all active eportfolios for specified root account' do
+  it "defaults to reporting all active eportfolios for specified root account" do
     parsed = read_report(@type, { order: 2, account: @account1 })
     expect(parsed.length).to eq 2
   end
 
-  it 'only includes deleted eportfolios' do
+  it "only includes deleted eportfolios" do
     @eportfolio.destroy
     parsed =
-      read_report(@type, { params: { 'include_deleted' => true }, order: 1, account: @account1 })
+      read_report(@type, { params: { "include_deleted" => true }, order: 1, account: @account1 })
     expect(parsed.length).to eq 1
   end
 
-  it 'only includes eportfolios from users with no enrollments' do
+  it "only includes eportfolios from users with no enrollments" do
     parsed =
-      read_report(@type, { params: { 'no_enrollments' => true }, order: 1, account: @account1 })
+      read_report(@type, { params: { "no_enrollments" => true }, order: 1, account: @account1 })
     expect(parsed.length).to eq 1
   end
 
-  it 'only includes deleted eportfolios from users with no enrollments' do
+  it "only includes deleted eportfolios from users with no enrollments" do
     @eportfolio.destroy
     parsed =
       read_report(
         @type,
         {
-          params: { 'include_deleted' => true, 'no_enrollments' => true },
+          params: { "include_deleted" => true, "no_enrollments" => true },
           order: 1,
           account: @account1
         }

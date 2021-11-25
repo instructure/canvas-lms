@@ -134,7 +134,7 @@ class AuthenticationAuditApiController < AuditorApiController
       accounts = Shard.with_each_shard(@user.associated_shards) do
         Account.joins(:pseudonyms).where(pseudonyms: {
                                            user_id: @user,
-                                           workflow_state: 'active'
+                                           workflow_state: "active"
                                          }).to_a
       end
       visible_accounts = accounts.select { |a| account_visible(a) }

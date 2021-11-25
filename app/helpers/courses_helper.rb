@@ -28,12 +28,12 @@ module CoursesHelper
     student_only = opts[:student_only]
     show_assignment_type_icon = opts[:show_assignment_type_icon]
 
-    return [nil, "Quiz", 'icon-quiz'] if recent_event.is_a?(Quizzes::Quiz)
+    return [nil, "Quiz", "icon-quiz"] if recent_event.is_a?(Quizzes::Quiz)
     return [nil, "Event", "icon-calendar-day"] unless recent_event.is_a?(Assignment)
 
-    event_type = ['Assignment', 'icon-assignment']
-    event_type = ['Quiz', 'icon-quiz'] if recent_event.submission_types == 'online_quiz'
-    event_type = ['Discussion', 'icon-discussion'] if recent_event.submission_types == 'discussion_topic'
+    event_type = ["Assignment", "icon-assignment"]
+    event_type = ["Quiz", "icon-quiz"] if recent_event.submission_types == "online_quiz"
+    event_type = ["Discussion", "icon-discussion"] if recent_event.submission_types == "discussion_topic"
 
     # because this happens in a sidebar, the context may be wrong. check and fix
     # it if that's the case.
@@ -46,27 +46,27 @@ module CoursesHelper
     icon_data = [nil] + event_type
 
     if can_do(context, current_user, :participate_as_student)
-      if submission && submission.workflow_state != 'unsubmitted'
-        event_type = ['', 'icon-check'] unless show_assignment_type_icon
+      if submission && submission.workflow_state != "unsubmitted"
+        event_type = ["", "icon-check"] unless show_assignment_type_icon
         icon_data = [submission.readable_state] + event_type
       else
-        icon_data = [t('#courses.recent_event.not_submitted', 'not submitted')] + event_type
+        icon_data = [t("#courses.recent_event.not_submitted", "not submitted")] + event_type
       end
       icon_data[0] = nil unless recent_event.expects_submission?
     elsif !student_only && can_do(context, current_user, :manage_grades)
       # no submissions
       icon_data = if !recent_event.has_submitted_submissions?
-                    [t('#courses.recent_event.no_submissions', 'no submissions')] + event_type
+                    [t("#courses.recent_event.no_submissions", "no submissions")] + event_type
                   # all received submissions graded (but not all turned in)
                   elsif recent_event.submitted_count < context.students.size &&
                         !current_user.assignments_needing_grading(contexts: contexts).include?(recent_event)
-                    [t('#courses.recent_event.no_new_submissions', 'no new submissions')] + event_type
+                    [t("#courses.recent_event.no_new_submissions", "no new submissions")] + event_type
                   # all submissions turned in and graded
                   elsif !current_user.assignments_needing_grading(contexts: contexts).include?(recent_event)
-                    [t('#courses.recent_event.all_graded', 'all graded')] + event_type
+                    [t("#courses.recent_event.all_graded", "all graded")] + event_type
                   # assignments need grading
                   else
-                    [t('#courses.recent_event.needs_grading', 'needs grading')] + event_type
+                    [t("#courses.recent_event.needs_grading", "needs grading")] + event_type
                   end
     end
 
@@ -91,7 +91,7 @@ module CoursesHelper
   #
   # Returns a text string.
   def user_count(count)
-    count == 0 ? t('#courses.settings.none', 'None') : count
+    count == 0 ? t("#courses.settings.none", "None") : count
   end
 
   # Public: check for permission on a new course
@@ -110,8 +110,8 @@ module CoursesHelper
 
   def readable_grade(submission)
     if submission.grade &&
-       submission.workflow_state == 'graded'
-      if submission.grading_type == 'points' &&
+       submission.workflow_state == "graded"
+      if submission.grading_type == "points" &&
          submission.assignment &&
          submission.assignment.respond_to?(:points_possible)
         score_out_of_points_possible(submission.grade, submission.assignment.points_possible)
@@ -122,7 +122,7 @@ module CoursesHelper
   end
 
   def skip_custom_role?(cr)
-    cr[:count] == 0 && cr[:workflow_state] == 'inactive'
+    cr[:count] == 0 && cr[:workflow_state] == "inactive"
   end
 
   def user_type(course, user, enrollments = nil)
@@ -143,7 +143,7 @@ module CoursesHelper
     return nil if MasterCourses::MasterTemplate.is_master_course?(course)
 
     if MasterCourses::ChildSubscription.is_child_course?(course)
-      t('Course is already associated with a blueprint')
+      t("Course is already associated with a blueprint")
     elsif course.student_enrollments.not_fake.exists?
       t("Cannot have a blueprint course with students")
     else

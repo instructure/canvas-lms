@@ -22,11 +22,11 @@ describe AddressBook::Service do
     allow(Canvas::DynamicSettings).to receive(:find).with(any_args).and_call_original
     allow(Canvas::DynamicSettings).to receive(:find)
       .with("address-book", anything)
-      .and_return({ 'app-host' => 'http://test.host' })
+      .and_return({ "app-host" => "http://test.host" })
 
     @sender = user_model
     @address_book = AddressBook::Service.new(@sender)
-    @recipient = user_model(name: 'Bob 1')
+    @recipient = user_model(name: "Bob 1")
   end
 
   def expand_user_ids(returns)
@@ -39,11 +39,11 @@ describe AddressBook::Service do
       common_contexts[user.global_id] =
         case result
         when :student
-          { courses: { 1 => ['StudentEnrollment'] }, groups: {} }
+          { courses: { 1 => ["StudentEnrollment"] }, groups: {} }
         when Course
-          { courses: { result.global_id => ['StudentEnrollment'] }, groups: {} }
+          { courses: { result.global_id => ["StudentEnrollment"] }, groups: {} }
         when Group
-          { courses: {}, groups: { result.global_id => ['Member'] } }
+          { courses: {}, groups: { result.global_id => ["Member"] } }
         else
           result
         end
@@ -141,8 +141,8 @@ describe AddressBook::Service do
         stub_known_in_context([@sender, @course3, [@recipient.global_id]], {})
         stub_common_contexts([@sender, [@recipient.global_id]], { @recipient => {
                                courses: {
-                                 @course1.global_id => ['StudentEnrollment'],
-                                 @course2.global_id => ['StudentEnrollment']
+                                 @course1.global_id => ["StudentEnrollment"],
+                                 @course2.global_id => ["StudentEnrollment"]
                                },
                                groups: {}
                              } })
@@ -195,11 +195,11 @@ describe AddressBook::Service do
       end
 
       it "conversation_id can be passed blank" do
-        expect { @address_book.known_users([@recipient], conversation_id: '') }.not_to raise_error
+        expect { @address_book.known_users([@recipient], conversation_id: "") }.not_to raise_error
       end
 
       it "conversation_id can be passed with garbage" do
-        expect { @address_book.known_users([@recipient], conversation_id: 'garbage') }.not_to raise_error
+        expect { @address_book.known_users([@recipient], conversation_id: "garbage") }.not_to raise_error
       end
 
       it "treats unknown users in that conversation as known" do
@@ -268,7 +268,7 @@ describe AddressBook::Service do
 
     it "pulls the corresponding user's common_courses" do
       common_courses = @address_book.common_courses(@recipient)
-      expect(common_courses).to eql({ @course.id => ['StudentEnrollment'] })
+      expect(common_courses).to eql({ @course.id => ["StudentEnrollment"] })
     end
   end
 
@@ -283,7 +283,7 @@ describe AddressBook::Service do
 
     it "pulls the corresponding user's common_groups" do
       common_groups = @address_book.common_groups(@recipient)
-      expect(common_groups).to eql({ @group.id => ['Member'] })
+      expect(common_groups).to eql({ @group.id => ["Member"] })
     end
   end
 
@@ -345,22 +345,22 @@ describe AddressBook::Service do
 
     it "returns a paginatable collection" do
       stub_search_users(
-        [@sender, { search: 'Bob' }, { per_page: 1 }],
+        [@sender, { search: "Bob" }, { per_page: 1 }],
         { @recipient => :student }
       )
 
-      known_users = @address_book.search_users(search: 'Bob')
+      known_users = @address_book.search_users(search: "Bob")
       expect(known_users).to respond_to(:paginate)
       expect(known_users.paginate(per_page: 1).size).to eq(1)
     end
 
     it "defers finding matching known users to service" do
       stub_search_users(
-        [@sender, { search: 'Bob' }, { per_page: 10 }],
+        [@sender, { search: "Bob" }, { per_page: 10 }],
         { @recipient => :student }
       )
 
-      known_users = @address_book.search_users(search: 'Bob')
+      known_users = @address_book.search_users(search: "Bob")
       page = known_users.paginate(per_page: 10)
       expect(page.map(&:id)).to include(@recipient.id)
     end
@@ -368,11 +368,11 @@ describe AddressBook::Service do
     it "passes optional :exclude_ids parameter to service" do
       other_recipient = user_model
       stub_search_users(
-        [@sender, { search: 'Bob', exclude_ids: [@recipient.global_id] }, { per_page: 10 }],
+        [@sender, { search: "Bob", exclude_ids: [@recipient.global_id] }, { per_page: 10 }],
         { other_recipient => :student }
       )
 
-      known_users = @address_book.search_users(search: 'Bob', exclude_ids: [@recipient.global_id])
+      known_users = @address_book.search_users(search: "Bob", exclude_ids: [@recipient.global_id])
       page = known_users.paginate(per_page: 10)
       expect(page.map(&:id)).not_to include(@recipient.id)
       expect(page.map(&:id)).to include(other_recipient.id)
@@ -381,11 +381,11 @@ describe AddressBook::Service do
     it "passes optional :context parameter to service" do
       course = course_model
       stub_search_users(
-        [@sender, { search: 'Bob', context: course.global_asset_string }, { per_page: 10 }],
+        [@sender, { search: "Bob", context: course.global_asset_string }, { per_page: 10 }],
         { @recipient => :student }
       )
 
-      known_users = @address_book.search_users(search: 'Bob', context: course.global_asset_string)
+      known_users = @address_book.search_users(search: "Bob", context: course.global_asset_string)
       page = known_users.paginate(per_page: 10)
       expect(page.map(&:id)).to include(@recipient.id)
     end
@@ -394,11 +394,11 @@ describe AddressBook::Service do
       course = course_model
       account_admin_user(user: @sender, account: course.account)
       stub_search_users(
-        [nil, { search: 'Bob', context: course.global_asset_string }, { per_page: 10 }],
+        [nil, { search: "Bob", context: course.global_asset_string }, { per_page: 10 }],
         { @recipient => :student }
       )
 
-      known_users = @address_book.search_users(search: 'Bob', context: course.global_asset_string)
+      known_users = @address_book.search_users(search: "Bob", context: course.global_asset_string)
       page = known_users.paginate(per_page: 10)
       expect(page.map(&:id)).to include(@recipient.id)
     end
@@ -407,22 +407,22 @@ describe AddressBook::Service do
       course = course_model
       teacher_in_course(user: @sender, course: course, active_all: true)
       stub_search_users(
-        [@sender, { search: 'Bob', context: course.global_asset_string }, { per_page: 10 }],
+        [@sender, { search: "Bob", context: course.global_asset_string }, { per_page: 10 }],
         { @recipient => :student }
       )
 
-      known_users = @address_book.search_users(search: 'Bob', context: course.global_asset_string)
+      known_users = @address_book.search_users(search: "Bob", context: course.global_asset_string)
       page = known_users.paginate(per_page: 10)
       expect(page.map(&:id)).to include(@recipient.id)
     end
 
     it "passes optional :weak_checks parameter to service" do
       stub_search_users(
-        [@sender, { search: 'Bob', weak_checks: true }, { per_page: 10 }],
+        [@sender, { search: "Bob", weak_checks: true }, { per_page: 10 }],
         { @recipient => :student }
       )
 
-      known_users = @address_book.search_users(search: 'Bob', weak_checks: true)
+      known_users = @address_book.search_users(search: "Bob", weak_checks: true)
       page = known_users.paginate(per_page: 10)
       expect(page.map(&:id)).to include(@recipient.id)
     end
@@ -430,37 +430,37 @@ describe AddressBook::Service do
     it "passes the pager's bookmark as cursor to service" do
       cursor = 5
       stub_search_users(
-        [@sender, { search: 'Bob' }, { per_page: 10, cursor: cursor }],
+        [@sender, { search: "Bob" }, { per_page: 10, cursor: cursor }],
         { @recipient => :student }
       )
 
-      known_users = @address_book.search_users(search: 'Bob')
+      known_users = @address_book.search_users(search: "Bob")
       bookmark = "bookmark:#{::JSONToken.encode(cursor)}"
       page = known_users.paginate(per_page: 10, page: bookmark)
       expect(page.map(&:id)).to include(@recipient.id)
     end
 
     it "returns a page that can give a bookmark per contained user" do
-      other_recipient = user_model(name: 'Bob 2')
+      other_recipient = user_model(name: "Bob 2")
       stub_search_users(
-        [@sender, { search: 'Bob' }, { per_page: 10 }],
+        [@sender, { search: "Bob" }, { per_page: 10 }],
         { @recipient => :student, other_recipient => :student }
       )
 
-      known_users = @address_book.search_users(search: 'Bob')
+      known_users = @address_book.search_users(search: "Bob")
       page = known_users.paginate(per_page: 10)
       expect(page.bookmark_for(@recipient)).to eq(0)
       expect(page.bookmark_for(other_recipient)).to eq(1)
     end
 
     it "uses the last user's bookmark for next page if non-nil" do
-      other_recipient = user_model(name: 'Bob 2')
+      other_recipient = user_model(name: "Bob 2")
       stub_search_users(
-        [@sender, { search: 'Bob' }, { per_page: 1 }],
+        [@sender, { search: "Bob" }, { per_page: 1 }],
         { @recipient => :student, other_recipient => :student }
       )
 
-      known_users = @address_book.search_users(search: 'Bob')
+      known_users = @address_book.search_users(search: "Bob")
       page = known_users.paginate(per_page: 1)
       expected_cursor = page.bookmark_for(other_recipient)
       expected_bookmark = "bookmark:#{::JSONToken.encode(expected_cursor)}"
@@ -468,25 +468,25 @@ describe AddressBook::Service do
     end
 
     it "returns a terminal page if the last user's bookmark is nil" do
-      other_recipient1 = user_model(name: 'Bob 2')
-      other_recipient2 = user_model(name: 'Bob 3')
+      other_recipient1 = user_model(name: "Bob 2")
+      other_recipient2 = user_model(name: "Bob 3")
       stub_search_users(
-        [@sender, { search: 'Bob' }, { per_page: 10 }],
+        [@sender, { search: "Bob" }, { per_page: 10 }],
         { @recipient => :student, other_recipient1 => :student, other_recipient2 => :student }
       )
 
-      known_users = @address_book.search_users(search: 'Bob')
+      known_users = @address_book.search_users(search: "Bob")
       page = known_users.paginate(per_page: 10)
       expect(page.next_page).to be_nil
     end
 
     it "caches the results for known users when a page is materialized" do
       stub_search_users(
-        [@sender, { search: 'Bob' }, { per_page: 10 }],
+        [@sender, { search: "Bob" }, { per_page: 10 }],
         { @recipient => :student }
       )
 
-      collection = @address_book.search_users(search: 'Bob')
+      collection = @address_book.search_users(search: "Bob")
       expect(@address_book.cached?(@recipient)).to be_falsey
       collection.paginate(per_page: 10)
       expect(@address_book.cached?(@recipient)).to be_truthy

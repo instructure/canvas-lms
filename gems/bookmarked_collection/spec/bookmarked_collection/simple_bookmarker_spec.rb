@@ -18,12 +18,12 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'spec_helper'
+require "spec_helper"
 
 describe BookmarkedCollection::SimpleBookmarker do
   before do
     @example_class = Class.new(ActiveRecord::Base) do
-      self.table_name = 'examples'
+      self.table_name = "examples"
     end
 
     BookmarkedCollection.best_unicode_collation_key_proc = lambda do |col|

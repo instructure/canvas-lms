@@ -151,7 +151,7 @@ module I18nExtraction::Extensions
       if method == :before_label
         default = args.first
       elsif args.first.is_a?(Hash)
-        default = args.first['en'] || args.first[:en]
+        default = args.first["en"] || args.first[:en]
       end
 
       if key && default
@@ -168,17 +168,17 @@ module I18nExtraction::Extensions
 
   module RubyProcessor
     STI_SUPERCLASSES = (`grep '^class.*<' ./app/models/*rb|grep -v '::'|sed 's~.*< ~~'|sort|uniq`
-      .split("\n") - ['OpenStruct', 'Tableless'])
+      .split("\n") - ["OpenStruct", "Tableless"])
                        .map(&:underscore).freeze
 
     def scope_for(filename)
       scope = case filename
               when %r{app/controllers/}
-                scope = filename.gsub(%r{.*app/controllers/|_controller\.rb}, '').gsub(%r{/_?}, '.')
-                scope == 'application.' ? '' : scope
+                scope = filename.gsub(%r{.*app/controllers/|_controller\.rb}, "").gsub(%r{/_?}, ".")
+                scope == "application." ? "" : scope
               when %r{app/models/}
-                scope = filename.gsub(%r{.*app/models/|\.rb}, '')
-                STI_SUPERCLASSES.include?(scope) ? '' : scope
+                scope = filename.gsub(%r{.*app/models/|\.rb}, "")
+                STI_SUPERCLASSES.include?(scope) ? "" : scope
               end
       I18nliner::Scope.new scope
     end
@@ -189,10 +189,10 @@ module I18nExtraction::Extensions
       remove_whitespace = true
       scope = case filename
               when %r{app/messages/}
-                remove_whitespace = false unless filename.include?('html')
-                filename.gsub(%r{.*app/|\.erb}, '').gsub(%r{/_?}, '.')
+                remove_whitespace = false unless filename.include?("html")
+                filename.gsub(%r{.*app/|\.erb}, "").gsub(%r{/_?}, ".")
               when %r{app/views/}
-                filename.gsub(%r{.*app/views/|\.(html\.|fbml\.)?erb\z}, '').gsub(%r{/_?}, '.')
+                filename.gsub(%r{.*app/views/|\.(html\.|fbml\.)?erb\z}, "").gsub(%r{/_?}, ".")
               end
       I18nliner::Scope.new scope, remove_whitespace: remove_whitespace
     end

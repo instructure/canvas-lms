@@ -18,10 +18,10 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../../helpers/gradebook_common'
-require_relative '../setup/gradebook_setup'
-require_relative '../pages/gradebook_page'
-require_relative '../pages/gradebook_cells_page'
+require_relative "../../helpers/gradebook_common"
+require_relative "../setup/gradebook_setup"
+require_relative "../pages/gradebook_page"
+require_relative "../pages/gradebook_cells_page"
 
 describe "Gradebook - concluded courses and enrollments" do
   include_context "in-process server selenium tests"
@@ -43,16 +43,16 @@ describe "Gradebook - concluded courses and enrollments" do
 
       Gradebook.visit(@course)
 
-      expect(ff('.student-name')).to have_size @course.students.count
+      expect(ff(".student-name")).to have_size @course.students.count
     end
 
     it "shows concluded enrollments when checked in column header", priority: "1" do
       conclude_student_1
       Gradebook.visit(@course)
 
-      Gradebook.click_student_header_menu_show_option('Concluded enrollments')
+      Gradebook.click_student_header_menu_show_option("Concluded enrollments")
 
-      expect(ff('.student-name')).to have_size @course.all_students.count
+      expect(ff(".student-name")).to have_size @course.all_students.count
     end
 
     it "hides concluded enrollments when unchecked in column header", priority: "1" do
@@ -60,9 +60,9 @@ describe "Gradebook - concluded courses and enrollments" do
       display_concluded_enrollments
       Gradebook.visit(@course)
 
-      Gradebook.click_student_header_menu_show_option('Concluded enrollments')
+      Gradebook.click_student_header_menu_show_option("Concluded enrollments")
 
-      expect(ff('.student-name')).to have_size @course.students.count
+      expect(ff(".student-name")).to have_size @course.students.count
     end
 
     it "does not show inactive enrollments by default", priority: "1" do
@@ -72,16 +72,16 @@ describe "Gradebook - concluded courses and enrollments" do
 
       Gradebook.visit(@course)
 
-      expect(ff('.student-name')).to have_size @course.students.count
+      expect(ff(".student-name")).to have_size @course.students.count
     end
 
     it "shows inactive enrollments when checked in column header", priority: "1" do
       deactivate_student_1
       Gradebook.visit(@course)
 
-      Gradebook.click_student_header_menu_show_option('Inactive enrollments')
+      Gradebook.click_student_header_menu_show_option("Inactive enrollments")
 
-      expect(ff('.student-name')).to have_size @course.all_students.count
+      expect(ff(".student-name")).to have_size @course.all_students.count
     end
 
     it "hides inactive enrollments when unchecked in column header", priority: "1" do
@@ -89,9 +89,9 @@ describe "Gradebook - concluded courses and enrollments" do
       display_inactive_enrollments
       Gradebook.visit(@course)
 
-      Gradebook.click_student_header_menu_show_option('Inactive enrollments')
+      Gradebook.click_student_header_menu_show_option("Inactive enrollments")
 
-      expect(ff('.student-name')).to have_size @course.students.count
+      expect(ff(".student-name")).to have_size @course.students.count
     end
   end
 
@@ -100,7 +100,7 @@ describe "Gradebook - concluded courses and enrollments" do
       @course.complete!
       Gradebook.visit(@course)
 
-      expect(Gradebook::Cells.get_grade(@student_1, @first_assignment)).to eq '10'
+      expect(Gradebook::Cells.get_grade(@student_1, @first_assignment)).to eq "10"
       cell = Gradebook::Cells.grading_cell(@student_1, @first_assignment)
       expect(cell).to contain_css(Gradebook::Cells.ungradable_selector)
     end

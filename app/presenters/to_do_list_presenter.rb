@@ -144,7 +144,7 @@ class ToDoListPresenter
 
     def needs_grading_badge
       if needs_grading_count > 999
-        I18n.t('%{more_than}+', more_than: 999)
+        I18n.t("%{more_than}+", more_than: 999)
       else
         needs_grading_count
       end
@@ -152,9 +152,9 @@ class ToDoListPresenter
 
     def needs_grading_label
       if needs_grading_count > 999
-        I18n.t('More than 999 submissions need grading')
+        I18n.t("More than 999 submissions need grading")
       else
-        I18n.t({ one: '1 submission needs grading', other: '%{count} submissions need grading' }, count: assignment.needs_grading_count)
+        I18n.t({ one: "1 submission needs grading", other: "%{count} submissions need grading" }, count: assignment.needs_grading_count)
       end
     end
 
@@ -181,31 +181,31 @@ class ToDoListPresenter
     def ignore_title
       case @type
       when :grading
-        I18n.t('Ignore until new submission')
+        I18n.t("Ignore until new submission")
       when :moderation
-        I18n.t('Ignore until new mark')
+        I18n.t("Ignore until new mark")
       when :submitting
-        I18n.t('Ignore this assignment')
+        I18n.t("Ignore this assignment")
       end
     end
 
     def ignore_sr_message
       case @type
       when :grading
-        I18n.t('Ignore %{item} until new submission', item: title)
+        I18n.t("Ignore %{item} until new submission", item: title)
       when :moderation
-        I18n.t('Ignore %{item} until new mark', item: title)
+        I18n.t("Ignore %{item} until new mark", item: title)
       when :submitting
-        I18n.t('Ignore %{item}', item: title)
+        I18n.t("Ignore %{item}", item: title)
       end
     end
 
     def ignore_flash_message
       case @type
       when :grading
-        I18n.t('This item will reappear when a new submission is made.')
+        I18n.t("This item will reappear when a new submission is made.")
       when :moderation
-        I18n.t('This item will reappear when there are new grades to moderate.')
+        I18n.t("This item will reappear when there are new grades to moderate.")
       end
     end
 
@@ -217,7 +217,7 @@ class ToDoListPresenter
       if assignment.peer_reviews_due_at
         @view.datetime_string(assignment.peer_reviews_due_at)
       else
-        I18n.t('No Due Date')
+        I18n.t("No Due Date")
       end
     end
   end
@@ -253,21 +253,21 @@ class ToDoListPresenter
     end
 
     def ignore_url
-      @view.todo_ignore_api_url('reviewing', @assessment_request)
+      @view.todo_ignore_api_url("reviewing", @assessment_request)
     end
 
     def ignore_title
-      I18n.t('Ignore this assignment')
+      I18n.t("Ignore this assignment")
     end
 
     def ignore_sr_message
-      I18n.t('Ignore %{assignment}', assignment: @assignment.title)
+      I18n.t("Ignore %{assignment}", assignment: @assignment.title)
     end
 
     def ignore_flash_message; end
 
     def submission_author_name
-      @view.submission_author_name_for(@assessment_request, "#{I18n.t('user')}: ")
+      @view.submission_author_name_for(@assessment_request, "#{I18n.t("user")}: ")
     end
   end
 end

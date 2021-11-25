@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../api_spec_helper'
+require_relative "../api_spec_helper"
 
 describe "Favorites API", type: :request do
   before :once do
@@ -29,10 +29,10 @@ describe "Favorites API", type: :request do
     it "lists favorite courses" do
       json = api_call(:get, "/api/v1/users/self/favorites/courses", controller: "favorites", action: "list_favorite_courses", format: "json")
       expect(json.size).to eql(6)
-      expect(json[0]['id']).to eql @courses[0].id
-      expect(json[0]['name']).to eql @courses[0].name
-      expect(json[0]['course_code']).to eql @courses[0].course_code
-      expect(json[0]['enrollments'][0]['type']).to eql 'student'
+      expect(json[0]["id"]).to eql @courses[0].id
+      expect(json[0]["name"]).to eql @courses[0].name
+      expect(json[0]["course_code"]).to eql @courses[0].course_code
+      expect(json[0]["enrollments"][0]["type"]).to eql "student"
       expect(json.collect { |row| row["id"] }.sort).to eql(@user.menu_courses.pluck(:id).sort)
 
       expect(@user.favorites.size).to be_zero
@@ -47,7 +47,7 @@ describe "Favorites API", type: :request do
         @observed_student = create_users(1, return_type: :record).first
         @student_enrollment =
           @observer_course.enroll_student(@observed_student,
-                                          enrollment_state: 'active')
+                                          enrollment_state: "active")
         @assigned_observer_enrollment =
           @observer_course.enroll_user(@observer, "ObserverEnrollment",
                                        associated_user_id: @observed_student.id)
@@ -60,7 +60,7 @@ describe "Favorites API", type: :request do
                                 controller: "favorites", include: ["observed_users"],
                                 action: "list_favorite_courses", format: "json")
 
-        expect(json[0]['enrollments']).to match_array [{
+        expect(json[0]["enrollments"]).to match_array [{
           "type" => "observer",
           "role" => @assigned_observer_enrollment.role.name,
           "role_id" => @assigned_observer_enrollment.role.id,
@@ -98,11 +98,11 @@ describe "Favorites API", type: :request do
     it "lists favorite courses" do
       json = api_call(:get, "/api/v1/users/self/favorites/courses", controller: "favorites", action: "list_favorite_courses", format: "json")
       expect(json.size).to eql(3)
-      expect(json[0]['id']).to eql @courses[0].id
-      expect(json[0]['name']).to eql @courses[0].name
-      expect(json[0]['course_code']).to eql @courses[0].course_code
-      expect(json[0]['enrollments'][0]['type']).to eql 'student'
-      expect(json.collect { |row| row["id"] }.sort).to eql(@user.favorites.by('Course').pluck(:context_id).sort)
+      expect(json[0]["id"]).to eql @courses[0].id
+      expect(json[0]["name"]).to eql @courses[0].name
+      expect(json[0]["course_code"]).to eql @courses[0].course_code
+      expect(json[0]["enrollments"][0]["type"]).to eql "student"
+      expect(json.collect { |row| row["id"] }.sort).to eql(@user.favorites.by("Course").pluck(:context_id).sort)
     end
 
     it "adds a course to favorites" do
@@ -194,7 +194,7 @@ describe "Favorites API", type: :request do
     it "lists favorite groups" do
       json = api_call(:get, "/api/v1/users/self/favorites/groups",
                       controller: "favorites", action: "list_favorite_groups", format: "json")
-      expect(json[0]['id']).to eql @group_fave.id
+      expect(json[0]["id"]).to eql @group_fave.id
       expect(@user.favorites.size).to eql(1)
     end
 
@@ -213,7 +213,7 @@ describe "Favorites API", type: :request do
     it "deletes one favorite group" do
       json = api_call(:delete, "/api/v1/users/self/favorites/groups/#{@group_fave.id}",
                       controller: "favorites", action: "remove_favorite_groups", format: "json", id: @group_fave.id)
-      expect(json['context_type']).to eql("Group")
+      expect(json["context_type"]).to eql("Group")
     end
 
     it "lists all groups if none are favorited" do

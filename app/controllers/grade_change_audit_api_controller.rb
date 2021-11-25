@@ -256,7 +256,7 @@ class GradeChangeAuditApiController < AuditorApiController
       return render json: { message: "Advanced query is unsupported on this instance" }, status: :not_implemented
     end
 
-    assignment = Auditors::GradeChange::COURSE_OVERRIDE_ASSIGNMENT if params[:assignment_id] == 'override'
+    assignment = Auditors::GradeChange::COURSE_OVERRIDE_ASSIGNMENT if params[:assignment_id] == "override"
 
     if params[:course_id].present?
       course = api_find(Course, params[:course_id])
@@ -276,7 +276,7 @@ class GradeChangeAuditApiController < AuditorApiController
     conditions = {}
     if course
       conditions[:context_id] = course.id
-      conditions[:context_type] = 'Course'
+      conditions[:context_type] = "Course"
     end
     conditions[:student_id] = student.id if student
     conditions[:grader_id] = grader.id if grader

@@ -53,7 +53,7 @@ module ContextExternalToolsHelper
 
     link_attrs[:class] = options[:link_class] if options[:link_class]
     link = content_tag(:a, link_attrs) do
-      concat(render(partial: 'external_tools/helpers/icon', locals: { tool: tool })) if options[:show_icon]
+      concat(render(partial: "external_tools/helpers/icon", locals: { tool: tool })) if options[:show_icon]
       concat(tool[:title])
     end
 

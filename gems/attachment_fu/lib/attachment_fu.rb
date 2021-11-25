@@ -17,44 +17,44 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'attachment_fu/railtie'
-require 'attachment_fu/processors/mini_magick_processor'
-require 'attachment_fu/backends/file_system_backend'
-require 'attachment_fu/backends/s3_backend'
+require "attachment_fu/railtie"
+require "attachment_fu/processors/mini_magick_processor"
+require "attachment_fu/backends/file_system_backend"
+require "attachment_fu/backends/s3_backend"
 
 module AttachmentFu # :nodoc:
   @@default_processors = %w[MiniMagick]
   # Instructure: I (ryan shaw) just copied and pasted this from http://github.com/technoweenie/attachment_fu/blob/master/lib/technoweenie/attachment_fu.rb
   @@content_types      = [
-    'image/jpeg',
-    'image/pjpeg',
-    'image/jpg',
-    'image/gif',
-    'image/png',
-    'image/x-png',
-    'image/jpg',
-    'image/x-ms-bmp',
-    'image/bmp',
-    'image/x-bmp',
-    'image/x-bitmap',
-    'image/x-xbitmap',
-    'image/x-win-bitmap',
-    'image/x-windows-bmp',
-    'image/ms-bmp',
-    'application/bmp',
-    'application/x-bmp',
-    'application/x-win-bitmap',
-    'application/preview',
-    'image/jp_',
-    'application/jpg',
-    'application/x-jpg',
-    'image/pipeg',
-    'image/vnd.swiftview-jpeg',
-    'image/x-xbitmap',
-    'application/png',
-    'application/x-png',
-    'image/gi_',
-    'image/x-citrix-pjpeg'
+    "image/jpeg",
+    "image/pjpeg",
+    "image/jpg",
+    "image/gif",
+    "image/png",
+    "image/x-png",
+    "image/jpg",
+    "image/x-ms-bmp",
+    "image/bmp",
+    "image/x-bmp",
+    "image/x-bitmap",
+    "image/x-xbitmap",
+    "image/x-win-bitmap",
+    "image/x-windows-bmp",
+    "image/ms-bmp",
+    "application/bmp",
+    "application/x-bmp",
+    "application/x-win-bitmap",
+    "application/preview",
+    "image/jp_",
+    "application/jpg",
+    "application/x-jpg",
+    "image/pipeg",
+    "image/vnd.swiftview-jpeg",
+    "image/x-xbitmap",
+    "application/png",
+    "application/x-png",
+    "image/gi_",
+    "image/x-citrix-pjpeg"
   ]
   mattr_reader :content_types, :tempfile_path, :default_processors
   mattr_writer :tempfile_path
@@ -99,7 +99,7 @@ module AttachmentFu # :nodoc:
       options[:size]             ||= (options[:min_size]..options[:max_size])
       options[:thumbnails]       ||= {}
       options[:thumbnail_class]  ||= self
-      options[:s3_access]        ||= 'public-read'
+      options[:s3_access]        ||= "public-read"
       options[:content_type] = [options[:content_type]].flatten.collect! { |t| t == :image ? AttachmentFu.content_types : t }.flatten unless options[:content_type].nil?
 
       unless options[:thumbnails].is_a?(Hash)
@@ -121,9 +121,9 @@ module AttachmentFu # :nodoc:
       if attachment_options[:path_prefix].nil?
         attachment_options[:path_prefix] = attachment_options[:storage] == :s3 ? table_name : File.join("public", table_name)
       end
-      attachment_options[:path_prefix] = attachment_options[:path_prefix][1..] if options[:path_prefix].first == '/'
+      attachment_options[:path_prefix] = attachment_options[:path_prefix][1..] if options[:path_prefix].first == "/"
 
-      with_options foreign_key: 'parent_id' do |m|
+      with_options foreign_key: "parent_id" do |m|
         m.has_many   :thumbnails, class_name: "::#{attachment_options[:thumbnail_class]}"
         m.belongs_to :parent, class_name: "::#{base_class}" unless options[:thumbnails].empty?
       end
@@ -201,7 +201,7 @@ module AttachmentFu # :nodoc:
 
     # Copies the given file path to a new tempfile, returning the closed tempfile.
     def copy_to_temp_file(file, temp_base_name)
-      Tempfile.new(['', temp_base_name], AttachmentFu.tempfile_path).tap do |tmp|
+      Tempfile.new(["", temp_base_name], AttachmentFu.tempfile_path).tap do |tmp|
         tmp.close
         FileUtils.cp file, tmp.path
       end
@@ -209,7 +209,7 @@ module AttachmentFu # :nodoc:
 
     # Writes the given data to a new tempfile, returning the closed tempfile.
     def write_to_temp_file(data, temp_base_name)
-      Tempfile.new(['', temp_base_name], AttachmentFu.tempfile_path).tap do |tmp|
+      Tempfile.new(["", temp_base_name], AttachmentFu.tempfile_path).tap do |tmp|
         tmp.binmode
         tmp.write data
         tmp.close
@@ -218,7 +218,7 @@ module AttachmentFu # :nodoc:
   end
 
   module InstanceMethods
-    require 'rack'
+    require "rack"
 
     def attachment_options
       @attachment_options || self.class.attachment_options
@@ -250,10 +250,10 @@ module AttachmentFu # :nodoc:
       ext = nil
       basename = filename.gsub(/\.\w+$/) do |s|
         ext = s
-        ''
+        ""
       end
       # ImageScience doesn't create gif thumbnails, only pngs
-      ext.sub!(/gif$/, 'png') if attachment_options[:processor] == "ImageScience"
+      ext.sub!(/gif$/, "png") if attachment_options[:processor] == "ImageScience"
       name = "#{basename}_#{thumbnail}#{ext}"
       if name.length > 255
         name = "#{basename[0..(254 - name.length)]}_#{thumbnail}#{ext}"
@@ -308,7 +308,7 @@ module AttachmentFu # :nodoc:
 
     # Returns the width/height in a suitable format for the image_tag helper: (100x100)
     def image_size
-      [width.to_s, height.to_s].join('x')
+      [width.to_s, height.to_s].join("x")
     end
 
     # Returns true if the attachment data will be written to the storage system on the next save
@@ -373,7 +373,7 @@ module AttachmentFu # :nodoc:
           begin
             io = file_data
             if file_from_path
-              io = File.open(temp_path, 'rb')
+              io = File.open(temp_path, "rb")
             end
             io.rewind
             io.each_line do |line|
@@ -425,11 +425,11 @@ module AttachmentFu # :nodoc:
         res ||= File.mime_type?(file_data.original_filename) if file_data.respond_to?(:original_filename)
         res ||= File.mime_type?(file_data)
         res ||= "text/plain" unless file_data.respond_to?(:path)
-        res || 'unknown/unknown'
+        res || "unknown/unknown"
       elsif file_data.respond_to?(:content_type)
         file_data.content_type
       else
-        'unknown/unknown'
+        "unknown/unknown"
       end
     end
 
@@ -497,17 +497,17 @@ module AttachmentFu # :nodoc:
 
     # Generates a unique filename for a Tempfile.
     def random_tempfile_filename
-      "#{rand Time.now.to_i}#{filename&.last(50) || 'attachment'}"
+      "#{rand Time.now.to_i}#{filename&.last(50) || "attachment"}"
     end
 
     def sanitize_filename(filename)
       filename.strip.tap do |name|
         # NOTE: File.basename doesn't work right with Windows paths on Unix
         # get only the filename, not the whole path
-        name.gsub!(%r{^.*(\\|/)}, '')
+        name.gsub!(%r{^.*(\\|/)}, "")
 
         # Finally, replace all non alphanumeric, underscore or periods with underscore
-        name.gsub!(/[^\w.\-]/, '_')
+        name.gsub!(/[^\w.\-]/, "_")
       end
     end
 

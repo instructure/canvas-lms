@@ -48,7 +48,7 @@ describe "MessageableUser::Calculator" do
       end
 
       it "does not include sections from restricted visibility courses" do
-        RoleOverride.manage_role_override(Account.default, student_role, 'send_messages', override: false)
+        RoleOverride.manage_role_override(Account.default, student_role, "send_messages", override: false)
         expect(@calculator.uncached_visible_section_ids).to eq({})
       end
     end
@@ -78,7 +78,7 @@ describe "MessageableUser::Calculator" do
         @observer_enrollment = course_with_observer(user: @viewing_user, active_all: true)
         @observer_enrollment.associated_user = student_in_course(active_all: true).user
         @observer_enrollment.save!
-        RoleOverride.manage_role_override(Account.default, observer_role, 'send_messages', override: true)
+        RoleOverride.manage_role_override(Account.default, observer_role, "send_messages", override: true)
       end
 
       it "returns an empty hash when no courses" do
@@ -96,7 +96,7 @@ describe "MessageableUser::Calculator" do
       end
 
       it "includes observed students from restricted visibility courses" do
-        RoleOverride.manage_role_override(Account.default, observer_role, 'send_messages', override: false)
+        RoleOverride.manage_role_override(Account.default, observer_role, "send_messages", override: false)
         expect(@calculator.uncached_observed_student_ids.keys).to include(@course.id)
         expect(@calculator.uncached_observed_student_ids[@course.id]).to include(@student.id)
       end
@@ -228,7 +228,7 @@ describe "MessageableUser::Calculator" do
 
       context "group in restricted visibilty course" do
         before do
-          RoleOverride.manage_role_override(Account.default, student_role, 'send_messages', override: false)
+          RoleOverride.manage_role_override(Account.default, student_role, "send_messages", override: false)
         end
 
         it "does not include the group" do
@@ -274,7 +274,7 @@ describe "MessageableUser::Calculator" do
       end
 
       it "does not include groups in restricted visibility courses, even with the user in it" do
-        RoleOverride.manage_role_override(Account.default, student_role, 'send_messages', override: false)
+        RoleOverride.manage_role_override(Account.default, student_role, "send_messages", override: false)
         expect(@calculator.uncached_section_visible_group_ids).to_not include(@group.id)
       end
     end
@@ -374,9 +374,9 @@ describe "MessageableUser::Calculator" do
 
   describe "shard_cached" do
     before do
-      @expected1 = 'random_string1'
-      @expected2 = 'random_string2'
-      @expected3 = 'random_string3 (also ponies)'
+      @expected1 = "random_string1"
+      @expected2 = "random_string2"
+      @expected3 = "random_string3 (also ponies)"
     end
 
     describe "sharding" do
@@ -384,7 +384,7 @@ describe "MessageableUser::Calculator" do
 
       it "yields once for each of the user's associated shards" do
         allow(@viewing_user).to receive_messages(associated_shards: [@shard1, @shard2])
-        values = @calculator.shard_cached('cache_key') { Shard.current.id }
+        values = @calculator.shard_cached("cache_key") { Shard.current.id }
         expect(values.keys.sort_by(&:id)).to eq [@shard1, @shard2].sort_by(&:id)
         expect(values[@shard1]).to eq @shard1.id
         expect(values[@shard2]).to eq @shard2.id
@@ -395,8 +395,8 @@ describe "MessageableUser::Calculator" do
       it "shares across calculators with same user" do
         calc2 = MessageableUser::Calculator.new(@viewing_user)
         enable_cache do
-          @calculator.shard_cached('cache_key') { @expected1 }
-          expect(calc2.shard_cached('cache_key')[Shard.current]).to eq @expected1
+          @calculator.shard_cached("cache_key") { @expected1 }
+          expect(calc2.shard_cached("cache_key")[Shard.current]).to eq @expected1
         end
       end
 
@@ -404,9 +404,9 @@ describe "MessageableUser::Calculator" do
         calc2 = MessageableUser::Calculator.new(user_factory)
 
         enable_cache do
-          @calculator.shard_cached('cache_key') { @expected1 }
-          calc2.shard_cached('cache_key') { @expected2 }
-          expect(calc2.shard_cached('cache_key')[Shard.current]).to eq @expected2
+          @calculator.shard_cached("cache_key") { @expected1 }
+          calc2.shard_cached("cache_key") { @expected2 }
+          expect(calc2.shard_cached("cache_key")[Shard.current]).to eq @expected2
         end
       end
 
@@ -414,18 +414,18 @@ describe "MessageableUser::Calculator" do
         calc2 = MessageableUser::Calculator.new(@viewing_user)
 
         enable_cache do
-          @calculator.shard_cached('cache_key') { @expected1 }
+          @calculator.shard_cached("cache_key") { @expected1 }
           @viewing_user.updated_at = 1.minute.from_now
-          calc2.shard_cached('cache_key') { @expected2 }
-          expect(calc2.shard_cached('cache_key')[Shard.current]).to eq @expected2
+          calc2.shard_cached("cache_key") { @expected2 }
+          expect(calc2.shard_cached("cache_key")[Shard.current]).to eq @expected2
         end
       end
 
       it "is sensitive to the key" do
         enable_cache do
-          @calculator.shard_cached('cache_key1') { @expected1 }
-          @calculator.shard_cached('cache_key2') { @expected2 }
-          expect(@calculator.shard_cached('cache_key2')[Shard.current]).to eq @expected2
+          @calculator.shard_cached("cache_key1") { @expected1 }
+          @calculator.shard_cached("cache_key2") { @expected2 }
+          expect(@calculator.shard_cached("cache_key2")[Shard.current]).to eq @expected2
         end
       end
 
@@ -439,9 +439,9 @@ describe "MessageableUser::Calculator" do
             self.cache_key = data
           end
         end)
-        expected1 = Foo.new('a')
-        expected2 = Foo.new('b')
-        expected3 = Foo.new('c')
+        expected1 = Foo.new("a")
+        expected2 = Foo.new("b")
+        expected3 = Foo.new("c")
         allow(@calculator).to receive_messages(method1: expected1)
         allow(@calculator).to receive_messages(method2: expected2)
 
@@ -454,28 +454,28 @@ describe "MessageableUser::Calculator" do
         allow(calc3).to receive_messages(method2: expected3)
 
         enable_cache do
-          @calculator.shard_cached('cache_key', :method1, :method2) { expected1 }
-          calc2.shard_cached('cache_key', :method1, :method2) { expected2 }
-          calc3.shard_cached('cache_key', :method1, :method2) { expected3 }
+          @calculator.shard_cached("cache_key", :method1, :method2) { expected1 }
+          calc2.shard_cached("cache_key", :method1, :method2) { expected2 }
+          calc3.shard_cached("cache_key", :method1, :method2) { expected3 }
 
-          expect(calc2.shard_cached('cache_key')[Shard.current]).to eq expected1
-          expect(calc3.shard_cached('cache_key')[Shard.current]).to eq expected3
+          expect(calc2.shard_cached("cache_key")[Shard.current]).to eq expected1
+          expect(calc3.shard_cached("cache_key")[Shard.current]).to eq expected3
         end
       end
     end
 
     describe "object-local cache" do
       it "caches the result the key" do
-        @calculator.shard_cached('cache_key') { @expected1 }
-        @calculator.shard_cached('cache_key') { raise 'should not get here' }
-        expect(@calculator.shard_cached('cache_key')[Shard.current]).to eq @expected1
+        @calculator.shard_cached("cache_key") { @expected1 }
+        @calculator.shard_cached("cache_key") { raise "should not get here" }
+        expect(@calculator.shard_cached("cache_key")[Shard.current]).to eq @expected1
       end
 
       it "distinguishes different keys" do
-        @calculator.shard_cached('cache_key1') { @expected1 }
-        @calculator.shard_cached('cache_key2') { @expected2 }
-        expect(@calculator.shard_cached('cache_key1')[Shard.current]).to eq @expected1
-        expect(@calculator.shard_cached('cache_key2')[Shard.current]).to eq @expected2
+        @calculator.shard_cached("cache_key1") { @expected1 }
+        @calculator.shard_cached("cache_key2") { @expected2 }
+        expect(@calculator.shard_cached("cache_key1")[Shard.current]).to eq @expected1
+        expect(@calculator.shard_cached("cache_key2")[Shard.current]).to eq @expected2
       end
     end
   end
@@ -539,8 +539,8 @@ describe "MessageableUser::Calculator" do
 
     describe "#observed_student_ids_by_shard" do
       before do
-        RoleOverride.manage_role_override(@account1, observer_role, 'send_messages', override: false)
-        RoleOverride.manage_role_override(@account2, observer_role, 'send_messages', override: false)
+        RoleOverride.manage_role_override(@account1, observer_role, "send_messages", override: false)
+        RoleOverride.manage_role_override(@account2, observer_role, "send_messages", override: false)
         @observer_enrollment1 = course_with_observer(course: @course1, active_all: true)
         @observer = @observer_enrollment1.user
         @observer_enrollment2 = course_with_observer(course: @course2, user: @observer, active_all: true)
@@ -584,8 +584,8 @@ describe "MessageableUser::Calculator" do
 
     describe "#observed_student_ids_in_courses" do
       before do
-        RoleOverride.manage_role_override(@account1, observer_role, 'send_messages', override: false)
-        RoleOverride.manage_role_override(@account2, observer_role, 'send_messages', override: false)
+        RoleOverride.manage_role_override(@account1, observer_role, "send_messages", override: false)
+        RoleOverride.manage_role_override(@account2, observer_role, "send_messages", override: false)
 
         @student1 = student_in_course(course: @course1, active_all: true).user
         @observer_enrollment1 = course_with_observer(course: @course1, active_all: true)
@@ -731,7 +731,7 @@ describe "MessageableUser::Calculator" do
     describe "load_messageable_users" do
       it "does not break when given an otherwise unmessageable user and a non-nil but empty conversation_id" do
         other_user = User.create!
-        expect { @calculator.load_messageable_users([other_user], conversation_id: '') }.not_to raise_exception
+        expect { @calculator.load_messageable_users([other_user], conversation_id: "") }.not_to raise_exception
       end
 
       it "finds common courses for users with a common course" do
@@ -739,7 +739,7 @@ describe "MessageableUser::Calculator" do
         student_in_course(active_all: true)
         expect(@calculator.load_messageable_users([@student])).not_to be_empty
         expect(@calculator.load_messageable_users([@student]).first.common_courses).to eq({
-                                                                                            @course.id => ['StudentEnrollment']
+                                                                                            @course.id => ["StudentEnrollment"]
                                                                                           })
       end
 
@@ -753,8 +753,8 @@ describe "MessageableUser::Calculator" do
         course2 = @course
 
         expect(@calculator.load_messageable_users([@student]).first.common_courses).to eq({
-                                                                                            course1.id => ['StudentEnrollment'],
-                                                                                            course2.id => ['StudentEnrollment']
+                                                                                            course1.id => ["StudentEnrollment"],
+                                                                                            course2.id => ["StudentEnrollment"]
                                                                                           })
       end
 
@@ -769,7 +769,7 @@ describe "MessageableUser::Calculator" do
         Enrollment.limit_privileges_to_course_section!(course2, @viewing_user, true)
 
         expect(@calculator.load_messageable_users([@student]).first.common_courses).to eq({
-                                                                                            course1.id => ['StudentEnrollment']
+                                                                                            course1.id => ["StudentEnrollment"]
                                                                                           })
       end
 
@@ -778,7 +778,7 @@ describe "MessageableUser::Calculator" do
         @group.add_user(@viewing_user)
         expect(@calculator.load_messageable_users([@user])).not_to be_empty
         expect(@calculator.load_messageable_users([@user]).first.common_groups).to eq({
-                                                                                        @group.id => ['Member']
+                                                                                        @group.id => ["Member"]
                                                                                       })
       end
 
@@ -792,8 +792,8 @@ describe "MessageableUser::Calculator" do
         group2 = @group
 
         expect(@calculator.load_messageable_users([@user]).first.common_groups).to eq({
-                                                                                        group1.id => ['Member'],
-                                                                                        group2.id => ['Member']
+                                                                                        group1.id => ["Member"],
+                                                                                        group2.id => ["Member"]
                                                                                       })
       end
 
@@ -816,7 +816,7 @@ describe "MessageableUser::Calculator" do
       context "creation pending users" do
         before do
           course_with_teacher(user: @viewing_user, active_all: true)
-          student_in_course(active_all: true, user_state: 'creation_pending')
+          student_in_course(active_all: true, user_state: "creation_pending")
         end
 
         it "is excluded by default" do
@@ -835,7 +835,7 @@ describe "MessageableUser::Calculator" do
       context "deleted users" do
         before do
           course_with_teacher(user: @viewing_user, active_all: true)
-          student_in_course(active_all: true, user_state: 'deleted')
+          student_in_course(active_all: true, user_state: "deleted")
         end
 
         it "is excluded by default" do
@@ -889,7 +889,7 @@ describe "MessageableUser::Calculator" do
           result = @calculator.load_messageable_users([@bob], conversation_id: @conversation.conversation_id)
           expect(result).not_to be_empty
           expect(result.first.common_courses).to eq({
-                                                      @course.id => ['StudentEnrollment']
+                                                      @course.id => ["StudentEnrollment"]
                                                     })
         end
 
@@ -938,14 +938,14 @@ describe "MessageableUser::Calculator" do
       it "recognizes asset string course_X_admins" do
         course_with_teacher(user: @viewing_user)
         expect(@calculator).to receive(:messageable_users_in_course_scope)
-          .with(@course.id, ['TeacherEnrollment', 'TaEnrollment'], {}).once
+          .with(@course.id, ["TeacherEnrollment", "TaEnrollment"], {}).once
         @calculator.messageable_users_in_context(@course.asset_string + "_admins")
       end
 
       it "recognizes asset string course_X_students" do
         course_with_teacher(user: @viewing_user)
         expect(@calculator).to receive(:messageable_users_in_course_scope)
-          .with(@course.id, ['StudentEnrollment'], {}).once
+          .with(@course.id, ["StudentEnrollment"], {}).once
         @calculator.messageable_users_in_context(@course.asset_string + "_students")
       end
 
@@ -959,14 +959,14 @@ describe "MessageableUser::Calculator" do
       it "recognizes asset string section_X_admins" do
         course_with_teacher(user: @viewing_user)
         expect(@calculator).to receive(:messageable_users_in_section_scope)
-          .with(@course.default_section.id, ['TeacherEnrollment', 'TaEnrollment'], {}).once
+          .with(@course.default_section.id, ["TeacherEnrollment", "TaEnrollment"], {}).once
         @calculator.messageable_users_in_context("section_#{@course.default_section.id}_admins")
       end
 
       it "recognizes asset string section_X_students" do
         course_with_teacher(user: @viewing_user)
         expect(@calculator).to receive(:messageable_users_in_section_scope)
-          .with(@course.default_section.id, ['StudentEnrollment'], {}).once
+          .with(@course.default_section.id, ["StudentEnrollment"], {}).once
         @calculator.messageable_users_in_context("section_#{@course.default_section.id}_students")
       end
 
@@ -1003,12 +1003,12 @@ describe "MessageableUser::Calculator" do
 
       context "with enrollment_types" do
         it "includes users with the specified types" do
-          expect(@calculator.messageable_users_in_course(@course, enrollment_types: ['StudentEnrollment']).map(&:id))
+          expect(@calculator.messageable_users_in_course(@course, enrollment_types: ["StudentEnrollment"]).map(&:id))
             .to include(@student.id)
         end
 
         it "excludes otherwise messageable users in the course without the specified types" do
-          expect(@calculator.messageable_users_in_course(@course, enrollment_types: ['TeacherEnrollment']).map(&:id))
+          expect(@calculator.messageable_users_in_course(@course, enrollment_types: ["TeacherEnrollment"]).map(&:id))
             .not_to include(@student.id)
         end
       end
@@ -1040,12 +1040,12 @@ describe "MessageableUser::Calculator" do
 
       context "with enrollment_types" do
         it "includes users with the specified types" do
-          expect(@calculator.messageable_users_in_section(@section, enrollment_types: ['StudentEnrollment']).map(&:id))
+          expect(@calculator.messageable_users_in_section(@section, enrollment_types: ["StudentEnrollment"]).map(&:id))
             .to include(@student.id)
         end
 
         it "excludes otherwise messageable users in the section without the specified types" do
-          expect(@calculator.messageable_users_in_section(@section, enrollment_types: ['TeacherEnrollment']).map(&:id))
+          expect(@calculator.messageable_users_in_section(@section, enrollment_types: ["TeacherEnrollment"]).map(&:id))
             .not_to include(@student.id)
         end
       end
@@ -1141,18 +1141,18 @@ describe "MessageableUser::Calculator" do
         end
 
         it "returns an empty set for unrecognized contexts" do
-          expect(messageable_user_ids(context: 'bogus')).to be_empty
+          expect(messageable_user_ids(context: "bogus")).to be_empty
         end
 
         context "for a group" do
           before do
-            @group = @course.groups.create(name: 'the group')
+            @group = @course.groups.create(name: "the group")
             @group.add_user(@viewing_user)
           end
 
           context "send_messages permission is disabled" do
             before do
-              @course.account.role_overrides.create!(role: student_role, permission: 'send_messages', enabled: false)
+              @course.account.role_overrides.create!(role: student_role, permission: "send_messages", enabled: false)
             end
 
             it "does not include group members" do
@@ -1179,14 +1179,14 @@ describe "MessageableUser::Calculator" do
 
         it "includes users messageable via groups" do
           group_with_user
-          @group.add_user(@viewing_user, 'accepted')
+          @group.add_user(@viewing_user, "accepted")
           expect(messageable_user_ids).to include(@user.id)
         end
 
         it "includes users messageable via adminned accounts" do
           user_factory
           tie_user_to_account(@viewing_user, role: admin_role)
-          custom_role = custom_account_role('CustomStudent', account: Account.default)
+          custom_role = custom_account_role("CustomStudent", account: Account.default)
           tie_user_to_account(@user, role: custom_role)
           expect(messageable_user_ids).to include(@user.id)
         end
@@ -1195,13 +1195,13 @@ describe "MessageableUser::Calculator" do
           student_in_course(user: @viewing_user, active_all: true)
           group_with_user(user: @viewing_user)
 
-          alice = user_factory(name: 'Alice')
-          @group.add_user(alice, 'accepted')
+          alice = user_factory(name: "Alice")
+          @group.add_user(alice, "accepted")
 
-          @teacher.name = 'Bob'
+          @teacher.name = "Bob"
           @teacher.save!
 
-          @viewing_user.name = 'Charles'
+          @viewing_user.name = "Charles"
           @viewing_user.save!
 
           expect(messageable_user_ids).to eq [alice.id, @teacher.id, @viewing_user.id]
@@ -1211,7 +1211,7 @@ describe "MessageableUser::Calculator" do
           before do
             student_in_course(user: @viewing_user, active_all: true)
             group_with_user(user: @viewing_user)
-            @group.add_user(@teacher, 'accepted')
+            @group.add_user(@teacher, "accepted")
           end
 
           it "only returns the user once" do
@@ -1221,8 +1221,8 @@ describe "MessageableUser::Calculator" do
           it "has combined common contexts" do
             messageable_user = @calculator.search_messageable_users
                                           .paginate(per_page: 2).last
-            expect(messageable_user.common_courses).to eq({ @course.id => ['TeacherEnrollment'] })
-            expect(messageable_user.common_groups).to eq({ @group.id => ['Member'] })
+            expect(messageable_user.common_courses).to eq({ @course.id => ["TeacherEnrollment"] })
+            expect(messageable_user.common_groups).to eq({ @group.id => ["Member"] })
           end
         end
       end

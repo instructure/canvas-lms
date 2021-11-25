@@ -50,11 +50,11 @@ module Canvas
 
     let(:error) { double("Some Error") }
 
-    describe '.capture_exception' do
-      it 'tags with the exception type and default level' do
+    describe ".capture_exception" do
+      it "tags with the exception type and default level" do
         Canvas::Errors.capture_exception(:core_meltdown, error)
         expect(@error_harness.exception).to eq(error)
-        expect(@error_harness.details[:tags][:type]).to eq('core_meltdown')
+        expect(@error_harness.details[:tags][:type]).to eq("core_meltdown")
         expect(@error_harness.level).to eq(:error)
       end
     end

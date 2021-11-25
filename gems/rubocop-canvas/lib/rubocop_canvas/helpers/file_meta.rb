@@ -24,7 +24,7 @@ module RuboCop
       CONTROLLER_FILE_NAME_REGEX = /controller\.rb$/.freeze
 
       def file_name
-        file_path.split('/').last
+        file_path.split("/").last
       end
 
       def file_path

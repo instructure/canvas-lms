@@ -17,38 +17,38 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../../qti_helper'
+require_relative "../../qti_helper"
 if Qti.migration_executable
   describe "Converting Angel CC QTI" do
     it "converts multiple choice" do
-      manifest_node = get_manifest_node('multiple_choice')
+      manifest_node = get_manifest_node("multiple_choice")
       hash = Qti::ChoiceInteraction.create_instructure_question(manifest_node: manifest_node, base_dir: angel_question_dir)
       hash[:answers].each { |a| a.delete(:id) }
       expect(hash).to eq AngelExpected::MULTIPLE_CHOICE
     end
 
     it "converts true false" do
-      manifest_node = get_manifest_node('true_false')
+      manifest_node = get_manifest_node("true_false")
       hash = Qti::ChoiceInteraction.create_instructure_question(manifest_node: manifest_node, base_dir: angel_question_dir)
       hash[:answers].each { |a| a.delete(:id) }
       expect(hash).to eq AngelExpected::TRUE_FALSE
     end
 
     it "converts multiple response" do
-      manifest_node = get_manifest_node('multiple_answer')
+      manifest_node = get_manifest_node("multiple_answer")
       hash = Qti::ChoiceInteraction.create_instructure_question(manifest_node: manifest_node, base_dir: angel_question_dir)
       hash[:answers].each { |a| a.delete(:id) }
       expect(hash).to eq AngelExpected::MULTIPLE_ANSWER
     end
 
     it "converts essay" do
-      manifest_node = get_manifest_node('essay')
+      manifest_node = get_manifest_node("essay")
       hash = Qti::ChoiceInteraction.create_instructure_question(manifest_node: manifest_node, base_dir: angel_question_dir)
       expect(hash).to eq AngelExpected::ESSAY
     end
 
     it "converts the assessment into a quiz" do
-      manifest_node = get_manifest_node('assessment', quiz_type: 'Test')
+      manifest_node = get_manifest_node("assessment", quiz_type: "Test")
       a = Qti::AssessmentTestConverter.new(manifest_node, angel_question_dir)
       a.create_instructure_quiz
       expect(a.quiz).to eq AngelExpected::ASSESSMENT

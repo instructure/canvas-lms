@@ -20,19 +20,19 @@
 
 module PlannerHelper
   PLANNABLE_TYPES = {
-    'discussion_topic' => 'DiscussionTopic',
-    'announcement' => 'Announcement',
-    'quiz' => 'Quizzes::Quiz',
-    'assignment' => 'Assignment',
-    'wiki_page' => 'WikiPage',
-    'planner_note' => 'PlannerNote',
-    'calendar_event' => 'CalendarEvent',
-    'assessment_request' => 'AssessmentRequest'
+    "discussion_topic" => "DiscussionTopic",
+    "announcement" => "Announcement",
+    "quiz" => "Quizzes::Quiz",
+    "assignment" => "Assignment",
+    "wiki_page" => "WikiPage",
+    "planner_note" => "PlannerNote",
+    "calendar_event" => "CalendarEvent",
+    "assessment_request" => "AssessmentRequest"
   }.freeze
 
   class << self
     def planner_meta_cache_key(user)
-      ['planner_items_meta', user].cache_key
+      ["planner_items_meta", user].cache_key
     end
 
     def get_planner_cache_id(user)
@@ -58,7 +58,7 @@ module PlannerHelper
 
       planner_override = PlannerOverride.find_or_create_by(
         plannable_id: quiz_submission.quiz_id,
-        plannable_type: PLANNABLE_TYPES['quiz'],
+        plannable_type: PLANNABLE_TYPES["quiz"],
         user_id: quiz_submission.user_id
       )
       complete_planner_override planner_override
@@ -83,20 +83,20 @@ module PlannerHelper
                            discussion_topic_id = DiscussionTopic.find_by(assignment_id: submission.assignment_id)&.id
                            PlannerOverride.find_by(
                              plannable_id: discussion_topic_id,
-                             plannable_type: PLANNABLE_TYPES['discussion_topic'],
+                             plannable_type: PLANNABLE_TYPES["discussion_topic"],
                              user_id: submission.user_id
                            )
                          when "online_quiz"
                            quiz_id = Quizzes::Quiz.find_by(assignment_id: submission.assignment_id)&.id
                            PlannerOverride.find_by(
                              plannable_id: quiz_id,
-                             plannable_type: PLANNABLE_TYPES['quiz'],
+                             plannable_type: PLANNABLE_TYPES["quiz"],
                              user_id: submission.user_id
                            )
                          end
       planner_override ||= PlannerOverride.find_by(
         plannable_id: submission.assignment_id,
-        plannable_type: PLANNABLE_TYPES['assignment'],
+        plannable_type: PLANNABLE_TYPES["assignment"],
         user_id: submission.user_id
       )
       planner_override

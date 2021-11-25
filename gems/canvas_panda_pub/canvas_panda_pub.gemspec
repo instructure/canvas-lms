@@ -5,7 +5,7 @@ Gem::Specification.new do |spec|
   spec.version       = "1.0.0"
   spec.authors       = ["Zach Wily"]
   spec.email         = ["zach@instructure.com"]
-  spec.summary       = 'Canvas PandaPub'
+  spec.summary       = "Canvas PandaPub"
 
   spec.files         = Dir.glob("{lib,spec}/**/*") + %w[test.sh]
   spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }

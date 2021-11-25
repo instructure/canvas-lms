@@ -31,12 +31,12 @@ describe ProgressSerializer do
     p = context.progresses.build
     p.id = 1
     p.completion = 10
-    p.workflow_state = 'running'
+    p.workflow_state = "running"
     p.save
     p
   end
 
-  let(:host_name) { 'example.com' }
+  let(:host_name) { "example.com" }
 
   let :controller do
     options = {
@@ -63,11 +63,11 @@ describe ProgressSerializer do
     end
   end
 
-  it 'serializes id' do
-    expect(json['id']).to eq "1"
+  it "serializes id" do
+    expect(json["id"]).to eq "1"
   end
 
-  it 'serializes url' do
-    expect(json['url']).to eq 'http://example.com/api/v1/progress/1'
+  it "serializes url" do
+    expect(json["url"]).to eq "http://example.com/api/v1/progress/1"
   end
 end

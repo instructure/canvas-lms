@@ -16,13 +16,13 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../common'
-require_relative 'page_objects/quizzes_index_page'
+require_relative "../common"
+require_relative "page_objects/quizzes_index_page"
 
 # Note that this is old quizzes in Canvas
 
-describe 'quizzes' do
-  include_context 'in-process server selenium tests'
+describe "quizzes" do
+  include_context "in-process server selenium tests"
   include QuizzesIndexPage
 
   before do
@@ -33,10 +33,10 @@ describe 'quizzes' do
     visit_quizzes_index_page(@course.id)
   end
 
-  it 'shows direct share options' do
+  it "shows direct share options" do
     manage_quiz_menu(@quiz1.id).click
 
-    expect(quiz_settings_menu(@quiz1.id).text).to include('Send to...')
-    expect(quiz_settings_menu(@quiz1.id).text).to include('Copy to...')
+    expect(quiz_settings_menu(@quiz1.id).text).to include("Send to...")
+    expect(quiz_settings_menu(@quiz1.id).text).to include("Copy to...")
   end
 end

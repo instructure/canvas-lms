@@ -32,7 +32,7 @@ class AccessToken < ActiveRecord::Base
 
   belongs_to :developer_key, counter_cache: :access_token_count
   belongs_to :user, inverse_of: :access_tokens
-  belongs_to :real_user, inverse_of: :masquerade_tokens, class_name: 'User'
+  belongs_to :real_user, inverse_of: :masquerade_tokens, class_name: "User"
   has_one :account, through: :developer_key
 
   serialize :scopes, Array
@@ -71,7 +71,7 @@ class AccessToken < ActiveRecord::Base
   def destroy
     return true if deleted?
 
-    self.workflow_state = 'deleted'
+    self.workflow_state = "deleted"
     run_callbacks(:destroy) { save! }
   end
 
@@ -130,7 +130,7 @@ class AccessToken < ActiveRecord::Base
   end
 
   def record_last_used_threshold
-    Setting.get('access_token_last_used_threshold', 10.minutes).to_i
+    Setting.get("access_token_last_used_threshold", 10.minutes).to_i
   end
 
   def used!
@@ -180,7 +180,7 @@ class AccessToken < ActiveRecord::Base
   end
 
   def regenerate=(val)
-    if val == '1' && manually_created?
+    if val == "1" && manually_created?
       generate_token(true)
     end
   end
@@ -209,11 +209,11 @@ class AccessToken < ActiveRecord::Base
   def url_scopes_for_method(method)
     re = /^url:#{method}\|/
     scopes.grep(re).map do |scope|
-      path = scope.split('|').last
+      path = scope.split("|").last
       # build up the scope matching regexp from the route path
-      path = path.gsub(%r{:[^/)]+}, '[^/]+') # handle dynamic segments /courses/:course_id -> /courses/[^/]+
-      path = path.gsub(%r{\*[^/)]+}, '.+') # handle glob segments /files/*path -> /files/.+
-      path = path.gsub(/\(/, '(?:').gsub(/\)/, '|)') # handle optional segments /files(/[^/]+) -> /files(?:/[^/]+|)
+      path = path.gsub(%r{:[^/)]+}, "[^/]+") # handle dynamic segments /courses/:course_id -> /courses/[^/]+
+      path = path.gsub(%r{\*[^/)]+}, ".+") # handle glob segments /files/*path -> /files/.+
+      path = path.gsub(/\(/, "(?:").gsub(/\)/, "|)") # handle optional segments /files(/[^/]+) -> /files(?:/[^/]+|)
       path = "#{path}(?:\\\.[^/]+|)" # handle format segments /files(.:format) -> /files(?:\.[^/]+|)
       Regexp.new("^#{path}$")
     end
@@ -236,7 +236,7 @@ class AccessToken < ActiveRecord::Base
   def must_only_include_valid_scopes
     return true if scopes.nil? || !developer_key.require_scopes?
 
-    errors.add(:scopes, 'requested scopes must match scopes on developer key') unless scopes.all? { |scope| developer_key.scopes.include?(scope) }
+    errors.add(:scopes, "requested scopes must match scopes on developer key") unless scopes.all? { |scope| developer_key.scopes.include?(scope) }
   end
 
   # It's encrypted, but end users still shouldn't see this.

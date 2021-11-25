@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'spec_helper'
+require "spec_helper"
 
 describe IncomingMailProcessor::Instrumentation do
   let(:mailbox) do
@@ -27,18 +27,18 @@ describe IncomingMailProcessor::Instrumentation do
   end
 
   let(:single_config) do
-    { 'imap' => {
-      'address' => "fake@fake.fake"
+    { "imap" => {
+      "address" => "fake@fake.fake"
     } }
   end
 
   let(:multi_config) do
-    { 'imap' => {
-      'accounts' => [
-        { 'username' => 'user1@fake.fake' },
-        { 'username' => 'user2@fake.fake' },
-        { 'username' => 'user3@fake.fake' },
-        { 'username' => 'user4@fake.fake' },
+    { "imap" => {
+      "accounts" => [
+        { "username" => "user1@fake.fake" },
+        { "username" => "user2@fake.fake" },
+        { "username" => "user3@fake.fake" },
+        { "username" => "user4@fake.fake" },
       ],
     }, }
   end
@@ -48,7 +48,7 @@ describe IncomingMailProcessor::Instrumentation do
       allow(IncomingMailProcessor::IncomingMessageProcessor).to receive(:create_mailbox).and_return(mailbox)
     end
 
-    it 'pushes to statsd for one mailbox' do
+    it "pushes to statsd for one mailbox" do
       IncomingMailProcessor::IncomingMessageProcessor.configure(single_config)
 
       expect(InstStatsd::Statsd).to receive(:gauge).with("incoming_mail_processor.mailbox_queue_size.fake@fake_fake", 4,
@@ -58,7 +58,7 @@ describe IncomingMailProcessor::Instrumentation do
       IncomingMailProcessor::Instrumentation.process
     end
 
-    it 'pushes to statsd for multiple mailboxes' do
+    it "pushes to statsd for multiple mailboxes" do
       IncomingMailProcessor::IncomingMessageProcessor.configure(multi_config)
 
       expect(InstStatsd::Statsd).to receive(:gauge).with("incoming_mail_processor.mailbox_queue_size.user1@fake_fake", 4,

@@ -35,20 +35,20 @@ module ConditionalRelease
     end
 
     scope :latest, lambda {
-      select('DISTINCT ON (assignment_set_id, student_id) id')
-        .order('assignment_set_id, student_id, created_at DESC')
+      select("DISTINCT ON (assignment_set_id, student_id) id")
+        .order("assignment_set_id, student_id, created_at DESC")
     }
 
     def self.current_assignments(student_id_or_ids, sets = nil)
       conditions = { student_id: student_id_or_ids }
       conditions[:assignment_set] = sets if sets
-      where(id: latest.where(conditions), action: 'assign')
+      where(id: latest.where(conditions), action: "assign")
     end
 
     def self.create_from_sets(assigned, unassigned, opts = {})
       opts[:actor_id] ||= opts[:student_id]
 
-      [['assign', assigned], ['unassign', unassigned]].each do |action, sets|
+      [["assign", assigned], ["unassign", unassigned]].each do |action, sets|
         sets = Array.wrap(sets)
         sets.each do |set|
           find_or_create_by! opts.merge(action: action, assignment_set: set, root_account_id: set.root_account_id)

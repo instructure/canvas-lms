@@ -59,7 +59,7 @@ class SubmissionVersion < ActiveRecord::Base
 
       {
         context_id: model.course_id,
-        context_type: 'Course',
+        context_type: "Course",
         user_id: model.user_id,
         assignment_id: model.assignment_id,
         version_id: version.id,

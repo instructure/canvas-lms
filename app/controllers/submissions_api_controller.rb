@@ -266,8 +266,8 @@ class SubmissionsApiController < ApplicationController
                submissions = submissions.order(:user_id)
 
                submissions = submissions.preload(:group) if includes.include?("group")
-               submissions = submissions.preload(:quiz_submission) unless params[:exclude_response_fields]&.include?('preview_url')
-               submissions = submissions.preload(:attachment) unless params[:exclude_response_fields]&.include?('attachments')
+               submissions = submissions.preload(:quiz_submission) unless params[:exclude_response_fields]&.include?("preview_url")
+               submissions = submissions.preload(:attachment) unless params[:exclude_response_fields]&.include?("attachments")
 
                submissions = Api.paginate(submissions, self,
                                           polymorphic_url([:api_v1, @section || @context, @assignment, :submissions]))
@@ -368,7 +368,7 @@ class SubmissionsApiController < ApplicationController
   #       }
   #     ]
   def for_students
-    if params[:student_ids].try(:include?, 'all')
+    if params[:student_ids].try(:include?, "all")
       all = true
     else
       student_ids = map_user_ids(params[:student_ids] || []).map(&:to_i)
@@ -388,7 +388,7 @@ class SubmissionsApiController < ApplicationController
     else
       # can view observees
       allowed_student_ids = @context.observer_enrollments
-                                    .where(user_id: @current_user.id, workflow_state: 'active')
+                                    .where(user_id: @current_user.id, workflow_state: "active")
                                     .where.not(associated_user_id: nil)
                                     .pluck(:associated_user_id)
 
@@ -409,23 +409,23 @@ class SubmissionsApiController < ApplicationController
     end
 
     if student_ids.is_a?(Array) && student_ids.length > Api.max_per_page
-      return render json: { error: 'too many students' }, status: :bad_request
+      return render json: { error: "too many students" }, status: :bad_request
     end
 
     enrollments = (@section || @context).all_student_enrollments
     if (enrollment_state = params[:enrollment_state].presence)
       state_based_on_date = params[:state_based_on_date] ? value_to_boolean(params[:state_based_on_date]) : true
       case [enrollment_state, state_based_on_date]
-      when ['active', true]
+      when ["active", true]
         enrollments = enrollments.active_by_date
-      when ['concluded', true]
+      when ["concluded", true]
         enrollments = enrollments.completed_by_date
-      when ['active', false]
-        enrollments = enrollments.where(workflow_state: 'active')
-      when ['concluded', false]
-        enrollments = enrollments.where(workflow_state: 'completed')
+      when ["active", false]
+        enrollments = enrollments.where(workflow_state: "active")
+      when ["concluded", false]
+        enrollments = enrollments.where(workflow_state: "completed")
       else
-        return render json: { error: 'invalid enrollment_state' }, status: :bad_request
+        return render json: { error: "invalid enrollment_state" }, status: :bad_request
       end
       student_ids = enrollments.where(user_id: student_ids).select(:user_id)
     end
@@ -456,7 +456,7 @@ class SubmissionsApiController < ApplicationController
     end
 
     if requested_assignment_ids.present? && (requested_assignment_ids - assignments.map(&:id)).present?
-      return render json: { error: 'invalid assignment ids requested' }, status: :forbidden
+      return render json: { error: "invalid assignment ids requested" }, status: :forbidden
     end
 
     assignment_visibilities = {}
@@ -475,7 +475,7 @@ class SubmissionsApiController < ApplicationController
       if Api::ISO8601_REGEX.match?(params[:submitted_since])
         submitted_since_date = Time.zone.parse(params[:submitted_since])
       else
-        return render(json: { errors: { submitted_since: t('Invalid datetime for submitted_since') } }, status: :bad_request)
+        return render(json: { errors: { submitted_since: t("Invalid datetime for submitted_since") } }, status: :bad_request)
       end
     end
 
@@ -483,7 +483,7 @@ class SubmissionsApiController < ApplicationController
       if Api::ISO8601_REGEX.match?(params[:graded_since])
         graded_since_date = Time.zone.parse(params[:graded_since])
       else
-        return render(json: { errors: { graded_since: t('Invalid datetime for graded_since') } }, status: :bad_request)
+        return render(json: { errors: { graded_since: t("Invalid datetime for graded_since") } }, status: :bad_request)
       end
     end
 
@@ -548,7 +548,7 @@ class SubmissionsApiController < ApplicationController
             hash[:submissions] << submission_json(submission, submission.assignment, @current_user, session, @context, includes, params)
           end
         end
-        if includes.include?('total_scores')
+        if includes.include?("total_scores")
           hash[:computed_final_score] = enrollment.computed_final_score
           hash[:computed_current_score] = enrollment.computed_current_score
 
@@ -569,15 +569,15 @@ class SubmissionsApiController < ApplicationController
       submissions = submissions.where("submitted_at>?", submitted_since_date) if submitted_since_date
       submissions = submissions.where("graded_at>?", graded_since_date) if graded_since_date
       submissions = submissions.preload(:user, :originality_reports, { quiz_submission: :versions })
-      submissions = submissions.preload(:attachment) unless params[:exclude_response_fields]&.include?('attachments')
+      submissions = submissions.preload(:attachment) unless params[:exclude_response_fields]&.include?("attachments")
       if includes.include?("has_postable_comments") || includes.include?("submission_comments")
         submissions = submissions.preload(:submission_comments)
       end
 
       # this will speed up pagination for large collections when order_direction is asc
-      if order_by == 'graded_at' && order_direction == 'asc'
+      if order_by == "graded_at" && order_direction == "asc"
         submissions = BookmarkedCollection.wrap(Submission::GradedAtBookmarker, submissions)
-      elsif order_by == :id && order_direction == 'asc'
+      elsif order_by == :id && order_direction == "asc"
         submissions = BookmarkedCollection.wrap(Submission::IdBookmarker, submissions)
       end
 
@@ -621,7 +621,7 @@ class SubmissionsApiController < ApplicationController
           params.merge(anonymize_user_id: !!@anonymize_user_id)
         )
       else
-        @unauthorized_message = t('#application.errors.submission_unauthorized', "You cannot access this submission.")
+        @unauthorized_message = t("#application.errors.submission_unauthorized", "You cannot access this submission.")
         render_unauthorized_action
       end
     end
@@ -658,8 +658,8 @@ class SubmissionsApiController < ApplicationController
 
     if @assignment.allowed_extensions.any?
       extension = infer_file_extension(params)
-      reject!(t('unable to find extension')) unless extension
-      reject!(t('filetype not allowed')) unless @assignment.allowed_extensions.include?(extension)
+      reject!(t("unable to find extension")) unless extension
+      reject!(t("filetype not allowed")) unless @assignment.allowed_extensions.include?(extension)
     end
     permission = @assignment.submission_types.include?("online_upload") ? :submit : :nothing
     submit_assignment = params.key?(:submit_assignment) ? value_to_boolean(params[:submit_assignment]) : true
@@ -837,7 +837,7 @@ class SubmissionsApiController < ApplicationController
         end
         submission[:provisional] = value_to_boolean(params[:submission][:provisional])
         submission[:final] = value_to_boolean(params[:submission][:final]) && @assignment.permits_moderation?(@current_user)
-        if params[:submission][:submission_type] == 'basic_lti_launch' && (!@submission.has_submission? || @submission.submission_type == 'basic_lti_launch')
+        if params[:submission][:submission_type] == "basic_lti_launch" && (!@submission.has_submission? || @submission.submission_type == "basic_lti_launch")
           submission[:submission_type] = params[:submission][:submission_type]
           submission[:url] = params[:submission][:url]
         end
@@ -894,7 +894,7 @@ class SubmissionsApiController < ApplicationController
           assessor: @current_user,
           user: @user,
           artifact: @submission,
-          assessment: assessment.merge(assessment_type: 'grading')
+          assessment: assessment.merge(assessment_type: "grading")
         )
       end
 
@@ -930,8 +930,8 @@ class SubmissionsApiController < ApplicationController
       bulk_load_attachments_and_previews([@submission])
 
       includes = %w[submission_comments]
-      includes.concat(Array.wrap(params[:include]) & ['visibility'])
-      includes << 'provisional_grades' if submission[:provisional]
+      includes.concat(Array.wrap(params[:include]) & ["visibility"])
+      includes << "provisional_grades" if submission[:provisional]
 
       visiblity_included = includes.include?("visibility")
       if visiblity_included
@@ -1117,7 +1117,7 @@ class SubmissionsApiController < ApplicationController
       submission_scope = @assignment.submissions.except(:preload).where(user_id: student_scope)
                                     .order(can_view_student_names ? :user_id : :anonymous_id)
       submission_scope = submission_scope.preload(:user) if can_view_student_names
-      if (include_pg = includes.include?('provisional_grades'))
+      if (include_pg = includes.include?("provisional_grades"))
         render_unauthorized_action and return unless @assignment.permits_moderation?(@current_user)
 
         submission_scope = submission_scope.preload(provisional_grades: :selection)
@@ -1186,7 +1186,7 @@ class SubmissionsApiController < ApplicationController
 
       student_displays = students.map do |student|
         user_display = user_display_json(student, @context)
-        user_display['assignment_ids'] = student.assignment_student_visibilities
+        user_display["assignment_ids"] = student.assignment_student_visibilities
                                                 .select { |visibility| assignment_ids.include?(visibility.assignment_id.to_s) }
                                                 .map(&:assignment_id)
         user_display

@@ -27,13 +27,13 @@ class Pseudonym < ActiveRecord::Base
   include Canvas::RootAccountCacher
   belongs_to :user
   has_many :communication_channels, -> { ordered }
-  has_many :sis_enrollments, class_name: 'Enrollment', inverse_of: :sis_pseudonym
+  has_many :sis_enrollments, class_name: "Enrollment", inverse_of: :sis_pseudonym
   has_many :auditor_authentication_records,
            class_name: "Auditors::ActiveRecord::AuthenticationRecord",
            dependent: :destroy,
            inverse_of: :pseudonym
   belongs_to :communication_channel
-  belongs_to :sis_communication_channel, class_name: 'CommunicationChannel'
+  belongs_to :sis_communication_channel, class_name: "CommunicationChannel"
   belongs_to :authentication_provider
   MAX_UNIQUE_ID_LENGTH = 100
 
@@ -162,7 +162,7 @@ class Pseudonym < ActiveRecord::Base
     return unless unique_id
 
     active_only.by_unique_id(unique_id).where("authentication_provider_id IS NULL OR EXISTS (?)",
-                                              AuthenticationProvider.active.where(auth_type: ['canvas', 'ldap'])
+                                              AuthenticationProvider.active.where(auth_type: ["canvas", "ldap"])
                                                 .where("authentication_provider_id=authentication_providers.id"))
                .order("authentication_provider_id NULLS LAST").first
   end
@@ -201,17 +201,17 @@ class Pseudonym < ActiveRecord::Base
   end
 
   def login_assertions_for_user
-    if !persistence_token || persistence_token == ''
+    if !persistence_token || persistence_token == ""
       # Some pseudonyms can end up without a persistence token if they were created
       # using the SIS, for example.
-      self.persistence_token = CanvasSlug.generate('pseudo', 15)
+      self.persistence_token = CanvasSlug.generate("pseudo", 15)
       save
     end
 
     user = self.user
     return nil if user.unavailable?
 
-    user.workflow_state = 'registered' unless user.registered?
+    user.workflow_state = "registered" unless user.registered?
 
     add_ldap_channel
 
@@ -237,7 +237,7 @@ class Pseudonym < ActiveRecord::Base
   end
 
   def retire_channels
-    communication_channels.each { |cc| cc.update_attribute(:workflow_state, 'retired') }
+    communication_channels.each { |cc| cc.update_attribute(:workflow_state, "retired") }
   end
 
   def validate_unique_id
@@ -267,7 +267,7 @@ class Pseudonym < ActiveRecord::Base
     return true unless Pseudonym.where.not(id: id).where(account_id: account_id, sis_user_id: sis_user_id).exists?
 
     errors.add(:sis_user_id, :taken,
-               message: t('#errors.sis_id_in_use', "SIS ID \"%{sis_id}\" is already in use", sis_id: sis_user_id))
+               message: t("#errors.sis_id_in_use", "SIS ID \"%{sis_id}\" is already in use", sis_id: sis_user_id))
     throw :abort
   end
 
@@ -351,7 +351,7 @@ class Pseudonym < ActiveRecord::Base
 
   alias_method :destroy_permanently!, :destroy
   def destroy
-    self.workflow_state = 'deleted'
+    self.workflow_state = "deleted"
     self.deleted_at = Time.now.utc
     result = save
     user.try(:update_account_associations) if result
@@ -371,7 +371,7 @@ class Pseudonym < ActiveRecord::Base
   end
 
   def email_channel
-    communication_channel if communication_channel && communication_channel.path_type == 'email'
+    communication_channel if communication_channel && communication_channel.path_type == "email"
   end
 
   def email=(e)
@@ -425,7 +425,7 @@ class Pseudonym < ActiveRecord::Base
     return false unless active?
     return false if plaintext_password.blank?
 
-    require 'net/ldap'
+    require "net/ldap"
     res = false
     res ||= valid_ldap_credentials?(plaintext_password)
     if !res && passwordable?
@@ -446,12 +446,12 @@ class Pseudonym < ActiveRecord::Base
   def valid_ssha?(plaintext_password)
     return false if plaintext_password.blank? || sis_ssha.blank?
 
-    decoded = Base64.decode64(sis_ssha.delete_prefix('{SSHA}'))
+    decoded = Base64.decode64(sis_ssha.delete_prefix("{SSHA}"))
     digest = decoded[0, 40]
     salt = decoded[40..]
     return false unless digest && salt
 
-    digested_password = Digest::SHA1.digest(plaintext_password + salt).unpack1('H*')
+    digested_password = Digest::SHA1.digest(plaintext_password + salt).unpack1("H*")
     digest == digested_password
   end
 
@@ -460,7 +460,7 @@ class Pseudonym < ActiveRecord::Base
           when AuthenticationProvider::LDAP
             [authentication_provider]
           when nil
-            account.authentication_providers.active.where(auth_type: 'ldap')
+            account.authentication_providers.active.where(auth_type: "ldap")
           # when AuthenticationProvider::Canvas
           else
             []
@@ -483,7 +483,7 @@ class Pseudonym < ActiveRecord::Base
       email = res[:mail][0]
       cc = user.communication_channels.email.by_path(email).first
       cc ||= user.communication_channels.build(path: email)
-      cc.workflow_state = 'active'
+      cc.workflow_state = "active"
       cc.user = user
       cc.save if cc.changed?
       self.communication_channel = cc
@@ -501,11 +501,11 @@ class Pseudonym < ActiveRecord::Base
   end
 
   def strip_inferred_authentication_provider(attribute_names)
-    if attribute_names.include?('authentication_provider_id') &&
+    if attribute_names.include?("authentication_provider_id") &&
        @inferred_auth_provider &&
        authentication_provider_id &&
        !account.feature_enabled?(:persist_inferred_authentication_providers)
-      attribute_names.delete('authentication_provider_id')
+      attribute_names.delete("authentication_provider_id")
     end
     attribute_names
   end
@@ -531,9 +531,9 @@ class Pseudonym < ActiveRecord::Base
     nil
   end
 
-  scope :active, -> { where.not(workflow_state: 'deleted') }
-  scope :active_only, -> { where(workflow_state: 'active') }
-  scope :deleted, -> { where(workflow_state: 'deleted') }
+  scope :active, -> { where.not(workflow_state: "deleted") }
+  scope :active_only, -> { where(workflow_state: "active") }
+  scope :deleted, -> { where(workflow_state: "deleted") }
 
   def self.serialization_excludes
     %i[crypted_password password_salt reset_password_token persistence_token single_access_token perishable_token sis_ssha]

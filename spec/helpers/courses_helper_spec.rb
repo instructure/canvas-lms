@@ -52,17 +52,17 @@ describe CoursesHelper do
       end
 
       it "returns a no submission tooltip if there are no submissions" do
-        expect(self).to receive(:t).with('#courses.recent_event.no_submissions', 'no submissions').and_return('no submissions')
+        expect(self).to receive(:t).with("#courses.recent_event.no_submissions", "no submissions").and_return("no submissions")
         check_icon_data("no submissions", "Assignment", "icon-assignment")
       end
 
       it "returns a not submitted tooltip for a student if they have not made a submission" do
-        expect(self).to receive(:t).with('#courses.recent_event.not_submitted', 'not submitted').and_return('not submitted')
+        expect(self).to receive(:t).with("#courses.recent_event.not_submitted", "not submitted").and_return("not submitted")
         check_icon_data("not submitted", "Assignment", "icon-assignment", current_user: @student_one)
       end
 
       it "returns a nil tooltip for a student if the assignment does not expect a submission" do
-        expect(self).to receive(:t).with('#courses.recent_event.not_submitted', 'not submitted').and_return('not submitted')
+        expect(self).to receive(:t).with("#courses.recent_event.not_submitted", "not submitted").and_return("not submitted")
         check_icon_data(nil, "Assignment", "icon-assignment", current_user: @student_one, recent_event: @assignment2)
       end
     end
@@ -80,7 +80,7 @@ describe CoursesHelper do
       end
 
       it "returns a needs grading tooltip if assignments have been submitted that aren't graded" do
-        expect(self).to receive(:t).with('#courses.recent_event.needs_grading', 'needs grading').and_return('needs grading')
+        expect(self).to receive(:t).with("#courses.recent_event.needs_grading", "needs grading").and_return("needs grading")
         @assignment.submit_homework(@student_one, { submission_type: "online_text_entry", body: "..." })
         check_icon_data("needs grading", "Assignment", "icon-assignment")
       end
@@ -99,14 +99,14 @@ describe CoursesHelper do
       end
 
       it "returns a no new submissions tooltip if some assignments have been submitted and graded" do
-        expect(self).to receive(:t).with('#courses.recent_event.no_new_submissions', 'no new submissions').and_return('no new submissions')
+        expect(self).to receive(:t).with("#courses.recent_event.no_new_submissions", "no new submissions").and_return("no new submissions")
         @assignment.submit_homework(@student_one, { submission_type: "online_text_entry", body: "xyz" })
         @assignment.grade_student(@student_one, grade: 5, grader: @teacher)
         check_icon_data("no new submissions", "Assignment", "icon-assignment")
       end
 
       it "returns an all graded tooltip if all assignments are submitted and graded" do
-        expect(self).to receive(:t).with('#courses.recent_event.all_graded', 'all graded').and_return('all graded')
+        expect(self).to receive(:t).with("#courses.recent_event.all_graded", "all graded").and_return("all graded")
         [@student_one, @student_two].each do |student|
           @assignment.submit_homework(student, { submission_type: "online_text_entry", body: "bod" })
           @assignment.grade_student(student, grade: 5, grader: @teacher)
@@ -137,15 +137,15 @@ describe CoursesHelper do
     end
 
     it "returns the score if graded" do
-      assignment = Assignment.new(points_possible: 5, grading_type: 'points')
-      submission = Submission.new(grade: 1.33333333, workflow_state: 'graded', assignment: assignment)
-      expect(readable_grade(submission)).to eq '1.33 out of 5'
+      assignment = Assignment.new(points_possible: 5, grading_type: "points")
+      submission = Submission.new(grade: 1.33333333, workflow_state: "graded", assignment: assignment)
+      expect(readable_grade(submission)).to eq "1.33 out of 5"
     end
 
     it "does not raise an error when passing a numeric type but grading_type is not 'points'" do
-      assignment = Assignment.new(points_possible: 5, grading_type: 'percent')
-      submission = Submission.new(grade: 1.33333333, workflow_state: 'graded', assignment: assignment)
-      expect(readable_grade(submission)).to eq '1.33333%'
+      assignment = Assignment.new(points_possible: 5, grading_type: "percent")
+      submission = Submission.new(grade: 1.33333333, workflow_state: "graded", assignment: assignment)
+      expect(readable_grade(submission)).to eq "1.33333%"
     end
   end
 
@@ -159,8 +159,8 @@ describe CoursesHelper do
     let(:rando) { User.create! }
     let(:observer) do
       observer_user = User.create!
-      enrollment = course.enroll_user(observer_user, 'ObserverEnrollment')
-      enrollment.update!(workflow_state: 'active', associated_user: student)
+      enrollment = course.enroll_user(observer_user, "ObserverEnrollment")
+      enrollment.update!(workflow_state: "active", associated_user: student)
       observer_user
     end
 

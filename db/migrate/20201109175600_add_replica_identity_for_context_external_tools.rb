@@ -22,13 +22,13 @@ class AddReplicaIdentityForContextExternalTools < ActiveRecord::Migration[5.2]
   disable_ddl_transaction!
 
   def up
-    add_replica_identity 'ContextExternalTool', :root_account_id, 0
-    remove_index :context_external_tools, name: 'index_context_external_tools_on_root_account_id', if_exists: true
+    add_replica_identity "ContextExternalTool", :root_account_id, 0
+    remove_index :context_external_tools, name: "index_context_external_tools_on_root_account_id", if_exists: true
   end
 
   def down
     add_index :context_external_tools, :root_account_id, algorithm: :concurrently, if_not_exists: true
-    remove_replica_identity 'ContextExternalTool'
+    remove_replica_identity "ContextExternalTool"
     change_column_null :context_external_tools, :root_account_id, true
   end
 end

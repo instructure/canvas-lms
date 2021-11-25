@@ -73,7 +73,7 @@ class Submission::ShowPresenter
   def submission_details_tool_launch_url
     params = {
       assignment_id: @assignment.id,
-      display: 'borderless',
+      display: "borderless",
       url: @submission.external_tool_url
     }
 

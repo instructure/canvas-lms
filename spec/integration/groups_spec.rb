@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'nokogiri'
+require "nokogiri"
 
 describe GroupsController do
   it "generates the correct 'Add Announcement' link" do
@@ -30,7 +30,7 @@ describe GroupsController do
     expect(response).to be_successful
 
     html = Nokogiri::HTML5(response.body)
-    expect(html.css('#right-side a#add-announcement').attribute("href").text).to eq "/groups/#{@group.id}/announcements#new"
+    expect(html.css("#right-side a#add-announcement").attribute("href").text).to eq "/groups/#{@group.id}/announcements#new"
   end
 
   it "does not rendering 'pending' page when joining a self-signup group" do
@@ -48,7 +48,7 @@ describe GroupsController do
 
   it "renders uncategorized groups" do
     user_session(account_admin_user)
-    group = Account.default.groups.create!(name: 'SIS imported')
+    group = Account.default.groups.create!(name: "SIS imported")
 
     get "/groups/#{group.id}"
     expect(response).to be_successful

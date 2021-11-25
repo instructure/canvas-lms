@@ -17,29 +17,29 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../helpers/discussions_common'
-require_relative '../common'
+require_relative "../helpers/discussions_common"
+require_relative "../common"
 
 describe "discussions" do
   include_context "in-process server selenium tests"
   include DiscussionsCommon
 
   let(:course) { course_model.tap(&:offer!) }
-  let(:teacher) { teacher_in_course(course: course, name: 'teacher', active_all: true).user }
-  let(:teacher_topic) { course.discussion_topics.create!(user: teacher, title: 'teacher topic title', message: 'teacher topic message') }
-  let(:assignment_group) { course.assignment_groups.create!(name: 'assignment group') }
-  let(:group_category) { course.group_categories.create!(name: 'group category') }
+  let(:teacher) { teacher_in_course(course: course, name: "teacher", active_all: true).user }
+  let(:teacher_topic) { course.discussion_topics.create!(user: teacher, title: "teacher topic title", message: "teacher topic message") }
+  let(:assignment_group) { course.assignment_groups.create!(name: "assignment group") }
+  let(:group_category) { course.group_categories.create!(name: "group category") }
   let(:assignment) do
     course.assignments.create!(
-      name: 'assignment',
+      name: "assignment",
       # submission_types: 'discussion_topic',
       assignment_group: assignment_group
     )
   end
   let(:assignment_topic) do
     course.discussion_topics.create!(user: teacher,
-                                     title: 'assignment topic title',
-                                     message: 'assignment topic message',
+                                     title: "assignment topic title",
+                                     message: "assignment topic message",
                                      assignment: assignment)
   end
 
@@ -65,7 +65,7 @@ describe "discussions" do
           wait.until { f("#assignment_group_id").present? }
           click_option("#assignment_group_id", assign_group_2.name)
 
-          expect_new_page_load { f('.form-actions button[type=submit]').click }
+          expect_new_page_load { f(".form-actions button[type=submit]").click }
           expect(topic.reload.assignment.assignment_group_id).to eq assign_group_2.id
         end
 
@@ -75,7 +75,7 @@ describe "discussions" do
           wait.until { f("#assignment_grading_type").present? }
           click_option("#assignment_grading_type", "Letter Grade")
 
-          expect_new_page_load { f('.form-actions button[type=submit]').click }
+          expect_new_page_load { f(".form-actions button[type=submit]").click }
           expect(topic.reload.assignment.grading_type).to eq "letter_grade"
         end
 
@@ -86,7 +86,7 @@ describe "discussions" do
           f("#has_group_category").click
           click_option("#assignment_group_category_id", group_cat.name)
 
-          expect_new_page_load { f('.form-actions button[type=submit]').click }
+          expect_new_page_load { f(".form-actions button[type=submit]").click }
           expect(topic.reload.group_category_id).to eq group_cat.id
         end
 
@@ -95,13 +95,13 @@ describe "discussions" do
 
           f("#assignment_peer_reviews").click
 
-          expect_new_page_load { f('.form-actions button[type=submit]').click }
+          expect_new_page_load { f(".form-actions button[type=submit]").click }
           expect(topic.reload.assignment.peer_reviews).to eq true
         end
 
         it "allows editing the due dates", priority: "1" do
           get url
-          wait_for_tiny(f('textarea[name=message]'))
+          wait_for_tiny(f("textarea[name=message]"))
 
           due_at = Time.zone.now + 3.days
           unlock_at = Time.zone.now + 2.days
@@ -113,7 +113,7 @@ describe "discussions" do
           f(".date_field[data-date-type='lock_at']").send_keys(format_date_for_view(lock_at))
           wait_for_ajaximations
 
-          expect_new_page_load { f('.form-actions button[type=submit]').click }
+          expect_new_page_load { f(".form-actions button[type=submit]").click }
 
           a = DiscussionTopic.last.assignment
           expect(a.due_at.to_date).to eq due_at.to_date
@@ -123,11 +123,11 @@ describe "discussions" do
 
         it "adds an attachment to a graded topic", priority: "1" do
           get url
-          wait_for_tiny(f('textarea[name=message]'))
+          wait_for_tiny(f("textarea[name=message]"))
 
           add_attachment_and_validate do
             # should correctly save changes to the assignment
-            set_value f('#discussion_topic_assignment_points_possible'), '123'
+            set_value f("#discussion_topic_assignment_points_possible"), "123"
           end
           assignment.reload
           expect(assignment.points_possible).to eq 123
@@ -137,19 +137,19 @@ describe "discussions" do
           get url
           add_attachment_and_validate
           get url
-          f('.removeAttachment').click
+          f(".removeAttachment").click
           wait_for_ajaximations
-          check_element_has_focus(f('input[name=attachment]'))
+          check_element_has_focus(f("input[name=attachment]"))
         end
 
         it "warns user when leaving page unsaved", priority: "1" do
           skip_if_safari(:alert)
-          title = 'new title'
+          title = "new title"
           get url
-          wait_for_tiny(f('textarea[name=message]'))
+          wait_for_tiny(f("textarea[name=message]"))
 
-          replace_content(f('input[name=title]'), title)
-          fln('Home').click
+          replace_content(f("input[name=title]"), title)
+          fln("Home").click
 
           expect(alert_present?).to be_truthy
 
@@ -218,7 +218,7 @@ describe "discussions" do
           teacher.time_zone = "Hawaii"
           teacher.save!
           get url
-          f('.form-actions button[type=submit]').click
+          f(".form-actions button[type=submit]").click
           get url
           expect(topic.reload.lock_at).to eq (Time.zone.now - 5.days).beginning_of_minute
         end
@@ -227,9 +227,9 @@ describe "discussions" do
       it "toggles checkboxes when clicking their labels", priority: "1" do
         get url
 
-        expect(is_checked('input[type=checkbox][name=threaded]')).not_to be_truthy
+        expect(is_checked("input[type=checkbox][name=threaded]")).not_to be_truthy
         driver.execute_script(%{$('input[type=checkbox][name=threaded]').parent().click()})
-        expect(is_checked('input[type=checkbox][name=threaded]')).to be_truthy
+        expect(is_checked("input[type=checkbox][name=threaded]")).to be_truthy
       end
 
       context "locking" do
@@ -240,14 +240,14 @@ describe "discussions" do
           topic.save!
 
           get url
-          wait_for_tiny(f('textarea[name=message]'))
+          wait_for_tiny(f("textarea[name=message]"))
 
           expect(f('input[type=text][name="delayed_post_at"]')).to be_displayed
 
           f('input[type=text][name="delayed_post_at"]').clear
           f('input[type=text][name="lock_at"]').clear
 
-          expect_new_page_load { f('.form-actions button[type=submit]').click }
+          expect_new_page_load { f(".form-actions button[type=submit]").click }
 
           topic.reload
           expect(topic.delayed_post_at).to be_nil
@@ -259,11 +259,11 @@ describe "discussions" do
         it "is locked when delayed_post_at and lock_at are in past", priority: "2" do
           topic.delayed_post_at = nil
           topic.lock_at         = nil
-          topic.workflow_state  = 'active'
+          topic.workflow_state  = "active"
           topic.save!
 
           get url
-          wait_for_tiny(f('textarea[name=message]'))
+          wait_for_tiny(f("textarea[name=message]"))
 
           delayed_post_at = Time.zone.now - 10.days
           lock_at = Time.zone.now - 5.days
@@ -271,7 +271,7 @@ describe "discussions" do
           f('input[type=text][name="delayed_post_at"]').send_keys(format_date_for_view(delayed_post_at))
           f('input[type=text][name="lock_at"]').send_keys(format_date_for_view(lock_at))
 
-          expect_new_page_load { f('.form-actions button[type=submit]').click }
+          expect_new_page_load { f(".form-actions button[type=submit]").click }
           wait_for_ajaximations
 
           topic.reload
@@ -283,19 +283,19 @@ describe "discussions" do
         it "sets workflow to active when delayed_post_at in past and lock_at in future", priority: "2" do
           topic.delayed_post_at = 5.days.from_now
           topic.lock_at         = 10.days.from_now
-          topic.workflow_state  = 'active'
+          topic.workflow_state  = "active"
           topic.locked          = false
           topic.save!
 
           get url
-          wait_for_tiny(f('textarea[name=message]'))
+          wait_for_tiny(f("textarea[name=message]"))
 
           delayed_post_at = Time.zone.now - 5.days
 
           f('input[type=text][name="delayed_post_at"]').clear
           f('input[type=text][name="delayed_post_at"]').send_keys(format_date_for_view(delayed_post_at))
 
-          expect_new_page_load { f('.form-actions button[type=submit]').click }
+          expect_new_page_load { f(".form-actions button[type=submit]").click }
           wait_for_ajaximations
 
           topic.reload
@@ -314,32 +314,32 @@ describe "discussions" do
         it "validates that usage rights are set" do
           get url
           _filename, fullpath, _data = get_file("testfile5.zip")
-          f('input[name=attachment]').send_keys(fullpath)
-          type_in_tiny('textarea[name=message]', 'file attachment discussion')
-          f('#edit_discussion_form_buttons .btn-primary[type=submit]').click
+          f("input[name=attachment]").send_keys(fullpath)
+          type_in_tiny("textarea[name=message]", "file attachment discussion")
+          f("#edit_discussion_form_buttons .btn-primary[type=submit]").click
           wait_for_ajaximations
           error_box = f("div[role='alert'] .error_text")
-          expect(error_box.text).to eq 'You must set usage rights'
+          expect(error_box.text).to eq "You must set usage rights"
         end
 
         it "sets usage rights on file attachment" do
           get url
           _filename, fullpath, _data = get_file("testfile1.txt")
-          f('input[name=attachment]').send_keys(fullpath)
-          f('#usage_rights_control button').click
-          click_option(".UsageRightsSelectBox__container select", 'own_copyright', :value)
+          f("input[name=attachment]").send_keys(fullpath)
+          f("#usage_rights_control button").click
+          click_option(".UsageRightsSelectBox__container select", "own_copyright", :value)
           f(".UsageRightsDialog__Footer-Actions button[type='submit']").click
-          expect_new_page_load { f('.form-actions button[type=submit]').click }
+          expect_new_page_load { f(".form-actions button[type=submit]").click }
           expect(topic.reload.attachment.usage_rights).not_to be_nil
         end
 
         it "displays usage rights on file attachment" do
           usage_rights = @course.usage_rights.create!(
-            legal_copyright: '(C) 2012 Initrode',
-            use_justification: 'own_copyright'
+            legal_copyright: "(C) 2012 Initrode",
+            use_justification: "own_copyright"
           )
           file = @course.attachments.create!(
-            display_name: 'hey.txt',
+            display_name: "hey.txt",
             uploaded_data: default_uploaded_data,
             usage_rights: usage_rights
           )

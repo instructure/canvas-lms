@@ -21,8 +21,8 @@
 describe ExternalFeed do
   it "adds rss entries" do
     @feed = external_feed_model
-    require 'rss/1.0'
-    require 'rss/2.0'
+    require "rss/1.0"
+    require "rss/2.0"
     rss = RSS::Parser.parse rss_example
     res = @feed.add_rss_entries(rss)
     expect(res).not_to be_nil
@@ -104,8 +104,8 @@ describe ExternalFeed do
   it "adds rss entries as course announcements" do
     @course = course_model
     @feed = external_feed_model(context: @course)
-    require 'rss/1.0'
-    require 'rss/2.0'
+    require "rss/1.0"
+    require "rss/2.0"
     rss = RSS::Parser.parse rss_example
     res = @feed.add_rss_entries(rss)
     expect(res).not_to be_nil
@@ -120,7 +120,7 @@ describe ExternalFeed do
 
   it "adds atom entries" do
     @feed = external_feed_model
-    require 'atom'
+    require "atom"
     atom = Atom::Feed.load_feed atom_example
     res = @feed.add_atom_entries(atom)
     expect(res).not_to be_nil
@@ -132,7 +132,7 @@ describe ExternalFeed do
   it "adds atom entries as course announcements" do
     @course = course_model
     @feed = external_feed_model(context: @course)
-    require 'atom'
+    require "atom"
     atom = Atom::Feed.load_feed atom_example
     res = @feed.add_atom_entries(atom)
     expect(res).not_to be_nil
@@ -145,8 +145,8 @@ describe ExternalFeed do
   it "allows deleting" do
     @course = course_model
     @feed = external_feed_model(context: @course)
-    require 'rss/1.0'
-    require 'rss/2.0'
+    require "rss/1.0"
+    require "rss/2.0"
     rss = RSS::Parser.parse rss_example
     @feed.add_rss_entries(rss)
 

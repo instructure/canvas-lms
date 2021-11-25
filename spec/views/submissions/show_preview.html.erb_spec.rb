@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../views_helper'
+require_relative "../views_helper"
 
 describe "/submissions/show_preview" do
   it "renders" do
@@ -34,9 +34,9 @@ describe "/submissions/show_preview" do
   it "loads an lti launch" do
     course_with_student
     view_context
-    a = @course.assignments.create!(title: "external assignment", submission_types: 'basic_lti_launch')
+    a = @course.assignments.create!(title: "external assignment", submission_types: "basic_lti_launch")
     assign(:assignment, a)
-    assign(:submission, a.submit_homework(@user, submission_type: 'basic_lti_launch', url: 'http://www.example.com'))
+    assign(:submission, a.submit_homework(@user, submission_type: "basic_lti_launch", url: "http://www.example.com"))
     render "submissions/show_preview"
     expect(response.body).to match(%r{courses/#{@course.id}/external_tools/retrieve})
     expect(response.body).to match(/.*www\.example\.com.*/)
@@ -45,7 +45,7 @@ describe "/submissions/show_preview" do
   it "gives a user-friendly explanation why there's no preview" do
     course_with_student
     view_context
-    a = @course.assignments.create!(title: "some assignment", submission_types: 'on_paper')
+    a = @course.assignments.create!(title: "some assignment", submission_types: "on_paper")
     assign(:assignment, a)
     assign(:submission, a.submit_homework(@user))
     render "submissions/show_preview"

@@ -18,18 +18,18 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'vericite_client'
-require 'digest/sha1'
-require 'date'
+require "vericite_client"
+require "digest/sha1"
+require "date"
 
 module VeriCite
   def self.state_from_similarity_score(similarity_score)
-    return 'none' if similarity_score == 0
-    return 'acceptable' if similarity_score < 25
-    return 'warning' if similarity_score < 50
-    return 'problem' if similarity_score < 75
+    return "none" if similarity_score == 0
+    return "acceptable" if similarity_score < 25
+    return "warning" if similarity_score < 50
+    return "problem" if similarity_score < 75
 
-    'failure'
+    "failure"
   end
 
   class Client
@@ -67,7 +67,7 @@ module VeriCite
 
     def self.default_assignment_vericite_settings
       {
-        originality_report_visibility: Canvas::Plugin.find(:vericite).settings[:release_to_students] || 'immediate',
+        originality_report_visibility: Canvas::Plugin.find(:vericite).settings[:release_to_students] || "immediate",
         exclude_quoted: Canvas::Plugin.find(:vericite).settings[:exclude_quotes],
         exclude_self_plag: Canvas::Plugin.find(:vericite).settings[:exclude_self_plag],
         store_in_index: Canvas::Plugin.find(:vericite).settings[:store_in_index],
@@ -81,11 +81,11 @@ module VeriCite
         valid_keys << :created
         settings = settings.slice(*valid_keys)
 
-        settings[:originality_report_visibility] = 'immediate' unless %w[immediate after_grading after_due_date never].include?(settings[:originality_report_visibility])
+        settings[:originality_report_visibility] = "immediate" unless %w[immediate after_grading after_due_date never].include?(settings[:originality_report_visibility])
 
         %i[exclude_quoted exclude_self_plag store_in_index].each do |key|
           bool = Canvas::Plugin.value_to_boolean(settings[key])
-          settings[key] = bool ? '1' : '0'
+          settings[key] = bool ? "1" : "0"
         end
       end
       settings
@@ -100,11 +100,11 @@ module VeriCite
                                                                    user: course,
                                                                    course: course,
                                                                    assignment: assignment,
-                                                                   utp: '2',
+                                                                   utp: "2",
                                                                    dtstart: "#{today.strftime} 00:00:00",
                                                                    dtdue: "#{today.strftime} 00:00:00",
                                                                    dtpost: "#{today.strftime} 00:00:00",
-                                                                   late_accept_flag: '1',
+                                                                   late_accept_flag: "1",
                                                                    post: true
                                                                  }))
 
@@ -118,7 +118,7 @@ module VeriCite
       course = assignment.context
       opts = {
         post: true,
-        utp: '1',
+        utp: "1",
         user: student,
         course: course,
         assignment: assignment,
@@ -126,7 +126,7 @@ module VeriCite
         role: submission.grants_right?(student, :grade) ? "Instructor" : "Learner"
       }
       responses = {}
-      if submission.submission_type == 'online_upload'
+      if submission.submission_type == "online_upload"
         attachments = submission.attachments.select { |a| a.vericiteable? && (asset_string.nil? || a.asset_string == asset_string) }
         attachments.each do |a|
           # do not resubmit if the score already exists
@@ -142,7 +142,7 @@ module VeriCite
           paper_size = 100 # File.size(
           responses[a.asset_string] = sendRequest(:submit_paper, { pid: paper_id, ptl: paper_title, pext: paper_ext, ptype: paper_type, psize: paper_size, pdata: a.open }.merge!(opts))
         end
-      elsif submission.submission_type == 'online_text_entry' && (asset_string.nil? || submission.asset_string == asset_string)
+      elsif submission.submission_type == "online_text_entry" && (asset_string.nil? || submission.asset_string == asset_string)
         paper_id = Digest::SHA1.hexdigest submission.plaintext_body
         paper_ext = "html"
         paper_title = "InlineSubmission"
@@ -168,7 +168,7 @@ module VeriCite
       course = assignment.context
       object_id = submission.vericite_data_hash[asset_string][:object_id] rescue nil
       res = nil
-      res = sendRequest(:get_scores, oid: object_id, utp: '2', user: user, course: course, assignment: assignment) if object_id
+      res = sendRequest(:get_scores, oid: object_id, utp: "2", user: user, course: course, assignment: assignment) if object_id
       data = {}
       if res
         data[:similarity_score] = res[:similarity_score]
@@ -181,7 +181,7 @@ module VeriCite
       assignment = submission.assignment
       course = assignment.context
       object_id = submission.vericite_data_hash[asset_string][:object_id] rescue nil
-      response = sendRequest(:generate_report, oid: object_id, utp: '2', current_user: current_user, user: user, course: course, assignment: assignment)
+      response = sendRequest(:generate_report, oid: object_id, utp: "2", current_user: current_user, user: user, course: course, assignment: assignment)
       if response.nil?
         nil
       else
@@ -194,7 +194,7 @@ module VeriCite
       assignment = submission.assignment
       course = assignment.context
       object_id = submission.vericite_data_hash[asset_string][:object_id] rescue nil
-      response = sendRequest(:generate_report, oid: object_id, utp: '1', current_user: current_user, user: user, course: course, assignment: assignment, tem: email(course))
+      response = sendRequest(:generate_report, oid: object_id, utp: "1", current_user: current_user, user: user, course: course, assignment: assignment, tem: email(course))
       if response.nil?
         nil
       else
@@ -208,7 +208,7 @@ module VeriCite
       begin
         vericite_config = VeriCiteClient::Configuration.new
         vericite_config.host = @host
-        vericite_config.base_path = '/lms/v1'
+        vericite_config.base_path = "/lms/v1"
         api_client = VeriCiteClient::ApiClient.new(vericite_config)
         vericite_client = VeriCiteClient::DefaultApi.new(api_client)
 
@@ -225,9 +225,9 @@ module VeriCite
           assignment_data = VeriCiteClient::AssignmentData.new
           assignment_data.assignment_title = assignment.title || assignment_id
           assignment_data.assignment_instructions = assignment.description || ""
-          assignment_data.assignment_exclude_quotes = args["exclude_quoted"] == '1'
-          assignment_data.assignment_exclude_self_plag = args["exclude_self_plag"] == '1'
-          assignment_data.assignment_store_in_index = args["store_in_index"] == '1'
+          assignment_data.assignment_exclude_quotes = args["exclude_quoted"] == "1"
+          assignment_data.assignment_exclude_self_plag = args["exclude_self_plag"] == "1"
+          assignment_data.assignment_store_in_index = args["store_in_index"] == "1"
           assignment_data.assignment_due_date = 0
           unless assignment.due_at.nil?
             # convert to epoch time in milli
@@ -333,10 +333,10 @@ module VeriCite
           user_id = user.id
           current_user = args.delete :current_user
           token_user = current_user.id
-          token_user_role = 'Learner'
-          if args[:utp] == '2'
+          token_user_role = "Learner"
+          if args[:utp] == "2"
             # instructor
-            token_user_role = 'Instructor'
+            token_user_role = "Instructor"
           end
           # @return [Array<ReportURLLinkReponse>]
           data, status_code, _headers = vericite_client.reports_urls_context_id_get(context_id, assignment_id_filter, consumer, consumer_secret, token_user, token_user_role, { user_id_filter => user_id, external_content_id_filter => args[:oid] })

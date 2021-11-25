@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'nokogiri'
+require "nokogiri"
 
 describe "enrollment_date_restrictions" do
   before do
@@ -46,7 +46,7 @@ describe "enrollment_date_restrictions" do
     active_enrollments = page.css("#my_courses_table tbody tr")
     expect(active_enrollments.length).to eq 1
     # Make sure that the active courses have the star column.
-    expect(active_enrollments[0].css('td')[0]['class']).to match(/star-column/)
+    expect(active_enrollments[0].css("td")[0]["class"]).to match(/star-column/)
 
     expect(page.css(".past_enrollments tr")).to be_empty
   end
@@ -56,10 +56,10 @@ describe "enrollment_date_restrictions" do
     e1 = student_in_course(user: @student, active_all: 1)
 
     e1.destroy
-    expect(e1.workflow_state).to eq 'deleted'
+    expect(e1.workflow_state).to eq "deleted"
 
     @course.complete
-    expect(@course.workflow_state).to eq 'completed'
+    expect(@course.workflow_state).to eq "completed"
 
     user_session(@student, @pseudonym)
 
@@ -85,15 +85,15 @@ describe "enrollment_date_restrictions" do
     @course2.restrict_enrollments_to_course_dates = true
     @course2.save!
 
-    @course1.enroll_user(@user, 'StudentEnrollment', enrollment_state: 'active')
-    @course2.enroll_user(@user, 'StudentEnrollment', enrollment_state: 'active')
-    @course3.enroll_user(@user, 'StudentEnrollment', enrollment_state: 'active')
-    @course4.enroll_user(@user, 'StudentEnrollment', enrollment_state: 'active')
+    @course1.enroll_user(@user, "StudentEnrollment", enrollment_state: "active")
+    @course2.enroll_user(@user, "StudentEnrollment", enrollment_state: "active")
+    @course3.enroll_user(@user, "StudentEnrollment", enrollment_state: "active")
+    @course4.enroll_user(@user, "StudentEnrollment", enrollment_state: "active")
     user_session(@user)
 
-    get '/grades'
+    get "/grades"
     html = Nokogiri::HTML5(response.body)
-    expect(html.css('.course').length).to eq 2
+    expect(html.css(".course").length).to eq 2
 
     Account.default.account_users.create!(user: @user)
     @user.reload
@@ -113,7 +113,7 @@ describe "enrollment_date_restrictions" do
     @course.save!
     expect(@enrollment.reload.state_based_on_date).to eq :inactive
 
-    get '/calendar2'
+    get "/calendar2"
     html = Nokogiri::HTML5(response.body)
     expect(html.css(".group_course_#{@course.id}").length).to eq 0
   end

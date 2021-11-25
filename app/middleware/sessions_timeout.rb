@@ -23,7 +23,7 @@ module SessionsTimeout
   # should be a Integer. This will work it's way up to encrypted_cookie_store.rb
   # where the session's expire time is determined. EncryptedCookieStore is in a gem.
   def get_cookie(req)
-    sessions_settings = Canvas::Plugin.find('sessions').settings
+    sessions_settings = Canvas::Plugin.find("sessions").settings
 
     # Grab settings, convert them to seconds.(everything is converted down to seconds)
     if sessions_settings && sessions_settings["session_timeout"].present?

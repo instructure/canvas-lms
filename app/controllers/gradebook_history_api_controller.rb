@@ -237,7 +237,7 @@ class GradebookHistoryApiController < ApplicationController
   #
   # @returns [Grader]
   def day_details
-    date = Date.strptime(params[:date], '%Y-%m-%d').in_time_zone
+    date = Date.strptime(params[:date], "%Y-%m-%d").in_time_zone
     path = api_v1_gradebook_history_for_day_url(@context, params[:date])
     day_hash = json_for_date(date, @context, api_context(path))
     render json: day_hash
@@ -260,7 +260,7 @@ class GradebookHistoryApiController < ApplicationController
   #
   # @returns [SubmissionHistory]
   def submissions
-    date = Date.strptime(params[:date], '%Y-%m-%d').in_time_zone
+    date = Date.strptime(params[:date], "%Y-%m-%d").in_time_zone
     path = api_v1_gradebook_history_submissions_url(@context, params[:date], params[:grader_id], params[:assignment_id])
     submissions_hash = submissions_for(@context, api_context(path), date, params[:grader_id], params[:assignment_id])
     render json: submissions_hash
@@ -297,8 +297,8 @@ class GradebookHistoryApiController < ApplicationController
 
     # construct scope of interesting submission versions using index table
     indexed_versions = SubmissionVersion
-                       .where(context_type: 'Course', context_id: @context)
-                       .order(params[:ascending] ? :version_id : 'version_id DESC')
+                       .where(context_type: "Course", context_id: @context)
+                       .order(params[:ascending] ? :version_id : "version_id DESC")
     indexed_versions = indexed_versions.where(assignment_id: assignment) if assignment
     indexed_versions = indexed_versions.where(user_id: student) if student
 

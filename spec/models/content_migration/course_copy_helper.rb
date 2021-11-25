@@ -29,7 +29,7 @@ shared_context "course copy" do
       context: @copy_to,
       user: @user,
       source_course: @copy_from,
-      migration_type: 'course_copy_importer',
+      migration_type: "course_copy_importer",
       copy_options: { everything: "1" }
     )
     @cm.migration_settings[:import_immediately] = true
@@ -46,7 +46,7 @@ shared_context "course copy" do
       expect("#{er.message} - #{er.backtrace}").to eq ""
     end
     expect(@cm.warnings).to match_array warnings
-    expect(@cm.workflow_state).to eq 'imported'
+    expect(@cm.workflow_state).to eq "imported"
     @copy_to.reload
   end
 
@@ -62,12 +62,12 @@ shared_context "course copy" do
 
   def run_import(export_attachment_id)
     @cm.set_default_settings
-    @cm.migration_type = 'canvas_cartridge_importer'
+    @cm.migration_type = "canvas_cartridge_importer"
     worker = CC::Importer::CCWorker.new
     @cm.attachment_id = export_attachment_id
     @cm.skip_job_progress = true
     worker.perform(@cm)
-    expect(@cm.workflow_state).to eq 'imported'
+    expect(@cm.workflow_state).to eq "imported"
     @copy_to.reload
   end
 
@@ -111,7 +111,7 @@ shared_context "course copy" do
     @rubric.save!
 
     @assignment = @copy_from.assignments.create!(title: "some assignment", points_possible: 12)
-    @assoc = @rubric.associate_with(@assignment, @copy_from, purpose: 'grading', use_for_grading: true)
+    @assoc = @rubric.associate_with(@assignment, @copy_from, purpose: "grading", use_for_grading: true)
     @assoc.hide_score_total = true
     @assoc.use_for_grading = true
     @assoc.save!

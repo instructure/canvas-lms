@@ -25,13 +25,13 @@ describe ClearSmsOverrides do
   let(:migration) { described_class.new }
 
   it "clears the global setting" do
-    Setting.set('allowed_sms_notification_categories', 'foobar')
+    Setting.set("allowed_sms_notification_categories", "foobar")
 
     expect do
       migration.change
     end.to change {
-      Setting.get('allowed_sms_notification_categories', nil)
-    }.from('foobar').to(nil)
+      Setting.get("allowed_sms_notification_categories", nil)
+    }.from("foobar").to(nil)
   end
 
   it "queues sms settings to be cleared" do

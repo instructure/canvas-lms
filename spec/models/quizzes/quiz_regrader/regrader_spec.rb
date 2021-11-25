@@ -24,7 +24,7 @@ describe Quizzes::QuizRegrader::Regrader do
 
   let(:questions) do
     1.upto(4).map do |i|
-      double(id: i, question_data: { id: i, regrade_option: 'full_credit' })
+      double(id: i, question_data: { id: i, regrade_option: "full_credit" })
     end
   end
 
@@ -33,7 +33,7 @@ describe Quizzes::QuizRegrader::Regrader do
   end
 
   let(:current_quiz_question_regrades) do
-    1.upto(4).map { |i| double(quiz_question_id: i, regrade_option: 'full_credit') }
+    1.upto(4).map { |i| double(quiz_question_id: i, regrade_option: "full_credit") }
   end
 
   let(:quiz) do
@@ -54,12 +54,12 @@ describe Quizzes::QuizRegrader::Regrader do
 
   let(:quiz_regrader) { Quizzes::QuizRegrader::Regrader.new(quiz: quiz) }
 
-  describe '#initialize' do
-    it 'saves the quiz passed' do
+  describe "#initialize" do
+    it "saves the quiz passed" do
       expect(quiz_regrader.quiz).to eq quiz
     end
 
-    it 'takes an optional submissions argument' do
+    it "takes an optional submissions argument" do
       submissions = []
       expect(Quizzes::QuizRegrader::Regrader.new(quiz: quiz, submissions: submissions)
         .submissions).to eq submissions
@@ -85,8 +85,8 @@ describe Quizzes::QuizRegrader::Regrader do
   end
 
   describe "#submissions" do
-    it 'skips submissions that are in progress' do
-      questions << double(id: 5, question_data: { regrade_option: 'no_regrade' })
+    it "skips submissions that are in progress" do
+      questions << double(id: 5, question_data: { regrade_option: "no_regrade" })
 
       uncompleted_submission = double(id: 5, completed?: false)
       submissions << uncompleted_submission
@@ -96,9 +96,9 @@ describe Quizzes::QuizRegrader::Regrader do
     end
   end
 
-  describe '#regrade!' do
-    it 'creates a QuizRegrader::Submission for each submission and regrades them' do
-      questions << double(id: 5, question_data: { regrade_option: 'no_regrade' })
+  describe "#regrade!" do
+    it "creates a QuizRegrader::Submission for each submission and regrades them" do
+      questions << double(id: 5, question_data: { regrade_option: "no_regrade" })
       questions << double(id: 6, question_data: {})
 
       expect(Quizzes::QuizRegradeRun).to receive(:perform).with(quiz_regrade)

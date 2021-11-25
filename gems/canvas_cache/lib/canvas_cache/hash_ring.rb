@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'zlib'
+require "zlib"
 
 # see https://github.com/redis/redis-rb/pull/739
 

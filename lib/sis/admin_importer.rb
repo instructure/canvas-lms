@@ -65,7 +65,7 @@ module SIS
 
         state = status.downcase.strip
         raise ImportError, "Invalid status #{status} for admin" unless %w[active deleted].include? state
-        return if @batch.skip_deletes? && state == 'deleted'
+        return if @batch.skip_deletes? && state == "deleted"
 
         get_account(account_id)
         raise ImportError, "Invalid account_id given for admin" unless @account
@@ -82,7 +82,7 @@ module SIS
         user = get_user(user_id, the_root_account)
         raise ImportError, "Invalid or unknown user_id '#{user_id}' for admin" unless user
 
-        if state == 'deleted' && user.id == @batch&.user_id && @account == @root_account
+        if state == "deleted" && user.id == @batch&.user_id && @account == @root_account
           raise ImportError, "Can't remove yourself user_id '#{user_id}'"
         end
 
@@ -92,10 +92,10 @@ module SIS
 
       def create_or_find_admin(user, state)
         case state
-        when 'active'
+        when "active"
           admin = @account.account_users.where(user: user, role: @role).first_or_initialize
           admin.workflow_state = state
-        when 'deleted'
+        when "deleted"
           admin = @account.account_users.where(user: user, role: @role).where.not(sis_batch_id: nil).take
           return unless admin
 

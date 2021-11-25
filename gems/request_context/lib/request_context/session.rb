@@ -27,7 +27,7 @@ module RequestContext
     def call(env)
       status, headers, body = @app.call(env)
 
-      session_id = (env['rack.session.options'] || {})[:id]
+      session_id = (env["rack.session.options"] || {})[:id]
       if session_id
         ActionDispatch::Request.new(env).cookie_jar[:log_session_id] = {
           value: session_id,

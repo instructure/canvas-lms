@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
-require 'securerandom'
+require "securerandom"
 
 def ping
   $stdout.sync = true
-  print '.'
+  print "."
 end
 
 def create_notification(values = {})
@@ -13,7 +13,7 @@ def create_notification(values = {})
 end
 
 def telemetry_enabled?
-  (ENV['TELEMETRY_OPT_IN'] || "").present?
+  (ENV["TELEMETRY_OPT_IN"] || "").present?
 end
 
 def obfuscate_input_or_echo(password = false)
@@ -24,11 +24,11 @@ end
 namespace :db do
   desc "Generate security.yml key"
   task :generate_security_key do
-    security_conf_path = Rails.root.join('config/security.yml')
+    security_conf_path = Rails.root.join("config/security.yml")
     security_conf = YAML.load_file(security_conf_path)
     if security_conf[Rails.env]["encryption_key"].to_s.length < 20
       security_conf[Rails.env]["encryption_key"] = SecureRandom.hex(64)
-      File.open(security_conf_path, 'w') { |f| YAML.dump(security_conf, f) }
+      File.open(security_conf_path, "w") { |f| YAML.dump(security_conf, f) }
     end
   end
 
@@ -39,34 +39,34 @@ namespace :db do
 
   desc "Resets the encryption_key hash in the database. Needed if you change the encryption_key"
   task :reset_encryption_key_hash do
-    ENV['UPDATE_ENCRYPTION_KEY_HASH'] = "1"
-    Rake::Task['db:load_environment'].invoke
+    ENV["UPDATE_ENCRYPTION_KEY_HASH"] = "1"
+    Rake::Task["db:load_environment"].invoke
   end
 
   desc "Make sure all message templates have notifications in the db"
   task evaluate_notification_templates: :load_environment do
-    Dir.glob(Rails.root.join('app/messages/*.erb')) do |filename|
+    Dir.glob(Rails.root.join("app/messages/*.erb")) do |filename|
       filename = File.split(filename)[1]
       name = filename.split(".")[0]
       unless name[0, 1] == "_"
-        titled = name.titleize.gsub(/Sms/, 'SMS')
+        titled = name.titleize.gsub(/Sms/, "SMS")
         puts "No notification found in db for #{name}" unless Notification.where(name: titled).first
       end
     end
     Notification.all_cached.each do |n|
-      puts "No notification files found for #{n.name}" if Dir.glob(Rails.root.join('app', 'messages', "#{n.name.downcase.gsub(/\s/, '_')}.*.erb")).empty?
+      puts "No notification files found for #{n.name}" if Dir.glob(Rails.root.join("app", "messages", "#{n.name.downcase.gsub(/\s/, "_")}.*.erb")).empty?
     end
   end
 
   desc "Find or create the notifications"
   task load_notifications: :load_environment do
     # Load the "notification_types.yml" file that provides initial values for the notifications.
-    categories = YAML.safe_load(ERB.new(File.read(Canvas::MessageHelper.find_message_path('notification_types.yml'))).result)
+    categories = YAML.safe_load(ERB.new(File.read(Canvas::MessageHelper.find_message_path("notification_types.yml"))).result)
     categories.each do |category|
-      category['notifications'].each do |notification|
-        create_notification({ name: notification['name'],
-                              delay_for: notification['delay_for'],
-                              category: category['category'] })
+      category["notifications"].each do |notification|
+        create_notification({ name: notification["name"],
+                              delay_for: notification["delay_for"],
+                              category: category["category"] })
       end
     end
     puts "\nNotifications Loaded"
@@ -97,7 +97,7 @@ namespace :db do
         # fail here.
         pseudonym = user.pseudonyms.create!(unique_id: email,
                                             password: "validpassword", password_confirmation: "validpassword", account: Account.site_admin)
-        user.communication_channels.create!(path: email) { |cc| cc.workflow_state = 'active' }
+        user.communication_channels.create!(path: email) { |cc| cc.workflow_state = "active" }
       end
       # set the password later.
       pseudonym.password = pseudonym.password_confirmation = password
@@ -107,9 +107,9 @@ namespace :db do
         raise "unknown error saving password"
       end
       Account.site_admin.account_users.where(user_id: user,
-                                             role_id: Role.get_built_in_role('AccountAdmin', root_account_id: Account.site_admin.id)).first_or_create!
+                                             role_id: Role.get_built_in_role("AccountAdmin", root_account_id: Account.site_admin.id)).first_or_create!
       Account.default.account_users.where(user_id: user,
-                                          role_id: Role.get_built_in_role('AccountAdmin', root_account_id: Account.default.id)).first_or_create!
+                                          role_id: Role.get_built_in_role("AccountAdmin", root_account_id: Account.default.id)).first_or_create!
       user
     rescue => e
       warn "Problem creating administrative account, please try again: #{e}"
@@ -117,12 +117,12 @@ namespace :db do
     end
 
     user = nil
-    if !(ENV['CANVAS_LMS_ADMIN_EMAIL'] || "").empty? && !(ENV['CANVAS_LMS_ADMIN_PASSWORD'] || "").empty?
-      user = create_admin(ENV['CANVAS_LMS_ADMIN_EMAIL'], ENV['CANVAS_LMS_ADMIN_PASSWORD'])
+    if !(ENV["CANVAS_LMS_ADMIN_EMAIL"] || "").empty? && !(ENV["CANVAS_LMS_ADMIN_PASSWORD"] || "").empty?
+      user = create_admin(ENV["CANVAS_LMS_ADMIN_EMAIL"], ENV["CANVAS_LMS_ADMIN_PASSWORD"])
     end
 
     unless user
-      require 'highline/import'
+      require "highline/import"
 
       until Rails.env.test? do
 
@@ -153,7 +153,7 @@ namespace :db do
     gather_data = "opt_out" if gather_data.empty?
 
     if !Rails.env.test? && (ENV["CANVAS_LMS_STATS_COLLECTION"] || "").empty?
-      require 'highline/import'
+      require "highline/import"
       choose do |menu|
         menu.header = "To help our developers better serve you, Instructure would like to collect some usage data about your Canvas installation. You can change this setting at any time."
         menu.prompt = "> "
@@ -190,8 +190,8 @@ namespace :db do
 
   desc "Configure Default Account Name"
   task configure_account_name: :load_environment do
-    if (ENV['CANVAS_LMS_ACCOUNT_NAME'] || "").empty?
-      require 'highline/import'
+    if (ENV["CANVAS_LMS_ACCOUNT_NAME"] || "").empty?
+      require "highline/import"
 
       unless Rails.env.test?
         while true do
@@ -208,7 +208,7 @@ namespace :db do
       end
     else
       a = Account.default.reload
-      a.name = ENV['CANVAS_LMS_ACCOUNT_NAME']
+      a.name = ENV["CANVAS_LMS_ACCOUNT_NAME"]
       a.save!
     end
   end
@@ -221,10 +221,10 @@ namespace :db do
   desc "Useful initial setup task"
   task initial_setup: [:environment, :generate_security_key] do
     Switchman::Shard.default(reload: true)
-    Rake::Task['db:migrate'].invoke
+    Rake::Task["db:migrate"].invoke
     ActiveRecord::Base.connection.schema_cache.clear!
     ActiveRecord::Base.descendants.reject { |m| m == Shard }.each(&:reset_column_information)
     Account.clear_special_account_cache!(true)
-    Rake::Task['db:load_initial_data'].invoke
+    Rake::Task["db:load_initial_data"].invoke
   end
 end # Namespace: db

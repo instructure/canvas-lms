@@ -24,8 +24,8 @@ class AddContextTypeToAssignmentConfigurationToolLookups < ActiveRecord::Migrati
 
   def up
     add_column :assignment_configuration_tool_lookups, :context_type, :string
-    change_column_default(:assignment_configuration_tool_lookups, :context_type, 'Account')
-    DataFixup::BackfillNulls.run(AssignmentConfigurationToolLookup, :context_type, default_value: 'Account')
+    change_column_default(:assignment_configuration_tool_lookups, :context_type, "Account")
+    DataFixup::BackfillNulls.run(AssignmentConfigurationToolLookup, :context_type, default_value: "Account")
     change_column_null(:assignment_configuration_tool_lookups, :context_type, false)
   end
 

@@ -17,12 +17,12 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../../qti_helper'
+require_relative "../../qti_helper"
 
 if Qti.migration_executable
   describe "Converting Blackboard 9 qti" do
     it "converts matching questions" do
-      manifest_node = get_manifest_node('matching', interaction_type: 'choiceInteraction', bb_question_type: 'Matching')
+      manifest_node = get_manifest_node("matching", interaction_type: "choiceInteraction", bb_question_type: "Matching")
       hash = Qti::ChoiceInteraction.create_instructure_question(manifest_node: manifest_node, base_dir: bb9_question_dir)
       # make sure the ids are correctly referencing each other
       matches = []
@@ -40,7 +40,7 @@ if Qti.migration_executable
     end
 
     it "converts matching questions if the divs precede the choice Interactions" do
-      manifest_node = get_manifest_node('matching3', interaction_type: 'choiceInteraction', bb_question_type: 'Matching')
+      manifest_node = get_manifest_node("matching3", interaction_type: "choiceInteraction", bb_question_type: "Matching")
       hash = Qti::ChoiceInteraction.create_instructure_question(manifest_node: manifest_node, base_dir: bb9_question_dir)
       # make sure the ids are correctly referencing each other
       matches = []
@@ -58,22 +58,22 @@ if Qti.migration_executable
     end
 
     it "finds question references in selection_metadata" do
-      hash = get_quiz_data(BB9_FIXTURE_DIR, 'group_with_selection_references')[1][0]
+      hash = get_quiz_data(BB9_FIXTURE_DIR, "group_with_selection_references")[1][0]
       expect(hash[:questions].first[:questions].first).to eq({ question_type: "question_reference", migration_id: "_428569_1" })
     end
 
     it "imports multiple-answers questions" do
-      hash = get_quiz_data(bb9_question_dir, 'multiple_answers')[0].detect { |qq| qq[:migration_id] == 'question_22_1' }
-      expect(hash[:question_type]).to eq 'multiple_answers_question'
+      hash = get_quiz_data(bb9_question_dir, "multiple_answers")[0].detect { |qq| qq[:migration_id] == "question_22_1" }
+      expect(hash[:question_type]).to eq "multiple_answers_question"
       expect(hash[:answers].sort_by { |answer| answer[:migration_id] }.pluck(:weight)).to eq [100, 0, 100, 100]
     end
 
     it "converts matching questions where the answers are given out of order" do
-      hash = get_question_hash(bb9_question_dir, 'matching2', delete_answer_ids: false)
+      hash = get_question_hash(bb9_question_dir, "matching2", delete_answer_ids: false)
       matches = {}
       hash[:matches].each { |m| matches[m[:match_id]] = m[:text] }
       hash[:answers].each do |a|
-        expect(matches[a[:match_id]]).to eq a[:text].sub('left', 'right')
+        expect(matches[a[:match_id]]).to eq a[:text].sub("left", "right")
       end
       # compare everything else without the ids
       hash[:answers].each do |a|
@@ -85,12 +85,12 @@ if Qti.migration_executable
     end
 
     it "converts true/false questions using identifiers, not mattext" do
-      hash = get_question_hash(bb9_question_dir, 'true_false', delete_answer_ids: false, flavor: Qti::Flavors::BBLEARN)
+      hash = get_question_hash(bb9_question_dir, "true_false", delete_answer_ids: false, flavor: Qti::Flavors::BBLEARN)
       hash[:answers].each { |m| expect(m[:migration_id]).to eq m[:text].downcase }
     end
 
     it "replaces negative points possible with zero" do
-      hash = get_question_hash(bb9_question_dir, 'minus_one', delete_answer_ids: false, flavor: Qti::Flavors::BBLEARN)
+      hash = get_question_hash(bb9_question_dir, "minus_one", delete_answer_ids: false, flavor: Qti::Flavors::BBLEARN)
       expect(hash[:points_possible]).to eq 0.0
     end
   end

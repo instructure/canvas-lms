@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative 'messages_helper'
+require_relative "messages_helper"
 
 describe "updated_wiki_page" do
   before :once do
@@ -32,9 +32,9 @@ describe "updated_wiki_page" do
   context "locked Wiki Pages" do
     it "sends locked notification if availibility date is locked for email" do
       enrollment = course_with_student(active_all: true)
-      context_module = @course.context_modules.create!(name: 'some module')
+      context_module = @course.context_modules.create!(name: "some module")
       page = @course.wiki_pages.create!(title: "some page")
-      context_module.add_item({ id: page.id, type: 'wiki_page' })
+      context_module.add_item({ id: page.id, type: "wiki_page" })
       page.reload
 
       context_module.update(
@@ -52,9 +52,9 @@ describe "updated_wiki_page" do
 
     it "sends Wiki Page notification with Wiki Pages content when unlocked for email" do
       enrollment = course_with_student(active_all: true)
-      context_module = @course.context_modules.create!(name: 'some module')
+      context_module = @course.context_modules.create!(name: "some module")
       page = @course.wiki_pages.create!(title: "some page")
-      context_module.add_item({ id: page.id, type: 'wiki_page' })
+      context_module.add_item({ id: page.id, type: "wiki_page" })
       page.reload
 
       context_module.update(

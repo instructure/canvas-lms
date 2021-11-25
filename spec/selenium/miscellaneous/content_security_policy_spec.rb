@@ -17,28 +17,28 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../common'
+require_relative "../common"
 
 describe "content security policy" do
   include_context "in-process server selenium tests"
 
   context "with csp enabled" do
     before(:once) do
-      @csp_account = Account.create!(name: 'csp account')
+      @csp_account = Account.create!(name: "csp account")
       @csp_account.enable_feature!(:javascript_csp)
       @csp_account.enable_csp!
-      @csp_course = @csp_account.courses.create!(name: 'csp course')
-      @csp_user = User.create!(name: 'csp user')
+      @csp_course = @csp_account.courses.create!(name: "csp course")
+      @csp_user = User.create!(name: "csp user")
       @csp_user.accept_terms
       @csp_user.register!
-      @csp_pseudonym = @csp_account.pseudonyms.create!(user: @csp_user, unique_id: 'csp@example.com')
-      @csp_course.enroll_user(@csp_user, 'TeacherEnrollment', enrollment_state: 'active')
+      @csp_pseudonym = @csp_account.pseudonyms.create!(user: @csp_user, unique_id: "csp@example.com")
+      @csp_course.enroll_user(@csp_user, "TeacherEnrollment", enrollment_state: "active")
     end
 
     before { create_session(@csp_pseudonym) }
 
     it "displays a flash alert for non-whitelisted iframe", ignore_js_errors: true do
-      @csp_course.wiki_pages.create!(title: 'Page1', body: "<iframe width=\"560\" height=\"315\""\
+      @csp_course.wiki_pages.create!(title: "Page1", body: "<iframe width=\"560\" height=\"315\""\
                                                            "src=\"https://www.youtube.com/embed/dQw4w9WgXcQ\" frameborder=\"0\""\
                                                            "allow=\"accelerometer; autoplay; encrypted-media; gyroscope;"\
                                                            "picture-in-picture\" allowfullscreen></iframe>")
@@ -49,8 +49,8 @@ describe "content security policy" do
     end
 
     it "does not display a flash alert for whitelisted iframe" do
-      @csp_account.add_domain!('www.youtube.com')
-      @csp_course.wiki_pages.create!(title: 'Page1', body: "<iframe width=\"560\" height=\"315\""\
+      @csp_account.add_domain!("www.youtube.com")
+      @csp_course.wiki_pages.create!(title: "Page1", body: "<iframe width=\"560\" height=\"315\""\
                                                            " src=\"https://www.youtube.com/embed/dQw4w9WgXcQ\" frameborder=\"0\""\
                                                            " allow=\"accelerometer; autoplay; encrypted-media; gyroscope;"\
                                                            " picture-in-picture\" allowfullscreen></iframe>")

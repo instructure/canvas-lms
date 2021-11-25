@@ -42,9 +42,9 @@ module StreamItemsHelper
     )
 
     ActiveRecord::Associations::Preloader.new.preload(
-      stream_items.select { |i| i.asset_type == 'DiscussionEntry' }.map(&:data), discussion_topic: :context
+      stream_items.select { |i| i.asset_type == "DiscussionEntry" }.map(&:data), discussion_topic: :context
     )
-    topic_types << 'DiscussionEntry'
+    topic_types << "DiscussionEntry"
 
     stream_items.each do |item|
       category = item.data.class.name
@@ -107,7 +107,7 @@ module StreamItemsHelper
     when "DiscussionEntry"
       polymorphic_path([item.context_type.underscore.to_sym, :discussion_topic],
                        "#{item.context_type.underscore}_id": Shard.short_id_for(item.context_id),
-                       id: Shard.short_id_for(item.data['discussion_topic_id']))
+                       id: Shard.short_id_for(item.data["discussion_topic_id"]))
     when "Conversation"
       conversation_path(Shard.short_id_for(item.asset_id))
     when "Assignment"
@@ -159,9 +159,9 @@ module StreamItemsHelper
       asset.subject
     when "AssessmentRequest"
       # TODO: I18N should use placeholders, not concatenation
-      asset.asset.assignment.title + " " + I18n.t('for', "for") + " " + assessment_author_name(asset, user)
+      asset.asset.assignment.title + " " + I18n.t("for", "for") + " " + assessment_author_name(asset, user)
     when "DiscussionEntry"
-      I18n.t("%{user_name} mentioned you in %{title}.", { user_name: asset.user.short_name, title: item.data['title'] })
+      I18n.t("%{user_name} mentioned you in %{title}.", { user_name: asset.user.short_name, title: item.data["title"] })
     else
       nil
     end

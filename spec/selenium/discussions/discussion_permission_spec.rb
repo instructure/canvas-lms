@@ -18,9 +18,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../common'
-require_relative '../discussions/discussion_helpers'
-require_relative '../helpers/shared_examples_common'
+require_relative "../common"
+require_relative "../discussions/discussion_helpers"
+require_relative "../helpers/shared_examples_common"
 
 describe "discussion permissions" do
   include SharedExamplesCommon
@@ -29,19 +29,19 @@ describe "discussion permissions" do
   include_context "discussions_page_shared_context"
   extend DiscussionHelpers::SetupContext
 
-  context 'discussion created by teacher' do
+  context "discussion created by teacher" do
     before do
-      course_with_teacher(active_all: true, name: 'teacher1')
+      course_with_teacher(active_all: true, name: "teacher1")
       @discussion_topic = DiscussionHelpers.create_discussion_topic(
         @course,
         @teacher,
-        'Discussion 1 Title',
-        'Discussion 1 message',
+        "Discussion 1 Title",
+        "Discussion 1 message",
         nil
       )
     end
 
-    shared_examples 'no viewing discussion title, no discussion link' do |context|
+    shared_examples "no viewing discussion title, no discussion link" do |context|
       before do
         DiscussionHelpers.disable_view_discussions(@course, context_role)
         DiscussionHelpers.disable_moderate_discussions(@course, context_role)
@@ -62,28 +62,28 @@ describe "discussion permissions" do
       end
     end
 
-    it_behaves_like 'no viewing discussion title, no discussion link', :student do
+    it_behaves_like "no viewing discussion title, no discussion link", :student do
       setup_student_context
     end
 
-    it_behaves_like 'no viewing discussion title, no discussion link', :teacher do
+    it_behaves_like "no viewing discussion title, no discussion link", :teacher do
       let(:context_user) { @teacher }
       let(:context_role) { teacher_role }
     end
 
-    it_behaves_like 'no viewing discussion title, no discussion link', :ta do
+    it_behaves_like "no viewing discussion title, no discussion link", :ta do
       setup_ta_context
     end
 
-    it_behaves_like 'no viewing discussion title, no discussion link', :observer do
+    it_behaves_like "no viewing discussion title, no discussion link", :observer do
       setup_observer_context
     end
 
-    it_behaves_like 'no viewing discussion title, no discussion link', :designer do
+    it_behaves_like "no viewing discussion title, no discussion link", :designer do
       setup_designer_context
     end
 
-    shared_examples 'no viewing discussion details' do |context|
+    shared_examples "no viewing discussion details" do |context|
       before do
         DiscussionHelpers.disable_view_discussions(@course, context_role)
         DiscussionHelpers.disable_moderate_discussions(@course, context_role)
@@ -98,23 +98,23 @@ describe "discussion permissions" do
       end
     end
 
-    it_behaves_like 'no viewing discussion details', :student do
+    it_behaves_like "no viewing discussion details", :student do
       setup_student_context
     end
 
-    it_behaves_like 'no viewing discussion details', :ta do
+    it_behaves_like "no viewing discussion details", :ta do
       setup_ta_context
     end
 
-    it_behaves_like 'no viewing discussion details', :observer do
+    it_behaves_like "no viewing discussion details", :observer do
       setup_observer_context
     end
 
-    it_behaves_like 'no viewing discussion details', :designer do
+    it_behaves_like "no viewing discussion details", :designer do
       setup_designer_context
     end
 
-    shared_examples 'allow viewing discussions, not edit or post' do |context|
+    shared_examples "allow viewing discussions, not edit or post" do |context|
       before do
         DiscussionHelpers.enable_view_discussions(@course, context_role)
         DiscussionHelpers.disable_moderate_discussions(@course, context_role)
@@ -131,23 +131,23 @@ describe "discussion permissions" do
       end
     end
 
-    it_behaves_like 'allow viewing discussions, not edit or post', :student do
+    it_behaves_like "allow viewing discussions, not edit or post", :student do
       setup_student_context
     end
 
-    it_behaves_like 'allow viewing discussions, not edit or post', :ta do
+    it_behaves_like "allow viewing discussions, not edit or post", :ta do
       setup_ta_context
     end
 
-    it_behaves_like 'allow viewing discussions, not edit or post', :observer do
+    it_behaves_like "allow viewing discussions, not edit or post", :observer do
       setup_observer_context
     end
 
-    it_behaves_like 'allow viewing discussions, not edit or post', :designer do
+    it_behaves_like "allow viewing discussions, not edit or post", :designer do
       setup_designer_context
     end
 
-    shared_examples 'allow viewing and posting to discussions, not edit' do |context|
+    shared_examples "allow viewing and posting to discussions, not edit" do |context|
       before do
         DiscussionHelpers.enable_view_discussions(@course, context_role)
         DiscussionHelpers.disable_moderate_discussions(@course, context_role)
@@ -164,28 +164,28 @@ describe "discussion permissions" do
       end
     end
 
-    it_behaves_like 'allow viewing and posting to discussions, not edit', :student do
+    it_behaves_like "allow viewing and posting to discussions, not edit", :student do
       setup_student_context
     end
 
-    it_behaves_like 'allow viewing and posting to discussions, not edit', :teacher do
+    it_behaves_like "allow viewing and posting to discussions, not edit", :teacher do
       let(:context_user) { @teacher }
       let(:context_role) { teacher_role }
     end
 
-    it_behaves_like 'allow viewing and posting to discussions, not edit', :ta do
+    it_behaves_like "allow viewing and posting to discussions, not edit", :ta do
       setup_ta_context
     end
 
-    it_behaves_like 'allow viewing and posting to discussions, not edit', :observer do
+    it_behaves_like "allow viewing and posting to discussions, not edit", :observer do
       setup_observer_context
     end
 
-    it_behaves_like 'allow viewing and posting to discussions, not edit', :designer do
+    it_behaves_like "allow viewing and posting to discussions, not edit", :designer do
       setup_designer_context
     end
 
-    shared_examples 'allow viewing and editing discussions, not posting' do |context|
+    shared_examples "allow viewing and editing discussions, not posting" do |context|
       before do
         DiscussionHelpers.enable_view_discussions(@course, context_role)
         DiscussionHelpers.enable_moderate_discussions(@course, context_role)
@@ -202,23 +202,23 @@ describe "discussion permissions" do
       end
     end
 
-    it_behaves_like 'allow viewing and editing discussions, not posting', :student do
+    it_behaves_like "allow viewing and editing discussions, not posting", :student do
       setup_student_context
     end
 
-    it_behaves_like 'allow viewing and editing discussions, not posting', :ta do
+    it_behaves_like "allow viewing and editing discussions, not posting", :ta do
       setup_ta_context
     end
 
-    it_behaves_like 'allow viewing and editing discussions, not posting', :observer do
+    it_behaves_like "allow viewing and editing discussions, not posting", :observer do
       setup_observer_context
     end
 
-    it_behaves_like 'allow viewing and editing discussions, not posting', :designer do
+    it_behaves_like "allow viewing and editing discussions, not posting", :designer do
       setup_designer_context
     end
 
-    shared_examples 'allow view, edit and post to discussions' do |context|
+    shared_examples "allow view, edit and post to discussions" do |context|
       before do
         DiscussionHelpers.enable_view_discussions(@course, context_role)
         DiscussionHelpers.enable_moderate_discussions(@course, context_role)
@@ -235,41 +235,41 @@ describe "discussion permissions" do
       end
     end
 
-    it_behaves_like 'allow view, edit and post to discussions', :student do
+    it_behaves_like "allow view, edit and post to discussions", :student do
       setup_student_context
     end
 
-    it_behaves_like 'allow view, edit and post to discussions', :teacher do
+    it_behaves_like "allow view, edit and post to discussions", :teacher do
       let(:context_user) { @teacher }
       let(:context_role) { teacher_role }
     end
 
-    it_behaves_like 'allow view, edit and post to discussions', :ta do
+    it_behaves_like "allow view, edit and post to discussions", :ta do
       setup_ta_context
     end
 
-    it_behaves_like 'allow view, edit and post to discussions', :observer do
+    it_behaves_like "allow view, edit and post to discussions", :observer do
       setup_observer_context
     end
 
-    it_behaves_like 'allow view, edit and post to discussions', :designer do
+    it_behaves_like "allow view, edit and post to discussions", :designer do
       setup_designer_context
     end
   end # context 'discussion created by teacher'
 
-  context 'discussion created by student' do
+  context "discussion created by student" do
     before do
-      course_with_student(active_all: true, name: 'student1')
+      course_with_student(active_all: true, name: "student1")
       @discussion_topic = DiscussionHelpers.create_discussion_topic(
         @course,
         @student,
-        'Student Discussion 1 Title',
-        'Student Discussion 1 message',
+        "Student Discussion 1 Title",
+        "Student Discussion 1 message",
         nil
       )
     end
 
-    shared_examples 'no viewing discussion title' do |context|
+    shared_examples "no viewing discussion title" do |context|
       before do
         DiscussionHelpers.disable_view_discussions(@course, context_role)
         DiscussionHelpers.disable_moderate_discussions(@course, context_role)
@@ -284,28 +284,28 @@ describe "discussion permissions" do
       end
     end
 
-    it_behaves_like 'no viewing discussion title', :student do
+    it_behaves_like "no viewing discussion title", :student do
       let(:context_user) { @student }
       let(:context_role) { student_role }
     end
 
-    it_behaves_like 'no viewing discussion title', :teacher do
+    it_behaves_like "no viewing discussion title", :teacher do
       setup_teacher_context
     end
 
-    it_behaves_like 'no viewing discussion title', :ta do
+    it_behaves_like "no viewing discussion title", :ta do
       setup_ta_context
     end
 
-    it_behaves_like 'no viewing discussion title', :observer do
+    it_behaves_like "no viewing discussion title", :observer do
       setup_observer_context
     end
 
-    it_behaves_like 'no viewing discussion title', :designer do
+    it_behaves_like "no viewing discussion title", :designer do
       setup_designer_context
     end
 
-    shared_examples 'no viewing discussion details' do |context|
+    shared_examples "no viewing discussion details" do |context|
       before do
         DiscussionHelpers.disable_view_discussions(@course, context_role)
         DiscussionHelpers.disable_moderate_discussions(@course, context_role)
@@ -320,23 +320,23 @@ describe "discussion permissions" do
       end
     end
 
-    it_behaves_like 'no viewing discussion details', :teacher do
+    it_behaves_like "no viewing discussion details", :teacher do
       setup_teacher_context
     end
 
-    it_behaves_like 'no viewing discussion details', :ta do
+    it_behaves_like "no viewing discussion details", :ta do
       setup_ta_context
     end
 
-    it_behaves_like 'no viewing discussion details', :observer do
+    it_behaves_like "no viewing discussion details", :observer do
       setup_observer_context
     end
 
-    it_behaves_like 'no viewing discussion details', :designer do
+    it_behaves_like "no viewing discussion details", :designer do
       setup_designer_context
     end
 
-    shared_examples 'allow viewing discussions, not edit or post' do |context|
+    shared_examples "allow viewing discussions, not edit or post" do |context|
       before do
         DiscussionHelpers.enable_view_discussions(@course, context_role)
         DiscussionHelpers.disable_moderate_discussions(@course, context_role)
@@ -353,23 +353,23 @@ describe "discussion permissions" do
       end
     end
 
-    it_behaves_like 'allow viewing discussions, not edit or post', :teacher do
+    it_behaves_like "allow viewing discussions, not edit or post", :teacher do
       setup_teacher_context
     end
 
-    it_behaves_like 'allow viewing discussions, not edit or post', :ta do
+    it_behaves_like "allow viewing discussions, not edit or post", :ta do
       setup_ta_context
     end
 
-    it_behaves_like 'allow viewing discussions, not edit or post', :observer do
+    it_behaves_like "allow viewing discussions, not edit or post", :observer do
       setup_observer_context
     end
 
-    it_behaves_like 'allow viewing discussions, not edit or post', :designer do
+    it_behaves_like "allow viewing discussions, not edit or post", :designer do
       setup_designer_context
     end
 
-    shared_examples 'allow viewing and posting to discussions, not edit' do |context|
+    shared_examples "allow viewing and posting to discussions, not edit" do |context|
       before do
         DiscussionHelpers.enable_view_discussions(@course, context_role)
         DiscussionHelpers.disable_moderate_discussions(@course, context_role)
@@ -386,23 +386,23 @@ describe "discussion permissions" do
       end
     end
 
-    it_behaves_like 'allow viewing and posting to discussions, not edit', :teacher do
+    it_behaves_like "allow viewing and posting to discussions, not edit", :teacher do
       setup_teacher_context
     end
 
-    it_behaves_like 'allow viewing and posting to discussions, not edit', :ta do
+    it_behaves_like "allow viewing and posting to discussions, not edit", :ta do
       setup_ta_context
     end
 
-    it_behaves_like 'allow viewing and posting to discussions, not edit', :observer do
+    it_behaves_like "allow viewing and posting to discussions, not edit", :observer do
       setup_observer_context
     end
 
-    it_behaves_like 'allow viewing and posting to discussions, not edit', :designer do
+    it_behaves_like "allow viewing and posting to discussions, not edit", :designer do
       setup_designer_context
     end
 
-    shared_examples 'allow viewing and editing discussions, not posting' do |context|
+    shared_examples "allow viewing and editing discussions, not posting" do |context|
       before do
         DiscussionHelpers.enable_view_discussions(@course, context_role)
         DiscussionHelpers.enable_moderate_discussions(@course, context_role)
@@ -419,23 +419,23 @@ describe "discussion permissions" do
       end
     end
 
-    it_behaves_like 'allow viewing and editing discussions, not posting', :teacher do
+    it_behaves_like "allow viewing and editing discussions, not posting", :teacher do
       setup_teacher_context
     end
 
-    it_behaves_like 'allow viewing and editing discussions, not posting', :ta do
+    it_behaves_like "allow viewing and editing discussions, not posting", :ta do
       setup_ta_context
     end
 
-    it_behaves_like 'allow viewing and editing discussions, not posting', :observer do
+    it_behaves_like "allow viewing and editing discussions, not posting", :observer do
       setup_observer_context
     end
 
-    it_behaves_like 'allow viewing and editing discussions, not posting', :designer do
+    it_behaves_like "allow viewing and editing discussions, not posting", :designer do
       setup_designer_context
     end
 
-    shared_examples 'allow view, edit and post to discussions' do |context|
+    shared_examples "allow view, edit and post to discussions" do |context|
       before do
         DiscussionHelpers.enable_view_discussions(@course, context_role)
         DiscussionHelpers.enable_moderate_discussions(@course, context_role)
@@ -457,28 +457,28 @@ describe "discussion permissions" do
       end
     end
 
-    it_behaves_like 'allow view, edit and post to discussions', :student do
+    it_behaves_like "allow view, edit and post to discussions", :student do
       let(:context_user) { @student }
       let(:context_role) { student_role }
     end
 
-    it_behaves_like 'allow view, edit and post to discussions', :teacher do
+    it_behaves_like "allow view, edit and post to discussions", :teacher do
       setup_teacher_context
     end
 
-    it_behaves_like 'allow view, edit and post to discussions', :ta do
+    it_behaves_like "allow view, edit and post to discussions", :ta do
       setup_ta_context
     end
 
-    it_behaves_like 'allow view, edit and post to discussions', :observer do
+    it_behaves_like "allow view, edit and post to discussions", :observer do
       setup_observer_context
     end
 
-    it_behaves_like 'allow view, edit and post to discussions', :designer do
+    it_behaves_like "allow view, edit and post to discussions", :designer do
       setup_designer_context
     end
 
-    shared_examples 'allow view, edit and post to own discussions with permissions off' do
+    shared_examples "allow view, edit and post to own discussions with permissions off" do
       before do
         DiscussionHelpers.disable_view_discussions(@course, context_role)
         DiscussionHelpers.disable_moderate_discussions(@course, context_role)
@@ -495,7 +495,7 @@ describe "discussion permissions" do
       end
     end
 
-    it_behaves_like 'allow view, edit and post to own discussions with permissions off', :student do
+    it_behaves_like "allow view, edit and post to own discussions with permissions off", :student do
       let(:context_user) { @student }
       let(:context_role) { student_role }
     end

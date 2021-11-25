@@ -38,7 +38,7 @@ module CanvasSort
     end
 
     def inspect
-      'CanvasSort::Last'
+      "CanvasSort::Last"
     end
 
     # when coercing, we're inverting the operation, so invert the result

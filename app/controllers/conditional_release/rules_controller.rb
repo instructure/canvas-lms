@@ -30,7 +30,7 @@ module ConditionalRelease
     # GET /api/rules
     def index
       rules = get_rules
-      rules = rules.preload(Rule.preload_associations) if include_param.include?('all')
+      rules = rules.preload(Rule.preload_associations) if include_param.include?("all")
       rules = rules.with_assignments if value_to_boolean(params[:active])
 
       render json: rules.as_json(include: json_includes, include_root: false, except: [:root_account_id, :deleted_at])
@@ -103,7 +103,7 @@ module ConditionalRelease
     end
 
     def json_includes
-      return Rule.includes_for_json if include_param.include? 'all'
+      return Rule.includes_for_json if include_param.include? "all"
     end
 
     def add_ordering_to(attrs)

@@ -56,10 +56,10 @@ describe EnrollmentsFromUserList do
     end
 
     it "respects the section option when a user is already enrolled in another section" do
-      othersection = @course.course_sections.create! name: 'othersection'
-      @teacher.pseudonyms.create! unique_id: 'teacher@example.com'
-      @el = UserList.new('teacher@example.com')
-      enrollments = EnrollmentsFromUserList.process(@el, @course, course_section_id: othersection.to_param, enrollment_type: 'TeacherEnrollment')
+      othersection = @course.course_sections.create! name: "othersection"
+      @teacher.pseudonyms.create! unique_id: "teacher@example.com"
+      @el = UserList.new("teacher@example.com")
+      enrollments = EnrollmentsFromUserList.process(@el, @course, course_section_id: othersection.to_param, enrollment_type: "TeacherEnrollment")
       expect(enrollments.map(&:course_section_id)).to eq([othersection.id])
       expect(@teacher.teacher_enrollments.where(course_id: @course).pluck(:course_section_id)).to match_array([@course.default_section.id, othersection.id])
     end
@@ -73,8 +73,8 @@ describe EnrollmentsFromUserList do
 
     it "touches only users whose enrollments were updated" do
       Timecop.freeze(1.hour.ago) do
-        @david_sr = user_with_pseudonym(username: 'david_richards@example.com')
-        @david_jr = user_with_pseudonym(username: 'david_richards_jr@example.com')
+        @david_sr = user_with_pseudonym(username: "david_richards@example.com")
+        @david_jr = user_with_pseudonym(username: "david_richards_jr@example.com")
         @course.enroll_student(@david_jr)
       end
       EnrollmentsFromUserList.process(UserList.new(list_to_parse), @course)

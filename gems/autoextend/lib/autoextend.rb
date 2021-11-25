@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative 'autoextend/extension'
+require_relative "autoextend/extension"
 require_relative "autoextend/railtie" if defined?(Rails::Railtie)
 
 module Autoextend
@@ -112,7 +112,7 @@ module Autoextend
 
       # immediately extend the class if it's already defined
       # If autoload? is true, don't use const_defined? as it is set up to be autoloaded but hasn't been loaded yet
-      module_chain = const_name.to_s.split('::').inject([]) { |all, val| all + [[(all.last ? "#{all.last.first}::#{all.last[1]}" : nil), val]] }
+      module_chain = const_name.to_s.split("::").inject([]) { |all, val| all + [[(all.last ? "#{all.last.first}::#{all.last[1]}" : nil), val]] }
       exists_and_not_to_autoload = module_chain.all? do |mod, name|
         mod = mod.nil? ? Object : Object.const_get(mod)
         !mod.autoload?(name) && mod.const_defined?(name.to_s, false)

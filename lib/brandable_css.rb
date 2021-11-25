@@ -17,15 +17,15 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'pathname'
-require 'yaml'
-require 'open3'
+require "pathname"
+require "yaml"
+require "open3"
 
 module BrandableCSS
   APP_ROOT = (defined?(Rails) && Rails.root) || Pathname.pwd
-  CONFIG = YAML.load_file(APP_ROOT.join('config/brandable_css.yml')).freeze
-  BRANDABLE_VARIABLES = JSON.parse(File.read(APP_ROOT.join(CONFIG['paths']['brandable_variables_json']))).freeze
-  MIGRATION_NAME = 'RegenerateBrandFilesBasedOnNewDefaults'
+  CONFIG = YAML.load_file(APP_ROOT.join("config/brandable_css.yml")).freeze
+  BRANDABLE_VARIABLES = JSON.parse(File.read(APP_ROOT.join(CONFIG["paths"]["brandable_variables_json"]))).freeze
+  MIGRATION_NAME = "RegenerateBrandFilesBasedOnNewDefaults"
 
   VARIABLE_HUMAN_NAMES = {
     "ic-brand-primary" => -> { I18n.t("Primary Brand Color") },
@@ -94,14 +94,14 @@ module BrandableCSS
   class << self
     def variables_map
       @variables_map ||= BRANDABLE_VARIABLES.each_with_object({}) do |variable_group, memo|
-        variable_group['variables'].each { |variable| memo[variable['variable_name']] = variable }
+        variable_group["variables"].each { |variable| memo[variable["variable_name"]] = variable }
       end.freeze
     end
 
     def variables_map_with_image_urls
       @variables_map_with_image_urls ||= variables_map.transform_values do |config|
-        if config['type'] == 'image'
-          config.merge('default' => ActionController::Base.helpers.image_url(config['default']))
+        if config["type"] == "image"
+          config.merge("default" => ActionController::Base.helpers.image_url(config["default"]))
         else
           config
         end
@@ -110,10 +110,10 @@ module BrandableCSS
 
     def things_that_go_into_defaults_md5
       variables_map.each_with_object({}) do |(variable_name, config), memo|
-        default = config['default']
-        if config['type'] == 'image'
+        default = config["default"]
+        if config["type"] == "image"
           # to make consistent md5s whether the cdn is enabled or not, don't include hostname in defaults
-          default = ActionController::Base.helpers.image_path(default, host: '')
+          default = ActionController::Base.helpers.image_path(default, host: "")
         end
         memo[variable_name] = default
       end.freeze
@@ -122,16 +122,16 @@ module BrandableCSS
     def migration_version
       # ActiveRecord usually uses integer timestamps to generate migration versions but any integer
       # will work, so we just use the result of stripping out the alphabetic characters from the md5
-      default_variables_md5_without_migration_check.gsub(/[a-z]/, '').to_i.freeze
+      default_variables_md5_without_migration_check.gsub(/[a-z]/, "").to_i.freeze
     end
 
     def check_if_we_need_to_create_a_db_migration
       path = ActiveRecord::Migrator.migrations_paths.first
       migrations = ActiveRecord::MigrationContext.new(path, ActiveRecord::SchemaMigration).migrations
-      ['predeploy', 'postdeploy'].each do |pre_or_post|
+      ["predeploy", "postdeploy"].each do |pre_or_post|
         migration = migrations.find { |m| m.name == MIGRATION_NAME + pre_or_post.camelize }
         # they can't have the same id, so we just add 1 to the postdeploy one
-        expected_version = (pre_or_post == 'predeploy') ? migration_version : (migration_version + 1)
+        expected_version = (pre_or_post == "predeploy") ? migration_version : (migration_version + 1)
         raise BrandConfigWithOutCompileAssets if expected_version == 85_663_486_644_871_658_581_990
         raise DefaultMD5NotUpToDateError unless migration && migration.version == expected_version
       end
@@ -140,7 +140,7 @@ module BrandableCSS
     def skip_migration_check?
       # our canvas_rspec build doesn't even run `yarn install` or `gulp rev` so since
       # they are not expecting all the frontend assets to work, this check isn't useful
-      Rails.env.test? && !Rails.root.join('public/dist/rev-manifest.json').exist?
+      Rails.env.test? && !Rails.root.join("public/dist/rev-manifest.json").exist?
     end
 
     def default_variables_md5
@@ -155,7 +155,7 @@ module BrandableCSS
     end
 
     def handle_urls(value, config, css_urls)
-      return value unless config['type'] == 'image' && css_urls
+      return value unless config["type"] == "image" && css_urls
 
       "url('#{value}')" if value.present?
     end
@@ -166,8 +166,8 @@ module BrandableCSS
       explicit_value = active_brand_config && active_brand_config.get_value(variable_name).presence
       return handle_urls(explicit_value, config, css_urls) if explicit_value
 
-      default = config['default']
-      if default&.starts_with?('$')
+      default = config["default"]
+      if default&.starts_with?("$")
         if css_urls
           return "var(--#{default[1..]})"
         else
@@ -177,26 +177,26 @@ module BrandableCSS
 
       # while in our sass, we want `url(/images/foo.png)`,
       # the Rails Asset Helpers expect us to not have the '/images/', eg: <%= image_tag('foo.png') %>
-      default = default.sub(%r{^/images/}, '') if config['type'] == 'image'
+      default = default.sub(%r{^/images/}, "") if config["type"] == "image"
       handle_urls(default, config, css_urls)
     end
 
     def computed_variables(active_brand_config = nil)
       [
-        ['ic-brand-primary', 'darken', 5],
-        ['ic-brand-primary', 'darken', 10],
-        ['ic-brand-primary', 'darken', 15],
-        ['ic-brand-primary', 'lighten', 5],
-        ['ic-brand-primary', 'lighten', 10],
-        ['ic-brand-primary', 'lighten', 15],
-        ['ic-brand-button--primary-bgd', 'darken', 5],
-        ['ic-brand-button--primary-bgd', 'darken', 15],
-        ['ic-brand-button--secondary-bgd', 'darken', 5],
-        ['ic-brand-button--secondary-bgd', 'darken', 15],
-        ['ic-brand-font-color-dark', 'lighten', 15],
-        ['ic-brand-font-color-dark', 'lighten', 30],
-        ['ic-link-color', 'darken', 10],
-        ['ic-link-color', 'lighten', 10],
+        ["ic-brand-primary", "darken", 5],
+        ["ic-brand-primary", "darken", 10],
+        ["ic-brand-primary", "darken", 15],
+        ["ic-brand-primary", "lighten", 5],
+        ["ic-brand-primary", "lighten", 10],
+        ["ic-brand-primary", "lighten", 15],
+        ["ic-brand-button--primary-bgd", "darken", 5],
+        ["ic-brand-button--primary-bgd", "darken", 15],
+        ["ic-brand-button--secondary-bgd", "darken", 5],
+        ["ic-brand-button--secondary-bgd", "darken", 15],
+        ["ic-brand-font-color-dark", "lighten", 15],
+        ["ic-brand-font-color-dark", "lighten", 30],
+        ["ic-link-color", "darken", 10],
+        ["ic-link-color", "lighten", 10],
       ].each_with_object({}) do |(variable_name, darken_or_lighten, percent), memo|
         color = brand_variable_value(variable_name, active_brand_config, variables_map_with_image_urls)
         computed_color = CanvasColor::Color.new(color).send(darken_or_lighten, percent / 100.0)
@@ -225,15 +225,15 @@ module BrandableCSS
     end
 
     def public_brandable_css_folder
-      Pathname.new('public/dist/brandable_css')
+      Pathname.new("public/dist/brandable_css")
     end
 
     def default_brand_folder
-      public_brandable_css_folder.join('default')
+      public_brandable_css_folder.join("default")
     end
 
     def default_brand_file(type, high_contrast = false)
-      default_brand_folder.join("variables#{high_contrast ? '-high_contrast' : ''}-#{default_variables_md5}.#{type}")
+      default_brand_folder.join("variables#{high_contrast ? "-high_contrast" : ""}-#{default_variables_md5}.#{type}")
     end
 
     def high_contrast_overrides
@@ -277,15 +277,15 @@ module BrandableCSS
     end
 
     def public_default_path(type, high_contrast = false)
-      "dist/brandable_css/default/variables#{high_contrast ? '-high_contrast' : ''}-#{default_variables_md5}.#{type}"
+      "dist/brandable_css/default/variables#{high_contrast ? "-high_contrast" : ""}-#{default_variables_md5}.#{type}"
     end
 
     def variants
-      @variants ||= CONFIG['variants'].keys.freeze
+      @variants ||= CONFIG["variants"].keys.freeze
     end
 
     def brandable_variants
-      @brandable_variants ||= CONFIG['variants'].select { |_, v| v['brandable'] }.map { |k, _| k }.freeze
+      @brandable_variants ||= CONFIG["variants"].select { |_, v| v["brandable"] }.map { |k, _| k }.freeze
     end
 
     def combined_checksums
@@ -293,7 +293,7 @@ module BrandableCSS
         return @combined_checksums
       end
 
-      file = APP_ROOT.join(CONFIG['paths']['bundles_with_deps'])
+      file = APP_ROOT.join(CONFIG["paths"]["bundles_with_deps"])
       if file.exist?
         @combined_checksums = JSON.parse(file.read).transform_values do |v|
           v.symbolize_keys.slice(:combinedChecksum, :includesNoVariables)
@@ -318,7 +318,7 @@ module BrandableCSS
         return @handlebars_index_json
       end
 
-      file = APP_ROOT.join(CONFIG.dig('indices', 'handlebars', 'path'))
+      file = APP_ROOT.join(CONFIG.dig("indices", "handlebars", "path"))
       unless file.exist?
         raise "#{file.expand_path} does not exist. You need to run brandable_css before you can serve css."
       end
@@ -328,7 +328,7 @@ module BrandableCSS
 
     # bundle path should be something like "bundles/speedgrader" or "plugins/analytics/something"
     def cache_for(bundle_path, variant)
-      key = ["#{bundle_path}.scss", variant].join(CONFIG['manifest_key_seperator'])
+      key = ["#{bundle_path}.scss", variant].join(CONFIG["manifest_key_seperator"])
       fingerprint = combined_checksums[key]
       raise "Fingerprint not found. #{bundle_path} #{variant}" unless fingerprint
 
@@ -343,7 +343,7 @@ module BrandableCSS
     def font_path_cache
       return @decorated_font_paths if defined?(@decorated_font_paths) && defined?(ActionController) && ActionController::Base.perform_caching
 
-      file = APP_ROOT.join(CONFIG.dig('paths', 'rev_manifest'))
+      file = APP_ROOT.join(CONFIG.dig("paths", "rev_manifest"))
 
       # in reality, if the rev-manifest.json file is missing you won't get this far, but let's be careful anyway
       if file.exist?
@@ -365,7 +365,7 @@ module BrandableCSS
       # eg: you want to test a controller action and you don't care that it links
       # to a css file that hasn't been created yet.
       @decorated_font_paths = {
-        anyfont: 'Error: unknown css checksum. you need to run brandable_css'
+        anyfont: "Error: unknown css checksum. you need to run brandable_css"
       }.freeze
     end
 

@@ -25,7 +25,7 @@ class PlannerNote < ActiveRecord::Base
   belongs_to :user
   belongs_to :course
   belongs_to :linked_object, polymorphic:
-    [:announcement, :assignment, :discussion_topic, :wiki_page, quiz: 'Quizzes::Quiz']
+    [:announcement, :assignment, :discussion_topic, :wiki_page, quiz: "Quizzes::Quiz"]
   validates :user_id, presence: true
   validates :title, presence: true
   validates :todo_date, presence: true

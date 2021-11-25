@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../../common'
+require_relative "../../common"
 
 class StudentAssignmentPageV2
   class << self
@@ -112,7 +112,7 @@ class StudentAssignmentPageV2
     end
 
     def comment_text_area
-      f('textarea')
+      f("textarea")
     end
 
     def url_text_box
@@ -150,11 +150,11 @@ class StudentAssignmentPageV2
     end
 
     def mce_iframe_id
-      f('.mce-container iframe')['id']
+      f(".mce-container iframe")["id"]
     end
 
     def tiny_rce_ifr_id
-      f('.tox-editor-container iframe')['id']
+      f(".tox-editor-container iframe")["id"]
     end
 
     def text_draft_contents
@@ -200,11 +200,11 @@ class StudentAssignmentPageV2
     end
 
     def submit_button
-      f('#submit-button')
+      f("#submit-button")
     end
 
     def submit_button_enabled
-      f('#submit-button:not([disabled]')
+      f("#submit-button:not([disabled]")
     end
 
     def text_entry_submission_button
@@ -233,7 +233,7 @@ class StudentAssignmentPageV2
     end
 
     def create_text_entry_draft(text)
-      type_in_tiny('textarea', text)
+      type_in_tiny("textarea", text)
     end
 
     def create_url_draft(url)

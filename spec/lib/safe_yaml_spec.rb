@@ -105,42 +105,42 @@ describe "safe_yaml" do
       obj
     end
 
-    hwia = verify(result, 'hwia', HashWithIndifferentAccess)
+    hwia = verify(result, "hwia", HashWithIndifferentAccess)
     expect(hwia.values_at(:a, :b)).to eq [1, 2]
 
-    float = verify(result, 'float', Float)
+    float = verify(result, "float", Float)
     expect(float).to eq 5.1
 
-    float_with_exp = verify(result, 'float_with_exp', Float)
+    float_with_exp = verify(result, "float_with_exp", Float)
     expect(float_with_exp).to eq(-1.7763568394002505e-15)
 
-    float_inf = verify(result, 'float_inf', Float)
+    float_inf = verify(result, "float_inf", Float)
     expect(float_inf).to eq(Float::INFINITY)
 
-    os = verify(result, 'os', OpenStruct)
+    os = verify(result, "os", OpenStruct)
     expect(os.a).to eq 1
     expect(os.b).to eq 2
     expect(os.sub.class).to eq OpenStruct
     expect(os.sub.c).to eq 3
 
-    str = verify(result, 'str', String)
+    str = verify(result, "str", String)
     expect(str).to eq "hai"
 
-    mime = verify(result, 'mime', Mime::Type)
-    expect(mime.to_s).to eq 'png'
+    mime = verify(result, "mime", Mime::Type)
+    expect(mime.to_s).to eq "png"
 
-    http = verify(result, 'http', URI::HTTP)
-    expect(http.host).to eq 'example.com'
+    http = verify(result, "http", URI::HTTP)
+    expect(http.host).to eq "example.com"
 
-    https = verify(result, 'https', URI::HTTPS)
-    expect(https.host).to eq 'example.com'
+    https = verify(result, "https", URI::HTTPS)
+    expect(https.host).to eq "example.com"
 
-    expect(result['ab']).to eq AcademicBenchmark::Converter
-    expect(result['qt']).to eq Qti::Converter
+    expect(result["ab"]).to eq AcademicBenchmark::Converter
+    expect(result["qt"]).to eq Qti::Converter
 
-    expect(result['verbose_symbol']).to eq :blah
+    expect(result["verbose_symbol"]).to eq :blah
 
-    oo = verify(result, 'oo', OpenObject)
+    oo = verify(result, "oo", OpenObject)
     expect(oo.a).to eq 1
   end
 
@@ -189,7 +189,7 @@ describe "safe_yaml" do
   end
 
   it "is able to dump and load Canvas:Plugin classes" do
-    plugin = Canvas::Plugin.find('canvas_cartridge_importer')
+    plugin = Canvas::Plugin.find("canvas_cartridge_importer")
     expect(YAML.unsafe_load(YAML.dump(plugin))).to eq plugin
   end
 

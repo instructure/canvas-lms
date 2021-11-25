@@ -93,7 +93,7 @@ class ContentExportsApiController < ApplicationController
   def index
     if authorized_action(@context, @current_user, :read)
       scope = @context.content_exports_visible_to(@current_user).active.not_for_copy
-      scope = scope.order('id DESC')
+      scope = scope.order("id DESC")
       route = polymorphic_url([:api_v1, @context, :content_exports])
       exports = Api.paginate(scope, self, route)
       render json: exports.map { |export| content_export_json(export, @current_user, session) }
@@ -149,7 +149,7 @@ class ContentExportsApiController < ApplicationController
     if authorized_action(@context, @current_user, :read)
       valid_types = %w[zip]
       valid_types += %w[qti common_cartridge quizzes2] if @context.is_a?(Course)
-      return render json: { message: 'invalid export_type' }, status: :bad_request unless valid_types.include?(params[:export_type])
+      return render json: { message: "invalid export_type" }, status: :bad_request unless valid_types.include?(params[:export_type])
 
       export = create_content_export_from_api(params, @context, @current_user)
       return unless export.instance_of?(ContentExport)
@@ -166,7 +166,7 @@ class ContentExportsApiController < ApplicationController
   def fail
     if authorized_action(Account.site_admin, @current_user, :read)
       export = @context.content_exports.find(params[:id])
-      export.fail_with_error! @current_user.global_id, error_message: 'manually marked failed by a site administrator'
+      export.fail_with_error! @current_user.global_id, error_message: "manually marked failed by a site administrator"
       render json: content_export_json(export, @current_user, session)
     end
   end

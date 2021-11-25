@@ -22,7 +22,7 @@ class SetDefaultWorkflowStateOnAssignments < ActiveRecord::Migration[5.2]
   tag :predeploy
 
   def up
-    change_column_default :assignments, :workflow_state, 'published'
+    change_column_default :assignments, :workflow_state, "published"
   end
 
   def down

@@ -17,17 +17,17 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'net/http'
+require "net/http"
 
-require 'cgi'
+require "cgi"
 
-require 'academic_benchmark/engine'
+require "academic_benchmark/engine"
 
-require 'academic_benchmark/ab_gem_extensions/authority'
-require 'academic_benchmark/ab_gem_extensions/document'
-require 'academic_benchmark/ab_gem_extensions/publication'
-require 'academic_benchmark/ab_gem_extensions/section'
-require 'academic_benchmark/ab_gem_extensions/standard'
+require "academic_benchmark/ab_gem_extensions/authority"
+require "academic_benchmark/ab_gem_extensions/document"
+require "academic_benchmark/ab_gem_extensions/publication"
+require "academic_benchmark/ab_gem_extensions/section"
+require "academic_benchmark/ab_gem_extensions/standard"
 
 module AcademicBenchmark
   # The authorities have changed from v3 to v4.1, namely:
@@ -35,18 +35,18 @@ module AcademicBenchmark
   # NRC/NGSS -> Achieve
   # NGA Center/CCSSO -> CC
 
-  COMMON_CORE_AUTHORITY = 'CC'
-  ISTE_AUTHORITY_CODE = 'ISTE'
-  ACHIEVE_AUTHORITY = 'Achieve' # code: -none-
+  COMMON_CORE_AUTHORITY = "CC"
+  ISTE_AUTHORITY_CODE = "ISTE"
+  ACHIEVE_AUTHORITY = "Achieve" # code: -none-
   NATIONAL_STDS = [COMMON_CORE_AUTHORITY, ISTE_AUTHORITY_CODE, ACHIEVE_AUTHORITY].freeze
   COUNTRY_STDS = [
-    'Australian Curriculum, Assessment and Reporting Authority', # code: acara
-    'UK Department for Education' # code: -none-
+    "Australian Curriculum, Assessment and Reporting Authority", # code: acara
+    "UK Department for Education" # code: -none-
   ].freeze
 
   def self.config
     empty_settings = {}.freeze
-    p = Canvas::Plugin.find('academic_benchmark_importer')
+    p = Canvas::Plugin.find("academic_benchmark_importer")
     return empty_settings unless p
 
     p.settings || empty_settings
@@ -149,8 +149,8 @@ module AcademicBenchmark
 
   def self.queue_migration_for(authority:, publication:, user:, options: {})
     cm = ContentMigration.new(context: Account.site_admin)
-    cm.converter_class = config['converter_class']
-    cm.migration_settings[:migration_type] = 'academic_benchmark_importer'
+    cm.converter_class = config["converter_class"]
+    cm.migration_settings[:migration_type] = "academic_benchmark_importer"
     cm.migration_settings[:import_immediately] = true
     cm.migration_settings[:authority] = authority
     cm.migration_settings[:publication] = publication
@@ -214,7 +214,7 @@ module AcademicBenchmark
     uid = Setting.get("academic_benchmark_migration_user_id", nil)
     unless uid.present?
       raise Canvas::Migration::Error,
-            'Not importing academic benchmark data because no user id set'
+            "Not importing academic benchmark data because no user id set"
     end
     uid
   end

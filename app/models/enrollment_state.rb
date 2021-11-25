@@ -44,7 +44,7 @@ class EnrollmentState < ActiveRecord::Base
 
   resolves_root_account through: :enrollment
 
-  self.primary_key = 'enrollment_id'
+  self.primary_key = "enrollment_id"
 
   delegate :hash, to: :global_enrollment_id
 
@@ -83,9 +83,9 @@ class EnrollmentState < ActiveRecord::Base
 
     if restricted_access?
       :inactive
-    elsif state == 'pending_invited'
+    elsif state == "pending_invited"
       :invited
-    elsif state == 'pending_active'
+    elsif state == "pending_active"
       :accepted
     else
       state.to_sym
@@ -115,7 +115,7 @@ class EnrollmentState < ActiveRecord::Base
 
     if invited_or_active
       if enrollment.course.completed?
-        self.state = 'completed'
+        self.state = "completed"
       else
         calculate_state_based_on_dates
       end
@@ -164,7 +164,7 @@ class EnrollmentState < ActiveRecord::Base
       elsif global_start_at < now
         # we've past the end date so no matter what the state was, we're "completed" now
         self.state_started_at = ranges.filter_map(&:last).min
-        self.state = 'completed'
+        self.state = "completed"
       elsif enrollment.fake_student? # rubocop:disable Lint/DuplicateBranch
         # Allow student view students to use the course before the term starts
         self.state = wf_state
@@ -174,14 +174,14 @@ class EnrollmentState < ActiveRecord::Base
         self.state = if enrollment.view_restrictable?
                        # these enrollment states mean they still can't participate yet even if they've accepted it,
                        # but should be able to view just like an invited enrollment
-                       if wf_state == 'active'
-                         'pending_active'
+                       if wf_state == "active"
+                         "pending_active"
                        else
-                         'pending_invited'
+                         "pending_invited"
                        end
                      else
                        # admin user restricted by term dates
-                       'inactive'
+                       "inactive"
                      end
       end
     end
@@ -194,7 +194,7 @@ class EnrollmentState < ActiveRecord::Base
     self.restricted_access = if enrollment.view_restrictable?
                                if pending?
                                  enrollment.restrict_future_view?
-                               elsif state == 'completed'
+                               elsif state == "completed"
                                  enrollment.restrict_past_view?
                                else
                                  false
@@ -290,7 +290,7 @@ class EnrollmentState < ActiveRecord::Base
     scope.find_ids_in_ranges(batch_size: ENROLLMENT_BATCH_SIZE) do |min_id, max_id|
       if invalidate_states(scope.where(id: min_id..max_id)) > 0
         EnrollmentState.delay_if_production(priority: Delayed::LOW_PRIORITY,
-                                            n_strand: ['invalidate_states_for_term', term.global_root_account_id])
+                                            n_strand: ["invalidate_states_for_term", term.global_root_account_id])
                        .process_term_states_in_ranges(min_id, max_id, term, enrollment_type)
       end
     end
@@ -306,8 +306,8 @@ class EnrollmentState < ActiveRecord::Base
   def self.access_states_to_update(changed_keys)
     states_to_update = []
     # only need to invalidate access for future students if future access changed, etc
-    states_to_update += ['pending_invited', 'pending_active'] if changed_keys.include?(:restrict_student_future_view)
-    states_to_update += ['completed'] if changed_keys.include?(:restrict_student_past_view)
+    states_to_update += ["pending_invited", "pending_active"] if changed_keys.include?(:restrict_student_future_view)
+    states_to_update += ["completed"] if changed_keys.include?(:restrict_student_past_view)
     states_to_update
   end
 
@@ -317,7 +317,7 @@ class EnrollmentState < ActiveRecord::Base
       scope = enrollments_for_account_ids(account_ids).where(id: min_id..max_id)
       if invalidate_access(scope, states_to_update) > 0
         EnrollmentState.delay_if_production(priority: Delayed::LOW_PRIORITY,
-                                            n_strand: ['invalidate_access_for_accounts', Shard.current.id])
+                                            n_strand: ["invalidate_access_for_accounts", Shard.current.id])
                        .process_account_states_in_ranges(min_id, max_id, account_ids)
       end
     end

@@ -57,8 +57,8 @@
 
 module MicrosoftSync
   class PartialMembershipDiff
-    OWNER_MSFT_ROLE_TYPE = 'owner'
-    MEMBER_MSFT_ROLE_TYPE = 'member'
+    OWNER_MSFT_ROLE_TYPE = "owner"
+    MEMBER_MSFT_ROLE_TYPE = "member"
 
     def initialize(user_id_to_msft_role_types)
       @user_infos = user_id_to_msft_role_types.to_h.transform_values { |ctypes| UserInfo.new(ctypes) }
@@ -148,9 +148,9 @@ module MicrosoftSync
       def enrollment_msft_role_types
         @enrollment_types.map do |e_type|
           if MicrosoftSync::MembershipDiff::OWNER_ENROLLMENT_TYPES.include?(e_type)
-            'owner'
+            "owner"
           else
-            'member'
+            "member"
           end
         end.uniq.sort
       end

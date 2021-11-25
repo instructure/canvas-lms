@@ -19,7 +19,7 @@
 #
 
 describe Quizzes::QuizApiSerializer do
-  it 'includes question_types' do
+  it "includes question_types" do
     expect(described_class._attributes).to include(:question_types)
   end
 end

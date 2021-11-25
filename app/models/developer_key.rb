@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'aws-sdk-sns'
+require "aws-sdk-sns"
 
 class DeveloperKey < ActiveRecord::Base
   class CacheOnAssociation < ActiveRecord::Associations::BelongsToAssociation
@@ -32,15 +32,15 @@ class DeveloperKey < ActiveRecord::Base
 
   belongs_to :user
   belongs_to :account
-  belongs_to :root_account, class_name: 'Account'
+  belongs_to :root_account, class_name: "Account"
 
   has_many :page_views
   has_many :access_tokens, -> { where(workflow_state: "active") }
   has_many :developer_key_account_bindings, inverse_of: :developer_key, dependent: :destroy
   has_many :context_external_tools
 
-  has_one :tool_consumer_profile, class_name: 'Lti::ToolConsumerProfile', inverse_of: :developer_key
-  has_one :tool_configuration, class_name: 'Lti::ToolConfiguration', dependent: :destroy, inverse_of: :developer_key
+  has_one :tool_consumer_profile, class_name: "Lti::ToolConsumerProfile", inverse_of: :developer_key
+  has_one :tool_configuration, class_name: "Lti::ToolConfiguration", dependent: :destroy, inverse_of: :developer_key
   serialize :scopes, Array
 
   before_validation :normalize_public_jwk_url
@@ -97,7 +97,7 @@ class DeveloperKey < ActiveRecord::Base
 
   alias_method :destroy_permanently!, :destroy
   def destroy
-    self.workflow_state = 'deleted'
+    self.workflow_state = "deleted"
     save
   end
 
@@ -129,11 +129,11 @@ class DeveloperKey < ActiveRecord::Base
 
     self.redirect_uris = uris unless uris == redirect_uris
   rescue URI::Error, ArgumentError
-    errors.add :redirect_uris, 'is not a valid URI'
+    errors.add :redirect_uris, "is not a valid URI"
   end
 
   def protect_default_key
-    raise "Please never delete the default developer key" if workflow_state != 'active' && self == self.class.default
+    raise "Please never delete the default developer key" if workflow_state != "active" && self == self.class.default
   end
 
   def nullify_empty_icon_url
@@ -186,7 +186,7 @@ class DeveloperKey < ActiveRecord::Base
         return @special_keys[default_key_name] = key if key
 
         key = DeveloperKey.create!(name: default_key_name)
-        key.developer_key_account_bindings.update_all(workflow_state: 'on')
+        key.developer_key_account_bindings.update_all(workflow_state: "on")
         key.update(auto_expire_tokens: false)
         Setting.set("#{default_key_name}_developer_key_id", key.id)
         return @special_keys[default_key_name] = key
@@ -196,7 +196,7 @@ class DeveloperKey < ActiveRecord::Base
     # for now, only one AWS account for SNS is supported
     def sns
       unless defined?(@sns)
-        settings = ConfigFile.load('sns')
+        settings = ConfigFile.load("sns")
         @sns = nil
         @sns = Aws::SNS::Client.new(settings) if settings
       end
@@ -356,7 +356,7 @@ class DeveloperKey < ActiveRecord::Base
   def tokens_expire_in
     return nil unless mobile_app?
 
-    sessions_settings = Canvas::Plugin.find('sessions').settings || {}
+    sessions_settings = Canvas::Plugin.find("sessions").settings || {}
     sessions_settings[:mobile_timeout]&.to_f&.minutes
   end
 
@@ -399,13 +399,13 @@ class DeveloperKey < ActiveRecord::Base
 
   def tool_management_enqueue_args
     {
-      n_strand: ['developer_key_tool_management', account&.global_id || 'site_admin'],
+      n_strand: ["developer_key_tool_management", account&.global_id || "site_admin"],
       priority: Delayed::LOW_PRIORITY
     }
   end
 
   def destroy_external_tools?
-    saved_change_to_workflow_state? && workflow_state == 'deleted' && tool_configuration.present?
+    saved_change_to_workflow_state? && workflow_state == "deleted" && tool_configuration.present?
   end
 
   def destroy_external_tools!
@@ -417,7 +417,7 @@ class DeveloperKey < ActiveRecord::Base
   end
 
   def destroy_tools_from_active_shard!(affected_account)
-    base_scope = ContextExternalTool.where.not(workflow_state: 'deleted')
+    base_scope = ContextExternalTool.where.not(workflow_state: "deleted")
     tool_management_scope(base_scope, affected_account).select(:id).find_in_batches do |tool_ids|
       ContextExternalTool.where(id: tool_ids).destroy_all
     end
@@ -443,7 +443,7 @@ class DeveloperKey < ActiveRecord::Base
   def update_tools_on_active_shard!(account)
     return if tool_configuration.blank?
 
-    base_scope = ContextExternalTool.where.not(workflow_state: 'deleted')
+    base_scope = ContextExternalTool.where.not(workflow_state: "deleted")
     tool_management_scope(base_scope, account).select(:id).find_in_batches do |tool_ids|
       ContextExternalTool.where(id: tool_ids).preload(:context).each do |tool|
         tool_configuration.new_external_tool(
@@ -530,7 +530,7 @@ class DeveloperKey < ActiveRecord::Base
     invalid_scopes = scopes - TokenScopes.all_scopes
     return true if invalid_scopes.empty?
 
-    errors[:scopes] << "cannot contain #{invalid_scopes.join(', ')}"
+    errors[:scopes] << "cannot contain #{invalid_scopes.join(", ")}"
   end
 
   def site_admin?

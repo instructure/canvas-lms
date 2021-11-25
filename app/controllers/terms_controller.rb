@@ -106,7 +106,7 @@ class TermsController < ApplicationController
   #
   def destroy
     @term = api_find(@context.enrollment_terms, params[:id])
-    @term.workflow_state = 'deleted'
+    @term.workflow_state = "deleted"
 
     if @term.save
       if api_request?
@@ -125,7 +125,7 @@ class TermsController < ApplicationController
     params.require(:enrollment_term)
     overrides = params[:enrollment_term][:overrides]&.to_unsafe_h
     if overrides.present? && !(overrides.keys.map(&:classify) - %w[StudentEnrollment TeacherEnrollment TaEnrollment DesignerEnrollment]).empty?
-      return render json: { message: 'Invalid enrollment type in overrides' }, status: :bad_request
+      return render json: { message: "Invalid enrollment type in overrides" }, status: :bad_request
     end
 
     sis_id = params[:enrollment_term][:sis_source_id] || params[:enrollment_term][:sis_term_id]
@@ -166,14 +166,14 @@ class TermsController < ApplicationController
       if @term.sis_source_id && @term.sis_source_id_changed?
         scope = @term.root_account.enrollment_terms.where(sis_source_id: @term.sis_source_id)
         scope = scope.where("id<>?", @term) unless @term.new_record?
-        @term.errors.add(:sis_source_id, t('errors.not_unique', "SIS ID \"%{sis_source_id}\" is already in use", sis_source_id: @term.sis_source_id)) if scope.exists?
+        @term.errors.add(:sis_source_id, t("errors.not_unique", "SIS ID \"%{sis_source_id}\" is already in use", sis_source_id: @term.sis_source_id)) if scope.exists?
       end
     end
   end
 
   def serialized_term
     if api_request?
-      enrollment_term_json(@term, @current_user, session, nil, ['overrides'])
+      enrollment_term_json(@term, @current_user, session, nil, ["overrides"])
     else
       @term.as_json(include: :enrollment_dates_overrides)
     end

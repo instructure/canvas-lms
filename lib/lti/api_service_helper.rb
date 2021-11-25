@@ -21,8 +21,8 @@
 # Filters added to this controller apply to all controllers in the application.
 # Likewise, all the methods added will be available for all controllers.
 
-require 'oauth'
-require 'oauth/request_proxy/action_controller_request'
+require "oauth"
+require "oauth/request_proxy/action_controller_request"
 
 module Lti
   module ApiServiceHelper
@@ -38,11 +38,11 @@ module Lti
     end
 
     def oauth_consumer_key
-      @oauth_consumer_key ||= ::OAuth::Helper.parse_header(request.authorization)['oauth_consumer_key']
+      @oauth_consumer_key ||= ::OAuth::Helper.parse_header(request.authorization)["oauth_consumer_key"]
     end
 
     def authenticate_body_hash
-      if (body_hash = ::OAuth::Helper.parse_header(request.authorization)['oauth_body_hash'])
+      if (body_hash = ::OAuth::Helper.parse_header(request.authorization)["oauth_body_hash"])
         request.body.rewind
         generated_hash = Digest::SHA1.base64digest(request.body.read)
         request.body.rewind # Be Kind Rewind
@@ -53,8 +53,8 @@ module Lti
     end
 
     def render_unauthorized_api
-      render json: { status: I18n.t('lib.auth.lti.api.status_unauthorized', 'unauthorized'),
-                     errors: [{ message: I18n.t('lib.auth.lti.api.not_unauthorized', 'unauthorized request') }] },
+      render json: { status: I18n.t("lib.auth.lti.api.status_unauthorized", "unauthorized"),
+                     errors: [{ message: I18n.t("lib.auth.lti.api.not_unauthorized", "unauthorized request") }] },
              status: :unauthorized
     end
   end

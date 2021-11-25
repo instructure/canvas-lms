@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'atom'
+require "atom"
 
 # @API Calendar Events
 #
@@ -487,7 +487,7 @@ class CalendarEventsApiController < ApplicationController
   #        -H "Authorization: Bearer <token>"
   def create
     if @context.is_a?(Course) && @context.deleted?
-      return render json: { error: t('cannot create event for deleted course') }, status: :bad_request
+      return render json: { error: t("cannot create event for deleted course") }, status: :bad_request
     end
 
     params_for_create = calendar_event_params
@@ -531,7 +531,7 @@ class CalendarEventsApiController < ApplicationController
           render json: event_json(
             original_event,
             @current_user,
-            session, { duplicates: events, include: includes('web_conference') }
+            session, { duplicates: events, include: includes("web_conference") }
           ), status: :created
         end
       end
@@ -585,13 +585,13 @@ class CalendarEventsApiController < ApplicationController
 
         reservation = @event.reserve_for(participant, @current_user,
                                          cancel_existing: value_to_boolean(params[:cancel_existing]),
-                                         comments: params['comments'])
+                                         comments: params["comments"])
         render json: event_json(reservation, @current_user, session)
       rescue CalendarEvent::ReservationError => e
         reservations = participant ? @event.appointment_group.reservations_for(participant) : []
         render json: [{
-          attribute: 'reservation',
-          type: 'calendar_event',
+          attribute: "reservation",
+          type: "calendar_event",
           message: e.message,
           reservations: reservations.map { |r| event_json(r, @current_user, session) }
         }],
@@ -670,10 +670,10 @@ class CalendarEventsApiController < ApplicationController
 
         if @event.context != context
           if @event.context.is_a?(AppointmentGroup)
-            return render json: { message: 'Cannot move Scheduler appointments between calendars' }, status: :bad_request
+            return render json: { message: "Cannot move Scheduler appointments between calendars" }, status: :bad_request
           end
           if @event.parent_calendar_event_id.present? || @event.child_events.any? || @event.effective_context_code.present?
-            return render json: { message: 'Cannot move events with section-specific times between calendars' }, status: :bad_request
+            return render json: { message: "Cannot move events with section-specific times between calendars" }, status: :bad_request
           end
 
           @event.context = context
@@ -691,7 +691,7 @@ class CalendarEventsApiController < ApplicationController
       end
 
       if @event.update(params_for_update)
-        render json: event_json(@event, @current_user, session, include: includes('web_conference'))
+        render json: event_json(@event, @current_user, session, include: includes("web_conference"))
       else
         render json: @event.errors, status: :bad_request
       end
@@ -737,8 +737,8 @@ class CalendarEventsApiController < ApplicationController
       # if the feed url included the information on the requesting user,
       # we can properly filter calendar events to the user's course sections
       @type = :feed
-      @start_date = Setting.get('calendar_feed_previous_days', '30').to_i.days.ago
-      @end_date = Setting.get('calendar_feed_upcoming_days', '366').to_i.days.from_now
+      @start_date = Setting.get("calendar_feed_previous_days", "30").to_i.days.ago
+      @end_date = Setting.get("calendar_feed_upcoming_days", "366").to_i.days.from_now
 
       get_options(nil)
 
@@ -798,22 +798,22 @@ class CalendarEventsApiController < ApplicationController
     @events = @events.sort_by { |e| [e.start_at || CanvasSort::Last, Canvas::ICU.collation_key(e.title)] }
 
     @contexts.each do |context|
-      log_asset_access(["calendar_feed", context], "calendar", 'other', context: @context)
+      log_asset_access(["calendar_feed", context], "calendar", "other", context: @context)
     end
     ActiveRecord::Associations::Preloader.new.preload(@events, :context)
 
     respond_to do |format|
       format.ics do
-        name = t('ics_title', "%{course_or_group_name} Calendar (Canvas)", course_or_group_name: @context.name)
+        name = t("ics_title", "%{course_or_group_name} Calendar (Canvas)", course_or_group_name: @context.name)
         description = case @context
                       when Course
-                        t('ics_description_course', "Calendar events for the course, %{course_name}", course_name: @context.name)
+                        t("ics_description_course", "Calendar events for the course, %{course_name}", course_name: @context.name)
                       when Group
-                        t('ics_description_group', "Calendar events for the group, %{group_name}", group_name: @context.name)
+                        t("ics_description_group", "Calendar events for the group, %{group_name}", group_name: @context.name)
                       when User
-                        t('ics_description_user', "Calendar events for the user, %{user_name}", user_name: @context.name)
+                        t("ics_description_user", "Calendar events for the user, %{user_name}", user_name: @context.name)
                       else
-                        t('ics_description', "Calendar events for %{context_name}", context_name: @context.name)
+                        t("ics_description", "Calendar events for %{context_name}", context_name: @context.name)
                       end
 
         calendar = Icalendar::Calendar.new
@@ -839,7 +839,7 @@ class CalendarEventsApiController < ApplicationController
       format.atom do
         feed = Atom::Feed.new do |f|
           f.title = t :feed_title, "%{course_or_group_name} Calendar Feed", course_or_group_name: @context.name
-          f.links << Atom::Link.new(href: calendar_url_for(@context), rel: 'self')
+          f.links << Atom::Link.new(href: calendar_url_for(@context), rel: "self")
           f.updated = Time.now
           f.id = calendar_url_for(@context)
         end
@@ -886,7 +886,7 @@ class CalendarEventsApiController < ApplicationController
 
   def save_selected_contexts
     @current_user.set_preference(:selected_calendar_contexts, params[:selected_contexts])
-    render json: { status: 'ok' }
+    render json: { status: "ok" }
   end
 
   # @API Set a course timetable
@@ -934,7 +934,7 @@ class CalendarEventsApiController < ApplicationController
       updated_section_ids = []
       timetable_data.each do |section_id, timetables|
         timetable_data[section_id] = Array(timetables)
-        section = section_id == 'all' ? nil : api_find(@context.active_course_sections, section_id)
+        section = section_id == "all" ? nil : api_find(@context.active_course_sections, section_id)
         updated_section_ids << section.id if section
 
         builder = Courses::TimetableEventBuilder.new(course: @context, course_section: section)
@@ -962,10 +962,10 @@ class CalendarEventsApiController < ApplicationController
       ignored_section_ids = @context.active_course_sections.where.not(id: updated_section_ids).pluck(:id)
       if ignored_section_ids.any?
         CalendarEvent.active.for_timetable.where(context_type: "CourseSection", context_id: ignored_section_ids)
-                     .update_all(workflow_state: 'deleted', deleted_at: Time.now.utc)
+                     .update_all(workflow_state: "deleted", deleted_at: Time.now.utc)
       end
 
-      render json: { status: 'ok' }
+      render json: { status: "ok" }
     end
   end
 
@@ -1030,7 +1030,7 @@ class CalendarEventsApiController < ApplicationController
       end
 
       builder.delay.create_or_update_events(event_hashes)
-      render json: { status: 'ok' }
+      render json: { status: "ok" }
     end
   end
 
@@ -1067,7 +1067,7 @@ class CalendarEventsApiController < ApplicationController
       elsif Api::ISO8601_REGEX.match?(params[:start_date])
         @start_date ||= Time.zone.parse(params[:start_date])
       else # params[:start_date] is not valid
-        @errors[:start_date] = t(:invalid_date_or_time, 'Invalid date or invalid datetime for %{attr}', attr: 'start_date')
+        @errors[:start_date] = t(:invalid_date_or_time, "Invalid date or invalid datetime for %{attr}", attr: "start_date")
       end
     end
 
@@ -1077,7 +1077,7 @@ class CalendarEventsApiController < ApplicationController
       elsif Api::ISO8601_REGEX.match?(params[:end_date])
         @end_date ||= Time.zone.parse(params[:end_date])
       else # params[:end_date] is not valid
-        @errors[:end_date] = t(:invalid_date_or_time, 'Invalid date or invalid datetime for %{attr}', attr: 'end_date')
+        @errors[:end_date] = t(:invalid_date_or_time, "Invalid date or invalid datetime for %{attr}", attr: "end_date")
       end
     end
   end
@@ -1093,7 +1093,7 @@ class CalendarEventsApiController < ApplicationController
       @end_date = @start_date.end_of_day if @end_date < @start_date
     end
 
-    @type ||= params[:type] == 'assignment' ? :assignment : :event
+    @type ||= params[:type] == "assignment" ? :assignment : :event
 
     @context ||= user
 
@@ -1129,13 +1129,13 @@ class CalendarEventsApiController < ApplicationController
     @context_codes = @selected_contexts.map(&:asset_string)
     @section_codes = []
     if user
-      @is_admin = user.roles(@domain_root_account).include?('admin') # if we're an admin - don't try to figure out which sections we belong to; just include all of them
+      @is_admin = user.roles(@domain_root_account).include?("admin") # if we're an admin - don't try to figure out which sections we belong to; just include all of them
       @section_codes = user.section_context_codes(@context_codes, @is_admin)
     end
 
     if @type == :event && @start_date && user
       # pull in reservable appointment group events, if requested
-      group_codes = codes.grep(/\Aappointment_group_(\d+)\z/).map { |m| m.sub(/.*_/, '').to_i }
+      group_codes = codes.grep(/\Aappointment_group_(\d+)\z/).map { |m| m.sub(/.*_/, "").to_i }
       if group_codes.present?
         ags = AppointmentGroup
               .reservable_by(user)
@@ -1223,7 +1223,7 @@ class CalendarEventsApiController < ApplicationController
     end
 
     # in courses with diff assignments on, only show the visible assignments
-    scope.filter_by_visibilities_in_given_courses(student_ids.to_a, courses_to_filter_assignments.map(&:id)).group('assignments.id')
+    scope.filter_by_visibilities_in_given_courses(student_ids.to_a, courses_to_filter_assignments.map(&:id)).group("assignments.id")
   end
 
   def calendar_event_scope(user)
@@ -1241,7 +1241,7 @@ class CalendarEventsApiController < ApplicationController
         relation = yield relation if block_given?
         relation = relation.send(*date_scope_and_args) unless @all_events
         relation = relation.with_important_dates if @important_dates
-        if includes.include?('web_conference')
+        if includes.include?("web_conference")
           relation = relation.preload(:web_conference)
         end
         relation
@@ -1266,7 +1266,7 @@ class CalendarEventsApiController < ApplicationController
       AssignmentOverrideApplicator.preload_assignment_override_students(events, user)
     end
 
-    unless (params[:excludes] || []).include?('assignments')
+    unless (params[:excludes] || []).include?("assignments")
       ActiveRecord::Associations::Preloader.new.preload(events, [:rubric, :rubric_association])
       # improves locked_json performance
 
@@ -1295,7 +1295,7 @@ class CalendarEventsApiController < ApplicationController
         end
 
         if original_dates.present?
-          section_override_count = dates_list.count { |d| d[:set_type] == 'CourseSection' }
+          section_override_count = dates_list.count { |d| d[:set_type] == "CourseSection" }
           all_sections_overridden = section_override_count > 0 && section_override_count == assignment.context.active_section_count
           if !all_sections_overridden ||
              (assignments.empty? && courses_user_has_been_enrolled_in[:observer].include?(assignment.context_id))
@@ -1432,12 +1432,12 @@ class CalendarEventsApiController < ApplicationController
     @errors = {}
     user = @observee || @current_user
     # appointment groups show up here in find-appointment mode; give them a free ride
-    ag_count = (params[:context_codes] || []).count { |code| code.start_with?('appointment_group_') }
+    ag_count = (params[:context_codes] || []).count { |code| code.start_with?("appointment_group_") }
     context_limit = @domain_root_account.settings[:calendar_contexts_limit] || 10
     codes = (params[:context_codes] || [user.asset_string])[0, context_limit + ag_count]
     # also accept a more compact comma-separated list of appointment group ids
     if params[:appointment_group_ids].present? && params[:appointment_group_ids].is_a?(String)
-      codes += params[:appointment_group_ids].split(',').map { |id| "appointment_group_#{id}" }
+      codes += params[:appointment_group_ids].split(",").map { |id| "appointment_group_#{id}" }
     end
     get_options(codes, user)
 
@@ -1466,7 +1466,7 @@ class CalendarEventsApiController < ApplicationController
   def check_for_past_signup(event)
     if event && event.end_at < Time.now.utc && event.context.is_a?(AppointmentGroup) &&
        !event.context.grants_right?(@current_user, :manage)
-      render json: { message: 'Cannot create or change reservation for past appointment' }, status: :forbidden
+      render json: { message: "Cannot create or change reservation for past appointment" }, status: :forbidden
       return false
     end
     true

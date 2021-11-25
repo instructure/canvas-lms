@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'ims/lti'
+require "ims/lti"
 
 module Lti
   class RegistrationRequestService
@@ -50,7 +50,7 @@ module Lti
     end
 
     def self.req_cache_key(context, reg_key)
-      ['lti_registration_request', context.class.name, context.global_id, reg_key].cache_key
+      ["lti_registration_request", context.class.name, context.global_id, reg_key].cache_key
     end
   end
 end

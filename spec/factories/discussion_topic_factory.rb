@@ -33,11 +33,11 @@ module Factories
 
   def group_assignment_discussion(opts = {})
     course = opts[:course] || course_model(reusable: true)
-    assignment_model(course: course, submission_types: 'discussion_topic', title: 'Group Assignment Discussion')
+    assignment_model(course: course, submission_types: "discussion_topic", title: "Group Assignment Discussion")
 
     @root_topic = DiscussionTopic.where(assignment_id: @assignment).first
-    @group_category = course.group_categories.create(name: 'Project Group')
-    group_model(name: 'Project Group 1', group_category: @group_category, context: course)
+    @group_category = course.group_categories.create(name: "Project Group")
+    group_model(name: "Project Group 1", group_category: @group_category, context: course)
     @root_topic.group_category = @group_category
     @root_topic.save!
 
@@ -48,7 +48,7 @@ module Factories
   def topic_with_nested_replies
     course_with_teacher(active_all: true)
     student_in_course(course: @course, active_all: true)
-    @topic = @course.discussion_topics.create!(title: "title", message: "message", user: @teacher, discussion_type: 'threaded')
+    @topic = @course.discussion_topics.create!(title: "title", message: "message", user: @teacher, discussion_type: "threaded")
     @root1 = @topic.reply_from(user: @student, html: "root1")
     @root2 = @topic.reply_from(user: @student, html: "root2")
     @reply1 = @root1.reply_from(user: @teacher, html: "reply1")
@@ -71,7 +71,7 @@ module Factories
 
   def create_valid_discussion_entry
     course_with_teacher(active_all: true)
-    @topic = @course.discussion_topics.create!(title: "title", message: "message", user: @teacher, discussion_type: 'threaded')
+    @topic = @course.discussion_topics.create!(title: "title", message: "message", user: @teacher, discussion_type: "threaded")
     @topic.discussion_entries.create!(message: "Hello!", user: @teacher, editor: @teacher)
   end
 
@@ -83,7 +83,7 @@ module Factories
 
     @topic = course.discussion_topics.build(title: "topic")
     @topic.group_category = group_category
-    @assignment = course.assignments.build(submission_types: 'discussion_topic', title: @topic.title)
+    @assignment = course.assignments.build(submission_types: "discussion_topic", title: @topic.title)
     @assignment.infer_times
     @assignment.saved_by = :discussion_topic
     @topic.assignment = @assignment
@@ -94,8 +94,8 @@ module Factories
 
   def group_discussion_topic_model(opts = {})
     @context = opts[:context] || @context || course_factory(active_all: true)
-    @group_category = @context.group_categories.create(name: 'Project Group')
-    group_model(name: 'Project Group 1', group_category: @group_category, context: @context)
+    @group_category = @context.group_categories.create(name: "Project Group")
+    group_model(name: "Project Group 1", group_category: @group_category, context: @context)
     opts[:group_category] = @group_category
     @group_topic = @context.discussion_topics.create!(valid_discussion_topic_attributes.merge(opts))
   end
@@ -103,7 +103,7 @@ module Factories
   def graded_discussion_topic(opts = {})
     @context = opts[:context] || @context || course_factory(active_all: true)
     @topic = discussion_topic_model(opts)
-    @assignment = @topic.context.assignments.build(submission_types: 'discussion_topic', title: @topic.title)
+    @assignment = @topic.context.assignments.build(submission_types: "discussion_topic", title: @topic.title)
     @assignment.infer_times
     @assignment.saved_by = :discussion_topic
     @topic.assignment = @assignment

@@ -17,13 +17,13 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../../api_spec_helper'
-require_relative '../../../file_upload_helper'
+require_relative "../../api_spec_helper"
+require_relative "../../../file_upload_helper"
 
 describe Quizzes::QuizQuestionsController, type: :request do
   include FileUploadHelper
 
-  context 'as a teacher' do
+  context "as a teacher" do
     before :once do
       @course = course_factory
       teacher_in_course active_all: true
@@ -40,7 +40,7 @@ describe Quizzes::QuizQuestionsController, type: :request do
                         controller: "quizzes/quiz_questions", action: "index", format: "json",
                         course_id: @course.id.to_s, quiz_id: @quiz.id.to_s)
 
-        question_ids = json.collect { |q| q['id'] }
+        question_ids = json.collect { |q| q["id"] }
         expect(question_ids).to eq questions.map(&:id)
       end
 
@@ -68,12 +68,12 @@ describe Quizzes::QuizQuestionsController, type: :request do
         json = api_call(:get, "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/questions",
                         controller: "quizzes/quiz_questions", action: "index", format: "json",
                         course_id: @course.id.to_s, quiz_id: @quiz.id.to_s)
-        question_ids = json.collect { |q| q['id'] }
+        question_ids = json.collect { |q| q["id"] }
         expect(question_ids).to eq [question2.id]
       end
 
-      context 'given a submission id and attempt' do
-        it 'returns the list of questions that were used for the submission' do
+      context "given a submission id and attempt" do
+        it "returns the list of questions that were used for the submission" do
           question1 = @quiz.quiz_questions.create!(question_data: { question_name: "Question 1" })
           question2 = @quiz.quiz_questions.create!(question_data: { question_name: "Question 2" })
 
@@ -100,15 +100,15 @@ describe Quizzes::QuizQuestionsController, type: :request do
             }
           )
 
-          question_ids = json.collect { |q| q['id'] }.sort
+          question_ids = json.collect { |q| q["id"] }.sort
           expect(question_ids).to eq [question1.id, question2.id]
         end
       end
     end
 
     describe "POST /courses/course_id/quizzes/:quiz_id/questions" do
-      it 'removes the hostname from URLs' do
-        file = create_fixture_attachment(@course, 'test_image.jpg')
+      it "removes the hostname from URLs" do
+        file = create_fixture_attachment(@course, "test_image.jpg")
         file_link = get_file_link(file)
 
         request_data = {
@@ -119,28 +119,28 @@ describe Quizzes::QuizQuestionsController, type: :request do
         json = api_call(
           :post,
           "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/questions", {
-            controller: 'quizzes/quiz_questions',
-            action: 'create',
-            format: 'json',
+            controller: "quizzes/quiz_questions",
+            action: "create",
+            format: "json",
             course_id: @course.id,
             quiz_id: @quiz.id,
           },
           request_data
         )
         link_without_domain = "<a href=\"/courses/#{@course.id}/files/#{file.id}/download\">Link</a>"
-        expect(json['question_text']).to eq(link_without_domain)
+        expect(json["question_text"]).to eq(link_without_domain)
       end
     end
 
     describe "PUT /courses/:course_id/quizzes/:quiz_id/questions/:id" do
-      it 'removes the hostname from URLs' do
-        file = create_fixture_attachment(@course, 'test_image.jpg')
+      it "removes the hostname from URLs" do
+        file = create_fixture_attachment(@course, "test_image.jpg")
         file_link = get_file_link(file)
 
         question = Quizzes::QuizQuestion.create!(
           quiz: @quiz,
           question_data: {
-            question_text: 'some text',
+            question_text: "some text",
           }
         )
 
@@ -149,9 +149,9 @@ describe Quizzes::QuizQuestionsController, type: :request do
           :put,
           "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/questions/#{question.id}",
           {
-            controller: 'quizzes/quiz_questions',
-            action: 'update',
-            format: 'json',
+            controller: "quizzes/quiz_questions",
+            action: "update",
+            format: "json",
             course_id: @course.id,
             quiz_id: @quiz.id,
             id: question.id,
@@ -159,7 +159,7 @@ describe Quizzes::QuizQuestionsController, type: :request do
           request_data
         )
         link_without_domain = "<a href=\"/courses/#{@course.id}/files/#{file.id}/download\">Link</a>"
-        expect(json['question_text']).to eq(link_without_domain)
+        expect(json["question_text"]).to eq(link_without_domain)
       end
     end
 
@@ -218,7 +218,7 @@ describe Quizzes::QuizQuestionsController, type: :request do
                             controller: "quizzes/quiz_questions", action: "show", format: "json",
                             course_id: @course.id.to_s, quiz_id: @quiz.id.to_s, id: @question.id.to_s)
 
-            json['question_text']
+            json["question_text"]
           end
         end
 
@@ -237,8 +237,8 @@ describe Quizzes::QuizQuestionsController, type: :request do
                             controller: "quizzes/quiz_questions", action: "show", format: "json",
                             course_id: @course.id.to_s, quiz_id: @quiz.id.to_s, id: @question.id.to_s)
 
-            expect(json['answers'][0]['text']).to eq plain_answer_txt
-            json['answers'][1]['html']
+            expect(json["answers"][0]["text"]).to eq plain_answer_txt
+            json["answers"][1]["html"]
           end
         end
       end
@@ -254,18 +254,18 @@ describe Quizzes::QuizQuestionsController, type: :request do
     end
   end
 
-  context 'as a student' do
+  context "as a student" do
     before :once do
       course_with_student active_all: true
 
-      @quiz = @course.quizzes.create!(title: 'quiz')
+      @quiz = @course.quizzes.create!(title: "quiz")
       @quiz.published_at = Time.now
-      @quiz.workflow_state = 'available'
+      @quiz.workflow_state = "available"
       @quiz.save!
     end
 
-    context 'whom has not started the quiz' do
-      describe 'GET /courses/:course_id/quizzes/:quiz_id/questions (index)' do
+    context "whom has not started the quiz" do
+      describe "GET /courses/:course_id/quizzes/:quiz_id/questions (index)" do
         it "is unauthorized" do
           raw_api_call(:get, "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/questions",
                        controller: "quizzes/quiz_questions", action: "index", format: "json",
@@ -274,7 +274,7 @@ describe Quizzes::QuizQuestionsController, type: :request do
         end
       end
 
-      describe 'GET /courses/:course_id/quizzes/:quiz_id/questions/:id (show)' do
+      describe "GET /courses/:course_id/quizzes/:quiz_id/questions/:id (show)" do
         it "is unauthorized" do
           @question = @quiz.quiz_questions.create!(question_data: multiple_choice_question_data)
 
@@ -286,12 +286,12 @@ describe Quizzes::QuizQuestionsController, type: :request do
       end
     end
 
-    context 'whom has started a quiz' do
+    context "whom has started a quiz" do
       before :once do
         @submission = @quiz.generate_submission(@student)
       end
 
-      describe 'GET /courses/:course_id/quizzes/:quiz_id/questions (index)' do
+      describe "GET /courses/:course_id/quizzes/:quiz_id/questions (index)" do
         it "is unauthorized" do
           raw_api_call(:get, "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/questions",
                        controller: "quizzes/quiz_questions", action: "index", format: "json",
@@ -299,7 +299,7 @@ describe Quizzes::QuizQuestionsController, type: :request do
           assert_status(401)
         end
 
-        it 'is authorized with quiz_submission_id & attempt' do
+        it "is authorized with quiz_submission_id & attempt" do
           url = "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/questions?quiz_submission_id=#{@submission.id}&quiz_submission_attempt=1"
           raw_api_call(:get, url,
                        controller: "quizzes/quiz_questions", action: "index", format: "json",
@@ -309,7 +309,7 @@ describe Quizzes::QuizQuestionsController, type: :request do
         end
       end
 
-      describe 'GET /courses/:course_id/quizzes/:quiz_id/questions/:id (show)' do
+      describe "GET /courses/:course_id/quizzes/:quiz_id/questions/:id (show)" do
         it "is unauthorized" do
           @question = @quiz.quiz_questions.create!(question_data: multiple_choice_question_data)
 

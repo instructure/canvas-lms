@@ -18,17 +18,17 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../api_spec_helper'
+require_relative "../api_spec_helper"
 
 def call_setting(opts)
   status_assertion = opts[:assert_unauthorized] ? { expected_status: 401 } : {}
   api_call_as_user(opts[:as_user], :get,
                    "/api/v1/users/#{opts[:for_user].id}/profile.json",
-                   { controller: 'profile', action: 'settings',
-                     format: 'json', user_id: opts[:for_user].id }, {}, {}, status_assertion)
+                   { controller: "profile", action: "settings",
+                     format: "json", user_id: opts[:for_user].id }, {}, {}, status_assertion)
 end
 
-describe 'ProfileController', type: :request do
+describe "ProfileController", type: :request do
   context "setting permissions" do
     context "admin" do
       it "shows all profiles" do

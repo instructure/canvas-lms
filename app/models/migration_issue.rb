@@ -34,7 +34,7 @@ class MigrationIssue < ActiveRecord::Base
     state :resolved
   end
 
-  scope :active, -> { where(workflow_state: 'active') }
+  scope :active, -> { where(workflow_state: "active") }
   scope :by_created_at, -> { order(:created_at) }
 
   set_policy do

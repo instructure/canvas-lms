@@ -18,9 +18,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative 'messages_helper'
+require_relative "messages_helper"
 
-describe 'rubric_association_created' do
+describe "rubric_association_created" do
   before :once do
     rubric_association_model
   end

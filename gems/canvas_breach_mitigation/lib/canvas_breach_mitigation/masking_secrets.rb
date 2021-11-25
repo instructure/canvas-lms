@@ -29,7 +29,7 @@ module CanvasBreachMitigation
       # 3.4 of "BREACH: Reviving the CRIME attack".
       def masked_authenticity_token(cookies, options = {})
         # remask token
-        encoded_masked_token = masked_token(unmasked_token(cookies['_csrf_token']))
+        encoded_masked_token = masked_token(unmasked_token(cookies["_csrf_token"]))
 
         cookie = { value: encoded_masked_token }
         %i[domain httponly secure].each do |key|
@@ -37,18 +37,18 @@ module CanvasBreachMitigation
 
           cookie[key] = options[key]
         end
-        cookies['_csrf_token'] = cookie
+        cookies["_csrf_token"] = cookie
 
         encoded_masked_token
       end
 
       def reset_authenticity_token!(cookies, options = {})
-        cookies['_csrf_token'] = nil
+        cookies["_csrf_token"] = nil
         masked_authenticity_token(cookies, options)
       end
 
       def valid_authenticity_token?(cookies, encoded_masked_token)
-        unmasked_token(cookies['_csrf_token']) == unmasked_token(encoded_masked_token)
+        unmasked_token(cookies["_csrf_token"]) == unmasked_token(encoded_masked_token)
       end
 
       def masked_token(token)
@@ -74,7 +74,7 @@ module CanvasBreachMitigation
       end
 
       def xor_byte_strings(s1, s2)
-        s1.bytes.zip(s2.bytes).map { |(c1, c2)| c1 ^ c2 }.pack('c*')
+        s1.bytes.zip(s2.bytes).map { |(c1, c2)| c1 ^ c2 }.pack("c*")
       end
     end
   end

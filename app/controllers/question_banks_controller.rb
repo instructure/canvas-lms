@@ -20,7 +20,7 @@
 
 class QuestionBanksController < ApplicationController
   before_action :require_context, except: :bookmark
-  add_crumb(proc { t('#crumbs.question_banks', "Question Banks") }, except: :bookmark) { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_question_banks_url }
+  add_crumb(proc { t("#crumbs.question_banks", "Question Banks") }, except: :bookmark) { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_question_banks_url }
 
   include Api::V1::Outcome
   include QuizMathDataFixup
@@ -28,13 +28,13 @@ class QuestionBanksController < ApplicationController
   def index
     if @context == @current_user || authorized_action(@context, @current_user, :read_question_banks)
       @question_banks = @context.assessment_question_banks.active.except(:preload).to_a
-      if params[:include_bookmarked] == '1'
+      if params[:include_bookmarked] == "1"
         @question_banks += @current_user.assessment_question_banks.active
       end
-      if params[:inherited] == '1' && @context != @current_user
+      if params[:inherited] == "1" && @context != @current_user
         @question_banks += @context.inherited_assessment_question_banks.active
       end
-      @question_banks = @question_banks.select { |b| b.grants_right?(@current_user, :manage) } if params[:managed] == '1'
+      @question_banks = @question_banks.select { |b| b.grants_right?(@current_user, :manage) } if params[:managed] == "1"
       @question_banks = Canvas::ICU.collate_by(@question_banks.uniq) { |b| b.title || CanvasSort::Last }
       respond_to do |format|
         format.html
@@ -44,7 +44,7 @@ class QuestionBanksController < ApplicationController
   end
 
   def questions
-    find_bank(params[:question_bank_id], params[:inherited] == '1') do
+    find_bank(params[:question_bank_id], params[:inherited] == "1") do
       @questions = @bank.assessment_questions.active
       url = polymorphic_url([@context, :question_bank_questions], question_bank_id: @bank)
       @questions = Api.paginate(@questions, self, url, default_per_page: 50)
@@ -55,7 +55,7 @@ class QuestionBanksController < ApplicationController
   def reorder
     @bank = @context.assessment_question_banks.find(params[:question_bank_id])
     if authorized_action(@bank, @current_user, :update)
-      @bank.assessment_questions.active.first.update_order(params[:order].split(','))
+      @bank.assessment_questions.active.first.update_order(params[:order].split(","))
       render json: { reorder: true }
     end
   end
@@ -96,10 +96,10 @@ class QuestionBanksController < ApplicationController
 
       ids = []
       params[:questions].each do |key, value|
-        ids << key.to_i if value != '0' && key.to_i != 0
+        ids << key.to_i if value != "0" && key.to_i != 0
       end
       @questions = @bank.assessment_questions.where(id: ids)
-      if params[:move] == '1'
+      if params[:move] == "1"
         @questions.update_all(assessment_question_bank_id: @new_bank.id)
       else
         attributes = @questions.columns.map(&:name) - %w[id created_at updated_at assessment_question_bank_id]
@@ -107,8 +107,8 @@ class QuestionBanksController < ApplicationController
         attributes = attributes.map { |attr| connection.quote_column_name(attr) }
         now = connection.quote(Time.now.utc)
         connection.insert(
-          "INSERT INTO #{AssessmentQuestion.quoted_table_name} (#{(%w[assessment_question_bank_id created_at updated_at] + attributes).join(', ')})" +
-          @questions.select(([@new_bank.id, now, now] + attributes).join(', ')).to_sql
+          "INSERT INTO #{AssessmentQuestion.quoted_table_name} (#{(%w[assessment_question_bank_id created_at updated_at] + attributes).join(", ")})" +
+          @questions.select(([@new_bank.id, now, now] + attributes).join(", ")).to_sql
         )
       end
 

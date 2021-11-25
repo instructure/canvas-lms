@@ -43,7 +43,7 @@ module Lti
 
       def message_handlers_for(context, placements)
         MessageHandler.for_context(context).has_placements(*placements)
-                      .by_message_types('basic-lti-launch-request')
+                      .by_message_types("basic-lti-launch-request")
       end
 
       def bookmarked_collection(context, placements, options = {})
@@ -54,8 +54,8 @@ module Lti
         message_handlers = BookmarkedCollection.wrap(MessageHandlerNameBookmarker, message_handlers)
 
         BookmarkedCollection.merge(
-          ['external_tools', external_tools],
-          ['message_handlers', message_handlers]
+          ["external_tools", external_tools],
+          ["message_handlers", message_handlers]
         )
       end
 

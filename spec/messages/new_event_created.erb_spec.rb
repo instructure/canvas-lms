@@ -18,9 +18,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative 'messages_helper'
+require_relative "messages_helper"
 
-describe 'new_event_created' do
+describe "new_event_created" do
   before :once do
     calendar_event_model
   end

@@ -316,44 +316,44 @@ class RubricsApiController < ApplicationController
               RubricAssessment.where(rubric_id: rubric.id)
             end
     case (api_includes & VALID_ASSESSMENT_SCOPES)[0]
-    when 'assessments'
+    when "assessments"
       scope
-    when 'graded_assessments'
-      scope.where(assessment_type: 'grading')
-    when 'peer_assessments'
-      scope.where(assessment_type: 'peer_review')
+    when "graded_assessments"
+      scope.where(assessment_type: "grading")
+    when "peer_assessments"
+      scope.where(assessment_type: "peer_review")
     end
   end
 
   def rubric_associations(rubric)
     scope = rubric.rubric_associations
     case (api_includes & VALID_ASSOCIATION_SCOPES)[0]
-    when 'associations'
+    when "associations"
       scope
-    when 'assignment_associations'
-      scope.where(association_type: 'Assignment')
-    when 'course_associations'
-      scope.where(association_type: 'Course')
-    when 'account_associations'
-      scope.where(association_type: 'Account')
+    when "assignment_associations"
+      scope.where(association_type: "Assignment")
+    when "course_associations"
+      scope.where(association_type: "Course")
+    when "account_associations"
+      scope.where(association_type: "Account")
     end
   end
 
   def validate_args
     errs = {}
 
-    valid_style_args = ['full', 'comments_only']
+    valid_style_args = ["full", "comments_only"]
     if params[:style] && !valid_style_args.include?(params[:style])
-      errs['style'] = "invalid style requested. Must be one of the following: #{valid_style_args.join(', ')}"
+      errs["style"] = "invalid style requested. Must be one of the following: #{valid_style_args.join(", ")}"
     end
 
     if (api_includes - VALID_INCLUDE_PARAMS).present?
-      errs['include'] = "invalid include value requested. Must be one of the following: #{VALID_INCLUDE_PARAMS.join(', ')}"
+      errs["include"] = "invalid include value requested. Must be one of the following: #{VALID_INCLUDE_PARAMS.join(", ")}"
     else
-      validate_inclusion_category(VALID_ASSOCIATION_SCOPES, errs, 'association')
-      include_assessments = validate_inclusion_category(VALID_ASSESSMENT_SCOPES, errs, 'assessment').present?
+      validate_inclusion_category(VALID_ASSOCIATION_SCOPES, errs, "association")
+      include_assessments = validate_inclusion_category(VALID_ASSESSMENT_SCOPES, errs, "assessment").present?
       if params[:style] && !include_assessments
-        errs['style'] = "invalid parameters. Style parameter passed without requesting assessments"
+        errs["style"] = "invalid parameters. Style parameter passed without requesting assessments"
       end
     end
 
@@ -363,7 +363,7 @@ class RubricsApiController < ApplicationController
   def validate_inclusion_category(category_items, errs, name)
     inclusion_items = api_includes & category_items
     if inclusion_items.count > 1
-      errs['include'] = "cannot list multiple #{name} includes. Multiple given: #{inclusion_items.join(', ')}"
+      errs["include"] = "cannot list multiple #{name} includes. Multiple given: #{inclusion_items.join(", ")}"
     elsif inclusion_items.count == 1
       return inclusion_items[0]
     end

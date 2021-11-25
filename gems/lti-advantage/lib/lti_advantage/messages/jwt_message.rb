@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'json/jwt'
+require "json/jwt"
 
 module LtiAdvantage::Messages
   # Abstract base class for all LTI 1.3 JWT message types

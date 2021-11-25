@@ -115,7 +115,7 @@ module SisGradePassbackCommon
     GradeCalculator.recompute_final_score(%w[S1 S2 S3 S4].map { |x| getuser(x).id }, @course.id)
     @course.reload
 
-    @plugin = Canvas::Plugin.find!('grade_export')
+    @plugin = Canvas::Plugin.find!("grade_export")
     @ps = PluginSetting.new(name: @plugin.id, settings: @plugin.default_settings)
     @ps.posted_settings = @plugin.default_settings.merge({
                                                            format_type: "instructure_csv",
@@ -139,11 +139,11 @@ module SisGradePassbackCommon
 
     csv = "publisher_id,publisher_sis_id,section_id,section_sis_id,student_id," \
           "student_sis_id,enrollment_id,enrollment_status,score,grade\n" \
-          "#{@teacher.id},T1,#{getsection('S1').id},S1,#{getpseudonym('S1').user.id},S1,#{getenroll('S1', 'S1').id},active,70,C-\n" \
-          "#{@teacher.id},T1,#{getsection('S2').id},S2,#{getpseudonym('S2').user.id},S2,#{getenroll('S2', 'S2').id},active,75,C\n" \
-          "#{@teacher.id},T1,#{getsection('S2').id},S2,#{getpseudonym('S3').user.id},S3,#{getenroll('S3', 'S2').id},active,80,B-\n" \
-          "#{@teacher.id},T1,#{getsection('S1').id},S1,#{getpseudonym('S4').user.id},S4,#{getenroll('S4', 'S1').id},active,0,F\n" \
-          "#{@teacher.id},T1,#{getsection('S3').id},S3,#{@stud5.id},,#{Enrollment.where(user_id: @stud5.user.id, course_section_id: getsection('S3').first.id).id},active,85,B\n" \
+          "#{@teacher.id},T1,#{getsection("S1").id},S1,#{getpseudonym("S1").user.id},S1,#{getenroll("S1", "S1").id},active,70,C-\n" \
+          "#{@teacher.id},T1,#{getsection("S2").id},S2,#{getpseudonym("S2").user.id},S2,#{getenroll("S2", "S2").id},active,75,C\n" \
+          "#{@teacher.id},T1,#{getsection("S2").id},S2,#{getpseudonym("S3").user.id},S3,#{getenroll("S3", "S2").id},active,80,B-\n" \
+          "#{@teacher.id},T1,#{getsection("S1").id},S1,#{getpseudonym("S4").user.id},S4,#{getenroll("S4", "S1").id},active,0,F\n" \
+          "#{@teacher.id},T1,#{getsection("S3").id},S3,#{@stud5.id},,#{Enrollment.where(user_id: @stud5.user.id, course_section_id: getsection("S3").first.id).id},active,85,B\n" \
           "#{@teacher.id},T1,#{@sec4.id},,#{@stud6.id},,#{Enrollment.where(user_id: @stud6.user.id, course_section_id: @sec4.id).first.id},active,90,A-\n"
     expect(SSLCommon).to receive(:post_data).with("http://localhost/endpoint", csv, "text/csv", {})
     f("#publish_grades_link").click

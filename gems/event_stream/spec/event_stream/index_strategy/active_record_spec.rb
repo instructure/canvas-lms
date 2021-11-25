@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'spec_helper'
+require "spec_helper"
 
 describe EventStream::IndexStrategy::ActiveRecord do
   let(:fake_record_type) do
@@ -62,7 +62,7 @@ describe EventStream::IndexStrategy::ActiveRecord do
 
   describe "scope assembly" do
     before do
-      stream = double('stream',
+      stream = double("stream",
                       record_type: EventStream::Record,
                       active_record_type: fake_record_type)
       ar_cls = fake_record_type
@@ -75,12 +75,12 @@ describe EventStream::IndexStrategy::ActiveRecord do
     end
 
     it "loads records from DB" do
-      arg1 = double('arg1', id: "abc")
-      arg2 = double('arg2', id: "def")
+      arg1 = double("arg1", id: "abc")
+      arg2 = double("arg2", id: "def")
       outcome = @index.for_ar_scope([arg1, arg2], {})
       outcome.paginate(per_page: 10)
       conditions = fake_record_type.applied_conditions
-      expect(conditions).to include({ one: 'abc', two: 'def' })
+      expect(conditions).to include({ one: "abc", two: "def" })
       expect(conditions).to include("created_at DESC")
     end
 

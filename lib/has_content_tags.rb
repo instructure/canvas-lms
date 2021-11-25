@@ -36,7 +36,7 @@ module HasContentTags
     @associated_content_tags_need_updating = true if respond_to?(:name_changed?) && name_changed?
     @associated_content_tags_need_updating = true if respond_to?(:display_name_changed?) && display_name_changed?
     @associated_content_tags_need_updating = true if respond_to?(:points_possible_changed?) && points_possible_changed?
-    @associated_content_tags_need_updating = true if (respond_to?(:workflow_state_changed?) && workflow_state_changed?) || workflow_state == 'deleted'
+    @associated_content_tags_need_updating = true if (respond_to?(:workflow_state_changed?) && workflow_state_changed?) || workflow_state == "deleted"
     @associated_content_tags_need_updating = true if is_a?(Attachment) && locked_changed?
   end
 
@@ -46,7 +46,7 @@ module HasContentTags
   end
 
   def locked_request_cache_key(user)
-    keys = ['_locked_for4', self, user]
+    keys = ["_locked_for4", self, user]
     unlocked_at = respond_to?(:unlock_at) ? unlock_at : nil
     locked_at = respond_to?(:lock_at) ? lock_at : nil
     keys << (unlocked_at ? unlocked_at > Time.zone.now : false)

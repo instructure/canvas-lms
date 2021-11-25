@@ -24,8 +24,8 @@ describe Canvas::Security::LoginRegistry do
   describe ".audit_login" do
     before do
       skip("requires redis config to run") unless Canvas.redis_enabled?
-      Setting.set('login_attempts_total', '2')
-      Setting.set('login_attempts_per_ip', '1')
+      Setting.set("login_attempts_total", "2")
+      Setting.set("login_attempts_per_ip", "1")
       u = user_with_pseudonym active_user: true,
                               username: "nobody@example.com",
                               password: "asdfasdf"
@@ -73,10 +73,10 @@ describe Canvas::Security::LoginRegistry do
       end
 
       it "timeouts the login block after a waiting period" do
-        Setting.set('login_attempts_ttl', 5.seconds)
+        Setting.set("login_attempts_ttl", 5.seconds)
         registry.failed_login!(@p, "5.5.5.5")
-        expect(registry.time_until_login_allowed(@p, '5.5.5.6')).to eq 0
-        expect(registry.time_until_login_allowed(@p, '5.5.5.5')).to be <= 5
+        expect(registry.time_until_login_allowed(@p, "5.5.5.6")).to eq 0
+        expect(registry.time_until_login_allowed(@p, "5.5.5.5")).to be <= 5
       end
     end
   end

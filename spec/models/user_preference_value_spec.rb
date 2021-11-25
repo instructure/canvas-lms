@@ -112,7 +112,7 @@ describe UserPreferenceValue do
     expect(migrated_user.get_preference(subbed_key, :b)).to be_nil
     expect(migrated_user.preference_row_exists?(subbed_key, :a)).to eq true
     expect(migrated_user.preference_row_exists?(subbed_key, :b)).to eq false
-    expect(migrated_user.user_preference_values.where(key: subbed_key).pluck(:sub_key)).to eq(['a'])
+    expect(migrated_user.user_preference_values.where(key: subbed_key).pluck(:sub_key)).to eq(["a"])
     expect(migrated_user.preferences[subbed_key]).to eq(UserPreferenceValue::EXTERNAL)
   end
 
@@ -164,7 +164,7 @@ describe UserPreferenceValue do
       u.preferences[:closed_notifications] << 123
       expect(u.needs_preference_migration?).to be true
       expect { u.migrate_preferences_if_needed }.not_to raise_error
-      expect(u.user_preference_values.where(key: 'closed_notifications').take.value).to eq [123]
+      expect(u.user_preference_values.where(key: "closed_notifications").take.value).to eq [123]
     end
 
     it "works even if the objects are from a different shard than the user" do

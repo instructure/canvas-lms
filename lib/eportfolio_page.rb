@@ -23,7 +23,7 @@ module EportfolioPage
     @categories = @portfolio.eportfolio_categories
     if @portfolio.grants_right?(@current_user, session, :manage)
       if @current_user && @current_user == @portfolio.user
-        @recent_submissions = @current_user.submissions.in_workflow_state(['submitted', 'graded']).order("created_at DESC").to_a
+        @recent_submissions = @current_user.submissions.in_workflow_state(["submitted", "graded"]).order("created_at DESC").to_a
       end
       @files = @current_user.attachments.to_a
       @folders = @current_user.active_folders.preload(:active_sub_folders, :active_file_attachments).to_a
@@ -32,7 +32,7 @@ module EportfolioPage
     @files ||= []
     @folders ||= []
     @attachments = []
-    @page.content_sections.select { |s| s.is_a?(Hash) && s[:section_type] == 'attachment' }.each do |section|
+    @page.content_sections.select { |s| s.is_a?(Hash) && s[:section_type] == "attachment" }.each do |section|
       begin
         attachment = @portfolio.user.attachments.find(section["attachment_id"])
       rescue ActiveRecord::RecordNotFound
@@ -45,7 +45,7 @@ module EportfolioPage
     @show_left_side = true
     add_crumb(@portfolio.name, eportfolio_path(@portfolio))
     if @owner_view
-      add_crumb(t('#crumbs.eportfolio_welcome', "Welcome to Your ePortfolio"))
+      add_crumb(t("#crumbs.eportfolio_welcome", "Welcome to Your ePortfolio"))
     else
       add_crumb(@category.name, eportfolio_named_category_path(@portfolio.id, @category.slug)) if @category.slug.present?
       add_crumb(@page.name, eportfolio_named_category_entry_path(@portfolio.id, @category.slug, @page.slug)) if @category.slug.present? && @page.slug.present?

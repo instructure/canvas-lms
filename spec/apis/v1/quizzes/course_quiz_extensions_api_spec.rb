@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-require_relative '../../api_spec_helper'
+require_relative "../../api_spec_helper"
 
 describe Quizzes::CourseQuizExtensionsController, type: :request do
   before :once do
@@ -36,7 +36,7 @@ describe Quizzes::CourseQuizExtensionsController, type: :request do
                { controller: "quizzes/course_quiz_extensions", action: "create", format: "json",
                  course_id: @course.id.to_s },
                { quiz_extensions: quiz_extension_params },
-               { 'Accept' => 'application/vnd.api+json' }, opts)
+               { "Accept" => "application/vnd.api+json" }, opts)
     end
 
     context "as a student" do
@@ -48,7 +48,7 @@ describe Quizzes::CourseQuizExtensionsController, type: :request do
                      { controller: "quizzes/course_quiz_extensions", action: "create", format: "json",
                        course_id: @course.id.to_s },
                      { quiz_extensions: quiz_extension_params },
-                     { 'Accept' => 'application/vnd.api+json' })
+                     { "Accept" => "application/vnd.api+json" })
         assert_status(403)
       end
     end
@@ -68,7 +68,7 @@ describe Quizzes::CourseQuizExtensionsController, type: :request do
           { user_id: @student1.id, extra_attempts: 2, quiz_ids: @quizzes.map(&:id) }
         ]
         res = api_create_quiz_extension(quiz_extension_params)
-        expect(res['quiz_extensions'][0]['extra_attempts']).to eq 2
+        expect(res["quiz_extensions"][0]["extra_attempts"]).to eq 2
       end
 
       it "extends attempts for a new submission" do
@@ -76,7 +76,7 @@ describe Quizzes::CourseQuizExtensionsController, type: :request do
           { user_id: @student1.id, extra_attempts: 2, quiz_ids: @quizzes.map(&:id) }
         ]
         res = api_create_quiz_extension(quiz_extension_params)
-        expect(res['quiz_extensions'][0]['extra_attempts']).to eq 2
+        expect(res["quiz_extensions"][0]["extra_attempts"]).to eq 2
       end
 
       it "extends attempts for multiple students" do
@@ -85,8 +85,8 @@ describe Quizzes::CourseQuizExtensionsController, type: :request do
           { user_id: @student2.id, extra_attempts: 3, quiz_ids: @quizzes.map(&:id) }
         ]
         res = api_create_quiz_extension(quiz_extension_params)
-        expect(res['quiz_extensions'][0]['extra_attempts']).to eq 2
-        expect(res['quiz_extensions'][1]['extra_attempts']).to eq 3
+        expect(res["quiz_extensions"][0]["extra_attempts"]).to eq 2
+        expect(res["quiz_extensions"][1]["extra_attempts"]).to eq 3
       end
     end
   end

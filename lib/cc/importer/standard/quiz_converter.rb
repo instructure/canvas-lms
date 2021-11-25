@@ -38,7 +38,7 @@ module CC::Importer::Standard
           qti_node = res_node.elements.first
           path = "#{id}_qti.xml"
           full_path = get_full_path(path)
-          File.open(full_path, 'w') { |f| f << qti_node.to_xml } # write to file so we can convert with qti exporter
+          File.open(full_path, "w") { |f| f << qti_node.to_xml } # write to file so we can convert with qti exporter
         end
 
         next unless File.exist?(full_path)
@@ -67,7 +67,7 @@ module CC::Importer::Standard
       if $?.exitstatus == 0
         true
       else
-        add_warning(I18n.t('lib.cc.standard.failed_to_convert_qti', 'Failed to import Assessment %{file_identifier}', file_identifier: resource_id), "Output of QTI conversion tool: #{python_std_out.last(300)}")
+        add_warning(I18n.t("lib.cc.standard.failed_to_convert_qti", "Failed to import Assessment %{file_identifier}", file_identifier: resource_id), "Output of QTI conversion tool: #{python_std_out.last(300)}")
         false
       end
     end
@@ -91,7 +91,7 @@ module CC::Importer::Standard
           end
         end
       rescue
-        add_warning(I18n.t('lib.cc.standard.failed_to_convert_qti', 'Failed to import Assessment %{file_identifier}', file_identifier: resource_id), $!)
+        add_warning(I18n.t("lib.cc.standard.failed_to_convert_qti", "Failed to import Assessment %{file_identifier}", file_identifier: resource_id), $!)
       end
       questions
     end
@@ -106,7 +106,7 @@ module CC::Importer::Standard
           quiz[:migration_id] = resource_id
         end
       rescue
-        add_warning(I18n.t('lib.cc.standard.failed_to_convert_qti', 'Failed to import Assessment %{file_identifier}', file_identifier: resource_id), $!)
+        add_warning(I18n.t("lib.cc.standard.failed_to_convert_qti", "Failed to import Assessment %{file_identifier}", file_identifier: resource_id), $!)
       end
       quiz
     end

@@ -17,8 +17,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../common'
-require_relative '../helpers/blueprint_common'
+require_relative "../common"
+require_relative "../helpers/blueprint_common"
 
 describe "blueprint courses - file locking" do
   include_context "in-process server selenium tests"
@@ -28,15 +28,15 @@ describe "blueprint courses - file locking" do
     before :once do
       @copy_from = course_factory(active_all: true)
       @template = MasterCourses::MasterTemplate.set_as_master_course(@copy_from)
-      @filename = 'file.txt'
-      @original_file = Attachment.create!(filename: @filename, uploaded_data: StringIO.new('1'),
+      @filename = "file.txt"
+      @original_file = Attachment.create!(filename: @filename, uploaded_data: StringIO.new("1"),
                                           folder: Folder.root_folders(@copy_from).first, context: @copy_from)
       @tag = @template.create_content_tag_for!(@original_file)
 
       course_with_teacher(active_all: true)
       @copy_to = @course
       @template.add_child_course!(@copy_to)
-      @file_copy = Attachment.create!(filename: @filename, uploaded_data: StringIO.new('1'),
+      @file_copy = Attachment.create!(filename: @filename, uploaded_data: StringIO.new("1"),
                                       folder: Folder.root_folders(@copy_to).first, context: @copy_to,
                                       migration_id: @tag.migration_id)
     end
@@ -50,10 +50,10 @@ describe "blueprint courses - file locking" do
 
       get "/courses/#{@copy_to.id}/files"
 
-      expect(lock_icon_container).to contain_css('.icon-blueprint-lock')
+      expect(lock_icon_container).to contain_css(".icon-blueprint-lock")
 
       file_object.click # select the file
-      expect(files_page_header).not_to contain_css('.btn-delete')
+      expect(files_page_header).not_to contain_css(".btn-delete")
 
       options_button.click
       expect(options_panel).not_to include_text("Delete")
@@ -67,11 +67,11 @@ describe "blueprint courses - file locking" do
 
       get "/courses/#{@copy_to.id}/files"
 
-      expect(f('.ef-item-row .ef-name-col')).to include_text("subfolder") # we're looking at the folder right?
-      expect(lock_icon_container).to contain_css('.icon-blueprint-lock')
+      expect(f(".ef-item-row .ef-name-col")).to include_text("subfolder") # we're looking at the folder right?
+      expect(lock_icon_container).to contain_css(".icon-blueprint-lock")
 
       file_object.click # select the file
-      expect(files_page_header).not_to contain_css('.btn-delete')
+      expect(files_page_header).not_to contain_css(".btn-delete")
 
       options_button.click
       expect(options_panel).not_to include_text("Delete")
@@ -80,10 +80,10 @@ describe "blueprint courses - file locking" do
     it "shows the manageable cog-menu options when a file is unlocked" do
       get "/courses/#{@copy_to.id}/files"
 
-      expect(lock_icon_container).to contain_css('.icon-blueprint')
+      expect(lock_icon_container).to contain_css(".icon-blueprint")
 
       file_object.click # select the file
-      expect(files_page_header).to contain_css('.btn-delete')
+      expect(files_page_header).to contain_css(".btn-delete")
 
       options_button.click
       expect(options_panel).to include_text("Delete")
@@ -96,7 +96,7 @@ describe "blueprint courses - file locking" do
       get "/courses/#{@copy_to.id}/files"
 
       file_object.click # select the file
-      expect(files_page_header).to contain_css('.btn-delete')
+      expect(files_page_header).to contain_css(".btn-delete")
 
       options_button.click
       expect(options_panel).to include_text("Delete")
@@ -107,8 +107,8 @@ describe "blueprint courses - file locking" do
     before :once do
       @copy_from = course_factory(active_all: true)
       @template = MasterCourses::MasterTemplate.set_as_master_course(@copy_from)
-      @filename = 'file.txt'
-      @original_file = Attachment.create!(filename: @filename, uploaded_data: StringIO.new('1'),
+      @filename = "file.txt"
+      @original_file = Attachment.create!(filename: @filename, uploaded_data: StringIO.new("1"),
                                           folder: Folder.root_folders(@copy_from).first, context: @copy_from)
       @tag = @template.create_content_tag_for!(@original_file)
     end
@@ -122,10 +122,10 @@ describe "blueprint courses - file locking" do
 
       get "/courses/#{@copy_from.id}/files"
 
-      expect(lock_icon_container).to contain_css('.icon-blueprint-lock')
+      expect(lock_icon_container).to contain_css(".icon-blueprint-lock")
 
       file_object.click # select the file
-      expect(files_page_header).to contain_css('.btn-delete')
+      expect(files_page_header).to contain_css(".btn-delete")
 
       options_button.click
       options_text = options_panel
@@ -143,11 +143,11 @@ describe "blueprint courses - file locking" do
 
       get "/courses/#{@copy_from.id}/files"
 
-      expect(f('.ef-item-row .ef-name-col')).to include_text("subfolder") # we're looking at the folder right?
-      expect(f('.ef-directory .ef-item-row')).not_to contain_css('.icon-blueprint-lock') # master folders never have locks
+      expect(f(".ef-item-row .ef-name-col")).to include_text("subfolder") # we're looking at the folder right?
+      expect(f(".ef-directory .ef-item-row")).not_to contain_css(".icon-blueprint-lock") # master folders never have locks
 
       file_object.click # select the file
-      expect(files_page_header).to contain_css('.btn-delete')
+      expect(files_page_header).to contain_css(".btn-delete")
 
       options_button.click
       options_text = options_panel
@@ -160,10 +160,10 @@ describe "blueprint courses - file locking" do
     it "shows the manageable cog-menu options when a file is unlocked" do
       get "/courses/#{@copy_from.id}/files"
 
-      expect(lock_icon_container).to contain_css('.icon-blueprint')
+      expect(lock_icon_container).to contain_css(".icon-blueprint")
 
       file_object.click # select the file
-      expect(files_page_header).to contain_css('.btn-delete')
+      expect(files_page_header).to contain_css(".btn-delete")
 
       options_button.click
       options_text = options_panel

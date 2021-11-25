@@ -76,7 +76,7 @@ class Quizzes::QuizSubmissionQuestionsController < ApplicationController
   def index
     retrieve_quiz_submission_attempt!(params[:quiz_submission_attempt]) if params[:quiz_submission_attempt]
 
-    reject! 'Cannot receive one question at a time questions in the API', 401 if @quiz.one_question_at_a_time && censored?
+    reject! "Cannot receive one question at a time questions in the API", 401 if @quiz.one_question_at_a_time && censored?
 
     if @quiz_submission.completed? && !@quiz_submission.results_visible?(user: @current_user)
       reject! "Cannot view questions due to quiz settings", 401
@@ -134,7 +134,7 @@ class Quizzes::QuizSubmissionQuestionsController < ApplicationController
   # @returns [QuizSubmissionQuestion]
   def answer
     unless @quiz_submission.grants_right?(@service.participant.user, :update)
-      reject! 'you are not allowed to update questions for this quiz submission', 403
+      reject! "you are not allowed to update questions for this quiz submission", 403
     end
 
     answers = params.to_unsafe_h.fetch(:quiz_questions, []).each_with_object({}) do |p, hsh|
@@ -179,7 +179,7 @@ class Quizzes::QuizSubmissionQuestionsController < ApplicationController
     student_answer = params[:answer]
 
     if student_answer.blank?
-      reject! 'answer param is required', 422
+      reject! "answer param is required", 422
     end
 
     question = @question.question_data.question
@@ -188,7 +188,7 @@ class Quizzes::QuizSubmissionQuestionsController < ApplicationController
     if question_type == "numerical_question"
       ## matches behavior of public/javascript/take_quiz.js when entering a numerical answer
       question_has_precision_answers =
-        question[:answers].any? { |answer| answer[:numerical_answer_type] == 'precision_answer' }
+        question[:answers].any? { |answer| answer[:numerical_answer_type] == "precision_answer" }
       formatting_options = {
         precision: question_has_precision_answers ? 16 : 4,
         strip_insignificant_zeros: true,
@@ -225,7 +225,7 @@ class Quizzes::QuizSubmissionQuestionsController < ApplicationController
   #  }
   def flag
     unless @quiz_submission.grants_right?(@service.participant.user, :update)
-      reject! 'you are not allowed to update questions for this quiz submission', 403
+      reject! "you are not allowed to update questions for this quiz submission", 403
     end
     flag_current_question(true)
     render json: quiz_submission_questions_json([@question],
@@ -257,7 +257,7 @@ class Quizzes::QuizSubmissionQuestionsController < ApplicationController
   #  }
   def unflag
     unless @quiz_submission.grants_right?(@service.participant.user, :update)
-      reject! 'you are not allowed to update questions for this quiz submission', 403
+      reject! "you are not allowed to update questions for this quiz submission", 403
     end
     flag_current_question(false)
     render json: quiz_submission_questions_json([@question],
@@ -285,7 +285,7 @@ class Quizzes::QuizSubmissionQuestionsController < ApplicationController
   # [Transient:CNVS-10071]
   def validate_ldb_status!(quiz = @quiz)
     if quiz.require_lockdown_browser? && !ldb_plugin.authorized?(self)
-      reject! 'this quiz requires the lockdown browser', 403
+      reject! "this quiz requires the lockdown browser", 403
     end
   end
 

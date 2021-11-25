@@ -22,7 +22,7 @@ class AppointmentGroup < ActiveRecord::Base
   include Workflow
   include TextHelper
 
-  has_many :appointments, -> { order(:start_at).preload(:child_events).where("calendar_events.workflow_state <> 'deleted'") }, **(opts = { class_name: 'CalendarEvent', as: :context, inverse_of: :context })
+  has_many :appointments, -> { order(:start_at).preload(:child_events).where("calendar_events.workflow_state <> 'deleted'") }, **(opts = { class_name: "CalendarEvent", as: :context, inverse_of: :context })
   # has_many :through on the same table does not alias columns in condition
   # strings, just hashes. we create this helper association to ensure
   # appointments_participants conditions have the correct table alias
@@ -40,7 +40,7 @@ class AppointmentGroup < ActiveRecord::Base
   end
 
   def active_contexts
-    contexts.reject { |context| context.workflow_state == 'deleted' }
+    contexts.reject { |context| context.workflow_state == "deleted" }
   end
 
   def sub_contexts
@@ -57,7 +57,7 @@ class AppointmentGroup < ActiveRecord::Base
   validates :title, length: { maximum: maximum_string_length }
   validates :location_name, length: { maximum: maximum_string_length }
   validates :description, length: { maximum: maximum_long_text_length, allow_blank: true }
-  validates :participant_visibility, inclusion: { in: ['private', 'protected'] } # presumably we might add public if we decide to show appointments on the public calendar feed
+  validates :participant_visibility, inclusion: { in: ["private", "protected"] } # presumably we might add public if we decide to show appointments on the public calendar feed
   validates_each :appointments do |record, attr, value|
     next unless record.new_appointments.present? || record.validation_event_override
 
@@ -67,8 +67,8 @@ class AppointmentGroup < ActiveRecord::Base
     end
     prev = nil
     appointments.sort_by(&:start_at).each do |appointment|
-      record.errors.add(attr, t('errors.invalid_end_at', "Appointment end time precedes start time")) if appointment.end_at < appointment.start_at
-      record.errors.add(attr, t('errors.overlapping_appointments', "Appointments overlap")) if prev && appointment.start_at < prev.end_at
+      record.errors.add(attr, t("errors.invalid_end_at", "Appointment end time precedes start time")) if appointment.end_at < appointment.start_at
+      record.errors.add(attr, t("errors.overlapping_appointments", "Appointments overlap")) if prev && appointment.start_at < prev.end_at
       prev = appointment
     end
   end
@@ -76,7 +76,7 @@ class AppointmentGroup < ActiveRecord::Base
   def validate
     if appointment_group_contexts.empty?
       errors.add :appointment_group_contexts,
-                 t('errors.needs_contexts', 'Must have at least one context')
+                 t("errors.needs_contexts", "Must have at least one context")
     end
   end
 
@@ -166,7 +166,7 @@ class AppointmentGroup < ActiveRecord::Base
     # contexts
     @new_contexts -= contexts if @new_contexts
     if @new_contexts.present? && !((appointment_group_sub_contexts + new_sub_contexts).size == 1 &&
-             (appointment_group_sub_contexts + new_sub_contexts).first.sub_context_type == 'GroupCategory' &&
+             (appointment_group_sub_contexts + new_sub_contexts).first.sub_context_type == "GroupCategory" &&
              !new_record?)
       self.appointment_group_contexts += @new_contexts.map do |c|
         AppointmentGroupContext.new context: c, appointment_group: self
@@ -250,7 +250,7 @@ class AppointmentGroup < ActiveRecord::Base
       next false if deleted?
       next false unless active_contexts.any? { |c| c.grants_right? user, :manage_calendar }
 
-      if appointment_group_sub_contexts.present? && appointment_group_sub_contexts.first.sub_context_type == 'CourseSection'
+      if appointment_group_sub_contexts.present? && appointment_group_sub_contexts.first.sub_context_type == "CourseSection"
         sub_context_ids = appointment_group_sub_contexts.map(&:sub_context_id)
         user_visible_section_ids = contexts.map do |c|
           c.section_visibilities_for(user).pluck(:course_section_id)
@@ -263,16 +263,16 @@ class AppointmentGroup < ActiveRecord::Base
       can :create and can :update and can :delete
 
     given do |user|
-      participant_visibility == 'protected' && grants_right?(user, :reserve)
+      participant_visibility == "protected" && grants_right?(user, :reserve)
     end
     can :read_appointment_participants
   end
 
   def broadcast_data
     data = {}
-    ids = appointment_group_contexts.where(context_type: 'Course')
+    ids = appointment_group_contexts.where(context_type: "Course")
                                     .joins("INNER JOIN #{Course.quoted_table_name} ON courses.id = context_id").pluck(:context_id, :root_account_id)
-    ids += appointment_group_contexts.where(context_type: 'CourseSection')
+    ids += appointment_group_contexts.where(context_type: "CourseSection")
                                      .joins("INNER JOIN #{CourseSection.quoted_table_name} ON course_sections.id = context_id").pluck(:course_id, :root_account_id)
     data[:root_account_id] = ids.map(&:last).first
     data[:course_ids] = ids.map(&:first).sort
@@ -299,7 +299,7 @@ class AppointmentGroup < ActiveRecord::Base
   end
 
   def possible_users
-    if participant_type == 'User'
+    if participant_type == "User"
       possible_participants(include_observers: true).uniq
     else
       possible_participants.flatten.map(&:participants).flatten.uniq
@@ -307,7 +307,7 @@ class AppointmentGroup < ActiveRecord::Base
   end
 
   def instructors
-    if participant_type == 'User' && sub_contexts.present?
+    if participant_type == "User" && sub_contexts.present?
       contexts.map { |c| c.participating_instructors.restrict_to_sections(sub_contexts) }.flatten.uniq
     else
       contexts.map(&:participating_instructors).flatten.uniq
@@ -315,7 +315,7 @@ class AppointmentGroup < ActiveRecord::Base
   end
 
   def possible_participants(registration_status: nil, include_observers: false)
-    participants = if participant_type == 'User'
+    participants = if participant_type == "User"
                      participant_func = if include_observers
                                           ->(c) { c.participating_students_by_date + c.participating_observers_by_date }
                                         else
@@ -334,15 +334,15 @@ class AppointmentGroup < ActiveRecord::Base
     registered = participants.select { |p| participant_ids.include?(p.id) }
 
     participants = case registration_status
-                   when 'registered'
+                   when "registered"
                      registered
-                   when 'unregistered'
+                   when "unregistered"
                      participants - registered
                    else
                      participants
                    end
 
-    if participant_type == 'User'
+    if participant_type == "User"
       participants.sort_by { |p| [Canvas::ICU.collation_key(p.sortable_name), p.id] }
     else
       participants.sort_by { |p| [Canvas::ICU.collation_key(p.name), p.id] }
@@ -375,7 +375,7 @@ class AppointmentGroup < ActiveRecord::Base
   # instructors would call it with the user or group (depending on participant_type)
   def requiring_action?(user_or_participant)
     participant = user_or_participant
-    participant = participant_for(user_or_participant) if participant_type == 'Group' && participant.is_a?(User)
+    participant = participant_for(user_or_participant) if participant_type == "Group" && participant.is_a?(User)
     return false unless eligible_participant?(participant)
     return false unless min_appointments_per_participant
     return false if all_appointments_filled?
@@ -387,7 +387,7 @@ class AppointmentGroup < ActiveRecord::Base
     return false unless participants_per_appointment
 
     appointments_participants.count >= appointments.sum(
-      sanitize_sql(['COALESCE(participants_per_appointment, ?)', participants_per_appointment])
+      sanitize_sql(["COALESCE(participants_per_appointment, ?)", participants_per_appointment])
     )
   end
 
@@ -396,7 +396,7 @@ class AppointmentGroup < ActiveRecord::Base
     return @participant_for[user.global_id] if @participant_for.key?(user.global_id)
 
     @participant_for[user.global_id] = begin
-      participant = if participant_type == 'User'
+      participant = if participant_type == "User"
                       user
                     else
                       # can't have more than one group_category
@@ -447,8 +447,8 @@ class AppointmentGroup < ActiveRecord::Base
 
     if changed.present?
       CalendarEvent.joins(:parent_event).where(
-        workflow_state: ['active', 'locked'],
-        parent_events_calendar_events: { context_id: self, context_type: 'AppointmentGroup' }
+        workflow_state: ["active", "locked"],
+        parent_events_calendar_events: { context_id: self, context_type: "AppointmentGroup" }
       ).update_all(changed)
     end
 
@@ -459,13 +459,13 @@ class AppointmentGroup < ActiveRecord::Base
     types = appointment_group_sub_contexts.map(&:participant_type).uniq
     raise "inconsistent participant types in appointment group" if types.size > 1
 
-    types.first || 'User'
+    types.first || "User"
   end
 
   def available_slots(current_only: false)
     return nil unless participants_per_appointment
 
-    Rails.cache.fetch([self, 'available_slots'].cache_key) do
+    Rails.cache.fetch([self, "available_slots"].cache_key) do
       filtered_appointments = current_only ? appointments.current : appointments
       # participants_per_appointment can change after the fact, so a given
       # could exceed it and we can't just say:
@@ -477,11 +477,11 @@ class AppointmentGroup < ActiveRecord::Base
   end
 
   def clear_cached_available_slots!
-    Rails.cache.delete([self, 'available_slots'].cache_key)
+    Rails.cache.delete([self, "available_slots"].cache_key)
   end
 
   def default_values
-    self.participant_visibility ||= 'private'
+    self.participant_visibility ||= "private"
   end
 
   workflow do
@@ -495,7 +495,7 @@ class AppointmentGroup < ActiveRecord::Base
   alias_method :destroy_permanently!, :destroy
   def destroy(updating_user)
     transaction do
-      self.workflow_state = 'deleted'
+      self.workflow_state = "deleted"
       save!
       appointments.map do |a|
         a.updating_user = updating_user

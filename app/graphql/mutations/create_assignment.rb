@@ -34,7 +34,7 @@ class Mutations::CreateAssignment < Mutations::AssignmentBase
     raise GraphQL::ExecutionError, "invalid course: #{course_id}" unless @working_assignment&.grants_right? current_user, :create
 
     # initialize published argument
-    @working_assignment.workflow_state = 'unpublished'
+    @working_assignment.workflow_state = "unpublished"
     input_hash = input.to_h
     if input_hash.key? :state
       asked_state = input_hash.delete :state

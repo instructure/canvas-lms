@@ -60,15 +60,15 @@ class CalendarsController < ApplicationController
         asset_string: context.asset_string,
         id: context.id,
         url: named_context_url(context, :context_url),
-        create_calendar_event_url: context.respond_to?("calendar_events") ? named_context_url(context, :context_calendar_events_url) : '',
-        create_assignment_url: context.respond_to?("assignments") ? named_context_url(context, :api_v1_context_assignments_url) : '',
-        create_appointment_group_url: context.respond_to?("appointment_groups") ? api_v1_appointment_groups_url : '',
-        new_calendar_event_url: context.respond_to?("calendar_events") ? named_context_url(context, :new_context_calendar_event_url) : '',
-        new_assignment_url: context.respond_to?("assignments") ? named_context_url(context, :new_context_assignment_url) : '',
-        calendar_event_url: context.respond_to?("calendar_events") ? named_context_url(context, :context_calendar_event_url, '{{ id }}') : '',
-        assignment_url: context.respond_to?("assignments") ? named_context_url(context, :api_v1_context_assignment_url, '{{ id }}') : '',
-        assignment_override_url: context.respond_to?(:assignments) ? api_v1_assignment_override_url(course_id: context.id, assignment_id: '{{ assignment_id }}', id: '{{ id }}') : '',
-        appointment_group_url: context.respond_to?("appointment_groups") ? api_v1_appointment_groups_url(id: '{{ id }}') : '',
+        create_calendar_event_url: context.respond_to?("calendar_events") ? named_context_url(context, :context_calendar_events_url) : "",
+        create_assignment_url: context.respond_to?("assignments") ? named_context_url(context, :api_v1_context_assignments_url) : "",
+        create_appointment_group_url: context.respond_to?("appointment_groups") ? api_v1_appointment_groups_url : "",
+        new_calendar_event_url: context.respond_to?("calendar_events") ? named_context_url(context, :new_context_calendar_event_url) : "",
+        new_assignment_url: context.respond_to?("assignments") ? named_context_url(context, :new_context_assignment_url) : "",
+        calendar_event_url: context.respond_to?("calendar_events") ? named_context_url(context, :context_calendar_event_url, "{{ id }}") : "",
+        assignment_url: context.respond_to?("assignments") ? named_context_url(context, :api_v1_context_assignment_url, "{{ id }}") : "",
+        assignment_override_url: context.respond_to?(:assignments) ? api_v1_assignment_override_url(course_id: context.id, assignment_id: "{{ assignment_id }}", id: "{{ id }}") : "",
+        appointment_group_url: context.respond_to?("appointment_groups") ? api_v1_appointment_groups_url(id: "{{ id }}") : "",
         can_create_calendar_events: context.respond_to?("calendar_events") && CalendarEvent.new.tap { |e| e.context = context }.grants_right?(@current_user, session, :create),
         can_create_assignments: context.respond_to?("assignments") && Assignment.new.tap { |a| a.context = context }.grants_right?(@current_user, session, :create),
         assignment_groups: context.respond_to?("assignments") ? context.assignment_groups.active.pluck(:id, :name).map { |id, name| { id: id, name: name } } : [],
@@ -110,7 +110,7 @@ class CalendarsController < ApplicationController
       info
     end
     StringifyIds.recursively_stringify_ids(@contexts_json)
-    content_for_head helpers.auto_discovery_link_tag(:atom, @feed_url + '.atom', { title: t(:feed_title, "Course Calendar Atom Feed") })
+    content_for_head helpers.auto_discovery_link_tag(:atom, @feed_url + ".atom", { title: t(:feed_title, "Course Calendar Atom Feed") })
     js_env(@hash) if @hash
 
     calendar_contexts = (@contexts + [@domain_root_account]).uniq

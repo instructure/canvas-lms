@@ -426,14 +426,14 @@ class MasterCourses::MasterTemplatesController < ApplicationController
 
     scope =
       case content_type
-      when 'external_tool'
+      when "external_tool"
         @course.context_external_tools.active
-      when 'attachment'
+      when "attachment"
         @course.attachments.not_deleted
-      when 'lti-quiz'
+      when "lti-quiz"
         @course.assignments.active
       else
-        @course.send(content_type.pluralize).where.not(workflow_state: 'deleted')
+        @course.send(content_type.pluralize).where.not(workflow_state: "deleted")
       end
     item = scope.where(id: params[:content_id]).first
     unless item
@@ -466,25 +466,25 @@ class MasterCourses::MasterTemplatesController < ApplicationController
   # @returns [ChangeRecord]
   def unsynced_changes
     cutoff_time = @template.last_export_started_at
-    return render json: [{ asset_name: @template.course.name, change_type: 'initial_sync' }] unless cutoff_time
+    return render json: [{ asset_name: @template.course.name, change_type: "initial_sync" }] unless cutoff_time
 
-    max_records = Setting.get('master_courses_history_count', '150').to_i
+    max_records = Setting.get("master_courses_history_count", "150").to_i
     items = []
     GuardRail.activate(:secondary) do
       MasterCourses::CONTENT_TYPES_FOR_UNSYNCED_CHANGES.each do |klass|
         item_scope = case klass
-                     when 'Attachment'
+                     when "Attachment"
                        @course.attachments
-                     when 'Assignment'
+                     when "Assignment"
                        @course.assignments.include_submittables
-                     when 'DiscussionTopic'
+                     when "DiscussionTopic"
                        @course.discussion_topics.only_discussion_topics
                      else
-                       klass.constantize.where(context_id: @course, context_type: 'Course')
+                       klass.constantize.where(context_id: @course, context_type: "Course")
                      end
 
         remaining_count = max_records - items.size
-        items += item_scope.where('updated_at>?', cutoff_time).order(:id).limit(remaining_count).to_a
+        items += item_scope.where("updated_at>?", cutoff_time).order(:id).limit(remaining_count).to_a
         break if items.size >= max_records
       end
       @template.load_tags!(items) # only load the tags we need
@@ -595,8 +595,8 @@ class MasterCourses::MasterTemplatesController < ApplicationController
   def imports_index
     # maybe add child_subscription_id as a column if we expect people to use this endpoint
     migrations = @course.content_migrations
-                        .where(migration_type: 'master_course_import', child_subscription_id: @subscription)
-                        .order('id DESC')
+                        .where(migration_type: "master_course_import", child_subscription_id: @subscription)
+                        .order("id DESC")
     migrations = Api.paginate(migrations, self, api_v1_course_blueprint_imports_url)
     ActiveRecord::Associations::Preloader.new.preload(migrations, :user)
     render json: migrations.map { |migration|
@@ -619,7 +619,7 @@ class MasterCourses::MasterTemplatesController < ApplicationController
   # @returns BlueprintMigration
   def imports_show
     migration = @course.content_migrations
-                       .where(migration_type: 'master_course_import', child_subscription_id: @subscription)
+                       .where(migration_type: "master_course_import", child_subscription_id: @subscription)
                        .find(params[:id])
     render json: master_migration_json(migration.master_migration, @current_user, session,
                                        child_migration: migration, subscription: @subscription)
@@ -637,7 +637,7 @@ class MasterCourses::MasterTemplatesController < ApplicationController
   #
   # @returns [ChangeRecord]
   def import_details
-    migration = @course.content_migrations.where(migration_type: 'master_course_import', id: params[:id]).first!
+    migration = @course.content_migrations.where(migration_type: "master_course_import", id: params[:id]).first!
     @mm = migration.master_migration
     return render json: [] unless @mm.export_results.key?(:selective) && @mm.export_results[:selective][:subscriptions].include?(@subscription.id)
 
@@ -663,7 +663,7 @@ class MasterCourses::MasterTemplatesController < ApplicationController
   def get_template
     mc_scope = @course.master_course_templates.active
     template_id = params[:template_id]
-    if template_id == 'default'
+    if template_id == "default"
       @template = mc_scope.for_full_course.first
       raise ActiveRecord::RecordNotFound unless @template
     else
@@ -674,7 +674,7 @@ class MasterCourses::MasterTemplatesController < ApplicationController
   def get_subscription
     subscription_scope = @course.master_course_subscriptions
     subscription_id = params[:subscription_id]
-    @subscription = if subscription_id == 'default'
+    @subscription = if subscription_id == "default"
                       subscription_scope.active.first!
                     else
                       subscription_scope.find(subscription_id)
@@ -705,22 +705,22 @@ class MasterCourses::MasterTemplatesController < ApplicationController
 
   def get_syllabus_exception!(skipped_items, child_subscription, exceptions)
     if skipped_items.delete(:syllabus)
-      exceptions['syllabus'] ||= []
-      exceptions['syllabus'] << { course_id: child_subscription.child_course_id, conflicting_changes: ['content'] }
+      exceptions["syllabus"] ||= []
+      exceptions["syllabus"] << { course_id: child_subscription.child_course_id, conflicting_changes: ["content"] }
     end
   end
 
   def render_changes(tag_association, subscriptions)
     changes = []
     exceptions = get_exceptions_by_subscription(subscriptions)
-    updated_syllabus = @mm.export_results[:selective][:updated].delete('syllabus')
+    updated_syllabus = @mm.export_results[:selective][:updated].delete("syllabus")
 
     %i[created updated deleted].each do |action|
       migration_ids = @mm.export_results[:selective][action].values.flatten
       tags = tag_association.where(migration_id: migration_ids).preload(:content).to_a
       restricted_ids = find_restricted_ids(tags)
       tags.each do |tag|
-        next if tag.content_type == 'AssignmentGroup' # these are noise, since they're touched with each assignment
+        next if tag.content_type == "AssignmentGroup" # these are noise, since they're touched with each assignment
 
         changes << changed_asset_json(tag.content, action, restricted_ids.include?(tag.migration_id),
                                       tag.migration_id, exceptions)
@@ -746,7 +746,7 @@ class MasterCourses::MasterTemplatesController < ApplicationController
   def change_classes(klass, columns)
     # if we skipped it because it's deleted, there's no sense
     # in going on and seeing if they also edited it first
-    return ['deleted'] if columns.include?("manually_deleted")
+    return ["deleted"] if columns.include?("manually_deleted")
 
     classes = []
     columns.each do |col|

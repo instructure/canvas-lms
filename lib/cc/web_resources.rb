@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-require 'set'
+require "set"
 
 module CC
   module WebResources
@@ -72,11 +72,11 @@ module CC
                 if file.usage_rights
                   lom_node.lom :rights do |rights_node|
                     rights_node.lom :copyrightAndOtherRestrictions do |node|
-                      node.lom :value, (file.usage_rights.license == 'public_domain') ? "no" : "yes"
+                      node.lom :value, (file.usage_rights.license == "public_domain") ? "no" : "yes"
                     end
                     description = []
                     description << file.usage_rights.legal_copyright if file.usage_rights.legal_copyright.present?
-                    description << file.usage_rights.license_name unless file.usage_rights.license == 'private'
+                    description << file.usage_rights.license_name unless file.usage_rights.license == "private"
                     rights_node.lom :description do |desc|
                       desc.lom :string, description.join('\n')
                     end
@@ -88,8 +88,8 @@ module CC
           res.file(href: path)
         end
       rescue
-        title = file.unencoded_filename rescue I18n.t('course_exports.unknown_titles.file', "Unknown file")
-        add_error(I18n.t('course_exports.errors.file', "The file \"%{file_name}\" failed to export", file_name: title), $!)
+        title = file.unencoded_filename rescue I18n.t("course_exports.unknown_titles.file", "Unknown file")
+        add_error(I18n.t("course_exports.errors.file", "The file \"%{file_name}\" failed to export", file_name: title), $!)
       end
 
       add_meta_info_for_files(files_with_metadata)
@@ -100,7 +100,7 @@ module CC
     end
 
     def add_meta_info_for_files(files)
-      files_file = File.new(File.join(@canvas_resource_dir, CCHelper::FILES_META), 'w')
+      files_file = File.new(File.join(@canvas_resource_dir, CCHelper::FILES_META), "w")
       rel_path = files_meta_path
       document = Builder::XmlMarkup.new(target: files_file, indent: 2)
 
@@ -172,7 +172,7 @@ module CC
     end
 
     def add_tracks(track_map)
-      tracks_file = File.new(File.join(@canvas_resource_dir, CCHelper::MEDIA_TRACKS), 'w')
+      tracks_file = File.new(File.join(@canvas_resource_dir, CCHelper::MEDIA_TRACKS), "w")
       document = Builder::XmlMarkup.new(target: tracks_file, indent: 2)
       document.instruct!
       document.media_tracks(
@@ -212,7 +212,7 @@ module CC
         total_size += info[:asset][:size].to_i.kilobytes
       end
       if total_size > MAX_MEDIA_OBJECT_SIZE
-        add_error(I18n.t('course_exports.errors.media_files_too_large',
+        add_error(I18n.t("course_exports.errors.media_files_too_large",
                          "Media files were not exported because the total file size was too large."))
         return
       end
@@ -232,7 +232,7 @@ module CC
         if !@added_attachments || @added_attachments[obj.attachment_id] != path
           unless CanvasKaltura::ClientV3::ASSET_STATUSES[info[:asset][:status]] == :READY &&
                  (url = (client.flavorAssetGetPlaylistUrl(obj.media_id, info[:asset][:id]) || client.flavorAssetGetDownloadUrl(info[:asset][:id])))
-            add_error(I18n.t('course_exports.errors.media_file', "A media file failed to export"))
+            add_error(I18n.t("course_exports.errors.media_file", "A media file failed to export"))
             next
           end
 
@@ -255,7 +255,7 @@ module CC
 
         process_media_tracks(tracks, migration_id, obj, path)
       rescue
-        add_error(I18n.t('course_exports.errors.media_file', "A media file failed to export"), $!)
+        add_error(I18n.t("course_exports.errors.media_file", "A media file failed to export"), $!)
       end
 
       add_tracks(tracks) if @canvas_resource_dir

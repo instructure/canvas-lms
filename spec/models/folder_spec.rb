@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'delayed/testing'
+require "delayed/testing"
 
 describe Folder do
   before(:once) do
@@ -103,7 +103,7 @@ describe Folder do
     f3 = f2.sub_folders.create!(name: "f3", context: @course)
     f1.parent_folder = f3
     expect(f1.save).to eq false
-    expect(f1.errors.detect { |e| e.first.to_s == 'parent_folder_id' }).to be_present
+    expect(f1.errors.detect { |e| e.first.to_s == "parent_folder_id" }).to be_present
   end
 
   it "does not allow root folders to have their names changed" do
@@ -111,7 +111,7 @@ describe Folder do
     f1.reload
     f1.update(name: "something")
     expect(f1.save).to eq false
-    expect(f1.errors.detect { |e| e.first.to_s == 'name' }).to be_present
+    expect(f1.errors.detect { |e| e.first.to_s == "name" }).to be_present
   end
 
   describe "set folder root account id" do
@@ -200,10 +200,10 @@ describe Folder do
   end
 
   it "does not create multiple root folders for a course" do
-    skip('spec requires postgres index') unless Folder.connection.adapter_name == 'PostgreSQL'
+    skip("spec requires postgres index") unless Folder.connection.adapter_name == "PostgreSQL"
 
-    @course.folders.create!(name: Folder::ROOT_FOLDER_NAME, full_name: Folder::ROOT_FOLDER_NAME, workflow_state: 'visible')
-    expect { @course.folders.create!(name: Folder::ROOT_FOLDER_NAME, full_name: Folder::ROOT_FOLDER_NAME, workflow_state: 'visible') }.to raise_error(ActiveRecord::RecordNotUnique)
+    @course.folders.create!(name: Folder::ROOT_FOLDER_NAME, full_name: Folder::ROOT_FOLDER_NAME, workflow_state: "visible")
+    expect { @course.folders.create!(name: Folder::ROOT_FOLDER_NAME, full_name: Folder::ROOT_FOLDER_NAME, workflow_state: "visible") }.to raise_error(ActiveRecord::RecordNotUnique)
 
     @course.reload
     expect(@course.folders.count).to eq 1
@@ -214,12 +214,12 @@ describe Folder do
 
     it "does not get confused by the same context on multiple shards" do
       user1 = User.create!
-      f1 = Folder.assert_path('myfolder', user1)
+      f1 = Folder.assert_path("myfolder", user1)
       @shard1.activate do
         user2 = User.new
         user2.id = user1.local_id
         user2.save!
-        f2 = Folder.assert_path('myfolder', user2)
+        f2 = Folder.assert_path("myfolder", user2)
         expect(f2).not_to eq f1
       end
     end
@@ -231,22 +231,22 @@ describe Folder do
     end
 
     it "returns a sequence of Folders" do
-      foo = @course.folders.create! name: 'foo', parent_folder: @root_folder
-      bar = @course.folders.create! name: 'bar', parent_folder: foo
+      foo = @course.folders.create! name: "foo", parent_folder: @root_folder
+      bar = @course.folders.create! name: "bar", parent_folder: foo
       expect(Folder.resolve_path(@course, "foo/bar")).to eql [@root_folder, foo, bar]
     end
 
     it "ignores trailing slashes" do
-      foo = @course.folders.create! name: 'foo', parent_folder: @root_folder
+      foo = @course.folders.create! name: "foo", parent_folder: @root_folder
       expect(Folder.resolve_path(@course, "foo/")).to eql [@root_folder, foo]
     end
 
     it "finds the root folder given an empty path" do
-      expect(Folder.resolve_path(@course, '')).to eql [@root_folder]
+      expect(Folder.resolve_path(@course, "")).to eql [@root_folder]
     end
 
     it "finds the root folder given '/'" do
-      expect(Folder.resolve_path(@course, '/')).to eql [@root_folder]
+      expect(Folder.resolve_path(@course, "/")).to eql [@root_folder]
     end
 
     it "finds the root folder given a nil path" do
@@ -258,40 +258,40 @@ describe Folder do
     end
 
     it "returns nil on incomplete match" do
-      @course.folders.create! name: 'foo', parent_folder: @root_folder
+      @course.folders.create! name: "foo", parent_folder: @root_folder
       expect(Folder.resolve_path(@course, "foo/bar")).to be_nil
     end
 
     it "excludes hidden if specified" do
-      foo = @course.folders.create! name: 'foo', parent_folder: @root_folder
-      foo.update_attribute(:workflow_state, 'hidden')
-      bar = @course.folders.create! name: 'bar', parent_folder: foo
+      foo = @course.folders.create! name: "foo", parent_folder: @root_folder
+      foo.update_attribute(:workflow_state, "hidden")
+      bar = @course.folders.create! name: "bar", parent_folder: foo
       expect(Folder.resolve_path(@course, "foo/bar", true)).to eql [@root_folder, foo, bar]
       expect(Folder.resolve_path(@course, "foo/bar", false)).to be_nil
     end
 
     it "excludes locked if specified" do
-      foo = @course.folders.create! name: 'foo', parent_folder: @root_folder, locked: true
-      bar = @course.folders.create! name: 'bar', parent_folder: foo
+      foo = @course.folders.create! name: "foo", parent_folder: @root_folder, locked: true
+      bar = @course.folders.create! name: "bar", parent_folder: foo
       expect(Folder.resolve_path(@course, "foo/bar", true)).to eql [@root_folder, foo, bar]
       expect(Folder.resolve_path(@course, "foo/bar", false)).to be_nil
     end
 
     it "accepts an array" do
-      foo = @course.folders.create! name: 'foo', parent_folder: @root_folder
-      bar = @course.folders.create! name: 'bar', parent_folder: foo
-      expect(Folder.resolve_path(@course, ['foo', 'bar'])).to eql [@root_folder, foo, bar]
+      foo = @course.folders.create! name: "foo", parent_folder: @root_folder
+      bar = @course.folders.create! name: "bar", parent_folder: foo
+      expect(Folder.resolve_path(@course, ["foo", "bar"])).to eql [@root_folder, foo, bar]
     end
   end
 
   describe "file_attachments_visible_to" do
     before(:once) do
       @root_folder = Folder.root_folders(@course).first
-      attachment_model context: @course, display_name: 'normal.txt', folder: @root_folder, uploaded_data: default_uploaded_data
-      attachment_model context: @course, display_name: 'hidden.txt', folder: @root_folder, uploaded_data: default_uploaded_data, hidden: true
-      attachment_model context: @course, display_name: 'locked.txt', folder: @root_folder, uploaded_data: default_uploaded_data, locked: true
-      attachment_model context: @course, display_name: 'date_restricted_unlocked.txt', folder: @root_folder, uploaded_data: default_uploaded_data, unlock_at: 1.day.ago, lock_at: 1.year.from_now
-      attachment_model context: @course, display_name: 'date_restricted_locked.txt', folder: @root_folder, uploaded_data: default_uploaded_data, lock_at: 1.day.ago, unlock_at: 1.year.from_now
+      attachment_model context: @course, display_name: "normal.txt", folder: @root_folder, uploaded_data: default_uploaded_data
+      attachment_model context: @course, display_name: "hidden.txt", folder: @root_folder, uploaded_data: default_uploaded_data, hidden: true
+      attachment_model context: @course, display_name: "locked.txt", folder: @root_folder, uploaded_data: default_uploaded_data, locked: true
+      attachment_model context: @course, display_name: "date_restricted_unlocked.txt", folder: @root_folder, uploaded_data: default_uploaded_data, unlock_at: 1.day.ago, lock_at: 1.year.from_now
+      attachment_model context: @course, display_name: "date_restricted_locked.txt", folder: @root_folder, uploaded_data: default_uploaded_data, lock_at: 1.day.ago, unlock_at: 1.year.from_now
     end
 
     it "includes all files for teachers" do
@@ -367,12 +367,12 @@ describe Folder do
       account_model
       folder_model(context: @account)
       expect(Folder.root_folders(@course).first).not_to eq(@folder),
-                                                        'precondition'
+                                                        "precondition"
       expect(Folder.from_context_or_id(nil, @folder.id)).to eq(@folder)
     end
 
     it "raises ActiveRecord::RecordNotFound when no record is found" do
-      expect(Folder.where(id: 1)).to be_empty, 'precondition'
+      expect(Folder.where(id: 1)).to be_empty, "precondition"
       expect do
         Folder.from_context_or_id(nil, 1)
       end.to raise_error(ActiveRecord::RecordNotFound)
@@ -384,8 +384,8 @@ describe Folder do
       student_in_course
       group_model(context: @course)
 
-      sf = Folder.new(name: 'test')
-      sf.submission_context_code = 'root'
+      sf = Folder.new(name: "test")
+      sf.submission_context_code = "root"
 
       sf.context = @user
       expect(sf).to be_valid
@@ -400,35 +400,35 @@ describe Folder do
     it "ensures only one root submissions folder per user exists" do
       user_factory
       @user.submissions_folder
-      dup = @user.folders.build(name: 'dup', parent_folder: Folder.root_folders(@user).first)
-      dup.submission_context_code = 'root'
+      dup = @user.folders.build(name: "dup", parent_folder: Folder.root_folders(@user).first)
+      dup.submission_context_code = "root"
       expect { dup.save! }.to raise_exception(ActiveRecord::RecordNotUnique)
     end
 
     it "ensures only one course submissions subfolder exists" do
       student_in_course
       @user.submissions_folder(@course)
-      dup = @user.folders.build(name: 'dup', parent_folder: @user.submissions_folder)
+      dup = @user.folders.build(name: "dup", parent_folder: @user.submissions_folder)
       dup.submission_context_code = @course.asset_string
       expect { dup.save! }.to raise_exception(ActiveRecord::RecordNotUnique)
     end
   end
 
-  describe 'permissions' do
+  describe "permissions" do
     before(:once) do
       @course.offer!
       student_in_course(active_all: true)
     end
 
-    let_once(:folder) { @course.folders.create!(name: 'f') }
-    let_once(:file) { attachment_model context: @course, display_name: 'normal.txt', folder: folder }
+    let_once(:folder) { @course.folders.create!(name: "f") }
+    let_once(:file) { attachment_model context: @course, display_name: "normal.txt", folder: folder }
 
-    context 'clears own permissions' do
+    context "clears own permissions" do
       def student_can_read_contents?
         Folder.find(folder.id).grants_right? @student, :read_contents
       end
 
-      it 'when unlock_at set' do
+      it "when unlock_at set" do
         Timecop.freeze do
           folder.update! unlock_at: 5.minutes.from_now
           expect(student_can_read_contents?).to be false
@@ -438,7 +438,7 @@ describe Folder do
         end
       end
 
-      it 'when lock_at set' do
+      it "when lock_at set" do
         Timecop.freeze do
           folder.update! lock_at: 5.minutes.from_now
           expect(student_can_read_contents?).to be true
@@ -448,7 +448,7 @@ describe Folder do
         end
       end
 
-      it 'when lock_at and unlock_at set' do
+      it "when lock_at and unlock_at set" do
         Timecop.freeze do
           folder.update! unlock_at: 5.minutes.from_now, lock_at: 15.minutes.from_now
           expect(student_can_read_contents?).to be false
@@ -462,33 +462,33 @@ describe Folder do
       end
     end
 
-    context 'clears file permissions' do
+    context "clears file permissions" do
       def student_can_download?
         file.reload.grants_right? @student, :download
       end
 
-      it 'when locked' do
+      it "when locked" do
         expect(student_can_download?).to be true
         folder.update! locked: true
         expect(student_can_download?).to be false
       end
 
-      it 'when unlocked' do
+      it "when unlocked" do
         folder.update! locked: true
         expect(student_can_download?).to be false
         folder.update! locked: false
         expect(student_can_download?).to be true
       end
 
-      it 'when moved' do
+      it "when moved" do
         expect(student_can_download?).to be true
-        parent_folder = @course.folders.create!(name: 'parent', locked: true)
+        parent_folder = @course.folders.create!(name: "parent", locked: true)
         folder.update! parent_folder: parent_folder
         expect(student_can_download?).to be false
       end
 
-      it 'in subfolders' do
-        parent_folder = @course.folders.create!(name: 'parent')
+      it "in subfolders" do
+        parent_folder = @course.folders.create!(name: "parent")
         parent_folder.sub_folders << folder
         expect(student_can_download?).to be true
         parent_folder.reload.update! locked: true

@@ -54,7 +54,7 @@ module LiveEvents
         data: event_json,
         partition_key: partition_key,
         statsd_prefix: "live_events.events",
-        tags: { event: event.dig(:attributes, :event_name) || 'event_name_not_found' },
+        tags: { event: event.dig(:attributes, :event_name) || "event_name_not_found" },
         total_bytes: total_bytes
       }
       true

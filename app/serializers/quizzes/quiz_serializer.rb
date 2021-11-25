@@ -110,7 +110,7 @@ module Quizzes
     # end
 
     def preview_url
-      course_quiz_take_url(context, quiz, preview: '1')
+      course_quiz_take_url(context, quiz, preview: "1")
     end
 
     # def unsubmitted_students
@@ -144,7 +144,7 @@ module Quizzes
     end
 
     def description
-      return '' if hide_locked_description?
+      return "" if hide_locked_description?
 
       if @serializer_options[:description_formatter]
         @serializer_options[:description_formatter].call(quiz.description)
@@ -154,7 +154,7 @@ module Quizzes
     end
 
     def unsubmitted_students_url
-      api_v1_course_quiz_submission_users_url(context, quiz, submitted: 'false')
+      api_v1_course_quiz_submission_users_url(context, quiz, submitted: "false")
     end
 
     def submitted_students_url
@@ -186,7 +186,7 @@ module Quizzes
     end
 
     def locked_for_json_type
-      'quiz'
+      "quiz"
     end
 
     # Teacher or Observer?
@@ -277,11 +277,11 @@ module Quizzes
         # since we're not embedding QuizStatistics as an association because
         # the statistics objects are built on-demand when the endpoint is
         # requested, and we only need the link, we'll have to assign it manually
-        hash['links'] ||= {}
-        hash['links']['quiz_statistics'] = hash.delete(:quiz_statistics_url)
-        hash['links']['quiz_reports'] = hash.delete(:quiz_reports_url)
+        hash["links"] ||= {}
+        hash["links"]["quiz_statistics"] = hash.delete(:quiz_statistics_url)
+        hash["links"]["quiz_reports"] = hash.delete(:quiz_reports_url)
       else
-        hash.delete('links')
+        hash.delete("links")
         # id = hash['assignment_group']
         # hash['assignment_group_id'] = quiz.assignment_group.try(:id)
       end

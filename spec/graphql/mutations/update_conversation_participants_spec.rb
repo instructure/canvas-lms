@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../graphql_spec_helper'
+require_relative "../graphql_spec_helper"
 
 describe Mutations::UpdateConversationParticipants do
   let(:sender) { user_model }
@@ -59,13 +59,13 @@ describe Mutations::UpdateConversationParticipants do
     expect(participant.starred).to be_falsey
 
     result = execute_with_input(query)
-    expect(result['errors']).to be_nil
-    expect(result.dig('data', 'updateConversationParticipants', 'errors')).to be_nil
-    updated_attributes = result.dig('data', 'updateConversationParticipants', 'conversationParticipants')
+    expect(result["errors"]).to be_nil
+    expect(result.dig("data", "updateConversationParticipants", "errors")).to be_nil
+    updated_attributes = result.dig("data", "updateConversationParticipants", "conversationParticipants")
     expect(updated_attributes).to include({
                                             "subscribed" => false,
-                                            "workflowState" => 'archived',
-                                            "label" => 'starred'
+                                            "workflowState" => "archived",
+                                            "label" => "starred"
                                           })
 
     participant = participant.reload
@@ -76,9 +76,9 @@ describe Mutations::UpdateConversationParticipants do
 
   describe "error handling" do
     def expect_error(result, message)
-      errors = result['errors'] || result.dig('data', 'updateConversationParticipants', 'errors')
+      errors = result["errors"] || result.dig("data", "updateConversationParticipants", "errors")
       expect(errors).not_to be_nil
-      expect(errors[0]['message']).to match(/#{message}/)
+      expect(errors[0]["message"]).to match(/#{message}/)
     end
 
     it "fails if the conversation doesn't exist" do
@@ -86,7 +86,7 @@ describe Mutations::UpdateConversationParticipants do
         conversationIds: [#{Conversation.maximum(:id)&.next || 0}]
       GQL
       result = execute_with_input(query)
-      expect_error(result, 'Unable to find Conversation')
+      expect_error(result, "Unable to find Conversation")
     end
 
     it "fails if the requesting user is not a participant" do
@@ -94,7 +94,7 @@ describe Mutations::UpdateConversationParticipants do
         conversationIds: [#{conv.id}]
       GQL
       result = execute_with_input(query, user_executing: user_model)
-      expect_error(result, 'Insufficient permissions')
+      expect_error(result, "Insufficient permissions")
     end
   end
 
@@ -113,9 +113,9 @@ describe Mutations::UpdateConversationParticipants do
         expect(participant2.starred).to be_falsey
 
         result = execute_with_input(query)
-        expect(result['errors']).to be_nil
-        expect(result.dig('data', 'updateConversationParticipants', 'errors')).to be_nil
-        updated_attrs = result.dig('data', 'updateConversationParticipants', 'conversationParticipants')
+        expect(result["errors"]).to be_nil
+        expect(result.dig("data", "updateConversationParticipants", "errors")).to be_nil
+        updated_attrs = result.dig("data", "updateConversationParticipants", "conversationParticipants")
         expect(updated_attrs.map { |i| i["label"] }).to match_array %w[starred starred]
 
         participant1 = participant1.reload
@@ -130,10 +130,10 @@ describe Mutations::UpdateConversationParticipants do
       let(:invalid_id) { Conversation.maximum(:id)&.next || 0 }
 
       def expect_error(result, id, message)
-        errors = result['errors'] || result.dig('data', 'updateConversationParticipants', 'errors')
+        errors = result["errors"] || result.dig("data", "updateConversationParticipants", "errors")
         expect(errors).not_to be_nil
         error = errors.find { |i| i["attribute"] == id.to_s }
-        expect(error['message']).to match(/#{message}/)
+        expect(error["message"]).to match(/#{message}/)
       end
 
       it "handles valid data and errors on invalid" do
@@ -145,13 +145,13 @@ describe Mutations::UpdateConversationParticipants do
         expect(participant.starred).to be_falsey
 
         result = execute_with_input(query)
-        expect_error(result, another_conv.id, 'Insufficient permissions')
-        expect_error(result, invalid_id, 'Unable to find Conversation')
-        updated_attributes = result.dig('data', 'updateConversationParticipants', 'conversationParticipants')
+        expect_error(result, another_conv.id, "Insufficient permissions")
+        expect_error(result, invalid_id, "Unable to find Conversation")
+        updated_attributes = result.dig("data", "updateConversationParticipants", "conversationParticipants")
         expect(updated_attributes).to include({
                                                 "subscribed" => true,
-                                                "workflowState" => 'read',
-                                                "label" => 'starred'
+                                                "workflowState" => "read",
+                                                "label" => "starred"
                                               })
 
         participant = participant.reload

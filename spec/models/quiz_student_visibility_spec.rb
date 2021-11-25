@@ -28,7 +28,7 @@ describe "differentiated_assignments" do
   def make_quiz(opts = {})
     @quiz = Quizzes::Quiz.create!({
                                     context: @course,
-                                    description: 'descript foo',
+                                    description: "descript foo",
                                     only_visible_to_overrides: opts[:ovto],
                                     points_possible: rand(1000),
                                     title: "I am a quiz"
@@ -75,8 +75,8 @@ describe "differentiated_assignments" do
 
   def add_multiple_sections
     @default_section = @course.default_section
-    @section_foo = @course.course_sections.create!(name: 'foo')
-    @section_bar = @course.course_sections.create!(name: 'bar')
+    @section_foo = @course.course_sections.create!(name: "foo")
+    @section_bar = @course.course_sections.create!(name: "bar")
   end
 
   def create_override_for_quiz(quiz)

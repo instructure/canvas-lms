@@ -94,7 +94,7 @@ module CC::Importer::Canvas
       Dir["#{folder}/**/**"].each do |path|
         next if File.directory?(path)
 
-        service_key = File.basename(path, '.json')
+        service_key = File.basename(path, ".json")
         json = File.read(path)
         begin
           data = JSON.parse(json)

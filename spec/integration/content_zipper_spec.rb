@@ -26,7 +26,7 @@ describe ContentZipper do
   def grab_zip(&block)
     expect(&block).to change(Delayed::Job, :count).by(1)
     expect(response).to be_successful
-    attachment_id = json_parse['attachment']['id']
+    attachment_id = json_parse["attachment"]["id"]
     expect(attachment_id).to be_present
 
     a = Attachment.find attachment_id
@@ -35,7 +35,7 @@ describe ContentZipper do
     # a second query should just return status
     expect(&block).to change(Delayed::Job, :count).by(0)
     expect(response).to be_successful
-    expect(json_parse['attachment']['id']).to eq a.id
+    expect(json_parse["attachment"]["id"]).to eq a.id
   end
 
   context "submission zips" do
@@ -56,11 +56,11 @@ describe ContentZipper do
 
     it "recreates the submission zip if the anonymous grading setting changes" do
       get "/courses/#{@course.id}/assignments/#{@assignment.id}/submissions.json?zip=1&compile=1"
-      att0 = json_parse['attachment']['id']
+      att0 = json_parse["attachment"]["id"]
 
       @assignment.update!(anonymous_grading: true)
       get "/courses/#{@course.id}/assignments/#{@assignment.id}/submissions.json?zip=1&compile=1"
-      att1 = json_parse['attachment']['id']
+      att1 = json_parse["attachment"]["id"]
 
       expect(att0).not_to eq(att1)
     end
@@ -69,11 +69,11 @@ describe ContentZipper do
       att0 = nil
       Timecop.travel(1.day.ago) do
         get "/courses/#{@course.id}/assignments/#{@assignment.id}/submissions.json?zip=1&compile=1"
-        att0 = json_parse['attachment']['id']
+        att0 = json_parse["attachment"]["id"]
       end
 
       get "/courses/#{@course.id}/assignments/#{@assignment.id}/submissions.json?zip=1&compile=1"
-      att1 = json_parse['attachment']['id']
+      att1 = json_parse["attachment"]["id"]
 
       expect(att0).not_to eq(att1)
     end
@@ -82,12 +82,12 @@ describe ContentZipper do
       att0 = nil
       Timecop.travel(1.minute.ago) do
         get "/courses/#{@course.id}/assignments/#{@assignment.id}/submissions.json?zip=1&compile=1"
-        att0 = json_parse['attachment']['id']
+        att0 = json_parse["attachment"]["id"]
       end
 
       submission_model(course: @course)
       get "/courses/#{@course.id}/assignments/#{@assignment.id}/submissions.json?zip=1&compile=1"
-      att1 = json_parse['attachment']['id']
+      att1 = json_parse["attachment"]["id"]
 
       expect(att0).not_to eq(att1)
     end
@@ -96,11 +96,11 @@ describe ContentZipper do
       att0 = nil
       Timecop.travel(1.minute.ago) do
         get "/courses/#{@course.id}/assignments/#{@assignment.id}/submissions.json?zip=1&compile=1"
-        att0 = json_parse['attachment']['id']
+        att0 = json_parse["attachment"]["id"]
       end
 
       get "/courses/#{@course.id}/assignments/#{@assignment.id}/submissions.json?zip=1&compile=1"
-      att1 = json_parse['attachment']['id']
+      att1 = json_parse["attachment"]["id"]
 
       expect(att0).to eq(att1)
     end
@@ -109,14 +109,14 @@ describe ContentZipper do
       att0 = nil
       Timecop.travel(1.minute.ago) do
         get "/courses/#{@course.id}/assignments/#{@assignment.id}/submissions.json?zip=1&compile=1"
-        att0 = json_parse['attachment']['id']
+        att0 = json_parse["attachment"]["id"]
       end
       section = @course.course_sections.create!
-      @course.enroll_user(@teacher, 'TeacherEnrollment', section: section,
-                                                         enrollment_state: 'active', allow_multiple_enrollments: true)
+      @course.enroll_user(@teacher, "TeacherEnrollment", section: section,
+                                                         enrollment_state: "active", allow_multiple_enrollments: true)
 
       get "/courses/#{@course.id}/assignments/#{@assignment.id}/submissions.json?zip=1&compile=1"
-      att1 = json_parse['attachment']['id']
+      att1 = json_parse["attachment"]["id"]
 
       expect(att0).not_to eq(att1)
     end

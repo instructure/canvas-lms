@@ -55,18 +55,18 @@ module Importers
         migration_id = link[:migration_id]
 
         type_for_url = type
-        type = 'context_modules' if type == 'modules'
-        type = 'pages' if type == 'wiki'
-        if type == 'pages'
+        type = "context_modules" if type == "modules"
+        type = "pages" if type == "wiki"
+        if type == "pages"
           query = resolve_module_item_query(context, link[:query])
           link[:new_value] = "#{context_path}/pages/#{migration_id}#{query}"
-        elsif type == 'attachments'
+        elsif type == "attachments"
           if (att_id = context.attachments.where(migration_id: migration_id).limit(1).pluck(:id).first)
             link[:new_value] = "#{context_path}/files/#{att_id}/preview"
           end
         elsif context.respond_to?(type) && context.send(type).respond_to?(:scope)
           scope = context.send(type).scope
-          if scope.klass.columns_hash['migration_id'] &&
+          if scope.klass.columns_hash["migration_id"] &&
              (object_id = scope.where(migration_id: migration_id).limit(1).pluck(:id).first)
             query = resolve_module_item_query(context, link[:query])
             link[:new_value] = "#{context_path}/#{type_for_url}/#{object_id}#{query}"
@@ -87,10 +87,10 @@ module Importers
           new_url ||= missing_relative_file_url(rel_path)
           link[:missing_url] = new_url
         end
-        if node.name == 'iframe'
-          node['src'] = new_url
+        if node.name == "iframe"
+          node["src"] = new_url
         else
-          node['href'] = new_url
+          node["href"] = new_url
         end
         link[:new_value] = node.to_s
       when :file
@@ -104,7 +104,7 @@ module Importers
       when :file_ref
         file_id = context.attachments.where(migration_id: link[:migration_id]).limit(1).pluck(:id).first
         if file_id
-          rest = link[:rest].presence || '/preview'
+          rest = link[:rest].presence || "/preview"
           link[:new_value] = "#{context_path}/files/#{file_id}#{rest}"
           link[:new_value] = "/media_objects_iframe?mediahref=#{link[:new_value]}" if link[:in_media_iframe]
         end
@@ -134,7 +134,7 @@ module Importers
       mig_id = nil
       # This is for backward-compatibility: canvas attachment filenames are escaped
       # with '+' for spaces and older exports have files with that instead of %20
-      alt_rel_path = rel_path.tr('+', ' ')
+      alt_rel_path = rel_path.tr("+", " ")
       if @migration.attachment_path_id_lookup
         mig_id ||= @migration.attachment_path_id_lookup[rel_path]
         mig_id ||= @migration.attachment_path_id_lookup[alt_rel_path]
@@ -148,13 +148,13 @@ module Importers
     end
 
     def resolve_relative_file_url(rel_path)
-      split = rel_path.split('?')
+      split = rel_path.split("?")
       qs = split.pop if split.length > 1
-      path = split.join('?')
+      path = split.join("?")
 
       # since we can't be sure whether a ? is part of a filename or query string, try it both ways
       new_url = resolve_relative_file_url_with_qs(path, qs)
-      new_url ||= resolve_relative_file_url_with_qs(rel_path, '') if qs.present?
+      new_url ||= resolve_relative_file_url_with_qs(rel_path, "") if qs.present?
       new_url
     end
 
@@ -198,25 +198,25 @@ module Importers
     def resolve_media_comment_data(node, rel_path)
       if (file = find_file_in_context(rel_path[/^[^?]+/])) # strip query string for this search
         media_id = (file.media_object&.media_id || file.media_entry_id)
-        if media_id && media_id != 'maybe'
-          if node.name == 'iframe'
-            node['data-media-id'] = media_id
-            return media_iframe_url(media_id, node['data-media-type'])
+        if media_id && media_id != "maybe"
+          if node.name == "iframe"
+            node["data-media-id"] = media_id
+            return media_iframe_url(media_id, node["data-media-type"])
           else
-            node['id'] = "media_comment_#{media_id}"
+            node["id"] = "media_comment_#{media_id}"
             return "/media_objects/#{media_id}"
           end
         end
       end
 
-      if node['id'] && node['id'] =~ /\Amedia_comment_(.+)\z/
+      if node["id"] && node["id"] =~ /\Amedia_comment_(.+)\z/
         "/media_objects/#{$1}"
-      elsif node['data-media-id'].present?
-        media_iframe_url(node['data-media-id'], node['data-media-type'])
+      elsif node["data-media-id"].present?
+        media_iframe_url(node["data-media-id"], node["data-media-type"])
       else
-        node.delete('class')
-        node.delete('id')
-        node.delete('style')
+        node.delete("class")
+        node.delete("id")
+        node.delete("style")
         nil
       end
     end

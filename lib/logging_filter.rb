@@ -33,7 +33,7 @@ module LoggingFilter
   end
 
   def self.filter_query_string(qs)
-    regs = all_filtered_parameters.map { |p| p.gsub("[", "\\[").gsub("]", "\\]") }.join('|')
+    regs = all_filtered_parameters.map { |p| p.gsub("[", "\\[").gsub("]", "\\]") }.join("|")
     @@filtered_parameters_regex ||= /([?&](?:#{regs}))=[^&]+/
     qs.gsub(@@filtered_parameters_regex, '\1=[FILTERED]')
   end

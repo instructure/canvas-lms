@@ -21,20 +21,20 @@ require "active_support/core_ext/object/blank"
 
 module LtiOutbound
   class LTIUser < LTIContext
-    ACTIVE_STATE = 'active'
-    INACTIVE_STATE = 'inactive'
+    ACTIVE_STATE = "active"
+    INACTIVE_STATE = "inactive"
 
     proc_accessor :avatar_url, :concluded_roles, :currently_active_in_course,
                   :current_roles, :first_name, :email, :last_name, :login_id,
                   :name, :timezone, :current_observee_ids
 
     def current_role_types
-      roles = current_roles.join(',') if current_roles.present?
+      roles = current_roles.join(",") if current_roles.present?
       roles || LtiOutbound::LTIRoles::System::NONE
     end
 
     def concluded_role_types
-      roles = concluded_roles.join(',') if concluded_roles.present?
+      roles = concluded_roles.join(",") if concluded_roles.present?
       roles || LtiOutbound::LTIRoles::System::NONE
     end
 
@@ -54,8 +54,8 @@ module LtiOutbound
       return false unless current_roles
 
       current_roles.any? do |e|
-        LtiOutbound::LTIRoles::ContextNotNamespaced::OBSERVER.split(',').include?(e) ||
-          LtiOutbound::LTIRoles::Context::OBSERVER.split(',').include?(e)
+        LtiOutbound::LTIRoles::ContextNotNamespaced::OBSERVER.split(",").include?(e) ||
+          LtiOutbound::LTIRoles::Context::OBSERVER.split(",").include?(e)
       end
     end
   end

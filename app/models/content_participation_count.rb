@@ -132,7 +132,7 @@ class ContentParticipationCount < ActiveRecord::Base
   # - deleting a discussion/announcement/assignment/submission
   # - marking a previously graded assignment as not_graded
   def ttl
-    Setting.get('content_participation_count_ttl', 30.minutes).to_i
+    Setting.get("content_participation_count_ttl", 30.minutes).to_i
   end
   private :ttl
 end

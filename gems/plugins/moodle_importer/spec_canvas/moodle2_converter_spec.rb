@@ -19,10 +19,10 @@
 
 describe Moodle::Converter do
   before(:once) do
-    fixture_dir = File.dirname(__FILE__) + '/fixtures'
-    archive_file_path = File.join(fixture_dir, 'moodle_backup_2.zip')
+    fixture_dir = File.dirname(__FILE__) + "/fixtures"
+    archive_file_path = File.join(fixture_dir, "moodle_backup_2.zip")
     unzipped_file_path = create_temp_dir!
-    converter = Moodle::Converter.new(export_archive_path: archive_file_path, course_name: 'oi', base_download_dir: unzipped_file_path)
+    converter = Moodle::Converter.new(export_archive_path: archive_file_path, course_name: "oi", base_download_dir: unzipped_file_path)
     converter.export
     @base_course_data = converter.course.with_indifferent_access
 
@@ -61,7 +61,7 @@ describe Moodle::Converter do
     it "converts assignments" do
       expect(@course.assignments.count).to eq 2
 
-      assignment2 = @course.assignments.where(title: 'Hidden Assignmnet').first
+      assignment2 = @course.assignments.where(title: "Hidden Assignmnet").first
       expect(assignment2.description).to eq "<p>This is a hidden assignment</p>"
       expect(assignment2.unpublished?).to eq true
     end
@@ -73,8 +73,8 @@ describe Moodle::Converter do
       expect(wiki).not_to be_nil
       expect(wiki.wiki_pages.count).to eq 12
 
-      page1 = wiki.wiki_pages.where(title: 'Hidden Section').first
-      expect(page1.body).to eq '<p>This is a Hidden Section, with hidden items</p>'
+      page1 = wiki.wiki_pages.where(title: "Hidden Section").first
+      expect(page1.body).to eq "<p>This is a Hidden Section, with hidden items</p>"
       expect(page1.unpublished?).to eq true
     end
   end
@@ -97,14 +97,14 @@ describe Moodle::Converter do
     it "converts Moodle Questionnaire module to a quiz" do
       quiz = @course.quizzes.where(title: "Questionnaire Name").first
       expect(quiz.description).to match(/Sumary/)
-      expect(quiz.quiz_type).to eq 'survey'
+      expect(quiz.quiz_type).to eq "survey"
       expect(quiz.quiz_questions.count).to eq 10
     end
   end
 
   context "modules" do
     it "converts modules and module items" do
-      skip 'Requires QtiMigrationTool' unless Qti.qti_enabled?
+      skip "Requires QtiMigrationTool" unless Qti.qti_enabled?
 
       expect(@course.context_modules.count).to eq 8
       expect(@course.context_module_tags.where(content_type: "Assignment", title: "Assignment Name")).to be_exists

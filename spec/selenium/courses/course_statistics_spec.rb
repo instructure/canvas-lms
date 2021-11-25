@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../common'
+require_relative "../common"
 
 describe "course statistics" do
   include_context "in-process server selenium tests"
@@ -42,9 +42,9 @@ describe "course statistics" do
 
     get "/courses/#{@course.id}/statistics"
     wait_for_ajaximations
-    f('#students_stats_tab').click
+    f("#students_stats_tab").click
 
-    users = ff('.item_list li')
+    users = ff(".item_list li")
     expect(users[0]).to include_text @student2.name
     expect(users[0]).not_to include_text "unknown"
     expect(users[1]).to include_text @student3.name
@@ -52,10 +52,10 @@ describe "course statistics" do
     expect(users[2]).to include_text @student1.name
     expect(users[2]).to include_text "unknown"
 
-    links = ff('.item_list li a')
-    expect(links[0]['href'].end_with?("/courses/#{@course.id}/users/#{@student2.id}")).to eq true
-    expect(links[1]['href'].end_with?("/courses/#{@course.id}/users/#{@student3.id}")).to eq true
-    expect(links[2]['href'].end_with?("/courses/#{@course.id}/users/#{@student1.id}")).to eq true
+    links = ff(".item_list li a")
+    expect(links[0]["href"].end_with?("/courses/#{@course.id}/users/#{@student2.id}")).to eq true
+    expect(links[1]["href"].end_with?("/courses/#{@course.id}/users/#{@student3.id}")).to eq true
+    expect(links[2]["href"].end_with?("/courses/#{@course.id}/users/#{@student1.id}")).to eq true
   end
 
   it "shows a deduped count" do

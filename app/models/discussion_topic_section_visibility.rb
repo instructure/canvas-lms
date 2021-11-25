@@ -29,7 +29,7 @@ class DiscussionTopicSectionVisibility < ActiveRecord::Base
   validate :discussion_topic_is_section_specific
   validate :course_and_topic_share_context
 
-  validates :course_section_id, uniqueness: { scope: :discussion_topic_id, conditions: -> { where(workflow_state: 'active') } }
+  validates :course_section_id, uniqueness: { scope: :discussion_topic_id, conditions: -> { where(workflow_state: "active") } }
 
   before_validation :set_discussion_topic_id
 
@@ -40,7 +40,7 @@ class DiscussionTopicSectionVisibility < ActiveRecord::Base
 
   alias_method :destroy_permanently!, :destroy
   def destroy
-    self.workflow_state = 'deleted'
+    self.workflow_state = "deleted"
     save!
   end
 

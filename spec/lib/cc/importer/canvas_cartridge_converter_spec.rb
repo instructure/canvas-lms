@@ -17,10 +17,10 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../cc_spec_helper'
+require_relative "../cc_spec_helper"
 
-require 'nokogiri'
-require 'tmpdir'
+require "nokogiri"
+require "tmpdir"
 
 describe "Canvas Cartridge importing" do
   before do
@@ -61,8 +61,8 @@ describe "Canvas Cartridge importing" do
     ag2.rules = "drop_lowest:2\ndrop_highest:5\nnever_drop:%s\n" % a.id
     ag2.save!
 
-    ag3 = @copy_from.assignment_groups.create!(name: 'group to import implicitly')
-    ag4 = @copy_from.assignment_groups.create!(name: 'group to not import implicitly')
+    ag3 = @copy_from.assignment_groups.create!(name: "group to import implicitly")
+    ag4 = @copy_from.assignment_groups.create!(name: "group to not import implicitly")
 
     # export to xml
     builder = Builder::XmlMarkup.new(indent: 2)
@@ -71,25 +71,25 @@ describe "Canvas Cartridge importing" do
     doc = Nokogiri::XML(builder.target!)
     ag_hash = @converter.convert_assignment_groups(doc)
     data = {
-      'assignment_groups' => ag_hash,
-      'assignments' => [
+      "assignment_groups" => ag_hash,
+      "assignments" => [
         # just a dummy assignment, but will implicitly import ag3
-        { 'migration_id' => 42, 'assignment_group_migration_id' => CC::CCHelper.create_key(ag3) },
-        { 'migration_id' => 43, 'assignment_group_migration_id' => CC::CCHelper.create_key(ag4) }
+        { "migration_id" => 42, "assignment_group_migration_id" => CC::CCHelper.create_key(ag3) },
+        { "migration_id" => 43, "assignment_group_migration_id" => CC::CCHelper.create_key(ag4) }
       ]
     }
 
     @migration.migration_ids_to_import = {
       copy: {
-        'assignments' => { 42 => true, CC::CCHelper.create_key(a) => true },
-        'assignment_groups' => {
+        "assignments" => { 42 => true, CC::CCHelper.create_key(a) => true },
+        "assignment_groups" => {
           CC::CCHelper.create_key(ag1) => true,
           CC::CCHelper.create_key(ag2) => true,
         }
       }
     }
-    expect(@migration.import_object?('assignment_group', CC::CCHelper.create_key(ag3))).to eq false
-    expect(@migration.import_object?('assignment_group', CC::CCHelper.create_key(ag4))).to eq false
+    expect(@migration.import_object?("assignment_group", CC::CCHelper.create_key(ag3))).to eq false
+    expect(@migration.import_object?("assignment_group", CC::CCHelper.create_key(ag4))).to eq false
 
     # import json into new course
     @copy_to.assignment_group_no_drop_assignments = {}
@@ -116,7 +116,7 @@ describe "Canvas Cartridge importing" do
     hash = { migration_id: CC::CCHelper.create_key(a),
              title: a.title,
              assignment_group_migration_id: CC::CCHelper.create_key(ag2) }.with_indifferent_access
-    Importers::AssignmentImporter.process_migration({ 'assignments' => [hash] }, @migration)
+    Importers::AssignmentImporter.process_migration({ "assignments" => [hash] }, @migration)
 
     ag2_2.reload
     expect(ag2_2.assignments.count).to eq 1
@@ -126,28 +126,28 @@ describe "Canvas Cartridge importing" do
 
   it "imports external tools" do
     tool1 = @copy_from.context_external_tools.new
-    tool1.url = 'http://instructure.com'
-    tool1.name = 'instructure'
+    tool1.url = "http://instructure.com"
+    tool1.name = "instructure"
     tool1.description = "description of boring"
-    tool1.privacy_level = 'name_only'
-    tool1.consumer_key = 'haha'
+    tool1.privacy_level = "name_only"
+    tool1.consumer_key = "haha"
     tool1.shared_secret = "don't share me"
     tool1.tool_id = "test_tool"
     tool1.settings[:custom_fields] = { "key1" => "value1", "key2" => "value2" }
-    tool1.settings[:user_navigation] = { url: "http://www.example.com", text: "hello", labels: { 'en' => 'hello', 'es' => 'hola' }, extra: 'extra' }
-    tool1.settings[:course_navigation] = { text: "hello", labels: { 'en' => 'hello', 'es' => 'hola' }, default: 'disabled', visibility: 'members', extra: 'extra', custom_fields: { "key3" => "value3" } }
-    tool1.settings[:account_navigation] = { url: "http://www.example.com", text: "hello", labels: { 'en' => 'hello', 'es' => 'hola' }, extra: 'extra' }
-    tool1.settings[:resource_selection] = { url: "http://www.example.com", text: "hello", labels: { 'en' => 'hello', 'es' => 'hola' }, selection_width: 100, selection_height: 50, extra: 'extra' }
-    tool1.settings[:editor_button] = { url: "http://www.example.com", text: "hello", labels: { 'en' => 'hello', 'es' => 'hola' }, selection_width: 100, selection_height: 50, icon_url: "http://www.example.com", extra: 'extra' }
-    tool1.settings[:homework_submission] = { url: "http://www.example.com", text: "hello", labels: { 'en' => 'hello', 'es' => 'hola' }, selection_width: 100, selection_height: 50, extra: 'extra' }
+    tool1.settings[:user_navigation] = { url: "http://www.example.com", text: "hello", labels: { "en" => "hello", "es" => "hola" }, extra: "extra" }
+    tool1.settings[:course_navigation] = { text: "hello", labels: { "en" => "hello", "es" => "hola" }, default: "disabled", visibility: "members", extra: "extra", custom_fields: { "key3" => "value3" } }
+    tool1.settings[:account_navigation] = { url: "http://www.example.com", text: "hello", labels: { "en" => "hello", "es" => "hola" }, extra: "extra" }
+    tool1.settings[:resource_selection] = { url: "http://www.example.com", text: "hello", labels: { "en" => "hello", "es" => "hola" }, selection_width: 100, selection_height: 50, extra: "extra" }
+    tool1.settings[:editor_button] = { url: "http://www.example.com", text: "hello", labels: { "en" => "hello", "es" => "hola" }, selection_width: 100, selection_height: 50, icon_url: "http://www.example.com", extra: "extra" }
+    tool1.settings[:homework_submission] = { url: "http://www.example.com", text: "hello", labels: { "en" => "hello", "es" => "hola" }, selection_width: 100, selection_height: 50, extra: "extra" }
     tool1.settings[:icon_url] = "http://www.example.com/favicon.ico"
     tool1.save!
     tool2 = @copy_from.context_external_tools.new
-    tool2.domain = 'example.com'
-    tool2.name = 'example'
+    tool2.domain = "example.com"
+    tool2.name = "example"
     tool2.description = "example.com? That's the best you could come up with?"
-    tool2.privacy_level = 'anonymous'
-    tool2.consumer_key = 'haha'
+    tool2.privacy_level = "anonymous"
+    tool2.consumer_key = "haha"
     tool2.shared_secret = "don't share me"
     tool2.settings[:vendor_extensions] = [{ platform: "my.lms.com", custom_fields: { "key" => "value" } }]
     tool2.save!
@@ -163,12 +163,12 @@ describe "Canvas Cartridge importing" do
     doc1 = Nokogiri::XML(builder.target!)
     lti_converter = CC::Importer::BLTIConverter.new
     tool1_hash = lti_converter.convert_blti_link(doc1)
-    tool1_hash['migration_id'] = CC::CCHelper.create_key(tool1)
+    tool1_hash["migration_id"] = CC::CCHelper.create_key(tool1)
     doc2 = Nokogiri::XML(builder2.target!)
     tool2_hash = lti_converter.convert_blti_link(doc2)
-    tool2_hash['migration_id'] = CC::CCHelper.create_key(tool2)
+    tool2_hash["migration_id"] = CC::CCHelper.create_key(tool2)
     # import json into new course
-    Importers::ContextExternalToolImporter.process_migration({ 'external_tools' => [tool1_hash, tool2_hash] }, @migration)
+    Importers::ContextExternalToolImporter.process_migration({ "external_tools" => [tool1_hash, tool2_hash] }, @migration)
     @copy_to.save!
 
     # compare settings
@@ -178,17 +178,17 @@ describe "Canvas Cartridge importing" do
     expect(t1.description).to eq tool1.description
     expect(t1.workflow_state).to eq tool1.workflow_state
     expect(t1.domain).to eq nil
-    expect(t1.consumer_key).to eq 'fake'
-    expect(t1.shared_secret).to eq 'fake'
-    expect(t1.tool_id).to eq 'test_tool'
-    expect(t1.settings[:icon_url]).to eq 'http://www.example.com/favicon.ico'
+    expect(t1.consumer_key).to eq "fake"
+    expect(t1.shared_secret).to eq "fake"
+    expect(t1.tool_id).to eq "test_tool"
+    expect(t1.settings[:icon_url]).to eq "http://www.example.com/favicon.ico"
     %i[user_navigation course_navigation account_navigation].each do |type|
       expect(t1.settings[type][:text]).to eq "hello"
-      expect(t1.settings[type][:labels][:en]).to eq 'hello'
-      expect(t1.settings[type][:labels]['es']).to eq 'hola'
+      expect(t1.settings[type][:labels][:en]).to eq "hello"
+      expect(t1.settings[type][:labels]["es"]).to eq "hola"
       if type == :course_navigation
-        expect(t1.settings[type][:default]).to eq 'disabled'
-        expect(t1.settings[type][:visibility]).to eq 'members'
+        expect(t1.settings[type][:default]).to eq "disabled"
+        expect(t1.settings[type][:visibility]).to eq "members"
         expect(t1.settings[type][:custom_fields]).to eq({ "key3" => "value3" })
         expect(t1.settings[type].keys.map(&:to_s).sort).to eq %w[custom_fields default extra labels text visibility]
       else
@@ -199,12 +199,12 @@ describe "Canvas Cartridge importing" do
     %i[resource_selection editor_button homework_submission].each do |type|
       expect(t1.settings[type][:url]).to eq "http://www.example.com"
       expect(t1.settings[type][:text]).to eq "hello"
-      expect(t1.settings[type][:labels][:en]).to eq 'hello'
-      expect(t1.settings[type][:labels]['es']).to eq 'hola'
+      expect(t1.settings[type][:labels][:en]).to eq "hello"
+      expect(t1.settings[type][:labels]["es"]).to eq "hola"
       expect(t1.settings[type][:selection_width]).to eq 100
       expect(t1.settings[type][:selection_height]).to eq 50
       if type == :editor_button
-        expect(t1.settings[type][:icon_url]).to eq 'http://www.example.com'
+        expect(t1.settings[type][:icon_url]).to eq "http://www.example.com"
         expect(t1.settings[type].keys.map(&:to_s).sort).to eq %w[extra icon_url labels selection_height selection_width text url]
       else
         expect(t1.settings[type].keys.map(&:to_s).sort).to eq %w[extra labels selection_height selection_width text url]
@@ -219,8 +219,8 @@ describe "Canvas Cartridge importing" do
     expect(t2.name).to eq tool2.name
     expect(t2.description).to eq tool2.description
     expect(t2.workflow_state).to eq tool2.workflow_state
-    expect(t2.consumer_key).to eq 'fake'
-    expect(t2.shared_secret).to eq 'fake'
+    expect(t2.consumer_key).to eq "fake"
+    expect(t2.shared_secret).to eq "fake"
     expect(t2.tool_id).to be_nil
     expect(t2.settings[:icon_url]).to be_nil
     expect(t2.settings[:user_navigation]).to be_nil
@@ -229,9 +229,9 @@ describe "Canvas Cartridge importing" do
     expect(t2.settings[:resource_selection]).to be_nil
     expect(t2.settings[:editor_button]).to be_nil
     expect(t2.settings[:homework_submission]).to be_nil
-    expect(t2.settings.keys.map(&:to_s).sort).to eq ['custom_fields', 'vendor_extensions']
-    expect(t2.settings[:vendor_extensions]).to eq [{ 'platform' => "my.lms.com", 'custom_fields' => { "key" => "value" } }]
-    expect(t2.settings[:vendor_extensions][0][:platform]).to eq 'my.lms.com'
+    expect(t2.settings.keys.map(&:to_s).sort).to eq ["custom_fields", "vendor_extensions"]
+    expect(t2.settings[:vendor_extensions]).to eq [{ "platform" => "my.lms.com", "custom_fields" => { "key" => "value" } }]
+    expect(t2.settings[:vendor_extensions][0][:platform]).to eq "my.lms.com"
     expect(t2.settings[:vendor_extensions][0][:custom_fields]).to eq({ "key" => "value" })
     expect(t2.settings[:custom_fields]).to eq({})
   end
@@ -245,8 +245,8 @@ describe "Canvas Cartridge importing" do
 
     mod1 = @copy_from.context_modules.create!(name: "some module")
 
-    mod1.add_item({ title: "test", type: 'context_external_tool', url: "http://example.com.ims/lti", new_tab: true })
-    mod1.add_item({ title: "test2", type: 'context_external_tool', url: "http://example.com.ims/lti" })
+    mod1.add_item({ title: "test", type: "context_external_tool", url: "http://example.com.ims/lti", new_tab: true })
+    mod1.add_item({ title: "test2", type: "context_external_tool", url: "http://example.com.ims/lti" })
     mod1.save!
 
     expect(mod1.content_tags.count).to eq 2
@@ -259,20 +259,20 @@ describe "Canvas Cartridge importing" do
     hash = @converter.convert_modules(doc)
     # import json into new course
     hash[0] = hash[0].with_indifferent_access
-    Importers::ContextModuleImporter.process_migration({ 'modules' => hash }, @migration)
+    Importers::ContextModuleImporter.process_migration({ "modules" => hash }, @migration)
     @copy_to.save!
 
     mod1_2 = @copy_to.context_modules.where(migration_id: CC::CCHelper.create_key(mod1)).first
     expect(mod1_2.content_tags.count).to eq mod1.content_tags.count
     tag = mod1_2.content_tags.first
     expect(tag.content_id).to eq tool_to.id
-    expect(tag.content_type).to eq 'ContextExternalTool'
+    expect(tag.content_type).to eq "ContextExternalTool"
     expect(tag.new_tab).to eq true
     expect(tag.url).to eq "http://example.com.ims/lti"
     tag = mod1_2.content_tags.last
     expect(tag.content_id).to eq tool_to.id
     expect(tag.new_tab).not_to eq true
-    expect(tag.content_type).to eq 'ContextExternalTool'
+    expect(tag.content_type).to eq "ContextExternalTool"
     expect(tag.url).to eq "http://example.com.ims/lti"
   end
 
@@ -280,7 +280,7 @@ describe "Canvas Cartridge importing" do
     ef = @copy_from.external_feeds.new
     ef.url = "http://search.twitter.com/search.atom?q=instructure"
     ef.title = "Instructure on Twitter"
-    ef.verbosity = 'full'
+    ef.verbosity = "full"
     ef.header_match = "canvas"
     ef.save!
 
@@ -291,7 +291,7 @@ describe "Canvas Cartridge importing" do
     doc = Nokogiri::XML(builder.target!)
     hash = @converter.convert_external_feeds(doc)
     # import json into new course
-    Importers::ExternalFeedImporter.process_migration({ 'external_feeds' => hash }, @migration)
+    Importers::ExternalFeedImporter.process_migration({ "external_feeds" => hash }, @migration)
     @copy_to.save!
 
     ef_2 = @copy_to.external_feeds.where(migration_id: CC::CCHelper.create_key(ef)).first
@@ -314,7 +314,7 @@ describe "Canvas Cartridge importing" do
     doc = Nokogiri::XML(builder.target!)
     hash = @converter.convert_grading_standards(doc)
     # import json into new course
-    Importers::GradingStandardImporter.process_migration({ 'grading_standards' => hash }, @migration)
+    Importers::GradingStandardImporter.process_migration({ "grading_standards" => hash }, @migration)
     @copy_to.save!
 
     gs_2 = @copy_to.grading_standards.where(migration_id: CC::CCHelper.create_key(gs)).first
@@ -334,7 +334,7 @@ describe "Canvas Cartridge importing" do
     XML
     hash = @converter.convert_grading_standards(doc)
     # import json into new course
-    Importers::GradingStandardImporter.process_migration({ 'grading_standards' => hash }, @migration)
+    Importers::GradingStandardImporter.process_migration({ "grading_standards" => hash }, @migration)
     @copy_to.save!
 
     gs_2 = @copy_to.grading_standards.last
@@ -347,7 +347,7 @@ describe "Canvas Cartridge importing" do
     lo.context = @copy_from
     lo.short_description = "Lone outcome"
     lo.description = "<p>Descriptions are boring</p>"
-    lo.workflow_state = 'active'
+    lo.workflow_state = "active"
     lo.data = { rubric_criterion: { mastery_points: 3, ratings: [{ description: "Exceeds Expectations", points: 5 }, { description: "Meets Expectations", points: 3 }, { description: "Does Not Meet Expectations", points: 0 }], description: "First outcome", points_possible: 5 } }
     lo.save!
     default = @copy_from.root_outcome_group
@@ -365,7 +365,7 @@ describe "Canvas Cartridge importing" do
     data = data.map(&:with_indifferent_access)
 
     # import json into new course
-    Importers::LearningOutcomeImporter.process_migration({ 'learning_outcomes' => data }, @migration)
+    Importers::LearningOutcomeImporter.process_migration({ "learning_outcomes" => data }, @migration)
     @copy_to.save!
   end
 
@@ -386,7 +386,7 @@ describe "Canvas Cartridge importing" do
     lo2 = @copy_from.created_learning_outcomes.new
     lo2.context = @copy_from
     lo2.short_description = "outcome in group"
-    lo2.workflow_state = 'active'
+    lo2.workflow_state = "active"
     lo2.data = { rubric_criterion: { mastery_points: 2, ratings: [{ description: "e", points: 50 }, { description: "me", points: 2 }, { description: "Does Not Meet Expectations", points: 0.5 }], description: "First outcome", points_possible: 5 } }
     lo2.save!
     lo_g.add_outcome(lo2)
@@ -437,7 +437,7 @@ describe "Canvas Cartridge importing" do
     rubric2.data = [{ ratings: [{ criterion_id: "309_6312", points: 5, description: "Full Marks", id: "blank", long_description: "" }, { criterion_id: "309_6312", points: 0, description: "No Marks", id: "blank_2", long_description: "" }], points: 5, description: "Description of criterion", id: "309_6312", long_description: "" }, { ignore_for_scoring: false, mastery_points: 3, learning_outcome_id: lo.id, ratings: [{ criterion_id: "309_343", points: 5, description: "Exceeds Expectations", id: "309_6516", long_description: "" }, { criterion_id: "309_343", points: 0, description: "Does Not Meet Expectations", id: "309_9962", long_description: "" }], points: 5, description: "Learning Outcome", id: "309_343", long_description: "<p>Outcome</p>" }]
     rubric2.save!
 
-    RubricAssociation.create!(context: @copy_from, rubric: rubric2, association_object: @copy_from, title: rubric2.title, purpose: 'bookmark')
+    RubricAssociation.create!(context: @copy_from, rubric: rubric2, association_object: @copy_from, title: rubric2.title, purpose: "bookmark")
 
     # export to xml
     builder = Builder::XmlMarkup.new(indent: 2)
@@ -448,7 +448,7 @@ describe "Canvas Cartridge importing" do
     # import json into new course
     hash[0] = hash[0].with_indifferent_access
     hash[1] = hash[1].with_indifferent_access
-    Importers::RubricImporter.process_migration({ 'rubrics' => hash }, @migration)
+    Importers::RubricImporter.process_migration({ "rubrics" => hash }, @migration)
     @copy_to.save!
 
     expect(@copy_to.rubric_associations.count).to eq 2
@@ -462,8 +462,8 @@ describe "Canvas Cartridge importing" do
     expect(rubric2_2.title).to eq rubric2.title
   end
 
-  context 'importing modules' do
-    it 'can import all info from a basic module structure' do
+  context "importing modules" do
+    it "can import all info from a basic module structure" do
       mod1 = @copy_from.context_modules.create!(name: "some module", unlock_at: 1.week.from_now, require_sequential_progress: true)
       mod2 = @copy_from.context_modules.create!(name: "next module")
       mod3 = @copy_from.context_modules.create!(name: "url module")
@@ -473,12 +473,12 @@ describe "Canvas Cartridge importing" do
       mod2.save!
 
       asmnt1 = @copy_from.assignments.create!(title: "some assignment")
-      tag = mod1.add_item({ id: asmnt1.id, type: 'assignment', indent: 1 })
+      tag = mod1.add_item({ id: asmnt1.id, type: "assignment", indent: 1 })
       c_reqs = []
-      c_reqs << { type: 'min_score', min_score: 5, id: tag.id }
+      c_reqs << { type: "min_score", min_score: 5, id: tag.id }
       page = @copy_from.wiki_pages.create!(title: "some page")
-      tag = mod1.add_item({ id: page.id, type: 'wiki_page' })
-      c_reqs << { type: 'must_view', id: tag.id }
+      tag = mod1.add_item({ id: page.id, type: "wiki_page" })
+      c_reqs << { type: "must_view", id: tag.id }
       mod1.completion_requirements = c_reqs
       mod1.save!
 
@@ -490,28 +490,28 @@ describe "Canvas Cartridge importing" do
       page2.migration_id = CC::CCHelper.create_key(page)
       page2.save!
 
-      mod3.add_item({ title: 'Example 1', type: 'external_url', url: 'http://a.example.com/' })
-      mod3.add_item({ title: 'Example 2', type: 'external_url', url: 'http://b.example.com/' })
-      ct = mod3.add_item({ title: 'Example 3', type: 'external_url', url: 'http://b.example.com/with%20space' })
+      mod3.add_item({ title: "Example 1", type: "external_url", url: "http://a.example.com/" })
+      mod3.add_item({ title: "Example 2", type: "external_url", url: "http://b.example.com/" })
+      ct = mod3.add_item({ title: "Example 3", type: "external_url", url: "http://b.example.com/with%20space" })
       ContentTag.where(id: ct).update_all(url: "http://b.example.com/with space")
 
       # attachments are migrated with just their filename as display_name,
       # if a content tag has a different title the display_name should not update
-      att = Attachment.create!(filename: 'boring.txt', display_name: "Super exciting!", uploaded_data: StringIO.new('even more boring'), folder: Folder.unfiled_folder(@copy_from), context: @copy_from)
+      att = Attachment.create!(filename: "boring.txt", display_name: "Super exciting!", uploaded_data: StringIO.new("even more boring"), folder: Folder.unfiled_folder(@copy_from), context: @copy_from)
       expect(att.display_name).to eq "Super exciting!"
       # create @copy_to attachment with normal display_name
-      att_2 = Attachment.create!(filename: 'boring.txt', uploaded_data: StringIO.new('even more boring'), folder: Folder.unfiled_folder(@copy_to), context: @copy_to)
+      att_2 = Attachment.create!(filename: "boring.txt", uploaded_data: StringIO.new("even more boring"), folder: Folder.unfiled_folder(@copy_to), context: @copy_to)
       att_2.migration_id = CC::CCHelper.create_key(att)
       att_2.save
       att_tag = mod4.add_item({ title: "A different title just because", type: "attachment", id: att.id })
 
       # create @copy_to module link with different name than attachment
-      att_3 = Attachment.create!(filename: 'filename.txt', uploaded_data: StringIO.new('even more boring'), folder: Folder.unfiled_folder(@copy_from), context: @copy_from)
+      att_3 = Attachment.create!(filename: "filename.txt", uploaded_data: StringIO.new("even more boring"), folder: Folder.unfiled_folder(@copy_from), context: @copy_from)
       att_3.migration_id = CC::CCHelper.create_key(att_3)
       att_3.save
       mod4.add_item({ title: "test answers", type: "attachment", id: att_3.id })
 
-      att_3_2 = Attachment.create!(filename: 'filename.txt', uploaded_data: StringIO.new('even more boring'), folder: Folder.unfiled_folder(@copy_to), context: @copy_to)
+      att_3_2 = Attachment.create!(filename: "filename.txt", uploaded_data: StringIO.new("even more boring"), folder: Folder.unfiled_folder(@copy_to), context: @copy_to)
       att_3_2.migration_id = CC::CCHelper.create_key(att_3)
       att_3_2.save
 
@@ -526,7 +526,7 @@ describe "Canvas Cartridge importing" do
       hash[1] = hash[1].with_indifferent_access
       hash[2] = hash[2].with_indifferent_access
       hash[3] = hash[3].with_indifferent_access
-      Importers::ContextModuleImporter.process_migration({ 'modules' => hash }, @migration)
+      Importers::ContextModuleImporter.process_migration({ "modules" => hash }, @migration)
       @copy_to.save!
 
       mod1_2 = @copy_to.context_modules.where(migration_id: CC::CCHelper.create_key(mod1)).first
@@ -536,16 +536,16 @@ describe "Canvas Cartridge importing" do
       expect(mod1_2.content_tags.count).to eq mod1.content_tags.count
       tag = mod1_2.content_tags.first
       expect(tag.content_id).to eq asmnt2.id
-      expect(tag.content_type).to eq 'Assignment'
+      expect(tag.content_type).to eq "Assignment"
       expect(tag.indent).to eq 1
       cr1 = mod1_2.completion_requirements.find { |cr| cr[:id] == tag.id }
-      expect(cr1[:type]).to eq 'min_score'
+      expect(cr1[:type]).to eq "min_score"
       expect(cr1[:min_score]).to eq 5
       tag = mod1_2.content_tags.last
       expect(tag.content_id).to eq page2.id
-      expect(tag.content_type).to eq 'WikiPage'
+      expect(tag.content_type).to eq "WikiPage"
       cr2 = mod1_2.completion_requirements.find { |cr| cr[:id] == tag.id }
-      expect(cr2[:type]).to eq 'must_view'
+      expect(cr2[:type]).to eq "must_view"
 
       mod2_2 = @copy_to.context_modules.where(migration_id: CC::CCHelper.create_key(mod2)).first
       expect(mod2_2.prerequisites.length).to eq 1
@@ -560,7 +560,7 @@ describe "Canvas Cartridge importing" do
       mod4_2 = @copy_to.context_modules.where(migration_id: CC::CCHelper.create_key(mod4)).first
       expect(mod4_2.content_tags.first.title).to eq att_tag.title
       att_2.reload
-      expect(att_2.display_name).to eq 'boring.txt'
+      expect(att_2.display_name).to eq "boring.txt"
 
       expect(mod4_2.content_tags.count).to eq 2
       tag = mod4_2.content_tags.last
@@ -568,7 +568,7 @@ describe "Canvas Cartridge importing" do
       expect(tag.content_id).to eq att_3_2.id
     end
 
-    context 'and the module items are ContextExternalTools' do
+    context "and the module items are ContextExternalTools" do
       let(:modules_doc) do
         xml_builder = Builder::XmlMarkup.new(indent: 1)
         @resource.create_module_meta(xml_builder)
@@ -578,17 +578,17 @@ describe "Canvas Cartridge importing" do
         @converter.convert_modules(modules_doc)
       end
 
-      context 'that use LTI 1.3' do
-        let(:context_module) { @copy_from.context_modules.create!(name: 'test module') }
+      context "that use LTI 1.3" do
+        let(:context_module) { @copy_from.context_modules.create!(name: "test module") }
         let(:tool) { external_tool_model(context: @copy_from, opts: { use_1_3: true, developer_key: developer_key }) }
         let(:developer_key) { DeveloperKey.create!(account: @copy_from.root_account) }
         let(:content_tag) do
-          context_module.add_item({ name: 'Test Tool', content: tool, url: tool.url,
-                                    type: 'context_external_tool', custom_params: custom_params,
+          context_module.add_item({ name: "Test Tool", content: tool, url: tool.url,
+                                    type: "context_external_tool", custom_params: custom_params,
                                     id: tool.id })
         end
         let(:resource_link) { content_tag.associated_asset }
-        let(:custom_params) { { foo: 'bar' } }
+        let(:custom_params) { { foo: "bar" } }
         # I hate defining this hash manually, rather than testing writing to the file, but I don't
         # actually need to test the resource link converter, as it has its own set of tests already.
         let(:external_tools) do
@@ -597,7 +597,7 @@ describe "Canvas Cartridge importing" do
           doc = Nokogiri::XML(builder.target!)
           lti_converter = CC::Importer::BLTIConverter.new
           tool_data_hash = lti_converter.convert_blti_link(doc)
-          tool_data_hash['migration_id'] = CC::CCHelper.create_key(tool)
+          tool_data_hash["migration_id"] = CC::CCHelper.create_key(tool)
           [tool_data_hash]
         end
         let(:data) do
@@ -608,14 +608,14 @@ describe "Canvas Cartridge importing" do
                 custom: custom_params,
                 lookup_uuid: content_tag.associated_asset.lookup_uuid,
                 context_id: @copy_from.id,
-                context_type: 'Course'
+                context_type: "Course"
               }
             ],
             external_tools: external_tools
           }.with_indifferent_access
         end
 
-        it 'can copy over the UUID and custom params to the new Lti::ResourceLink' do
+        it "can copy over the UUID and custom params to the new Lti::ResourceLink" do
           content_tag
           Importers::CourseContentImporter.import_content(@copy_to,
                                                           data,
@@ -630,8 +630,8 @@ describe "Canvas Cartridge importing" do
   end
 
   it "translates attachment links on import" do
-    attachment = Attachment.create!(filename: 'ohai there.txt', uploaded_data: StringIO.new('ohai'), folder: Folder.unfiled_folder(@copy_from), context: @copy_from)
-    attachment_import = factory_with_protected_attributes(Attachment, filename: 'ohai there.txt', uploaded_data: StringIO.new('ohai'), folder: Folder.unfiled_folder(@copy_to), context: @copy_to, migration_id: 'ohai')
+    attachment = Attachment.create!(filename: "ohai there.txt", uploaded_data: StringIO.new("ohai"), folder: Folder.unfiled_folder(@copy_from), context: @copy_from)
+    attachment_import = factory_with_protected_attributes(Attachment, filename: "ohai there.txt", uploaded_data: StringIO.new("ohai"), folder: Folder.unfiled_folder(@copy_to), context: @copy_to, migration_id: "ohai")
     body_with_link = %{<p>Watup? <strong>eh?</strong>
       <a href="/courses/%s/files/%s/preview">Preview File</a>
       <a href="/courses/%s/files/%s/download">Download File</a>
@@ -646,10 +646,10 @@ describe "Canvas Cartridge importing" do
     exported_html = CC::CCHelper::HtmlContentExporter.new(@copy_from, @from_teacher).html_page(page.body, page.title, identifier: migration_id)
     # convert to json
     doc = Nokogiri::XML(exported_html)
-    hash = @converter.convert_wiki(doc, 'some-page')
+    hash = @converter.convert_wiki(doc, "some-page")
     hash = hash.with_indifferent_access
     # import into new course
-    @migration.attachment_path_id_lookup = { 'unfiled/ohai there.txt' => attachment_import.migration_id }
+    @migration.attachment_path_id_lookup = { "unfiled/ohai there.txt" => attachment_import.migration_id }
     Importers::WikiPageImporter.import_from_migration(hash, @copy_to, @migration)
     @migration.resolve_content_links!
 
@@ -660,10 +660,10 @@ describe "Canvas Cartridge importing" do
   end
 
   it "translates media file links on import" do
-    att = Attachment.create!(filename: 'video.mp4',
-                             uploaded_data: StringIO.new('stuff'),
+    att = Attachment.create!(filename: "video.mp4",
+                             uploaded_data: StringIO.new("stuff"),
                              folder: Folder.root_folders(@copy_to).first, context: @copy_to)
-    att.migration_id = 'stuff'
+    att.migration_id = "stuff"
     att.content_type = "video/mp4"
     att.save!
 
@@ -679,8 +679,8 @@ describe "Canvas Cartridge importing" do
     HTML
 
     hash = {
-      migration_id: 'mig',
-      title: 'title',
+      migration_id: "mig",
+      title: "title",
       text: body_with_links
     }.with_indifferent_access
     # import into new course
@@ -691,15 +691,15 @@ describe "Canvas Cartridge importing" do
     page_2 = @copy_to.wiki_pages.where(migration_id: hash[:migration_id]).first
     links = Nokogiri::HTML5.fragment(page_2.body).css("a")
     expect(links.count).to eq 2
-    expect(links.first['href']).to eq "/media_objects/#{media_id}"
-    expect(links.last['href']).to eq "/courses/#{@copy_to.id}/files/#{att.id}/preview"
+    expect(links.first["href"]).to eq "/media_objects/#{media_id}"
+    expect(links.last["href"]).to eq "/courses/#{@copy_to.id}/files/#{att.id}/preview"
   end
 
   it "translates new RCE media iframes on import" do
-    att = Attachment.create!(filename: 'video.mp4',
-                             uploaded_data: StringIO.new('stuff'),
+    att = Attachment.create!(filename: "video.mp4",
+                             uploaded_data: StringIO.new("stuff"),
                              folder: Folder.root_folders(@copy_to).first, context: @copy_to)
-    att.migration_id = 'stuff'
+    att.migration_id = "stuff"
     att.content_type = "video/mp4"
     att.save!
 
@@ -710,8 +710,8 @@ describe "Canvas Cartridge importing" do
     body = %(<p>WHAT<iframe style="width: 400px; height: 225px; display: inline-block;" title="Video player for video.mp4" data-media-type="video" src="%24IMS-CC-FILEBASE%24/#{path}" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="m-old-mediaid"></iframe></p>)
 
     hash = {
-      migration_id: 'mig',
-      title: 'title',
+      migration_id: "mig",
+      title: "title",
       text: body
     }.with_indifferent_access
 
@@ -720,9 +720,9 @@ describe "Canvas Cartridge importing" do
     @migration.resolve_content_links!
 
     page_2 = @copy_to.wiki_pages.where(migration_id: hash[:migration_id]).first
-    expect(page_2.body).to include '</iframe>'
+    expect(page_2.body).to include "</iframe>"
     frame = Nokogiri::HTML5.fragment(page_2.body).at_css("iframe")
-    expect(frame['src']).to eq "/media_objects_iframe/#{media_id}?type=video"
+    expect(frame["src"]).to eq "/media_objects_iframe/#{media_id}?type=video"
   end
 
   it "imports wiki pages" do
@@ -736,14 +736,14 @@ describe "Canvas Cartridge importing" do
     # Create files for the wiki text to reference
     from_root = Folder.root_folders(@copy_from).first
     from_dir = Folder.create!(name: "sub & folder", parent_folder: from_root, context: @copy_from)
-    from_att = Attachment.create!(filename: 'picture+%2B+cropped.png', display_name: "picture + cropped.png", uploaded_data: StringIO.new('pretend .png data'), folder: from_dir, context: @copy_from)
+    from_att = Attachment.create!(filename: "picture+%2B+cropped.png", display_name: "picture + cropped.png", uploaded_data: StringIO.new("pretend .png data"), folder: from_dir, context: @copy_from)
 
     to_root = Folder.root_folders(@copy_to).first
     to_dir = Folder.create!(name: "sub & folder", parent_folder: to_root, context: @copy_to)
-    to_att = Attachment.create!(filename: 'picture+%2B+cropped.png', display_name: "picture + cropped.png", uploaded_data: StringIO.new('pretend .png data'), folder: to_dir, context: @copy_to)
+    to_att = Attachment.create!(filename: "picture+%2B+cropped.png", display_name: "picture + cropped.png", uploaded_data: StringIO.new("pretend .png data"), folder: to_dir, context: @copy_to)
     to_att.migration_id = CC::CCHelper.create_key(from_att)
     to_att.save
-    path = to_att.full_display_path.gsub('course files/', '')
+    path = to_att.full_display_path.gsub("course files/", "")
     @migration.attachment_path_id_lookup = { path => to_att.migration_id }
 
     body_with_link = %(<p>Watup? <strong>eh?</strong>
@@ -758,7 +758,7 @@ describe "Canvas Cartridge importing" do
         <div><img src="http://www.instructure.com/images/header-logo.png"></div>
       </div>)
     page = @copy_from.wiki_pages.create!(title: "some page", body: body_with_link % [@copy_from.id, @copy_from.id, @copy_from.id, @copy_from.id, @copy_from.id, mod.id, @copy_from.id, from_att.id], editing_roles: "teachers", notify_of_update: true)
-    page.workflow_state = 'unpublished'
+    page.workflow_state = "unpublished"
     @copy_from.save!
 
     # export to html file
@@ -770,10 +770,10 @@ describe "Canvas Cartridge importing" do
     exported_html = CC::CCHelper::HtmlContentExporter.new(@copy_from, @from_teacher).html_page(page.body, page.title, meta_fields)
     # convert to json
     doc = Nokogiri::HTML5(exported_html)
-    hash = @converter.convert_wiki(doc, 'some-page')
+    hash = @converter.convert_wiki(doc, "some-page")
     hash = hash.with_indifferent_access
     # import into new course
-    Importers::WikiPageImporter.process_migration({ 'wikis' => [hash, nil] }, @migration)
+    Importers::WikiPageImporter.process_migration({ "wikis" => [hash, nil] }, @migration)
     @migration.resolve_content_links!
 
     expect(ErrorReport.last.message).to match(/nil wiki/)
@@ -789,7 +789,7 @@ describe "Canvas Cartridge importing" do
 
   it "imports migrate inline external tool URLs in wiki pages" do
     # make sure that the wiki page we're linking to in the test below exists
-    page = @copy_from.wiki_pages.create!(title: "blti-link", body: "<a href='/courses/#{@copy_from.id}/external_tools/retrieve?url=#{CGI.escape('http://www.example.com')}'>link</a>")
+    page = @copy_from.wiki_pages.create!(title: "blti-link", body: "<a href='/courses/#{@copy_from.id}/external_tools/retrieve?url=#{CGI.escape("http://www.example.com")}'>link</a>")
     @copy_from.save!
 
     # export to html file
@@ -797,7 +797,7 @@ describe "Canvas Cartridge importing" do
     exported_html = CC::CCHelper::HtmlContentExporter.new(@copy_from, @from_teacher).html_page(page.body, page.title, identifier: migration_id)
     # convert to json
     doc = Nokogiri::HTML5(exported_html)
-    hash = @converter.convert_wiki(doc, 'blti-link')
+    hash = @converter.convert_wiki(doc, "blti-link")
     hash = hash.with_indifferent_access
     # import into new course
     Importers::WikiPageImporter.import_from_migration(hash, @copy_to, @migration)
@@ -832,7 +832,7 @@ describe "Canvas Cartridge importing" do
     asmnt.allowed_extensions = ["doc", "odt"]
     asmnt.unlock_at = 1.day.from_now
     asmnt.submission_types = "online_upload,online_text_entry,online_url"
-    asmnt.grading_type = 'points'
+    asmnt.grading_type = "points"
     asmnt.due_at = 1.week.from_now
     asmnt.all_day_date = 1.week.from_now
     asmnt.turnitin_enabled = true
@@ -880,9 +880,9 @@ describe "Canvas Cartridge importing" do
 
   it "imports external tool assignments" do
     course_with_teacher
-    assignment_model(course: @copy_from, points_possible: 40, submission_types: 'external_tool', grading_type: 'points')
+    assignment_model(course: @copy_from, points_possible: 40, submission_types: "external_tool", grading_type: "points")
     tag_from = @assignment.build_external_tool_tag(url: "http://example.com/one", new_tab: true)
-    tag_from.content_type = 'ContextExternalTool'
+    tag_from.content_type = "ContextExternalTool"
     tag_from.save!
 
     # export to xml/html
@@ -927,7 +927,7 @@ describe "Canvas Cartridge importing" do
     # import
     Importers::AssignmentImporter.import_from_migration(hash, @copy_to, @migration)
 
-    asmnt_2 = @copy_to.assignments.where(migration_id: 'ia24c092694901d2a5529c142accdaf0b').first
+    asmnt_2 = @copy_to.assignments.where(migration_id: "ia24c092694901d2a5529c142accdaf0b").first
     expect(asmnt_2.submission_types).to eq "external_tool"
 
     # the url was invalid so it won't be there
@@ -975,7 +975,7 @@ describe "Canvas Cartridge importing" do
     dt.save!
 
     assignment = @copy_from.assignments.build
-    assignment.submission_types = 'discussion_topic'
+    assignment.submission_types = "discussion_topic"
     assignment.assignment_group = @copy_from.assignment_groups.where(name: "Stupid Group").first_or_create
     assignment.title = dt.title
     assignment.points_possible = 13.37
@@ -1030,7 +1030,7 @@ describe "Canvas Cartridge importing" do
     dt.save!
 
     assignment = @copy_from.assignments.build
-    assignment.submission_types = 'discussion_topic'
+    assignment.submission_types = "discussion_topic"
     assignment.assignment_group = @copy_from.assignment_groups.where(name: "Stupid Group").first_or_create
     assignment.title = dt.title
     assignment.points_possible = 13.37
@@ -1199,21 +1199,21 @@ describe "Canvas Cartridge importing" do
 
   it "imports media tracks" do
     media_objects_folder = Folder.create! context: @copy_to, name: CC::CCHelper::MEDIA_OBJECTS_FOLDER, parent_folder: Folder.root_folders(@course).first
-    media_file = @copy_to.attachments.create(folder: media_objects_folder, filename: 'media.flv', uploaded_data: StringIO.new('pretend this is a media file'))
-    media_file.migration_id = 'xyz'
+    media_file = @copy_to.attachments.create(folder: media_objects_folder, filename: "media.flv", uploaded_data: StringIO.new("pretend this is a media file"))
+    media_file.migration_id = "xyz"
     media_file.save!
     mo = MediaObject.new
     mo.attachment = media_file
-    mo.media_id = '0_deadbeef'
+    mo.media_id = "0_deadbeef"
     mo.save!
-    track_file1 = @copy_to.attachments.create(folder: media_objects_folder, filename: 'media.flv.en.subtitles', uploaded_data: StringIO.new('pretend this is a track file'))
-    track_file1.migration_id = 'abc'
+    track_file1 = @copy_to.attachments.create(folder: media_objects_folder, filename: "media.flv.en.subtitles", uploaded_data: StringIO.new("pretend this is a track file"))
+    track_file1.migration_id = "abc"
     track_file1.save!
-    track_file2 = @copy_to.attachments.create(folder: media_objects_folder, filename: 'media.flv.tlh.subtitles', uploaded_data: StringIO.new("Qapla'"))
-    track_file2.migration_id = 'def'
+    track_file2 = @copy_to.attachments.create(folder: media_objects_folder, filename: "media.flv.tlh.subtitles", uploaded_data: StringIO.new("Qapla'"))
+    track_file2.migration_id = "def"
     track_file2.save!
-    bad_track_file = @copy_to.attachments.create!(folder: media_objects_folder, filename: 'media.flv.bad.subtitles', uploaded_data: StringIO.new('<tt xml>'), content_type: 'text/plain')
-    bad_track_file.migration_id = 'ghi'
+    bad_track_file = @copy_to.attachments.create!(folder: media_objects_folder, filename: "media.flv.bad.subtitles", uploaded_data: StringIO.new("<tt xml>"), content_type: "text/plain")
+    bad_track_file.migration_id = "ghi"
     bad_track_file.save!
     data = {
       "media_tracks" => {
@@ -1225,38 +1225,38 @@ describe "Canvas Cartridge importing" do
 
     migration = ContentMigration.create(context: @copy_to)
     allow(migration).to receive(:canvas_import?).and_return(true)
-    migration.migration_settings[:migration_ids_to_import] = { copy: { 'everything' => 1 } }
+    migration.migration_settings[:migration_ids_to_import] = { copy: { "everything" => 1 } }
     Importers::CourseContentImporter.import_content(@copy_to, data, nil, migration)
 
-    expect(mo.media_tracks.where(locale: 'en').first.content).to eql('pretend this is a track file')
-    expect(mo.media_tracks.where(locale: 'tlh').first.content).to eql("Qapla'")
-    expect(mo.media_tracks.where(locale: 'bad').first).to be_nil
+    expect(mo.media_tracks.where(locale: "en").first.content).to eql("pretend this is a track file")
+    expect(mo.media_tracks.where(locale: "tlh").first.content).to eql("Qapla'")
+    expect(mo.media_tracks.where(locale: "bad").first).to be_nil
 
     expect(migration.migration_issues.map(&:description)).to include "Subtitles could not be imported from media.flv.bad.subtitles"
 
-    expect(@copy_to.attachments.where(migration_id: 'abc').first).to be_deleted
-    expect(@copy_to.attachments.where(migration_id: 'def').first).to be_deleted
-    expect(@copy_to.attachments.where(migration_id: 'ghi').first).to be_deleted
+    expect(@copy_to.attachments.where(migration_id: "abc").first).to be_deleted
+    expect(@copy_to.attachments.where(migration_id: "def").first).to be_deleted
+    expect(@copy_to.attachments.where(migration_id: "ghi").first).to be_deleted
   end
 
-  context 'importing lti resource links' do
+  context "importing lti resource links" do
     let(:data) do
       {
-        'lti_resource_links' => [
+        "lti_resource_links" => [
           {
-            'custom' => {
-              'param1' => 'value1'
+            "custom" => {
+              "param1" => "value1"
             },
-            'lookup_uuid' => '1b302c1e-c0a2-42dc-88b6-c029699a7c7a',
-            'context_id' => @copy_from.id,
-            'context_type' => 'Course'
+            "lookup_uuid" => "1b302c1e-c0a2-42dc-88b6-c029699a7c7a",
+            "context_id" => @copy_from.id,
+            "context_type" => "Course"
           }
         ]
       }
     end
     let(:migration) { ContentMigration.create(context: @copy_to) }
 
-    it 'process migration from LtiResourceLinkImporter' do
+    it "process migration from LtiResourceLinkImporter" do
       expect(Importers::LtiResourceLinkImporter).to receive(:process_migration).once.with(data, migration)
 
       Importers::CourseContentImporter.import_content(@copy_to, data, nil, migration)
@@ -1550,7 +1550,7 @@ describe "cc assignment extensions" do
   before(:once) do
     archive_file_path = File.join(File.dirname(__FILE__) + "/../../../fixtures/migration/cc_assignment_extension.zip")
     unzipped_file_path = create_temp_dir!
-    converter = CC::Importer::Canvas::Converter.new(export_archive_path: archive_file_path, course_name: 'oi', base_download_dir: unzipped_file_path)
+    converter = CC::Importer::Canvas::Converter.new(export_archive_path: archive_file_path, course_name: "oi", base_download_dir: unzipped_file_path)
     converter.export
     @course_data = converter.course.with_indifferent_access
 
@@ -1564,27 +1564,27 @@ describe "cc assignment extensions" do
   it "parses canvas data from cc extension" do
     expect(@migration.migration_issues.count).to eq 0
 
-    att = @course.attachments.where(migration_id: 'ieee173de6109d169c627d07bedae0595').first
+    att = @course.attachments.where(migration_id: "ieee173de6109d169c627d07bedae0595").first
 
     # see common_cartridge_converter_spec
     # should get all the cc assignments
     expect(@course.assignments.count).to eq 3
     assignment1 = @course.assignments.where(migration_id: "icd613a5039d9a1539e100058efe44242").first
-    expect(assignment1.grading_type).to eq 'pass_fail'
+    expect(assignment1.grading_type).to eq "pass_fail"
     expect(assignment1.points_possible).to eq 20
     expect(assignment1.description).to include("<img src=\"/courses/#{@course.id}/files/#{att.id}/preview\" alt=\"dana_small.png\">")
     expect(assignment1.submission_types).to eq "online_text_entry,online_url,media_recording,online_upload" # overridden
 
     assignment2 = @course.assignments.where(migration_id: "icd613a5039d9a1539e100058efe44242copy").first
-    expect(assignment2.grading_type).to eq 'points'
+    expect(assignment2.grading_type).to eq "points"
     expect(assignment2.points_possible).to eq 21
-    expect(assignment2.description).to include('hi, the canvas meta stuff does not have submission types')
+    expect(assignment2.description).to include("hi, the canvas meta stuff does not have submission types")
     expect(assignment2.submission_types).to eq "online_upload,online_text_entry,online_url"
 
     # and the canvas only one as well
     assignment3 = @course.assignments.where(migration_id: "ifb359e06083b6eb3a294a7ac2c69e451").first
     expect(assignment3.description).to include("This is left to all custom canvas stuff.")
-    expect(assignment3.workflow_state).to eq 'unpublished'
+    expect(assignment3.workflow_state).to eq "unpublished"
   end
 end
 
@@ -1593,7 +1593,7 @@ describe "matching question reordering" do
     skip unless Qti.qti_enabled?
     archive_file_path = File.join(File.dirname(__FILE__) + "/../../../fixtures/migration/canvas_matching_reorder.zip")
     unzipped_file_path = create_temp_dir!
-    converter = CC::Importer::Canvas::Converter.new(export_archive_path: archive_file_path, course_name: 'oi', base_download_dir: unzipped_file_path)
+    converter = CC::Importer::Canvas::Converter.new(export_archive_path: archive_file_path, course_name: "oi", base_download_dir: unzipped_file_path)
     converter.export
     @course_data = converter.course.with_indifferent_access
 
@@ -1636,7 +1636,7 @@ describe "matching question reordering" do
     before(:once) do
       archive_file_path = File.join(File.dirname(__FILE__) + "/../../../fixtures/migration/canvas_announcement.zip")
       unzipped_file_path = create_temp_dir!
-      converter = CC::Importer::Canvas::Converter.new(export_archive_path: archive_file_path, course_name: 'oi', base_download_dir: unzipped_file_path)
+      converter = CC::Importer::Canvas::Converter.new(export_archive_path: archive_file_path, course_name: "oi", base_download_dir: unzipped_file_path)
       converter.export
       @course_data = converter.course.with_indifferent_access
 

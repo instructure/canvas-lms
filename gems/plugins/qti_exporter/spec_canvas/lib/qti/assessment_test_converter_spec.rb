@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../../qti_helper'
+require_relative "../../qti_helper"
 
 describe Qti::AssessmentTestConverter do
   it "interprets duration strings that include units" do
@@ -39,7 +39,7 @@ describe Qti::AssessmentTestConverter do
   end
 
   def test_section(select)
-    Nokogiri::XML(<<~XML).at_css('testPart')
+    Nokogiri::XML(<<~XML).at_css("testPart")
       <testPart identifier="BaseTestPart">
       #{select && %(<selection select="#{select}">)}
       </testPart>
@@ -48,11 +48,11 @@ describe Qti::AssessmentTestConverter do
 
   it "accepts a numeric pick count even if it's zero" do
     assess = Qti::AssessmentTestConverter
-    expect(assess.parse_pick_count(test_section(' 1'))).to eq 1
-    expect(assess.parse_pick_count(test_section('0'))).to eq 0
-    expect(assess.parse_pick_count(test_section('-5'))).to eq nil
-    expect(assess.parse_pick_count(test_section(''))).to eq nil
-    expect(assess.parse_pick_count(test_section('puppies'))).to eq nil
+    expect(assess.parse_pick_count(test_section(" 1"))).to eq 1
+    expect(assess.parse_pick_count(test_section("0"))).to eq 0
+    expect(assess.parse_pick_count(test_section("-5"))).to eq nil
+    expect(assess.parse_pick_count(test_section(""))).to eq nil
+    expect(assess.parse_pick_count(test_section("puppies"))).to eq nil
     expect(assess.parse_pick_count(test_section(nil))).to eq nil
   end
 end

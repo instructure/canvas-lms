@@ -18,10 +18,10 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'net/pop'
-require 'zlib'
+require "net/pop"
+require "zlib"
 
-require_relative 'configurable_timeout'
+require_relative "configurable_timeout"
 
 module IncomingMailProcessor
   class Pop3Mailbox

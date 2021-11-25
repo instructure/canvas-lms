@@ -105,13 +105,13 @@ module AssignmentOverrideApplicator
               visible_user_ids = context.enrollments_visible_to(user).select(:user_id)
 
               overrides = if overrides.loaded?
-                            ovs, adhoc_ovs = overrides.select { |ov| ov.workflow_state == 'active' }
-                                                      .partition { |ov| ov.set_type != 'ADHOC' }
+                            ovs, adhoc_ovs = overrides.select { |ov| ov.workflow_state == "active" }
+                                                      .partition { |ov| ov.set_type != "ADHOC" }
 
                             preload_student_ids_for_adhoc_overrides(adhoc_ovs, visible_user_ids)
                             ovs + adhoc_ovs.select { |ov| ov.preloaded_student_ids.any? }
                           else
-                            ovs = overrides.active.where.not(set_type: 'ADHOC').to_a
+                            ovs = overrides.active.where.not(set_type: "ADHOC").to_a
                             adhoc_ovs = overrides.active.visible_students_only(visible_user_ids).to_a
                             preload_student_ids_for_adhoc_overrides(adhoc_ovs, visible_user_ids)
 
@@ -122,7 +122,7 @@ module AssignmentOverrideApplicator
             end
 
             unless ConditionalRelease::Service.enabled_in_context?(assignment_or_quiz.context)
-              overrides = overrides.reject { |override| override.try(:set_type) == 'Noop' }
+              overrides = overrides.reject { |override| override.try(:set_type) == "Noop" }
             end
 
             return overrides
@@ -208,9 +208,9 @@ module AssignmentOverrideApplicator
 
     if group
       if assignment_or_quiz.assignment_overrides.loaded?
-        assignment_or_quiz.assignment_overrides.select { |o| o.set_type == 'Group' && o.set_id == group.id }
+        assignment_or_quiz.assignment_overrides.select { |o| o.set_type == "Group" && o.set_id == group.id }
       else
-        assignment_or_quiz.assignment_overrides.where(set_type: 'Group', set_id: group.id).to_a
+        assignment_or_quiz.assignment_overrides.where(set_type: "Group", set_id: group.id).to_a
       end
     end
   end
@@ -230,20 +230,20 @@ module AssignmentOverrideApplicator
       context.sections_visible_to(
         user,
         context.active_course_sections,
-        excluded_workflows: ['deleted', 'completed']
+        excluded_workflows: ["deleted", "completed"]
       ).map(&:id) +
         context.section_visibilities_for(
           user,
-          excluded_workflows: ['deleted', 'completed']
+          excluded_workflows: ["deleted", "completed"]
         ).select do |v|
           %w[StudentEnrollment ObserverEnrollment StudentViewEnrollment].include? v[:type]
         end.pluck(:course_section_id).uniq
     end
 
     if assignment_or_quiz.assignment_overrides.loaded?
-      assignment_or_quiz.assignment_overrides.select { |o| o.set_type == 'CourseSection' && section_ids.include?(o.set_id) }
+      assignment_or_quiz.assignment_overrides.select { |o| o.set_type == "CourseSection" && section_ids.include?(o.set_id) }
     else
-      assignment_or_quiz.assignment_overrides.where(set_type: 'CourseSection', set_id: section_ids)
+      assignment_or_quiz.assignment_overrides.where(set_type: "CourseSection", set_id: section_ids)
     end
   end
 
@@ -272,15 +272,15 @@ module AssignmentOverrideApplicator
     # serialize/deserialize cycle for a potentially very large blob. we (almost)
     # always overrwrite our quiz object with the overridden result anyway
     if assignment.is_a?(::Quizzes::Quiz)
-      quiz_data = assignment.instance_variable_get(:@attributes)['quiz_data']
+      quiz_data = assignment.instance_variable_get(:@attributes)["quiz_data"]
       assignment.quiz_data = nil
     end
 
     clone = assignment.clone
     assignment.instance_variable_set(:@readonly_clone, false)
     if quiz_data
-      assignment.instance_variable_get(:@attributes)['quiz_data'] = quiz_data
-      clone.instance_variable_get(:@attributes)['quiz_data'] = quiz_data
+      assignment.instance_variable_get(:@attributes)["quiz_data"] = quiz_data
+      clone.instance_variable_get(:@attributes)["quiz_data"] = quiz_data
     end
 
     # ActiveRecord::Base#clone wipes out some important crap; put it back
@@ -337,8 +337,8 @@ module AssignmentOverrideApplicator
   # the same collapsed assignment or quiz, regardless of the user that ended up at that
   # set of overrides.
   def self.collapsed_overrides(assignment_or_quiz, overrides)
-    cache_key = ['collapsed_overrides', assignment_or_quiz.cache_key(:availability), version_for_cache(assignment_or_quiz), overrides_hash(overrides)].cache_key
-    RequestCache.cache('collapsed_overrides', cache_key) do
+    cache_key = ["collapsed_overrides", assignment_or_quiz.cache_key(:availability), version_for_cache(assignment_or_quiz), overrides_hash(overrides)].cache_key
+    RequestCache.cache("collapsed_overrides", cache_key) do
       Rails.cache.fetch(cache_key) do
         overridden_data = {}
         # clone the assignment_or_quiz, apply overrides, and freeze
@@ -416,8 +416,8 @@ module AssignmentOverrideApplicator
   def self.should_preload_override_students?(assignments, user, endpoint_key)
     return false unless user
 
-    assignment_key = Digest::MD5.hexdigest(assignments.map(&:id).sort.map(&:to_s).join(','))
-    key = ['should_preload_assignment_override_students', user.cache_key(:enrollments), user.cache_key(:groups), endpoint_key, assignment_key].cache_key
+    assignment_key = Digest::MD5.hexdigest(assignments.map(&:id).sort.map(&:to_s).join(","))
+    key = ["should_preload_assignment_override_students", user.cache_key(:enrollments), user.cache_key(:groups), endpoint_key, assignment_key].cache_key
     # if the user has been touch we should preload all of the overrides because it's almost certain we'll need them all
     if Rails.cache.read(key)
       false

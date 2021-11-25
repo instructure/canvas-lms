@@ -22,13 +22,13 @@ class AddReplicaIdentityForDeveloperKeyAccountBindings < ActiveRecord::Migration
   disable_ddl_transaction!
 
   def up
-    add_replica_identity 'DeveloperKeyAccountBinding', :root_account_id, 0
-    remove_index :developer_key_account_bindings, name: 'index_developer_key_account_bindings_on_root_account_id', if_exists: true
+    add_replica_identity "DeveloperKeyAccountBinding", :root_account_id, 0
+    remove_index :developer_key_account_bindings, name: "index_developer_key_account_bindings_on_root_account_id", if_exists: true
   end
 
   def down
     add_index :developer_key_account_bindings, :root_account_id, algorithm: :concurrently, if_not_exists: true
-    remove_replica_identity 'DeveloperKeyAccountBinding'
+    remove_replica_identity "DeveloperKeyAccountBinding"
     change_column_null :developer_key_account_bindings, :root_account_id, true
   end
 end

@@ -140,7 +140,7 @@ class CollaborationsController < ApplicationController
     return unless authorized_action(@context, @current_user, :read) &&
                   tab_enabled?(@context.class::TAB_COLLABORATIONS)
 
-    add_crumb(t('#crumbs.collaborations', "Collaborations"), polymorphic_path([@context, :collaborations]))
+    add_crumb(t("#crumbs.collaborations", "Collaborations"), polymorphic_path([@context, :collaborations]))
     @collaborations = @context.collaborations.active.select { |c| can_do(c, @current_user, :read) }
     log_asset_access(["collaborations", @context], "collaborations", "other")
 
@@ -148,9 +148,9 @@ class CollaborationsController < ApplicationController
     user_has_google_drive
 
     @sunsetting_etherpad = EtherpadCollaboration.config.try(:[], :domain) == "etherpad.instructure.com/p"
-    @has_etherpad_collaborations = @collaborations.any? { |c| c.collaboration_type == 'EtherPad' }
+    @has_etherpad_collaborations = @collaborations.any? { |c| c.collaboration_type == "EtherPad" }
     @etherpad_only = Collaboration.collaboration_types.length == 1 &&
-                     Collaboration.collaboration_types[0]['type'] == "etherpad"
+                     Collaboration.collaboration_types[0]["type"] == "etherpad"
     @hide_create_ui = @sunsetting_etherpad && @etherpad_only
     js_env TITLE_MAX_LEN: Collaboration::TITLE_MAX_LENGTH,
            CAN_MANAGE_GROUPS:
@@ -185,7 +185,7 @@ class CollaborationsController < ApplicationController
 
     collaborations_query = @context.collaborations.active
                                    .eager_load(:user)
-                                   .where(type: 'ExternalToolCollaboration')
+                                   .where(type: "ExternalToolCollaboration")
 
     unless @context.grants_right?(@current_user, session, :manage_content)
       where_collaborators = Collaboration.arel_table[:user_id].eq(@current_user&.id)
@@ -216,7 +216,7 @@ class CollaborationsController < ApplicationController
       begin
         if @collaboration.valid_user?(@current_user)
           @collaboration.authorize_user(@current_user)
-          log_asset_access(@collaboration, "collaborations", "other", 'participate')
+          log_asset_access(@collaboration, "collaborations", "other", "participate")
           url = if @collaboration.is_a? ExternalToolCollaboration
                   external_tool_launch_url(
                     @collaboration.url,
@@ -230,12 +230,12 @@ class CollaborationsController < ApplicationController
         elsif @collaboration.is_a?(GoogleDocsCollaboration)
           redirect_to oauth_url(service: :google_drive, return_to: request.url)
         else
-          flash[:error] = t 'errors.cannot_load_collaboration', "Cannot load collaboration"
+          flash[:error] = t "errors.cannot_load_collaboration", "Cannot load collaboration"
           redirect_to named_context_url(@context, :context_collaborations_url)
         end
       rescue GoogleDrive::ConnectionException => e
         Canvas::Errors.capture(e, {}, :warn)
-        flash[:error] = t 'errors.cannot_load_collaboration', "Cannot load collaboration"
+        flash[:error] = t "errors.cannot_load_collaboration", "Cannot load collaboration"
         redirect_to named_context_url(@context, :context_collaborations_url)
       end
     end
@@ -245,12 +245,12 @@ class CollaborationsController < ApplicationController
     return unless authorized_action(@context, @current_user, :read) &&
                   tab_enabled?(@context.class::TAB_COLLABORATIONS)
 
-    @page_title = t('lti_collaborations', 'External Collaborations')
-    @body_classes << 'full-width padless-content'
+    @page_title = t("lti_collaborations", "External Collaborations")
+    @body_classes << "full-width padless-content"
     js_bundle :lti_collaborations
     css_bundle :react_collaborations
 
-    add_crumb(t('#crumbs.collaborations', "Collaborations"), polymorphic_path([@context, :lti_collaborations]))
+    add_crumb(t("#crumbs.collaborations", "Collaborations"), polymorphic_path([@context, :lti_collaborations]))
 
     if @context.instance_of? Group
       parent_context = @context.context
@@ -269,7 +269,7 @@ class CollaborationsController < ApplicationController
   def create
     return unless authorized_action(@context.collaborations.build, @current_user, :create) && authorized_action(@context, @current_user, :create_collaborations)
 
-    content_item = params['contentItems'] ? JSON.parse(params['contentItems']).first : nil
+    content_item = params["contentItems"] ? JSON.parse(params["contentItems"]).first : nil
     if content_item
       @collaboration = collaboration_from_content_item(content_item)
       users, group_ids = content_item_visibility(content_item)
@@ -292,7 +292,7 @@ class CollaborationsController < ApplicationController
         format.json { render json: @collaboration.as_json(methods: [:collaborator_ids], permissions: { user: @current_user, session: session }) }
       else
         Lti::ContentItemUtil.new(content_item).failure_callback if content_item
-        flash[:error] = t 'errors.create_failed', "Collaboration creation failed"
+        flash[:error] = t "errors.create_failed", "Collaboration creation failed"
         format.html { redirect_to named_context_url(@context, :context_collaborations_url) }
         format.json { render json: @collaboration.errors, status: :bad_request }
       end
@@ -305,7 +305,7 @@ class CollaborationsController < ApplicationController
     @collaboration = @context.collaborations.find(params[:id])
     return unless authorized_action(@collaboration, @current_user, :update)
 
-    content_item = params['contentItems'] ? JSON.parse(params['contentItems']).first : nil
+    content_item = params["contentItems"] ? JSON.parse(params["contentItems"]).first : nil
     begin
       if content_item
         @collaboration = collaboration_from_content_item(content_item, @collaboration)
@@ -331,18 +331,18 @@ class CollaborationsController < ApplicationController
           end
         else
           Lti::ContentItemUtil.new(content_item).failure_callback if content_item
-          flash[:error] = t 'errors.update_failed', "Collaboration update failed"
+          flash[:error] = t "errors.update_failed", "Collaboration update failed"
           format.html { redirect_to named_context_url(@context, :context_collaborations_url) }
           format.json { render json: @collaboration.errors, status: :bad_request }
         end
       end
     rescue GoogleDrive::ConnectionException => e
       Rails.logger.warn e
-      flash[:error] = t 'errors.update_failed', "Collaboration update failed" # generic failure message
-      if e.message.include?('File not found')
-        flash[:error] = t 'google_drive.file_not_found', "Collaboration file not found"
+      flash[:error] = t "errors.update_failed", "Collaboration update failed" # generic failure message
+      if e.message.include?("File not found")
+        flash[:error] = t "google_drive.file_not_found", "Collaboration file not found"
       end
-      raise e unless e.message.include?('File not found')
+      raise e unless e.message.include?("File not found")
 
       redirect_to named_context_url(@context, :context_collaborations_url)
     end
@@ -385,7 +385,7 @@ class CollaborationsController < ApplicationController
                                  self,
                                  api_v1_collaboration_members_url)
 
-    UserPastLtiId.manual_preload_past_lti_ids(collaborators, @context) if includes.include? 'collaborator_lti_id'
+    UserPastLtiId.manual_preload_past_lti_ids(collaborators, @context) if includes.include? "collaborator_lti_id"
     render(json: collaborators.map { |c| collaborator_json(c, @current_user, session, options, context: @context) })
   end
 
@@ -421,7 +421,7 @@ class CollaborationsController < ApplicationController
 
   def require_collaborations_configured
     unless Collaboration.any_collaborations_configured?(@context) || @domain_root_account.feature_enabled?(:new_collaborations)
-      flash[:error] = t 'errors.not_enabled', "Collaborations have not been enabled for this Canvas site"
+      flash[:error] = t "errors.not_enabled", "Collaborations have not been enabled for this Canvas site"
       redirect_to named_context_url(@context, :context_url)
       false
     end
@@ -429,13 +429,13 @@ class CollaborationsController < ApplicationController
 
   def collaboration_from_content_item(content_item, collaboration = ExternalToolCollaboration.new)
     collaboration.attributes = {
-      title: content_item['title'],
-      description: content_item['text'],
+      title: content_item["title"],
+      description: content_item["text"],
       user: @current_user
     }
     collaboration.data = content_item
-    collaboration.url = content_item['url']
-    collaboration.resource_link_lookup_uuid = content_item['lookup_uuid']
+    collaboration.url = content_item["url"]
+    collaboration.resource_link_lookup_uuid = content_item["lookup_uuid"]
     collaboration
   end
 
@@ -443,17 +443,17 @@ class CollaborationsController < ApplicationController
     polymorphic_url(
       [:retrieve, @context, :external_tools],
       url: url,
-      display: 'borderless',
+      display: "borderless",
       resource_link_lookup_id: resource_link_lookup_uuid
     )
   end
 
   def content_item_visibility(content_item)
-    visibility = content_item['ext_canvas_visibility'] ||
+    visibility = content_item["ext_canvas_visibility"] ||
                  content_item[Collaboration::DEEP_LINKING_EXTENSION]
 
-    lti_user_ids = visibility&.dig('users') || []
-    lti_group_ids = visibility&.dig('groups') || []
+    lti_user_ids = visibility&.dig("users") || []
+    lti_group_ids = visibility&.dig("groups") || []
 
     # Past user IDs, both 1.3 IDs (lti_id) and legacy LTI IDs (lti_context_id)
     users = User.active

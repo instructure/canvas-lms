@@ -318,7 +318,7 @@ class ContextModuleItemsApiController < ApplicationController
     if authorized_action(@context, @current_user, :read)
       @tag = @context.context_module_tags.not_deleted.find(params[:id])
       if !(@tag.unpublished? || @tag.context_module.unpublished?) || authorized_action(@tag.context_module, @current_user, :update)
-        if @tag.content_type == 'ExternalUrl'
+        if @tag.content_type == "ExternalUrl"
           @tag.context_module_action(@current_user, :read)
           redirect_to @tag.url
         else
@@ -392,7 +392,7 @@ class ContextModuleItemsApiController < ApplicationController
 
       item_params = params[:module_item].slice(:title, :type, :indent, :new_tab)
       item_params[:id] = params[:module_item][:content_id]
-      if ['Page', 'WikiPage'].include?(item_params[:type])
+      if ["Page", "WikiPage"].include?(item_params[:type])
         if (page_url = params[:module_item][:page_url])
           if (wiki_page = @context.wiki_pages.not_deleted.where(url: page_url).first)
             item_params[:id] = wiki_page.id
@@ -543,12 +543,12 @@ class ContextModuleItemsApiController < ApplicationController
   def select_mastery_path
     return unless authorized_action(@context, @current_user, :read)
     return unless @student == @current_user || authorized_action(@context, @current_user, [:manage_assignments, :manage_assignments_edit])
-    return render json: { message: 'mastery paths not enabled' }, status: :bad_request unless cyoe_enabled?(@context)
-    return render json: { message: 'assignment_set_id required' }, status: :bad_request unless params[:assignment_set_id]
+    return render json: { message: "mastery paths not enabled" }, status: :bad_request unless cyoe_enabled?(@context)
+    return render json: { message: "assignment_set_id required" }, status: :bad_request unless params[:assignment_set_id]
 
     get_module_item
     assignment = @item.assignment
-    return render json: { message: 'requested item is not an assignment' }, status: :bad_request unless assignment
+    return render json: { message: "requested item is not an assignment" }, status: :bad_request unless assignment
 
     assignment_ids = ConditionalRelease::OverrideHandler.handle_assignment_set_selection(@student, assignment, params[:assignment_set_id])
 
@@ -565,7 +565,7 @@ class ContextModuleItemsApiController < ApplicationController
     items = assignments.map(&:all_context_module_tags).flatten.select { |a| a.context_module_id == @module.id }
 
     render json: {
-      meta: { primaryCollection: 'assignments' },
+      meta: { primaryCollection: "assignments" },
       items: items.map { |item| module_item_json(item, @student || @current_user, session, @module) },
       assignments: assignments_json(assignments, @current_user, session)
     }
@@ -607,7 +607,7 @@ class ContextModuleItemsApiController < ApplicationController
       get_module_item
       @item.context_module_action(@current_user, :done)
       sync_planner_completion(@item.content, @current_user, true) if planner_enabled?
-      render json: { message: t('OK') }
+      render json: { message: t("OK") }
     end
   end
 
@@ -619,7 +619,7 @@ class ContextModuleItemsApiController < ApplicationController
         progression.evaluate
         sync_planner_completion(@item.content, @current_user, false) if planner_enabled?
       end
-      render json: { message: t('OK') }
+      render json: { message: t("OK") }
     end
   end
 
@@ -652,10 +652,10 @@ class ContextModuleItemsApiController < ApplicationController
   def item_sequence
     if authorized_action(@context, @current_user, :read)
       asset_type = Api.api_type_to_canvas_name(params[:asset_type])
-      return render json: { message: 'invalid asset_type' }, status: :bad_request unless asset_type
+      return render json: { message: "invalid asset_type" }, status: :bad_request unless asset_type
 
       asset_id = params[:asset_id]
-      return render json: { message: 'missing asset_id' }, status: :bad_request unless asset_id
+      return render json: { message: "missing asset_id" }, status: :bad_request unless asset_id
 
       result = context_module_sequence_items_by_asset_id(asset_id, asset_type)
       render json: result
@@ -680,10 +680,10 @@ class ContextModuleItemsApiController < ApplicationController
     if authorized_action(@context, @current_user, :read)
       get_module_item
       content = @item.content.respond_to?(:locked_for?) ? @item.content : @item
-      return render json: { message: t('The module item is locked.') }, status: :forbidden if content.locked_for?(@current_user)
+      return render json: { message: t("The module item is locked.") }, status: :forbidden if content.locked_for?(@current_user)
 
       @item.context_module_action(@current_user, :read)
-      render json: { message: t('OK') }
+      render json: { message: t("OK") }
     end
   end
 
@@ -714,8 +714,8 @@ class ContextModuleItemsApiController < ApplicationController
         new_tag.insert_at(original_tag.position + 1)
 
         json = new_tag.as_json
-        json['new_positions'] = new_tag.context_module.content_tags.select(:id, :position)
-        json['content_tag'].merge!(
+        json["new_positions"] = new_tag.context_module.content_tags.select(:id, :position)
+        json["content_tag"].merge!(
           publishable: module_item_publishable?(new_tag),
           published: new_tag.published?,
           publishable_id: module_item_publishable_id(new_tag),

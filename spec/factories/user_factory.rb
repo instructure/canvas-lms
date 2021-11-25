@@ -33,7 +33,7 @@ module Factories
 
   def valid_user_attributes
     {
-      name: 'value for name',
+      name: "value for name",
     }
   end
 
@@ -112,21 +112,21 @@ module Factories
 
   def student_in_section(section, opts = {})
     student = opts.fetch(:user) { user_factory }
-    enrollment = section.course.enroll_user(student, 'StudentEnrollment', section: section,
+    enrollment = section.course.enroll_user(student, "StudentEnrollment", section: section,
                                                                           force_update: true,
                                                                           allow_multiple_enrollments: opts[:allow_multiple_enrollments])
     student.save!
-    enrollment.workflow_state = 'active'
+    enrollment.workflow_state = "active"
     enrollment.save!
     student
   end
 
   def ta_in_section(section, opts = {})
     ta = opts.fetch(:user) { user_factory }
-    enrollment = section.course.enroll_user(ta, 'TaEnrollment', section: section, force_update: true)
+    enrollment = section.course.enroll_user(ta, "TaEnrollment", section: section, force_update: true)
     ta.save!
     enrollment.limit_privileges_to_course_section = true unless opts[:full_course_permissions]
-    enrollment.workflow_state = 'active'
+    enrollment.workflow_state = "active"
     enrollment.save!
     ta
   end
@@ -134,11 +134,11 @@ module Factories
   def teacher_in_section(section, opts = {})
     teacher = opts.fetch(:user) { user_factory }
     limit_privileges_to_course_section = opts[:limit_privileges_to_course_section] || false
-    enrollment = section.course.enroll_user(teacher, 'TeacherEnrollment', section: section,
+    enrollment = section.course.enroll_user(teacher, "TeacherEnrollment", section: section,
                                                                           force_update: true, limit_privileges_to_course_section: limit_privileges_to_course_section,
                                                                           allow_multiple_enrollments: opts[:allow_multiple_enrollments])
     teacher.save!
-    enrollment.workflow_state = 'active'
+    enrollment.workflow_state = "active"
     enrollment.save!
     teacher
   end

@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'nokogiri'
+require "nokogiri"
 
 describe "assignments" do
   def multiple_section_submissions
@@ -51,7 +51,7 @@ describe "assignments" do
     get "/courses/#{@course.id}/assignments/#{@assignment.id}"
 
     expect(response).to be_successful
-    expect(Nokogiri::HTML5(response.body).at_css('.graded_count').text).to match(/0 out of 2/)
+    expect(Nokogiri::HTML5(response.body).at_css(".graded_count").text).to match(/0 out of 2/)
   end
 
   it "lists ungraded and total submissions for ta correctly" do
@@ -65,19 +65,19 @@ describe "assignments" do
     get "/courses/#{@course.id}/assignments/#{@assignment.id}"
 
     expect(response).to be_successful
-    expect(Nokogiri::HTML5(response.body).at_css('.graded_count').text).to match(/0 out of 1/)
+    expect(Nokogiri::HTML5(response.body).at_css(".graded_count").text).to match(/0 out of 1/)
   end
 
   it "shows student view student submission as needing grading" do
     course_with_teacher_logged_in(active_all: true)
     @fake_student = @course.student_view_student
-    assignment_model(course: @course, submission_types: 'online_text_entry', title: 'Assignment 1')
-    @assignment.submit_homework(@fake_student, submission_type: 'online_text_entry', body: "my submission")
+    assignment_model(course: @course, submission_types: "online_text_entry", title: "Assignment 1")
+    @assignment.submit_homework(@fake_student, submission_type: "online_text_entry", body: "my submission")
 
     get "/courses/#{@course.id}/assignments/#{@assignment.id}"
 
     expect(response).to be_successful
-    expect(Nokogiri::HTML5(response.body).at_css('.graded_count').text).to match(/0 out of 1/)
+    expect(Nokogiri::HTML5(response.body).at_css(".graded_count").text).to match(/0 out of 1/)
   end
 
   describe "due date overrides" do
@@ -125,16 +125,16 @@ end
 describe "download submissions link" do
   before do
     course_with_teacher_logged_in(active_all: true)
-    assignment_model(course: @course, submission_types: 'online_url', title: 'Assignment 1')
-    @student = User.create!(name: 'student1')
+    assignment_model(course: @course, submission_types: "online_url", title: "Assignment 1")
+    @student = User.create!(name: "student1")
     @student.register!
-    @student.workflow_state = 'active'
-    @student2 = User.create!(name: 'student2')
+    @student.workflow_state = "active"
+    @student2 = User.create!(name: "student2")
     @student2.register
-    @student2.workflow_state = 'active'
+    @student2.workflow_state = "active"
     @student2.save
-    @course.enroll_user(@student, 'StudentEnrollment')
-    @course.enroll_user(@student2, 'StudentEnrollment')
+    @course.enroll_user(@student, "StudentEnrollment")
+    @course.enroll_user(@student2, "StudentEnrollment")
     @course.save!
     @student.save!
     @student2.save!
@@ -144,56 +144,56 @@ describe "download submissions link" do
     get "/courses/#{@course.id}/assignments/#{@assignment.id}"
     expect(response).to be_successful
     doc = Nokogiri::HTML5(response.body)
-    expect(doc.at_css('#download_submission_button')).to be_nil
+    expect(doc.at_css("#download_submission_button")).to be_nil
   end
 
   it "does not show download submissions button with no submissions from active students" do
     @submission = @assignment.submissions.find_by!(user: @student)
-    @submission.update(submission_type: 'online_url')
+    @submission.update(submission_type: "online_url")
     @student.enrollments.each(&:conclude)
 
     get "/courses/#{@course.id}/assignments/#{@assignment.id}"
     expect(response).to be_successful
     doc = Nokogiri::HTML5(response.body)
-    expect(doc.at_css('#download_submission_button')).to be_nil
+    expect(doc.at_css("#download_submission_button")).to be_nil
   end
 
   it "shows download submissions button with submission not graded" do
     @submission = @assignment.submissions.find_by!(user: @student)
-    @submission.update(submission_type: 'online_url')
+    @submission.update(submission_type: "online_url")
     expect(@submission.state).to eql(:submitted)
 
     get "/courses/#{@course.id}/assignments/#{@assignment.id}"
     expect(response).to be_successful
     doc = Nokogiri::HTML5(response.body)
-    expect(doc.at_css('#download_submission_button')).not_to be_nil
+    expect(doc.at_css("#download_submission_button")).not_to be_nil
   end
 
   it "shows download submissions button with a submission graded" do
     @submission = @assignment.submissions.find_by!(user: @student)
-    @submission.update!(submission_type: 'online_url')
+    @submission.update!(submission_type: "online_url")
     @submission.grade_it
     @submission.score = 5
     @submission.save!
     expect(@submission.state).to eql(:graded)
     @submission2 = @assignment.submissions.find_by!(user: @student2)
-    @submission2.update!(submission_type: 'online_url')
+    @submission2.update!(submission_type: "online_url")
 
     get "/courses/#{@course.id}/assignments/#{@assignment.id}"
     expect(response).to be_successful
     doc = Nokogiri::HTML5(response.body)
-    expect(doc.at_css('#download_submission_button')).not_to be_nil
+    expect(doc.at_css("#download_submission_button")).not_to be_nil
   end
 
   it "shows download submissions button with all submissions graded" do
     @submission = @assignment.submissions.find_by!(user: @student)
-    @submission.update!(submission_type: 'online_url')
+    @submission.update!(submission_type: "online_url")
     @submission.grade_it
     @submission.score = 5
     @submission.save!
     expect(@submission.state).to eql(:graded)
     @submission2 = @assignment.submissions.find_by!(user: @student2)
-    @submission2.update!(submission_type: 'online_url')
+    @submission2.update!(submission_type: "online_url")
     @submission2.grade_it
     @submission2.score = 5
     @submission2.save!
@@ -202,34 +202,34 @@ describe "download submissions link" do
     get "/courses/#{@course.id}/assignments/#{@assignment.id}"
     expect(response).to be_successful
     doc = Nokogiri::HTML5(response.body)
-    expect(doc.at_css('#download_submission_button')).not_to be_nil
+    expect(doc.at_css("#download_submission_button")).not_to be_nil
   end
 
   it "does not show download submissions button to students" do
     @submission = @assignment.submissions.find_by!(user: @student)
-    @submission.update!(submission_type: 'online_url')
+    @submission.update!(submission_type: "online_url")
     expect(@submission.state).to eql(:submitted)
     user_session(@student)
     get "/courses/#{@course.id}/assignments/#{@assignment.id}"
     expect(response).to be_successful
     doc = Nokogiri::HTML5(response.body)
-    expect(doc.at_css('#download_submission_button')).to be_nil
+    expect(doc.at_css("#download_submission_button")).to be_nil
   end
 end
 
 describe "ratio of submissions graded" do
   before do
     course_with_teacher_logged_in(active_all: true)
-    assignment_model(course: @course, submission_types: 'online_url', title: 'Assignment 1')
-    @student = User.create!(name: 'student1')
+    assignment_model(course: @course, submission_types: "online_url", title: "Assignment 1")
+    @student = User.create!(name: "student1")
     @student.register!
-    @student.workflow_state = 'active'
-    @student2 = User.create!(name: 'student2')
+    @student.workflow_state = "active"
+    @student2 = User.create!(name: "student2")
     @student2.register
-    @student2.workflow_state = 'active'
+    @student2.workflow_state = "active"
     @student2.save
-    @course.enroll_user(@student, 'StudentEnrollment')
-    @course.enroll_user(@student2, 'StudentEnrollment')
+    @course.enroll_user(@student, "StudentEnrollment")
+    @course.enroll_user(@student2, "StudentEnrollment")
     @course.save!
     @student.save!
     @student2.save!
@@ -239,48 +239,48 @@ describe "ratio of submissions graded" do
     get "/courses/#{@course.id}/assignments/#{@assignment.id}"
     expect(response).to be_successful
     doc = Nokogiri::HTML5(response.body)
-    expect(doc.at_css('#ratio_of_submissions_graded')).to be_nil
+    expect(doc.at_css("#ratio_of_submissions_graded")).to be_nil
   end
 
   it "shows ratio of submissions graded with submission not graded" do
     @submission = @assignment.submissions.find_by!(user: @student)
-    @submission.update!(submission_type: 'online_url')
+    @submission.update!(submission_type: "online_url")
     expect(@submission.state).to eql(:submitted)
     @submission2 = @assignment.submissions.find_by!(user: @student2)
-    @submission2.update!(submission_type: 'online_url')
+    @submission2.update!(submission_type: "online_url")
     expect(@submission2.state).to eql(:submitted)
 
     get "/courses/#{@course.id}/assignments/#{@assignment.id}"
     expect(response).to be_successful
     doc = Nokogiri::HTML5(response.body)
-    expect(doc.at_css('#ratio_of_submissions_graded').text.strip).to eq "0 out of 2 Submissions Graded"
+    expect(doc.at_css("#ratio_of_submissions_graded").text.strip).to eq "0 out of 2 Submissions Graded"
   end
 
   it "shows ratio of submissions graded with a submission graded" do
     @submission = @assignment.submissions.find_by!(user: @student)
-    @submission.update!(submission_type: 'online_url')
+    @submission.update!(submission_type: "online_url")
     @submission.grade_it
     @submission.score = 5
     @submission.save!
     expect(@submission.state).to eql(:graded)
     @submission2 = @assignment.submissions.find_by!(user: @student2)
-    @submission2.update!(submission_type: 'online_url')
+    @submission2.update!(submission_type: "online_url")
 
     get "/courses/#{@course.id}/assignments/#{@assignment.id}"
     expect(response).to be_successful
     doc = Nokogiri::HTML5(response.body)
-    expect(doc.at_css('#ratio_of_submissions_graded').text.strip).to eq "1 out of 2 Submissions Graded"
+    expect(doc.at_css("#ratio_of_submissions_graded").text.strip).to eq "1 out of 2 Submissions Graded"
   end
 
   it "shows ratio of submissions graded with all submissions graded" do
     @submission = @assignment.submissions.find_by!(user: @student)
-    @submission.update!(submission_type: 'online_url')
+    @submission.update!(submission_type: "online_url")
     @submission.grade_it
     @submission.score = 5
     @submission.save!
     expect(@submission.state).to eql(:graded)
     @submission2 = @assignment.submissions.find_by!(user: @student2)
-    @submission2.update!(submission_type: 'online_url')
+    @submission2.update!(submission_type: "online_url")
     @submission2.grade_it
     @submission2.score = 5
     @submission2.save!
@@ -289,32 +289,32 @@ describe "ratio of submissions graded" do
     get "/courses/#{@course.id}/assignments/#{@assignment.id}"
     expect(response).to be_successful
     doc = Nokogiri::HTML5(response.body)
-    expect(doc.at_css('#ratio_of_submissions_graded').text.strip).to eq "2 out of 2 Submissions Graded"
+    expect(doc.at_css("#ratio_of_submissions_graded").text.strip).to eq "2 out of 2 Submissions Graded"
   end
 
   it "does not show ratio of submissions graded to students" do
     @submission = @assignment.submissions.find_by!(user: @student)
-    @submission.update!(submission_type: 'online_url')
+    @submission.update!(submission_type: "online_url")
     expect(@submission.state).to eql(:submitted)
 
     user_session(@student)
     get "/courses/#{@course.id}/assignments/#{@assignment.id}"
     expect(response).to be_successful
     doc = Nokogiri::HTML5(response.body)
-    expect(doc.at_css('#ratio_of_submissions_graded')).to be_nil
+    expect(doc.at_css("#ratio_of_submissions_graded")).to be_nil
   end
 
-  describe 'assignment moderation' do
-    let(:moderate_button) { Nokogiri::HTML5(response.body).at_css('#moderated_grading_button') }
+  describe "assignment moderation" do
+    let(:moderate_button) { Nokogiri::HTML5(response.body).at_css("#moderated_grading_button") }
 
-    it 'shows the moderation link for moderated assignments' do
+    it "shows the moderation link for moderated assignments" do
       @assignment.update!(moderated_grading: true, grader_count: 1, final_grader: @teacher)
 
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
       expect(moderate_button).not_to be_nil
     end
 
-    it 'does not show the moderation link for non-moderated assignments' do
+    it "does not show the moderation link for non-moderated assignments" do
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
       expect(moderate_button).to be_nil
     end
@@ -336,7 +336,7 @@ describe "assignments_2 feature flag and parameter" do
       it "shows the old assignments page even with query parameter" do
         get "/courses/#{@course.id}/assignments/#{@assignment.id}?assignments_2=1"
         html = Nokogiri::HTML5(response.body)
-        expect(html.at_css('div#assignment_show')).to be
+        expect(html.at_css("div#assignment_show")).to be
       end
     end
 
@@ -348,13 +348,13 @@ describe "assignments_2 feature flag and parameter" do
       it "shows new assignments" do
         get "/courses/#{@course.id}/assignments/#{@assignment.id}"
         html = Nokogiri::HTML5(response.body)
-        expect(html.at_css('div#assignment_show')).not_to be
+        expect(html.at_css("div#assignment_show")).not_to be
       end
 
       it "shows old assignments when explicitly requested" do
         get "/courses/#{@course.id}/assignments/#{@assignment.id}?assignments_2=0"
         html = Nokogiri::HTML5(response.body)
-        expect(html.at_css('div#assignment_show')).to be
+        expect(html.at_css("div#assignment_show")).to be
       end
     end
   end
@@ -373,7 +373,7 @@ describe "assignments_2 feature flag and parameter" do
       it "shows the old assignments page even with query parameter" do
         get "/courses/#{@course.id}/assignments/#{@assignment.id}?assignments_2=1"
         html = Nokogiri::HTML5(response.body)
-        expect(html.at_css('div#assignment_show')).to be
+        expect(html.at_css("div#assignment_show")).to be
       end
     end
 
@@ -383,21 +383,21 @@ describe "assignments_2 feature flag and parameter" do
       end
 
       it "shows new assignments by default" do
-        @assignment.submission_types = 'online_text_entry'
+        @assignment.submission_types = "online_text_entry"
         @assignment.save!
         get "/courses/#{@course.id}/assignments/#{@assignment.id}"
         html = Nokogiri::HTML5(response.body)
-        expect(html.at_css('div#assignment_show')).not_to be
+        expect(html.at_css("div#assignment_show")).not_to be
       end
 
       it "shows old assignments if requested" do
         get "/courses/#{@course.id}/assignments/#{@assignment.id}?assignments_2=0"
         html = Nokogiri::HTML5(response.body)
-        expect(html.at_css('div#assignment_show')).to be
+        expect(html.at_css("div#assignment_show")).to be
       end
 
       it "sets the necessary RCS ENV" do
-        @assignment.submission_types = 'online_text_entry'
+        @assignment.submission_types = "online_text_entry"
         @assignment.save!
         get "/courses/#{@course.id}/assignments/#{@assignment.id}"
         expect(controller.js_env).to have_key(:RICH_CONTENT_APP_HOST)
@@ -409,12 +409,12 @@ describe "assignments_2 feature flag and parameter" do
     before(:once) do
       course_with_student(active_all: true)
       @assignment = @course.assignments.create!(title: "Some Assignment")
-      @observer = user_factory(active_all: true, active_state: 'active')
+      @observer = user_factory(active_all: true, active_state: "active")
       @course.enroll_user(
         @observer,
-        'ObserverEnrollment',
+        "ObserverEnrollment",
         section: @course.course_sections.first,
-        enrollment_state: 'active', allow_multiple_enrollments: true
+        enrollment_state: "active", allow_multiple_enrollments: true
       )
       add_linked_observer(@student, @observer)
     end
@@ -423,7 +423,7 @@ describe "assignments_2 feature flag and parameter" do
       user_session(@observer)
     end
 
-    let(:old_assignment_page_indicator) { Nokogiri::HTML5(response.body).at_css('div#assignment_show') }
+    let(:old_assignment_page_indicator) { Nokogiri::HTML5(response.body).at_css("div#assignment_show") }
 
     context "with the feature disabled" do
       it "shows the old assignments page even with query parameter" do
@@ -469,7 +469,7 @@ describe "assignments_2 feature flag and parameter" do
       user_session(@student)
       expect(UserContent::FilesHandler).to receive(:new).with(hash_including(is_public: false))
       assignment = @course.assignments.create(
-        title: 'some assignment',
+        title: "some assignment",
         description: description
       )
       get "/courses/#{@course.id}/assignments/#{assignment.id}"

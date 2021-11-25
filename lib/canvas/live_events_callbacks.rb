@@ -70,9 +70,9 @@ module Canvas::LiveEventsCallbacks
       Canvas::LiveEvents.module_created(obj)
     when ContentTag
       case obj.tag_type
-      when 'context_module'
+      when "context_module"
         Canvas::LiveEvents.module_item_created(obj)
-      when 'learning_outcome_association'
+      when "learning_outcome_association"
         Canvas::LiveEvents.learning_outcome_link_created(obj)
       end
     when LearningOutcomeResult
@@ -136,7 +136,7 @@ module Canvas::LiveEventsCallbacks
       if attachment_eligible?(obj)
         if changes["display_name"]
           Canvas::LiveEvents.attachment_updated(obj, changes["display_name"].first)
-        elsif changes["file_state"] && obj.file_state == 'deleted'
+        elsif changes["file_state"] && obj.file_state == "deleted"
           # Attachments are often soft deleted rather than destroyed
           Canvas::LiveEvents.attachment_deleted(obj)
         end
@@ -158,16 +158,16 @@ module Canvas::LiveEventsCallbacks
         singleton_key = "course_progress_course_#{obj.context_module.global_context_id}_user_#{obj.global_user_id}"
         CourseProgress.delay_if_production(
           singleton: singleton_key,
-          run_at: Setting.get('course_progress_live_event_delay_seconds', '120').to_i.seconds.from_now,
+          run_at: Setting.get("course_progress_live_event_delay_seconds", "120").to_i.seconds.from_now,
           on_conflict: :overwrite,
           priority: 15
         ).dispatch_live_event(obj)
       end
     when ContentTag
       case obj.tag_type
-      when 'context_module'
+      when "context_module"
         Canvas::LiveEvents.module_item_updated(obj)
-      when 'learning_outcome_association'
+      when "learning_outcome_association"
         Canvas::LiveEvents.learning_outcome_link_updated(obj)
       end
     when LearningOutcomeResult

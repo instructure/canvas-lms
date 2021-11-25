@@ -25,8 +25,8 @@ describe PlannerHelper do
       @assignment = @course.assignments.create!(name: "pls submit", submission_types: ["online_text_entry"], points_possible: 42)
       @assignment.publish
 
-      @discussion_assignment = @course.assignments.create!(title: 'graded discussion assignment', due_at: 1.day.from_now, points_possible: 10)
-      @discussion = @course.discussion_topics.create!(assignment: @discussion_assignment, title: 'graded discussion')
+      @discussion_assignment = @course.assignments.create!(title: "graded discussion assignment", due_at: 1.day.from_now, points_possible: 10)
+      @discussion = @course.discussion_topics.create!(assignment: @discussion_assignment, title: "graded discussion")
       @discussion.publish
 
       @quiz = generate_quiz(@course)
@@ -40,7 +40,7 @@ describe PlannerHelper do
 
     describe "#completes_planner_item_for_submission" do
       it "completes an assignment override" do
-        @assignment.submit_homework(@student, body: 'hello world')
+        @assignment.submit_homework(@student, body: "hello world")
         @assignment_po.reload
         expect(@assignment_po.marked_complete).to be_truthy
       end

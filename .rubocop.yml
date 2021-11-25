@@ -181,14 +181,16 @@ Style/PercentQLiterals:
   EnforcedStyle: upper_case_q
 Style/PerlBackrefs:
   Enabled: false # Regexp.last_match(1) is far worse than $1
-Style/QuotedSymbols:
-  EnforcedStyle: double_quotes # once Style/StringLiterals is enabled, we can remove this since it will inherit
 Style/RescueStandardError:
   EnforcedStyle: implicit
 Style/ReturnNil:
   Enabled: false # explicit nil is okay when a method is expected to have a return value
 Style/SpecialGlobalVars:
   Enabled: false # $! and $? are fine
+Style/StringLiterals:
+  EnforcedStyle: double_quotes
+Style/StringLiteralsInInterpolation:
+  EnforcedStyle: double_quotes
 Style/SymbolArray:
   MinSize: 3
 Style/TernaryParentheses:
@@ -453,13 +455,6 @@ Style/RescueModifier:
   AutoCorrect: false
 Style/StringConcatenation:
   Enabled: false
-  AutoCorrect: false
-Style/StringLiterals:
-  EnforcedStyle: double_quotes
-  Enabled: false
-  AutoCorrect: false
-Style/StringLiteralsInInterpolation:
-  Severity: convention
   AutoCorrect: false
 Style/TrailingCommaInArrayLiteral:
   Enabled: false

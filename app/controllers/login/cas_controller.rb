@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'casclient'
+require "casclient"
 
 class Login::CasController < ApplicationController
   include Login::Shared
@@ -44,7 +44,7 @@ class Login::CasController < ApplicationController
 
     st = CASClient::ServiceTicket.new(params[:ticket], cas_login_url)
     begin
-      default_timeout = Setting.get('cas_timelimit', 5.seconds.to_s).to_f
+      default_timeout = Setting.get("cas_timelimit", 5.seconds.to_s).to_f
 
       timeout_options = { raise_on_timeout: true, fallback_timeout_length: default_timeout }
 
@@ -108,8 +108,8 @@ class Login::CasController < ApplicationController
     if !Canvas.redis_enabled?
       # NOT SUPPORTED without redis
       return render plain: "NOT SUPPORTED", status: :method_not_allowed
-    elsif params['logoutRequest'] &&
-          (match = params['logoutRequest'].match(CAS_SAML_LOGOUT_REQUEST))
+    elsif params["logoutRequest"] &&
+          (match = params["logoutRequest"].match(CAS_SAML_LOGOUT_REQUEST))
       # we *could* validate the timestamp here, but the whole request is easily spoofed anyway, so there's no
       # point. all the security is in the ticket being secret and non-predictable
       return render plain: "OK", status: :ok if Pseudonym.expire_cas_ticket(match[:session_index])
@@ -122,12 +122,12 @@ class Login::CasController < ApplicationController
 
   def aac
     @aac ||= begin
-      scope = @domain_root_account.authentication_providers.active.where(auth_type: 'cas')
+      scope = @domain_root_account.authentication_providers.active.where(auth_type: "cas")
       params[:id] ? scope.find(params[:id]) : scope.first!
     end
   end
 
   def cas_login_url
-    url_for({ controller: 'login/cas', action: :new }.merge(params.permit(:id).to_unsafe_h))
+    url_for({ controller: "login/cas", action: :new }.merge(params.permit(:id).to_unsafe_h))
   end
 end

@@ -26,7 +26,7 @@ describe Polling::Poll do
 
   context "creating a poll" do
     it "requires an associated user" do
-      expect { Polling::Poll.create!(question: 'A Test Poll') }.to raise_error(ActiveRecord::RecordInvalid,
+      expect { Polling::Poll.create!(question: "A Test Poll") }.to raise_error(ActiveRecord::RecordInvalid,
                                                                                /User can't be blank/)
     end
 
@@ -36,7 +36,7 @@ describe Polling::Poll do
     end
 
     it "saves successfully" do
-      @poll = Polling::Poll.create!(user: @teacher, question: 'A Test Poll', description: 'A test description.')
+      @poll = Polling::Poll.create!(user: @teacher, question: "A Test Poll", description: "A test description.")
       expect(@poll).to be_valid
     end
   end
@@ -44,7 +44,7 @@ describe Polling::Poll do
   describe "#closed_and_viewable_for?" do
     it "returns false if the latest poll session available to the user is opened" do
       student = student_in_course(active_user: true).user
-      poll = @teacher.polls.create!(question: 'A Test Poll')
+      poll = @teacher.polls.create!(question: "A Test Poll")
       session = poll.poll_sessions.create(course: @course)
       session.publish!
 
@@ -54,8 +54,8 @@ describe Polling::Poll do
     context "the latest poll session available to the user is closed" do
       before do
         @student = student_in_course(active_user: true).user
-        @poll = @teacher.polls.create!(question: 'A Test Poll')
-        @choice = @poll.poll_choices.create!(text: 'Choice A', is_correct: true)
+        @poll = @teacher.polls.create!(question: "A Test Poll")
+        @choice = @poll.poll_choices.create!(text: "Choice A", is_correct: true)
         @session = @poll.poll_sessions.create(course: @course)
       end
 
@@ -91,12 +91,12 @@ describe Polling::Poll do
     end
 
     before do
-      @poll = @teacher.polls.create!(question: 'A Test Poll')
-      @choice1 = @poll.poll_choices.create!(text: 'Choice A', is_correct: false)
-      @choice2 = @poll.poll_choices.create!(text: 'Choice B', is_correct: true)
-      @choice3 = @poll.poll_choices.create!(text: 'Choice B', is_correct: false)
+      @poll = @teacher.polls.create!(question: "A Test Poll")
+      @choice1 = @poll.poll_choices.create!(text: "Choice A", is_correct: false)
+      @choice2 = @poll.poll_choices.create!(text: "Choice B", is_correct: true)
+      @choice3 = @poll.poll_choices.create!(text: "Choice B", is_correct: false)
 
-      @section = @course.course_sections.create!(name: 'Section 2')
+      @section = @course.course_sections.create!(name: "Section 2")
     end
 
     it "sums multiple poll session results together" do

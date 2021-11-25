@@ -51,7 +51,7 @@ module ActiveSupport
           else
             if batch_object # just fall back to the usual after appending to the key if needed
               key += (if Canvas::CacheRegister.enabled?
-                        "/#{batched_keys&.map { |bk| batch_object.cache_key(bk) }&.join('/')}"
+                        "/#{batched_keys&.map { |bk| batch_object.cache_key(bk) }&.join("/")}"
                       else
                         "/#{batch_object.cache_key}"
                       end)

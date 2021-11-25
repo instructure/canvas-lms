@@ -39,15 +39,15 @@ describe DataFixup::MoveFeatureFlagsToSettings do
 
   def with_feature_definitions
     allow(Feature).to receive(:definitions).and_return({
-                                                         'course_feature_going_away' => Feature.new(feature: 'course_feature_going_away', applies_to: 'Course', state: 'hidden'),
-                                                         'root_account_feature_going_away' => Feature.new(feature: 'root_account_feature_going_away', applies_to: 'RootAccount', state: 'hidden'),
+                                                         "course_feature_going_away" => Feature.new(feature: "course_feature_going_away", applies_to: "Course", state: "hidden"),
+                                                         "root_account_feature_going_away" => Feature.new(feature: "root_account_feature_going_away", applies_to: "RootAccount", state: "hidden"),
                                                        })
     yield
     allow(Feature).to receive(:definitions).and_call_original
   end
 
   it "handles unknown ff state gracefully" do
-    override = @root_account.feature_flags.build(feature: 'root_account_feature_going_away')
+    override = @root_account.feature_flags.build(feature: "root_account_feature_going_away")
     override.state = "some_invalid_state"
     override.save!(validate: false)
 

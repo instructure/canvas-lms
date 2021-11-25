@@ -63,8 +63,8 @@ describe UserProfile do
       expect(tabs.detect { |t| t[:id] == UserProfile::TAB_FILES }[:label]).to_not eq "Files"
     end
 
-    context 'with lti tabs' do
-      let(:visibility) { 'public' }
+    context "with lti tabs" do
+      let(:visibility) { "public" }
       let(:additional_settings) do
         {
           user_navigation:
@@ -77,7 +77,7 @@ describe UserProfile do
         }.with_indifferent_access
       end
 
-      context 'with non-admin' do
+      context "with non-admin" do
         it "does show lti tab" do
           student_in_course(active_all: true)
           external_tool_model(
@@ -91,7 +91,7 @@ describe UserProfile do
           )
         end
 
-        context 'with permission needed' do
+        context "with permission needed" do
           let(:additional_settings) do
             {
               user_navigation:
@@ -100,12 +100,12 @@ describe UserProfile do
                   "default" => "enabled",
                   "text" => "LTI or die",
                   "visibility" => visibility,
-                  :required_permissions => 'manage_data_services'
+                  :required_permissions => "manage_data_services"
                 }
             }.with_indifferent_access
           end
 
-          it 'does not show the tab' do
+          it "does not show the tab" do
             student_in_course(active_all: true)
             external_tool_model(
               context: account,
@@ -120,7 +120,7 @@ describe UserProfile do
         end
       end
 
-      context 'with admin' do
+      context "with admin" do
         it "does show lti tab" do
           account_admin_user
           external_tool_model(
@@ -135,10 +135,10 @@ describe UserProfile do
         end
       end
 
-      context 'with visiblity as admins' do
-        let(:visibility) { 'admins' }
+      context "with visiblity as admins" do
+        let(:visibility) { "admins" }
 
-        context 'with non-admin' do
+        context "with non-admin" do
           it "does not show lti tab" do
             student_in_course(active_all: true)
             external_tool_model(
@@ -153,7 +153,7 @@ describe UserProfile do
           end
         end
 
-        context 'with admin' do
+        context "with admin" do
           it "does show lti tab" do
             account_admin_user
             external_tool_model(
@@ -169,7 +169,7 @@ describe UserProfile do
         end
       end
 
-      context 'with permission needed' do
+      context "with permission needed" do
         let(:additional_settings) do
           {
             user_navigation:
@@ -178,12 +178,12 @@ describe UserProfile do
                 "default" => "enabled",
                 "text" => "LTI or die",
                 "visibility" => visibility,
-                :required_permissions => 'manage_data_services'
+                :required_permissions => "manage_data_services"
               }
           }.with_indifferent_access
         end
 
-        it 'does show the tab' do
+        it "does show the tab" do
           account_admin_user
           external_tool_model(
             context: account,

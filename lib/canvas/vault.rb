@@ -17,10 +17,10 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'vault'
+require "vault"
 
 module Canvas::Vault
-  CACHE_KEY_PREFIX = 'vault/'
+  CACHE_KEY_PREFIX = "vault/"
   class MissingVaultSecret < StandardError; end
 
   class << self
@@ -71,11 +71,11 @@ module Canvas::Vault
     end
 
     def kv_mount
-      config[:kv_mount] || 'app-canvas'
+      config[:kv_mount] || "app-canvas"
     end
 
     def config
-      ConfigFile.load('vault').try(:symbolize_keys) || {}
+      ConfigFile.load("vault").try(:symbolize_keys) || {}
     end
 
     private

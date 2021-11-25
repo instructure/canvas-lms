@@ -18,11 +18,11 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'spec_helper'
+require "spec_helper"
 
 describe PaginatedCollection do
-  describe '.build' do
-    it 'returns a #paginate proxy' do
+  describe ".build" do
+    it "returns a #paginate proxy" do
       expect { PaginatedCollection.build }.to raise_error(ArgumentError)
       proxy = PaginatedCollection.build { |pager| pager }
       expect(proxy).to be_a_kind_of(PaginatedCollection::Proxy)
@@ -31,8 +31,8 @@ describe PaginatedCollection do
     end
   end
 
-  describe '#paginate' do
-    it 'uses the provided collection' do
+  describe "#paginate" do
+    it "uses the provided collection" do
       expect { PaginatedCollection.build { [] }.paginate(per_page: 5) }.to raise_error(ArgumentError)
       items = PaginatedCollection.build { |pager| pager.replace([1, 2]) }.paginate(page: 1, per_page: 5)
       expect(items).to eq [1, 2]
@@ -45,9 +45,9 @@ describe PaginatedCollection do
       end
     end
 
-    it 'uses the pager returned' do
+    it "uses the pager returned" do
       # using WillPaginate Array to get WillPaginate style object
-      @simple = ('a'..'c').to_a
+      @simple = ("a".."c").to_a
 
       proxy = PaginatedCollection.build do |pager|
         result = @simple.paginate(page: pager.current_page, per_page: pager.per_page)

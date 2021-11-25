@@ -212,7 +212,7 @@ class AppointmentGroupsController < ApplicationController
   before_action :get_appointment_group, only: %i[show update destroy users groups edit]
 
   def calendar_fragment(opts)
-    opts.to_json.unpack('H*')
+    opts.to_json.unpack("H*")
   end
   private :calendar_fragment
 
@@ -244,7 +244,7 @@ class AppointmentGroupsController < ApplicationController
 
     contexts = params[:context_codes] if params.include?(:context_codes)
 
-    if params[:scope] == 'manageable'
+    if params[:scope] == "manageable"
       scope = AppointmentGroup.manageable_by(@current_user, contexts)
       scope = scope.current_or_undated unless value_to_boolean(params[:include_past_appointments])
     else
@@ -252,7 +252,7 @@ class AppointmentGroupsController < ApplicationController
       scope = scope.current unless value_to_boolean(params[:include_past_appointments])
     end
     groups = Api.paginate(
-      scope.order('id'),
+      scope.order("id"),
       self,
       api_v1_appointment_groups_url(scope: params[:scope])
     )
@@ -348,7 +348,7 @@ class AppointmentGroupsController < ApplicationController
     # it would be very delicate to write one in a way that doesn't accidentally
     # break the ability to edit those.
     if contexts.any?(&:concluded?)
-      return render json: { error: t('cannot create an appointment group for a concluded course') },
+      return render json: { error: t("cannot create an appointment group for a concluded course") },
                     status: :bad_request
     end
 
@@ -390,7 +390,7 @@ class AppointmentGroupsController < ApplicationController
       return web_show unless request.format == :json
 
       render json: appointment_group_json(@group, @current_user, session,
-                                          include: ((params[:include] || []) | ['appointments']),
+                                          include: ((params[:include] || []) | ["appointments"]),
                                           include_past_appointments: @group.grants_right?(@current_user, :manage))
     end
   end
@@ -398,7 +398,7 @@ class AppointmentGroupsController < ApplicationController
   # Shows the edit page for an assignment group
   def edit
     if request.format == :html && authorized_action(@group, @current_user, :update)
-      @page_title = t('Edit %{title}', { title: @group.title })
+      @page_title = t("Edit %{title}", { title: @group.title })
       js_env({
                APPOINTMENT_GROUP_ID: @group.id,
                CALENDAR: {
@@ -519,7 +519,7 @@ class AppointmentGroupsController < ApplicationController
   # @argument registration_status ["all"|"registered"|"registered"]
   #   Limits results to the a given participation status, defaults to "all"
   def users
-    participants('User') { |u| user_json(u, @current_user, session) }
+    participants("User") { |u| user_json(u, @current_user, session) }
   end
 
   # @API List student group participants
@@ -531,7 +531,7 @@ class AppointmentGroupsController < ApplicationController
   # @argument registration_status ["all"|"registered"|"registered"]
   #   Limits results to the a given participation status, defaults to "all"
   def groups
-    participants('Group') { |g| group_json(g, @current_user, session) }
+    participants("Group") { |g| group_json(g, @current_user, session) }
   end
 
   # @API Get next appointment
@@ -601,7 +601,7 @@ class AppointmentGroupsController < ApplicationController
   def web_index
     # start with the first reservable appointment group
     group = AppointmentGroup.reservable_by(@current_user, params[:context_codes]).current.order(:start_at).first
-    anchor = calendar_fragment view_name: :agenda, view_start: group&.start_at&.strftime('%Y-%m-%d')
+    anchor = calendar_fragment view_name: :agenda, view_start: group&.start_at&.strftime("%Y-%m-%d")
     redirect_to calendar2_url(anchor: anchor)
   end
 
@@ -616,7 +616,7 @@ class AppointmentGroupsController < ApplicationController
                          !@group.users_with_reservations_through_group.include?(@current_user.id))
     anchor = if needs_appointment
                # start at the appointment group; enter find-appointment mode for a relevant course
-               args[:view_start] = @group.start_at.strftime('%Y-%m-%d')
+               args[:view_start] = @group.start_at.strftime("%Y-%m-%d")
                args[:find_appointment] = "course_#{student_course_id}"
                calendar_fragment({ view_name: :agenda }.merge(args))
              else
@@ -627,7 +627,7 @@ class AppointmentGroupsController < ApplicationController
                # i.e. teacher viewing appointment slot filled by student.
                event = event.parent_event if event&.user && event.user != @current_user
                event = nil unless event&.grants_right?(@current_user, :read)
-               args[:view_start] = (event || @group).start_at.strftime('%Y-%m-%d')
+               args[:view_start] = (event || @group).start_at.strftime("%Y-%m-%d")
                if event
                  calendar_args[:event_id] = event.id
                  # Event pop-up only works in month or week mode.

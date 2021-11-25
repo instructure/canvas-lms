@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'nokogiri'
+require "nokogiri"
 
 module Canvas::Migration
   module XMLHelper
@@ -52,7 +52,7 @@ module Canvas::Migration
     end
 
     def get_unescaped_html_val(node, selector)
-      ::CGI.unescapeHTML(get_node_val(node, selector, ''))
+      ::CGI.unescapeHTML(get_node_val(node, selector, ""))
     end
 
     def get_bool_val(node, selector, default = nil)
@@ -90,7 +90,7 @@ module Canvas::Migration
     # Gets the node value and changed forward slashes to back slashes
     def get_file_path(node, selector)
       path = get_node_val(node, selector)
-      path = path.tr('\\', '/') if path
+      path = path.tr("\\", "/") if path
       path
     end
 
@@ -110,17 +110,17 @@ module Canvas::Migration
 
     def create_xml_doc(string_or_io)
       doc = ::Nokogiri::XML(string_or_io)
-      if doc.encoding != 'UTF-8'
+      if doc.encoding != "UTF-8"
         begin
-          doc.at_css('*')
+          doc.at_css("*")
         rescue ArgumentError => e
           # ruby 2.2
           raise unless /^invalid byte sequence/.match?(e.message)
 
-          doc.encoding = 'UTF-8'
+          doc.encoding = "UTF-8"
         rescue Encoding::CompatibilityError
           # ruby 2.1
-          doc.encoding = 'UTF-8'
+          doc.encoding = "UTF-8"
         end
       end
       doc

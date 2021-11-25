@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'atom'
+require "atom"
 
 class Group < ActiveRecord::Base
   include Context
@@ -36,26 +36,26 @@ class Group < ActiveRecord::Base
   has_many :group_memberships, -> { where("group_memberships.workflow_state<>'deleted'") }, dependent: :destroy
   has_many :users, -> { where("users.workflow_state<>'deleted'") }, through: :group_memberships
   has_many :user_past_lti_ids, as: :context, inverse_of: :context
-  has_many :participating_group_memberships, -> { where(workflow_state: 'accepted') }, class_name: "GroupMembership"
+  has_many :participating_group_memberships, -> { where(workflow_state: "accepted") }, class_name: "GroupMembership"
   has_many :participating_users, source: :user, through: :participating_group_memberships
-  belongs_to :context, polymorphic: [:course, { context_account: 'Account' }]
+  belongs_to :context, polymorphic: [:course, { context_account: "Account" }]
   belongs_to :group_category
   belongs_to :account
-  belongs_to :root_account, class_name: 'Account', inverse_of: :all_groups
+  belongs_to :root_account, class_name: "Account", inverse_of: :all_groups
   has_many :calendar_events, as: :context, inverse_of: :context, dependent: :destroy
-  has_many :discussion_topics, -> { where("discussion_topics.workflow_state<>'deleted'").preload(:user).order('discussion_topics.position DESC, discussion_topics.created_at DESC') }, dependent: :destroy, as: :context, inverse_of: :context
-  has_many :active_discussion_topics, -> { where("discussion_topics.workflow_state<>'deleted'").preload(:user) }, as: :context, inverse_of: :context, class_name: 'DiscussionTopic'
+  has_many :discussion_topics, -> { where("discussion_topics.workflow_state<>'deleted'").preload(:user).order("discussion_topics.position DESC, discussion_topics.created_at DESC") }, dependent: :destroy, as: :context, inverse_of: :context
+  has_many :active_discussion_topics, -> { where("discussion_topics.workflow_state<>'deleted'").preload(:user) }, as: :context, inverse_of: :context, class_name: "DiscussionTopic"
   has_many :all_discussion_topics, -> { preload(:user) }, as: :context, inverse_of: :context, class_name: "DiscussionTopic", dependent: :destroy
   has_many :discussion_entries, -> { preload(:discussion_topic, :user) }, through: :discussion_topics, dependent: :destroy
-  has_many :announcements, as: :context, inverse_of: :context, class_name: 'Announcement', dependent: :destroy
-  has_many :active_announcements, -> { where("discussion_topics.workflow_state<>'deleted'") }, as: :context, inverse_of: :context, class_name: 'Announcement'
+  has_many :announcements, as: :context, inverse_of: :context, class_name: "Announcement", dependent: :destroy
+  has_many :active_announcements, -> { where("discussion_topics.workflow_state<>'deleted'") }, as: :context, inverse_of: :context, class_name: "Announcement"
   has_many :attachments, as: :context, inverse_of: :context, dependent: :destroy, extend: Attachment::FindInContextAssociation
-  has_many :active_images, -> { where("attachments.file_state<>'deleted' AND attachments.content_type LIKE 'image%'").order('attachments.display_name').preload(:thumbnail) }, as: :context, inverse_of: :context, class_name: 'Attachment'
-  has_many :active_assignments, -> { where("assignments.workflow_state<>'deleted'") }, as: :context, inverse_of: :context, class_name: 'Assignment'
-  has_many :all_attachments, as: 'context', class_name: 'Attachment'
-  has_many :folders, -> { order('folders.name') }, as: :context, inverse_of: :context, dependent: :destroy
-  has_many :active_folders, -> { where("folders.workflow_state<>'deleted'").order('folders.name') }, class_name: 'Folder', as: :context, inverse_of: :context
-  has_many :submissions_folders, -> { where.not(folders: { submission_context_code: nil }) }, as: :context, inverse_of: :context, class_name: 'Folder'
+  has_many :active_images, -> { where("attachments.file_state<>'deleted' AND attachments.content_type LIKE 'image%'").order("attachments.display_name").preload(:thumbnail) }, as: :context, inverse_of: :context, class_name: "Attachment"
+  has_many :active_assignments, -> { where("assignments.workflow_state<>'deleted'") }, as: :context, inverse_of: :context, class_name: "Assignment"
+  has_many :all_attachments, as: "context", class_name: "Attachment"
+  has_many :folders, -> { order("folders.name") }, as: :context, inverse_of: :context, dependent: :destroy
+  has_many :active_folders, -> { where("folders.workflow_state<>'deleted'").order("folders.name") }, class_name: "Folder", as: :context, inverse_of: :context
+  has_many :submissions_folders, -> { where.not(folders: { submission_context_code: nil }) }, as: :context, inverse_of: :context, class_name: "Folder"
   has_many :collaborators
   has_many :external_feeds, as: :context, inverse_of: :context, dependent: :destroy
   has_many :messages, as: :context, inverse_of: :context, dependent: :destroy
@@ -66,7 +66,7 @@ class Group < ActiveRecord::Base
   has_many :media_objects, as: :context, inverse_of: :context
   has_many :content_migrations, as: :context, inverse_of: :context
   has_many :content_exports, as: :context, inverse_of: :context
-  has_many :usage_rights, as: :context, inverse_of: :context, class_name: 'UsageRights', dependent: :destroy
+  has_many :usage_rights, as: :context, inverse_of: :context, class_name: "UsageRights", dependent: :destroy
   belongs_to :avatar_attachment, class_name: "Attachment"
   belongs_to :leader, class_name: "User"
 
@@ -150,12 +150,12 @@ class Group < ActiveRecord::Base
 
   def auto_accept?
     group_category&.allows_multiple_memberships? &&
-      join_level == 'parent_context_auto_join'
+      join_level == "parent_context_auto_join"
   end
 
   def allow_join_request?
     group_category&.allows_multiple_memberships? &&
-      ['parent_context_auto_join', 'parent_context_request'].include?(join_level)
+      ["parent_context_auto_join", "parent_context_request"].include?(join_level)
   end
 
   def allow_self_signup?(user)
@@ -257,7 +257,7 @@ class Group < ActiveRecord::Base
   end
 
   def submission?
-    if context_type == 'Course'
+    if context_type == "Course"
       assignments = Assignment.for_group_category(group_category_id).active
       return Submission.active.where(group_id: id, assignment_id: assignments).exists?
     end
@@ -295,13 +295,13 @@ class Group < ActiveRecord::Base
 
   alias_method :destroy_permanently!, :destroy
   def destroy
-    self.workflow_state = 'deleted'
+    self.workflow_state = "deleted"
     self.deleted_at = Time.now.utc
     save
   end
 
   def restore
-    self.workflow_state = 'available'
+    self.workflow_state = "available"
     self.deleted_at = nil
     save!
   end
@@ -332,7 +332,7 @@ class Group < ActiveRecord::Base
       entry.title     = name
       entry.updated   = updated_at
       entry.published = created_at
-      entry.links << Atom::Link.new(rel: 'alternate',
+      entry.links << Atom::Link.new(rel: "alternate",
                                     href: "/groups/#{id}")
     end
   end
@@ -342,9 +342,9 @@ class Group < ActiveRecord::Base
     return nil unless user
 
     attrs = { user: user, moderator: !!moderator }
-    new_record_state ||= { 'invitation_only' => 'invited',
-                           'parent_context_request' => 'requested',
-                           'parent_context_auto_join' => 'accepted' }[join_level]
+    new_record_state ||= { "invitation_only" => "invited",
+                           "parent_context_request" => "requested",
+                           "parent_context_auto_join" => "accepted" }[join_level]
     attrs[:workflow_state] = new_record_state if new_record_state
 
     member = nil
@@ -376,7 +376,7 @@ class Group < ActiveRecord::Base
   end
 
   def broadcast_data
-    if context_type == 'Course'
+    if context_type == "Course"
       { course_id: context_id, root_account_id: root_account_id }
     else
       {}
@@ -418,7 +418,7 @@ class Group < ActiveRecord::Base
     current_time = Time.now
     options = {
       group_id: id,
-      workflow_state: 'accepted',
+      workflow_state: "accepted",
       moderator: false,
       created_at: current_time,
       updated_at: current_time,
@@ -430,19 +430,19 @@ class Group < ActiveRecord::Base
   end
 
   def invite_user(user)
-    add_user(user, 'invited')
+    add_user(user, "invited")
   end
 
   def request_user(user)
-    add_user(user, 'requested')
+    add_user(user, "requested")
   end
 
   def invitees=(params)
     invitees = []
     (params || {}).each do |key, val|
       if context
-        invitees << context.users.where(id: key.to_i).first if val != '0'
-      elsif val != '0'
+        invitees << context.users.where(id: key.to_i).first if val != "0"
+      elsif val != "0"
         invitees << User.where(id: key.to_i).first
       end
     end
@@ -459,7 +459,7 @@ class Group < ActiveRecord::Base
     self.name ||= CanvasSlug.generate_securish_uuid
     self.uuid ||= CanvasSlug.generate_securish_uuid
     self.group_category ||= GroupCategory.student_organized_for(context)
-    self.join_level ||= 'invitation_only'
+    self.join_level ||= "invitation_only"
     self.is_public ||= false
     self.is_public = false unless self.group_category.try(:communities?)
     set_default_account
@@ -668,13 +668,13 @@ class Group < ActiveRecord::Base
   end
 
   def members_json_cached
-    Rails.cache.fetch(['group_members_json', self].cache_key) do
+    Rails.cache.fetch(["group_members_json", self].cache_key) do
       users.map { |u| u.group_member_json(context) }
     end
   end
 
   def members_count_cached
-    Rails.cache.fetch(['group_members_count', self].cache_key) do
+    Rails.cache.fetch(["group_members_count", self].cache_key) do
       members_json_cached.length
     end
   end
@@ -688,7 +688,7 @@ class Group < ActiveRecord::Base
   end
 
   def self.default_storage_quota
-    Setting.get('group_default_quota', 50.megabytes.to_s).to_i
+    Setting.get("group_default_quota", 50.megabytes.to_s).to_i
   end
 
   def storage_quota_mb
@@ -704,18 +704,18 @@ class Group < ActiveRecord::Base
     TAB_COLLABORATIONS_NEW = *1..20
   def tabs_available(user = nil, **)
     available_tabs = [
-      { id: TAB_HOME,          label: t("#group.tabs.home", "Home"), css_class: 'home', href: :group_path },
-      { id: TAB_ANNOUNCEMENTS, label: t('#tabs.announcements', "Announcements"), css_class: 'announcements', href: :group_announcements_path },
-      { id: TAB_PAGES,         label: t("#group.tabs.pages", "Pages"), css_class: 'pages', href: :group_wiki_path },
-      { id: TAB_PEOPLE,        label: t("#group.tabs.people", "People"), css_class: 'people', href: :group_users_path },
-      { id: TAB_DISCUSSIONS,   label: t("#group.tabs.discussions", "Discussions"), css_class: 'discussions', href: :group_discussion_topics_path },
-      { id: TAB_FILES,         label: t("#group.tabs.files", "Files"), css_class: 'files', href: :group_files_path },
+      { id: TAB_HOME,          label: t("#group.tabs.home", "Home"), css_class: "home", href: :group_path },
+      { id: TAB_ANNOUNCEMENTS, label: t("#tabs.announcements", "Announcements"), css_class: "announcements", href: :group_announcements_path },
+      { id: TAB_PAGES,         label: t("#group.tabs.pages", "Pages"), css_class: "pages", href: :group_wiki_path },
+      { id: TAB_PEOPLE,        label: t("#group.tabs.people", "People"), css_class: "people", href: :group_users_path },
+      { id: TAB_DISCUSSIONS,   label: t("#group.tabs.discussions", "Discussions"), css_class: "discussions", href: :group_discussion_topics_path },
+      { id: TAB_FILES,         label: t("#group.tabs.files", "Files"), css_class: "files", href: :group_files_path },
     ]
 
     if user && grants_right?(user, :read)
-      available_tabs << { id: TAB_CONFERENCES, label: WebConference.conference_tab_name, css_class: 'conferences', href: :group_conferences_path }
-      available_tabs << { id: TAB_COLLABORATIONS, label: t('#tabs.collaborations', "Collaborations"), css_class: 'collaborations', href: :group_collaborations_path }
-      available_tabs << { id: TAB_COLLABORATIONS_NEW, label: t('#tabs.collaborations', "Collaborations"), css_class: 'collaborations', href: :group_lti_collaborations_path }
+      available_tabs << { id: TAB_CONFERENCES, label: WebConference.conference_tab_name, css_class: "conferences", href: :group_conferences_path }
+      available_tabs << { id: TAB_COLLABORATIONS, label: t("#tabs.collaborations", "Collaborations"), css_class: "collaborations", href: :group_collaborations_path }
+      available_tabs << { id: TAB_COLLABORATIONS_NEW, label: t("#tabs.collaborations", "Collaborations"), css_class: "collaborations", href: :group_lti_collaborations_path }
     end
 
     available_tabs
@@ -743,12 +743,12 @@ class Group < ActiveRecord::Base
 
   def as_json(options = nil)
     json = super(options)
-    if json && json['group']
+    if json && json["group"]
       # remove anything coming automatically from deprecated db column
-      json['group'].delete('category')
+      json["group"].delete("category")
       if self.group_category
         # put back version from association
-        json['group']['group_category'] = self.group_category.name
+        json["group"]["group_category"] = self.group_category.name
       end
     end
     json
@@ -818,15 +818,15 @@ class Group < ActiveRecord::Base
   # Returns a boolean describing if the user passed in has marked this group
   # as a favorite.
   def favorite_for_user?(user)
-    user.favorites.where(context_type: 'Group', context_id: self).exists?
+    user.favorites.where(context_type: "Group", context_id: self).exists?
   end
 
   def submissions_folder(_course = nil)
     return @submissions_folder if @submissions_folder
 
     Folder.unique_constraint_retry do
-      @submissions_folder = folders.where(parent_folder_id: Folder.root_folders(self).first, submission_context_code: 'root')
-                                   .first_or_create!(name: I18n.t('Submissions'))
+      @submissions_folder = folders.where(parent_folder_id: Folder.root_folders(self).first, submission_context_code: "root")
+                                   .first_or_create!(name: I18n.t("Submissions"))
     end
   end
 

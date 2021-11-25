@@ -74,7 +74,7 @@ class GradebookSettingsController < ApplicationController
     massaged_hash = {}
     hash.each do |key, value|
       massaged_hash[key] = case value
-                           when 'null'
+                           when "null"
                              nil
                            when Hash
                              nilify_strings(value)
@@ -103,7 +103,7 @@ class GradebookSettingsController < ApplicationController
     @course_settings.deep_merge!(nilify_strings(gradebook_settings_params.except(:colors).to_h))
 
     @color_settings = @current_user.get_preference(:gradebook_settings, :colors) || {}
-    @color_settings.deep_merge!(valid_colors(gradebook_settings_params.fetch('colors', {})).to_unsafe_h)
+    @color_settings.deep_merge!(valid_colors(gradebook_settings_params.fetch("colors", {})).to_unsafe_h)
 
     @current_user.set_preference(:gradebook_settings, @context.global_id, @course_settings) &&
       @current_user.set_preference(:gradebook_settings, :colors, @color_settings)

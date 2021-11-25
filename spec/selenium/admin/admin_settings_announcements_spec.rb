@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../common'
+require_relative "../common"
 
 describe "settings tabs" do
   context "announcements tab" do
@@ -51,8 +51,8 @@ describe "settings tabs" do
       dismiss_flash_messages
 
       # close the "user account" Tray that opened so we could read the displayed username
-      f('body').click
-      expect(f('body')).not_to contain_css('[aria-label="Profile tray"]')
+      f("body").click
+      expect(f("body")).not_to contain_css('[aria-label="Profile tray"]')
 
       expect(f("#tab-announcements .notification_subject").text).to eq subject
       expect(f("#tab-announcements .notification_message").text).to eq "this is a message"
@@ -66,7 +66,7 @@ describe "settings tabs" do
       type_in_tiny(textarea_selector, "edited message", clear: true)
 
       cb = f(".account_notification_role_cbx")
-      f("label[for=#{cb['id']}]").click
+      f("label[for=#{cb["id"]}]").click
 
       ff(".edit_notification_form .ui-datepicker-trigger")[0].click
       fln("2").click
@@ -101,7 +101,7 @@ describe "settings tabs" do
     end
 
     it "edits an announcement" do
-      skip_if_chrome('issue with edit_announcement method')
+      skip_if_chrome("issue with edit_announcement method")
       notification = account_notification(user: @user)
       get "/accounts/#{Account.default.id}/settings"
       f("#tab-announcements-link").click

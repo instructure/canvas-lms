@@ -144,9 +144,9 @@ class EffectiveDueDates
 
   def filter_students_sql(table)
     if @filtered_students.present?
-      "AND #{table}.user_id IN (#{filtered_students.join(',')})"
+      "AND #{table}.user_id IN (#{filtered_students.join(",")})"
     else
-      ''
+      ""
     end
   end
 
@@ -188,7 +188,7 @@ class EffectiveDueDates
         assignment_collection.flatten!
         assignment_collection.map! { |assignment| assignment.try(:id) } if assignment_collection.first.is_a?(Assignment)
         assignment_collection.compact!
-        assignment_collection = assignment_collection.join(',')
+        assignment_collection = assignment_collection.join(",")
       end
 
       if assignment_collection.empty?
@@ -238,7 +238,7 @@ class EffectiveDueDates
               os.workflow_state = 'active'
             WHERE
               o.set_type = 'ADHOC'
-              #{filter_students_sql('os')}
+              #{filter_students_sql("os")}
           ),
 
           /* fetch all students affected by group overrides */
@@ -260,7 +260,7 @@ class EffectiveDueDates
               o.set_type = 'Group' AND
               g.workflow_state <> 'deleted' AND
               gm.workflow_state = 'accepted'
-              #{filter_students_sql('gm')}
+              #{filter_students_sql("gm")}
           ),
 
           /* fetch all students affected by section overrides */
@@ -283,7 +283,7 @@ class EffectiveDueDates
               s.workflow_state <> 'deleted' AND
               e.workflow_state NOT IN #{filter_section_assigned_enrollments_sql} AND
               e.type IN ('StudentEnrollment', 'StudentViewEnrollment')
-              #{filter_students_sql('e')}
+              #{filter_students_sql("e")}
           ),
 
           /* fetch all students who have an 'Everyone Else'
@@ -305,7 +305,7 @@ class EffectiveDueDates
               e.workflow_state NOT IN ('rejected', 'deleted') AND
               e.type IN ('StudentEnrollment', 'StudentViewEnrollment') AND
               a.only_visible_to_overrides IS NOT TRUE
-              #{filter_students_sql('e')}
+              #{filter_students_sql("e")}
           ),
 
           /* join all these students together into a single table */

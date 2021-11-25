@@ -63,7 +63,7 @@ class Quizzes::QuizQuestion::MultipleAnswersQuestion < Quizzes::QuizQuestion::Ba
 
     responses.each do |response|
       answers.each do |answer|
-        if response[:"answer_#{answer[:id]}"] == '1'
+        if response[:"answer_#{answer[:id]}"] == "1"
           answer[:responses] += 1
           answer[:user_ids] << response[:user_id]
         end

@@ -20,15 +20,15 @@
 
 module Types
   class AssessmentType < BaseEnum
-    graphql_name 'AssessmentType'
-    description 'The type of assessment'
-    value 'grading'
-    value 'peer_review'
-    value 'provisional_grade'
+    graphql_name "AssessmentType"
+    description "The type of assessment"
+    value "grading"
+    value "peer_review"
+    value "provisional_grade"
   end
 
   class RubricAssessmentType < ApplicationObjectType
-    description 'An assessment for a rubric'
+    description "An assessment for a rubric"
 
     implements Interfaces::LegacyIDInterface
 

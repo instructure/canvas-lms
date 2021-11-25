@@ -18,14 +18,14 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class CanvasPartmanTest::Zoo < ActiveRecord::Base
-  self.table_name = 'partman_zoos'
+  self.table_name = "partman_zoos"
 
   has_many :animals,
-           class_name: 'CanvasPartmanTest::Animal',
+           class_name: "CanvasPartmanTest::Animal",
            dependent: :destroy
 
   has_many :trails,
-           class_name: 'CanvasPartmanTest::Trail',
+           class_name: "CanvasPartmanTest::Trail",
            dependent: :destroy
 
   def self.create_schema

@@ -18,49 +18,49 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../api_spec_helper'
+require_relative "../api_spec_helper"
 
 describe AssignmentOverridesController, type: :request do
   def validate_override_json(override, json)
-    expect(json['id']).to eq override.id
-    expect(json['assignment_id']).to eq override.assignment_id
-    expect(json['title']).to eq override.title
+    expect(json["id"]).to eq override.id
+    expect(json["assignment_id"]).to eq override.assignment_id
+    expect(json["title"]).to eq override.title
 
     if override.due_at_overridden
-      expect(json['due_at']).to eq override.due_at.iso8601
-      expect(json['all_day']).to eq override.all_day
-      expect(json['all_day_date']).to eq override.all_day_date.to_s
+      expect(json["due_at"]).to eq override.due_at.iso8601
+      expect(json["all_day"]).to eq override.all_day
+      expect(json["all_day_date"]).to eq override.all_day_date.to_s
     else
-      expect(json).not_to have_key 'due_at'
-      expect(json).not_to have_key 'all_day'
-      expect(json).not_to have_key 'all_day_date'
+      expect(json).not_to have_key "due_at"
+      expect(json).not_to have_key "all_day"
+      expect(json).not_to have_key "all_day_date"
     end
 
     if override.unlock_at_overridden
-      expect(json['unlock_at']).to eq override.unlock_at.iso8601
+      expect(json["unlock_at"]).to eq override.unlock_at.iso8601
     else
-      expect(json).not_to have_key 'unlock_at'
+      expect(json).not_to have_key "unlock_at"
     end
 
     if override.lock_at_overridden
-      expect(json['lock_at']).to eq override.lock_at.iso8601
+      expect(json["lock_at"]).to eq override.lock_at.iso8601
     else
-      expect(json).not_to have_key 'lock_at'
+      expect(json).not_to have_key "lock_at"
     end
 
     case override.set
     when Array
-      expect(json['student_ids']).to eq override.set.map(&:id)
-      expect(json).not_to have_key 'group_id'
-      expect(json).not_to have_key 'course_section_id'
+      expect(json["student_ids"]).to eq override.set.map(&:id)
+      expect(json).not_to have_key "group_id"
+      expect(json).not_to have_key "course_section_id"
     when Group
-      expect(json['group_id']).to eq override.set_id
-      expect(json).not_to have_key 'student_ids'
-      expect(json).not_to have_key 'course_section_id'
+      expect(json["group_id"]).to eq override.set_id
+      expect(json).not_to have_key "student_ids"
+      expect(json).not_to have_key "course_section_id"
     when CourseSection
-      expect(json['course_section_id']).to eq override.set_id
-      expect(json).not_to have_key 'student_ids'
-      expect(json).not_to have_key 'group_id'
+      expect(json["course_section_id"]).to eq override.set_id
+      expect(json).not_to have_key "student_ids"
+      expect(json).not_to have_key "group_id"
     end
   end
 
@@ -85,7 +85,7 @@ describe AssignmentOverridesController, type: :request do
 
     it "includes visible overrides" do
       json = api_call(:get, "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/overrides.json",
-                      controller: 'assignment_overrides', action: 'index', format: 'json',
+                      controller: "assignment_overrides", action: "index", format: "json",
                       course_id: @course.id.to_s,
                       assignment_id: @assignment.id.to_s)
 
@@ -96,7 +96,7 @@ describe AssignmentOverridesController, type: :request do
       @override.destroy
 
       json = api_call(:get, "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/overrides.json",
-                      controller: 'assignment_overrides', action: 'index', format: 'json',
+                      controller: "assignment_overrides", action: "index", format: "json",
                       course_id: @course.id.to_s,
                       assignment_id: @assignment.id.to_s)
 
@@ -111,7 +111,7 @@ describe AssignmentOverridesController, type: :request do
 
       expect(@course.sections_visible_to(@teacher)).not_to include @override.set
       json = api_call(:get, "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/overrides.json",
-                      controller: 'assignment_overrides', action: 'index', format: 'json',
+                      controller: "assignment_overrides", action: "index", format: "json",
                       course_id: @course.id.to_s,
                       assignment_id: @assignment.id.to_s)
 
@@ -120,7 +120,7 @@ describe AssignmentOverridesController, type: :request do
 
     it "has formatted overrides" do
       json = api_call(:get, "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/overrides.json",
-                      controller: 'assignment_overrides', action: 'index', format: 'json',
+                      controller: "assignment_overrides", action: "index", format: "json",
                       course_id: @course.id.to_s,
                       assignment_id: @assignment.id.to_s)
       validate_override_json(@override, json.first)
@@ -130,7 +130,7 @@ describe AssignmentOverridesController, type: :request do
   context "show" do
     before :once do
       course_with_teacher(active_all: true)
-      assignment_model(course: @course, group_category: 'category')
+      assignment_model(course: @course, group_category: "category")
       assignment_override_model(assignment: @assignment)
       @override.set = @course.default_section
       @override.save!
@@ -138,22 +138,22 @@ describe AssignmentOverridesController, type: :request do
 
     def raw_api_show_override(course, assignment, override)
       raw_api_call(:get, "/api/v1/courses/#{course.id}/assignments/#{assignment.id}/overrides/#{override.id}.json",
-                   controller: 'assignment_overrides', action: 'show', format: 'json',
+                   controller: "assignment_overrides", action: "show", format: "json",
                    course_id: course.id.to_s, assignment_id: assignment.id.to_s, id: override.id.to_s)
     end
 
     def api_show_override(course, assignment, override)
       api_call(:get, "/api/v1/courses/#{course.id}/assignments/#{assignment.id}/overrides/#{override.id}.json",
-               controller: 'assignment_overrides', action: 'show', format: 'json',
+               controller: "assignment_overrides", action: "show", format: "json",
                course_id: course.id.to_s, assignment_id: assignment.id.to_s, id: override.id.to_s)
     end
 
-    describe 'as an account admin not enrolled in the class' do
+    describe "as an account admin not enrolled in the class" do
       before do
         account_admin_user(account: Account.site_admin, active_all: true)
       end
 
-      it 'works' do
+      it "works" do
         json = api_show_override(@course, @assignment, @override)
         validate_override_json(@override, json)
       end
@@ -198,8 +198,8 @@ describe AssignmentOverridesController, type: :request do
       @assignment.group_category = @course.group_categories.create!(name: "foo")
       @assignment.save!
 
-      @group = @course.groups.create!(name: 'my group', group_category: @assignment.group_category)
-      @group.add_user(@teacher, 'accepted')
+      @group = @course.groups.create!(name: "my group", group_category: @assignment.group_category)
+      @group.add_user(@teacher, "accepted")
 
       @override.reload
       @override.set = @group
@@ -210,7 +210,7 @@ describe AssignmentOverridesController, type: :request do
     end
 
     it "includes proper set fields when set is adhoc" do
-      student_in_course({ course: @course, workflow_state: 'active' })
+      student_in_course({ course: @course, workflow_state: "active" })
       create_adhoc_override_for_assignment(@assignment, @student)
 
       json = api_show_override(@course, @assignment, @override)
@@ -221,17 +221,17 @@ describe AssignmentOverridesController, type: :request do
   context "group alias" do
     before :once do
       course_with_teacher(active_all: true)
-      assignment_model(course: @course, group_category: 'category')
+      assignment_model(course: @course, group_category: "category")
       group_model(context: @course, group_category: @assignment.group_category)
       assignment_override_model(assignment: @assignment)
       @override.set = @group
       @override.save!
-      @group.add_user(@teacher, 'accepted')
+      @group.add_user(@teacher, "accepted")
     end
 
     it "redirects in nominal case" do
       raw_api_call(:get, "/api/v1/groups/#{@group.id}/assignments/#{@assignment.id}/override.json",
-                   controller: 'assignment_overrides', action: 'group_alias', format: 'json',
+                   controller: "assignment_overrides", action: "group_alias", format: "json",
                    group_id: @group.id.to_s,
                    assignment_id: @assignment.id.to_s)
       expect(response).to be_redirect
@@ -245,7 +245,7 @@ describe AssignmentOverridesController, type: :request do
 
       @user = @original_teacher
       raw_api_call(:get, "/api/v1/groups/#{@other_group.id}/assignments/#{@assignment.id}/override.json",
-                   controller: 'assignment_overrides', action: 'group_alias', format: 'json',
+                   controller: "assignment_overrides", action: "group_alias", format: "json",
                    group_id: @other_group.id.to_s,
                    assignment_id: @assignment.id.to_s)
       assert_status(404)
@@ -256,7 +256,7 @@ describe AssignmentOverridesController, type: :request do
       @other_group = @course.groups.create!
 
       raw_api_call(:get, "/api/v1/groups/#{@other_group.id}/assignments/#{@assignment.id}/override.json",
-                   controller: 'assignment_overrides', action: 'group_alias', format: 'json',
+                   controller: "assignment_overrides", action: "group_alias", format: "json",
                    group_id: @other_group.id.to_s,
                    assignment_id: @assignment.id.to_s)
       assert_status(404)
@@ -274,7 +274,7 @@ describe AssignmentOverridesController, type: :request do
 
     it "redirects in nominal case" do
       raw_api_call(:get, "/api/v1/sections/#{@course.default_section.id}/assignments/#{@assignment.id}/override.json",
-                   controller: 'assignment_overrides', action: 'section_alias', format: 'json',
+                   controller: "assignment_overrides", action: "section_alias", format: "json",
                    course_section_id: @course.default_section.id.to_s,
                    assignment_id: @assignment.id.to_s)
       expect(response).to be_redirect
@@ -286,7 +286,7 @@ describe AssignmentOverridesController, type: :request do
       section = @course.course_sections.create!
 
       raw_api_call(:get, "/api/v1/sections/#{section.id}/assignments/#{@assignment.id}/override.json",
-                   controller: 'assignment_overrides', action: 'section_alias', format: 'json',
+                   controller: "assignment_overrides", action: "section_alias", format: "json",
                    course_section_id: section.id.to_s,
                    assignment_id: @assignment.id.to_s)
       assert_status(404)
@@ -296,7 +296,7 @@ describe AssignmentOverridesController, type: :request do
       course_with_teacher(user: @teacher, active_all: true)
 
       raw_api_call(:get, "/api/v1/sections/#{@course.default_section.id}/assignments/#{@assignment.id}/override.json",
-                   controller: 'assignment_overrides', action: 'section_alias', format: 'json',
+                   controller: "assignment_overrides", action: "section_alias", format: "json",
                    course_section_id: @course.default_section.id.to_s,
                    assignment_id: @assignment.id.to_s)
       assert_status(404)
@@ -306,7 +306,7 @@ describe AssignmentOverridesController, type: :request do
   context "create" do
     def raw_api_create_override(course, assignment, data)
       raw_api_call(:post, "/api/v1/courses/#{course.id}/assignments/#{assignment.id}/overrides.json",
-                   { controller: 'assignment_overrides', action: 'create', format: 'json',
+                   { controller: "assignment_overrides", action: "create", format: "json",
                      course_id: course.id.to_s, assignment_id: assignment.id.to_s },
                    data)
     end
@@ -314,7 +314,7 @@ describe AssignmentOverridesController, type: :request do
     def api_create_override(course, assignment, data)
       @user = @teacher
       api_call(:post, "/api/v1/courses/#{course.id}/assignments/#{assignment.id}/overrides.json",
-               { controller: 'assignment_overrides', action: 'create', format: 'json',
+               { controller: "assignment_overrides", action: "create", format: "json",
                  course_id: course.id.to_s, assignment_id: assignment.id.to_s },
                data)
     end
@@ -345,7 +345,7 @@ describe AssignmentOverridesController, type: :request do
 
       before :once do
         @student = student_in_course(course: @course, user: user_with_pseudonym).user
-        @title = 'adhoc title'
+        @title = "adhoc title"
         @user = @teacher
       end
 
@@ -392,7 +392,7 @@ describe AssignmentOverridesController, type: :request do
       end
 
       it "errors with wrong data type for student_ids" do
-        raw_api_create_override(@course, @assignment, assignment_override: { student_ids: 'bad data', title: @title })
+        raw_api_create_override(@course, @assignment, assignment_override: { student_ids: "bad data", title: @title })
         expect_error("invalid student_ids \"bad data\"")
       end
 
@@ -485,7 +485,7 @@ describe AssignmentOverridesController, type: :request do
         @assignment.save!
 
         raw_api_create_override(@course, @assignment, assignment_override: { group_id: @group.id })
-        expect_error('group_id is not valid for non-group assignments')
+        expect_error("group_id is not valid for non-group assignments")
       end
     end
 
@@ -524,7 +524,7 @@ describe AssignmentOverridesController, type: :request do
       it "ignores group_id if there are student_ids" do
         @student = student_in_course(course: @course, user: user_with_pseudonym).user
         @group = group_model(context: @course)
-        @title = 'adhoc title'
+        @title = "adhoc title"
         @user = @teacher
 
         api_create_override(@course, @assignment, assignment_override: { student_ids: [@student.id], title: @title, group_id: @group.id })
@@ -535,7 +535,7 @@ describe AssignmentOverridesController, type: :request do
 
       it "ignores course_section_id if there are student_ids" do
         @student = student_in_course(course: @course, user: user_with_pseudonym).user
-        @title = 'adhoc title'
+        @title = "adhoc title"
         @user = @teacher
 
         api_create_override(@course, @assignment, assignment_override: { student_ids: [@student.id], title: @title, course_section_id: @course.default_section.id })
@@ -574,7 +574,7 @@ describe AssignmentOverridesController, type: :request do
       @override_student.save!
       @user = @teacher
 
-      raw_api_create_override(@course, @assignment, assignment_override: { student_ids: [@student.id], title: 'adhoc title' })
+      raw_api_create_override(@course, @assignment, assignment_override: { student_ids: [@student.id], title: "adhoc title" })
       expect_errors("assignment_override_students" => [{
                       "attribute" => "assignment_override_students",
                       "type" => "taken",
@@ -604,7 +604,7 @@ describe AssignmentOverridesController, type: :request do
       end
 
       it "errors on invalid due_at" do
-        raw_api_create_override(@course, @assignment, assignment_override: { course_section_id: @course.default_section.id, due_at: 'bad data' })
+        raw_api_create_override(@course, @assignment, assignment_override: { course_section_id: @course.default_section.id, due_at: "bad data" })
         expect_error("invalid due_at \"bad data\"")
       end
     end
@@ -631,7 +631,7 @@ describe AssignmentOverridesController, type: :request do
       end
 
       it "errors on invalid unlock_at" do
-        raw_api_create_override(@course, @assignment, assignment_override: { course_section_id: @course.default_section.id, unlock_at: 'bad data' })
+        raw_api_create_override(@course, @assignment, assignment_override: { course_section_id: @course.default_section.id, unlock_at: "bad data" })
         expect_error("invalid unlock_at \"bad data\"")
       end
     end
@@ -658,7 +658,7 @@ describe AssignmentOverridesController, type: :request do
       end
 
       it "errors on invalid lock_at" do
-        raw_api_create_override(@course, @assignment, assignment_override: { course_section_id: @course.default_section.id, lock_at: 'bad data' })
+        raw_api_create_override(@course, @assignment, assignment_override: { course_section_id: @course.default_section.id, lock_at: "bad data" })
         expect_error("invalid lock_at \"bad data\"")
       end
     end
@@ -674,7 +674,7 @@ describe AssignmentOverridesController, type: :request do
   context "update" do
     def raw_api_update_override(course, assignment, override, data)
       raw_api_call(:put, "/api/v1/courses/#{course.id}/assignments/#{assignment.id}/overrides/#{override.id}.json",
-                   { controller: 'assignment_overrides', action: 'update', format: 'json',
+                   { controller: "assignment_overrides", action: "update", format: "json",
                      course_id: course.id.to_s, assignment_id: assignment.id.to_s, id: override.id.to_s },
                    data)
     end
@@ -682,7 +682,7 @@ describe AssignmentOverridesController, type: :request do
     def api_update_override(course, assignment, override, data)
       @user = @teacher
       api_call(:put, "/api/v1/courses/#{course.id}/assignments/#{assignment.id}/overrides/#{override.id}.json",
-               { controller: 'assignment_overrides', action: 'update', format: 'json',
+               { controller: "assignment_overrides", action: "update", format: "json",
                  course_id: course.id.to_s, assignment_id: assignment.id.to_s, id: override.id.to_s },
                data)
     end
@@ -704,7 +704,7 @@ describe AssignmentOverridesController, type: :request do
       @override.set = @course.default_section
       @override.save!
 
-      api_update_override(@course, @assignment, @override, assignment_override: { dummy: 'ignored' })
+      api_update_override(@course, @assignment, @override, assignment_override: { dummy: "ignored" })
 
       @override.reload
       expect(@override.set).to eq @course.default_section
@@ -717,7 +717,7 @@ describe AssignmentOverridesController, type: :request do
     context "adhoc override" do
       before :once do
         @student = student_in_course(course: @course).user
-        @title = 'adhoc title'
+        @title = "adhoc title"
         @user = @teacher
 
         @override.title = @title
@@ -762,7 +762,7 @@ describe AssignmentOverridesController, type: :request do
 
         mod = @course.context_modules.create!
         tag = mod.add_item({ id: @assignment.id, type: "assignment" })
-        mod.completion_requirements = { tag.id => { type: 'must_submit' } }
+        mod.completion_requirements = { tag.id => { type: "must_submit" } }
         mod.save!
 
         @old_student = @student
@@ -862,7 +862,7 @@ describe AssignmentOverridesController, type: :request do
         @original_group = @group
         @student = student_in_course(course: @course).user
         @user = @teacher
-        @original_group.add_user(@user, 'accepted')
+        @original_group.add_user(@user, "accepted")
 
         api_update_override(@course, @assignment, @override, assignment_override: { student_ids: [@student.id] })
         @override.reload
@@ -879,7 +879,7 @@ describe AssignmentOverridesController, type: :request do
 
       it "does not allow changing the title" do
         @new_title = "new title"
-        @group.add_user(@user, 'accepted')
+        @group.add_user(@user, "accepted")
         api_update_override(@course, @assignment, @override, assignment_override: { title: @new_title })
         @override.reload
         expect(@override.title).to eq @group.name
@@ -960,7 +960,7 @@ describe AssignmentOverridesController, type: :request do
       end
 
       it "errors on invalid due_at" do
-        raw_api_update_override(@course, @assignment, @override, assignment_override: { due_at: 'bad data' })
+        raw_api_update_override(@course, @assignment, @override, assignment_override: { due_at: "bad data" })
         expect_error("invalid due_at \"bad data\"")
       end
     end
@@ -1007,7 +1007,7 @@ describe AssignmentOverridesController, type: :request do
       end
 
       it "errors on invalid unlock_at" do
-        raw_api_update_override(@course, @assignment, @override, assignment_override: { unlock_at: 'bad data' })
+        raw_api_update_override(@course, @assignment, @override, assignment_override: { unlock_at: "bad data" })
         expect_error("invalid unlock_at \"bad data\"")
       end
     end
@@ -1054,7 +1054,7 @@ describe AssignmentOverridesController, type: :request do
       end
 
       it "errors on invalid lock_at" do
-        raw_api_update_override(@course, @assignment, @override, assignment_override: { lock_at: 'bad data' })
+        raw_api_update_override(@course, @assignment, @override, assignment_override: { lock_at: "bad data" })
         expect_error("invalid lock_at \"bad data\"")
       end
     end
@@ -1073,7 +1073,7 @@ describe AssignmentOverridesController, type: :request do
   context "destroy" do
     before :once do
       course_with_teacher(active_all: true)
-      assignment_model(course: @course, group_category: 'category')
+      assignment_model(course: @course, group_category: "category")
       assignment_override_model(assignment: @assignment)
       @override.set = @course.default_section
       @override.save!
@@ -1081,7 +1081,7 @@ describe AssignmentOverridesController, type: :request do
 
     it "deletes the override" do
       api_call(:delete, "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/overrides/#{@override.id}.json",
-               controller: 'assignment_overrides', action: 'destroy', format: 'json',
+               controller: "assignment_overrides", action: "destroy", format: "json",
                course_id: @course.id.to_s, assignment_id: @assignment.id.to_s, id: @override.id.to_s)
       @override.reload
       expect(@override).to be_deleted
@@ -1089,7 +1089,7 @@ describe AssignmentOverridesController, type: :request do
 
     it "returns the override details" do
       json = api_call(:delete, "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/overrides/#{@override.id}.json",
-                      controller: 'assignment_overrides', action: 'destroy', format: 'json',
+                      controller: "assignment_overrides", action: "destroy", format: "json",
                       course_id: @course.id.to_s, assignment_id: @assignment.id.to_s, id: @override.id.to_s)
       @override.reload
       validate_override_json(@override, json)
@@ -1098,13 +1098,13 @@ describe AssignmentOverridesController, type: :request do
     it "404s for non-visible override" do
       @override.destroy
       raw_api_call(:delete, "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/overrides/#{@override.id}.json",
-                   controller: 'assignment_overrides', action: 'destroy', format: 'json',
+                   controller: "assignment_overrides", action: "destroy", format: "json",
                    course_id: @course.id.to_s, assignment_id: @assignment.id.to_s, id: @override.id.to_s)
       assert_status(404)
     end
   end
 
-  context 'batch operations' do
+  context "batch operations" do
     before :once do
       course_with_teacher(active_all: true)
       @a, @b = Array.new(2) { assignment_model(course: @course) }
@@ -1127,7 +1127,7 @@ describe AssignmentOverridesController, type: :request do
     describe "batch_retrieve" do
       def call_batch_retrieve(overrides_array, opts = {})
         api_call(:get, "/api/v1/courses/#{@course.id}/assignments/overrides.json", {
-                   controller: 'assignment_overrides', action: 'batch_retrieve', format: 'json',
+                   controller: "assignment_overrides", action: "batch_retrieve", format: "json",
                    course_id: @course.id.to_s
                  },
                  { assignment_overrides: overrides_array },
@@ -1136,7 +1136,7 @@ describe AssignmentOverridesController, type: :request do
       end
 
       def matched_ids(json)
-        json.map { |override_json| override_json.try(:[], 'id') }
+        json.map { |override_json| override_json.try(:[], "id") }
       end
 
       it "fails if no overrides requested" do
@@ -1145,12 +1145,12 @@ describe AssignmentOverridesController, type: :request do
 
       it "fails if overrides incorrectly specified" do
         json = call_batch_retrieve([@a1.id, @a2.id], expected_status: 400)
-        expect(json['errors']).to eq ['must specify an array with entry format { id, assignment_id }']
+        expect(json["errors"]).to eq ["must specify an array with entry format { id, assignment_id }"]
       end
 
       it "fails if override ids incorrectly specified" do
         json = call_batch_retrieve([{ assignment: @a.id, override: @a1.id }], expected_status: 400)
-        expect(json['errors']).to eq ['must specify an array with entry format { id, assignment_id }']
+        expect(json["errors"]).to eq ["must specify an array with entry format { id, assignment_id }"]
       end
 
       it "retrieves multiple overrides in order" do
@@ -1161,7 +1161,7 @@ describe AssignmentOverridesController, type: :request do
                                    ])
         expect(matched_ids(json)).to eq [@a1.id, @b1.id, @a2.id]
         json.each do |override_json|
-          override = [@a1, @b1, @a2].find { |o| o.id == override_json['id'] }
+          override = [@a1, @b1, @a2].find { |o| o.id == override_json["id"] }
           validate_override_json(override, override_json)
         end
       end
@@ -1206,7 +1206,7 @@ describe AssignmentOverridesController, type: :request do
     describe "batch_update" do
       def call_batch_update(overrides_array, opts = {})
         api_call(:put, "/api/v1/courses/#{@course.id}/assignments/overrides.json", {
-                   controller: 'assignment_overrides', action: 'batch_update', format: 'json',
+                   controller: "assignment_overrides", action: "batch_update", format: "json",
                    course_id: @course.id.to_s
                  },
                  { assignment_overrides: overrides_array },
@@ -1216,9 +1216,9 @@ describe AssignmentOverridesController, type: :request do
 
       it "fails unless override ids are specified" do
         json = call_batch_update([
-                                   args_for(@a, nil, title: 'foo')
+                                   args_for(@a, nil, title: "foo")
                                  ], expected_status: 400)
-        expect(json['errors'][0]).to eq ["must specify an override id"]
+        expect(json["errors"][0]).to eq ["must specify an override id"]
       end
 
       it "fails for user without permissions" do
@@ -1228,29 +1228,29 @@ describe AssignmentOverridesController, type: :request do
 
       it "fails if ids not present" do
         json = call_batch_update([
-                                   args_for(@a, nil, title: 'foo'),
-                                   { title: 'bar', id: @b2.id, due_at: 'foo' }
+                                   args_for(@a, nil, title: "foo"),
+                                   { title: "bar", id: @b2.id, due_at: "foo" }
                                  ], expected_status: 400)
-        expect(json['errors'][0]).to eq ['must specify an override id']
-        expect(json['errors'][1]).to eq ['must specify an assignment id']
+        expect(json["errors"][0]).to eq ["must specify an override id"]
+        expect(json["errors"][1]).to eq ["must specify an assignment id"]
       end
 
       it "fails if attributes are invalid" do
         json = call_batch_update([
-                                   args_for(@a, @a1, due_at: 'foo')
+                                   args_for(@a, @a1, due_at: "foo")
                                  ], expected_status: 400)
-        expect(json['errors'][0]).to eq ['invalid due_at "foo"']
+        expect(json["errors"][0]).to eq ['invalid due_at "foo"']
       end
 
       it "fails if records not found" do
         @a.destroy!
         @b1.destroy!
         json = call_batch_update([
-                                   args_for(@a, @a1, title: 'foo'),
-                                   args_for(@b, @b1, title: 'bar')
+                                   args_for(@a, @a1, title: "foo"),
+                                   args_for(@b, @b1, title: "bar")
                                  ], expected_status: 400)
-        expect(json['errors'][0]).to eq ['assignment not found']
-        expect(json['errors'][1]).to eq ['override not found']
+        expect(json["errors"][0]).to eq ["assignment not found"]
+        expect(json["errors"][1]).to eq ["override not found"]
       end
 
       it "fails and not update if updates are invalid" do
@@ -1262,8 +1262,8 @@ describe AssignmentOverridesController, type: :request do
                                    args_for(@b, @b1, due_at: Time.zone.now.to_s),
                                    args_for(@a, @a1, title: new_title)
                                  ], expected_status: 400)
-        expect(json['errors'][0]).to be nil
-        expect(json['errors'][1].to_s).to match(/too_long/)
+        expect(json["errors"][0]).to be nil
+        expect(json["errors"][1].to_s).to match(/too_long/)
         expect(@a1.reload.title).to eq old_title
         expect(@b1.reload.due_at).to eq old_due_at
       end
@@ -1287,7 +1287,7 @@ describe AssignmentOverridesController, type: :request do
     describe "batch_create" do
       def call_batch_create(overrides_array, opts = {})
         api_call(:post, "/api/v1/courses/#{@course.id}/assignments/overrides.json", {
-                   controller: 'assignment_overrides', action: 'batch_create', format: 'json',
+                   controller: "assignment_overrides", action: "batch_create", format: "json",
                    course_id: @course.id.to_s
                  },
                  { assignment_overrides: overrides_array },
@@ -1297,13 +1297,13 @@ describe AssignmentOverridesController, type: :request do
 
       it "fails if override ids are specified" do
         json = call_batch_create([
-                                   args_for(@a, @a1, title: 'foo')
+                                   args_for(@a, @a1, title: "foo")
                                  ], expected_status: 400)
-        expect(json['errors'][0]).to eq ['may not specify an override id']
+        expect(json["errors"][0]).to eq ["may not specify an override id"]
       end
 
       it "succeeds if formatted correctly" do
-        skip 'DEMO-119 (1/27/2021)'
+        skip "DEMO-119 (1/27/2021)"
         section = @course.course_sections.create!
         student = student_in_section(section)
         date = Time.zone.now.tomorrow
@@ -1312,11 +1312,11 @@ describe AssignmentOverridesController, type: :request do
         json = call_batch_create([
                                    args_for(@a, nil, course_section_id: section.id, due_at: date),
                                    args_for(@b, nil, course_section_id: section.id, unlock_at: date),
-                                   args_for(@a, nil, student_ids: [student.id], title: 'foo')
+                                   args_for(@a, nil, student_ids: [student.id], title: "foo")
                                  ])
-        override1 = @a.assignment_overrides.find(json[0]['id'])
-        override2 = @b.assignment_overrides.find(json[1]['id'])
-        override3 = @a.assignment_overrides.find(json[2]['id'])
+        override1 = @a.assignment_overrides.find(json[0]["id"])
+        override2 = @b.assignment_overrides.find(json[1]["id"])
+        override3 = @a.assignment_overrides.find(json[2]["id"])
         validate_override_json(override1, json[0])
         validate_override_json(override2, json[1])
         validate_override_json(override3, json[2])

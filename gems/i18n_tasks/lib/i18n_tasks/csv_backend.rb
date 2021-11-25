@@ -20,13 +20,13 @@
 module I18nTasks
   module CsvBackend
     def load_csv(filename)
-      scope = File.basename(filename, '.*')
+      scope = File.basename(filename, ".*")
       data = CSV.read(filename, headers: true)
       csv_locales = data.headers - ["key"]
       ret = {}
       csv_locales.each do |locale|
         ret[locale.to_sym] = {
-          scope.to_sym => data.map { |row| [row['key'].to_sym, row[locale]] }.to_h
+          scope.to_sym => data.map { |row| [row["key"].to_sym, row[locale]] }.to_h
         }
       end
       ret

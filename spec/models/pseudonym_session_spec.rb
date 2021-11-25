@@ -26,7 +26,7 @@ describe PseudonymSession do
       def initialize
         request_cls = Class.new do
           def ip
-            '127.0.0.1'
+            "127.0.0.1"
           end
         end
         @request = request_cls.new
@@ -84,7 +84,7 @@ describe PseudonymSession do
       sess.save_record
       expect(pseud.reload.last_request_at).to eq(expected_timestamp)
       pseud.last_request_at = 1.second.from_now.utc
-      pseud.unique_id = 'some new value'
+      pseud.unique_id = "some new value"
       sess.save_record
       expect(pseud.reload.last_request_at > expected_timestamp).to be_truthy
     end

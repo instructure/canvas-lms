@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_dependency 'importers'
+require_dependency "importers"
 
 module Importers
   class CourseContentImporter < Importer
@@ -25,21 +25,21 @@ module Importers
     Importers.register_content_importer(self)
 
     def self.process_migration_files(data, migration)
-      data['all_files_export'] ||= {}
-      data['all_files_export']['file_path'] ||= data['all_files_zip']
-      return unless data['all_files_export']['file_path'] && File.exist?(data['all_files_export']['file_path'])
+      data["all_files_export"] ||= {}
+      data["all_files_export"]["file_path"] ||= data["all_files_zip"]
+      return unless data["all_files_export"]["file_path"] && File.exist?(data["all_files_export"]["file_path"])
 
       migration.attachment_path_id_lookup ||= {}
       migration.attachment_path_id_lookup_lower ||= {}
 
       params = migration.migration_settings[:migration_ids_to_import]
       valid_paths = []
-      (data['file_map'] || {}).each_value do |file|
-        path = file['path_name'].starts_with?('/') ? file['path_name'][1..] : file['path_name']
-        migration.add_attachment_path(path, file['migration_id'])
-        if migration.import_object?("attachments", file['migration_id']) || migration.import_object?("files", file['migration_id'])
-          if file['errored']
-            migration.add_warning(t(:file_import_warning, "File %{file} could not be found", file: File.basename(file['path_name'])))
+      (data["file_map"] || {}).each_value do |file|
+        path = file["path_name"].starts_with?("/") ? file["path_name"][1..] : file["path_name"]
+        migration.add_attachment_path(path, file["migration_id"])
+        if migration.import_object?("attachments", file["migration_id"]) || migration.import_object?("files", file["migration_id"])
+          if file["errored"]
+            migration.add_warning(t(:file_import_warning, "File %{file} could not be found", file: File.basename(file["path_name"])))
           else
             valid_paths << path
           end
@@ -60,7 +60,7 @@ module Importers
         end
         unzip_opts = {
           course: migration.context,
-          filename: data['all_files_export']['file_path'],
+          filename: data["all_files_export"]["file_path"],
           valid_paths: valid_paths,
           callback: callback,
           logger: logger,
@@ -97,8 +97,8 @@ module Importers
         migration.check_cross_institution
         logger.debug "migration is cross-institution; external references will not be used" if migration.cross_institution?
 
-        (data['web_link_categories'] || []).map { |c| c['links'] }.flatten.each do |link|
-          course.external_url_hash[link['link_id']] = link
+        (data["web_link_categories"] || []).map { |c| c["links"] }.flatten.each do |link|
+          course.external_url_hash[link["link_id"]] = link
         end
         ActiveRecord::Base.skip_touch_context
 
@@ -116,7 +116,7 @@ module Importers
               import_media_objects(mo_attachments, migration)
             rescue => e
               er = Canvas::Errors.capture_exception(:import_media_objects, e)[:error_report]
-              error_message = t('Failed to import media objects')
+              error_message = t("Failed to import media objects")
               migration.add_error(error_message, error_report_id: er)
             end
           end
@@ -208,8 +208,8 @@ module Importers
         migration.resolve_content_links!
         migration.update_import_progress(95)
 
-        if data['external_content']
-          Canvas::Migration::ExternalContent::Migrator.send_imported_content(migration, data['external_content'])
+        if data["external_content"]
+          Canvas::Migration::ExternalContent::Migrator.send_imported_content(migration, data["external_content"])
         end
         migration.update_import_progress(97)
 
@@ -225,7 +225,7 @@ module Importers
         migration.migration_settings ||= {}
 
         imported_asset_hash = {}
-        migration.imported_migration_items_hash.each { |k, assets| imported_asset_hash[k] = assets.values.map(&:id).join(',') if assets.present? }
+        migration.imported_migration_items_hash.each { |k, assets| imported_asset_hash[k] = assets.values.map(&:id).join(",") if assets.present? }
         migration.migration_settings[:imported_assets] = imported_asset_hash
         migration.workflow_state = :imported unless post_processing?(migration)
         migration.save
@@ -234,7 +234,7 @@ module Importers
            migration.migration_settings[:publish_after_completion] &&
            course.unpublished?
           # i could just do it directly but this way preserves the audit trail
-          course.update_one({ event: 'offer' }, migration.user, :blueprint_sync)
+          course.update_one({ event: "offer" }, migration.user, :blueprint_sync)
         end
 
         if course.changed?
@@ -417,10 +417,10 @@ module Importers
         tab_config = []
         all_tools = nil
         settings[:tab_configuration].each do |tab|
-          if tab['id'].is_a?(String) && tab['id'].start_with?('context_external_tool_')
-            tool_mig_id = tab['id'].sub('context_external_tool_', '')
+          if tab["id"].is_a?(String) && tab["id"].start_with?("context_external_tool_")
+            tool_mig_id = tab["id"].sub("context_external_tool_", "")
             all_tools ||= if migration.cross_institution?
-                            course.context_external_tools.having_setting('course_navigation')
+                            course.context_external_tools.having_setting("course_navigation")
                           else
                             ContextExternalTool.find_all_for(course, :course_navigation)
                           end
@@ -430,7 +430,7 @@ module Importers
                   CC::CCHelper.create_key(t, global: true) == tool_mig_id
                 end)
               # translate the migration_id to a real id
-              tab['id'] = "context_external_tool_#{tool.id}"
+              tab["id"] = "context_external_tool_#{tool.id}"
               tab_config << tab
             end
           else
@@ -447,7 +447,7 @@ module Importers
       course.settings_will_change! unless atts.empty?
 
       # superhax to force new wiki front page if home view changed (or is master course sync)
-      if settings['default_view'] && data[:wikis] && (migration.for_master_course_import? || (settings['default_view'] != course.default_view))
+      if settings["default_view"] && data[:wikis] && (migration.for_master_course_import? || (settings["default_view"] != course.default_view))
         course.wiki # ensure that it exists already
         if (page_hash = data[:wikis].detect { |h| h[:front_page] }) &&
            (page = migration.find_imported_migration_item(WikiPage, page_hash[:migration_id]))
@@ -455,13 +455,13 @@ module Importers
         end
       end
 
-      if settings.key?('overridden_course_visibility')
-        course.apply_overridden_course_visibility(settings.delete('overridden_course_visibility'))
+      if settings.key?("overridden_course_visibility")
+        course.apply_overridden_course_visibility(settings.delete("overridden_course_visibility"))
       end
 
       if migration.for_master_course_import?
-        course.start_at    = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(settings['start_at']) if settings.key?('start_at')
-        course.conclude_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(settings['conclude_at']) if settings.key?('conclude_at')
+        course.start_at    = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(settings["start_at"]) if settings.key?("start_at")
+        course.conclude_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(settings["conclude_at"]) if settings.key?("conclude_at")
       end
 
       settings.slice(*atts.map(&:to_s)).each do |key, val|

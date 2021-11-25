@@ -22,7 +22,7 @@ class Mutations::DeleteConversationMessages < Mutations::BaseMutation
   graphql_name "DeleteConversationMessages"
 
   # input arguments
-  argument :ids, [ID], required: true, prepare: GraphQLHelpers.relay_or_legacy_ids_prepare_func('ConversationMessage')
+  argument :ids, [ID], required: true, prepare: GraphQLHelpers.relay_or_legacy_ids_prepare_func("ConversationMessage")
 
   field :conversation_message_ids, [ID], null: false
 

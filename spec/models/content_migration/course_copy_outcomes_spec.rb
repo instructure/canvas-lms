@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative 'course_copy_helper'
+require_relative "course_copy_helper"
 
 describe ContentMigration do
   context "course copy outcomes" do
@@ -35,7 +35,7 @@ describe ContentMigration do
       lo = @copy_from.created_learning_outcomes.new
       lo.context = @copy_from
       lo.short_description = "outcome1"
-      lo.workflow_state = 'active'
+      lo.workflow_state = "active"
       lo.data = { rubric_criterion: { mastery_points: 2, ratings: [{ description: "e", points: 50 }, { description: "me", points: 2 }, { description: "Does Not Meet Expectations", points: 0.5 }], description: "First outcome", points_possible: 5 } }
       lo.save!
 
@@ -58,15 +58,15 @@ describe ContentMigration do
       lo = @copy_from.created_learning_outcomes.new
       lo.context = @copy_from
       lo.short_description = "outcome1"
-      lo.workflow_state = 'active'
+      lo.workflow_state = "active"
       lo.data = { rubric_criterion: { mastery_points: 2, ratings: [{ description: "e", points: 50 }, { description: "me", points: 2 }, { description: "Does Not Meet Expectations", points: 0.5 }], description: "First outcome", points_possible: 5 } }
       lo.save!
       default.add_outcome(lo)
 
-      bank = @copy_from.assessment_question_banks.create!(title: 'bank')
-      bank.assessment_questions.create!(question_data: { 'name' => 'test question', 'question_type' => 'essay_question' })
+      bank = @copy_from.assessment_question_banks.create!(title: "bank")
+      bank.assessment_questions.create!(question_data: { "name" => "test question", "question_type" => "essay_question" })
 
-      lo.align(bank, @copy_from, { mastery_type: 'points', mastery_score: 50.0 })
+      lo.align(bank, @copy_from, { mastery_type: "points", mastery_score: 50.0 })
 
       run_course_copy
 
@@ -79,7 +79,7 @@ describe ContentMigration do
       expect(new_alignment.content).to eq new_bank
       expect(new_alignment.context).to eq @copy_to
 
-      expect(new_alignment.tag).to eq 'points_mastery'
+      expect(new_alignment.tag).to eq "points_mastery"
       expect(new_alignment.mastery_score).to eq 50.0
     end
 
@@ -209,10 +209,10 @@ describe ContentMigration do
       root.adopt_outcome_group(log)
       log.add_outcome(lo)
 
-      bank = @copy_from.assessment_question_banks.create!(title: 'bank')
-      bank.assessment_questions.create!(question_data: { 'name' => 'test question', 'question_type' => 'essay_question' })
+      bank = @copy_from.assessment_question_banks.create!(title: "bank")
+      bank.assessment_questions.create!(question_data: { "name" => "test question", "question_type" => "essay_question" })
 
-      lo.align(bank, @copy_from, { mastery_type: 'points', mastery_score: 50.0 })
+      lo.align(bank, @copy_from, { mastery_type: "points", mastery_score: 50.0 })
 
       run_course_copy
 
@@ -328,7 +328,7 @@ describe ContentMigration do
     end
 
     it "links copied account outcomes to rubrics in a cross-account copy" do
-      sub1 = Account.default.sub_accounts.create!(name: 'A')
+      sub1 = Account.default.sub_accounts.create!(name: "A")
       @copy_from.account = sub1
       @copy_from.save!
 
@@ -346,7 +346,7 @@ describe ContentMigration do
       rub.save!
       rub.associate_with(@copy_from, @copy_from)
 
-      sub2 = Account.default.sub_accounts.create!(name: 'B')
+      sub2 = Account.default.sub_accounts.create!(name: "B")
       @copy_to.account = sub2
       @copy_to.save!
 
@@ -412,7 +412,7 @@ describe ContentMigration do
       lo = @copy_from.created_learning_outcomes.new
       lo.context = @copy_from
       lo.short_description = "outcome1"
-      lo.workflow_state = 'active'
+      lo.workflow_state = "active"
       lo.data = { rubric_criterion: { mastery_points: 2, ratings: [{ description: "e", points: 50 }, { description: "me", points: 2 }, { description: "Does Not Meet Expectations", points: 0.5 }], description: "First outcome", points_possible: 5 } }
       lo.save!
 

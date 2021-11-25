@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'spec_helper'
+require "spec_helper"
 
 describe AdheresToPolicy::Policy, "set_policy" do
   it "takes a block" do
@@ -60,8 +60,8 @@ describe AdheresToPolicy::Policy, "set_policy" do
     end
   end
 
-  describe '#add_rights' do
-    it 'adds rights to parents' do
+  describe "#add_rights" do
+    it "adds rights to parents" do
       right = double
       condition = double
       parent = AdheresToPolicy::Policy.new(nil, nil)

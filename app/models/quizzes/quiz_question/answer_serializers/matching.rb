@@ -43,7 +43,7 @@ module Quizzes::QuizQuestion::AnswerSerializers
       rc = SerializedAnswer.new
 
       unless pairings.is_a?(Array)
-        return rc.reject :invalid_type, 'answer', Array
+        return rc.reject :invalid_type, "answer", Array
       end
 
       pairings.each_with_index do |entry, index|
@@ -64,7 +64,7 @@ module Quizzes::QuizQuestion::AnswerSerializers
         answer_id = Util.to_integer(entry[:answer_id])
 
         if answer_id.nil?
-          return rc.reject :invalid_type, 'answer_id', Integer
+          return rc.reject :invalid_type, "answer_id", Integer
         end
 
         unless answer_available? answer_id
@@ -74,7 +74,7 @@ module Quizzes::QuizQuestion::AnswerSerializers
         match_id = Util.to_integer(entry[:match_id])
 
         if match_id.nil?
-          return rc.reject :invalid_type, 'match_id', Integer
+          return rc.reject :invalid_type, "match_id", Integer
         end
 
         unless match_available? match_id
@@ -115,7 +115,7 @@ module Quizzes::QuizQuestion::AnswerSerializers
     private
 
     def build_answer_key(answer_id)
-      [question_key, 'answer', answer_id].join('_')
+      [question_key, "answer", answer_id].join("_")
     end
 
     def match_ids

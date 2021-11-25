@@ -21,7 +21,7 @@
 describe SIS::CSV::TermImporter do
   before { account_model }
 
-  it 'skips bad content' do
+  it "skips bad content" do
     before_count = EnrollmentTerm.where.not(sis_source_id: nil).count
     importer = process_csv_data(
       "term_id,name,status,start_date,end_date",
@@ -38,7 +38,7 @@ describe SIS::CSV::TermImporter do
                           "No name given for term T003"]
   end
 
-  it 'creates terms' do
+  it "creates terms" do
     before_count = EnrollmentTerm.where.not(sis_source_id: nil).count
     importer = process_csv_data(
       "term_id,name,status,start_date,end_date",
@@ -48,22 +48,22 @@ describe SIS::CSV::TermImporter do
     )
     expect(EnrollmentTerm.where.not(sis_source_id: nil).count).to eq before_count + 3
 
-    t1 = @account.enrollment_terms.where(sis_source_id: 'T001').first
+    t1 = @account.enrollment_terms.where(sis_source_id: "T001").first
     expect(t1).not_to be_nil
-    expect(t1.name).to eq 'Winter11'
-    expect(t1.start_at.to_s(:db)).to eq '2011-01-05 00:00:00'
-    expect(t1.end_at.to_s(:db)).to eq '2011-04-14 00:00:00'
+    expect(t1.name).to eq "Winter11"
+    expect(t1.start_at.to_s(:db)).to eq "2011-01-05 00:00:00"
+    expect(t1.end_at.to_s(:db)).to eq "2011-04-14 00:00:00"
 
-    t2 = @account.enrollment_terms.where(sis_source_id: 'T002').first
+    t2 = @account.enrollment_terms.where(sis_source_id: "T002").first
     expect(t2).not_to be_nil
-    expect(t2.name).to eq 'Winter12'
+    expect(t2.name).to eq "Winter12"
     expect(t2.start_at).to be_nil
     expect(t2.end_at).to be_nil
 
     expect(importer.errors.map(&:last)).to eq ["Bad date format for term T002"]
   end
 
-  it 'supports stickiness' do
+  it "supports stickiness" do
     before_count = EnrollmentTerm.where.not(sis_source_id: nil).count
     process_csv_data(
       "term_id,name,status,start_date,end_date",
@@ -101,13 +101,13 @@ describe SIS::CSV::TermImporter do
     end
   end
 
-  it 'does not delete terms with active courses' do
+  it "does not delete terms with active courses" do
     process_csv_data(
       "term_id,name,status,start_date,end_date",
       "T001,Winter11,active,2011-1-05 00:00:00,2011-4-14 00:00:00"
     )
 
-    t1 = @account.enrollment_terms.where(sis_source_id: 'T001').first
+    t1 = @account.enrollment_terms.where(sis_source_id: "T001").first
 
     course_factory(account: @account)
     @course.enrollment_term = t1
@@ -133,14 +133,14 @@ describe SIS::CSV::TermImporter do
     expect(t1).to be_deleted
   end
 
-  it 'allows setting and removing enrollment type date overrides' do
+  it "allows setting and removing enrollment type date overrides" do
     process_csv_data(
       "term_id,name,status,start_date,end_date,date_override_enrollment_type",
       "T001,Winter11,active,2011-1-05 00:00:00,2011-4-14 00:00:00,",
       "T001,Winter11,active,2012-1-05 00:00:00,2012-4-14 00:00:00,StudentEnrollment"
     )
 
-    t1 = @account.enrollment_terms.where(sis_source_id: 'T001').first
+    t1 = @account.enrollment_terms.where(sis_source_id: "T001").first
     override = t1.enrollment_dates_overrides.where(enrollment_type: "StudentEnrollment").first
     expect(override.start_at).to eq DateTime.parse("2012-1-05 00:00:00")
     expect(override.end_at).to eq DateTime.parse("2012-4-14 00:00:00")
@@ -153,7 +153,7 @@ describe SIS::CSV::TermImporter do
     expect(t1.enrollment_dates_overrides.where(enrollment_type: "StudentEnrollment").first).to be_nil
   end
 
-  it 'creates rollback data' do
+  it "creates rollback data" do
     process_csv_data_cleanly(
       "term_id,name,status,start_date,end_date",
       "T001,Winter11,active,2011-1-05 00:00:00,2011-4-14 00:00:00"
@@ -164,8 +164,8 @@ describe SIS::CSV::TermImporter do
       "T001,Winter11,deleted,2011-1-05 00:00:00,2011-4-14 00:00:00",
       batch: batch2
     )
-    expect(batch2.roll_back_data.where(updated_workflow_state: 'deleted').count).to eq 1
+    expect(batch2.roll_back_data.where(updated_workflow_state: "deleted").count).to eq 1
     batch2.restore_states_for_batch
-    expect(@account.enrollment_terms.where(sis_source_id: 'T001').take.workflow_state).to eq 'active'
+    expect(@account.enrollment_terms.where(sis_source_id: "T001").take.workflow_state).to eq "active"
   end
 end

@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'active_support/core_ext/enumerable'
+require "active_support/core_ext/enumerable"
 
 module AdheresToPolicy
   module InstanceMethods
@@ -307,8 +307,8 @@ module AdheresToPolicy
       # If you're going to add something to the user session that
       # affects permissions, you'd durn well better a :permissions_key
       # on the session as well
-      permissions_key = session ? (session[:permissions_key] || 'default') : nil # no session != no permissions_key
-      ['permissions', self, user, permissions_key, right].compact
+      permissions_key = session ? (session[:permissions_key] || "default") : nil # no session != no permissions_key
+      ["permissions", self, user, permissions_key, right].compact
                                                          .map { |element| ActiveSupport::Cache.expand_cache_key(element) }
                                                          .to_param
     end

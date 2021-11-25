@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../api_spec_helper'
+require_relative "../api_spec_helper"
 
 describe "Admins API", type: :request do
   before :once do
@@ -28,14 +28,14 @@ describe "Admins API", type: :request do
 
   describe "create" do
     before :once do
-      @new_user = user_factory(name: 'new guy')
-      @admin.account.root_account.pseudonyms.create!(unique_id: 'user', user: @new_user)
+      @new_user = user_factory(name: "new guy")
+      @admin.account.root_account.pseudonyms.create!(unique_id: "user", user: @new_user)
       @user = @admin
     end
 
     it "flags the user as an admin for the account" do
       api_call(:post, "/api/v1/accounts/#{@admin.account.id}/admins",
-               { controller: 'admins', action: 'create', format: 'json', account_id: @admin.account.id.to_s },
+               { controller: "admins", action: "create", format: "json", account_id: @admin.account.id.to_s },
                { user_id: @new_user.id })
       @new_user.reload
       expect(@new_user.account_users.size).to eq 1
@@ -45,7 +45,7 @@ describe "Admins API", type: :request do
 
     it "defaults the role of the admin association to AccountAdmin" do
       api_call(:post, "/api/v1/accounts/#{@admin.account.id}/admins",
-               { controller: 'admins', action: 'create', format: 'json', account_id: @admin.account.id.to_s },
+               { controller: "admins", action: "create", format: "json", account_id: @admin.account.id.to_s },
                { user_id: @new_user.id })
       @new_user.reload
       admin = @new_user.account_users.first
@@ -53,9 +53,9 @@ describe "Admins API", type: :request do
     end
 
     it "respects the provided role, if any" do
-      role = custom_account_role('CustomAccountUser', account: @admin.account)
+      role = custom_account_role("CustomAccountUser", account: @admin.account)
       api_call(:post, "/api/v1/accounts/#{@admin.account.id}/admins",
-               { controller: 'admins', action: 'create', format: 'json', account_id: @admin.account.id.to_s },
+               { controller: "admins", action: "create", format: "json", account_id: @admin.account.id.to_s },
                { user_id: @new_user.id, role_id: role.id })
       @new_user.reload
       admin = @new_user.account_users.first
@@ -63,9 +63,9 @@ describe "Admins API", type: :request do
     end
 
     it "is able to find a role by name (though deprecated)" do
-      role = custom_account_role('CustomAccountUser', account: @admin.account)
+      role = custom_account_role("CustomAccountUser", account: @admin.account)
       api_call(:post, "/api/v1/accounts/#{@admin.account.id}/admins",
-               { controller: 'admins', action: 'create', format: 'json', account_id: @admin.account.id.to_s },
+               { controller: "admins", action: "create", format: "json", account_id: @admin.account.id.to_s },
                { user_id: @new_user.id, role: "CustomAccountUser" })
       @new_user.reload
       admin = @new_user.account_users.first
@@ -74,7 +74,7 @@ describe "Admins API", type: :request do
 
     it "returns json of the new admin association" do
       json = api_call(:post, "/api/v1/accounts/#{@admin.account.id}/admins",
-                      { controller: 'admins', action: 'create', format: 'json', account_id: @admin.account.id.to_s },
+                      { controller: "admins", action: "create", format: "json", account_id: @admin.account.id.to_s },
                       { user_id: @new_user.id })
       @new_user.reload
       admin = @new_user.account_users.first
@@ -93,7 +93,7 @@ describe "Admins API", type: :request do
                              "sortable_name" => @new_user.sortable_name,
                              "login_id" => "user",
                            },
-                           "workflow_state" => 'active'
+                           "workflow_state" => "active"
                          })
     end
 
@@ -102,9 +102,9 @@ describe "Admins API", type: :request do
       expect_any_instance_of(AccountUser).not_to receive(:account_user_registration!)
 
       api_call(:post, "/api/v1/accounts/#{@admin.account.id}/admins",
-               { controller: 'admins', action: 'create', format: 'json',
+               { controller: "admins", action: "create", format: "json",
                  account_id: @admin.account.to_param },
-               { user_id: @new_user.to_param, send_confirmation: '0' })
+               { user_id: @new_user.to_param, send_confirmation: "0" })
 
       # Both of the expectations above should pass.
     end
@@ -114,9 +114,9 @@ describe "Admins API", type: :request do
       expect_any_instance_of(AccountUser).not_to receive(:account_user_registration!)
 
       api_call(:post, "/api/v1/accounts/#{@admin.account.id}/admins",
-               { controller: 'admins', action: 'create', format: 'json',
+               { controller: "admins", action: "create", format: "json",
                  account_id: @admin.account.to_param },
-               { user_id: @new_user.to_param, send_confirmation: 'false' })
+               { user_id: @new_user.to_param, send_confirmation: "false" })
 
       # Both of the expectations above should pass.
     end
@@ -125,7 +125,7 @@ describe "Admins API", type: :request do
       expect_any_instance_of(AccountUser).to receive(:account_user_registration!).once
 
       api_call(:post, "/api/v1/accounts/#{@admin.account.id}/admins",
-               { controller: 'admins', action: 'create', format: 'json',
+               { controller: "admins", action: "create", format: "json",
                  account_id: @admin.account.to_param },
                { user_id: @new_user.to_param })
 
@@ -135,16 +135,16 @@ describe "Admins API", type: :request do
     it "does not allow you to add a random user" do
       @new_user.pseudonym.destroy
       raw_api_call(:post, "/api/v1/accounts/#{@admin.account.id}/admins",
-                   { controller: 'admins', action: 'create', format: 'json', account_id: @admin.account.id.to_s },
+                   { controller: "admins", action: "create", format: "json", account_id: @admin.account.id.to_s },
                    { user_id: @new_user.id })
-      expect(response.code).to eq '404'
+      expect(response.code).to eq "404"
     end
   end
 
   describe "destroy" do
     before :once do
       @account = Account.default
-      @new_user = user_with_managed_pseudonym(name: 'bad admin', account: @account, sis_user_id: 'badmin')
+      @new_user = user_with_managed_pseudonym(name: "bad admin", account: @account, sis_user_id: "badmin")
       @user = @admin
       @base_path = "/api/v1/accounts/#{@account.id}/admins/"
       @path = @base_path + @new_user.id.to_s
@@ -170,11 +170,11 @@ describe "Admins API", type: :request do
 
       it "removes AccountAdmin membership" do
         json = api_call(:delete, @path, @path_opts)
-        expect(json['user']['id']).to eq @new_user.id
-        expect(json['id']).to eq @au.id
-        expect(json['role']).to eq 'AccountAdmin'
-        expect(json['workflow_state']).to eq 'deleted'
-        expect(@au.reload.workflow_state).to eq 'deleted'
+        expect(json["user"]["id"]).to eq @new_user.id
+        expect(json["id"]).to eq @au.id
+        expect(json["role"]).to eq "AccountAdmin"
+        expect(json["workflow_state"]).to eq "deleted"
+        expect(@au.reload.workflow_state).to eq "deleted"
       end
 
       it "removes AccountAdmin membership explicitly" do
@@ -199,7 +199,7 @@ describe "Admins API", type: :request do
 
     context "with custom membership" do
       before :once do
-        @role = custom_account_role('CustomAdmin', account: @account)
+        @role = custom_account_role("CustomAdmin", account: @account)
         @au = @account.account_users.create!(user: @new_user, role: @role)
       end
 
@@ -226,7 +226,7 @@ describe "Admins API", type: :request do
 
     context "with multiple memberships" do
       before :once do
-        @role = custom_account_role('CustomAdmin', account: @account)
+        @role = custom_account_role("CustomAdmin", account: @account)
         @au1 = @account.account_users.create! user: @new_user
         @au2 = @account.account_users.create! user: @new_user, role: @role
       end
@@ -292,7 +292,7 @@ describe "Admins API", type: :request do
                                         "integration_id" => nil,
                                         "sis_import_id" => nil,
                                         "login_id" => @admin.pseudonym.unique_id },
-                                     "workflow_state" => 'active' })
+                                     "workflow_state" => "active" })
       end
 
       it "scopes the results to the user_id if given" do
@@ -310,7 +310,7 @@ describe "Admins API", type: :request do
                                  "integration_id" => nil,
                                  "sis_import_id" => nil,
                                  "login_id" => @admin.pseudonym.unique_id },
-                              "workflow_state" => 'active' }]
+                              "workflow_state" => "active" }]
       end
 
       it "scopes the results to the array of user_ids if given" do
@@ -328,7 +328,7 @@ describe "Admins API", type: :request do
                                  "integration_id" => nil,
                                  "sis_import_id" => nil,
                                  "login_id" => @admin.pseudonym.unique_id },
-                              "workflow_state" => 'active' },
+                              "workflow_state" => "active" },
                             { "id" => @another_admin.account_users.first.id,
                               "role" => "MT 1",
                               "role_id" => @roles[1].id,
@@ -341,10 +341,10 @@ describe "Admins API", type: :request do
                                  "integration_id" => nil,
                                  "sis_import_id" => nil,
                                  "short_name" => @another_admin.short_name },
-                              "workflow_state" => 'active' }]
+                              "workflow_state" => "active" }]
       end
 
-      context 'sharding' do
+      context "sharding" do
         specs_require_sharding
 
         it "works with cross-shard users" do
@@ -359,15 +359,15 @@ describe "Admins API", type: :request do
       end
 
       it "paginates" do
-        json = api_call(:get, @path + "?per_page=2", @path_opts.merge(per_page: '2'))
-        expect(response.headers['Link']).to match(%r{<http://www.example.com/api/v1/accounts/#{@account.id}/admins\?.*page=2.*>; rel="next",<http://www.example.com/api/v1/accounts/#{@account.id}/admins\?.*page=1.*>; rel="first",<http://www.example.com/api/v1/accounts/#{@account.id}/admins\?.*page=2.*>; rel="last"})
-        expect(json.map { |au| { user: au['user']['name'], role: au['role'], role_id: au['role_id'] } }).to eq [
-          { user: @admin.name, role: 'AccountAdmin', role_id: admin_role.id },
+        json = api_call(:get, @path + "?per_page=2", @path_opts.merge(per_page: "2"))
+        expect(response.headers["Link"]).to match(%r{<http://www.example.com/api/v1/accounts/#{@account.id}/admins\?.*page=2.*>; rel="next",<http://www.example.com/api/v1/accounts/#{@account.id}/admins\?.*page=1.*>; rel="first",<http://www.example.com/api/v1/accounts/#{@account.id}/admins\?.*page=2.*>; rel="last"})
+        expect(json.map { |au| { user: au["user"]["name"], role: au["role"], role_id: au["role_id"] } }).to eq [
+          { user: @admin.name, role: "AccountAdmin", role_id: admin_role.id },
           { user: "User 0", role: "MT 0", role_id: @roles[0].id },
         ]
-        json = api_call(:get, @path + "?per_page=2&page=2", @path_opts.merge(per_page: '2', page: '2'))
-        expect(response.headers['Link']).to match(%r{<http://www.example.com/api/v1/accounts/#{@account.id}/admins\?.*page=1.*>; rel="prev",<http://www.example.com/api/v1/accounts/#{@account.id}/admins\?.*page=1.*>; rel="first",<http://www.example.com/api/v1/accounts/#{@account.id}/admins\?.*page=2.*>; rel="last"})
-        expect(json.map { |au| { user: au['user']['name'], role: au['role'], role_id: au['role_id'] } }).to eq [
+        json = api_call(:get, @path + "?per_page=2&page=2", @path_opts.merge(per_page: "2", page: "2"))
+        expect(response.headers["Link"]).to match(%r{<http://www.example.com/api/v1/accounts/#{@account.id}/admins\?.*page=1.*>; rel="prev",<http://www.example.com/api/v1/accounts/#{@account.id}/admins\?.*page=1.*>; rel="first",<http://www.example.com/api/v1/accounts/#{@account.id}/admins\?.*page=2.*>; rel="last"})
+        expect(json.map { |au| { user: au["user"]["name"], role: au["role"], role_id: au["role_id"] } }).to eq [
           { user: "User 1", role: "MT 1", role_id: @roles[1].id }
         ]
       end

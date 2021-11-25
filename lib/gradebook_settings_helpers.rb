@@ -27,8 +27,8 @@ module GradebookSettingsHelpers
       gb_settings = user.get_preference(:gradebook_settings, course_id) || {}
 
       includes = []
-      includes << :inactive if gb_settings.fetch('show_inactive_enrollments', "false") == "true"
-      if gb_settings.fetch('show_concluded_enrollments', "false") == "true" || course.completed?
+      includes << :inactive if gb_settings.fetch("show_inactive_enrollments", "false") == "true"
+      if gb_settings.fetch("show_concluded_enrollments", "false") == "true" || course.completed?
         includes << :completed
       end
       includes

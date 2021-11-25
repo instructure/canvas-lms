@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'authlogic/crypto_providers/bcrypt'
+require "authlogic/crypto_providers/bcrypt"
 
 # A SessionPersistenceToken is a one-time-use "remember me" token to maintain a
 # user's login across browser sessions. It has an expiry, and it's destroyed
@@ -75,7 +75,7 @@ class SessionPersistenceToken < ActiveRecord::Base
   end
 
   def self.delete_expired(since)
-    where('updated_at < ?', since.seconds.ago).delete_all
+    where("updated_at < ?", since.seconds.ago).delete_all
   end
 
   def valid_token?(persistence_token, uncrypted_token)

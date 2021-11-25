@@ -29,7 +29,7 @@ describe StreamItemCache do
         @teacher.cached_recent_stream_items # cache the dashboard items
         @teacher.cached_recent_stream_items(contexts: [@course]) # cache the context items
         dashboard_key = StreamItemCache.recent_stream_items_key(@teacher)
-        context_key   = StreamItemCache.recent_stream_items_key(@teacher, 'Course', @course.id)
+        context_key   = StreamItemCache.recent_stream_items_key(@teacher, "Course", @course.id)
         expect(Rails.cache.read(dashboard_key)).not_to be_blank
         expect(Rails.cache.read(context_key)).not_to be_blank
 

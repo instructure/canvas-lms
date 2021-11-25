@@ -79,7 +79,7 @@ class ErrorsController < ApplicationController
 
     @message = params[:message]
     if error_search_enabled? && @message.present?
-      @reports = @reports.where("message LIKE ?", '%' + @message + '%')
+      @reports = @reports.where("message LIKE ?", "%" + @message + "%")
     elsif params[:category].blank?
       @reports = @reports.where("category<>'404'")
     end
@@ -87,7 +87,7 @@ class ErrorsController < ApplicationController
       @reports = @reports.where(category: params[:category])
     end
 
-    @reports = @reports.order('created_at DESC').paginate(per_page: PER_PAGE, page: params[:page], total_entries: nil)
+    @reports = @reports.order("created_at DESC").paginate(per_page: PER_PAGE, page: params[:page], total_entries: nil)
   end
 
   def show
@@ -141,7 +141,7 @@ class ErrorsController < ApplicationController
     # this is a honeypot field to catch spambots. it's hidden via css and should always be empty.
     return render(nothing: true, status: :bad_request) if error.delete(:username).present?
 
-    error[:user_agent] = request.headers['User-Agent']
+    error[:user_agent] = request.headers["User-Agent"]
     begin
       report_id = error.delete(:id)
       report = ErrorReport.where(id: report_id.to_i).first if report_id.present? && report_id.to_i != 0
@@ -171,7 +171,7 @@ class ErrorsController < ApplicationController
       )
     end
     respond_to do |format|
-      flash[:notice] = t('notices.error_reported', "Thanks for your help!  We'll get right on this")
+      flash[:notice] = t("notices.error_reported", "Thanks for your help!  We'll get right on this")
       format.html { redirect_to root_url }
       format.json { render json: { logged: true, id: report.try(:id) } }
     end

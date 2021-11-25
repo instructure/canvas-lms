@@ -21,9 +21,9 @@ class ContentTag < ActiveRecord::Base
   class LastLinkToOutcomeNotDestroyed < StandardError
   end
 
-  TABLED_CONTENT_TYPES = ['Attachment', 'Assignment', 'WikiPage', 'Quizzes::Quiz', 'LearningOutcome', 'DiscussionTopic',
-                          'Rubric', 'ContextExternalTool', 'LearningOutcomeGroup', 'AssessmentQuestionBank', 'LiveAssessments::Assessment', 'Lti::MessageHandler'].freeze
-  TABLELESS_CONTENT_TYPES = ['ContextModuleSubHeader', 'ExternalUrl'].freeze
+  TABLED_CONTENT_TYPES = ["Attachment", "Assignment", "WikiPage", "Quizzes::Quiz", "LearningOutcome", "DiscussionTopic",
+                          "Rubric", "ContextExternalTool", "LearningOutcomeGroup", "AssessmentQuestionBank", "LiveAssessments::Assessment", "Lti::MessageHandler"].freeze
+  TABLELESS_CONTENT_TYPES = ["ContextModuleSubHeader", "ExternalUrl"].freeze
   CONTENT_TYPES = (TABLED_CONTENT_TYPES + TABLELESS_CONTENT_TYPES).freeze
 
   include Workflow
@@ -36,15 +36,15 @@ class ContentTag < ActiveRecord::Base
   validates :content_type, inclusion: { allow_nil: true, in: CONTENT_TYPES }
   belongs_to :context, polymorphic:
       [:course, :learning_outcome_group, :assignment, :account,
-       { quiz: 'Quizzes::Quiz' }]
-  belongs_to :associated_asset, polymorphic: [:learning_outcome_group, lti_resource_link: 'Lti::ResourceLink'],
+       { quiz: "Quizzes::Quiz" }]
+  belongs_to :associated_asset, polymorphic: [:learning_outcome_group, lti_resource_link: "Lti::ResourceLink"],
                                 polymorphic_prefix: true
   belongs_to :context_module
   belongs_to :learning_outcome
   # This allows doing a has_many_through relationship on ContentTags for linked LearningOutcomes. (see LearningOutcomeContext)
-  belongs_to :learning_outcome_content, class_name: 'LearningOutcome', foreign_key: :content_id
+  belongs_to :learning_outcome_content, class_name: "LearningOutcome", foreign_key: :content_id
   has_many :learning_outcome_results
-  belongs_to :root_account, class_name: 'Account'
+  belongs_to :root_account, class_name: "Account"
 
   after_create :clear_stream_items_if_module_is_unpublished
 
@@ -90,7 +90,7 @@ class ContentTag < ActiveRecord::Base
 
   alias_method :published?, :active?
 
-  scope :active, -> { where(workflow_state: 'active') }
+  scope :active, -> { where(workflow_state: "active") }
   scope :not_deleted, -> { where("content_tags.workflow_state<>'deleted'") }
 
   attr_accessor :skip_touch
@@ -120,21 +120,21 @@ class ContentTag < ActiveRecord::Base
   end
 
   def touch_context_if_learning_outcome
-    if (tag_type == 'learning_outcome_association' || tag_type == 'learning_outcome') && skip_touch.blank?
+    if (tag_type == "learning_outcome_association" || tag_type == "learning_outcome") && skip_touch.blank?
       context_type.constantize.where(id: context_id).update_all(updated_at: Time.now.utc)
     end
   end
 
   def update_outcome_contexts
-    return unless tag_type == 'learning_outcome_association'
+    return unless tag_type == "learning_outcome_association"
 
-    if context_type == 'Account' || context_type == 'Course'
+    if context_type == "Account" || context_type == "Course"
       content.add_root_account_id_for_context!(context)
     end
   end
 
   def associate_external_tool
-    return if content.present? || content_type != 'ContextExternalTool' || context.blank? || url.blank?
+    return if content.present? || content_type != "ContextExternalTool" || context.blank? || url.blank?
 
     content = ContextExternalTool.find_external_tool(url, context)
     self.content = content if content
@@ -189,8 +189,8 @@ class ContentTag < ActiveRecord::Base
   end
 
   def graded?
-    return true if content_type == 'Assignment'
-    return false if content_type == 'WikiPage'
+    return true if content_type == "Assignment"
+    return false if content_type == "WikiPage"
     return false unless can_have_assignment?
 
     content && !content.assignment_id.nil?
@@ -198,9 +198,9 @@ class ContentTag < ActiveRecord::Base
 
   def duplicate_able?
     case content_type_class
-    when 'assignment'
+    when "assignment"
       content&.can_duplicate?
-    when 'discussion_topic', 'wiki_page'
+    when "discussion_topic", "wiki_page"
       true
     else
       false
@@ -221,18 +221,18 @@ class ContentTag < ActiveRecord::Base
 
   def content_type_class(is_student = false)
     case content_type
-    when 'Assignment'
-      if content && content.submission_types == 'online_quiz'
-        is_student ? 'lti-quiz' : 'quiz'
-      elsif content && content.submission_types == 'discussion_topic'
-        'discussion_topic'
+    when "Assignment"
+      if content && content.submission_types == "online_quiz"
+        is_student ? "lti-quiz" : "quiz"
+      elsif content && content.submission_types == "discussion_topic"
+        "discussion_topic"
       elsif self&.content&.quiz_lti?
-        'lti-quiz'
+        "lti-quiz"
       else
-        'assignment'
+        "assignment"
       end
-    when 'Quizzes::Quiz'
-      is_student ? 'lti-quiz' : 'quiz'
+    when "Quizzes::Quiz"
+      is_student ? "lti-quiz" : "quiz"
     else
       content_type.underscore
     end
@@ -241,15 +241,15 @@ class ContentTag < ActiveRecord::Base
   end
 
   def item_class
-    (content_type || "").gsub(/\A[A-Za-z]+::/, '') + '_' + content_id.to_s
+    (content_type || "").gsub(/\A[A-Za-z]+::/, "") + "_" + content_id.to_s
   end
 
   def can_have_assignment?
-    ['Assignment', 'DiscussionTopic', 'Quizzes::Quiz', 'WikiPage'].include?(content_type)
+    ["Assignment", "DiscussionTopic", "Quizzes::Quiz", "WikiPage"].include?(content_type)
   end
 
   def assignment
-    if content_type == 'Assignment'
+    if content_type == "Assignment"
       content
     elsif can_have_assignment?
       content&.assignment
@@ -278,17 +278,17 @@ class ContentTag < ActiveRecord::Base
   def self.asset_workflow_state(asset)
     if asset.respond_to?(:published?)
       if asset.respond_to?(:deleted?) && asset.deleted?
-        'deleted'
+        "deleted"
       elsif asset.published?
-        'active'
+        "active"
       else
-        'unpublished'
+        "unpublished"
       end
     elsif asset.respond_to?(:workflow_state)
       workflow_state = asset.workflow_state.to_s
       if %w[active available published].include?(workflow_state)
-        'active'
-      elsif ['unpublished', 'deleted'].include?(workflow_state)
+        "active"
+      elsif ["unpublished", "deleted"].include?(workflow_state)
         workflow_state
       end
     else
@@ -310,11 +310,11 @@ class ContentTag < ActiveRecord::Base
 
     # Assignment proxies name= and name to title= and title, which breaks the asset_safe_title logic
     if content.respond_to?("name=") && content.respond_to?("name") && !content.is_a?(Assignment)
-      content.name = asset_safe_title('name')
+      content.name = asset_safe_title("name")
     elsif content.respond_to?("title=")
-      content.title = asset_safe_title('title')
+      content.title = asset_safe_title("title")
     elsif content.respond_to?("display_name=")
-      content.display_name = asset_safe_title('display_name')
+      content.display_name = asset_safe_title("display_name")
     end
     if content.changed?
       content.user = user if user && content.is_a?(WikiPage)
@@ -344,7 +344,7 @@ class ContentTag < ActiveRecord::Base
 
   def can_destroy?
     # if it's a learning outcome link...
-    if tag_type == 'learning_outcome_association'
+    if tag_type == "learning_outcome_association"
       # and there are no other links to the same outcome in the same context...
       outcome = content
       other_link = ContentTag.learning_outcome_links.active
@@ -381,11 +381,11 @@ class ContentTag < ActiveRecord::Base
 
     context_module&.remove_completion_requirement(id)
 
-    self.workflow_state = 'deleted'
+    self.workflow_state = "deleted"
     save!
 
     # for outcome links delete the associated friendly description
-    delete_outcome_friendly_description if content_type == 'LearningOutcome'
+    delete_outcome_friendly_description if content_type == "LearningOutcome"
 
     run_due_date_cacher_for_quizzes_next(force: true)
 
@@ -411,28 +411,28 @@ class ContentTag < ActiveRecord::Base
   end
 
   def send_items_to_stream
-    if content_type == "DiscussionTopic" && saved_change_to_workflow_state? && workflow_state == 'active'
+    if content_type == "DiscussionTopic" && saved_change_to_workflow_state? && workflow_state == "active"
       content.send_items_to_stream
     end
   end
 
   def clear_discussion_stream_items
     if content_type == "DiscussionTopic" && (saved_change_to_workflow_state? &&
-         ['active', nil].include?(workflow_state_before_last_save) &&
-         workflow_state == 'unpublished')
+         ["active", nil].include?(workflow_state_before_last_save) &&
+         workflow_state == "unpublished")
       content.clear_stream_items
     end
   end
 
   def clear_stream_items_if_module_is_unpublished
-    if content_type == "DiscussionTopic" && context_module&.workflow_state == 'unpublished'
+    if content_type == "DiscussionTopic" && context_module&.workflow_state == "unpublished"
       content.clear_stream_items
     end
   end
 
   def self.update_for(asset, exclude_tag: nil)
     tags = ContentTag.where(content_id: asset, content_type: asset.class.to_s).not_deleted
-    tags = tags.where('content_tags.id<>?', exclude_tag.id) if exclude_tag
+    tags = tags.where("content_tags.id<>?", exclude_tag.id) if exclude_tag
     tags = tags.select(%i[id tag_type content_type context_module_id]).to_a
     return if tags.empty?
 
@@ -459,7 +459,7 @@ class ContentTag < ActiveRecord::Base
   end
 
   def sync_title_to_asset_title?
-    tag_type != "learning_outcome_association" && !['ContextExternalTool', 'Attachment'].member?(content_type)
+    tag_type != "learning_outcome_association" && !["ContextExternalTool", "Attachment"].member?(content_type)
   end
 
   def sync_workflow_state_to_asset?
@@ -471,7 +471,7 @@ class ContentTag < ActiveRecord::Base
   end
 
   def content_type_discussion?
-    content_type == 'DiscussionTopic'
+    content_type == "DiscussionTopic"
   end
 
   def context_module_action(user, action, points = nil)
@@ -521,18 +521,18 @@ class ContentTag < ActiveRecord::Base
       ON caa.course_id = content_tags.context_id AND content_tags.context_type = 'Course'
       AND caa.account_id = #{account.id}")
   }
-  scope :learning_outcome_alignments, -> { where(tag_type: 'learning_outcome') }
-  scope :learning_outcome_links, -> { where(tag_type: 'learning_outcome_association', associated_asset_type: 'LearningOutcomeGroup', content_type: 'LearningOutcome') }
+  scope :learning_outcome_alignments, -> { where(tag_type: "learning_outcome") }
+  scope :learning_outcome_links, -> { where(tag_type: "learning_outcome_association", associated_asset_type: "LearningOutcomeGroup", content_type: "LearningOutcome") }
 
   # Scopes For Differentiated Assignment Filtering:
 
   scope :visible_to_students_in_course_with_da, lambda { |user_ids, course_ids|
-    differentiable_classes = ['Assignment', 'DiscussionTopic', 'Quiz', 'Quizzes::Quiz', 'WikiPage']
+    differentiable_classes = ["Assignment", "DiscussionTopic", "Quiz", "Quizzes::Quiz", "WikiPage"]
     scope = for_non_differentiable_classes(course_ids, differentiable_classes)
 
     cyoe_courses, non_cyoe_courses = Course.where(id: course_ids).partition { |course| ConditionalRelease::Service.enabled_in_context?(course) }
     if non_cyoe_courses.any?
-      scope = scope.union(where(context_id: non_cyoe_courses, context_type: 'Course', content_type: 'WikiPage'))
+      scope = scope.union(where(context_id: non_cyoe_courses, context_type: "Course", content_type: "WikiPage"))
     end
     if cyoe_courses.any?
       scope = scope.union(
@@ -551,7 +551,7 @@ class ContentTag < ActiveRecord::Base
   }
 
   scope :for_non_differentiable_classes, lambda { |course_ids, differentiable_classes|
-    where(context_id: course_ids, context_type: 'Course').where.not(content_type: differentiable_classes)
+    where(context_id: course_ids, context_type: "Course").where.not(content_type: differentiable_classes)
   }
 
   scope :for_non_differentiable_discussions, lambda { |course_ids|
@@ -616,7 +616,7 @@ class ContentTag < ActiveRecord::Base
       ", course_ids, course_ids, user_ids)
   }
 
-  scope :can_have_assignment, -> { where(content_type: ['Assignment', 'DiscussionTopic', 'Quizzes::Quiz', 'WikiPage']) }
+  scope :can_have_assignment, -> { where(content_type: ["Assignment", "DiscussionTopic", "Quizzes::Quiz", "WikiPage"]) }
 
   # only intended for learning outcome links
   def self.outcome_title_order_by_clause
@@ -661,7 +661,7 @@ class ContentTag < ActiveRecord::Base
     # assignment.  Let's ignore any other contexts.
     return unless context_type == "Assignment"
 
-    DueDateCacher.recompute(context) if content.try(:quiz_lti?) && (force || workflow_state != 'deleted')
+    DueDateCacher.recompute(context) if content.try(:quiz_lti?) && (force || workflow_state != "deleted")
   end
 
   def set_root_account
@@ -676,7 +676,7 @@ class ContentTag < ActiveRecord::Base
   end
 
   def quiz_lti
-    @quiz_lti ||= has_attribute?(:content_type) && content_type == 'Assignment' ? content&.quiz_lti? : false
+    @quiz_lti ||= has_attribute?(:content_type) && content_type == "Assignment" ? content&.quiz_lti? : false
   end
 
   def to_json(options = {})
@@ -688,9 +688,9 @@ class ContentTag < ActiveRecord::Base
   end
 
   def clear_total_outcomes_cache
-    return unless tag_type == 'learning_outcome_association' && associated_asset_type == 'LearningOutcomeGroup'
+    return unless tag_type == "learning_outcome_association" && associated_asset_type == "LearningOutcomeGroup"
 
-    clear_context = context_type == 'LearningOutcomeGroup' ? nil : context
+    clear_context = context_type == "LearningOutcomeGroup" ? nil : context
     Outcomes::LearningOutcomeGroupChildren.new(clear_context).clear_total_outcomes_cache
   end
 

@@ -31,6 +31,6 @@ class AccountNotificationRole < ActiveRecord::Base
   end
 
   def role_name
-    role_id ? role.name : 'NilEnrollment'
+    role_id ? role.name : "NilEnrollment"
   end
 end

@@ -59,7 +59,7 @@ module DataFixup::PopulateRootAccountIdOnAttachments
       # Attachment#namespace is a mix bag of local (1, account_1) and gobal
       # (account_20000000000001) account ids, convert to local and back to
       # global to ensure everything is a global id in the end.
-      namespace_id = namespace.split('_').last
+      namespace_id = namespace.split("_").last
       local_account_id, shard_id = Shard.local_id_for(namespace_id)
       global_account_id = Shard.global_id_for(local_account_id, shard_id)
 

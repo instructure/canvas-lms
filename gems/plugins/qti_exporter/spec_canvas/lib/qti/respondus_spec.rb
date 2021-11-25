@@ -17,24 +17,24 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../../qti_helper'
+require_relative "../../qti_helper"
 if Qti.migration_executable
   describe "Converting respondus QTI" do
     it "converts multiple choice" do
-      manifest_node = get_manifest_node('multiple_choice')
+      manifest_node = get_manifest_node("multiple_choice")
       hash = Qti::AssessmentItemConverter.create_instructure_question(manifest_node: manifest_node, base_dir: respondus_question_dir)
       hash[:answers].each { |a| a.delete(:id) }
       expect(hash).to eq RespondusExpected::MULTIPLE_CHOICE
     end
 
     it "finds correct answer for multiple choice with zero point weights" do
-      hash = get_question_hash(RESPONDUS_FIXTURE_DIR, 'zero_point_mc', delete_answer_ids: false, flavor: Qti::Flavors::RESPONDUS)
+      hash = get_question_hash(RESPONDUS_FIXTURE_DIR, "zero_point_mc", delete_answer_ids: false, flavor: Qti::Flavors::RESPONDUS)
       expect(hash[:import_error]).to eq nil
       expect(hash[:answers].first[:weight]).to eq 100
     end
 
     it "converts algorithm question as multiple choice question" do
-      manifest_node = get_manifest_node('algorithm_question')
+      manifest_node = get_manifest_node("algorithm_question")
       hash = Qti::AssessmentItemConverter.create_instructure_question(manifest_node: manifest_node, base_dir: respondus_question_dir)
       hash[:answers].each { |a| a.delete(:id) }
       hash.delete :question_text # Because it's ugly html that we don't really care about.
@@ -42,28 +42,28 @@ if Qti.migration_executable
     end
 
     it "converts true false" do
-      manifest_node = get_manifest_node('true_false')
+      manifest_node = get_manifest_node("true_false")
       hash = Qti::AssessmentItemConverter.create_instructure_question(manifest_node: manifest_node, base_dir: respondus_question_dir)
       hash[:answers].each { |a| a.delete(:id) }
       expect(hash).to eq RespondusExpected::TRUE_FALSE
     end
 
     it "converts multiple response" do
-      manifest_node = get_manifest_node('multiple_response')
+      manifest_node = get_manifest_node("multiple_response")
       hash = Qti::AssessmentItemConverter.create_instructure_question(manifest_node: manifest_node, base_dir: respondus_question_dir)
       hash[:answers].each { |a| a.delete(:id) }
       expect(hash).to eq RespondusExpected::MULTIPLE_ANSWER
     end
 
     it "converts multiple response with partial credit" do
-      manifest_node = get_manifest_node('multiple_response_partial')
+      manifest_node = get_manifest_node("multiple_response_partial")
       hash = Qti::AssessmentItemConverter.create_instructure_question(manifest_node: manifest_node, base_dir: respondus_question_dir)
       hash[:answers].each { |a| a.delete(:id) }
       expect(hash).to eq RespondusExpected::MULTIPLE_ANSWER2
     end
 
     it "converts matching" do
-      manifest_node = get_manifest_node('matching')
+      manifest_node = get_manifest_node("matching")
       hash = Qti::AssessmentItemConverter.create_instructure_question({ manifest_node: manifest_node, base_dir: respondus_question_dir })
       # make sure the ids are correctly referencing each other
       matches = {}
@@ -81,7 +81,7 @@ if Qti.migration_executable
     end
 
     it "converts matching with choiceInteraction interaction type" do
-      manifest_node = get_manifest_node('matching', interaction_type: 'choiceInteraction', question_type: 'Matching')
+      manifest_node = get_manifest_node("matching", interaction_type: "choiceInteraction", question_type: "Matching")
       hash = Qti::AssessmentItemConverter.create_instructure_question({ manifest_node: manifest_node, base_dir: respondus_question_dir })
       # make sure the ids are correctly referencing each other
       matches = {}
@@ -99,20 +99,20 @@ if Qti.migration_executable
     end
 
     it "converts essay" do
-      manifest_node = get_manifest_node('essay')
+      manifest_node = get_manifest_node("essay")
       hash = Qti::AssessmentItemConverter.create_instructure_question(manifest_node: manifest_node, base_dir: respondus_question_dir)
       expect(hash).to eq RespondusExpected::ESSAY
     end
 
     it "converts fill in the blank (short answer)" do
-      manifest_node = get_manifest_node('fill_in_the_blank')
+      manifest_node = get_manifest_node("fill_in_the_blank")
       hash = Qti::AssessmentItemConverter.create_instructure_question(manifest_node: manifest_node, base_dir: respondus_question_dir)
       hash[:answers].each { |a| a.delete(:id) }
       expect(hash).to eq RespondusExpected::FILL_IN_THE_BLANK
     end
 
     it "converts the assessment into a quiz" do
-      manifest_node = get_manifest_node('assessment', quiz_type: 'Test')
+      manifest_node = get_manifest_node("assessment", quiz_type: "Test")
       a = Qti::AssessmentTestConverter.new(manifest_node, respondus_question_dir)
       a.create_instructure_quiz
       expect(a.quiz).to eq RespondusExpected::ASSESSMENT
@@ -219,8 +219,8 @@ if Qti.migration_executable
         question_type: "multiple_answers_question",
         question_text: "Select all answers that rhyme with \"box\"." }.freeze
     MULTIPLE_CHOICE =
-      {       correct_comments: '',
-              incorrect_comments: '',
+      {       correct_comments: "",
+              incorrect_comments: "",
               question_name: "Multiple Choice",
               migration_id: "QUE_1004",
               answers: [{ comments: "No, that's not \"C\", that's \"A\"",

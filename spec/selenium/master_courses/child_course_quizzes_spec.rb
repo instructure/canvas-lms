@@ -17,13 +17,13 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../common'
+require_relative "../common"
 
 describe "master courses - child courses - quiz locking" do
   include_context "in-process server selenium tests"
 
   before :once do
-    qd = { question_type: "text_only_question", id: 1, question_name: 'the hardest question ever' }.with_indifferent_access
+    qd = { question_type: "text_only_question", id: 1, question_name: "the hardest question ever" }.with_indifferent_access
     due_date = format_date_for_view(Time.zone.now - 1.month)
     @copy_from = course_factory(active_all: true)
     @template = MasterCourses::MasterTemplate.set_as_master_course(@copy_from)
@@ -56,10 +56,10 @@ describe "master courses - child courses - quiz locking" do
 
     # open the questions tab
     hover_and_click('#quiz_tabs_tab_list li[aria-controls="questions_tab"]')
-    expect(f('#quiz_edit_wrapper #questions_tab').displayed?).to eq  true
+    expect(f("#quiz_edit_wrapper #questions_tab").displayed?).to eq  true
 
     # hover the question description and the edit/pencil link should not appear
-    hover(f('.question_text'))
-    expect(f('.question_holder')).to contain_css('.edit_question_link')
+    hover(f(".question_text"))
+    expect(f(".question_holder")).to contain_css(".edit_question_link")
   end
 end

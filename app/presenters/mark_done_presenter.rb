@@ -53,7 +53,7 @@ class MarkDonePresenter
     requirement = requirements.find { |i| i[:id] == @item.id }
     return false unless requirement
 
-    requirement[:type] == 'must_mark_done'
+    requirement[:type] == "must_mark_done"
   end
 
   def checked?

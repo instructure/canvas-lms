@@ -38,7 +38,7 @@ module CanvadocsHelper
   end
 
   def canvadocs_user_name(user)
-    user.short_name.delete(',')
+    user.short_name.delete(",")
   end
 
   def canvadocs_user_id(user)

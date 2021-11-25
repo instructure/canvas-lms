@@ -34,7 +34,7 @@ class ConversationMessageParticipant < ActiveRecord::Base
   before_create :set_root_account_ids
 
   scope :active, -> { where("(conversation_message_participants.workflow_state <> 'deleted' OR conversation_message_participants.workflow_state IS NULL)") }
-  scope :deleted, -> { where(workflow_state: 'deleted') }
+  scope :deleted, -> { where(workflow_state: "deleted") }
 
   scope :for_conversation_and_message, lambda { |conversation_id, message_id|
     joins(:conversation_participant)
@@ -51,9 +51,9 @@ class ConversationMessageParticipant < ActiveRecord::Base
   def self.query_deleted(user_id, options = {})
     query = deleted.eager_load(:conversation_message).where(user_id: user_id).order(deleted_at: :desc)
 
-    query = query.where(conversation_messages: { conversation_id: options['conversation_id'] }) if options['conversation_id']
-    query = query.where('conversation_message_participants.deleted_at < ?', options['deleted_before']) if options['deleted_before']
-    query = query.where('conversation_message_participants.deleted_at > ?', options['deleted_after']) if options['deleted_after']
+    query = query.where(conversation_messages: { conversation_id: options["conversation_id"] }) if options["conversation_id"]
+    query = query.where("conversation_message_participants.deleted_at < ?", options["deleted_before"]) if options["deleted_before"]
+    query = query.where("conversation_message_participants.deleted_at > ?", options["deleted_after"]) if options["deleted_after"]
 
     query
   end

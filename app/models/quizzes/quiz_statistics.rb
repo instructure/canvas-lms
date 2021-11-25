@@ -24,10 +24,10 @@ class Quizzes::QuizStatistics < ActiveRecord::Base
 
   self.table_name = :quiz_statistics
 
-  belongs_to :quiz, class_name: 'Quizzes::Quiz'
-  has_one :csv_attachment, class_name: 'Attachment', as: 'context',
+  belongs_to :quiz, class_name: "Quizzes::Quiz"
+  has_one :csv_attachment, class_name: "Attachment", as: "context",
                            dependent: :destroy
-  has_one :progress, as: 'context', dependent: :destroy
+  has_one :progress, as: "context", dependent: :destroy
 
   scope :report_type, ->(type) { where(report_type: type) }
 
@@ -51,9 +51,9 @@ class Quizzes::QuizStatistics < ActiveRecord::Base
   # still have to restart your Canvas instance for the settings to take effect.)
   def self.large_quiz?(quiz)
     (quiz.active_quiz_questions.size >
-      Setting.get('quiz_statistics_max_questions', DefaultMaxQuestions).to_i) ||
+      Setting.get("quiz_statistics_max_questions", DefaultMaxQuestions).to_i) ||
       (quiz.quiz_submissions.size >
-        Setting.get('quiz_statistics_max_submissions', DefaultMaxSubmissions).to_i)
+        Setting.get("quiz_statistics_max_submissions", DefaultMaxSubmissions).to_i)
   end
 
   def report
@@ -65,7 +65,7 @@ class Quizzes::QuizStatistics < ActiveRecord::Base
   def generate_csv
     self.csv_attachment ||= begin
       attachment = build_csv_attachment(
-        content_type: 'text/csv',
+        content_type: "text/csv",
         filename: "quiz_#{report_type}_report.csv",
         display_name: t("%{quiz_title} %{quiz_type} %{report_type} Report", {
                           quiz_title: quiz.title,
@@ -88,7 +88,7 @@ class Quizzes::QuizStatistics < ActiveRecord::Base
 
     progress.tag = self.class.name
     progress.completion = 0
-    progress.workflow_state = 'queued'
+    progress.workflow_state = "queued"
     progress.save!
 
     progress.process_job(self, :__process_csv_job, {
@@ -121,7 +121,7 @@ class Quizzes::QuizStatistics < ActiveRecord::Base
   end
 
   def self.csv_job_tag
-    'Quizzes::QuizStatistics#__process_csv_job'
+    "Quizzes::QuizStatistics#__process_csv_job"
   end
 
   def csv_job_strand_id

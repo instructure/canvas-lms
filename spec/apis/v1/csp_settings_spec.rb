@@ -17,11 +17,11 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-require_relative '../api_spec_helper'
+require_relative "../api_spec_helper"
 
 describe "CSP Settings API", type: :request do
   def create_tool(context, attrs)
-    context.context_external_tools.create!({ name: "a", consumer_key: '12345', shared_secret: 'secret' }.merge(attrs))
+    context.context_external_tools.create!({ name: "a", consumer_key: "12345", shared_secret: "secret" }.merge(attrs))
   end
 
   before :once do
@@ -315,7 +315,7 @@ describe "CSP Settings API", type: :request do
 
     it "just passes through the result from the external service" do
       allow_any_instantiation_of(Account.default).to receive(:csp_logging_config).and_return(
-        { 'host' => 'http://csp_logging.docker/', 'shared_secret' => 'bob' }
+        { "host" => "http://csp_logging.docker/", "shared_secret" => "bob" }
       )
       expect(CanvasHttp).to receive(:get).with("http://csp_logging.docker/report/#{Account.default.global_id}",
                                                { "Authorization" => "Bearer bob" }).and_return(double(body: "{}"))

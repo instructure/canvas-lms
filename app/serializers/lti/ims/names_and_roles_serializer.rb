@@ -90,7 +90,7 @@ module Lti::IMS
     def member(enrollment, expander)
       user = enrollment.user
       {
-        status: 'Active',
+        status: "Active",
         name: (user.name if page[:tool].include_name?),
         picture: (user.avatar_url if page[:tool].public?),
         given_name: (user.first_name if page[:tool].include_name?),
@@ -104,8 +104,8 @@ module Lti::IMS
     end
 
     def member_sourced_id(expander)
-      expanded = expander.expand_variables!({ value: '$Person.sourcedId' })[:value]
-      expanded == '$Person.sourcedId' ? nil : expanded
+      expanded = expander.expand_variables!({ value: "$Person.sourcedId" })[:value]
+      expanded == "$Person.sourcedId" ? nil : expanded
     end
 
     def message(enrollment, expander)

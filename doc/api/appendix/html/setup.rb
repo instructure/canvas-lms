@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-include T('default/appendix/html')
+include T("default/appendix/html")
 
 def appendix
   controllers = options[:controllers]

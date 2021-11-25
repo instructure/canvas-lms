@@ -17,13 +17,13 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'puma'
-require 'httparty'
+require "puma"
+require "httparty"
 
 class SpecFriendlyWebServer
   class << self
     def bind_address
-      '0.0.0.0'
+      "0.0.0.0"
     end
 
     def run(app, port:, timeout: 15)

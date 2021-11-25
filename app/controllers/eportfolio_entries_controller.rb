@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'securerandom'
+require "securerandom"
 
 class EportfolioEntriesController < ApplicationController
   include EportfolioPage
@@ -62,7 +62,7 @@ class EportfolioEntriesController < ApplicationController
         @page = @category.eportfolio_entries.where(slug: params[:entry_name]).first
       end
       unless @page
-        flash[:notice] = t('notices.missing_page', "Couldn't find that page")
+        flash[:notice] = t("notices.missing_page", "Couldn't find that page")
         redirect_to eportfolio_url(@portfolio.id)
         return
       end
@@ -112,7 +112,7 @@ class EportfolioEntriesController < ApplicationController
       @category = @entry.eportfolio_category
       @attachment = @portfolio.user.all_attachments.shard(@portfolio.user).where(uuid: params[:attachment_id]).first
       unless @attachment.present?
-        return render json: { message: t('errors.not_found', "Not Found") }, status: :not_found
+        return render json: { message: t("errors.not_found", "Not Found") }, status: :not_found
       end
 
       # @entry.check_for_matching_attachment_id
@@ -120,7 +120,7 @@ class EportfolioEntriesController < ApplicationController
         redirect_to file_download_url(@attachment, { verifier: @attachment.uuid })
       rescue => e
         Canvas::Errors.capture_exception(:eportfolios, e, :warn)
-        raise EportfolioNotFound, t('errors.not_found', "Not Found")
+        raise EportfolioNotFound, t("errors.not_found", "Not Found")
       end
     end
   end
@@ -135,7 +135,7 @@ class EportfolioEntriesController < ApplicationController
       @context = @assignment.context
       # @entry.check_for_matching_attachment_id
       @headers = false
-      render template: 'submissions/show_preview', locals: {
+      render template: "submissions/show_preview", locals: {
         anonymize_students: @assignment.anonymize_students?
       }
     end

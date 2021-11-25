@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'account_reports/report_helper'
+require "account_reports/report_helper"
 
 module AccountReports
   class GradeReports
@@ -26,7 +26,7 @@ module AccountReports
 
     def initialize(account_report, runner = nil)
       @account_report = account_report
-      @include_deleted = value_to_boolean(account_report.parameters&.dig('include_deleted'))
+      @include_deleted = value_to_boolean(account_report.parameters&.dig("include_deleted"))
 
       # we do not want to add extra_text more than one time.
       unless runner
@@ -34,8 +34,8 @@ module AccountReports
         include_deleted_objects
 
         if @account_report.value_for_param("limiting_period")
-          add_extra_text(I18n.t('account_reports.grades.limited',
-                                'deleted objects limited by days specified;'))
+          add_extra_text(I18n.t("account_reports.grades.limited",
+                                "deleted objects limited by days specified;"))
         end
       end
     end
@@ -61,19 +61,19 @@ module AccountReports
     # - enrollment status
     def grade_export
       headers = []
-      headers << I18n.t('student name')
-      headers << I18n.t('student id')
-      headers << I18n.t('student sis')
-      headers << I18n.t('student integration id') if include_integration_id?
-      headers << I18n.t('course')
-      headers << I18n.t('course id')
-      headers << I18n.t('course sis')
-      headers << I18n.t('section')
-      headers << I18n.t('section id')
-      headers << I18n.t('section sis')
-      headers << I18n.t('term')
-      headers << I18n.t('term id')
-      headers << I18n.t('term sis')
+      headers << I18n.t("student name")
+      headers << I18n.t("student id")
+      headers << I18n.t("student sis")
+      headers << I18n.t("student integration id") if include_integration_id?
+      headers << I18n.t("course")
+      headers << I18n.t("course id")
+      headers << I18n.t("course sis")
+      headers << I18n.t("section")
+      headers << I18n.t("section id")
+      headers << I18n.t("section sis")
+      headers << I18n.t("term")
+      headers << I18n.t("term id")
+      headers << I18n.t("term sis")
 
       headers.concat(grading_field_headers)
 
@@ -163,33 +163,33 @@ module AccountReports
       return false unless gp_set
 
       headers = []
-      headers << I18n.t('student name')
-      headers << I18n.t('student id')
-      headers << I18n.t('student sis')
-      headers << I18n.t('student integration id') if include_integration_id?
-      headers << I18n.t('course')
-      headers << I18n.t('course id')
-      headers << I18n.t('course sis')
-      headers << I18n.t('section')
-      headers << I18n.t('section id')
-      headers << I18n.t('section sis')
-      headers << I18n.t('term')
-      headers << I18n.t('term id')
-      headers << I18n.t('term sis')
-      headers << I18n.t('grading period set')
-      headers << I18n.t('grading period set id')
+      headers << I18n.t("student name")
+      headers << I18n.t("student id")
+      headers << I18n.t("student sis")
+      headers << I18n.t("student integration id") if include_integration_id?
+      headers << I18n.t("course")
+      headers << I18n.t("course id")
+      headers << I18n.t("course sis")
+      headers << I18n.t("section")
+      headers << I18n.t("section id")
+      headers << I18n.t("section sis")
+      headers << I18n.t("term")
+      headers << I18n.t("term id")
+      headers << I18n.t("term sis")
+      headers << I18n.t("grading period set")
+      headers << I18n.t("grading period set id")
       gp_set.grading_periods.active.order(:start_date).each do |gp|
-        headers << I18n.t('%{name} grading period id', name: gp.title)
-        headers << I18n.t('%{name} current score', name: gp.title)
-        headers << I18n.t('%{name} final score', name: gp.title)
-        headers << I18n.t('%{name} unposted current score', name: gp.title)
-        headers << I18n.t('%{name} unposted final score', name: gp.title)
-        headers << I18n.t('%{name} override score', name: gp.title) if include_override_score?
-        headers << I18n.t('%{name} current grade', name: gp.title)
-        headers << I18n.t('%{name} final grade', name: gp.title)
-        headers << I18n.t('%{name} unposted current grade', name: gp.title)
-        headers << I18n.t('%{name} unposted final grade', name: gp.title)
-        headers << I18n.t('%{name} override grade', name: gp.title) if include_override_score?
+        headers << I18n.t("%{name} grading period id", name: gp.title)
+        headers << I18n.t("%{name} current score", name: gp.title)
+        headers << I18n.t("%{name} final score", name: gp.title)
+        headers << I18n.t("%{name} unposted current score", name: gp.title)
+        headers << I18n.t("%{name} unposted final score", name: gp.title)
+        headers << I18n.t("%{name} override score", name: gp.title) if include_override_score?
+        headers << I18n.t("%{name} current grade", name: gp.title)
+        headers << I18n.t("%{name} final grade", name: gp.title)
+        headers << I18n.t("%{name} unposted current grade", name: gp.title)
+        headers << I18n.t("%{name} unposted final grade", name: gp.title)
+        headers << I18n.t("%{name} override grade", name: gp.title) if include_override_score?
       end
       headers.concat(grading_field_headers)
     end
@@ -267,7 +267,7 @@ module AccountReports
     end
 
     def grading_period_scores_for_student(student, grading_period, scores)
-      scores["#{student['enrollment_id']}:#{grading_period.id}"] || {}
+      scores["#{student["enrollment_id"]}:#{grading_period.id}"] || {}
     end
 
     def student_grade_scope
@@ -299,8 +299,8 @@ module AccountReports
 
       if @include_deleted
         students = students.where("enrollments.workflow_state IN ('active', 'completed', 'inactive', 'deleted')")
-        if @account_report.parameters.key? 'limiting_period'
-          limiting_period = @account_report.parameters['limiting_period'].to_i
+        if @account_report.parameters.key? "limiting_period"
+          limiting_period = @account_report.parameters["limiting_period"].to_i
           students = students.where("enrollments.workflow_state = 'active'
                                     OR c.conclude_at >= ?
                                     OR (enrollments.workflow_state IN ('inactive', 'deleted')

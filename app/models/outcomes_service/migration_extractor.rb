@@ -58,7 +58,7 @@ module OutcomesService
     end
 
     def valid_link?(item)
-      item.tag_type == 'learning_outcome_association' && item.associated_asset_type == 'LearningOutcomeGroup' && item.content_type == 'LearningOutcome'
+      item.tag_type == "learning_outcome_association" && item.associated_asset_type == "LearningOutcomeGroup" && item.content_type == "LearningOutcome"
     end
 
     def link_attributes(learning_outcome_link)

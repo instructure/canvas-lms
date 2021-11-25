@@ -116,7 +116,7 @@ module Api::V1::DiscussionTopics
     end
 
     if opts[:include_assignment] && topic.assignment
-      excludes = opts[:exclude_assignment_description] ? ['description'] : []
+      excludes = opts[:exclude_assignment_description] ? ["description"] : []
       json[:assignment] = assignment_json(topic.assignment, user, session,
                                           { include_discussion_topic: false, override_dates: opts[:override_dates],
                                             include_all_dates: opts[:include_all_dates],
@@ -129,7 +129,7 @@ module Api::V1::DiscussionTopics
 
     if opts[:include_sections] && topic.is_section_specific
       section_includes = []
-      section_includes.push('user_count') if opts[:include_sections_user_count]
+      section_includes.push("user_count") if opts[:include_sections_user_count]
       json[:sections] = sections_json(topic.course_sections, user, session, section_includes)
     end
 
@@ -161,7 +161,7 @@ module Api::V1::DiscussionTopics
   # Returns a hash.
   def serialize_additional_topic_fields(topic, context, user, opts = {})
     attachment_opts = {}
-    attachment_opts[:include] = ['usage_rights'] if opts[:include_usage_rights]
+    attachment_opts[:include] = ["usage_rights"] if opts[:include_usage_rights]
     attachments = topic.attachment ? [attachment_json(topic.attachment, user, {}, attachment_opts)] : []
     html_url    = named_context_url(context, :context_discussion_topic_url,
                                     topic, include_host: true)
@@ -189,12 +189,12 @@ module Api::V1::DiscussionTopics
 
     fields[:context_code] = topic.context_code if opts[:include_context_code]
 
-    locked_json(fields, topic, user, 'topic', check_policies: true, deep_check_if_needed: true)
+    locked_json(fields, topic, user, "topic", check_policies: true, deep_check_if_needed: true)
     can_view = !fields[:lock_info].is_a?(Hash) || fields[:lock_info][:can_view]
     unless opts[:exclude_messages]
       fields[:message] =
         if !can_view
-          lock_explanation(fields[:lock_info], 'topic', context)
+          lock_explanation(fields[:lock_info], "topic", context)
         elsif opts[:plain_messages]
           topic.message # used for searching by body on index
         elsif opts[:text_only]
@@ -242,9 +242,9 @@ module Api::V1::DiscussionTopics
   def serialize_entry(entry, user, context, session, includes)
     allowed_fields  = %w[id created_at updated_at parent_id rating_count rating_sum]
     allowed_methods = []
-    allowed_fields << 'editor_id' if entry.deleted? || entry.editor_id
-    allowed_fields << 'user_id'   unless entry.deleted?
-    allowed_methods << 'user_name' if !entry.deleted? && includes.include?(:user_name)
+    allowed_fields << "editor_id" if entry.deleted? || entry.editor_id
+    allowed_fields << "user_id"   unless entry.deleted?
+    allowed_methods << "user_name" if !entry.deleted? && includes.include?(:user_name)
 
     json = api_json(entry, user, session, only: allowed_fields, methods: allowed_methods)
 

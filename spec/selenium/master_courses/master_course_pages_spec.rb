@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../common'
+require_relative "../common"
 
 describe "master courses - pages locking" do
   include_context "in-process server selenium tests"
@@ -25,7 +25,7 @@ describe "master courses - pages locking" do
   before :once do
     @course = course_factory(active_all: true)
     @template = MasterCourses::MasterTemplate.set_as_master_course(@course)
-    @page = @course.wiki_pages.create!(title: 'Page1')
+    @page = @course.wiki_pages.create!(title: "Page1")
     @tag = @template.create_content_tag_for!(@page)
   end
 
@@ -35,7 +35,7 @@ describe "master courses - pages locking" do
 
   it "shows unlocked button on index page for unlocked page" do
     get "/courses/#{@course.id}/pages"
-    expect(f('.master-content-lock-cell i.icon-blueprint')).to be_displayed
+    expect(f(".master-content-lock-cell i.icon-blueprint")).to be_displayed
   end
 
   it "shows locked button on index page for locked page" do
@@ -43,6 +43,6 @@ describe "master courses - pages locking" do
     @tag.update_attribute(:restrictions, { content: true })
 
     get "/courses/#{@course.id}/pages"
-    expect(f('.master-content-lock-cell i.icon-blueprint-lock')).to be_displayed
+    expect(f(".master-content-lock-cell i.icon-blueprint-lock")).to be_displayed
   end
 end

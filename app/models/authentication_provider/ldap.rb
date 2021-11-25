@@ -20,7 +20,7 @@
 
 class AuthenticationProvider::LDAP < AuthenticationProvider
   def self.sti_name
-    'ldap'
+    "ldap"
   end
 
   # if the config changes, clear out last_timeout_failure so another attempt can be made immediately
@@ -43,12 +43,12 @@ class AuthenticationProvider::LDAP < AuthenticationProvider
 
   def self.auth_over_tls_setting(value)
     case value
-    when nil, '', false, 'false', 'f', 0, '0'
+    when nil, "", false, "false", "f", 0, "0"
       nil
-    when true, 'true', 't', 1, '1', 'simple_tls', :simple_tls
-      'simple_tls'
-    when 'start_tls', :start_tls
-      'start_tls'
+    when true, "true", "t", 1, "1", "simple_tls", :simple_tls
+      "simple_tls"
+    when "start_tls", :start_tls
+      "start_tls"
     else
       raise ArgumentError("invalid auth_over_tls setting: #{value}")
     end
@@ -59,9 +59,9 @@ class AuthenticationProvider::LDAP < AuthenticationProvider
   end
 
   def ldap_connection
-    raise "Not an LDAP config" unless auth_type == 'ldap'
+    raise "Not an LDAP config" unless auth_type == "ldap"
 
-    require 'net/ldap'
+    require "net/ldap"
     args = {}
     if auth_over_tls
       encryption = {
@@ -82,10 +82,10 @@ class AuthenticationProvider::LDAP < AuthenticationProvider
   end
 
   LDAP_SANITIZE_MAP = {
-    '\\' => '\5c',
-    '*' => '\2a',
-    '(' => '\28',
-    ')' => '\29',
+    "\\" => '\5c',
+    "*" => '\2a',
+    "(" => '\28',
+    ")" => '\29',
     "\00" => '\00',
   }.freeze
   def sanitized_ldap_login(login)
@@ -103,7 +103,7 @@ class AuthenticationProvider::LDAP < AuthenticationProvider
   end
 
   def ldap_ip
-    Socket.getaddrinfo(auth_host, 'http', nil, Socket::SOCK_STREAM)[0][3]
+    Socket.getaddrinfo(auth_host, "http", nil, Socket::SOCK_STREAM)[0][3]
   rescue SocketError
     nil
   end
@@ -114,7 +114,7 @@ class AuthenticationProvider::LDAP < AuthenticationProvider
 
   def test_ldap_connection
     begin
-      timeout(Setting.get('test_ldap_connection_timeout', '5').to_i) do
+      timeout(Setting.get("test_ldap_connection_timeout", "5").to_i) do
         TCPSocket.open(auth_host, auth_port)
       end
       return true
@@ -129,7 +129,7 @@ class AuthenticationProvider::LDAP < AuthenticationProvider
   end
 
   def test_ldap_bind
-    timeout(Setting.get('test_ldap_bind_timeout', '60').to_i) do
+    timeout(Setting.get("test_ldap_bind_timeout", "60").to_i) do
       conn = ldap_connection
       unless (res = conn.bind)
         error = conn.get_operation_result
@@ -146,7 +146,7 @@ class AuthenticationProvider::LDAP < AuthenticationProvider
   end
 
   def test_ldap_search
-    Timeout.timeout(Setting.get('test_ldap_search_timeout', '60').to_i) do
+    Timeout.timeout(Setting.get("test_ldap_search_timeout", "60").to_i) do
       conn = ldap_connection
       filter = ldap_filter("canvas_ldap_test_user")
       Net::LDAP::Filter.construct(filter)
@@ -192,7 +192,7 @@ class AuthenticationProvider::LDAP < AuthenticationProvider
   end
 
   def ldap_account_ids_to_send_to_statsd
-    @ldap_account_ids_to_send_to_statsd ||= (InstStatsd.settings['ldap_account_ids_to_send_to_statsd'] || []).to_set
+    @ldap_account_ids_to_send_to_statsd ||= (InstStatsd.settings["ldap_account_ids_to_send_to_statsd"] || []).to_set
   end
 
   def should_send_to_statsd?
@@ -202,7 +202,7 @@ class AuthenticationProvider::LDAP < AuthenticationProvider
   def ldap_bind_result(unique_id, password_plaintext)
     return nil if password_plaintext.blank?
 
-    default_timeout = Setting.get('ldap_timelimit', 5.seconds.to_s).to_f
+    default_timeout = Setting.get("ldap_timelimit", 5.seconds.to_s).to_f
 
     timeout_options = { raise_on_timeout: true, fallback_timeout_length: default_timeout }
     result = ::Canvas.timeout_protection("ldap:#{global_id}", timeout_options) do
@@ -212,8 +212,8 @@ class AuthenticationProvider::LDAP < AuthenticationProvider
     end
 
     if should_send_to_statsd?
-      InstStatsd::Statsd.increment("#{statsd_prefix}.ldap_#{result ? 'success' : 'failure'}",
-                                   short_stat: "ldap_#{result ? 'success' : 'failure'}",
+      InstStatsd::Statsd.increment("#{statsd_prefix}.ldap_#{result ? "success" : "failure"}",
+                                   short_stat: "ldap_#{result ? "success" : "failure"}",
                                    tags: { account_id: Shard.global_id_for(account_id), auth_provider_id: global_id })
     end
 

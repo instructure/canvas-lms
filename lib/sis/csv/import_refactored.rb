@@ -18,8 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'csv'
-require 'zip'
+require "csv"
+require "zip"
 
 module SIS
   module CSV
@@ -70,7 +70,7 @@ module SIS
         @pending = false
         @finished = false
 
-        settings = PluginSetting.settings_for_plugin('sis_import')
+        settings = PluginSetting.settings_for_plugin("sis_import")
         parallel = Setting.get("sis_parallel_import/#{@root_account.global_id}_num_strands", nil).presence || "1"
         if settings[:parallelism].to_i > 1 && settings[:parallelism] != parallel
           Setting.set("sis_parallel_import/#{@root_account.global_id}_num_strands", settings[:parallelism])
@@ -93,7 +93,7 @@ module SIS
           next unless File.file?(file)
 
           case File.extname(file).downcase
-          when '.zip'
+          when ".zip"
             tmp_dir = Dir.mktmpdir
             @tmp_dirs << tmp_dir
             CanvasUnzip.extract_archive(file, tmp_dir)
@@ -104,8 +104,8 @@ module SIS
               att = create_batch_attachment(File.join(tmp_dir, file_name))
               process_file(tmp_dir, file_name, att)
             end
-          when '.csv'
-            att = @batch.attachment if @batch.attachment && File.extname(@batch.attachment.filename).casecmp?('.csv')
+          when ".csv"
+            att = @batch.attachment if @batch.attachment && File.extname(@batch.attachment.filename).casecmp?(".csv")
             att ||= create_batch_attachment file
             process_file(File.dirname(file), File.basename(file), att)
           end
@@ -155,7 +155,7 @@ module SIS
       end
 
       def create_parallel_importer(csv, importer, rows)
-        @batch.parallel_importers.create!(workflow_state: 'pending',
+        @batch.parallel_importers.create!(workflow_state: "pending",
                                           importer_type: importer.to_s,
                                           attachment: csv[:attachment],
                                           index: rows,
@@ -178,7 +178,7 @@ module SIS
           @batch.data[:supplied_batches] << importer if @csvs[importer].present?
           @batch.data[:counts][importer.to_s.pluralize.to_sym] = 0
         end
-        @run_immediately = @total_rows <= Setting.get('sis_batch_parallelism_count_threshold', '50').to_i
+        @run_immediately = @total_rows <= Setting.get("sis_batch_parallelism_count_threshold", "50").to_i
         @batch.data[:running_immediately] = @run_immediately
 
         @batch.data[:completed_importers] = []
@@ -216,7 +216,7 @@ module SIS
       def run_parallel_importer(id, csv: nil, attempt: 0)
         ensure_later = false
         parallel_importer = id.is_a?(ParallelImporter) ? id : ParallelImporter.find(id)
-        in_retry = parallel_importer.workflow_state == 'retry'
+        in_retry = parallel_importer.workflow_state == "retry"
 
         if should_stop_import?
           parallel_importer.abort
@@ -225,16 +225,16 @@ module SIS
         InstStatsd::Statsd.increment("sis_parallel_worker", tags: { attempt: attempt, retry: in_retry })
 
         importer_type = parallel_importer.importer_type.to_sym
-        importer_object = SIS::CSV.const_get(importer_type.to_s.camelcase + 'Importer').new(self)
+        importer_object = SIS::CSV.const_get(importer_type.to_s.camelcase + "Importer").new(self)
         try_importing_segment(csv, parallel_importer, importer_object, skip_progress: @run_immediately)
       rescue => e
         if !in_retry
           ensure_later = true
-          parallel_importer.write_attribute(:workflow_state, 'retry')
+          parallel_importer.write_attribute(:workflow_state, "retry")
           run_parallel_importer(parallel_importer, attempt: attempt)
-        elsif attempt < Setting.get('number_of_tries_before_failing', 5).to_i
+        elsif attempt < Setting.get("number_of_tries_before_failing", 5).to_i
           ensure_later = true
-          parallel_importer.write_attribute(:workflow_state, 'queued')
+          parallel_importer.write_attribute(:workflow_state, "queued")
           attempt += 1
           args = job_args(importer_type, attempt: attempt)
           delay_if_production(**args).run_parallel_importer(parallel_importer, attempt: attempt)
@@ -284,7 +284,7 @@ module SIS
       end
 
       def fail_with_error!(e, csv: nil)
-        return @batch if @batch.workflow_state == 'aborted'
+        return @batch if @batch.workflow_state == "aborted"
 
         message = "Importing CSV for account: "\
                   "#{@root_account.id} (#{@root_account.name}) sis_batch_id: #{@batch.id}: #{e}"
@@ -304,7 +304,7 @@ module SIS
       end
 
       def should_stop_import?
-        !@batch.workflow_state == 'importing'
+        !@batch.workflow_state == "importing"
       end
 
       def run_all_importers
@@ -384,12 +384,12 @@ module SIS
         # throttling can be set on individual SisBatch instances, and also
         # site-wide in the Setting table.
         @batch.data ||= {}
-        @pause_duration = (@batch.data[:pause_duration] || Setting.get('sis_batch_pause_duration', 0)).to_f
+        @pause_duration = (@batch.data[:pause_duration] || Setting.get("sis_batch_pause_duration", 0)).to_f
       end
 
       def process_file(base, file, att)
         csv = { base: base, file: file, fullpath: File.join(base, file), attachment: att }
-        if File.file?(csv[:fullpath]) && File.extname(csv[:fullpath]).casecmp?('.csv')
+        if File.file?(csv[:fullpath]) && File.extname(csv[:fullpath]).casecmp?(".csv")
           unless Attachment.valid_utf8?(File.open(csv[:fullpath]))
             SisBatch.add_error(csv, I18n.t("Invalid UTF-8"), sis_batch: @batch, failure: true)
             return
@@ -398,7 +398,7 @@ module SIS
             ::CSV.foreach(csv[:fullpath], **CSVBaseImporter::PARSE_ARGS.merge(headers: false)) do |row|
               row.each { |header| header&.downcase! }
               importer = IMPORTERS.index do |type|
-                if SIS::CSV.const_get(type.to_s.camelcase + 'Importer').send(type.to_s + '_csv?', row)
+                if SIS::CSV.const_get(type.to_s.camelcase + "Importer").send(type.to_s + "_csv?", row)
                   unless @previous_diff_import
                     downloadable_att = (type == :user && (row & HEADERS_TO_EXCLUDE_FOR_DOWNLOAD).any?) ? create_filtered_csv(csv, row) : att
                     if downloadable_att
@@ -429,7 +429,7 @@ module SIS
       def create_filtered_csv(csv, headers)
         Dir.mktmpdir do |tmp_dir|
           path = File.join(tmp_dir, File.basename(csv[:fullpath]).sub(/\.csv$/i, "_filtered.csv"))
-          new_csv = ::CSV.open(path, 'wb', headers: headers - HEADERS_TO_EXCLUDE_FOR_DOWNLOAD, write_headers: true)
+          new_csv = ::CSV.open(path, "wb", headers: headers - HEADERS_TO_EXCLUDE_FOR_DOWNLOAD, write_headers: true)
           ::CSV.foreach(csv[:fullpath], **CSVBaseImporter::PARSE_ARGS) do |row|
             HEADERS_TO_EXCLUDE_FOR_DOWNLOAD.each do |header|
               row.delete(header)

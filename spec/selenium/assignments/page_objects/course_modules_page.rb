@@ -46,7 +46,7 @@ module ModulesPage
   end
 
   def move_context_module_item_menu
-    f('a.move_module_item_link')
+    f("a.move_module_item_link")
   end
 
   def move_context_module_item_sidebar

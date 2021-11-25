@@ -48,7 +48,7 @@ class Quizzes::QuizSortables
   end
 
   def find_object_for_item(item)
-    all_objects_hash["quiz_#{item['type']}_#{item['id']}"]
+    all_objects_hash["quiz_#{item["type"]}_#{item["id"]}"]
   end
 
   def all_objects_hash

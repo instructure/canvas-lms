@@ -18,11 +18,11 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'nokogiri'
+require "nokogiri"
 
 describe "discussion_topics" do
   def discussion_assignment
-    assignment_model(course: @course, submission_types: 'discussion_topic', title: 'Assignment Discussion')
+    assignment_model(course: @course, submission_types: "discussion_topic", title: "Assignment Discussion")
     @topic = DiscussionTopic.where(assignment_id: @assignment).first
   end
 
@@ -82,7 +82,7 @@ describe "discussion_topics" do
     get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
     expect(response).to be_successful
     doc = Nokogiri::HTML5(response.body)
-    expect(doc.at_css('.admin-links .icon-speed-grader')).not_to be_nil
+    expect(doc.at_css(".admin-links .icon-speed-grader")).not_to be_nil
   end
 
   it "shows peer reviews button" do
@@ -94,6 +94,6 @@ describe "discussion_topics" do
     get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
     expect(response).to be_successful
     doc = Nokogiri::HTML5(response.body)
-    expect(doc.at_css('.admin-links .icon-peer-review')).not_to be_nil
+    expect(doc.at_css(".admin-links .icon-peer-review")).not_to be_nil
   end
 end

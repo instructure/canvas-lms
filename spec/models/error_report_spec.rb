@@ -25,13 +25,13 @@ describe ErrorReport do
                 255.chr +
                 "llo"
       data = { extra: { message: message } }
-      expect { described_class.log_exception_from_canvas_errors('my error', data) }
+      expect { described_class.log_exception_from_canvas_errors("my error", data) }
         .to_not raise_error
     end
 
     it "uses an empty hash as a default for errors with no extra data" do
       data = { tags: { a: "b" } }
-      expect { described_class.log_exception_from_canvas_errors('my error', data) }
+      expect { described_class.log_exception_from_canvas_errors("my error", data) }
         .to_not raise_error
     end
 
@@ -43,7 +43,7 @@ describe ErrorReport do
 
     it "ignores category 404" do
       count = ErrorReport.count
-      ErrorReport.log_error('404', {})
+      ErrorReport.log_error("404", {})
       expect(ErrorReport.count).to eq(count)
     end
 
@@ -69,13 +69,13 @@ describe ErrorReport do
 
   it "returns categories" do
     expect(ErrorReport.categories).to eq []
-    ErrorReport.create! { |r| r.category = 'bob' }
-    expect(ErrorReport.categories).to eq ['bob']
-    ErrorReport.create! { |r| r.category = 'bob' }
-    expect(ErrorReport.categories).to eq ['bob']
-    ErrorReport.create! { |r| r.category = 'george' }
-    expect(ErrorReport.categories).to eq ['bob', 'george']
-    ErrorReport.create! { |r| r.category = 'fred' }
+    ErrorReport.create! { |r| r.category = "bob" }
+    expect(ErrorReport.categories).to eq ["bob"]
+    ErrorReport.create! { |r| r.category = "bob" }
+    expect(ErrorReport.categories).to eq ["bob"]
+    ErrorReport.create! { |r| r.category = "george" }
+    expect(ErrorReport.categories).to eq ["bob", "george"]
+    ErrorReport.create! { |r| r.category = "fred" }
     expect(ErrorReport.categories).to eq %w[bob fred george]
   end
 
@@ -120,7 +120,7 @@ describe ErrorReport do
 
   it "truncates absurdly long messages" do
     report = described_class.new
-    long_message = (0...100_000).map { 'a' }.join
+    long_message = (0...100_000).map { "a" }.join
     report.assign_data(message: long_message)
     expect(report.message.length).to eq long_message.length
     report.save!

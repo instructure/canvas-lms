@@ -72,9 +72,9 @@ module LocaleSelection
 
     ranges = accept_language.downcase.split(SEPARATOR).map do |range|
       quality = (range =~ QUALITY_VALUE) ? $1.to_f : 1
-      [range.sub(/\s*;.*/, ''), quality]
+      [range.sub(/\s*;.*/, ""), quality]
     end
-    ranges = ranges.sort_by { |r,| r == '*' ? 1 : -r.count('-') }
+    ranges = ranges.sort_by { |r,| r == "*" ? 1 : -r.count("-") }
     # we want the longest ranges first (and * last of all), since the "quality
     # factor assigned to a [language] ... is the quality value of the longest
     # language-range ... that matches", e.g.
@@ -84,11 +84,11 @@ module LocaleSelection
     #                           en-US range is a longer match, so it loses)
 
     best_locales = supported_locales.filter_map do |locale|
-      if (best_range = ranges.detect { |r, _q| "#{r}-" == ("#{locale.downcase}-")[0..r.size] || r == '*' }) &&
+      if (best_range = ranges.detect { |r, _q| "#{r}-" == ("#{locale.downcase}-")[0..r.size] || r == "*" }) &&
          best_range.last != 0
         [locale, best_range.last, ranges.index(best_range)]
       end
-    end.sort_by { |l, q, pos| [-q, pos, l.count('-'), l] }
+    end.sort_by { |l, q, pos| [-q, pos, l.count("-"), l] }
     # wrt the sorting here, rfc2616 doesn't specify which tag is preferable
     # if there is a quality tie (due to prefix matching or otherwise).
     # technically they are equally acceptable.  we've decided to break ties

@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-require_relative '../../common'
+require_relative "../../common"
 
 module NewUserSearchPage
   # ---------------------- Page ----------------------
@@ -102,11 +102,11 @@ module NewUserSearchPage
   end
 
   def results_alert
-    f('#content .alert')
+    f("#content .alert")
   end
 
   def results_body
-    f('#content')
+    f("#content")
   end
 
   def all_results_users
@@ -126,15 +126,15 @@ module NewUserSearchPage
   end
 
   def left_navigation
-    f('#left-side #section-tabs')
+    f("#left-side #section-tabs")
   end
 
   def users_left_navigation
-    f('#section-tabs .users')
+    f("#section-tabs .users")
   end
 
   def courses_left_navigation
-    f('#section-tabs .courses')
+    f("#section-tabs .courses")
   end
 
   def breadcrumbs

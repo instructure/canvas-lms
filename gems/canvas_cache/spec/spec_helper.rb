@@ -17,13 +17,13 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'byebug'
-require 'canvas_cache'
-require 'action_controller'
-require 'active_record'
+require "byebug"
+require "canvas_cache"
+require "action_controller"
+require "active_record"
 
-Rails.env = 'test'
-Time.zone = 'UTC' # This is simplest, fight me.
+Rails.env = "test"
+Time.zone = "UTC" # This is simplest, fight me.
 
 # Right now Canvas injects the Setting class as the store.
 # It would be great to pull that one out to something we can
@@ -124,12 +124,12 @@ RSpec.configure do |config|
     mocks.verify_partial_doubles = true
   end
 
-  config.order = 'random'
+  config.order = "random"
 
   config.before do
     # load config from local spec/fixtures/config/redis.yml
     # so that we have something for ConfigFile to parse.
-    target_location = Pathname.new(File.join(File.dirname(__FILE__), 'fixtures'))
+    target_location = Pathname.new(File.join(File.dirname(__FILE__), "fixtures"))
     allow(Rails).to receive(:root).and_return(target_location)
 
     # make sure redis is in a stable state before every spec

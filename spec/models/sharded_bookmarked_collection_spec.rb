@@ -22,7 +22,7 @@ describe ShardedBookmarkedCollection do
   before do
     @user = user_factory(active_user: true)
     @user.account_users.create! account: Account.create!
-    @user.account_users.create! account: Account.create! { |a| a.workflow_state = 'deleted' }
+    @user.account_users.create! account: Account.create! { |a| a.workflow_state = "deleted" }
   end
 
   it "returns a paginatable collection" do

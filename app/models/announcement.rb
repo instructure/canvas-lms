@@ -34,10 +34,10 @@ class Announcement < DiscussionTopic
   validates :context_type, presence: true
   validates :message, presence: true
 
-  acts_as_list scope: { context: self, type: 'Announcement' }
+  acts_as_list scope: { context: self, type: "Announcement" }
 
   scope :between, lambda { |start_date, end_date|
-    where('COALESCE(delayed_post_at, posted_at, created_at) BETWEEN ? AND ?', start_date, end_date)
+    where("COALESCE(delayed_post_at, posted_at, created_at) BETWEEN ? AND ?", start_date, end_date)
   }
 
   scope :ordered_between, lambda { |start_date, end_date|
@@ -49,8 +49,8 @@ class Announcement < DiscussionTopic
   }
 
   def validate_draft_state_change
-    _old_draft_state, new_draft_state = changes['workflow_state']
-    errors.add :workflow_state, I18n.t('#announcements.error_draft_state', "This topic cannot be set to draft state because it is an announcement.") if new_draft_state == 'unpublished'
+    _old_draft_state, new_draft_state = changes["workflow_state"]
+    errors.add :workflow_state, I18n.t("#announcements.error_draft_state", "This topic cannot be set to draft state because it is an announcement.") if new_draft_state == "unpublished"
   end
 
   def infer_content
@@ -67,9 +67,9 @@ class Announcement < DiscussionTopic
 
   def self.lock_from_course(course)
     Announcement.where(
-      context_type: 'Course',
+      context_type: "Course",
       context_id: course,
-      workflow_state: 'active'
+      workflow_state: "active"
     ).update_all(locked: true)
   end
 
@@ -161,18 +161,18 @@ class Announcement < DiscussionTopic
   end
 
   def create_alert
-    return if !saved_changes.key?('workflow_state') || saved_changes['workflow_state'][1] != 'active'
-    return if context_type != 'Course'
+    return if !saved_changes.key?("workflow_state") || saved_changes["workflow_state"][1] != "active"
+    return if context_type != "Course"
 
-    observer_enrollments = course.enrollments.active.where(type: 'ObserverEnrollment')
+    observer_enrollments = course.enrollments.active.where(type: "ObserverEnrollment")
     observer_enrollments.each do |enrollment|
       observer = enrollment.user
       student = enrollment.associated_user
-      threshold = ObserverAlertThreshold.where(observer: observer, alert_type: 'course_announcement', student: student).first
+      threshold = ObserverAlertThreshold.where(observer: observer, alert_type: "course_announcement", student: student).first
       next unless threshold
 
       ObserverAlert.create!(observer: observer, student: student, observer_alert_threshold: threshold,
-                            context: self, alert_type: 'course_announcement', action_date: updated_at,
+                            context: self, alert_type: "course_announcement", action_date: updated_at,
                             title: I18n.t("Course announcement: \"%{title}\" in %{course_code}", {
                                             title: self.title,
                                             course_code: course.course_code

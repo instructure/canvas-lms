@@ -28,8 +28,8 @@ module MicrosoftSync
 
     class UnexpectedResponseError < Errors::PublicError
       def self.public_message
-        I18n.t('Unexpected response from Microsoft API. This is likely a bug. ' \
-               'Please contact support.')
+        I18n.t("Unexpected response from Microsoft API. This is likely a bug. " \
+               "Please contact support.")
       end
     end
 
@@ -51,7 +51,7 @@ module MicrosoftSync
         displayName: course.name,
         externalId: course.uuid,
         externalName: course.name,
-        externalSource: 'manual',
+        externalSource: "manual",
         mailNickname: mail_nickname_for(course)
       )
     end
@@ -91,7 +91,7 @@ module MicrosoftSync
     # makes sure the keys in the return hash match the case of the ULUVs that
     # were passed in.
     def users_uluvs_to_aads(remote_attribute, uluvs)
-      remote_attribute ||= 'userPrincipalName'
+      remote_attribute ||= "userPrincipalName"
 
       downcased_uniqued = uluvs.map(&:downcase).uniq
       if downcased_uniqued.length > USERS_ULUVS_TO_AADS_BATCH_SIZE
@@ -104,13 +104,13 @@ module MicrosoftSync
       result_hash = {}
 
       graph_service.users.list(
-        select: ['id', remote_attribute],
+        select: ["id", remote_attribute],
         filter: { remote_attribute => downcased_uniqued }
       ).each do |user_object|
         given_forms = uluvs_downcased_to_given_forms[user_object[remote_attribute].downcase]
         if given_forms
           given_forms.each do |given_form|
-            result_hash[given_form] = user_object['id']
+            result_hash[given_form] = user_object["id"]
           end
         else
           unexpected << user_object[remote_attribute]
@@ -130,9 +130,9 @@ module MicrosoftSync
       method = owners ? :list_owners : :list_members
       [].tap do |aad_ids|
         graph_service.groups.send(
-          method, group_id, select: ['id'], top: GET_GROUP_USERS_BATCH_SIZE
+          method, group_id, select: ["id"], top: GET_GROUP_USERS_BATCH_SIZE
         ) do |users|
-          aad_ids.concat(users.map { |user| user['id'] })
+          aad_ids.concat(users.map { |user| user["id"] })
         end
       end
     end

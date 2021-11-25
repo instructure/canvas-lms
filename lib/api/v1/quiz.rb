@@ -52,7 +52,7 @@ module Api::V1::Quiz
       disable_timer_autosubmission
       title
       unlock_at
-    ] + [{ 'hide_results' => ArbitraryStrongishParams::ANYTHING }] # because sometimes this is a hash :/
+    ] + [{ "hide_results" => ArbitraryStrongishParams::ANYTHING }] # because sometimes this is a hash :/
           ).freeze
   }.freeze
 
@@ -102,7 +102,7 @@ module Api::V1::Quiz
     api_route = options.fetch(:api_route)
     @quizzes, meta = Api.jsonapi_paginate(scope, self, api_route)
     @quiz_submissions = Quizzes::QuizSubmission.where(quiz_id: @quizzes, user_id: @current_user.id).index_by(&:quiz_id)
-    meta[:primaryCollection] = 'quizzes'
+    meta[:primaryCollection] = "quizzes"
     add_meta_permissions!(meta)
     Canvas::APIArraySerializer.new(@quizzes,
                                    scope: @current_user,
@@ -131,8 +131,8 @@ module Api::V1::Quiz
 
     update_params = filter_params(quiz_params)
 
-    if update_params.key?('description')
-      update_params['description'] = process_incoming_html_content(update_params['description'])
+    if update_params.key?("description")
+      update_params["description"] = process_incoming_html_content(update_params["description"])
     end
 
     # make sure assignment_group_id belongs to context
@@ -144,35 +144,35 @@ module Api::V1::Quiz
 
     # make sure allowed_attempts isn't set with a silly negative value
     # (note that -1 is ok and it means unlimited attempts)
-    if update_params.key?('allowed_attempts')
-      allowed_attempts = update_params.fetch('allowed_attempts', quiz.allowed_attempts)
+    if update_params.key?("allowed_attempts")
+      allowed_attempts = update_params.fetch("allowed_attempts", quiz.allowed_attempts)
       allowed_attempts = -1 if allowed_attempts.nil?
 
       if allowed_attempts.to_i < -1
-        update_params.delete 'allowed_attempts'
+        update_params.delete "allowed_attempts"
       end
     end
 
     # hide_results="until_after_last_attempt" is valid if allowed_attempts > 1
-    if update_params['hide_results'] == "until_after_last_attempt"
-      allowed_attempts = update_params.fetch('allowed_attempts', quiz.allowed_attempts)
+    if update_params["hide_results"] == "until_after_last_attempt"
+      allowed_attempts = update_params.fetch("allowed_attempts", quiz.allowed_attempts)
 
       unless allowed_attempts.to_i > 1
-        update_params.delete 'hide_results'
+        update_params.delete "hide_results"
       end
     end
 
     # show_correct_answers is valid if hide_results is null
-    if update_params.key?('show_correct_answers')
-      hide_results = update_params.fetch('hide_results', quiz.hide_results)
+    if update_params.key?("show_correct_answers")
+      hide_results = update_params.fetch("hide_results", quiz.hide_results)
 
       unless hide_results.blank?
-        update_params.delete 'show_correct_answers'
+        update_params.delete "show_correct_answers"
       end
     end
 
     begin
-      show_correct_answers = parse_tribool update_params.fetch('show_correct_answers', quiz.show_correct_answers)
+      show_correct_answers = parse_tribool update_params.fetch("show_correct_answers", quiz.show_correct_answers)
 
       # The following fields are valid only if `show_correct_answers` is true:
       if show_correct_answers == false
@@ -183,51 +183,51 @@ module Api::V1::Quiz
 
       # show_correct_answers_last_attempt is valid only if
       # show_correct_answers=true and allowed_attempts > 1
-      if update_params.key?('show_correct_answers_last_attempt')
-        allowed_attempts = update_params.fetch('allowed_attempts', quiz.allowed_attempts).to_i
+      if update_params.key?("show_correct_answers_last_attempt")
+        allowed_attempts = update_params.fetch("allowed_attempts", quiz.allowed_attempts).to_i
 
         if show_correct_answers == false || allowed_attempts <= 1
-          update_params.delete 'show_correct_answers_last_attempt'
+          update_params.delete "show_correct_answers_last_attempt"
         end
       end
     end
 
     # one_time_results is valid if hide_results is null
-    if update_params.key?('one_time_results')
-      hide_results = update_params.fetch('hide_results', quiz.hide_results)
+    if update_params.key?("one_time_results")
+      hide_results = update_params.fetch("hide_results", quiz.hide_results)
 
       unless hide_results.blank?
-        update_params.delete 'one_time_results'
+        update_params.delete "one_time_results"
       end
     end
 
     # scoring_policy is valid if allowed_attempts > 1
-    if update_params.key?('scoring_policy')
-      allowed_attempts = update_params.fetch('allowed_attempts', quiz.allowed_attempts)
+    if update_params.key?("scoring_policy")
+      allowed_attempts = update_params.fetch("allowed_attempts", quiz.allowed_attempts)
       unless allowed_attempts.to_i > 1
-        update_params.delete 'scoring_policy'
+        update_params.delete "scoring_policy"
       end
     end
 
     # cant_go_back is valid if one_question_at_a_time=true
-    if update_params.key?('cant_go_back')
-      one_question_at_a_time = update_params.fetch('one_question_at_a_time', quiz.one_question_at_a_time)
+    if update_params.key?("cant_go_back")
+      one_question_at_a_time = update_params.fetch("one_question_at_a_time", quiz.one_question_at_a_time)
 
       unless one_question_at_a_time
-        update_params.delete 'one_question_at_a_time'
+        update_params.delete "one_question_at_a_time"
       end
     end
 
     # discard time limit if it's a negative value
-    if update_params.key?('time_limit')
-      time_limit = update_params.fetch('time_limit', quiz.time_limit)
+    if update_params.key?("time_limit")
+      time_limit = update_params.fetch("time_limit", quiz.time_limit)
 
       if time_limit && time_limit.to_i < 0
-        update_params.delete 'time_limit'
+        update_params.delete "time_limit"
       end
     end
 
-    published = update_params.delete('published') if update_params.key?('published')
+    published = update_params.delete("published") if update_params.key?("published")
     quiz.attributes = update_params
     unless published.nil? || published.to_s.blank?
       if quiz.new_record?
@@ -250,7 +250,7 @@ module Api::V1::Quiz
   # false, "false" => false
   # true, "true" => true
   def parse_tribool(value)
-    if value.nil? || value.to_s == 'null'
+    if value.nil? || value.to_s == "null"
       nil
     else
       Canvas::Plugin.value_to_boolean(value)

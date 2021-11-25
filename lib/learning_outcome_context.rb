@@ -20,9 +20,9 @@
 module LearningOutcomeContext
   def self.included(klass)
     if klass < ActiveRecord::Base
-      klass.has_many :learning_outcome_links, -> { where("content_tags.tag_type='learning_outcome_association' AND content_tags.workflow_state<>'deleted'") }, as: :context, inverse_of: :context, class_name: 'ContentTag'
-      klass.has_many :linked_learning_outcomes, -> { distinct.where(content_tags: { content_type: 'LearningOutcome' }) }, through: :learning_outcome_links, source: :learning_outcome_content
-      klass.has_many :created_learning_outcomes, class_name: 'LearningOutcome', as: :context, inverse_of: :context
+      klass.has_many :learning_outcome_links, -> { where("content_tags.tag_type='learning_outcome_association' AND content_tags.workflow_state<>'deleted'") }, as: :context, inverse_of: :context, class_name: "ContentTag"
+      klass.has_many :linked_learning_outcomes, -> { distinct.where(content_tags: { content_type: "LearningOutcome" }) }, through: :learning_outcome_links, source: :learning_outcome_content
+      klass.has_many :created_learning_outcomes, class_name: "LearningOutcome", as: :context, inverse_of: :context
       klass.has_many :learning_outcome_groups, as: :context, inverse_of: :context
       klass.send :include, InstanceMethods
 
@@ -68,7 +68,7 @@ module LearningOutcomeContext
     end
 
     def has_outcomes?
-      Rails.cache.fetch(['has_outcomes', self].cache_key) do
+      Rails.cache.fetch(["has_outcomes", self].cache_key) do
         linked_learning_outcomes.exists?
       end
     end

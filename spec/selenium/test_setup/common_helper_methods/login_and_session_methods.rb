@@ -76,7 +76,7 @@ module LoginAndSessionMethods
   end
 
   def provision_quizzes_next(account)
-    account.root_account.settings[:provision] = { 'lti' => 'lti url' }
+    account.root_account.settings[:provision] = { "lti" => "lti url" }
     account.root_account.save!
   end
 
@@ -98,13 +98,13 @@ module LoginAndSessionMethods
   end
 
   def leave_student_view
-    expect_new_page_load { f('.leave_student_view').click }
+    expect_new_page_load { f(".leave_student_view").click }
   end
 
   def fill_in_login_form(username, password)
-    user_element = f('#pseudonym_session_unique_id')
+    user_element = f("#pseudonym_session_unique_id")
     user_element.send_keys(username)
-    password_element = f('#pseudonym_session_password')
+    password_element = f("#pseudonym_session_password")
     password_element.send_keys(password)
     password_element.submit
     wait_for_ajaximations
@@ -130,13 +130,13 @@ module LoginAndSessionMethods
   end
 
   def displayed_username
-    f('#global_nav_profile_link').click
+    f("#global_nav_profile_link").click
     f('[aria-label="Profile tray"] h2').text
   end
 
   def expect_logout_link_present
     logout_element = begin
-      f('#global_nav_profile_link').click
+      f("#global_nav_profile_link").click
       wait_for_animations
       fj('form[action="/logout"] button:contains("Logout")')
     end

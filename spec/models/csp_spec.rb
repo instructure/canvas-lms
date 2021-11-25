@@ -17,11 +17,11 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-require_relative '../spec_helper'
+require_relative "../spec_helper"
 
 describe Csp do
   def create_tool(context, attrs)
-    context.context_external_tools.create!({ name: "a", consumer_key: '12345', shared_secret: 'secret' }.merge(attrs))
+    context.context_external_tools.create!({ name: "a", consumer_key: "12345", shared_secret: "secret" }.merge(attrs))
   end
 
   describe "account setting inheritance" do
@@ -171,8 +171,8 @@ describe Csp do
     end
 
     it "includes the global whitelist Setting" do
-      allow(Setting).to receive(:get).with('csp.global_whitelist', '').and_return('some-domain.com,another.net, a-third.io')
-      expect(@sub.csp_whitelisted_domains(include_files: false, include_tools: false)).to match_array(['some-domain.com', 'another.net', 'a-third.io'])
+      allow(Setting).to receive(:get).with("csp.global_whitelist", "").and_return("some-domain.com,another.net, a-third.io")
+      expect(@sub.csp_whitelisted_domains(include_files: false, include_tools: false)).to match_array(["some-domain.com", "another.net", "a-third.io"])
     end
   end
 
@@ -217,21 +217,21 @@ describe Csp do
     end
 
     it "groups tools by domain" do
-      root_tool = create_tool(@root, domain: 'example1.com')
-      sub1_tool = create_tool(@sub1, domain: 'example2.com')
-      sub2_tool = create_tool(@sub2, domain: 'example2.com')
+      root_tool = create_tool(@root, domain: "example1.com")
+      sub1_tool = create_tool(@sub1, domain: "example2.com")
+      sub2_tool = create_tool(@sub2, domain: "example2.com")
 
       expect(@sub1.csp_tools_grouped_by_domain).to eq({
-                                                        'example1.com' => [root_tool],
-                                                        '*.example1.com' => [root_tool],
-                                                        'example2.com' => [sub1_tool],
-                                                        '*.example2.com' => [sub1_tool]
+                                                        "example1.com" => [root_tool],
+                                                        "*.example1.com" => [root_tool],
+                                                        "example2.com" => [sub1_tool],
+                                                        "*.example2.com" => [sub1_tool]
                                                       })
       expect(@sub2.csp_tools_grouped_by_domain).to eq({
-                                                        'example1.com' => [root_tool],
-                                                        '*.example1.com' => [root_tool],
-                                                        'example2.com' => [sub1_tool, sub2_tool],
-                                                        '*.example2.com' => [sub1_tool, sub2_tool]
+                                                        "example1.com" => [root_tool],
+                                                        "*.example1.com" => [root_tool],
+                                                        "example2.com" => [sub1_tool, sub2_tool],
+                                                        "*.example2.com" => [sub1_tool, sub2_tool]
                                                       })
     end
   end
@@ -246,8 +246,8 @@ describe Csp do
 
     it "caches course-level tools" do
       enable_cache do
-        tool = create_tool(@course, domain: 'example.com')
-        expect(Csp::Domain).to receive(:domains_for_tool).with(tool).once.and_return(['example.com'])
+        tool = create_tool(@course, domain: "example.com")
+        expect(Csp::Domain).to receive(:domains_for_tool).with(tool).once.and_return(["example.com"])
         @course.cached_tool_domains
         Course.find(@course.id).cached_tool_domains
       end

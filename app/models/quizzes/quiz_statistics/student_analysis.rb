@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'csv'
+require "csv"
 
 class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
   CQS = CanvasQuizStatistics
@@ -33,7 +33,7 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
   include HtmlTextHelper
 
   def readable_type
-    t('#quizzes.quiz_statistics.types.student_analysis', 'Student Analysis')
+    t("#quizzes.quiz_statistics.types.student_analysis", "Student Analysis")
   end
 
   TemporaryUser = Struct.new(:id, :short_name)
@@ -156,11 +156,11 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
           obj[:name] = aq_name if aq_name
         end
       end
-      next unless obj[:answers] && obj[:question_type] != 'text_only_question'
+      next unless obj[:answers] && obj[:question_type] != "text_only_question"
 
       stat = stats_for_question(obj, responses_for_question[obj[:id]], legacy)
       stat[:answers].each { |a| a.delete(:user_names) } if stat[:answers] && anonymous?
-      stats[:questions] << ['question', stat]
+      stats[:questions] << ["question", stat]
     end
 
     stats
@@ -181,7 +181,7 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
     if attachment.present?
       attachment.display_name
     else
-      ''
+      ""
     end
   end
 
@@ -192,15 +192,15 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
 
       # write columns to csv
       columns = []
-      columns << I18n.t('statistics.csv_columns.name', 'name') unless anonymous?
-      columns << I18n.t('statistics.csv_columns.id', 'id') unless anonymous?
-      columns << I18n.t('statistics.csv_columns.sis_id', 'sis_id') if !anonymous? && includes_sis_ids?
-      columns << I18n.t('statistics.csv_columns.root_account', 'root_account') if !anonymous? && include_root_accounts
-      columns << I18n.t('statistics.csv_columns.section', 'section')
-      columns << I18n.t('statistics.csv_columns.section_id', 'section_id')
-      columns << I18n.t('statistics.csv_columns.section_sis_id', 'section_sis_id') if includes_sis_ids?
-      columns << I18n.t('statistics.csv_columns.submitted', 'submitted')
-      columns << I18n.t('statistics.csv_columns.attempt', 'attempt') if includes_all_versions?
+      columns << I18n.t("statistics.csv_columns.name", "name") unless anonymous?
+      columns << I18n.t("statistics.csv_columns.id", "id") unless anonymous?
+      columns << I18n.t("statistics.csv_columns.sis_id", "sis_id") if !anonymous? && includes_sis_ids?
+      columns << I18n.t("statistics.csv_columns.root_account", "root_account") if !anonymous? && include_root_accounts
+      columns << I18n.t("statistics.csv_columns.section", "section")
+      columns << I18n.t("statistics.csv_columns.section_id", "section_id")
+      columns << I18n.t("statistics.csv_columns.section_sis_id", "section_sis_id") if includes_sis_ids?
+      columns << I18n.t("statistics.csv_columns.submitted", "submitted")
+      columns << I18n.t("statistics.csv_columns.attempt", "attempt") if includes_all_versions?
       first_question_index = columns.length
       submissions = submissions_for_statistics
       preload_attachments(submissions)
@@ -208,7 +208,7 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
       quiz_datas = [quiz.quiz_data] + submissions.map(&:quiz_data)
       quiz_datas.compact.each do |quiz_data|
         quiz_data.each do |question|
-          next if question['entry_type'] == 'quiz_group'
+          next if question["entry_type"] == "quiz_group"
 
           next if found_question_ids[question[:id]]
 
@@ -218,9 +218,9 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
         end
       end
       last_question_index = columns.length - 1
-      columns << I18n.t('statistics.csv_columns.n_correct', 'n correct')
-      columns << I18n.t('statistics.csv_columns.n_incorrect', 'n incorrect')
-      columns << I18n.t('statistics.csv_columns.score', 'score')
+      columns << I18n.t("statistics.csv_columns.n_correct", "n correct")
+      columns << I18n.t("statistics.csv_columns.n_incorrect", "n incorrect")
+      columns << I18n.t("statistics.csv_columns.score", "score")
       csv << columns
 
       # write rows to csv
@@ -238,10 +238,10 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
             row << (pseudonym && HostUrl.context_host(pseudonym.account)) if include_root_accounts
           else
             2.times do
-              row << ''
+              row << ""
             end
-            row << '' if includes_sis_ids?
-            row << '' if include_root_accounts
+            row << "" if includes_sis_ids?
+            row << "" if include_root_accounts
           end
         end
         section_name = []
@@ -265,32 +265,32 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
           question = submission.quiz_data.detect { |q| q[:id] == id }
           unless question
             # if this submission didn't answer this question, fill in with blanks
-            row << ''
-            row << ''
+            row << ""
+            row << ""
             next
           end
           strip_html_answers(question)
           answer_item = question && question[:answers]&.detect { |a| a[:id] == answer[:answer_id] }
           answer_item ||= answer
           case question[:question_type]
-          when 'fill_in_multiple_blanks_question'
+          when "fill_in_multiple_blanks_question"
             blank_ids = question[:answers].pluck(:blank_id).uniq
-            row << blank_ids.filter_map { |blank_id| answer["answer_for_#{blank_id}".to_sym].try(:gsub, /,/, '\,') }.join(',')
-          when 'multiple_answers_question'
-            row << question[:answers].filter_map { |a| answer["answer_#{a[:id]}".to_sym] == '1' ? a[:text].gsub(/,/, '\,') : nil }.join(',')
-          when 'multiple_dropdowns_question'
+            row << blank_ids.filter_map { |blank_id| answer["answer_for_#{blank_id}".to_sym].try(:gsub, /,/, "\\,") }.join(",")
+          when "multiple_answers_question"
+            row << question[:answers].filter_map { |a| answer["answer_#{a[:id]}".to_sym] == "1" ? a[:text].gsub(/,/, "\\,") : nil }.join(",")
+          when "multiple_dropdowns_question"
             blank_ids = question[:answers].pluck(:blank_id).uniq
             answer_ids = blank_ids.map { |blank_id| answer["answer_for_#{blank_id}".to_sym] }
-            row << answer_ids.filter_map { |answer_id| (question[:answers].detect { |a| a[:id] == answer_id } || {})[:text].try(:gsub, /,/, '\,') }.join(',')
-          when 'calculated_question'
+            row << answer_ids.filter_map { |answer_id| (question[:answers].detect { |a| a[:id] == answer_id } || {})[:text].try(:gsub, /,/, "\\,") }.join(",")
+          when "calculated_question"
             list = question[:answers].take(1).flat_map do |ans|
               ans[:variables]&.map do |variable|
-                [variable[:name], variable[:value].to_s].map { |str| str.gsub(/=>/, '\=>') }.join('=>')
+                [variable[:name], variable[:value].to_s].map { |str| str.gsub(/=>/, "\\=>") }.join("=>")
               end
             end
             list << answer[:text]
-            row << list.map { |str| (str || '').gsub(/,/, '\,') }.join(',')
-          when 'matching_question'
+            row << list.map { |str| (str || "").gsub(/,/, "\\,") }.join(",")
+          when "matching_question"
             answer_ids = question[:answers].pluck(:id)
             answer_and_matches = answer_ids.map { |aid| [aid, answer["answer_#{aid}".to_sym].to_i] }
             row << answer_and_matches.map do |answer_id, match_id|
@@ -298,15 +298,15 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
               res << (question[:answers].detect { |a| a[:id] == answer_id } || {})[:text]
               match = question[:matches].detect { |m| m[:match_id] == match_id } || question[:answers].detect { |m| m[:match_id] == match_id } || {}
               res << (match[:right] || match[:text])
-              res.map { |s| (s || '').gsub(/=>/, '\=>') }.join('=>').gsub(/,/, '\,')
-            end.join(',')
-          when 'numerical_question'
+              res.map { |s| (s || "").gsub(/=>/, "\\=>") }.join("=>").gsub(/,/, "\\,")
+            end.join(",")
+          when "numerical_question"
             row << (answer && answer[:text])
-          when 'file_upload_question'
+          when "file_upload_question"
 
             row << attachment_csv(answer)
           else
-            row << ((answer_item && answer_item[:text]) || '')
+            row << ((answer_item && answer_item[:text]) || "")
           end
           row.push(html_to_text(row.pop.to_s))
           row << (answer ? answer[:points] : "")
@@ -417,7 +417,7 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
       responses: question[:responses] - question[:answers].sum { |a| a[:responses] || 0 },
       id: "none",
       weight: 0,
-      text: I18n.t('statistics.no_answer', "No Answer"),
+      text: I18n.t("statistics.no_answer", "No Answer"),
       user_ids: question[:user_ids] - question[:answers].pluck(:user_ids).flatten
     } rescue nil
     question[:answers] << none if none && none[:responses] > 0

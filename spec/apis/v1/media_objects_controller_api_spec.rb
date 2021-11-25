@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-require_relative '../api_spec_helper'
+require_relative "../api_spec_helper"
 
 describe MediaObjectsController, type: :request do
   before :once do
@@ -33,7 +33,7 @@ describe MediaObjectsController, type: :request do
     end
 
     it "matches the create_media_object api route" do
-      assert_recognizes({ :controller => 'media_objects', :action => 'create_media_object', 'format' => 'json' }, { path: 'api/v1/media_objects', method: :post })
+      assert_recognizes({ :controller => "media_objects", :action => "create_media_object", "format" => "json" }, { path: "api/v1/media_objects", method: :post })
     end
 
     it "creates the object if it doesn't already exist" do
@@ -41,7 +41,7 @@ describe MediaObjectsController, type: :request do
       allow_any_instance_of(MediaObject).to receive(:media_sources).and_return("stub")
 
       json = api_call(:post, "/api/v1/media_objects",
-                      { controller: 'media_objects', action: 'create_media_object', format: 'json', context_code: "user_#{@user.id}",
+                      { controller: "media_objects", action: "create_media_object", format: "json", context_code: "user_#{@user.id}",
                         id: "new_object",
                         type: "audio",
                         title: "title" })
@@ -57,7 +57,7 @@ describe MediaObjectsController, type: :request do
       expect(json["media_object"]["media_type"]).to eq @media_object.media_type
     end
 
-    context 'when the context is a cross-shard user' do
+    context "when the context is a cross-shard user" do
       specs_require_sharding
 
       let(:user_shard) { @shard2 }
@@ -77,26 +77,26 @@ describe MediaObjectsController, type: :request do
       let(:media_object_request) do
         api_call(
           :post,
-          '/api/v1/media_objects',
+          "/api/v1/media_objects",
           {
-            controller: 'media_objects',
-            action: 'create_media_object',
-            format: 'json',
+            controller: "media_objects",
+            action: "create_media_object",
+            format: "json",
             context_code: "user_#{user.id}",
-            id: 'new_object',
-            type: 'video',
-            title: 'title'
+            id: "new_object",
+            type: "video",
+            title: "title"
           }
         )
       end
 
-      it 'sets the MediaObject root account to the domain root account' do
-        new_object = default_shard.activate { MediaObject.find(media_object_request.dig('media_object', 'id')) }
+      it "sets the MediaObject root account to the domain root account" do
+        new_object = default_shard.activate { MediaObject.find(media_object_request.dig("media_object", "id")) }
         expect(new_object.root_account).to eq Account.default
       end
 
       it "creates the MediaObject on the domain root account's shard" do
-        new_object = default_shard.activate { MediaObject.find(media_object_request.dig('media_object', 'id')) }
+        new_object = default_shard.activate { MediaObject.find(media_object_request.dig("media_object", "id")) }
         expect(new_object.shard).to eq Account.default.shard
       end
     end

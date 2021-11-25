@@ -31,12 +31,12 @@ describe NotificationPolicy do
       e.accept!
       Notification.all.each(&:destroy)
       Notification.reset_cache!
-      @notif = Notification.create!(name: "Assignment Created", subject: "Test", category: 'TestNever')
+      @notif = Notification.create!(name: "Assignment Created", subject: "Test", category: "TestNever")
     end
 
     it "causes message dispatch to specified channel on triggered policies" do
-      communication_channel(@student, { username: 'default@example.com', active_cc: true })
-      communication_channel(@student, { username: 'secondary@example.com', active_cc: true })
+      communication_channel(@student, { username: "default@example.com", active_cc: true })
+      communication_channel(@student, { username: "secondary@example.com", active_cc: true })
       @policy = NotificationPolicy.create(notification: @notif, communication_channel: @cc, frequency: "immediately")
       @assignment = @course.assignments.create!(title: "test assignment")
       expect(@assignment.messages_sent).to be_include("Assignment Created")
@@ -47,7 +47,7 @@ describe NotificationPolicy do
     end
 
     it "prevents message dispatches if set to 'never' on triggered policies" do
-      communication_channel(@student, { username: 'secondary@example.com', active_cc: true })
+      communication_channel(@student, { username: "secondary@example.com", active_cc: true })
       @policy = NotificationPolicy.create(notification: @notif, communication_channel: @cc, frequency: "never")
       @assignment = @course.assignments.create!(title: "test assignment")
       m = @assignment.messages_sent["Assignment Created"].find { |message| message.to == "default@example.com" }
@@ -57,7 +57,7 @@ describe NotificationPolicy do
     end
 
     it "prevents message dispatches if no policy setting exists" do
-      communication_channel(@student, { username: 'secondary@example.com', active_cc: true })
+      communication_channel(@student, { username: "secondary@example.com", active_cc: true })
       NotificationPolicy.where(notification_id: @notif, communication_channel_id: @cc).delete_all
       @assignment = @course.assignments.create!(title: "test assignment")
       m = @assignment.messages_sent["Assignment Created"].find { |message| message.to == "default@example.com" }
@@ -81,15 +81,15 @@ describe NotificationPolicy do
         to do
           u = User.create
           u.communication_channels.build(
-            path: 'blarg@example.com',
-            path_type: 'email'
-          ) { |cc| cc.workflow_state = 'active' }
+            path: "blarg@example.com",
+            path_type: "email"
+          ) { |cc| cc.workflow_state = "active" }
           u.save!
           u.register
           u
         end
         whenever { true }
-        data { { course_id: 'this is a real course_id', root_account_id: Account.default.id } }
+        data { { course_id: "this is a real course_id", root_account_id: Account.default.id } }
       end
       def root_account
         Account.default
@@ -98,7 +98,7 @@ describe NotificationPolicy do
     dt = klass.new(account_id: Account.default.id,
                    root_account_id: Account.default.id,
                    enrollment_term_id: Account.default.default_enrollment_term.id,
-                   workflow_state: 'created')
+                   workflow_state: "created")
     dt.save!
     msg = dt.messages_sent["Hello"].find { |m| m.to == "blarg@example.com" }
     expect(msg).not_to be_nil
@@ -126,10 +126,10 @@ describe NotificationPolicy do
     context "by" do
       before :once do
         user_with_pseudonym(active_all: 1)
-        @n1 = notification_policy_model(frequency: 'immediately', communication_channel: @cc, notification: notification_model(name: 'N1'))
-        @n2 = notification_policy_model(frequency: 'daily', communication_channel: @cc, notification: notification_model(name: 'N2'))
-        @n3 = notification_policy_model(frequency: 'weekly', communication_channel: @cc, notification: notification_model(name: 'N3'))
-        @n4 = notification_policy_model(frequency: 'never', communication_channel: @cc, notification: notification_model(name: 'N4'))
+        @n1 = notification_policy_model(frequency: "immediately", communication_channel: @cc, notification: notification_model(name: "N1"))
+        @n2 = notification_policy_model(frequency: "daily", communication_channel: @cc, notification: notification_model(name: "N2"))
+        @n3 = notification_policy_model(frequency: "weekly", communication_channel: @cc, notification: notification_model(name: "N3"))
+        @n4 = notification_policy_model(frequency: "never", communication_channel: @cc, notification: notification_model(name: "N4"))
       end
 
       it "has a scope to differentiate by frequency" do
@@ -163,15 +163,15 @@ describe NotificationPolicy do
       policies = NotificationPolicy.for(@notification).for(@user).for(@communication_channel).by_frequency([:daily, :weekly])
       expect(policies).to eq []
 
-      n1.update_attribute(:frequency, 'never')
+      n1.update_attribute(:frequency, "never")
       policies = NotificationPolicy.for(@notification).for(@user).for(@communication_channel).by_frequency([:daily, :weekly])
       expect(policies).to eq []
 
-      n1.update_attribute(:frequency, 'daily')
+      n1.update_attribute(:frequency, "daily")
       policies = NotificationPolicy.for(@notification).for(@user).for(@communication_channel).by_frequency([:daily, :weekly])
       expect(policies).to eq [n1]
 
-      n1.update_attribute(:frequency, 'weekly')
+      n1.update_attribute(:frequency, "weekly")
       policies = NotificationPolicy.for(@notification).for(@user).for(@communication_channel).by_frequency([:daily, :weekly])
       expect(policies).to eq [n1]
     end
@@ -181,7 +181,7 @@ describe NotificationPolicy do
     it "does not fail when params does not include a user, and the account doesn't allow scores in e-mails" do
       user_model
       communication_channel_model
-      notification_model(name: 'Setting 1', category: 'MultiCategory')
+      notification_model(name: "Setting 1", category: "MultiCategory")
       params = { channel_id: @communication_channel.id }
       params[:root_account] = Account.default
       params[:root_account].settings[:allow_sending_scores_in_emails] = false
@@ -193,16 +193,16 @@ describe NotificationPolicy do
       communication_channel_model
       params = { channel_id: @communication_channel.id }
       params[:root_account] = Account.default
-      params[:user] = { send_observed_names_in_notifications: 'true' }
+      params[:user] = { send_observed_names_in_notifications: "true" }
       NotificationPolicy.setup_for(@user, params)
       expect(@user.send_observed_names_in_notifications?).to eq true
-      params[:user] = { send_observed_names_in_notifications: 'false' }
+      params[:user] = { send_observed_names_in_notifications: "false" }
       NotificationPolicy.setup_for(@user, params)
       expect(@user.send_observed_names_in_notifications?).to eq false
 
       # Verify KNO-298
       params[:root_account].settings[:allow_sending_scores_in_emails] = false
-      params[:user] = { send_observed_names_in_notifications: 'true' }
+      params[:user] = { send_observed_names_in_notifications: "true" }
       NotificationPolicy.setup_for(@user, params)
       expect(@user.send_observed_names_in_notifications?).to eq true
     end
@@ -210,8 +210,8 @@ describe NotificationPolicy do
     it "sets all notification entries within the same category" do
       user_model
       communication_channel_model
-      notify1 = notification_model(name: 'Setting 1', category: 'MultiCategory')
-      notify2 = notification_model(name: 'Setting 2', category: 'MultiCategory')
+      notify1 = notification_model(name: "Setting 1", category: "MultiCategory")
+      notify2 = notification_model(name: "Setting 2", category: "MultiCategory")
 
       NotificationPolicy.delete_all
 
@@ -221,7 +221,7 @@ describe NotificationPolicy do
       }
       n1 = notification_policy_model(trifecta_opts.merge(notification: notify1))
       n2 = notification_policy_model(trifecta_opts.merge(notification: notify2))
-      params = { category: 'multi_category', channel_id: @communication_channel.id, frequency: Notification::FREQ_IMMEDIATELY }
+      params = { category: "multi_category", channel_id: @communication_channel.id, frequency: Notification::FREQ_IMMEDIATELY }
       NotificationPolicy.setup_for(@user, params)
       n1.reload
       n2.reload
@@ -234,7 +234,7 @@ describe NotificationPolicy do
       hax0r = user_with_communication_channel
       user_with_communication_channel
       expect do
-        NotificationPolicy.setup_for(hax0r, channel_id: @cc.id, frequency: Notification::FREQ_IMMEDIATELY, category: 'test_immediately')
+        NotificationPolicy.setup_for(hax0r, channel_id: @cc.id, frequency: Notification::FREQ_IMMEDIATELY, category: "test_immediately")
       end.to raise_error(ActiveRecord::RecordNotFound)
       expect(@user.notification_policies.any?).to eq false
     end
@@ -248,7 +248,7 @@ describe NotificationPolicy do
         notification_model
         @shard1.activate do
           expect(@user.notification_policies.scope.exists?).to be_falsey
-          NotificationPolicy.setup_for(@user, channel_id: @cc.id, frequency: Notification::FREQ_IMMEDIATELY, category: 'test_immediately')
+          NotificationPolicy.setup_for(@user, channel_id: @cc.id, frequency: Notification::FREQ_IMMEDIATELY, category: "test_immediately")
           expect(@user.notification_policies.scope.exists?).to be_truthy
         end
       end
@@ -258,8 +258,8 @@ describe NotificationPolicy do
   describe "setup_with_default_policies" do
     before :once do
       @user = User.create!
-      @communication_channel = communication_channel(@user, { username: 'email@example.com' })
-      @announcement = notification_model(name: 'Setting 1', category: 'Announcement')
+      @communication_channel = communication_channel(@user, { username: "email@example.com" })
+      @announcement = notification_model(name: "Setting 1", category: "Announcement")
     end
 
     before do
@@ -292,7 +292,7 @@ describe NotificationPolicy do
       NotificationPolicy.delete_all
       # Setup the second channel (higher position)
       primary_channel   = @user.communication_channel
-      secondary_channel = communication_channel_model(path: 'secondary@example.com')
+      secondary_channel = communication_channel_model(path: "secondary@example.com")
       # start out with 0 on primary and secondary
       expect(primary_channel.notification_policies.count).to eq 0
       expect(secondary_channel.notification_policies.count).to eq 0
@@ -307,7 +307,7 @@ describe NotificationPolicy do
       NotificationPolicy.delete_all
       # Setup the second channel (higher position)
       primary_channel   = @user.communication_channel
-      secondary_channel = communication_channel_model(path: 'secondary@example.com')
+      secondary_channel = communication_channel_model(path: "secondary@example.com")
       secondary_channel.notification_policies.create!(notification: @notification, frequency: Notification::FREQ_NEVER)
       NotificationPolicy.setup_with_default_policies(@user)
       # Primary should have 1 created and secondary should be left alone.
@@ -337,19 +337,19 @@ describe NotificationPolicy do
     end
   end
 
-  context 'find_all_for' do
-    it 'only returns course type notification policies if provided a course context type' do
+  context "find_all_for" do
+    it "only returns course type notification policies if provided a course context type" do
       student = factory_with_protected_attributes(User, name: "student", workflow_state: "registered")
-      channel = communication_channel(student, { username: 'default@example.com', active_cc: true })
+      channel = communication_channel(student, { username: "default@example.com", active_cc: true })
 
-      course_type_notification = Notification.create!(name: "Course Type", subject: "Test", category: 'Due Date')
-      notification = Notification.create!(name: "Panda Express", subject: "Test", category: 'Whatever')
+      course_type_notification = Notification.create!(name: "Course Type", subject: "Test", category: "Due Date")
+      notification = Notification.create!(name: "Panda Express", subject: "Test", category: "Whatever")
 
       NotificationPolicy.create(notification: course_type_notification, communication_channel: channel, frequency: "immediately")
       NotificationPolicy.create(notification: notification, communication_channel: channel, frequency: "daily")
       NotificationPolicy.create(communication_channel: channel, frequency: "daily")
 
-      policies = NotificationPolicy.find_all_for(channel, context_type: 'Course')
+      policies = NotificationPolicy.find_all_for(channel, context_type: "Course")
       expect(policies.count).to eq 1
       expect(policies.first.notification.name).to eq course_type_notification.name
     end

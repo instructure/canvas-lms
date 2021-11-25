@@ -103,14 +103,14 @@ describe Types::AssignmentType do
 
   it "works with rubric" do
     rubric_for_course
-    rubric_association_model(context: course, rubric: @rubric, association_object: assignment, purpose: 'grading')
+    rubric_association_model(context: course, rubric: @rubric, association_object: assignment, purpose: "grading")
     expect(assignment_type.resolve("rubric { _id }")).to eq @rubric.id.to_s
   end
 
   describe "rubric association" do
     before do
       rubric_for_course
-      rubric_association_model(context: course, rubric: @rubric, association_object: assignment, purpose: 'grading')
+      rubric_association_model(context: course, rubric: @rubric, association_object: assignment, purpose: "grading")
     end
 
     it "is returned if an association exists and is active" do
@@ -148,23 +148,23 @@ describe Types::AssignmentType do
     expect(assignment_type.resolve("peerReviews { automaticReviews }")).to eq assignment.automatic_peer_reviews
   end
 
-  it 'returns assessment requests for the current user' do
-    student2 = student_in_course(course: course, name: 'Matthew Lemon', active_all: true).user
-    student3 = student_in_course(course: course, name: 'Rob Orton', active_all: true).user
+  it "returns assessment requests for the current user" do
+    student2 = student_in_course(course: course, name: "Matthew Lemon", active_all: true).user
+    student3 = student_in_course(course: course, name: "Rob Orton", active_all: true).user
 
     assignment.assign_peer_review(student, student2)
     assignment.assign_peer_review(student2, student3)
     assignment.assign_peer_review(student3, student)
 
-    result = assignment_type.resolve('assessmentRequestsForCurrentUser { user { name } }')
+    result = assignment_type.resolve("assessmentRequestsForCurrentUser { user { name } }")
     expect(result.count).to eq 1
     expect(result[0]).to eq student2.name
 
-    result = GraphQLTypeTester.new(assignment, current_user: student2).resolve('assessmentRequestsForCurrentUser { user { name } }')
+    result = GraphQLTypeTester.new(assignment, current_user: student2).resolve("assessmentRequestsForCurrentUser { user { name } }")
     expect(result.count).to eq 1
     expect(result[0]).to eq student3.name
 
-    result = GraphQLTypeTester.new(assignment, current_user: student3).resolve('assessmentRequestsForCurrentUser { user { name } }')
+    result = GraphQLTypeTester.new(assignment, current_user: student3).resolve("assessmentRequestsForCurrentUser { user { name } }")
     expect(result.count).to eq 1
     expect(result[0]).to eq student.name
   end
@@ -267,7 +267,7 @@ describe Types::AssignmentType do
                                                              states: ["submitted"],
                                                              section_ids: ["42"],
                                                              enrollment_types: ["StudentEnrollment"],
-                                                             user_search: 'foo',
+                                                             user_search: "foo",
                                                              scored_less_than: 3.0,
                                                              scored_more_than: 1.0,
                                                              grading_status: :needs_grading,
@@ -366,10 +366,10 @@ describe Types::AssignmentType do
     end
   end
 
-  describe 'groupSubmissionConnection' do
+  describe "groupSubmissionConnection" do
     before(:once) do
       course_with_teacher
-      assignment_model(group_category: 'GROUPS!')
+      assignment_model(group_category: "GROUPS!")
       @group_category.create_groups(2)
       2.times do
         student_in_course
@@ -379,8 +379,8 @@ describe Types::AssignmentType do
         student_in_course
         @group_category.groups.last.add_user(@user)
       end
-      @assignment.submit_homework(@group_category.groups.first.users.first, body: 'Submit!')
-      @assignment.submit_homework(@group_category.groups.last.users.first, body: 'Submit!')
+      @assignment.submit_homework(@group_category.groups.first.users.first, body: "Submit!")
+      @assignment.submit_homework(@group_category.groups.last.users.first, body: "Submit!")
 
       @assignment_type = GraphQLTypeTester.new(@assignment, current_user: @teacher)
     end
@@ -404,7 +404,7 @@ describe Types::AssignmentType do
                                                              states: ["submitted"],
                                                              section_ids: ["42"],
                                                              enrollment_types: ["StudentEnrollment"],
-                                                             user_search: 'foo',
+                                                             user_search: "foo",
                                                              scored_less_than: 3.0,
                                                              scored_more_than: 1.0,
                                                              grading_status: :needs_grading,
@@ -445,8 +445,8 @@ describe Types::AssignmentType do
         }
       }
     GQL
-    expect(result['errors']).to be_nil
-    expect(result.dig('data', 'assignment')).to be_nil
+    expect(result["errors"]).to be_nil
+    expect(result.dig("data", "assignment")).to be_nil
   end
 
   it "can access it's parent course" do
@@ -458,10 +458,10 @@ describe Types::AssignmentType do
   end
 
   it "has modules" do
-    module1 = assignment.course.context_modules.create!(name: 'Module 1')
-    module2 = assignment.course.context_modules.create!(name: 'Module 2')
-    assignment.context_module_tags.create!(context_module: module1, context: assignment.course, tag_type: 'context_module')
-    assignment.context_module_tags.create!(context_module: module2, context: assignment.course, tag_type: 'context_module')
+    module1 = assignment.course.context_modules.create!(name: "Module 1")
+    module2 = assignment.course.context_modules.create!(name: "Module 2")
+    assignment.context_module_tags.create!(context_module: module1, context: assignment.course, tag_type: "context_module")
+    assignment.context_module_tags.create!(context_module: module2, context: assignment.course, tag_type: "context_module")
     expect(assignment_type.resolve("modules { _id }").to_set).to eq [module1.id.to_s, module2.id.to_s].to_set
   end
 
@@ -588,8 +588,8 @@ describe Types::AssignmentType do
     end
 
     it "works for Noop tags" do
-      course.root_account.enable_feature! 'conditional_release'
-      assignment.assignment_overrides.create!(set_type: 'Noop', set_id: 555)
+      course.root_account.enable_feature! "conditional_release"
+      assignment.assignment_overrides.create!(set_type: "Noop", set_id: 555)
       expect(
         assignment_type.resolve(<<~GQL, current_user: teacher)
           assignmentOverrides { edges { node { set {
@@ -598,7 +598,7 @@ describe Types::AssignmentType do
             }
           } } } }
         GQL
-      ).to eq ['555']
+      ).to eq ["555"]
     end
   end
 

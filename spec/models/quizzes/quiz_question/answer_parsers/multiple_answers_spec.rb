@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative 'answer_parser_spec_helper'
+require_relative "answer_parser_spec_helper"
 
 describe Quizzes::QuizQuestion::AnswerParsers::MultipleAnswers do
   context "#parse" do

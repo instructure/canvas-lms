@@ -22,7 +22,7 @@ class GoogleDocsCollaboration < Collaboration
   GOOGLE_DRIVE_SERVICE = "drive.google.com"
 
   def style_class
-    'google_docs'
+    "google_docs"
   end
 
   def service_name
@@ -42,7 +42,7 @@ class GoogleDocsCollaboration < Collaboration
     if !document_id && user
       name = title
       name = nil if name && name.empty?
-      name ||= I18n.t('lib.google_docs.default_document_name', "Instructure Doc")
+      name ||= I18n.t("lib.google_docs.default_document_name", "Instructure Doc")
 
       result = google_adapter_for_user.create_doc(name)
       if result
@@ -125,7 +125,7 @@ class GoogleDocsCollaboration < Collaboration
   end
 
   def google_drive_for_user
-    refresh_token, access_token = Rails.cache.fetch(['google_drive_tokens', user].cache_key) do
+    refresh_token, access_token = Rails.cache.fetch(["google_drive_tokens", user].cache_key) do
       service = user.user_services.where(service: "google_drive").first
       service && [service.token, service.secret]
     end

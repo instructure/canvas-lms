@@ -103,7 +103,7 @@ module Api::V1
       # load all versions for the given submissions and back-populate their
       # versionable associations
       submission_index = submissions.index_by(&:id)
-      versions = Version.where(versionable_type: 'Submission', versionable_id: submissions).order(:number)
+      versions = Version.where(versionable_type: "Submission", versionable_id: submissions).order(:number)
       versions.each { |version| version.versionable = submission_index[version.versionable_id] }
 
       # convert them all to json and then group by submission
@@ -133,7 +133,7 @@ module Api::V1
 
     def day_string_for(submission)
       graded_at = submission.graded_at
-      return '' if graded_at.nil?
+      return "" if graded_at.nil?
 
       graded_at.in_time_zone.to_date.as_json
     end
@@ -153,7 +153,7 @@ module Api::V1
       end
 
       if (grader_id = options[:grader_id])
-        collection = if grader_id.to_s == '0'
+        collection = if grader_id.to_s == "0"
                        # yes, this is crazy.  autograded submissions have the grader_id of (quiz_id x -1)
                        collection.where("submissions.grader_id<=0")
                      else
@@ -172,7 +172,7 @@ module Api::V1
     DEFAULT_GRADER = Struct.new(:name, :id)
 
     def default_grader
-      @default_grader ||= DEFAULT_GRADER.new(I18n.t('gradebooks.history.graded_on_submission', 'Graded on submission'), 0)
+      @default_grader ||= DEFAULT_GRADER.new(I18n.t("gradebooks.history.graded_on_submission", "Graded on submission"), 0)
     end
 
     def user_cache

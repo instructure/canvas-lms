@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_dependency 'microsoft_sync'
+require_dependency "microsoft_sync"
 
 #
 # See MicrosoftSync::Group for more info on Microsoft sync. This model is
@@ -37,7 +37,7 @@ require_dependency 'microsoft_sync'
 # as a "ULUV" or User Lookup Value.
 #
 class MicrosoftSync::UserMapping < ActiveRecord::Base
-  belongs_to :root_account, class_name: 'Account'
+  belongs_to :root_account, class_name: "Account"
   belongs_to :user
   validates :root_account, presence: true
   validates :user_id, presence: true
@@ -53,8 +53,8 @@ class MicrosoftSync::UserMapping < ActiveRecord::Base
 
   class AccountSettingsChanged < MicrosoftSync::Errors::GracefulCancelError
     def self.public_message
-      I18n.t 'The account-wide sync settings were changed while syncing. ' \
-             'Please attempt the sync again.'
+      I18n.t "The account-wide sync settings were changed while syncing. " \
+             "Please attempt the sync again."
     end
   end
 
@@ -136,7 +136,7 @@ class MicrosoftSync::UserMapping < ActiveRecord::Base
         ON mappings.user_id=enrollments.user_id
         AND mappings.root_account_id=#{course.root_account_id.to_i}
       SQL
-      .select(:id, :type, 'mappings.aad_id as aad_id')
+      .select(:id, :type, "mappings.aad_id as aad_id")
   end
 
   def self.delete_old_user_mappings_later(account, batch_size = 1000)

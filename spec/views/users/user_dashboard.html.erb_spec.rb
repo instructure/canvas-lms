@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../views_helper'
+require_relative "../views_helper"
 
 describe "/users/user_dashboard" do
   it "renders" do
@@ -44,7 +44,7 @@ describe "/users/user_dashboard" do
     assign(:topics, [])
     assign(:upcoming_events, [])
     assign(:stream_items, [])
-    assign(:announcements, [AccountNotification.create(message: 'hi', start_at: Time.zone.today - 1.day,
+    assign(:announcements, [AccountNotification.create(message: "hi", start_at: Time.zone.today - 1.day,
                                                        end_at: Time.zone.today + 2.days, user: User.create!,
                                                        subject: "My Global Announcement", account: Account.default)])
     render "users/user_dashboard"
@@ -61,7 +61,7 @@ describe "/users/user_dashboard" do
     assign(:topics, [])
     assign(:upcoming_events, [])
     assign(:stream_items, [])
-    assign(:announcements, [AccountNotification.create(message: 'hi', start_at: Time.zone.today - 1.day,
+    assign(:announcements, [AccountNotification.create(message: "hi", start_at: Time.zone.today - 1.day,
                                                        end_at: Time.zone.today + 2.days, user: User.create!,
                                                        subject: "My Global Announcement", account: Account.site_admin)])
     render "users/user_dashboard"

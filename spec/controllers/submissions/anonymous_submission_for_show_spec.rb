@@ -37,7 +37,7 @@ describe Submissions::AnonymousSubmissionForShow do
   let(:assignment) { course.assignments.create! }
   let(:submission) do
     Timecop.freeze(2.hours.ago) do
-      assignment.submit_homework(student, { body: 'hello' })
+      assignment.submit_homework(student, { body: "hello" })
     end
   end
 
@@ -61,7 +61,7 @@ describe Submissions::AnonymousSubmissionForShow do
     it "returns a new submission when the given anonymous_id does not match an active record" do
       Submission.delete_all
       submission_for_show = Submissions::AnonymousSubmissionForShow.new(
-        anonymous_id: 'abc12',
+        anonymous_id: "abc12",
         assignment_id: assignment.id,
         context: course
       )
@@ -74,11 +74,11 @@ describe Submissions::AnonymousSubmissionForShow do
         @course.account.enable_service(:avatars)
         assignment = @course.assignments.create!
         submission = Timecop.freeze(2.hours.ago) do
-          assignment.submit_homework(@student, { body: 'hello' })
+          assignment.submit_homework(@student, { body: "hello" })
         end
         Timecop.freeze(1.hour.ago) do
           submission.with_versioning(explicit: true) do
-            submission.body = '...world!'
+            submission.body = "...world!"
             submission.save!
           end
         end

@@ -27,7 +27,7 @@ class ReleaseNotesController < ApplicationController
 
   def index
     notes = Api.paginate(ReleaseNote.paginated(include_langs: include_langs?), self, api_v1_release_notes_url)
-    render json: notes.to_json(except: include_langs? ? [] : ['langs'])
+    render json: notes.to_json(except: include_langs? ? [] : ["langs"])
   end
 
   def create
@@ -54,7 +54,7 @@ class ReleaseNotesController < ApplicationController
     note = ReleaseNote.find(params.require(:id), include_langs: true)
     note.delete
 
-    render json: { status: 'ok' }
+    render json: { status: "ok" }
   end
 
   def publish
@@ -71,7 +71,7 @@ class ReleaseNotesController < ApplicationController
 
   def latest
     transformed_notes = release_notes_for_user.map do |note|
-      localized_text = note[release_note_lang] || note['en']
+      localized_text = note[release_note_lang] || note["en"]
       {
         id: note.id,
         title: localized_text[:title],
@@ -99,9 +99,9 @@ class ReleaseNotesController < ApplicationController
   def manage
     raise ActiveRecord::RecordNotFound unless @context.site_admin?
 
-    @page_title = t('Canvas Release Notes')
+    @page_title = t("Canvas Release Notes")
     js_bundle :release_notes_edit
-    set_active_tab 'release_notes'
+    set_active_tab "release_notes"
     js_env({
              release_notes_langs: allowed_langs,
              release_notes_envs: allowed_envs,
@@ -115,7 +115,7 @@ class ReleaseNotesController < ApplicationController
     return [] unless ReleaseNote.enabled?
 
     # Treat anonymous users as regular "user"
-    roles = @current_user&.roles(@domain_root_account) || ['user']
+    roles = @current_user&.roles(@domain_root_account) || ["user"]
 
     all_notes = roles.flat_map do |role|
       # Caches are partitioned by environment anyways so don't include in the key
@@ -124,7 +124,7 @@ class ReleaseNotesController < ApplicationController
       MultiCache.fetch("latest_release_notes/#{role}/#{release_note_lang}", expires_in: 300) do
         notes = ReleaseNote.latest(env: release_note_env, role: role, limit: latest_limit)
         # Ensure we have loaded the locales *before* caching
-        notes.each { |note| note[release_note_lang] || note['en'] }
+        notes.each { |note| note[release_note_lang] || note["en"] }
         notes
       end
     end
@@ -150,19 +150,19 @@ class ReleaseNotesController < ApplicationController
   end
 
   def allowed_langs
-    Setting.get('release_notes_langs', 'en,es,pt,nn,nl,zh').split(',')
+    Setting.get("release_notes_langs", "en,es,pt,nn,nl,zh").split(",")
   end
 
   def allowed_envs
-    Setting.get('release_notes_envs', Rails.env.production? ? 'beta,production' : Rails.env).split(',')
+    Setting.get("release_notes_envs", Rails.env.production? ? "beta,production" : Rails.env).split(",")
   end
 
   def latest_limit
-    Setting.get('release_notes_latest_limit', '10').to_i
+    Setting.get("release_notes_latest_limit", "10").to_i
   end
 
   def include_langs?
-    !!params[:includes]&.include?('langs')
+    !!params[:includes]&.include?("langs")
   end
 
   # For specs only

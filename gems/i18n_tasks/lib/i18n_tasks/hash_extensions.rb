@@ -19,7 +19,7 @@
 
 module I18nTasks
   module HashExtensions
-    def flatten_keys(result = {}, prefix = '')
+    def flatten_keys(result = {}, prefix = "")
       each_pair do |k, v|
         if v.is_a?(Hash)
           v.flatten_keys(result, "#{prefix}#{k}.")
@@ -32,7 +32,7 @@ module I18nTasks
 
     def expand_keys(result = {})
       each_pair do |k, v|
-        parts = k.split('.')
+        parts = k.split(".")
         last = parts.pop
         parts.inject(result) { |h, k2| h[k2] ||= {} }[last] = v
       end

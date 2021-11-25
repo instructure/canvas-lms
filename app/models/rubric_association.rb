@@ -64,9 +64,9 @@ class RubricAssociation < ActiveRecord::Base
   end
 
   ValidAssociationModels = {
-    'Course' => ::Course,
-    'Assignment' => ::Assignment,
-    'Account' => ::Account,
+    "Course" => ::Course,
+    "Assignment" => ::Assignment,
+    "Account" => ::Account,
   }.freeze
 
   # takes params[:association_type] and params[:association_id] and finds the
@@ -107,14 +107,14 @@ class RubricAssociation < ActiveRecord::Base
   scope :active, -> { where("rubric_associations.workflow_state<>'deleted'") }
   scope :bookmarked, -> { where(bookmarked: true) }
   scope :for_purpose, ->(purpose) { where(purpose: purpose) }
-  scope :for_grading, -> { where(purpose: 'grading') }
+  scope :for_grading, -> { where(purpose: "grading") }
   scope :for_context_codes, ->(codes) { where(context_code: codes) }
   scope :include_rubric, -> { preload(:rubric) }
   scope :before, ->(date) { where("rubric_associations.created_at<?", date) }
 
   def assert_uniqueness
-    if purpose == 'grading'
-      RubricAssociation.where(association_id: association_id, association_type: association_type, purpose: 'grading').each do |ra|
+    if purpose == "grading"
+      RubricAssociation.where(association_id: association_id, association_type: association_type, purpose: "grading").each do |ra|
         next if ra == self
 
         ra.rubric_assessments.update_all(rubric_association_id: nil)
@@ -158,14 +158,14 @@ class RubricAssociation < ActiveRecord::Base
 
   def context_name
     @cached_context_name ||= shard.activate do
-      Rails.cache.fetch(['short_name_lookup', context_code].cache_key) do
+      Rails.cache.fetch(["short_name_lookup", context_code].cache_key) do
         context.short_name rescue ""
       end
     end
   end
 
   def update_values
-    self.bookmarked = true if purpose == 'bookmark' || bookmarked.nil?
+    self.bookmarked = true if purpose == "bookmark" || bookmarked.nil?
     self.context_code ||= "#{context_type.underscore}_#{context_id}" rescue nil
     self.title ||= (association_object.title rescue association_object.name) rescue nil
     self.workflow_state ||= "active"
@@ -229,9 +229,9 @@ class RubricAssociation < ActiveRecord::Base
     # Go up to the assignment and loop through all submissions.
     # Update each submission's assessment_requests with a link to this rubric association
     # but only if not already associated
-    if association_id && association_type == 'Assignment'
+    if association_id && association_type == "Assignment"
       association_object.submissions.each do |sub|
-        sub.assessment_requests.where(rubric_association_id: nil).update_all(rubric_association_id: id, workflow_state: 'assigned')
+        sub.assessment_requests.where(rubric_association_id: nil).update_all(rubric_association_id: id, workflow_state: "assigned")
       end
     end
   end
@@ -253,9 +253,9 @@ class RubricAssociation < ActiveRecord::Base
 
     # Update/create the association -- this is what ties the rubric to an entity
     update_if_existing = params.delete(:update_if_existing)
-    if params[:hide_points] == '1'
-      params[:use_for_grading] = '0'
-      params[:hide_score_total] = '0'
+    if params[:hide_points] == "1"
+      params[:use_for_grading] = "0"
+      params[:hide_score_total] = "0"
     end
     association ||= rubric.associate_with(
       association_object,
@@ -350,7 +350,7 @@ class RubricAssociation < ActiveRecord::Base
         rating[:description] ||= r.description
         rating[:id] ||= r.id
       end
-      save_comment = data[:save_comment] == '1' && params[:assessment_type] != 'peer_review'
+      save_comment = data[:save_comment] == "1" && params[:assessment_type] != "peer_review"
       if rating[:comments].present? && save_comment
         self.summary_data ||= {}
         self.summary_data[:saved_comments] ||= {}
@@ -360,7 +360,7 @@ class RubricAssociation < ActiveRecord::Base
         self.summary_data[:saved_comments][criterion.id.to_s] = self.summary_data[:saved_comments][criterion.id.to_s].select { |desc| desc.present? && desc != "No Details" }.uniq.sort
         save
       end
-      rating[:description] = t('no_details', "No details") if rating[:description].blank?
+      rating[:description] = t("no_details", "No details") if rating[:description].blank?
       ratings << rating
     end
     assessment_to_return = nil
@@ -398,8 +398,8 @@ class RubricAssociation < ActiveRecord::Base
 
   def record_save_audit_event
     existing_association = assignment.active_rubric_association? ? assignment.rubric_association : nil
-    event_type = existing_association.present? ? 'rubric_updated' : 'rubric_created'
-    payload = if event_type == 'rubric_created'
+    event_type = existing_association.present? ? "rubric_updated" : "rubric_created"
+    payload = if event_type == "rubric_created"
                 { id: rubric_id }
               else
                 { id: [existing_association.rubric_id, rubric_id] }
@@ -416,7 +416,7 @@ class RubricAssociation < ActiveRecord::Base
   def record_deletion_audit_event
     AnonymousOrModerationEvent.create!(
       assignment: assignment,
-      event_type: 'rubric_deleted',
+      event_type: "rubric_deleted",
       payload: { id: rubric_id },
       user: @updating_user
     )
@@ -424,7 +424,7 @@ class RubricAssociation < ActiveRecord::Base
 
   def set_root_account_id
     self.root_account_id ||=
-      if context_type == 'Account' && context.root_account?
+      if context_type == "Account" && context.root_account?
         context.id
       else
         context&.root_account_id

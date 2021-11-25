@@ -45,7 +45,7 @@ describe Lti::ContentItemUtil do
       }')
     end
 
-    it 'makes a POST to confirm creation' do
+    it "makes a POST to confirm creation" do
       stub_request(:post, url)
         .to_return(status: 200, body: "", headers: {})
 
@@ -54,7 +54,7 @@ describe Lti::ContentItemUtil do
       expect(WebMock).to have_requested(:post, url).with(body: "")
     end
 
-    it 'makes a DELETE to signify Cancelation' do
+    it "makes a DELETE to signify Cancelation" do
       stub_request(:delete, url)
         .to_return(status: 200, body: "", headers: {})
 

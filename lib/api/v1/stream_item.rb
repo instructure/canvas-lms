@@ -23,11 +23,11 @@ module Api::V1::StreamItem
   include Api::V1::Submission
 
   def stream_item_preloads(stream_items)
-    discussion_topics = stream_items.select { |si| ['DiscussionTopic', 'Announcement'].include?(si.asset_type) }
+    discussion_topics = stream_items.select { |si| ["DiscussionTopic", "Announcement"].include?(si.asset_type) }
     ActiveRecord::Associations::Preloader.new.preload(discussion_topics, :context)
-    assessment_requests = stream_items.select { |si| si.asset_type == 'AssessmentRequest' }.map(&:data)
+    assessment_requests = stream_items.select { |si| si.asset_type == "AssessmentRequest" }.map(&:data)
     ActiveRecord::Associations::Preloader.new.preload(assessment_requests, asset: :assignment)
-    submissions = stream_items.select { |si| si.asset_type == 'Submission' }
+    submissions = stream_items.select { |si| si.asset_type == "Submission" }
     ActiveRecord::Associations::Preloader.new.preload(submissions, asset: { assignment: :context })
   end
 
@@ -35,85 +35,85 @@ module Api::V1::StreamItem
     data = stream_item.data(current_user.id)
     {}.tap do |hash|
       # generic attributes common to all stream item types
-      hash['created_at'] = stream_item.created_at
-      hash['updated_at'] = stream_item.updated_at
-      hash['id'] = stream_item.id
-      hash['title'] = data.respond_to?(:title) ? data.title : nil
-      hash['message'] = data.respond_to?(:body) ? data.body : nil
-      hash['type'] = stream_item.data.class.name
-      hash['read_state'] = stream_item_instance.read?
+      hash["created_at"] = stream_item.created_at
+      hash["updated_at"] = stream_item.updated_at
+      hash["id"] = stream_item.id
+      hash["title"] = data.respond_to?(:title) ? data.title : nil
+      hash["message"] = data.respond_to?(:body) ? data.body : nil
+      hash["type"] = stream_item.data.class.name
+      hash["read_state"] = stream_item_instance.read?
       hash.merge!(context_data(stream_item))
       context_type, context_id = stream_item.context_type.try(:underscore), stream_item.context_id
 
       case stream_item.asset_type
-      when 'DiscussionTopic', 'Announcement'
+      when "DiscussionTopic", "Announcement"
         context = stream_item.context
-        hash['message'] = api_user_content(data.message, context)
+        hash["message"] = api_user_content(data.message, context)
         if stream_item.data.instance_of?(DiscussionTopic)
-          hash['discussion_topic_id'] = stream_item.asset_id
-          hash['html_url'] = send("#{context_type}_discussion_topic_url", context_id, stream_item.asset_id)
+          hash["discussion_topic_id"] = stream_item.asset_id
+          hash["html_url"] = send("#{context_type}_discussion_topic_url", context_id, stream_item.asset_id)
         else
-          hash['announcement_id'] = stream_item.asset_id
-          hash['html_url'] = send("#{context_type}_announcement_url", context_id, stream_item.asset_id)
+          hash["announcement_id"] = stream_item.asset_id
+          hash["html_url"] = send("#{context_type}_announcement_url", context_id, stream_item.asset_id)
         end
-        hash['total_root_discussion_entries'] = data.total_root_discussion_entries
-        hash['require_initial_post'] = data.require_initial_post
-        hash['user_has_posted'] = data.respond_to?(:user_has_posted) ? data.user_has_posted : nil
-        hash['root_discussion_entries'] = (data.root_discussion_entries || [])[0, StreamItem::LATEST_ENTRY_LIMIT].map do |entry|
+        hash["total_root_discussion_entries"] = data.total_root_discussion_entries
+        hash["require_initial_post"] = data.require_initial_post
+        hash["user_has_posted"] = data.respond_to?(:user_has_posted) ? data.user_has_posted : nil
+        hash["root_discussion_entries"] = (data.root_discussion_entries || [])[0, StreamItem::LATEST_ENTRY_LIMIT].map do |entry|
           {
-            'user' => {
-              'user_id' => entry.user_id,
-              'user_name' => entry.user_short_name,
+            "user" => {
+              "user_id" => entry.user_id,
+              "user_name" => entry.user_short_name,
             },
-            'message' => api_user_content(entry.message, context),
+            "message" => api_user_content(entry.message, context),
           }
         end
-      when 'ContextMessage'
+      when "ContextMessage"
         # pass, these were converted to Conversations but may still show up in
         # the stream for a few weeks
-      when 'Conversation'
-        hash['conversation_id'] = stream_item.asset_id
-        hash['private'] = data.private
-        hash['participant_count'] = data.participant_count
-        hash['html_url'] = conversation_url(stream_item.asset_id)
-        hash['latest_messages'] = data.latest_messages_from_stream_item if data.latest_messages_from_stream_item.present?
-      when 'Message'
-        hash['message_id'] = stream_item.asset_id
+      when "Conversation"
+        hash["conversation_id"] = stream_item.asset_id
+        hash["private"] = data.private
+        hash["participant_count"] = data.participant_count
+        hash["html_url"] = conversation_url(stream_item.asset_id)
+        hash["latest_messages"] = data.latest_messages_from_stream_item if data.latest_messages_from_stream_item.present?
+      when "Message"
+        hash["message_id"] = stream_item.asset_id
         # this type encompasses a huge number of different types of messages,
         # anything that gets send to communication channels
-        hash['title'] = data.subject
-        hash['notification_category'] = data.notification_category
-        hash['html_url'] = hash['url'] = data.url
-      when 'Submission'
+        hash["title"] = data.subject
+        hash["notification_category"] = data.notification_category
+        hash["html_url"] = hash["url"] = data.url
+      when "Submission"
         submission = stream_item.asset
         assignment = submission.assignment
         includes = %w[submission_comments assignment course html_url user]
         json = submission_json(submission, assignment, current_user, session, nil, includes, params)
-        json.delete('id')
+        json.delete("id")
         hash.merge! json
-        hash['submission_id'] = stream_item.asset_id
+        hash["submission_id"] = stream_item.asset_id
 
         # backwards compat from before using submission_json
-        hash['assignment']['title'] = hash['assignment']['name']
-        hash['title'] = hash['assignment']['name']
-        hash['submission_comments'].each { |c| c['body'] = c['comment'] }
+        hash["assignment"]["title"] = hash["assignment"]["name"]
+        hash["title"] = hash["assignment"]["name"]
+        hash["submission_comments"].each { |c| c["body"] = c["comment"] }
       when /Conference/
-        hash['web_conference_id'] = stream_item.asset_id
-        hash['type'] = 'WebConference'
-        hash['message'] = data.description
-        hash['html_url'] = send("#{context_type}_conference_url", context_id, stream_item.asset_id) if context_type
+        hash["web_conference_id"] = stream_item.asset_id
+        hash["type"] = "WebConference"
+        hash["message"] = data.description
+        hash["html_url"] = send("#{context_type}_conference_url", context_id, stream_item.asset_id) if context_type
       when /Collaboration/
-        hash['collaboration_id'] = stream_item.asset_id
+        hash["collaboration_id"] = stream_item.asset_id
         # TODO: this type isn't even shown on the web activity stream yet
-        hash['message'] = data.description
-        hash['type'] = 'Collaboration'
-        hash['html_url'] = send("#{context_type}_collaboration_url", context_id, stream_item.asset_id) if context_type
+        hash["message"] = data.description
+        hash["type"] = "Collaboration"
+        hash["html_url"] = send("#{context_type}_collaboration_url", context_id, stream_item.asset_id) if context_type
       when /AssessmentRequest/
         assessment_request = stream_item.data
         assignment = assessment_request.asset.assignment
-        hash['assessment_request_id'] = assessment_request.id
-        hash['html_url'] = course_assignment_submission_url(assignment.context_id, assignment.id, assessment_request.user_id)
-        hash['title'] = I18n.t("stream_items_api.assessment_request_title", 'Peer Review for %{title}', title: assignment.title)
+        hash["assessment_request_id"] = assessment_request.id
+        hash["html_url"] = course_assignment_submission_url(assignment.context_id, assignment.id, assessment_request.user_id)
+        hash["title"] = I18n.t("stream_items_api.assessment_request_title", "Peer Review for %{title}", title: assignment.title)
       else
         raise("Unexpected stream item type: #{stream_item.asset_type}")
       end
@@ -131,7 +131,7 @@ module Api::V1::StreamItem
           scope = scope.where(stream_item_id: filtered_stream_item_ids(opts))
         else
           scope = scope.eager_load(:stream_item).where("stream_items.asset_type=?", opts[:asset_type])
-          if opts[:asset_type] == 'Submission'
+          if opts[:asset_type] == "Submission"
             scope = scope.joins("INNER JOIN #{Submission.quoted_table_name} ON submissions.id=asset_id")
             # just because there are comments doesn't mean the user can see them.
             # we still need to filter after the pagination :(
@@ -145,7 +145,7 @@ module Api::V1::StreamItem
     items.select!(&:stream_item)
     stream_item_preloads(items.map(&:stream_item))
     json = items.map { |i| stream_item_json(i, i.stream_item, @current_user, session) }
-    json.select! { |hash| hash['submission_comments'].present? } if opts[:asset_type] == 'Submission'
+    json.select! { |hash| hash["submission_comments"].present? } if opts[:asset_type] == "Submission"
     render json: json
   end
 
@@ -155,7 +155,7 @@ module Api::V1::StreamItem
 
     Shard.partition_by_shard(all_stream_item_ids) do |sliced_ids|
       si_scope = StreamItem.where(id: sliced_ids).where(asset_type: opts[:asset_type])
-      if opts[:asset_type] == 'Submission'
+      if opts[:asset_type] == "Submission"
         si_scope = si_scope.joins("INNER JOIN #{Submission.quoted_table_name} ON submissions.id=asset_id")
         # just because there are comments doesn't mean the user can see them.
         # we still need to filter after the pagination :(
@@ -174,18 +174,18 @@ module Api::V1::StreamItem
       @current_user.shard.activate do
         base_scope = @current_user.visible_stream_item_instances(contexts: contexts).joins(:stream_item)
 
-        full_counts = base_scope.except(:order).group('stream_items.asset_type', 'stream_items.notification_category',
-                                                      'stream_item_instances.workflow_state').count
+        full_counts = base_scope.except(:order).group("stream_items.asset_type", "stream_items.notification_category",
+                                                      "stream_item_instances.workflow_state").count
         # as far as I can tell, the 'type' column previously extracted by stream_item_json is identical to asset_type
         # oh wait, except for Announcements -_-
-        if full_counts.keys.any? { |k| k[0] == 'DiscussionTopic' }
+        if full_counts.keys.any? { |k| k[0] == "DiscussionTopic" }
           ann_counts = base_scope.where(stream_items: { asset_type: "DiscussionTopic" })
                                  .joins("INNER JOIN #{DiscussionTopic.quoted_table_name} ON discussion_topics.id=stream_items.asset_id")
-                                 .where(discussion_topics: { type: "Announcement" }).except(:order).group('stream_item_instances.workflow_state').count
+                                 .where(discussion_topics: { type: "Announcement" }).except(:order).group("stream_item_instances.workflow_state").count
 
           ann_counts.each do |wf_state, ann_count|
-            full_counts[['Announcement', nil, wf_state]] = ann_count
-            full_counts[['DiscussionTopic', nil, wf_state]] -= ann_count # subtract the announcement count from the "true" discussion topics
+            full_counts[["Announcement", nil, wf_state]] = ann_count
+            full_counts[["DiscussionTopic", nil, wf_state]] -= ann_count # subtract the announcement count from the "true" discussion topics
           end
         end
 
@@ -194,7 +194,7 @@ module Api::V1::StreamItem
         full_counts.each do |k, count|
           new_key = k.dup
           wf_state = new_key.pop
-          if wf_state == 'unread'
+          if wf_state == "unread"
             unread_counts[new_key] = count
           end
           total_counts[new_key] ||= 0
@@ -238,20 +238,20 @@ module Api::V1::StreamItem
         unread_counts = StreamItem.where(id: unread_stream_item_ids).except(:order).group(:asset_type, :notification_category).count
       end
 
-      if total_counts.keys.any? { |k| k[0] == 'DiscussionTopic' }
+      if total_counts.keys.any? { |k| k[0] == "DiscussionTopic" }
         ann_scope = StreamItem.where(stream_items: { asset_type: "DiscussionTopic" })
                               .joins(:discussion_topic)
                               .where(discussion_topics: { type: "Announcement" })
         ann_total = ann_scope.where(id: stream_item_ids).count
 
         if ann_total > 0
-          total_counts[['Announcement', nil]] = ann_total
-          total_counts[['DiscussionTopic', nil]] -= ann_total
+          total_counts[["Announcement", nil]] = ann_total
+          total_counts[["DiscussionTopic", nil]] -= ann_total
 
           ann_unread = ann_scope.where(id: unread_stream_item_ids).count
           if ann_unread > 0
-            unread_counts[['Announcement', nil]] = ann_unread
-            unread_counts[['DiscussionTopic', nil]] -= ann_unread
+            unread_counts[["Announcement", nil]] = ann_unread
+            unread_counts[["DiscussionTopic", nil]] -= ann_unread
           end
         end
       end

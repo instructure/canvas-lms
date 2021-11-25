@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../spec_helper'
+require_relative "../spec_helper"
 
 describe SubmissionDraftAttachment do
   before :once do
@@ -34,11 +34,11 @@ describe SubmissionDraftAttachment do
     )
   end
 
-  it 'submission draft attachment has one attachment' do
+  it "submission draft attachment has one attachment" do
     expect(@submission_draft_attachment.attachment).to eq @attachment
   end
 
-  it 'attachments can have multiple submission draft attachments' do
+  it "attachments can have multiple submission draft attachments" do
     submission2 = submission_model
     submission_draft2 = SubmissionDraft.create!(
       submission: submission2,
@@ -54,8 +54,8 @@ describe SubmissionDraftAttachment do
     ]
   end
 
-  context 'validation' do
-    it 'will not let you have multiple of the same attachment to submission draft' do
+  context "validation" do
+    it "will not let you have multiple of the same attachment to submission draft" do
       expect do
         SubmissionDraftAttachment.create!(
           submission_draft: @submission_draft,
@@ -64,7 +64,7 @@ describe SubmissionDraftAttachment do
       end.to raise_error(ActiveRecord::RecordInvalid)
     end
 
-    it 'requires an attachment' do
+    it "requires an attachment" do
       expect do
         SubmissionDraftAttachment.create!(
           submission_draft: @submission_draft,
@@ -73,7 +73,7 @@ describe SubmissionDraftAttachment do
       end.to raise_error(ActiveRecord::RecordInvalid)
     end
 
-    it 'requires a submission draft' do
+    it "requires a submission draft" do
       expect do
         SubmissionDraftAttachment.create!(
           submission_draft: nil,
@@ -83,7 +83,7 @@ describe SubmissionDraftAttachment do
     end
   end
 
-  context 'sharding' do
+  context "sharding" do
     specs_require_sharding
 
     before(:once) do
@@ -95,7 +95,7 @@ describe SubmissionDraftAttachment do
       end
     end
 
-    it 'can have attachments saved that are cross shard' do
+    it "can have attachments saved that are cross shard" do
       @shard1.activate do
         expect(
           @submission_draft.attachments.pluck(:id).sort

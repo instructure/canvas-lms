@@ -23,10 +23,10 @@ describe "site-wide" do
     consider_all_requests_local(false, &example)
   end
 
-  let(:x_canvas_meta) { 'X-Canvas-Meta' }
-  let(:x_canvas_user_id) { 'X-Canvas-User-Id' }
-  let(:x_canvas_real_user_id) { 'X-Canvas-Real-User-Id' }
-  let(:content_security_policy) { 'Content-Security-Policy' }
+  let(:x_canvas_meta) { "X-Canvas-Meta" }
+  let(:x_canvas_user_id) { "X-Canvas-User-Id" }
+  let(:x_canvas_real_user_id) { "X-Canvas-Real-User-Id" }
+  let(:content_security_policy) { "Content-Security-Policy" }
 
   it "renders 404 when user isn't logged in" do
     get "/dashbo"
@@ -35,14 +35,14 @@ describe "site-wide" do
 
   it "sets no-cache headers for html requests" do
     get "/login"
-    expect(response['Pragma']).to match(/no-cache/)
-    expect(response['Cache-Control']).to match(/no-store/)
+    expect(response["Pragma"]).to match(/no-cache/)
+    expect(response["Cache-Control"]).to match(/no-store/)
   end
 
   it "does not set no-cache headers for API/xhr requests" do
     get "/api/v1/courses"
-    expect(response['Pragma']).to be_nil
-    expect(response['Cache-Control']).not_to match(/no-store/)
+    expect(response["Pragma"]).to be_nil
+    expect(response["Cache-Control"]).not_to match(/no-store/)
   end
 
   it "sets the content-security-policy http header" do
@@ -91,7 +91,7 @@ describe "site-wide" do
 
     it "sets page view information in user requests" do
       course_with_teacher_logged_in
-      Setting.set('enable_page_views', 'db')
+      Setting.set("enable_page_views", "db")
       get "/courses/#{@course.id}"
       expect(response[x_canvas_meta]).to match(/o=courses;n=show;/)
       expect(response[x_canvas_meta]).to match(/t=Course;/)
@@ -104,11 +104,11 @@ describe "site-wide" do
       course_with_teacher
 
       student_in_course
-      user_with_pseudonym user: @student, username: 'student@example.com', password: 'password'
+      user_with_pseudonym user: @student, username: "student@example.com", password: "password"
       @student_pseudonym = @pseudonym
 
       account_admin_user account: Account.site_admin
-      user_with_pseudonym user: @admin, username: 'admin@example.com', password: 'password'
+      user_with_pseudonym user: @admin, username: "admin@example.com", password: "password"
     end
 
     it "does not set the logged in user headers when no one is logged in" do
@@ -149,7 +149,7 @@ describe "site-wide" do
   context "policy cache" do
     it "clears the in-process policy cache between requests" do
       expect(AdheresToPolicy::Cache).to receive(:clear).with(no_args).once
-      get '/'
+      get "/"
     end
   end
 
@@ -195,10 +195,10 @@ describe "site-wide" do
       enable_forgery_protection do
         course_with_teacher
         student_in_course
-        user_with_pseudonym(user: @student, username: 'student@example.com', password: 'password')
+        user_with_pseudonym(user: @student, username: "student@example.com", password: "password")
 
         account_admin_user(account: Account.site_admin)
-        user_with_pseudonym(user: @admin, username: 'admin@example.com', password: 'password')
+        user_with_pseudonym(user: @admin, username: "admin@example.com", password: "password")
 
         user_session(@admin, @admin.pseudonyms.first)
         post "/users/#{@student.id}/masquerade"
@@ -218,12 +218,12 @@ describe "site-wide" do
   context "stringifying ids" do
     it "stringifies ids when objects are passed to render" do
       course_with_teacher_logged_in
-      user_with_pseudonym username: 'blah'
+      user_with_pseudonym username: "blah"
       post "/courses/#{@course.id}/user_lists.json",
-           params: { user_list: ['blah'], search_type: 'unique_id', v2: true },
-           headers: { 'Accept' => 'application/json+canvas-string-ids' }
+           params: { user_list: ["blah"], search_type: "unique_id", v2: true },
+           headers: { "Accept" => "application/json+canvas-string-ids" }
       json = JSON.parse response.body
-      expect(json['users'][0]['user_id']).to be_a String
+      expect(json["users"][0]["user_id"]).to be_a String
     end
   end
 end

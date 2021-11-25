@@ -23,7 +23,7 @@ module Factories
     @context ||= opts.delete(:course) || course_model(reusable: true)
     @quiz = @context.quizzes.build(valid_quiz_attributes.merge(opts))
     @quiz.published_at = Time.zone.now
-    @quiz.workflow_state = 'available'
+    @quiz.workflow_state = "available"
     @quiz.save!
     @quiz
   end
@@ -53,7 +53,7 @@ module Factories
       @qsub.submission_data = [{ points: 0, text: "7051", question_id: 128, correct: false, answer_id: 7051 }]
       @qsub.score = 0
       @qsub.finished_at = Time.now.utc
-      @qsub.workflow_state = 'complete'
+      @qsub.workflow_state = "complete"
       @qsub.submission = @quiz.assignment.find_or_create_submission(@student.id)
     else
       @qsub.submission_data = {}
@@ -67,20 +67,20 @@ module Factories
   def test_quiz_data
     [
       {
-        correct_comments: '',
+        correct_comments: "",
         assessment_question_id: nil,
-        incorrect_comments: '',
-        question_name: 'Question 1',
+        incorrect_comments: "",
+        question_name: "Question 1",
         points_possible: 1,
-        question_text: 'Which book(s) are required for this course?',
-        name: 'Question 1',
+        question_text: "Which book(s) are required for this course?",
+        name: "Question 1",
         id: 128,
         answers: [
-          { weight: 100, text: 'A', comments: '', id: 1490 },
-          { weight: 0, text: 'B', comments: '', id: 1020 },
-          { weight: 0, text: 'C', comments: '', id: 7051 }
+          { weight: 100, text: "A", comments: "", id: 1490 },
+          { weight: 0, text: "B", comments: "", id: 1020 },
+          { weight: 0, text: "C", comments: "", id: 7051 }
         ],
-        question_type: 'multiple_choice_question'
+        question_type: "multiple_choice_question"
       }
     ]
   end
@@ -90,7 +90,7 @@ module Factories
   end
 
   def generate_quiz(course)
-    quiz = course.quizzes.create(workflow_state: 'available')
+    quiz = course.quizzes.create(workflow_state: "available")
     quiz.quiz_questions.create!(question_data: test_quiz_data.first)
     quiz.save!
 
@@ -109,12 +109,12 @@ module Factories
       qsub.submission_data = test_submission_data
       qsub.score = 0
       qsub.finished_at = finished_at || Time.now.utc
-      qsub.workflow_state = 'complete'
+      qsub.workflow_state = "complete"
     end
 
     qsub.submission = quiz.assignment.find_or_create_submission(student.id)
     qsub.submission.quiz_submission = qsub
-    qsub.submission.submission_type = 'online_quiz'
+    qsub.submission.submission_type = "online_quiz"
     qsub.submission.submitted_at = qsub.finished_at
 
     qsub.save!
@@ -267,20 +267,20 @@ module Factories
     ], "question_text" => "<p>Test Question</p>" }.with_indifferent_access
 
     if options[:answer_parser_compatibility]
-      data['answers'].each do |record|
-        record['answer_match_left'] = record['left']
-        record['answer_match_text'] = record['text']
-        record['answer_match_right'] = record['right']
-        record['answer_comments'] = record['comments']
+      data["answers"].each do |record|
+        record["answer_match_left"] = record["left"]
+        record["answer_match_text"] = record["text"]
+        record["answer_match_right"] = record["right"]
+        record["answer_comments"] = record["comments"]
 
         %w[left text right comments].each { |k| record.delete k }
       end
 
       # match#1397 has a duplicate text with #7396 that needs to be adjusted
-      i = data['matches'].index { |record| record['match_id'] == 1397 }
-      data['matches'][i]['text'] = '_1'
-      i = data['answers'].index { |record| record['match_id'] == 1397 }
-      data['answers'][i]['text'] = '_1'
+      i = data["matches"].index { |record| record["match_id"] == 1397 }
+      data["matches"][i]["text"] = "_1"
+      i = data["answers"].index { |record| record["match_id"] == 1397 }
+      data["answers"][i]["text"] = "_1"
     end
 
     data
@@ -363,8 +363,8 @@ module Factories
              "question_text" => "<p>which of these are numbers?</p>", "id" => 1 }.with_indifferent_access
 
     if options[:answer_parser_compatibility]
-      data['answers'].each do |record|
-        record['answer_weight'] = record['weight']
+      data["answers"].each do |record|
+        record["answer_weight"] = record["weight"]
       end
     end
 
@@ -395,7 +395,7 @@ module Factories
   def assignment_quiz(questions, opts = {})
     course = opts[:course] || course_factory(active_course: true)
     user = opts[:user] || user_factory(active_user: true)
-    course.enroll_student(user, enrollment_state: 'active') unless user.enrollments.any? { |e| e.course_id == course.id }
+    course.enroll_student(user, enrollment_state: "active") unless user.enrollments.any? { |e| e.course_id == course.id }
     @assignment = course.assignments.create(title: opts.fetch(:title, "Test Assignment"))
     @assignment.workflow_state = "published"
     @assignment.submission_types = "online_quiz"
@@ -448,7 +448,7 @@ module Factories
     @course.enroll_student(@student).accept
 
     @quiz = @course.quizzes.create
-    @quiz.quiz_type = 'practice_quiz'
+    @quiz.quiz_type = "practice_quiz"
     @quiz.workflow_state = "available"
     @quiz.quiz_questions.create!({ question_data: test_quiz_data.first })
     @quiz.save!
@@ -460,7 +460,7 @@ module Factories
     @qsub.submission_data = [{ points: 0, text: "7051", question_id: 128, correct: false, answer_id: 7051 }]
     @qsub.score = 0
     @qsub.finished_at = Time.now.utc
-    @qsub.workflow_state = 'complete'
+    @qsub.workflow_state = "complete"
     @qsub.with_versioning(true) do
       @qsub.save!
     end
@@ -476,8 +476,8 @@ module Factories
   def question_data(reset = false, data = {})
     @qdc = reset || !@qdc ? 1 : @qdc + 1
     {
-      :name => "question #{@qdc}", :points_possible => 1, 'question_type' => 'multiple_choice_question', 'answers' =>
-      [{ 'answer_text' => '1', 'answer_weight' => '100' }, { 'answer_text' => '2' }, { 'answer_text' => '3' }, { 'answer_text' => '4' }]
+      :name => "question #{@qdc}", :points_possible => 1, "question_type" => "multiple_choice_question", "answers" =>
+      [{ "answer_text" => "1", "answer_weight" => "100" }, { "answer_text" => "2" }, { "answer_text" => "3" }, { "answer_text" => "4" }]
     }.merge(data)
   end
 
@@ -486,7 +486,7 @@ module Factories
   end
 
   def answer_a_question(question, submission, correct: true)
-    return if question.question_data['answers'] == []
+    return if question.question_data["answers"] == []
 
     q_id = question.data[:id]
     answer = if correct
@@ -503,7 +503,7 @@ module Factories
     @quiz = @course.quizzes.create!(title: "new quiz", shuffle_answers: true, quiz_type: "assignment", scoring_policy: scoring_policy)
     @q1 = @quiz.quiz_questions.create!(question_data: question_data(true, data[:q1] || data))
     @q2 = @quiz.quiz_questions.create!(question_data: question_data(false, data[:q2] || data))
-    @outcome = @course.created_learning_outcomes.create!(short_description: 'new outcome')
+    @outcome = @course.created_learning_outcomes.create!(short_description: "new outcome")
     @bank = @q1.assessment_question.assessment_question_bank
     @outcome.align(@bank, @bank.context, mastery_score: 0.7)
   end

@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_dependency 'messageable_user'
+require_dependency "messageable_user"
 
 class MessageableUser
   class Calculator
@@ -177,7 +177,7 @@ class MessageableUser
     def search_in_context_scope(options, global_exclude_ids: [])
       scope = messageable_users_in_context_scope(options.delete(:context), options)
       scope = search_scope(scope, options[:search], global_exclude_ids) if scope
-      scope ||= MessageableUser.where('?', false)
+      scope ||= MessageableUser.where("?", false)
       scope
     end
 
@@ -198,7 +198,7 @@ class MessageableUser
       else
         scope = self_scope(options)
         scope = search_scope(scope, options[:search], global_exclude_ids)
-        collections = [['self', bookmark(scope)]]
+        collections = [["self", bookmark(scope)]]
 
         Shard.with_each_shard(@user.associated_shards) do
           if all_courses.present?
@@ -354,7 +354,7 @@ class MessageableUser
           group.shard.activate do
             reverse_lookup = missing_users.index_by(&:id)
             missing_user_ids = reverse_lookup.keys
-            group_user_scope(scope_options).where(:id => missing_user_ids, 'group_memberships.group_id' => group.id).each do |user|
+            group_user_scope(scope_options).where(:id => missing_user_ids, "group_memberships.group_id" => group.id).each do |user|
               reverse_lookup[user.id].include_common_contexts_from(user)
             end
           end
@@ -390,28 +390,28 @@ class MessageableUser
     def messageable_users_in_context_scope(asset_string_or_asset, options = {})
       if asset_string_or_asset.is_a?(String)
         asset_string = asset_string_or_asset
-        return unless asset_string.delete_suffix('_all') =~ CONTEXT_RECIPIENT
+        return unless asset_string.delete_suffix("_all") =~ CONTEXT_RECIPIENT
 
         context_type = $1
         context_id_or_object = $2.to_i
       else
         context_type = asset_string_or_asset.class_name.underscore
-        context_type = 'section' if context_type == 'course_section'
+        context_type = "section" if context_type == "course_section"
         context_id_or_object = asset_string_or_asset
       end
 
       enrollment_type = $4
-      if enrollment_type == 'admins'
-        enrollment_types = ['TeacherEnrollment', 'TaEnrollment']
+      if enrollment_type == "admins"
+        enrollment_types = ["TeacherEnrollment", "TaEnrollment"]
       elsif enrollment_type
         enrollment_types = ["#{enrollment_type.capitalize.singularize}Enrollment"]
       end
 
       case context_type
-      when 'course' then messageable_users_in_course_scope(context_id_or_object, enrollment_types, options)
-      when 'section' then messageable_users_in_section_scope(context_id_or_object, enrollment_types, options)
-      when 'group' then messageable_users_in_group_scope(context_id_or_object, options)
-      when 'announcement', 'discussion_topic' then messageable_users_in_discussion_scope(context_id_or_object, options)
+      when "course" then messageable_users_in_course_scope(context_id_or_object, enrollment_types, options)
+      when "section" then messageable_users_in_section_scope(context_id_or_object, enrollment_types, options)
+      when "group" then messageable_users_in_group_scope(context_id_or_object, options)
+      when "announcement", "discussion_topic" then messageable_users_in_discussion_scope(context_id_or_object, options)
       end
     end
 
@@ -440,7 +440,7 @@ class MessageableUser
           when :restricted then scope.where(restricted_visibility_clause([course]))
           end
         scope = scope.where(observer_restriction_clause) if student_courses.present?
-        scope = scope.where('enrollments.type' => enrollment_types) if enrollment_types
+        scope = scope.where("enrollments.type" => enrollment_types) if enrollment_types
         scope
       end
     end
@@ -478,7 +478,7 @@ class MessageableUser
         scope = enrollment_scope(options.merge(include_concluded_students: false, course_workflow_state: course.workflow_state))
                 .where(enrollments: { course_section_id: sections || section })
         scope = scope.where(observer_restriction_clause) if student_courses.present?
-        scope = scope.where('enrollments.type' => enrollment_types) if enrollment_types
+        scope = scope.where("enrollments.type" => enrollment_types) if enrollment_types
         scope
       end
     end
@@ -501,7 +501,7 @@ class MessageableUser
           # bail early if user doesn't have permission to message group members
           return if group&.context.is_a?(Course) && !group.context.grants_right?(@user, nil, :send_messages)
 
-          group_user_scope.where('group_memberships.group_id' => group.id).merge(active_users_in_group_context.except(:joins))
+          group_user_scope.where("group_memberships.group_id" => group.id).merge(active_users_in_group_context.except(:joins))
         elsif section_visible_group_ids.include?(group.id)
           # group.context is guaranteed to be a course from
           # section_visible_courses at this point
@@ -509,7 +509,7 @@ class MessageableUser
           scope = enrollment_scope({ common_group_column: group.id }.merge(options)).where(
             "course_section_id IN (?) AND EXISTS (?)",
             visible_section_ids_in_courses([course]),
-            GroupMembership.where(group_id: group, workflow_state: 'accepted').where("user_id=users.id").merge(active_users_in_group_context)
+            GroupMembership.where(group_id: group, workflow_state: "accepted").where("user_id=users.id").merge(active_users_in_group_context)
           )
           scope = scope.where(observer_restriction_clause) if student_courses.present?
           scope
@@ -547,7 +547,7 @@ class MessageableUser
 
       if search.present? && (parts = search.strip.split(/\s+/)).present?
         parts.each do |part|
-          scope = scope.where(@user.wildcard('users.name', 'users.short_name', part))
+          scope = scope.where(@user.wildcard("users.name", "users.short_name", part))
         end
       end
 
@@ -592,7 +592,7 @@ class MessageableUser
       state_clauses.compact!
       return nil if state_clauses.empty?
 
-      "(#{state_clauses.join(' OR ')}) AND enrollments.type != 'StudentViewEnrollment'"
+      "(#{state_clauses.join(" OR ")}) AND enrollments.type != 'StudentViewEnrollment'"
     end
 
     def base_scope(options = {})
@@ -618,8 +618,8 @@ class MessageableUser
     # be included, not just active users. (see MessageableUser.prepped)
     def enrollment_scope(options = {})
       options = {
-        common_course_column: 'enrollments.course_id',
-        common_role_column: 'enrollments.type'
+        common_course_column: "enrollments.course_id",
+        common_role_column: "enrollments.type"
       }.merge(options)
       scope = base_scope(options)
       scope = scope.joins("INNER JOIN #{Enrollment.quoted_table_name} ON enrollments.user_id=users.id")
@@ -644,7 +644,7 @@ class MessageableUser
 
       # redundant with the visibility_restriction_clause, which is narrower, but
       # helps out the query planner
-      scope.where('enrollments.course_id' => all_courses.map(&:id))
+      scope.where("enrollments.course_id" => all_courses.map(&:id))
     end
 
     # sql clause to limit an enrollment scope to those in the viewing user's
@@ -680,7 +680,7 @@ class MessageableUser
       clauses << full_visibility_clause if fully_visible_courses.present?
       clauses << section_visibility_clause if section_visible_courses.present?
       clauses << restricted_visibility_clause if restricted_visibility_courses.present?
-      sql = "(#{clauses.map(&:shift).join(' OR ')})"
+      sql = "(#{clauses.map(&:shift).join(" OR ")})"
       clauses.inject([sql], &:concat)
     end
 
@@ -718,7 +718,7 @@ class MessageableUser
     # further restricts the account user scope to users associated with
     # accounts in which I can read the roster (see visible_account_ids).
     def visible_account_user_scope(options = {})
-      account_user_scope(options).where('user_account_associations.account_id' => visible_account_ids)
+      account_user_scope(options).where("user_account_associations.account_id" => visible_account_ids)
     end
 
     # scopes MessageableUsers via group memberships, setting up the common
@@ -728,23 +728,23 @@ class MessageableUser
     # not just active users. (see MessageableUser.prepped)
     def group_user_scope(options = {})
       options = {
-        common_group_column: 'group_id'
+        common_group_column: "group_id"
       }.merge(options)
 
       base_scope(options)
         .joins("INNER JOIN #{GroupMembership.quoted_table_name} ON group_memberships.user_id=users.id")
-        .where(group_memberships: { workflow_state: 'accepted' })
+        .where(group_memberships: { workflow_state: "accepted" })
     end
 
     # further restricts the group user scope to users in groups for which I
     # have full visibility (see fully_visible_group_ids).
     def fully_visible_group_user_scope(options = {})
-      group_user_scope(options).where('group_memberships.group_id' => fully_visible_group_ids)
+      group_user_scope(options).where("group_memberships.group_id" => fully_visible_group_ids)
     end
 
     def self_scope(options = {})
       @user.shard.activate do
-        base_scope(options).where('users.id' => @user)
+        base_scope(options).where("users.id" => @user)
       end
     end
 
@@ -808,7 +808,7 @@ class MessageableUser
     end
 
     def uncached_group_ids_in_courses(courses)
-      Group.active.where(context_type: 'Course', context_id: courses).pluck(:id)
+      Group.active.where(context_type: "Course", context_id: courses).pluck(:id)
     end
 
     def uncached_messageable_sections
@@ -829,7 +829,7 @@ class MessageableUser
                             .select("group_memberships.group_id AS group_id")
                             .distinct
                             .joins(:user, :group)
-                            .where(workflow_state: 'accepted')
+                            .where(workflow_state: "accepted")
                             .where("groups.workflow_state<>'deleted'")
                             .where(MessageableUser::AVAILABLE_CONDITIONS)
                             .where(group_id: fully_visible_group_ids)
@@ -844,10 +844,10 @@ class MessageableUser
                                   enrollments.course_id=groups.context_id
                                 INNER JOIN #{Course.quoted_table_name} ON courses.id=enrollments.course_id
                               SQL
-                              .where(workflow_state: 'accepted')
+                              .where(workflow_state: "accepted")
                               .where("groups.workflow_state<>'deleted'")
                               .where(MessageableUser::AVAILABLE_CONDITIONS)
-                              .where(groups: { context_type: 'Course' })
+                              .where(groups: { context_type: "Course" })
                               .where(self.class.enrollment_conditions)
                               .where(enrollments: { course_section_id: visible_section_ids_in_courses(recent_section_visible_courses) })
 
@@ -877,7 +877,7 @@ class MessageableUser
         begin
           by_shard = {}
           Shard.with_each_shard(@user.in_region_associated_shards) do
-            shard_key = [@user, 'messageable_user', key]
+            shard_key = [@user, "messageable_user", key]
             methods.each do |method|
               canonical = send(method).cache_key
               shard_key << method
@@ -894,13 +894,13 @@ class MessageableUser
     end
 
     def visible_section_ids_by_shard
-      shard_cached('visible_section_ids', :section_visible_courses) do
+      shard_cached("visible_section_ids", :section_visible_courses) do
         uncached_visible_section_ids
       end
     end
 
     def observed_student_ids_by_shard
-      shard_cached('observed_student_ids', :restricted_visibility_courses) do
+      shard_cached("observed_student_ids", :restricted_visibility_courses) do
         uncached_observed_student_ids
       end
     end
@@ -912,7 +912,7 @@ class MessageableUser
     def linked_observer_ids_by_shard
       @global_linked_observer_ids ||=
         begin
-          by_shard = shard_cached('linked_observer_ids') do
+          by_shard = shard_cached("linked_observer_ids") do
             uncached_linked_observer_ids
           end
           by_shard.values.flatten.uniq
@@ -931,31 +931,31 @@ class MessageableUser
     end
 
     def visible_account_ids_by_shard
-      shard_cached('visible_account_ids') do
+      shard_cached("visible_account_ids") do
         uncached_visible_account_ids
       end
     end
 
     def fully_visible_group_ids_by_shard
-      shard_cached('fully_visible_group_ids', :recent_fully_visible_courses) do
+      shard_cached("fully_visible_group_ids", :recent_fully_visible_courses) do
         uncached_fully_visible_group_ids
       end
     end
 
     def section_visible_group_ids_by_shard
-      shard_cached('section_visible_group_ids', :recent_section_visible_courses, :recent_fully_visible_courses) do
+      shard_cached("section_visible_group_ids", :recent_section_visible_courses, :recent_fully_visible_courses) do
         uncached_section_visible_group_ids
       end
     end
 
     def messageable_sections_by_shard
-      shard_cached('messageable_sections', :all_courses) do
+      shard_cached("messageable_sections", :all_courses) do
         uncached_messageable_sections
       end
     end
 
     def messageable_groups_by_shard
-      shard_cached('messageable_groups', :fully_visible_group_ids, :section_visible_group_ids) do
+      shard_cached("messageable_groups", :fully_visible_group_ids, :section_visible_group_ids) do
         uncached_messageable_groups
       end
     end

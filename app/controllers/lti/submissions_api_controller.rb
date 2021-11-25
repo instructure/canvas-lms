@@ -142,21 +142,21 @@ module Lti
     include Api::V1::Submission
     include AttachmentHelper
 
-    SUBMISSION_SERVICE = 'vnd.Canvas.submission'
-    SUBMISSION_HISTORY_SERVICE = 'vnd.Canvas.submission.history'
+    SUBMISSION_SERVICE = "vnd.Canvas.submission"
+    SUBMISSION_HISTORY_SERVICE = "vnd.Canvas.submission.history"
 
     SERVICE_DEFINITIONS = [
       {
         id: SUBMISSION_SERVICE,
-        endpoint: 'api/lti/assignments/{assignment_id}/submissions/{submission_id}',
-        format: ['application/json'].freeze,
-        action: ['GET'].freeze
+        endpoint: "api/lti/assignments/{assignment_id}/submissions/{submission_id}",
+        format: ["application/json"].freeze,
+        action: ["GET"].freeze
       }.freeze,
       {
         id: SUBMISSION_HISTORY_SERVICE,
-        endpoint: 'api/lti/assignments/{assignment_id}/submissions/{submission_id}/history',
-        format: ['application/json'].freeze,
-        action: ['GET'].freeze
+        endpoint: "api/lti/assignments/{assignment_id}/submissions/{submission_id}/history",
+        format: ["application/json"].freeze,
+        action: ["GET"].freeze
       }.freeze
     ].freeze
 

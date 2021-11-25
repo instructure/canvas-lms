@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../views_helper'
+require_relative "../views_helper"
 
 describe "/users/name" do
   it "allows deletes for unmanagaged pseudonyms with correct privileges" do
@@ -67,7 +67,7 @@ describe "/users/name" do
     before :once do
       course_with_teacher active_all: true
       student_in_course active_all: true
-      communication_channel(@student, { username: 'secret@example.com', active_cc: true })
+      communication_channel(@student, { username: "secret@example.com", active_cc: true })
     end
 
     it "includes email address for teachers by default" do
@@ -75,17 +75,17 @@ describe "/users/name" do
       assign(:user, @student)
       assign(:enrollments, [])
       render partial: "users/name"
-      expect(response.body).to include 'secret@example.com'
+      expect(response.body).to include "secret@example.com"
     end
 
     it "does not include it if the permission is denied" do
-      RoleOverride.create!(context: Account.default, permission: 'read_email_addresses',
+      RoleOverride.create!(context: Account.default, permission: "read_email_addresses",
                            role: teacher_role, enabled: false)
       view_context(@course, @teacher)
       assign(:user, @student)
       assign(:enrollments, [])
       render partial: "users/name"
-      expect(response.body).not_to include 'secret@example.com'
+      expect(response.body).not_to include "secret@example.com"
     end
   end
 

@@ -21,7 +21,7 @@
 describe Quizzes::LogAuditing::EventAggregator do
   def build_course_quiz_qs
     teacher_in_course
-    @quiz = Quizzes::Quiz.create!(title: 'quiz', context: @course)
+    @quiz = Quizzes::Quiz.create!(title: "quiz", context: @course)
     @questions = Array.new(2) do
       @quiz.quiz_questions.create!(question_data: short_answer_question_data)
     end
@@ -43,21 +43,21 @@ describe Quizzes::LogAuditing::EventAggregator do
       Quizzes::QuizSubmissionEvent::EVT_QUESTION_ANSWERED,
       Quizzes::QuizSubmissionEvent::EVT_QUESTION_FLAGGED,
       # build an additional event types to ensure that we are properly filtering for submission_data events
-      'page_blurred'
+      "page_blurred"
     ]
     event_data_examples = {
-      'page_blurred' => [nil, nil, nil, nil],
+      "page_blurred" => [nil, nil, nil, nil],
       Quizzes::QuizSubmissionEvent::EVT_QUESTION_FLAGGED => [
-        { "quiz_question_id" => @questions[0].id, 'flagged' => true },
-        { "quiz_question_id" => @questions[0].id, 'flagged' => false },
-        { "quiz_question_id" => @questions[1].id, 'flagged' => true },
-        { "quiz_question_id" => @questions[1].id, 'flagged' => false },
+        { "quiz_question_id" => @questions[0].id, "flagged" => true },
+        { "quiz_question_id" => @questions[0].id, "flagged" => false },
+        { "quiz_question_id" => @questions[1].id, "flagged" => true },
+        { "quiz_question_id" => @questions[1].id, "flagged" => false },
       ],
       Quizzes::QuizSubmissionEvent::EVT_QUESTION_ANSWERED => [
-        [{ 'quiz_question_id' => @questions[0].id, "answer" => "hello" }],
-        [{ 'quiz_question_id' => @questions[0].id, 'answer' => "goodbye" }],
-        [{ 'quiz_question_id' => @questions[1].id, "answer" => "hello" }],
-        [{ 'quiz_question_id' => @questions[1].id, "answer" => "goodbye" }],
+        [{ "quiz_question_id" => @questions[0].id, "answer" => "hello" }],
+        [{ "quiz_question_id" => @questions[0].id, "answer" => "goodbye" }],
+        [{ "quiz_question_id" => @questions[1].id, "answer" => "hello" }],
+        [{ "quiz_question_id" => @questions[1].id, "answer" => "goodbye" }],
       ]
     }
     # Build out each event in pairs to test that we are aggregating correctly

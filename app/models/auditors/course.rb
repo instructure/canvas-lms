@@ -30,12 +30,12 @@ class Auditors::Course
       event_source = opts[:source] || :manual
       sis_batch_id = opts[:sis_batch_id]
       event = new(
-        'course' => course,
-        'user' => user,
-        'event_type' => event_type,
-        'event_data' => event_data,
-        'event_source' => event_source.to_s,
-        'sis_batch_id' => sis_batch_id
+        "course" => course,
+        "user" => user,
+        "event_type" => event_type,
+        "event_data" => event_data,
+        "event_source" => event_source.to_s,
+        "sis_batch_id" => sis_batch_id
       )
       event.sis_batch = opts[:sis_batch] if opts[:sis_batch]
       event
@@ -44,25 +44,25 @@ class Auditors::Course
     def initialize(*args)
       super(*args)
 
-      if attributes['course']
-        self.course = attributes.delete('course')
+      if attributes["course"]
+        self.course = attributes.delete("course")
       end
 
-      if attributes['user']
-        self.user = attributes.delete('user')
+      if attributes["user"]
+        self.user = attributes.delete("user")
       end
 
-      if attributes['event_data']
-        self.event_data = attributes.delete('event_data')
+      if attributes["event_data"]
+        self.event_data = attributes.delete("event_data")
       end
 
-      if attributes['sis_batch']
-        self.sis_batch = attributes.delete('sis_batch')
+      if attributes["sis_batch"]
+        self.sis_batch = attributes.delete("sis_batch")
       end
     end
 
     def event_source
-      attributes['event_source']&.to_sym
+      attributes["event_source"]&.to_sym
     end
 
     def user
@@ -72,7 +72,7 @@ class Auditors::Course
     def user=(user)
       @user = user
 
-      attributes['user_id'] = Shard.global_id_for(@user)
+      attributes["user_id"] = Shard.global_id_for(@user)
     end
 
     def sis_batch
@@ -82,7 +82,7 @@ class Auditors::Course
     def sis_batch=(batch)
       @sis_batch = batch
 
-      attributes['sis_batch_id'] = Shard.global_id_for(batch)
+      attributes["sis_batch_id"] = Shard.global_id_for(batch)
     end
 
     def course
@@ -92,18 +92,18 @@ class Auditors::Course
     def course=(course)
       @course = course
 
-      attributes['course_id'] = Shard.global_id_for(@course)
-      attributes['account_id'] = Shard.global_id_for(@course.account_id)
+      attributes["course_id"] = Shard.global_id_for(@course)
+      attributes["account_id"] = Shard.global_id_for(@course.account_id)
     end
 
     def event_data
-      @event_data ||= JSON.parse(attributes['data']) if attributes['data']
+      @event_data ||= JSON.parse(attributes["data"]) if attributes["data"]
     end
 
     def event_data=(value)
       @event_data = value
 
-      attributes['data'] = @event_data.to_json
+      attributes["data"] = @event_data.to_json
     end
 
     delegate :account, to: :course
@@ -153,58 +153,58 @@ class Auditors::Course
     changes = remove_empty_changes(changes)
     return if changes.empty?
 
-    record(course, user, 'updated', changes, opts)
+    record(course, user, "updated", changes, opts)
   end
 
   def self.record_concluded(course, user, opts = {})
     return unless course
 
-    record(course, user, 'concluded', {}, opts)
+    record(course, user, "concluded", {}, opts)
   end
 
   def self.record_unconcluded(course, user, opts = {})
     return unless course
 
-    record(course, user, 'unconcluded', {}, opts)
+    record(course, user, "unconcluded", {}, opts)
   end
 
   def self.record_deleted(course, user, opts = {})
     return unless course
 
-    record(course, user, 'deleted', {}, opts)
+    record(course, user, "deleted", {}, opts)
   end
 
   def self.record_restored(course, user, opts = {})
     return unless course
 
-    record(course, user, 'restored', {}, opts)
+    record(course, user, "restored", {}, opts)
   end
 
   def self.record_published(course, user, opts = {})
     return unless course
 
-    record(course, user, 'published', {}, opts)
+    record(course, user, "published", {}, opts)
   end
 
   def self.record_claimed(course, user, opts = {})
     return unless course
 
-    record(course, user, 'claimed', {}, opts)
+    record(course, user, "claimed", {}, opts)
   end
 
   def self.record_copied(course, copy, user, opts = {})
     return unless course && copy
 
-    copied_from = record(copy, user, 'copied_from', { copied_from: Shard.global_id_for(course) }, opts)
-    copied_to = record(course, user, 'copied_to', { copied_to: Shard.global_id_for(copy) }, opts)
+    copied_from = record(copy, user, "copied_from", { copied_from: Shard.global_id_for(course) }, opts)
+    copied_to = record(course, user, "copied_to", { copied_to: Shard.global_id_for(copy) }, opts)
     [copied_from, copied_to]
   end
 
   def self.record_reset(course, new_course, user, opts = {})
     return unless course && new_course
 
-    reset_from = record(new_course, user, 'reset_from', { reset_from: Shard.global_id_for(course) }, opts)
-    reset_to = record(course, user, 'reset_to', { reset_to: Shard.global_id_for(new_course) }, opts)
+    reset_from = record(new_course, user, "reset_from", { reset_from: Shard.global_id_for(course) }, opts)
+    reset_to = record(course, user, "reset_to", { reset_to: Shard.global_id_for(new_course) }, opts)
     [reset_from, reset_to]
   end
 

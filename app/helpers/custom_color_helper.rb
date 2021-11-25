@@ -32,7 +32,7 @@ module CustomColorHelper
   end
 
   def normalize_hexcode(hex_to_normalize)
-    if hex_to_normalize.start_with?('#')
+    if hex_to_normalize.start_with?("#")
       hex_to_normalize
     else
       "#" + hex_to_normalize

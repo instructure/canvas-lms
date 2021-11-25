@@ -17,7 +17,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'spec_helper' # File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
+require "spec_helper" # File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe CanvasTextHelper do
   describe "#truncate_text" do
@@ -62,11 +62,11 @@ describe CanvasTextHelper do
 
   describe "cgi_escape_truncate" do
     it "does not truncate strings that fit" do
-      expect(CanvasTextHelper.cgi_escape_truncate('!!!', 9)).to eql("%21%21%21")
+      expect(CanvasTextHelper.cgi_escape_truncate("!!!", 9)).to eql("%21%21%21")
     end
 
     it "does not split escape sequences" do
-      expect(CanvasTextHelper.cgi_escape_truncate('!!!', 8)).to eql("%21%21")
+      expect(CanvasTextHelper.cgi_escape_truncate("!!!", 8)).to eql("%21%21")
     end
 
     it "does not split UTF-8 characters" do

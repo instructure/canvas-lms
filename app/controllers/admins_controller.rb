@@ -78,7 +78,7 @@ class AdminsController < ApplicationController
 
     require_role
     admin = @context.account_users.where(user_id: user.id, role_id: @role.id).first_or_initialize
-    admin.workflow_state = 'active'
+    admin.workflow_state = "active"
 
     return unless authorized_action(admin, @current_user, :create)
 

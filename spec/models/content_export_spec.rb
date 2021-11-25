@@ -68,20 +68,20 @@ describe ContentExport do
 
   context "Quizzes2 Export" do
     before :once do
-      quiz = @course.quizzes.create!(title: 'quiz1')
+      quiz = @course.quizzes.create!(title: "quiz1")
       Account.default.context_external_tools.create!(
-        name: 'Quizzes.Next',
-        consumer_key: 'test_key',
-        shared_secret: 'test_secret',
-        tool_id: 'Quizzes 2',
-        url: 'http://example.com/launch'
+        name: "Quizzes.Next",
+        consumer_key: "test_key",
+        shared_secret: "test_secret",
+        tool_id: "Quizzes 2",
+        url: "http://example.com/launch"
       )
       @ce = @course.content_exports.create!(
         export_type: ContentExport::QUIZZES2,
         selected_content: quiz.id,
         user: @user
       )
-      @course.root_account.settings[:provision] = { 'lti' => 'lti url' }
+      @course.root_account.settings[:provision] = { "lti" => "lti url" }
       @course.root_account.save!
     end
 
@@ -118,10 +118,10 @@ describe ContentExport do
     it "completes with export_type of 'quizzes2'" do
       @course.enable_feature!(:quizzes_next)
       @ce.export(synchronous: true)
-      expect(@ce.export_type).to eq('quizzes2')
+      expect(@ce.export_type).to eq("quizzes2")
     end
 
-    context 'failure cases' do
+    context "failure cases" do
       it "fails if the quiz exporter fails" do
         @course.enable_feature!(:quizzes_next)
         allow_any_instance_of(Exporters::Quizzes2Exporter).to receive(:export).and_return(false)
@@ -137,17 +137,17 @@ describe ContentExport do
       end
     end
 
-    context 'when newquizzes_on_quiz_page is enabled' do
+    context "when newquizzes_on_quiz_page is enabled" do
       before do
         @course.enable_feature!(:quizzes_next)
         @course.root_account.enable_feature!(:newquizzes_on_quiz_page)
       end
 
-      it 'sets up assignment and content_export settings' do
+      it "sets up assignment and content_export settings" do
         expect(@ce).to receive(:export)
         @ce.queue_api_job({})
-        expect(@ce.settings['quizzes2']).not_to be_nil
-        assignment_id = @ce.settings['quizzes2']['assignment']['assignment_id']
+        expect(@ce.settings["quizzes2"]).not_to be_nil
+        assignment_id = @ce.settings["quizzes2"]["assignment"]["assignment_id"]
         assignment = Assignment.find_by(id: assignment_id)
         expect(assignment).not_to be_nil
       end
@@ -155,30 +155,30 @@ describe ContentExport do
       # CC export is the first step of Quiz migration
       # Canvas then sends live events to N.Q
       # N.Q finally imports the CC package
-      it 'completes CC export for new quizzes migration' do
+      it "completes CC export for new quizzes migration" do
         cc_exporter = CC::CCExporter.new(@ce)
         expect(CC::CCExporter).to receive(:new).and_return(cc_exporter)
         expect(cc_exporter).to receive(:export).and_call_original
         @ce.quizzes2_build_assignment
         @ce.export(synchronous: true)
         expect(@ce.settings[:quizzes2][:qti_export][:url]).to eq(@ce.attachment.public_download_url)
-        expect(@ce.export_type).to eq('quizzes2')
+        expect(@ce.export_type).to eq("quizzes2")
       end
 
-      it 'marks failure if CC export is failed' do
+      it "marks failure if CC export is failed" do
         cc_exporter = CC::CCExporter.new(@ce)
         expect(CC::CCExporter).to receive(:new).and_return(cc_exporter)
         # CC exporter fails and returns false
         expect(cc_exporter).to receive(:export).and_return(false)
         @ce.quizzes2_build_assignment
-        assignment_id = @ce.settings['quizzes2']['assignment']['assignment_id']
+        assignment_id = @ce.settings["quizzes2"]["assignment"]["assignment_id"]
         @ce.export(synchronous: true)
         assignment = Assignment.find_by(id: assignment_id)
-        expect(assignment.workflow_state).to eq('failed_to_migrate')
-        expect(@ce.workflow_state).to eq('failed')
+        expect(assignment.workflow_state).to eq("failed_to_migrate")
+        expect(@ce.workflow_state).to eq("failed")
       end
 
-      context 'when failed assignment is provided' do
+      context "when failed assignment is provided" do
         let(:failed_assignment) do
           @course.assignments.create!(
             position: 777,
@@ -187,10 +187,10 @@ describe ContentExport do
         end
 
         let(:assignment_group) do
-          @course.assignment_groups.create!(name: 'group_123')
+          @course.assignment_groups.create!(name: "group_123")
         end
 
-        it 'creates assignment with expected group and position' do
+        it "creates assignment with expected group and position" do
           @ce.quizzes2_build_assignment(failed_assignment_id: failed_assignment.id)
           expect(@ce.settings[:quizzes2][:assignment]).not_to be_empty
           assignment_id = @ce.settings[:quizzes2][:assignment][:assignment_id]
@@ -236,8 +236,8 @@ describe ContentExport do
   context "notifications" do
     before :once do
       @ce.update_attribute(:user_id, @user.id)
-      Notification.create!(name: 'Content Export Finished', category: 'Migration')
-      Notification.create!(name: 'Content Export Failed', category: 'Migration')
+      Notification.create!(name: "Content Export Finished", category: "Migration")
+      Notification.create!(name: "Content Export Failed", category: "Migration")
     end
 
     it "sends notifications immediately" do
@@ -246,17 +246,17 @@ describe ContentExport do
       %w[created exporting exported_for_course_copy deleted].each do |workflow|
         @ce.workflow_state = workflow
         expect { @ce.save! }.to change(DelayedMessage, :count).by 0
-        expect(@ce.messages_sent['Content Export Finished']).to be_blank
-        expect(@ce.messages_sent['Content Export Failed']).to be_blank
+        expect(@ce.messages_sent["Content Export Finished"]).to be_blank
+        expect(@ce.messages_sent["Content Export Failed"]).to be_blank
       end
 
-      @ce.workflow_state = 'exported'
+      @ce.workflow_state = "exported"
       expect { @ce.save! }.to change(DelayedMessage, :count).by 0
-      expect(@ce.messages_sent['Content Export Finished']).not_to be_blank
+      expect(@ce.messages_sent["Content Export Finished"]).not_to be_blank
 
-      @ce.workflow_state = 'failed'
+      @ce.workflow_state = "failed"
       expect { @ce.save! }.to change(DelayedMessage, :count).by 0
-      expect(@ce.messages_sent['Content Export Failed']).not_to be_blank
+      expect(@ce.messages_sent["Content Export Failed"]).not_to be_blank
     end
 
     it "does not send emails as part of a content migration (course copy)" do
@@ -264,13 +264,13 @@ describe ContentExport do
       @ce.content_migration = @cm
       @ce.save!
 
-      @ce.workflow_state = 'exported'
+      @ce.workflow_state = "exported"
       expect { @ce.save! }.to change(DelayedMessage, :count).by 0
-      expect(@ce.messages_sent['Content Export Finished']).to be_blank
+      expect(@ce.messages_sent["Content Export Finished"]).to be_blank
 
-      @ce.workflow_state = 'failed'
+      @ce.workflow_state = "failed"
       expect { @ce.save! }.to change(DelayedMessage, :count).by 0
-      expect(@ce.messages_sent['Content Export Failed']).to be_blank
+      expect(@ce.messages_sent["Content Export Failed"]).to be_blank
     end
   end
 
@@ -285,13 +285,13 @@ describe ContentExport do
     end
 
     it "does not mark as expired if setting is 0" do
-      Setting.set('content_exports_expire_after_days', '0')
+      Setting.set("content_exports_expire_after_days", "0")
       ContentExport.where(id: @ce.id).update_all(created_at: 35.days.ago)
       expect(@ce.reload).not_to be_expired
     end
 
     it "does not mark expired if part of a ContentShare" do
-      @teacher.sent_content_shares.create!(read_state: 'read', name: 'test', content_export_id: @ce.id)
+      @teacher.sent_content_shares.create!(read_state: "read", name: "test", content_export_id: @ce.id)
       ContentExport.where(id: @ce.id).update_all(created_at: 35.days.ago, user_id: @teacher.id)
       expect(@ce.reload).not_to be_expired
     end
@@ -308,7 +308,7 @@ describe ContentExport do
     end
 
     it "does not mark as expired if setting is 0" do
-      Setting.set('content_exports_expire_after_days', '0')
+      Setting.set("content_exports_expire_after_days", "0")
       ContentExport.where(id: @ce.id).update_all(created_at: 35.days.ago)
       expect(ContentExport.expired.pluck(:id)).to be_empty
     end

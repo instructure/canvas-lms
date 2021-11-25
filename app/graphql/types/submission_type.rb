@@ -26,7 +26,7 @@
 
 module Types
   class SubmissionHistoryFilterInputType < Types::BaseInputObject
-    graphql_name 'SubmissionHistoryFilterInput'
+    graphql_name "SubmissionHistoryFilterInput"
 
     argument :states, [SubmissionStateType], required: false,
                                              default_value: DEFAULT_SUBMISSION_HISTORY_STATES
@@ -38,7 +38,7 @@ module Types
   end
 
   class SubmissionType < ApplicationObjectType
-    graphql_name 'Submission'
+    graphql_name "Submission"
 
     implements GraphQL::Types::Relay::Node
     implements Interfaces::TimestampInterface

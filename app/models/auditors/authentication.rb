@@ -25,14 +25,14 @@ class Auditors::Authentication
                :user_id
 
     def self.generate(pseudonym, event_type)
-      new('pseudonym' => pseudonym, 'event_type' => event_type)
+      new("pseudonym" => pseudonym, "event_type" => event_type)
     end
 
     def initialize(*args)
       super(*args)
 
-      if attributes['pseudonym']
-        self.pseudonym = attributes.delete('pseudonym')
+      if attributes["pseudonym"]
+        self.pseudonym = attributes.delete("pseudonym")
       end
     end
 
@@ -42,9 +42,9 @@ class Auditors::Authentication
 
     def pseudonym=(pseudonym)
       @pseudonym = pseudonym
-      attributes['pseudonym_id'] = @pseudonym.global_id
-      attributes['account_id'] = Shard.global_id_for(@pseudonym.account_id)
-      attributes['user_id'] = Shard.global_id_for(@pseudonym.user_id)
+      attributes["pseudonym_id"] = @pseudonym.global_id
+      attributes["account_id"] = Shard.global_id_for(@pseudonym.account_id)
+      attributes["user_id"] = Shard.global_id_for(@pseudonym.user_id)
     end
 
     delegate :user, :account, to: :pseudonym

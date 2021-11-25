@@ -182,7 +182,7 @@ module DataFixup::PopulateRootAccountIdOnModels
   def self.unfillable_criteria
     # Arguments to where()
     @unfillable_criteria ||= {
-      DeveloperKey => 'account_id IS NULL',
+      DeveloperKey => "account_id IS NULL",
     }.transform_values { |criteria| [criteria].flatten(1) }.freeze
   end
 
@@ -195,9 +195,9 @@ module DataFixup::PopulateRootAccountIdOnModels
   def self.fill_with_zeros_criteria
     # Arguments to where()
     @fill_with_zeros_criteria ||= {
-      CalendarEvent => { context_type: 'User', effective_context_code: nil },
-      LearningOutcomeGroup => 'context_id IS NULL',
-      ContentMigration => { context_type: 'User' },
+      CalendarEvent => { context_type: "User", effective_context_code: nil },
+      LearningOutcomeGroup => "context_id IS NULL",
+      ContentMigration => { context_type: "User" },
     }.transform_values { |criteria| [criteria].flatten(1) }.freeze
   end
 
@@ -490,7 +490,7 @@ module DataFixup::PopulateRootAccountIdOnModels
           .where(table.primary_key => batch_min..batch_max)
           .where(root_account_id: nil)
           .where(*criteria)
-          .update_all('root_account_id = 0')
+          .update_all("root_account_id = 0")
       end
     end
   end
@@ -523,7 +523,7 @@ module DataFixup::PopulateRootAccountIdOnModels
         scope_for_association_does_not_exist(table, assoc_name)
           .where(id: batch_min..batch_max)
           .where(root_account_id: nil)
-          .update_all('root_account_id = 0')
+          .update_all("root_account_id = 0")
       end
     end
   end
@@ -544,7 +544,7 @@ module DataFixup::PopulateRootAccountIdOnModels
     return columns if columns.is_a?(String)
 
     names = Array(columns).map { |column| "#{assoc.klass.table_name}.#{column}" }
-    names.count == 1 ? names.first : "COALESCE(#{names.join(', ')})"
+    names.count == 1 ? names.first : "COALESCE(#{names.join(", ")})"
   end
 
   def self.fill_cross_shard_associations(table, scope, reflection, column)
@@ -572,7 +572,7 @@ module DataFixup::PopulateRootAccountIdOnModels
         end
         root_ids_with_foreign_keys.each do |attributes|
           foreign_keys = attributes.foreign_keys.map { |fk| Shard.global_id_for(fk, foreign_shard) }
-          subscope.where("#{foreign_key} IN (#{foreign_keys.join(',')})")
+          subscope.where("#{foreign_key} IN (#{foreign_keys.join(",")})")
                   .update_all("root_account_id = #{Shard.global_id_for(attributes.root_id, foreign_shard) || "null"}")
         end
       end

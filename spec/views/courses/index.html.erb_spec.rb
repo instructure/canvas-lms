@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../views_helper'
+require_relative "../views_helper"
 
 describe "/courses/index" do
   it "renders" do
@@ -42,7 +42,7 @@ describe "/courses/index" do
     assign(:visible_groups, [@group])
     render "courses/index"
     doc = Nokogiri::HTML5(response.body)
-    expect(doc.at_css('#my_groups_table td:nth-child(2) span.name').text).to eq @course.name
+    expect(doc.at_css("#my_groups_table td:nth-child(2) span.name").text).to eq @course.name
   end
 
   it "does not show groups for restricted future courses" do
@@ -59,6 +59,6 @@ describe "/courses/index" do
     assign(:visible_groups, [])
     render "courses/index"
     doc = Nokogiri::HTML5(response.body)
-    expect(doc.at_css('#my_groups_table')).to be_nil
+    expect(doc.at_css("#my_groups_table")).to be_nil
   end
 end

@@ -33,8 +33,8 @@ describe CanvasSecurity::JWTWorkflow do
     @g.add_user(@u)
   end
 
-  describe 'workflows' do
-    describe ':rich_content' do
+  describe "workflows" do
+    describe ":rich_content" do
       before do
         allow(@c).to receive(:respond_to?).with(:usage_rights_required?).and_return(true)
         allow(@c).to receive(:grants_right?)
@@ -46,43 +46,43 @@ describe CanvasSecurity::JWTWorkflow do
         allow(@g).to receive(:can_participate).and_return(true)
       end
 
-      it 'sets can_upload_files to false' do
+      it "sets can_upload_files to false" do
         expect(@c).to receive(:grants_right?).with(@u, :manage_files_add).and_return(false)
         state = described_class.state_for(%i[rich_content], @c, @u)
         expect(state[:can_upload_files]).to be false
       end
 
-      it 'sets can_upload_files to true' do
+      it "sets can_upload_files to true" do
         expect(@c).to receive(:grants_right?).with(@u, :manage_files_add).and_return(true)
         state = described_class.state_for(%i[rich_content], @c, @u)
         expect(state[:can_upload_files]).to be true
       end
 
-      it 'sets usage_rights_required to false' do
+      it "sets usage_rights_required to false" do
         @c.usage_rights_required = false
         state = described_class.state_for(%i[rich_content], @c, @u)
         expect(state[:usage_rights_required]).to be false
       end
 
-      it 'sets usage_rights_required to true' do
+      it "sets usage_rights_required to true" do
         @c.usage_rights_required = true
         state = described_class.state_for(%i[rich_content], @c, @u)
         expect(state[:usage_rights_required]).to be true
       end
 
-      it 'sets group usage_rights_required to false if false on its course' do
+      it "sets group usage_rights_required to false if false on its course" do
         @c.usage_rights_required = false
         state = described_class.state_for(%i[rich_content], @g, @u)
         expect(state[:usage_rights_required]).to be false
       end
 
-      it 'sets group usage_rights_required to true if true on its course' do
+      it "sets group usage_rights_required to true if true on its course" do
         @c.usage_rights_required = true
         state = described_class.state_for(%i[rich_content], @g, @u)
         expect(state[:usage_rights_required]).to be true
       end
 
-      it 'sets can_create_pages to false if context does not have a wiki' do
+      it "sets can_create_pages to false if context does not have a wiki" do
         expect(@c).to receive(:respond_to?).with(:wiki).and_return(false)
         state = described_class.state_for(%i[rich_content], @c, @u)
         expect(state[:can_create_pages]).to be false
@@ -91,14 +91,14 @@ describe CanvasSecurity::JWTWorkflow do
         expect(state[:can_create_pages]).to be false
       end
 
-      it 'sets can_create_pages to false if user does not have create_page rights' do
+      it "sets can_create_pages to false if user does not have create_page rights" do
         @c.wiki_id = 1
         expect(@wiki).to receive(:grants_right?).with(@u, :create_page).and_return(false)
         state = described_class.state_for(%i[rich_content], @c, @u)
         expect(state[:can_create_pages]).to be false
       end
 
-      it 'sets can_create_pages to true if user has create_page rights' do
+      it "sets can_create_pages to true if user has create_page rights" do
         @c.wiki_id = 1
         expect(@wiki).to receive(:grants_right?).with(@u, :create_page).and_return(true)
         state = described_class.state_for(%i[rich_content], @c, @u)
@@ -106,16 +106,16 @@ describe CanvasSecurity::JWTWorkflow do
       end
     end
 
-    describe ':ui' do
+    describe ":ui" do
       before { allow(@u).to receive(:prefers_high_contrast?) }
 
-      it 'sets use_high_contrast to true' do
+      it "sets use_high_contrast to true" do
         expect(@u).to receive(:prefers_high_contrast?).and_return(true)
         state = described_class.state_for(%i[ui], @c, @u)
         expect(state[:use_high_contrast]).to be true
       end
 
-      it 'sets use_high_contrast to false' do
+      it "sets use_high_contrast to false" do
         expect(@u).to receive(:prefers_high_contrast?).and_return(false)
         state = described_class.state_for(%i[ui], @c, @u)
         expect(state[:use_high_contrast]).to be false

@@ -26,11 +26,11 @@ class GroupCategory < ActiveRecord::Base
 
   belongs_to :context, polymorphic: [:course, :account]
   belongs_to :sis_batch
-  belongs_to :root_account, class_name: 'Account', inverse_of: :all_group_categories
+  belongs_to :root_account, class_name: "Account", inverse_of: :all_group_categories
   has_many :groups, dependent: :destroy
-  has_many :progresses, as: 'context', dependent: :destroy
+  has_many :progresses, as: "context", dependent: :destroy
   has_many :group_and_membership_importers, dependent: :destroy, inverse_of: :group_category
-  has_one :current_progress, -> { where(workflow_state: ['queued', 'running']).order(:created_at) }, as: :context, inverse_of: :context, class_name: 'Progress'
+  has_one :current_progress, -> { where(workflow_state: ["queued", "running"]).order(:created_at) }, as: :context, inverse_of: :context, class_name: "Progress"
 
   before_validation :set_root_account_id
   validates :sis_source_id, uniqueness: { scope: :root_account }, allow_nil: true
@@ -69,7 +69,7 @@ class GroupCategory < ActiveRecord::Base
 
     if !record.context.is_a?(Course) && record != communities_for(record.context)
       record.errors.add :enable_self_signup, t(:self_signup_for_courses, "Self-signup may only be enabled for course groups or communities")
-    elsif value != 'enabled' && value != 'restricted'
+    elsif value != "enabled" && value != "restricted"
       record.errors.add attr, t(:invalid_self_signup, "Self-signup needs to be one of the following values: %{values}", values: "null, 'enabled', 'restricted'")
     elsif record.restricted_self_signup? && record.has_heterogenous_group?
       record.errors.add :restrict_self_signup, t(:cant_restrict_self_signup, "Can't restrict self-signup while a mixed-section group exists in the category")
@@ -80,16 +80,16 @@ class GroupCategory < ActiveRecord::Base
     next unless record.auto_leader_changed?
     next if value.blank?
 
-    unless ['first', 'random'].include?(value)
+    unless ["first", "random"].include?(value)
       record.errors.add attr, t(:invalid_auto_leader, "AutoLeader type needs to be one of the following values: %{values}", values: "null, 'first', 'random'")
     end
   end
 
-  validates :context_id, presence: { message: t(:empty_course_or_account_id, 'Must have an account or course ID') }
+  validates :context_id, presence: { message: t(:empty_course_or_account_id, "Must have an account or course ID") }
 
   validates_each :context_type do |record, attr, value|
-    unless ['Account', 'Course'].include?(value)
-      record.errors.add attr, t(:group_category_must_have_context, 'Must belong to an account or course')
+    unless ["Account", "Course"].include?(value)
+      record.errors.add attr, t(:group_category_must_have_context, "Must belong to an account or course")
     end
   end
 
@@ -105,19 +105,19 @@ class GroupCategory < ActiveRecord::Base
     end
 
     def student_organized_for(context)
-      role_category_for_context('student_organized', context)
+      role_category_for_context("student_organized", context)
     end
 
     def imported_for(context)
-      role_category_for_context('imported', context)
+      role_category_for_context("imported", context)
     end
 
     def communities_for(context)
-      role_category_for_context('communities', context)
+      role_category_for_context("communities", context)
     end
 
     def uncategorized(context: nil)
-      gc = GroupCategory.new(name: name_for_role('uncategorized'), role: 'uncategorized', context: context)
+      gc = GroupCategory.new(name: name_for_role("uncategorized"), role: "uncategorized", context: context)
       gc.set_root_account_id
       gc
     end
@@ -126,17 +126,17 @@ class GroupCategory < ActiveRecord::Base
 
     def name_for_role(role)
       case role
-      when 'student_organized' then t('group_categories.student_organized', "Student Groups")
-      when 'imported'          then t('group_categories.imported', "Imported Groups")
-      when 'communities'       then t('group_categories.communities', "Communities")
-      when 'uncategorized'     then t('group_categories.uncategorized', "Uncategorized")
+      when "student_organized" then t("group_categories.student_organized", "Student Groups")
+      when "imported"          then t("group_categories.imported", "Imported Groups")
+      when "communities"       then t("group_categories.communities", "Communities")
+      when "uncategorized"     then t("group_categories.uncategorized", "Uncategorized")
       end
     end
 
     def protected_roles_for_context(context)
       case context
-      when Course  then ['student_organized', 'imported']
-      when Account then ['communities', 'imported']
+      when Course  then ["student_organized", "imported"]
+      when Account then ["communities", "imported"]
       else              []
       end
     end
@@ -162,15 +162,15 @@ class GroupCategory < ActiveRecord::Base
   end
 
   def communities?
-    role == 'communities'
+    role == "communities"
   end
 
   def student_organized?
-    role == 'student_organized'
+    role == "student_organized"
   end
 
   def protected?
-    role.present? && role != 'imported'
+    role.present? && role != "imported"
   end
 
   # Group categories generally restrict students to only be in one group per
@@ -195,11 +195,11 @@ class GroupCategory < ActiveRecord::Base
   end
 
   def unrestricted_self_signup?
-    self_signup.present? && self_signup != 'restricted'
+    self_signup.present? && self_signup != "restricted"
   end
 
   def restricted_self_signup?
-    self_signup.present? && self_signup == 'restricted'
+    self_signup.present? && self_signup == "restricted"
   end
 
   def has_heterogenous_group?
@@ -236,7 +236,7 @@ class GroupCategory < ActiveRecord::Base
   end
 
   def restore
-    groups.where(deleted_at: [deleted_at - 10.minutes..deleted_at]).update_all(workflow_state: 'available', deleted_at: nil)
+    groups.where(deleted_at: [deleted_at - 10.minutes..deleted_at]).update_all(workflow_state: "available", deleted_at: nil)
     self.deleted_at = nil
     save!
   end
@@ -391,7 +391,7 @@ class GroupCategory < ActiveRecord::Base
       end
     end
     Group.where(id: groups).touch_all
-    if context_type == 'Course'
+    if context_type == "Course"
       opts = { assignments: Assignment.where(context_type: context_type, context_id: context_id, group_category_id: self).pluck(:id) }
       DueDateCacher.recompute_course(context_id, **opts)
     end
@@ -423,7 +423,7 @@ class GroupCategory < ActiveRecord::Base
 
   def create_group_count=(num)
     @create_group_count = if num && num > 0
-                            [num, Setting.get('max_groups_in_new_category', '200').to_i].min
+                            [num, Setting.get("max_groups_in_new_category", "200").to_i].min
                           else
                             nil
                           end
@@ -443,13 +443,13 @@ class GroupCategory < ActiveRecord::Base
 
   def auto_create_groups
     split_type = if @create_group_member_count
-                   'by_membership_count'
+                   "by_membership_count"
                  elsif @create_group_count
-                   'by_group_count'
+                   "by_group_count"
                  end
 
     if split_type
-      InstStatsd::Statsd.increment('groups.auto_create',
+      InstStatsd::Statsd.increment("groups.auto_create",
                                    tags: { split_type: split_type, root_account_id: root_account&.global_id, root_account_name: root_account&.name })
     end
 
@@ -474,8 +474,8 @@ class GroupCategory < ActiveRecord::Base
   def calculate_group_count_by_membership(by_section: false)
     @create_group_count = if by_section
                             counts = User.joins(:not_ended_enrollments)
-                                         .where(enrollments: { course_id: context, type: 'StudentEnrollment' })
-                                         .distinct('user_id').group('course_section_id').count
+                                         .where(enrollments: { course_id: context, type: "StudentEnrollment" })
+                                         .distinct("user_id").group("course_section_id").count
                             @create_group_count = counts.values.map { |count| count / @create_group_member_count.to_f }.sum(&:ceil)
                           else
                             (unassigned_users.to_a.length.to_f / @create_group_member_count).ceil
@@ -549,7 +549,7 @@ class GroupCategory < ActiveRecord::Base
   def submission_ids_by_user_id(user_ids = nil)
     shard.activate do
       assignments = Assignment.active.where(context_type: context_type, context_id: context_id, group_category_id: id)
-      submissions = Submission.active.where(assignment_id: assignments, workflow_state: 'submitted')
+      submissions = Submission.active.where(assignment_id: assignments, workflow_state: "submitted")
       submissions = submissions.where(user_id: user_ids) if user_ids
       rows = submissions.pluck(:id, :user_id)
       rows.each_with_object({}) do |row, obj|
@@ -562,7 +562,7 @@ class GroupCategory < ActiveRecord::Base
   protected
 
   def start_progress
-    self.current_progress ||= progresses.build(tag: 'assign_unassigned_members', completion: 0)
+    self.current_progress ||= progresses.build(tag: "assign_unassigned_members", completion: 0)
     current_progress.start
   end
 
@@ -603,7 +603,7 @@ class GroupCategory < ActiveRecord::Base
 
     def get_users_by_section_id
       # fetch and group users by section_id
-      id_pairs = User.joins(:not_ended_enrollments).where(enrollments: { course_id: @category.context, type: 'StudentEnrollment' })
+      id_pairs = User.joins(:not_ended_enrollments).where(enrollments: { course_id: @category.context, type: "StudentEnrollment" })
                      .pluck("users.id, enrollments.course_section_id").uniq(&:first) # not even going to try to deal with multi-section students
 
       @users_by_section_id = {}

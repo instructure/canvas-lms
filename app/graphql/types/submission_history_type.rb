@@ -20,7 +20,7 @@
 
 module Types
   class SubmissionHistoryType < ApplicationObjectType
-    graphql_name 'SubmissionHistory'
+    graphql_name "SubmissionHistory"
 
     # This does not implement Relay::Node or have an id/_id because all of the
     # submission histories share the same submission id. There is only one

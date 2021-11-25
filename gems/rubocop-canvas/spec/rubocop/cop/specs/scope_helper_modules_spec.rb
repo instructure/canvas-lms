@@ -21,7 +21,7 @@ describe RuboCop::Cop::Specs::ScopeHelperModules do
   subject(:cop) { described_class.new }
 
   context "within class" do
-    it 'allows defs' do
+    it "allows defs" do
       inspect_source(<<~RUBY)
         class CombatArmband
           def laserbeams
@@ -34,7 +34,7 @@ describe RuboCop::Cop::Specs::ScopeHelperModules do
   end
 
   context "within context" do
-    it 'allows defs' do
+    it "allows defs" do
       inspect_source(<<~RUBY)
         context "Jumpity JumpStick" do
           def jump_and_jab
@@ -47,7 +47,7 @@ describe RuboCop::Cop::Specs::ScopeHelperModules do
   end
 
   context "within describe" do
-    it 'allows defs' do
+    it "allows defs" do
       inspect_source(<<~RUBY)
         describe JumpStick do
           def zappy_zap
@@ -60,7 +60,7 @@ describe RuboCop::Cop::Specs::ScopeHelperModules do
   end
 
   context "within module" do
-    it 'allows defs' do
+    it "allows defs" do
       inspect_source(<<~RUBY)
         module JumpStick
           def jumpy
@@ -74,7 +74,7 @@ describe RuboCop::Cop::Specs::ScopeHelperModules do
   end
 
   context "within shared_context" do
-    it 'allows defs' do
+    it "allows defs" do
       inspect_source(<<~RUBY)
         shared_context "in-process server selenium tests" do
           def bat_poo
@@ -87,7 +87,7 @@ describe RuboCop::Cop::Specs::ScopeHelperModules do
   end
 
   context "within shared_examples" do
-    it 'allows defs' do
+    it "allows defs" do
       inspect_source(<<~RUBY)
         shared_examples '[:correct]' do
           def pirates

@@ -118,13 +118,13 @@ module Canvas
       associations.each_with_object({}) do |(name, association), hash|
         if included_associations.include? name
           if association.embed_ids?
-            hash['links'] ||= {}
-            hash['links'][association.name] = serialize_ids association
+            hash["links"] ||= {}
+            hash["links"][association.name] = serialize_ids association
           elsif association.embed_objects? && association.embed_in_root?
             hash[association.embedded_key] = build_serializer(association).serializable_object
           elsif association.embed_objects?
-            hash['links'] ||= {}
-            hash['links'][association.embedded_key] = serialize association
+            hash["links"] ||= {}
+            hash["links"][association.embedded_key] = serialize association
           end
         end
       end
@@ -152,7 +152,7 @@ module Canvas
     # use object if you don't want to.
     def self.inherited(klass)
       super(klass)
-      resource_name = klass.name.demodulize.underscore.downcase.split('_serializer').first
+      resource_name = klass.name.demodulize.underscore.downcase.split("_serializer").first
       klass.send(:alias_method, resource_name.to_sym, :object)
     end
 
@@ -167,7 +167,7 @@ module Canvas
       options = { controller: @controller, scope: scope }
       association.build_serializer(object, options).tap do |serializer|
         if association.options.key?(:wrap_in_array)
-          serializer.instance_variable_set('@wrap_in_array',
+          serializer.instance_variable_set("@wrap_in_array",
                                            association.options[:wrap_in_array])
         end
       end

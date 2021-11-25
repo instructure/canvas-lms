@@ -1,13 +1,13 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
-require_relative './linter'
+require_relative "./linter"
 
 linter_options = {
   linter_name: "stylelint",
   file_regex: /\.s?css$/,
-  format: 'stylelint',
-  command: 'node_modules/.bin/stylelint',
+  format: "stylelint",
+  command: "node_modules/.bin/stylelint",
   campsite_mode: false,
   append_files_to_command: true
 }

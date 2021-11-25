@@ -19,17 +19,17 @@
 #
 
 describe AttachmentAssociation do
-  context 'create' do
-    it 'sets the root_account_id using course context' do
-      attachment_model filename: 'test.txt', context: account_model(root_account_id: nil)
+  context "create" do
+    it "sets the root_account_id using course context" do
+      attachment_model filename: "test.txt", context: account_model(root_account_id: nil)
       course_model
       association = @attachment.attachment_associations.create!(context: @course)
       expect(association.root_account_id).to eq @course.root_account_id
     end
 
-    context 'when context is a converation message' do
-      it 'sets the root_account_id using attachment' do
-        attachment_model filename: 'test.txt', context: account_model(root_account_id: nil)
+    context "when context is a converation message" do
+      it "sets the root_account_id using attachment" do
+        attachment_model filename: "test.txt", context: account_model(root_account_id: nil)
         cm = conversation(user_model).messages.first
         association = @attachment.attachment_associations.create!(context: cm)
         expect(association.root_account_id).to eq @attachment.root_account_id

@@ -23,7 +23,7 @@ class AddCassandraPageViewTables < ActiveRecord::Migration[4.2]
   include Canvas::Cassandra::Migration
 
   def self.cassandra_cluster
-    'page_views'
+    "page_views"
   end
 
   def self.up

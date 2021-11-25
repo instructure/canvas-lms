@@ -39,12 +39,12 @@ class UnreadCommentCountLoader < GraphQL::Batch::Loader
                         .where(id: submission_ids)
                         .joins(:submission_comments)
                         .where(
-                          'NOT EXISTS (?)',
+                          "NOT EXISTS (?)",
                           ViewedSubmissionComment
-                            .where('viewed_submission_comments.submission_comment_id=submission_comments.id')
+                            .where("viewed_submission_comments.submission_comment_id=submission_comments.id")
                             .where(user_id: @current_user)
                         )
-                        .group(:submission_id, 'submission_comments.attempt')
+                        .group(:submission_id, "submission_comments.attempt")
                         .count
 
     submission_ids_and_attempts.each do |submission_id, attempt|
@@ -65,7 +65,7 @@ class UnreadCommentCountLoader < GraphQL::Batch::Loader
 end
 
 class SubmissionRubricAssessmentFilterInputType < Types::BaseInputObject
-  graphql_name 'SubmissionRubricAssessmentFilterInput'
+  graphql_name "SubmissionRubricAssessmentFilterInput"
 
   argument :for_attempt, Integer, <<~MD, required: false, default_value: nil
     What submission attempt the rubric assessment should be returned for. If not
@@ -77,13 +77,13 @@ end
 module Interfaces::SubmissionInterface
   include Interfaces::BaseInterface
 
-  description 'Types for submission or submission history'
+  description "Types for submission or submission history"
 
   class LatePolicyStatusType < Types::BaseEnum
-    graphql_name 'LatePolicyStatusType'
-    value 'late'
-    value 'missing'
-    value 'none'
+    graphql_name "LatePolicyStatusType"
+    value "late"
+    value "missing"
+    value "none"
   end
 
   def submission
@@ -163,28 +163,28 @@ module Interfaces::SubmissionInterface
   end
 
   field :entered_score, Float,
-        'the submission score *before* late policy deductions were applied',
+        "the submission score *before* late policy deductions were applied",
         null: true
   def entered_score
     protect_submission_grades(:entered_score)
   end
 
   field :entered_grade, String,
-        'the submission grade *before* late policy deductions were applied',
+        "the submission grade *before* late policy deductions were applied",
         null: true
   def entered_grade
     protect_submission_grades(:entered_grade)
   end
 
   field :deducted_points, Float,
-        'how many points are being deducted due to late policy',
+        "how many points are being deducted due to late policy",
         null: true
   def deducted_points
     protect_submission_grades(:points_deducted)
   end
 
   field :excused, Boolean,
-        'excused assignments are ignored when calculating grades',
+        "excused assignments are ignored when calculating grades",
         method: :excused?, null: true
 
   field :submitted_at, Types::DateTimeType, null: true
@@ -200,7 +200,7 @@ module Interfaces::SubmissionInterface
 
   field :submission_status, String, null: true
   def submission_status
-    if submission.submission_type == 'online_quiz'
+    if submission.submission_type == "online_quiz"
       Loaders::AssociationLoader.for(Submission, :quiz_submission)
                                 .load(submission)
                                 .then { submission.submission_status }
@@ -214,7 +214,7 @@ module Interfaces::SubmissionInterface
   field :late, Boolean, method: :late?, null: true
   field :missing, Boolean, method: :missing?, null: true
   field :grade_matches_current_submission, Boolean,
-        'was the grade given on the current submission (resubmission)', null: true
+        "was the grade given on the current submission (resubmission)", null: true
   field :submission_type, Types::AssignmentSubmissionType, null: true
 
   field :attachment, Types::FileType, null: true

@@ -17,10 +17,10 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'byebug'
-require 'request_context'
-require 'rails'
-Rails.env = 'test'
+require "byebug"
+require "request_context"
+require "rails"
+Rails.env = "test"
 Rails.logger = Logger.new($stdout)
 
 RSpec.configure do |config|
@@ -28,5 +28,5 @@ RSpec.configure do |config|
     mocks.verify_partial_doubles = true
   end
 
-  config.order = 'random'
+  config.order = "random"
 end

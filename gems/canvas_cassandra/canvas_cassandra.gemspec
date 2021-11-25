@@ -5,7 +5,7 @@ Gem::Specification.new do |spec|
   spec.version       = "0.1.0"
   spec.authors       = ["Ethan Vizitei"]
   spec.email         = ["evizitei@instructure.com"]
-  spec.summary       = 'Cassandra wrapper for Canvas LMS'
+  spec.summary       = "Cassandra wrapper for Canvas LMS"
   spec.homepage      = "https://github.com/instructure/canvas-lms"
   spec.license       = "AGPL"
 
@@ -14,7 +14,7 @@ Gem::Specification.new do |spec|
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ["lib"]
 
-  spec.add_dependency 'cassandra-cql', '~> 1.2.2'
+  spec.add_dependency "cassandra-cql", "~> 1.2.2"
   spec.add_dependency "config_file"
   spec.add_dependency "rails", ">= 5.0"
 

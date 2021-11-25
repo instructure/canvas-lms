@@ -16,8 +16,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../common'
-require_relative 'pages/user_profile_page'
+require_relative "../common"
+require_relative "pages/user_profile_page"
 
 describe "admin account people profile" do
   include_context "in-process server selenium tests"
@@ -34,7 +34,7 @@ describe "admin account people profile" do
     @user3 = user_with_pseudonym(account: @account, name: "Random User")
   end
 
-  context 'in admin merge page' do
+  context "in admin merge page" do
     before do
       user_session(@admin)
       visit_merge_user_accounts(@user1.id)
@@ -51,7 +51,7 @@ describe "admin account people profile" do
       choose_suggested_username(@user2.name).click
 
       expect(selected_user.text).to eq "Test User2"
-      expect(select_user_button.attribute('href')).to include "/admin_merge?pending_user_id=#{@user2.id}"
+      expect(select_user_button.attribute("href")).to include "/admin_merge?pending_user_id=#{@user2.id}"
     end
 
     it "navigates to user details page when user is selected", priority: "1" do

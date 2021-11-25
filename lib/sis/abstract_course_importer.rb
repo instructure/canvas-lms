@@ -73,9 +73,9 @@ module SIS
         course.sis_source_id = abstract_course_id
         case status
         when /active/i
-          course.workflow_state = 'active'
+          course.workflow_state = "active"
         when /deleted/i
-          course.workflow_state = 'deleted'
+          course.workflow_state = "deleted"
         end
 
         if course.changed?

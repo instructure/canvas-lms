@@ -18,8 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'open_object'
-require 'set'
+require "open_object"
+require "set"
 
 class StreamItem < ActiveRecord::Base
   serialize :data
@@ -39,13 +39,13 @@ class StreamItem < ActiveRecord::Base
   before_save :ensure_notification_category
 
   def ensure_notification_category
-    if asset_type == 'Message'
+    if asset_type == "Message"
       self.notification_category ||= get_notification_category
     end
   end
 
   def get_notification_category
-    read_attribute(:data)['notification_category'] || data.notification_category
+    read_attribute(:data)["notification_category"] || data.notification_category
   end
 
   def self.reconstitute_ar_object(type, data)
@@ -53,42 +53,42 @@ class StreamItem < ActiveRecord::Base
 
     data = data.instance_variable_get(:@table) if data.is_a?(OpenObject)
     data = data.with_indifferent_access
-    type = data['type'] || type
+    type = data["type"] || type
     res = type.constantize.new
 
     case type
-    when 'Announcement', 'DiscussionTopic'
+    when "Announcement", "DiscussionTopic"
       root_discussion_entries = data.delete(:root_discussion_entries)
-      root_discussion_entries = root_discussion_entries.map { |entry| reconstitute_ar_object('DiscussionEntry', entry) }
+      root_discussion_entries = root_discussion_entries.map { |entry| reconstitute_ar_object("DiscussionEntry", entry) }
       res.association(:root_discussion_entries).target = root_discussion_entries
-      res.attachment = reconstitute_ar_object('Attachment', data.delete(:attachment))
+      res.attachment = reconstitute_ar_object("Attachment", data.delete(:attachment))
       res.total_root_discussion_entries = data.delete(:total_root_discussion_entries)
-    when 'Conversation'
+    when "Conversation"
       res.latest_messages_from_stream_item = data.delete(:latest_messages)
-    when 'Submission'
-      data['body'] = nil
+    when "Submission"
+      data["body"] = nil
     end
-    if data.key?('users')
-      users = data.delete('users')
-      users = users.map { |user| reconstitute_ar_object('User', user) }
+    if data.key?("users")
+      users = data.delete("users")
+      users = users.map { |user| reconstitute_ar_object("User", user) }
       res.association(:users).target = users
     end
-    if data.key?('participants')
-      users = data.delete('participants')
-      users = users.map { |user| reconstitute_ar_object('User', user) }
+    if data.key?("participants")
+      users = data.delete("participants")
+      users = users.map { |user| reconstitute_ar_object("User", user) }
       res.instance_variable_set(:@participants, users)
     end
 
     # unnecessary after old stream items have expired
-    if res.is_a?(Conversation) && !data.key?('updated_at')
-      data['updated_at'] = Time.now.utc
+    if res.is_a?(Conversation) && !data.key?("updated_at")
+      data["updated_at"] = Time.now.utc
     end
 
     data = res.class.attributes_builder.build_from_database(data) # @attributes is now an AttributeSet
 
     res.instance_variable_set(:@attributes, data)
     res.instance_variable_set(:@attributes_cache, {})
-    res.instance_variable_set(:@new_record, false) if data['id']
+    res.instance_variable_set(:@new_record, false) if data["id"]
 
     # the after_find from NotificationPreloader won't get triggered
     if res.respond_to?(:preload_notification) && res.read_attribute(:notification_id)
@@ -106,7 +106,7 @@ class StreamItem < ActiveRecord::Base
     res = @ar_data
 
     if viewing_user_id
-      res.user_id ||= viewing_user_id if asset_type != 'DiscussionTopic' && res.respond_to?(:user_id)
+      res.user_id ||= viewing_user_id if asset_type != "DiscussionTopic" && res.respond_to?(:user_id)
       post_process(res, viewing_user_id)
     else
       res
@@ -114,26 +114,26 @@ class StreamItem < ActiveRecord::Base
   end
 
   def prepare_user(user)
-    res = user.attributes.slice('id', 'name', 'short_name')
-    res['short_name'] ||= res['name']
+    res = user.attributes.slice("id", "name", "short_name")
+    res["short_name"] ||= res["name"]
     res
   end
 
   def prepare_conversation(conversation)
-    res = conversation.attributes.slice('id', 'has_attachments', 'updated_at')
-    res['title'] = conversation.subject
-    res['private'] = conversation.private?
-    res['participant_count'] = conversation.conversation_participants.size
+    res = conversation.attributes.slice("id", "has_attachments", "updated_at")
+    res["title"] = conversation.subject
+    res["private"] = conversation.private?
+    res["participant_count"] = conversation.conversation_participants.size
     # arbitrary limit. would be nice to say "John, Jane, Michael, and 6
     # others." if there's too many recipients, where those listed are the N
     # most active posters in the conversation, but we'll just leave it at "9
     # Participants" for now when the count is > 8.
-    if res['participant_count'] <= 8
-      res['participants'] = conversation.participants.map { |u| prepare_user(u) }
+    if res["participant_count"] <= 8
+      res["participants"] = conversation.participants.map { |u| prepare_user(u) }
     end
 
     messages = conversation.conversation_messages.human.order(created_at: :desc).limit(LATEST_ENTRY_LIMIT).to_a.reverse
-    res['latest_messages'] = messages.map do |message|
+    res["latest_messages"] = messages.map do |message|
       {
         "id" => message.id,
         "created_at" => message.created_at,
@@ -148,9 +148,9 @@ class StreamItem < ActiveRecord::Base
 
   def regenerate!(obj = nil)
     obj ||= asset
-    return nil if asset_type == 'Message' && asset_id.nil?
+    return nil if asset_type == "Message" && asset_id.nil?
 
-    if !obj || (obj.respond_to?(:workflow_state) && obj.workflow_state == 'deleted')
+    if !obj || (obj.respond_to?(:workflow_state) && obj.workflow_state == "deleted")
       destroy
       return nil
     end
@@ -178,54 +178,54 @@ class StreamItem < ActiveRecord::Base
     case object
     when DiscussionEntry
       res = object.attributes
-      res['user_ids_that_can_see_responses'] = object.discussion_topic.user_ids_who_have_posted_and_admins if object.discussion_topic.require_initial_post?
-      res['title'] = object.discussion_topic.title
-      res['message'] = object['message'][0, 4.kilobytes] if object['message'].present?
-      res['user_short_name'] = object.user.short_name if object.user
+      res["user_ids_that_can_see_responses"] = object.discussion_topic.user_ids_who_have_posted_and_admins if object.discussion_topic.require_initial_post?
+      res["title"] = object.discussion_topic.title
+      res["message"] = object["message"][0, 4.kilobytes] if object["message"].present?
+      res["user_short_name"] = object.user.short_name if object.user
     when DiscussionTopic
       res = object.attributes
-      res['user_ids_that_can_see_responses'] = object.user_ids_who_have_posted_and_admins if object.require_initial_post?
-      res['total_root_discussion_entries'] = object.root_discussion_entries.active.count
+      res["user_ids_that_can_see_responses"] = object.user_ids_who_have_posted_and_admins if object.require_initial_post?
+      res["total_root_discussion_entries"] = object.root_discussion_entries.active.count
       res[:root_discussion_entries] = object.root_discussion_entries.active.order(created_at: :desc).limit(LATEST_ENTRY_LIMIT).to_a.reverse.map do |entry|
         hash = entry.attributes
-        hash['user_short_name'] = entry.user.short_name if entry.user
-        hash['message'] = hash['message'][0, 4.kilobytes] if hash['message'].present?
+        hash["user_short_name"] = entry.user.short_name if entry.user
+        hash["message"] = hash["message"][0, 4.kilobytes] if hash["message"].present?
         hash
       end
       if object.attachment
-        res[:attachment] = object.attachment.attributes.slice('id', 'display_name')
+        res[:attachment] = object.attachment.attributes.slice("id", "display_name")
       end
     when Conversation
       res = prepare_conversation(object)
     when Message
       res = object.attributes
-      res['notification_category'] = object.notification_display_category
+      res["notification_category"] = object.notification_display_category
       if !object.context.is_a?(Context) && object.context_context
         self.context = object.context_context
       end
     when Submission
       res = object.attributes
-      res.delete 'body' # this can be pretty large, and we don't display it
-      res['assignment'] = object.assignment.attributes.slice('id', 'title', 'due_at', 'points_possible', 'submission_types', 'group_category_id')
+      res.delete "body" # this can be pretty large, and we don't display it
+      res["assignment"] = object.assignment.attributes.slice("id", "title", "due_at", "points_possible", "submission_types", "group_category_id")
       res[:course_id] = object.context.id
     when Collaboration, WebConference
       res = object.attributes
-      res['users'] = object.users.map { |u| prepare_user(u) }
+      res["users"] = object.users.map { |u| prepare_user(u) }
     when AssessmentRequest
       res = object.attributes
     else
       raise "Unexpected stream item type: #{object.class}"
     end
     if context_type
-      res['context_short_name'] = Rails.cache.fetch(['short_name_lookup', "#{context_type.underscore}_#{context_id}"].cache_key) do
-        self.context.short_name rescue ''
+      res["context_short_name"] = Rails.cache.fetch(["short_name_lookup", "#{context_type.underscore}_#{context_id}"].cache_key) do
+        self.context.short_name rescue ""
       end
     end
-    res['type'] = object.class.to_s
-    res['user_short_name'] = object.user.short_name rescue nil
+    res["type"] = object.class.to_s
+    res["user_short_name"] = object.user.short_name rescue nil
 
     if self.class.new_message?(object)
-      self.asset_type = 'Message'
+      self.asset_type = "Message"
       self.asset_id = nil
     else
       self.asset = object
@@ -357,7 +357,7 @@ class StreamItem < ActiveRecord::Base
 
   # call destroy_stream_items using a before_date based on the global setting
   def self.destroy_stream_items_using_setting
-    ttl = Setting.get('stream_items_ttl', 4.weeks).to_i.seconds.ago
+    ttl = Setting.get("stream_items_ttl", 4.weeks).to_i.seconds.ago
     # we pass false for the touch_users argument, on the assumption that these
     # stream items that we delete aren't visible on the user's dashboard anymore
     # anyway, so there's no need to invalidate all the caches.

@@ -44,7 +44,7 @@ describe SubmissionVersion do
 
     it "sets the index record's context" do
       index = SubmissionVersion.index_version(@version)
-      expect(index.context_type).to eq 'Course'
+      expect(index.context_type).to eq "Course"
       expect(index.context_id).to eq @course.id
     end
 
@@ -97,7 +97,7 @@ describe SubmissionVersion do
 
   it "skips submissions with no assignment" do
     attrs = YAML.load(@version.yaml)
-    attrs.delete('assignment_id')
+    attrs.delete("assignment_id")
     @version.update_attribute(:yaml, attrs.to_yaml)
     expect do
       SubmissionVersion.index_version(@version)

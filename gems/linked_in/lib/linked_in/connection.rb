@@ -18,8 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'nokogiri'
-require 'oauth'
+require "nokogiri"
+require "oauth"
 
 module LinkedIn
   class Connection
@@ -53,7 +53,7 @@ module LinkedIn
     end
 
     def service_user
-      url = '/v1/people/~:(id,first-name,last-name,public-profile-url,picture-url)'
+      url = "/v1/people/~:(id,first-name,last-name,public-profile-url,picture-url)"
       @data ||= Nokogiri::XML(access_token.get(url).body)
     end
 
@@ -63,8 +63,8 @@ module LinkedIn
 
     def self.consumer(key = nil, secret = nil)
       config = self.config
-      key ||= config['api_key']
-      secret ||= config['secret_key']
+      key ||= config["api_key"]
+      secret ||= config["secret_key"]
       OAuth::Consumer.new(key, secret, {
                             site: "https://api.linkedin.com",
                             request_token_path: "/uas/oauth/requestToken",

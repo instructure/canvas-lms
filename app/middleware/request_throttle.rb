@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-require 'set'
+require "set"
 
 class RequestThrottle
   # this @@last_sample data isn't thread-safe, and if canvas ever becomes
@@ -78,10 +78,10 @@ class RequestThrottle
       cost
     end
 
-    if client_identifier(request) && !client_identifier(request).starts_with?('session')
-      headers['X-Request-Cost'] = cost.to_s unless throttled
-      headers['X-Rate-Limit-Remaining'] = bucket.remaining.to_s
-      headers['X-Rate-Limit-Remaining'] = 0.0.to_s if blocked?(request)
+    if client_identifier(request) && !client_identifier(request).starts_with?("session")
+      headers["X-Request-Cost"] = cost.to_s unless throttled
+      headers["X-Rate-Limit-Remaining"] = bucket.remaining.to_s
+      headers["X-Rate-Limit-Remaining"] = 0.0.to_s if blocked?(request)
     end
 
     [status, headers, response]
@@ -150,7 +150,7 @@ class RequestThrottle
   # This is cached on the request, so a theoretical change to the request
   # object won't be caught.
   def client_identifiers(request)
-    request.env['canvas.request_throttle.user_id'] ||= [
+    request.env["canvas.request_throttle.user_id"] ||= [
       (token_string = AuthenticationMethods.access_token(request, :GET).presence) && "token:#{AccessToken.hashed_token(token_string)}",
       tag_identifier("user", AuthenticationMethods.user_id(request).presence),
       tag_identifier("session", session_id(request).presence),
@@ -174,15 +174,15 @@ class RequestThrottle
   end
 
   def session_id(request)
-    request.env['rack.session.options'].try(:[], :id)
+    request.env["rack.session.options"].try(:[], :id)
   end
 
   def self.blocklist
-    @blocklist ||= list_from_setting('request_throttle.blocklist')
+    @blocklist ||= list_from_setting("request_throttle.blocklist")
   end
 
   def self.approvelist
-    @approvelist ||= list_from_setting('request_throttle.approvelist')
+    @approvelist ||= list_from_setting("request_throttle.approvelist")
   end
 
   def self.reload!
@@ -191,20 +191,20 @@ class RequestThrottle
   end
 
   def self.enabled?
-    Setting.get("request_throttle.enabled", "true") == 'true'
+    Setting.get("request_throttle.enabled", "true") == "true"
   end
 
   def self.list_from_setting(key)
-    Set.new(Setting.get(key, '').split(',').map { |i| i.gsub(/^\s+|\s*(?:;.+)?\s*$/, "") }.reject(&:blank?))
+    Set.new(Setting.get(key, "").split(",").map { |i| i.gsub(/^\s+|\s*(?:;.+)?\s*$/, "") }.reject(&:blank?))
   end
 
   def self.dynamic_settings
-    @dynamic_settings ||= YAML.safe_load(Canvas::DynamicSettings.find(tree: :private)['request_throttle.yml', failsafe: ''] || '') || {}
+    @dynamic_settings ||= YAML.safe_load(Canvas::DynamicSettings.find(tree: :private)["request_throttle.yml", failsafe: ""] || "") || {}
   end
 
   def rate_limit_exceeded
     [403,
-     { 'Content-Type' => 'text/plain; charset=utf-8', 'X-Rate-Limit-Remaining' => '0.0' },
+     { "Content-Type" => "text/plain; charset=utf-8", "X-Rate-Limit-Remaining" => "0.0" },
      ["403 #{Rack::Utils::HTTP_STATUS_CODES[403]} (Rate Limit Exceeded)\n"]]
   end
 
@@ -217,10 +217,10 @@ class RequestThrottle
 
     if account&.shard&.database_server
       InstStatsd::Statsd.timing("requests_system_cpu.cluster_#{account.shard.database_server.id}", system_cpu,
-                                short_stat: 'requests_system_cpu',
+                                short_stat: "requests_system_cpu",
                                 tags: { cluster: account.shard.database_server.id })
       InstStatsd::Statsd.timing("requests_user_cpu.cluster_#{account.shard.database_server.id}", user_cpu,
-                                short_stat: 'requests_user_cpu',
+                                short_stat: "requests_user_cpu",
                                 tags: { cluster: account.shard.database_server.id })
     end
 
@@ -276,7 +276,7 @@ class RequestThrottle
     def self.custom_settings_hash
       @custom_settings_hash ||= begin
         JSON.parse(
-          Setting.get('request_throttle.custom_settings', '{}')
+          Setting.get("request_throttle.custom_settings", "{}")
         )
       rescue JSON::JSONError
         {}
@@ -286,7 +286,7 @@ class RequestThrottle
     def self.up_front_cost_by_path_regex
       @up_front_cost_regex_map ||=
         begin
-          hash = RequestThrottle.dynamic_settings['up_front_cost_by_path_regex'] || {}
+          hash = RequestThrottle.dynamic_settings["up_front_cost_by_path_regex"] || {}
           hash.keys.select { |k| k.is_a?(String) }.map { |k| hash[Regexp.new(k)] = hash.delete(k) } # regexify strings
           hash.each do |k, v|
             next if k.is_a?(Regexp) && v.is_a?(Numeric)

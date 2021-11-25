@@ -23,22 +23,22 @@ class LearningOutcomeResult < ActiveRecord::Base
 
   belongs_to :user
   belongs_to :learning_outcome
-  belongs_to :alignment, class_name: 'ContentTag', foreign_key: :content_tag_id
+  belongs_to :alignment, class_name: "ContentTag", foreign_key: :content_tag_id
   belongs_to :association_object, polymorphic:
       [:rubric_association, :assignment,
-       { quiz: 'Quizzes::Quiz', assessment: 'LiveAssessments::Assessment' }],
+       { quiz: "Quizzes::Quiz", assessment: "LiveAssessments::Assessment" }],
                                   polymorphic_prefix: :association,
                                   foreign_type: :association_type, foreign_key: :association_id
   belongs_to :artifact, polymorphic:
       [:rubric_assessment, :submission,
-       { quiz_submission: 'Quizzes::QuizSubmission', live_assessments_submission: 'LiveAssessments::Submission' }],
+       { quiz_submission: "Quizzes::QuizSubmission", live_assessments_submission: "LiveAssessments::Submission" }],
                         polymorphic_prefix: true
   belongs_to :associated_asset, polymorphic:
       [:assessment_question, :assignment,
-       { quiz: 'Quizzes::Quiz', assessment: 'LiveAssessments::Assessment' }],
+       { quiz: "Quizzes::Quiz", assessment: "LiveAssessments::Assessment" }],
                                 polymorphic_prefix: true
   belongs_to :context, polymorphic: [:course]
-  belongs_to :root_account, class_name: 'Account'
+  belongs_to :root_account, class_name: "Account"
   has_many :learning_outcome_question_results, dependent: :destroy
   simply_versioned
 
@@ -89,7 +89,7 @@ class LearningOutcomeResult < ActiveRecord::Base
   end
 
   def save_to_version(attempt)
-    InstStatsd::Statsd.increment('learning_outcome_result.create') if new_record?
+    InstStatsd::Statsd.increment("learning_outcome_result.create") if new_record?
     current_version = versions.current.try(:model)
     if current_version.try(:attempt) && attempt < current_version.attempt
       versions = self.versions.sort_by(&:created_at).reverse.select { |v| v.model.attempt == attempt }
@@ -117,7 +117,7 @@ class LearningOutcomeResult < ActiveRecord::Base
   end
 
   scope :for_context_codes, lambda { |codes|
-    if codes == 'all'
+    if codes == "all"
       all
     else
       where(context_code: codes)
@@ -126,12 +126,12 @@ class LearningOutcomeResult < ActiveRecord::Base
   scope :for_user, ->(user) { where(user_id: user) }
   scope :custom_ordering, lambda { |param|
     orders = {
-      'recent' => { assessed_at: :desc },
-      'highest' => { score: :desc },
-      'oldest' => { score: :asc },
-      'default' => { assessed_at: :desc }
+      "recent" => { assessed_at: :desc },
+      "highest" => { score: :desc },
+      "oldest" => { score: :asc },
+      "default" => { assessed_at: :desc }
     }
-    order_clause = orders[param] || orders['default']
+    order_clause = orders[param] || orders["default"]
     order(order_clause)
   }
   scope :for_outcome_ids, ->(ids) { where(learning_outcome_id: ids) }
@@ -146,13 +146,13 @@ class LearningOutcomeResult < ActiveRecord::Base
       .joins("LEFT JOIN #{Assignment.quoted_table_name} sa ON sa.id = learning_outcome_results.association_id AND learning_outcome_results.association_type = 'Assignment'")
       .joins("LEFT JOIN #{Submission.quoted_table_name} ON submissions.user_id = learning_outcome_results.user_id AND submissions.assignment_id in (ra.id, qa.id, sa.id)")
       .joins("LEFT JOIN #{PostPolicy.quoted_table_name} pc on pc.assignment_id  in (ra.id, qa.id, sa.id)")
-      .where('(ra.id IS NULL AND qa.id IS NULL AND sa.id IS NULL)'\
-             ' OR submissions.posted_at IS NOT NULL'\
-             ' OR ra.grading_type = \'not_graded\''\
-             ' OR qa.grading_type = \'not_graded\''\
-             ' OR sa.grading_type = \'not_graded\''\
-             ' OR pc.id IS NULL'\
-             ' OR (pc.id IS NOT NULL AND pc.post_manually = False)')
+      .where("(ra.id IS NULL AND qa.id IS NULL AND sa.id IS NULL)"\
+             " OR submissions.posted_at IS NOT NULL"\
+             " OR ra.grading_type = 'not_graded'"\
+             " OR qa.grading_type = 'not_graded'"\
+             " OR sa.grading_type = 'not_graded'"\
+             " OR pc.id IS NULL"\
+             " OR (pc.id IS NOT NULL AND pc.post_manually = False)")
   }
 
   private

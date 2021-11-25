@@ -64,7 +64,7 @@ module GoogleAnalyticsDimensions
   def self._encode_admin_status(roles:)
     # again, look at User#user_roles for the definition
     %w[admin root_admin].map do |enrollment_type|
-      roles.include?(enrollment_type) ? '1' : '0'
+      roles.include?(enrollment_type) ? "1" : "0"
     end.join
   end
 
@@ -72,17 +72,17 @@ module GoogleAnalyticsDimensions
     # keep in mind that some of these roles may be rolled up from different
     # enrollment types, see User#user_roles for the meat
     %w[student teacher observer].map do |enrollment_type|
-      roles.include?(enrollment_type) ? '1' : '0'
+      roles.include?(enrollment_type) ? "1" : "0"
     end.join
   end
 
   def self._encode_org_type(account:)
     account&.external_integration_keys&.find_by(
-      key_type: 'salesforce_org_type'
+      key_type: "salesforce_org_type"
     )&.key_value
   end
 
   def self._encode_masquerading_status(user:, real_user:)
-    real_user && real_user != user ? '1' : '0'
+    real_user && real_user != user ? "1" : "0"
   end
 end

@@ -70,7 +70,7 @@ module FeatureFlags
   end
 
   def feature_flag_cache_key(feature)
-    ['feature_flag3', self.class.name, global_id, feature.to_s].cache_key
+    ["feature_flag3", self.class.name, global_id, feature.to_s].cache_key
   end
 
   def feature_flag_cache
@@ -114,9 +114,9 @@ module FeatureFlags
       return chain.reverse.map(&:global_id)
     end
 
-    RequestCache.cache('feature_flag_account_ids', self) do
+    RequestCache.cache("feature_flag_account_ids", self) do
       shard.activate do
-        Rails.cache.fetch(['feature_flag_account_ids', self].cache_key) do
+        Rails.cache.fetch(["feature_flag_account_ids", self].cache_key) do
           chain = account_chain(include_site_admin: true).dup
           chain.shift if is_a?(Account)
           chain.reverse.map(&:global_id)
@@ -172,10 +172,10 @@ module FeatureFlags
     # if this feature requires root account opt-in, reject a default or site admin flag
     # if the context is beneath a root account
     if retval && (retval.state == Feature::STATE_DEFAULT_OFF || retval.hidden?) && feature_def.root_opt_in && !is_site_admin &&
-       (retval.default? || (retval.context_type == 'Account' && retval.context_id == Account.site_admin.id))
+       (retval.default? || (retval.context_type == "Account" && retval.context_id == Account.site_admin.id))
       if is_root_account
         # create a virtual feature flag in corresponding default state state
-        retval = feature_flags.temp_record feature: feature, state: 'off' unless retval.hidden?
+        retval = feature_flags.temp_record feature: feature, state: "off" unless retval.hidden?
       elsif inherited_only
         # the feature doesn't exist beneath the root account until the root account opts in
         return nil

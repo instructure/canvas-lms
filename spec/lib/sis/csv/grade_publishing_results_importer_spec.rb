@@ -21,7 +21,7 @@
 describe SIS::CSV::GradePublishingResultsImporter do
   before { account_model }
 
-  it 'skips bad content' do
+  it "skips bad content" do
     importer = process_csv_data(
       "enrollment_id,grade_publishing_status",
       ",published",
@@ -35,10 +35,10 @@ describe SIS::CSV::GradePublishingResultsImporter do
                           "Improper grade_publishing_status \"asplode\" for enrollment 2"]
   end
 
-  it 'properly updates the db' do
+  it "properly updates the db" do
     course_with_student(account: @account)
 
-    @enrollment.grade_publishing_status = 'publishing'
+    @enrollment.grade_publishing_status = "publishing"
     @enrollment.save!
 
     process_csv_data_cleanly(
@@ -47,13 +47,13 @@ describe SIS::CSV::GradePublishingResultsImporter do
     )
 
     @enrollment.reload
-    expect(@enrollment.grade_publishing_status).to eq 'published'
+    expect(@enrollment.grade_publishing_status).to eq "published"
   end
 
-  it 'properly passes in messages' do
+  it "properly passes in messages" do
     course_with_student(account: @account)
 
-    @enrollment.grade_publishing_status = 'publishing'
+    @enrollment.grade_publishing_status = "publishing"
     @enrollment.save!
 
     expect(@course.reload.grade_publishing_statuses[1]).to eq "publishing"
@@ -68,10 +68,10 @@ describe SIS::CSV::GradePublishingResultsImporter do
     expect(statuses[0]).to eq({ "Synced: message1" => [@enrollment] })
 
     @enrollment.reload
-    expect(@enrollment.grade_publishing_status).to eq 'published'
+    expect(@enrollment.grade_publishing_status).to eq "published"
   end
 
-  it 'gives a proper error if you try to reference an enrollment from another root account' do
+  it "gives a proper error if you try to reference an enrollment from another root account" do
     account = Account.create!
     course_with_student(account: account)
 

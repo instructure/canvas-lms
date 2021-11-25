@@ -51,7 +51,7 @@ class UserObserveesController < ApplicationController
     observed_users = observer.linked_students.order_by_sortable_name
     observed_users = Api.paginate(observed_users, self, api_v1_user_observees_url)
 
-    UserPastLtiId.manual_preload_past_lti_ids(users, @domain_root_account) if ['uuid', 'lti_id'].any? { |id| includes.include? id }
+    UserPastLtiId.manual_preload_past_lti_ids(users, @domain_root_account) if ["uuid", "lti_id"].any? { |id| includes.include? id }
     data = users_json(observed_users, @current_user, session, includes, @domain_root_account)
     add_linked_root_account_ids_to_user_json(data)
     render json: data
@@ -81,7 +81,7 @@ class UserObserveesController < ApplicationController
     users = student.linked_observers.order_by_sortable_name
     users = Api.paginate(users, self, api_v1_user_observers_url)
 
-    UserPastLtiId.manual_preload_past_lti_ids(users, @domain_root_account) if ['uuid', 'lti_id'].any? { |id| includes.include? id }
+    UserPastLtiId.manual_preload_past_lti_ids(users, @domain_root_account) if ["uuid", "lti_id"].any? { |id| includes.include? id }
     data = users_json(users, @current_user, session, includes, @domain_root_account)
     add_linked_root_account_ids_to_user_json(data)
     render json: data
@@ -126,7 +126,7 @@ class UserObserveesController < ApplicationController
     if params[:access_token]
       verified_token = AccessToken.authenticate(params[:access_token])
       if verified_token.nil?
-        render json: { errors: [{ 'message' => 'Unknown observee.' }] }, status: :unprocessable_entity
+        render json: { errors: [{ "message" => "Unknown observee." }] }, status: :unprocessable_entity
         return
       end
       @student = verified_token.user
@@ -134,7 +134,7 @@ class UserObserveesController < ApplicationController
     elsif params[:pairing_code]
       code = find_observer_pairing_code(params[:pairing_code])
       if code.nil?
-        render json: { errors: [{ 'message' => 'Invalid pairing code.' }] }, status: :unprocessable_entity
+        render json: { errors: [{ "message" => "Invalid pairing code." }] }, status: :unprocessable_entity
         return
       end
       @student = code.user
@@ -145,7 +145,7 @@ class UserObserveesController < ApplicationController
 
       common_root_accounts = common_root_accounts_for(observer, observee_pseudonym.user) if observee_pseudonym
       if observee_pseudonym.nil? || common_root_accounts.empty?
-        render json: { errors: [{ 'message' => 'Unknown observee.' }] }, status: :unprocessable_entity
+        render json: { errors: [{ "message" => "Unknown observee." }] }, status: :unprocessable_entity
         return
       end
 
@@ -162,7 +162,7 @@ class UserObserveesController < ApplicationController
 
       # verify provided password
       unless Pseudonym.authenticate(params[:observee] || {}, [@domain_root_account.id] + @domain_root_account.trusted_account_ids)
-        render json: { errors: [{ 'message' => 'Invalid credentials provided.' }] }, status: :unauthorized
+        render json: { errors: [{ "message" => "Invalid credentials provided." }] }, status: :unauthorized
         return
       end
 
@@ -285,7 +285,7 @@ class UserObserveesController < ApplicationController
   end
 
   def user
-    if ['observers', 'show_observer'].include?(params[:action])
+    if ["observers", "show_observer"].include?(params[:action])
       student
     else
       observer
@@ -378,11 +378,11 @@ class UserObserveesController < ApplicationController
   def add_linked_root_account_ids_to_user_json(user_rows)
     user_rows = Array(user_rows)
     ra_id_map = {}
-    if ['observers', 'show_observer'].include?(params[:action])
-      scope = student.as_student_observation_links.where(observer: user_rows.map { |r| r['id'] })
+    if ["observers", "show_observer"].include?(params[:action])
+      scope = student.as_student_observation_links.where(observer: user_rows.map { |r| r["id"] })
       column = :observer_id
     else
-      scope = observer.as_observer_observation_links.where(student: user_rows.map { |r| r['id'] })
+      scope = observer.as_observer_observation_links.where(student: user_rows.map { |r| r["id"] })
       column = :user_id
     end
 
@@ -395,7 +395,7 @@ class UserObserveesController < ApplicationController
     end
 
     user_rows.each do |row|
-      row['observation_link_root_account_ids'] = ra_id_map[row['id']] || []
+      row["observation_link_root_account_ids"] = ra_id_map[row["id"]] || []
     end
   end
 end

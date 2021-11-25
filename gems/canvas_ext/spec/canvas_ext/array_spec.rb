@@ -18,12 +18,12 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'spec_helper'
+require "spec_helper"
 
 describe "Array#cache_key" do
   it "works with frozen arrays" do
     array = [1, 2, 3]
     array.freeze
-    expect(array.cache_key).to eq '1/2/3'
+    expect(array.cache_key).to eq "1/2/3"
   end
 end

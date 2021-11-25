@@ -25,7 +25,7 @@ module Factories
 
   def valid_folder_attributes
     {
-      name: 'vale for name',
+      name: "vale for name",
       context: @course
     }
   end

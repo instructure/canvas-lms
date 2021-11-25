@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../spec_helper'
+require_relative "../spec_helper"
 
 describe SessionToken do
   it "is valid after serialization and parsing" do
@@ -86,7 +86,7 @@ describe SessionToken do
     expect(SessionToken.parse("{}")).to be_nil
 
     # good base64, bad json
-    bad_token = Base64.encode64("[[]").tr('+/', '-_').gsub(/=|\n/, '')
+    bad_token = Base64.encode64("[[]").tr("+/", "-_").gsub(/=|\n/, "")
     expect(SessionToken.parse(bad_token)).to be_nil
 
     # good json, wrong data structure
@@ -102,16 +102,16 @@ describe SessionToken do
     expect(SessionToken.parse(JSONToken.encode(data))).to be_nil
 
     # good json, wrong data types
-    data = token.as_json.merge(created_at: 'invalid')
+    data = token.as_json.merge(created_at: "invalid")
     expect(SessionToken.parse(JSONToken.encode(data))).to be_nil
 
-    data = token.as_json.merge(pseudonym_id: 'invalid')
+    data = token.as_json.merge(pseudonym_id: "invalid")
     expect(SessionToken.parse(JSONToken.encode(data))).to be_nil
 
-    data = token.as_json.merge(current_user_id: 'invalid')
+    data = token.as_json.merge(current_user_id: "invalid")
     expect(SessionToken.parse(JSONToken.encode(data))).to be_nil
 
-    data = token.as_json.merge(used_remember_me_token: 'invalid')
+    data = token.as_json.merge(used_remember_me_token: "invalid")
     expect(SessionToken.parse(JSONToken.encode(data))).to be_nil
 
     data = token.as_json.merge(signature: 1)

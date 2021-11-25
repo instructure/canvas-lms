@@ -31,9 +31,9 @@ module Factories
 
     valid_attrs = %i[alert_type threshold workflow_state student observer]
     default_attrs = {
-      alert_type: 'course_announcement',
+      alert_type: "course_announcement",
       threshold: nil,
-      workflow_state: 'active'
+      workflow_state: "active"
     }
 
     attrs = default_attrs.deep_merge(opts.slice(*valid_attrs))

@@ -27,14 +27,14 @@ class ModeratedGrading::ProvisionalGrade < ActiveRecord::Base
   attr_writer :force_save, :current_user
 
   belongs_to :submission, inverse_of: :provisional_grades
-  belongs_to :scorer, class_name: 'User'
+  belongs_to :scorer, class_name: "User"
 
   has_many :rubric_assessments, as: :artifact
   has_one :selection,
-          class_name: 'ModeratedGrading::Selection',
+          class_name: "ModeratedGrading::Selection",
           foreign_key: :selected_provisional_grade_id
 
-  belongs_to :source_provisional_grade, class_name: 'ModeratedGrading::ProvisionalGrade'
+  belongs_to :source_provisional_grade, class_name: "ModeratedGrading::ProvisionalGrade"
 
   validates :scorer, presence: true
   validates :submission, presence: true
@@ -73,7 +73,7 @@ class ModeratedGrading::ProvisionalGrade < ActiveRecord::Base
   end
 
   def remove_moderation_ignores
-    submission.assignment.ignores.where(purpose: 'moderation', permanent: false).delete_all
+    submission.assignment.ignores.where(purpose: "moderation", permanent: false).delete_all
   end
 
   def valid?(*)

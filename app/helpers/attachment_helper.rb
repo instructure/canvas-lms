@@ -54,7 +54,7 @@ module AttachmentHelper
   end
 
   def media_preview_attributes(attachment, attrs = {})
-    attrs[:type] = attachment.content_type&.include?('video') ? 'video' : 'audio'
+    attrs[:type] = attachment.content_type&.include?("video") ? "video" : "audio"
     attrs[:download_url] = context_url(attachment.context, :context_file_download_url, attachment.id)
     attrs[:media_entry_id] = attachment.media_entry_id if attachment.media_entry_id
     attrs.inject(+"") { |s, (attr, val)| s << "data-#{attr}=#{val} " }
@@ -72,7 +72,7 @@ module AttachmentHelper
 
   def render_or_redirect_to_stored_file(attachment:, verifier: nil, inline: false)
     can_proxy = inline && attachment.can_be_proxied?
-    must_proxy = inline && csp_enforced? && attachment.mime_class == 'html'
+    must_proxy = inline && csp_enforced? && attachment.mime_class == "html"
     direct = attachment.stored_locally? || can_proxy || must_proxy
 
     # up here to preempt files domain redirect
@@ -92,11 +92,11 @@ module AttachmentHelper
                                                    verifier: verifier, download: !inline)
     elsif attachment.stored_locally?
       @headers = false if @files_domain
-      send_file(attachment.full_filename, type: attachment.content_type_with_encoding, disposition: (inline ? 'inline' : 'attachment'), filename: attachment.display_name)
+      send_file(attachment.full_filename, type: attachment.content_type_with_encoding, disposition: (inline ? "inline" : "attachment"), filename: attachment.display_name)
     elsif can_proxy
       body = attachment.open.read
-      add_csp_for_file if attachment.mime_class == 'html'
-      send_file_headers!(length: body.length, filename: attachment.filename, disposition: 'inline', type: attachment.content_type_with_encoding)
+      add_csp_for_file if attachment.mime_class == "html"
+      send_file_headers!(length: body.length, filename: attachment.filename, disposition: "inline", type: attachment.content_type_with_encoding)
       render body: body
     elsif must_proxy
       render 400, text: t("It's not allowed to redirect to HTML files that can't be proxied while Content-Security-Policy is being enforced")
@@ -127,7 +127,7 @@ module AttachmentHelper
     # investigate opportunities to reuse JWTs when the same user requests the
     # same file within a reasonable window of time, so that the URL redirected
     # too can still take advantage of browser caching.
-    unless (attachment.instfs_hosted? && !direct) || attachment.content_type&.start_with?('text') || attachment.extension == '.html' || attachment.extension == '.htm'
+    unless (attachment.instfs_hosted? && !direct) || attachment.content_type&.start_with?("text") || attachment.extension == ".html" || attachment.extension == ".htm"
       cancel_cache_buster
       # set cache to expire whenever the s3 url does (or one day if local or inline proxy), max-age take seconds, and Expires takes a date
       ttl = direct ? 1.day : attachment.url_ttl

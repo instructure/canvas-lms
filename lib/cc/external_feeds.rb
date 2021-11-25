@@ -26,7 +26,7 @@ module CC
         feed_file = nil
         rel_path = nil
       else
-        feed_file = File.new(File.join(@canvas_resource_dir, CCHelper::EXTERNAL_FEEDS), 'w')
+        feed_file = File.new(File.join(@canvas_resource_dir, CCHelper::EXTERNAL_FEEDS), "w")
         rel_path = File.join(CCHelper::COURSE_SETTINGS_DIR, CCHelper::EXTERNAL_FEEDS)
         document = Builder::XmlMarkup.new(target: feed_file, indent: 2)
       end

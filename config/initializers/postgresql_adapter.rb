@@ -50,9 +50,9 @@ module PostgreSQLAdapterExtensions
 
   def bulk_insert(table_name, records)
     keys = records.first.keys
-    quoted_keys = keys.map { |k| quote_column_name(k) }.join(', ')
+    quoted_keys = keys.map { |k| quote_column_name(k) }.join(", ")
     execute "COPY #{quote_table_name(table_name)} (#{quoted_keys}) FROM STDIN"
-    raw_connection.put_copy_data records.inject(+'') { |result, record|
+    raw_connection.put_copy_data records.inject(+"") { |result, record|
                                    result << keys.map { |k| quote_text(record[k]) }.join("\t") << "\n"
                                  }
     ActiveRecord::Base.connection.clear_query_cache
@@ -104,7 +104,7 @@ module PostgreSQLAdapterExtensions
   def func(name, *args)
     case name
     when :group_concat
-      "string_agg((#{func_arg_esc(args.first)})::text, #{quote(args[1] || ',')})"
+      "string_agg((#{func_arg_esc(args.first)})::text, #{quote(args[1] || ",")})"
     else
       super
     end
@@ -115,7 +115,7 @@ module PostgreSQLAdapterExtensions
     # dependent on the primary keys, that's only true if the FROM items are
     # all tables (i.e. not subselects). to keep things simple, we always
     # specify all columns for postgres
-    infer_group_by_columns(columns).flatten.join(', ')
+    infer_group_by_columns(columns).flatten.join(", ")
   end
 
   # ActiveRecord 3.2 ignores indexes if it cannot parse the column names
@@ -124,7 +124,7 @@ module PostgreSQLAdapterExtensions
   def indexes(table_name)
     schema = shard.name
 
-    result = query(<<~SQL.squish, 'SCHEMA')
+    result = query(<<~SQL.squish, "SCHEMA")
        SELECT distinct i.relname, d.indisunique, d.indkey, pg_get_indexdef(d.indexrelid), t.oid
        FROM pg_class t
        INNER JOIN pg_index d ON t.oid = d.indrelid
@@ -132,13 +132,13 @@ module PostgreSQLAdapterExtensions
        WHERE i.relkind = 'i'
          AND d.indisprimary = 'f'
          AND t.relname = '#{table_name}'
-         AND t.relnamespace IN (SELECT oid FROM pg_namespace WHERE nspname = #{schema ? "'#{schema}'" : 'ANY (current_schemas(false))'} )
+         AND t.relnamespace IN (SELECT oid FROM pg_namespace WHERE nspname = #{schema ? "'#{schema}'" : "ANY (current_schemas(false))"} )
       ORDER BY i.relname
     SQL
 
     result.map do |row|
       index_name = row[0]
-      unique = row[1] == 't'
+      unique = row[1] == "t"
       indkey = row[2].split
       inddef = row[3]
       oid = row[4]
@@ -197,7 +197,7 @@ module PostgreSQLAdapterExtensions
       algorithm =
         if options.is_a?(Hash) && options.key?(:algorithm)
           index_algorithms.fetch(options[:algorithm]) do
-            raise ArgumentError, "Algorithm must be one of the following: #{index_algorithms.keys.map(&:inspect).join(', ')}"
+            raise ArgumentError, "Algorithm must be one of the following: #{index_algorithms.keys.map(&:inspect).join(", ")}"
           end
         end
       algorithm = nil if open_transactions > 0
@@ -234,7 +234,7 @@ module PostgreSQLAdapterExtensions
 
     if matching_indexes.count > 1
       raise ArgumentError, "Multiple indexes found on #{table_name} columns #{column_names}. " \
-                           "Specify an index name from #{matching_indexes.map(&:name).join(', ')}"
+                           "Specify an index name from #{matching_indexes.map(&:name).join(", ")}"
     elsif matching_indexes.none?
       return if options.is_a?(Hash) && options[:if_exists]
 
@@ -317,7 +317,7 @@ module PostgreSQLAdapterExtensions
     end
 
     I18n.available_locales.each do |locale|
-      next if locale.to_s.include?('-x-')
+      next if locale.to_s.include?("-x-")
 
       I18n.locale = locale
       next if Canvas::ICU.collator.rules.empty?
@@ -382,8 +382,8 @@ module SchemaCreationExtensions
     sql = +"CONSTRAINT #{quote_column_name(o.name)}"
     sql << " FOREIGN KEY (#{quote_column_name(o.column)})" if constraint_type == :table
     sql << " REFERENCES #{quote_table_name(o.to_table)} (#{quote_column_name(o.primary_key)})"
-    sql << " #{action_sql('DELETE', o.on_delete)}" if o.on_delete
-    sql << " #{action_sql('UPDATE', o.on_update)}" if o.on_update
+    sql << " #{action_sql("DELETE", o.on_delete)}" if o.on_delete
+    sql << " #{action_sql("UPDATE", o.on_update)}" if o.on_update
     sql
   end
 

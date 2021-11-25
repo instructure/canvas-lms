@@ -166,7 +166,7 @@ describe SIS::CSV::ImportRefactored do
     end.not_to raise_error
   end
 
-  it 'supports sis stickiness overriding' do
+  it "supports sis stickiness overriding" do
     before_count = AbstractCourse.count
     process_csv_data_cleanly(
       "term_id,name,status,start_date,end_date",
@@ -227,7 +227,7 @@ describe SIS::CSV::ImportRefactored do
     end
   end
 
-  it 'allows turning on stickiness' do
+  it "allows turning on stickiness" do
     before_count = AbstractCourse.count
     process_csv_data_cleanly(
       "term_id,name,status,start_date,end_date",
@@ -271,7 +271,7 @@ describe SIS::CSV::ImportRefactored do
     end
   end
 
-  it 'allows turning off stickiness' do
+  it "allows turning off stickiness" do
     before_count = AbstractCourse.count
     process_csv_data_cleanly(
       "term_id,name,status,start_date,end_date",
@@ -349,14 +349,14 @@ describe SIS::CSV::ImportRefactored do
     end.not_to raise_error
   end
 
-  it 'does not fail on mac zip files' do
+  it "does not fail on mac zip files" do
     path = File.expand_path("#{File.dirname(__FILE__)}/../../../fixtures/sis/mac_sis_batch.zip")
     importer = process_csv_data(files: path)
     expect(importer.errors).to eq []
   end
 
   describe "parallel imports" do
-    it 'retries an importer once locally' do
+    it "retries an importer once locally" do
       expect_any_instance_of(SIS::CSV::ImportRefactored).to receive(:run_parallel_importer).twice.and_call_original
       expect_any_instance_of(SIS::CSV::ImportRefactored).to receive(:try_importing_segment).twice.and_call_original
       # don't actually run the job.
@@ -369,8 +369,8 @@ describe SIS::CSV::ImportRefactored do
       )
     end
 
-    it 'alsoes retry in a new job' do
-      Setting.set('number_of_tries_before_failing', 2)
+    it "alsoes retry in a new job" do
+      Setting.set("number_of_tries_before_failing", 2)
       allow(InstStatsd::Statsd).to receive(:increment)
       expect_any_instance_of(SIS::CSV::ImportRefactored).to receive(:run_parallel_importer).exactly(6).and_call_original
       expect_any_instance_of(SIS::CSV::ImportRefactored).to receive(:try_importing_segment).exactly(6).and_call_original
@@ -387,14 +387,14 @@ describe SIS::CSV::ImportRefactored do
       process_csv_data("term_id,name,status", "T001,Winter13,active")
 
       [0, 1, 2].each do |i|
-        expect(InstStatsd::Statsd).to have_received(:increment).once.with('sis_parallel_worker',
+        expect(InstStatsd::Statsd).to have_received(:increment).once.with("sis_parallel_worker",
                                                                           tags: { attempt: i, retry: false })
-        expect(InstStatsd::Statsd).to have_received(:increment).once.with('sis_parallel_worker',
+        expect(InstStatsd::Statsd).to have_received(:increment).once.with("sis_parallel_worker",
                                                                           tags: { attempt: i, retry: true })
       end
     end
 
-    it 'only runs an importer once if successful' do
+    it "only runs an importer once if successful" do
       expect_any_instance_of(SIS::CSV::ImportRefactored).to receive(:run_parallel_importer).once.and_call_original
       process_csv_data(
         "term_id,name,status",

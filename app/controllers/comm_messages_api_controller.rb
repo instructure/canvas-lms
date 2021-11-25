@@ -124,7 +124,7 @@ class CommMessagesApiController < ApplicationController
     start_time = CanvasTime.try_parse(params[:start_time])
     end_time = CanvasTime.try_parse(params[:end_time])
 
-    query = user.messages.order('created_at DESC')
+    query = user.messages.order("created_at DESC")
 
     # site admins see all, but if not a site admin...
     unless Account.site_admin.grants_right?(@current_user, :read_messages)
@@ -138,8 +138,8 @@ class CommMessagesApiController < ApplicationController
       query = query.where(root_account_id: @domain_root_account)
     end
 
-    query = query.where('created_at >= ?', start_time) if start_time
-    query = query.where('created_at <= ?', end_time) if end_time
+    query = query.where("created_at >= ?", start_time) if start_time
+    query = query.where("created_at <= ?", end_time) if end_time
     messages = Api.paginate(query, self, api_v1_comm_messages_url)
 
     messages_json = messages.map { |m| comm_message_json(m) }

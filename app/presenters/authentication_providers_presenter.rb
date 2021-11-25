@@ -152,7 +152,7 @@ class AuthenticationProvidersPresenter
         text_field_tag(nil)
       end
     else
-      select_tag(name, options_for_select(aac.class.recognized_federated_attributes, selected), class: 'ic-Input', id: id)
+      select_tag(name, options_for_select(aac.class.recognized_federated_attributes, selected), class: "ic-Input", id: id)
     end
   end
 
@@ -165,6 +165,6 @@ class AuthenticationProvidersPresenter
   private
 
   def ip_addresses_setting
-    Setting.get('account_authorization_config_ip_addresses', nil)
+    Setting.get("account_authorization_config_ip_addresses", nil)
   end
 end

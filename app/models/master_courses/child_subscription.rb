@@ -24,7 +24,7 @@ class MasterCourses::ChildSubscription < ActiveRecord::Base
 
   belongs_to :master_template, class_name: "MasterCourses::MasterTemplate"
   belongs_to :child_course, class_name: "Course"
-  belongs_to :root_account, class_name: 'Account'
+  belongs_to :root_account, class_name: "Account"
 
   before_create :set_root_account_id
 
@@ -70,12 +70,12 @@ class MasterCourses::ChildSubscription < ActiveRecord::Base
   def check_migration_id_deactivation
     # mess up the migration ids so restrictions no longer get applied
     if workflow_state_changed?
-      if deleted? && workflow_state_was == 'active'
+      if deleted? && workflow_state_was == "active"
         self.class.connection.after_transaction_commit do
           unlink_syllabus!
           add_deactivation_prefix!
         end
-      elsif active? && workflow_state_was == 'deleted'
+      elsif active? && workflow_state_was == "deleted"
         self.use_selective_copy = false # require a full import next time
         self.class.connection.after_transaction_commit do
           link_syllabus!
@@ -136,7 +136,7 @@ class MasterCourses::ChildSubscription < ActiveRecord::Base
   end
 
   def last_migration_id
-    child_course.content_migrations.where(child_subscription_id: self).order('id desc').limit(1).pluck(:id).first
+    child_course.content_migrations.where(child_subscription_id: self).order("id desc").limit(1).pluck(:id).first
   end
 
   def set_root_account_id

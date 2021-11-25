@@ -27,9 +27,9 @@ describe Types::QueryType do
     test_course_2 = Course.create! name: "TEST2"
     Course.create! name: "TEST3"
 
-    teacher = user_factory(name: 'Coolguy Mcgee')
-    test_course_1.enroll_user(teacher, 'TeacherEnrollment')
-    test_course_2.enroll_user(teacher, 'TeacherEnrollment')
+    teacher = user_factory(name: "Coolguy Mcgee")
+    test_course_1.enroll_user(teacher, "TeacherEnrollment")
+    test_course_2.enroll_user(teacher, "TeacherEnrollment")
 
     # this is a set of course ids to check against
 
@@ -76,7 +76,7 @@ describe Types::QueryType do
     let_once(:generic_sis_id) { "di_ecruos_sis" }
     let_once(:course) { Course.create!(name: "TEST", sis_source_id: generic_sis_id, account: account) }
     let_once(:account) do
-      acct = Account.default.sub_accounts.create!(name: 'sub')
+      acct = Account.default.sub_accounts.create!(name: "sub")
       acct.update!(sis_source_id: generic_sis_id)
       acct
     end

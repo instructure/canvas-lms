@@ -26,7 +26,7 @@ module CC
         group_file = nil
         rel_path = nil
       else
-        group_file = File.new(File.join(@canvas_resource_dir, CCHelper::ASSIGNMENT_GROUPS), 'w')
+        group_file = File.new(File.join(@canvas_resource_dir, CCHelper::ASSIGNMENT_GROUPS), "w")
         rel_path = File.join(CCHelper::COURSE_SETTINGS_DIR, CCHelper::ASSIGNMENT_GROUPS)
         document = Builder::XmlMarkup.new(target: group_file, indent: 2)
       end
@@ -52,17 +52,17 @@ module CC
               # "drop_lowest:1\ndrop_highest:2\nnever_drop:259\n"
               # to something like:
               # [["drop_lowest", "1"], ["drop_highest", "2"], ["never_drop", "259"]]
-              rules = group.rules.split("\n").map { |r| r.split(':') }
+              rules = group.rules.split("\n").map { |r| r.split(":") }
               group_node.rules do |rules_node|
                 rules.each do |rule|
                   a = nil
-                  if rule.first == 'never_drop'
+                  if rule.first == "never_drop"
                     a = @course.assignments.where(id: rule.last).first
                     next unless a
                   end
                   rules_node.rule do |rule_node|
                     rule_node.drop_type rule.first
-                    if rule.first == 'never_drop'
+                    if rule.first == "never_drop"
                       rule_node.identifierref create_key(a)
                     else
                       rule_node.drop_count rule.last

@@ -24,7 +24,7 @@ class AddOptimizationIndexes < ActiveRecord::Migration[6.0]
   def change
     add_index :assessment_question_banks,
               %i[context_id context_type title id],
-              name: 'index_aqb_context_and_title',
+              name: "index_aqb_context_and_title",
               algorithm: :concurrently,
               if_not_exists: true
     add_index :content_migrations,

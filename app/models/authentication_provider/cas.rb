@@ -18,11 +18,11 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'casclient'
+require "casclient"
 
 class AuthenticationProvider::CAS < AuthenticationProvider::Delegated
   def self.sti_name
-    'cas'
+    "cas"
   end
 
   def self.recognized_params

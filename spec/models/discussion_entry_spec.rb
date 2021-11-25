@@ -21,7 +21,7 @@
 describe DiscussionEntry do
   let(:topic) { discussion_topic_model }
 
-  describe 'callback lifecycle' do
+  describe "callback lifecycle" do
     before(:once) do
       course_with_teacher(active_all: true)
     end
@@ -36,7 +36,7 @@ describe DiscussionEntry do
       expect(discussion_topic_participant.reload.subscribed).to be_truthy
     end
 
-    it 'sets the root_account_id using topic' do
+    it "sets the root_account_id using topic" do
       expect(entry.root_account_id).to eq topic.root_account_id
     end
   end
@@ -84,15 +84,15 @@ describe DiscussionEntry do
     expect(topic.message).to eql("<a href=\"#\">only this should stay</a>")
   end
 
-  it 'does not allow viewing when in an announcement without :read_announcements' do
+  it "does not allow viewing when in an announcement without :read_announcements" do
     course_with_teacher(active_all: true)
     student_in_course(active_all: true)
-    @course.account.role_overrides.create!(permission: 'read_announcements', role: student_role, enabled: false)
+    @course.account.role_overrides.create!(permission: "read_announcements", role: student_role, enabled: false)
     # because :post_to_forum implies :read in about half of discussions, and this is one such place
-    @course.account.role_overrides.create!(permission: 'post_to_forum', role: student_role, enabled: false)
+    @course.account.role_overrides.create!(permission: "post_to_forum", role: student_role, enabled: false)
 
     topic = @course.announcements.create!(user: @teacher, message: "announcement text")
-    entry = topic.discussion_entries.create!(user: @teacher, message: 'reply text')
+    entry = topic.discussion_entries.create!(user: @teacher, message: "reply text")
 
     expect(entry.grants_right?(@student, :read)).to be(false)
   end
@@ -105,7 +105,7 @@ describe DiscussionEntry do
     let(:student) { student_in_course(active_all: true).user }
     let(:mentioned_student) { student_in_course(active_all: true).user }
 
-    it 'creates on entry save' do
+    it "creates on entry save" do
       entry = topic.discussion_entries.new(user: student)
       allow(entry).to receive(:message).and_return("<p>hello <span class='mceNonEditable mention' data-mention=#{mentioned_student.id}>@#{mentioned_student.short_name}</span> what's up dude</p>")
       expect { entry.save! }.to change { entry.mentions.count }.from(0).to(1)
@@ -265,7 +265,7 @@ describe DiscussionEntry do
       topic.subscribe(@student)
       entry = topic.discussion_entries.create!(user: @teacher, message: "Oh, and another thing...")
       expect(BroadcastPolicy.notifier).to receive(:send_notification).once
-      entry.broadcast_report_notification('hello I have been reported')
+      entry.broadcast_report_notification("hello I have been reported")
     end
   end
 
@@ -352,9 +352,9 @@ describe DiscussionEntry do
 
       # Create 4 entries, first 2 are 'read' by reader.
       @entry_1 = @topic.discussion_entries.create!(message: "entry 1", user: @author)
-      @entry_1.change_read_state('read', @reader)
+      @entry_1.change_read_state("read", @reader)
       @entry_2 = @topic.discussion_entries.create!(message: "entry 2", user: @author)
-      @entry_2.change_read_state('read', @reader)
+      @entry_2.change_read_state("read", @reader)
       @entry_3 = @topic.discussion_entries.create!(message: "entry 3", user: @author)
       @entry_4 = @topic.discussion_entries.create!(message: "entry 4", user: @author)
     end
@@ -366,8 +366,8 @@ describe DiscussionEntry do
       end
     end
 
-    it 'allows teacher entry on assignment topic to be destroyed' do
-      assignment = @course.assignments.create!(title: @topic.title, submission_types: 'discussion_topic')
+    it "allows teacher entry on assignment topic to be destroyed" do
+      assignment = @course.assignments.create!(title: @topic.title, submission_types: "discussion_topic")
       topic = @course.discussion_topics.create!(title: "title", message: "message", user: @teacher, assignment: assignment)
       entry = topic.discussion_entries.create!(message: "entry", user: @teacher)
       expect { entry.destroy }.to_not raise_error
@@ -594,12 +594,12 @@ describe DiscussionEntry do
 
     context ".read_entry_ids" do
       it "returns the ids of the read entries" do
-        @root2.change_read_state('read', @teacher)
-        @reply_reply1.change_read_state('read', @teacher)
-        @reply_reply2.change_read_state('read', @teacher)
-        @reply3.change_read_state('read', @teacher)
+        @root2.change_read_state("read", @teacher)
+        @reply_reply1.change_read_state("read", @teacher)
+        @reply_reply2.change_read_state("read", @teacher)
+        @reply3.change_read_state("read", @teacher)
         # change one back to unread, it shouldn't be returned
-        @reply_reply2.change_read_state('unread', @teacher)
+        @reply_reply2.change_read_state("unread", @teacher)
         read = DiscussionEntryParticipant.read_entry_ids(@topic.discussion_entries.map(&:id), @teacher).sort
         expect(read).to eq [@root2, @reply1, @reply2, @reply_reply1, @reply3].map(&:id)
       end
@@ -609,12 +609,12 @@ describe DiscussionEntry do
       it "returns the ids of entries that have been marked as force_read_state" do
         marked_entries = [@root2, @reply_reply1, @reply_reply2, @reply3]
         marked_entries.each do |e|
-          e.change_read_state('read', @teacher, forced: true)
+          e.change_read_state("read", @teacher, forced: true)
         end
         # change back, without :forced parameter, should stay forced
-        @reply_reply2.change_read_state('unread', @teacher)
+        @reply_reply2.change_read_state("unread", @teacher)
         # change forced to false so it shouldn't be in results
-        @reply3.change_read_state('unread', @teacher, forced: false)
+        @reply3.change_read_state("unread", @teacher, forced: false)
         marked_entries -= [@reply3]
 
         forced = DiscussionEntryParticipant.forced_read_state_entry_ids(@all_entries.map(&:id), @teacher).sort
@@ -624,13 +624,13 @@ describe DiscussionEntry do
 
     context ".find_existing_participant" do
       it "returns existing data" do
-        @root2.change_read_state('read', @teacher, forced: true)
+        @root2.change_read_state("read", @teacher, forced: true)
         participant = @root2.find_existing_participant(@teacher)
         expect(participant.id).not_to be_nil
         expect(participant).to be_readonly
         expect(participant.user).to eq @teacher
         expect(participant.discussion_entry).to eq @root2
-        expect(participant.workflow_state).to eq 'read'
+        expect(participant.workflow_state).to eq "read"
         expect(participant.forced_read_state).to be_truthy
       end
 
@@ -640,14 +640,14 @@ describe DiscussionEntry do
         expect(participant).to be_readonly
         expect(participant.user).to eq @student
         expect(participant.discussion_entry).to eq @reply2
-        expect(participant.workflow_state).to eq 'unread'
+        expect(participant.workflow_state).to eq "unread"
         expect(participant.forced_read_state).to be_falsey
       end
 
       it "works with user_id or user" do
         participant = @reply2.find_existing_participant(@student.id)
         expect(participant.id).to be_nil
-        @reply2.change_read_state('read', @student, forced: true)
+        @reply2.change_read_state("read", @student, forced: true)
         participant_from_id = @reply2.find_existing_participant(@student.id)
         participant_from_user = @reply2.find_existing_participant(@student)
         expect(participant_from_id.id).not_to be_nil
@@ -656,9 +656,9 @@ describe DiscussionEntry do
 
       it "updates stream item from a mention" do
         @reply2.mentions.create!(user_id: @student, root_account_id: @reply2.root_account_id)
-        expect(@student.stream_item_instances.last.workflow_state).to eq 'unread'
-        @reply2.change_read_state('read', @student, forced: true)
-        expect(@student.stream_item_instances.last.workflow_state).to eq 'read'
+        expect(@student.stream_item_instances.last.workflow_state).to eq "unread"
+        @reply2.change_read_state("read", @student, forced: true)
+        expect(@student.stream_item_instances.last.workflow_state).to eq "read"
       end
     end
   end
@@ -700,19 +700,19 @@ describe DiscussionEntry do
       expect { @entry.reply_from(user: @student, text: "reply") }.to raise_error(IncomingMail::Errors::ReplyToLockedTopic)
     end
 
-    it 'raises InvalidParticipant for invalid participants' do
-      u = user_with_pseudonym(active_user: true, username: 'test1@example.com', password: 'test1234')
+    it "raises InvalidParticipant for invalid participants" do
+      u = user_with_pseudonym(active_user: true, username: "test1@example.com", password: "test1234")
       expect { @topic.reply_from(user: u, text: "entry 1") }.to raise_error IncomingMail::Errors::InvalidParticipant
     end
   end
 
-  context 'stream items' do
+  context "stream items" do
     before(:once) do
       course_with_student active_all: true
       @empty_section = @course.course_sections.create!
       @topic = @course.discussion_topics.build(title: "topic")
       @assignment = @course.assignments.build title: @topic.title,
-                                              submission_types: 'discussion_topic',
+                                              submission_types: "discussion_topic",
                                               only_visible_to_overrides: true
       @assignment.assignment_overrides.build set: @empty_section
       @assignment.saved_by = :discussion_topic
@@ -726,7 +726,7 @@ describe DiscussionEntry do
     end
   end
 
-  context 'planner items cache' do
+  context "planner items cache" do
     before(:once) do
       course_with_student active_all: true
       @topic = @course.discussion_topics.build(title: "topic")
@@ -734,7 +734,7 @@ describe DiscussionEntry do
       @topic.discussion_topic_participants.create!(user: @student, subscribed: true)
     end
 
-    it 'is cleared for top level replies on a todo discussion' do
+    it "is cleared for top level replies on a todo discussion" do
       @topic.todo_date = 1.day.from_now
       @topic.save
 
@@ -744,7 +744,7 @@ describe DiscussionEntry do
       expect(@student.cache_key).not_to eql(cache_key)
     end
 
-    it 'is not cleared on nested replies for non-assignment non-todo discussions' do
+    it "is not cleared on nested replies for non-assignment non-todo discussions" do
       entry = @topic.discussion_entries.build(parent_id: nil)
       entry.save!
 
@@ -759,8 +759,8 @@ describe DiscussionEntry do
       expect(@student.cache_key).to eql(cache_key)
     end
 
-    it 'is cleared on top level and for graded discussions' do
-      assignment = @course.assignments.build(submission_types: 'discussion_topic', title: topic.title, due_at: 1.day.from_now)
+    it "is cleared on top level and for graded discussions" do
+      assignment = @course.assignments.build(submission_types: "discussion_topic", title: topic.title, due_at: 1.day.from_now)
       assignment.saved_by = :discussion_topic
       @topic.assignment = assignment
       @topic.save
@@ -771,8 +771,8 @@ describe DiscussionEntry do
       expect(@student.cache_key).not_to eql(cache_key)
     end
 
-    it 'is cleared on nested replies for graded discussions' do
-      assignment = @course.assignments.build(submission_types: 'discussion_topic', title: topic.title, due_at: 1.day.from_now)
+    it "is cleared on nested replies for graded discussions" do
+      assignment = @course.assignments.build(submission_types: "discussion_topic", title: topic.title, due_at: 1.day.from_now)
       assignment.saved_by = :discussion_topic
       @topic.assignment = assignment
       @topic.save
@@ -790,7 +790,7 @@ describe DiscussionEntry do
       expect(@student.cache_key).not_to eql(cache_key)
     end
 
-    it 'is cleared on nested replies for todo discussions' do
+    it "is cleared on nested replies for todo discussions" do
       @topic.todo_date = 1.day.from_now
       @topic.save
 
@@ -808,41 +808,41 @@ describe DiscussionEntry do
     end
   end
 
-  describe 'permissions' do
+  describe "permissions" do
     let(:user) { user_model }
     let(:entry) { topic.discussion_entries.create!(message: "Hello!", user: user) }
 
-    describe 'reply' do
-      context 'when a user is no longer enrolled in the course' do
+    describe "reply" do
+      context "when a user is no longer enrolled in the course" do
         before do
           create_enrollment(topic.course, user, { enrollment_state: "completed" })
         end
 
-        it 'returns false for their own posts' do
+        it "returns false for their own posts" do
           expect(entry.grants_right?(user, :reply)).to eq false
         end
       end
     end
 
-    describe 'update' do
-      context 'when a user is no longer enrolled in the course' do
+    describe "update" do
+      context "when a user is no longer enrolled in the course" do
         before do
           create_enrollment(topic.course, user, { enrollment_state: "completed" })
         end
 
-        it 'returns false for their own posts' do
+        it "returns false for their own posts" do
           expect(entry.grants_right?(user, :update)).to eq false
         end
       end
     end
 
-    describe 'delete' do
-      context 'when a user is no longer enrolled in the course' do
+    describe "delete" do
+      context "when a user is no longer enrolled in the course" do
         before do
           create_enrollment(topic.course, user, { enrollment_state: "completed" })
         end
 
-        it 'returns false for their own posts' do
+        it "returns false for their own posts" do
           expect(entry.grants_right?(user, :delete)).to eq false
         end
       end

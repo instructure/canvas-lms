@@ -282,7 +282,7 @@ class FeatureFlagsController < ApplicationController
       if !current_flag && feature_def.hidden?
         return render json: { message: "invalid feature" }, status: :bad_request unless Account.site_admin.grants_right?(@current_user, session, :read)
 
-        prior_state = 'hidden'
+        prior_state = "hidden"
       end
 
       new_attrs = { feature: params[:feature] }
@@ -290,7 +290,7 @@ class FeatureFlagsController < ApplicationController
       # check transition
       if params[:state].present?
         transitions = Feature.transitions(params[:feature], @current_user, @context, prior_state)
-        if transitions[params[:state]] && transitions[params[:state]]['locked']
+        if transitions[params[:state]] && transitions[params[:state]]["locked"]
           return render json: { message: "state change not allowed" }, status: :forbidden
         end
 

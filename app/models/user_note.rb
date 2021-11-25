@@ -22,7 +22,7 @@ class UserNote < ActiveRecord::Base
   include Workflow
 
   belongs_to :user
-  belongs_to :creator, class_name: 'User', foreign_key: :created_by_id
+  belongs_to :creator, class_name: "User", foreign_key: :created_by_id
 
   validates :user_id, :created_by_id, :workflow_state, presence: true
   validates :note, length: { maximum: maximum_text_length, allow_blank: true }
@@ -37,7 +37,7 @@ class UserNote < ActiveRecord::Base
   end
 
   scope :active, -> { where("workflow_state<>'deleted'") }
-  scope :desc_by_date, -> { order('created_at DESC') }
+  scope :desc_by_date, -> { order("created_at DESC") }
 
   set_policy do
     given { |user| creator == user }
@@ -52,7 +52,7 @@ class UserNote < ActiveRecord::Base
 
   alias_method :destroy_permanently!, :destroy
   def destroy
-    self.workflow_state = 'deleted'
+    self.workflow_state = "deleted"
     self.deleted_at = Time.now.utc
     save!
   end

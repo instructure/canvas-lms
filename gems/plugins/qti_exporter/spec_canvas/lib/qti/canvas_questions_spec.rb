@@ -16,18 +16,18 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../../qti_helper'
+require_relative "../../qti_helper"
 if Qti.migration_executable
   describe "Converting Canvas QTI" do
     it "converts multiple choice" do
-      manifest_node = get_manifest_node('multiple_choice')
+      manifest_node = get_manifest_node("multiple_choice")
       hash = Qti::AssessmentItemConverter.create_instructure_question(manifest_node: manifest_node, base_dir: CANVAS_FIXTURE_DIR)
       hash[:answers].each { |a| a.delete(:id) }
       expect(hash).to eq CanvasExpected::MULTIPLE_CHOICE
     end
 
     it "converts true false" do
-      manifest_node = get_manifest_node('true_false')
+      manifest_node = get_manifest_node("true_false")
       hash = Qti::AssessmentItemConverter.create_instructure_question(manifest_node: manifest_node, base_dir: CANVAS_FIXTURE_DIR)
       hash[:answers].each { |a| a.delete(:id) }
       expect(hash).to eq CanvasExpected::TRUE_FALSE
@@ -35,95 +35,95 @@ if Qti.migration_executable
 
     it "converts true false even when response ids are actually the answer text" do
       # sigh
-      manifest_node = get_manifest_node('true_false2')
+      manifest_node = get_manifest_node("true_false2")
       hash = Qti::AssessmentItemConverter.create_instructure_question(manifest_node: manifest_node, base_dir: CANVAS_FIXTURE_DIR)
       hash[:answers].each { |a| a.delete(:id) }
       expect(hash).to eq CanvasExpected::TRUE_FALSE
     end
 
     it "converts multiple answers" do
-      manifest_node = get_manifest_node('multiple_answers')
+      manifest_node = get_manifest_node("multiple_answers")
       hash = Qti::AssessmentItemConverter.create_instructure_question(manifest_node: manifest_node, base_dir: CANVAS_FIXTURE_DIR)
       hash[:answers].each { |a| a.delete(:id) }
       expect(hash).to eq CanvasExpected::MULTIPLE_ANSWERS
     end
 
     it "converts essays" do
-      manifest_node = get_manifest_node('essay')
+      manifest_node = get_manifest_node("essay")
       hash = Qti::AssessmentItemConverter.create_instructure_question(manifest_node: manifest_node, base_dir: CANVAS_FIXTURE_DIR)
       expect(hash).to eq CanvasExpected::ESSAY
     end
 
     it "prefers extendedTextInteraction > prompt over empty div when convering essays" do
-      manifest_node = get_manifest_node('essay2')
+      manifest_node = get_manifest_node("essay2")
       hash = Qti::AssessmentItemConverter.create_instructure_question(manifest_node: manifest_node, base_dir: CANVAS_FIXTURE_DIR)
       expect(hash[:question_text]).to include "What is the difference between a tree?"
     end
 
     it "converts short answer" do
-      manifest_node = get_manifest_node('short_answer')
+      manifest_node = get_manifest_node("short_answer")
       hash = Qti::AssessmentItemConverter.create_instructure_question(manifest_node: manifest_node, base_dir: CANVAS_FIXTURE_DIR)
       hash[:answers].each { |a| a.delete(:id) }
       expect(hash).to eq CanvasExpected::SHORT_ANSWER
     end
 
     it "converts text only questions" do
-      manifest_node = get_manifest_node('text_only')
+      manifest_node = get_manifest_node("text_only")
       hash = Qti::AssessmentItemConverter.create_instructure_question(manifest_node: manifest_node, base_dir: CANVAS_FIXTURE_DIR)
       expect(hash).to eq CanvasExpected::TEXT_ONLY
     end
 
     it "converts fill in multiple blanks questions" do
-      manifest_node = get_manifest_node('fimb', question_type: 'fill_in_multiple_blanks_question')
+      manifest_node = get_manifest_node("fimb", question_type: "fill_in_multiple_blanks_question")
       hash = Qti::AssessmentItemConverter.create_instructure_question(manifest_node: manifest_node, base_dir: CANVAS_FIXTURE_DIR)
       hash[:answers].each { |a| a.delete(:id) }
       expect(hash).to eq CanvasExpected::FIMB
     end
 
     it "converts fill in multiple drop downs questions" do
-      manifest_node = get_manifest_node('multiple_dropdowns', question_type: 'multiple_dropdowns_question')
+      manifest_node = get_manifest_node("multiple_dropdowns", question_type: "multiple_dropdowns_question")
       hash = Qti::AssessmentItemConverter.create_instructure_question(manifest_node: manifest_node, base_dir: CANVAS_FIXTURE_DIR)
       hash[:answers].each { |a| a.delete(:id) }
       expect(hash).to eq CanvasExpected::MULTIPLE_DROP_DOWNS
     end
 
     it "converts matching questions" do
-      manifest_node = get_manifest_node('matching', question_type: 'matching_question')
+      manifest_node = get_manifest_node("matching", question_type: "matching_question")
       hash = Qti::AssessmentItemConverter.create_instructure_question(manifest_node: manifest_node, base_dir: CANVAS_FIXTURE_DIR)
       hash[:answers].each { |a| a.delete(:id) }
       expect(hash).to eq CanvasExpected::MATCHING
     end
 
     it "converts calculated questions (simple)" do
-      manifest_node = get_manifest_node('calculated_simple', question_type: 'calculated_question', interaction_type: 'extendedTextInteraction')
+      manifest_node = get_manifest_node("calculated_simple", question_type: "calculated_question", interaction_type: "extendedTextInteraction")
       hash = Qti::AssessmentItemConverter.create_instructure_question(manifest_node: manifest_node, base_dir: CANVAS_FIXTURE_DIR)
       hash[:answers].each { |a| a.delete(:id) }
       expect(hash).to eq CanvasExpected::CALCULATED_SIMPLE
     end
 
     it "converts calculated questions missing formulas (e.g., imported from blackboard)" do
-      manifest_node = get_manifest_node('calculated_without_formula', question_type: 'calculated_question', interaction_type: 'extendedTextInteraction')
+      manifest_node = get_manifest_node("calculated_without_formula", question_type: "calculated_question", interaction_type: "extendedTextInteraction")
       hash = Qti::AssessmentItemConverter.create_instructure_question(manifest_node: manifest_node, base_dir: CANVAS_FIXTURE_DIR)
       hash[:answers].each { |a| a.delete(:id) }
       expect(hash).to eq CanvasExpected::CALCULATED_WITHOUT_FORMULA
     end
 
     it "converts calculated questions (complex)" do
-      manifest_node = get_manifest_node('calculated', question_type: 'calculated_question', interaction_type: 'extendedTextInteraction')
+      manifest_node = get_manifest_node("calculated", question_type: "calculated_question", interaction_type: "extendedTextInteraction")
       hash = Qti::AssessmentItemConverter.create_instructure_question(manifest_node: manifest_node, base_dir: CANVAS_FIXTURE_DIR)
       hash[:answers].each { |a| a.delete(:id) }
       expect(hash).to eq CanvasExpected::CALCULATED_COMPLEX
     end
 
     it "converts numerical questions" do
-      manifest_node = get_manifest_node('numerical', question_type: 'numerical_question', interaction_type: 'extendedTextInteraction')
+      manifest_node = get_manifest_node("numerical", question_type: "numerical_question", interaction_type: "extendedTextInteraction")
       hash = Qti::AssessmentItemConverter.create_instructure_question(manifest_node: manifest_node, base_dir: CANVAS_FIXTURE_DIR)
       hash[:answers].each { |a| a.delete(:id) }
       expect(hash).to eq CanvasExpected::NUMERICAL
     end
 
     it "gets html properties" do
-      expect(get_question_hash(CANVAS_FIXTURE_DIR, 'multiple_choice_html')).to eq({ neutral_comments: "meh",
+      expect(get_question_hash(CANVAS_FIXTURE_DIR, "multiple_choice_html")).to eq({ neutral_comments: "meh",
                                                                                     migration_id: "ie690f9d83784275a4d26a26daee5ebca",
                                                                                     correct_comments_html: "<strong>correct</strong>",
                                                                                     answers: [{ migration_id: "RESPONSE_8080",
@@ -151,7 +151,7 @@ if Qti.migration_executable
     end
 
     it "converts links to external banks" do
-      expect(get_quiz_data(CANVAS_FIXTURE_DIR, 'external_bank')[1][0][:questions]).to eq [{ pick_count: 3,
+      expect(get_quiz_data(CANVAS_FIXTURE_DIR, "external_bank")[1][0][:questions]).to eq [{ pick_count: 3,
                                                                                             title: "group",
                                                                                             questions: [],
                                                                                             question_points: 5,
@@ -172,14 +172,14 @@ if Qti.migration_executable
     end
 
     it "leaves text answers as text" do
-      hash = get_quiz_data(CANVAS_FIXTURE_DIR, 'mc_text_answers').first.first
-      expect(hash[:answers][0][:text]).to eq '<br />'
+      hash = get_quiz_data(CANVAS_FIXTURE_DIR, "mc_text_answers").first.first
+      expect(hash[:answers][0][:text]).to eq "<br />"
       expect(hash[:answers][0][:html]).to be_nil
-      expect(hash[:answers][1][:text]).to eq '<hr />'
+      expect(hash[:answers][1][:text]).to eq "<hr />"
       expect(hash[:answers][1][:html]).to be_nil
-      expect(hash[:answers][2][:text]).to eq '<pre>'
+      expect(hash[:answers][2][:text]).to eq "<pre>"
       expect(hash[:answers][2][:html]).to be_nil
-      expect(hash[:answers][3][:text]).to eq '<n />'
+      expect(hash[:answers][3][:text]).to eq "<n />"
       expect(hash[:answers][3][:html]).to be_nil
       expect(hash[:question_text]).to eq "<div><p>This tag is an inline element that will restart text that follows it onto next line.</p></div>"
     end
@@ -370,7 +370,7 @@ if Qti.migration_executable
                                        { scale: 3, min: 1, max: 10, name: "brian" }],
                            incorrect_comments: "Calculated incorrect. (idiot)",
                            question_name: "Formula 2",
-                           answer_tolerance: '0.1%',
+                           answer_tolerance: "0.1%",
                            correct_comments: "Calculated Correct",
                            formulas: [{ formula: "temp = 1 + x" }, { formula: "temp + x + y + brian" }],
                            points_possible: 15,

@@ -18,10 +18,10 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'barby'
-require 'barby/barcode/qr_code'
-require 'barby/outputter/png_outputter'
-require 'rotp'
+require "barby"
+require "barby/barcode/qr_code"
+require "barby/outputter/png_outputter"
+require "rotp"
 
 class Login::OtpController < ApplicationController
   include Login::Shared
@@ -57,11 +57,11 @@ class Login::OtpController < ApplicationController
       session[:pending_otp_communication_channel_id] = cc.id
     end
     if session[:pending_otp_secret_key] && params[:otp_login].try(:[], :phone_number)
-      path = "#{params[:otp_login][:phone_number].gsub(/[^\d]/, '')}@#{params[:otp_login][:carrier]}"
+      path = "#{params[:otp_login][:phone_number].gsub(/[^\d]/, "")}@#{params[:otp_login][:carrier]}"
       cc = @current_user.communication_channels.sms.by_path(path).first
       cc ||= @current_user.communication_channels.sms.create!(path: path)
       if cc.retired?
-        cc.workflow_state = 'unconfirmed'
+        cc.workflow_state = "unconfirmed"
         cc.save!
       end
       session[:pending_otp_communication_channel_id] = cc.id
@@ -84,7 +84,7 @@ class Login::OtpController < ApplicationController
       if Canvas.redis.get(key)
         force_fail = true
       else
-        Canvas.redis.setex(key, 10.minutes, '1')
+        Canvas.redis.setex(key, 10.minutes, "1")
       end
     end
 
@@ -103,17 +103,17 @@ class Login::OtpController < ApplicationController
         @current_user.save!
       end
 
-      if params[:otp_login][:remember_me] == '1'
+      if params[:otp_login][:remember_me] == "1"
         now = Time.now.utc
-        old_cookie = cookies['canvas_otp_remember_me']
+        old_cookie = cookies["canvas_otp_remember_me"]
         old_cookie = nil unless @current_user.validate_otp_secret_key_remember_me_cookie(old_cookie)
-        cookies['canvas_otp_remember_me'] = {
+        cookies["canvas_otp_remember_me"] = {
           value: @current_user.otp_secret_key_remember_me_cookie(now, old_cookie, request.remote_ip),
           expires: now + 30.days,
           domain: remember_me_cookie_domain,
           httponly: true,
           secure: CanvasRails::Application.config.session_options[:secure],
-          path: '/login'
+          path: "/login"
         }
       end
       if session.delete(:pending_otp)
@@ -123,13 +123,13 @@ class Login::OtpController < ApplicationController
         redirect_to settings_profile_url
       end
     else
-      flash[:error] = t 'errors.invalid_otp', "Invalid verification code, please try again"
+      flash[:error] = t "errors.invalid_otp", "Invalid verification code, please try again"
       redirect_to otp_login_url
     end
   end
 
   def destroy
-    user = if params[:user_id] == 'self'
+    user = if params[:user_id] == "self"
              @current_user
            else
              User.find(params[:user_id])

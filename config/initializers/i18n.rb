@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_dependency 'lazy_presumptuous_i18n_backend'
+require_dependency "lazy_presumptuous_i18n_backend"
 
 Rails.application.config.i18n.enforce_available_locales = true
 Rails.application.config.i18n.fallbacks = true
@@ -140,15 +140,15 @@ module I18nliner
   CallHelpers.extend(RehashArrays)
 end
 
-if ENV['LOLCALIZE']
-  require 'i18n_tasks'
+if ENV["LOLCALIZE"]
+  require "i18n_tasks"
   I18n.extend I18nTasks::Lolcalize
 end
 
 module I18nUtilities
   def before_label(text_or_key, default_value = nil, *args)
     if default_value
-      text_or_key = "labels.#{text_or_key}" unless text_or_key.to_s.start_with?('#')
+      text_or_key = "labels.#{text_or_key}" unless text_or_key.to_s.start_with?("#")
       text_or_key = respond_to?(:t) ? t(text_or_key, default_value, *args) : I18n.t(text_or_key, default_value, *args)
     end
     I18n.t("#before_label_wrapper", "%{text}:", text: text_or_key)
@@ -161,7 +161,7 @@ module I18nUtilities
     end
     text = method if text.nil? && method.is_a?(Symbol)
     if text.is_a?(Symbol)
-      text = "labels.#{text}" unless text.to_s.start_with?('#')
+      text = "labels.#{text}" unless text.to_s.start_with?("#")
       text = t(text, options.delete(:en))
     end
     text = before_label(text) if options.delete(:before)
@@ -242,7 +242,7 @@ module NumberLocalizer
   end
 
   def form_proper_noun_singular_genitive(noun)
-    if I18n.locale.to_s.start_with?('de') && %(s ß x z).include?(noun.last)
+    if I18n.locale.to_s.start_with?("de") && %(s ß x z).include?(noun.last)
       "#{noun}'"
     else
       I18n.t("#proper_noun_singular_genitive", "%{noun}'s", noun: noun)
@@ -285,7 +285,7 @@ I18n.send(:extend, Module.new do
   alias_method :t, :translate
 
   def bigeasy_locale
-    backend.send(:lookup, locale.to_s, "bigeasy_locale") || locale.to_s.tr('-', '_')
+    backend.send(:lookup, locale.to_s, "bigeasy_locale") || locale.to_s.tr("-", "_")
   end
 
   def fullcalendar_locale
@@ -313,7 +313,7 @@ module I18nTemplate
   def render(view, *args)
     old_i18nliner_scope = view.i18nliner_scope
     if @virtual_path
-      view.i18nliner_scope = I18nliner::Scope.new(@virtual_path.gsub(%r{/_?}, '.'))
+      view.i18nliner_scope = I18nliner::Scope.new(@virtual_path.gsub(%r{/_?}, "."))
     end
     super
   ensure
@@ -328,7 +328,7 @@ end
 
 ActionController::Base.class_eval do
   def i18nliner_scope
-    @i18nliner_scope ||= I18nliner::Scope.new(controller_path.tr('/', '.'))
+    @i18nliner_scope ||= I18nliner::Scope.new(controller_path.tr("/", "."))
   end
 end
 
@@ -359,7 +359,7 @@ ActiveRecord::Base.class_eval do
       if options[:allow_nil] && !options[:allow_empty]
         before_validation do |record|
           args.each do |field|
-            record.write_attribute(field, nil) if record.read_attribute(field) == ''
+            record.write_attribute(field, nil) if record.read_attribute(field) == ""
           end
         end
       end
@@ -370,13 +370,13 @@ ActiveRecord::Base.class_eval do
   end
 end
 
-require 'active_support/core_ext/array/conversions'
+require "active_support/core_ext/array/conversions"
 
 module ToSentenceWithSimpleOr
   def to_sentence(options = {})
     if options == :or
-      super(two_words_connector: I18n.t('support.array.or.two_words_connector'),
-            last_word_connector: I18n.t('support.array.or.last_word_connector'))
+      super(two_words_connector: I18n.t("support.array.or.two_words_connector"),
+            last_word_connector: I18n.t("support.array.or.last_word_connector"))
     else
       super
     end

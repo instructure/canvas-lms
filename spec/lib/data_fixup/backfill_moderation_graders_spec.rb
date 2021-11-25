@@ -25,7 +25,7 @@ describe DataFixup::BackfillModerationGraders do
     @course.enroll_student(@student)
     @teacher = User.create!
     @course.enroll_teacher(@teacher)
-    @assignment = @course.assignments.create!(title: 'test')
+    @assignment = @course.assignments.create!(title: "test")
     @assignment.update_columns(moderated_grading: true, grader_count: 1)
     @assignment.grade_student(@student, grade: 90, provisional: true, grader: @teacher)
 

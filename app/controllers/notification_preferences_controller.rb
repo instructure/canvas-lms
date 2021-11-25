@@ -105,7 +105,7 @@ class NotificationPreferencesController < ApplicationController
 
     # Every other category is along the lines of `Due Date`, which is processed correctly by
     # titleize. Make `DiscussionEntry` not a special snowflake here.
-    category = params[:category].casecmp?('discussionentry') ? 'DiscussionEntry' : params[:category].titleize
+    category = params[:category].casecmp?("discussionentry") ? "DiscussionEntry" : params[:category].titleize
 
     policies = NotificationPolicy.find_or_update_for_category(@cc, category, preference[:frequency])
     render json: { notification_preferences: policies.map { |p| notification_policy_json(p, @current_user, session) } }
@@ -140,7 +140,7 @@ class NotificationPreferencesController < ApplicationController
   end
 
   def get_cc
-    params[:user_id] ||= 'self'
+    params[:user_id] ||= "self"
     @user = api_find(User, params[:user_id])
     if params[:communication_channel_id]
       @cc = @user.communication_channels.unretired.find(params[:communication_channel_id])

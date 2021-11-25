@@ -31,7 +31,7 @@ describe Types::RubricAssociationType do
       context: course,
       rubric: rubric,
       association_object: assignment,
-      purpose: 'grading'
+      purpose: "grading"
     )
   end
   let_once(:rubric_assessment) do
@@ -39,34 +39,34 @@ describe Types::RubricAssociationType do
       user: student,
       assessor: teacher,
       rubric_association: rubric_association,
-      assessment_type: 'grading'
+      assessment_type: "grading"
     )
   end
   let(:submission) { assignment.submissions.where(user: student).first }
   let(:submission_type) { GraphQLTypeTester.new(submission, current_user: teacher) }
 
-  it 'works' do
+  it "works" do
     expect(
-      submission_type.resolve('rubricAssessmentsConnection { nodes { rubricAssociation { _id } } }')
+      submission_type.resolve("rubricAssessmentsConnection { nodes { rubricAssociation { _id } } }")
     ).to eq [rubric_association.id.to_s]
   end
 
-  describe 'works for the field' do
-    it 'hide_points' do
+  describe "works for the field" do
+    it "hide_points" do
       expect(
-        submission_type.resolve('rubricAssessmentsConnection { nodes { rubricAssociation { hidePoints } } }')
+        submission_type.resolve("rubricAssessmentsConnection { nodes { rubricAssociation { hidePoints } } }")
       ).to eq [rubric_association.hide_points]
     end
 
-    it 'hide_score_total' do
+    it "hide_score_total" do
       expect(
-        submission_type.resolve('rubricAssessmentsConnection { nodes { rubricAssociation { hideScoreTotal } } }')
+        submission_type.resolve("rubricAssessmentsConnection { nodes { rubricAssociation { hideScoreTotal } } }")
       ).to eq [false]
     end
 
-    it 'use_for_grading' do
+    it "use_for_grading" do
       expect(
-        submission_type.resolve('rubricAssessmentsConnection { nodes { rubricAssociation { useForGrading } } }')
+        submission_type.resolve("rubricAssessmentsConnection { nodes { rubricAssociation { useForGrading } } }")
       ).to eq [false]
     end
   end

@@ -17,13 +17,13 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../../common'
-require_relative '../pages/mgp_page'
+require_relative "../../common"
+require_relative "../pages/mgp_page"
 
 describe "grading periods account page" do
   include_context "in-process server selenium tests"
 
-  context 'with grading periods' do
+  context "with grading periods" do
     let(:grading_standards_page) { GradingStandards::MultipleGradingPeriods.new }
     let(:backend_group_helper) { Factories::GradingPeriodGroupHelper.new }
     let(:backend_period_helper) { Factories::GradingPeriodHelper.new }

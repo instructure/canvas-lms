@@ -77,7 +77,7 @@ module DataFixup::Lti::UpdateCustomParams
 
     def select_by_domains(domains, subdomain_matching)
       # we allow one \w*. before the provided domain
-      subdomain_match = subdomain_matching ? '(\\w*\\.)?' : ''
+      subdomain_match = subdomain_matching ? "(\\w*\\.)?" : ""
 
       ContextExternalTool.active.where(
         '"context_external_tools".url ~ ANY (array[?])', domains.map { |d| "^https?://#{subdomain_match}#{d}/" }

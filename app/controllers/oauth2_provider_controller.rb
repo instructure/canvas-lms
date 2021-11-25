@@ -32,7 +32,7 @@ class OAuth2ProviderController < ApplicationController
       return render
     end
 
-    scopes = (params[:scope] || params[:scopes] || '').split
+    scopes = (params[:scope] || params[:scopes] || "").split
 
     provider = Canvas::OAuth::Provider.new(params[:client_id], params[:redirect_uri], scopes, params[:purpose])
     unless provider.has_valid_key?
@@ -58,7 +58,7 @@ class OAuth2ProviderController < ApplicationController
                                                                 error_description: "Client does not have access to the specified Canvas account.")
     end
 
-    unless params[:response_type] == 'code'
+    unless params[:response_type] == "code"
       return redirect_to Canvas::OAuth::Provider.final_redirect(self,
                                                                 error: "unsupported_response_type",
                                                                 error_description: "Only response_type=code is permitted")
@@ -67,22 +67,22 @@ class OAuth2ProviderController < ApplicationController
     case params[:prompt]
     when nil
       # do nothing, omitting this param is fine
-    when 'none'
+    when "none"
       if !logged_in_user
         return redirect_to Canvas::OAuth::Provider.final_redirect(self,
-                                                                  error: 'login_required',
-                                                                  error_description: 'prompt=none but there is no current session')
+                                                                  error: "login_required",
+                                                                  error_description: "prompt=none but there is no current session")
       elsif !provider.authorized_token?(@current_user, real_user: logged_in_user)
         return redirect_to Canvas::OAuth::Provider.final_redirect(self,
-                                                                  error: 'interaction_required',
-                                                                  error_description: 'prompt=none but a token cannot be granted without user interaction')
+                                                                  error: "interaction_required",
+                                                                  error_description: "prompt=none but a token cannot be granted without user interaction")
       else
         redirect_params = Canvas::OAuth::Provider.final_redirect_params(session[:oauth2], @current_user, logged_in_user)
         return redirect_to Canvas::OAuth::Provider.final_redirect(self, redirect_params)
       end
     else
       return redirect_to Canvas::OAuth::Provider.final_redirect(self,
-                                                                error: 'unsupported_prompt_type',
+                                                                error: "unsupported_prompt_type",
                                                                 error_description: 'prompt must be "none" (or omitted)')
     end
 
@@ -100,7 +100,7 @@ class OAuth2ProviderController < ApplicationController
       @provider = Canvas::OAuth::Provider.new(session[:oauth2][:client_id], session[:oauth2][:redirect_uri], session[:oauth2][:scopes], session[:oauth2][:purpose])
 
       if mobile_device?
-        render layout: 'mobile_auth', action: 'confirm_mobile'
+        render layout: "mobile_auth", action: "confirm_mobile"
       end
     else
       flash[:error] = t("Must submit new OAuth2 request")
@@ -133,7 +133,7 @@ class OAuth2ProviderController < ApplicationController
                 Canvas::OAuth::GrantTypes::AuthorizationCode.new(client_id, secret, params)
               when "refresh_token"
                 Canvas::OAuth::GrantTypes::RefreshToken.new(client_id, secret, params)
-              when 'client_credentials'
+              when "client_credentials"
                 Canvas::OAuth::GrantTypes::ClientCredentials.new(params, request.host_with_port, request.protocol)
               else
                 Canvas::OAuth::GrantTypes::BaseType.new(client_id, secret, params)
@@ -175,7 +175,7 @@ class OAuth2ProviderController < ApplicationController
 
   def oauth_error(exception)
     if @should_not_redirect || params[:redirect_uri] == Canvas::OAuth::Provider::OAUTH2_OOB_URI || params[:redirect_uri].blank?
-      response['WWW-Authenticate'] = 'Canvas OAuth 2.0' if exception.http_status == 401
+      response["WWW-Authenticate"] = "Canvas OAuth 2.0" if exception.http_status == 401
       render(exception.to_render_data)
     else
       redirect_to exception.redirect_uri(params[:redirect_uri])

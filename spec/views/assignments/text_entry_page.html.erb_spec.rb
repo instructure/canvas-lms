@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../views_helper'
+require_relative "../views_helper"
 
 describe "/assignments/text_entry_page" do
   it "renders" do
@@ -26,7 +26,7 @@ describe "/assignments/text_entry_page" do
     view_context(@course, @user)
     ass = assign(:assignment, @course.assignments.create!(title: "some assignment"))
     assign(:submission, ass.submit_homework(@user))
-    render 'assignments/text_entry_page'
+    render "assignments/text_entry_page"
     expect(response).not_to be_nil
   end
 end

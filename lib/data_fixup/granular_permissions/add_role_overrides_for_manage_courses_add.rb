@@ -30,7 +30,7 @@ module DataFixup::GranularPermissions::AddRoleOverridesForManageCoursesAdd
     end
 
     def add_new_role_overrides(base_role_types)
-      roles = Role.where.not(workflow_state: 'deleted').where(base_role_type: base_role_types)
+      roles = Role.where.not(workflow_state: "deleted").where(base_role_type: base_role_types)
 
       roles.each do |role|
         next if role.root_account.site_admin? || role.root_account_id == 0
@@ -53,14 +53,14 @@ module DataFixup::GranularPermissions::AddRoleOverridesForManageCoursesAdd
     end
 
     def create_role_override(role, role_context)
-      if RoleOverride.where(permission: 'manage_courses_add', context: role_context, role: role)
+      if RoleOverride.where(permission: "manage_courses_add", context: role_context, role: role)
                      .exists?
         return
       end
 
       RoleOverride.create!(
         context: role_context,
-        permission: 'manage_courses_add',
+        permission: "manage_courses_add",
         role: role,
         enabled: true
       )

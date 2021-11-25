@@ -36,7 +36,7 @@ describe QuizzesHelper do
 
     it "is false if quiz is available with no unpublished changes" do
       quiz = Quizzes::Quiz.new(context: @course)
-      quiz.workflow_state = 'available'
+      quiz.workflow_state = "available"
       quiz.last_edited_at = 10.minutes.ago
       quiz.published_at   = Time.now
 
@@ -46,7 +46,7 @@ describe QuizzesHelper do
 
     it "is true if quiz is not available" do
       quiz = Quizzes::Quiz.new(context: @course)
-      quiz.workflow_state = 'created'
+      quiz.workflow_state = "created"
 
       allow(self).to receive(:can_publish).and_return(true)
       expect(needs_unpublished_warning?(quiz)).to be_truthy
@@ -54,7 +54,7 @@ describe QuizzesHelper do
 
     it "is true if quiz has unpublished changes" do
       quiz = Quizzes::Quiz.new(context: @course)
-      quiz.workflow_state = 'available'
+      quiz.workflow_state = "available"
       quiz.last_edited_at = Time.now
       quiz.published_at   = 10.minutes.ago
 
@@ -79,99 +79,99 @@ describe QuizzesHelper do
     end
   end
 
-  context 'render_number' do
-    it 'renders numbers' do
-      expect(render_number(1)).to eq '1'
-      expect(render_number(100)).to eq '100'
-      expect(render_number(1.123)).to eq '1.123'
-      expect(render_number(1000.45)).to eq '1,000.45'
-      expect(render_number(1000.45966)).to eq '1,000.45966'
-      expect(render_number('100')).to eq '100'
-      expect(render_number('1.43')).to eq '1.43'
+  context "render_number" do
+    it "renders numbers" do
+      expect(render_number(1)).to eq "1"
+      expect(render_number(100)).to eq "100"
+      expect(render_number(1.123)).to eq "1.123"
+      expect(render_number(1000.45)).to eq "1,000.45"
+      expect(render_number(1000.45966)).to eq "1,000.45966"
+      expect(render_number("100")).to eq "100"
+      expect(render_number("1.43")).to eq "1.43"
     end
 
-    it 'removes trailing zeros' do
-      expect(render_number(1.20000000)).to eq '1.2'
-      expect(render_number(0.10340000)).to eq '0.1034'
+    it "removes trailing zeros" do
+      expect(render_number(1.20000000)).to eq "1.2"
+      expect(render_number(0.10340000)).to eq "0.1034"
     end
 
-    it 'removes trailing zeros and decimal point' do
-      expect(render_number(0.00000000)).to eq '0'
-      expect(render_number(1.00000000)).to eq '1'
-      expect(render_number(100.0)).to eq '100'
+    it "removes trailing zeros and decimal point" do
+      expect(render_number(0.00000000)).to eq "0"
+      expect(render_number(1.00000000)).to eq "1"
+      expect(render_number(100.0)).to eq "100"
     end
 
-    it 'renders percentages' do
-      expect(render_number('1234.456%')).to eq '1,234.456%'
-    end
-  end
-
-  context 'render_score' do
-    it 'renders nil scores' do
-      expect(render_score(nil)).to eq '_'
-    end
-
-    it 'renders with default precision' do
-      expect(render_score(1000.45966)).to eq '1,000.46'
-      expect(render_score('12.3456')).to eq '12.35'
-    end
-
-    it 'supports higher precision' do
-      expect(render_score(1234.4567, 3)).to eq '1,234.457'
-      expect(render_score(0.12345000, 4)).to eq '0.1235'
+    it "renders percentages" do
+      expect(render_number("1234.456%")).to eq "1,234.456%"
     end
   end
 
-  context 'render_quiz_type' do
-    it 'renders a humanized quiz type string' do
-      expect(render_quiz_type('practice_quiz')).to eq "Practice Quiz"
-      expect(render_quiz_type('assignment')).to eq "Graded Quiz"
-      expect(render_quiz_type('graded_survey')).to eq "Graded Survey"
-      expect(render_quiz_type('survey')).to eq "Ungraded Survey"
+  context "render_score" do
+    it "renders nil scores" do
+      expect(render_score(nil)).to eq "_"
     end
 
-    it 'returns nil for an unrecognized quiz_type' do
+    it "renders with default precision" do
+      expect(render_score(1000.45966)).to eq "1,000.46"
+      expect(render_score("12.3456")).to eq "12.35"
+    end
+
+    it "supports higher precision" do
+      expect(render_score(1234.4567, 3)).to eq "1,234.457"
+      expect(render_score(0.12345000, 4)).to eq "0.1235"
+    end
+  end
+
+  context "render_quiz_type" do
+    it "renders a humanized quiz type string" do
+      expect(render_quiz_type("practice_quiz")).to eq "Practice Quiz"
+      expect(render_quiz_type("assignment")).to eq "Graded Quiz"
+      expect(render_quiz_type("graded_survey")).to eq "Graded Survey"
+      expect(render_quiz_type("survey")).to eq "Ungraded Survey"
+    end
+
+    it "returns nil for an unrecognized quiz_type" do
       expect(render_quiz_type(nil)).to be_nil
-      expect(render_quiz_type('made_up_quiz_type')).to be_nil
+      expect(render_quiz_type("made_up_quiz_type")).to be_nil
     end
   end
 
-  context 'render_score_to_keep' do
-    it 'renders which score to keep when passed in a scoring_policy option' do
-      expect(render_score_to_keep('keep_highest')).to eq "Highest"
-      expect(render_score_to_keep('keep_latest')).to eq "Latest"
+  context "render_score_to_keep" do
+    it "renders which score to keep when passed in a scoring_policy option" do
+      expect(render_score_to_keep("keep_highest")).to eq "Highest"
+      expect(render_score_to_keep("keep_latest")).to eq "Latest"
     end
 
-    it 'returns nil for an unrecognized scoring_policy' do
+    it "returns nil for an unrecognized scoring_policy" do
       expect(render_score_to_keep(nil)).to be_nil
-      expect(render_score_to_keep('made_up_scoring_policy')).to be_nil
+      expect(render_score_to_keep("made_up_scoring_policy")).to be_nil
     end
   end
 
-  context 'render_show_responses' do
+  context "render_show_responses" do
     it "answers 'Let Students See Quiz Responses?' when passed a hide_results option" do
-      expect(render_show_responses('always')).to eq "No"
-      expect(render_show_responses('until_after_last_attempt')).to eq "After Last Attempt"
+      expect(render_show_responses("always")).to eq "No"
+      expect(render_show_responses("until_after_last_attempt")).to eq "After Last Attempt"
       expect(render_show_responses(nil)).to eq "Always"
     end
 
     it "returns nil for an unrecognized hide_results value" do
-      expect(render_show_responses('made_up_hide_results')).to be_nil
+      expect(render_show_responses("made_up_hide_results")).to be_nil
     end
   end
 
-  context 'score_out_of_points_possible' do
-    it 'shows single digit scores' do
+  context "score_out_of_points_possible" do
+    it "shows single digit scores" do
       expect(score_out_of_points_possible(1, 5)).to eq "1 out of 5"
       expect(score_out_of_points_possible(0, 9)).to eq "0 out of 9"
     end
 
-    it 'shows 2-decimal precision if necessary' do
+    it "shows 2-decimal precision if necessary" do
       expect(score_out_of_points_possible(0.66666666666, 1)).to eq "0.67 out of 1"
       expect(score_out_of_points_possible(5.23333333333, 10.0)).to eq "5.23 out of 10"
     end
 
-    it 'is wrapped by a span when a CSS class, id, or style is given' do
+    it "is wrapped by a span when a CSS class, id, or style is given" do
       expect(score_out_of_points_possible(1.5, 3, class: "score_value")).to eq( \
         '<span class="score_value">1.5</span> out of 3'
       )
@@ -184,7 +184,7 @@ describe QuizzesHelper do
     end
   end
 
-  context 'fill_in_multiple_blanks_question' do
+  context "fill_in_multiple_blanks_question" do
     before do
       @question_text = %(<input name="question_1_1813d2a7223184cf43e19db6622df40b" 'value={{question_1}}' />)
       @answer_list = []
@@ -196,8 +196,8 @@ describe QuizzesHelper do
       end
     end
 
-    it 'extracts the answers by blank' do
-      @answer_list = [{ blank_id: 'color', answer: 'red' }]
+    it "extracts the answers by blank" do
+      @answer_list = [{ blank_id: "color", answer: "red" }]
 
       html = fill_in_multiple_blanks_question(
         question: { question_text: @question_text },
@@ -208,10 +208,10 @@ describe QuizzesHelper do
       expect(html).to eq %(<input name="question_1_1813d2a7223184cf43e19db6622df40b" 'value=red' readonly="readonly" aria-label='Fill in the blank, read surrounding text' />)
     end
 
-    it 'sanitizes user input' do
+    it "sanitizes user input" do
       malicious_answer_list = [{
-        blank_id: 'color',
-        answer: '><script>alert()</script><img'
+        blank_id: "color",
+        answer: "><script>alert()</script><img"
       }]
 
       html = fill_in_multiple_blanks_question(
@@ -224,7 +224,7 @@ describe QuizzesHelper do
       expect(html).to be_html_safe
     end
 
-    it 'adds an appropriate label' do
+    it "adds an appropriate label" do
       html = fill_in_multiple_blanks_question(
         question: { question_text: @question_text },
         answer_list: @answer_list,
@@ -235,11 +235,11 @@ describe QuizzesHelper do
       expect(html).to match(/Fill in the blank/)
     end
 
-    it 'handles equation img tags in the question text' do
+    it "handles equation img tags in the question text" do
       broken_question_text = "\"<p>Rubisco is a <input class='question_input' type='text' autocomplete='off' style='width: 120px;' name=\\\"question_8_26534e6c8737f63335d5d98ca4136d09\\\" value='{{question_8_26534e6c8737f63335d5d98ca4136d09}}' > responsible for the first enzymatic step of carbon <input class='question_input' type='text' autocomplete='off' style='width: 120px;' name='question_8_f8e302199c03689d87c52e942b56e1f4' value='{{question_8_f8e302199c03689d87c52e942b56e1f4}}' >. <br><br>equation here: <img class=\\\"equation_image\\\" title=\\\"\\sum\\frac{k}{l}\\\" src=\\\"/equation_images/%255Csum%255Cfrac%257Bk%257D%257Bl%257D\\\" alt=\\\"\\sum\\frac{k}{l}\\\"></p>\""
       @answer_list = [
-        { blank_id: 'kindof', answer: 'protein' },
-        { blank_id: 'role', answer: 'fixing' }
+        { blank_id: "kindof", answer: "protein" },
+        { blank_id: "role", answer: "fixing" }
       ]
       html = fill_in_multiple_blanks_question(
         question: { question_text: broken_question_text },
@@ -277,7 +277,7 @@ describe QuizzesHelper do
                                            question: {
                                              question_text: 'some <select class="question_input" name="question_4"><option value="val">val</option></select>'
                                            },
-                                           answer_list: ['val'],
+                                           answer_list: ["val"],
                                            editable: true
                                          })
       expect(html).to eq 'some <select class="question_input" name="question_4" aria-label="Multiple dropdowns, read surrounding text"><option value="val" selected="selected">val</option></select>'
@@ -289,7 +289,7 @@ describe QuizzesHelper do
                                            question: {
                                              question_text: 'some <select class="question_input" name="question_4"><option value="other_val">val</option></select>'
                                            },
-                                           answer_list: ['val'],
+                                           answer_list: ["val"],
                                            editable: true
                                          })
       expect(html).to eq 'some <select class="question_input" name="question_4" aria-label="Multiple dropdowns, read surrounding text"><option value="other_val">val</option></select>'
@@ -301,11 +301,11 @@ describe QuizzesHelper do
                                                   question: {
                                                     question_text: 'some <select class="question_input" name="question_4"><option value="val">val</option></select>'
                                                   },
-                                                  answer_list: ['val'],
+                                                  answer_list: ["val"],
                                                   editable: false
                                                 })
       html = Nokogiri::HTML.fragment(html_string)
-      span_html = html.css('span').first
+      span_html = html.css("span").first
       expect(span_html).not_to be_nil
       expect(html_string).to be_html_safe
     end
@@ -349,31 +349,31 @@ describe QuizzesHelper do
 
   describe "#answer_title" do
     it "builds title if answer is selected" do
-      title = answer_title('foo', true, false, false)
+      title = answer_title("foo", true, false, false)
       expect(title).to eq "title=\"foo. You selected this answer.\""
     end
 
     it "builds title if answer is correct" do
-      title = answer_title('foo', false, true, true)
+      title = answer_title("foo", false, true, true)
       expect(title).to eq "title=\"foo. This was the correct answer.\""
     end
 
     it "returns nil if not selected or correct" do
-      title = answer_title('foo', false, false, false)
+      title = answer_title("foo", false, false, false)
       expect(title).to be_nil
     end
   end
 
   describe "#render_show_correct_answers" do
     context "show_correct_answers is false" do
-      it 'shows No' do
+      it "shows No" do
         quiz = double({ show_correct_answers: false })
         expect(render_show_correct_answers(quiz)).to eq "No"
       end
     end
 
     context "show_correct_answers is true, but nothing else is set" do
-      it 'shows Immediately' do
+      it "shows Immediately" do
         quiz = double({
                         show_correct_answers: true,
                         show_correct_answers_at: nil,
@@ -385,7 +385,7 @@ describe QuizzesHelper do
     end
 
     context "show_correct_answers_last_attempt is true" do
-      it 'shows After Last Attempt' do
+      it "shows After Last Attempt" do
         quiz = double({
                         show_correct_answers: true,
                         show_correct_answers_at: nil,
@@ -397,7 +397,7 @@ describe QuizzesHelper do
     end
 
     context "show_correct_answers_at is set" do
-      it 'shows date of' do
+      it "shows date of" do
         time = 1.day.from_now
         quiz = double({
                         show_correct_answers: true,
@@ -409,7 +409,7 @@ describe QuizzesHelper do
     end
 
     context "hide_correct_answers_at is set" do
-      it 'shows date of' do
+      it "shows date of" do
         time = 1.day.from_now
         quiz = double({
                         show_correct_answers: true,
@@ -421,7 +421,7 @@ describe QuizzesHelper do
     end
 
     context "show_correct_answers_at and hide_correct_answers_at are set" do
-      it 'shows date of' do
+      it "shows date of" do
         time = 1.day.from_now
         time2 = 1.week.from_now
 
@@ -435,7 +435,7 @@ describe QuizzesHelper do
     end
   end
 
-  describe '#render_correct_answer_protection' do
+  describe "#render_correct_answer_protection" do
     it 'provides a useful message when "last attempt"' do
       quiz = double({
                       show_correct_answers_last_attempt: true,
@@ -505,8 +505,8 @@ describe QuizzesHelper do
     let(:quiz) { @quiz }
 
     before do
-      @quiz = double(quiz_type: 'graded_survey')
-      @user_answer = { correct: 'undefined', points: 5 }
+      @quiz = double(quiz_type: "graded_survey")
+      @user_answer = { correct: "undefined", points: 5 }
     end
 
     it "returns user_answer[:points] if correct is true/false" do
@@ -517,14 +517,14 @@ describe QuizzesHelper do
     end
 
     it "returns empty if quiz is practice quiz or assignment" do
-      ['assignment', 'practice_quiz'].each do |quiz_type|
+      ["assignment", "practice_quiz"].each do |quiz_type|
         expect(@quiz).to receive(:quiz_type).and_return quiz_type
         expect(point_value_for_input(user_answer, question)).to eq ""
       end
     end
 
     it "returns points possible for the question if (un)graded survey" do
-      ['survey', 'graded_survey'].each do |quiz_type|
+      ["survey", "graded_survey"].each do |quiz_type|
         expect(@quiz).to receive(:quiz_type).and_return quiz_type
         expect(point_value_for_input(user_answer, question)).to eq(
           question[:points_possible]
@@ -534,31 +534,31 @@ describe QuizzesHelper do
   end
 
   context "#comment_get" do
-    it 'returns _html field if present' do
-      comment = comment_get({ foo_html: '<div>Foo</div>', foo: 'Bar' }, 'foo')
-      expect(comment).to eq '<div>Foo</div>'
+    it "returns _html field if present" do
+      comment = comment_get({ foo_html: "<div>Foo</div>", foo: "Bar" }, "foo")
+      expect(comment).to eq "<div>Foo</div>"
     end
 
-    it 'returns raw field if _html field not present' do
-      comment = comment_get({ foo: 'Bar' }, 'foo')
-      expect(comment).to eq 'Bar'
+    it "returns raw field if _html field not present" do
+      comment = comment_get({ foo: "Bar" }, "foo")
+      expect(comment).to eq "Bar"
     end
 
-    it 'adds MathML if appropriate' do
+    it "adds MathML if appropriate" do
       comment = comment_get({
                               foo_html: '<img class="equation_image" data-equation-content="\coprod"></img>'
-                            }, 'foo')
+                            }, "foo")
       expect(comment).to match(/MathML/)
       expect(comment).to match(/∐/)
     end
 
-    it 'does not add MathML if new math handling feature is active' do
+    it "does not add MathML if new math handling feature is active" do
       def controller.use_new_math_equation_handling?
         true
       end
       comment = comment_get({
                               foo_html: '<img class="equation_image" data-equation-content="\coprod"></img>'
-                            }, 'foo')
+                            }, "foo")
       expect(comment).to eq('<img class="equation_image" data-equation-content="\\coprod">')
     end
   end

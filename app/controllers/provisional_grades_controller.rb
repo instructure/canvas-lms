@@ -185,7 +185,7 @@ class ProvisionalGradesController < ProvisionalGradesBaseController
     pg = @assignment.provisional_grades.find(params[:provisional_grade_id])
     submission = pg.submission
     selection = @assignment.moderated_grading_selections.where(student_id: submission.user_id).first
-    return render json: { message: 'student not in moderation set' }, status: :bad_request unless selection
+    return render json: { message: "student not in moderation set" }, status: :bad_request unless selection
 
     selection.provisional_grade = pg
     selection.save!

@@ -20,7 +20,7 @@
 
 module Types
   class AssessmentRequestType < ApplicationObjectType
-    graphql_name 'AssessmentRequest'
+    graphql_name "AssessmentRequest"
 
     implements Interfaces::TimestampInterface
     implements Interfaces::LegacyIDInterface

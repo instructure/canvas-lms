@@ -20,7 +20,7 @@
 
 describe PluginSetting do
   before(:all) do
-    Canvas::Plugin.register('plugin_setting_test', nil, { encrypted_settings: [:foo], settings: { bar: 'asdf' } })
+    Canvas::Plugin.register("plugin_setting_test", nil, { encrypted_settings: [:foo], settings: { bar: "asdf" } })
   end
 
   it "encrypt/decrypts transparently" do
@@ -33,12 +33,12 @@ describe PluginSetting do
   end
 
   context "dirty_checking" do
-    it 'considers a new object to be dirty' do
+    it "considers a new object to be dirty" do
       s = PluginSetting.new(name: "plugin_setting_test", settings: { bar: "qwerty", foo: "asdf" })
       expect(s.changed?).to be_truthy
     end
 
-    it 'considers a freshly loaded encrypted object to be clean' do
+    it "considers a freshly loaded encrypted object to be clean" do
       PluginSetting.create!(name: "plugin_setting_test", settings: { bar: "qwerty", foo: "asdf" })
       settings = PluginSetting.find_by(name: "plugin_setting_test")
       expect(settings.changed?).to_not be_truthy

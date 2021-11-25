@@ -18,8 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 module CanvasCache
-  require 'canvas_cache/redis'
-  require 'canvas_cache/hash_ring'
+  require "canvas_cache/redis"
+  require "canvas_cache/hash_ring"
 
   class UnconfiguredError < StandardError; end
 

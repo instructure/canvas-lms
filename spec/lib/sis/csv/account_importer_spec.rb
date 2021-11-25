@@ -21,7 +21,7 @@
 describe SIS::CSV::AccountImporter do
   before { account_model }
 
-  it 'skips bad content' do
+  it "skips bad content" do
     before_count = Account.where.not(sis_source_id: nil).count
     importer = process_csv_data(
       "account_id,parent_account_id,name,status",
@@ -40,7 +40,7 @@ describe SIS::CSV::AccountImporter do
                                    "No name given for account A004, skipping"]
   end
 
-  it 'creates accounts' do
+  it "creates accounts" do
     before_count = Account.where.not(sis_source_id: nil).count
     process_csv_data_cleanly(
       "account_id,parent_account_id,name,status",
@@ -51,26 +51,26 @@ describe SIS::CSV::AccountImporter do
     )
     expect(Account.where.not(sis_source_id: nil).count).to eq before_count + 4
 
-    a1 = @account.sub_accounts.where(sis_source_id: 'A001').first
+    a1 = @account.sub_accounts.where(sis_source_id: "A001").first
     expect(a1).not_to be_nil
     expect(a1.parent_account_id).to eq @account.id
     expect(a1.root_account_id).to eq @account.id
-    expect(a1.name).to eq 'Humanities'
+    expect(a1.name).to eq "Humanities"
 
-    a2 = a1.sub_accounts.where(sis_source_id: 'A002').first
+    a2 = a1.sub_accounts.where(sis_source_id: "A002").first
     expect(a2).not_to be_nil
     expect(a2.parent_account_id).to eq a1.id
     expect(a2.root_account_id).to eq @account.id
-    expect(a2.name).to eq 'English'
+    expect(a2.name).to eq "English"
 
-    a3 = a2.sub_accounts.where(sis_source_id: 'A003').first
+    a3 = a2.sub_accounts.where(sis_source_id: "A003").first
     expect(a3).not_to be_nil
     expect(a3.parent_account_id).to eq a2.id
     expect(a3.root_account_id).to eq @account.id
-    expect(a3.name).to eq 'English Literature'
+    expect(a3.name).to eq "English Literature"
   end
 
-  it 'updates the hierarchies of existing accounts' do
+  it "updates the hierarchies of existing accounts" do
     before_count = Account.where.not(sis_source_id: nil).count
     process_csv_data_cleanly(
       "account_id,parent_account_id,name,status",
@@ -84,8 +84,8 @@ describe SIS::CSV::AccountImporter do
     %w[A001 A002 A003 A004].each do |id|
       expect(Account.where(sis_source_id: id).first.parent_account).to eq @account
     end
-    expect(Account.where(sis_source_id: 'A002').first.workflow_state).to eq "deleted"
-    expect(Account.where(sis_source_id: 'A003').first.name).to eq "English Literature"
+    expect(Account.where(sis_source_id: "A002").first.workflow_state).to eq "deleted"
+    expect(Account.where(sis_source_id: "A003").first.name).to eq "English Literature"
 
     process_csv_data_cleanly(
       "account_id,parent_account_id,name,status",
@@ -95,20 +95,20 @@ describe SIS::CSV::AccountImporter do
     )
     expect(Account.where.not(sis_source_id: nil).count).to eq before_count + 4
 
-    a1 = Account.where(sis_source_id: 'A001').first
-    a2 = Account.where(sis_source_id: 'A002').first
-    a3 = Account.where(sis_source_id: 'A003').first
-    a4 = Account.where(sis_source_id: 'A004').first
+    a1 = Account.where(sis_source_id: "A001").first
+    a2 = Account.where(sis_source_id: "A002").first
+    a3 = Account.where(sis_source_id: "A003").first
+    a4 = Account.where(sis_source_id: "A004").first
     expect(a1.parent_account).to eq @account
     expect(a2.parent_account).to eq a1
     expect(a3.parent_account).to eq a2
     expect(a4.parent_account).to eq a2
 
-    expect(Account.where(sis_source_id: 'A002').first.workflow_state).to eq "deleted"
-    expect(Account.where(sis_source_id: 'A003').first.name).to eq "English Literature"
+    expect(Account.where(sis_source_id: "A002").first.workflow_state).to eq "deleted"
+    expect(Account.where(sis_source_id: "A003").first.name).to eq "English Literature"
   end
 
-  it 'does not allow deleting accounts with content' do
+  it "does not allow deleting accounts with content" do
     process_csv_data_cleanly(
       "account_id,parent_account_id,name,status",
       "A001,,Humanities,active",
@@ -123,17 +123,17 @@ describe SIS::CSV::AccountImporter do
     expect(errors).to eq ["Cannot delete the sub_account with ID: A001 because it has active sub accounts."]
   end
 
-  it 'supports sticky fields' do
+  it "supports sticky fields" do
     process_csv_data_cleanly(
       "account_id,parent_account_id,name,status",
       "A001,,Humanities,active"
     )
-    expect(Account.where(sis_source_id: 'A001').first.name).to eq "Humanities"
+    expect(Account.where(sis_source_id: "A001").first.name).to eq "Humanities"
     process_csv_data_cleanly(
       "account_id,parent_account_id,name,status",
       "A001,,Math,active"
     )
-    Account.where(sis_source_id: 'A001').first.tap do |a|
+    Account.where(sis_source_id: "A001").first.tap do |a|
       expect(a.name).to eq "Math"
       a.name = "Science"
       a.save!
@@ -142,10 +142,10 @@ describe SIS::CSV::AccountImporter do
       "account_id,parent_account_id,name,status",
       "A001,,History,active"
     )
-    expect(Account.where(sis_source_id: 'A001').first.name).to eq "Science"
+    expect(Account.where(sis_source_id: "A001").first.name).to eq "Science"
   end
 
-  it 'treats parent_account_id as stickyish' do
+  it "treats parent_account_id as stickyish" do
     process_csv_data_cleanly(
       "account_id,parent_account_id,name,status",
       "A001,,Math,active",
@@ -153,7 +153,7 @@ describe SIS::CSV::AccountImporter do
       "S001,A001,Submath,active",
       { add_sis_stickiness: true }
     )
-    sub = Account.where(sis_source_id: 'S001').first
+    sub = Account.where(sis_source_id: "S001").first
     expect(sub.reload.parent_account.sis_source_id).to eq "A001"
     expect(sub.stuck_sis_fields).to include(:parent_account_id)
 
@@ -171,7 +171,7 @@ describe SIS::CSV::AccountImporter do
     expect(sub.reload.parent_account.sis_source_id).to eq "A002" # should override
   end
 
-  it 'matches headers case-insensitively' do
+  it "matches headers case-insensitively" do
     before_count = Account.where.not(sis_source_id: nil).count
     process_csv_data_cleanly(
       "Account_ID,Parent_Account_ID,Name,Status",
@@ -179,14 +179,14 @@ describe SIS::CSV::AccountImporter do
     )
     expect(Account.where.not(sis_source_id: nil).count).to eq before_count + 1
 
-    a1 = @account.sub_accounts.where(sis_source_id: 'A001').first
+    a1 = @account.sub_accounts.where(sis_source_id: "A001").first
     expect(a1).not_to be_nil
     expect(a1.parent_account_id).to eq @account.id
     expect(a1.root_account_id).to eq @account.id
-    expect(a1.name).to eq 'Humanities'
+    expect(a1.name).to eq "Humanities"
   end
 
-  it 'does not allow the creation of loops in account chains' do
+  it "does not allow the creation of loops in account chains" do
     process_csv_data_cleanly(
       "Account_ID,Parent_Account_ID,Name,Status",
       "A001,,Humanities,active",
@@ -200,7 +200,7 @@ describe SIS::CSV::AccountImporter do
     expect(errors).to eq ["Setting account A001's parent to A002 would create a loop"]
   end
 
-  it 'updates batch id on unchanging accounts' do
+  it "updates batch id on unchanging accounts" do
     process_csv_data_cleanly(
       "Account_ID,Parent_Account_ID,Name,Status",
       "A001,,Humanities,active"
@@ -211,12 +211,12 @@ describe SIS::CSV::AccountImporter do
       "A001,,Humanities,active",
       batch: batch
     )
-    a1 = @account.sub_accounts.where(sis_source_id: 'A001').first
+    a1 = @account.sub_accounts.where(sis_source_id: "A001").first
     expect(a1).not_to be_nil
     expect(a1.sis_batch_id).to eq batch.id
   end
 
-  it 'creates rollback data' do
+  it "creates rollback data" do
     batch1 = @account.sis_batches.create! { |sb| sb.data = {} }
     process_csv_data_cleanly(
       "Account_ID,Parent_Account_ID,Name,Status",
@@ -231,10 +231,10 @@ describe SIS::CSV::AccountImporter do
       "A2,A1,special,deleted",
       batch: batch2
     )
-    expect(batch1.roll_back_data.where(previous_workflow_state: 'non-existent').count).to eq 2
+    expect(batch1.roll_back_data.where(previous_workflow_state: "non-existent").count).to eq 2
     expect(batch2.roll_back_data.count).to eq 1
-    expect(@account.all_accounts.where(sis_source_id: 'A2').take.workflow_state).to eq 'deleted'
+    expect(@account.all_accounts.where(sis_source_id: "A2").take.workflow_state).to eq "deleted"
     batch2.restore_states_for_batch
-    expect(@account.all_accounts.where(sis_source_id: 'A2').take.workflow_state).to eq 'active'
+    expect(@account.all_accounts.where(sis_source_id: "A2").take.workflow_state).to eq "active"
   end
 end

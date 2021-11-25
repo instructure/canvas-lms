@@ -97,8 +97,8 @@ describe ContentParticipation do
     end
   end
 
-  describe 'create' do
-    it 'sets the root_account_id from the submissions assignment' do
+  describe "create" do
+    it "sets the root_account_id from the submissions assignment" do
       participant = ContentParticipation.create_or_update({
                                                             content: @content,
                                                             user: @student,

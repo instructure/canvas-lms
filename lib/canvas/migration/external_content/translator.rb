@@ -78,9 +78,9 @@ module Canvas::Migration::ExternalContent
     CLASSES_TO_TYPES = TYPES_TO_CLASSES.invert.freeze
 
     ALIASED_TYPES = {
-      'context_module_item' => 'context_module_tag',
-      'file' => 'attachment',
-      'page' => 'wiki_page'
+      "context_module_item" => "context_module_tag",
+      "file" => "attachment",
+      "page" => "wiki_page"
     }.freeze
 
     def object_class_for_translation(key)

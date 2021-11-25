@@ -56,7 +56,7 @@ class MessageDispatcher < Delayed::PerformableMethod
       queued.each_with_index do |m, i|
         start_time ||= m.created_at
         previous_time ||= m.created_at
-        partition = Message.infer_partition_table_name('created_at' => m.created_at)
+        partition = Message.infer_partition_table_name("created_at" => m.created_at)
         current_partition ||= partition
 
         if partition != current_partition || i == queued.length - 1
@@ -66,7 +66,7 @@ class MessageDispatcher < Delayed::PerformableMethod
             previous_time = m.created_at
           end
           range_for_partition = start_time..previous_time
-          messages.concat(Message.in_partition('created_at' => start_time).where(id: message_ids, created_at: range_for_partition).to_a)
+          messages.concat(Message.in_partition("created_at" => start_time).where(id: message_ids, created_at: range_for_partition).to_a)
           message_ids = []
           start_time = m.created_at
           current_partition = partition

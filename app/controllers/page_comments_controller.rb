@@ -37,7 +37,7 @@ class PageCommentsController < ApplicationController
           format.html { redirect_to url }
           format.json { render json: @comment }
         else
-          flash[:error] = t('errors.create_failed', "Comment creation failed")
+          flash[:error] = t("errors.create_failed", "Comment creation failed")
           format.html { redirect_to url }
           format.json { render json: @comment.errors, status: :bad_request }
         end

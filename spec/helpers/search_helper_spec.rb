@@ -37,7 +37,7 @@ describe SearchHelper do
       course_with_teacher(active_all: true)
       course_with_teacher(active_all: true, user: @teacher)
       @current_user = @teacher
-      second_section = @course.course_sections.create!(name: 'second section')
+      second_section = @course.course_sections.create!(name: "second section")
       load_all_contexts(context: second_section)
 
       expect(@contexts[:courses].count).to eq 1
@@ -94,7 +94,7 @@ describe SearchHelper do
 
       it "includes sections from shards other than the user's native shard" do
         # needs at least two sections for any sections to show up
-        second_section = @course.course_sections.create!(name: 'second section')
+        second_section = @course.course_sections.create!(name: "second section")
         load_all_contexts
         expect(@contexts[:sections]).to have_key(second_section.id)
       end

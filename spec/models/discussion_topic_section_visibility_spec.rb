@@ -20,8 +20,8 @@
 
 # require 'rails_helper'
 
-require_relative '../selenium/helpers/groups_common'
-require_relative '../lti2_spec_helper'
+require_relative "../selenium/helpers/groups_common"
+require_relative "../lti2_spec_helper"
 
 describe DiscussionTopicSectionVisibility do
   before :once do
@@ -41,7 +41,7 @@ describe DiscussionTopicSectionVisibility do
     )
   end
 
-  it 'forbid non-section-specific topics from having sections' do
+  it "forbid non-section-specific topics from having sections" do
     @announcement.is_section_specific = false
     @announcement.discussion_topic_section_visibilities <<
       DiscussionTopicSectionVisibility.new(
@@ -53,7 +53,7 @@ describe DiscussionTopicSectionVisibility do
     expect(errors).to eq ["Cannot add section to a non-section-specific discussion"]
   end
 
-  it 'forbid sections with wrong context' do
+  it "forbid sections with wrong context" do
     @announcement.is_section_specific = true
     @announcement.discussion_topic_section_visibilities <<
       DiscussionTopicSectionVisibility.new(
@@ -65,7 +65,7 @@ describe DiscussionTopicSectionVisibility do
     expect(errors).to eq ["Section does not belong to course for this discussion topic"]
   end
 
-  it 'valid entry' do
+  it "valid entry" do
     @announcement.is_section_specific = true
     @announcement.discussion_topic_section_visibilities <<
       DiscussionTopicSectionVisibility.new(
@@ -95,7 +95,7 @@ describe DiscussionTopicSectionVisibility do
     )
   end
 
-  it 'duplicates' do
+  it "duplicates" do
     course3 = course_factory({ course_name: "Course 3" })
     section3a = course3.course_sections.create!
     section3b = course3.course_sections.create!

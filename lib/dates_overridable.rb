@@ -28,9 +28,9 @@ module DatesOverridable
 
   def self.included(base)
     base.has_many :assignment_overrides, dependent: :destroy, inverse_of: base.table_name.singularize
-    base.has_many :active_assignment_overrides, -> { where(workflow_state: 'active') }, class_name: 'AssignmentOverride', inverse_of: base.table_name.singularize
-    base.has_many :assignment_override_students, -> { where(workflow_state: 'active') }, dependent: :destroy
-    base.has_many :all_assignment_override_students, class_name: 'AssignmentOverrideStudent', dependent: :destroy
+    base.has_many :active_assignment_overrides, -> { where(workflow_state: "active") }, class_name: "AssignmentOverride", inverse_of: base.table_name.singularize
+    base.has_many :assignment_override_students, -> { where(workflow_state: "active") }, dependent: :destroy
+    base.has_many :all_assignment_override_students, class_name: "AssignmentOverrideStudent", dependent: :destroy
 
     base.validates_associated :active_assignment_overrides
 
@@ -122,8 +122,8 @@ module DatesOverridable
                 .pluck(:course_id, :type, :associated_user_id).each do |(course_id, type, associated_user_id)|
         relative_course_id = Shard.relative_id_for(course_id, Shard.current, current_shard)
         bucket = case type
-                 when 'ObserverEnrollment' then :observer
-                 when 'StudentEnrollment', 'StudentViewEnrollment' then :student
+                 when "ObserverEnrollment" then :observer
+                 when "StudentEnrollment", "StudentViewEnrollment" then :student
                  # when 'TeacherEnrollment', 'TaEnrollment', 'DesignerEnrollment' then :admin
                  else; :admin
                  end
@@ -190,7 +190,7 @@ module DatesOverridable
 
     if all_dates
       # remove base if all sections are set
-      overrides = all_dates.select { |d| d[:set_type] == 'CourseSection' }
+      overrides = all_dates.select { |d| d[:set_type] == "CourseSection" }
       if overrides.count > 0 && overrides.count == context.active_section_count
         all_dates.delete_if { |d| d[:base] }
       end

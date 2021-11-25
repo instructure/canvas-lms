@@ -19,24 +19,24 @@
 #
 
 class Mutations::CreateDiscussionEntryDraft < Mutations::BaseMutation
-  graphql_name 'CreateDiscussionEntryDraft'
+  graphql_name "CreateDiscussionEntryDraft"
 
   argument :discussion_topic_id,
            ID,
            required: true,
-           prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func('DiscussionTopic')
+           prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("DiscussionTopic")
   argument :discussion_entry_id,
            ID,
            required: false,
-           prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func('DiscussionEntry')
+           prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("DiscussionEntry")
   argument :parent_id,
            ID,
            required: false,
-           prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func('DiscussionEntry')
+           prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("DiscussionEntry")
   argument :file_id,
            ID,
            required: false,
-           prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func('Attachment')
+           prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Attachment")
   argument :message, String, required: true
   argument :include_reply_preview, Boolean, required: false
 
@@ -88,9 +88,9 @@ class Mutations::CreateDiscussionEntryDraft < Mutations::BaseMutation
 
     { discussion_entry_draft: draft }
   rescue ActiveRecord::RecordNotFound
-    raise GraphQL::ExecutionError, 'not found'
+    raise GraphQL::ExecutionError, "not found"
   rescue InsufficientPermissionsError
-    validation_error(I18n.t('Insufficient Permissions'))
+    validation_error(I18n.t("Insufficient Permissions"))
   end
 
   class InsufficientPermissionsError < StandardError; end

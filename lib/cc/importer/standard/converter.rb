@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'nokogiri'
+require "nokogiri"
 
 module CC::Importer::Standard
   class Converter < Canvas::Migration::Migrator
@@ -97,8 +97,8 @@ module CC::Importer::Standard
     def find_file_migration_id(path)
       return unless path.present?
 
-      mig_id = @file_path_migration_id[path] || @file_path_migration_id[path.gsub(%r{\$[^$]*\$|\.\./}, '')] ||
-               @file_path_migration_id[path.gsub(%r{\$[^$]*\$|\.\./}, '').sub(WEB_RESOURCES_FOLDER + '/', '')]
+      mig_id = @file_path_migration_id[path] || @file_path_migration_id[path.gsub(%r{\$[^$]*\$|\.\./}, "")] ||
+               @file_path_migration_id[path.gsub(%r{\$[^$]*\$|\.\./}, "").sub(WEB_RESOURCES_FOLDER + "/", "")]
 
       unless mig_id
         full_path = @package_root.item_path(path)
@@ -107,7 +107,7 @@ module CC::Importer::Standard
           # try to make it work even if the file wasn't technically included in the manifest :/
           mig_id = Digest::MD5.hexdigest(path)
           file = { path_name: path, migration_id: mig_id,
-                   file_name: File.basename(path), type: 'FILE_TYPE' }
+                   file_name: File.basename(path), type: "FILE_TYPE" }
           add_course_file(file)
         end
       end
@@ -116,11 +116,11 @@ module CC::Importer::Standard
     end
 
     def get_canvas_att_replacement_url(path, resource_dir = nil)
-      if path.start_with?('../') && (url = get_canvas_att_replacement_url(path.sub('../', ''), resource_dir))
+      if path.start_with?("../") && (url = get_canvas_att_replacement_url(path.sub("../", ""), resource_dir))
         return url
       end
 
-      path = path[1..] if path.start_with?('/')
+      path = path[1..] if path.start_with?("/")
       mig_id = nil
       if resource_dir && resource_dir != "."
         mig_id = find_file_migration_id(File.join(resource_dir, path))
@@ -128,7 +128,7 @@ module CC::Importer::Standard
       mig_id ||= find_file_migration_id(path)
 
       unless mig_id
-        path = path.gsub(%r{\$[^$]*\$|\.\./}, '')
+        path = path.gsub(%r{\$[^$]*\$|\.\./}, "")
         if (key = @file_path_migration_id.keys.detect { |k| k.end_with?(path) })
           mig_id = @file_path_migration_id[key]
         end
@@ -144,8 +144,8 @@ module CC::Importer::Standard
     def add_course_file(file, overwrite = false)
       return unless file[:path_name]
 
-      file[:path_name].sub!(WEB_RESOURCES_FOLDER + '/', '')
-      file[:path_name] = file[:path_name][1..] if file[:path_name].start_with?('/')
+      file[:path_name].sub!(WEB_RESOURCES_FOLDER + "/", "")
+      file[:path_name] = file[:path_name][1..] if file[:path_name].start_with?("/")
       if @file_path_migration_id[file[:path_name]] && overwrite
         @course[:file_map].delete @file_path_migration_id[file[:path_name]]
       elsif @file_path_migration_id[file[:path_name]]
@@ -168,7 +168,7 @@ module CC::Importer::Standard
           val = URI.unescape(node[attr])
           begin
             if FILEBASE_REGEX.match?(val)
-              val.gsub!(FILEBASE_REGEX, '')
+              val.gsub!(FILEBASE_REGEX, "")
               if (new_url = get_canvas_att_replacement_url(val, resource_dir))
                 node[attr] = URI.escape(new_url)
 
@@ -185,7 +185,7 @@ module CC::Importer::Standard
           end
         end
       end
-      (doc.at_css('body') || doc).inner_html
+      (doc.at_css("body") || doc).inner_html
     end
 
     def find_assignment(migration_id)
@@ -208,9 +208,9 @@ module CC::Importer::Standard
 
     # these types all came from https://www.imsglobal.org/cc/ccv1p3/imscc_Overview-v1p3.html#toc-7
     UNSUPPORTED_RESOURCE_TYPES = [
-      ['imsapip_zipv1p0', -> { I18n.t("This package includes APIP file(s), which are not compatible with Canvas and were not included in the import.") }],
-      ['imsiwb_iwbv1p0', -> { I18n.t("This package includes IWB file(s), which are not compatible with Canvas and were not included in the import.") }],
-      ['idpfepub_epubv3p0', -> { I18n.t("This package includes EPub3 file(s), which are not compatible with Canvas and were not included in the import.") }]
+      ["imsapip_zipv1p0", -> { I18n.t("This package includes APIP file(s), which are not compatible with Canvas and were not included in the import.") }],
+      ["imsiwb_iwbv1p0", -> { I18n.t("This package includes IWB file(s), which are not compatible with Canvas and were not included in the import.") }],
+      ["idpfepub_epubv3p0", -> { I18n.t("This package includes EPub3 file(s), which are not compatible with Canvas and were not included in the import.") }]
     ].freeze
 
     def check_for_unsupported_resources
@@ -220,7 +220,7 @@ module CC::Importer::Standard
         end
       end
 
-      if @manifest.at_css('metadata curriculumStandardsMetadata')
+      if @manifest.at_css("metadata curriculumStandardsMetadata")
         add_warning(I18n.t("This package includes Curriculum Standards, which are not compatible with Canvas and were not included in the import."))
       end
     end

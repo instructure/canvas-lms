@@ -54,7 +54,7 @@ module CC
     end
 
     def create_document
-      @file = File.new(File.join(export_dir, MANIFEST), 'w')
+      @file = File.new(File.join(export_dir, MANIFEST), "w")
       @document = Builder::XmlMarkup.new(target: @file, indent: 2)
       @document.instruct!
       @document.manifest({ "identifier" => create_key(course, "common_cartridge_") }.merge(namespace_hash)) do |manifest_node|
@@ -66,20 +66,20 @@ module CC
         begin
           Organization.create_organizations(self, manifest_node)
         rescue
-          add_error(I18n.t('course_exports.errors.organization', "Failed to generate organization structure."), $!)
+          add_error(I18n.t("course_exports.errors.organization", "Failed to generate organization structure."), $!)
         end
         set_progress(10)
 
         begin
           @resource = Resource.create_resources(self, manifest_node)
         rescue
-          add_error(I18n.t('course_exports.errors.resources', "Failed to link some resources."), $!)
+          add_error(I18n.t("course_exports.errors.resources", "Failed to link some resources."), $!)
         end
       end # manifest
 
       # write any errors to the manifest file
       unless @exporter.errors.empty?
-        @document.comment! I18n.t('course_exports.errors_list_message', "Export errors for export %{export_id}:", export_id: @exporter.export_id)
+        @document.comment! I18n.t("course_exports.errors_list_message", "Export errors for export %{export_id}:", export_id: @exporter.export_id)
         @exporter.errors.each do |error|
           @document.comment! error.first
         end

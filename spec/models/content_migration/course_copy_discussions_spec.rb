@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative 'course_copy_helper'
+require_relative "course_copy_helper"
 
 describe ContentMigration do
   context "course copy discussions" do
@@ -78,7 +78,7 @@ describe ContentMigration do
     end
 
     it "copies group setting" do
-      group_category = @copy_from.group_categories.create!(name: 'blah')
+      group_category = @copy_from.group_categories.create!(name: "blah")
       topic = @copy_from.discussion_topics.create! group_category: group_category
 
       run_course_copy
@@ -89,9 +89,9 @@ describe ContentMigration do
     end
 
     it "assigns group discussions to a group with a matching name in the destination course" do
-      group_category = @copy_from.group_categories.create!(name: 'blah')
+      group_category = @copy_from.group_categories.create!(name: "blah")
       topic = @copy_from.discussion_topics.create! group_category: group_category
-      @copy_to.group_categories.create!(name: 'blah')
+      @copy_to.group_categories.create!(name: "blah")
 
       run_course_copy
 
@@ -104,7 +104,7 @@ describe ContentMigration do
       graded_discussion_topic(context: @copy_from)
 
       # Should not fail if the destination has a group
-      @copy_to.groups.create!(name: 'some random group of people')
+      @copy_to.groups.create!(name: "some random group of people")
 
       @cm.copy_options = {
         assignments: { mig_id(@assignment) => "1" },
@@ -137,7 +137,7 @@ describe ContentMigration do
       Timecop.freeze(2.hours.from_now) do
         run_jobs
         to_ann.reload
-        expect(to_ann.workflow_state).to eq 'active'
+        expect(to_ann.workflow_state).to eq "active"
       end
 
       Timecop.freeze(26.hours.from_now) do
@@ -175,7 +175,7 @@ describe ContentMigration do
       Timecop.freeze(3.days.from_now) do
         run_jobs
         to_ann.reload
-        expect(to_ann.workflow_state).to eq 'active'
+        expect(to_ann.workflow_state).to eq "active"
       end
 
       Timecop.freeze(6.days.from_now) do
@@ -199,7 +199,7 @@ describe ContentMigration do
     end
 
     it "implicitly copies files attached to topics" do
-      att = Attachment.create!(filename: 'test.txt', display_name: "testing.txt", uploaded_data: StringIO.new('file'),
+      att = Attachment.create!(filename: "test.txt", display_name: "testing.txt", uploaded_data: StringIO.new("file"),
                                folder: Folder.root_folders(@copy_from).first, context: @copy_from)
       topic = @copy_from.discussion_topics.new(message: "howdy", title: "title")
       topic.attachment = att
@@ -219,7 +219,7 @@ describe ContentMigration do
 
     it "does not copy deleted assignment attached to topic" do
       graded_discussion_topic(context: @copy_from)
-      @assignment.workflow_state = 'deleted'
+      @assignment.workflow_state = "deleted"
       @assignment.save!
 
       @topic.reload
@@ -233,7 +233,7 @@ describe ContentMigration do
 
     it "copies the assignment group and grading standard in complete copy" do
       graded_discussion_topic(context: @copy_from)
-      gs = make_grading_standard(@copy_from, title: 'One')
+      gs = make_grading_standard(@copy_from, title: "One")
       group = @copy_from.assignment_groups.create!(name: "new group")
       @assignment.assignment_group = group
       @assignment.grading_standard = gs
@@ -247,12 +247,12 @@ describe ContentMigration do
 
     it "copies the grading standard (but not assignment group) in selective copy" do
       graded_discussion_topic(context: @copy_from)
-      gs = make_grading_standard(@copy_from, title: 'One')
+      gs = make_grading_standard(@copy_from, title: "One")
       group = @copy_from.assignment_groups.create!(name: "new group")
       @assignment.assignment_group = group
       @assignment.grading_standard = gs
       @assignment.save!
-      @cm.copy_options = { 'everything' => '0', 'discussion_topics' => { mig_id(@topic) => "1" } }
+      @cm.copy_options = { "everything" => "0", "discussion_topics" => { mig_id(@topic) => "1" } }
       run_course_copy
       new_topic = @copy_to.discussion_topics.where(migration_id: mig_id(@topic)).first
       expect(new_topic.assignment).to be_present
@@ -262,18 +262,18 @@ describe ContentMigration do
 
     it "does not copy the assignment group and grading standard in selective export" do
       graded_discussion_topic(context: @copy_from)
-      gs = make_grading_standard(@copy_from, title: 'One')
+      gs = make_grading_standard(@copy_from, title: "One")
       group = @copy_from.assignment_groups.create!(name: "new group")
       @assignment.assignment_group = group
       @assignment.grading_standard = gs
       @assignment.save!
       # test that we neither export nor reference the grading standard and assignment group
-      decoy_gs = make_grading_standard(@copy_to, title: 'decoy')
+      decoy_gs = make_grading_standard(@copy_to, title: "decoy")
       decoy_gs.update_attribute :migration_id, mig_id(gs)
-      decoy_ag = @copy_to.assignment_groups.create! name: 'decoy'
+      decoy_ag = @copy_to.assignment_groups.create! name: "decoy"
       decoy_ag.update_attribute :migration_id, mig_id(group)
       run_export_and_import do |export|
-        export.selected_content = { 'discussion_topics' => { mig_id(@topic) => "1" } }
+        export.selected_content = { "discussion_topics" => { mig_id(@topic) => "1" } }
       end
       new_topic = @copy_to.discussion_topics.where(migration_id: mig_id(@topic)).first
       expect(new_topic.assignment).to be_present
@@ -284,10 +284,10 @@ describe ContentMigration do
     end
 
     it "copies references to locked discussions even if manage_content is not true" do
-      @role = Account.default.roles.build name: 'SuperTeacher'
-      @role.base_role_type = 'TeacherEnrollment'
+      @role = Account.default.roles.build name: "SuperTeacher"
+      @role.base_role_type = "TeacherEnrollment"
       @role.save!
-      @copy_to.enroll_user(@user, 'TeacherEnrollment', role: @role)
+      @copy_to.enroll_user(@user, "TeacherEnrollment", role: @role)
 
       Account.default.role_overrides.create!(permission: "manage_content", role: teacher_role, enabled: false)
 

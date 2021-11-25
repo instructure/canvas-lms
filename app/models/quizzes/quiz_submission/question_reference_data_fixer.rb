@@ -66,7 +66,7 @@ class Quizzes::QuizSubmission::QuestionReferenceDataFixer
               question_references_fixed = TRUE
             SQL
           else
-            quiz_submission.update_column('question_references_fixed', true)
+            quiz_submission.update_column("question_references_fixed", true)
           end
 
           # Now pass over all the version models:

@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../spec_helper'
+require_relative "../spec_helper"
 
 describe BroadcastPolicy::InstanceMethods do
   let(:harness_class) do
@@ -65,7 +65,7 @@ describe BroadcastPolicy::InstanceMethods do
   let(:default_attrs) do
     {
       id: 1,
-      workflow_state: 'active',
+      workflow_state: "active",
       score: 5.0
     }
   end
@@ -76,23 +76,23 @@ describe BroadcastPolicy::InstanceMethods do
 
   describe "#changed_in_state" do
     it "is false if the field has not changed" do
-      expect(harness.changed_in_state('active', fields: :score)).to be_falsey
+      expect(harness.changed_in_state("active", fields: :score)).to be_falsey
     end
 
     it "is true if field has changed" do
       harness.changed_attributes[:score] = 3.0
-      expect(harness.changed_in_state('active', fields: :score)).to be_truthy
+      expect(harness.changed_in_state("active", fields: :score)).to be_truthy
     end
   end
 
   describe "#changed_state" do
     it "is false if the state has not changed" do
-      expect(harness.changed_state('active', 'deleted')).to be_falsey
+      expect(harness.changed_state("active", "deleted")).to be_falsey
     end
 
     it "is true if state has changed" do
-      harness.changed_attributes[:workflow_state] = 'deleted'
-      expect(harness.changed_state('active', 'deleted')).to be_truthy
+      harness.changed_attributes[:workflow_state] = "deleted"
+      expect(harness.changed_state("active", "deleted")).to be_truthy
     end
   end
 

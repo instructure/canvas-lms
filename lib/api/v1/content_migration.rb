@@ -23,7 +23,7 @@ module Api::V1::ContentMigration
   include Api::V1::Attachment
 
   def content_migrations_json(migrations, current_user, session)
-    migrations.reject { |m| m.migration_settings['hide_from_index'] }.map do |migration|
+    migrations.reject { |m| m.migration_settings["hide_from_index"] }.map do |migration|
       content_migration_json(migration, current_user, session)
     end
   end
@@ -31,16 +31,16 @@ module Api::V1::ContentMigration
   def content_migration_json(migration, current_user, session, attachment_preflight = nil, includes = [])
     json = api_json(migration, current_user, session, only: %w[id user_id workflow_state started_at finished_at migration_type])
     json[:created_at] = migration.created_at
-    if json[:workflow_state] == 'created'
-      json[:workflow_state] = 'pre_processing'
-    elsif json[:workflow_state] == 'pre_process_error'
-      json[:workflow_state] = 'failed'
-    elsif json[:workflow_state] == 'exported' && !migration.import_immediately?
-      json[:workflow_state] = 'waiting_for_select'
+    if json[:workflow_state] == "created"
+      json[:workflow_state] = "pre_processing"
+    elsif json[:workflow_state] == "pre_process_error"
+      json[:workflow_state] = "failed"
+    elsif json[:workflow_state] == "exported" && !migration.import_immediately?
+      json[:workflow_state] = "waiting_for_select"
     elsif %w[exporting importing exported].member?(json[:workflow_state])
-      json[:workflow_state] = 'running'
-    elsif json[:workflow_state] == 'imported'
-      json[:workflow_state] = 'completed'
+      json[:workflow_state] = "running"
+    elsif json[:workflow_state] == "imported"
+      json[:workflow_state] = "completed"
     end
     json[:migration_issues_url] = api_v1_course_content_migration_migration_issue_list_url(migration.context_id, migration.id)
     json[:migration_issues_count] = migration.migration_issues.count
@@ -59,18 +59,18 @@ module Api::V1::ContentMigration
     end
 
     if migration.job_progress
-      json['progress_url'] = polymorphic_url([:api_v1, migration.job_progress])
+      json["progress_url"] = polymorphic_url([:api_v1, migration.job_progress])
     end
     if (plugin = Canvas::Plugin.find(migration.migration_type))
       if plugin.meta[:display_name].respond_to?(:call)
-        json['migration_type_title'] = plugin.meta[:display_name].call
+        json["migration_type_title"] = plugin.meta[:display_name].call
       elsif plugin.meta[:name].respond_to?(:call)
-        json['migration_type_title'] = plugin.meta[:name].call
+        json["migration_type_title"] = plugin.meta[:name].call
       end
     end
 
     # For easier auditing for support requests
-    if Account.site_admin.grants_right?(current_user, :read) || (includes || []).include?('audit_info')
+    if Account.site_admin.grants_right?(current_user, :read) || (includes || []).include?("audit_info")
       json[:audit_info] = migration.respond_to?(:slice) &&
                           migration.slice(:id,
                                           :user_id,

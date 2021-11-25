@@ -29,9 +29,9 @@ module Factories
 
     valid_attrs = %i[title alert_type workflow_state action_date student observer]
     default_attrs = {
-      title: 'value for type',
-      alert_type: 'course_announcement',
-      workflow_state: 'unread',
+      title: "value for type",
+      alert_type: "course_announcement",
+      workflow_state: "unread",
       action_date: Time.zone.now
     }
 

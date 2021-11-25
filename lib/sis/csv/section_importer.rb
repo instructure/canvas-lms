@@ -23,7 +23,7 @@ module SIS
     class SectionImporter < CSVBaseImporter
       def self.section_csv?(row)
         # This matcher works because an enrollment doesn't have name
-        row.include?('section_id') && row.include?('name')
+        row.include?("section_id") && row.include?("name")
       end
 
       def self.identifying_fields
@@ -38,16 +38,16 @@ module SIS
             start_date = nil
             end_date = nil
             begin
-              start_date = Time.zone.parse(row['start_date']) if row['start_date'].present?
-              end_date = Time.zone.parse(row['end_date']) if row['end_date'].present?
+              start_date = Time.zone.parse(row["start_date"]) if row["start_date"].present?
+              end_date = Time.zone.parse(row["end_date"]) if row["end_date"].present?
             rescue
-              SisBatch.add_error(csv, "Bad date format for section #{row['section_id']}", sis_batch: @batch, row: row['lineno'], row_info: row)
+              SisBatch.add_error(csv, "Bad date format for section #{row["section_id"]}", sis_batch: @batch, row: row["lineno"], row_info: row)
             end
 
             begin
-              importer.add_section(row['section_id'], row['course_id'], row['name'], row['status'], start_date, end_date, row['integration_id'])
+              importer.add_section(row["section_id"], row["course_id"], row["name"], row["status"], start_date, end_date, row["integration_id"])
             rescue ImportError => e
-              SisBatch.add_error(csv, e.to_s, sis_batch: @batch, row: row['lineno'], row_info: row)
+              SisBatch.add_error(csv, e.to_s, sis_batch: @batch, row: row["lineno"], row_info: row)
             end
           end
         end

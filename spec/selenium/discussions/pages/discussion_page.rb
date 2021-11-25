@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-require_relative '../../common'
+require_relative "../../common"
 
 class Discussion
   class << self
@@ -27,11 +27,11 @@ class Discussion
     # ---------------------- Elements ----------------------
 
     def discussion_page_body
-      f('body')
+      f("body")
     end
 
     def create_reply_button
-      f('.discussion-reply-box')
+      f(".discussion-reply-box")
     end
 
     def post_reply_button
@@ -39,11 +39,11 @@ class Discussion
     end
 
     def add_media_button
-      f('.mce-i-media')
+      f(".mce-i-media")
     end
 
     def close_media_modal_button
-      f('.mce-close')
+      f(".mce-close")
     end
 
     def media_modal

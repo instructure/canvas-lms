@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-require 'bigdecimal/util'
+require "bigdecimal/util"
 module Quizzes
   class SubmissionGrader
     class AlreadyGradedError < RuntimeError; end
@@ -45,7 +45,7 @@ module Quizzes
       @submission.workflow_state = "complete"
       user_answers.each do |answer|
         if answer[:correct] == "undefined" && !@submission.quiz.survey?
-          @submission.workflow_state = 'pending_review'
+          @submission.workflow_state = "pending_review"
         end
       end
       @submission.score_before_regrade = nil
@@ -144,11 +144,11 @@ module Quizzes
       # we'll need this method to return true. if the method is highest,
       # the kept score only updates if it's higher than the original score
       quiz = @submission.quiz
-      return true if quiz.scoring_policy != 'keep_highest' || quiz.points_possible.to_i == 0 || original_score.nil?
+      return true if quiz.scoring_policy != "keep_highest" || quiz.points_possible.to_i == 0 || original_score.nil?
       # when a submission is pending review, no outcome results are generated.
       # if the submission transitions to completed, then we need this method
       # to return true, even if the kept score isn't changing, so outcome results are generated.
-      return true if original_workflow_state == 'pending_review' && @submission.workflow_state == 'complete'
+      return true if original_workflow_state == "pending_review" && @submission.workflow_state == "complete"
 
       @submission.kept_score && @submission.kept_score > original_score
     end
@@ -162,7 +162,7 @@ module Quizzes
 
       # equivalent to AssessmentQuestionBank#learning_outcome_alignments, but for multiple banks at once
       [questions, ContentTag.learning_outcome_alignments.active.where(
-        content_type: 'AssessmentQuestionBank',
+        content_type: "AssessmentQuestionBank",
         content_id: bank_ids
       )
                             .preload(:learning_outcome, :context).to_a]

@@ -18,8 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../../spec_helper'
-require_relative '../../lti_spec_helper'
+require_relative "../../spec_helper"
+require_relative "../../lti_spec_helper"
 require_dependency "lti/app_launch_collator"
 
 module Lti
@@ -28,11 +28,11 @@ module Lti
 
     let(:account) { Account.create }
     let(:resource_handler) do
-      ResourceHandler.create(resource_type_code: 'code', name: 'resource name', tool_proxy: tool_proxy)
+      ResourceHandler.create(resource_type_code: "code", name: "resource name", tool_proxy: tool_proxy)
     end
 
     describe "#launch_definitions" do
-      describe 'selection properties' do
+      describe "selection properties" do
         subject do
           Lti::AppLaunchCollator.launch_definitions(
             [tool],
@@ -45,22 +45,22 @@ module Lti
         let(:tool) do
           ContextExternalTool.new(
             name: "Selection Test Tool",
-            url: 'https://www.test.tool.com',
+            url: "https://www.test.tool.com",
             consumer_key: "key",
             shared_secret: "secret",
             settings: settings
           )
         end
 
-        context 'with a message type that allows content selection' do
+        context "with a message type that allows content selection" do
           let(:settings) do
             {
               assignment_selection: {
-                message_type: 'LtiDeepLinkingRequest',
+                message_type: "LtiDeepLinkingRequest",
                 selection_width: 1000
               },
               resource_selection: {
-                message_type: 'LtiDeepLinkingRequest',
+                message_type: "LtiDeepLinkingRequest",
                 selection_width: 500
               }
             }
@@ -74,7 +74,7 @@ module Lti
             let(:settings) do
               {
                 assignment_selection: {
-                  message_type: 'LtiDeepLinkingRequest',
+                  message_type: "LtiDeepLinkingRequest",
                   selection_width: 1000
                 }
               }
@@ -86,14 +86,14 @@ module Lti
           end
         end
 
-        context 'whith a message type that does not allow content selection' do
-          it 'does not set selection properties' do
+        context "whith a message type that does not allow content selection" do
+          it "does not set selection properties" do
             expect(subject.dig(:placements, :assignment_selection, :selection_width)).to be_nil
           end
         end
       end
 
-      it 'returns lti2 launch definitions' do
+      it "returns lti2 launch definitions" do
         tp = create_tool_proxy
         tp.bindings.create(context: account)
         rh = create_resource_handler(tp)
@@ -128,7 +128,7 @@ module Lti
                                  })
       end
 
-      it 'returns an external tool definition' do
+      it "returns an external tool definition" do
         tool = new_valid_external_tool(account)
         placements = %w[assignment_selection link_selection resource_selection]
         tools_collection = described_class.bookmarked_collection(account, placements).paginate(per_page: 100).to_a
@@ -157,16 +157,16 @@ module Lti
                                  })
       end
 
-      it 'uses localized labels' do
+      it "uses localized labels" do
         tool = account.context_external_tools.new(name: "bob", consumer_key: "test", shared_secret: "secret",
                                                   url: "http://example.com")
 
         assignment_selection = {
-          text: 'this should not be the title',
-          url: 'http://www.example.com',
+          text: "this should not be the title",
+          url: "http://www.example.com",
           labels: {
-            'en' => 'English Label',
-            'sp' => 'Spanish Label'
+            "en" => "English Label",
+            "sp" => "Spanish Label"
           }
         }
 
@@ -181,7 +181,7 @@ module Lti
         expect(definitions[0][:name]).to eq "English Label"
       end
 
-      it 'returns resource_selection tools' do
+      it "returns resource_selection tools" do
         tool = new_valid_external_tool(account, true)
         placements = %w[assignment_selection link_selection resource_selection]
         tools_collection = described_class.bookmarked_collection(account, placements).paginate(per_page: 100).to_a
@@ -217,7 +217,7 @@ module Lti
                                  })
       end
 
-      it 'returns an external tool and a message handler' do
+      it "returns an external tool and a message handler" do
         tp = create_tool_proxy
         tp.bindings.create(context: account)
         rh = create_resource_handler(tp)
@@ -230,14 +230,14 @@ module Lti
 
         definitions = described_class.launch_definitions(tools_collection, placements)
         expect(definitions.count).to eq 2
-        external_tool = definitions.find { |d| d[:definition_type] == 'ContextExternalTool' }
-        message_handler = definitions.find { |d| d[:definition_type] == 'Lti::MessageHandler' }
+        external_tool = definitions.find { |d| d[:definition_type] == "ContextExternalTool" }
+        message_handler = definitions.find { |d| d[:definition_type] == "Lti::MessageHandler" }
         expect(message_handler).to_not be nil
         expect(external_tool).to_not be nil
       end
 
-      context 'pagination' do
-        it 'paginates correctly' do
+      context "pagination" do
+        it "paginates correctly" do
           3.times do |_|
             tp = create_tool_proxy
             tp.bindings.create(context: account)

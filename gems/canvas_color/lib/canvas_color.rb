@@ -44,7 +44,7 @@ module CanvasColor
     attr_reader :r, :g, :b, :a
 
     # Table for conversion to hex
-    HEXVAL = (('0'..'9').to_a).concat(('A'..'F').to_a).freeze
+    HEXVAL = (("0".."9").to_a).concat(("A".."F").to_a).freeze
     # Default value for #darken, #lighten etc.
     BRIGHTNESS_DEFAULT = 0.2
 
@@ -277,7 +277,7 @@ module CanvasColor
         found_hex_code = NAMED_COLORS[val.to_sym]
         return Color.new(found_hex_code) if found_hex_code
 
-        str = str[/[0-9A-F]{3,8}/] || ''
+        str = str[/[0-9A-F]{3,8}/] || ""
         case str.size
         when 3, 4
           r, g, b, a = str.scan(/[0-9A-F]/)
@@ -305,7 +305,7 @@ module CanvasColor
     end
 
     def to_rgb(add_hash = true)
-      (add_hash ? '#' : '') + to_hex(r) + to_hex(g) + to_hex(b)
+      (add_hash ? "#" : "") + to_hex(r) + to_hex(g) + to_hex(b)
     end
 
     def to_rgba(add_hash = true)

@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'nokogiri'
+require "nokogiri"
 
 describe Announcement do
   it "creates a new instance given valid attributes" do
@@ -55,7 +55,7 @@ describe Announcement do
       course.lock_all_announcements = true
       course.save!
       announcement = course.announcements.build(valid_announcement_attributes.merge(delayed_post_at: Time.now + 1.week))
-      announcement.workflow_state = 'post_delayed'
+      announcement.workflow_state = "post_delayed"
       announcement.save!
 
       expect(announcement).to be_post_delayed
@@ -74,7 +74,7 @@ describe Announcement do
       course_factory(active_all: true)
       att = attachment_model(context: @course)
       announcement = @course.announcements.create!(valid_announcement_attributes
-        .merge(delayed_post_at: Time.now + 1.week, workflow_state: 'post_delayed', attachment: att))
+        .merge(delayed_post_at: Time.now + 1.week, workflow_state: "post_delayed", attachment: att))
       att.reload
       expect(att).to be_locked
 
@@ -89,16 +89,16 @@ describe Announcement do
   context "section specific announcements" do
     before(:once) do
       course_with_teacher(active_course: true)
-      @section = @course.course_sections.create!(name: 'test section')
+      @section = @course.course_sections.create!(name: "test section")
 
-      @announcement = @course.announcements.create!(user: @teacher, message: 'hello my favorite section!')
+      @announcement = @course.announcements.create!(user: @teacher, message: "hello my favorite section!")
       @announcement.is_section_specific = true
       @announcement.course_sections = [@section]
       @announcement.save!
 
       @student1, @student2 = create_users(2, return_type: :record)
-      @course.enroll_student(@student1, enrollment_state: 'active')
-      @course.enroll_student(@student2, enrollment_state: 'active')
+      @course.enroll_student(@student1, enrollment_state: "active")
+      @course.enroll_student(@student2, enrollment_state: "active")
       student_in_section(@section, user: @student1)
     end
 
@@ -134,35 +134,35 @@ describe Announcement do
       expect(Announcement.context_allows_user_to_create?(@group, @teacher, {})).to be_truthy
     end
 
-    it 'allows announcements to be viewed without :read_forum' do
+    it "allows announcements to be viewed without :read_forum" do
       course_with_student(active_all: true)
-      @course.account.role_overrides.create!(permission: 'read_forum', role: student_role, enabled: false)
+      @course.account.role_overrides.create!(permission: "read_forum", role: student_role, enabled: false)
       a = @course.announcements.create!(valid_announcement_attributes)
       expect(a.grants_right?(@user, :read)).to be(true)
     end
 
-    it 'does not allow announcements to be viewed without :read_announcements' do
+    it "does not allow announcements to be viewed without :read_announcements" do
       course_with_student(active_all: true)
-      @course.account.role_overrides.create!(permission: 'read_announcements', role: student_role, enabled: false)
+      @course.account.role_overrides.create!(permission: "read_announcements", role: student_role, enabled: false)
       a = @course.announcements.create!(valid_announcement_attributes)
       expect(a.grants_right?(@user, :read)).to be(false)
     end
 
-    it 'does not allow announcements to be viewed without :read_announcements (even with moderate_forum)' do
+    it "does not allow announcements to be viewed without :read_announcements (even with moderate_forum)" do
       course_with_teacher(active_all: true)
-      @course.account.role_overrides.create!(permission: 'read_announcements', role: teacher_role, enabled: false)
+      @course.account.role_overrides.create!(permission: "read_announcements", role: teacher_role, enabled: false)
       a = @course.announcements.create!(valid_announcement_attributes)
       expect(a.grants_right?(@user, :read)).to be(false)
     end
 
-    it 'does allows announcements to be viewed only if visible_for? is true' do
+    it "does allows announcements to be viewed only if visible_for? is true" do
       course_with_student(active_all: true)
       a = @course.announcements.create!(valid_announcement_attributes)
       allow(a).to receive(:visible_for?).and_return true
       expect(a.grants_right?(@user, :read)).to be(true)
     end
 
-    it 'does not allow announcements to be viewed if visible_for? is false' do
+    it "does not allow announcements to be viewed if visible_for? is false" do
       course_with_student(active_all: true)
       a = @course.announcements.create!(valid_announcement_attributes)
       allow(a).to receive(:visible_for?).and_return false
@@ -186,9 +186,9 @@ describe Announcement do
         @a.message = "<object data=\"http://www.youtuube.com/test\" othertag=\"bob\"></object>"
         @a.save!
         dom = Nokogiri(@a.message)
-        expect(dom.css('object').length).to eql(1)
-        expect(dom.css('object')[0]['data']).to eql("http://www.youtuube.com/test")
-        expect(dom.css('object')[0]['othertag']).to eql(nil)
+        expect(dom.css("object").length).to eql(1)
+        expect(dom.css("object")[0]["data"]).to eql("http://www.youtuube.com/test")
+        expect(dom.css("object")[0]["othertag"]).to eql(nil)
       end
     end
 
@@ -216,7 +216,7 @@ describe Announcement do
     end
 
     it "does not broadcast if read_announcements is diabled" do
-      Account.default.role_overrides.create!(role: student_role, permission: 'read_announcements', enabled: false)
+      Account.default.role_overrides.create!(role: student_role, permission: "read_announcements", enabled: false)
       course_with_student(active_all: true)
       notification_name = "New Announcement"
       n = Notification.create(name: notification_name, category: "TestImmediately")
@@ -232,7 +232,7 @@ describe Announcement do
       course_with_student(active_all: true)
       section2 = @course.course_sections.create!
       other_student = user_factory(active_all: true)
-      @course.enroll_student(other_student, section: section2, enrollment_state: 'active')
+      @course.enroll_student(other_student, section: section2, enrollment_state: "active")
       section2.update(start_at: 2.months.ago, end_at: 1.month.ago, restrict_enrollments_to_section_dates: true)
 
       notification_name = "New Announcement"

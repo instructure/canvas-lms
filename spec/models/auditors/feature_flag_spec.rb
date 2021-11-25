@@ -18,20 +18,20 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../../cassandra_spec_helper'
+require_relative "../../cassandra_spec_helper"
 
 describe Auditors::FeatureFlag do
   let(:request_id) { 42 }
-  let(:feature_name) { 'root_account_feature' }
+  let(:feature_name) { "root_account_feature" }
 
   before do
     allow(Feature).to receive(:definitions).and_return({
-                                                         feature_name => Feature.new(feature: feature_name, applies_to: 'RootAccount')
+                                                         feature_name => Feature.new(feature: feature_name, applies_to: "RootAccount")
                                                        })
-    allow(Audits).to receive(:config).and_return({ 'write_paths' => ['active_record'], 'read_path' => 'active_record' })
+    allow(Audits).to receive(:config).and_return({ "write_paths" => ["active_record"], "read_path" => "active_record" })
     @flag = Account.site_admin.feature_flags.build
     @flag.feature = feature_name
-    @flag.state = 'on'
+    @flag.state = "on"
     @user = user_with_pseudonym(active_all: true)
     @flag.current_user = @user
     @flag.save!
@@ -49,8 +49,8 @@ describe Auditors::FeatureFlag do
     include_examples "cassandra audit logs"
 
     before do
-      allow(Audits).to receive(:config).and_return({ 'write_paths' => ['cassandra'], 'read_path' => 'cassandra' })
-      @event = Auditors::FeatureFlag.record(@flag, @user, 'off')
+      allow(Audits).to receive(:config).and_return({ "write_paths" => ["cassandra"], "read_path" => "cassandra" })
+      @event = Auditors::FeatureFlag.record(@flag, @user, "off")
     end
 
     context "nominal cases" do
@@ -71,15 +71,15 @@ describe Auditors::FeatureFlag do
         allow(Auditors::FeatureFlag::Stream).to receive(:database).and_return(nil)
         expect(CanvasCassandra::DatabaseBuilder).to receive(:configured?).with("auditors").once.and_return(false)
         expect(EventStream::Logger).not_to receive(:error)
-        Auditors::FeatureFlag.record(@flag, @user, 'off')
+        Auditors::FeatureFlag.record(@flag, @user, "off")
       end
     end
   end
 
   describe "with dual writing enabled" do
     before do
-      allow(Audits).to receive(:config).and_return({ 'write_paths' => ['cassandra', 'active_record'], 'read_path' => 'cassandra' })
-      @event = Auditors::FeatureFlag.record(@flag, @user, 'off')
+      allow(Audits).to receive(:config).and_return({ "write_paths" => ["cassandra", "active_record"], "read_path" => "cassandra" })
+      @event = Auditors::FeatureFlag.record(@flag, @user, "off")
     end
 
     it "writes to cassandra" do
@@ -97,8 +97,8 @@ describe Auditors::FeatureFlag do
 
   describe "with postgres backend" do
     before do
-      allow(Audits).to receive(:config).and_return({ 'write_paths' => ['active_record'], 'read_path' => 'active_record' })
-      @event = Auditors::FeatureFlag.record(@flag, @user, 'off')
+      allow(Audits).to receive(:config).and_return({ "write_paths" => ["active_record"], "read_path" => "active_record" })
+      @event = Auditors::FeatureFlag.record(@flag, @user, "off")
     end
 
     it "can be read from postgres" do
@@ -110,7 +110,7 @@ describe Auditors::FeatureFlag do
     it "does not swallow auditor write errors" do
       test_err_class = Class.new(StandardError)
       allow(Auditors::ActiveRecord::FeatureFlagRecord).to receive(:create_from_event_stream!).and_raise(test_err_class.new("DB Error"))
-      expect { Auditors::FeatureFlag.record(@flag, @user, 'on') }.to raise_error(test_err_class)
+      expect { Auditors::FeatureFlag.record(@flag, @user, "on") }.to raise_error(test_err_class)
     end
   end
 end

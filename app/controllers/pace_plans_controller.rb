@@ -134,7 +134,7 @@ class PacePlansController < ApplicationController
   private
 
   def latest_progress
-    progress = Progress.order(created_at: :desc).find_by(context: @pace_plan, tag: 'pace_plan_publish')
+    progress = Progress.order(created_at: :desc).find_by(context: @pace_plan, tag: "pace_plan_publish")
     progress&.workflow_state == "completed" ? nil : progress
   end
 
@@ -218,7 +218,7 @@ class PacePlansController < ApplicationController
   end
 
   def publish_pace_plan
-    @progress = Progress.create!(context: @pace_plan, tag: 'pace_plan_publish')
+    @progress = Progress.create!(context: @pace_plan, tag: "pace_plan_publish")
     @progress.process_job(@pace_plan, :publish, {})
   end
 end

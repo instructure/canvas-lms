@@ -96,7 +96,7 @@ module SIS
         if section.course_id != course.id
           if section.nonxlist_course_id
             # this section is crosslisted
-            if (section.nonxlist_course_id != course.id && !section.stuck_sis_fields.include?(:course_id)) || (section.course.workflow_state == 'deleted' && status.start_with?('active'))
+            if (section.nonxlist_course_id != course.id && !section.stuck_sis_fields.include?(:course_id)) || (section.course.workflow_state == "deleted" && status.start_with?("active"))
               # but the course id we were given didn't match the crosslist info
               # we have, so, uncrosslist and move
               @course_ids_to_update_associations.merge [course.id, section.course_id, section.nonxlist_course_id]
@@ -116,9 +116,9 @@ module SIS
         section.integration_id = integration_id
         case status
         when /active/i
-          section.workflow_state = 'active'
+          section.workflow_state = "active"
         when /deleted/i
-          section.workflow_state = 'deleted'
+          section.workflow_state = "deleted"
           deleted_section_ids << section.id
         end
 

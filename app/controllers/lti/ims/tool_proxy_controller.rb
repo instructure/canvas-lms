@@ -24,21 +24,21 @@ module Lti
       include Lti::ApiServiceHelper
       include Lti::IMS::AccessTokenHelper
 
-      TOOL_PROXY_COLLECTION = 'ToolProxy.collection'
-      TOOL_PROXY_ITEM = 'ToolProxy.item'
+      TOOL_PROXY_COLLECTION = "ToolProxy.collection"
+      TOOL_PROXY_ITEM = "ToolProxy.item"
 
       SERVICE_DEFINITIONS = [
         {
           id: TOOL_PROXY_COLLECTION,
           endpoint: ->(context) { "api/lti/#{context.class.name.downcase}s/#{context.id}/tool_proxy" },
-          format: ['application/vnd.ims.lti.v2.toolproxy+json'].freeze,
-          action: ['POST'].freeze
+          format: ["application/vnd.ims.lti.v2.toolproxy+json"].freeze,
+          action: ["POST"].freeze
         }.freeze,
         {
           id: TOOL_PROXY_ITEM,
-          endpoint: 'api/lti/tool_proxy/{tool_proxy_guid}',
-          format: ['application/vnd.ims.lti.v2.toolproxy+json'].freeze,
-          action: ['GET'].freeze
+          endpoint: "api/lti/tool_proxy/{tool_proxy_guid}",
+          format: ["application/vnd.ims.lti.v2.toolproxy+json"].freeze,
+          action: ["GET"].freeze
         }.freeze
       ].freeze
 
@@ -54,11 +54,11 @@ module Lti
       end
 
       def show
-        tool_proxy = ToolProxy.where(guid: params['tool_proxy_guid']).first
+        tool_proxy = ToolProxy.where(guid: params["tool_proxy_guid"]).first
         if tool_proxy && oauth_authenticated_request?(tool_proxy.shared_secret)
-          render json: tool_proxy.raw_data, content_type: 'application/vnd.ims.lti.v2.toolproxy+json'
+          render json: tool_proxy.raw_data, content_type: "application/vnd.ims.lti.v2.toolproxy+json"
         else
-          render json: { error: 'unauthorized' }, status: :unauthorized
+          render json: { error: "unauthorized" }, status: :unauthorized
         end
       end
 
@@ -133,9 +133,9 @@ module Lti
         end
 
         tp.save
-        render json: json, status: :created, content_type: 'application/vnd.ims.lti.v2.toolproxy.id+json'
+        render json: json, status: :created, content_type: "application/vnd.ims.lti.v2.toolproxy.id+json"
       rescue JSON::ParserError
-        render json: { error: 'Invalid request' }, status: :bad_request
+        render json: { error: "Invalid request" }, status: :bad_request
       end
 
       private
@@ -156,7 +156,7 @@ module Lti
           "tool_proxy_guid" => tool_proxy.guid
         }
         json["tc_half_shared_secret"] = tp_service.tc_half_secret if tp_service.tc_half_secret
-        render json: json, status: :created, content_type: 'application/vnd.ims.lti.v2.toolproxy.id+json'
+        render json: json, status: :created, content_type: "application/vnd.ims.lti.v2.toolproxy.id+json"
       end
 
       def payload

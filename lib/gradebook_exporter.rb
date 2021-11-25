@@ -28,11 +28,11 @@ class GradebookExporter
   # hash. Use the buffer_columns and buffer_column_headers methods to populate the
   # relevant rows.
   BUFFER_COLUMN_DEFINITIONS = {
-    grading_standard: ['Current Grade', 'Unposted Current Grade', 'Final Grade', 'Unposted Final Grade'].freeze,
-    override_score: ['Override Score'].freeze,
-    override_grade: ['Override Grade'].freeze,
-    points: ['Current Points', 'Final Points'].freeze,
-    total_scores: ['Current Score', 'Unposted Current Score', 'Final Score', 'Unposted Final Score'].freeze
+    grading_standard: ["Current Grade", "Unposted Current Grade", "Final Grade", "Unposted Final Grade"].freeze,
+    override_score: ["Override Score"].freeze,
+    override_grade: ["Override Grade"].freeze,
+    points: ["Current Points", "Final Points"].freeze,
+    total_scores: ["Current Score", "Unposted Current Score", "Final Score", "Unposted Final Score"].freeze
   }.freeze
 
   def initialize(course, user, options = {})
@@ -114,7 +114,7 @@ class GradebookExporter
 
     groups = calc.groups
 
-    read_only = I18n.t('csv.read_only_field', '(read only)')
+    read_only = I18n.t("csv.read_only_field", "(read only)")
     include_root_account = @course.root_account.trust_exists?
     should_show_totals = show_totals?
     include_sis_id = @options[:include_sis_id]

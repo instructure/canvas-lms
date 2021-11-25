@@ -17,15 +17,15 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../common'
-require_relative '../helpers/groups_common'
+require_relative "../common"
+require_relative "../helpers/groups_common"
 
 describe "student groups" do
   include_context "in-process server selenium tests"
   include GroupsCommon
 
-  let(:group_name) { 'Windfury' }
-  let(:group_category_name) { 'cat1' }
+  let(:group_name) { "Windfury" }
+  let(:group_category_name) { "cat1" }
 
   describe "as a student" do
     before do
@@ -44,8 +44,8 @@ describe "student groups" do
 
       get "/groups/#{g1.id}"
 
-      f('#edit_group').click
-      set_value f('#group_name'), "new group name"
+      f("#edit_group").click
+      set_value f("#group_name"), "new group name"
       expect_new_page_load { submit_form("span[aria-label='Edit Group']") }
       expect(g1.reload.name).to include("new group name")
     end
@@ -60,7 +60,7 @@ describe "student groups" do
     it "restricts students from accessing groups in unpublished course", priority: "1" do
       group_test_setup(1, 1, 1)
       add_user_to_group(@students.first, @testgroup[0])
-      @course.workflow_state = 'unpublished'
+      @course.workflow_state = "unpublished"
       @course.save!
       user_session(@students.first)
       get "/courses/#{@course.id}/groups"
@@ -144,7 +144,7 @@ describe "student groups" do
         user_session(@students[0])
         get "/courses/#{@course.id}/groups"
 
-        f('.student-group-header .icon-mini-arrow-right').click
+        f(".student-group-header .icon-mini-arrow-right").click
         wait_for_ajaximations
 
         expect(f('div[role="list"]')).to include_text(@students[0].name.to_s)
@@ -164,7 +164,7 @@ describe "student groups" do
 
         # Ensure First Student is no longer in groups, but in Unassigned Students section
         expect(f('div[data-view="groups"]')).not_to include_text(@students[0].name.to_s)
-        expect(f('.unassigned-students')).to include_text(@students[0].name.to_s)
+        expect(f(".unassigned-students")).to include_text(@students[0].name.to_s)
         # Fourth student should remain group leader
         expect(fj(".group[data-id=\"#{@testgroup[0].id}\"] ." \
                   ".group-leader:contains(\"#{@students[3].name}\")")).to be_displayed
@@ -202,14 +202,14 @@ describe "student groups" do
       end
 
       it "visits the group", priority: "1" do
-        fln('Visit').click
+        fln("Visit").click
         wait_for_ajaximations
 
         expect(f("#breadcrumbs")).to include_text(group_name.to_s)
       end
 
       it "student group leader can manage group", priority: "2" do
-        fln('Manage').click
+        fln("Manage").click
         wait_for_ajaximations
 
         expect(f(".ui-dialog-titlebar")).to include_text("Manage Student Group")
@@ -234,20 +234,20 @@ describe "student groups" do
       end
 
       it "populates dialog with current group name", priority: "2" do
-        fln('Manage').click
+        fln("Manage").click
         wait_for_ajaximations
 
         expect(f("#group_name")).to have_attribute(:value, group_name.to_s)
       end
 
       it "changes group name", priority: "2" do
-        fln('Manage').click
+        fln("Manage").click
         wait_for_ajaximations
 
         addition = "CRIT"
         f("#group_name").send_keys(addition.to_s)
         wait_for_ajaximations
-        f('button.confirm-dialog-confirm-btn').click
+        f("button.confirm-dialog-confirm-btn").click
 
         new_group_name = group_name.to_s + addition.to_s
         expect(f(".student-group-title")).to include_text(new_group_name.to_s)
@@ -264,13 +264,13 @@ describe "student groups" do
         expect(students.length).to eq 2
         expect(students[1]).to include_text("nobody@example.com")
 
-        fln('Manage').click
+        fln("Manage").click
         wait_for_ajaximations
 
         students = ffj(".checkbox")
         students.each(&:click)
 
-        fj('button.confirm-dialog-confirm-btn').click
+        fj("button.confirm-dialog-confirm-btn").click
         wait_for_ajaximations
 
         expected_student_list = ["nobody@example.com", "Test Student 1", "Test Student 2"]
@@ -286,8 +286,8 @@ describe "student groups" do
       end
 
       it "add/remove plurality to the word 'student' if one student", priority: "2" do
-        skip('KNO-183')
-        fln('Manage').click
+        skip("KNO-183")
+        fln("Manage").click
         wait_for_ajaximations
 
         # add the first student that isn't the current student
@@ -295,7 +295,7 @@ describe "student groups" do
         second_student_checkbox.click
         wait_for_animations
 
-        f('button.confirm-dialog-confirm-btn').click
+        f("button.confirm-dialog-confirm-btn").click
 
         # expect plural of the word 'student'
         expect(f(".student-group-students")).to include_text("students")

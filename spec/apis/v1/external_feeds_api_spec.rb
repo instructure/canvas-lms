@@ -18,9 +18,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../api_spec_helper'
+require_relative "../api_spec_helper"
 
-describe 'ExternalFeedsController', type: :request do
+describe "ExternalFeedsController", type: :request do
   shared_examples_for "Announcement External Feeds" do
     before :once do
       @url_params = { controller: "external_feeds", action: "index", format: "json" }
@@ -35,13 +35,13 @@ describe 'ExternalFeedsController', type: :request do
 
     def feed_json(f)
       {
-        'id' => f.id,
-        'display_name' => f.display_name,
-        'url' => f.url,
-        'header_match' => f.header_match,
-        'created_at' => f.created_at.as_json,
-        'verbosity' => f.verbosity,
-        'external_feed_entries_count' => f.external_feed_entries.size,
+        "id" => f.id,
+        "display_name" => f.display_name,
+        "url" => f.url,
+        "header_match" => f.header_match,
+        "created_at" => f.created_at.as_json,
+        "verbosity" => f.verbosity,
+        "external_feed_entries_count" => f.external_feed_entries.size,
       }
     end
 
@@ -56,28 +56,28 @@ describe 'ExternalFeedsController', type: :request do
     it "allows creating feeds" do
       json = api_call_as_user(@allowed_user, :post, @url_base, @url_params.merge(action: "create"),
                               { url: "http://www.example.com/feed" })
-      feed = @context.external_feeds.find(json['id'])
+      feed = @context.external_feeds.find(json["id"])
       expect(json).to eq feed_json(feed)
 
       json = api_call_as_user(@allowed_user, :post, @url_base, @url_params.merge(action: "create"),
-                              { url: "http://www.example.com/feed2", header_match: '' })
-      feed = @context.external_feeds.find(json['id'])
-      expect(feed.verbosity).to eq 'full'
+                              { url: "http://www.example.com/feed2", header_match: "" })
+      feed = @context.external_feeds.find(json["id"])
+      expect(feed.verbosity).to eq "full"
       expect(feed.header_match).to eq nil
       expect(json).to eq feed_json(feed)
 
       json = api_call_as_user(@allowed_user, :post, @url_base, @url_params.merge(action: "create"),
-                              { url: "http://www.example.com/feed3", header_match: ' #mytag  ', verbosity: 'truncate' })
-      feed = @context.external_feeds.find(json['id'])
-      expect(feed.verbosity).to eq 'truncate'
-      expect(feed.header_match).to eq '#mytag'
+                              { url: "http://www.example.com/feed3", header_match: " #mytag  ", verbosity: "truncate" })
+      feed = @context.external_feeds.find(json["id"])
+      expect(feed.verbosity).to eq "truncate"
+      expect(feed.header_match).to eq "#mytag"
       expect(json).to eq feed_json(feed)
 
       # bad verbosity value
       json = api_call_as_user(@allowed_user, :post, @url_base, @url_params.merge(action: "create"),
-                              { url: "http://www.example.com/feed4", verbosity: 'bogus' })
-      feed = @context.external_feeds.find(json['id'])
-      expect(feed.verbosity).to eq 'full'
+                              { url: "http://www.example.com/feed4", verbosity: "bogus" })
+      feed = @context.external_feeds.find(json["id"])
+      expect(feed.verbosity).to eq "full"
 
       # invalid url
       api_call_as_user(@allowed_user, :post, @url_base, @url_params.merge(action: "create"),
@@ -85,7 +85,7 @@ describe 'ExternalFeedsController', type: :request do
 
       # no url
       api_call_as_user(@allowed_user, :post, @url_base, @url_params.merge(action: "create"),
-                       { verbosity: 'full' }, {}, expected_status: 400)
+                       { verbosity: "full" }, {}, expected_status: 400)
 
       # duplicate url
       api_call_as_user(@allowed_user, :post, @url_base, @url_params.merge(action: "create"),
@@ -94,7 +94,7 @@ describe 'ExternalFeedsController', type: :request do
       # url protocol is inferred
       json = api_call_as_user(@allowed_user, :post, @url_base, @url_params.merge(action: "create"),
                               { url: "www.example.com/feed5" })
-      feed = @context.external_feeds.find(json['id'])
+      feed = @context.external_feeds.find(json["id"])
       expect(feed.url).to eq "http://www.example.com/feed5"
       expect(json).to eq feed_json(feed)
     end
@@ -122,9 +122,9 @@ describe 'ExternalFeedsController', type: :request do
     before :once do
       group_with_user(moderator: true, active_all: true)
       @allowed_user = @user
-      @allowed_user.pseudonyms.create!(unique_id: 'user1', account: Account.default)
+      @allowed_user.pseudonyms.create!(unique_id: "user1", account: Account.default)
       @context = @group
-      @denied_user = user_with_pseudonym(active_all: true, unique_id: 'user2')
+      @denied_user = user_with_pseudonym(active_all: true, unique_id: "user2")
       @url_base = "/api/v1/groups/#{@group.id}/external_feeds"
       @url_params.merge!({ group_id: @group.to_param })
     end

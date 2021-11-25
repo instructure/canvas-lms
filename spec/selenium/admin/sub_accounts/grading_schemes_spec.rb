@@ -17,14 +17,14 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../../common'
-require_relative '../../helpers/grading_schemes_common'
+require_relative "../../common"
+require_relative "../../helpers/grading_schemes_common"
 
 describe "sub account grading schemes" do
   include_context "in-process server selenium tests"
   include GradingSchemesCommon
 
-  let(:account) { Account.create(name: 'sub account from default account', parent_account: Account.default) }
+  let(:account) { Account.create(name: "sub account from default account", parent_account: Account.default) }
   let(:url) { "/accounts/#{account.id}/grading_standards" }
 
   before do
@@ -47,31 +47,31 @@ describe "sub account grading schemes" do
       should_delete_a_grading_scheme(account, url)
     end
 
-    it 'disables add grading scheme button during update', priority: "2" do
+    it "disables add grading scheme button during update", priority: "2" do
       simple_grading_standard(account)
       get url
       f('#react_grading_tabs a[href="#grading-standards-tab"]').click
-      f('.edit_grading_standard_button').click
-      expect(f('#react_grading_tabs .add_standard_button')).to have_class('disabled')
+      f(".edit_grading_standard_button").click
+      expect(f("#react_grading_tabs .add_standard_button")).to have_class("disabled")
     end
 
-    it 'disables other grading schemes from being edited', priority: "2" do
+    it "disables other grading schemes from being edited", priority: "2" do
       2.times do
         simple_grading_standard(account)
       end
       get url
       f('#react_grading_tabs a[href="#grading-standards-tab"]').click
-      f('.edit_grading_standard_button').click
-      expect(f('.disabled-buttons')).to be_truthy
+      f(".edit_grading_standard_button").click
+      expect(f(".disabled-buttons")).to be_truthy
     end
 
-    it 'allows all available grading schemes to be edited on page load', priority: "2" do
+    it "allows all available grading schemes to be edited on page load", priority: "2" do
       2.times do
         simple_grading_standard(account)
       end
       get url
       f('#react_grading_tabs a[href="#grading-standards-tab"]').click
-      expect(ff('.standard_title .links').count).to eq(2)
+      expect(ff(".standard_title .links").count).to eq(2)
     end
   end
 

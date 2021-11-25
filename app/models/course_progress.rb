@@ -156,7 +156,7 @@ class CourseProgress
       }
     else
       { error:
-        { message: 'no progress available because this course is not module based (has modules and module completion requirements) or the user is not enrolled as a student in this course' } }
+        { message: "no progress available because this course is not module based (has modules and module completion requirements) or the user is not enrolled as a student in this course" } }
     end
   end
 

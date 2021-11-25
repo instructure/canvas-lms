@@ -88,11 +88,11 @@ module BroadcastPolicy # :nodoc:
     @notification_finder = nil if @notification_finder_proc
   end
 
-  require 'active_support/core_ext/class/attribute'
-  require 'active_support/core_ext/string/inflections'
-  require 'broadcast_policy/policy_list'
-  require 'broadcast_policy/notification_policy'
-  require 'broadcast_policy/class_methods'
-  require 'broadcast_policy/singleton_methods'
-  require 'broadcast_policy/instance_methods'
+  require "active_support/core_ext/class/attribute"
+  require "active_support/core_ext/string/inflections"
+  require "broadcast_policy/policy_list"
+  require "broadcast_policy/notification_policy"
+  require "broadcast_policy/class_methods"
+  require "broadcast_policy/singleton_methods"
+  require "broadcast_policy/instance_methods"
 end

@@ -22,9 +22,9 @@ describe PlannerApiHelper do
   include PlannerApiHelper
 
   describe "#formatted_planner_date" do
-    it 'creates errors for bad dates' do
-      expect { formatted_planner_date('start_date', '123-456-789') }.to raise_error(PlannerApiHelper::InvalidDates)
-      expect { formatted_planner_date('end_date', '9876-5-4321') }.to raise_error(PlannerApiHelper::InvalidDates)
+    it "creates errors for bad dates" do
+      expect { formatted_planner_date("start_date", "123-456-789") }.to raise_error(PlannerApiHelper::InvalidDates)
+      expect { formatted_planner_date("end_date", "9876-5-4321") }.to raise_error(PlannerApiHelper::InvalidDates)
     end
   end
 
@@ -38,11 +38,11 @@ describe PlannerApiHelper do
       @wiki_page.publish
 
       # add assignment as a completion requirement in one module
-      @assignment_tag = @module1.add_item(id: @assignment.id, type: 'assignment')
-      @wiki_page_tag = @module1.add_item(id: @wiki_page.id, type: 'wiki_page')
+      @assignment_tag = @module1.add_item(id: @assignment.id, type: "assignment")
+      @wiki_page_tag = @module1.add_item(id: @wiki_page.id, type: "wiki_page")
       @module1.completion_requirements = {
-        @assignment_tag.id => { type: 'must_mark_done' },
-        @wiki_page_tag.id => { type: 'must_mark_done' }
+        @assignment_tag.id => { type: "must_mark_done" },
+        @wiki_page_tag.id => { type: "must_mark_done" }
       }
       @module1.save!
     end
@@ -137,9 +137,9 @@ describe PlannerApiHelper do
 
       it "does nothing if mark-doneable in multiple modules" do
         @module2 = @course.context_modules.create!(name: "module1")
-        @assignment_tag2 = @module2.add_item(id: @assignment.id, type: 'assignment')
+        @assignment_tag2 = @module2.add_item(id: @assignment.id, type: "assignment")
         @module2.completion_requirements = {
-          @assignment_tag2.id => { type: 'must_mark_done' }
+          @assignment_tag2.id => { type: "must_mark_done" }
         }
         @module2.save!
         override = sync_planner_completion(@assignment, @user, true)

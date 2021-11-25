@@ -116,8 +116,8 @@ class CourseNicknamesController < ApplicationController
   def update
     course = api_find(Course, params[:course_id])
     return unless authorized_action(course, @current_user, :read)
-    return render(json: { message: 'missing nickname' }, status: :bad_request) unless params[:nickname].present?
-    return render(json: { message: 'nickname too long' }, status: :bad_request) if params[:nickname].length >= 60
+    return render(json: { message: "missing nickname" }, status: :bad_request) unless params[:nickname].present?
+    return render(json: { message: "nickname too long" }, status: :bad_request) if params[:nickname].length >= 60
 
     @current_user.shard.activate do
       if @current_user.set_preference(:course_nicknames, course.id, params[:nickname])
@@ -150,7 +150,7 @@ class CourseNicknamesController < ApplicationController
           render json: @current_user.errors, status: :bad_request
         end
       else
-        render json: { message: 'no nickname exists for course' }, status: :not_found
+        render json: { message: "no nickname exists for course" }, status: :not_found
       end
     end
   end
@@ -167,7 +167,7 @@ class CourseNicknamesController < ApplicationController
   def clear
     @current_user.clear_all_preferences_for(:course_nicknames)
     if @current_user.save
-      render json: { message: 'OK' }
+      render json: { message: "OK" }
     else
       render json: @current_user.errors, status: :bad_request
     end

@@ -120,7 +120,7 @@ describe ConversationMessage do
       message = conversation_message.messages_sent["Conversation Message"].first
 
       expect(message.context).to eq conversation_message
-      message.context.reply_from(user: message.user, purpose: 'general',
+      message.context.reply_from(user: message.user, purpose: "general",
                                  subject: message.subject,
                                  text: "Reply to notification")
       # The initial message, the one the sent the notification,
@@ -184,12 +184,12 @@ describe ConversationMessage do
 
     it "does not create a conversation stream item for a submission comment" do
       assignment_model(course: @course)
-      @assignment.workflow_state = 'published'
+      @assignment.workflow_state = "published"
       @assignment.save
-      @submission = @assignment.submit_homework(@user, body: 'some message')
+      @submission = @assignment.submit_homework(@user, body: "some message")
       @submission.add_comment(author: @user, comment: "hello")
 
-      expect(StreamItem.all.select { |i| i.asset_string.include?('conversation_') }).to be_empty
+      expect(StreamItem.all.select { |i| i.asset_string.include?("conversation_") }).to be_empty
     end
 
     it "does not create additional stream_items for additional messages in the same conversation" do
@@ -219,10 +219,10 @@ describe ConversationMessage do
     it "should delete the stream_item if the conversation is deleted" # not yet implemented
   end
 
-  context 'sharding' do
+  context "sharding" do
     specs_require_sharding
 
-    it 'preserves attachments across shards' do
+    it "preserves attachments across shards" do
       @shard1.activate do
         course_with_teacher(active_all: true)
       end
@@ -232,7 +232,7 @@ describe ConversationMessage do
       m = nil
       @shard2.activate do
         student_in_course(active_all: true)
-        m = @teacher.initiate_conversation([@student]).add_message('test', attachment_ids: [a.id])
+        m = @teacher.initiate_conversation([@student]).add_message("test", attachment_ids: [a.id])
         expect(m.attachments).to match_array([a])
       end
       @shard1.activate do
@@ -266,8 +266,8 @@ describe ConversationMessage do
 
     it "sets has_media_objects if there is a media comment" do
       mc = MediaObject.new
-      mc.media_type = 'audio'
-      mc.media_id = 'asdf'
+      mc.media_type = "audio"
+      mc.media_id = "asdf"
       mc.context = mc.user = @teacher
       mc.save
       m = @teacher.initiate_conversation([@student]).add_message("ohai", media_comment: mc)
@@ -278,8 +278,8 @@ describe ConversationMessage do
 
     it "sets has_media_objects if there are forwarded media comments" do
       mc = MediaObject.new
-      mc.media_type = 'audio'
-      mc.media_id = 'asdf'
+      mc.media_type = "audio"
+      mc.media_id = "asdf"
       mc.context = mc.user = @teacher
       mc.save
       m1 = @teacher.initiate_conversation([user_factory]).add_message("ohai", media_comment: mc)
@@ -305,7 +305,7 @@ describe ConversationMessage do
 
       expect do
         cm.reply_from({
-                        purpose: 'general',
+                        purpose: "general",
                         user: @teacher,
                         subject: "an email reply",
                         html: "body",
@@ -316,12 +316,12 @@ describe ConversationMessage do
 
     it "replies only to the message author on conversations2 conversations" do
       users = Array.new(3) { course_with_student(course: @course).user }
-      conversation = Conversation.initiate(users, false, context_type: 'Course', context_id: @course.id)
+      conversation = Conversation.initiate(users, false, context_type: "Course", context_id: @course.id)
       conversation.add_message(users[0], "initial message", root_account_id: Account.default.id)
       cm2 = conversation.add_message(users[1], "subsequent message", root_account_id: Account.default.id)
       expect(cm2.conversation_message_participants.size).to eq 3
       cm3 = cm2.reply_from({
-                             purpose: 'general',
+                             purpose: "general",
                              user: users[2],
                              subject: "an email reply",
                              html: "body",
@@ -337,16 +337,16 @@ describe ConversationMessage do
       cm = cp.add_message("initial message", root_account_id: Account.default.id)
 
       cp2 = cp.conversation.conversation_participants.where(user_id: @user).first
-      expect(cp2.workflow_state).to eq 'unread'
+      expect(cp2.workflow_state).to eq "unread"
       cm.reply_from({
-                      purpose: 'general',
+                      purpose: "general",
                       user: @user,
                       subject: "an email reply",
                       html: "body",
                       text: "body"
                     })
       cp2.reload
-      expect(cp2.workflow_state).to eq 'read'
+      expect(cp2.workflow_state).to eq "read"
     end
   end
 end

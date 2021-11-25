@@ -18,8 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'atom'
-require 'securerandom'
+require "atom"
+require "securerandom"
 
 class EportfoliosController < ApplicationController
   include EportfolioPage
@@ -50,7 +50,7 @@ class EportfoliosController < ApplicationController
       respond_to do |format|
         if @portfolio.save
           @portfolio.ensure_defaults
-          flash[:notice] = t('notices.created', "ePortfolio successfully created")
+          flash[:notice] = t("notices.created", "ePortfolio successfully created")
           format.html { redirect_to eportfolio_url(@portfolio) }
           format.json { render json: @portfolio.as_json(permissions: { user: @current_user, session: session }) }
         else
@@ -75,7 +75,7 @@ class EportfoliosController < ApplicationController
       @portfolio.ensure_defaults
       @category = @portfolio.eportfolio_categories.first
       @page = @category.eportfolio_entries.first
-      @owner_view = @portfolio.user == @current_user && params[:view] != 'preview'
+      @owner_view = @portfolio.user == @current_user && params[:view] != "preview"
       if @owner_view
         @used_submission_ids = []
         @portfolio.eportfolio_entries.each do |entry|
@@ -103,9 +103,9 @@ class EportfoliosController < ApplicationController
       end
 
       if can_do(@portfolio, @current_user, :update)
-        content_for_head helpers.auto_discovery_link_tag(:atom, feeds_eportfolio_path(@portfolio.id, :atom, verifier: @portfolio.uuid), { title: t('titles.feed', "Eportfolio Atom Feed") })
+        content_for_head helpers.auto_discovery_link_tag(:atom, feeds_eportfolio_path(@portfolio.id, :atom, verifier: @portfolio.uuid), { title: t("titles.feed", "Eportfolio Atom Feed") })
       elsif @portfolio.public
-        content_for_head helpers.auto_discovery_link_tag(:atom, feeds_eportfolio_path(@portfolio.id, :atom), { title: t('titles.feed', "Eportfolio Atom Feed") })
+        content_for_head helpers.auto_discovery_link_tag(:atom, feeds_eportfolio_path(@portfolio.id, :atom), { title: t("titles.feed", "Eportfolio Atom Feed") })
       end
     end
   end
@@ -121,7 +121,7 @@ class EportfoliosController < ApplicationController
       respond_to do |format|
         if @portfolio.update(update_params)
           @portfolio.ensure_defaults
-          flash[:notice] = t('notices.updated', "ePortfolio successfully updated")
+          flash[:notice] = t("notices.updated", "ePortfolio successfully updated")
           format.html { redirect_to eportfolio_url(@portfolio) }
           format.json { render json: @portfolio.as_json(permissions: { user: @current_user, session: session }) }
         else
@@ -141,7 +141,7 @@ class EportfoliosController < ApplicationController
     if authorized_action(@portfolio, @current_user, :delete)
       respond_to do |format|
         if @portfolio.destroy
-          flash[:notice] = t('notices.deleted', "ePortfolio successfully deleted")
+          flash[:notice] = t("notices.deleted", "ePortfolio successfully deleted")
           format.html { redirect_to user_profile_url(@current_user) }
           format.json { render json: @portfolio }
         else
@@ -191,8 +191,8 @@ class EportfoliosController < ApplicationController
           if @attachment.zipped?
             if @attachment.stored_locally?
               cancel_cache_buster
-              format.html { send_file(@attachment.full_filename, type: @attachment.content_type_with_encoding, disposition: 'inline') }
-              format.zip { send_file(@attachment.full_filename, type: @attachment.content_type_with_encoding, disposition: 'inline') }
+              format.html { send_file(@attachment.full_filename, type: @attachment.content_type_with_encoding, disposition: "inline") }
+              format.zip { send_file(@attachment.full_filename, type: @attachment.content_type_with_encoding, disposition: "inline") }
             else
               inline_url = authenticated_inline_url(@attachment)
               format.html { redirect_to inline_url }
@@ -200,7 +200,7 @@ class EportfoliosController < ApplicationController
             end
             format.json { render json: @attachment.as_json(methods: :readable_size) }
           else
-            flash[:notice] = t('notices.zipping', "File zipping still in process...")
+            flash[:notice] = t("notices.zipping", "File zipping still in process...")
             format.html { redirect_to eportfolio_url(@portfolio.id) }
             format.zip { redirect_to eportfolio_url(@portfolio.id) }
             format.json { render json: @attachment }
@@ -208,8 +208,8 @@ class EportfoliosController < ApplicationController
         end
       else
         @attachment = @portfolio.attachments.build(display_name: zip_filename)
-        @attachment.workflow_state = 'to_be_zipped'
-        @attachment.file_state = '0'
+        @attachment.workflow_state = "to_be_zipped"
+        @attachment.file_state = "0"
         @attachment.user = @current_user
         @attachment.save!
         ContentZipper.delay(priority: Delayed::LOW_PRIORITY).process_attachment(@attachment)
@@ -220,10 +220,10 @@ class EportfoliosController < ApplicationController
 
   def public_feed
     if @portfolio.public || params[:verifier] == @portfolio.uuid
-      @entries = @portfolio.eportfolio_entries.order('eportfolio_entries.created_at DESC').to_a
+      @entries = @portfolio.eportfolio_entries.order("eportfolio_entries.created_at DESC").to_a
       feed = Atom::Feed.new do |f|
         f.title = t(:title, "%{portfolio_name} Feed", portfolio_name: @portfolio.name)
-        f.links << Atom::Link.new(href: eportfolio_url(@portfolio.id), rel: 'self')
+        f.links << Atom::Link.new(href: eportfolio_url(@portfolio.id), rel: "self")
         f.updated = @entries.first.updated_at rescue Time.now
         f.id = eportfolio_url(@portfolio.id)
       end

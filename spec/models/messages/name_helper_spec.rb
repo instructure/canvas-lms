@@ -37,35 +37,35 @@ module Messages
       )
     end
 
-    describe '#reply_to_name' do
-      it 'is nil for notification types that dont have source users' do
+    describe "#reply_to_name" do
+      it "is nil for notification types that dont have source users" do
         expect(asset_for("Nonsense").reply_to_name).to be_nil
       end
 
-      it 'uses the author name for messages with authors' do
+      it "uses the author name for messages with authors" do
         comment = double(:submission_comment, author: author, recipient: user, submission: submission, can_read_author?: true)
         expect(asset_for("Submission Comment", comment).reply_to_name).to eq "Author Name via Canvas Notifications"
       end
 
-      it 'uses the user name for messages belonging to users' do
+      it "uses the user name for messages belonging to users" do
         expect(asset_for("New Discussion Entry").reply_to_name).to eq "User Name via Canvas Notifications"
       end
     end
 
-    describe '#from_name' do
-      it 'is nil for notification types that dont have source users' do
+    describe "#from_name" do
+      it "is nil for notification types that dont have source users" do
         expect(asset_for("Nonsense").from_name).to be_nil
       end
 
-      it 'is nil for missing asset' do
+      it "is nil for missing asset" do
         expect(asset_for("Conversation Message", nil).from_name).to be_nil
       end
 
-      it 'uses the author name for messages with authors' do
+      it "uses the author name for messages with authors" do
         expect(asset_for("Conversation Message").from_name).to eq "Author Name"
       end
 
-      it 'uses the user name for messages belonging to users' do
+      it "uses the user name for messages belonging to users" do
         expect(asset_for("Assignment Resubmitted", submission).from_name).to eq "User Name"
       end
 

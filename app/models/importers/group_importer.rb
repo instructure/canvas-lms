@@ -17,21 +17,21 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_dependency 'importers'
+require_dependency "importers"
 
 module Importers
   class GroupImporter < Importer
     self.item_class = Group
 
     def self.process_migration(data, migration)
-      groups = data['groups'] || []
+      groups = data["groups"] || []
       groups.each do |group|
-        next unless migration.import_object?("groups", group['migration_id'])
+        next unless migration.import_object?("groups", group["migration_id"])
 
         begin
           import_from_migration(group, migration.context, migration)
         rescue
-          migration.add_import_warning(t('#migration.group_type', "Group"), group[:title], $!)
+          migration.add_import_warning(t("#migration.group_type", "Group"), group[:title], $!)
         end
       end
     end

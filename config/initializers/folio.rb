@@ -17,12 +17,12 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'folio/core_ext/enumerable'
+require "folio/core_ext/enumerable"
 
 module Folio::WillPaginate::ActiveRecord::Pagination
   def paginate(options = {})
     unless options.key?(:total_entries)
-      scope = if ::Rails.version < '4'
+      scope = if ::Rails.version < "4"
                 scoped
               elsif is_a?(::ActiveRecord::Relation)
                 self
@@ -35,14 +35,14 @@ module Folio::WillPaginate::ActiveRecord::Pagination
       unless group_values.empty?
         begin
           scope.connection.transaction(requires_new: true) do
-            timeout = Setting.get('pagination_count_timeout', '5s')
+            timeout = Setting.get("pagination_count_timeout", "5s")
             scope.connection.execute("SET LOCAL statement_timeout=#{scope.connection.quote(timeout)}")
             # total_entries left to an auto-count, but the relation being
             # paginated has a grouping. we need to do a special count, lest
             # self.count give us a hash instead of the integer we expect.
-            having_clause_empty = Rails.version < '5' ? scope.having_values.empty? : scope.having_clause.empty?
+            having_clause_empty = Rails.version < "5" ? scope.having_values.empty? : scope.having_clause.empty?
             options[:total_entries] = if having_clause_empty && group_values.length == 1 # multi-column distinct counts are broken right now (as of rails 4.2.5) :(
-                                        if Rails.version < '5'
+                                        if Rails.version < "5"
                                           except(:group, :select).select(group_values).uniq.count
                                         else
                                           except(:group, :select).select(group_values).distinct.count
@@ -65,7 +65,7 @@ module FolioARPagination
     if !options.key?(:total_entries) && respond_to?(:count)
       begin
         connection.transaction(requires_new: true) do
-          timeout = Setting.get('pagination_count_timeout', '5s')
+          timeout = Setting.get("pagination_count_timeout", "5s")
           connection.execute("SET LOCAL statement_timeout=#{connection.quote(timeout)}")
           options[:total_entries] = count(:all)
         end

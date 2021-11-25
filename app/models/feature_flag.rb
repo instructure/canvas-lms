@@ -88,7 +88,7 @@ class FeatureFlag < ActiveRecord::Base
   def audit_log_update(operation: :update)
     # kill switch in case something goes crazy in rolling this out.
     # TODO: we can yank this guard clause once we're happy with it's stability.
-    return unless Setting.get('write_feature_flag_audit_logs', 'true') == 'true'
+    return unless Setting.get("write_feature_flag_audit_logs", "true") == "true"
 
     # User feature flags only get changed by the target user,
     # are much higher volume than higher level flags, and are generally
@@ -121,7 +121,7 @@ class FeatureFlag < ActiveRecord::Base
   end
 
   def default_for_flag
-    Feature.definitions[feature]&.state || 'undefined'
+    Feature.definitions[feature]&.state || "undefined"
   end
 
   private

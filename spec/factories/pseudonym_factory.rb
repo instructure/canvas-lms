@@ -55,7 +55,7 @@ module Factories
     @pseudonym.sis_user_id = opts[:sis_user_id]
     @pseudonym.integration_id = opts[:integration_id]
     @pseudonym.save_without_session_maintenance
-    opts[:username] = opts[:username] + user.id.to_s + '@example.com' unless opts[:username].include? '@'
+    opts[:username] = opts[:username] + user.id.to_s + "@example.com" unless opts[:username].include? "@"
     @pseudonym.communication_channel = communication_channel(user, opts)
     @pseudonym
   end

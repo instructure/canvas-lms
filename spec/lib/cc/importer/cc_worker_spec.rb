@@ -26,7 +26,7 @@ describe CC::Importer::CCWorker do
     expect_any_instance_of(CC::Importer::Canvas::Converter).to receive(:export).and_return({})
     worker = CC::Importer::CCWorker.new(cm.id)
     expect(worker.perform).to eq true
-    expect(cm.reload.migration_settings[:worker_class]).to eq 'CC::Importer::Canvas::Converter'
+    expect(cm.reload.migration_settings[:worker_class]).to eq "CC::Importer::Canvas::Converter"
   end
 
   it "honors skip_job_progress" do

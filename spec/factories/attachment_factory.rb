@@ -57,7 +57,7 @@ module Factories
       folder = opts[:folder]
     else
       if @context.respond_to?(:folders)
-        @folder = Folder.root_folders(@context).find { |f| f.name == 'unfiled' } || Folder.root_folders(@context).first
+        @folder = Folder.root_folders(@context).find { |f| f.name == "unfiled" } || Folder.root_folders(@context).first
       end
       @folder ||= folder_model
       folder = @folder
@@ -66,8 +66,8 @@ module Factories
       context: @context,
       size: 100,
       folder: folder,
-      content_type: 'application/loser',
-      filename: 'unknown.loser'
+      content_type: "application/loser",
+      filename: "unknown.loser"
     }
   end
 
@@ -80,22 +80,22 @@ module Factories
     sio
   end
 
-  def stub_png_data(filename = 'test my file? hai!&.png', data = nil)
-    stub_file_data(filename, data, 'image/png')
+  def stub_png_data(filename = "test my file? hai!&.png", data = nil)
+    stub_file_data(filename, data, "image/png")
   end
 
   def jpeg_data_frd
-    fixture_path = 'test_image.jpg'
-    fixture_file_upload(fixture_path, 'image/jpeg', true)
+    fixture_path = "test_image.jpg"
+    fixture_file_upload(fixture_path, "image/jpeg", true)
   end
 
   def one_hundred_megapixels_of_highly_compressed_png_data
-    fixture_path = '100mpx.png'
-    fixture_file_upload(fixture_path, 'image/png', true)
+    fixture_path = "100mpx.png"
+    fixture_file_upload(fixture_path, "image/png", true)
   end
 
   def crocodocable_attachment_model(opts = {})
-    attachment_model({ content_type: 'application/pdf' }.merge(opts))
+    attachment_model({ content_type: "application/pdf" }.merge(opts))
   end
 
   alias_method :canvadocable_attachment_model, :crocodocable_attachment_model

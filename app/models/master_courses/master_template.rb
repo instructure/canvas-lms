@@ -27,7 +27,7 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
   # instead of the entire course, but for now that's what we'll roll with
 
   belongs_to :course
-  belongs_to :root_account, class_name: 'Account'
+  belongs_to :root_account, class_name: "Account"
 
   # these store which pieces of blueprint content are locked (and how)
   has_many :master_content_tags, class_name: "MasterCourses::MasterContentTag", inverse_of: :master_template
@@ -273,12 +273,12 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
     deletions_by_type = {}
     MasterCourses::CONTENT_TYPES_FOR_DELETIONS.each do |klass|
       item_scope = case klass
-                   when 'Attachment'
-                     course.attachments.where(file_state: 'deleted')
+                   when "Attachment"
+                     course.attachments.where(file_state: "deleted")
                    else
-                     klass.constantize.where(context_id: course, context_type: 'Course', workflow_state: 'deleted')
+                     klass.constantize.where(context_id: course, context_type: "Course", workflow_state: "deleted")
                    end
-      item_scope = item_scope.where('updated_at>?', last_export_started_at).select(:id)
+      item_scope = item_scope.where("updated_at>?", last_export_started_at).select(:id)
       deleted_mig_ids = content_tags.where(content_type: klass, content_id: item_scope).pluck(:migration_id)
       deletions_by_type[klass] = deleted_mig_ids if deleted_mig_ids.any?
     end

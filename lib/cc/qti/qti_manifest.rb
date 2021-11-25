@@ -35,7 +35,7 @@ module CC
                                                            @exporter.user,
                                                            key_generator: @exporter,
                                                            track_referenced_files: true,
-                                                           media_object_flavor: Setting.get('exporter_media_object_flavor', nil).presence)
+                                                           media_object_flavor: Setting.get("exporter_media_object_flavor", nil).presence)
       end
 
       def export_dir
@@ -53,7 +53,7 @@ module CC
       end
 
       def create_document
-        @file = File.new(File.join(export_dir, MANIFEST), 'w')
+        @file = File.new(File.join(export_dir, MANIFEST), "w")
         @document = Builder::XmlMarkup.new(target: @file, indent: 2)
         @document.instruct!
         # noinspection RubyArgCount
@@ -75,7 +75,7 @@ module CC
               g = Qti::QtiGenerator.new(self, resources, @html_exporter)
               g.generate_qti_only
             rescue
-              add_error(I18n.t('course_exports.errors.quizzes', "Some quizzes failed to export"), $!)
+              add_error(I18n.t("course_exports.errors.quizzes", "Some quizzes failed to export"), $!)
             end
             set_progress(60)
 
@@ -84,7 +84,7 @@ module CC
               att = course.attachments.find_by(id: file_id)
               next unless att
 
-              path = att.full_display_path.sub("course files/", '')
+              path = att.full_display_path.sub("course files/", "")
               zipper.add_attachment_to_zip(att, @exporter.zip_file, path)
 
               resources.resource(
@@ -99,14 +99,14 @@ module CC
             begin
               Resource.new(self, manifest_node, resources).add_media_objects(@html_exporter)
             rescue
-              add_error(I18n.t('course_exports.errors.resources', "Failed to link some resources."), $!)
+              add_error(I18n.t("course_exports.errors.resources", "Failed to link some resources."), $!)
             end
           end
         end # manifest
 
         # write any errors to the manifest file
         unless @exporter.errors.empty?
-          @document.comment! I18n.t('course_exports.errors_list_message', "Export errors for export %{export_id}:", export_id: @exporter.export_id)
+          @document.comment! I18n.t("course_exports.errors_list_message", "Export errors for export %{export_id}:", export_id: @exporter.export_id)
           @exporter.errors.each do |error|
             @document.comment! error.first
           end

@@ -23,11 +23,11 @@ module Canvas::Plugins::Validators::EtherpadValidator
     if settings.map(&:last).all?(&:blank?)
       {}
     elsif settings.map(&:last).any?(&:blank?)
-      plugin_setting.errors.add(:base, I18n.t('canvas.plugins.errors.all_fields_required', 'All fields are required'))
+      plugin_setting.errors.add(:base, I18n.t("canvas.plugins.errors.all_fields_required", "All fields are required"))
       false
     else
       settings = settings.slice(:domain, :name).to_h.with_indifferent_access
-      settings[:domain] = settings[:domain]&.sub(/https?:/, '')&.gsub(%r{(^/+)|(/)+$}, '')
+      settings[:domain] = settings[:domain]&.sub(/https?:/, "")&.gsub(%r{(^/+)|(/)+$}, "")
       settings[:name] ||= "EtherPad"
       settings
     end

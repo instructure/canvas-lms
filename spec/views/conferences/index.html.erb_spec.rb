@@ -18,13 +18,13 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../views_helper'
+require_relative "../views_helper"
 
 describe "/conferences/index" do
   before do
     # these specs need an enabled web conference plugin
-    @plugin = PluginSetting.create!(name: 'wimba')
-    @plugin.update_attribute(:settings, { domain: 'www.example.com' })
+    @plugin = PluginSetting.create!(name: "wimba")
+    @plugin.update_attribute(:settings, { domain: "www.example.com" })
   end
 
   it "renders" do

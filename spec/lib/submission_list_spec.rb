@@ -45,11 +45,11 @@ describe SubmissionList do
     course_with_teacher(active_all: true)
     course_with_student(course: @course, active_all: true)
 
-    @assignment1 = @course.assignments.create!(title: 'one', points_possible: 10)
-    @assignment2 = @course.assignments.create!(title: 'two', points_possible: 10)
-    @assignment3 = @course.assignments.create!(title: 'three', points_possible: 10)
+    @assignment1 = @course.assignments.create!(title: "one", points_possible: 10)
+    @assignment2 = @course.assignments.create!(title: "two", points_possible: 10)
+    @assignment3 = @course.assignments.create!(title: "three", points_possible: 10)
 
-    Time.zone = 'Alaska'
+    Time.zone = "Alaska"
     allow(Time).to receive(:now).and_return(Time.utc(2011, 12, 31, 23, 0))   # 12/31 14:00 local time
     @assignment1.grade_student(@student, { grade: 10, grader: @teacher })
     allow(Time).to receive(:now).and_return(Time.utc(2012, 1, 1, 1, 0))      # 12/31 16:00 local time
@@ -70,7 +70,7 @@ describe SubmissionList do
     course_with_teacher(active_all: true)
     course_with_student(course: @course, active_all: true)
 
-    @some_assignment = @course.assignments.create!(title: 'one', points_possible: 10)
+    @some_assignment = @course.assignments.create!(title: "one", points_possible: 10)
     subs = @some_assignment.grade_student(@student, { grade: 8, grader: @teacher })
     subs.each do |s|
       s.created_at = 3.days.ago
@@ -176,20 +176,20 @@ describe SubmissionList do
       it "sorts submissions alphabetically by student name" do
         day = SubmissionList.days(@course)[0]
         submissions = day.graders[0].assignments[0].submissions
-        expect(submissions[0].student_name).to eql('student')
-        expect(submissions[1].student_name).to eql('studeñt')
-        expect(submissions[2].student_name).to eql('studeЖt')
+        expect(submissions[0].student_name).to eql("student")
+        expect(submissions[1].student_name).to eql("studeñt")
+        expect(submissions[2].student_name).to eql("studeЖt")
       end
     end
   end
 
   context "regrading" do
-    it 'includes regrade events in the final data' do
+    it "includes regrade events in the final data" do
       # Figure out how to manually regrade a test piece of data
       interesting_submission_data
-      @assignment = @course.assignments.create!(title: 'some_assignment')
+      @assignment = @course.assignments.create!(title: "some_assignment")
       @quiz = Quizzes::Quiz.create!({ context: @course, title: "quiz time", points_possible: 10, assignment_id: @assignment.id, quiz_type: "assignment" })
-      @quiz.workflow_state = 'published'
+      @quiz.workflow_state = "published"
       @quiz.quiz_data = [multiple_choice_question_data]
       @quiz.save!
       @qs = @quiz.generate_submission(@student)
@@ -197,7 +197,7 @@ describe SubmissionList do
       @points = 15.0
 
       @question = double(id: 1, question_data: { id: 1,
-                                                 regrade_option: 'full_credit',
+                                                 regrade_option: "full_credit",
                                                  points_possible: @points },
                          quiz_group: nil)
 
@@ -234,7 +234,7 @@ describe SubmissionList do
   end
 
   context "remembers the most recent grade change" do
-    let(:grader)  { User.create name: 'some_grader' }
+    let(:grader)  { User.create name: "some_grader" }
     let(:student) { User.create name: "some student", workflow_state: "registered" }
     let(:course)  { Course.create name: "some course", workflow_state: "available" }
     let(:list)    { SubmissionList.new course }
@@ -311,8 +311,8 @@ def interesting_submission_data(opts = {})
   opts[:assignment] ||= {}
   opts[:submission] ||= {}
 
-  @grader = user_model({ name: 'some_grader' }.merge(opts[:grader]))
-  @grader2 = user_model({ name: 'another_grader' }.merge(opts[:grader]))
+  @grader = user_model({ name: "some_grader" }.merge(opts[:grader]))
+  @grader2 = user_model({ name: "another_grader" }.merge(opts[:grader]))
   @student = factory_with_protected_attributes(User, { name: "studeñt", workflow_state: "registered" }.merge(opts[:user]))
   @course = factory_with_protected_attributes(Course, { name: "some course", workflow_state: "available" }.merge(opts[:course]))
   [@grader, @grader2].each do |grader|
@@ -329,11 +329,11 @@ def interesting_submission_data(opts = {})
   @assignment.grade_student(@student, { grade: 1.5, grader: @grader }.merge(opts[:submission]))
   @assignment.grade_student(@student, { grade: 3, grader: @grader }.merge(opts[:submission]))
   @assignment.grade_student(@student, { grade: 5, grader: @grader2 }.merge(opts[:submission]))
-  @student = user_model(name: 'studeЖt')
+  @student = user_model(name: "studeЖt")
   @course.enroll_student(@student)
   @assignment.reload
   @assignment.grade_student(@student, { grade: 8, grader: @grader }.merge(opts[:submission]))
-  @student = user_model(name: 'student')
+  @student = user_model(name: "student")
   @course.enroll_student(@student)
   @assignment.reload
   @assignment.grade_student(@student, { grade: 10, grader: @grader }.merge(opts[:submission]))

@@ -176,7 +176,7 @@ describe MasterCourses::MasterTemplate do
       assmt_restricts = { content: true, points: true }
       topic_restricts = { content: true }
       @template.update_attribute(:default_restrictions_by_type,
-                                 { 'Assignment' => assmt_restricts, 'DiscussionTopic' => topic_restricts })
+                                 { "Assignment" => assmt_restricts, "DiscussionTopic" => topic_restricts })
 
       expect(topic_tag1.reload.restrictions).to be_blank # shouldn't have updated yet because it's not configured to use per-object defaults
       expect(assmt_tag1.reload.restrictions).to be_blank
@@ -217,9 +217,9 @@ describe MasterCourses::MasterTemplate do
     it "touches content when tightening default_restrictions_by_type" do
       @template.update(use_default_restrictions_by_type: true,
                        default_restrictions_by_type: {
-                         'Assignment' => { content: true, points: true },
-                         'DiscussionTopic' => { content: true },
-                         'Quizzes::Quiz' => { content: true }
+                         "Assignment" => { content: true, points: true },
+                         "DiscussionTopic" => { content: true },
+                         "Quizzes::Quiz" => { content: true }
                        })
 
       old_time = 1.minute.ago
@@ -232,9 +232,9 @@ describe MasterCourses::MasterTemplate do
         end
       end
       @template.update(default_restrictions_by_type: {
-                         'Assignment' => { content: true }, # lessened restrictions
-                         'DiscussionTopic' => { content: true, points: true },
-                         'Quizzes::Quiz' => { content: true, due_dates: true }
+                         "Assignment" => { content: true }, # lessened restrictions
+                         "DiscussionTopic" => { content: true, points: true },
+                         "Quizzes::Quiz" => { content: true, due_dates: true }
                        })
       expect(@assmt.reload.updated_at.to_i).to eq old_time.to_i
       expect(@topic.reload.updated_at.to_i).to_not eq old_time.to_i
@@ -290,9 +290,9 @@ describe MasterCourses::MasterTemplate do
 
       time1 = 2.days.ago
       time2 = 1.day.ago
-      t1.master_migrations.create!(imports_completed_at: time1, workflow_state: 'completed')
-      t1.master_migrations.create!(imports_completed_at: time2, workflow_state: 'completed')
-      t2.master_migrations.create!(imports_completed_at: time1, workflow_state: 'completed')
+      t1.master_migrations.create!(imports_completed_at: time1, workflow_state: "completed")
+      t1.master_migrations.create!(imports_completed_at: time2, workflow_state: "completed")
+      t2.master_migrations.create!(imports_completed_at: time1, workflow_state: "completed")
 
       MasterCourses::MasterTemplate.preload_index_data([t1, t2, t3])
 
@@ -309,7 +309,7 @@ describe MasterCourses::MasterTemplate do
     it "does not count deleted courses" do
       t = MasterCourses::MasterTemplate.set_as_master_course(@course)
       t.add_child_course!(Course.create!)
-      t.add_child_course!(Course.create!(workflow_state: 'deleted'))
+      t.add_child_course!(Course.create!(workflow_state: "deleted"))
 
       MasterCourses::MasterTemplate.preload_index_data([t])
 

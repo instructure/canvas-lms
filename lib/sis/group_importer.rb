@@ -104,15 +104,15 @@ module SIS
         group.name = name if name.present? && !group.stuck_sis_fields.include?(:name)
         group.context = context
         group.sis_batch_id = @batch.id
-        group.workflow_state = status == 'deleted' ? 'deleted' : 'available'
+        group.workflow_state = status == "deleted" ? "deleted" : "available"
 
         if group.save
           data = SisBatchRollBackData.build_data(sis_batch: @batch, context: group)
           @roll_back_data << data if data
-          if status == 'deleted'
+          if status == "deleted"
             gms = SisBatchRollBackData.build_dependent_data(sis_batch: @batch,
                                                             contexts: group.group_memberships,
-                                                            updated_state: 'deleted')
+                                                            updated_state: "deleted")
           end
           @roll_back_data.push(*gms) if gms
           @success_count += 1

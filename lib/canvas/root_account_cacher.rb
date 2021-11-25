@@ -35,10 +35,10 @@ module Canvas
     end
 
     def self.included(klass)
-      if (r = klass.reflections['root_account'])
+      if (r = klass.reflections["root_account"])
         r.extend(ExtendRootAccountReflection)
       else
-        (r = klass.reflections['account']).extend(ExtendRootAccountReflection)
+        (r = klass.reflections["account"]).extend(ExtendRootAccountReflection)
       end
       m = Module.new
 

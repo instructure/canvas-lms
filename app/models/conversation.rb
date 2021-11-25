@@ -66,7 +66,7 @@ class Conversation < ActiveRecord::Base
                else
                  users_or_user_ids
                end
-    str = user_ids.uniq.sort.join(',')
+    str = user_ids.uniq.sort.join(",")
     str += "|#{context_code}" if context_code
     Digest::SHA1.hexdigest(str)
   end
@@ -74,7 +74,7 @@ class Conversation < ActiveRecord::Base
   def bulk_insert_participants(user_ids, options = {})
     options = {
       conversation_id: id,
-      workflow_state: 'read',
+      workflow_state: "read",
       has_attachments: has_attachments?,
       has_media_objects: has_media_objects?,
       root_account_ids: read_attribute(:root_account_ids)
@@ -116,7 +116,7 @@ class Conversation < ActiveRecord::Base
 
         # TODO: transaction on these shards as well?
         bulk_insert_options = {
-          tags: '',
+          tags: "",
           private_hash: private_hash
         }
         Shard.partition_by_shard(user_ids) do |shard_user_ids|
@@ -153,7 +153,7 @@ class Conversation < ActiveRecord::Base
 
         if options[:no_messages]
           bulk_insert_options = {
-            workflow_state: 'unread',
+            workflow_state: "unread",
             message_count: 0,
             private_hash: private_hash
           }
@@ -164,7 +164,7 @@ class Conversation < ActiveRecord::Base
           num_messages = conversation_messages.human.size
 
           bulk_insert_options = {
-            workflow_state: 'unread',
+            workflow_state: "unread",
             last_message_at: last_message_at,
             message_count: num_messages,
             private_hash: private_hash
@@ -316,7 +316,7 @@ class Conversation < ActiveRecord::Base
     message.body = body
     message.generated = options[:generated] || false
     if options[:root_account_id]
-      message.context_type = 'Account'
+      message.context_type = "Account"
       message.context_id = options[:root_account_id]
     end
 
@@ -330,7 +330,7 @@ class Conversation < ActiveRecord::Base
       raise "user doesn't have permission to forward these messages" unless current_user.all_conversations.where(conversation_id: conversation_ids.first).exists?
 
       # TODO: optimize me
-      message.forwarded_message_ids = messages.map(&:id).join(',')
+      message.forwarded_message_ids = messages.map(&:id).join(",")
     end
     message.generate_user_note = true if options[:generate_user_note]
     message
@@ -338,7 +338,7 @@ class Conversation < ActiveRecord::Base
 
   def preload_users_and_context_codes
     users = User.where(id: conversation_participants.map(&:user_id)).pluck(:id, :updated_at).map do |id, updated_at|
-      User.send(:instantiate, 'id' => id, 'updated_at' => updated_at)
+      User.send(:instantiate, "id" => id, "updated_at" => updated_at)
     end
     User.preload_conversation_context_codes(users)
     users.index_by(&:id)
@@ -408,7 +408,7 @@ class Conversation < ActiveRecord::Base
             conversation_participant_id: cp.id,
             user_id: cp.user_id,
             tags: message_tags ? serialized_tags(message_tags) : nil,
-            workflow_state: 'active'
+            workflow_state: "active"
           }
         end
         # some of the participants we're about to insert may have been soft-deleted,
@@ -482,16 +482,16 @@ class Conversation < ActiveRecord::Base
       update_for_skips = options[:update_for_skips] != false
 
       conversation_participants.where("(last_message_at IS NULL OR subscribed) AND user_id NOT IN (?)", skip_ids)
-                               .update_all(last_message_at: message.created_at, workflow_state: 'unread')
+                               .update_all(last_message_at: message.created_at, workflow_state: "unread")
 
       # for the sender (or override(s)), we just update the timestamps (if
       # needed). for last_authored_at, we ignore update_for_skips, since the
       # column is only viewed by the other participants and doesn't care about
       # what messages the author may have deleted
       updates = [
-        maybe_update_timestamp('last_message_at', message.created_at, update_for_skips ? [] : ["last_message_at IS NOT NULL AND user_id NOT IN (?)", skip_ids]),
-        maybe_update_timestamp('last_authored_at', message.created_at, ["user_id = ?", message.author_id]),
-        maybe_update_timestamp('visible_last_authored_at', message.created_at, ["user_id = ?", message.author_id])
+        maybe_update_timestamp("last_message_at", message.created_at, update_for_skips ? [] : ["last_message_at IS NOT NULL AND user_id NOT IN (?)", skip_ids]),
+        maybe_update_timestamp("last_authored_at", message.created_at, ["user_id = ?", message.author_id]),
+        maybe_update_timestamp("visible_last_authored_at", message.created_at, ["user_id = ?", message.author_id])
       ]
       updates << "workflow_state = CASE WHEN workflow_state = 'archived' THEN 'read' ELSE workflow_state END" if update_for_skips
       conversation_participants.where(user_id: skip_ids).update_all(updates.join(", "))
@@ -521,7 +521,7 @@ class Conversation < ActiveRecord::Base
     participant = conversation_participants.where(user_id: user).first
     user = nil unless user && participant
     if user
-      participant.update_attribute(:workflow_state, 'read') if participant.workflow_state == 'unread'
+      participant.update_attribute(:workflow_state, "read") if participant.workflow_state == "unread"
       message = truncate_message(message)
       add_message(user, message, opts)
     else
@@ -581,10 +581,10 @@ class Conversation < ActiveRecord::Base
   end
 
   def self.batch_regenerate_private_hashes!(ids)
-    select("conversations.*, (SELECT #{connection.func(:group_concat, :user_id, ',')} FROM #{ConversationParticipant.quoted_table_name} WHERE conversation_id = conversations.id) AS user_ids")
+    select("conversations.*, (SELECT #{connection.func(:group_concat, :user_id, ",")} FROM #{ConversationParticipant.quoted_table_name} WHERE conversation_id = conversations.id) AS user_ids")
       .where(id: ids)
       .each do |c|
-      c.regenerate_private_hash!(c.user_ids.split(',').map(&:to_i)) # group_concat order is arbitrary in sqlite, so we just let ruby do the sorting
+      c.regenerate_private_hash!(c.user_ids.split(",").map(&:to_i)) # group_concat order is arbitrary in sqlite, so we just let ruby do the sorting
     end
   end
 
@@ -787,7 +787,7 @@ class Conversation < ActiveRecord::Base
 
   def maybe_update_timestamp(col, val, additional_conditions = [])
     scope = self.class.where(["(#{col} IS NULL OR #{col} < ?)", val]).where(additional_conditions)
-    condition = scope.where_clause.send(:predicates).join(' AND ')
+    condition = scope.where_clause.send(:predicates).join(" AND ")
     sanitize_sql ["#{col} = CASE WHEN #{condition} THEN ? ELSE #{col} END", val]
   end
 end

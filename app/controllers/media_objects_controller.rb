@@ -146,10 +146,10 @@ class MediaObjectsController < ApplicationController
       url = api_v1_media_objects_url
     end
 
-    order_dir = params[:order] == 'desc' ? 'desc' : 'asc'
-    order_by = params[:sort] || 'title'
-    if order_by == 'title'
-      order_by = MediaObject.best_unicode_collation_key('COALESCE(user_entered_title, title)')
+    order_dir = params[:order] == "desc" ? "desc" : "asc"
+    order_by = params[:sort] || "title"
+    if order_by == "title"
+      order_by = MediaObject.best_unicode_collation_key("COALESCE(user_entered_title, title)")
     end
     scope = scope.order(order_by => order_dir)
     scope = MediaObject.search_by_attribute(scope, :title, params[:search_term])
@@ -180,7 +180,7 @@ class MediaObjectsController < ApplicationController
 
       if params[:user_entered_title].blank?
         return(
-          render json: { message: 'The user_entered_title parameter must have a value' },
+          render json: { message: "The user_entered_title parameter must have a value" },
                  status: :bad_request
         )
       end
@@ -226,7 +226,7 @@ class MediaObjectsController < ApplicationController
     @show_right_side = false
     @media_object = MediaObject.by_media_id(params[:id]).first
     js_env(MEDIA_OBJECT_ID: params[:id],
-           MEDIA_OBJECT_TYPE: @media_object ? @media_object.media_type.to_s : 'video')
+           MEDIA_OBJECT_TYPE: @media_object ? @media_object.media_type.to_s : "video")
     render
   end
 
@@ -270,8 +270,8 @@ class MediaObjectsController < ApplicationController
     js_env media_object: media_object_api_json(@media_object, @current_user, session) if @media_object
     js_bundle :media_player_iframe_content
     css_bundle :media_player
-    render html: "<div id='player_container'>#{I18n.t('Loading...')}</div>".html_safe,
-           layout: 'layouts/bare'
+    render html: "<div id='player_container'>#{I18n.t("Loading...")}</div>".html_safe,
+           layout: "layouts/bare"
   end
 
   private
@@ -287,7 +287,7 @@ class MediaObjectsController < ApplicationController
       raise ActiveRecord::RecordNotFound, "invalid media_object_id" unless @media_object
 
       @media_object.delay(singleton: "retrieve_media_details:#{@media_object.media_id}").retrieve_details
-      increment_request_cost(Setting.get('missed_media_additional_request_cost', '200').to_i)
+      increment_request_cost(Setting.get("missed_media_additional_request_cost", "200").to_i)
     end
 
     @media_object.viewed!

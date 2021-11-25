@@ -17,38 +17,38 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../../qti_helper'
+require_relative "../../qti_helper"
 if Qti.migration_executable
   describe "Converting D2L QTI" do
     let(:opts) { { flavor: Qti::Flavors::D2L } }
 
     it "converts multiple choice" do
-      expect(get_question_hash(d2l_question_dir, 'multiple_choice', **opts)).to eq D2LExpected::MULTIPLE_CHOICE
+      expect(get_question_hash(d2l_question_dir, "multiple_choice", **opts)).to eq D2LExpected::MULTIPLE_CHOICE
     end
 
     it "converts true false" do
-      expect(get_question_hash(d2l_question_dir, 'true_false', **opts)).to eq D2LExpected::TRUE_FALSE
+      expect(get_question_hash(d2l_question_dir, "true_false", **opts)).to eq D2LExpected::TRUE_FALSE
     end
 
     it "converts short answer" do
-      expect(get_question_hash(d2l_question_dir, 'short_answer', **opts)).to eq D2LExpected::SHORT_ANSWER
+      expect(get_question_hash(d2l_question_dir, "short_answer", **opts)).to eq D2LExpected::SHORT_ANSWER
     end
 
     it "converts multi select" do
-      expect(get_question_hash(d2l_question_dir, 'multi_select', **opts)).to eq D2LExpected::MULTI_SELECT
+      expect(get_question_hash(d2l_question_dir, "multi_select", **opts)).to eq D2LExpected::MULTI_SELECT
     end
 
     it "converts multiple short" do
-      expect(get_question_hash(d2l_question_dir, 'multiple_short', **opts)).to eq D2LExpected::MULTIPLE_SHORT
+      expect(get_question_hash(d2l_question_dir, "multiple_short", **opts)).to eq D2LExpected::MULTIPLE_SHORT
     end
 
     it "converts fill in the blank with multiple blanks" do
-      expect(get_question_hash(d2l_question_dir, 'fib', **opts)).to eq D2LExpected::FIB
+      expect(get_question_hash(d2l_question_dir, "fib", **opts)).to eq D2LExpected::FIB
     end
 
     it "converts matching" do
       # pp get_question_hash(d2l_question_dir, 'matching', false)
-      hash = get_question_hash(d2l_question_dir, 'matching', delete_answer_ids: false, **opts)
+      hash = get_question_hash(d2l_question_dir, "matching", delete_answer_ids: false, **opts)
       matches = {}
       hash[:matches].each { |m| matches[m[:match_id]] = m[:text] }
       hash[:answers].each do |a|
@@ -64,36 +64,36 @@ if Qti.migration_executable
     end
 
     it "flags ordering question as an error" do
-      expect(get_question_hash(d2l_question_dir, 'ordering', **opts)).to eq D2LExpected::ORDERING
+      expect(get_question_hash(d2l_question_dir, "ordering", **opts)).to eq D2LExpected::ORDERING
     end
 
     it "converts math question" do
-      expect(get_question_hash(d2l_question_dir, 'math', **opts)).to eq D2LExpected::MATH
+      expect(get_question_hash(d2l_question_dir, "math", **opts)).to eq D2LExpected::MATH
     end
 
     it "converts a simple math question to a numeric question" do
-      expect(get_question_hash(d2l_question_dir, 'simple_math', **opts)).to eq D2LExpected::SIMPLE_MATH
+      expect(get_question_hash(d2l_question_dir, "simple_math", **opts)).to eq D2LExpected::SIMPLE_MATH
     end
 
     it "converts long answer" do
-      expect(get_question_hash(d2l_question_dir, 'long_answer', **opts)).to eq D2LExpected::LONG_ANSWER
+      expect(get_question_hash(d2l_question_dir, "long_answer", **opts)).to eq D2LExpected::LONG_ANSWER
     end
 
     it "converts an item with a response condition with no condition" do
-      expect(get_question_hash(d2l_question_dir, 'no_condition', **opts)).to eq D2LExpected::NO_CONDITION
+      expect(get_question_hash(d2l_question_dir, "no_condition", **opts)).to eq D2LExpected::NO_CONDITION
     end
 
     it "converts the assessment into a quiz" do
       allow_any_instance_of(Qti::AssessmentTestConverter).to receive(:unique_local_id).and_return("random")
-      expect(get_quiz_data(d2l_question_dir, 'assessment', **opts).last.first).to eq D2LExpected::ASSESSMENT
+      expect(get_quiz_data(d2l_question_dir, "assessment", **opts).last.first).to eq D2LExpected::ASSESSMENT
     end
 
     it "converts the assessment references into a quiz" do
-      expect(get_quiz_data(d2l_question_dir, 'assessment_references', **opts).last.first).to eq D2LExpected::ASSESSMENT_REFS
+      expect(get_quiz_data(d2l_question_dir, "assessment_references", **opts).last.first).to eq D2LExpected::ASSESSMENT_REFS
     end
 
     it "converts text only questions" do
-      expect(get_quiz_data(d2l_question_dir, 'text_only', **opts).first).to eq D2LExpected::TEXT_ONLY
+      expect(get_quiz_data(d2l_question_dir, "text_only", **opts).first).to eq D2LExpected::TEXT_ONLY
     end
   end
 
@@ -159,7 +159,7 @@ if Qti.migration_executable
                    ],
                    time_limit: 15,
                    allowed_attempts: -1,
-                   assignment_migration_id: '435646',
+                   assignment_migration_id: "435646",
                    description: "<p>description</p>" }.freeze
 
     ASSESSMENT_REFS = { title: "Quiz 2",
@@ -179,7 +179,7 @@ if Qti.migration_executable
                         question_count: 3,
                         time_limit: 15,
                         access_code: "insecure",
-                        assignment_migration_id: '164842' }.freeze
+                        assignment_migration_id: "164842" }.freeze
 
     LONG_ANSWER = { question_bank_name: "02gilback",
                     points_possible: 5.0,
@@ -234,8 +234,8 @@ if Qti.migration_executable
     MATCHING = { question_text: "<p>letter to number</p>",
                  question_name: "matching",
                  migration_id: "QUES_968912_1181398",
-                 matches: [{ html: "<strong>1</strong>", text: '1' },
-                           { html: "<span style=\"text-decoration: underline;\">2</span>", text: '2' }],
+                 matches: [{ html: "<strong>1</strong>", text: "1" },
+                           { html: "<span style=\"text-decoration: underline;\">2</span>", text: "2" }],
                  correct_comments: "",
                  question_type: "matching_question",
                  incorrect_comments: "",

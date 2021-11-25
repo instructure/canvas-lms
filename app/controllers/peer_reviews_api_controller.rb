@@ -136,7 +136,7 @@ class PeerReviewsApiController < ApplicationController
         assessment_request.destroy
         render json: assessment_request_json(assessment_request, @current_user, session, [])
       else
-        render json: { errors: { base: t('errors.delete_reminder_failed', "Delete failed") } },
+        render json: { errors: { base: t("errors.delete_reminder_failed", "Delete failed") } },
                status: :bad_request
       end
     end

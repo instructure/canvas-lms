@@ -229,7 +229,7 @@ class SubmissionsController < SubmissionsBaseController
     return if (user_id || submit_at) && !authorized_action(user_sub, @current_user, :grade)
 
     if @assignment.locked_for?(@submission_user) && !@assignment.grants_right?(@current_user, :update)
-      flash[:notice] = t('errors.can_not_submit_locked_assignment', "You can't submit an assignment when it is locked")
+      flash[:notice] = t("errors.can_not_submit_locked_assignment", "You can't submit an assignment when it is locked")
       redirect_to named_context_url(@context, :context_assignment_url, @assignment.id)
       return
     end
@@ -249,18 +249,18 @@ class SubmissionsController < SubmissionsBaseController
         return unless extensions_allowed?
         return unless has_file_attached?
       elsif is_google_doc?
-        params[:submission][:submission_type] = 'online_upload'
+        params[:submission][:submission_type] = "online_upload"
         attachment, err_message = submit_google_doc(params[:google_doc][:document_id])
         if attachment.nil? || err_message
-          flash[:error] = err_message || t('errors.no_attachment_found', "Could not find an attachment to send to google drive")
+          flash[:error] = err_message || t("errors.no_attachment_found", "Could not find an attachment to send to google drive")
           return redirect_to(course_assignment_url(@context, @assignment))
         else
           params[:submission][:attachments] << attachment
         end
       elsif is_media_recording? && !has_media_recording?
-        flash[:error] = t('errors.media_file_attached', "There was no media recording in the submission")
+        flash[:error] = t("errors.media_file_attached", "There was no media recording in the submission")
         return redirect_to named_context_url(@context, :context_assignment_url, @assignment)
-      elsif params[:submission][:submission_type] == 'student_annotation' && params[:submission][:annotatable_attachment_id].blank?
+      elsif params[:submission][:submission_type] == "student_annotation" && params[:submission][:annotatable_attachment_id].blank?
         flash[:error] = t("Student Annotation submissions require an annotatable_attachment_id to submit")
         return redirect_to(course_assignment_url(@context, @assignment))
       end
@@ -292,7 +292,7 @@ class SubmissionsController < SubmissionsBaseController
     rescue ActiveRecord::RecordInvalid => e
       respond_to do |format|
         format.html do
-          flash[:error] = t('errors.assignment_submit_fail', "Assignment failed to submit")
+          flash[:error] = t("errors.assignment_submit_fail", "Assignment failed to submit")
           redirect_to course_assignment_url(@context, @assignment)
         end
         format.json { render json: e.record.errors, status: :bad_request }
@@ -302,9 +302,9 @@ class SubmissionsController < SubmissionsBaseController
 
     respond_to do |format|
       if @submission.persisted?
-        log_asset_access(@assignment, "assignments", @assignment_group, 'submit')
+        log_asset_access(@assignment, "assignments", @assignment_group, "submit")
         format.html do
-          flash[:notice] = t('assignment_submit_success', 'Assignment successfully submitted.')
+          flash[:notice] = t("assignment_submit_success", "Assignment successfully submitted.")
           tardiness = if @submission.late?
                         2 # late
                       elsif @submission.cached_due_date.nil?
@@ -333,7 +333,7 @@ class SubmissionsController < SubmissionsBaseController
         end
       else
         format.html do
-          flash[:error] = t('errors.assignment_submit_fail', "Assignment failed to submit")
+          flash[:error] = t("errors.assignment_submit_fail", "Assignment failed to submit")
           render :show, id: @submission.assignment.context.id
         end
         format.json { render json: @submission.errors, status: :bad_request }
@@ -428,7 +428,7 @@ class SubmissionsController < SubmissionsBaseController
   private :lookup_existing_attachments
 
   def is_media_recording?
-    params[:submission][:submission_type] == 'media_recording'
+    params[:submission][:submission_type] == "media_recording"
   end
   private :is_media_recording?
 
@@ -438,7 +438,7 @@ class SubmissionsController < SubmissionsBaseController
   private :has_media_recording?
 
   def verify_api_call_has_attachment
-    if params[:submission][:submission_type] == 'online_upload' && params[:submission][:attachments].blank?
+    if params[:submission][:submission_type] == "online_upload" && params[:submission][:attachments].blank?
       render(json: { message: "No valid file ids given" }, status: :bad_request)
       return false
     end
@@ -464,7 +464,7 @@ class SubmissionsController < SubmissionsBaseController
     always_permitted = always_permitted_create_params
 
     # Make sure that the submitted parameters match what we expect
-    submission_params = (['submission_type'] + API_SUBMISSION_TYPES[submission_type]).sort
+    submission_params = (["submission_type"] + API_SUBMISSION_TYPES[submission_type]).sort
     params[:submission].slice!(*submission_params)
     if params[:submission].keys.sort != submission_params
       render(json: {
@@ -485,14 +485,14 @@ class SubmissionsController < SubmissionsBaseController
   private :process_api_submission_params
 
   def online_upload?
-    params[:attachments] && params[:submission][:submission_type] == 'online_upload'
+    params[:attachments] && params[:submission][:submission_type] == "online_upload"
   end
   private :online_upload?
 
   def has_file_attached?
     # require at least one file to be attached
     if params[:attachments].blank?
-      flash[:error] = t('errors.no_attached_file', "You must attach at least one file to this assignment")
+      flash[:error] = t("errors.no_attached_file", "You must attach at least one file to this assignment")
       redirect_to named_context_url(@context, :context_assignment_url, @assignment)
       return false
     end
@@ -505,12 +505,12 @@ class SubmissionsController < SubmissionsBaseController
     # The first check here is for web interface submissions that contain only one file
     # The second check is for multiple submissions and API calls that use the uploaded_data parameter to pass a filename
     if @assignment.allowed_extensions.present? &&
-       (params[:submission][:attachments].any? { |a| !@assignment.allowed_extensions.include?((a.after_extension || '').downcase) } ||
+       (params[:submission][:attachments].any? { |a| !@assignment.allowed_extensions.include?((a.after_extension || "").downcase) } ||
           params[:attachments].values.any? do |a|
             !a[:uploaded_data].empty? &&
-            !@assignment.allowed_extensions.include?((a[:uploaded_data].split('.').last || '').downcase)
+            !@assignment.allowed_extensions.include?((a[:uploaded_data].split(".").last || "").downcase)
           end)
-      flash[:error] = t('errors.invalid_file_type', "Invalid file type")
+      flash[:error] = t("errors.invalid_file_type", "Invalid file type")
       redirect_to named_context_url(@context, :context_assignment_url, @assignment)
       return false
     end
@@ -520,8 +520,8 @@ class SubmissionsController < SubmissionsBaseController
 
   def valid_text_entry?
     sub_params = params[:submission]
-    if sub_params[:submission_type] == 'online_text_entry' && sub_params[:body].blank?
-      flash[:error] = t('Text entry submission cannot be empty')
+    if sub_params[:submission_type] == "online_text_entry" && sub_params[:body].blank?
+      flash[:error] = t("Text entry submission cannot be empty")
       redirect_to named_context_url(@context, :context_assignment_url, @assignment)
       return false
     end
@@ -545,17 +545,17 @@ class SubmissionsController < SubmissionsBaseController
                                                                                                      @assignment.allowed_extensions)
 
     unless document_response.try(:is_a?, Net::HTTPOK) || document_response.status == 200
-      return nil, t('errors.assignment_submit_fail', 'Assignment failed to submit')
+      return nil, t("errors.assignment_submit_fail", "Assignment failed to submit")
     end
 
     restriction_enabled           = @domain_root_account.feature_enabled?(:google_docs_domain_restriction)
     restricted_google_docs_domain = @domain_root_account.settings[:google_docs_domain]
     if restriction_enabled && restricted_google_docs_domain.present? && !@current_user.gmail.match(/@#{restricted_google_docs_domain}$/)
-      return nil, t('errors.invalid_google_docs_domain', 'You cannot submit assignments from this google_docs domain')
+      return nil, t("errors.invalid_google_docs_domain", "You cannot submit assignments from this google_docs domain")
     end
 
     # process the file and create an attachment
-    filename = "google_doc_#{Time.zone.now.strftime('%Y%m%d%H%M%S')}#{@current_user.id}.#{file_extension}"
+    filename = "google_doc_#{Time.zone.now.strftime("%Y%m%d%H%M%S")}#{@current_user.id}.#{file_extension}"
 
     attachment = @assignment.attachments.new
     attachment.user = @current_user
@@ -563,7 +563,7 @@ class SubmissionsController < SubmissionsBaseController
 
     Dir.mktmpdir do |dirname|
       path = File.join(dirname, filename)
-      File.open(path, 'wb') do |f|
+      File.open(path, "wb") do |f|
         f.write(document_response.body)
       end
       store_google_doc_attachment(attachment, Rack::Test::UploadedFile.new(path, content_type, true))
@@ -572,10 +572,10 @@ class SubmissionsController < SubmissionsBaseController
     [attachment, nil] # error message doesn't exist if we got this far
   rescue GoogleDrive::WorkflowError => e
     Canvas::Errors.capture_exception(:google_drive, e, :warn)
-    [nil, t('errors.google_drive_workflow', 'Google Drive entry was unable to be downloaded')]
+    [nil, t("errors.google_drive_workflow", "Google Drive entry was unable to be downloaded")]
   rescue GoogleDrive::ConnectionException => e
     Canvas::Errors.capture_exception(:google_drive, e, :warn)
-    [nil, t('errors.googld_drive_timeout', 'Timed out while talking to google drive')]
+    [nil, t("errors.googld_drive_timeout", "Timed out while talking to google drive")]
   end
   protected :submit_google_doc
 
@@ -602,7 +602,7 @@ class SubmissionsController < SubmissionsBaseController
 
     return true if resource_link
 
-    message = t('Resource link not found for given `resource_link_lookup_uuid`')
+    message = t("Resource link not found for given `resource_link_lookup_uuid`")
 
     # Homework submission is done by API request, but I saw other parts of code
     # that are handling HTML and JSON format. So, I kept the same logic here...
@@ -630,14 +630,14 @@ class SubmissionsController < SubmissionsBaseController
           format.html do
             send_file(attachment.full_filename, {
                         type: attachment.content_type_with_encoding,
-                        disposition: 'inline'
+                        disposition: "inline"
                       })
           end
 
           format.zip do
             send_file(attachment.full_filename, {
                         type: attachment.content_type_with_encoding,
-                        disposition: 'inline'
+                        disposition: "inline"
                       })
           end
         else
@@ -647,7 +647,7 @@ class SubmissionsController < SubmissionsBaseController
         end
         format.json { render json: attachment.as_json(methods: :readable_size) }
       else
-        flash[:notice] = t('still_zipping', "File zipping still in process...")
+        flash[:notice] = t("still_zipping", "File zipping still in process...")
 
         format.html do
           redirect_to named_context_url(context, :context_assignment_url, assignment.id)

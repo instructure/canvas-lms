@@ -146,7 +146,7 @@ describe MasterCourses::Restrictor do
 
   describe "file weirdness" do
     before(:once) do
-      @original_file = @copy_from.attachments.create! display_name: 'blargh',
+      @original_file = @copy_from.attachments.create! display_name: "blargh",
                                                       uploaded_data: default_uploaded_data,
                                                       folder: Folder.root_folders(@copy_from).first
       @file_tag = @template.create_content_tag_for!(@original_file)
@@ -155,32 +155,32 @@ describe MasterCourses::Restrictor do
     end
 
     it "allows overwriting a non-restricted file" do
-      new_file = @copy_to.attachments.create! display_name: 'blargh',
+      new_file = @copy_to.attachments.create! display_name: "blargh",
                                               uploaded_data: default_uploaded_data,
                                               folder: Folder.root_folders(@copy_to).first
       deleted_files = new_file.handle_duplicates(:overwrite)
       expect(deleted_files).to match_array([@copied_file])
       expect(@copied_file.reload).to be_deleted
       expect(new_file.reload).not_to be_deleted
-      expect(new_file.display_name).to eq 'blargh'
+      expect(new_file.display_name).to eq "blargh"
     end
 
     it "prevents overwriting a restricted file" do
       @file_tag.update_attribute(:restrictions, { content: true })
-      new_file = @copy_to.attachments.create! display_name: 'blargh',
+      new_file = @copy_to.attachments.create! display_name: "blargh",
                                               uploaded_data: default_uploaded_data,
                                               folder: Folder.root_folders(@copy_to).first
       deleted_files = new_file.handle_duplicates(:overwrite)
       expect(deleted_files).to be_empty
       expect(@copied_file.reload).not_to be_deleted
       expect(new_file.reload).not_to be_deleted
-      expect(new_file.display_name).not_to eq 'blargh'
+      expect(new_file.display_name).not_to eq "blargh"
     end
   end
 
   it "prevents updating a title on a module item for restricted content" do
     mod = @copy_to.context_modules.create!
-    item = mod.add_item(id: @page_copy.id, type: 'wiki_page')
+    item = mod.add_item(id: @page_copy.id, type: "wiki_page")
     item.update_attribute(:title, "new title") # should work
     @tag.update_attribute(:restrictions, { content: true })
     item.reload
@@ -199,7 +199,7 @@ describe MasterCourses::Restrictor do
     assmt_copy.child_content_restrictions = nil
 
     rubric = Rubric.create!(context: @copy_to, points_possible: 3)
-    rubric.associate_with(assmt_copy, @copy_to, purpose: 'grading', use_for_grading: true)
+    rubric.associate_with(assmt_copy, @copy_to, purpose: "grading", use_for_grading: true)
 
     expect(assmt_copy.reload.points_possible).to eq 1 # don't change the points via the rubric
   end

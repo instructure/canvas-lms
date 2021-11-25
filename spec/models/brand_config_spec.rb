@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'db/migrate/20150709205405_create_k12_theme'
+require "db/migrate/20150709205405_create_k12_theme"
 
 describe BrandConfig do
   it "creates an instance with a parent_md5" do
@@ -94,15 +94,15 @@ describe BrandConfig do
     end
 
     it "includes custom variables from brand config" do
-      expect(@brand_variables["ic-brand-global-nav-bgd"]).to eq '#123'
+      expect(@brand_variables["ic-brand-global-nav-bgd"]).to eq "#123"
     end
 
     it "includes custom variables from parent brand config" do
-      expect(@brand_variables["ic-brand-primary"]).to eq '#321'
+      expect(@brand_variables["ic-brand-primary"]).to eq "#321"
     end
 
     it "includes default variables not found in brand config" do
-      expect(@brand_variables["ic-link-color"]).to eq '#008EE2'
+      expect(@brand_variables["ic-link-color"]).to eq "#008EE2"
     end
   end
 
@@ -200,7 +200,7 @@ describe BrandConfig do
         expect(@css_file.string).to eq @subaccount_bc.to_css
       end
 
-      it 'uploads json, css & js file to s3' do
+      it "uploads json, css & js file to s3" do
         @upload_expectation.with(eq(
           @subaccount_bc.public_json_path
         ).or(eq(

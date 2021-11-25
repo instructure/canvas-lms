@@ -87,9 +87,9 @@ class ExternalFeed < ActiveRecord::Base
   def format_description(desc)
     desc = (desc || "").to_s
     case verbosity
-    when 'link_only'
+    when "link_only"
       ""
-    when 'truncate'
+    when "truncate"
       extend TextHelper
       truncate_html(desc, max_length: 250)
     else
@@ -104,7 +104,7 @@ class ExternalFeed < ActiveRecord::Base
       if uuid && uuid.length > 255
         uuid = Digest::SHA256.hexdigest(uuid)
       end
-      uuid ||= Digest::SHA256.hexdigest("#{item.title}#{item.date.strftime('%Y-%m-%d')}")
+      uuid ||= Digest::SHA256.hexdigest("#{item.title}#{item.date.strftime("%Y-%m-%d")}")
 
       entry = external_feed_entries.where(uuid: uuid).first
       entry ||= external_feed_entries.where(url: item.link).first
@@ -139,7 +139,7 @@ class ExternalFeed < ActiveRecord::Base
       )
       return entry if entry.save
     when :atom
-      uuid = item.id || Digest::SHA256.hexdigest("#{item.title}#{item.published.utc.strftime('%Y-%m-%d')}")
+      uuid = item.id || Digest::SHA256.hexdigest("#{item.title}#{item.published.utc.strftime("%Y-%m-%d")}")
       entry = external_feed_entries.where(uuid: uuid).first
       entry ||= external_feed_entries.where(url: item.links.alternate.to_s).first
       author = item.authors.first || OpenObject.new

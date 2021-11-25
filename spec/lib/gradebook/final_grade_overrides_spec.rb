@@ -46,16 +46,16 @@ describe Gradebook::FinalGradeOverrides do
 
     @student_enrollment_1 = student_in_course(active_all: true, course: @course)
     @student_enrollment_2 = student_in_course(active_all: true, course: @course)
-    @test_student_enrollment = course_with_user('StudentViewEnrollment', course: @course, active_all: true)
+    @test_student_enrollment = course_with_user("StudentViewEnrollment", course: @course, active_all: true)
 
     @student_1 = @student_enrollment_1.user
     @student_2 = @student_enrollment_2.user
     @test_student = @test_student_enrollment.user
 
     @assignment = assignment_model(course: @course, points_possible: 10)
-    @assignment.grade_student(@student_1, grade: '85%', grader: @teacher)
-    @assignment.grade_student(@student_2, grade: '85%', grader: @teacher)
-    @assignment.grade_student(@test_student, grade: '85%', grader: @teacher)
+    @assignment.grade_student(@student_1, grade: "85%", grader: @teacher)
+    @assignment.grade_student(@student_2, grade: "85%", grader: @teacher)
+    @assignment.grade_student(@test_student, grade: "85%", grader: @teacher)
   end
 
   it "includes user ids for each user with an overridden course grade" do

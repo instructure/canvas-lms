@@ -17,14 +17,14 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-ENV['RAILS_ENV'] = ENV['RACK_ENV'] = 'test'
+ENV["RAILS_ENV"] = ENV["RACK_ENV"] = "test"
 
-require 'pact/provider/rspec'
-require_relative '../pact_config'
-require_relative '../../../spec_helper'
-require_relative 'pact_setup'
-require_relative 'proxy_app'
-require_relative 'provider_states_for_consumer'
+require "pact/provider/rspec"
+require_relative "../pact_config"
+require_relative "../../../spec_helper"
+require_relative "pact_setup"
+require_relative "proxy_app"
+require_relative "provider_states_for_consumer"
 
 Pact.service_provider PactConfig::Providers::CANVAS_LMS_API do
   app { PactApiConsumerProxy.new }
@@ -32,7 +32,7 @@ Pact.service_provider PactConfig::Providers::CANVAS_LMS_API do
   def provider_verification_for(consumer)
     pact_path =
       format(
-        'pacts/provider/%<provider>s/consumer/%<consumer>s',
+        "pacts/provider/%<provider>s/consumer/%<consumer>s",
         provider: ERB::Util.url_encode(PactConfig::Providers::CANVAS_LMS_API),
         consumer: ERB::Util.url_encode(consumer)
       )
@@ -49,8 +49,8 @@ Pact.service_provider PactConfig::Providers::CANVAS_LMS_API do
   PactConfig::Consumers::ALL.each do |consumer|
     next if consumer == PactConfig::Consumers::CANVAS_LMS_API # don't want to run canvas-lms contracts against itself where it would be a consumer and provider
 
-    if (ENV['PACT_API_CONSUMER'].present? && ENV['PACT_API_CONSUMER'] == consumer) ||
-       ENV['PACT_API_CONSUMER'].blank?
+    if (ENV["PACT_API_CONSUMER"].present? && ENV["PACT_API_CONSUMER"] == consumer) ||
+       ENV["PACT_API_CONSUMER"].blank?
       provider_verification_for(consumer)
     end
   end

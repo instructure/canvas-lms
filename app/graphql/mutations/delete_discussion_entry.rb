@@ -19,9 +19,9 @@
 #
 
 class Mutations::DeleteDiscussionEntry < Mutations::BaseMutation
-  graphql_name 'DeleteDiscussionEntry'
+  graphql_name "DeleteDiscussionEntry"
 
-  argument :id, ID, required: true, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func('DiscussionEntry')
+  argument :id, ID, required: true, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("DiscussionEntry")
 
   # Due to the way we represent deleted discussion entries we are diverging from
   # the convention of only returning deleted record ids. This is intentional and
@@ -29,13 +29,13 @@ class Mutations::DeleteDiscussionEntry < Mutations::BaseMutation
   field :discussion_entry, Types::DiscussionEntryType, null: true
   def resolve(input:)
     entry = DiscussionEntry.find(input[:id])
-    raise GraphQL::ExecutionError, 'not found' unless entry.grants_right?(current_user, session, :read)
-    return validation_error(I18n.t('Insufficient permissions')) unless entry.grants_right?(current_user, session, :delete)
+    raise GraphQL::ExecutionError, "not found" unless entry.grants_right?(current_user, session, :read)
+    return validation_error(I18n.t("Insufficient permissions")) unless entry.grants_right?(current_user, session, :delete)
 
     entry.editor_id = current_user.id
     entry.destroy
     { discussion_entry: entry }
   rescue ActiveRecord::RecordNotFound
-    raise GraphQL::ExecutionError, 'not found'
+    raise GraphQL::ExecutionError, "not found"
   end
 end

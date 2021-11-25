@@ -18,14 +18,14 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../views_helper'
+require_relative "../views_helper"
 
 describe "/users/show" do
   before do
     enroll = course_with_student
     account_admin_user
     gm = GroupMembership.create!(
-      group: @course.groups.create(name: 'our group'),
+      group: @course.groups.create(name: "our group"),
       user: @user,
       workflow_state: "accepted"
     )

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-require 'rake/task_graph'
-require 'parallel'
+require "rake/task_graph"
+require "parallel"
 
 $canvas_tasks_loaded ||= false
 unless $canvas_tasks_loaded
@@ -15,7 +15,7 @@ unless $canvas_tasks_loaded
   end
 
   def parallel_processes
-    processes = (ENV['CANVAS_BUILD_CONCURRENCY'] || Parallel.processor_count).to_i
+    processes = (ENV["CANVAS_BUILD_CONCURRENCY"] || Parallel.processor_count).to_i
     puts "working in #{processes} processes"
     processes
   end
@@ -27,7 +27,7 @@ unless $canvas_tasks_loaded
       # need it for this task: forked processes (through Parallel) that invoke other
       # Rake tasks may require the Rails environment and for some reason, Rake will
       # not re-run the environment task when forked
-      require 'config/environment' rescue nil
+      require "config/environment" rescue nil
 
       # opt out
       npm_install = ENV["COMPILE_ASSETS_NPM_INSTALL"] != "0"
@@ -36,38 +36,38 @@ unless $canvas_tasks_loaded
       build_styleguide = ENV["COMPILE_ASSETS_STYLEGUIDE"] != "0"
       build_i18n = ENV["RAILS_LOAD_ALL_LOCALES"] != "0"
       build_js = ENV["COMPILE_ASSETS_BUILD_JS"] != "0"
-      build_prod_js = ENV['RAILS_ENV'] == 'production' || ENV['USE_OPTIMIZED_JS'] == 'true' || ENV['USE_OPTIMIZED_JS'] == 'True'
+      build_prod_js = ENV["RAILS_ENV"] == "production" || ENV["USE_OPTIMIZED_JS"] == "true" || ENV["USE_OPTIMIZED_JS"] == "True"
       # build dev bundles even in prod mode so you can debug with ?optimized_js=0
       # query string (except for on jenkins where we set JS_BUILD_NO_UGLIFY anyway
       # so there's no need for an unminified fallback)
-      build_dev_js = ENV['JS_BUILD_NO_FALLBACK'] != "1" && (!build_prod_js || ENV['JS_BUILD_NO_UGLIFY'] != "1")
+      build_dev_js = ENV["JS_BUILD_NO_FALLBACK"] != "1" && (!build_prod_js || ENV["JS_BUILD_NO_UGLIFY"] != "1")
 
       batches = Rake::TaskGraph.draw do
-        task 'css:compile' => ['js:gulp_rev'] if build_css
-        task 'css:styleguide' if build_styleguide
-        task 'doc:api' if build_api_docs
-        task 'js:yarn_install' if npm_install
-        task 'js:gulp_rev' => [
-          ('js:yarn_install' if npm_install)
+        task "css:compile" => ["js:gulp_rev"] if build_css
+        task "css:styleguide" if build_styleguide
+        task "doc:api" if build_api_docs
+        task "js:yarn_install" if npm_install
+        task "js:gulp_rev" => [
+          ("js:yarn_install" if npm_install)
         ].compact
 
         if build_i18n
-          task 'i18n:generate_js' => [
-            ('js:yarn_install' if npm_install)
+          task "i18n:generate_js" => [
+            ("js:yarn_install" if npm_install)
           ].compact
         end
 
         if build_js && build_dev_js
-          task 'js:webpack_development' => [
-            'js:gulp_rev',
-            ('i18n:generate_js' if build_i18n),
+          task "js:webpack_development" => [
+            "js:gulp_rev",
+            ("i18n:generate_js" if build_i18n),
           ]
         end
 
         if build_js && build_prod_js
-          task 'js:webpack_production' => [
-            'js:gulp_rev',
-            ('i18n:generate_js' if build_i18n),
+          task "js:webpack_production" => [
+            "js:gulp_rev",
+            ("i18n:generate_js" if build_i18n),
           ]
         end
       end
@@ -101,14 +101,14 @@ unless $canvas_tasks_loaded
       ENV["COMPILE_ASSETS_NPM_INSTALL"] = "0"
       ENV["COMPILE_ASSETS_STYLEGUIDE"] = "0"
       ENV["COMPILE_ASSETS_API_DOCS"] = "0"
-      Rake::Task['canvas:compile_assets'].invoke
+      Rake::Task["canvas:compile_assets"].invoke
     end
 
     desc "Load config/dynamic_settings.yml into the configured consul cluster"
     task seed_consul: [:environment] do
       def load_tree(root, tree)
         tree.each do |node, subtree|
-          key = [root, node].compact.join('/')
+          key = [root, node].compact.join("/")
           if subtree.is_a?(Hash)
             load_tree(key, subtree)
           else
@@ -117,16 +117,16 @@ unless $canvas_tasks_loaded
         end
       end
 
-      load_tree(nil, ConfigFile.load('dynamic_settings'))
+      load_tree(nil, ConfigFile.load("dynamic_settings"))
     end
 
     desc "Initialize vault"
     task seed_vault: [:environment] do
-      Canvas::Vault.api_client.sys.mount(Canvas::Vault.kv_mount, 'kv', 'Application secrets for canvas', {
+      Canvas::Vault.api_client.sys.mount(Canvas::Vault.kv_mount, "kv", "Application secrets for canvas", {
                                            options: { version: 1 },
                                            config: {
                                              # In prod this is higher, but for dev, a low ttl is more useful
-                                             default_lease_ttl: '10s'
+                                             default_lease_ttl: "10s"
                                            }
                                          })
     end
@@ -153,8 +153,8 @@ unless $canvas_tasks_loaded
       pending_migrations = ActiveRecord::Migrator.new(:up, migrations, ActiveRecord::Base.connection.schema_migration).pending_migrations
       pending_migrations.each do |pending_migration|
         tags = pending_migration.tags
-        tags = " (#{tags.join(', ')})" unless tags.empty?
-        puts '  %4d %s%s' % [pending_migration.version, pending_migration.name, tags]
+        tags = " (#{tags.join(", ")})" unless tags.empty?
+        puts "  %4d %s%s" % [pending_migration.version, pending_migration.name, tags]
       end
     end
 
@@ -164,8 +164,8 @@ unless $canvas_tasks_loaded
       skipped_migrations = ActiveRecord::Migrator.new(:up, migrations, ActiveRecord::Base.connection.schema_migration).skipped_migrations
       skipped_migrations.each do |skipped_migration|
         tags = skipped_migration.tags
-        tags = " (#{tags.join(', ')})" unless tags.empty?
-        puts '  %4d %s%s' % [skipped_migration.version, skipped_migration.name, tags]
+        tags = " (#{tags.join(", ")})" unless tags.empty?
+        puts "  %4d %s%s" % [skipped_migration.version, skipped_migration.name, tags]
       end
     end
 
@@ -187,8 +187,8 @@ unless $canvas_tasks_loaded
       task reset: [:environment, :load_config] do
         raise "Run with RAILS_ENV=test" unless Rails.env.test?
 
-        config = ActiveRecord::Base.configurations['test']
-        queue = config['queue']
+        config = ActiveRecord::Base.configurations["test"]
+        queue = config["queue"]
         ActiveRecord::Tasks::DatabaseTasks.drop(queue) if queue rescue nil
         ActiveRecord::Tasks::DatabaseTasks.drop(config) rescue nil
         Shard.default(reload: true) # make sure we know that sharding isn't set up yet
@@ -202,19 +202,19 @@ unless $canvas_tasks_loaded
         ActiveRecord::Tasks::DatabaseTasks.create(config)
         ::ActiveRecord::Base.connection.schema_cache.clear!
         ::ActiveRecord::Base.descendants.each(&:reset_column_information)
-        Rake::Task['db:migrate'].invoke
+        Rake::Task["db:migrate"].invoke
       end
     end
   end
 
   Switchman::Rake.filter_database_servers do |servers, block|
-    ENV['REGION']&.split(',')&.each do |region|
+    ENV["REGION"]&.split(",")&.each do |region|
       method = :select!
-      if region[0] == '-'
+      if region[0] == "-"
         method = :reject!
         region = region[1..]
       end
-      if region == 'self'
+      if region == "self"
         servers.send(method, &:in_current_region?)
       else
         servers.send(method) { |server| server.in_region?(region) }

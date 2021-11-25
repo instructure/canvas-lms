@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../common'
+require_relative "../common"
 
 describe "course people" do
   include_context "in-process server selenium tests"
@@ -31,7 +31,7 @@ describe "course people" do
 
   def add_user(email, type, section_name = nil)
     get "/courses/#{@course.id}/users"
-    add_button = f('#addUsers')
+    add_button = f("#addUsers")
     expect(add_button).to be_displayed
     add_button.click
     wait_for_ajaximations
@@ -86,7 +86,7 @@ describe "course people" do
 
     def open_kyle_menu(user, role = nil)
       cog = kyle_menu(user, role)
-      f('.al-trigger', cog).click
+      f(".al-trigger", cog).click
       wait_for_ajaximations
       cog
     end
@@ -101,21 +101,21 @@ describe "course people" do
     it "removes a user from the course" do
       username = "user@example.com"
       student_in_course(name: username, role: @custom_student_role)
-      add_section('Section1')
+      add_section("Section1")
       @enrollment.course_section = @course_section
       @enrollment.save!
 
       go_to_people_page
-      expect(f('.roster')).to include_text(username)
+      expect(f(".roster")).to include_text(username)
 
       remove_user(@student)
-      expect(f('.roster')).not_to include_text(username)
+      expect(f(".roster")).not_to include_text(username)
     end
 
-    def add_user_to_second_section(role = nil, enrollment_state = 'invited')
+    def add_user_to_second_section(role = nil, enrollment_state = "invited")
       role ||= student_role
       student_in_course(user: user_with_pseudonym, role: role, enrollment_state: enrollment_state)
-      section_name = 'Another Section'
+      section_name = "Another Section"
       add_section(section_name)
       # open tab
       go_to_people_page
@@ -123,7 +123,7 @@ describe "course people" do
       # open dialog
       use_edit_sections_dialog(@student) do
         # choose section
-        select_from_auto_complete(section_name, 'section_input')
+        select_from_auto_complete(section_name, "section_input")
       end
       # expect
       expect(f("#user_#{@student.id}")).to include_text(section_name)
@@ -138,7 +138,7 @@ describe "course people" do
     end
 
     it "adds an active enrollment to another section if the user has already accepted their enrollment" do
-      add_user_to_second_section(nil, 'active')
+      add_user_to_second_section(nil, "active")
     end
 
     it "adds a user to a second (active) section in a concluded course" do
@@ -148,7 +148,7 @@ describe "course people" do
       @course.save!
 
       student_in_course(user: user_with_pseudonym, role: student_role)
-      section_name = 'Another Section'
+      section_name = "Another Section"
       add_section(section_name)
 
       @course_section.end_at = 1.day.from_now
@@ -161,7 +161,7 @@ describe "course people" do
       # open dialog
       use_edit_sections_dialog(@student) do
         # choose section
-        select_from_auto_complete(section_name, 'section_input')
+        select_from_auto_complete(section_name, "section_input")
       end
       # expect
       expect(f("#user_#{@student.id}")).to include_text(section_name)
@@ -181,7 +181,7 @@ describe "course people" do
       # when
       links = ff(".admin-links li a")
       link = links.detect { |l| l.text.include?("User Details") }
-      href = link['href']
+      href = link["href"]
       link.click
       wait_for_ajaximations
       wait_for_ajax_requests
@@ -203,7 +203,7 @@ describe "course people" do
 
       expect(f("#user_#{@student.id} span.label")).to include_text("inactive")
       @enrollment.reload
-      expect(@enrollment.workflow_state).to eq 'inactive'
+      expect(@enrollment.workflow_state).to eq "inactive"
 
       cog = open_kyle_menu(@student)
       link = f('a[data-event="reactivateUser"]', cog)
@@ -212,7 +212,7 @@ describe "course people" do
       wait_for_ajaximations
       expect(f("#content")).not_to contain_css("#user_#{@student.id} span.label")
       @enrollment.reload
-      expect(@enrollment.workflow_state).to eq 'active'
+      expect(@enrollment.workflow_state).to eq "active"
     end
 
     def use_link_dialog(observer, role = nil)
@@ -220,7 +220,7 @@ describe "course people" do
       f('a[data-event="linkToStudents"]', cog).click
       wait_for_ajaximations
       yield
-      f('.ui-dialog-buttonpane .btn-primary').click
+      f(".ui-dialog-buttonpane .btn-primary").click
       wait_for_ajaximations
     end
 
@@ -229,7 +229,7 @@ describe "course people" do
       f('a[data-event="editSections"]', cog).click
       wait_for_ajaximations
       yield
-      f('.ui-dialog-buttonpane .btn-primary').click
+      f(".ui-dialog-buttonpane .btn-primary").click
       wait_for_ajaximations
     end
 
@@ -239,7 +239,7 @@ describe "course people" do
       2.times do |i|
         student_in_course(name: "Student #{i}")
         students << @student
-        e = @course.observer_enrollments.create!(user: obs, workflow_state: 'active')
+        e = @course.observer_enrollments.create!(user: obs, workflow_state: "active")
         e.associated_user_id = @student.id
         e.save!
       end
@@ -248,7 +248,7 @@ describe "course people" do
 
       go_to_people_page
 
-      observer_row = ff("#user_#{obs.id}").map(&:text).join(',')
+      observer_row = ff("#user_#{obs.id}").map(&:text).join(",")
       expect(observer_row).to include students[0].name
       expect(observer_row).to include students[1].name
       # remove an observer
@@ -259,7 +259,7 @@ describe "course people" do
       expect(obs.reload.not_ended_enrollments.count).to eq 1
       # add an observer
       use_link_dialog(obs) do
-        select_from_auto_complete(students[2].name, 'student_input')
+        select_from_auto_complete(students[2].name, "student_input")
       end
       # expect
       expect(obs.reload.not_ended_enrollments.count).to eq 2
@@ -271,13 +271,13 @@ describe "course people" do
 
       obs = user_model(name: "The Observer")
       student_in_course(name: "Student 1", active_all: true, role: @custom_student_role)
-      @course.enroll_user(obs, 'ObserverEnrollment', enrollment_state: 'active', associated_user_id: @student.id, role: custom_observer_role)
+      @course.enroll_user(obs, "ObserverEnrollment", enrollment_state: "active", associated_user_id: @student.id, role: custom_observer_role)
       student_in_course(name: "Student 2", active_all: true, role: @custom_student_role)
       obs_enrollment =
         @course.enroll_user(
           obs,
-          'ObserverEnrollment',
-          enrollment_state: 'active',
+          "ObserverEnrollment",
+          enrollment_state: "active",
           associated_user_id: @student.id,
           allow_multiple_enrollments: true,
           role: custom_observer_role
@@ -288,7 +288,7 @@ describe "course people" do
 
       go_to_people_page
 
-      observer_row = ff("#user_#{obs.id}").map(&:text).join(',')
+      observer_row = ff("#user_#{obs.id}").map(&:text).join(",")
       expect(observer_row).to include "Student 1"
       expect(observer_row).not_to include "Student 2"
 
@@ -303,7 +303,7 @@ describe "course people" do
     %w[ta designer].each do |et|
       it "does not let #{et}s remove admins from the course" do
         send "custom_#{et}_role", "custom"
-        send "course_with_#{et}", course: @course, active_all: true, custom_role: 'custom'
+        send "course_with_#{et}", course: @course, active_all: true, custom_role: "custom"
         user_session @user
         student_in_course user: user_with_pseudonym, course: @course, role: @custom_student_role
 
@@ -323,7 +323,7 @@ describe "course people" do
       expect(f("#content")).not_to contain_css(".student_enrollments #user_#{@fake_student.id}")
     end
 
-    context 'with granular permissions enabled' do
+    context "with granular permissions enabled" do
       before do
         @account.root_account.enable_feature!(:granular_permissions_manage_users)
       end
@@ -331,15 +331,15 @@ describe "course people" do
       it "removes a user from the course" do
         username = "user@example.com"
         student_in_course(name: username, role: @custom_student_role)
-        add_section('Section1')
+        add_section("Section1")
         @enrollment.course_section = @course_section
         @enrollment.save!
 
         go_to_people_page
-        expect(f('.roster')).to include_text(username)
+        expect(f(".roster")).to include_text(username)
 
         remove_user(@student)
-        expect(f('.roster')).not_to include_text(username)
+        expect(f(".roster")).not_to include_text(username)
       end
 
       it "adds a user without custom role to another section" do
@@ -349,13 +349,13 @@ describe "course people" do
 
     context "multiple enrollments" do
       it "links an observer enrollment when other enrollment types exist" do
-        course_with_student course: @course, active_all: true, name: 'teh student'
+        course_with_student course: @course, active_all: true, name: "teh student"
         course_with_ta user: user_with_pseudonym, course: @course, active_all: true
         course_with_observer course: @course, active_all: true, user: @ta
 
         go_to_people_page
-        use_link_dialog(@observer, 'ObserverEnrollment') do
-          select_from_auto_complete(@student.name, 'student_input')
+        use_link_dialog(@observer, "ObserverEnrollment") do
+          select_from_auto_complete(@student.name, "student_input")
         end
 
         expect(@observer.enrollments.where(associated_user_id: @student)).to be_exists
@@ -372,7 +372,7 @@ describe "course people" do
         go_to_people_page
 
         use_link_dialog(@observer) do
-          select_from_auto_complete(@student.name, 'student_input')
+          select_from_auto_complete(@student.name, "student_input")
         end
 
         @observer.reload
@@ -385,10 +385,10 @@ describe "course people" do
 
       def select_new_role_type(type)
         get "/courses/#{@course.id}/users"
-        add_button = f('#addUsers')
+        add_button = f("#addUsers")
         keep_trying_until { expect(add_button).to be_displayed }
         add_button.click
-        click_INSTUI_Select_option('#role_id', type)
+        click_INSTUI_Select_option("#role_id", type)
       end
 
       %w[student teacher ta designer observer].each do |base_type|
@@ -400,7 +400,7 @@ describe "course people" do
         end
       end
 
-      context 'with granular permissions enabled' do
+      context "with granular permissions enabled" do
         before do
           @account.root_account.enable_feature!(:granular_permissions_manage_users)
         end

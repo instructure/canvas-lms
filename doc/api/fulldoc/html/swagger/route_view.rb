@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'hash_view'
+require "hash_view"
 
 class RouteView < HashView
   attr_reader :raw_route, :method_view
@@ -41,12 +41,12 @@ class RouteView < HashView
 
   def api_path
     path = remove_parentheticals(raw_route.path.spec.to_s)
-    path.chop! if path.length > 1 && path[-1] == '/' # remove trailing slash
+    path.chop! if path.length > 1 && path[-1] == "/" # remove trailing slash
     path
   end
 
   def remove_parentheticals(str)
-    str.gsub(/\([^)]+\)/, '')
+    str.gsub(/\([^)]+\)/, "")
   end
 
   def path_variables
@@ -55,7 +55,7 @@ class RouteView < HashView
 
   def swagger_path
     api_path
-      .gsub(%r{^/api}, '')
+      .gsub(%r{^/api}, "")
       .gsub(/:(\w+)/, '{\1}')
   end
 
@@ -65,7 +65,7 @@ class RouteView < HashView
 
   def query_args
     method_view.raw_arguments.map do |tag|
-      ArgumentView.new(tag.text, verb, path_variables, deprecated: tag.tag_name&.downcase == 'deprecated_argument')
+      ArgumentView.new(tag.text, verb, path_variables, deprecated: tag.tag_name&.downcase == "deprecated_argument")
     end
   end
 

@@ -181,7 +181,7 @@ class GradeCalculator
         end
 
         preloaded_thresholds = ObserverAlertThreshold.active
-                                                     .where(user_id: scores_info[:student_ids], alert_type: ['course_grade_high', 'course_grade_low'])
+                                                     .where(user_id: scores_info[:student_ids], alert_type: ["course_grade_high", "course_grade_low"])
                                                      .group_by(&:user_id)
 
         reloaded_scores = Score.where(id: scores_info[:ids]).index_by(&:id)
@@ -401,7 +401,7 @@ class GradeCalculator
 
   def joined_enrollment_ids
     # use local_id because we'll exec the query on the enrollment's shard
-    @joined_enrollment_ids ||= enrollments.map(&:local_id).join(',')
+    @joined_enrollment_ids ||= enrollments.map(&:local_id).join(",")
   end
 
   def enrollments_by_user
@@ -416,7 +416,7 @@ class GradeCalculator
     # GradeCalculator sometimes divides by 0 somewhere,
     # resulting in NaN. Treat that as null here
     score = nil if score.try(:nan?)
-    score || 'NULL::float'
+    score || "NULL::float"
   end
 
   def group_score_rows
@@ -438,7 +438,7 @@ class GradeCalculator
           fields << number_or_null(current[:score])
           fields << number_or_null(final[:score])
 
-          "(#{fields.join(', ')})"
+          "(#{fields.join(", ")})"
         end
       end
     end.flatten
@@ -466,7 +466,7 @@ class GradeCalculator
   end
 
   def column_prefix
-    @ignore_muted ? '' : 'unposted_'
+    @ignore_muted ? "" : "unposted_"
   end
 
   def current_score_column
@@ -504,7 +504,7 @@ class GradeCalculator
         score_rows = group_score_rows
         if @grading_period.nil? && score_rows.any?
           dropped_rows = group_dropped_rows
-          save_assignment_group_scores(score_rows.join(','), dropped_rows.join(','))
+          save_assignment_group_scores(score_rows.join(","), dropped_rows.join(","))
         end
       end
     end
@@ -517,7 +517,7 @@ class GradeCalculator
       end
     end
 
-    "#{specific_values.join(' ')} ELSE #{default_value}"
+    "#{specific_values.join(" ")} ELSE #{default_value}"
   end
 
   def update_values_for(column, updates: {}, key: :grade)
@@ -531,7 +531,7 @@ class GradeCalculator
   def insert_values_for(column, updates: {}, key: :grade)
     return unless column
 
-    actual_updates = user_specific_updates(updates: updates, default_value: 'NULL', key: key)
+    actual_updates = user_specific_updates(updates: updates, default_value: "NULL", key: key)
 
     "CASE enrollments.id #{actual_updates} END :: float AS #{column}"
   end
@@ -580,14 +580,14 @@ class GradeCalculator
       INSERT INTO #{Score.quoted_table_name}
           (
             enrollment_id, grading_period_id,
-            #{columns_to_insert_or_update[:columns].join(', ')},
+            #{columns_to_insert_or_update[:columns].join(", ")},
             course_score, root_account_id, created_at, updated_at
           )
           SELECT
             enrollments.id as enrollment_id,
-            #{@grading_period.try(:id) || 'NULL'} as grading_period_id,
-            #{columns_to_insert_or_update[:insert_values].join(', ')},
-            #{@grading_period ? 'FALSE' : 'TRUE'} AS course_score,
+            #{@grading_period.try(:id) || "NULL"} as grading_period_id,
+            #{columns_to_insert_or_update[:insert_values].join(", ")},
+            #{@grading_period ? "FALSE" : "TRUE"} AS course_score,
             #{@course.root_account_id} AS root_account_id,
             #{updated_at} as created_at,
             #{updated_at} as updated_at
@@ -597,7 +597,7 @@ class GradeCalculator
           ORDER BY enrollment_id
       ON CONFLICT #{conflict_target}
       DO UPDATE SET
-          #{columns_to_insert_or_update[:update_values].join(', ')},
+          #{columns_to_insert_or_update[:update_values].join(", ")},
           updated_at = excluded.updated_at,
           root_account_id = #{@course.root_account_id},
           /* if workflow_state was previously deleted for some reason, update it to active */
@@ -623,7 +623,7 @@ class GradeCalculator
           CASE enrollments.user_id
             #{@dropped_updates.map do |user_id, dropped|
               "WHEN #{user_id} THEN cast('#{dropped.to_json}' as json)"
-            end.join(' ')}
+            end.join(" ")}
             ELSE NULL
           END AS calculation_details,
           #{updated_at} AS created_at,
@@ -636,7 +636,7 @@ class GradeCalculator
         WHERE
           scores.enrollment_id IN (#{joined_enrollment_ids}) AND
           scores.assignment_group_id IS NULL AND
-          #{@grading_period ? "scores.grading_period_id = #{@grading_period.id}" : 'scores.course_score IS TRUE'}
+          #{@grading_period ? "scores.grading_period_id = #{@grading_period.id}" : "scores.course_score IS TRUE"}
         ORDER BY enrollment_id
       ON CONFLICT (score_id)
       DO UPDATE SET
@@ -658,20 +658,20 @@ class GradeCalculator
     }
 
     unless @only_update_points
-      column_list[:value_names] << 'current_score'
+      column_list[:value_names] << "current_score"
       column_list[:update_columns] << "#{current_score_column} = excluded.current_score"
       column_list[:insert_columns] << "val.current_score AS #{current_score_column}"
 
-      column_list[:value_names] << 'final_score'
+      column_list[:value_names] << "final_score"
       column_list[:update_columns] << "#{final_score_column} = excluded.final_score"
       column_list[:insert_columns] << "val.final_score AS #{final_score_column}"
     end
 
-    column_list[:value_names] << 'current_points'
+    column_list[:value_names] << "current_points"
     column_list[:update_columns] << "#{points_column(:current)} = excluded.current_points"
     column_list[:insert_columns] << "val.current_points AS #{points_column(:current)}"
 
-    column_list[:value_names] << 'final_points'
+    column_list[:value_names] << "final_points"
     column_list[:update_columns] << "#{points_column(:final)} = excluded.final_points"
     column_list[:insert_columns] << "val.final_points AS #{points_column(:final)}"
 
@@ -683,13 +683,13 @@ class GradeCalculator
     Score.connection.execute("
       INSERT INTO #{Score.quoted_table_name} (
         enrollment_id, assignment_group_id,
-        #{assignment_group_columns_to_insert_or_update[:value_names].join(', ')},
+        #{assignment_group_columns_to_insert_or_update[:value_names].join(", ")},
         course_score, root_account_id, created_at, updated_at
       )
         SELECT
           val.enrollment_id AS enrollment_id,
           val.assignment_group_id as assignment_group_id,
-          #{assignment_group_columns_to_insert_or_update[:insert_columns].join(', ')},
+          #{assignment_group_columns_to_insert_or_update[:insert_columns].join(", ")},
           FALSE AS course_score,
           #{@course.root_account_id} AS root_account_id,
           #{updated_at} AS created_at,
@@ -698,12 +698,12 @@ class GradeCalculator
           (
             enrollment_id,
             assignment_group_id,
-            #{assignment_group_columns_to_insert_or_update[:value_names].join(', ')}
+            #{assignment_group_columns_to_insert_or_update[:value_names].join(", ")}
           )
         ORDER BY assignment_group_id, enrollment_id
       ON CONFLICT (enrollment_id, assignment_group_id) WHERE assignment_group_id IS NOT NULL
       DO UPDATE SET
-        #{assignment_group_columns_to_insert_or_update[:update_columns].join(', ')},
+        #{assignment_group_columns_to_insert_or_update[:update_columns].join(", ")},
         updated_at = excluded.updated_at,
         root_account_id = #{@course.root_account_id},
         workflow_state = COALESCE(NULLIF(excluded.workflow_state, 'deleted'), 'active')
@@ -787,7 +787,7 @@ class GradeCalculator
         }
       end
 
-      if enrollments_by_user[user_id].all? { |e| e.workflow_state == 'completed' }
+      if enrollments_by_user[user_id].all? { |e| e.workflow_state == "completed" }
         group_submissions.reject! { |s| s[:submission].nil? }
       end
 
@@ -993,7 +993,7 @@ class GradeCalculator
   def calculate_total_from_group_scores(group_sums)
     dropped = gather_dropped_from_group_scores(group_sums)
 
-    if @course.group_weighting_scheme == 'percent'
+    if @course.group_weighting_scheme == "percent"
       relevant_group_sums = group_sums.reject do |gs|
         gs[:possible].zero? || gs[:possible].nil?
       end

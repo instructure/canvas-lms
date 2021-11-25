@@ -41,9 +41,9 @@ class MicrosoftSync::PartialSyncChange < ApplicationRecord
     else
       quoted_columns = columns.map { |col| connection.quote_column_name(col) }
       quoted_values_arrays = values_arrays.map do |arr|
-        '(' + arr.map { |val| connection.quote(val) }.join(',') + ')'
+        "(" + arr.map { |val| connection.quote(val) }.join(",") + ")"
       end
-      where("(#{quoted_columns.join(',')}) IN (#{quoted_values_arrays.join(',')})")
+      where("(#{quoted_columns.join(",")}) IN (#{quoted_values_arrays.join(",")})")
     end
   }
 
@@ -76,7 +76,7 @@ class MicrosoftSync::PartialSyncChange < ApplicationRecord
     end
 
     while where(course_id: course_id)
-          .where('updated_at <= ?', last_replicated_updated_at)
+          .where("updated_at <= ?", last_replicated_updated_at)
           .limit(batch_size).delete_all == batch_size
     end
   end

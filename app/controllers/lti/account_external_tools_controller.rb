@@ -32,7 +32,7 @@ module Lti
 
     before_action :verify_target_developer_key, only: [:create, :update]
 
-    MIME_TYPE = 'application/vnd.canvas.contextexternaltools+json'
+    MIME_TYPE = "application/vnd.canvas.contextexternaltools+json"
 
     ACTION_SCOPE_MATCHERS = {
       create: all_of(TokenScopes::LTI_CREATE_ACCOUNT_EXTERNAL_TOOLS_SCOPE),
@@ -56,7 +56,7 @@ module Lti
     end
 
     def show
-      tool = tools.active.find(params['external_tool_id'])
+      tool = tools.active.find(params["external_tool_id"])
       render json: external_tool_json(tool, context, @current_user, session), content_type: MIME_TYPE
     end
 
@@ -66,7 +66,7 @@ module Lti
     end
 
     def destroy
-      tool = tools.active.find(params['external_tool_id'])
+      tool = tools.active.find(params["external_tool_id"])
       if tool.destroy
         render json: external_tool_json(tool, context, @current_user, session), content_type: MIME_TYPE
       else
@@ -97,7 +97,7 @@ module Lti
     end
 
     def message_type
-      params[:message_type] || 'live-event'
+      params[:message_type] || "live-event"
     end
 
     def invalidate_nav_tabs_cache(tool)

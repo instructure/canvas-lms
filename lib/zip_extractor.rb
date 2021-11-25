@@ -18,9 +18,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'rubygems'
-require 'zip'
-require 'fileutils'
+require "rubygems"
+require "zip"
+require "fileutils"
 
 # Call this with a block.  The block will take an array of filenames
 # extracted.  Once this block is executed, these extracted files and

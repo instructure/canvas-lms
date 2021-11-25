@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../common'
+require_relative "../common"
 
 describe "account admin question bank" do
   include_context "in-process server selenium tests"
@@ -40,7 +40,7 @@ describe "account admin question bank" do
       answer = { text: "incorrect answer", weight: 0 }
       answers.push answer
     end
-    data = { question_text: "what is the answer to #{name}?", question_type: 'multiple_choice_question', answers: answers }
+    data = { question_text: "what is the answer to #{name}?", question_type: "multiple_choice_question", answers: answers }
     data[:question_name] = name
     question = AssessmentQuestion.create(question_data: data)
     bank.assessment_questions << question
@@ -110,7 +110,7 @@ describe "account admin question bank" do
   end
 
   it "adds bank and multiple choice question" do
-    question_bank2 = create_question_bank('question bank 2')
+    question_bank2 = create_question_bank("question bank 2")
     get "/accounts/#{Account.default.id}/question_banks/#{question_bank2.id}"
     add_multiple_choice_question
   end
@@ -146,7 +146,7 @@ describe "account admin question bank" do
     wait_for_ajaximations
     f("#move_question_dialog #question_bank_#{question_bank_2.id}").click
     wait_for_ajaximations
-    submit_dialog("#move_question_dialog", '.submit_button')
+    submit_dialog("#move_question_dialog", ".submit_button")
     wait_for_ajaximations
     expect(question_bank_2.assessment_questions.where(name: @question.name).first).to be_present
   end
@@ -216,7 +216,7 @@ describe "account admin question bank" do
       expect(questions.count).to eq 3
       f("#bank_new").click
       f("#new_question_bank_name").send_keys(new_bank)
-      submit_dialog("#move_question_dialog", '.submit_button')
+      submit_dialog("#move_question_dialog", ".submit_button")
       wait_for_ajaximations
       expect(AssessmentQuestionBank.count).to eq 2
       move_questions_validation(new_bank, questions)
@@ -229,7 +229,7 @@ describe "account admin question bank" do
       expect(questions.count).to eq 2
       expect(f(".bank .bank_name")).to include_text bank_name
       f("#question_bank_#{question_bank_2.id}").click
-      submit_dialog("#move_question_dialog", '.submit_button')
+      submit_dialog("#move_question_dialog", ".submit_button")
       wait_for_ajaximations
       move_questions_validation(bank_name, questions)
     end
@@ -237,18 +237,18 @@ describe "account admin question bank" do
 
   context "outcome alignment" do
     def add_outcome_to_bank(outcome, mastery_percent = 60)
-      f('.add_outcome_link').click
+      f(".add_outcome_link").click
       wait_for_ajaximations
-      f('.outcome-link').click
+      f(".outcome-link").click
       wait_for_ajaximations
-      replace_content(f('#outcome_mastery_at'), mastery_percent)
-      fj('.btn-primary:visible').click
+      replace_content(f("#outcome_mastery_at"), mastery_percent)
+      fj(".btn-primary:visible").click
       wait_for_ajax_requests
       expect(fj("[data-id=#{outcome.id}]:visible")).to include_text outcome.short_description
     end
 
     it "aligns an outcome" do
-      skip_if_chrome('issue with add_outcome_to_bank method')
+      skip_if_chrome("issue with add_outcome_to_bank method")
       add_outcome_to_bank(@outcome)
       expect(fj("[data-id=#{@outcome.id}]:visible")).to include_text("60%")
       expect(@question_bank.reload.learning_outcome_alignments.count).to be > 0
@@ -257,7 +257,7 @@ describe "account admin question bank" do
     end
 
     it "changes the outcome set mastery score" do
-      skip_if_chrome('issue with add_outcome_to_bank method')
+      skip_if_chrome("issue with add_outcome_to_bank method")
       add_outcome_to_bank(@outcome, 40)
       expect(fj("[data-id=#{@outcome.id}]:visible .content")).to include_text("mastery at 40%")
       learning_outcome_tag = AssessmentQuestionBank.last.learning_outcome_alignments.where(mastery_score: 0.4).first

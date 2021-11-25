@@ -18,13 +18,13 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../common'
-require_relative '../announcements/announcement_helpers'
-require_relative '../discussions/discussion_helpers'
-require_relative '../discussions/pages/discussions_index_page'
-require_relative '../helpers/shared_examples_common'
+require_relative "../common"
+require_relative "../announcements/announcement_helpers"
+require_relative "../discussions/discussion_helpers"
+require_relative "../discussions/pages/discussions_index_page"
+require_relative "../helpers/shared_examples_common"
 
-describe 'announcement permissions' do
+describe "announcement permissions" do
   include DiscussionHelpers
   include AnnouncementHelpers
   include SharedExamplesCommon
@@ -34,20 +34,20 @@ describe 'announcement permissions' do
   include_context "discussions_page_shared_context"
   extend DiscussionHelpers::SetupContext
 
-  context 'discussion created by teacher' do
+  context "discussion created by teacher" do
     before do
-      course_with_teacher(active_all: true, name: 'teacher1')
+      course_with_teacher(active_all: true, name: "teacher1")
       @discussion_topic = DiscussionHelpers.create_discussion_topic(
         @course,
         @teacher,
-        'Discussion 1 Title',
-        'Discussion 1 message',
+        "Discussion 1 Title",
+        "Discussion 1 message",
         nil
       )
       new_announcement(@course)
     end
 
-    shared_examples 'allow announcement view with discussions disallowed' do |context|
+    shared_examples "allow announcement view with discussions disallowed" do |context|
       before do
         enable_view_announcements(@course, context_role)
         DiscussionHelpers.disable_view_discussions(@course, context_role)
@@ -63,28 +63,28 @@ describe 'announcement permissions' do
       end
     end
 
-    it_behaves_like 'allow announcement view with discussions disallowed', :student do
+    it_behaves_like "allow announcement view with discussions disallowed", :student do
       setup_student_context
     end
 
-    it_behaves_like 'allow announcement view with discussions disallowed', :teacher do
+    it_behaves_like "allow announcement view with discussions disallowed", :teacher do
       let(:context_user) { @teacher }
       let(:context_role) { teacher_role }
     end
 
-    it_behaves_like 'allow announcement view with discussions disallowed', :ta do
+    it_behaves_like "allow announcement view with discussions disallowed", :ta do
       setup_ta_context
     end
 
-    it_behaves_like 'allow announcement view with discussions disallowed', :observer do
+    it_behaves_like "allow announcement view with discussions disallowed", :observer do
       setup_observer_context
     end
 
-    it_behaves_like 'allow announcement view with discussions disallowed', :designer do
+    it_behaves_like "allow announcement view with discussions disallowed", :designer do
       setup_designer_context
     end
 
-    shared_examples 'disallow announcement view with discussions disallowed' do |context|
+    shared_examples "disallow announcement view with discussions disallowed" do |context|
       before do
         disable_view_announcements(@course, context_role)
         DiscussionHelpers.disable_view_discussions(@course, context_role)
@@ -105,15 +105,15 @@ describe 'announcement permissions' do
       end
     end
 
-    it_behaves_like 'disallow announcement view with discussions disallowed', :student do
+    it_behaves_like "disallow announcement view with discussions disallowed", :student do
       setup_student_context
     end
 
-    it_behaves_like 'disallow announcement view with discussions disallowed', :observer do
+    it_behaves_like "disallow announcement view with discussions disallowed", :observer do
       setup_observer_context
     end
 
-    shared_examples 'disallow discussion topic view with announcements allowed' do |context|
+    shared_examples "disallow discussion topic view with announcements allowed" do |context|
       before do
         enable_view_announcements(@course, context_role)
         DiscussionHelpers.disable_view_discussions(@course, context_role)
@@ -134,28 +134,28 @@ describe 'announcement permissions' do
       end
     end
 
-    it_behaves_like 'disallow discussion topic view with announcements allowed', :student do
+    it_behaves_like "disallow discussion topic view with announcements allowed", :student do
       setup_student_context
     end
 
-    it_behaves_like 'disallow discussion topic view with announcements allowed', :teacher do
+    it_behaves_like "disallow discussion topic view with announcements allowed", :teacher do
       let(:context_user) { @teacher }
       let(:context_role) { teacher_role }
     end
 
-    it_behaves_like 'disallow discussion topic view with announcements allowed', :ta do
+    it_behaves_like "disallow discussion topic view with announcements allowed", :ta do
       setup_ta_context
     end
 
-    it_behaves_like 'disallow discussion topic view with announcements allowed', :observer do
+    it_behaves_like "disallow discussion topic view with announcements allowed", :observer do
       setup_observer_context
     end
 
-    it_behaves_like 'disallow discussion topic view with announcements allowed', :designer do
+    it_behaves_like "disallow discussion topic view with announcements allowed", :designer do
       setup_designer_context
     end
 
-    shared_examples 'disallow discussion detail view with announcements allowed' do |context|
+    shared_examples "disallow discussion detail view with announcements allowed" do |context|
       before do
         enable_view_announcements(@course, context_role)
         DiscussionHelpers.disable_view_discussions(@course, context_role)
@@ -171,37 +171,37 @@ describe 'announcement permissions' do
       end
     end
 
-    it_behaves_like 'disallow discussion detail view with announcements allowed', :student do
+    it_behaves_like "disallow discussion detail view with announcements allowed", :student do
       setup_student_context
     end
 
-    it_behaves_like 'disallow discussion detail view with announcements allowed', :ta do
+    it_behaves_like "disallow discussion detail view with announcements allowed", :ta do
       setup_ta_context
     end
 
-    it_behaves_like 'disallow discussion detail view with announcements allowed', :observer do
+    it_behaves_like "disallow discussion detail view with announcements allowed", :observer do
       setup_observer_context
     end
 
-    it_behaves_like 'disallow discussion detail view with announcements allowed', :designer do
+    it_behaves_like "disallow discussion detail view with announcements allowed", :designer do
       setup_designer_context
     end
   end
 
-  context 'discussion created by student' do
+  context "discussion created by student" do
     before do
-      course_with_student(active_all: true, name: 'student1')
+      course_with_student(active_all: true, name: "student1")
       @discussion_topic = DiscussionHelpers.create_discussion_topic(
         @course,
         @student,
-        'Discussion 1 Title',
-        'Discussion 1 message',
+        "Discussion 1 Title",
+        "Discussion 1 message",
         nil
       )
       new_announcement(@course)
     end
 
-    shared_examples 'disallow discussion detail view with announcements allowed' do |context|
+    shared_examples "disallow discussion detail view with announcements allowed" do |context|
       before do
         enable_view_announcements(@course, context_role)
         DiscussionHelpers.disable_view_discussions(@course, context_role)
@@ -217,19 +217,19 @@ describe 'announcement permissions' do
       end
     end
 
-    it_behaves_like 'disallow discussion detail view with announcements allowed', :teacher do
+    it_behaves_like "disallow discussion detail view with announcements allowed", :teacher do
       setup_teacher_context
     end
 
-    it_behaves_like 'disallow discussion detail view with announcements allowed', :ta do
+    it_behaves_like "disallow discussion detail view with announcements allowed", :ta do
       setup_ta_context
     end
 
-    it_behaves_like 'disallow discussion detail view with announcements allowed', :observer do
+    it_behaves_like "disallow discussion detail view with announcements allowed", :observer do
       setup_observer_context
     end
 
-    it_behaves_like 'disallow discussion detail view with announcements allowed', :designer do
+    it_behaves_like "disallow discussion detail view with announcements allowed", :designer do
       setup_designer_context
     end
   end

@@ -57,7 +57,7 @@ module Context
 
   def clear_cached_short_name
     self.class.connection.after_transaction_commit do
-      Rails.cache.delete(['short_name_lookup', asset_string].cache_key)
+      Rails.cache.delete(["short_name_lookup", asset_string].cache_key)
     end
   end
 
@@ -143,8 +143,8 @@ module Context
 
     raise ArgumentError, "only_check is either an empty array or you are aking for invalid types" if types_to_check.empty?
 
-    base_cache_key = 'active_record_types3'
-    cache_key = [base_cache_key, (only_check.presence || 'everything'), self].cache_key
+    base_cache_key = "active_record_types3"
+    cache_key = [base_cache_key, (only_check.presence || "everything"), self].cache_key
 
     # if it exists in redis, return that
     if (cached = Rails.cache.read(cache_key))
@@ -152,7 +152,7 @@ module Context
     end
 
     # if we're only asking for a subset but the full set is cached return that, but filtered with just what we want
-    if only_check.present? && (cache_with_everything = Rails.cache.read([base_cache_key, 'everything', self].cache_key))
+    if only_check.present? && (cache_with_everything = Rails.cache.read([base_cache_key, "everything", self].cache_key))
       return @active_record_types[only_check] = cache_with_everything.select { |k, _v| only_check.include?(k) }
     end
 
@@ -221,7 +221,7 @@ module Context
     res = nil
     if context && klass == ContextExternalTool
       res = klass.find_external_tool_by_id(id, context)
-    elsif context && (klass.column_names & ['context_id', 'context_type']).length == 2
+    elsif context && (klass.column_names & ["context_id", "context_type"]).length == 2
       res = klass.where(context: context, id: id).first
     else
       res = klass.find_by(id: id)
@@ -259,36 +259,36 @@ module Context
     return nil unless context
 
     case params[:controller]
-    when 'files'
+    when "files"
       rel_path = params[:file_path]
       object = rel_path && Folder.find_attachment_in_context_with_path(course, CGI.unescape(rel_path))
       file_id = params[:file_id] || params[:id]
       file_id ||= uri.query && CGI.parse(uri.query).send(:[], "preview")&.first
       object ||= context.attachments.find_by(id: file_id) # attachments.find_by(id:) uses the replacement hackery
-    when 'wiki_pages'
+    when "wiki_pages"
       object = context.wiki.find_page(CGI.unescape(params[:id]), include_deleted: true)
       if !object && params[:id].to_s.include?("+") # maybe it really is a "+"
         object = context.wiki.find_page(CGI.unescape(params[:id].to_s.gsub("+", "%2B")), include_deleted: true)
       end
-    when 'external_tools'
+    when "external_tools"
       if params[:action] == "retrieve"
         tool_url = CGI.parse(uri.query)["url"].first rescue nil
         object = ContextExternalTool.find_external_tool(tool_url, context) if tool_url
       elsif params[:id]
         object = ContextExternalTool.find_external_tool_by_id(params[:id], context)
       end
-    when 'context_modules'
+    when "context_modules"
       object = if %w[item_redirect item_redirect_mastery_paths choose_mastery_path].include?(params[:action])
                  context.context_module_tags.find_by(id: params[:id])
                else
                  context.context_modules.find_by(id: params[:id])
                end
-    when 'media_objects'
+    when "media_objects"
       object = media_obj
-    when 'context'
-      object = context.users.find(params[:id]) if params[:action] == 'roster_user' && params[:id]
+    when "context"
+      object = context.users.find(params[:id]) if params[:action] == "roster_user" && params[:id]
     else
-      object = context.try(params[:controller].sub(%r{^.+/}, ''))&.find_by(id: params[:id])
+      object = context.try(params[:controller].sub(%r{^.+/}, ""))&.find_by(id: params[:id])
     end
     object
   rescue
@@ -300,7 +300,7 @@ module Context
     name ||= asset.title.presence if asset.respond_to?(:title)
     name ||= asset.short_description.presence if asset.respond_to?(:short_description)
     name ||= asset.name if asset.respond_to?(:name)
-    name || ''
+    name || ""
   end
 
   def self.asset_body(asset)

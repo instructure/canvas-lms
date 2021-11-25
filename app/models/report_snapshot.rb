@@ -30,18 +30,18 @@ class ReportSnapshot < ActiveRecord::Base
   def self.report_value_over_time(report, key)
     items = []
     now = Time.now.utc.to_i
-    report['monthly'].each do |month|
+    report["monthly"].each do |month|
       next unless month[key]
 
-      stamp = ((Time.utc(month['year'], month['month'], 1).to_date >> 1) - 1.day).to_time.to_i
+      stamp = ((Time.utc(month["year"], month["month"], 1).to_date >> 1) - 1.day).to_time.to_i
       next if stamp > now
 
       items << [stamp.to_i * 1000, month[key]]
     end
-    report['weekly'].each do |week|
+    report["weekly"].each do |week|
       next unless week[key]
 
-      stamp = (week['week'] * 604_800) + ((week['year'] - 1970) * 31_556_926)
+      stamp = (week["week"] * 604_800) + ((week["year"] - 1970) * 31_556_926)
       next if stamp > now
 
       items << [stamp * 1000, week[key]]
@@ -59,8 +59,8 @@ class ReportSnapshot < ActiveRecord::Base
 
   def data
     unless @data
-      @data = JSON.parse(read_attribute(:data) || '{}')
-      @data['generated_at'] = Time.at(@data['generated_at'].to_i / 1000) if @data['generated_at']
+      @data = JSON.parse(read_attribute(:data) || "{}")
+      @data["generated_at"] = Time.at(@data["generated_at"].to_i / 1000) if @data["generated_at"]
     end
     @data
   end
@@ -73,12 +73,12 @@ class ReportSnapshot < ActiveRecord::Base
     return unless @data
 
     data = @data.dup
-    data['generated_at'] = data['generated_at'].to_i * 1000 if data['generated_at']
+    data["generated_at"] = data["generated_at"].to_i * 1000 if data["generated_at"]
     write_attribute(:data, data.to_json)
   end
 
-  scope :detailed, -> { where(report_type: 'counts_detailed') }
-  scope :progressive, -> { where(report_type: 'counts_progressive_detailed') }
+  scope :detailed, -> { where(report_type: "counts_detailed") }
+  scope :progressive, -> { where(report_type: "counts_progressive_detailed") }
 
   def push_to_instructure_if_collection_enabled
     return if report_type != REPORT_TO_SEND
@@ -87,7 +87,7 @@ class ReportSnapshot < ActiveRecord::Base
     collection_type = Setting.get("usage_statistics_collection", "opt_out")
     return if collection_type == "opt_out"
 
-    require 'lib/ssl_common'
+    require "lib/ssl_common"
 
     data = {
       "collection_type" => collection_type,

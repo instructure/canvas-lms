@@ -28,7 +28,7 @@ module Canvas::Plugins::Validators::KalturaValidator
       errors = false
       settings.each do |k, v|
         if v.blank? && !CAN_BE_BLANK.member?(k.to_sym)
-          plugin_setting.errors.add(:base, I18n.t('canvas.plugins.errors.fields_required', 'The field "%{field}" is required', field: k))
+          plugin_setting.errors.add(:base, I18n.t("canvas.plugins.errors.fields_required", 'The field "%{field}" is required', field: k))
           errors = true
         end
       end
@@ -39,7 +39,7 @@ module Canvas::Plugins::Validators::KalturaValidator
       elsif /\A\d*\z/.match?(settings[:cache_play_list_seconds])
         settings[:cache_play_list_seconds] = settings[:cache_play_list_seconds].to_i
       else
-        plugin_setting.errors.add(:base, I18n.t('canvas.plugins.errors.need_integer', 'Please enter an integer for the play list cache'))
+        plugin_setting.errors.add(:base, I18n.t("canvas.plugins.errors.need_integer", "Please enter an integer for the play list cache"))
         return false
       end
 

@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative 'api_spec_helper'
+require_relative "api_spec_helper"
 
 describe "API", type: :request do
   describe "Api::V1::Json" do
@@ -45,7 +45,7 @@ describe "API", type: :request do
       def @course.filter_attributes_for_user(hash, user, session)
         expect(user).to eq teachers.first
         expect(session).to be_nil
-        hash.delete('sis_source_id')
+        hash.delete("sis_source_id")
       end
       expect(@course.as_json(include_root: false, permissions: { user: @user }, only: %w[name sis_source_id]).keys.sort).to eq %w[name permissions]
     end
@@ -75,7 +75,7 @@ describe "API", type: :request do
       # no content-type header is sent
       post "/api/v1/courses/#{@course.id}/assignments", params: html_request, headers: { "HTTP_AUTHORIZATION" => "Bearer #{@token.full_token}" }
       expect(response).to be_successful
-      expect(response.header[content_type_key]).to eq 'application/json; charset=utf-8'
+      expect(response.header[content_type_key]).to eq "application/json; charset=utf-8"
 
       @assignment = @course.assignments.order(:id).last
       expect(@assignment.title).to eq "test assignment"
@@ -86,7 +86,7 @@ describe "API", type: :request do
       json_request = { "assignment" => { "name" => "test assignment", "points_possible" => 15 } }
       post "/api/v1/courses/#{@course.id}/assignments", params: json_request.to_json, headers: { "CONTENT_TYPE" => "application/json", "HTTP_AUTHORIZATION" => "Bearer #{@token.full_token}" }
       expect(response).to be_successful
-      expect(response.header[content_type_key]).to eq 'application/json; charset=utf-8'
+      expect(response.header[content_type_key]).to eq "application/json; charset=utf-8"
 
       @assignment = @course.assignments.order(:id).last
       expect(@assignment.title).to eq "test assignment"
@@ -94,7 +94,7 @@ describe "API", type: :request do
     end
 
     it "uses array params without the [] on the key" do
-      assignment_model(course: @course, submission_types: 'online_upload')
+      assignment_model(course: @course, submission_types: "online_upload")
       @user = user_with_pseudonym
       course_with_student(course: @course, user: @user, active_all: true)
       @token = @user.access_tokens.create!(purpose: "specs")
@@ -110,7 +110,7 @@ describe "API", type: :request do
       post "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions",
            params: json_request.to_json, headers: { "CONTENT_TYPE" => "application/json", "HTTP_AUTHORIZATION" => "Bearer #{@token.full_token}" }
       expect(response).to be_successful
-      expect(response.header[content_type_key]).to eq 'application/json; charset=utf-8'
+      expect(response.header[content_type_key]).to eq "application/json; charset=utf-8"
 
       @submission = @assignment.submissions.where(user_id: @user).first
       sub_a1 = Attachment.where(root_attachment_id: a1).first
@@ -125,19 +125,19 @@ describe "API", type: :request do
       account = Account.default.sub_accounts.create!
       account_admin_user(active_all: true, account: account)
       json = api_call(:get, "/api/v1/accounts/#{account.id}",
-                      { controller: 'accounts', action: 'show', id: account.to_param, format: 'json' },
-                      {}, { 'Accept' => 'application/json+canvas-string-ids' })
-      expect(json['id']).to eq account.id.to_s
-      expect(json['root_account_id']).to eq Account.default.id.to_s
+                      { controller: "accounts", action: "show", id: account.to_param, format: "json" },
+                      {}, { "Accept" => "application/json+canvas-string-ids" })
+      expect(json["id"]).to eq account.id.to_s
+      expect(json["root_account_id"]).to eq Account.default.id.to_s
     end
 
     it "does not stringify fields without Accept header" do
       account = Account.default.sub_accounts.create!
       account_admin_user(active_all: true, account: account)
       json = api_call(:get, "/api/v1/accounts/#{account.id}",
-                      { controller: 'accounts', action: 'show', id: account.to_param, format: 'json' })
-      expect(json['id']).to eq account.id
-      expect(json['root_account_id']).to eq Account.default.id
+                      { controller: "accounts", action: "show", id: account.to_param, format: "json" })
+      expect(json["id"]).to eq account.id
+      expect(json["root_account_id"]).to eq Account.default.id
     end
   end
 end

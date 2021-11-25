@@ -18,11 +18,11 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'spec_helper'
+require "spec_helper"
 
 describe EventStream::Index do
   before do
-    @database = double('database')
+    @database = double("database")
 
     def @database.batch
       yield
@@ -33,10 +33,10 @@ describe EventStream::Index do
     def @database.update(*); end
 
     def @database.keyspace
-      'test_db'
+      "test_db"
     end
 
-    @stream = double('stream',
+    @stream = double("stream",
                      database: @database,
                      record_type: EventStream::Record,
                      ttl_seconds: 1.year,
@@ -45,7 +45,7 @@ describe EventStream::Index do
 
   context "setup block" do
     before do
-      @table = double(to_s: double('table'))
+      @table = double(to_s: double("table"))
       @entry_proc = -> { "entry" }
     end
 
@@ -53,10 +53,10 @@ describe EventStream::Index do
       # can't access spec ivars inside instance_exec
       table = @table
       entry_proc = @entry_proc
-      id_column = double(to_s: double('id_column'))
-      key_column = double(to_s: double('key_column'))
-      bucket_size = double(to_i: double('bucket_size'))
-      scrollback_limit = double(to_i: double('scrollback_limit'))
+      id_column = double(to_s: double("id_column"))
+      key_column = double(to_s: double("key_column"))
+      bucket_size = double(to_i: double("bucket_size"))
+      scrollback_limit = double(to_i: double("scrollback_limit"))
       key_proc = -> { "key" }
 
       index = EventStream::Index.new(@stream) do
@@ -103,11 +103,11 @@ describe EventStream::Index do
       end
 
       it "defaults id_column to 'id'" do
-        expect(@index.id_column).to eq 'id'
+        expect(@index.id_column).to eq "id"
       end
 
       it "defaults key_column to 'key'" do
-        expect(@index.key_column).to eq 'key'
+        expect(@index.key_column).to eq "key"
       end
 
       it "defaults bucket_size to 1 week" do

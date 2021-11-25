@@ -20,7 +20,7 @@
 
 module Types
   class SubmissionDraftType < ApplicationObjectType
-    graphql_name 'SubmissionDraft'
+    graphql_name "SubmissionDraft"
 
     implements Interfaces::LegacyIDInterface
 

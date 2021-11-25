@@ -17,16 +17,16 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../../common'
+require_relative "../../common"
 
 class GradebookIndividualViewPage
   class << self
     include SeleniumDependencies
 
     ASSIGNMENT_SORT_ORDER_OPTIONS = {
-      assignment_group: 'By Assignment Group and Position',
-      alpha: 'Alphabetically',
-      due_date: 'By Due Date'
+      assignment_group: "By Assignment Group and Position",
+      alpha: "Alphabetically",
+      due_date: "By Due Date"
     }.freeze
 
     def assignment_sorting_dropdown
@@ -34,7 +34,7 @@ class GradebookIndividualViewPage
     end
 
     def main_grade_input
-      f('#student_and_assignment_grade')
+      f("#student_and_assignment_grade")
     end
 
     def grade_for_label
@@ -46,35 +46,35 @@ class GradebookIndividualViewPage
     end
 
     def submission_details_button
-      f('#submission_details')
+      f("#submission_details")
     end
 
     def notes_field
-      fj('#student_information textarea:visible:not([disabled])')
+      fj("#student_information textarea:visible:not([disabled])")
     end
 
     def final_grade
-      f('#student_information .total-grade')
+      f("#student_information .total-grade")
     end
 
     def assign_subtotal_grade
-      f('.assignment-subtotal-grade .grade')
+      f(".assignment-subtotal-grade .grade")
     end
 
     def secondary_id_label
-      f('#student_information .secondary_id')
+      f("#student_information .secondary_id")
     end
 
     def grading_period_dropdown
-      f('#grading_period_select')
+      f("#grading_period_select")
     end
 
     def student_dropdown
-      f('#student_select')
+      f("#student_select")
     end
 
     def assignment_dropdown
-      f('#assignment_select')
+      f("#assignment_select")
     end
 
     def default_grade
@@ -82,7 +82,7 @@ class GradebookIndividualViewPage
     end
 
     def curve_grade_button
-      f('#curve_grades')
+      f("#curve_grades")
     end
 
     def status_pill(status)
@@ -99,49 +99,49 @@ class GradebookIndividualViewPage
 
     # global checkboxes
     def ungraded_as_zero
-      f('#ungraded')
+      f("#ungraded")
     end
 
     def hide_student_names
-      f('#hide_names_checkbox')
+      f("#hide_names_checkbox")
     end
 
     def concluded_enrollments
-      f('#concluded_enrollments')
+      f("#concluded_enrollments")
     end
 
     def show_notes_option
-      f('#show_notes')
+      f("#show_notes")
     end
 
     # content selection buttons
     def previous_student
-      f('.student_navigation button.previous_object')
+      f(".student_navigation button.previous_object")
     end
 
     def next_student
-      f('.student_navigation button.next_object')
+      f(".student_navigation button.next_object")
     end
 
     def previous_assignment
-      f('.assignment_navigation button.previous_object')
+      f(".assignment_navigation button.previous_object")
     end
 
     def next_assignment
-      f('.assignment_navigation button.next_object')
+      f(".assignment_navigation button.next_object")
     end
 
     # assignment information
     def assignment_link
-      f('.assignment_selection a')
+      f(".assignment_selection a")
     end
 
     def speedgrader_link
-      f('#assignment-speedgrader-link a')
+      f("#assignment-speedgrader-link a")
     end
 
     def assignment_scores
-      f('#assignment_information .ic-Table tbody tr')
+      f("#assignment_information .ic-Table tbody tr")
     end
 
     def visit(course_id)
@@ -178,7 +178,7 @@ class GradebookIndividualViewPage
     end
 
     def current_grade
-      main_grade_input['value']
+      main_grade_input["value"]
     end
 
     def grading_enabled?
@@ -208,7 +208,7 @@ class GradebookIndividualViewPage
     private
 
     def assignment_sort_order_selector
-      'select#arrange_assignments'
+      "select#arrange_assignments"
     end
   end
 end

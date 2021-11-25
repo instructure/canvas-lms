@@ -5,7 +5,7 @@ class AddUniqueIndexToRoleOverrides < ActiveRecord::Migration[5.1]
   disable_ddl_transaction!
 
   def up
-    DataFixup::DeleteDuplicateRows.run(RoleOverride.where(context_type: 'Account'), :context_id, :permission, :role_id)
+    DataFixup::DeleteDuplicateRows.run(RoleOverride.where(context_type: "Account"), :context_id, :permission, :role_id)
 
     add_index :role_overrides, %i[context_id context_type role_id permission], unique: true, algorithm: :concurrently,
                                                                                name: "index_role_overrides_on_context_role_permission"

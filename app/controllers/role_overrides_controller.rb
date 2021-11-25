@@ -137,7 +137,7 @@ class RoleOverridesController < ApplicationController
       states = %w[active] if states.empty?
 
       roles = []
-      roles += Role.visible_built_in_roles(root_account_id: @context.resolved_root_account_id) if states.include?('active')
+      roles += Role.visible_built_in_roles(root_account_id: @context.resolved_root_account_id) if states.include?("active")
 
       scope = value_to_boolean(params[:show_inherited]) ? @context.available_custom_roles(true) : @context.roles
       roles += scope.where(workflow_state: states).order(:id).to_a
@@ -175,7 +175,7 @@ class RoleOverridesController < ApplicationController
 
       js_bundle :permissions
       css_bundle :permissions
-      set_active_tab 'permissions'
+      set_active_tab "permissions"
     end
   end
 
@@ -394,13 +394,13 @@ class RoleOverridesController < ApplicationController
     base_role_type = params[:base_role_type] || Role::DEFAULT_ACCOUNT_TYPE
     role = @context.roles.build(name: name)
     role.base_role_type = base_role_type
-    role.workflow_state = 'active'
+    role.workflow_state = "active"
     role.deleted_at = nil
     unless role.save
       if api_request?
         render json: role.errors, status: :bad_request
       else
-        flash[:error] = t(:update_failed_notice, 'Role creation failed')
+        flash[:error] = t(:update_failed_notice, "Role creation failed")
         redirect_to named_context_url(@context, :context_permissions_url, account_roles: params[:account_roles])
       end
       return
@@ -445,9 +445,9 @@ class RoleOverridesController < ApplicationController
   def remove_role
     if authorized_action(@context, @current_user, :manage_role_overrides)
       if @role.inactive?
-        return render json: { message: t('cannot_deactivate_inactive_role', "Cannot deactivate an already inactive role") }, status: :bad_request
+        return render json: { message: t("cannot_deactivate_inactive_role", "Cannot deactivate an already inactive role") }, status: :bad_request
       elsif @role.built_in?
-        return render json: { message: t('cannot_remove_built_in_role', "Cannot remove a built-in role") }, status: :bad_request
+        return render json: { message: t("cannot_remove_built_in_role", "Cannot remove a built-in role") }, status: :bad_request
       end
       raise ActiveRecord::RecordNotFound unless @role.account == @context
 
@@ -475,7 +475,7 @@ class RoleOverridesController < ApplicationController
         @role.activate!
         render json: role_json(@context, @role, @current_user, session)
       else
-        render json: { message: t('no_role_found', "Role not found") }, status: :bad_request
+        render json: { message: t("no_role_found", "Role not found") }, status: :bad_request
       end
     end
   end
@@ -560,13 +560,13 @@ class RoleOverridesController < ApplicationController
           roles.each do |role|
             next unless (settings = params[:permissions][key][role.id.to_s] || params[:permissions][key][role.id])
 
-            override = settings[:override] == 'checked' if ['checked', 'unchecked'].include?(settings[:override])
-            locked = settings[:locked] == 'true' if settings[:locked]
+            override = settings[:override] == "checked" if ["checked", "unchecked"].include?(settings[:override])
+            locked = settings[:locked] == "true" if settings[:locked]
             RoleOverride.manage_role_override(@context, role, key.to_s, override: override, locked: locked)
           end
         end
       end
-      flash[:notice] = t 'notices.saved', "Changes Saved Successfully."
+      flash[:notice] = t "notices.saved", "Changes Saved Successfully."
       redirect_to named_context_url(@context, :context_permissions_url, account_roles: params[:account_roles])
     end
   end
@@ -658,7 +658,7 @@ class RoleOverridesController < ApplicationController
 
         if permission_updates.key?(:locked)
           if target_permissions.any? { |permission| permission[:disable_locking] }
-            raise BadPermissionSettingError, t('Cannot change locked status on granular permission')
+            raise BadPermissionSettingError, t("Cannot change locked status on granular permission")
           else
             locked = value_to_boolean(permission_updates[:locked])
           end
@@ -677,7 +677,7 @@ class RoleOverridesController < ApplicationController
         end
 
         if applies_to_descendants == false && applies_to_self == false
-          raise BadPermissionSettingError, t('Permission must be enabled for someone')
+          raise BadPermissionSettingError, t("Permission must be enabled for someone")
         end
 
         target_permissions.each do |permission|
@@ -696,19 +696,19 @@ class RoleOverridesController < ApplicationController
 
   def course_permissions(context)
     site_admin = {
-      group_name: t('site_admin_permissions', 'Site Admin Permissions'),
+      group_name: t("site_admin_permissions", "Site Admin Permissions"),
       group_permissions: [],
-      context_type: 'Siteadmin'
+      context_type: "Siteadmin"
     }
     account = {
-      group_name: t('account_permissions', 'Account Permissions'),
+      group_name: t("account_permissions", "Account Permissions"),
       group_permissions: [],
-      context_type: 'Account'
+      context_type: "Account"
     }
     course = {
-      group_name: t('course_permissions', 'Course & Account Permissions'),
+      group_name: t("course_permissions", "Course & Account Permissions"),
       group_permissions: [],
-      context_type: 'Course'
+      context_type: "Course"
     }
 
     RoleOverride.manageable_permissions(context).each do |p|
@@ -765,25 +765,25 @@ class RoleOverridesController < ApplicationController
   # context - the current context
   def account_permissions(context)
     site_admin = {
-      group_name: t('site_admin_permissions', 'Site Admin Permissions'),
+      group_name: t("site_admin_permissions", "Site Admin Permissions"),
       group_permissions: [],
-      context_type: 'Siteadmin'
+      context_type: "Siteadmin"
     }
     account = {
-      group_name: t('account_permissions', 'Account Permissions'),
+      group_name: t("account_permissions", "Account Permissions"),
       group_permissions: [],
-      context_type: 'Account'
+      context_type: "Account"
     }
     course = {
-      group_name: t('course_permissions', 'Course & Account Permissions'),
+      group_name: t("course_permissions", "Course & Account Permissions"),
       group_permissions: [],
-      context_type: 'Course'
+      context_type: "Course"
     }
-    admin_tools = { group_name: t('admin_tools_permissions', 'Admin Tools'), group_permissions: [] }
+    admin_tools = { group_name: t("admin_tools_permissions", "Admin Tools"), group_permissions: [] }
 
     # Add group_permissions
     RoleOverride.manageable_permissions(context).each do |p|
-      next if !context.root_account? && p[0].to_s == 'manage_developer_keys'
+      next if !context.root_account? && p[0].to_s == "manage_developer_keys"
 
       # NOTE: p[1][:label_v2].call could eventually be removed if we copied everything over to :label
       hash = { label: p[1].key?(:label_v2) ? p[1][:label_v2].call : p[1][:label].call, permission_name: p[0] }

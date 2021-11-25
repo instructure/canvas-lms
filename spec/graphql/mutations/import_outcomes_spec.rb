@@ -157,7 +157,7 @@ describe Mutations::ImportOutcomes do
       result = exec_graphql(outcome_id: get_outcome_id(
         "0 Group E outcome"
       ))
-      errors = result.dig('data', 'importOutcomes', 'errors')
+      errors = result.dig("data", "importOutcomes", "errors")
       expect(errors).to be_nil
     end
   end
@@ -172,16 +172,16 @@ describe Mutations::ImportOutcomes do
     end
 
     def expect_validation_error(result, attribute, message)
-      errors = result.dig('data', 'importOutcomes', 'errors')
+      errors = result.dig("data", "importOutcomes", "errors")
       expect(errors).not_to be_nil
-      expect(errors[0]['attribute']).to eq attribute
-      expect(errors[0]['message']).to match(/#{message}/)
+      expect(errors[0]["attribute"]).to eq attribute
+      expect(errors[0]["message"]).to match(/#{message}/)
     end
 
     def expect_error(result, message)
-      errors = result['errors']
+      errors = result["errors"]
       expect(errors).not_to be_nil
-      expect(errors[0]['message']).to match(/#{message}/)
+      expect(errors[0]["message"]).to match(/#{message}/)
     end
 
     it "errors when groupId is missing" do
@@ -199,11 +199,11 @@ describe Mutations::ImportOutcomes do
         }
       GQL
       result = execute_query(query, ctx)
-      errors = result['errors']
+      errors = result["errors"]
       expect(errors).not_to be_nil
       expect(errors.length).to eq 1
       expect(
-        errors.select { |e| e['path'] == %w[mutation importOutcomes input targetGroupId] }
+        errors.select { |e| e["path"] == %w[mutation importOutcomes input targetGroupId] }
       ).not_to be_nil
     end
 
@@ -213,17 +213,17 @@ describe Mutations::ImportOutcomes do
     end
 
     it "errors when sourceContextType is invalid" do
-      result = exec_graphql(source_context_type: 'FooContext')
+      result = exec_graphql(source_context_type: "FooContext")
       expect_validation_error(result, "sourceContextType", "invalid value")
     end
 
     it "errors when no such source context is found" do
-      result = exec_graphql(source_context_type: 'Account', source_context_id: -1)
+      result = exec_graphql(source_context_type: "Account", source_context_id: -1)
       expect_error(result, "no such source context")
     end
 
     it "errors when sourceContextId is not provided when sourceContextType is provided" do
-      result = exec_graphql(source_context_type: 'Account', source_context_id: nil)
+      result = exec_graphql(source_context_type: "Account", source_context_id: nil)
       expect_validation_error(
         result,
         "sourceContextId",
@@ -251,17 +251,17 @@ describe Mutations::ImportOutcomes do
     end
 
     it "errors when targetContextType and targetGroupId is blank" do
-      result = exec_graphql(target_context_type: 'Account', target_context_id: nil, target_group_id: nil)
+      result = exec_graphql(target_context_type: "Account", target_context_id: nil, target_group_id: nil)
       expect_error(result, "targetContextId required if targetContextType provided")
     end
 
     it "errors when no such context is found" do
-      result = exec_graphql(target_context_type: 'Account', target_context_id: -1, target_group_id: nil)
+      result = exec_graphql(target_context_type: "Account", target_context_id: -1, target_group_id: nil)
       expect_error(result, "no such target context")
     end
 
     it "errors when targetContextType is invalid" do
-      result = exec_graphql(target_context_type: 'Foo', target_context_id: -1, target_group_id: nil)
+      result = exec_graphql(target_context_type: "Foo", target_context_id: -1, target_group_id: nil)
       expect_error(result, "Invalid targetContextType")
     end
 
@@ -270,7 +270,7 @@ describe Mutations::ImportOutcomes do
       expect_validation_error(result, "message", "Either groupId or outcomeId values are required")
     end
 
-    context 'import group' do
+    context "import group" do
       it "errors on invalid group id" do
         result = exec_graphql(group_id: 0)
         expect_error(result, "group not found")
@@ -293,14 +293,14 @@ describe Mutations::ImportOutcomes do
       it "errors when source context does not match the group's context" do
         result = exec_graphql(
           group_id: find_group("Group B").id,
-          source_context_type: 'Course',
+          source_context_type: "Course",
           source_context_id: @course2.id
         )
         expect_error(result, "source context does not match group context")
       end
     end
 
-    context 'import outcome' do
+    context "import outcome" do
       it "errors when importing non-existence outcome" do
         result = exec_graphql(outcome_id: 0)
         expect_error(result, "Outcome 0 is not available in context Course##{@course.id}")
@@ -338,7 +338,7 @@ describe Mutations::ImportOutcomes do
     exec_graphql(
       outcome_id: get_outcome_id("0 Group E outcome"),
       target_group_id: nil,
-      target_context_type: 'Course',
+      target_context_type: "Course",
       target_context_id: @course.id
     )
   end
@@ -816,8 +816,8 @@ describe Mutations::ImportOutcomes do
                              }]
                            }], Account.default.root_outcome_group)
 
-        exec(group_id: LearningOutcomeGroup.find_by(context: Account.default, title: 'Root Group B').id)
-        exec(group_id: LearningOutcomeGroup.find_by(context: Account.default, title: 'Root Group C').id)
+        exec(group_id: LearningOutcomeGroup.find_by(context: Account.default, title: "Root Group B").id)
+        exec(group_id: LearningOutcomeGroup.find_by(context: Account.default, title: "Root Group C").id)
 
         assert_tree_exists([{
                              title: "Root Group A",

@@ -17,8 +17,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>
 
-require_relative '../../helpers/gradebook_common'
-require_relative '../pages/gradebook_page'
+require_relative "../../helpers/gradebook_common"
+require_relative "../pages/gradebook_page"
 
 describe "Gradebook - custom columns" do
   include_context "in-process server selenium tests"
@@ -55,18 +55,18 @@ describe "Gradebook - custom columns" do
     # create the notes column
     Gradebook.select_view_dropdown
     Gradebook.select_notes_option
-    expect(Gradebook.content_selector).to contain_css('.custom_column')
+    expect(Gradebook.content_selector).to contain_css(".custom_column")
 
     # hide the notes column
     driver.action.send_keys(:escape).perform
     Gradebook.select_view_dropdown
     Gradebook.select_notes_option
-    expect(Gradebook.content_selector).not_to contain_css('.custom_column')
+    expect(Gradebook.content_selector).not_to contain_css(".custom_column")
 
     # show the notes column
     driver.action.send_keys(:escape).perform
     Gradebook.select_view_dropdown
     Gradebook.select_notes_option
-    expect(Gradebook.content_selector).to contain_css('.custom_column')
+    expect(Gradebook.content_selector).to contain_css(".custom_column")
   end
 end

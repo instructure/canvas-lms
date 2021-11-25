@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'rspec/core/formatters/base_text_formatter'
+require "rspec/core/formatters/base_text_formatter"
 module RSpec
   class NestedInstafailFormatter < RSpec::Core::Formatters::BaseTextFormatter
     def example_failed(example)

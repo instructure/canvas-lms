@@ -26,7 +26,7 @@ module CC
         meta_file = nil
         rel_path = nil
       else
-        meta_file = File.new(File.join(@canvas_resource_dir, CCHelper::LATE_POLICY), 'w')
+        meta_file = File.new(File.join(@canvas_resource_dir, CCHelper::LATE_POLICY), "w")
         rel_path = File.join(CCHelper::COURSE_SETTINGS_DIR, CCHelper::LATE_POLICY)
         document = Builder::XmlMarkup.new(target: meta_file, indent: 2)
       end

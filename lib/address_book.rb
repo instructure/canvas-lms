@@ -19,14 +19,14 @@
 
 # manually require since ::MessageableUser satisfies
 # AddressBook::MessageableUser and prevents the autoload
-require_relative 'address_book/messageable_user'
+require_relative "address_book/messageable_user"
 
 # see AddressBook::Base for primary documentation of the interface
 module AddressBook
   STRATEGIES = {
-    'messageable_user' => { implementation: AddressBook::MessageableUser, label: -> { I18n.t('MessageableUser library') } }.freeze,
+    "messageable_user" => { implementation: AddressBook::MessageableUser, label: -> { I18n.t("MessageableUser library") } }.freeze,
   }.freeze
-  DEFAULT_STRATEGY = 'messageable_user'
+  DEFAULT_STRATEGY = "messageable_user"
 
   def self.registry
     RequestStore.store[:address_books] ||= {}
@@ -77,10 +77,10 @@ module AddressBook
 
     context_class =
       case context_type
-      when 'course' then Course
-      when 'section' then CourseSection
-      when 'group' then Group
-      when 'discussion_topic' then DiscussionTopic
+      when "course" then Course
+      when "section" then CourseSection
+      when "group" then Group
+      when "discussion_topic" then DiscussionTopic
       end
     context_class.find(context_id)
   end

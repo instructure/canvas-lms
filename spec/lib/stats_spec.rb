@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'lib/stats'
+require "lib/stats"
 
 describe Stats do
   context Stats::Counter do
@@ -72,7 +72,7 @@ describe Stats do
     it "determines standard deviation" do
       c = Stats::Counter.new([9, 2, 5, 4, 12, 7, 8, 11, 9, 3, 7, 4, 12, 5, 4, 10, 9, 6, 9, 4])
       stddev = c.stddev
-      expect('%.2f' % stddev).to eq '2.98'
+      expect("%.2f" % stddev).to eq "2.98"
 
       c = Stats::Counter.new([0.30000000000000004, 0.30000000000000004, 0.30000000000000004, 0.30000000000000004, 0.30000000000000004,
                               0.30000000000000004, 0.30000000000000004, 0.30000000000000004, 0.30000000000000004, 0.30000000000000004,
@@ -82,7 +82,7 @@ describe Stats do
                               0.30000000000000004, 0.30000000000000004, 0.30000000000000004, 0.30000000000000004, 0.30000000000000004,
                               0.30000000000000004, 0.30000000000000004])
       stddev = c.stddev
-      expect('%.2f' % stddev).to eq '0.00'
+      expect("%.2f" % stddev).to eq "0.00"
 
       c = Stats::Counter.new
       expect(c.stddev).to be_nil

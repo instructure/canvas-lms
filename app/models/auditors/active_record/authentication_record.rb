@@ -23,8 +23,8 @@ module Auditors::ActiveRecord
     include CanvasPartman::Concerns::Partitioned
     self.partitioning_strategy = :by_date
     self.partitioning_interval = :months
-    self.partitioning_field = 'created_at'
-    self.table_name = 'auditor_authentication_records'
+    self.partitioning_field = "created_at"
+    self.table_name = "auditor_authentication_records"
 
     belongs_to :account, inverse_of: :auditor_authentication_records
     belongs_to :user, inverse_of: :auditor_authentication_records
@@ -34,12 +34,12 @@ module Auditors::ActiveRecord
       include Auditors::ActiveRecord::Model
 
       def ar_attributes_from_event_stream(record)
-        attrs_hash = record.attributes.except('id')
-        attrs_hash['request_id'] ||= "MISSING"
-        attrs_hash['uuid'] = record.id
-        attrs_hash['account_id'] = Shard.relative_id_for(record.account_id, Shard.current, Shard.current)
-        attrs_hash['user_id'] = Shard.relative_id_for(record.user_id, Shard.current, Shard.current)
-        attrs_hash['pseudonym_id'] = Shard.relative_id_for(record.pseudonym_id, Shard.current, Shard.current)
+        attrs_hash = record.attributes.except("id")
+        attrs_hash["request_id"] ||= "MISSING"
+        attrs_hash["uuid"] = record.id
+        attrs_hash["account_id"] = Shard.relative_id_for(record.account_id, Shard.current, Shard.current)
+        attrs_hash["user_id"] = Shard.relative_id_for(record.user_id, Shard.current, Shard.current)
+        attrs_hash["pseudonym_id"] = Shard.relative_id_for(record.pseudonym_id, Shard.current, Shard.current)
         attrs_hash
       end
     end

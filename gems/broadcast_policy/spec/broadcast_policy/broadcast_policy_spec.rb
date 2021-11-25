@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../spec_helper'
+require_relative "../spec_helper"
 
 describe BroadcastPolicy do
   let(:policy_harness) do
@@ -35,7 +35,7 @@ describe BroadcastPolicy do
   end
 
   describe ".has_a_broadcast_policy" do
-    it 'includes instance methods once declared to have one' do
+    it "includes instance methods once declared to have one" do
       obj = policy_harness.new
       expect(obj).not_to respond_to(:messages_sent)
       policy_harness.has_a_broadcast_policy
@@ -60,8 +60,8 @@ describe BroadcastPolicy do
       end
 
       policy_list = policy_harness.broadcast_policy_list
-      expect(policy_list.find_policy_for('Foo')).not_to be(nil)
-      expect(policy_list.find_policy_for('Bar')).not_to be(nil)
+      expect(policy_list.find_policy_for("Foo")).not_to be(nil)
+      expect(policy_list.find_policy_for("Bar")).not_to be(nil)
     end
   end
 
@@ -90,8 +90,8 @@ describe BroadcastPolicy do
 
     it "overwrites any inherited blocks" do
       policy_list = child.broadcast_policy_list
-      expect(policy_list.find_policy_for('Foo')).to be(nil)
-      expect(policy_list.find_policy_for('Bar')).not_to be(nil)
+      expect(policy_list.find_policy_for("Foo")).to be(nil)
+      expect(policy_list.find_policy_for("Bar")).not_to be(nil)
     end
   end
 end

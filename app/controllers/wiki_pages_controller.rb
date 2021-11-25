@@ -32,9 +32,9 @@ class WikiPagesController < ApplicationController
 
   include K5Mode
 
-  add_crumb(proc { t '#crumbs.wiki_pages', "Pages" }) do |c|
-    context = c.instance_variable_get('@context')
-    current_user = c.instance_variable_get('@current_user')
+  add_crumb(proc { t "#crumbs.wiki_pages", "Pages" }) do |c|
+    context = c.instance_variable_get("@context")
+    current_user = c.instance_variable_get("@current_user")
     if context.grants_right?(current_user, :read)
       c.send :polymorphic_path, [context, :wiki_pages]
     end
@@ -68,7 +68,7 @@ class WikiPagesController < ApplicationController
       @padless = true
       js_bundle :wiki_page_show
       css_bundle :wiki_page
-      render template: 'wiki_pages/show'
+      render template: "wiki_pages/show"
     else
       redirect_to polymorphic_url([@context, :wiki_pages])
     end
@@ -90,15 +90,15 @@ class WikiPagesController < ApplicationController
     GuardRail.activate(:secondary) do
       if @page.new_record?
         if @page.grants_any_right?(@current_user, session, :update, :update_content)
-          flash[:info] = t('notices.create_non_existent_page', 'The page "%{title}" does not exist, but you can create it below', title: @page.title)
+          flash[:info] = t("notices.create_non_existent_page", 'The page "%{title}" does not exist, but you can create it below', title: @page.title)
           encoded_name = @page_name && CGI.escape(@page_name).tr("+", " ")
           redirect_to polymorphic_url([@context, :wiki_page], id: encoded_name || @page, titleize: params[:titleize], action: :edit)
         else
           wiki_page = @context.wiki_pages.deleted_last.where(url: @page.url).first
           flash[:warning] = if wiki_page && wiki_page.deleted?
-                              t('notices.page_deleted', 'The page "%{title}" has been deleted.', title: @page.title)
+                              t("notices.page_deleted", 'The page "%{title}" has been deleted.', title: @page.title)
                             else
-                              t('notices.page_does_not_exist', 'The page "%{title}" does not exist.', title: @page.title)
+                              t("notices.page_does_not_exist", 'The page "%{title}" does not exist.', title: @page.title)
                             end
           redirect_to polymorphic_url([@context, :wiki_pages])
         end
@@ -108,7 +108,7 @@ class WikiPagesController < ApplicationController
       if authorized_action(@page, @current_user, :read) &&
          (!@context.feature_enabled?(:conditional_release) || enforce_assignment_visible(@page))
         add_crumb(@page.title)
-        log_asset_access(@page, 'wiki', @wiki)
+        log_asset_access(@page, "wiki", @wiki)
         wiki_pages_js_env(@context)
         set_master_course_js_env_data(@page, @context)
         @mark_done = MarkDonePresenter.new(self, @context, params["module_item_id"], @current_user, @page)
@@ -130,7 +130,7 @@ class WikiPagesController < ApplicationController
         @padless = true
       end
     elsif authorized_action(@page, @current_user, :read)
-      flash[:warning] = t('notices.cannot_edit', 'You are not allowed to edit the page "%{title}".', title: @page.title)
+      flash[:warning] = t("notices.cannot_edit", 'You are not allowed to edit the page "%{title}".', title: @page.title)
       redirect_to polymorphic_url([@context, @page])
     end
   end
@@ -144,7 +144,7 @@ class WikiPagesController < ApplicationController
         @padless = true
       end
     elsif authorized_action(@page, @current_user, :read)
-      flash[:warning] = t('notices.cannot_read_revisions', 'You are not allowed to review the historical revisions of "%{title}".', title: @page.title)
+      flash[:warning] = t("notices.cannot_read_revisions", 'You are not allowed to review the historical revisions of "%{title}".', title: @page.title)
       redirect_to polymorphic_url([@context, @page])
     end
   end

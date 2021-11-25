@@ -180,9 +180,9 @@ class GradingPeriod < ActiveRecord::Base
     # cache that the job has processed.
     # If the look_back in the job is changed, the amount of time we cache needs
     # to also follow, so using the same setting.
-    look_back = Setting.get('disable_post_to_sis_on_grading_period', '60').to_i + 10
+    look_back = Setting.get("disable_post_to_sis_on_grading_period", "60").to_i + 10
     due_at_range = start_date..end_date
-    Rails.cache.fetch(['disable_post_to_sis_in_completed', self].cache_key, expires_in: look_back.minutes) do
+    Rails.cache.fetch(["disable_post_to_sis_in_completed", self].cache_key, expires_in: look_back.minutes) do
       possible_assignments_scope = Assignment.active
                                              .where(root_account_id: root_account_id, post_to_sis: true)
       scope = possible_assignments_scope
@@ -238,7 +238,7 @@ class GradingPeriod < ActiveRecord::Base
 
   def not_overlapping
     if overlapping?
-      errors.add(:base, t('errors.overlap_message',
+      errors.add(:base, t("errors.overlap_message",
                           "Grading period cannot overlap with existing grading periods in group"))
     end
   end
@@ -261,7 +261,7 @@ class GradingPeriod < ActiveRecord::Base
 
   def start_date_is_before_end_date
     if start_date && end_date && end_date < start_date
-      errors.add(:end_date, t('must be after start date'))
+      errors.add(:end_date, t("must be after start date"))
     end
   end
 
@@ -275,7 +275,7 @@ class GradingPeriod < ActiveRecord::Base
 
   def close_date_is_on_or_after_end_date
     if close_date.present? && end_date.present? && close_date < end_date
-      errors.add(:close_date, t('must be on or after end date'))
+      errors.add(:close_date, t("must be on or after end date"))
     end
   end
 

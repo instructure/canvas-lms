@@ -22,7 +22,7 @@ class ScheduledSmartAlert < ApplicationRecord
   def self.queue_current_jobs
     ScheduledSmartAlert.distinct.pluck(:root_account_id).each do |root_account_id|
       account = Account.find(root_account_id)
-      offset = account.settings['smart_alerts_threshold'] || 36
+      offset = account.settings["smart_alerts_threshold"] || 36
 
       ScheduledSmartAlert.runnable(offset, root_account_id).order(:due_at).find_each do |record|
         AssignmentUtil.delay.process_due_date_reminder(record.context_type, record.context_id) if account.feature_enabled?(:smart_alerts)
@@ -32,7 +32,7 @@ class ScheduledSmartAlert < ApplicationRecord
   end
 
   def self.runnable(offset, root_account_id)
-    where(['due_at < ? and root_account_id = ?', offset.hours.from_now, root_account_id])
+    where(["due_at < ? and root_account_id = ?", offset.hours.from_now, root_account_id])
   end
 
   def self.upsert(context_type:, context_id:, alert_type:, due_at:, root_account_id:)

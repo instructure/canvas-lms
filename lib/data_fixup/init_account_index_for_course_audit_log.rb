@@ -20,7 +20,7 @@
 
 module DataFixup
   class InitAccountIndexForCourseAuditLog
-    LAST_BATCH_TABLE = 'courses_index_last_batch'
+    LAST_BATCH_TABLE = "courses_index_last_batch"
 
     def self.run
       fixup = new
@@ -67,12 +67,12 @@ module DataFixup
 
     def read_batch_size
       @read_batch_size ||=
-        Setting.get('init_account_index_for_course_audit_log_read_batch_size', 1000).to_i
+        Setting.get("init_account_index_for_course_audit_log_read_batch_size", 1000).to_i
     end
 
     def write_batch_size
       @write_batch_size ||=
-        Setting.get('init_account_index_for_course_audit_log_write_batch_size', 200).to_i
+        Setting.get("init_account_index_for_course_audit_log_write_batch_size", 200).to_i
     end
 
     def database
@@ -94,7 +94,7 @@ module DataFixup
         end
 
         # build course_id to account_id lookup map to speed things up
-        course_ids = rows.map { |r| r['course_id'] }.uniq
+        course_ids = rows.map { |r| r["course_id"] }.uniq
         account_course_map = Course.where(id: course_ids).pluck(:id, :account_id).map { |e| [Shard.global_id_for(e[0]), Shard.global_id_for(e[1])] }.to_h
 
         batch_updates = []
@@ -102,15 +102,15 @@ module DataFixup
         last_id = nil
 
         rows.each do |row|
-          if row['account_id'].nil?
+          if row["account_id"].nil?
             # lookup account from course id, can also cache here
-            account_id = account_course_map[row['course_id']]
+            account_id = account_course_map[row["course_id"]]
             # update course row with account id
-            batch_updates << [account_id, row['id']]
+            batch_updates << [account_id, row["id"]]
             # write account id to index
             batch_inserts << add_course_account_index(row, account_id)
           end
-          last_id = row['id']
+          last_id = row["id"]
         end
 
         log_message("Writing #{batch_updates.count} updates to courses table")
@@ -158,7 +158,7 @@ module DataFixup
 
     def fetch_last_id
       database.execute("SELECT last_id FROM #{LAST_BATCH_TABLE}").fetch do |row|
-        return row.to_hash['last_id']
+        return row.to_hash["last_id"]
       end
       nil
     end

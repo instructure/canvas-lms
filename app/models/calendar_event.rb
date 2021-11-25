@@ -18,9 +18,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'atom'
-require 'date'
-require 'icalendar'
+require "atom"
+require "date"
+require "icalendar"
 
 Icalendar::Event.optional_property :x_alt_desc
 
@@ -51,10 +51,10 @@ class CalendarEvent < ActiveRecord::Base
   belongs_to :context, polymorphic: %i[course user group appointment_group course_section],
                        polymorphic_prefix: true
   belongs_to :user
-  belongs_to :parent_event, class_name: 'CalendarEvent', foreign_key: :parent_calendar_event_id, inverse_of: :child_events
-  has_many :child_events, -> { where("calendar_events.workflow_state <> 'deleted'") }, class_name: 'CalendarEvent', foreign_key: :parent_calendar_event_id, inverse_of: :parent_event
+  belongs_to :parent_event, class_name: "CalendarEvent", foreign_key: :parent_calendar_event_id, inverse_of: :child_events
+  has_many :child_events, -> { where("calendar_events.workflow_state <> 'deleted'") }, class_name: "CalendarEvent", foreign_key: :parent_calendar_event_id, inverse_of: :parent_event
   belongs_to :web_conference, autosave: true
-  belongs_to :root_account, class_name: 'Account'
+  belongs_to :root_account, class_name: "Account"
 
   validates :context, :workflow_state, presence: true
   validates_associated :context, if: ->(record) { record.validate_context }
@@ -86,17 +86,17 @@ class CalendarEvent < ActiveRecord::Base
 
     events ||= []
     events = events.values if events.is_a?(Hash)
-    next record.errors.add(attr, t('errors.no_updating_user', "Can't update child events unless an updating_user is set")) if events.present? && !record.updating_user
+    next record.errors.add(attr, t("errors.no_updating_user", "Can't update child events unless an updating_user is set")) if events.present? && !record.updating_user
 
     context_codes = events.pluck(:context_code)
-    next record.errors.add(attr, t('errors.duplicate_child_event_contexts', "Duplicate child event contexts")) if context_codes != context_codes.uniq
+    next record.errors.add(attr, t("errors.duplicate_child_event_contexts", "Duplicate child event contexts")) if context_codes != context_codes.uniq
 
     contexts = find_all_by_asset_string(context_codes).group_by(&:asset_string)
     context_codes.each do |code|
       context = contexts[code] && contexts[code][0]
       next if context&.grants_right?(record.updating_user, :manage_calendar) && context.try(:parent_event_context) == record.context
 
-      break record.errors.add(attr, t('errors.invalid_child_event_context', "Invalid child event context"))
+      break record.errors.add(attr, t("errors.invalid_child_event_context", "Invalid child event context"))
     end
     record.child_event_contexts = contexts
     record.child_event_data = events
@@ -134,7 +134,7 @@ class CalendarEvent < ActiveRecord::Base
   end
 
   scope :active, -> { where("calendar_events.workflow_state<>'deleted'") }
-  scope :are_locked, -> { where(workflow_state: 'locked') }
+  scope :are_locked, -> { where(workflow_state: "locked") }
   scope :are_unlocked, -> { where("calendar_events.workflow_state NOT IN ('deleted', 'locked')") }
 
   # controllers/apis/etc. should generally use for_user_and_context_codes instead
@@ -167,7 +167,7 @@ class CalendarEvent < ActiveRecord::Base
         this_scope = where(context_code: effectively_courses_codes)
 
         codes_conditions = codes.map do |code|
-          wildcard(quoted_table_name + '.effective_context_code', code, delimiter: ',')
+          wildcard(quoted_table_name + ".effective_context_code", code, delimiter: ",")
         end.join(" OR ")
 
         this_scope = this_scope.where(codes_conditions)
@@ -283,7 +283,7 @@ class CalendarEvent < ActiveRecord::Base
 
   def populate_with_parent_event
     self.effective_context_code = if appointment_group # appointment participant
-                                    appointment_group.appointment_group_contexts.map(&:context_code).join(',') if appointment_group.participant_type == 'User'
+                                    appointment_group.appointment_group_contexts.map(&:context_code).join(",") if appointment_group.participant_type == "User"
                                   else # e.g. section-level event
                                     parent_event.context_code
                                   end
@@ -307,7 +307,7 @@ class CalendarEvent < ActiveRecord::Base
       self.start_at = zoned_start_at.beginning_of_day rescue nil
       self.end_at = zoned_end_at.beginning_of_day rescue nil
     elsif start_at_changed? || end_at_changed? || Canvas::Plugin.value_to_boolean(remove_child_events)
-      self.all_day = self.start_at && self.start_at == self.end_at && zoned_start_at.strftime("%H:%M") == '00:00'
+      self.all_day = self.start_at && self.start_at == self.end_at && zoned_start_at.strftime("%H:%M") == "00:00"
     end
 
     if all_day && (!all_day_date || start_at_changed? || all_day_date_changed?)
@@ -372,7 +372,7 @@ class CalendarEvent < ActiveRecord::Base
     return unless saved_change_to_start_at? || saved_change_to_end_at? || saved_change_to_workflow_state?
     return if @skip_sync_parent_event
 
-    parent_event.cache_child_event_ranges! unless workflow_state == 'deleted'
+    parent_event.cache_child_event_ranges! unless workflow_state == "deleted"
   end
 
   def cache_child_event_ranges!
@@ -397,7 +397,7 @@ class CalendarEvent < ActiveRecord::Base
   alias_method :destroy_permanently!, :destroy
   def destroy(update_context_or_parent = true)
     transaction do
-      self.workflow_state = 'deleted'
+      self.workflow_state = "deleted"
       self.deleted_at = Time.now.utc
       save!
       child_events.find_each do |e|
@@ -408,13 +408,13 @@ class CalendarEvent < ActiveRecord::Base
       return true unless update_context_or_parent
 
       if appointment_group
-        context.touch if context_type == 'AppointmentGroup' # ensures end_at/start_at get updated
+        context.touch if context_type == "AppointmentGroup" # ensures end_at/start_at get updated
         # when deleting an appointment or appointment_participant, make sure we reset the cache
         appointment_group.clear_cached_available_slots!
         appointment_group.save!
       end
       if parent_event && parent_event.child_events.empty?
-        parent_event.workflow_state = parent_event.locked? ? 'active' : 'deleted'
+        parent_event.workflow_state = parent_event.locked? ? "active" : "deleted"
         parent_event.save!
       end
       true
@@ -501,9 +501,9 @@ class CalendarEvent < ActiveRecord::Base
   end
 
   def participants(include_observers: false)
-    if context_type == 'User'
+    if context_type == "User"
       if appointment_group? && include_observers
-        course_ids = appointment_group.appointment_group_contexts.where(context_type: 'Course').pluck(:context_id)
+        course_ids = appointment_group.appointment_group_contexts.where(context_type: "Course").pluck(:context_id)
         [context] + User.observing_students_in_course(context, course_ids)
       else
         [context]
@@ -524,17 +524,17 @@ class CalendarEvent < ActiveRecord::Base
   end
 
   def user
-    read_attribute(:user) || (context_type == 'User' ? context : nil)
+    read_attribute(:user) || (context_type == "User" ? context : nil)
   end
 
   def appointment_group?
-    context_type == 'AppointmentGroup' || parent_event.try(:context_type) == 'AppointmentGroup'
+    context_type == "AppointmentGroup" || parent_event.try(:context_type) == "AppointmentGroup"
   end
 
   def appointment_group
     if parent_event.try(:context).is_a?(AppointmentGroup)
       parent_event.context
-    elsif context_type == 'AppointmentGroup'
+    elsif context_type == "AppointmentGroup"
       context
     end
   end
@@ -542,7 +542,7 @@ class CalendarEvent < ActiveRecord::Base
   class ReservationError < StandardError; end
 
   def reserve_for(participant, user, options = {})
-    raise ReservationError, "not an appointment" unless context_type == 'AppointmentGroup'
+    raise ReservationError, "not an appointment" unless context_type == "AppointmentGroup"
     raise ReservationError, "ineligible participant" unless context.eligible_participant?(participant)
 
     transaction do
@@ -569,7 +569,7 @@ class CalendarEvent < ActiveRecord::Base
       event.comments = options[:comments]
       event.save!
       if active?
-        self.workflow_state = 'locked'
+        self.workflow_state = "locked"
         save!
       end
       context.clear_cached_available_slots!
@@ -605,11 +605,11 @@ class CalendarEvent < ActiveRecord::Base
   end
 
   def update_matching_days=(update)
-    @update_matching_days = update == '1' || update == true || update == 'true'
+    @update_matching_days = update == "1" || update == true || update == "true"
   end
 
   def all_day
-    read_attribute(:all_day) || (new_record? && self.start_at && self.start_at == self.end_at && self.start_at.strftime("%H:%M") == '00:00')
+    read_attribute(:all_day) || (new_record? && self.start_at && self.start_at == self.end_at && self.start_at.strftime("%H:%M") == "00:00")
   end
 
   def to_atom(opts = {})
@@ -620,7 +620,7 @@ class CalendarEvent < ActiveRecord::Base
       entry.authors << Atom::Person.new(name: context.name)
       entry.updated   = updated_at.utc
       entry.published = created_at.utc
-      entry.links << Atom::Link.new(rel: 'alternate',
+      entry.links << Atom::Link.new(rel: "alternate",
                                     href: "http://#{HostUrl.context_host(context)}/#{context_url_prefix}/calendar?month=#{self.start_at.strftime("%m") rescue ""}&year=#{self.start_at.strftime("%Y") rescue ""}#calendar_event_#{id}")
       entry.id        = "tag:#{HostUrl.default_host},#{created_at.strftime("%Y-%m-%d")}:/calendar_events/#{feed_code}_#{self.start_at.strftime("%Y-%m-%d-%H-%M") rescue "none"}_#{self.end_at.strftime("%Y-%m-%d-%H-%M") rescue "none"}"
       entry.content   = Atom::Content::Html.new("#{datetime_string(self.start_at, self.end_at)}<br/>#{description}")
@@ -697,8 +697,8 @@ class CalendarEvent < ActiveRecord::Base
       start_at = @event.is_a?(CalendarEvent) ? @event.start_at : @event.due_at
       end_at = @event.is_a?(CalendarEvent) ? @event.end_at : @event.due_at
 
-      event.dtstart = Icalendar::Values::DateTime.new(start_at.utc_datetime, 'tzid' => 'UTC') if start_at
-      event.dtend = Icalendar::Values::DateTime.new(end_at.utc_datetime, 'tzid' => 'UTC') if end_at
+      event.dtstart = Icalendar::Values::DateTime.new(start_at.utc_datetime, "tzid" => "UTC") if start_at
+      event.dtend = Icalendar::Values::DateTime.new(end_at.utc_datetime, "tzid" => "UTC") if end_at
 
       if @event.all_day && @event.all_day_date
         event.dtstart = Date.new(@event.all_day_date.year, @event.all_day_date.month, @event.all_day_date.day)
@@ -712,7 +712,7 @@ class CalendarEvent < ActiveRecord::Base
       if @event.description && include_description
         html = api_user_content(@event.description, @event.context, nil, preloaded_attachments)
         event.description = html_to_text(html)
-        event.x_alt_desc = Icalendar::Values::Text.new(html, { 'FMTTYPE' => 'text/html' })
+        event.x_alt_desc = Icalendar::Values::Text.new(html, { "FMTTYPE" => "text/html" })
       end
 
       loc_string = if @event.is_a?(CalendarEvent)
@@ -740,7 +740,7 @@ class CalendarEvent < ActiveRecord::Base
       end
 
       event.location = loc_string
-      event.dtstamp = Icalendar::Values::DateTime.new(@event.updated_at.utc_datetime, 'tzid' => 'UTC') if @event.updated_at
+      event.dtstamp = Icalendar::Values::DateTime.new(@event.updated_at.utc_datetime, "tzid" => "UTC") if @event.updated_at
 
       tag_name = @event.class.name.underscore
 
@@ -753,7 +753,7 @@ class CalendarEvent < ActiveRecord::Base
       # This will change when there are other things that have calendars...
       # can't call calendar_url or calendar_url_for here, have to do it manually
       event.url =         "https://#{HostUrl.context_host(url_context)}/calendar?include_contexts=#{@event.context.asset_string}&month=#{start_at.try(:strftime, "%m")}&year=#{start_at.try(:strftime, "%Y")}##{tag_name}_#{@event.id}"
-      event.uid =         "event-#{tag_name.tr('_', '-')}-#{@event.id}"
+      event.uid =         "event-#{tag_name.tr("_", "-")}-#{@event.id}"
       event.sequence =    0
 
       if @event.respond_to?(:applied_overrides)
@@ -761,7 +761,7 @@ class CalendarEvent < ActiveRecord::Base
           next unless override.due_at_overridden
 
           tag_name = override.class.name.underscore
-          event.uid       = "event-#{tag_name.tr('_', '-')}-#{override.id}"
+          event.uid       = "event-#{tag_name.tr("_", "-")}-#{override.id}"
           event.summary   = "#{@event.title} (#{override.title})"
           # TODO: event.url
         end
@@ -795,7 +795,7 @@ class CalendarEvent < ActiveRecord::Base
     return if web_conference_id.nil?
 
     unless user.blank? || web_conference.grants_right?(user, :read)
-      errors.add(:web_conference_id, 'cannot add web conference without read access for user')
+      errors.add(:web_conference_id, "cannot add web conference without read access for user")
       return
     end
     conference_context = case context
@@ -805,7 +805,7 @@ class CalendarEvent < ActiveRecord::Base
                            context.course
                          end
     if conference_context != web_conference.context
-      errors.add(:web_conference_id, 'cannot add web conference from different context')
+      errors.add(:web_conference_id, "cannot add web conference from different context")
     end
   end
 end

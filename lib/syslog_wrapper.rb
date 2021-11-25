@@ -18,8 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'logger'
-require 'syslog'
+require "logger"
+require "syslog"
 
 class SyslogWrapper
   attr_accessor :level, :datetime_format
@@ -111,7 +111,7 @@ class SyslogWrapper
                   progname
                 end
     end
-    message = message.to_s.strip.gsub(/\e\[([0-9]+(;|))+m/, '')
+    message = message.to_s.strip.gsub(/\e\[([0-9]+(;|))+m/, "")
     unless @skip_thread_context
       context = Thread.current[:context] || {}
       message = "[#{context[:session_id] || "-"} #{context[:request_id] || "-"}] #{message}"

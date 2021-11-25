@@ -18,8 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../../../spec_helper'
-require_relative '../../views_helper'
+require_relative "../../../spec_helper"
+require_relative "../../views_helper"
 
 describe "/quizzes/quizzes/_quiz_submission" do
   before do
@@ -50,7 +50,7 @@ describe "/quizzes/quizzes/_quiz_submission" do
   context "quiz results are not visible to the student" do
     it "renders" do
       quiz = @course.quizzes.create!
-      quiz.hide_results = 'always'
+      quiz.hide_results = "always"
       quiz.save!
 
       assign(:quiz, quiz)
@@ -61,7 +61,7 @@ describe "/quizzes/quizzes/_quiz_submission" do
     end
   end
 
-  context 'as a teacher' do
+  context "as a teacher" do
     it "renders Respondus lockdown submission for soft concluded course" do
       course_with_student course: @course, active_all: true
       course_with_teacher course: @course, active_all: true

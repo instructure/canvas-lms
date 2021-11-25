@@ -58,7 +58,7 @@ module CC
           end
           meta_fields[:todo_date] = page.todo_date
 
-          File.open(path, 'w') do |file|
+          File.open(path, "w") do |file|
             file << @html_exporter.html_page(page.body, page.title, meta_fields)
           end
 
@@ -70,8 +70,8 @@ module CC
             res.file(href: relative_path)
           end
         rescue
-          title = page.title rescue I18n.t('course_exports.unknown_titles.wiki_page', "Unknown wiki page")
-          add_error(I18n.t('course_exports.errors.wiki_page', "The wiki page \"%{title}\" failed to export", title: title), $!)
+          title = page.title rescue I18n.t("course_exports.unknown_titles.wiki_page", "Unknown wiki page")
+          add_error(I18n.t("course_exports.errors.wiki_page", "The wiki page \"%{title}\" failed to export", title: title), $!)
         end
       end
     end

@@ -5,7 +5,7 @@ Gem::Specification.new do |spec|
   spec.version       = "1.0.0"
   spec.authors       = ["Brad Humphrey"]
   spec.email         = ["brad@instructure.com"]
-  spec.summary       = 'Google Drive'
+  spec.summary       = "Google Drive"
 
   spec.files         = Dir.glob("{lib,spec}/**/*") + %w[test.sh]
   spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
@@ -21,5 +21,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "rspec", "~> 3.5.0"
   spec.add_development_dependency "timecop"
   spec.add_development_dependency "webmock"
-  spec.add_dependency 'faraday', '~> 0.17.3'
+  spec.add_dependency "faraday", "~> 0.17.3"
 end

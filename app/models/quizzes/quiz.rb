@@ -17,11 +17,11 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-require 'canvas/draft_state_validations'
+require "canvas/draft_state_validations"
 
 class Quizzes::Quiz < ActiveRecord::Base
   extend RootAccountResolver
-  self.table_name = 'quizzes'
+  self.table_name = "quizzes"
 
   include Workflow
   include HasContentTags
@@ -38,18 +38,18 @@ class Quizzes::Quiz < ActiveRecord::Base
   attr_readonly :context_id, :context_type
   attr_accessor :notify_of_update
 
-  has_many :quiz_questions, -> { order(:position) }, dependent: :destroy, class_name: 'Quizzes::QuizQuestion', inverse_of: :quiz
-  has_many :quiz_submissions, dependent: :destroy, class_name: 'Quizzes::QuizSubmission'
+  has_many :quiz_questions, -> { order(:position) }, dependent: :destroy, class_name: "Quizzes::QuizQuestion", inverse_of: :quiz
+  has_many :quiz_submissions, dependent: :destroy, class_name: "Quizzes::QuizSubmission"
   has_many :submissions, through: :quiz_submissions
-  has_many :quiz_groups, -> { order(:position) }, dependent: :destroy, class_name: 'Quizzes::QuizGroup'
-  has_many :quiz_statistics, -> { order(:created_at) }, class_name: 'Quizzes::QuizStatistics'
+  has_many :quiz_groups, -> { order(:position) }, dependent: :destroy, class_name: "Quizzes::QuizGroup"
+  has_many :quiz_statistics, -> { order(:created_at) }, class_name: "Quizzes::QuizStatistics"
   has_many :attachments, as: :context, inverse_of: :context, dependent: :destroy
-  has_many :quiz_regrades, class_name: 'Quizzes::QuizRegrade'
+  has_many :quiz_regrades, class_name: "Quizzes::QuizRegrade"
   has_many :quiz_student_visibilities
   belongs_to :context, polymorphic: [:course]
   belongs_to :assignment
   belongs_to :assignment_group
-  belongs_to :root_account, class_name: 'Account'
+  belongs_to :root_account, class_name: "Account"
   has_many :ignores, as: :asset
 
   validates :description, length: { maximum: maximum_long_text_length, allow_blank: true }
@@ -77,13 +77,13 @@ class Quizzes::Quiz < ActiveRecord::Base
   after_save :regrade_if_published
   # We currently only create LORs for quizzes that are assignments. If we change the quiz_type,
   # we should destroy or restore the results appropriately
-  after_save :destroy_learning_outcome_results, if: -> { saved_change_to_quiz_type?(from: 'assignment') }
-  after_save :restore_learning_outcome_results, if: -> { saved_change_to_quiz_type?(to: 'assignment') }
+  after_save :destroy_learning_outcome_results, if: -> { saved_change_to_quiz_type?(from: "assignment") }
+  after_save :restore_learning_outcome_results, if: -> { saved_change_to_quiz_type?(to: "assignment") }
   serialize :quiz_data
 
   simply_versioned
 
-  has_many :context_module_tags, -> { where("content_tags.tag_type='context_module' AND content_tags.workflow_state<>'deleted'") }, as: :content, inverse_of: :content, class_name: 'ContentTag'
+  has_many :context_module_tags, -> { where("content_tags.tag_type='context_module' AND content_tags.workflow_state<>'deleted'") }, as: :content, inverse_of: :content, class_name: "ContentTag"
 
   # This callback is listed here in order for the :link_assignment_overrides
   # method to be called after the simply_versioned callbacks. We want the
@@ -135,7 +135,7 @@ class Quizzes::Quiz < ActiveRecord::Base
     if !available? && !survey?
       self.points_possible = current_points_possible
     end
-    self.title = t('#quizzes.quiz.default_title', "Unnamed Quiz") if title.blank?
+    self.title = t("#quizzes.quiz.default_title", "Unnamed Quiz") if title.blank?
     self.quiz_type ||= "assignment"
     self.last_assignment_id = assignment_id_was if assignment_id_was
     if (!graded? && assignment_id) || (assignment_id_was && assignment_id != assignment_id_was)
@@ -166,7 +166,7 @@ class Quizzes::Quiz < ActiveRecord::Base
   # generate quiz data and update time when we publish. This method makes it
   # harder to mess up (like someone setting using workflow_state directly)
   def generate_quiz_data_on_publish
-    if workflow_state == 'available'
+    if workflow_state == "available"
       generate_quiz_data
       self.published_at = Time.zone.now
     end
@@ -206,16 +206,16 @@ class Quizzes::Quiz < ActiveRecord::Base
 
   def build_assignment(force: false)
     # There is no need to create a new assignment if the quiz being deleted
-    return if workflow_state == 'deleted'
+    return if workflow_state == "deleted"
 
     if !assignment_id && graded? && (force || !%i[assignment clone migration].include?(@saved_by))
       assignment = self.assignment
-      assignment ||= context.assignments.build(title: title, due_at: due_at, submission_types: 'online_quiz')
+      assignment ||= context.assignments.build(title: title, due_at: due_at, submission_types: "online_quiz")
       assignment.assignment_group_id = self.assignment_group_id
       assignment.only_visible_to_overrides = only_visible_to_overrides
       assignment.saved_by = :quiz
       unless deleted?
-        assignment.workflow_state = published? ? 'published' : 'unpublished'
+        assignment.workflow_state = published? ? "published" : "unpublished"
       end
       assignment.save
       self.assignment_id = assignment.id
@@ -223,11 +223,11 @@ class Quizzes::Quiz < ActiveRecord::Base
   end
 
   def readable_type
-    survey? ? t('#quizzes.quiz.types.survey', "Survey") : t('#quizzes.quiz.types.quiz', "Quiz")
+    survey? ? t("#quizzes.quiz.types.survey", "Survey") : t("#quizzes.quiz.types.quiz", "Quiz")
   end
 
   def valid_ip?(ip)
-    require 'ipaddr'
+    require "ipaddr"
     ip_filter.split(",").any? do |filter|
       addr_range = ::IPAddr.new(filter) rescue nil
       addr = ::IPAddr.new(ip) rescue nil
@@ -237,7 +237,7 @@ class Quizzes::Quiz < ActiveRecord::Base
 
   def self.count_points_possible(entries)
     util = Quizzes::QuizQuestion::AnswerSerializers::Util
-    possible = BigDecimal('0.0')
+    possible = BigDecimal("0.0")
     entries.each do |e|
       if e[:question_points] # QuizGroup
         possible += (util.to_decimal(e[:question_points].to_s) * util.to_decimal(e[:pick_count].to_s))
@@ -274,7 +274,7 @@ class Quizzes::Quiz < ActiveRecord::Base
   end
 
   def for_assignment?
-    assignment_id && assignment && assignment.submission_types == 'online_quiz'
+    assignment_id && assignment && assignment.submission_types == "online_quiz"
   end
 
   def muted?
@@ -284,7 +284,7 @@ class Quizzes::Quiz < ActiveRecord::Base
   alias_method :destroy_permanently!, :destroy
 
   def destroy
-    self.workflow_state = 'deleted'
+    self.workflow_state = "deleted"
     self.deleted_at = Time.now.utc
     res = save!
     if for_assignment? && !assignment.deleted?
@@ -322,7 +322,7 @@ class Quizzes::Quiz < ActiveRecord::Base
     val = val.in_time_zone.end_of_day if val.is_a?(Date)
     if val.is_a?(String)
       super(Time.zone.parse(val))
-      self.lock_at = CanvasTime.fancy_midnight(lock_at) unless val.include?(':')
+      self.lock_at = CanvasTime.fancy_midnight(lock_at) unless val.include?(":")
     else
       super(val)
     end
@@ -332,7 +332,7 @@ class Quizzes::Quiz < ActiveRecord::Base
     val = val.in_time_zone.end_of_day if val.is_a?(Date)
     if val.is_a?(String)
       super(Time.zone.parse(val))
-      infer_times unless val.include?(':')
+      infer_times unless val.include?(":")
     else
       super(val)
     end
@@ -342,23 +342,23 @@ class Quizzes::Quiz < ActiveRecord::Base
     due_at_changed? ||
       workflow_state_changed? ||
       only_visible_to_overrides_changed? ||
-      (assignment.nil? && next_quiz_type == 'assignment')
+      (assignment.nil? && next_quiz_type == "assignment")
   end
 
   def assignment?
-    self.quiz_type == 'assignment'
+    self.quiz_type == "assignment"
   end
 
   def survey?
-    self.quiz_type == 'survey' || graded_survey?
+    self.quiz_type == "survey" || graded_survey?
   end
 
   def graded?
-    self.quiz_type == 'assignment' || graded_survey?
+    self.quiz_type == "assignment" || graded_survey?
   end
 
   def graded_survey?
-    self.quiz_type == 'graded_survey'
+    self.quiz_type == "graded_survey"
   end
 
   def ungraded?
@@ -419,11 +419,11 @@ class Quizzes::Quiz < ActiveRecord::Base
   end
 
   def destroy_learning_outcome_results
-    delay_if_production.update_learning_outcome_results('deleted')
+    delay_if_production.update_learning_outcome_results("deleted")
   end
 
   def restore_learning_outcome_results
-    delay_if_production.update_learning_outcome_results('active')
+    delay_if_production.update_learning_outcome_results("active")
   end
 
   def destroy_related_submissions
@@ -445,8 +445,8 @@ class Quizzes::Quiz < ActiveRecord::Base
     if !graded? && (@old_assignment_id || last_assignment_id)
       ::Assignment.where(
         id: [@old_assignment_id, last_assignment_id].compact,
-        submission_types: 'online_quiz'
-      ).update_all(workflow_state: 'deleted', updated_at: Time.now.utc)
+        submission_types: "online_quiz"
+      ).update_all(workflow_state: "deleted", updated_at: Time.now.utc)
       course.recompute_student_scores
       delay_if_production(priority: Delayed::HIGH_PRIORITY).destroy_related_submissions
       ::ContentTag.delete_for(::Assignment.find(@old_assignment_id)) if @old_assignment_id
@@ -458,7 +458,7 @@ class Quizzes::Quiz < ActiveRecord::Base
        (@assignment_id_set || for_assignment?) &&
        @saved_by != :assignment &&
        (graded? || !@old_assignment_id)
-      Quizzes::Quiz.where("assignment_id=? AND id<>?", assignment_id, self).update_all(workflow_state: 'deleted', assignment_id: nil, updated_at: Time.now.utc) if assignment_id
+      Quizzes::Quiz.where("assignment_id=? AND id<>?", assignment_id, self).update_all(workflow_state: "deleted", assignment_id: nil, updated_at: Time.now.utc) if assignment_id
       self.assignment = @assignment_to_set if @assignment_to_set && !assignment
       a = assignment
       a.quiz&.clear_changes_information # AR#changes persist in after_saves now - needed to prevent an autosave loop
@@ -476,7 +476,7 @@ class Quizzes::Quiz < ActiveRecord::Base
         a.needs_update_cached_due_dates = true
       end
       unless deleted?
-        a.workflow_state = published? ? 'published' : 'unpublished'
+        a.workflow_state = published? ? "published" : "unpublished"
       end
       @notify_of_update = a.will_save_change_to_workflow_state? && a.published? unless defined?(@notify_of_update)
       a.notify_of_update = @notify_of_update
@@ -689,7 +689,7 @@ class Quizzes::Quiz < ActiveRecord::Base
 
     # We no longer use enrollment_term but get this info from enrollment_state
     fallback_end_at = course.enrollments.for_user(user).active_by_date
-                            .maximum('enrollment_states.state_valid_until')
+                            .maximum("enrollment_states.state_valid_until")
 
     # set to lock date
     if lock_at && !submission.manually_unlocked
@@ -730,7 +730,7 @@ class Quizzes::Quiz < ActiveRecord::Base
       submission.end_at = build_submission_end_at(submission)
       submission.finished_at = nil
       submission.submission_data = {}
-      submission.workflow_state = 'preview' if preview
+      submission.workflow_state = "preview" if preview
       submission.was_preview = preview
       submission.question_references_fixed = true
 
@@ -793,7 +793,7 @@ class Quizzes::Quiz < ActiveRecord::Base
 
   def quiz_title
     result = title
-    result = t('#quizzes.quiz.default_title', "Unnamed Quiz") if result == "undefined" || !result
+    result = t("#quizzes.quiz.default_title", "Unnamed Quiz") if result == "undefined" || !result
     result = assignment.title if assignment
     result
   end
@@ -863,10 +863,10 @@ class Quizzes::Quiz < ActiveRecord::Base
   def hide_results=(val)
     case val
     when Hash
-      val = if val[:last_attempt] == '1'
-              'until_after_last_attempt'
-            elsif val[:never] != '1'
-              'always'
+      val = if val[:last_attempt] == "1"
+              "until_after_last_attempt"
+            elsif val[:never] != "1"
+              "always"
             else
               nil
             end
@@ -892,7 +892,7 @@ class Quizzes::Quiz < ActiveRecord::Base
 
       if submissions_to_update.any?
         shard.activate do
-          Quizzes::QuizSubmission.where(id: submissions_to_update).update_all(workflow_state: 'pending_review', updated_at: Time.now.utc)
+          Quizzes::QuizSubmission.where(id: submissions_to_update).update_all(workflow_state: "pending_review", updated_at: Time.now.utc)
         end
       end
     end
@@ -913,7 +913,7 @@ class Quizzes::Quiz < ActiveRecord::Base
       new_data = quiz_data
       old_data = old_version.quiz_data
       new_data.each_with_index do |q, i|
-        needs_review = true if (q[:id] || q['id']) != (old_data[i][:id] || old_data[i]['id'])
+        needs_review = true if (q[:id] || q["id"]) != (old_data[i][:id] || old_data[i]["id"])
       end
     end
     @significant_version[version_number] = needs_review
@@ -923,7 +923,7 @@ class Quizzes::Quiz < ActiveRecord::Base
     return if self.quiz_type.blank?
 
     unless valid_quiz_type_values.include?(self.quiz_type)
-      errors.add(:invalid_quiz_type, t('#quizzes.quiz.errors.invalid_quiz_type', "Quiz type is not valid"))
+      errors.add(:invalid_quiz_type, t("#quizzes.quiz.errors.invalid_quiz_type", "Quiz type is not valid"))
     end
   end
 
@@ -934,11 +934,11 @@ class Quizzes::Quiz < ActiveRecord::Base
   def validate_ip_filter
     return if ip_filter.blank?
 
-    require 'ipaddr'
+    require "ipaddr"
     begin
       ip_filter.split(",").each { |filter| ::IPAddr.new(filter) }
     rescue
-      errors.add(:invalid_ip_filter, t('#quizzes.quiz.errors.invalid_ip_filter', "IP filter is not valid"))
+      errors.add(:invalid_ip_filter, t("#quizzes.quiz.errors.invalid_ip_filter", "IP filter is not valid"))
     end
   end
 
@@ -946,7 +946,7 @@ class Quizzes::Quiz < ActiveRecord::Base
     return if hide_results.blank?
 
     unless valid_hide_results_values.include?(hide_results)
-      errors.add(:invalid_hide_results, t('#quizzes.quiz.errors.invalid_hide_results', "Hide results is not valid"))
+      errors.add(:invalid_hide_results, t("#quizzes.quiz.errors.invalid_hide_results", "Hide results is not valid"))
     end
   end
 
@@ -959,7 +959,7 @@ class Quizzes::Quiz < ActiveRecord::Base
     hide_at = hide_correct_answers_at
 
     if show_at.present? && hide_at.present? && hide_at <= show_at
-      errors.add(:show_correct_answers, 'bad_range')
+      errors.add(:show_correct_answers, "bad_range")
     end
   end
 
@@ -973,7 +973,7 @@ class Quizzes::Quiz < ActiveRecord::Base
 
   def statistics(include_all_versions = true, includes_sis_ids = true)
     quiz_statistics.build(
-      report_type: 'student_analysis',
+      report_type: "student_analysis",
       includes_all_versions: include_all_versions,
       includes_sis_ids: includes_sis_ids
     ).report.generate
@@ -984,10 +984,10 @@ class Quizzes::Quiz < ActiveRecord::Base
   def current_statistics_for(report_type, options = {})
     # item analysis always takes the first attempt (not necessarily the
     # most recent), thus we say it always cares about all versions
-    options[:includes_all_versions] = true if report_type == 'item_analysis'
+    options[:includes_all_versions] = true if report_type == "item_analysis"
 
     # item analysis doesn't include sis ids
-    options[:includes_sis_ids] = false if report_type == 'item_analysis'
+    options[:includes_sis_ids] = false if report_type == "item_analysis"
 
     quiz_stats_opts = {
       report_type: report_type,
@@ -1149,7 +1149,7 @@ class Quizzes::Quiz < ActiveRecord::Base
   scope :active, -> { where("quizzes.workflow_state<>'deleted'") }
   scope :not_for_assignment, -> { where(assignment_id: nil) }
   scope :available, -> { where("quizzes.workflow_state = 'available'") }
-  scope :for_course, ->(course_id) { where(context_type: 'Course', context_id: course_id) }
+  scope :for_course, ->(course_id) { where(context_type: "Course", context_id: course_id) }
 
   # NOTE: only use for courses with differentiated assignments on
   scope :visible_to_students_in_course_with_da, lambda { |student_ids, course_ids|
@@ -1226,9 +1226,9 @@ class Quizzes::Quiz < ActiveRecord::Base
 
   scope :not_ignored_by, lambda { |user, purpose|
     where("NOT EXISTS (?)",
-          Ignore.where(asset_type: 'Quizzes::Quiz',
+          Ignore.where(asset_type: "Quizzes::Quiz",
                        user_id: user,
-                       purpose: purpose).where('asset_id=quizzes.id'))
+                       purpose: purpose).where("asset_id=quizzes.id"))
   }
 
   def peer_reviews_due_at
@@ -1302,11 +1302,11 @@ class Quizzes::Quiz < ActiveRecord::Base
   end
 
   def publish
-    self.workflow_state = 'available'
+    self.workflow_state = "available"
   end
 
   def unpublish
-    self.workflow_state = 'unpublished'
+    self.workflow_state = "unpublished"
   end
 
   def publish!
@@ -1371,16 +1371,16 @@ class Quizzes::Quiz < ActiveRecord::Base
   def has_file_upload_question?
     return false unless quiz_data.present?
 
-    !!quiz_data.detect { |data_hash| data_hash[:question_type] == 'file_upload_question' }
+    !!quiz_data.detect { |data_hash| data_hash[:question_type] == "file_upload_question" }
   end
 
   def draft_state
     state = workflow_state
-    (state == 'available') ? 'active' : state
+    (state == "available") ? "active" : state
   end
 
   def active?
-    draft_state == 'active'
+    draft_state == "active"
   end
 
   alias_method :published?, :active?
@@ -1465,7 +1465,7 @@ class Quizzes::Quiz < ActiveRecord::Base
 
     if ip_filter.present?
       filters << {
-        name: t('#quizzes.quiz.current_filter', 'Current Filter'),
+        name: t("#quizzes.quiz.current_filter", "Current Filter"),
         account: title,
         filter: ip_filter
       }
@@ -1494,7 +1494,7 @@ class Quizzes::Quiz < ActiveRecord::Base
   end
 
   def self.reflection_type_name
-    'quizzes:quiz'
+    "quizzes:quiz"
   end
 
   def run_if_overrides_changed!

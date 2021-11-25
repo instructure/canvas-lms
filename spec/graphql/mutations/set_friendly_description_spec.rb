@@ -71,9 +71,9 @@ describe Mutations::SetFriendlyDescription do
   end
 
   def expect_error(result, message)
-    errors = result['errors']
+    errors = result["errors"]
     expect(errors).not_to be_nil
-    expect(errors[0]['message']).to match(/#{message}/)
+    expect(errors[0]["message"]).to match(/#{message}/)
   end
 
   def res_field(result, field)
@@ -155,7 +155,7 @@ describe Mutations::SetFriendlyDescription do
 
       expect(res_field(result, "_id")).to eql(friendly_description.id.to_s)
       friendly_description.reload
-      expect(friendly_description.workflow_state).to eql('deleted')
+      expect(friendly_description.workflow_state).to eql("deleted")
     end
   end
 

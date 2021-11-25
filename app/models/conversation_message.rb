@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'atom'
+require "atom"
 
 class ConversationMessage < ActiveRecord::Base
   self.ignored_columns = %i[root_account_id]
@@ -30,7 +30,7 @@ class ConversationMessage < ActiveRecord::Base
   include SimpleTags::ReaderInstanceMethods
 
   belongs_to :conversation
-  belongs_to :author, class_name: 'User'
+  belongs_to :author, class_name: "User"
   belongs_to :context, polymorphic: [:account]
   has_many :conversation_message_participants
   has_many :attachment_associations, as: :context, inverse_of: :context
@@ -63,7 +63,7 @@ class ConversationMessage < ActiveRecord::Base
       # limit it for non-postgres so we can reduce the amount of extra data we
       # crunch in ruby (generally none, unless a conversation has multiple
       # most-recent messages, i.e. same created_at)
-      unless connection.adapter_name == 'PostgreSQL'
+      unless connection.adapter_name == "PostgreSQL"
         base_conditions += <<~SQL.squish
           AND conversation_messages.created_at = (
             SELECT MAX(created_at)
@@ -79,7 +79,7 @@ class ConversationMessage < ActiveRecord::Base
         ret = where(base_conditions)
               .joins("JOIN #{ConversationMessageParticipant.quoted_table_name} ON conversation_messages.id = conversation_message_id")
               .select("conversation_messages.*, conversation_participant_id, conversation_message_participants.user_id, conversation_message_participants.tags")
-              .order('conversation_id DESC, user_id DESC, created_at DESC')
+              .order("conversation_id DESC, user_id DESC, created_at DESC")
               .distinct_on(:conversation_id, :user_id).to_a
         map = ret.index_by { |m| [m.conversation_id, m.user_id] }
         backmap = ret.index_by(&:conversation_participant_id)
@@ -139,12 +139,12 @@ class ConversationMessage < ActiveRecord::Base
 
   # override AR association magic
   def attachment_ids
-    (read_attribute(:attachment_ids) || "").split(',').map(&:to_i)
+    (read_attribute(:attachment_ids) || "").split(",").map(&:to_i)
   end
 
   def attachment_ids=(ids)
     ids = author.conversation_attachments_folder.attachments.where(id: ids.map(&:to_i)).pluck(:id) unless ids.empty?
-    write_attribute(:attachment_ids, ids.join(','))
+    write_attribute(:attachment_ids, ids.join(","))
   end
 
   def relativize_attachment_ids(from_shard:, to_shard:)
@@ -279,7 +279,7 @@ class ConversationMessage < ActiveRecord::Base
   end
 
   def root_account_id
-    return nil unless context && context_type == 'Account'
+    return nil unless context && context_type == "Account"
 
     context.resolved_root_account_id
   end
@@ -300,7 +300,7 @@ class ConversationMessage < ActiveRecord::Base
   end
 
   def forwarded_messages
-    @forwarded_messages ||= (forwarded_message_ids && self.class.unscoped { self.class.where(id: forwarded_message_ids.split(',')).order('created_at DESC').to_a }) || []
+    @forwarded_messages ||= (forwarded_message_ids && self.class.unscoped { self.class.where(id: forwarded_message_ids.split(",")).order("created_at DESC").to_a }) || []
   end
 
   def all_forwarded_messages
@@ -315,10 +315,10 @@ class ConversationMessage < ActiveRecord::Base
   end
 
   def as_json(**)
-    super(only: %i[id created_at body generated author_id])['conversation_message']
-      .merge('forwarded_messages' => forwarded_messages,
-             'attachments' => attachments,
-             'media_comment' => media_comment)
+    super(only: %i[id created_at body generated author_id])["conversation_message"]
+      .merge("forwarded_messages" => forwarded_messages,
+             "attachments" => attachments,
+             "media_comment" => media_comment)
   end
 
   def to_atom(opts = {})
@@ -337,8 +337,8 @@ class ConversationMessage < ActiveRecord::Base
       content += "<ul>"
       attachments.each do |attachment|
         href = file_download_url(attachment, verifier: attachment.uuid,
-                                             download: '1',
-                                             download_frd: '1',
+                                             download: "1",
+                                             download_frd: "1",
                                              host: HostUrl.context_host(context))
         content += "<li><a href='#{href}'>#{ERB::Util.h(attachment.display_name)}</a></li>"
       end
@@ -353,13 +353,13 @@ class ConversationMessage < ActiveRecord::Base
       entry.updated   = created_at.utc
       entry.published = created_at.utc
       entry.id        = "tag:#{HostUrl.context_host(context)},#{created_at.strftime("%Y-%m-%d")}:/conversations/#{feed_code}"
-      entry.links << Atom::Link.new(rel: 'alternate',
+      entry.links << Atom::Link.new(rel: "alternate",
                                     href: "http://#{HostUrl.context_host(context)}/conversations/#{conversation.id}")
       attachments.each do |attachment|
-        entry.links << Atom::Link.new(rel: 'enclosure',
+        entry.links << Atom::Link.new(rel: "enclosure",
                                       href: file_download_url(attachment, verifier: attachment.uuid,
-                                                                          download: '1',
-                                                                          download_frd: '1',
+                                                                          download: "1",
+                                                                          download_frd: "1",
                                                                           host: HostUrl.context_host(context)))
       end
       entry.content = Atom::Content::Html.new(content)
@@ -368,7 +368,7 @@ class ConversationMessage < ActiveRecord::Base
 
   class EventFormatter
     def self.users_added(author_name, user_names)
-      I18n.t 'conversation_message.users_added', {
+      I18n.t "conversation_message.users_added", {
         one: "%{user} was added to the conversation by %{current_user}",
         other: "%{list_of_users} were added to the conversation by %{current_user}"
       },
