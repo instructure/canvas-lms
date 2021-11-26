@@ -55,11 +55,11 @@
   font-weight: bold;
   text-align: center;
   display: flex;
-  flex: 3;
-  max-width: 50%;
+  flex: 2;
   justify-content: center;
-  margin: 1% 25% 1% 1%;
+  margin: 1%;
 }
+
 
 // when the viewport width shrinks,
 // shrink the course name so it doesn't
@@ -68,7 +68,7 @@
 // where "Back to Subject" is the longest translated string.
 @media (max-width: 875px) {
   .k5-heading-course-name {
-    margin: 1% 30% 1% 5%
+    flex: 1;
   }
 }
 // grades
