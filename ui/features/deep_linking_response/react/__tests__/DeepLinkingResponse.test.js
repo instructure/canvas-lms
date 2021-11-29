@@ -24,14 +24,16 @@ import {RetrievingContent} from '../DeepLinkingResponse'
 let wrapper = 'empty wrapper'
 const windowMock = {}
 const env = {
-  content_items: [{type: 'link'}],
-  message: 'message',
-  log: 'log',
-  error_message: 'error message',
-  error_log: 'error log',
   DEEP_LINKING_POST_MESSAGE_ORIGIN: '*',
-  lti_endpoint: 'https://www.test.com/retrieve',
-  close_dialog: false
+  deep_link_response: {
+    content_items: [{type: 'link'}],
+    msg: 'message',
+    log: 'log',
+    errormsg: 'error message',
+    errorlog: 'error log',
+    ltiEndpoint: 'https://www.test.com/retrieve',
+    reloadpage: false
+  }
 }
 
 const render = () => mount(<RetrievingContent environment={env} parentWindow={windowMock} />)
@@ -56,31 +58,19 @@ describe('post message', () => {
 
   const messageData = () => windowMock.postMessage.mock.calls[0][0]
 
-  it('sends the correct message type', () => {
-    expect(messageData().messageType).toEqual('LtiDeepLinkingResponse')
-  })
+  ;['content_items', 'msg', 'log', 'errormsg', 'errorlog', 'ltiEndpoint', 'reloadpage'].forEach(
+    attr => {
+      it(`sends the correct ${attr}`, () => {
+        expect(messageData()[attr]).toEqual(env.deep_link_response[attr])
+      })
+    }
+  )
 
   it('sends the correct content items', () => {
-    expect(messageData().content_items).toMatchObject(env.content_items)
+    expect(messageData().content_items).toMatchObject(env.deep_link_response.content_items)
   })
 
-  it('sends the correct message', () => {
-    expect(messageData().msg).toEqual(env.message)
-  })
-
-  it('sends the correct log', () => {
-    expect(messageData().log).toEqual(env.log)
-  })
-
-  it('sends the correct error message', () => {
-    expect(messageData().errormsg).toEqual(env.error_message)
-  })
-
-  it('sends the correct error log', () => {
-    expect(messageData().errorlog).toEqual(env.error_log)
-  })
-
-  it('sends the correct ltiEndpiont', () => {
-    expect(messageData().ltiEndpoint).toEqual('https://www.test.com/retrieve')
+  it('sends the correct message type', () => {
+    expect(messageData().messageType).toEqual('LtiDeepLinkingResponse')
   })
 })
