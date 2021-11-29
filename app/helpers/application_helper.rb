@@ -1472,4 +1472,14 @@ module ApplicationHelper
     @current_pseudonym && @current_pseudonym.login_count < 10 && @current_user &&
       !@current_user.fake_student? && !@current_user.used_feature?(:cc_prefs) && !k5_student
   end
+
+  def individual_outcome_rating_and_calculation_js_env
+    if @domain_root_account.feature_enabled?(:individual_outcome_rating_and_calculation) && !@domain_root_account.feature_enabled?(:account_level_mastery_scales)
+      js_env(
+        INDIVIDUAL_OUTCOME_RATING_AND_CALCULATION: true,
+        IMPROVED_OUTCOMES_MANAGEMENT:
+          @domain_root_account.feature_enabled?(:improved_outcomes_management)
+      )
+    end
+  end
 end
