@@ -130,18 +130,17 @@ describe('SearchItemSelector', () => {
     expect(handleCourseSelected).toHaveBeenCalledWith(null)
   })
 
-  it('renders no results if search comes back empty', async () => {
+  it('renders no results if search comes back empty', () => {
     useManagedCourseSearchApi.mockImplementationOnce(({success}) => success([]))
-    const {getByLabelText, findByText} = render(
+    const {getByText} = render(
       <SearchItemSelector
         itemSearchFunction={useManagedCourseSearchApi}
         onItemSelected={() => {}}
         renderLabel="Select a course"
       />
     )
-    const selectInput = getByLabelText(/select a course/i)
-    fireEvent.change(selectInput, {target: {value: 'nothing'}})
-    expect(await findByText(/no results/i)).toBeInTheDocument()
+    fireEvent.click(getByText(/select a course/i))
+    expect(getByText(/no results/i)).toBeInTheDocument()
   })
 
   it('removes the existing input if the contextId changes', () => {

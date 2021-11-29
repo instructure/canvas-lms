@@ -17,7 +17,6 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
 import {arrayOf, bool, func, instanceOf, number, shape, string} from 'prop-types'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Button} from '@instructure/ui-buttons'
@@ -188,7 +187,6 @@ export default class AssignmentColumnHeader extends ColumnHeader {
     }).isRequired,
 
     onMenuDismiss: func.isRequired,
-    showMessageStudentsWithObserversDialog: bool.isRequired,
     showUnpostedMenuItem: bool.isRequired
   }
 
@@ -270,34 +268,14 @@ export default class AssignmentColumnHeader extends ColumnHeader {
   showMessageStudentsWhoDialog = async () => {
     this.state.skipFocusOnClose = true
     this.setState({skipFocusOnClose: true})
+    const MessageStudentsWhoDialog = await AsyncComponents.loadMessageStudentsWhoDialog()
 
     const options = {
       assignment: this.props.assignment,
       students: this.activeStudentDetails()
     }
 
-    if (this.props.showMessageStudentsWithObserversDialog) {
-      const mountPoint = document.querySelector(
-        "[data-component='MessageStudentsWithObserversModal']"
-      )
-      if (mountPoint != null) {
-        const MessageStudentsWhoDialog =
-          await AsyncComponents.loadMessageStudentsWithObserversDialog()
-
-        const props = {
-          ...options,
-          onClose: () => {
-            ReactDOM.unmountComponentAtNode(mountPoint)
-            this.focusAtEnd()
-          }
-        }
-        ReactDOM.render(<MessageStudentsWhoDialog {...props} />, mountPoint)
-      }
-    } else {
-      const MessageStudentsWhoDialog = await AsyncComponents.loadMessageStudentsWhoDialog()
-
-      MessageStudentsWhoDialog.show(options, this.focusAtEnd)
-    }
+    MessageStudentsWhoDialog.show(options, this.focusAtEnd)
   }
 
   activeStudentDetails() {

@@ -112,9 +112,6 @@ export default handleActions(
     START_LOADING_OPPORTUNITIES: (state, _action) => {
       return {...state, loadingOpportunities: true}
     },
-    START_LOADING_ALL_OPPORTUNITIES: (state, _action) => {
-      return {...state, loadingOpportunities: true, allOpportunitiesLoaded: false}
-    },
     START_LOADING_ITEMS: (state, _action) => {
       return loadingState(state, {isLoading: true})
     },

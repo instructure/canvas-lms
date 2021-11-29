@@ -97,18 +97,20 @@ describe('CanvasInbox Full Page', () => {
   it('renders the conversation messages', async () => {
     const container = setup()
 
-    const conversation = await container.findByTestId('conversationListItem-Checkbox')
+    const conversation = await container.findByTestId('messageListItem-Checkbox')
     fireEvent.click(conversation)
 
-    expect(await container.findByText('this is the first reply message')).toBeInTheDocument()
-    expect(await container.findByText('this is a reply all')).toBeInTheDocument()
-    expect(await container.findByText('testing 123')).toBeInTheDocument()
+    expect(await container.findByText('Watch out for that Magneto guy')).toBeInTheDocument()
+    expect(
+      await container.findByText('Wolverine is not so bad when you get to know him')
+    ).toBeInTheDocument()
   })
 
   // TODO: will be fixed with VICE-2077
-  it.skip('should change the read state of a conversation', async () => {
+  // eslint-disable-next-line jest/no-disabled-tests
+  it.skip('should change the read state of a message', async () => {
     const container = setup()
-    const conversation = await container.findByTestId('conversationListItem-Checkbox')
+    const conversation = await container.findByTestId('messageListItem-Checkbox')
     fireEvent.click(conversation)
     await container.findByText('Watch out for that Magneto guy')
     expect(container.queryByTestId('unread-badge')).toBeTruthy()
@@ -122,7 +124,7 @@ describe('CanvasInbox Full Page', () => {
   it('Successfully star selected conversation', async () => {
     const {findAllByTestId, findByTestId, getByText} = setup()
 
-    const checkboxes = await findAllByTestId('conversationListItem-Checkbox')
+    const checkboxes = await findAllByTestId('messageListItem-Checkbox')
     expect(checkboxes.length).toBe(1)
     fireEvent.click(checkboxes[0])
 
@@ -167,7 +169,7 @@ describe('CanvasInbox Full Page', () => {
 
     const {findAllByTestId, findByTestId, getByText} = setup()
 
-    const checkboxes = await findAllByTestId('conversationListItem-Checkbox')
+    const checkboxes = await findAllByTestId('messageListItem-Checkbox')
     expect(checkboxes.length).toBe(2)
     fireEvent.click(checkboxes[0])
     fireEvent.click(checkboxes[1])

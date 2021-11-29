@@ -19,7 +19,7 @@
 #
 
 class ExternalStatuses
-  ALL_POSSIBLE_EXTERNAL_STATUSES = [:active].freeze
+  ALL_POSSIBLE_EXTERNAL_STATUSES = [:active]
 
   # before changing this, be sure to consider the database schema defaults
   DEFAULT_EXTERNAL_STATUS = :active
@@ -33,8 +33,6 @@ class ExternalStatuses
       end
     end
 
-    def default_external_status
-      DEFAULT_EXTERNAL_STATUS
-    end
+    def default_external_status; DEFAULT_EXTERNAL_STATUS; end
   end
 end

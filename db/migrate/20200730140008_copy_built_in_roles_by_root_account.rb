@@ -27,4 +27,7 @@ class CopyBuiltInRolesByRootAccount < ActiveRecord::Migration[5.2]
   def up
     DataFixup::CopyBuiltInRolesByRootAccount.run
   end
+
+  def down
+  end
 end

@@ -85,14 +85,7 @@ const OutcomeManagementPanel = ({
     setRhsGroupIdsToRefetch(ids => [...new Set([...ids, ...createdOutcomeGroupIds])])
   }, [createdOutcomeGroupIds])
 
-  const {
-    group,
-    loading,
-    loadMore,
-    removeLearningOutcomes,
-    readLearningOutcomes,
-    refetchLearningOutcome
-  } = useGroupDetail({
+  const {group, loading, loadMore, removeLearningOutcomes, readLearningOutcomes} = useGroupDetail({
     id: selectedGroupId,
     searchString: debouncedSearchString,
     rhsGroupIdsToRefetch
@@ -150,7 +143,7 @@ const OutcomeManagementPanel = ({
     queryCollections
   })
 
-  const onSuccessGroupRemove = () => {
+  const onSucessGroupRemove = () => {
     selectParentGroupInLhs()
     removeGroup(selectedGroupId)
     clearSelectedOutcomes()
@@ -447,7 +440,6 @@ const OutcomeManagementPanel = ({
                 outcome={selectedOutcome}
                 isOpen={isOutcomeEditModalOpen}
                 onCloseHandler={onCloseOutcomeEditModal}
-                onEditLearningOutcomeHandler={refetchLearningOutcome}
               />
               <OutcomeMoveModal
                 outcomes={selectedOutcomeObj}
@@ -469,7 +461,7 @@ const OutcomeManagementPanel = ({
             isOpen={isGroupRemoveModalOpen}
             onCloseHandler={closeGroupRemoveModal}
             onCollectionToggle={queryCollections}
-            onSuccess={onSuccessGroupRemove}
+            onSuccess={onSucessGroupRemove}
           />
           <GroupEditModal
             outcomeGroup={group}

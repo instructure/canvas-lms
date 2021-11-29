@@ -37,7 +37,9 @@ module Types
       value "deleted"
     end
 
-    GRADING_TYPES = Assignment::ALLOWED_GRADING_TYPES.zip(Assignment::ALLOWED_GRADING_TYPES).to_h
+    GRADING_TYPES = Hash[
+      Assignment::ALLOWED_GRADING_TYPES.zip(Assignment::ALLOWED_GRADING_TYPES)
+    ]
 
     class AssignmentGradingType < Types::BaseEnum
       graphql_name "GradingType"
@@ -109,12 +111,12 @@ module Types
 
     def self.overridden_field(field_name, description)
       field field_name, DateTimeType, description, null: true do
-        argument :apply_overrides, Boolean, <<~MD, required: false, default_value: true
+        argument :apply_overrides, Boolean, <<~DOC, required: false, default_value: true
           When true, return the overridden dates.
 
           Not all roles have permission to view un-overridden dates (in which
           case the overridden dates will be returned)
-        MD
+        DOC
       end
 
       define_method(field_name) do |apply_overrides:|
@@ -283,7 +285,7 @@ module Types
       Assignments::NeedsGradingCountQuery.new(
         assignment,
         current_user
-        # TODO: course proxy stuff
+        # TODO course proxy stuff
         # (actually for some reason not passing along a course proxy doesn't
         # seem to matter)
       ).count

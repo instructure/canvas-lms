@@ -75,7 +75,7 @@
     z-index: 10000;
   }
   .tox .tox-button {
-    background-color: var(--canvasPrimaryButtonHoverBackground);
+    background-color: var(--canvasPrimaryButtonBackground);
     font-family: var(--canvasFontFamily);
     font-weight: var(--canvasButtonFontWeight);
     font-size: var(--canvasButtonFontSize);

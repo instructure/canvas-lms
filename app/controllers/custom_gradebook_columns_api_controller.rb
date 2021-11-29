@@ -77,15 +77,13 @@ class CustomGradebookColumnsApiController < ApplicationController
   def index
     if authorized_action? @context.custom_gradebook_columns.build,
                           @current_user, :read
-      scope = if value_to_boolean(params[:include_hidden])
-                @context.custom_gradebook_columns.not_deleted
-              else
-                @context.custom_gradebook_columns.active
-              end
+      scope = value_to_boolean(params[:include_hidden]) ?
+        @context.custom_gradebook_columns.not_deleted :
+        @context.custom_gradebook_columns.active
       columns = Api.paginate(scope, self,
                              api_v1_course_custom_gradebook_columns_url(@context))
 
-      render json: columns.map { |c|
+      render :json => columns.map { |c|
         custom_gradebook_column_json(c, @current_user, session)
       }
     end
@@ -132,8 +130,8 @@ class CustomGradebookColumnsApiController < ApplicationController
     column = @context.custom_gradebook_columns.not_deleted.find(params[:id])
     if authorized_action? column, @current_user, :manage
       column.destroy
-      render json: custom_gradebook_column_json(column,
-                                                @current_user, session)
+      render :json => custom_gradebook_column_json(column,
+                                                   @current_user, session)
     end
   end
 
@@ -146,7 +144,7 @@ class CustomGradebookColumnsApiController < ApplicationController
   # <b>200 OK</b> is returned if successful
   def reorder
     @context.custom_gradebook_columns.build.update_order(params[:order])
-    render status: :ok, json: {}
+    render :status => 200, :json => {}
   end
 
   private
@@ -154,10 +152,10 @@ class CustomGradebookColumnsApiController < ApplicationController
   def update_column(column)
     if authorized_action? column, @current_user, :manage
       if column.save
-        render json: custom_gradebook_column_json(column,
-                                                  @current_user, session)
+        render :json => custom_gradebook_column_json(column,
+                                                     @current_user, session)
       else
-        render json: column.errors, status: :bad_request
+        render :json => column.errors, :status => :bad_request
       end
     end
   end

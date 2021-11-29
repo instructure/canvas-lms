@@ -21,10 +21,8 @@
 module GroupsHelper
   def group_avatar_url(group)
     attachment = group.avatar_attachment
-    if attachment
-      thumbnail_image_url(attachment)
-    else
+    attachment ?
+      thumbnail_image_url(attachment) :
       "/images/group-placeholder.png"
-    end
   end
 end

@@ -32,8 +32,7 @@ const timeZone = 'Europe/Dublin'
 
 const defaultProps = {
   ...MOCK_TODOS[1],
-  timeZone,
-  openInNewTab: true
+  timeZone
 }
 
 beforeEach(() => {
@@ -163,17 +162,5 @@ describe('Todo', () => {
     act(() => ignoreButton.click())
 
     expect((await findAllByText('Failed to ignore assignment'))[0]).toBeInTheDocument()
-  })
-
-  it('adds target attribute to link if openInNewTab is true', () => {
-    const {getByRole} = render(<Todo {...defaultProps} />)
-    const link = getByRole('link', {name: 'Grade Plant a plant'})
-    expect(link.getAttribute('target')).toBe('_blank')
-  })
-
-  it('does not add target attribute to link if openInNewTab is false', () => {
-    const {getByRole} = render(<Todo {...defaultProps} openInNewTab={false} />)
-    const link = getByRole('link', {name: 'Grade Plant a plant'})
-    expect(link.getAttribute('target')).toBeNull()
   })
 })

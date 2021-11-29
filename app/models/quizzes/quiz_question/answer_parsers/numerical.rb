@@ -33,11 +33,10 @@ module Quizzes::QuizQuestion::AnswerParsers
 
         a[:numerical_answer_type] = fields.fetch_any(:numerical_answer_type)
 
-        case a[:numerical_answer_type]
-        when "exact_answer"
+        if a[:numerical_answer_type] == "exact_answer"
           a[:exact] = fields.fetch_any(:answer_exact).to_f
           a[:margin] = fields.fetch_any(:answer_error_margin).to_f
-        when "precision_answer"
+        elsif a[:numerical_answer_type] == "precision_answer"
           a[:approximate] = fields.fetch_any(:answer_approximate).to_f
           a[:precision] = fields.fetch_any(:answer_precision).to_i
         else

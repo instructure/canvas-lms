@@ -40,7 +40,7 @@ import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
 import {useMutation} from 'react-apollo'
 import OutcomesRceField from '../shared/OutcomesRceField'
 
-const OutcomeEditModal = ({outcome, isOpen, onCloseHandler, onEditLearningOutcomeHandler}) => {
+const OutcomeEditModal = ({outcome, isOpen, onCloseHandler}) => {
   const [title, titleChangeHandler, titleChanged] = useInput(outcome.title)
   const [displayName, displayNameChangeHandler, displayNameChanged] = useInput(
     outcome.displayName || ''
@@ -79,8 +79,6 @@ const OutcomeEditModal = ({outcome, isOpen, onCloseHandler, onEditLearningOutcom
     ;(async () => {
       try {
         const promises = []
-        // See OUT-4889
-        // description is not required so no need to check if it is not null/empty like displayName & title
         if (
           (title && titleChanged) ||
           (displayName && displayNameChanged) ||
@@ -115,8 +113,7 @@ const OutcomeEditModal = ({outcome, isOpen, onCloseHandler, onEditLearningOutcom
         }
 
         await Promise.all(promises)
-        // Only perform a refetch when an edit actually happened.
-        onEditLearningOutcomeHandler()
+
         showFlashAlert({
           message: I18n.t('"%{title}" was successfully updated.', {
             title
@@ -130,6 +127,7 @@ const OutcomeEditModal = ({outcome, isOpen, onCloseHandler, onEditLearningOutcom
         })
       }
     })()
+
     onCloseHandler()
   }
 
@@ -250,8 +248,7 @@ OutcomeEditModal.propTypes = {
     })
   }).isRequired,
   isOpen: PropTypes.bool.isRequired,
-  onCloseHandler: PropTypes.func.isRequired,
-  onEditLearningOutcomeHandler: PropTypes.func.isRequired
+  onCloseHandler: PropTypes.func.isRequired
 }
 
 export default OutcomeEditModal
