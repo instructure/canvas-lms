@@ -33,7 +33,7 @@ module Api::V1::DiscussionTopics
     id title assignment_id delayed_post_at lock_at created_at
     last_reply_at posted_at root_topic_id podcast_has_student_posts
     discussion_type position allow_rating only_graders_can_rate sort_by_rating
-    is_section_specific
+    is_section_specific anonymous_state
   ].freeze
 
   # Public: DiscussionTopic methods to serialize.
