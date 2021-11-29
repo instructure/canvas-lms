@@ -135,11 +135,11 @@
                 <h4 id="anonymous_section_header">Anonymous Discussion</h4>
                 <div style="margin: 0 0 20px 0;">
                   <label class="radio" style="display: block;">
-                    <input type="radio" name="anonymous_state" value=null checked="checked" {{#if isEditing}}disabled{{/if}} />
+                    <input type="radio" name="anonymous_state" value=null {{checkedIfNullOrUndef anonymousState}} {{#if isEditing}}disabled{{/if}} />
                     {{#t}}Off: student names and profile pictures will be visible to other members of this course{{/t}}
                   </label>
                   <label class="radio" style="display: block;">
-                    <input type="radio" name="anonymous_state" value="full_anonymity" {{#if isEditing}}disabled{{/if}} />
+                    <input type="radio" name="anonymous_state" value="full_anonymity" {{checkedIf anonymousState "full_anonymity"}} {{#if isEditing}}disabled{{/if}} />
                     {{#t}}Full: student names and profile pictures will be hidden{{/t}}
                   </label>
                 </div>
