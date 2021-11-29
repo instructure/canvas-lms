@@ -22,7 +22,8 @@ import {render} from '@testing-library/react'
 import DimensionsInput, {useDimensionsState} from '..'
 import DimensionsInputDriver from './DimensionsInputDriver'
 
-const NAN_ERROR = 'Width and height must be numbers'
+const W_AND_H_NAN_ERROR = 'Width and height must be numbers'
+const PERCENTAGE_NAN_ERROR = 'Percentage must be a number'
 const ASPECT_MESSAGE = 'Aspect ratio will be preserved'
 
 describe('RCE > Plugins > Shared > DimensionsInput', () => {
@@ -67,7 +68,7 @@ describe('RCE > Plugins > Shared > DimensionsInput', () => {
 
   function renderComponent() {
     component = render(<SpecComponent />, {container: $container})
-    dimensions = new DimensionsInputDriver($container.firstChild)
+    dimensions = new DimensionsInputDriver($container)
   }
 
   function buildMinDimensionsError() {
@@ -271,7 +272,7 @@ describe('RCE > Plugins > Shared > DimensionsInput', () => {
         })
 
         it('displays a validation error with the field', () => {
-          expect(dimensions.messageTexts).toEqual([NAN_ERROR])
+          expect(dimensions.messageTexts).toEqual([W_AND_H_NAN_ERROR])
         })
       })
 
@@ -745,7 +746,7 @@ describe('RCE > Plugins > Shared > DimensionsInput', () => {
         })
 
         it('displays a validation error with the field', () => {
-          expect(dimensions.messageTexts).toEqual([NAN_ERROR])
+          expect(dimensions.messageTexts).toEqual([W_AND_H_NAN_ERROR])
         })
       })
 
@@ -1155,7 +1156,7 @@ describe('RCE > Plugins > Shared > DimensionsInput', () => {
         })
 
         it('displays a validation error with the field', () => {
-          expect(dimensions.messageTexts).toEqual([NAN_ERROR])
+          expect(dimensions.messageTexts).toEqual([PERCENTAGE_NAN_ERROR])
         })
       })
 

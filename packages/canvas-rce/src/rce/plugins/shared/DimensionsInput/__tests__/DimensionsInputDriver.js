@@ -32,42 +32,43 @@ export default class DimensionsInputDriver {
     return new DimensionsInputDriver($fieldset)
   }
 
-  constructor($element) {
-    this.$element = $element
+  constructor($parent) {
+    this.$typeSelector = $parent.firstChild
+    this.$dimensionsInput = $parent.lastChild
   }
 
   get width() {
-    const $container = getByTestId(this.$element, 'input-number-container')
+    const $container = getByTestId(this.$dimensionsInput, 'input-number-container')
     return NumberInputDriver.findByLabelText('Width', $container)
   }
 
   get height() {
-    const $container = getByTestId(this.$element, 'input-number-container')
+    const $container = getByTestId(this.$dimensionsInput, 'input-number-container')
     return NumberInputDriver.findByLabelText('Height', $container)
   }
 
   get percentage() {
-    const $container = getByTestId(this.$element, 'input-number-container')
+    const $container = getByTestId(this.$dimensionsInput, 'input-number-container')
     return NumberInputDriver.findByLabelText('Percentage', $container)
   }
 
   get pixelsRadioButton() {
-    const $parent = getByTestId(this.$element, 'dimension-type')
+    const $parent = getByTestId(this.$typeSelector, 'dimension-type')
     return queryByLabelText($parent, 'Pixels', {exact: false})
   }
 
   get percentageRadioButton() {
-    const $parent = getByTestId(this.$element, 'dimension-type')
+    const $parent = getByTestId(this.$typeSelector, 'dimension-type')
     return queryByLabelText($parent, 'Percentage', {exact: false})
   }
 
   get messageTexts() {
-    const messagesId = this.$element.getAttribute('aria-describedby')
+    const messagesId = this.$dimensionsInput.getAttribute('aria-describedby')
     if (messagesId == null) {
       return []
     }
 
-    return [...this.$element.querySelectorAll(`#${messagesId} > *`)].map($message =>
+    return [...this.$dimensionsInput.querySelectorAll(`#${messagesId} > *`)].map($message =>
       $message.textContent.trim()
     )
   }
