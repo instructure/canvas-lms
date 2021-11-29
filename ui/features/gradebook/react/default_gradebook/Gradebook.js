@@ -2407,18 +2407,21 @@ class Gradebook extends React.Component {
   }
 
   studentSearchMatcher(option, searchTerm) {
-    const studentName = option.label
-    if (studentName.match(new RegExp(searchTerm, 'i'))) {
+    const term = searchTerm?.toLowerCase() || ''
+    const studentName = option.label?.toLowerCase() || ''
+
+    if (studentName.includes(term)) {
       return true
     }
 
     const {sis_user_id: sisId} = this.courseContent.students.student(option.id)
-    return !!sisId && sisId === searchTerm
+    return !!sisId && sisId.toLowerCase() === term
   }
 
   assignmentSearchMatcher(option, searchTerm) {
-    const assignmentName = option.label
-    return !!assignmentName.match(new RegExp(searchTerm, 'i'))
+    const term = searchTerm?.toLowerCase() || ''
+    const assignmentName = option.label?.toLowerCase() || ''
+    return assignmentName.includes(term)
   }
 
   renderStudentSearchFilter(students) {

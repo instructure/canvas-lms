@@ -157,15 +157,9 @@ function CanvasMultiSelect(props) {
 
   function onInputChange(e) {
     const {value} = e.target
-    const defaultMatcher = new RegExp(`^${value.trim()}`, 'i')
-    const filtered = childProps.filter(child => {
-      if (customMatcher) {
-        return customMatcher(child, value.trim())
-      }
-
-      return child.label.match(defaultMatcher)
-    })
-
+    const defaultMatcher = (option, term) => option.label.match(new RegExp(`^${term}`, 'i'))
+    const matcher = customMatcher || defaultMatcher
+    const filtered = childProps.filter(child => matcher(child, value.trim()))
     let message =
       // if number of options has changed, announce the new total.
       filtered.length !== filteredOptionIds?.length
