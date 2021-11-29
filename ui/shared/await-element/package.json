@@ -1,0 +1,8 @@
+	
+{
+  "name": "@canvas/await-element",
+  "private": true,
+  "version": "1.0.0",
+  "author": "ckline@instructure.com",
+  "main": "./index.js"
+}
