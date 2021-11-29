@@ -30,13 +30,7 @@ export const RetrievingContent = ({environment, parentWindow}) => {
     parentWindow.postMessage(
       {
         messageType,
-        content_items: environment.content_items,
-        msg: environment.message,
-        log: environment.log,
-        errormsg: environment.error_message,
-        errorlog: environment.error_log,
-        ltiEndpoint: environment.lti_endpoint,
-        reloadpage: environment.reload_page
+        ...environment.deep_link_response
       },
       environment.DEEP_LINKING_POST_MESSAGE_ORIGIN
     )

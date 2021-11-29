@@ -33,34 +33,37 @@ module Lti
 
         it "sets the JS ENV" do
           expect(controller).to receive(:js_env).with(
-            content_items: content_items,
-            message: message,
-            log: log,
-            error_message: error_message,
-            error_log: error_log,
-            lti_endpoint: Rails.application.routes.url_helpers.polymorphic_url(
-              [:retrieve, account, :external_tools],
-              host: "test.host"
-            ),
-            reload_page: false
+            deep_link_response: {
+              content_items: content_items,
+              msg: msg,
+              log: log,
+              errormsg: errormsg,
+              errorlog: errorlog,
+              ltiEndpoint: Rails.application.routes.url_helpers.polymorphic_url(
+                [:retrieve, account, :external_tools],
+                host: "test.host"
+              ),
+              reloadpage: false
+            }
           )
 
           subject
         end
 
         context "when the messages/logs passed in are not strings" do
-          let(:message) { { html: "some message" } }
-          let(:error_message) { { html: "some error message" } }
+          let(:msg) { { html: "some message" } }
+          let(:errormsg) { { html: "some error message" } }
           let(:log) { { html: "some log" } }
-          let(:error_log) { { html: "some error log" } }
+          let(:errorlog) { { html: "some error log" } }
 
           it "turns them into strings before calling js_env to prevent HTML injection" do
-            expect(controller).to receive(:js_env).with(hash_including(
-                                                          message: '{"html"=>"some message"}',
-                                                          log: '{"html"=>"some log"}',
-                                                          error_message: '{"html"=>"some error message"}',
-                                                          error_log: '{"html"=>"some error log"}'
-                                                        ))
+            expect(controller).to receive(:js_env).with(deep_link_response:
+              hash_including(
+                msg: '{"html"=>"some message"}',
+                log: '{"html"=>"some log"}',
+                errormsg: '{"html"=>"some error message"}',
+                errorlog: '{"html"=>"some error log"}'
+              ))
             subject
           end
         end
@@ -514,7 +517,7 @@ module Lti
             it_behaves_like "does nothing"
             it "sends error in content item response" do
               subject
-              expect(assigns[:js_env][:content_items].first).to have_key(:errors)
+              expect(assigns[:js_env][:deep_link_response][:content_items].first).to have_key(:errors)
             end
           end
 
