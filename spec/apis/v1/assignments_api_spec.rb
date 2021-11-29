@@ -5230,6 +5230,7 @@ describe AssignmentsApiController, type: :request do
                                                  "only_graders_can_rate" => false,
                                                  "sort_by_rating" => false,
                                                  "todo_date" => nil,
+                                                 "anonymous_state" => nil
                                                })
       end
 

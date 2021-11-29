@@ -438,7 +438,8 @@ describe DiscussionTopicsController, type: :request do
         "todo_date" => nil,
         "group_category_id" => nil,
         "topic_children" => [],
-        "group_topic_children" => [], }
+        "group_topic_children" => [],
+        "anonymous_state" => nil }
     end
 
     let(:root_topic_response_json) do
@@ -1679,6 +1680,7 @@ describe DiscussionTopicsController, type: :request do
       "only_graders_can_rate" => false,
       "sort_by_rating" => false,
       "todo_date" => nil,
+      "anonymous_state" => nil
     }
     expect(json.sort.to_h).to eq expected.sort.to_h
   end
