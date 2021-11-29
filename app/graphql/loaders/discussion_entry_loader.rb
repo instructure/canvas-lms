@@ -59,8 +59,12 @@ class Loaders::DiscussionEntryLoader < GraphQL::Batch::Loader
       if @search_term.present?
         # search results cannot look at the messages from deleted
         # discussion_entries, so they need to be excluded.
-        scope = scope.active.joins(:user).where(UserSearch.like_condition("message"), pattern: UserSearch.like_string_for(@search_term))
-                     .or(scope.joins(:user).where(UserSearch.like_condition("users.name"), pattern: UserSearch.like_string_for(@search_term)))
+        scope = if object.is_a?(DiscussionTopic) && object.anonymous_state != "full_anonymity"
+                  scope.active.joins(:user).where(UserSearch.like_condition("message"), pattern: UserSearch.like_string_for(@search_term))
+                       .or(scope.joins(:user).where(UserSearch.like_condition("users.name"), pattern: UserSearch.like_string_for(@search_term)))
+                else
+                  scope.active.where(UserSearch.like_condition("message"), pattern: UserSearch.like_string_for(@search_term))
+                end
       end
 
       if @root_entries
