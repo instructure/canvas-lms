@@ -142,7 +142,8 @@ export const K5Dashboard = ({
   parentSupportEnabled,
   observerList,
   canAddObservee,
-  openTodosInNewTab
+  openTodosInNewTab,
+  loadingOpportunities
 }) => {
   const initialObservedId = observerList.find(o => o.id === savedObservedId(currentUser.id))
     ? savedObservedId(currentUser.id)
@@ -325,7 +326,8 @@ export const K5Dashboard = ({
               loadingAnnouncements,
               isStudent: plannerEnabled,
               responsiveSize,
-              subjectAnnouncements
+              subjectAnnouncements,
+              loadingOpportunities
             }}
           >
             {currentTab && (
@@ -408,6 +410,7 @@ K5Dashboard.propTypes = {
   assignmentsDueToday: PropTypes.object.isRequired,
   assignmentsMissing: PropTypes.object.isRequired,
   assignmentsCompletedForToday: PropTypes.object.isRequired,
+  loadingOpportunities: PropTypes.bool.isRequired,
   createPermission: PropTypes.oneOf(['admin', 'teacher', 'student', 'no_enrollments']),
   restrictCourseCreation: PropTypes.bool.isRequired,
   currentUser: PropTypes.shape({
