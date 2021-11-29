@@ -18,24 +18,24 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative 'lti2_api_spec_helper'
-require_relative '../api_spec_helper'
+require_relative "lti2_api_spec_helper"
+require_relative "../api_spec_helper"
 
 require_dependency "lti/ims/access_token_helper"
 require_dependency "lti/plagiarism_assignments_api_controller"
 module Lti
   describe PlagiarismAssignmentsApiController, type: :request do
-    include_context 'lti2_api_spec_helper'
+    include_context "lti2_api_spec_helper"
 
     before do
       message_handler.update(capabilities: [Lti::ResourcePlacement::SIMILARITY_DETECTION_LTI2])
-      tool_proxy.raw_data['security_contract']['tool_service'] = authorized_services
+      tool_proxy.raw_data["security_contract"]["tool_service"] = authorized_services
       tool_proxy.save!
       assignment.tool_settings_tool = message_handler
       assignment.save!
     end
 
-    describe '#show' do
+    describe "#show" do
       let(:service_name) { PlagiarismAssignmentsApiController::ASSIGNMENT_SERVICE }
       let(:endpoint) { "/api/lti/assignments" }
       let(:authorized_services) do
@@ -47,7 +47,7 @@ module Lti
         student
       end
       let(:assignment) do
-        a = course.assignments.new(title: "some assignment", points_possible: 10, description: '<p>Dude...</p>', due_at: DateTime.now)
+        a = course.assignments.new(title: "some assignment", points_possible: 10, description: "<p>Dude...</p>", due_at: DateTime.now)
         a.workflow_state = "published"
         a.tool_settings_tool = message_handler
         a.save!
@@ -66,8 +66,8 @@ module Lti
         }
       end
 
-      it 'verifies the tool has the required services' do
-        tool_proxy.raw_data['security_contract']['tool_service'] = []
+      it "verifies the tool has the required services" do
+        tool_proxy.raw_data["security_contract"]["tool_service"] = []
         tool_proxy.save!
         get "#{endpoint}/#{assignment.id}", headers: request_headers
         expect(response).to be_unauthorized
@@ -79,62 +79,56 @@ module Lti
         expect(response).to be_unauthorized
       end
 
-      it 'verifies the user is associated with the assignment' do
+      it "verifies the user is associated with the assignment" do
         user = user_model
         get "#{endpoint}/#{assignment.id}", params: { user_id: user.id }, headers: request_headers
         expect(response).to be_unauthorized
       end
 
-      it 'returns 404 when the assignment cannot be found' do
+      it "returns 404 when the assignment cannot be found" do
         user_model
         get "#{endpoint}/blah", headers: request_headers
         expect(response).to be_not_found
       end
 
-      it 'returns 404 when the user cannot be found' do
+      it "returns 404 when the user cannot be found" do
         user_model
-        get "#{endpoint}/#{assignment.id}", params: { user_id: 'blah' }, headers: request_headers
+        get "#{endpoint}/#{assignment.id}", params: { user_id: "blah" }, headers: request_headers
         expect(response).to be_not_found
       end
 
-      it 'returns an assignment by lti id' do
+      it "returns an assignment by Canvas id" do
         get "#{endpoint}/#{assignment.id}", headers: request_headers
         parsed_body = JSON.parse(response.body)
         expect(parsed_body).to eq expected_assignment
       end
 
-      it 'returns an assignment by Canvas id' do
-        get "#{endpoint}/#{assignment.id}", headers: request_headers
-        parsed_body = JSON.parse(response.body)
-        expect(parsed_body).to eq expected_assignment
-      end
-
-      it 'returns an assignment by lti assignment id' do
+      it "returns an assignment by lti assignment id" do
         get "#{endpoint}/#{assignment.lti_context_id}", headers: request_headers
         parsed_body = JSON.parse(response.body)
         expect(parsed_body).to eq expected_assignment
       end
 
-      it 'returns an assignment with user lti id' do
+      it "returns an assignment with user lti id" do
         get "#{endpoint}/#{assignment.id}", params: { user_id: student.lti_context_id }, headers: request_headers
         parsed_body = JSON.parse(response.body)
         expect(parsed_body).to eq expected_assignment
       end
 
-      it 'returns an assignment with an old user lti id' do
-        UserPastLtiId.create!(user: student, context: course, user_lti_id: student.lti_id, user_lti_context_id: 'old_lti_id', user_uuid: 'old')
-        get "#{endpoint}/#{assignment.id}", params: { user_id: 'old_lti_id' }, headers: request_headers
+      it "returns an assignment with an old user lti id" do
+        UserPastLtiId.create!(user: student, context: course, user_lti_id: student.lti_id, user_lti_context_id: "old_lti_id", user_uuid: "old")
+        get "#{endpoint}/#{assignment.id}", params: { user_id: "old_lti_id" }, headers: request_headers
         parsed_body = JSON.parse(response.body)
         expect(parsed_body).to eq expected_assignment
       end
 
-      it 'returns an assignment with user Canvas id' do
+      it "returns an assignment with user Canvas id" do
         get "#{endpoint}/#{assignment.id}", params: { user_id: student.id }, headers: request_headers
         parsed_body = JSON.parse(response.body)
         expect(parsed_body).to eq expected_assignment
       end
 
-      it 'returns an assignment that is differentiated by user' do
+      it "returns an assignment that is differentiated by user" do
         due_at = CanvasTime.fancy_midnight(3.days.from_now.midnight)
 
         create_adhoc_override_for_assignment(assignment, student, due_at: due_at)

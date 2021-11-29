@@ -30,6 +30,6 @@ class CreateViewedSubmissionCommentTable < ActiveRecord::Migration[5.1]
 
     add_foreign_key :viewed_submission_comments, :submission_comments
     add_foreign_key :viewed_submission_comments, :users
-    add_index :viewed_submission_comments, [:user_id, :submission_comment_id], name: 'index_viewed_submission_comments_user_comment', unique: true
+    add_index :viewed_submission_comments, [:user_id, :submission_comment_id], name: "index_viewed_submission_comments_user_comment", unique: true
   end
 end

@@ -17,10 +17,10 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../../helpers/gradebook_common'
-require_relative '../../helpers/groups_common'
-require_relative '../pages/gradebook_cells_page'
-require_relative '../pages/gradebook_page'
+require_relative "../../helpers/gradebook_common"
+require_relative "../../helpers/groups_common"
+require_relative "../pages/gradebook_cells_page"
+require_relative "../pages/gradebook_page"
 
 describe "Gradebook - message students who" do
   include_context "in-process server selenium tests"
@@ -40,8 +40,8 @@ describe "Gradebook - message students who" do
     Gradebook.click_assignment_header_menu_element(@third_assignment.id, "message students")
 
     expect do
-      message_form = f('#message_assignment_recipients')
-      message_form.find_element(:css, '#body').send_keys(message_text)
+      message_form = f("#message_assignment_recipients")
+      message_form.find_element(:css, "#body").send_keys(message_text)
       submit_form(message_form)
       wait_for_ajax_requests
       run_jobs
@@ -50,7 +50,7 @@ describe "Gradebook - message students who" do
 
   it "only sends messages to students who have not submitted and have not been graded" do
     # student 1 submitted but not graded yet
-    @third_submission = @third_assignment.submit_homework(@student_1, body: ' student 1 submission assignment 4')
+    @third_submission = @third_assignment.submit_homework(@student_1, body: " student 1 submission assignment 4")
     @third_submission.save!
 
     # student 2 graded without submission (turned in paper by hand)
@@ -63,9 +63,9 @@ describe "Gradebook - message students who" do
     Gradebook.click_assignment_header_menu_element(@third_assignment.id, "message students")
 
     expect do
-      message_form = f('#message_assignment_recipients')
-      click_option('#message_assignment_recipients .message_types', "Haven't submitted yet")
-      message_form.find_element(:css, '#body').send_keys(message_text)
+      message_form = f("#message_assignment_recipients")
+      click_option("#message_assignment_recipients .message_types", "Haven't submitted yet")
+      message_form.find_element(:css, "#body").send_keys(message_text)
       submit_form(message_form)
       wait_for_ajax_requests
       run_jobs
@@ -79,41 +79,41 @@ describe "Gradebook - message students who" do
     Gradebook.click_assignment_header_menu_element(@second_assignment.id, "message students")
 
     expect do
-      message_form = f('#message_assignment_recipients')
-      click_option('#message_assignment_recipients .message_types', 'Scored more than')
-      message_form.find_element(:css, '.cutoff_score').send_keys('3') # both assignments have score of 5
-      message_form.find_element(:css, '#body').send_keys(message_text)
+      message_form = f("#message_assignment_recipients")
+      click_option("#message_assignment_recipients .message_types", "Scored more than")
+      message_form.find_element(:css, ".cutoff_score").send_keys("3") # both assignments have score of 5
+      message_form.find_element(:css, "#body").send_keys(message_text)
       submit_form(message_form)
       wait_for_ajax_requests
       run_jobs
     end.to change(ConversationMessage, :count).by_at_least(2)
   end
 
-  it "shows not-submitted students", priority: "2", test_id: 3265183 do
+  it "shows not-submitted students", priority: "2" do
     # student 2 has submitted assignment 3, but it hasn't been graded
-    submission = @third_assignment.submit_homework(@student_2, body: 'student 2 submission assignment 3')
+    submission = @third_assignment.submit_homework(@student_2, body: "student 2 submission assignment 3")
     submission.save!
 
     Gradebook.visit(@course)
     Gradebook.click_assignment_header_menu_element(@third_assignment.id, "message students")
     # expect dialog to show Student1 and Student3
-    visible_students = ffj('.student_list li:visible')
+    visible_students = ffj(".student_list li:visible")
 
     expect(visible_students).to have_size 2
     expect(visible_students[0]).to include_text @student_name_1
   end
 
-  it "shows ungraded students", priority: "2", test_id: 3440541 do
+  it "shows ungraded students", priority: "2" do
     # student 2 has submitted assignment 3, but it hasn't been graded
-    submission = @third_assignment.submit_homework(@student_2, body: 'student 2 submission assignment 3')
+    submission = @third_assignment.submit_homework(@student_2, body: "student 2 submission assignment 3")
     submission.save!
     # set grade for first student, 3rd assignment
     @third_assignment.grade_student(@student_1, grade: 50, grader: @teacher)
     Gradebook.visit(@course)
     Gradebook.click_assignment_header_menu_element(@third_assignment.id, "message students")
     # expect dialog to show Student2 & Student3
-    click_option('#message_assignment_recipients .message_types', "Haven't been graded")
-    visible_students = ffj('.student_list li:visible')
+    click_option("#message_assignment_recipients .message_types", "Haven't been graded")
+    visible_students = ffj(".student_list li:visible")
 
     expect(visible_students).to have_size 2
     expect(visible_students[0]).to include_text @student_name_2
@@ -127,8 +127,8 @@ describe "Gradebook - message students who" do
     Gradebook.click_assignment_header_menu_element(@third_assignment.id, "message students")
 
     expect do
-      message_form = f('#message_assignment_recipients')
-      message_form.find_element(:css, '#body').send_keys(message_text)
+      message_form = f("#message_assignment_recipients")
+      message_form.find_element(:css, "#body").send_keys(message_text)
       submit_form(message_form)
       wait_for_ajax_requests
       run_jobs
@@ -139,11 +139,11 @@ describe "Gradebook - message students who" do
     Gradebook.visit(@course)
     Gradebook.click_assignment_header_menu_element(@second_assignment.id, "message students")
 
-    message_form = f('#message_assignment_recipients')
-    click_option('#message_assignment_recipients .message_types', 'Scored more than')
-    message_form.find_element(:css, '.cutoff_score').send_keys('3')
+    message_form = f("#message_assignment_recipients")
+    click_option("#message_assignment_recipients .message_types", "Scored more than")
+    message_form.find_element(:css, ".cutoff_score").send_keys("3")
 
-    remove_buttons = ff('#message_students_dialog .student_list li:not(.blank) .remove-button')
+    remove_buttons = ff("#message_students_dialog .student_list li:not(.blank) .remove-button")
     expect(remove_buttons).to have_size 3
 
     remove_buttons[0].click
@@ -152,11 +152,11 @@ describe "Gradebook - message students who" do
 
     remove_buttons[2].click
     wait_for_animations
-    check_element_has_focus(message_form.find_element(:css, '#subject'))
+    check_element_has_focus(message_form.find_element(:css, "#subject"))
 
-    expect(message_form.find_element(:css, '.send_button')).to have_class('disabled')
-    message_form.find_element(:css, '#body').send_keys('ohai student2')
-    expect(message_form.find_element(:css, '.send_button')).not_to have_class('disabled')
+    expect(message_form.find_element(:css, ".send_button")).to have_class("disabled")
+    message_form.find_element(:css, "#body").send_keys("ohai student2")
+    expect(message_form.find_element(:css, ".send_button")).not_to have_class("disabled")
 
     submit_form(message_form)
     wait_for_ajax_requests
@@ -168,38 +168,38 @@ describe "Gradebook - message students who" do
     Gradebook.visit(@course)
     Gradebook.click_assignment_header_menu_element(@second_assignment.id, "message students")
 
-    message_form = f('#message_assignment_recipients')
-    message_form.find_element(:css, '#body').send_keys('hello')
+    message_form = f("#message_assignment_recipients")
+    message_form.find_element(:css, "#body").send_keys("hello")
 
-    click_option('#message_assignment_recipients .message_types', 'Scored more than')
-    replace_content(message_form.find_element(:css, '.cutoff_score'), '1000')
-    expect(message_form.find_element(:css, '.send_button')).to have_class('disabled')
+    click_option("#message_assignment_recipients .message_types", "Scored more than")
+    replace_content(message_form.find_element(:css, ".cutoff_score"), "1000")
+    expect(message_form.find_element(:css, ".send_button")).to have_class("disabled")
 
-    replace_content(message_form.find_element(:css, '.cutoff_score'), '1')
-    expect(message_form.find_element(:css, '.send_button')).not_to have_class('disabled')
+    replace_content(message_form.find_element(:css, ".cutoff_score"), "1")
+    expect(message_form.find_element(:css, ".send_button")).not_to have_class("disabled")
   end
 
   it "disables the submit button if all students are manually removed" do
     Gradebook.visit(@course)
     Gradebook.click_assignment_header_menu_element(@second_assignment.id, "message students")
 
-    message_form = f('#message_assignment_recipients')
-    message_form.find_element(:css, '#body').send_keys('hello')
+    message_form = f("#message_assignment_recipients")
+    message_form.find_element(:css, "#body").send_keys("hello")
 
-    click_option('#message_assignment_recipients .message_types', 'Scored more than')
-    message_form.find_element(:css, '.cutoff_score').send_keys('3')
+    click_option("#message_assignment_recipients .message_types", "Scored more than")
+    message_form.find_element(:css, ".cutoff_score").send_keys("3")
 
-    remove_buttons = ff('#message_students_dialog .student_list li:not(.blank) .remove-button')
+    remove_buttons = ff("#message_students_dialog .student_list li:not(.blank) .remove-button")
     expect(remove_buttons).to have_size 3
 
-    expect(message_form.find_element(:css, '.send_button')).not_to have_class('disabled')
+    expect(message_form.find_element(:css, ".send_button")).not_to have_class("disabled")
 
     remove_buttons.each do |button|
       button.click
       wait_for_animations
     end
 
-    expect(message_form.find_element(:css, '.send_button')).to have_class('disabled')
+    expect(message_form.find_element(:css, ".send_button")).to have_class("disabled")
   end
 
   it "does not send messages to inactive students" do
@@ -210,12 +210,12 @@ describe "Gradebook - message students who" do
     Gradebook.visit(@course)
     Gradebook.click_assignment_header_menu_element(@second_assignment.id, "message students")
 
-    message_form = f('#message_assignment_recipients')
-    click_option('#message_assignment_recipients .message_types', 'Scored more than')
-    message_form.find_element(:css, '.cutoff_score').send_keys('3') # both assignments have score of 5
-    message_form.find_element(:css, '#body').send_keys(message_text)
+    message_form = f("#message_assignment_recipients")
+    click_option("#message_assignment_recipients .message_types", "Scored more than")
+    message_form.find_element(:css, ".cutoff_score").send_keys("3") # both assignments have score of 5
+    message_form.find_element(:css, "#body").send_keys(message_text)
 
-    expect(f('#message_students_dialog .student_list')).not_to include_text(@student_1.name)
+    expect(f("#message_students_dialog .student_list")).not_to include_text(@student_1.name)
 
     submit_form(message_form)
     wait_for_ajax_requests

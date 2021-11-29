@@ -422,6 +422,62 @@ describe('RCE > Plugins > Instructure Image > ImageEmbedOptions', () => {
       })
     })
 
+    describe('.appliedPercentage', () => {
+      it('is the percentage width when applied to the image', () => {
+        $image.setAttribute('width', '50%')
+        expect(getImageOptions().appliedPercentage).toEqual(50)
+      })
+
+      it('is the percentage height when applied to the image', () => {
+        $image.setAttribute('height', '60%')
+        expect(getImageOptions().appliedPercentage).toEqual(60)
+      })
+
+      it('is the percentage attribute when percentage width and height applied to the image', () => {
+        $image.setAttribute('width', '50%')
+        $image.setAttribute('height', '60%')
+        expect(getImageOptions().appliedPercentage).toEqual(50)
+      })
+
+      it('is the percentage attribute when percentage and pixels width/height applied to the image', () => {
+        $image.setAttribute('width', '50%')
+        $image.setAttribute('height', '30px')
+        expect(getImageOptions().appliedPercentage).toEqual(50)
+      })
+
+      it('is 100 when no percentage width or height has been applied to the image', () => {
+        expect(getImageOptions().appliedPercentage).toEqual(100)
+      })
+    })
+
+    describe('.usePercentageUnits', () => {
+      it('is true when percentage width applied to the image', () => {
+        $image.setAttribute('width', '50%')
+        expect(getImageOptions().usePercentageUnits).toEqual(true)
+      })
+
+      it('is true when percentage height applied to the image', () => {
+        $image.setAttribute('height', '60%')
+        expect(getImageOptions().usePercentageUnits).toEqual(true)
+      })
+
+      it('is true when percentage width and height applied to the image', () => {
+        $image.setAttribute('width', '50%')
+        $image.setAttribute('height', '60%')
+        expect(getImageOptions().usePercentageUnits).toEqual(true)
+      })
+
+      it('is true when percentage width and pixels height applied to the image', () => {
+        $image.setAttribute('width', '50%')
+        $image.setAttribute('height', '30px')
+        expect(getImageOptions().usePercentageUnits).toEqual(true)
+      })
+
+      it('is false when no percentage width or height has been applied to the image', () => {
+        expect(getImageOptions().usePercentageUnits).toEqual(false)
+      })
+    })
+
     it('sets .naturalHeight to the natural height of the image', () => {
       expect(getImageOptions().naturalHeight).toEqual(480)
     })

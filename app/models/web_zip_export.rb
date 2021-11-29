@@ -36,14 +36,14 @@ class WebZipExport < EpubExport
 
   def generate
     job_progress.update_attribute(:completion, PERCENTAGE_COMPLETE[:generating])
-    update_attribute(:workflow_state, 'generating')
+    update_attribute(:workflow_state, "generating")
     convert_to_offline_web_zip
   end
   handle_asynchronously :generate, priority: Delayed::LOW_PRIORITY
 
   # WebZip Exportable overrides
   def content_cartridge
-    self.content_export.attachment
+    content_export.attachment
   end
 
   def convert_to_offline_web_zip

@@ -42,11 +42,11 @@ callback_chain.append(cb) if cb
 module IgnoreSlaveErrors
   def save_record(alternate_record = nil)
     super
-  rescue ActiveRecord::StatementInvalid => error
+  rescue ActiveRecord::StatementInvalid => e
     # "simulated" secondary of a user with read-only access; probably the same error for Slony
-    raise if !error.message.match(/PG(?:::)?Error: ERROR: +permission denied for relation/) &&
+    raise if !e.message.match(/PG(?:::)?Error: ERROR: +permission denied for relation/) &&
              # real secondary that's in recovery
-             !error.message.match(/PG(?:::)?Error: ERROR: +cannot execute UPDATE in a read-only transaction/)
+             !e.message.match(/PG(?:::)?Error: ERROR: +cannot execute UPDATE in a read-only transaction/)
   end
 end
 Authlogic::Session::Base.prepend(IgnoreSlaveErrors)

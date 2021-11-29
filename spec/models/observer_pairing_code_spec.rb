@@ -18,30 +18,30 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../spec_helper'
+require_relative "../spec_helper"
 
 describe ObserverPairingCode do
   before :once do
     @student = user_model
   end
 
-  it 'can pass validations' do
+  it "can pass validations" do
     code = ObserverPairingCode.create(user: @student, expires_at: 1.day.from_now, code: SecureRandom.hex(3))
     expect(code.valid?).to eq true
   end
 
-  it 'can be generated from a user' do
+  it "can be generated from a user" do
     code = @student.generate_observer_pairing_code
     expect(code).not_to be_nil
   end
 
-  it 'can generate more than one code' do
+  it "can generate more than one code" do
     code = @student.generate_observer_pairing_code
     code2 = @student.generate_observer_pairing_code
     expect(code2.id).not_to eq code.id
   end
 
-  it 'ignores expired codes' do
+  it "ignores expired codes" do
     ObserverPairingCode.create(user: @student, expires_at: 1.day.ago, code: SecureRandom.hex(3))
     codes = @student.observer_pairing_codes
     expect(codes.length).to eq 0

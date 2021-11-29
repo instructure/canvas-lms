@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'delayed/testing'
+require "delayed/testing"
 require_dependency "canvas/apm/inst_jobs/plugin"
 require_relative "../../apm_common"
 
@@ -35,28 +35,28 @@ describe Canvas::Apm::InstJobs::Plugin do
     Canvas::Apm::InstJobs::Plugin.reset!
   end
 
-  describe 'instrumenting worker execution' do
-    let(:worker) { double(:worker, name: 'worker') }
+  describe "instrumenting worker execution" do
+    let(:worker) { double(:worker, name: "worker") }
 
-    it 'execution callback yields control' do
+    it "execution callback yields control" do
       expect { |b| Delayed::Worker.lifecycle.run_callbacks(:execute, worker, &b) }.to yield_with_args(worker)
     end
   end
 
-  describe 'instrumented job invocation' do
+  describe "instrumented job invocation" do
     specs_require_sharding
     let(:sample_job_object) do
-      stub_const('SampleJob', Class.new do
+      stub_const("SampleJob", Class.new do
         def perform; end
       end)
     end
 
-    it 'has resource name equal to job name' do
+    it "has resource name equal to job name" do
       expect(Canvas::Apm::InstJobs::Plugin.tracer).to eq(tracer)
       job = Delayed::Job.enqueue(sample_job_object.new, {})
-      job.account_id = 12345
+      job.account_id = 12_345
       Delayed::Testing.run_job(job)
-      expect(span.resource).to eq('SampleJob')
+      expect(span.resource).to eq("SampleJob")
       expect(span.tags["inst_jobs.id"] > 0).to be_truthy
       expect(span.tags["inst_jobs.queue"]).to eq("canvas_queue")
       expect(span.tags["inst_jobs.priority"] > 0).to be_truthy

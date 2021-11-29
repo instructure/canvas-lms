@@ -26,36 +26,36 @@ class DiscussionEntryParticipant < ActiveRecord::Base
 
   before_create :set_root_account_id
 
-  validates_presence_of :discussion_entry_id, :user_id, :workflow_state
+  validates :discussion_entry_id, :user_id, :workflow_state, presence: true
   validate :prevent_creates
 
-  validates :report_type, inclusion: { in: %w(inappropriate offensive other),
+  validates :report_type, inclusion: { in: %w[inappropriate offensive other],
                                        message: "%{value} is not valid" }
 
   def prevent_creates
-    if self.new_record?
+    if new_record?
       # e.g. DiscussionEntryParticipant.upsert_for_entries(entry, user, new_state: 'read')
-      self.errors.add(:base, "Regular creation is disabled on DiscussionEntryParticipant - use upsert_for_entries")
+      errors.add(:base, "Regular creation is disabled on DiscussionEntryParticipant - use upsert_for_entries")
     end
   end
 
   def self.read_entry_ids(entry_ids, user)
-    self.where(:user_id => user, :discussion_entry_id => entry_ids, :workflow_state => 'read')
-        .pluck(:discussion_entry_id)
+    where(user_id: user, discussion_entry_id: entry_ids, workflow_state: "read")
+      .pluck(:discussion_entry_id)
   end
 
   def self.forced_read_state_entry_ids(entry_ids, user)
-    self.where(:user_id => user, :discussion_entry_id => entry_ids, :forced_read_state => true)
-        .pluck(:discussion_entry_id)
+    where(user_id: user, discussion_entry_id: entry_ids, forced_read_state: true)
+      .pluck(:discussion_entry_id)
   end
 
   def self.entry_ratings(entry_ids, user)
-    ratings = self.where(:user_id => user, :discussion_entry_id => entry_ids).where('rating IS NOT NULL')
-    Hash[ratings.map { |x| [x.discussion_entry_id, x.rating] }]
+    ratings = where(user_id: user, discussion_entry_id: entry_ids).where.not(rating: nil)
+    ratings.map { |x| [x.discussion_entry_id, x.rating] }.to_h
   end
 
   def self.not_null_column_object(column: nil, entry: nil, user: nil)
-    entry_participant = self.new(discussion_entry: entry, user: user)
+    entry_participant = new(discussion_entry: entry, user: user)
     error_message = "Null value in column '#{column}' violates not-null constraint"
     entry_participant.errors.add(column, error_message)
     entry_participant
@@ -81,28 +81,28 @@ class DiscussionEntryParticipant < ActiveRecord::Base
       return not_null_column_object(column: :entry, entry: entry_or_topic, user: user) unless entry_or_topic
       return not_null_column_object(column: :user, entry: entry_or_topic, user: user) unless user
 
-      insert_columns = %w(discussion_entry_id user_id root_account_id workflow_state)
+      insert_columns = %w[discussion_entry_id user_id root_account_id workflow_state]
       update_columns = []
       update_values = []
 
       # need to still set to false when passed as false, so check for not nil.
       unless forced.nil?
-        update_columns << 'forced_read_state'
+        update_columns << "forced_read_state"
         update_values << connection.quote(forced)
       end
 
       # need to still set to 0 when passed as 0, so check for not nil.
       unless rating.nil?
-        update_columns << 'rating'
+        update_columns << "rating"
         update_values << connection.quote(rating)
       end
 
       unless report_type.nil?
-        unless %w(inappropriate offensive other).include? report_type
+        unless %w[inappropriate offensive other].include? report_type
           raise(ArgumentError)
         end
 
-        update_columns << 'report_type'
+        update_columns << "report_type"
         update_values << connection.quote(report_type)
       end
 
@@ -110,7 +110,7 @@ class DiscussionEntryParticipant < ActiveRecord::Base
       # workflow_state is a non null column and is required for the insert side.
       # The update side does not require workflow_state. Already exists in the
       # non-null column
-      default_state = new_state || 'unread'
+      default_state = new_state || "unread"
       insert_values = batch.map do |batch_entry|
         row_values(batch_entry, user.id, entry_or_topic.root_account_id, default_state, update_values)
       end
@@ -118,7 +118,7 @@ class DiscussionEntryParticipant < ActiveRecord::Base
       # takes ruby arrays of values into sql arrays ready for insert.
       # [[entry_id, user_id, root_account_id, "'read'"],[...]] =>
       # ["(entry_id,user_id,root_account_id,'read'),(...)"]
-      insert_rows = insert_values.map { |row| "(#{row.join(',')})" }
+      insert_rows = insert_values.map { |row| "(#{row.join(",")})" }
 
       # new_state needs to be handled after the insert_values because we always
       # have workflow_state in the insert, but should only be on the update side
@@ -126,7 +126,7 @@ class DiscussionEntryParticipant < ActiveRecord::Base
       # 'unread', but also don't want to include 'workflow_state' two times in the
       # insert.
       if new_state
-        update_columns << 'workflow_state'
+        update_columns << "workflow_state"
         update_values << connection.quote(new_state)
       end
 
@@ -137,20 +137,20 @@ class DiscussionEntryParticipant < ActiveRecord::Base
       # takes two ruby arrays and makes into a sql update statement.
       # ['workflow_state', 'forced_read_state'], ["'read'", true] =>
       # "workflow_state='read',forced_read_state=true"
-      update_statement = update_columns.zip(update_values).map { |a| a.join('=') }.join(',')
+      update_statement = update_columns.zip(update_values).map { |a| a.join("=") }.join(",")
       # takes the update_arrays and also creates a where clause so we don't update
       # records that wouldn't end up changing.
       # ['workflow_state', 'forced_read_state'], ["'read'", true] =>
       # "(discussion_entry_participants.workflow_state,discussion_entry_participants.forced_read_state)
       #   IS DISTINCT FROM ('read',true)
       where_clause = "(#{quoted_table_name}.#{update_columns.join(",#{quoted_table_name}.")})
-                     IS DISTINCT FROM (#{update_values.join(',')})"
+                     IS DISTINCT FROM (#{update_values.join(",")})"
 
       # actual sql query combined into a statement.
       upsert_sql = <<~SQL.squish
           INSERT INTO #{quoted_table_name}
-                      (#{insert_columns.join(',')})
-               VALUES #{insert_rows.join(',')}
+                      (#{insert_columns.join(",")})
+               VALUES #{insert_rows.join(",")}
           ON CONFLICT (discussion_entry_id,user_id)
         DO UPDATE SET #{update_statement}
                 WHERE #{where_clause}
@@ -189,13 +189,13 @@ class DiscussionEntryParticipant < ActiveRecord::Base
     state :read
   end
 
-  scope :read, -> { where(:workflow_state => 'read') }
-  scope :existing_participants, ->(user, entry_id) {
+  scope :read, -> { where(workflow_state: "read") }
+  scope :existing_participants, lambda { |user, entry_id|
     select([:id, :discussion_entry_id])
       .where(user_id: user, discussion_entry_id: entry_id)
   }
 
   def set_root_account_id
-    self.root_account_id = self.discussion_entry.root_account_id
+    self.root_account_id = discussion_entry.root_account_id
   end
 end

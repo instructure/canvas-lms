@@ -17,10 +17,10 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../common'
-require_relative '../helpers/quizzes_common'
+require_relative "../common"
+require_relative "../helpers/quizzes_common"
 
-describe 'quizzes' do
+describe "quizzes" do
   include_context "in-process server selenium tests"
   include QuizzesCommon
 
@@ -32,67 +32,67 @@ describe 'quizzes' do
     user_session(@student)
   end
 
-  context 'with a student' do
-    it 'can\'t see unpublished quizzes', priority: "1", test_id: 140651 do
+  context "with a student" do
+    it "can't see unpublished quizzes", priority: "1" do
       # create course with an unpublished quiz
       assignment_quiz([], course: @course)
       @quiz.update_attribute(:published_at, nil)
-      @quiz.update_attribute(:workflow_state, 'unavailable')
+      @quiz.update_attribute(:workflow_state, "unavailable")
 
       get "/courses/#{@course.id}/quizzes/"
-      expect(f('#content-wrapper')).to include_text 'No quizzes available'
+      expect(f("#content-wrapper")).to include_text "No quizzes available"
     end
 
-    it 'can see published quizzes', priority: "1", test_id: 220304 do
+    it "can see published quizzes", priority: "1" do
       # create course with a published quiz
       assignment_quiz([], course: @course)
 
       get "/courses/#{@course.id}/quizzes/"
-      expect(f('#assignment-quizzes')).to be_present
+      expect(f("#assignment-quizzes")).to be_present
     end
 
-    context 'with a quiz started' do
+    context "with a quiz started" do
       before(:once) do
         @qsub = quiz_with_submission(false)
       end
 
-      context 'when attempting to resume a quiz' do
+      context "when attempting to resume a quiz" do
         def update_quiz_lock(lock_at, unlock_at)
           @quiz.update(lock_at: lock_at, unlock_at: unlock_at)
         end
 
-        describe 'on individual quiz page' do
+        describe "on individual quiz page" do
           def validate_resume_button_text(text)
-            expect(f('#not_right_side .take_quiz_button').text).to eq text
+            expect(f("#not_right_side .take_quiz_button").text).to eq text
           end
 
           before do
-            @resume_text = 'Resume Quiz'
+            @resume_text = "Resume Quiz"
           end
 
-          it 'can see the resume quiz button if the quiz is unlocked', priority: "1", test_id: 209408 do
+          it "can see the resume quiz button if the quiz is unlocked", priority: "1" do
             get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
             validate_resume_button_text(@resume_text)
           end
 
-          it 'can see the resume quiz button if the quiz unlock_at date is < now', priority: "1", test_id: 209409 do
+          it "can see the resume quiz button if the quiz unlock_at date is < now", priority: "1" do
             update_quiz_lock(nil, 10.minutes.ago)
             get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
             validate_resume_button_text(@resume_text)
           end
 
-          it 'can\'t see the resume quiz button if quiz is locked', priority: "1", test_id: 209410 do
+          it "can't see the resume quiz button if quiz is locked", priority: "1" do
             update_quiz_lock(5.minutes.ago, nil)
             get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
-            expect(f('#not_right_side')).not_to contain_css('.take_quiz_button')
+            expect(f("#not_right_side")).not_to contain_css(".take_quiz_button")
           end
 
-          it 'can\'t see the publish button', priority: "1", test_id: 209411 do
+          it "can't see the publish button", priority: "1" do
             get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
-            expect(f('#content')).not_to contain_css('#quiz-publish-link')
+            expect(f("#content")).not_to contain_css("#quiz-publish-link")
           end
 
-          it 'can\'t see unpublished warning', priority: "1", test_id: 209412 do
+          it "can't see unpublished warning", priority: "1" do
             # set to unpublished state
             @quiz.last_edited_at = Time.now.utc
             @quiz.published_at   = 1.hour.ago
@@ -100,23 +100,23 @@ describe 'quizzes' do
 
             get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
 
-            expect(f('#content')).not_to contain_css('.unpublished_warning')
+            expect(f("#content")).not_to contain_css(".unpublished_warning")
           end
         end
       end
 
-      context 'when logged out while taking a quiz' do
-        it 'is notified and able to relogin', priority: "1", test_id: 209413 do
+      context "when logged out while taking a quiz" do
+        it "is notified and able to relogin", priority: "1" do
           # setup a quiz and start taking it
           quiz_with_new_questions(goto_edit: false)
           get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
-          expect_new_page_load { f('#take_quiz_link').click }
+          expect_new_page_load { f("#take_quiz_link").click }
           sleep 1 # sleep because display is updated on timer, not ajax callback
 
           # answer a question, and check that it is saved
-          ff('.answers .answer_input input')[0].click
+          ff(".answers .answer_input input")[0].click
           wait_for_ajaximations
-          expect(f('#last_saved_indicator').text).to match(/^Quiz saved at \d+:\d+(pm|am)$/)
+          expect(f("#last_saved_indicator").text).to match(/^Quiz saved at \d+:\d+(pm|am)$/)
           # now kill our session (like logging out)
           destroy_session
           sleep 1 # updateSubmission throttles itself at 1 sec (quite
@@ -125,19 +125,19 @@ describe 'quizzes' do
           # update to hit)
 
           # and try answering another question
-          ff('.answers .answer_input input')[1].click
+          ff(".answers .answer_input input")[1].click
 
           # we should get notified that we are logged out
-          expect(fj('#deauthorized_dialog:visible')).to be_present
+          expect(fj("#deauthorized_dialog:visible")).to be_present
 
-          expect_new_page_load { submit_dialog('#deauthorized_dialog') }
+          expect_new_page_load { submit_dialog("#deauthorized_dialog") }
         end
       end
     end
   end
 
-  context 'with multiple fill in the blanks' do
-    it 'displays MFITB responses in their respective boxes on submission view page', priority: "2", test_id: 209414 do
+  context "with multiple fill in the blanks" do
+    it "displays MFITB responses in their respective boxes on submission view page", priority: "2" do
       # create new multiple fill in the blank quiz and question
       @quiz = quiz_model({ course: @course, time_limit: 5 })
 
@@ -156,77 +156,77 @@ describe 'quizzes' do
       Quizzes::SubmissionGrader.new(qs).grade_submission
       get "/courses/#{@course.id}/quizzes/#{@quiz.id}/"
       wait_for_ajaximations
-      answer_fields = ff('.question_input')
+      answer_fields = ff(".question_input")
       answer_array = answer_fields.map { |element| driver.execute_script("return $(arguments[0]).val()", element) }
       expect(answer_array).to eq response_array
     end
   end
 
-  context 'when a student closes the session without submitting' do
-    it 'automatically grades the submission when it becomes overdue', priority: "1", test_id: 209415
+  context "when a student closes the session without submitting" do
+    it "automatically grades the submission when it becomes overdue", priority: "1"
   end
 
-  context 'when the \'show correct answers\' setting is on' do
+  context "when the 'show correct answers' setting is on" do
     before(:once) do
       quiz_with_submission
       @quiz.update(show_correct_answers: true)
       @quiz.save!
     end
 
-    it 'highlights correct answers', priority: "1", test_id: 209417 do
+    it "highlights correct answers", priority: "1" do
       get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
 
-      expect(ff('.correct_answer').length).to be > 0
+      expect(ff(".correct_answer").length).to be > 0
     end
 
-    it 'always highlights incorrect answers', priority: "1", test_id: 209418 do
+    it "always highlights incorrect answers", priority: "1" do
       get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
 
-      expect(ff('.incorrect.answer_arrow').length).to be > 0
+      expect(ff(".incorrect.answer_arrow").length).to be > 0
     end
   end
 
   context "when 'show correct answers after last attempt setting' is on" do
     before do
       quiz_with_submission
-      @quiz.update(:show_correct_answers => true,
-                   :show_correct_answers_last_attempt => true, :allowed_attempts => 2)
+      @quiz.update(show_correct_answers: true,
+                   show_correct_answers_last_attempt: true, allowed_attempts: 2)
       @quiz.save!
     end
 
-    it "does not show correct answers on first attempt", priority: "1", test_id: 474288 do
+    it "does not show correct answers on first attempt", priority: "1" do
       get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
-      expect(f("#content")).not_to contain_css('.correct_answer')
+      expect(f("#content")).not_to contain_css(".correct_answer")
     end
 
-    it "shows correct answers on last attempt", priority: "1", test_id: 474288 do
+    it "shows correct answers on last attempt", priority: "1" do
       @qsub.update_attribute :attempt, 2
       get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
-      expect(ff('.correct_answer').length).to be > 0
+      expect(ff(".correct_answer").length).to be > 0
     end
   end
 
-  context 'when the \'show correct answers\' setting is off' do
+  context "when the 'show correct answers' setting is off" do
     before(:once) do
       quiz_with_submission
       @quiz.update(show_correct_answers: false)
       @quiz.save!
     end
 
-    it 'doesn\'t highlight correct answers', priority: "1", test_id: 209416 do
+    it "doesn't highlight correct answers", priority: "1" do
       get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
 
-      expect(f("#content")).not_to contain_css('.correct_answer')
+      expect(f("#content")).not_to contain_css(".correct_answer")
     end
 
-    it 'always highlights incorrect answers', priority: "1", test_id: 209480 do
+    it "always highlights incorrect answers", priority: "1" do
       get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
 
-      expect(ff('.incorrect.answer_arrow').length).to be > 0
+      expect(ff(".incorrect.answer_arrow").length).to be > 0
     end
   end
 
-  it "shows badge counts after completion", priority: "1", test_id: 474289 do
+  it "shows badge counts after completion", priority: "1" do
     quiz_with_submission
     get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
 

@@ -16,12 +16,12 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-require_relative '../common'
+require_relative "../common"
 
 module ConversationsNewMessageModalPage
   # ---------------------- Controls ----------------------
 
   def message_recipient_input
-    f('.message-header-input .ac-token')
+    f(".message-header-input .ac-token")
   end
 end

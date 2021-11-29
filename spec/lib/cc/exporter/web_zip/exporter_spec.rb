@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../../cc_spec_helper'
+require_relative "../../cc_spec_helper"
 
 describe "Exporter" do
   include CC::Exporter::WebZip
@@ -29,7 +29,7 @@ describe "Exporter" do
 
     @attachment = Attachment.create({
                                       context: course_factory,
-                                      filename: 'exportable-test-file',
+                                      filename: "exportable-test-file",
                                       uploaded_data: File.open(cartridge_path)
                                     })
   end

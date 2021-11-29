@@ -18,11 +18,11 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'lti2_spec_helper'
-require_relative '../../apis/api_spec_helper'
+require "lti2_spec_helper"
+require_relative "../../apis/api_spec_helper"
 
-RSpec.shared_context "lti2_api_spec_helper", :shared_context => :metadata do
-  include_context 'lti2_spec_helper'
+RSpec.shared_context "lti2_api_spec_helper", shared_context: :metadata do
+  include_context "lti2_spec_helper"
   let(:developer_key) { DeveloperKey.create! }
   let(:dev_key_access_token) do
     aud = host rescue (@request || request).host
@@ -40,24 +40,24 @@ RSpec.shared_context "lti2_api_spec_helper", :shared_context => :metadata do
   let(:raw_data) do
     rsp = ::IMS::LTI::Models::RestServiceProfile.new(
       service: "http://example.com/endpoint##{service_name}",
-      action: %w(get put delete post)
+      action: %w[get put delete post]
     )
     ims_tp = ::IMS::LTI::Models::ToolProxy.new
     security_contract = ::IMS::LTI::Models::SecurityContract.new(tool_service: rsp)
     ims_tp.security_contract = security_contract
-    ims_tp.enabled_capability = ['Security.splitSecret']
+    ims_tp.enabled_capability = ["Security.splitSecret"]
     ims_tp.as_json
   end
   let(:tool_proxy) do
     tp = Lti::ToolProxy.create!(
       context: account,
       guid: SecureRandom.uuid,
-      shared_secret: 'abc',
+      shared_secret: "abc",
       product_family: product_family,
-      product_version: '1',
-      workflow_state: 'active',
+      product_version: "1",
+      workflow_state: "active",
       raw_data: raw_data.as_json,
-      lti_version: '1'
+      lti_version: "1"
     )
     Lti::ToolProxyBinding.where(context_id: account, context_type: account.class.to_s,
                                 tool_proxy_id: tp).first_or_create!

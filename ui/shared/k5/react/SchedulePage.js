@@ -53,16 +53,17 @@ const SchedulePage = ({
     }
   }, [plannerInitialized])
 
-  const plannerReady = isPlannerCreated && userHasEnrollments && visible
+  const plannerReady = isPlannerCreated && userHasEnrollments
+  const showPlanner = plannerReady && visible
 
   // Only preload the previous and next weeks' items once the schedule tab is active
   // The present week's items are loaded regardless of tab state
   useEffect(() => {
-    if (plannerReady && !hasPreloadedItems && !observedUserId) {
+    if (showPlanner && !hasPreloadedItems && !observedUserId) {
       preloadInitialItems()
       setHasPreloadedItems(true)
     }
-  }, [plannerReady, hasPreloadedItems, observedUserId])
+  }, [showPlanner, hasPreloadedItems, observedUserId])
 
   useEffect(() => {
     if (plannerReady) {

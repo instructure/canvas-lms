@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 namespace :db do
-  task :nuke => :environment do
+  task nuke: :environment do
     # dont kill db:nuke if it dies with destoying all the attachments.
     # it probably is just because it tries to delete an attachment who's
     # file on disk or s3 is no longer there.

@@ -82,8 +82,8 @@ module Quizzes
       super.select do |key|
         case key
         when :progress_url then !accepts_jsonapi? && has_progress?
-        when :progress then has_progress? && including?('progress')
-        when :attachment then has_attachment? && including?('file')
+        when :progress then has_progress? && including?("progress")
+        when :attachment then has_attachment? && including?("file")
         else true
         end
       end
@@ -92,7 +92,7 @@ module Quizzes
     def serializable_object(**)
       super.tap do |hash|
         unless accepts_jsonapi?
-          hash.delete('links')
+          hash.delete("links")
           hash[:quiz_id] = quiz.id
         end
       end

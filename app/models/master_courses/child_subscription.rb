@@ -22,21 +22,21 @@ class MasterCourses::ChildSubscription < ActiveRecord::Base
   # keeps track of the last sync status so future syncs know whether they perform faster selective syncs
   # also links the associated course to child_content_tags to keep track of changes
 
-  belongs_to :master_template, :class_name => "MasterCourses::MasterTemplate"
-  belongs_to :child_course, :class_name => "Course"
-  belongs_to :root_account, :class_name => 'Account'
+  belongs_to :master_template, class_name: "MasterCourses::MasterTemplate"
+  belongs_to :child_course, class_name: "Course"
+  belongs_to :root_account, class_name: "Account"
 
   before_create :set_root_account_id
 
-  has_many :child_content_tags, :class_name => "MasterCourses::ChildContentTag", :inverse_of => :child_subscription
+  has_many :child_content_tags, class_name: "MasterCourses::ChildContentTag", inverse_of: :child_subscription
 
   validate :require_same_root_account
 
   def require_same_root_account
     # at some point we may want to expand this so it can be done across trusted root accounts
     # but for now make sure they're in the same root account so we don't have to worry about cross-shard course copies yet
-    if self.child_course.root_account_id != self.master_template.course.root_account_id
-      self.errors.add(:child_course_id, t("Child course must belong to the same root account as master course"))
+    if child_course.root_account_id != master_template.course.root_account_id
+      errors.add(:child_course_id, t("Child course must belong to the same root account as master course"))
     end
   end
 
@@ -51,8 +51,8 @@ class MasterCourses::ChildSubscription < ActiveRecord::Base
   self.content_tag_association = :child_content_tags
 
   def invalidate_course_cache
-    if self.saved_change_to_workflow_state?
-      Rails.cache.delete(self.class.course_cache_key(self.child_course))
+    if saved_change_to_workflow_state?
+      Rails.cache.delete(self.class.course_cache_key(child_course))
     end
   end
 
@@ -63,23 +63,23 @@ class MasterCourses::ChildSubscription < ActiveRecord::Base
   def self.is_child_course?(course_id)
     Rails.cache.fetch(course_cache_key(course_id)) do
       course_id = course_id.id if course_id.is_a?(Course)
-      self.where(:child_course_id => course_id).active.exists?
+      where(child_course_id: course_id).active.exists?
     end
   end
 
   def check_migration_id_deactivation
     # mess up the migration ids so restrictions no longer get applied
     if workflow_state_changed?
-      if deleted? && workflow_state_was == 'active'
+      if deleted? && workflow_state_was == "active"
         self.class.connection.after_transaction_commit do
-          self.unlink_syllabus!
-          self.add_deactivation_prefix!
+          unlink_syllabus!
+          add_deactivation_prefix!
         end
-      elsif active? && workflow_state_was == 'deleted'
+      elsif active? && workflow_state_was == "deleted"
         self.use_selective_copy = false # require a full import next time
         self.class.connection.after_transaction_commit do
-          self.link_syllabus!
-          self.remove_deactivation_prefix!
+          link_syllabus!
+          remove_deactivation_prefix!
         end
       end
     end
@@ -87,34 +87,34 @@ class MasterCourses::ChildSubscription < ActiveRecord::Base
 
   def deactivation_prefix
     # a silly string to prepend onto all the bc object migration ids when we deactivate
-    "deletedsub_#{self.id}_"
+    "deletedsub_#{id}_"
   end
 
   def link_syllabus!
-    self.child_course.syllabus_master_template_id = self.master_template_id
-    self.child_course.save!
+    child_course.syllabus_master_template_id = master_template_id
+    child_course.save!
   end
 
   def unlink_syllabus!
-    self.child_course.syllabus_master_template_id = nil
-    self.child_course.save!
+    child_course.syllabus_master_template_id = nil
+    child_course.save!
   end
 
   def add_deactivation_prefix!
-    where_clause = ["migration_id IS NOT NULL AND migration_id LIKE ?", "#{MasterCourses::MasterTemplate.migration_id_prefix(self.shard.id, self.master_template_id)}%"]
-    update_query = ["migration_id = concat(?, migration_id)", self.deactivation_prefix]
+    where_clause = ["migration_id IS NOT NULL AND migration_id LIKE ?", "#{MasterCourses::MasterTemplate.migration_id_prefix(shard.id, master_template_id)}%"]
+    update_query = ["migration_id = concat(?, migration_id)", deactivation_prefix]
     update_content_in_child_course(where_clause, update_query)
   end
 
   def remove_deactivation_prefix!
     where_clause = ["migration_id LIKE ?", "#{deactivation_prefix}%"]
-    update_query = ["migration_id = substr(migration_id, ?)", self.deactivation_prefix.length + 1]
+    update_query = ["migration_id = substr(migration_id, ?)", deactivation_prefix.length + 1]
     update_content_in_child_course(where_clause, update_query)
   end
 
   def update_content_in_child_course(where_clause, update_query)
-    if self.child_content_tags.where(where_clause).update_all(update_query) > 0 # don't run all the rest of it if there's no reason to
-      self.content_scopes_for_deactivation.each do |scope|
+    if child_content_tags.where(where_clause).update_all(update_query) > 0 # don't run all the rest of it if there's no reason to
+      content_scopes_for_deactivation.each do |scope|
         scope.where(where_clause).find_ids_in_batches do |ids|
           scope.where(where_clause).where(scope.klass.primary_key => ids).update_all(update_query)
         end
@@ -124,7 +124,7 @@ class MasterCourses::ChildSubscription < ActiveRecord::Base
 
   def content_scopes_for_deactivation
     # there are more things we've added the restrictor module to, but we may not bother actually restricting them in the end
-    c = self.child_course
+    c = child_course
     [
       c.assignments,
       c.attachments,
@@ -136,10 +136,10 @@ class MasterCourses::ChildSubscription < ActiveRecord::Base
   end
 
   def last_migration_id
-    child_course.content_migrations.where(child_subscription_id: self).order('id desc').limit(1).pluck(:id).first
+    child_course.content_migrations.where(child_subscription_id: self).order("id desc").limit(1).pluck(:id).first
   end
 
   def set_root_account_id
-    self.root_account_id = self.child_course.root_account_id
+    self.root_account_id = child_course.root_account_id
   end
 end

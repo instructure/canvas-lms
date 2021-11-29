@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'securerandom'
+require "securerandom"
 
 class EportfolioEntriesController < ApplicationController
   include EportfolioPage
@@ -38,9 +38,9 @@ class EportfolioEntriesController < ApplicationController
       respond_to do |format|
         if @page.save
           format.html { redirect_to eportfolio_entry_url(@portfolio, @page) }
-          format.json { render :json => @page.as_json(:methods => :category_slug) }
+          format.json { render json: @page.as_json(methods: :category_slug) }
         else
-          format.json { render :json => @page.errors }
+          format.json { render json: @page.errors }
         end
       end
     end
@@ -61,8 +61,8 @@ class EportfolioEntriesController < ApplicationController
       elsif params[:entry_name] && @category
         @page = @category.eportfolio_entries.where(slug: params[:entry_name]).first
       end
-      if !@page
-        flash[:notice] = t('notices.missing_page', "Couldn't find that page")
+      unless @page
+        flash[:notice] = t("notices.missing_page", "Couldn't find that page")
         redirect_to eportfolio_url(@portfolio.id)
         return
       end
@@ -84,12 +84,11 @@ class EportfolioEntriesController < ApplicationController
       end
       respond_to do |format|
         if @entry.update!(entry_params)
-          format.html { redirect_to eportfolio_entry_url(@portfolio, @entry) }
-          format.json { render :json => @entry }
+          format.json { render json: @entry }
         else
-          format.html { redirect_to eportfolio_entry_url(@portfolio, @entry) }
-          format.json { render :json => @entry.errors, :status => :bad_request }
+          format.json { render json: @entry.errors, status: :bad_request }
         end
+        format.html { redirect_to eportfolio_entry_url(@portfolio, @entry) }
       end
     end
   end
@@ -101,8 +100,7 @@ class EportfolioEntriesController < ApplicationController
       respond_to do |format|
         if @entry.destroy
           format.html { redirect_to eportfolio_category_url(@portfolio, @category) }
-          format.json { render :json => @entry }
-        else
+          format.json { render json: @entry }
         end
       end
     end
@@ -114,15 +112,15 @@ class EportfolioEntriesController < ApplicationController
       @category = @entry.eportfolio_category
       @attachment = @portfolio.user.all_attachments.shard(@portfolio.user).where(uuid: params[:attachment_id]).first
       unless @attachment.present?
-        return render json: { message: t('errors.not_found', "Not Found") }, status: :not_found
+        return render json: { message: t("errors.not_found", "Not Found") }, status: :not_found
       end
 
       # @entry.check_for_matching_attachment_id
       begin
-        redirect_to file_download_url(@attachment, { :verifier => @attachment.uuid })
-      rescue StandardError => e
+        redirect_to file_download_url(@attachment, { verifier: @attachment.uuid })
+      rescue => e
         Canvas::Errors.capture_exception(:eportfolios, e, :warn)
-        raise EportfolioNotFound, t('errors.not_found', "Not Found")
+        raise EportfolioNotFound, t("errors.not_found", "Not Found")
       end
     end
   end
@@ -137,7 +135,7 @@ class EportfolioEntriesController < ApplicationController
       @context = @assignment.context
       # @entry.check_for_matching_attachment_id
       @headers = false
-      render template: 'submissions/show_preview', locals: {
+      render template: "submissions/show_preview", locals: {
         anonymize_students: @assignment.anonymize_students?
       }
     end

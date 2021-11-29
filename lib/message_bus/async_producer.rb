@@ -45,7 +45,7 @@ module MessageBus
       @logger = MessageBus.logger
       @interval = MessageBus.worker_process_interval
 
-      self.start! if start_thread
+      start! if start_thread
     end
 
     def push(namespace, topic_name, message)
@@ -78,7 +78,7 @@ module MessageBus
     end
 
     def start!
-      @thread = Thread.new { self.run_thread }
+      @thread = Thread.new { run_thread }
     end
 
     def run_thread
@@ -139,7 +139,7 @@ module MessageBus
       Rails.application.executor.wrap do
         Shard.lookup(shard_id).activate do
           status = produce_message(namespace, topic_name, message)
-        rescue StandardError => e
+        rescue => e
           # if we errored, we didn't actually process the message
           # put it back on the queue to try to get to it later.
           # Does this screw up ordering?  yes, absolutely, but ruby queues are one-way.

@@ -18,11 +18,11 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'sanitize'
+require "sanitize"
 
 class Quizzes::QuizSubmission < ActiveRecord::Base
   extend RootAccountResolver
-  self.table_name = 'quiz_submissions'
+  self.table_name = "quiz_submissions"
 
   include Workflow
 
@@ -31,21 +31,21 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
 
   GRACEFUL_FINISHED_AT_DRIFT_PERIOD = 5.minutes
 
-  validates_presence_of :quiz_id
-  validates_numericality_of :extra_time, greater_than_or_equal_to: 0,
-                                         less_than_or_equal_to: 10080, # one week
-                                         allow_nil: true
-  validates_numericality_of :extra_attempts, greater_than_or_equal_to: 0,
+  validates :quiz_id, presence: true
+  validates :extra_time, numericality: { greater_than_or_equal_to: 0,
+                                         less_than_or_equal_to: 10_080, # one week
+                                         allow_nil: true }
+  validates :extra_attempts, numericality: { greater_than_or_equal_to: 0,
                                              less_than_or_equal_to: 1000,
-                                             allow_nil: true
-  validates_numericality_of :quiz_points_possible, less_than_or_equal_to: 2000000000,
-                                                   allow_nil: true
+                                             allow_nil: true }
+  validates :quiz_points_possible, numericality: { less_than_or_equal_to: 2_000_000_000,
+                                                   allow_nil: true }
 
   before_validation :update_quiz_points_possible
-  before_validation :rectify_finished_at_drift, :if => :end_at?
-  belongs_to :quiz, class_name: 'Quizzes::Quiz'
+  before_validation :rectify_finished_at_drift, if: :end_at?
+  belongs_to :quiz, class_name: "Quizzes::Quiz"
   belongs_to :user
-  belongs_to :submission, :touch => true
+  belongs_to :submission, touch: true
   before_save :update_kept_score
   before_save :sanitize_responses
   before_save :update_assignment_submission
@@ -54,8 +54,8 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   before_create :assign_validation_token
   after_save :delete_ignores
 
-  has_many :attachments, :as => :context, :inverse_of => :context, :dependent => :destroy
-  has_many :events, class_name: 'Quizzes::QuizSubmissionEvent'
+  has_many :attachments, as: :context, inverse_of: :context, dependent: :destroy
+  has_many :events, class_name: "Quizzes::QuizSubmissionEvent"
 
   resolves_root_account through: :quiz
 
@@ -75,8 +75,8 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   after_update :update_planner_override
 
   def update_planner_override
-    return unless self.saved_change_to_workflow_state?
-    return unless self.workflow_state == "complete"
+    return unless saved_change_to_workflow_state?
+    return unless workflow_state == "complete"
 
     PlannerHelper.complete_planner_override_for_quiz_submission(self)
   end
@@ -84,21 +84,21 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   serialize :quiz_data
   serialize :submission_data
 
-  simply_versioned :automatic => false
+  simply_versioned automatic: false
 
   workflow do
     state :untaken do
-      event :start_grading, :transitions_to => :pending_review
+      event :start_grading, transitions_to: :pending_review
     end
     state :pending_review do
-      event :complete, :transitions_to => :complete
-      event :retake, :transitions_to => :untaken
+      event :complete, transitions_to: :complete
+      event :retake, transitions_to: :untaken
     end
     state :complete do
-      event :retake, :transitions_to => :untaken
+      event :retake, transitions_to: :untaken
     end
     state :settings_only do
-      event :retake, :transitions_to => :untaken
+      event :retake, transitions_to: :untaken
     end
     state :preview
   end
@@ -109,26 +109,26 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   end
 
   set_policy do
-    given { |user| user && user.id == self.user_id }
+    given { |user| user && user.id == user_id }
     can :read
 
     # allow anonymous users take ungraded quizzes from a public course
     given { |user, session| unenrolled_user_can_read?(user, session) }
     can :record_events
 
-    given { |user| user && user.id == self.user_id && end_date_is_valid? }
+    given { |user| user && user.id == user_id && end_date_is_valid? }
     can :record_events
 
-    given { |user| user && user.id == self.user_id && self.untaken? }
+    given { |user| user && user.id == user_id && untaken? }
     can :update
 
-    given { |user, session| self.quiz.grants_right?(user, session, :review_grades) }
+    given { |user, session| quiz.grants_right?(user, session, :review_grades) }
     can :read
 
-    given { |user|
+    given do |user|
       user &&
-        self.quiz.context.observer_enrollments.where(user_id: user, associated_user_id: self.user_id, workflow_state: 'active').exists?
-    }
+        quiz.context.observer_enrollments.where(user_id: user, associated_user_id: user_id, workflow_state: "active").exists?
+    end
     can :read
 
     given { |user, session| quiz.context.grants_right?(user, session, :manage_grades) }
@@ -141,8 +141,8 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   end
 
   def sanitize_responses
-    questions.select { |q| q['question_type'] == 'essay_question' }.each do |q|
-      question_id = q['id']
+    questions.select { |q| q["question_type"] == "essay_question" }.each do |q|
+      question_id = q["id"]
       if graded?
         submission = submission_data.find { |s| s[:question_id] == question_id }
         submission[:text] = Sanitize.clean(submission[:text] || "", CanvasSanitize::SANITIZE) if submission
@@ -165,32 +165,31 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   end
 
   def temporary_data
-    raise "Cannot view temporary data for completed quiz" unless !self.completed?
+    raise "Cannot view temporary data for completed quiz" if completed?
     raise "Cannot view temporary data for completed quiz" if graded?
 
-    res = (self.submission_data || {}).with_indifferent_access
-    res
+    (submission_data || {}).with_indifferent_access
   end
 
   def question_answered?(id)
-    keys = temporary_data.keys.select { |key|
+    keys = temporary_data.keys.select do |key|
       # find keys with answers for this question; skip question_x_marked and _read
-      (key =~ /question_#{id}(_|$)/) && !(key =~ /_(marked|read)$/)
-    }
+      (key =~ /question_#{id}(_|$)/) && key !~ /_(marked|read)$/
+    end
 
     if keys.present?
       all_present = keys.all? { |key| temporary_data[key].present? }
-      all_zeroes = keys.length > 1 && keys.all? { |key| temporary_data[key] == '0' }
+      all_zeroes = keys.length > 1 && keys.all? { |key| temporary_data[key] == "0" }
 
       all_present && !all_zeroes # all zeroes applies to multiple answer questions
     end
   end
 
   def data
-    raise "Cannot view data for uncompleted quiz" unless self.completed?
-    raise "Cannot view data for uncompleted quiz" if !graded?
+    raise "Cannot view data for uncompleted quiz" unless completed?
+    raise "Cannot view data for uncompleted quiz" unless graded?
 
-    Utf8Cleaner.recursively_strip_invalid_utf8!(self.submission_data, true)
+    Utf8Cleaner.recursively_strip_invalid_utf8!(submission_data, true)
   end
 
   def results_visible?(user: nil)
@@ -198,13 +197,13 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
     return true if quiz.grants_right?(user, :review_grades)
     return false if quiz.restrict_answers_for_concluded_course?(user: user)
     return false if quiz.one_time_results && has_seen_results?
-    return false if quiz.hide_results == 'always'
+    return false if quiz.hide_results == "always"
 
     results_visible_for_attempt?
   end
 
   def results_visible_for_attempt?
-    return true unless quiz.hide_results == 'until_after_last_attempt'
+    return true unless quiz.hide_results == "until_after_last_attempt"
 
     # Visible if quiz has unlimited attempts (no way to get to last
     # attempts), if this attempt is higher than the allowed attempts
@@ -233,22 +232,22 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
          quiz_submissions.workflow_state = 'completed'
          AND quiz_submissions.submission_data IS NOT NULL
        )", { time: Time.now }).to_a
-    resp.select! { |qs| qs.needs_grading? }
+    resp.select!(&:needs_grading?)
     resp
   end
 
   # There is also a needs_grading scope which needs to replicate this logic
   def needs_grading?(strict = false)
-    overdue_and_needs_submission?(strict) || (self.completed? && !graded?)
+    overdue_and_needs_submission?(strict) || (completed? && !graded?)
   end
 
   def overdue_and_needs_submission?(strict = false)
-    return true if strict && self.untaken? && self.overdue?(true)
+    return true if strict && untaken? && overdue?(true)
 
-    if self.untaken? && self.end_at && self.end_at < Time.zone.now
-      return true unless self.quiz&.timer_autosubmit_disabled?
+    if untaken? && end_at && end_at < Time.zone.now
+      return true unless quiz&.timer_autosubmit_disabled?
 
-      self.end_at_without_time_limit && self.end_at_without_time_limit < Time.zone.now
+      end_at_without_time_limit && end_at_without_time_limit < Time.zone.now
     else
       false
     end
@@ -256,7 +255,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   alias_method :overdue_and_needs_submission, :overdue_and_needs_submission?
 
   def end_date_needs_recalculated?
-    self.end_at == nil && !!quiz.time_limit
+    end_at.nil? && !!quiz.time_limit
   end
 
   def end_date_is_valid?
@@ -264,7 +263,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   end
 
   def has_seen_results?
-    !!self.has_seen_results
+    !!has_seen_results
   end
 
   def finished_in_words
@@ -273,15 +272,15 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   end
 
   def finished_at_fallback
-    [self.end_at, Time.zone.now].compact.min
+    [end_at, Time.zone.now].compact.min
   end
 
   def points_possible_at_submission_time
-    self.questions.map { |q| q[:points_possible].to_f }.compact.sum || 0
+    questions.filter_map { |q| q[:points_possible].to_f }.sum || 0
   end
 
   def questions
-    Utf8Cleaner.recursively_strip_invalid_utf8!(self.quiz_data, true) || []
+    Utf8Cleaner.recursively_strip_invalid_utf8!(quiz_data, true) || []
   end
 
   def backup_submission_data(params)
@@ -289,13 +288,13 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
 
     params = sanitize_params(params)
 
-    new_params = if !graded? && self.submission_data[:attempt] == self.attempt
-                   self.submission_data.deep_merge(params) rescue params
+    new_params = if !graded? && submission_data[:attempt] == attempt
+                   submission_data.deep_merge(params) rescue params
                  else
                    params
                  end
 
-    new_params[:attempt] = self.attempt
+    new_params[:attempt] = attempt
 
     # take a snapshot every 5 other saves:
     new_params[:cnt] ||= 0
@@ -317,11 +316,11 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   end
 
   def record_creation_event
-    self.events.create!(
+    events.create!(
       event_type: Quizzes::QuizSubmissionEvent::EVT_SUBMISSION_CREATED,
-      event_data: { "quiz_version" => self.quiz_version, "quiz_data" => self.quiz_data },
+      event_data: { "quiz_version" => quiz_version, "quiz_data" => quiz_data },
       created_at: Time.zone.now,
-      attempt: self.attempt
+      attempt: attempt
     )
   end
 
@@ -330,7 +329,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
 
     # if the submission has already been graded
     if graded?
-      return params.merge({ :_already_graded => true })
+      return params.merge({ _already_graded: true })
     end
 
     if quiz.cant_go_back?
@@ -366,19 +365,19 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
     snapshot_data = submission_data || {}
 
     if full_snapshot
-      snapshot_data = self.sanitize_params(snapshot_data).stringify_keys
+      snapshot_data = sanitize_params(snapshot_data).stringify_keys
       snapshot_data.merge!(self.submission_data || {})
     end
 
     Quizzes::QuizSubmissionSnapshot.create({
                                              quiz_submission: self,
-                                             attempt: self.attempt,
+                                             attempt: attempt,
                                              data: snapshot_data
                                            })
   end
 
   def quiz_question_ids
-    questions.map { |question| question["id"] }.compact
+    questions.filter_map { |question| question["id"] }
   end
 
   def quiz_questions
@@ -386,7 +385,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   end
 
   def update_quiz_points_possible
-    self.quiz_points_possible = self.quiz && self.quiz.points_possible
+    self.quiz_points_possible = quiz && quiz.points_possible
   end
 
   # This callback attempts to handle a somewhat edge-case reported in CNVS-8463
@@ -405,20 +404,20 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   #
   # Of course, this is purely guess-work and is not bullet-proof.
   def rectify_finished_at_drift
-    if self.finished_at && self.end_at && self.finished_at > self.end_at
-      drift = self.finished_at - self.end_at
+    if finished_at && end_at && finished_at > end_at
+      drift = finished_at - end_at
 
       if drift <= GRACEFUL_FINISHED_AT_DRIFT_PERIOD.to_i
-        self.finished_at = self.end_at
+        self.finished_at = end_at
       end
     end
   end
 
   def update_kept_score
-    return if self.manually_scored || @skip_after_save_score_updates
+    return if manually_scored || @skip_after_save_score_updates
 
-    if self.completed?
-      if self.submission_data && !graded?
+    if completed?
+      if submission_data && !graded?
         Quizzes::SubmissionGrader.new(self).grade_submission
       end
 
@@ -432,9 +431,9 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   # so we do not bother updating kept_score in previous versions when they are
   # updated.
   def score_to_keep
-    if self.quiz && self.quiz.scoring_policy == "keep_highest"
+    if quiz && quiz.scoring_policy == "keep_highest"
       highest_score_so_far
-    elsif self.quiz && self.quiz.scoring_policy == "keep_average"
+    elsif quiz && quiz.scoring_policy == "keep_average"
       average_score_so_far
     else # keep_latest
       latest_score
@@ -442,21 +441,21 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   end
 
   def update_assignment_submission
-    return if self.manually_scored || @skip_after_save_score_updates
+    return if manually_scored || @skip_after_save_score_updates
 
-    if self.quiz && self.quiz.for_assignment? && assignment && !self.submission && self.user_id
-      self.submission = assignment.find_or_create_submission(self.user_id)
+    if quiz&.for_assignment? && assignment && !submission && user_id
+      self.submission = assignment.find_or_create_submission(user_id)
     end
-    if self.completed? && self.submission
-      @assignment_submission = self.submission
-      @assignment_submission.score = self.kept_score if self.kept_score
-      @assignment_submission.submitted_at = self.finished_at
+    if completed? && submission
+      @assignment_submission = submission
+      @assignment_submission.score = kept_score if kept_score
+      @assignment_submission.submitted_at = finished_at
       @assignment_submission.grade_matches_current_submission = true
-      @assignment_submission.quiz_submission_id = self.id
-      @assignment_submission.graded_at = [self.end_at, Time.zone.now].compact.min
-      @assignment_submission.grader_id = self.grader_id || "-#{self.quiz_id}".to_i
-      @assignment_submission.body = "user: #{self.user_id}, quiz: #{self.quiz_id}, score: #{self.score}, time: #{Time.now}"
-      @assignment_submission.user_id = self.user_id
+      @assignment_submission.quiz_submission_id = id
+      @assignment_submission.graded_at = [end_at, Time.zone.now].compact.min
+      @assignment_submission.grader_id = grader_id || "-#{quiz_id}".to_i
+      @assignment_submission.body = "user: #{user_id}, quiz: #{quiz_id}, score: #{score}, time: #{Time.now}"
+      @assignment_submission.user_id = user_id
       @assignment_submission.submission_type = "online_quiz"
       @assignment_submission.saved_by = :quiz_submission
 
@@ -467,13 +466,13 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   end
 
   def save_assignment_submission
-    @assignment_submission.save! if @assignment_submission
+    @assignment_submission&.save!
   end
 
   def scores_for_versions(exclude_version_id)
     versions = self.versions.reload.reject { |v| v.id == exclude_version_id } rescue []
     scores = {}
-    scores[attempt] = self.score if self.score
+    scores[attempt] = score if score
 
     # only most recent version for each attempt - some have regraded a version
     versions.sort_by(&:number).reverse_each do |ver|
@@ -500,7 +499,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   def latest_score
     # the current model's score is the latest, unless the quiz is currently in
     # progress, in which case it is nil
-    s = self.score
+    s = score
 
     # otherwise, try to be the latest version's score, if possible
     if s.nil?
@@ -516,7 +515,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   # Adjust the fudge points so that the score is the given score
   # Used when the score is explicitly set by teacher instead of auto-calculating
   def set_final_score(final_score)
-    version = self.versions.current # this gets us the most recent completed version
+    version = versions.current # this gets us the most recent completed version
     return if final_score.blank? || version.blank?
 
     self.manually_scored = false
@@ -531,49 +530,47 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
     to_be_kept_score = final_score
     self.fudge_points = new_fudge
 
-    if self.workflow_state == "pending_review"
+    if workflow_state == "pending_review"
       self.workflow_state = "complete"
       self.has_seen_results = false
     end
 
-    if self.quiz && self.quiz.scoring_policy == "keep_highest"
-      # exclude the score of the version we're curretly overwriting
-      if to_be_kept_score < highest_score_so_far(version.id)
-        self.manually_scored = true
-      end
+    # exclude the score of the version we're curretly overwriting
+    if quiz && quiz.scoring_policy == "keep_highest" && to_be_kept_score < highest_score_so_far(version.id)
+      self.manually_scored = true
     end
 
-    update_submission_version(version, [:score, :fudge_points, :manually_scored])
+    update_submission_version(version, %i[score fudge_points manually_scored])
 
     # we might be in the middle of a new attempt, in which case we don't want
     # to overwrite the score and fudge points when we save
-    self.reload if !self.completed?
+    reload unless completed?
 
     self.kept_score = to_be_kept_score
-    self.without_versioning(&:save)
+    without_versioning(&:save)
     @skip_after_save_score_updates = false
   end
 
   def time_left(hard: false)
     return unless end_at
-    return (end_at - Time.zone.now).round unless hard && self.quiz&.timer_autosubmit_disabled?
+    return (end_at - Time.zone.now).round unless hard && quiz&.timer_autosubmit_disabled?
     return (end_at_without_time_limit - Time.zone.now).round if end_at_without_time_limit
   end
 
   def less_than_allotted_time?
-    self.started_at && self.end_at && self.quiz && self.quiz.time_limit && (self.end_at - self.started_at) < self.quiz.time_limit.minutes.to_i
+    started_at && end_at && quiz && quiz.time_limit && (end_at - started_at) < quiz.time_limit.minutes.to_i
   end
 
   def completed?
-    self.complete? || self.pending_review?
+    complete? || pending_review?
   end
 
   def overdue?(strict = false)
     now = (Time.zone.now - ((strict ? 1 : 5) * 60))
     return false unless end_at && end_at.localtime < now
 
-    if self.quiz&.timer_autosubmit_disabled?
-      return false unless self.end_at_without_time_limit && self.end_at_without_time_limit.localtime < now
+    if quiz&.timer_autosubmit_disabled? && !(end_at_without_time_limit && end_at_without_time_limit.localtime < now)
+      return false
     end
 
     true
@@ -625,16 +622,16 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   end
 
   def attempts_left
-    return -1 if self.quiz.allowed_attempts < 0
+    return -1 if quiz.allowed_attempts < 0
 
-    [0, self.quiz.allowed_attempts - (self.attempt || 0) + (self.extra_attempts || 0)].max
+    [0, quiz.allowed_attempts - (attempt || 0) + (extra_attempts || 0)].max
   end
 
   def mark_completed
-    Quizzes::QuizSubmission.where(:id => self).update_all({
-                                                            workflow_state: 'complete',
-                                                            has_seen_results: false
-                                                          })
+    Quizzes::QuizSubmission.where(id: self).update_all({
+                                                         workflow_state: "complete",
+                                                         has_seen_results: false
+                                                       })
   end
 
   # Complete (e.g, turn-in) the quiz submission by doing the following:
@@ -649,14 +646,14 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   #
   # @return [QuizSubmission] self
   def complete!(submission_data = {})
-    self.snapshot!(submission_data, true)
-    self.mark_completed
+    snapshot!(submission_data, true)
+    mark_completed
     Quizzes::SubmissionGrader.new(self).grade_submission
     self
   end
 
   def graded?
-    self.submission_data.is_a?(Array)
+    submission_data.is_a?(Array)
   end
 
   # Updates a simply_versioned version instance in-place.  We want
@@ -664,54 +661,53 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   # taken quiz, even if it's a prior version of the submission. Thank you
   # simply_versioned for making this possible!
   def update_submission_version(version, attrs)
-    version_data = YAML::load(version.yaml)
-    version_data["submission_data"] = self.submission_data if attrs.include?(:submission_data)
-    version_data["temporary_user_code"] = "was #{version_data['score']} until #{Time.now}"
-    version_data["score"] = self.score if attrs.include?(:score)
-    version_data["fudge_points"] = self.fudge_points if attrs.include?(:fudge_points)
-    version_data["workflow_state"] = self.workflow_state if attrs.include?(:workflow_state)
-    version_data["manually_scored"] = self.manually_scored if attrs.include?(:manually_scored)
+    version_data = YAML.load(version.yaml)
+    version_data["submission_data"] = submission_data if attrs.include?(:submission_data)
+    version_data["temporary_user_code"] = "was #{version_data["score"]} until #{Time.now}"
+    version_data["score"] = score if attrs.include?(:score)
+    version_data["fudge_points"] = fudge_points if attrs.include?(:fudge_points)
+    version_data["workflow_state"] = workflow_state if attrs.include?(:workflow_state)
+    version_data["manually_scored"] = manually_scored if attrs.include?(:manually_scored)
     version.yaml = version_data.to_yaml
-    res = version.save
-    res
+    version.save
   end
 
   def context_module_action
     self.class.connection.after_transaction_commit do
-      if self.quiz && self.user
-        if self.score
-          self.quiz.context_module_action(self.user, :scored, self.kept_score)
+      if quiz && user
+        if score
+          quiz.context_module_action(user, :scored, kept_score)
         end
-        if self.finished_at
-          self.quiz.context_module_action(self.user, :submitted, self.kept_score) # pass in the score so we don't accidentally unset a min_score requirement
+        if finished_at
+          quiz.context_module_action(user, :submitted, kept_score) # pass in the score so we don't accidentally unset a min_score requirement
         end
       end
     end
   end
 
   def update_scores(params)
-    original_score = self.score
-    original_workflow_state = self.workflow_state
+    original_score = score
+    original_workflow_state = workflow_state
     params = (params || {}).with_indifferent_access
     self.manually_scored = false
     self.grader_id = params[:grader_id]
-    self.submission&.mark_unread(self.user)
+    submission&.mark_unread(user)
     versions = self.versions
     version = versions.current
     version = versions.get(params[:submission_version_number]) if params[:submission_version_number]
-    # note that self may not match versions.current, because we only save a new version on actual submit
-    raise "Can't update submission scores unless it's completed" if !self.completed? && !params[:submission_version_number]
+    # NOTE: that self may not match versions.current, because we only save a new version on actual submit
+    raise "Can't update submission scores unless it's completed" if !completed? && !params[:submission_version_number]
 
     data = version.model.submission_data || []
     res = []
     tally = 0
-    completed_before_changes = self.completed?
+    completed_before_changes = completed?
     self.workflow_state = "complete"
     self.fudge_points = params[:fudge_points].to_f if params[:fudge_points] && params[:fudge_points] != ""
-    tally += self.fudge_points if self.fudge_points
+    tally += fudge_points if fudge_points
     data.each do |answer|
       unless answer.respond_to?(:with_indifferent_access)
-        logger.error "submission = #{self.to_json}"
+        logger.error "submission = #{to_json}"
         logger.error "answer = #{answer.inspect}"
         raise "Quizzes::QuizSubmission.update_scores called on a quiz that appears to be in progress"
       end
@@ -739,21 +735,21 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
     end
 
     # Graded surveys always get the full points
-    if quiz && quiz.graded_survey?
-      self.score = quiz.points_possible
-    else
-      self.score = tally
-    end
+    self.score = if quiz && quiz.graded_survey?
+                   quiz.points_possible
+                 else
+                   tally
+                 end
 
     self.submission_data = res
 
     # the interaction in here is messy
 
     # first we update the version we've been modifying, so that all versions are current.
-    update_submission_version(version, [:submission_data, :score, :fudge_points, :workflow_state])
+    update_submission_version(version, %i[submission_data score fudge_points workflow_state])
 
-    if version.model.attempt != self.attempt || !completed_before_changes
-      self.reload
+    if version.model.attempt != attempt || !completed_before_changes
+      reload
 
       # score_to_keep should work regardless of the current model workflow_state and score
       # (ie even if the current model is an in-progress submission)
@@ -763,22 +759,22 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
       # will handle updating the submission. otherwise we need to set its score
       # here so that when it is touched by the association, it does not try to
       # sync an old score back to this quiz_submission
-      if !self.completed? && self.submission
-        s = self.submission
-        s.score = self.kept_score
+      if !completed? && submission
+        s = submission
+        s.score = kept_score
         s.grade_change_event_author_id = params[:grader_id]
         s.grade_matches_current_submission = true
-        s.body = "user: #{self.user_id}, quiz: #{self.quiz_id}, score: #{self.kept_score}, time: #{Time.now}"
+        s.body = "user: #{user_id}, quiz: #{quiz_id}, score: #{kept_score}, time: #{Time.now}"
         s.saved_by = :quiz_submission
       end
     end
 
     # submission has to be saved with versioning
     # to help Auditors::GradeChange record grade_before correctly
-    self.submission.with_versioning(explicit: true, &:save) if self.submission.present?
-    self.without_versioning(&:save)
+    submission.with_versioning(explicit: true, &:save) if submission.present?
+    without_versioning(&:save)
 
-    self.reload
+    reload
     grader = Quizzes::SubmissionGrader.new(self)
     if grader.outcomes_require_update(self, original_score, original_workflow_state)
       grader.track_outcomes(version.model.attempt)
@@ -787,7 +783,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   end
 
   def duration
-    (self.finished_at || self.started_at) - self.started_at rescue 0
+    (finished_at || started_at) - started_at rescue 0
   end
 
   def time_spent
@@ -796,21 +792,21 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
     (finished_at - started_at + (extra_time || 0)).round
   end
 
-  scope :before, lambda { |date| where("quiz_submissions.created_at<?", date) }
+  scope :before, ->(date) { where("quiz_submissions.created_at<?", date) }
   scope :updated_after, lambda { |date|
     date ? where("quiz_submissions.updated_at>?", date) : all
   }
-  scope :for_user_ids, lambda { |user_ids| where(:user_id => user_ids) }
+  scope :for_user_ids, ->(user_ids) { where(user_id: user_ids) }
   scope :logged_out, -> { where("temporary_user_code is not null AND NOT was_preview") }
   scope :not_settings_only, -> { where("quiz_submissions.workflow_state<>'settings_only'") }
-  scope :completed, -> { where(:workflow_state => %w(complete pending_review)) }
+  scope :completed, -> { where(workflow_state: %w[complete pending_review]) }
 
   # Excludes teacher preview submissions.
   #
   # You may still have to deal with StudentView submissions if you want
   # submissions made by students for real, which you can do by using the
   # for_user_ids scope and pass in quiz.context.all_real_student_ids.
-  scope :not_preview, -> { where('was_preview IS NULL OR NOT was_preview') }
+  scope :not_preview, -> { where("was_preview IS NULL OR NOT was_preview") }
 
   # Excludes teacher preview and Student View submissions.
   scope :for_students, ->(quiz) { not_preview.for_user_ids(quiz.context.all_real_student_ids) }
@@ -826,27 +822,27 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
     # submissions, not quiz submissions.  The necessary delegations
     # are at the bottom of this class.
     p.dispatch :submission_graded
-    p.to { ([user] + User.observing_students_in_course(user, self.context)).uniq(&:id) }
-    p.whenever { |q_sub|
+    p.to { ([user] + User.observing_students_in_course(user, context)).uniq(&:id) }
+    p.whenever do |q_sub|
       BroadcastPolicies::QuizSubmissionPolicy.new(q_sub)
                                              .should_dispatch_submission_graded?
-    }
+    end
     p.data { course_broadcast_data }
 
     p.dispatch :submission_grade_changed
-    p.to { ([user] + User.observing_students_in_course(user, self.context)).uniq(&:id) }
-    p.whenever { |q_sub|
+    p.to { ([user] + User.observing_students_in_course(user, context)).uniq(&:id) }
+    p.whenever do |q_sub|
       BroadcastPolicies::QuizSubmissionPolicy.new(q_sub)
                                              .should_dispatch_submission_grade_changed?
-    }
+    end
     p.data { course_broadcast_data }
 
     p.dispatch :submission_needs_grading
     p.to { teachers }
-    p.whenever { |q_sub|
+    p.whenever do |q_sub|
       BroadcastPolicies::QuizSubmissionPolicy.new(q_sub)
                                              .should_dispatch_submission_needs_grading?
-    }
+    end
     p.data { course_broadcast_data }
   end
 
@@ -860,27 +856,27 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
 
   def delete_ignores
     if completed?
-      Ignore.where(asset_type: 'Quizzes::Quiz', asset_id: quiz_id, user_id: user_id, purpose: 'submitting').delete_all
+      Ignore.where(asset_type: "Quizzes::Quiz", asset_id: quiz_id, user_id: user_id, purpose: "submitting").delete_all
     end
     true
   end
 
   def valid_token?(token)
-    self.validation_token.blank? || self.validation_token == token
+    validation_token.blank? || validation_token == token
   end
 
   # TODO: this could probably be put in as a convenience method in simply_versioned
   def save_with_versioning!
-    self.with_versioning(true) { self.save! }
+    with_versioning(true) { save! }
   end
 
   # evizitei: these 3 delegations allow quiz submissions to be used in
   # templates designed for regular submissions.  Any additional functionality
   # put into those templates will need to be provided in both submissions and
   # quiz_submissions
-  delegate :assignment_id, :assignment, :to => :quiz
-  delegate :graded_at, :to => :submission
-  delegate :context, :to => :quiz
+  delegate :assignment_id, :assignment, to: :quiz
+  delegate :graded_at, to: :submission
+  delegate :context, to: :quiz
   delegate :excused?, to: :submission, allow_nil: true
 
   # Determine whether the QS can be retried (ie, re-generated).
@@ -895,12 +891,12 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   # @return [Boolean]
   #   Whether the QS is retriable.
   def retriable?
-    return true if self.preview?
-    return true if self.settings_only?
+    return true if preview?
+    return true if settings_only?
 
     attempts_left = self.attempts_left || 0
 
-    self.completed? && (attempts_left > 0 || self.quiz.unlimited_attempts?)
+    completed? && (attempts_left > 0 || quiz.unlimited_attempts?)
   end
 
   # Locate the Quiz Submission for this participant, regardless of them being
@@ -909,9 +905,11 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   # @return [Relation]
   #   The QS Relation, for the participant.
   def self.for_participant(participant)
-    participant.anonymous? ?
-        where(temporary_user_code: participant.user_code) :
-        where(user_id: participant.user.id)
+    if participant.anonymous?
+      where(temporary_user_code: participant.user_code)
+    else
+      where(user_id: participant.user.id)
+    end
   end
 
   def ensure_question_reference_integrity!
@@ -920,13 +918,13 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   end
 
   def ensure_end_at_integrity!
-    if end_date_needs_recalculated? && !!self.started_at
+    if end_date_needs_recalculated? && !!started_at
       self.end_at = quiz.build_submission_end_at(self)
 
-      if self.untaken?
-        self.save!
+      if untaken?
+        save!
       else
-        self.with_versioning(true, &:save!)
+        with_versioning(true, &:save!)
       end
     end
   end
@@ -940,8 +938,8 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   # same as the instance method, but with a hash of attributes, instead
   # of an instance, so that you can avoid instantiating
   def self.late_from_attributes?(attributes, quiz, submission)
-    return submission.late_policy_status == 'late' if submission&.late_policy_status.present?
-    return false if attributes['finished_at'].blank?
+    return submission.late_policy_status == "late" if submission&.late_policy_status.present?
+    return false if attributes["finished_at"].blank?
 
     due_at = if submission.blank?
                quiz.due_at
@@ -950,7 +948,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
              end
     return false if due_at.blank?
 
-    check_time = attributes['finished_at'] - 60.seconds
+    check_time = attributes["finished_at"] - 60.seconds
     check_time > due_at
   end
 
@@ -966,7 +964,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
 
   def filter_attributes_for_user(hash, user, session)
     if submission.present? && !submission.user_can_read_grade?(user, session)
-      secret_keys = %w(score kept_score)
+      secret_keys = %w[score kept_score]
       hash.except!(*secret_keys)
     end
   end

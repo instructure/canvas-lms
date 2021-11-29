@@ -92,10 +92,10 @@ module Quizzes
       @users = index_users
       includes = Array(params[:include])
       @users, meta = Api.jsonapi_paginate(@users, self, index_base_url, params)
-      if includes.include? 'quiz_submissions'
+      if includes.include? "quiz_submissions"
         quiz_submissions = QuizSubmission.where(user_id: @users.to_a, quiz_id: @quiz).index_by(&:user_id)
       end
-      UserPastLtiId.manual_preload_past_lti_ids(@users, @context) if ['uuid', 'lti_id'].any? { |id| includes.include? id }
+      UserPastLtiId.manual_preload_past_lti_ids(@users, @context) if ["uuid", "lti_id"].any? { |id| includes.include? id }
       users_json = Canvas::APIArraySerializer.new(@users, {
                                                     quiz: @quiz,
                                                     root: :users,
@@ -145,7 +145,7 @@ module Quizzes
       @conversation = Array(params[:conversations]).first
       if @conversation
         send_message
-        render json: { status: t('created', 'created') }, status: :created
+        render json: { status: t("created", "created") }, status: :created
       else
         render json: [], status: :invalid_request
       end
@@ -158,7 +158,7 @@ module Quizzes
         api_v1_course_quiz_submission_users_url(
           @quiz.context,
           @quiz,
-          submitted: submitted? ? 'true' : 'false'
+          submitted: submitted? ? "true" : "false"
         )
       else
         api_v1_course_quiz_submission_users_url(@quiz.context, @quiz)

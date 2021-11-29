@@ -17,10 +17,10 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'ddtrace'
-require 'digest/sha1'
+require "ddtrace"
+require "digest/sha1"
 
-require_dependency 'canvas/dynamic_settings'
+require_dependency "canvas/dynamic_settings"
 
 module Canvas
   # This module is currently a wrapper for managing connecting with ddtrace
@@ -44,7 +44,7 @@ module Canvas
   #  calling Canvas::Apm.annotate_trace() with the shard and account
   #  will provide the facets useful for searching by in the aggregation client.
   module Apm
-    HOST_SAMPLING_INTERVAL = 10000
+    HOST_SAMPLING_INTERVAL = 10_000
     class << self
       attr_writer :enable_debug_mode, :hostname, :tracer
       attr_accessor :canvas_cluster
@@ -65,32 +65,32 @@ module Canvas
         return @_config if @_config.present?
 
         dynamic_settings = Canvas::DynamicSettings.find(tree: :private)
-        if self.canvas_cluster.present?
-          dynamic_settings = Canvas::DynamicSettings.find(tree: :private, cluster: self.canvas_cluster)
+        if canvas_cluster.present?
+          dynamic_settings = Canvas::DynamicSettings.find(tree: :private, cluster: canvas_cluster)
         end
-        @_config = YAML.safe_load(dynamic_settings['datadog_apm.yml'] || '{}')
+        @_config = YAML.safe_load(dynamic_settings["datadog_apm.yml"] || "{}")
       end
 
       def sample_rate
         return @_sample_rate if @_sample_rate.present?
 
-        @_sample_rate = self.config.fetch('sample_rate', 0.0).to_f
+        @_sample_rate = config.fetch("sample_rate", 0.0).to_f
       end
 
       def host_sample_rate
         return @_host_sample_rate if @_host_sample_rate.present?
 
-        @_host_sample_rate = self.config.fetch('host_sample_rate', 0.0).to_f
+        @_host_sample_rate = config.fetch("host_sample_rate", 0.0).to_f
       end
 
       def analytics_enabled?
         return @_app_analytics_enabled unless @_app_analytics_enabled.nil?
 
-        @_app_analytics_enabled = self.config.fetch('app_analytics_enabled', false)
+        @_app_analytics_enabled = config.fetch("app_analytics_enabled", false)
       end
 
       def configured?
-        self.sample_rate > 0.0 && host_chosen?
+        sample_rate > 0.0 && host_chosen?
       end
 
       def host_chosen?
@@ -116,17 +116,17 @@ module Canvas
       end
 
       def rate_sampler
-        Datadog::RateSampler.new(self.sample_rate)
+        Datadog::RateSampler.new(sample_rate)
       end
 
       def enable_apm!
-        sampler = self.rate_sampler
+        sampler = rate_sampler
         debug_mode = @enable_debug_mode.presence || false
         Datadog.configure do |c|
           # this is filtered on the datadog UI side
           # to make sure we don't analyze _everything_
           # which would be very expensive
-          c.analytics_enabled = self.analytics_enabled?
+          c.analytics_enabled = analytics_enabled?
           c.tracer sampler: sampler, debug: debug_mode
           c.use :aws
           c.use :faraday
@@ -139,20 +139,20 @@ module Canvas
       end
 
       def configure_apm!
-        self.enable_apm! if self.configured?
+        enable_apm! if configured?
       end
 
       def annotate_trace(shard, root_account, request_context_id, current_user)
-        return unless self.configured?
+        return unless configured?
 
         apm_root_span = tracer.active_root_span
         return if apm_root_span.blank?
 
-        apm_root_span.set_tag('request_context_id', request_context_id.to_s) if request_context_id.present?
-        apm_root_span.set_tag('shard', shard.id.to_s) if shard.try(:id).present?
+        apm_root_span.set_tag("request_context_id", request_context_id.to_s) if request_context_id.present?
+        apm_root_span.set_tag("shard", shard.id.to_s) if shard.try(:id).present?
         act_global_id = root_account.try(:global_id)
-        apm_root_span.set_tag('root_account', act_global_id.to_s) if act_global_id.present?
-        apm_root_span.set_tag('current_user', current_user.global_id.to_s) if current_user
+        apm_root_span.set_tag("root_account", act_global_id.to_s) if act_global_id.present?
+        apm_root_span.set_tag("current_user", current_user.global_id.to_s) if current_user
       end
 
       # use this to wrap arbitrary code in traces
@@ -171,7 +171,7 @@ module Canvas
       # See datadog examples here:
       # http://gems.datadoghq.com/trace/docs/#Manual_Instrumentation
       def tracer
-        return Canvas::Apm::StubTracer.instance unless self.configured?
+        return Canvas::Apm::StubTracer.instance unless configured?
 
         @tracer || Datadog.tracer
       end
@@ -185,13 +185,11 @@ module Canvas
       #
       # see available "Options" to be passed on here:
       # http://gems.datadoghq.com/trace/docs/#Manual_Instrumentation
-      def trace(resource_name, opts = {})
-        opts[:service] = opts.fetch(:service, 'canvas_custom')
+      def trace(resource_name, opts = {}, &block)
+        opts[:service] = opts.fetch(:service, "canvas_custom")
         opts[:resource] = resource_name
-        opts[:span_type] = opts.fetch(:span_type, 'canvas_ruby')
-        tracer.trace("application.code", opts) do |span|
-          yield span
-        end
+        opts[:span_type] = opts.fetch(:span_type, "canvas_ruby")
+        tracer.trace("application.code", opts, &block)
       end
     end
   end

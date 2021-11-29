@@ -18,13 +18,13 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'net-ldap'
-require 'net_ldap_extensions'
+require "net-ldap"
+require "net_ldap_extensions"
 NetLdapExtensions.apply
 
 class AuthenticationProvider < ActiveRecord::Base
   include Workflow
-  validates :auth_filter, length: { maximum: maximum_text_length, allow_nil: true, allow_blank: true }
+  validates :auth_filter, length: { maximum: maximum_text_length, allow_blank: true }
 
   workflow do
     state :active
@@ -33,7 +33,7 @@ class AuthenticationProvider < ActiveRecord::Base
 
   self.inheritance_column = :auth_type
   # backcompat while authentication_providers might be a view
-  self.primary_key = 'id'
+  self.primary_key = "id"
 
   def self.subclass_from_attributes?(_)
     false
@@ -45,17 +45,17 @@ class AuthenticationProvider < ActiveRecord::Base
     return self if type_name.blank? # super no longer does this in Rails 4
 
     case type_name
-    when 'cas', 'ldap', 'saml'
+    when "cas", "ldap", "saml"
       const_get(type_name.upcase)
-    when 'apple', 'clever', 'facebook', 'google', 'microsoft', 'saml_idp_discovery', 'twitter'
+    when "apple", "clever", "facebook", "google", "microsoft", "saml_idp_discovery", "twitter"
       const_get(type_name.classify)
-    when 'canvas'
+    when "canvas"
       Canvas
-    when 'github'
+    when "github"
       GitHub
-    when 'linkedin'
+    when "linkedin"
       LinkedIn
-    when 'openid_connect'
+    when "openid_connect"
       OpenIDConnect
     else
       super
@@ -96,19 +96,19 @@ class AuthenticationProvider < ActiveRecord::Base
   # only be used from inside a transaction.
   def self.maybe_recreate_view
     if (view_exists = connection.view_exists?("authentication_providers"))
-      connection.execute("DROP VIEW #{connection.quote_table_name('authentication_providers')}")
+      connection.execute("DROP VIEW #{connection.quote_table_name("authentication_providers")}")
     end
     yield
     if view_exists
-      connection.execute("CREATE VIEW #{connection.quote_table_name('authentication_providers')} AS SELECT * FROM #{connection.quote_table_name('account_authorization_configs')}")
+      connection.execute("CREATE VIEW #{connection.quote_table_name("authentication_providers")} AS SELECT * FROM #{connection.quote_table_name("account_authorization_configs")}")
     end
   end
 
   scope :active, -> { where("workflow_state <> 'deleted'") }
   belongs_to :account
   include ::Canvas::RootAccountCacher
-  has_many :pseudonyms, foreign_key: :authentication_provider_id, inverse_of: :authentication_provider
-  acts_as_list scope: { account: self, workflow_state: [nil, 'active'] }
+  has_many :pseudonyms, inverse_of: :authentication_provider
+  acts_as_list scope: { account: self, workflow_state: [nil, "active"] }
 
   def self.valid_auth_types
     %w[apple canvas cas clever facebook github google ldap linkedin microsoft openid_connect saml saml_idp_discovery twitter].freeze
@@ -116,7 +116,7 @@ class AuthenticationProvider < ActiveRecord::Base
 
   validates :auth_type,
             inclusion: { in: ->(_) { valid_auth_types },
-                         message: -> { "invalid auth_type, must be one of #{valid_auth_types.join(',')}" } }
+                         message: -> { "invalid auth_type, must be one of #{valid_auth_types.join(",")}" } }
   validates :account_id, presence: true
   validate :validate_federated_attributes
 
@@ -151,9 +151,9 @@ class AuthenticationProvider < ActiveRecord::Base
   end
 
   def destroy
-    self.send(:remove_from_list_for_destroy)
-    self.workflow_state = 'deleted'
-    self.save!
+    send(:remove_from_list_for_destroy)
+    self.workflow_state = "deleted"
+    save!
     enable_canvas_authentication
     delay_if_production.soft_delete_pseudonyms
     true
@@ -163,13 +163,13 @@ class AuthenticationProvider < ActiveRecord::Base
   def auth_password=(password)
     return if password.blank?
 
-    self.auth_crypted_password, self.auth_password_salt = ::Canvas::Security.encrypt_password(password, 'instructure_auth')
+    self.auth_crypted_password, self.auth_password_salt = ::Canvas::Security.encrypt_password(password, "instructure_auth")
   end
 
   def auth_decrypted_password
-    return nil unless self.auth_password_salt && self.auth_crypted_password
+    return nil unless auth_password_salt && auth_crypted_password
 
-    ::Canvas::Security.decrypt_password(self.auth_crypted_password, self.auth_password_salt, 'instructure_auth')
+    ::Canvas::Security.decrypt_password(auth_crypted_password, auth_password_salt, "instructure_auth")
   end
 
   def auth_provider_filter
@@ -201,24 +201,24 @@ class AuthenticationProvider < ActiveRecord::Base
   def federated_attributes=(value)
     value = {} unless value.is_a?(Hash)
     settings_will_change! unless value == federated_attributes
-    settings['federated_attributes'] = value
+    settings["federated_attributes"] = value
   end
 
   def federated_attributes
-    settings['federated_attributes'] ||= {}
+    settings["federated_attributes"] ||= {}
   end
 
   def mfa_required?
     return false if account.mfa_settings == :disabled
     return true if account.mfa_settings == :required
 
-    !!settings['mfa_required']
+    !!settings["mfa_required"]
   end
   alias_method :mfa_required, :mfa_required?
 
   def mfa_required=(value)
     value = false if account.mfa_settings == :disabled
-    settings['mfa_required'] = ::Canvas::Plugin.value_to_boolean(value)
+    settings["mfa_required"] = ::Canvas::Plugin.value_to_boolean(value)
   end
 
   def federated_attributes_for_api
@@ -227,15 +227,15 @@ class AuthenticationProvider < ActiveRecord::Base
     else
       result = {}
       federated_attributes.each do |(canvas_attribute_name, provider_attribute_config)|
-        next if provider_attribute_config['provisioning_only']
+        next if provider_attribute_config["provisioning_only"]
 
-        result[canvas_attribute_name] = provider_attribute_config['attribute']
+        result[canvas_attribute_name] = provider_attribute_config["attribute"]
       end
       result
     end
   end
 
-  CANVAS_ALLOWED_FEDERATED_ATTRIBUTES = %w{
+  CANVAS_ALLOWED_FEDERATED_ATTRIBUTES = %w[
     admin_roles
     display_name
     email
@@ -247,12 +247,12 @@ class AuthenticationProvider < ActiveRecord::Base
     sortable_name
     surname
     time_zone
-  }.freeze
+  ].freeze
 
   def provision_user(unique_id, provider_attributes = {})
     User.transaction(requires_new: true) do
       pseudonym = account.pseudonyms.build
-      pseudonym.user = User.create!(name: unique_id) { |u| u.workflow_state = 'registered' }
+      pseudonym.user = User.create!(name: unique_id) { |u| u.workflow_state = "registered" }
       pseudonym.authentication_provider = self
       pseudonym.unique_id = unique_id
       pseudonym.save!
@@ -270,8 +270,8 @@ class AuthenticationProvider < ActiveRecord::Base
 
     canvas_attributes = translate_provider_attributes(provider_attributes,
                                                       purpose: purpose)
-    given_name = canvas_attributes.delete('given_name')
-    surname = canvas_attributes.delete('surname')
+    given_name = canvas_attributes.delete("given_name")
+    surname = canvas_attributes.delete("surname")
     if given_name || surname
       user.name = "#{given_name} #{surname}"
       user.sortable_name = if given_name.present? && surname.present?
@@ -286,13 +286,13 @@ class AuthenticationProvider < ActiveRecord::Base
       next unless value
 
       case attribute
-      when 'admin_roles'
-        role_names = value.is_a?(String) ? value.split(',').map(&:strip) : value
+      when "admin_roles"
+        role_names = value.is_a?(String) ? value.split(",").map(&:strip) : value
         account = pseudonym.account
         existing_account_users = account.account_users.merge(user.account_users).preload(:role).to_a
-        roles = role_names.map do |role_name|
+        roles = role_names.filter_map do |role_name|
           account.get_account_role_by_name(role_name)
-        end.compact
+        end
         roles_to_add = roles - existing_account_users.map(&:role)
         account_users_to_delete = existing_account_users.select { |au| au.active? && !roles.include?(au.role) }
         account_users_to_activate = existing_account_users.select { |au| au.deleted? && roles.include?(au.role) }
@@ -301,23 +301,23 @@ class AuthenticationProvider < ActiveRecord::Base
         end
         account_users_to_delete.each(&:destroy)
         account_users_to_activate.each(&:reactivate)
-      when 'sis_user_id', 'integration_id'
+      when "sis_user_id", "integration_id"
         pseudonym[attribute] = value
-      when 'display_name'
+      when "display_name"
         user.short_name = value
-      when 'email'
+      when "email"
         cc = user.communication_channels.email.by_path(value).first
         cc ||= user.communication_channels.email.new(path: value)
-        cc.workflow_state = 'active'
+        cc.workflow_state = "active"
         cc.save! if cc.changed?
-      when 'locale'
+      when "locale"
         # convert _ to -, be lenient about case, and perform fallbacks
-        value = value.tr('_', '-')
+        value = value.tr("_", "-")
         lowercase_locales = I18n.available_locales.map(&:to_s).map(&:downcase)
-        while value.include?('-')
+        while value.include?("-")
           break if lowercase_locales.include?(value.downcase)
 
-          value = value.sub(/(?:x-)?-[^-]*$/, '')
+          value = value.sub(/(?:x-)?-[^-]*$/, "")
         end
         if (i = lowercase_locales.index(value.downcase))
           user.locale = I18n.available_locales[i].to_s
@@ -326,15 +326,11 @@ class AuthenticationProvider < ActiveRecord::Base
         user.send("#{attribute}=", value)
       end
     end
-    if pseudonym.changed?
-      unless pseudonym.save
-        Rails.logger.warn("Unable to save federated pseudonym: #{pseudonym.errors}")
-      end
+    if pseudonym.changed? && !pseudonym.save
+      Rails.logger.warn("Unable to save federated pseudonym: #{pseudonym.errors}")
     end
-    if user.changed?
-      unless user.save
-        Rails.logger.warn("Unable to save federated user: #{user.errors}")
-      end
+    if user.changed? && !user.save
+      Rails.logger.warn("Unable to save federated user: #{user.errors}")
     end
   end
 
@@ -368,7 +364,7 @@ class AuthenticationProvider < ActiveRecord::Base
   protected
 
   def statsd_prefix
-    "auth.account_#{Shard.global_id_for(account_id)}.config_#{self.global_id}"
+    "auth.account_#{Shard.global_id_for(account_id)}.config_#{global_id}"
   end
 
   private
@@ -376,7 +372,7 @@ class AuthenticationProvider < ActiveRecord::Base
   def validate_federated_attributes
     bad_keys = federated_attributes.keys - CANVAS_ALLOWED_FEDERATED_ATTRIBUTES
     unless bad_keys.empty?
-      errors.add(:federated_attributes, "#{bad_keys.join(', ')} is not an attribute that can be federated")
+      errors.add(:federated_attributes, "#{bad_keys.join(", ")} is not an attribute that can be federated")
       return
     end
 
@@ -384,15 +380,15 @@ class AuthenticationProvider < ActiveRecord::Base
     federated_attributes.each_key do |key|
       case federated_attributes[key]
       when String
-        federated_attributes[key] = { 'attribute' => federated_attributes[key], 'provisioning_only' => false }
+        federated_attributes[key] = { "attribute" => federated_attributes[key], "provisioning_only" => false }
       when Hash
-        bad_keys = federated_attributes[key].keys - ['attribute', 'provisioning_only']
+        bad_keys = federated_attributes[key].keys - ["attribute", "provisioning_only"]
         unless bad_keys.empty?
-          errors.add(:federated_attributes, "unrecognized key #{bad_keys.join(', ')} in #{key} attribute definition")
+          errors.add(:federated_attributes, "unrecognized key #{bad_keys.join(", ")} in #{key} attribute definition")
           return
         end
-        federated_attributes[key]['provisioning_only'] =
-          ::Canvas::Plugin.value_to_boolean(federated_attributes[key]['provisioning_only'])
+        federated_attributes[key]["provisioning_only"] =
+          ::Canvas::Plugin.value_to_boolean(federated_attributes[key]["provisioning_only"])
       else
         errors.add(:federated_attributes, "invalid attribute definition for #{key}")
         return
@@ -401,18 +397,18 @@ class AuthenticationProvider < ActiveRecord::Base
 
     return if self.class.recognized_federated_attributes.nil?
 
-    bad_values = federated_attributes.values.map { |v| v['attribute'] } - self.class.recognized_federated_attributes
+    bad_values = federated_attributes.values.map { |v| v["attribute"] } - self.class.recognized_federated_attributes
     unless bad_values.empty?
-      errors.add(:federated_attributes, "#{bad_values.join(', ')} is not a valid attribute")
+      errors.add(:federated_attributes, "#{bad_values.join(", ")} is not a valid attribute")
     end
   end
 
   def translate_provider_attributes(provider_attributes, purpose:)
     result = {}
     federated_attributes.each do |(canvas_attribute_name, provider_attribute_config)|
-      next if purpose != :provisioning && provider_attribute_config['provisioning_only']
+      next if purpose != :provisioning && provider_attribute_config["provisioning_only"]
 
-      provider_attribute_name = provider_attribute_config['attribute']
+      provider_attribute_name = provider_attribute_config["attribute"]
 
       if provider_attributes.key?(provider_attribute_name)
         result[canvas_attribute_name] = provider_attributes[provider_attribute_name]
@@ -432,17 +428,17 @@ class AuthenticationProvider < ActiveRecord::Base
   end
 
   def debug_key(key)
-    ['auth_provider_debugging', self.global_id, key.to_s].cache_key
+    ["auth_provider_debugging", global_id, key.to_s].cache_key
   end
 
   def debug_expire
-    Setting.get('auth_provider_debug_expire_minutes', 30).to_i.minutes
+    Setting.get("auth_provider_debug_expire_minutes", 30).to_i.minutes
   end
 end
 
 # so it doesn't get mixed up with ::CAS, ::LinkedIn and ::Twitter
-require_dependency 'authentication_provider/canvas'
-require_dependency 'authentication_provider/cas'
-require_dependency 'authentication_provider/google'
-require_dependency 'authentication_provider/linked_in'
-require_dependency 'authentication_provider/twitter'
+require_dependency "authentication_provider/canvas"
+require_dependency "authentication_provider/cas"
+require_dependency "authentication_provider/google"
+require_dependency "authentication_provider/linked_in"
+require_dependency "authentication_provider/twitter"

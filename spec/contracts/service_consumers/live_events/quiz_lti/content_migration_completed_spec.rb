@@ -18,48 +18,48 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../live_events_pact_helper'
+require_relative "../live_events_pact_helper"
 
-RSpec.describe 'Canvas LMS Live Events', :pact_live_events do
-  describe 'content_migration_completed' do
+RSpec.describe "Canvas LMS Live Events", :pact_live_events do
+  describe "content_migration_completed" do
     let(:live_event) do
       LiveEvents::PactHelper::Event.new(
-        event_name: 'content_migration_completed',
+        event_name: "content_migration_completed",
         event_subscriber: PactConfig::LiveEventConsumers::QUIZ_LTI
       )
     end
 
-    it 'keeps the contract' do
+    it "keeps the contract" do
       live_event.emit_with do
         # arrange
         params = {
-          :name => "Quizzes.Next",
-          :url => 'http://example.com/launch',
-          :domain => "example.com",
-          :consumer_key => 'test_key',
-          :shared_secret => 'test_secret',
-          :privacy_level => 'public',
-          :tool_id => 'Quizzes 2'
+          name: "Quizzes.Next",
+          url: "http://example.com/launch",
+          domain: "example.com",
+          consumer_key: "test_key",
+          shared_secret: "test_secret",
+          privacy_level: "public",
+          tool_id: "Quizzes 2"
         }
         account = Account.default
         account.context_external_tools.create!(params)
-        account.settings[:provision] = { 'lti' => 'lti url' }
-        account.lti_context_id = '1'
+        account.settings[:provision] = { "lti" => "lti url" }
+        account.lti_context_id = "1"
         account.enable_feature!(:quizzes_next)
         account.save!
 
-        course_model(uuid: '100006')
+        course_model(uuid: "100006")
         teacher = user_model
 
         migration = ContentMigration.create!(
           context: account,
           user: teacher,
-          workflow_state: 'importing',
+          workflow_state: "importing",
           migration_settings: {
             import_quizzes_next: true
           }
         )
-        migration.workflow_state = 'imported'
+        migration.workflow_state = "imported"
 
         # act
         migration.save!

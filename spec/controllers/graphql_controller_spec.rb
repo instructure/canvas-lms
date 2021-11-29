@@ -25,7 +25,7 @@ describe GraphQLController do
 
   let(:federation_query_params) do
     {
-      query: 'query ($representations: [_Any!]!) { _entities(representations: $representations) { ...on Course { name } } }',
+      query: "query ($representations: [_Any!]!) { _entities(representations: $representations) { ...on Course { name } } }",
       variables: {
         representations: [{ __typename: "Course", id: "Q291cnNlLTE=" }]
       }
@@ -35,7 +35,7 @@ describe GraphQLController do
   context "graphiql" do
     it "requires a user" do
       get :graphiql
-      expect(response.location).to match(/\/login$/)
+      expect(response.location).to match(%r{/login$})
     end
 
     it "works in production for normal users" do
@@ -106,10 +106,10 @@ describe GraphQLController do
             }
           GQL
           post :execute, params: { query: test_query }, format: :json
-          expect_increment("graphql.operation.count", operation_name: 'GetStuff', domain: 'test.host', operation_md5: String)
-          expect_increment("graphql.query.count", operation_name: 'GetStuff', field: 'course', operation_md5: String)
-          expect_increment("graphql.query.count", operation_name: 'GetStuff', field: 'assignment', operation_md5: String)
-          expect_increment("graphql.query.count", operation_name: 'GetStuff', field: 'legacyNode', operation_md5: String)
+          expect_increment("graphql.operation.count", operation_name: "GetStuff", domain: "test.host", operation_md5: String)
+          expect_increment("graphql.query.count", operation_name: "GetStuff", field: "course", operation_md5: String)
+          expect_increment("graphql.query.count", operation_name: "GetStuff", field: "assignment", operation_md5: String)
+          expect_increment("graphql.query.count", operation_name: "GetStuff", field: "legacyNode", operation_md5: String)
         end
 
         it "counts unnamed operations" do
@@ -121,9 +121,9 @@ describe GraphQLController do
             }
           GQL
           post :execute, params: { query: test_query }, format: :json
-          expect_increment("graphql.operation.count", operation_name: 'unnamed', domain: 'test.host', operation_md5: String)
-          expect_increment("graphql.query.count", operation_name: 'unnamed', field: 'course', operation_md5: String)
-          expect_increment("graphql.query.count", operation_name: 'unnamed', field: 'assignment', operation_md5: String)
+          expect_increment("graphql.operation.count", operation_name: "unnamed", domain: "test.host", operation_md5: String)
+          expect_increment("graphql.query.count", operation_name: "unnamed", field: "course", operation_md5: String)
+          expect_increment("graphql.query.count", operation_name: "unnamed", field: "assignment", operation_md5: String)
         end
 
         it "counts each mutation top-level field" do
@@ -139,9 +139,9 @@ describe GraphQLController do
             }
           GQL
           post :execute, params: { query: test_query }, format: :json
-          expect_increment("graphql.operation.count", operation_name: 'unnamed', domain: 'test.host', operation_md5: String)
-          expect_increment("graphql.mutation.count", operation_name: 'unnamed', field: 'createAssignment', operation_md5: String)
-          expect_increment("graphql.mutation.count", operation_name: 'unnamed', field: 'updateAssignment', operation_md5: String)
+          expect_increment("graphql.operation.count", operation_name: "unnamed", domain: "test.host", operation_md5: String)
+          expect_increment("graphql.mutation.count", operation_name: "unnamed", field: "createAssignment", operation_md5: String)
+          expect_increment("graphql.mutation.count", operation_name: "unnamed", field: "updateAssignment", operation_md5: String)
         end
       end
 
@@ -153,8 +153,8 @@ describe GraphQLController do
             }
           GQL
           post :execute, params: { query: test_query }, format: :json
-          expect_increment("graphql.operation.count", operation_name: '3rdparty', domain: 'test.host')
-          expect_increment("graphql.query.count", operation_name: '3rdparty', field: 'course')
+          expect_increment("graphql.operation.count", operation_name: "3rdparty", domain: "test.host")
+          expect_increment("graphql.query.count", operation_name: "3rdparty", field: "course")
         end
       end
     end
@@ -188,7 +188,7 @@ describe GraphQLController do
 
     describe "without authentication" do
       it "services subgraph introspection queries" do
-        post :subgraph_execute, params: { query: 'query FederationSubgraphIntrospection { _service { sdl } }' }, format: :json
+        post :subgraph_execute, params: { query: "query FederationSubgraphIntrospection { _service { sdl } }" }, format: :json
         expect(JSON.parse(response.body)["errors"]).to be_blank
         expect(JSON.parse(response.body)["data"]).not_to be_blank
       end

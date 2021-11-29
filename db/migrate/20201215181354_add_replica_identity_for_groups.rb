@@ -22,11 +22,11 @@ class AddReplicaIdentityForGroups < ActiveRecord::Migration[5.2]
   disable_ddl_transaction!
 
   def up
-    add_replica_identity 'Group', :root_account_id, 0
+    add_replica_identity "Group", :root_account_id, 0
     # no index to remove
   end
 
   def down
-    remove_replica_identity 'Group'
+    remove_replica_identity "Group"
   end
 end

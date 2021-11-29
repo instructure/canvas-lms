@@ -26,13 +26,13 @@ module MicrosoftSync
   module LoginService
     class TenantDoesNotExist < MicrosoftSync::Errors::GracefulCancelError
       def self.public_message
-        I18n.t 'Microsoft tenant does not exist.'
+        I18n.t "Microsoft tenant does not exist."
       end
     end
 
-    BASE_URL = 'https://login.microsoftonline.com'
-    TOKEN_SUBPATH = 'oauth2/v2.0/token'
-    REDIRECT_URI = 'https://www.instructure.com/'
+    BASE_URL = "https://login.microsoftonline.com"
+    TOKEN_SUBPATH = "oauth2/v2.0/token"
+    REDIRECT_URI = "https://www.instructure.com/"
 
     # Tokens are normally 3599 or 3600 seconds. Assume it will be and adjust
     # the expiry if it isn't.
@@ -41,7 +41,7 @@ module MicrosoftSync
     CACHE_EXPIRY_BUFFER = 8.seconds
     CACHE_RACE_CONDITION_TTL = 5.seconds
 
-    STATSD_NAME = 'microsoft_sync.login_service'
+    STATSD_NAME = "microsoft_sync.login_service"
 
     class << self
       def login_url(tenant)
@@ -50,15 +50,15 @@ module MicrosoftSync
 
       # Returns JSON returned from endpoint, including 'access_token' and 'expires_in'
       def new_token(tenant)
-        headers = { 'Content-Type' => 'application/x-www-form-urlencoded' }
+        headers = { "Content-Type" => "application/x-www-form-urlencoded" }
         body = {
-          scope: 'https://graph.microsoft.com/.default',
-          grant_type: 'client_credentials',
+          scope: "https://graph.microsoft.com/.default",
+          grant_type: "client_credentials",
           client_id: client_id,
           client_secret: client_secret,
         }
 
-        response = Canvas.timeout_protection('microsoft_sync_login', raise_on_timeout: true) do
+        response = Canvas.timeout_protection("microsoft_sync_login", raise_on_timeout: true) do
           HTTParty.post(login_url(tenant), body: body, headers: headers)
         end
 
@@ -66,25 +66,25 @@ module MicrosoftSync
           # Probably the key itself is bad. As of 3/2021, it seems like if the tenant
           # hasn't granted permission, we get a token but then a 401 from the Graph API
           raise MicrosoftSync::Errors::HTTPInvalidStatus.for(
-            service: 'login', tenant: tenant, response: response
+            service: "login", tenant: tenant, response: response
           )
         end
 
         response.parsed_response
       rescue Errors::HTTPBadRequest
-        if response.body =~ /Tenant .* not found/ || response.body.include?('is neither a valid DNS name')
+        if response.body =~ /Tenant .* not found/ || response.body.include?("is neither a valid DNS name")
           raise TenantDoesNotExist
         end
 
         raise
       ensure
-        statsd_tags = { status_code: response&.code&.to_s || 'error' }
+        statsd_tags = { status_code: response&.code&.to_s || "error" }
         InstStatsd::Statsd.increment(STATSD_NAME, tags: statsd_tags)
       end
 
       # Returns a string token. Cached per-tenant for the time given in the login response.
       def token(tenant)
-        cache_key = ['microsoft_sync_login', tenant]
+        cache_key = ["microsoft_sync_login", tenant]
 
         new_value = expiry = nil
         result = Rails.cache.fetch(
@@ -93,8 +93,8 @@ module MicrosoftSync
           race_condition_ttl: CACHE_RACE_CONDITION_TTL
         ) do
           response = new_token(tenant)
-          expiry = response['expires_in']&.seconds
-          new_value = response['access_token']
+          expiry = response["expires_in"]&.seconds
+          new_value = response["access_token"]
         end
 
         # If we just got a new token, update the expiry with what Microsoft
@@ -112,18 +112,18 @@ module MicrosoftSync
       end
 
       def client_id
-        settings['client-id']
+        settings["client-id"]
       end
 
       private
 
       def settings
-        DynamicSettings.find('microsoft-sync') or
-          raise ArgumentError, 'MicrosoftSync not configured'
+        DynamicSettings.find("microsoft-sync") or
+          raise ArgumentError, "MicrosoftSync not configured"
       end
 
       def client_secret
-        settings['client-secret']
+        settings["client-secret"]
       end
     end
   end

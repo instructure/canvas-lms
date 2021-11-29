@@ -43,6 +43,7 @@ ready(() => {
         parentSupportEnabled={ENV.FEATURES?.k5_parent_support}
         observerList={ENV.OBSERVER_LIST}
         canAddObservee={ENV.CAN_ADD_OBSERVEE}
+        openTodosInNewTab={ENV.OPEN_TEACHER_TODOS_IN_NEW_TAB}
       />,
       dashboardContainer
     )

@@ -25,18 +25,18 @@ module Types
   ].freeze
 
   class MediaType < Types::BaseEnum
-    graphql_name 'MediaType'
+    graphql_name "MediaType"
 
     VALID_MEDIA_TYPES.each { |type| value(type) }
   end
 
   class MediaObjectType < ApplicationObjectType
-    graphql_name 'MediaObject'
+    graphql_name "MediaObject"
 
     implements GraphQL::Types::Relay::Node
 
     global_id_field :id
-    field :_id, ID, 'legacy canvas id', null: false, method: :media_id
+    field :_id, ID, "legacy canvas id", null: false, method: :media_id
 
     field :can_add_captions, Boolean, null: true
     def can_add_captions

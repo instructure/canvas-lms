@@ -29,7 +29,7 @@ environment_configuration(defined?(config) && config) do |config|
   config.action_controller.perform_caching = true
 
   # run rake js:build to build the optimized JS if set to true
-  ENV['USE_OPTIMIZED_JS'] = "true"
+  ENV["USE_OPTIMIZED_JS"] = "true"
 
   # Specifies the header that your web server uses for directly sending files
   # If you have mod_xsendfile enabled in apache:
@@ -70,5 +70,5 @@ environment_configuration(defined?(config) && config) do |config|
   config.eager_load = true
 
   # eval <env>-local.rb if it exists
-  Dir[File.dirname(__FILE__) + "/" + File.basename(__FILE__, ".rb") + "-*.rb"].each { |localfile| eval(File.new(localfile).read, nil, localfile, 1) }
+  Dir[File.dirname(__FILE__) + "/" + File.basename(__FILE__, ".rb") + "-*.rb"].each { |localfile| eval(File.new(localfile).read, nil, localfile, 1) } # rubocop:disable Security/Eval
 end

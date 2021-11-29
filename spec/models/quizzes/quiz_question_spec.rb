@@ -20,12 +20,12 @@
 
 describe Quizzes::QuizQuestion do
   it "deserializes its json data" do
-    answers = [{ 'id' => 1 }, { 'id' => 2 }]
-    qd = { 'name' => 'test question', 'question_type' => 'multiple_choice_question', 'answers' => answers }
+    answers = [{ "id" => 1 }, { "id" => 2 }]
+    qd = { "name" => "test question", "question_type" => "multiple_choice_question", "answers" => answers }
     course_factory
     bank = @course.assessment_question_banks.create!
     a = bank.assessment_questions.create!
-    q = Quizzes::QuizQuestion.create(:question_data => qd, :assessment_question => a)
+    q = Quizzes::QuizQuestion.create(question_data: qd, assessment_question: a)
     expect(q.question_data).not_to be_nil
     expect(q.question_data.class).to eq Quizzes::QuizQuestion::QuestionData
     expect(q.assessment_question_id).to eql(a.id)
@@ -41,20 +41,20 @@ describe Quizzes::QuizQuestion do
 
   context "blank answers for fill_in[_multiple]_blank[s] questions" do
     before :once do
-      answers = [{ "answer_text" => "True", 'id' => 1, }, { 'id' => 2, "answer_text" => "" }]
+      answers = [{ "answer_text" => "True", "id" => 1, }, { "id" => 2, "answer_text" => "" }]
       course_with_teacher
 
       @quiz = @course.quizzes.create
-      @short_answer_data = { :question_name => 'test question',
-                             :points_possible => '1',
-                             :question_type => 'short_answer_question',
-                             :answers => answers }
-      @question = @quiz.quiz_questions.create(:question_data => @short_answer_data)
+      @short_answer_data = { question_name: "test question",
+                             points_possible: "1",
+                             question_type: "short_answer_question",
+                             answers: answers }
+      @question = @quiz.quiz_questions.create(question_data: @short_answer_data)
     end
 
     it "clears blanks before saving" do
       expect(@question.question_data.answers.size).to eq 1
-      expect(@question.question_data.answers.first['text']).to eq @short_answer_data[:answers].first["answer_text"]
+      expect(@question.question_data.answers.first["text"]).to eq @short_answer_data[:answers].first["answer_text"]
     end
   end
 
@@ -64,28 +64,28 @@ describe Quizzes::QuizQuestion do
 
       @quiz = @course.quizzes.create
 
-      @data = { :question_name => 'test question',
-                :points_possible => '1',
-                :question_type => 'multiple_choice_question',
-                :answers => [{ 'answer_text' => '1', 'id' => 1 },
-                             { 'answer_text' => '2', 'id' => 2 },
-                             { 'answer_text' => '3', 'id' => 3 },
-                             { 'answer_text' => '4', 'id' => 4 }] }
+      @data = { question_name: "test question",
+                points_possible: "1",
+                question_type: "multiple_choice_question",
+                answers: [{ "answer_text" => "1", "id" => 1 },
+                          { "answer_text" => "2", "id" => 2 },
+                          { "answer_text" => "3", "id" => 3 },
+                          { "answer_text" => "4", "id" => 4 }] }
 
-      @question = @quiz.quiz_questions.create(:question_data => @data)
+      @question = @quiz.quiz_questions.create(question_data: @data)
     end
 
     it "saves regrade if passed in regrade option in data hash" do
       expect(Quizzes::QuizQuestionRegrade.first).to be_nil
 
       Quizzes::QuizRegrade.create(quiz_id: @quiz.id, user_id: @user.id, quiz_version: @quiz.version_number)
-      @question.question_data = @data.merge(:regrade_option => 'full_credit',
-                                            :regrade_user => @user)
+      @question.question_data = @data.merge(regrade_option: "full_credit",
+                                            regrade_user: @user)
       @question.save
 
       question_regrade = Quizzes::QuizQuestionRegrade.first
       expect(question_regrade).to be
-      expect(question_regrade.regrade_option).to eq 'full_credit'
+      expect(question_regrade.regrade_option).to eq "full_credit"
     end
 
     it "sanitizes all the html" do
@@ -116,33 +116,33 @@ describe Quizzes::QuizQuestion do
           }
         ]
       }
-      qq = @quiz.quiz_questions.create(:question_data => question_data)
-      expect(qq.question_data['correct_comments_html']).not_to include('onerror')
-      expect(qq.question_data['incorrect_comments_html']).not_to include('onerror')
-      expect(qq.question_data['neutral_comments_html']).not_to include('onerror')
-      expect(qq.question_data['question_text']).not_to include('onerror')
-      expect(qq.question_data['answers'][0]['html']).not_to include('onerror')
-      expect(qq.question_data['answers'][0]['comments_html']).not_to include('onerror')
-      expect(qq.question_data['answers'][1]['html']).not_to include('onerror')
-      expect(qq.question_data['answers'][1]['comments_html']).not_to include('onerror')
+      qq = @quiz.quiz_questions.create(question_data: question_data)
+      expect(qq.question_data["correct_comments_html"]).not_to include("onerror")
+      expect(qq.question_data["incorrect_comments_html"]).not_to include("onerror")
+      expect(qq.question_data["neutral_comments_html"]).not_to include("onerror")
+      expect(qq.question_data["question_text"]).not_to include("onerror")
+      expect(qq.question_data["answers"][0]["html"]).not_to include("onerror")
+      expect(qq.question_data["answers"][0]["comments_html"]).not_to include("onerror")
+      expect(qq.question_data["answers"][1]["html"]).not_to include("onerror")
+      expect(qq.question_data["answers"][1]["comments_html"]).not_to include("onerror")
     end
   end
 
   describe ".update_all_positions" do
     def question_positions(object)
-      object.quiz_questions.active.sort_by { |q| q.position }.map { |q| q.id }
+      object.quiz_questions.active.sort_by(&:position).map(&:id)
     end
 
     before :once do
       course_factory
-      @quiz = @course.quizzes.create!(:title => "some quiz")
-      @question1 = @quiz.quiz_questions.create!(:question_data => { 'name' => 'test question 1', 'answers' => [{ 'id' => 1 }, { 'id' => 2 }] })
-      @question2 = @quiz.quiz_questions.create!(:question_data => { 'name' => 'test question 2', 'answers' => [{ 'id' => 3 }, { 'id' => 4 }] })
-      @question3 = @quiz.quiz_questions.create!(:question_data => { 'name' => 'test question 3', 'answers' => [{ 'id' => 5 }, { 'id' => 6 }] })
+      @quiz = @course.quizzes.create!(title: "some quiz")
+      @question1 = @quiz.quiz_questions.create!(question_data: { "name" => "test question 1", "answers" => [{ "id" => 1 }, { "id" => 2 }] })
+      @question2 = @quiz.quiz_questions.create!(question_data: { "name" => "test question 2", "answers" => [{ "id" => 3 }, { "id" => 4 }] })
+      @question3 = @quiz.quiz_questions.create!(question_data: { "name" => "test question 3", "answers" => [{ "id" => 5 }, { "id" => 6 }] })
     end
 
     it "noops if list of items is empty" do
-      group = @quiz.quiz_groups.create(:name => "question group")
+      group = @quiz.quiz_groups.create(name: "question group")
       group.quiz_questions = [@question1, @question2, @question3]
       before = question_positions(group)
 
@@ -151,7 +151,7 @@ describe Quizzes::QuizQuestion do
     end
 
     it "updates positions for quiz questions within a group" do
-      group = @quiz.quiz_groups.create(:name => "question group")
+      group = @quiz.quiz_groups.create(name: "question group")
       group.quiz_questions = [@question1, @question2, @question3]
 
       @question3.position = 1
@@ -163,7 +163,7 @@ describe Quizzes::QuizQuestion do
     end
 
     it "updates positions for quiz questions outside a group" do
-      group = @quiz.quiz_groups.create(:name => "question group")
+      group = @quiz.quiz_groups.create(name: "question group")
       group.quiz_questions = [@question1, @question2]
 
       @question3.position = 1
@@ -198,7 +198,7 @@ describe Quizzes::QuizQuestion do
     end
   end
 
-  context 'root_account_id' do
+  context "root_account_id" do
     before { quiz_with_graded_submission([]) }
 
     it "uses root_account value from account" do

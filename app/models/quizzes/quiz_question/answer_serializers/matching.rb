@@ -43,7 +43,7 @@ module Quizzes::QuizQuestion::AnswerSerializers
       rc = SerializedAnswer.new
 
       unless pairings.is_a?(Array)
-        return rc.reject :invalid_type, 'answer', Array
+        return rc.reject :invalid_type, "answer", Array
       end
 
       pairings.each_with_index do |entry, index|
@@ -54,7 +54,7 @@ module Quizzes::QuizQuestion::AnswerSerializers
         entry = entry.with_indifferent_access
 
         %w[answer_id match_id].each do |required_param|
-          unless entry.has_key?(required_param)
+          unless entry.key?(required_param)
             return rc.reject 'Matching pair is missing parameter "%s"' % [
               required_param
             ]
@@ -64,7 +64,7 @@ module Quizzes::QuizQuestion::AnswerSerializers
         answer_id = Util.to_integer(entry[:answer_id])
 
         if answer_id.nil?
-          return rc.reject :invalid_type, 'answer_id', Integer
+          return rc.reject :invalid_type, "answer_id", Integer
         end
 
         unless answer_available? answer_id
@@ -74,7 +74,7 @@ module Quizzes::QuizQuestion::AnswerSerializers
         match_id = Util.to_integer(entry[:match_id])
 
         if match_id.nil?
-          return rc.reject :invalid_type, 'match_id', Integer
+          return rc.reject :invalid_type, "match_id", Integer
         end
 
         unless match_available? match_id
@@ -103,19 +103,19 @@ module Quizzes::QuizQuestion::AnswerSerializers
         match_id = submission_data[answer_key] # this is always a string
         has_match = match_id.present?
 
-        if has_match || full
-          out << {
-            answer_id: answer_id.to_s,
-            match_id: has_match ? match_id : nil
-          }.with_indifferent_access
-        end
+        next unless has_match || full
+
+        out << {
+          answer_id: answer_id.to_s,
+          match_id: has_match ? match_id : nil
+        }.with_indifferent_access
       end
     end
 
     private
 
     def build_answer_key(answer_id)
-      [question_key, 'answer', answer_id].join('_')
+      [question_key, "answer", answer_id].join("_")
     end
 
     def match_ids

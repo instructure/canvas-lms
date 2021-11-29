@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative 'boot'
+require_relative "boot"
 
 require "active_record/railtie"
 require "action_controller/railtie"
@@ -46,8 +46,8 @@ unless defined?(CANVAS_ZEITWERK)
   # choose to force zeitwerk on
   # unless overridden with
   # an env var or file
-  CANVAS_ZEITWERK = if ENV['CANVAS_ZEITWERK']
-                      (ENV['CANVAS_ZEITWERK'] == '1')
+  CANVAS_ZEITWERK = if ENV["CANVAS_ZEITWERK"]
+                      (ENV["CANVAS_ZEITWERK"] == "1")
                     elsif Rails.root && (zw_settings = ConfigFile.load("zeitwerk"))
                       zw_settings["enabled"]
                     else
@@ -74,15 +74,15 @@ module CanvasRails
     end
 
     $LOAD_PATH << config.root.to_s
-    config.encoding = 'utf-8'
-    require 'logging_filter'
+    config.encoding = "utf-8"
+    require "logging_filter"
     config.filter_parameters.concat LoggingFilter.filtered_parameters
-    config.action_dispatch.rescue_responses['AuthenticationMethods::AccessTokenError'] = 401
-    config.action_dispatch.rescue_responses['AuthenticationMethods::AccessTokenScopeError'] = 401
-    config.action_dispatch.rescue_responses['AuthenticationMethods::LoggedOutError'] = 401
-    config.action_dispatch.rescue_responses['CanvasHttp::CircuitBreakerError'] = 502
-    config.action_dispatch.default_headers.delete('X-Frame-Options')
-    config.action_dispatch.default_headers['Referrer-Policy'] = 'no-referrer-when-downgrade'
+    config.action_dispatch.rescue_responses["AuthenticationMethods::AccessTokenError"] = 401
+    config.action_dispatch.rescue_responses["AuthenticationMethods::AccessTokenScopeError"] = 401
+    config.action_dispatch.rescue_responses["AuthenticationMethods::LoggedOutError"] = 401
+    config.action_dispatch.rescue_responses["CanvasHttp::CircuitBreakerError"] = 502
+    config.action_dispatch.default_headers.delete("X-Frame-Options")
+    config.action_dispatch.default_headers["Referrer-Policy"] = "no-referrer-when-downgrade"
     config.action_controller.forgery_protection_origin_check = true
     ActiveSupport.to_time_preserves_timezone = true
 
@@ -100,68 +100,68 @@ module CanvasRails
     # Make Time.zone default to the specified zone, and make Active Record store time values
     # in the database in UTC, and return them converted to the specified local zone.
     # Run "rake -D time" for a list of tasks for finding time zone names. Comment line to use default local time.
-    config.time_zone = 'UTC'
+    config.time_zone = "UTC"
 
-    log_config = File.exist?(Rails.root + 'config/logging.yml') && Rails.application.config_for(:logging).with_indifferent_access
-    log_config = { 'logger' => 'rails', 'log_level' => 'debug' }.merge(log_config || {})
+    log_config = Rails.root.join("config/logging.yml").file? && Rails.application.config_for(:logging).with_indifferent_access
+    log_config = { "logger" => "rails", "log_level" => "debug" }.merge(log_config || {})
     opts = {}
-    require 'canvas_logger'
+    require "canvas_logger"
 
-    config.log_level = log_config['log_level']
+    config.log_level = log_config["log_level"]
     log_level = ActiveSupport::Logger.const_get(config.log_level.to_s.upcase)
-    opts[:skip_thread_context] = true if log_config['log_context'] == false
+    opts[:skip_thread_context] = true if log_config["log_context"] == false
 
     case log_config["logger"]
     when "syslog"
-      require 'syslog_wrapper'
+      require "syslog_wrapper"
       log_config["app_ident"] ||= "canvas-lms"
       log_config["daemon_ident"] ||= "canvas-lms-daemon"
       facilities = 0
       (log_config["facilities"] || []).each do |facility|
         facilities |= Syslog.const_get "LOG_#{facility.to_s.upcase}"
       end
-      ident = ENV['RUNNING_AS_DAEMON'] == 'true' ? log_config["daemon_ident"] : log_config["app_ident"]
+      ident = ENV["RUNNING_AS_DAEMON"] == "true" ? log_config["daemon_ident"] : log_config["app_ident"]
       opts[:include_pid] = true if log_config["include_pid"] == true
       config.logger = SyslogWrapper.new(ident, facilities, opts)
       config.logger.level = log_level
     else
-      log_path = config.paths['log'].first
+      log_path = config.paths["log"].first
 
-      if ENV['RUNNING_AS_DAEMON'] == 'true'
-        log_path = Rails.root + 'log/delayed_job.log'
+      if ENV["RUNNING_AS_DAEMON"] == "true"
+        log_path = Rails.root.join("log/delayed_job.log")
       end
 
       config.logger = CanvasLogger.new(log_path, log_level, opts)
     end
 
     # Activate observers that should always be running
-    config.active_record.observers = [:cacher, :stream_item_cache, :live_events_observer]
+    config.active_record.observers = %i[cacher stream_item_cache live_events_observer]
     config.active_record.allow_unsafe_raw_sql = :disabled
 
     config.active_support.encode_big_decimal_as_string = false
 
-    config.paths['lib'].eager_load!
-    config.paths.add('app/middleware', eager_load: true, autoload_once: true)
+    config.paths["lib"].eager_load!
+    config.paths.add("app/middleware", eager_load: true, autoload_once: true)
 
     # prevent directory->module inference in these directories from wreaking
     # havoc on the app (e.g. stylesheets/base -> ::Base)
-    config.eager_load_paths -= %W(#{Rails.root}/app/coffeescripts
-                                  #{Rails.root}/app/stylesheets
-                                  #{Rails.root}/ui)
+    config.eager_load_paths -= [Rails.root.join("app/coffeescripts"),
+                                Rails.root.join("app/stylesheets"),
+                                Rails.root.join("ui")]
 
     config.middleware.use Rack::Chunked
-    config.middleware.use Rack::Deflater, if: ->(*) {
+    config.middleware.use Rack::Deflater, if: lambda { |*|
       ::Canvas::DynamicSettings.find(tree: :private)["enable_rack_deflation", failsafe: true]
     }
-    config.middleware.use Rack::Brotli, if: ->(*) {
+    config.middleware.use Rack::Brotli, if: lambda { |*|
       ::Canvas::DynamicSettings.find(tree: :private)["enable_rack_brotli", failsafe: true]
     }
 
-    config.i18n.load_path << Rails.root.join('config', 'locales', 'locales.yml')
-    config.i18n.load_path << Rails.root.join('config', 'locales', 'community.csv')
+    config.i18n.load_path << Rails.root.join("config/locales/locales.yml")
+    config.i18n.load_path << Rails.root.join("config/locales/community.csv")
 
     config.to_prepare do
-      require_dependency 'canvas/plugins/default_plugins'
+      require_dependency "canvas/plugins/default_plugins"
       Canvas::Plugins::DefaultPlugins.apply_all
       ActiveSupport::JSON::Encoding.escape_html_entities_in_json = true
     end
@@ -203,12 +203,12 @@ module CanvasRails
 
           configure_connection
 
-          raise "Canvas requires PostgreSQL 12 or newer" unless postgresql_version >= 12_00_00
+          raise "Canvas requires PostgreSQL 12 or newer" unless postgresql_version >= 12_00_00 # rubocop:disable Style/NumericLiterals
 
           break
-        rescue ::PG::Error => error
-          if error.message.include?("does not exist")
-            raise ActiveRecord::NoDatabaseError.new(error.message)
+        rescue ::PG::Error => e
+          if e.message.include?("does not exist")
+            raise ActiveRecord::NoDatabaseError, e.message
           elsif index == hosts.length - 1
             raise
           end
@@ -220,7 +220,7 @@ module CanvasRails
     module TypeMapInitializerExtensions
       def query_conditions_for_initial_load
         known_type_names = @store.keys.map { |n| "'#{n}'" } + @store.keys.map { |n| "'_#{n}'" }
-        <<~SQL % [known_type_names.join(", "),]
+        <<~SQL.squish % [known_type_names.join(", "),]
           WHERE
             t.typname IN (%s)
         SQL
@@ -253,11 +253,8 @@ module CanvasRails
 
     Autoextend.hook(:"Thor::Option", PatchThorWarning, method: :prepend)
 
-    # Extend any base classes, even gem classes
-    Dir.glob("#{Rails.root}/lib/ext/**/*.rb").sort.each { |file| require file }
-
     # tell Rails to use the native XML parser instead of REXML
-    ActiveSupport::XmlMini.backend = 'Nokogiri'
+    ActiveSupport::XmlMini.backend = "Nokogiri"
 
     class NotImplemented < StandardError; end
 
@@ -285,7 +282,7 @@ module CanvasRails
       def call(env)
         req = ActionDispatch::Request.new(env)
         res = ApplicationController.make_response!(req)
-        ApplicationController.dispatch('rescue_action_dispatch_exception', req, res)
+        ApplicationController.dispatch("rescue_action_dispatch_exception", req, res)
       end
     end
 
@@ -306,8 +303,7 @@ module CanvasRails
     end
 
     class DummyKeyGenerator
-      def self.generate_key(*)
-      end
+      def self.generate_key(*); end
     end
 
     def key_generator
@@ -323,7 +319,7 @@ module CanvasRails
         # and these resources actually aren't even on disk in those cases.
         # do not remove this conditional until the asset build no longer
         # needs the rails app for anything.
-        require_dependency 'canvas/dynamic_settings'
+        require_dependency "canvas/dynamic_settings"
         Canvas::DynamicSettingsInitializer.bootstrap!
       end
     end
@@ -344,7 +340,7 @@ module CanvasRails
     initializer "canvas.init_credentials", before: "active_record.initialize_database" do
       self.credentials = Canvas::Credentials.new(credentials)
       # Ensure we load credentials at initailization time to avoid overloading vault
-      self.credentials.config
+      credentials.config
     end
 
     # we don't know what middleware to make SessionsTimeout follow until after

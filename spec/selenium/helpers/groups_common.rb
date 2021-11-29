@@ -25,17 +25,17 @@ module GroupsCommon
   module ClassMethods
     def setup_group_page_urls
       let(:url) { "/groups/#{@testgroup.first.id}" }
-      let(:announcements_page) { url + '/announcements' }
-      let(:people_page) { url + '/users' }
-      let(:discussions_page) { url + '/discussion_topics' }
-      let(:pages_page) { url + '/pages' }
-      let(:files_page) { url + '/files' }
-      let(:conferences_page) { url + '/conferences' }
-      let(:collaborations_page) { url + '/collaborations' }
+      let(:announcements_page) { url + "/announcements" }
+      let(:people_page) { url + "/users" }
+      let(:discussions_page) { url + "/discussion_topics" }
+      let(:pages_page) { url + "/pages" }
+      let(:files_page) { url + "/files" }
+      let(:conferences_page) { url + "/conferences" }
+      let(:collaborations_page) { url + "/collaborations" }
     end
   end
 
-  def seed_students(count, base_name = 'Test Student')
+  def seed_students(count, base_name = "Test Student")
     @students = create_users_in_course(@course, count, return_type: :record, name_prefix: base_name)
   end
 
@@ -44,10 +44,10 @@ module GroupsCommon
     @group_category = []
     @testgroup = []
     groupset_count.times do |n|
-      @group_category << @course.group_categories.create!(:name => "Test Group Set #{n + 1}")
+      @group_category << @course.group_categories.create!(name: "Test Group Set #{n + 1}")
 
       groups_per_set.times do |i|
-        @testgroup << @course.groups.create!(:name => "Test Group #{i + 1}", :group_category => @group_category[n])
+        @testgroup << @course.groups.create!(name: "Test Group #{i + 1}", group_category: @group_category[n])
       end
     end
   end
@@ -75,7 +75,7 @@ module GroupsCommon
 
   def create_default_student_group(group_name = "Windfury")
     fj("#groupName").send_keys(group_name.to_s)
-    fj('button.confirm-dialog-confirm-btn').click
+    fj("button.confirm-dialog-confirm-btn").click
     wait_for_ajaximations
   end
 
@@ -83,13 +83,13 @@ module GroupsCommon
     fj("#groupName").send_keys(group_name.to_s)
     students = ffj(".checkbox")
     students.each(&:click)
-    fj('button.confirm-dialog-confirm-btn').click
+    fj("button.confirm-dialog-confirm-btn").click
     wait_for_ajaximations
   end
 
   def create_category(params = {})
     default_params = {
-      category_name: 'category1',
+      category_name: "category1",
       has_max_membership: false,
       member_limit: 0,
     }
@@ -106,11 +106,11 @@ module GroupsCommon
 
   def create_group(params = {})
     default_params = {
-      group_name: 'Windfury',
+      group_name: "Windfury",
       enroll_student_count: 0,
       add_self_to_group: true,
-      category_name: 'category1',
-      is_leader: 'true',
+      category_name: "category1",
+      is_leader: "true",
       has_max_membership: false,
       member_limit: 0,
       group_category: nil,
@@ -145,14 +145,14 @@ module GroupsCommon
   end
 
   def create_student_group_as_a_teacher(group_name = "Windfury", enroll_student_count = 0)
-    @student = User.create!(:name => "Test Student 1")
+    @student = User.create!(name: "Test Student 1")
     @course.enroll_student(@student).accept!
 
-    group = @course.groups.create!(:name => group_name)
+    group = @course.groups.create!(name: group_name)
     add_user_to_group(@student, group, false)
 
     enroll_student_count.times do |n|
-      @student = User.create!(:name => "Test Student #{n + 2}")
+      @student = User.create!(name: "Test Student #{n + 2}")
       @course.enroll_student(@student).accept!
 
       add_user_to_group(@student, group, false)
@@ -163,17 +163,17 @@ module GroupsCommon
 
   def manually_create_group(params = {})
     default_params = {
-      group_name: 'Test Group',
+      group_name: "Test Group",
       has_max_membership: false,
       member_limit: 0,
     }
     params = default_params.merge(params)
 
-    f('.btn.add-group').click
+    f(".btn.add-group").click
     wait_for_ajaximations
-    f('#group_name').send_keys(params[:group_name])
+    f("#group_name").send_keys(params[:group_name])
     if params[:has_max_membership]
-      f('#group_max_membership').send_keys(params[:member_limit])
+      f("#group_max_membership").send_keys(params[:member_limit])
       wait_for_ajaximations
     end
     submit_form("span[aria-label='Add Group']")
@@ -184,100 +184,103 @@ module GroupsCommon
   def manually_set_groupset_limit(member_limit = "2")
     replace_content(fj('input[name="group_limit"]:visible'), member_limit)
     scroll_page_to_bottom
-    fj('.btn.btn-primary[type=submit]').click
+    fj(".btn.btn-primary[type=submit]").click
     wait_for_ajaximations
   end
 
   def manually_fill_limited_group(member_limit = "2", student_count = 0)
     student_count.times do |n|
-      f('.assign-to-group').click
-      f('.set-group').click
-      expect(f('.group-summary')).to include_text("#{n + 1} / #{member_limit} students")
+      f(".assign-to-group").click
+      f(".set-group").click
+      expect(f(".group-summary")).to include_text("#{n + 1} / #{member_limit} students")
       # make sure the popover is gone; it takes 100ms, and its on('close') -> focus can mess up the next click
-      expect(f('body')).not_to contain_css('.set-group')
+      expect(f("body")).not_to contain_css(".set-group")
     end
-    expect(f('.show-group-full')).to be_displayed
+    expect(f(".show-group-full")).to be_displayed
   end
 
   # Used to enable self-signup on an already created group set by opening Edit Group Set
   def manually_enable_self_signup
-    f('.icon-more').click
+    f(".icon-more").click
     wait_for_ajaximations
-    f('.edit-category').click
+    f(".edit-category").click
     wait_for_ajaximations
 
-    f('.self-signup-toggle').click
+    f(".self-signup-toggle").click
   end
 
   def open_clone_group_set_option
-    move_to_click('.icon-more')
+    move_to_click(".icon-more")
     wait_for_ajaximations
-    move_to_click('.clone-category')
+    move_to_click(".clone-category")
     wait_for_ajaximations
   end
 
   def set_cloned_groupset_name(groupset_name = "Test Group Set Clone", page_reload = false)
-    replace_content(f('#cloned_category_name'), groupset_name)
+    replace_content(f("#cloned_category_name"), groupset_name)
     if page_reload
-      expect_new_page_load { f('#clone_category_submit_button').click }
+      expect_new_page_load { f("#clone_category_submit_button").click }
     else
-      f('#clone_category_submit_button').click
+      f("#clone_category_submit_button").click
       wait_for_ajaximations
     end
   end
 
   def select_randomly_assign_students_option
-    f('.group-category-summary .icon-more').click
+    f(".group-category-summary .icon-more").click
     wait_for_ajaximations
-    f('.randomly-assign-members').click
+    f(".randomly-assign-members").click
     wait_for_ajaximations
-    f('.randomly-assign-members-confirm').click
+    f(".randomly-assign-members-confirm").click
     wait_for_ajaximations
   end
 
   def select_change_groups_option
-    ff('#option_change_groups').last.click
-    ff('#clone_category_submit_button').last.click
+    ff("#option_change_groups").last.click
+    ff("#clone_category_submit_button").last.click
     wait_for_ajaximations
   end
 
   def move_unassigned_student_to_group(group = 0)
-    f('.assign-to-group').click
+    f(".assign-to-group").click
     wait_for_ajaximations
-    ff('.set-group')[group].click
+    ff(".set-group")[group].click
     wait_for_ajaximations
   end
 
   # Moves student from one group to another group. Assumes student can be seen by toggling group's collapse arrow.
   def move_student_to_group(group_destination, student = 0)
-    ff('.group-user-actions')[student].click
+    ff(".group-user-actions")[student].click
     wait_for(method: nil, timeout: 1) { f(".ui-menu-item .edit-group-assignment").displayed? }
-    ff('.edit-group-assignment')[student].click
+    ff(".edit-group-assignment")[student].click
     wait_for(method: nil, timeout: 2) { fxpath("//*[@data-cid='Tray']//*[@role='dialog']").displayed? }
-    click_option('.move-select .move-select__group select', @testgroup[group_destination].name)
+    click_option(".move-select .move-select__group select", @testgroup[group_destination].name)
     wait_for_animations
     button = f('.move-select button[type="submit"]')
-    keep_trying_until { button.click; true }
+    keep_trying_until do
+      button.click
+      true
+    end
     wait_for_ajaximations
   end
 
   # Assumes student can be seen by toggling group's collapse arrow
   def remove_student_from_group(student = 0)
-    ff('.group-user-actions')[student].click
+    ff(".group-user-actions")[student].click
     wait_for_ajaximations
-    ff('.remove-from-group')[student].click
+    ff(".remove-from-group")[student].click
     wait_for_ajaximations
   end
 
   def toggle_group_collapse_arrow
-    f('.toggle-group').click
+    f(".toggle-group").click
     wait_for_ajaximations
   end
 
   def manually_delete_group
-    f('.group-actions .icon-more').click
-    wait_for(method: nil, timeout: 1) { f('.delete-group').displayed? }
-    f('.delete-group').click
+    f(".group-actions .icon-more").click
+    wait_for(method: nil, timeout: 1) { f(".delete-group").displayed? }
+    f(".delete-group").click
 
     accept_alert
     wait_for_animations
@@ -287,7 +290,7 @@ module GroupsCommon
     f(".icon-more").click
     wait_for_animations
 
-    fln('Delete').click
+    fln("Delete").click
 
     accept_alert
     wait_for_animations
@@ -295,20 +298,20 @@ module GroupsCommon
 
   # Only use to add group_set if no group sets already exist
   def click_add_group_set
-    f('#add-group-set').click
+    f("#add-group-set").click
     wait_for_ajaximations
   end
 
   def save_group_set
-    move_to_click('#newGroupSubmitButton')
+    move_to_click("#newGroupSubmitButton")
     wait_for_ajaximations
   end
 
   def create_and_submit_assignment_from_group(student)
     category = @group_category[0]
     assignment = @course.assignments.create({
-                                              :name => "test assignment",
-                                              :group_category => category
+                                              name: "test assignment",
+                                              group_category: category
                                             })
     a = Attachment.create! context: student,
                            filename: "homework.pdf",
@@ -319,10 +322,10 @@ module GroupsCommon
 
   def create_group_announcement_manually(title, text)
     get announcements_page
-    expect_new_page_load { f('.btn-primary').click }
-    replace_content(f('input[name=title]'), title)
-    type_in_tiny('textarea[name=message]', text)
-    expect_new_page_load { submit_form('.form-actions') }
+    expect_new_page_load { f(".btn-primary").click }
+    replace_content(f("input[name=title]"), title)
+    type_in_tiny("textarea[name=message]", text)
+    expect_new_page_load { submit_form(".form-actions") }
     get announcements_page
   end
 
@@ -330,22 +333,22 @@ module GroupsCommon
   # Expects @page is defined and index is defined as which wiki page is desired to click on. First page entry is default
   def verify_member_sees_group_page(index = 0)
     get pages_page
-    expect_new_page_load { ff('.wiki-page-link')[index].click }
-    expect(f('.page-title')).to include_text(@page.title)
+    expect_new_page_load { ff(".wiki-page-link")[index].click }
+    expect(f(".page-title")).to include_text(@page.title)
   end
 
   # context test. if true, allows you to test files both in and out of group context,
   #   otherwise it adds two files to the group
   def add_test_files(context_test = true)
-    if context_test
-      second_file_context = @course
-    else
-      second_file_context = @testgroup.first
-    end
+    second_file_context = if context_test
+                            @course
+                          else
+                            @testgroup.first
+                          end
 
-    add_file(fixture_file_upload('files/example.pdf', 'application/pdf'),
+    add_file(fixture_file_upload("files/example.pdf", "application/pdf"),
              @testgroup.first, "example.pdf")
-    add_file(fixture_file_upload('files/a_file.txt', 'text/plain'),
+    add_file(fixture_file_upload("files/a_file.txt", "text/plain"),
              second_file_context, "a_file.txt")
   end
 
@@ -358,19 +361,19 @@ module GroupsCommon
   def move_file_to_folder(file_name, destination_name)
     move(file_name, 1, :toolbar_menu)
     wait_for_ajaximations
-    expect(f('#flash_message_holder').text).to eq "#{file_name} moved to #{destination_name}"
+    expect(f("#flash_message_holder").text).to eq "#{file_name} moved to #{destination_name}"
     # Click folder
-    ff('.ef-name-col__text').first.click
+    ff(".ef-name-col__text").first.click
     wait_for_ajaximations
     expect(fln(file_name)).to be_displayed
   end
 
   # For files page, creates a folder and then adds a folder within it
   def create_folder_structure
-    @top_folder = 'Top Folder'
-    @inner_folder = 'Inner Folder'
+    @top_folder = "Top Folder"
+    @inner_folder = "Inner Folder"
     add_folder(@top_folder)
-    ff('.ef-name-col__text')[0].click
+    ff(".ef-name-col__text")[0].click
     wait_for_ajaximations
     add_folder(@inner_folder)
     wait_for_ajaximations
@@ -380,22 +383,22 @@ module GroupsCommon
   def move_folder(folder_name)
     move(folder_name, 0, :toolbar_menu)
     wait_for_ajaximations
-    expect(f('#flash_message_holder').text).to eq "#{folder_name} moved to files"
-    expect(ff('.treeLabel span')[2].text).to eq folder_name
+    expect(f("#flash_message_holder").text).to eq "#{folder_name} moved to files"
+    expect(ff(".treeLabel span")[2].text).to eq folder_name
   end
 
   def verify_no_course_user_access(path)
     # User.create! creates a course user, who won't be able to access the page
-    user_session(User.create!(name: 'course student'))
+    user_session(User.create!(name: "course student"))
     get path
-    expect(f('#unauthorized_message')).to be_displayed
+    expect(f("#unauthorized_message")).to be_displayed
   end
 
   def edit_group_announcement
     get announcements_page
-    expect_new_page_load { ff('li.discussion-topic').first.click }
+    expect_new_page_load { ff("li.discussion-topic").first.click }
     click_edit_btn
     # edit also verifies it has been edited
-    edit('I edited it', 'My test message')
+    edit("I edited it", "My test message")
   end
 end

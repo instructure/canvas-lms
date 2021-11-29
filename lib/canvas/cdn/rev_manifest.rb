@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'set'
+require "set"
 
 # An interface to the manifest file created by `gulp rev` and webpack
 module Canvas
@@ -59,14 +59,14 @@ module Canvas
         end
 
         def webpack_prod?
-          ENV['USE_OPTIMIZED_JS'] == 'true' || ENV['USE_OPTIMIZED_JS'] == 'True'
+          ENV["USE_OPTIMIZED_JS"] == "true" || ENV["USE_OPTIMIZED_JS"] == "True"
         end
 
         def webpack_dir
           if webpack_prod?
-            'dist/webpack-production'
+            "dist/webpack-production"
           else
-            'dist/webpack-dev'
+            "dist/webpack-dev"
           end
         end
 
@@ -78,7 +78,7 @@ module Canvas
           # source will look something like: "dist/webpack-prod/vendor.js"
           # the manifest looks something like: {"vendor.js" : "vendor-c-d4be58c989364f9fe7db.js", ...}
           # we want to return something like: "/dist/webpack-prod/vendor-c-d4be58c989364f9fe7db.js"
-          key = source.sub(webpack_dir + '/', '')
+          key = source.sub(webpack_dir + "/", "")
           fingerprinted = webpack_manifest[key]
           "/#{webpack_dir}/#{fingerprinted}" if fingerprinted
         end
@@ -90,7 +90,7 @@ module Canvas
 
         def url_for(source)
           # remove the leading slash if there is one
-          source = source.sub(/^\//, '')
+          source = source.sub(%r{^/}, "")
           if webpack_request?(source)
             webpack_url_for(source)
           else
@@ -105,7 +105,7 @@ module Canvas
 
           RequestCache.cache("rev-manifest") do
             benchmark("reading rev-manifest") do
-              file = Rails.root.join('public', 'dist', 'rev-manifest.json')
+              file = Rails.root.join("public/dist/rev-manifest.json")
               if file.exist?
                 Rails.logger.debug "reading rev-manifest.json"
                 @gulp_manifest = JSON.parse(file.read).freeze
@@ -124,7 +124,7 @@ module Canvas
 
           RequestCache.cache("webpack_manifest") do
             benchmark("reading webpack_manifest") do
-              file = Rails.root.join('public', webpack_dir, 'webpack-manifest.json')
+              file = Rails.root.join("public", webpack_dir, "webpack-manifest.json")
               if file.exist?
                 Rails.logger.debug "reading #{file}"
                 @webpack_manifest = JSON.parse(file.read).freeze

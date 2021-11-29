@@ -76,9 +76,9 @@ describe DataFixup::AddPostPoliciesToAssignments do
     end
 
     it "does not update submissions for an assignment that already has a post policy" do
-      expect {
+      expect do
         run_for_submissions
-      }.not_to change {
+      end.not_to change {
         assignment.submission_for_student(student1).reload.updated_at
       }
     end
@@ -87,9 +87,9 @@ describe DataFixup::AddPostPoliciesToAssignments do
       it "does not update the submissions associated with the assignment" do
         assignment.ensure_post_policy(post_manually: true)
 
-        expect {
+        expect do
           run_for_submissions
-        }.not_to change {
+        end.not_to change {
           assignment.submission_for_student(student1).reload.updated_at
         }
       end
@@ -140,9 +140,9 @@ describe DataFixup::AddPostPoliciesToAssignments do
         it "does not update assignments that already have a post policy" do
           assignment.ensure_post_policy(post_manually: true)
 
-          expect {
+          expect do
             run_for_courses
-          }.not_to change {
+          end.not_to change {
             PostPolicy.find_by!(assignment: assignment).updated_at
           }
         end
@@ -162,17 +162,17 @@ describe DataFixup::AddPostPoliciesToAssignments do
       end
 
       it "does not update the course post policy" do
-        expect {
+        expect do
           run_for_courses
-        }.not_to change {
+        end.not_to change {
           PostPolicy.find_by!(course: course, assignment: nil).updated_at
         }
       end
 
       it "does not update assignments within the course" do
-        expect {
+        expect do
           run_for_courses
-        }.not_to change {
+        end.not_to change {
           PostPolicy.find_by!(assignment: assignment).updated_at
         }
       end

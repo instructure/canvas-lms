@@ -25,16 +25,16 @@ describe Quizzes::QuizSubmission::QuestionReferenceDataFixer do
     User.connection.execute "ALTER SEQUENCE public.quiz_questions_id_seq RESTART WITH 2000"
 
     @course = course_model
-    @bank = @course.assessment_question_banks.create!(:title => 'Test Bank')
+    @bank = @course.assessment_question_banks.create!(title: "Test Bank")
     @aq = assessment_question_model({
                                       bank: @bank,
                                       question_data: {
-                                        question_type: 'multiple_choice_question',
-                                        question_text: 'Choose one! (Tip: A might be a good choice!)',
+                                        question_type: "multiple_choice_question",
+                                        question_text: "Choose one! (Tip: A might be a good choice!)",
                                         answers: [
-                                          { id: 1, text: 'A', weight: 100 },
-                                          { id: 2, text: 'B' },
-                                          { id: 3, text: 'C' }
+                                          { id: 1, text: "A", weight: 100 },
+                                          { id: 2, text: "B" },
+                                          { id: 3, text: "C" }
                                         ]
                                       }
                                     })
@@ -61,43 +61,43 @@ describe Quizzes::QuizSubmission::QuestionReferenceDataFixer do
     @quiz.quiz_questions.where(workflow_state: "generated").last
   end
 
-  it 'is a no-op for :settings_only submissions (has no quiz_data)' do
+  it "is a no-op for :settings_only submissions (has no quiz_data)" do
     quiz_submission.quiz_data = nil
     expect(subject.run!(quiz_submission)).to eq(nil)
   end
 
-  it 'is a no-op if the data fix has already been applied' do
+  it "is a no-op if the data fix has already been applied" do
     quiz_submission.quiz_data = []
     quiz_submission.question_references_fixed = true
 
     expect(subject.run!(quiz_submission)).to eq(nil)
   end
 
-  it 'creates missing questions' do
+  it "creates missing questions" do
     expect(subject.run!(quiz_submission)).to eq(true)
 
     expect(@quiz.quiz_questions.count).to eq(2),
-                                          'it implicitly created a QuizQuestion'
+                                          "it implicitly created a QuizQuestion"
 
     expect(generated_quiz_question).to be_present,
                                        'the created QuizQuestion has a workflow state of "generated"'
   end
 
-  it 'updates the IDs in quiz_data to point to newly created questions' do
+  it "updates the IDs in quiz_data to point to newly created questions" do
     expect(subject.run!(quiz_submission)).to eq(true)
     expect(quiz_submission.quiz_data[0][:id])
       .to eq(generated_quiz_question.id)
   end
 
-  context 'with a graded submission' do
-    it 'updates all grading records for affected questions' do
+  context "with a graded submission" do
+    it "updates all grading records for affected questions" do
       quiz_submission.submission_data = [
         {
           question_id: @aq.id,
           correct: true,
           points: 1,
           answer_id: 1,
-          text: 'A'
+          text: "A"
         }
       ]
 
@@ -107,8 +107,8 @@ describe Quizzes::QuizSubmission::QuestionReferenceDataFixer do
     end
   end # context: with a graded submission
 
-  context 'with a graded submission mixed with group and bank questions' do
-    it 'updates submission data to reflect new ids' do
+  context "with a graded submission mixed with group and bank questions" do
+    it "updates submission data to reflect new ids" do
       @quiz.add_assessment_questions([@aq])
 
       quiz_submission.submission_data = [
@@ -117,7 +117,7 @@ describe Quizzes::QuizSubmission::QuestionReferenceDataFixer do
           correct: true,
           points: 1,
           answer_id: 1,
-          text: 'A'
+          text: "A"
         }
       ]
 
@@ -127,7 +127,7 @@ describe Quizzes::QuizSubmission::QuestionReferenceDataFixer do
     end
   end
 
-  context 'with an active submission' do
+  context "with an active submission" do
     def run_with_submission_data(submission_data)
       quiz_submission.submission_data = submission_data
       subject.run!(quiz_submission)
@@ -138,7 +138,7 @@ describe Quizzes::QuizSubmission::QuestionReferenceDataFixer do
     end
 
     # question_xxx => question_yyy
-    it 'updates all answer records for affected questions' do
+    it "updates all answer records for affected questions" do
       run_with_submission_data({
                                  "question_#{@aq.id}" => "2",
                                })
@@ -182,7 +182,7 @@ describe Quizzes::QuizSubmission::QuestionReferenceDataFixer do
                                          })
     end
 
-    it 'does not touch irrelevant records' do
+    it "does not touch irrelevant records" do
       run_with_submission_data({
                                  "question_5" => "don't touch me",
                                  "_question_5_read" => true,
@@ -196,7 +196,7 @@ describe Quizzes::QuizSubmission::QuestionReferenceDataFixer do
                                          })
     end
 
-    context 'OQAAT quizzes' do
+    context "OQAAT quizzes" do
       # next_question_path for OQAAT quizzes needs to be adjusted:
       #   /courses/.../questions/xxx => /courses/.../questions/yyy
       it 'adjusts the "next_question_path" record' do
@@ -209,7 +209,7 @@ describe Quizzes::QuizSubmission::QuestionReferenceDataFixer do
       end
 
       # ... but only if it's our question:
-      it 'does nothing for a QuizQuestion reference' do
+      it "does nothing for a QuizQuestion reference" do
         run_with_submission_data({
                                    "next_question_path" => "/courses/1/quizzes/1/take/questions/#{@qq.assessment_question_id}"
                                  })
@@ -219,7 +219,7 @@ describe Quizzes::QuizSubmission::QuestionReferenceDataFixer do
       end
     end # context: OQAAT quizzes
 
-    context 'OQAAT + CantGoBack quizzes' do
+    context "OQAAT + CantGoBack quizzes" do
       # last_question_id for OQAAT + CantGoBack needs to be adjusted as well:
       it 'adjusts "last_question_id"' do
         run_with_submission_data({
@@ -231,7 +231,7 @@ describe Quizzes::QuizSubmission::QuestionReferenceDataFixer do
                                            })
       end
 
-      it 'does nothing for a QuizQuestion reference' do
+      it "does nothing for a QuizQuestion reference" do
         run_with_submission_data({
                                    "last_question_id" => @qq.assessment_question_id.to_s
                                  })
@@ -241,8 +241,8 @@ describe Quizzes::QuizSubmission::QuestionReferenceDataFixer do
       end
     end # context: OQAAT + CantGoBack quizzes
 
-    context 'with everything put together' do
-      it 'works' do
+    context "with everything put together" do
+      it "works" do
         run_with_submission_data({
                                    "question_#{@aq.id}" => "2",
                                    "question_#{@aq.id}_marked" => true,
@@ -268,8 +268,8 @@ describe Quizzes::QuizSubmission::QuestionReferenceDataFixer do
     end # context: with everything put together
   end # context: with an active submission
 
-  context 'with multiple versions' do
-    it 'fixes previous versions just like the current one' do
+  context "with multiple versions" do
+    it "fixes previous versions just like the current one" do
       # this will be version 1
       quiz_submission.quiz_data = [@aq.data]
       quiz_submission.with_versioning { quiz_submission.save! }
@@ -289,8 +289,8 @@ describe Quizzes::QuizSubmission::QuestionReferenceDataFixer do
     end
   end
 
-  context 'with an existing quiz question' do
-    it 'does not generate another, only link to the existing one' do
+  context "with an existing quiz question" do
+    it "does not generate another, only link to the existing one" do
       @qq2 = @aq.create_quiz_question(@quiz.id)
 
       expect(subject.run!(quiz_submission)).to eq(true)

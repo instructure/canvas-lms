@@ -23,11 +23,11 @@ class RemoveRoleOverridesManageCoursesAdd < ActiveRecord::Migration[6.0]
   def up
     RoleOverride
       .joins(:role)
-      .where(permission: 'manage_courses_add')
+      .where(permission: "manage_courses_add")
       .where.not(
-        'roles.base_role_type = ? OR roles.base_role_type = ?',
-        'AccountAdmin',
-        'AccountMembership'
+        "roles.base_role_type = ? OR roles.base_role_type = ?",
+        "AccountAdmin",
+        "AccountMembership"
       )
       .distinct
       .in_batches

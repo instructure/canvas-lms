@@ -27,10 +27,10 @@ describe "speed grader" do
 
   before(:once) do
     Account.site_admin.enable_feature!(:assignment_comment_library)
-    course_with_teacher(name: 'Teacher1', active_user: true, active_enrollment: true, active_course: true).user
-    student_in_course(name: 'Student1', active_user: true).user
+    course_with_teacher(name: "Teacher1", active_user: true, active_enrollment: true, active_course: true).user
+    student_in_course(name: "Student1", active_user: true).user
 
-    @assignment = @course.assignments.create(name: 'assignment with rubric', points_possible: 10)
+    @assignment = @course.assignments.create(name: "assignment with rubric", points_possible: 10)
     submission_model(user: @student, assignment: @assignment, body: "first student submission text")
   end
 
@@ -45,7 +45,7 @@ describe "speed grader" do
       Speedgrader.comment_library_link.click
       Speedgrader.comment_library_text_area.send_keys("New Comment")
       Speedgrader.comment_library_add_button.click
-      f('.flashalert-message button').click
+      f(".flashalert-message button").click
 
       expect(Speedgrader.comment_library_area).to include_text("New Comment")
       Speedgrader.comment_library_close_button.click
@@ -56,7 +56,7 @@ describe "speed grader" do
       Speedgrader.comment_library_link.click
       Speedgrader.comment_library_delete_button.click
       accept_alert
-      f('.flashalert-message button').click
+      f(".flashalert-message button").click
       Speedgrader.comment_library_close_button.click
 
       expect(Speedgrader.comment_library_count).to eq("0")
@@ -68,7 +68,7 @@ describe "speed grader" do
       Speedgrader.comment_library_edit_text_area.clear
       Speedgrader.comment_library_edit_text_area.send_keys("Edited")
       Speedgrader.comment_library_save_button.click
-      f('.flashalert-message button').click
+      f(".flashalert-message button").click
 
       expect(Speedgrader.comment_library_area).not_to include_text("First Comment")
       expect(Speedgrader.comment_library_area).to include_text("Edited")

@@ -21,7 +21,7 @@ class AddProcessingErrorsAttachmentToSisBatch < ActiveRecord::Migration[5.0]
   tag :predeploy
 
   def change
-    add_column :sis_batches, :errors_attachment_id, :integer, :limit => 8
+    add_column :sis_batches, :errors_attachment_id, :integer, limit: 8
     add_foreign_key :sis_batches, :attachments, column: :errors_attachment_id
     add_index :sis_batches, :errors_attachment_id
   end

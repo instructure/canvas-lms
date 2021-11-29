@@ -20,8 +20,8 @@
 module DrDiff
   class CommandCapture
     def self.run(format, command)
-      require 'bundler'
-      require 'gergich/capture'
+      require "bundler"
+      require "gergich/capture"
 
       Bundler.with_unbundled_env do
         _, comments = Gergich::Capture.run(format, command, add_comments: false, suppress_output: true)

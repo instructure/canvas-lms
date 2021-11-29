@@ -17,23 +17,23 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../common'
-require_relative '../helpers/blueprint_common'
+require_relative "../common"
+require_relative "../helpers/blueprint_common"
 
 describe "master courses - child courses - wiki page locking" do
   include_context "in-process server selenium tests"
   include_context "blueprint courses files context"
 
   before :once do
-    @copy_from = course_factory(:active_all => true)
+    @copy_from = course_factory(active_all: true)
     @template = MasterCourses::MasterTemplate.set_as_master_course(@copy_from)
-    @original_page = @copy_from.wiki_pages.create!(:title => "blah", :body => "bloo")
+    @original_page = @copy_from.wiki_pages.create!(title: "blah", body: "bloo")
     @tag = @template.create_content_tag_for!(@original_page)
 
-    course_with_teacher(:active_all => true)
+    course_with_teacher(active_all: true)
     @copy_to = @course
     @template.add_child_course!(@copy_to)
-    @page_copy = @copy_to.wiki_pages.new(:title => "bloo", :body => "bloo") # just create a copy directly instead of doing a real migraiton
+    @page_copy = @copy_to.wiki_pages.new(title: "bloo", body: "bloo") # just create a copy directly instead of doing a real migraiton
     @page_copy.migration_id = @tag.migration_id
     @page_copy.save!
   end
@@ -44,52 +44,52 @@ describe "master courses - child courses - wiki page locking" do
 
   describe "on index page" do
     def options_panel
-      f('tbody .al-options')
+      f("tbody .al-options")
     end
 
     def options_button
-      f('tbody .al-trigger')
+      f("tbody .al-trigger")
     end
 
     it "does not show the edit/delete cog-menu options on the index when locked" do
-      @tag.update(restrictions: { :content => true })
+      @tag.update(restrictions: { content: true })
 
       get "/courses/#{@copy_to.id}/pages"
 
-      expect(f('.master-content-lock-cell .icon-blueprint-lock')).to be_displayed
+      expect(f(".master-content-lock-cell .icon-blueprint-lock")).to be_displayed
 
       options_button.click
-      expect(options_panel).not_to contain_css('.edit-menu-item')
-      expect(options_panel).not_to contain_css('.delete-menu-item')
+      expect(options_panel).not_to contain_css(".edit-menu-item")
+      expect(options_panel).not_to contain_css(".delete-menu-item")
     end
 
     it "shows the edit/delete cog-menu options on the index when not locked" do
       get "/courses/#{@copy_to.id}/pages"
 
-      expect(f('.master-content-lock-cell .icon-blueprint')).to be_displayed
+      expect(f(".master-content-lock-cell .icon-blueprint")).to be_displayed
 
       options_button.click
-      expect(options_panel).to contain_css('.edit-menu-item')
-      expect(options_panel).to contain_css('.delete-menu-item')
+      expect(options_panel).to contain_css(".edit-menu-item")
+      expect(options_panel).to contain_css(".delete-menu-item")
     end
   end
 
   describe "on show page" do
     it "does not show the delete option when locked" do
-      @tag.update(restrictions: { :points => true })
+      @tag.update(restrictions: { points: true })
 
       get "/courses/#{@copy_to.id}/pages/#{@page_copy.url}"
 
       options_button.click
-      expect(options_panel).not_to contain_css('.delete_page')
+      expect(options_panel).not_to contain_css(".delete_page")
     end
 
     it "shows the edit/delete cog-menu options when not locked" do
       get "/courses/#{@copy_to.id}/pages/#{@page_copy.url}"
 
-      expect(f('#content')).to contain_css('.edit-wiki')
+      expect(f("#content")).to contain_css(".edit-wiki")
       options_button.click
-      expect(options_panel).to contain_css('.delete_page')
+      expect(options_panel).to contain_css(".delete_page")
     end
   end
 end

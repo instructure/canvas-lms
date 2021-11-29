@@ -17,8 +17,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-require 'csv'
-require 'set'
+require "csv"
+require "set"
 
 module Outcomes
   class CSVImporter
@@ -76,13 +76,13 @@ module Outcomes
     def parse_file
       headers = nil
       total = file_line_count
-      raise ParseError, I18n.t('File has no data') if total < 1
+      raise ParseError, I18n.t("File has no data") if total < 1
 
       separator = test_header_i18n
       rows = CSV.new(@file, col_sep: separator).to_enum
       rows.with_index(1).each_slice(BATCH_SIZE) do |batch|
         headers ||= validate_headers(*batch.shift)
-        raise ParseError, I18n.t('File has no outcomes data') if batch.empty?
+        raise ParseError, I18n.t("File has no outcomes data") if batch.empty?
 
         errors = parse_batch(headers, batch)
         status = {
@@ -115,10 +115,10 @@ module Outcomes
 
     def test_header_i18n
       header = @file.readline
-      has_bom = header.start_with?((+"\xEF\xBB\xBF").force_encoding('ASCII-8BIT'))
+      has_bom = header.start_with?((+"\xEF\xBB\xBF").force_encoding("ASCII-8BIT"))
       @file.rewind
       @file.read(3) if has_bom
-      header.count(';') > header.count(',') ? ';' : ','
+      header.count(";") > header.count(",") ? ";" : ","
     end
 
     def file_line_count
@@ -128,18 +128,18 @@ module Outcomes
     end
 
     def check_encoding(str)
-      encoded = str&.force_encoding('utf-8')
-      valid = (encoded || '').valid_encoding?
-      raise ParseError, I18n.t('Not a valid utf-8 string: %{string}', string: str.inspect) unless valid
+      encoded = str&.force_encoding("utf-8")
+      valid = (encoded || "").valid_encoding?
+      raise ParseError, I18n.t("Not a valid utf-8 string: %{string}", string: str.inspect) unless valid
 
       encoded
     end
 
     def validate_headers(row, _index)
-      main_columns_end = row.find_index('ratings') || row.length
+      main_columns_end = row.find_index("ratings") || row.length
       headers = row.slice(0, main_columns_end).map(&:to_sym)
 
-      after_ratings = row[(main_columns_end + 1)..-1] || []
+      after_ratings = row[(main_columns_end + 1)..] || []
       after_ratings = after_ratings.select(&:present?).map(&:to_s)
       raise ParseError, I18n.t("Invalid fields after ratings: %{fields}", fields: after_ratings.inspect) unless after_ratings.empty?
 
@@ -154,13 +154,13 @@ module Outcomes
 
     def import_row(headers, row)
       simple = headers.zip(row).to_h
-      ratings = row[headers.length..-1]
+      ratings = row[headers.length..]
 
       object = simple.to_h
       object[:ratings] = parse_ratings(ratings)
       object[:learning_outcome_group_id] = @import[:learning_outcome_group_id]
       if object[:mastery_points].present?
-        object[:mastery_points] = strict_parse_float(object[:mastery_points], I18n.t('mastery points'))
+        object[:mastery_points] = strict_parse_float(object[:mastery_points], I18n.t("mastery points"))
       end
       import_object(object)
     end
@@ -170,7 +170,7 @@ module Outcomes
       drop_trailing_nils(ratings).each_slice(2).to_a.map.with_index(1) do |(points, description), index|
         raise InvalidDataError, I18n.t("Points for rating tier %{index} not present", index: index) if points.nil? || points.blank?
 
-        points = strict_parse_float(points, I18n.t('rating tier %{index} threshold', index: index))
+        points = strict_parse_float(points, I18n.t("rating tier %{index} threshold", index: index))
 
         if prior.present? && prior < points
           raise InvalidDataError, I18n.t(
@@ -187,9 +187,9 @@ module Outcomes
     def normalize_i18n(string)
       raise ArgumentError if string.blank?
 
-      separator = I18n.t(:separator, :scope => :'number.format')
-      delimiter = I18n.t(:delimiter, :scope => :'number.format')
-      string.gsub(delimiter, '').gsub(separator, '.')
+      separator = I18n.t(:separator, scope: :"number.format")
+      delimiter = I18n.t(:delimiter, scope: :"number.format")
+      string.gsub(delimiter, "").gsub(separator, ".")
     end
 
     def strict_parse_float(v, name)

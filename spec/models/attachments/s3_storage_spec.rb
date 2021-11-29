@@ -24,7 +24,7 @@ describe Attachments::S3Storage do
     let(:access_key_id) { "AKIAIOSFODNN7EXAMPLE" }
     let(:secret_access_key) { "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY" }
     let(:datetime) { "20151229T000000Z" }
-    let(:string_to_sign) { <<~STS.gsub("\n", "") }
+    let(:string_to_sign) { <<~BASE64.delete("\n") }
       eyAiZXhwaXJhdGlvbiI6ICIyMDE1LTEyLTMwVDEyOjAwOjAwLjAwMFoiLA0KICAiY29uZ
       Gl0aW9ucyI6IFsNCiAgICB7ImJ1Y2tldCI6ICJzaWd2NGV4YW1wbGVidWNrZXQifSwNCi
       AgICBbInN0YXJ0cy13aXRoIiwgIiRrZXkiLCAidXNlci91c2VyMS8iXSwNCiAgICB7ImF
@@ -38,7 +38,7 @@ describe Attachments::S3Storage do
       AxNTEyMjkvdXMtZWFzdC0xL3MzL2F3czRfcmVxdWVzdCJ9LA0KICAgIHsieC1hbXotYWx
       nb3JpdGhtIjogIkFXUzQtSE1BQy1TSEEyNTYifSwNCiAgICB7IngtYW16LWRhdGUiOiAi
       MjAxNTEyMjlUMDAwMDAwWiIgfQ0KICBdDQp9
-    STS
+    BASE64
     let(:signature) { "8afdbf4008c03f22c2cd3cdb72e4afbb1f6a588f3255ac628749a66d7f09699e" }
     let(:bucket) do
       config = double("config", {

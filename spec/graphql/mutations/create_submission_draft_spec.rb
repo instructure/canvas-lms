@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../graphql_spec_helper'
+require_relative "../graphql_spec_helper"
 
 RSpec.describe Mutations::CreateSubmissionDraft do
   before(:once) do
@@ -27,7 +27,7 @@ RSpec.describe Mutations::CreateSubmissionDraft do
       attachment_with_context(@student),
       attachment_with_context(@student)
     ]
-    @media_object = factory_with_protected_attributes(MediaObject, :media_id => 'm-123456')
+    @media_object = factory_with_protected_attributes(MediaObject, media_id: "m-123456")
   end
 
   def mutation_str(
@@ -89,10 +89,10 @@ RSpec.describe Mutations::CreateSubmissionDraft do
     result.to_h.with_indifferent_access
   end
 
-  it 'creates a new submission draft' do
+  it "creates a new submission draft" do
     result = run_mutation(
       submission_id: @submission.id,
-      active_submission_type: 'online_upload',
+      active_submission_type: "online_upload",
       attempt: @submission.attempt,
       file_ids: @attachments.map(&:id)
     )
@@ -101,14 +101,14 @@ RSpec.describe Mutations::CreateSubmissionDraft do
     ).to eq SubmissionDraft.last.id.to_s
   end
 
-  it 'updates an existing submission draft' do
+  it "updates an existing submission draft" do
     first_result = run_mutation(
       submission_id: @submission.id,
-      active_submission_type: 'online_upload',
+      active_submission_type: "online_upload",
       attempt: @submission.attempt,
       file_ids: @attachments.map(&:id)
     )
-    attachment_ids = first_result.dig(:data, :createSubmissionDraft, :submissionDraft, :attachments).map { |attachment| attachment[:_id] }
+    attachment_ids = first_result.dig(:data, :createSubmissionDraft, :submissionDraft, :attachments).pluck(:_id)
     expect(attachment_ids.count).to eq 2
     @attachments.each do |attachment|
       expect(attachment_ids.include?(attachment[:id].to_s)).to be true
@@ -116,11 +116,11 @@ RSpec.describe Mutations::CreateSubmissionDraft do
 
     second_result = run_mutation(
       submission_id: @submission.id,
-      active_submission_type: 'online_upload',
+      active_submission_type: "online_upload",
       attempt: @submission.attempt,
       file_ids: [@attachments[0].id]
     )
-    attachment_ids = second_result.dig(:data, :createSubmissionDraft, :submissionDraft, :attachments).map { |attachment| attachment[:_id] }
+    attachment_ids = second_result.dig(:data, :createSubmissionDraft, :submissionDraft, :attachments).pluck(:_id)
     expect(attachment_ids.count).to eq 1
     expect(attachment_ids[0]).to eq @attachments[0].id.to_s
 
@@ -129,34 +129,34 @@ RSpec.describe Mutations::CreateSubmissionDraft do
     ).to eq second_result.dig(:data, :createSubmissionDraft, :submissionDraft, :submissionAttempt)
   end
 
-  it 'allows you to set a body on the submission draft' do
+  it "allows you to set a body on the submission draft" do
     result = run_mutation(
       submission_id: @submission.id,
-      active_submission_type: 'online_text_entry',
+      active_submission_type: "online_text_entry",
       attempt: @submission.attempt,
-      body: 'some text body'
+      body: "some text body"
     )
     expect(
       result.dig(:data, :createSubmissionDraft, :submissionDraft, :body)
-    ).to eq 'some text body'
+    ).to eq "some text body"
   end
 
-  it 'allows you to set a url on the submission draft' do
+  it "allows you to set a url on the submission draft" do
     result = run_mutation(
       submission_id: @submission.id,
-      active_submission_type: 'online_url',
+      active_submission_type: "online_url",
       attempt: @submission.attempt,
-      url: 'http://www.google.com'
+      url: "http://www.google.com"
     )
     expect(
       result.dig(:data, :createSubmissionDraft, :submissionDraft, :url)
-    ).to eq 'http://www.google.com'
+    ).to eq "http://www.google.com"
   end
 
-  it 'allows you to set a media_object_id on the submission draft' do
+  it "allows you to set a media_object_id on the submission draft" do
     result = run_mutation(
       submission_id: @submission.id,
-      active_submission_type: 'media_recording',
+      active_submission_type: "media_recording",
       attempt: @submission.attempt,
       media_id: @media_object.media_id
     )
@@ -165,27 +165,27 @@ RSpec.describe Mutations::CreateSubmissionDraft do
     ).to eq @media_object.media_id
   end
 
-  it 'allows you to set an active_submission_type on the submission draft' do
+  it "allows you to set an active_submission_type on the submission draft" do
     result = run_mutation(
-      active_submission_type: 'online_text_entry',
+      active_submission_type: "online_text_entry",
       attempt: @submission.attempt,
-      body: 'some text body',
+      body: "some text body",
       submission_id: @submission.id
     )
     expect(
       result.dig(:data, :createSubmissionDraft, :submissionDraft, :activeSubmissionType)
-    ).to eq 'online_text_entry'
+    ).to eq "online_text_entry"
   end
 
-  it 'only updates attachments when the active submission type is online_upload' do
+  it "only updates attachments when the active submission type is online_upload" do
     result = run_mutation(
       submission_id: @submission.id,
-      active_submission_type: 'online_upload',
+      active_submission_type: "online_upload",
       attempt: @submission.attempt,
-      body: 'some text body',
+      body: "some text body",
       file_ids: @attachments.map(&:id)
     )
-    attachment_ids = result.dig(:data, :createSubmissionDraft, :submissionDraft, :attachments).map { |attachment| attachment[:_id] }
+    attachment_ids = result.dig(:data, :createSubmissionDraft, :submissionDraft, :attachments).pluck(:_id)
 
     expect(attachment_ids.count).to eq 2
     @attachments.each do |attachment|
@@ -197,31 +197,31 @@ RSpec.describe Mutations::CreateSubmissionDraft do
     ).to be nil
   end
 
-  it 'only updates the body when the active submission type is online_text_entry' do
+  it "only updates the body when the active submission type is online_text_entry" do
     result = run_mutation(
       submission_id: @submission.id,
-      active_submission_type: 'online_text_entry',
+      active_submission_type: "online_text_entry",
       attempt: @submission.attempt,
-      body: 'some text body',
-      url: 'http://www.google.com'
+      body: "some text body",
+      url: "http://www.google.com"
     )
 
     expect(
       result.dig(:data, :createSubmissionDraft, :submissionDraft, :body)
-    ).to eq 'some text body'
+    ).to eq "some text body"
 
     expect(
       result.dig(:data, :createSubmissionDraft, :submissionDraft, :url)
     ).to be nil
   end
 
-  it 'only updates the url when the active submission type is online_url' do
+  it "only updates the url when the active submission type is online_url" do
     result = run_mutation(
       submission_id: @submission.id,
-      active_submission_type: 'online_url',
+      active_submission_type: "online_url",
       attempt: @submission.attempt,
-      body: 'some text body',
-      url: 'http://www.google.com'
+      body: "some text body",
+      url: "http://www.google.com"
     )
 
     expect(
@@ -230,13 +230,13 @@ RSpec.describe Mutations::CreateSubmissionDraft do
 
     expect(
       result.dig(:data, :createSubmissionDraft, :submissionDraft, :url)
-    ).to eq 'http://www.google.com'
+    ).to eq "http://www.google.com"
   end
 
-  it 'returns an error if the active submission type is not included' do
+  it "returns an error if the active submission type is not included" do
     result = run_mutation(
       attempt: @submission.attempt,
-      body: 'some text body',
+      body: "some text body",
       submission_id: @submission.id
     )
     expect(
@@ -244,11 +244,11 @@ RSpec.describe Mutations::CreateSubmissionDraft do
     ).to include "Argument 'activeSubmissionType' on InputObject 'CreateSubmissionDraftInput' is required"
   end
 
-  it 'returns an error if the active submission type is not valid' do
+  it "returns an error if the active submission type is not valid" do
     result = run_mutation(
-      active_submission_type: 'thundercougarfalconbird',
+      active_submission_type: "thundercougarfalconbird",
       attempt: @submission.attempt,
-      body: 'some text body',
+      body: "some text body",
       submission_id: @submission.id
     )
     expect(
@@ -256,24 +256,24 @@ RSpec.describe Mutations::CreateSubmissionDraft do
     ).to include "Expected type 'DraftableSubmissionType!'"
   end
 
-  it 'prefixes the url with a scheme if missing' do
-    @submission.assignment.update!(submission_types: 'online_url')
+  it "prefixes the url with a scheme if missing" do
+    @submission.assignment.update!(submission_types: "online_url")
     result = run_mutation(
       submission_id: @submission.id,
-      active_submission_type: 'online_url',
+      active_submission_type: "online_url",
       attempt: @submission.attempt,
-      url: 'www.google.com'
+      url: "www.google.com"
     )
     expect(
       result.dig(:data, :createSubmissionDraft, :submissionDraft, :url)
-    ).to eq 'http://www.google.com'
+    ).to eq "http://www.google.com"
   end
 
-  it 'returns an error if the attachments are not owned by the user' do
+  it "returns an error if the attachments are not owned by the user" do
     attachment = attachment_with_context(@teacher)
     result = run_mutation(
       submission_id: @submission.id,
-      active_submission_type: 'online_upload',
+      active_submission_type: "online_upload",
       attempt: @submission.attempt,
       file_ids: [attachment.id]
     )
@@ -282,46 +282,46 @@ RSpec.describe Mutations::CreateSubmissionDraft do
     ).to eq "No attachments found for the following ids: [\"#{attachment.id}\"]"
   end
 
-  it 'returns an error if the attachments don\'t have an allowed file extension' do
-    @submission.assignment.update!(allowed_extensions: ['lemon'])
+  it "returns an error if the attachments don't have an allowed file extension" do
+    @submission.assignment.update!(allowed_extensions: ["lemon"])
     result = run_mutation(
       submission_id: @submission.id,
-      active_submission_type: 'online_upload',
+      active_submission_type: "online_upload",
       attempt: @submission.attempt,
       file_ids: [@attachments[0].id]
     )
     expect(
       result.dig(:data, :createSubmissionDraft, :errors, 0, :message)
-    ).to eq 'Invalid file type'
+    ).to eq "Invalid file type"
   end
 
-  it 'returns a graceful error if the submission is not found' do
+  it "returns a graceful error if the submission is not found" do
     result = run_mutation(
       submission_id: 1337,
-      active_submission_type: 'online_upload',
+      active_submission_type: "online_upload",
       attempt: 0,
       file_ids: []
     )
     expect(
       result.dig(:errors, 0, :message)
-    ).to eq 'not found'
+    ).to eq "not found"
   end
 
-  it 'returns an error if the draft is more then one attempt more the current submission attempt' do
+  it "returns an error if the draft is more then one attempt more the current submission attempt" do
     result = run_mutation(
       submission_id: @submission.id,
-      active_submission_type: 'online_upload',
+      active_submission_type: "online_upload",
       attempt: 1337,
       file_ids: [@attachments[0].id]
     )
     expect(
       result.dig(:data, :createSubmissionDraft, :errors, 0, :message)
-    ).to eq 'submission draft cannot be more then one attempt ahead of the current submission'
+    ).to eq "submission draft cannot be more then one attempt ahead of the current submission"
   end
 
-  it 'uses the submission attempt plus one if an explicit attempt is not provided' do
+  it "uses the submission attempt plus one if an explicit attempt is not provided" do
     result = run_mutation(
-      active_submission_type: 'online_upload',
+      active_submission_type: "online_upload",
       submission_id: @submission.id,
       file_ids: [@attachments[0].id]
     )
@@ -330,11 +330,11 @@ RSpec.describe Mutations::CreateSubmissionDraft do
     ).to eq @submission.attempt + 1
   end
 
-  it 'uses the given attempt when provided' do
+  it "uses the given attempt when provided" do
     @submission.update!(attempt: 2)
     result = run_mutation(
       submission_id: @submission.id,
-      active_submission_type: 'online_upload',
+      active_submission_type: "online_upload",
       attempt: 1,
       file_ids: [@attachments[0].id]
     )
@@ -412,7 +412,7 @@ RSpec.describe Mutations::CreateSubmissionDraft do
     end
   end
 
-  context 'when dup records exist' do
+  context "when dup records exist" do
     before do
       # simulate creating a dup record
       submission_draft = SubmissionDraft.where(
@@ -427,33 +427,33 @@ RSpec.describe Mutations::CreateSubmissionDraft do
       submission_draft.update_attribute(:submission_attempt, @submission.attempt)
     end
 
-    it 'updates an existing submission draft without error' do
+    it "updates an existing submission draft without error" do
       result = run_mutation(
-        active_submission_type: 'online_text_entry',
+        active_submission_type: "online_text_entry",
         attempt: @submission.attempt,
-        body: 'some text body 123',
+        body: "some text body 123",
         submission_id: @submission.id
       )
 
       drafts = SubmissionDraft.where(
         submission: @submission, submission_attempt: @submission.attempt
       )
-      expect(drafts.first.body).to eq 'some text body 123'
+      expect(drafts.first.body).to eq "some text body 123"
       expect(
         result.dig(:data, :createSubmissionDraft, :submissionDraft, :activeSubmissionType)
-      ).to eq 'online_text_entry'
+      ).to eq "online_text_entry"
     end
 
-    it 'removes dup records' do
+    it "removes dup records" do
       drafts = SubmissionDraft.where(
         submission: @submission, submission_attempt: @submission.attempt
       )
 
       expect(drafts.count).to be 2
       run_mutation(
-        active_submission_type: 'online_text_entry',
+        active_submission_type: "online_text_entry",
         attempt: @submission.attempt,
-        body: 'some text body 123',
+        body: "some text body 123",
         submission_id: @submission.id
       )
 

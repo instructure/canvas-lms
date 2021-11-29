@@ -20,7 +20,7 @@
 
 class MessageDispatcher < Delayed::PerformableMethod
   def self.dispatch(message)
-    Delayed::Job.enqueue(self.new(message.for_queue, :deliver),
+    Delayed::Job.enqueue(new(message.for_queue, :deliver),
                          run_at: message.dispatch_at,
                          priority: 25,
                          max_attempts: 15)
@@ -30,11 +30,11 @@ class MessageDispatcher < Delayed::PerformableMethod
     return if messages.empty?
 
     if messages.size == 1
-      self.dispatch(messages.first)
+      dispatch(messages.first)
       return
     end
 
-    Delayed::Job.enqueue(self.new(self, :deliver_batch, args: [messages.map(&:for_queue)]),
+    Delayed::Job.enqueue(new(self, :deliver_batch, args: [messages.map(&:for_queue)]),
                          run_at: messages.first.dispatch_at,
                          priority: 25,
                          max_attempts: 15)
@@ -56,7 +56,7 @@ class MessageDispatcher < Delayed::PerformableMethod
       queued.each_with_index do |m, i|
         start_time ||= m.created_at
         previous_time ||= m.created_at
-        partition = Message.infer_partition_table_name('created_at' => m.created_at)
+        partition = Message.infer_partition_table_name("created_at" => m.created_at)
         current_partition ||= partition
 
         if partition != current_partition || i == queued.length - 1
@@ -66,7 +66,7 @@ class MessageDispatcher < Delayed::PerformableMethod
             previous_time = m.created_at
           end
           range_for_partition = start_time..previous_time
-          messages.concat(Message.in_partition('created_at' => start_time).where(id: message_ids, created_at: range_for_partition).to_a)
+          messages.concat(Message.in_partition("created_at" => start_time).where(id: message_ids, created_at: range_for_partition).to_a)
           message_ids = []
           start_time = m.created_at
           current_partition = partition
@@ -81,7 +81,7 @@ class MessageDispatcher < Delayed::PerformableMethod
       message.deliver
     rescue
       # this delivery failed, we'll have to make an individual job to retry
-      self.dispatch(message)
+      dispatch(message)
     end
   end
 end

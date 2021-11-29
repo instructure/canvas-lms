@@ -31,13 +31,13 @@ describe Mutations::UpdateLearningOutcome do
   let!(:record) { outcome_model(context: @course) }
 
   def variables(args = {})
-    <<~VARS
+    <<~YAML
       id: #{args[:id] || record.id},
-      title: "#{args[:title] || 'Outcome 1 edited'}",
-      displayName: "#{args[:display_name] || 'Outcome display name 1'}",
-      description: "#{args[:description] || 'Outcome description 1'}",
-      vendorGuid: "#{args[:vendor_guid] || 'vg--1'}"
-    VARS
+      title: "#{args[:title] || "Outcome 1 edited"}",
+      displayName: "#{args[:display_name] || "Outcome display name 1"}",
+      description: "#{args[:description] || "Outcome description 1"}",
+      vendorGuid: "#{args[:vendor_guid] || "vg--1"}"
+    YAML
   end
 
   def execute_with_input(update_input, user_executing: @admin)
@@ -68,39 +68,39 @@ describe Mutations::UpdateLearningOutcome do
 
   it "updates a learning outcome" do
     result = execute_with_input(variables)
-    expect(result.dig('errors')).to be_nil
-    expect(result.dig('data', 'updateLearningOutcome', 'errors')).to be_nil
-    result = result.dig('data', 'updateLearningOutcome', 'learningOutcome')
-    expect(result['title']).to eq 'Outcome 1 edited'
-    expect(result['displayName']).to eq 'Outcome display name 1'
-    expect(result['description']).to eq 'Outcome description 1'
-    expect(result['vendorGuid']).to eq 'vg--1'
+    expect(result["errors"]).to be_nil
+    expect(result.dig("data", "updateLearningOutcome", "errors")).to be_nil
+    result = result.dig("data", "updateLearningOutcome", "learningOutcome")
+    expect(result["title"]).to eq "Outcome 1 edited"
+    expect(result["displayName"]).to eq "Outcome display name 1"
+    expect(result["description"]).to eq "Outcome description 1"
+    expect(result["vendorGuid"]).to eq "vg--1"
   end
 
-  context 'errors' do
+  context "errors" do
     def expect_error(result, message)
-      errors = result.dig('errors') || result.dig('data', 'updateLearningOutcome', 'errors')
+      errors = result["errors"] || result.dig("data", "updateLearningOutcome", "errors")
       expect(errors).not_to be_nil
-      expect(errors[0]['message']).to match(message)
+      expect(errors[0]["message"]).to match(message)
     end
 
     it "requires outcome to exist" do
-      result = execute_with_input(variables(id: 99999))
+      result = execute_with_input(variables(id: 99_999))
       expect_error(result, "unable to find LearningOutcome")
     end
 
     it "requires update permission for teacher" do
       result = execute_with_input(variables, user_executing: @teacher)
-      expect_error(result, 'insufficient permissions')
+      expect_error(result, "insufficient permissions")
     end
 
     it "requires update permission for student" do
       result = execute_with_input(variables, user_executing: @student)
-      expect_error(result, 'insufficient permissions')
+      expect_error(result, "insufficient permissions")
     end
 
     it "requires title to be present" do
-      result = execute_with_input(variables(title: ''))
+      result = execute_with_input(variables(title: ""))
       expect_error(result, "can't be blank")
     end
   end

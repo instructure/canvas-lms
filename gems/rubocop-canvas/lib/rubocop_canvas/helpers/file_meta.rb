@@ -20,11 +20,11 @@
 module RuboCop
   module Cop
     module FileMeta
-      SPEC_FILE_NAME_REGEX = /_spec\.rb$/
-      CONTROLLER_FILE_NAME_REGEX = /controller\.rb$/
+      SPEC_FILE_NAME_REGEX = /_spec\.rb$/.freeze
+      CONTROLLER_FILE_NAME_REGEX = /controller\.rb$/.freeze
 
       def file_name
-        file_path.split('/').last
+        file_path.split("/").last
       end
 
       def file_path

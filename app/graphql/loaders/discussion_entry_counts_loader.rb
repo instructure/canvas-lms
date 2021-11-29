@@ -27,7 +27,7 @@ class Loaders::DiscussionEntryCountsLoader < GraphQL::Batch::Loader
   end
 
   def counts_sql(id_string)
-    <<~SQL
+    <<~SQL.squish
       #{id_string},
       SUM(CASE WHEN discussion_entries.workflow_state <> 'deleted' THEN 1 END) AS replies,
       SUM(CASE WHEN discussion_entries.workflow_state = 'deleted' THEN 1 END) deleted_count,
@@ -58,18 +58,20 @@ class Loaders::DiscussionEntryCountsLoader < GraphQL::Batch::Loader
   end
 
   def object_specific_hash(objects)
-    if objects.first.is_a?(DiscussionTopic)
+    case objects.first
+    when DiscussionTopic
       { discussion_topic_id: objects }
-    elsif objects.first.is_a?(DiscussionEntry)
+    when DiscussionEntry
       { root_entry_id: objects }
     end
   end
 
   def object_id_string(object)
-    if object.is_a?(DiscussionTopic)
-      'discussion_topic_id'
-    elsif object.is_a?(DiscussionEntry)
-      'root_entry_id'
+    case object
+    when DiscussionTopic
+      "discussion_topic_id"
+    when DiscussionEntry
+      "root_entry_id"
     end
   end
 end

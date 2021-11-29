@@ -20,8 +20,8 @@
 require_relative "../../spec_helper"
 
 describe DataFixup::CreateQuizLtiNavigationPlacements do
-  context 'when there are no Quiz LTI tools' do
-    it 'does not create context_external_tool_placements' do
+  context "when there are no Quiz LTI tools" do
+    it "does not create context_external_tool_placements" do
       expect(ContextExternalToolPlacement.count).to eq 0
 
       DataFixup::CreateQuizLtiNavigationPlacements.run
@@ -30,7 +30,7 @@ describe DataFixup::CreateQuizLtiNavigationPlacements do
     end
   end
 
-  context 'when there are Quiz LTI tools' do
+  context "when there are Quiz LTI tools" do
     let_once(:root_account) { Account.default }
     let_once(:developer_key) { DeveloperKey.create! }
 
@@ -38,12 +38,12 @@ describe DataFixup::CreateQuizLtiNavigationPlacements do
       # create 2 Quiz LTI tools on 2 different accounts
       2.times do
         ContextExternalTool.create!(
-          context: account_model(:root_account => root_account, :parent_account => root_account),
-          consumer_key: 'key',
-          shared_secret: 'secret',
-          name: 'Quizzes 2',
-          tool_id: 'Quizzes 2',
-          url: 'http://www.tool.com/launch',
+          context: account_model(root_account: root_account, parent_account: root_account),
+          consumer_key: "key",
+          shared_secret: "secret",
+          name: "Quizzes 2",
+          tool_id: "Quizzes 2",
+          url: "http://www.tool.com/launch",
           developer_key: developer_key,
           root_account: root_account
         )
@@ -52,77 +52,77 @@ describe DataFixup::CreateQuizLtiNavigationPlacements do
 
     let_once(:some_tool) do
       ContextExternalTool.create!(
-        context: account_model(:root_account => root_account, :parent_account => root_account),
-        consumer_key: 'key',
-        shared_secret: 'secret',
-        name: 'Some tool',
-        tool_id: 'Some tool',
-        url: 'http://www.tool.com/launch',
+        context: account_model(root_account: root_account, parent_account: root_account),
+        consumer_key: "key",
+        shared_secret: "secret",
+        name: "Some tool",
+        tool_id: "Some tool",
+        url: "http://www.tool.com/launch",
         developer_key: developer_key,
         root_account: root_account
       )
     end
 
-    it 'creates an account level placement associated for each Quiz LTI tool' do
+    it "creates an account level placement associated for each Quiz LTI tool" do
       expect(ContextExternalToolPlacement.count).to eq 0
 
       DataFixup::CreateQuizLtiNavigationPlacements.run
 
-      ContextExternalTool.quiz_lti.where.not(workflow_state: 'deleted').each do |quiz_tool|
+      ContextExternalTool.quiz_lti.where.not(workflow_state: "deleted").each do |quiz_tool|
         placements = quiz_tool.context_external_tool_placements
 
         expect(placements.count).to eq 2
-        expect(placements.find_by(placement_type: 'account_navigation', context_external_tool_id: quiz_tool.id)).to_not be_nil
-        expect(placements.find_by(placement_type: 'course_navigation', context_external_tool_id: quiz_tool.id)).to_not be_nil
+        expect(placements.find_by(placement_type: "account_navigation", context_external_tool_id: quiz_tool.id)).to_not be_nil
+        expect(placements.find_by(placement_type: "course_navigation", context_external_tool_id: quiz_tool.id)).to_not be_nil
       end
     end
 
-    it 'does not create navigation placements for deleted Quiz LTI tools' do
-      ContextExternalTool.quiz_lti.last.update!(workflow_state: 'deleted')
+    it "does not create navigation placements for deleted Quiz LTI tools" do
+      ContextExternalTool.quiz_lti.last.update!(workflow_state: "deleted")
 
       expect(ContextExternalToolPlacement.count).to eq 0
 
       DataFixup::CreateQuizLtiNavigationPlacements.run
 
-      ContextExternalTool.quiz_lti.where(workflow_state: 'deleted').each do |quiz_tool|
+      ContextExternalTool.quiz_lti.where(workflow_state: "deleted").each do |quiz_tool|
         expect(quiz_tool.context_external_tool_placements.count).to eq 0
       end
 
-      ContextExternalTool.quiz_lti.where.not(workflow_state: 'deleted').each do |quiz_tool|
+      ContextExternalTool.quiz_lti.where.not(workflow_state: "deleted").each do |quiz_tool|
         expect(quiz_tool.context_external_tool_placements.count).to eq 2
       end
     end
 
-    it 'does not create navigation placements if the placements where already created' do
+    it "does not create navigation placements if the placements where already created" do
       expect(ContextExternalToolPlacement.count).to eq 0
 
       DataFixup::CreateQuizLtiNavigationPlacements.run
 
       expect(ContextExternalToolPlacement.count).to eq 4
 
-      expect {
+      expect do
         DataFixup::CreateQuizLtiNavigationPlacements.run
-      }.to not_change { ContextExternalToolPlacement.count }
+      end.to not_change { ContextExternalToolPlacement.count }
     end
 
-    it 'does not create navigation placements for tools that are not Quiz LTI' do
-      some_tool = ContextExternalTool.find_by(tool_id: 'Some tool')
+    it "does not create navigation placements for tools that are not Quiz LTI" do
+      some_tool = ContextExternalTool.find_by(tool_id: "Some tool")
 
       expect(some_tool.quiz_lti?).to eq false
-      expect {
+      expect do
         DataFixup::CreateQuizLtiNavigationPlacements.run
         some_tool.reload
-      }.to not_change { some_tool.context_external_tool_placements.count }
+      end.to not_change { some_tool.context_external_tool_placements.count }
     end
 
-    it 'does not create navigation placements for Quiz LTI tools where context_type is not Account' do
+    it "does not create navigation placements for Quiz LTI tools where context_type is not Account" do
       quiz_tool = ContextExternalTool.quiz_lti.last
-      quiz_tool.update!(context_type: 'Course')
+      quiz_tool.update!(context_type: "Course")
 
-      expect {
+      expect do
         DataFixup::CreateQuizLtiNavigationPlacements.run
         quiz_tool.reload
-      }.to not_change { quiz_tool.context_external_tool_placements.count }
+      end.to not_change { quiz_tool.context_external_tool_placements.count }
     end
   end
 end

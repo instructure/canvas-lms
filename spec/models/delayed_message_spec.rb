@@ -29,12 +29,12 @@ describe DelayedMessage do
     end
 
     it "has scope for :daily" do
-      delayed_message_model(:frequency => 'daily')
+      delayed_message_model(frequency: "daily")
       expect(DelayedMessage.for(:daily)).to eq [@delayed_message]
     end
 
     it "scopes for :weekly" do
-      delayed_message_model(:frequency => 'weekly')
+      delayed_message_model(frequency: "weekly")
       expect(DelayedMessage.for(:weekly)).to eq [@delayed_message]
     end
 
@@ -46,14 +46,14 @@ describe DelayedMessage do
 
     it "scopes for notification_policy" do
       notification_policy_model
-      delayed_message_model(:notification_policy_id => @notification_policy.id)
+      delayed_message_model(notification_policy_id: @notification_policy.id)
       expect(@notification_policy).to be_is_a(NotificationPolicy)
       expect(DelayedMessage.for(@notification_policy)).to eq [@delayed_message]
     end
 
     it "scopes for communication_channel" do
       communication_channel_model
-      delayed_message_model(:communication_channel_id => @communication_channel.id)
+      delayed_message_model(communication_channel_id: @communication_channel.id)
       expect(@communication_channel).to be_is_a(CommunicationChannel)
       expect(DelayedMessage.for(@communication_channel)).to eq [@delayed_message]
     end
@@ -66,10 +66,10 @@ describe DelayedMessage do
     end
 
     it "has a scope to filter by the state" do
-      notification_model :name => 'New Stuff'
-      delayed_message_model(:workflow_state => 'pending')
-      delayed_message_model(:workflow_state => 'cancelled')
-      delayed_message_model(:workflow_state => 'sent')
+      notification_model name: "New Stuff"
+      delayed_message_model(workflow_state: "pending")
+      delayed_message_model(workflow_state: "cancelled")
+      delayed_message_model(workflow_state: "sent")
       expect(DelayedMessage.in_state(:pending).all? { |d| d.state == :pending }).to be_truthy
       expect(DelayedMessage.in_state(:pending).size).to eql(1)
       expect(DelayedMessage.in_state(:cancelled).all? { |d| d.state == :cancelled }).to be_truthy
@@ -100,43 +100,43 @@ describe DelayedMessage do
   end
 
   it "uses the user's main account domain for links" do
-    Canvas::MessageHelper.create_notification(:name => 'Summaries', :category => 'Summaries')
-    account = Account.create!(:name => 'new acct')
-    user = user_with_pseudonym(:account => account)
+    Canvas::MessageHelper.create_notification(name: "Summaries", category: "Summaries")
+    account = Account.create!(name: "new acct")
+    user = user_with_pseudonym(account: account)
     expect(user.pseudonym.account).to eq account
     expect(SisPseudonym).to receive(:for).with(user, Account.default, type: :implicit, require_sis: false).and_return(user.pseudonym)
     expect(HostUrl).to receive(:context_host).with(account, any_args).at_least(1).and_return("dm.dummy.test.host")
     allow(HostUrl).to receive(:default_host).and_return("test.host")
     user.communication_channel.confirm!
-    dm = DelayedMessage.create!(:summary => "This is a notification", :context => Account.default, :communication_channel => user.communication_channel, :notification => notification_model)
+    dm = DelayedMessage.create!(summary: "This is a notification", context: Account.default, communication_channel: user.communication_channel, notification: notification_model)
     DelayedMessage.summarize([dm])
     message = Message.last
     expect(message.body.to_s).not_to match(%r{http://test.host/})
     expect(message.body.to_s).to match(%r{http://dm.dummy.test.host/})
   end
 
-  it 'returns nil if the delayed messages are using a retired communication channel' do
-    Canvas::MessageHelper.create_notification(:name => 'Summaries', :category => 'Summaries')
-    account = Account.create!(:name => 'new acct')
-    user = user_with_pseudonym(:account => account)
+  it "returns nil if the delayed messages are using a retired communication channel" do
+    Canvas::MessageHelper.create_notification(name: "Summaries", category: "Summaries")
+    account = Account.create!(name: "new acct")
+    user = user_with_pseudonym(account: account)
     user.communication_channel.retire!
-    dm = DelayedMessage.create!(:summary => "This is a notification", :context => Account.default, :communication_channel => user.communication_channel, :notification => notification_model)
+    dm = DelayedMessage.create!(summary: "This is a notification", context: Account.default, communication_channel: user.communication_channel, notification: notification_model)
     expect(DelayedMessage.summarize([dm])).to be_nil
   end
 
   it "uses the root account's locale if the user locale isn't set" do
-    Canvas::MessageHelper.create_notification(:name => 'Summaries', :category => 'Summaries')
-    account = Account.create!(default_locale: 'es')
+    Canvas::MessageHelper.create_notification(name: "Summaries", category: "Summaries")
+    account = Account.create!(default_locale: "es")
     delayed_message_model(root_account_id: account.id).save!
-    expect(I18n).to receive(:with_locale).with('es').once
+    expect(I18n).to receive(:with_locale).with("es").once
     DelayedMessage.summarize([@delayed_message])
   end
 
   it "uses the user's locale for the summary message" do
-    Canvas::MessageHelper.create_notification(:name => 'Summaries', :category => 'Summaries')
-    @user = User.create!(locale: 'es')
+    Canvas::MessageHelper.create_notification(name: "Summaries", category: "Summaries")
+    @user = User.create!(locale: "es")
     delayed_message_model.save!
-    expect(I18n).to receive(:with_locale).with('es').once
+    expect(I18n).to receive(:with_locale).with("es").once
     DelayedMessage.summarize([@delayed_message])
   end
 
@@ -144,17 +144,17 @@ describe DelayedMessage do
     specs_require_sharding
 
     it "creates messages on the user's shard" do
-      Canvas::MessageHelper.create_notification(:name => 'Summaries', :category => 'Summaries')
+      Canvas::MessageHelper.create_notification(name: "Summaries", category: "Summaries")
 
       @shard1.activate do
-        account = Account.create!(:name => 'new acct')
-        user = user_with_pseudonym(:account => account)
+        account = Account.create!(name: "new acct")
+        user = user_with_pseudonym(account: account)
         expect(user.pseudonym.account).to eq account
         expect(HostUrl).to receive(:context_host).with(user.pseudonym.account, any_args).at_least(1).and_return("dm.dummy.test.host")
         allow(HostUrl).to receive(:default_host).and_return("test.host")
         @cc = user.communication_channel
         @cc.confirm!
-        @dm = DelayedMessage.create!(:summary => "This is a notification", :context => account, :communication_channel => @cc, :notification => notification_model)
+        @dm = DelayedMessage.create!(summary: "This is a notification", context: account, communication_channel: @cc, notification: notification_model)
       end
       @shard2.activate do
         DelayedMessage.summarize([@dm])
@@ -168,18 +168,18 @@ describe DelayedMessage do
     before :once do
       # shouldn't be used, but to make sure it's not equal to any of the other
       # time zones in play
-      Time.zone = 'UTC'
+      Time.zone = "UTC"
       @true_now = Time.zone.now
 
       # time zones of interest
-      @mountain = ActiveSupport::TimeZone.us_zones.find { |zone| zone.name == 'Mountain Time (US & Canada)' }
-      @central = ActiveSupport::TimeZone.us_zones.find { |zone| zone.name == 'Central Time (US & Canada)' }
-      @eastern = ActiveSupport::TimeZone.us_zones.find { |zone| zone.name == 'Eastern Time (US & Canada)' }
+      @mountain = ActiveSupport::TimeZone.us_zones.find { |zone| zone.name == "Mountain Time (US & Canada)" }
+      @central = ActiveSupport::TimeZone.us_zones.find { |zone| zone.name == "Central Time (US & Canada)" }
+      @eastern = ActiveSupport::TimeZone.us_zones.find { |zone| zone.name == "Eastern Time (US & Canada)" }
 
       # set up user in central time (different than the specific time zones
       # referenced in set_send_at)
-      @account = Account.create!(:name => 'new acct')
-      @user = user_with_pseudonym(:account => @account)
+      @account = Account.create!(name: "new acct")
+      @user = user_with_pseudonym(account: @account)
       @user.time_zone = @central.name
       @user.pseudonym.update_attribute(:account, @account)
       @user.save
@@ -187,7 +187,7 @@ describe DelayedMessage do
 
     before do
       # build the delayed message
-      @dm = DelayedMessage.new(:context => @account, :communication_channel => @user.communication_channel)
+      @dm = DelayedMessage.new(context: @account, communication_channel: @user.communication_channel)
     end
 
     it "does nothing if the CC isn't set yet" do
@@ -204,10 +204,10 @@ describe DelayedMessage do
     end
 
     it "sets to 6pm in the user's time zone for non-weekly messages" do
-      Timecop.freeze(@central.now.change(:hour => 12)) do
-        @dm.frequency = 'daily'
+      Timecop.freeze(@central.now.change(hour: 12)) do
+        @dm.frequency = "daily"
         @dm.send(:set_send_at)
-        expect(@dm.send_at).to eq @central.now.change(:hour => 18)
+        expect(@dm.send_at).to eq @central.now.change(hour: 18)
       end
     end
 
@@ -215,18 +215,18 @@ describe DelayedMessage do
       @user.time_zone = nil
       @user.save
 
-      Timecop.freeze(@mountain.now.change(:hour => 12)) do
-        @dm.frequency = 'daily'
+      Timecop.freeze(@mountain.now.change(hour: 12)) do
+        @dm.frequency = "daily"
         @dm.send(:set_send_at)
-        expect(@dm.send_at).to eq @mountain.now.change(:hour => 18)
+        expect(@dm.send_at).to eq @mountain.now.change(hour: 18)
       end
     end
 
     it "sets to 6pm the next day for non-weekly messages created after 6pm" do
-      Timecop.freeze(@central.now.change(:hour => 20)) do
-        @dm.frequency = 'daily'
+      Timecop.freeze(@central.now.change(hour: 20)) do
+        @dm.frequency = "daily"
         @dm.send(:set_send_at)
-        expect(@dm.send_at).to eq @central.now.tomorrow.change(:hour => 18)
+        expect(@dm.send_at).to eq @central.now.tomorrow.change(hour: 18)
       end
     end
 
@@ -236,7 +236,7 @@ describe DelayedMessage do
       sunday = saturday + 1.day
 
       Timecop.freeze(monday) do
-        @dm.frequency = 'weekly'
+        @dm.frequency = "weekly"
         @dm.send(:set_send_at)
         expect(@dm.send_at.in_time_zone(@eastern).midnight).to eq saturday
       end
@@ -253,7 +253,7 @@ describe DelayedMessage do
       saturday = monday + 5.days
 
       Timecop.freeze(monday) do
-        @dm.frequency = 'weekly'
+        @dm.frequency = "weekly"
         @dm.send(:set_send_at)
       end
 
@@ -267,11 +267,11 @@ describe DelayedMessage do
     it "uses the same time of day across weeks for weekly messages for the same user" do
       # anchor to January 1st to avoid DST; we're consigned to slightly weird
       # behavior around DST, but don't want it failing tests
-      monday = @eastern.now.change(:month => 1, :day => 1).monday
+      monday = @eastern.now.change(month: 1, day: 1).monday
       first = nil
 
       Timecop.freeze(monday) do
-        @dm.frequency = 'weekly'
+        @dm.frequency = "weekly"
         @dm.send(:set_send_at)
         first = @dm.send_at
       end
@@ -288,12 +288,12 @@ describe DelayedMessage do
       saturday = monday + 5.days
 
       Timecop.freeze(monday) do
-        @dm.frequency = 'weekly'
+        @dm.frequency = "weekly"
 
         expected_windows = []
         actual_windows = []
 
-        DelayedMessage::WEEKLY_ACCOUNT_BUCKETS.times.map do |i|
+        DelayedMessage::WEEKLY_ACCOUNT_BUCKETS.times do |i|
           @dm.communication_channel.user.pseudonym.account_id = i
           @dm.send_at = nil
           @dm.send(:set_send_at)
@@ -310,13 +310,13 @@ describe DelayedMessage do
       saturday = monday + 5.days
 
       Timecop.freeze(monday) do
-        @dm.frequency = 'weekly'
+        @dm.frequency = "weekly"
 
         expected_diffs = []
         actual_diffs = []
         windows = []
 
-        DelayedMessage::MINUTES_PER_WEEKLY_ACCOUNT_BUCKET.times.map do |i|
+        DelayedMessage::MINUTES_PER_WEEKLY_ACCOUNT_BUCKET.times do |i|
           @dm.communication_channel.user.id = i
           @dm.send_at = nil
           @dm.send(:set_send_at)

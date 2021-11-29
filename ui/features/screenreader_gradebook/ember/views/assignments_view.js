@@ -40,7 +40,9 @@ const AssignmentsView = Ember.View.extend({
         context_url: ENV.GRADEBOOK_OPTIONS.context_url,
         speed_grader_enabled: ENV.GRADEBOOK_OPTIONS.speed_grader_enabled,
         change_grade_url: ENV.GRADEBOOK_OPTIONS.change_grade_url,
-        isAdmin: _.includes(ENV.current_user_roles, 'admin')
+        isAdmin: _.includes(ENV.current_user_roles, 'admin'),
+        show_message_students_with_observers_dialog:
+          ENV.GRADEBOOK_OPTIONS.show_message_students_with_observers_dialog
       }
 
       const dialogs = {

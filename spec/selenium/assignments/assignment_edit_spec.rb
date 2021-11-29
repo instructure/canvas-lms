@@ -17,30 +17,30 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../common'
-require_relative 'page_objects/assignment_create_edit_page'
-require_relative 'page_objects/assignment_page'
+require_relative "../common"
+require_relative "page_objects/assignment_create_edit_page"
+require_relative "page_objects/assignment_page"
 
 describe "assignment" do
   include_context "in-process server selenium tests"
 
   context "for submission limited attempts" do
     before(:once) do
-      @course1 = Course.create!(:name => "First Course1")
+      @course1 = Course.create!(name: "First Course1")
       @teacher1 = User.create!
-      @teacher1 = User.create!(:name => "First Teacher")
+      @teacher1 = User.create!(name: "First Teacher")
       @teacher1.accept_terms
       @teacher1.register!
-      @course1.enroll_teacher(@teacher1, :enrollment_state => 'active')
+      @course1.enroll_teacher(@teacher1, enrollment_state: "active")
       @assignment1 = @course1.assignments.create!(
-        :title => 'Existing Assignment',
-        :points_possible => 10,
-        :submission_types => "online_url,online_upload,online_text_entry"
+        title: "Existing Assignment",
+        points_possible: 10,
+        submission_types: "online_url,online_upload,online_text_entry"
       )
       @assignment2_paper = @course1.assignments.create!(
-        :title => 'Existing Assignment',
-        :points_possible => 10,
-        :submission_types => "on_paper"
+        title: "Existing Assignment",
+        points_possible: 10,
+        submission_types: "on_paper"
       )
     end
 
@@ -79,11 +79,11 @@ describe "assignment" do
       click_option(AssignmentCreateEditPage.limited_attempts_dropdown, "Limited")
 
       # default attempt count is 1
-      expect(AssignmentCreateEditPage.limited_attempts_input.attribute('value')).to eq "1"
+      expect(AssignmentCreateEditPage.limited_attempts_input.attribute("value")).to eq "1"
 
       # increase attempts count
-      AssignmentCreateEditPage.increase_attempts_btn.click()
-      AssignmentCreateEditPage.assignment_save_button.click()
+      AssignmentCreateEditPage.increase_attempts_btn.click
+      AssignmentCreateEditPage.assignment_save_button.click
       wait_for_ajaximations
 
       expect(AssignmentPage.allowed_attempts_count.text).to include "2"

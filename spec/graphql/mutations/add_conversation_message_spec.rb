@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../graphql_spec_helper'
+require_relative "../graphql_spec_helper"
 
 RSpec.describe Mutations::AddConversationMessage do
   before(:once) do
@@ -29,10 +29,10 @@ RSpec.describe Mutations::AddConversationMessage do
   def conversation(opts = {})
     num_other_users = opts[:num_other_users] || 1
     course = opts[:course] || @course
-    user_data = num_other_users.times.map { { name: 'User' } }
+    user_data = Array.new(num_other_users) { { name: "User" } }
     users = opts[:users] || create_users_in_course(course, user_data, account_associations: true, return_type: :record)
     @conversation = @user.initiate_conversation(users)
-    @conversation.add_message(opts[:message] || 'test')
+    @conversation.add_message(opts[:message] || "test")
     @conversation.conversation.update_attribute(:context, course)
     @conversation
   end
@@ -97,83 +97,83 @@ RSpec.describe Mutations::AddConversationMessage do
     result.to_h.with_indifferent_access
   end
 
-  it 'adds a message' do
+  it "adds a message" do
     conversation
-    result = run_mutation(conversation_id: @conversation.conversation_id, body: 'This is a neat message', recipients: [@teacher.id.to_s])
+    result = run_mutation(conversation_id: @conversation.conversation_id, body: "This is a neat message", recipients: [@teacher.id.to_s])
 
-    expect(result.dig('errors')).to be nil
-    expect(result.dig('data', 'addConversationMessage', 'errors')).to be nil
+    expect(result["errors"]).to be nil
+    expect(result.dig("data", "addConversationMessage", "errors")).to be nil
     expect(
-      result.dig('data', 'addConversationMessage', 'conversationMessage', 'body')
-    ).to eq 'This is a neat message'
-    cm = ConversationMessage.find(result.dig('data', 'addConversationMessage', 'conversationMessage', '_id'))
+      result.dig("data", "addConversationMessage", "conversationMessage", "body")
+    ).to eq "This is a neat message"
+    cm = ConversationMessage.find(result.dig("data", "addConversationMessage", "conversationMessage", "_id"))
     expect(cm).to_not be nil
     expect(cm.conversation_id).to eq @conversation.conversation_id
   end
 
-  it 'requires permissions' do
+  it "requires permissions" do
     conversation
     @course.account.role_overrides.create!(permission: :send_messages, role: student_role, enabled: false)
 
-    result = run_mutation(conversation_id: @conversation.conversation_id, body: 'need some perms yo', recipients: [@teacher.id.to_s])
-    expect(result.dig('errors')).to be nil
-    expect(result.dig('data', 'addConversationMessage', 'conversationMessage')).to be nil
+    result = run_mutation(conversation_id: @conversation.conversation_id, body: "need some perms yo", recipients: [@teacher.id.to_s])
+    expect(result["errors"]).to be nil
+    expect(result.dig("data", "addConversationMessage", "conversationMessage")).to be nil
     expect(
-      result.dig('data', 'addConversationMessage', 'errors', 0, 'message')
-    ).to eq 'Unauthorized, unable to add messages to conversation'
+      result.dig("data", "addConversationMessage", "errors", 0, "message")
+    ).to eq "Unauthorized, unable to add messages to conversation"
   end
 
-  it 'queues a job if needed' do
+  it "queues a job if needed" do
     allow_any_instance_of(ConversationParticipant).to receive(:should_process_immediately?).and_return(false)
     conversation
-    result = run_mutation(conversation_id: @conversation.conversation_id, body: 'This should be delayed', recipients: [@teacher.id.to_s])
+    result = run_mutation(conversation_id: @conversation.conversation_id, body: "This should be delayed", recipients: [@teacher.id.to_s])
 
-    expect(result.dig('errors')).to be nil
+    expect(result["errors"]).to be nil
     # a nil result with no errors implies that the message was delayed and will be processed later
-    expect(result.dig('data', 'addConversationMessage', 'conversationMessage')).to be nil
+    expect(result.dig("data", "addConversationMessage", "conversationMessage")).to be nil
     expect(@conversation.reload.messages.count(:all)).to eq 1
     run_jobs
     expect(@conversation.reload.messages.count(:all)).to eq 2
   end
 
-  it 'generates a user note when requested' do
+  it "generates a user note when requested" do
     Account.default.update_attribute(:enable_user_notes, true)
     conversation(users: [@teacher])
 
-    result = run_mutation({ conversation_id: @conversation.conversation_id, body: 'Have a note', recipients: [@student.id.to_s] }, @teacher)
-    expect(result.dig('errors')).to be nil
-    cm = ConversationMessage.find(result.dig('data', 'addConversationMessage', 'conversationMessage', '_id'))
+    result = run_mutation({ conversation_id: @conversation.conversation_id, body: "Have a note", recipients: [@student.id.to_s] }, @teacher)
+    expect(result["errors"]).to be nil
+    cm = ConversationMessage.find(result.dig("data", "addConversationMessage", "conversationMessage", "_id"))
     student = cm.recipients.first
     expect(student.user_notes.size).to eq 0
 
-    result = run_mutation({ conversation_id: @conversation.conversation_id, body: 'Have a note', recipients: [@student.id.to_s], user_note: true }, @teacher)
-    expect(result.dig('errors')).to be nil
-    cm = ConversationMessage.find(result.dig('data', 'addConversationMessage', 'conversationMessage', '_id'))
+    result = run_mutation({ conversation_id: @conversation.conversation_id, body: "Have a note", recipients: [@student.id.to_s], user_note: true }, @teacher)
+    expect(result["errors"]).to be nil
+    cm = ConversationMessage.find(result.dig("data", "addConversationMessage", "conversationMessage", "_id"))
     student = cm.recipients.first
     expect(student.user_notes.size).to eq 1
   end
 
-  it 'does not allow new messages in concluded courses for students' do
+  it "does not allow new messages in concluded courses for students" do
     allow_any_instance_of(Conversation).to receive(:replies_locked_for?).and_return(false)
     conversation
-    @course.update!(workflow_state: 'completed')
+    @course.update!(workflow_state: "completed")
 
-    result = run_mutation(conversation_id: @conversation.conversation_id, body: 'uh uh uh', recipients: [@student.id.to_s])
-    expect(result.dig('errors')).to be nil
-    expect(result.dig('data', 'addConversationMessage', 'conversationMessage')).to be nil
+    result = run_mutation(conversation_id: @conversation.conversation_id, body: "uh uh uh", recipients: [@student.id.to_s])
+    expect(result["errors"]).to be nil
+    expect(result.dig("data", "addConversationMessage", "conversationMessage")).to be nil
     expect(
-      result.dig('data', 'addConversationMessage', 'errors', 0, 'message')
-    ).to eq 'Course concluded, unable to send messages'
+      result.dig("data", "addConversationMessage", "errors", 0, "message")
+    ).to eq "Course concluded, unable to send messages"
   end
 
-  it 'allows new messages in concluded courses for teachers' do
+  it "allows new messages in concluded courses for teachers" do
     conversation(users: [@teacher])
-    @course.update!(workflow_state: 'completed')
+    @course.update!(workflow_state: "completed")
 
-    result = run_mutation({ conversation_id: @conversation.conversation_id, body: 'I have the power', recipients: [@student.id.to_s] }, @teacher)
-    expect(result.dig('errors')).to be nil
+    result = run_mutation({ conversation_id: @conversation.conversation_id, body: "I have the power", recipients: [@student.id.to_s] }, @teacher)
+    expect(result["errors"]).to be nil
     expect(
-      result.dig('data', 'addConversationMessage', 'conversationMessage', 'body')
-    ).to eq 'I have the power'
+      result.dig("data", "addConversationMessage", "conversationMessage", "body")
+    ).to eq "I have the power"
   end
 end

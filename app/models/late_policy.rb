@@ -19,7 +19,7 @@
 #
 
 class LatePolicy < ActiveRecord::Base
-  POINT_DEDUCTIBLE_GRADING_TYPES = %w(points percent letter_grade gpa_scale).freeze
+  POINT_DEDUCTIBLE_GRADING_TYPES = %w[points percent letter_grade gpa_scale].freeze
 
   belongs_to :course, inverse_of: :late_policy
 
@@ -31,7 +31,7 @@ class LatePolicy < ActiveRecord::Base
             numericality: { greater_than_or_equal_to: 0, less_than_or_equal_to: 100 }
   validates :late_submission_interval,
             presence: true,
-            inclusion: { in: %w(day hour) }
+            inclusion: { in: %w[day hour] }
 
   before_save :set_root_account_id
   after_save :update_late_submissions, if: :late_policy_attributes_changed?
@@ -49,7 +49,7 @@ class LatePolicy < ActiveRecord::Base
   end
 
   def missing_points_deducted(points_possible, grading_type)
-    return points_possible.to_f if grading_type == 'pass_fail'
+    return points_possible.to_f if grading_type == "pass_fail"
 
     points_possible.to_f * missing_submission_deduction.to_f / 100
   end
@@ -65,7 +65,7 @@ class LatePolicy < ActiveRecord::Base
   end
 
   def interval_seconds
-    { 'hour' => 1.hour, 'day' => 1.day }[late_submission_interval].to_f
+    { "hour" => 1.hour, "day" => 1.day }[late_submission_interval].to_f
   end
 
   def update_late_submissions
@@ -74,13 +74,13 @@ class LatePolicy < ActiveRecord::Base
 
   def late_policy_attributes_changed?
     (
-      [
-        'late_submission_deduction_enabled',
-        'late_submission_deduction',
-        'late_submission_interval',
-        'late_submission_minimum_percent_enabled',
-        'late_submission_minimum_percent',
-        'missing_submission_deduction_enabled'
+      %w[
+        late_submission_deduction_enabled
+        late_submission_deduction
+        late_submission_interval
+        late_submission_minimum_percent_enabled
+        late_submission_minimum_percent
+        missing_submission_deduction_enabled
       ] & saved_changes.keys
     ).present?
   end

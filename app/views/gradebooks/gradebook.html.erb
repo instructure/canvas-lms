@@ -120,6 +120,10 @@
   <span data-component="StatusesModal"></span>
   <span data-component="AnonymousSpeedGraderAlert"></span>
 
+  <% if show_message_students_with_observers_dialog? %>
+    <span data-component="MessageStudentsWithObserversModal"></span>
+  <% end %>
+
   <div id="assignment-posting-policy-tray"></div>
   <div id="hide-assignment-grades-tray"></div>
   <div id="post-assignment-grades-tray"></div>

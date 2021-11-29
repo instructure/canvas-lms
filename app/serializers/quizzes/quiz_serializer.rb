@@ -59,9 +59,7 @@ module Quizzes
                    :course_quiz_quiz_submissions_url,
                    :course_quiz_submission_versions_url
 
-    def context
-      quiz.context
-    end
+    delegate context: :quiz
 
     def_delegators :@quiz, :quiz_questions
 
@@ -112,7 +110,7 @@ module Quizzes
     # end
 
     def preview_url
-      course_quiz_take_url(context, quiz, preview: '1')
+      course_quiz_take_url(context, quiz, preview: "1")
     end
 
     # def unsubmitted_students
@@ -146,7 +144,7 @@ module Quizzes
     end
 
     def description
-      return '' if hide_locked_description?
+      return "" if hide_locked_description?
 
       if @serializer_options[:description_formatter]
         @serializer_options[:description_formatter].call(quiz.description)
@@ -156,7 +154,7 @@ module Quizzes
     end
 
     def unsubmitted_students_url
-      api_v1_course_quiz_submission_users_url(context, quiz, submitted: 'false')
+      api_v1_course_quiz_submission_users_url(context, quiz, submitted: "false")
     end
 
     def submitted_students_url
@@ -188,7 +186,7 @@ module Quizzes
     end
 
     def locked_for_json_type
-      'quiz'
+      "quiz"
     end
 
     # Teacher or Observer?
@@ -270,24 +268,22 @@ module Quizzes
       quiz.require_lockdown_browser_monitor?
     end
 
-    def lockdown_browser_monitor_data
-      quiz.lockdown_browser_monitor_data
-    end
+    delegate lockdown_browser_monitor_data: :quiz
 
     def serializable_object(**)
       hash = super
       # legacy v1 api
-      unless accepts_jsonapi?
-        hash.delete('links')
-        # id = hash['assignment_group']
-        # hash['assignment_group_id'] = quiz.assignment_group.try(:id)
-      else
+      if accepts_jsonapi?
         # since we're not embedding QuizStatistics as an association because
         # the statistics objects are built on-demand when the endpoint is
         # requested, and we only need the link, we'll have to assign it manually
-        hash['links'] ||= {}
-        hash['links']['quiz_statistics'] = hash.delete(:quiz_statistics_url)
-        hash['links']['quiz_reports'] = hash.delete(:quiz_reports_url)
+        hash["links"] ||= {}
+        hash["links"]["quiz_statistics"] = hash.delete(:quiz_statistics_url)
+        hash["links"]["quiz_reports"] = hash.delete(:quiz_reports_url)
+      else
+        hash.delete("links")
+        # id = hash['assignment_group']
+        # hash['assignment_group_id'] = quiz.assignment_group.try(:id)
       end
       if (mc_status = serializer_option(:master_course_status))
         hash.merge!(quiz.master_course_api_restriction_data(mc_status))
@@ -351,10 +347,12 @@ module Quizzes
     #
     # @param [:due_at|:lock_at|:unlock_at] domain
     def overridden_date(domain)
-      !serializer_option(:skip_date_overrides) &&
-        context.user_has_been_student?(current_user) && due_dates.any? ?
-        due_dates[0][domain] :
+      if !serializer_option(:skip_date_overrides) &&
+         context.user_has_been_student?(current_user) && due_dates.any?
+        due_dates[0][domain]
+      else
         quiz.send(domain)
+      end
     end
 
     def due_at

@@ -25,16 +25,16 @@
 # See http://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration
 
 begin
-  require '../../spec/coverage_tool.rb'
-  CoverageTool.start('lti_outbound-gem')
+  require "../../spec/coverage_tool"
+  CoverageTool.start("lti_outbound-gem")
 rescue LoadError => e
   puts "Error: #{e} "
 end
 
-require 'lti_outbound'
+require "lti_outbound"
 
-Dir.glob("#{File.dirname(__FILE__).gsub(/\\/, "/")}/shared_examples/*.rb").sort.each { |file| require file }
-Dir.glob("#{File.dirname(__FILE__).gsub(/\\/, "/")}/support/*.rb").sort.each { |file| require file }
+Dir.glob("#{File.dirname(__FILE__).tr("\\", "/")}/shared_examples/*.rb").sort.each { |file| require file }
+Dir.glob("#{File.dirname(__FILE__).tr("\\", "/")}/support/*.rb").sort.each { |file| require file }
 
 RSpec.configure do |config|
   config.run_all_when_everything_filtered = true
@@ -44,5 +44,5 @@ RSpec.configure do |config|
   # order dependency and want to debug it, you can fix the order by providing
   # the seed, which is printed after each run.
   #     --seed 1234
-  config.order = 'random'
+  config.order = "random"
 end

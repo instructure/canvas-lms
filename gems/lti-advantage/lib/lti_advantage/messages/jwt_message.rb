@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'json/jwt'
+require "json/jwt"
 
 module LtiAdvantage::Messages
   # Abstract base class for all LTI 1.3 JWT message types
@@ -115,7 +115,7 @@ module LtiAdvantage::Messages
     end
 
     def read_attribute(attribute)
-      self.send(attribute)
+      send(attribute)
     end
 
     def to_h
@@ -123,7 +123,7 @@ module LtiAdvantage::Messages
     end
 
     def to_jws(private_key, alg = :RS256)
-      self.class.create_jws(self.to_h, private_key, alg)
+      self.class.create_jws(to_h, private_key, alg)
     end
   end
 end

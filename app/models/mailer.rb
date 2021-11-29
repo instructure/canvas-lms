@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'mail'
+require "mail"
 
 class Mailer < ActionMailer::Base
   attr_reader :email
@@ -26,7 +26,7 @@ class Mailer < ActionMailer::Base
   # define in rails3-style
   def create_message(m)
     # notifications have context, bounce replies don't.
-    headers('Auto-Submitted' => m.context ? 'auto-generated' : 'auto-replied')
+    headers("Auto-Submitted" => m.context ? "auto-generated" : "auto-replied")
 
     params = {
       from: from_mailbox(m),
@@ -51,8 +51,8 @@ class Mailer < ActionMailer::Base
   # the notification service.
   def self.deliver(mail_obj)
     InstStatsd::Statsd.increment("message.deliver",
-                                 short_stat: 'message.deliver',
-                                 tags: { path_type: 'mailer_emails', notification_name: 'mailer_delivery' })
+                                 short_stat: "message.deliver",
+                                 tags: { path_type: "mailer_emails", notification_name: "mailer_delivery" })
     if Account.site_admin.feature_enabled?(:notification_service)
       Services::NotificationService.process(
         "direct:#{SecureRandom.hex(10)}",

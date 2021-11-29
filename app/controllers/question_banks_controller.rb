@@ -19,8 +19,8 @@
 #
 
 class QuestionBanksController < ApplicationController
-  before_action :require_context, :except => :bookmark
-  add_crumb(proc { t('#crumbs.question_banks', "Question Banks") }, :except => :bookmark) { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_question_banks_url }
+  before_action :require_context, except: :bookmark
+  add_crumb(proc { t("#crumbs.question_banks", "Question Banks") }, except: :bookmark) { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_question_banks_url }
 
   include Api::V1::Outcome
   include QuizMathDataFixup
@@ -28,43 +28,43 @@ class QuestionBanksController < ApplicationController
   def index
     if @context == @current_user || authorized_action(@context, @current_user, :read_question_banks)
       @question_banks = @context.assessment_question_banks.active.except(:preload).to_a
-      if params[:include_bookmarked] == '1'
+      if params[:include_bookmarked] == "1"
         @question_banks += @current_user.assessment_question_banks.active
       end
-      if params[:inherited] == '1' && @context != @current_user
+      if params[:inherited] == "1" && @context != @current_user
         @question_banks += @context.inherited_assessment_question_banks.active
       end
-      @question_banks = @question_banks.select { |b| b.grants_right?(@current_user, :manage) } if params[:managed] == '1'
+      @question_banks = @question_banks.select { |b| b.grants_right?(@current_user, :manage) } if params[:managed] == "1"
       @question_banks = Canvas::ICU.collate_by(@question_banks.uniq) { |b| b.title || CanvasSort::Last }
       respond_to do |format|
         format.html
-        format.json { render :json => @question_banks.map { |b| b.as_json(methods: [:cached_context_short_name, :assessment_question_count]) } }
+        format.json { render json: @question_banks.map { |b| b.as_json(methods: [:cached_context_short_name, :assessment_question_count]) } }
       end
     end
   end
 
   def questions
-    find_bank(params[:question_bank_id], params[:inherited] == '1') do
+    find_bank(params[:question_bank_id], params[:inherited] == "1") do
       @questions = @bank.assessment_questions.active
-      url = polymorphic_url([@context, :question_bank_questions], :question_bank_id => @bank)
+      url = polymorphic_url([@context, :question_bank_questions], question_bank_id: @bank)
       @questions = Api.paginate(@questions, self, url, default_per_page: 50)
-      render :json => { :pages => @questions.total_pages, :questions => @questions }
+      render json: { pages: @questions.total_pages, questions: @questions }
     end
   end
 
   def reorder
     @bank = @context.assessment_question_banks.find(params[:question_bank_id])
     if authorized_action(@bank, @current_user, :update)
-      @bank.assessment_questions.active.first.update_order(params[:order].split(','))
-      render :json => { :reorder => true }
+      @bank.assessment_questions.active.first.update_order(params[:order].split(","))
+      render json: { reorder: true }
     end
   end
 
   def show
     @bank = @context.assessment_question_banks.find(params[:id])
     js_env(
-      :CONTEXT_URL_ROOT => polymorphic_path([@context]),
-      :ROOT_OUTCOME_GROUP => outcome_group_json(@context.root_outcome_group, @current_user, session)
+      CONTEXT_URL_ROOT: polymorphic_path([@context]),
+      ROOT_OUTCOME_GROUP: outcome_group_json(@context.root_outcome_group, @current_user, session)
     )
     mastery_scales_js_env
     rce_js_env
@@ -78,7 +78,7 @@ class QuestionBanksController < ApplicationController
 
     if authorized_action(@bank, @current_user, :read)
       @alignments = Canvas::ICU.collate_by(@bank.learning_outcome_alignments) { |a| a.learning_outcome.short_description }
-      @questions = @bank.assessment_questions.active.paginate(:per_page => 50, :page => 1)
+      @questions = @bank.assessment_questions.active.paginate(per_page: 50, page: 1)
     end
 
     js_bundle :quizzes, :question_bank
@@ -96,25 +96,25 @@ class QuestionBanksController < ApplicationController
 
       ids = []
       params[:questions].each do |key, value|
-        ids << key.to_i if value != '0' && key.to_i != 0
+        ids << key.to_i if value != "0" && key.to_i != 0
       end
-      @questions = @bank.assessment_questions.where(:id => ids)
-      if params[:move] != '1'
-        attributes = @questions.columns.map(&:name) - %w{id created_at updated_at assessment_question_bank_id}
+      @questions = @bank.assessment_questions.where(id: ids)
+      if params[:move] == "1"
+        @questions.update_all(assessment_question_bank_id: @new_bank.id)
+      else
+        attributes = @questions.columns.map(&:name) - %w[id created_at updated_at assessment_question_bank_id]
         connection = @questions.connection
         attributes = attributes.map { |attr| connection.quote_column_name(attr) }
         now = connection.quote(Time.now.utc)
         connection.insert(
-          "INSERT INTO #{AssessmentQuestion.quoted_table_name} (#{(%w{assessment_question_bank_id created_at updated_at} + attributes).join(', ')})" +
-          @questions.select(([@new_bank.id, now, now] + attributes).join(', ')).to_sql
+          "INSERT INTO #{AssessmentQuestion.quoted_table_name} (#{(%w[assessment_question_bank_id created_at updated_at] + attributes).join(", ")})" +
+          @questions.select(([@new_bank.id, now, now] + attributes).join(", ")).to_sql
         )
-      else
-        @questions.update_all(:assessment_question_bank_id => @new_bank.id)
       end
 
       [@bank, @new_bank].each(&:touch)
 
-      render :json => {}
+      render json: {}
     end
   end
 
@@ -126,11 +126,11 @@ class QuestionBanksController < ApplicationController
           @bank.bookmark_for(@current_user)
           flash[:notice] = t :bank_success, "Question bank successfully created!"
           format.html { redirect_to named_context_url(@context, :context_question_banks_url) }
-          format.json { render :json => @bank }
+          format.json { render json: @bank }
         else
           flash[:error] = t :bank_fail, "Question bank failed to create."
           format.html { redirect_to named_context_url(@context, :context_question_banks_url) }
-          format.json { render :json => @bank.errors, :status => :bad_request }
+          format.json { render json: @bank.errors, status: :bad_request }
         end
       end
     end
@@ -140,9 +140,9 @@ class QuestionBanksController < ApplicationController
     @bank = AssessmentQuestionBank.find(params[:question_bank_id])
 
     if params[:unbookmark] == "1"
-      render :json => @bank.bookmark_for(@current_user, false)
+      render json: @bank.bookmark_for(@current_user, false)
     elsif authorized_action(@bank, @current_user, :update)
-      render :json => @bank.bookmark_for(@current_user)
+      render json: @bank.bookmark_for(@current_user)
     end
   end
 
@@ -151,9 +151,9 @@ class QuestionBanksController < ApplicationController
     if authorized_action(@bank, @current_user, :update)
       if @bank.update(bank_params)
         @bank.reload
-        render :json => @bank.as_json(:include => { :learning_outcome_alignments => { :include => { :learning_outcome => { :include_root => false } } } })
+        render json: @bank.as_json(include: { learning_outcome_alignments: { include: { learning_outcome: { include_root: false } } } })
       else
-        render :json => @bank.errors, :status => :bad_request
+        render json: @bank.errors, status: :bad_request
       end
     end
   end
@@ -162,13 +162,13 @@ class QuestionBanksController < ApplicationController
     @bank = @context.assessment_question_banks.find(params[:id])
     if authorized_action(@bank, @current_user, :delete)
       @bank.destroy
-      render :json => @bank
+      render json: @bank
     end
   end
 
   private
 
   def bank_params
-    params.require(:assessment_question_bank).permit(:title, :alignments => strong_anything)
+    params.require(:assessment_question_bank).permit(:title, alignments: strong_anything)
   end
 end

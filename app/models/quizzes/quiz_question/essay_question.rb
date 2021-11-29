@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'sanitize'
+require "sanitize"
 
 class Quizzes::QuizQuestion::EssayQuestion < Quizzes::QuizQuestion::Base
   def requires_manual_scoring?(_user_answer)
@@ -33,12 +33,12 @@ class Quizzes::QuizQuestion::EssayQuestion < Quizzes::QuizQuestion::Base
 
   # TODO: remove once new stats is on for everybody
   def stats(responses)
-    stats = { :essay_responses => [] }
+    stats = { essay_responses: [] }
 
     responses.each do |response|
       stats[:essay_responses] << {
-        :user_id => response[:user_id],
-        :text => response[:text].to_s.strip
+        user_id: response[:user_id],
+        text: response[:text].to_s.strip
       }
     end
 

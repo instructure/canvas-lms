@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'json/jwt'
+require "json/jwt"
 
 module Lti
   module IMS
@@ -54,15 +54,15 @@ module Lti
         # it will with the content items
         js_env({
           content_items: content_items,
-          message: messaging_value('msg'),
-          log: messaging_value('log'),
-          error_message: messaging_value('errormsg'),
-          error_log: messaging_value('errorlog'),
+          message: messaging_value("msg"),
+          log: messaging_value("log"),
+          error_message: messaging_value("errormsg"),
+          error_log: messaging_value("errorlog"),
           lti_endpoint: polymorphic_url([:retrieve, @context, :external_tools]),
           reload_page: multiple_items_for_existing_module?
         }.compact)
 
-        render layout: 'bare'
+        render layout: "bare"
       end
     end
   end

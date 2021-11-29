@@ -21,7 +21,7 @@
 class ContentExportsController < ApplicationController
   include K5Mode
 
-  before_action :require_permission, :except => :xml_schema
+  before_action :require_permission, except: :xml_schema
   before_action { |c| c.active_tab = "settings" }
 
   def require_permission
@@ -32,7 +32,7 @@ class ContentExportsController < ApplicationController
 
   def index
     scope = @context.content_exports_visible_to(@current_user).without_epub
-    @exports = scope.active.not_for_copy.order('content_exports.created_at DESC')
+    @exports = scope.active.not_for_copy.order("content_exports.created_at DESC")
     @current_export_id = scope.running.first.try(:id)
   end
 
@@ -40,26 +40,30 @@ class ContentExportsController < ApplicationController
     if params[:id].present? && (export = @context.content_exports_visible_to(@current_user).where(id: params[:id]).first)
       render_export(export)
     else
-      render :json => { :errors => { :base => t('errors.not_found', "Export does not exist") } }, :status => :not_found
+      render json: { errors: { base: t("errors.not_found", "Export does not exist") } }, status: :not_found
     end
   end
 
   def create
     export = @context.content_exports_visible_to(@current_user).running.first
-    unless export
+    if export
+      # an export is already running, just return it
+      render_export(export)
+    else
       export = @context.content_exports.build
       export.user = @current_user
-      export.workflow_state = 'created'
+      export.workflow_state = "created"
 
-      if @context.is_a?(Course)
-        if params[:export_type] == 'qti'
+      case @context
+      when Course
+        if params[:export_type] == "qti"
           export.export_type = ContentExport::QTI
           export.selected_content = params[:copy].to_unsafe_h
         else
           export.export_type = ContentExport::COMMON_CARTRIDGE
-          export.selected_content = { :everything => true }
+          export.selected_content = { everything: true }
         end
-      elsif @context.is_a?(User)
+      when User
         export.export_type = ContentExport::USER_DATA
       end
 
@@ -68,37 +72,34 @@ class ContentExportsController < ApplicationController
         export.export
         render_export(export)
       else
-        render :json => { :error_message => t('errors.couldnt_create', "Couldn't create content export.") }
+        render json: { error_message: t("errors.couldnt_create", "Couldn't create content export.") }
       end
-    else
-      # an export is already running, just return it
-      render_export(export)
     end
   end
 
   def destroy
     if params[:id].present? && (export = @context.content_exports_visible_to(@current_user).where(id: params[:id]).first)
       export.destroy
-      render :json => { :success => 'true' }
+      render json: { success: "true" }
     else
-      render :json => { :errors => { :base => t('errors.not_found', "Export does not exist") } }, :status => :not_found
+      render json: { errors: { base: t("errors.not_found", "Export does not exist") } }, status: :not_found
     end
   end
 
   def xml_schema
     if (filename = CC::Schema.for_version(params[:version]))
       cancel_cache_buster
-      send_file(filename, :type => 'text/xml', :disposition => 'inline')
+      send_file(filename, type: "text/xml", disposition: "inline")
     else
-      render 'shared/errors/404_message', status: :not_found, formats: [:html]
+      render "shared/errors/404_message", status: :not_found, formats: [:html]
     end
   end
 
   private
 
   def render_export(export)
-    json = export.as_json(:only => [:id, :progress, :workflow_state], :methods => [:error_message])
-    json['content_export']['download_url'] = verified_file_download_url(export.attachment, export) if export.attachment && !export.expired?
-    render :json => json
+    json = export.as_json(only: %i[id progress workflow_state], methods: [:error_message])
+    json["content_export"]["download_url"] = verified_file_download_url(export.attachment, export) if export.attachment && !export.expired?
+    render json: json
   end
 end

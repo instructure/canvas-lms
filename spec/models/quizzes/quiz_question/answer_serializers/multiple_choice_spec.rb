@@ -17,23 +17,22 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative 'support/answer_serializers_specs'
-require_relative 'support/id_answer_serializers_specs'
+require_relative "support/answer_serializers_specs"
+require_relative "support/id_answer_serializers_specs"
 
 describe Quizzes::QuizQuestion::AnswerSerializers::MultipleChoice do
-  include_examples 'Answer Serializers'
-
-  let :input do
-    '2405'
-  end
-
   let :output do
     {
       question_5: "2405"
     }.with_indifferent_access
   end
+  let :input do
+    "2405"
+  end
 
-  context 'validations' do
-    include_examples 'Id Answer Serializers'
+  include_examples "Answer Serializers"
+
+  context "validations" do
+    include_examples "Id Answer Serializers"
   end
 end

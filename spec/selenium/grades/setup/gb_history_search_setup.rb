@@ -17,8 +17,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../setup/gradebook_setup'
-require_relative '../../helpers/gradebook_common'
+require_relative "../setup/gradebook_setup"
+require_relative "../../helpers/gradebook_common"
 
 module GradebookHistorySetup
   include GradebookCommon
@@ -41,31 +41,31 @@ module GradebookHistorySetup
 
   def create_assignment_past_due_day(now)
     @assignment_past_due_day = @course.assignments.create!(
-      title: 'assignment one',
-      grading_type: 'points',
+      title: "assignment one",
+      grading_type: "points",
       points_possible: 100,
       due_at: 1.day.ago(now),
-      submission_types: 'online_text_entry'
+      submission_types: "online_text_entry"
     )
   end
 
   def create_assignment_due_one_day(now)
     @assignment_due_one_day = @course.assignments.create!(
-      title: 'assignment two',
-      grading_type: 'points',
+      title: "assignment two",
+      grading_type: "points",
       points_possible: 100,
       due_at: 1.day.from_now(now),
-      submission_types: 'online_text_entry'
+      submission_types: "online_text_entry"
     )
   end
 
   def create_assignment_due_one_week(now)
     @assignment_due_one_week = @course.assignments.create!(
-      title: 'assignment three',
-      grading_type: 'points',
+      title: "assignment three",
+      grading_type: "points",
       points_possible: 10,
       due_at: 1.week.from_now(now),
-      submission_types: 'online_text_entry'
+      submission_types: "online_text_entry"
     )
   end
 

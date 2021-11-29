@@ -18,13 +18,13 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'json'
-require 'hash_view'
-require 'object_part_view'
-require 'model_view'
+require "json"
+require "hash_view"
+require "object_part_view"
+require "model_view"
 
 class ObjectView < HashView
-  SEP = '=|='
+  SEP = "=|="
 
   attr_reader :object
 
@@ -45,7 +45,7 @@ class ObjectView < HashView
   end
 
   def json_text
-    text.sub(/^.*$/, '')
+    text.sub(/^.*$/, "")
   end
 
   def clean_json_text
@@ -59,7 +59,7 @@ class ObjectView < HashView
   end
 
   def clean_json_parts
-    clean_json_text_parts.map { |text| JSON::parse(text) }
+    clean_json_text_parts.map { |text| JSON.parse(text) }
   end
 
   def parts
@@ -77,6 +77,6 @@ class ObjectView < HashView
   end
 
   def self.strip_comments(str)
-    str.gsub(%r(//[^\n"]+$), '')
+    str.gsub(%r{//[^\n"]+$}, "")
   end
 end

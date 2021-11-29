@@ -21,17 +21,17 @@
 shared_examples_for "Canvas::DraftStateValidations" do
   describe ":validate_draft_state_change" do
     it "works" do
-      subject.workflow_state = 'unpublished'
+      subject.workflow_state = "unpublished"
       allow(subject).to receive_messages(has_student_submissions?: true)
       allow(subject).to receive_messages(workflow_state_changed?: true)
       allow(subject).to receive_messages({
-                                           changes: { 'workflow_state' => ['published', 'unpublished'] }
+                                           changes: { "workflow_state" => ["published", "unpublished"] }
                                          })
       subject.save
 
       expect(subject.errors[:workflow_state]).to be_present
       expect(subject.errors[:workflow_state][0].to_s).to match(
-        %r{can't unpublish if there are student submissions}i
+        /can't unpublish if there are student submissions/i
       )
     end
   end

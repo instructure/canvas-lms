@@ -329,6 +329,9 @@
     "feedback_6dcc1991": {
         "message": "Geribildirim"
     },
+    "file_name_8fd421ff": {
+        "message": "Dosya adı"
+    },
     "file_url_c12b64be": {
         "message": "Dosya URL"
     },
@@ -529,6 +532,9 @@
     },
     "people_b4ebb13c": {
         "message": "Katılımcılar"
+    },
+    "percentage_34ab7c2c": {
+        "message": "Yüzde"
     },
     "points_bceb5005": {
         "message": "puanlar"

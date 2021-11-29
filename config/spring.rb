@@ -4,10 +4,10 @@ module Spring
   module Commands
     class FlakeySpecCatcher
       def env(*)
-        'test'
+        "test"
       end
     end
 
-    Spring.register_command 'flakey_spec_catcher', FlakeySpecCatcher.new
+    Spring.register_command "flakey_spec_catcher", FlakeySpecCatcher.new
   end
 end

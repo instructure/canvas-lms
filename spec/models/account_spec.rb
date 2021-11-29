@@ -21,10 +21,10 @@
 describe Account do
   include_examples "outcome import context examples"
 
-  describe 'relationships' do
+  describe "relationships" do
     it { is_expected.to have_many(:feature_flags) }
     it { is_expected.to have_one(:outcome_proficiency).dependent(:destroy) }
-    it { is_expected.to have_many(:lti_resource_links).class_name('Lti::ResourceLink') }
+    it { is_expected.to have_many(:lti_resource_links).class_name("Lti::ResourceLink") }
   end
 
   context "BASIC_COLUMNS_FOR_CALLBACKS" do
@@ -38,8 +38,8 @@ describe Account do
   context "domain_method" do
     it "retrieves correct account domain" do
       root_account = Account.create!
-      AccountDomain.create!(:host => 'canvas.instructure.com', :account => root_account)
-      expect(root_account.domain).to eq 'canvas.instructure.com'
+      AccountDomain.create!(host: "canvas.instructure.com", account: root_account)
+      expect(root_account.domain).to eq "canvas.instructure.com"
     end
   end
 
@@ -62,8 +62,8 @@ describe Account do
       expect(@subaccount.resolved_outcome_proficiency).to eq proficiency
     end
 
-    context 'cache' do
-      it 'uses the cache' do
+    context "cache" do
+      it "uses the cache" do
         enable_cache do
           proficiency = outcome_proficiency_model(@root_account)
 
@@ -71,15 +71,15 @@ describe Account do
           @root_account.resolved_outcome_proficiency
 
           # update without callbacks
-          OutcomeProficiency.where(id: proficiency.id).update_all workflow_state: 'deleted'
+          OutcomeProficiency.where(id: proficiency.id).update_all workflow_state: "deleted"
 
           # verify cached version wins with new AR object
           cached = Account.find(@root_account.id).resolved_outcome_proficiency
-          expect(cached.workflow_state).not_to eq 'deleted'
+          expect(cached.workflow_state).not_to eq "deleted"
         end
       end
 
-      it 'updates when account chain is changed' do
+      it "updates when account chain is changed" do
         enable_cache do
           other_subaccount = @root_account.sub_accounts.create!
           other_proficiency = outcome_proficiency_model(other_subaccount)
@@ -90,7 +90,7 @@ describe Account do
         end
       end
 
-      it 'updates when outcome_proficiency_id cache changed' do
+      it "updates when outcome_proficiency_id cache changed" do
         enable_cache do
           subsubaccount = @subaccount.sub_accounts.create!
 
@@ -105,7 +105,7 @@ describe Account do
         end
       end
 
-      it 'does not conflict with other caches' do
+      it "does not conflict with other caches" do
         enable_cache do
           Timecop.freeze do
             outcome_proficiency_model(@root_account)
@@ -143,7 +143,7 @@ describe Account do
     end
   end
 
-  context 'resolved_outcome_calculation_method' do
+  context "resolved_outcome_calculation_method" do
     before do
       @root_account = Account.create!
       @subaccount = @root_account.sub_accounts.create!
@@ -173,8 +173,8 @@ describe Account do
       expect(@subaccount.resolved_outcome_calculation_method).to eq method
     end
 
-    context 'cache' do
-      it 'uses the cache' do
+    context "cache" do
+      it "uses the cache" do
         enable_cache do
           method = outcome_calculation_method_model(@root_account)
 
@@ -182,15 +182,15 @@ describe Account do
           @root_account.resolved_outcome_calculation_method
 
           # update without callbacks
-          OutcomeCalculationMethod.where(id: method.id).update_all workflow_state: 'deleted'
+          OutcomeCalculationMethod.where(id: method.id).update_all workflow_state: "deleted"
 
           # verify cached version wins with new AR object
           cached = Account.find(@root_account.id).resolved_outcome_calculation_method
-          expect(cached.workflow_state).not_to eq 'deleted'
+          expect(cached.workflow_state).not_to eq "deleted"
         end
       end
 
-      it 'updates when account chain is changed' do
+      it "updates when account chain is changed" do
         enable_cache do
           other_subaccount = @root_account.sub_accounts.create!
           other_method = outcome_calculation_method_model(other_subaccount)
@@ -201,7 +201,7 @@ describe Account do
         end
       end
 
-      it 'updates when outcome_calculation_method_id cache changed' do
+      it "updates when outcome_calculation_method_id cache changed" do
         enable_cache do
           subsubaccount = @subaccount.sub_accounts.create!
 
@@ -376,33 +376,33 @@ describe Account do
 
     context "fast list" do
       it "lists associated courses" do
-        expect(@account.fast_all_courses.map(&:sis_source_id).sort).to eq [
-          "C001", "C005", "C006", "C007", "C008", "C009",
+        expect(@account.fast_all_courses.map(&:sis_source_id).sort).to eq %w[
+          C001 C005 C006 C007 C008 C009
 
-          "C001S", "C005S", "C006S", "C007S", "C008S", "C009S",
+          C001S C005S C006S C007S C008S C009S
         ].sort
       end
 
       it "lists associated courses by term" do
-        expect(@account.fast_all_courses({ :term => EnrollmentTerm.where(sis_source_id: "T001").first }).map(&:sis_source_id).sort).to eq ["C001", "C001S"]
-        expect(@account.fast_all_courses({ :term => EnrollmentTerm.where(sis_source_id: "T002").first }).map(&:sis_source_id).sort).to eq []
-        expect(@account.fast_all_courses({ :term => EnrollmentTerm.where(sis_source_id: "T003").first }).map(&:sis_source_id).sort).to eq ["C005", "C006", "C007", "C008", "C009", "C005S", "C006S", "C007S", "C008S", "C009S"].sort
+        expect(@account.fast_all_courses({ term: EnrollmentTerm.where(sis_source_id: "T001").first }).map(&:sis_source_id).sort).to eq ["C001", "C001S"]
+        expect(@account.fast_all_courses({ term: EnrollmentTerm.where(sis_source_id: "T002").first }).map(&:sis_source_id).sort).to eq []
+        expect(@account.fast_all_courses({ term: EnrollmentTerm.where(sis_source_id: "T003").first }).map(&:sis_source_id).sort).to eq %w[C005 C006 C007 C008 C009 C005S C006S C007S C008S C009S].sort
       end
 
       it "counting cross-listed courses only if requested" do
         def check_account(account, include_crosslisted_courses, expected_length, expected_course_names)
-          actual_courses = account.fast_all_courses({ :include_crosslisted_courses => include_crosslisted_courses })
+          actual_courses = account.fast_all_courses({ include_crosslisted_courses: include_crosslisted_courses })
           expect(actual_courses.length).to eq expected_length
           actual_course_names = actual_courses.pluck("name").sort!
           expect(actual_course_names).to eq(expected_course_names.sort!)
         end
 
         root_account = Account.create!
-        account_a = Account.create!({ :root_account => root_account })
-        account_b = Account.create!({ :root_account => root_account })
-        course_a = course_factory({ :account => account_a, :course_name => "course_a" })
-        course_b = course_factory({ :account => account_b, :course_name => "course_b" })
-        course_b.course_sections.create!({ :name => "section_b" })
+        account_a = Account.create!({ root_account: root_account })
+        account_b = Account.create!({ root_account: root_account })
+        course_a = course_factory({ account: account_a, course_name: "course_a" })
+        course_b = course_factory({ account: account_b, course_name: "course_b" })
+        course_b.course_sections.create!({ name: "section_b" })
         course_b.course_sections.first.crosslist_to_course(course_a)
         check_account(account_a, false, 1, ["course_a"])
         check_account(account_a, true, 1, ["course_a"])
@@ -411,13 +411,13 @@ describe Account do
       end
 
       it "lists associated nonenrollmentless courses" do
-        expect(@account.fast_all_courses({ :hide_enrollmentless_courses => true }).map(&:sis_source_id).sort).to eq ["C001", "C005", "C007", "C001S", "C005S", "C007S"].sort # C007 probably shouldn't be here, cause the enrollment section is deleted, but we kinda want to minimize database traffic
+        expect(@account.fast_all_courses({ hide_enrollmentless_courses: true }).map(&:sis_source_id).sort).to eq %w[C001 C005 C007 C001S C005S C007S].sort # C007 probably shouldn't be here, cause the enrollment section is deleted, but we kinda want to minimize database traffic
       end
 
       it "lists associated nonenrollmentless courses by term" do
-        expect(@account.fast_all_courses({ :term => EnrollmentTerm.where(sis_source_id: "T001").first, :hide_enrollmentless_courses => true }).map(&:sis_source_id).sort).to eq ["C001", "C001S"]
-        expect(@account.fast_all_courses({ :term => EnrollmentTerm.where(sis_source_id: "T002").first, :hide_enrollmentless_courses => true }).map(&:sis_source_id).sort).to eq []
-        expect(@account.fast_all_courses({ :term => EnrollmentTerm.where(sis_source_id: "T003").first, :hide_enrollmentless_courses => true }).map(&:sis_source_id).sort).to eq ["C005", "C007", "C005S", "C007S"].sort
+        expect(@account.fast_all_courses({ term: EnrollmentTerm.where(sis_source_id: "T001").first, hide_enrollmentless_courses: true }).map(&:sis_source_id).sort).to eq ["C001", "C001S"]
+        expect(@account.fast_all_courses({ term: EnrollmentTerm.where(sis_source_id: "T002").first, hide_enrollmentless_courses: true }).map(&:sis_source_id).sort).to eq []
+        expect(@account.fast_all_courses({ term: EnrollmentTerm.where(sis_source_id: "T003").first, hide_enrollmentless_courses: true }).map(&:sis_source_id).sort).to eq %w[C005 C007 C005S C007S].sort
       end
 
       it "orders list by specified parameter" do
@@ -429,25 +429,25 @@ describe Account do
 
     context "name searching" do
       it "lists associated courses" do
-        expect(@account.courses_name_like("search").map(&:sis_source_id).sort).to eq [
-          "C001S", "C005S", "C006S", "C007S", "C008S", "C009S"
+        expect(@account.courses_name_like("search").map(&:sis_source_id).sort).to eq %w[
+          C001S C005S C006S C007S C008S C009S
         ]
       end
 
       it "lists associated courses by term" do
-        expect(@account.courses_name_like("search", { :term => EnrollmentTerm.where(sis_source_id: "T001").first }).map(&:sis_source_id).sort).to eq ["C001S"]
-        expect(@account.courses_name_like("search", { :term => EnrollmentTerm.where(sis_source_id: "T002").first }).map(&:sis_source_id).sort).to eq []
-        expect(@account.courses_name_like("search", { :term => EnrollmentTerm.where(sis_source_id: "T003").first }).map(&:sis_source_id).sort).to eq ["C005S", "C006S", "C007S", "C008S", "C009S"]
+        expect(@account.courses_name_like("search", { term: EnrollmentTerm.where(sis_source_id: "T001").first }).map(&:sis_source_id).sort).to eq ["C001S"]
+        expect(@account.courses_name_like("search", { term: EnrollmentTerm.where(sis_source_id: "T002").first }).map(&:sis_source_id).sort).to eq []
+        expect(@account.courses_name_like("search", { term: EnrollmentTerm.where(sis_source_id: "T003").first }).map(&:sis_source_id).sort).to eq %w[C005S C006S C007S C008S C009S]
       end
 
       it "lists associated nonenrollmentless courses" do
-        expect(@account.courses_name_like("search", { :hide_enrollmentless_courses => true }).map(&:sis_source_id).sort).to eq ["C001S", "C005S", "C007S"] # C007 probably shouldn't be here, cause the enrollment section is deleted, but we kinda want to minimize database traffic
+        expect(@account.courses_name_like("search", { hide_enrollmentless_courses: true }).map(&:sis_source_id).sort).to eq %w[C001S C005S C007S] # C007 probably shouldn't be here, cause the enrollment section is deleted, but we kinda want to minimize database traffic
       end
 
       it "lists associated nonenrollmentless courses by term" do
-        expect(@account.courses_name_like("search", { :term => EnrollmentTerm.where(sis_source_id: "T001").first, :hide_enrollmentless_courses => true }).map(&:sis_source_id).sort).to eq ["C001S"]
-        expect(@account.courses_name_like("search", { :term => EnrollmentTerm.where(sis_source_id: "T002").first, :hide_enrollmentless_courses => true }).map(&:sis_source_id).sort).to eq []
-        expect(@account.courses_name_like("search", { :term => EnrollmentTerm.where(sis_source_id: "T003").first, :hide_enrollmentless_courses => true }).map(&:sis_source_id).sort).to eq ["C005S", "C007S"]
+        expect(@account.courses_name_like("search", { term: EnrollmentTerm.where(sis_source_id: "T001").first, hide_enrollmentless_courses: true }).map(&:sis_source_id).sort).to eq ["C001S"]
+        expect(@account.courses_name_like("search", { term: EnrollmentTerm.where(sis_source_id: "T002").first, hide_enrollmentless_courses: true }).map(&:sis_source_id).sort).to eq []
+        expect(@account.courses_name_like("search", { term: EnrollmentTerm.where(sis_source_id: "T003").first, hide_enrollmentless_courses: true }).map(&:sis_source_id).sort).to eq ["C005S", "C007S"]
       end
     end
   end
@@ -458,7 +458,7 @@ describe Account do
     end
 
     it "is able to specify a list of enabled services" do
-      @a.allowed_services = 'twitter'
+      @a.allowed_services = "twitter"
       expect(@a.service_enabled?(:twitter)).to be_truthy
       expect(@a.service_enabled?(:diigo)).to be_falsey
       expect(@a.service_enabled?(:avatars)).to be_falsey
@@ -469,7 +469,7 @@ describe Account do
     end
 
     it "adds and remove services from the defaults" do
-      @a.allowed_services = '+avatars,-twitter'
+      @a.allowed_services = "+avatars,-twitter"
       expect(@a.service_enabled?(:avatars)).to be_truthy
       expect(@a.service_enabled?(:twitter)).to be_falsey
     end
@@ -490,19 +490,19 @@ describe Account do
       expect(@a.allowed_services).to be_nil
 
       @a.disable_service(:twitter)
-      expect(@a.allowed_services).to match('\-twitter')
+      expect(@a.allowed_services).to match("\\-twitter")
 
       @a.disable_service(:avatars)
       expect(@a.service_enabled?(:avatars)).to be_falsey
-      expect(@a.allowed_services).not_to match('avatars')
+      expect(@a.allowed_services).not_to match("avatars")
 
       @a.enable_service(:avatars)
       expect(@a.service_enabled?(:avatars)).to be_truthy
-      expect(@a.allowed_services).to match('\+avatars')
+      expect(@a.allowed_services).to match("\\+avatars")
     end
 
     it "is able to set service availibity for previously hard-coded values" do
-      @a.allowed_services = 'avatars'
+      @a.allowed_services = "avatars"
 
       @a.enable_service(:twitter)
       expect(@a.service_enabled?(:twitter)).to be_truthy
@@ -518,13 +518,13 @@ describe Account do
       AccountServices.register_service(
         :google_docs_prev,
         {
-          :name => "My google docs prev", :description => "", :expose_to_ui => :service, :default => true
+          name: "My google docs prev", description: "", expose_to_ui: :service, default: true
         }
       )
 
-      @a.disable_service('google_docs_previews')
-      @a.disable_service('google_docs_prev')
-      expect(@a.allowed_services).to eq '-google_docs_previews,-google_docs_prev'
+      @a.disable_service("google_docs_previews")
+      @a.disable_service("google_docs_prev")
+      expect(@a.allowed_services).to eq "-google_docs_previews,-google_docs_prev"
     end
 
     describe "services_exposed_to_ui_hash" do
@@ -556,7 +556,7 @@ describe Account do
 
     describe "plugin services" do
       before do
-        AccountServices.register_service(:myplugin, { :name => "My Plugin", :description => "", :expose_to_ui => :setting, :default => false })
+        AccountServices.register_service(:myplugin, { name: "My Plugin", description: "", expose_to_ui: :setting, default: false })
       end
 
       it "returns the service" do
@@ -577,7 +577,7 @@ describe Account do
 
       describe "services_exposed_to_ui_hash" do
         it "returns services defined in a plugin" do
-          expect(Account.services_exposed_to_ui_hash().keys).to be_include(:myplugin)
+          expect(Account.services_exposed_to_ui_hash.keys).to be_include(:myplugin)
           expect(Account.services_exposed_to_ui_hash(:setting).keys).to be_include(:myplugin)
         end
       end
@@ -587,11 +587,11 @@ describe Account do
   context "settings=" do
     it "filters non-hash hash settings" do
       a = Account.new
-      a.settings = { 'sis_default_grade_export' => 'string' }.with_indifferent_access
+      a.settings = { "sis_default_grade_export" => "string" }.with_indifferent_access
       expect(a.settings[:error_reporting]).to eql(nil)
 
-      a.settings = { 'sis_default_grade_export' => {
-        'value' => true
+      a.settings = { "sis_default_grade_export" => {
+        "value" => true
       } }.with_indifferent_access
       expect(a.settings[:sis_default_grade_export]).to be_is_a(Hash)
       expect(a.settings[:sis_default_grade_export][:value]).to eql true
@@ -606,7 +606,7 @@ describe Account do
     end
 
     it "true if they've checked the box to allow it" do
-      root.settings = { 'global_includes' => true }
+      root.settings = { "global_includes" => true }
       expect(root.allow_global_includes?).to be_truthy
     end
 
@@ -616,15 +616,15 @@ describe Account do
       it "false if root account hasn't checked global_includes AND subaccount branding" do
         expect(sub_account.allow_global_includes?).to be_falsey
 
-        sub_account.root_account.settings = { 'global_includes' => true, 'sub_account_includes' => false }
+        sub_account.root_account.settings = { "global_includes" => true, "sub_account_includes" => false }
         expect(sub_account.allow_global_includes?).to be_falsey
 
-        sub_account.root_account.settings = { 'global_includes' => false, 'sub_account_includes' => true }
+        sub_account.root_account.settings = { "global_includes" => false, "sub_account_includes" => true }
         expect(sub_account.allow_global_includes?).to be_falsey
       end
 
       it "true if root account HAS checked global_includes and turned on subaccount branding" do
-        sub_account.root_account.settings = { 'global_includes' => true, 'sub_account_includes' => true }
+        sub_account.root_account.settings = { "global_includes" => true, "sub_account_includes" => true }
         expect(sub_account.allow_global_includes?).to be_truthy
       end
     end
@@ -642,70 +642,70 @@ describe Account do
 
   context "closest_turnitin_originality" do
     before do
-      @root_account = Account.create!(:turnitin_pledge => "root")
-      @root_account.turnitin_originality = 'after_grading'
+      @root_account = Account.create!(turnitin_pledge: "root")
+      @root_account.turnitin_originality = "after_grading"
       @root_account.save!
     end
 
     it "finds closest_turnitin_originality from root account" do
-      expect(@root_account.closest_turnitin_originality).to eq('after_grading')
+      expect(@root_account.closest_turnitin_originality).to eq("after_grading")
     end
 
     it "finds closest_turnitin_originality from sub account" do
-      sub_account = Account.create(:name => 'sub', :parent_account => @root_account)
-      sub_account.turnitin_originality = 'never'
-      expect(sub_account.closest_turnitin_originality).to eq('never')
+      sub_account = Account.create(name: "sub", parent_account: @root_account)
+      sub_account.turnitin_originality = "never"
+      expect(sub_account.closest_turnitin_originality).to eq("never")
     end
 
     it "finds closest_turnitin_originality from sub account when set on root account" do
-      sub_account = Account.create(:name => 'sub', :parent_account => @root_account)
-      expect(sub_account.closest_turnitin_originality).to eq('after_grading')
+      sub_account = Account.create(name: "sub", parent_account: @root_account)
+      expect(sub_account.closest_turnitin_originality).to eq("after_grading")
     end
   end
 
   context "closest_turnitin_pledge" do
     it "works for custom sub, custom root" do
-      root_account = Account.create!(:turnitin_pledge => "root")
-      sub_account = Account.create!(:parent_account => root_account, :turnitin_pledge => "sub")
+      root_account = Account.create!(turnitin_pledge: "root")
+      sub_account = Account.create!(parent_account: root_account, turnitin_pledge: "sub")
       expect(root_account.closest_turnitin_pledge).to eq "root"
       expect(sub_account.closest_turnitin_pledge).to eq "sub"
     end
 
     it "works for nil sub, custom root" do
-      root_account = Account.create!(:turnitin_pledge => "root")
-      sub_account = Account.create!(:parent_account => root_account)
+      root_account = Account.create!(turnitin_pledge: "root")
+      sub_account = Account.create!(parent_account: root_account)
       expect(root_account.closest_turnitin_pledge).to eq "root"
       expect(sub_account.closest_turnitin_pledge).to eq "root"
     end
 
     it "works for nil sub, nil root" do
       root_account = Account.create!
-      sub_account = Account.create!(:parent_account => root_account)
+      sub_account = Account.create!(parent_account: root_account)
       expect(root_account.closest_turnitin_pledge).not_to be_empty
       expect(sub_account.closest_turnitin_pledge).not_to be_empty
     end
 
-    it 'uses the default message if pledge is nil or empty' do
-      account = Account.create!(turnitin_pledge: '')
-      expect(account.closest_turnitin_pledge).to eq 'This assignment submission is my own, original work'
+    it "uses the default message if pledge is nil or empty" do
+      account = Account.create!(turnitin_pledge: "")
+      expect(account.closest_turnitin_pledge).to eq "This assignment submission is my own, original work"
     end
   end
 
   it "makes a default enrollment term if necessary" do
-    a = Account.create!(:name => "nada")
+    a = Account.create!(name: "nada")
     expect(a.enrollment_terms.size).to eq 1
     expect(a.enrollment_terms.first.name).to eq EnrollmentTerm::DEFAULT_TERM_NAME
 
     # don't create a new default term for sub-accounts
-    a2 = a.all_accounts.create!(:name => "sub")
+    a2 = a.all_accounts.create!(name: "sub")
     expect(a2.enrollment_terms.size).to eq 0
   end
 
   def account_with_admin_and_restricted_user(account, restricted_role)
     admin = User.create
     user = User.create
-    account.account_users.create!(:user => admin, :role => admin_role)
-    account.account_users.create!(:user => user, :role => restricted_role)
+    account.account_users.create!(user: admin, role: admin_role)
+    account.account_users.create!(user: user, role: restricted_role)
     [admin, user]
   end
 
@@ -721,30 +721,30 @@ describe Account do
     # Set up a hierarchy of 4 accounts - a root account, a sub account,
     # a sub sub account, and SiteAdmin account.  Create a 'Restricted Admin'
     # role available for each one, and create an admin user and a user in that restricted role
-    @sa_role = custom_account_role('Restricted SA Admin', account: site_admin)
+    @sa_role = custom_account_role("Restricted SA Admin", account: site_admin)
 
-    site_admin.settings[:mfa_settings] = 'required'
+    site_admin.settings[:mfa_settings] = "required"
     site_admin.save!
     root_account = Account.create
-    @root_role = custom_account_role('Restricted Root Admin', :account => root_account)
+    @root_role = custom_account_role("Restricted Root Admin", account: root_account)
 
-    sub_account = Account.create(:parent_account => root_account)
-    sub_sub_account = Account.create(:parent_account => sub_account)
+    sub_account = Account.create(parent_account: root_account)
+    sub_sub_account = Account.create(parent_account: sub_account)
 
     hash = {}
-    hash[:site_admin] = { :account => Account.site_admin }
-    hash[:root] = { :account => root_account }
-    hash[:sub] = { :account => sub_account }
-    hash[:sub_sub] = { :account => sub_sub_account }
+    hash[:site_admin] = { account: Account.site_admin }
+    hash[:root] = { account: root_account }
+    hash[:sub] = { account: sub_account }
+    hash[:sub_sub] = { account: sub_sub_account }
 
     hash.each do |k, v|
-      v[:account].update_attribute(:settings, { :no_enrollments_can_create_courses => false })
+      v[:account].update_attribute(:settings, { no_enrollments_can_create_courses: false })
       admin, user = account_with_admin_and_restricted_user(v[:account], (k == :site_admin ? @sa_role : @root_role))
       hash[k][:admin] = admin
       hash[k][:user] = user
     end
 
-    limited_access = [:read, :read_as_admin, :manage, :update, :delete, :read_outcomes, :read_terms]
+    limited_access = %i[read read_as_admin manage update delete read_outcomes read_terms]
     conditional_access = RoleOverride.permissions.select { |_, v| v[:account_allows] }.map(&:first)
     conditional_access += [:view_bounced_emails] # since this depends on :view_notifications
     disabled_by_default = RoleOverride.permissions.select { |_, v| v[:true_for].empty? }.map(&:first)
@@ -801,10 +801,13 @@ describe Account do
     some_access = [:read_reports] + limited_access
     hash.each do |k, v|
       account = v[:account]
-      account.role_overrides.create!(:permission => 'read_reports', :role => (k == :site_admin ? @sa_role : @root_role), :enabled => true)
-      account.role_overrides.create!(:permission => 'reset_any_mfa', :role => @sa_role, :enabled => true)
+      account.role_overrides.create!(permission: "read_reports", role: (k == :site_admin ? @sa_role : @root_role), enabled: true)
+      account.role_overrides.create!(permission: "reset_any_mfa", role: @sa_role, enabled: true)
       # clear caches
-      account.tap { |a| a.settings[:mfa_settings] = :optional; a.save! }
+      account.tap do |a|
+        a.settings[:mfa_settings] = :optional
+        a.save!
+      end
       v[:account] = Account.find(account.id)
     end
     AdheresToPolicy::Cache.clear
@@ -858,13 +861,45 @@ describe Account do
         expect(@course.grants_right?(@user, :read_sis)).to eq true
       end
     end
+
+    it "returns sub account ids recursively when another shard is active" do
+      a = Account.default
+      subs = []
+      sub = Account.create!(name: "sub", parent_account: a)
+      subs << grand_sub = Account.create!(name: "grand_sub", parent_account: sub)
+      subs << great_grand_sub = Account.create!(name: "great_grand_sub", parent_account: grand_sub)
+      subs << Account.create!(name: "great_great_grand_sub", parent_account: great_grand_sub)
+      @shard1.activate do
+        expect(Account.select(:id).sub_accounts_recursive(sub.id, :pluck).sort).to eq(subs.map(&:id).sort)
+        expect(Account.sub_accounts_recursive(sub.id).sort_by(&:id)).to eq(subs.sort_by(&:id))
+      end
+    end
+
+    it "properly returns site admin permissions regardless of active shard" do
+      enable_cache do
+        user_factory
+        site_admin = Account.site_admin
+        site_admin.account_users.create!(user: @user)
+
+        @shard1.activate do
+          expect(site_admin.grants_right?(@user, :manage_site_settings)).to be_truthy
+        end
+        expect(site_admin.grants_right?(@user, :manage_site_settings)).to be_truthy
+
+        user_factory
+        @shard1.activate do
+          expect(site_admin.grants_right?(@user, :manage_site_settings)).to be_falsey
+        end
+        expect(site_admin.grants_right?(@user, :manage_site_settings)).to be_falsey
+      end
+    end
   end
 
   # TODO: deprecated; need to look into removing this setting
   it "allows no_enrollments_can_create_courses correctly" do
     a = Account.default
     a.disable_feature!(:granular_permissions_manage_courses)
-    a.settings = { :no_enrollments_can_create_courses => true }
+    a.settings = { no_enrollments_can_create_courses: true }
     a.save!
 
     user_factory
@@ -873,7 +908,7 @@ describe Account do
 
   it "does not allow create_courses even to admins on site admin and children" do
     a = Account.site_admin
-    a.settings = { :no_enrollments_can_create_courses => true }
+    a.settings = { no_enrollments_can_create_courses: true }
     a.save!
     manual = a.manually_created_courses_account
     user_factory
@@ -884,7 +919,7 @@ describe Account do
 
   it "does not allow create courses for student view students" do
     a = Account.default
-    a.settings = { :no_enrollments_can_create_courses => true }
+    a.settings = { no_enrollments_can_create_courses: true }
     a.save!
 
     manual = a.manually_created_courses_account
@@ -897,7 +932,7 @@ describe Account do
 
   it "does not allow create courses for student view students (granular permissions)" do
     a = Account.default
-    a.settings = { :no_enrollments_can_create_courses => true }
+    a.settings = { no_enrollments_can_create_courses: true }
     a.save!
     a.enable_feature!(:granular_permissions_manage_courses)
 
@@ -911,9 +946,9 @@ describe Account do
 
   it "returns sub-accounts as options correctly" do
     a = Account.default
-    sub = Account.create!(:name => 'sub', :parent_account => a)
-    sub2 = Account.create!(:name => 'sub2', :parent_account => a)
-    sub2_1 = Account.create!(:name => 'sub2-1', :parent_account => sub2)
+    sub = Account.create!(name: "sub", parent_account: a)
+    sub2 = Account.create!(name: "sub2", parent_account: a)
+    sub2_1 = Account.create!(name: "sub2-1", parent_account: sub2)
     options = a.sub_accounts_as_options
     expect(options).to eq(
       [
@@ -928,28 +963,12 @@ describe Account do
   it "correctly returns sub-account_ids recursively" do
     a = Account.default
     subs = []
-    sub = Account.create!(name: 'sub', parent_account: a)
-    subs << grand_sub = Account.create!(name: 'grand_sub', parent_account: sub)
-    subs << great_grand_sub = Account.create!(name: 'great_grand_sub', parent_account: grand_sub)
-    subs << Account.create!(name: 'great_great_grand_sub', parent_account: great_grand_sub)
+    sub = Account.create!(name: "sub", parent_account: a)
+    subs << grand_sub = Account.create!(name: "grand_sub", parent_account: sub)
+    subs << great_grand_sub = Account.create!(name: "great_grand_sub", parent_account: grand_sub)
+    subs << Account.create!(name: "great_great_grand_sub", parent_account: great_grand_sub)
     expect(Account.select(:id).sub_accounts_recursive(sub.id, :pluck).sort).to eq(subs.map(&:id).sort)
     expect(Account.limit(10).sub_accounts_recursive(sub.id).sort).to eq(subs.sort_by(&:id))
-  end
-
-  context "sharding" do
-    specs_require_sharding
-    it "returns sub account ids recursively when another shard is active" do
-      a = Account.default
-      subs = []
-      sub = Account.create!(name: 'sub', parent_account: a)
-      subs << grand_sub = Account.create!(name: 'grand_sub', parent_account: sub)
-      subs << great_grand_sub = Account.create!(name: 'great_grand_sub', parent_account: grand_sub)
-      subs << Account.create!(name: 'great_great_grand_sub', parent_account: great_grand_sub)
-      @shard1.activate do
-        expect(Account.select(:id).sub_accounts_recursive(sub.id, :pluck).sort).to eq(subs.map(&:id).sort)
-        expect(Account.sub_accounts_recursive(sub.id).sort_by(&:id)).to eq(subs.sort_by(&:id))
-      end
-    end
   end
 
   it "returns the correct user count" do
@@ -968,7 +987,7 @@ describe Account do
     expect(a.user_count).to eq 2
 
     a2 = a.sub_accounts.create!
-    course_with_teacher(:account => a2)
+    course_with_teacher(account: a2)
     @teacher.update_account_associations
     expect(a.all_users.count).to eq a.user_count
     expect(a.user_count).to eq 3
@@ -981,8 +1000,8 @@ describe Account do
   it "group_categories should not include deleted categories" do
     account = Account.default
     expect(account.group_categories.count).to eq 0
-    category1 = account.group_categories.create(:name => 'category 1')
-    category2 = account.group_categories.create(:name => 'category 2')
+    category1 = account.group_categories.create(name: "category 1")
+    category2 = account.group_categories.create(name: "category 2")
     expect(account.group_categories.count).to eq 2
     category1.destroy
     account.reload
@@ -993,8 +1012,8 @@ describe Account do
   it "group_categories.active should not include deleted categories" do
     account = Account.default
     expect(account.group_categories.active.count).to eq 0
-    category1 = account.group_categories.create(name: 'category 1')
-    category2 = account.group_categories.create(name: 'category 2')
+    category1 = account.group_categories.create(name: "category 1")
+    category2 = account.group_categories.create(name: "category 2")
     expect(account.group_categories.active.count).to eq 2
     category1.destroy
     account.reload
@@ -1007,17 +1026,17 @@ describe Account do
     account = Account.default
     expect(account.login_handle_name_with_inference).to eq "Email"
 
-    config = account.authentication_providers.create!(auth_type: 'cas')
+    config = account.authentication_providers.create!(auth_type: "cas")
     account.authentication_providers.first.move_to_bottom
     expect(account.login_handle_name_with_inference).to eq "Login"
 
     config.destroy
-    config = account.authentication_providers.create!(auth_type: 'saml')
+    config = account.authentication_providers.create!(auth_type: "saml")
     account.authentication_providers.active.first.move_to_bottom
     expect(account.reload.login_handle_name_with_inference).to eq "Login"
 
     config.destroy
-    account.authentication_providers.create!(auth_type: 'ldap')
+    account.authentication_providers.create!(auth_type: "ldap")
     account.authentication_providers.active.first.move_to_bottom
     expect(account.reload.login_handle_name_with_inference).to eq "Email"
     account.login_handle_name = "LDAP Login"
@@ -1028,9 +1047,9 @@ describe Account do
   context "users_not_in_groups" do
     before :once do
       @account = Account.default
-      @user1 = account_admin_user(:account => @account)
-      @user2 = account_admin_user(:account => @account)
-      @user3 = account_admin_user(:account => @account)
+      @user1 = account_admin_user(account: @account)
+      @user2 = account_admin_user(account: @account)
+      @user3 = account_admin_user(account: @account)
     end
 
     it "does not include deleted users" do
@@ -1055,66 +1074,69 @@ describe Account do
     end
 
     it "allows ordering by user's sortable name" do
-      @user1.sortable_name = 'jonny'; @user1.save
-      @user2.sortable_name = 'bob'; @user2.save
-      @user3.sortable_name = 'richard'; @user3.save
-      users = @account.users_not_in_groups([], order: User.sortable_name_order_by_clause('users'))
-      expect(users.map { |u| u.id }).to eq [@user2.id, @user1.id, @user3.id]
+      @user1.sortable_name = "jonny"
+      @user1.save
+      @user2.sortable_name = "bob"
+      @user2.save
+      @user3.sortable_name = "richard"
+      @user3.save
+      users = @account.users_not_in_groups([], order: User.sortable_name_order_by_clause("users"))
+      expect(users.map(&:id)).to eq [@user2.id, @user1.id, @user3.id]
     end
   end
 
   context "tabs_available" do
     before :once do
-      @account = Account.default.sub_accounts.create!(:name => "sub-account")
+      @account = Account.default.sub_accounts.create!(name: "sub-account")
     end
 
     it "includes 'Developer Keys' for the authorized users of the site_admin account" do
-      account_admin_user(:account => Account.site_admin)
+      account_admin_user(account: Account.site_admin)
       tabs = Account.site_admin.tabs_available(@admin)
-      expect(tabs.map { |t| t[:id] }).to be_include(Account::TAB_DEVELOPER_KEYS)
+      expect(tabs.pluck(:id)).to be_include(Account::TAB_DEVELOPER_KEYS)
 
       tabs = Account.site_admin.tabs_available(nil)
-      expect(tabs.map { |t| t[:id] }).not_to be_include(Account::TAB_DEVELOPER_KEYS)
+      expect(tabs.pluck(:id)).not_to be_include(Account::TAB_DEVELOPER_KEYS)
     end
 
     it "includes 'Developer Keys' for the admin users of an account" do
       account = Account.create!
-      account_admin_user(:account => account)
+      account_admin_user(account: account)
       tabs = account.tabs_available(@admin)
-      expect(tabs.map { |t| t[:id] }).to be_include(Account::TAB_DEVELOPER_KEYS)
+      expect(tabs.pluck(:id)).to be_include(Account::TAB_DEVELOPER_KEYS)
 
       tabs = account.tabs_available(nil)
-      expect(tabs.map { |t| t[:id] }).not_to be_include(Account::TAB_DEVELOPER_KEYS)
+      expect(tabs.pluck(:id)).not_to be_include(Account::TAB_DEVELOPER_KEYS)
     end
 
     it "does not include 'Developer Keys' for non-site_admin accounts" do
       tabs = @account.tabs_available(nil)
-      expect(tabs.map { |t| t[:id] }).not_to be_include(Account::TAB_DEVELOPER_KEYS)
+      expect(tabs.pluck(:id)).not_to be_include(Account::TAB_DEVELOPER_KEYS)
 
       tabs = @account.root_account.tabs_available(nil)
-      expect(tabs.map { |t| t[:id] }).not_to be_include(Account::TAB_DEVELOPER_KEYS)
+      expect(tabs.pluck(:id)).not_to be_include(Account::TAB_DEVELOPER_KEYS)
     end
 
     it "does not include external tools if not configured for account navigation" do
-      tool = @account.context_external_tools.new(:name => "bob", :consumer_key => "bob", :shared_secret => "bob", :domain => "example.com")
-      tool.user_navigation = { :url => "http://www.example.com", :text => "Example URL" }
+      tool = @account.context_external_tools.new(name: "bob", consumer_key: "bob", shared_secret: "bob", domain: "example.com")
+      tool.user_navigation = { url: "http://www.example.com", text: "Example URL" }
       tool.save!
       expect(tool.has_placement?(:account_navigation)).to eq false
       tabs = @account.tabs_available(nil)
-      expect(tabs.map { |t| t[:id] }).not_to be_include(tool.asset_string)
+      expect(tabs.pluck(:id)).not_to be_include(tool.asset_string)
     end
 
     it "includes active external tools if configured on the account" do
       tools = Array.new(2) do
         t = @account.context_external_tools.new(
-          :name => "bob",
-          :consumer_key => "bob",
-          :shared_secret => "bob",
-          :domain => "example.com"
+          name: "bob",
+          consumer_key: "bob",
+          shared_secret: "bob",
+          domain: "example.com"
         )
         t.account_navigation = {
-          :text => "Example URL",
-          :url => "http://www.example.com",
+          text: "Example URL",
+          url: "http://www.example.com",
         }
         t.tap(&:save!)
       end
@@ -1124,7 +1146,7 @@ describe Account do
       tools.each { |t| expect(t.has_placement?(:account_navigation)).to eq true }
 
       tabs = @account.tabs_available
-      tab_ids = tabs.map { |t| t[:id] }
+      tab_ids = tabs.pluck(:id)
       expect(tab_ids).to be_include(tool1.asset_string)
       expect(tab_ids).not_to be_include(tool2.asset_string)
       tab = tabs.detect { |t| t[:id] == tool1.asset_string }
@@ -1134,12 +1156,12 @@ describe Account do
     end
 
     it "includes external tools if configured on the root account" do
-      tool = @account.context_external_tools.new(:name => "bob", :consumer_key => "bob", :shared_secret => "bob", :domain => "example.com")
-      tool.account_navigation = { :url => "http://www.example.com", :text => "Example URL" }
+      tool = @account.context_external_tools.new(name: "bob", consumer_key: "bob", shared_secret: "bob", domain: "example.com")
+      tool.account_navigation = { url: "http://www.example.com", text: "Example URL" }
       tool.save!
       expect(tool.has_placement?(:account_navigation)).to eq true
       tabs = @account.tabs_available(nil)
-      expect(tabs.map { |t| t[:id] }).to be_include(tool.asset_string)
+      expect(tabs.pluck(:id)).to be_include(tool.asset_string)
       tab = tabs.detect { |t| t[:id] == tool.asset_string }
       expect(tab[:label]).to eq tool.settings[:account_navigation][:text]
       expect(tab[:href]).to eq :account_external_tool_path
@@ -1147,29 +1169,29 @@ describe Account do
     end
 
     it "does not include external tools for non-admins if visibility is set" do
-      course_with_teacher(:account => @account)
-      tool = @account.context_external_tools.new(:name => "bob", :consumer_key => "bob", :shared_secret => "bob", :domain => "example.com")
-      tool.account_navigation = { :url => "http://www.example.com", :text => "Example URL", :visibility => "admins" }
+      course_with_teacher(account: @account)
+      tool = @account.context_external_tools.new(name: "bob", consumer_key: "bob", shared_secret: "bob", domain: "example.com")
+      tool.account_navigation = { url: "http://www.example.com", text: "Example URL", visibility: "admins" }
       tool.save!
       expect(tool.has_placement?(:account_navigation)).to eq true
       tabs = @account.tabs_available(@teacher)
-      expect(tabs.map { |t| t[:id] }).to_not be_include(tool.asset_string)
+      expect(tabs.pluck(:id)).to_not be_include(tool.asset_string)
 
-      admin = account_admin_user(:account => @account)
+      admin = account_admin_user(account: @account)
       tabs = @account.tabs_available(admin)
-      expect(tabs.map { |t| t[:id] }).to be_include(tool.asset_string)
+      expect(tabs.pluck(:id)).to be_include(tool.asset_string)
     end
 
     it "uses localized labels" do
-      tool = @account.context_external_tools.new(:name => "bob", :consumer_key => "test", :shared_secret => "secret",
-                                                 :url => "http://example.com")
+      tool = @account.context_external_tools.new(name: "bob", consumer_key: "test", shared_secret: "secret",
+                                                 url: "http://example.com")
 
       account_navigation = {
-        :text => 'this should not be the title',
-        :url => 'http://www.example.com',
-        :labels => {
-          'en' => 'English Label',
-          'sp' => 'Spanish Label'
+        text: "this should not be the title",
+        url: "http://www.example.com",
+        labels: {
+          "en" => "English Label",
+          "sp" => "Spanish Label"
         }
       }
 
@@ -1181,25 +1203,25 @@ describe Account do
       expect(tabs.first[:label]).to eq "English Label"
     end
 
-    it 'includes message handlers' do
+    it "includes message handlers" do
       mock_tab = {
-        :id => '1234',
-        :label => 'my_label',
-        :css_class => '1234',
-        :href => :launch_path_helper,
-        :visibility => nil,
-        :external => true,
-        :hidden => false,
-        :args => [1, 2]
+        id: "1234",
+        label: "my_label",
+        css_class: "1234",
+        href: :launch_path_helper,
+        visibility: nil,
+        external: true,
+        hidden: false,
+        args: [1, 2]
       }
       allow(Lti::MessageHandler).to receive(:lti_apps_tabs).and_return([mock_tab])
       expect(@account.tabs_available(nil)).to include(mock_tab)
     end
 
-    it 'uses :manage_assignments to determine question bank tab visibility' do
+    it "uses :manage_assignments to determine question bank tab visibility" do
       account_admin_user_with_role_changes(acccount: @account, role_changes: { manage_assignments: true, manage_grades: false })
       tabs = @account.tabs_available(@admin)
-      expect(tabs.map { |t| t[:id] }).to be_include(Account::TAB_QUESTION_BANKS)
+      expect(tabs.pluck(:id)).to be_include(Account::TAB_QUESTION_BANKS)
     end
 
     describe "'ePortfolio Moderation' tab" do
@@ -1233,10 +1255,10 @@ describe Account do
 
   describe "fast_all_users" do
     it "preserves sortable_name" do
-      user_with_pseudonym(:active_all => 1)
-      @user.update(:name => "John St. Clair", :sortable_name => "St. Clair, John")
+      user_with_pseudonym(active_all: 1)
+      @user.update(name: "John St. Clair", sortable_name: "St. Clair, John")
       @johnstclair = @user
-      user_with_pseudonym(:active_all => 1, :username => 'jt@instructure.com', :name => 'JT Olds')
+      user_with_pseudonym(active_all: 1, username: "jt@instructure.com", name: "JT Olds")
       @jtolds = @user
       expect(Account.default.fast_all_users).to eq [@jtolds, @johnstclair]
     end
@@ -1244,14 +1266,14 @@ describe Account do
 
   it "does not allow setting an sis id for a root account" do
     @account = Account.create!
-    @account.sis_source_id = 'abc'
+    @account.sis_source_id = "abc"
     expect(@account.save).to be_falsey
   end
 
   describe "user_list_search_mode_for" do
     let_once(:account) { Account.default }
     it "is preferred for anyone if open registration is turned on" do
-      account.settings = { :open_registration => true }
+      account.settings = { open_registration: true }
       expect(account.user_list_search_mode_for(nil)).to eq :preferred
       expect(account.user_list_search_mode_for(user_factory)).to eq :preferred
     end
@@ -1262,29 +1284,6 @@ describe Account do
       user_factory
       account.account_users.create!(user: @user)
       expect(account.user_list_search_mode_for(@user)).to eq :preferred
-    end
-  end
-
-  context "sharding" do
-    specs_require_sharding
-
-    it "properly returns site admin permissions regardless of active shard" do
-      enable_cache do
-        user_factory
-        site_admin = Account.site_admin
-        site_admin.account_users.create!(user: @user)
-
-        @shard1.activate do
-          expect(site_admin.grants_right?(@user, :manage_site_settings)).to be_truthy
-        end
-        expect(site_admin.grants_right?(@user, :manage_site_settings)).to be_truthy
-
-        user_factory
-        @shard1.activate do
-          expect(site_admin.grants_right?(@user, :manage_site_settings)).to be_falsey
-        end
-        expect(site_admin.grants_right?(@user, :manage_site_settings)).to be_falsey
-      end
     end
   end
 
@@ -1304,17 +1303,17 @@ describe Account do
     end
 
     it "grants :read_outcomes to account admins" do
-      account_admin_user(:account => Account.default)
+      account_admin_user(account: Account.default)
       expect(Account.default.grants_right?(@admin, :read_outcomes)).to be_truthy
     end
 
     it "grants :read_outcomes to subaccount admins" do
-      account_admin_user(:account => Account.default.sub_accounts.create!)
+      account_admin_user(account: Account.default.sub_accounts.create!)
       expect(Account.default.grants_right?(@admin, :read_outcomes)).to be_truthy
     end
 
     it "grants :read_outcomes to enrollees in account courses" do
-      course_factory(:account => Account.default)
+      course_factory(account: Account.default)
       teacher_in_course
       student_in_course
       expect(Account.default.grants_right?(@teacher, :read_outcomes)).to be_truthy
@@ -1322,7 +1321,7 @@ describe Account do
     end
 
     it "grants :read_outcomes to enrollees in subaccount courses" do
-      course_factory(:account => Account.default.sub_accounts.create!)
+      course_factory(account: Account.default.sub_accounts.create!)
       teacher_in_course
       student_in_course
       expect(Account.default.grants_right?(@teacher, :read_outcomes)).to be_truthy
@@ -1332,7 +1331,7 @@ describe Account do
 
   describe "authentication_providers.active" do
     let(:account) { Account.default }
-    let!(:aac) { account.authentication_providers.create!(auth_type: 'facebook') }
+    let!(:aac) { account.authentication_providers.create!(auth_type: "facebook") }
 
     it "pulls active AACS" do
       expect(account.authentication_providers.active).to include(aac)
@@ -1352,12 +1351,12 @@ describe Account do
     end
 
     it "is false for LDAP" do
-      account.authentication_providers.create!(auth_type: 'ldap')
+      account.authentication_providers.create!(auth_type: "ldap")
       expect(account.delegated_authentication?).to eq false
     end
 
     it "is true for CAS" do
-      account.authentication_providers.create!(auth_type: 'cas')
+      account.authentication_providers.create!(auth_type: "cas")
       expect(account.delegated_authentication?).to eq true
     end
   end
@@ -1370,31 +1369,31 @@ describe Account do
     end
 
     it "is true for having aacs" do
-      Account.default.authentication_providers.create!(auth_type: 'ldap')
+      Account.default.authentication_providers.create!(auth_type: "ldap")
       expect(account.non_canvas_auth_configured?).to be_truthy
     end
 
     it "is false after aacs deleted" do
-      Account.default.authentication_providers.create!(auth_type: 'ldap')
+      Account.default.authentication_providers.create!(auth_type: "ldap")
       account.authentication_providers.destroy_all
       expect(account.non_canvas_auth_configured?).to be_falsey
     end
   end
 
-  describe '#find_child' do
-    it 'works for root accounts' do
+  describe "#find_child" do
+    it "works for root accounts" do
       sub = Account.default.sub_accounts.create!
       expect(Account.default.find_child(sub.id)).to eq sub
     end
 
-    it 'works for children accounts' do
+    it "works for children accounts" do
       sub = Account.default.sub_accounts.create!
       sub_sub = sub.sub_accounts.create!
       sub_sub_sub = sub_sub.sub_accounts.create!
       expect(sub.find_child(sub_sub_sub.id)).to eq sub_sub_sub
     end
 
-    it 'raises for out-of-tree accounts' do
+    it "raises for out-of-tree accounts" do
       sub = Account.default.sub_accounts.create!
       sub_sub = sub.sub_accounts.create!
       sibling = sub.sub_accounts.create!
@@ -1405,7 +1404,7 @@ describe Account do
   context "manually created courses account" do
     it "still works with existing manually created courses accounts" do
       acct = Account.default
-      sub = acct.sub_accounts.create!(:name => "Manually-Created Courses")
+      sub = acct.sub_accounts.create!(name: "Manually-Created Courses")
       manual_courses_account = acct.manually_created_courses_account
       expect(manual_courses_account.id).to eq sub.id
       expect(acct.reload.settings[:manually_created_courses_account_id]).to eq sub.id
@@ -1486,15 +1485,15 @@ describe Account do
   describe "available_custom_course_roles" do
     before :once do
       account_model
-      @roleA = @account.roles.create :name => 'A'
-      @roleA.base_role_type = 'StudentEnrollment'
+      @roleA = @account.roles.create name: "A"
+      @roleA.base_role_type = "StudentEnrollment"
       @roleA.save!
-      @roleB = @account.roles.create :name => 'B'
-      @roleB.base_role_type = 'StudentEnrollment'
+      @roleB = @account.roles.create name: "B"
+      @roleB.base_role_type = "StudentEnrollment"
       @roleB.save!
       @sub_account = @account.sub_accounts.create!
-      @roleC = @sub_account.roles.create :name => 'C'
-      @roleC.base_role_type = 'StudentEnrollment'
+      @roleC = @sub_account.roles.create name: "C"
+      @roleC.base_role_type = "StudentEnrollment"
       @roleC.save!
     end
 
@@ -1568,19 +1567,19 @@ describe Account do
     end
 
     it "returns false if you are a site admin" do
-      admin = account_admin_user(:account => Account.site_admin)
+      admin = account_admin_user(account: Account.site_admin)
       expect(Account.site_admin.can_see_admin_tools_tab?(admin)).to be_falsey
     end
 
     it "doesn't have permission, it returns false" do
       allow(account).to receive(:grants_right?).and_return(false)
-      account_admin_user(:account => account)
+      account_admin_user(account: account)
       expect(account.can_see_admin_tools_tab?(@admin)).to be_falsey
     end
 
     it "does have permission, it returns true" do
       allow(account).to receive(:grants_right?).and_return(true)
-      account_admin_user(:account => account)
+      account_admin_user(account: account)
       expect(account.can_see_admin_tools_tab?(@admin)).to be_truthy
     end
   end
@@ -1615,8 +1614,8 @@ describe Account do
       end
 
       it "uses provided value when set" do
-        @account.default_time_zone = 'America/New_York'
-        expect(@account.default_time_zone).to eq ActiveSupport::TimeZone['Eastern Time (US & Canada)']
+        @account.default_time_zone = "America/New_York"
+        expect(@account.default_time_zone).to eq ActiveSupport::TimeZone["Eastern Time (US & Canada)"]
       end
 
       it "has a sensible default if not set" do
@@ -1632,14 +1631,14 @@ describe Account do
       end
 
       it "uses provided value when set, regardless of root account setting" do
-        @root_account.default_time_zone = 'America/Chicago'
-        @account.default_time_zone = 'America/New_York'
-        expect(@account.default_time_zone).to eq ActiveSupport::TimeZone['Eastern Time (US & Canada)']
+        @root_account.default_time_zone = "America/Chicago"
+        @account.default_time_zone = "America/New_York"
+        expect(@account.default_time_zone).to eq ActiveSupport::TimeZone["Eastern Time (US & Canada)"]
       end
 
       it "defaults to root account value if not set" do
-        @root_account.default_time_zone = 'America/Chicago'
-        expect(@account.default_time_zone).to eq ActiveSupport::TimeZone['Central Time (US & Canada)']
+        @root_account.default_time_zone = "America/Chicago"
+        expect(@account.default_time_zone).to eq ActiveSupport::TimeZone["Central Time (US & Canada)"]
       end
 
       it "has a sensible default if neither is set" do
@@ -1648,7 +1647,7 @@ describe Account do
     end
   end
 
-  it 'sets allow_sis_import if root_account' do
+  it "sets allow_sis_import if root_account" do
     account = Account.create!
     expect(account.allow_sis_import).to eq true
     sub = account.sub_accounts.create!
@@ -1658,16 +1657,16 @@ describe Account do
   describe "#ensure_defaults" do
     it "assigns an lti_guid postfixed by canvas-lms" do
       account = Account.new
-      account.uuid = '12345'
+      account.uuid = "12345"
       account.ensure_defaults
-      expect(account.lti_guid).to eq '12345:canvas-lms'
+      expect(account.lti_guid).to eq "12345:canvas-lms"
     end
 
     it "does not change existing an lti_guid" do
       account = Account.new
-      account.lti_guid = '12345'
+      account.lti_guid = "12345"
       account.ensure_defaults
-      expect(account.lti_guid).to eq '12345'
+      expect(account.lti_guid).to eq "12345"
     end
 
     it "removes carriage returns from the name" do
@@ -1678,66 +1677,66 @@ describe Account do
     end
   end
 
-  it 'formats a referer url' do
+  it "formats a referer url" do
     account = Account.new
     expect(account.format_referer(nil)).to be_nil
-    expect(account.format_referer('')).to be_nil
-    expect(account.format_referer('not a url')).to be_nil
-    expect(account.format_referer('http://example.com/')).to eq 'http://example.com'
-    expect(account.format_referer('http://example.com/index.html')).to eq 'http://example.com'
-    expect(account.format_referer('http://example.com:80')).to eq 'http://example.com'
-    expect(account.format_referer('https://example.com:443')).to eq 'https://example.com'
-    expect(account.format_referer('http://example.com:3000')).to eq 'http://example.com:3000'
+    expect(account.format_referer("")).to be_nil
+    expect(account.format_referer("not a url")).to be_nil
+    expect(account.format_referer("http://example.com/")).to eq "http://example.com"
+    expect(account.format_referer("http://example.com/index.html")).to eq "http://example.com"
+    expect(account.format_referer("http://example.com:80")).to eq "http://example.com"
+    expect(account.format_referer("https://example.com:443")).to eq "https://example.com"
+    expect(account.format_referer("http://example.com:3000")).to eq "http://example.com:3000"
   end
 
-  it 'formats trusted referers when set' do
+  it "formats trusted referers when set" do
     account = Account.new
-    account.trusted_referers = 'https://example.com/,http://example.com:80,http://example.com:3000'
-    expect(account.settings[:trusted_referers]).to eq 'https://example.com,http://example.com,http://example.com:3000'
+    account.trusted_referers = "https://example.com/,http://example.com:80,http://example.com:3000"
+    expect(account.settings[:trusted_referers]).to eq "https://example.com,http://example.com,http://example.com:3000"
 
     account.trusted_referers = nil
     expect(account.settings[:trusted_referers]).to be_nil
 
-    account.trusted_referers = ''
+    account.trusted_referers = ""
     expect(account.settings[:trusted_referers]).to be_nil
   end
 
-  describe 'trusted_referer?' do
+  describe "trusted_referer?" do
     let!(:account) do
       account = Account.new
-      account.settings[:trusted_referers] = 'https://example.com,http://example.com,http://example.com:3000'
+      account.settings[:trusted_referers] = "https://example.com,http://example.com,http://example.com:3000"
       account
     end
 
-    it 'is true when a referer is trusted' do
-      expect(account.trusted_referer?('http://example.com')).to be_truthy
-      expect(account.trusted_referer?('http://example.com:3000')).to be_truthy
-      expect(account.trusted_referer?('http://example.com:80')).to be_truthy
-      expect(account.trusted_referer?('https://example.com:443')).to be_truthy
+    it "is true when a referer is trusted" do
+      expect(account.trusted_referer?("http://example.com")).to be_truthy
+      expect(account.trusted_referer?("http://example.com:3000")).to be_truthy
+      expect(account.trusted_referer?("http://example.com:80")).to be_truthy
+      expect(account.trusted_referer?("https://example.com:443")).to be_truthy
     end
 
-    it 'is false when a referer is not provided' do
+    it "is false when a referer is not provided" do
       expect(account.trusted_referer?(nil)).to be_falsey
-      expect(account.trusted_referer?('')).to be_falsey
+      expect(account.trusted_referer?("")).to be_falsey
     end
 
-    it 'is false when a referer is not trusted' do
-      expect(account.trusted_referer?('https://example.com:5000')).to be_falsey
+    it "is false when a referer is not trusted" do
+      expect(account.trusted_referer?("https://example.com:5000")).to be_falsey
     end
 
-    it 'is false when the account has no trusted referer setting' do
+    it "is false when the account has no trusted referer setting" do
       account.settings.delete(:trusted_referers)
-      expect(account.trusted_referer?('https://example.com')).to be_falsey
+      expect(account.trusted_referer?("https://example.com")).to be_falsey
     end
 
-    it 'is false when the account has nil trusted referer setting' do
+    it "is false when the account has nil trusted referer setting" do
       account.settings[:trusted_referers] = nil
-      expect(account.trusted_referer?('https://example.com')).to be_falsey
+      expect(account.trusted_referer?("https://example.com")).to be_falsey
     end
 
-    it 'is false when the account has empty trusted referer setting' do
-      account.settings[:trusted_referers] = ''
-      expect(account.trusted_referer?('https://example.com')).to be_falsey
+    it "is false when the account has empty trusted referer setting" do
+      account.settings[:trusted_referers] = ""
+      expect(account.trusted_referer?("https://example.com")).to be_falsey
     end
   end
 
@@ -1812,7 +1811,7 @@ describe Account do
     end
 
     it "uses the default value if nothing is set anywhere" do
-      expected = { :locked => false, :value => false }
+      expected = { locked: false, value: false }
       [@account, @sub1, @sub2].each do |a|
         expect(a.restrict_student_future_view).to eq expected
         expect(a.lock_all_announcements).to eq expected
@@ -1821,25 +1820,25 @@ describe Account do
 
     it "is able to lock values for sub-accounts" do
       @settings.each do |key|
-        @sub1.settings[key] = { :locked => true, :value => true }
+        @sub1.settings[key] = { locked: true, value: true }
       end
       @sub1.save!
       # should ignore the subaccount's wishes
       @settings.each do |key|
-        @sub2.settings[key] = { :locked => true, :value => false }
+        @sub2.settings[key] = { locked: true, value: false }
       end
       @sub2.save!
 
       @settings.each do |key|
-        expect(@account.send(key)).to eq({ :locked => false, :value => false })
+        expect(@account.send(key)).to eq({ locked: false, value: false })
       end
 
       @settings.each do |key|
-        expect(@sub1.send(key)).to eq({ :locked => true, :value => true })
+        expect(@sub1.send(key)).to eq({ locked: true, value: true })
       end
 
       @settings.each do |key|
-        expect(@sub2.send(key)).to eq({ :locked => true, :value => true, :inherited => true })
+        expect(@sub2.send(key)).to eq({ locked: true, value: true, inherited: true })
       end
     end
 
@@ -1855,15 +1854,15 @@ describe Account do
       @sub2.save!
 
       @settings.each do |key|
-        expect(@account.send(key)).to eq({ :locked => false, :value => true })
+        expect(@account.send(key)).to eq({ locked: false, value: true })
       end
 
       @settings.each do |key|
-        expect(@sub1.send(key)).to eq({ :locked => false, :value => true, :inherited => true })
+        expect(@sub1.send(key)).to eq({ locked: false, value: true, inherited: true })
       end
 
       @settings.each do |key|
-        expect(@sub2.send(key)).to eq({ :locked => false, :value => false })
+        expect(@sub2.send(key)).to eq({ locked: false, value: false })
       end
     end
 
@@ -1874,8 +1873,8 @@ describe Account do
       @account.settings = settings
       @account.save!
 
-      expect(@account.restrict_student_future_view).to eq({ :locked => false, :value => true })
-      expect(@account.lock_all_announcements).to eq({ :locked => false, :value => true })
+      expect(@account.restrict_student_future_view).to eq({ locked: false, value: true })
+      expect(@account.lock_all_announcements).to eq({ locked: false, value: true })
     end
 
     context "caching" do
@@ -1886,7 +1885,7 @@ describe Account do
           [@account, @sub1, @sub2].each(&:restrict_student_future_view)
           [@account, @sub1, @sub2].each(&:lock_all_announcements)
 
-          @sub1.settings = @sub1.settings.merge(:restrict_student_future_view => { :locked => true, :value => true }, :lock_all_announcements => { :locked => true, :value => true })
+          @sub1.settings = @sub1.settings.merge(restrict_student_future_view: { locked: true, value: true }, lock_all_announcements: { locked: true, value: true })
           @sub1.save!
 
           # hard reload
@@ -1894,14 +1893,14 @@ describe Account do
           @sub1 = Account.find(@sub1.id)
           @sub2 = Account.find(@sub2.id)
 
-          expect(@account.restrict_student_future_view).to eq({ :locked => false, :value => false })
-          expect(@account.lock_all_announcements).to eq({ :locked => false, :value => false })
+          expect(@account.restrict_student_future_view).to eq({ locked: false, value: false })
+          expect(@account.lock_all_announcements).to eq({ locked: false, value: false })
 
-          expect(@sub1.restrict_student_future_view).to eq({ :locked => true, :value => true })
-          expect(@sub1.lock_all_announcements).to eq({ :locked => true, :value => true })
+          expect(@sub1.restrict_student_future_view).to eq({ locked: true, value: true })
+          expect(@sub1.lock_all_announcements).to eq({ locked: true, value: true })
 
-          expect(@sub2.restrict_student_future_view).to eq({ :locked => true, :value => true, :inherited => true })
-          expect(@sub2.lock_all_announcements).to eq({ :locked => true, :value => true, :inherited => true })
+          expect(@sub2.restrict_student_future_view).to eq({ locked: true, value: true, inherited: true })
+          expect(@sub2.lock_all_announcements).to eq({ locked: true, value: true, inherited: true })
         end
       end
     end
@@ -1940,7 +1939,7 @@ describe Account do
     specs_require_sharding
 
     describe ".find_cached" do
-      let(:nonsense_id) { 987654321 }
+      let(:nonsense_id) { 987_654_321 }
 
       it "works relative to a different shard" do
         @shard1.activate do
@@ -1974,14 +1973,14 @@ describe Account do
   end
 
   describe "#users_name_like" do
-    context 'sharding' do
+    context "sharding" do
       specs_require_sharding
 
       it "works cross-shard" do
         @shard1.activate do
           @account = Account.create!
-          @user = user_factory(:name => "silly name")
-          @user.account_users.create(:account => @account)
+          @user = user_factory(name: "silly name")
+          @user.account_users.create(account: @account)
         end
         expect(@account.users_name_like("silly").first).to eq @user
       end
@@ -2014,7 +2013,7 @@ describe Account do
     expect(Account.default.settings[:blah]).to eq true
   end
 
-  it_behaves_like 'a learning outcome context'
+  it_behaves_like "a learning outcome context"
 
   describe "#default_dashboard_view" do
     before(:once) do
@@ -2048,39 +2047,39 @@ describe Account do
     before :once do
       @account = Account.create!
 
-      @user1 = user_factory(:active_all => true)
+      @user1 = user_factory(active_all: true)
       @account.account_users.create!(user: @user1)
-      @user1.dashboard_view = 'activity'
+      @user1.dashboard_view = "activity"
       @user1.save
 
-      @user2 = user_factory(:active_all => true)
+      @user2 = user_factory(active_all: true)
       @account.account_users.create!(user: @user2)
-      @user2.dashboard_view = 'cards'
+      @user2.dashboard_view = "cards"
       @user2.save
     end
 
     it "adds or overwrite all account users' dashboard_view preference" do
-      @account.default_dashboard_view = 'planner'
+      @account.default_dashboard_view = "planner"
       @account.save!
       @account.reload
 
-      expect([@user1.dashboard_view(@account), @user2.dashboard_view(@account)]).to match_array(['activity', 'cards'])
+      expect([@user1.dashboard_view(@account), @user2.dashboard_view(@account)]).to match_array(["activity", "cards"])
       @account.update_user_dashboards(synchronous: true)
       @account.reload
-      expect([@user1.reload.dashboard_view(@account), @user2.reload.dashboard_view(@account)]).to match_array(Array.new(2, 'planner'))
+      expect([@user1.reload.dashboard_view(@account), @user2.reload.dashboard_view(@account)]).to match_array(Array.new(2, "planner"))
     end
   end
 
   it "only sends new account user notifications to active admins" do
-    active_admin = account_admin_user(:active_all => true)
-    deleted_admin = account_admin_user(:active_all => true)
+    active_admin = account_admin_user(active_all: true)
+    deleted_admin = account_admin_user(active_all: true)
     deleted_admin.account_users.destroy_all
-    n = Notification.create(:name => "New Account User", :category => "TestImmediately")
+    n = Notification.create(name: "New Account User", category: "TestImmediately")
     [active_admin, deleted_admin].each do |u|
-      NotificationPolicy.create(:notification => n, :communication_channel => u.communication_channel, :frequency => "immediately")
+      NotificationPolicy.create(notification: n, communication_channel: u.communication_channel, frequency: "immediately")
     end
-    user_factory(:active_all => true)
-    au = Account.default.account_users.create!(:user => @user)
+    user_factory(active_all: true)
+    au = Account.default.account_users.create!(user: @user)
     expect(au.messages_sent[n.name].map(&:user)).to match_array [active_admin, @user]
   end
 
@@ -2094,7 +2093,7 @@ describe Account do
       end
 
       def cached_account_users
-        [:@account_users_cache, :@account_chain_ids, :@account_chain].each do |iv|
+        %i[@account_users_cache @account_chain_ids @account_chain].each do |iv|
           @account.instance_variable_set(iv, nil)
         end
         @account.cached_account_users_for(@user)
@@ -2113,7 +2112,7 @@ describe Account do
 
       it "updates if the account chain changes" do
         other_account = Account.create!
-        au = AccountUser.create!(:account => other_account, :user => @user)
+        au = AccountUser.create!(account: other_account, user: @user)
         expect(cached_account_users).to eq []
         @account.update_attribute(:parent_account, other_account)
         @account.reload
@@ -2122,7 +2121,7 @@ describe Account do
 
       it "updates if the user has an account user added" do
         expect(cached_account_users).to eq []
-        au = AccountUser.create!(:account => @account, :user => @user)
+        au = AccountUser.create!(account: @account, user: @user)
         expect(cached_account_users).to eq [au]
       end
     end
@@ -2149,54 +2148,54 @@ describe Account do
     end
   end
 
-  context '#destroy on sub accounts' do
+  context "#destroy on sub accounts" do
     before :once do
       @root_account = Account.create!
       @sub_account = @root_account.sub_accounts.create!
     end
 
-    it 'wont let you destroy if there are active sub accounts' do
+    it "wont let you destroy if there are active sub accounts" do
       @sub_account.sub_accounts.create!
       expect { @sub_account.destroy! }.to raise_error ActiveRecord::RecordInvalid
     end
 
-    it 'wont let you destroy if there are active courses' do
+    it "wont let you destroy if there are active courses" do
       @sub_account.courses.create!
       expect { @sub_account.destroy! }.to raise_error ActiveRecord::RecordInvalid
     end
 
-    it 'destroys associated account users' do
+    it "destroys associated account users" do
       account_user1 = @sub_account.account_users.create!(user: User.create!)
       account_user2 = @sub_account.account_users.create!(user: User.create!)
       @sub_account.destroy!
-      expect(account_user1.reload.workflow_state).to eq 'deleted'
-      expect(account_user2.reload.workflow_state).to eq 'deleted'
+      expect(account_user1.reload.workflow_state).to eq "deleted"
+      expect(account_user2.reload.workflow_state).to eq "deleted"
     end
   end
 
-  context 'custom help link validation' do
+  context "custom help link validation" do
     before do
       account_model
     end
 
-    it 'is valid if custom help links are not present' do
-      @account.settings[:foo] = 'bar'
+    it "is valid if custom help links are not present" do
+      @account.settings[:foo] = "bar"
       expect(@account.valid?).to be true
     end
 
-    it 'is valid if custom help links are valid' do
+    it "is valid if custom help links are valid" do
       @account.settings[:custom_help_links] = [{ is_new: true, is_featured: false }, { is_new: false, is_featured: true }]
       expect(@account.valid?).to be true
     end
 
-    it 'is not valid if custom help links are invalid' do
+    it "is not valid if custom help links are invalid" do
       @account.settings[:custom_help_links] = [{ is_new: true, is_featured: true }]
       expect(@account.valid?).to be false
     end
 
-    it 'does not check custom help links if not changed' do
+    it "does not check custom help links if not changed" do
       @account.update_attribute(:settings, [{ is_new: true, is_featured: true }]) # skips validation
-      @account.name = 'foo'
+      @account.name = "foo"
       expect(@account.valid?).to be true
     end
   end
@@ -2238,10 +2237,10 @@ describe Account do
     specs_require_cache(:redis_cache_store)
 
     it "caches" do
-      sub_acc1 = Account.default.sub_accounts.create!(:default_locale => "es")
+      sub_acc1 = Account.default.sub_accounts.create!(default_locale: "es")
       sub_acc2 = sub_acc1.sub_accounts.create!
       expect(Account.recursive_default_locale_for_id(sub_acc2.id)).to eq "es"
-      Account.where(:id => sub_acc1).update_all(:default_locale => "de") # directly update db - shouldn't invalidate cache
+      Account.where(id: sub_acc1).update_all(default_locale: "de") # directly update db - shouldn't invalidate cache
       expect(Account.recursive_default_locale_for_id(sub_acc2.id)).to eq "es"
 
       sub_acc1.update_attribute(:default_locale, "en") # should invalidate cache downstream
@@ -2261,7 +2260,7 @@ describe Account do
       sub_acc1 = Account.default.sub_accounts.create!
       sub_acc2 = sub_acc1.sub_accounts.create!
       expect(sub_acc2.effective_brand_config).to eq config1
-      Account.where(:id => sub_acc1).update_all(:brand_config_md5 => config2.md5) # directly update db - shouldn't invalidate cache
+      Account.where(id: sub_acc1).update_all(brand_config_md5: config2.md5) # directly update db - shouldn't invalidate cache
       expect(Account.find(sub_acc2.id).effective_brand_config).to eq config1
 
       Account.default.update_attribute(:brand_config_md5, config2.md5) # should invalidate downstream
@@ -2269,7 +2268,7 @@ describe Account do
     end
   end
 
-  context '#roles_with_enabled_permission' do
+  context "#roles_with_enabled_permission" do
     def create_role_override(permission, role, context, enabled = true)
       RoleOverride.create!(
         context: context,
@@ -2280,29 +2279,29 @@ describe Account do
     end
     let(:account) { account_model }
 
-    it 'returns expected roles with the given permission' do
+    it "returns expected roles with the given permission" do
       account.disable_feature!(:granular_permissions_manage_courses)
-      role = account.roles.create :name => 'AssistantGrader'
-      role.base_role_type = 'TaEnrollment'
-      role.workflow_state = 'active'
+      role = account.roles.create name: "AssistantGrader"
+      role.base_role_type = "TaEnrollment"
+      role.workflow_state = "active"
       role.save!
-      create_role_override('change_course_state', role, account)
+      create_role_override("change_course_state", role, account)
       expect(
         account.roles_with_enabled_permission(:change_course_state).map(&:name).sort
       ).to eq %w[AccountAdmin AssistantGrader DesignerEnrollment TeacherEnrollment]
     end
 
-    it 'returns expected roles with the given permission (granular permissions)' do
+    it "returns expected roles with the given permission (granular permissions)" do
       account.enable_feature!(:granular_permissions_manage_courses)
-      role = account.roles.create :name => 'TeacherAdmin'
-      role.base_role_type = 'TeacherEnrollment'
-      role.workflow_state = 'active'
+      role = account.roles.create name: "TeacherAdmin"
+      role.base_role_type = "TeacherEnrollment"
+      role.workflow_state = "active"
       role.save!
-      create_role_override('manage_courses_add', role, account)
-      create_role_override('manage_courses_publish', role, account)
-      create_role_override('manage_courses_conclude', role, account)
-      create_role_override('manage_courses_reset', role, account)
-      create_role_override('manage_courses_delete', role, account)
+      create_role_override("manage_courses_add", role, account)
+      create_role_override("manage_courses_publish", role, account)
+      create_role_override("manage_courses_conclude", role, account)
+      create_role_override("manage_courses_reset", role, account)
+      create_role_override("manage_courses_delete", role, account)
       expect(
         account.roles_with_enabled_permission(:manage_courses_add).map(&:name).sort
       ).to eq %w[AccountAdmin]
@@ -2321,16 +2320,16 @@ describe Account do
     end
   end
 
-  describe '#invalidate_caches_if_changed' do
-    it 'works for root accounts' do
-      Account.default.name = 'Something new'
+  describe "#invalidate_caches_if_changed" do
+    it "works for root accounts" do
+      Account.default.name = "Something new"
       expect(Account).to receive(:invalidate_cache).with(Account.default.id).at_least(1)
       Account.default.save!
     end
 
-    it 'works for sub accounts' do
+    it "works for sub accounts" do
       a = Account.default.manually_created_courses_account
-      a.name = 'something else'
+      a.name = "something else"
       expect(Rails.cache).to receive(:delete).with("short_name_lookup/account_#{a.id}").ordered
       expect(Rails.cache).to receive(:delete).with(["account2", a.id].cache_key).ordered
       a.save!
@@ -2430,12 +2429,12 @@ describe Account do
     end
   end
 
-  describe '#log_changes_to_app_center_access_token' do
+  describe "#log_changes_to_app_center_access_token" do
     subject { account.update!(settings: after_settings) }
 
     let!(:account) { account_model(settings: before_settings).tap(&:save!) }
     let(:calls) { [] }
-    let(:notifier) { lambda { |*args| calls << args } }
+    let(:notifier) { ->(*args) { calls << args } }
 
     before do
       @old_notifier = CanvasErrors.send(:registry)[:sentry_notification]
@@ -2447,8 +2446,8 @@ describe Account do
       CanvasErrors.send(:registry).compact!
     end
 
-    shared_examples_for 'a change to the token' do |was_present, now_present|
-      it 'triggers a Sentry log' do
+    shared_examples_for "a change to the token" do |was_present, now_present|
+      it "triggers a Sentry log" do
         subject
         expect(calls).to include([
                                    "Account's app_center_access_token changed",
@@ -2458,54 +2457,54 @@ describe Account do
       end
     end
 
-    shared_examples_for 'no change to the token' do
-      it 'does not trigger a Sentry log' do
+    shared_examples_for "no change to the token" do
+      it "does not trigger a Sentry log" do
         subject
         expect(calls.map(&:first)).to_not include("Account's app_center_access_token changed")
       end
     end
 
-    context 'when it changes from empty to non-empty' do
+    context "when it changes from empty to non-empty" do
       let(:before_settings) { {} }
-      let(:after_settings) { { app_center_access_token: 'foo' } }
+      let(:after_settings) { { app_center_access_token: "foo" } }
 
-      it_behaves_like 'a change to the token', false, true
+      it_behaves_like "a change to the token", false, true
     end
 
-    context 'when it changes from non-empty to empty' do
-      let(:before_settings) { { app_center_access_token: 'foo' } }
+    context "when it changes from non-empty to empty" do
+      let(:before_settings) { { app_center_access_token: "foo" } }
       let(:after_settings) { { app_center_access_token: nil } }
 
-      it_behaves_like 'a change to the token', true, false
+      it_behaves_like "a change to the token", true, false
     end
 
-    context 'when it changes from non-empty to something else non-empty' do
-      let(:before_settings) { { app_center_access_token: 'foo' } }
-      let(:after_settings) { { app_center_access_token: 'foo2' } }
+    context "when it changes from non-empty to something else non-empty" do
+      let(:before_settings) { { app_center_access_token: "foo" } }
+      let(:after_settings) { { app_center_access_token: "foo2" } }
 
-      it_behaves_like 'a change to the token', true, true
+      it_behaves_like "a change to the token", true, true
     end
 
-    context 'when it is empty and does not change' do
-      let(:before_settings) { { foo: 'bar' } }
-      let(:after_settings) { { foo: 'waz', app_center_access_token: nil } }
+    context "when it is empty and does not change" do
+      let(:before_settings) { { foo: "bar" } }
+      let(:after_settings) { { foo: "waz", app_center_access_token: nil } }
 
-      it_behaves_like 'no change to the token'
+      it_behaves_like "no change to the token"
     end
 
-    context 'when it is not empty and does not change' do
-      let(:before_settings) { { foo: 'bar', app_center_access_token: 'foo' } }
-      let(:after_settings) { { foo: 'waz', app_center_access_token: 'foo' } }
+    context "when it is not empty and does not change" do
+      let(:before_settings) { { foo: "bar", app_center_access_token: "foo" } }
+      let(:after_settings) { { foo: "waz", app_center_access_token: "foo" } }
 
-      it_behaves_like 'no change to the token'
+      it_behaves_like "no change to the token"
     end
 
-    context 'when settings does not change' do
-      subject { account.update!(name: 'foobar') }
+    context "when settings does not change" do
+      subject { account.update!(name: "foobar") }
 
       let(:before_settings) { {} }
 
-      it_behaves_like 'no change to the token'
+      it_behaves_like "no change to the token"
     end
   end
 end

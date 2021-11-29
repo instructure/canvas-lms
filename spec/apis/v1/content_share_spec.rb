@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../../spec_helper'
+require_relative "../../spec_helper"
 require_dependency "api/v1/content_share"
 
 describe ContentShare do
@@ -26,24 +26,24 @@ describe ContentShare do
   before :once do
     course_with_teacher
     @export = @course.content_exports.create!
-    @cs = @teacher.sent_content_shares.create! name: 'test', content_export: @export, read_state: 'read'
+    @cs = @teacher.sent_content_shares.create! name: "test", content_export: @export, read_state: "read"
   end
 
   let(:export_settings) do
     {
-      "assignment" => { "assignments" => { 'blah' => '1' } },
+      "assignment" => { "assignments" => { "blah" => "1" } },
       "attachment" => { "attachments" => { "blah" => "1" } },
-      "discussion_topic" => { "discussion_topics" => { 'blah' => '1' } },
-      "page" => { "wiki_pages" => { 'blah' => '1' } },
-      "quiz" => { "quizzes" => { 'blah' => '1' } },
-      "module_item" => { "wiki_pages" => { 'bap' => '1' }, "content_tags" => { 'blah' => '1' } },
-      "module" => { "content_tags" => { 'bar' => '1', 'baz' => '1' }, "context_modules" => { 'foo' => '1' },
-                    "assignments" => { 'bip' => '1' }, "wiki_pages" => { 'bap' => '1' } }
+      "discussion_topic" => { "discussion_topics" => { "blah" => "1" } },
+      "page" => { "wiki_pages" => { "blah" => "1" } },
+      "quiz" => { "quizzes" => { "blah" => "1" } },
+      "module_item" => { "wiki_pages" => { "bap" => "1" }, "content_tags" => { "blah" => "1" } },
+      "module" => { "content_tags" => { "bar" => "1", "baz" => "1" }, "context_modules" => { "foo" => "1" },
+                    "assignments" => { "bip" => "1" }, "wiki_pages" => { "bap" => "1" } }
     }
   end
 
   it "detects an assignment export" do
-    detect_export('assignment')
+    detect_export("assignment")
   end
 
   it "detects an attachment export" do
@@ -51,29 +51,29 @@ describe ContentShare do
   end
 
   it "detects a discussion topic export" do
-    detect_export('discussion_topic')
+    detect_export("discussion_topic")
   end
 
   it "detects a page export" do
-    detect_export('page')
+    detect_export("page")
   end
 
   it "detects a quiz export" do
-    detect_export('quiz')
+    detect_export("quiz")
   end
 
   it "detects a module item export" do
-    detect_export('module_item')
+    detect_export("module_item")
   end
 
   it "detects a module export" do
-    detect_export('module')
+    detect_export("module")
   end
 
   def detect_export(type)
     @export.settings = { "selected_content" => export_settings[type] }
     @export.save!
     thing = content_share_json(@cs, nil, {})
-    expect(thing['content_type']).to eq type
+    expect(thing["content_type"]).to eq type
   end
 end

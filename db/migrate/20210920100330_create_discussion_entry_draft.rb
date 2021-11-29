@@ -23,23 +23,23 @@ class CreateDiscussionEntryDraft < ActiveRecord::Migration[6.0]
     create_table :discussion_entry_drafts do |t|
       t.references :discussion_topic, null: false, foreign_key: true, index: true
       t.references :discussion_entry, null: true, foreign_key: true, index: false
-      t.references :root_entry, foreign_key: { to_table: 'discussion_entries' }, null: true, index: true
-      t.references :parent, foreign_key: { to_table: 'discussion_entries' }, null: true, index: true
+      t.references :root_entry, foreign_key: { to_table: "discussion_entries" }, null: true, index: true
+      t.references :parent, foreign_key: { to_table: "discussion_entries" }, null: true, index: true
       t.references :attachment, null: true, foreign_key: true, index: true
       t.references :user, null: false, foreign_key: true, index: true
       t.text :message
       t.boolean :include_reply_preview, null: false, default: false
       t.timestamps
-      t.index %i(discussion_topic_id user_id),
-              name: 'unique_index_on_topic_and_user',
-              where: 'discussion_entry_id IS NULL AND root_entry_id IS NULL',
+      t.index %i[discussion_topic_id user_id],
+              name: "unique_index_on_topic_and_user",
+              where: "discussion_entry_id IS NULL AND root_entry_id IS NULL",
               unique: true
-      t.index %i(root_entry_id user_id),
-              name: 'unique_index_on_root_entry_and_user',
-              where: 'discussion_entry_id IS NULL',
+      t.index %i[root_entry_id user_id],
+              name: "unique_index_on_root_entry_and_user",
+              where: "discussion_entry_id IS NULL",
               unique: true
-      t.index %i(discussion_entry_id user_id),
-              name: 'unique_index_on_entry_and_user',
+      t.index %i[discussion_entry_id user_id],
+              name: "unique_index_on_entry_and_user",
               unique: true
     end
   end

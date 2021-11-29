@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../../import_helper'
+require_relative "../../import_helper"
 
 describe Importers::ExternalFeedImporter do
   context ".import_from_migration" do
@@ -26,10 +26,10 @@ describe Importers::ExternalFeedImporter do
       @course = course_factory
       migration = @course.content_migrations.create!
       data = {
-        url: 'http://www.example.com/feed',
-        title: 'test feed',
-        verbosity: 'link_only',
-        header_match: ''
+        url: "http://www.example.com/feed",
+        title: "test feed",
+        verbosity: "link_only",
+        header_match: ""
       }
       feed = Importers::ExternalFeedImporter.import_from_migration(data, @course, migration)
       expect(feed.url).to eq data[:url]
@@ -42,19 +42,19 @@ describe Importers::ExternalFeedImporter do
   context ".find_or_initialize_from_migration" do
     before(:once) do
       @course = course_factory
-      @feed = external_feed_model(migration_id: '12345')
+      @feed = external_feed_model(migration_id: "12345")
     end
 
     it "finds a feed by migration id" do
       found = Importers::ExternalFeedImporter.find_or_initialize_from_migration({
-                                                                                  migration_id: '12345'
+                                                                                  migration_id: "12345"
                                                                                 }, @course)
       expect(found.id).to eq @feed.id
     end
 
     it "finds by uniq attrs" do
       found = Importers::ExternalFeedImporter.find_or_initialize_from_migration({
-                                                                                  migration_id: 'xyzyx',
+                                                                                  migration_id: "xyzyx",
                                                                                   url: @feed.url,
                                                                                   header_match: @feed.header_match,
                                                                                   verbosity: @feed.verbosity
@@ -64,7 +64,7 @@ describe Importers::ExternalFeedImporter do
 
     it "initializes if none found" do
       found = Importers::ExternalFeedImporter.find_or_initialize_from_migration({
-                                                                                  migration_id: 'xyzyx',
+                                                                                  migration_id: "xyzyx",
                                                                                   url: @feed.url + "xxx",
                                                                                   header_match: @feed.header_match,
                                                                                   verbosity: @feed.verbosity

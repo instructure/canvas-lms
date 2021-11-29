@@ -20,39 +20,39 @@
 module CC::Importer::Standard
   module DiscussionConverter
     include CC::Importer
-    TOPIC_NODE = 'topic'
+    TOPIC_NODE = "topic"
 
     def convert_discussions
       topics = []
 
       resources_by_type("imsdt").each do |res|
-        path = res[:href] || (res[:files] && res[:files].first && res[:files].first[:href])
+        path = res[:href] || (res[:files]&.first && res[:files].first[:href])
         resource_dir = File.dirname(path) if path
-        if (doc = get_node_or_open_file(res, TOPIC_NODE))
-          topic = { :migration_id => res[:migration_id] }
-          topic[:description] = get_node_val(doc, 'text')
-          topic[:description] = replace_urls(topic[:description])
-          topic[:title] = get_node_val(doc, 'title')
-          if res[:intended_user_role] == 'Instructor'
-            topic[:workflow_state] = 'unpublished'
-          end
+        next unless (doc = get_node_or_open_file(res, TOPIC_NODE))
 
-          if doc.css('attachment').length > 1
-            # canvas discussions only support one attachment, so just list them at the bottom of the description
-            topic[:description] += "\n<ul>"
-            doc.css('attachment').each do |att_node|
-              att_path = att_node['href']
-              topic[:description] += "\n<li><a href=\"#{get_canvas_att_replacement_url(att_path, resource_dir) || att_path}\">#{File.basename att_path}</a>"
-            end
-            topic[:description] += "\n</ul>"
-          elsif (att_node = doc.at_css('attachment'))
-            path = att_node['href']
-            if (id = find_file_migration_id(path))
-              topic[:attachment_migration_id] = id
-            end
-          end
-          topics << topic
+        topic = { migration_id: res[:migration_id] }
+        topic[:description] = get_node_val(doc, "text")
+        topic[:description] = replace_urls(topic[:description])
+        topic[:title] = get_node_val(doc, "title")
+        if res[:intended_user_role] == "Instructor"
+          topic[:workflow_state] = "unpublished"
         end
+
+        if doc.css("attachment").length > 1
+          # canvas discussions only support one attachment, so just list them at the bottom of the description
+          topic[:description] += "\n<ul>"
+          doc.css("attachment").each do |att_node|
+            att_path = att_node["href"]
+            topic[:description] += "\n<li><a href=\"#{get_canvas_att_replacement_url(att_path, resource_dir) || att_path}\">#{File.basename att_path}</a>"
+          end
+          topic[:description] += "\n</ul>"
+        elsif (att_node = doc.at_css("attachment"))
+          path = att_node["href"]
+          if (id = find_file_migration_id(path))
+            topic[:attachment_migration_id] = id
+          end
+        end
+        topics << topic
       end
 
       topics

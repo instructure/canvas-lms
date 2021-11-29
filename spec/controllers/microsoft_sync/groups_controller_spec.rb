@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'microsoft_sync/membership_diff'
+require "microsoft_sync/membership_diff"
 
 describe MicrosoftSync::GroupsController, type: :controller do
   let!(:group) { MicrosoftSync::Group.create!(course: course, workflow_state: workflow_state) }
@@ -40,32 +40,32 @@ describe MicrosoftSync::GroupsController, type: :controller do
     root_account.save!
   end
 
-  shared_examples_for 'endpoints that respond with 404 when records do not exist' do
-    context 'when the course does not exist' do
+  shared_examples_for "endpoints that respond with 404 when records do not exist" do
+    context "when the course does not exist" do
       before { course.destroy! }
 
       it { is_expected.to be_not_found }
     end
 
-    context 'when the course has no active microsoft group' do
+    context "when the course has no active microsoft group" do
       before { group.destroy! }
 
       it { is_expected.to be_not_found }
     end
   end
 
-  shared_examples_for 'endpoints that require a user' do
-    context 'when there is no user' do
+  shared_examples_for "endpoints that require a user" do
+    context "when there is no user" do
       before { remove_user_session }
 
-      it { is_expected.to redirect_to '/login' }
+      it { is_expected.to redirect_to "/login" }
     end
   end
 
-  shared_examples_for 'endpoints that require permissions' do
-    let(:user) { raise 'set in examples' }
+  shared_examples_for "endpoints that require permissions" do
+    let(:user) { raise "set in examples" }
 
-    context 'when the user does not have the required permissions' do
+    context "when the user does not have the required permissions" do
       let(:unauthorized_user) { student }
 
       before { user_session(unauthorized_user) }
@@ -73,7 +73,7 @@ describe MicrosoftSync::GroupsController, type: :controller do
       it { is_expected.to be_unauthorized }
     end
 
-    context 'when the user has the update permission but not manage_students' do
+    context "when the user has the update permission but not manage_students" do
       before do
         account_with_role_changes(role: teacher_role, role_changes: { manage_students: false })
         user_session(teacher)
@@ -83,30 +83,30 @@ describe MicrosoftSync::GroupsController, type: :controller do
     end
   end
 
-  shared_examples_for 'endpoints that require a release flag to be on' do
-    context 'when the release flag is off' do
+  shared_examples_for "endpoints that require a release flag to be on" do
+    context "when the release flag is off" do
       before { root_account.disable_feature! feature }
 
       it { is_expected.to be_not_found }
     end
   end
 
-  shared_examples_for 'endpoints that return an existing group' do
-    before { group.reload.update!(job_state: { step: 'abc' }, last_error_report_id: 123) }
+  shared_examples_for "endpoints that return an existing group" do
+    before { group.reload.update!(job_state: { step: "abc" }, last_error_report_id: 123) }
 
-    specify { expect(subject.parsed_body).to_not include('job_state') }
-    specify { expect(subject.parsed_body).to_not include('last_error_report_id') }
+    specify { expect(subject.parsed_body).to_not include("job_state") }
+    specify { expect(subject.parsed_body).to_not include("last_error_report_id") }
 
-    context 'when the user is a site admin' do
+    context "when the user is a site admin" do
       before { user_session(site_admin) }
 
       let(:site_admin) { site_admin_user(user: user_with_pseudonym(account: Account.site_admin)) }
 
-      specify { expect(subject.parsed_body).to_not include('job_state') }
-      specify { expect(subject.parsed_body['last_error_report_id']).to eq(123) }
+      specify { expect(subject.parsed_body).to_not include("job_state") }
+      specify { expect(subject.parsed_body["last_error_report_id"]).to eq(123) }
     end
 
-    it 'deserializes and localizes the error' do
+    it "deserializes and localizes the error" do
       serialized = MicrosoftSync::Errors.serialize(StandardError.new)
       group.update! last_error: serialized
       allow(MicrosoftSync::Errors).to receive(:deserialize_and_localize).and_call_original
@@ -115,7 +115,7 @@ describe MicrosoftSync::GroupsController, type: :controller do
     end
   end
 
-  shared_examples_for 'endpoints that require the integration to be available' do
+  shared_examples_for "endpoints that require the integration to be available" do
     before do
       root_account.settings[:microsoft_sync_enabled] = false
       root_account.save!
@@ -124,20 +124,20 @@ describe MicrosoftSync::GroupsController, type: :controller do
     it { is_expected.to be_bad_request }
   end
 
-  describe '#sync' do
+  describe "#sync" do
     subject { post :sync, params: params }
 
     before { user_session(teacher) }
 
-    it_behaves_like 'endpoints that require a user'
-    it_behaves_like 'endpoints that require permissions'
-    it_behaves_like 'endpoints that require a release flag to be on'
-    it_behaves_like 'endpoints that return an existing group'
-    it_behaves_like 'endpoints that require the integration to be available'
+    it_behaves_like "endpoints that require a user"
+    it_behaves_like "endpoints that require permissions"
+    it_behaves_like "endpoints that require a release flag to be on"
+    it_behaves_like "endpoints that return an existing group"
+    it_behaves_like "endpoints that require the integration to be available"
 
     it { is_expected.to be_successful }
 
-    it 'schedules a sync' do
+    it "schedules a sync" do
       expect_any_instance_of(MicrosoftSync::StateMachineJob).to receive(
         :run_later
       ).once
@@ -146,7 +146,7 @@ describe MicrosoftSync::GroupsController, type: :controller do
 
     it 'updates the group state to "manually_scheduled"' do
       subject
-      expect(group.reload.workflow_state).to eq 'manually_scheduled'
+      expect(group.reload.workflow_state).to eq "manually_scheduled"
     end
 
     context 'when the group is in a "running" state' do
@@ -154,27 +154,27 @@ describe MicrosoftSync::GroupsController, type: :controller do
 
       it { is_expected.to be_bad_request }
 
-      it 'responds with an error' do
+      it "responds with an error" do
         subject
-        expect(json_parse['errors']).to match_array [
-          'A sync job is already running for the specified group'
+        expect(json_parse["errors"]).to match_array [
+          "A sync job is already running for the specified group"
         ]
       end
     end
 
-    context 'when the cool down period has not passed' do
+    context "when the cool down period has not passed" do
       before { group.update!(last_manually_synced_at: Time.zone.now) }
 
       it { is_expected.to be_bad_request }
 
-      it 'responds with an error' do
+      it "responds with an error" do
         subject
-        expect(json_parse['errors']).to match_array [
-          'Not enough time elapsed since last manual sync'
+        expect(json_parse["errors"]).to match_array [
+          "Not enough time elapsed since last manual sync"
         ]
       end
 
-      context 'and the current user is a site admin' do
+      context "and the current user is a site admin" do
         before { user_session(site_admin) }
 
         let(:site_admin) { site_admin_user(user: user_with_pseudonym(account: Account.site_admin)) }
@@ -190,23 +190,23 @@ describe MicrosoftSync::GroupsController, type: :controller do
     end
   end
 
-  describe '#create' do
+  describe "#create" do
     subject { post :create, params: params }
 
     before { user_session(teacher) }
 
-    it_behaves_like 'endpoints that require a user'
-    it_behaves_like 'endpoints that require permissions'
-    it_behaves_like 'endpoints that require a release flag to be on'
-    it_behaves_like 'endpoints that require the integration to be available'
+    it_behaves_like "endpoints that require a user"
+    it_behaves_like "endpoints that require permissions"
+    it_behaves_like "endpoints that require a release flag to be on"
+    it_behaves_like "endpoints that require the integration to be available"
 
-    context 'when the course does not exist' do
+    context "when the course does not exist" do
       before { course.destroy! }
 
       it { is_expected.to be_not_found }
     end
 
-    context 'when a deleted group exists for the course' do
+    context "when a deleted group exists for the course" do
       subject do
         super()
         json_parse
@@ -215,8 +215,8 @@ describe MicrosoftSync::GroupsController, type: :controller do
       before do
         group.update!(
           job_state: :membership_fetched,
-          last_error: 'something bad happened',
-          workflow_state: 'errored'
+          last_error: "something bad happened",
+          workflow_state: "errored"
         )
         group.destroy!
       end
@@ -226,30 +226,30 @@ describe MicrosoftSync::GroupsController, type: :controller do
         expect(response).to be_created
       end
 
-      it 'reactivates the existing group' do
-        expect(subject['id']).to eq group.id
+      it "reactivates the existing group" do
+        expect(subject["id"]).to eq group.id
       end
 
-      it 'clears the job state' do
-        expect(subject['job_state']).to be_blank
+      it "clears the job state" do
+        expect(subject["job_state"]).to be_blank
       end
 
-      it 'clears the last error' do
-        expect(subject['last_error']).to be_blank
+      it "clears the last error" do
+        expect(subject["last_error"]).to be_blank
       end
 
-      it 'resets the workflow state' do
-        expect(subject['workflow_state']).to eq 'pending'
+      it "resets the workflow state" do
+        expect(subject["workflow_state"]).to eq "pending"
       end
     end
 
-    context 'when an active group already exists for the course' do
+    context "when an active group already exists for the course" do
       it 'responds with "conflict"' do
         expect(subject.status).to eq 409
       end
     end
 
-    context 'when no group exists for the course' do
+    context "when no group exists for the course" do
       subject do
         super()
         json_parse
@@ -262,10 +262,10 @@ describe MicrosoftSync::GroupsController, type: :controller do
         expect(response.status).to eq 201
       end
 
-      it 'creates a new group' do
+      it "creates a new group" do
         expect(subject).to match(
           JSON.parse(
-            MicrosoftSync::Group.find(subject['id']).to_json(
+            MicrosoftSync::Group.find(subject["id"]).to_json(
               include_root: false,
               except: %i[job_state last_error_report_id]
             )
@@ -273,28 +273,28 @@ describe MicrosoftSync::GroupsController, type: :controller do
         )
       end
 
-      context 'when too many owners are enrolled in the course' do
+      context "when too many owners are enrolled in the course" do
         before { 3.times { teacher_in_course(course: course, active_enrollment: true) } }
 
-        before { stub_const('MicrosoftSync::MembershipDiff::MAX_ENROLLMENT_OWNERS', 2) }
+        before { stub_const("MicrosoftSync::MembershipDiff::MAX_ENROLLMENT_OWNERS", 2) }
 
         it 'responds with "unprocessable_entity" and an error message' do
           subject
-          expect(response.parsed_body['message']).to match(
+          expect(response.parsed_body["message"]).to match(
             /allows a maximum of 2 owners/
           )
           expect(response.status).to eq 422
         end
       end
 
-      context 'when too many members are enrolled in the course' do
+      context "when too many members are enrolled in the course" do
         before { 3.times { student_in_course(course: course, active_enrollment: true) } }
 
-        before { stub_const('MicrosoftSync::MembershipDiff::MAX_ENROLLMENT_MEMBERS', 2) }
+        before { stub_const("MicrosoftSync::MembershipDiff::MAX_ENROLLMENT_MEMBERS", 2) }
 
         it 'responds with "unprocessable_entity" and an error message' do
           subject
-          expect(response.parsed_body['message']).to match(
+          expect(response.parsed_body["message"]).to match(
             /allows a maximum of 2 members/
           )
           expect(response.status).to eq 422
@@ -303,40 +303,40 @@ describe MicrosoftSync::GroupsController, type: :controller do
     end
   end
 
-  describe '#deleted' do
+  describe "#deleted" do
     subject { delete :destroy, params: params }
 
     before { user_session(teacher) }
 
-    it_behaves_like 'endpoints that respond with 404 when records do not exist'
-    it_behaves_like 'endpoints that require a user'
-    it_behaves_like 'endpoints that require permissions'
-    it_behaves_like 'endpoints that require a release flag to be on'
-    it_behaves_like 'endpoints that require the integration to be available'
+    it_behaves_like "endpoints that respond with 404 when records do not exist"
+    it_behaves_like "endpoints that require a user"
+    it_behaves_like "endpoints that require permissions"
+    it_behaves_like "endpoints that require a release flag to be on"
+    it_behaves_like "endpoints that require the integration to be available"
 
     it { is_expected.to be_no_content }
 
-    it 'destroys the group' do
+    it "destroys the group" do
       subject
       expect(group.reload).to be_deleted
     end
   end
 
-  describe '#show' do
+  describe "#show" do
     subject { get :show, params: params }
 
     before { user_session(teacher) }
 
-    it_behaves_like 'endpoints that respond with 404 when records do not exist'
-    it_behaves_like 'endpoints that require a user'
-    it_behaves_like 'endpoints that require permissions'
-    it_behaves_like 'endpoints that require a release flag to be on'
-    it_behaves_like 'endpoints that return an existing group'
-    it_behaves_like 'endpoints that require the integration to be available'
+    it_behaves_like "endpoints that respond with 404 when records do not exist"
+    it_behaves_like "endpoints that require a user"
+    it_behaves_like "endpoints that require permissions"
+    it_behaves_like "endpoints that require a release flag to be on"
+    it_behaves_like "endpoints that return an existing group"
+    it_behaves_like "endpoints that require the integration to be available"
 
     it { is_expected.to be_successful }
 
-    it 'responds with the expected group' do
+    it "responds with the expected group" do
       subject
       expect(json_parse).to eq(
         JSON.parse(group.to_json(include_root: false, except: %i[job_state last_error_report_id]))

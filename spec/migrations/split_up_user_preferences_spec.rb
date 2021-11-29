@@ -17,13 +17,13 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-require_relative '../spec_helper'
+require_relative "../spec_helper"
 
 describe DataFixup::SplitUpUserPreferences do
   it "works" do
     u = User.create!
-    original_prefs = { :selected_calendar_contexts => ["course_1000"], :course_nicknames => { 2 => "Why am i taking this course" }, :some_other_thing => true }
-    User.where(:id => u).update_all(:preferences => original_prefs)
+    original_prefs = { selected_calendar_contexts: ["course_1000"], course_nicknames: { 2 => "Why am i taking this course" }, some_other_thing: true }
+    User.where(id: u).update_all(preferences: original_prefs)
     DataFixup::SplitUpUserPreferences.run(nil, nil)
     u.reload
     expect(u.reload.needs_preference_migration?).to eq false
@@ -34,9 +34,9 @@ describe DataFixup::SplitUpUserPreferences do
 
     expect(u.preferences).to eq(
       {
-        :selected_calendar_contexts => UserPreferenceValue::EXTERNAL,
-        :course_nicknames => UserPreferenceValue::EXTERNAL,
-        :some_other_thing => true
+        selected_calendar_contexts: UserPreferenceValue::EXTERNAL,
+        course_nicknames: UserPreferenceValue::EXTERNAL,
+        some_other_thing: true
       }
     )
     expect(u.get_preference(:selected_calendar_contexts)).to eq ["course_1000"]

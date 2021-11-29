@@ -23,14 +23,14 @@ module Api::V1::ObserverAlertThreshold
   include ApplicationHelper
 
   API_ALLOWED_OUTPUT_FIELDS = {
-    :only => %w(
+    only: %w[
       id
       user_id
       observer_id
       alert_type
       threshold
       workflow_state
-    ).freeze
+    ].freeze
   }.freeze
 
   def observer_alert_threshold_json(threshold, user, session, _opts = {})

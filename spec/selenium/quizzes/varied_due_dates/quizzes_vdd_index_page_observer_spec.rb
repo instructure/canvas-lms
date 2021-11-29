@@ -21,54 +21,54 @@ require_relative "../../common"
 require_relative "../../helpers/quizzes_common"
 require_relative "../../helpers/assignment_overrides"
 
-describe 'viewing a quiz with variable due dates on the quizzes index page' do
+describe "viewing a quiz with variable due dates on the quizzes index page" do
   include_context "in-process server selenium tests"
   include QuizzesCommon
   include AssignmentOverridesSeleniumHelper
 
-  context 'as an observer linked to two students in different sections' do
+  context "as an observer linked to two students in different sections" do
     before(:once) { prepare_vdd_scenario_for_first_observer }
 
     before do
-      skip('Entire spec context is buggy. Bug tickets created: CNVS-22794 and CNVS-22793')
+      skip("Entire spec context is buggy. Bug tickets created: CNVS-22794 and CNVS-22793")
       user_session(@observer1)
       get "/courses/#{@course.id}/quizzes"
     end
 
-    it 'shows the due dates for Section A', priority: "2", test_id: 282169 do
-      skip('Bug ticket created: CNVS-22794')
+    it "shows the due dates for Section A", priority: "2" do
+      skip("Bug ticket created: CNVS-22794")
       validate_vdd_quiz_tooltip_dates(
-        '.date-due',
+        ".date-due",
         "Everyone else\n#{format_date_for_view(@due_at_a)}"
       )
     end
 
-    it 'shows the due dates for Section B', priority: "2", test_id: 315666 do
-      skip('Bug ticket created: CNVS-22794')
+    it "shows the due dates for Section B", priority: "2" do
+      skip("Bug ticket created: CNVS-22794")
       validate_vdd_quiz_tooltip_dates(
-        '.date-due',
+        ".date-due",
         "#{@section_b.name}\n#{format_date_for_view(@due_at_b)}"
       )
     end
 
-    it 'shows the availability dates for Section A', priority: "2", test_id: 282397 do
-      skip('Bug ticket created: CNVS-22793')
+    it "shows the availability dates for Section A", priority: "2" do
+      skip("Bug ticket created: CNVS-22793")
       validate_vdd_quiz_tooltip_dates(
-        '.date-available',
+        ".date-available",
         "Everyone else\nAvailable until #{format_date_for_view(@lock_at_a)}"
       )
     end
 
-    it 'shows the availability dates for Section B', priority: "2", test_id: 315669 do
-      skip('Bug ticket created: CNVS-22793')
+    it "shows the availability dates for Section B", priority: "2" do
+      skip("Bug ticket created: CNVS-22793")
       validate_vdd_quiz_tooltip_dates(
-        '.date-available',
+        ".date-available",
         "#{@section_b.name}\nNot available until #{format_date_for_view(@unlock_at_b)}"
       )
     end
   end
 
-  context 'as an observer linked to a single student' do
+  context "as an observer linked to a single student" do
     before(:once) { prepare_vdd_scenario_for_second_observer }
 
     before do
@@ -76,12 +76,12 @@ describe 'viewing a quiz with variable due dates on the quizzes index page' do
       get "/courses/#{@course.id}/quizzes"
     end
 
-    it 'shows the due dates for Section B', priority: "2", test_id: 282170 do
-      expect(f('.date-due')).to include_text("Due #{format_time_for_view(@due_at_b)}")
+    it "shows the due dates for Section B", priority: "2" do
+      expect(f(".date-due")).to include_text("Due #{format_time_for_view(@due_at_b)}")
     end
 
-    it 'shows the availability dates for Section B', priority: "2", test_id: 282399 do
-      expect(f('.date-available')).to include_text("Not available until "\
+    it "shows the availability dates for Section B", priority: "2" do
+      expect(f(".date-available")).to include_text("Not available until "\
                                                    "#{format_date_for_view(@unlock_at_b, :short)}")
     end
   end

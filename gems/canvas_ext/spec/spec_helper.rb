@@ -17,13 +17,13 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'canvas_ext'
+require "canvas_ext"
 
 RSpec.configure do |config|
   config.run_all_when_everything_filtered = true
   config.filter_run :focus
   config.color = true
-  config.order = 'random'
+  config.order = "random"
 end
 
 Time.zone = "UTC"

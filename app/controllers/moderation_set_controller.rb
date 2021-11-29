@@ -37,11 +37,11 @@ class ModerationSetController < ApplicationController
   def index
     render_unauthorized_action and return unless @assignment.permits_moderation?(@current_user)
 
-    scope = @assignment.shard.activate {
+    scope = @assignment.shard.activate do
       User.where(
         id: @assignment.moderated_grading_selections.select(:student_id)
       ).order(:id)
-    }
+    end
 
     users = Api.paginate(scope, self, api_v1_moderated_students_url(@context, @assignment))
     render json: users_json(users, @current_user, session)

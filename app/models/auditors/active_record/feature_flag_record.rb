@@ -23,30 +23,29 @@ module Auditors::ActiveRecord
     include CanvasPartman::Concerns::Partitioned
     self.partitioning_strategy = :by_date
     self.partitioning_interval = :months
-    self.partitioning_field = 'created_at'
-    self.table_name = 'auditor_feature_flag_records'
+    self.partitioning_field = "created_at"
+    self.table_name = "auditor_feature_flag_records"
 
     belongs_to :account, inverse_of: :auditor_grade_change_records
     belongs_to :user
     belongs_to :root_account,
-               class_name: 'Account',
-               inverse_of: :auditor_feature_flag_records,
-               foreign_key: 'root_account_id'
+               class_name: "Account",
+               inverse_of: :auditor_feature_flag_records
 
     class << self
       include Auditors::ActiveRecord::Model
 
       def ar_attributes_from_event_stream(record)
-        record.attributes.except('id').tap do |attrs_hash|
-          attrs_hash['request_id'] ||= "MISSING"
-          attrs_hash['uuid'] = record.id
+        record.attributes.except("id").tap do |attrs_hash|
+          attrs_hash["request_id"] ||= "MISSING"
+          attrs_hash["uuid"] = record.id
           # could be nil in the rare case of an unprovisioned console user.
           # NULL is therefore the signal that there was no inferrable user at
           # the time of the feature flag flip.
-          attrs_hash['user_id'] = Shard.relative_id_for(record.user_id, Shard.current, Shard.current)
-          attrs_hash['feature_flag_id'] = Shard.relative_id_for(record.feature_flag_id, Shard.current, Shard.current)
-          attrs_hash['context_id'] = Shard.relative_id_for(record.context_id, Shard.current, Shard.current)
-          attrs_hash['root_account_id'] = Shard.relative_id_for(record.root_account_id, Shard.current, Shard.current)
+          attrs_hash["user_id"] = Shard.relative_id_for(record.user_id, Shard.current, Shard.current)
+          attrs_hash["feature_flag_id"] = Shard.relative_id_for(record.feature_flag_id, Shard.current, Shard.current)
+          attrs_hash["context_id"] = Shard.relative_id_for(record.context_id, Shard.current, Shard.current)
+          attrs_hash["root_account_id"] = Shard.relative_id_for(record.root_account_id, Shard.current, Shard.current)
         end
       end
     end

@@ -22,9 +22,9 @@ class AddWorkflowStateToLineItems < ActiveRecord::Migration[5.1]
   disable_ddl_transaction!
 
   def up
-    add_column :lti_line_items, :workflow_state, :string, null: false, default: 'active'
-    add_column :lti_results, :workflow_state, :string, null: false, default: 'active'
-    add_column :lti_resource_links, :workflow_state, :string, null: false, default: 'active'
+    add_column :lti_line_items, :workflow_state, :string, null: false, default: "active"
+    add_column :lti_results, :workflow_state, :string, null: false, default: "active"
+    add_column :lti_resource_links, :workflow_state, :string, null: false, default: "active"
 
     add_index :lti_resource_links, :workflow_state, algorithm: :concurrently
     add_index :lti_results, :workflow_state, algorithm: :concurrently

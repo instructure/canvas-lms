@@ -20,7 +20,7 @@
   <table style="width: 500px;" class="formtable">
     <tr>
       <td colspan="2">
-        <%= mt(:description, <<-TEXT)
+        <%= mt(:description, <<~TEXT)
 This plugin allows final grades to be published back to a student information system (SIS).  When enabled, the user will be given an option in the gradebook to publish these grades.  This will occur via a POST request to the specified publish endpoint.  Each type defines it's own content format and mime type.  The response from the endpoint does not matter and is currently ignored.
 
 For example, the Instructure formatted CSV will POST a csv file with mime type 'text/csv' to the specified endpoint, containing the following columns:

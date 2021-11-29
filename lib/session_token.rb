@@ -34,21 +34,21 @@ class SessionToken
     result = JSONToken.decode(serialized_token) rescue nil
     return nil unless
       result.is_a?(Hash) &&
-      result.keys.sort == ['created_at', 'current_user_id', 'pseudonym_id', 'signature', 'used_remember_me_token'] &&
-      result['created_at'].is_a?(Integer) &&
-      result['pseudonym_id'].is_a?(Integer) &&
-      (result['current_user_id'].nil? || result['current_user_id'].is_a?(Integer)) &&
-      [nil, true, false].include?(result['used_remember_me_token']) &&
-      result['signature'].is_a?(String)
+      result.keys.sort == %w[created_at current_user_id pseudonym_id signature used_remember_me_token] &&
+      result["created_at"].is_a?(Integer) &&
+      result["pseudonym_id"].is_a?(Integer) &&
+      (result["current_user_id"].nil? || result["current_user_id"].is_a?(Integer)) &&
+      [nil, true, false].include?(result["used_remember_me_token"]) &&
+      result["signature"].is_a?(String)
 
     # reconstruct token (validation of values for created_at and signature will
     # take place later)
-    token = new(result['pseudonym_id'],
-                current_user_id: result['current_user_id'],
-                used_remember_me_token: result['used_remember_me_token'])
-    token.created_at = Time.at(result['created_at'])
-    token.signature = result['signature']
-    return token
+    token = new(result["pseudonym_id"],
+                current_user_id: result["current_user_id"],
+                used_remember_me_token: result["used_remember_me_token"])
+    token.created_at = Time.at(result["created_at"])
+    token.signature = result["signature"]
+    token
   end
 
   VALIDITY_PERIOD = 30
@@ -78,6 +78,6 @@ class SessionToken
     [created_at.to_i.to_s,
      pseudonym_id.to_s,
      current_user_id.to_s,
-     used_remember_me_token.to_s].join('::')
+     used_remember_me_token.to_s].join("::")
   end
 end

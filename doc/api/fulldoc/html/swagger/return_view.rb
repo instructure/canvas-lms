@@ -18,12 +18,16 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'hash_view'
+require "hash_view"
 
 class ReturnViewNull < HashView
-  def array?; false; end
+  def array?
+    false
+  end
 
-  def type; nil; end
+  def type
+    nil
+  end
 
   def to_hash
     {
@@ -50,15 +54,15 @@ class ReturnView < ReturnViewNull
   end
 
   def array?
-    @line.include?('[') && @line.include?(']')
+    @line.include?("[") && @line.include?("]")
   end
 
   def type
-    @line.gsub('[', '').gsub(']', '')
+    @line.delete("[").delete("]")
   end
 
   def to_swagger
-    if array? and type
+    if array? && type
       {
         "type" => "array",
         "items" => {

@@ -17,9 +17,9 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../../helpers/gradebook_common'
-require_relative '../pages/gradebook_cells_page'
-require_relative '../pages/gradebook_page'
+require_relative "../../helpers/gradebook_common"
+require_relative "../pages/gradebook_cells_page"
+require_relative "../pages/gradebook_page"
 
 describe "Gradebook" do
   include_context "in-process server selenium tests"
@@ -35,7 +35,7 @@ describe "Gradebook" do
 
   before { user_session(@teacher) }
 
-  it "validates posting a comment to a graded assignment", priority: "1", test_id: 210046 do
+  it "validates posting a comment to a graded assignment", priority: "1" do
     Gradebook.visit(@course)
 
     Gradebook::Cells.open_tray(@student_1, assignment)
@@ -48,18 +48,18 @@ describe "Gradebook" do
     expect(Gradebook::GradeDetailTray.comment(@comment_text)).to be_displayed
   end
 
-  it "lets you post a group comment to a group assignment", priority: "1", test_id: 210047 do
+  it "lets you post a group comment to a group assignment", priority: "1" do
     group_assignment = @course.assignments.create!({
-                                                     title: 'group assignment',
+                                                     title: "group assignment",
                                                      due_at: (Time.zone.now + 1.week),
                                                      points_possible: @assignment_3_points,
-                                                     submission_types: 'online_text_entry',
+                                                     submission_types: "online_text_entry",
                                                      assignment_group: @group,
                                                      group_category: GroupCategory.create!(name: "groups", context: @course),
                                                      grade_group_students_individually: false
                                                    })
 
-    project_group = group_assignment.group_category.groups.create!(name: 'g1', context: @course)
+    project_group = group_assignment.group_category.groups.create!(name: "g1", context: @course)
     project_group.users << @student_1
     project_group.users << @student_2
 

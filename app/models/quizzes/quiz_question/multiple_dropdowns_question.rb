@@ -20,7 +20,7 @@
 
 class Quizzes::QuizQuestion::MultipleDropdownsQuestion < Quizzes::QuizQuestion::FillInMultipleBlanksQuestion
   def find_chosen_answer(variable, response)
-    @question_data.answers.detect { |answer| answer[:blank_id] == variable && answer[:id].to_i == response.to_i } || { :text => nil, :id => nil, :weight => 0 }
+    @question_data.answers.detect { |answer| answer[:blank_id] == variable && answer[:id].to_i == response.to_i } || { text: nil, id: nil, weight: 0 }
   end
 
   def answer_text(answer)

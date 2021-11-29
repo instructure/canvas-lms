@@ -17,18 +17,18 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'cgi'
-require 'net/http'
-require 'net/https'
-require 'json'
+require "cgi"
+require "net/http"
+require "net/https"
+require "json"
 
-require_dependency 'canvadocs/session'
+require_dependency "canvadocs/session"
 module Canvadocs
   extend CanvadocsHelper
-  RENDER_O365     = 'office_365'
-  RENDER_BOX      = 'box_view'
-  RENDER_CROCODOC = 'crocodoc'
-  RENDER_PDFJS    = 'pdfjs'
+  RENDER_O365     = "office_365"
+  RENDER_BOX      = "box_view"
+  RENDER_CROCODOC = "crocodoc"
+  RENDER_PDFJS    = "pdfjs"
 
   # Public: A small ruby client that wraps the Box View api.
   #
@@ -104,7 +104,7 @@ module Canvadocs
     # Returns a hash containing the session id
     def session(document_id, opts = {})
       raw_body = api_call(:post, "sessions",
-                          opts.merge(:document_id => document_id))
+                          opts.merge(document_id: document_id))
       JSON.parse(raw_body)
     end
 
@@ -141,11 +141,11 @@ module Canvadocs
     # Returns the json parsed response body of the call
     def api_call(method, endpoint, params = {})
       # dispatch to the right method, with the full path (/api/v2 + endpoint)
-      request = self.send("format_#{method}", "#{@url.path}/#{endpoint}", params)
+      request = send("format_#{method}", "#{@url.path}/#{endpoint}", params)
       request["Authorization"] = "Token #{token}"
       response = @http.request(request)
 
-      unless response.code =~ /\A20./
+      unless /\A20./.match?(response.code)
         err_message = "HTTP Error #{response.code}: #{response.body}"
         klass = Canvadocs::HttpError
         klass = Canvadocs::ServerError if response.code.to_s == "500"
@@ -171,7 +171,7 @@ module Canvadocs
     #
     # Returns a Net::HTTP::Get object for the path with query params
     def format_get(path, params)
-      query = params.map { |k, v| "#{k}=#{CGI::escape(v.to_s)}" }.join("&")
+      query = params.map { |k, v| "#{k}=#{CGI.escape(v.to_s)}" }.join("&")
       Net::HTTP::Get.new("#{path}?#{query}")
     end
 
@@ -189,10 +189,10 @@ module Canvadocs
     #
     # Returns a Net::HTTP::Post object for the path with json-formatted params
     def format_post(path, params)
-      Net::HTTP::Post.new(path).tap { |req|
+      Net::HTTP::Post.new(path).tap do |req|
         req["Content-Type"] = "application/json"
         req.body = params.to_json
-      }
+      end
     end
   end
 
@@ -228,7 +228,7 @@ module Canvadocs
       return {} if attachment.nil?
 
       submission = Submission.find_by(
-        id: AttachmentAssociation.where(context_type: 'Submission', attachment: attachment).select(:context_id)
+        id: AttachmentAssociation.where(context_type: "Submission", attachment: attachment).select(:context_id)
       )
       return {} if submission.nil?
     end
@@ -247,7 +247,7 @@ module Canvadocs
     end
 
     # Set visibility for students and peer reviewers.
-    if !submission.user_can_read_grade?(current_user)
+    unless submission.user_can_read_grade?(current_user)
       session_params[:restrict_annotations_to_user_filter] = true
       session_params[:user_filter] ||= [
         user_filter_entry(
@@ -337,7 +337,7 @@ module Canvadocs
           user,
           submission,
           role: canvadocs_user_role(submission.assignment.course, user, enrollments),
-          anonymize: anonymize_user_for_moderated_assignment?(user, current_user, submission),
+          anonymize: anonymize_user_for_moderated_assignment?(user, current_user, submission)
         )
       end
     end
@@ -365,12 +365,13 @@ module Canvadocs
     def user_filter_entry(user, submission, role:, anonymize:)
       if anonymize
         id = submission.anonymous_identities.dig(user.id, :id).to_s
-        type = 'anonymous'
+        type = "anonymous"
         name = submission.anonymous_identities.dig(user.id, :name)
       else
-        id = user.global_id.to_s
-        type = 'real'
-        name = canvadocs_user_name(user)
+        filter_user = submission.observer?(user) ? submission.user : user
+        id = filter_user.global_id.to_s
+        type = "real"
+        name = canvadocs_user_name(filter_user)
       end
 
       { id: id, type: type, role: role, name: name }

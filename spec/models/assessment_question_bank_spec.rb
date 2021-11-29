@@ -22,14 +22,14 @@ describe AssessmentQuestionBank do
   before :once do
     course_factory
     assessment_question_bank_model
-    @bank = @course.assessment_question_banks.create!(:title => 'Test Bank')
+    @bank = @course.assessment_question_banks.create!(title: "Test Bank")
   end
 
   describe "#select_for_submission" do
     before :once do
       assessment_question_bank_with_questions
-      @quiz = @course.quizzes.create!(:title => "some quiz")
-      @group = @quiz.quiz_groups.create!(:name => "question group", :pick_count => 3, :question_points => 5.0)
+      @quiz = @course.quizzes.create!(title: "some quiz")
+      @group = @quiz.quiz_groups.create!(name: "question group", pick_count: 3, question_points: 5.0)
       @group.assessment_question_bank = @bank
       @group.save
     end
@@ -89,13 +89,13 @@ describe AssessmentQuestionBank do
 
   it "allows user read access through question bank users" do
     user_factory
-    @bank.assessment_question_bank_users.create!(:user => user_factory)
+    @bank.assessment_question_bank_users.create!(user: user_factory)
     expect(@course.grants_right?(@user, :manage_assignments)).to be_falsey
     expect(@bank.grants_right?(@user, :read)).to be_truthy
   end
 
   it "removes outcome alignments when deleted" do
-    outcome_model(:context => @course)
+    outcome_model(context: @course)
     @bank.alignments = { @outcome.id => 0.5 }
 
     @bank.reload
@@ -113,7 +113,7 @@ describe AssessmentQuestionBank do
     expect(@bank.learning_outcome_alignments).to be_empty
   end
 
-  context 'root_account_id' do
+  context "root_account_id" do
     it "uses root_account value from account" do
       expect(@bank.root_account_id).to eq Account.default.id
     end

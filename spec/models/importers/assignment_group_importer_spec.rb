@@ -18,66 +18,66 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../../import_helper'
+require_relative "../../import_helper"
 
 describe "Importing Assignment Groups" do
   SYSTEMS.each do |system|
-    if import_data_exists? system, 'assignment_group'
-      it "imports from #{system}" do
-        data = get_import_data(system, 'assignment_group')
-        context = get_import_context(system)
-        migration = context.content_migrations.create!
+    next unless import_data_exists? system, "assignment_group"
 
-        data[:assignment_groups_to_import] = {}
-        expect {
-          expect(Importers::AssignmentGroupImporter.import_from_migration(data, context, migration)).to be_nil
-        }.to change(AssignmentGroup, :count).by(0)
+    it "imports from #{system}" do
+      data = get_import_data(system, "assignment_group")
+      context = get_import_context(system)
+      migration = context.content_migrations.create!
 
-        data[:assignment_groups_to_import][data[:migration_id]] = true
-        expect {
-          Importers::AssignmentGroupImporter.import_from_migration(data, context, migration)
-          Importers::AssignmentGroupImporter.import_from_migration(data, context, migration)
-        }.to change(AssignmentGroup, :count).by(1)
-        g = AssignmentGroup.where(migration_id: data[:migration_id]).first
+      data[:assignment_groups_to_import] = {}
+      expect do
+        expect(Importers::AssignmentGroupImporter.import_from_migration(data, context, migration)).to be_nil
+      end.to change(AssignmentGroup, :count).by(0)
 
-        expect(g.name).to eq data[:title]
-      end
+      data[:assignment_groups_to_import][data[:migration_id]] = true
+      expect do
+        Importers::AssignmentGroupImporter.import_from_migration(data, context, migration)
+        Importers::AssignmentGroupImporter.import_from_migration(data, context, migration)
+      end.to change(AssignmentGroup, :count).by(1)
+      g = AssignmentGroup.where(migration_id: data[:migration_id]).first
+
+      expect(g.name).to eq data[:title]
     end
   end
 
   it "reuses existing empty assignment groups with the same name" do
     course_model
     migration = @course.content_migrations.create!
-    assignment_group = @course.assignment_groups.create! name: 'teh group'
-    assignment_group_json = { 'title' => 'teh group', 'migration_id' => '123' }
+    assignment_group = @course.assignment_groups.create! name: "teh group"
+    assignment_group_json = { "title" => "teh group", "migration_id" => "123" }
     Importers::AssignmentGroupImporter.import_from_migration(assignment_group_json, @course, migration)
-    expect(assignment_group.reload.migration_id).to eq('123')
+    expect(assignment_group.reload.migration_id).to eq("123")
     expect(@course.assignment_groups.count).to eq 1
   end
 
   it "does not match assignment groups with migration ids by name" do
     course_model
     migration = @course.content_migrations.create!
-    assignment_group = @course.assignment_groups.create name: 'teh group'
-    assignment_group.migration_id = '456'
+    assignment_group = @course.assignment_groups.create name: "teh group"
+    assignment_group.migration_id = "456"
     assignment_group.save!
-    assignment_group_json = { 'title' => 'teh group', 'migration_id' => '123' }
+    assignment_group_json = { "title" => "teh group", "migration_id" => "123" }
     Importers::AssignmentGroupImporter.import_from_migration(assignment_group_json, @course, migration)
-    expect(assignment_group.reload.migration_id).to eq('456')
+    expect(assignment_group.reload.migration_id).to eq("456")
     expect(@course.assignment_groups.count).to eq 2
   end
 
   it "gets attached to an assignment" do
-    data = get_import_data('bb8', 'assignment_group')
-    context = get_import_context('bb8')
+    data = get_import_data("bb8", "assignment_group")
+    context = get_import_context("bb8")
     migration = context.content_migrations.create!
-    expect {
+    expect do
       Importers::AssignmentGroupImporter.import_from_migration(data, context, migration)
-    }.to change(AssignmentGroup, :count).by(1)
+    end.to change(AssignmentGroup, :count).by(1)
 
-    expect {
-      ass = Importers::AssignmentImporter.import_from_migration(get_import_data('bb8', 'assignment'), context, migration)
+    expect do
+      ass = Importers::AssignmentImporter.import_from_migration(get_import_data("bb8", "assignment"), context, migration)
       expect(ass.assignment_group.name).to eq data[:title]
-    }.to change(AssignmentGroup, :count).by(0)
+    end.to change(AssignmentGroup, :count).by(0)
   end
 end

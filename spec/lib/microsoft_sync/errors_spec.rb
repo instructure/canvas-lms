@@ -17,8 +17,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../../spec_helper'
-require 'httparty'
+require_relative "../../spec_helper"
+require "httparty"
 
 # See also be_a_microsoft_sync_public_error matcher in support/microsoft_sync/errors.rb
 describe MicrosoftSync::Errors do
@@ -29,14 +29,14 @@ describe MicrosoftSync::Errors do
     stub_const("MicrosoftSync::TestError",
                Class.new(MicrosoftSync::Errors::PublicError) do
                  def self.public_message
-                   I18n.t 'oops, this is a public error'
+                   I18n.t "oops, this is a public error"
                  end
                end)
 
     stub_const("MicrosoftSync::TestErrorInterpolations",
                Class.new(MicrosoftSync::Errors::PublicError) do
                  def self.public_message
-                   I18n.t 'An API named %{name} returned problem %{description} :('
+                   I18n.t "An API named %{name} returned problem %{description} :("
                  end
 
                  def public_interpolated_values
@@ -53,7 +53,7 @@ describe MicrosoftSync::Errors do
     stub_const("MicrosoftSync::TestErrorCountInterpolation",
                Class.new(MicrosoftSync::Errors::PublicError) do
                  def self.public_message
-                   I18n.t(one: 'One problem happened', other: '%{count} problems happened')
+                   I18n.t(one: "One problem happened", other: "%{count} problems happened")
                  end
 
                  def public_interpolated_values
@@ -69,7 +69,7 @@ describe MicrosoftSync::Errors do
     stub_const("MicrosoftSync::TestErrorBadInterpolations",
                Class.new(MicrosoftSync::Errors::PublicError) do
                  def self.public_message
-                   I18n.t 'Interpolation foo does not exist, see: %{foo}'
+                   I18n.t "Interpolation foo does not exist, see: %{foo}"
                  end
 
                  def public_interpolated_values
@@ -78,33 +78,33 @@ describe MicrosoftSync::Errors do
                end)
   end
 
-  describe '.serialize' do
+  describe ".serialize" do
     subject { JSON.parse(described_class.serialize(error)) }
 
-    context 'when the error is a non-public error' do
-      let(:error) { MicrosoftSync::TestErrorNotPublic.new('abc') }
+    context "when the error is a non-public error" do
+      let(:error) { MicrosoftSync::TestErrorNotPublic.new("abc") }
 
-      it 'returns a JSON blob with error class and message' do
-        expect(subject).to eq('class' => 'MicrosoftSync::TestErrorNotPublic', 'message' => 'abc')
+      it "returns a JSON blob with error class and message" do
+        expect(subject).to eq("class" => "MicrosoftSync::TestErrorNotPublic", "message" => "abc")
       end
     end
 
-    context 'when the error is a PublicError' do
-      let(:error) { MicrosoftSync::TestErrorCountInterpolation.new('foo', 123) }
+    context "when the error is a PublicError" do
+      let(:error) { MicrosoftSync::TestErrorCountInterpolation.new("foo", 123) }
 
-      it 'returns a JSON blob with error class, message, public message, and interpolations' do
+      it "returns a JSON blob with error class, message, public message, and interpolations" do
         expect(subject).to eq(
-          'class' => 'MicrosoftSync::TestErrorCountInterpolation',
-          'message' => 'foo',
-          'public_message' =>
-            { 'one' => 'One problem happened', 'other' => '%{count} problems happened' },
-          'public_interpolated_values' => { 'count' => 123 }
+          "class" => "MicrosoftSync::TestErrorCountInterpolation",
+          "message" => "foo",
+          "public_message" =>
+            { "one" => "One problem happened", "other" => "%{count} problems happened" },
+          "public_interpolated_values" => { "count" => 123 }
         )
       end
     end
   end
 
-  describe '.deserialize_and_localize' do
+  describe ".deserialize_and_localize" do
     let(:serialized) { described_class.serialize(error) }
     let(:deserialized) { described_class.deserialize_and_localize(serialized) }
     let(:t_calls_args) { [] }
@@ -123,60 +123,60 @@ describe MicrosoftSync::Errors do
 
     after { I18n.locale = @orig_locale }
 
-    context 'with a serialized non-PublicError' do
-      let(:error) { MicrosoftSync::TestErrorNotPublic.new('foo') }
+    context "with a serialized non-PublicError" do
+      let(:error) { MicrosoftSync::TestErrorNotPublic.new("foo") }
 
-      it 'returns an I18nized generic error message' do
-        expected = 'Microsoft Sync has encountered an internal error.'
+      it "returns an I18nized generic error message" do
+        expected = "Microsoft Sync has encountered an internal error."
         allow(I18n).to receive(:t).and_call_original
         expect(deserialized).to eq(expected)
         expect(I18n).to have_received(:t).with(expected)
       end
     end
 
-    context 'with a serialized PublicError with no interpolations' do
-      let(:error) { MicrosoftSync::TestError.new('foo') }
+    context "with a serialized PublicError with no interpolations" do
+      let(:error) { MicrosoftSync::TestError.new("foo") }
 
-      it 'returns the I18nized public_message' do
-        expected = 'oops, this is a public error'
+      it "returns the I18nized public_message" do
+        expected = "oops, this is a public error"
         expect(deserialized).to eq(expected)
         expect(t_calls_args).to include([expected, {}])
       end
     end
 
-    context 'with a serialized PublicError with interpolations' do
+    context "with a serialized PublicError with interpolations" do
       let(:error) do
-        MicrosoftSync::TestErrorInterpolations.new('foo', 'some_api', 'oh no, something happened')
+        MicrosoftSync::TestErrorInterpolations.new("foo", "some_api", "oh no, something happened")
       end
 
-      it 'returns the I18nized public_message with interpolated values' do
+      it "returns the I18nized public_message with interpolated values" do
         expect(deserialized).to eq(
-          'An API named some_api returned problem oh no, something happened :('
+          "An API named some_api returned problem oh no, something happened :("
         )
       end
     end
 
     context 'with a serialized PublicError with "count" interpolations' do
-      context 'when count == 1' do
-        let(:error) { MicrosoftSync::TestErrorCountInterpolation.new('foo', 1) }
+      context "when count == 1" do
+        let(:error) { MicrosoftSync::TestErrorCountInterpolation.new("foo", 1) }
 
         it 'returns the I18nized public_message using the "one" string' do
-          expect(deserialized).to eq('One problem happened')
+          expect(deserialized).to eq("One problem happened")
         end
       end
 
-      context 'when count > 1' do
-        let(:error) { MicrosoftSync::TestErrorCountInterpolation.new('foo', 2) }
+      context "when count > 1" do
+        let(:error) { MicrosoftSync::TestErrorCountInterpolation.new("foo", 2) }
 
         it 'returns the I18nized public_message using the "multiple" string' do
-          expect(deserialized).to eq('2 problems happened')
+          expect(deserialized).to eq("2 problems happened")
         end
       end
     end
 
-    context 'with an old (non-JSON serialized) error string' do
-      it 'just returns the string' do
-        err_string = 'Some old error string'
+    context "with an old (non-JSON serialized) error string" do
+      it "just returns the string" do
+        err_string = "Some old error string"
         expect(described_class.deserialize_and_localize(err_string)).to eq(err_string)
       end
     end
@@ -185,46 +185,46 @@ describe MicrosoftSync::Errors do
   describe described_class::HTTPInvalidStatus do
     subject do
       described_class.for(
-        service: 'my api',
+        service: "my api",
         response: double(code: code, body: body, headers: HTTParty::Response::Headers.new(headers)),
-        tenant: 'mytenant'
+        tenant: "mytenant"
       )
     end
 
     let(:code) { 422 }
-    let(:body) { 'abc' }
+    let(:body) { "abc" }
     let(:headers) { {} }
 
-    it 'gives a public message with the service name, status code, and tenant' do
+    it "gives a public message with the service name, status code, and tenant" do
       expect(subject).to be_a_microsoft_sync_public_error(
-        'Unexpected response from Microsoft API: got 422 status code',
+        "Unexpected response from Microsoft API: got 422 status code"
       )
     end
 
-    it 'gives an internal message with the public message plus full response body' do
+    it "gives an internal message with the public message plus full response body" do
       expect(subject.message).to \
         eq('My api service returned 422 for tenant mytenant, full body: "abc"')
     end
 
-    context 'when the body is very long' do
-      let(:body) { 'abc' * 1000 }
+    context "when the body is very long" do
+      let(:body) { "abc" * 1000 }
 
-      it 'is truncated' do
+      it "is truncated" do
         expect(subject.message.length).to be_between(1000, 1300)
-        expect(subject.message).to include('abc' * 250)
+        expect(subject.message).to include("abc" * 250)
       end
     end
 
-    context 'when body is nil' do
+    context "when body is nil" do
       let(:body) { nil }
 
-      it 'gives a message showing a nil body' do
+      it "gives a message showing a nil body" do
         expect(subject.message).to \
-          eq('My api service returned 422 for tenant mytenant, full body: nil')
+          eq("My api service returned 422 for tenant mytenant, full body: nil")
       end
     end
 
-    describe '.for' do
+    describe ".for" do
       {
         400 => MicrosoftSync::Errors::HTTPBadRequest,
         404 => MicrosoftSync::Errors::HTTPNotFound,
@@ -243,15 +243,15 @@ describe MicrosoftSync::Errors do
         end
       end
 
-      context 'when the response status code is 429' do
+      context "when the response status code is 429" do
         let(:code) { 429 }
 
         it { expect(subject.retry_after_seconds).to eq(nil) }
 
-        context 'when the retry-after header is set' do
-          let(:headers) { { 'Retry-After' => '12.345' } }
+        context "when the retry-after header is set" do
+          let(:headers) { { "Retry-After" => "12.345" } }
 
-          it 'sets retry_after_seconds' do
+          it "sets retry_after_seconds" do
             expect(subject.retry_after_seconds).to eq(12.345)
           end
         end
@@ -259,20 +259,20 @@ describe MicrosoftSync::Errors do
     end
   end
 
-  describe 'GroupHasNoOwners' do
-    it 'has a public message' do
+  describe "GroupHasNoOwners" do
+    it "has a public message" do
       expect(described_class::GroupHasNoOwners.public_message).to eq(
         I18n.t(
-          'The team could be not be created because the Microsoft group has no owners. ' \
-          'This may be an intermittent error: please try to sync again, and ' \
-          'if the problem persists, contact support.'
+          "The team could be not be created because the Microsoft group has no owners. " \
+          "This may be an intermittent error: please try to sync again, and " \
+          "if the problem persists, contact support."
         )
       )
     end
   end
 
-  describe 'GracefulCancelError' do
-    it 'is a type of PublicError' do
+  describe "GracefulCancelError" do
+    it "is a type of PublicError" do
       # ... since expected errors should have error messages for users
       expect(described_class::GracefulCancelError.new).to be_a(described_class::PublicError)
     end

@@ -28,7 +28,7 @@ describe "differentiated_assignments" do
   def make_quiz(opts = {})
     @quiz = Quizzes::Quiz.create!({
                                     context: @course,
-                                    description: 'descript foo',
+                                    description: "descript foo",
                                     only_visible_to_overrides: opts[:ovto],
                                     points_possible: rand(1000),
                                     title: "I am a quiz"
@@ -48,8 +48,8 @@ describe "differentiated_assignments" do
 
   def student_in_course_with_adhoc_override(quiz, opts = {})
     @user = opts[:user] || user_model
-    StudentEnrollment.create!(:user => @user, :course => @course)
-    ao = AssignmentOverride.new()
+    StudentEnrollment.create!(user: @user, course: @course)
+    ao = AssignmentOverride.new
     ao.quiz = quiz
     ao.title = "ADHOC OVERRIDE"
     ao.workflow_state = "active"
@@ -64,27 +64,27 @@ describe "differentiated_assignments" do
 
   def enroller_user_in_section(section, opts = {})
     @user = opts[:user] || user_model
-    StudentEnrollment.create!(:user => @user, :course => @course, :course_section => section)
+    StudentEnrollment.create!(user: @user, course: @course, course_section: section)
   end
 
   def enroller_user_in_both_sections
     @user = user_model
-    StudentEnrollment.create!(:user => @user, :course => @course, :course_section => @section_foo)
-    StudentEnrollment.create!(:user => @user, :course => @course, :course_section => @section_bar)
+    StudentEnrollment.create!(user: @user, course: @course, course_section: @section_foo)
+    StudentEnrollment.create!(user: @user, course: @course, course_section: @section_bar)
   end
 
   def add_multiple_sections
     @default_section = @course.default_section
-    @section_foo = @course.course_sections.create!(:name => 'foo')
-    @section_bar = @course.course_sections.create!(:name => 'bar')
+    @section_foo = @course.course_sections.create!(name: "foo")
+    @section_bar = @course.course_sections.create!(name: "bar")
   end
 
-  def create_override_for_quiz(quiz, &block)
-    ao = AssignmentOverride.new()
+  def create_override_for_quiz(quiz)
+    ao = AssignmentOverride.new
     ao.quiz = quiz
     ao.title = "Lorem"
     ao.workflow_state = "active"
-    block.call(ao)
+    yield(ao)
     ao.save!
     quiz.reload
   end
@@ -129,11 +129,11 @@ describe "differentiated_assignments" do
     end
 
     it "doesnt allow new records" do
-      expect {
+      expect do
         Quizzes::QuizStudentVisibility.create!(user_id: @user.id,
                                                quiz_id: @quiz_id,
                                                course_id: @course.id)
-      }.to raise_error(ActiveRecord::ReadOnlyRecord)
+      end.to raise_error(ActiveRecord::ReadOnlyRecord)
     end
 
     it "doesnt allow deletion" do
@@ -220,6 +220,7 @@ describe "differentiated_assignments" do
           ensure_user_does_not_see_quiz
         end
       end
+
       context "user in section with override" do
         before { enroller_user_in_section(@section_foo) }
 
@@ -229,7 +230,7 @@ describe "differentiated_assignments" do
 
         it "updates when enrollments change" do
           ensure_user_sees_quiz
-          enrollments = StudentEnrollment.where(:user_id => @user.id, :course_id => @course.id, :course_section_id => @section_foo.id)
+          enrollments = StudentEnrollment.where(user_id: @user.id, course_id: @course.id, course_section_id: @section_foo.id)
           Score.where(enrollment_id: enrollments).each(&:destroy_permanently!)
           enrollments.each(&:destroy_permanently!)
           ensure_user_does_not_see_quiz
@@ -241,6 +242,7 @@ describe "differentiated_assignments" do
           ensure_user_does_not_see_quiz
         end
       end
+
       context "user in section with no override" do
         before { enroller_user_in_section(@section_bar) }
 
@@ -248,6 +250,7 @@ describe "differentiated_assignments" do
           ensure_user_does_not_see_quiz
         end
       end
+
       context "user in section with override and one without override" do
         before do
           enroller_user_in_both_sections
@@ -258,6 +261,7 @@ describe "differentiated_assignments" do
         end
       end
     end
+
     context "quiz with false only_visible_to_overrides" do
       before do
         quiz_with_false_only_visible_to_overrides
@@ -269,6 +273,7 @@ describe "differentiated_assignments" do
           ensure_user_sees_quiz
         end
       end
+
       context "user in section with override" do
         before { enroller_user_in_section(@section_foo) }
 
@@ -276,6 +281,7 @@ describe "differentiated_assignments" do
           ensure_user_sees_quiz
         end
       end
+
       context "user in section with no override" do
         before { enroller_user_in_section(@section_bar) }
 
@@ -283,6 +289,7 @@ describe "differentiated_assignments" do
           ensure_user_sees_quiz
         end
       end
+
       context "user in section with override and one without override" do
         before do
           enroller_user_in_both_sections

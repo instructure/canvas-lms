@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../../helpers/k5_common'
+require_relative "../../helpers/k5_common"
 
 describe K5Mode do
   include K5Common
@@ -40,23 +40,23 @@ describe K5Mode do
     toggle_k5_setting(@course.account)
   end
 
-  describe 'set_k5_mode' do
-    shared_examples_for ':show_left_side' do
-      it 'does not set :show_left_side in non-k5 contexts' do
+  describe "set_k5_mode" do
+    shared_examples_for ":show_left_side" do
+      it "does not set :show_left_side in non-k5 contexts" do
         toggle_k5_setting(@course.account, false)
         get :index, params: { course_id: @course.id }
         expect(assigns(:show_left_side)).to be_nil
       end
     end
 
-    context 'teacher' do
+    context "teacher" do
       before do
         user_session(@teacher)
       end
 
-      it_behaves_like ':show_left_side'
+      it_behaves_like ":show_left_side"
 
-      it 'sets k5 variables' do
+      it "sets k5 variables" do
         get :index, params: { course_id: @course.id }
         expect(assigns(:k5_details_view)).to eq(false)
         expect(assigns(:show_left_side)).to eq(true)
@@ -64,14 +64,14 @@ describe K5Mode do
         expect(assigns(:js_bundles).flatten).to include(:k5_theme)
       end
 
-      context 'that is also a student' do
+      context "that is also a student" do
         before do
-          @course.enroll_user(@teacher, 'StudentEnrollment', enrollment_state: 'active')
+          @course.enroll_user(@teacher, "StudentEnrollment", enrollment_state: "active")
         end
 
-        it_behaves_like ':show_left_side'
+        it_behaves_like ":show_left_side"
 
-        it 'sets k5 variables' do
+        it "sets k5 variables" do
           get :index, params: { course_id: @course.id }
           expect(assigns(:k5_details_view)).to eq(false)
           expect(assigns(:show_left_side)).to eq(true)
@@ -81,14 +81,14 @@ describe K5Mode do
       end
     end
 
-    context 'admin' do
+    context "admin" do
       before do
         user_session(@admin)
       end
 
-      it_behaves_like ':show_left_side'
+      it_behaves_like ":show_left_side"
 
-      it 'sets k5 variables' do
+      it "sets k5 variables" do
         get :index, params: { course_id: @course.id }
         expect(assigns(:k5_details_view)).to eq(false)
         expect(assigns(:show_left_side)).to eq(true)
@@ -97,14 +97,14 @@ describe K5Mode do
       end
     end
 
-    context 'student' do
+    context "student" do
       before do
         user_session(@student)
       end
 
-      it_behaves_like ':show_left_side'
+      it_behaves_like ":show_left_side"
 
-      it 'sets k5 variables' do
+      it "sets k5 variables" do
         get :index, params: { course_id: @course.id }
         expect(assigns(:k5_details_view)).to eq(true)
         expect(assigns(:show_left_side)).to eq(false)
@@ -113,7 +113,7 @@ describe K5Mode do
       end
     end
 
-    it 'uses K5 theme for homeroom courses' do
+    it "uses K5 theme for homeroom courses" do
       @course.homeroom_course = true
       user_session(@teacher)
       get :index, params: { course_id: @course.id }
@@ -121,7 +121,7 @@ describe K5Mode do
       expect(assigns(:js_bundles).flatten).to include(:k5_theme)
     end
 
-    it 'prefers the K5 theme to the old elementary theme if both apply' do
+    it "prefers the K5 theme to the old elementary theme if both apply" do
       @course.enable_feature!(:canvas_k6_theme)
       user_session(@teacher)
       get :index, params: { course_id: @course.id }
@@ -130,7 +130,7 @@ describe K5Mode do
       expect(assigns(:js_bundles).flatten).not_to include(:k6_theme)
     end
 
-    it 'uses the old elementary theme if the flag is on and K5 mode is off' do
+    it "uses the old elementary theme if the flag is on and K5 mode is off" do
       @course.enable_feature!(:canvas_k6_theme)
       @course.account.settings[:enable_as_k5_account] = { value: false }
       @course.account.save!

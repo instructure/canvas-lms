@@ -189,7 +189,7 @@ class Quizzes::QuizQuestionsController < ApplicationController
   include ::Filters::QuizSubmissions
 
   before_action :require_context, :require_quiz
-  before_action :require_question, :only => [:show]
+  before_action :require_question, only: [:show]
 
   # @API List questions in a quiz or a submission
   #
@@ -227,12 +227,12 @@ class Quizzes::QuizQuestionsController < ApplicationController
   # @returns QuizQuestion
   def show
     if authorized_action(@quiz, @current_user, :update)
-      render :json => question_json(@question,
-                                    @current_user,
-                                    session,
-                                    @context,
-                                    parse_includes,
-                                    censored?)
+      render json: question_json(@question,
+                                 @current_user,
+                                 session,
+                                 @context,
+                                 parse_includes,
+                                 censored?)
     end
   end
 
@@ -289,7 +289,7 @@ class Quizzes::QuizQuestionsController < ApplicationController
       process_answer_html_content(question_data)
 
       guard_against_big_fields do
-        @question = @quiz.quiz_questions.create(:quiz_group => @group, :question_data => question_data)
+        @question = @quiz.quiz_questions.create(quiz_group: @group, question_data: question_data)
         @quiz.did_edit if @quiz.created?
         render json: question_json(@question, @current_user, session, @context, [:assessment_question, :plain_html])
       end
@@ -400,15 +400,15 @@ class Quizzes::QuizQuestionsController < ApplicationController
 
   def guard_against_big_fields
     yield
-  rescue Quizzes::QuizQuestion::RawFields::FieldTooLongError => ex
-    raise ex unless request.xhr?
+  rescue Quizzes::QuizQuestion::RawFields::FieldTooLongError => e
+    raise e unless request.xhr?
 
-    render_xhr_exception(ex, ex.message)
+    render_xhr_exception(e, e.message)
   end
 
   def require_question
     unless (@question = @quiz.quiz_questions.active.find(params[:id]))
-      raise ActiveRecord::RecordNotFound.new('Quiz Question not found')
+      raise ActiveRecord::RecordNotFound, "Quiz Question not found"
     end
   end
 
@@ -441,7 +441,7 @@ class Quizzes::QuizQuestionsController < ApplicationController
       retrieve_quiz_submission_attempt!(params[:quiz_submission_attempt])
 
       scope = Quizzes::QuizQuestion.where({
-                                            id: @quiz_submission.quiz_data.map { |question| question['id'] }
+                                            id: @quiz_submission.quiz_data.map { |question| question["id"] }
                                           })
 
       results_visible = @quiz_submission.results_visible?(user: @current_user)
@@ -452,17 +452,17 @@ class Quizzes::QuizQuestionsController < ApplicationController
   end
 
   def render_question_set(scope, quiz_data = nil)
-    api_route = polymorphic_url([:api, :v1, @context, :quiz_questions], { :quiz_id => @quiz })
+    api_route = polymorphic_url([:api, :v1, @context, :quiz_questions], { quiz_id: @quiz })
     questions = Api.paginate(scope, self, api_route)
 
-    render :json => questions_json(questions,
-                                   @current_user,
-                                   session,
-                                   @context,
-                                   parse_includes,
-                                   censored?,
-                                   quiz_data,
-                                   shuffle_answers: @quiz.shuffle_answers_for_user?(@current_user))
+    render json: questions_json(questions,
+                                @current_user,
+                                session,
+                                @context,
+                                parse_includes,
+                                censored?,
+                                quiz_data,
+                                shuffle_answers: @quiz.shuffle_answers_for_user?(@current_user))
   end
 
   def process_answer_html_content(question_data)

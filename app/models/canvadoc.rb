@@ -35,15 +35,15 @@ class Canvadoc < ActiveRecord::Base
 
     opts.delete(:annotatable) unless Canvadocs.annotations_supported?
 
-    response = Canvas.timeout_protection("canvadocs") {
+    response = Canvas.timeout_protection("canvadocs") do
       canvadocs_api.upload(url, opts)
-    }
+    end
 
-    if response && response['id']
-      self.document_id = response['id']
-      self.process_state = response['status']
+    if response && response["id"]
+      self.document_id = response["id"]
+      self.process_state = response["status"]
       self.has_annotations = opts[:annotatable]
-      self.save!
+      save!
     elsif response.nil?
       raise UploadTimeout, "no response received (request timed out?)"
     else
@@ -52,13 +52,13 @@ class Canvadoc < ActiveRecord::Base
   end
 
   def submissions
-    self.canvadocs_submissions
-        .preload(submission: :assignment)
-        .map(&:submission)
+    canvadocs_submissions
+      .preload(submission: :assignment)
+      .map(&:submission)
   end
 
   def available?
-    !!(document_id && process_state != 'error' && Canvadocs.enabled?)
+    !!(document_id && process_state != "error" && Canvadocs.enabled?)
   end
 
   def has_annotations?
@@ -66,7 +66,7 @@ class Canvadoc < ActiveRecord::Base
   end
 
   def self.jwt_secret
-    secret = Canvas::DynamicSettings.find(service: 'canvadoc', default_ttl: 5.minutes)['secret']
+    secret = Canvas::DynamicSettings.find(service: "canvadoc", default_ttl: 5.minutes)["secret"]
     Base64.decode64(secret) if secret
   end
 
@@ -83,7 +83,7 @@ class Canvadoc < ActiveRecord::Base
   # does not need them)
 
   def self.mime_types
-    JSON.parse Setting.get('canvadoc_mime_types', %w[
+    JSON.parse Setting.get("canvadoc_mime_types", %w[
       application/excel
       application/msword
       application/pdf
@@ -98,7 +98,7 @@ class Canvadoc < ActiveRecord::Base
   end
 
   def self.submission_mime_types
-    JSON.parse Setting.get('canvadoc_submission_mime_types', %w[
+    JSON.parse Setting.get("canvadoc_submission_mime_types", %w[
       application/excel
       application/msword
       application/pdf
@@ -121,7 +121,7 @@ class Canvadoc < ActiveRecord::Base
   def self.canvadocs_api
     raise "Canvadocs isn't enabled" unless Canvadocs.enabled?
 
-    Canvadocs::API.new(token: Canvadocs.config['api_key'],
-                       base_url: Canvadocs.config['base_url'])
+    Canvadocs::API.new(token: Canvadocs.config["api_key"],
+                       base_url: Canvadocs.config["base_url"])
   end
 end

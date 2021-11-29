@@ -24,16 +24,17 @@ module CC::Importer::Canvas
     def convert_learning_outcomes(doc)
       return [] unless doc
 
-      process_outcome_children(doc.at_css('learningOutcomes'))
+      process_outcome_children(doc.at_css("learningOutcomes"))
     end
 
     def process_outcome_children(node, list = [])
       return list unless node
 
       node.children.each do |child|
-        if child.name == 'learningOutcome'
+        case child.name
+        when "learningOutcome"
           list << process_learning_outcome(child)
-        elsif child.name == 'learningOutcomeGroup'
+        when "learningOutcomeGroup"
           list << process_outcome_group(child)
         end
       end
@@ -43,48 +44,48 @@ module CC::Importer::Canvas
 
     def process_outcome_group(node)
       group = {}
-      group[:migration_id] = node['identifier']
-      group[:title] = get_val_if_child(node, 'title')
-      group[:type] = 'learning_outcome_group'
-      group[:description] = get_val_if_child(node, 'description')
-      group[:source_outcome_group_id] = get_val_if_child(node, 'source_outcome_group_id')
-      group[:outcomes] = process_outcome_children(node.at_css('learningOutcomes'))
-      group[:vendor_guid] = get_val_if_child(node, 'vendor_guid')
+      group[:migration_id] = node["identifier"]
+      group[:title] = get_val_if_child(node, "title")
+      group[:type] = "learning_outcome_group"
+      group[:description] = get_val_if_child(node, "description")
+      group[:source_outcome_group_id] = get_val_if_child(node, "source_outcome_group_id")
+      group[:outcomes] = process_outcome_children(node.at_css("learningOutcomes"))
+      group[:vendor_guid] = get_val_if_child(node, "vendor_guid")
 
       group
     end
 
     def process_learning_outcome(node)
       outcome = {}
-      outcome[:migration_id] = node['identifier']
-      outcome[:title] = get_node_val(node, 'title')
-      outcome[:type] = 'learning_outcome'
-      outcome[:description] = get_val_if_child(node, 'description')
-      outcome[:mastery_points] = get_float_val(node, 'mastery_points')
-      outcome[:points_possible] = get_float_val(node, 'points_possible')
-      outcome[:calculation_method] = get_node_val(node, 'calculation_method')
-      outcome[:calculation_int] = get_int_val(node, 'calculation_int')
-      outcome[:is_global_outcome] = get_bool_val(node, 'is_global_outcome')
-      outcome[:external_identifier] = get_node_val(node, 'external_identifier')
-      outcome[:vendor_guid] = get_val_if_child(node, 'vendor_guid')
-      outcome[:friendly_description] = get_val_if_child(node, 'friendly_description')
+      outcome[:migration_id] = node["identifier"]
+      outcome[:title] = get_node_val(node, "title")
+      outcome[:type] = "learning_outcome"
+      outcome[:description] = get_val_if_child(node, "description")
+      outcome[:mastery_points] = get_float_val(node, "mastery_points")
+      outcome[:points_possible] = get_float_val(node, "points_possible")
+      outcome[:calculation_method] = get_node_val(node, "calculation_method")
+      outcome[:calculation_int] = get_int_val(node, "calculation_int")
+      outcome[:is_global_outcome] = get_bool_val(node, "is_global_outcome")
+      outcome[:external_identifier] = get_node_val(node, "external_identifier")
+      outcome[:vendor_guid] = get_val_if_child(node, "vendor_guid")
+      outcome[:friendly_description] = get_val_if_child(node, "friendly_description")
 
       outcome[:ratings] = []
-      node.css('rating').each do |r_node|
+      node.css("rating").each do |r_node|
         rating = {}
-        rating[:description] = get_node_val(r_node, 'description')
-        rating[:points] = get_float_val(r_node, 'points')
+        rating[:description] = get_node_val(r_node, "description")
+        rating[:points] = get_float_val(r_node, "points")
         outcome[:ratings] << rating
       end
 
       outcome[:alignments] = []
-      node.css('alignments alignment').each do |align_node|
+      node.css("alignments alignment").each do |align_node|
         alignment = {}
-        alignment[:content_type] = get_node_val(align_node, 'content_type')
-        alignment[:content_id] = get_node_val(align_node, 'content_id')
-        alignment[:mastery_type] = get_node_val(align_node, 'mastery_type')
-        alignment[:mastery_score] = get_float_val(align_node, 'mastery_score')
-        alignment[:position] = get_int_val(align_node, 'position')
+        alignment[:content_type] = get_node_val(align_node, "content_type")
+        alignment[:content_id] = get_node_val(align_node, "content_id")
+        alignment[:mastery_type] = get_node_val(align_node, "mastery_type")
+        alignment[:mastery_score] = get_float_val(align_node, "mastery_score")
+        alignment[:position] = get_int_val(align_node, "position")
         outcome[:alignments] << alignment
       end
 

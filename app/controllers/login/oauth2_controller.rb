@@ -26,7 +26,7 @@ class Login::OAuth2Controller < Login::OAuthBaseController
   def new
     super
     nonce = session[:oauth2_nonce] = SecureRandom.hex(24)
-    expiry = Time.zone.now + Setting.get('oauth2_client_timeout', 10.minutes.to_i).to_i
+    expiry = Time.zone.now + Setting.get("oauth2_client_timeout", 10.minutes.to_i).to_i
     jwt = Canvas::Security.create_jwt({ aac_id: @aac.global_id, nonce: nonce, host: request.host_with_port }, expiry)
     authorize_url = @aac.generate_authorize_url(oauth2_login_callback_url, jwt)
 
@@ -41,10 +41,10 @@ class Login::OAuth2Controller < Login::OAuthBaseController
   def create
     return unless validate_request
 
-    @aac = AuthenticationProvider.find(jwt['aac_id'])
+    @aac = AuthenticationProvider.find(jwt["aac_id"])
     raise ActiveRecord::RecordNotFound unless @aac.is_a?(AuthenticationProvider::OAuth2)
 
-    debugging = @aac.debugging? && jwt['nonce'] == @aac.debug_get(:nonce)
+    debugging = @aac.debugging? && jwt["nonce"] == @aac.debug_get(:nonce)
     if debugging
       @aac.debug_set(:debugging, t("Received callback from identity provider"))
       @aac.instance_debugging = true
@@ -90,7 +90,7 @@ class Login::OAuth2Controller < Login::OAuthBaseController
     end
 
     begin
-      if jwt['nonce'].blank? || jwt['nonce'] != session.delete(:oauth2_nonce)
+      if jwt["nonce"].blank? || jwt["nonce"] != session.delete(:oauth2_nonce)
         raise ActionController::InvalidAuthenticityToken
       end
     rescue Canvas::Security::TokenExpired

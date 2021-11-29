@@ -25,7 +25,7 @@ module ConditionalRelease
     private_class_method :new
 
     def self.env_for(context, user = nil, session: nil, assignment: nil, includes: [])
-      enabled = self.enabled_in_context?(context)
+      enabled = enabled_in_context?(context)
       env = {
         CONDITIONAL_RELEASE_SERVICE_ENABLED: enabled
       }
@@ -67,18 +67,18 @@ module ConditionalRelease
       rules = active_rules(assignment.context, current_user, session)
       return nil unless rules
 
-      rules.find { |r| r['trigger_assignment'] == assignment.id.to_s || r['trigger_assignment_id'] == assignment.id }
+      rules.find { |r| r["trigger_assignment"] == assignment.id.to_s || r["trigger_assignment_id"] == assignment.id }
     end
 
     def self.active_rules(course, current_user, session)
       return unless enabled_in_context?(course)
       return unless course.grants_any_right?(current_user, session, :read, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS)
 
-      rules_data = Rails.cache.fetch_with_batched_keys('conditional_release_active_rules', batch_object: course, batched_keys: :conditional_release) do
+      rules_data = Rails.cache.fetch_with_batched_keys("conditional_release_active_rules", batch_object: course, batched_keys: :conditional_release) do
         rules = course.conditional_release_rules.active.with_assignments.to_a
         rules.as_json(include: Rule.includes_for_json, include_root: false, except: [:root_account_id, :deleted_at])
       end
-      trigger_ids = rules_data.map { |rule| rule['trigger_assignment_id'] }
+      trigger_ids = rules_data.map { |rule| rule["trigger_assignment_id"] }
       trigger_assgs = course.assignments.preload(:grading_standard).where(id: trigger_ids).each_with_object({}) do |a, assgs|
         assgs[a.id] = {
           points_possible: a.points_possible,
@@ -87,28 +87,28 @@ module ConditionalRelease
         }
       end
       rules_data.each do |rule|
-        rule['trigger_assignment_model'] = trigger_assgs[rule['trigger_assignment_id']]
+        rule["trigger_assignment_model"] = trigger_assgs[rule["trigger_assignment_id"]]
       end
       rules_data
     end
 
     def self.release_mastery_paths_content_in_course(course)
-      overrides_scope = AssignmentOverride.where(:set_type => AssignmentOverride::SET_TYPE_NOOP, :set_id => AssignmentOverride::NOOP_MASTERY_PATHS).active
-      assignment_ids = overrides_scope.where.not(:assignment_id => nil).pluck(:assignment_id)
+      overrides_scope = AssignmentOverride.where(set_type: AssignmentOverride::SET_TYPE_NOOP, set_id: AssignmentOverride::NOOP_MASTERY_PATHS).active
+      assignment_ids = overrides_scope.where.not(assignment_id: nil).pluck(:assignment_id)
       assignment_ids.sort.each_slice(100) do |sliced_ids|
-        course.assignments.active.where(:id => sliced_ids).where(:only_visible_to_overrides => true).where.not(submission_types: 'wiki_page').to_a.each do |assignment|
+        course.assignments.active.where(id: sliced_ids).where(only_visible_to_overrides: true).where.not(submission_types: "wiki_page").to_a.each do |assignment|
           assignment.update_attribute(:only_visible_to_overrides, false)
         end
       end
-      wp_assignment_ids = course.wiki_pages.not_deleted.where.not(:assignment_id => nil).pluck(:assignment_id)
+      wp_assignment_ids = course.wiki_pages.not_deleted.where.not(assignment_id: nil).pluck(:assignment_id)
       wp_assignment_ids.sort.each_slice(100) do |sliced_ids|
-        course.assignments.active.where(:id => sliced_ids).where(:only_visible_to_overrides => true, :submission_types => 'wiki_page').each do |wp_assignment|
+        course.assignments.active.where(id: sliced_ids).where(only_visible_to_overrides: true, submission_types: "wiki_page").each do |wp_assignment|
           wp_assignment.update_attribute(:only_visible_to_overrides, false)
         end
       end
-      quiz_ids = overrides_scope.where(:assignment_id => nil).where.not(:quiz_id => nil).pluck(:quiz_id)
+      quiz_ids = overrides_scope.where(assignment_id: nil).where.not(quiz_id: nil).pluck(:quiz_id)
       quiz_ids.sort.each_slice(100) do |sliced_ids|
-        course.quizzes.active.where(:id => sliced_ids).where(:only_visible_to_overrides => true).to_a.each do |quiz|
+        course.quizzes.active.where(id: sliced_ids).where(only_visible_to_overrides: true).to_a.each do |quiz|
           quiz.update_attribute(:only_visible_to_overrides, false)
         end
       end
@@ -135,14 +135,14 @@ module ConditionalRelease
         return [] if course.blank? || student.blank?
 
         rules_data =
-          ::Rails.cache.fetch(['conditional_release_rules_for_student2', student.cache_key(:submissions), course.cache_key(:conditional_release)].cache_key) do
+          ::Rails.cache.fetch(["conditional_release_rules_for_student2", student.cache_key(:submissions), course.cache_key(:conditional_release)].cache_key) do
             rules = course.conditional_release_rules.active.preload(Rule.preload_associations).to_a
 
             # ignore functionally empty rules
             rules.reject! { |r| r.scoring_ranges.all? { |sr| sr.assignment_sets.all? { |s| s.assignment_set_associations.empty? } } }
 
-            trigger_assignments = course.assignments.where(:id => rules.map(&:trigger_assignment_id)).to_a.index_by(&:id)
-            trigger_submissions = course.submissions.where(:assignment_id => trigger_assignments.keys)
+            trigger_assignments = course.assignments.where(id: rules.map(&:trigger_assignment_id)).to_a.index_by(&:id)
+            trigger_submissions = course.submissions.where(assignment_id: trigger_assignments.keys)
                                         .for_user(student).in_workflow_state(:graded).posted.to_a.index_by(&:assignment_id)
 
             assigned_set_ids = ConditionalRelease::AssignmentSetAction.current_assignments(
@@ -176,10 +176,10 @@ module ConditionalRelease
         # to get the assignment data in when we're not maintaining back compat
         referenced_assignment_ids = rules_data.map do |rule_hash|
           rule_hash[:assignment_sets].map do |set_hash|
-            set_hash[:assignment_set_associations].map { |assoc_hash| assoc_hash[:assignment_id] }
+            set_hash[:assignment_set_associations].pluck(:assignment_id)
           end
         end.flatten
-        referenced_assignments = course.assignments.where(:id => referenced_assignment_ids).to_a.index_by(&:id)
+        referenced_assignments = course.assignments.where(id: referenced_assignment_ids).to_a.index_by(&:id)
         rules_data.each do |rule_hash|
           rule_hash[:assignment_sets].each do |set_hash|
             set_hash[:assignment_set_associations].each do |assoc_hash|
@@ -229,10 +229,10 @@ module ConditionalRelease
       end
 
       def assignment_keys
-        %i(id title name description due_at unlock_at lock_at
+        %i[id title name description due_at unlock_at lock_at
            points_possible min_score max_score grading_type
            submission_types workflow_state context_id
-           context_type updated_at context_code)
+           context_type updated_at context_code]
       end
     end
   end

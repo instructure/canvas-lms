@@ -33,7 +33,7 @@ context "accessing public content" do
 
       Timecop.freeze(8.seconds.ago) do
         @course.update_attribute(:is_public, false)
-        @course.touch_content_if_public_visibility_changed(:is_public => [true, false])
+        @course.touch_content_if_public_visibility_changed(is_public: [true, false])
 
         yield
         assert_unauthorized
@@ -48,7 +48,7 @@ context "accessing public content" do
       end
 
       @course.update_attribute(:is_public_to_auth_users, false)
-      @course.touch_content_if_public_visibility_changed(:is_public_to_auth_users => [true, false])
+      @course.touch_content_if_public_visibility_changed(is_public_to_auth_users: [true, false])
 
       yield
       assert_unauthorized
@@ -56,7 +56,7 @@ context "accessing public content" do
   end
 
   it "shows assignments" do
-    assignment = @course.assignments.create!(:name => "blah")
+    assignment = @course.assignments.create!(name: "blah")
 
     test_public_access do
       get "/courses/#{@course.id}/assignments/#{assignment.id}"
@@ -73,7 +73,7 @@ context "accessing public content" do
   end
 
   it "shows wiki pages" do
-    page = @course.wiki_pages.create!(:title => "stuff")
+    page = @course.wiki_pages.create!(title: "stuff")
 
     test_public_access do
       get "/courses/#{@course.id}/pages/#{page.url}"

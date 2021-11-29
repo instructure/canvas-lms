@@ -24,9 +24,10 @@ class ActionController::InvalidByteSequenceErrorFromParams < Encoding::InvalidBy
 class ActionController::Base
   def force_utf8_params
     traverse = lambda do |object, block|
-      if object.kind_of?(Hash)
+      case object
+      when Hash
         object.each_value { |o| traverse.call(o, block) }
-      elsif object.kind_of?(Array)
+      when Array
         object.each { |o| traverse.call(o, block) }
       else
         block.call(object)

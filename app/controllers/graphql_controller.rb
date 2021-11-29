@@ -42,7 +42,7 @@ class GraphQLController < ApplicationController
 
   def graphiql
     @page_title = "GraphiQL"
-    render :graphiql, layout: 'bare'
+    render :graphiql, layout: "bare"
   end
 
   private
@@ -63,23 +63,23 @@ class GraphQLController < ApplicationController
       tracers: [
         Tracers::DatadogTracer.new(
           request.headers["GraphQL-Metrics"] == "true",
-          request.host_with_port.sub(':', '_')
+          request.host_with_port.sub(":", "_")
         )
       ]
     }
 
-    overall_timeout = Setting.get('graphql_overall_timeout', '60').to_i.seconds
+    overall_timeout = Setting.get("graphql_overall_timeout", "60").to_i.seconds
     Timeout.timeout(overall_timeout) do
       schema.execute(query, variables: variables, context: context)
     end
   end
 
   def require_auth?
-    if action_name == 'execute'
+    if action_name == "execute"
       return !::Account.site_admin.feature_enabled?(:disable_graphql_authentication)
     end
 
-    if !Rails.env.production? && action_name == 'subgraph_execute' && sdl_query?
+    if !Rails.env.production? && action_name == "subgraph_execute" && sdl_query?
       return false
     end
 
@@ -87,19 +87,19 @@ class GraphQLController < ApplicationController
   end
 
   def sdl_query?
-    query = (params[:query] || '').strip
-    return false unless query.starts_with?('query') || query.starts_with?('{')
+    query = (params[:query] || "").strip
+    return false unless query.starts_with?("query") || query.starts_with?("{")
 
     query = query[/{.*/] # slice off leading "query" keyword and/or query name, if any
-    query.gsub!(/\s+/, '') # strip all whitespace
-    query == '{_service{sdl}}'
+    query.gsub!(/\s+/, "") # strip all whitespace
+    query == "{_service{sdl}}"
   end
 
   def require_inst_access_token_auth
     unless @authenticated_with_inst_access_token
       render(
         json: { errors: [{ message: "InstAccess token auth required" }] },
-        status: 401
+        status: :unauthorized
       )
     end
   end

@@ -30,12 +30,12 @@ class OriginalityReport < ActiveRecord::Base
   belongs_to :originality_report_attachment, class_name: "Attachment"
   belongs_to :root_account, class_name: "Account"
 
-  has_one :lti_link, class_name: 'Lti::Link', as: :linkable, inverse_of: :linkable, dependent: :destroy
+  has_one :lti_link, class_name: "Lti::Link", as: :linkable, inverse_of: :linkable, dependent: :destroy
   accepts_nested_attributes_for :lti_link, allow_destroy: true
 
   validates :submission, presence: true
   validates :workflow_state, inclusion: { in: ORDERED_VALID_WORKFLOW_STATES }
-  validates :originality_score, inclusion: { in: 0..100, message: 'score must be between 0 and 100' }, allow_nil: true
+  validates :originality_score, inclusion: { in: 0..100, message: "score must be between 0 and 100" }, allow_nil: true
 
   alias_attribute :file_id, :attachment_id
   alias_attribute :originality_report_file_id, :originality_report_attachment_id
@@ -48,7 +48,7 @@ class OriginalityReport < ActiveRecord::Base
   end
 
   def state
-    if workflow_state != 'scored'
+    if workflow_state != "scored"
       return workflow_state
     end
 
@@ -72,7 +72,7 @@ class OriginalityReport < ActiveRecord::Base
                                               assignment_id: assignment.id,
                                               resource_link_id: lti_link.resource_link_id,
                                               host: HostUrl.context_host(assignment.context),
-                                              display: 'borderless')
+                                              display: "borderless")
     else
       originality_report_url
     end
@@ -89,7 +89,7 @@ class OriginalityReport < ActiveRecord::Base
   end
 
   def self.copy_to_group_submissions!(report_id:, user_id:)
-    report = self.find(report_id)
+    report = find(report_id)
     report.copy_to_group_submissions!
   rescue ActiveRecord::RecordNotFound => e
     user = User.where(id: user_id).first
@@ -109,7 +109,7 @@ class OriginalityReport < ActiveRecord::Base
 
     group_submissions = assignment.submissions.where.not(id: submission.id).where(group: submission.group)
     group_submissions.find_each do |s|
-      copy_of_report = self.dup
+      copy_of_report = dup
       copy_of_report.submission_time = nil
 
       # We don't want a single submission to have
@@ -138,10 +138,10 @@ class OriginalityReport < ActiveRecord::Base
   end
 
   def infer_workflow_state
-    self.workflow_state = 'error' if error_message.present?
-    return if self.workflow_state == 'error'
+    self.workflow_state = "error" if error_message.present?
+    return if workflow_state == "error"
 
-    self.workflow_state = self.originality_score.present? ? 'scored' : 'pending'
+    self.workflow_state = originality_score.present? ? "scored" : "pending"
   end
 
   def set_root_account

@@ -19,14 +19,14 @@
 #
 
 class Mutations::ImportOutcomes < Mutations::BaseMutation
-  graphql_name 'ImportOutcomes'
+  graphql_name "ImportOutcomes"
 
-  argument :group_id, ID, required: false, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func('LearningOutcomeGroup')
-  argument :outcome_id, ID, required: false, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func('LearningOutcome')
+  argument :group_id, ID, required: false, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("LearningOutcomeGroup")
+  argument :outcome_id, ID, required: false, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("LearningOutcome")
   argument :source_context_id, ID, required: false
   argument :source_context_type, String, required: false
   # after Remove target_context attributes, the target_group_id should be required
-  argument :target_group_id, ID, required: false, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func('LearningOutcomeGroup')
+  argument :target_group_id, ID, required: false, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("LearningOutcomeGroup")
   argument :target_context_id, ID, required: false
   argument :target_context_type, String, required: false
 
@@ -42,23 +42,23 @@ class Mutations::ImportOutcomes < Mutations::BaseMutation
           source_context = context_class(input[:source_context_type]).find_by(id: input[:source_context_id])
         rescue NameError
           return validation_error(
-            I18n.t('invalid value'), attribute: 'sourceContextType'
+            I18n.t("invalid value"), attribute: "sourceContextType"
           )
         end
 
         if source_context.nil?
-          raise GraphQL::ExecutionError, I18n.t('no such source context')
+          raise GraphQL::ExecutionError, I18n.t("no such source context")
         end
       else
         return validation_error(
-          I18n.t('sourceContextId required if sourceContextType provided'),
-          attribute: 'sourceContextId'
+          I18n.t("sourceContextId required if sourceContextType provided"),
+          attribute: "sourceContextId"
         )
       end
     elsif input[:source_context_id].present?
       return validation_error(
-        I18n.t('sourceContextType required if sourceContextId provided'),
-        attribute: 'sourceContextType'
+        I18n.t("sourceContextType required if sourceContextId provided"),
+        attribute: "sourceContextType"
       )
     end
 
@@ -70,24 +70,24 @@ class Mutations::ImportOutcomes < Mutations::BaseMutation
       # Import the entire group into the given context
       group = LearningOutcomeGroup.active.find_by(id: group_id)
       if group.nil?
-        raise GraphQL::ExecutionError, I18n.t('group not found')
+        raise GraphQL::ExecutionError, I18n.t("group not found")
       end
 
       # If optional source context provided, then check that
       # matches the group's context
       source_context ||= group.context
       if source_context && source_context != group.context
-        raise GraphQL::ExecutionError, I18n.t('source context does not match group context')
+        raise GraphQL::ExecutionError, I18n.t("source context does not match group context")
       end
 
       # source has to be global or in an associated account
       unless !source_context || target_context.associated_accounts.include?(source_context)
-        raise GraphQL::ExecutionError, I18n.t('invalid context for group')
+        raise GraphQL::ExecutionError, I18n.t("invalid context for group")
       end
 
       # source can't be a root group
       if group.learning_outcome_group_id.nil?
-        raise GraphQL::ExecutionError, I18n.t('cannot import a root group')
+        raise GraphQL::ExecutionError, I18n.t("cannot import a root group")
       end
 
       return process_job(
@@ -102,7 +102,7 @@ class Mutations::ImportOutcomes < Mutations::BaseMutation
           "Outcome %{outcome_id} is not available in context %{context_type}#%{context_id}",
           outcome_id: outcome_id,
           context_id: target_context.id.to_s,
-          context_type: target_context.class.name,
+          context_type: target_context.class.name
         )
       end
 
@@ -112,7 +112,7 @@ class Mutations::ImportOutcomes < Mutations::BaseMutation
     end
 
     validation_error(
-      I18n.t('Either groupId or outcomeId values are required')
+      I18n.t("Either groupId or outcomeId values are required")
     )
   end
 
@@ -162,7 +162,7 @@ class Mutations::ImportOutcomes < Mutations::BaseMutation
 
     def get_outcome_group(outcome_id, context)
       links = ContentTag.learning_outcome_links.active.where(content_id: outcome_id)
-      link = context ? links.find_by(context: context) : links.find_by(context_type: 'LearningOutcomeGroup')
+      link = context ? links.find_by(context: context) : links.find_by(context_type: "LearningOutcomeGroup")
       link&.associated_asset
     end
 
@@ -301,7 +301,7 @@ class Mutations::ImportOutcomes < Mutations::BaseMutation
     if input[:target_group_id]
       target_group = LearningOutcomeGroup.active.find_by(id: input[:target_group_id])
       if target_group.nil?
-        raise GraphQL::ExecutionError, I18n.t('no such target group')
+        raise GraphQL::ExecutionError, I18n.t("no such target group")
       end
 
       target_context = target_group.context
@@ -310,15 +310,15 @@ class Mutations::ImportOutcomes < Mutations::BaseMutation
     else
       if input[:target_context_type].blank? && input[:target_context_id].blank?
         raise GraphQL::ExecutionError, I18n.t(
-          "You must provide targetGroupId or targetContextId and targetContextType",
+          "You must provide targetGroupId or targetContextId and targetContextType"
         )
       elsif input[:target_context_type].blank? && input[:target_context_id].present?
         raise GraphQL::ExecutionError, I18n.t(
-          "targetContextType required if targetContextId provided",
+          "targetContextType required if targetContextId provided"
         )
       elsif input[:target_context_type].present? && input[:target_context_id].blank?
         raise GraphQL::ExecutionError, I18n.t(
-          "targetContextId required if targetContextType provided",
+          "targetContextId required if targetContextType provided"
         )
       end
 
@@ -328,11 +328,11 @@ class Mutations::ImportOutcomes < Mutations::BaseMutation
             id: input[:target_context_id]
           )
         rescue NameError
-          raise GraphQL::ExecutionError, I18n.t('Invalid targetContextType')
+          raise GraphQL::ExecutionError, I18n.t("Invalid targetContextType")
         end
 
       if target_context.nil?
-        raise GraphQL::ExecutionError, I18n.t('no such target context')
+        raise GraphQL::ExecutionError, I18n.t("no such target context")
       end
 
       [target_context, target_context.root_outcome_group]

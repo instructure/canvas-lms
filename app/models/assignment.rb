@@ -18,12 +18,12 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'atom'
-require 'set'
-require 'canvas/draft_state_validations'
-require 'bigdecimal'
-require_dependency 'turnitin'
-require_dependency 'vericite'
+require "atom"
+require "set"
+require "canvas/draft_state_validations"
+require "bigdecimal"
+require_dependency "turnitin"
+require_dependency "vericite"
 
 class Assignment < ActiveRecord::Base
   include Workflow
@@ -42,10 +42,10 @@ class Assignment < ActiveRecord::Base
 
   self.ignored_columns = %i[context_code]
 
-  ALLOWED_GRADING_TYPES = %w(points percent letter_grade gpa_scale pass_fail not_graded).freeze
-  OFFLINE_SUBMISSION_TYPES = %i(on_paper external_tool none not_graded wiki_page).freeze
-  SUBMITTABLE_TYPES = %w(online_quiz discussion_topic wiki_page).freeze
-  LTI_EULA_SERVICE = 'vnd.Canvas.Eula'
+  ALLOWED_GRADING_TYPES = %w[points percent letter_grade gpa_scale pass_fail not_graded].freeze
+  OFFLINE_SUBMISSION_TYPES = %i[on_paper external_tool none not_graded wiki_page].freeze
+  SUBMITTABLE_TYPES = %w[online_quiz discussion_topic wiki_page].freeze
+  LTI_EULA_SERVICE = "vnd.Canvas.Eula"
   AUDITABLE_ATTRIBUTES = %w[
     muted
     due_at
@@ -77,38 +77,38 @@ class Assignment < ActiveRecord::Base
   attribute :lti_resource_link_lookup_uuid, :string, default: nil
 
   has_many :submissions, -> { active.preload(:grading_period) }, inverse_of: :assignment
-  has_many :all_submissions, class_name: 'Submission', dependent: :delete_all
+  has_many :all_submissions, class_name: "Submission", dependent: :delete_all
   has_many :observer_alerts, through: :all_submissions
-  has_many :provisional_grades, :through => :submissions
-  belongs_to :annotatable_attachment, class_name: 'Attachment'
-  has_many :attachments, :as => :context, :inverse_of => :context, :dependent => :destroy
+  has_many :provisional_grades, through: :submissions
+  belongs_to :annotatable_attachment, class_name: "Attachment"
+  has_many :attachments, as: :context, inverse_of: :context, dependent: :destroy
   has_many :assignment_student_visibilities
-  has_one :quiz, class_name: 'Quizzes::Quiz'
+  has_one :quiz, class_name: "Quizzes::Quiz"
   belongs_to :assignment_group
   has_one :discussion_topic, -> { where(root_topic_id: nil).order(:created_at) }
   has_one :wiki_page
-  has_many :learning_outcome_alignments, -> { where("content_tags.tag_type='learning_outcome' AND content_tags.workflow_state<>'deleted'").preload(:learning_outcome) }, as: :content, inverse_of: :content, class_name: 'ContentTag'
-  has_one :rubric_association, -> { where(purpose: 'grading').order(:created_at).preload(:rubric) }, as: :association, inverse_of: :association_object
-  has_one :rubric, -> { merge(RubricAssociation.active) }, :through => :rubric_association
-  has_one :teacher_enrollment, -> { preload(:user).where(enrollments: { workflow_state: 'active', type: 'TeacherEnrollment' }) }, class_name: 'TeacherEnrollment', foreign_key: 'course_id', primary_key: 'context_id'
-  has_many :ignores, :as => :asset
-  has_many :moderated_grading_selections, class_name: 'ModeratedGrading::Selection'
+  has_many :learning_outcome_alignments, -> { where("content_tags.tag_type='learning_outcome' AND content_tags.workflow_state<>'deleted'").preload(:learning_outcome) }, as: :content, inverse_of: :content, class_name: "ContentTag"
+  has_one :rubric_association, -> { where(purpose: "grading").order(:created_at).preload(:rubric) }, as: :association, inverse_of: :association_object
+  has_one :rubric, -> { merge(RubricAssociation.active) }, through: :rubric_association
+  has_one :teacher_enrollment, -> { preload(:user).where(enrollments: { workflow_state: "active", type: "TeacherEnrollment" }) }, class_name: "TeacherEnrollment", foreign_key: "course_id", primary_key: "context_id"
+  has_many :ignores, as: :asset
+  has_many :moderated_grading_selections, class_name: "ModeratedGrading::Selection"
   belongs_to :context, polymorphic: [:course]
   delegate :moderated_grading_max_grader_count, to: :course
   belongs_to :grading_standard
   belongs_to :group_category
 
-  belongs_to :grader_section, class_name: 'CourseSection', optional: true
-  belongs_to :final_grader, class_name: 'User', optional: true
+  belongs_to :grader_section, class_name: "CourseSection", optional: true
+  belongs_to :final_grader, class_name: "User", optional: true
 
-  belongs_to :duplicate_of, class_name: 'Assignment', optional: true, inverse_of: :duplicates
-  has_many :duplicates, class_name: 'Assignment', inverse_of: :duplicate_of, foreign_key: 'duplicate_of_id'
+  belongs_to :duplicate_of, class_name: "Assignment", optional: true, inverse_of: :duplicates
+  has_many :duplicates, class_name: "Assignment", inverse_of: :duplicate_of, foreign_key: "duplicate_of_id"
 
   has_many :assignment_configuration_tool_lookups, dependent: :delete_all
-  has_many :tool_settings_context_external_tools, through: :assignment_configuration_tool_lookups, source: :tool, source_type: 'ContextExternalTool'
-  has_many :line_items, inverse_of: :assignment, class_name: 'Lti::LineItem', dependent: :destroy
+  has_many :tool_settings_context_external_tools, through: :assignment_configuration_tool_lookups, source: :tool, source_type: "ContextExternalTool"
+  has_many :line_items, inverse_of: :assignment, class_name: "Lti::LineItem", dependent: :destroy
 
-  has_one :external_tool_tag, :class_name => 'ContentTag', :as => :context, :inverse_of => :context, :dependent => :destroy
+  has_one :external_tool_tag, class_name: "ContentTag", as: :context, inverse_of: :context, dependent: :destroy
   has_one :score_statistic, dependent: :destroy
   has_one :post_policy, dependent: :destroy, inverse_of: :assignment
 
@@ -116,41 +116,41 @@ class Assignment < ActiveRecord::Base
   has_many :moderation_grader_users, through: :moderation_graders, source: :user
 
   has_many :auditor_grade_change_records,
-           class_name: 'Auditors::ActiveRecord::GradeChangeRecord',
+           class_name: "Auditors::ActiveRecord::GradeChangeRecord",
            dependent: :destroy,
            inverse_of: :assignment
   has_many :lti_resource_links,
            as: :context,
            inverse_of: :context,
-           class_name: 'Lti::ResourceLink',
+           class_name: "Lti::ResourceLink",
            dependent: :destroy
 
-  has_many :conditional_release_rules, class_name: "ConditionalRelease::Rule", dependent: :destroy, foreign_key: 'trigger_assignment_id', inverse_of: :trigger_assignment
+  has_many :conditional_release_rules, class_name: "ConditionalRelease::Rule", dependent: :destroy, foreign_key: "trigger_assignment_id", inverse_of: :trigger_assignment
   has_many :conditional_release_associations, class_name: "ConditionalRelease::AssignmentSetAssociation", dependent: :destroy, inverse_of: :assignment
 
   scope :anonymous, -> { where(anonymous_grading: true) }
   scope :moderated, -> { where(moderated_grading: true) }
   scope :auditable, -> { anonymous.or(moderated) }
-  scope :type_quiz_lti, -> {
+  scope :type_quiz_lti, lambda {
     all.primary_shard.activate do
       where("EXISTS (?)",
-            ContentTag.where("content_tags.context_id=assignments.id").where(context_type: 'Assignment', content_type: 'ContextExternalTool')
+            ContentTag.where("content_tags.context_id=assignments.id").where(context_type: "Assignment", content_type: "ContextExternalTool")
                 .where("EXISTS (?)", ContextExternalTool.where("context_external_tools.id=content_tags.content_id").quiz_lti.offset(0)).offset(0))
     end
   }
   scope :not_type_quiz_lti, -> { where.not(id: type_quiz_lti) }
 
-  validates_associated :external_tool_tag, :if => :external_tool?
+  validates_associated :external_tool_tag, if: :external_tool?
   validate :group_category_changes_ok?
   validate :anonymous_grading_changes_ok?
   validate :no_anonymous_group_assignments
-  validate :due_date_ok?, :unless => :active_assignment_overrides?
+  validate :due_date_ok?, unless: :active_assignment_overrides?
   validate :assignment_overrides_due_date_ok?
   validate :discussion_group_ok?
   validate :positive_points_possible?
   validate :reasonable_points_possible?
   validate :moderation_setting_ok?
-  validate :assignment_name_length_ok?, :unless => :deleted?
+  validate :assignment_name_length_ok?, unless: :deleted?
   validate :annotatable_and_group_exclusivity_ok?
   validates :lti_context_id, presence: true, uniqueness: true
   validates :grader_count, numericality: true
@@ -168,17 +168,17 @@ class Assignment < ActiveRecord::Base
     validate :final_grader_ok?
   end
 
-  accepts_nested_attributes_for :external_tool_tag, :update_only => true, :reject_if => proc { |attrs|
+  accepts_nested_attributes_for :external_tool_tag, update_only: true, reject_if: proc { |attrs|
     # only accept the url, content_type, content_id, and new_tab params, the other accessible
     # params don't apply to an content tag being used as an external_tool_tag
-    content = case attrs['content_type']
-              when 'Lti::MessageHandler', 'lti/message_handler'
-                Lti::MessageHandler.find(attrs['content_id'].to_i)
-              when 'ContextExternalTool', 'context_external_tool'
-                ContextExternalTool.find(attrs['content_id'].to_i)
+    content = case attrs["content_type"]
+              when "Lti::MessageHandler", "lti/message_handler"
+                Lti::MessageHandler.find(attrs["content_id"].to_i)
+              when "ContextExternalTool", "context_external_tool"
+                ContextExternalTool.find(attrs["content_id"].to_i)
               end
     attrs[:content] = content if content
-    attrs[:external_data] = JSON.parse(attrs[:external_data]) if attrs['external_data'].present? && attrs[:external_data].is_a?(String)
+    attrs[:external_data] = JSON.parse(attrs[:external_data]) if attrs["external_data"].present? && attrs[:external_data].is_a?(String)
     attrs.slice!(:url, :new_tab, :content, :external_data)
     false
   }
@@ -205,8 +205,8 @@ class Assignment < ActiveRecord::Base
   end
 
   def positive_points_possible?
-    return if self.points_possible.to_i >= 0
-    return unless self.points_possible_changed?
+    return if points_possible.to_i >= 0
+    return unless points_possible_changed?
 
     errors.add(
       :points_possible,
@@ -218,8 +218,8 @@ class Assignment < ActiveRecord::Base
   end
 
   def reasonable_points_possible?
-    return if self.points_possible.to_i < 1000000000
-    return unless self.points_possible_changed?
+    return if points_possible.to_i < 1_000_000_000
+    return unless points_possible_changed?
 
     errors.add(
       :points_possible,
@@ -230,13 +230,13 @@ class Assignment < ActiveRecord::Base
   end
 
   def get_potentially_conflicting_titles(title_base)
-    assignment_titles = Assignment.active.for_course(self.context_id)
+    assignment_titles = Assignment.active.for_course(context_id)
                                   .starting_with_title(title_base).pluck("title").to_set
-    if self.wiki_page
-      wiki_titles = self.wiki_page.get_potentially_conflicting_titles(title_base)
-    else
-      wiki_titles = [].to_set
-    end
+    wiki_titles = if wiki_page
+                    wiki_page.get_potentially_conflicting_titles(title_base)
+                  else
+                    [].to_set
+                  end
     assignment_titles.union(wiki_titles)
   end
 
@@ -259,25 +259,25 @@ class Assignment < ActiveRecord::Base
     raise "This assignment can't be duplicated" unless can_duplicate?
 
     # Don't clone a new record
-    return self if self.new_record?
+    return self if new_record?
 
     default_opts = {
-      :duplicate_wiki_page => true,
-      :duplicate_discussion_topic => true,
-      :duplicate_plagiarism_tool_association => true,
-      :copy_title => nil,
-      :user => nil
+      duplicate_wiki_page: true,
+      duplicate_discussion_topic: true,
+      duplicate_plagiarism_tool_association: true,
+      copy_title: nil,
+      user: nil
     }
     opts_with_default = default_opts.merge(opts)
 
-    result = self.clone
+    result = clone
     result.all_submissions.clear
     result.attachments.clear
     result.ignores.clear
     result.moderated_grading_selections.clear
     result.grades_published_at = nil
-    [:migration_id, :lti_context_id, :turnitin_id,
-     :discussion_topic, :integration_id, :integration_data].each do |attr|
+    %i[migration_id lti_context_id turnitin_id
+       discussion_topic integration_id integration_data].each do |attr|
       result.send(:"#{attr}=", nil)
     end
     result.peer_review_count = 0
@@ -285,35 +285,35 @@ class Assignment < ActiveRecord::Base
     # override later.  Just helps to avoid duplicate positions.
     result.position = Assignment.active.where(assignment_group: assignment_group).maximum(:position) + 1
     result.title =
-      opts_with_default[:copy_title] ? opts_with_default[:copy_title] : get_copy_title(self, t("Copy"), self.title)
+      opts_with_default[:copy_title] || get_copy_title(self, t("Copy"), title)
 
-    if self.wiki_page && opts_with_default[:duplicate_wiki_page]
-      result.wiki_page = self.wiki_page.duplicate({
-                                                    :duplicate_assignment => false,
-                                                    :copy_title => result.title
-                                                  })
+    if wiki_page && opts_with_default[:duplicate_wiki_page]
+      result.wiki_page = wiki_page.duplicate({
+                                               duplicate_assignment: false,
+                                               copy_title: result.title
+                                             })
     end
 
-    if self.discussion_topic && opts_with_default[:duplicate_discussion_topic]
-      result.discussion_topic = self.discussion_topic.duplicate({
-                                                                  :duplicate_assignment => false,
-                                                                  :copy_title => result.title,
-                                                                  :user => opts_with_default[:user]
-                                                                })
+    if discussion_topic && opts_with_default[:duplicate_discussion_topic]
+      result.discussion_topic = discussion_topic.duplicate({
+                                                             duplicate_assignment: false,
+                                                             copy_title: result.title,
+                                                             user: opts_with_default[:user]
+                                                           })
     end
 
     result.discussion_topic&.assignment = result
 
-    if self.assignment_configuration_tool_lookups.present? && opts_with_default[:duplicate_plagiarism_tool_association]
+    if assignment_configuration_tool_lookups.present? && opts_with_default[:duplicate_plagiarism_tool_association]
       result.assignment_configuration_tool_lookups = [
-        self.assignment_configuration_tool_lookups.first.dup
+        assignment_configuration_tool_lookups.first.dup
       ]
     end
 
     # Learning outcome alignments seem to get copied magically, possibly
     # through the rubric
     if active_rubric_association?
-      result.rubric_association = self.rubric_association.clone
+      result.rubric_association = rubric_association.clone
       result.rubric_association.skip_updating_points_possible = true
     end
 
@@ -324,10 +324,10 @@ class Assignment < ActiveRecord::Base
     # the assignment as "duplicating"
     if external_tool_tag.present?
       result.external_tool_tag = external_tool_tag.dup
-      result.workflow_state = 'duplicating'
+      result.workflow_state = "duplicating"
       result.duplication_started_at = Time.zone.now
     else
-      result.workflow_state = 'unpublished'
+      result.workflow_state = "unpublished"
     end
 
     result.post_to_sis = false
@@ -345,7 +345,7 @@ class Assignment < ActiveRecord::Base
   def self.clean_up_duplicating_assignments
     duplicating_for_too_long.update_all(
       duplication_started_at: nil,
-      workflow_state: 'failed_to_duplicate',
+      workflow_state: "failed_to_duplicate",
       updated_at: Time.zone.now
     )
   end
@@ -353,7 +353,7 @@ class Assignment < ActiveRecord::Base
   def self.clean_up_importing_assignments
     importing_for_too_long.update_all(
       importing_started_at: nil,
-      workflow_state: 'failed_to_import',
+      workflow_state: "failed_to_import",
       updated_at: Time.zone.now
     )
   end
@@ -361,7 +361,7 @@ class Assignment < ActiveRecord::Base
   def self.clean_up_migrating_assignments
     migrating_for_too_long.update_all(
       duplication_started_at: nil,
-      workflow_state: 'failed_to_migrate',
+      workflow_state: "failed_to_migrate",
       updated_at: Time.zone.now
     )
   end
@@ -412,14 +412,14 @@ class Assignment < ActiveRecord::Base
 
   def secure_params
     body = {}
-    body[:lti_assignment_id] = self.lti_context_id || SecureRandom.uuid
-    body[:lti_assignment_description] = self.lti_safe_description
+    body[:lti_assignment_id] = lti_context_id || SecureRandom.uuid
+    body[:lti_assignment_description] = lti_safe_description
     Canvas::Security.create_jwt(body)
   end
 
   def discussion_group_ok?
     return unless new_record? || group_category_id_changed?
-    return unless group_category_id && submission_types == 'discussion_topic'
+    return unless group_category_id && submission_types == "discussion_topic"
 
     errors.add :group_category_id, I18n.t("discussion_group_category_locked",
                                           "Group categories cannot be set directly on a discussion assignment, but should be set on the discussion instead")
@@ -429,8 +429,8 @@ class Assignment < ActiveRecord::Base
     return false unless moderated_grading? || moderated_grading_changed?
 
     ModeratedGrading::ProvisionalGrade
-      .where(submission_id: self.submissions.having_submission.select(:id))
-      .where('score IS NOT NULL').exists?
+      .where(submission_id: submissions.having_submission.select(:id))
+      .where.not(score: nil).exists?
   end
 
   def graded_submissions_exist?
@@ -444,7 +444,7 @@ class Assignment < ActiveRecord::Base
       errors.add :moderated_grading, I18n.t("Moderated grading setting cannot be changed if graded submissions exist")
     end
     if (moderated_grading_changed? || new_record?) && moderated_grading?
-      if !graded?
+      unless graded?
         errors.add :moderated_grading, I18n.t("Moderated grading setting cannot be enabled for ungraded assignments")
       end
       if has_group_category?
@@ -456,7 +456,7 @@ class Assignment < ActiveRecord::Base
     end
   end
 
-  API_NEEDED_FIELDS = %w(
+  API_NEEDED_FIELDS = %w[
     id
     title
     context_id
@@ -504,31 +504,31 @@ class Assignment < ActiveRecord::Base
     grader_comments_visible_to_graders
     grader_names_visible_to_final_grader
     grader_count
-  ).freeze
+  ].freeze
 
   def external_tool?
-    self.submission_types == 'external_tool'
+    submission_types == "external_tool"
   end
 
-  validates_presence_of :context_id, :context_type, :workflow_state
+  validates :context_id, :context_type, :workflow_state, presence: true
 
-  validates_presence_of :title, if: :title_changed?
-  validates_length_of :description, :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true
-  validates_length_of :allowed_extensions, :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true
-  validate :frozen_atts_not_altered, :if => :frozen?, :on => :update
+  validates :title, presence: { if: :title_changed? }
+  validates :description, length: { maximum: maximum_long_text_length, allow_blank: true }
+  validates :allowed_extensions, length: { maximum: maximum_long_text_length, allow_blank: true }
+  validate :frozen_atts_not_altered, if: :frozen?, on: :update
   validates :grading_type, inclusion: { in: ALLOWED_GRADING_TYPES }
 
-  acts_as_list :scope => :assignment_group
-  simply_versioned :keep => 5
+  acts_as_list scope: :assignment_group
+  simply_versioned keep: 5
   sanitize_field :description, CanvasSanitize::SANITIZE
-  copy_authorized_links(:description) { [self.context, nil] }
+  copy_authorized_links(:description) { [context, nil] }
 
   def root_account
-    context && context.root_account
+    context&.root_account
   end
 
   def name
-    self.title
+    title
   end
 
   def name=(val)
@@ -546,7 +546,7 @@ class Assignment < ActiveRecord::Base
     new_value = new_value.split(/[\s,]+/) if new_value.is_a?(String)
 
     # remove the . if they put it on, and extra whitespace
-    new_value.map! { |v| v.strip.gsub(/\A\./, '').downcase } if new_value.is_a?(Array)
+    new_value.map! { |v| v.strip.delete_prefix(".").downcase } if new_value.is_a?(Array)
 
     write_attribute(:allowed_extensions, new_value)
   end
@@ -562,7 +562,7 @@ class Assignment < ActiveRecord::Base
   before_destroy :delete_observer_alerts
 
   def delete_observer_alerts
-    until self.observer_alerts.limit(1_000).delete_all < 1_000; end
+    until observer_alerts.limit(1_000).delete_all < 1_000; end
   end
 
   before_create :set_root_account_id, :set_muted
@@ -670,11 +670,11 @@ class Assignment < ActiveRecord::Base
       # needs to be .each(&:destroy) instead of .update_all(:workflow_state =>
       # 'deleted') so that the override gets versioned properly
       active_assignment_overrides
-        .where(:set_type => 'Group')
-        .each { |o|
+        .where(set_type: "Group")
+        .each do |o|
           o.dont_touch_assignment = true
           o.destroy
-        }
+        end
     end
 
     AssignmentOverrideStudent.clean_up_for_assignment(self)
@@ -693,7 +693,7 @@ class Assignment < ActiveRecord::Base
     run_at = 1.minute.from_now if run_at < 1.minute.from_now # delay immediate run in case associated objects are still being saved
     delay(run_at: run_at,
           on_conflict: :overwrite,
-          singleton: Shard.birth.activate { "assignment:auto_peer_review:#{self.id}" })
+          singleton: Shard.birth.activate { "assignment:auto_peer_review:#{id}" })
       .do_auto_peer_review
   end
 
@@ -711,14 +711,14 @@ class Assignment < ActiveRecord::Base
     if saved_change_to_assignment_group_id? && assignment_group_id_before_last_save.present?
       AssignmentGroup.where(id: assignment_group_id_before_last_save).update_all(updated_at: Time.zone.now.utc)
     end
-    AssignmentGroup.where(:id => self.assignment_group_id).update_all(:updated_at => Time.zone.now.utc) if self.assignment_group_id
+    AssignmentGroup.where(id: assignment_group_id).update_all(updated_at: Time.zone.now.utc) if assignment_group_id
     true
   end
 
   def update_student_submissions(updating_user)
     graded_at = Time.zone.now
     submissions.graded.preload(:user).find_each do |s|
-      if grading_type == 'pass_fail' && ['complete', 'pass'].include?(s.grade)
+      if grading_type == "pass_fail" && ["complete", "pass"].include?(s.grade)
         s.score = points_possible
       end
       s.grade = score_to_grade(s.score, s.grade)
@@ -730,10 +730,10 @@ class Assignment < ActiveRecord::Base
 
       # Skip the grade calculation for now. We'll do it at the end.
       s.skip_grade_calc = true
-      s.with_versioning(:explicit => true) { s.save! }
+      s.with_versioning(explicit: true) { s.save! }
     end
 
-    unless self.saved_by == :migration
+    unless saved_by == :migration
       context.recompute_student_scores
     end
   end
@@ -777,18 +777,16 @@ class Assignment < ActiveRecord::Base
   private :needs_to_recompute_grade?
 
   def update_grades_if_details_changed
-    if needs_to_recompute_grade?
-      unless self.saved_by == :migration
-        Rails.logger.debug "GRADES: recalculating because assignment #{global_id} changed. (#{saved_changes.inspect})"
-        self.class.connection.after_transaction_commit { self.context.recompute_student_scores }
-      end
+    if needs_to_recompute_grade? && saved_by != :migration
+      Rails.logger.debug "GRADES: recalculating because assignment #{global_id} changed. (#{saved_changes.inspect})"
+      self.class.connection.after_transaction_commit { context.recompute_student_scores }
     end
     true
   end
   private :update_grades_if_details_changed
 
   def update_grading_period_grades
-    return true unless saved_change_to_due_at? && !saved_change_to_id? && context.grading_periods? && self.saved_by != :migration
+    return true unless saved_change_to_due_at? && !saved_change_to_id? && context.grading_periods? && saved_by != :migration
 
     grading_period_was = GradingPeriod.for_date_in_course(date: due_at_before_last_save, course: context)
     grading_period = GradingPeriod.for_date_in_course(date: due_at, course: context)
@@ -814,27 +812,27 @@ class Assignment < ActiveRecord::Base
   private :update_grading_period_grades
 
   def create_in_turnitin
-    return false unless self.context.turnitin_settings
-    return true if self.turnitin_settings[:current]
+    return false unless context.turnitin_settings
+    return true if turnitin_settings[:current]
 
-    turnitin = Turnitin::Client.new(*self.context.turnitin_settings)
-    res = turnitin.createOrUpdateAssignment(self, self.turnitin_settings)
+    turnitin = Turnitin::Client.new(*context.turnitin_settings)
+    res = turnitin.createOrUpdateAssignment(self, turnitin_settings)
 
     # make sure the defaults get serialized
     self.turnitin_settings = turnitin_settings
 
     if res[:assignment_id]
-      self.turnitin_settings[:created] = true
-      self.turnitin_settings[:current] = true
-      self.turnitin_settings.delete(:error)
+      turnitin_settings[:created] = true
+      turnitin_settings[:current] = true
+      turnitin_settings.delete(:error)
     else
-      self.turnitin_settings[:error] = res
+      turnitin_settings[:error] = res
     end
-    self.save
-    return self.turnitin_settings[:current]
+    save
+    turnitin_settings[:current]
   end
 
-  def turnitin_settings settings = nil
+  def turnitin_settings(settings = nil)
     if super().empty?
       # turnitin settings are overloaded for all plagiarism services as requested, so
       # alternative services can send in their own default settings, otherwise,
@@ -851,14 +849,14 @@ class Assignment < ActiveRecord::Base
   end
 
   def turnitin_settings=(settings)
-    if vericite_enabled?
-      settings = VeriCite::Client.normalize_assignment_vericite_settings(settings)
-    else
-      settings = Turnitin::Client.normalize_assignment_turnitin_settings(settings)
-    end
+    settings = if vericite_enabled?
+                 VeriCite::Client.normalize_assignment_vericite_settings(settings)
+               else
+                 Turnitin::Client.normalize_assignment_turnitin_settings(settings)
+               end
     unless settings.blank?
       [:created, :error].each do |key|
-        settings[key] = self.turnitin_settings[key] if self.turnitin_settings[key]
+        settings[key] = turnitin_settings[key] if turnitin_settings[key]
       end
     end
     write_attribute :turnitin_settings, settings
@@ -866,35 +864,35 @@ class Assignment < ActiveRecord::Base
 
   def create_in_vericite
     return false unless Canvas::Plugin.find(:vericite).try(:enabled?)
-    return true if self.turnitin_settings[:current] && self.turnitin_settings[:vericite]
+    return true if turnitin_settings[:current] && turnitin_settings[:vericite]
 
-    vericite = VeriCite::Client.new()
-    res = vericite.createOrUpdateAssignment(self, self.turnitin_settings)
+    vericite = VeriCite::Client.new
+    res = vericite.createOrUpdateAssignment(self, turnitin_settings)
 
     # make sure the defaults get serialized
     self.turnitin_settings = turnitin_settings
 
     if res[:assignment_id]
-      self.turnitin_settings[:created] = true
-      self.turnitin_settings[:current] = true
-      self.turnitin_settings[:vericite] = true
-      self.turnitin_settings.delete(:error)
+      turnitin_settings[:created] = true
+      turnitin_settings[:current] = true
+      turnitin_settings[:vericite] = true
+      turnitin_settings.delete(:error)
     else
-      self.turnitin_settings[:error] = res
+      turnitin_settings[:error] = res
     end
-    self.save
-    return self.turnitin_settings[:current]
+    save
+    turnitin_settings[:current]
   end
 
   def vericite_settings
-    self.turnitin_settings(VeriCite::Client.default_assignment_vericite_settings)
+    turnitin_settings(VeriCite::Client.default_assignment_vericite_settings)
   end
 
   def vericite_settings=(settings)
     settings = VeriCite::Client.normalize_assignment_vericite_settings(settings)
     unless settings.blank?
       [:created, :error].each do |key|
-        settings[key] = self.turnitin_settings[key] if self.turnitin_settings[key]
+        settings[key] = turnitin_settings[key] if turnitin_settings[key]
       end
     end
     write_attribute :turnitin_settings, settings
@@ -904,15 +902,15 @@ class Assignment < ActiveRecord::Base
     if opts[:due_at]
       if opts[:due_at] == opts[:due_at_was]
         # (comparison is modulo time zone) no real change, leave as was
-        return opts[:all_day_was], opts[:all_day_date_was]
+        [opts[:all_day_was], opts[:all_day_date_was]]
       else
         # 'normal' case. compare due_at to fancy midnight and extract its
         # date-part
-        return (opts[:due_at].strftime("%H:%M") == '23:59'), opts[:due_at].to_date
+        [(opts[:due_at].strftime("%H:%M") == "23:59"), opts[:due_at].to_date]
       end
     else
       # no due at = all_day and all_day_date are irrelevant
-      return false, nil
+      [false, nil]
     end
   end
 
@@ -924,7 +922,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def self.remove_user_as_final_grader_immediately(user_id, course_id)
-    Assignment.where(context_id: course_id, context_type: 'Course', final_grader_id: user_id).find_each do |assignment|
+    Assignment.where(context_id: course_id, context_type: "Course", final_grader_id: user_id).find_each do |assignment|
       # going this route instead of doing an update_all so that we create a new
       # assignment version when this update happens
       assignment.update!(final_grader_id: nil)
@@ -938,25 +936,25 @@ class Assignment < ActiveRecord::Base
   private :ensure_post_to_sis_valid
 
   def default_values
-    raise "Assignments can only be assigned to Course records" if self.context_type && self.context_type != "Course"
+    raise "Assignments can only be assigned to Course records" if context_type && context_type != "Course"
 
-    self.title ||= (self.assignment_group.default_assignment_name rescue nil) || "Assignment"
+    self.title ||= (assignment_group.default_assignment_name rescue nil) || "Assignment"
 
-    self.infer_all_day
-    self.position = self.position_was if self.will_save_change_to_position? && self.position.nil? # don't allow setting to nil
+    infer_all_day
+    self.position = position_was if will_save_change_to_position? && position.nil? # don't allow setting to nil
 
-    if !self.assignment_group || (self.assignment_group.deleted? && !self.deleted?)
+    if !assignment_group || (assignment_group.deleted? && !deleted?)
       ensure_assignment_group(false)
     end
     self.submission_types ||= "none"
     self.peer_reviews_assigned = false if peer_reviews_due_at_changed?
-    [
-      :all_day, :could_be_locked, :grade_group_students_individually,
-      :anonymous_peer_reviews, :turnitin_enabled, :vericite_enabled,
-      :moderated_grading, :omit_from_final_grade, :freeze_on_copy,
-      :copied, :only_visible_to_overrides, :post_to_sis, :peer_reviews_assigned,
-      :peer_reviews, :automatic_peer_reviews, :muted, :intra_group_peer_reviews,
-      :anonymous_grading
+    %i[
+      all_day could_be_locked grade_group_students_individually
+      anonymous_peer_reviews turnitin_enabled vericite_enabled
+      moderated_grading omit_from_final_grade freeze_on_copy
+      copied only_visible_to_overrides post_to_sis peer_reviews_assigned
+      peer_reviews automatic_peer_reviews muted intra_group_peer_reviews
+      anonymous_grading
     ].each { |attr| self[attr] = false if self[attr].nil? }
     self.graders_anonymous_to_graders = false unless grader_comments_visible_to_graders
   end
@@ -965,26 +963,26 @@ class Assignment < ActiveRecord::Base
   def ensure_assignment_group(do_save = true)
     return if assignment_group_id
 
-    self.context.require_assignment_group
-    self.assignment_group = self.context.assignment_groups.active.first
+    context.require_assignment_group
+    self.assignment_group = context.assignment_groups.active.first
     if do_save
       GuardRail.activate(:primary) { save! }
     end
   end
 
   def attendance?
-    submission_types == 'attendance'
+    submission_types == "attendance"
   end
 
   def due_date
-    self.all_day ? self.all_day_date : self.due_at
+    all_day ? all_day_date : due_at
   end
 
   def delete_empty_abandoned_children
     if saved_change_to_submission_types?
       each_submission_type do |submittable, type|
         unless self.submission_types == type.to_s
-          submittable.unlink!(:assignment) if submittable
+          submittable&.unlink!(:assignment)
         end
       end
     end
@@ -999,7 +997,7 @@ class Assignment < ActiveRecord::Base
   def update_submissions
     @updated_submissions ||= []
     Submission.suspend_callbacks(:update_assignment, :touch_graders) do
-      self.submissions.find_each do |submission|
+      submissions.find_each do |submission|
         @updated_submissions << submission
         submission.save!
       end
@@ -1010,54 +1008,54 @@ class Assignment < ActiveRecord::Base
   def update_submittable
     # If we're updating the assignment's muted status as part of posting
     # grades, don't bother doing this
-    return true if self.deleted? || grade_posting_in_progress
+    return true if deleted? || grade_posting_in_progress
 
     if self.submission_types == "online_quiz" && @saved_by != :quiz
-      quiz = Quizzes::Quiz.where(assignment_id: self).first || self.context.quizzes.build
-      quiz.assignment_id = self.id
+      quiz = Quizzes::Quiz.where(assignment_id: self).first || context.quizzes.build
+      quiz.assignment_id = id
       quiz.title = self.title
-      quiz.description = self.description
-      quiz.due_at = self.due_at
-      quiz.unlock_at = self.unlock_at
-      quiz.lock_at = self.lock_at
-      quiz.points_possible = self.points_possible
-      quiz.assignment_group_id = self.assignment_group_id
-      quiz.workflow_state = 'created' if quiz.deleted?
+      quiz.description = description
+      quiz.due_at = due_at
+      quiz.unlock_at = unlock_at
+      quiz.lock_at = lock_at
+      quiz.points_possible = points_possible
+      quiz.assignment_group_id = assignment_group_id
+      quiz.workflow_state = "created" if quiz.deleted?
       quiz.saved_by = :assignment
-      quiz.workflow_state = published? ? 'available' : 'unpublished'
+      quiz.workflow_state = published? ? "available" : "unpublished"
       quiz.save if quiz.changed?
     elsif self.submission_types == "discussion_topic" && @saved_by != :discussion_topic
-      topic = self.discussion_topic || self.context.discussion_topics.build(:user => @updating_user)
-      topic.message = self.description
+      topic = discussion_topic || context.discussion_topics.build(user: @updating_user)
+      topic.message = description
       save_submittable(topic)
       self.discussion_topic = topic
-    elsif self.context.feature_enabled?(:conditional_release) &&
+    elsif context.feature_enabled?(:conditional_release) &&
           self.submission_types == "wiki_page" && @saved_by != :wiki_page
-      page = self.wiki_page || self.context.wiki_pages.build(:user => @updating_user)
+      page = wiki_page || context.wiki_pages.build(user: @updating_user)
       save_submittable(page)
       self.wiki_page = page
     end
   end
 
   def save_submittable(submittable)
-    submittable.assignment_id = self.id
+    submittable.assignment_id = id
     submittable.title = self.title
     submittable.saved_by = :assignment
     submittable.updated_at = Time.zone.now
-    submittable.workflow_state = 'active' if submittable.deleted?
-    submittable.workflow_state = published? ? 'active' : 'unpublished'
+    submittable.workflow_state = "active" if submittable.deleted?
+    submittable.workflow_state = published? ? "active" : "unpublished"
     submittable.save
   end
   protected :save_submittable
 
   def update_grading_standard
-    self.grading_standard.save! if self.grading_standard
+    grading_standard&.save!
   end
 
   def all_context_module_tags
     all_tags = context_module_tags.to_a
     each_submission_type do |submission, _, short_type|
-      all_tags.concat(submission.context_module_tags) if self.send("#{short_type}?")
+      all_tags.concat(submission.context_module_tags) if send("#{short_type}?")
     end
     all_tags
   end
@@ -1075,8 +1073,8 @@ class Assignment < ActiveRecord::Base
     tags = all_context_module_tags
     return unless tags.any?
 
-    modules = ContextModule.where(:id => tags.map(&:context_module_id)).ordered.to_a.select do |mod|
-      mod.completion_requirements && mod.completion_requirements.any? { |req| req[:type] == 'min_score' && tags.map(&:id).include?(req[:id]) }
+    modules = ContextModule.where(id: tags.map(&:context_module_id)).ordered.to_a.select do |mod|
+      mod.completion_requirements&.any? { |req| req[:type] == "min_score" && tags.map(&:id).include?(req[:id]) }
     end
     return unless modules.any?
 
@@ -1170,14 +1168,14 @@ class Assignment < ActiveRecord::Base
   # and creates results like they are created in the AGS Scores API.
   # It ignores any previous submission versions in favor of the most recent.
   def create_results_from_prior_grades(line_item)
-    self.submissions.where.not(score: nil).each do |sub|
+    submissions.where.not(score: nil).each do |sub|
       line_item.results.create!(
         submission: sub,
         user: sub.user,
         created_at: Time.zone.now,
         updated_at: sub.graded_at,
         result_score: sub.score,
-        result_maximum: self.points_possible || 0,
+        result_maximum: points_possible || 0,
         extensions: {
           Lti::Result::AGS_EXT_SUBMISSION => { submitted_at: sub.submitted_at }
         }
@@ -1216,7 +1214,7 @@ class Assignment < ActiveRecord::Base
     # TODO: this will blow up if the group_category string is set on the
     # previous version, because it gets confused between the db string field
     # and the association.  one more reason to drop the db column
-    prior_version ||= self.versions.previous(self.current_version.number).try(:model)
+    prior_version ||= versions.previous(current_version.number).try(:model)
     self.notify_of_update = notify || false
     broadcast_notifications(prior_version || dup)
     remove_assignment_updated_flag
@@ -1228,49 +1226,49 @@ class Assignment < ActiveRecord::Base
 
   set_broadcast_policy do |p|
     p.dispatch :assignment_due_date_changed
-    p.to { |assignment|
+    p.to do |assignment|
       # everyone who is _not_ covered by an assignment override affecting due_at
       # (the AssignmentOverride records will take care of notifying those users)
       excluded_ids = participants_with_overridden_due_at.map(&:id).to_set
       BroadcastPolicies::AssignmentParticipants.new(assignment, excluded_ids).to
-    }
-    p.whenever { |assignment|
+    end
+    p.whenever do |assignment|
       BroadcastPolicies::AssignmentPolicy.new(assignment)
                                          .should_dispatch_assignment_due_date_changed?
-    }
+    end
     p.data { course_broadcast_data }
 
     p.dispatch :assignment_changed
-    p.to { |assignment|
+    p.to do |assignment|
       BroadcastPolicies::AssignmentParticipants.new(assignment).to
-    }
-    p.whenever { |assignment|
+    end
+    p.whenever do |assignment|
       BroadcastPolicies::AssignmentPolicy.new(assignment)
                                          .should_dispatch_assignment_changed?
-    }
+    end
     p.data { course_broadcast_data }
 
     p.dispatch :assignment_created
-    p.to { |assignment|
+    p.to do |assignment|
       BroadcastPolicies::AssignmentParticipants.new(assignment).to
-    }
-    p.whenever { |assignment|
+    end
+    p.whenever do |assignment|
       BroadcastPolicies::AssignmentPolicy.new(assignment)
                                          .should_dispatch_assignment_created?
-    }
+    end
     p.data { course_broadcast_data }
-    p.filter_asset_by_recipient { |assignment, user|
+    p.filter_asset_by_recipient do |assignment, user|
       assignment.overridden_for(user, skip_clone: true)
-    }
+    end
 
     p.dispatch :submissions_posted
-    p.to { |assignment|
+    p.to do |assignment|
       assignment.course.participating_instructors
-    }
-    p.whenever { |assignment|
+    end
+    p.whenever do |assignment|
       BroadcastPolicies::AssignmentPolicy.new(assignment)
                                          .should_dispatch_submissions_posted?
-    }
+    end
     p.data do |record|
       if record.posting_params_for_notifications.present?
         record.posting_params_for_notifications.merge(course_broadcast_data)
@@ -1294,31 +1292,31 @@ class Assignment < ActiveRecord::Base
   end
 
   def points_uneditable?
-    (self.submission_types == 'online_quiz') # && self.quiz && (self.quiz.edited? || self.quiz.available?))
+    (self.submission_types == "online_quiz") # && self.quiz && (self.quiz.edited? || self.quiz.available?))
   end
 
   workflow do
     state :published do
-      event :unpublish, :transitions_to => :unpublished
+      event :unpublish, transitions_to: :unpublished
     end
     state :unpublished do
-      event :publish, :transitions_to => :published
+      event :publish, transitions_to: :published
     end
     state :duplicating do
-      event :finish_duplicating, :transitions_to => :unpublished
-      event :fail_to_duplicate, :transitions_to => :failed_to_duplicate
+      event :finish_duplicating, transitions_to: :unpublished
+      event :fail_to_duplicate, transitions_to: :failed_to_duplicate
     end
     state :failed_to_duplicate do
-      event :finish_duplicating, :transitions_to => :unpublished
+      event :finish_duplicating, transitions_to: :unpublished
     end
     state :importing do
-      event :finish_importing, :transitions_to => :unpublished
-      event :fail_to_import, :transitions_to => :fail_to_import
+      event :finish_importing, transitions_to: :unpublished
+      event :fail_to_import, transitions_to: :fail_to_import
     end
     state :fail_to_import
     state :migrating do
-      event :finish_migrating, :transitions_to => :unpublished
-      event :fail_to_migrate, :transitions_to => :failed_to_migrate
+      event :finish_migrating, transitions_to: :unpublished
+      event :fail_to_migrate, transitions_to: :failed_to_migrate
     end
     state :failed_to_migrate
     state :deleted
@@ -1326,34 +1324,34 @@ class Assignment < ActiveRecord::Base
 
   alias_method :destroy_permanently!, :destroy
   def destroy
-    self.workflow_state = 'deleted'
+    self.workflow_state = "deleted"
     ContentTag.delete_for(self)
-    self.rubric_association.destroy if active_rubric_association?
-    self.save!
+    rubric_association.destroy if active_rubric_association?
+    save!
 
     each_submission_type { |submission| submission.destroy if submission && !submission.deleted? }
-    self.conditional_release_rules.destroy_all
-    self.conditional_release_associations.destroy_all
+    conditional_release_rules.destroy_all
+    conditional_release_associations.destroy_all
     refresh_course_content_participation_counts
 
-    ScheduledSmartAlert.where(context_type: 'Assignment', context_id: self.id).destroy_all
-    ScheduledSmartAlert.where(context_type: 'AssignmentOverride', context_id: self.assignment_override_ids).destroy_all
+    ScheduledSmartAlert.where(context_type: "Assignment", context_id: id).destroy_all
+    ScheduledSmartAlert.where(context_type: "AssignmentOverride", context_id: assignment_override_ids).destroy_all
   end
 
   def refresh_course_content_participation_counts
-    progress = self.context.progresses.build(tag: 'refresh_content_participation_counts')
+    progress = context.progresses.build(tag: "refresh_content_participation_counts")
     progress.save!
-    progress.process_job(self.context, :refresh_content_participation_counts,
+    progress.process_job(context, :refresh_content_participation_counts,
                          singleton: "refresh_content_participation_counts:#{context.global_id}")
   end
 
   def time_zone_edited
-    CGI::unescapeHTML(read_attribute(:time_zone_edited) || "")
+    CGI.unescapeHTML(read_attribute(:time_zone_edited) || "")
   end
 
   def restore(from = nil)
-    self.workflow_state = self.has_student_submissions? ? "published" : "unpublished"
-    self.save
+    self.workflow_state = has_student_submissions? ? "published" : "unpublished"
+    save
     each_submission_type do |submission, _, short_type|
       submission.restore(:assignment) if from != short_type && submission
     end
@@ -1377,17 +1375,17 @@ class Assignment < ActiveRecord::Base
 
   def students_with_visibility(scope = nil)
     scope ||= context.all_students.where("enrollments.workflow_state NOT IN ('inactive', 'rejected')")
-    return scope unless self.differentiated_assignments_applies?
+    return scope unless differentiated_assignments_applies?
 
-    scope.able_to_see_assignment_in_course_with_da(self.id, context.id)
+    scope.able_to_see_assignment_in_course_with_da(id, context.id)
   end
 
   attr_accessor :saved_by
 
   def process_if_quiz
     if self.submission_types == "online_quiz"
-      self.points_possible = quiz.points_possible if quiz && quiz.available?
-      copy_attrs = %w(due_at lock_at unlock_at)
+      self.points_possible = quiz.points_possible if quiz&.available?
+      copy_attrs = %w[due_at lock_at unlock_at]
       if quiz && @saved_by != :quiz &&
          copy_attrs.any? { |attr| changes[attr] }
         copy_attrs.each { |attr| quiz.send "#{attr}=", send(attr) }
@@ -1398,12 +1396,10 @@ class Assignment < ActiveRecord::Base
   end
   protected :process_if_quiz
 
-  def grading_scheme
-    grading_standard_or_default.grading_scheme
-  end
+  delegate :grading_scheme, to: :grading_standard_or_default
 
   def infer_grading_type
-    self.grading_type = nil if self.grading_type.blank?
+    self.grading_type = nil if grading_type.blank?
     self.grading_type = "pass_fail" if self.submission_types == "attendance"
     self.grading_type = "not_graded" if self.submission_types == "wiki_page"
     self.grading_type ||= "points"
@@ -1411,7 +1407,7 @@ class Assignment < ActiveRecord::Base
 
   def score_to_grade_percent(score = 0.0)
     if points_possible && points_possible > 0
-      result = score.to_f / self.points_possible
+      result = score.to_f / points_possible
       (result * 100.0).round(2)
     else
       # there's not really any reasonable value we can set here -- if the
@@ -1439,8 +1435,8 @@ class Assignment < ActiveRecord::Base
                end
       result = passed ? "complete" : "incomplete"
     when "letter_grade", "gpa_scale"
-      if self.points_possible.to_f > 0.0
-        score = BigDecimal(score.to_s.presence || '0.0') / BigDecimal(points_possible.to_s)
+      if points_possible.to_f > 0.0
+        score = BigDecimal(score.to_s.presence || "0.0") / BigDecimal(points_possible.to_s)
         result = grading_standard_or_default.score_to_grade((score * 100).to_f)
       elsif given_grade
         # the score for a zero-point letter_grade assignment could be considered
@@ -1459,11 +1455,11 @@ class Assignment < ActiveRecord::Base
 
   def interpret_grade(grade)
     case grade.to_s
-    when %r{^[+-]?\d*\.?\d+%$}
+    when /^[+-]?\d*\.?\d+%$/
       # interpret as a percentage
       percentage = grade.to_f / 100.0.to_d
       points_possible.to_f * percentage
-    when %r{^[+-]?\d*\.?\d+$}
+    when /^[+-]?\d*\.?\d+$/
       if uses_grading_standard && (standard_based_score = grading_standard_or_default.grade_to_score(grade))
         (points_possible || 0.0) * standard_based_score / 100.0
       else
@@ -1514,38 +1510,38 @@ class Assignment < ActiveRecord::Base
 
   def infer_times
     # set the time to 11:59 pm in the creator's time zone, if none given
-    self.due_at = CanvasTime.fancy_midnight(self.due_at) if will_save_change_to_due_at?
-    self.lock_at = CanvasTime.fancy_midnight(self.lock_at) if will_save_change_to_lock_at?
+    self.due_at = CanvasTime.fancy_midnight(due_at) if will_save_change_to_due_at?
+    self.lock_at = CanvasTime.fancy_midnight(lock_at) if will_save_change_to_lock_at?
   end
 
   def infer_all_day(tz = nil)
     # make the comparison to "fancy midnight" and the date-part extraction in
     # the time zone that was active during editing
-    time_zone = tz || (ActiveSupport::TimeZone.new(self.time_zone_edited) rescue nil) || Time.zone
+    time_zone = tz || (ActiveSupport::TimeZone.new(time_zone_edited) rescue nil) || Time.zone
     self.all_day, self.all_day_date = Assignment.all_day_interpretation(
-      :due_at => self.due_at ? self.due_at.in_time_zone(time_zone) : nil,
-      :due_at_was => self.due_at_was,
-      :all_day_was => self.all_day_was,
-      :all_day_date_was => self.all_day_date_was
+      due_at: due_at ? due_at.in_time_zone(time_zone) : nil,
+      due_at_was: due_at_was,
+      all_day_was: all_day_was,
+      all_day_date_was: all_day_date_was
     )
   end
 
   def to_atom(opts = {})
     extend ApplicationHelper
-    author_name = self.context.present? ? self.context.name : t('atom_no_author', "No Author")
+    author_name = context.present? ? context.name : t("atom_no_author", "No Author")
     Atom::Entry.new do |entry|
-      entry.title     = t(:feed_entry_title, "Assignment: %{assignment}", :assignment => self.title) unless opts[:include_context]
-      entry.title     = t(:feed_entry_title_with_course, "Assignment, %{course}: %{assignment}", :assignment => self.title, :course => self.context.name) if opts[:include_context]
-      entry.updated   = self.updated_at.utc
-      entry.published = self.created_at.utc
-      entry.id        = "tag:#{HostUrl.default_host},#{self.created_at.strftime('%Y-%m-%d')}:/assignments/#{self.feed_code}_#{self.due_at.strftime('%Y-%m-%d-%H-%M') rescue 'none'}"
-      entry.content   = Atom::Content::Html.new(before_label(:due, "Due") + " #{datetime_string(self.due_at, :due_date)}<br/>#{self.description}<br/><br/>
+      entry.title     = t(:feed_entry_title, "Assignment: %{assignment}", assignment: self.title) unless opts[:include_context]
+      entry.title     = t(:feed_entry_title_with_course, "Assignment, %{course}: %{assignment}", assignment: self.title, course: context.name) if opts[:include_context]
+      entry.updated   = updated_at.utc
+      entry.published = created_at.utc
+      entry.id        = "tag:#{HostUrl.default_host},#{created_at.strftime("%Y-%m-%d")}:/assignments/#{feed_code}_#{due_at.strftime("%Y-%m-%d-%H-%M") rescue "none"}"
+      entry.content   = Atom::Content::Html.new(before_label(:due, "Due") + " #{datetime_string(due_at, :due_date)}<br/>#{description}<br/><br/>
         <div>
-          #{self.description}
+          #{description}
         </div>
       ")
-      entry.links << Atom::Link.new(:rel => 'alternate', :href => direct_link)
-      entry.authors << Atom::Person.new(:name => author_name)
+      entry.links << Atom::Link.new(rel: "alternate", href: direct_link)
+      entry.authors << Atom::Person.new(name: author_name)
     end
   end
 
@@ -1558,7 +1554,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def direct_link
-    "http://#{HostUrl.context_host(self.context)}/#{context_url_prefix}/assignments/#{self.id}"
+    "http://#{HostUrl.context_host(context)}/#{context_url_prefix}/assignments/#{id}"
   end
 
   def context_prefix
@@ -1574,12 +1570,12 @@ class Assignment < ActiveRecord::Base
   def include_description?(user, lock_info = nil)
     return unless user
 
-    lock_info = locked_for?(user, :check_policies => true) if lock_info.nil?
+    lock_info = locked_for?(user, check_policies: true) if lock_info.nil?
     !lock_info || (lock_info[:can_view] && !lock_info[:context_module])
   end
 
   def all_day
-    read_attribute(:all_day) || (self.new_record? && !!self.due_at && (self.due_at.strftime("%H:%M") == '23:59' || self.due_at.strftime("%H:%M") == '00:00'))
+    read_attribute(:all_day) || (new_record? && !!due_at && (due_at.strftime("%H:%M") == "23:59" || due_at.strftime("%H:%M") == "00:00"))
   end
 
   def self.preload_context_module_tags(assignments, include_context_modules: false)
@@ -1593,9 +1589,9 @@ class Assignment < ActiveRecord::Base
     ActiveRecord::Associations::Preloader.new.preload(assignments, [
                                                         module_tags_include,
                                                         :context, # necessary while wiki_page assignments behind feature flag
-                                                        { :discussion_topic => :context_module_tags },
-                                                        { :wiki_page => :context_module_tags },
-                                                        { :quiz => :context_module_tags }
+                                                        { discussion_topic: :context_module_tags },
+                                                        { wiki_page: :context_module_tags },
+                                                        { quiz: :context_module_tags }
                                                       ])
   end
 
@@ -1627,22 +1623,22 @@ class Assignment < ActiveRecord::Base
   end
 
   def touch_on_unlock_if_necessary
-    if self.unlock_at && Time.zone.now < self.unlock_at && (Time.zone.now + 1.hour) > self.unlock_at
+    if unlock_at && Time.zone.now < unlock_at && (Time.zone.now + 1.hour) > unlock_at
       GuardRail.activate(:primary) do
         # Because of assignemnt overrides, an assignment can have the same global id but
         # a different unlock_at time, so include that in the singleton key so that different
         # unlock_at times are properly handled.
-        singleton = "touch_on_unlock_assignment_#{self.global_id}_#{self.unlock_at}"
-        delay(run_at: self.unlock_at, singleton: singleton).touch_assignment_and_submittable
+        singleton = "touch_on_unlock_assignment_#{global_id}_#{unlock_at}"
+        delay(run_at: unlock_at, singleton: singleton).touch_assignment_and_submittable
       end
     end
   end
 
   def touch_assignment_and_submittable
-    self.touch
-    self.submittable_object&.touch
-    if self.submittable_object.is_a?(DiscussionTopic) && self.submittable_object.root_topic?
-      self.submittable_object.child_topics.touch_all
+    touch
+    submittable_object&.touch
+    if submittable_object.is_a?(DiscussionTopic) && submittable_object.root_topic?
+      submittable_object.child_topics.touch_all
     end
   end
 
@@ -1651,18 +1647,18 @@ class Assignment < ActiveRecord::Base
 
     RequestCache.cache(locked_request_cache_key(user)) do
       locked = false
-      assignment_for_user = self.overridden_for(user)
+      assignment_for_user = overridden_for(user)
       if assignment_for_user.unlock_at && assignment_for_user.unlock_at > Time.zone.now
         locked = { object: assignment_for_user, unlock_at: assignment_for_user.unlock_at }
-      elsif self.could_be_locked && (item = locked_by_module_item?(user, opts))
+      elsif could_be_locked && (item = locked_by_module_item?(user, opts))
         locked = { object: self, module: item.context_module }
       elsif assignment_for_user.lock_at && assignment_for_user.lock_at < Time.zone.now
         locked = { object: assignment_for_user, lock_at: assignment_for_user.lock_at, can_view: true }
       else
         each_submission_type do |submission, _, short_type|
-          next unless self.send("#{short_type}?")
+          next unless send("#{short_type}?")
 
-          if (submission_locked = submission.low_level_locked_for?(user, opts.merge(:skip_assignment => true)))
+          if (submission_locked = submission.low_level_locked_for?(user, opts.merge(skip_assignment: true)))
             locked = submission_locked
           end
           break
@@ -1674,7 +1670,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def self.assignment_type?(type)
-    %w(quiz attendance discussion_topic wiki_page external_tool).include? type.to_s
+    %w[quiz attendance discussion_topic wiki_page external_tool].include? type.to_s
   end
 
   def self.get_submission_type(assignment_type)
@@ -1692,33 +1688,33 @@ class Assignment < ActiveRecord::Base
 
   def submittable_type?
     submission_types && ![
-      '',
-      'none',
-      'not_graded',
-      'online_quiz',
-      'discussion_topic',
-      'wiki_page',
-      'attendance'
+      "",
+      "none",
+      "not_graded",
+      "online_quiz",
+      "discussion_topic",
+      "wiki_page",
+      "attendance"
     ].include?(self.submission_types)
   end
 
   def submittable_object
     case self.submission_types
-    when 'online_quiz'
-      self.quiz
-    when 'discussion_topic'
-      self.discussion_topic
-    when 'wiki_page'
-      self.wiki_page
+    when "online_quiz"
+      quiz
+    when "discussion_topic"
+      discussion_topic
+    when "wiki_page"
+      wiki_page
     end
   end
 
   def each_submission_type
     if block_given?
-      submittable_types = %i(discussion_topic quiz)
-      submittable_types << :wiki_page if self.context.try(:feature_enabled?, :conditional_release)
+      submittable_types = %i[discussion_topic quiz]
+      submittable_types << :wiki_page if context.try(:feature_enabled?, :conditional_release)
       submittable_types.each do |asg_type|
-        submittable = self.send(asg_type)
+        submittable = send(asg_type)
         yield submittable, Assignment.get_submission_type(asg_type), asg_type
       end
     end
@@ -1727,8 +1723,8 @@ class Assignment < ActiveRecord::Base
   def graded_count
     return read_attribute(:graded_count).to_i if read_attribute(:graded_count)
 
-    Rails.cache.fetch(['graded_count', self].cache_key) do
-      submissions.graded.in_workflow_state('graded').count
+    Rails.cache.fetch(["graded_count", self].cache_key) do
+      submissions.graded.in_workflow_state("graded").count
     end
   end
 
@@ -1742,35 +1738,35 @@ class Assignment < ActiveRecord::Base
   def submitted_count
     return read_attribute(:submitted_count).to_i if read_attribute(:submitted_count)
 
-    Rails.cache.fetch(['submitted_count', self].cache_key) do
-      self.submissions.having_submission.count
+    Rails.cache.fetch(["submitted_count", self].cache_key) do
+      submissions.having_submission.count
     end
   end
 
   set_policy do
-    given { |user, session| self.context.grants_right?(user, session, :read) && self.published? }
+    given { |user, session| context.grants_right?(user, session, :read) && published? }
     can :read and can :read_own_submission
 
-    given { |user, session|
+    given do |user, session|
       (submittable_type? || submission_types == "discussion_topic") &&
         context.grants_right?(user, session, :participate_as_student) &&
         !locked_for?(user) &&
         visible_to_user?(user) &&
         !excused_for?(user)
-    }
+    end
     can :submit
 
     given do |user, session|
-      (submittable_type? || %w(discussion_topic online_quiz).include?(submission_types)) &&
+      (submittable_type? || %w[discussion_topic online_quiz].include?(submission_types)) &&
         context.grants_right?(user, session, :participate_as_student) &&
         visible_to_user?(user)
     end
     can :attach_submission_comment_files
 
-    given { |user, session| self.context.grants_right?(user, session, :read_as_admin) }
+    given { |user, session| context.grants_right?(user, session, :read_as_admin) }
     can :read
 
-    given { |user, session| self.context.grants_right?(user, session, :manage_grades) }
+    given { |user, session| context.grants_right?(user, session, :manage_grades) }
     can :grade and
       can :attach_submission_comment_files and
       can :manage_files_add and
@@ -1778,32 +1774,32 @@ class Assignment < ActiveRecord::Base
       can :manage_files_delete
 
     given do |user, session|
-      !self.context.root_account.feature_enabled?(:granular_permissions_manage_assignments) &&
-        self.context.grants_right?(user, session, :manage_assignments)
+      !context.root_account.feature_enabled?(:granular_permissions_manage_assignments) &&
+        context.grants_right?(user, session, :manage_assignments)
     end
     can :create and can :read
 
     given do |user, session|
-      self.context.root_account.feature_enabled?(:granular_permissions_manage_assignments) &&
-        self.context.grants_right?(user, session, :manage_assignments_add)
+      context.root_account.feature_enabled?(:granular_permissions_manage_assignments) &&
+        context.grants_right?(user, session, :manage_assignments_add)
     end
     can :create and can :read
 
-    given { |user, session| self.user_can_update?(user, session) }
+    given { |user, session| user_can_update?(user, session) }
     can :update
 
     given do |user, session|
-      !self.context.root_account.feature_enabled?(:granular_permissions_manage_assignments) &&
-        self.context.grants_right?(user, session, :manage_assignments) &&
-        (self.context.account_membership_allows(user) ||
+      !context.root_account.feature_enabled?(:granular_permissions_manage_assignments) &&
+        context.grants_right?(user, session, :manage_assignments) &&
+        (context.account_membership_allows(user) ||
          !in_closed_grading_period?)
     end
     can :delete
 
     given do |user, session|
-      self.context.root_account.feature_enabled?(:granular_permissions_manage_assignments) &&
-        self.context.grants_right?(user, session, :manage_assignments_delete) &&
-        (self.context.account_membership_allows(user) ||
+      context.root_account.feature_enabled?(:granular_permissions_manage_assignments) &&
+        context.grants_right?(user, session, :manage_assignments_delete) &&
+        (context.account_membership_allows(user) ||
          !in_closed_grading_period?)
     end
     can :delete
@@ -1819,16 +1815,16 @@ class Assignment < ActiveRecord::Base
   end
 
   def user_can_read_grades?(user, session = nil)
-    RequestCache.cache('user_can_read_grades', self, user, session) do
-      self.context.grants_right?(user, session, :view_all_grades) ||
-        (self.published? && self.context.grants_right?(user, session, :manage_grades))
+    RequestCache.cache("user_can_read_grades", self, user, session) do
+      context.grants_right?(user, session, :view_all_grades) ||
+        (published? && context.grants_right?(user, session, :manage_grades))
     end
   end
 
   def filter_attributes_for_user(hash, user, _session)
-    if (lock_info = self.locked_for?(user, :check_policies => true))
-      hash.delete('description') unless include_description?(user, lock_info)
-      hash['lock_info'] = lock_info
+    if (lock_info = locked_for?(user, check_policies: true))
+      hash.delete("description") unless include_description?(user, lock_info)
+      hash["lock_info"] = lock_info
     end
   end
 
@@ -1842,12 +1838,12 @@ class Assignment < ActiveRecord::Base
     users = context.participating_admins
 
     student_scope = students_with_visibility(context.participating_students_by_date)
-    student_scope = student_scope.where.not(:id => opts[:excluded_user_ids]) if opts[:excluded_user_ids]
+    student_scope = student_scope.where.not(id: opts[:excluded_user_ids]) if opts[:excluded_user_ids]
     applicable_students = student_scope.to_a
     users += applicable_students
 
     if opts[:include_observers]
-      users += User.observing_students_in_course(applicable_students.map(&:id), self.context_id)
+      users += User.observing_students_in_course(applicable_students.map(&:id), context_id)
       users += User.observing_full_course(context.id)
     end
 
@@ -1859,7 +1855,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def title_slug
-    CanvasTextHelper.truncate_text(title, :ellipsis => '')
+    CanvasTextHelper.truncate_text(title, ellipsis: "")
   end
 
   def self.title_and_id(str)
@@ -1875,8 +1871,8 @@ class Assignment < ActiveRecord::Base
     students = if group
                  group.users
                       .joins(:enrollments)
-                      .where(:enrollments => { :course_id => self.context })
-                      .merge(Course.instance_exec(&Course.reflections['admin_visible_student_enrollments'].scope).only(:where))
+                      .where(enrollments: { course_id: context })
+                      .merge(Course.instance_exec(&Course.reflections["admin_visible_student_enrollments"].scope).only(:where))
                       .order("users.id") # this helps with preventing deadlock with other things that touch lots of users
                       .distinct
                       .to_a
@@ -1888,9 +1884,9 @@ class Assignment < ActiveRecord::Base
   end
 
   def multiple_module_actions(student_ids, action, points = nil)
-    students = self.context.students.where(id: student_ids)
+    students = context.students.where(id: student_ids)
     students.each do |user|
-      self.context_module_action(user, action, points)
+      context_module_action(user, action, points)
     end
   end
 
@@ -1899,31 +1895,31 @@ class Assignment < ActiveRecord::Base
   end
 
   def submission_for_student_id(user_id)
-    self.all_submissions.where(user_id: user_id).first_or_initialize
+    all_submissions.where(user_id: user_id).first_or_initialize
   end
 
   def compute_grade_and_score(grade, score)
-    grade = nil if grade == ''
+    grade = nil if grade == ""
 
     if grade
-      score = self.grade_to_score(grade)
+      score = grade_to_score(grade)
     end
     if score
-      grade = self.score_to_grade(score, grade)
+      grade = score_to_grade(score, grade)
     end
     [grade, score]
   end
 
   def grade_student(original_student, opts = {})
-    raise GradeError.new("Student is required") unless original_student
+    raise GradeError, "Student is required" unless original_student
     unless context.includes_user?(original_student, context.admin_visible_student_enrollments) # allows inactive users to be graded
-      raise GradeError.new("Student must be enrolled in the course as a student to be graded")
+      raise GradeError, "Student must be enrolled in the course as a student to be graded"
     end
-    raise GradeError.new("Grader must be enrolled as a course admin") if opts[:grader] && !self.context.grants_right?(opts[:grader], :manage_grades)
+    raise GradeError, "Grader must be enrolled as a course admin" if opts[:grader] && !context.grants_right?(opts[:grader], :manage_grades)
 
     opts[:excused] = Canvas::Plugin.value_to_boolean(opts.delete(:excuse)) if opts.key? :excuse
-    raise GradeError.new("Cannot simultaneously grade and excuse an assignment") if opts[:excused] && (opts[:grade] || opts[:score])
-    raise GradeError.new("Provisional grades require a grader") if opts[:provisional] && opts[:grader].nil?
+    raise GradeError, "Cannot simultaneously grade and excuse an assignment" if opts[:excused] && (opts[:grade] || opts[:score])
+    raise GradeError, "Provisional grades require a grader" if opts[:provisional] && opts[:grader].nil?
 
     opts.delete(:id)
     group, students = group_students(original_student)
@@ -1963,7 +1959,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def tool_settings_tool
-    self.tool_settings_tools.first
+    tool_settings_tools.first
   end
 
   def tool_settings_tool=(tool)
@@ -1985,7 +1981,7 @@ class Assignment < ActiveRecord::Base
           tool_vendor_code: product_family.vendor_code,
           tool_product_code: product_family.product_code,
           tool_resource_type_code: t.resource_handler.resource_type_code,
-          tool_type: 'Lti::MessageHandler',
+          tool_type: "Lti::MessageHandler",
           context_type: t.tool_proxy.context_type
         )
       end
@@ -1999,7 +1995,7 @@ class Assignment < ActiveRecord::Base
   protected :tool_settings_tools
 
   def tool_settings_message_handlers
-    assignment_configuration_tool_lookups.where(tool_type: 'Lti::MessageHandler').map(&:lti_tool)
+    assignment_configuration_tool_lookups.where(tool_type: "Lti::MessageHandler").map(&:lti_tool)
   end
   private :tool_settings_message_handlers
 
@@ -2062,12 +2058,12 @@ class Assignment < ActiveRecord::Base
     end
     submission.group = group
     submission.grade_posting_in_progress = opts.fetch(:grade_posting_in_progress, false)
-    previously_graded ? submission.with_versioning(:explicit => true) { submission.save! } : submission.save!
+    previously_graded ? submission.with_versioning(explicit: true) { submission.save! } : submission.save!
     submission.audit_grade_changes = false
 
     if opts[:provisional]
-      unless score.present? || submission.excused
-        raise GradeError, error_code: GradeError::PROVISIONAL_GRADE_INVALID_SCORE unless opts[:grade] == ""
+      if !(score.present? || submission.excused) && opts[:grade] != ""
+        raise GradeError, error_code: GradeError::PROVISIONAL_GRADE_INVALID_SCORE
       end
 
       submission.find_or_create_provisional_grade!(
@@ -2087,7 +2083,7 @@ class Assignment < ActiveRecord::Base
   def find_or_create_submission(user)
     Assignment.unique_constraint_retry do
       s = all_submissions.where(user_id: user).first
-      if !s
+      unless s
         s = submissions.build
         user.is_a?(User) ? s.user = user : s.user_id = user
         s.save!
@@ -2097,13 +2093,17 @@ class Assignment < ActiveRecord::Base
   end
 
   def find_or_create_submissions(students, relation = nil)
-    submissions = self.all_submissions.where(user_id: students)
+    submissions = all_submissions.where(user_id: students)
     submissions = submissions.merge(relation) if relation
     submissions_hash = submissions.to_a.index_by(&:user_id)
     submissions = []
     students.each do |student|
       submission = submissions_hash[student.id]
-      if !submission
+      if submission
+        submission.assignment = self
+        submission.user = student
+        yield submission if block_given?
+      else
         begin
           transaction(requires_new: true) do
             submission = self.submissions.build(user: student)
@@ -2112,17 +2112,13 @@ class Assignment < ActiveRecord::Base
             submission.without_versioning(&:save) if submission.changed?
           end
         rescue ActiveRecord::RecordNotUnique
-          submission = self.all_submissions.where(user_id: student).first
+          submission = all_submissions.where(user_id: student).first
           raise unless submission
 
           submission.assignment = self
           submission.user = student
           yield submission if block_given?
         end
-      else
-        submission.assignment = self
-        submission.user = student
-        yield submission if block_given?
       end
       submissions << submission
     end
@@ -2130,10 +2126,10 @@ class Assignment < ActiveRecord::Base
   end
 
   def find_asset_for_assessment(association, user_or_user_id, opts = {})
-    user = user_or_user_id.is_a?(User) ? user_or_user_id : self.context.users.where(id: user_or_user_id).first
+    user = user_or_user_id.is_a?(User) ? user_or_user_id : context.users.where(id: user_or_user_id).first
     if association.purpose == "grading"
       if user
-        sub = self.find_or_create_submission(user)
+        sub = find_or_create_submission(user)
         if opts[:provisional_grader]
           [sub.find_or_create_provisional_grade!(opts[:provisional_grader], final: opts[:final]), user]
         else
@@ -2157,9 +2153,9 @@ class Assignment < ActiveRecord::Base
       submissions: []
     }
 
-    if opts[:comment] && opts[:assessment_request]
+    if opts[:comment] && opts[:assessment_request] && !opts[:assessment_request].active_rubric_association?
       # if there is no rubric the peer review is complete with just a comment
-      opts[:assessment_request].complete unless opts[:assessment_request].active_rubric_association?
+      opts[:assessment_request].complete
     end
 
     # commenting on a student submission results in a teacher occupying a
@@ -2194,7 +2190,7 @@ class Assignment < ActiveRecord::Base
   def save_comment_to_submission(submission, group, opts, uuid = nil)
     # Only teachers (those who can manage grades) can have hidden comments
     unless opts.key?(:hidden)
-      opts[:hidden] = submission.hide_grade_from_student? && self.context.grants_right?(opts[:author], :manage_grades)
+      opts[:hidden] = submission.hide_grade_from_student? && context.grants_right?(opts[:author], :manage_grades)
     end
     submission.group = group
     submission.save! if submission.changed?
@@ -2219,18 +2215,18 @@ class Assignment < ActiveRecord::Base
 
     if opts[:submission_type] == "student_annotation"
       raise "Invalid Attachment" if opts[:annotatable_attachment_id].blank?
-      raise "Invalid submission type" unless self.annotated_document?
+      raise "Invalid submission type" unless annotated_document?
       # Prevent the case where a user clicks Submit on a stale tab, expecting
       # to submit one set of work, only for another set to be submitted
       # instead.
-      raise "Invalid Attachment" if opts[:annotatable_attachment_id].to_i != self.annotatable_attachment_id
+      raise "Invalid Attachment" if opts[:annotatable_attachment_id].to_i != annotatable_attachment_id
     end
 
     # Only allow a few fields to be submitted.  Cannot submit the grade of a
     # homework assignment, for instance.
-    opts.keys.each { |k|
+    opts.each_key do |k|
       opts.delete(k) unless ALLOWABLE_SUBMIT_HOMEWORK_OPTS.include?(k.to_s)
-    }
+    end
 
     comment = opts.delete(:comment)
     group_comment = opts.delete(:group_comment)
@@ -2275,11 +2271,11 @@ class Assignment < ActiveRecord::Base
           homework.turnitin_data.delete(:webhook_info)
         end
 
-        if self.annotated_document?
+        if annotated_document?
           annotation_context = homework.annotation_context(draft: true)
         end
 
-        homework.with_versioning(:explicit => (homework.submission_type != "discussion_topic")) do
+        homework.with_versioning(explicit: (homework.submission_type != "discussion_topic")) do
           if group
             Submission.suspend_callbacks(:delete_submission_drafts!) do
               is_primary_student ? homework.broadcast_group_submission : homework.save_without_broadcasting!
@@ -2295,14 +2291,14 @@ class Assignment < ActiveRecord::Base
     end
     homeworks.each do |homework|
       context_module_action(homework.student, homework.workflow_state.to_sym)
-      if comment && (group_comment || homework == primary_homework)
-        hash = { :comment => comment, :author => original_student }
-        hash[:group_comment_id] = CanvasSlug.generate_securish_uuid if group_comment && group
-        homework.add_comment(hash)
-      end
+      next unless comment && (group_comment || homework == primary_homework)
+
+      hash = { comment: comment, author: original_student }
+      hash[:group_comment_id] = CanvasSlug.generate_securish_uuid if group_comment && group
+      homework.add_comment(hash)
     end
     touch_context
-    return primary_homework
+    primary_homework
   end
 
   def submission_attributes(opts, group)
@@ -2312,21 +2308,21 @@ class Assignment < ActiveRecord::Base
                 when "online_url", "basic_lti_launch"
                   opts[:url].present?
                 when "online_upload"
-                  opts[:attachments].size > 0
+                  !opts[:attachments].empty?
                 else
                   true
                 end
 
     opts.merge({
-                 :attachment => nil,
-                 :processed => false,
-                 :workflow_state => submitted ? "submitted" : "unsubmitted",
-                 :group => group
+                 attachment: nil,
+                 processed: false,
+                 workflow_state: submitted ? "submitted" : "unsubmitted",
+                 group: group
                })
   end
 
   def submissions_downloaded?
-    self.submissions_downloads && self.submissions_downloads > 0
+    submissions_downloads && submissions_downloads > 0
   end
 
   def serializable_hash(opts = {})
@@ -2337,31 +2333,31 @@ class Assignment < ActiveRecord::Base
     json = super(options)
     return json unless json
 
-    if json['assignment']
+    if json["assignment"]
       # remove anything coming automatically from deprecated db column
-      json['assignment'].delete('group_category')
-      if self.group_category
+      json["assignment"].delete("group_category")
+      if group_category
         # put back version from association
-        json['assignment']['group_category'] = self.group_category.name
-      elsif self.read_attribute('group_category').present?
+        json["assignment"]["group_category"] = group_category.name
+      elsif read_attribute("group_category").present?
         # or failing that, version from query
-        json['assignment']['group_category'] = self.read_attribute('group_category')
+        json["assignment"]["group_category"] = read_attribute("group_category")
       end
 
-      if json.dig('assignment', 'rubric_association') && !active_rubric_association?
-        json['assignment'].delete('rubric_association')
+      if json.dig("assignment", "rubric_association") && !active_rubric_association?
+        json["assignment"].delete("rubric_association")
       end
     end
 
-    if json['rubric_association'] && !active_rubric_association?
-      json.delete('rubric_association')
+    if json["rubric_association"] && !active_rubric_association?
+      json.delete("rubric_association")
     end
 
     json
   end
 
   def lti_safe_description
-    description&.truncate(1000, omission: '... (truncated)')
+    description&.truncate(1000, omission: "... (truncated)")
   end
 
   def grades_published?
@@ -2369,22 +2365,22 @@ class Assignment < ActiveRecord::Base
   end
 
   def sections_with_visibility(user)
-    return context.active_course_sections unless self.differentiated_assignments_applies?
+    return context.active_course_sections unless differentiated_assignments_applies?
 
     visible_student_ids = visible_students_for_speed_grader(user: user).map(&:id)
     context.active_course_sections.joins(:student_enrollments)
-           .where(:enrollments => { :user_id => visible_student_ids, :type => "StudentEnrollment" }).distinct.reorder("name")
+           .where(enrollments: { user_id: visible_student_ids, type: "StudentEnrollment" }).distinct.reorder("name")
   end
 
   # quiz submission versions are too expensive to de-serialize so we have to
   # cap the number we will do
   def too_many_qs_versions?(student_submissions)
     qs_threshold = Setting.get("too_many_quiz_submission_versions", "150").to_i
-    qs_ids = student_submissions.map(&:quiz_submission_id).compact
+    qs_ids = student_submissions.filter_map(&:quiz_submission_id)
     return false if qs_ids.empty?
 
     Version.shard(shard).from(Version
-        .where(versionable_type: 'Quizzes::QuizSubmission', versionable_id: qs_ids)
+        .where(versionable_type: "Quizzes::QuizSubmission", versionable_id: qs_ids)
         .limit(qs_threshold)).count >= qs_threshold
   end
 
@@ -2396,7 +2392,7 @@ class Assignment < ActiveRecord::Base
     submissions_with_qs = student_submissions.select do |sub|
       quiz && sub.quiz_submission && !too_many_qs_versions
     end
-    qs_versions = Version.where(versionable_type: 'Quizzes::QuizSubmission',
+    qs_versions = Version.where(versionable_type: "Quizzes::QuizSubmission",
                                 versionable_id: submissions_with_qs.map(&:quiz_submission))
                          .order(:number)
 
@@ -2417,7 +2413,7 @@ class Assignment < ActiveRecord::Base
   # for group assignments, returns a single "student" for each
   # group's submission.  the students name will be changed to the group's
   # name.  for non-group assignments this just returns all visible users
-  def representatives(user:, includes: [:inactive], group_id: nil, section_id: nil)
+  def representatives(user:, includes: [:inactive], group_id: nil, section_id: nil, &block)
     return visible_students_for_speed_grader(user: user, includes: includes, group_id: group_id, section_id: section_id) unless grade_as_group?
 
     submissions = self.submissions.to_a
@@ -2438,15 +2434,15 @@ class Assignment < ActiveRecord::Base
     user_ids_who_arent_excused = submissions.reject(&:excused?).map(&:user_id).to_set
 
     enrollment_state =
-      Hash[self.context.all_accepted_student_enrollments.pluck(:user_id, :workflow_state)]
+      context.all_accepted_student_enrollments.pluck(:user_id, :workflow_state).to_h
 
     # prefer active over inactive, inactive over everything else
-    enrollment_priority = { 'active' => 1, 'inactive' => 2 }
+    enrollment_priority = { "active" => 1, "inactive" => 2 }
     enrollment_priority.default = 100
 
     visible_student_ids = visible_students_for_speed_grader(user: user, includes: includes).map(&:id).to_set
 
-    reps_and_others = groups_and_ungrouped(user, includes: includes).map do |group_name, group_info|
+    reps_and_others = groups_and_ungrouped(user, includes: includes).filter_map do |group_name, group_info|
       group_students = group_info[:users]
       visible_group_students = group_students.select { |u| visible_student_ids.include?(u.id) }
 
@@ -2466,12 +2462,12 @@ class Assignment < ActiveRecord::Base
       representative.short_name = group_name
 
       [representative, others]
-    end.compact
+    end
 
     sorted_reps_with_others =
       Canvas::ICU.collate_by(reps_and_others) { |rep, _| rep.sortable_name }
-    if block_given?
-      sorted_reps_with_others.each { |r, o| yield r, o }
+    if block
+      sorted_reps_with_others.each(&block)
     end
     sorted_reps_with_others.map(&:first)
   end
@@ -2519,19 +2515,19 @@ class Assignment < ActiveRecord::Base
   def visible_rubric_assessments_for(user, opts = {})
     return [] unless user && active_rubric_association?
 
-    scope = self.rubric_association.rubric_assessments.preload(:assessor)
+    scope = rubric_association.rubric_assessments.preload(:assessor)
 
     if opts[:provisional_grader]
-      scope = scope.for_provisional_grades.where(:assessor_id => user.id)
+      scope = scope.for_provisional_grades.where(assessor_id: user.id)
     elsif opts[:provisional_moderator]
       scope = scope.for_provisional_grades
     else
       scope = scope.for_submissions
-      unless self.rubric_association.grants_any_right?(user, :manage, :view_rubric_assessments)
-        scope = scope.where(:assessor_id => user.id)
+      unless rubric_association.grants_any_right?(user, :manage, :view_rubric_assessments)
+        scope = scope.where(assessor_id: user.id)
       end
     end
-    scope.to_a.sort_by { |a| [a.assessment_type == 'grading' ? CanvasSort::First : CanvasSort::Last, Canvas::ICU.collation_key(a.assessor_name)] }
+    scope.to_a.sort_by { |a| [a.assessment_type == "grading" ? CanvasSort::First : CanvasSort::Last, Canvas::ICU.collation_key(a.assessor_name)] }
   end
 
   # Takes a zipped file full of assignment comments/annotated assignments
@@ -2559,7 +2555,7 @@ class Assignment < ActiveRecord::Base
     zip_extractor = ZipExtractor.new(file.path)
     # Creates a list of hashes, each one with a :user, :filename, and :submission entry.
     @ignored_files = []
-    file_map = zip_extractor.unzip_files.map { |f| infer_comment_context_from_filename(f) }.compact
+    file_map = zip_extractor.unzip_files.filter_map { |f| infer_comment_context_from_filename(f) }
     files_for_user = file_map.group_by { |f| f[:user] }
 
     comments = []
@@ -2618,7 +2614,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def group_category_name
-    self.read_attribute(:group_category)
+    read_attribute(:group_category)
   end
 
   def maintain_group_category_attribute
@@ -2626,21 +2622,21 @@ class Assignment < ActiveRecord::Base
     # exists solely for the migration that introduces the GroupCategory model).
     # this way group_category_name is correct if someone mistakenly uses it
     # (modulo category renaming in the GroupCategory model).
-    self.write_attribute(:group_category, self.group_category && self.group_category.name)
+    write_attribute(:group_category, group_category&.name)
   end
 
   def has_group_category?
-    self.group_category_id.present?
+    group_category_id.present?
   end
 
   def assign_peer_review(reviewer, reviewee)
-    reviewer_submission = self.find_or_create_submission(reviewer)
-    reviewee_submission = self.find_or_create_submission(reviewee)
+    reviewer_submission = find_or_create_submission(reviewer)
+    reviewee_submission = find_or_create_submission(reviewee)
     reviewee_submission.assign_assessor(reviewer_submission)
   end
 
   def assign_peer_reviews
-    return [] unless self.peer_review_count && self.peer_review_count > 0
+    return [] unless peer_review_count && peer_review_count > 0
 
     # there could be any conceivable configuration of peer reviews already
     # assigned when this method is called, since teachers can assign individual
@@ -2656,7 +2652,7 @@ class Assignment < ActiveRecord::Base
     # reviews.
     peer_review_params[:submissions].sort_by { rand }.each do |submission|
       existing = submission.assigned_assessments
-      needed = self.peer_review_count - existing.size
+      needed = peer_review_count - existing.size
       next if needed <= 0
 
       # candidate_set is all submissions for the assignment that this
@@ -2682,7 +2678,7 @@ class Assignment < ActiveRecord::Base
     unless @next_auto_peer_review_date
       self.peer_reviews_assigned = true
     end
-    self.save
+    save
     res
   end
 
@@ -2698,7 +2694,7 @@ class Assignment < ActiveRecord::Base
     { student_ids: student_ids,
       submissions: submissions,
       submission_ids: Set.new(submissions.pluck(:id)),
-      assessor_id_map: Hash[submissions.map { |s| [s.id, s.assessment_requests.map(&:assessor_asset_id)] }] }
+      assessor_id_map: submissions.map { |s| [s.id, s.assessment_requests.map(&:assessor_asset_id)] }.to_h }
   end
 
   def sorted_review_candidates(peer_review_params, current_submission, candidate_set)
@@ -2709,7 +2705,7 @@ class Assignment < ActiveRecord::Base
     candidates_for_review.sort_by do |c|
       [
         # prefer those who need reviews done
-        assessor_id_map[c.id].count < self.peer_review_count ? CanvasSort::First : CanvasSort::Last,
+        assessor_id_map[c.id].count < peer_review_count ? CanvasSort::First : CanvasSort::Last,
         # then prefer those who are not reviewing this submission
         assessor_id_map[current_submission.id].include?(c.id) ? CanvasSort::Last : CanvasSort::First,
         # then prefer those who need the most reviews done (that way we don't run the risk of
@@ -2730,21 +2726,19 @@ class Assignment < ActiveRecord::Base
     # don't assign to ourselves
     candidate_set.delete(current_submission.id)
 
-    if self.group_category_id && !self.intra_group_peer_reviews
+    if group_category_id && !intra_group_peer_reviews
       if current_submission.group_id
         # don't assign to our group partners (assuming we have a group)
         group_ids = peer_review_params[:submissions].select { |s| candidate_set.include?(s.id) && current_submission.group_id == s.group_id }.map(&:id)
         candidate_set -= group_ids
       end
-    else
-      if self.discussion_topic? && self.discussion_topic.group_category_id
-        # only assign to other members in the group discussion
-        child_topic = self.discussion_topic.child_topic_for(current_submission.user)
-        if child_topic
-          other_member_ids = child_topic.discussion_entries.except(:order).active.distinct.pluck(:user_id)
-          candidate_set = candidate_set & peer_review_params[:submissions].select { |s| other_member_ids.include?(s.user_id) }.map(&:id)
-        end
+    elsif discussion_topic? && discussion_topic.group_category_id
+      child_topic = discussion_topic.child_topic_for(current_submission.user)
+      if child_topic
+        other_member_ids = child_topic.discussion_entries.except(:order).active.distinct.pluck(:user_id)
+        candidate_set &= peer_review_params[:submissions].select { |s| other_member_ids.include?(s.user_id) }.map(&:id)
       end
+      # only assign to other members in the group discussion
     end
     candidate_set
   end
@@ -2762,21 +2756,21 @@ class Assignment < ActiveRecord::Base
   def auto_peer_review_dates
     # When a date is specified for assigning peer reviews, that is the ONLY
     # date that should be used.
-    return [self.peer_reviews_assign_at] if self.peer_reviews_assign_at.present?
+    return [peer_reviews_assign_at] if peer_reviews_assign_at.present?
 
     # When the `due_at` on the assignment applies to some assignees, it should
     # be used as one of the dates for automatic peer review assignment.
     dates = []
-    dates.push(self.due_at) unless self.due_at.blank? || self.only_visible_to_overrides?
+    dates.push(due_at) unless due_at.blank? || only_visible_to_overrides?
 
     # Each unique override date is likely a time at which peer reviews will
     # need to be assigned.
-    override_dates = self.assignment_overrides
-                         .active
-                         .where(due_at_overridden: true)
-                         .where.not(due_at: nil)
-                         .distinct
-                         .pluck(:due_at)
+    override_dates = assignment_overrides
+                     .active
+                     .where(due_at_overridden: true)
+                     .where.not(due_at: nil)
+                     .distinct
+                     .pluck(:due_at)
 
     # Return all of the unique dates from above in chronological order.
     (dates + override_dates).sort.uniq
@@ -2793,10 +2787,10 @@ class Assignment < ActiveRecord::Base
   end
 
   def has_peer_reviews?
-    self.peer_reviews
+    peer_reviews
   end
 
-  scope :include_submitted_count, -> {
+  scope :include_submitted_count, lambda {
                                     select(
                                       "assignments.*, (SELECT COUNT(*) FROM #{Submission.quoted_table_name}
     WHERE assignments.id = submissions.assignment_id
@@ -2805,7 +2799,7 @@ class Assignment < ActiveRecord::Base
                                     )
                                   }
 
-  scope :include_graded_count, -> {
+  scope :include_graded_count, lambda {
                                  select(
                                    "assignments.*, (SELECT COUNT(*) FROM #{Submission.quoted_table_name}
     WHERE assignments.id = submissions.assignment_id
@@ -2826,7 +2820,7 @@ class Assignment < ActiveRecord::Base
   }
 
   scope :starting_with_title, lambda { |title|
-    where('title ILIKE ?', "#{title}%")
+    where("title ILIKE ?", "#{title}%")
   }
 
   scope :having_submissions_for_user, lambda { |user|
@@ -2834,23 +2828,23 @@ class Assignment < ActiveRecord::Base
   }
 
   scope :by_assignment_group_id, lambda { |group_id|
-    where('assignment_group_id = ?', group_id.to_s)
+    where(assignment_group_id: group_id.to_s)
   }
 
   # assignments only ever belong to courses, so we can reduce this to just IDs to simplify the db query
-  scope :for_context_codes, ->(codes) do
-    ids = codes.map do |code|
+  scope :for_context_codes, lambda { |codes|
+    ids = codes.filter_map do |code|
       type, id = parse_asset_string(code)
-      next unless type == 'Course'
+      next unless type == "Course"
 
       id
-    end.compact
+    end
     next none if ids.empty?
 
     for_course(ids)
-  end
-  scope :for_course, lambda { |course_id| where(:context_type => 'Course', :context_id => course_id) }
-  scope :for_group_category, lambda { |group_category_id| where(:group_category_id => group_category_id) }
+  }
+  scope :for_course, ->(course_id) { where(context_type: "Course", context_id: course_id) }
+  scope :for_group_category, ->(group_category_id) { where(group_category_id: group_category_id) }
 
   scope :visible_to_students_in_course_with_da, lambda { |user_id, course_id|
     if Account.site_admin.feature_enabled?(:visible_assignments_scope_change)
@@ -2864,12 +2858,12 @@ class Assignment < ActiveRecord::Base
   # course_ids should be courses that restrict visibility based on overrides
   # ie: courses with differentiated assignments on or in which the user is not a teacher
   scope :filter_by_visibilities_in_given_courses, lambda { |user_ids, course_ids_that_have_da_enabled|
-    if course_ids_that_have_da_enabled.nil? || course_ids_that_have_da_enabled.empty?
+    if course_ids_that_have_da_enabled.blank?
       active
     else
-      user_ids = Array.wrap(user_ids).join(',')
-      course_ids = Array.wrap(course_ids_that_have_da_enabled).join(',')
-      scope = joins(sanitize_sql([<<~SQL, course_ids, user_ids]))
+      user_ids = Array.wrap(user_ids).join(",")
+      course_ids = Array.wrap(course_ids_that_have_da_enabled).join(",")
+      scope = joins(sanitize_sql([<<~SQL.squish, course_ids, user_ids]))
         LEFT OUTER JOIN #{AssignmentStudentVisibility.quoted_table_name} ON (
          assignment_student_visibilities.assignment_id = assignments.id
          AND assignment_student_visibilities.course_id IN (%s)
@@ -2879,20 +2873,20 @@ class Assignment < ActiveRecord::Base
     end
   }
 
-  scope :due_before, lambda { |date| where("assignments.due_at<?", date) }
+  scope :due_before, ->(date) { where("assignments.due_at<?", date) }
 
-  scope :due_after, lambda { |date| where("assignments.due_at>?", date) }
-  scope :undated, -> { where(:due_at => nil) }
+  scope :due_after, ->(date) { where("assignments.due_at>?", date) }
+  scope :undated, -> { where(due_at: nil) }
 
-  scope :with_just_calendar_attributes, -> {
-    select(((Assignment.column_names & CalendarEvent.column_names) + ['due_at', 'assignment_group_id', 'could_be_locked', 'unlock_at', 'lock_at', 'submission_types', '(freeze_on_copy AND copied) AS frozen'] - ['cloned_item_id', 'migration_id']).join(", "))
+  scope :with_just_calendar_attributes, lambda {
+    select(((Assignment.column_names & CalendarEvent.column_names) + ["due_at", "assignment_group_id", "could_be_locked", "unlock_at", "lock_at", "submission_types", "(freeze_on_copy AND copied) AS frozen"] - ["cloned_item_id", "migration_id"]).join(", "))
   }
 
-  scope :due_between, lambda { |start, ending| where(:due_at => start..ending) }
+  scope :due_between, ->(start, ending) { where(due_at: start..ending) }
 
   # Return all assignments and their active overrides where either the
   # assignment or one of its overrides is due between start and ending.
-  scope :due_between_with_overrides, ->(start, ending) do
+  scope :due_between_with_overrides, lambda { |start, ending|
     overrides_subquery = AssignmentOverride.where("assignment_id=assignments.id")
                                            .where(due_at_overridden: true, due_at: start..ending)
 
@@ -2907,27 +2901,27 @@ class Assignment < ActiveRecord::Base
         from: true
       )
     end
-  end
+  }
 
-  scope :due_between_for_user, ->(start, ending, user) do
+  scope :due_between_for_user, lambda { |start, ending, user|
     with_user_due_date(user).where(user_due_date: start..ending)
-  end
+  }
 
-  scope :with_user_due_date, ->(user) do
+  scope :with_user_due_date, lambda { |user|
     from("(SELECT s.cached_due_date AS user_due_date, a.*
           FROM #{Assignment.quoted_table_name} a
           INNER JOIN #{Submission.quoted_table_name} AS s ON s.assignment_id = a.id
           WHERE s.user_id = #{User.connection.quote(user)} AND s.workflow_state <> 'deleted') AS assignments")
-  end
+  }
 
-  scope :with_latest_due_date, -> do
+  scope :with_latest_due_date, lambda {
     from("(SELECT GREATEST(a.due_at, MAX(ao.due_at)) latest_due_date, a.*
           FROM #{Assignment.quoted_table_name} a
           LEFT JOIN #{AssignmentOverride.quoted_table_name} ao
           ON ao.assignment_id = a.id
           AND ao.due_at_overridden
           GROUP BY a.id) AS assignments")
-  end
+  }
 
   scope :updated_after, lambda { |*args|
     if args.first
@@ -2939,9 +2933,9 @@ class Assignment < ActiveRecord::Base
 
   scope :not_ignored_by, lambda { |user, purpose|
     where("NOT EXISTS (?)",
-          Ignore.where(asset_type: 'Assignment',
+          Ignore.where(asset_type: "Assignment",
                        user_id: user,
-                       purpose: purpose).where('asset_id=assignments.id'))
+                       purpose: purpose).where("asset_id=assignments.id"))
   }
 
   # the map on the API_NEEDED_FIELDS here is because PostgreSQL will see the
@@ -2967,53 +2961,53 @@ class Assignment < ActiveRecord::Base
     chain.preload(:context)
   }
 
-  scope :expecting_submission, -> do
-    where.not(submission_types: [nil, ''] + %w(none not_graded on_paper wiki_page))
-  end
-
-  scope :gradeable, -> { where.not(submission_types: %w(not_graded wiki_page)) }
-
-  scope :active, -> { where.not(workflow_state: 'deleted') }
-  scope :before, lambda { |date| where("assignments.created_at<?", date) }
-
-  scope :not_locked, -> {
-    where("(assignments.unlock_at IS NULL OR assignments.unlock_at<:now) AND (assignments.lock_at IS NULL OR assignments.lock_at>:now)",
-          :now => Time.zone.now)
+  scope :expecting_submission, lambda {
+    where.not(submission_types: [nil, ""] + %w[none not_graded on_paper wiki_page])
   }
 
-  scope :unpublished, -> { where(:workflow_state => 'unpublished') }
-  scope :published, -> { where(:workflow_state => 'published') }
+  scope :gradeable, -> { where.not(submission_types: %w[not_graded wiki_page]) }
 
-  scope :duplicating_for_too_long, -> {
+  scope :active, -> { where.not(workflow_state: "deleted") }
+  scope :before, ->(date) { where("assignments.created_at<?", date) }
+
+  scope :not_locked, lambda {
+    where("(assignments.unlock_at IS NULL OR assignments.unlock_at<:now) AND (assignments.lock_at IS NULL OR assignments.lock_at>:now)",
+          now: Time.zone.now)
+  }
+
+  scope :unpublished, -> { where(workflow_state: "unpublished") }
+  scope :published, -> { where(workflow_state: "published") }
+
+  scope :duplicating_for_too_long, lambda {
     where(
       "workflow_state = 'duplicating' AND duplication_started_at < ?",
-      Setting.get('quizzes_next_timeout_minutes', '15').to_i.minutes.ago
+      Setting.get("quizzes_next_timeout_minutes", "15").to_i.minutes.ago
     )
   }
 
-  scope :importing_for_too_long, -> {
+  scope :importing_for_too_long, lambda {
     where(
       "workflow_state = 'importing' AND importing_started_at < ?",
-      Setting.get('quizzes_next_timeout_minutes', '15').to_i.minutes.ago
+      Setting.get("quizzes_next_timeout_minutes", "15").to_i.minutes.ago
     )
   }
 
-  scope :migrating_for_too_long, -> {
+  scope :migrating_for_too_long, lambda {
     where(
       "workflow_state = 'migrating' AND duplication_started_at < ?",
-      Setting.get('quizzes_next_timeout_minutes', '15').to_i.minutes.ago
+      Setting.get("quizzes_next_timeout_minutes", "15").to_i.minutes.ago
     )
   }
 
-  scope :quiz_lti, -> {
+  scope :quiz_lti, lambda {
     type_quiz_lti.where(submission_types: "external_tool")
   }
 
-  scope :with_important_dates, -> {
+  scope :with_important_dates, lambda {
     joins("LEFT JOIN #{AssignmentOverride.quoted_table_name} ON assignment_overrides.assignment_id=assignments.id")
       .where(important_dates: true)
       .where(
-        'assignments.due_at IS NOT NULL OR (assignment_overrides.due_at IS NOT NULL AND assignment_overrides.due_at_overridden)'
+        "assignments.due_at IS NOT NULL OR (assignment_overrides.due_at IS NOT NULL AND assignment_overrides.due_at_overridden)"
       )
   }
 
@@ -3024,7 +3018,7 @@ class Assignment < ActiveRecord::Base
   def readable_submission_types
     return nil unless expects_submission? || expects_external_submission?
 
-    res = (self.submission_types || "").split(",").map { |s| readable_submission_type(s) }.compact
+    res = (self.submission_types || "").split(",").filter_map { |s| readable_submission_type(s) }
     res.to_sentence(:or)
   end
 
@@ -3034,26 +3028,26 @@ class Assignment < ActiveRecord::Base
 
   def readable_submission_type(submission_type)
     case submission_type
-    when 'online_quiz'
-      t 'submission_types.a_quiz', "a quiz"
-    when 'online_upload'
-      t 'submission_types.a_file_upload', "a file upload"
-    when 'online_text_entry'
-      t 'submission_types.a_text_entry_box', "a text entry box"
-    when 'online_url'
-      t 'submission_types.a_website_url', "a website url"
-    when 'student_annotation'
-      t 'student_annotation', "a student annotation"
-    when 'discussion_topic'
-      t 'submission_types.a_discussion_post', "a discussion post"
-    when 'wiki_page'
-      t 'submission_types.a_content_page', "a content page"
-    when 'media_recording'
-      t 'submission_types.a_media_recording', "a media recording"
-    when 'on_paper'
-      t 'submission_types.on_paper', "on paper"
-    when 'external_tool'
-      t 'submission_types.external_tool', "an external tool"
+    when "online_quiz"
+      t "submission_types.a_quiz", "a quiz"
+    when "online_upload"
+      t "submission_types.a_file_upload", "a file upload"
+    when "online_text_entry"
+      t "submission_types.a_text_entry_box", "a text entry box"
+    when "online_url"
+      t "submission_types.a_website_url", "a website url"
+    when "student_annotation"
+      t "student_annotation", "a student annotation"
+    when "discussion_topic"
+      t "submission_types.a_discussion_post", "a discussion post"
+    when "wiki_page"
+      t "submission_types.a_content_page", "a content page"
+    when "media_recording"
+      t "submission_types.a_media_recording", "a media recording"
+    when "on_paper"
+      t "submission_types.on_paper", "on paper"
+    when "external_tool"
+      t "submission_types.external_tool", "an external tool"
     else
       nil
     end
@@ -3063,11 +3057,11 @@ class Assignment < ActiveRecord::Base
   def expects_submission?
     submission_types.present? &&
       !expects_external_submission? &&
-      !%w(none not_graded wiki_page).include?(submission_types)
+      !%w[none not_graded wiki_page].include?(submission_types)
   end
 
   def expects_external_submission?
-    %w(on_paper external_tool).include?(submission_types)
+    %w[on_paper external_tool].include?(submission_types)
   end
 
   def non_digital_submission?
@@ -3075,7 +3069,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def allow_google_docs_submission?
-    submission_types&.include?('online_upload')
+    submission_types&.include?("online_upload")
   end
 
   def <=>(comparable)
@@ -3087,29 +3081,31 @@ class Assignment < ActiveRecord::Base
     [due_at || CanvasSort::Last, Canvas::ICU.collation_key(title)]
   end
 
-  def special_class; nil; end
+  def special_class
+    nil
+  end
 
   def submission_action_string
     if submission_types == "online_quiz"
-      t :submission_action_take_quiz, "Take %{title}", :title => title
+      t :submission_action_take_quiz, "Take %{title}", title: title
     elsif graded? && expects_submission?
-      t :submission_action_turn_in_assignment, "Turn in %{title}", :title => title
+      t :submission_action_turn_in_assignment, "Turn in %{title}", title: title
     else
-      t "Complete %{title}", :title => title
+      t "Complete %{title}", title: title
     end
   end
 
   # Infers the user, submission, and attachment from a filename
   def infer_comment_context_from_filename(fullpath)
     filename = File.basename(fullpath)
-    split_filename = filename.split('_') - ['LATE']
+    split_filename = filename.split("_") - ["LATE"]
     # If the filename is like Richards_David_2_link.html, then there is no
     # useful attachment here.  The assignment was submitted as a URL and the
     # teacher commented directly with the gradebook.  Otherwise, grab that
     # last value and strip off everything after the first period.
 
     attachment_id, user, submission = nil
-    if split_filename.first == 'anon'
+    if split_filename.first == "anon"
       anon_id, attachment_id = split_filename[1, 2]
       submission = Submission.active.where(assignment_id: self, anonymous_id: anon_id).first
       user = submission&.user
@@ -3126,25 +3122,25 @@ class Assignment < ActiveRecord::Base
 
     if !attachment || !submission ||
        !attachment.grants_right?(user, :read) ||
-       !submission.attachments.where(:id => attachment_id).exists?
+       !submission.attachments.where(id: attachment_id).exists?
       @ignored_files << fullpath
       return nil
     end
 
     {
-      :user => user,
-      :submission => submission,
-      :filename => fullpath,
-      :display_name => attachment.display_name
+      user: user,
+      submission: submission,
+      filename: fullpath,
+      display_name: attachment.display_name
     }
   end
   protected :infer_comment_context_from_filename
 
-  FREEZABLE_ATTRIBUTES = %w{title description lock_at points_possible grading_type
+  FREEZABLE_ATTRIBUTES = %w[title description lock_at points_possible grading_type
                             submission_types assignment_group_id allowed_extensions
-                            group_category_id notify_of_update peer_reviews workflow_state}
+                            group_category_id notify_of_update peer_reviews workflow_state].freeze
   def frozen?
-    !!(self.freeze_on_copy && self.copied &&
+    !!(freeze_on_copy && copied &&
        PluginSetting.settings_for_plugin(:assignment_freezer))
   end
 
@@ -3154,7 +3150,7 @@ class Assignment < ActiveRecord::Base
   def frozen_for_user?(user)
     return true if user.blank?
 
-    frozen? && !self.context.grants_right?(user, :manage_frozen_assignments)
+    frozen? && !context.grants_right?(user, :manage_frozen_assignments)
   end
 
   def frozen_attributes_for_user(user)
@@ -3166,13 +3162,11 @@ class Assignment < ActiveRecord::Base
   def att_frozen?(att, user = nil)
     return false unless frozen?
 
-    if (settings = PluginSetting.settings_for_plugin(:assignment_freezer))
-      if Canvas::Plugin.value_to_boolean(settings[att.to_s])
-        if user
-          return !self.context.grants_right?(user, :manage_frozen_assignments)
-        else
-          return true
-        end
+    if (settings = PluginSetting.settings_for_plugin(:assignment_freezer)) && Canvas::Plugin.value_to_boolean(settings[att.to_s])
+      if user
+        return !context.grants_right?(user, :manage_frozen_assignments)
+      else
+        return true
       end
     end
 
@@ -3184,15 +3178,15 @@ class Assignment < ActiveRecord::Base
   end
 
   def frozen_atts_not_altered
-    return if self.copying
+    return if copying
 
     FREEZABLE_ATTRIBUTES.each do |att|
-      if self.changes[att] && att_frozen?(att, @updating_user)
-        self.errors.add(att,
-                        t('errors.cannot_save_att',
-                          "You don't have permission to edit the locked attribute %{att_name}",
-                          :att_name => att))
-      end
+      next unless changes[att] && att_frozen?(att, @updating_user)
+
+      errors.add(att,
+                 t("errors.cannot_save_att",
+                   "You don't have permission to edit the locked attribute %{att_name}",
+                   att_name: att))
     end
   end
 
@@ -3201,22 +3195,18 @@ class Assignment < ActiveRecord::Base
   # * Assignment
   # * AssignmentOverride and
   # * AssignmentOverrideStudent
-  def self.suspend_due_date_caching
+  def self.suspend_due_date_caching(&block)
     Assignment.suspend_callbacks(:update_cached_due_dates) do
       AssignmentOverride.suspend_callbacks(:update_cached_due_dates) do
-        AssignmentOverrideStudent.suspend_callbacks(:update_cached_due_dates) do
-          yield
-        end
+        AssignmentOverrideStudent.suspend_callbacks(:update_cached_due_dates, &block)
       end
     end
   end
 
   # Suspend callbacks that recalculate grading period grades
-  def self.suspend_grading_period_grade_recalculation
+  def self.suspend_grading_period_grade_recalculation(&block)
     Assignment.suspend_callbacks(:update_grading_period_grades) do
-      AssignmentOverride.suspend_callbacks(:update_grading_period_grades) do
-        yield
-      end
+      AssignmentOverride.suspend_callbacks(:update_grading_period_grades, &block)
     end
   end
 
@@ -3225,10 +3215,10 @@ class Assignment < ActiveRecord::Base
   def update_cached_due_dates
     return unless update_cached_due_dates?
 
-    self.clear_cache_key(:availability)
-    self.quiz.clear_cache_key(:availability) if self.quiz?
+    clear_cache_key(:availability)
+    quiz.clear_cache_key(:availability) if quiz?
 
-    unless self.saved_by == :migration
+    unless saved_by == :migration
       relevant_changes = saved_changes.slice(:due_at, :workflow_state, :only_visible_to_overrides, :anonymous_grading).inspect
       Rails.logger.debug "GRADES: recalculating because scope changed for Assignment #{global_id}: #{relevant_changes}"
       DueDateCacher.recompute(self, update_grades: true)
@@ -3246,15 +3236,15 @@ class Assignment < ActiveRecord::Base
   end
 
   def update_due_date_smart_alerts
-    unless self.saved_by == :migration
-      if self.due_at.nil? || self.due_at < Time.zone.now
-        ScheduledSmartAlert.find_by(context_type: self.class.name, context_id: self.id, alert_type: :due_date_reminder)&.destroy
+    unless saved_by == :migration
+      if due_at.nil? || due_at < Time.zone.now
+        ScheduledSmartAlert.find_by(context_type: self.class.name, context_id: id, alert_type: :due_date_reminder)&.destroy
       else
         ScheduledSmartAlert.upsert(
           context_type: self.class.name,
-          context_id: self.id,
+          context_id: id,
           alert_type: :due_date_reminder,
-          due_at: self.due_at,
+          due_at: due_at,
           root_account_id: root_account.id
         )
       end
@@ -3269,16 +3259,16 @@ class Assignment < ActiveRecord::Base
   end
 
   def gradeable?
-    submission_types != 'not_graded' && submission_types != 'wiki_page'
+    submission_types != "not_graded" && submission_types != "wiki_page"
   end
   alias_method :graded?, :gradeable?
 
   def gradeable_was?
-    submission_types_was != 'not_graded' && submission_types_was != 'wiki_page'
+    submission_types_was != "not_graded" && submission_types_was != "wiki_page"
   end
 
   def active?
-    workflow_state != 'deleted'
+    workflow_state != "deleted"
   end
 
   def available?
@@ -3295,13 +3285,13 @@ class Assignment < ActiveRecord::Base
     elsif attribute_present? :student_submission_count
       student_submission_count.to_i > 0
     else
-      submissions.having_submission.where("user_id IS NOT NULL").exists?
+      submissions.having_submission.where.not(user_id: nil).exists?
     end
   end
   attr_writer :has_student_submissions
 
   def group_category_deleted_with_submissions?
-    self.group_category.try(:deleted_at?) && self.has_student_submissions?
+    group_category.try(:deleted_at?) && has_student_submissions?
   end
 
   def self.with_student_submission_count
@@ -3324,7 +3314,7 @@ class Assignment < ActiveRecord::Base
   def can_publish?
     return true if new_record?
 
-    ['unpublished', 'published'].include?(workflow_state)
+    ["unpublished", "published"].include?(workflow_state)
   end
 
   def can_unpublish?
@@ -3350,14 +3340,14 @@ class Assignment < ActiveRecord::Base
 
   # override so validations are called
   def publish
-    self.workflow_state = 'published'
-    self.save
+    self.workflow_state = "published"
+    save
   end
 
   # override so validations are called
   def unpublish
-    self.workflow_state = 'unpublished'
-    self.save
+    self.workflow_state = "unpublished"
+    save
   end
 
   def unmute!
@@ -3384,7 +3374,7 @@ class Assignment < ActiveRecord::Base
 
                                   submissions_in_closed_gp = submissions.select do |submission|
                                     submission.grading_period.present? &&
-                                      submission.grading_period.workflow_state == 'active' &&
+                                      submission.grading_period.workflow_state == "active" &&
                                       submission.grading_period.closed?
                                   end
 
@@ -3418,7 +3408,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def quiz?
-    submission_types == 'online_quiz' && quiz.present?
+    submission_types == "online_quiz" && quiz.present?
   end
 
   def quiz_lti?
@@ -3430,16 +3420,16 @@ class Assignment < ActiveRecord::Base
     tool = context.present? && context.quiz_lti_tool
     return unless tool
 
-    self.submission_types = 'external_tool'
+    self.submission_types = "external_tool"
     self.external_tool_tag_attributes = { content: tool, url: tool.url }
   end
 
   def discussion_topic?
-    submission_types == 'discussion_topic' && discussion_topic.present?
+    submission_types == "discussion_topic" && discussion_topic.present?
   end
 
   def wiki_page?
-    submission_types == 'wiki_page' && wiki_page.present?
+    submission_types == "wiki_page" && wiki_page.present?
   end
 
   def self.sis_grade_export_enabled?(context)
@@ -3449,7 +3439,7 @@ class Assignment < ActiveRecord::Base
 
   def run_if_overrides_changed!(student_ids = nil, updating_user = nil)
     relocked_modules = []
-    self.relock_modules!(relocked_modules, student_ids)
+    relock_modules!(relocked_modules, student_ids)
     each_submission_type { |submission| submission&.relock_modules!(relocked_modules, student_ids) }
 
     update_grades = if only_visible_to_overrides?
@@ -3465,13 +3455,13 @@ class Assignment < ActiveRecord::Base
   def run_if_overrides_changed_later!(student_ids: nil, updating_user: nil)
     return if self.class.suspended_callback?(:update_cached_due_dates, :save)
 
-    self.clear_cache_key(:availability)
-    self.quiz.clear_cache_key(:availability) if self.quiz?
+    clear_cache_key(:availability)
+    quiz.clear_cache_key(:availability) if quiz?
 
     enqueuing_args = if student_ids
-                       { strand: "assignment_overrides_changed_for_students_#{self.global_id}" }
+                       { strand: "assignment_overrides_changed_for_students_#{global_id}" }
                      else
-                       { singleton: "assignment_overrides_changed_#{self.global_id}" }
+                       { singleton: "assignment_overrides_changed_#{global_id}" }
                      end
 
     delay_if_production(**enqueuing_args).run_if_overrides_changed!(student_ids, updating_user)
@@ -3716,7 +3706,7 @@ class Assignment < ActiveRecord::Base
       end
     end
 
-    submissions.in_workflow_state('graded').each(&:assignment_muted_changed)
+    submissions.in_workflow_state("graded").each(&:assignment_muted_changed)
 
     show_stream_items(submissions: submissions)
     course.recompute_student_scores(submissions.pluck(:user_id))
@@ -3738,7 +3728,7 @@ class Assignment < ActiveRecord::Base
 
     User.clear_cache_keys(user_ids, :submissions)
     submissions.update_all(posted_at: nil, updated_at: Time.zone.now) unless skip_updating_timestamp
-    submissions.in_workflow_state('graded').each(&:assignment_muted_changed)
+    submissions.in_workflow_state("graded").each(&:assignment_muted_changed)
     hide_stream_items(submissions: submissions)
     course.recompute_student_scores(submissions.pluck(:user_id))
     update_muted_status!
@@ -3747,7 +3737,7 @@ class Assignment < ActiveRecord::Base
 
   def broadcast_submissions_posted(posting_params)
     @posting_params_for_notifications = posting_params
-    self.broadcast_notifications
+    broadcast_notifications
     @posting_params_for_notifications = nil
   end
 
@@ -3778,7 +3768,7 @@ class Assignment < ActiveRecord::Base
     # grading periods that have closed within a somewhat larger interval to
     # avoid "missing" a given period if the periodic job doesn't run for a while.
     now = Time.zone.now
-    look_back = Setting.get('disable_post_to_sis_on_grading_period', '60').to_i
+    look_back = Setting.get("disable_post_to_sis_on_grading_period", "60").to_i
     GradingPeriod.active.joins(:grading_period_group)
                  .where(close_date: look_back.minutes.ago(now)..now)
                  .where(grading_period_groups: { root_account: eligible_root_accounts }).find_each do |gp|
@@ -3790,11 +3780,11 @@ class Assignment < ActiveRecord::Base
     lti_context_id = Lti::Security.decoded_lti_assignment_id(secure_params)
     return nil if lti_context_id.blank?
 
-    self.find_by(lti_context_id: lti_context_id)
+    find_by(lti_context_id: lti_context_id)
   end
 
   def active_rubric_association?
-    !!self.rubric_association&.active?
+    !!rubric_association&.active?
   end
 
   def can_reassign?(grader)
@@ -3866,11 +3856,9 @@ class Assignment < ActiveRecord::Base
 
   def due_date_ok?
     # lock_at OR unlock_at can be empty
-    if (unlock_at || lock_at) && due_at
-      unless AssignmentUtil.in_date_range?(due_at, unlock_at, lock_at)
-        errors.add(:due_at, I18n.t("must be between availability dates"))
-        return false
-      end
+    if (unlock_at || lock_at) && due_at && !AssignmentUtil.in_date_range?(due_at, unlock_at, lock_at)
+      errors.add(:due_at, I18n.t("must be between availability dates"))
+      return false
     end
     unless @skip_sis_due_date_validation || AssignmentUtil.due_date_ok?(self)
       errors.add(:due_at, I18n.t("due_at", "cannot be blank when Post to Sis is checked"))
@@ -3882,7 +3870,7 @@ class Assignment < ActiveRecord::Base
 
     if AssignmentUtil.due_date_required?(self)
       overrides = gather_override_data(overrides)
-      if overrides.select { |o| !!o[:due_at_overridden] && o[:due_at].blank? && o[:workflow_state] != 'deleted' }.length > 0
+      if overrides.count { |o| !!o[:due_at_overridden] && o[:due_at].blank? && o[:workflow_state] != "deleted" } > 0
         errors.add(:due_at, I18n.t("cannot be blank for any assignees when Post to Sis is checked"))
         return false
       end
@@ -3894,17 +3882,17 @@ class Assignment < ActiveRecord::Base
     overrides = overrides.values.reject(&:empty?).flatten if overrides.is_a?(Hash)
     overrides = overrides.map do |o|
       o = o.to_unsafe_h if o.is_a?(ActionController::Parameters)
-      if o.is_a?(Hash) && o.has_key?(:due_at) && !o.has_key?(:due_at_overridden)
-        o = o.merge(:due_at_overridden => true) # default to true if provided by api
+      if o.is_a?(Hash) && o.key?(:due_at) && !o.key?(:due_at_overridden)
+        o = o.merge(due_at_overridden: true) # default to true if provided by api
       end
       o
     end
-    override_ids = overrides.map { |ele| ele[:id] }.to_set
-    self.assignment_overrides.reject { |o| override_ids.include? o[:id] } + overrides
+    override_ids = overrides.pluck(:id).to_set
+    assignment_overrides.reject { |o| override_ids.include? o[:id] } + overrides
   end
 
   def active_assignment_overrides?
-    self.assignment_overrides.exists?
+    assignment_overrides.exists?
   end
 
   def assignment_name_length_ok?
@@ -3913,25 +3901,25 @@ class Assignment < ActiveRecord::Base
     # Due to the removal of the multiple `validates_length_of :title` validations we need this nil check
     # here to act as those validations so we can reduce the number of validations for this attribute
     # to just one single check
-    return if self.nil? || self.title.nil?
+    return if nil? || self.title.nil?
 
-    if self.title.to_s.length > name_length && self.grading_type != 'not_graded'
-      errors.add(:title, I18n.t('The title cannot be longer than %{length} characters', length: name_length))
+    if self.title.to_s.length > name_length && self.grading_type != "not_graded"
+      errors.add(:title, I18n.t("The title cannot be longer than %{length} characters", length: name_length))
     end
   end
 
   def annotatable_and_group_exclusivity_ok?
     return unless has_group_category? && annotated_document?
 
-    errors.add(:annotatable_attachment_id, 'must be blank when group_category_id is present')
-    errors.add(:group_category_id, 'must be blank when annotatable_attachment_id is present')
+    errors.add(:annotatable_attachment_id, "must be blank when group_category_id is present")
+    errors.add(:group_category_id, "must be blank when annotatable_attachment_id is present")
   end
 
   def grader_section_ok?
     return if grader_section.blank?
 
-    if grader_section.workflow_state != 'active' || grader_section.course_id != course.id
-      errors.add(:grader_section, 'must be active and in same course as assignment')
+    if grader_section.workflow_state != "active" || grader_section.course_id != course.id
+      errors.add(:grader_section, "must be active and in same course as assignment")
     end
   end
 
@@ -3939,10 +3927,10 @@ class Assignment < ActiveRecord::Base
     return unless final_grader_id_changed?
     return if final_grader_id.blank?
 
-    if grader_section_id.present? && grader_section.instructor_enrollments.where(user_id: final_grader_id, workflow_state: 'active').empty?
-      errors.add(:final_grader, 'must be enrolled in selected section')
+    if grader_section_id.present? && grader_section.instructor_enrollments.where(user_id: final_grader_id, workflow_state: "active").empty?
+      errors.add(:final_grader, "must be enrolled in selected section")
     elsif course.participating_instructors.where(id: final_grader_id).empty?
-      errors.add(:final_grader, 'must be an instructor in this course')
+      errors.add(:final_grader, "must be an instructor in this course")
     end
   end
 
@@ -3973,7 +3961,7 @@ class Assignment < ActiveRecord::Base
   def instructor_selectable_states
     return {} unless moderated_grading?
 
-    states = ['inactive', 'completed', 'deleted', 'invited']
+    states = %w[inactive completed deleted invited]
     active_user_ids = course.instructors.where.not(enrollments: { workflow_state: states }).pluck(:id)
     provisional_grades.each_with_object({}) do |provisional_grade, hash|
       hash[provisional_grade.id] = active_user_ids.include?(provisional_grade.scorer_id)

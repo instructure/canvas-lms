@@ -29,13 +29,13 @@ module Factories
 
   def valid_collaboration_attributes
     {
-      :collaboration_type => "value for collaboration_type",
-      :document_id => "document:dc3pjs4r_3hhc6fvcc",
-      :user_id => User.create!.id,
-      :context => @course || course_model,
-      :url => "value for url",
-      :title => "My Collaboration",
-      :data => File.read('gems/google_drive/spec/fixtures/google_drive/file_data.json')
+      collaboration_type: "value for collaboration_type",
+      document_id: "document:dc3pjs4r_3hhc6fvcc",
+      user_id: User.create!.id,
+      context: @course || course_model,
+      url: "value for url",
+      title: "My Collaboration",
+      data: File.read("gems/google_drive/spec/fixtures/google_drive/file_data.json")
     }
   end
 end

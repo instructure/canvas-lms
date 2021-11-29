@@ -27,8 +27,8 @@ describe Mutations::MoveOutcomeLinks do
     @site_admin = site_admin_user
     course_with_teacher
     @context = @course
-    @source_group = outcome_group_model()
-    @destination_group = outcome_group_model()
+    @source_group = outcome_group_model
+    @destination_group = outcome_group_model
 
     # belonging to other account
     @other_account = account_model
@@ -37,8 +37,8 @@ describe Mutations::MoveOutcomeLinks do
     @outcome_other_context_link = @other_account.root_outcome_group.child_outcome_links.first
 
     # global groups
-    @global_source = LearningOutcomeGroup.create!(title: 'source')
-    @global_destination = LearningOutcomeGroup.create!(title: 'destination')
+    @global_source = LearningOutcomeGroup.create!(title: "source")
+    @global_destination = LearningOutcomeGroup.create!(title: "destination")
     outcome_model(outcome_group: @global_source, global: true)
     @global_link = @global_source.child_outcome_links.first
   end
@@ -52,7 +52,7 @@ describe Mutations::MoveOutcomeLinks do
     <<~GQL
       mutation {
         moveOutcomeLinks(input: {
-          #{gql_arguments('', attrs)}
+          #{gql_arguments("", attrs)}
         }) {
           movedOutcomeLinks {
             _id
@@ -95,7 +95,7 @@ describe Mutations::MoveOutcomeLinks do
         current_user: @teacher
       }
     )
-    moved_links = response.dig("data", "moveOutcomeLinks", "movedOutcomeLinks").map { |link| link['_id'] }
+    moved_links = response.dig("data", "moveOutcomeLinks", "movedOutcomeLinks").map { |link| link["_id"] }
     expect(moved_links).to eql([@outcome_link.id.to_s])
     expect(response.dig("data", "moveOutcomeLinks", "errors")).to match_array([
                                                                                 { "attribute" => @outcome_other_context_link.id.to_s, "message" => "Could not find associated outcome in this context" }
@@ -152,24 +152,24 @@ describe Mutations::MoveOutcomeLinks do
     it "validates required attributes" do
       response = execute_query(mutation_str, {})
 
-      expect(response.dig("errors")[0]["message"]).to eql(
+      expect(response["errors"][0]["message"]).to eql(
         "Argument 'outcomeLinkIds' on InputObject 'MoveOutcomeLinksInput' is required. Expected type [ID!]!"
       )
-      expect(response.dig("errors")[1]["message"]).to eql(
+      expect(response["errors"][1]["message"]).to eql(
         "Argument 'groupId' on InputObject 'MoveOutcomeLinksInput' is required. Expected type ID!"
       )
     end
 
     it "validates group not exist" do
-      response = execute_query(mutation_str(group_id: 123123, outcome_link_ids: []), {})
-      expect(response.dig("errors")[0]["message"]).to eql(
+      response = execute_query(mutation_str(group_id: 123_123, outcome_link_ids: []), {})
+      expect(response["errors"][0]["message"]).to eql(
         "Group not found"
       )
     end
 
     it "validates when user doesn't have permission to manage the group" do
       response = execute_query(mutation_str(group_id: @group_without_permission.id, outcome_link_ids: []), {})
-      expect(response.dig("errors")[0]["message"]).to eql(
+      expect(response["errors"][0]["message"]).to eql(
         "Insufficient permission"
       )
     end
@@ -184,7 +184,7 @@ describe Mutations::MoveOutcomeLinks do
           current_user: @teacher
         }
       )
-      expect(response.dig("errors")[0]["message"]).to eql(
+      expect(response["errors"][0]["message"]).to eql(
         "Insufficient permission"
       )
     end
@@ -193,7 +193,7 @@ describe Mutations::MoveOutcomeLinks do
       response = execute_query(
         mutation_str(
           group_id: @destination_group.id,
-          outcome_link_ids: [123123]
+          outcome_link_ids: [123_123]
         ),
         {
           current_user: @teacher

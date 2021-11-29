@@ -19,13 +19,13 @@
 #
 
 describe Auditors::ActiveRecord::FeatureFlagRecord do
-  let(:request_id) { 'abcde-12345' }
-  let(:feature_name) { 'root_account_feature' }
+  let(:request_id) { "abcde-12345" }
+  let(:feature_name) { "root_account_feature" }
 
   before do
     allow(RequestContextGenerator).to receive_messages(request_id: request_id)
     allow(Feature).to receive(:definitions).and_return({
-                                                         feature_name => Feature.new(feature: feature_name, applies_to: 'RootAccount')
+                                                         feature_name => Feature.new(feature: feature_name, applies_to: "RootAccount")
                                                        })
   end
 
@@ -38,12 +38,12 @@ describe Auditors::ActiveRecord::FeatureFlagRecord do
     let(:flag_record) do
       flag = Account.site_admin.feature_flags.build
       flag.feature = feature_name
-      flag.state = 'on'
+      flag.state = "on"
       flag.id = -1
       flag
     end
     let(:user) { user_model }
-    let(:es_record) { Auditors::FeatureFlag::Record.generate(flag_record, user, 'nonexistent') }
+    let(:es_record) { Auditors::FeatureFlag::Record.generate(flag_record, user, "nonexistent") }
 
     it "is creatable from an event_stream record of the correct type" do
       ar_rec = Auditors::ActiveRecord::FeatureFlagRecord.create_from_event_stream!(es_record)

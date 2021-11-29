@@ -23,7 +23,7 @@ class GradeSummaryPresenter
 
   class << self
     def cache_key(context, method)
-      ['grade_summary_presenter', context, method].cache_key
+      ["grade_summary_presenter", context, method].cache_key
     end
   end
 
@@ -84,7 +84,7 @@ class GradeSummaryPresenter
 
   def observed_student
     # be consistent about which student we return by default
-    (observed_students.to_a.sort_by { |e| e[0].sortable_name }.first)[1].first
+    (observed_students.to_a.min_by { |e| e[0].sortable_name })[1].first
   end
 
   def linkable_observed_students
@@ -124,7 +124,7 @@ class GradeSummaryPresenter
   end
 
   def student
-    @student ||= (student_enrollment && student_enrollment.user)
+    @student ||= student_enrollment&.user
   end
 
   def student_name
@@ -152,7 +152,7 @@ class GradeSummaryPresenter
     includes << :assignment_group if @assignment_order == :assignment_group
     AssignmentGroup
       .visible_assignments(student, @context, all_groups, includes: includes)
-      .where.not(submission_types: %w(not_graded wiki_page))
+      .where.not(submission_types: %w[not_graded wiki_page])
       .except(:order)
   end
 
@@ -179,11 +179,11 @@ class GradeSummaryPresenter
   end
 
   def sort_options
-    options = [[I18n.t('Due Date'), 'due_at'], [I18n.t('Name'), 'title']]
+    options = [[I18n.t("Due Date"), "due_at"], [I18n.t("Name"), "title"]]
     if @context.active_record_types[:assignments] && assignments.uniq(&:assignment_group_id).length > 1
-      options << [I18n.t('Assignment Group'), 'assignment_group']
+      options << [I18n.t("Assignment Group"), "assignment_group"]
     end
-    options << [I18n.t('Module'), 'module'] if @context.active_record_types[:modules]
+    options << [I18n.t("Module"), "module"] if @context.active_record_types[:modules]
     Canvas::ICU.collate_by(options, &:first)
   end
 
@@ -192,9 +192,9 @@ class GradeSummaryPresenter
       ss = @context.submissions
                    .preload(
                      :visible_submission_comments,
-                     { :rubric_assessments => [:rubric, :rubric_association] },
+                     { rubric_assessments: [:rubric, :rubric_association] },
                      :content_participations,
-                     { :assignment => [:context, :post_policy] }
+                     { assignment: [:context, :post_policy] }
                    )
                    .joins(:assignment)
                    .where("assignments.workflow_state != 'deleted'")
@@ -207,15 +207,15 @@ class GradeSummaryPresenter
       assignments_index = assignments.index_by(&:id)
 
       # preload submission comment stuff
-      comments = ss.map { |s|
+      comments = ss.map do |s|
         assign = assignments_index[s.assignment_id]
         s.assignment = assign if assign.present?
 
-        s.visible_submission_comments.map { |c|
+        s.visible_submission_comments.map do |c|
           c.submission = s
           c
-        }
-      }.flatten
+        end
+      end.flatten
       SubmissionComment.preload_attachments comments
 
       ss

@@ -18,9 +18,10 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'fileutils'
-require File.expand_path('../configurable_timeout', __FILE__)
-require 'zlib'
+require "fileutils"
+require "zlib"
+
+require_relative "configurable_timeout"
 
 module IncomingMailProcessor
   class DirectoryMailbox
@@ -32,7 +33,7 @@ module IncomingMailProcessor
       @folder = options.fetch(:folder, "")
       @options = options
       wrap_with_timeout(self,
-                        [:folder_exists?, :files_in_folder, :read_file, :file?, :delete_file, :move_file, :create_folder])
+                        %i[folder_exists? files_in_folder read_file file? delete_file move_file create_folder])
     end
 
     def connect

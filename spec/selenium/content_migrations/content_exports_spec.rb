@@ -17,9 +17,9 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../common'
+require_relative "../common"
 
-require 'nokogiri'
+require "nokogiri"
 
 describe "content exports" do
   include_context "in-process server selenium tests"
@@ -32,37 +32,37 @@ describe "content exports" do
     def run_export
       get "/courses/#{@course.id}/content_exports"
       yield if block_given?
-      submit_form('#exporter_form')
+      submit_form("#exporter_form")
       @export = keep_trying_until { ContentExport.last }
       @export.export(synchronous: true)
       new_download_link = f("#export_files a")
-      expect(new_download_link).to have_attribute('href', %r{/files/\d+/download\?verifier=})
+      expect(new_download_link).to have_attribute("href", %r{/files/\d+/download\?verifier=})
     end
 
-    it "allows course export downloads", priority: "1", test_id: 126678 do
+    it "allows course export downloads", priority: "1" do
       run_export
-      expect(@export.export_type).to eq 'common_cartridge'
+      expect(@export.export_type).to eq "common_cartridge"
     end
 
-    it "allows qti export downloads", priority: "1", test_id: 126680 do
+    it "allows qti export downloads", priority: "1" do
       run_export do
         f("input[value=qti]").click
       end
-      expect(@export.export_type).to eq 'qti'
+      expect(@export.export_type).to eq "qti"
     end
 
-    it "selectively creates qti export", priority: "2", test_id: 1341342 do
-      q1 = @course.quizzes.create!(:title => 'quiz1')
-      q2 = @course.quizzes.create!(:title => 'quiz2')
+    it "selectively creates qti export", priority: "2" do
+      q1 = @course.quizzes.create!(title: "quiz1")
+      q2 = @course.quizzes.create!(title: "quiz2")
 
       run_export do
         f("input[value=qti]").click
-        f(%{.quiz_item[name="copy[quizzes][#{CC::CCHelper.create_key(q2, global: true)}]"]}).click
+        f(%(.quiz_item[name="copy[quizzes][#{CC::CCHelper.create_key(q2, global: true)}]"])).click
       end
 
-      expect(@export.export_type).to eq 'qti'
+      expect(@export.export_type).to eq "qti"
 
-      file_handle = @export.attachment.open :need_local_file => true
+      file_handle = @export.attachment.open need_local_file: true
       zip_file = Zip::File.open(file_handle.path)
       manifest_doc = Nokogiri::XML.parse(zip_file.read("imsmanifest.xml"))
 

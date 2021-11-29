@@ -215,30 +215,6 @@ export const MOCK_OBSERVEE_EVENTS = [
   }
 ]
 
-export const MOCK_OBSERVER_LIST = [
-  {
-    id: '13',
-    name: 'Zelda',
-    avatar_url: 'http://avatar'
-  },
-  {
-    id: '4',
-    name: 'Student 4',
-    avatar_url: 'http://canvas.instructure.com/images/messages/avatar-50.png'
-  },
-  {
-    id: '2',
-    name: 'Student 2',
-    avatar_url:
-      'http://localhost:3000/images/thumbnails/424/pLccjAlvK1xtbcCRgvSMElUOwCBnFU26kgXRif8h'
-  },
-  {
-    id: '5',
-    name: 'Student 5',
-    avatar_url: 'http://canvas.instructure.com/images/messages/avatar-50.png'
-  }
-]
-
 export const MOCK_PLANNER_ITEM = [
   {
     context_name: 'Course2',

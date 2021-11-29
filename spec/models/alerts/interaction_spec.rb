@@ -23,10 +23,10 @@ require_dependency "alerts/interaction"
 module Alerts
   describe Interaction do
     before :once do
-      course_with_teacher(:active_all => 1)
+      course_with_teacher(active_all: 1)
       @teacher = @user
       @user = nil
-      student_in_course(:active_all => 1)
+      student_in_course(active_all: 1)
     end
 
     describe "#should_not_receive_message?" do
@@ -67,12 +67,12 @@ module Alerts
       end
 
       it "returns true for submission comments" do
-        @assignment = @course.assignments.new(:title => "some assignment")
+        @assignment = @course.assignments.new(title: "some assignment")
         @assignment.workflow_state = "published"
         @assignment.save
         @submission = @assignment.submit_homework(@student)
-        SubmissionComment.create!(:submission => @submission, :comment => 'new comment', :author => @teacher)
-        SubmissionComment.create!(:submission => @submission, :comment => 'old comment', :author => @teacher) do |submission_comment|
+        SubmissionComment.create!(submission: @submission, comment: "new comment", author: @teacher)
+        SubmissionComment.create!(submission: @submission, comment: "old comment", author: @teacher) do |submission_comment|
           submission_comment.created_at = Time.now - 30.days
         end
         @course.start_at = Time.now - 30.days
@@ -82,11 +82,11 @@ module Alerts
       end
 
       it "returns false for old submission comments" do
-        @assignment = @course.assignments.new(:title => "some assignment")
+        @assignment = @course.assignments.new(title: "some assignment")
         @assignment.workflow_state = "published"
         @assignment.save
         @submission = @assignment.submit_homework(@student)
-        SubmissionComment.create!(:submission => @submission, :comment => 'some comment', :author => @teacher) do |sc|
+        SubmissionComment.create!(submission: @submission, comment: "some comment", author: @teacher) do |sc|
           sc.created_at = Time.now - 30.days
         end
         @course.start_at = Time.now - 30.days

@@ -118,7 +118,7 @@ describe GradebookGradingPeriodAssignments do
         expect(hash[@period2.id]).not_to include(assignment.id.to_s)
       end
 
-      context 'with students that are not active' do
+      context "with students that are not active" do
         before(:once) do
           @course = Course.create!
           @student_enrollment = student_in_course(course: @course, active_all: true)
@@ -128,76 +128,76 @@ describe GradebookGradingPeriodAssignments do
 
         let(:hash) { GradebookGradingPeriodAssignments.new(@course, course_settings: @settings).to_h }
 
-        describe 'concluded students' do
+        describe "concluded students" do
           before(:once) do
             @student_enrollment.conclude
           end
 
-          it 'does not include assignments assigned exclusively to concluded students' do
+          it "does not include assignments assigned exclusively to concluded students" do
             expect(hash[@period2.id]).to be_nil
           end
 
-          it 'ignores deleted enrollments' do
+          it "ignores deleted enrollments" do
             # update_columns in order to avoid callbacks that would soft-delete the submission
             @student_enrollment.update_columns(workflow_state: :deleted)
             expect(hash[@period2.id]).to be_nil
           end
 
-          it 'ignores enrollments in other courses' do
+          it "ignores enrollments in other courses" do
             new_course = Course.create!
             new_course.enroll_student(@student_enrollment.user, active_all: true)
             expect(hash[@period2.id]).to be_nil
           end
 
-          it 'ignores non-student enrollments' do
+          it "ignores non-student enrollments" do
             @course.enroll_ta(@student_enrollment.user, active_all: true)
             expect(hash[@period2.id]).to be_nil
           end
 
-          it 'optionally includes assignments assigned exclusively to concluded students' do
-            @settings = { 'show_concluded_enrollments' => 'true' }
+          it "optionally includes assignments assigned exclusively to concluded students" do
+            @settings = { "show_concluded_enrollments" => "true" }
             expect(hash[@period2.id]).to include @assignment.id.to_s
           end
 
-          it 'optionally excludes assignments assigned exclusively to concluded students' do
-            @settings = { 'show_concluded_enrollments' => 'false' }
+          it "optionally excludes assignments assigned exclusively to concluded students" do
+            @settings = { "show_concluded_enrollments" => "false" }
             expect(hash[@period2.id]).to be_nil
           end
         end
 
-        describe 'deactivated students' do
+        describe "deactivated students" do
           before(:once) do
             @student_enrollment.deactivate
           end
 
-          it 'does not include assignments assigned exclusively to deactivated students' do
+          it "does not include assignments assigned exclusively to deactivated students" do
             expect(hash[@period2.id]).to be_nil
           end
 
-          it 'ignores deleted enrollments' do
+          it "ignores deleted enrollments" do
             # update_columns in order to avoid callbacks that would soft-delete the submission
             @student_enrollment.update_columns(workflow_state: :deleted)
             expect(hash[@period2.id]).to be_nil
           end
 
-          it 'ignores enrollments in other courses' do
+          it "ignores enrollments in other courses" do
             new_course = Course.create!
             new_course.enroll_student(@student_enrollment.user, active_all: true)
             expect(hash[@period2.id]).to be_nil
           end
 
-          it 'ignores non-student enrollments' do
+          it "ignores non-student enrollments" do
             @course.enroll_ta(@student_enrollment.user, active_all: true)
             expect(hash[@period2.id]).to be_nil
           end
 
-          it 'optionally includes assignments assigned exclusively to deactivated students' do
-            @settings = { 'show_inactive_enrollments' => 'true' }
+          it "optionally includes assignments assigned exclusively to deactivated students" do
+            @settings = { "show_inactive_enrollments" => "true" }
             expect(hash[@period2.id]).to include @assignment.id.to_s
           end
 
-          it 'optionally excludes assignments assigned exclusively to deactivated students' do
-            @settings = { 'show_inactive_enrollments' => 'false' }
+          it "optionally excludes assignments assigned exclusively to deactivated students" do
+            @settings = { "show_inactive_enrollments" => "false" }
             expect(hash[@period2.id]).to be_nil
           end
         end

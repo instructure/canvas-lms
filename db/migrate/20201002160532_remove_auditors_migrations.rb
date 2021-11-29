@@ -39,7 +39,7 @@ class RemoveAuditorsMigrations < ActiveRecord::Migration[5.2]
       t.timestamps
     end
     add_index :auditor_migration_cells, :account_id
-    add_index :auditor_migration_cells, [:auditor_type, :account_id, :year, :month, :day], name: 'index_auditor_migration_cells_by_primary_access_path', unique: true
+    add_index :auditor_migration_cells, %i[auditor_type account_id year month day], name: "index_auditor_migration_cells_by_primary_access_path", unique: true
     add_foreign_key :auditor_migration_cells, :accounts
   end
 end

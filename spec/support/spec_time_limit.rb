@@ -59,7 +59,7 @@ module SpecTimeLimit
         [:target, example.metadata[:custom_timeout].to_i]
       elsif ENV.fetch("SELENIUM_REMOTE_URL", "undefined remote url").include? "saucelabs"
         [:status_quo, SAUCELABS_ABSOLUTE_TIMEOUT]
-      elsif example.file_path.match?(/\.\/spec\/selenium\/.*rcs/) # files in ./spec/selenium/**/rcs
+      elsif example.file_path.match?(%r{\./spec/selenium/.*rcs}) # files in ./spec/selenium/**/rcs
         [:target, SIDEBAR_LOADING_TIMEOUT]
       elsif example.file_path.include? "./spec/selenium/performance/"
         [:status_quo, PERFORMANCE_TIMEOUT]
@@ -79,11 +79,11 @@ module SpecTimeLimit
     TARGET_TIMEOUT = ENV.fetch("SPEC_TIME_LIMIT_TARGET", 15).to_i
     SIDEBAR_LOADING_TIMEOUT = ENV.fetch("SIDEBAR_LOADING_TIMEOUT", 35).to_i
 
-    # note: we only see if the file itself was modified, this won't catch
+    # NOTE: we only see if the file itself was modified, this won't catch
     # changes to things it depends on. but that's where the status_quo stuff
     # helps us out
     def commit_modifies_spec?(example)
-      commit_files.include?(example.metadata[:file_path].sub(/\A\.\//, ''))
+      commit_files.include?(example.metadata[:file_path].delete_prefix("./"))
     end
 
     def commit_files

@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../spec_helper'
+require_relative "../spec_helper"
 
 describe "a mock static site" do
   after do
@@ -25,40 +25,40 @@ describe "a mock static site" do
   end
 
   it "throws exception if static site directory doesn't exist" do
-    expect {
-      MockStaticSite.new('asdf.test', 'non_existant_location')
-    }.to raise_error(NonexistentMockSiteError)
+    expect do
+      MockStaticSite.new("asdf.test", "non_existant_location")
+    end.to raise_error(NonexistentMockSiteError)
   end
 
   it "creates a MockStaticSite if the directory does exist" do
-    expect {
-      MockStaticSite.new('asdf.test', 'sample_site')
-    }.not_to raise_error
+    expect do
+      MockStaticSite.new("asdf.test", "sample_site")
+    end.not_to raise_error
   end
 
   context "when created" do
     it "finds the index file" do
-      MockStaticSite.new('google.com', 'sample_site')
-      response = Net::HTTP.get('google.com', '/')
-      expect(response).to include('sample page')
+      MockStaticSite.new("google.com", "sample_site")
+      response = Net::HTTP.get("google.com", "/")
+      expect(response).to include("sample page")
     end
 
     it "finds a specific file" do
-      MockStaticSite.new('google.com', 'sample_site')
-      response = Net::HTTP.get('google.com', '/file.txt')
-      expect(response).to include('This is a sample file.')
+      MockStaticSite.new("google.com", "sample_site")
+      response = Net::HTTP.get("google.com", "/file.txt")
+      expect(response).to include("This is a sample file.")
     end
 
     it "only blocks the specified host" do
       WebMock.enable!
       WebMock.stub_request(:get, "http://notarealdomain-srsly.com/")
              .to_return(status: 200, body: "some other page", headers: {})
-      MockStaticSite.new('google.com', 'sample_site')
-      google_response = Net::HTTP.get('google.com', '/')
-      other_response = Net::HTTP.get('notarealdomain-srsly.com', '/')
+      MockStaticSite.new("google.com", "sample_site")
+      google_response = Net::HTTP.get("google.com", "/")
+      other_response = Net::HTTP.get("notarealdomain-srsly.com", "/")
 
-      expect(google_response).to include('This is a sample page')
-      expect(other_response).not_to include('This is a sample page')
+      expect(google_response).to include("This is a sample page")
+      expect(other_response).not_to include("This is a sample page")
     end
   end
 end

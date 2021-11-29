@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'spec_helper'
+require "spec_helper"
 
 describe AdheresToPolicy::InstanceMethods do
   let(:some_class) do
@@ -36,7 +36,7 @@ describe AdheresToPolicy::InstanceMethods do
   let(:user_class) { Class.new }
 
   it "has setup a series of methods on the instance" do
-    %w(rights_status granted_rights grants_right? grants_any_right? grants_all_rights?).each do |method|
+    %w[rights_status granted_rights grants_right? grants_any_right? grants_all_rights?].each do |method|
       expect(some_class.new).to respond_to(method)
     end
   end
@@ -68,7 +68,7 @@ describe AdheresToPolicy::InstanceMethods do
     expect(actor.rights_status(3, :read, :manage, :set_permissions)).to eq({ read: false, manage: true, set_permissions: true })
   end
 
-  it 'checks parent conditions' do
+  it "checks parent conditions" do
     actor_class = Class.new do
       extend AdheresToPolicy::ClassMethods
       set_policy do
@@ -87,7 +87,7 @@ describe AdheresToPolicy::InstanceMethods do
     expect(actor.rights_status([true, true])).to eq(do_stuff: true)
   end
 
-  it 'checks deeply nested parent conditions' do
+  it "checks deeply nested parent conditions" do
     actor_class = Class.new do
       extend AdheresToPolicy::ClassMethods
       set_policy do
@@ -125,13 +125,13 @@ describe AdheresToPolicy::InstanceMethods do
       end
 
       set_policy do
-        given { |_| @total = @total + 1 }
+        given { |_| @total += 1 }
         can :read
 
-        given { |_| @total = @total + 1 }
+        given { |_| @total += 1 }
         can :write
 
-        given { |_| @total = @total + 1 }
+        given { |_| @total += 1 }
         can :update
       end
     end
@@ -152,13 +152,13 @@ describe AdheresToPolicy::InstanceMethods do
       end
 
       set_policy do
-        given { |_| @total = @total + 1 }
+        given { |_| @total += 1 }
         can :read, :write
 
         given { |_| raise "don't execute me" }
         can :write
 
-        given { |_| @total = @total + 1 }
+        given { |_| @total += 1 }
         can :update
       end
     end
@@ -179,7 +179,7 @@ describe AdheresToPolicy::InstanceMethods do
       end
 
       set_policy do
-        given { |_| @total = @total + 1 }
+        given { |_| @total += 1 }
         can :read
 
         given { |_| raise "don't execute me" }
@@ -206,10 +206,10 @@ describe AdheresToPolicy::InstanceMethods do
       end
 
       set_policy do
-        given { |_| @total = @total + 1 }
+        given { |_| @total += 1 }
         can :read
 
-        given { |_| @total = @total + 1 }
+        given { |_| @total += 1 }
         can :write
 
         given { |_| raise "me either" }
@@ -238,8 +238,8 @@ describe AdheresToPolicy::InstanceMethods do
     end
 
     it "clear the permissions cache" do
-      expect(Rails.cache).to receive(:delete).with(/\/read$/)
-      expect(Rails.cache).to receive(:delete).with(/\/write$/)
+      expect(Rails.cache).to receive(:delete).with(%r{/read$})
+      expect(Rails.cache).to receive(:delete).with(%r{/write$})
 
       sample = sample_class.new
       expect(sample.grants_right?(1, :read)).to eq true
@@ -314,7 +314,7 @@ describe AdheresToPolicy::InstanceMethods do
         end
 
         set_policy do
-          given { |arg1| @total = @total + arg1 }
+          given { |arg1| @total += arg1 }
           can :read
 
           given { |arg1, arg2| @total = @total + arg1 + arg2[:count] }
@@ -365,9 +365,9 @@ describe AdheresToPolicy::InstanceMethods do
     it "raises argument exception if anything other then one right is provided" do
       non_context = actor_class.new
       expect(non_context.grants_right?("allowed actor", :read)).to eq true
-      expect {
+      expect do
         non_context.grants_right?("allowed actor", :asdf, :read)
-      }.to raise_exception ArgumentError
+      end.to raise_exception ArgumentError
     end
 
     context "caching" do
@@ -390,10 +390,10 @@ describe AdheresToPolicy::InstanceMethods do
           attr_reader :session
 
           extend AdheresToPolicy::ClassMethods
-          set_policy {
+          set_policy do
             given { |_, session| @session = session }
             can :read
-          }
+          end
         end
 
         actor = actor_class.new
@@ -403,15 +403,15 @@ describe AdheresToPolicy::InstanceMethods do
 
       it "changes cache key based on session[:permissions_key]" do
         session = {
-          permissions_key: 'permissions_key',
-          session_id: 'session_id'
+          permissions_key: "permissions_key",
+          session_id: "session_id"
         }
         actor_class = Class.new do
           extend AdheresToPolicy::ClassMethods
-          set_policy {
+          set_policy do
             given { |_| true }
             can :read
-          }
+          end
 
           def call_permission_cache_key_for(*args)
             permission_cache_key_for(*args)
@@ -419,15 +419,15 @@ describe AdheresToPolicy::InstanceMethods do
         end
 
         actor = actor_class.new
-        expect(actor.call_permission_cache_key_for(nil, session, :read)).to match(/>\/permissions_key\/read$/)
+        expect(actor.call_permission_cache_key_for(nil, session, :read)).to match(%r{>/permissions_key/read$})
 
         session.delete(:permissions_key)
-        expect(actor.call_permission_cache_key_for(nil, session, :read)).to match(/>\/default\/read$/)
+        expect(actor.call_permission_cache_key_for(nil, session, :read)).to match(%r{>/default/read$})
 
-        expect(actor.call_permission_cache_key_for(nil, nil, :read)).to match(/>\/read$/)
+        expect(actor.call_permission_cache_key_for(nil, nil, :read)).to match(%r{>/read$})
       end
 
-      it 'must not use the rails cache for permissions included in the configured blacklist' do
+      it "must not use the rails cache for permissions included in the configured blacklist" do
         klass = Class.new do
           extend AdheresToPolicy::ClassMethods
           set_policy do
@@ -436,14 +436,14 @@ describe AdheresToPolicy::InstanceMethods do
           end
         end
         instance = klass.new
-        AdheresToPolicy.configuration.blacklist = ['.read']
+        AdheresToPolicy.configuration.blacklist = [".read"]
         expect(AdheresToPolicy::Cache).to receive(:fetch)
           .with(an_instance_of(String), a_hash_including(use_rails_cache: false))
           .and_return([])
         instance.granted_rights(instance)
       end
 
-      it 'must cache permissions calculated using the same given block by default' do
+      it "must cache permissions calculated using the same given block by default" do
         klass = Class.new do
           extend AdheresToPolicy::ClassMethods
           set_policy do
@@ -458,10 +458,10 @@ describe AdheresToPolicy::InstanceMethods do
 
         expect(AdheresToPolicy::Cache).to receive(:write)
           .with(/write/, true, an_instance_of(Hash))
-        instance.grants_right?('', :read)
+        instance.grants_right?("", :read)
       end
 
-      it 'must not cache related permissions when configured not to' do
+      it "must not cache related permissions when configured not to" do
         AdheresToPolicy.configuration.cache_related_permissions = false
         klass = Class.new do
           extend AdheresToPolicy::ClassMethods
@@ -477,10 +477,10 @@ describe AdheresToPolicy::InstanceMethods do
 
         expect(AdheresToPolicy::Cache).to receive(:write)
           .with(/write/, true, a_hash_including(use_rails_cache: false))
-        instance.grants_right?('', :read)
+        instance.grants_right?("", :read)
       end
 
-      it 'must cache permissions calculated in the course of calculating others' do
+      it "must cache permissions calculated in the course of calculating others" do
         klass = Class.new do
           extend AdheresToPolicy::ClassMethods
 
@@ -488,7 +488,7 @@ describe AdheresToPolicy::InstanceMethods do
             given { |_| true }
             can :create
 
-            given { |u| self.grants_right?(u, :create) }
+            given { |u| grants_right?(u, :create) }
             can :update
           end
         end
@@ -497,10 +497,10 @@ describe AdheresToPolicy::InstanceMethods do
         allow(AdheresToPolicy::Cache).to receive(:fetch).and_yield
         expect(AdheresToPolicy::Cache).to receive(:fetch)
           .with(/create/, a_hash_including(use_rails_cache: true))
-        instance.grants_right?('foobar', :update)
+        instance.grants_right?("foobar", :update)
       end
 
-      it 'must not cache permissions calculated in the course of calculating others when configured not to' do
+      it "must not cache permissions calculated in the course of calculating others when configured not to" do
         AdheresToPolicy.configuration.cache_intermediate_permissions = false
 
         klass = Class.new do
@@ -510,7 +510,7 @@ describe AdheresToPolicy::InstanceMethods do
             given { |_| true }
             can :create
 
-            given { |u| self.grants_right?(u, :create) }
+            given { |u| grants_right?(u, :create) }
             can :update
           end
         end
@@ -523,11 +523,11 @@ describe AdheresToPolicy::InstanceMethods do
         expect(AdheresToPolicy::Cache).to receive(:fetch)
           .with(/create/, a_hash_including(use_rails_cache: false))
           .twice
-        instance.grants_right?('foobar', :update)
-        instance.grants_right?('foobar', :update)
+        instance.grants_right?("foobar", :update)
+        instance.grants_right?("foobar", :update)
       end
 
-      it 'must not cache anything when configured not to' do
+      it "must not cache anything when configured not to" do
         AdheresToPolicy.configuration.cache_permissions = false
 
         klass = Class.new do
@@ -545,7 +545,7 @@ describe AdheresToPolicy::InstanceMethods do
           .and_yield
         expect(AdheresToPolicy::Cache).to receive(:write)
           .with(/update/, true, a_hash_including(use_rails_cache: false))
-        instance.grants_right?('foobar', :create)
+        instance.grants_right?("foobar", :create)
       end
     end
   end

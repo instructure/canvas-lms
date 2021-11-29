@@ -20,7 +20,7 @@
 module DataFixup::FixReinsertedVerifierQuestionYaml
   def self.links_to_change(data)
     updates = {}
-    data.scan(/\/assessment_questions\/\d+\/files\/\d+[^'">\\]*(.\\&[^'">\\]*verifier[^'">\\]*)"/) do |match|
+    data.scan(%r{/assessment_questions/\d+/files/\d+[^'">\\]*(.\\&[^'">\\]*verifier[^'">\\]*)"}) do |match|
       verifier = match.first
       # remove the & if it was added in unnecessarily - i.e. we'll get a "?&verifier=blah"
       updates["#{verifier}\""] = verifier.start_with?("?") ? "#{verifier.sub("\\&", "")}\\\"" : "#{verifier.sub("\\&", "&")}\\\""
@@ -35,7 +35,7 @@ module DataFixup::FixReinsertedVerifierQuestionYaml
 
     GuardRail.activate(:secondary) do
       Quizzes::Quiz.find_ids_in_ranges do |min_id, max_id|
-        Quizzes::Quiz.where(:id => min_id..max_id)
+        Quizzes::Quiz.where(id: min_id..max_id)
                      .where("updated_at > ? AND quiz_data LIKE ?", date, "%assessment_questions%").pluck(Arel.sql("id, quiz_data as qd")).each do |id, data|
           updates = links_to_change(data)
           quiz_updates[id] = updates if updates.any?
@@ -43,7 +43,7 @@ module DataFixup::FixReinsertedVerifierQuestionYaml
       end
 
       Quizzes::QuizQuestion.find_ids_in_ranges do |min_id, max_id|
-        Quizzes::QuizQuestion.where(:id => min_id..max_id)
+        Quizzes::QuizQuestion.where(id: min_id..max_id)
                              .where("updated_at > ? AND question_data LIKE ? AND (assessment_question_id IS NOT NULL OR migration_id IS NOT NULL)",
                                     date, "%assessment_questions%").pluck(Arel.sql("id, question_data as qd")).each do |id, data|
           updates = links_to_change(data)
@@ -58,7 +58,7 @@ module DataFixup::FixReinsertedVerifierQuestionYaml
         sql.sub!("replace(quiz_data", "replace(replace(quiz_data, ?, ?)")
       end
       update_sql = User.send(:sanitize_sql, [sql] + updates.to_a.flatten + [Time.now.utc])
-      Quizzes::Quiz.where(:id => id).update_all(update_sql)
+      Quizzes::Quiz.where(id: id).update_all(update_sql)
     end
 
     qq_updates.each do |id, updates|
@@ -67,7 +67,7 @@ module DataFixup::FixReinsertedVerifierQuestionYaml
         sql.sub!("replace(question_data", "replace(replace(question_data, ?, ?)")
       end
       update_sql = User.send(:sanitize_sql, [sql] + updates.to_a.flatten + [Time.now.utc])
-      Quizzes::QuizQuestion.where(:id => id).update_all(update_sql)
+      Quizzes::QuizQuestion.where(id: id).update_all(update_sql)
     end
   end
 end

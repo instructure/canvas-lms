@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../views_helper'
+require_relative "../views_helper"
 
 describe "/users/user_dashboard" do
   it "renders" do
@@ -44,9 +44,9 @@ describe "/users/user_dashboard" do
     assign(:topics, [])
     assign(:upcoming_events, [])
     assign(:stream_items, [])
-    assign(:announcements, [AccountNotification.create(:message => 'hi', :start_at => Time.zone.today - 1.day,
-                                                       :end_at => Time.zone.today + 2.days, :user => User.create!,
-                                                       :subject => "My Global Announcement", :account => Account.default)])
+    assign(:announcements, [AccountNotification.create(message: "hi", start_at: Time.zone.today - 1.day,
+                                                       end_at: Time.zone.today + 2.days, user: User.create!,
+                                                       subject: "My Global Announcement", account: Account.default)])
     render "users/user_dashboard"
     expect(response.body).to match(/My\sGlobal\sAnnouncement/)
     expect(response.body).to match(/(This\sis\sa\smessage\sfrom\s<b>Default\sAccount)/)
@@ -61,9 +61,9 @@ describe "/users/user_dashboard" do
     assign(:topics, [])
     assign(:upcoming_events, [])
     assign(:stream_items, [])
-    assign(:announcements, [AccountNotification.create(:message => 'hi', :start_at => Time.zone.today - 1.day,
-                                                       :end_at => Time.zone.today + 2.days, :user => User.create!,
-                                                       :subject => "My Global Announcement", :account => Account.site_admin)])
+    assign(:announcements, [AccountNotification.create(message: "hi", start_at: Time.zone.today - 1.day,
+                                                       end_at: Time.zone.today + 2.days, user: User.create!,
+                                                       subject: "My Global Announcement", account: Account.site_admin)])
     render "users/user_dashboard"
     expect(response.body).to match(/(This\sis\sa\smessage\sfrom\s<b>Canvas\sAdministration)/)
   end

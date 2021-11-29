@@ -20,12 +20,12 @@
 
 class BookmarkedCollection::WrapProxy < BookmarkedCollection::Proxy
   def initialize(bookmarker, base_scope)
-    super bookmarker, lambda { |pager|
+    super(bookmarker, lambda do |pager|
       scope = base_scope
       scope = bookmarker.restrict_scope(scope, pager)
       scope = yield scope if block_given?
-      scope.paginate(:page => 1, :per_page => pager.per_page, :total_entries => scope.except(:group, :select).count)
-    }
+      scope.paginate(page: 1, per_page: pager.per_page, total_entries: scope.except(:group, :select).count)
+    end)
   end
 
   def execute_pager(pager)

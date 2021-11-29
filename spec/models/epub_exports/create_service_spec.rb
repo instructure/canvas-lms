@@ -30,7 +30,7 @@ describe EpubExports::CreateService do
     end
 
     it "sends save & export to epub_export" do
-      expect(create_service.offline_export.new_record?).to be_truthy, 'precondition'
+      expect(create_service.offline_export.new_record?).to be_truthy, "precondition"
       expect(create_service.offline_export).to receive(:export).once.and_return(nil)
       expect(create_service.save).to be_truthy
       expect(create_service.offline_export.new_record?).to be_falsey

@@ -22,15 +22,15 @@ describe "Quizzes2 Exporter" do
     before :once do
       @course = Account.default.courses.create!
       @tool = Account.default.context_external_tools.create!(
-        name: 'Quizzes.Next',
-        consumer_key: 'test_key',
-        shared_secret: 'test_secret',
-        tool_id: 'Quizzes 2',
-        url: 'http://example.com/launch'
+        name: "Quizzes.Next",
+        consumer_key: "test_key",
+        shared_secret: "test_secret",
+        tool_id: "Quizzes 2",
+        url: "http://example.com/launch"
       )
       @quiz = @course.quizzes.create!(
-        title: 'quiz1',
-        quiz_type: 'assignment',
+        title: "quiz1",
+        quiz_type: "assignment",
         points_possible: 2.0,
         due_at: 2.days.ago,
         unlock_at: 7.days.ago,
@@ -44,16 +44,16 @@ describe "Quizzes2 Exporter" do
     end
 
     it "creates a Quizzes2 assignment group if it doesn't exist" do
-      expect(@course.assignment_groups.exists?(name: Exporters::Quizzes2Exporter::GROUP_NAME)).to eq false
+      expect(@course.assignment_groups.where(name: Exporters::Quizzes2Exporter::GROUP_NAME).exists?).to eq false
       @quizzes2.export
-      expect(@course.assignment_groups.exists?(name: Exporters::Quizzes2Exporter::GROUP_NAME)).to eq true
+      expect(@course.assignment_groups.where(name: Exporters::Quizzes2Exporter::GROUP_NAME).exists?).to eq true
     end
 
     it "creates a Quizzes2 assignment group if it was previously deleted" do
       old_group = @course.assignment_groups.create(name: Exporters::Quizzes2Exporter::GROUP_NAME)
       old_group.destroy
       @quizzes2.export
-      expect(@course.assignment_groups.exists?(name: Exporters::Quizzes2Exporter::GROUP_NAME)).to eq true
+      expect(@course.assignment_groups.where(name: Exporters::Quizzes2Exporter::GROUP_NAME).exists?).to eq true
     end
 
     it "does not create a new Quizzes2 assignment group if one exists" do
@@ -73,14 +73,14 @@ describe "Quizzes2 Exporter" do
       expect(assignment.unlock_at).to eq @quiz.unlock_at
       expect(assignment.lock_at).to eq @quiz.lock_at
       expect(assignment.post_to_sis).to eq @quiz.assignment.post_to_sis
-      expect(assignment.submission_types).to eq 'external_tool'
+      expect(assignment.submission_types).to eq "external_tool"
       expect(assignment.external_tool_tag.url).to eq @tool.url
       expect(assignment.assignment_group.name).to eq Exporters::Quizzes2Exporter::GROUP_NAME
     end
 
     it "doesn't fail when exporting an ungraded quiz and SIS grade export is enabled" do
       @course.enable_feature!(:post_grades)
-      survey_quiz = @course.quizzes.create!(title: 'blah', quiz_type: 'survey')
+      survey_quiz = @course.quizzes.create!(title: "blah", quiz_type: "survey")
       ce = @course.content_exports.create!(
         export_type: ContentExport::QUIZZES2,
         selected_content: survey_quiz.id
@@ -89,19 +89,19 @@ describe "Quizzes2 Exporter" do
       expect { exporter.export }.to change { @course.assignments.count }.by(1)
     end
 
-    context 'when newquizzes_on_quiz_page is enabled' do
+    context "when newquizzes_on_quiz_page is enabled" do
       before do
         @course.root_account.enable_feature!(:newquizzes_on_quiz_page)
       end
 
-      it 'sets correct workflow_state' do
+      it "sets correct workflow_state" do
         @quizzes2.export
         assignment = @course.assignments.where.not(id: @quiz.assignment.id).first
-        expect(assignment.workflow_state).to eq 'migrating'
+        expect(assignment.workflow_state).to eq "migrating"
         expect(assignment.migrate_from_id).to be(@quiz.id)
       end
 
-      context 'when failed assignment is provided' do
+      context "when failed assignment is provided" do
         let(:failed_assignment) do
           @course.assignments.create!(
             position: 777,
@@ -110,10 +110,10 @@ describe "Quizzes2 Exporter" do
         end
 
         let(:assignment_group) do
-          @course.assignment_groups.create!(name: 'group_123')
+          @course.assignment_groups.create!(name: "group_123")
         end
 
-        it 'creates assignment with expected group and position' do
+        it "creates assignment with expected group and position" do
           @quizzes2.export(failed_assignment_id: failed_assignment.id)
           assignment = @course.assignments.where.not(id: @quiz.assignment.id).first
           expect(assignment.position).to be(777)

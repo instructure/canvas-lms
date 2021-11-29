@@ -17,13 +17,13 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'json'
-require 'securerandom'
-require 'simple_oauth'
-require 'faraday'
-require 'faraday_middleware'
+require "json"
+require "securerandom"
+require "simple_oauth"
+require "faraday"
+require "faraday_middleware"
 
 module TurnitinApi
-  require 'turnitin_api/version'
-  require 'turnitin_api/outcomes_response_transformer'
+  require "turnitin_api/version"
+  require "turnitin_api/outcomes_response_transformer"
 end

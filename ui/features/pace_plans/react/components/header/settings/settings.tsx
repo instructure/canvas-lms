@@ -151,6 +151,7 @@ export class Settings extends React.Component<ComponentProps, LocalState> {
     return (
       <View as="div" margin="small 0 0" width="100%">
         <Checkbox
+          data-testid='require-end-date-toggle'
           label={I18n.t('Require Completion by Specified End Date')}
           checked={this.props.pacePlan.hard_end_dates}
           disabled={this.props.planPublishing}

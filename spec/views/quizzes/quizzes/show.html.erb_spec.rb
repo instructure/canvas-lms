@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../../views_helper'
+require_relative "../../views_helper"
 
 describe "/quizzes/quizzes/show" do
   it "renders" do
@@ -30,7 +30,7 @@ describe "/quizzes/quizzes/show" do
   end
 
   it "renders a notice instead of grades when grades have not been posted" do
-    course_with_student(:active_all => true)
+    course_with_student(active_all: true)
     quiz = @course.quizzes.create
     quiz.workflow_state = "available"
     quiz.save!
@@ -52,7 +52,7 @@ describe "/quizzes/quizzes/show" do
   end
 
   it "doesn't warn students if quiz is published" do
-    course_with_student(:active_all => true)
+    course_with_student(active_all: true)
     quiz = @course.quizzes.build
     quiz.publish!
     assign(:quiz, quiz)
@@ -62,7 +62,7 @@ describe "/quizzes/quizzes/show" do
   end
 
   it "shows header bar and publish button" do
-    course_with_teacher(:active_all => true)
+    course_with_teacher(active_all: true)
     assign(:quiz, @course.quizzes.create!)
 
     view_context
@@ -73,7 +73,7 @@ describe "/quizzes/quizzes/show" do
   end
 
   it "shows unpublished quiz changes to instructors" do
-    course_with_teacher(:active_all => true)
+    course_with_teacher(active_all: true)
     @quiz = @course.quizzes.create!
     @quiz.workflow_state = "available"
     @quiz.save!
@@ -105,60 +105,60 @@ describe "/quizzes/quizzes/show" do
     end
   end
 
-  it 'renders teacher partial for teachers' do
+  it "renders teacher partial for teachers" do
     course_with_teacher(active_all: true)
     view_context
     assign(:quiz, @course.quizzes.create!)
-    render 'quizzes/quizzes/show'
-    expect(view).to have_rendered '/quizzes/quizzes/_quiz_show_teacher'
-    expect(view).not_to have_rendered '/quizzes/quizzes/_quiz_show_student'
+    render "quizzes/quizzes/show"
+    expect(view).to have_rendered "/quizzes/quizzes/_quiz_show_teacher"
+    expect(view).not_to have_rendered "/quizzes/quizzes/_quiz_show_student"
   end
 
-  it 'does not render direct share menu options for students' do
+  it "does not render direct share menu options for students" do
     course_with_student(active_all: true)
     view_context
     assign(:quiz, @course.quizzes.create!)
-    render 'quizzes/quizzes/show'
+    render "quizzes/quizzes/show"
     doc = Nokogiri::HTML5(response)
-    expect(doc.css('.direct-share-send-to-menu-item')).to be_empty
+    expect(doc.css(".direct-share-send-to-menu-item")).to be_empty
   end
 
-  it 'renders direct share menu options for user with :read_as_admin, even without manage permission' do
+  it "renders direct share menu options for user with :read_as_admin, even without manage permission" do
     @account = Account.default
-    @role = custom_teacher_role('No Manage')
+    @role = custom_teacher_role("No Manage")
     @account.role_overrides.create!(permission: :manage_assignments, role: @role, enabled: false)
     course_with_teacher(active_all: true, role: @role)
     view_context
     assign(:quiz, @course.quizzes.create!)
-    render 'quizzes/quizzes/show'
+    render "quizzes/quizzes/show"
     doc = Nokogiri::HTML5(response)
-    expect(doc.css('.direct-share-send-to-menu-item')).not_to be_empty
+    expect(doc.css(".direct-share-send-to-menu-item")).not_to be_empty
   end
 
-  it 'renders direct share menu items when enabled with permission' do
+  it "renders direct share menu items when enabled with permission" do
     course_with_teacher(active_all: true)
     view_context
     assign(:quiz, @course.quizzes.create!)
-    render 'quizzes/quizzes/show'
+    render "quizzes/quizzes/show"
     doc = Nokogiri::HTML5(response)
-    expect(doc.css('.direct-share-send-to-menu-item')).not_to be_empty
+    expect(doc.css(".direct-share-send-to-menu-item")).not_to be_empty
   end
 
-  it 'renders student partial for students' do
+  it "renders student partial for students" do
     course_with_student(active_all: true)
     quiz = @course.quizzes.build
     quiz.publish!
     assign(:quiz, quiz)
     view_context
-    render 'quizzes/quizzes/show'
-    expect(view).to have_rendered '/quizzes/quizzes/_quiz_show_student'
-    expect(view).not_to have_rendered '/quizzes/quizzes/_quiz_show_teacher'
+    render "quizzes/quizzes/show"
+    expect(view).to have_rendered "/quizzes/quizzes/_quiz_show_student"
+    expect(view).not_to have_rendered "/quizzes/quizzes/_quiz_show_teacher"
   end
 
-  it 'renders draft version warning' do
+  it "renders draft version warning" do
     course_with_student(active_all: true)
     quiz = @course.quizzes.create
-    quiz.workflow_state = 'available'
+    quiz.workflow_state = "available"
     quiz.save!
     quiz.reload
     quiz.assignment.ensure_post_policy(post_manually: true)
@@ -167,14 +167,14 @@ describe "/quizzes/quizzes/show" do
     submission.score = 5
     submission.user = @student
     submission.attempt = 1
-    submission.workflow_state = 'complete'
+    submission.workflow_state = "complete"
     submission.save
     assign(:quiz, quiz)
     assign(:submission, submission)
     params[:preview] = true
     view_context
-    render 'quizzes/quizzes/show'
+    render "quizzes/quizzes/show"
 
-    expect(response).to include 'preview of the draft version'
+    expect(response).to include "preview of the draft version"
   end
 end

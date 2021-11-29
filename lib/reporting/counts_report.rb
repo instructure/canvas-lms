@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'date'
+require "date"
 
 module Reporting
   class CountsReport
@@ -29,7 +29,7 @@ module Reporting
       reporter = new
 
       Account.root_accounts.active.non_shadow.each do |account|
-        next if account.external_status == 'test'
+        next if account.external_status == "test"
 
         reporter.process_account(account)
       end
@@ -62,14 +62,14 @@ module Reporting
           data[:media_files] = 0
           data[:media_files_size] = 0
         else
-          timespan = Setting.get('recently_logged_in_timespan', 30.days.to_s).to_i.seconds
+          timespan = Setting.get("recently_logged_in_timespan", 30.days.to_s).to_i.seconds
           enrollment_scope = Enrollment.active.not_fake
                                        .joins("INNER JOIN #{Pseudonym.quoted_table_name} ON enrollments.user_id=pseudonyms.user_id")
-                                       .where(pseudonyms: { workflow_state: 'active' })
+                                       .where(pseudonyms: { workflow_state: "active" })
                                        .where("course_id IN (?) AND pseudonyms.last_request_at>?", course_ids, timespan.seconds.ago)
 
-          data[:teachers] = enrollment_scope.where(:type => 'TeacherEnrollment').distinct.count(:user_id)
-          data[:students] = enrollment_scope.where(:type => 'StudentEnrollment').distinct.count(:user_id)
+          data[:teachers] = enrollment_scope.where(type: "TeacherEnrollment").distinct.count(:user_id)
+          data[:students] = enrollment_scope.where(type: "StudentEnrollment").distinct.count(:user_id)
           data[:users] = enrollment_scope.distinct.count(:user_id)
 
           # ActiveRecord::Base.calculate doesn't support multiple calculations in account single pass
@@ -109,14 +109,14 @@ module Reporting
     end
 
     def create_progressive_hashes(cumulative, totals)
-      year = { :year => @yesterday.year }
+      year = { year: @yesterday.year }
       copy_counts(year, totals)
-      cumulative[:yearly].pop if cumulative[:yearly].last and cumulative[:yearly].last[:year] == year[:year]
+      cumulative[:yearly].pop if cumulative[:yearly].last && cumulative[:yearly].last[:year] == year[:year]
       cumulative[:yearly] << year
 
-      month = { :year => @yesterday.year, :month => @yesterday.month }
+      month = { year: @yesterday.year, month: @yesterday.month }
       copy_counts(month, totals)
-      if cumulative[:monthly].last and cumulative[:monthly].last[:year] == month[:year] and cumulative[:monthly].last[:month] == month[:month]
+      if cumulative[:monthly].last && (cumulative[:monthly].last[:year] == month[:year]) && cumulative[:monthly].last[:month] == month[:month]
         cumulative[:monthly].pop
       end
       cumulative[:monthly] << month
@@ -124,9 +124,9 @@ module Reporting
         cumulative[:monthly].shift
       end
 
-      week = { :year => @yesterday.year, :month => @yesterday.month, :week => @week }
+      week = { year: @yesterday.year, month: @yesterday.month, week: @week }
       copy_counts(week, totals)
-      if cumulative[:weekly].last and cumulative[:weekly].last[:year] == week[:year] and cumulative[:weekly].last[:week] == week[:week]
+      if cumulative[:weekly].last && (cumulative[:weekly].last[:year] == week[:year]) && cumulative[:weekly].last[:week] == week[:week]
         cumulative[:weekly].pop
       end
       cumulative[:weekly] << week
@@ -150,7 +150,7 @@ module Reporting
     def get_course_ids(account)
       is_default_account = account.external_status == ExternalStatuses.default_external_status.to_s
       course_ids = []
-      account.all_courses.where(:workflow_state => 'available').select([:id, :updated_at]).find_in_batches do |batch|
+      account.all_courses.where(workflow_state: "available").select([:id, :updated_at]).find_in_batches do |batch|
         course_ids.concat batch.select { |course| !is_default_account || should_use_default_account_course(course) }.map(&:id)
       end
       course_ids
@@ -163,29 +163,28 @@ module Reporting
 
     def new_counts_hash
       {
-        :institutions => 0,
-        :courses => 0,
-        :teachers => 0,
-        :students => 0,
-        :users => 0,
-        :files => 0,
-        :files_size => 0,
-        :media_files => 0,
-        :media_files_size => 0,
+        institutions: 0,
+        courses: 0,
+        teachers: 0,
+        students: 0,
+        users: 0,
+        files: 0,
+        files_size: 0,
+        media_files: 0,
+        media_files_size: 0,
       }
     end
 
     def new_progressive_hash
-      { :yearly => [], :monthly => [], :weekly => [] }
+      { yearly: [], monthly: [], weekly: [] }
     end
 
     def start_progressive_hash
-      hash = {
-        :generated_at => @timestamp,
-        :totals => new_progressive_hash,
-        :detailed => {}
+      {
+        generated_at: @timestamp,
+        totals: new_progressive_hash,
+        detailed: {}
       }
-      hash
     end
   end
 end

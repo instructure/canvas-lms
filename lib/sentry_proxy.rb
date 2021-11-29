@@ -17,14 +17,14 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'raven/base'
+require "raven/base"
 
 class SentryProxy
   def self.capture(exception, data, level = :error)
     if exception.is_a?(String) || exception.is_a?(Symbol)
       Raven.capture_message(exception.to_s, data) if reportable?(exception.to_s, level)
-    else
-      Raven.capture_exception(exception, data) if reportable?(exception, level)
+    elsif reportable?(exception, level)
+      Raven.capture_exception(exception, data)
     end
   end
 
@@ -34,7 +34,7 @@ class SentryProxy
   #  configure the sentry client in an initializer).  This allows plugins and extensions
   # to register their own errors that they don't want to get reported to sentry
   def self.register_ignorable_error(error_class)
-    @ignorable_errors = (self.ignorable_errors << error_class.to_s).uniq
+    @ignorable_errors = (ignorable_errors << error_class.to_s).uniq
   end
 
   def self.ignorable_errors

@@ -19,32 +19,32 @@
 #
 
 class Mutations::UpdateDiscussionEntry < Mutations::BaseMutation
-  graphql_name 'UpdateDiscussionEntry'
+  graphql_name "UpdateDiscussionEntry"
 
-  argument :discussion_entry_id, ID, required: true, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func('DiscussionEntry')
+  argument :discussion_entry_id, ID, required: true, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("DiscussionEntry")
   argument :message, String, required: false
   argument :remove_attachment, Boolean, required: false
-  argument :file_id, ID, required: false, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func('Attachment')
+  argument :file_id, ID, required: false, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Attachment")
   argument :include_reply_preview, Boolean, required: false
 
   field :discussion_entry, Types::DiscussionEntryType, null: true
   def resolve(input:)
     entry = DiscussionEntry.find(input[:discussion_entry_id])
     raise ActiveRecord::RecordNotFound unless entry.grants_right?(current_user, session, :read)
-    return validation_error(I18n.t('Insufficient Permissions')) unless entry.grants_right?(current_user, session, :update)
+    return validation_error(I18n.t("Insufficient Permissions")) unless entry.grants_right?(current_user, session, :update)
 
     unless input[:message].nil?
       entry.message = Api::Html::Content.process_incoming(input[:message], host: context[:request].host, port: context[:request].port)
     end
 
-    unless input[:remove_attachment].nil?
-      entry.attachment_id = nil if input[:remove_attachment]
+    if !input[:remove_attachment].nil? && input[:remove_attachment]
+      entry.attachment_id = nil
     end
 
-    unless input[:include_reply_preview].nil?
-      if entry.parent_entry && entry.parent_entry.id != entry.root_entry_id
-        entry.include_reply_preview = input[:include_reply_preview]
-      end
+    if !input[:include_reply_preview].nil? &&
+       entry.parent_entry &&
+       entry.parent_entry.id != entry.root_entry_id
+      entry.include_reply_preview = input[:include_reply_preview]
     end
 
     unless input[:file_id].nil?
@@ -61,6 +61,6 @@ class Mutations::UpdateDiscussionEntry < Mutations::BaseMutation
 
     { discussion_entry: entry }
   rescue ActiveRecord::RecordNotFound
-    raise GraphQL::ExecutionError, 'not found'
+    raise GraphQL::ExecutionError, "not found"
   end
 end

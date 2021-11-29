@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../graphql_spec_helper'
+require_relative "../graphql_spec_helper"
 
 RSpec.describe Mutations::UpdateDiscussionTopic do
   before(:once) do
@@ -59,44 +59,44 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
     result.to_h.with_indifferent_access
   end
 
-  it 'publishes the discussion topic' do
+  it "publishes the discussion topic" do
     @topic.unpublish!
     expect(@topic.published?).to be false
 
     result = run_mutation({ id: @topic.id, published: true })
-    expect(result.dig('errors')).to be nil
-    expect(result.dig('data', 'updateDiscussionTopic', 'discussionTopic', 'published')).to be true
+    expect(result["errors"]).to be nil
+    expect(result.dig("data", "updateDiscussionTopic", "discussionTopic", "published")).to be true
     @topic.reload
     expect(@topic.published?).to be true
   end
 
-  it 'unpublishes the discussion topic' do
+  it "unpublishes the discussion topic" do
     @topic.publish!
     expect(@topic.published?).to be true
 
     result = run_mutation({ id: @topic.id, published: false })
-    expect(result.dig('errors')).to be nil
-    expect(result.dig('data', 'updateDiscussionTopic', 'discussionTopic', 'published')).to be false
+    expect(result["errors"]).to be nil
+    expect(result.dig("data", "updateDiscussionTopic", "discussionTopic", "published")).to be false
     @topic.reload
     expect(@topic.published?).to be false
   end
 
-  it 'locks the discussion topic' do
+  it "locks the discussion topic" do
     expect(@topic.locked).to be false
 
     result = run_mutation(id: @topic.id, locked: true)
-    expect(result.dig('errors')).to be nil
-    expect(result.dig('data', 'updateDiscussionTopic', 'discussionTopic', 'locked')).to be true
+    expect(result["errors"]).to be nil
+    expect(result.dig("data", "updateDiscussionTopic", "discussionTopic", "locked")).to be true
     expect(@topic.reload.locked).to be true
   end
 
-  it 'unlocks the discussion topic' do
+  it "unlocks the discussion topic" do
     @topic.lock!
     expect(@topic.locked).to be true
 
     result = run_mutation(id: @topic.id, locked: false)
-    expect(result.dig('errors')).to be nil
-    expect(result.dig('data', 'updateDiscussionTopic', 'discussionTopic', 'locked')).to be false
+    expect(result["errors"]).to be nil
+    expect(result.dig("data", "updateDiscussionTopic", "discussionTopic", "locked")).to be false
     expect(@topic.reload.locked).to be false
   end
 end

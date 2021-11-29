@@ -18,8 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'yaml'
-require 'date'
+require "yaml"
+require "date"
 
 # SafeYAML-like interface, but vanilla Psych
 module SafeYAML
@@ -47,7 +47,7 @@ module SafeYAML
     Symbol,
     Time,
     URI::HTTP,
-    URI::HTTPS,
+    URI::HTTPS
   )
 
   module Psych

@@ -27,7 +27,7 @@ describe DataFixup::ReassociateGradingPeriodGroups do
   let(:period_helper) { Factories::GradingPeriodHelper.new }
 
   before do
-    @root_account = Account.create(name: 'new account')
+    @root_account = Account.create(name: "new account")
     group = group_helper.create_for_account(@root_account)
     period_helper.create_presets_for_group(group, :current)
     @root_account.enrollment_terms.create!

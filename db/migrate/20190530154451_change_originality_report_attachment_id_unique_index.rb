@@ -23,8 +23,8 @@ class ChangeOriginalityReportAttachmentIdUniqueIndex < ActiveRecord::Migration[5
   disable_ddl_transaction!
 
   def change
-    add_index :originality_reports, :originality_report_attachment_id, algorithm: :concurrently, name: 'temp_index_reports_on_originality_report_attachment_id'
-    remove_index :originality_reports, name: 'index_originality_reports_on_originality_report_attachment_id', column: 'originality_report_attachment_id'
-    rename_index :originality_reports, 'temp_index_reports_on_originality_report_attachment_id', 'index_originality_reports_on_originality_report_attachment_id'
+    add_index :originality_reports, :originality_report_attachment_id, algorithm: :concurrently, name: "temp_index_reports_on_originality_report_attachment_id"
+    remove_index :originality_reports, name: "index_originality_reports_on_originality_report_attachment_id", column: "originality_report_attachment_id"
+    rename_index :originality_reports, "temp_index_reports_on_originality_report_attachment_id", "index_originality_reports_on_originality_report_attachment_id"
   end
 end

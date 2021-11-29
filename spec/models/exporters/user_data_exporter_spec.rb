@@ -19,18 +19,18 @@
 
 describe "User data exports" do
   before do
-    course_with_student(:active_all => true)
+    course_with_student(active_all: true)
     @course.name = "some silly course"
     @course.save!
-    @assignment = @course.assignments.create!(:name => "assignmentname")
+    @assignment = @course.assignments.create!(name: "assignmentname")
     @assignment.submission_types = "online_text_entry,online_url,online_upload"
     @assignment.save!
 
-    @file = Attachment.create!(:uploaded_data => StringIO.new('blah'),
-                               :context => @course, :filename => 'blah.txt')
-    @sub1 = @assignment.submit_homework(@student, :attachments => [@file], :submission_type => "online_upload")
-    @sub2 = @assignment.submit_homework(@student, :body => "blahblahblah text entry", :submission_type => "online_text_entry")
-    @sub3 = @assignment.submit_homework(@student, :url => "http://reddit.com/r/mylittlepony", :submission_type => "online_url")
+    @file = Attachment.create!(uploaded_data: StringIO.new("blah"),
+                               context: @course, filename: "blah.txt")
+    @sub1 = @assignment.submit_homework(@student, attachments: [@file], submission_type: "online_upload")
+    @sub2 = @assignment.submit_homework(@student, body: "blahblahblah text entry", submission_type: "online_text_entry")
+    @sub3 = @assignment.submit_homework(@student, url: "http://reddit.com/r/mylittlepony", submission_type: "online_url")
   end
 
   it "exports student submissions" do

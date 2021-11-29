@@ -22,16 +22,16 @@ class AddReportedReplyNotification < ActiveRecord::Migration[6.0]
   def up
     if Shard.current.default? && !::Rails.env.test?
       Canvas::MessageHelper.create_notification({
-                                                  name: 'Reported Reply',
+                                                  name: "Reported Reply",
                                                   delay_for: 120,
-                                                  category: 'ReportedReply'
+                                                  category: "ReportedReply"
                                                 })
     end
   end
 
   def down
     if Shard.current.default?
-      Notification.where(name: 'Reported Reply').delete_all
+      Notification.where(name: "Reported Reply").delete_all
     end
   end
 end

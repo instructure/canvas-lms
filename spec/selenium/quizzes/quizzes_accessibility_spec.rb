@@ -17,10 +17,10 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../common'
-require_relative '../helpers/quizzes_common'
+require_relative "../common"
+require_relative "../helpers/quizzes_common"
 
-describe 'quizzes accessibility' do
+describe "quizzes accessibility" do
   include_context "in-process server selenium tests"
   include QuizzesCommon
 
@@ -29,9 +29,9 @@ describe 'quizzes accessibility' do
     @last_quiz = start_quiz_question
   end
 
-  it 'renders all answer arrows accessible to a screen reader', priority: "2", test_id: 209355 do
-    skip('started failing around Mar 20, 2016 - need investigation')
-    skip_if_chrome('Can not get to student view in Chrome')
+  it "renders all answer arrows accessible to a screen reader", priority: "2" do
+    skip("started failing around Mar 20, 2016 - need investigation")
+    skip_if_chrome("Can not get to student view in Chrome")
     # -------------------------------------------------------------------------
     # adapted from:
     #   file: quizzes_question_creation_spec
@@ -58,11 +58,11 @@ describe 'quizzes accessibility' do
       expect(f("#question_#{quiz.quiz_questions[i].id}")).to be_truthy
     end
 
-    questions = ff('.display_question')
-    expect(questions[0]).to have_class('multiple_choice_question')
-    expect(questions[1]).to have_class('multiple_choice_question')
-    expect(questions[2]).to have_class('true_false_question')
-    expect(questions[3]).to have_class('short_answer_question')
+    questions = ff(".display_question")
+    expect(questions[0]).to have_class("multiple_choice_question")
+    expect(questions[1]).to have_class("multiple_choice_question")
+    expect(questions[2]).to have_class("true_false_question")
+    expect(questions[3]).to have_class("short_answer_question")
 
     #
     # end of adapted code
@@ -72,7 +72,7 @@ describe 'quizzes accessibility' do
     # snippet from:
     #   file: teacher_quizzes_statistics_spec
     #   symbol: publish_the_quiz
-    quiz.workflow_state = 'available'
+    quiz.workflow_state = "available"
     quiz.generate_quiz_data
     quiz.published_at = Time.zone.now
     quiz.save!
@@ -84,7 +84,7 @@ describe 'quizzes accessibility' do
     @fake_student = @course.student_view_student
     enter_student_view
     get "/courses/#{@course.id}/quizzes/#{quiz.id}"
-    f('#take_quiz_link').click
+    f("#take_quiz_link").click
     wait_for_ajaximations
     # --
 
@@ -96,23 +96,23 @@ describe 'quizzes accessibility' do
     q = quiz.stored_questions[1]
     f("#question_#{q[:id]}_answer_#{q[:answers][1][:id]}").click
 
-    f('#submit_quiz_button').click
+    f("#submit_quiz_button").click
     accept_alert # it will warn about having unanswered questions
     wait_for_ajaximations
 
     get "/courses/#{@course.id}/quizzes/#{quiz.id}/history?version=1"
 
     # all arrows should have an @id attribute node
-    expect(ffj('.answer_arrow:not([id])').length).to eq 0
+    expect(ffj(".answer_arrow:not([id])").length).to eq 0
 
     # the following test cases are intermittent and broken:
 
     # there should be 5x <input /> nodes with an @aria-describedby attribute node
-    expect(ffj('.answer input[aria-describedby]').length).to eq 5
+    expect(ffj(".answer input[aria-describedby]").length).to eq 5
 
     # this covers the fill-in-the-blank question edge case where the answers are
     # not input fields, so the @aria-describedby attribute is set on the wrapper
     # element instead
-    expect(ffj('.answers_wrapper[aria-describedby]').length).to eq 1
+    expect(ffj(".answers_wrapper[aria-describedby]").length).to eq 1
   end
 end

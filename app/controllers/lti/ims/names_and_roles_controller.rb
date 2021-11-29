@@ -261,7 +261,7 @@ module Lti::IMS
   class NamesAndRolesController < ApplicationController
     include Concerns::AdvantageServices
 
-    MIME_TYPE = 'application/vnd.ims.lti-nrps.v2.membershipcontainer+json'
+    MIME_TYPE = "application/vnd.ims.lti-nrps.v2.membershipcontainer+json"
 
     # @API List Course Memberships
     # Return active NamesAndRoleMemberships in the given course.

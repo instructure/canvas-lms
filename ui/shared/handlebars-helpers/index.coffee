@@ -484,6 +484,9 @@ Handlebars.registerHelper name, fn for name, fn of {
     else
       if thing then 'checked' else ''
 
+  checkedIfNullOrUndef: ( thing ) ->
+    if thing == null || thing == undefined then 'checked' else ''
+
   selectedIf: ( thing, thingToCompare, hash ) ->
     if arguments.length == 3
       if thing == thingToCompare

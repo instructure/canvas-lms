@@ -128,6 +128,6 @@ class Quizzes::QuizEligibility
   end
 
   def user_is_active?
-    user.workflow_state.present? && user.workflow_state != 'deleted'
+    user.workflow_state.present? && user.workflow_state != "deleted"
   end
 end

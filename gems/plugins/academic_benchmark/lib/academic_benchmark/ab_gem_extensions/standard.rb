@@ -39,15 +39,15 @@ module AcademicBenchmarks
         all_clarification = has_children? && children.all?(&:clarification?)
         if has_children? && !all_clarification
           # create outcome group
-          hash[:type] = 'learning_outcome_group'
+          hash[:type] = "learning_outcome_group"
           hash[:title] = build_title
           hash[:outcomes] = children.map { |c| c.build_outcomes(ratings) }
         else
           # create outcome
-          hash[:type] = 'learning_outcome'
+          hash[:type] = "learning_outcome"
           hash[:title] = build_num_title
           # include clarifications with parent standard
-          hash[:description] = [description, *children.map(&:description)].join(' ') if all_clarification
+          hash[:description] = [description, *children.map(&:description)].join(" ") if all_clarification
           set_default_ratings(hash, ratings)
         end
         hash
@@ -70,9 +70,9 @@ module AcademicBenchmarks
       end
 
       def set_default_ratings(hash, overrides = {})
-        hash[:ratings] = [{ :description => "Exceeds Expectations", :points => 5 },
-                          { :description => "Meets Expectations", :points => 3 },
-                          { :description => "Does Not Meet Expectations", :points => 0 }]
+        hash[:ratings] = [{ description: "Exceeds Expectations", points: 5 },
+                          { description: "Meets Expectations", points: 3 },
+                          { description: "Does Not Meet Expectations", points: 0 }]
         hash[:mastery_points] = 3
         hash[:points_possible] = 5
         hash.merge!(overrides)
@@ -93,14 +93,14 @@ module AcademicBenchmarks
       end
 
       def clarification?
-        'clarification'.in?(utilizations.map(&:type))
+        "clarification".in?(utilizations.map(&:type))
       end
 
       private
 
       def group_hash(itm)
         {
-          type: 'learning_outcome_group',
+          type: "learning_outcome_group",
           title: Standard.crop(itm.try(:description) || itm.try(:title)),
           migration_id: itm.guid,
           vendor_guid: itm.guid,

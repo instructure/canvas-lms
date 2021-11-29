@@ -18,17 +18,17 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative 'ims/concerns/advantage_services_shared_context'
-require_relative 'ims/concerns/lti_services_shared_examples'
+require_relative "ims/concerns/advantage_services_shared_context"
+require_relative "ims/concerns/lti_services_shared_examples"
 require_dependency "lti/public_jwk_controller"
 
 describe Lti::AccountLookupController do
   include WebMock::API
 
-  include_context 'advantage services context'
+  include_context "advantage services context"
 
-  describe '#show' do
-    it_behaves_like 'lti services' do
+  describe "#show" do
+    it_behaves_like "lti services" do
       let(:action) { :show }
       let(:expected_mime_type) { described_class::MIME_TYPE }
       let(:scope_to_remove) { "https://canvas.instructure.com/lti/account_lookup/scope/show" }
@@ -39,69 +39,69 @@ describe Lti::AccountLookupController do
 
     let(:action) { :show }
 
-    context 'when given just an account it' do
+    context "when given just an account it" do
       let(:params_overrides) do
         { account_id: Account.root_accounts.first.id }
       end
 
-      it 'returns id, uuid, and other fields on account' do
+      it "returns id, uuid, and other fields on account" do
         send_request
         acct = Account.root_accounts.first
         body = JSON.parse(response.body)
         expect(body).to include(
-          'id' => acct.id,
-          'uuid' => acct.uuid,
-          'name' => acct.name,
-          'workflow_state' => acct.workflow_state,
-          'parent_account_id' => acct.parent_account_id,
-          'root_account_id' => nil
+          "id" => acct.id,
+          "uuid" => acct.uuid,
+          "name" => acct.name,
+          "workflow_state" => acct.workflow_state,
+          "parent_account_id" => acct.parent_account_id,
+          "root_account_id" => nil
         )
-        expect(body['id']).to be_a(Integer)
-        expect(body['uuid']).to be_a(String)
+        expect(body["id"]).to be_a(Integer)
+        expect(body["uuid"]).to be_a(String)
       end
     end
 
-    context 'when an invalid account ID is given' do
+    context "when an invalid account ID is given" do
       let(:params_overrides) do
-        { account_id: 991234 }
+        { account_id: 991_234 }
       end
 
-      it 'returns a 404' do
+      it "returns a 404" do
         send_request
-        expect(response.code).to eq('404')
+        expect(response.code).to eq("404")
       end
     end
 
-    context 'when an ID on an invalid shard given' do
+    context "when an ID on an invalid shard given" do
       let(:params_overrides) do
-        { account_id: 1987650000000000000 + Account.root_accounts.first.local_id }
+        { account_id: 1_987_650_000_000_000_000 + Account.root_accounts.first.local_id }
       end
 
-      it 'returns a 404' do
-        expect(Shard.find_by(id: 198765)).to eq(nil)
+      it "returns a 404" do
+        expect(Shard.find_by(id: 198_765)).to eq(nil)
         send_request
-        expect(response.code).to eq('404')
+        expect(response.code).to eq("404")
       end
     end
 
-    context 'when given a global ID' do
+    context "when given a global ID" do
       let(:params_overrides) do
         { account_id: Account.root_accounts.first.global_id }
       end
 
-      it 'returns id, uuid, and other fields on account' do
+      it "returns id, uuid, and other fields on account" do
         send_request
         acct = Account.root_accounts.first
         body = JSON.parse(response.body)
         expect(body).to include(
-          'id' => acct.id,
-          'uuid' => acct.uuid,
-          'name' => acct.name,
-          'workflow_state' => acct.workflow_state,
-          'parent_account_id' => acct.parent_account_id,
-          'root_account_id' => nil
+          "id" => acct.id,
+          "uuid" => acct.uuid,
+          "name" => acct.name,
+          "workflow_state" => acct.workflow_state,
+          "parent_account_id" => acct.parent_account_id,
+          "root_account_id" => nil
         )
-        expect(body['id']).to be_a(Integer)
+        expect(body["id"]).to be_a(Integer)
       end
     end
   end

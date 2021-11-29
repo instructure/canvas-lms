@@ -21,12 +21,12 @@ class DropOldLastAccountReportIndex < ActiveRecord::Migration[5.1]
   tag :postdeploy
 
   def up
-    remove_index :account_reports, name: 'index_account_reports_latest_per_account'
+    remove_index :account_reports, name: "index_account_reports_latest_per_account"
   end
 
   def down
-    add_index :account_reports, [:account_id, :report_type, :updated_at],
+    add_index :account_reports, %i[account_id report_type updated_at],
               order: { updated_at: :desc },
-              name: 'index_account_reports_latest_per_account'
+              name: "index_account_reports_latest_per_account"
   end
 end

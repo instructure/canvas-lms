@@ -22,26 +22,26 @@ module Canvas::Plugins::Validators::GoogleDriveValidator
   def self.validate(settings, plugin_setting)
     if settings.map(&:last).all?(&:blank?)
       {
-        :client_id => '',
-        :client_secret => '',
-        :redirect_uri => '',
-        :auth_uri => '',
-        :token_uri => '',
-        :client_secret_json => ''
+        client_id: "",
+        client_secret: "",
+        redirect_uri: "",
+        auth_uri: "",
+        token_uri: "",
+        client_secret_json: ""
       }
     elsif (res = check_json(settings))
       plugin_setting.errors.add(:base, res)
       false
     else
-      if settings['client_secret_json'].present?
-        parsed = JSON.parse(settings['client_secret_json'])['web']
+      if settings["client_secret_json"].present?
+        parsed = JSON.parse(settings["client_secret_json"])["web"]
         to_return = {
-          :client_id => parsed['client_id'],
-          :client_secret => parsed['client_secret'],
-          :redirect_uri => parsed['redirect_uris'][0], # we only care about the first one
-          :auth_uri => parsed['auth_uri'],
-          :token_uri => parsed['token_uri'],
-          :client_secret_json => ""
+          client_id: parsed["client_id"],
+          client_secret: parsed["client_secret"],
+          redirect_uri: parsed["redirect_uris"][0], # we only care about the first one
+          auth_uri: parsed["auth_uri"],
+          token_uri: parsed["token_uri"],
+          client_secret_json: ""
         }
       else
         to_return = settings.to_hash.with_indifferent_access
@@ -51,17 +51,17 @@ module Canvas::Plugins::Validators::GoogleDriveValidator
   end
 
   def self.check_json(settings)
-    return nil if settings['client_secret_json'].blank?
+    return nil if settings["client_secret_json"].blank?
 
     begin
-      jayson = JSON.parse(settings['client_secret_json'])
+      jayson = JSON.parse(settings["client_secret_json"])
       if !!jayson # if is valid json
-        return 'Missing application type (Needs `web` somewhere in there)' unless jayson['web']
-        return 'Missing `client_id`' unless jayson['web']['client_id']
-        return 'Missing `client_secret`' unless jayson['web']['client_secret']
-        return 'Missing `redirect_uris` (need at least one)' unless jayson['web']['redirect_uris']
-        return 'Missing `auth_uri`' unless jayson['web']['auth_uri']
-        return 'Missing `token_uri`' unless jayson['web']['token_uri']
+        return "Missing application type (Needs `web` somewhere in there)" unless jayson["web"]
+        return "Missing `client_id`" unless jayson["web"]["client_id"]
+        return "Missing `client_secret`" unless jayson["web"]["client_secret"]
+        return "Missing `redirect_uris` (need at least one)" unless jayson["web"]["redirect_uris"]
+        return "Missing `auth_uri`" unless jayson["web"]["auth_uri"]
+        return "Missing `token_uri`" unless jayson["web"]["token_uri"]
       end
     rescue TypeError, JSON::JSONError => e
       "Is not valid JSON \n (#{e.message}) \n (#{e.backtrace.inspect})"

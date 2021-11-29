@@ -18,9 +18,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../../helpers/gradebook_common'
-require_relative '../setup/gradebook_setup'
-require_relative '../pages/gradebook_page'
+require_relative "../../helpers/gradebook_common"
+require_relative "../setup/gradebook_setup"
+require_relative "../pages/gradebook_page"
 
 describe "Student column header options" do
   include_context "in-process server selenium tests"
@@ -37,8 +37,8 @@ describe "Student column header options" do
       @students = @course.students.sort_by { |x| x[:id] }
     end
 
-    it "sorts student column in A-Z order", priority: "1", test_id: 3253316 do
-      Gradebook.click_student_menu_sort_by('A-Z')
+    it "sorts student column in A-Z order", priority: "1" do
+      Gradebook.click_student_menu_sort_by("A-Z")
       expect(Gradebook.fetch_student_names[0]).to eq(@students[0].name)
     end
   end
@@ -49,20 +49,20 @@ describe "Student column header options" do
       @students = @course.students.sort_by { |x| x[:id] }
     end
 
-    it "displays student names as First Last", priority: "1", test_id: 3253319 do
-      Gradebook.click_student_menu_display_as('First,Last')
+    it "displays student names as First Last", priority: "1" do
+      Gradebook.click_student_menu_display_as("First,Last")
       expect(Gradebook.fetch_student_names[0]).to eq(@students[0].name)
     end
 
-    it "displays student names as Last,First", priority: "2", test_id: 3253320 do
-      Gradebook.click_student_menu_display_as('Last,First')
+    it "displays student names as Last,First", priority: "2" do
+      Gradebook.click_student_menu_display_as("Last,First")
 
       student_name = @students[0].last_name + ", " + @students[0].first_name
       expect(Gradebook.fetch_student_names[0]).to eq(student_name)
     end
 
-    it "first,last display name persists", priority: "2", test_id: 3253322 do
-      Gradebook.click_student_menu_display_as('Last,First')
+    it "first,last display name persists", priority: "2" do
+      Gradebook.click_student_menu_display_as("Last,First")
       Gradebook.visit(@course)
 
       student_name = @students[0].last_name + ", " + @students[0].first_name
@@ -75,17 +75,17 @@ describe "Student column header options" do
       Gradebook.visit(@course)
     end
 
-    it "hides Secondary info for display as none", priority: "1", test_id: 3253326 do
-      Gradebook.click_student_menu_secondary_info('None')
+    it "hides Secondary info for display as none", priority: "1" do
+      Gradebook.click_student_menu_secondary_info("None")
 
-      expect(Gradebook.student_column_cell_select(0, 0)).not_to contain_css('secondary-info')
+      expect(Gradebook.student_column_cell_select(0, 0)).not_to contain_css("secondary-info")
     end
 
-    it "persists Secondary info selection", priority: "2", test_id: 3253327 do
-      Gradebook.click_student_menu_secondary_info('None')
+    it "persists Secondary info selection", priority: "2" do
+      Gradebook.click_student_menu_secondary_info("None")
       Gradebook.visit(@course)
 
-      expect(Gradebook.student_column_cell_select(0, 0)).not_to contain_css('secondary-info')
+      expect(Gradebook.student_column_cell_select(0, 0)).not_to contain_css("secondary-info")
     end
   end
 end

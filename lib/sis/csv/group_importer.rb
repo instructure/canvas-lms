@@ -20,10 +20,10 @@
 
 module SIS
   module CSV
-    # note these are account-level groups, not course groups
+    # NOTE: these are account-level groups, not course groups
     class GroupImporter < CSVBaseImporter
       def self.group_csv?(row)
-        row.include?('group_id') && row.include?('name')
+        row.include?("group_id") && row.include?("name")
       end
 
       def self.identifying_fields
@@ -33,15 +33,14 @@ module SIS
       # expected columns
       # group_id,account_id,name,status
       def process(csv, index = nil, count = nil)
-        count = SIS::GroupImporter.new(@root_account, importer_opts).process do |importer|
+        SIS::GroupImporter.new(@root_account, importer_opts).process do |importer|
           csv_rows(csv, index, count) do |row|
-            importer.add_group(row['group_id'], row['group_category_id'], row['account_id'],
-                               row['course_id'], row['name'], row['status'])
+            importer.add_group(row["group_id"], row["group_category_id"], row["account_id"],
+                               row["course_id"], row["name"], row["status"])
           rescue ImportError => e
-            SisBatch.add_error(csv, e.to_s, sis_batch: @batch, row: row['lineno'], row_info: row)
+            SisBatch.add_error(csv, e.to_s, sis_batch: @batch, row: row["lineno"], row_info: row)
           end
         end
-        count
       end
     end
   end

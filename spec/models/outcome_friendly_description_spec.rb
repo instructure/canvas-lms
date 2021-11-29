@@ -21,10 +21,10 @@
 describe OutcomeFriendlyDescription, type: :model do
   let_once(:account) { account_model }
   let_once(:outcome) { outcome_model }
-  let(:description) { 'description' }
+  let(:description) { "description" }
   let(:creation_params) { { context: account, description: description, learning_outcome: outcome } }
 
-  describe 'validations' do
+  describe "validations" do
     subject { OutcomeFriendlyDescription.create!(creation_params) }
 
     it { is_expected.to validate_presence_of :context }
@@ -40,14 +40,14 @@ describe OutcomeFriendlyDescription, type: :model do
     let(:creation_arguments) { [creation_params, creation_params.merge(context: course_model)] }
   end
 
-  describe 'root_account_id' do
-    subject { OutcomeFriendlyDescription.create!(description: 'A', context: @context, learning_outcome: outcome_model) }
+  describe "root_account_id" do
+    subject { OutcomeFriendlyDescription.create!(description: "A", context: @context, learning_outcome: outcome_model) }
 
     before do
       @root_account = account_model
     end
 
-    context 'sets root account from course context' do
+    context "sets root account from course context" do
       before do
         @context = course_model(account: @root_account)
       end
@@ -55,7 +55,7 @@ describe OutcomeFriendlyDescription, type: :model do
       it { expect(subject.root_account_id).to eq(@context.root_account_id) }
     end
 
-    context 'sets root account from account context' do
+    context "sets root account from account context" do
       before do
         @context = account_model(parent_account: @root_account)
       end

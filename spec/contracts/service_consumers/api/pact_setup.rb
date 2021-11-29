@@ -17,8 +17,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'database_cleaner'
-require_relative '../../../support/test_database_utils'
+require "database_cleaner"
+require_relative "../../../support/test_database_utils"
 
 Pact.configure do |config|
   config.include Factories

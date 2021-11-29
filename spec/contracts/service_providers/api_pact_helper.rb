@@ -17,26 +17,26 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'pact/consumer/rspec'
-require_relative '../service_consumers/pact_config'
-require_relative '../../spec_helper'
+require "pact/consumer/rspec"
+require_relative "../service_consumers/pact_config"
+require_relative "../../spec_helper"
 
 Pact.configure do |config|
-  config.pact_dir = File.expand_path('pacts')
+  config.pact_dir = File.expand_path("pacts")
 end
 
 Pact.service_consumer PactConfig::Consumers::CANVAS_LMS_API do
   has_pact_with PactConfig::Providers::OUTCOMES do
     mock_service :outcomes do
       port 1234
-      pact_specification_version '2.0.0'
+      pact_specification_version "2.0.0"
     end
   end
 end
 
 RSpec.configure do |config|
   config.before(:context, :pact) do
-    WebMock.disable_net_connect!(allow: ['localhost'])
+    WebMock.disable_net_connect!(allow: ["localhost"])
   end
   config.after(:context, :pact) do
     WebMock.enable_net_connect!

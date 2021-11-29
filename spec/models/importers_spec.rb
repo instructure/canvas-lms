@@ -19,25 +19,25 @@
 #
 
 describe Importers do
-  describe 'disable_live_events!' do
-    it 'disables the live event observer' do
+  describe "disable_live_events!" do
+    it "disables the live event observer" do
       Importers.disable_live_events! do
         expect(Canvas::LiveEvents).not_to receive(:assignment_created)
         assignment_model
       end
     end
 
-    it 'ensures live events are re-enabled' do
+    it "ensures live events are re-enabled" do
       expect do
-        Importers.disable_live_events! { raise 'an error' }
-      end.to raise_error 'an error'
+        Importers.disable_live_events! { raise "an error" }
+      end.to raise_error "an error"
       expect(Canvas::LiveEvents).to receive(:assignment_created)
       assignment_model
     end
   end
 
-  describe 'enable_live_events!' do
-    it 'enables live events' do
+  describe "enable_live_events!" do
+    it "enables live events" do
       Importers.disable_live_events! do
         Importers.enable_live_events!
         expect(Canvas::LiveEvents).to receive(:assignment_created)

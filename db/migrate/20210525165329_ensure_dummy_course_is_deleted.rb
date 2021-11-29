@@ -20,6 +20,6 @@ class EnsureDummyCourseIsDeleted < ActiveRecord::Migration[6.0]
   tag :postdeploy
 
   def up
-    Course.where(id: 0).where.not(workflow_state: 'deleted').update_all(workflow_state: 'deleted')
+    Course.where(id: 0).where.not(workflow_state: "deleted").update_all(workflow_state: "deleted")
   end
 end

@@ -1,0 +1,28 @@
+# to hide RuboCop re-layout commits in git blame, do
+#
+# git config blame.ignoreRevsFile .git-blame-ignore-revs
+#
+# if you perform additional RuboCop re-layout commits,
+# please add the commit hashes here
+
+7c1f3bbb0354262145b37acf372547d22d86fc07 # Layout gems/plugins
+dd8fc67c414faf398380463d4a872c8cbd6121c7 # Layout gems
+4896de008ed30710180923831b7db0da6f4fc102 # Layout config
+ea68d75b246914a1164630f1f6afb764e6a08743 # Layout bin, script
+47bcd425da38c81ac06c5a0b0a7bdce68e6b119c # Layout doc
+975fa9aabe5f604ef7ffeb9e2f5ef0b5fd4776fa # Layout engines
+d93722cffef37701055f09431506581fecf8e46d # Layout db
+9c1936f588577dd7ca913614f85e675b9a3fa3f5 # Layout build
+1bf181eaa25398da89b68e7f75226ec1e472c6b8 # Layout spec/selenium
+8a906e4000da86dd9f283b72e13f8510eb2d9aed # Layout spec/apis
+649ed905565e8b08695aca150cb79c1380e19ebe # Layout spec/lib
+8e0327867e4175851de68983308bf4106c9a5ffc # Layout spec/models
+c119dd49bc5b40836bfffd9d386d487c494b2753 # Layout app/controllers
+f5cdb0d986d870366b9e55a1d3776edc2b53c08b # Layout app/models
+5e3e92230797b9ccfe2d9d0c0aad5166bbfd500c # Layout app
+578a6e01dae3fdf895941bf9fa32334632546ba0 # Layout spec/controllers
+c65d57737a72f79e66b2d8a37594c1c459d5160f # Layout lib
+6b0095610cdcebde8b8fed968f9d76e165c79c8d # Layout spec
+c3c2c7dd6541be340abf8f012d88061e85d0f1bc # Layout
+e73cf9ddf4a9748a4255373c97624222bdc29b8c # Style/HashSyntax
+c2cba46851df512ab26e827e4bdad76b848f6db9 # Style/StringLiterals

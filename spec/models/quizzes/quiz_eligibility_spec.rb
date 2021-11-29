@@ -25,8 +25,8 @@ describe Quizzes::QuizEligibility do
     @eligibility = Quizzes::QuizEligibility.new(course: @course, user: @student, quiz: @quiz)
   end
 
-  describe '#eligible?' do
-    it 'always returns true if the user is a teacher' do
+  describe "#eligible?" do
+    it "always returns true if the user is a teacher" do
       allow(@quiz).to receive(:grants_right?).and_return(false)
       allow(@quiz).to receive(:grants_right?)
         .with(anything, anything, :manage).and_return(true)
@@ -35,7 +35,7 @@ describe Quizzes::QuizEligibility do
       expect(@eligibility).to be_potentially_eligible
     end
 
-    it 'always returns true if the user can submit' do
+    it "always returns true if the user can submit" do
       allow(@quiz).to receive(:grants_right?).and_return(false)
       allow(@quiz).to receive(:grants_right?)
         .with(anything, anything, :submit).and_return(true)
@@ -44,21 +44,21 @@ describe Quizzes::QuizEligibility do
       expect(@eligibility).to be_potentially_eligible
     end
 
-    it 'returns false if no course is provided' do
+    it "returns false if no course is provided" do
       allow(@eligibility).to receive(:course).and_return(nil)
 
       expect(@eligibility).to_not be_eligible
       expect(@eligibility).to_not be_potentially_eligible
     end
 
-    it 'returns false if the student is inactive' do
-      allow(@user).to receive(:workflow_state).and_return('deleted')
+    it "returns false if the student is inactive" do
+      allow(@user).to receive(:workflow_state).and_return("deleted")
 
       expect(@eligibility).to_not be_eligible
       expect(@eligibility).to_not be_potentially_eligible
     end
 
-    it 'returns false if a user cannot submit or read as an admin' do
+    it "returns false if a user cannot submit or read as an admin" do
       allow(@quiz).to receive(:grants_right?).and_return(false)
       allow(@course).to receive(:grants_right?).and_return(false)
 
@@ -66,7 +66,7 @@ describe Quizzes::QuizEligibility do
       expect(@eligibility).to_not be_potentially_eligible
     end
 
-    it 'returns true if a user can read as an admin' do
+    it "returns true if a user can read as an admin" do
       allow(@quiz).to receive(:grants_right?).and_return(true)
       allow(@quiz).to receive(:grants_right?)
         .with(anything, anything, :manage).and_return(false)
@@ -78,63 +78,63 @@ describe Quizzes::QuizEligibility do
       expect(@eligibility).to be_potentially_eligible
     end
 
-    it 'returns false if a quiz is access code restricted (but is still potentially_eligible)' do
-      @quiz.access_code = 'x'
+    it "returns false if a quiz is access code restricted (but is still potentially_eligible)" do
+      @quiz.access_code = "x"
 
       expect(@eligibility).to_not be_eligible
       expect(@eligibility).to be_potentially_eligible
     end
 
-    it 'returns false if a quiz is ip restricted (but is still potentially_eligible)' do
-      @quiz.ip_filter = '1.1.1.1'
+    it "returns false if a quiz is ip restricted (but is still potentially_eligible)" do
+      @quiz.ip_filter = "1.1.1.1"
 
       expect(@eligibility).to_not be_eligible
       expect(@eligibility).to be_potentially_eligible
     end
 
-    it 'returns false if course is completed' do
-      other_user = user_factory()
-      @course.enroll_student(other_user, enrollment_state: 'complete')
+    it "returns false if course is completed" do
+      other_user = user_factory
+      @course.enroll_student(other_user, enrollment_state: "complete")
       allow(@eligibility).to receive(:user).and_return(other_user)
 
       expect(@eligibility).to_not be_eligible
       expect(@eligibility).to_not be_potentially_eligible
     end
 
-    it 'otherwise returns true' do
+    it "otherwise returns true" do
       expect(@eligibility).to be_eligible
       expect(@eligibility).to be_potentially_eligible
     end
   end
 
-  describe '#declined_reason_renders' do
-    it 'returns nil when no additional information should be rendered' do
+  describe "#declined_reason_renders" do
+    it "returns nil when no additional information should be rendered" do
       expect(@eligibility.declined_reason_renders).to be_nil
     end
 
-    it 'returns :access_code when an access code is needed' do
-      @quiz.access_code = 'x'
+    it "returns :access_code when an access code is needed" do
+      @quiz.access_code = "x"
       expect(@eligibility.declined_reason_renders).to eq(:access_code)
     end
 
-    it 'returns :invalid_ip an invalid IP is used to attempt to take a quiz' do
-      @quiz.ip_filter = '1.1.1.1'
+    it "returns :invalid_ip an invalid IP is used to attempt to take a quiz" do
+      @quiz.ip_filter = "1.1.1.1"
       expect(@eligibility.declined_reason_renders).to eq(:invalid_ip)
     end
   end
 
-  describe '#locked?' do
-    it 'returns false the quiz is not locked' do
+  describe "#locked?" do
+    it "returns false the quiz is not locked" do
       expect(@eligibility).to_not be_locked
     end
 
-    it 'returns false if quiz explicitly grant access to the user' do
+    it "returns false if quiz explicitly grant access to the user" do
       allow(@quiz).to receive(:locked_for?).and_return(true)
       allow(@quiz).to receive(:grants_right?).and_return(true)
       expect(@eligibility).to_not be_locked
     end
 
-    it 'returns true if the quiz is locked and access is not granted' do
+    it "returns true if the quiz is locked and access is not granted" do
       allow(@quiz).to receive(:locked_for?).and_return(true)
       allow(@quiz).to receive(:grants_right?).and_return(false)
       expect(@eligibility).to be_locked

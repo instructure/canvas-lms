@@ -21,7 +21,7 @@
 describe BrandableCSS do
   describe "all_brand_variable_values" do
     it "returns defaults if called without a brand config" do
-      expect(BrandableCSS.all_brand_variable_values["ic-link-color"]).to eq '#008EE2'
+      expect(BrandableCSS.all_brand_variable_values["ic-link-color"]).to eq "#008EE2"
     end
 
     it "includes image_url asset path for default images" do
@@ -52,16 +52,16 @@ describe BrandableCSS do
       end
 
       it "includes custom variables from brand config" do
-        expect(@brand_variables["ic-brand-global-nav-bgd"]).to eq '#123'
+        expect(@brand_variables["ic-brand-global-nav-bgd"]).to eq "#123"
       end
 
       it "includes custom variables from parent brand config" do
-        expect(@brand_variables["ic-brand-primary"]).to eq 'red'
+        expect(@brand_variables["ic-brand-primary"]).to eq "red"
       end
 
       it "handles named html colors when lightening/darkening" do
         {
-          "ic-brand-primary" => 'red',
+          "ic-brand-primary" => "red",
           "ic-brand-primary-darkened-5" => "#F30000",
           "ic-brand-primary-darkened-10" => "#E60000",
           "ic-brand-primary-darkened-15" => "#D90000",
@@ -76,15 +76,15 @@ describe BrandableCSS do
       end
 
       it "includes default variables not found in brand config" do
-        expect(@brand_variables["ic-link-color"]).to eq '#008EE2'
+        expect(@brand_variables["ic-link-color"]).to eq "#008EE2"
       end
     end
   end
 
   describe "all_brand_variable_values_as_js" do
     it "eports the default js to the right global variable" do
-      expected_js = "CANVAS_ACTIVE_BRAND_VARIABLES = #{BrandableCSS.default('json')};"
-      expect(BrandableCSS.default('js')).to eq expected_js
+      expected_js = "CANVAS_ACTIVE_BRAND_VARIABLES = #{BrandableCSS.default("json")};"
+      expect(BrandableCSS.default("js")).to eq expected_js
     end
   end
 
@@ -93,25 +93,25 @@ describe BrandableCSS do
       expected_css = ":root {
         #{BrandableCSS.all_brand_variable_values(nil, true).map { |k, v| "--#{k}: #{v};" }.join("\n")}
       }"
-      expect(BrandableCSS.default('css')).to eq expected_css
+      expect(BrandableCSS.default("css")).to eq expected_css
     end
   end
 
   describe "default_json" do
     it "includes default variables not found in brand config" do
-      brand_variables = JSON.parse(BrandableCSS.default('json'))
-      expect(brand_variables["ic-link-color"]).to eq '#008EE2'
+      brand_variables = JSON.parse(BrandableCSS.default("json"))
+      expect(brand_variables["ic-link-color"]).to eq "#008EE2"
     end
 
     it "has high contrast overrides for link and brand-primary" do
-      brand_variables = JSON.parse(BrandableCSS.default('json', true))
+      brand_variables = JSON.parse(BrandableCSS.default("json", true))
       expect(brand_variables["ic-brand-primary"]).to eq "#0770A3"
       expect(brand_variables["ic-link-color"]).to eq "#0073A7"
     end
   end
 
   [true, false].each do |high_contrast|
-    ['js', 'json', 'css'].each do |type|
+    %w[js json css].each do |type|
       describe "save_default!(#{type})" do
         it "writes the default json representation to the default json file" do
           allow(Canvas::Cdn).to receive(:enabled?).and_return(false)
@@ -121,9 +121,9 @@ describe BrandableCSS do
           expect(file.string).to eq BrandableCSS.default(type, high_contrast)
         end
 
-        it 'uploads json file to s3 if cdn is enabled' do
+        it "uploads json file to s3 if cdn is enabled" do
           allow(Canvas::Cdn).to receive(:enabled?).and_return(true)
-          allow(Canvas::Cdn).to receive(:config).and_return(ActiveSupport::OrderedOptions.new.merge(region: 'us-east-1', aws_access_key_id: 'id', aws_secret_access_key: 'secret', bucket: 'cdn'))
+          allow(Canvas::Cdn).to receive(:config).and_return(ActiveSupport::OrderedOptions.new.merge(region: "us-east-1", aws_access_key_id: "id", aws_secret_access_key: "secret", bucket: "cdn"))
 
           file = StringIO.new
           allow(BrandableCSS).to receive(:default_brand_file).with(type, high_contrast).and_return(file)
@@ -132,9 +132,9 @@ describe BrandableCSS do
           BrandableCSS.save_default!(type, high_contrast)
         end
 
-        it 'deletes the local json file if cdn is enabled' do
+        it "deletes the local json file if cdn is enabled" do
           allow(Canvas::Cdn).to receive(:enabled?).and_return(true)
-          allow(Canvas::Cdn).to receive(:config).and_return(ActiveSupport::OrderedOptions.new.merge(region: 'us-east-1', aws_access_key_id: 'id', aws_secret_access_key: 'secret', bucket: 'cdn'))
+          allow(Canvas::Cdn).to receive(:config).and_return(ActiveSupport::OrderedOptions.new.merge(region: "us-east-1", aws_access_key_id: "id", aws_secret_access_key: "secret", bucket: "cdn"))
           file = StringIO.new
           allow(BrandableCSS).to receive(:default_brand_file).with(type, high_contrast).and_return(file)
           expect(File).to receive(:delete).with(BrandableCSS.default_brand_file(type, high_contrast))
@@ -145,16 +145,16 @@ describe BrandableCSS do
     end
   end
 
-  describe 'font_path_cache' do
-    it 'creates the cache' do
-      BrandableCSS.font_path_cache()
+  describe "font_path_cache" do
+    it "creates the cache" do
+      BrandableCSS.font_path_cache
       expect(BrandableCSS.instance_variable_get(:@decorated_font_paths)).not_to be_nil
     end
 
-    it 'maps font paths' do
+    it "maps font paths" do
       cache = BrandableCSS.font_path_cache
       cache.each do |key, val|
-        expect(key).to start_with('/fonts')
+        expect(key).to start_with("/fonts")
         expect(val).to start_with("/dist/fonts")
         expect(val).to match(/-[a-z0-9]+\.woff2$/)
       end

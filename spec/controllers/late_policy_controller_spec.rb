@@ -22,72 +22,72 @@ RSpec.describe LatePolicyController, type: :controller do
   let(:valid_attributes) do
     {
       missing_submission_deduction_enabled: true,
-      missing_submission_deduction: '1',
+      missing_submission_deduction: "1",
       late_submission_deduction_enabled: true,
-      late_submission_deduction: '2',
-      late_submission_interval: 'hour',
+      late_submission_deduction: "2",
+      late_submission_interval: "hour",
       late_submission_minimum_percent_enabled: true,
-      late_submission_minimum_percent: '3'
+      late_submission_minimum_percent: "3"
     }
   end
 
   let(:expected_attributes) do
     {
-      'missing_submission_deduction_enabled' => true,
-      'missing_submission_deduction' => 1.0,
-      'late_submission_deduction_enabled' => true,
-      'late_submission_deduction' => 2.0,
-      'late_submission_interval' => 'hour',
-      'late_submission_minimum_percent_enabled' => true,
-      'late_submission_minimum_percent' => 3.0
+      "missing_submission_deduction_enabled" => true,
+      "missing_submission_deduction" => 1.0,
+      "late_submission_deduction_enabled" => true,
+      "late_submission_deduction" => 2.0,
+      "late_submission_interval" => "hour",
+      "late_submission_minimum_percent_enabled" => true,
+      "late_submission_minimum_percent" => 3.0
     }
   end
 
   let(:invalid_attributes) do
     {
       missing_submission_deduction_enabled: true,
-      missing_submission_deduction: '-20',
+      missing_submission_deduction: "-20",
       late_submission_deduction_enabled: true,
-      late_submission_deduction: '-20',
-      late_submission_interval: 'millenia',
+      late_submission_deduction: "-20",
+      late_submission_interval: "millenia",
       late_submission_minimum_percent_enabled: true,
-      late_submission_minimum_percent: '-20'
+      late_submission_minimum_percent: "-20"
     }
   end
 
   let(:new_attributes) do
     {
       missing_submission_deduction_enabled: false,
-      missing_submission_deduction: '1.5',
+      missing_submission_deduction: "1.5",
       late_submission_deduction_enabled: false,
-      late_submission_deduction: '3',
-      late_submission_interval: 'day',
+      late_submission_deduction: "3",
+      late_submission_interval: "day",
       late_submission_minimum_percent_enabled: false,
-      late_submission_minimum_percent: '4.74'
+      late_submission_minimum_percent: "4.74"
     }
   end
 
   let(:updated_attributes) do
     {
-      'missing_submission_deduction_enabled' => false,
-      'missing_submission_deduction' => 1.5,
-      'late_submission_deduction_enabled' => false,
-      'late_submission_deduction' => 3,
-      'late_submission_interval' => 'day',
-      'late_submission_minimum_percent_enabled' => false,
-      'late_submission_minimum_percent' => 4.74
+      "missing_submission_deduction_enabled" => false,
+      "missing_submission_deduction" => 1.5,
+      "late_submission_deduction_enabled" => false,
+      "late_submission_deduction" => 3,
+      "late_submission_interval" => "day",
+      "late_submission_minimum_percent_enabled" => false,
+      "late_submission_minimum_percent" => 4.74
     }
   end
 
   let(:course) { Course.create! }
 
   before do
-    request.accept = 'application/json'
+    request.accept = "application/json"
     course_with_teacher_logged_in(course: course)
   end
 
-  describe 'GET #show' do
-    context 'given a valid late_policy' do
+  describe "GET #show" do
+    context "given a valid late_policy" do
       let!(:late_policy) { course.create_late_policy! valid_attributes }
 
       before do
@@ -95,10 +95,10 @@ RSpec.describe LatePolicyController, type: :controller do
       end
 
       it { expect(response).to have_http_status(:ok) }
-      it { expect(json_parse['late_policy']).to eql expected_attributes.merge('id' => late_policy.id.to_s) }
+      it { expect(json_parse["late_policy"]).to eql expected_attributes.merge("id" => late_policy.id.to_s) }
     end
 
-    context 'given an unauthorized user' do
+    context "given an unauthorized user" do
       let(:user) { User.create! }
 
       before do
@@ -110,46 +110,46 @@ RSpec.describe LatePolicyController, type: :controller do
 
       it do
         expect(json_parse).to eql(
-          'status' => 'unauthorized',
-          'errors' => [{ 'message' => 'user not authorized to perform that action' }]
+          "status" => "unauthorized",
+          "errors" => [{ "message" => "user not authorized to perform that action" }]
         )
       end
     end
 
-    context 'given no late_policy' do
+    context "given no late_policy" do
       before do
         get :show, params: { id: course.to_param }
       end
 
       it { expect(response).to have_http_status(:not_found) }
-      it { expect(json_parse).to include('errors' => [{ 'message' => 'The specified resource does not exist.' }]) }
+      it { expect(json_parse).to include("errors" => [{ "message" => "The specified resource does not exist." }]) }
     end
   end
 
-  describe 'POST #create' do
-    it 'creates a new LatePolicy' do
+  describe "POST #create" do
+    it "creates a new LatePolicy" do
       expect { post :create, params: { id: course.to_param, late_policy: valid_attributes } }.to change(LatePolicy, :count).by(1)
     end
 
-    context 'with valid params' do
+    context "with valid params" do
       before do
         post :create, params: { id: course.to_param, late_policy: valid_attributes }
       end
 
       it { expect(response).to have_http_status(:created) }
-      it { expect(json_parse['late_policy']).to eql expected_attributes.merge('id' => course.late_policy.id.to_s) }
+      it { expect(json_parse["late_policy"]).to eql expected_attributes.merge("id" => course.late_policy.id.to_s) }
     end
 
-    context 'with invalid params' do
+    context "with invalid params" do
       before do
         post :create, params: { id: course.to_param, late_policy: invalid_attributes }
       end
 
       it { expect(response).to have_http_status(:unprocessable_entity) }
-      it { expect(json_parse).to have_key 'errors' }
+      it { expect(json_parse).to have_key "errors" }
     end
 
-    context 'given an unauthorized user' do
+    context "given an unauthorized user" do
       let(:user) { User.create! }
 
       before do
@@ -161,13 +161,13 @@ RSpec.describe LatePolicyController, type: :controller do
 
       it do
         expect(json_parse).to eql(
-          'status' => 'unauthorized',
-          'errors' => [{ 'message' => 'user not authorized to perform that action' }]
+          "status" => "unauthorized",
+          "errors" => [{ "message" => "user not authorized to perform that action" }]
         )
       end
     end
 
-    context 'given an existing late policy associated with the course' do
+    context "given an existing late policy associated with the course" do
       let!(:existing_late_policy) { course.create_late_policy! valid_attributes }
 
       before do
@@ -178,25 +178,25 @@ RSpec.describe LatePolicyController, type: :controller do
 
       it do
         expect(json_parse).to eql(
-          'status' => 'bad_request',
-          'errors' => [{ 'message' => 'only one late policy per course is allowed' }]
+          "status" => "bad_request",
+          "errors" => [{ "message" => "only one late policy per course is allowed" }]
         )
       end
 
-      it 'does not delete the existing policy' do
+      it "does not delete the existing policy" do
         post :create, params: { id: course.to_param, late_policy: new_attributes }
         expect(existing_late_policy.reload).to be_persisted
       end
     end
   end
 
-  describe 'PATCH #update' do
-    context 'given an existing late policy' do
+  describe "PATCH #update" do
+    context "given an existing late policy" do
       before do
         course.create_late_policy! valid_attributes
       end
 
-      context 'with valid params' do
+      context "with valid params" do
         before do
           patch :update, params: { id: course.to_param, late_policy: new_attributes }
         end
@@ -206,16 +206,16 @@ RSpec.describe LatePolicyController, type: :controller do
         it { expect(course.late_policy.reload).to have_attributes updated_attributes }
       end
 
-      context 'with invalid params' do
+      context "with invalid params" do
         before do
           patch :update, params: { id: course.to_param, late_policy: invalid_attributes }
         end
 
         it { expect(response).to have_http_status(:unprocessable_entity) }
-        it { expect(json_parse).to have_key 'errors' }
+        it { expect(json_parse).to have_key "errors" }
       end
 
-      context 'given an unauthorized user' do
+      context "given an unauthorized user" do
         let(:user) { User.create! }
 
         before do
@@ -227,20 +227,20 @@ RSpec.describe LatePolicyController, type: :controller do
 
         it do
           expect(json_parse).to eql(
-            'status' => 'unauthorized',
-            'errors' => [{ 'message' => 'user not authorized to perform that action' }]
+            "status" => "unauthorized",
+            "errors" => [{ "message" => "user not authorized to perform that action" }]
           )
         end
       end
     end
 
-    context 'given no existing late policy' do
+    context "given no existing late policy" do
       before do
         patch :update, params: { id: course.to_param, late_policy: new_attributes }
       end
 
       it { expect(response).to have_http_status(:not_found) }
-      it { expect(json_parse).to include('errors' => [{ 'message' => 'The specified resource does not exist.' }]) }
+      it { expect(json_parse).to include("errors" => [{ "message" => "The specified resource does not exist." }]) }
     end
   end
 end

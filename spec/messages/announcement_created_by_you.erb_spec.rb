@@ -18,9 +18,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative 'messages_helper'
+require_relative "messages_helper"
 
-describe 'announcement_created_by_you' do
+describe "announcement_created_by_you" do
   include MessagesCommon
 
   before :once do
@@ -36,8 +36,8 @@ describe 'announcement_created_by_you' do
     it "renders" do
       msg = generate_message(notification_name, path_type, asset)
       expect(msg.subject).to eq "value for title: value for name"
-      expect(msg.url).to match(/\/courses\/\d+\/announcements\/\d+/)
-      expect(msg.body).to match(/\/courses\/\d+\/announcements\/\d+/)
+      expect(msg.url).to match(%r{/courses/\d+/announcements/\d+})
+      expect(msg.body).to match(%r{/courses/\d+/announcements/\d+})
     end
   end
 
@@ -55,7 +55,7 @@ describe 'announcement_created_by_you' do
     it "renders" do
       msg = generate_message(notification_name, path_type, asset)
       expect(msg.subject).to eq "value for title: value for name"
-      expect(msg.url).to match(/\/courses\/\d+\/announcements\/\d+/)
+      expect(msg.url).to match(%r{/courses/\d+/announcements/\d+})
       expect(msg.body.strip).to eq "value for message"
     end
   end
@@ -66,7 +66,7 @@ describe 'announcement_created_by_you' do
     it "renders" do
       msg = generate_message(notification_name, path_type, asset)
       expect(msg.subject).to eq "Canvas Alert"
-      expect(msg.url).to match(/\/courses\/\d+\/announcements\/\d+/)
+      expect(msg.url).to match(%r{/courses/\d+/announcements/\d+})
       expect(msg.body).to include("Canvas Alert - You created this Announcement: value for title")
     end
   end

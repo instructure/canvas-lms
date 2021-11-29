@@ -18,9 +18,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'rubygems'
-require 'zip'
-require 'fileutils'
+require "rubygems"
+require "zip"
+require "fileutils"
 
 # Call this with a block.  The block will take an array of filenames
 # extracted.  Once this block is executed, these extracted files and
@@ -52,10 +52,10 @@ class ZipExtractor
 
       local_name = File.join(dirname, File.split(zip_entry.name).last)
       zip_entry.extract(local_name)
-      self.unzipped_files << local_name
+      unzipped_files << local_name
     end
-    block.call(self.unzipped_files) if block
-    return self.unzipped_files
+    block&.call(unzipped_files)
+    unzipped_files
   end
 
   def remove_extracted_files!

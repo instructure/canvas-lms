@@ -26,7 +26,7 @@ describe MicrosoftSync::UserMapping do
   it { is_expected.to validate_presence_of(:root_account) }
   it { is_expected.to validate_presence_of(:user_id) }
 
-  describe '.find_enrolled_user_ids_without_mappings' do
+  describe ".find_enrolled_user_ids_without_mappings" do
     let(:course) { course_with_teacher.course }
     let(:users) do
       [course.enrollments.first.user, *n_students_in_course(3, course: course)]
@@ -34,8 +34,8 @@ describe MicrosoftSync::UserMapping do
 
     %w[active creation_pending].each do |state|
       context "when the user's enrollment state is #{state}" do
-        it 'returns the user ids of enrolled users without mappings in batches' do
-          described_class.create!(user: users[1], root_account: course.root_account, aad_id: 'manual')
+        it "returns the user ids of enrolled users without mappings in batches" do
+          described_class.create!(user: users[1], root_account: course.root_account, aad_id: "manual")
           Enrollment.update_all(workflow_state: state)
           calls_results = []
           described_class.find_enrolled_user_ids_without_mappings(
@@ -63,43 +63,43 @@ describe MicrosoftSync::UserMapping do
     end
   end
 
-  describe '.bulk_insert_for_root_account' do
-    context 'when user_id_to_aad_hash is not empty' do
+  describe ".bulk_insert_for_root_account" do
+    context "when user_id_to_aad_hash is not empty" do
       subject do
         described_class.bulk_insert_for_root_account(
           account,
-          user1.id => 'user1',
-          user2.id => 'user2'
+          user1.id => "user1",
+          user2.id => "user2"
         )
       end
 
       let(:account) do
         account_model(settings: {
-                        microsoft_sync_tenant: 'myinstructuretenant.onmicrosoft.com',
-                        microsoft_sync_login_attribute: 'email',
+                        microsoft_sync_tenant: "myinstructuretenant.onmicrosoft.com",
+                        microsoft_sync_login_attribute: "email",
                         microsoft_sync_login_attribute_suffix: nil,
-                        microsoft_sync_remote_attribute: 'upn',
+                        microsoft_sync_remote_attribute: "upn",
                       })
       end
       let(:user1) { user_model }
       let(:user2) { user_model }
 
       before do
-        described_class.create!(root_account_id: account.id, user_id: user1.id, aad_id: 'manual')
-        described_class.create!(root_account_id: 0, user_id: user2.id, aad_id: 'manual-wrong-ra-id')
+        described_class.create!(root_account_id: account.id, user_id: user1.id, aad_id: "manual")
+        described_class.create!(root_account_id: 0, user_id: user2.id, aad_id: "manual-wrong-ra-id")
       end
 
       it "creates UserMappings if they don't already exist" do
         subject
         expect(described_class.where(root_account_id: account.id).pluck(:user_id, :aad_id).sort).to \
-          eq([[user1.id, 'manual'], [user2.id, 'user2']].sort)
+          eq([[user1.id, "manual"], [user2.id, "user2"]].sort)
       end
 
       {
-        microsoft_sync_tenant: 'somedifferenttenant.onmicrosoft.com',
-        microsoft_sync_login_attribute: 'sis_user_id',
-        microsoft_sync_login_attribute_suffix: '@thebestschool.edu',
-        microsoft_sync_remote_attribute: 'email',
+        microsoft_sync_tenant: "somedifferenttenant.onmicrosoft.com",
+        microsoft_sync_login_attribute: "sis_user_id",
+        microsoft_sync_login_attribute_suffix: "@thebestschool.edu",
+        microsoft_sync_remote_attribute: "email",
       }.each do |setting, value|
         context "when the #{setting} in the Account settings has changed since fetching the account" do
           before do
@@ -120,7 +120,7 @@ describe MicrosoftSync::UserMapping do
       end
     end
 
-    context 'when user_id_to_aad_hash is empty' do
+    context "when user_id_to_aad_hash is empty" do
       it "doesn't raise an error" do
         expect { described_class.bulk_insert_for_root_account(account_model, {}) }.to_not \
           change { described_class.count }.from(0)
@@ -128,27 +128,27 @@ describe MicrosoftSync::UserMapping do
     end
   end
 
-  describe '.enrollments_and_aads' do
+  describe ".enrollments_and_aads" do
     subject { described_class.enrollments_and_aads(course).pluck(:aad_id, :type).sort }
 
     let(:course) { course_model }
     let(:example_enrollment_types) { %w[Student Ta Teacher] }
     let!(:enrollments) do
       example_enrollment_types.map do |type|
-        create_enrollment(course, user_model, enrollment_type: type + 'Enrollment')
+        create_enrollment(course, user_model, enrollment_type: type + "Enrollment")
       end
     end
     let!(:user_mappings) do
       enrollments.map do |e|
         described_class.create!(
-          root_account: course.root_account, user: e.user, aad_id: e.type.gsub('Enrollment', 'Aad')
+          root_account: course.root_account, user: e.user, aad_id: e.type.gsub("Enrollment", "Aad")
         )
       end
     end
 
-    it 'selects at least type and aad_id' do
-      expect(described_class.enrollments_and_aads(course).first.type).to end_with('Enrollment')
-      expect(described_class.enrollments_and_aads(course).first.aad_id).to end_with('Aad')
+    it "selects at least type and aad_id" do
+      expect(described_class.enrollments_and_aads(course).first.type).to end_with("Enrollment")
+      expect(described_class.enrollments_and_aads(course).first.aad_id).to end_with("Aad")
     end
 
     it 'returns a scope with values for "type" and "aad_id"' do
@@ -157,15 +157,15 @@ describe MicrosoftSync::UserMapping do
                             ])
     end
 
-    it 'does not ignore creation_pending enrollments' do
-      Enrollment.update_all(workflow_state: 'creation_pending')
+    it "does not ignore creation_pending enrollments" do
+      Enrollment.update_all(workflow_state: "creation_pending")
       expect(subject).to eq([
                               %w[StudentAad StudentEnrollment], %w[TaAad TaEnrollment], %w[TeacherAad TeacherEnrollment]
                             ])
     end
 
-    it 'ignores enrollments of type StudentViewEnrollment' do
-      enrollments.first.update!(type: 'StudentViewEnrollment')
+    it "ignores enrollments of type StudentViewEnrollment" do
+      enrollments.first.update!(type: "StudentViewEnrollment")
       expect(subject).to eq([
                               %w[TaAad TaEnrollment], %w[TeacherAad TeacherEnrollment]
                             ])
@@ -178,12 +178,12 @@ describe MicrosoftSync::UserMapping do
       end
     end
 
-    it 'ignores enrollments with missing UserMappings' do
+    it "ignores enrollments with missing UserMappings" do
       user_mappings[2].destroy
       expect(subject).to eq([%w[StudentAad StudentEnrollment], %w[TaAad TaEnrollment]])
     end
 
-    it 'can be used with find_each on the primary' do
+    it "can be used with find_each on the primary" do
       res = []
       described_class.enrollments_and_aads(course).find_each do |e|
         res << [e.aad_id, e.type]
@@ -192,7 +192,7 @@ describe MicrosoftSync::UserMapping do
     end
   end
 
-  describe '.delete_old_user_mappings_later' do
+  describe ".delete_old_user_mappings_later" do
     let(:account) { account_model }
     let(:teacher) { user_model }
     let(:student) { user_model }
@@ -210,13 +210,13 @@ describe MicrosoftSync::UserMapping do
       setup_microsoft_sync_data(account, user_id_to_aad_hash)
     end
 
-    it 'deletes all UserMappings associated with the current account' do
-      expect {
+    it "deletes all UserMappings associated with the current account" do
+      expect do
         MicrosoftSync::UserMapping.delete_old_user_mappings_later(account, 1)
-      }.to change { MicrosoftSync::UserMapping.where(root_account: account).count }.from(2).to(0)
+      end.to change { MicrosoftSync::UserMapping.where(root_account: account).count }.from(2).to(0)
     end
 
-    context 'multiple root accounts' do
+    context "multiple root accounts" do
       let(:account2) { account_model }
       let(:teacher2) { user_model }
       let(:student2) { user_model }
@@ -227,17 +227,17 @@ describe MicrosoftSync::UserMapping do
       end
 
       it "doesn't delete the other root account's UserMappings" do
-        expect {
+        expect do
           MicrosoftSync::UserMapping.delete_old_user_mappings_later(account, 1)
-        }.to not_change { MicrosoftSync::UserMapping.where(root_account: account2).count }.from(2)
+        end.to not_change { MicrosoftSync::UserMapping.where(root_account: account2).count }.from(2)
       end
     end
   end
 
-  describe '.user_ids_without_mappings' do
-    it 'filters the given user ids to ones without mappings in the root account' do
-      users = 4.times.map { user_model }
-      accounts = 2.times.map { account_model }
+  describe ".user_ids_without_mappings" do
+    it "filters the given user ids to ones without mappings in the root account" do
+      users = Array.new(4) { user_model }
+      accounts = Array.new(2) { account_model }
 
       described_class.create!(root_account: accounts[0], user: users[1])
       described_class.create!(root_account: accounts[1], user: users[0])

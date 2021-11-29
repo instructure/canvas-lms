@@ -17,24 +17,24 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'spec_helper'
+require "spec_helper"
 
 describe CanvasQuizStatistics::Analyzers::FileUpload do
-  let(:question_data) { QuestionHelpers.fixture('file_upload_question') }
-
   subject { described_class.new(question_data) }
 
-  it 'does not blow up when no responses are provided' do
+  let(:question_data) { QuestionHelpers.fixture("file_upload_question") }
+
+  it "does not blow up when no responses are provided" do
     expect { expect(subject.run([])).to be_present }.to_not raise_error
   end
 
-  describe '[:responses]' do
-    it 'counts students who have uploaded an attachment' do
+  describe "[:responses]" do
+    it "counts students who have uploaded an attachment" do
       expect(subject.run([
                            {},
                            { attachment_ids: nil },
                            { attachment_ids: [] },
-                           { attachment_ids: ['1'] }
+                           { attachment_ids: ["1"] }
                          ])[:responses]).to eq(1)
     end
   end

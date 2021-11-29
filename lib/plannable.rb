@@ -19,7 +19,7 @@
 #
 
 module Plannable
-  ACTIVE_WORKFLOW_STATES = ['active', 'published'].freeze
+  ACTIVE_WORKFLOW_STATES = ["active", "published"].freeze
 
   def self.included(base)
     base.class_eval do
@@ -40,22 +40,22 @@ module Plannable
 
   def check_if_associated_planner_overrides_need_updating
     @associated_planner_items_need_updating = false
-    return if self.new_record?
-    return if self.respond_to?(:context_type) && !PlannerOverride::CONTENT_TYPES.include?(self.context_type)
+    return if new_record?
+    return if respond_to?(:context_type) && !PlannerOverride::CONTENT_TYPES.include?(context_type)
 
-    @associated_planner_items_need_updating = true if self.try(:workflow_state_changed?) || self.workflow_state == 'deleted'
+    @associated_planner_items_need_updating = true if try(:workflow_state_changed?) || workflow_state == "deleted"
   end
 
   def planner_override_for(user)
-    if self.respond_to? :submittable_object
-      submittable_override = self.submittable_object&.planner_override_for(user)
+    if respond_to? :submittable_object
+      submittable_override = submittable_object&.planner_override_for(user)
       return submittable_override if submittable_override
     end
 
-    if self.association(:planner_overrides).loaded?
-      self.planner_overrides.find { |po| po.user_id == user.id && po.workflow_state != 'deleted' }
+    if association(:planner_overrides).loaded?
+      planner_overrides.find { |po| po.user_id == user.id && po.workflow_state != "deleted" }
     else
-      self.planner_overrides.where(user_id: user).where.not(workflow_state: 'deleted').take
+      planner_overrides.where(user_id: user).where.not(workflow_state: "deleted").take
     end
   end
 
@@ -128,9 +128,10 @@ module Plannable
 
     # Grabs the value to use for the bookmark & comparison
     def column_value(object, col)
-      if col.is_a?(Array)
+      case col
+      when Array
         object.attributes.values_at(*col).compact.first # coalesce nulls
-      elsif col.is_a?(Hash)
+      when Hash
         association_value(object, col)
       else
         object.attributes[col]
@@ -146,7 +147,7 @@ module Plannable
       @columns.flatten.each do |col|
         val = column_value(object, col)
         val = val.utc.strftime("%Y-%m-%d %H:%M:%S.%6N") if val.respond_to?(:strftime)
-        if !val.nil?
+        unless val.nil?
           bookmark << val
           break
         end
@@ -186,7 +187,7 @@ module Plannable
     end
 
     def order_by
-      @order_by ||= Arel.sql(@columns.map { |col| column_order(col) }.join(', '))
+      @order_by ||= Arel.sql(@columns.map { |col| column_order(col) }.join(", "))
     end
 
     # Gets the object or object's associated column name to be used in the SQL query
@@ -214,20 +215,20 @@ module Plannable
 
     def column_order(col_name)
       if col_name.is_a?(Array)
-        order = "COALESCE(#{col_name.map { |c| column_name(c) }.join(', ')})"
+        order = "COALESCE(#{col_name.map { |c| column_name(c) }.join(", ")})"
       else
         order = column_comparand(col_name)
         if @model.columns_hash[col_name].null
-          order = "#{column_comparand(col_name, '=')} IS NULL, #{order}"
+          order = "#{column_comparand(col_name, "=")} IS NULL, #{order}"
         end
       end
       order += " DESC" if @descending
       order
     end
 
-    def column_comparand(column, comparator = '>', placeholder = nil)
+    def column_comparand(column, comparator = ">", placeholder = nil)
       col_name = placeholder ||
-                 (column.is_a?(Array) ? "COALESCE(#{column.map { |c| column_name(c) }.join(', ')})" : column_name(column))
+                 (column.is_a?(Array) ? "COALESCE(#{column.map { |c| column_name(c) }.join(", ")})" : column_name(column))
       if comparator != "=" && type_for_column(column) == :string
         col_name = BookmarkedCollection.best_unicode_collation_key(col_name)
       end
@@ -242,14 +243,14 @@ module Plannable
       elsif value.nil?
         # likewise only NULL values in column satisfy 'column = NULL' and
         # 'column >= NULL'
-        ["#{column_comparand(column, '=')} IS NULL"]
+        ["#{column_comparand(column, "=")} IS NULL"]
       else
-        sql = "#{column_comparand(column, comparator)} #{comparator} #{column_comparand(column, comparator, '?')}"
-        if !column.is_a?(Array) && @model.columns_hash[column].null && comparator != '='
+        sql = "#{column_comparand(column, comparator)} #{comparator} #{column_comparand(column, comparator, "?")}"
+        if !column.is_a?(Array) && @model.columns_hash[column].null && comparator != "="
           # our sort order wants "NULL > ?" to be universally true for non-NULL
           # values (we already handle NULL values above). but it is false in
           # SQL, so we need to include "column IS NULL" with > or >=
-          sql = "(#{sql} OR #{column_comparand(column, '=')} IS NULL)"
+          sql = "(#{sql} OR #{column_comparand(column, "=")} IS NULL)"
         end
         [sql, value]
       end
@@ -289,7 +290,7 @@ module Plannable
         visited << [col, val]
       end
       sql = "(" + top_clauses.join(" OR ") + ")"
-      return [sql, *args]
+      [sql, *args]
     end
   end
 end

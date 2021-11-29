@@ -43,7 +43,7 @@ describe Types::LearningOutcomeType do
 
   context "without edit permission" do
     before(:once) do
-      RoleOverride.manage_role_override(@account_user.account, @account_user.role, "manage_outcomes", :override => false)
+      RoleOverride.manage_role_override(@account_user.account, @account_user.role, "manage_outcomes", override: false)
     end
 
     it "returns canEdit false" do

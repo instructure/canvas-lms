@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../graphql_spec_helper'
+require_relative "../graphql_spec_helper"
 
 RSpec.describe Mutations::SubscribeToDiscussionTopic do
   before(:once) do
@@ -56,24 +56,24 @@ RSpec.describe Mutations::SubscribeToDiscussionTopic do
     result.to_h.with_indifferent_access
   end
 
-  it 'subscribes to the discussion topic' do
+  it "subscribes to the discussion topic" do
     @topic.unsubscribe(@teacher)
     expect(@topic.subscribed?(@teacher)).to be false
 
     result = run_mutation({ id: @topic.id, subscribed: true })
-    expect(result.dig('errors')).to be nil
-    expect(result.dig('data', 'subscribeToDiscussionTopic', 'discussionTopic', 'subscribed')).to be true
+    expect(result["errors"]).to be nil
+    expect(result.dig("data", "subscribeToDiscussionTopic", "discussionTopic", "subscribed")).to be true
     @topic.reload
     expect(@topic.subscribed?(@teacher)).to be true
   end
 
-  it 'unsubscribes to the discussion topic' do
+  it "unsubscribes to the discussion topic" do
     @topic.subscribe(@teacher)
     expect(@topic.subscribed?(@teacher)).to be true
 
     result = run_mutation({ id: @topic.id, subscribed: false })
-    expect(result.dig('errors')).to be nil
-    expect(result.dig('data', 'subscribeToDiscussionTopic', 'discussionTopic', 'subscribed')).to be false
+    expect(result["errors"]).to be nil
+    expect(result.dig("data", "subscribeToDiscussionTopic", "discussionTopic", "subscribed")).to be false
     @topic.reload
     expect(@topic.subscribed?(@teacher)).to be false
   end

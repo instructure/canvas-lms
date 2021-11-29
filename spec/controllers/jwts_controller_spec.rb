@@ -17,23 +17,23 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../spec_helper'
+require_relative "../spec_helper"
 
 describe JwtsController do
   include_context "JWT setup"
   let(:token_user) { user_with_pseudonym }
   let(:other_user) { user_with_pseudonym }
   let(:translate_token) do
-    ->(resp) {
-      utf8_token_string = json_parse(resp.body)['token']
+    lambda do |resp|
+      utf8_token_string = json_parse(resp.body)["token"]
       decoded_crypted_token = Canvas::Security.base64_decode(utf8_token_string)
       return CanvasSecurity::ServicesJwt.decrypt(decoded_crypted_token)
-    }
+    end
   end
 
   describe "#generate" do
     it "requires being logged in" do
-      post 'create'
+      post "create"
       expect(response).to be_redirect
       expect(response.status).to eq(302)
     end
@@ -42,13 +42,13 @@ describe JwtsController do
       before { user_session(token_user) }
 
       it "generates a base64 encoded token for a user session with env var secrets" do
-        post 'create', format: 'json'
+        post "create", format: "json"
         decrypted_token_body = translate_token.call(response)
         expect(decrypted_token_body[:sub]).to eq(token_user.global_id)
       end
 
       it "has the users domain in the token" do
-        post 'create', format: 'json'
+        post "create", format: "json"
         decrypted_token_body = translate_token.call(response)
         expect(decrypted_token_body[:domain]).to eq("test.host")
       end
@@ -56,8 +56,8 @@ describe JwtsController do
 
     it "doesn't allow using a token to gen a token" do
       token = build_wrapped_token(token_user.global_id)
-      @request.headers['Authorization'] = "Bearer #{token}"
-      get 'create', format: 'json'
+      @request.headers["Authorization"] = "Bearer #{token}"
+      get "create", format: "json"
       expect(response.status).to eq(403)
       expect(response.body).to match(/cannot generate a JWT when authorized by a JWT/)
     end
@@ -65,15 +65,15 @@ describe JwtsController do
 
   describe "#refresh" do
     it "requires being logged in" do
-      post 'refresh'
+      post "refresh"
       expect(response).to be_redirect
       expect(response.status).to eq(302)
     end
 
     it "doesn't allow using a token to gen a token" do
       token = build_wrapped_token(token_user.global_id)
-      @request.headers['Authorization'] = "Bearer #{token}"
-      get 'refresh', format: 'json'
+      @request.headers["Authorization"] = "Bearer #{token}"
+      get "refresh", format: "json"
       expect(response.status).to eq(403)
       expect(response.body).to match(/cannot generate a JWT when authorized by a JWT/)
     end
@@ -81,25 +81,25 @@ describe JwtsController do
     context "with valid user session" do
       before do
         user_session(token_user)
-        request.env['HTTP_HOST'] = 'testhost'
+        request.env["HTTP_HOST"] = "testhost"
       end
 
       it "requires a jwt param" do
-        post 'refresh'
+        post "refresh"
         expect(response.status).to_not eq(200)
       end
 
       it "returns a refreshed token for user" do
         real_user = site_admin_user(active_user: true)
-        user_with_pseudonym(:user => other_user, :username => "other@example.com")
+        user_with_pseudonym(user: other_user, username: "other@example.com")
         user_session(real_user)
         services_jwt = class_double(CanvasSecurity::ServicesJwt).as_stubbed_const
         expect(services_jwt).to receive(:refresh_for_user)
-          .with('testjwt', 'testhost', other_user, real_user: real_user, symmetric: true)
-          .and_return('refreshedjwt')
-        post 'refresh', params: { jwt: 'testjwt', as_user_id: other_user.id }, format: 'json'
-        token = JSON.parse(response.body)['token']
-        expect(token).to eq('refreshedjwt')
+          .with("testjwt", "testhost", other_user, real_user: real_user, symmetric: true)
+          .and_return("refreshedjwt")
+        post "refresh", params: { jwt: "testjwt", as_user_id: other_user.id }, format: "json"
+        token = JSON.parse(response.body)["token"]
+        expect(token).to eq("refreshedjwt")
       end
 
       it "returns a different jwt when refresh is called" do
@@ -109,8 +109,8 @@ describe JwtsController do
           token_user,
           symmetric: true
         )
-        post 'refresh', params: { jwt: original_jwt }
-        refreshed_jwt = JSON.parse(response.body)['token']
+        post "refresh", params: { jwt: original_jwt }
+        refreshed_jwt = JSON.parse(response.body)["token"]
         expect(refreshed_jwt).to_not eq(original_jwt)
       end
 
@@ -119,7 +119,7 @@ describe JwtsController do
                        .as_stubbed_const(transfer_nested_constants: true)
         expect(services_jwt).to receive(:refresh_for_user)
           .and_raise(CanvasSecurity::ServicesJwt::InvalidRefresh)
-        post 'refresh', params: { jwt: 'testjwt' }, format: 'json'
+        post "refresh", params: { jwt: "testjwt" }, format: "json"
         expect(response.status).to eq(400)
       end
     end

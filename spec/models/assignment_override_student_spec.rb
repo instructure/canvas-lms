@@ -22,7 +22,7 @@ describe AssignmentOverrideStudent do
   describe "validations" do
     before :once do
       student_in_course
-      @override = assignment_override_model(:course => @course)
+      @override = assignment_override_model(course: @course)
       @override_student = @override.assignment_override_students.build
       @override_student.user = @student
     end
@@ -66,7 +66,7 @@ describe AssignmentOverrideStudent do
     end
   end
 
-  describe 'recalculation of cached due dates' do
+  describe "recalculation of cached due dates" do
     before(:once) do
       course = Course.create!
       @student = User.create!
@@ -75,12 +75,12 @@ describe AssignmentOverrideStudent do
       @assignment_override = @assignment.assignment_overrides.create!
     end
 
-    it 'on creation, recalculates cached due dates on the assignment' do
+    it "on creation, recalculates cached due dates on the assignment" do
       expect(DueDateCacher).to receive(:recompute_users_for_course).with(@student.id, @assignment.context, [@assignment]).once
       @assignment_override.assignment_override_students.create!(user: @student)
     end
 
-    it 'on destroy, recalculates cached due dates on the assignment' do
+    it "on destroy, recalculates cached due dates on the assignment" do
       override_student = @assignment_override.assignment_override_students.create!(user: @student)
 
       # Expect DueDateCacher to be called once from AssignmentOverrideStudent after it's destroyed and another time
@@ -100,8 +100,8 @@ describe AssignmentOverrideStudent do
         account = Account.create!
         course = account.courses.create!
         e2 = course.enroll_student(@student)
-        e2.update_attribute(:workflow_state, 'active')
-        override = assignment_override_model(:course => course)
+        e2.update_attribute(:workflow_state, "active")
+        override = assignment_override_model(course: course)
         override_student = override.assignment_override_students.build
         override_student.user = @student
         expect(override_student).to be_valid
@@ -111,8 +111,8 @@ describe AssignmentOverrideStudent do
 
   it "maintains assignment from assignment_override" do
     student_in_course
-    @override1 = assignment_override_model(:course => @course)
-    @override2 = assignment_override_model(:course => @course)
+    @override1 = assignment_override_model(course: @course)
+    @override2 = assignment_override_model(course: @course)
     expect(@override1.assignment_id).not_to eq @override2.assignment_id
 
     @override_student = @override1.assignment_override_students.build
@@ -125,9 +125,9 @@ describe AssignmentOverrideStudent do
   end
 
   def adhoc_override_with_student
-    student_in_course(:active_all => true)
-    @assignment = assignment_model(:course => @course)
-    @ao = AssignmentOverride.new()
+    student_in_course(active_all: true)
+    @assignment = assignment_model(course: @course)
+    @ao = AssignmentOverride.new
     @ao.assignment = @assignment
     @ao.title = "ADHOC OVERRIDE"
     @ao.workflow_state = "active"
@@ -182,10 +182,10 @@ describe AssignmentOverrideStudent do
       Timecop.freeze(1.day.ago) do
         adhoc_override_with_student
       end
-      Enrollment.where(:id => @enrollment).update_all(:workflow_state => "deleted") # skip callbacks
+      Enrollment.where(id: @enrollment).update_all(workflow_state: "deleted") # skip callbacks
 
       notification_name = "Assignment Due Date Override Changed"
-      @notification = Notification.create! :name => notification_name, :category => "TestImmediately"
+      @notification = Notification.create! name: notification_name, category: "TestImmediately"
       teacher_in_course(active_all: true)
       notification_policy_model
 
@@ -248,8 +248,8 @@ describe AssignmentOverrideStudent do
     end
   end
 
-  describe 'create' do
-    it 'sets the root_account_id using assignment' do
+  describe "create" do
+    it "sets the root_account_id using assignment" do
       adhoc_override_with_student
       expect(@override_student.root_account_id).to eq @assignment.root_account_id
     end

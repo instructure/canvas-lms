@@ -19,9 +19,9 @@
 #
 
 class Mutations::UpdateLearningOutcome < Mutations::BaseMutation
-  graphql_name 'UpdateLearningOutcome'
+  graphql_name "UpdateLearningOutcome"
 
-  argument :id, ID, required: true, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func('LearningOutcome')
+  argument :id, ID, required: true, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("LearningOutcome")
   argument :title, String, required: true
   argument :display_name, String, required: false
   argument :description, String, required: false

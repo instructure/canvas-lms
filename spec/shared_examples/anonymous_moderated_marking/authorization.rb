@@ -18,8 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-RSpec.shared_examples 'authorization for provisional final grade selection' do |http_verb|
-  it 'is unauthorized if the user is not the assigned final grader' do
+RSpec.shared_examples "authorization for provisional final grade selection" do |http_verb|
+  it "is unauthorized if the user is not the assigned final grader" do
     @assignment.update_attribute(:final_grader_id, nil)
     api_call_as_user(@teacher, http_verb, @path, @params, {}, {}, expected_status: 401)
   end
@@ -29,7 +29,7 @@ RSpec.shared_examples 'authorization for provisional final grade selection' do |
     api_call_as_user(account_admin_user, http_verb, @path, @params, {}, {}, expected_status: 401)
   end
 
-  it 'is authorized if the user is the final grader' do
+  it "is authorized if the user is the final grader" do
     @assignment.update!(final_grader: @teacher, grader_count: 2)
     api_call_as_user(@teacher, http_verb, @path, @params, {}, {}, expected_status: 200)
   end

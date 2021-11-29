@@ -33,6 +33,7 @@ import {
   CUSTOM,
   MIN_HEIGHT,
   MIN_WIDTH,
+  MIN_PERCENTAGE,
   imageSizes,
   labelForImageSize
 } from '../instructure_image/ImageEmbedOptions'
@@ -146,6 +147,7 @@ const ImageOptionsForm = ({
                 disabled={displayAs !== 'embed'}
                 minHeight={MIN_HEIGHT}
                 minWidth={MIN_WIDTH}
+                minPercentage={MIN_PERCENTAGE}
               />
             </View>
           )}

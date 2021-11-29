@@ -24,14 +24,14 @@
 class PreventNonMultipartParse
   def initialize(app)
     @app = app
-    @considered_paths = [/\A\/api\/.*\/sis_imports[^\/]*(\/|)\z/,
-                         /\A\/api\/.*\/outcome_imports[^\/]*(\/|)\z/]
-    @ignored_content_types = [/\Amultipart\/form-data/i]
+    @considered_paths = [%r{\A/api/.*/sis_imports[^/]*(/|)\z},
+                         %r{\A/api/.*/outcome_imports[^/]*(/|)\z}]
+    @ignored_content_types = [%r{\Amultipart/form-data}i]
   end
 
   def call(env)
-    env['ORIGINAL_CONTENT_TYPE'] = env['CONTENT_TYPE']
-    env['CONTENT_TYPE'] = 'application/octet-stream' if !@considered_paths.detect { |r| env['PATH_INFO'] =~ r }.nil? && @ignored_content_types.detect { |r| env['CONTENT_TYPE'] =~ r }.nil?
+    env["ORIGINAL_CONTENT_TYPE"] = env["CONTENT_TYPE"]
+    env["CONTENT_TYPE"] = "application/octet-stream" if !@considered_paths.detect { |r| env["PATH_INFO"] =~ r }.nil? && @ignored_content_types.detect { |r| env["CONTENT_TYPE"] =~ r }.nil?
     @app.call(env)
   end
 end

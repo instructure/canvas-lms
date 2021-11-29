@@ -18,13 +18,13 @@
 #
 module CanvasCassandra
   class Database
-    CONSISTENCY_CLAUSE = %r{%CONSISTENCY% ?}
+    CONSISTENCY_CLAUSE = /%CONSISTENCY% ?/.freeze
 
     def initialize(fingerprint, servers, opts, logger)
       thrift_opts = {}
-      thrift_opts[:retries] = opts.delete(:retries) if opts.has_key?(:retries)
-      thrift_opts[:connect_timeout] = opts.delete(:connect_timeout) if opts.has_key?(:connect_timeout)
-      thrift_opts[:timeout] = opts.delete(:timeout) if opts.has_key?(:timeout)
+      thrift_opts[:retries] = opts.delete(:retries) if opts.key?(:retries)
+      thrift_opts[:connect_timeout] = opts.delete(:connect_timeout) if opts.key?(:connect_timeout)
+      thrift_opts[:timeout] = opts.delete(:timeout) if opts.key?(:timeout)
 
       @db = CassandraCQL::Database.new(servers, opts, thrift_opts)
       @fingerprint = fingerprint
@@ -46,16 +46,16 @@ module CanvasCassandra
         consistency = CanvasCassandra.consistency_level(consistency_text) if consistency_text
 
         if @db.use_cql3? || !consistency
-          query = query.sub(CONSISTENCY_CLAUSE, '')
+          query = query.sub(CONSISTENCY_CLAUSE, "")
         elsif !@db.use_cql3?
           query = query.sub(CONSISTENCY_CLAUSE, "USING CONSISTENCY #{consistency_text} ")
         end
 
-        if @db.use_cql3? && consistency
-          result = @db.execute_with_consistency(query, consistency, *args)
-        else
-          result = @db.execute(query, *args)
-        end
+        result = if @db.use_cql3? && consistency
+                   @db.execute_with_consistency(query, consistency, *args)
+                 else
+                   @db.execute(query, *args)
+                 end
       end
 
       @logger.debug("  #{"CQL (%.2fms)" % [ms]}  #{sanitize(query, args)} #{opts.inspect} [#{fingerprint}]")
@@ -67,7 +67,7 @@ module CanvasCassandra
     end
 
     # private Struct used to store batch information
-    class Batch < Struct.new(:statements, :args, :counter_statements, :counter_args, :execute_options)
+    Batch = Struct.new(:statements, :args, :counter_statements, :counter_args, :execute_options) do
       def initialize
         super([], [], [], [], {})
       end
@@ -85,7 +85,7 @@ module CanvasCassandra
           # http://www.datastax.com/docs/1.1/references/cql/BATCH
           # note there's no semicolons between statements in the batch
           cql = []
-          cql << "BEGIN #{'COUNTER ' if field == 'counter_'}BATCH"
+          cql << "BEGIN #{"COUNTER " if field == "counter_"}BATCH"
           cql.concat statements
           cql << "APPLY BATCH"
           # join with spaces rather than newlines, because cassandra doesn't care
@@ -181,13 +181,13 @@ module CanvasCassandra
     end
 
     def tables
-      if @db.connection.describe_version >= '20.1.0' && @db.execute("SELECT cql_version FROM system.local").first['cql_version'] >= '3.4.4'
+      if @db.connection.describe_version >= "20.1.0" && @db.execute("SELECT cql_version FROM system.local").first["cql_version"] >= "3.4.4"
         @db.execute("SELECT table_name FROM system_schema.tables WHERE keyspace_name=?", keyspace).map do |row|
-          row['table_name']
+          row["table_name"]
         end
       elsif @db.use_cql3?
         @db.execute("SELECT columnfamily_name FROM system.schema_columnfamilies WHERE keyspace_name=?", keyspace).map do |row|
-          row['columnfamily_name']
+          row["columnfamily_name"]
         end
       else
         @db.schema.tables
@@ -204,7 +204,7 @@ module CanvasCassandra
         where_args << v
         "#{k} = ?"
       end.join(" AND ")
-      return where_clause, where_args
+      [where_clause, where_args]
     end
 
     def available?
@@ -212,7 +212,7 @@ module CanvasCassandra
     end
 
     def keyspace
-      db.keyspace.to_s.dup.force_encoding('UTF-8')
+      db.keyspace.to_s.dup.force_encoding("UTF-8")
     end
     alias_method :name, :keyspace
 
@@ -241,21 +241,24 @@ module CanvasCassandra
 
       # inserts and updates in cassandra are equivalent,
       # so no need to differentiate here
-      if updates && !updates.empty?
+      if updates.present?
         args = []
         statement = +"UPDATE #{table_name}"
         if ttl_seconds
           args << ttl_seconds
           statement << " USING TTL ?"
         end
-        update_cql = updates.map { |key, val| args << val; "#{key} = ?" }.join(", ")
+        update_cql = updates.map do |key, val|
+          args << val
+          "#{key} = ?"
+        end.join(", ")
         statement << " SET #{update_cql} WHERE #{where_clause}"
         args.concat where_args
         args.concat [execute_options]
         update(statement, *args)
       end
 
-      if deletes && !deletes.empty?
+      if deletes.present?
         args = []
         delete_cql = deletes.map(&:first).join(", ")
         statement = "DELETE #{delete_cql} FROM #{table_name} WHERE #{where_clause}"

@@ -18,13 +18,13 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../views_helper'
+require_relative "../views_helper"
 
 describe "/files/_nested_content" do
   it "renders" do
     course_with_student
     view_context
-    render :partial => "files/nested_content", :object => []
+    render partial: "files/nested_content", object: []
     expect(response).not_to be_nil
   end
 end

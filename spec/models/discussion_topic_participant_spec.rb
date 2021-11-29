@@ -18,35 +18,35 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 describe DiscussionTopicParticipant do
-  describe 'check_unread_count' do
+  describe "check_unread_count" do
     before(:once) do
-      @participant = DiscussionTopicParticipant.create!(:user => user_factory,
-                                                        :discussion_topic => discussion_topic_model)
+      @participant = DiscussionTopicParticipant.create!(user: user_factory,
+                                                        discussion_topic: discussion_topic_model)
     end
 
-    it 'sets negative unread_counts to zero on save' do
+    it "sets negative unread_counts to zero on save" do
       @participant.update_attribute(:unread_entry_count, -15)
       expect(@participant.unread_entry_count).to eq 0
     end
 
-    it 'does not change an unread_count of zero' do
+    it "does not change an unread_count of zero" do
       @participant.update_attribute(:unread_entry_count, 0)
       expect(@participant.unread_entry_count).to eq 0
     end
 
-    it 'does not change a positive unread_count' do
+    it "does not change a positive unread_count" do
       @participant.update_attribute(:unread_entry_count, 15)
       expect(@participant.unread_entry_count).to eq 15
     end
   end
 
-  describe 'create' do
+  describe "create" do
     before(:once) do
-      @participant = DiscussionTopicParticipant.create!(:user => user_factory,
-                                                        :discussion_topic => discussion_topic_model)
+      @participant = DiscussionTopicParticipant.create!(user: user_factory,
+                                                        discussion_topic: discussion_topic_model)
     end
 
-    it 'sets the root_account_id using topic' do
+    it "sets the root_account_id using topic" do
       expect(@participant.root_account_id).to eq @topic.root_account_id
     end
   end

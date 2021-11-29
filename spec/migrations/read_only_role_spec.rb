@@ -16,7 +16,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-describe 'read-only database role' do
+describe "read-only database role" do
   def with_read_only_role
     ActiveRecord::Base.connection.execute("SET ROLE canvas_readonly_user")
     yield
@@ -24,47 +24,47 @@ describe 'read-only database role' do
     ActiveRecord::Base.connection.execute("RESET ROLE")
   end
 
-  it 'allows select' do
-    user_factory(name: 'blah')
-    with_read_only_role {
-      expect(User.where(id: @user).pluck(:name)).to eq(['blah'])
-    }
+  it "allows select" do
+    user_factory(name: "blah")
+    with_read_only_role do
+      expect(User.where(id: @user).pluck(:name)).to eq(["blah"])
+    end
   end
 
-  it 'allows switching from read-only to read-write' do
-    user_factory(name: 'blah')
+  it "allows switching from read-only to read-write" do
+    user_factory(name: "blah")
     name = nil
-    with_read_only_role {
+    with_read_only_role do
       name = User.take.name
-    }
-    expect {
+    end
+    expect do
       @user.update name: name.succ
-    }.not_to raise_error
+    end.not_to raise_error
   end
 
-  it 'disallows insert' do
-    expect {
-      with_read_only_role {
+  it "disallows insert" do
+    expect do
+      with_read_only_role do
         user_factory
-      }
-    }.to raise_error(ActiveRecord::StatementInvalid, /PG::InsufficientPrivilege/)
+      end
+    end.to raise_error(ActiveRecord::StatementInvalid, /PG::InsufficientPrivilege/)
   end
 
-  it 'disallows update' do
-    user_factory(name: 'blah')
-    expect {
-      with_read_only_role {
-        @user.update_attribute(:name, 'bleh')
-      }
-    }.to raise_error(ActiveRecord::StatementInvalid, /PG::InsufficientPrivilege/)
+  it "disallows update" do
+    user_factory(name: "blah")
+    expect do
+      with_read_only_role do
+        @user.update_attribute(:name, "bleh")
+      end
+    end.to raise_error(ActiveRecord::StatementInvalid, /PG::InsufficientPrivilege/)
   end
 
-  it 'disallows delete' do
-    user_factory(name: 'blah')
-    expect {
-      with_read_only_role {
+  it "disallows delete" do
+    user_factory(name: "blah")
+    expect do
+      with_read_only_role do
         @user.destroy_permanently!
-      }
-    }.to raise_error(ActiveRecord::StatementInvalid, /PG::InsufficientPrivilege/)
+      end
+    end.to raise_error(ActiveRecord::StatementInvalid, /PG::InsufficientPrivilege/)
   end
 end

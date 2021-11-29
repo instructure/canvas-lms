@@ -25,6 +25,6 @@ class CreateSubscriptionsForPlagiarismTools < ActiveRecord::Migration[5.2]
   end
 
   def down
-    DataFixup::CreateSubscriptionsForPlagiarismTools.delay_if_production(strand: 'plagiarism_subscription_delete').delete_subscriptions
+    DataFixup::CreateSubscriptionsForPlagiarismTools.delay_if_production(strand: "plagiarism_subscription_delete").delete_subscriptions
   end
 end

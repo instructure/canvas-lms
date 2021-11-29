@@ -23,24 +23,24 @@ module ContextModulesHelper
   include CyoeHelper
 
   TRANSLATED_COMMENT_TYPE = {
-    Announcement: I18n.t('Announcement'),
-    Assignment: I18n.t('Assignment'),
-    Attachment: I18n.t('Attachment'),
-    ContextExternalTool: I18n.t('External Tool'),
-    ContextModuleSubHeader: I18n.t('Context Module Sub Header'),
-    DiscussionTopic: I18n.t('Discussion Topic'),
-    ExternalUrl: I18n.t('External Url'),
-    Quiz: I18n.t('Quiz'),
-    'Quizzes::Quiz': I18n.t('Quiz'),
-    WikiPage: I18n.t('Page')
+    Announcement: I18n.t("Announcement"),
+    Assignment: I18n.t("Assignment"),
+    Attachment: I18n.t("Attachment"),
+    ContextExternalTool: I18n.t("External Tool"),
+    ContextModuleSubHeader: I18n.t("Context Module Sub Header"),
+    DiscussionTopic: I18n.t("Discussion Topic"),
+    ExternalUrl: I18n.t("External Url"),
+    Quiz: I18n.t("Quiz"),
+    "Quizzes::Quiz": I18n.t("Quiz"),
+    WikiPage: I18n.t("Page")
   }.freeze
 
   def cache_if_module(context_module, editable, is_student, can_view_unpublished, user, context, &block)
     if context_module
       visible_assignments = user ? user.assignment_and_quiz_visibilities(context) : []
-      cache_key_items = ['context_module_render_21_', context_module.cache_key, editable, is_student, can_view_unpublished,
+      cache_key_items = ["context_module_render_21_", context_module.cache_key, editable, is_student, can_view_unpublished,
                          true, Time.zone, Digest::MD5.hexdigest([visible_assignments, @section_visibility].join("/"))]
-      cache_key = cache_key_items.join('/')
+      cache_key = cache_key_items.join("/")
       cache_key = add_menu_tools_to_cache_key(cache_key)
       cache_key = add_mastery_paths_to_cache_key(cache_key, context, user)
       cache(cache_key, {}, &block)
@@ -59,12 +59,12 @@ module ContextModulesHelper
 
   def add_mastery_paths_to_cache_key(cache_key, context, user)
     if user && cyoe_enabled?(context)
-      if context.user_is_student?(user)
-        rules = cyoe_rules(context, user, @session)
-      else
-        rules = ConditionalRelease::Service.active_rules(context, user, @session)
-      end
-      cache_key += '/mastery:' + Digest::MD5.hexdigest(rules.to_s)
+      rules = if context.user_is_student?(user)
+                cyoe_rules(context, user, @session)
+              else
+                ConditionalRelease::Service.active_rules(context, user, @session)
+              end
+      cache_key += "/mastery:" + Digest::MD5.hexdigest(rules.to_s)
     end
     cache_key
   end
@@ -85,11 +85,11 @@ module ContextModulesHelper
 
   def module_item_publishable_id(item)
     if item.nil?
-      ''
-    elsif item.content_type == 'WikiPage'
+      ""
+    elsif item.content_type == "WikiPage"
       item.content.url
     else
-      (item.content && item.content.respond_to?(:published?) ? item.content.id : item.id)
+      (item.content.respond_to?(:published?) ? item.content.id : item.id)
     end
   end
 
@@ -100,7 +100,7 @@ module ContextModulesHelper
   end
 
   def prerequisite_list(prerequisites)
-    prerequisites.map { |p| p[:name] }.join(', ')
+    prerequisites.pluck(:name).join(", ")
   end
 
   def module_item_unpublishable?(item)
@@ -110,14 +110,14 @@ module ContextModulesHelper
   end
 
   def preload_modules_content(modules, can_edit)
-    ActiveRecord::Associations::Preloader.new.preload(modules, :content_tags => :content)
+    ActiveRecord::Associations::Preloader.new.preload(modules, content_tags: :content)
     preload_can_unpublish(@context, modules) if can_edit
   end
 
   def process_module_data(mod, is_student = false, current_user = nil, session = nil)
     # pre-calculated module view data can be added here
     module_data = {
-      published_status: mod.published? ? 'published' : 'unpublished',
+      published_status: mod.published? ? "published" : "unpublished",
       items: mod.content_tags_visible_to(@current_user)
     }
 
@@ -129,7 +129,7 @@ module ContextModulesHelper
     module_data[:items].each do |item|
       # pre-calculated module item view data can be added here
       item_data = {
-        published_status: item.published? ? 'published' : 'unpublished',
+        published_status: item.published? ? "published" : "unpublished",
       }
 
       if cyoe_enabled?(@context)
@@ -137,7 +137,7 @@ module ContextModulesHelper
         item_data[:mastery_paths] = conditional_release_rule_for_module_item(item, path_opts)
         if is_student && item_data[:mastery_paths].present?
           item_data[:show_cyoe_placeholder] = show_cyoe_placeholder(item_data[:mastery_paths])
-          item_data[:choose_url] = context_url(@context, :context_url) + '/modules/items/' + item.id.to_s + '/choose'
+          item_data[:choose_url] = context_url(@context, :context_url) + "/modules/items/" + item.id.to_s + "/choose"
         end
       end
 
@@ -145,16 +145,16 @@ module ContextModulesHelper
     end
 
     module_data[:items_data] = items_data
-    return module_data
+    module_data
   end
 
   def module_item_translated_content_type(item, is_student = false)
-    return '' unless item
-    if item.content_type_class == 'lti-quiz'
-      return is_student ? I18n.t('Quiz') : I18n.t('New Quiz')
+    return "" unless item
+    if item.content_type_class == "lti-quiz"
+      return is_student ? I18n.t("Quiz") : I18n.t("New Quiz")
     end
 
-    TRANSLATED_COMMENT_TYPE[item.content_type.to_sym] || I18n.t('Unknown Content Type')
+    TRANSLATED_COMMENT_TYPE[item.content_type.to_sym] || I18n.t("Unknown Content Type")
   end
 
   def module_item_new_quizzes_build_button_enabled?

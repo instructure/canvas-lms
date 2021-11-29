@@ -22,12 +22,12 @@ require_dependency "lti/navigation_cache"
 
 module Lti
   describe NavigationCache do
-    let(:account) { double }
-
     subject { NavigationCache.new(account) }
 
+    let(:account) { double }
+
     describe "#cache_key" do
-      it 'creates a new cache key' do
+      it "creates a new cache key" do
         enable_cache do
           uuid = SecureRandom.uuid
           expect(SecureRandom).to receive(:uuid).once.and_return(uuid)
@@ -35,7 +35,7 @@ module Lti
         end
       end
 
-      it 'returns the cached result on subsequent calls' do
+      it "returns the cached result on subsequent calls" do
         enable_cache do
           uuid = SecureRandom.uuid
           expect(SecureRandom).to receive(:uuid).once.and_return(uuid)
@@ -46,7 +46,7 @@ module Lti
     end
 
     describe "#invalidate_cache_key" do
-      it 'invalidates the cache' do
+      it "invalidates the cache" do
         enable_cache do
           uuid = SecureRandom.uuid
           expect(SecureRandom).to receive(:uuid).twice.and_return(uuid)

@@ -132,9 +132,9 @@ class AuthenticationAuditApiController < AuditorApiController
       render_events(events, @user)
     else
       accounts = Shard.with_each_shard(@user.associated_shards) do
-        Account.joins(:pseudonyms).where(:pseudonyms => {
-                                           :user_id => @user,
-                                           :workflow_state => 'active'
+        Account.joins(:pseudonyms).where(pseudonyms: {
+                                           user_id: @user,
+                                           workflow_state: "active"
                                          }).to_a
       end
       visible_accounts = accounts.select { |a| account_visible(a) }
@@ -162,6 +162,6 @@ class AuthenticationAuditApiController < AuditorApiController
   def render_events(events, context, route = nil)
     route ||= polymorphic_url([:api_v1, :audit_authentication, context])
     events = Api.paginate(events, self, route)
-    render :json => authentication_events_compound_json(events, @current_user, session)
+    render json: authentication_events_compound_json(events, @current_user, session)
   end
 end

@@ -41,10 +41,11 @@ module CanvasPartman::Concerns
       def partitioning_strategy=(value)
         raise ArgumentError unless [:by_date, :by_id].include?(value)
 
-        if value == :by_date
+        case value
+        when :by_date
           self.partitioning_field = "created_at"
           self.partitioning_interval = :months
-        elsif value == :by_id
+        when :by_id
           self.partitioning_field = nil
           self.partition_size = 1_000_000
         end
@@ -74,7 +75,7 @@ module CanvasPartman::Concerns
       attr_reader :partitioning_interval
 
       def partitioning_interval=(value)
-        raise ArgumentError unless [:weeks, :months, :years].include?(value)
+        raise ArgumentError unless %i[weeks months years].include?(value)
 
         @partitioning_interval = value
       end
@@ -107,10 +108,8 @@ module CanvasPartman::Concerns
       #   each element is a hash that carries the attributes of a
       #   potential record of the current class type
       #
-      def attrs_in_partition_groups(attrs_list)
-        attrs_list.group_by { |a| infer_partition_table_name(a) }.each do |name, group|
-          yield name, group
-        end
+      def attrs_in_partition_groups(attrs_list, &block)
+        attrs_list.group_by { |a| infer_partition_table_name(a) }.each(&block)
       end
 
       # :nodoc:
@@ -148,8 +147,8 @@ module CanvasPartman::Concerns
         partition_table_name = infer_partition_table_name(attributes)
 
         @arel_tables ||= {}
-        @arel_tables[partition_table_name] ||= if ::ActiveRecord.version < Gem::Version.new('5')
-                                                 Arel::Table.new(partition_table_name, { engine: self.arel_engine })
+        @arel_tables[partition_table_name] ||= if ::ActiveRecord.version < Gem::Version.new("5")
+                                                 Arel::Table.new(partition_table_name, { engine: arel_engine })
                                                else
                                                  Arel::Table.new(partition_table_name, type_caster: type_caster)
                                                end
@@ -170,13 +169,13 @@ module CanvasPartman::Concerns
         attr = attributes.detect { |(k, _v)| (k.is_a?(String) ? k : k.name) == partitioning_field }
 
         if attr.nil? || attr[1].nil?
-          raise ArgumentError.new <<-ERROR
+          raise ArgumentError, <<~TEXT
             Partition resolution failure!!!
             Expected "#{partitioning_field}" attribute to be present in set and
             have a value, but was or did not:
 
             #{attributes}
-          ERROR
+          TEXT
         end
 
         if partitioning_strategy == :by_date
@@ -186,15 +185,15 @@ module CanvasPartman::Concerns
           case partitioning_interval
           when :weeks
             date = date.to_date
-            [table_name, date.cwyear, ("%02d" % date.cweek)].join('_')
+            [table_name, date.cwyear, ("%02d" % date.cweek)].join("_")
           when :months
-            [table_name, date.year, date.month].join('_')
+            [table_name, date.year, date.month].join("_")
           when :years
-            [table_name, date.year].join('_')
+            [table_name, date.year].join("_")
           end
         else
           id = attr[1]
-          [table_name, id / partition_size].join('_')
+          [table_name, id / partition_size].join("_")
         end
       end
     end

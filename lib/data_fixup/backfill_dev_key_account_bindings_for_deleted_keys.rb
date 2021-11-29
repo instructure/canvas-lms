@@ -29,7 +29,7 @@ module DataFixup
       return if developer_key.owner_account.developer_key_account_bindings.where(developer_key: developer_key).exists?
 
       developer_key.owner_account.developer_key_account_bindings.create!(
-        workflow_state: 'off',
+        workflow_state: "off",
         developer_key: developer_key
       )
     end

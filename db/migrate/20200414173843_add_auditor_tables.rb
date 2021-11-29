@@ -86,13 +86,13 @@ class AddAuditorTables < ActiveRecord::Migration[5.2]
     # course_id -> assignment_id -> grader_id -> student_id,
     # course_id -> assignment_id -> student_id
     # (the claim is that those subsets are small enough filtering the results from the simpler index is fine)
-    add_index :auditor_grade_change_records, [:context_type, :context_id, :assignment_id], name: "index_auditor_grades_by_course_and_assignment"
+    add_index :auditor_grade_change_records, %i[context_type context_id assignment_id], name: "index_auditor_grades_by_course_and_assignment"
     add_index :auditor_grade_change_records, [:root_account_id, :grader_id], name: "index_auditor_grades_by_account_and_grader"
     add_index :auditor_grade_change_records, [:root_account_id, :student_id], name: "index_auditor_grades_by_account_and_student"
     # next index overs cassandra previous indices by course_id -> grader_id,
     # and course_id -> grader_id -> student_id (same theory as above)
-    add_index :auditor_grade_change_records, [:context_type, :context_id, :grader_id], name: "index_auditor_grades_by_course_and_grader"
-    add_index :auditor_grade_change_records, [:context_type, :context_id, :student_id], name: "index_auditor_grades_by_course_and_student"
+    add_index :auditor_grade_change_records, %i[context_type context_id grader_id], name: "index_auditor_grades_by_course_and_grader"
+    add_index :auditor_grade_change_records, %i[context_type context_id student_id], name: "index_auditor_grades_by_course_and_student"
     add_foreign_key :auditor_grade_change_records, :accounts
     add_foreign_key :auditor_grade_change_records, :accounts, column: :root_account_id
     add_foreign_key :auditor_grade_change_records, :assignments

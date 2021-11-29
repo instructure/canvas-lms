@@ -41,13 +41,13 @@ describe "LoggingFilter" do
   describe "filter_params" do
     it "filters sensitive keys" do
       params = {
-        :access_token => "abcdef",
-        :api_key => 123
+        access_token: "abcdef",
+        api_key: 123
       }
       filtered_params = LoggingFilter.filter_params(params)
       expect(filtered_params).to eq({
-                                      :access_token => "[FILTERED]",
-                                      :api_key => "[FILTERED]"
+                                      access_token: "[FILTERED]",
+                                      api_key: "[FILTERED]"
                                     })
     end
 
@@ -85,14 +85,14 @@ describe "LoggingFilter" do
 
     it "filters ested keys in hash format" do
       params = {
-        :pseudonym_session => {
-          :password => 123
+        pseudonym_session: {
+          password: 123
         }
       }
       filtered_params = LoggingFilter.filter_params(params)
       expect(filtered_params).to eq({
-                                      :pseudonym_session => {
-                                        :password => "[FILTERED]"
+                                      pseudonym_session: {
+                                        password: "[FILTERED]"
                                       }
                                     })
     end

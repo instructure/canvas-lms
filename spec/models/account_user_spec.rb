@@ -20,14 +20,14 @@
 
 describe AccountUser do
   before :once do
-    @role1 = custom_account_role('role1', :account => Account.default)
-    @role2 = custom_account_role('role2', :account => Account.default)
+    @role1 = custom_account_role("role1", account: Account.default)
+    @role2 = custom_account_role("role2", account: Account.default)
   end
 
   shared_examples_for "touching" do
     it "recaches permissions when created" do
       enable_cache do
-        @user.shard.activate { User.update_all(:updated_at => 1.month.ago) }
+        @user.shard.activate { User.update_all(updated_at: 1.month.ago) }
         @user.reload
         expect(@account.grants_right?(@user, :read)).to be_falsey
         @account.account_users.create!(user: @user)
@@ -40,14 +40,14 @@ describe AccountUser do
     it "recaches permissions when deleted" do
       enable_cache do
         au = @account.account_users.create!(user: @user)
-        @user.shard.activate { User.update_all(:updated_at => 1.month.ago) }
+        @user.shard.activate { User.update_all(updated_at: 1.month.ago) }
         @user.reload
         expect(@account.grants_right?(@user, :read)).to be_truthy
         au.destroy
         @user.reload
         @account.instance_variable_set(:@account_users_cache, {})
         expect(@account.grants_right?(@user, :read)).to be_falsey
-        expect(au.reload.workflow_state).to eq 'deleted'
+        expect(au.reload.workflow_state).to eq "deleted"
       end
     end
   end
@@ -74,9 +74,9 @@ describe AccountUser do
   describe "all_permissions_for" do
     it "includes granted permissions from multiple roles" do
       user = User.create!
-      manage_wiki_permissions = { :manage_wiki_create => true, :manage_wiki_update => true, :manage_wiki_delete => true }
-      account_admin_user_with_role_changes(:user => user, :role => @role1, :role_changes => { :manage_sis => true })
-      account_admin_user_with_role_changes(:user => user, :role => @role2, :role_changes => manage_wiki_permissions)
+      manage_wiki_permissions = { manage_wiki_create: true, manage_wiki_update: true, manage_wiki_delete: true }
+      account_admin_user_with_role_changes(user: user, role: @role1, role_changes: { manage_sis: true })
+      account_admin_user_with_role_changes(user: user, role: @role2, role_changes: manage_wiki_permissions)
 
       permissions = AccountUser.all_permissions_for(user, Account.default)
       expect(permissions.delete(:manage_sis)).not_to be_empty
@@ -91,8 +91,8 @@ describe AccountUser do
     before :once do
       @user1 = User.create!
       @user2 = User.create!
-      @ro1 = Account.default.role_overrides.create!(:role => @role1, :permission => 'manage_sis', :enabled => true)
-      @ro2 = Account.default.role_overrides.create!(:role => @role2, :permission => 'manage_sis', :enabled => true)
+      @ro1 = Account.default.role_overrides.create!(role: @role1, permission: "manage_sis", enabled: true)
+      @ro2 = Account.default.role_overrides.create!(role: @role2, permission: "manage_sis", enabled: true)
       @au1 = Account.default.account_users.create!(user: @user1, role: @role1)
       @au2 = Account.default.account_users.create!(user: @user2, role: @role2)
     end
@@ -146,7 +146,7 @@ describe AccountUser do
 
   describe "set_policy" do
     it "does not allow a lesser admin to create" do
-      lesser_role = custom_account_role('lesser', :account => Account.default)
+      lesser_role = custom_account_role("lesser", account: Account.default)
 
       account_admin_user_with_role_changes(role: lesser_role, role_changes: { manage_account_memberships: true })
       au = Account.default.account_users.build(user: @user, role: admin_role)
@@ -163,28 +163,28 @@ describe AccountUser do
     before :once do
       @account = Account.default
       @user = User.create!
-      @sub1 = @account.sub_accounts.create! name: 'sub1'
-      @sub1role = custom_account_role('sub1', :account => @sub1)
-      @sub1a = @sub1.sub_accounts.create! name: 'sub1a'
-      @sub2 = @account.sub_accounts.create! name: 'sub2'
+      @sub1 = @account.sub_accounts.create! name: "sub1"
+      @sub1role = custom_account_role("sub1", account: @sub1)
+      @sub1a = @sub1.sub_accounts.create! name: "sub1a"
+      @sub2 = @account.sub_accounts.create! name: "sub2"
     end
 
-    it 'accepts a custom role in the account chain' do
+    it "accepts a custom role in the account chain" do
       au = AccountUser.create(user: @user, account: @sub1a, role: @sub1role)
       expect(au).to be_valid
     end
 
-    it 'rejects a custom role outside the account chain' do
+    it "rejects a custom role outside the account chain" do
       au = AccountUser.create(user: @user, account: @sub2, role: @sub1role)
       expect(au).not_to be_valid
     end
 
-    it 'allows an invalid AccountUser to be deleted' do
-      au = AccountUser.create(user: @user, account: @sub2, role: @sub1role, workflow_state: 'deleted')
+    it "allows an invalid AccountUser to be deleted" do
+      au = AccountUser.create(user: @user, account: @sub2, role: @sub1role, workflow_state: "deleted")
       expect(au).to be_valid
     end
 
-    describe 'root_account_id' do
+    describe "root_account_id" do
       it "uses root_account value from account" do
         au = AccountUser.create(user: @user, account: @sub1a, role: @sub1role)
         expect(au.root_account_id).to eq(@account.id)

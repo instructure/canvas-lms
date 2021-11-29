@@ -23,15 +23,15 @@ module Auditors::ActiveRecord
     include CanvasPartman::Concerns::Partitioned
     self.partitioning_strategy = :by_date
     self.partitioning_interval = :months
-    self.partitioning_field = 'created_at'
-    self.table_name = 'auditor_grade_change_records'
+    self.partitioning_field = "created_at"
+    self.table_name = "auditor_grade_change_records"
 
     belongs_to :account, inverse_of: :auditor_grade_change_records
-    belongs_to :root_account, class_name: 'Account', inverse_of: :auditor_root_grade_change_records, foreign_key: 'root_account_id'
-    belongs_to :student, class_name: 'User', inverse_of: :auditor_student_grade_change_records, foreign_key: 'student_id'
-    belongs_to :grader, class_name: 'User', inverse_of: :auditor_grader_grade_change_records, foreign_key: 'grader_id'
+    belongs_to :root_account, class_name: "Account", inverse_of: :auditor_root_grade_change_records
+    belongs_to :student, class_name: "User", inverse_of: :auditor_student_grade_change_records
+    belongs_to :grader, class_name: "User", inverse_of: :auditor_grader_grade_change_records
     belongs_to :submission, inverse_of: :auditor_grade_change_records
-    belongs_to :course, -> { where(context_type: 'Course') }, class_name: "::Course", foreign_key: 'context_id', inverse_of: :auditor_grade_change_records
+    belongs_to :course, -> { where(context_type: "Course") }, class_name: "::Course", foreign_key: "context_id", inverse_of: :auditor_grade_change_records
     belongs_to :assignment, inverse_of: :auditor_grade_change_records
     belongs_to :grading_period, inverse_of: :auditor_grade_change_records
 
@@ -41,26 +41,26 @@ module Auditors::ActiveRecord
       include Auditors::ActiveRecord::Model
 
       def ar_attributes_from_event_stream(record)
-        attrs_hash = record.attributes.except('id', 'version_number')
+        attrs_hash = record.attributes.except("id", "version_number")
         root_account_id = Account.where(id: record.account_id).select(:id, :root_account_id).take.resolved_root_account_id
-        attrs_hash['request_id'] ||= "MISSING"
-        attrs_hash['uuid'] = record.id
-        attrs_hash['account_id'] = Shard.relative_id_for(record.account_id, Shard.current, Shard.current)
-        attrs_hash['root_account_id'] = (root_account_id || attrs_hash['account_id'])
-        attrs_hash['assignment_id'] = resolve_id_or_placeholder(record.assignment_id)
-        attrs_hash['context_id'] = Shard.relative_id_for(record.context_id, Shard.current, Shard.current)
-        attrs_hash['grader_id'] = Shard.relative_id_for(record.grader_id, Shard.current, Shard.current)
-        attrs_hash['graded_anonymously'] ||= false
-        attrs_hash['student_id'] = Shard.relative_id_for(record.student_id, Shard.current, Shard.current)
-        attrs_hash['submission_id'] = resolve_id_or_placeholder(record.submission_id)
-        attrs_hash['submission_version_number'] = record.version_number
-        attrs_hash['grading_period_id'] = resolve_id_or_placeholder(record.grading_period_id)
+        attrs_hash["request_id"] ||= "MISSING"
+        attrs_hash["uuid"] = record.id
+        attrs_hash["account_id"] = Shard.relative_id_for(record.account_id, Shard.current, Shard.current)
+        attrs_hash["root_account_id"] = (root_account_id || attrs_hash["account_id"])
+        attrs_hash["assignment_id"] = resolve_id_or_placeholder(record.assignment_id)
+        attrs_hash["context_id"] = Shard.relative_id_for(record.context_id, Shard.current, Shard.current)
+        attrs_hash["grader_id"] = Shard.relative_id_for(record.grader_id, Shard.current, Shard.current)
+        attrs_hash["graded_anonymously"] ||= false
+        attrs_hash["student_id"] = Shard.relative_id_for(record.student_id, Shard.current, Shard.current)
+        attrs_hash["submission_id"] = resolve_id_or_placeholder(record.submission_id)
+        attrs_hash["submission_version_number"] = record.version_number
+        attrs_hash["grading_period_id"] = resolve_id_or_placeholder(record.grading_period_id)
         attrs_hash
       end
     end
 
     def course_id
-      return nil unless context_type == 'Course'
+      return nil unless context_type == "Course"
 
       context_id
     end

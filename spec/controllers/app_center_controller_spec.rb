@@ -22,19 +22,19 @@ describe AppCenterController do
   describe "#map_tools_to_apps!" do
     it "maps tools" do
       course_model
-      tool1 = @course.account.context_external_tools.create(:tool_id => 'tool1', :name => "bob", :consumer_key => "bob", :shared_secret => "bob", :domain => "google.com")
-      tool2 = @course.context_external_tools.create(:tool_id => 'tool2', :name => "bob", :consumer_key => "bob", :shared_secret => "bob", :domain => "google.com")
+      tool1 = @course.account.context_external_tools.create(tool_id: "tool1", name: "bob", consumer_key: "bob", shared_secret: "bob", domain: "google.com")
+      tool2 = @course.context_external_tools.create(tool_id: "tool2", name: "bob", consumer_key: "bob", shared_secret: "bob", domain: "google.com")
       apps = [
-        { 'short_name' => tool1.tool_id },
-        { 'short_name' => tool2.tool_id },
-        { 'short_name' => 'not_installed' }
+        { "short_name" => tool1.tool_id },
+        { "short_name" => tool2.tool_id },
+        { "short_name" => "not_installed" }
       ]
 
       controller.map_tools_to_apps!(@course, apps)
 
-      expect(apps).to include({ 'short_name' => tool1.tool_id, 'is_installed' => true })
-      expect(apps).to include({ 'short_name' => tool2.tool_id, 'is_installed' => true })
-      expect(apps).to include({ 'short_name' => 'not_installed' })
+      expect(apps).to include({ "short_name" => tool1.tool_id, "is_installed" => true })
+      expect(apps).to include({ "short_name" => tool2.tool_id, "is_installed" => true })
+      expect(apps).to include({ "short_name" => "not_installed" })
     end
   end
 end

@@ -19,10 +19,10 @@
 #
 
 class Mutations::CreateLearningOutcome < Mutations::BaseMutation
-  graphql_name 'CreateLearningOutcome'
+  graphql_name "CreateLearningOutcome"
 
   # input arguments
-  argument :group_id, ID, required: true, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func('LearningOutcomeGroup')
+  argument :group_id, ID, required: true, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("LearningOutcomeGroup")
   argument :title, String, required: true
   argument :description, String, required: false
   argument :display_name, String, required: false
@@ -44,12 +44,12 @@ class Mutations::CreateLearningOutcome < Mutations::BaseMutation
 
   def learning_outcome_group(input)
     LearningOutcomeGroup.active.find_by(id: input[:group_id]).tap do |group|
-      raise GraphQL::ExecutionError, I18n.t('group not found') if group.nil?
+      raise GraphQL::ExecutionError, I18n.t("group not found") if group.nil?
     end
   end
 
   def check_permission(outcome)
-    raise GraphQL::ExecutionError, I18n.t('insufficient permission') unless outcome.grants_right? current_user, :create
+    raise GraphQL::ExecutionError, I18n.t("insufficient permission") unless outcome.grants_right? current_user, :create
   end
 
   def attrs(input)

@@ -20,7 +20,7 @@
 
 module Types
   class DiscussionEntryDraftType < ApplicationObjectType
-    graphql_name 'DiscussionEntryDraft'
+    graphql_name "DiscussionEntryDraft"
 
     implements Interfaces::TimestampInterface
     implements Interfaces::LegacyIDInterface

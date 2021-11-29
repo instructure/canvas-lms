@@ -24,31 +24,32 @@ class AssignmentOverride < ActiveRecord::Base
 
   NOOP_MASTERY_PATHS = 1
 
-  SET_TYPE_NOOP = 'Noop'
+  SET_TYPE_NOOP = "Noop"
 
-  simply_versioned :keep => 10
+  simply_versioned keep: 10
 
   attr_accessor :dont_touch_assignment, :preloaded_student_ids, :changed_student_ids
 
+  belongs_to :root_account, class_name: "Account"
   belongs_to :assignment, inverse_of: :assignment_overrides
-  belongs_to :quiz, class_name: 'Quizzes::Quiz', inverse_of: :assignment_overrides
+  belongs_to :quiz, class_name: "Quizzes::Quiz", inverse_of: :assignment_overrides
   belongs_to :set, polymorphic: [:group, :course_section], exhaustive: false
-  has_many :assignment_override_students, -> { where(workflow_state: 'active') }, :inverse_of => :assignment_override, :dependent => :destroy, :validate => false
-  validates_presence_of :assignment_version, :if => :assignment
-  validates_presence_of :title, :workflow_state
-  validates :set_type, inclusion: ['CourseSection', 'Group', 'ADHOC', SET_TYPE_NOOP]
-  validates_length_of :title, :maximum => maximum_string_length, :allow_nil => true
-  concrete_set = lambda { |override| ['CourseSection', 'Group'].include?(override.set_type) }
+  has_many :assignment_override_students, -> { where(workflow_state: "active") }, inverse_of: :assignment_override, dependent: :destroy, validate: false
+  validates :assignment_version, presence: { if: :assignment }
+  validates :title, :workflow_state, presence: true
+  validates :set_type, inclusion: ["CourseSection", "Group", "ADHOC", SET_TYPE_NOOP]
+  validates :title, length: { maximum: maximum_string_length, allow_nil: true }
+  concrete_set = ->(override) { ["CourseSection", "Group"].include?(override.set_type) }
 
-  validates_presence_of :set, :set_id, :if => concrete_set
-  validates_uniqueness_of :set_id, :scope => [:assignment_id, :set_type, :workflow_state],
-                                   :if => lambda { |override| override.assignment? && override.active? && concrete_set.call(override) }
-  validates_uniqueness_of :set_id, :scope => [:quiz_id, :set_type, :workflow_state],
-                                   :if => lambda { |override| override.quiz? && override.active? && concrete_set.call(override) }
+  validates :set, :set_id, presence: { if: concrete_set }
+  validates :set_id, uniqueness: { scope: %i[assignment_id set_type workflow_state],
+                                   if: ->(override) { override.assignment? && override.active? && concrete_set.call(override) } }
+  validates :set_id, uniqueness: { scope: %i[quiz_id set_type workflow_state],
+                                   if: ->(override) { override.quiz? && override.active? && concrete_set.call(override) } }
 
   before_create :set_root_account_id
 
-  validate :if => concrete_set do |record|
+  validate if: concrete_set do |record|
     if record.set && record.assignment && record.active?
       case record.set
       when CourseSection
@@ -60,8 +61,8 @@ class AssignmentOverride < ActiveRecord::Base
     end
   end
 
-  validate :set_id, :unless => concrete_set do |record|
-    if record.set_type == 'ADHOC' && !record.set_id.nil?
+  validate :set_id, unless: concrete_set do |record|
+    if record.set_type == "ADHOC" && !record.set_id.nil?
       record.errors.add :set_id, "must be nil with set_type ADHOC"
     end
   end
@@ -83,14 +84,14 @@ class AssignmentOverride < ActiveRecord::Base
     end
   end
 
-  after_save :touch_assignment, :if => :assignment
+  after_save :touch_assignment, if: :assignment
   after_save :update_grading_period_grades
   after_save :update_due_date_smart_alerts, if: :update_cached_due_dates?
   after_commit :update_cached_due_dates
 
   def set_not_empty?
     overridable = assignment? ? assignment : quiz
-    ['CourseSection', 'Group', SET_TYPE_NOOP].include?(self.set_type) ||
+    ["CourseSection", "Group", SET_TYPE_NOOP].include?(set_type) ||
       (set.any? && overridable.context.current_enrollments.where(user_id: set).exists?)
   end
 
@@ -127,7 +128,7 @@ class AssignmentOverride < ActiveRecord::Base
   # This method is meant to be used in an after_commit setting
   def update_cached_due_dates?
     set_id_changed = previous_changes.key?(:set_id)
-    set_type_changed_to_non_adhoc = previous_changes.key?(:set_type) && set_type != 'ADHOC'
+    set_type_changed_to_non_adhoc = previous_changes.key?(:set_type) && set_type != "ADHOC"
     due_at_overridden_changed = previous_changes.key?(:due_at_overridden)
     due_at_changed = previous_changes.key?(:due_at) && due_at_overridden?
     workflow_state_changed = previous_changes.key?(:workflow_state)
@@ -142,23 +143,23 @@ class AssignmentOverride < ActiveRecord::Base
 
   def update_cached_due_dates
     if update_cached_due_dates?
-      if self.assignment
+      if assignment
         assignment.clear_cache_key(:availability)
         DueDateCacher.recompute(assignment)
       end
-      self.quiz.clear_cache_key(:availability) if self.quiz
+      quiz&.clear_cache_key(:availability)
     end
   end
 
   def update_due_date_smart_alerts
-    if self.due_at.nil? || self.due_at < Time.zone.now
-      ScheduledSmartAlert.find_by(context_type: self.class.name, context_id: self.id, alert_type: :due_date_reminder)&.destroy
+    if due_at.nil? || due_at < Time.zone.now
+      ScheduledSmartAlert.find_by(context_type: self.class.name, context_id: id, alert_type: :due_date_reminder)&.destroy
     else
       ScheduledSmartAlert.upsert(
         context_type: self.class.name,
-        context_id: self.id,
+        context_id: id,
         alert_type: :due_date_reminder,
-        due_at: self.due_at,
+        due_at: due_at,
         root_account_id: root_account_id
       )
     end
@@ -171,9 +172,13 @@ class AssignmentOverride < ActiveRecord::Base
   end
   private :touch_assignment
 
-  def assignment?; !!assignment_id; end
+  def assignment?
+    !!assignment_id
+  end
 
-  def quiz?; !!quiz_id; end
+  def quiz?
+    !!quiz_id
+  end
 
   workflow do
     state :active
@@ -183,38 +188,38 @@ class AssignmentOverride < ActiveRecord::Base
   alias_method :destroy_permanently!, :destroy
   def destroy
     transaction do
-      self.assignment_override_students.reload.destroy_all
-      self.workflow_state = 'deleted'
-      self.default_values
-      self.save!(validate: false)
+      assignment_override_students.reload.destroy_all
+      self.workflow_state = "deleted"
+      default_values
+      save!(validate: false)
     end
 
-    ScheduledSmartAlert.where(context_type: self.class.name, context_id: self.id).destroy_all
+    ScheduledSmartAlert.where(context_type: self.class.name, context_id: id).destroy_all
   end
 
-  scope :active, -> { where(:workflow_state => 'active') }
+  scope :active, -> { where(workflow_state: "active") }
 
-  scope :visible_students_only, ->(visible_ids) do
+  scope :visible_students_only, lambda { |visible_ids|
     scope = select("assignment_overrides.*")
             .joins(:assignment_override_students)
             .distinct
 
-    if ActiveRecord::Relation === visible_ids
+    if visible_ids.is_a?(ActiveRecord::Relation)
       column = visible_ids.klass == User ? :id : visible_ids.select_values.first
-      scope = scope.primary_shard.activate {
+      scope = scope.primary_shard.activate do
         scope.joins("INNER JOIN #{visible_ids.klass.quoted_table_name} ON assignment_override_students.user_id=#{visible_ids.klass.table_name}.#{column}")
-      }
+      end
       next scope.merge(visible_ids.except(:select))
     end
 
     scope.where(
-      assignment_override_students: { user_id: visible_ids },
+      assignment_override_students: { user_id: visible_ids }
     )
-  end
+  }
 
   before_validation :default_values
   def default_values
-    self.set_type ||= 'ADHOC'
+    self.set_type ||= "ADHOC"
     if assignment
       self.assignment_version = assignment.version_number
       self.quiz = assignment.quiz
@@ -241,9 +246,10 @@ class AssignmentOverride < ActiveRecord::Base
   end
 
   def set
-    if self.set_type == 'ADHOC'
+    case self.set_type
+    when "ADHOC"
       assignment_override_students.preload(:user).map(&:user)
-    elsif self.set_type == SET_TYPE_NOOP
+    when SET_TYPE_NOOP
       nil
     else
       super
@@ -251,7 +257,7 @@ class AssignmentOverride < ActiveRecord::Base
   end
 
   def set_id=(id)
-    if ['ADHOC', SET_TYPE_NOOP].include? self.set_type
+    if ["ADHOC", SET_TYPE_NOOP].include? self.set_type
       write_attribute(:set_id, id)
     else
       super
@@ -269,7 +275,7 @@ class AssignmentOverride < ActiveRecord::Base
       send("#{field}=", nil)
     end
 
-    validates_inclusion_of "#{field}_overridden", :in => [false, true]
+    validates "#{field}_overridden", inclusion: { in: [false, true] }
     before_validation do |override|
       if override.send("#{field}_overridden").nil?
         override.send("#{field}_overridden=", false)
@@ -291,7 +297,7 @@ class AssignmentOverride < ActiveRecord::Base
     (override.assignment || override.quiz).context.enrollments_visible_to(user)
   end
 
-  OVERRIDDEN_DATES = %i(due_at unlock_at lock_at).freeze
+  OVERRIDDEN_DATES = %i[due_at unlock_at lock_at].freeze
   OVERRIDDEN_DATES.each do |field|
     override field
   end
@@ -304,10 +310,10 @@ class AssignmentOverride < ActiveRecord::Base
     new_due_at = self.class.type_for_attribute(:due_at).cast(new_due_at) if new_due_at.is_a?(String)
     new_due_at = CanvasTime.fancy_midnight(new_due_at)
     new_all_day, new_all_day_date = Assignment.all_day_interpretation(
-      :due_at => new_due_at,
-      :due_at_was => read_attribute(:due_at),
-      :all_day_was => read_attribute(:all_day),
-      :all_day_date_was => read_attribute(:all_day_date)
+      due_at: new_due_at,
+      due_at_was: read_attribute(:due_at),
+      all_day_was: read_attribute(:all_day),
+      all_day_date_was: read_attribute(:all_day_date)
     )
 
     write_attribute(:due_at, new_due_at)
@@ -327,27 +333,27 @@ class AssignmentOverride < ActiveRecord::Base
   end
 
   def as_hash
-    { :title => title,
-      :due_at => due_at,
-      :id => id,
-      :all_day => all_day,
-      :set_type => set_type,
-      :set_id => set_id,
-      :all_day_date => all_day_date,
-      :lock_at => lock_at,
-      :unlock_at => unlock_at,
-      :override => self }
+    { title: title,
+      due_at: due_at,
+      id: id,
+      all_day: all_day,
+      set_type: set_type,
+      set_id: set_id,
+      all_day_date: all_day_date,
+      lock_at: lock_at,
+      unlock_at: unlock_at,
+      override: self }
   end
 
   def applies_to_students
     # FIXME: exclude students for whom this override does not apply
     # because a higher-priority override exists
     case set_type
-    when 'ADHOC'
+    when "ADHOC"
       set
-    when 'CourseSection'
+    when "CourseSection"
       set.participating_students
-    when 'Group'
+    when "Group"
       set.participants
     else
       []
@@ -356,7 +362,7 @@ class AssignmentOverride < ActiveRecord::Base
 
   def applies_to_admins
     case set_type
-    when 'CourseSection'
+    when "CourseSection"
       set.participating_admins
     else
       assignment.context.participating_admins
@@ -364,19 +370,18 @@ class AssignmentOverride < ActiveRecord::Base
   end
 
   def notify_change?
-    self.assignment &&
-      self.assignment.context.available? &&
-      self.assignment.published? &&
-      self.assignment.created_at < 3.hours.ago &&
+    assignment&.context&.available? &&
+      assignment.published? &&
+      assignment.created_at < 3.hours.ago &&
       (saved_change_to_workflow_state? ||
         saved_change_to_due_at_overridden? ||
         (due_at_overridden && !Assignment.due_dates_equal?(due_at, due_at_before_last_save)))
   end
 
   def set_title_if_needed
-    if set_type != 'ADHOC' && set
+    if set_type != "ADHOC" && set
       self.title = set.name
-    elsif set_type == 'ADHOC' && set.any?
+    elsif set_type == "ADHOC" && set.any?
       self.title ||= title_from_students(set)
     else
       self.title ||= "No Title"
@@ -390,14 +395,14 @@ class AssignmentOverride < ActiveRecord::Base
   end
 
   def self.title_from_student_count(student_count)
-    t(:student_count, { one: '%{count} student', other: '%{count} students' }, count: student_count)
+    t(:student_count, { one: "%{count} student", other: "%{count} students" }, count: student_count)
   end
 
   def destroy_if_empty_set
-    return unless set_type == 'ADHOC'
+    return unless set_type == "ADHOC"
 
-    self.assignment_override_students.reload if self.id_before_last_save.nil? # fixes a problem with rails 4.2 caching an empty association scope
-    self.destroy if set.empty?
+    assignment_override_students.reload if id_before_last_save.nil? # fixes a problem with rails 4.2 caching an empty association scope
+    destroy if set.empty?
   end
 
   has_a_broadcast_policy
@@ -409,25 +414,25 @@ class AssignmentOverride < ActiveRecord::Base
   set_broadcast_policy do |p|
     p.dispatch :assignment_due_date_changed
     p.to { applies_to_students }
-    p.whenever { |record| record.notify_change? }
-    p.filter_asset_by_recipient { |record, user|
-      # note that our asset for this message is an Assignment, not an AssignmentOverride
+    p.whenever(&:notify_change?)
+    p.filter_asset_by_recipient do |record, user|
+      # NOTE: our asset for this message is an Assignment, not an AssignmentOverride
       record.assignment.overridden_for(user)
-    }
+    end
     p.data { course_broadcast_data }
 
     p.dispatch :assignment_due_date_override_changed
     p.to { applies_to_admins }
-    p.whenever { |record| record.notify_change? }
+    p.whenever(&:notify_change?)
     p.data { course_broadcast_data }
   end
 
   def root_account_id
-    # Use the attribute if availible, otherwise fall back to getting it from a parent entity
+    # Use the attribute if available, otherwise fall back to getting it from a parent entity
     super || assignment&.root_account_id || quiz&.root_account_id || quiz&.assignment&.root_account_id
   end
 
   def set_root_account_id
-    self.write_attribute(:root_account_id, root_account_id) unless read_attribute(:root_account_id)
+    write_attribute(:root_account_id, root_account_id) unless read_attribute(:root_account_id)
   end
 end
