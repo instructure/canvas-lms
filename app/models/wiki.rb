@@ -200,7 +200,7 @@ class Wiki < ActiveRecord::Base
   def build_wiki_page(user, opts = {})
     if (opts.include?(:url) || opts.include?(:title)) && (!opts.include?(:url) || !opts.include?(:title))
       opts[:title] = opts[:url].to_s.titleize if opts.include?(:url)
-      opts[:url] = opts[:title].to_s.to_url if opts.include?(:title)
+      opts[:url] = WikiPage.url_for(opts[:title]) if opts.include?(:title)
     end
 
     shard.activate do

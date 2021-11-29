@@ -205,4 +205,56 @@ describe Wiki do
       end
     end
   end
+
+  describe "#build_wiki_page" do
+    let(:created_page) { wiki.build_wiki_page(user, opts) }
+
+    let(:user) do
+      account_admin_user
+      @user
+    end
+
+    let(:wiki) { @wiki }
+    let(:opts) { {} }
+
+    context "with Latin title" do
+      let(:opts) { { title: "Hello World" } }
+
+      it "Uses that latin title in the URL" do
+        expect(created_page.url).to eq "hello-world"
+      end
+
+      context "with reserved URL chars" do
+        let(:opts) { { title: "?&Hello World" } }
+
+        it "Removes or replaces the reserved chars" do
+          expect(created_page.url).to eq "and-hello-world"
+        end
+      end
+    end
+
+    context "with Katakana title" do
+      let(:opts) { { title: "グループ映画プロジェクトの概要" } }
+
+      it "uses the unicode characters" do
+        expect(created_page.url).to eq "グループ映画プロジェクトの概要"
+      end
+
+      context "with reserved URL chars" do
+        let(:opts) { { title: "?&グループ映画プロジェクトの概要" } }
+
+        it "uses the unicode characters" do
+          expect(created_page.url).to eq "and グループ映画プロジェクトの概要"
+        end
+      end
+
+      context "with Latin characters mixed in" do
+        let(:opts) { { title: "グループ映画プロジェクトの概要hello" } }
+
+        it "uses the unicode characters" do
+          expect(created_page.url).to eq "グループ映画プロジェクトの概要hello"
+        end
+      end
+    end
+  end
 end
