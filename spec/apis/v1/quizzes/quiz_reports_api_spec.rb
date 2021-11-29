@@ -18,14 +18,14 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../../api_spec_helper'
-require_relative '../../../models/quizzes/quiz_statistics/item_analysis/common'
+require_relative "../../api_spec_helper"
+require_relative "../../../models/quizzes/quiz_statistics/item_analysis/common"
 
 describe Quizzes::QuizReportsController, type: :request do
   describe "GET /courses/:course_id/quizzes/:quiz_id/reports [index]" do
     def api_index(params = {}, options = {})
       method = options[:raw] ? :raw_api_call : :api_call
-      headers = options[:jsonapi] ? { 'Accept' => 'application/vnd.api+json' } : {}
+      headers = options[:jsonapi] ? { "Accept" => "application/vnd.api+json" } : {}
       send method, :get,
            "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/reports", {
              controller: "quizzes/quiz_reports",
@@ -36,69 +36,69 @@ describe Quizzes::QuizReportsController, type: :request do
            }, params, headers
     end
 
-    it 'denies unprivileged access' do
-      student_in_course(:active_all => true)
-      @quiz = @course.quizzes.create({ title: 'Test Quiz' })
+    it "denies unprivileged access" do
+      student_in_course(active_all: true)
+      @quiz = @course.quizzes.create({ title: "Test Quiz" })
       api_index({}, { raw: true })
       assert_status(401)
     end
 
-    context 'with privileged access' do
+    context "with privileged access" do
       before(:once) do
-        teacher_in_course(:active_all => true)
-        @quiz = @course.quizzes.create({ title: 'Test Quiz' })
+        teacher_in_course(active_all: true)
+        @quiz = @course.quizzes.create({ title: "Test Quiz" })
       end
 
-      it 'returns all reports, generated or not' do
+      it "returns all reports, generated or not" do
         stats = @quiz.current_statistics_for "student_analysis"
         stats.save!
 
         json = api_index
         expect(json.length).to eq 2
-        expect(json.map { |report| report['report_type'] }.sort)
+        expect(json.map { |report| report["report_type"] }.sort)
           .to eq %w[item_analysis student_analysis]
       end
 
-      context 'flags' do
+      context "flags" do
         def student_analysis(opts = {})
           json = api_index(opts)
           json.detect do |report|
-            report['report_type'] == 'student_analysis'
+            report["report_type"] == "student_analysis"
           end
         end
 
-        describe 'the `includes_all_versions` flag' do
-          it 'enables it' do
-            expect(student_analysis(includes_all_versions: true)['includes_all_versions']).to eq true
+        describe "the `includes_all_versions` flag" do
+          it "enables it" do
+            expect(student_analysis(includes_all_versions: true)["includes_all_versions"]).to eq true
           end
 
-          it 'defaults to false' do
-            expect(student_analysis()['includes_all_versions']).to eq false
+          it "defaults to false" do
+            expect(student_analysis["includes_all_versions"]).to eq false
           end
         end
 
-        describe 'includes_sis_ids' do
-          it 'includes sis ids for users with access' do
-            expect(student_analysis()['includes_sis_ids']).to eq true
+        describe "includes_sis_ids" do
+          it "includes sis ids for users with access" do
+            expect(student_analysis["includes_sis_ids"]).to eq true
           end
 
-          it 'does not include sis ids for users without access' do
+          it "does not include sis ids for users without access" do
             ta_in_course(active_all: true)
-            expect(student_analysis()['includes_sis_ids']).to eq false
+            expect(student_analysis["includes_sis_ids"]).to eq false
           end
         end
       end
 
-      context 'JSON-API' do
-        it 'returns all reports, generated or not' do
+      context "JSON-API" do
+        it "returns all reports, generated or not" do
           stats = @quiz.current_statistics_for "student_analysis"
           stats.save!
 
           json = api_index({}, { jsonapi: true })
 
-          expect(json['quiz_reports']).to be_present
-          expect(json['quiz_reports'].length).to eq 2
-          expect(json['quiz_reports'].map { |report| report['report_type'] }.sort)
+          expect(json["quiz_reports"]).to be_present
+          expect(json["quiz_reports"].length).to eq 2
+          expect(json["quiz_reports"].map { |report| report["report_type"] }.sort)
             .to eq %w[item_analysis student_analysis]
         end
       end
@@ -108,7 +108,7 @@ describe Quizzes::QuizReportsController, type: :request do
   describe "POST /courses/:course_id/quizzes/:quiz_id/reports" do
     def api_create(params = {}, options = {})
       method = options[:raw] ? :raw_api_call : :api_call
-      headers = options[:jsonapi] ? { 'Accept' => 'application/vnd.api+json' } : {}
+      headers = options[:jsonapi] ? { "Accept" => "application/vnd.api+json" } : {}
       send method, :post,
            "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/reports", {
              controller: "quizzes/quiz_reports",
@@ -120,28 +120,28 @@ describe Quizzes::QuizReportsController, type: :request do
     end
 
     before :once do
-      teacher_in_course(:active_all => true)
+      teacher_in_course(active_all: true)
       @me = @user
-      simple_quiz_with_submissions %w{T T T}, %w{T T T}, %w{T F F}, %w{T F T}, :user => @user, :course => @course
+      simple_quiz_with_submissions %w[T T T], %w[T T T], %w[T F F], %w[T F T], user: @user, course: @course
       @user = @me
     end
 
     it "creates a new report" do
       expect(Quizzes::QuizStatistics.count).to eq 0
-      json = api_create({ :quiz_report => { :report_type => "item_analysis" } })
+      json = api_create({ quiz_report: { report_type: "item_analysis" } })
       expect(Quizzes::QuizStatistics.count).to eq 1
-      expect(json['id']).to eq Quizzes::QuizStatistics.first.id
+      expect(json["id"]).to eq Quizzes::QuizStatistics.first.id
     end
 
     it "reuses an existing report" do
-      @quiz.statistics_csv('item_analysis')
+      @quiz.statistics_csv("item_analysis")
       expect(Quizzes::QuizStatistics.count).to eq 1
-      json = api_create({ :quiz_report => { :report_type => "item_analysis" } })
+      json = api_create({ quiz_report: { report_type: "item_analysis" } })
       expect(Quizzes::QuizStatistics.count).to eq 1
-      expect(json['id']).to eq Quizzes::QuizStatistics.first.id
+      expect(json["id"]).to eq Quizzes::QuizStatistics.first.id
     end
 
-    context 'JSON-API' do
+    context "JSON-API" do
       it "creates a new report" do
         expect(Quizzes::QuizStatistics.count).to eq 0
 
@@ -153,19 +153,19 @@ describe Quizzes::QuizReportsController, type: :request do
 
         expect(Quizzes::QuizStatistics.count).to eq 1
 
-        expect(json['quiz_reports']).to be_present
-        expect(json['quiz_reports'][0]['id']).to eq Quizzes::QuizStatistics.first.id.to_s
+        expect(json["quiz_reports"]).to be_present
+        expect(json["quiz_reports"][0]["id"]).to eq Quizzes::QuizStatistics.first.id.to_s
       end
     end
 
-    context 're-generation' do
+    context "re-generation" do
       let(:job_tag) { Quizzes::QuizStatistics.csv_job_tag }
-      let(:report_type) { 'student_analysis' }
+      let(:report_type) { "student_analysis" }
 
       it "works when a job had failed previously" do
         stats, original_job = *begin
           allow_any_instance_of(Quizzes::QuizStatistics::StudentAnalysis).to receive(:to_csv) {
-            throw 'simulated failure'
+            throw "simulated failure"
           }
 
           stats = @quiz.current_statistics_for(report_type)
@@ -211,9 +211,9 @@ describe Quizzes::QuizReportsController, type: :request do
 
   describe "DELETE /courses/:course_id/quizzes/:quiz_id/reports/:id [#abort]" do
     before :once do
-      teacher_in_course(:active_all => true)
+      teacher_in_course(active_all: true)
 
-      simple_quiz_with_submissions %w{T T T}, %w{T T T}, %w{T F F}, %w{T F T}, {
+      simple_quiz_with_submissions %w[T T T], %w[T T T], %w[T F F], %w[T F T], {
         user: @teacher,
         course: @course
       }
@@ -232,25 +232,25 @@ describe Quizzes::QuizReportsController, type: :request do
           quiz_id: @quiz.id.to_s,
           id: report.id.to_s
         }, {}, {
-          'Accept' => 'application/vnd.api+json'
+          "Accept" => "application/vnd.api+json"
         }
       )
     end
 
-    it 'denies unprivileged access' do
-      student_in_course(:active_all => true)
+    it "denies unprivileged access" do
+      student_in_course(active_all: true)
       api_abort
       assert_status(401)
     end
 
-    it 'works when the report is already generated' do
+    it "works when the report is already generated" do
       report.generate_csv
       api_abort
       assert_status(204)
       expect(report.reload.csv_attachment).to eq nil
     end
 
-    it 'works when the report is queued for generation' do
+    it "works when the report is queued for generation" do
       report.generate_csv_in_background
       expect(report.reload.generating_csv?).to eq true
 
@@ -260,7 +260,7 @@ describe Quizzes::QuizReportsController, type: :request do
       expect(report.reload.generating_csv?).to eq false
     end
 
-    it 'works when the report failed to generate' do
+    it "works when the report failed to generate" do
       report.generate_csv_in_background
       report.progress.fail
 
@@ -268,7 +268,7 @@ describe Quizzes::QuizReportsController, type: :request do
       assert_status(204)
     end
 
-    it 'does not work when the report is being generated' do
+    it "does not work when the report is being generated" do
       report.generate_csv_in_background
       report.progress.start
 
@@ -281,7 +281,7 @@ describe Quizzes::QuizReportsController, type: :request do
   describe "GET /courses/:course_id/quizzes/:quiz_id/reports/:id [show]" do
     def api_show(params = {}, options = {})
       method = options[:raw] ? :raw_api_call : :api_call
-      headers = options[:jsonapi] ? { 'Accept' => 'application/vnd.api+json' } : {}
+      headers = options[:jsonapi] ? { "Accept" => "application/vnd.api+json" } : {}
       send method, :get,
            "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/reports/#{@report.id}", {
              controller: "quizzes/quiz_reports",
@@ -293,62 +293,62 @@ describe Quizzes::QuizReportsController, type: :request do
            }, params, headers
     end
 
-    it 'denies unprivileged access' do
-      student_in_course(:active_all => true)
-      @quiz = @course.quizzes.create({ title: 'Test Quiz' })
-      @report = @quiz.current_statistics_for('student_analysis')
+    it "denies unprivileged access" do
+      student_in_course(active_all: true)
+      @quiz = @course.quizzes.create({ title: "Test Quiz" })
+      @report = @quiz.current_statistics_for("student_analysis")
       api_show({}, raw: true)
       assert_status(401)
     end
 
-    context 'with privileged access' do
+    context "with privileged access" do
       before :once do
-        teacher_in_course(:active_all => true)
-        @quiz = @course.quizzes.create({ title: 'Test Quiz' })
-        @report = @quiz.current_statistics_for('student_analysis')
+        teacher_in_course(active_all: true)
+        @quiz = @course.quizzes.create({ title: "Test Quiz" })
+        @report = @quiz.current_statistics_for("student_analysis")
       end
 
-      it 'shows the report' do
+      it "shows the report" do
         json = api_show
-        expect(json['id']).to eq @report.id
-        expect(json['report_type']).to eq 'student_analysis'
+        expect(json["id"]).to eq @report.id
+        expect(json["report_type"]).to eq "student_analysis"
       end
 
-      it 'embeds its attachment automatically in JSON format' do
+      it "embeds its attachment automatically in JSON format" do
         @report.generate_csv
         @report.reload
 
         json = api_show
-        expect(json['file']).to be_present
-        expect(json['file']['id']).to eq @report.csv_attachment.id
+        expect(json["file"]).to be_present
+        expect(json["file"]["id"]).to eq @report.csv_attachment.id
       end
 
-      context 'JSON-API' do
-        it 'renders' do
+      context "JSON-API" do
+        it "renders" do
           json = api_show({}, { jsonapi: true })
-          expect(json['quiz_reports']).to be_present
-          expect(json['quiz_reports'][0]['id']).to eq @report.id.to_s
-          expect(json['quiz_reports'][0]['report_type']).to eq 'student_analysis'
+          expect(json["quiz_reports"]).to be_present
+          expect(json["quiz_reports"][0]["id"]).to eq @report.id.to_s
+          expect(json["quiz_reports"][0]["report_type"]).to eq "student_analysis"
         end
 
-        it 'embeds its attachment with ?include=file' do
+        it "embeds its attachment with ?include=file" do
           @report.generate_csv
           @report.reload
 
-          json = api_show({ :include => ['file'] }, { jsonapi: true })
-          expect(json['quiz_reports'][0]['file']).to be_present
-          expect(json['quiz_reports'][0]['file']['id']).to eq @report.csv_attachment.id
+          json = api_show({ include: ["file"] }, { jsonapi: true })
+          expect(json["quiz_reports"][0]["file"]).to be_present
+          expect(json["quiz_reports"][0]["file"]["id"]).to eq @report.csv_attachment.id
         end
 
-        it 'embeds its progress with ?include=progress' do
+        it "embeds its progress with ?include=progress" do
           @report.generate_csv_in_background
           @report.reload
 
-          json = api_show({ :include => ['progress'] }, { jsonapi: true })
+          json = api_show({ include: ["progress"] }, { jsonapi: true })
 
-          expect(json['quiz_reports'][0]['file']).not_to be_present
-          expect(json['quiz_reports'][0]['progress']).to be_present
-          expect(json['quiz_reports'][0]['progress']['id']).to eq @report.progress.id
+          expect(json["quiz_reports"][0]["file"]).not_to be_present
+          expect(json["quiz_reports"][0]["progress"]).to be_present
+          expect(json["quiz_reports"][0]["progress"]["id"]).to eq @report.progress.id
         end
       end
     end # context 'with privileged access'

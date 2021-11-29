@@ -17,19 +17,19 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../common'
-require_relative '../helpers/groups_common'
+require_relative "../common"
+require_relative "../helpers/groups_common"
 
-describe 'account groups' do
-  include_context 'in-process server selenium tests'
+describe "account groups" do
+  include_context "in-process server selenium tests"
   include GroupsCommon
 
-  describe 'as an admin' do
-    it 'lists uncategorized groups' do
+  describe "as an admin" do
+    it "lists uncategorized groups" do
       a = Account.default
       admin_logged_in
       # no group category means uncategorized
-      group = a.groups.create(name: 'anugroup', context: a)
+      group = a.groups.create(name: "anugroup", context: a)
       group.add_user @user
 
       get "/accounts/#{a.id}/groups/"

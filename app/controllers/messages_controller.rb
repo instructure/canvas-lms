@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'mail'
+require "mail"
 
 class MessagesController < ApplicationController
   before_action :require_read_messages, :get_context
@@ -28,7 +28,7 @@ class MessagesController < ApplicationController
   end
 
   def index
-    @messages = @context.messages.order('created_at DESC').paginate(:page => params[:page], :per_page => 20)
+    @messages = @context.messages.order("created_at DESC").paginate(page: params[:page], per_page: 20)
   end
 
   def show
@@ -39,9 +39,9 @@ class MessagesController < ApplicationController
     secure_id, message_id = [params[:secure_id], params[:message_id].to_i]
 
     message = Mail.new
-    message['Content-Type'] = 'text/plain; charset="UTF-8"'
-    message['Subject']      = params[:subject]
-    message['From']         = params[:from]
+    message["Content-Type"] = 'text/plain; charset="UTF-8"'
+    message["Subject"]      = params[:subject]
+    message["From"]         = params[:from]
     message.body            = params[:message]
 
     IncomingMailProcessor::IncomingMessageProcessor.new(IncomingMail::MessageHandler.new, ErrorReport::Reporter.new).process_single(message, "#{secure_id}-#{message_id}")
@@ -51,9 +51,9 @@ class MessagesController < ApplicationController
   def html_message
     message = @context.messages.find(params[:message_id])
     if message.html_body.present?
-      render :inline => message.html_body, :layout => false
+      render inline: message.html_body, layout: false
     else
-      render :layout => false
+      render layout: false
     end
   end
 end

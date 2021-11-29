@@ -18,22 +18,32 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'logger'
-require 'syslog'
+require "logger"
+require "syslog"
 
 class SyslogWrapper
   attr_accessor :level, :datetime_format
 
-  def formatter; nil; end
+  def formatter
+    nil
+  end
 
   @@silencer = true
-  def self.silencer; @@silencer; end
+  def self.silencer
+    @@silencer
+  end
 
-  def silencer; @@silencer; end
+  def silencer
+    @@silencer
+  end
 
-  def self.silencer=(obj); @@silencer = obj; end
+  def self.silencer=(obj)
+    @@silencer = obj
+  end
 
-  def silencer=(obj); @@silencer = obj; end
+  def silencer=(obj)
+    @@silencer = obj
+  end
 
   def silence(temporary_level = Logger::ERROR)
     if silencer
@@ -88,20 +98,20 @@ class SyslogWrapper
     Logger::ERROR => :err,
     Logger::FATAL => :crit,
     Logger::UNKNOWN => :notice
-  }
+  }.freeze
 
   def add(severity, message = nil, progname = nil)
     severity ||= Logger::UNKNOWN
     return if @level > severity
 
     if message.nil?
-      if block_given?
-        message = yield
-      else
-        message = progname
-      end
+      message = if block_given?
+                  yield
+                else
+                  progname
+                end
     end
-    message = message.to_s.strip.gsub(/\e\[([0-9]+(;|))+m/, '')
+    message = message.to_s.strip.gsub(/\e\[([0-9]+(;|))+m/, "")
     unless @skip_thread_context
       context = Thread.current[:context] || {}
       message = "[#{context[:session_id] || "-"} #{context[:request_id] || "-"}] #{message}"
@@ -110,27 +120,51 @@ class SyslogWrapper
   end
   alias_method :log, :add
 
-  def <<(msg); add(@level, msg); end
+  def <<(msg)
+    add(@level, msg)
+  end
 
-  def debug(progname = nil, &block); add(Logger::DEBUG, nil, progname, &block); end
+  def debug(progname = nil, &block)
+    add(Logger::DEBUG, nil, progname, &block)
+  end
 
-  def info(progname = nil, &block); add(Logger::INFO, nil, progname, &block); end
+  def info(progname = nil, &block)
+    add(Logger::INFO, nil, progname, &block)
+  end
 
-  def warn(progname = nil, &block); add(Logger::WARN, nil, progname, &block); end
+  def warn(progname = nil, &block)
+    add(Logger::WARN, nil, progname, &block)
+  end
 
-  def error(progname = nil, &block); add(Logger::ERROR, nil, progname, &block); end
+  def error(progname = nil, &block)
+    add(Logger::ERROR, nil, progname, &block)
+  end
 
-  def fatal(progname = nil, &block); add(Logger::FATAL, nil, progname, &block); end
+  def fatal(progname = nil, &block)
+    add(Logger::FATAL, nil, progname, &block)
+  end
 
-  def unknown(progname = nil, &block); add(Logger::UNKNOWN, nil, progname, &block); end
+  def unknown(progname = nil, &block)
+    add(Logger::UNKNOWN, nil, progname, &block)
+  end
 
-  def debug?; @level <= Logger::DEBUG; end
+  def debug?
+    @level <= Logger::DEBUG
+  end
 
-  def info?; @level <= Logger::INFO; end
+  def info?
+    @level <= Logger::INFO
+  end
 
-  def warn?; @level <= Logger::WARN; end
+  def warn?
+    @level <= Logger::WARN
+  end
 
-  def error?; @level <= Logger::ERROR; end
+  def error?
+    @level <= Logger::ERROR
+  end
 
-  def fatal?; @level <= Logger::FATAL; end
+  def fatal?
+    @level <= Logger::FATAL
+  end
 end

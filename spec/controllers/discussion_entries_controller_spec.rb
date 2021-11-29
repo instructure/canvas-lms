@@ -20,39 +20,39 @@
 
 describe DiscussionEntriesController do
   before :once do
-    course_with_teacher(:active_all => true)
-    student_in_course(:active_all => true)
-    @topic = @course.discussion_topics.create(:title => "some topic")
-    @entry = @topic.discussion_entries.create(:message => "some message", :user => @student)
+    course_with_teacher(active_all: true)
+    student_in_course(active_all: true)
+    @topic = @course.discussion_topics.create(title: "some topic")
+    @entry = @topic.discussion_entries.create(message: "some message", user: @student)
   end
 
   def topic_with_media_reply
     @topic.update_attribute(:podcast_enabled, true)
-    @mo1 = @course.media_objects.build(:media_id => 'asdf', :title => 'asdf')
-    @mo1.data = { :extensions => { :mp4 => {
-      :size => 100,
-      :extension => 'mp4'
+    @mo1 = @course.media_objects.build(media_id: "asdf", title: "asdf")
+    @mo1.data = { extensions: { mp4: {
+      size: 100,
+      extension: "mp4"
     } } }
     @mo1.save!
-    @entry = @topic.discussion_entries.create!(:user => @student, :message => " media_comment_asdf ")
+    @entry = @topic.discussion_entries.create!(user: @student, message: " media_comment_asdf ")
   end
 
   describe "GET 'show'" do
     it "requires authorization" do
-      get 'show', params: { :course_id => @course.id, :id => @entry.id }
+      get "show", params: { course_id: @course.id, id: @entry.id }
       assert_unauthorized
     end
 
     it "requires course to be published for students" do
       user_session(@student)
       @course.claim
-      get 'show', params: { :course_id => @course.id, :id => @entry.id }
+      get "show", params: { course_id: @course.id, id: @entry.id }
       assert_unauthorized
     end
 
     it "assigns variables" do
       user_session(@student)
-      get 'show', params: { :course_id => @course.id, :id => @entry.id }, :format => :json
+      get "show", params: { course_id: @course.id, id: @entry.id }, format: :json
       # response.should be_successful
       expect(assigns[:entry]).not_to be_nil
       expect(assigns[:entry]).to eql(@entry)
@@ -61,13 +61,13 @@ describe DiscussionEntriesController do
 
   describe "POST 'create'" do
     it "requires authorization" do
-      post 'create', params: { :course_id => @course.id, :discussion_entry => { :discussion_topic_id => @topic.id, :message => "yo" } }
+      post "create", params: { course_id: @course.id, discussion_entry: { discussion_topic_id: @topic.id, message: "yo" } }
       assert_unauthorized
     end
 
     it "creates a message" do
       user_session(@student)
-      post 'create', params: { :course_id => @course.id, :discussion_entry => { :discussion_topic_id => @topic.id, :message => "yo" } }
+      post "create", params: { course_id: @course.id, discussion_entry: { discussion_topic_id: @topic.id, message: "yo" } }
       expect(assigns[:topic]).to eql(@topic)
       expect(assigns[:entry]).not_to be_nil
       expect(assigns[:entry].message).to eql("yo")
@@ -76,7 +76,7 @@ describe DiscussionEntriesController do
 
     it "attaches a file if authorized" do
       user_session(@teacher)
-      post 'create', params: { :course_id => @course.id, :discussion_entry => { :discussion_topic_id => @topic.id, :message => "yo" }, :attachment => { :uploaded_data => default_uploaded_data } }
+      post "create", params: { course_id: @course.id, discussion_entry: { discussion_topic_id: @topic.id, message: "yo" }, attachment: { uploaded_data: default_uploaded_data } }
       expect(assigns[:topic]).to eql(@topic)
       expect(assigns[:entry]).not_to be_nil
       expect(assigns[:entry].message).to eql("yo")
@@ -88,7 +88,7 @@ describe DiscussionEntriesController do
       @course.allow_student_forum_attachments = false
       @course.save!
       user_session(@student)
-      post 'create', params: { :course_id => @course.id, :discussion_entry => { :discussion_topic_id => @topic.id, :message => "yo" }, :attachment => { :uploaded_data => default_uploaded_data } }
+      post "create", params: { course_id: @course.id, discussion_entry: { discussion_topic_id: @topic.id, message: "yo" }, attachment: { uploaded_data: default_uploaded_data } }
       expect(assigns[:topic]).to eql(@topic)
       expect(assigns[:entry]).not_to be_nil
       expect(assigns[:entry].message).to eql("yo")
@@ -97,30 +97,30 @@ describe DiscussionEntriesController do
     end
 
     it "creates a submission if the topic has an assignment" do
-      course_with_student_logged_in(active_all: true, :course => @course)
-      assignment_model(:course => @course)
+      course_with_student_logged_in(active_all: true, course: @course)
+      assignment_model(course: @course)
       @topic.assignment = @assignment
       @topic.save
       expect(@student.submissions.not_placeholder).to be_empty
 
-      post 'create', params: { :course_id => @course.id, :discussion_entry => { :discussion_topic_id => @topic.id, :message => "yo" } }
+      post "create", params: { course_id: @course.id, discussion_entry: { discussion_topic_id: @topic.id, message: "yo" } }
       expect(response).to be_redirect
 
       @student.reload
       expect(@student.submissions.not_placeholder.size).to eq 1
-      expect(@student.submissions.not_placeholder.first.submission_type).to eq 'discussion_topic'
+      expect(@student.submissions.not_placeholder.first.submission_type).to eq "discussion_topic"
     end
   end
 
   describe "PUT 'update'" do
     it "requires authorization" do
-      put 'update', params: { :course_id => @course.id, :id => @entry.id, :discussion_entry => {} }
+      put "update", params: { course_id: @course.id, id: @entry.id, discussion_entry: {} }
       assert_unauthorized
     end
 
     it "updates the entry" do
       user_session(@teacher)
-      put 'update', params: { :course_id => @course.id, :id => @entry.id, :discussion_entry => { :message => "ahem" } }
+      put "update", params: { course_id: @course.id, id: @entry.id, discussion_entry: { message: "ahem" } }
       expect(response).to be_redirect
       expect(assigns[:entry]).to eql(@entry)
       expect(assigns[:entry].message).to eql("ahem")
@@ -128,7 +128,7 @@ describe DiscussionEntriesController do
 
     it "attaches a new file to the entry" do
       user_session(@teacher)
-      put 'update', params: { :course_id => @course.id, :id => @entry.id, :discussion_entry => { :message => "ahem" }, :attachment => { :uploaded_data => default_uploaded_data } }
+      put "update", params: { course_id: @course.id, id: @entry.id, discussion_entry: { message: "ahem" }, attachment: { uploaded_data: default_uploaded_data } }
       expect(response).to be_redirect
       expect(assigns[:entry]).to eql(@entry)
       expect(assigns[:entry].message).to eql("ahem")
@@ -137,10 +137,10 @@ describe DiscussionEntriesController do
 
     it "replaces the file on the entry" do
       user_session(@teacher)
-      @a = @course.attachments.create!(:uploaded_data => default_uploaded_data)
+      @a = @course.attachments.create!(uploaded_data: default_uploaded_data)
       @entry.attachment = @a
       @entry.save
-      put 'update', params: { :course_id => @course.id, :id => @entry.id, :discussion_entry => { :message => "ahem" }, :attachment => { :uploaded_data => default_uploaded_data } }
+      put "update", params: { course_id: @course.id, id: @entry.id, discussion_entry: { message: "ahem" }, attachment: { uploaded_data: default_uploaded_data } }
       expect(response).to be_redirect
       expect(assigns[:entry]).to eql(@entry)
       expect(assigns[:entry].message).to eql("ahem")
@@ -150,10 +150,10 @@ describe DiscussionEntriesController do
 
     it "removes the file from the entry" do
       user_session(@teacher)
-      @a = @course.attachments.create!(:uploaded_data => default_uploaded_data)
+      @a = @course.attachments.create!(uploaded_data: default_uploaded_data)
       @entry.attachment = @a
       @entry.save
-      put 'update', params: { :course_id => @course.id, :id => @entry.id, :discussion_entry => { :message => "ahem", :remove_attachment => '1' } }
+      put "update", params: { course_id: @course.id, id: @entry.id, discussion_entry: { message: "ahem", remove_attachment: "1" } }
       expect(response).to be_redirect
       expect(assigns[:entry]).to eql(@entry)
       expect(assigns[:entry].message).to eql("ahem")
@@ -164,7 +164,7 @@ describe DiscussionEntriesController do
       @course.allow_student_forum_attachments = false
       @course.save!
       user_session(@student)
-      put 'update', params: { :course_id => @course.id, :id => @entry.id, :discussion_entry => { :message => "ahem" }, :attachment => { :uploaded_data => default_uploaded_data } }
+      put "update", params: { course_id: @course.id, id: @entry.id, discussion_entry: { message: "ahem" }, attachment: { uploaded_data: default_uploaded_data } }
       expect(response).to be_redirect
       expect(assigns[:entry]).to eql(@entry)
       expect(assigns[:entry].message).to eql("ahem")
@@ -173,12 +173,12 @@ describe DiscussionEntriesController do
 
     it "sets the editor_id to whoever edited to entry" do
       user_session(@teacher)
-      @entry = @topic.discussion_entries.build(:message => "test")
+      @entry = @topic.discussion_entries.build(message: "test")
       @entry.user = @student
       @entry.save!
       expect(@entry.user).to eql(@student)
       expect(@entry.editor).to eql(nil)
-      put 'update', params: { :course_id => @course.id, :id => @entry.id, :discussion_entry => { :message => "new message" } }
+      put "update", params: { course_id: @course.id, id: @entry.id, discussion_entry: { message: "new message" } }
       expect(response).to be_redirect
       expect(assigns[:entry].editor).to eql(@teacher)
       expect(assigns[:entry].user).to eql(@student)
@@ -187,13 +187,13 @@ describe DiscussionEntriesController do
 
   describe "DELETE 'destroy'" do
     it "requires authorization" do
-      delete 'destroy', params: { :course_id => @course.id, :id => @entry.id }
+      delete "destroy", params: { course_id: @course.id, id: @entry.id }
       assert_unauthorized
     end
 
     it "deletes the entry" do
       user_session(@teacher)
-      delete 'destroy', params: { :course_id => @course.id, :id => @entry.id }
+      delete "destroy", params: { course_id: @course.id, id: @entry.id }
       expect(response).to be_redirect
 
       @entry.reload
@@ -211,20 +211,20 @@ describe DiscussionEntriesController do
     end
 
     it "requires authorization" do
-      get 'public_feed', params: { :discussion_topic_id => @topic.id, :feed_code => @enrollment.feed_code + "x" }, :format => 'rss'
+      get "public_feed", params: { discussion_topic_id: @topic.id, feed_code: @enrollment.feed_code + "x" }, format: "rss"
       expect(assigns[:problem]).to eql("The verification code does not match any currently enrolled user.")
     end
 
     it "requires the podcast to be enabled" do
-      get 'public_feed', params: { :discussion_topic_id => @topic.id, :feed_code => @enrollment.feed_code }, :format => 'rss'
+      get "public_feed", params: { discussion_topic_id: @topic.id, feed_code: @enrollment.feed_code }, format: "rss"
       expect(assigns[:problem]).to eql("Podcasts have not been enabled for this topic.")
     end
 
     it "returns a valid RSS feed" do
       @topic.update_attribute(:podcast_enabled, true)
-      get 'public_feed', params: { :discussion_topic_id => @topic.id, :feed_code => @enrollment.feed_code }, :format => 'rss'
+      get "public_feed", params: { discussion_topic_id: @topic.id, feed_code: @enrollment.feed_code }, format: "rss"
       expect(assigns[:entries]).not_to be_nil
-      require 'rss/2.0'
+      require "rss/2.0"
       rss = RSS::Parser.parse(response.body, false) rescue nil
       expect(rss).not_to be_nil
       expect(rss.channel.title).to eql("some topic Posts Podcast Feed")
@@ -235,8 +235,8 @@ describe DiscussionEntriesController do
       topic_with_media_reply
       @topic.update_attribute(:podcast_has_student_posts, true)
       @mo1.destroy
-      get 'public_feed', params: { :discussion_topic_id => @topic.id, :feed_code => @enrollment.feed_code }, :format => 'rss'
-      require 'rss/2.0'
+      get "public_feed", params: { discussion_topic_id: @topic.id, feed_code: @enrollment.feed_code }, format: "rss"
+      require "rss/2.0"
       rss = RSS::Parser.parse(response.body, false) rescue nil
       expect(rss).not_to be_nil
       expect(rss.channel.title).to eql("some topic Posts Podcast Feed")
@@ -247,8 +247,8 @@ describe DiscussionEntriesController do
       topic_with_media_reply
       @topic.update_attribute(:podcast_has_student_posts, true)
       @entry.update_attribute(:message, "<iframe data-media-id=\"#{@mo1.media_id}\"></iframe>")
-      get 'public_feed', params: { :discussion_topic_id => @topic.id, :feed_code => @enrollment.feed_code }, :format => 'rss'
-      require 'rss/2.0'
+      get "public_feed", params: { discussion_topic_id: @topic.id, feed_code: @enrollment.feed_code }, format: "rss"
+      require "rss/2.0"
       rss = RSS::Parser.parse(response.body, false) rescue nil
       expect(rss).not_to be_nil
       expect(rss.channel.title).to eql("some topic Posts Podcast Feed")
@@ -261,13 +261,13 @@ describe DiscussionEntriesController do
       topic_with_media_reply
       @topic.update_attribute(:podcast_has_student_posts, true)
 
-      @a = attachment_model(:context => @course, :filename => 'test.mp4', :content_type => 'video')
+      @a = attachment_model(context: @course, filename: "test.mp4", content_type: "video")
       @a.media_entry_id = @mo1.media_id
       @a.save!
-      @topic.discussion_entries.create!(:user => @student, :message => " /courses/#{@course.id}/files/#{@a.id}/download ")
+      @topic.discussion_entries.create!(user: @student, message: " /courses/#{@course.id}/files/#{@a.id}/download ")
 
-      get 'public_feed', params: { :discussion_topic_id => @topic.id, :feed_code => @enrollment.feed_code }, :format => 'rss'
-      require 'rss/2.0'
+      get "public_feed", params: { discussion_topic_id: @topic.id, feed_code: @enrollment.feed_code }, format: "rss"
+      require "rss/2.0"
       rss = RSS::Parser.parse(response.body, false) rescue nil
       expect(rss).not_to be_nil
       expect(rss.channel.title).to eql("some topic Posts Podcast Feed")
@@ -279,10 +279,10 @@ describe DiscussionEntriesController do
     it "includes student entries if enabled" do
       topic_with_media_reply
       @topic.update_attribute(:podcast_has_student_posts, true)
-      get 'public_feed', params: { :discussion_topic_id => @topic.id, :feed_code => @enrollment.feed_code }, :format => 'rss'
+      get "public_feed", params: { discussion_topic_id: @topic.id, feed_code: @enrollment.feed_code }, format: "rss"
       expect(assigns[:entries]).not_to be_nil
       expect(assigns[:entries]).not_to be_empty
-      require 'rss/2.0'
+      require "rss/2.0"
       rss = RSS::Parser.parse(response.body, false) rescue nil
       expect(rss).not_to be_nil
       expect(rss.channel.title).to eql("some topic Posts Podcast Feed")
@@ -295,16 +295,16 @@ describe DiscussionEntriesController do
 
     it "includes student entries when media is from user context if enabled" do
       @topic.update_attribute(:podcast_enabled, true)
-      @student_mo1 = @student.media_objects.build(:media_id => 'asdf', :title => 'asdf')
-      @student_mo1.data = { :extensions => { :mp4 => { :size => 100, :extension => 'mp4' } } }
+      @student_mo1 = @student.media_objects.build(media_id: "asdf", title: "asdf")
+      @student_mo1.data = { extensions: { mp4: { size: 100, extension: "mp4" } } }
       @student_mo1.save!
-      @entry = @topic.discussion_entries.create!(:user => @student, :message => " media_comment_asdf ")
+      @entry = @topic.discussion_entries.create!(user: @student, message: " media_comment_asdf ")
       @entry.update_attribute(:message, "<iframe data-media-id=\"#{@student_mo1.media_id}\"></iframe>")
       @topic.update_attribute(:podcast_has_student_posts, true)
-      get 'public_feed', params: { :discussion_topic_id => @topic.id, :feed_code => @enrollment.feed_code }, :format => 'rss'
+      get "public_feed", params: { discussion_topic_id: @topic.id, feed_code: @enrollment.feed_code }, format: "rss"
       expect(assigns[:entries]).not_to be_nil
       expect(assigns[:entries]).not_to be_empty
-      require 'rss/2.0'
+      require "rss/2.0"
       rss = RSS::Parser.parse(response.body, false) rescue nil
       expect(rss).not_to be_nil
       expect(rss.channel.title).to eql("some topic Posts Podcast Feed")
@@ -318,16 +318,16 @@ describe DiscussionEntriesController do
     it "does not include media objects from another course if enabled" do
       @topic.update_attribute(:podcast_enabled, true)
       @other_course = Course.create!
-      @other_mo = @other_course.media_objects.build(:media_id => 'asdf', :title => 'asdf')
-      @other_mo.data = { :extensions => { :mp4 => { :size => 100, :extension => 'mp4' } } }
+      @other_mo = @other_course.media_objects.build(media_id: "asdf", title: "asdf")
+      @other_mo.data = { extensions: { mp4: { size: 100, extension: "mp4" } } }
       @other_mo.save!
-      @entry = @topic.discussion_entries.create!(:user => @teacher, :message => " media_comment_asdf ")
+      @entry = @topic.discussion_entries.create!(user: @teacher, message: " media_comment_asdf ")
       @entry.update_attribute(:message, "<iframe data-media-id=\"#{@other_mo.media_id}\"></iframe>")
 
-      get 'public_feed', params: { :discussion_topic_id => @topic.id, :feed_code => @enrollment.feed_code }, :format => 'rss'
+      get "public_feed", params: { discussion_topic_id: @topic.id, feed_code: @enrollment.feed_code }, format: "rss"
       expect(assigns[:entries]).not_to be_nil
       expect(assigns[:entries]).not_to be_empty
-      require 'rss/2.0'
+      require "rss/2.0"
       rss = RSS::Parser.parse(response.body, false) rescue nil
       expect(rss).not_to be_nil
       expect(rss.channel.title).to eql("some topic Posts Podcast Feed")
@@ -341,10 +341,10 @@ describe DiscussionEntriesController do
       @topic.update_attribute(:podcast_has_student_posts, true)
       @topic.update_attribute(:delayed_post_at, 2.days.from_now)
       expect(@topic.locked_for?(@student)).not_to eql(nil)
-      get 'public_feed', params: { :discussion_topic_id => @topic.id, :feed_code => @enrollment.feed_code }, :format => 'rss'
+      get "public_feed", params: { discussion_topic_id: @topic.id, feed_code: @enrollment.feed_code }, format: "rss"
       expect(assigns[:entries]).not_to be_nil
       expect(assigns[:entries]).not_to be_empty
-      require 'rss/2.0'
+      require "rss/2.0"
       rss = RSS::Parser.parse(response.body, false) rescue nil
       expect(rss).not_to be_nil
       expect(rss.channel.title).to eql("some topic Posts Podcast Feed")
@@ -360,10 +360,10 @@ describe DiscussionEntriesController do
       @topic.update_attribute(:podcast_has_student_posts, true)
       @topic.update_attribute(:require_initial_post, true)
       expect(@topic.locked_for?(@user)).not_to eql(nil)
-      get 'public_feed', params: { :discussion_topic_id => @topic.id, :feed_code => @enrollment.feed_code }, :format => 'rss'
+      get "public_feed", params: { discussion_topic_id: @topic.id, feed_code: @enrollment.feed_code }, format: "rss"
       expect(assigns[:entries]).not_to be_nil
       expect(assigns[:entries]).not_to be_empty
-      require 'rss/2.0'
+      require "rss/2.0"
       rss = RSS::Parser.parse(response.body, false) rescue nil
       expect(rss).not_to be_nil
       expect(rss.channel.title).to eql("some topic Posts Podcast Feed")
@@ -375,10 +375,10 @@ describe DiscussionEntriesController do
       topic_with_media_reply
       @topic.update_attribute(:podcast_has_student_posts, true)
       @topic.update_attribute(:require_initial_post, true)
-      get 'public_feed', params: { :discussion_topic_id => @topic.id, :feed_code => @enrollment.feed_code }, :format => 'rss'
+      get "public_feed", params: { discussion_topic_id: @topic.id, feed_code: @enrollment.feed_code }, format: "rss"
       expect(assigns[:entries]).not_to be_nil
       expect(assigns[:entries]).not_to be_empty
-      require 'rss/2.0'
+      require "rss/2.0"
       rss = RSS::Parser.parse(response.body, false) rescue nil
       expect(rss).not_to be_nil
       expect(rss.channel.title).to eql("some topic Posts Podcast Feed")
@@ -389,9 +389,9 @@ describe DiscussionEntriesController do
 
     it "does not include student entries if disabled" do
       topic_with_media_reply
-      get 'public_feed', params: { :discussion_topic_id => @topic.id, :feed_code => @enrollment.feed_code }, :format => 'rss'
+      get "public_feed", params: { discussion_topic_id: @topic.id, feed_code: @enrollment.feed_code }, format: "rss"
       expect(assigns[:entries]).not_to be_nil
-      require 'rss/2.0'
+      require "rss/2.0"
       rss = RSS::Parser.parse(response.body, false) rescue nil
       expect(rss).not_to be_nil
       expect(rss.channel.title).to eql("some topic Posts Podcast Feed")
@@ -411,29 +411,29 @@ describe DiscussionEntriesController do
       @mo1.data = nil
       @mo1.save!
 
-      get 'public_feed', params: { :discussion_topic_id => @topic.id, :feed_code => @enrollment.feed_code }, :format => 'rss'
+      get "public_feed", params: { discussion_topic_id: @topic.id, feed_code: @enrollment.feed_code }, format: "rss"
       expect(assigns[:entries]).not_to be_nil
-      require 'rss/2.0'
+      require "rss/2.0"
       rss = RSS::Parser.parse(response.body, false) rescue nil
       expect(rss).not_to be_nil
       expect(rss.channel.title).to eql("some topic Posts Podcast Feed")
       expect(rss.items.length).to eql(0)
     end
 
-    it 'respects podcast_has_student_posts for course discussions' do
+    it "respects podcast_has_student_posts for course discussions" do
       @topic.update(podcast_enabled: true, podcast_has_student_posts: false)
-      get 'public_feed', params: { :discussion_topic_id => @topic.id, :feed_code => @enrollment.feed_code }, :format => 'rss'
+      get "public_feed", params: { discussion_topic_id: @topic.id, feed_code: @enrollment.feed_code }, format: "rss"
       expect(assigns[:discussion_entries].length).to eql 0
     end
 
-    it 'always returns student entries for group discussions' do
+    it "always returns student entries for group discussions" do
       group_category
       membership = group_with_user(group_category: @group_category, user: @student)
       @topic = @group.discussion_topics.create(title: "group topic", user: @teacher)
       @entry = @topic.discussion_entries.create(message: "some message", user: @student)
 
       @topic.update(podcast_enabled: true, podcast_has_student_posts: false)
-      get 'public_feed', params: { :discussion_topic_id => @topic.id, :feed_code => membership.feed_code }, :format => 'rss'
+      get "public_feed", params: { discussion_topic_id: @topic.id, feed_code: membership.feed_code }, format: "rss"
       expect(assigns[:discussion_entries].length).to eql 1
     end
   end

@@ -18,10 +18,10 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'spec_helper'
-require 'webmock'
-require 'tempfile'
-require 'multipart'
+require "spec_helper"
+require "webmock"
+require "tempfile"
+require "multipart"
 
 describe "CanvasHttp" do
   include WebMock::API
@@ -30,7 +30,7 @@ describe "CanvasHttp" do
     fake_logger = Class.new do
       attr_reader :messages
 
-      def initialize()
+      def initialize
         @messages = []
         super
       end
@@ -73,7 +73,7 @@ describe "CanvasHttp" do
       url = "www.example.com/a"
       body = "abc"
       content_type = "plain/text"
-      stub_request(:post, url).with(body: "abc", :headers => { 'Content-Type' => content_type })
+      stub_request(:post, url).with(body: "abc", headers: { "Content-Type" => content_type })
                               .to_return(status: 200)
       expect(CanvasHttp.post(url, body: body, content_type: content_type).code).to eq "200"
     end
@@ -84,12 +84,12 @@ describe "CanvasHttp" do
       form_data = { "file.txt" => StringIO.new(file_contents) }
 
       stubbed = stub_request(:post, url).with do |req|
-        expect(req.headers['Content-Type']).to match(%r{\Amultipart/form-data})
+        expect(req.headers["Content-Type"]).to match(%r{\Amultipart/form-data})
         expect(req.body.lines[1]).to match('Content-Disposition: form-data; name="file.txt"; filename="file.txt"')
-        expect(req.body.lines[2]).to match('Content-Transfer-Encoding: binary')
-        expect(req.body.lines[3]).to match('Content-Type: text/plain')
-        expect(req.body.lines[5]).to match('file contents')
-      end.to_return(:status => 200)
+        expect(req.body.lines[2]).to match("Content-Transfer-Encoding: binary")
+        expect(req.body.lines[3]).to match("Content-Type: text/plain")
+        expect(req.body.lines[5]).to match("file contents")
+      end.to_return(status: 200)
 
       CanvasHttp.post(url, form_data: form_data, multipart: true, streaming: true)
 
@@ -102,12 +102,12 @@ describe "CanvasHttp" do
       form_data = { "dangling\"quote.txt" => StringIO.new(file_contents) }
 
       stubbed = stub_request(:post, url).with do |req|
-        expect(req.headers['Content-Type']).to match(%r{\Amultipart/form-data})
+        expect(req.headers["Content-Type"]).to match(%r{\Amultipart/form-data})
         expect(req.body.lines[1]).to match('Content-Disposition: form-data; name="dangling%22quote.txt"; filename="dangling%22quote.txt"')
-        expect(req.body.lines[2]).to match('Content-Transfer-Encoding: binary')
-        expect(req.body.lines[3]).to match('Content-Type: text/plain')
-        expect(req.body.lines[5]).to match('file contents')
-      end.to_return(:status => 200)
+        expect(req.body.lines[2]).to match("Content-Transfer-Encoding: binary")
+        expect(req.body.lines[3]).to match("Content-Type: text/plain")
+        expect(req.body.lines[5]).to match("file contents")
+      end.to_return(status: 200)
 
       CanvasHttp.post(url, form_data: form_data, multipart: true, streaming: true)
 
@@ -130,7 +130,7 @@ describe "CanvasHttp" do
   describe ".get" do
     it "returns response objects" do
       stub_request(:get, "http://www.example.com/a/b")
-        .to_return(body: "Hello", headers: { 'Content-Length' => 5 })
+        .to_return(body: "Hello", headers: { "Content-Length" => 5 })
       res = CanvasHttp.get("http://www.example.com/a/b")
       expect(res).to be_a Net::HTTPOK
       expect(res.body).to eq("Hello")
@@ -140,7 +140,7 @@ describe "CanvasHttp" do
       http = double.as_null_object
       allow(Net::HTTP).to receive(:new) { http }
       expect(http).to receive(:use_ssl=).with(false)
-      response = double('Response')
+      response = double("Response")
       expect(response).to receive(:body)
       expect(http).to receive(:request).and_yield(response)
 
@@ -152,7 +152,7 @@ describe "CanvasHttp" do
       allow(Net::HTTP).to receive(:new) { http }
       expect(http).to receive(:use_ssl=).with(true)
       expect(http).to receive(:verify_mode=).with(OpenSSL::SSL::VERIFY_NONE)
-      expect(http).to receive(:request).and_yield(double(body: 'Hello SSL'))
+      expect(http).to receive(:request).and_yield(double(body: "Hello SSL"))
       expect(http).to receive(:open_timeout=).with(5)
       expect(http).to receive(:ssl_timeout=).with(5)
       expect(http).to receive(:read_timeout=).with(30)
@@ -162,11 +162,11 @@ describe "CanvasHttp" do
 
     it "follows redirects" do
       stub_request(:get, "http://www.example.com/a")
-        .to_return(status: 301, headers: { 'Location' => 'http://www.example2.com/a' })
+        .to_return(status: 301, headers: { "Location" => "http://www.example2.com/a" })
       stub_request(:get, "http://www.example2.com/a")
-        .to_return(status: 301, headers: { 'Location' => 'http://www.example3.com/a' })
+        .to_return(status: 301, headers: { "Location" => "http://www.example3.com/a" })
       stub_request(:get, "http://www.example3.com/a")
-        .to_return(body: "Hello", headers: { 'Content-Length' => 5 })
+        .to_return(body: "Hello", headers: { "Content-Length" => 5 })
       res = CanvasHttp.get("http://www.example.com/a")
       expect(res).to be_a Net::HTTPOK
       expect(res.body).to eq("Hello")
@@ -174,9 +174,9 @@ describe "CanvasHttp" do
 
     it "follows relative redirects" do
       stub_request(:get, "http://www.example.com/a")
-        .to_return(status: 301, headers: { 'Location' => '/b' })
+        .to_return(status: 301, headers: { "Location" => "/b" })
       stub_request(:get, "http://www.example.com/b")
-        .to_return(body: "Hello", headers: { 'Content-Length' => 5 })
+        .to_return(body: "Hello", headers: { "Content-Length" => 5 })
       res = CanvasHttp.get("http://www.example.com/a")
       expect(res).to be_a Net::HTTPOK
       expect(res.body).to eq("Hello")
@@ -184,16 +184,16 @@ describe "CanvasHttp" do
 
     it "fails on too many redirects" do
       stub_request(:get, "http://www.example.com/a")
-        .to_return(status: 301, headers: { 'Location' => 'http://www.example2.com/a' })
+        .to_return(status: 301, headers: { "Location" => "http://www.example2.com/a" })
       stub_request(:get, "http://www.example2.com/a")
-        .to_return(status: 301, headers: { 'Location' => 'http://www.example3.com/a' })
+        .to_return(status: 301, headers: { "Location" => "http://www.example3.com/a" })
       expect { CanvasHttp.get("http://www.example.com/a", redirect_limit: 2) }.to raise_error(CanvasHttp::TooManyRedirectsError)
     end
 
     it "yields requests to blocks" do
       res = nil
       stub_request(:get, "http://www.example.com/a/b")
-        .to_return(body: "Hello", headers: { 'Content-Length' => 5 })
+        .to_return(body: "Hello", headers: { "Content-Length" => 5 })
       CanvasHttp.get("http://www.example.com/a/b") do |yielded_res|
         res = yielded_res
       end
@@ -203,13 +203,13 @@ describe "CanvasHttp" do
 
     it "checks host before running" do
       stub_request(:get, "http://www.example.com/a/b")
-        .to_return(body: "Hello", headers: { 'Content-Length' => 5 })
+        .to_return(body: "Hello", headers: { "Content-Length" => 5 })
       expect(CanvasHttp).to receive(:insecure_host?).with("www.example.com").and_return(true)
       expect { CanvasHttp.get("http://www.example.com/a/b") }.to raise_error(CanvasHttp::InsecureUriError)
     end
 
-    context 'when given a max_response_body_length' do
-      it 'calls .read_body_max_length() to read the body' do
+    context "when given a max_response_body_length" do
+      it "calls .read_body_max_length() to read the body" do
         # it's extremely hard to stub out a response with multiple chunks
         # (webmock doesn't support it), the best we can do is check that
         # read_body_max_length() is called and test in isolation (below)
@@ -223,16 +223,16 @@ describe "CanvasHttp" do
         expect(res.body).to eq("Hello")
       end
 
-      context 'when the response body is <= max_response_body_length' do
-        it 'returns a response with a string body' do
+      context "when the response body is <= max_response_body_length" do
+        it "returns a response with a string body" do
           stub_request(:get, "http://www.example.com/a/b").to_return(body: "Hello" * 20)
           res = CanvasHttp.get("http://www.example.com/a/b", max_response_body_length: 100)
           expect(res.body).to eq("Hello" * 20)
         end
       end
 
-      context 'when the response body is larger than this (one chunk)' do
-        it 'raises a ResponseTooLargeError' do
+      context "when the response body is larger than this (one chunk)" do
+        it "raises a ResponseTooLargeError" do
           stub_request(:get, "http://www.example.com/a/b").to_return(body: "Hello" * 20)
           expect do
             CanvasHttp.get("http://www.example.com/a/b", max_response_body_length: 99)
@@ -242,59 +242,59 @@ describe "CanvasHttp" do
     end
   end
 
-  describe '.read_body_max_length' do
-    context 'when the response has multiple chunks' do
-      let(:mock_response) { double('response') }
+  describe ".read_body_max_length" do
+    context "when the response has multiple chunks" do
+      let(:mock_response) { double("response") }
 
       before do
         allow(mock_response).to receive(:read_body) do |&blk|
           20.times do
-            blk.call 'Hello'
+            blk.call "Hello"
           end
         end
       end
 
-      context 'if the total response body is larger than the max length' do
-        it 'raises a ResponseTooLargeError' do
+      context "if the total response body is larger than the max length" do
+        it "raises a ResponseTooLargeError" do
           expect { CanvasHttp.read_body_max_length(mock_response, 99) }.to \
             raise_error(CanvasHttp::ResponseTooLargeError)
         end
       end
 
-      context 'if the total response body is <= the max length' do
-        it 'concatenates the chunks and sets the body as a string' do
-          expect(mock_response).to receive(:body=).with('Hello' * 20)
+      context "if the total response body is <= the max length" do
+        it "concatenates the chunks and sets the body as a string" do
+          expect(mock_response).to receive(:body=).with("Hello" * 20)
           CanvasHttp.read_body_max_length(mock_response, 100)
         end
       end
     end
   end
 
-  describe '#insecure_host?' do
+  describe "#insecure_host?" do
     around do |example|
       old_filters = CanvasHttp.blocked_ip_filters
-      CanvasHttp.blocked_ip_filters = -> { ['127.0.0.1/8', '42.42.42.42/16'] }
+      CanvasHttp.blocked_ip_filters = -> { ["127.0.0.1/8", "42.42.42.42/16"] }
       example.call
     ensure
       CanvasHttp.blocked_ip_filters = old_filters
     end
 
     it "checks for insecure hosts" do
-      expect(CanvasHttp.insecure_host?('example.com')).to eq false
-      expect(CanvasHttp.insecure_host?('localhost')).to eq true
-      expect(CanvasHttp.insecure_host?('127.0.0.1')).to eq true
-      expect(CanvasHttp.insecure_host?('42.42.42.42')).to eq true
-      expect(CanvasHttp.insecure_host?('42.42.1.1')).to eq true
-      expect(CanvasHttp.insecure_host?('42.1.1.1')).to eq false
+      expect(CanvasHttp.insecure_host?("example.com")).to eq false
+      expect(CanvasHttp.insecure_host?("localhost")).to eq true
+      expect(CanvasHttp.insecure_host?("127.0.0.1")).to eq true
+      expect(CanvasHttp.insecure_host?("42.42.42.42")).to eq true
+      expect(CanvasHttp.insecure_host?("42.42.1.1")).to eq true
+      expect(CanvasHttp.insecure_host?("42.1.1.1")).to eq false
     end
 
     it "raises an error when URL is not resolveable" do
-      bad_url = 'this-should-never-be-a-real-url-registered-by-anyone.fake-tld'
+      bad_url = "this-should-never-be-a-real-url-registered-by-anyone.fake-tld"
       expect { CanvasHttp.insecure_host?(bad_url) }.to raise_error(CanvasHttp::UnresolvableUriError)
     end
 
     it "won't continue to process a host with no valid IPs" do
-      bad_url = 'this-should-never-be-a-real-url-registered-by-anyone.fake-tld'
+      bad_url = "this-should-never-be-a-real-url-registered-by-anyone.fake-tld"
       expect(Resolv).to receive(:getaddresses).with(bad_url).and_return(["not.an.ip.address"])
       expect { CanvasHttp.insecure_host?(bad_url) }.to raise_error(CanvasHttp::UnresolvableUriError)
     end
@@ -302,14 +302,14 @@ describe "CanvasHttp" do
 
   describe ".tempfile_for_url" do
     before do
-      tempfile = double('tempfile')
+      tempfile = double("tempfile")
       allow(tempfile).to receive(:binmode)
       allow(Tempfile).to receive(:new).and_return(tempfile)
     end
 
     it "truncates uris to 100 characters" do
-      expect(Tempfile).to receive(:new).with('1234567890' * 10)
-      CanvasHttp.tempfile_for_uri(URI.parse('1234567890' * 12))
+      expect(Tempfile).to receive(:new).with("1234567890" * 10)
+      CanvasHttp.tempfile_for_uri(URI.parse("1234567890" * 12))
     end
   end
 
@@ -330,39 +330,39 @@ describe "CanvasHttp" do
 
   describe ".validate_url" do
     it "accepts a valid url" do
-      value, _ = CanvasHttp.validate_url('http://example.com')
-      expect(value).to eq 'http://example.com'
+      value, _ = CanvasHttp.validate_url("http://example.com")
+      expect(value).to eq "http://example.com"
     end
 
     it "rejects a bad url" do
-      expect { CanvasHttp.validate_url('this is not a url') }.to raise_error(URI::InvalidURIError)
+      expect { CanvasHttp.validate_url("this is not a url") }.to raise_error(URI::InvalidURIError)
     end
 
     it "infers host and scheme" do
-      value, _ = CanvasHttp.validate_url('/whatever', host: 'example.org', scheme: 'https')
-      expect(value).to eq 'https://example.org/whatever'
+      value, _ = CanvasHttp.validate_url("/whatever", host: "example.org", scheme: "https")
+      expect(value).to eq "https://example.org/whatever"
     end
 
     it "enforces allowed schemes" do
-      expect { CanvasHttp.validate_url('ftp://example.com', allowed_schemes: ['ftp']) }.not_to raise_error
-      expect { CanvasHttp.validate_url('ftp://example.com') }.to raise_error(ArgumentError)
+      expect { CanvasHttp.validate_url("ftp://example.com", allowed_schemes: ["ftp"]) }.not_to raise_error
+      expect { CanvasHttp.validate_url("ftp://example.com") }.to raise_error(ArgumentError)
     end
 
     it "checks for unsafe hosts" do
       expect(CanvasHttp).to receive(:insecure_host?).with("127.0.0.1").and_return(true)
-      expect { CanvasHttp.validate_url('http://127.0.0.1') }.not_to raise_error
-      expect { CanvasHttp.validate_url('http://127.0.0.1', check_host: true) }.to raise_error(CanvasHttp::InsecureUriError)
+      expect { CanvasHttp.validate_url("http://127.0.0.1") }.not_to raise_error
+      expect { CanvasHttp.validate_url("http://127.0.0.1", check_host: true) }.to raise_error(CanvasHttp::InsecureUriError)
     end
 
     it "normalizes unicode names" do
-      value, _ = CanvasHttp.validate_url('http://example.com/whät')
-      expect(value).to eq 'http://example.com/wh%C3%A4t'
+      value, _ = CanvasHttp.validate_url("http://example.com/whät")
+      expect(value).to eq "http://example.com/wh%C3%A4t"
     end
 
     it "does not bypass other checks when normalizing unicode names" do
       expect(CanvasHttp).to receive(:insecure_host?).with("127.0.0.1").and_return(true)
-      expect { CanvasHttp.validate_url('http://127.0.0.1/嘊', check_host: true) }.to raise_error(CanvasHttp::InsecureUriError)
-      expect { CanvasHttp.validate_url('http://example.com/whät', allowed_schemes: ['https']) }.to raise_error(ArgumentError)
+      expect { CanvasHttp.validate_url("http://127.0.0.1/嘊", check_host: true) }.to raise_error(CanvasHttp::InsecureUriError)
+      expect { CanvasHttp.validate_url("http://example.com/whät", allowed_schemes: ["https"]) }.to raise_error(ArgumentError)
     end
   end
 end

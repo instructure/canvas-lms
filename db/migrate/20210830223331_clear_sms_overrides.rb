@@ -21,11 +21,11 @@ class ClearSmsOverrides < ActiveRecord::Migration[6.0]
   tag :postdeploy
 
   def change
-    Setting.remove('allowed_sms_notification_categories') if Shard.current == Shard.default
+    Setting.remove("allowed_sms_notification_categories") if Shard.current == Shard.default
 
     DataFixup::ClearAccountSettings.delay_if_production(
       priority: Delayed::LOW_PRIORITY,
-      n_strand: 'long_datafixups'
+      n_strand: "long_datafixups"
     ).run([
             "allowed_sms_notification_categories",
             "allowed_sms_notification_types"

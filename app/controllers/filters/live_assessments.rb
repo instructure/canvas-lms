@@ -23,10 +23,10 @@ module Filters::LiveAssessments
 
   # be sure to have a valid context before calling this
   def require_assessment
-    id = params.has_key?(:assessment_id) ? params[:assessment_id] : params[:id]
+    id = params.key?(:assessment_id) ? params[:assessment_id] : params[:id]
 
     @assessment = LiveAssessments::Assessment.find(id)
-    reject! 'assessment does not belong to the given context' unless @assessment.context == @context
+    reject! "assessment does not belong to the given context" unless @assessment.context == @context
     @assessment
   end
 end

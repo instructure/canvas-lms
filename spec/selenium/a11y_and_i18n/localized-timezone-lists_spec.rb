@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-describe Rails.root.join('app', 'jsx', 'shared', 'components', 'TimeZoneSelect', 'localized-timezone-lists') do
+describe Rails.root.join("app/jsx/shared/components/TimeZoneSelect/localized-timezone-lists") do
   it("each json file should match ruby data for that locale") do
     def localized_timezones(zones)
       zones.map { |tz| { name: tz.name, localized_name: tz.to_s } }

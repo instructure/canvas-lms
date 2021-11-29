@@ -37,13 +37,13 @@ module Assignments
       end
 
       def visible_section_ids
-        @visible_section_ids ||= section_visibilities.map { |v| v[:course_section_id] }
+        @visible_section_ids ||= section_visibilities.pluck(:course_section_id)
       end
     end
 
     attr_reader :assignment, :user, :course_proxy
 
-    delegate :course, :section_visibilities, :visibility_level, :visible_section_ids, :to => :course_proxy
+    delegate :course, :section_visibilities, :visibility_level, :visible_section_ids, to: :course_proxy
 
     def initialize(assignment, user = nil, course_proxy = nil)
       @assignment = assignment
@@ -54,7 +54,7 @@ module Assignments
     def count
       assignment.shard.activate do
         # the needs_grading_count trigger should clear the assignment's needs_grading cache
-        Rails.cache.fetch_with_batched_keys(['assignment_user_grading_count', assignment.cache_key(:needs_grading), user].cache_key,
+        Rails.cache.fetch_with_batched_keys(["assignment_user_grading_count", assignment.cache_key(:needs_grading), user].cache_key,
                                             batch_object: user, batched_keys: :todo_list) do
           if assignment.moderated_grading? && !assignment.grades_published?
             needs_moderated_grading_count
@@ -74,22 +74,21 @@ module Assignments
 
     def needs_moderated_grading_count
       level = visibility_level
-      return 0 unless [:full, :limited, :sections, :sections_limited].include?(level)
+      return 0 unless %i[full limited sections sections_limited].include?(level)
 
       # ignore submissions this user has graded
       graded_sub_ids = assignment.submissions.joins(:provisional_grades)
-                                 .where("moderated_grading_provisional_grades.final = ?", false)
-                                 .where("moderated_grading_provisional_grades.scorer_id = ?", user.id)
-                                 .where("moderated_grading_provisional_grades.score IS NOT NULL").pluck(:id)
+                                 .where(moderated_grading_provisional_grades: { final: false, scorer_id: user.id })
+                                 .where.not(moderated_grading_provisional_grades: { score: nil }).pluck(:id)
 
       moderation_set_student_ids = assignment.moderated_grading_selections.pluck(:student_id)
 
       # ignore submissions that don't need any more provisional grades
       pg_scope = assignment.submissions.joins(:provisional_grades)
-                           .where("moderated_grading_provisional_grades.final = ?", false)
-                           .where("moderated_grading_provisional_grades.scorer_id <> ?", user.id)
+                           .where(moderated_grading_provisional_grades: { final: false })
+                           .where.not(moderated_grading_provisional_grades: { scorer_id: user.id })
                            .group("submissions.id", "submissions.user_id")
-      pg_scope = pg_scope.where("submissions.id NOT IN (?)", graded_sub_ids) if graded_sub_ids.any?
+      pg_scope = pg_scope.where.not(submissions: { id: graded_sub_ids }) if graded_sub_ids.any?
       pg_scope.count.each do |key, count|
         sub_id, user_id = key
         graded_sub_ids << sub_id if count >= (moderation_set_student_ids.include?(user_id) ? 2 : 1)
@@ -97,7 +96,7 @@ module Assignments
 
       scope = (level == :sections) ? section_filtered_submissions : all_submissions
       if graded_sub_ids.any?
-        scope.where("submissions.id NOT IN (?)", graded_sub_ids).distinct.count(:id)
+        scope.where.not(submissions: { id: graded_sub_ids }).distinct.count(:id)
       else
         scope.distinct.count(:id)
       end
@@ -105,13 +104,13 @@ module Assignments
 
     def count_by_section
       assignment.shard.activate do
-        Rails.cache.fetch(['assignment_user_grading_count_by_section', assignment.cache_key(:needs_grading), user].cache_key,
+        Rails.cache.fetch(["assignment_user_grading_count_by_section", assignment.cache_key(:needs_grading), user].cache_key,
                           batch_object: user, batched_keys: :todo_list) do
-          if visibility_level == :sections
-            submissions = section_filtered_submissions
-          else
-            submissions = all_submissions
-          end
+          submissions = if visibility_level == :sections
+                          section_filtered_submissions
+                        else
+                          all_submissions
+                        end
 
           submissions
             .group("e.course_section_id")
@@ -130,11 +129,11 @@ module Assignments
     private
 
     def section_filtered_submissions
-      all_submissions.where('e.course_section_id in (?)', visible_section_ids)
+      all_submissions.where(e: { course_section_id: visible_section_ids })
     end
 
     def all_submissions
-      string = <<~SQL
+      string = <<~SQL.squish
         submissions.assignment_id = ?
           AND e.course_id = ?
           AND e.type IN ('StudentEnrollment', 'StudentViewEnrollment')

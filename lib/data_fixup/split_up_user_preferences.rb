@@ -19,11 +19,11 @@
 #
 module DataFixup::SplitUpUserPreferences
   def self.run(start_at, end_at)
-    User.find_ids_in_ranges(:start_at => start_at, :end_at => end_at) do |min_id, max_id|
-      User.where(:id => min_id..max_id).where("id < ? AND preferences IS NOT NULL", Shard::IDS_PER_SHARD).each do |u|
+    User.find_ids_in_ranges(start_at: start_at, end_at: end_at) do |min_id, max_id|
+      User.where(id: min_id..max_id).where("id < ? AND preferences IS NOT NULL", Shard::IDS_PER_SHARD).each do |u|
         if u.needs_preference_migration?
           u.migrate_preferences_if_needed
-          User.where(:id => u).update_all(:preferences => u.preferences, :updated_at => Time.now.utc)
+          User.where(id: u).update_all(preferences: u.preferences, updated_at: Time.now.utc)
         end
       end
     end

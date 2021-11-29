@@ -28,7 +28,7 @@ module DataFixup::RebuildQuizSubmissionsFromQuizSubmissionVersions
       quiz_submission = restore_quiz_submission_from_versions_table_by_submission(submission, timestamp)
 
       # save the result
-      quiz_submission.save_with_versioning! if quiz_submission
+      quiz_submission&.save_with_versioning!
     end
 
     # Time.zone.parse("2015-05-08")
@@ -65,12 +65,12 @@ module DataFixup::RebuildQuizSubmissionsFromQuizSubmissionVersions
         tally += (user_answer[:points] || 0) if user_answer[:correct]
       end
       qs.score = tally
-      qs.score = qs.quiz.points_possible if qs.quiz && qs.quiz.quiz_type == 'graded_survey'
+      qs.score = qs.quiz.points_possible if qs.quiz && qs.quiz.quiz_type == "graded_survey"
       qs.submission_data = user_answers
       qs.workflow_state = "complete"
       user_answers.each do |answer|
         if answer[:correct] == "undefined" && !qs.quiz.survey?
-          qs.workflow_state = 'pending_review'
+          qs.workflow_state = "pending_review"
         end
       end
       qs.score_before_regrade = nil
@@ -125,12 +125,12 @@ module DataFixup::RebuildQuizSubmissionsFromQuizSubmissionVersions
       end
 
       if submission.reload.workflow_state == "pending_review"
-        if old_submission_grading_data.first != submission.score
-          Rails.logger.warn LOG_PREFIX + "GRADING REPORT - " +
-                            "score-- #{old_submission_grading_data.first}:#{submission.score} " +
-                            "grader_id-- #{old_submission_grading_data[1]}:#{submission.grader_id} "
-        else
+        if old_submission_grading_data.first == submission.score
           Rails.logger.warn LOG_PREFIX + "GRADING REPORT - " + "Grading required for quiz_submission: #{persisted_qs.id}"
+        else
+          Rails.logger.warn LOG_PREFIX + "GRADING REPORT - " \
+                                         "score-- #{old_submission_grading_data.first}:#{submission.score} " \
+                                         "grader_id-- #{old_submission_grading_data[1]}:#{submission.grader_id} "
         end
       end
       persisted_qs

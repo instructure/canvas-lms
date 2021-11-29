@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_dependency 'sis'
+require_dependency "sis"
 
 module SIS
   class BaseImporter
@@ -28,9 +28,9 @@ module SIS
       @batch_user = opts[:batch_user]
       @logger = opts[:logger] || Rails.logger
       @sis_options = {
-        :override_sis_stickiness => opts[:override_sis_stickiness],
-        :add_sis_stickiness => opts[:add_sis_stickiness],
-        :clear_sis_stickiness => opts[:clear_sis_stickiness]
+        override_sis_stickiness: opts[:override_sis_stickiness],
+        add_sis_stickiness: opts[:add_sis_stickiness],
+        clear_sis_stickiness: opts[:clear_sis_stickiness]
       }
     end
   end

@@ -18,8 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../../spec_helper'
-require_relative '../graphql_spec_helper'
+require_relative "../../spec_helper"
+require_relative "../graphql_spec_helper"
 
 describe Types::CommentBankItemType do
   before(:once) do
@@ -37,6 +37,6 @@ describe Types::CommentBankItemType do
   end
 
   it "requires read permission on record" do
-    expect(item_type.resolve('_id', current_user: user_model)).to eq nil
+    expect(item_type.resolve("_id", current_user: user_model)).to eq nil
   end
 end

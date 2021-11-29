@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'simplecov'
+require "simplecov"
 
 class CoverageTool
   def self.start(command_name)
@@ -26,11 +26,11 @@ class CoverageTool
     SimpleCov.command_name(command_name)
     SimpleCov.start do
       # no formatting by default, just get the json
-      SimpleCov.at_exit {
+      SimpleCov.at_exit do
         # generate an HTML report if this is running locally / not on jenkins:
-        SimpleCov.result.format! unless ENV['RSPEC_PROCESSES']
+        SimpleCov.result.format! unless ENV["RSPEC_PROCESSES"]
         SimpleCov.result
-      }
+      end
     end
   end
 end

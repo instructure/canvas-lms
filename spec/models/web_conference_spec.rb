@@ -26,9 +26,9 @@ describe WebConference do
   def stub_plugins
     allow(WebConference).to receive(:plugins).and_return(
       [
-        web_conference_plugin_mock("big_blue_button", { :domain => "bbb.instructure.com", :secret_dec => "secret" }),
-        web_conference_plugin_mock("wimba", { :domain => "wimba.test" }),
-        web_conference_plugin_mock("broken_plugin", { :foor => :bar })
+        web_conference_plugin_mock("big_blue_button", { domain: "bbb.instructure.com", secret_dec: "secret" }),
+        web_conference_plugin_mock("wimba", { domain: "wimba.test" }),
+        web_conference_plugin_mock("broken_plugin", { foor: :bar })
       ]
     )
   end
@@ -39,14 +39,14 @@ describe WebConference do
     end
   end
 
-  describe '.conference_tab_name' do
-    context 'when there are plugins enabled' do
-      it 'returns the plugin names' do
+  describe ".conference_tab_name" do
+    context "when there are plugins enabled" do
+      it "returns the plugin names" do
         expect(WebConference.conference_tab_name).to eq("Big blue button Wimba (Conferences)")
       end
     end
 
-    context 'when there are no enabled' do
+    context "when there are no enabled" do
       before do
         allow(WebConference).to receive(:plugins).and_return([])
       end
@@ -61,7 +61,7 @@ describe WebConference do
     it "returns false on valid_config? if no matching config" do
       expect(WebConference.new).not_to be_valid_config
       conf = WebConference.new
-      conf.conference_type = 'bad_type'
+      conf.conference_type = "bad_type"
       expect(conf).not_to be_valid_config
     end
 
@@ -80,15 +80,15 @@ describe WebConference do
     it "ignores invalid user settings" do
       email = "email@email.com"
       allow(@user).to receive(:email).and_return(email)
-      conference = WimbaConference.create!(:title => "my conference", :user => @user, :user_settings => { :foo => :bar }, :context => course_factory)
+      conference = WimbaConference.create!(title: "my conference", user: @user, user_settings: { foo: :bar }, context: course_factory)
       expect(conference.user_settings).to be_empty
     end
 
     it "does not expose internal settings to users" do
       email = "email@email.com"
       allow(@user).to receive(:email).and_return(email)
-      conference = BigBlueButtonConference.new(:title => "my conference", :user => @user, :context => course_factory)
-      conference.settings = { :record => true, :not => :for_user }
+      conference = BigBlueButtonConference.new(title: "my conference", user: @user, context: course_factory)
+      conference.settings = { record: true, not: :for_user }
       conference.save
       conference.reload
       expect(conference.user_settings).not_to have_key(:not)
@@ -97,7 +97,7 @@ describe WebConference do
     it "does not mark object dirty if settings are unchanged" do
       email = "email@email.com"
       allow(@user).to receive(:email).and_return(email)
-      conference = BigBlueButtonConference.create!(:title => "my conference", :user => @user, :context => course_factory, user_settings: { record: true })
+      conference = BigBlueButtonConference.create!(title: "my conference", user: @user, context: course_factory, user_settings: { record: true })
       user_settings = conference.user_settings.dup
       conference.user_settings = user_settings
       expect(conference).not_to be_changed
@@ -106,7 +106,7 @@ describe WebConference do
     it "marks object dirty if settings are changed" do
       email = "email@email.com"
       allow(@user).to receive(:email).and_return(email)
-      conference = BigBlueButtonConference.create!(:title => "my conference", :user => @user, :context => course_factory, user_settings: { record: true })
+      conference = BigBlueButtonConference.create!(title: "my conference", user: @user, context: course_factory, user_settings: { record: true })
       conference.user_settings = { record: false }
       expect(conference).to be_changed
     end
@@ -118,7 +118,7 @@ describe WebConference do
     end
 
     let!(:conference) do
-      WimbaConference.create!(:title => "my conference", :user => @user, :duration => 60, :context => course_factory)
+      WimbaConference.create!(title: "my conference", user: @user, duration: 60, context: course_factory)
     end
 
     before do
@@ -190,7 +190,7 @@ describe WebConference do
     end
 
     it "rejects ridiculously long conferences" do
-      conference.duration = 100000000000000
+      conference.duration = 100_000_000_000_000
       expect(conference).not_to be_valid
     end
 
@@ -221,7 +221,7 @@ describe WebConference do
       course = course_factory(active_all: true)
       course.enroll_student(user1).accept!
       course.enroll_student(user2).accept!
-      conference = BigBlueButtonConference.new(:title => "my conference", :user => user1, :context => course)
+      conference = BigBlueButtonConference.new(title: "my conference", user: user1, context: course)
       conference.save
       conference.invite_users_from_context([user2.id])
       expect(conference.invitees.pluck(:user_id)).to match_array([user2.id])
@@ -233,7 +233,7 @@ describe WebConference do
       course = course_factory(active_all: true)
       course.enroll_student(user1).accept!
       course.enroll_student(user2).accept!
-      conference = BigBlueButtonConference.new(:title => "my conference", :user => user1, :context => course)
+      conference = BigBlueButtonConference.new(title: "my conference", user: user1, context: course)
       conference.save
       conference.invite_users_from_context
       expect(conference.invitees.pluck(:user_id)).to match_array(course.user_ids)
@@ -242,38 +242,38 @@ describe WebConference do
 
   context "notifications" do
     before do
-      Notification.create!(:name => 'Web Conference Invitation',
-                           :category => "TestImmediately")
-      Notification.create!(:name => 'Web Conference Recording Ready',
-                           :category => "TestImmediately")
+      Notification.create!(name: "Web Conference Invitation",
+                           category: "TestImmediately")
+      Notification.create!(name: "Web Conference Recording Ready",
+                           category: "TestImmediately")
       course_with_teacher(active_all: true)
       @student = user_with_communication_channel(active_all: true)
       student_in_course(user: @student, active_all: true)
     end
 
-    it "sends invitation notifications", priority: "1", test_id: 193154 do
+    it "sends invitation notifications", priority: "1" do
       conference = WimbaConference.create!(
-        :title => "my conference",
-        :user => @teacher,
-        :context => @course
+        title: "my conference",
+        user: @teacher,
+        context: @course
       )
       conference.add_attendee(@student)
       conference.save!
-      expect(conference.messages_sent['Web Conference Invitation']).not_to be_empty
+      expect(conference.messages_sent["Web Conference Invitation"]).not_to be_empty
     end
 
     it "does not send invitation notifications if course is not published" do
-      @course.workflow_state = 'claimed'
+      @course.workflow_state = "claimed"
       @course.save!
 
       conference = WimbaConference.create!(
-        :title => "my conference",
-        :user => @teacher,
-        :context => @course
+        title: "my conference",
+        user: @teacher,
+        context: @course
       )
       conference.add_attendee(@student)
       conference.save!
-      expect(conference.messages_sent['Web Conference Invitation']).to be_blank
+      expect(conference.messages_sent["Web Conference Invitation"]).to be_blank
     end
 
     it "does not send invitation notifications to inactive users" do
@@ -283,46 +283,46 @@ describe WebConference do
       @course.save!
 
       conference = WimbaConference.create!(
-        :title => "my conference",
-        :user => @teacher,
-        :context => @course
+        title: "my conference",
+        user: @teacher,
+        context: @course
       )
       conference.add_attendee(@student)
       conference.save!
-      expect(conference.messages_sent['Web Conference Invitation']).to be_blank
+      expect(conference.messages_sent["Web Conference Invitation"]).to be_blank
     end
 
     it "sends recording ready notifications, but only once" do
       conference = WimbaConference.create!(
-        :title => "my conference",
-        :user => @student,
-        :context => @course
+        title: "my conference",
+        user: @student,
+        context: @course
       )
       conference.recording_ready!
-      expect(conference.messages_sent['Web Conference Recording Ready'].length).to eq(2)
+      expect(conference.messages_sent["Web Conference Recording Ready"].length).to eq(2)
 
       # check that it won't send the notification again when saved again.
       conference.save!
-      expect(conference.messages_sent['Web Conference Recording Ready'].length).to eq(2)
+      expect(conference.messages_sent["Web Conference Recording Ready"].length).to eq(2)
     end
 
     it "does not send notifications to users that don't belong to the context" do
       non_course_user = user_with_communication_channel(active_all: true)
       conference = WimbaConference.create!(
-        :title => "my conference",
-        :user => @teacher,
-        :context => @course
+        title: "my conference",
+        user: @teacher,
+        context: @course
       )
       conference.add_attendee(non_course_user)
       conference.save!
-      expect(conference.messages_sent['Web Conference Invitation']).to be_blank
+      expect(conference.messages_sent["Web Conference Invitation"]).to be_blank
     end
   end
 
   context "scheduled conferences" do
     before do
-      course_with_student(:active_all => 1)
-      @conference = WimbaConference.create!(:title => "my conference", :user => @user, :duration => 60, :context => @course)
+      course_with_student(active_all: 1)
+      @conference = WimbaConference.create!(title: "my conference", user: @user, duration: 60, context: @course)
     end
 
     it "has a start date" do
@@ -343,36 +343,36 @@ describe WebConference do
 
   context "creation rights" do
     it "lets teachers create conferences" do
-      course_with_teacher(:active_all => true)
+      course_with_teacher(active_all: true)
       expect(@course.web_conferences.temp_record.grants_right?(@teacher, :create)).to be_truthy
 
-      group(:context => @course)
+      group(context: @course)
       expect(@group.web_conferences.temp_record.grants_right?(@teacher, :create)).to be_truthy
     end
 
     it "does not let teachers create conferences if the permission is disabled" do
-      course_with_teacher(:active_all => true)
-      @course.account.role_overrides.create!(:role => teacher_role, :permission => "create_conferences", :enabled => false)
+      course_with_teacher(active_all: true)
+      @course.account.role_overrides.create!(role: teacher_role, permission: "create_conferences", enabled: false)
       expect(@course.web_conferences.temp_record.grants_right?(@teacher, :create)).to be_falsey
 
-      group(:context => @course)
+      group(context: @course)
       expect(@group.web_conferences.temp_record.grants_right?(@teacher, :create)).to be_falsey
     end
 
     it "lets students create conferences" do
-      course_with_student(:active_all => true)
+      course_with_student(active_all: true)
       expect(@course.web_conferences.temp_record.grants_right?(@student, :create)).to be_truthy
 
-      group_with_user(:user => @student, :context => @course)
+      group_with_user(user: @student, context: @course)
       expect(@group.web_conferences.temp_record.grants_right?(@student, :create)).to be_truthy
     end
 
     it "does not let students create conferences if the permission is disabled" do
-      course_with_student(:active_all => true)
-      @course.account.role_overrides.create!(:role => student_role, :permission => "create_conferences", :enabled => false)
+      course_with_student(active_all: true)
+      @course.account.role_overrides.create!(role: student_role, permission: "create_conferences", enabled: false)
       expect(@course.web_conferences.temp_record.grants_right?(@student, :create)).to be_falsey
 
-      group_with_user(:user => @student, :context => @course)
+      group_with_user(user: @student, context: @course)
       expect(@group.web_conferences.temp_record.grants_right?(@student, :create)).to be_falsey
     end
   end
@@ -392,15 +392,15 @@ describe WebConference do
     let_once(:course) { course_model }
     let_once(:tool) do
       new_valid_tool(course).tap do |t|
-        t.name = 'course tool'
-        t.conference_selection = { message_type: 'LtiResourceLinkRequest' }
+        t.name = "course tool"
+        t.conference_selection = { message_type: "LtiResourceLinkRequest" }
         t.save!
       end
     end
     let_once(:user) { user_model }
 
     it "does not include LTI conference types without the feature flag enabled" do
-      expect(WebConference.conference_types(course).pluck(:conference_type)).not_to include 'LtiConference'
+      expect(WebConference.conference_types(course).pluck(:conference_type)).not_to include "LtiConference"
     end
 
     context "with conference_selection_lti_placement FF" do
@@ -410,7 +410,7 @@ describe WebConference do
 
       context "self.conference_types" do
         it "includes an LTI conference type" do
-          expect(WebConference.conference_types(course).pluck(:conference_type)).to include 'LtiConference'
+          expect(WebConference.conference_types(course).pluck(:conference_type)).to include "LtiConference"
           expect(WebConference.conference_types(course).pluck(:name)).to include tool.name
         end
 
@@ -421,8 +421,8 @@ describe WebConference do
 
         it "can include multiple LTI conference type" do
           another_tool = new_valid_tool(course)
-          another_tool.name = 'same course tool'
-          another_tool.conference_selection = { message_type: 'LtiResourceLinkRequest' }
+          another_tool.name = "same course tool"
+          another_tool.conference_selection = { message_type: "LtiResourceLinkRequest" }
           another_tool.save!
           expect(WebConference.conference_types(course).pluck(:name)).to include tool.name
           expect(WebConference.conference_types(course).pluck(:name)).to include another_tool.name
@@ -430,8 +430,8 @@ describe WebConference do
 
         it "only includes tools with conference_selection placements" do
           editor_button = new_valid_tool(course)
-          editor_button.name = 'different type of tool'
-          editor_button.editor_button = { message_type: 'LtiResourceLinkRequest' }
+          editor_button.name = "different type of tool"
+          editor_button.editor_button = { message_type: "LtiResourceLinkRequest" }
           editor_button.save!
 
           expect(WebConference.conference_types(course).pluck(:name)).not_to include editor_button.name
@@ -440,8 +440,8 @@ describe WebConference do
         it "only includes types from the given context" do
           another_course = course_model
           another_tool = new_valid_tool(another_course)
-          another_tool.name = 'another course tool'
-          another_tool.conference_selection = { message_type: 'LtiResourceLinkRequest' }
+          another_tool.name = "another course tool"
+          another_tool.conference_selection = { message_type: "LtiResourceLinkRequest" }
           another_tool.save!
 
           expect(WebConference.conference_types(course).pluck(:name)).not_to include another_tool.name
@@ -453,7 +453,7 @@ describe WebConference do
         it "does not include LTI conferences" do
           conference = course.web_conferences.create! do |c|
             c.user = user
-            c.conference_type = 'LtiConference'
+            c.conference_type = "LtiConference"
             c.lti_settings = { tool_id: tool.id }
           end
           expect(WebConference.active.pluck(:id)).not_to include conference.id
@@ -464,7 +464,7 @@ describe WebConference do
         it "allows creating an LTI conference" do
           conference = course.web_conferences.create! do |c|
             c.user = user
-            c.conference_type = 'LtiConference'
+            c.conference_type = "LtiConference"
             c.lti_settings = { tool_id: tool.id }
           end
           expect(conference).not_to be_nil
@@ -473,52 +473,52 @@ describe WebConference do
         it "requires an external tool be specified" do
           conference = course.web_conferences.build
           conference.user = user
-          conference.conference_type = 'LtiConference'
-          conference.lti_settings = { foo: 'bar' }
+          conference.conference_type = "LtiConference"
+          conference.lti_settings = { foo: "bar" }
           expect(conference).not_to be_valid
-          expect(conference.errors[:settings].to_s).to include('must exist')
+          expect(conference.errors[:settings].to_s).to include("must exist")
         end
 
         it "requires the external tool be visible from the conference context" do
           another_tool = new_valid_tool(course_model)
-          another_tool.conference_selection = { message_type: 'LtiResourceLinkRequest' }
+          another_tool.conference_selection = { message_type: "LtiResourceLinkRequest" }
           another_tool.save!
 
           conference = course.web_conferences.build
           conference.user = user
-          conference.conference_type = 'LtiConference'
+          conference.conference_type = "LtiConference"
           conference.lti_settings = { tool_id: another_tool.id }
           expect(conference).not_to be_valid
-          expect(conference.errors[:settings].to_s).to include('visible in context')
+          expect(conference.errors[:settings].to_s).to include("visible in context")
         end
 
         it "requires the external tool have a conference_selection placement" do
           another_tool = new_valid_tool(course)
-          another_tool.editor_button = { message_type: 'LtiResourceLinkRequest' }
+          another_tool.editor_button = { message_type: "LtiResourceLinkRequest" }
           another_tool.save!
 
           conference = course.web_conferences.build
           conference.user = user
-          conference.conference_type = 'LtiConference'
+          conference.conference_type = "LtiConference"
           conference.lti_settings = { tool_id: another_tool.id }
           expect(conference).not_to be_valid
-          expect(conference.errors[:settings].to_s).to include('conference_selection placement')
+          expect(conference.errors[:settings].to_s).to include("conference_selection placement")
         end
       end
     end
   end
 
-  context 'record creation' do
-    it 'sets the root_account_id using course context' do
+  context "record creation" do
+    it "sets the root_account_id using course context" do
       course_factory
       user_factory
       tool = new_valid_tool(@course)
-      tool.conference_selection = { message_type: 'LtiResourceLinkRequest' }
+      tool.conference_selection = { message_type: "LtiResourceLinkRequest" }
       tool.save!
 
       conference = @course.web_conferences.build
       conference.user = @user
-      conference.conference_type = 'LtiConference'
+      conference.conference_type = "LtiConference"
       conference.lti_settings = { tool_id: tool.id }
       conference.save!
 

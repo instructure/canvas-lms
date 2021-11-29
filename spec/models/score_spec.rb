@@ -21,7 +21,7 @@
 describe Score do
   before(:once) do
     @grading_periods = grading_periods
-    @assignment_group = test_course.assignment_groups.create!(name: 'Assignments')
+    @assignment_group = test_course.assignment_groups.create!(name: "Assignments")
   end
 
   let(:test_course) { Course.create! }
@@ -67,62 +67,62 @@ describe Score do
     end
   end
 
-  describe 'validations' do
+  describe "validations" do
     it { is_expected.to be_valid }
     it { is_expected.to validate_numericality_of(:current_score).allow_nil }
     it { is_expected.to validate_numericality_of(:unposted_current_score).allow_nil }
     it { is_expected.to validate_numericality_of(:final_score).allow_nil }
     it { is_expected.to validate_numericality_of(:unposted_final_score).allow_nil }
 
-    it 'is invalid without an enrollment' do
+    it "is invalid without an enrollment" do
       score.enrollment = nil
       expect(score).to be_invalid
     end
 
     it { is_expected.to validate_presence_of(:enrollment) }
 
-    it 'is invalid without unique enrollment for course' do
+    it "is invalid without unique enrollment for course" do
       student.scores.create!(params)
       expect { student.scores.create!(params) }.to raise_error(ActiveRecord::RecordNotUnique)
     end
 
-    it 'is invalid without unique enrollment for grading period' do
+    it "is invalid without unique enrollment for grading period" do
       student.scores.create!(grading_period_score_params)
       expect { student.scores.create!(grading_period_score_params) }.to raise_error(ActiveRecord::RecordNotUnique)
     end
 
-    it('is invalid without unique enrollment for assignment group') do
+    it("is invalid without unique enrollment for assignment group") do
       student.scores.create!(assignment_group_score_params)
       expect { student.scores.create!(assignment_group_score_params) }.to raise_error(ActiveRecord::RecordNotUnique)
     end
 
     context("scorable associations") do
-      it 'is valid with course_score true and no scorable associations' do
+      it "is valid with course_score true and no scorable associations" do
         expect(student.scores.create!(course_score: true, **params)).to be_valid
       end
 
-      it 'is valid with course_score false and a grading period association' do
+      it "is valid with course_score false and a grading period association" do
         expect(student.scores.create!(course_score: false, **grading_period_score_params)).to be_valid
       end
 
-      it 'is valid with course_score false and an assignment group association' do
+      it "is valid with course_score false and an assignment group association" do
         expect(student.scores.create!(course_score: false, **assignment_group_score_params)).to be_valid
       end
 
-      it 'is invalid with course_score false and no scorable associations' do
+      it "is invalid with course_score false and no scorable associations" do
         expect do
           score = student.scores.create!(params)
           score.update!(course_score: false)
         end.to raise_error(ActiveRecord::RecordInvalid)
       end
 
-      it 'is invalid with course_score true and a scorable association' do
+      it "is invalid with course_score true and a scorable association" do
         expect do
           student.scores.create!(course_score: true, **grading_period_score_params)
         end.to raise_error(ActiveRecord::RecordInvalid)
       end
 
-      it 'is invalid with multiple scorable associations' do
+      it "is invalid with multiple scorable associations" do
         expect do
           student.scores.create!(grading_period_id: @grading_periods.first.id, **assignment_group_score_params)
         end.to raise_error(ActiveRecord::RecordInvalid)
@@ -159,12 +159,12 @@ describe Score do
     end
   end
 
-  describe '#destroy' do
-    context 'with score metadata' do
+  describe "#destroy" do
+    context "with score metadata" do
       let(:metadata) { score.create_score_metadata!(calculation_details: { foo: :bar }) }
 
-      describe 'score_metadata association' do
-        it 'also destroys score metadata' do
+      describe "score_metadata association" do
+        it "also destroys score metadata" do
           metadata.score.destroy
           expect(metadata).to be_deleted
         end
@@ -172,12 +172,12 @@ describe Score do
     end
   end
 
-  describe '#destroy_permanently' do
-    context 'with score metadata' do
+  describe "#destroy_permanently" do
+    context "with score metadata" do
       let(:metadata) { score.create_score_metadata!(calculation_details: { foo: :bar }) }
 
-      describe 'score_metadata association' do
-        it 'also permanently destroys score metadata' do
+      describe "score_metadata association" do
+        it "also permanently destroys score metadata" do
           metadata.score.destroy_permanently!
           expect { metadata.reload }.to raise_error(ActiveRecord::RecordNotFound)
         end
@@ -185,20 +185,20 @@ describe Score do
     end
   end
 
-  describe '#undestroy' do
-    context 'without score metadata' do
-      it 'is active' do
+  describe "#undestroy" do
+    context "without score metadata" do
+      it "is active" do
         score.destroy
         score.undestroy
         expect(score).to be_active
       end
     end
 
-    context 'with score metadata' do
+    context "with score metadata" do
       let(:metadata) { score.create_score_metadata!(calculation_details: { foo: :bar }) }
 
-      describe 'score_metadata association' do
-        it 'is active' do
+      describe "score_metadata association" do
+        it "is active" do
           metadata.score.destroy
           metadata.score.undestroy
           expect(metadata).to be_active
@@ -207,70 +207,70 @@ describe Score do
     end
   end
 
-  describe '#current_grade' do
-    it 'delegates the grade conversion to the course' do
+  describe "#current_grade" do
+    it "delegates the grade conversion to the course" do
       expect(score.course).to receive(:score_to_grade).once.with(score.current_score)
       score.current_grade
     end
 
-    it 'returns nil if grading schemes are not used in the course' do
+    it "returns nil if grading schemes are not used in the course" do
       expect(score.course).to receive(:grading_standard_enabled?).and_return(false)
       expect(score.current_grade).to be_nil
     end
 
-    it 'returns the grade according to the course grading scheme' do
+    it "returns the grade according to the course grading scheme" do
       expect(score.course).to receive(:grading_standard_enabled?).and_return(true)
-      expect(score.current_grade).to eq 'B-'
+      expect(score.current_grade).to eq "B-"
     end
   end
 
-  describe '#final_grade' do
-    it 'delegates the grade conversion to the course' do
+  describe "#final_grade" do
+    it "delegates the grade conversion to the course" do
       expect(score.course).to receive(:score_to_grade).once.with(score.final_score)
       score.final_grade
     end
 
-    it 'returns nil if grading schemes are not used in the course' do
+    it "returns nil if grading schemes are not used in the course" do
       expect(score.course).to receive(:grading_standard_enabled?).and_return(false)
       expect(score.final_grade).to be_nil
     end
 
-    it 'returns the grade according to the course grading scheme' do
+    it "returns the grade according to the course grading scheme" do
       expect(score.course).to receive(:grading_standard_enabled?).and_return(true)
-      expect(score.final_grade).to eq 'C'
+      expect(score.final_grade).to eq "C"
     end
   end
 
-  describe('#scorable') do
-    it 'returns course for course score' do
+  describe("#scorable") do
+    it "returns course for course score" do
       expect(score.scorable).to be score.enrollment.course
     end
 
-    it 'returns grading period for grading period score' do
+    it "returns grading period for grading period score" do
       expect(grading_period_score.scorable).to be grading_period_score.grading_period
     end
 
-    it 'returns assignment group for assignment group score' do
+    it "returns assignment group for assignment group score" do
       expect(assignment_group_score.scorable).to be assignment_group_score.assignment_group
     end
   end
 
-  describe('#course_score') do
-    it 'sets course_score to true when there are no scorable associations' do
+  describe("#course_score") do
+    it "sets course_score to true when there are no scorable associations" do
       expect(score.course_score).to be true
     end
 
-    it 'sets course_score to false for grading period scores' do
+    it "sets course_score to false for grading period scores" do
       expect(grading_period_score.course_score).to be false
     end
 
-    it 'sets course_score to false for assignment group scores' do
+    it "sets course_score to false for assignment group scores" do
       expect(assignment_group_score.course_score).to be false
     end
   end
 
-  describe('#params_for_course') do
-    it('uses course_score') do
+  describe("#params_for_course") do
+    it("uses course_score") do
       expect(Score.params_for_course).to eq(course_score: true)
     end
   end
@@ -290,13 +290,13 @@ describe Score do
     it "doesn't allow random classmates to read" do
       score
       student_in_course(active_all: true)
-      expect(score.grants_right? @student, :read).to eq false
+      expect(score.grants_right?(@student, :read)).to eq false
     end
 
     it "doesn't work for yourself if the course is configured badly" do
       @enrollment.course.hide_final_grade = true
       @enrollment.course.save!
-      expect(score.grants_right? @enrollment.user, :read).to eq false
+      expect(score.grants_right?(@enrollment.user, :read)).to eq false
     end
   end
 
@@ -316,12 +316,12 @@ describe Score do
       it "returns a grade commensurate with the override score when one is present" do
         score.update!(override_score: 88)
         allow(score.course).to receive(:grading_standard_enabled?).and_return(true)
-        expect(score.effective_final_grade).to eq 'B+'
+        expect(score.effective_final_grade).to eq "B+"
       end
 
       it "returns the calculated final grade when no override score is present" do
         allow(score.course).to receive(:grading_standard_enabled?).and_return(true)
-        expect(score.effective_final_grade).to eq 'C'
+        expect(score.effective_final_grade).to eq "C"
       end
     end
   end

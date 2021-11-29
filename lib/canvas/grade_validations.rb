@@ -17,12 +17,12 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'active_support/concern'
+require "active_support/concern"
 
 module Canvas::GradeValidations
   extend ActiveSupport::Concern
 
   included do
-    validates_length_of :grade, :maximum => maximum_string_length, :allow_nil => true, :allow_blank => true
+    validates_length_of :grade, maximum: maximum_string_length, allow_nil: true, allow_blank: true
   end
 end

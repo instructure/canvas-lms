@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../../common'
+require_relative "../../common"
 
 class ModeratePage
   class << self
@@ -58,7 +58,7 @@ class ModeratePage
 
     def fetch_selected_final_grade_text(student)
       grade_input(student).click
-      text = grade_input_dropdown_list(student).find { |e| e.attribute('aria-selected') == "true" }.text
+      text = grade_input_dropdown_list(student).find { |e| e.attribute("aria-selected") == "true" }.text
       # close the menu
       grade_input(student).send_keys(:escape)
       text
@@ -107,11 +107,11 @@ class ModeratePage
     end
 
     def student_table_headers
-      ff('.GradesGrid__GraderHeader')
+      ff(".GradesGrid__GraderHeader")
     end
 
     def student_table_row_headers
-      ff('.GradesGrid__BodyRowHeader')
+      ff(".GradesGrid__BodyRowHeader")
     end
 
     def student_table_row_by_displayed_name(name)
@@ -139,19 +139,19 @@ class ModeratePage
     end
 
     def grades(student)
-      ff('.GradesGrid__ProvisionalGradeCell', student_table_row_by_displayed_name(student.name))
+      ff(".GradesGrid__ProvisionalGradeCell", student_table_row_by_displayed_name(student.name))
     end
 
     def grade_input(student)
-      f('.GradesGrid__FinalGradeCell input', student_table_row_by_displayed_name(student.name))
+      f(".GradesGrid__FinalGradeCell input", student_table_row_by_displayed_name(student.name))
     end
 
     def grade_input_dropdown_list(student)
-      ff("ul##{grade_input(student).attribute('aria-controls')} li span[role='option']")
+      ff("ul##{grade_input(student).attribute("aria-controls")} li span[role='option']")
     end
 
     def grade_input_dropdown(student)
-      f("ul##{grade_input(student).attribute('aria-controls')}")
+      f("ul##{grade_input(student).attribute("aria-controls")}")
     end
 
     def student_link(student_name)

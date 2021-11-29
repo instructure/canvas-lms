@@ -23,16 +23,16 @@ class Quizzes::QuizSubmissionEventsController < ApplicationController
   include ::Filters::QuizSubmissions
 
   before_action :require_user, :require_context
-  before_action :require_quiz, :only => [:index]
-  before_action :require_quiz_submission, :only => [:index]
+  before_action :require_quiz, only: [:index]
+  before_action :require_quiz_submission, only: [:index]
 
-  protect_from_forgery :only => [:index], with: :exception
+  protect_from_forgery only: [:index], with: :exception
 
   def index
     if authorized_action(@quiz_submission, @current_user, :view_log)
 
       unless @context.feature_enabled?(:quiz_log_auditing)
-        flash[:error] = t('errors.quiz_log_auditing_required',
+        flash[:error] = t("errors.quiz_log_auditing_required",
                           "The quiz log auditing feature needs to be enabled for this course.")
 
         return redirect_to named_context_url(@context, :context_quiz_history_url,
@@ -42,7 +42,7 @@ class Quizzes::QuizSubmissionEventsController < ApplicationController
 
       dont_show_user_name = @quiz.anonymous_submissions || (!@quiz_submission.user || @quiz_submission.user == @current_user)
 
-      add_crumb(t('#crumbs.quizzes', "Quizzes"), named_context_url(@context, :context_quizzes_url))
+      add_crumb(t("#crumbs.quizzes", "Quizzes"), named_context_url(@context, :context_quizzes_url))
       add_crumb(@quiz.title, named_context_url(@context, :context_quiz_url, @quiz))
 
       submission_crumb = if dont_show_user_name

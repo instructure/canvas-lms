@@ -24,4 +24,4 @@
 #   application.rb?  this is to conform to https://guides.rubyonrails.org/autoloading_and_reloading_constants.html
 #   which states "Please, do not mutate ActiveSupport::Dependencies.autoload_paths,
 #                  the public interface to change autoload paths is config.autoload_paths."
-ActiveSupport::Dependencies.autoload_paths.push(Rails.root + 'lib/stubs')
+ActiveSupport::Dependencies.autoload_paths.push(Rails.root.join("lib/stubs"))

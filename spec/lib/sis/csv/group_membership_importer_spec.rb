@@ -22,15 +22,15 @@ describe SIS::CSV::GroupMembershipImporter do
   before { account_model }
 
   before do
-    group_model(:context => @account, :sis_source_id => "G001")
-    @user1 = user_with_pseudonym(:username => 'u1@example.com')
-    @user1.pseudonym.update_attribute(:sis_user_id, 'U001')
+    group_model(context: @account, sis_source_id: "G001")
+    @user1 = user_with_pseudonym(username: "u1@example.com")
+    @user1.pseudonym.update_attribute(:sis_user_id, "U001")
     @user1.pseudonym.update_attribute(:account, @account)
-    @user2 = user_with_pseudonym(:username => 'u2@example.com')
-    @user2.pseudonym.update_attribute(:sis_user_id, 'U002')
+    @user2 = user_with_pseudonym(username: "u2@example.com")
+    @user2.pseudonym.update_attribute(:sis_user_id, "U002")
     @user2.pseudonym.update_attribute(:account, @account)
-    @user3 = user_with_pseudonym(:username => 'u3@example.com')
-    @user3.pseudonym.update_attribute(:sis_user_id, 'U003')
+    @user3 = user_with_pseudonym(username: "u3@example.com")
+    @user3.pseudonym.update_attribute(:sis_user_id, "U003")
     @user3.pseudonym.update_attribute(:account, @account)
   end
 
@@ -58,7 +58,7 @@ describe SIS::CSV::GroupMembershipImporter do
     ms = GroupMembership.order(:id).to_a
     expect(ms.map(&:user_id)).to eq [@user1.id, @user3.id]
     expect(ms.map(&:group_id)).to eq [@group.id, @group.id]
-    expect(ms.map(&:workflow_state)).to eq %w(accepted deleted)
+    expect(ms.map(&:workflow_state)).to eq %w[accepted deleted]
 
     process_csv_data_cleanly(
       "group_id,user_id,status",
@@ -68,11 +68,11 @@ describe SIS::CSV::GroupMembershipImporter do
     ms = GroupMembership.order(:id).to_a
     expect(ms.map(&:user_id)).to eq [@user1.id, @user3.id]
     expect(ms.map(&:group_id)).to eq [@group.id, @group.id]
-    expect(ms.map(&:workflow_state)).to eq %w(deleted deleted)
+    expect(ms.map(&:workflow_state)).to eq %w[deleted deleted]
   end
 
   it "adds users to groups that the user cannot access" do
-    course = course_factory(account: @account, sis_source_id: 'c001')
+    course = course_factory(account: @account, sis_source_id: "c001")
     group_model(context: course, sis_source_id: "G002")
     importer = process_csv_data(
       "group_id,user_id,status",
@@ -83,8 +83,8 @@ describe SIS::CSV::GroupMembershipImporter do
 
   it "finds active gm first" do
     g = group_model(context: @account, sis_source_id: "G002")
-    g.group_memberships.create!(user: @user1, workflow_state: 'accepted')
-    g.group_memberships.create!(user: @user1, workflow_state: 'deleted')
+    g.group_memberships.create!(user: @user1, workflow_state: "accepted")
+    g.group_memberships.create!(user: @user1, workflow_state: "deleted")
     importer = process_csv_data_cleanly(
       "group_id,user_id,status",
       "G002,U001,accepted"
@@ -92,7 +92,7 @@ describe SIS::CSV::GroupMembershipImporter do
     expect(importer.errors).to eq []
   end
 
-  it 'creates rollback data' do
+  it "creates rollback data" do
     batch1 = @account.sis_batches.create! { |sb| sb.data = {} }
     process_csv_data_cleanly(
       "group_id,user_id,status",
@@ -105,13 +105,13 @@ describe SIS::CSV::GroupMembershipImporter do
       "G001,U001,deleted",
       batch: batch2
     )
-    expect(batch1.roll_back_data.where(previous_workflow_state: 'non-existent').count).to eq 1
-    expect(batch2.roll_back_data.first.updated_workflow_state).to eq 'deleted'
+    expect(batch1.roll_back_data.where(previous_workflow_state: "non-existent").count).to eq 1
+    expect(batch2.roll_back_data.first.updated_workflow_state).to eq "deleted"
     batch2.restore_states_for_batch
-    expect(@account.all_groups.where(sis_source_id: 'G001').take.group_memberships.take.workflow_state).to eq 'accepted'
+    expect(@account.all_groups.where(sis_source_id: "G001").take.group_memberships.take.workflow_state).to eq "accepted"
   end
 
-  it 'handles unique constraint errors rolling back data' do
+  it "handles unique constraint errors rolling back data" do
     batch1 = @account.sis_batches.create! { |sb| sb.data = {} }
     process_csv_data_cleanly(
       "group_id,user_id,status",
@@ -126,12 +126,12 @@ describe SIS::CSV::GroupMembershipImporter do
       "G001,U002,deleted",
       batch: batch2
     )
-    group = @account.all_groups.where(sis_source_id: 'G001').take
+    group = @account.all_groups.where(sis_source_id: "G001").take
     deleted_gm = GroupMembership.where(group_id: group, user_id: @user1).take
-    group.group_memberships.create!(:workflow_state => 'accepted', :user => @user1)
+    group.group_memberships.create!(workflow_state: "accepted", user: @user1)
     batch2.restore_states_for_batch
     expect(batch2.sis_batch_errors.last.message).to include("Couldn't rollback SIS batch data for row")
-    expect(batch2.roll_back_data.where(context_type: "GroupMembership", context_id: deleted_gm.id).take.workflow_state).to eq 'failed'
-    expect(group.group_memberships.where(user_id: @user2).take.workflow_state).to eq 'accepted' # should restore the one still
+    expect(batch2.roll_back_data.where(context_type: "GroupMembership", context_id: deleted_gm.id).take.workflow_state).to eq "failed"
+    expect(group.group_memberships.where(user_id: @user2).take.workflow_state).to eq "accepted" # should restore the one still
   end
 end

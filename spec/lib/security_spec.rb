@@ -27,10 +27,10 @@ describe "security" do
     expect(CanvasSecurity.verify_hmac_sha1(hmac, msg + "haha")).not_to be_truthy
   end
 
-  describe '#url_key_encrypt_data' do
-    it 'does not include url unsafe keys' do
+  describe "#url_key_encrypt_data" do
+    it "does not include url unsafe keys" do
       data1 = 'abcde12345!@#$%^&*()~`/\\|+=-_🙂Ю'
-      data2 = 'https://www.google.com/maps'
+      data2 = "https://www.google.com/maps"
 
       encrypted_data1 = CanvasSecurity.url_key_encrypt_data(data1)
       encrypted_data2 = CanvasSecurity.url_key_encrypt_data(data2)
@@ -38,14 +38,14 @@ describe "security" do
       expect(URI.encode(encrypted_data2)).to eq encrypted_data2
     end
 
-    it 'decrypts to the same data you sent in' do
+    it "decrypts to the same data you sent in" do
       data1 = 'abcde12345!@#$%^&*()~`/\\|+=-_🙂Ю'
-      data2 = 'https://www.google.com/maps'
+      data2 = "https://www.google.com/maps"
 
       encrypted_data1 = CanvasSecurity.url_key_encrypt_data(data1)
       encrypted_data2 = CanvasSecurity.url_key_encrypt_data(data2)
       expect(data1).to eq 'abcde12345!@#$%^&*()~`/\\|+=-_🙂Ю'
-      expect(data2).to eq 'https://www.google.com/maps'
+      expect(data2).to eq "https://www.google.com/maps"
       expect(encrypted_data1).to_not eq data1
       expect(encrypted_data2).to_not eq data2
       expect(encrypted_data1).to match(/[\w-]+~[\w-]+~[\w-]+/)
@@ -55,13 +55,13 @@ describe "security" do
     end
   end
 
-  describe '#url_key_decrypt_data' do
-    it 'is able to decrypt' do
+  describe "#url_key_decrypt_data" do
+    it "is able to decrypt" do
       allow(CanvasSecurity).to receive(:encryption_key).and_return("facdd3a131ddd8988b14f6e4e01039c93cfa0160")
       encrypted_data1 = "ywOHQZAfnsU351MRazIS2TZ5BM8IgbiuOYxrvecBcELXLdMvvW4CeAQ~qbbJvWGrYf9GwNBB~J1hDYUhq85eHr53KgtLIpg"
       encrypted_data2 = "NmJk7iV0hTz2ztUb50yuX3tCAcNbMKKQELiIMuu4SyLV~aGt-Ed5h1HRsF8n0~Id488slCbupK0V9n-6DpMg"
       expect(CanvasSecurity.url_key_decrypt_data(encrypted_data1)).to eq 'abcde12345!@#$%^&*()~`/\\|+=-_🙂Ю'
-      expect(CanvasSecurity.url_key_decrypt_data(encrypted_data2)).to eq 'https://www.google.com/maps'
+      expect(CanvasSecurity.url_key_decrypt_data(encrypted_data2)).to eq "https://www.google.com/maps"
     end
   end
 end

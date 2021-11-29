@@ -19,13 +19,13 @@
 #
 
 class Mutations::SetFriendlyDescription < Mutations::BaseMutation
-  graphql_name 'SetFriendlyDescription'
+  graphql_name "SetFriendlyDescription"
 
   argument :description, String, required: true
   argument :outcome_id,
            ID,
            required: true,
-           prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func('LearningOutcome')
+           prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("LearningOutcome")
   argument :context_id, ID, required: true
   argument :context_type, String, required: true
 
@@ -87,7 +87,7 @@ class Mutations::SetFriendlyDescription < Mutations::BaseMutation
 
   def get_context(context_type, context_id)
     unless VALID_CONTEXTS.include?(context_type)
-      raise GraphQL::ExecutionError, I18n.t('Invalid context type')
+      raise GraphQL::ExecutionError, I18n.t("Invalid context type")
     end
 
     context_type.constantize.find_by(id: context_id).tap do |context|
@@ -95,7 +95,7 @@ class Mutations::SetFriendlyDescription < Mutations::BaseMutation
         raise GraphQL::ExecutionError, I18n.t(
           "No such context for %{context_type}#%{context_id}",
           context_type: context_type,
-          context_id: context_id.to_s,
+          context_id: context_id.to_s
         )
       end
     end

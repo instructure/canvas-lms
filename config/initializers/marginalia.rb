@@ -17,12 +17,12 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_dependency 'setting'
+require_dependency "setting"
 
-config = ConfigFile.load('marginalia') || {}
+config = ConfigFile.load("marginalia") || {}
 
 if config[:components].present?
-  require 'marginalia'
+  require "marginalia"
   Marginalia::Railtie.insert
 
   module Marginalia
@@ -45,7 +45,7 @@ if config[:components].present?
 
   module Marginalia::RakeTask
     def execute(args = nil)
-      previous, Marginalia::Comment.rake_task = Marginalia::Comment.rake_task, self.name
+      previous, Marginalia::Comment.rake_task = Marginalia::Comment.rake_task, name
       super
     ensure
       Marginalia::Comment.rake_task = previous

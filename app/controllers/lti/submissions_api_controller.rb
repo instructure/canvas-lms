@@ -142,21 +142,21 @@ module Lti
     include Api::V1::Submission
     include AttachmentHelper
 
-    SUBMISSION_SERVICE = 'vnd.Canvas.submission'
-    SUBMISSION_HISTORY_SERVICE = 'vnd.Canvas.submission.history'
+    SUBMISSION_SERVICE = "vnd.Canvas.submission"
+    SUBMISSION_HISTORY_SERVICE = "vnd.Canvas.submission.history"
 
     SERVICE_DEFINITIONS = [
       {
         id: SUBMISSION_SERVICE,
-        endpoint: 'api/lti/assignments/{assignment_id}/submissions/{submission_id}',
-        format: ['application/json'].freeze,
-        action: ['GET'].freeze
+        endpoint: "api/lti/assignments/{assignment_id}/submissions/{submission_id}",
+        format: ["application/json"].freeze,
+        action: ["GET"].freeze
       }.freeze,
       {
         id: SUBMISSION_HISTORY_SERVICE,
-        endpoint: 'api/lti/assignments/{assignment_id}/submissions/{submission_id}/history',
-        format: ['application/json'].freeze,
-        action: ['GET'].freeze
+        endpoint: "api/lti/assignments/{assignment_id}/submissions/{submission_id}/history",
+        format: ["application/json"].freeze,
+        action: ["GET"].freeze
       }.freeze
     ].freeze
 
@@ -218,7 +218,7 @@ module Lti
 
     def attachment_for_submission?(attachment)
       submissions = Submission.bulk_load_versioned_attachments(submission.submission_history + [submission])
-      attachments = submissions.map { |s| s.versioned_attachments }.flatten
+      attachments = submissions.map(&:versioned_attachments).flatten
       attachments.include?(attachment)
     end
 
@@ -233,7 +233,7 @@ module Lti
     end
 
     def api_json(submission)
-      submission_attributes = %w(id body url submitted_at assignment_id user_id submission_type workflow_state attempt attachments)
+      submission_attributes = %w[id body url submitted_at assignment_id user_id submission_type workflow_state attempt attachments]
       sub_hash = filtered_json(model: submission, allow_list: submission_attributes)
       sub_hash[:user_id] = Lti::Asset.opaque_identifier_for(User.find(sub_hash[:user_id]), context: submission.assignment.context)
       if submission.turnitin_data[:eula_agreement_timestamp].present?
@@ -247,7 +247,7 @@ module Lti
     end
 
     def attachment_json(attachment)
-      attachment_attributes = %w(id display_name filename content-type size created_at updated_at)
+      attachment_attributes = %w[id display_name filename content-type size created_at updated_at]
       attach = filtered_json(model: attachment, allow_list: attachment_attributes)
       attach[:upload_status] = AttachmentUploadStatus.upload_status(attachment)
       attach[:url] = attachment_url(attachment)

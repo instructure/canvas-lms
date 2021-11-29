@@ -18,14 +18,14 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../views_helper'
+require_relative "../views_helper"
 
 describe "/users/show" do
   before do
     enroll = course_with_student
     account_admin_user
     gm = GroupMembership.create!(
-      group: @course.groups.create(name: 'our group'),
+      group: @course.groups.create(name: "our group"),
       user: @user,
       workflow_state: "accepted"
     )
@@ -36,7 +36,7 @@ describe "/users/show" do
     assign(:upcoming_events, [])
     assign(:enrollments, [enroll])
     assign(:group_memberships, [gm])
-    assign(:page_views, PageView.paginate(:page => 1, :per_page => 20))
+    assign(:page_views, PageView.paginate(page: 1, per_page: 20))
   end
 
   it "renders" do

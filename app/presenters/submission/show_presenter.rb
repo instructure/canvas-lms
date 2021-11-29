@@ -73,7 +73,7 @@ class Submission::ShowPresenter
   def submission_details_tool_launch_url
     params = {
       assignment_id: @assignment.id,
-      display: 'borderless',
+      display: "borderless",
       url: @submission.external_tool_url
     }
 
@@ -83,7 +83,7 @@ class Submission::ShowPresenter
   end
 
   def submission_preview_frame_url
-    submission_data_url(preview: 1, rand: rand(999999))
+    submission_data_url(preview: 1, rand: rand(999_999))
   end
 
   def comment_attachment_download_url(submission_comment:, attachment:)

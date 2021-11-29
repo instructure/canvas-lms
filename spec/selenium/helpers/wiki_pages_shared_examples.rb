@@ -34,23 +34,23 @@ RSpec.shared_examples "course_pages_granular_permissions" do
     end
   end
 
-  context 'user only having manage_wiki_create permission' do
+  context "user only having manage_wiki_create permission" do
     before do
-      update_role_override('manage_wiki_create', @role, true)
-      update_role_override('manage_wiki_update', @role, false)
-      update_role_override('manage_wiki_delete', @role, false)
+      update_role_override("manage_wiki_create", @role, true)
+      update_role_override("manage_wiki_update", @role, false)
+      update_role_override("manage_wiki_delete", @role, false)
     end
 
-    context 'show page' do
-      it 'hides ability to edit or delete page' do
+    context "show page" do
+      it "hides ability to edit or delete page" do
         visit_wiki_page_view(@course.id, @page.title)
         expect(published_status_published).to be_displayed
         expect(wiki_page_show).not_to contain_css(edit_btn_selector)
       end
     end
 
-    context 'index page' do
-      it 'hides ability to edit or delete page' do
+    context "index page" do
+      it "hides ability to edit or delete page" do
         visit_course_wiki_index_page(@course.id)
         expect(page_index_new_page_btn).to be_displayed
         click_manage_wiki_page_item_button(@page.title)
@@ -61,15 +61,15 @@ RSpec.shared_examples "course_pages_granular_permissions" do
     end
   end
 
-  context 'user only having manage_wiki_update permission' do
+  context "user only having manage_wiki_update permission" do
     before do
-      update_role_override('manage_wiki_create', @role, false)
-      update_role_override('manage_wiki_update', @role, true)
-      update_role_override('manage_wiki_delete', @role, false)
+      update_role_override("manage_wiki_create", @role, false)
+      update_role_override("manage_wiki_update", @role, true)
+      update_role_override("manage_wiki_delete", @role, false)
     end
 
-    context 'show page' do
-      it 'hides ability to delete page' do
+    context "show page" do
+      it "hides ability to delete page" do
         visit_wiki_page_view(@course.id, @page.title)
         expect(published_btn).to be_displayed
         expect(wiki_page_show).to contain_css(edit_btn_selector)
@@ -79,8 +79,8 @@ RSpec.shared_examples "course_pages_granular_permissions" do
       end
     end
 
-    context 'index page' do
-      it 'hides ability to create or delete a page' do
+    context "index page" do
+      it "hides ability to create or delete a page" do
         visit_course_wiki_index_page(@course.id)
         expect(page_index_content_container).not_to contain_css(new_page_btn_selector)
         click_manage_wiki_page_item_button(@page.title)
@@ -90,15 +90,15 @@ RSpec.shared_examples "course_pages_granular_permissions" do
     end
   end
 
-  context 'user only having manage_wiki_delete permission' do
+  context "user only having manage_wiki_delete permission" do
     before do
-      update_role_override('manage_wiki_create', @role, false)
-      update_role_override('manage_wiki_update', @role, false)
-      update_role_override('manage_wiki_delete', @role, true)
+      update_role_override("manage_wiki_create", @role, false)
+      update_role_override("manage_wiki_update", @role, false)
+      update_role_override("manage_wiki_delete", @role, true)
     end
 
-    context 'show page' do
-      it 'hides ability to create or edit page' do
+    context "show page" do
+      it "hides ability to create or edit page" do
         visit_wiki_page_view(@course.id, @page.title)
         expect(published_status_published).to be_displayed
         expect(wiki_page_show).not_to contain_css(edit_btn_selector)
@@ -107,8 +107,8 @@ RSpec.shared_examples "course_pages_granular_permissions" do
       end
     end
 
-    context 'index page' do
-      it 'hides ability to create or edit a page' do
+    context "index page" do
+      it "hides ability to create or edit a page" do
         visit_course_wiki_index_page(@course.id)
         expect(page_index_content_container).not_to contain_css(new_page_btn_selector)
         click_manage_wiki_page_item_button(@page.title)

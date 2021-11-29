@@ -22,9 +22,9 @@ module Lti
   class ResourceHandler < ActiveRecord::Base
     attr_readonly :created_at
 
-    belongs_to :tool_proxy, class_name: 'Lti::ToolProxy'
-    has_many :message_handlers, class_name: 'Lti::MessageHandler', :foreign_key => :resource_handler_id, dependent: :destroy
-    has_many :placements, class_name: 'Lti::ResourcePlacement', through: :message_handlers
+    belongs_to :tool_proxy, class_name: "Lti::ToolProxy"
+    has_many :message_handlers, class_name: "Lti::MessageHandler", dependent: :destroy
+    has_many :placements, class_name: "Lti::ResourcePlacement", through: :message_handlers
 
     serialize :icon_info
 

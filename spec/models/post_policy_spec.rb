@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../spec_helper'
+require_relative "../spec_helper"
 
 describe PostPolicy do
   describe "relationships" do
@@ -31,7 +31,7 @@ describe PostPolicy do
 
   describe "validation" do
     let(:course) { Course.create! }
-    let(:assignment) { course.assignments.create!(title: '!!!') }
+    let(:assignment) { course.assignments.create!(title: "!!!") }
 
     it "is valid if a valid course and assignment are specified" do
       post_policy = PostPolicy.new(course: course, assignment: assignment)
@@ -50,7 +50,7 @@ describe PostPolicy do
 
   describe "callbacks" do
     let(:course) { Course.create! }
-    let(:assignment) { course.assignments.create!(title: '!!!') }
+    let(:assignment) { course.assignments.create!(title: "!!!") }
 
     context "when the policy is for a specific assignment" do
       let(:policy) { assignment.post_policy }
@@ -60,9 +60,9 @@ describe PostPolicy do
 
         save_time = Time.zone.now
         Timecop.freeze(save_time) do
-          expect {
+          expect do
             policy.update!(post_manually: true)
-          }.to change { assignment.updated_at }.to(save_time)
+          end.to change { assignment.updated_at }.to(save_time)
         end
       end
 
@@ -70,9 +70,9 @@ describe PostPolicy do
         course.update!(updated_at: 1.day.ago)
 
         Timecop.freeze(Time.zone.now) do
-          expect {
+          expect do
             policy.update!(post_manually: true)
-          }.not_to change { course.updated_at }
+          end.not_to change { course.updated_at }
         end
       end
     end
@@ -85,9 +85,9 @@ describe PostPolicy do
         save_time = Time.zone.now
 
         Timecop.freeze(save_time) do
-          expect {
+          expect do
             policy.update!(post_manually: true)
-          }.to change { course.updated_at }.to(save_time)
+          end.to change { course.updated_at }.to(save_time)
         end
       end
     end

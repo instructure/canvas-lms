@@ -29,15 +29,15 @@ describe SearchHelper do
       load_all_contexts
       expect(@contexts[:courses][@course.id][:permissions]).to be_empty
 
-      load_all_contexts(:permissions => [:manage_assignments])
+      load_all_contexts(permissions: [:manage_assignments])
       expect(@contexts[:courses][@course.id][:permissions][:manage_assignments]).to be_truthy
     end
 
     it "only loads the section and its course when given a section context" do
-      course_with_teacher(:active_all => true)
-      course_with_teacher(:active_all => true, :user => @teacher)
+      course_with_teacher(active_all: true)
+      course_with_teacher(active_all: true, user: @teacher)
       @current_user = @teacher
-      second_section = @course.course_sections.create!(:name => 'second section')
+      second_section = @course.course_sections.create!(name: "second section")
       load_all_contexts(context: second_section)
 
       expect(@contexts[:courses].count).to eq 1
@@ -45,8 +45,8 @@ describe SearchHelper do
     end
 
     it "only loads the group and its course when given a group context" do
-      course_with_teacher(:active_all => true)
-      course_with_teacher(:active_all => true, :user => @teacher)
+      course_with_teacher(active_all: true)
+      course_with_teacher(active_all: true, user: @teacher)
       @current_user = @teacher
       group_model(context: @course)
       load_all_contexts(context: @group)
@@ -57,7 +57,7 @@ describe SearchHelper do
     end
 
     it "loads the section even with section-restricted teacher privileges" do
-      course_with_teacher(:active_all => true, :limit_privileges_to_course_section => true)
+      course_with_teacher(active_all: true, limit_privileges_to_course_section: true)
       @current_user = @teacher
       load_all_contexts(context: @course.default_section)
 
@@ -66,9 +66,9 @@ describe SearchHelper do
     end
 
     it "doesn't load the section for observers" do
-      course_with_student(:active_all => true)
+      course_with_student(active_all: true)
       observer = user_factory
-      @course.enroll_user(observer, "ObserverEnrollment", :associated_user_id => @student)
+      @course.enroll_user(observer, "ObserverEnrollment", associated_user_id: @student)
       @current_user = observer
       load_all_contexts(context: @course.default_section)
 
@@ -84,7 +84,7 @@ describe SearchHelper do
 
       before do
         @current_user = @shard1.activate { user_factory(active_all: true) }
-        @shard2.activate { course_with_teacher(:account => Account.create!, :user => @current_user, :active_all => true) }
+        @shard2.activate { course_with_teacher(account: Account.create!, user: @current_user, active_all: true) }
       end
 
       it "includes courses from shards other than the user's native shard" do
@@ -94,7 +94,7 @@ describe SearchHelper do
 
       it "includes sections from shards other than the user's native shard" do
         # needs at least two sections for any sections to show up
-        second_section = @course.course_sections.create!(:name => 'second section')
+        second_section = @course.course_sections.create!(name: "second section")
         load_all_contexts
         expect(@contexts[:sections]).to have_key(second_section.id)
       end

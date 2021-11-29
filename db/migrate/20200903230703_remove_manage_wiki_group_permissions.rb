@@ -22,7 +22,7 @@ class RemoveManageWikiGroupPermissions < ActiveRecord::Migration[5.2]
   disable_ddl_transaction!
 
   def up
-    RoleOverride.where(permission: 'manage_wiki').in_batches.delete_all
+    RoleOverride.where(permission: "manage_wiki").in_batches.delete_all
   end
 
   def down

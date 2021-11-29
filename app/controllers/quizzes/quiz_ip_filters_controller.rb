@@ -68,7 +68,7 @@ class Quizzes::QuizIpFiltersController < ApplicationController
 
       renderable = quiz_ip_filters_json(paginated_set, @context, @current_user, session)
 
-      render :json => renderable
+      render json: renderable
     end
   end
 end

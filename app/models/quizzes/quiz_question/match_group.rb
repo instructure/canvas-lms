@@ -36,7 +36,7 @@ class Quizzes::QuizQuestion::MatchGroup
   end
 
   def to_a
-    matches.map { |match| match.to_hash }
+    matches.map(&:to_hash)
   end
 
   private

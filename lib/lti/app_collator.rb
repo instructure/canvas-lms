@@ -31,13 +31,13 @@ module Lti
       tool_proxy_collection = BookmarkedCollection.wrap(ToolProxyNameBookmarker, tool_proxy_scope)
 
       BookmarkedCollection.merge(
-        ['external_tools', external_tools_collection],
-        ['message_handlers', tool_proxy_collection]
+        ["external_tools", external_tools_collection],
+        ["message_handlers", tool_proxy_collection]
       )
     end
 
     def app_definitions(collection, opts = {})
-      collection.map do |o|
+      collection.filter_map do |o|
         case o
         when ContextExternalTool
           hash = external_tool_definition(o)
@@ -48,14 +48,14 @@ module Lti
         when ToolProxy
           tool_proxy_definition(o)
         end
-      end.compact
+      end
     end
 
     private
 
     def external_tool_definition(external_tool)
       result = {
-        app_type: 'ContextExternalTool',
+        app_type: "ContextExternalTool",
         app_id: external_tool.id,
         name: external_tool.name,
         description: external_tool.description,
@@ -66,7 +66,7 @@ module Lti
         context_id: external_tool.context.id,
         reregistration_url: nil,
         has_update: nil,
-        lti_version: external_tool.use_1_3? ? '1.3' : '1.1',
+        lti_version: external_tool.use_1_3? ? "1.3" : "1.1",
         deployment_id: external_tool.deployment_id,
         editor_button_settings: external_tool.editor_button
       }
@@ -81,13 +81,13 @@ module Lti
         name: tool_proxy.name,
         description: tool_proxy.description,
         installed_locally: tool_proxy.context == @context,
-        enabled: tool_proxy.workflow_state == 'active',
+        enabled: tool_proxy.workflow_state == "active",
         tool_configuration: nil,
         context: tool_proxy.context_type,
         context_id: tool_proxy.context.id,
         reregistration_url: build_reregistration_url(tool_proxy),
         has_update: root_account.feature_enabled?(:lti2_rereg) ? tool_proxy.update? : nil,
-        lti_version: '2.0'
+        lti_version: "2.0"
       }
     end
 

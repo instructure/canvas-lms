@@ -18,30 +18,30 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'spec_helper'
+require "spec_helper"
 
 describe StringifyIds do
-  describe '.recursively_stringify_ids' do
-    it 'stringifies in a sub-hash' do
+  describe ".recursively_stringify_ids" do
+    it "stringifies in a sub-hash" do
       input = { obj: { id: 1 } }
       StringifyIds.recursively_stringify_ids(input)
       expect(input[:obj][:id]).to eq "1"
     end
 
-    it 'stringifies in a sub-array' do
+    it "stringifies in a sub-array" do
       input = { objs: [{ id: 1 }] }
       StringifyIds.recursively_stringify_ids(input)
       expect(input[:objs][0][:id]).to eq "1"
     end
 
-    it 'allows reversing' do
+    it "allows reversing" do
       input = { obj: { id: "1" } }
       StringifyIds.recursively_stringify_ids(input, reverse: true)
       expect(input[:obj][:id]).to eq 1
     end
   end
 
-  describe '.stringify_ids' do
+  describe ".stringify_ids" do
     it 'stringifies an "id" field' do
       input = { id: 1 }
       StringifyIds.stringify_ids(input)
@@ -57,7 +57,7 @@ describe StringifyIds do
     it 'stringifies a "something_ids" array field' do
       input = { something_ids: [1, 2, 3] }
       StringifyIds.stringify_ids(input)
-      expect(input[:something_ids]).to eq ["1", "2", "3"]
+      expect(input[:something_ids]).to eq %w[1 2 3]
     end
 
     it 'stringifies a "SOMETHING_ID" field' do
@@ -69,30 +69,30 @@ describe StringifyIds do
     it 'stringifies a "SOMETHING_IDS" field' do
       input = { SOMETHING_IDS: [1, 2, 3] }
       StringifyIds.stringify_ids(input)
-      expect(input[:SOMETHING_IDS]).to eq ["1", "2", "3"]
+      expect(input[:SOMETHING_IDS]).to eq %w[1 2 3]
     end
 
-    it 'allows reversing' do
+    it "allows reversing" do
       input = { id: "1" }
       StringifyIds.stringify_ids(input, reverse: true)
       expect(input[:id]).to eq 1
     end
   end
 
-  describe '.stringify_id' do
-    it 'converts an int to a string' do
+  describe ".stringify_id" do
+    it "converts an int to a string" do
       expect(StringifyIds.stringify_id(1)).to eq "1"
     end
 
-    it 'passes a non-int through' do
+    it "passes a non-int through" do
       expect(StringifyIds.stringify_id(1.0)).to eq 1.0
     end
 
-    it 'converts a string to an int with reverse specified' do
+    it "converts a string to an int with reverse specified" do
       expect(StringifyIds.stringify_id("1", reverse: true)).to eq 1
     end
 
-    it 'passes a non-string through with reverse specified' do
+    it "passes a non-string through with reverse specified" do
       expect(StringifyIds.stringify_id(1.0, reverse: true)).to eq 1.0
     end
   end

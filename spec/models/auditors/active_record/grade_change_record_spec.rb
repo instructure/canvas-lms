@@ -19,7 +19,7 @@
 #
 
 describe Auditors::ActiveRecord::GradeChangeRecord do
-  let(:request_id) { 'abcde-12345' }
+  let(:request_id) { "abcde-12345" }
 
   it "appropriately connected to a table" do
     expect(Auditors::ActiveRecord::GradeChangeRecord.count).to eq(0)
@@ -54,7 +54,7 @@ describe Auditors::ActiveRecord::GradeChangeRecord do
       expect(ar_rec.event_type).to eq("grade_change")
       expect(ar_rec.context_id).to eq(course.id)
       expect(ar_rec.course_id).to eq(course.id)
-      expect(ar_rec.context_type).to eq('Course')
+      expect(ar_rec.context_type).to eq("Course")
       expect(ar_rec.grader_id).to eq(submission_record.grader_id)
       expect(ar_rec.grading_period_id).to eq(submission_record.grading_period_id)
       expect(ar_rec.student_id).to eq(submission_record.user_id)

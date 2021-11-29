@@ -25,8 +25,8 @@ class AddTypeToContentShares < ActiveRecord::Migration[5.2]
     add_column :content_shares, :type, :string, limit: 255
     # there shouldn't be any ContentShares in production, so we shouldn't have to worry
     # about long jobs
-    ContentShare.where(type: nil, sender_id: nil).update_all(type: 'SentContentShare')
-    ContentShare.where(type: nil).where.not(sender_id: nil).update_all(type: 'ReceivedContentShare')
+    ContentShare.where(type: nil, sender_id: nil).update_all(type: "SentContentShare")
+    ContentShare.where(type: nil).where.not(sender_id: nil).update_all(type: "ReceivedContentShare")
     change_column :content_shares, :type, :string, limit: 255, null: false
   end
 

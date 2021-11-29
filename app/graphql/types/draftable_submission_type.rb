@@ -29,11 +29,11 @@ module Types
   ].freeze
 
   class DraftableSubmissionType < BaseEnum
-    graphql_name 'DraftableSubmissionType'
-    description 'Types of submissions that can have a submission draft'
+    graphql_name "DraftableSubmissionType"
+    description "Types of submissions that can have a submission draft"
 
-    DRAFTABLE_SUBMISSION_TYPES.each { |draftable_type|
+    DRAFTABLE_SUBMISSION_TYPES.each do |draftable_type|
       value(draftable_type)
-    }
+    end
   end
 end

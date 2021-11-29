@@ -21,14 +21,14 @@
 describe LegalInformationController do
   describe "GET 'terms_of_use'" do
     it "redirects to terms_of_use_url, no authorization required" do
-      get 'terms_of_use'
+      get "terms_of_use"
       expect(response).to redirect_to controller.terms_of_use_url
     end
 
     it "works with authorization" do
       user_factory
       user_session @user
-      get 'terms_of_use'
+      get "terms_of_use"
       expect(response).to redirect_to controller.terms_of_use_url
     end
 
@@ -36,21 +36,21 @@ describe LegalInformationController do
       user_factory
       user_session @user
       session[:require_terms] = true
-      get 'terms_of_use'
+      get "terms_of_use"
       expect(response).to redirect_to controller.terms_of_use_url
     end
   end
 
   describe "GET 'privacy_policy'" do
     it "redirects to privacy_policy_url, no authorization required" do
-      get 'privacy_policy'
+      get "privacy_policy"
       expect(response).to redirect_to controller.privacy_policy_url
     end
 
     it "works with authorization" do
       user_factory
       user_session @user
-      get 'privacy_policy'
+      get "privacy_policy"
       expect(response).to redirect_to controller.privacy_policy_url
     end
 
@@ -58,7 +58,7 @@ describe LegalInformationController do
       user_factory
       user_session @user
       session[:require_terms] = true
-      get 'privacy_policy'
+      get "privacy_policy"
       expect(response).to redirect_to controller.privacy_policy_url
     end
   end

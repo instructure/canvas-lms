@@ -18,6 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 module CanvasSort
-  require 'canvas_sort/sort_first'
-  require 'canvas_sort/sort_last'
+  require "canvas_sort/sort_first"
+  require "canvas_sort/sort_last"
 end

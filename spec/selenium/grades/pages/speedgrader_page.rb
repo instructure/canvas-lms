@@ -17,8 +17,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative 'post_grades_tray_page'
-require_relative 'hide_grades_tray_page'
+require_relative "post_grades_tray_page"
+require_relative "hide_grades_tray_page"
 
 class Speedgrader
   class << self
@@ -30,15 +30,15 @@ class Speedgrader
 
     # components/elements
     def right_inner_panel
-      f('#rightside_inner')
+      f("#rightside_inner")
     end
 
     def grade_value
-      f('#grade_container input[type=text]').attribute('value')
+      f("#grade_container input[type=text]").attribute("value")
     end
 
     def points_possible_label
-      f('#grading-box-points-possible')
+      f("#grading-box-points-possible")
     end
 
     def fraction_graded
@@ -50,7 +50,7 @@ class Speedgrader
     end
 
     def grade_input
-      f('#grading-box-extended')
+      f("#grading-box-extended")
     end
 
     def hidden_pill
@@ -58,7 +58,7 @@ class Speedgrader
     end
 
     def hidden_pill_container
-      f('#speed_grader_hidden_submission_pill_mount_point')
+      f("#speed_grader_hidden_submission_pill_mount_point")
     end
 
     def grading_enabled?
@@ -74,7 +74,7 @@ class Speedgrader
     end
 
     def settings_link
-      f('#speed_grader_settings_mount_point button')
+      f("#speed_grader_settings_mount_point button")
     end
 
     def options_link
@@ -110,83 +110,83 @@ class Speedgrader
     end
 
     def grades_hidden_icon
-      f('svg[name=IconOff]', f('#speed_grader_post_grades_menu_mount_point'))
+      f("svg[name=IconOff]", f("#speed_grader_post_grades_menu_mount_point"))
     end
 
     def hide_students_chkbox
-      f('#hide_student_names')
+      f("#hide_student_names")
     end
 
     def selected_student
-      f('span.ui-selectmenu-item-header')
+      f("span.ui-selectmenu-item-header")
     end
 
     def student_x_of_x_label
-      f('#x_of_x_students_frd')
+      f("#x_of_x_students_frd")
     end
 
     def student_dropdown_menu
-      f('div.ui-selectmenu-menu.ui-selectmenu-open')
+      f("div.ui-selectmenu-menu.ui-selectmenu-open")
     end
 
     def next_student_btn
-      f('#next-student-button')
+      f("#next-student-button")
     end
 
     def next_student
-      f('.next')
+      f(".next")
     end
 
     def previous_student
-      f('.prev')
+      f(".prev")
     end
 
     def students_dropdown_button
-      f('#students_selectmenu-button')
+      f("#students_selectmenu-button")
     end
 
     def comment_citation
-      ff('.author_name')
+      ff(".author_name")
     end
 
     def new_comment_text_area
-      f('#speed_grader_comment_textarea')
+      f("#speed_grader_comment_textarea")
     end
 
     def comment_submit_button
-      f('#comment_submit_button')
+      f("#comment_submit_button")
     end
 
     def delete_comment
-      ff('.delete_comment_link')
+      ff(".delete_comment_link")
     end
 
     def comments
-      ff('#comments>.comment')
+      ff("#comments>.comment")
     end
 
     def submission_file_name
-      f('#submission_files_list .submission-file .display_name')
+      f("#submission_files_list .submission-file .display_name")
     end
 
     def submission_to_view_dropdown
-      f('#submission_to_view')
+      f("#submission_to_view")
     end
 
     def submission_file_download
-      f('.submission-file-download')
+      f(".submission-file-download")
     end
 
     def attachment_button
-      f('#add_attachment')
+      f("#add_attachment")
     end
 
     def attachment_input
-      f('#comment_attachments input')
+      f("#comment_attachments input")
     end
 
     def attachment_link
-      f('.display_name')
+      f(".display_name")
     end
 
     def submission_status_pill(status)
@@ -239,27 +239,27 @@ class Speedgrader
 
     # returns a list of comment strings from right pane
     def comment_list
-      ff('span.comment').map(&:text)
+      ff("span.comment").map(&:text)
     end
 
     def media_comment_button
-      f('#media_comment_button')
+      f("#media_comment_button")
     end
 
     def media_audio_record_option
-      f('#audio_record_option')
+      f("#audio_record_option")
     end
 
     def media_video_record_option
-      f('#video_record_option')
+      f("#video_record_option")
     end
 
     def attachment_input_close_button
-      f('#comment_attachments a')
+      f("#comment_attachments a")
     end
 
     def comment_posted_at
-      ff('#comments > .comment .posted_at')
+      ff("#comments > .comment .posted_at")
     end
 
     def avatar
@@ -271,47 +271,47 @@ class Speedgrader
     end
 
     def assignment_link
-      f('#assignment_url')
+      f("#assignment_url")
     end
 
     def comment_saved_alert
-      f('#comment_saved')
+      f("#comment_saved")
     end
 
     def comment_saved_alert_close_button
-      f('#comment_saved .dismiss_alert')
+      f("#comment_saved .dismiss_alert")
     end
 
     def draft_comments
-      ff('#comments .comment.draft')
+      ff("#comments .comment.draft")
     end
 
     def draft_comment_markers
-      ff('#comments .comment.draft .comment_flex > .draft-marker')
+      ff("#comments .comment.draft .comment_flex > .draft-marker")
     end
 
     def publish_draft_link
-      f('#comments .comment.draft .comment_flex > button.submit_comment_button')
+      f("#comments .comment.draft .comment_flex > button.submit_comment_button")
     end
 
     def draft_comment_delete_button
-      ff('#comments .comment.draft .comment_flex > a.delete_comment_link')
+      ff("#comments .comment.draft .comment_flex > a.delete_comment_link")
     end
 
     def comment_delete_buttons
-      ff('#comments .comment .comment_flex > a.delete_comment_link')
+      ff("#comments .comment .comment_flex > a.delete_comment_link")
     end
 
     def gradebook_link
-      f('#speed_grader_gradebook_link')
+      f("#speed_grader_gradebook_link")
     end
 
     def keyboard_navigation_modal
-      f('#keyboard_navigation')
+      f("#keyboard_navigation")
     end
 
     def keyboard_modal_close_button
-      f('.ui-resizable .ui-dialog-titlebar-close')
+      f(".ui-resizable .ui-dialog-titlebar-close")
     end
 
     def audit_link
@@ -362,7 +362,7 @@ class Speedgrader
     end
 
     def current_grade
-      grade_input['value']
+      grade_input["value"]
     end
 
     def click_students_dropdown
@@ -370,7 +370,7 @@ class Speedgrader
     end
 
     def fetch_student_names
-      ff('li', student_dropdown_menu).map(&:text)
+      ff("li", student_dropdown_menu).map(&:text)
     end
 
     def click_next_or_prev_student(direction_string)
@@ -436,7 +436,7 @@ class Speedgrader
     end
 
     def submit_settings_form
-      wait_for_new_page_load { fj('.ui-dialog-buttonset .ui-button:visible:last').click }
+      wait_for_new_page_load { fj(".ui-dialog-buttonset .ui-button:visible:last").click }
     end
 
     def grade_rubric_criteria(criteria_id, grade)
@@ -444,7 +444,7 @@ class Speedgrader
     end
 
     def select_rubric_criterion(criterion)
-      ff(".rating-description").select { |elt| elt.displayed? && elt.text == criterion }[0].click
+      ff(".rating-description").find { |elt| elt.displayed? && elt.text == criterion }.click
     end
 
     def clear_new_comment
@@ -485,7 +485,7 @@ class Speedgrader
 
     def wait_for_grade_input
       wait = Selenium::WebDriver::Wait.new(timeout: 5)
-      wait.until { grade_input.attribute('value') != "" }
+      wait.until { grade_input.attribute("value") != "" }
     end
 
     def open_assessment_audit
@@ -511,49 +511,49 @@ class Speedgrader
     end
 
     def right_pane
-      f('#right_side')
+      f("#right_side")
     end
 
     # quizzes
     def quiz_alerts
-      ff('#update_history_form .alert')
+      ff("#update_history_form .alert")
     end
 
     def quiz_questions_need_review
-      ff('#questions_needing_review li a')
+      ff("#questions_needing_review li a")
     end
 
     def quiz_header
-      f('header.quiz-header')
+      f("header.quiz-header")
     end
 
     def quiz_nav
-      f('#quiz-nav-inner-wrapper')
+      f("#quiz-nav-inner-wrapper")
     end
 
     def quiz_nav_questions
-      ff('.quiz-nav-li')
+      ff(".quiz-nav-li")
     end
 
     def quiz_point_inputs
-      ff('#questions .user_points input')
+      ff("#questions .user_points input")
     end
 
     def quiz_fudge_points
-      f('#fudge_points_entry')
+      f("#fudge_points_entry")
     end
 
     def quiz_after_fudge_total
-      f('#after_fudge_points_total')
+      f("#after_fudge_points_total")
     end
 
     def quiz_update_scores_button
-      f('button.update-scores')
+      f("button.update-scores")
     end
 
     # rubric
     def view_rubric_button
-      f('button.toggle_full_rubric')
+      f("button.toggle_full_rubric")
     end
 
     def view_longer_description_link(index = 0)
@@ -565,7 +565,7 @@ class Speedgrader
     end
 
     def save_rubric_button
-      f('button.save_rubric_button')
+      f("button.save_rubric_button")
     end
 
     def rubric_total_points
@@ -573,15 +573,15 @@ class Speedgrader
     end
 
     def rating_tiers
-      ff('.rating-tier')
+      ff(".rating-tier")
     end
 
     def rating_by_text(rating_text)
-      ff(".rating-description").select { |elt| elt.displayed? && elt.text == rating_text }[0]
+      ff(".rating-description").find { |elt| elt.displayed? && elt.text == rating_text }
     end
 
     def saved_rubric_ratings
-      ff('#rubric_summary_container .rating-description')
+      ff("#rubric_summary_container .rating-description")
     end
 
     def learning_outcome_points
@@ -597,11 +597,11 @@ class Speedgrader
     end
 
     def rubric_grade_input(criteria_id)
-      f(%{#criterion_#{criteria_id} td[data-testid="criterion-points"] input})
+      f(%(#criterion_#{criteria_id} td[data-testid="criterion-points"] input))
     end
 
     def rubric_graded_points(index = 0)
-      ffj('.react-rubric-cell.graded-points:visible')[index]
+      ffj(".react-rubric-cell.graded-points:visible")[index]
     end
 
     def comment_button_for_row(row_text)
@@ -686,7 +686,7 @@ class Speedgrader
       comment_library_link.click
       comment_library_text_area.send_keys(comment)
       comment_library_add_button.click
-      f('.flashalert-message button').click
+      f(".flashalert-message button").click
       Speedgrader.comment_library_close_button.click
     end
   end

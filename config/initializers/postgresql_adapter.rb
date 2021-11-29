@@ -23,14 +23,14 @@ class QuotedValue < String
 end
 
 module PostgreSQLAdapterExtensions
-  def receive_timeout_wrapper
+  def receive_timeout_wrapper(&block)
     return yield unless @config[:receive_timeout]
 
-    Timeout.timeout(@config[:receive_timeout], PG::ConnectionBad, "receive timeout") { yield }
+    Timeout.timeout(@config[:receive_timeout], PG::ConnectionBad, "receive timeout", &block)
   end
 
-  %I{begin_db_transaction create_savepoint active?}.each do |method|
-    class_eval <<-RUBY, __FILE__, __LINE__ + 1
+  %I[begin_db_transaction create_savepoint active?].each do |method|
+    class_eval <<~RUBY, __FILE__, __LINE__ + 1
       def #{method}(*)
         receive_timeout_wrapper { super }
       end
@@ -50,9 +50,9 @@ module PostgreSQLAdapterExtensions
 
   def bulk_insert(table_name, records)
     keys = records.first.keys
-    quoted_keys = keys.map { |k| quote_column_name(k) }.join(', ')
+    quoted_keys = keys.map { |k| quote_column_name(k) }.join(", ")
     execute "COPY #{quote_table_name(table_name)} (#{quoted_keys}) FROM STDIN"
-    raw_connection.put_copy_data records.inject(+'') { |result, record|
+    raw_connection.put_copy_data records.inject(+"") { |result, record|
                                    result << keys.map { |k| quote_text(record[k]) }.join("\t") << "\n"
                                  }
     ActiveRecord::Base.connection.clear_query_cache
@@ -92,7 +92,7 @@ module PostgreSQLAdapterExtensions
   # have max length validations in the models.
   def type_to_sql(type, limit: nil, **)
     if type == :text && limit
-      if limit <= 10485760
+      if limit <= 10_485_760
         type = :string
       else
         limit = nil
@@ -104,7 +104,7 @@ module PostgreSQLAdapterExtensions
   def func(name, *args)
     case name
     when :group_concat
-      "string_agg((#{func_arg_esc(args.first)})::text, #{quote(args[1] || ',')})"
+      "string_agg((#{func_arg_esc(args.first)})::text, #{quote(args[1] || ",")})"
     else
       super
     end
@@ -115,7 +115,7 @@ module PostgreSQLAdapterExtensions
     # dependent on the primary keys, that's only true if the FROM items are
     # all tables (i.e. not subselects). to keep things simple, we always
     # specify all columns for postgres
-    infer_group_by_columns(columns).flatten.join(', ')
+    infer_group_by_columns(columns).flatten.join(", ")
   end
 
   # ActiveRecord 3.2 ignores indexes if it cannot parse the column names
@@ -124,7 +124,7 @@ module PostgreSQLAdapterExtensions
   def indexes(table_name)
     schema = shard.name
 
-    result = query(<<~SQL, 'SCHEMA')
+    result = query(<<~SQL.squish, "SCHEMA")
        SELECT distinct i.relname, d.indisunique, d.indkey, pg_get_indexdef(d.indexrelid), t.oid
        FROM pg_class t
        INNER JOIN pg_index d ON t.oid = d.indrelid
@@ -132,18 +132,18 @@ module PostgreSQLAdapterExtensions
        WHERE i.relkind = 'i'
          AND d.indisprimary = 'f'
          AND t.relname = '#{table_name}'
-         AND t.relnamespace IN (SELECT oid FROM pg_namespace WHERE nspname = #{schema ? "'#{schema}'" : 'ANY (current_schemas(false))'} )
+         AND t.relnamespace IN (SELECT oid FROM pg_namespace WHERE nspname = #{schema ? "'#{schema}'" : "ANY (current_schemas(false))"} )
       ORDER BY i.relname
     SQL
 
     result.map do |row|
       index_name = row[0]
-      unique = row[1] == 't'
-      indkey = row[2].split(" ")
+      unique = row[1] == "t"
+      indkey = row[2].split
       inddef = row[3]
       oid = row[4]
 
-      columns = Hash[query(<<~SQL, "SCHEMA")]
+      columns = query(<<~SQL.squish, "SCHEMA").to_h
         SELECT a.attnum, a.attname
         FROM pg_attribute a
         WHERE a.attrelid = #{oid}
@@ -154,15 +154,15 @@ module PostgreSQLAdapterExtensions
 
       # add info on sort order for columns (only desc order is explicitly specified, asc is the default)
       desc_order_columns = inddef.scan(/(\w+) DESC/).flatten
-      orders = desc_order_columns.any? ? Hash[desc_order_columns.map { |order_column| [order_column, :desc] }] : {}
+      orders = desc_order_columns.any? ? desc_order_columns.index_with { :desc } : {}
 
       ActiveRecord::ConnectionAdapters::IndexDefinition.new(table_name, index_name, unique, column_names, orders: orders)
     end
   end
 
   def index_exists?(_table_name, columns, _options = {})
-    raise ArgumentError.new("if you're identifying an index by name only, you should use index_name_exists?") if columns.is_a?(Hash) && columns[:name]
-    raise ArgumentError.new("columns should be a string, a symbol, or an array of those ") unless columns.is_a?(String) || columns.is_a?(Symbol) || columns.is_a?(Array)
+    raise ArgumentError, "if you're identifying an index by name only, you should use index_name_exists?" if columns.is_a?(Hash) && columns[:name]
+    raise ArgumentError, "columns should be a string, a symbol, or an array of those " unless columns.is_a?(String) || columns.is_a?(Symbol) || columns.is_a?(Array)
 
     super
   end
@@ -186,7 +186,7 @@ module PostgreSQLAdapterExtensions
         table = ActiveRecord::ConnectionAdapters::PostgreSQL::Name.new(provided_index.schema, table.identifier) unless table.schema.present?
 
         if provided_index.schema.present? && table.schema != provided_index.schema
-          raise ArgumentError.new("Index schema '#{provided_index.schema}' does not match table schema '#{table.schema}'")
+          raise ArgumentError, "Index schema '#{provided_index.schema}' does not match table schema '#{table.schema}'"
         end
       end
 
@@ -197,7 +197,7 @@ module PostgreSQLAdapterExtensions
       algorithm =
         if options.is_a?(Hash) && options.key?(:algorithm)
           index_algorithms.fetch(options[:algorithm]) do
-            raise ArgumentError.new("Algorithm must be one of the following: #{index_algorithms.keys.map(&:inspect).join(', ')}")
+            raise ArgumentError, "Algorithm must be one of the following: #{index_algorithms.keys.map(&:inspect).join(", ")}"
           end
         end
       algorithm = nil if open_transactions > 0
@@ -218,14 +218,14 @@ module PostgreSQLAdapterExtensions
     checks = []
 
     if options.is_a?(Hash)
-      checks << lambda { |i| i.name == options[:name].to_s } if options.key?(:name)
+      checks << ->(i) { i.name == options[:name].to_s } if options.key?(:name)
       column_names = index_column_names(options[:column])
     else
       column_names = index_column_names(options)
     end
 
     if column_names.present?
-      checks << lambda { |i| index_name(table_name, i.columns) == index_name(table_name, column_names) }
+      checks << ->(i) { index_name(table_name, i.columns) == index_name(table_name, column_names) }
     end
 
     raise ArgumentError, "No name or columns specified" if checks.none?
@@ -234,7 +234,7 @@ module PostgreSQLAdapterExtensions
 
     if matching_indexes.count > 1
       raise ArgumentError, "Multiple indexes found on #{table_name} columns #{column_names}. " \
-                           "Specify an index name from #{matching_indexes.map(&:name).join(', ')}"
+                           "Specify an index name from #{matching_indexes.map(&:name).join(", ")}"
     elsif matching_indexes.none?
       return if options.is_a?(Hash) && options[:if_exists]
 
@@ -293,9 +293,9 @@ module PostgreSQLAdapterExtensions
   end
 
   def icu_collations
-    return [] if postgresql_version < 120000
+    return [] if postgresql_version < 12_00_00 # rubocop:disable Style/NumericLiterals
 
-    @collations ||= select_rows <<~SQL, "SCHEMA"
+    @collations ||= select_rows <<~SQL.squish, "SCHEMA"
       SELECT nspname, collname
       FROM pg_collation
       INNER JOIN pg_namespace ON collnamespace=pg_namespace.oid
@@ -307,7 +307,7 @@ module PostgreSQLAdapterExtensions
   end
 
   def create_icu_collations
-    return if postgresql_version < 120000
+    return if postgresql_version < 12_00_00 # rubocop:disable Style/NumericLiterals
 
     original_locale = I18n.locale
 
@@ -317,7 +317,7 @@ module PostgreSQLAdapterExtensions
     end
 
     I18n.available_locales.each do |locale|
-      next if locale.to_s.include?('-x-')
+      next if locale.to_s.include?("-x-")
 
       I18n.locale = locale
       next if Canvas::ICU.collator.rules.empty?
@@ -382,8 +382,8 @@ module SchemaCreationExtensions
     sql = +"CONSTRAINT #{quote_column_name(o.name)}"
     sql << " FOREIGN KEY (#{quote_column_name(o.column)})" if constraint_type == :table
     sql << " REFERENCES #{quote_table_name(o.to_table)} (#{quote_column_name(o.primary_key)})"
-    sql << " #{action_sql('DELETE', o.on_delete)}" if o.on_delete
-    sql << " #{action_sql('UPDATE', o.on_update)}" if o.on_update
+    sql << " #{action_sql("DELETE", o.on_delete)}" if o.on_delete
+    sql << " #{action_sql("UPDATE", o.on_update)}" if o.on_update
     sql
   end
 

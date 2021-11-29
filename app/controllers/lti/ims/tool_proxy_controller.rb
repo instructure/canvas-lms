@@ -24,21 +24,21 @@ module Lti
       include Lti::ApiServiceHelper
       include Lti::IMS::AccessTokenHelper
 
-      TOOL_PROXY_COLLECTION = 'ToolProxy.collection'
-      TOOL_PROXY_ITEM = 'ToolProxy.item'
+      TOOL_PROXY_COLLECTION = "ToolProxy.collection"
+      TOOL_PROXY_ITEM = "ToolProxy.item"
 
       SERVICE_DEFINITIONS = [
         {
           id: TOOL_PROXY_COLLECTION,
           endpoint: ->(context) { "api/lti/#{context.class.name.downcase}s/#{context.id}/tool_proxy" },
-          format: ['application/vnd.ims.lti.v2.toolproxy+json'].freeze,
-          action: ['POST'].freeze
+          format: ["application/vnd.ims.lti.v2.toolproxy+json"].freeze,
+          action: ["POST"].freeze
         }.freeze,
         {
           id: TOOL_PROXY_ITEM,
-          endpoint: 'api/lti/tool_proxy/{tool_proxy_guid}',
-          format: ['application/vnd.ims.lti.v2.toolproxy+json'].freeze,
-          action: ['GET'].freeze
+          endpoint: "api/lti/tool_proxy/{tool_proxy_guid}",
+          format: ["application/vnd.ims.lti.v2.toolproxy+json"].freeze,
+          action: ["GET"].freeze
         }.freeze
       ].freeze
 
@@ -46,19 +46,19 @@ module Lti
         [TOOL_PROXY_COLLECTION, TOOL_PROXY_ITEM]
       end
 
-      before_action :require_context, :except => [:show]
-      skip_before_action :load_user, only: [:create, :show, :re_reg]
+      before_action :require_context, except: [:show]
+      skip_before_action :load_user, only: %i[create show re_reg]
 
       rescue_from Lti::Errors::InvalidToolProxyError, ::IMS::LTI::Errors::InvalidToolConsumerProfile do |exception|
-        render json: exception.as_json, status: 400
+        render json: exception.as_json, status: :bad_request
       end
 
       def show
-        tool_proxy = ToolProxy.where(guid: params['tool_proxy_guid']).first
+        tool_proxy = ToolProxy.where(guid: params["tool_proxy_guid"]).first
         if tool_proxy && oauth_authenticated_request?(tool_proxy.shared_secret)
-          render json: tool_proxy.raw_data, content_type: 'application/vnd.ims.lti.v2.toolproxy+json'
+          render json: tool_proxy.raw_data, content_type: "application/vnd.ims.lti.v2.toolproxy+json"
         else
-          render json: { error: 'unauthorized' }, status: :unauthorized
+          render json: { error: "unauthorized" }, status: :unauthorized
         end
       end
 
@@ -68,22 +68,26 @@ module Lti
             validate_access_token!
             reg_key = access_token.reg_key
             reg_info = RegistrationRequestService.retrieve_registration_password(context, reg_key) if reg_key
-            render_new_tool_proxy(
-              context: context,
-              tool_proxy_guid: reg_key,
-              dev_key: developer_key,
-              registration_url: reg_info[:registration_url]
-            ) and return if reg_info.present?
+            if reg_info.present?
+              render_new_tool_proxy(
+                context: context,
+                tool_proxy_guid: reg_key,
+                dev_key: developer_key,
+                registration_url: reg_info[:registration_url]
+              ) and return
+            end
           rescue Lti::OAuth2::InvalidTokenError
             render_unauthorized and return
           end
         elsif request.authorization.present?
           secret = RegistrationRequestService.retrieve_registration_password(context, oauth_consumer_key)
-          render_new_tool_proxy(
-            context: context,
-            tool_proxy_guid: oauth_consumer_key,
-            registration_url: secret[:registration_url]
-          ) and return if secret.present? && oauth_authenticated_request?(secret[:reg_password])
+          if secret.present? && oauth_authenticated_request?(secret[:reg_password])
+            render_new_tool_proxy(
+              context: context,
+              tool_proxy_guid: oauth_consumer_key,
+              registration_url: secret[:registration_url]
+            ) and return
+          end
         end
         render_unauthorized
       end
@@ -129,9 +133,9 @@ module Lti
         end
 
         tp.save
-        render json: json, status: :created, content_type: 'application/vnd.ims.lti.v2.toolproxy.id+json'
+        render json: json, status: :created, content_type: "application/vnd.ims.lti.v2.toolproxy.id+json"
       rescue JSON::ParserError
-        render json: { error: 'Invalid request' }, status: 400
+        render json: { error: "Invalid request" }, status: :bad_request
       end
 
       private
@@ -152,14 +156,14 @@ module Lti
           "tool_proxy_guid" => tool_proxy.guid
         }
         json["tc_half_shared_secret"] = tp_service.tc_half_secret if tp_service.tc_half_secret
-        render json: json, status: :created, content_type: 'application/vnd.ims.lti.v2.toolproxy.id+json'
+        render json: json, status: :created, content_type: "application/vnd.ims.lti.v2.toolproxy.id+json"
       end
 
       def payload
-        @payload ||= (
+        @payload ||= begin
           request.body.rewind
           request.body.read
-        )
+        end
       end
 
       def tp_validator(tcp_uuid: nil)

@@ -21,7 +21,7 @@ module Canvas
   module DynamoDB
     module DevUtils
       SCHEMA_FIXTURES = {
-        'graphql_mutations' => {
+        "graphql_mutations" => {
           attribute_definitions: [
             { attribute_name: "object_id", attribute_type: "S" },
             { attribute_name: "mutation_id", attribute_type: "S" },
@@ -62,12 +62,12 @@ module Canvas
                                    })
         begin
           result = dynamodb.create_table(params)
-          Rails.logger.debug('Created table. Status: ' + result.table_description.table_status)
-          return true
-        rescue Aws::DynamoDB::Errors::ServiceError => error
-          Rails.logger.debug('Unable to create table:')
-          Rails.logger.debug(error.message)
-          return false
+          Rails.logger.debug("Created table. Status: " + result.table_description.table_status)
+          true
+        rescue Aws::DynamoDB::Errors::ServiceError => e
+          Rails.logger.debug("Unable to create table:")
+          Rails.logger.debug(e.message)
+          false
         end
       end
     end

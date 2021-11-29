@@ -123,7 +123,7 @@ class NotificationMessageCreator
   def build_fallback_for(user, channel)
     # delayed_messages are only sent to email channels.
     # some types of notifications are only for immediate.
-    return unless @notification.summarizable? && channel.path_type == 'email'
+    return unless @notification.summarizable? && channel.path_type == "email"
     # we only send fallback when we did not send an immediate message, ie.
     # when the channel is bouncing or there have been too_many_messages
     return unless channel.bouncing? || too_many_messages_for?(user)
@@ -131,11 +131,11 @@ class NotificationMessageCreator
     fallback_policy = nil
     NotificationPolicy.unique_constraint_retry do
       # notification_policies are already loaded, so use find instead of generating a query
-      fallback_policy = channel.notification_policies.find { |np| np.frequency == 'daily' && np.notification_id == nil }
-      fallback_policy ||= channel.notification_policies.create!(frequency: 'daily')
+      fallback_policy = channel.notification_policies.find { |np| np.frequency == "daily" && np.notification_id.nil? }
+      fallback_policy ||= channel.notification_policies.create!(frequency: "daily")
     end
 
-    InstStatsd::Statsd.increment("message.fall_back_used", short_stat: 'message.fall_back_used')
+    InstStatsd::Statsd.increment("message.fall_back_used", short_stat: "message.fall_back_used")
     build_summary_for(user, fallback_policy)
   end
 
@@ -143,12 +143,12 @@ class NotificationMessageCreator
   def build_delayed_message_for(user, channel)
     # delayed_messages are only sent to email channels.
     # some types of notifications are only for immediate.
-    return unless @notification.summarizable? && channel.path_type == 'email'
+    return unless @notification.summarizable? && channel.path_type == "email"
 
     policy = effective_policy_for(user, channel)
     # if the policy is not daily or weekly, it is either immediate which was
     # picked up before in build_immediate_message_for, or it's never.
-    return unless %w(daily weekly).include?(policy&.frequency)
+    return unless %w[daily weekly].include?(policy&.frequency)
 
     build_summary_for(user, policy) if policy
   end
@@ -156,20 +156,20 @@ class NotificationMessageCreator
   def build_summary_for(user, policy)
     user.shard.activate do
       message = user.messages.build(message_options_for(user))
-      message.parse!('summary', root_account: @account)
-      delayed_message = policy.delayed_messages.build(:notification => @notification,
-                                                      :frequency => policy.frequency,
+      message.parse!("summary", root_account: @account)
+      delayed_message = policy.delayed_messages.build(notification: @notification,
+                                                      frequency: policy.frequency,
                                                       # policy.communication_channel should
                                                       # already be loaded in memory as the
                                                       # inverse association of loading the
                                                       # policy from the channel. passing the
                                                       # object through here lets the delayed
                                                       # message use it without having to re-query.
-                                                      :communication_channel => policy.communication_channel,
-                                                      :root_account_id => message.context_root_account.try(:id),
-                                                      :name_of_topic => message.subject,
-                                                      :link => message.url,
-                                                      :summary => message.body)
+                                                      communication_channel: policy.communication_channel,
+                                                      root_account_id: message.context_root_account.try(:id),
+                                                      name_of_topic: message.subject,
+                                                      link: message.url,
+                                                      summary: message.body)
       delayed_message.context = @asset
       delayed_message.save! if Rails.env.test?
       delayed_message
@@ -179,12 +179,12 @@ class NotificationMessageCreator
   def build_immediate_message_for(user, channel)
     # if we have already created a fallback message, we don't want to make an
     # immediate message.
-    return if @notification.summarizable? && too_many_messages_for?(user) && ['email', 'sms'].include?(channel.path_type)
+    return if @notification.summarizable? && too_many_messages_for?(user) && ["email", "sms"].include?(channel.path_type)
 
     message_options = message_options_for(user)
     message = user.messages.build(message_options.merge(communication_channel: channel, to: channel.path))
     message&.parse!(root_account: @account)
-    message.workflow_state = 'bounced' if channel.bouncing?
+    message.workflow_state = "bounced" if channel.bouncing?
     message
   end
 
@@ -209,7 +209,7 @@ class NotificationMessageCreator
     # if a user has never logged in, let's not spam the dashboard for no reason.
     return unless @notification.dashboard? && @notification.show_in_feed? && !user.pre_registered?
 
-    message = user.messages.build(message_options_for(user).merge(:to => 'dashboard'))
+    message = user.messages.build(message_options_for(user).merge(to: "dashboard"))
     message.parse!(root_account: @account)
     message
   end
@@ -227,8 +227,8 @@ class NotificationMessageCreator
     # root_account, the course_id needs to be provided in the notification from
     # broadcast_policy in message_data, the lowest level override is the one
     # that should be respected.
-    policy = override_policy_for(channel, 'Course')
-    policy ||= override_policy_for(channel, 'Account')
+    policy = override_policy_for(channel, "Course")
+    policy ||= override_policy_for(channel, "Account")
     if !policy && should_use_default_policy?(user, channel)
       begin
         policy = channel.notification_policies.create!(notification_id: @notification.id, frequency: @notification.default_frequency(user))
@@ -260,9 +260,9 @@ class NotificationMessageCreator
     # an array and can only have one for a given context and channel.
     ops = channel.notification_policy_overrides.select { |np| np.notification_id == @notification.id && np.context_type == context_type }
     case context_type
-    when 'Course'
+    when "Course"
       ops.find { |np| courses.map(&:id).include?(np.context_id) } if courses&.any?
-    when 'Account'
+    when "Account"
       ops.find { |np| np.context_id == account.id } if account
     end
   end
@@ -319,11 +319,11 @@ class NotificationMessageCreator
     user_asset = asset_applied_to(user)
 
     message_options = {
-      :subject => @notification.subject,
-      :notification => @notification,
-      :notification_name => @notification.name,
-      :user => user,
-      :context => user_asset,
+      subject: @notification.subject,
+      notification: @notification,
+      notification_name: @notification.name,
+      user: user,
+      context: user_asset,
     }
 
     # can't just merge these because nil values need to be overwritten in a later merge
@@ -350,26 +350,26 @@ class NotificationMessageCreator
     return true if @notification.migration?
 
     policy = effective_policy_for(user, channel)
-    policy&.frequency == 'immediately'
+    policy&.frequency == "immediately"
   end
 
   def cancel_pending_duplicate_messages
     first_start_time = start_time = Setting.get("pending_duplicate_message_window_hours", "6").to_i.hours.ago
     final_end_time = Time.now.utc
-    first_partition = Message.infer_partition_table_name('created_at' => first_start_time)
+    first_partition = Message.infer_partition_table_name("created_at" => first_start_time)
 
     loop do
       end_time = start_time + 7.days
       end_time = final_end_time if end_time > final_end_time
       scope = Message
-              .in_partition('created_at' => start_time)
-              .where(:notification_id => @notification)
+              .in_partition("created_at" => start_time)
+              .where(notification_id: @notification)
               .for(@asset)
               .by_name(@notification.name)
               .for_user(@to_user_channels.keys)
               .cancellable
-      start_partition = Message.infer_partition_table_name('created_at' => start_time)
-      end_partition = Message.infer_partition_table_name('created_at' => end_time)
+      start_partition = Message.infer_partition_table_name("created_at" => start_time)
+      end_partition = Message.infer_partition_table_name("created_at" => end_time)
       if first_partition == start_partition &&
          start_partition == end_partition
         scope = scope.where(created_at: start_time..end_time)
@@ -381,7 +381,7 @@ class NotificationMessageCreator
         break_this_loop = true
         # else <no conditions; we're addressing the entire partition>
       end
-      scope.update_all(:workflow_state => 'cancelled') if Message.connection.table_exists?(start_partition)
+      scope.update_all(workflow_state: "cancelled") if Message.connection.table_exists?(start_partition)
 
       break if break_this_loop
 
@@ -391,7 +391,7 @@ class NotificationMessageCreator
 
   def too_many_messages_for?(user)
     if @user_counts[user.id] >= user.max_messages_per_day
-      InstStatsd::Statsd.increment("message.too_many_messages_for_was_true", short_stat: 'message.too_many_messages_for_was_true')
+      InstStatsd::Statsd.increment("message.too_many_messages_for_was_true", short_stat: "message.too_many_messages_for_was_true")
       true
     end
   end

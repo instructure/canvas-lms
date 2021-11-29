@@ -18,13 +18,13 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../views_helper'
+require_relative "../views_helper"
 
 describe "shared/_discussion_entry" do
   it "renders" do
     course_with_student
     view_context
-    render :partial => "shared/discussion_entry"
+    render partial: "shared/discussion_entry"
     expect(response).not_to be_nil
   end
 end

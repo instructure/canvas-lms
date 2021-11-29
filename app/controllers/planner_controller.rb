@@ -129,7 +129,7 @@ class PlannerController < ApplicationController
       # fetch a meta key so we can invalidate just this info and not the whole of the user's cache
       planner_overrides_meta_key = get_planner_cache_id(@current_user)
 
-      composite_cache_key = ['planner_items3',
+      composite_cache_key = ["planner_items3",
                              planner_overrides_meta_key,
                              page,
                              params[:filter],
@@ -172,16 +172,16 @@ class PlannerController < ApplicationController
 
   def public_access?
     # this is for things that are visible on courses with a public syllabus
-    params[:filter] == 'all_ungraded_todo_items'
+    params[:filter] == "all_ungraded_todo_items"
   end
 
   def collection_for_filter(filter)
     case filter
-    when 'new_activity'
+    when "new_activity"
       unread_items
-    when 'ungraded_todo_items'
+    when "ungraded_todo_items"
       ungraded_todo_items
-    when 'all_ungraded_todo_items'
+    when "all_ungraded_todo_items"
       all_ungraded_todo_items
     else
       planner_items
@@ -220,7 +220,7 @@ class PlannerController < ApplicationController
       collections << item_collection("pages_#{i}", scope, WikiPage, [:todo_date, :created_at], :id)
     end
     discussion_topic_todo_scopes.each_with_index do |scope, i|
-      collections << item_collection("discussions_#{i}", scope, DiscussionTopic, [:todo_date, :posted_at, :created_at], :id)
+      collections << item_collection("discussions_#{i}", scope, DiscussionTopic, %i[todo_date posted_at created_at], :id)
     end
     BookmarkedCollection.merge(*collections)
   end
@@ -232,7 +232,7 @@ class PlannerController < ApplicationController
     #
     # grading = @user.assignments_needing_grading(default_opts) if @domain_root_account.grants_right?(@user, :manage_grades)
     # moderation = @user.assignments_needing_moderation(default_opts)
-    viewing = @user.assignments_for_student('viewing', **default_opts)
+    viewing = @user.assignments_for_student("viewing", **default_opts)
                    .preload(:quiz, :discussion_topic, :wiki_page)
     scopes = { viewing: viewing }
     # TODO: Add when ready (see above comment)
@@ -244,38 +244,38 @@ class PlannerController < ApplicationController
 
       collections << item_collection(scope_name.to_s,
                                      scope,
-                                     Assignment, [:user_due_date, :due_at, :created_at], :id)
+                                     Assignment, %i[user_due_date due_at created_at], :id)
     end
     collections
   end
 
   def ungraded_quiz_collection
-    item_collection('ungraded_quizzes',
+    item_collection("ungraded_quizzes",
                     @user.ungraded_quizzes(**default_opts),
-                    Quizzes::Quiz, [:user_due_date, :due_at, :created_at], :id)
+                    Quizzes::Quiz, %i[user_due_date due_at created_at], :id)
   end
 
   def unread_discussion_topic_collection
-    item_collection('unread_discussion_topics',
+    item_collection("unread_discussion_topics",
                     @user.discussion_topics_needing_viewing(**default_opts.except(:include_locked))
                     .unread_for(@user),
-                    DiscussionTopic, [:todo_date, :posted_at, :delayed_post_at, :created_at], :id)
+                    DiscussionTopic, %i[todo_date posted_at delayed_post_at created_at], :id)
   end
 
   def unread_assignment_collection
     assign_scope = Assignment.active.where(context_type: "Course", context_id: @local_course_ids)
-    disc_assign_ids = DiscussionTopic.active.published.where(context_type: 'Course', context_id: @local_course_ids)
+    disc_assign_ids = DiscussionTopic.active.published.where(context_type: "Course", context_id: @local_course_ids)
                                      .where.not(assignment_id: nil).unread_for(@user).pluck(:assignment_id)
     # we can assume content participations because they're automatically created when comments
     # are made - see SubmissionComment#update_participation
     scope = assign_scope.where("assignments.muted IS NULL OR NOT assignments.muted")
                         .joins(submissions: :content_participations)
-                        .where(content_participations: { user_id: @user, workflow_state: 'unread' }).union(
+                        .where(content_participations: { user_id: @user, workflow_state: "unread" }).union(
                           assign_scope.where(id: disc_assign_ids)
                         ).due_between_for_user(start_date, end_date, @user)
-    item_collection('unread_assignment_submissions',
+    item_collection("unread_assignment_submissions",
                     scope,
-                    Assignment, [:user_due_date, :due_at, :created_at], :id)
+                    Assignment, %i[user_due_date due_at created_at], :id)
   end
 
   def planner_note_collection
@@ -283,37 +283,37 @@ class PlannerController < ApplicationController
     shard = @local_user_ids.present? ? Shard.shard_for(@local_user_ids.first) : @user.shard # TODO: fix to span multiple shards if needed
     course_ids = @course_ids.map { |id| Shard.relative_id_for(id, @user.shard, shard) }
     course_ids += [nil] if @user_ids.present?
-    item_collection('planner_notes',
+    item_collection("planner_notes",
                     shard.activate { PlannerNote.active.where(user: user, todo_date: @start_date..@end_date, course_id: course_ids) },
                     PlannerNote, [:todo_date, :created_at], :id)
   end
 
   def page_collection
-    item_collection('pages', @user.wiki_pages_needing_viewing(**default_opts.except(:include_locked)),
+    item_collection("pages", @user.wiki_pages_needing_viewing(**default_opts.except(:include_locked)),
                     WikiPage, [:todo_date, :created_at], :id)
   end
 
   def ungraded_discussion_collection
-    item_collection('ungraded_discussions', @user.discussion_topics_needing_viewing(**default_opts.except(:include_locked)),
-                    DiscussionTopic, [:todo_date, :posted_at, :created_at], :id)
+    item_collection("ungraded_discussions", @user.discussion_topics_needing_viewing(**default_opts.except(:include_locked)),
+                    DiscussionTopic, %i[todo_date posted_at created_at], :id)
   end
 
   def calendar_events_collection
-    item_collection('calendar_events',
+    item_collection("calendar_events",
                     CalendarEvent.active.not_hidden.for_user_and_context_codes(@user, @context_codes)
                        .between(@start_date, @end_date),
                     CalendarEvent, [:start_at, :created_at], :id)
   end
 
   def peer_reviews_collection
-    item_collection('peer_reviews',
+    item_collection("peer_reviews",
                     @user.submissions_needing_peer_review(**default_opts.except(:include_locked)),
                     AssessmentRequest, [{ submission: { assignment: :peer_reviews_due_at } },
                                         { assessor_asset: :cached_due_date }, :created_at], :id)
   end
 
   def item_collection(label, scope, base_model, *order_by)
-    descending = params[:order] == 'desc'
+    descending = params[:order] == "desc"
     bookmarker = Plannable::Bookmarker.new(base_model, descending, *order_by)
     [label, BookmarkedCollection.wrap(bookmarker, scope)]
   end
@@ -328,25 +328,25 @@ class PlannerController < ApplicationController
     # Since a range is needed, set values that weren't passed to a date
     # in the far past/future as to get all values before or after whichever
     # date was passed
-    @start_date = formatted_planner_date('start_date', @start_date, 10.years.ago.beginning_of_day)
-    @end_date = formatted_planner_date('end_date', @end_date, 10.years.from_now.beginning_of_day)
+    @start_date = formatted_planner_date("start_date", @start_date, 10.years.ago.beginning_of_day)
+    @end_date = formatted_planner_date("end_date", @end_date, 10.years.from_now.beginning_of_day)
   rescue InvalidDates => e
     render json: { errors: e.message.as_json }, status: :bad_request
   end
 
   def set_params
-    includes = Array.wrap(params[:include]) & %w{concluded}
+    includes = Array.wrap(params[:include]) & %w[concluded]
     @per_page = params[:per_page] || 50
-    @page = params[:page] || 'first'
-    @include_concluded = includes.include? 'concluded'
+    @page = params[:page] || "first"
+    @include_concluded = includes.include? "concluded"
 
     # for specs, that do multiple requests in a single spec, we have to reset these ivars
     @course_ids = @group_ids = @user_ids = nil
     if params[:context_codes].present?
       context_ids = ActiveRecord::Base.parse_asset_string_list(Array(params[:context_codes]))
-      @course_ids = context_ids['Course'] || []
-      @group_ids = context_ids['Group'] || []
-      @user_ids = context_ids['User'] || []
+      @course_ids = context_ids["Course"] || []
+      @group_ids = context_ids["Group"] || []
+      @user_ids = context_ids["User"] || []
       # needed for all_ungraded_todo_items, but otherwise we don't need to load the actual
       # objects
       @contexts = Context.find_all_by_asset_string(context_ids) if public_access?
@@ -371,9 +371,9 @@ class PlannerController < ApplicationController
       # fetch all the objects they requested that weren't immediately available;
       # we need to do a deep permissions check on them
       contexts_to_check_permissions = ActiveRecord::Base.find_all_by_asset_string(
-        'Course' => original_course_ids - @course_ids,
-        'Group' => original_group_ids - @group_ids,
-        'User' => original_user_ids - @user_ids
+        "Course" => original_course_ids - @course_ids,
+        "Group" => original_group_ids - @group_ids,
+        "User" => original_user_ids - @user_ids
       )
 
       perms = public_access? ? [:read, :read_syllabus] : [:read]

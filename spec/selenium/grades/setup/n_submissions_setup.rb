@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../../helpers/gradebook_common'
+require_relative "../../helpers/gradebook_common"
 
 module NSubmisssionsSetup
   # use this to create X students and Y assignments = XY Submissions
@@ -31,7 +31,7 @@ module NSubmisssionsSetup
     @students = create_users_in_course(@course, number_of_students)
 
     # assignment data
-    @group = @course.assignment_groups.create!(name: 'first assignment group', group_weight: 100)
+    @group = @course.assignment_groups.create!(name: "first assignment group", group_weight: 100)
     @assignments = []
     (1..number_of_assignments).each do |assignment_number|
       assignment = assignment_model({
@@ -39,7 +39,7 @@ module NSubmisssionsSetup
                                       name: "Assignment_#{assignment_number}",
                                       due_at: nil,
                                       points_possible: 10,
-                                      submission_types: 'online_text_entry,online_upload',
+                                      submission_types: "online_text_entry,online_upload",
                                       assignment_group: @group
                                     })
       @students[0..number_of_students].map { |student_id| assignment.grade_student(User.find(student_id), grade: 10, grader: @teacher) }

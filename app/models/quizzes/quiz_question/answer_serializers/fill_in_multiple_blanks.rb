@@ -71,7 +71,7 @@ module Quizzes::QuizQuestion::AnswerSerializers
       rc = SerializedAnswer.new
 
       unless answer_hash.is_a?(Hash) || answer_hash.is_a?(ActionController::Parameters)
-        return rc.reject :invalid_type, 'answer', Hash
+        return rc.reject :invalid_type, "answer", Hash
       end
 
       answer_hash.stringify_keys.each_pair do |blank, answer_text|
@@ -151,7 +151,7 @@ module Quizzes::QuizQuestion::AnswerSerializers
 
     # something like: "question_5_1813d2a7223184cf43e19db6622df40b"
     def answer_blank_key(blank)
-      [question_key, Util.blank_id(blank)].join('_')
+      [question_key, Util.blank_id(blank)].join("_")
     end
   end
 end

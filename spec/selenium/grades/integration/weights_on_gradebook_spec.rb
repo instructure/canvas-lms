@@ -17,12 +17,12 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../pages/gradebook_page'
-require_relative '../pages/gradebook_cells_page'
-require_relative './weighting_setup'
-require_relative './a_gradebook_shared_example'
+require_relative "../pages/gradebook_page"
+require_relative "../pages/gradebook_cells_page"
+require_relative "./weighting_setup"
+require_relative "./a_gradebook_shared_example"
 
-describe 'gradebook' do
+describe "gradebook" do
   include_context "in-process server selenium tests"
   include WeightingSetup
 
@@ -41,8 +41,8 @@ describe 'gradebook' do
 
   before(:once) do
     weighted_grading_setup
-    update_course_preferences(@teacher, selected_view_options_filters: ['gradingPeriods'])
+    update_course_preferences(@teacher, selected_view_options_filters: ["gradingPeriods"])
   end
 
-  it_behaves_like 'a gradebook'
+  it_behaves_like "a gradebook"
 end

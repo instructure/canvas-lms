@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'anonymity'
+require "anonymity"
 
 class DueDateCacher
   include Moderation
@@ -112,7 +112,7 @@ class DueDateCacher
     assignments_to_recompute = assignments || Assignment.active.where(context: course).pluck(:id)
     return if assignments_to_recompute.empty?
 
-    executing_user ||= self.current_executing_user
+    executing_user ||= current_executing_user
     due_date_cacher = new(course, assignments_to_recompute, update_grades: update_grades, original_caller: original_caller, executing_user: executing_user)
     if run_immediately
       due_date_cacher.recompute
@@ -126,14 +126,14 @@ class DueDateCacher
     course = Course.find(course) unless course.is_a?(Course)
     inst_jobs_opts[:max_attempts] ||= 10
     if assignments.nil?
-      inst_jobs_opts[:singleton] ||= "cached_due_date:calculator:Users:#{course.global_id}:#{Digest::SHA256.hexdigest(user_ids.sort.join(':'))}"
+      inst_jobs_opts[:singleton] ||= "cached_due_date:calculator:Users:#{course.global_id}:#{Digest::SHA256.hexdigest(user_ids.sort.join(":"))}"
     end
     assignments ||= Assignment.active.where(context: course).pluck(:id)
     return if assignments.empty?
 
     current_caller = caller(1..1).first
     update_grades = inst_jobs_opts.delete(:update_grades) || false
-    executing_user = inst_jobs_opts.delete(:executing_user) || self.current_executing_user
+    executing_user = inst_jobs_opts.delete(:executing_user) || current_executing_user
     due_date_cacher = new(course, assignments, user_ids, update_grades: update_grades, original_caller: current_caller, executing_user: executing_user)
 
     due_date_cacher.delay_if_production(**inst_jobs_opts).recompute
@@ -179,8 +179,8 @@ class DueDateCacher
 
         students_without_priors.each do |student_id|
           submission_info = student_due_dates[student_id]
-          due_date = submission_info[:due_at] ? "'#{submission_info[:due_at].iso8601}'::timestamptz" : 'NULL'
-          grading_period_id = submission_info[:grading_period_id] || 'NULL'
+          due_date = submission_info[:due_at] ? "'#{submission_info[:due_at].iso8601}'::timestamptz" : "NULL"
+          grading_period_id = submission_info[:grading_period_id] || "NULL"
 
           anonymous_id = Anonymity.generate_id(existing_ids: existing_anonymous_ids)
           existing_anonymous_ids << anonymous_id
@@ -237,7 +237,7 @@ class DueDateCacher
         end
 
         # prepare values for SQL interpolation
-        batch_values = batch.map { |entry| "(#{entry.join(',')})" }
+        batch_values = batch.map { |entry| "(#{entry.join(",")})" }
 
         perform_submission_upsert(batch_values)
 
@@ -281,7 +281,7 @@ class DueDateCacher
           "count(nullif(workflow_state in ('completed'), false)) as prior_count",
           "count(nullif(workflow_state in ('rejected', 'deleted'), false)) as deleted_count"
         )
-                          .where(course_id: @course, type: ['StudentEnrollment', 'StudentViewEnrollment'])
+                          .where(course_id: @course, type: ["StudentEnrollment", "StudentViewEnrollment"])
                           .group(:user_id)
 
         scope = scope.where(user_id: @user_ids) if @user_ids.present?
@@ -314,7 +314,7 @@ class DueDateCacher
     return {} if entries.empty?
 
     entries_for_query = assignment_and_student_id_values(entries: entries)
-    submissions_with_due_dates = Submission.where("(assignment_id, user_id) IN (#{entries_for_query.join(',')})")
+    submissions_with_due_dates = Submission.where("(assignment_id, user_id) IN (#{entries_for_query.join(",")})")
                                            .where.not(cached_due_date: nil)
                                            .pluck(:id, :cached_due_date)
 
@@ -325,7 +325,7 @@ class DueDateCacher
 
   def record_due_date_changes_for_auditable_assignments!(entries:, previous_cached_dates:)
     entries_for_query = assignment_and_student_id_values(entries: entries)
-    updated_submissions = Submission.where("(assignment_id, user_id) IN (#{entries_for_query.join(',')})")
+    updated_submissions = Submission.where("(assignment_id, user_id) IN (#{entries_for_query.join(",")})")
                                     .pluck(:id, :assignment_id, :cached_due_date)
 
     timestamp = Time.zone.now
@@ -340,7 +340,7 @@ class DueDateCacher
         assignment_id: assignment_id,
         submission_id: submission_id,
         user_id: @executing_user_id,
-        event_type: 'submission_updated',
+        event_type: "submission_updated",
         payload: payload.to_json,
         created_at: timestamp,
         updated_at: timestamp
@@ -366,12 +366,12 @@ class DueDateCacher
     @quiz_lti_assignments ||=
       ContentTag.joins("INNER JOIN #{ContextExternalTool.quoted_table_name} ON content_tags.content_type='ContextExternalTool' AND context_external_tools.id = content_tags.content_id")
                 .merge(ContextExternalTool.quiz_lti)
-                .where(context_type: 'Assignment'). #
+                .where(context_type: "Assignment"). #
       # We're doing the following direct postgres any() rather than .where(context_id: @assignment_ids) on advice
       # from our DBAs that the any is considerably faster in the postgres planner than the "IN ()" statement that
       # AR would have generated.
       where("content_tags.context_id = any('{?}'::int8[])", @assignment_ids)
-                .where.not(workflow_state: 'deleted').distinct.pluck(:context_id).to_set
+                .where.not(workflow_state: "deleted").distinct.pluck(:context_id).to_set
   end
 
   def existing_anonymous_ids_by_assignment_id
@@ -385,7 +385,7 @@ class DueDateCacher
 
   def perform_submission_upsert(batch_values)
     # Construct upsert statement to update existing Submissions or create them if needed.
-    query = <<~SQL
+    query = <<~SQL.squish
       UPDATE #{Submission.quoted_table_name}
         SET
           cached_due_date = vals.due_date::timestamptz,
@@ -396,7 +396,7 @@ class DueDateCacher
           anonymous_id = COALESCE(submissions.anonymous_id, vals.anonymous_id),
           cached_quiz_lti = vals.cached_quiz_lti,
           updated_at = now() AT TIME ZONE 'UTC'
-        FROM (VALUES #{batch_values.join(',')})
+        FROM (VALUES #{batch_values.join(",")})
           AS vals(assignment_id, student_id, due_date, grading_period_id, anonymous_id, cached_quiz_lti, root_account_id)
         WHERE submissions.user_id = vals.student_id AND
               submissions.assignment_id = vals.assignment_id AND
@@ -419,7 +419,7 @@ class DueDateCacher
           vals.anonymous_id,
           vals.cached_quiz_lti,
           vals.root_account_id
-        FROM (VALUES #{batch_values.join(',')})
+        FROM (VALUES #{batch_values.join(",")})
           AS vals(assignment_id, student_id, due_date, grading_period_id, anonymous_id, cached_quiz_lti, root_account_id)
         INNER JOIN #{Assignment.quoted_table_name} assignments
           ON assignments.id = vals.assignment_id

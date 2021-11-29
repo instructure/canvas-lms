@@ -25,12 +25,12 @@ describe "lti full width launch view" do
   include_context "lti_layout_spec_helper"
 
   describe "for Quizzes 2 / New Quizzes / Quizzes.Next assignments" do
-    let(:course) { course_factory(:active_course => true) }
-    let(:tool) {
+    let(:course) { course_factory(active_course: true) }
+    let(:tool) do
       dev_key = DeveloperKey.create
       tool_id = ContextExternalTool::QUIZ_LTI
       ContextExternalTool.create(developer_key: dev_key, context: course, tool_id: tool_id)
-    }
+    end
     let(:tag) { LtiLayoutSpecHelper.create_tag(tool) }
     let(:current_user) { user_with_pseudonym }
 
@@ -54,15 +54,15 @@ describe "lti full width launch view" do
         end
 
         context "with sections" do
-          let(:active_section) { add_section("Section A", { :course => course }) }
+          let(:active_section) { add_section("Section A", { course: course }) }
 
-          let(:completed_section) {
-            section = add_section("Section B", { :course => course })
+          let(:completed_section) do
+            section = add_section("Section B", { course: course })
             section.restrict_enrollments_to_section_dates = true
             section.start_at = 3.days.ago
             section.end_at = 1.day.ago
             section.tap(&:save!)
-          }
+          end
 
           it "does not warn the student in an active section about a New Quizzes being unavailable" do
             active_section.enroll_user(current_user, "StudentEnrollment", "active")
@@ -120,7 +120,7 @@ describe "lti full width launch view" do
 
     context "when the user is an observer" do
       it "warns the observer with a concluded enrollment about a New Quizzes being unavailable" do
-        course.enroll_user(current_user, 'ObserverEnrollment', enrollment_state: "completed")
+        course.enroll_user(current_user, "ObserverEnrollment", enrollment_state: "completed")
         ctrl.send(:content_tag_redirect, Account.default, tag, nil)
         expect(ctrl.response.body).to have_text("no longer available")
       end

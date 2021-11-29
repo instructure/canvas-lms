@@ -16,9 +16,9 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative 'cc_spec_helper'
+require_relative "cc_spec_helper"
 
-require 'nokogiri'
+require "nokogiri"
 
 describe CC::BasicLTILinks do
   subject { (Class.new { include CC::BasicLTILinks }).new }
@@ -34,18 +34,18 @@ describe CC::BasicLTILinks do
   describe "#create_blti_link" do
     let(:lti_doc) { Builder::XmlMarkup.new(target: xml, indent: 2) }
     # this is the target for Builder::XmlMarkup. this is how you access the generated XML
-    let(:xml) { +'' }
+    let(:xml) { +"" }
 
     it "sets the encoding to 'UTF-8'" do
       subject.create_blti_link(tool, lti_doc)
       xml_doc = Nokogiri::XML(xml) { |c| c.nonet.strict }
-      expect(xml_doc.encoding).to eq 'UTF-8'
+      expect(xml_doc.encoding).to eq "UTF-8"
     end
 
     it "sets the version to '1.0'" do
       subject.create_blti_link(tool, lti_doc)
       xml_doc = Nokogiri::XML(xml) { |c| c.nonet.strict }
-      expect(xml_doc.version).to eq '1.0'
+      expect(xml_doc.version).to eq "1.0"
     end
 
     it "sets the namespaces correctly" do
@@ -98,13 +98,13 @@ describe CC::BasicLTILinks do
     it "sets the vendor code to 'unknown'" do
       subject.create_blti_link(tool, lti_doc)
       xml_doc = Nokogiri::XML(xml) { |c| c.nonet.strict }
-      expect(xml_doc.at_xpath("//blti:vendor/lticp:code").text).to eq 'unknown'
+      expect(xml_doc.at_xpath("//blti:vendor/lticp:code").text).to eq "unknown"
     end
 
     it "sets the vendor name to 'unknown'" do
       subject.create_blti_link(tool, lti_doc)
       xml_doc = Nokogiri::XML(xml) { |c| c.nonet.strict }
-      expect(xml_doc.at_xpath("//blti:vendor/lticp:name").text).to eq 'unknown'
+      expect(xml_doc.at_xpath("//blti:vendor/lticp:name").text).to eq "unknown"
     end
 
     it "adds custom fields" do
@@ -166,7 +166,7 @@ describe CC::BasicLTILinks do
         tool.settings[:post_only] = "true"
         subject.create_blti_link(tool, lti_doc)
         xml_doc = Nokogiri::XML(xml) { |c| c.nonet.strict }
-        expect(xml_doc.at_xpath('//blti:extensions/lticm:property[@name="post_only"]').text).to eq 'true'
+        expect(xml_doc.at_xpath('//blti:extensions/lticm:property[@name="post_only"]').text).to eq "true"
       end
 
       it "doesn't add non placement extensions if their value is a collection" do
@@ -176,23 +176,23 @@ describe CC::BasicLTILinks do
         expect(xml_doc.at_xpath('//blti:extensions/lticm:property[@name="my_list"]')).to be_nil
       end
 
-      it 'does not add a client id' do
+      it "does not add a client id" do
         subject.create_blti_link(tool, lti_doc)
         xml_doc = Nokogiri::XML(xml) { |c| c.nonet.strict }
         expect(xml_doc.at_xpath('//blti:extensions/lticm:property[@name="my_list"]')).to be_nil
       end
 
-      context 'when the tool does not have a developer key' do
+      context "when the tool does not have a developer key" do
         let(:xml_doc) { Nokogiri::XML(xml) { |c| c.nonet.strict } }
 
         before { subject.create_blti_link(tool, lti_doc) }
 
-        it 'does not add the client_id property element' do
+        it "does not add the client_id property element" do
           expect(xml_doc.at_xpath('//blti:extensions/lticm:property[@name="client_id"]')).to be_nil
         end
       end
 
-      context 'when the tool has a developer key' do
+      context "when the tool has a developer key" do
         let(:developer_key) { DeveloperKey.create! }
         let(:xml_doc) { Nokogiri::XML(xml) { |c| c.nonet.strict } }
 
@@ -201,7 +201,7 @@ describe CC::BasicLTILinks do
           subject.create_blti_link(tool, lti_doc)
         end
 
-        it 'adds the client_id property element' do
+        it "adds the client_id property element" do
           expect(xml_doc.at_xpath('//blti:extensions/lticm:property[@name="client_id"]').text.to_i).to eq developer_key.global_id
         end
       end

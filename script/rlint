@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
-exit 0 if ENV['DISABLE_RUBOCOP'] == '1'
+exit 0 if ENV["DISABLE_RUBOCOP"] == "1"
 
 require "bundler/inline"
 
@@ -12,8 +12,8 @@ gemfile do
   gem "colorize", "0.8.1"
 end
 
-require_relative './linter'
-require 'optparse'
+require_relative "./linter"
+require "optparse"
 
 linter_options = {
   linter_name: "Rubocop",
@@ -54,7 +54,7 @@ OptionParser.new do |opts|
     linter_options[:comment_post_processing] = proc do |comments|
       grouped_comments = comments.group_by { |comment| comment[:rule] }
 
-      require 'pp'
+      require "pp"
       pp grouped_comments.transform_values(&:length).to_a.sort_by(&:last).reverse.to_h
       exit 0
     end
@@ -82,7 +82,7 @@ OptionParser.new do |opts|
     linter_options[:severe_levels] = SEVERITIES[SEVERITIES.index(severity)..]
   end
   opts.on("--only-severe", "Filter non-severe comments out of results") do
-    linter_options[:comment_post_processing] = ->(comments) do
+    linter_options[:comment_post_processing] = lambda do |comments|
       min_severity = SEVERITIES.index(rlint.severe_levels.first)
       comments.select do |c|
         c[:corrected] || SEVERITIES.index(c[:severity]) >= min_severity

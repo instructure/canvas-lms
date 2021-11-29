@@ -28,14 +28,14 @@ class Lti::ResourceLink < ApplicationRecord
   validates :lookup_uuid, uniqueness: { scope: [:context_id, :context_type] }
 
   belongs_to :context_external_tool
-  belongs_to :context, polymorphic: [:account, :assignment, :course]
-  belongs_to :root_account, class_name: 'Account'
+  belongs_to :context, polymorphic: %i[account assignment course]
+  belongs_to :root_account, class_name: "Account"
 
   alias_method :original_context_external_tool, :context_external_tool
 
   has_many :line_items,
            inverse_of: :resource_link,
-           class_name: 'Lti::LineItem',
+           class_name: "Lti::LineItem",
            dependent: :destroy,
            foreign_key: :lti_resource_link_id
 
@@ -55,7 +55,7 @@ class Lti::ResourceLink < ApplicationRecord
   def context_external_tool
     # Use 'current_external_tool' to lookup the tool in a way that is safe with
     # tool reinstallation and content migrations
-    raise 'Use Lti::ResourceLink#current_external_tool to lookup associated tool'
+    raise "Use Lti::ResourceLink#current_external_tool to lookup associated tool"
   end
 
   def current_external_tool(context)
@@ -93,6 +93,6 @@ class Lti::ResourceLink < ApplicationRecord
   end
 
   def set_root_account
-    self.root_account_id ||= self.original_context_external_tool&.root_account_id
+    self.root_account_id ||= original_context_external_tool&.root_account_id
   end
 end

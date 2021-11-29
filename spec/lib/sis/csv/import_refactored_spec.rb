@@ -156,17 +156,17 @@ describe SIS::CSV::ImportRefactored do
       ",U008,student,S008S,deleted,",
       ",U009,student,S005S,deleted,"
     )
-    expect {
+    expect do
       process_csv_data_cleanly(
         "group_id,name,account_id,status",
         "G001,Group 1,,available",
         "G002,Group 2,,deleted",
         "G003,Group 3,,closed"
       )
-    }.not_to raise_error
+    end.not_to raise_error
   end
 
-  it 'supports sis stickiness overriding' do
+  it "supports sis stickiness overriding" do
     before_count = AbstractCourse.count
     process_csv_data_cleanly(
       "term_id,name,status,start_date,end_date",
@@ -209,7 +209,7 @@ describe SIS::CSV::ImportRefactored do
     process_csv_data_cleanly(
       "abstract_course_id,short_name,long_name,account_id,term_id,status",
       "C001,Thea101,Theater,A001,T001,active",
-      { :override_sis_stickiness => true }
+      { override_sis_stickiness: true }
     )
     expect(AbstractCourse.count).to eq before_count + 1
     AbstractCourse.last.tap do |c|
@@ -227,7 +227,7 @@ describe SIS::CSV::ImportRefactored do
     end
   end
 
-  it 'allows turning on stickiness' do
+  it "allows turning on stickiness" do
     before_count = AbstractCourse.count
     process_csv_data_cleanly(
       "term_id,name,status,start_date,end_date",
@@ -258,7 +258,7 @@ describe SIS::CSV::ImportRefactored do
     process_csv_data_cleanly(
       "abstract_course_id,short_name,long_name,account_id,term_id,status",
       "C001,Phys101,Physics,A001,T001,active",
-      { :add_sis_stickiness => true }
+      { add_sis_stickiness: true }
     )
     process_csv_data_cleanly(
       "abstract_course_id,short_name,long_name,account_id,term_id,status",
@@ -271,7 +271,7 @@ describe SIS::CSV::ImportRefactored do
     end
   end
 
-  it 'allows turning off stickiness' do
+  it "allows turning off stickiness" do
     before_count = AbstractCourse.count
     process_csv_data_cleanly(
       "term_id,name,status,start_date,end_date",
@@ -314,8 +314,8 @@ describe SIS::CSV::ImportRefactored do
     process_csv_data_cleanly(
       "abstract_course_id,short_name,long_name,account_id,term_id,status",
       "C001,Thea101,Theater,A001,T001,active",
-      { :override_sis_stickiness => true,
-        :clear_sis_stickiness => true }
+      { override_sis_stickiness: true,
+        clear_sis_stickiness: true }
     )
     expect(AbstractCourse.count).to eq before_count + 1
     AbstractCourse.last.tap do |c|
@@ -334,11 +334,11 @@ describe SIS::CSV::ImportRefactored do
   end
 
   it "does not invalidly break up UTF-8 characters" do
-    expect {
+    expect do
       process_csv_data_cleanly(
         File.read(File.expand_path("#{File.dirname(__FILE__)}/../../../fixtures/sis/utf8.csv"))
       )
-    }.not_to raise_error
+    end.not_to raise_error
   end
 
   it "ignores BOM chars" do
@@ -349,14 +349,14 @@ describe SIS::CSV::ImportRefactored do
     end.not_to raise_error
   end
 
-  it 'does not fail on mac zip files' do
+  it "does not fail on mac zip files" do
     path = File.expand_path("#{File.dirname(__FILE__)}/../../../fixtures/sis/mac_sis_batch.zip")
     importer = process_csv_data(files: path)
     expect(importer.errors).to eq []
   end
 
   describe "parallel imports" do
-    it 'retries an importer once locally' do
+    it "retries an importer once locally" do
       expect_any_instance_of(SIS::CSV::ImportRefactored).to receive(:run_parallel_importer).twice.and_call_original
       expect_any_instance_of(SIS::CSV::ImportRefactored).to receive(:try_importing_segment).twice.and_call_original
       # don't actually run the job.
@@ -369,8 +369,8 @@ describe SIS::CSV::ImportRefactored do
       )
     end
 
-    it 'alsoes retry in a new job' do
-      Setting.set('number_of_tries_before_failing', 2)
+    it "alsoes retry in a new job" do
+      Setting.set("number_of_tries_before_failing", 2)
       allow(InstStatsd::Statsd).to receive(:increment)
       expect_any_instance_of(SIS::CSV::ImportRefactored).to receive(:run_parallel_importer).exactly(6).and_call_original
       expect_any_instance_of(SIS::CSV::ImportRefactored).to receive(:try_importing_segment).exactly(6).and_call_original
@@ -387,14 +387,14 @@ describe SIS::CSV::ImportRefactored do
       process_csv_data("term_id,name,status", "T001,Winter13,active")
 
       [0, 1, 2].each do |i|
-        expect(InstStatsd::Statsd).to have_received(:increment).once.with('sis_parallel_worker',
+        expect(InstStatsd::Statsd).to have_received(:increment).once.with("sis_parallel_worker",
                                                                           tags: { attempt: i, retry: false })
-        expect(InstStatsd::Statsd).to have_received(:increment).once.with('sis_parallel_worker',
+        expect(InstStatsd::Statsd).to have_received(:increment).once.with("sis_parallel_worker",
                                                                           tags: { attempt: i, retry: true })
       end
     end
 
-    it 'only runs an importer once if successful' do
+    it "only runs an importer once if successful" do
       expect_any_instance_of(SIS::CSV::ImportRefactored).to receive(:run_parallel_importer).once.and_call_original
       process_csv_data(
         "term_id,name,status",
@@ -428,8 +428,10 @@ describe SIS::CSV::ImportRefactored do
           tf
         end
       end
-      csv_string = "term_id,name,status\n" +
-                   "\"T001\",\"Winter13\",active"
+      csv_string = <<~CSV
+        term_id,name,status
+        "T001","Winter13",active
+      CSV
       fake_attachment = flakey_attachment_cls.new(csv_string)
       root_account = account_model
       user = user_model

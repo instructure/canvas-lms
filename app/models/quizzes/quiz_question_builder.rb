@@ -18,10 +18,10 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class Quizzes::QuizQuestionBuilder
-  QUIZ_GROUP_ENTRY = 'quiz_group'
+  QUIZ_GROUP_ENTRY = "quiz_group"
   DEFAULT_OPTIONS = {
     shuffle_answers: false
-  }
+  }.freeze
 
   class << self
     def t(*args)
@@ -60,11 +60,9 @@ class Quizzes::QuizQuestionBuilder
         end
 
       # A normal question:
-      else
-        if val[:answers]
-          val[:answers] = shuffle_answers(val)
-          val[:matches] = shuffle_matches(val) if val[:matches]
-        end
+      elsif val[:answers]
+        val[:answers] = shuffle_answers(val)
+        val[:matches] = shuffle_matches(val) if val[:matches]
       end
     end
   end
@@ -89,7 +87,7 @@ class Quizzes::QuizQuestionBuilder
 
     # initially, exclude all the questions defined locally in the quiz from bank
     # selections:
-    mark_picked(quiz_data.select { |d| d[:entry_type] != QUIZ_GROUP_ENTRY })
+    mark_picked(quiz_data.reject { |d| d[:entry_type] == QUIZ_GROUP_ENTRY })
 
     quiz_data.reduce([]) do |submission_questions, descriptor|
       # pulling from question bank
@@ -133,7 +131,7 @@ class Quizzes::QuizQuestionBuilder
 
   def self.decorate_question_for_submission(q, position)
     question_name = t(
-      '#quizzes.quiz.question_name_counter',
+      "#quizzes.quiz.question_name_counter",
       "Question %{question_number}", {
         question_number: position
       }
@@ -143,14 +141,14 @@ class Quizzes::QuizQuestionBuilder
 
     case q[:question_type]
     when ::Quizzes::QuizQuestion::Q_TEXT_ONLY
-      question_name = t('#quizzes.quiz.default_text_only_question_name', 'Spacer')
+      question_name = t("#quizzes.quiz.default_text_only_question_name", "Spacer")
     when ::Quizzes::QuizQuestion::Q_FILL_IN_MULTIPLE_BLANKS
       text = q[:question_text]
-      variables = q[:answers].map { |a| a[:blank_id] }.uniq
+      variables = q[:answers].pluck(:blank_id).uniq
       variables.each do |variable|
         variable_id = ::AssessmentQuestion.variable_id(variable)
         re = Regexp.new("\\[#{variable}\\]")
-        text = text.sub re, <<-HTML
+        text = text.sub re, <<~HTML
           <input
             class='question_input'
             type='text'
@@ -165,7 +163,7 @@ class Quizzes::QuizQuestionBuilder
       q[:question_text] = text
     when ::Quizzes::QuizQuestion::Q_MULTIPLE_DROPDOWNS
       text = q[:question_text]
-      variables = q[:answers].map { |a| a[:blank_id] }.uniq
+      variables = q[:answers].pluck(:blank_id).uniq
       variables.each do |variable|
         variable_id = ::AssessmentQuestion.variable_id(variable)
         variable_answers = q[:answers].select { |a| a[:blank_id] == variable }
@@ -175,10 +173,10 @@ class Quizzes::QuizQuestionBuilder
           "<option value='#{a[:id]}'>#{CGI.escapeHTML(answer_text)}</option>"
         end
 
-        select = <<-HTML
+        select = <<~HTML
           <select class='question_input' name='question_#{q[:id]}_#{variable_id}'>
             <option value=''>
-              #{ERB::Util.h(t('#quizzes.quiz.default_question_input', "[ Select ]"))}
+              #{ERB::Util.h(t("#quizzes.quiz.default_question_input", "[ Select ]"))}
             </option>
             #{options}
           </select>
@@ -243,15 +241,15 @@ class Quizzes::QuizQuestionBuilder
 
   def shuffleable_question_type?(question_type)
     # TODO: constantize
-    ![
-      "true_false_question",
-      "matching_question",
-      "fill_in_multiple_blanks_question"
+    !%w[
+      true_false_question
+      matching_question
+      fill_in_multiple_blanks_question
     ].include?(question_type)
   end
 
   def mark_picked(questions)
-    @picked[:aq].concat(questions.map { |q| q[:assessment_question_id] }).uniq!
-    @picked[:qq].concat(questions.map { |q| q[:id] })
+    @picked[:aq].concat(questions.pluck(:assessment_question_id)).uniq!
+    @picked[:qq].concat(questions.pluck(:id))
   end
 end

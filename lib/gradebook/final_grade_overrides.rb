@@ -110,7 +110,7 @@ module Gradebook
     end
 
     def student_enrollments_scope
-      workflow_states = [:active, :inactive, :completed, :invited]
+      workflow_states = %i[active inactive completed invited]
       student_enrollments = @course.enrollments.where(
         workflow_state: workflow_states,
         type: [:StudentEnrollment, :StudentViewEnrollment]

@@ -24,7 +24,7 @@ module Outcomes
     class DataFormatError < RuntimeError; end
 
     OBJECT_ONLY_FIELDS = %i[calculation_method calculation_int ratings].freeze
-    VALID_WORKFLOWS = [nil, '', 'active', 'deleted'].freeze
+    VALID_WORKFLOWS = [nil, "", "active", "deleted"].freeze
 
     def check_object(object)
       %i[vendor_guid title].each do |field|
@@ -37,15 +37,15 @@ module Outcomes
       if object[:vendor_guid].match?(/\s/)
         raise InvalidDataError, I18n.t(
           'The "%{field}" field must have no spaces',
-          field: 'vendor_guid'
+          field: "vendor_guid"
         )
       end
       unless VALID_WORKFLOWS.include? object[:workflow_state]
         raise InvalidDataError, I18n.t(
           '"%{field}" must be either "%{active}" or "%{deleted}"',
-          field: 'workflow_state',
-          active: 'active',
-          deleted: 'deleted'
+          field: "workflow_state",
+          active: "active",
+          deleted: "deleted"
         )
       end
     end
@@ -54,14 +54,15 @@ module Outcomes
       check_object(object)
 
       type = object[:object_type]
-      if type == 'outcome'
+      case type
+      when "outcome"
         import_outcome(object)
-      elsif type == 'group'
+      when "group"
         import_group(object)
       else
         raise InvalidDataError, I18n.t(
           'Invalid %{field}: "%{type}"',
-          field: 'object_type',
+          field: "object_type",
           type: type
         )
       end
@@ -73,7 +74,7 @@ module Outcomes
       end
       if invalid.present?
         raise InvalidDataError, I18n.t(
-          'Invalid fields for a group: %{invalid}',
+          "Invalid fields for a group: %{invalid}",
           invalid: invalid.map(&:to_s).inspect
         )
       end
@@ -86,7 +87,7 @@ module Outcomes
       model = find_prior_group(group)
       unless model.context == context
         raise InvalidDataError, I18n.t(
-          'Group with ID %{guid} already exists in another unrelated course or account (%{name})',
+          "Group with ID %{guid} already exists in another unrelated course or account (%{name})",
           guid: group[:vendor_guid],
           name: model.context.name
         )
@@ -99,13 +100,13 @@ module Outcomes
       end
       model.vendor_guid = group[:vendor_guid]
       model.title = group[:title]
-      model.description = group[:description] || ''
-      model.workflow_state = group[:workflow_state].presence || 'active'
+      model.description = group[:description] || ""
+      model.workflow_state = group[:workflow_state].presence || "active"
       model.learning_outcome_group = parent
       model.outcome_import_id = outcome_import_id
       model.save!
 
-      if model.workflow_state == 'deleted'
+      if model.workflow_state == "deleted"
         model.destroy!
       end
 
@@ -119,7 +120,7 @@ module Outcomes
       model.context = context if model.new_record?
       unless context_visible?(model.context)
         raise InvalidDataError, I18n.t(
-          'Outcome with ID %{guid} already exists in another unrelated course or account (%{name})',
+          "Outcome with ID %{guid} already exists in another unrelated course or account (%{name})",
           guid: outcome[:vendor_guid],
           name: model.context.name
         )
@@ -138,7 +139,7 @@ module Outcomes
       model.calculation_method = outcome[:calculation_method].presence || model.default_calculation_method
       model.calculation_int = outcome[:calculation_int].presence || model.default_calculation_int
       # let removing the outcome_links content tags delete the underlying outcome
-      model.workflow_state = 'active' unless outcome[:workflow_state] == 'deleted'
+      model.workflow_state = "active" unless outcome[:workflow_state] == "deleted"
 
       prior_rubric = model.rubric_criterion || {}
       changed = ->(k) { outcome[k].present? && outcome[k] != prior_rubric[k] }
@@ -150,17 +151,17 @@ module Outcomes
         model.save!
       elsif non_vendor_guid_changes?(model)
         raise InvalidDataError, I18n.t(
-          'Cannot modify outcome from another context: %{changes}; outcome must be modified in %{context}',
+          "Cannot modify outcome from another context: %{changes}; outcome must be modified in %{context}",
           changes: model.changes.keys.inspect,
           context: if model.context.present?
                      I18n.t('"%{name}"', name: model.context.name)
                    else
-                     I18n.t('the global context')
+                     I18n.t("the global context")
                    end
         )
       end
 
-      parents = [] if outcome[:workflow_state] == 'deleted'
+      parents = [] if outcome[:workflow_state] == "deleted"
       update_outcome_parents(model, parents)
 
       model
@@ -184,7 +185,7 @@ module Outcomes
 
     def non_vendor_guid_changes?(model)
       model.has_changes_to_save? && !(model.changes_to_save.length == 1 &&
-        model.changes_to_save.key?('vendor_guid'))
+        model.changes_to_save.key?("vendor_guid"))
     end
 
     def find_prior_outcome(outcome)
@@ -221,7 +222,7 @@ module Outcomes
           return by_id if by_id.context == context
         rescue ActiveRecord::RecordNotFound
           raise InvalidDataError, I18n.t(
-            'Outcome group with canvas id %{id} not found',
+            "Outcome group with canvas id %{id} not found",
             id: group[:canvas_id]
           )
         end
@@ -257,8 +258,8 @@ module Outcomes
         if parents.length < guids.length
           missing = guids - parents.map(&:vendor_guid)
           raise InvalidDataError, I18n.t(
-            'Parent references not found prior to this row: %{missing}',
-            missing: missing.inspect,
+            "Parent references not found prior to this row: %{missing}",
+            missing: missing.inspect
           )
         end
       end
@@ -276,9 +277,9 @@ module Outcomes
       next_parent_ids = parents.map(&:id)
       resurrect = existing_links
                   .where(associated_asset_id: next_parent_ids)
-                  .where(associated_asset_type: 'LearningOutcomeGroup')
-                  .where(workflow_state: 'deleted')
-      resurrect.update_all(workflow_state: 'active')
+                  .where(associated_asset_type: "LearningOutcomeGroup")
+                  .where(workflow_state: "deleted")
+      resurrect.update_all(workflow_state: "active")
 
       # add new parents before removing old to avoid deleting last link
       # to an aligned outcome
@@ -288,8 +289,8 @@ module Outcomes
 
       kill = existing_links
              .where.not(associated_asset_id: next_parent_ids)
-             .where(associated_asset_type: 'LearningOutcomeGroup')
-             .where(workflow_state: 'active')
+             .where(associated_asset_type: "LearningOutcomeGroup")
+             .where(workflow_state: "active")
       kill.destroy_all
     end
 

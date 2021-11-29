@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../apis/api_spec_helper'
+require_relative "../apis/api_spec_helper"
 
 describe EpubExportsController do
   before :once do
@@ -30,7 +30,7 @@ describe EpubExportsController do
   describe "GET index, format html" do
     context "without user" do
       it "requires user to be logged in to access the page" do
-        get 'index'
+        get "index"
         assert_unauthorized
       end
     end
@@ -41,10 +41,10 @@ describe EpubExportsController do
         @n_more = 4
         create_courses(@n_more, {
                          enroll_user: @student,
-                         enrollment_type: 'StudentEnrollment'
+                         enrollment_type: "StudentEnrollment"
                        })
         @student.enrollments.last.update_attribute(
-          :workflow_state, 'completed'
+          :workflow_state, "completed"
         )
       end
 
@@ -68,10 +68,10 @@ describe EpubExportsController do
       @n_more = 4
       create_courses(@n_more, {
                        enroll_user: @student,
-                       enrollment_type: 'StudentEnrollment'
+                       enrollment_type: "StudentEnrollment"
                      })
       @student.enrollments.last.update_attribute(
-        :workflow_state, 'completed'
+        :workflow_state, "completed"
       )
     end
 
@@ -79,10 +79,10 @@ describe EpubExportsController do
       json = api_call_as_user(@student, :get, "/api/v1/epub_exports", {
                                 controller: :epub_exports,
                                 action: :index,
-                                format: 'json'
+                                format: "json"
                               })
 
-      expect(json['courses'].size).to eq(@n + @n_more)
+      expect(json["courses"].size).to eq(@n + @n_more)
     end
   end
 
@@ -99,11 +99,11 @@ describe EpubExportsController do
                                 action: :show,
                                 course_id: @course.to_param,
                                 id: epub_export.to_param,
-                                format: 'json'
+                                format: "json"
                               })
 
-      expect(json['id']).to eq(@course.id)
-      expect(json['epub_export']['id']).to eq(epub_export.id)
+      expect(json["id"]).to eq(@course.id)
+      expect(json["epub_export"]["id"]).to eq(epub_export.id)
     end
   end
 
@@ -118,21 +118,21 @@ describe EpubExportsController do
                                   action: :create,
                                   controller: :epub_exports,
                                   course_id: @course.id,
-                                  format: 'json'
+                                  format: "json"
                                 })
 
-        expect(json['epub_export']['workflow_state']).to eq('created')
+        expect(json["epub_export"]["workflow_state"]).to eq("created")
       end
 
       it "creates one epub_export" do
-        expect {
+        expect do
           api_call_as_user(@student, :post, url, {
                              action: :create,
                              controller: :epub_exports,
                              course_id: @course.id,
-                             format: 'json'
+                             format: "json"
                            })
-        }.to change { EpubExport.count }.from(0).to(1)
+        end.to change { EpubExport.count }.from(0).to(1)
       end
     end
 
@@ -144,16 +144,16 @@ describe EpubExportsController do
       end
 
       it "does not create one epub_export" do
-        expect {
+        expect do
           api_call_as_user(@student, :post, url, {
                              action: :create,
                              controller: :epub_exports,
                              course_id: @course.id,
-                             format: 'json'
+                             format: "json"
                            }, {}, {}, {
                              expected_status: 422
                            })
-        }.not_to change { EpubExport.count }
+        end.not_to change { EpubExport.count }
       end
     end
   end
@@ -167,7 +167,7 @@ describe EpubExportsController do
       account = Account.default
       account.disable_feature!(:epub_export)
       get :index
-      expect(response.code).to eq '404'
+      expect(response.code).to eq "404"
     end
 
     it "returns 404 with the feature enabled and offline web enabled" do
@@ -176,7 +176,7 @@ describe EpubExportsController do
       account.settings[:enable_offline_web_export] = true
       account.save!
       get :index
-      expect(response.code).to eq '404'
+      expect(response.code).to eq "404"
     end
   end
 end

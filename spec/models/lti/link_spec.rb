@@ -18,18 +18,18 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../../lti2_spec_helper'
+require_relative "../../lti2_spec_helper"
 module Lti
   RSpec.describe Link, type: :model do
-    include_context 'lti2_spec_helper'
+    include_context "lti2_spec_helper"
 
     describe "validations" do
       let(:params) do
         {
-          vendor_code: 'vendor_code',
-          product_code: 'product_code',
-          resource_type_code: 'resource_type_code',
-          resource_link_id: 'resource_link_id'
+          vendor_code: "vendor_code",
+          product_code: "product_code",
+          resource_type_code: "resource_type_code",
+          resource_link_id: "resource_link_id"
         }
       end
 
@@ -64,7 +64,7 @@ module Lti
       end
     end
 
-    describe '#message_handler' do
+    describe "#message_handler" do
       let(:lti_link) { subject }
 
       before do
@@ -77,26 +77,26 @@ module Lti
                         vendor_code: product_family.vendor_code)
       end
 
-      it 'looks up the message handler identified by the codes' do
+      it "looks up the message handler identified by the codes" do
         expect(lti_link.message_handler(account)).to eq message_handler
       end
     end
 
-    describe '#originality_report' do
-      it 'returns an originality_report if linkable is an OriginalityReport' do
+    describe "#originality_report" do
+      it "returns an originality_report if linkable is an OriginalityReport" do
         report = OriginalityReport.new
         lti_link = Lti::Link.new(linkable: report)
         expect(lti_link.originality_report).to eq report
       end
 
-      it 'returns nil if linkable is not an OriginalityReport ' do
+      it "returns nil if linkable is not an OriginalityReport" do
         lti_link = Lti::Link.new
         expect(lti_link.originality_report).to be_nil
       end
     end
 
-    describe '#generate_resource_link_id' do
-      it 'sets the resource_link_id' do
+    describe "#generate_resource_link_id" do
+      it "sets the resource_link_id" do
         lti_link = Lti::Link.new
         expect(lti_link.resource_link_id).to be_nil
         lti_link.generate_resource_link_id

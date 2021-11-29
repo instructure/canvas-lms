@@ -18,39 +18,39 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../../../spec_helper'
+require_relative "../../../spec_helper"
 require_dependency "api/html/content"
 
 module Api
   module Html
     describe Content do
       describe "#might_need_modification?" do
-        it 'is true for a link with a verifier param' do
+        it "is true for a link with a verifier param" do
           string = "<body><a href='http://example.com/123?verifier=321'>link</a></body>"
           expect(Content.new(string).might_need_modification?).to be(true)
         end
 
-        it 'is true with an inline media comment' do
+        it "is true with an inline media comment" do
           string = "<body><a href='http://example.com/123?instructure_inline_media_comment=true'>link</a></body>"
           expect(Content.new(string).might_need_modification?).to be(true)
         end
 
-        it 'is true for a link to files' do
+        it "is true for a link to files" do
           string = "<body><a href='/files'>link</a></body>"
           expect(Content.new(string).might_need_modification?).to be(true)
         end
 
-        it 'is true for a link that includes the host' do
+        it "is true for a link that includes the host" do
           string = "<body><a href='https://example.com/123'>link</a></body>"
           expect(Content.new(string, host: "example.com").might_need_modification?).to be(true)
         end
 
-        it 'is false for a link to files in a context' do
+        it "is false for a link to files in a context" do
           string = "<body><a href='/courses/1/files'>link</a></body>"
           expect(Content.new(string).might_need_modification?).to be(false)
         end
 
-        it 'is false for garden-variety content' do
+        it "is false for garden-variety content" do
           string = "<body><a href='http://example.com/123'>link</a></body>"
           expect(Content.new(string).might_need_modification?).to be(false)
         end
@@ -59,7 +59,7 @@ module Api
       describe "#modified_html" do
         it "scrubs links" do
           string = "<body><a href='http://somelink.com'>link</a></body>"
-          host = 'somelink.com'
+          host = "somelink.com"
           port = 80
           expect(Html::Link).to receive(:new).with("http://somelink.com", host: host, port: port).and_return(
             double(to_corrected_s: "http://otherlink.com")
@@ -71,7 +71,7 @@ module Api
         it "changes media tags into anchors" do
           string = "<audio class='instructure_inline_media_comment' data-media_comment_id=123/>"
           html = Content.new(string).modified_html
-          expect(html).to eq(%Q{<a class=\"instructure_inline_media_comment audio_comment\" id=\"media_comment_123/\" href=\"/media_objects/123/\"></a>})
+          expect(html).to eq('<a class="instructure_inline_media_comment audio_comment" id="media_comment_123/" href="/media_objects/123/"></a>')
         end
       end
 
@@ -128,17 +128,17 @@ module Api
           string = "<div>stuff</div>"
 
           root_bc = BrandConfig.create!({
-                                          mobile_css_overrides: 'https://example.com/root/account.css',
-                                          mobile_js_overrides: 'https://example.com/root/account.js'
+                                          mobile_css_overrides: "https://example.com/root/account.css",
+                                          mobile_js_overrides: "https://example.com/root/account.js"
                                         })
 
-          child_account = Account.default.sub_accounts.create!(name: 'child account')
+          child_account = Account.default.sub_accounts.create!(name: "child account")
           child_account.root_account.settings[:sub_account_includes] = true
           child_account.root_account.save!
 
           bc = child_account.build_brand_config({
-                                                  mobile_css_overrides: 'https://example.com/child/account.css',
-                                                  mobile_js_overrides: 'https://example.com/child/account.js'
+                                                  mobile_css_overrides: "https://example.com/child/account.css",
+                                                  mobile_js_overrides: "https://example.com/child/account.js"
                                                 })
           bc.parent = root_bc
           bc.save!
@@ -147,7 +147,7 @@ module Api
           html = Content.new(string, child_account, include_mobile: true).add_css_and_js_overrides
           expect(html.to_s).to eq '<link rel="stylesheet" href="https://example.com/root/account.css">' \
                                   '<link rel="stylesheet" href="https://example.com/child/account.css">' \
-                                  '<div>stuff</div>' \
+                                  "<div>stuff</div>" \
                                   '<script src="https://example.com/root/account.js"></script>' \
                                   '<script src="https://example.com/child/account.js"></script>'
         end
@@ -156,16 +156,16 @@ module Api
           string = "<div>stuff</div>"
 
           Account.site_admin.create_brand_config!({
-                                                    mobile_css_overrides: 'https://example.com/site_admin/account.css',
-                                                    mobile_js_overrides: 'https://example.com/site_admin/account.js'
+                                                    mobile_css_overrides: "https://example.com/site_admin/account.css",
+                                                    mobile_js_overrides: "https://example.com/site_admin/account.js"
                                                   })
 
-          child_account = Account.default.sub_accounts.create!(name: 'child account')
+          child_account = Account.default.sub_accounts.create!(name: "child account")
           child_account.save!
 
           html = Content.new(string, child_account, include_mobile: true).add_css_and_js_overrides
           expect(html.to_s).to eq '<link rel="stylesheet" href="https://example.com/site_admin/account.css">' \
-                                  '<div>stuff</div>' \
+                                  "<div>stuff</div>" \
                                   '<script src="https://example.com/site_admin/account.js"></script>'
         end
       end

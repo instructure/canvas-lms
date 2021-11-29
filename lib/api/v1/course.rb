@@ -34,6 +34,7 @@ module Api::V1::Course
     settings[:allow_student_forum_attachments] = course.allow_student_forum_attachments?
     settings[:allow_student_discussion_editing] = course.allow_student_discussion_editing?
     settings[:allow_student_discussion_reporting] = course.allow_student_discussion_reporting?
+    settings[:allow_student_anonymous_discussion_topics] = course.allow_student_anonymous_discussion_topics?
     settings[:filter_speed_grader_by_student_group] = course.filter_speed_grader_by_student_group?
     settings[:grading_standard_enabled] = course.grading_standard_enabled?
     settings[:grading_standard_id] = course.grading_standard_id
@@ -96,66 +97,66 @@ module Api::V1::Course
   #   }
   #
   def course_json(course, user, session, includes, enrollments, subject_user = user, preloaded_progressions: nil, precalculated_permissions: nil, prefer_friendly_name: true)
-    if includes.include?('access_restricted_by_date') && enrollments&.all?(&:inactive?) && !course.grants_right?(user, :read_as_admin)
-      return { 'id' => course.id, 'access_restricted_by_date' => true }
+    if includes.include?("access_restricted_by_date") && enrollments&.all?(&:inactive?) && !course.grants_right?(user, :read_as_admin)
+      return { "id" => course.id, "access_restricted_by_date" => true }
     end
 
     Api::V1::CourseJson.to_hash(course, user, includes, enrollments,
                                 precalculated_permissions: precalculated_permissions) do |builder, allowed_attributes, methods, permissions_to_include|
-      hash = api_json(course, user, session, { :only => allowed_attributes, :methods => methods }, permissions_to_include)
-      hash['term'] = enrollment_term_json(course.enrollment_term, user, session, enrollments, []) if includes.include?('term')
-      if includes.include?('grading_periods')
-        hash['grading_periods'] = course.enrollment_term&.grading_period_group&.grading_periods&.map do |gp|
-          api_json(gp, user, session, :only => %w(id title start_date end_date workflow_state))
+      hash = api_json(course, user, session, { only: allowed_attributes, methods: methods }, permissions_to_include)
+      hash["term"] = enrollment_term_json(course.enrollment_term, user, session, enrollments, []) if includes.include?("term")
+      if includes.include?("grading_periods")
+        hash["grading_periods"] = course.enrollment_term&.grading_period_group&.grading_periods&.map do |gp|
+          api_json(gp, user, session, only: %w[id title start_date end_date workflow_state])
         end
       end
-      if includes.include?('course_progress')
-        hash['course_progress'] = CourseProgress.new(course,
+      if includes.include?("course_progress")
+        hash["course_progress"] = CourseProgress.new(course,
                                                      subject_user,
                                                      preloaded_progressions: preloaded_progressions).to_json
       end
-      hash['apply_assignment_group_weights'] = course.apply_group_weights?
-      if includes.include?('sections')
-        hash['sections'] = if enrollments.any?
+      hash["apply_assignment_group_weights"] = course.apply_group_weights?
+      if includes.include?("sections")
+        hash["sections"] = if enrollments.any?
                              section_enrollments_json(enrollments)
                            else
-                             course.course_sections.map { |section| section.attributes.slice(*%w(id name start_at end_at)) }
+                             course.course_sections.map { |section| section.attributes.slice(*%w[id name start_at end_at]) }
                            end
       end
-      hash['total_students'] = course.student_count || course.student_enrollments.not_fake.distinct.count(:user_id) if includes.include?('total_students')
-      hash['passback_status'] = post_grades_status_json(course) if includes.include?('passback_status')
-      hash['is_favorite'] = course.favorite_for_user?(subject_user) if includes.include?('favorites')
-      if includes.include?('teachers')
+      hash["total_students"] = course.student_count || course.student_enrollments.not_fake.distinct.count(:user_id) if includes.include?("total_students")
+      hash["passback_status"] = post_grades_status_json(course) if includes.include?("passback_status")
+      hash["is_favorite"] = course.favorite_for_user?(subject_user) if includes.include?("favorites")
+      if includes.include?("teachers")
         if course.teacher_count
-          hash['teacher_count'] = course.teacher_count
+          hash["teacher_count"] = course.teacher_count
         else
-          hash['teachers'] = course.teachers.distinct.map { |teacher| user_display_json(teacher) }
+          hash["teachers"] = course.teachers.distinct.map { |teacher| user_display_json(teacher) }
         end
       end
       # undocumented; used in AccountCourseUserSearch
-      if includes.include?('active_teachers')
+      if includes.include?("active_teachers")
         course.shard.activate do
           scope =
             TeacherEnrollment.where.not(workflow_state: %w[rejected completed deleted inactive]).where(course_id: course.id).distinct.select(:user_id)
-          hash['teachers'] =
+          hash["teachers"] =
             User.where(id: scope).map { |teacher| user_display_json(teacher) }
         end
       end
-      hash['tabs'] = tabs_available_json(course, user, session, ['external'], precalculated_permissions: precalculated_permissions) if includes.include?('tabs')
-      hash['locale'] = course.locale unless course.locale.nil?
-      hash['account'] = account_json(course.account, user, session, []) if includes.include?('account')
+      hash["tabs"] = tabs_available_json(course, user, session, ["external"], precalculated_permissions: precalculated_permissions) if includes.include?("tabs")
+      hash["locale"] = course.locale unless course.locale.nil?
+      hash["account"] = account_json(course.account, user, session, []) if includes.include?("account")
       # undocumented, but leaving for backwards compatibility.
-      hash['subaccount_name'] = course.account.name if includes.include?('subaccount')
+      hash["subaccount_name"] = course.account.name if includes.include?("subaccount")
       add_helper_dependant_entries(hash, course, builder)
       apply_nickname(hash, course, user, prefer_friendly_name: prefer_friendly_name)
 
-      hash['image_download_url'] = course.image if includes.include?('course_image')
-      hash['concluded'] = course.concluded? if includes.include?('concluded')
+      hash["image_download_url"] = course.image if includes.include?("course_image")
+      hash["concluded"] = course.concluded? if includes.include?("concluded")
       apply_master_course_settings(hash, course, user)
       if course.root_account.feature_enabled?(:course_templates)
-        hash['template'] = course.template?
-        if course.template? && includes.include?('templated_accounts')
-          hash['templated_accounts'] = course.templated_accounts.map { |a| { id: a.id, name: a.name } }
+        hash["template"] = course.template?
+        if course.template? && includes.include?("templated_accounts")
+          hash["templated_accounts"] = course.templated_accounts.map { |a| { id: a.id, name: a.name } }
         end
       end
 
@@ -165,14 +166,14 @@ module Api::V1::Course
   end
 
   def copy_status_json(import, course, user, session)
-    hash = api_json(import, user, session, :only => %w(id progress created_at workflow_state integration_id))
+    hash = api_json(import, user, session, only: %w[id progress created_at workflow_state integration_id])
 
     # the type of object for course copy changed but we don't want the api to change
     # so map the workflow states to the old ones
-    if hash['workflow_state'] == 'imported'
-      hash['workflow_state'] = 'completed'
-    elsif !['created', 'failed'].member?(hash['workflow_state'])
-      hash['workflow_state'] = 'started'
+    if hash["workflow_state"] == "imported"
+      hash["workflow_state"] = "completed"
+    elsif !["created", "failed"].member?(hash["workflow_state"])
+      hash["workflow_state"] = "started"
     end
 
     hash[:status_url] = api_v1_course_copy_status_url(course, import)
@@ -180,11 +181,11 @@ module Api::V1::Course
   end
 
   def add_helper_dependant_entries(hash, course, builder)
-    request = self.respond_to?(:request) ? self.request : nil
-    hash['calendar'] = { 'ics' => "#{feeds_calendar_url(course.feed_code)}.ics" }
-    hash['syllabus_body'] = api_user_content(course.syllabus_body, course) if builder.include_syllabus
-    hash['html_url'] = course_url(course, :host => HostUrl.context_host(course, request.try(:host_with_port))) if builder.include_url
-    hash['time_zone'] = course.time_zone && course.time_zone.tzinfo.name
+    request = respond_to?(:request) ? self.request : nil
+    hash["calendar"] = { "ics" => "#{feeds_calendar_url(course.feed_code)}.ics" }
+    hash["syllabus_body"] = api_user_content(course.syllabus_body, course) if builder.include_syllabus
+    hash["html_url"] = course_url(course, host: HostUrl.context_host(course, request.try(:host_with_port))) if builder.include_url
+    hash["time_zone"] = course.time_zone&.tzinfo&.name
     hash
   end
 
@@ -192,22 +193,22 @@ module Api::V1::Course
     nickname = course.friendly_name if prefer_friendly_name
     nickname ||= course.preloaded_nickname? ? course.preloaded_nickname : user&.course_nickname(course)
     if nickname
-      hash['original_name'] = hash['name']
-      hash['name'] = nickname
+      hash["original_name"] = hash["name"]
+      hash["name"] = nickname
     end
     hash
   end
 
   def apply_master_course_settings(hash, course, _user)
     is_mc = MasterCourses::MasterTemplate.is_master_course?(course)
-    hash['blueprint'] = is_mc
+    hash["blueprint"] = is_mc
 
     if is_mc
       template = MasterCourses::MasterTemplate.full_template_for(course)
       if template&.use_default_restrictions_by_type
-        hash['blueprint_restrictions_by_object_type'] = template.default_restrictions_by_type_for_api
+        hash["blueprint_restrictions_by_object_type"] = template.default_restrictions_by_type_for_api
       else
-        hash['blueprint_restrictions'] = template&.default_restrictions
+        hash["blueprint_restrictions"] = template&.default_restrictions
       end
     end
   end
@@ -215,7 +216,7 @@ module Api::V1::Course
   def preload_teachers(courses)
     threshold = params[:teacher_limit].presence&.to_i
     if threshold
-      scope = TeacherEnrollment.where.not(:workflow_state => %w{deleted rejected}).where(:course_id => courses).distinct.select(:user_id, :course_id)
+      scope = TeacherEnrollment.where.not(workflow_state: %w[deleted rejected]).where(course_id: courses).distinct.select(:user_id, :course_id)
       teacher_counts = Enrollment.from("(#{scope.to_sql}) AS t").group("t.course_id").count
       to_preload = []
       courses.each do |course|

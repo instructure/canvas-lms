@@ -18,16 +18,16 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../views_helper'
+require_relative "../views_helper"
 
 describe "/pseudonyms/confirm_change_password" do
   it "renders" do
     user_factory
     assign(:user, @user)
     assign(:current_user, @user)
-    assign(:pseudonym, @user.pseudonyms.create!(:unique_id => "unique@example.com", :password => "asdfaabb", :password_confirmation => "asdfaabb"))
+    assign(:pseudonym, @user.pseudonyms.create!(unique_id: "unique@example.com", password: "asdfaabb", password_confirmation: "asdfaabb"))
     assign(:password_pseudonyms, @user.pseudonyms)
-    assign(:cc, communication_channel(@user, { username: 'unique@example.com' }))
+    assign(:cc, communication_channel(@user, { username: "unique@example.com" }))
     render "pseudonyms/confirm_change_password"
     expect(response).not_to be_nil
   end

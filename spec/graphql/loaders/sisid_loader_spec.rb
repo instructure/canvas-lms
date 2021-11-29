@@ -24,12 +24,12 @@ describe Loaders::SISIDLoader do
     @course.update!(sis_source_id: "importedCourse")
     GraphQL::Batch.batch do
       course_loader = Loaders::SISIDLoader.for(Course)
-      course_loader.load("importedCourse").then { |course|
+      course_loader.load("importedCourse").then do |course|
         expect(course).to eq @course
-      }
-      course_loader.load(-1).then { |course|
+      end
+      course_loader.load(-1).then do |course|
         expect(course).to be_nil
-      }
+      end
     end
   end
 end

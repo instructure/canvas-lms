@@ -22,13 +22,13 @@ class AddReplicaIdentityForRoleOverrides < ActiveRecord::Migration[6.0]
   disable_ddl_transaction!
 
   def up
-    add_replica_identity 'RoleOverride', :root_account_id, 0
+    add_replica_identity "RoleOverride", :root_account_id, 0
     remove_index :role_overrides, column: :root_account_id, if_exists: true
   end
 
   def down
     add_index :role_overrides, :root_account_id, algorithm: :concurrently, if_not_exists: true
-    remove_replica_identity 'RoleOverride'
+    remove_replica_identity "RoleOverride"
     change_column_null :role_overrides, :root_account_id, true
   end
 end

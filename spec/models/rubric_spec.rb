@@ -35,7 +35,7 @@ describe Rubric do
         assessor: @user,
         artifact: @submission,
         assessment: {
-          assessment_type: 'grading',
+          assessment_type: "grading",
           "#{crit_id}": {
             points: opts[:points],
             comments: "cool, yo"
@@ -44,17 +44,17 @@ describe Rubric do
       }
     end
 
-    context 'updating criteria' do
-      context 'from outcomes' do
+    context "updating criteria" do
+      context "from outcomes" do
         before do
-          @outcome.short_description = 'alpha'
-          @outcome.description = 'beta'
+          @outcome.short_description = "alpha"
+          @outcome.description = "beta"
           criterion = {
-            :mastery_points => 3,
-            :ratings => [
-              { :points => 7, :description => "Exceeds Expectations" },
-              { :points => 3, :description => "Meets Expectations" },
-              { :points => 0, :description => "Does Not Meet Expectations" }
+            mastery_points: 3,
+            ratings: [
+              { points: 7, description: "Exceeds Expectations" },
+              { points: 3, description: "Meets Expectations" },
+              { points: 0, description: "Does Not Meet Expectations" }
             ]
           }
           @outcome.rubric_criterion = criterion
@@ -63,68 +63,68 @@ describe Rubric do
         it "allows updating learning outcome criteria" do
           @rubric.update_learning_outcome_criteria(@outcome)
           rubric_criterion = @rubric.criteria_object.first
-          expect(rubric_criterion.description).to eq 'alpha'
-          expect(rubric_criterion.long_description).to eq 'beta'
+          expect(rubric_criterion.description).to eq "alpha"
+          expect(rubric_criterion.long_description).to eq "beta"
           expect(rubric_criterion.ratings.length).to eq 3
           expect(rubric_criterion.mastery_points).to eq 3
           expect(rubric_criterion.ratings.map(&:description)).to eq [
-            'Exceeds Expectations',
-            'Meets Expectations',
-            'Does Not Meet Expectations'
+            "Exceeds Expectations",
+            "Meets Expectations",
+            "Does Not Meet Expectations"
           ]
           expect(rubric_criterion.ratings.map(&:points)).to eq [7.0, 3.0, 0.0]
           expect(@rubric.points_possible).to eq 12
         end
 
-        it 'only updates learning outcome text when mastery scales are enabled' do
+        it "only updates learning outcome text when mastery scales are enabled" do
           Account.default.enable_feature! :account_level_mastery_scales
           @rubric.update_learning_outcome_criteria(@outcome)
           rubric_criterion = @rubric.criteria_object.first
-          expect(rubric_criterion.description).to eq 'alpha'
-          expect(rubric_criterion.long_description).to eq 'beta'
+          expect(rubric_criterion.description).to eq "alpha"
+          expect(rubric_criterion.long_description).to eq "beta"
           expect(rubric_criterion.ratings.length).to eq 2
           expect(@rubric.points_possible).to eq 8
         end
       end
 
-      context 'from mastery scales' do
+      context "from mastery scales" do
         before do
           Account.default.enable_feature! :account_level_mastery_scales
           @outcome_proficiency = outcome_proficiency_model(Account.default)
           @rubric.update_mastery_scales
         end
 
-        it 'updates scale and points from mastery scales' do
+        it "updates scale and points from mastery scales" do
           rubric_criterion = @rubric.criteria_object.first
-          expect(rubric_criterion.description).to eq 'Outcome row'
+          expect(rubric_criterion.description).to eq "Outcome row"
           expect(rubric_criterion.long_description).to eq @outcome.description
-          expect(rubric_criterion.ratings.map(&:description)).to eq ['best', 'worst']
+          expect(rubric_criterion.ratings.map(&:description)).to eq ["best", "worst"]
           expect(@rubric.points_possible).to eq 15
         end
 
-        context 'it should update' do
-          it 'when number of ratings changes' do
-            @outcome_proficiency.outcome_proficiency_ratings.create! description: 'new', points: 5, color: 'abbaab', mastery: false
+        context "it should update" do
+          it "when number of ratings changes" do
+            @outcome_proficiency.outcome_proficiency_ratings.create! description: "new", points: 5, color: "abbaab", mastery: false
             @rubric.reload.update_mastery_scales
 
             rubric_criterion = @rubric.criteria_object.first
-            expect(rubric_criterion.ratings.map(&:description)).to eq ['best', 'new', 'worst']
+            expect(rubric_criterion.ratings.map(&:description)).to eq %w[best new worst]
             expect(rubric_criterion.ratings.map(&:points)).to eq [10, 5, 0]
           end
 
-          it 'when text of rating changes' do
+          it "when text of rating changes" do
             ratings = @outcome_proficiency.ratings_hash
-            ratings.first[:description] = 'new best'
+            ratings.first[:description] = "new best"
             @outcome_proficiency.replace_ratings(ratings)
             @outcome_proficiency.save!
             @rubric.reload.update_mastery_scales
 
             rubric_criterion = @rubric.criteria_object.first
-            expect(rubric_criterion.ratings.map(&:description)).to eq ['new best', 'worst']
+            expect(rubric_criterion.ratings.map(&:description)).to eq ["new best", "worst"]
             expect(rubric_criterion.ratings.map(&:points)).to eq [10, 0]
           end
 
-          it 'when score of rating changes' do
+          it "when score of rating changes" do
             ratings = @outcome_proficiency.ratings_hash
             ratings.first[:points] = 3
             @outcome_proficiency.replace_ratings(ratings)
@@ -132,12 +132,12 @@ describe Rubric do
             @rubric.reload.update_mastery_scales
 
             rubric_criterion = @rubric.criteria_object.first
-            expect(rubric_criterion.ratings.map(&:description)).to eq ['best', 'worst']
+            expect(rubric_criterion.ratings.map(&:description)).to eq ["best", "worst"]
             expect(rubric_criterion.ratings.map(&:points)).to eq [3, 0]
             expect(rubric_criterion[:points]).to eq 3
           end
 
-          it 'when proficiency is destroyed' do
+          it "when proficiency is destroyed" do
             @outcome_proficiency.destroy
             @rubric.reload.update_mastery_scales
 
@@ -146,21 +146,21 @@ describe Rubric do
           end
         end
 
-        context 'it should not update' do
+        context "it should not update" do
           before do
             @rubric.update_mastery_scales
             @last_update = 2.days.ago
             @rubric.touch(time: @last_update)
           end
 
-          it 'when mastery scale unchanged' do
+          it "when mastery scale unchanged" do
             @rubric.update_mastery_scales
             expect(@rubric.reload.updated_at).to eq @last_update
           end
 
-          it 'when only color is changed' do
+          it "when only color is changed" do
             ratings = @outcome_proficiency.ratings_hash
-            ratings[0]['color'] = 'ffffff'
+            ratings[0]["color"] = "ffffff"
             @outcome_proficiency.replace_ratings(ratings)
 
             @rubric.update_mastery_scales
@@ -186,7 +186,7 @@ describe Rubric do
     end
 
     it "creates learning outcome associations for multiple outcome rows" do
-      outcome2 = @course.created_learning_outcomes.create!(:title => 'outcome2')
+      outcome2 = @course.created_learning_outcomes.create!(title: "outcome2")
       @rubric.data[1][:learning_outcome_id] = outcome2.id
       @rubric.save!
       expect(@rubric).not_to be_new_record
@@ -200,7 +200,7 @@ describe Rubric do
       expect(@rubric.learning_outcome_alignments.first.learning_outcome_id).to eql(@outcome.id)
       user = user_factory(active_all: true)
       @course.enroll_student(user)
-      a = @rubric.associate_with(@assignment, @course, :purpose => 'grading')
+      a = @rubric.associate_with(@assignment, @course, purpose: "grading")
       @assignment.reload
       expect(@assignment.learning_outcome_alignments).not_to be_empty
       @submission = @assignment.grade_student(user, grade: "10", grader: @teacher).first
@@ -224,17 +224,17 @@ describe Rubric do
     end
 
     it "destroys an outcome link after the assignment using it is destroyed (if it's not used anywhere else)" do
-      outcome2 = @course.account.created_learning_outcomes.create!(:title => 'outcome')
+      outcome2 = @course.account.created_learning_outcomes.create!(title: "outcome")
       link = @course.root_outcome_group.add_outcome(outcome2)
       rubric = rubric_model
       rubric.data[0][:learning_outcome_id] = outcome2.id
       rubric.save!
       assignment2 = @course.assignments.create!(assignment_valid_attributes)
-      rubric.associate_with(@assignment, @course, :purpose => 'grading')
-      a2 = rubric.associate_with(assignment2, @course, :purpose => 'grading')
+      rubric.associate_with(@assignment, @course, purpose: "grading")
+      a2 = rubric.associate_with(assignment2, @course, purpose: "grading")
 
       assignment2.destroy
-      expect(RubricAssociation.where(:id => a2).first).to be_deleted
+      expect(RubricAssociation.where(id: a2).first).to be_deleted
 
       rubric.reload
       expect(rubric).to be_active
@@ -253,10 +253,10 @@ describe Rubric do
       course_factory
       data = [
         {
-          :points => 0.5,
-          :description => "Fraction row",
-          :id => 1,
-          :ratings => [
+          points: 0.5,
+          description: "Fraction row",
+          id: 1,
+          ratings: [
             { points: 0.5, description: "Rockin'", criterion_id: 1, id: 2 },
             { points: 0, description: "Lame", criterion_id: 1, id: 3 }
           ]
@@ -316,7 +316,7 @@ describe Rubric do
     expect(r3.title).to eql "rubric"
   end
 
-  context "#update_with_association" do
+  context "#update_with_association group 1" do
     before :once do
       course_with_teacher
       assignment_model(points_possible: 20)
@@ -371,7 +371,7 @@ describe Rubric do
     end
 
     it "does not destroy associations when deleted from an account" do
-      @rubric.associate_with(@assignment, @course, :purpose => 'grading')
+      @rubric.associate_with(@assignment, @course, purpose: "grading")
       @rubric.destroy_for(@course.account)
       expect(@rubric.rubric_associations).to be_present
     end
@@ -382,53 +382,53 @@ describe Rubric do
       course2 = Course.last
       assignment2 = course2.assignments.create! title: "Assignment 2: Electric Boogaloo",
                                                 points_possible: 20
-      @rubric.associate_with(@assignment, course1, :purpose => 'grading')
-      @rubric.associate_with(assignment2, course2, :purpose => 'grading')
+      @rubric.associate_with(@assignment, course1, purpose: "grading")
+      @rubric.associate_with(assignment2, course2, purpose: "grading")
       expect(@rubric.rubric_associations.length).to eq 2
       @rubric.destroy_for(course1)
       @rubric.reload
       expect(@rubric.rubric_associations.length).to eq 1
     end
 
-    context 'when associated with a context containing an auditable assignment' do
+    context "when associated with a context containing an auditable assignment" do
       let(:course) { Course.create! }
       let(:teacher) { course.enroll_teacher(User.create!, active_all: true).user }
       let(:assignment) { course.assignments.create!(anonymous_grading: true) }
-      let(:rubric) { Rubric.create!(title: 'hi', context: course) }
+      let(:rubric) { Rubric.create!(title: "hi", context: course) }
 
-      let(:last_event) { AnonymousOrModerationEvent.where(event_type: 'rubric_deleted').last }
+      let(:last_event) { AnonymousOrModerationEvent.where(event_type: "rubric_deleted").last }
 
       before do
         rubric.update_with_association(teacher, {}, course, association_object: assignment)
       end
 
-      it 'records a rubric_deleted AnonymousOrModerationEvent for the assignment' do
+      it "records a rubric_deleted AnonymousOrModerationEvent for the assignment" do
         expect { rubric.destroy_for(course, current_user: teacher) }
-          .to change { AnonymousOrModerationEvent.where(event_type: 'rubric_deleted').count }.by(1)
+          .to change { AnonymousOrModerationEvent.where(event_type: "rubric_deleted").count }.by(1)
       end
 
-      it 'includes the ID of the destroyed rubric in the payload' do
+      it "includes the ID of the destroyed rubric in the payload" do
         rubric.destroy_for(course, current_user: teacher)
-        expect(last_event.payload['id']).to eq rubric.id
+        expect(last_event.payload["id"]).to eq rubric.id
       end
 
-      it 'includes the current user in the event data' do
+      it "includes the current user in the event data" do
         rubric.destroy_for(course, current_user: teacher)
         expect(last_event.user_id).to eq teacher.id
       end
     end
   end
 
-  describe '#update_with_association' do
+  describe "#update_with_association" do
     let(:course) { Course.create! }
     let(:teacher) { course.enroll_teacher(User.create!, active_all: true).user }
     let(:assignment) { course.assignments.create!(anonymous_grading: true) }
-    let(:rubric) { Rubric.create!(title: 'hi', context: course) }
+    let(:rubric) { Rubric.create!(title: "hi", context: course) }
 
-    describe 'AnonymousOrModerationEvent creation for auditable assignments' do
-      context 'when the assignment has a prior grading rubric' do
-        let(:old_rubric) { Rubric.create!(title: 'zzz', context: course) }
-        let(:last_updated_event) { AnonymousOrModerationEvent.where(event_type: 'rubric_updated').last }
+    describe "AnonymousOrModerationEvent creation for auditable assignments" do
+      context "when the assignment has a prior grading rubric" do
+        let(:old_rubric) { Rubric.create!(title: "zzz", context: course) }
+        let(:last_updated_event) { AnonymousOrModerationEvent.where(event_type: "rubric_updated").last }
 
         before do
           old_rubric.update_with_association(
@@ -436,64 +436,64 @@ describe Rubric do
             {},
             course,
             association_object: assignment,
-            purpose: 'grading'
+            purpose: "grading"
           )
 
           assignment.reload
         end
 
-        it 'records a rubric_updated event for the assignment' do
-          expect {
-            rubric.update_with_association(teacher, {}, course, association_object: assignment, purpose: 'grading')
-          }.to change {
-            AnonymousOrModerationEvent.where(event_type: 'rubric_updated').count
+        it "records a rubric_updated event for the assignment" do
+          expect do
+            rubric.update_with_association(teacher, {}, course, association_object: assignment, purpose: "grading")
+          end.to change {
+            AnonymousOrModerationEvent.where(event_type: "rubric_updated").count
           }.by(1)
         end
 
-        it 'includes the ID of the removed rubric in the payload' do
-          rubric.update_with_association(teacher, {}, course, association_object: assignment, purpose: 'grading')
-          expect(last_updated_event.payload['id'].first).to eq old_rubric.id
+        it "includes the ID of the removed rubric in the payload" do
+          rubric.update_with_association(teacher, {}, course, association_object: assignment, purpose: "grading")
+          expect(last_updated_event.payload["id"].first).to eq old_rubric.id
         end
 
-        it 'includes the ID of the added rubric in the payload' do
-          rubric.update_with_association(teacher, {}, course, association_object: assignment, purpose: 'grading')
-          expect(last_updated_event.payload['id'].second).to eq rubric.id
+        it "includes the ID of the added rubric in the payload" do
+          rubric.update_with_association(teacher, {}, course, association_object: assignment, purpose: "grading")
+          expect(last_updated_event.payload["id"].second).to eq rubric.id
         end
 
-        it 'includes the updating user on the event' do
-          rubric.update_with_association(teacher, {}, course, association_object: assignment, purpose: 'grading')
+        it "includes the updating user on the event" do
+          rubric.update_with_association(teacher, {}, course, association_object: assignment, purpose: "grading")
           expect(last_updated_event.user_id).to eq teacher.id
         end
 
-        it 'includes the associated assignment on the event' do
-          rubric.update_with_association(teacher, {}, course, association_object: assignment, purpose: 'grading')
+        it "includes the associated assignment on the event" do
+          rubric.update_with_association(teacher, {}, course, association_object: assignment, purpose: "grading")
           expect(last_updated_event.assignment_id).to eq assignment.id
         end
       end
 
-      context 'when the assignment has no prior grading rubric' do
-        let(:last_created_event) { AnonymousOrModerationEvent.where(event_type: 'rubric_created').last }
+      context "when the assignment has no prior grading rubric" do
+        let(:last_created_event) { AnonymousOrModerationEvent.where(event_type: "rubric_created").last }
 
-        it 'records a rubric_created event for the assignment' do
-          expect {
-            rubric.update_with_association(teacher, {}, course, association_object: assignment, purpose: 'grading')
-          }.to change {
-            AnonymousOrModerationEvent.where(event_type: 'rubric_created', assignment: assignment).count
+        it "records a rubric_created event for the assignment" do
+          expect do
+            rubric.update_with_association(teacher, {}, course, association_object: assignment, purpose: "grading")
+          end.to change {
+            AnonymousOrModerationEvent.where(event_type: "rubric_created", assignment: assignment).count
           }.by(1)
         end
 
-        it 'includes the ID of the added rubric in the payload' do
-          rubric.update_with_association(teacher, {}, course, association_object: assignment, purpose: 'grading')
-          expect(last_created_event.payload['id']).to eq rubric.id
+        it "includes the ID of the added rubric in the payload" do
+          rubric.update_with_association(teacher, {}, course, association_object: assignment, purpose: "grading")
+          expect(last_created_event.payload["id"]).to eq rubric.id
         end
 
-        it 'includes the updating user on the event' do
-          rubric.update_with_association(teacher, {}, course, association_object: assignment, purpose: 'grading')
+        it "includes the updating user on the event" do
+          rubric.update_with_association(teacher, {}, course, association_object: assignment, purpose: "grading")
           expect(last_created_event.user_id).to eq teacher.id
         end
 
-        it 'includes the associated assignment on the event' do
-          rubric.update_with_association(teacher, {}, course, association_object: assignment, purpose: 'grading')
+        it "includes the associated assignment on the event" do
+          rubric.update_with_association(teacher, {}, course, association_object: assignment, purpose: "grading")
           expect(last_created_event.assignment_id).to eq assignment.id
         end
       end
@@ -501,23 +501,22 @@ describe Rubric do
   end
 
   it "normalizes criteria for comparison" do
-    criteria = [{ :id => "45_392",
-                  :description => "Description of criterion",
-                  :long_description => "",
-                  :points => 5,
-                  :mastery_points => nil,
-                  :ignore_for_scoring => nil,
-                  :learning_outcome_migration_id => nil,
-                  :title => "Description of criterion",
-                  :ratings =>
-        [{ :description => "Full Marks",
-           :id => "blank",
-           :criterion_id => "45_392",
-           :points => 5 },
-         { :description => "No Marks",
-           :id => "blank_2",
-           :criterion_id => "45_392",
-           :points => 0 }] }]
+    criteria = [{ id: "45_392",
+                  description: "Description of criterion",
+                  long_description: "",
+                  points: 5,
+                  mastery_points: nil,
+                  ignore_for_scoring: nil,
+                  learning_outcome_migration_id: nil,
+                  title: "Description of criterion",
+                  ratings: [{ description: "Full Marks",
+                              id: "blank",
+                              criterion_id: "45_392",
+                              points: 5 },
+                            { description: "No Marks",
+                              id: "blank_2",
+                              criterion_id: "45_392",
+                              points: 0 }] }]
     expect(Rubric.normalize(criteria)).to eq(
       [{ "description" => "Description of criterion",
          "points" => 5.0,
@@ -540,11 +539,11 @@ describe Rubric do
         rubric_model
         @rubric.update_criteria(
           criteria: {
-            '0' => {
-              description: '',
+            "0" => {
+              description: "",
               ratings: {
-                '0' => {
-                  description: ''
+                "0" => {
+                  description: ""
                 }
               }
             }
@@ -553,11 +552,11 @@ describe Rubric do
       end
 
       it "populates blank criterion title" do
-        expect(@rubric.criteria[0][:description]).to eq 'No Description'
+        expect(@rubric.criteria[0][:description]).to eq "No Description"
       end
 
       it "populates blank rating title" do
-        expect(@rubric.criteria[0][:ratings][0][:description]).to eq 'No Description'
+        expect(@rubric.criteria[0][:ratings][0][:description]).to eq "No Description"
       end
     end
 
@@ -567,15 +566,15 @@ describe Rubric do
         outcome_with_rubric({ mastery_points: 3 })
         @rubric.update_criteria(
           criteria: {
-            '0' => {
+            "0" => {
               long_description: "<script>alert('danger');</script>",
               ratings: {
-                '0' => {
-                  description: ''
+                "0" => {
+                  description: ""
                 }
               }
             },
-            '1' => {
+            "1" => {
               long_description: "<script>alert('danger');</script>",
               learning_outcome_id: @outcome.id
             }
@@ -588,8 +587,8 @@ describe Rubric do
       end
 
       it "uses the sanitized outcome description when an id is provided" do
-        @outcome.description = '<b>beta</b>'
-        expect(@rubric.criteria[1][:long_description]).to eq '<p>This is <b>awesome</b>.</p>'
+        @outcome.description = "<b>beta</b>"
+        expect(@rubric.criteria[1][:long_description]).to eq "<p>This is <b>awesome</b>.</p>"
       end
     end
 
@@ -601,25 +600,25 @@ describe Rubric do
           criteria: {
             "206000" => {
               description: "aaaaa",
-              ratings: { '0' => { description: "" } }
+              ratings: { "0" => { description: "" } }
             },
             "106215" => {
               description: "bbbbb",
-              ratings: { '0' => { description: "" } }
+              ratings: { "0" => { description: "" } }
             },
             "6043341" => {
               description: "ccccc",
-              ratings: { '0' => { description: "" } }
+              ratings: { "0" => { description: "" } }
             },
             "fred" => {
               description: "ddddd",
-              ratings: { '0' => { description: "" } }
+              ratings: { "0" => { description: "" } }
             }
           },
           title: "my rubric"
         )
 
-        expect(rubric.criteria.pluck(:description)).to eq ["ddddd", "bbbbb", "aaaaa", "ccccc"]
+        expect(rubric.criteria.pluck(:description)).to eq %w[ddddd bbbbb aaaaa ccccc]
       end
 
       it "sorts ratings within each criterion by the number of points in descending order" do
@@ -638,7 +637,7 @@ describe Rubric do
         )
 
         criterion = rubric.criteria.first
-        expect(criterion[:ratings].pluck(:description)).to eq ["good", "ok", "bad"]
+        expect(criterion[:ratings].pluck(:description)).to eq %w[good ok bad]
       end
 
       it "sorts ratings with the same number of points by description" do
@@ -662,28 +661,28 @@ describe Rubric do
     end
   end
 
-  describe 'create' do
+  describe "create" do
     let(:root_account) { Account.default }
 
-    it 'sets the root_account_id using course' do
+    it "sets the root_account_id using course" do
       course_model
       rubric_for_course
       expect(@rubric.root_account_id).to eq @course.root_account_id
     end
 
-    it 'sets the root_account_id using root account' do
+    it "sets the root_account_id using root account" do
       rubric_model
       expect(@rubric.root_account_id).to eq root_account.id
     end
 
-    it 'sets the root_account_id using sub account' do
+    it "sets the root_account_id using sub account" do
       sub_account = root_account.sub_accounts.create!
       rubric_model({ context: sub_account })
       expect(@rubric.root_account_id).to eq sub_account.root_account_id
     end
   end
 
-  context 'scope methods' do
+  context "scope methods" do
     before do
       student_in_course
     end
@@ -697,7 +696,7 @@ describe Rubric do
       if (attributes & [:assessed, :associated]).present?
         (opts[:association_count] || 1).times do
           assignment = assignment_model(course: @course)
-          association = rubric_association_model(**opts, rubric: rubric, association_object: assignment, purpose: 'grading')
+          association = rubric_association_model(**opts, rubric: rubric, association_object: assignment, purpose: "grading")
         end
       end
       if attributes.include? :assessed
@@ -707,8 +706,8 @@ describe Rubric do
       rubric
     end
 
-    describe 'aligned_to_outcomes' do
-      it 'distinguishes aligned from unaligned' do
+    describe "aligned_to_outcomes" do
+      it "distinguishes aligned from unaligned" do
         course_aligned = make_rubric(:aligned)
         _course_unaligned = make_rubric
         account_aligned = make_rubric(:aligned, context: @account)
@@ -718,7 +717,7 @@ describe Rubric do
         expect(Rubric.aligned_to_outcomes).to contain_exactly(course_aligned, account_aligned, mixed_aligned)
       end
 
-      it 'returns rubric only once despite multiple alignments' do
+      it "returns rubric only once despite multiple alignments" do
         aligned_twice = make_rubric(:aligned)
         second_outcome = outcome_model(context: @course)
         aligned_twice.criteria << {
@@ -730,7 +729,7 @@ describe Rubric do
         expect(Rubric.aligned_to_outcomes).to contain_exactly(aligned_twice)
       end
 
-      it 'mixes with other scopes' do
+      it "mixes with other scopes" do
         rubric1 = make_rubric(:aligned)
         rubric2 = make_rubric(:aligned)
         rubric1.destroy
@@ -738,8 +737,8 @@ describe Rubric do
       end
     end
 
-    describe 'unassessed' do
-      it 'distinguishes assessed from unassessed' do
+    describe "unassessed" do
+      it "distinguishes assessed from unassessed" do
         _assessed_account_rubric = make_rubric(:assessed, context: @account)
         _assessed_course_rubric = make_rubric(:assessed)
         unassessed_account_rubric = make_rubric(:associated, context: @account)
@@ -750,7 +749,7 @@ describe Rubric do
         expect(Rubric.unassessed).to contain_exactly(new_account_rubric, new_course_rubric, unassessed_account_rubric, unassessed_course_rubric)
       end
 
-      it 'mixes with other scopes' do
+      it "mixes with other scopes" do
         _assessed_rubric_with_outcome = make_rubric(:aligned, :assessed)
         _assessed_rubric_without_outcome = make_rubric(:assessed)
         unassessed_rubric_with_outcome = make_rubric(:aligned, :associated)
@@ -765,8 +764,8 @@ describe Rubric do
       end
     end
 
-    describe 'with_at_most_one_association' do
-      it 'distinguishes several associations with at most one' do
+    describe "with_at_most_one_association" do
+      it "distinguishes several associations with at most one" do
         not_associated = make_rubric
         associated_once = make_rubric(:associated)
         _associated_twice = make_rubric(:associated, association_count: 2)
@@ -775,7 +774,7 @@ describe Rubric do
         expect(Rubric.with_at_most_one_association).to contain_exactly(not_associated, associated_once)
       end
 
-      it 'mixes with other scopes' do
+      it "mixes with other scopes" do
         not_associated = make_rubric
         associated_once = make_rubric(:associated)
         _associated_twice = make_rubric(:associated, association_count: 2)
@@ -804,7 +803,7 @@ describe Rubric do
         expect(Rubric.with_at_most_one_association.unassessed.aligned_to_outcomes).to contain_exactly(aligned_not_associated, aligned_associated_once)
       end
 
-      it 'works for rubrics with multiple alignments' do
+      it "works for rubrics with multiple alignments" do
         aligned_twice = make_rubric(:aligned, :associated)
         second_outcome = outcome_model(context: @course)
         aligned_twice.criteria << {

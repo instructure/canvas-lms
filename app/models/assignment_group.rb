@@ -35,23 +35,23 @@ class AssignmentGroup < ActiveRecord::Base
   attr_accessor :saved_by
 
   belongs_to :context, polymorphic: [:course]
-  acts_as_list scope: { context: self, workflow_state: 'available' }
+  acts_as_list scope: { context: self, workflow_state: "available" }
   has_a_broadcast_policy
   serialize :integration_data, Hash
 
   has_many :scores, -> { active }
-  has_many :assignments, -> { order('position, due_at, title') }
+  has_many :assignments, -> { order("position, due_at, title") }
 
-  has_many :active_assignments, -> {
-    where("assignments.workflow_state<>'deleted'").order('assignments.position, assignments.due_at, assignments.title')
-  }, class_name: 'Assignment', dependent: :destroy
+  has_many :active_assignments, lambda {
+    where("assignments.workflow_state<>'deleted'").order("assignments.position, assignments.due_at, assignments.title")
+  }, class_name: "Assignment", dependent: :destroy
 
-  has_many :published_assignments, -> {
-    where(workflow_state: 'published').order('assignments.position, assignments.due_at, assignments.title')
-  }, class_name: 'Assignment'
+  has_many :published_assignments, lambda {
+    where(workflow_state: "published").order("assignments.position, assignments.due_at, assignments.title")
+  }, class_name: "Assignment"
 
   validates :context_id, :context_type, :workflow_state, presence: true
-  validates :rules, length: { maximum: maximum_text_length }, allow_nil: true, allow_blank: true
+  validates :rules, length: { maximum: maximum_text_length }, allow_blank: true
   validates :default_assignment_name, length: { maximum: maximum_string_length }, allow_nil: true
   validates :name, length: { maximum: maximum_string_length }, allow_nil: true
 
@@ -66,79 +66,77 @@ class AssignmentGroup < ActiveRecord::Base
   after_destroy :clear_context_has_assignment_group_cache
 
   def generate_default_values
-    if self.name.blank?
-      self.name = t 'default_title', "Assignments"
+    if name.blank?
+      self.name = t "default_title", "Assignments"
     end
-    if !self.group_weight || self.group_weight.nan?
+    if !group_weight || group_weight.nan?
       self.group_weight = 0
     end
-    self.default_assignment_name = self.name
-    self.default_assignment_name = self.default_assignment_name.singularize if I18n.locale == :en
-    self.position = self.position_was if self.will_save_change_to_position? && self.position.nil? # don't allow setting to nil
+    self.default_assignment_name = name
+    self.default_assignment_name = default_assignment_name.singularize if I18n.locale == :en
+    self.position = position_was if will_save_change_to_position? && position.nil? # don't allow setting to nil
   end
   protected :generate_default_values
 
   def update_student_grades
-    if self.saved_change_to_rules? || self.saved_change_to_group_weight?
-      unless self.saved_by == :migration
-        self.class.connection.after_transaction_commit { self.context.recompute_student_scores }
-      end
+    if (saved_change_to_rules? || saved_change_to_group_weight?) && saved_by != :migration
+      self.class.connection.after_transaction_commit { context.recompute_student_scores }
     end
   end
 
   def set_context_code
-    self.context_code = "#{self.context_type.underscore}_#{self.context_id}"
+    self.context_code = "#{context_type.underscore}_#{context_id}"
   end
 
   set_policy do
-    given { |user, session| self.context.grants_any_right?(user, session, :read, :view_all_grades, :manage_grades) }
+    given { |user, session| context.grants_any_right?(user, session, :read, :view_all_grades, :manage_grades) }
     can :read
 
     given do |user, session|
-      !self.context.root_account.feature_enabled?(:granular_permissions_manage_assignments) &&
-        self.context.grants_right?(user, session, :manage_assignments)
+      !context.root_account.feature_enabled?(:granular_permissions_manage_assignments) &&
+        context.grants_right?(user, session, :manage_assignments)
     end
     can :read and can :create and can :update
 
     given do |user, session|
-      self.context.root_account.feature_enabled?(:granular_permissions_manage_assignments) &&
-        self.context.grants_right?(user, session, :manage_assignments_add)
+      context.root_account.feature_enabled?(:granular_permissions_manage_assignments) &&
+        context.grants_right?(user, session, :manage_assignments_add)
     end
     can :read and can :create
 
     given do |user, session|
-      self.context.root_account.feature_enabled?(:granular_permissions_manage_assignments) &&
-        self.context.grants_right?(user, session, :manage_assignments_edit)
+      context.root_account.feature_enabled?(:granular_permissions_manage_assignments) &&
+        context.grants_right?(user, session, :manage_assignments_edit)
     end
     can :read and can :update
 
     given do |user, session|
-      !self.context.root_account.feature_enabled?(:granular_permissions_manage_assignments) &&
-        self.context.grants_right?(user, session, :manage_assignments) &&
-        (self.context.account_membership_allows(user) ||
+      !context.root_account.feature_enabled?(:granular_permissions_manage_assignments) &&
+        context.grants_right?(user, session, :manage_assignments) &&
+        (context.account_membership_allows(user) ||
          !any_assignment_in_closed_grading_period?)
     end
     can :delete
 
     given do |user, session|
-      self.context.root_account.feature_enabled?(:granular_permissions_manage_assignments) &&
-        self.context.grants_right?(user, session, :manage_assignments_delete) &&
-        (self.context.account_membership_allows(user) ||
+      context.root_account.feature_enabled?(:granular_permissions_manage_assignments) &&
+        context.grants_right?(user, session, :manage_assignments_delete) &&
+        (context.account_membership_allows(user) ||
          !any_assignment_in_closed_grading_period?)
     end
     can :delete
   end
 
   def restore(try_to_selectively_undelete_assignments = true)
-    to_restore = self.assignments.include_submittables
+    to_restore = assignments.include_submittables
     if try_to_selectively_undelete_assignments
       # It's a pretty good guess that if an assignment was modified at the same
       # time that this group was last modified, that assignment was deleted
       # along with this group. This might help avoid undeleting assignments that
       # were deleted earlier.
-      to_restore = to_restore.where('updated_at >= ?', self.updated_at.utc)
+      to_restore = to_restore.where("updated_at >= ?", updated_at.utc)
     end
-    undestroy(active_state: 'available')
+    undestroy(active_state: "available")
     restore_scores
     to_restore.each { |assignment| assignment.restore(:assignment_group) }
   end
@@ -150,7 +148,7 @@ class AssignmentGroup < ActiveRecord::Base
     (rules || "").split("\n").each do |rule|
       split = rule.split(":", 2)
       if split.length > 1
-        if split[0] == 'never_drop'
+        if split[0] == "never_drop"
           @rules_hash[split[0]] ||= []
           @rules_hash[split[0]] << (options[:stringify_json_ids] ? split[1].to_s : split[1].to_i)
         else
@@ -171,34 +169,32 @@ class AssignmentGroup < ActiveRecord::Base
   # drop_lowest:2\ndrop_highest:1\nnever_drop:12\nnever_drop:14\n
   def rules_hash=(incoming_hash)
     rule_string = ""
-    rule_string += "drop_lowest:#{incoming_hash['drop_lowest']}\n" if incoming_hash['drop_lowest']
-    rule_string += "drop_highest:#{incoming_hash['drop_highest']}\n" if incoming_hash['drop_highest']
-    if incoming_hash['never_drop']
-      incoming_hash['never_drop'].each do |r|
-        rule_string += "never_drop:#{r}\n"
-      end
+    rule_string += "drop_lowest:#{incoming_hash["drop_lowest"]}\n" if incoming_hash["drop_lowest"]
+    rule_string += "drop_highest:#{incoming_hash["drop_highest"]}\n" if incoming_hash["drop_highest"]
+    incoming_hash["never_drop"]&.each do |r|
+      rule_string += "never_drop:#{r}\n"
     end
     self.rules = rule_string
   end
 
   def points_possible
-    self.assignments.reduce(0) { |sum, assignment| sum + (assignment.points_possible || 0) }
+    assignments.reduce(0) { |sum, assignment| sum + (assignment.points_possible || 0) }
   end
 
   scope :include_active_assignments, -> { preload(:active_assignments) }
   scope :active, -> { where("assignment_groups.workflow_state<>'deleted'") }
-  scope :before, lambda { |date| where("assignment_groups.created_at<?", date) }
-  scope :for_context_codes, lambda { |codes| active.where(:context_code => codes).ordered }
-  scope :for_course, lambda { |course| where(:context_id => course, :context_type => 'Course') }
+  scope :before, ->(date) { where("assignment_groups.created_at<?", date) }
+  scope :for_context_codes, ->(codes) { active.where(context_code: codes).ordered }
+  scope :for_course, ->(course) { where(context_id: course, context_type: "Course") }
 
   def course_grading_change
-    self.context.grade_weight_changed! if saved_change_to_group_weight? && self.context && self.context.group_weighting_scheme == 'percent'
+    context.grade_weight_changed! if saved_change_to_group_weight? && context && context.group_weighting_scheme == "percent"
     true
   end
 
   # this is just in case we happen to delete the last assignment_group in a course
   def clear_context_has_assignment_group_cache
-    Rails.cache.delete(['has_assignment_group', global_context_id].cache_key) if context_id
+    Rails.cache.delete(["has_assignment_group", global_context_id].cache_key) if context_id
   end
 
   def course_broadcast_data
@@ -208,10 +204,10 @@ class AssignmentGroup < ActiveRecord::Base
   set_broadcast_policy do |p|
     p.dispatch :grade_weight_changed
     p.to { context.participating_students_by_date }
-    p.whenever { |record|
+    p.whenever do |record|
       false &&
-        record.changed_in_state(:available, :fields => :group_weight)
-    }
+        record.changed_in_state(:available, fields: :group_weight)
+    end
     p.data { course_broadcast_data }
   end
 
@@ -231,18 +227,18 @@ class AssignmentGroup < ActiveRecord::Base
 
   def has_frozen_assignments?(user)
     return false unless PluginSetting.settings_for_plugin(:assignment_freezer)
-    return false unless self.active_assignments.length > 0
+    return false if active_assignments.empty?
 
-    self.active_assignments.any? do |assignment|
+    active_assignments.any? do |assignment|
       assignment.frozen_for_user?(user)
     end
   end
 
   def has_frozen_assignment_group_id_assignment?(user)
     return false unless PluginSetting.settings_for_plugin(:assignment_freezer)
-    return false unless self.active_assignments.length > 0
+    return false if active_assignments.empty?
 
-    self.active_assignments.any? do |assignment|
+    active_assignments.any? do |assignment|
       assignment.att_frozen?(:assignment_group_id, user)
     end
   end
@@ -254,7 +250,7 @@ class AssignmentGroup < ActiveRecord::Base
   def visible_assignments(user, includes: [], assignment_ids: [])
     self.class.visible_assignments(
       user,
-      self.context,
+      context,
       [self],
       includes: includes,
       assignment_ids: assignment_ids
@@ -263,12 +259,12 @@ class AssignmentGroup < ActiveRecord::Base
 
   def self.visible_assignments(user, context, assignment_groups, includes: [], assignment_ids: [])
     scope = if context.grants_any_right?(user, :manage_grades, :read_as_admin, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS)
-              context.active_assignments.where(:assignment_group_id => assignment_groups)
+              context.active_assignments.where(assignment_group_id: assignment_groups)
             elsif user.nil?
-              context.active_assignments.published.where(:assignment_group_id => assignment_groups)
+              context.active_assignments.published.where(assignment_group_id: assignment_groups)
             else
               user.assignments_visible_in_course(context)
-                  .where(:assignment_group_id => assignment_groups).published
+                  .where(assignment_group_id: assignment_groups).published
             end
 
     if assignment_ids&.any?
@@ -281,12 +277,12 @@ class AssignmentGroup < ActiveRecord::Base
   def move_assignments_to(move_to_id)
     new_group = context.assignment_groups.active.find(move_to_id)
     order = new_group.assignments.active.pluck(:id)
-    ids_to_change = self.assignments.active.pluck(:id)
+    ids_to_change = assignments.active.pluck(:id)
     order += ids_to_change
-    Assignment.where(:id => ids_to_change).update_all(:assignment_group_id => new_group.id, :updated_at => Time.now.utc) unless ids_to_change.empty?
+    Assignment.where(id: ids_to_change).update_all(assignment_group_id: new_group.id, updated_at: Time.now.utc) unless ids_to_change.empty?
     Assignment.where(id: order).first.update_order(order) unless order.empty?
     new_group.touch
-    self.reload
+    reload
   end
 
   private

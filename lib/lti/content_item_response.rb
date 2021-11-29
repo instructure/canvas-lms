@@ -23,15 +23,15 @@
 
 module Lti
   class ContentItemResponse
-    MEDIA_TYPES = [:assignments, :discussion_topics, :modules, :module_items, :pages, :quizzes, :files]
-    SUPPORTED_EXPORT_TYPES = %w(common_cartridge)
+    MEDIA_TYPES = %i[assignments discussion_topics modules module_items pages quizzes files].freeze
+    SUPPORTED_EXPORT_TYPES = %w[common_cartridge].freeze
 
     def initialize(context, controller, current_user, media_types, export_type)
       @context = context
       @controller = controller # for url generation
       @current_user = current_user
       @media_types = media_types.with_indifferent_access
-      @export_type = export_type || 'common_cartridge' # legacy API behavior defaults to common cartridge
+      @export_type = export_type || "common_cartridge" # legacy API behavior defaults to common cartridge
 
       raise Lti::Errors::InvalidMediaTypeError unless media_types_valid?
       raise Lti::Errors::UnsupportedExportTypeError unless SUPPORTED_EXPORT_TYPES.include? @export_type
@@ -42,23 +42,23 @@ module Lti
         select = {}
         @media_types.each { |k, v| select[k] = v }
         @query_params = { "export_type" => @export_type }
-        @query_params['select'] = select if select.present?
+        @query_params["select"] = select if select.present?
       end
       @query_params
     end
 
     def media_type
       unless @media_type
-        if canvas_media_type == 'module_item'
+        if canvas_media_type == "module_item"
           case tag.content
           when Assignment
-            @media_type = 'assignment'
+            @media_type = "assignment"
           when DiscussionTopic
-            @media_type = 'discussion_topic'
+            @media_type = "discussion_topic"
           when Quizzes::Quiz
-            @media_type = 'quiz'
+            @media_type = "quiz"
           when WikiPage
-            @media_type = 'page'
+            @media_type = "page"
           end
         else
           @media_type = canvas_media_type
@@ -68,10 +68,8 @@ module Lti
     end
 
     def tag
-      unless @tag
-        if @media_types.include? :module_items
-          @tag = @context.context_module_tags.where(id: @media_types[:module_items].first).first
-        end
+      if !@tag && @media_types.include?(:module_items)
+        @tag = @context.context_module_tags.where(id: @media_types[:module_items].first).first
       end
       @tag
     end
@@ -80,7 +78,7 @@ module Lti
       return unless @media_types.include? :files
 
       unless @file
-        @file = Attachment.where(:id => @media_types[:files].first).first
+        @file = Attachment.where(id: @media_types[:files].first).first
         if @context.is_a?(Account)
           raise ActiveRecord::RecordNotFound unless @file.context == @current_user
         elsif @file.context.is_a?(Course)
@@ -95,21 +93,21 @@ module Lti
 
     def title
       @title ||= case canvas_media_type
-                 when 'file'
+                 when "file"
                    file.display_name
-                 when 'assignment'
+                 when "assignment"
                    @context.assignments.where(id: @media_types[:assignments].first).first.title
-                 when 'discussion_topic'
+                 when "discussion_topic"
                    @context.discussion_topics.where(id: @media_types[:discussion_topics].first).first.title
-                 when 'module'
+                 when "module"
                    @context.context_modules.where(id: @media_types[:modules].first).first.name
-                 when 'page'
+                 when "page"
                    @context.wiki_pages.where(id: @media_types[:pages].first).first.title
-                 when 'module_item'
+                 when "module_item"
                    tag.title
-                 when 'quiz'
+                 when "quiz"
                    @context.quizzes.where(id: @media_types[:quizzes].first).first.title
-                 when 'course'
+                 when "course"
                    @context.name
                  end
     end
@@ -119,14 +117,14 @@ module Lti
     end
 
     def url
-      @url ||= @media_types.include?(:files) ? @controller.file_download_url(file, { :verifier => file.uuid, :download => '1', :download_frd => '1' }) : @controller.api_v1_course_content_exports_url(@context) + '?' + query_params.to_query
+      @url ||= @media_types.include?(:files) ? @controller.file_download_url(file, { verifier: file.uuid, download: "1", download_frd: "1" }) : @controller.api_v1_course_content_exports_url(@context) + "?" + query_params.to_query
     end
 
     def as_json(opts = {})
       case opts[:lti_message_type]
-      when 'ContentItemSelectionResponse'
+      when "ContentItemSelectionResponse"
         content_item_selection_response_json
-      when 'ContentItemSelection'
+      when "ContentItemSelection"
         content_item_selection_json
       else
         raise Lti::Errors::UnsupportedMessageTypeError
@@ -139,30 +137,30 @@ module Lti
       @canvas_media_type ||= if @media_types.keys.size == 1
                                @media_types.keys.first.to_s.singularize
                              else
-                               'course'
+                               "course"
                              end
     end
 
     def media_types_valid?
       @media_types.each do |type, ids|
         scope = case type
-                when 'files'
+                when "files"
                   Attachment
-                when 'assignments'
+                when "assignments"
                   @context.assignments
-                when 'discussion_topics'
+                when "discussion_topics"
                   @context.discussion_topics
-                when 'modules'
+                when "modules"
                   @context.context_modules
-                when 'pages'
+                when "pages"
                   @context.wiki_pages
-                when 'module_items'
+                when "module_items"
                   @context.context_module_tags
-                when 'quizzes'
+                when "quizzes"
                   @context.quizzes
                 end
 
-        return false if scope.where(:id => ids).count != ids.count
+        return false if scope.where(id: ids).count != ids.count
       end
       true
     end

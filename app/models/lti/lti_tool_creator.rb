@@ -20,16 +20,16 @@
 module Lti
   class LtiToolCreator
     PRIVACY_LEVEL_MAP = {
-      'public' => LtiOutbound::LTITool::PRIVACY_LEVEL_PUBLIC,
-      'email_only' => LtiOutbound::LTITool::PRIVACY_LEVEL_EMAIL_ONLY,
-      'name_only' => LtiOutbound::LTITool::PRIVACY_LEVEL_NAME_ONLY,
-      'anonymous' => LtiOutbound::LTITool::PRIVACY_LEVEL_ANONYMOUS
-    }
+      "public" => LtiOutbound::LTITool::PRIVACY_LEVEL_PUBLIC,
+      "email_only" => LtiOutbound::LTITool::PRIVACY_LEVEL_EMAIL_ONLY,
+      "name_only" => LtiOutbound::LTITool::PRIVACY_LEVEL_NAME_ONLY,
+      "anonymous" => LtiOutbound::LTITool::PRIVACY_LEVEL_ANONYMOUS
+    }.freeze
     def initialize(context_external_tool)
       @context_external_tool = context_external_tool
     end
 
-    def convert()
+    def convert
       LtiOutbound::LTITool.new.tap do |lti_tool|
         lti_tool.name = @context_external_tool.name
         lti_tool.consumer_key = @context_external_tool.consumer_key

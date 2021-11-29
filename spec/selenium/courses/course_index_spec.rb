@@ -17,8 +17,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../../helpers/k5_common'
-require_relative './pages/course_index_page'
+require_relative "../../helpers/k5_common"
+require_relative "./pages/course_index_page"
 
 describe "course index" do
   include_context "in-process server selenium tests"
@@ -32,17 +32,17 @@ describe "course index" do
     @user = User.create!
 
     @current_courses = []
-    @current_courses << course_with_student(:course_name => "Classic Course (Current)", :account => @classic_account, :user => @user, :active_all => true).course
-    @current_courses << course_with_student(:course_name => "K5 Course (Current)", :account => @k5_account, :user => @user, :active_all => true).course
+    @current_courses << course_with_student(course_name: "Classic Course (Current)", account: @classic_account, user: @user, active_all: true).course
+    @current_courses << course_with_student(course_name: "K5 Course (Current)", account: @k5_account, user: @user, active_all: true).course
 
     @past_courses = []
-    @past_courses << course_with_student(:course_name => "Classic Course (Past)", :account => @classic_account, :user => @user, :active_all => true).course
-    @past_courses << course_with_student(:course_name => "K5 Course (Past)", :account => @k5_account, :user => @user, :active_all => true).course
+    @past_courses << course_with_student(course_name: "Classic Course (Past)", account: @classic_account, user: @user, active_all: true).course
+    @past_courses << course_with_student(course_name: "K5 Course (Past)", account: @k5_account, user: @user, active_all: true).course
     @past_courses.each(&:complete!)
 
     @future_courses = []
-    @future_courses << course_with_student(:course_name => "Classic Course (Future)", :account => @classic_account, :user => @user).course
-    @future_courses << course_with_student(:course_name => "K5 Course (Future)", :account => @k5_account, :user => @user).course
+    @future_courses << course_with_student(course_name: "Classic Course (Future)", account: @classic_account, user: @user).course
+    @future_courses << course_with_student(course_name: "K5 Course (Future)", account: @k5_account, user: @user).course
     @future_courses.each do |c|
       c.start_at = 1.week.from_now
       c.conclude_at = 6.weeks.from_now
@@ -50,7 +50,7 @@ describe "course index" do
       c.save!
       c.offer!
     end
-    @user.enrollments.where(course: @future_courses).update_all(workflow_state: 'active')
+    @user.enrollments.where(course: @future_courses).update_all(workflow_state: "active")
   end
 
   before do
@@ -112,24 +112,24 @@ describe "course index" do
 
   context "start new course button" do
     it "launches k5 dialog for k5 users" do
-      course_with_teacher_logged_in(:account => @k5_account)
+      course_with_teacher_logged_in(account: @k5_account)
       @teacher.account.settings[:teachers_can_create_courses] = true
       @teacher.account.save!
 
       get "/courses"
-      add_course_button = f('#start_new_course')
+      add_course_button = f("#start_new_course")
       expect(add_course_button).to include_text("Subject")
       add_course_button.click
       expect(fj('h2:contains("Create Subject")')).to be_displayed
     end
 
     it "launches classic new course dialog for non-k5 users" do
-      course_with_teacher_logged_in(:account => @classic_account)
+      course_with_teacher_logged_in(account: @classic_account)
       @teacher.account.settings[:teachers_can_create_courses] = true
       @teacher.account.save!
 
       get "/courses"
-      add_course_button = f('#start_new_course')
+      add_course_button = f("#start_new_course")
       expect(add_course_button).to include_text("Course")
       add_course_button.click
       expect(fj('.ui-dialog-title:contains("Start a New Course")')).to be_displayed
@@ -137,12 +137,12 @@ describe "course index" do
 
     it "launches improved new course dialog for non-k5 users if create_course_subaccount_picker is enabled" do
       @classic_account.root_account.enable_feature!(:create_course_subaccount_picker)
-      course_with_teacher_logged_in(:account => @classic_account)
+      course_with_teacher_logged_in(account: @classic_account)
       @teacher.account.settings[:teachers_can_create_courses] = true
       @teacher.account.save!
 
       get "/courses"
-      add_course_button = f('#start_new_course')
+      add_course_button = f("#start_new_course")
       expect(add_course_button).to include_text("Course")
       add_course_button.click
       expect(fj('h2:contains("Create Course")')).to be_displayed

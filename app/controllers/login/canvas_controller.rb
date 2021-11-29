@@ -32,7 +32,7 @@ class Login::CanvasController < ApplicationController
     @pseudonym_session = PseudonymSession.new
     @headers = false
     flash.now[:error] = params[:message] if params[:message]
-    flash.now[:notice] = t('Your password has been changed.') if params[:password_changed] == '1'
+    flash.now[:notice] = t("Your password has been changed.") if params[:password_changed] == "1"
     @include_recaptcha = recaptcha_enabled?
 
     maybe_render_mobile_login
@@ -72,7 +72,7 @@ class Login::CanvasController < ApplicationController
 
     # look for LDAP pseudonyms where we get the unique_id back from LDAP, or if we're doing JIT provisioning
     if !found && !@pseudonym_session.attempted_record
-      found = @domain_root_account.authentication_providers.active.where(auth_type: 'ldap').any? do |aac|
+      found = @domain_root_account.authentication_providers.active.where(auth_type: "ldap").any? do |aac|
         next unless aac.identifier_format.present? || aac.jit_provisioning?
 
         res = aac.ldap_bind_result(params[:pseudonym_session][:unique_id], params[:pseudonym_session][:password])
@@ -133,7 +133,7 @@ class Login::CanvasController < ApplicationController
       session[:login_aac] ||= ap.id
       successful_login(user, pseudonym)
     else
-      link_url = Setting.get('invalid_login_faq_url', nil)
+      link_url = Setting.get("invalid_login_faq_url", nil)
       if link_url
         unsuccessful_login t(
           "Invalid username or password. Trouble logging in? *Check out our Login FAQs*.",
@@ -148,19 +148,19 @@ class Login::CanvasController < ApplicationController
   protected
 
   def validate_auth_type
-    @domain_root_account.authentication_providers.where(auth_type: params[:controller].sub(%r{^login/}, '')).active.take!
+    @domain_root_account.authentication_providers.where(auth_type: params[:controller].sub(%r{^login/}, "")).active.take!
   end
 
   def unsuccessful_login(message)
     if request.format.json?
-      return render :json => { :errors => [message] }, :status => :bad_request
+      return render json: { errors: [message] }, status: :bad_request
     end
 
-    if mobile_device?
-      flash[:error] = message
-    else
-      flash[:error] = { html: message, timeout: 15000 }
-    end
+    flash[:error] = if mobile_device?
+                      message
+                    else
+                      { html: message, timeout: 15_000 }
+                    end
     @errored = true
     @headers = false
     maybe_render_mobile_login :bad_request
@@ -170,7 +170,7 @@ class Login::CanvasController < ApplicationController
     if mobile_device?
       @login_handle_name = @domain_root_account.login_handle_name_with_inference
       @login_handle_is_email = @login_handle_name == AuthenticationProvider.default_login_handle_name
-      render :mobile_login, layout: 'mobile_auth', status: status
+      render :mobile_login, layout: "mobile_auth", status: status
     else
       @aacs_with_buttons = @domain_root_account.authentication_providers.active.select { |aac| aac.class.login_button? }
       render :new, status: status

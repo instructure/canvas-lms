@@ -26,7 +26,7 @@ describe Mutations::DeleteOutcomeProficiency do
     @account = Account.default
     @course = @account.courses.create!
     @admin = account_admin_user(account: @account)
-    @teacher = @course.enroll_teacher(User.create!, enrollment_state: 'active').user
+    @teacher = @course.enroll_teacher(User.create!, enrollment_state: "active").user
   end
 
   let(:original_record) { outcome_proficiency_model(@account) }
@@ -50,55 +50,55 @@ describe Mutations::DeleteOutcomeProficiency do
   end
 
   it "deletes an outcome proficency with legacy id" do
-    query = <<~QUERY
+    query = <<~GQL
       id: #{original_record.id}
-    QUERY
+    GQL
     result = execute_with_input(query)
-    expect(result.dig('errors')).to be_nil
-    expect(result.dig('data', 'deleteOutcomeProficiency', 'errors')).to be_nil
-    expect(result.dig('data', 'deleteOutcomeProficiency', 'outcomeProficiencyId')).to eq original_record.id.to_s
+    expect(result["errors"]).to be_nil
+    expect(result.dig("data", "deleteOutcomeProficiency", "errors")).to be_nil
+    expect(result.dig("data", "deleteOutcomeProficiency", "outcomeProficiencyId")).to eq original_record.id.to_s
   end
 
   it "deletes an outcome proficency with relay id" do
-    query = <<~QUERY
-      id: #{GraphQLHelpers.relay_or_legacy_id_prepare_func('OutcomeProficiency').call(original_record.id.to_s)}
-    QUERY
+    query = <<~GQL
+      id: #{GraphQLHelpers.relay_or_legacy_id_prepare_func("OutcomeProficiency").call(original_record.id.to_s)}
+    GQL
     result = execute_with_input(query)
-    expect(result.dig('errors')).to be_nil
-    expect(result.dig('data', 'deleteOutcomeProficiency', 'errors')).to be_nil
-    expect(result.dig('data', 'deleteOutcomeProficiency', 'outcomeProficiencyId')).to eq original_record.id.to_s
+    expect(result["errors"]).to be_nil
+    expect(result.dig("data", "deleteOutcomeProficiency", "errors")).to be_nil
+    expect(result.dig("data", "deleteOutcomeProficiency", "outcomeProficiencyId")).to eq original_record.id.to_s
   end
 
-  context 'errors' do
+  context "errors" do
     def expect_error(result, message)
-      errors = result.dig('errors') || result.dig('data', 'deleteOutcomeProficiency', 'errors')
+      errors = result["errors"] || result.dig("data", "deleteOutcomeProficiency", "errors")
       expect(errors).not_to be_nil
-      expect(errors[0]['message']).to match(/#{message}/)
+      expect(errors[0]["message"]).to match(/#{message}/)
     end
 
     it "requires manage_proficiency_scales permission" do
-      query = <<~QUERY
+      query = <<~GQL
         id: #{original_record.id}
-      QUERY
+      GQL
       result = execute_with_input(query, user_executing: @teacher)
-      expect_error(result, 'insufficient permission')
+      expect_error(result, "insufficient permission")
     end
 
     it "invalid id" do
-      query = <<~QUERY
+      query = <<~GQL
         id: 0
-      QUERY
+      GQL
       result = execute_with_input(query)
-      expect_error(result, 'Unable to find OutcomeProficiency')
+      expect_error(result, "Unable to find OutcomeProficiency")
     end
 
     it "does not delete a record twice" do
       original_record.destroy
-      query = <<~QUERY
+      query = <<~GQL
         id: #{original_record.id}
-      QUERY
+      GQL
       result = execute_with_input(query)
-      expect_error(result, 'Unable to find OutcomeProficiency')
+      expect_error(result, "Unable to find OutcomeProficiency")
     end
   end
 end

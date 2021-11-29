@@ -60,13 +60,13 @@ class Quizzes::QuizSubmission::QuestionReferenceDataFixer
           if relink_or_create_questions(quiz_submission)
             modified = true
 
-            Quizzes::QuizSubmission.where(id: quiz_submission).update_all <<~SQL
+            Quizzes::QuizSubmission.where(id: quiz_submission).update_all <<~SQL.squish
               quiz_data = '#{connection.quote_string(quiz_submission.quiz_data.to_yaml)}',
               submission_data = '#{connection.quote_string(quiz_submission.submission_data.to_yaml)}',
               question_references_fixed = TRUE
             SQL
           else
-            quiz_submission.update_column('question_references_fixed', true)
+            quiz_submission.update_column("question_references_fixed", true)
           end
 
           # Now pass over all the version models:
@@ -82,7 +82,7 @@ class Quizzes::QuizSubmission::QuestionReferenceDataFixer
       end # QuizSubmission#transaction
     end
 
-    return modified
+    modified
   end
 
   protected
@@ -106,7 +106,7 @@ class Quizzes::QuizSubmission::QuestionReferenceDataFixer
     # objects for later access:
     erratic_ids = quiz_data.select do |question_data|
       question_data[:id] == question_data[:assessment_question_id]
-    end.map { |question_data| question_data[:id] }
+    end.pluck(:id)
 
     return false if erratic_ids.empty?
 
@@ -117,7 +117,7 @@ class Quizzes::QuizSubmission::QuestionReferenceDataFixer
     quiz_questions = Quizzes::QuizQuestion.where({
                                                    quiz_id: quiz_id,
                                                    assessment_question_id: assessment_questions.map(&:id)
-                                                 }).select([:id, :quiz_id, :assessment_question_id]).to_a
+                                                 }).select(%i[id quiz_id assessment_question_id]).to_a
 
     quiz_data.each do |question_data|
       # 1. the "id" must point to the assessment question's:
@@ -163,7 +163,7 @@ class Quizzes::QuizSubmission::QuestionReferenceDataFixer
   # has side-effects on submission data
   def process_graded_submission_data(submission_data, id_map)
     submission_data.each do |grading_record|
-      if id_map.has_key?(grading_record[:question_id])
+      if id_map.key?(grading_record[:question_id])
         grading_record[:question_id] = id_map[grading_record[:question_id]]
       end
     end
@@ -178,17 +178,13 @@ class Quizzes::QuizSubmission::QuestionReferenceDataFixer
     #  - question_xxx_marked
     #  - _question_xxx_read
     #
-    submission_data.keys.each do |key|
-      new_key = key.sub(/question_(\d+)/) { "question_#{id_map[$1.to_i] || $1}" }
-
-      if new_key != key
-        submission_data[new_key] = submission_data.delete(key)
-      end
+    submission_data.transform_keys! do |key|
+      key.sub(/question_(\d+)/) { "question_#{id_map[$1.to_i] || $1}" }
     end
 
     # Adjust the "next_question_path" for OQAAT quizzes. This is a URL entry
     # that ends with a question ID, like "/courses/1/quizzes/1/questions/1"
-    if submission_data.has_key?("next_question_path")
+    if submission_data.key?("next_question_path")
       submission_data["next_question_path"].sub!(/(\d+)$/) do |id|
         id_map[id.to_i] || id
       end

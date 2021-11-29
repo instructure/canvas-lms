@@ -21,10 +21,10 @@
 SUBMISSION_COMMENT_LIMIT = 200
 
 class Mutations::MarkSubmissionCommentsRead < Mutations::BaseMutation
-  graphql_name 'MarkSubmissionCommentsRead'
+  graphql_name "MarkSubmissionCommentsRead"
 
-  argument :submission_comment_ids, [ID], required: true, prepare: GraphQLHelpers.relay_or_legacy_ids_prepare_func('SubmissionComment')
-  argument :submission_id, ID, required: true, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func('Submission')
+  argument :submission_comment_ids, [ID], required: true, prepare: GraphQLHelpers.relay_or_legacy_ids_prepare_func("SubmissionComment")
+  argument :submission_id, ID, required: true, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Submission")
   field :submission_comments, [Types::SubmissionCommentType], null: true
 
   def resolve(input:)
@@ -39,9 +39,9 @@ class Mutations::MarkSubmissionCommentsRead < Mutations::BaseMutation
       ViewedSubmissionComment.create!(submission_comment_id: sc_id, user: current_user)
     end
     { submission_comments: SubmissionComment.where(id: input_sc_ids) }
-  rescue ActiveRecord::RecordInvalid => invalid
-    errors_for(invalid.record)
+  rescue ActiveRecord::RecordInvalid => e
+    errors_for(e.record)
   rescue ActiveRecord::RecordNotFound
-    raise GraphQL::ExecutionError, 'not found'
+    raise GraphQL::ExecutionError, "not found"
   end
 end

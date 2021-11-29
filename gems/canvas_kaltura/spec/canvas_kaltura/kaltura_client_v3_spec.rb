@@ -18,21 +18,21 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'spec_helper'
+require "spec_helper"
 
 describe CanvasKaltura::ClientV3 do
   def create_config(opts = {})
     allow(CanvasKaltura::ClientV3).to receive(:config) {
       {
-        'domain' => 'www.instructuremedia.com',
-        'resource_domain' => 'www.instructuremedia.com',
-        'partner_id' => '100',
-        'subpartner_id' => '10000',
-        'secret_key' => 'fenwl1n23k4123lk4hl321jh4kl321j4kl32j14kl321',
-        'user_secret_key' => '1234821hrj3k21hjk4j3kl21j4kl321j4kl3j21kl4j3k2l1',
-        'player_ui_conf' => '1',
-        'kcw_ui_conf' => '1',
-        'upload_ui_conf' => '1'
+        "domain" => "www.instructuremedia.com",
+        "resource_domain" => "www.instructuremedia.com",
+        "partner_id" => "100",
+        "subpartner_id" => "10000",
+        "secret_key" => "fenwl1n23k4123lk4hl321jh4kl321j4kl32j14kl321",
+        "user_secret_key" => "1234821hrj3k21hjk4j3kl21j4kl321j4kl3j21kl4j3k2l1",
+        "player_ui_conf" => "1",
+        "kcw_ui_conf" => "1",
+        "upload_ui_conf" => "1"
       }.merge(opts)
     }
 
@@ -42,37 +42,37 @@ describe CanvasKaltura::ClientV3 do
   include WebMock::API
 
   def stub_kaltura_session(options = {})
-    default_params = { :service => 'session', :action => 'start' }
+    default_params = { service: "session", action: "start" }
     query_params   = default_params.merge(options.fetch(:params, {}))
-    ks             = options.fetch(:ks, 'fakekalturasession')
+    ks             = options.fetch(:ks, "fakekalturasession")
 
     stub_request(:get, "https://www.instructuremedia.com/api_v3/")
-      .with(:query => hash_including(query_params))
-      .to_return(:body => "<result>#{ks}</result>")
+      .with(query: hash_including(query_params))
+      .to_return(body: "<result>#{ks}</result>")
   end
 
   before do
     CanvasKaltura.cache = double(read: nil)
     CanvasKaltura.logger = double.as_null_object
-    CanvasKaltura.timeout_protector_proc = lambda { |_options, &block| block.call }
+    CanvasKaltura.timeout_protector_proc = ->(_options, &block) { block.call }
     create_config
     WebMock.enable!
   end
 
-  describe 'thumbnail_url' do
+  describe "thumbnail_url" do
     it "properly sanitizes thumbnail parameters" do
-      url = @kaltura.thumbnail_url('0_123<evil>', {
-                                     :width => 'evilwidth',
-                                     :height => 'evilheight',
-                                     :type => 'eviltype',
-                                     :bgcolor => 'evilcolor',
-                                     :vid_sec => 'evilsec'
+      url = @kaltura.thumbnail_url("0_123<evil>", {
+                                     width: "evilwidth",
+                                     height: "evilheight",
+                                     type: "eviltype",
+                                     bgcolor: "evilcolor",
+                                     vid_sec: "evilsec"
                                    })
       expect(url).to eq "https://www.instructuremedia.com/p/100/thumbnail/entry_id/0_123evil/width/0/height/0/bgcolor/ec/type/0/vid_sec/0"
     end
 
     it "allows properly formed notorious-style media ids through without mangling" do
-      url = @kaltura.thumbnail_url('m-9w7egf9e2gduowehf08dshfsd')
+      url = @kaltura.thumbnail_url("m-9w7egf9e2gduowehf08dshfsd")
       expect(url).to eq(
         "https://www.instructuremedia.com/p/100/thumbnail/entry_id/m-9w7egf9e2gduowehf08dshfsd/width/140/height/100/bgcolor/ffffff/type/2/vid_sec/5"
       )
@@ -85,145 +85,145 @@ describe CanvasKaltura::ClientV3 do
     end
 
     it "works with an empty file extension" do
-      file_info = [{ :fileExt => '', :bitrate => '128' }]
+      file_info = [{ fileExt: "", bitrate: "128" }]
       expect(@kaltura.sort_source_list(file_info)).to eq file_info
     end
 
     it "sorts bitrates properly as numbers, and not as strings" do
-      file_info1 = { :fileExt => 'mp4', :bitrate => '2' }
-      file_info2 = { :fileExt => 'mp4', :bitrate => '100' }
+      file_info1 = { fileExt: "mp4", bitrate: "2" }
+      file_info2 = { fileExt: "mp4", bitrate: "100" }
       expect(@kaltura.sort_source_list([file_info1, file_info2])).to eq [file_info2, file_info1]
     end
 
     it "works with unknown file types, and sort them last" do
-      file_info1 = { :fileExt => 'unknown', :bitrate => '100' }
-      file_info2 = { :fileExt => 'mp4', :bitrate => '100' }
+      file_info1 = { fileExt: "unknown", bitrate: "100" }
+      file_info2 = { fileExt: "mp4", bitrate: "100" }
       expect(@kaltura.sort_source_list([file_info1, file_info2])).to eq [file_info2, file_info1]
     end
 
     it "sorts by preferred file types" do
-      file_info1 = { :fileExt => 'flv', :bitrate => '100' }
-      file_info2 = { :fileExt => 'mp3', :bitrate => '100' }
-      file_info3 = { :fileExt => 'mp4', :bitrate => '100' }
+      file_info1 = { fileExt: "flv", bitrate: "100" }
+      file_info2 = { fileExt: "mp3", bitrate: "100" }
+      file_info3 = { fileExt: "mp4", bitrate: "100" }
       expect(@kaltura.sort_source_list([file_info1, file_info2, file_info3])).to eq [file_info3, file_info2, file_info1]
     end
 
     it "prefers converted assets to the original" do
-      file_info1 = { :fileExt => 'mp4', :bitrate => '200', :isOriginal => '1' }
-      file_info2 = { :fileExt => 'flv', :bitrate => '100', :isOriginal => '0' }
-      file_info3 = { :fileExt => 'mp3', :bitrate => '100', :isOriginal => '0' }
-      file_info4 = { :fileExt => 'mp4', :bitrate => '100', :isOriginal => '0' }
+      file_info1 = { fileExt: "mp4", bitrate: "200", isOriginal: "1" }
+      file_info2 = { fileExt: "flv", bitrate: "100", isOriginal: "0" }
+      file_info3 = { fileExt: "mp3", bitrate: "100", isOriginal: "0" }
+      file_info4 = { fileExt: "mp4", bitrate: "100", isOriginal: "0" }
       expect(@kaltura.sort_source_list([file_info1, file_info2, file_info3, file_info4])).to eq [file_info4, file_info3, file_info2, file_info1]
     end
 
     it "prefers assets without conversion warnings" do
-      file_info1 = { :fileExt => 'mp4', :bitrate => '200', :isOriginal => '1' }
-      file_info2 = { :fileExt => 'flv', :bitrate => '100', :isOriginal => '0', :hasWarnings => true }
-      file_info3 = { :fileExt => 'mp3', :bitrate => '100', :isOriginal => '0' }
-      file_info4 = { :fileExt => 'mp4', :bitrate => '100', :isOriginal => '0' }
+      file_info1 = { fileExt: "mp4", bitrate: "200", isOriginal: "1" }
+      file_info2 = { fileExt: "flv", bitrate: "100", isOriginal: "0", hasWarnings: true }
+      file_info3 = { fileExt: "mp3", bitrate: "100", isOriginal: "0" }
+      file_info4 = { fileExt: "mp4", bitrate: "100", isOriginal: "0" }
       expect(@kaltura.sort_source_list([file_info1, file_info2, file_info3, file_info4])).to eq [file_info4, file_info3, file_info2.delete_if { |k| k == :hasWarnings }, file_info1]
     end
 
     it "prefers assets with conversion warnings over original" do
       file_list = [
-        { :fileExt => 'mp4', :bitrate => '200', :isOriginal => '1' },
-        { :fileExt => 'flv', :bitrate => '100', :isOriginal => '0', :hasWarnings => true },
-        { :fileExt => 'mp3', :bitrate => '100', :isOriginal => '0', :hasWarnings => true },
-        { :fileExt => 'mp4', :bitrate => '100', :isOriginal => '0', :hasWarnings => true },
+        { fileExt: "mp4", bitrate: "200", isOriginal: "1" },
+        { fileExt: "flv", bitrate: "100", isOriginal: "0", hasWarnings: true },
+        { fileExt: "mp3", bitrate: "100", isOriginal: "0", hasWarnings: true },
+        { fileExt: "mp4", bitrate: "100", isOriginal: "0", hasWarnings: true },
       ]
-      expect(@kaltura.sort_source_list(file_list).first[:isOriginal]).to_not eq '1'
+      expect(@kaltura.sort_source_list(file_list).first[:isOriginal]).to_not eq "1"
     end
 
     it "sorts by descending bitrate but deprioritize sources with suspiciously high bitrates" do
       expect(@kaltura.sort_source_list(
                [
-                 { :fileExt => 'mp4', :bitrate => '180', :isOriginal => '1' },
-                 { :fileExt => 'mp4', :bitrate => '120', :isOriginal => '0' },
-                 { :fileExt => 'mp4', :bitrate => '5000', :isOriginal => '0' },
-                 { :fileExt => 'mp4', :bitrate => '200', :isOriginal => '0' },
+                 { fileExt: "mp4", bitrate: "180", isOriginal: "1" },
+                 { fileExt: "mp4", bitrate: "120", isOriginal: "0" },
+                 { fileExt: "mp4", bitrate: "5000", isOriginal: "0" },
+                 { fileExt: "mp4", bitrate: "200", isOriginal: "0" },
                ]
              )).to eq(
                [
-                 { :fileExt => 'mp4', :bitrate => '200', :isOriginal => '0' },
-                 { :fileExt => 'mp4', :bitrate => '120', :isOriginal => '0' },
-                 { :fileExt => 'mp4', :bitrate => '5000', :isOriginal => '0' },
-                 { :fileExt => 'mp4', :bitrate => '180', :isOriginal => '1' },
+                 { fileExt: "mp4", bitrate: "200", isOriginal: "0" },
+                 { fileExt: "mp4", bitrate: "120", isOriginal: "0" },
+                 { fileExt: "mp4", bitrate: "5000", isOriginal: "0" },
+                 { fileExt: "mp4", bitrate: "180", isOriginal: "1" },
                ]
              )
     end
   end
 
-  describe 'media_sources' do
+  describe "media_sources" do
     before do
       stub_kaltura_session
     end
 
     context "caching" do
       def create_config_with_mock(seconds)
-        create_config('cache_play_list_seconds' => seconds)
-        @source = { :content_type => "video/mp4", :containerFormat => "isom", :url => "https://kaltura.example.com/url", :fileExt => "mp4" }
-        expect(@kaltura).to receive(:flavorAssetGetByEntryId) { [@source.merge({ :status => '2' })] }
+        create_config("cache_play_list_seconds" => seconds)
+        @source = { content_type: "video/mp4", containerFormat: "isom", url: "https://kaltura.example.com/url", fileExt: "mp4" }
+        expect(@kaltura).to receive(:flavorAssetGetByEntryId) { [@source.merge({ status: "2" })] }
         expect(@kaltura).to receive(:flavorAssetGetPlaylistUrl) { "https://kaltura.example.com/url" }
       end
 
       it "does not cache" do
         create_config_with_mock(0)
         expect(CanvasKaltura.cache).to_not receive(:write)
-        @kaltura.media_sources('hi')
+        @kaltura.media_sources("hi")
       end
 
       it "caches for set length" do
         create_config_with_mock(2)
-        m = double()
-        expect(m).to receive(:write).with(['media_sources2', 'hi', 2].join('/'), [@source], { :expires_in => 2 })
+        m = double
+        expect(m).to receive(:write).with(["media_sources2", "hi", 2].join("/"), [@source], { expires_in: 2 })
         expect(m).to receive(:read)
         allow(CanvasKaltura).to receive(:cache) { m }
-        @kaltura.media_sources('hi')
+        @kaltura.media_sources("hi")
       end
 
       it "caches indefinitely" do
         create_config_with_mock(nil)
-        m = double()
-        expect(m).to receive(:write).with(['media_sources2', 'hi', nil].join('/'), [@source])
+        m = double
+        expect(m).to receive(:write).with(["media_sources2", "hi", nil].join("/"), [@source])
         expect(m).to receive(:read)
         allow(CanvasKaltura).to receive(:cache) { m }
-        @kaltura.media_sources('hi')
+        @kaltura.media_sources("hi")
       end
     end
 
     it "skips empty urls" do
       create_config
-      @source = { :content_type => "video/mp4", :containerFormat => "isom", :url => nil, :fileExt => "mp4", :status => '2', :id => "1" }
-      expect(@kaltura).to receive(:flavorAssetGetByEntryId) { [@source, @source.merge({ :fileExt => "wav", :id => '2' })] }
+      @source = { content_type: "video/mp4", containerFormat: "isom", url: nil, fileExt: "mp4", status: "2", id: "1" }
+      expect(@kaltura).to receive(:flavorAssetGetByEntryId) { [@source, @source.merge({ fileExt: "wav", id: "2" })] }
       allow(@kaltura).to receive(:flavorAssetGetPlaylistUrl)
       allow(@kaltura).to receive(:flavorAssetGetDownloadUrl)
 
-      res = @kaltura.media_sources('hi')
+      res = @kaltura.media_sources("hi")
       expect(res).to be_empty
     end
 
     it "skips unknown types" do
       create_config
-      @source = { :content_type => "video/mp4", :containerFormat => "isom", :url => nil, :fileExt => "wav", :status => '2', :id => "1" }
+      @source = { content_type: "video/mp4", containerFormat: "isom", url: nil, fileExt: "wav", status: "2", id: "1" }
       expect(@kaltura).to receive(:flavorAssetGetByEntryId) { [@source] }
       allow(@kaltura).to receive(:flavorAssetGetPlaylistUrl)
 
-      res = @kaltura.media_sources('hi')
+      res = @kaltura.media_sources("hi")
       expect(res).to be_empty
     end
   end
 
   describe "startSession" do
     it "sends Kaltura a request with proper parameters for a user" do
-      user_id = 12345
+      user_id = 12_345
       session_type = CanvasKaltura::SessionType::USER
 
       kaltura_stub = stub_kaltura_session(
-        :params => {
-          :secret => CanvasKaltura::ClientV3.config['user_secret_key'],
-          :partnerId => '100',
-          :userId => user_id.to_s,
-          :type => session_type.to_s
+        params: {
+          secret: CanvasKaltura::ClientV3.config["user_secret_key"],
+          partnerId: "100",
+          userId: user_id.to_s,
+          type: session_type.to_s
         }
       )
 
@@ -236,10 +236,10 @@ describe CanvasKaltura::ClientV3 do
       session_type = CanvasKaltura::SessionType::ADMIN
 
       kaltura_stub = stub_kaltura_session(
-        :params => {
-          :secret => CanvasKaltura::ClientV3.config['secret_key'],
-          :partnerId => '100',
-          :type => session_type.to_s
+        params: {
+          secret: CanvasKaltura::ClientV3.config["secret_key"],
+          partnerId: "100",
+          type: session_type.to_s
         }
       )
 
@@ -252,27 +252,27 @@ describe CanvasKaltura::ClientV3 do
       session_type = CanvasKaltura::SessionType::USER
 
       stub_kaltura_session(
-        :ks => 'ks_from_kaltura',
-        :params => {
-          :secret => CanvasKaltura::ClientV3.config['user_secret_key'],
-          :partnerId => '100',
-          :type => session_type.to_s
+        ks: "ks_from_kaltura",
+        params: {
+          secret: CanvasKaltura::ClientV3.config["user_secret_key"],
+          partnerId: "100",
+          type: session_type.to_s
         }
       )
 
       @kaltura.startSession
 
-      expect(@kaltura.ks).to eq 'ks_from_kaltura'
+      expect(@kaltura.ks).to eq "ks_from_kaltura"
     end
   end
 
   describe "mediaGet" do
     it "calls getRequest with proper parameters" do
-      entry_id = 12345
+      entry_id = 12_345
 
       expect(@kaltura).to receive(:getRequest).with(
-        :media, :get, { :ks => nil, :entryId => entry_id }
-      ).and_return(double(:children => []))
+        :media, :get, { ks: nil, entryId: entry_id }
+      ).and_return(double(children: []))
 
       @kaltura.mediaGet(entry_id)
     end
@@ -292,12 +292,12 @@ describe CanvasKaltura::ClientV3 do
       expect(@kaltura).to receive(:getRequest).with(
         :media, :update, {
           :ks => nil,
-          :entryId => 12345,
-          'mediaEntry:key' => 'value'
+          :entryId => 12_345,
+          "mediaEntry:key" => "value"
         }
-      ).and_return(double(:children => []))
+      ).and_return(double(children: []))
 
-      @kaltura.mediaUpdate(12345, { "key" => "value" })
+      @kaltura.mediaUpdate(12_345, { "key" => "value" })
     end
 
     it "returns a properly formatted item" do
@@ -313,10 +313,10 @@ describe CanvasKaltura::ClientV3 do
   describe "mediaDelete" do
     it "calls getRequest with proper parameters" do
       expect(@kaltura).to receive(:getRequest).with(
-        :media, :delete, { :ks => nil, :entryId => 12345 }
+        :media, :delete, { ks: nil, entryId: 12_345 }
       )
 
-      @kaltura.mediaDelete(12345)
+      @kaltura.mediaDelete(12_345)
     end
   end
 
@@ -326,11 +326,11 @@ describe CanvasKaltura::ClientV3 do
       img = @kaltura.mediaTypeToSymbol(2)
       aud = @kaltura.mediaTypeToSymbol(5)
 
-      expect([vid, img, aud]).to eq [:video, :image, :audio]
+      expect([vid, img, aud]).to eq %i[video image audio]
     end
 
     it "defaults to video" do
-      expect(@kaltura.mediaTypeToSymbol(rand(10) + 6)).to eq :video
+      expect(@kaltura.mediaTypeToSymbol(rand(6..15))).to eq :video
     end
   end
 
@@ -344,8 +344,8 @@ describe CanvasKaltura::ClientV3 do
       originalId = "theOriginalId"
 
       stub_request(:get, "https://www.instructuremedia.com/api_v3/")
-        .with(:query => hash_including(:service => 'bulkUpload', :action => 'get'))
-        .to_return(:body => <<-XML)
+        .with(query: hash_including(service: "bulkUpload", action: "get"))
+        .to_return(body: <<~XML)
           <result>
             <logFileUrl>#{log_file_url}</logFileUrl>
             <id>#{bulk_upload_id}</id>
@@ -354,16 +354,16 @@ describe CanvasKaltura::ClientV3 do
         XML
 
       stub_request(:get, log_file_url)
-        .to_return(:body => "#{name},,,,,,,,,#{entryId},,#{originalId}")
+        .to_return(body: "#{name},,,,,,,,,#{entryId},,#{originalId}")
 
       bulk_upload_result = @kaltura.bulkUploadGet(bulk_upload_id)
 
       expect(bulk_upload_result[:id]).to eq bulk_upload_id.to_s
       expect(bulk_upload_result[:status]).to eq status.to_s
       expect(bulk_upload_result[:entries]).to eq [{
-        :name => name,
-        :entryId => entryId,
-        :originalId => originalId
+        name: name,
+        entryId: entryId,
+        originalId: originalId
       }]
     end
   end
@@ -372,44 +372,44 @@ describe CanvasKaltura::ClientV3 do
     it "given a string of csv, posts that csv to kaltura, then fetches the status of the created job" do
       log_file_url = "https://www.instructuremedia.com/bulk_uploads/12345.log"
       bulk_upload_add_stub = stub_request(:post, "https://www.instructuremedia.com/api_v3/")
-                             .with(:query => hash_including(:service => 'bulkUpload', :action => 'add'))
-                             .with { |request| request.headers['Content-Type'] =~ /\Amultipart\/form-data/ }
-                             .to_return(:body => <<-XML)
-          <result>
-            <id>batch_job_12345</id>
-            <status>ready</status>
-            <logFileUrl>#{log_file_url}</logFileUrl>
-          </result>
+                             .with(query: hash_including(service: "bulkUpload", action: "add"))
+                             .with { |request| request.headers["Content-Type"].start_with?("multipart/form-data") }
+                             .to_return(body: <<~XML)
+                               <result>
+                                 <id>batch_job_12345</id>
+                                 <status>ready</status>
+                                 <logFileUrl>#{log_file_url}</logFileUrl>
+                               </result>
                              XML
 
       log_file_stub = stub_request(:get, log_file_url)
-                      .to_return(:body => "aName,,,,,,,,,anEntryId,,anOriginalId")
+                      .to_return(body: "aName,,,,,,,,,anEntryId,,anOriginalId")
 
       parsed_bulk_upload = @kaltura.bulkUploadCsv("csv,data,with,bulk,upload,info")
 
       expect(bulk_upload_add_stub).to have_been_requested
       expect(log_file_stub).to have_been_requested
 
-      expect(parsed_bulk_upload[:id]).to eq 'batch_job_12345'
-      expect(parsed_bulk_upload[:status]).to eq 'ready'
+      expect(parsed_bulk_upload[:id]).to eq "batch_job_12345"
+      expect(parsed_bulk_upload[:status]).to eq "ready"
       expect(parsed_bulk_upload[:ready]).to eq true
-      expect(parsed_bulk_upload[:entries]).to eq [{ :name => 'aName', :entryId => 'anEntryId', :originalId => 'anOriginalId' }]
+      expect(parsed_bulk_upload[:entries]).to eq [{ name: "aName", entryId: "anEntryId", originalId: "anOriginalId" }]
     end
   end
 
   describe "bulkUploadAdd" do
     it "accepts data about files to upload and passes them as CSV to bulkUploadCsv" do
       files = [{
-        :name => "the_name",
-        :description => "the_desc",
-        :tags => "the_tags",
-        :media_type => "the_media_type",
-        :partner_data => "the_partner_data",
-        :url => "the_url"
+        name: "the_name",
+        description: "the_desc",
+        tags: "the_tags",
+        media_type: "the_media_type",
+        partner_data: "the_partner_data",
+        url: "the_url"
       }]
 
       expect(@kaltura).to receive(:bulkUploadCsv).with(
-        %Q[the_name,the_desc,the_tags,the_url,the_media_type,"","","","","","",the_partner_data\n]
+        %(the_name,the_desc,the_tags,the_url,the_media_type,"","","","","","",the_partner_data\n)
       )
 
       @kaltura.bulkUploadAdd(files)
@@ -438,7 +438,7 @@ describe CanvasKaltura::ClientV3 do
       playlist_url = "https://www.instructuremedia.com/p/100/playManifest/entryId/#{entry_id}/flavorId/#{flavor_id}"
 
       stub_request(:get, playlist_url)
-        .to_return(:body => <<-XML)
+        .to_return(body: <<~XML)
           <manifest>
             <media url="#{media_url}" />
             </media>

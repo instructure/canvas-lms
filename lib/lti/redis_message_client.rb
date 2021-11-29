@@ -19,8 +19,8 @@
 
 module Lti::RedisMessageClient
   TTL = 5.minutes
-  LTI_1_3_PREFIX = 'external_tool:id_token:'
-  SESSIONLESS_LAUNCH_PREFIX = 'external_tool:sessionless_launch:'
+  LTI_1_3_PREFIX = "external_tool:id_token:"
+  SESSIONLESS_LAUNCH_PREFIX = "external_tool:sessionless_launch:"
 
   def cache_launch(launch, context, prefix: LTI_1_3_PREFIX)
     return unless Canvas.redis_enabled?

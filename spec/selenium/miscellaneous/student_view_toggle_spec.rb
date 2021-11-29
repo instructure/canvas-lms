@@ -18,13 +18,13 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../common'
+require_relative "../common"
 
 describe "student view toggle" do
   include_context "in-process server selenium tests"
 
   before :once do
-    course_with_teacher :active_all => true
+    course_with_teacher active_all: true
   end
 
   before do
@@ -58,7 +58,7 @@ describe "student view toggle" do
   end
 
   it "is not visible from pages that have been disabled by instructor" do
-    @course.update_attribute(:tab_configuration, [{ 'id' => Course::TAB_QUIZZES, 'hidden' => true }])
+    @course.update_attribute(:tab_configuration, [{ "id" => Course::TAB_QUIZZES, "hidden" => true }])
     get "/courses/#{@course.id}/quizzes"
     expect(page_header).not_to contain_css("#easy_student_view")
   end

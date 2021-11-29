@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../graphql_spec_helper'
+require_relative "../graphql_spec_helper"
 
 describe Mutations::DeleteDiscussionEntry do
   before(:once) do
@@ -60,41 +60,41 @@ describe Mutations::DeleteDiscussionEntry do
     result.to_h.with_indifferent_access
   end
 
-  it 'marks a discussion entry as deleted' do
-    expect(@discussion_entry.workflow_state).to eq 'active'
+  it "marks a discussion entry as deleted" do
+    expect(@discussion_entry.workflow_state).to eq "active"
     result = run_mutation(id: @discussion_entry.id)
-    expect(result.dig('errors')).to be_nil
-    expect(result.dig('data', 'deleteDiscussionEntry', 'errors')).to be_nil
-    expect(result.dig('data', 'deleteDiscussionEntry', 'discussionEntry', '_id')).to eq @discussion_entry.id.to_s
-    expect(result.dig('data', 'deleteDiscussionEntry', 'discussionEntry', 'deleted')).to be true
-    expect(@discussion_entry.reload.workflow_state).to eq 'deleted'
+    expect(result["errors"]).to be_nil
+    expect(result.dig("data", "deleteDiscussionEntry", "errors")).to be_nil
+    expect(result.dig("data", "deleteDiscussionEntry", "discussionEntry", "_id")).to eq @discussion_entry.id.to_s
+    expect(result.dig("data", "deleteDiscussionEntry", "discussionEntry", "deleted")).to be true
+    expect(@discussion_entry.reload.workflow_state).to eq "deleted"
   end
 
-  it 'sets the editor when deleting' do
+  it "sets the editor when deleting" do
     expect(@discussion_entry.editor_id).to be_nil
     result = run_mutation(id: @discussion_entry.id)
-    expect(result.dig('errors')).to be_nil
-    expect(result.dig('data', 'deleteDiscussionEntry', 'errors')).to be_nil
-    expect(result.dig('data', 'deleteDiscussionEntry', 'discussionEntry', 'editor', '_id')).to eq @teacher.id.to_s
+    expect(result["errors"]).to be_nil
+    expect(result.dig("data", "deleteDiscussionEntry", "errors")).to be_nil
+    expect(result.dig("data", "deleteDiscussionEntry", "discussionEntry", "editor", "_id")).to eq @teacher.id.to_s
     expect(@discussion_entry.reload.editor_id).to eq @teacher.id
   end
 
-  context 'errors' do
-    it 'if the record does not exist' do
+  context "errors" do
+    it "if the record does not exist" do
       result = run_mutation(id: @discussion_entry.id + 1337)
-      expect(result.dig('errors', 0, 'message')).to eq 'not found'
+      expect(result.dig("errors", 0, "message")).to eq "not found"
     end
 
-    it 'if the user does not have read access to the discussion entry' do
+    it "if the user does not have read access to the discussion entry" do
       user = user_model
       result = run_mutation({ id: @discussion_entry.id }, user)
-      expect(result.dig('errors', 0, 'message')).to eq 'not found'
+      expect(result.dig("errors", 0, "message")).to eq "not found"
     end
 
-    it 'if the user does not have delete permissions' do
+    it "if the user does not have delete permissions" do
       result = run_mutation({ id: @discussion_entry.id }, @student)
-      expect(result.dig('errors')).to be_nil
-      expect(result.dig('data', 'deleteDiscussionEntry', 'errors', 0, 'message')).to eq 'Insufficient permissions'
+      expect(result["errors"]).to be_nil
+      expect(result.dig("data", "deleteDiscussionEntry", "errors", 0, "message")).to eq "Insufficient permissions"
     end
   end
 end

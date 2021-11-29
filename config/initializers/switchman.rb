@@ -41,7 +41,7 @@ Rails.application.config.after_initialize do
       end
 
       def settings
-        return {} unless self.class.columns_hash.key?('settings')
+        return {} unless self.class.columns_hash.key?("settings")
 
         s = super
         if s.nil?
@@ -52,7 +52,7 @@ Rails.application.config.after_initialize do
         secret = s.delete(:encryption_key_enc)
         if secret || salt
           if secret && salt
-            s[:encryption_key] = Canvas::Security.decrypt_password(secret, salt, 'shard_encryption_key')
+            s[:encryption_key] = Canvas::Security.decrypt_password(secret, salt, "shard_encryption_key")
           end
           self.settings = s
         end
@@ -61,13 +61,13 @@ Rails.application.config.after_initialize do
       end
 
       def encrypt_settings
-        s = self.settings.dup
+        s = settings.dup
         if (encryption_key = s.delete(:encryption_key))
-          secret, salt = Canvas::Security.encrypt_password(encryption_key, 'shard_encryption_key')
+          secret, salt = Canvas::Security.encrypt_password(encryption_key, "shard_encryption_key")
           s[:encryption_key_enc] = secret
           s[:encryption_key_salt] = salt
         end
-        if s != self.settings
+        if s != settings
           self.settings = s
         end
         s
@@ -102,7 +102,7 @@ Rails.application.config.after_initialize do
       end
     end
 
-    scope :in_region, ->(region) do
+    scope :in_region, lambda { |region|
       next in_current_region if region.nil?
 
       dbs_by_region = DatabaseServer.all.group_by { |db| db.config[:region] }
@@ -128,21 +128,21 @@ Rails.application.config.after_initialize do
           where.not(database_server_id: dbs_not_in_this_region)
         end
       end
-    end
+    }
 
-    scope :in_current_region, -> do
+    scope :in_current_region, lambda {
       # sharding isn't set up? maybe we're in tests, or a somehow degraded environment
       # either way there's only one shard, and we always want to see it
       return [default] unless default.is_a?(Switchman::Shard)
       return all if !ApplicationController.region || DatabaseServer.all.all? { |db| !db.config[:region] }
 
       in_region(ApplicationController.region)
-    end
+    }
   end
 
   Switchman::DatabaseServer.class_eval do
     def self.regions
-      @regions ||= all.map { |db| db.config[:region] }.compact.uniq.sort
+      @regions ||= all.filter_map { |db| db.config[:region] }.uniq.sort
     end
 
     def in_region?(region)
@@ -168,7 +168,7 @@ Rails.application.config.after_initialize do
         (start_day + 1.month).send("#{ordinal}_#{maintenance_window_weekday}_in_month".downcase)
       end
 
-      next_day = maintenance_days.find { |d| d.future? }
+      next_day = maintenance_days.find(&:future?)
       # Time offsets are strange
       start_at = next_day.utc.beginning_of_day - maintenance_window_start_hour.hours + maintenance_window_offset.minutes
       end_at = start_at + maintenance_window_duration
@@ -177,24 +177,24 @@ Rails.application.config.after_initialize do
     end
 
     def maintenance_window_start_hour
-      Setting.get('maintenance_window_start_hour', nil)&.to_i
+      Setting.get("maintenance_window_start_hour", nil)&.to_i
     end
 
     def maintenance_window_offset
-      Setting.get('maintenance_window_offset', '0').to_i
+      Setting.get("maintenance_window_offset", "0").to_i
     end
 
     def maintenance_window_duration
       # ISO 8601 duration
-      ActiveSupport::Duration.parse(Setting.get('maintenance_window_duration', "PT2H"))
+      ActiveSupport::Duration.parse(Setting.get("maintenance_window_duration", "PT2H"))
     end
 
     def maintenance_window_weekday
-      Setting.get('maintenance_window_weekday', 'thursday').downcase
+      Setting.get("maintenance_window_weekday", "thursday").downcase
     end
 
     def maintenance_window_weeks_of_month
-      Setting.get('maintenance_window_weeks_of_month', "1,3").split(',').map(&:to_i)
+      Setting.get("maintenance_window_weeks_of_month", "1,3").split(",").map(&:to_i)
     end
 
     def self.send_in_each_region(klass, method, enqueue_args = {}, *args)
@@ -203,7 +203,7 @@ Rails.application.config.after_initialize do
       return klass.send(method, *args) if DatabaseServer.all.all? { |db| !db.config[:region] }
 
       regions = Set.new
-      if !run_current_region_asynchronously
+      unless run_current_region_asynchronously
         klass.send(method, *args)
         regions << Shard.current.database_server.config[:region]
       end
@@ -260,8 +260,8 @@ Rails.application.config.after_initialize do
     end
   end
 
-  if !Shard.default.is_a?(Shard) && Switchman.config[:force_sharding] && !ENV['SKIP_FORCE_SHARDING']
-    raise 'Sharding is supposed to be set up, but is not! Use SKIP_FORCE_SHARDING=1 to ignore'
+  if !Shard.default.is_a?(Shard) && Switchman.config[:force_sharding] && !ENV["SKIP_FORCE_SHARDING"]
+    raise "Sharding is supposed to be set up, but is not! Use SKIP_FORCE_SHARDING=1 to ignore"
   end
 
   if Shard.default.is_a?(Shard)

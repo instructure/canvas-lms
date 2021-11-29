@@ -17,57 +17,57 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>
 
-require_relative '../common'
+require_relative "../common"
 
 module GradebookCommon
-  shared_context 'reusable_gradebook_course' do
+  shared_context "reusable_gradebook_course" do
     let(:test_course)       { course_factory(active_course: true) }
     let(:teacher)           { user_factory(active_all: true) }
     let(:student)           { user_factory(active_all: true) }
-    let(:concluded_student) { user_factory(name: 'Concluded Student', active_all: true) }
+    let(:concluded_student) { user_factory(name: "Concluded Student", active_all: true) }
     let(:observer)          { user_factory(active_all: true) }
     let(:enroll_teacher_and_students) do
-      test_course.enroll_user(teacher, 'TeacherEnrollment', enrollment_state: 'active')
-      test_course.enroll_user(student, 'StudentEnrollment', enrollment_state: 'active')
-      test_course.enroll_user(concluded_student, 'StudentEnrollment', enrollment_state: 'completed')
+      test_course.enroll_user(teacher, "TeacherEnrollment", enrollment_state: "active")
+      test_course.enroll_user(student, "StudentEnrollment", enrollment_state: "active")
+      test_course.enroll_user(concluded_student, "StudentEnrollment", enrollment_state: "completed")
     end
-    let(:assignment_group_1) { test_course.assignment_groups.create! name: 'Group 1' }
-    let(:assignment_group_2) { test_course.assignment_groups.create! name: 'Group 2' }
+    let(:assignment_group_1) { test_course.assignment_groups.create! name: "Group 1" }
+    let(:assignment_group_2) { test_course.assignment_groups.create! name: "Group 2" }
     let(:assignment_1) do
       test_course.assignments.create!(
-        title: 'Points Assignment',
-        grading_type: 'points',
+        title: "Points Assignment",
+        grading_type: "points",
         points_possible: 10,
-        submission_types: 'online_text_entry',
+        submission_types: "online_text_entry",
         due_at: 2.days.ago,
         assignment_group: assignment_group_1
       )
     end
     let(:assignment_2) do
       test_course.assignments.create!(
-        title: 'Percent Assignment',
-        grading_type: 'percent',
-        points_possible: 10,
+        title: "Percent Assignment",
+        grading_type: "percent",
+        points_possible: 10
       )
     end
     let(:assignment_3) do
       test_course.assignments.create!(
-        title: 'Complete/Incomplete Assignment',
-        grading_type: 'pass_fail',
+        title: "Complete/Incomplete Assignment",
+        grading_type: "pass_fail",
         points_possible: 10
       )
     end
     let(:assignment_4) do
       test_course.assignments.create!(
-        title: 'Letter Grade Assignment',
-        grading_type: 'letter_grade',
+        title: "Letter Grade Assignment",
+        grading_type: "letter_grade",
         points_possible: 10
       )
     end
     let(:assignment_5) do
       test_course.assignments.create!(
-        title: 'Zero Points Possible',
-        grading_type: 'points',
+        title: "Zero Points Possible",
+        grading_type: "points",
         points_possible: 0,
         assignment_group: assignment_group_2
       )
@@ -75,8 +75,8 @@ module GradebookCommon
     let(:student_submission) do
       assignment_1.submit_homework(
         student,
-        submission_type: 'online_text_entry',
-        body: 'Hello!'
+        submission_type: "online_text_entry",
+        body: "Hello!"
       )
     end
   end
@@ -86,11 +86,11 @@ module GradebookCommon
 
     @students = []
     (1..num).each do |i|
-      student = User.create!(:name => "Student_#{i} lastname#{i}")
+      student = User.create!(name: "Student_#{i} lastname#{i}")
       student.register!
 
       e1 = @course.enroll_student(student)
-      e1.workflow_state = 'active'
+      e1.workflow_state = "active"
       e1.save!
       @course.reload
 
@@ -100,16 +100,16 @@ module GradebookCommon
 
   def set_default_grade(points = "5")
     move_to_click('[data-menu-item-id="set-default-grade"]')
-    dialog = find_with_jquery('.ui-dialog:visible')
-    f('.grading_value').send_keys(points)
-    submit_dialog(dialog, '.ui-button')
+    dialog = find_with_jquery(".ui-dialog:visible")
+    f(".grading_value").send_keys(points)
+    submit_dialog(dialog, ".ui-button")
     accept_alert
   end
 
   def find_slick_cells(row_index, element)
     grid = element
-    rows = grid.find_elements(:css, '.slick-row')
-    ff('.slick-cell', rows[row_index])
+    rows = grid.find_elements(:css, ".slick-row")
+    ff(".slick-cell", rows[row_index])
   end
 
   def edit_grade(cell, grade)
@@ -121,9 +121,9 @@ module GradebookCommon
   end
 
   def final_score_for_row(row)
-    grade_grid = f('#gradebook_grid .container_1')
+    grade_grid = f("#gradebook_grid .container_1")
     cells = find_slick_cells(row, grade_grid)
-    cells[4].find_element(:css, '.percentage').text.strip
+    cells[4].find_element(:css, ".percentage").text.strip
   end
 
   def switch_to_section(section = nil)
@@ -161,109 +161,109 @@ module GradebookCommon
     @course.reload
 
     # add first student
-    @student_1 = User.create!(:name => @student_name_1)
+    @student_1 = User.create!(name: @student_name_1)
     @student_1.register!
-    @student_1.pseudonyms.create!(:unique_id => "nobody1@example.com", :password => @default_password, :password_confirmation => @default_password)
+    @student_1.pseudonyms.create!(unique_id: "nobody1@example.com", password: @default_password, password_confirmation: @default_password)
 
     e1 = @course.enroll_student(@student_1)
-    e1.workflow_state = 'active'
+    e1.workflow_state = "active"
     e1.save!
     @course.reload
 
     # add second student
-    @other_section = @course.course_sections.create(:name => "the other section")
-    @student_2 = User.create!(:name => @student_name_2)
+    @other_section = @course.course_sections.create(name: "the other section")
+    @student_2 = User.create!(name: @student_name_2)
     @student_2.register!
-    @student_2.pseudonyms.create!(:unique_id => "nobody2@example.com", :password => @default_password, :password_confirmation => @default_password)
-    e2 = @course.enroll_student(@student_2, :section => @other_section)
+    @student_2.pseudonyms.create!(unique_id: "nobody2@example.com", password: @default_password, password_confirmation: @default_password)
+    e2 = @course.enroll_student(@student_2, section: @other_section)
 
-    e2.workflow_state = 'active'
+    e2.workflow_state = "active"
     e2.save!
     @course.reload
 
     # add third student
-    @student_3 = User.create!(:name => @student_name_3)
+    @student_3 = User.create!(name: @student_name_3)
     @student_3.register!
-    @student_3.pseudonyms.create!(:unique_id => "nobody3@example.com", :password => @default_password, :password_confirmation => @default_password)
+    @student_3.pseudonyms.create!(unique_id: "nobody3@example.com", password: @default_password, password_confirmation: @default_password)
     e3 = @course.enroll_student(@student_3)
-    e3.workflow_state = 'active'
+    e3.workflow_state = "active"
     e3.save!
     @course.reload
 
     @all_students = [@student_1, @student_2, @student_3]
 
     # first assignment data
-    @group = @course.assignment_groups.create!(:name => 'first assignment group', :group_weight => 100)
+    @group = @course.assignment_groups.create!(name: "first assignment group", group_weight: 100)
     @first_assignment = assignment_model({
-                                           :course => @course,
-                                           :name => 'A name that would not reasonably fit in the header cell which should have some limit set',
-                                           :due_at => nil,
-                                           :points_possible => @assignment_1_points,
-                                           :submission_types => 'online_text_entry,online_upload',
-                                           :assignment_group => @group
+                                           course: @course,
+                                           name: "A name that would not reasonably fit in the header cell which should have some limit set",
+                                           due_at: nil,
+                                           points_possible: @assignment_1_points,
+                                           submission_types: "online_text_entry,online_upload",
+                                           assignment_group: @group
                                          })
     rubric_model
-    @association = @rubric.associate_with(@assignment, @course, :purpose => 'grading')
+    @association = @rubric.associate_with(@assignment, @course, purpose: "grading")
     @assignment.reload
-    @assignment.submit_homework(@student_1, :body => 'student 1 submission assignment 1')
+    @assignment.submit_homework(@student_1, body: "student 1 submission assignment 1")
     @assignment.grade_student(@student_1, grade: 10, grader: @teacher)
 
     # second student submission for assignment 1
-    @assignment.submit_homework(@student_2, :body => 'student 2 submission assignment 1')
+    @assignment.submit_homework(@student_2, body: "student 2 submission assignment 1")
     @assignment.grade_student(@student_2, grade: 5, grader: @teacher)
 
     # third student submission for assignment 1
-    @student_3_submission = @assignment.submit_homework(@student_3, :body => 'student 3 submission assignment 1')
+    @student_3_submission = @assignment.submit_homework(@student_3, body: "student 3 submission assignment 1")
     @assignment.grade_student(@student_3, grade: 5, grader: @teacher)
 
     # second assignment data
     @second_assignment = assignment_model({
-                                            :course => @course,
-                                            :name => 'second assignment',
-                                            :due_at => nil,
-                                            :points_possible => @assignment_2_points,
-                                            :submission_types => 'online_text_entry',
-                                            :assignment_group => @group
+                                            course: @course,
+                                            name: "second assignment",
+                                            due_at: nil,
+                                            points_possible: @assignment_2_points,
+                                            submission_types: "online_text_entry",
+                                            assignment_group: @group
                                           })
-    @second_association = @rubric.associate_with(@second_assignment, @course, :purpose => 'grading')
+    @second_association = @rubric.associate_with(@second_assignment, @course, purpose: "grading")
 
     # all students get a 5 on assignment 2
     @all_students.each do |s|
-      @second_assignment.submit_homework(s, :body => "#{s.name} submission assignment 2")
+      @second_assignment.submit_homework(s, body: "#{s.name} submission assignment 2")
       @second_assignment.grade_student(s, grade: 5, grader: @teacher)
     end
 
     # third assignment data
     due_date = Time.zone.now + 1.day
     @third_assignment = assignment_model({
-                                           :course => @course,
-                                           :name => 'assignment three',
-                                           :due_at => due_date,
-                                           :points_possible => @assignment_3_points,
-                                           :submission_types => 'online_text_entry',
-                                           :assignment_group => @group
+                                           course: @course,
+                                           name: "assignment three",
+                                           due_at: due_date,
+                                           points_possible: @assignment_3_points,
+                                           submission_types: "online_text_entry",
+                                           assignment_group: @group
                                          })
-    @third_association = @rubric.associate_with(@third_assignment, @course, :purpose => 'grading')
+    @third_association = @rubric.associate_with(@third_assignment, @course, purpose: "grading")
 
     # attendance assignment
     @attendance_assignment = assignment_model({
-                                                :course => @course,
-                                                :name => 'attendance assignment',
-                                                :title => 'attendance assignment',
-                                                :due_at => nil,
-                                                :points_possible => @attendance_points,
-                                                :submission_types => 'attendance',
-                                                :assignment_group => @group,
+                                                course: @course,
+                                                name: "attendance assignment",
+                                                title: "attendance assignment",
+                                                due_at: nil,
+                                                points_possible: @attendance_points,
+                                                submission_types: "attendance",
+                                                assignment_group: @group,
                                               })
 
     @ungraded_assignment = @course.assignments.create!(
-      :title => 'not-graded assignment',
-      :submission_types => 'not_graded',
-      :assignment_group => @group
+      title: "not-graded assignment",
+      submission_types: "not_graded",
+      assignment_group: @group
     )
   end
 
-  shared_context 'late_policy_course_setup' do
+  shared_context "late_policy_course_setup" do
     let(:now) { Time.zone.now }
 
     def create_course_late_policy
@@ -273,54 +273,54 @@ module GradebookCommon
         missing_submission_deduction: 50.0,
         late_submission_deduction_enabled: true,
         late_submission_deduction: 10.0,
-        late_submission_interval: 'day',
+        late_submission_interval: "day",
         late_submission_minimum_percent_enabled: true,
-        late_submission_minimum_percent: 50.0,
+        late_submission_minimum_percent: 50.0
       )
     end
 
     def create_assignments
       # create 2 assignments due in the past
       @a1 = @course.assignments.create!(
-        title: 'assignment one',
-        grading_type: 'points',
+        title: "assignment one",
+        grading_type: "points",
         points_possible: 100,
         due_at: 1.day.ago(now),
-        submission_types: 'online_text_entry'
+        submission_types: "online_text_entry"
       )
 
       @a2 = @course.assignments.create!(
-        title: 'assignment two',
-        grading_type: 'points',
+        title: "assignment two",
+        grading_type: "points",
         points_possible: 100,
         due_at: 1.day.ago(now),
-        submission_types: 'online_text_entry'
+        submission_types: "online_text_entry"
       )
 
       # create 1 assignment due in the future
       @a3 = @course.assignments.create!(
-        title: 'assignment three',
-        grading_type: 'points',
+        title: "assignment three",
+        grading_type: "points",
         points_possible: 10,
         due_at: 2.days.from_now,
-        submission_types: 'online_text_entry'
+        submission_types: "online_text_entry"
       )
 
       # create 1 assignment that will be Excused for Student1
       @a4 = @course.assignments.create!(
-        title: 'assignment four',
-        grading_type: 'points',
+        title: "assignment four",
+        grading_type: "points",
         points_possible: 10,
         due_at: 2.days.from_now,
-        submission_types: 'online_text_entry'
+        submission_types: "online_text_entry"
       )
     end
 
     def make_submissions
       # submit a1(late) and a3(on-time) so a2(missing)
       Timecop.freeze(now) do
-        @a1.submit_homework(@course.students.first, body: 'submitting my homework')
-        @a3.submit_homework(@course.students.first, body: 'submitting my homework')
+        @a1.submit_homework(@course.students.first, body: "submitting my homework")
+        @a3.submit_homework(@course.students.first, body: "submitting my homework")
       end
     end
 

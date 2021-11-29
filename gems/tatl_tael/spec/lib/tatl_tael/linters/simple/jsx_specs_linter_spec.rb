@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'spec_helper'
+require "spec_helper"
 require_relative "../shared_constants"
 require_relative "../shared_linter_examples"
 

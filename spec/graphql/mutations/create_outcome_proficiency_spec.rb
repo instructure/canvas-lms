@@ -26,7 +26,7 @@ describe Mutations::CreateOutcomeProficiency do
     @account = Account.default
     @course = @account.courses.create!
     @admin = account_admin_user(account: @account)
-    @teacher = @course.enroll_teacher(User.create!, enrollment_state: 'active').user
+    @teacher = @course.enroll_teacher(User.create!, enrollment_state: "active").user
   end
 
   def execute_with_input(create_input, user_executing: @admin)
@@ -61,7 +61,7 @@ describe Mutations::CreateOutcomeProficiency do
   end
 
   let(:good_query) do
-    <<~QUERY
+    <<~GQL
       contextType: "Account"
       contextId: #{@account.id}
       proficiencyRatings: [
@@ -72,65 +72,65 @@ describe Mutations::CreateOutcomeProficiency do
           points: 1.0
         }
       ]
-    QUERY
+    GQL
   end
 
   it "creates an outcome proficiency" do
     result = execute_with_input(good_query)
-    expect(result.dig('errors')).to be_nil
-    expect(result.dig('data', 'createOutcomeProficiency', 'errors')).to be_nil
-    result = result.dig('data', 'createOutcomeProficiency', 'outcomeProficiency')
-    record = OutcomeProficiency.find(result.dig('_id'))
+    expect(result["errors"]).to be_nil
+    expect(result.dig("data", "createOutcomeProficiency", "errors")).to be_nil
+    result = result.dig("data", "createOutcomeProficiency", "outcomeProficiency")
+    record = OutcomeProficiency.find(result["_id"])
     expect(record.context).to eq @account
-    expect(result.dig('contextType')).to eq 'Account'
-    expect(result.dig('contextId')).to eq @account.id.to_s
-    ratings = result.dig('proficiencyRatingsConnection', 'nodes')
+    expect(result["contextType"]).to eq "Account"
+    expect(result["contextId"]).to eq @account.id.to_s
+    ratings = result.dig("proficiencyRatingsConnection", "nodes")
     expect(ratings.length).to eq 1
-    expect(ratings[0]['color']).to eq 'FFFFFF'
-    expect(ratings[0]['description']).to eq 'white'
-    expect(ratings[0]['mastery']).to eq true
-    expect(ratings[0]['points']).to eq 1.0
+    expect(ratings[0]["color"]).to eq "FFFFFF"
+    expect(ratings[0]["description"]).to eq "white"
+    expect(ratings[0]["mastery"]).to eq true
+    expect(ratings[0]["points"]).to eq 1.0
   end
 
   it "restores previously soft-deleted record" do
     original_record = outcome_proficiency_model(@account)
     original_record.destroy
     result = execute_with_input(good_query)
-    result = result.dig('data', 'createOutcomeProficiency', 'outcomeProficiency')
-    record = OutcomeProficiency.find(result.dig('_id'))
+    result = result.dig("data", "createOutcomeProficiency", "outcomeProficiency")
+    record = OutcomeProficiency.find(result["_id"])
     expect(record.id).to eq original_record.id
   end
 
-  context 'errors' do
+  context "errors" do
     def expect_error(result, message)
-      errors = result.dig('errors') || result.dig('data', 'createOutcomeProficiency', 'errors')
+      errors = result["errors"] || result.dig("data", "createOutcomeProficiency", "errors")
       expect(errors).not_to be_nil
-      expect(errors[0]['message']).to match(/#{message}/)
+      expect(errors[0]["message"]).to match(/#{message}/)
     end
 
     it "requires manage_proficiency_scales permission" do
       result = execute_with_input(good_query, user_executing: @teacher)
-      expect_error(result, 'insufficient permission')
+      expect_error(result, "insufficient permission")
     end
 
     it "invalid context type" do
-      query = <<~QUERY
+      query = <<~GQL
         contextType: "Foobar"
         contextId: 1
         proficiencyRatings: []
-      QUERY
+      GQL
       result = execute_with_input(query)
-      expect_error(result, 'invalid context type')
+      expect_error(result, "invalid context type")
     end
 
     it "invalid context id" do
-      query = <<~QUERY
+      query = <<~GQL
         contextType: "Account"
         contextId: -1
         proficiencyRatings: []
-      QUERY
+      GQL
       result = execute_with_input(query)
-      expect_error(result, 'context not found')
+      expect_error(result, "context not found")
     end
 
     it "retries on concurrent create" do
@@ -149,10 +149,10 @@ describe Mutations::CreateOutcomeProficiency do
         end
       end
       result = execute_with_input(good_query)
-      expect(result.dig('errors')).to be_nil
-      expect(result.dig('data', 'createOutcomeProficiency', 'errors')).to be_nil
-      result = result.dig('data', 'createOutcomeProficiency', 'outcomeProficiency')
-      record = OutcomeProficiency.find(result.dig('_id'))
+      expect(result["errors"]).to be_nil
+      expect(result.dig("data", "createOutcomeProficiency", "errors")).to be_nil
+      result = result.dig("data", "createOutcomeProficiency", "outcomeProficiency")
+      record = OutcomeProficiency.find(result["_id"])
       expect(record.id).to eq original_record.id
     end
   end

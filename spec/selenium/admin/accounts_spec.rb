@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../common'
+require_relative "../common"
 
 describe "account" do
   include_context "in-process server selenium tests"
@@ -56,74 +56,74 @@ describe "account" do
       expect(term.end_at).to eq Date.parse("2011-07-31")
     end
 
-    it 'general term dates', priority: 1, test_id: 1621631 do
+    it "general term dates", priority: 1 do
       get "/accounts/#{Account.default.id}/terms"
       term = f("tr.term")
-      f('.edit_term_link').click
-      f('.editing_term .general_dates .start_date .edit_term input').send_keys("2011-07-01")
-      f('.editing_term .general_dates .end_date .edit_term input').send_keys("2011-07-31")
+      f(".edit_term_link").click
+      f(".editing_term .general_dates .start_date .edit_term input").send_keys("2011-07-01")
+      f(".editing_term .general_dates .end_date .edit_term input").send_keys("2011-07-31")
       f(".submit_button").click
       expect(term).not_to have_class("editing_term")
       verify_displayed_term_dates(term, {
-                                    :general => ["Jul 1", "Jul 31"],
-                                    :student_enrollment => ["term start", "term end"],
-                                    :teacher_enrollment => ["whenever", "term end"],
-                                    :ta_enrollment => ["whenever", "term end"]
+                                    general: ["Jul 1", "Jul 31"],
+                                    student_enrollment: ["term start", "term end"],
+                                    teacher_enrollment: ["whenever", "term end"],
+                                    ta_enrollment: ["whenever", "term end"]
                                   })
     end
 
-    it 'student enrollment dates', priority: 1, test_id: 1621632 do
+    it "student enrollment dates", priority: 1 do
       get "/accounts/#{Account.default.id}/terms"
       term = f("tr.term")
-      f('.edit_term_link').click
-      f('.editing_term .student_enrollment_dates .start_date .edit_term input').send_keys("2011-07-02")
-      f('.editing_term .student_enrollment_dates .end_date .edit_term input').send_keys("2011-07-30")
+      f(".edit_term_link").click
+      f(".editing_term .student_enrollment_dates .start_date .edit_term input").send_keys("2011-07-02")
+      f(".editing_term .student_enrollment_dates .end_date .edit_term input").send_keys("2011-07-30")
       f(".submit_button").click
       expect(term).not_to have_class("editing_term")
       verify_displayed_term_dates(term, {
-                                    :general => ["whenever", "whenever"],
-                                    :student_enrollment => ["Jul 2", "Jul 30"],
-                                    :teacher_enrollment => ["whenever", "term end"],
-                                    :ta_enrollment => ["whenever", "term end"]
+                                    general: ["whenever", "whenever"],
+                                    student_enrollment: ["Jul 2", "Jul 30"],
+                                    teacher_enrollment: ["whenever", "term end"],
+                                    ta_enrollment: ["whenever", "term end"]
                                   })
     end
 
-    it 'teacher enrollment dates', priority: 1, test_id: 1621633 do
+    it "teacher enrollment dates", priority: 1 do
       get "/accounts/#{Account.default.id}/terms"
       term = f("tr.term")
-      f('.edit_term_link').click
-      f('.editing_term .teacher_enrollment_dates .start_date .edit_term input').send_keys("2011-07-03")
-      f('.editing_term .teacher_enrollment_dates .end_date .edit_term input').send_keys("2011-07-29")
+      f(".edit_term_link").click
+      f(".editing_term .teacher_enrollment_dates .start_date .edit_term input").send_keys("2011-07-03")
+      f(".editing_term .teacher_enrollment_dates .end_date .edit_term input").send_keys("2011-07-29")
       f(".submit_button").click
       expect(term).not_to have_class("editing_term")
       verify_displayed_term_dates(term, {
-                                    :general => ["whenever", "whenever"],
-                                    :student_enrollment => ["term start", "term end"],
-                                    :teacher_enrollment => ["Jul 3", "Jul 29"],
-                                    :ta_enrollment => ["whenever", "term end"]
+                                    general: ["whenever", "whenever"],
+                                    student_enrollment: ["term start", "term end"],
+                                    teacher_enrollment: ["Jul 3", "Jul 29"],
+                                    ta_enrollment: ["whenever", "term end"]
                                   })
     end
 
-    it 'ta enrollment dates', priority: 1, test_id: 1621934 do
+    it "ta enrollment dates", priority: 1 do
       get "/accounts/#{Account.default.id}/terms"
       term = f("tr.term")
-      f('.edit_term_link').click
-      f('.editing_term .ta_enrollment_dates .start_date .edit_term input').send_keys("2011-07-04")
-      f('.editing_term .ta_enrollment_dates .end_date .edit_term input').send_keys("2011-07-28")
+      f(".edit_term_link").click
+      f(".editing_term .ta_enrollment_dates .start_date .edit_term input").send_keys("2011-07-04")
+      f(".editing_term .ta_enrollment_dates .end_date .edit_term input").send_keys("2011-07-28")
       f(".submit_button").click
       expect(term).not_to have_class("editing_term")
       verify_displayed_term_dates(term, {
-                                    :general => ["whenever", "whenever"],
-                                    :student_enrollment => ["term start", "term end"],
-                                    :teacher_enrollment => ["whenever", "term end"],
-                                    :ta_enrollment => ["Jul 4", "Jul 28"]
+                                    general: ["whenever", "whenever"],
+                                    student_enrollment: ["term start", "term end"],
+                                    teacher_enrollment: ["whenever", "term end"],
+                                    ta_enrollment: ["Jul 4", "Jul 28"]
                                   })
     end
   end
 
   describe "user details view" do
-    def create_sub_account(name = 'sub_account', parent_account = Account.default)
-      Account.create(:name => name, :parent_account => parent_account)
+    def create_sub_account(name = "sub_account", parent_account = Account.default)
+      Account.create(name: name, parent_account: parent_account)
     end
 
     it "is able to view user details from parent account" do
@@ -131,7 +131,7 @@ describe "account" do
       create_sub_account.account_users.create!(user: user_non_root)
       get "/accounts/#{Account.default.id}/users/#{user_non_root.id}"
       # verify user details displayed properly
-      expect(f('.accounts .unstyled_list li')).to include_text('sub_account')
+      expect(f(".accounts .unstyled_list li")).to include_text("sub_account")
     end
   end
 end

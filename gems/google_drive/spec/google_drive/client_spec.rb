@@ -18,54 +18,54 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'spec_helper'
+require "spec_helper"
 
 describe GoogleDrive::Client do
-  let(:client_secrets) {
+  let(:client_secrets) do
     {
-      'client_id' => "6",
-      'client_secret' => "secret",
-      'redirect_uri' => "http://example.com/custom"
+      "client_id" => "6",
+      "client_secret" => "secret",
+      "redirect_uri" => "http://example.com/custom"
     }
-  }
+  end
 
-  it 'creates a new Google API client' do
+  it "creates a new Google API client" do
     client = described_class.create(client_secrets)
-    expect(client.authorization.client_secret).to eq 'secret'
+    expect(client.authorization.client_secret).to eq "secret"
     expect(client.authorization.refresh_token).to be_nil
   end
 
-  it 'creates a new Google API client with a refresh token' do
-    client = described_class.create(client_secrets, 'refresh_token')
-    expect(client.authorization.client_secret).to eq 'secret'
-    expect(client.authorization.refresh_token).to eq 'refresh_token'
+  it "creates a new Google API client with a refresh token" do
+    client = described_class.create(client_secrets, "refresh_token")
+    expect(client.authorization.client_secret).to eq "secret"
+    expect(client.authorization.refresh_token).to eq "refresh_token"
   end
 
-  it 'creates a new Google API client with a access token' do
-    client = described_class.create(client_secrets, nil, 'access_token')
-    expect(client.authorization.client_secret).to eq 'secret'
-    expect(client.authorization.access_token).to eq 'access_token'
+  it "creates a new Google API client with a access token" do
+    client = described_class.create(client_secrets, nil, "access_token")
+    expect(client.authorization.client_secret).to eq "secret"
+    expect(client.authorization.access_token).to eq "access_token"
   end
 
-  it 'creates a new Google API client with the proper scopes' do
+  it "creates a new Google API client with the proper scopes" do
     expect(described_class.create(client_secrets).authorization.scope).to match_array(
-      ['https://www.googleapis.com/auth/drive.appdata', 'https://www.googleapis.com/auth/drive.file']
+      ["https://www.googleapis.com/auth/drive.appdata", "https://www.googleapis.com/auth/drive.file"]
     )
   end
 
-  it 'auth_uri handles all params being passed in' do
-    client = described_class.create(client_secrets, nil, 'access_token')
+  it "auth_uri handles all params being passed in" do
+    client = described_class.create(client_secrets, nil, "access_token")
 
-    auth_uri = described_class.auth_uri(client, 'awesome_scope', 'my_crazy_username')
-    expect(auth_uri).to include 'state=awesome_scope'
-    expect(auth_uri).to include 'login_hint=my_crazy_username'
+    auth_uri = described_class.auth_uri(client, "awesome_scope", "my_crazy_username")
+    expect(auth_uri).to include "state=awesome_scope"
+    expect(auth_uri).to include "login_hint=my_crazy_username"
   end
 
-  it 'auth_uri handles scope and no username' do
-    client = described_class.create(client_secrets, nil, 'access_token')
+  it "auth_uri handles scope and no username" do
+    client = described_class.create(client_secrets, nil, "access_token")
 
-    auth_uri = described_class.auth_uri(client, 'scope')
-    expect(auth_uri).to include 'state=scope'
-    expect(auth_uri).to_not include 'login_hint'
+    auth_uri = described_class.auth_uri(client, "scope")
+    expect(auth_uri).to include "state=scope"
+    expect(auth_uri).to_not include "login_hint"
   end
 end

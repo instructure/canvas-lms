@@ -20,7 +20,7 @@
 describe RuboCop::Cop::Specs::NoExecuteScript do
   subject(:cop) { described_class.new }
 
-  it 'disallows execute_script' do
+  it "disallows execute_script" do
     inspect_source(%{
       describe "sis imports ui" do
         it 'should properly show sis stickiness options' do

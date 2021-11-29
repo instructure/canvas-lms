@@ -21,7 +21,7 @@
 class Loaders::OutcomeFriendlyDescriptionLoader < GraphQL::Batch::Loader
   include Outcomes::OutcomeFriendlyDescriptionResolver
 
-  VALID_CONTEXT_TYPES = ['Course', 'Account'].freeze
+  VALID_CONTEXT_TYPES = ["Course", "Account"].freeze
 
   def initialize(context_id, context_type)
     super()

@@ -33,9 +33,9 @@ module CC
         outcomes_file = nil
         rel_path = nil
       else
-        outcomes_file = File.new(File.join(@canvas_resource_dir, CCHelper::LEARNING_OUTCOMES), 'w')
+        outcomes_file = File.new(File.join(@canvas_resource_dir, CCHelper::LEARNING_OUTCOMES), "w")
         rel_path = File.join(CCHelper::COURSE_SETTINGS_DIR, CCHelper::LEARNING_OUTCOMES)
-        document = Builder::XmlMarkup.new(:target => outcomes_file, :indent => 2)
+        document = Builder::XmlMarkup.new(target: outcomes_file, indent: 2)
       end
 
       document.instruct!
@@ -48,23 +48,23 @@ module CC
 
         process_outcome_group_content(outs_node, root_group)
 
-        if @manifest&.exporter&.for_master_migration || !export_object?(LearningOutcome.new, 'learning_outcomes')
+        if @manifest&.exporter&.for_master_migration || !export_object?(LearningOutcome.new, "learning_outcomes")
           # copy straggler outcomes that should be brought in implicitly
-          @course.linked_learning_outcomes.where.not(:id => @exported_outcome_ids).each do |item|
-            if export_object?(item, 'learning_outcomes')
+          @course.linked_learning_outcomes.where.not(id: @exported_outcome_ids).each do |item|
+            if export_object?(item, "learning_outcomes")
               process_learning_outcome(outs_node, item)
             end
           end
         end
       end
 
-      outcomes_file.close if outcomes_file
+      outcomes_file&.close
       rel_path
     end
 
     def process_outcome_group(node, group, force_export = false)
       migration_id = create_key(group)
-      node.learningOutcomeGroup(:identifier => migration_id) do |group_node|
+      node.learningOutcomeGroup(identifier: migration_id) do |group_node|
         group_node.title group.title unless group.title.blank?
         group_node.description @html_exporter.html_content(group.description) unless group.description.blank?
         group_node.vendor_guid group.vendor_guid if group.vendor_guid.present?
@@ -78,7 +78,7 @@ module CC
 
     def process_outcome_group_content(node, group, force_export = false)
       group.child_outcome_groups.active.each do |item|
-        export_group = export_object?(item, 'learning_outcomes') || export_object?(item, 'learning_outcome_groups')
+        export_group = export_object?(item, "learning_outcomes") || export_object?(item, "learning_outcome_groups")
         export_group ||= force_export if @selectable_outcomes
         if export_group
           process_outcome_group(node, item, @selectable_outcomes)
@@ -89,7 +89,7 @@ module CC
       end
       group.child_outcome_links.active.each do |item|
         item = item.content
-        next unless force_export || export_object?(item, 'learning_outcomes')
+        next unless force_export || export_object?(item, "learning_outcomes")
 
         process_learning_outcome(node, item)
       end
@@ -101,7 +101,7 @@ module CC
       add_exported_asset(item)
 
       migration_id = create_key(item)
-      node.learningOutcome(:identifier => migration_id) do |out_node|
+      node.learningOutcome(identifier: migration_id) do |out_node|
         out_node.title item.short_description if item.short_description.present?
         out_node.description @html_exporter.html_content(item.description) if item.description.present?
         out_node.calculation_method item.calculation_method if item.calculation_method.present?
@@ -136,7 +136,7 @@ module CC
         if item.data && (criterion = item.data[:rubric_criterion])
           out_node.points_possible criterion[:points_possible] if criterion[:points_possible]
           out_node.mastery_points criterion[:mastery_points] if criterion[:mastery_points]
-          if criterion[:ratings] && criterion[:ratings].length > 0
+          if criterion[:ratings].present?
             out_node.ratings do |ratings_node|
               criterion[:ratings].each do |rating|
                 ratings_node.rating do |rating_node|

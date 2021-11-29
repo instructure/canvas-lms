@@ -18,13 +18,13 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative 'messages_helper'
+require_relative "messages_helper"
 
-describe 'assignment_created' do
+describe "assignment_created" do
   include MessagesCommon
 
   before :once do
-    assignment_model(:title => "Quiz 2")
+    assignment_model(title: "Quiz 2")
   end
 
   let(:notification_name) { :assignment_created }

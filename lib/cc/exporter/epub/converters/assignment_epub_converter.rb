@@ -23,12 +23,12 @@ module CC::Exporter::Epub::Converters
 
     def convert_assignments
       assignments = []
-      @manifest.css('resource[type$=learning-application-resource]').each do |res|
+      @manifest.css("resource[type$=learning-application-resource]").each do |res|
         meta_path = res.at_css('file[href$="assignment_settings.xml"]')
         next unless meta_path
 
-        meta_path = @package_root.item_path meta_path['href']
-        html_path = @package_root.item_path res.at_css('file[href$="html"]')['href']
+        meta_path = @package_root.item_path meta_path["href"]
+        html_path = @package_root.item_path res.at_css('file[href$="html"]')["href"]
 
         meta_node = open_file_xml(meta_path)
         html_node = open_file(html_path)
@@ -51,7 +51,7 @@ module CC::Exporter::Epub::Converters
         val = get_node_val(meta_doc, string_type)
         assignment[string_type] = val unless val.nil?
       end
-      [:due_at, :lock_at, :unlock_at].each do |date_type|
+      %i[due_at lock_at unlock_at].each do |date_type|
         val = get_node_val(meta_doc, date_type)
         assignment[date_type] = val unless val.nil?
       end
@@ -61,8 +61,8 @@ module CC::Exporter::Epub::Converters
       end
       assignment[:grading_type] = CartridgeConverter::ALLOWED_GRADING_TYPES[get_node_val(meta_doc, :grading_type)]
       assignment[:submission_types] = submission_types(get_node_val(meta_doc, :submission_types))
-      assignment[:position] = get_node_val(meta_doc, 'position')
-      assignment[:identifier] = get_node_att(meta_doc, 'assignment', 'identifier')
+      assignment[:position] = get_node_val(meta_doc, "position")
+      assignment[:identifier] = get_node_att(meta_doc, "assignment", "identifier")
       assignment[:href] = "assignments.xhtml##{assignment[:identifier]}"
       update_syllabus(assignment)
       assignment

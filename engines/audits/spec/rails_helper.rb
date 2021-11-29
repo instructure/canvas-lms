@@ -19,15 +19,15 @@
 #
 
 # This file is copied to spec/ when you run 'rails generate rspec:install'
-require 'spec_helper'
-require 'rails'
-ENV['RAILS_ENV'] ||= 'test'
-Rails.env = 'test'
-require File.expand_path('dummy/config/environment', __dir__)
+require "spec_helper"
+require "rails"
+ENV["RAILS_ENV"] ||= "test"
+Rails.env = "test"
+require_relative "dummy/config/environment"
 
 # Prevent database truncation if the environment is production
 abort("The Rails environment is running in production mode!") if Rails.env.production?
-require 'rspec/rails'
+require "rspec/rails"
 # Add additional requires below this line. Rails is not loaded until this point!
 
 # Requires supporting ruby files with custom matchers and macros, etc, in
@@ -55,7 +55,7 @@ rescue ActiveRecord::PendingMigrationError => e
 end
 RSpec.configure do |config|
   # Remove this line if you're not using ActiveRecord or ActiveRecord fixtures
-  config.fixture_path = "#{::Rails.root}/spec/fixtures"
+  config.fixture_path = ::Rails.root.join("spec/fixtures")
 
   # If you're not using ActiveRecord, or you'd prefer not to run each of your
   # examples within a transaction, remove the following line or assign false

@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'datadog/statsd'
+require "datadog/statsd"
 
 module Tracers
   class DatadogTracer
@@ -27,7 +27,7 @@ module Tracers
       @domain = domain
     end
 
-    def trace(key, metadata)
+    def trace(key, metadata, &block)
       if key == "validate"
         tags = {}
 
@@ -43,9 +43,7 @@ module Tracers
           InstStatsd::Statsd.increment("graphql.#{op}.count", tags: tags.merge(field: field))
         end
         InstStatsd::Statsd.increment("graphql.operation.count", tags: tags.merge(domain: @domain))
-        InstStatsd::Statsd.time("graphql.operation.time", tags: tags.merge(domain: @domain)) do
-          yield
-        end
+        InstStatsd::Statsd.time("graphql.operation.time", tags: tags.merge(domain: @domain), &block)
       else
         yield
       end

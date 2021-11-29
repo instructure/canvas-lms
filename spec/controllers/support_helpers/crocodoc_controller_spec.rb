@@ -18,20 +18,20 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 describe SupportHelpers::CrocodocController do
-  describe 'require_site_admin' do
-    it 'redirects to root url if current user is not a site admin' do
+  describe "require_site_admin" do
+    it "redirects to root url if current user is not a site admin" do
       account_admin_user
       user_session(@user)
       get :shard
       assert_unauthorized
     end
 
-    it 'redirects to login if current user is not logged in' do
+    it "redirects to login if current user is not logged in" do
       get :shard
       assert_unauthorized
     end
 
-    it 'renders 200 if current user is a site admin' do
+    it "renders 200 if current user is a site admin" do
       site_admin_user
       user_session(@user)
       get :shard
@@ -39,13 +39,13 @@ describe SupportHelpers::CrocodocController do
     end
   end
 
-  describe 'helper action' do
+  describe "helper action" do
     before do
       site_admin_user
       user_session(@user)
     end
 
-    context 'shard' do
+    context "shard" do
       it "creates a new ShardFixer" do
         fixer = SupportHelpers::Crocodoc::ShardFixer.new(@user.email)
         expect(SupportHelpers::Crocodoc::ShardFixer).to receive(:new).with(@user.email, nil).and_return(fixer)
@@ -55,16 +55,16 @@ describe SupportHelpers::CrocodocController do
       end
 
       it "creates a new ShardFixer with after_time" do
-        fixer = SupportHelpers::Crocodoc::ShardFixer.new(@user.email, '2016-05-01')
+        fixer = SupportHelpers::Crocodoc::ShardFixer.new(@user.email, "2016-05-01")
         expect(SupportHelpers::Crocodoc::ShardFixer).to receive(:new)
-          .with(@user.email, Time.zone.parse('2016-05-01')).and_return(fixer)
+          .with(@user.email, Time.zone.parse("2016-05-01")).and_return(fixer)
         expect(fixer).to receive(:monitor_and_fix)
-        get :shard, params: { after_time: '2016-05-01' }
+        get :shard, params: { after_time: "2016-05-01" }
         expect(response.body).to eq("Enqueued Crocodoc ShardFixer ##{fixer.job_id}...")
       end
     end
 
-    context 'submission' do
+    context "submission" do
       it "creates a new SubmissionFixer" do
         fixer = SupportHelpers::Crocodoc::SubmissionFixer.new(@user.email, nil, 1234, 5678)
         expect(SupportHelpers::Crocodoc::SubmissionFixer).to receive(:new)

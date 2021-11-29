@@ -23,17 +23,21 @@ require_dependency "api/html/track_tag"
 module Api
   module Html
     describe TrackTag do
-      describe '#to_node' do
+      describe "#to_node" do
+        subject(:node) do
+          track_tag.to_node(url_helper)
+        end
+
         let(:url_helper) do
           double({
-                   show_media_tracks_url: 'media/track/vtt'
+                   show_media_tracks_url: "media/track/vtt"
                  })
         end
 
         let(:media_track) do
           double(
-            kind: 'subtitles',
-            locale: 'en',
+            kind: "subtitles",
+            locale: "en",
             id: 1,
             media_object_id: 1
           )
@@ -42,19 +46,15 @@ module Api
         let(:track_tag) do
           TrackTag.new(
             media_track,
-            Nokogiri::XML::DocumentFragment.parse('<div></div>'),
+            Nokogiri::XML::DocumentFragment.parse("<div></div>"),
             Nokogiri::XML::Node
           )
         end
 
-        subject(:node) do
-          track_tag.to_node(url_helper)
-        end
-
-        specify { expect(node['kind']).to eq 'subtitles' }
-        specify { expect(node['srclang']).to eq 'en' }
-        specify { expect(node['src']).not_to be_nil }
-        specify { expect(node['label']).to match(/English/) }
+        specify { expect(node["kind"]).to eq "subtitles" }
+        specify { expect(node["srclang"]).to eq "en" }
+        specify { expect(node["src"]).not_to be_nil }
+        specify { expect(node["label"]).to match(/English/) }
       end
     end
   end

@@ -16,23 +16,23 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-require_relative '../../common'
+require_relative "../../common"
 
 module NewCourseAddPeopleModal
   # ---------------------- Controls ----------------------
   def add_people_modal
-    f('#add_people_modal')
+    f("#add_people_modal")
   end
 
   def add_people_header
-    f('#add_people_modal h2')
+    f("#add_people_modal h2")
   end
 
   def role_options
-    INSTUI_Select_options('#peoplesearch_select_role').map(&:text)
+    INSTUI_Select_options("#peoplesearch_select_role").map(&:text)
   end
 
   def section_options
-    INSTUI_Select_options('#peoplesearch_select_section').map(&:text)
+    INSTUI_Select_options("#peoplesearch_select_section").map(&:text)
   end
 end

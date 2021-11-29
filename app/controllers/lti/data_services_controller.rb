@@ -78,7 +78,7 @@ module Lti
   #
   class DataServicesController < ApplicationController
     include ::Lti::IMS::Concerns::AdvantageServices
-    MIME_TYPE = 'application/vnd.canvas.dataservices+json'
+    MIME_TYPE = "application/vnd.canvas.dataservices+json"
 
     ACTION_SCOPE_MATCHERS = {
       create: all_of(TokenScopes::LTI_CREATE_DATA_SERVICE_SUBSCRIPTION_SCOPE),
@@ -90,11 +90,11 @@ module Lti
     }.freeze.with_indifferent_access
 
     rescue_from Lti::SubscriptionsValidator::InvalidContextType do
-      render json: { error: 'Invalid context type for subscription' }, status: :bad_request
+      render json: { error: "Invalid context type for subscription" }, status: :bad_request
     end
 
     rescue_from Lti::SubscriptionsValidator::ContextNotFound do
-      render json: { error: 'Invalid context for subscription - context not found.' }, status: :bad_request
+      render json: { error: "Invalid context for subscription - context not found." }, status: :bad_request
     end
 
     before_action :verify_service_configured
@@ -229,7 +229,7 @@ module Lti
 
     def verify_service_configured
       unless Services::LiveEventsSubscriptionService.available?
-        render json: { error: 'Subscription service not configured' }, status: :internal_server_error
+        render json: { error: "Subscription service not configured" }, status: :internal_server_error
       end
     end
 
@@ -252,7 +252,7 @@ module Lti
     end
 
     def message_type
-      params[:message_type] || 'live-event'
+      params[:message_type] || "live-event"
     end
 
     def add_updater(sub)
@@ -260,9 +260,9 @@ module Lti
         u = User.find(params[:subscription][:UpdatedBy])
         raise ActiveRecord::RecordInvalid unless context.grants_right?(u, nil, :manage_data_services)
 
-        sub.merge(UpdatedByType: 'person')
+        sub.merge(UpdatedByType: "person")
       else
-        sub.merge(UpdatedBy: tool.global_id.to_s, UpdatedByType: 'external_tool')
+        sub.merge(UpdatedBy: tool.global_id.to_s, UpdatedByType: "external_tool")
       end
     end
 
@@ -271,9 +271,9 @@ module Lti
         u = User.find(params[:subscription][:OwnerId])
         raise ActiveRecord::RecordInvalid unless context.grants_right?(u, nil, :manage_data_services)
 
-        sub.merge(OwnerType: 'person')
+        sub.merge(OwnerType: "person")
       else
-        sub.merge(OwnerId: tool.global_id.to_s, OwnerType: 'external_tool')
+        sub.merge(OwnerId: tool.global_id.to_s, OwnerType: "external_tool")
       end
     end
   end

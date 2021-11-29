@@ -22,12 +22,12 @@ class AddReplicaIdentityForGroupCategories < ActiveRecord::Migration[5.2]
   disable_ddl_transaction!
 
   def up
-    add_replica_identity 'GroupCategory', :root_account_id, 0
-    remove_index :group_categories, name: 'index_group_categories_on_root_account_id', if_exists: true
+    add_replica_identity "GroupCategory", :root_account_id, 0
+    remove_index :group_categories, name: "index_group_categories_on_root_account_id", if_exists: true
   end
 
   def down
-    remove_replica_identity 'GroupCategory'
+    remove_replica_identity "GroupCategory"
     # no need to re-add index_group_categories_on_root_account_id
     # since index_group_categories_on_root_account_id_and_sis_source_id exists
   end

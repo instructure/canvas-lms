@@ -36,12 +36,12 @@ module IncomingMailProcessor
     private_class_method :mailbox_accounts
 
     def self.report_unreads(unreads)
-      result = Hash[mailbox_accounts.map(&:escaped_address).zip(unreads)]
+      result = mailbox_accounts.map(&:escaped_address).zip(unreads).to_h
       result.delete_if { |_k, v| v.nil? }
       result.each_pair do |identifier, count|
         name = "incoming_mail_processor.mailbox_queue_size.#{identifier}"
         InstStatsd::Statsd.gauge(name, count,
-                                 short_stat: 'incoming_mail_processor.mailbox_queue_size',
+                                 short_stat: "incoming_mail_processor.mailbox_queue_size",
                                  tags: { identifier: identifier })
       end
     end

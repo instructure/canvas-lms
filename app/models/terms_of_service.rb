@@ -24,50 +24,50 @@ class TermsOfService < ActiveRecord::Base
   belongs_to :terms_of_service_content
   validates :terms_type, presence: true
 
-  before_save :set_content_on_type_change, :if => :terms_type_changed?
+  before_save :set_content_on_type_change, if: :terms_type_changed?
 
   validate :validate_account_is_root
 
   cattr_accessor :skip_automatic_terms_creation
 
   def validate_account_is_root
-    if self.account_id_changed? && !self.account.root_account?
-      self.errors.add(:account, "must be root account")
+    if account_id_changed? && !account.root_account?
+      errors.add(:account, "must be root account")
     end
   end
 
   def set_content_on_type_change
-    self.terms_of_service_content = self.custom? ? self.account.terms_of_service_content : nil
+    self.terms_of_service_content = custom? ? account.terms_of_service_content : nil
   end
 
   def custom?
-    self.terms_type == "custom"
+    terms_type == "custom"
   end
 
   def self.ensure_terms_for_account(account, is_new_account = false)
-    return unless self.table_exists?
+    return unless table_exists?
 
-    passive = is_new_account || !(Setting.get('terms_required', 'true') == 'true' && account.account_terms_required?)
-    self.unique_constraint_retry do |retry_count|
+    passive = is_new_account || !(Setting.get("terms_required", "true") == "true" && account.account_terms_required?)
+    unique_constraint_retry do |retry_count|
       account.reload_terms_of_service if retry_count > 0
-      account.terms_of_service || account.create_terms_of_service!(term_options_for_account(account).merge(:passive => passive))
+      account.terms_of_service || account.create_terms_of_service!(term_options_for_account(account).merge(passive: passive))
     end
   end
 
-  DEFAULT_OPTIONS = { :terms_type => "default" }.freeze
+  DEFAULT_OPTIONS = { terms_type: "default" }.freeze
   def self.term_options_for_account(_account)
     DEFAULT_OPTIONS
   end
 
   def self.type_dropdown_options_for_account(_account = nil)
-    self.type_dropdown_options
+    type_dropdown_options
   end
 
   def self.type_dropdown_options
     [
-      [t('Default'), "default"],
-      [t('Custom'), "custom"],
-      [t('No Terms'), "no_terms"]
+      [t("Default"), "default"],
+      [t("Custom"), "custom"],
+      [t("No Terms"), "no_terms"]
     ]
   end
 
@@ -80,7 +80,7 @@ class TermsOfService < ActiveRecord::Base
     end
   end
 
-  reflections['terms_of_service_content'].instance_eval do
+  reflections["terms_of_service_content"].instance_eval do
     def association_class
       CacheTermsOfServiceContentOnAssociation
     end

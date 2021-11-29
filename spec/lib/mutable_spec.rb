@@ -26,7 +26,7 @@ describe Mutable do
       # them
       def muted?; end
 
-      def update_attribute(*args); end
+      def update_attribute(*); end
 
       def save!; end
 

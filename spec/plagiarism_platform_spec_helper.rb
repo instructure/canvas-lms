@@ -17,17 +17,17 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'lti2_spec_helper.rb'
+require "lti2_spec_helper"
 
-RSpec.shared_context "plagiarism_platform", :shared_context => :metadata do
-  include_context 'lti2_spec_helper'
+RSpec.shared_context "plagiarism_platform", shared_context: :metadata do
+  include_context "lti2_spec_helper"
 
   let(:subscription_service) { class_double(Services::LiveEventsSubscriptionService).as_stubbed_const }
   let(:assignment) { assignment_model(course: course) }
   let(:assignment_two) { assignment_model(course: course) }
 
   def success_response
-    double(code: 200, parsed_response: { 'Id' => SecureRandom.uuid }, ok?: true)
+    double(code: 200, parsed_response: { "Id" => SecureRandom.uuid }, ok?: true)
   end
 
   before do

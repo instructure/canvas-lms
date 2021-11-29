@@ -18,11 +18,15 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 describe Latex::MathMl do
+  subject(:math_ml) do
+    Latex::MathMl.new(latex: latex)
+  end
+
   let(:latex) do
     '\sqrt{25}+12^{12}'
   end
   let(:mml_doc) do
-    <<-DOC
+    <<~XML
       <math xmlns="http://www.w3.org/1998/Math/MathML" display="inline">
         <msqrt>
           <mrow>
@@ -37,39 +41,35 @@ describe Latex::MathMl do
           </mrow>
         </msup>
       </math>
-    DOC
+    XML
   end
-  let(:service_url) { 'http://get.mml.com' }
-  let(:request_id)  { '0c0dad8c-7857-4447-ba1f-9f33a2f1debf' }
+  let(:service_url) { "http://get.mml.com" }
+  let(:request_id)  { "0c0dad8c-7857-4447-ba1f-9f33a2f1debf" }
   let(:request_id_signature) { CanvasSecurity.sign_hmac_sha512(request_id) }
 
-  subject(:math_ml) do
-    Latex::MathMl.new(latex: latex)
-  end
-
-  describe '#parse' do
-    it 'delegates to Ritex::Parser' do
+  describe "#parse" do
+    it "delegates to Ritex::Parser" do
       expect_any_instance_of(Ritex::Parser).to receive(:parse).once
       math_ml.parse
     end
 
-    context 'when using mathman' do
+    context "when using mathman" do
       before do
         expect(MathMan).to receive(:url_for).at_least(:once).and_return(service_url)
         expect(MathMan).to receive(:use_for_mml?).at_least(:once).and_return(true)
         expect(RequestContextGenerator).to receive(:request_id).at_least(:once).and_return(request_id)
-        expect(CanvasSecurity).to receive(:services_signing_secret).at_least(:once).and_return('wooper')
+        expect(CanvasSecurity).to receive(:services_signing_secret).at_least(:once).and_return("wooper")
       end
 
-      it 'calls `CanvasHttp.get` with full url' do
+      it "calls `CanvasHttp.get` with full url" do
         expect(CanvasHttp).to receive(:get)
           .with(service_url, {
-                  'X-Request-Context-Id' => CanvasSecurity.base64_encode(request_id),
-                  'X-Request-Context-Signature' => CanvasSecurity.base64_encode(request_id_signature)
+                  "X-Request-Context-Id" => CanvasSecurity.base64_encode(request_id),
+                  "X-Request-Context-Signature" => CanvasSecurity.base64_encode(request_id_signature)
                 })
           .and_return(
             OpenStruct.new(
-              status: '200',
+              status: "200",
               body: mml_doc
             )
           )
@@ -77,28 +77,28 @@ describe Latex::MathMl do
         math_ml.parse
       end
 
-      context 'when response status is not 200' do
-        it 'returns an empty string' do
+      context "when response status is not 200" do
+        it "returns an empty string" do
           expect(CanvasHttp).to receive_messages(get: OpenStruct.new(
-            status: '500',
+            status: "500",
             body: mml_doc
           ))
           expect(math_ml.parse).to be_empty
         end
       end
 
-      context 'integral request id' do
+      context "integral request id" do
         let(:request_id) { 5 }
 
         it "doesn't throw an error" do
           expect(CanvasHttp).to receive(:get)
             .with(service_url, {
-                    'X-Request-Context-Id' => CanvasSecurity.base64_encode('5'),
-                    'X-Request-Context-Signature' => CanvasSecurity.base64_encode(CanvasSecurity.sign_hmac_sha512('5'))
+                    "X-Request-Context-Id" => CanvasSecurity.base64_encode("5"),
+                    "X-Request-Context-Signature" => CanvasSecurity.base64_encode(CanvasSecurity.sign_hmac_sha512("5"))
                   })
             .and_return(
               OpenStruct.new(
-                code: '200',
+                code: "200",
                 body: mml_doc
               )
             )
@@ -108,7 +108,7 @@ describe Latex::MathMl do
 
         it "caches" do
           enable_cache do
-            expect(CanvasHttp).to receive(:get).and_return(OpenStruct.new(code: '200', body: mml_doc)).once
+            expect(CanvasHttp).to receive(:get).and_return(OpenStruct.new(code: "200", body: mml_doc)).once
 
             math_ml.parse
             math_ml.parse

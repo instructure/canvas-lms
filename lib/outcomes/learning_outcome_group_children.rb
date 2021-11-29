@@ -91,8 +91,8 @@ module Outcomes
         add_search_order(relation, args[:search_query])
       else
         relation.order(
-          LearningOutcomeGroup.best_unicode_collation_key('logs.title'),
-          LearningOutcome.best_unicode_collation_key('short_description')
+          LearningOutcomeGroup.best_unicode_collation_key("logs.title"),
+          LearningOutcome.best_unicode_collation_key("short_description")
         )
       end
     end
@@ -104,8 +104,8 @@ module Outcomes
     def self.supported_languages
       # cache this in the class since this won't change so much
       @supported_languages ||= ContentTag.connection.execute(
-        'SELECT cfgname FROM pg_ts_config'
-      ).to_a.map { |r| r['cfgname'] }
+        "SELECT cfgname FROM pg_ts_config"
+      ).to_a.map { |r| r["cfgname"] }
     end
 
     private
@@ -141,7 +141,7 @@ module Outcomes
               SQL
             end
 
-      search_query_tokens = ContentTag.connection.execute(sql).to_a.map { |r| r['token'] }.uniq
+      search_query_tokens = ContentTag.connection.execute(sql).to_a.map { |r| r["token"] }.uniq
 
       short_description_query = ContentTag.sanitize_sql_array(["#{SHORT_DESCRIPTION} ~* ANY(array[?])",
                                                                search_query_tokens])
@@ -151,20 +151,20 @@ module Outcomes
     end
 
     def add_search_order(relation, search_query)
-      select_query = ContentTag.sanitize_sql_array([<<-SQL.squish, search_query, search_query])
+      select_query = ContentTag.sanitize_sql_array([<<~SQL.squish, search_query, search_query])
         "content_tags".*,
         GREATEST(public.word_similarity(?, #{SHORT_DESCRIPTION}), public.word_similarity(?, #{DESCRIPTION})) as sim
       SQL
 
       relation.select(select_query).order(
         "sim DESC",
-        LearningOutcomeGroup.best_unicode_collation_key('logs.title'),
-        LearningOutcome.best_unicode_collation_key('short_description')
+        LearningOutcomeGroup.best_unicode_collation_key("logs.title"),
+        LearningOutcome.best_unicode_collation_key("short_description")
       )
     end
 
     def children_ids_with_self(learning_outcome_group_id)
-      sql = <<-SQL.squish
+      sql = <<~SQL.squish
         WITH RECURSIVE levels AS (
           SELECT id, id AS parent_id
             FROM (#{LearningOutcomeGroup.active.where(id: learning_outcome_group_id).to_sql}) AS data
@@ -187,14 +187,14 @@ module Outcomes
     end
 
     def total_outcomes_cache_key(learning_outcome_group_id = nil)
-      ['learning_outcome_group_total_outcomes',
+      ["learning_outcome_group_total_outcomes",
        context_asset_string,
        context_timestamp_cache,
        learning_outcome_group_id].cache_key
     end
 
     def context_timestamp_cache_key
-      ['learning_outcome_group_context_timestamp', context_asset_string].cache_key
+      ["learning_outcome_group_context_timestamp", context_asset_string].cache_key
     end
 
     def context_asset_string

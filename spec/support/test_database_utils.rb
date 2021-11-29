@@ -37,17 +37,17 @@ module TestDatabaseUtils
       Shard.default(reload: true)
 
       # RSpecQ fails when using json formatter due to this output. Don't output when running on RSpecQ
-      puts "finished resetting test db in #{Time.now - start} seconds" unless ENV['RSPECQ_ENABLED'] == '1'
+      puts "finished resetting test db in #{Time.now - start} seconds" unless ENV["RSPECQ_ENABLED"] == "1"
     end
 
     # Like ActiveRecord::Base.connection.reset_pk_sequence! but handles the
     # dummy Account (id=0) properly.
     def reset_pk_sequence!(t)
-      if t == 'accounts' && Account.maximum('id') == 0
+      if t == "accounts" && Account.maximum("id") == 0
         # reset_pk_sequence! crashes if the only account is the dummy Account (id=0).
         # Reset PK sequence manually. (Code from reset_pk_sequence!)
         conn = ActiveRecord::Base.connection
-        _pk, sequence = conn.pk_and_sequence_for('accounts')
+        _pk, sequence = conn.pk_and_sequence_for("accounts")
         quoted_sequence = conn.quote_table_name(sequence)
         conn.query_value("SELECT setval(#{conn.quote(quoted_sequence)}, 1, false)", "SCHEMA")
       else
@@ -57,31 +57,29 @@ module TestDatabaseUtils
 
     private
 
-    def each_connection
+    def each_connection(&block)
       ::Shard.with_each_shard(::Shard.categories) do
         models = ::ActiveRecord::Base.descendants
         models.reject! { |m| m.shard_category == :unsharded } unless ::Shard.current.default?
         model_connections = models.map(&:connection).uniq
-        model_connections.each do |connection|
-          yield connection
-        end
+        model_connections.each(&block)
       end
     end
 
     def get_table_names(connection)
       # use custom SQL to exclude tables from extensions
       schema = connection.shard.name
-      table_names = connection.query(<<-SQL, 'SCHEMA').map(&:first)
-         SELECT relname
-         FROM pg_class INNER JOIN pg_namespace ON relnamespace=pg_namespace.oid
-         WHERE nspname = #{schema ? "'#{schema}'" : 'ANY (current_schemas(false))'}
-           AND relkind='r'
-           AND NOT EXISTS (
-             SELECT 1 FROM pg_depend WHERE deptype='e' AND objid=pg_class.oid
-           )
+      table_names = connection.query(<<~SQL.squish, "SCHEMA").map(&:first)
+        SELECT relname
+        FROM pg_class INNER JOIN pg_namespace ON relnamespace=pg_namespace.oid
+        WHERE nspname = #{schema ? "'#{schema}'" : "ANY (current_schemas(false))"}
+          AND relkind='r'
+          AND NOT EXISTS (
+            SELECT 1 FROM pg_depend WHERE deptype='e' AND objid=pg_class.oid
+          )
       SQL
-      table_names.delete('schema_migrations')
-      table_names.delete('switchman_shards')
+      table_names.delete("schema_migrations")
+      table_names.delete("switchman_shards")
       table_names
     end
 
@@ -92,24 +90,24 @@ module TestDatabaseUtils
 
     def truncate_all_tables!
       # RSpecQ fails when using json formatter due to this output. Don't output when running on RSpecQ
-      puts "truncating all tables..." unless ENV['RSPECQ_ENABLED'] == '1'
+      puts "truncating all tables..." unless ENV["RSPECQ_ENABLED"] == "1"
       each_connection do |connection|
         table_names = get_table_names(connection)
         next if table_names.empty?
 
-        connection.execute("TRUNCATE TABLE #{table_names.map { |t| connection.quote_table_name(t) }.join(',')}")
+        connection.execute("TRUNCATE TABLE #{table_names.map { |t| connection.quote_table_name(t) }.join(",")}")
       end
       Account.ensure_dummy_root_account
     end
 
     def get_sequences(connection)
       schema = connection.shard.name
-      sequences = connection.query(<<-SQL, 'SCHEMA').map(&:first)
-         SELECT relname
-         FROM pg_class INNER JOIN pg_namespace ON relnamespace=pg_namespace.oid
-         WHERE nspname = #{schema ? "'#{schema}'" : 'ANY (current_schemas(false))'} AND relkind='S'
+      sequences = connection.query(<<~SQL.squish, "SCHEMA").map(&:first)
+        SELECT relname
+        FROM pg_class INNER JOIN pg_namespace ON relnamespace=pg_namespace.oid
+        WHERE nspname = #{schema ? "'#{schema}'" : "ANY (current_schemas(false))"} AND relkind='S'
       SQL
-      sequences.delete('switchman_shards_id_seq')
+      sequences.delete("switchman_shards_id_seq")
       sequences
     end
 
@@ -119,7 +117,7 @@ module TestDatabaseUtils
 
     def randomize_sequences!
       # RSpecQ fails when using json formatter due to this output. Don't output when running on RSpecQ
-      puts "randomizing db sequences..." unless ENV['RSPECQ_ENABLED'] == '1'
+      puts "randomizing db sequences..." unless ENV["RSPECQ_ENABLED"] == "1"
       seed = ::RSpec.configuration.seed
       i = 0
       each_connection do |connection|

@@ -1,9 +1,6 @@
 # frozen_string_literal: true
 
-$:.push File.expand_path("lib", __dir__)
-
-# Maintain your gem's version:
-require "audits/version"
+require_relative "lib/audits/version"
 
 # Describe your gem and declare its dependencies:
 Gem::Specification.new do |spec|
@@ -19,7 +16,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency "dynamic_settings"
   spec.add_dependency "event_stream"
   spec.add_dependency "rails", ">= 5.2.4.5"
-  spec.add_dependency "switchman", '>= 2.0.3'
+  spec.add_dependency "switchman", ">= 2.0.3"
 
   spec.add_development_dependency "brakeman"
   spec.add_development_dependency "byebug"

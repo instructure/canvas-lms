@@ -76,11 +76,11 @@ class Mutations::BaseMutation < GraphQL::Schema::Mutation
   end
 
   def verify_authorized_action!(obj, perm)
-    raise GraphQL::ExecutionError, 'not found' unless obj.grants_right?(current_user, session, perm)
+    raise GraphQL::ExecutionError, "not found" unless obj.grants_right?(current_user, session, perm)
   end
 
   # TODO: replace this with model validation where applicable
-  def validation_error(message, attribute: 'message')
+  def validation_error(message, attribute: "message")
     {
       errors: {
         attribute.to_sym => message
@@ -99,13 +99,13 @@ class Mutations::BaseMutation < GraphQL::Schema::Mutation
   # `override_keys` is a hash where the key is the field at the table and the value
   # is the alias of the field; the keys and values need to be set as symbols.
   def errors_for(model, override_keys = {})
-    input_fields = Hash[self.class.arguments.values.map { |a| [a.keyword, a.name] }]
+    input_fields = self.class.arguments.values.map { |a| [a.keyword, a.name] }.to_h
 
     {
-      errors: model.errors.entries.map { |attribute, message|
+      errors: model.errors.entries.map do |attribute, message|
         key = override_keys.key?(attribute) ? override_keys[attribute] : attribute
         [input_fields[key], message]
-      }
+      end
     }
   end
 end

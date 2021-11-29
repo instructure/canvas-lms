@@ -18,18 +18,18 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../views_helper'
+require_relative "../views_helper"
 
 describe "/context_modules/_module_item_conditional_next" do
   let_once(:module_item) do
     course_factory
     assignment_model course: @course
     context_module = @course.context_modules.create!
-    context_module.add_item type: 'assignment', id: @assignment.id
+    context_module.add_item type: "assignment", id: @assignment.id
   end
 
   it "shows mastery path selection" do
-    render partial: 'context_modules/module_item_conditional_next', locals: {
+    render partial: "context_modules/module_item_conditional_next", locals: {
       module_item: module_item,
       item_data: { mastery_paths: { locked: true } }
     }
@@ -37,7 +37,7 @@ describe "/context_modules/_module_item_conditional_next" do
   end
 
   it "shows mastery path locked" do
-    render partial: 'context_modules/module_item_conditional_next', locals: {
+    render partial: "context_modules/module_item_conditional_next", locals: {
       module_item: module_item,
       item_data: {
         mastery_paths: {
@@ -46,14 +46,14 @@ describe "/context_modules/_module_item_conditional_next" do
         }
       }
     }
-    expect(rendered).to match('Choose Assignment Group')
+    expect(rendered).to match("Choose Assignment Group")
   end
 
   it "shows mastery path still processing" do
-    render partial: 'context_modules/module_item_conditional_next', locals: {
+    render partial: "context_modules/module_item_conditional_next", locals: {
       module_item: module_item,
       item_data: { mastery_paths: { still_processing: true } }
     }
-    expect(rendered).to match('until mastery path is processed')
+    expect(rendered).to match("until mastery path is processed")
   end
 end

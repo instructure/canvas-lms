@@ -27,23 +27,23 @@ module Factories
   end
 
   def custom_student_role(name, opts = {})
-    custom_role('StudentEnrollment', name, opts)
+    custom_role("StudentEnrollment", name, opts)
   end
 
   def custom_teacher_role(name, opts = {})
-    custom_role('TeacherEnrollment', name, opts)
+    custom_role("TeacherEnrollment", name, opts)
   end
 
   def custom_ta_role(name, opts = {})
-    custom_role('TaEnrollment', name, opts)
+    custom_role("TaEnrollment", name, opts)
   end
 
   def custom_designer_role(name, opts = {})
-    custom_role('DesignerEnrollment', name, opts)
+    custom_role("DesignerEnrollment", name, opts)
   end
 
   def custom_observer_role(name, opts = {})
-    custom_role('ObserverEnrollment', name, opts)
+    custom_role("ObserverEnrollment", name, opts)
   end
 
   def custom_account_role(name, opts = {})

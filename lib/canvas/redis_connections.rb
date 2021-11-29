@@ -70,7 +70,7 @@ module Canvas
         @last_clear_time = Time.now.utc
         # gather all the redises we can find
         redises = Switchman.config[:cache_map].values
-                           .map { |cache| cache.try(:redis) }.compact.uniq
+                           .filter_map { |cache| cache.try(:redis) }.uniq
                            .map { |redis| redis.try(:ring)&.nodes || [redis] }.inject([], &:concat).uniq
         redises.each { |r| r._client.disconnect_if_idle(@last_clear_time - clear_timeout) }
       end

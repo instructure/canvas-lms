@@ -45,20 +45,7 @@ module ActiveSupport::Cache::SafeRedisRaceCondition
 
     lock_key = "lock:#{key}"
 
-    unless entry
-      while !entry
-        unless (lock_nonce = lock(lock_key, options))
-          # someone else is already generating it; wait for them
-          sleep 0.1
-          entry = read_entry(key, options)
-          next
-        else
-          @safe_redis_internal_options[:lock_nonce] = lock_nonce
-          break
-        end
-      end
-      entry
-    else
+    if entry
       if entry.expired? && (lock_nonce = lock(lock_key, options))
         @safe_redis_internal_options[:lock_nonce] = lock_nonce
         @safe_redis_internal_options[:stale_entry] = entry
@@ -66,8 +53,20 @@ module ActiveSupport::Cache::SafeRedisRaceCondition
       end
       # just return the stale value; someone else is busy
       # regenerating it
-      entry
+    else
+      until entry
+        if (lock_nonce = lock(lock_key, options))
+          @safe_redis_internal_options[:lock_nonce] = lock_nonce
+          break
+        else
+          # someone else is already generating it; wait for them
+          sleep 0.1
+          entry = read_entry(key, options)
+          next
+        end
+      end
     end
+    entry
   end
 
   # this is originally defined in ActiveSupport::Cache::Store,
@@ -82,7 +81,7 @@ module ActiveSupport::Cache::SafeRedisRaceCondition
     # if we have old stale data, silently swallow any
     # errors fetching fresh data, and return the stale entry
     Canvas::Errors.capture(e)
-    return @safe_redis_internal_options[:stale_entry].value
+    @safe_redis_internal_options[:stale_entry].value
   ensure
     # only unlock if we have an actual lock nonce, not just "true"
     # that happens on failure
@@ -127,7 +126,7 @@ module ActiveSupport::Cache::SafeRedisRaceCondition
   # is written to delete a key, but only if it's value matches the
   # provided value (so if someone else has re-written it since we won't delete it)
   def delif_script
-    @_delif ||= Redis::Scripting::Script.new(File.expand_path("../delif.lua", __FILE__))
+    @_delif ||= Redis::Scripting::Script.new(File.expand_path("delif.lua", __dir__))
   end
 
   # vanilla Rails is weird, and assumes "race_condition_ttl" is 5 minutes; override that to actually do math

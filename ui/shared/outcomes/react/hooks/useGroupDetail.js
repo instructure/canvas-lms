@@ -163,6 +163,18 @@ const useGroupDetail = ({
     }
   }
 
+  const refetchLearningOutcome = () => {
+    // only need to call refetch once instead of refetching every group that has cache
+    // that is because the Learning Outcome & Friendly Description cache is stored separately
+    // Later we should look at updating the cache directly however...
+    // When going down the path of writeFragment and readFragment.  As it worked well for updating the
+    // LearningOutcome fragment, it did not for FriendlyDescription fragment.
+    // Mainly b/c when removing the friendly description there is no easy way to remove the
+    // FriendlyDescription cache object from the cache store in graphql v2. v3 does have this ability
+    // so yet another reason to look into upgrading to v3
+    refetch()
+  }
+
   const removeLearningOutcomes = (contentTagIds, allVars = true) => {
     const vars = allVars ? allVariables.current : [variables]
 
@@ -266,6 +278,7 @@ const useGroupDetail = ({
     loadMore,
     removeLearningOutcomes,
     readLearningOutcomes,
+    refetchLearningOutcome,
     refetch
   }
 }

@@ -112,7 +112,7 @@ class ConditionalReleaseObjects
     end
 
     def last_add_assignment_button
-      ff('.cr-scoring-range__add-assignment-button').last
+      ff(".cr-scoring-range__add-assignment-button").last
     end
 
     def mp_assignment_checkbox(assignment_name)
@@ -120,7 +120,7 @@ class ConditionalReleaseObjects
     end
 
     def add_items_button
-      find_button('Add Items')
+      find_button("Add Items")
     end
 
     def assignment_card_exists?(assignment_name)

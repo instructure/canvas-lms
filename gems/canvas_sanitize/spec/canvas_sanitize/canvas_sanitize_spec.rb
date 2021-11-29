@@ -18,8 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'spec_helper'
-require 'timeout'
+require "spec_helper"
+require "timeout"
 
 describe CanvasSanitize do
   describe "#clean" do
@@ -142,36 +142,36 @@ describe CanvasSanitize do
   end
 
   it "allows font tags with valid attributes" do
-    str = %{<font face="Comic Sans MS" color="blue" size="3" bacon="yes">hello</font>}
+    str = %(<font face="Comic Sans MS" color="blue" size="3" bacon="yes">hello</font>)
     res = Sanitize.clean(str, CanvasSanitize::SANITIZE)
-    expect(res).to eq %{<font face="Comic Sans MS" color="blue" size="3">hello</font>}
+    expect(res).to eq %(<font face="Comic Sans MS" color="blue" size="3">hello</font>)
   end
 
   it "allows valid MathML" do
-    str = %{<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>a</mi><mo>+</mo><mi>b</mi></mrow></math>}
+    str = %(<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>a</mi><mo>+</mo><mi>b</mi></mrow></math>)
     res = Sanitize.clean(str, CanvasSanitize::SANITIZE)
     expect(res).to eq str
   end
 
   it "strips invalid attributes from MathML" do
-    str = %{<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi foo="bar">a</mi><mo>+</mo><mi>b</mi></mrow></math>}
+    str = %(<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi foo="bar">a</mi><mo>+</mo><mi>b</mi></mrow></math>)
     res = Sanitize.clean(str, CanvasSanitize::SANITIZE)
     expect(res).not_to match(/foo/)
   end
 
   it "removes and not escape contents of style tags" do
-    str = %{<p><style type="text/css">pleaseignoreme: blahblahblah</style>but not me</p>}
+    str = %(<p><style type="text/css">pleaseignoreme: blahblahblah</style>but not me</p>)
     res = Sanitize.clean(str, CanvasSanitize::SANITIZE)
     expect(res).to eq "<p>but not me</p>"
   end
 
   it "is not extremely slow with long, weird microsoft styles" do
-    str = %{<span lang="EN" style="font-family: 'Times New Roman','serif'; color: #17375e; font-size: 12pt; mso-fareast-font-family: 'Times New Roman'; mso-themecolor: text2; mso-themeshade: 191; mso-style-textfill-fill-color: #17375E; mso-style-textfill-fill-themecolor: text2; mso-style-textfill-fill-alpha: 100.0%; mso-ansi-language: EN; mso-style-textfill-fill-colortransforms: lumm=75000"><p></p></span>}
+    str = %(<span lang="EN" style="font-family: 'Times New Roman','serif'; color: #17375e; font-size: 12pt; mso-fareast-font-family: 'Times New Roman'; mso-themecolor: text2; mso-themeshade: 191; mso-style-textfill-fill-color: #17375E; mso-style-textfill-fill-themecolor: text2; mso-style-textfill-fill-alpha: 100.0%; mso-ansi-language: EN; mso-style-textfill-fill-colortransforms: lumm=75000"><p></p></span>)
     # the above string took over a minute to sanitize as of 8ae4ba8e
     Timeout.timeout(1) { Sanitize.clean(str, CanvasSanitize::SANITIZE) }
   end
 
-  Dir.glob(File.expand_path(File.join(__FILE__, '..', '..', 'fixtures', 'xss', '*.xss'))) do |filename|
+  Dir.glob(File.expand_path(File.join(__FILE__, "..", "..", "fixtures", "xss", "*.xss"))) do |filename|
     name = File.split(filename).last
     it "sanitizes xss attempts for #{name}" do
       f = File.open(filename)

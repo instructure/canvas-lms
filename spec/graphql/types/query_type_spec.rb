@@ -27,9 +27,9 @@ describe Types::QueryType do
     test_course_2 = Course.create! name: "TEST2"
     Course.create! name: "TEST3"
 
-    teacher = user_factory(name: 'Coolguy Mcgee')
-    test_course_1.enroll_user(teacher, 'TeacherEnrollment')
-    test_course_2.enroll_user(teacher, 'TeacherEnrollment')
+    teacher = user_factory(name: "Coolguy Mcgee")
+    test_course_1.enroll_user(teacher, "TeacherEnrollment")
+    test_course_2.enroll_user(teacher, "TeacherEnrollment")
 
     # this is a set of course ids to check against
 
@@ -76,7 +76,7 @@ describe Types::QueryType do
     let_once(:generic_sis_id) { "di_ecruos_sis" }
     let_once(:course) { Course.create!(name: "TEST", sis_source_id: generic_sis_id, account: account) }
     let_once(:account) do
-      acct = Account.default.sub_accounts.create!(name: 'sub')
+      acct = Account.default.sub_accounts.create!(name: "sub")
       acct.update!(sis_source_id: generic_sis_id)
       acct
     end
@@ -85,10 +85,13 @@ describe Types::QueryType do
       assignment.assignment_group.update!(sis_source_id: generic_sis_id)
       assignment.assignment_group
     end
-    let_once(:term) { course.enrollment_term.update!(sis_source_id: generic_sis_id); course.enrollment_term }
+    let_once(:term) do
+      course.enrollment_term.update!(sis_source_id: generic_sis_id)
+      course.enrollment_term
+    end
     let_once(:admin) { account_admin_user(account: Account.default) }
 
-    %w/account course assignment assignmentGroup term/.each do |type|
+    %w[account course assignment assignmentGroup term].each do |type|
       it "doesn't allow searching #{type} when given both types of ids" do
         expect(
           CanvasSchema.execute("{#{type}(id: \"123\", sisId: \"123\") { id }}").dig("errors", 0, "message")

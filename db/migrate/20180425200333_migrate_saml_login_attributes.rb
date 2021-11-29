@@ -22,20 +22,20 @@ class MigrateSamlLoginAttributes < ActiveRecord::Migration[5.1]
   tag :postdeploy
 
   def up
-    AuthenticationProvider::SAML.where(login_attribute: 'nameid').update_all(login_attribute: 'NameID')
-    AuthenticationProvider::SAML.where(login_attribute: 'eduPersonPrincipalName_stripped').each do |ap|
-      ap.login_attribute = 'eduPersonPrincipalName'
+    AuthenticationProvider::SAML.where(login_attribute: "nameid").update_all(login_attribute: "NameID")
+    AuthenticationProvider::SAML.where(login_attribute: "eduPersonPrincipalName_stripped").each do |ap|
+      ap.login_attribute = "eduPersonPrincipalName"
       ap.strip_domain_from_login_attribute = true
       ap.save!
     end
   end
 
   def down
-    AuthenticationProvider::SAML.where(login_attribute: 'NameID').update_all(login_attribute: 'nameid')
-    AuthenticationProvider::SAML.where(login_attribute: 'eduPersonPrincipalName').each do |ap|
+    AuthenticationProvider::SAML.where(login_attribute: "NameID").update_all(login_attribute: "nameid")
+    AuthenticationProvider::SAML.where(login_attribute: "eduPersonPrincipalName").each do |ap|
       next unless ap.strip_domain_from_login_attribute?
 
-      ap.login_attribute = 'eduPersonPrincipalName_stripped'
+      ap.login_attribute = "eduPersonPrincipalName_stripped"
       ap.save!
     end
   end

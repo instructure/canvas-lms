@@ -21,9 +21,9 @@
 module LiveAssessments
   class Submission < ActiveRecord::Base
     belongs_to :user
-    belongs_to :assessment, class_name: 'LiveAssessments::Assessment'
+    belongs_to :assessment, class_name: "LiveAssessments::Assessment"
 
-    validates_presence_of :user, :assessment
+    validates :user, :assessment, presence: true
 
     def create_outcome_result(alignment)
       # we don't delete results right now
@@ -44,11 +44,11 @@ module LiveAssessments
       outcome_result.possible = possible
       outcome_result.percent = score.to_f / possible.to_f
 
-      if alignment.mastery_score
-        outcome_result.mastery = outcome_result.percent >= alignment.mastery_score
-      else
-        outcome_result.mastery = nil
-      end
+      outcome_result.mastery = if alignment.mastery_score
+                                 outcome_result.percent >= alignment.mastery_score
+                               else
+                                 nil
+                               end
 
       # map actual magic marker result to outcome rubric criterion if we have one
       # this is a hack. the rollups and gradebooks should handle explicit mastery

@@ -20,15 +20,15 @@
 
 module CanvasSecurity
   class KeyStorage
-    PAST = 'jwk-past.json'
-    PRESENT = 'jwk-present.json'
-    FUTURE = 'jwk-future.json'
+    PAST = "jwk-past.json"
+    PRESENT = "jwk-present.json"
+    FUTURE = "jwk-future.json"
     MAX_CACHE_AGE = 10.days.to_i
     MIN_ROTATION_PERIOD = 1.hour
 
     class << self
       def max_cache_age
-        Setting.get('public_jwk_cache_age_in_seconds', MAX_CACHE_AGE)
+        Setting.get("public_jwk_cache_age_in_seconds", MAX_CACHE_AGE)
       end
 
       def new_key
@@ -62,7 +62,7 @@ module CanvasSecurity
       if keys.values.compact.blank?
         initialize_keys
       else
-        return if (Time.zone.now - Time.zone.parse(keys.dig(FUTURE, 'kid'))) < min_rotation_period.to_i
+        return if (Time.zone.now - Time.zone.parse(keys.dig(FUTURE, "kid"))) < min_rotation_period.to_i
 
         kvs = {
           PAST => keys[PRESENT].to_json,
@@ -80,7 +80,7 @@ module CanvasSecurity
     def public_keyset
       JSON::JWK::Set.new(retrieve_keys.values.compact.map do |private_jwk|
         public_jwk = private_jwk.to_key.public_key.to_jwk
-        public_jwk.merge(private_jwk.select { |k, _| %w(alg use kid).include?(k) })
+        public_jwk.merge(private_jwk.select { |k, _| %w[alg use kid].include?(k) })
       end)
     end
 

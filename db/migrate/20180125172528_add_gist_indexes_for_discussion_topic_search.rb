@@ -27,6 +27,6 @@ class AddGistIndexesForDiscussionTopicSearch < ActiveRecord::Migration[5.0]
   end
 
   def self.down
-    remove_index :discussion_topics, name: 'index_trgm_discussion_topics_title'
+    remove_index :discussion_topics, name: "index_trgm_discussion_topics_title"
   end
 end

@@ -20,7 +20,7 @@
 require_relative "../spec_helper"
 
 describe SentryProxy do
-  let(:data) { { a: 'b', c: 'd' } }
+  let(:data) { { a: "b", c: "d" } }
   let(:error_klass) { Class.new(StandardError) }
 
   before { SentryProxy.clear_ignorable_errors }

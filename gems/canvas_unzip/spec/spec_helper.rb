@@ -17,8 +17,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'canvas_unzip'
+require "canvas_unzip"
 
 RSpec.configure do |config|
-  config.order = 'random'
+  config.order = "random"
 end

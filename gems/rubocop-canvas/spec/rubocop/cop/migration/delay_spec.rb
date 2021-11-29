@@ -20,7 +20,7 @@
 describe RuboCop::Cop::Migration::Delay do
   subject(:cop) { described_class.new }
 
-  it 'catches other forms of delay' do
+  it "catches other forms of delay" do
     inspect_source(%{
       class TestMigration < ActiveRecord::Migration
 
@@ -34,7 +34,7 @@ describe RuboCop::Cop::Migration::Delay do
     expect(cop.offenses.first.severity.name).to eq(:warning)
   end
 
-  it 'disallows delay in predeploys' do
+  it "disallows delay in predeploys" do
     inspect_source(%{
       class TestMigration < ActiveRecord::Migration
         tag :predeploy

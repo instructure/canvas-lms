@@ -22,24 +22,24 @@ PactConfig::Consumers::ALL.each do |consumer|
     # Teacher ID: 3 || Name: Teacher1
     # Course ID: 1
     # Discussion ID: 1
-    provider_state 'a teacher in a course with a discussion' do
+    provider_state "a teacher in a course with a discussion" do
       set_up do
         @course = Pact::Canvas.base_state.course
         @teacher = Pact::Canvas.base_state.teachers.first
-        @course.discussion_topics.create!(title: "title", message: nil, user: @teacher, discussion_type: 'threaded')
+        @course.discussion_topics.create!(title: "title", message: nil, user: @teacher, discussion_type: "threaded")
       end
     end
 
     # Teacher ID: 3 || Name: Teacher1
     # Course ID: 1
     # Discussion ID: 1
-    provider_state 'a teacher in a course with a discussion and a student reply' do
+    provider_state "a teacher in a course with a discussion and a student reply" do
       set_up do
         @course = Pact::Canvas.base_state.course
         @teacher = Pact::Canvas.base_state.teachers.first
         @student = Pact::Canvas.base_state.students.first
-        @topic = @course.discussion_topics.create!(title: "title", message: nil, user: @teacher, discussion_type: 'threaded')
-        @entry = @topic.discussion_entries.create!(:user => @student, :message => "a comment")
+        @topic = @course.discussion_topics.create!(title: "title", message: nil, user: @teacher, discussion_type: "threaded")
+        @entry = @topic.discussion_entries.create!(user: @student, message: "a comment")
       end
     end
 
@@ -48,7 +48,7 @@ PactConfig::Consumers::ALL.each do |consumer|
     # Student: "Mobile Student", ID 8
     # Discussion topic w/ ID 1: Includes section data
     # Discussion topic w/ ID 2: Locked, delayed, requires an initial post to comment, associated with assignment
-    provider_state 'mobile course with discussions' do
+    provider_state "mobile course with discussions" do
       set_up do
         student = Pact::Canvas.base_state.mobile_student
         teacher = Pact::Canvas.base_state.mobile_teacher
@@ -65,18 +65,18 @@ PactConfig::Consumers::ALL.each do |consumer|
           description: "Awesome!",
           due_at: 2.days.from_now,
           points_possible: 10,
-          allowed_extensions: ['txt'],
-          submission_types: ['online_text_entry']
+          allowed_extensions: ["txt"],
+          submission_types: ["online_text_entry"]
         )
 
         # Create Topic 1: section specific, has an entry with ratings
         topic1 = course.discussion_topics.create!(title: "title", message: "message", user: student,
-                                                  discussion_type: 'threaded', podcast_enabled: true, position: 0)
+                                                  discussion_type: "threaded", podcast_enabled: true, position: 0)
         topic1.lock_at = 2.days.from_now
         topic1.is_section_specific = true
         topic1.course_sections = [section]
         topic1.save!
-        entry = topic1.discussion_entries.create!(:user => teacher, :message => "A discussion entry.")
+        entry = topic1.discussion_entries.create!(user: teacher, message: "A discussion entry.")
         entry.change_rating(1, teacher)
         entry.change_rating(2, student)
         entry.save!
@@ -88,7 +88,7 @@ PactConfig::Consumers::ALL.each do |consumer|
 
         # Create Topic 2: locked, delayed, assignment-specific, requires initial post
         topic2 = course.discussion_topics.create!(title: "title", message: "message", user: student,
-                                                  discussion_type: 'threaded', require_initial_post: true, podcast_enabled: true, position: 1)
+                                                  discussion_type: "threaded", require_initial_post: true, podcast_enabled: true, position: 1)
         topic2.lock_at = 2.days.ago
         topic2.assignment_id = assignment.id
         topic2.delayed_post_at = 2.days.from_now

@@ -11,17 +11,17 @@ class AddStrandOrderOverride < ActiveRecord::Migration[4.2]
   def up
     add_column :delayed_jobs, :strand_order_override, :integer, default: 0, null: false, if_not_exists: true
     add_column :failed_jobs, :strand_order_override, :integer, default: 0, null: false, if_not_exists: true
-    add_index :delayed_jobs, [:strand, :strand_order_override, :id],
+    add_index :delayed_jobs, %i[strand strand_order_override id],
               algorithm: :concurrently,
               where: "strand IS NOT NULL",
               name: "next_in_strand_index",
               if_not_exists: true
 
-    if connection.adapter_name == 'PostgreSQL'
+    if connection.adapter_name == "PostgreSQL"
       search_path = Shard.current.name
       # Use the strand_order_override as the primary sorting mechanism (useful when moving between jobs queues without preserving ID ordering)
-      execute(<<-SQL)
-        CREATE OR REPLACE FUNCTION #{connection.quote_table_name('delayed_jobs_after_delete_row_tr_fn')} () RETURNS trigger AS $$
+      execute(<<~SQL) # rubocop:disable Rails/SquishedSQLHeredocs
+        CREATE OR REPLACE FUNCTION #{connection.quote_table_name("delayed_jobs_after_delete_row_tr_fn")} () RETURNS trigger AS $$
         DECLARE
           running_count integer;
           should_lock boolean;
@@ -76,10 +76,10 @@ class AddStrandOrderOverride < ActiveRecord::Migration[4.2]
     remove_column :delayed_jobs, :strand_order_override, :integer
     remove_column :failed_jobs, :strand_order_override, :integer
 
-    if connection.adapter_name == 'PostgreSQL'
+    if connection.adapter_name == "PostgreSQL"
       search_path = Shard.current.name
-      execute(<<-SQL)
-        CREATE OR REPLACE FUNCTION #{connection.quote_table_name('delayed_jobs_after_delete_row_tr_fn')} () RETURNS trigger AS $$
+      execute(<<~SQL) # rubocop:disable Rails/SquishedSQLHeredocs
+        CREATE OR REPLACE FUNCTION #{connection.quote_table_name("delayed_jobs_after_delete_row_tr_fn")} () RETURNS trigger AS $$
         DECLARE
           running_count integer;
           should_lock boolean;

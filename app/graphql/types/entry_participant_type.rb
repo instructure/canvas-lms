@@ -20,7 +20,7 @@
 
 module Types
   class EntryParticipantType < ApplicationObjectType
-    graphql_name 'EntryParticipant'
+    graphql_name "EntryParticipant"
 
     field :rating, Boolean, null: true
     field :forced_read_state, Boolean, null: true

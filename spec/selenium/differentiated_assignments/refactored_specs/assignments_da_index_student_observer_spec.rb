@@ -17,44 +17,18 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../../helpers/differentiated_assignments/da_common'
+require_relative "../../helpers/differentiated_assignments/da_common"
 
-describe 'Viewing differentiated assignments' do
-  include_context 'differentiated assignments'
+describe "Viewing differentiated assignments" do
+  include_context "differentiated assignments"
 
-  context 'as the first student' do
+  context "as the first student" do
     before { login_as(users.first_student) }
 
-    context 'on the assignments index page' do
+    context "on the assignments index page" do
       before { go_to(urls.assignments_index_page) }
 
-      it 'only shows assigned quizzes, assignments, and discussions', priority: "1", test_id: 618804 do
-        expect(list_of_assignments.text).to include(
-          # assignments
-          assignments.assignment_for_sections_a_and_b.title,
-          # discussions
-          discussions.discussion_for_sections_a_and_b.title,
-          # quizzes
-          quizzes.quiz_for_sections_a_and_b.title,
-        )
-
-        # hides the rest
-        expect(list_of_assignments.text).not_to include(
-          assignments.assignment_for_second_and_third_students.title,
-          discussions.discussion_for_second_and_third_students.title,
-          quizzes.quiz_for_second_and_third_students.title
-        )
-      end
-    end
-  end
-
-  context 'as the first observer' do
-    before { login_as(users.first_observer) }
-
-    context 'on the assignments index page' do
-      before { go_to(urls.assignments_index_page) }
-
-      it 'only shows assigned quizzes, assignments, and discussions', priority: "1", test_id: 619042 do
+      it "only shows assigned quizzes, assignments, and discussions", priority: "1" do
         expect(list_of_assignments.text).to include(
           # assignments
           assignments.assignment_for_sections_a_and_b.title,
@@ -74,13 +48,39 @@ describe 'Viewing differentiated assignments' do
     end
   end
 
-  context 'as the second student' do
+  context "as the first observer" do
+    before { login_as(users.first_observer) }
+
+    context "on the assignments index page" do
+      before { go_to(urls.assignments_index_page) }
+
+      it "only shows assigned quizzes, assignments, and discussions", priority: "1" do
+        expect(list_of_assignments.text).to include(
+          # assignments
+          assignments.assignment_for_sections_a_and_b.title,
+          # discussions
+          discussions.discussion_for_sections_a_and_b.title,
+          # quizzes
+          quizzes.quiz_for_sections_a_and_b.title
+        )
+
+        # hides the rest
+        expect(list_of_assignments.text).not_to include(
+          assignments.assignment_for_second_and_third_students.title,
+          discussions.discussion_for_second_and_third_students.title,
+          quizzes.quiz_for_second_and_third_students.title
+        )
+      end
+    end
+  end
+
+  context "as the second student" do
     before { login_as(users.second_student) }
 
-    context 'on the assignments index page' do
+    context "on the assignments index page" do
       before { go_to(urls.assignments_index_page) }
 
-      it 'only shows assigned quizzes, assignments, and discussions', priority: "1", test_id: 619043 do
+      it "only shows assigned quizzes, assignments, and discussions", priority: "1" do
         expect(list_of_assignments.text).to include(
           # assignments
           assignments.assignment_for_sections_a_and_b.title,
@@ -96,13 +96,13 @@ describe 'Viewing differentiated assignments' do
     end
   end
 
-  context 'as the third student' do
+  context "as the third student" do
     before { login_as(users.third_student) }
 
-    context 'on the assignments index page' do
+    context "on the assignments index page" do
       before { go_to(urls.assignments_index_page) }
 
-      it 'only shows assigned quizzes, assignments, and discussions', priority: "1", test_id: 619044 do
+      it "only shows assigned quizzes, assignments, and discussions", priority: "1" do
         expect(list_of_assignments.text).to include(
           # assignments
           assignments.assignment_for_sections_a_and_b.title,
@@ -118,13 +118,13 @@ describe 'Viewing differentiated assignments' do
     end
   end
 
-  context 'as the third observer' do
+  context "as the third observer" do
     before { login_as(users.third_observer) }
 
-    context 'on the assignments index page' do
+    context "on the assignments index page" do
       before { go_to(urls.assignments_index_page) }
 
-      it 'only shows assigned quizzes, assignments, and discussions', priority: "1", test_id: 619046 do
+      it "only shows assigned quizzes, assignments, and discussions", priority: "1" do
         expect(list_of_assignments.text).to include(
           # assignments
           assignments.assignment_for_sections_a_and_b.title,

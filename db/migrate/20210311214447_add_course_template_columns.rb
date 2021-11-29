@@ -22,7 +22,7 @@ class AddCourseTemplateColumns < ActiveRecord::Migration[6.0]
   disable_ddl_transaction!
 
   def up
-    new_pg = connection.postgresql_version >= 110000
+    new_pg = connection.postgresql_version >= 11_00_00 # rubocop:disable Style/NumericLiterals
     defaults = new_pg ? { default: false, null: false } : {}
 
     add_column :courses, :template, :boolean, if_not_exists: true, **defaults

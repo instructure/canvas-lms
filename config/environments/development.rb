@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_dependency 'host_url'
+require_dependency "host_url"
 
 environment_configuration(defined?(config) && config) do |config|
   # Settings specified here will take precedence over those in config/application.rb
@@ -42,17 +42,17 @@ environment_configuration(defined?(config) && config) do |config|
   # Option to DISABLE_RUBY_DEBUGGING is helpful IDE-based debugging.
   # The ruby debug gems conflict with the IDE-based debugger gem.
   # Set this option in your dev environment to disable.
-  unless ENV['DISABLE_RUBY_DEBUGGING'] || RUBY_ENGINE != 'ruby'
-    require 'byebug'
-    if ENV['REMOTE_DEBUGGING_ENABLED']
-      require 'byebug/core'
-      Byebug.start_server('0.0.0.0', 0)
+  unless ENV["DISABLE_RUBY_DEBUGGING"] || RUBY_ENGINE != "ruby"
+    require "byebug"
+    if ENV["REMOTE_DEBUGGING_ENABLED"]
+      require "byebug/core"
+      Byebug.start_server("0.0.0.0", 0)
       puts "Byebug listening on 0.0.0.0:#{Byebug.actual_port}" # rubocop:disable Rails/Output
-      byebug_port_file = File.join(Dir.tmpdir, 'byebug.port')
+      byebug_port_file = File.join(Dir.tmpdir, "byebug.port")
       File.write(byebug_port_file, Byebug.actual_port)
 
-      require 'debase'
-      require 'ruby-debug-ide'
+      require "debase"
+      require "ruby-debug-ide"
     end
   end
 
@@ -71,13 +71,13 @@ environment_configuration(defined?(config) && config) do |config|
   config.hosts << HostUrl
 
   # allow docker dev setup to use http proxy
-  config.hosts << ENV['VIRTUAL_HOST'] if ENV['VIRTUAL_HOST']
+  config.hosts << ENV["VIRTUAL_HOST"] if ENV["VIRTUAL_HOST"]
 
   # allow any additional hosts
-  ENV['ADDITIONAL_ALLOWED_HOSTS']&.split(',')&.each do |host|
+  ENV["ADDITIONAL_ALLOWED_HOSTS"]&.split(",")&.each do |host|
     config.hosts << host
   end
 
   # eval <env>-local.rb if it exists
-  Dir[File.dirname(__FILE__) + "/" + File.basename(__FILE__, ".rb") + "-*.rb"].each { |localfile| eval(File.new(localfile).read, nil, localfile, 1) }
+  Dir[File.dirname(__FILE__) + "/" + File.basename(__FILE__, ".rb") + "-*.rb"].each { |localfile| eval(File.new(localfile).read, nil, localfile, 1) } # rubocop:disable Security/Eval
 end

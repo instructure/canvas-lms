@@ -18,8 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative 'swagger_helper'
-require 'return_view'
+require_relative "swagger_helper"
+require "return_view"
 
 describe ReturnView do
   context "with no type" do

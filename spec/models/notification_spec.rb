@@ -24,11 +24,11 @@ def notification_set(opts = {})
   notification_opts = opts.delete(:notification_opts) || {}
 
   assignment_model
-  notification_model({ :subject => "<%= t :subject, 'This is 5!' %>", :name => "Test Name" }.merge(notification_opts))
-  user_model({ :workflow_state => 'registered' }.merge(user_opts))
+  notification_model({ subject: "<%= t :subject, 'This is 5!' %>", name: "Test Name" }.merge(notification_opts))
+  user_model({ workflow_state: "registered" }.merge(user_opts))
   communication_channel_model.confirm!
-  notification_policy_model(:notification => @notification,
-                            :communication_channel => @communication_channel)
+  notification_policy_model(notification: @notification,
+                            communication_channel: @communication_channel)
 
   @notification.reload
 end
@@ -53,12 +53,12 @@ describe Notification do
   end
 
   it "always has some subject" do
-    expect(Notification.create!(:name => 'Testing').subject).not_to be_nil
+    expect(Notification.create!(name: "Testing").subject).not_to be_nil
   end
 
   describe "#related_user_setting" do
     it "doesnt exist for nil user" do
-      notification = notification_model({ subject: "<%= t :subject, 'This is 6!' %>", name: "Test Name", category: 'Grading' })
+      notification = notification_model({ subject: "<%= t :subject, 'This is 6!' %>", name: "Test Name", category: "Grading" })
       expect(notification.related_user_setting(nil, Account.default)).to be_nil
     end
   end

@@ -66,7 +66,7 @@ class RubricAssessmentsController < ApplicationController
     @request = @association.assessment_requests.find(params[:assessment_request_id])
     if authorized_action(@association, @current_user, :manage)
       @request.send_reminder!
-      render :json => @request
+      render json: @request
     end
   end
 
@@ -113,7 +113,7 @@ class RubricAssessmentsController < ApplicationController
 
     # Funky flow to avoid a double-render, re-work it if you like
     if @assessment && !authorized_action(@assessment, @current_user, :update)
-      return
+      nil
     else
       opts = {}
       provisional = value_to_boolean(params[:provisional])
@@ -151,7 +151,7 @@ class RubricAssessmentsController < ApplicationController
               [:artifact, :rubric_association]
             end
           json = @assessment.as_json(
-            methods: [:ratings, :assessor_name, :related_group_submissions_and_assessments],
+            methods: %i[ratings assessor_name related_group_submissions_and_assessments],
             include: artifact_includes,
             include_root: false
           )
@@ -180,9 +180,9 @@ class RubricAssessmentsController < ApplicationController
 
           render json: json
         end
-      rescue Assignment::GradeError => error
-        json = { errors: { base: error.to_s, error_code: error.error_code } }
-        render json: json, status: error.status_code || :bad_request
+      rescue Assignment::GradeError => e
+        json = { errors: { base: e.to_s, error_code: e.error_code } }
+        render json: json, status: e.status_code || :bad_request
       end
     end
   end
@@ -198,9 +198,9 @@ class RubricAssessmentsController < ApplicationController
     @assessment = @rubric.rubric_assessments.find(params[:id])
     if authorized_action(@assessment, @current_user, :delete)
       if @assessment.destroy
-        render :json => @assessment
+        render json: @assessment
       else
-        render :json => @assessment.errors, :status => :bad_request
+        render json: @assessment.errors, status: :bad_request
       end
     end
   end
@@ -210,7 +210,7 @@ class RubricAssessmentsController < ApplicationController
   def resolve_user_id
     user_id = params[:rubric_assessment][:user_id]
     if user_id
-      user_id =~ Api::ID_REGEX ? user_id.to_i : nil
+      Api::ID_REGEX.match?(user_id) ? user_id.to_i : nil
     elsif params[:rubric_assessment][:anonymous_id]
       Submission.find_by!(
         anonymous_id: params[:rubric_assessment][:anonymous_id],
@@ -223,7 +223,7 @@ class RubricAssessmentsController < ApplicationController
     value_to_boolean(params[:final]) && @association_object.permits_moderation?(@current_user)
   end
 
-  def ensure_adjudication_possible(provisional:)
+  def ensure_adjudication_possible(provisional:, &block)
     # Non-assignment association objects crash if they're passed into this
     # controller, since find_asset_for_assessment only exists on assignments.
     # The check here thus serves only to make sure the crash doesn't happen on
@@ -233,9 +233,7 @@ class RubricAssessmentsController < ApplicationController
     @association_object.ensure_grader_can_adjudicate(
       grader: @current_user,
       provisional: provisional,
-      occupy_slot: true
-    ) do
-      yield
-    end
+      occupy_slot: true, &block
+    )
   end
 end

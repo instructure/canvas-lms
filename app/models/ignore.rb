@@ -20,10 +20,10 @@
 
 class Ignore < ActiveRecord::Base
   belongs_to :user
-  belongs_to :asset, polymorphic: [:assignment, :assessment_request, :quiz => 'Quizzes::Quiz']
+  belongs_to :asset, polymorphic: [:assignment, :assessment_request, quiz: "Quizzes::Quiz"]
 
-  validates_presence_of :user_id, :asset_id, :asset_type, :purpose
-  validates_inclusion_of :permanent, :in => [false, true]
+  validates :user_id, :asset_id, :asset_type, :purpose, presence: true
+  validates :permanent, inclusion: { in: [false, true] }
 
   def self.cleanup
     GuardRail.activate(:secondary) do

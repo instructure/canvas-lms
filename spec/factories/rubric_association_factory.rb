@@ -26,7 +26,7 @@ module Factories
     @rubric_association_object = opts[:association_object] ||
                                  course.assignments.first ||
                                  course.assignments.create!(assignment_valid_attributes)
-    @rubric_association = @rubric.rubric_associations.create!(valid_rubric_assessment_attributes.merge(:association_object => @rubric_association_object, context: context, :purpose => opts[:purpose] || "none"))
+    @rubric_association = @rubric.rubric_associations.create!(valid_rubric_assessment_attributes.merge(association_object: @rubric_association_object, context: context, purpose: opts[:purpose] || "none"))
   end
 
   def valid_rubric_assessment_attributes

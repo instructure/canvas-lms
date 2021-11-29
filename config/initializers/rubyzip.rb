@@ -22,15 +22,15 @@
 # Tag the string as UTF-8 if it's valid UTF-8 so we can search
 # for files with non-ASCII names inside archives.
 
-require 'zip'
+require "zip"
 
 Zip.write_zip64_support = true
 Zip.unicode_names = true
 
 module ZipEncodingFix
   def fix_name_encoding
-    @name.force_encoding('UTF-8')
-    @name.force_encoding('ASCII-8BIT') unless @name.valid_encoding?
+    @name.force_encoding("UTF-8")
+    @name.force_encoding("ASCII-8BIT") unless @name.valid_encoding?
   end
 
   # see https://github.com/rubyzip/rubyzip/issues/324
@@ -38,7 +38,7 @@ module ZipEncodingFix
   # spec/lib/canvas/migration_spec.rb:85, ie
   # "should deal with backslashes path separators in migrations"
   def fix_name_backslashes
-    @name.tr!('\\', '/')
+    @name.tr!("\\", "/")
   end
 
   def read_c_dir_entry(io)

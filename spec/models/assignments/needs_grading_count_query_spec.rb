@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 #
-require_relative "../../spec_helper.rb"
+require_relative "../../spec_helper"
 require_dependency "assignments/needs_grading_count_query"
 
 module Assignments
@@ -30,23 +30,23 @@ module Assignments
 
     describe "#count" do
       it "only counts submissions in the user's visible section(s)" do
-        @section = @course.course_sections.create!(:name => 'section 2')
-        @user2 = user_with_pseudonym(:active_all => true, :name => 'Student2', :username => 'student2@instructure.com')
-        @section.enroll_user(@user2, 'StudentEnrollment', 'active')
-        @user1 = user_with_pseudonym(:active_all => true, :name => 'Student1', :username => 'student1@instructure.com')
-        @course.enroll_student(@user1).update_attribute(:workflow_state, 'active')
+        @section = @course.course_sections.create!(name: "section 2")
+        @user2 = user_with_pseudonym(active_all: true, name: "Student2", username: "student2@instructure.com")
+        @section.enroll_user(@user2, "StudentEnrollment", "active")
+        @user1 = user_with_pseudonym(active_all: true, name: "Student1", username: "student1@instructure.com")
+        @course.enroll_student(@user1).update_attribute(:workflow_state, "active")
 
         # enroll a section-limited TA
-        @ta = user_with_pseudonym(:active_all => true, :name => 'TA1', :username => 'ta1@instructure.com')
+        @ta = user_with_pseudonym(active_all: true, name: "TA1", username: "ta1@instructure.com")
         ta_enrollment = @course.enroll_ta(@ta)
         ta_enrollment.limit_privileges_to_course_section = true
-        ta_enrollment.workflow_state = 'active'
+        ta_enrollment.workflow_state = "active"
         ta_enrollment.save!
 
         # make a submission in each section
-        @assignment = @course.assignments.create(:title => "some assignment", :submission_types => ['online_text_entry'])
-        @assignment.submit_homework @user1, :submission_type => "online_text_entry", :body => "o hai"
-        @assignment.submit_homework @user2, :submission_type => "online_text_entry", :body => "haldo"
+        @assignment = @course.assignments.create(title: "some assignment", submission_types: ["online_text_entry"])
+        @assignment.submit_homework @user1, submission_type: "online_text_entry", body: "o hai"
+        @assignment.submit_homework @user2, submission_type: "online_text_entry", body: "haldo"
         @assignment.reload
 
         # check the teacher sees both, the TA sees one
@@ -62,22 +62,22 @@ module Assignments
         expect(NeedsGradingCountQuery.new(@assignment, @ta).count).to eql(0)
 
         # test limited enrollment in multiple sections
-        @course.enroll_user(@ta, 'TaEnrollment', :enrollment_state => 'active', :section => @section,
-                                                 :allow_multiple_enrollments => true, :limit_privileges_to_course_section => true)
+        @course.enroll_user(@ta, "TaEnrollment", enrollment_state: "active", section: @section,
+                                                 allow_multiple_enrollments: true, limit_privileges_to_course_section: true)
         @assignment.reload
         expect(NeedsGradingCountQuery.new(@assignment, @ta).count).to eql(1)
       end
 
-      it 'breaks them out by section if the by_section flag is passed' do
-        @section = @course.course_sections.create!(:name => 'section 2')
-        @user2 = user_with_pseudonym(:active_all => true, :name => 'Student2', :username => 'student2@instructure.com')
-        @section.enroll_user(@user2, 'StudentEnrollment', 'active')
-        @user1 = user_with_pseudonym(:active_all => true, :name => 'Student1', :username => 'student1@instructure.com')
-        @course.enroll_student(@user1).update_attribute(:workflow_state, 'active')
+      it "breaks them out by section if the by_section flag is passed" do
+        @section = @course.course_sections.create!(name: "section 2")
+        @user2 = user_with_pseudonym(active_all: true, name: "Student2", username: "student2@instructure.com")
+        @section.enroll_user(@user2, "StudentEnrollment", "active")
+        @user1 = user_with_pseudonym(active_all: true, name: "Student1", username: "student1@instructure.com")
+        @course.enroll_student(@user1).update_attribute(:workflow_state, "active")
 
-        @assignment = @course.assignments.create(:title => "some assignment", :submission_types => ['online_text_entry'])
-        @assignment.submit_homework @user1, :submission_type => "online_text_entry", :body => "o hai"
-        @assignment.submit_homework @user2, :submission_type => "online_text_entry", :body => "haldo"
+        @assignment = @course.assignments.create(title: "some assignment", submission_types: ["online_text_entry"])
+        @assignment.submit_homework @user1, submission_type: "online_text_entry", body: "o hai"
+        @assignment.submit_homework @user2, submission_type: "online_text_entry", body: "haldo"
         @assignment.reload
 
         expect(NeedsGradingCountQuery.new(@assignment, @teacher).count).to eql(2)
@@ -92,14 +92,14 @@ module Assignments
       end
 
       it "does not count submissions multiple times" do
-        @section1 = @course.course_sections.create!(:name => 'section 1')
-        @section2 = @course.course_sections.create!(:name => 'section 2')
-        @user = user_with_pseudonym(:active_all => true, :name => 'Student1', :username => 'student1@instructure.com')
-        @section1.enroll_user(@user, 'StudentEnrollment', 'active')
-        @section2.enroll_user(@user, 'StudentEnrollment', 'active')
+        @section1 = @course.course_sections.create!(name: "section 1")
+        @section2 = @course.course_sections.create!(name: "section 2")
+        @user = user_with_pseudonym(active_all: true, name: "Student1", username: "student1@instructure.com")
+        @section1.enroll_user(@user, "StudentEnrollment", "active")
+        @section2.enroll_user(@user, "StudentEnrollment", "active")
 
-        @assignment = @course.assignments.create(:title => "some assignment", :submission_types => ['online_text_entry'])
-        @assignment.submit_homework @user, :submission_type => "online_text_entry", :body => "o hai"
+        @assignment = @course.assignments.create(title: "some assignment", submission_types: ["online_text_entry"])
+        @assignment.submit_homework @user, submission_type: "online_text_entry", body: "o hai"
         @assignment.reload
 
         querier = NeedsGradingCountQuery.new(@assignment, @teacher)
@@ -113,7 +113,7 @@ module Assignments
       it "caches the count query" do
         @assignment = @course.assignments.create!(
           title: "some assignment",
-          submission_types: ['online_text_entry'],
+          submission_types: ["online_text_entry"],
           moderated_grading: true,
           grader_count: 2
         )
@@ -128,7 +128,7 @@ module Assignments
       it "invalidates cache for count query when specifically cleared" do
         @assignment = @course.assignments.create!(
           title: "some assignment",
-          submission_types: ['online_text_entry'],
+          submission_types: ["online_text_entry"],
           moderated_grading: true,
           grader_count: 2
         )
@@ -147,20 +147,20 @@ module Assignments
         before do
           @assignment = @course.assignments.create(
             title: "some assignment",
-            submission_types: ['online_text_entry'],
+            submission_types: ["online_text_entry"],
             moderated_grading: true,
             grader_count: 2,
             points_possible: 3
           )
           @students = []
           3.times do
-            student = student_in_course(:course => @course, :active_all => true).user
-            @assignment.submit_homework(student, :submission_type => "online_text_entry", :body => "o hai")
+            student = student_in_course(course: @course, active_all: true).user
+            @assignment.submit_homework(student, submission_type: "online_text_entry", body: "o hai")
             @students << student
           end
 
-          @ta1 = ta_in_course(:course => @course, :active_all => true).user
-          @ta2 = ta_in_course(:course => @course, :active_all => true).user
+          @ta1 = ta_in_course(course: @course, active_all: true).user
+          @ta2 = ta_in_course(course: @course, active_all: true).user
         end
 
         it "only includes students with no marks when unmoderated" do
@@ -195,15 +195,15 @@ module Assignments
 
     describe "#manual_count" do
       before :once do
-        @assignment = @course.assignments.create(title: "some assignment", submission_types: ['online_text_entry'])
-        @section2 = @course.course_sections.create!(name: 'section 2')
+        @assignment = @course.assignments.create(title: "some assignment", submission_types: ["online_text_entry"])
+        @section2 = @course.course_sections.create!(name: "section 2")
       end
 
       it "counts submissions in all section(s)" do
-        @user1 = user_with_pseudonym(active_all: true, name: 'Student1', username: 'student1@instructure.com')
-        @user2 = user_with_pseudonym(active_all: true, name: 'Student2', username: 'student2@instructure.com')
-        @section2.enroll_user(@user2, 'StudentEnrollment', 'active')
-        @course.enroll_student(@user1).update_attribute(:workflow_state, 'active')
+        @user1 = user_with_pseudonym(active_all: true, name: "Student1", username: "student1@instructure.com")
+        @user2 = user_with_pseudonym(active_all: true, name: "Student2", username: "student2@instructure.com")
+        @section2.enroll_user(@user2, "StudentEnrollment", "active")
+        @course.enroll_student(@user1).update_attribute(:workflow_state, "active")
 
         # make a submission in each section
         @assignment.submit_homework @user1, submission_type: "online_text_entry", body: "o hai"
@@ -221,10 +221,10 @@ module Assignments
       end
 
       it "does not count submissions multiple times" do
-        @user = user_with_pseudonym(active_all: true, name: 'Student1', username: 'student1@instructure.com')
-        @section1 = @course.course_sections.create!(name: 'section 1')
-        @section1.enroll_user(@user, 'StudentEnrollment', 'active')
-        @section2.enroll_user(@user, 'StudentEnrollment', 'active')
+        @user = user_with_pseudonym(active_all: true, name: "Student1", username: "student1@instructure.com")
+        @section1 = @course.course_sections.create!(name: "section 1")
+        @section1.enroll_user(@user, "StudentEnrollment", "active")
+        @section2.enroll_user(@user, "StudentEnrollment", "active")
 
         @assignment.submit_homework @user, submission_type: "online_text_entry", body: "o hai"
         @assignment.reload
@@ -234,7 +234,7 @@ module Assignments
 
       context "with submission" do
         before :once do
-          @assignment.submit_homework(@user, submission_type: 'online_text_entry', body: 'blah')
+          @assignment.submit_homework(@user, submission_type: "online_text_entry", body: "blah")
         end
 
         it "counts ungraded submissions" do
@@ -247,11 +247,11 @@ module Assignments
         it "does not count non-student submissions" do
           assignment_model(course: @course)
           s = @assignment.find_or_create_submission(@teacher)
-          s.submission_type = 'online_quiz'
-          s.workflow_state = 'submitted'
+          s.submission_type = "online_quiz"
+          s.workflow_state = "submitted"
           s.save!
           expect(NeedsGradingCountQuery.new(@assignment).manual_count).to be(0)
-          s.workflow_state = 'graded'
+          s.workflow_state = "graded"
           s.save!
           @assignment.reload
           expect(NeedsGradingCountQuery.new(@assignment).manual_count).to be(0)
@@ -269,18 +269,18 @@ module Assignments
           expect(NeedsGradingCountQuery.new(@assignment).manual_count).to be(1)
 
           # multiple enrollments should not cause double-counting (either by creating as or updating into "active")
-          section2 = @course.course_sections.create!(name: 's2')
+          section2 = @course.course_sections.create!(name: "s2")
           e2 = @course.enroll_student(@user,
-                                      enrollment_state: 'invited',
+                                      enrollment_state: "invited",
                                       section: section2,
                                       allow_multiple_enrollments: true)
           e2.accept
-          section3 = @course.course_sections.create!(name: 's2')
+          section3 = @course.course_sections.create!(name: "s2")
           e3 = @course.enroll_student(@user,
-                                      enrollment_state: 'active',
+                                      enrollment_state: "active",
                                       section: section3,
                                       allow_multiple_enrollments: true)
-          expect(@user.enrollments.where(workflow_state: 'active').count).to be(3)
+          expect(@user.enrollments.where(workflow_state: "active").count).to be(3)
           @assignment.reload
           expect(NeedsGradingCountQuery.new(@assignment).manual_count).to be(1)
 
@@ -294,14 +294,14 @@ module Assignments
           e.destroy
           @assignment.reload
           expect(NeedsGradingCountQuery.new(@assignment).manual_count).to be(0)
-          expect(@user.enrollments.where(workflow_state: 'active').count).to be(0)
+          expect(@user.enrollments.where(workflow_state: "active").count).to be(0)
 
           # enroll the user as a teacher, it should have no effect
           e4 = @course.enroll_teacher(@user)
           e4.accept
           @assignment.reload
           expect(NeedsGradingCountQuery.new(@assignment).manual_count).to be(0)
-          expect(@user.enrollments.where(workflow_state: 'active').count).to be(1)
+          expect(@user.enrollments.where(workflow_state: "active").count).to be(1)
         end
       end
     end

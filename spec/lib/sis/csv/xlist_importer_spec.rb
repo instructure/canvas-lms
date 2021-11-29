@@ -21,7 +21,7 @@
 describe SIS::CSV::XlistImporter do
   before { account_model }
 
-  context 'account associations' do
+  context "account associations" do
     before do
       process_csv_data_cleanly(
         "account_id,parent_account_id,name,status",
@@ -40,7 +40,7 @@ describe SIS::CSV::XlistImporter do
       )
     end
 
-    it 'has proper account associations when new' do
+    it "has proper account associations when new" do
       process_csv_data_cleanly(
         "section_id,course_id,name,start_date,end_date,status",
         "S001,C002,Sec1,2011-1-05 00:00:00,2011-4-14 00:00:00,active"
@@ -49,15 +49,15 @@ describe SIS::CSV::XlistImporter do
         "xlist_course_id,section_id,status",
         "X001,S001,active"
       )
-      expect(Course.where(sis_source_id: "X001").first.associated_accounts.map(&:id).sort).to eq [Account.where(sis_source_id: 'A001').first.id, @account.id].sort
+      expect(Course.where(sis_source_id: "X001").first.associated_accounts.map(&:id).sort).to eq [Account.where(sis_source_id: "A001").first.id, @account.id].sort
       process_csv_data_cleanly(
         "xlist_course_id,section_id,status",
         "X001,S001,deleted"
       )
-      expect(Course.where(sis_source_id: "X001").first.associated_accounts.map(&:id).sort).to eq [Account.where(sis_source_id: 'A001').first.id, @account.id].sort
+      expect(Course.where(sis_source_id: "X001").first.associated_accounts.map(&:id).sort).to eq [Account.where(sis_source_id: "A001").first.id, @account.id].sort
     end
 
-    it 'has proper account associations when being undeleted' do
+    it "has proper account associations when being undeleted" do
       process_csv_data_cleanly(
         "section_id,course_id,name,start_date,end_date,status",
         "S001,C002,Sec1,2011-1-05 00:00:00,2011-4-14 00:00:00,active",
@@ -78,31 +78,31 @@ describe SIS::CSV::XlistImporter do
         "X001,S002,active"
       )
       expect(Course.where(sis_source_id: "X001").first.deleted?).to be_falsey
-      expect(Course.where(sis_source_id: "X001").first.associated_accounts.map(&:id).sort).to eq [Account.where(sis_source_id: 'A001').first.id, @account.id].sort
+      expect(Course.where(sis_source_id: "X001").first.associated_accounts.map(&:id).sort).to eq [Account.where(sis_source_id: "A001").first.id, @account.id].sort
     end
 
-    it 'has proper account associations when a section is added and then removed' do
+    it "has proper account associations when a section is added and then removed" do
       process_csv_data_cleanly(
         "section_id,course_id,name,start_date,end_date,status",
         "S001,C005,Sec1,2011-1-05 00:00:00,2011-4-14 00:00:00,active"
       )
-      expect(Course.where(sis_source_id: "C005").first.associated_accounts.map(&:id).sort).to eq [Account.where(sis_source_id: 'A004').first.id, @account.id].sort
-      expect(Course.where(sis_source_id: "C002").first.associated_accounts.map(&:id).sort).to eq [Account.where(sis_source_id: 'A001').first.id, @account.id].sort
+      expect(Course.where(sis_source_id: "C005").first.associated_accounts.map(&:id).sort).to eq [Account.where(sis_source_id: "A004").first.id, @account.id].sort
+      expect(Course.where(sis_source_id: "C002").first.associated_accounts.map(&:id).sort).to eq [Account.where(sis_source_id: "A001").first.id, @account.id].sort
       process_csv_data_cleanly(
         "xlist_course_id,section_id,status",
         "C002,S001,active"
       )
-      expect(Course.where(sis_source_id: "C005").first.associated_accounts.map(&:id)).to eq [Account.where(sis_source_id: 'A004').first.id, @account.id]
-      expect(Course.where(sis_source_id: "C002").first.associated_accounts.map(&:id).sort).to eq [Account.where(sis_source_id: 'A001').first.id, Account.where(sis_source_id: 'A004').first.id, @account.id].sort
+      expect(Course.where(sis_source_id: "C005").first.associated_accounts.map(&:id)).to eq [Account.where(sis_source_id: "A004").first.id, @account.id]
+      expect(Course.where(sis_source_id: "C002").first.associated_accounts.map(&:id).sort).to eq [Account.where(sis_source_id: "A001").first.id, Account.where(sis_source_id: "A004").first.id, @account.id].sort
       process_csv_data_cleanly(
         "xlist_course_id,section_id,status",
         "C002,S001,deleted"
       )
-      expect(Course.where(sis_source_id: "C005").first.associated_accounts.map(&:id).sort).to eq [Account.where(sis_source_id: 'A004').first.id, @account.id].sort
-      expect(Course.where(sis_source_id: "C002").first.associated_accounts.map(&:id).sort).to eq [Account.where(sis_source_id: 'A001').first.id, @account.id].sort
+      expect(Course.where(sis_source_id: "C005").first.associated_accounts.map(&:id).sort).to eq [Account.where(sis_source_id: "A004").first.id, @account.id].sort
+      expect(Course.where(sis_source_id: "C002").first.associated_accounts.map(&:id).sort).to eq [Account.where(sis_source_id: "A001").first.id, @account.id].sort
     end
 
-    it 'gets account associations updated when the template course is updated' do
+    it "gets account associations updated when the template course is updated" do
       process_csv_data_cleanly(
         "section_id,course_id,name,start_date,end_date,status",
         "S001,C001,Sec1,2011-1-05 00:00:00,2011-4-14 00:00:00,active"
@@ -117,17 +117,17 @@ describe SIS::CSV::XlistImporter do
         "course_id,short_name,long_name,account_id,term_id,status",
         "C001,TC 101,Test Course 101,A004,,active"
       )
-      expect(Course.where(sis_source_id: "C001").first.associated_accounts.map(&:id).sort).to eq [Account.where(sis_source_id: 'A004').first.id, @account.id].sort
-      expect(Course.where(sis_source_id: "X001").first.associated_accounts.map(&:id).sort).to eq [Account.where(sis_source_id: 'A004').first.id, @account.id].sort
+      expect(Course.where(sis_source_id: "C001").first.associated_accounts.map(&:id).sort).to eq [Account.where(sis_source_id: "A004").first.id, @account.id].sort
+      expect(Course.where(sis_source_id: "X001").first.associated_accounts.map(&:id).sort).to eq [Account.where(sis_source_id: "A004").first.id, @account.id].sort
       process_csv_data_cleanly(
         "course_id,short_name,long_name,account_id,term_id,status",
         "C001,TC 101,Test Course 101,A001,,active"
       )
-      expect(Course.where(sis_source_id: "C001").first.associated_accounts.map(&:id).sort).to eq [Account.where(sis_source_id: 'A001').first.id, @account.id].sort
-      expect(Course.where(sis_source_id: "X001").first.associated_accounts.map(&:id).sort).to eq [Account.where(sis_source_id: 'A001').first.id, @account.id].sort
+      expect(Course.where(sis_source_id: "C001").first.associated_accounts.map(&:id).sort).to eq [Account.where(sis_source_id: "A001").first.id, @account.id].sort
+      expect(Course.where(sis_source_id: "X001").first.associated_accounts.map(&:id).sort).to eq [Account.where(sis_source_id: "A001").first.id, @account.id].sort
     end
 
-    it 'imports active enrollments with states based on enrollment date restrictions' do
+    it "imports active enrollments with states based on enrollment date restrictions" do
       process_csv_data_cleanly(
         "term_id,name,status,start_date,end_date",
         "T001,Winter13,active,#{2.days.from_now.strftime("%Y-%m-%d 00:00:00")},#{4.days.from_now.strftime("%Y-%m-%d 00:00:00")}"

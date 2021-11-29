@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../common'
+require_relative "../common"
 
 module CopyToTrayPage
   # ------------------------------ Selectors -----------------------------
@@ -83,7 +83,7 @@ module CopyToTrayPage
   end
 
   def placement_dropdown_options
-    placement_dropdown.find_all('option')
+    placement_dropdown.find_all("option")
   end
 
   def import_button
@@ -100,7 +100,7 @@ module CopyToTrayPage
   # ------------------------------ Actions --------------------------------
   # the course dropdown triggers a fetch that needs to then fetch the modules
 
-  def wait_for_module_search_dropdown
+  def wait_for_search_dropdown
     wait_for(method: nil, timeout: 1) { dropdowns_in_tray.count == 2 }
   end
 end

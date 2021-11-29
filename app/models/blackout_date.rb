@@ -20,7 +20,7 @@
 
 class BlackoutDate < ActiveRecord::Base
   belongs_to :context, polymorphic: [:account, :course]
-  belongs_to :root_account, class_name: 'Account'
+  belongs_to :root_account, class_name: "Account"
 
   validates :context, presence: true
   validates :start_date, presence: true

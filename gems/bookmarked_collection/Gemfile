@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-source 'https://rubygems.org'
+source "https://rubygems.org"
 
 gemspec
 
-gem 'paginated_collection', path: '../paginated_collection'
-gem 'json_token', path: '../json_token'
+gem "json_token", path: "../json_token"
+gem "paginated_collection", path: "../paginated_collection"

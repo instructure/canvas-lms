@@ -23,7 +23,7 @@ module Canvas
       return hash unless stringify_ids?
 
       StringifyIds.stringify_ids(hash)
-      if (links = hash['links']).present?
+      if (links = hash["links"]).present?
         links.each do |key, value|
           next if value.nil?
 

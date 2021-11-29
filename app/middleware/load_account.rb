@@ -45,13 +45,15 @@ class LoadAccount
     domain_root_account = ::LoadAccount.default_domain_root_account
     configure_for_root_account(domain_root_account)
 
-    env['canvas.domain_root_account'] = domain_root_account
+    env["canvas.domain_root_account"] = domain_root_account
     @app.call(env)
   ensure
     clear_caches
   end
 
-  def self.default_domain_root_account; Account.default; end
+  def self.default_domain_root_account
+    Account.default
+  end
 
   def clear_caches
     Canvas::Reloader.reload! if Canvas::Reloader.pending_reload
@@ -61,7 +63,7 @@ class LoadAccount
   end
 
   def self.clear_shard_cache
-    @timed_cache ||= TimedCache.new(-> { Setting.get('shard_cache_time', 60).to_i.seconds.ago }) do
+    @timed_cache ||= TimedCache.new(-> { Setting.get("shard_cache_time", 60).to_i.seconds.ago }) do
       Shard.clear_cache
     end
     @timed_cache.clear

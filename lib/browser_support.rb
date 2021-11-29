@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'browser/browser'
+require "browser/browser"
 
 BrowserSupport = Struct.new(:browser, :version) do
   class << self
@@ -29,11 +29,11 @@ BrowserSupport = Struct.new(:browser, :version) do
     end
 
     def configuration
-      @configuration ||= YAML.load_file(File.expand_path('../../config/browsers.yml', __FILE__))
+      @configuration ||= YAML.load_file(File.expand_path("../config/browsers.yml", __dir__))
     end
 
     def minimum_browsers
-      @minimum_browsers ||= (configuration['minimums'] || [])
+      @minimum_browsers ||= (configuration["minimums"] || [])
                             .map { |browser, version| new(browser, version.to_s) }
     end
   end

@@ -28,12 +28,12 @@ module Factories
   end
 
   def tie_user_to_account(user, opts = {})
-    user.account_users.create(:account => opts[:account] || Account.default, :role => opts[:role] || admin_role)
+    user.account_users.create(account: opts[:account] || Account.default, role: opts[:role] || admin_role)
   end
 
   def valid_user_attributes
     {
-      :name => 'value for name',
+      name: "value for name",
     }
   end
 
@@ -49,7 +49,7 @@ module Factories
     @user = opts[:user] || account.shard.activate { user_factory(opts) }
     @admin = @user
 
-    account.account_users.create!(:user => @user, :role => opts[:role])
+    account.account_users.create!(user: @user, role: opts[:role])
     @user
   end
 
@@ -112,21 +112,21 @@ module Factories
 
   def student_in_section(section, opts = {})
     student = opts.fetch(:user) { user_factory }
-    enrollment = section.course.enroll_user(student, 'StudentEnrollment', :section => section,
-                                                                          :force_update => true,
-                                                                          :allow_multiple_enrollments => opts[:allow_multiple_enrollments])
+    enrollment = section.course.enroll_user(student, "StudentEnrollment", section: section,
+                                                                          force_update: true,
+                                                                          allow_multiple_enrollments: opts[:allow_multiple_enrollments])
     student.save!
-    enrollment.workflow_state = 'active'
+    enrollment.workflow_state = "active"
     enrollment.save!
     student
   end
 
   def ta_in_section(section, opts = {})
     ta = opts.fetch(:user) { user_factory }
-    enrollment = section.course.enroll_user(ta, 'TaEnrollment', :section => section, :force_update => true)
+    enrollment = section.course.enroll_user(ta, "TaEnrollment", section: section, force_update: true)
     ta.save!
     enrollment.limit_privileges_to_course_section = true unless opts[:full_course_permissions]
-    enrollment.workflow_state = 'active'
+    enrollment.workflow_state = "active"
     enrollment.save!
     ta
   end
@@ -134,11 +134,11 @@ module Factories
   def teacher_in_section(section, opts = {})
     teacher = opts.fetch(:user) { user_factory }
     limit_privileges_to_course_section = opts[:limit_privileges_to_course_section] || false
-    enrollment = section.course.enroll_user(teacher, 'TeacherEnrollment', :section => section,
-                                                                          :force_update => true, :limit_privileges_to_course_section => limit_privileges_to_course_section,
-                                                                          :allow_multiple_enrollments => opts[:allow_multiple_enrollments])
+    enrollment = section.course.enroll_user(teacher, "TeacherEnrollment", section: section,
+                                                                          force_update: true, limit_privileges_to_course_section: limit_privileges_to_course_section,
+                                                                          allow_multiple_enrollments: opts[:allow_multiple_enrollments])
     teacher.save!
-    enrollment.workflow_state = 'active'
+    enrollment.workflow_state = "active"
     enrollment.save!
     teacher
   end
@@ -156,7 +156,7 @@ module Factories
   def create_users(records, options = {})
     @__create_user_count ||= 0
     name_prefix = options[:name_prefix] || "user"
-    records = records.times.map { |i| { name: "#{name_prefix} #{@__create_user_count + i + 1}" } } if records.is_a?(Integer)
+    records = Array.new(records) { |i| { name: "#{name_prefix} #{@__create_user_count + i + 1}" } } if records.is_a?(Integer)
     now = Time.now.utc
     records = records.map { |record| valid_user_attributes.merge(workflow_state: "registered", created_at: now, updated_at: now).merge(record) }
     @__create_user_count += records.size

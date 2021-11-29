@@ -17,8 +17,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../helpers/assignments_common'
-require_relative '../helpers/differentiated_assignments'
+require_relative "../helpers/assignments_common"
+require_relative "../helpers/differentiated_assignments"
 
 describe "interaction with differentiated assignments/quizzes/discusssions in modules" do
   include_context "in-process server selenium tests"
@@ -66,9 +66,9 @@ describe "interaction with differentiated assignments/quizzes/discusssions in mo
       create_section_override_for_assignment(@da_discussion.assignment)
       create_section_override_for_assignment(@da_quiz)
       create_section_override_for_assignment(@da_assignment, course_section: @section1)
-      @module.completion_requirements = { @tag_assignment.id => { :type => 'must_view' },
-                                          @tag_discussion.id => { :type => 'must_view' },
-                                          @tag_quiz.id => { :type => 'must_view' } }
+      @module.completion_requirements = { @tag_assignment.id => { type: "must_view" },
+                                          @tag_discussion.id => { type: "must_view" },
+                                          @tag_quiz.id => { type: "must_view" } }
       @module.save
       expect(@module.evaluate_for(@student).workflow_state).to include("unlocked")
       get "/courses/#{@course.id}/modules/items/#{@tag_discussion.id}"
@@ -86,19 +86,19 @@ describe "interaction with differentiated assignments/quizzes/discusssions in mo
         da_module_setup
       end
 
-      it "does not show inaccessible module items", priority: "1", test_id: 135291 do
+      it "does not show inaccessible module items", priority: "1" do
         create_section_overrides(@section1)
         get "/courses/#{@course.id}/modules"
         expect_module_to_not_have_items(@module)
       end
 
-      it "displays module items with overrides", priority: "1", test_id: 135292 do
+      it "displays module items with overrides", priority: "1" do
         create_section_overrides(@default_section)
         get "/courses/#{@course.id}/modules"
         expect_module_to_have_items(@module)
       end
 
-      it "shows module items with graded submissions", priority: "1", test_id: 135293 do
+      it "shows module items with graded submissions", priority: "1" do
         grade_da_assignments
         get "/courses/#{@course.id}/modules"
         expect_module_to_have_items(@module)

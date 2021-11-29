@@ -17,10 +17,10 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../common'
-require_relative '../helpers/public_courses_context'
-require_relative '../helpers/files_common'
-require_relative 'pages/syllabus_page'
+require_relative "../common"
+require_relative "../helpers/public_courses_context"
+require_relative "../helpers/files_common"
+require_relative "pages/syllabus_page"
 
 describe "course syllabus" do
   include_context "in-process server selenium tests"
@@ -29,12 +29,12 @@ describe "course syllabus" do
   context "with syllabus course summary option for a course" do
     before :once do
       # course_with_teacher :active_all => true
-      @course1 = Course.create!(:name => "First Course1")
-      @teacher1 = User.create!(:name => "First Teacher")
+      @course1 = Course.create!(name: "First Course1")
+      @teacher1 = User.create!(name: "First Teacher")
       @teacher1.accept_terms
       @teacher1.register!
-      @course1.enroll_teacher(@teacher1, :enrollment_state => 'active')
-      @assignment1 = @course1.assignments.create!(:title => 'Assignment First', :points_possible => 10)
+      @course1.enroll_teacher(@teacher1, enrollment_state: "active")
+      @assignment1 = @course1.assignments.create!(title: "Assignment First", points_possible: 10)
     end
 
     before do
@@ -104,15 +104,15 @@ describe "course syllabus" do
     end
   end
 
-  context 'mini calendar' do
+  context "mini calendar" do
     before do
       course_with_teacher_logged_in(active_all: true)
     end
 
-    it 'starts the week on sunday' do
-      skip('USE_OPTIMIZED_JS=true') unless ENV['USE_OPTIMIZED_JS']
-      skip('RAILS_LOAD_ALL_LOCALES=true') unless ENV['RAILS_LOAD_ALL_LOCALES']
-      @user.locale = 'en-US'
+    it "starts the week on sunday" do
+      skip("USE_OPTIMIZED_JS=true") unless ENV["USE_OPTIMIZED_JS"]
+      skip("RAILS_LOAD_ALL_LOCALES=true") unless ENV["RAILS_LOAD_ALL_LOCALES"]
+      @user.locale = "en-US"
       @user.save!
 
       # travel to April 5, 2021 4:30
@@ -121,23 +121,23 @@ describe "course syllabus" do
         visit_syllabus_page(@course.id)
 
         # first day on the calendar should be Sunday March 28
-        expect(mini_calendar_first_day_of_month_number.text).to eq '28'
-        expect(mini_calendar_first_day_of_month_label.text).to eq '28 March 2021'
+        expect(mini_calendar_first_day_of_month_number.text).to eq "28"
+        expect(mini_calendar_first_day_of_month_label.text).to eq "28 March 2021"
 
         # click to next month (May)
         mini_calendar_next_month_button.click
         wait_for_animations
 
         # first day on the calendar should be Sunday April 25
-        expect(mini_calendar_first_day_of_month_number.text).to eq '25'
-        expect(mini_calendar_first_day_of_month_label.text).to eq '25 April 2021'
+        expect(mini_calendar_first_day_of_month_number.text).to eq "25"
+        expect(mini_calendar_first_day_of_month_label.text).to eq "25 April 2021"
       end
     end
 
-    it 'starts the week on monday' do
-      skip('USE_OPTIMIZED_JS=true') unless ENV['USE_OPTIMIZED_JS']
-      skip('RAILS_LOAD_ALL_LOCALES=true') unless ENV['RAILS_LOAD_ALL_LOCALES']
-      @user.locale = 'en-GB'
+    it "starts the week on monday" do
+      skip("USE_OPTIMIZED_JS=true") unless ENV["USE_OPTIMIZED_JS"]
+      skip("RAILS_LOAD_ALL_LOCALES=true") unless ENV["RAILS_LOAD_ALL_LOCALES"]
+      @user.locale = "en-GB"
       @user.save!
 
       # travel to April 5, 2021 4:30
@@ -146,16 +146,16 @@ describe "course syllabus" do
         visit_syllabus_page(@course.id)
 
         # first day on the calendar should be Monday March 29
-        expect(mini_calendar_first_day_of_month_number.text).to eq '29'
-        expect(mini_calendar_first_day_of_month_label.text).to eq '29 March 2021'
+        expect(mini_calendar_first_day_of_month_number.text).to eq "29"
+        expect(mini_calendar_first_day_of_month_label.text).to eq "29 March 2021"
 
         # click to next month (May)
         mini_calendar_next_month_button.click
         wait_for_animations
 
         # first day on the calendar should be Monday April 26
-        expect(mini_calendar_first_day_of_month_number.text).to eq '26'
-        expect(mini_calendar_first_day_of_month_label.text).to eq '26 April 2021'
+        expect(mini_calendar_first_day_of_month_number.text).to eq "26"
+        expect(mini_calendar_first_day_of_month_label.text).to eq "26 April 2021"
       end
     end
   end

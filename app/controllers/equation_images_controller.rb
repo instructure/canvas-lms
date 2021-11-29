@@ -32,7 +32,7 @@ class EquationImagesController < ApplicationController
     # This is nearly how we want it to pass it on to the next service, except
     # `+` signs are in tact. Since normally the `+` signifies a space and we
     # want the `+` signs for real, we need to encode them.
-    @latex = @latex.gsub('+', '%2B')
+    @latex = @latex.gsub("+", "%2B")
     redirect_to url
   end
 
@@ -43,8 +43,8 @@ class EquationImagesController < ApplicationController
       MathMan.url_for(latex: @latex, target: :svg, scale: @scale)
     else
       scale_param = "&scale=#{@scale}" if @scale.present?
-      scale_param ||= ''
-      Setting.get('equation_image_url', 'http://latex.codecogs.com/gif.latex?') + @latex +
+      scale_param ||= ""
+      Setting.get("equation_image_url", "http://latex.codecogs.com/gif.latex?") + @latex +
         scale_param
     end
   end

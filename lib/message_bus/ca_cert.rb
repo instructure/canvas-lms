@@ -44,7 +44,7 @@ module MessageBus
 
       cert_vault_path = config_hash.fetch("PULSAR_CERT_VAULT_PATH")
       process_file_version = cert_path_on_disk.gsub(".pem", "-#{Process.pid}-#{Thread.current.object_id}.pem")
-      self.write_cert(cert_vault_path, process_file_version)
+      write_cert(cert_vault_path, process_file_version)
       # it's possible another process has already
       # moved this file into place, in which case do nothing.
       return true if File.exist?(cert_path_on_disk)

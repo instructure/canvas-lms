@@ -23,7 +23,7 @@ require_dependency "enrollment/recent_activity"
 class Enrollment
   describe RecentActivity do
     describe "initialization" do
-      let(:context) { double('enrollment context') }
+      let(:context) { double("enrollment context") }
       let(:enrollment) { double(context: context) }
 
       it "defaults to the enrollments context" do
@@ -37,7 +37,7 @@ class Enrollment
     end
 
     describe "recording updates" do
-      before(:once) { course_with_student(:active_all => 1) }
+      before(:once) { course_with_student(active_all: 1) }
 
       let(:recent_activity) { Enrollment::RecentActivity.new(@enrollment) }
       let(:now) { Time.zone.now }
@@ -50,7 +50,7 @@ class Enrollment
 
         it "does not record anything within the time threshold" do
           recent_activity.record!(now)
-          recent_activity.record!(now + 1.minutes)
+          recent_activity.record!(now + 1.minute)
           expect(@enrollment.last_activity_at.to_s).to eq now.to_s
         end
 
@@ -63,7 +63,7 @@ class Enrollment
         it "updates total_activity_time within the time threshold" do
           expect(@enrollment.total_activity_time).to eq 0
           recent_activity.record!(now)
-          recent_activity.record!(now + 1.minutes)
+          recent_activity.record!(now + 1.minute)
           expect(@enrollment.total_activity_time).to eq 0
           recent_activity.record!(now + 3.minutes)
           expect(@enrollment.total_activity_time).to eq 3.minutes.to_i
@@ -73,8 +73,8 @@ class Enrollment
 
         it "updates total_activity_time based on the maximum" do
           section2 = @course.course_sections.create!
-          enrollment2 = @course.enroll_student(@student, :allow_multiple_enrollments => true, :section => section2)
-          Enrollment.where(:id => enrollment2).update_all(:total_activity_time => 39.minutes.to_i)
+          enrollment2 = @course.enroll_student(@student, allow_multiple_enrollments: true, section: section2)
+          Enrollment.where(id: enrollment2).update_all(total_activity_time: 39.minutes.to_i)
 
           expect(@enrollment.total_activity_time).to eq 0
           recent_activity.record!(now)

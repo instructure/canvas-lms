@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-require 'ims/lti'
+require "ims/lti"
 
 module Lti
   class ToolProxyService
@@ -39,7 +39,7 @@ module Lti
       @tc_half_secret = tc_half_shared_secret
       tp = ::IMS::LTI::Models::ToolProxy.new.from_json(json)
       tp.tool_proxy_guid = guid
-      tcp_uuid = tp.tool_consumer_profile&.match(/tool_consumer_profile\/([a-fA-f0-9\-]+)/)&.captures&.first
+      tcp_uuid = tp.tool_consumer_profile&.match(%r{tool_consumer_profile/([a-fA-f0-9\-]+)})&.captures&.first
       tcp_uuid ||= developer_key&.tool_consumer_profile&.uuid
       tcp_uuid ||= Lti::ToolConsumerProfile::DEFAULT_TCP_UUID
       begin
@@ -74,7 +74,7 @@ module Lti
     def create_secret(tp)
       security_contract = tp.security_contract
       tp_half_secret = security_contract.tp_half_shared_secret
-      if (tp.enabled_capabilities & ['OAuth.splitSecret', 'Security.splitSecret']).present? && tp_half_secret.present?
+      if (tp.enabled_capabilities & ["OAuth.splitSecret", "Security.splitSecret"]).present? && tp_half_secret.present?
         @tc_half_secret ||= SecureRandom.hex(64)
         tc_half_secret + tp_half_secret
       else
@@ -103,7 +103,7 @@ module Lti
     def create_tool_proxy(tp:, context:, product_family:, tool_proxy: nil, registration_url:, developer_key: nil)
       # make sure the guid never changes
       raise Lti::Errors::InvalidToolProxyError if tool_proxy && tp.tool_proxy_guid != tool_proxy.guid
-      raise Errors::InvalidToolProxyError, 'Developer key mismatch' if developer_key_mismatch?(tp, developer_key)
+      raise Errors::InvalidToolProxyError, "Developer key mismatch" if developer_key_mismatch?(tp, developer_key)
 
       tool_proxy ||= ToolProxy.new
       tool_proxy.registration_url = registration_url
@@ -115,7 +115,7 @@ module Lti
       tool_proxy.name = tp.tool_profile.product_instance.product_info.default_name
       tool_proxy.description = tp.tool_profile.product_instance.product_info.default_description
       tool_proxy.context = context
-      tool_proxy.workflow_state ||= 'disabled'
+      tool_proxy.workflow_state ||= "disabled"
       tool_proxy.raw_data = tp.as_json
       tool_proxy.update_payload = nil
       tool_proxy.save!
@@ -172,7 +172,7 @@ module Lti
         product_name = tp.tool_profile.product_instance.product_info.product_name
         r = ::IMS::LTI::Models::ResourceHandler.new.from_json(
           {
-            resource_type: { code: 'instructure.com:default' },
+            resource_type: { code: "instructure.com:default" },
             resource_name: product_name
           }.to_json
         )

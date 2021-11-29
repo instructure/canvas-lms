@@ -17,39 +17,39 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../cc_spec_helper'
+require_relative "../cc_spec_helper"
 
-require 'nokogiri'
-require 'tmpdir'
+require "nokogiri"
+require "tmpdir"
 
 describe "Standard Common Cartridge importing" do
   before(:once) do
     archive_file_path = File.join(File.dirname(__FILE__) + "/../../../fixtures/migration/cc_full_test.zip")
     unzipped_file_path = create_temp_dir!
-    converter = CC::Importer::Standard::Converter.new(:export_archive_path => archive_file_path, :course_name => 'oi', :base_download_dir => unzipped_file_path)
+    converter = CC::Importer::Standard::Converter.new(export_archive_path: archive_file_path, course_name: "oi", base_download_dir: unzipped_file_path)
     converter.export
     @course_data = converter.course.with_indifferent_access
-    @course_data['all_files_export'] ||= {}
-    @course_data['all_files_export']['file_path'] = @course_data['all_files_zip']
+    @course_data["all_files_export"] ||= {}
+    @course_data["all_files_export"]["file_path"] = @course_data["all_files_zip"]
 
     @course = course_factory
-    @migration = ContentMigration.create(:context => @course)
-    @migration.migration_settings[:migration_ids_to_import] = { :copy => {} }
+    @migration = ContentMigration.create(context: @course)
+    @migration.migration_settings[:migration_ids_to_import] = { copy: {} }
     Importers::CourseContentImporter.import_content(@course, @course_data, nil, @migration)
   end
 
   it "imports webcontent" do
     expect(@course.attachments.count).to eq 10
-    atts = %w{I_00001_R I_00006_Media I_media_R f3 f4 f5 8612e3db71e452d5d2952ff64647c0d8 I_00003_R_IMAGERESOURCE 7acb90d1653008e73753aa2cafb16298 6a35b0974f59819404dc86d48fe39fc3}
+    atts = %w[I_00001_R I_00006_Media I_media_R f3 f4 f5 8612e3db71e452d5d2952ff64647c0d8 I_00003_R_IMAGERESOURCE 7acb90d1653008e73753aa2cafb16298 6a35b0974f59819404dc86d48fe39fc3]
     atts.each do |mig_id|
       expect(@course.attachments.where(migration_id: mig_id)).to be_exists
     end
   end
 
   it "imports files as assignments with intended_use set" do
-    assignment = @course.assignments.where(:migration_id => "f5").first
-    att = @course.attachments.where(:migration_id => "8612e3db71e452d5d2952ff64647c0d8").first
-    expect(assignment.description).to match_ignoring_whitespace(%{<img src="/courses/#{@course.id}/files/#{att.id}/preview">})
+    assignment = @course.assignments.where(migration_id: "f5").first
+    att = @course.attachments.where(migration_id: "8612e3db71e452d5d2952ff64647c0d8").first
+    expect(assignment.description).to match_ignoring_whitespace(%(<img src="/courses/#{@course.id}/files/#{att.id}/preview">))
     expect(assignment.title).to eq "Assignment 2"
   end
 
@@ -59,11 +59,11 @@ describe "Standard Common Cartridge importing" do
     file2_id = @course.attachments.where(migration_id: "I_00006_Media").first.id
 
     dt = @course.discussion_topics.where(migration_id: "I_00006_R").first
-    expect(dt.message).to match_ignoring_whitespace(%{Your face is ugly. <br><img src="/courses/#{@course.id}/files/#{file1_id}/preview">})
+    expect(dt.message).to match_ignoring_whitespace(%(Your face is ugly. <br><img src="/courses/#{@course.id}/files/#{file1_id}/preview">))
     dt.attachment_id = file2_id
 
     dt = @course.discussion_topics.where(migration_id: "I_00009_R").first
-    expect(dt.message).to match_ignoring_whitespace(%{Monkeys: Go!\n<ul>\n<li>\n<a href="/courses/#{@course.id}/files/#{file2_id}/preview">angry_person.jpg</a>\n</li>\n<li>\n<a href="/courses/#{@course.id}/files/#{file1_id}/preview">smiling_dog.jpg</a>\n</li>\n</ul>})
+    expect(dt.message).to match_ignoring_whitespace(%(Monkeys: Go!\n<ul>\n<li>\n<a href="/courses/#{@course.id}/files/#{file2_id}/preview">angry_person.jpg</a>\n</li>\n<li>\n<a href="/courses/#{@course.id}/files/#{file1_id}/preview">smiling_dog.jpg</a>\n</li>\n</ul>))
   end
 
   # This also tests the WebLinks, they are just content tags and don't have their own class
@@ -74,11 +74,11 @@ describe "Standard Common Cartridge importing" do
     mod1 = @course.context_modules.where(migration_id: "I_00000").first
     expect(mod1.name).to eq "Your Mom, Research, & You"
     tag = mod1.content_tags[0]
-    expect(tag.content_type).to eq 'Attachment'
+    expect(tag.content_type).to eq "Attachment"
     expect(tag.content_id).to eq @course.attachments.where(migration_id: "I_00001_R").first.id
     expect(tag.indent).to eq 0
     tag = mod1.content_tags[1]
-    expect(tag.content_type).to eq 'ContextModuleSubHeader'
+    expect(tag.content_type).to eq "ContextModuleSubHeader"
     expect(tag.title).to eq "Study Guide"
     expect(tag.migration_id).to eq "I_00002"
     expect(tag.indent).to eq 0
@@ -86,13 +86,13 @@ describe "Standard Common Cartridge importing" do
     if Qti.qti_enabled?
       tag = mod1.content_tags[index]
       expect(tag.title).to eq "Pretest"
-      expect(tag.content_type).to eq 'Quizzes::Quiz'
+      expect(tag.content_type).to eq "Quizzes::Quiz"
       expect(tag.content_id).to eq @course.quizzes.where(migration_id: "I_00003_R").first.id
       expect(tag.indent).to eq 1
       index += 1
     end
     tag = mod1.content_tags[index]
-    expect(tag.content_type).to eq 'ExternalUrl'
+    expect(tag.content_type).to eq "ExternalUrl"
     expect(tag.title).to eq "Wikipedia - Your Mom"
     expect(tag.url).to eq "http://en.wikipedia.org/wiki/Maternal_insult"
     expect(tag.indent).to eq 0
@@ -101,23 +101,23 @@ describe "Standard Common Cartridge importing" do
     expect(mod1.name).to eq "Attachment module"
     expect(mod1.content_tags.count).to eq 5
     tag = mod1.content_tags[0]
-    expect(tag.content_type).to eq 'Attachment'
+    expect(tag.content_type).to eq "Attachment"
     expect(tag.content_id).to eq @course.attachments.where(migration_id: "f3").first.id
     expect(tag.indent).to eq 0
     tag = mod1.content_tags[1]
-    expect(tag.content_type).to eq 'ContextModuleSubHeader'
+    expect(tag.content_type).to eq "ContextModuleSubHeader"
     expect(tag.title).to eq "Sub-Folder"
     expect(tag.indent).to eq 0
     tag = mod1.content_tags[2]
-    expect(tag.content_type).to eq 'Attachment'
+    expect(tag.content_type).to eq "Attachment"
     expect(tag.content_id).to eq @course.attachments.where(migration_id: "f4").first.id
     expect(tag.indent).to eq 1
     tag = mod1.content_tags[3]
-    expect(tag.content_type).to eq 'ContextModuleSubHeader'
+    expect(tag.content_type).to eq "ContextModuleSubHeader"
     expect(tag.title).to eq "Sub-Folder 2"
     expect(tag.indent).to eq 1
     tag = mod1.content_tags[4]
-    expect(tag.content_type).to eq 'Assignment'
+    expect(tag.content_type).to eq "Assignment"
     expect(tag.content_id).to eq @course.assignments.where(migration_id: "f5").first.id
     expect(tag.indent).to eq 2
 
@@ -125,22 +125,22 @@ describe "Standard Common Cartridge importing" do
     expect(mod1.name).to eq "Misc Module"
     expect(mod1.content_tags.count).to eq 4
     tag = mod1.content_tags[0]
-    expect(tag.content_type).to eq 'ExternalUrl'
+    expect(tag.content_type).to eq "ExternalUrl"
     expect(tag.title).to eq "Wikipedia - Sigmund Freud"
     expect(tag.url).to eq "http://en.wikipedia.org/wiki/Sigmund_Freud"
     expect(tag.indent).to eq 0
     tag = mod1.content_tags[1]
-    expect(tag.content_type).to eq 'DiscussionTopic'
+    expect(tag.content_type).to eq "DiscussionTopic"
     expect(tag.title).to eq "Talk about the issues"
     expect(tag.content_id).to eq @course.discussion_topics.where(migration_id: "I_00009_R").first.id
     expect(tag.indent).to eq 0
     tag = mod1.content_tags[2]
-    expect(tag.content_type).to eq 'ContextExternalTool'
+    expect(tag.content_type).to eq "ContextExternalTool"
     expect(tag.title).to eq "BLTI Test"
     expect(tag.url).to eq "http://www.imsglobal.org/developers/BLTI/tool.php"
     expect(tag.indent).to eq 0
     tag = mod1.content_tags[3]
-    expect(tag.content_type).to eq 'Assignment'
+    expect(tag.content_type).to eq "Assignment"
     expect(tag.title).to eq "BLTI Assignment Test"
     expect(tag.content_id).to eq @course.assignments.where(migration_id: "I_00011_R").first.id
     expect(tag.indent).to eq 0
@@ -150,14 +150,14 @@ describe "Standard Common Cartridge importing" do
     expect(@course.context_external_tools.count).to eq 2
     et = @course.context_external_tools.where(migration_id: "I_00010_R").first
     expect(et.name).to eq "BLTI Test"
-    expect(et.url).to eq 'http://www.imsglobal.org/developers/BLTI/tool.php'
+    expect(et.url).to eq "http://www.imsglobal.org/developers/BLTI/tool.php"
     expect(et.settings[:custom_fields]).to eq({ "key1" => "value1", "key2" => "value2" })
-    expect(et.settings[:vendor_extensions]).to eq [{ :platform => "my.lms.com", :custom_fields => { "key" => "value" } }, { :platform => "your.lms.com", :custom_fields => { "key" => "value", "key2" => "value2" } }].map(&:with_indifferent_access)
+    expect(et.settings[:vendor_extensions]).to eq [{ platform: "my.lms.com", custom_fields: { "key" => "value" } }, { platform: "your.lms.com", custom_fields: { "key" => "value", "key2" => "value2" } }].map(&:with_indifferent_access)
     expect(@migration.warnings.member?("The security parameters for the external tool \"#{et.name}\" need to be set in Course Settings.")).to be_truthy
 
     et = @course.context_external_tools.where(migration_id: "I_00011_R").first
     expect(et.name).to eq "BLTI Assignment Test"
-    expect(et.url).to eq 'http://www.imsglobal.org/developers/BLTI/tool2.php'
+    expect(et.url).to eq "http://www.imsglobal.org/developers/BLTI/tool2.php"
     expect(et.settings[:custom_fields]).to eq({})
     expect(et.settings[:vendor_extensions]).to eq [].map(&:with_indifferent_access)
     expect(@migration.warnings.member?("The security parameters for the external tool \"#{et.name}\" need to be set in Course Settings.")).to be_truthy
@@ -167,7 +167,7 @@ describe "Standard Common Cartridge importing" do
     expect(asmnt).not_to be_nil
     expect(asmnt.points_possible).to eq 15.5
     expect(asmnt.external_tool_tag.url).to eq et.url
-    expect(asmnt.external_tool_tag.content_type).to eq 'ContextExternalTool'
+    expect(asmnt.external_tool_tag.content_type).to eq "ContextExternalTool"
   end
 
   it "imports assessment data" do
@@ -175,7 +175,7 @@ describe "Standard Common Cartridge importing" do
       quiz = @course.quizzes.where(migration_id: "I_00003_R").first
       expect(quiz.active_quiz_questions.size).to eq 11
       expect(quiz.title).to eq "Pretest"
-      expect(quiz.quiz_type).to eq 'assignment'
+      expect(quiz.quiz_type).to eq "assignment"
       expect(quiz.allowed_attempts).to eq 2
       expect(quiz.time_limit).to eq 120
 
@@ -198,8 +198,8 @@ describe "Standard Common Cartridge importing" do
       bank.reload
       expect(bank.workflow_state).to eq "deleted"
 
-      @migration = ContentMigration.create(:context => @course)
-      @migration.migration_settings[:migration_ids_to_import] = { :copy => {} }
+      @migration = ContentMigration.create(context: @course)
+      @migration.migration_settings[:migration_ids_to_import] = { copy: {} }
       Importers::CourseContentImporter.import_content(@course, @course_data, nil, @migration)
 
       bank = @course.assessment_question_banks.active.where(migration_id: "I_00004_R_QDB_1").first
@@ -225,18 +225,18 @@ describe "Standard Common Cartridge importing" do
 
   context "re-importing the cartridge" do
     append_before do
-      @migration2 = ContentMigration.create(:context => @course)
-      @migration2.migration_settings[:migration_ids_to_import] = { :copy => {} }
+      @migration2 = ContentMigration.create(context: @course)
+      @migration2.migration_settings[:migration_ids_to_import] = { copy: {} }
       Importers::CourseContentImporter.import_content(@course, @course_data, nil, @migration2)
     end
 
     it "imports webcontent" do
       expect(@course.attachments.active.count).to eq 10
-      mig_ids = %w{I_00001_R I_00006_Media I_media_R f3 f4 I_00003_R_IMAGERESOURCE 7acb90d1653008e73753aa2cafb16298 6a35b0974f59819404dc86d48fe39fc3}
+      mig_ids = %w[I_00001_R I_00006_Media I_media_R f3 f4 I_00003_R_IMAGERESOURCE 7acb90d1653008e73753aa2cafb16298 6a35b0974f59819404dc86d48fe39fc3]
       mig_ids.each do |mig_id|
         atts = @course.attachments.where(migration_id: mig_id).to_a
         expect(atts.length).to eq 1
-        expect(atts.first.file_state).to eq 'available'
+        expect(atts.first.file_state).to eq "available"
       end
     end
 
@@ -247,7 +247,7 @@ describe "Standard Common Cartridge importing" do
       expect(mod1.content_tags.count).to eq(Qti.qti_enabled? ? 9 : 7)
       expect(mod1.name).to eq "Your Mom, Research, & You"
       tag = mod1.content_tags[0]
-      expect(tag.content_type).to eq 'Attachment'
+      expect(tag.content_type).to eq "Attachment"
       expect(tag.content_id).to eq @course.attachments.not_deleted.where(migration_id: "I_00001_R").first.id
     end
   end
@@ -255,36 +255,36 @@ describe "Standard Common Cartridge importing" do
   context "selective import" do
     it "selectively imports files" do
       @course = course_factory
-      @migration = ContentMigration.create(:context => @course)
+      @migration = ContentMigration.create(context: @course)
       @migration.migration_settings[:migration_ids_to_import] = {
-        :copy => { "discussion_topics" => { "I_00006_R" => true },
-                   "everything" => "0",
-                   "folders" =>
+        copy: { "discussion_topics" => { "I_00006_R" => true },
+                "everything" => "0",
+                "folders" =>
                           { "I_00006_Media" => true,
                             "6a35b0974f59819404dc86d48fe39fc3" => true,
                             "I_00001_R" => true },
-                   "all_quizzes" => "1",
-                   "all_context_external_tools" => "0",
-                   "all_groups" => "0",
-                   "all_context_modules" => "0",
-                   "all_rubrics" => "0",
-                   "assessment_questions" => "1",
-                   "all_wiki_pages" => "0",
-                   "all_attachments" => "0",
-                   "all_assignments" => "1",
-                   "topic_entries" => { "undefined" => true },
-                   "context_external_tools" => { "I_00011_R" => true },
-                   "shift_dates" => "0",
-                   "all_discussion_topics" => "0",
-                   "all_announcements" => "0",
-                   "attachments" =>
+                "all_quizzes" => "1",
+                "all_context_external_tools" => "0",
+                "all_groups" => "0",
+                "all_context_modules" => "0",
+                "all_rubrics" => "0",
+                "assessment_questions" => "1",
+                "all_wiki_pages" => "0",
+                "all_attachments" => "0",
+                "all_assignments" => "1",
+                "topic_entries" => { "undefined" => true },
+                "context_external_tools" => { "I_00011_R" => true },
+                "shift_dates" => "0",
+                "all_discussion_topics" => "0",
+                "all_announcements" => "0",
+                "attachments" =>
                           { "I_00006_Media" => true,
                             "7acb90d1653008e73753aa2cafb16298" => true,
                             "6a35b0974f59819404dc86d48fe39fc3" => true,
                             "I_00003_R_IMAGERESOURCE" => true,
                             "I_00001_R" => true },
-                   "context_modules" => { "I_00000" => true },
-                   "all_assignment_groups" => "0" }
+                "context_modules" => { "I_00000" => true },
+                "all_assignment_groups" => "0" }
       }.with_indifferent_access
 
       Importers::CourseContentImporter.import_content(@course, @course_data, nil, @migration)
@@ -293,17 +293,17 @@ describe "Standard Common Cartridge importing" do
       expect(@course.context_external_tools.count).to eq 1
       expect(@course.context_external_tools.first.migration_id).to eq "I_00011_R"
       expect(@course.context_modules.count).to eq 1
-      expect(@course.context_modules.first.migration_id).to eq 'I_00000'
+      expect(@course.context_modules.first.migration_id).to eq "I_00000"
       expect(@course.wiki_pages.count).to eq 0
       expect(@course.discussion_topics.count).to eq 1
-      expect(@course.discussion_topics.first.migration_id).to eq 'I_00006_R'
+      expect(@course.discussion_topics.first.migration_id).to eq "I_00006_R"
     end
 
     it "does not import all attachments if :files does not exist" do
       @course = course_factory
-      @migration = ContentMigration.create(:context => @course)
+      @migration = ContentMigration.create(context: @course)
       @migration.migration_settings[:migration_ids_to_import] = {
-        :copy => { "everything" => "0" }
+        copy: { "everything" => "0" }
       }.with_indifferent_access
 
       Importers::CourseContentImporter.import_content(@course, @course_data, nil, @migration)
@@ -320,12 +320,12 @@ describe "Standard Common Cartridge importing" do
             {
               "title" => "monkeys",
               "position" => 1,
-              "migration_id" => 'm_monkeys'
+              "migration_id" => "m_monkeys"
             },
             {
               "title" => "ponies",
               "position" => 2,
-              "migration_id" => 'm_ponies'
+              "migration_id" => "m_ponies"
             },
             {
               "title" => "last",
@@ -356,19 +356,19 @@ describe "Standard Common Cartridge importing" do
     it "fixes position conflicts for modules" do
       @course = course_factory
 
-      mod1 = @course.context_modules.create :name => "ponies"
+      mod1 = @course.context_modules.create name: "ponies"
       mod1.position = 1
-      mod1.migration_id = 'm_ponies'
+      mod1.migration_id = "m_ponies"
       mod1.save!
 
-      mod2 = @course.context_modules.create :name => "monsters"
-      mod2.migration_id = 'm_monsters'
+      mod2 = @course.context_modules.create name: "monsters"
+      mod2.migration_id = "m_monsters"
       mod2.position = 2
       mod2.save!
 
-      @migration = ContentMigration.create(:context => @course)
+      @migration = ContentMigration.create(context: @course)
       @migration.migration_settings[:migration_ids_to_import] = {
-        :copy => {
+        copy: {
           "everything" => "0",
           "all_context_modules" => "1"
         }
@@ -377,25 +377,25 @@ describe "Standard Common Cartridge importing" do
 
       mods = @course.context_modules.to_a
       expect(mods.map(&:position)).to eql [1, 2, 3, 4]
-      expect(mods.map(&:name)).to eql %w(ponies monsters monkeys last)
+      expect(mods.map(&:name)).to eql %w[ponies monsters monkeys last]
     end
 
     it "fixes position conflicts for assignment groups" do
       @course = course_factory
 
-      ag1 = @course.assignment_groups.create :name => "ponies"
+      ag1 = @course.assignment_groups.create name: "ponies"
       ag1.position = 1
-      ag1.migration_id = 'ag_ponies'
+      ag1.migration_id = "ag_ponies"
       ag1.save!
 
-      ag2 = @course.assignment_groups.create :name => "monsters"
+      ag2 = @course.assignment_groups.create name: "monsters"
       ag2.position = 2
-      ag2.migration_id = 'ag_monsters'
+      ag2.migration_id = "ag_monsters"
       ag2.save!
 
-      @migration = ContentMigration.create(:context => @course)
+      @migration = ContentMigration.create(context: @course)
       @migration.migration_settings[:migration_ids_to_import] = {
-        :copy => {
+        copy: {
           "everything" => "0",
           "all_assignment_groups" => "1"
         }
@@ -404,28 +404,28 @@ describe "Standard Common Cartridge importing" do
 
       ags = @course.assignment_groups.to_a
       expect(ags.map(&:position)).to eql [1, 2, 3, 4]
-      expect(ags.map(&:name)).to eql %w(monkeys ponies monsters last)
+      expect(ags.map(&:name)).to eql %w[monkeys ponies monsters last]
     end
   end
 
   context "sub-modules" do
     it "list submodules in the overview" do
-      overview = JSON.parse(File.read(@course_data['overview_file_path']))
-      root_mod = overview['modules'][1]
-      sub_mod = root_mod['submodules'].first
-      expect(sub_mod['title']).to eq "Sub-Folder"
-      expect(sub_mod['migration_id']).to eq "sf1"
+      overview = JSON.parse(File.read(@course_data["overview_file_path"]))
+      root_mod = overview["modules"][1]
+      sub_mod = root_mod["submodules"].first
+      expect(sub_mod["title"]).to eq "Sub-Folder"
+      expect(sub_mod["migration_id"]).to eq "sf1"
 
-      sub_mod2 = sub_mod['submodules'].first
-      expect(sub_mod2['title']).to eq "Sub-Folder 2"
-      expect(sub_mod2['migration_id']).to eq "sf2"
+      sub_mod2 = sub_mod["submodules"].first
+      expect(sub_mod2["title"]).to eq "Sub-Folder 2"
+      expect(sub_mod2["migration_id"]).to eq "sf2"
     end
 
     it "imports submodules individually if selected" do
       course_factory
-      @migration = ContentMigration.create(:context => @course)
+      @migration = ContentMigration.create(context: @course)
       @migration.migration_settings[:migration_ids_to_import] = {
-        :copy => { "context_modules" => { "sf2" => "1" } }
+        copy: { "context_modules" => { "sf2" => "1" } }
       }
       Importers::CourseContentImporter.import_content(@course, @course_data, nil, @migration)
 
@@ -486,24 +486,28 @@ describe "More Standard Common Cartridge importing" do
 
     # convert to json
     # pretend there were resources for the referenced items
-    @converter.resources = { 'w1' => { :type => "webcontent" }, 'f3' => { :type => "webcontent" }, 'f4' => { :type => "webcontent" }, 'f5' => { :type => "webcontent" }, }
+    @converter.resources = { "w1" => { type: "webcontent" }, "f3" => { type: "webcontent" }, "f4" => { type: "webcontent" }, "f5" => { type: "webcontent" }, }
     doc = Nokogiri::XML(orgs)
     hash = @converter.convert_organizations(doc)
 
     # make all the fake attachments for the module items to link to
     unfiled_folder = Folder.unfiled_folder(@copy_to)
-    w1 = Attachment.create!(:filename => 'w1.html', :uploaded_data => StringIO.new('w1'), :folder => unfiled_folder, :context => @copy_to)
-    w1.migration_id = "w1"; w1.save
-    f3 = Attachment.create!(:filename => 'f3.html', :uploaded_data => StringIO.new('f3'), :folder => unfiled_folder, :context => @copy_to)
-    f3.migration_id = "f3"; f3.save
-    f4 = Attachment.create!(:filename => 'f4.html', :uploaded_data => StringIO.new('f4'), :folder => unfiled_folder, :context => @copy_to)
-    f4.migration_id = "f4"; f4.save
-    f5 = Attachment.create!(:filename => 'f5.html', :uploaded_data => StringIO.new('f5'), :folder => unfiled_folder, :context => @copy_to)
-    f5.migration_id = "f5"; f5.save
+    w1 = Attachment.create!(filename: "w1.html", uploaded_data: StringIO.new("w1"), folder: unfiled_folder, context: @copy_to)
+    w1.migration_id = "w1"
+    w1.save
+    f3 = Attachment.create!(filename: "f3.html", uploaded_data: StringIO.new("f3"), folder: unfiled_folder, context: @copy_to)
+    f3.migration_id = "f3"
+    f3.save
+    f4 = Attachment.create!(filename: "f4.html", uploaded_data: StringIO.new("f4"), folder: unfiled_folder, context: @copy_to)
+    f4.migration_id = "f4"
+    f4.save
+    f5 = Attachment.create!(filename: "f5.html", uploaded_data: StringIO.new("f5"), folder: unfiled_folder, context: @copy_to)
+    f5.migration_id = "f5"
+    f5.save
 
     # import json into new course
-    hash = hash.map { |h| h.with_indifferent_access }
-    Importers::ContextModuleImporter.process_migration({ 'modules' => hash }, @migration)
+    hash = hash.map(&:with_indifferent_access)
+    Importers::ContextModuleImporter.process_migration({ "modules" => hash }, @migration)
     @copy_to.save!
 
     expect(@copy_to.context_modules.count).to eq 3
@@ -514,7 +518,7 @@ describe "More Standard Common Cartridge importing" do
     expect(mod1.position).to eq 1
     tag = mod1.content_tags.last
     expect(tag.content_id).to eq w1.id
-    expect(tag.content_type).to eq 'Attachment'
+    expect(tag.content_type).to eq "Attachment"
     expect(tag.indent).to eq 0
 
     mod2 = @copy_to.context_modules.where(migration_id: "misc_module_top_level_items").first
@@ -523,15 +527,15 @@ describe "More Standard Common Cartridge importing" do
     expect(mod2.position).to eq 2
     tag = mod2.content_tags.first
     expect(tag.content_id).to eq f3.id
-    expect(tag.content_type).to eq 'Attachment'
+    expect(tag.content_type).to eq "Attachment"
     expect(tag.indent).to eq 0
     tag = mod2.content_tags[1]
     expect(tag.content_id).to eq f4.id
-    expect(tag.content_type).to eq 'Attachment'
+    expect(tag.content_type).to eq "Attachment"
     expect(tag.indent).to eq 0
     tag = mod2.content_tags[2]
     expect(tag.content_id).to eq f5.id
-    expect(tag.content_type).to eq 'Attachment'
+    expect(tag.content_type).to eq "Attachment"
     expect(tag.indent).to eq 0
 
     mod3 = @copy_to.context_modules.where(migration_id: "m2").first
@@ -558,17 +562,17 @@ describe "More Standard Common Cartridge importing" do
 
     doc = Nokogiri::XML(resources)
     @converter.get_all_resources(doc)
-    expect(@converter.resources['a1'][:href]).to eq 'a1/a1.html'
-    expect(@converter.resources['w1'][:files].first[:href]).to eq 'w1/w1.html'
-    expect(@converter.resources['w1'][:files][1][:href]).to eq 'w1/w2.html'
-    expect(@converter.resources['q1'][:files].first[:href]).to eq 'q1/q1.xml'
+    expect(@converter.resources["a1"][:href]).to eq "a1/a1.html"
+    expect(@converter.resources["w1"][:files].first[:href]).to eq "w1/w1.html"
+    expect(@converter.resources["w1"][:files][1][:href]).to eq "w1/w2.html"
+    expect(@converter.resources["q1"][:files].first[:href]).to eq "q1/q1.xml"
   end
 end
 
 describe "non-ASCII attachment names" do
   it "does not fail to create all_files.zip" do
     archive_file_path = File.join(File.dirname(__FILE__) + "/../../../fixtures/migration/unicode-filename-test-export.imscc")
-    @converter = CC::Importer::Standard::Converter.new(:export_archive_path => archive_file_path)
+    @converter = CC::Importer::Standard::Converter.new(export_archive_path: archive_file_path)
     expect { @converter.export }.not_to raise_error
     contents = ["course_settings/assignment_groups.xml",
                 "course_settings/canvas_export.txt",
@@ -578,7 +582,7 @@ describe "non-ASCII attachment names" do
                 "abc.txt",
                 "molé.txt",
                 "xyz.txt"]
-    expect(@converter.course[:file_map].values.map { |v| v[:path_name] }.sort).to eq contents.sort
+    expect(@converter.course[:file_map].values.pluck(:path_name).sort).to eq contents.sort
 
     Zip::File.open File.join(@converter.base_export_dir, "all_files.zip") do |zipfile|
       zipcontents = zipfile.entries.map(&:name)
@@ -591,16 +595,16 @@ describe "LTI tool combination" do
   before(:once) do
     archive_file_path = File.join(File.dirname(__FILE__) + "/../../../fixtures/migration/cc_lti_combine_test.zip")
     unzipped_file_path = create_temp_dir!
-    converter = CC::Importer::Standard::Converter.new(:export_archive_path => archive_file_path, :course_name => 'oi', :base_download_dir => unzipped_file_path)
+    converter = CC::Importer::Standard::Converter.new(export_archive_path: archive_file_path, course_name: "oi", base_download_dir: unzipped_file_path)
     converter.export
     @course_data = converter.course.with_indifferent_access
-    @course_data['all_files_export'] ||= {}
-    @course_data['all_files_export']['file_path'] = @course_data['all_files_zip']
+    @course_data["all_files_export"] ||= {}
+    @course_data["all_files_export"]["file_path"] = @course_data["all_files_zip"]
 
     @course = course_factory
-    @migration = ContentMigration.create(:context => @course)
+    @migration = ContentMigration.create(context: @course)
     @migration.migration_type = "common_cartridge_importer"
-    @migration.migration_settings[:migration_ids_to_import] = { :copy => {} }
+    @migration.migration_settings[:migration_ids_to_import] = { copy: {} }
     Importers::CourseContentImporter.import_content(@course, @course_data, nil, @migration)
   end
 
@@ -631,12 +635,12 @@ describe "other cc files" do
     unzipped_file_path = create_temp_dir!
 
     @course = course_factory
-    @migration = ContentMigration.create(:context => @course)
+    @migration = ContentMigration.create(context: @course)
     @migration.migration_type = "common_cartridge_importer"
-    @migration.migration_settings[:migration_ids_to_import] = { :copy => {} }
+    @migration.migration_settings[:migration_ids_to_import] = { copy: {} }
 
-    converter = CC::Importer::Standard::Converter.new(:export_archive_path => archive_file_path, :course_name => 'oi',
-                                                      :base_download_dir => unzipped_file_path, :content_migration => @migration)
+    converter = CC::Importer::Standard::Converter.new(export_archive_path: archive_file_path, course_name: "oi",
+                                                      base_download_dir: unzipped_file_path, content_migration: @migration)
     converter.export
     @course_data = converter.course.with_indifferent_access
     Importers::CourseContentImporter.import_content(@course, @course_data, nil, @migration)
@@ -650,19 +654,19 @@ describe "other cc files" do
     it "parses canvas data from cc extension" do
       expect(@migration.migration_issues.count).to eq 0
 
-      att = @course.attachments.where(migration_id: 'ieee173de6109d169c627d07bedae0595').first
+      att = @course.attachments.where(migration_id: "ieee173de6109d169c627d07bedae0595").first
 
       expect(@course.assignments.count).to eq 2
       assignment1 = @course.assignments.where(migration_id: "icd613a5039d9a1539e100058efe44242").first
-      expect(assignment1.grading_type).to eq 'pass_fail'
+      expect(assignment1.grading_type).to eq "pass_fail"
       expect(assignment1.points_possible).to eq 20
       expect(assignment1.description).to include("<img src=\"/courses/#{@course.id}/files/#{att.id}/preview\" alt=\"dana_small.png\">")
       expect(assignment1.submission_types).to eq "online_text_entry,online_url,media_recording,online_upload" # overridden
 
       assignment2 = @course.assignments.where(migration_id: "icd613a5039d9a1539e100058efe44242copy").first
-      expect(assignment2.grading_type).to eq 'points'
+      expect(assignment2.grading_type).to eq "points"
       expect(assignment2.points_possible).to eq 21
-      expect(assignment2.description).to include('hi, the canvas meta stuff does not have submission types')
+      expect(assignment2.description).to include("hi, the canvas meta stuff does not have submission types")
       expect(assignment2.submission_types).to eq "online_upload,online_text_entry,online_url"
     end
   end
@@ -671,9 +675,9 @@ describe "other cc files" do
     it "does some possibly broken converting" do
       Account.default.enable_feature!(:common_cartridge_page_conversion)
       import_cc_file("cc_file_to_page_test.zip")
-      img = @course.attachments.where(:migration_id => "I_00001_R_1").first
+      img = @course.attachments.where(migration_id: "I_00001_R_1").first
 
-      page = @course.wiki_pages.where(:migration_id => "I_00001_R").first
+      page = @course.wiki_pages.where(migration_id: "I_00001_R").first
       expect(page.title).to eq "Some kind of file or page thingy"
       expect(page.body).to match_ignoring_whitespace("<p>THis is an image or something <img src=\"/courses/#{@course.id}/files/#{img.id}/preview\"></p>")
 
@@ -685,7 +689,7 @@ describe "other cc files" do
       import_cc_file("cc_file_to_page_test.zip")
       expect(@course.wiki_pages.count).to eq 0
 
-      att = @course.attachments.where(:migration_id => "I_00001_R").first
+      att = @course.attachments.where(migration_id: "I_00001_R").first
       tag = @course.context_module_tags.first
       expect(tag.content).to eq att
     end
@@ -722,11 +726,11 @@ describe "other cc files" do
   describe "empty file link name inference" do
     it "adds the file name to empty links in html content" do
       import_cc_file("cc_empty_link.zip")
-      assmt = @course.assignments.where(:migration_id => "assignment1").first
-      file = @course.attachments.where(:migration_id => "file1").first
+      assmt = @course.assignments.where(migration_id: "assignment1").first
+      file = @course.attachments.where(migration_id: "file1").first
       doc = Nokogiri::HTML::DocumentFragment.parse(assmt.description)
       link = doc.at_css("a")
-      expect(link.attr('href')).to include("courses/#{@course.id}/files/#{file.id}")
+      expect(link.attr("href")).to include("courses/#{@course.id}/files/#{file.id}")
       expect(link.text.strip).to eq file.display_name
     end
   end

@@ -27,7 +27,7 @@ module CanvasStringex
   if defined?(ActiveRecord)
     # Prevents uninitialized constant ActiveRecord::DatabaseConfigurations::ConnectionUrlResolver::URI
     # (probably only relevant for specs in practice)
-    require 'uri'
+    require "uri"
     ActiveRecord::Base.include LuckySneaks::ActsAsUrl
   end
 end

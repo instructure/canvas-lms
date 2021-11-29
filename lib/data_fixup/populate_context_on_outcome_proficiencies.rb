@@ -21,7 +21,7 @@
 module DataFixup::PopulateContextOnOutcomeProficiencies
   def self.run
     OutcomeProficiency.find_ids_in_ranges do |min_id, max_id|
-      OutcomeProficiency.where(:id => min_id..max_id, :context_id => nil).update_all("context_type='Account', context_id=account_id")
+      OutcomeProficiency.where(id: min_id..max_id, context_id: nil).update_all("context_type='Account', context_id=account_id")
     end
   end
 end

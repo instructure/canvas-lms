@@ -31,9 +31,9 @@ describe DataFixup::ClearAccountSettings do
 
   context "when clearing a single setting" do
     it "clears the specified setting" do
-      expect {
+      expect do
         described_class.run(%w[foo])
-      }.to change {
+      end.to change {
         account.reload.settings[:foo]
       }.from("bar").to(nil)
 
@@ -43,9 +43,9 @@ describe DataFixup::ClearAccountSettings do
 
   context "when clearing multiple settings" do
     it "clears all provided settings" do
-      expect {
+      expect do
         described_class.run(%w[foo bar])
-      }.to change {
+      end.to change {
         account.reload.settings[:foo]
       }.from("bar").to(nil).and change {
         account.reload.settings[:bar]
@@ -62,9 +62,9 @@ describe DataFixup::ClearAccountSettings do
     end
 
     it "clears the settings that apply to each account" do
-      expect {
+      expect do
         described_class.run(%w[foo baz])
-      }.to change {
+      end.to change {
         account.reload.settings[:foo]
       }.from("bar").to(nil).and change {
         account2.reload.settings[:baz]
@@ -83,9 +83,9 @@ describe DataFixup::ClearAccountSettings do
     end
 
     it "ignores subaccounts" do
-      expect {
+      expect do
         described_class.run(%w[foo])
-      }.to change {
+      end.to change {
         account.reload.settings[:foo]
       }.from("bar").to(nil).and not_change {
         subaccount.reload.settings[:foo]
@@ -94,9 +94,9 @@ describe DataFixup::ClearAccountSettings do
 
     context "include_subaccounts is true" do
       it "clears subaccount settings" do
-        expect {
+        expect do
           described_class.run(%w[foo], include_subaccounts: true)
-        }.to change {
+        end.to change {
           account.reload.settings[:foo]
         }.from("bar").to(nil).and change {
           subaccount.reload.settings[:foo]

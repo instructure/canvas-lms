@@ -29,19 +29,21 @@ class AddFlagAuditorsCassandra < ActiveRecord::Migration[6.0]
   include Canvas::Cassandra::Migration
 
   def self.cassandra_cluster
-    'auditors'
+    "auditors"
   end
 
   def self.indexes
-    %w(
+    %w[
       feature_flag_changes_by_feature_flag
-    )
+    ]
   end
 
   def self.up
-    compression_params = cassandra.db.use_cql3? ?
-        "WITH compression = { 'sstable_compression' : 'DeflateCompressor' }" :
-        "WITH compression_parameters:sstable_compression='DeflateCompressor'"
+    compression_params = if cassandra.db.use_cql3?
+                           "WITH compression = { 'sstable_compression' : 'DeflateCompressor' }"
+                         else
+                           "WITH compression_parameters:sstable_compression='DeflateCompressor'"
+                         end
 
     cassandra.execute %{
       CREATE TABLE feature_flags (
@@ -72,8 +74,8 @@ class AddFlagAuditorsCassandra < ActiveRecord::Migration[6.0]
 
   def self.down
     indexes.each do |index_name|
-      cassandra.execute %{DROP TABLE #{index_name};}
+      cassandra.execute %(DROP TABLE #{index_name};)
     end
-    cassandra.execute %{DROP TABLE feature_flags;}
+    cassandra.execute %(DROP TABLE feature_flags;)
   end
 end

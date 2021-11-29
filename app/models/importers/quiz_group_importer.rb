@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_dependency 'importers'
+require_dependency "importers"
 
 module Importers
   class QuizGroupImporter < Importer
@@ -32,16 +32,17 @@ module Importers
       item.question_points = hash[:question_points]
       item.pick_count = hash[:pick_count]
       item.position = position
-      item.name = hash[:title] || t('#quizzes.quiz_group.question_group', "Question Group")
+      item.name = hash[:title] || t("#quizzes.quiz_group.question_group", "Question Group")
       if hash[:question_bank_migration_id]
         if hash[:question_bank_is_external] && migration && migration.user && hash[:question_bank_context].present? && hash[:question_bank_migration_id].present?
           bank = nil
           bank_context = nil
 
           unless migration.cross_institution?
-            if hash[:question_bank_context] =~ /account_(\d*)/
+            case hash[:question_bank_context]
+            when /account_(\d*)/
               bank_context = Account.where(id: $1).first
-            elsif hash[:question_bank_context] =~ /course_(\d*)/
+            when /course_(\d*)/
               bank_context = Course.where(id: $1).first
             end
 
@@ -55,15 +56,13 @@ module Importers
               # if it's account-level they'd still be able to see it in the list to link to a new question group even though they can't directly view it... weird
               item.assessment_question_bank_id = bank.id
             else
-              migration.add_warning(t('#quizzes.quiz_group.errors.no_permissions', "User didn't have permission to reference question bank in quiz group %{group_name}", :group_name => item.name))
+              migration.add_warning(t("#quizzes.quiz_group.errors.no_permissions", "User didn't have permission to reference question bank in quiz group %{group_name}", group_name: item.name))
             end
           else
-            migration.add_warning(t('#quizzes.quiz_group.errors.no_bank', "Couldn't find the question bank for quiz group %{group_name}", :group_name => item.name))
+            migration.add_warning(t("#quizzes.quiz_group.errors.no_bank", "Couldn't find the question bank for quiz group %{group_name}", group_name: item.name))
           end
-        else
-          if (bank = context.assessment_question_banks.where(migration_id: hash[:question_bank_migration_id]).first)
-            item.assessment_question_bank_id = bank.id
-          end
+        elsif (bank = context.assessment_question_banks.where(migration_id: hash[:question_bank_migration_id]).first)
+          item.assessment_question_bank_id = bank.id
         end
       end
       item.save!

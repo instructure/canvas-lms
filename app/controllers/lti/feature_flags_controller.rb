@@ -43,7 +43,7 @@ module Lti
   #
   class FeatureFlagsController < ApplicationController
     include ::Lti::IMS::Concerns::AdvantageServices
-    MIME_TYPE = 'application/vnd.canvas.featureflags+json'
+    MIME_TYPE = "application/vnd.canvas.featureflags+json"
 
     ACTION_SCOPE_MATCHERS = {
       show: all_of(TokenScopes::LTI_SHOW_FEATURE_FLAG_SCOPE),
@@ -75,7 +75,7 @@ module Lti
     def feature
       context.lookup_feature_flag(params.require(:feature)) || Account.site_admin.lookup_feature_flag(params.require(:feature))
     rescue => e
-      raise e.message.include?('no such feature') ? ActiveRecord::RecordNotFound : e
+      raise e.message.include?("no such feature") ? ActiveRecord::RecordNotFound : e
     end
 
     def scopes_matcher

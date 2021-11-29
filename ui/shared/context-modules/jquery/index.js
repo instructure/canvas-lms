@@ -63,6 +63,7 @@ import DirectShareCourseTray from '@canvas/direct-sharing/react/components/Direc
 import DirectShareUserModal from '@canvas/direct-sharing/react/components/DirectShareUserModal'
 import mathml from 'mathml'
 import {addDeepLinkingListener} from '@canvas/deep-linking/DeepLinking'
+import ExternalToolModalLauncher from '@canvas/external-tools/react/components/ExternalToolModalLauncher'
 
 function scrollTo($thing, time = 500) {
   if (!$thing || $thing.length === 0) return
@@ -2615,15 +2616,49 @@ $(document).ready(function () {
     )
   }
 
+  function setExternalToolModal(tool, launchType, returnFocusTo, isOpen) {
+    if (isOpen) {
+      addDeepLinkingListener(() => {
+        window.location.reload()
+      })
+    }
+
+    const handleDismiss = () => {
+      setExternalToolModal(tool, launchType, returnFocusTo, false)
+      returnFocusTo.focus()
+    }
+
+    ReactDOM.render(
+      <ExternalToolModalLauncher
+        tool={tool}
+        launchType={launchType}
+        isOpen={isOpen}
+        contextType="course"
+        contextId={parseInt(ENV.COURSE_ID, 10)}
+        title={tool.name}
+        onRequestClose={handleDismiss}
+      />,
+      $('#external-tool-mount-point')[0]
+    )
+  }
+
+  function findToolFromEvent(collection, idAttribute, event) {
+    return (collection || []).find(t => t[idAttribute] === event.target.dataset.toolId)
+  }
+
   function openExternalTool(ev) {
     if (ev != null) {
       ev.preventDefault()
     }
     const launchType = ev.target.dataset.toolLaunchType
-    const tool = (ENV.MODULE_TRAY_TOOLS[launchType] || []).find(
-      t => t.id === ev.target.dataset.toolId
-    )
 
+    if (launchType === 'module_index_menu_modal') {
+      const tool = findToolFromEvent(ENV.MODULE_MENU_TOOLS, 'definition_id', ev)
+      setExternalToolModal(tool, launchType, $('.al-trigger')[0], true)
+      return
+    }
+
+    const tool = findToolFromEvent(ENV.MODULE_TRAY_TOOLS[launchType], 'id', ev)
     const moduleData = []
     if (launchType == 'module_index_menu') {
       // include all modules
@@ -2640,10 +2675,6 @@ $(document).ready(function () {
       })
     }
     setExternalToolTray(tool, moduleData, launchType == 'module_index_menu', $('.al-trigger')[0])
-
-    addDeepLinkingListener(() => {
-      window.location.reload()
-    })
   }
 
   $('.menu_tray_tool_link').click(openExternalTool)

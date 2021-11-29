@@ -22,8 +22,8 @@ class CreateTermsOfService < ActiveRecord::Migration[4.2]
   tag :predeploy
   def change
     create_table :terms_of_services do |t|
-      t.string :terms_type, null: false, :default => "default"
-      t.boolean :passive, null: false, :default => true
+      t.string :terms_type, null: false, default: "default"
+      t.boolean :passive, null: false, default: true
       t.integer :terms_of_service_content_id, limit: 8
       t.integer :account_id, null: false, limit: 8
       t.timestamps

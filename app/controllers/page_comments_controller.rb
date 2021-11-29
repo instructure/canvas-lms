@@ -35,11 +35,11 @@ class PageCommentsController < ApplicationController
       respond_to do |format|
         if @comment.save
           format.html { redirect_to url }
-          format.json { render :json => @comment }
+          format.json { render json: @comment }
         else
-          flash[:error] = t('errors.create_failed', "Comment creation failed")
+          flash[:error] = t("errors.create_failed", "Comment creation failed")
           format.html { redirect_to url }
-          format.json { render :json => @comment.errors, :status => :bad_request }
+          format.json { render json: @comment.errors, status: :bad_request }
         end
       end
     end
@@ -51,7 +51,7 @@ class PageCommentsController < ApplicationController
     @comment = @page.page_comments.find(params[:id])
     if authorized_action(@portfolio, @current_user, :update)
       @comment.destroy
-      render :json => @comment
+      render json: @comment
     end
   end
 end

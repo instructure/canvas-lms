@@ -17,12 +17,12 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../views_helper'
+require_relative "../views_helper"
 
 describe "/context/_roster_right_side" do
   it "renders with an account as context" do
     view_context(Account.default)
-    render :partial => "context/roster_right_side"
+    render partial: "context/roster_right_side"
     expect(response).not_to be_nil
   end
 end

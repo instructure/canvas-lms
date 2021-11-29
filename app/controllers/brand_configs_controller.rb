@@ -28,8 +28,8 @@ class BrandConfigsController < ApplicationController
   before_action { |c| c.active_tab = "brand_configs" }
 
   def index
-    add_crumb t('Themes')
-    @page_title = join_title(t('Themes'), @account.name)
+    add_crumb t("Themes")
+    @page_title = join_title(t("Themes"), @account.name)
     css_bundle :brand_config_index
     js_bundle :brand_configs
 
@@ -40,14 +40,14 @@ class BrandConfigsController < ApplicationController
       baseBrandableVariables: BrandableCSS.all_brand_variable_values(base_brand_config),
       brandableVariableDefaults: BrandableCSS.variables_map,
       accountID: @account.id.to_s,
-      sharedBrandConfigs: visible_shared_brand_configs.as_json(include_root: false, include: 'brand_config'),
+      sharedBrandConfigs: visible_shared_brand_configs.as_json(include_root: false, include: "brand_config"),
       activeBrandConfig: active_brand_config(ignore_parents: true).as_json(include_root: false)
     }
-    render html: '', layout: true
+    render html: "", layout: true
   end
 
   def new
-    @page_title = join_title(t('Theme Editor'), @account.name)
+    @page_title = join_title(t("Theme Editor"), @account.name)
     css_bundle :common, :theme_editor
     js_bundle :theme_editor
     brand_config = active_brand_config(ignore_parents: true) || BrandConfig.new
@@ -57,7 +57,7 @@ class BrandConfigsController < ApplicationController
            variableSchema: default_schema,
            allowGlobalIncludes: @account.allow_global_includes?,
            account_id: @account.id
-    render html: '', layout: 'layouts/bare'
+    render html: "", layout: "layouts/bare"
   end
 
   def show
@@ -70,7 +70,7 @@ class BrandConfigsController < ApplicationController
     overridden_schema = duped_brandable_vars
     overridden_schema.each do |group|
       group["variables"].each do |var|
-        if variables.keys.include?(var["variable_name"])
+        if variables.key?(var["variable_name"])
           var["default"] = variables[var["variable_name"]]
         end
       end
@@ -82,11 +82,11 @@ class BrandConfigsController < ApplicationController
   def duped_brandable_vars
     BrandableCSS::BRANDABLE_VARIABLES.map do |group|
       new_group = group.deep_dup
-      new_group["group_name"] = BrandableCSS::GROUP_NAMES[new_group['group_key']].call
+      new_group["group_name"] = BrandableCSS::GROUP_NAMES[new_group["group_key"]].call
       new_group["variables"] = new_group["variables"].map(&:deep_dup)
       new_group["variables"].each do |v|
-        v["human_name"] = BrandableCSS::VARIABLE_HUMAN_NAMES[v['variable_name']].call
-        if (helper_text_proc = BrandableCSS::HELPER_TEXTS[v['variable_name']])
+        v["human_name"] = BrandableCSS::VARIABLE_HUMAN_NAMES[v["variable_name"]].call
+        if (helper_text_proc = BrandableCSS::HELPER_TEXTS[v["variable_name"]])
           v["helper_text"] = helper_text_proc.call
         end
       end
@@ -137,7 +137,7 @@ class BrandConfigsController < ApplicationController
   #   (so the user will see the canvas default theme).
   def save_to_user_session
     old_md5 = session.delete(:brand_config_md5)
-    session[:brand_config_md5] = if params[:brand_config_md5] == ''
+    session[:brand_config_md5] = if params[:brand_config_md5] == ""
                                    false
                                  elsif params[:brand_config_md5]
                                    BrandConfig.find(params[:brand_config_md5]).md5
@@ -167,7 +167,7 @@ class BrandConfigsController < ApplicationController
   def destroy
     old_md5 = session.delete(:brand_config_md5).presence
     BrandConfig.destroy_if_unused(old_md5)
-    redirect_to account_brand_configs_path(@account), notice: t('Theme editor changes have been cancelled.')
+    redirect_to account_brand_configs_path(@account), notice: t("Theme editor changes have been cancelled.")
   end
 
   def existing_config(config)
@@ -195,7 +195,7 @@ class BrandConfigsController < ApplicationController
     variables.to_unsafe_h.each_with_object({}) do |(key, value), memo|
       next unless value.present? && (config = BrandableCSS.variables_map[key])
 
-      value = process_file(value) if config['type'] == 'image'
+      value = process_file(value) if config["type"] == "image"
       memo[key] = value
     end
   end
@@ -220,7 +220,7 @@ class BrandConfigsController < ApplicationController
   def upload_file(file)
     expires_in = 15.years
     attachment = Attachment.new(attachment_options: {
-                                  s3_access: 'public-read',
+                                  s3_access: "public-read",
                                   skip_sis: true,
                                   cache_control: "Cache-Control:max-age=#{expires_in.to_i}, public",
                                   expires: expires_in.from_now.httpdate

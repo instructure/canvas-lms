@@ -50,6 +50,8 @@ describe "Exporters::ZipExporter" do
       end
 
       context "when exporting a published attachment" do
+        subject { exporter.export }
+
         before do
           attachment_model(
             context: course,
@@ -59,8 +61,6 @@ describe "Exporters::ZipExporter" do
         end
 
         let(:exporter) { exporter_for_attachment(@attachment, course, @user) }
-
-        subject { exporter.export }
 
         context "when the user is an active teacher" do
           before { @user = teacher }
@@ -85,6 +85,8 @@ describe "Exporters::ZipExporter" do
       end
 
       context "when exporting an unpublished attachment" do
+        subject { exporter.export }
+
         before do
           attachment_model(
             context: course,
@@ -95,8 +97,6 @@ describe "Exporters::ZipExporter" do
         end
 
         let(:exporter) { exporter_for_attachment(@attachment, course, @user) }
-
-        subject { exporter.export }
 
         context "when the user is an active teacher" do
           before { @user = teacher }
@@ -121,6 +121,8 @@ describe "Exporters::ZipExporter" do
       end
 
       context "when exporting an availability locked attachment" do
+        subject { exporter.export }
+
         before do
           attachment_model(
             context: course,
@@ -132,8 +134,6 @@ describe "Exporters::ZipExporter" do
         end
 
         let(:exporter) { exporter_for_attachment(@attachment, course, @user) }
-
-        subject { exporter.export }
 
         context "when the user is an active teacher" do
           before { @user = teacher }
@@ -158,6 +158,8 @@ describe "Exporters::ZipExporter" do
       end
 
       context "when exporting a hidden attachment" do
+        subject { exporter.export }
+
         before do
           attachment_model(
             context: course,
@@ -168,8 +170,6 @@ describe "Exporters::ZipExporter" do
         end
 
         let(:exporter) { exporter_for_attachment(@attachment, course, @user) }
-
-        subject { exporter.export }
 
         context "when the user is an active teacher" do
           before { @user = teacher }
@@ -209,6 +209,8 @@ describe "Exporters::ZipExporter" do
       end
 
       context "when exporting a published folder with published files" do
+        subject { exporter.export }
+
         before do
           attachment_model(
             context: course,
@@ -218,8 +220,6 @@ describe "Exporters::ZipExporter" do
         end
 
         let(:exporter) { exporter_for_folder(folder, course, @user) }
-
-        subject { exporter.export }
 
         context "when the user is an active teacher" do
           before { @user = teacher }
@@ -244,6 +244,8 @@ describe "Exporters::ZipExporter" do
       end
 
       context "when exporting an unpublished folder containing unpublished files" do
+        subject { exporter.export }
+
         before do
           folder.update!(locked: true)
 
@@ -256,8 +258,6 @@ describe "Exporters::ZipExporter" do
         end
 
         let(:exporter) { exporter_for_folder(folder, course, @user) }
-
-        subject { exporter.export }
 
         context "when the user is an active teacher" do
           before { @user = teacher }
@@ -282,6 +282,8 @@ describe "Exporters::ZipExporter" do
       end
 
       context "when exporting an availability locked folder with availability locked files" do
+        subject { exporter.export }
+
         before do
           folder.update!(lock_at: 1.day.ago, unlock_at: 3.days.ago)
 
@@ -295,8 +297,6 @@ describe "Exporters::ZipExporter" do
         end
 
         let(:exporter) { exporter_for_folder(folder, course, @user) }
-
-        subject { exporter.export }
 
         context "when the user is an active teacher" do
           before { @user = teacher }
@@ -321,6 +321,8 @@ describe "Exporters::ZipExporter" do
       end
 
       context "when exporting a hidden folder with hidden files" do
+        subject { exporter.export }
+
         before do
           folder.update!(workflow_state: "hidden")
 
@@ -328,13 +330,11 @@ describe "Exporters::ZipExporter" do
             context: course,
             file_state: "hidden",
             folder: folder,
-            uploaded_data: stub_file_data("file.txt", "some text", "text/plain"),
+            uploaded_data: stub_file_data("file.txt", "some text", "text/plain")
           )
         end
 
         let(:exporter) { exporter_for_folder(folder, course, @user) }
-
-        subject { exporter.export }
 
         context "when the user is an active teacher" do
           before { @user = teacher }

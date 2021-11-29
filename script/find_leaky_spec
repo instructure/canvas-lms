@@ -16,11 +16,11 @@
 # Preceding Specs section from a Jenkins failure report
 
 specs = File.readlines(ARGV[0]).each do |line|
-  line.gsub!(/^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2} UTC: bin\/rspec)?/, '').strip!
+  line.gsub!(%r{^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2} UTC: bin/rspec)?}, "").strip!
 end
-specs = specs.reverse if specs.first.end_with?(' (failed)')
+specs = specs.reverse if specs.first.end_with?(" (failed)")
 specs.each do |line|
-  line.gsub!(/ \(failed\)$/, '')
+  line.gsub!(/ \(failed\)$/, "")
 end
 target = specs.pop
 
@@ -31,7 +31,7 @@ def find_leaky_spec(specs, target)
 
   group_size = [specs.length / 2, 16].min
   specs.each_slice(group_size) do |sub_specs|
-    command = "bin/rspec --order=defined #{sub_specs.join(' ')} #{target}"
+    command = "bin/rspec --order=defined #{sub_specs.join(" ")} #{target}"
     puts command
     system(command)
     unless $?.success?

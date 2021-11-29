@@ -24,10 +24,10 @@ module Api::V1::Tab
   include NewQuizzesFeaturesHelper
 
   def tabs_available_json(context, user, session, _includes = [], precalculated_permissions: nil)
-    json = context_tabs(context, user, session: session, precalculated_permissions: precalculated_permissions).map { |tab|
+    json = context_tabs(context, user, session: session, precalculated_permissions: precalculated_permissions).map do |tab|
       tab_json(tab.with_indifferent_access, context, user, session)
-    }
-    json.sort! { |x, y| x['position'] <=> y['position'] }
+    end
+    json.sort! { |x, y| x["position"] <=> y["position"] }
   end
 
   def tab_json(tab, context, user, session)
@@ -40,9 +40,9 @@ module Api::V1::Tab
     hash[:unused] = true if tab[:hidden_unused]
     hash[:visibility] = visibility(tab, hash)
     hash[:label] = tab[:label]
-    hash[:type] = (tab[:external] && 'external') || 'internal'
+    hash[:type] = (tab[:external] && "external") || "internal"
     if tab[:external] && tab[:args] && tab[:args].length > 1
-      launch_type = context.is_a?(Account) ? 'account_navigation' : 'course_navigation'
+      launch_type = context.is_a?(Account) ? "account_navigation" : "course_navigation"
       hash[:url] = sessionless_launch_url(context, id: tab[:args][1], launch_type: launch_type)
     end
     api_json(hash, user, session)
@@ -50,8 +50,8 @@ module Api::V1::Tab
 
   def html_url(tab, context, full_url = false)
     if full_url
-      method = tab[:href].to_s.sub(/_path$/, '_url').to_sym
-      opts = { :host => HostUrl.context_host(context, request.try(:host_with_port)) }
+      method = tab[:href].to_s.sub(/_path$/, "_url").to_sym
+      opts = { host: HostUrl.context_host(context, request.try(:host_with_port)) }
     else
       method = tab[:href]
       opts = {}
@@ -77,17 +77,17 @@ module Api::V1::Tab
   end
 
   def visibility(tab, hash)
-    if hash[:type] == 'external' && hash[:hidden]
-      'none'
-    elsif hash[:id] == 'settings' || hash[:unused] || hash[:hidden]
-      'admins'
+    if hash[:type] == "external" && hash[:hidden]
+      "none"
+    elsif hash[:id] == "settings" || hash[:unused] || hash[:hidden]
+      "admins"
     else
-      tab[:visibility] || 'public'
+      tab[:visibility] || "public"
     end
   end
 
   def quiz_lti_tab?(tab)
-    if tab[:id].is_a?(String) && tab[:id].start_with?('context_external_tool_') && tab[:args] && tab[:args][1]
+    if tab[:id].is_a?(String) && tab[:id].start_with?("context_external_tool_") && tab[:args] && tab[:args][1]
       return ContextExternalTool.find_by(id: tab[:args][1])&.quiz_lti?
     end
 
@@ -108,7 +108,7 @@ module Api::V1::Tab
       precalculated_permissions: precalculated_permissions,
       root_account: root_account,
       session: session,
-      course_subject_tabs: params['include']&.include?('course_subject_tabs')
+      course_subject_tabs: params["include"]&.include?("course_subject_tabs")
     }
 
     tabs = context.tabs_available(user, opts).select do |tab|

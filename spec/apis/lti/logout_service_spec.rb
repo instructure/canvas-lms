@@ -18,18 +18,18 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../api_spec_helper'
+require_relative "../api_spec_helper"
 
-require 'nokogiri'
+require "nokogiri"
 
 describe LtiApiController, type: :request do
   before :once do
-    user_with_pseudonym(:username => 'parajsa', :password => 'password1', :active_user => true)
-    course_with_student(:active_all => true, :user => @user)
-    @tool = @course.context_external_tools.create(:shared_secret => 'test_secret', :consumer_key => 'test_key', :name => 'logout service test tool', :domain => 'example.com')
-    @tool.url = 'https://example.edu/tool-launch-url'
+    user_with_pseudonym(username: "parajsa", password: "password1", active_user: true)
+    course_with_student(active_all: true, user: @user)
+    @tool = @course.context_external_tools.create(shared_secret: "test_secret", consumer_key: "test_key", name: "logout service test tool", domain: "example.com")
+    @tool.url = "https://example.edu/tool-launch-url"
     @tool.course_navigation = {
-      :enabled => "true"
+      enabled: "true"
     }
     @tool.custom_fields = {
       "sub_logout_service_url" => "$Canvas.logoutService.url"
@@ -39,20 +39,20 @@ describe LtiApiController, type: :request do
 
   def api_path(token = nil, callback = nil)
     token ||= Lti::LogoutService.create_token(@tool, @pseudonym)
-    callback ||= 'http://logout.notify.example.com'
+    callback ||= "http://logout.notify.example.com"
     "/api/lti/v1/logout_service/#{token}?#{{ callback: callback }.to_query}"
   end
 
   def make_call(opts = {})
-    opts['path'] ||= api_path
-    opts['key'] ||= @tool.consumer_key
-    opts['secret'] ||= @tool.shared_secret
-    consumer = OAuth::Consumer.new(opts['key'], opts['secret'], :site => "http://www.example.com", :signature_method => "HMAC-SHA1")
-    req = consumer.create_signed_request(:post, opts['path'], nil, :scheme => 'header', :timestamp => opts['timestamp'], :nonce => opts['nonce'])
-    req.body = opts['body'] if opts['body']
+    opts["path"] ||= api_path
+    opts["key"] ||= @tool.consumer_key
+    opts["secret"] ||= @tool.shared_secret
+    consumer = OAuth::Consumer.new(opts["key"], opts["secret"], site: "http://www.example.com", signature_method: "HMAC-SHA1")
+    req = consumer.create_signed_request(:post, opts["path"], nil, scheme: "header", timestamp: opts["timestamp"], nonce: opts["nonce"])
+    req.body = opts["body"] if opts["body"]
     post "http://www.example.com#{req.path}",
          params: req.body,
-         headers: { "CONTENT_TYPE" => opts['content-type'], "HTTP_AUTHORIZATION" => req['Authorization'] }
+         headers: { "CONTENT_TYPE" => opts["content-type"], "HTTP_AUTHORIZATION" => req["Authorization"] }
   end
 
   it "generates a logout service URL with token" do
@@ -61,7 +61,7 @@ describe LtiApiController, type: :request do
     get "/courses/#{@course.id}/external_tools/#{@tool.id}"
     expect(response).to be_successful
     doc = Nokogiri::HTML5(response.body)
-    logout_service_url = doc.css('#custom_sub_logout_service_url').attr('value').value
+    logout_service_url = doc.css("#custom_sub_logout_service_url").attr("value").value
     match = %r{\Ahttp://www.example.com/api/lti/v1/logout_service/([a-z0-9-]+)\z}.match(logout_service_url)
     expect(match).not_to be_nil
     token = Lti::LogoutService::Token.parse_and_validate(match[1])
@@ -70,16 +70,16 @@ describe LtiApiController, type: :request do
   end
 
   it "rejects an invalid secret" do
-    make_call('secret' => 'not secret')
+    make_call("secret" => "not secret")
     expect(response.status).to eql 401
     expect(response.body).to match(/Invalid authorization header/)
   end
 
   it "rejects an invalid token" do
-    token_parts = Lti::LogoutService.create_token(@tool, @pseudonym).split('-')
+    token_parts = Lti::LogoutService.create_token(@tool, @pseudonym).split("-")
     # falsify the pseudonym to try and get notified when somebody else logs out
     token_parts[1] = (token_parts[1].to_i + 1).to_s
-    make_call('path' => api_path(token_parts.join('-')))
+    make_call("path" => api_path(token_parts.join("-")))
     expect(response.status).to eql 401
     expect(response.body).to match(/Invalid logout service token/)
   end
@@ -88,7 +88,7 @@ describe LtiApiController, type: :request do
     token = Timecop.freeze(15.minutes.ago) do
       Lti::LogoutService.create_token(@tool, @pseudonym)
     end
-    make_call('path' => api_path(token))
+    make_call("path" => api_path(token))
     expect(response.status).to eql 401
     expect(response.body).to match(/Logout service token has expired/)
   end
@@ -96,12 +96,12 @@ describe LtiApiController, type: :request do
   it "registers callbacks" do
     enable_cache do
       token1 = Lti::LogoutService.create_token(@tool, @pseudonym)
-      make_call('path' => api_path(token1, 'http://logout.notify.example.com/123'))
+      make_call("path" => api_path(token1, "http://logout.notify.example.com/123"))
       token2 = Lti::LogoutService.create_token(@tool, @pseudonym)
-      make_call('path' => api_path(token2, 'http://logout.notify.example.com/456'))
+      make_call("path" => api_path(token2, "http://logout.notify.example.com/456"))
       expect(Lti::LogoutService.get_logout_callbacks(@pseudonym).values).to match_array [
-        'http://logout.notify.example.com/123',
-        'http://logout.notify.example.com/456'
+        "http://logout.notify.example.com/123",
+        "http://logout.notify.example.com/456"
       ]
     end
   end
@@ -109,9 +109,9 @@ describe LtiApiController, type: :request do
   it "rejects reused tokens" do
     enable_cache do
       token = Lti::LogoutService.create_token(@tool, @pseudonym)
-      make_call('path' => api_path(token, 'http://logout.notify.example.com/123'))
+      make_call("path" => api_path(token, "http://logout.notify.example.com/123"))
       expect(response).to be_successful
-      make_call('path' => api_path(token, 'http://logout.notify.example.com/456'))
+      make_call("path" => api_path(token, "http://logout.notify.example.com/456"))
       expect(response.status).to eql 401
       expect(response.body).to match(/Logout service token has already been used/)
     end
@@ -119,11 +119,11 @@ describe LtiApiController, type: :request do
 
   it "calls registered callbacks when the user logs out" do
     enable_cache do
-      login_as 'parajsa', 'password1'
+      login_as "parajsa", "password1"
       token = Lti::LogoutService::Token.create(@tool, @pseudonym)
-      Lti::LogoutService.register_logout_callback(token, 'http://logout.notify.example.com/789')
-      expect(CanvasHttp).to receive(:get).with('http://logout.notify.example.com/789')
-      delete '/logout'
+      Lti::LogoutService.register_logout_callback(token, "http://logout.notify.example.com/789")
+      expect(CanvasHttp).to receive(:get).with("http://logout.notify.example.com/789")
+      delete "/logout"
       run_jobs
     end
   end

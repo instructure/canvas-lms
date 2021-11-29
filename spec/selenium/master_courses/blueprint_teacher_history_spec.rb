@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../common'
+require_relative "../common"
 
 describe "master courses - child courses - sync history for teacher" do
   include_context "in-process server selenium tests"
@@ -35,14 +35,14 @@ describe "master courses - child courses - sync history for teacher" do
   def run_master_migration
     @migration = MasterCourses::MasterMigration.start_new_migration!(@template, @admin)
     run_jobs
-    @cm = @copy_to.content_migrations.where(:child_subscription_id => @sub).last
+    @cm = @copy_to.content_migrations.where(child_subscription_id: @sub).last
   end
 
   before do
     user_session(@teacher)
   end
 
-  it "shows import history to a teacher", priority: "1", test_id: 3208649 do
+  it "shows import history to a teacher", priority: "1" do
     assmt = @copy_from.assignments.create!(title: "assmt", due_at: 2.days.from_now)
     @template.create_content_tag_for!(assmt, { restrictions: { content: true } })
     topic = @copy_from.discussion_topics.create!(title: "something")

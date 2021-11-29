@@ -33,7 +33,7 @@ describe "jquery ui" do
   end
 
   def create_simple_modal
-    driver.execute_script(<<-JS)
+    driver.execute_script(<<~JS)
       $('<div><select /><input /></div>')
         .dialog()
         .find('select')
@@ -47,13 +47,13 @@ describe "jquery ui" do
   end
 
   it "makes dialogs modal by default" do
-    expect(driver.execute_script(<<-JS)).to eq true
+    expect(driver.execute_script(<<~JS)).to eq true
       return $('<div />').dialog().dialog('option', 'modal');
     JS
     expect(f(".ui-widget-overlay")).to be_displayed
 
     # make sure that hiding then showing the same dialog again, it still looks modal
-    expect(driver.execute_script(<<-JS)).to eq true
+    expect(driver.execute_script(<<~JS)).to eq true
       return $('<div />')
         .dialog()
         .dialog('close')
@@ -65,28 +65,28 @@ describe "jquery ui" do
 
   it "captures tabbing" do
     create_simple_modal
-    expect(active.tag_name).to eq 'select'
+    expect(active.tag_name).to eq "select"
     active.send_keys(:tab)
-    expect(active.tag_name).to eq 'input'
+    expect(active.tag_name).to eq "input"
     active.send_keys(:tab)
-    expect(active.tag_name).to eq 'button'
+    expect(active.tag_name).to eq "button"
     active.send_keys(:tab)
-    expect(active.tag_name).to eq 'div'
+    expect(active.tag_name).to eq "div"
     active.send_keys(:tab)
-    expect(active.tag_name).to eq 'select'
+    expect(active.tag_name).to eq "select"
   end
 
   it "captures shift-tabbing" do
-    skip_if_chrome('fragile')
+    skip_if_chrome("fragile")
     create_simple_modal
     active.click # sometimes the viewport doesn't have focus
-    expect(active.tag_name).to eq 'select'
+    expect(active.tag_name).to eq "select"
     shift_tab
-    expect(active.tag_name).to eq 'button'
+    expect(active.tag_name).to eq "button"
     shift_tab
-    expect(active.tag_name).to eq 'input'
+    expect(active.tag_name).to eq "input"
     shift_tab
-    expect(active.tag_name).to eq 'select'
+    expect(active.tag_name).to eq "select"
   end
 
   context "calendar widget" do
@@ -106,8 +106,8 @@ describe "jquery ui" do
       wait_for_ajaximations
 
       driver.execute_script("$('#ui-datepicker-time-hour').select();")
-      f("#ui-datepicker-time-hour").send_keys('5')
-      expect(f("#ui-datepicker-time-hour")).to have_attribute('value', '5')
+      f("#ui-datepicker-time-hour").send_keys("5")
+      expect(f("#ui-datepicker-time-hour")).to have_attribute("value", "5")
     end
   end
 
@@ -120,7 +120,7 @@ describe "jquery ui" do
     # see http://bugs.jqueryui.com/ticket/6016
     it "html-escapes inferred dialog titles" do
       title = "<b>this</b> is the title"
-      expect(driver.execute_script(<<-JS)).to eq title
+      expect(driver.execute_script(<<~JS)).to eq title
         return $('<div id="jqueryui_test" title="#{title}">hello</div>')
           .dialog()
           .parent('.ui-dialog')
@@ -130,7 +130,7 @@ describe "jquery ui" do
     end
 
     it "uses a non-breaking space for empty titles" do
-      expect(driver.execute_script(<<-JS)).to eq "\302\240"
+      expect(driver.execute_script(<<~JS)).to eq "\302\240"
         return $('<div id="jqueryui_test">hello</div>')
           .dialog()
           .parent('.ui-dialog')
@@ -138,7 +138,7 @@ describe "jquery ui" do
           .text();
       JS
 
-      expect(driver.execute_script(<<-JS)).to eq "\302\240"
+      expect(driver.execute_script(<<~JS)).to eq "\302\240"
         return $('#jqueryui_test')
           .dialog()
           .dialog('option', 'title', 'foo')
@@ -151,7 +151,7 @@ describe "jquery ui" do
 
     it "html-escapes explicit string dialog titles" do
       title = "<b>this</b> is the title"
-      expect(driver.execute_script(<<-JS)).to eq title
+      expect(driver.execute_script(<<~JS)).to eq title
         return $('<div id="jqueryui_test">hello again</div>')
           .dialog({title: #{title.inspect}})
           .parent('.ui-dialog')
@@ -160,7 +160,7 @@ describe "jquery ui" do
       JS
 
       new_title = "and now <i>this</i> is the title"
-      expect(driver.execute_script(<<-JS)).to eq new_title
+      expect(driver.execute_script(<<~JS)).to eq new_title
         return $('#jqueryui_test')
           .dialog()
           .dialog('option', 'title', #{new_title.inspect})
@@ -172,7 +172,7 @@ describe "jquery ui" do
 
     it "accepts jquery object dialog titles" do
       title = "<i>i want formatting <b>for realz</b></i>"
-      expect(driver.execute_script(<<-JS)).to eq title
+      expect(driver.execute_script(<<~JS)).to eq title
         return $('<div id="jqueryui_test">here we go</div>')
           .dialog({title: $(#{title.inspect})})
           .parent('.ui-dialog')
@@ -181,7 +181,7 @@ describe "jquery ui" do
       JS
 
       new_title = "<i>i <b>still</b> want formatting</i>"
-      expect(driver.execute_script(<<-JS)).to eq new_title
+      expect(driver.execute_script(<<~JS)).to eq new_title
         return $('#jqueryui_test')
           .dialog()
           .dialog('option', 'title', $(#{new_title.inspect}))
@@ -192,9 +192,9 @@ describe "jquery ui" do
     end
   end
 
-  context 'admin-links' do
+  context "admin-links" do
     before do
-      driver.execute_script(<<-JS)
+      driver.execute_script(<<~JS)
         $('<div class="al-selenium">\
             <a class="al-trigger btn" role="button" aria-haspopup="true" aria-owns="toolbar-1" href="#">\
               <i class="icon-settings"></i>\
@@ -211,15 +211,15 @@ describe "jquery ui" do
     end
 
     it "opens every time when pressing return" do
-      container = f('.al-selenium')
-      options = '.al-options:visible'
-      scroll_to(f('.footer-logo'))
+      container = f(".al-selenium")
+      options = ".al-options:visible"
+      scroll_to(f(".footer-logo"))
       expect(container).not_to contain_jqcss(options)
       active.send_keys(:return)
       expect(container).to contain_jqcss(options)
-      f('.icon-edit').click
+      f(".icon-edit").click
       expect(container).not_to contain_jqcss(options)
-      f('.al-selenium .al-trigger').send_keys(:return)
+      f(".al-selenium .al-trigger").send_keys(:return)
       expect(container).to contain_jqcss(options)
     end
   end

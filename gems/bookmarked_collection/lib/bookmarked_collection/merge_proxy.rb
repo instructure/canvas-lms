@@ -75,12 +75,12 @@ class BookmarkedCollection::MergeProxy < BookmarkedCollection::CompositeProxy
         last_item, last_leaf_bookmark = item, leaf_bookmark
       end
 
-      unless collection.empty?
-        # collection still has items, put the index back in the list with
-        # the bookmark of the next item, and keep it sorted
-        indexed_bookmarks << indexed_bookmark(collection, index)
-        indexed_bookmarks.sort!
-      end
+      next if collection.empty?
+
+      # collection still has items, put the index back in the list with
+      # the bookmark of the next item, and keep it sorted
+      indexed_bookmarks << indexed_bookmark(collection, index)
+      indexed_bookmarks.sort!
     end
 
     # we have a bookmark if any collection has more pages or, even if this is

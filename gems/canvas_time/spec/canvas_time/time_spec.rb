@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
+require_relative "../spec_helper"
 
 describe CanvasTime do
   around do |example|
@@ -36,10 +36,10 @@ describe CanvasTime do
     end
 
     it "works on a daylight savings boundary" do
-      Time.use_zone('Alaska') do
-        time = Time.zone.parse('2013-03-10T00:00:00')
+      Time.use_zone("Alaska") do
+        time = Time.zone.parse("2013-03-10T00:00:00")
         expect(CanvasTime.fancy_midnight(time).to_i)
-          .to eq(Time.zone.parse('2013-03-10T23:59:59').to_i)
+          .to eq(Time.zone.parse("2013-03-10T23:59:59").to_i)
       end
     end
 

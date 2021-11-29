@@ -39,7 +39,7 @@ import {Flex} from '@instructure/ui-flex'
 import {Highlight} from '../../components/Highlight/Highlight'
 import I18n from 'i18n!discussion_topics_post'
 import LoadingIndicator from '@canvas/loading-indicator'
-import {PER_PAGE, SearchContext} from '../../utils/constants'
+import {SearchContext} from '../../utils/constants'
 import {DiscussionEntryContainer} from '../DiscussionEntryContainer/DiscussionEntryContainer'
 import PropTypes from 'prop-types'
 import React, {useContext, useEffect, useState, useCallback} from 'react'
@@ -67,7 +67,7 @@ export const DiscussionThreadContainer = props => {
     const newDiscussionEntry = result.data.createDiscussionEntry.discussionEntry
     const variables = {
       discussionEntryID: newDiscussionEntry.parentId,
-      first: PER_PAGE,
+      first: ENV.per_page,
       sort,
       courseID: window.ENV?.course_id
     }
@@ -522,7 +522,7 @@ const DiscussionSubentries = props => {
   const {sort} = useContext(SearchContext)
   const variables = {
     discussionEntryID: props.discussionEntryId,
-    first: PER_PAGE,
+    first: ENV.per_page,
     sort,
     courseID: window.ENV?.course_id
   }

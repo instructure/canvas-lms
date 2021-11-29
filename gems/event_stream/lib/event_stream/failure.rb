@@ -27,11 +27,11 @@ class EventStream::Failure < ActiveRecord::Base
   def self.log!(operation, stream, record, exception)
     return if stream.raise_on_error
 
-    create!(:operation => operation.to_s,
-            :event_stream => stream.identifier,
-            :record_id => record.id.to_s,
-            :payload => stream.operation_payload(operation, record),
-            :exception => exception.message.to_s,
-            :backtrace => exception.backtrace)
+    create!(operation: operation.to_s,
+            event_stream: stream.identifier,
+            record_id: record.id.to_s,
+            payload: stream.operation_payload(operation, record),
+            exception: exception.message.to_s,
+            backtrace: exception.backtrace)
   end
 end

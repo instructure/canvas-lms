@@ -16,13 +16,13 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'spec_helper'
+require "spec_helper"
 require_relative "./shared_constants"
 require_relative "./shared_linter_examples"
 # pp required for to make fakefs happy, see:
 # github.com/fakefs/fakefs#fakefs-----typeerror-superclass-mismatch-for-class-file
-require 'pp'
-require 'fakefs/safe'
+require "pp"
+require "fakefs/safe"
 require "timecop"
 
 FIXTURE_BASE = File.expand_path("fixtures/copyright_linter/", __dir__)
@@ -85,7 +85,7 @@ describe TatlTael::Linters::CopyrightLinter do
       path = changes.first.path
       path_parts = path.split(".")
       type = path_parts.last
-      corrected_path = [path_parts.first, "--auto-corrected"].join("")
+      corrected_path = [path_parts.first, "--auto-corrected"].join
 
       # copy the corrected fixture into our fake fs
       real_path = fixture_path_for(type, corrected_path)
@@ -126,10 +126,10 @@ describe TatlTael::Linters::CopyrightLinter do
     # "invalid--some-variant-name.ext" where "some-variant-name" is why it's invalid
     # and "ext" is extension (e.g. coffee).
     Dir.chdir(FIXTURE_BASE) do
-      Dir.glob('*').each do |fixture_base_type| # e.g. "coffee"
+      Dir.glob("*").each do |fixture_base_type| # e.g. "coffee"
         Dir.chdir(fixture_base_type) do
           context fixture_base_type do # e.g. context "coffee" do
-            Dir.glob('*').each do |fixture_variant| # e.g. "invalid--missing.coffee"
+            Dir.glob("*").each do |fixture_variant| # e.g. "invalid--missing.coffee"
               fixture_variant_name = fixture_variant.split(".").first # e.g. "invalid--missing"
               next if fixture_variant_name.split("--").last == "auto-corrected"
 
@@ -140,7 +140,7 @@ describe TatlTael::Linters::CopyrightLinter do
                   # cache linter config so we don't have to clone it into the fake fs
                   TatlTael::Linters.config
                   FakeFS do
-                    FileUtils.mkdir_p('/tmp') # to make Tempfile happy
+                    FileUtils.mkdir_p("/tmp") # to make Tempfile happy
                     Timecop.freeze(Time.local(2017, 5, 5), &example)
                   end
                 end

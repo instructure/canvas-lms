@@ -19,16 +19,16 @@
 #
 
 describe BasicLTI::QuizzesNextSubmissionReverter do
+  subject { described_class.new(submission, launch_url, -1) }
+
   before do
-    course_model(workflow_state: 'available')
+    course_model(workflow_state: "available")
     @root_account = @course.root_account
-    @account = account_model(:root_account => @root_account, :parent_account => @root_account)
+    @account = account_model(root_account: @root_account, parent_account: @root_account)
     @course.update_attribute(:account, @account)
-    @user = factory_with_protected_attributes(User, :name => "some user", :workflow_state => "registered")
+    @user = factory_with_protected_attributes(User, name: "some user", workflow_state: "registered")
     @course.enroll_student(@user)
   end
-
-  subject { described_class.new(submission, launch_url, -1) }
 
   let(:assignment) do
     @course.assignments.create!(
@@ -37,24 +37,24 @@ describe BasicLTI::QuizzesNextSubmissionReverter do
         description: "value for description",
         due_at: Time.zone.now + 1000,
         points_possible: "1.5",
-        submission_types: 'external_tool',
+        submission_types: "external_tool",
         external_tool_tag_attributes: { url: tool.url }
       }
     )
   end
 
   let(:tool) do
-    @course.context_external_tools.create(name: "a", url: "http://google.com", consumer_key: '12345', shared_secret: 'secret', tool_id: "Quizzes 2")
+    @course.context_external_tools.create(name: "a", url: "http://google.com", consumer_key: "12345", shared_secret: "secret", tool_id: "Quizzes 2")
   end
 
   describe "#revert_attempt (without unsubmitted padding version)" do
     let(:submission_version_data) do
       time_now = Time.zone.now
       [
-        { score: 50, url: 'http://url1', submitted_at: time_now - 10.days },
-        { score: 25, url: 'http://url2', submitted_at: time_now - 8.days },
-        { score: 55, url: 'http://url1', submitted_at: time_now - 9.days },
-        { score: 75, url: 'http://url3', submitted_at: time_now - 3.days }
+        { score: 50, url: "http://url1", submitted_at: time_now - 10.days },
+        { score: 25, url: "http://url2", submitted_at: time_now - 8.days },
+        { score: 55, url: "http://url1", submitted_at: time_now - 9.days },
+        { score: 75, url: "http://url3", submitted_at: time_now - 3.days }
       ]
     end
 
@@ -66,14 +66,14 @@ describe BasicLTI::QuizzesNextSubmissionReverter do
         s.submitted_at = d[:submitted_at]
         s.grader_id = -1
         s.url = d[:url]
-        s.with_versioning(:explicit => true) { s.save! }
+        s.with_versioning(explicit: true) { s.save! }
       end
       s
     end
 
     context "without a submission" do
       let(:submission) { nil }
-      let(:launch_url) { 'http://url3' }
+      let(:launch_url) { "http://url3" }
 
       it "does nothing to revert" do
         expect(subject).not_to receive(:version_to_be_reverted)
@@ -93,7 +93,7 @@ describe BasicLTI::QuizzesNextSubmissionReverter do
     end
 
     context "when passed launch_url is not in submission history" do
-      let(:launch_url) { 'http://url4' }
+      let(:launch_url) { "http://url4" }
 
       it "does nothing to revert" do
         expect(subject).not_to receive(:version_to_be_reverted)
@@ -102,8 +102,8 @@ describe BasicLTI::QuizzesNextSubmissionReverter do
       end
     end
 
-    context 'when a submission has history versions' do
-      let(:launch_url) { 'http://url3' }
+    context "when a submission has history versions" do
+      let(:launch_url) { "http://url3" }
 
       it "creates a new version" do
         expect { subject.revert_attempt }.to change { submission.versions.count }.by(1)
@@ -130,33 +130,33 @@ describe BasicLTI::QuizzesNextSubmissionReverter do
       end
     end
 
-    context 'when it is a new submission with history from current attempt' do
+    context "when it is a new submission with history from current attempt" do
       let(:submission_version_data) do
         time_now = Time.zone.now
         [
-          { score: 75, url: 'http://url3', submitted_at: time_now - 3.days }
+          { score: 75, url: "http://url3", submitted_at: time_now - 3.days }
         ]
       end
 
-      let(:launch_url) { 'http://url3' }
+      let(:launch_url) { "http://url3" }
 
-      it 'has a nil score' do
+      it "has a nil score" do
         subject.revert_attempt
         expect(submission.score).to be_nil
       end
 
-      it 'reuses the last version (without creating a new version)' do
+      it "reuses the last version (without creating a new version)" do
         subject.revert_attempt
         expect(submission.versions.count).to be(1)
       end
     end
 
-    context 'when it is a new submission without history' do
+    context "when it is a new submission without history" do
       let(:submission_version_data) { [] }
 
-      let(:launch_url) { 'http://url3' }
+      let(:launch_url) { "http://url3" }
 
-      it 'has a nil score' do
+      it "has a nil score" do
         expect(submission.versions.count).to be(0)
         expect { subject.revert_attempt }.not_to change { submission.versions.count }
       end
@@ -167,28 +167,28 @@ describe BasicLTI::QuizzesNextSubmissionReverter do
     let(:submission_version_data) do
       time_now = Time.zone.now
       [
-        { score: 50, url: 'http://url1', submitted_at: time_now - 10.days },
-        { score: 55, url: 'http://url1', submitted_at: time_now - 9.days },
-        { score: 75, url: 'http://url1', submitted_at: time_now - 3.days }
+        { score: 50, url: "http://url1", submitted_at: time_now - 10.days },
+        { score: 55, url: "http://url1", submitted_at: time_now - 9.days },
+        { score: 75, url: "http://url1", submitted_at: time_now - 3.days }
       ]
     end
 
     let(:submission) do
       s = assignment.submissions.first || Submission.find_or_initialize_by(assignment: assignment, user: @user)
 
-      s.with_versioning(:explicit => true) { s.save! }
+      s.with_versioning(explicit: true) { s.save! }
       submission_version_data.each do |d|
         s.score = d[:score]
         s.submitted_at = d[:submitted_at]
         s.grader_id = -1
         s.url = d[:url]
-        s.with_versioning(:explicit => true) { s.save! }
+        s.with_versioning(explicit: true) { s.save! }
       end
       s
     end
 
-    context 'when a submission has history versions' do
-      let(:launch_url) { 'http://url1' }
+    context "when a submission has history versions" do
+      let(:launch_url) { "http://url1" }
 
       it "creates a new version" do
         expect { subject.revert_attempt }.to change { submission.versions.count }.by(1)

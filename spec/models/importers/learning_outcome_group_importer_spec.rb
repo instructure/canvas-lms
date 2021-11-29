@@ -18,13 +18,13 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../../import_helper'
+require_relative "../../import_helper"
 
 describe "Importing Learning Outcome Groups" do
   before :once do
     @context = course_model
-    @migration = ContentMigration.create!(:context => @context)
-    @migration.migration_ids_to_import = { :copy => {} }
+    @migration = ContentMigration.create!(context: @context)
+    @migration.migration_ids_to_import = { copy: {} }
     @migration.outcome_to_id_map = {}
   end
 
@@ -52,12 +52,12 @@ describe "Importing Learning Outcome Groups" do
     end.not_to change { @context.learning_outcome_groups.count }
   end
 
-  it 'imports outcome group contents if skip import enabled on group' do
+  it "imports outcome group contents if skip import enabled on group" do
     log_data = group_data(outcomes: [
                             outcome_data,
                             group_data(
                               outcomes: [
-                                outcome_data(migration_id: '73b696ec-957b-11ea-bb37-0242ac130002')
+                                outcome_data(migration_id: "73b696ec-957b-11ea-bb37-0242ac130002")
                               ]
                             )
                           ])
@@ -71,7 +71,7 @@ describe "Importing Learning Outcome Groups" do
     Importers::LearningOutcomeGroupImporter.import_from_migration(log_data, @migration)
     expect(@context.learning_outcome_groups.count).to eq 2
     existing_group = LearningOutcomeGroup.where(migration_id: "3c811a5d-7a39-401b-8db5-9ce5fbd2d556").first
-    existing_group.write_attribute('migration_id', "779f2c13-ea41-4804-8d2c-64d46e429210")
+    existing_group.write_attribute("migration_id", "779f2c13-ea41-4804-8d2c-64d46e429210")
     existing_group.save!
     log_data[:migration_id] = "779f2c13-ea41-4804-8d2c-64d46e429210"
     Importers::LearningOutcomeGroupImporter.import_from_migration(log_data, @migration)
@@ -81,20 +81,20 @@ describe "Importing Learning Outcome Groups" do
   it "does not generate a new outcome group when already exists a group with the same name in the same folder" do
     Importers::LearningOutcomeGroupImporter.import_from_migration(group_data, @migration)
     expect(@context.learning_outcome_groups.count).to eq 2
-    log_data = group_data(migration_id: 'other-migration-id')
-    expect {
+    log_data = group_data(migration_id: "other-migration-id")
+    expect do
       Importers::LearningOutcomeGroupImporter.import_from_migration(log_data, @migration)
-    }.to change(@context.learning_outcome_groups, :count).by(0)
+    end.to change(@context.learning_outcome_groups, :count).by(0)
   end
 
   it "generates a new outcome group when already exists a deleted group with the same name in the same folder" do
     Importers::LearningOutcomeGroupImporter.import_from_migration(group_data, @migration)
     expect(@context.learning_outcome_groups.count).to eq 2
     LearningOutcomeGroup.find_by(title: "Stuff").destroy
-    log_data = group_data(migration_id: 'other-migration-id')
-    expect {
+    log_data = group_data(migration_id: "other-migration-id")
+    expect do
       Importers::LearningOutcomeGroupImporter.import_from_migration(log_data, @migration)
-    }.to change(@context.learning_outcome_groups, :count).by(1)
+    end.to change(@context.learning_outcome_groups, :count).by(1)
   end
 
   it "does not duplicate an outcome group with the same vendor_guid when it already exists in the context" do
@@ -113,7 +113,7 @@ describe "Importing Learning Outcome Groups" do
     expect(@context.learning_outcome_groups.count).to eq 2
 
     # make a new group within the context and move the imported group into it
-    parent_group = LearningOutcomeGroup.create!(:title => "subgroup", context: @context, learning_outcome_group: course_root_group)
+    parent_group = LearningOutcomeGroup.create!(title: "subgroup", context: @context, learning_outcome_group: course_root_group)
     imported_group = LearningOutcomeGroup.find_by(migration_id: "3c811a5d-7a39-401b-8db5-9ce5fbd2d556")
     imported_group.update!(learning_outcome_group: parent_group)
 

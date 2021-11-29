@@ -21,15 +21,15 @@
 class ExternalIntegrationKey < ActiveRecord::Base
   belongs_to :context, polymorphic: [:account]
 
-  validates_presence_of :context_id, unless: -> { new_record? && context&.new_record? }
-  validates_presence_of :context_type
-  validates_presence_of :key_type
-  validates_presence_of :key_value
-  validates_inclusion_of :key_type, in: proc { self.key_types }
-  validates_uniqueness_of :key_type, scope: [:context_type, :context_id]
+  validates :context_id, presence: { unless: -> { new_record? && context&.new_record? } }
+  validates :context_type, presence: true
+  validates :key_type, presence: true
+  validates :key_value, presence: true
+  validates :key_type, inclusion: { in: proc { key_types } }
+  validates :key_type, uniqueness: { scope: [:context_type, :context_id] }
 
   def key_type
-    attributes['key_type'].try(:to_sym)
+    attributes["key_type"].try(:to_sym)
   end
 
   scope :of_type, ->(type) { where(key_type: type) }
@@ -47,10 +47,10 @@ class ExternalIntegrationKey < ActiveRecord::Base
   end
 
   set_policy do
-    given { |user| self.grants_right_for?(user, :read) }
+    given { |user| grants_right_for?(user, :read) }
     can :read
 
-    given { |user| self.grants_right_for?(user, :write) }
+    given { |user| grants_right_for?(user, :write) }
     can :write
   end
 

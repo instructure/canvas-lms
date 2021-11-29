@@ -27,15 +27,15 @@ describe CanvadocSessionsController do
     course_with_teacher(active_all: true)
     student_in_course(active_all: true)
 
-    @attachment1 = attachment_model :content_type => 'application/pdf',
-                                    :context => @student
+    @attachment1 = attachment_model content_type: "application/pdf",
+                                    context: @student
   end
 
   before do
-    PluginSetting.create! :name => 'canvadocs',
-                          :settings => { "base_url" => "https://example.com" }
+    PluginSetting.create! name: "canvadocs",
+                          settings: { "base_url" => "https://example.com" }
     allow_any_instance_of(Canvadocs::API).to receive(:upload).and_return "id" => 1234
-    allow_any_instance_of(Canvadocs::API).to receive(:session).and_return 'id' => 'SESSION'
+    allow_any_instance_of(Canvadocs::API).to receive(:session).and_return "id" => "SESSION"
     user_session(@teacher)
   end
 
@@ -118,6 +118,14 @@ describe CanvadocSessionsController do
       end
     end
 
+    it "renders OK response if the user observes the submission" do
+      observer = course_with_observer(course: @course, associated_user_id: @student.id, active_all: true).user
+      user_session(observer)
+
+      post :create, params: params
+      expect(response).to have_http_status(:ok)
+    end
+
     it "contains a canvadocs_session_url in the response" do
       post :create, params: params
       expect(json_parse(response.body)["canvadocs_session_url"]).not_to be_nil
@@ -142,9 +150,9 @@ describe CanvadocSessionsController do
 
     it "successfully signed the blob" do
       post :create, params: params
-      expect {
+      expect do
         extract_blob(canvadocs_session_url_params["hmac"], canvadocs_session_url_params["blob"])
-      }.not_to raise_error
+      end.not_to raise_error
     end
 
     it "creates a CanvadocsAnnotationContext when one does not exist" do
@@ -153,9 +161,9 @@ describe CanvadocSessionsController do
 
       user_session(new_student)
 
-      expect {
+      expect do
         post :create, params: { submission_attempt: "draft", submission_id: new_submission.id }
-      }.to change {
+      end.to change {
         new_submission.canvadocs_annotation_contexts.where(attachment: @attachment, submission_attempt: nil).count
       }.by(1)
     end
@@ -188,14 +196,22 @@ describe CanvadocSessionsController do
         post :create, params: params
         expect(blob["disable_annotation_notifications"]).to be true
       end
+
+      it "disables annotations when observing draft" do
+        observer = course_with_observer(course: @course, associated_user_id: @student.id, active_all: true).user
+        user_session(observer)
+
+        post :create, params: params
+        expect(blob["enable_annotations"]).to be false
+      end
     end
   end
 
-  describe '#show' do
+  describe "#show" do
     before(:once) do
       @assignment = assignment_model(course: @course)
       @submission = submission_model(assignment: @assignment, user: @student)
-      @attachment = attachment_model(content_type: 'application/pdf', user: @student)
+      @attachment = attachment_model(content_type: "application/pdf", user: @student)
       @attachment.associate_with(@submission)
       Canvadoc.create!(attachment: @attachment)
     end
@@ -223,8 +239,8 @@ describe CanvadocSessionsController do
     it "needs a valid signed blob" do
       hmac = Canvas::Security.hmac_sha1(@blob.to_json)
 
-      attachment2 = attachment_model :content_type => 'application/pdf',
-                                     :context => @course
+      attachment2 = attachment_model content_type: "application/pdf",
+                                     context: @course
       @blob[:attachment_id] = attachment2.id
 
       get :show, params: { blob: @blob.to_json, hmac: hmac }
@@ -287,20 +303,20 @@ describe CanvadocSessionsController do
     end
 
     it "contains multiple submission_user_ids when group assignment" do
-      group = @course.groups.create(:name => "some group")
+      group = @course.groups.create(name: "some group")
       student2 = User.create
-      group.add_user(@student, 'accepted', true)
-      group.add_user(student2, 'accepted', true)
+      group.add_user(@student, "accepted", true)
+      group.add_user(student2, "accepted", true)
       group_assignment = assignment_model(course: @course, assignment_group: @group)
       group_submission = submission_model(assignment: group_assignment, user: @student)
-      group_attachment = attachment_model(content_type: 'application/pdf', user: @student)
+      group_attachment = attachment_model(content_type: "application/pdf", user: @student)
       group_attachment.associate_with(group_submission)
       Canvadoc.create!(attachment: group_attachment)
 
       allow(Attachment).to receive(:find).and_return(group_attachment)
       expect(group_attachment).to receive(:submit_to_canvadocs) do |arg1, arg2|
         expect(arg1).to eq 1
-        expect(arg2[:submission_user_ids].length()).to eq 2
+        expect(arg2[:submission_user_ids].length).to eq 2
         expect(arg2[:submission_user_ids]).to match_array [@student.id, student2.id]
       end
 
@@ -446,7 +462,7 @@ describe CanvadocSessionsController do
 
     it "updates attachment.viewed_at if the owner (person in the user attribute of the attachment) views" do
       assignment = @course.assignments.create!(assignment_valid_attributes)
-      attachment = attachment_model content_type: 'application/pdf', context: assignment, user: @student
+      attachment = attachment_model content_type: "application/pdf", context: assignment, user: @student
       blob = { attachment_id: attachment.global_id,
                user_id: @student.global_id,
                type: "canvadoc" }.to_json
@@ -474,7 +490,7 @@ describe CanvadocSessionsController do
       before(:once) do
         @assignment = assignment_model(course: @course)
         @submission = submission_model(assignment: @assignment, user: @student)
-        @attachment = attachment_model(content_type: 'application/pdf', user: @student)
+        @attachment = attachment_model(content_type: "application/pdf", user: @student)
         @attachment.associate_with(@submission)
         Canvadoc.create!(attachment: @attachment)
       end
@@ -490,7 +506,7 @@ describe CanvadocSessionsController do
           user_id: @student.global_id,
           type: "canvadoc",
           enable_annotations: true,
-          enrollment_type: 'student',
+          enrollment_type: "student",
           submission_id: @submission.id
         }
       end

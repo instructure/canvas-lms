@@ -17,14 +17,14 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../common'
-require_relative '../helpers/quizzes_common'
+require_relative "../common"
+require_relative "../helpers/quizzes_common"
 
-describe 'taking a timed quiz without auto-submit' do
+describe "taking a timed quiz without auto-submit" do
   include_context "in-process server selenium tests"
   include QuizzesCommon
 
-  context 'as a teacher' do
+  context "as a teacher" do
     before do
       Account.site_admin.allow_feature! :timer_without_autosubmission
       Account.default.enable_feature! :timer_without_autosubmission
@@ -38,7 +38,7 @@ describe 'taking a timed quiz without auto-submit' do
       @quiz.disable_timer_autosubmission = true
       @quiz.save!
       get "/courses/#{@course.id}/quizzes/#{@quiz.id}/edit"
-      expect(f('#quiz_disable_timer_autosubmission')).to be
+      expect(f("#quiz_disable_timer_autosubmission")).to be
     end
   end
 end

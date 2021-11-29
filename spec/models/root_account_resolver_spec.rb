@@ -32,15 +32,14 @@ describe RootAccountResolver do
       end
 
       def attributes
-        { 'root_account_id' => root_account_id }
+        { "root_account_id" => root_account_id }
       end
 
       def has_attribute?(key)
         attributes.key?(key)
       end
 
-      def self.belongs_to(relation, **opts)
-      end
+      def self.belongs_to(relation, **opts); end
     end
   end
   let(:test_class) do
@@ -62,22 +61,22 @@ describe RootAccountResolver do
       test_class.resolves_root_account through: :knower_of_account_1337
     end
 
-    it 'assigns it on save if it is not set' do
+    it "assigns it on save if it is not set" do
       subject = test_class.new(nil)
 
-      expect {
+      expect do
         subject.save
-      }.to change {
+      end.to change {
         subject.root_account_id
       }.from(nil).to(1337)
     end
 
-    it 'preserves it on save if it was already set' do
+    it "preserves it on save if it was already set" do
       subject = test_class.new(666)
 
-      expect {
+      expect do
         subject.save
-      }.not_to change {
+      end.not_to change {
         subject.root_account_id
       }
     end
@@ -88,22 +87,22 @@ describe RootAccountResolver do
       test_class.resolves_root_account through: proc { 9000 }
     end
 
-    it 'assigns it on save if it is not set' do
+    it "assigns it on save if it is not set" do
       subject = test_class.new(nil)
 
-      expect {
+      expect do
         subject.save
-      }.to change {
+      end.to change {
         subject.root_account_id
       }.from(nil).to(9000)
     end
 
-    it 'preserves it on save if it was already set' do
+    it "preserves it on save if it was already set" do
       subject = test_class.new(666)
 
-      expect {
+      expect do
         subject.save
-      }.not_to change {
+      end.not_to change {
         subject.root_account_id
       }
     end

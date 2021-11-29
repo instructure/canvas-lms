@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../../views_helper'
+require_relative "../../views_helper"
 
 describe "/quizzes/quizzes/_single_answer" do
   it "renders" do
@@ -29,7 +29,7 @@ describe "/quizzes/quizzes/_single_answer" do
     answer.id = 5
     answer.weight = 100
     question_type = OpenObject.new
-    render :partial => "quizzes/quizzes/single_answer", :object => answer, :locals => { :question_type => question_type, :user_answer => nil }
+    render partial: "quizzes/quizzes/single_answer", object: answer, locals: { question_type: question_type, user_answer: nil }
     expect(response).not_to be_nil
   end
 end

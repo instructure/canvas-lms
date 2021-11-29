@@ -40,7 +40,7 @@ module SubmittableHelper
     if assignment_params
       if assignment_params.key?(:set_assignment) &&
          !value_to_boolean(assignment_params[:set_assignment])
-        if submittable.assignment && submittable.assignment.grants_right?(@current_user, session, :update)
+        if submittable.assignment&.grants_right?(@current_user, session, :update)
           assignment = submittable.assignment
           submittable.assignment = nil
           submittable.save!
@@ -62,7 +62,7 @@ module SubmittableHelper
         submittable.sync_assignment
         submittable.save_without_broadcasting!
 
-        assignment_params.delete('anonymous_peer_reviews')
+        assignment_params.delete("anonymous_peer_reviews")
         update_api_assignment(@assignment.reload, assignment_params, @current_user, @context)
 
         submittable.save!

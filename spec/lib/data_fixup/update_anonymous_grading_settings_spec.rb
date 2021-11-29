@@ -21,7 +21,7 @@ describe DataFixup::UpdateAnonymousGradingSettings do
   before(:once) do
     account_model
     course_factory(account: @account, active_all: true)
-    assignment_model(course: @course, workflow_state: 'published', anonymous_grading: false)
+    assignment_model(course: @course, workflow_state: "published", anonymous_grading: false)
   end
 
   def run_for_course(course: @course)
@@ -36,7 +36,7 @@ describe DataFixup::UpdateAnonymousGradingSettings do
     DataFixup::UpdateAnonymousGradingSettings.destroy_allowed_and_off_flags
   end
 
-  def set_anonymous_grading_flag(course_or_account:, state: 'on')
+  def set_anonymous_grading_flag(course_or_account:, state: "on")
     # Manually build the old flag for testing because this patchset also
     # removes the definition of the flag.
     anonymous_grading_flag = course_or_account.feature_flags.where(feature: :anonymous_grading).first_or_initialize
@@ -44,35 +44,35 @@ describe DataFixup::UpdateAnonymousGradingSettings do
     anonymous_grading_flag.save!(validate: false)
   end
 
-  describe 'UpdateAnonymousGradingSettings::run_for_accounts_in_range' do
-    context 'for an account with anonymous_grading enabled' do
+  describe "UpdateAnonymousGradingSettings::run_for_accounts_in_range" do
+    context "for an account with anonymous_grading enabled" do
       before do
         set_anonymous_grading_flag(course_or_account: @account)
       end
 
-      it 'removes the flag on the account' do
+      it "removes the flag on the account" do
         run_for_account
         expect(@course.feature_flag(:anonymous_grading)).to be nil
       end
 
-      it 'enables the anonymous_marking flag on the account' do
+      it "enables the anonymous_marking flag on the account" do
         run_for_account
         expect(@course).to be_feature_enabled(:anonymous_marking)
       end
 
-      it 'enables anonymous grading for assignments in courses belonging to the account' do
+      it "enables anonymous grading for assignments in courses belonging to the account" do
         run_for_account
         @assignment.reload
         expect(@assignment).to be_anonymous_grading
       end
 
-      it 'enables anonymous grading for assignments in courses in sub-accounts' do
+      it "enables anonymous grading for assignments in courses in sub-accounts" do
         subaccount = Account.create!(parent_account: @account)
-        subaccount_course = Course.create!(account: subaccount, workflow_state: 'available')
+        subaccount_course = Course.create!(account: subaccount, workflow_state: "available")
         assignment = subaccount_course.assignments.create!(
           anonymous_grading: false,
-          title: 'hi :)',
-          workflow_state: 'published'
+          title: "hi :)",
+          workflow_state: "published"
         )
 
         run_for_account
@@ -82,36 +82,36 @@ describe DataFixup::UpdateAnonymousGradingSettings do
       end
     end
 
-    it 'does nothing for an account with anonymous_grading set to allowed' do
-      set_anonymous_grading_flag(course_or_account: @account, state: 'allowed')
+    it "does nothing for an account with anonymous_grading set to allowed" do
+      set_anonymous_grading_flag(course_or_account: @account, state: "allowed")
       run_for_account
       expect(@account.feature_flag(:anonymous_grading)).to be_can_override
     end
 
-    it 'does nothing for an account with anonymous_grading disabled' do
-      set_anonymous_grading_flag(course_or_account: @account, state: 'off')
+    it "does nothing for an account with anonymous_grading disabled" do
+      set_anonymous_grading_flag(course_or_account: @account, state: "off")
       run_for_account
       expect(@account.feature_flag(:anonymous_grading)).not_to be_enabled
     end
   end
 
-  describe 'UpdateAnonymousGradingSettings::run_for_courses_in_range' do
-    context 'for a course with anonymous_grading enabled' do
+  describe "UpdateAnonymousGradingSettings::run_for_courses_in_range" do
+    context "for a course with anonymous_grading enabled" do
       before do
-        set_anonymous_grading_flag(course_or_account: @course, state: 'on')
+        set_anonymous_grading_flag(course_or_account: @course, state: "on")
       end
 
-      it 'removes the flag on the course' do
+      it "removes the flag on the course" do
         run_for_course
         expect(@course.feature_flag(:anonymous_grading)).to be nil
       end
 
-      it 'enables the anonymous_marking flag on the course' do
+      it "enables the anonymous_marking flag on the course" do
         run_for_course
         expect(@course).to be_feature_enabled(:anonymous_marking)
       end
 
-      it 'enables anonymous grading for assignments in the course' do
+      it "enables anonymous grading for assignments in the course" do
         @assignment.update!(anonymous_grading: false)
         run_for_course
         @assignment.reload
@@ -119,28 +119,28 @@ describe DataFixup::UpdateAnonymousGradingSettings do
       end
     end
 
-    it 'does nothing for a course with anonymous_grading disabled' do
-      set_anonymous_grading_flag(course_or_account: @course, state: 'off')
+    it "does nothing for a course with anonymous_grading disabled" do
+      set_anonymous_grading_flag(course_or_account: @course, state: "off")
       run_for_course
-      expect(@course.feature_flag(:anonymous_grading).state).to eq 'off'
+      expect(@course.feature_flag(:anonymous_grading).state).to eq "off"
     end
   end
 
-  describe 'UpdateAnonymousGradingSettings::destroy_allowed_and_off_flags' do
-    it 'removes the anonymous_grading feature flag for an account with the flag set to allowed' do
-      set_anonymous_grading_flag(course_or_account: @account, state: 'allowed')
+  describe "UpdateAnonymousGradingSettings::destroy_allowed_and_off_flags" do
+    it "removes the anonymous_grading feature flag for an account with the flag set to allowed" do
+      set_anonymous_grading_flag(course_or_account: @account, state: "allowed")
       destroy_allowed_and_off_flags
       expect(@account.feature_flag(:anonymous_grading)).to be nil
     end
 
-    it 'removes the anonymous_grading feature flag for an account with the flag set to off' do
-      set_anonymous_grading_flag(course_or_account: @account, state: 'off')
+    it "removes the anonymous_grading feature flag for an account with the flag set to off" do
+      set_anonymous_grading_flag(course_or_account: @account, state: "off")
       destroy_allowed_and_off_flags
       expect(@account.feature_flag(:anonymous_grading)).to be nil
     end
 
-    it 'ignores the anonymous_grading feature flag for an account with the flag set to on' do
-      set_anonymous_grading_flag(course_or_account: @account, state: 'on')
+    it "ignores the anonymous_grading feature flag for an account with the flag set to on" do
+      set_anonymous_grading_flag(course_or_account: @account, state: "on")
       destroy_allowed_and_off_flags
       expect(@account.feature_flag(:anonymous_grading)).to be_enabled
     end

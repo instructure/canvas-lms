@@ -19,7 +19,7 @@
 
 describe Quizzes::QuizQuestion::UnknownQuestion do
   let(:question_data) do
-    { :id => 1 }
+    { id: 1 }
   end
 
   let(:question) do

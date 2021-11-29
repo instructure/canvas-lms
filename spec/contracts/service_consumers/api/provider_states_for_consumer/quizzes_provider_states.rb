@@ -19,18 +19,18 @@
 
 PactConfig::Consumers::ALL.each do |consumer|
   Pact.provider_states_for consumer do
-    provider_state 'a quiz' do
+    provider_state "a quiz" do
       set_up do
         course = Pact::Canvas.base_state.course
         quiz_model(course: course)
       end
     end
 
-    provider_state 'a migrated quiz' do
+    provider_state "a migrated quiz" do
       set_up do
         course = Pact::Canvas.base_state.course
         quiz = quiz_model(course: course)
-        quiz.migration_id = 'i09d7615b43e5f35589cc1e2647dd345f'
+        quiz.migration_id = "i09d7615b43e5f35589cc1e2647dd345f"
         quiz.save!
       end
     end
@@ -39,15 +39,15 @@ PactConfig::Consumers::ALL.each do |consumer|
     # Course ID: 3
     # Quiz ID: 1
     # Quiz submission ID: 1
-    provider_state 'mobile course with quiz' do
+    provider_state "mobile course with quiz" do
       set_up do
         # Access our mobile course and student
         mcourse = Pact::Canvas.base_state.mobile_courses[1]
         mstudent = Pact::Canvas.base_state.mobile_student
 
         # create a quiz with three different types of questions
-        quiz = quiz_model(course: mcourse, title: 'mobile quiz', description: 'a quiz for mobile tests', due_at: 1.week.from_now)
-        quiz.workflow_state = 'available'
+        quiz = quiz_model(course: mcourse, title: "mobile quiz", description: "a quiz for mobile tests", due_at: 1.week.from_now)
+        quiz.workflow_state = "available"
         quiz.quiz_questions.create!({ question_data: MobileQuizQuestionData.mobile_multiple_choice_question_data })
         quiz.quiz_questions.create!({ question_data: MobileQuizQuestionData.mobile_true_false_question_data })
         quiz.quiz_questions.create!({ question_data: MobileQuizQuestionData.mobile_matching_question_data })
@@ -59,10 +59,10 @@ PactConfig::Consumers::ALL.each do |consumer|
         quiz.show_correct_answers_at = 1.day.ago
         quiz.hide_correct_answers_at = 2.days.from_now
         quiz.points_possible = 145
-        quiz.ip_filter = '192.168.1.10'
+        quiz.ip_filter = "192.168.1.10"
         quiz.unlock_at = 2.hours.from_now
         quiz.lock_at = 8.days.from_now
-        quiz.access_code = 'abcd'
+        quiz.access_code = "abcd"
         quiz.require_lockdown_browser_for_results = false
         quiz.require_lockdown_browser = false
         quiz.only_visible_to_overrides = false
@@ -79,13 +79,13 @@ PactConfig::Consumers::ALL.each do |consumer|
         qsub.started_at = 10.minutes.ago
         qsub.attempt = 1
         qsub.submission_data = [
-          { points: 50, text: 'c', question_id: 1, correct: true, answer_id: 1658 },
-          { points: 45, text: 'True', question_id: 2, correct: false, answer_id: 8403 },
-          { points: 50, text: '', question_id: 3, correct: true, answer_7396: "6061", answer_6081: "3855" }
+          { points: 50, text: "c", question_id: 1, correct: true, answer_id: 1658 },
+          { points: 45, text: "True", question_id: 2, correct: false, answer_id: 8403 },
+          { points: 50, text: "", question_id: 3, correct: true, answer_7396: "6061", answer_6081: "3855" }
         ]
         qsub.score = 100
         qsub.finished_at = 5.minutes.ago
-        qsub.workflow_state = 'complete'
+        qsub.workflow_state = "complete"
         qsub.end_at = 1.day.from_now
         qsub.extra_attempts = 0
         qsub.extra_time = 0
@@ -96,7 +96,7 @@ PactConfig::Consumers::ALL.each do |consumer|
         # Don't know exactly why this is necessary
         qsub.submission = quiz.assignment.find_or_create_submission(mstudent.id)
         qsub.submission.quiz_submission = qsub
-        qsub.submission.submission_type = 'online_quiz'
+        qsub.submission.submission_type = "online_quiz"
         qsub.submission.submitted_at = qsub.finished_at
 
         qsub.with_versioning(true) do
@@ -137,7 +137,7 @@ module MobileQuizQuestionData
       "name" => "Question",
       "correct_comments" => "",
       "question_type" => "true_false_question",
-      "assessment_question_id" => 8197062,
+      "assessment_question_id" => 8_197_062,
       "neutral_comments" => "",
       "incorrect_comments" => "",
       "question_name" => "Question",

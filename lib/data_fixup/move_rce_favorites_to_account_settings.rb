@@ -22,10 +22,10 @@ module DataFixup::MoveRceFavoritesToAccountSettings
     Account.root_accounts.non_shadow.to_a.each do |root_account|
       next if root_account.settings[:rce_favorite_tool_ids]
 
-      tool_ids = root_account.context_external_tools.active.where(:is_rce_favorite => true).pluck(:id).map { |id| Shard.global_id_for(id) }
+      tool_ids = root_account.context_external_tools.active.where(is_rce_favorite: true).pluck(:id).map { |id| Shard.global_id_for(id) }
       next unless tool_ids.any?
 
-      root_account.settings[:rce_favorite_tool_ids] = { :value => tool_ids }
+      root_account.settings[:rce_favorite_tool_ids] = { value: tool_ids }
       root_account.save!
     end
   end

@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'authlogic/crypto_providers/bcrypt'
+require "authlogic/crypto_providers/bcrypt"
 
 # A SessionPersistenceToken is a one-time-use "remember me" token to maintain a
 # user's login across browser sessions. It has an expiry, and it's destroyed
@@ -43,20 +43,20 @@ class SessionPersistenceToken < ActiveRecord::Base
 
   attr_accessor :uncrypted_token
 
-  validates_presence_of :pseudonym_id, :crypted_token, :token_salt
+  validates :pseudonym_id, :crypted_token, :token_salt, presence: true
 
   def self.generate(pseudonym)
     salt = SecureRandom.hex(8)
     token = SecureRandom.hex(32)
     pseudonym.session_persistence_tokens.create!(
-      :token_salt => salt,
-      :uncrypted_token => token,
-      :crypted_token => self.hashed_token(salt, token)
+      token_salt: salt,
+      uncrypted_token: token,
+      crypted_token: hashed_token(salt, token)
     )
   end
 
   def self.hashed_token(salt, token)
-    self.crypto.encrypt(salt, token)
+    crypto.encrypt(salt, token)
   end
 
   def self.crypto
@@ -67,23 +67,23 @@ class SessionPersistenceToken < ActiveRecord::Base
     token_id, persistence_token, uuid = creds.split("::")
     return unless token_id.present? && persistence_token.present? && uuid.present?
 
-    token = self.where(id: token_id).first
+    token = where(id: token_id).first
     return unless token
     return unless token.valid_token?(persistence_token, uuid)
 
-    return token
+    token
   end
 
   def self.delete_expired(since)
-    where('updated_at < ?', since.seconds.ago).delete_all
+    where("updated_at < ?", since.seconds.ago).delete_all
   end
 
   def valid_token?(persistence_token, uncrypted_token)
     # if the pseudonym is marked deleted, the token can still be marked as
     # valid, but the actual login step will fail as expected.
-    self.pseudonym &&
-      self.pseudonym.persistence_token == persistence_token &&
-      self.class.crypto.matches?(self.crypted_token, self.token_salt, uncrypted_token)
+    pseudonym &&
+      pseudonym.persistence_token == persistence_token &&
+      self.class.crypto.matches?(crypted_token, token_salt, uncrypted_token)
   end
 
   def pseudonym_credentials
@@ -94,6 +94,6 @@ class SessionPersistenceToken < ActiveRecord::Base
 
   def use!
     destroy
-    return pseudonym
+    pseudonym
   end
 end

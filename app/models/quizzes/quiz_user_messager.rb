@@ -70,10 +70,10 @@ module Quizzes
     end
 
     def recipients
-      list = conversation.fetch(:recipients, 'all')
+      list = conversation.fetch(:recipients, "all")
       recipients = case list.to_s
-                   when 'unsubmitted' then unsubmitted_students
-                   when 'submitted' then submitted_students
+                   when "unsubmitted" then unsubmitted_students
+                   when "submitted" then submitted_students
                    else all_students
                    end
       sender.address_book.known_users(recipients)

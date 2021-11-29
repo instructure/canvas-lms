@@ -17,14 +17,14 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-require_relative '../../api_spec_helper'
+require_relative "../../api_spec_helper"
 
 describe Quizzes::QuizExtensionsController, type: :request do
   before :once do
     course_factory
-    @quiz = @course.quizzes.create!(:title => 'quiz')
+    @quiz = @course.quizzes.create!(title: "quiz")
     @quiz.published_at = Time.now
-    @quiz.workflow_state = 'available'
+    @quiz.workflow_state = "available"
     @quiz.save!
     @student = student_in_course(course: @course, active_all: true).user
   end
@@ -32,10 +32,10 @@ describe Quizzes::QuizExtensionsController, type: :request do
   describe "POST /api/v1/courses/:course_id/quizzes/:quiz_id/extensions (create)" do
     def api_create_quiz_extension(quiz_extension_params, opts = {})
       api_call(:post, "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/extensions",
-               { :controller => "quizzes/quiz_extensions", :action => "create", :format => "json",
-                 :course_id => @course.id.to_s, :quiz_id => @quiz.id.to_s },
-               { :quiz_extensions => quiz_extension_params },
-               { 'Accept' => 'application/vnd.api+json' }, opts)
+               { controller: "quizzes/quiz_extensions", action: "create", format: "json",
+                 course_id: @course.id.to_s, quiz_id: @quiz.id.to_s },
+               { quiz_extensions: quiz_extension_params },
+               { "Accept" => "application/vnd.api+json" }, opts)
     end
 
     context "as a student" do
@@ -44,10 +44,10 @@ describe Quizzes::QuizExtensionsController, type: :request do
           { user_id: @student.id, extra_attempts: 2 },
         ]
         raw_api_call(:post, "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/extensions",
-                     { :controller => "quizzes/quiz_extensions", :action => "create", :format => "json",
-                       :course_id => @course.id.to_s, :quiz_id => @quiz.id.to_s },
-                     { :quiz_extensions => quiz_extension_params },
-                     { 'Accept' => 'application/vnd.api+json' })
+                     { controller: "quizzes/quiz_extensions", action: "create", format: "json",
+                       course_id: @course.id.to_s, quiz_id: @quiz.id.to_s },
+                     { quiz_extensions: quiz_extension_params },
+                     { "Accept" => "application/vnd.api+json" })
         assert_status(403)
       end
     end
@@ -67,7 +67,7 @@ describe Quizzes::QuizExtensionsController, type: :request do
           { user_id: @student1.id, extra_attempts: 2 }
         ]
         res = api_create_quiz_extension(quiz_extension_params)
-        expect(res['quiz_extensions'][0]['extra_attempts']).to eq 2
+        expect(res["quiz_extensions"][0]["extra_attempts"]).to eq 2
       end
 
       it "extends attempts for a new submission" do
@@ -75,7 +75,7 @@ describe Quizzes::QuizExtensionsController, type: :request do
           { user_id: @student1.id, extra_attempts: 2 }
         ]
         res = api_create_quiz_extension(quiz_extension_params)
-        expect(res['quiz_extensions'][0]['extra_attempts']).to eq 2
+        expect(res["quiz_extensions"][0]["extra_attempts"]).to eq 2
       end
 
       it "extends attempts for multiple students" do
@@ -84,8 +84,8 @@ describe Quizzes::QuizExtensionsController, type: :request do
           { user_id: @student2.id, extra_attempts: 3 }
         ]
         res = api_create_quiz_extension(quiz_extension_params)
-        expect(res['quiz_extensions'][0]['extra_attempts']).to eq 2
-        expect(res['quiz_extensions'][1]['extra_attempts']).to eq 3
+        expect(res["quiz_extensions"][0]["extra_attempts"]).to eq 2
+        expect(res["quiz_extensions"][1]["extra_attempts"]).to eq 3
       end
     end
   end

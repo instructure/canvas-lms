@@ -26,9 +26,9 @@ module Api::V1::AccountNotifications
   end
 
   def account_notification_json(account_notification, user, session)
-    json = api_json(account_notification, user, session, :only => %w(id subject start_at end_at icon message))
-    json['role_ids'] = account_notification.account_notification_roles.map(&:role_id)
-    json['roles'] = account_notification.account_notification_roles.map(&:role_name)
+    json = api_json(account_notification, user, session, only: %w[id subject start_at end_at icon message])
+    json["role_ids"] = account_notification.account_notification_roles.map(&:role_id)
+    json["roles"] = account_notification.account_notification_roles.map(&:role_name)
     json
   end
 end

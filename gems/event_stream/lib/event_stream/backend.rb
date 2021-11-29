@@ -17,9 +17,9 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-require 'event_stream/backend/strategy'
-require 'event_stream/backend/cassandra'
-require 'event_stream/backend/active_record'
+require "event_stream/backend/strategy"
+require "event_stream/backend/cassandra"
+require "event_stream/backend/active_record"
 
 module EventStream
   module Backend

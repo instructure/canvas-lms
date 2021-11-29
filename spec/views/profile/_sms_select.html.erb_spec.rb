@@ -18,17 +18,17 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../views_helper'
+require_relative "../views_helper"
 
 describe "/profile/_sms_select" do
   it "renders" do
     course_with_student
     view_context
-    cc = communication_channel(@user, { username: 'user@example.com' })
+    cc = communication_channel(@user, { username: "user@example.com" })
     assign(:other_channels, [cc])
     assign(:sms_channels, [])
 
-    render :partial => "profile/sms_select", :object => cc
+    render partial: "profile/sms_select", object: cc
     expect(response).not_to be_nil
   end
 end

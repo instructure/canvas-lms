@@ -17,22 +17,22 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_dependency 'importers'
+require_dependency "importers"
 
 module Importers
   class PacePlanImporter < Importer
     self.item_class = PacePlan
 
     def self.process_migration(data, migration)
-      pace_plans = data['pace_plans'] || []
+      pace_plans = data["pace_plans"] || []
       pace_plans.each do |pace_plan|
-        self.import_from_migration(pace_plan, migration.context, migration)
+        import_from_migration(pace_plan, migration.context, migration)
       end
     end
 
     def self.import_from_migration(hash, context, migration)
       hash = hash.with_indifferent_access
-      return unless migration.import_object?('pace_plans', hash[:migration_id])
+      return unless migration.import_object?("pace_plans", hash[:migration_id])
 
       pace_plan = context.pace_plans.primary.where(workflow_state: hash[:workflow_state]).take
       pace_plan ||= context.pace_plans.create
@@ -51,11 +51,11 @@ module Importers
 
       hash[:module_items].each do |pp_module_item|
         module_item_id = module_items_by_migration_id[pp_module_item[:module_item_migration_id]]&.id
-        if module_item_id
-          pace_plan_module_item = pace_plan.pace_plan_module_items.find_or_create_by(module_item_id: module_item_id)
-          pace_plan_module_item.duration = pp_module_item[:duration]
-          pace_plan_module_item.save!
-        end
+        next unless module_item_id
+
+        pace_plan_module_item = pace_plan.pace_plan_module_items.find_or_create_by(module_item_id: module_item_id)
+        pace_plan_module_item.duration = pp_module_item[:duration]
+        pace_plan_module_item.save!
       end
     end
   end

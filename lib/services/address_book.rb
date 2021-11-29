@@ -109,12 +109,12 @@ module Services
     def self.count_recipients(params)
       return {} if params[:contexts].blank?
 
-      fetch("/recipients/counts", query_params(params))['counts'] || {}
+      fetch("/recipients/counts", query_params(params))["counts"] || {}
     end
 
     def self.jwt # public only for testing, should not be used directly
       Canvas::Security.create_jwt({ iat: Time.now.to_i }, nil, jwt_secret, :HS512)
-    rescue StandardError => e
+    rescue => e
       Canvas::Errors.capture_exception(:address_book, e)
       nil
     end
@@ -137,18 +137,20 @@ module Services
       # generic retrieve, parse
       def fetch(path, params = {})
         url = app_host + path
-        url += '?' + params.to_query unless params.empty?
+        url += "?" + params.to_query unless params.empty?
         fallback = { "records" => [] }
-        timeout_service_name = params[:ignore_result] == 1 ?
-          "address_book_performance_tap" :
-          "address_book"
+        timeout_service_name = if params[:ignore_result] == 1
+                                 "address_book_performance_tap"
+                               else
+                                 "address_book"
+                               end
         Canvas.timeout_protection(timeout_service_name) do
-          response = CanvasHttp.get(url, 'Authorization' => "Bearer #{jwt}")
+          response = CanvasHttp.get(url, "Authorization" => "Bearer #{jwt}")
           if ![200, 202].include?(response.code.to_i)
             err = CanvasHttp::InvalidResponseCodeError.new(response.code.to_i)
             data = {
               extra: { url: url, response: response.body },
-              tags: { type: 'address_book_fault' }
+              tags: { type: "address_book_fault" }
             }
             Canvas::Errors.capture(err, data, :warn)
             return fallback
@@ -178,7 +180,7 @@ module Services
         query_params[:in_context] = serialize_context(params[:context]) if params[:context]
         if params[:contexts]
           contexts = params[:contexts].map { |ctx| serialize_context(ctx) }
-          query_params[:in_contexts] = contexts.join(',')
+          query_params[:in_contexts] = contexts.join(",")
         end
         query_params[:user_ids] = serialize_list(params[:user_ids]) if params[:user_ids]
         query_params[:exclude_ids] = serialize_list(params[:exclude_ids]) if params[:exclude_ids]
@@ -192,14 +194,14 @@ module Services
       end
 
       def serialize_list(list) # can be either IDs or objects (e.g. User)
-        list.map { |item| serialize_item(item) }.join(',')
+        list.map { |item| serialize_item(item) }.join(",")
       end
 
       def serialize_context(context)
         if context.respond_to?(:global_asset_string)
           context.global_asset_string
         else
-          context_type, context_id, scope = context.split('_', 3)
+          context_type, context_id, scope = context.split("_", 3)
           global_context_id = serialize_item(context_id)
           asset_string = "#{context_type}_#{global_context_id}"
           asset_string += "_#{scope}" if scope
@@ -246,7 +248,7 @@ module Services
 
       # extract just the user IDs from the response, as an ordered list
       def user_ids
-        @response['records'].map { |record| record['user_id'].to_i }
+        @response["records"].map { |record| record["user_id"].to_i }
       end
 
       # reshape the records into a ruby hash with integers instead of strings
@@ -267,16 +269,16 @@ module Services
       #
       def common_contexts
         common_contexts = {}
-        @response['records'].each do |recipient|
-          global_user_id = recipient['user_id'].to_i
-          contexts = recipient['contexts']
+        @response["records"].each do |recipient|
+          global_user_id = recipient["user_id"].to_i
+          contexts = recipient["contexts"]
           common_contexts[global_user_id] ||= { courses: {}, groups: {} }
           contexts.each do |context|
-            context_type = context['context_type'].pluralize.to_sym
+            context_type = context["context_type"].pluralize.to_sym
             next unless common_contexts[global_user_id].key?(context_type)
 
-            global_context_id = context['context_id'].to_i
-            common_contexts[global_user_id][context_type][global_context_id] = context['roles']
+            global_context_id = context["context_id"].to_i
+            common_contexts[global_user_id][context_type][global_context_id] = context["roles"]
           end
         end
         common_contexts
@@ -284,7 +286,7 @@ module Services
 
       # extract the next page cursor from the response
       def cursors
-        @response['records'].map { |record| record['cursor'] }
+        @response["records"].map { |record| record["cursor"] }
       end
     end
   end

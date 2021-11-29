@@ -23,7 +23,7 @@ import {SimpleSelect} from '@instructure/ui-simple-select'
 
 import formatMessage from '../../../../../format-message'
 
-const SHAPES = ['square', 'circle', 'triangle', 'hexagon', 'octagon', 'star']
+const SHAPES = ['square', 'circle', 'triangle', 'diamond', 'pentagon', 'hexagon', 'octagon', 'star']
 const SIZES = ['x-small', 'small', 'medium', 'large']
 
 export const ShapeSection = ({settings, onChange}) => (
@@ -66,6 +66,8 @@ const SHAPE_DESCRIPTION = {
   square: formatMessage('Square'),
   circle: formatMessage('Circle'),
   triangle: formatMessage('Triangle'),
+  diamond: formatMessage('Diamond'),
+  pentagon: formatMessage('Pentagon'),
   hexagon: formatMessage('Hexagon'),
   octagon: formatMessage('Octagon'),
   star: formatMessage('Star')

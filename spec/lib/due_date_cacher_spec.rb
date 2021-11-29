@@ -18,17 +18,17 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../spec_helper'
+require_relative "../spec_helper"
 
 describe DueDateCacher do
   before(:once) do
-    course_with_student(:active_all => true)
-    assignment_model(:course => @course)
+    course_with_student(active_all: true)
+    assignment_model(course: @course)
   end
 
   describe ".recompute" do
     before do
-      @instance = double('instance', :recompute => nil)
+      @instance = double("instance", recompute: nil)
     end
 
     it "doesn't call self.recompute_course if the assignment passed in hasn't been persisted" do
@@ -99,8 +99,8 @@ describe DueDateCacher do
   describe ".recompute_course" do
     before do
       @assignments = [@assignment]
-      @assignments << assignment_model(:course => @course)
-      @instance = double('instance', :recompute => nil)
+      @assignments << assignment_model(course: @course)
+      @instance = double("instance", recompute: nil)
     end
 
     it "passes along the whole array" do
@@ -252,7 +252,7 @@ describe DueDateCacher do
     end
 
     it "queues a delayed job in a singleton if given no assignments and no singleton option" do
-      @instance = double()
+      @instance = double
       expect(DueDateCacher).to receive(:new).and_return(@instance)
       expect(@instance).to receive(:delay_if_production)
         .with(
@@ -265,7 +265,7 @@ describe DueDateCacher do
     end
 
     it "queues a delayed job in a singleton if given no assignments and a singleton option" do
-      @instance = double()
+      @instance = double
       expect(DueDateCacher).to receive(:new).and_return(@instance)
       expect(@instance).to receive(:delay_if_production)
         .with(singleton: "what:up:dog", max_attempts: 10)
@@ -304,39 +304,39 @@ describe DueDateCacher do
     let(:student) { User.create! }
     let(:other_student) { User.create! }
     let(:course) { Course.create! }
-    let(:assignment) { course.assignments.create!(title: 'hi') }
+    let(:assignment) { course.assignments.create!(title: "hi") }
     let(:instance) { instance_double("DueDateCacher", recompute: nil) }
 
     it "accepts a User" do
-      expect {
+      expect do
         DueDateCacher.with_executing_user(student) do
           DueDateCacher.recompute_course(course, run_immediately: true)
         end
-      }.not_to raise_error
+      end.not_to raise_error
     end
 
     it "accepts a user ID" do
-      expect {
-        DueDateCacher.with_executing_user(student) do
+      expect do
+        DueDateCacher.with_executing_user(student.id) do
           DueDateCacher.recompute_course(course, run_immediately: true)
         end
-      }.not_to raise_error
+      end.not_to raise_error
     end
 
     it "accepts a nil value" do
-      expect {
+      expect do
         DueDateCacher.with_executing_user(nil) do
           DueDateCacher.recompute_course(course, run_immediately: true)
         end
-      }.not_to raise_error
+      end.not_to raise_error
     end
 
     it "raises an error if no argument is given" do
-      expect {
+      expect do
         DueDateCacher.with_executing_user do
           DueDateCacher.recompute_course(course, run_immediately: true)
         end
-      }.to raise_error(ArgumentError)
+      end.to raise_error(ArgumentError)
     end
   end
 
@@ -412,37 +412,37 @@ describe DueDateCacher do
     end
 
     describe "moderated grading" do
-      it 'creates moderated selections for students' do
+      it "creates moderated selections for students" do
         expect(cacher).to receive(:create_moderation_selections_for_assignment).once.and_return(nil)
         cacher.recompute
       end
     end
 
     describe "anonymous_id" do
-      context 'given no existing submission' do
+      context "given no existing submission" do
         before do
           submission.delete
           cacher.recompute
         end
 
-        it 'creates a submission with an anoymous_id' do
+        it "creates a submission with an anoymous_id" do
           first_student_submission = @assignment.submissions.find_by!(user: first_student)
           expect(first_student_submission.anonymous_id).to be_present
         end
       end
 
-      context 'given an existing submission with an anoymous_id' do
-        it 'does not change anonymous_ids' do
+      context "given an existing submission with an anoymous_id" do
+        it "does not change anonymous_ids" do
           expect { cacher.recompute }.not_to change { submission.reload.anonymous_id }
         end
       end
 
-      context 'given an existing submission without an anonymous_id' do
+      context "given an existing submission without an anonymous_id" do
         before do
           submission.update_attribute(:anonymous_id, nil)
         end
 
-        it 'sets anonymous_id for an existing submission' do
+        it "sets anonymous_id for an existing submission" do
           expect { cacher.recompute }.to change { submission.reload.anonymous_id }.from(nil).to(String)
         end
       end
@@ -453,7 +453,7 @@ describe DueDateCacher do
         Submission.update_all(cached_due_date: nil)
       end
 
-      context 'without existing submissions' do
+      context "without existing submissions" do
         it "creates submissions for enrollments that are not overridden" do
           Submission.destroy_all
           expect { cacher.recompute }.to change {
@@ -462,7 +462,7 @@ describe DueDateCacher do
         end
 
         it "deletes submissions for enrollments that are deleted" do
-          @course.student_enrollments.update_all(workflow_state: 'deleted')
+          @course.student_enrollments.update_all(workflow_state: "deleted")
 
           expect { cacher.recompute }.to change {
             Submission.active.where(assignment_id: @assignment.id).count
@@ -470,7 +470,7 @@ describe DueDateCacher do
         end
 
         it "updates the timestamp when deleting submissions for enrollments that are deleted" do
-          @course.student_enrollments.update_all(workflow_state: 'deleted')
+          @course.student_enrollments.update_all(workflow_state: "deleted")
 
           expect { cacher.recompute }.to change {
             Submission.where(assignment_id: @assignment.id).first.updated_at
@@ -503,7 +503,7 @@ describe DueDateCacher do
 
         it "does not create submissions for concluded enrollments" do
           student2 = user_factory
-          @course.enroll_student(student2, enrollment_state: 'active')
+          @course.enroll_student(student2, enrollment_state: "active")
           student2.enrollments.find_by(course: @course).conclude
           expect { DueDateCacher.recompute_course(@course) }.not_to change {
             Submission.active.where(user_id: student2.id).count
@@ -545,7 +545,7 @@ describe DueDateCacher do
 
       it "does not delete submissions for concluded enrollments" do
         student2 = user_factory
-        @course.enroll_student(student2, enrollment_state: 'active')
+        @course.enroll_student(student2, enrollment_state: "active")
         submission_model(assignment: @assignment, user: student2)
         student2.enrollments.find_by(course: @course).conclude
 
@@ -556,16 +556,16 @@ describe DueDateCacher do
       end
 
       it "restores submissions for enrollments that are assigned again" do
-        @assignment.submit_homework(@student, submission_type: :online_url, url: 'http://instructure.com')
+        @assignment.submit_homework(@student, submission_type: :online_url, url: "http://instructure.com")
         @assignment.only_visible_to_overrides = true
         @assignment.save!
-        expect(Submission.first.workflow_state).to eq 'deleted'
+        expect(Submission.first.workflow_state).to eq "deleted"
 
         @assignment.only_visible_to_overrides = false
         expect { @assignment.save! }.to change {
           Submission.active.count
         }.from(0).to(1)
-        expect(Submission.first.workflow_state).to eq 'submitted'
+        expect(Submission.first.workflow_state).to eq "submitted"
       end
 
       context "no overrides" do
@@ -587,7 +587,7 @@ describe DueDateCacher do
 
         it "does not update submissions for students with concluded enrollments" do
           student2 = user_factory
-          @course.enroll_student(student2, enrollment_state: 'active')
+          @course.enroll_student(student2, enrollment_state: "active")
           submission2 = submission_model(assignment: @assignment, user: student2)
           submission2.update(cached_due_date: nil)
           student2.enrollments.find_by(course: @course).conclude
@@ -600,8 +600,8 @@ describe DueDateCacher do
       context "one applicable override" do
         before do
           assignment_override_model(
-            :assignment => @assignment,
-            :set => @course.default_section
+            assignment: @assignment,
+            set: @course.default_section
           )
         end
 
@@ -642,7 +642,7 @@ describe DueDateCacher do
 
         it "does not update submissions for students with concluded enrollments" do
           student2 = user_factory
-          @course.enroll_student(student2, enrollment_state: 'active')
+          @course.enroll_student(student2, enrollment_state: "active")
           submission2 = submission_model(assignment: @assignment, user: student2)
           submission2.update(cached_due_date: nil)
           student2.enrollments.find_by(course: @course).conclude
@@ -656,17 +656,17 @@ describe DueDateCacher do
         before do
           @student1 = @student
           @student2 = user_factory
-          @course.enroll_student(@student2, :enrollment_state => 'active')
+          @course.enroll_student(@student2, enrollment_state: "active")
 
           assignment_override_model(
-            :assignment => @assignment,
-            :due_at => @assignment.due_at + 1.day
+            assignment: @assignment,
+            due_at: @assignment.due_at + 1.day
           )
-          @override.assignment_override_students.create!(:user => @student2)
+          @override.assignment_override_students.create!(user: @student2)
 
-          @submission1 = submission_model(:assignment => @assignment, :user => @student1)
-          @submission2 = submission_model(:assignment => @assignment, :user => @student2)
-          Submission.update_all(:cached_due_date => nil)
+          @submission1 = submission_model(assignment: @assignment, user: @student1)
+          @submission2 = submission_model(assignment: @assignment, user: @student2)
+          Submission.update_all(cached_due_date: nil)
         end
 
         it "applies to students in the adhoc set" do
@@ -691,18 +691,18 @@ describe DueDateCacher do
           @student1 = @student
           @student2 = user_factory
 
-          add_section('second section')
-          @course.enroll_student(@student2, :enrollment_state => 'active', :section => @course_section)
+          add_section("second section")
+          @course.enroll_student(@student2, enrollment_state: "active", section: @course_section)
 
           assignment_override_model(
-            :assignment => @assignment,
-            :due_at => @assignment.due_at + 1.day,
-            :set => @course_section
+            assignment: @assignment,
+            due_at: @assignment.due_at + 1.day,
+            set: @course_section
           )
 
-          @submission1 = submission_model(:assignment => @assignment, :user => @student1)
-          @submission2 = submission_model(:assignment => @assignment, :user => @student2)
-          Submission.update_all(:cached_due_date => nil)
+          @submission1 = submission_model(assignment: @assignment, user: @student1)
+          @submission2 = submission_model(assignment: @assignment, user: @student2)
+          Submission.update_all(cached_due_date: nil)
 
           cacher.recompute
         end
@@ -717,9 +717,9 @@ describe DueDateCacher do
 
         it "does not apply to non-active enrollments in that section" do
           @course.enroll_student(@student1,
-                                 :enrollment_state => 'deleted',
-                                 :section => @course_section,
-                                 :allow_multiple_enrollments => true)
+                                 enrollment_state: "deleted",
+                                 section: @course_section,
+                                 allow_multiple_enrollments: true)
           expect(@submission1.reload.cached_due_date).to eq @assignment.due_at.change(usec: 0)
         end
       end
@@ -728,27 +728,27 @@ describe DueDateCacher do
         before do
           @student1 = @student
           @student2 = user_factory
-          @course.enroll_student(@student2, :enrollment_state => 'active')
+          @course.enroll_student(@student2, enrollment_state: "active")
 
           @assignment.group_category = group_category
           @assignment.save!
 
           group_with_user(
-            :group_context => @course,
-            :group_category => @assignment.group_category,
-            :user => @student2,
-            :active_all => true
+            group_context: @course,
+            group_category: @assignment.group_category,
+            user: @student2,
+            active_all: true
           )
 
           assignment_override_model(
-            :assignment => @assignment,
-            :due_at => @assignment.due_at + 1.day,
-            :set => @group
+            assignment: @assignment,
+            due_at: @assignment.due_at + 1.day,
+            set: @group
           )
 
-          @submission1 = submission_model(:assignment => @assignment, :user => @student1)
-          @submission2 = submission_model(:assignment => @assignment, :user => @student2)
-          Submission.update_all(:cached_due_date => nil)
+          @submission1 = submission_model(assignment: @assignment, user: @student1)
+          @submission2 = submission_model(assignment: @assignment, user: @student2)
+          Submission.update_all(cached_due_date: nil)
         end
 
         it "applies to students in that group" do
@@ -763,7 +763,7 @@ describe DueDateCacher do
 
         it "does not apply to non-active memberships in that group" do
           cacher.recompute
-          @group.add_user(@student1, 'deleted')
+          @group.add_user(@student1, "deleted")
           expect(@submission1.reload.cached_due_date).to eq @assignment.due_at.change(usec: 0)
         end
 
@@ -776,19 +776,19 @@ describe DueDateCacher do
 
       context "multiple overrides" do
         before do
-          add_section('second section')
+          add_section("second section")
           multiple_student_enrollment(@student, @course_section)
 
           @override1 = assignment_override_model(
-            :assignment => @assignment,
-            :due_at => @assignment.due_at + 1.day,
-            :set => @course.default_section
+            assignment: @assignment,
+            due_at: @assignment.due_at + 1.day,
+            set: @course.default_section
           )
 
           @override2 = assignment_override_model(
-            :assignment => @assignment,
-            :due_at => @assignment.due_at + 1.day,
-            :set => @course_section
+            assignment: @assignment,
+            due_at: @assignment.due_at + 1.day,
+            set: @course_section
           )
         end
 
@@ -831,27 +831,27 @@ describe DueDateCacher do
           @student2 = user_factory
           @student3 = user_factory
 
-          add_section('second section')
-          @course.enroll_student(@student2, :enrollment_state => 'active', :section => @course_section)
-          @course.enroll_student(@student3, :enrollment_state => 'active')
+          add_section("second section")
+          @course.enroll_student(@student2, enrollment_state: "active", section: @course_section)
+          @course.enroll_student(@student3, enrollment_state: "active")
           multiple_student_enrollment(@student3, @course_section)
 
           @override1 = assignment_override_model(
-            :assignment => @assignment,
-            :due_at => @assignment.due_at + 2.days,
-            :set => @course.default_section
+            assignment: @assignment,
+            due_at: @assignment.due_at + 2.days,
+            set: @course.default_section
           )
 
           @override2 = assignment_override_model(
-            :assignment => @assignment,
-            :due_at => @assignment.due_at + 2.days,
-            :set => @course_section
+            assignment: @assignment,
+            due_at: @assignment.due_at + 2.days,
+            set: @course_section
           )
 
-          @submission1 = submission_model(:assignment => @assignment, :user => @student1)
-          @submission2 = submission_model(:assignment => @assignment, :user => @student2)
-          @submission3 = submission_model(:assignment => @assignment, :user => @student3)
-          Submission.update_all(:cached_due_date => nil)
+          @submission1 = submission_model(assignment: @assignment, user: @student1)
+          @submission2 = submission_model(assignment: @assignment, user: @student2)
+          @submission3 = submission_model(assignment: @assignment, user: @student3)
+          Submission.update_all(cached_due_date: nil)
         end
 
         it "uses first override where second doesn't apply" do
@@ -882,17 +882,17 @@ describe DueDateCacher do
       context "multiple assignments, only one overridden" do
         before do
           @assignment1 = @assignment
-          @assignment2 = assignment_model(:course => @course)
+          @assignment2 = assignment_model(course: @course)
 
           assignment_override_model(
-            :assignment => @assignment1,
-            :due_at => @assignment1.due_at + 1.day
+            assignment: @assignment1,
+            due_at: @assignment1.due_at + 1.day
           )
-          @override.assignment_override_students.create!(:user => @student)
+          @override.assignment_override_students.create!(user: @student)
 
-          @submission1 = submission_model(:assignment => @assignment1, :user => @student)
-          @submission2 = submission_model(:assignment => @assignment2, :user => @student)
-          Submission.update_all(:cached_due_date => nil)
+          @submission1 = submission_model(assignment: @assignment1, user: @student)
+          @submission2 = submission_model(assignment: @assignment2, user: @student)
+          Submission.update_all(cached_due_date: nil)
 
           DueDateCacher.new(@course, [@assignment1, @assignment2]).recompute
         end
@@ -985,11 +985,11 @@ describe DueDateCacher do
     describe "cached_quiz_lti" do
       let_once(:tool) do
         @course.context_external_tools.create!(
-          name: 'Quizzes.Next',
-          consumer_key: 'test_key',
-          shared_secret: 'test_secret',
-          tool_id: 'Quizzes 2',
-          url: 'http://example.com/launch'
+          name: "Quizzes.Next",
+          consumer_key: "test_key",
+          shared_secret: "test_secret",
+          tool_id: "Quizzes 2",
+          url: "http://example.com/launch"
         )
       end
 
@@ -1035,7 +1035,7 @@ describe DueDateCacher do
     let(:original_due_at_formatted) { original_due_at.change(usec: 0).iso8601 }
     let(:due_at_formatted) { due_at.change(usec: 0).iso8601 }
 
-    let(:event_type) { 'submission_updated' }
+    let(:event_type) { "submission_updated" }
 
     before do
       course.enroll_teacher(teacher, active_all: true)
@@ -1046,7 +1046,7 @@ describe DueDateCacher do
       context "when the due date changes on an auditable assignment" do
         let!(:assignment) do
           course.assignments.create!(
-            title: 'zzz',
+            title: "zzz",
             anonymous_grading: true,
             due_at: original_due_at
           )
@@ -1060,26 +1060,26 @@ describe DueDateCacher do
         end
 
         it "creates an AnonymousOrModerationEvent for each updated submission" do
-          expect {
+          expect do
             DueDateCacher.recompute(assignment, executing_user: teacher)
-          }.to change {
+          end.to change {
             AnonymousOrModerationEvent.where(assignment: assignment, event_type: event_type).count
           }.by(1)
         end
 
         it "includes the old due date in the payload" do
           DueDateCacher.recompute(assignment, executing_user: teacher)
-          expect(last_event.payload['due_at'].first).to eq original_due_at_formatted
+          expect(last_event.payload["due_at"].first).to eq original_due_at_formatted
         end
 
         it "includes the new due date in the payload" do
           DueDateCacher.recompute(assignment, executing_user: teacher)
-          expect(last_event.payload['due_at'].second).to eq due_at_formatted
+          expect(last_event.payload["due_at"].second).to eq due_at_formatted
         end
       end
 
       context "when a due date is added to an auditable assignment" do
-        let!(:assignment) { course.assignments.create!(title: 'zzz', anonymous_grading: true) }
+        let!(:assignment) { course.assignments.create!(title: "zzz", anonymous_grading: true) }
         let(:last_event) { AnonymousOrModerationEvent.where(assignment: assignment, event_type: event_type).last }
 
         before do
@@ -1089,26 +1089,26 @@ describe DueDateCacher do
         end
 
         it "creates an AnonymousOrModerationEvent for each updated submission" do
-          expect {
+          expect do
             DueDateCacher.recompute(assignment, executing_user: teacher)
-          }.to change {
+          end.to change {
             AnonymousOrModerationEvent.where(assignment: assignment, event_type: event_type).count
           }.by(1)
         end
 
         it "includes nil as the old due date in the payload" do
           DueDateCacher.recompute(assignment, executing_user: teacher)
-          expect(last_event.payload['due_at'].first).to be nil
+          expect(last_event.payload["due_at"].first).to be nil
         end
 
         it "includes the new due date in the payload" do
           DueDateCacher.recompute(assignment, executing_user: teacher)
-          expect(last_event.payload['due_at'].second).to eq due_at_formatted
+          expect(last_event.payload["due_at"].second).to eq due_at_formatted
         end
       end
 
       context "when a due date is removed from an auditable assignment" do
-        let!(:assignment) { course.assignments.create!(title: 'z!', anonymous_grading: true, due_at: original_due_at) }
+        let!(:assignment) { course.assignments.create!(title: "z!", anonymous_grading: true, due_at: original_due_at) }
         let(:last_event) { AnonymousOrModerationEvent.where(assignment: assignment, event_type: event_type).last }
 
         before do
@@ -1118,21 +1118,21 @@ describe DueDateCacher do
         end
 
         it "creates an AnonymousOrModerationEvent for each updated submission" do
-          expect {
+          expect do
             DueDateCacher.recompute(assignment, executing_user: teacher)
-          }.to change {
+          end.to change {
             AnonymousOrModerationEvent.where(assignment: assignment, event_type: event_type).count
           }.by(1)
         end
 
         it "includes the old due date in the payload" do
           DueDateCacher.recompute(assignment, executing_user: teacher)
-          expect(last_event.payload['due_at'].first).to eq original_due_at_formatted
+          expect(last_event.payload["due_at"].first).to eq original_due_at_formatted
         end
 
         it "includes nil as the new due date in the payload" do
           DueDateCacher.recompute(assignment, executing_user: teacher)
-          expect(last_event.payload['due_at'].second).to be nil
+          expect(last_event.payload["due_at"].second).to be nil
         end
       end
 
@@ -1140,15 +1140,15 @@ describe DueDateCacher do
         assignment = nil
         Assignment.suspend_due_date_caching do
           assignment = course.assignments.create!(
-            title: 'zzz',
+            title: "zzz",
             due_at: due_at
           )
         end
 
-        expect {
+        expect do
           DueDateCacher.recompute(assignment, executing_user: teacher)
-        }.not_to change {
-          AnonymousOrModerationEvent.where(assignment: assignment, event_type: 'submission_updated').count
+        end.not_to change {
+          AnonymousOrModerationEvent.where(assignment: assignment, event_type: "submission_updated").count
         }
       end
     end
@@ -1156,13 +1156,13 @@ describe DueDateCacher do
     it "does not create AnonymousOrModerationEvents when no executing user is supplied" do
       assignment = nil
       Assignment.suspend_due_date_caching do
-        assignment = course.assignments.create!(title: 'zzz', anonymous_grading: true)
+        assignment = course.assignments.create!(title: "zzz", anonymous_grading: true)
       end
 
-      expect {
+      expect do
         DueDateCacher.recompute(assignment)
-      }.not_to change {
-        AnonymousOrModerationEvent.where(assignment: assignment, event_type: 'submission_updated').count
+      end.not_to change {
+        AnonymousOrModerationEvent.where(assignment: assignment, event_type: "submission_updated").count
       }
     end
   end
