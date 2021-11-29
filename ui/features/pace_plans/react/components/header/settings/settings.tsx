@@ -178,7 +178,13 @@ export class Settings extends React.Component<ComponentProps, LocalState> {
           label={I18n.t('Require Completion by Specified End Date')}
           checked={this.props.pacePlan.hard_end_dates}
           disabled={this.props.planPublishing}
-          onChange={() => this.props.toggleHardEndDates()}
+          onChange={() => {
+            this.props.toggleHardEndDates()
+            // this has the dual affect of setting the plan's end_date
+            // when unchecked and setting a default value for when it
+            // gets checked
+            this.props.setEndDate(ENV.VALID_DATE_RANGE.end_at.date)
+          }}
         />
       </View>
     )
