@@ -94,7 +94,6 @@ export default class GradebookSettingsModal extends React.Component {
   static propTypes = {
     allowSortingByModules: bool,
     allowViewUngradedAsZero: bool,
-    allowShowSeparateFirstLastNames: bool,
     anonymousAssignmentsPresent: bool,
     courseFeatures: shape({
       finalGradeOverrideEnabled: bool.isRequired
@@ -400,7 +399,6 @@ export default class GradebookSettingsModal extends React.Component {
                       }
                     }}
                     showSeparateFirstLastNames={{
-                      allowed: this.props.allowShowSeparateFirstLastNames,
                       checked: this.state.viewOptions.showSeparateFirstLastNames,
                       onChange: value => {
                         this.setViewOption('showSeparateFirstLastNames', value)

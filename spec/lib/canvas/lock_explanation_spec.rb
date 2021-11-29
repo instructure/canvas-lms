@@ -20,17 +20,17 @@
 
 describe Canvas::LockExplanation do
   describe "#lock_explanation(hash, type, context, options)" do
-    let(:klass) do
-      Class.new do
+    let(:klass) {
+      Class.new {
         include Rails.application.routes.url_helpers
         include Canvas::LockExplanation
-        def js_bundle(*); end
-      end
-    end
+        def js_bundle(*args); end
+      }
+    }
     let(:host) { klass.new }
     let(:result) { host.lock_explanation(hash, type, context) }
     let(:context) { nil }
-    let(:type) { "page" }
+    let(:type) { 'page' }
 
     context "with a :lock_at key in the hash" do
       let(:hash) { { lock_at: DateTime.tomorrow } }
@@ -41,35 +41,34 @@ describe Canvas::LockExplanation do
         end
       end
     end
-
     context "with no :unlock_at or :lock_at in the hash" do
       context "with a context module in the hash" do
-        let(:hash) { { context_module: object, asset_string: "course_1" } }
+        let(:hash) { { context_module: object, asset_string: 'course_1' } }
 
         context "with a published object" do
-          let(:object) do
-            cm = ContextModule.new(workflow_state: "published", name: "foo")
+          let(:object) {
+            cm = ContextModule.new(workflow_state: 'published', name: 'foo')
             cm.id = 1
             cm
-          end
+          }
 
           context "with a context" do
             context "when the context is a group" do
-              let(:course) do
+              let(:course) {
                 c = Course.new
                 c.id = 7
                 c
-              end
+              }
 
-              let(:context) do
+              let(:context) {
                 g = Group.new
                 g.id = 3
                 g.context = course
                 g
-              end
+              }
 
               it "uses the group's course in the link" do
-                expect(host).to receive(:course_context_modules_url).with(course, { anchor: "module_1" })
+                expect(host).to receive(:course_context_modules_url).with(course, { :anchor => 'module_1' })
                 result
               end
 

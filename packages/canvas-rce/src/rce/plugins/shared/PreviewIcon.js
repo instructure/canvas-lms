@@ -19,32 +19,22 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-import {Spinner} from '@instructure/ui-spinner'
-import {Flex} from '@instructure/ui-flex'
-import formatMessage from '../../../format-message'
-
-const PreviewIcon = ({color, testId, variant, image, loading}) => {
+const PreviewIcon = ({color, testId, variant, image}) => {
   const variantSettings = PreviewIcon.variants[variant]
 
   const background = () => {
-    if (loading) return {}
-
     if (!!image) {
       return {
         backgroundImage: `url(${image})`,
-        backgroundSize: 'cover',
+        backgroundSize: 'contain',
         backgroundRepeat: 'no-repeat',
-        backgroundPosition: 'center',
-        borderRadius: '8px'
+        backgroundPosition: 'center'
       }
     }
 
     return {
-      border: '1px solid #73818C',
-      borderRadius: '3px',
-      background:
-        color ||
-        `
+      background: color ||
+      `
         linear-gradient(
           135deg,
           rgba(255,255,255,1) ${variantSettings.gradientOne}, rgba(255,0,0,1) ${variantSettings.gradientOne},
@@ -58,20 +48,14 @@ const PreviewIcon = ({color, testId, variant, image, loading}) => {
     <span
       data-testid={testId}
       style={{
+        border: '1px solid #73818C',
+        borderRadius: '3px',
         display: 'block',
         height: variantSettings.width,
         width: variantSettings.width,
         ...background()
       }}
-    >
-      {loading && (
-        <Flex as="div" direction="column">
-          <Flex.Item textAlign="center">
-            <Spinner renderTitle={formatMessage('Loading preview')} size="small" />
-          </Flex.Item>
-        </Flex>
-      )}
-    </span>
+    />
   )
 }
 
@@ -92,16 +76,14 @@ PreviewIcon.propTypes = {
   color: PropTypes.string,
   testId: PropTypes.string,
   variant: PropTypes.string,
-  image: PropTypes.string,
-  loading: PropTypes.bool
+  image: PropTypes.string
 }
 
 PreviewIcon.defaultProps = {
   variant: 'small',
   color: null,
   testId: null,
-  image: '',
-  loading: false
+  image: ''
 }
 
 export default PreviewIcon

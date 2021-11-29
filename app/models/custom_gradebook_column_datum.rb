@@ -21,14 +21,14 @@
 class CustomGradebookColumnDatum < ActiveRecord::Base
   belongs_to :custom_gradebook_column
 
-  validates :content, length: { maximum: maximum_string_length,
-                                allow_nil: true }
-  validates :user_id, uniqueness: { scope: :custom_gradebook_column_id }
+  validates_length_of :content, :maximum => maximum_string_length,
+                                :allow_nil => true
+  validates_uniqueness_of :user_id, :scope => :custom_gradebook_column_id
 
   set_policy do
-    given do |user|
+    given { |user|
       custom_gradebook_column.grants_right? user, :manage
-    end
+    }
     can :update
   end
 

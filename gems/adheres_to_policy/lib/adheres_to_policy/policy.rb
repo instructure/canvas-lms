@@ -41,8 +41,7 @@ module AdheresToPolicy
     # Stores the permissions, guarded by the condition given to the most
     # recent call of #given.
     def can(right, *rights)
-      raise "must have a `given` block before calling `can`" if !@last_condition && @conditions.empty?
-
+      raise "must have a `given` block before calling `can`" if @conditions.empty? unless @last_condition
       rights = [right, rights].flatten.compact
       @last_condition.can(*rights)
       add_rights(rights, @last_condition)
@@ -61,7 +60,7 @@ module AdheresToPolicy
         @conditions[right] << condition unless @conditions[right].include?(condition)
       end
 
-      @parent_policy&.add_rights(rights, condition)
+      @parent_policy.add_rights(rights, condition) if @parent_policy
     end
 
     # Stores a nested set of conditions and permissions. This can be used like:

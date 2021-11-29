@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "zlib"
+require 'zlib'
 
 # see https://github.com/redis/redis-rb/pull/739
 
@@ -92,15 +92,15 @@ module CanvasCache
     end
 
     def get_node_pos(key)
-      return [nil, nil] if @ring.empty?
+      return [nil, nil] if @ring.size == 0
 
       crc = @digest[key]
       idx = HashRing.binary_search(@sorted_keys, crc)
-      [@ring[@sorted_keys[idx]], idx]
+      return [@ring[@sorted_keys[idx]], idx]
     end
 
     def iter_nodes(key)
-      return [nil, nil] if @ring.empty?
+      return [nil, nil] if @ring.size == 0
 
       _, pos = get_node_pos(key)
       @ring.size.times do |n|
@@ -130,7 +130,7 @@ module CanvasCache
       if upper < 0
         upper = ary.size - 1
       end
-      upper
+      return upper
     end
 
     private

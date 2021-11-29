@@ -124,7 +124,6 @@ const locale = {
   "options_3ab0ea65": { "message": "گزینه ها" },
   "pages_e5414c2c": { "message": "صفحه ها" },
   "people_b4ebb13c": { "message": "افراد" },
-  "percentage_34ab7c2c": { "message": "درصد" },
   "preview_53003fd2": { "message": "پیش‌نمایش" },
   "previous_page_928fc112": { "message": "صفحه قبل" },
   "published_c944a23d": { "message": "منتشر شده" },

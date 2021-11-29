@@ -47,15 +47,15 @@ class Loaders::ForeignKeyLoader < GraphQL::Batch::Loader
 
   # :nodoc:
   def perform(ids)
-    Shard.partition_by_shard(ids) do |sharded_ids|
+    Shard.partition_by_shard(ids) { |sharded_ids|
       @scope.where(@column => sharded_ids)
             .group_by { |o| o.send(@column).to_s }
-            .each do |id, os|
+            .each { |id, os|
         fulfill(Shard.global_id_for(id), os)
-      end
-    end
-    ids.each do |id|
+      }
+    }
+    ids.each { |id|
       fulfill(id, nil) unless fulfilled?(id)
-    end
+    }
   end
 end

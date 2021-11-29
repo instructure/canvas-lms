@@ -51,19 +51,19 @@ class BookmarkedCollection::Collection < Array
   end
 
   def current_bookmark=(bookmark)
-    @current_bookmark = if bookmark.nil? || validate(bookmark)
-                          bookmark
-                        else
-                          nil
-                        end
+    if bookmark.nil? || validate(bookmark)
+      @current_bookmark = bookmark
+    else
+      @current_bookmark = nil
+    end
   end
 
   def next_bookmark=(bookmark)
-    @next_bookmark = if bookmark.nil? || validate(bookmark)
-                       bookmark
-                     else
-                       nil
-                     end
+    if bookmark.nil? || validate(bookmark)
+      @next_bookmark = bookmark
+    else
+      @next_bookmark = nil
+    end
   end
 
   # typically not set unless part of a merger of many collections
@@ -85,16 +85,18 @@ class BookmarkedCollection::Collection < Array
     page = first_page if page.nil?
     if page == first_page
       nil
-    elsif page.is_a?(String) && page =~ /^bookmark:/
-      begin
-        ::JSONToken.decode(page.gsub(/^bookmark:/, ""))
-      rescue
-        # bookmark value could not be decoded
+    else
+      if page.is_a?(String) && page =~ /^bookmark:/
+        begin
+          ::JSONToken.decode(page.gsub(/^bookmark:/, ''))
+        rescue
+          # bookmark value could not be decoded
+          nil
+        end
+      else
+        # not tagged as a bookmark
         nil
       end
-      # else
-      # not tagged as a bookmark
-      # nil
     end
   end
 

@@ -6,4 +6,7 @@ class PopulateRootAccountIdOnUserObservers < ActiveRecord::Migration[5.0]
   def up
     DataFixup::PopulateRootAccountIdOnUserObservers.run
   end
+
+  def down
+  end
 end

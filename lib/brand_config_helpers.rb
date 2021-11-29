@@ -39,9 +39,9 @@ module BrandConfigHelpers
   private
 
   def brand_config_chain(include_self:)
-    chain = account_chain(include_site_admin: true).dup
+    chain = self.account_chain(include_site_admin: true).dup
     chain.shift unless include_self
-    chain.select! { |a| a.shard == shard }
+    chain.select! { |a| a.shard == self.shard }
     chain
   end
 end

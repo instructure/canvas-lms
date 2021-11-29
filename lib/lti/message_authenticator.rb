@@ -19,7 +19,7 @@
 #
 module Lti
   class MessageAuthenticator
-    CACHE_KEY_PREFIX = "lti_nonce_"
+    CACHE_KEY_PREFIX = 'lti_nonce_'
     NONCE_EXPIRATION = 10.minutes
 
     def initialize(launch_url, params)
@@ -33,12 +33,14 @@ module Lti
     def valid?
       @valid ||= begin
         valid = lti_message_authenticator.valid_signature?
-        valid &&= Security.check_and_store_nonce(cache_key, @params[:oauth_timestamp], NONCE_EXPIRATION)
+        valid &&= Security::check_and_store_nonce(cache_key, @params[:oauth_timestamp], NONCE_EXPIRATION)
         valid
       end
     end
 
-    delegate :message, to: :lti_message_authenticator
+    def message
+      lti_message_authenticator.message
+    end
 
     private
 
@@ -48,9 +50,9 @@ module Lti
 
     def shared_secret
       @shared_secret ||=
-        if @version.strip == "LTI-1p0"
+        if @version.strip == 'LTI-1p0'
           tool = ContextExternalTool.where(consumer_key: @params[:oauth_consumer_key]).first
-          tool&.shared_secret
+          tool && tool.shared_secret
         end
     end
 

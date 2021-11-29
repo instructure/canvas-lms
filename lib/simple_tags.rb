@@ -20,11 +20,11 @@
 module SimpleTags
   module ReaderInstanceMethods
     def tags
-      @tag_array ||= read_attribute(:tags)&.split(",") || []
+      @tag_array ||= read_attribute(:tags)&.split(',') || []
     end
 
     def serialized_tags(tags = self.tags)
-      SimpleTags.normalize_tags(tags).join(",")
+      SimpleTags.normalize_tags(tags).join(',')
     end
 
     def self.included(klass)
@@ -37,14 +37,12 @@ module SimpleTags
       options = tags.last.is_a?(Hash) ? tags.pop : {}
       options[:mode] ||= :or
       conditions = handle_tags(tags, options) +
-                   tags.map do |tag|
-                     wildcard(quoted_table_name + ".tags", tag, delimiter: ",")
-                   end
-      if conditions.empty?
-        none
-      else
-        where(conditions.join(options[:mode] == :or ? " OR " : " AND "))
-      end
+                   tags.map { |tag|
+                     wildcard(quoted_table_name + '.tags', tag, :delimiter => ',')
+                   }
+      conditions.empty? ?
+          none :
+          where(conditions.join(options[:mode] == :or ? " OR " : " AND "))
     end
 
     def tagged_scope_handler(pattern, &block)
@@ -60,7 +58,7 @@ module SimpleTags
       @tagged_scope_handlers.inject([]) do |result, (pattern, handler)|
         handler_tags = []
         tags.delete_if do |tag|
-          handler_tags << tag and true if tag&.match?(pattern)
+          handler_tags << tag and true if tag =~ pattern
         end
         result.concat handler_tags.present? ? [handler.call(handler_tags, options)].flatten : []
       end
@@ -93,16 +91,16 @@ module SimpleTags
   end
 
   def self.normalize_tags(tags)
-    tags.each_with_object([]) do |tag, ary|
-      case tag
-      when /\A((course|group)_\d+).*/
+    tags.inject([]) { |ary, tag|
+      if tag =~ /\A((course|group)_\d+).*/
         ary << $1
-      when /\Asection_(\d+).*/
+      elsif tag =~ /\Asection_(\d+).*/
         section = CourseSection.where(id: $1).first
         ary << section.course.asset_string if section
         # TODO: allow user-defined tags, e.g. #foo
       end
-    end.uniq
+      ary
+    }.uniq
   end
 
   def self.included(klass)

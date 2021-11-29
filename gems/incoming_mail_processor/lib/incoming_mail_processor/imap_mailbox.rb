@@ -18,15 +18,14 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "net/imap"
-
-require_relative "configurable_timeout"
+require 'net/imap'
+require File.expand_path('../configurable_timeout', __FILE__)
 
 module IncomingMailProcessor
   class ImapMailbox
     include ConfigurableTimeout
 
-    UsedImapMethods = %i[login logout disconnect select search fetch expunge store list create copy].freeze
+    UsedImapMethods = [:login, :logout, :disconnect, :select, :search, :fetch, :expunge, :store, :list, :create, :copy]
 
     attr_accessor :server, :port, :ssl, :username, :password, :folder, :filter
 
@@ -41,7 +40,7 @@ module IncomingMailProcessor
     end
 
     def connect
-      @imap = with_timeout { Net::IMAP.new(@server, port: @port, ssl: @ssl) }
+      @imap = with_timeout { Net::IMAP.new(@server, :port => @port, :ssl => @ssl) }
       wrap_with_timeout(@imap, UsedImapMethods)
       @imap.login(@username, @password)
     end
@@ -70,7 +69,7 @@ module IncomingMailProcessor
 
     def move_message(message_id, target_folder)
       existing = @imap.list("", target_folder)
-      if existing.blank?
+      if !existing || existing.empty?
         @imap.create(target_folder)
       end
       @imap.copy(message_id, target_folder)

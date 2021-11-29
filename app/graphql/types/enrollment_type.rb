@@ -100,9 +100,9 @@ module Types
                     load_association(:course)
                   ]).then do
         if grading_period_id == DEFAULT_GRADING_PERIOD
-          Loaders::CurrentGradingPeriodLoader.load(enrollment.course).then do |gp, _|
+          Loaders::CurrentGradingPeriodLoader.load(enrollment.course).then { |gp, _|
             load_grades(gp&.id)
-          end
+          }
         else
           load_grades(grading_period_id)
         end
@@ -110,29 +110,23 @@ module Types
     end
 
     def load_grades(grading_period_id)
-      grades = if grading_period_id
-                 enrollment.find_score(grading_period_id: grading_period_id.to_i)
-               else
-                 enrollment.find_score(course_score: true)
-               end
+      grades = grading_period_id ?
+        enrollment.find_score(grading_period_id: grading_period_id.to_i) :
+        enrollment.find_score(course_score: true)
 
       # make a dummy score so that the grade object is always returned (if
       # the user has permission to read it)
       if grades.nil?
-        score_attrs = if grading_period_id
-                        { enrollment: enrollment, grading_period_id: grading_period_id }
-                      else
-                        { enrollment: enrollment, course_score: true }
-                      end
+        score_attrs = grading_period_id ?
+          { enrollment: enrollment, grading_period_id: grading_period_id } :
+          { enrollment: enrollment, course_score: true }
 
         grades = Score.new(score_attrs)
       end
 
-      if grades.grants_right?(current_user, :read)
-        grades
-      else
+      grades.grants_right?(current_user, :read) ?
+        grades :
         nil
-      end
     end
     private :load_grades
 

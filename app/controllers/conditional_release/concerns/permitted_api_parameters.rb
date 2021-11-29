@@ -49,7 +49,7 @@ module ConditionalRelease
       end
 
       def base_scoring_range_keys
-        %i[upper_bound lower_bound position]
+        [:upper_bound, :lower_bound, :position]
       end
 
       def base_assignment_set_association_keys

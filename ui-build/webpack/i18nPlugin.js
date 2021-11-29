@@ -25,9 +25,19 @@
 // and that file actually does exist over in
 // ui/shims/dummyI18nResource
 
-const webpack = require('webpack')
+class I18nPlugin {
+  apply(compiler) {
+    compiler.plugin('normal-module-factory', nmf => {
+      nmf.plugin('before-resolve', (result, callback) => {
+        if (/^i18n!/.test(result.request)) {
+          const scopeName = result.request.split('!')[1]
+          const newRequest = `i18n?${scopeName}!dummyI18nResource`
+          result.request = newRequest
+        }
+        return callback(null, result)
+      })
+    })
+  }
+}
 
-module.exports = new webpack.NormalModuleReplacementPlugin(/^i18n!/, function (resource) {
-  const scopeName = resource.request.split('!')[1]
-  resource.request = `i18n?${scopeName}!dummyI18nResource`
-})
+module.exports = I18nPlugin
