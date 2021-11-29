@@ -278,6 +278,7 @@ class GradebooksController < ApplicationController
   private :show_individual_gradebook
 
   def show_learning_mastery
+    InstStatsd::Statsd.increment("outcomes_page_views", tags: { type: "teacher_lmgb" })
     set_current_grading_period if grading_periods?
     set_tutorial_js_env
 
