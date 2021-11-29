@@ -51,8 +51,10 @@ const FindOutcomeItem = ({
   friendlyDescription
 }) => {
   const [truncated, setTruncated] = useState(true)
-  const onClickHandler = () => description && setTruncated(prevState => !prevState)
-  const {isMobileView} = useCanvasContext()
+  const {isMobileView, individualOutcomeRatingAndCalculationFF} = useCanvasContext()
+  const shouldShowDescription =
+    description || friendlyDescription || individualOutcomeRatingAndCalculationFF
+  const onClickHandler = () => shouldShowDescription && setTruncated(prevState => !prevState)
   const IconArrowOpenEnd = isMobileView ? IconArrowOpenEndSolid : IconArrowOpenEndLine
   const IconArrowOpenDown = isMobileView ? IconArrowOpenDownSolid : IconArrowOpenDownLine
   const importStatus = [importGroupStatus, importOutcomeStatus]
@@ -121,7 +123,7 @@ const FindOutcomeItem = ({
                   }
                   withBackground={false}
                   withBorder={false}
-                  interaction={description ? 'enabled' : 'disabled'}
+                  interaction={shouldShowDescription ? 'enabled' : 'disabled'}
                   onClick={onClickHandler}
                 >
                   <div style={{display: 'flex', alignSelf: 'center', fontSize: '0.875rem'}}>
@@ -157,7 +159,7 @@ const FindOutcomeItem = ({
             )}
             {isMobileView && checkbox}
           </div>
-          {(description || friendlyDescription) && (
+          {shouldShowDescription && (
             <div style={{paddingBottom: '0.75rem'}}>
               <OutcomeDescription
                 description={description}
