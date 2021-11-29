@@ -16,12 +16,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+// @ts-ignore: TS doesn't understand i18n scoped imports
 import I18n from 'i18n!external_content.success'
 import React, {useEffect, useCallback} from 'react'
 import ReactDOM from 'react-dom'
 import {Text} from '@instructure/ui-text'
 import {Spinner} from '@instructure/ui-spinner'
 import {Flex} from '@instructure/ui-flex'
+import {DeepLinkResponse} from '@canvas/deep-linking/types'
+
+// Doing this to avoid TS2339 errors-- remove once we're on InstUI 8
+const {Item: FlexItem} = Flex as any
 
 export const RetrievingContent = ({environment, parentWindow}) => {
   const messageType = 'LtiDeepLinkingResponse'
@@ -30,7 +35,7 @@ export const RetrievingContent = ({environment, parentWindow}) => {
     parentWindow.postMessage(
       {
         messageType,
-        ...environment.deep_link_response
+        ...(environment.deep_link_response as DeepLinkResponse)
       },
       environment.DEEP_LINKING_POST_MESSAGE_ORIGIN
     )
@@ -44,16 +49,16 @@ export const RetrievingContent = ({environment, parentWindow}) => {
   return (
     <div>
       <Flex justifyItems="center" margin="x-large 0 large 0">
-        <Flex.Item>
+        <FlexItem>
           <Spinner renderTitle={message} size="large" />
-        </Flex.Item>
+        </FlexItem>
       </Flex>
       <Flex justifyItems="center" margin="0 0 large">
-        <Flex.Item>
+        <FlexItem>
           <Text size="x-large" fontStyle="italic">
             {message}
           </Text>
-        </Flex.Item>
+        </FlexItem>
       </Flex>
     </div>
   )
