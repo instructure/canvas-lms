@@ -1553,14 +1553,14 @@ test('renders Student Names label', function () {
 
 test('enables the input if there is at least one student to filter by', function () {
   sinon.stub(this.gradebook.gridReady, 'state').returns('resolved')
-  this.gradebook.renderStudentSearchFilter([{id: '1', name: 'Joe Dirt'}])
+  this.gradebook.renderStudentSearchFilter([{id: '1', displayName: 'Joe Dirt'}])
   const studentSearchInput = document.getElementById('student-names-filter')
   notOk(studentSearchInput.disabled)
 })
 
 test('disables the input if the grid has not yet rendered', function () {
   sinon.stub(this.gradebook.gridReady, 'state').returns('pending')
-  this.gradebook.renderStudentSearchFilter([{id: '1', name: 'Joe Dirt'}])
+  this.gradebook.renderStudentSearchFilter([{id: '1', displayName: 'Joe Dirt'}])
   const studentSearchInput = document.getElementById('student-names-filter')
   ok(studentSearchInput.disabled)
 })
@@ -1574,12 +1574,12 @@ test('disables the input if there are no students to filter by', function () {
 
 test('displays a select menu option for each student', function () {
   sinon.stub(this.gradebook.gridReady, 'state').returns('resolved')
-  const student = {id: '1', name: 'Joe Dirt', loaded: true, isPlaceholder: false}
+  const student = {id: '1', displayName: 'Joe Dirt', loaded: true, isPlaceholder: false}
   this.gradebook.renderStudentSearchFilter([student])
   const studentSearchInput = document.getElementById('student-names-filter')
   studentSearchInput.click()
   const options = [...document.querySelectorAll('ul[role="listbox"] li span[role="option"]')]
-  ok(options.some(option => option.textContent === student.name))
+  ok(options.some(option => option.textContent === student.displayName))
   studentSearchInput.click() // close the menu to avoid DOM test pollution
 })
 
