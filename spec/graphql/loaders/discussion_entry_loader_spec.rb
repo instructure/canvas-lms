@@ -278,4 +278,27 @@ describe Loaders::DiscussionEntryLoader do
       end
     end
   end
+
+  describe "anonymous discussion" do
+    before(:once) do
+      @discussion.anonymous_state = "full_anonymity"
+      @discussion.save!
+    end
+
+    after do
+      @discussion.anonymous_state = nil
+      @discussion.save!
+    end
+
+    it "does not find by user name" do
+      GraphQL::Batch.batch do
+        Loaders::DiscussionEntryLoader.for(
+          current_user: @teacher,
+          search_term: "student"
+        ).load(@discussion).then do |discussion_entries|
+          expect(discussion_entries).to match []
+        end
+      end
+    end
+  end
 end
