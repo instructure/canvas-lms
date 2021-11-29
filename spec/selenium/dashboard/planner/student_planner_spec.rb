@@ -351,6 +351,7 @@ describe "student planner" do
     end
 
     it "allows date of a to-do item to be edited.", priority: "1" do
+      skip("LS-2872 Skip because sometimes not getting the right date set.")
       view_todo_item
       element = ff("input", @modal)[1]
       element.click
