@@ -56,6 +56,12 @@ class DiscussionTopicsApiController < ApplicationController
   #     curl https://<canvas>/api/v1/courses/<course_id>/discussion_topics/<topic_id> \
   #         -H 'Authorization: Bearer <token>'
   def show
+    if @topic.anonymous_state == "full_anonymity"
+      render json: { errors: [{ message: "The specified resource does not exist." }] }, status: :not_found
+
+      return
+    end
+
     include_params = Array(params[:include])
     log_asset_access(@topic, "topics", "topics")
     render(json: discussion_topics_api_json([@topic], @context,

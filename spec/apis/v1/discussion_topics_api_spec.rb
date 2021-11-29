@@ -196,6 +196,25 @@ describe DiscussionTopicsController, type: :request do
     end
   end
 
+  context "anonymous discussion" do
+    let_once(:discussion_topic) do
+      dt = @course.discussion_topics.create!(user: @user, message: "Locked Discussion")
+      dt.anonymous_state = "full_anonymity"
+      dt.save!
+
+      dt
+    end
+
+    it "gets 404" do
+      api_call(
+        :get,
+        "/api/v1/courses/#{@course.id}/discussion_topics/#{discussion_topic.id}",
+        { controller: "discussion_topics_api", action: "show", format: "json", course_id: @course.id.to_s, topic_id: discussion_topic.id.to_s },
+        {}, {}, expected_status: 404
+      )
+    end
+  end
+
   before(:once) do
     course_with_teacher(active_all: true, user: user_with_pseudonym)
     user = @user
