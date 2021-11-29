@@ -1226,6 +1226,20 @@ class DiscussionTopicsController < ApplicationController
 
   def process_discussion_topic_runner(is_new:)
     @errors = {}
+    if is_new &&
+       params.include?(:anonymous_state) &&
+       (!Account.site_admin.feature_enabled?(:discussion_anonymity) ||
+        !Account.site_admin.feature_enabled?(:react_discussions_post))
+      params[:anonymous_state] = nil
+    end
+
+    if is_new &&
+       !params[:anonymous_state].nil? &&
+       !@context.settings[:allow_student_anonymous_discussion_topics] &&
+       !@context.grants_right?(@current_user, session, :manage)
+      @errors[:anonymous_state] = t(:error_anonymous_state_unauthorized_create,
+                                    "You are not able to create an anonymous discussion")
+    end
 
     model_type = if value_to_boolean(params[:is_announcement]) &&
                     @context.announcements.temp_record.grants_right?(@current_user, session, :create)
@@ -1243,6 +1257,10 @@ class DiscussionTopicsController < ApplicationController
       end
     else
       @topic = @context.send(model_type).active.find(params[:id] || params[:topic_id])
+      if params.include?(:anonymous_state) && @topic.anonymous_state != params[:anonymous_state]
+        @errors[:anonymous_state] = t(:error_anonymous_state_unauthorized_update,
+                                      "You are not able to update the anonymous state of a discussion")
+      end
       prior_version = DiscussionTopic.find(@topic.id)
       verify_specific_section_visibilities # Make sure user actually has perms to modify this
     end
