@@ -29,6 +29,7 @@ const setEditingBlackoutDates = jest.fn()
 const showLoadingOverlay = jest.fn()
 const toggleExcludeWeekends = jest.fn()
 const toggleHardEndDates = jest.fn()
+const setEndDate = jest.fn()
 
 const defaultProps = {
   courseId: COURSE.id,
@@ -39,7 +40,8 @@ const defaultProps = {
   setEditingBlackoutDates,
   showLoadingOverlay,
   toggleExcludeWeekends,
-  toggleHardEndDates
+  toggleHardEndDates,
+  setEndDate
 }
 
 beforeAll(() => {

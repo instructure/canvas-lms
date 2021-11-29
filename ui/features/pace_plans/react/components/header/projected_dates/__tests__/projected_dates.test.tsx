@@ -27,8 +27,12 @@ const defaultProps = {
   assignments: 5,
   planPublishing: false,
   planWeeks: 8,
-  projectedEndDate: PRIMARY_PLAN.end_date,
+  projectedEndDate: '2021-12-01',
+  blackoutDates: [],
+  weekendsDisabled: false,
   setStartDate: () => {},
+  compressDates: jest.fn(),
+  uncompressDates: jest.fn(),
   showProjections: true
 }
 
@@ -37,6 +41,10 @@ beforeEach(() => {
     end_at: {date: COURSE.end_at, date_context: 'course'},
     start_at: {date: COURSE.start_at, date_context: 'course'}
   }
+})
+
+afterEach(() => {
+  jest.clearAllMocks()
 })
 
 describe('ProjectedDates', () => {
@@ -82,14 +90,6 @@ describe('ProjectedDates', () => {
       expect(getByText('Date is after the specified end date')).toBeInTheDocument()
     })
 
-    it('shows error is there are not enough days left in the course', async () => {
-      const plan = {...defaultProps.pacePlan, hard_end_dates: false}
-      const {findByText} = renderConnected(
-        <ProjectedDates {...defaultProps} pacePlan={plan} projectedEndDate="2022-01-02" />
-      )
-      expect(await findByText('Not enough days for this hypothetical date')).toBeInTheDocument()
-    })
-
     it('copes with no course start date', () => {
       window.ENV.VALID_DATE_RANGE = {
         end_at: {date: null, date_context: 'course'},
@@ -104,15 +104,26 @@ describe('ProjectedDates', () => {
   })
 
   describe('end date messages', () => {
-    it('shows open-ended plan text', () => {
-      const plan = {...defaultProps.pacePlan, hard_end_dates: false, start_sate: '2022-01-03'}
-      const {getAllByText} = renderConnected(<ProjectedDates {...defaultProps} pacePlan={plan} />)
+    it('shows course end date text', () => {
+      const plan = {
+        ...defaultProps.pacePlan,
+        hard_end_dates: false,
+        start_sate: '2022-01-03',
+        end_date: undefined
+      }
+      const {getAllByText, getByTestId} = renderConnected(
+        <ProjectedDates {...defaultProps} pacePlan={plan} />
+      )
       expect(getAllByText('Required by course end date').length).toBeTruthy()
+      // expect the course end date
+      expect(getByTestId('paceplan-date-text').textContent).toStrictEqual('December 31, 2021')
     })
 
     it('shows specified end date text', () => {
-      const {getAllByText} = renderConnected(<ProjectedDates {...defaultProps} />)
+      const {getAllByText, getByTestId} = renderConnected(<ProjectedDates {...defaultProps} />)
       expect(getAllByText('Required by specified end date').length).toBeTruthy()
+      // expect the plan end date
+      expect(getByTestId('paceplan-date-text').textContent).toStrictEqual('December 15, 2021')
     })
 
     it('shows open-ended plan text', () => {
@@ -120,9 +131,48 @@ describe('ProjectedDates', () => {
         end_at: {date: null, date_context: 'course'},
         start_at: {date: null, date_context: 'course'}
       }
-      const plan = {...defaultProps.pacePlan, hard_end_dates: false, start_sate: '2022-01-03'}
-      const {getAllByText} = renderConnected(<ProjectedDates {...defaultProps} pacePlan={plan} />)
+      const plan = {
+        ...defaultProps.pacePlan,
+        hard_end_dates: false,
+        start_date: '2022-01-03',
+        end_date: undefined
+      }
+      const {getAllByText, getByTestId} = renderConnected(
+        <ProjectedDates {...defaultProps} pacePlan={plan} />
+      )
       expect(getAllByText('Hypothetical end date').length).toBeTruthy()
+      // expect projectedEndDate in this case
+      expect(getByTestId('paceplan-date-text').textContent).toStrictEqual('December 1, 2021')
+    })
+  })
+
+  describe('date compression', () => {
+    it('calls uncompressDates when start date allows enough days', () => {
+      renderConnected(<ProjectedDates {...defaultProps} />)
+
+      expect(defaultProps.uncompressDates).toHaveBeenCalled()
+      expect(defaultProps.compressDates).not.toHaveBeenCalled()
+    })
+
+    it('calls compressDates if start date does not allow enough days before the specified end date', () => {
+      const pp = {...defaultProps.pacePlan}
+      pp.end_date = '2021-09-05'
+      renderConnected(<ProjectedDates {...defaultProps} pacePlan={pp} />)
+
+      expect(defaultProps.uncompressDates).not.toHaveBeenCalled()
+      expect(defaultProps.compressDates).toHaveBeenCalled()
+    })
+
+    it('calls compressDates if start date does not allow enough days before the course end date', () => {
+      // the course ends on 2021-12-31
+      const pp = {...defaultProps.pacePlan}
+      pp.hard_end_dates = false
+      pp.end_date = undefined
+      const ped = '2022-01-01'
+      renderConnected(<ProjectedDates {...defaultProps} pacePlan={pp} projectedEndDate={ped} />)
+
+      expect(defaultProps.uncompressDates).not.toHaveBeenCalled()
+      expect(defaultProps.compressDates).toHaveBeenCalled()
     })
   })
 })
