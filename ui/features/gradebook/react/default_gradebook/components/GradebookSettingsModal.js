@@ -423,7 +423,12 @@ export default class GradebookSettingsModal extends React.Component {
               )}
             </Tabs>
           </Flex.Item>
-          <Flex.Item align="end" as="footer" margin="small" overflowY="hidden">
+          <Flex.Item
+            id="gradebook-settings-modal-footer"
+            align="end"
+            as="footer"
+            overflowY="hidden"
+          >
             <Button id="gradebook-settings-cancel-button" onClick={this.close} margin="0 small">
               {I18n.t('Cancel')}
             </Button>
