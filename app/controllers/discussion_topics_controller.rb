@@ -653,6 +653,12 @@ class DiscussionTopicsController < ApplicationController
       return
     end
 
+    if @topic.anonymous_state == "full_anonymity" && !@context.feature_enabled?(:react_discussions_post)
+      flash[:info] = I18n.t :anonymous_topic_notice, "That topic requires the Discussions / Announcements Redesign feature flag turned on"
+      redirect_to named_context_url(@context, :context_discussion_topics_url)
+      return
+    end
+
     if (can_read_and_visible = @topic.grants_right?(@current_user, session, :read) && @topic.visible_for?(@current_user))
       @topic.change_read_state("read", @current_user) unless @locked.is_a?(Hash) && !@locked[:can_view]
       add_rss_links_to_content

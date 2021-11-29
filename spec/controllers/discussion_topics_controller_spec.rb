@@ -300,6 +300,18 @@ describe DiscussionTopicsController do
       expect(response.status).to equal(401)
     end
 
+    it "redirects full_anonymity discussions to index when react_discussions_post is turned off" do
+      user_session(@teacher)
+      course_topic
+      @topic.anonymous_state = "full_anonymity"
+      @topic.save!
+      Account.site_admin.disable_feature! :react_discussions_post
+      get('show', params: { course_id: @course.id, id: @topic.id })
+      expect(flash[:info]).to match(/Redesign feature flag turned on/)
+      expect(response).to be_redirect
+      expect(response.location).to eq course_discussion_topics_url @course
+    end
+
     it "js_env TOTAL_USER_COUNT and IS_ANNOUNCEMENT are set correctly for section specific announcements" do
       user_session(@teacher)
       section1 = @course.course_sections.create!(name: "Section 1")
