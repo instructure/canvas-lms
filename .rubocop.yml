@@ -40,6 +40,8 @@ Lint/NoSleep:
   Severity: warning # intended for specs; not enforced
 Lint/NonLocalExitFromIterator:
   Enabled: false # SnR is too low because of how often this construct is used
+Lint/RedundantCopDisableDirective:
+  Enabled: false # can't have this enabled until https://github.com/rubocop/rubocop/issues/10263
 Lint/SafeNavigationConsistency:
   Enabled: false # https://github.com/rubocop/rubocop/issues/9816
 Lint/UnusedBlockArgument:
