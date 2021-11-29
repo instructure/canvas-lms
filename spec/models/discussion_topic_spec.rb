@@ -2770,4 +2770,24 @@ describe DiscussionTopic do
       expect(@topic.root_account_id).to eq @course.root_account_id
     end
   end
+
+  describe "#anonymous?" do
+    let(:discussion) { discussion_topic_model(context: @course) }
+
+    context "anonymous_state is nil" do
+      it "returns false" do
+        expect(discussion.anonymous?).to eq false
+      end
+    end
+
+    context "anonymous_state is not nil" do
+      before do
+        discussion.update(anonymous_state: "full_anonymity")
+      end
+
+      it "returns true" do
+        expect(discussion.anonymous?).to eq true
+      end
+    end
+  end
 end

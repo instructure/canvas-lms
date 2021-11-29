@@ -1688,4 +1688,8 @@ class DiscussionTopic < ActiveRecord::Base
   def set_root_account_id
     self.root_account_id ||= context&.root_account_id
   end
+
+  def anonymous?
+    !anonymous_state.nil?
+  end
 end
