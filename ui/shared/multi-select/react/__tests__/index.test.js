@@ -92,10 +92,10 @@ describe('CanvasMultiSelect', () => {
   })
 
   it('can be configured to perform custom matching', () => {
-    props.customMatcher = (option, searchString) => option.label !== searchString
+    props.customMatcher = (option, _searchString) => option.label === 'Broccoli'
     const {getByRole, queryByRole} = renderComponent()
     const combobox = getByRole('combobox', {name: 'Vegetables'})
-    fireEvent.input(combobox, {target: {value: 'Cucumber'}})
+    fireEvent.input(combobox, {target: {value: '?'}})
     expect(getByRole('option', {name: 'Broccoli'})).toBeInTheDocument()
     expect(queryByRole('option', {name: 'Cucumber'})).not.toBeInTheDocument()
   })
