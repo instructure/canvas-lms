@@ -155,7 +155,13 @@ class WikiPage < ActiveRecord::Base
 
     url_attribute = self.class.url_attribute
     base_url = send(url_attribute)
-    base_url = send(self.class.attribute_to_urlify).to_s.to_url if base_url.blank? || !only_when_blank
+
+    if base_url.blank? || !only_when_blank
+      base_url = self.class.url_for(
+        send(self.class.attribute_to_urlify).to_s
+      )
+    end
+
     conditions = [wildcard(url_attribute.to_s, base_url, type: :right)]
     unless new_record?
       conditions.first << " and id != ?"
@@ -459,6 +465,21 @@ class WikiPage < ActiveRecord::Base
     # cleaned up the yaml successfully
     YAML.load(new_string)
     new_string
+  end
+
+  def self.url_for(title)
+    use_unicode_scripts = %w[Katakana]
+
+    return title if title.blank?
+
+    # Convert to ascii chars unless the string matches
+    # a script we want to store in unicode
+    return title.to_s.to_url unless title.match?(
+      /#{use_unicode_scripts.map { |s| "\\p{#{s}}" }.join('|')}/
+    )
+
+    # Return title with unicode chars, replacing chars like ? and &
+    title.to_s.convert_misc_characters.collapse
   end
 
   # opts contains a set of related entities that should be duplicated.

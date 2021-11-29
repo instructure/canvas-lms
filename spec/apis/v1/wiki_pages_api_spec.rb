@@ -57,6 +57,20 @@ describe WikiPagesApiController, type: :request do
         api_call_as_user(user, @http_verb, @url, path, params, {}, { expected_status: expected_status })
       end
 
+      context "with a title containing charaters from the Katakana script" do
+        let(:created_page) do
+          create_wiki_page(
+            @teacher,
+            { title: "グループ映画プロジェクトの概要hi", body: "banana" }
+          )
+          WikiPage.last
+        end
+
+        it "uses the unicode titles in the url" do
+          expect(created_page.url).to eq "グループ映画プロジェクトの概要hi"
+        end
+      end
+
       context "with the user having manage_wiki_create permission" do
         it "succeeds" do
           create_wiki_page(@teacher, { title: "New Page", body: "banana" })

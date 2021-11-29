@@ -716,6 +716,44 @@ describe WikiPage do
     end
   end
 
+  describe ".url_for" do
+    subject { WikiPage.url_for(title) }
+
+    let(:title) { "" }
+
+    describe "when called with latin charactes" do
+      let(:title) { "Hello, world!" }
+
+      it { is_expected.to eq "hello-world" }
+    end
+
+    describe "when called with Katakana characters" do
+      let(:title) { "グループ映画プロジェクトの概要" }
+
+      it { is_expected.to eq "グループ映画プロジェクトの概要" }
+    end
+
+    describe "when it is called with Katakana chars mixed with others" do
+      describe "when called with Katakana characters" do
+        let(:title) { "グループ映画プロジェクトの概要hi" }
+
+        it { is_expected.to eq "グループ映画プロジェクトの概要hi" }
+      end
+    end
+
+    describe "when called with nil" do
+      let(:title) { nil }
+
+      it { is_expected.to be_nil }
+    end
+
+    describe "when called with empty string" do
+      let(:title) { "" }
+
+      it { is_expected.to eq "" }
+    end
+  end
+
   describe ".reinterpret_version_yaml" do
     it "replaces the unescaped media comments" do
       bad_yaml = <<~YAML
