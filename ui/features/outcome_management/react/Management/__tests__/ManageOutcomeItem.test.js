@@ -31,6 +31,7 @@ const render = (
     contextId = '2',
     contextType = 'Account',
     friendlyDescriptionFF = true,
+    individualOutcomeRatingAndCalculationFF = false,
     renderer = rtlRender
   } = {}
 ) => {
@@ -42,7 +43,8 @@ const render = (
           isAdmin,
           contextId,
           contextType,
-          friendlyDescriptionFF
+          friendlyDescriptionFF,
+          individualOutcomeRatingAndCalculationFF
         }
       }}
     >
@@ -122,15 +124,6 @@ describe('ManageOutcomeItem', () => {
     expect(queryByTestId('description-truncated')).toBeInTheDocument()
   })
 
-  it('displays disabled caret button with "not-allowed" cursor if no description', () => {
-    const {queryByTestId} = render(<ManageOutcomeItem {...defaultProps({description: null})} />)
-    expect(queryByTestId('icon-arrow-right').closest('button')).toHaveAttribute('disabled')
-    expect(queryByTestId('icon-arrow-right').closest('button').style).toHaveProperty(
-      'cursor',
-      'not-allowed'
-    )
-  })
-
   it('handles click on individual outcome -> kebab menu -> remove option', () => {
     const {getByText} = render(<ManageOutcomeItem {...defaultProps()} />)
     fireEvent.click(getByText('Menu for outcome Outcome Title'))
@@ -200,6 +193,31 @@ describe('ManageOutcomeItem', () => {
         canManage: false
       })
       expect(queryByText('Select outcome Outcome Title')).not.toBeInTheDocument()
+    })
+  })
+
+  describe('individual outcome rating and calculation FF', () => {
+    describe('when feature flag enabled', () => {
+      it('enables caret button even if no description', () => {
+        const {queryByTestId} = render(
+          <ManageOutcomeItem {...defaultProps({description: null})} />,
+          {
+            individualOutcomeRatingAndCalculationFF: true
+          }
+        )
+        expect(queryByTestId('icon-arrow-right').closest('button')).toBeEnabled()
+      })
+    })
+
+    describe('when feature flag disabled', () => {
+      it('disables caret button and changes cursor to "not-allowed" if no description', () => {
+        const {queryByTestId} = render(<ManageOutcomeItem {...defaultProps({description: null})} />)
+        expect(queryByTestId('icon-arrow-right').closest('button')).toBeDisabled()
+        expect(queryByTestId('icon-arrow-right').closest('button').style).toHaveProperty(
+          'cursor',
+          'not-allowed'
+        )
+      })
     })
   })
 })
