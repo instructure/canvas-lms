@@ -33,6 +33,11 @@ module Lti
       before_action :require_tool
 
       def deep_linking_response
+        # multiple content items meant for creating module items, or module items destined
+        # for a new module should create the module items and associate resource links here
+        # before passing them to the UI and reloading the modules page
+        add_module_items if add_module_items?
+
         # any content items that contain line items should be handled here, and create
         # assignments, content tags, line items, and resource links
         add_assignments if add_assignment?
@@ -40,11 +45,6 @@ module Lti
         # content items not meant for creating module items should have resource links
         # associated with them here before passing them to the UI for further processing
         create_lti_resource_links unless add_item_to_existing_module? || create_new_module?
-
-        # multiple content items meant for creating module items, or module items destined
-        # for a new module should create the module items and associate resource links here
-        # before passing them to the UI and reloading the modules page
-        add_module_items if add_module_items?
 
         # one content item meant for creating a module item in an existing module
         # should be ignored, since the add module item modal in the UI will handle it
