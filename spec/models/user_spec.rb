@@ -3606,6 +3606,33 @@ describe User do
     end
   end
 
+  describe "#custom_colors" do
+    context "user has high_contrast and high_contrast_course_colors enables" do
+      let(:user) { user_model }
+
+      before do
+        user.enable_feature!(:high_contrast)
+        Account.site_admin.enable_feature!(:high_contrast_course_colors)
+      end
+
+      it "sufficiently darkens colors with a contrast below 4.5" do
+        user.preferences[:custom_colors] = {
+          user_1: "#5a92de",
+          course_1: "#199eb7",
+          course_2: "#ffffff",
+          course_3: "#c8c8c8",
+          course_4: "#767777"
+        }
+        expect(user.custom_colors.map { |_k, v| WCAGColorContrast.ratio(v.delete("#"), "ffffff") }).to all(be >= 4.5)
+      end
+
+      it "leaves colors with enough contrast alone" do
+        user.preferences[:custom_colors] = { user_1: "#757777" }
+        expect(user.custom_colors[:user_1]).to be("#757777")
+      end
+    end
+  end
+
   describe "#prefers_no_celebrations?" do
     let(:user) { user_model }
 
