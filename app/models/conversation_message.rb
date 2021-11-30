@@ -175,7 +175,7 @@ class ConversationMessage < ActiveRecord::Base
 
   def media_comment
     if !@media_comment && media_comment_id
-      @media_comment = MediaObject.by_media_id(media_comment_id).first
+      @media_comment = MediaObject.shard(shard).by_media_id(media_comment_id).first
     end
     @media_comment
   end
