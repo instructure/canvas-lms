@@ -202,6 +202,9 @@ describe DiscussionTopicsController, type: :request do
       dt.anonymous_state = "full_anonymity"
       dt.save!
 
+      entry = dt.discussion_entries.create!(message: "first message", user: @student)
+      entry.save
+
       dt
     end
 
@@ -228,6 +231,15 @@ describe DiscussionTopicsController, type: :request do
         :get,
         "/api/v1/courses/#{@course.id}/discussion_topics/#{discussion_topic.id}/entries",
         { controller: "discussion_topics_api", action: "entries", format: "json", course_id: @course.id.to_s, topic_id: discussion_topic.id.to_s },
+        {}, {}, expected_status: 404
+      )
+    end
+
+    it "replies" do
+      api_call(
+        :get,
+        "/api/v1/courses/#{@course.id}/discussion_topics/#{discussion_topic.id}/entries/#{discussion_topic.discussion_entries.last.id}/replies",
+        { controller: "discussion_topics_api", action: "replies", format: "json", course_id: @course.id.to_s, topic_id: discussion_topic.id.to_s, entry_id: discussion_topic.discussion_entries.last.id.to_s },
         {}, {}, expected_status: 404
       )
     end

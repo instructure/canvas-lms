@@ -455,6 +455,8 @@ class DiscussionTopicsApiController < ApplicationController
   #       "forced_read_state": false,
   #       "created_at": "2011-11-03T21:26:44Z" } ]
   def replies
+    return unless is_not_anonymous
+
     @parent = root_entries(@topic).find(params[:entry_id])
     @replies = Api.paginate(reply_entries(@parent).newest_first, self, reply_pagination_url(@topic, @parent))
     render json: discussion_entry_api_json(@replies, @context, @current_user, session)
