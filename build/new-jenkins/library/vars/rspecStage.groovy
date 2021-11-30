@@ -31,7 +31,6 @@ def createDistribution(nestedStages) {
 
   def baseEnvVars = [
     "ENABLE_AXE_SELENIUM=${env.ENABLE_AXE_SELENIUM}",
-    "ENABLE_CRYSTALBALL=${env.ENABLE_CRYSTALBALL}",
     'POSTGRES_PASSWORD=sekret',
     'SELENIUM_VERSION=3.141.59-20201119',
     "RSPECQ_ENABLED=${env.RSPECQ_ENABLED}"
@@ -147,14 +146,6 @@ def tearDownNode(prefix) {
   sh 'build/new-jenkins/docker-copy-files.sh /usr/src/app/log/results tmp/rspec_results canvas_ --allow-error --clean-dir'
   sh "build/new-jenkins/docker-copy-files.sh /usr/src/app/log/spec_failures/ tmp/spec_failures/$prefix canvas_ --allow-error --clean-dir"
 
-  // Don't generate map pre-merge
-  if (env.ENABLE_CRYSTALBALL == '1' && env.RSPECQ_ENABLED != '1') {
-    sh 'build/new-jenkins/docker-copy-files.sh /usr/src/app/log/results/crystalball_results tmp/crystalball canvas_ --allow-error --clean-dir'
-    sh 'ls tmp/crystalball'
-    sh 'ls -R'
-    archiveArtifacts allowEmptyArchive: true, artifacts: 'tmp/crystalball/**/*'
-  }
-
   if (configuration.getBoolean('upload-docker-logs', 'false')) {
     sh "docker ps -aq | xargs -I{} -n1 -P1 docker logs --timestamps --details {} 2>&1 > tmp/docker-${prefix}-${CI_NODE_INDEX}.log"
     archiveArtifacts(artifacts: "tmp/docker-${prefix}-${CI_NODE_INDEX}.log")
@@ -201,7 +192,6 @@ def runRspecqSuite() {
       return
     }
     sh(script: 'docker-compose exec -T -e ENABLE_AXE_SELENIUM \
-                                       -e ENABLE_CRYSTALBALL \
                                        -e RSPECQ_ENABLED \
                                        -e SENTRY_DSN \
                                        -e RSPECQ_UPDATE_TIMINGS \
@@ -234,7 +224,7 @@ def runRspecqSuite() {
 
 def runLegacySuite() {
   try {
-    sh(script: 'docker-compose exec -T -e RSPEC_PROCESSES -e ENABLE_AXE_SELENIUM -e ENABLE_CRYSTALBALL canvas bash -c \'build/new-jenkins/rspec-with-retries.sh\'', label: 'Run Tests')
+    sh(script: 'docker-compose exec -T -e RSPEC_PROCESSES -e ENABLE_AXE_SELENIUM canvas bash -c \'build/new-jenkins/rspec-with-retries.sh\'', label: 'Run Tests')
   } catch (org.jenkinsci.plugins.workflow.steps.FlowInterruptedException e) {
     if (e.causes[0] instanceof org.jenkinsci.plugins.workflow.steps.TimeoutStepExecution.ExceededTimeout) {
       /* groovylint-disable-next-line GStringExpressionWithinString */

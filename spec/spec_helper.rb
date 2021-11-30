@@ -32,7 +32,6 @@ end
 
 require "securerandom"
 require "tmpdir"
-require "crystalball"
 
 ENV["RAILS_ENV"] = "test"
 require_relative "../config/environment"
@@ -153,28 +152,6 @@ if ENV["ENABLE_AXE_SELENIUM"] == "1"
     if ENV["RSPEC_PROCESSES"]
       config.serialize_output = true
       config.serialize_prefix = "log/results/stormbreaker_results"
-    end
-  end
-end
-
-# Don't do map generation in pre-merge, which runs rspecq
-if ENV["ENABLE_CRYSTALBALL"] == "1" && ENV["RSPECQ_ENABLED"] != "1"
-  Crystalball::MapGenerator.start! do |config|
-    config.register Crystalball::MapGenerator::CoverageStrategy.new
-    config.map_storage_path = "log/results/crystalball_results/#{ENV.fetch("PARALLEL_INDEX", "0")}_map.yml"
-  end
-end
-
-module Crystalball
-  class MapGenerator
-    class CoverageStrategy
-      def call(example_map, example)
-        puts "Calling Coverage Strategy for #{example.inspect}"
-        before = Coverage.peek_result
-        yield example_map, example
-        after = Coverage.peek_result
-        example_map.push(*execution_detector.detect(before, after))
-      end
     end
   end
 end
