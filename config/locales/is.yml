@@ -15285,7 +15285,7 @@ is:
     no_recipients_choose_another_group: "Engir móttakendur eru í þessum hóp. Veldu annan hóp."
   moderate_assignment_ccb00173: "Stjórna %{assignment}"
   moderate_assignment_name_cf59e0a7: "Stjórna %{assignment_name}"
-  moderate_d0c85e92: Stjórna
+  moderate_d0c85e92: "Í meðallagi"
   moderate_grades_4f43f85d: "Stjórna einkunnum"
   moderated_assignment_12873e87: "Stjórnað verkefni"
   moderated_assignments_must_be_manually_posted_unti_39545855: "Stjórnuð verkefni þarf að birta handvirkt þangað til einkunnir eru gefnar upp"
@@ -23032,7 +23032,7 @@ is:
       one: "Fyrir 1 mínútu"
       other: "Fyrir %{count} mínútum"
     due_date: "%{date} af %{time}"
-    event: "%{date} á %{time}"
+    event: "%{date} kl. %{time}"
     formats: 
       default: "%a, %d %b %Y %H:%M:%S %z"
       long: "%B %d, %Y %H:%M"
