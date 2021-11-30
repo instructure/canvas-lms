@@ -351,10 +351,8 @@ describe "student planner" do
     end
 
     it "allows date of a to-do item to be edited.", priority: "1" do
-      skip("LS-2872 Skip because sometimes not getting the right date set.")
       view_todo_item
-      element = ff("input", @modal)[1]
-      element.click
+
       date = format_date_for_view(Time.zone.now, :long).split
       day =
         if date[1] == "15"
@@ -364,7 +362,14 @@ describe "student planner" do
           date[1] = "15"
           date[0] + " 15, " + date[2]
         end
-      fj("button:contains('#{date[1]}')").click
+
+      date_input = ff("input", @modal)[1]
+
+      keep_trying_until(10) do
+        date_input.send_keys([:control, "a"], :backspace, day)
+        expect(element_value_for_attr(date_input, "value")).to eq(day)
+      end
+
       todo_save_button.click
       @student_to_do.reload
       expect(format_date_for_view(@student_to_do.todo_date, :long)).to eq(day)
