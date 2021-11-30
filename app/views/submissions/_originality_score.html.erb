@@ -82,9 +82,9 @@
             class="not_external turnitin_similarity_score <%= turnitin_score[:state] %>_score">
             <%= turnitin_score[:similarity_score] %>%</a>
         <% else %>
-          <% if turnitin_score[:error_message] %>
+          <% if turnitin_score[:error_message].present? %>
             <a title="<%= turnitin_score[:error_message] %>"
-               href="<%= polymorphic_url([@context, @assignment, @submission, :originality_report], asset_string: attachment&.asset_string || @submission.asset_string) %>"
+               href="<%= polymorphic_url([@context, @assignment, @submission, :originality_report], asset_string: attachment&.asset_string || @submission.asset_string, attempt: @submission.attempt) %>"
                data-tooltip="left"
                target="_blank" >
               <%= image_tag("turnitin_#{turnitin_score[:state]}_score.png", :alt => turnitin_score[:error_message]) %>
