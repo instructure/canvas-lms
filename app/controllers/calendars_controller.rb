@@ -78,7 +78,7 @@ class CalendarsController < ApplicationController
         can_update_discussion_topic: context.grants_right?(@current_user, session, :moderate_forum),
         can_update_wiki_page: context.grants_right?(@current_user, session, :update),
         concluded: (context.is_a? Course) ? context.concluded? : false,
-        k5_subject: context.is_a?(Course) && context.elementary_subject_course?
+        k5_course: context.is_a?(Course) && context.elementary_enabled?
       }
       if context.respond_to?("course_sections")
         info[:course_sections] = context.course_sections.active.pluck(:id, :name).map do |id, name|

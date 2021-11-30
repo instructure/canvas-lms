@@ -208,6 +208,11 @@ shared_examples_for "k5 important dates calendar picker" do |context|
         user: @observer,
         course: @subject_course
       )
+      course_with_student(
+        active_all: true,
+        user: @observer,
+        course: @homeroom_course
+      )
       user_session(@observer)
     end
   end
@@ -246,7 +251,7 @@ shared_examples_for "k5 important dates calendar picker" do |context|
     get "/"
     click_calendar_picker_gear
 
-    expect(subject_list_text.sort).to eq([@subject_course.name, "Subject 1", "Subject 2"])
+    expect(subject_list_text.sort).to eq([@homeroom_course.name, @subject_course.name, "Subject 1", "Subject 2"].sort)
   end
 
   it "enables and disables items when calendar max is hit" do
@@ -265,7 +270,11 @@ shared_examples_for "k5 important dates calendar picker" do |context|
   end
 
   context "important items shown based on calendar selection" do
-    it "submits calendar selections when submit button is clicked", custom_timeout: 20 do
+    before do
+      @user.set_preference(:selected_calendar_contexts, [@subject_course.asset_string, @new_course_list[0].asset_string])
+    end
+
+    it "submits calendar selections when submit button is clicked", custom_timeout: 25 do
       create_important_date_assignment(@subject_course, "#{@subject_course.name} New Assignment", 2.days.from_now(Time.zone.now))
       create_important_date_assignment(@new_course_list[0], "#{@new_course_list[0].name} New Assignment", 2.days.from_now(Time.zone.now))
       create_important_date_assignment(@new_course_list[1], "#{@new_course_list[0].name} New Assignment", 2.days.from_now(Time.zone.now))
@@ -277,8 +286,8 @@ shared_examples_for "k5 important dates calendar picker" do |context|
       expect(subject_list[1]).to include_text(@new_course_list[0].name)
 
       click_calendar_picker_gear
-      click_subject_calendar_checkbox(1)
       click_subject_calendar_checkbox(2)
+      click_subject_calendar_checkbox(3)
       click_calendar_modal_submit
 
       expect(is_calendar_modal_gone?).to be_truthy
@@ -300,8 +309,8 @@ shared_examples_for "k5 important dates calendar picker" do |context|
       expect(subject_list[1]).to include_text(@new_course_list[0].name)
 
       click_calendar_picker_gear
-      click_subject_calendar_checkbox(1)
       click_subject_calendar_checkbox(2)
+      click_subject_calendar_checkbox(3)
       click_calendar_modal_cancel
 
       expect(is_calendar_modal_gone?).to be_truthy
@@ -323,8 +332,8 @@ shared_examples_for "k5 important dates calendar picker" do |context|
       expect(subject_list[1]).to include_text(@new_course_list[0].name)
 
       click_calendar_picker_gear
-      click_subject_calendar_checkbox(1)
       click_subject_calendar_checkbox(2)
+      click_subject_calendar_checkbox(3)
       click_calendar_modal_close
 
       expect(is_calendar_modal_gone?).to be_truthy

@@ -76,10 +76,7 @@ export default class EditAssignmentDetailsRewrite extends ValidatedFormView {
   }
 
   setContext(newContext) {
-    this.$el
-      .find('select.context_id')
-      .val(newContext)
-      .triggerHandler('change', false)
+    this.$el.find('select.context_id').val(newContext).triggerHandler('change', false)
   }
 
   contextInfoForCode(code) {
@@ -97,19 +94,14 @@ export default class EditAssignmentDetailsRewrite extends ValidatedFormView {
 
   moreOptions(jsEvent) {
     jsEvent.preventDefault()
-    const pieces = $(jsEvent.target)
-      .attr('href')
-      .split('#')
+    const pieces = $(jsEvent.target).attr('href').split('#')
     const data = this.$el.getFormData({object_name: 'assignment'})
     const params = {}
     if (data.name) {
       params.title = data.name
     }
     if (data.due_at && this.$el.find('.datetime_field').data('unfudged-date')) {
-      params.due_at = this.$el
-        .find('.datetime_field')
-        .data('unfudged-date')
-        .toISOString()
+      params.due_at = this.$el.find('.datetime_field').data('unfudged-date').toISOString()
     }
 
     if (data.assignment_group_id) {
@@ -140,7 +132,7 @@ export default class EditAssignmentDetailsRewrite extends ValidatedFormView {
     // Only show important date checkbox if selected context is k5 subject and the feature is enabled
     this.$el
       .find('#important_dates')
-      .toggle(this.currentContextInfo.k5_subject && ENV.FEATURES?.important_dates)
+      .toggle(this.currentContextInfo.k5_course && ENV.FEATURES?.important_dates)
 
     // Update the edit and more options links with the new context
     this.$el.attr('action', this.currentContextInfo.create_assignment_url)
@@ -191,9 +183,7 @@ export default class EditAssignmentDetailsRewrite extends ValidatedFormView {
     data.due_at = this.unfudgedDate(data.due_at)
 
     if (this.event.isNewEvent()) {
-      data.context_code = $(this.$el)
-        .find('.context_id')
-        .val()
+      data.context_code = $(this.$el).find('.context_id').val()
       this.model = commonEventFactory(data, this.event.possibleContexts())
       return this.submit(event)
     } else {

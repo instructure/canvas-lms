@@ -284,7 +284,7 @@ export const K5Dashboard = ({
   const importantDates = (
     <ImportantDates
       timeZone={timeZone}
-      contexts={cards?.filter(c => c.isK5Subject)}
+      contexts={cards?.filter(c => c.isK5Subject || c.isHomeroom)}
       handleClose={useImportantDatesTray ? () => setTrayOpen(false) : undefined}
       selectedContextCodes={selectedContextCodes}
       selectedContextsLimit={selectedContextsLimit}
