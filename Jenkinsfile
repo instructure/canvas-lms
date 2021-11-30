@@ -387,7 +387,7 @@ pipeline {
                 }
               ]
 
-              extendedStage('Root').hooks(postBuildHandler).obeysAllowStages(false).timings(false).execute {
+              extendedStage('Root').hooks(postBuildHandler).obeysAllowStages(false).reportTimings(false).execute {
                 def rootStages = [:]
 
                 buildParameters += string(name: 'CANVAS_BUILDS_REFSPEC', value: "${env.CANVAS_BUILDS_REFSPEC}")
@@ -412,7 +412,7 @@ pipeline {
                   buildParameters += string(name: 'CANVAS_LMS_REFSPEC', value: env.CANVAS_LMS_REFSPEC)
                 }
 
-                extendedStage('Builder').nodeRequirements(label: 'canvas-docker', podTemplate: null).obeysAllowStages(false).timings(false).queue(rootStages) {
+                extendedStage('Builder').nodeRequirements(label: 'canvas-docker', podTemplate: null).obeysAllowStages(false).reportTimings(false).queue(rootStages) {
                   extendedStage('Setup')
                     .obeysAllowStages(false)
                     .timeout(2)
