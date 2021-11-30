@@ -1000,6 +1000,9 @@
   "percentage_34ab7c2c": {
     "message": "Percentage"
   },
+  "percentage_must_be_a_number_8033c341": {
+    "message": "Percentage must be a number"
+  },
   "pixels_52ece7d1": {
     "message": "Pixels"
   },
