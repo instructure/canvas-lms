@@ -243,6 +243,15 @@ describe DiscussionTopicsController, type: :request do
         {}, {}, expected_status: 404
       )
     end
+
+    it "entry_list" do
+      api_call(
+        :get,
+        "/api/v1/courses/#{@course.id}/discussion_topics/#{discussion_topic.id}/entry_list?ids[]=#{discussion_topic.discussion_entries.last.id}",
+        { controller: "discussion_topics_api", action: "entry_list", format: "json", course_id: @course.id.to_s, topic_id: discussion_topic.id.to_s, entry_id: discussion_topic.discussion_entries.last.id.to_s, ids: [discussion_topic.discussion_entries.last.id.to_s] },
+        {}, {}, expected_status: 404
+      )
+    end
   end
 
   before(:once) do
