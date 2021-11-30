@@ -163,6 +163,8 @@ module Lti::IMS::Concerns
             custom: Lti::DeepLinkingUtil.validate_custom_params(content_item[:custom])
           )
 
+          context_module.add_item({ type: "assignment", id: assignment.id }) if create_new_module?
+
           content_item[:errors] = assignment.errors unless assignment.valid?
         end
       end

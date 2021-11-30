@@ -603,6 +603,26 @@ module Lti
               expect(Lti::ResourceLink.last.custom).to eq content_items.first[:custom].with_indifferent_access
             end
           end
+
+          context "when placement should create new module" do
+            let(:params) { super().merge({ placement: "module_index_menu_modal" }) }
+
+            before do
+              course.root_account.enable_feature! :lti_deep_linking_module_index_menu_modal
+            end
+
+            it "creates a module item" do
+              expect { subject }.to change { course.context_modules.count }.by 1
+            end
+
+            it "creates a link within the module item to the created assignment" do
+              subject
+              new_module = course.context_modules.last
+              content_tags = new_module.content_tags
+
+              expect(content_tags.last.title).to eq(content_item[:title])
+            end
+          end
         end
       end
     end
