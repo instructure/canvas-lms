@@ -269,6 +269,8 @@ class Gradebook extends React.Component {
     this.onUserFilterInputStudents = this.onUserFilterInputStudents.bind(this)
     this.onFilterToAssignments = this.onFilterToAssignments.bind(this)
     this.onFilterToStudents = this.onFilterToStudents.bind(this)
+    this.assignmentSearchMatcher = this.assignmentSearchMatcher.bind(this)
+    this.studentSearchMatcher = this.studentSearchMatcher.bind(this)
     this.renderStudentSearchFilter = this.renderStudentSearchFilter.bind(this)
     this.renderAssignmentSearchFilter = this.renderAssignmentSearchFilter.bind(this)
     // Custom Column
@@ -2404,12 +2406,28 @@ class Gradebook extends React.Component {
     this.buildRows()
   }
 
+  studentSearchMatcher(option, searchTerm) {
+    const studentName = option.label
+    if (studentName.match(new RegExp(searchTerm, 'i'))) {
+      return true
+    }
+
+    const {sis_user_id: sisId} = this.courseContent.students.student(option.id)
+    return !!sisId && sisId === searchTerm
+  }
+
+  assignmentSearchMatcher(option, searchTerm) {
+    const assignmentName = option.label
+    return !!assignmentName.match(new RegExp(searchTerm, 'i'))
+  }
+
   renderStudentSearchFilter(students) {
     if (this.options.gradebook_assignment_search_and_redesign) {
       const props = {
         id: 'student-names-filter',
         disabled: students.length === 0 || !this._gridHasRendered(),
         label: I18n.t('Student Names'),
+        customMatcher: this.studentSearchMatcher,
         onChange: this.onFilterToStudents,
         options: students.map(student => ({id: student.id, text: student.name})),
         placeholder: I18n.t('Search Students')
@@ -2442,6 +2460,7 @@ class Gradebook extends React.Component {
         id: 'assignments-filter',
         disabled: assignments.length === 0 || !this._gridHasRendered(),
         label: I18n.t('Assignment Names'),
+        customMatcher: this.assignmentSearchMatcher,
         onChange: this.onFilterToAssignments,
         options: assignments.map(assignment => ({id: assignment.id, text: assignment.name})),
         placeholder: I18n.t('Search Assignments')
