@@ -375,6 +375,8 @@ class DiscussionTopicsApiController < ApplicationController
   #         } ],
   #       "has_more_replies": false } ]
   def entries
+    return unless is_not_anonymous
+
     @entries = Api.paginate(root_entries(@topic).newest_first, self, entry_pagination_url(@topic))
     render json: discussion_entry_api_json(@entries, @context, @current_user, session)
   end
