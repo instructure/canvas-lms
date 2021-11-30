@@ -381,7 +381,7 @@ pipeline {
               ]
 
               def postBuildHandler = [
-                onStageEnded: { stageName, stageConfig ->
+                onStageEnded: { stageName, stageConfig, result ->
                   buildSummaryReport.addFailureRun('Main Build', currentBuild)
                   postFn(stageConfig.status())
                 }
