@@ -239,6 +239,36 @@ describe ConversationMessage do
         expect(m.attachments).to match_array([a])
       end
     end
+
+    context "sharding" do
+      specs_require_sharding
+
+      it "preserves media comment across shards" do
+        @shard1.activate do
+          course_with_teacher(active_all: true)
+          @student_1 =  student_in_course(active_all: true).user
+          @student_2 =  student_in_course(active_all: true).user
+        end
+
+        m = nil
+        @shard2.activate do
+          course_with_teacher(active_all: true)
+          @course.enroll_student(@student_1, enrollment_state: "active")
+          @course.enroll_student(@student_2, enrollment_state: "active")
+
+          @mc = MediaObject.new
+          @mc.media_type = "audio"
+          @mc.media_id = "asdf"
+          @mc.context = @mc.user = @student_1
+          @mc.save
+          m = @student_1.initiate_conversation([@student_2]).add_message("ohai", media_comment: @mc)
+        end
+
+        @shard1.activate do
+          expect(m.conversation.reload.conversation_messages.first.media_comment).to eq(@mc)
+        end
+      end
+    end
   end
 
   context "infer_defaults" do
