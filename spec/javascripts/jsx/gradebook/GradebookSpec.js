@@ -10424,9 +10424,9 @@ QUnit.module('Gradebook', suiteHooks => {
       gradebook.gotChunkOfStudents(students)
     })
 
-    test('returns true if the search term is a substring of the student name', () => {
+    test('returns true if the search term is a substring of the student name (case insensitive)', () => {
       const option = {id: '1303', label: 'Joe Dirt'}
-      ok(gradebook.studentSearchMatcher(option, 'Dir'))
+      ok(gradebook.studentSearchMatcher(option, 'dir'))
     })
 
     test('returns false if the search term is not a substring of the student name', () => {
@@ -10434,14 +10434,19 @@ QUnit.module('Gradebook', suiteHooks => {
       notOk(gradebook.studentSearchMatcher(option, 'Dirz'))
     })
 
-    test('returns true if the search term matches the SIS ID exactly', () => {
+    test('returns true if the search term matches the SIS ID exactly (case insensitive)', () => {
       const option = {id: '1303', label: 'Joe Dirt'}
-      ok(gradebook.studentSearchMatcher(option, 'meteor'))
+      ok(gradebook.studentSearchMatcher(option, 'Meteor'))
     })
 
     test('returns false if the search term is a substring of the SIS ID, but does not match exactly', () => {
       const option = {id: '1303', label: 'Joe Dirt'}
       notOk(gradebook.studentSearchMatcher(option, 'meteo'))
+    })
+
+    test('does not treat the search term as a regular expression', () => {
+      const option = {id: '1303', label: 'Joe Dirt'}
+      notOk(gradebook.studentSearchMatcher(option, 'Joe.*rt'))
     })
   })
 
@@ -10450,14 +10455,19 @@ QUnit.module('Gradebook', suiteHooks => {
       gradebook = createGradebook()
     })
 
-    test('returns true if the search term is a substring of the assignment name', () => {
+    test('returns true if the search term is a substring of the assignment name (case insensitive)', () => {
       const option = {id: '122', label: 'Science Lab II'}
-      ok(gradebook.assignmentSearchMatcher(option, 'Lab'))
+      ok(gradebook.assignmentSearchMatcher(option, 'lab'))
     })
 
     test('returns false if the search term is not a substring of the assignment name', () => {
       const option = {id: '122', label: 'Science Lab II'}
       notOk(gradebook.assignmentSearchMatcher(option, 'Lib'))
+    })
+
+    test('does not treat the search term as a regular expression', () => {
+      const option = {id: '122', label: 'Science Lab II'}
+      notOk(gradebook.assignmentSearchMatcher(option, 'Science.*II'))
     })
   })
 

@@ -73,6 +73,10 @@ module FeatureFlags
     ["feature_flag3", self.class.name, global_id, feature.to_s].cache_key
   end
 
+  def feature_analytics_cache_key(feature, result)
+    ["feature_flag_analytics", feature.to_s, self.class.name, global_id, result].cache_key
+  end
+
   def feature_flag_cache
     Rails.cache
   end
@@ -204,7 +208,37 @@ module FeatureFlags
   private
 
   def persist_result(feature, result)
+    persist_result_context(feature, result)
     InstStatsd::Statsd.increment("feature_flag_check", tags: { feature: feature, enabled: result.to_s })
     result
+  end
+
+  def persist_result_context(feature, result)
+    context_type = self.class.name
+    return unless %w[Course Account].include?(context_type)
+
+    config = Canvas::DynamicSettings.find("feature_analytics", tree: :private)
+    cache_expiry = (config[:cache_expiry] || 1.day).to_i
+    sampling_rate = (config[:sampling_rate] || 0).to_f
+    return unless rand < sampling_rate
+
+    LocalCache.fetch(feature_analytics_cache_key(feature, result), expires_in: cache_expiry) do
+      message = {
+        feature: feature,
+        env: Canvas.environment,
+        context: context_type,
+        root_account_id: try(:root_account?) ? global_id : try(:global_root_account_id),
+        account_id: is_a?(Account) ? global_id : try(:global_account_id),
+        course_id: is_a?(Course) ? global_id : nil,
+        state: result,
+        timestamp: Time.now.to_f
+      }
+      Services::FeatureAnalyticsService.persist_feature_evaluation(message)
+      true
+    end
+  rescue => e
+    Canvas::Errors.capture_exception(:feature_analytics, e)
+    Rails.logger.error(e)
+    raise e if Rails.env.development?
   end
 end

@@ -113,9 +113,14 @@ development:
       # To work with the release notes UI, uncomment this and ensure you have vault_contents.yml
       # with the example contents.  Also see docker-compose/dynamodb.override.yml
       # release_notes.yml: |
-      #  ddb_endpoint: 'http://dynamo:8000/'
-      #  ddb_table_name: 'canvas-release-notes'
-      #  vault_credential_path: 'sts/testaccount/sts/canvas-release-notes'
+      #   ddb_endpoint: 'http://dynamo:8000/'
+      #   ddb_table_name: 'canvas-release-notes'
+      #   vault_credential_path: 'sts/testaccount/sts/canvas-release-notes'
+      # feature_analytics:
+      #   cache_expiry: '86400'
+      #   sampling_rate: '0.0'
+      #   queue_url: ''
+      #   region: 'us-west-2'
   store:
     canvas:
       lti-keys:
