@@ -503,6 +503,8 @@ class DiscussionTopicsApiController < ApplicationController
   #     { ... entry 3 ... },
   #   ]
   def entry_list
+    return unless is_not_anonymous
+
     ids = Array(params[:ids])
     entries = @topic.discussion_entries.order(:id).find(ids)
     @entries = Api.paginate(entries, self, entry_pagination_url(@topic))
@@ -806,7 +808,7 @@ class DiscussionTopicsApiController < ApplicationController
   end
 
   def is_not_anonymous
-    if @topic.anonymous_state == "full_anonymity"
+    if @topic.anonymous?
       render json: { errors: [{ message: "The specified resource does not exist." }] }, status: :not_found
 
       return false
