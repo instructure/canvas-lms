@@ -370,16 +370,6 @@ pipeline {
 
               maybeSlackSendRetrigger()
 
-              def buildSummaryReportHooks = [
-                onStageEnded: { stageName, stageConfig, buildResult ->
-                  if (buildResult) {
-                    buildSummaryReport.addFailureRun(stageName, buildResult)
-                    buildSummaryReport.addRunTestActions(stageName, buildResult)
-                    buildSummaryReport.setStageIgnored(stageName)
-                  }
-                }
-              ]
-
               def postBuildHandler = [
                 onStageEnded: { stageName, stageConfig, result ->
                   buildSummaryReport.addFailureRun('Main Build', currentBuild)
@@ -414,33 +404,39 @@ pipeline {
 
                 extendedStage('Builder').nodeRequirements(label: 'canvas-docker', podTemplate: null).obeysAllowStages(false).reportTimings(false).queue(rootStages) {
                   extendedStage('Setup')
+                    .hooks(buildSummaryReportHooks.call())
                     .obeysAllowStages(false)
                     .timeout(2)
                     .execute { setupStage() }
 
                   extendedStage('Rebase')
+                    .hooks(buildSummaryReportHooks.call())
                     .obeysAllowStages(false)
                     .required(!configuration.isChangeMerged() && env.GERRIT_PROJECT == 'canvas-lms')
                     .timeout(2)
                     .execute { rebaseStage() }
 
                   extendedStage(filesChangedStage.STAGE_NAME)
+                    .hooks(buildSummaryReportHooks.call())
                     .obeysAllowStages(false)
                     .timeout(2)
                     .execute(filesChangedStage.&call)
 
                   extendedStage('Build Docker Image (Pre-Merge)')
+                    .hooks(buildSummaryReportHooks.call())
                     .obeysAllowStages(false)
                     .required(configuration.isChangeMerged())
                     .timeout(20)
                     .execute(buildDockerImageStage.&premergeCacheImage)
 
                   extendedStage('Build Docker Image')
+                    .hooks(buildSummaryReportHooks.call())
                     .obeysAllowStages(false)
                     .timeout(20)
                     .execute(buildDockerImageStage.&patchsetImage)
 
                   extendedStage(RUN_MIGRATIONS_STAGE)
+                    .hooks(buildSummaryReportHooks.call())
                     .obeysAllowStages(false)
                     .timeout(10)
                     .execute { runMigrationsStage() }
@@ -448,11 +444,11 @@ pipeline {
                   extendedStage('Parallel Run Tests').obeysAllowStages(false).execute { stageConfig, buildConfig ->
                     def stages = [:]
 
-                    extendedStage('Consumer Smoke Test').queue(stages) {
+                    extendedStage('Consumer Smoke Test').hooks(buildSummaryReportHooks.call()).queue(stages) {
                       sh 'build/new-jenkins/consumer-smoke-test.sh'
                     }
 
-                    extendedStage('Zeitwerk Check').queue(stages) {
+                    extendedStage('Zeitwerk Check').hooks(buildSummaryReportHooks.call()).queue(stages) {
                       withEnv([
                           'COMPOSE_FILE=docker-compose.new-jenkins.yml',
                           'CANVAS_ZEITWERK=1'
@@ -475,12 +471,15 @@ pipeline {
                     }
 
                     extendedStage(JS_BUILD_IMAGE_STAGE)
+                      .hooks(buildSummaryReportHooks.call())
                       .queue(stages, buildDockerImageStage.&jsImage)
 
                     extendedStage(LINTERS_BUILD_IMAGE_STAGE)
+                      .hooks(buildSummaryReportHooks.call())
                       .queue(stages, buildDockerImageStage.&lintersImage)
 
                     extendedStage('Run i18n:generate')
+                      .hooks(buildSummaryReportHooks.call())
                       .required(configuration.isChangeMerged())
                       .queue(stages, buildDockerImageStage.&i18nGenerate)
 
@@ -492,7 +491,7 @@ pipeline {
                   def nestedStages = [:]
 
                   extendedStage('Local Docker Dev Build')
-                    .hooks(buildSummaryReportHooks)
+                    .hooks(buildSummaryReportHooks.call())
                     .required(env.GERRIT_PROJECT == 'canvas-lms' && filesChangedStage.hasDockerDevFiles(buildConfig))
                     .queue(nestedStages, jobName: '/Canvas/test-suites/local-docker-dev-smoke', buildParameters: buildParameters)
 
@@ -503,7 +502,7 @@ pipeline {
                   def nestedStages = [:]
 
                   extendedStage('Javascript')
-                    .hooks(buildSummaryReportHooks)
+                    .hooks(buildSummaryReportHooks.call())
                     .queue(nestedStages, jobName: '/Canvas/test-suites/JS', buildParameters: buildParameters + [
                       string(name: 'KARMA_RUNNER_IMAGE', value: env.KARMA_RUNNER_IMAGE),
                     ])
@@ -539,14 +538,14 @@ pipeline {
                   def nestedStages = [:]
 
                   extendedStage('CDC Schema Check')
-                    .hooks(buildSummaryReportHooks)
+                    .hooks(buildSummaryReportHooks.call())
                     .required(filesChangedStage.hasMigrationFiles(buildConfig))
                     .queue(nestedStages, jobName: '/Canvas/cdc-event-transformer-master', buildParameters: buildParameters + [
                       string(name: 'CANVAS_LMS_IMAGE_PATH', value: "${env.PATCHSET_TAG}"),
                     ])
 
                   extendedStage('Contract Tests')
-                    .hooks(buildSummaryReportHooks)
+                    .hooks(buildSummaryReportHooks.call())
                     .queue(nestedStages, jobName: '/Canvas/test-suites/contract-tests', buildParameters: buildParameters + [
                       string(name: 'CASSANDRA_IMAGE_TAG', value: "${env.CASSANDRA_IMAGE_TAG}"),
                       string(name: 'DYNAMODB_IMAGE_TAG', value: "${env.DYNAMODB_IMAGE_TAG}"),
@@ -554,7 +553,7 @@ pipeline {
                     ])
 
                   extendedStage('Flakey Spec Catcher')
-                    .hooks(buildSummaryReportHooks)
+                    .hooks(buildSummaryReportHooks.call())
                     .required(!configuration.isChangeMerged() && filesChangedStage.hasSpecFiles(buildConfig) || configuration.forceFailureFSC() == '1')
                     .queue(nestedStages, jobName: '/Canvas/test-suites/flakey-spec-catcher', buildParameters: buildParameters + [
                       string(name: 'CASSANDRA_IMAGE_TAG', value: "${env.CASSANDRA_IMAGE_TAG}"),
@@ -563,7 +562,7 @@ pipeline {
                     ])
 
                   extendedStage('Vendored Gems')
-                    .hooks(buildSummaryReportHooks)
+                    .hooks(buildSummaryReportHooks.call())
                     .queue(nestedStages, jobName: '/Canvas/test-suites/vendored-gems', buildParameters: buildParameters + [
                       string(name: 'CASSANDRA_IMAGE_TAG', value: "${env.CASSANDRA_IMAGE_TAG}"),
                       string(name: 'DYNAMODB_IMAGE_TAG', value: "${env.DYNAMODB_IMAGE_TAG}"),
