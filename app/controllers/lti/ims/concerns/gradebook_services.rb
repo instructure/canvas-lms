@@ -35,9 +35,10 @@ module Lti::IMS::Concerns
 
       def user
         @user ||= begin
+          possible_lti_id = params.fetch(:userId, params[:user_id])
           active_user = User
                         .active
-                        .where(lti_id: params[:userId])
+                        .where(lti_id: possible_lti_id)
                         .where.not(lti_id: nil)
                         .or(User.where(id: user_id))
                         .take
@@ -46,7 +47,7 @@ module Lti::IMS::Concerns
           # If the user is a deleted user, we need to check if it was a merged user.
           # If the user was merged, we'll return the merged user, otherwise we return `nil`.
           # So, we won't return a deleted user anymore
-          active_user || context.user_past_lti_ids.find_by(user_lti_id: params[:userId])&.user
+          active_user || context.user_past_lti_ids.find_by(user_lti_id: possible_lti_id)&.user
         end
       end
 
