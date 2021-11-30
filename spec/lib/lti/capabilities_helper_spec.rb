@@ -120,7 +120,7 @@ module Lti
 
     describe "#supported_capabilities" do
       it "returns all supported capabilities asociated with launch params" do
-        expect(CapabilitiesHelper.supported_capabilities).to match_array(supported_capabilities)
+        expect(CapabilitiesHelper.supported_capabilities).to include(*supported_capabilities)
       end
     end
 

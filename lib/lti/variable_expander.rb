@@ -187,6 +187,18 @@ module Lti
                        ENROLLMENT_GUARD,
                        default_name: "com_instructure_user_section_names"
 
+    # Returns the host of the rich content service for the current region
+    #
+    # @example
+    #   ```
+    #   "rich-content-iad.inscloudgate.net"
+    #   ```
+    register_expansion "com.instructure.RCS.app_host", [],
+                       lambda {
+                         Services::RichContent.env_for[:RICH_CONTENT_APP_HOST]
+                       },
+                       default_name: "com_instructure_rcs_app_host"
+
     # returns all observee ids linked to this observer as an String separated by `,`
     # @launch_parameter com_instructure_observee_ids
     # @example
