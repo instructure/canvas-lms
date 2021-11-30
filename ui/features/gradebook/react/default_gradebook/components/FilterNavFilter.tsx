@@ -150,6 +150,7 @@ export default function FilterNavFilter({
         <Condition
           key={condition.id}
           condition={condition}
+          conditionsInFilter={filter.conditions}
           onChange={onChangeCondition}
           onDelete={onDeleteCondition}
           modules={modules}

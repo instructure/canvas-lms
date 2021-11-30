@@ -215,6 +215,8 @@ class Gradebook extends React.Component {
     this.filterAssignmentByGradingPeriod = this.filterAssignmentByGradingPeriod.bind(this)
     this.filterAssignmentByModule = this.filterAssignmentByModule.bind(this)
     this.filterAssignmentBySearchInput = this.filterAssignmentBySearchInput.bind(this)
+    this.filterAssignmentByStartDate = this.filterAssignmentByStartDate.bind(this)
+    this.filterAssignmentByEndDate = this.filterAssignmentByEndDate.bind(this)
 
     // # Course Content Event Handlers
     this.handleSubmissionPostedChange = this.handleSubmissionPostedChange.bind(this)
@@ -1229,7 +1231,9 @@ class Gradebook extends React.Component {
       this.filterAssignmentByAssignmentGroup,
       this.filterAssignmentByGradingPeriod,
       this.filterAssignmentByModule,
-      this.filterAssignmentBySearchInput
+      this.filterAssignmentBySearchInput,
+      this.filterAssignmentByStartDate,
+      this.filterAssignmentByEndDate
     ]
     const matchesAllFilters = assignment => assignmentFilters.every(filter => filter(assignment))
 
@@ -1293,6 +1297,26 @@ class Gradebook extends React.Component {
 
     const moduleIds = findAllAppliedFilterValuesOfType('module', this.state.filters)
     return moduleIds.length === 0 || intersection(assignment.module_ids, moduleIds).length > 0
+  }
+
+  filterAssignmentByStartDate(assignment) {
+    const date = findAllAppliedFilterValuesOfType('start-date', this.state.filters)[0]
+    if (!date) {
+      return true
+    }
+    return Object.values(assignment.effectiveDueDates).some(
+      effectiveDueDateObject => tz.parse(effectiveDueDateObject.due_at) >= tz.parse(date)
+    )
+  }
+
+  filterAssignmentByEndDate(assignment) {
+    const date = findAllAppliedFilterValuesOfType('end-date', this.state.filters)[0]
+    if (!date) {
+      return true
+    }
+    return Object.values(assignment.effectiveDueDates).some(
+      effectiveDueDateObject => tz.parse(effectiveDueDateObject.due_at) <= tz.parse(date)
+    )
   }
 
   handleSubmissionPostedChange(assignment) {
