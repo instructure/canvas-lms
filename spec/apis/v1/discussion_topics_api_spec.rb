@@ -222,6 +222,15 @@ describe DiscussionTopicsController, type: :request do
         {}, {}, expected_status: 404
       )
     end
+
+    it "entries" do
+      api_call(
+        :get,
+        "/api/v1/courses/#{@course.id}/discussion_topics/#{discussion_topic.id}/entries",
+        { controller: "discussion_topics_api", action: "entries", format: "json", course_id: @course.id.to_s, topic_id: discussion_topic.id.to_s },
+        {}, {}, expected_status: 404
+      )
+    end
   end
 
   before(:once) do
