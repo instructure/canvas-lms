@@ -3157,7 +3157,7 @@ nn:
     grade_assignment: 
       buttons: 
         upload_files: "Last opp filer"
-      graded_count: "%{graded_count} *out of* %{total} vurderte innleveringar"
+      graded_count: "%{graded_count} *av* %{total} vurderte innleveringar"
       links: 
         download_submissions: "Last ned innleverte filer"
         peer_reviews: Fagfellevurderingar
@@ -3406,7 +3406,7 @@ nn:
       advanced_turnitin_settings: "Avanserte Turnitin-innstillingar"
       advanced_vericite_settings: "Avanserte VeriCite-innstillingar"
       descriptions: 
-        allowed_extensions: "Oppgi ei liste med aksepterte filtypar, for eksempel: doc,xls,txt"
+        allowed_extensions: "Oppgi ei liste med aksepterte filtypar, for eksempel: docx, xlsx, txt, pdf"
       external_tool_group_warning: "Gruppeoppgåver kan ikkje bruke eksterne verktøy. Markering for gruppeinnstilling blir fjerna når du lagrar"
       external_tool_options: "Alternativ for eksterne verktøy"
       label: 
@@ -7126,7 +7126,7 @@ nn:
       eller Quizar. Oppgåvegrupper kan vektast.
   create_content_for_your_course_500a7032: "Opprett emneinnhald"
   create_criterion_6df4d4ad: "Opprett kriterium"
-  create_delete_update_pages_be209769: "Opprett / Fjern / Oppdater sider"
+  create_delete_update_pages_be209769: "Opprett / Slett / Oppdater sider"
   create_developer_key_78de8510: "Lag utviklarnøkkel"
   create_discussion_topics_8330d52b: "Opprett diskusjonsemne"
   create_educational_resources_8219326e: "Opprett utdanningsressursar"
@@ -7563,7 +7563,7 @@ nn:
   delete_in_progress_2d3f0e0d: "Sletting i gang"
   delete_key_developername_be80e695: "Slett nøkkel %{developerName}"
   delete_key_name_c2de8c0c: "Slett nøkkel %{name}"
-  delete_mastery_level_position_5cf0f8f7: "Fjern meistringsnivå %{position}"
+  delete_mastery_level_position_5cf0f8f7: "Slett meistringsnivå %{position}"
   delete_my_account_41060aad: "Slett Min konto"
   delete_name_81c1b5b2: "Slett %{name}"
   delete_outcome_cc6546f1: "Slett læringsmål"
@@ -15864,8 +15864,8 @@ nn:
   permission_must_be_enabled_for_someone_397e1ce3: "Nokon må ha denne tilgangen"
   permission_not_found_620b80d1: "Finn ikkje løyve"
   permission_to_change_this_mastery_calculation_at_t_9b1966c5: "Tillatelse for å endre denne meistringsutrekninga på emnenivå er skrudd på for:"
-  permission_to_change_this_mastery_calculation_at_t_f292da7a: "Tillatelse til å endre denne meistringsutrekninga på kontonivå er skrudd på for:"
-  permission_to_change_this_mastery_scale_at_the_acc_ea75238f: "Tillatelse til å endre denne meistringsskalaen på kontonivå er skrudd på for:"
+  permission_to_change_this_mastery_calculation_at_t_f292da7a: "Løyve til å endre denne meistringsutrekninga på kontonivå er skrudd på for:"
+  permission_to_change_this_mastery_scale_at_the_acc_ea75238f: "Løyve til å endre denne meistringsskalaen på kontonivå er skrudd på for:"
   permission_to_change_this_mastery_scale_at_the_cou_58677e7f: "Tillatelse til å endre denne meistringsskalaen på emnenivå er skrudd på for:"
   permissions: 
     manage_webhooks: "Webhooks - administrer"
@@ -22136,7 +22136,7 @@ nn:
   to_manage_sis_data_sis_data_manage_must_also_be_en_cc52f042: "For å administrere SIS-data, må 'SIS-data - administrer' óg vere slått på."
   to_manage_sis_data_sis_data_manage_must_be_enabled_23f57d2: "For å administrere SIS-data må 'SIS-data - administrer' vere slått på. Dersom 'SIS-data - administrer' er slått på og 'SIS-data - les' er slått av, vil kontoløyvet overstyre emneløyvet. Dersom 'SIS-data - administrer' er slått av og 'SIS-data - les' er slått på, kan ein brukar kun sjå SIS-ID-ar for emne, brukarar og underkontoar. For å hindre ein brukar frå å sjå SIS-ID-ar  på emnenivå, må både 'SIS-data - administrer' og 'SIS-data - les' vere slått av. "
   to_manage_the_feature_options_tab_feature_options__c478f81: "For å administrere fana for funksjonsval, må 'Funksjonsval - slå på / av' òg vere slått på."
-  to_manage_the_feature_options_tab_feature_options__fc32fca3: "For å administrere fana for funksjonsval, må 'Funksjonsval - slå på slå av må òg vere slått på."
+  to_manage_the_feature_options_tab_feature_options__fc32fca3: "For å administrere fana for funksjonsval, må 'Funksjonsval - slå på slå av òg vere slått på."
   to_minscore_43e5452e: "to %{minScore}%"
   to_moderate_a_quiz_assignments_and_quizzes_add_edi_2c7f4c18: |-
       For å moderere ein quiz, må 'Oppgåver og Quizar - legg til / endre / slett' òg vere slått på..
