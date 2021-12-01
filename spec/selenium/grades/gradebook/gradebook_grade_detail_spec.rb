@@ -48,6 +48,29 @@ describe "Grade Detail Tray:" do
       expect(Gradebook::GradeDetailTray.is_radio_button_selected("missing")).to be true
     end
 
+    context "remove_missing_status_when_graded enabled" do
+      before do
+        Account.site_admin.enable_feature!(:remove_missing_status_when_graded)
+        Gradebook.visit(@course)
+      end
+
+      it "missing submission has missing-radiobutton unselected", priority: "1" do
+        Gradebook::Cells.open_tray(@course.students.first, @a2)
+
+        expect(Gradebook::GradeDetailTray.is_radio_button_selected("missing")).to be false
+      end
+
+      it "updates status when none-option is selected", priority: "2" do
+        Gradebook::Cells.open_tray(@course.students.first, @a2)
+        Gradebook::GradeDetailTray.change_status_to("Missing")
+        Gradebook::GradeDetailTray.change_status_to("None")
+
+        late_policy_status = @course.students.first.submissions.find_by(assignment_id: @a2.id).late_policy_status
+
+        expect(late_policy_status).to eq "none"
+      end
+    end
+
     it "on-time submission has none-radiobutton selected", priority: "1" do
       Gradebook::Cells.open_tray(@course.students.first, @a3)
 
