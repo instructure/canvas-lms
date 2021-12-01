@@ -17,11 +17,18 @@
  */
 
 export type DeepLinkResponse = {
-  content_items: object[]
+  content_items: ContentItem[]
   msg: string
   log: string
   errormsg: string
   errorlog: string
   ltiEndpoint: string
   reloadpage: boolean
+}
+
+export type ContentItem = {
+  title: string
+  errors: object
+  // there are other fields not included here as defined in the spec:
+  // https://www.imsglobal.org/spec/lti-dl/v2p0#content-item-types
 }
