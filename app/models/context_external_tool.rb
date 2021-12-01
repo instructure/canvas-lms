@@ -924,10 +924,12 @@ class ContextExternalTool < ActiveRecord::Base
       return preferred_tool if url.blank? && can_use_preferred_tool
       return nil unless url
 
-      query = ContextExternalTool.shard(context.shard).where(context: contexts).active
-      query = query.where(developer_key_id: preferred_client_id) if preferred_client_id
+      all_external_tools = context.shard.activate do
+        query = ContextExternalTool.where(context: contexts).active
+        query = query.where(developer_key_id: preferred_client_id) if preferred_client_id
+        query.to_a
+      end
 
-      all_external_tools = query.to_a
       sorted_external_tools = all_external_tools.sort_by do |t|
         [contexts.index { |c| c.id == t.context_id && c.class.polymorphic_name == t.context_type }, t.precedence, t.id == preferred_tool_id ? CanvasSort::First : CanvasSort::Last]
       end

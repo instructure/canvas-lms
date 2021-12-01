@@ -755,6 +755,18 @@ describe ContextExternalTool do
       expect(@found_tool).to eql(@tool)
     end
 
+    context "when context is a course on a different shard" do
+      specs_require_sharding
+
+      it "matches on the same domain" do
+        @tool = @course.context_external_tools.create!(name: "a", domain: "google.com", consumer_key: "12345", shared_secret: "secret")
+        @shard2.activate do
+          @found_tool = ContextExternalTool.find_external_tool("http://google.com/is/cool", @course)
+        end
+        expect(@found_tool).to eql(@tool)
+      end
+    end
+
     it "is case insensitive when matching on the same domain" do
       @tool = @course.context_external_tools.create!(name: "a", domain: "Google.com", consumer_key: "12345", shared_secret: "secret")
       @found_tool = ContextExternalTool.find_external_tool("http://google.com/is/cool", Course.find(@course.id), @tool.id)
