@@ -512,12 +512,34 @@ module Lti
           end
 
           context "when required parameter scoreMaximum is absent" do
-            let(:lineItem) { { label: "will not work" } }
+            let(:lineItem) { { tag: "will not work" } }
 
             it_behaves_like "does nothing"
             it "sends error in content item response" do
               subject
-              expect(assigns[:js_env][:deep_link_response][:content_items].first).to have_key(:errors)
+              expect(assigns.dig(:js_env, :deep_link_response, :content_items).first).to have_key(:errors)
+            end
+
+            context "when title is present in content item" do
+              let(:title) { "hello" }
+              let(:content_item) do
+                super().merge({ title: title })
+              end
+
+              it "includes title in response" do
+                subject
+                expect(assigns.dig(:js_env, :deep_link_response, :content_items, 0, :title)).to eq title
+              end
+            end
+
+            context "when label is present in line item" do
+              let(:label) { "will not work" }
+              let(:lineItem) { { label: label } }
+
+              it "includes label as title in response" do
+                subject
+                expect(assigns.dig(:js_env, :deep_link_response, :content_items, 0, :title)).to eq label
+              end
             end
           end
 

@@ -17,60 +17,114 @@
  */
 
 import React from 'react'
-import {mount} from 'enzyme'
-import {Text} from '@instructure/ui-text'
+import {render, cleanup, fireEvent} from '@testing-library/react'
 import {RetrievingContent} from '../DeepLinkingResponse'
 
-let wrapper = 'empty wrapper'
-const windowMock = {}
-const env = {
-  DEEP_LINKING_POST_MESSAGE_ORIGIN: '*',
-  deep_link_response: {
-    content_items: [{type: 'link'}],
-    msg: 'message',
-    log: 'log',
-    errormsg: 'error message',
-    errorlog: 'error log',
-    ltiEndpoint: 'https://www.test.com/retrieve',
-    reloadpage: false
-  }
-}
-
-const render = () => mount(<RetrievingContent environment={env} parentWindow={windowMock} />)
-
-beforeEach(() => {
-  windowMock.postMessage = jest.fn()
-})
-
-afterEach(() => {
-  wrapper.unmount()
-})
-
-it('renders an informative message', () => {
-  wrapper = render()
-  expect(wrapper.find(Text).html()).toContain('Retrieving Content')
-})
-
-describe('post message', () => {
-  beforeEach(() => {
-    wrapper = render()
-  })
-
-  const messageData = () => windowMock.postMessage.mock.calls[0][0]
-
-  ;['content_items', 'msg', 'log', 'errormsg', 'errorlog', 'ltiEndpoint', 'reloadpage'].forEach(
-    attr => {
-      it(`sends the correct ${attr}`, () => {
-        expect(messageData()[attr]).toEqual(env.deep_link_response[attr])
-      })
+describe('RetrievingContent', () => {
+  let component
+  const windowMock = {}
+  let content_items = []
+  const env = () => ({
+    DEEP_LINKING_POST_MESSAGE_ORIGIN: '*',
+    deep_link_response: {
+      content_items,
+      msg: 'message',
+      log: 'log',
+      errormsg: 'error message',
+      errorlog: 'error log',
+      ltiEndpoint: 'https://www.test.com/retrieve',
+      reloadpage: false
     }
-  )
-
-  it('sends the correct content items', () => {
-    expect(messageData().content_items).toMatchObject(env.deep_link_response.content_items)
   })
 
-  it('sends the correct message type', () => {
-    expect(messageData().messageType).toEqual('LtiDeepLinkingResponse')
+  const renderComponent = () =>
+    render(<RetrievingContent environment={env()} parentWindow={windowMock} />)
+
+  beforeEach(() => {
+    windowMock.postMessage = jest.fn()
+  })
+
+  afterEach(() => {
+    cleanup()
+  })
+
+  describe('with no content item errors', () => {
+    beforeEach(() => {
+      content_items = [{type: 'link'}]
+      component = renderComponent()
+    })
+
+    it('renders an informative message', () => {
+      expect(component.getByTitle('Retrieving Content')).toBeInTheDocument()
+    })
+
+    it('immediately calls postMessage', () => {
+      expect(windowMock.postMessage).toHaveBeenCalled()
+    })
+  })
+
+  describe('with errored content items', () => {
+    beforeEach(() => {
+      content_items = [
+        {type: 'LtiResourceLink', title: 'all good'},
+        {
+          type: 'LtiResourceLink',
+          title: 'not happy',
+          errors: {fieldOne: 'error one', fieldTwo: 'error two'}
+        }
+      ]
+      component = renderComponent()
+    })
+
+    it('shows succeeded content items just for info', () => {
+      expect(component.getAllByText('Processed').length).toBe(1)
+      expect(component.getByText(content_items[0].title)).toBeInTheDocument()
+    })
+
+    it('shows one row per errored field', () => {
+      expect(component.getAllByText('Discarded').length).toBe(2)
+      expect(component.getAllByText(content_items[1].title).length).toBe(2)
+      expect(component.getByText(content_items[1].errors.fieldOne)).toBeInTheDocument()
+      expect(component.getByText(content_items[1].errors.fieldTwo)).toBeInTheDocument()
+    })
+
+    describe('after user clicks Continue', () => {
+      beforeEach(() => {
+        fireEvent.click(component.getByRole('button'))
+      })
+
+      it('only sends postMessage after user clicks Continue', () => {
+        expect(windowMock.postMessage).toHaveBeenCalled()
+      })
+
+      it('shows original informative message', () => {
+        expect(component.getByTitle('Retrieving Content')).toBeInTheDocument()
+      })
+    })
+  })
+
+  describe('post message', () => {
+    beforeEach(() => {
+      content_items = [{type: 'link'}]
+      component = renderComponent()
+    })
+
+    const messageData = () => windowMock.postMessage.mock.calls[0][0]
+
+    ;['content_items', 'msg', 'log', 'errormsg', 'errorlog', 'ltiEndpoint', 'reloadpage'].forEach(
+      attr => {
+        it(`sends the correct ${attr}`, () => {
+          expect(messageData()[attr]).toEqual(env().deep_link_response[attr])
+        })
+      }
+    )
+
+    it('sends the correct content items', () => {
+      expect(messageData().content_items).toMatchObject(env().deep_link_response.content_items)
+    })
+
+    it('sends the correct message type', () => {
+      expect(messageData().messageType).toEqual('LtiDeepLinkingResponse')
+    })
   })
 })
