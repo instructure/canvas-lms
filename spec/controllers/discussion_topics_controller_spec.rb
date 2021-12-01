@@ -435,6 +435,15 @@ describe DiscussionTopicsController do
           subject
           expect(assigns.dig(:js_env, :rce_mentions_in_discussions)).to be true
         end
+
+        context "topic is anonymous" do
+          it 'sets "rce_mentions_in_discussions" to false in the JS ENV' do
+            DiscussionTopic.where(id: discussion.id).update_all(anonymous_state: "full_anonymity")
+            discussion.reload
+            subject
+            expect(assigns.dig(:js_env, :rce_mentions_in_discussions)).to be false
+          end
+        end
       end
 
       context 'and "rce_mentions_in_discussions" disabled' do

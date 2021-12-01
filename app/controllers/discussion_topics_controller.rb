@@ -653,7 +653,7 @@ class DiscussionTopicsController < ApplicationController
       return
     end
 
-    if @topic.anonymous_state == "full_anonymity" && !@context.feature_enabled?(:react_discussions_post)
+    if @topic.anonymous? && !@context.feature_enabled?(:react_discussions_post)
       flash[:info] = I18n.t :anonymous_topic_notice, "That topic requires the Discussions / Announcements Redesign feature flag turned on"
       redirect_to named_context_url(@context, :context_discussion_topics_url)
       return
@@ -727,7 +727,7 @@ class DiscussionTopicsController < ApplicationController
                discussion_topic_id: params[:id],
                manual_mark_as_read: @current_user&.manual_mark_as_read?,
                discussion_topic_menu_tools: external_tools_display_hashes(:discussion_topic_menu),
-               rce_mentions_in_discussions: Account.site_admin.feature_enabled?(:rce_mentions_in_discussions),
+               rce_mentions_in_discussions: Account.site_admin.feature_enabled?(:rce_mentions_in_discussions) && !@topic.anonymous?,
                isolated_view: Account.site_admin.feature_enabled?(:isolated_view),
                draft_discussions: Account.site_admin.feature_enabled?(:draft_discussions),
                student_reporting_enabled: Account.site_admin.feature_enabled?(:discussions_reporting),
