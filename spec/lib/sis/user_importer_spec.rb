@@ -48,6 +48,20 @@ describe SIS::UserImporter do
     end
   end
 
+  it "must raise ImportError when user doesn't have status" do
+    messages = []
+    account_model
+    Setting.set("sis_transaction_seconds", "1")
+    user1 = SIS::Models::User.new(user_id: "sis_id", login_id: "123456", status: nil,
+                                  full_name: "User One", email: "user1@example.com")
+
+    expect do
+      SIS::UserImporter.new(@account, { batch: @account.sis_batches.create! }).process(messages) do |importer|
+        importer.add_user(user1)
+      end
+    end.to raise_error(SIS::ImportError)
+  end
+
   it "populates the deleted_at property when user gets deleted and field is not stuck" do
     account_model
     Setting.set("sis_transaction_seconds", "1")
