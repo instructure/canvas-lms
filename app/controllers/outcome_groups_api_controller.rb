@@ -200,7 +200,7 @@ class OutcomeGroupsApiController < ApplicationController
       ret = LearningOutcomeResult.active.distinct.where(learning_outcome_id: outcome_ids).pluck(:learning_outcome_id)
       # ret is now a list of outcomes that have been assessed
       outcome_params[:assessed_outcomes] = ret
-      if Account.site_admin.feature_enabled?(:outcomes_friendly_description)
+      if @context.root_account.feature_enabled?(:improved_outcomes_management) && Account.site_admin.feature_enabled?(:outcomes_friendly_description)
         account = @context.is_a?(Account) ? @context : @context.account
         course = @context.is_a?(Course) ? @context : nil
         friendly_descriptions = resolve_friendly_descriptions(account, course, outcome_ids).map { |description| [description.learning_outcome_id, description.description] }
