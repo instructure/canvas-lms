@@ -37,6 +37,7 @@ export const getContext = isMobileView => {
   const treeBrowserAccountGroupId = ACCOUNT_GROUP_ID
   const rootIds = [globalRootId, treeBrowserAccountGroupId, treeBrowserRootGroupId]
   const individualOutcomeRatingAndCalculationFF = ENV.INDIVIDUAL_OUTCOME_RATING_AND_CALCULATION
+  const accountLevelMasteryScalesFF = ENV.ACCOUNT_LEVEL_MASTERY_SCALES
 
   return {
     env: {
@@ -53,7 +54,8 @@ export const getContext = isMobileView => {
       treeBrowserRootGroupId,
       treeBrowserAccountGroupId,
       rootIds,
-      individualOutcomeRatingAndCalculationFF
+      individualOutcomeRatingAndCalculationFF,
+      accountLevelMasteryScalesFF
     }
   }
 }
