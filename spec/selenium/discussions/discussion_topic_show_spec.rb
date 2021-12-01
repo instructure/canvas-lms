@@ -66,6 +66,20 @@ describe "Discussion Topic Show" do
       end
     end
 
+    it "Displays when all features are turned on" do
+      Account.site_admin.enable_feature! :react_discussions_post
+      Account.site_admin.enable_feature! :discussions_reporting
+      Account.site_admin.enable_feature! :discussion_anonymity
+
+      gc = @course.account.group_categories.create(name: "Group Category")
+      group = group_model(name: "Group", group_category: gc, context: @course.account)
+      group_membership_model(group: group, user: @teacher)
+      topic = discussion_topic_model(context: group)
+
+      get "/groups/#{group.id}/discussion_topics/#{topic.id}"
+      expect(fj("h1:contains('value for title')")).to be_present
+    end
+
     it "has a module progression section when applicable" do
       module1 = @course.context_modules.create!(name: "module1")
       item1 = @course.assignments.create!(

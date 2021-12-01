@@ -2263,4 +2263,8 @@ class Account < ActiveRecord::Base
       end
     end
   end
+
+  def student_reporting?
+    false
+  end
 end
