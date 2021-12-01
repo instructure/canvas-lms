@@ -124,6 +124,22 @@ describe('ManageOutcomeItem', () => {
     expect(queryByTestId('description-truncated')).toBeInTheDocument()
   })
 
+  it('displays disabled caret button with "not-allowed" cursor if no description', () => {
+    const {queryByTestId} = render(<ManageOutcomeItem {...defaultProps({description: null})} />)
+    expect(queryByTestId('icon-arrow-right').closest('button')).toHaveAttribute('disabled')
+    expect(queryByTestId('icon-arrow-right').closest('button').style).toHaveProperty(
+      'cursor',
+      'not-allowed'
+    )
+  })
+
+  it('displays enabled caret button if no description but individualOutcomeRatingAndCalculationFF on', () => {
+    const {queryByTestId} = render(<ManageOutcomeItem {...defaultProps({description: null})} />, {
+      individualOutcomeRatingAndCalculationFF: true
+    })
+    expect(queryByTestId('icon-arrow-right').closest('button')).toBeEnabled()
+  })
+
   it('handles click on individual outcome -> kebab menu -> remove option', () => {
     const {getByText} = render(<ManageOutcomeItem {...defaultProps()} />)
     fireEvent.click(getByText('Menu for outcome Outcome Title'))

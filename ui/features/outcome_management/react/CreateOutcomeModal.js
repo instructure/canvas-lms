@@ -44,6 +44,8 @@ import OutcomesRceField from './shared/OutcomesRceField'
 import ProficiencyCalculation, {
   defaultProficiencyCalculation
 } from './MasteryCalculation/ProficiencyCalculation'
+import useRatings, {defaultOutcomesManagementRatings} from '@canvas/outcomes/react/hooks/useRatings'
+import Ratings from './Management/Ratings'
 
 const CreateOutcomeModal = ({isOpen, onCloseHandler, onSuccess, starterGroupId}) => {
   const {
@@ -64,6 +66,8 @@ const CreateOutcomeModal = ({isOpen, onCloseHandler, onSuccess, starterGroupId})
     collection: 'OutcomeManagementPanel',
     initialGroupId: starterGroupId
   })
+
+  const {ratings, setRatings} = useRatings({initialRatings: defaultOutcomesManagementRatings})
   const [selectedGroup, setSelectedGroup] = useState(null)
   const [selectedGroupAncestorIds, setSelectedGroupAncestorIds] = useState([])
   const [proficiencyCalculation, setProficiencyCalculation] = useState(
@@ -243,15 +247,18 @@ const CreateOutcomeModal = ({isOpen, onCloseHandler, onSuccess, starterGroupId})
             </View>
           )}
           {individualOutcomeRatingAndCalculationFF && (
-            <View as="div" minHeight="14rem">
-              <hr style={{margin: '1rem 0 0'}} />
-              <ProficiencyCalculation
-                update={updateProficiencyCalculation}
-                setError={setProficiencyCalculationError}
-                individualOutcome="edit"
-                canManage
-              />
-            </View>
+            <>
+              <Ratings ratings={ratings} onChangeRatings={setRatings} canManage />
+              <View as="div" minHeight="14rem">
+                <hr style={{margin: '1rem 0 0'}} />
+                <ProficiencyCalculation
+                  update={updateProficiencyCalculation}
+                  setError={setProficiencyCalculationError}
+                  individualOutcome="edit"
+                  canManage
+                />
+              </View>
+            </>
           )}
           <View as="div" padding="x-small 0 0">
             <Text size="medium" weight="bold">
