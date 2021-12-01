@@ -198,9 +198,7 @@ describe DiscussionTopicsController, type: :request do
 
   context "anonymous discussion gets 404" do
     let_once(:discussion_topic) do
-      dt = @course.discussion_topics.create!(user: @user, message: "Locked Discussion")
-      dt.anonymous_state = "full_anonymity"
-      dt.save!
+      dt = @course.discussion_topics.create!(user: @user, message: "Locked Discussion", anonymous_state: "full_anonymity")
 
       entry = dt.discussion_entries.create!(message: "first message", user: @student)
       entry.save
@@ -363,6 +361,13 @@ describe DiscussionTopicsController, type: :request do
       end
 
       it "creates a fully anonymous discussion" do
+        expect(@topic["anonymous_state"]).to eq "full_anonymity"
+      end
+
+      it "not able to update the anonymous state of an existing topic" do
+        api_call(:put, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
+                 { controller: "discussion_topics", action: "update", format: "json", course_id: @course.to_param, topic_id: @topic.to_param },
+                 { anonymous_state: nil }, {}, expected_status: 200)
         expect(@topic["anonymous_state"]).to eq "full_anonymity"
       end
     end

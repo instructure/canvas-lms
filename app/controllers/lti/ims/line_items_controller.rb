@@ -177,6 +177,9 @@ module Lti
       #
       # @returns LineItem
       def show
+        # the LineItem workflow_state still "active" even if the assignment is deleted
+        head :not_found and return if line_item.assignment.deleted?
+
         render json: LineItemsSerializer.new(line_item, line_item_id(line_item)),
                content_type: MIME_TYPE
       end

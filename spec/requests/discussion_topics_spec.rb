@@ -26,6 +26,7 @@ describe "Discussion Topics API", type: :request do
   let(:course) { teacher_enrollment.course }
   let(:teacher) { teacher_enrollment.user }
   let!(:discussion) { discussion_topic_model(context: course, user: teacher) }
+  let!(:anon_discussion) { discussion_topic_model(context: course, user: teacher, anonymous_state: "full_anonymity") }
 
   describe "index" do
     before do
@@ -43,14 +44,10 @@ describe "Discussion Topics API", type: :request do
       end
 
       context "when the discussion is anonymous" do
-        before do
-          discussion.update(anonymous_state: "full_anonymity")
-        end
-
         it "does not include the author information" do
           get api_v1_course_discussion_topics_path(course.id), params: { format: :json }
           expect(response.status).to eq 200
-          json = JSON.parse(response.body).detect { |d| d["id"] == discussion.id }
+          json = JSON.parse(response.body).detect { |d| d["id"] == anon_discussion.id }
           expect(json["author"]).to be_nil
         end
       end

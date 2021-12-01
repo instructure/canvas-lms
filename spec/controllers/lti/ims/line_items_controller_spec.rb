@@ -564,6 +564,17 @@ module Lti
           send_request
           expect(response.headers["Content-Type"]).to include described_class::MIME_TYPE
         end
+
+        context "when the assignment is deleted" do
+          before do
+            assignment.destroy!
+          end
+
+          it "responds with 404" do
+            send_request
+            expect(response).to be_not_found
+          end
+        end
       end
 
       describe "#index" do
