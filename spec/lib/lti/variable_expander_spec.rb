@@ -1136,6 +1136,30 @@ module Lti
           end
         end
 
+        describe "$com.instructure.RCS.app_host" do
+          subject do
+            exp_hash = { test: "$com.instructure.RCS.app_host" }
+            variable_expander.expand_variables!(exp_hash)
+            exp_hash[:test]
+          end
+
+          let(:app_host) { "rich-content-iad.inscloudgate.net" }
+
+          context "when the RCS in configured" do
+            before do
+              allow(Canvas::DynamicSettings).to receive(:find)
+                .with(any_args)
+                .and_call_original
+
+              allow(Canvas::DynamicSettings).to receive(:find)
+                .with("rich-content-service", default_ttl: 5.minutes)
+                .and_return(DynamicSettings::FallbackProxy.new({ "app-host" => app_host }))
+            end
+
+            it { is_expected.to eq app_host }
+          end
+        end
+
         describe "$com.instructure.User.observees" do
           subject do
             exp_hash = { test: "$com.instructure.User.observees" }
