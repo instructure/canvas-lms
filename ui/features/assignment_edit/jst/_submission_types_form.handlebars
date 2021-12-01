@@ -133,7 +133,7 @@
               maxlength="254"
               placeholder="{{#t "labels.allowed_extensions"}}Allowed File Extensions{{/t}}"
               aria-labelledby="explanation_nest"
-              value="{{join allowedExtensions " ,"}}"
+              value="{{join allowedExtensions ", "}}"
               {{disabledIfIncludes frozenAttributes "submission_types"}} />
             <div id="explanation_nest" class="explanation nest">
               {{#t "descriptions.allowed_extensions"}}
