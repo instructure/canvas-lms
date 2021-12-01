@@ -87,4 +87,16 @@ describe('Report Reply', () => {
     expect(container.getByText('Submit').closest('button').hasAttribute('disabled')).toBeTruthy()
     expect(container.getByText('Cancel').closest('button').hasAttribute('disabled')).toBeTruthy()
   })
+
+  it('should disable options when cancelling', async () => {
+    const container = setup(mockProps({onCloseReportModal: jest.fn()}))
+
+    const option = await container.findByText('Other')
+    fireEvent.click(option)
+
+    const cancelButton = await container.findByTestId('report-reply-cancel-modal-button')
+    fireEvent.click(cancelButton)
+
+    expect(container.getByText('Submit').closest('button').hasAttribute('disabled')).toBeTruthy()
+  })
 })
