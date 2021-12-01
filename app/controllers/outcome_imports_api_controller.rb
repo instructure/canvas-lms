@@ -209,6 +209,37 @@ class OutcomeImportsApiController < ApplicationController
     end
   end
 
+  # @API Get IDs of outcome groups created after successful import
+  #
+  # Get the IDs of the outcome groups created after a successful import.
+  # Pass 'latest' for the outcome import id for the latest import.
+  #
+  #   Examples:
+  #     curl 'https://<canvas>/api/v1/accounts/<account_id>/outcome_imports/outcomes_group_ids/<outcome_import_id>' \
+  #         -H "Authorization: Bearer <token>"
+  #     curl 'https://<canvas>/api/v1/courses/<course_id>/outcome_imports/outcome_group_ids/<outcome_import_id>' \
+  #         -H "Authorization: Bearer <token>"
+  #
+  # @returns array of outcome ids
+  def created_group_ids
+    if authorized_action(@context, @current_user, %i[import_outcomes manage_outcomes])
+      begin
+        import = if params[:id] == "latest"
+                   @context.latest_outcome_import or raise ActiveRecord::RecordNotFound
+                 else
+                   @context.outcome_imports.find(params[:id])
+                 end
+
+        raise ActiveRecord::RecordNotFound, "Import has failed" if import.failed?
+        raise ActiveRecord::RecordNotFound, "Import is still being processed" unless import.succeeded?
+
+        render json: LearningOutcomeGroup.where(outcome_import_id: import.id).pluck(:id).map(&:to_s)
+      rescue ActiveRecord::RecordNotFound => e
+        render json: { message: e.message }, status: :not_found
+      end
+    end
+  end
+
   private
 
   def body_file
