@@ -282,7 +282,7 @@ class ConferencesController < ApplicationController
       @render_alternatives = WebConference.conference_types(@context).all? { |ct| ct[:replace_with_alternatives] }
       case @context
       when Course
-        @sections = @context.course_sections
+        @sections = @context.course_sections.active
         @groups = @context.active_groups
 
         @group_user_ids_map = @groups.to_a.each_with_object({}) do |group, acc|
