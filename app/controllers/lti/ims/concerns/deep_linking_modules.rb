@@ -120,8 +120,12 @@ module Lti::IMS::Concerns
       return unless @context.root_account.feature_enabled? :lti_deep_linking_line_items
 
       content_items_for_assignments.each do |content_item|
+        if content_item.dig(:lineItem, :label)
+          content_item[:title] = content_item.dig(:lineItem, :label)
+        end
+
         unless content_item.dig(:lineItem, :scoreMaximum)
-          content_item[:errors] = "lineItem.scoreMaximum is a required field"
+          content_item[:errors] = { "lineItem.scoreMaximum": I18n.t("lineItem.scoreMaximum is a required field") }
           next
         end
 
@@ -130,7 +134,7 @@ module Lti::IMS::Concerns
             @context.assignments.create!(
               {
                 submission_types: "external_tool",
-                title: content_item.dig(:lineItem, :label) || content_item[:title],
+                title: content_item[:title],
                 description: content_item[:text],
                 points_possible: content_item.dig(:lineItem, :scoreMaximum),
                 unlock_at: content_item.dig(:available, :startDateTime),

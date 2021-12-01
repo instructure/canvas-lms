@@ -53,13 +53,15 @@ module Lti
         # window.postMessage to the main Canvas window, which can choose to do what
         # it will with the content items
         js_env({
-          content_items: content_items,
-          message: messaging_value("msg"),
-          log: messaging_value("log"),
-          error_message: messaging_value("errormsg"),
-          error_log: messaging_value("errorlog"),
-          lti_endpoint: polymorphic_url([:retrieve, @context, :external_tools]),
-          reload_page: multiple_items_for_existing_module?
+          deep_link_response: {
+            content_items: content_items,
+            msg: messaging_value("msg"),
+            log: messaging_value("log"),
+            errormsg: messaging_value("errormsg"),
+            errorlog: messaging_value("errorlog"),
+            ltiEndpoint: polymorphic_url([:retrieve, @context, :external_tools]),
+            reloadpage: multiple_items_for_existing_module?
+          }
         }.compact)
 
         render layout: "bare"
