@@ -36,10 +36,16 @@ const REPORT_TYPES = [
 
 export const ReportReply = props => {
   const [selectedReportType, setSelectedReportType] = useState('')
+
+  const onClose = () => {
+    setSelectedReportType('')
+    props.onCloseReportModal()
+  }
+
   return (
     <Modal
       open={props.showReportModal}
-      onDismiss={props.onCloseReportModal}
+      onDismiss={onClose}
       size="medium"
       label={I18n.t('Report Reply')}
       shouldCloseOnDocumentClick
@@ -48,7 +54,7 @@ export const ReportReply = props => {
         <CloseButton
           placement="end"
           offset="small"
-          onClick={props.onCloseReportModal}
+          onClick={onClose}
           screenReaderLabel={I18n.t('Close')}
         />
         <Heading>{I18n.t('Report Reply')}</Heading>
@@ -86,7 +92,7 @@ export const ReportReply = props => {
       <Modal.Footer>
         <Button
           data-testid="report-reply-cancel-modal-button"
-          onClick={props.onCloseReportModal}
+          onClick={onClose}
           margin="0 x-small 0 0"
           interaction={!props.isLoading ? 'enabled' : 'disabled'}
         >
