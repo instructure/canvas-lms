@@ -198,6 +198,14 @@ describe('DiscussionFullPage', () => {
   })
 
   describe('searchFilter', () => {
+    beforeAll(() => {
+      jest.setTimeout(15000)
+    })
+
+    afterAll(() => {
+      jest.setTimeout(5000)
+    })
+
     it('filters by unread', async () => {
       const mocks = [
         ...getDiscussionQueryMock(),
