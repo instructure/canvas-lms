@@ -23,10 +23,7 @@ import org.jenkinsci.plugins.workflow.steps.FlowInterruptedException
 @Field static final SUCCESS_UNSTABLE = [buildResult: 'SUCCESS', stageResult: 'UNSTABLE']
 
 def createDistribution(nestedStages) {
-  def rspecNodeTotal = configuration.getInteger('rspec-ci-node-total')
-  def seleniumNodeTotal = configuration.getInteger('selenium-ci-node-total')
   def rspecqNodeTotal = configuration.getInteger('rspecq-ci-node-total')
-  def rspecqEnabled = env.RSPECQ_ENABLED == '1' || configuration.isRspecqEnabled()
   def setupNodeHook = this.&setupNode
 
   def baseEnvVars = [
@@ -34,26 +31,6 @@ def createDistribution(nestedStages) {
     'POSTGRES_PASSWORD=sekret',
     'SELENIUM_VERSION=3.141.59-20201119',
     "RSPECQ_ENABLED=${env.RSPECQ_ENABLED}"
-  ]
-
-  def rspecEnvVars = baseEnvVars + [
-    "CI_NODE_TOTAL=$rspecNodeTotal",
-    'COMPOSE_FILE=docker-compose.new-jenkins.yml',
-    'EXCLUDE_TESTS=.*/(selenium|contracts)',
-    "FORCE_FAILURE=${configuration.isForceFailureRSpec() ? '1' : ''}",
-    "RERUNS_RETRY=${configuration.getInteger('rspec-rerun-retry')}",
-    "RSPEC_PROCESSES=${configuration.getInteger('rspec-processes')}",
-    'TEST_PATTERN=^./(spec|gems/plugins/.*/spec_canvas)/',
-  ]
-
-  def seleniumEnvVars = baseEnvVars + [
-    "CI_NODE_TOTAL=$seleniumNodeTotal",
-    'COMPOSE_FILE=docker-compose.new-jenkins.yml:docker-compose.new-jenkins-selenium.yml',
-    'EXCLUDE_TESTS=.*/performance',
-    "FORCE_FAILURE=${configuration.isForceFailureSelenium() ? '1' : ''}",
-    "RERUNS_RETRY=${configuration.getInteger('selenium-rerun-retry')}",
-    "RSPEC_PROCESSES=${configuration.getInteger('selenium-processes')}",
-    'TEST_PATTERN=^./(spec|gems/plugins/.*/spec_canvas)/selenium',
   ]
 
   def rspecqEnvVars = baseEnvVars + [
@@ -70,40 +47,20 @@ def createDistribution(nestedStages) {
 
   def rspecNodeRequirements = [label: 'canvas-docker']
 
-  if (rspecqEnabled) {
-    extendedStage('RSpecQ Reporter for Rspec')
-        .envVars(rspecqEnvVars)
-        .hooks([onNodeAcquired: setupNodeHook])
-        .nodeRequirements(rspecNodeRequirements)
-        .timeout(15)
-        .queue(nestedStages, this.&runReporter)
+  extendedStage('RSpecQ Reporter for Rspec')
+      .envVars(rspecqEnvVars)
+      .hooks([onNodeAcquired: setupNodeHook])
+      .nodeRequirements(rspecNodeRequirements)
+      .timeout(15)
+      .queue(nestedStages, this.&runReporter)
 
-    rspecqNodeTotal.times { index ->
-      extendedStage("RSpecQ Test Set ${(index + 1).toString().padLeft(2, '0')}")
-          .envVars(rspecqEnvVars + ["CI_NODE_INDEX=$index"])
-          .hooks([onNodeAcquired: setupNodeHook, onNodeReleasing: { tearDownNode('spec') }])
-          .nodeRequirements(rspecNodeRequirements)
-          .timeout(15)
-          .queue(nestedStages, this.&runRspecqSuite)
-    }
-  } else {
-    rspecNodeTotal.times { index ->
-      extendedStage("RSpec Test Set ${(index + 1).toString().padLeft(2, '0')}")
-        .envVars(rspecEnvVars + ["CI_NODE_INDEX=$index"])
-        .hooks([onNodeAcquired: setupNodeHook, onNodeReleasing: { tearDownNode('rspec') }])
+  rspecqNodeTotal.times { index ->
+    extendedStage("RSpecQ Test Set ${(index + 1).toString().padLeft(2, '0')}")
+        .envVars(rspecqEnvVars + ["CI_NODE_INDEX=$index"])
+        .hooks([onNodeAcquired: setupNodeHook, onNodeReleasing: { tearDownNode('spec') }])
         .nodeRequirements(rspecNodeRequirements)
         .timeout(15)
-        .queue(nestedStages, this.&runLegacySuite)
-    }
-
-    seleniumNodeTotal.times { index ->
-      extendedStage("Selenium Test Set ${(index + 1).toString().padLeft(2, '0')}")
-        .envVars(seleniumEnvVars + ["CI_NODE_INDEX=$index"])
-        .hooks([onNodeAcquired: setupNodeHook, onNodeReleasing: { tearDownNode('selenium') }])
-        .nodeRequirements(rspecNodeRequirements)
-        .timeout(15)
-        .queue(nestedStages, this.&runLegacySuite)
-    }
+        .queue(nestedStages, this.&runRspecqSuite)
   }
 }
 
