@@ -341,6 +341,9 @@ const locale = {
   "pentagon_17d82ea3": { "message": "Pentagon" },
   "people_b4ebb13c": { "message": "People" },
   "percentage_34ab7c2c": { "message": "Percentage" },
+  "percentage_must_be_a_number_8033c341": {
+    "message": "Percentage must be a number"
+  },
   "pixels_52ece7d1": { "message": "Pixels" },
   "posted_when_a578f5ab": { "message": "Posted: { when }" },
   "preformatted_d0670862": { "message": "Preformatted" },
