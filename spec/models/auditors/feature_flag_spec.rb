@@ -24,7 +24,7 @@ describe Auditors::FeatureFlag do
   let(:request_id) { 42 }
   let(:feature_name) { 'root_account_feature' }
 
-  before(:each) do
+  before do
     allow(Feature).to receive(:definitions).and_return({
                                                          feature_name => Feature.new(feature: feature_name, applies_to: 'RootAccount')
                                                        })
@@ -70,7 +70,7 @@ describe Auditors::FeatureFlag do
       it "doesn't record an error when not configured" do
         allow(Auditors::FeatureFlag::Stream).to receive(:database).and_return(nil)
         expect(CanvasCassandra::DatabaseBuilder).to receive(:configured?).with("auditors").once.and_return(false)
-        expect(EventStream::Logger).to receive(:error).never
+        expect(EventStream::Logger).not_to receive(:error)
         Auditors::FeatureFlag.record(@flag, @user, 'off')
       end
     end
@@ -108,7 +108,7 @@ describe Auditors::FeatureFlag do
     end
 
     it "does not swallow auditor write errors" do
-      test_err_class = Class.new(StandardError) {}
+      test_err_class = Class.new(StandardError)
       allow(Auditors::ActiveRecord::FeatureFlagRecord).to receive(:create_from_event_stream!).and_raise(test_err_class.new("DB Error"))
       expect { Auditors::FeatureFlag.record(@flag, @user, 'on') }.to raise_error(test_err_class)
     end

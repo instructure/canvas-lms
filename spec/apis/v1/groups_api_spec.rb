@@ -137,7 +137,7 @@ describe "Groups API", type: :request do
     json = api_call(:get, "/api/v1/users/self/groups", @category_path_options.merge(:action => "index"))
     expect(json).to eq [group_json(@community), group_json(@group)]
     links = response.headers['Link'].split(",")
-    expect(links.all? { |l| l =~ /api\/v1\/users\/self\/groups/ }).to be_truthy
+    expect(links.all? { |l| l.include?('api/v1/users/self/groups') }).to be_truthy
   end
 
   describe "show SIS fields based on manage_sis permissions" do
@@ -818,7 +818,7 @@ describe "Groups API", type: :request do
       }.to change(User, :count).by(2)
       @memberships = @community.reload.group_memberships.where(:workflow_state => "invited").order(:id).to_a
       expect(@memberships.count).to eq 2
-      expect(@json.sort_by { |a| a['id'] }).to eq @memberships.map { |gm| membership_json(gm) }
+      expect(@json.sort_by { |a| a['id'] }).to eq(@memberships.map { |gm| membership_json(gm) })
     end
 
     it "does not allow a member to invite people to a group" do
@@ -1027,7 +1027,7 @@ describe "Groups API", type: :request do
       @group = @course.groups.create!(:name => 'Group 1')
     end
 
-    before :each do
+    before do
       user_session @teacher
     end
 

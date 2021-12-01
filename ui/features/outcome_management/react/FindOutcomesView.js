@@ -220,12 +220,16 @@ const FindOutcomesView = ({
                 </View>
               )}
               {outcomes?.edges?.map(
-                ({_id: linkId, node: {_id, title, description, isImported}}, index) => (
+                (
+                  {_id: linkId, node: {_id, title, description, friendlyDescription, isImported}},
+                  index
+                ) => (
                   <FindOutcomeItem
                     key={linkId}
                     id={_id}
                     title={title}
                     description={description}
+                    friendlyDescription={friendlyDescription?.description}
                     isFirst={index === 0}
                     importOutcomeStatus={importOutcomesStatus?.[_id]}
                     isImported={isImported}

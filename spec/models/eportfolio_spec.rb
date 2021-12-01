@@ -303,7 +303,7 @@ describe Eportfolio do
       let(:spam_status) { eportfolio.reload.spam_status }
 
       context "when the setting has a value" do
-        before(:each) do
+        before do
           Setting.set('eportfolio_title_spam_keywords', 'bad, verybad, worse')
         end
 

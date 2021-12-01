@@ -309,7 +309,7 @@ describe ObserverAlert do
       let(:observer) { course.enroll_user(User.create!, 'ObserverEnrollment', associated_user_id: student.id).user }
       let(:assignment) { course.assignments.create!(title: 'missing', submission_types: 'online_text_entry') }
 
-      before(:each) do
+      before do
         ObserverAlertThreshold.create!(observer: observer, student: student, alert_type: 'assignment_missing')
         assignment.submission_for_student(student).update!(late_policy_status: 'missing')
       end

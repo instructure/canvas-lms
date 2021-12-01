@@ -230,6 +230,14 @@ with the following parameters:
   </tbody>
 </table>
 
+If the user doesn't accept the request for access, or if another error
+occurs, Canvas redirects back to your request\_uri with an `error`
+parameter in the query string, rather than responding with JSON.
+
+Note that the once the code issued in step 2 is used in a POST request
+to this endpoint, it is invalidated and further requests for tokens
+with the same code will fail.
+
 <a name="using-access-tokens"></a>
 ## [Using an Access Token to authenticate requests](#using-access-tokens)
 <small><a href="#top">Back to Top</a></small>

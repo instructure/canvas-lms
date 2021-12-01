@@ -85,17 +85,17 @@ describe "Folders API", type: :request do
       expect(json.length).to eq 3
       links = response.headers['Link'].split(",")
       expect(links.all? { |l| l =~ /api\/v1\/folders\/#{@root.id}\/folders/ }).to be_truthy
-      expect(links.find { |l| l.match(/rel="next"/) }).to match(/page=2&per_page=3>/)
-      expect(links.find { |l| l.match(/rel="first"/) }).to match(/page=1&per_page=3>/)
-      expect(links.find { |l| l.match(/rel="last"/) }).to match(/page=3&per_page=3>/)
+      expect(links.find { |l| l.include?('rel="next"') }).to match(/page=2&per_page=3>/)
+      expect(links.find { |l| l.include?('rel="first"') }).to match(/page=1&per_page=3>/)
+      expect(links.find { |l| l.include?('rel="last"') }).to match(/page=3&per_page=3>/)
 
       json = api_call(:get, @folders_path + "/#{@root.id}/folders?per_page=3&page=3", @folders_path_options.merge(:per_page => '3', :page => '3'), {})
       expect(json.length).to eq 1
       links = response.headers['Link'].split(",")
       expect(links.all? { |l| l =~ /api\/v1\/folders\/#{@root.id}\/folders/ }).to be_truthy
-      expect(links.find { |l| l.match(/rel="prev"/) }).to match(/page=2&per_page=3>/)
-      expect(links.find { |l| l.match(/rel="first"/) }).to match(/page=1&per_page=3>/)
-      expect(links.find { |l| l.match(/rel="last"/) }).to match(/page=3&per_page=3>/)
+      expect(links.find { |l| l.include?('rel="prev"') }).to match(/page=2&per_page=3>/)
+      expect(links.find { |l| l.include?('rel="first"') }).to match(/page=1&per_page=3>/)
+      expect(links.find { |l| l.include?('rel="last"') }).to match(/page=3&per_page=3>/)
     end
 
     context "student" do
@@ -979,18 +979,18 @@ describe "Folders API", type: :request do
         expect(json.length).to eq 3
         links = response.headers['Link'].split(",")
         expect(links.all? { |l| l =~ /api\/v1\/courses\/#{@course.id}\/folders/ }).to be_truthy
-        expect(links.find { |l| l.match(/rel="next"/) }).to match(/page=2&per_page=3>/)
-        expect(links.find { |l| l.match(/rel="first"/) }).to match(/page=1&per_page=3>/)
-        expect(links.find { |l| l.match(/rel="last"/) }).to match(/page=3&per_page=3>/)
+        expect(links.find { |l| l.include?('rel="next"') }).to match(/page=2&per_page=3>/)
+        expect(links.find { |l| l.include?('rel="first"') }).to match(/page=1&per_page=3>/)
+        expect(links.find { |l| l.include?('rel="last"') }).to match(/page=3&per_page=3>/)
 
         json = api_call(:get, "/api/v1/courses/#{@course.id}/folders",
                         { :controller => "folders", :action => "list_all_folders", :format => "json", :course_id => @course.id.to_param, :per_page => 3, :page => 3 })
         expect(json.length).to eq 1
         links = response.headers['Link'].split(",")
         expect(links.all? { |l| l =~ /api\/v1\/courses\/#{@course.id}\/folders/ }).to be_truthy
-        expect(links.find { |l| l.match(/rel="prev"/) }).to match(/page=2&per_page=3>/)
-        expect(links.find { |l| l.match(/rel="first"/) }).to match(/page=1&per_page=3>/)
-        expect(links.find { |l| l.match(/rel="last"/) }).to match(/page=3&per_page=3>/)
+        expect(links.find { |l| l.include?('rel="prev"') }).to match(/page=2&per_page=3>/)
+        expect(links.find { |l| l.include?('rel="first"') }).to match(/page=1&per_page=3>/)
+        expect(links.find { |l| l.include?('rel="last"') }).to match(/page=3&per_page=3>/)
       end
     end
 

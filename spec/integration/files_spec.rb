@@ -20,13 +20,13 @@
 require 'nokogiri'
 
 describe FilesController do
-  before :each do
+  before do
     user_with_pseudonym(:active_all => true)
     local_storage!
   end
 
   context "should support Submission as a context" do
-    before(:each) do
+    before do
       course_with_teacher_logged_in(:active_all => true, :user => @user)
       host!("test.host")
       @me = @user
@@ -67,7 +67,7 @@ describe FilesController do
   end
 
   context "should support User as a context" do
-    before(:each) do
+    before do
       host!("test.host")
       user_session(@user)
       @me = @user

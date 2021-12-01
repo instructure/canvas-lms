@@ -249,7 +249,7 @@ describe ModeratedGrading::ProvisionalGrade do
   end
 
   describe 'final' do
-    before(:each) do
+    before do
       @admin1 = account_admin_user(account: course.root_account)
       @admin2 = account_admin_user(account: course.root_account)
       ta = ta_in_course(course: course, active_all: true).user

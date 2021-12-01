@@ -78,7 +78,7 @@ describe Quizzes::QuizRegrader::Answer do
       sent_params, sent_answer_data = args
       if question.question_data[:question_type] == 'multiple_answers_question'
         answer.each do |k, v|
-          next unless /answer/ =~ k
+          next unless k.to_s.include?('answer')
 
           key = "question_#{question.id}_#{k}"
           expect(sent_answer_data[key]).to eq v

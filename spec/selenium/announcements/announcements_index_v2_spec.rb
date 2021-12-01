@@ -50,7 +50,7 @@ describe "announcements index v2" do
       @announcement1.discussion_entries.create!(user: @student, message: "It's already gone! :(")
     end
 
-    before :each do
+    before do
       user_session(@teacher)
       AnnouncementIndex.visit_announcements(@course.id)
     end

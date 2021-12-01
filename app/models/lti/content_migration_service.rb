@@ -37,13 +37,11 @@ module Lti
       exports = {}
 
       configured_tools.each do |tool|
-        begin
-          migrator = Lti::ContentMigrationService::Exporter.new(course, tool, options)
-          migrator.start!
-          exports["lti_#{tool.id}"] = migrator if migrator.successfully_started?
-        rescue => e
-          Canvas::Errors.capture_exception(:external_content_migration, e)
-        end
+        migrator = Lti::ContentMigrationService::Exporter.new(course, tool, options)
+        migrator.start!
+        exports["lti_#{tool.id}"] = migrator if migrator.successfully_started?
+      rescue => e
+        Canvas::Errors.capture_exception(:external_content_migration, e)
       end
 
       exports

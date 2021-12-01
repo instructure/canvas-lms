@@ -34,7 +34,7 @@ describe "master courses - child courses - settings" do
     run_master_course_migration(@master)
   end
 
-  before :each do
+  before do
     user_session(@teacher)
   end
 

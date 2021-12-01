@@ -157,7 +157,7 @@ CanvasRails::Application.routes.draw do
   end
 
   concern :pages do
-    resources :wiki_pages, path: :pages, except: [:update, :destroy, :new], constraints: { id: %r{[^\/]+} } do
+    resources :wiki_pages, path: :pages, except: [:update, :destroy, :new], constraints: { id: %r{[^/]+} } do
       get 'revisions' => 'wiki_pages#revisions', as: :revisions
     end
 
@@ -169,12 +169,10 @@ CanvasRails::Application.routes.draw do
 
   concern :conferences do
     resources :conferences do
-      # rubocop:disable Style/SymbolArray
       match :join, via: [:get, :post]
       match :close, via: [:get, :post]
       match :recording, via: [:get]
       match :recording, via: [:delete], to: 'conferences#delete_recording', as: :delete_recording
-      # rubocop:enable Style/SymbolArray
       get :settings
     end
   end
@@ -1068,6 +1066,14 @@ CanvasRails::Application.routes.draw do
       get "groups/:group_id/tabs", action: :index, as: 'group_tabs'
       get "users/:user_id/tabs", action: :index, as: 'user_profile_tabs'
       put "courses/:course_id/tabs/:tab_id", action: :update
+    end
+
+    scope(controller: :gradebook_filters_api) do
+      get 'courses/:course_id/gradebook_filters', action: :index
+      post 'courses/:course_id/gradebook_filters', action: :create
+      get 'courses/:course_id/gradebook_filters/:id', action: :show
+      put 'courses/:course_id/gradebook_filters/:id', action: :update
+      delete 'courses/:course_id/gradebook_filters/:id', action: :destroy
     end
 
     scope(controller: :scopes_api) do
@@ -2073,7 +2079,7 @@ CanvasRails::Application.routes.draw do
     scope(controller: :feature_flags) do
       %w(course account user).each do |context|
         prefix = "#{context}s/:#{context}_id/features"
-        get "#{prefix}", action: :index, as: "#{context}_features"
+        get prefix.to_s, action: :index, as: "#{context}_features"
         get "#{prefix}/enabled", action: :enabled_features, as: "#{context}_enabled_features"
         get "#{prefix}/flags/:feature", action: :show
         put "#{prefix}/flags/:feature", action: :update
@@ -2086,7 +2092,7 @@ CanvasRails::Application.routes.draw do
       %w(course group).each do |context|
         prefix = "#{context}s/:#{context}_id/conferences"
         get prefix, action: :index, as: "#{context}_conferences"
-        post "#{prefix}", action: :create
+        post prefix.to_s, action: :create
         post "#{prefix}/:conference_id/recording_ready", action: :recording_ready, as: "#{context}_conferences_recording_ready"
       end
 
@@ -2370,6 +2376,16 @@ CanvasRails::Application.routes.draw do
       get 'courses/:course_id/pace_plans/:id', action: :api_show
       put 'courses/:course_id/pace_plans/:id', action: :update
       post 'courses/:course_id/pace_plans/:id/publish', action: :publish
+    end
+
+    scope(controller: :eportfolios_api) do
+      get 'users/:user_id/eportfolios', action: :index, as: :eportfolios
+      get 'eportfolios/:id', action: :show
+      delete 'eportfolios/:id', action: :delete
+      get 'eportfolios/:eportfolio_id/pages', action: :pages, as: :eportfolio_pages
+      put 'eportfolios/:eportfolio_id/moderate', action: :moderate
+      put 'users/:user_id/eportfolios', action: :moderate_all
+      put 'eportfolios/:eportfolio_id/restore', action: :restore
     end
   end
 

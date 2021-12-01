@@ -72,6 +72,7 @@ module Importers
     end
 
     def initialize(hash, context, migration, item)
+      super()
       self.options = DiscussionTopicOptions.new(hash)
       self.context = context
       self.migration = migration

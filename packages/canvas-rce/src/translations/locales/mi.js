@@ -147,6 +147,7 @@ const locale = {
   "course_navigation_dd035109": { "message": "Whakaterenga Akoranga" },
   "create_button_and_icon_5c089934": { "message": "Hanga Pātene me te Ata" },
   "creative_commons_license_725584ae": { "message": "Auaha ngā Raihana Noa:" },
+  "crop_image_807ebb08": { "message": "Tapahi Whakaahua" },
   "current_image_f16c249c": { "message": "Whakapakoko o Nāianei" },
   "custom_6979cd81": { "message": "Tikanga" },
   "date_added_ed5ad465": { "message": "Rā kua tāpiritia" },
@@ -323,6 +324,7 @@ const locale = {
     "message": "Kaore i kitea he hua mo { term }."
   },
   "none_3b5e34d2": { "message": "Kaore" },
+  "none_selected_b93d56d2": { "message": "Kaore i Tīpakohia" },
   "octagon_e48be9f": { "message": "Tapawaru" },
   "open_this_keyboard_shortcuts_dialog_9658b83a": {
     "message": "Huaki tēnei pokatata papapātuhi kōrero"
@@ -371,6 +373,7 @@ const locale = {
   },
   "search_280d00bd": { "message": "Rapu" },
   "search_term_b2d2235": { "message": "Rapu tau" },
+  "select_crop_shape_d441feeb": { "message": "Tīpako tapahi āhua" },
   "select_language_7c93a900": { "message": "Tīpako Reo" },
   "selected_274ce24f": { "message": "Kua tīpakohia" },
   "shift_o_to_open_the_pretty_html_editor_55ff5a31": {

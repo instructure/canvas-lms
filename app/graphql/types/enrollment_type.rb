@@ -40,6 +40,16 @@ module Types
     value "StudentViewEnrollment"
   end
 
+  class EnrollmentFilterInputType < Types::BaseInputObject
+    graphql_name "EnrollmentFilterInput"
+
+    argument :types, [EnrollmentTypeType], required: false, default_value: nil
+    argument :associated_user_ids, [ID],
+             prepare: GraphQLHelpers.relay_or_legacy_ids_prepare_func("User"),
+             required: false,
+             default_value: []
+  end
+
   class EnrollmentType < ApplicationObjectType
     graphql_name "Enrollment"
 
@@ -55,6 +65,11 @@ module Types
     field :user, UserType, null: true
     def user
       load_association(:user)
+    end
+
+    field :associated_user, UserType, null: true
+    def associated_user
+      load_association(:associated_user)
     end
 
     field :course, CourseType, null: true

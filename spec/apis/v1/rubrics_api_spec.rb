@@ -22,7 +22,7 @@ require_relative '../api_spec_helper'
 describe "Rubrics API", type: :request do
   include Api::V1::Rubric
 
-  ALLOWED_RUBRIC_FIELDS = Api::V1::Rubric::API_ALLOWED_RUBRIC_OUTPUT_FIELDS[:only]
+  let(:allowed_rubric_fields) { Api::V1::Rubric::API_ALLOWED_RUBRIC_OUTPUT_FIELDS[:only] }
 
   before :once do
     @account = Account.default
@@ -152,9 +152,9 @@ describe "Rubrics API", type: :request do
     expect(json.length).to eq 3
     links = response.headers['Link'].split(",")
     expect(links.all? { |l| l =~ /api\/v1\/#{type}s\/#{context.id}\/rubrics/ }).to be_truthy
-    expect(links.find { |l| l.match(/rel="next"/) }).to match(/page=2/)
-    expect(links.find { |l| l.match(/rel="first"/) }).to match(/page=1/)
-    expect(links.find { |l| l.match(/rel="last"/) }).to match(/page=3/)
+    expect(links.find { |l| l.include?('rel="next"') }).to match(/page=2/)
+    expect(links.find { |l| l.include?('rel="first"') }).to match(/page=1/)
+    expect(links.find { |l| l.include?('rel="last"') }).to match(/page=3/)
 
     # get the last page
     json = rubrics_api_call(context, { :per_page => '3', :page => '3' }, type)
@@ -162,9 +162,9 @@ describe "Rubrics API", type: :request do
     expect(json.length).to eq 2
     links = response.headers['Link'].split(",")
     expect(links.all? { |l| l =~ /api\/v1\/#{type}s\/#{context.id}\/rubrics/ }).to be_truthy
-    expect(links.find { |l| l.match(/rel="prev"/) }).to match(/page=2/)
-    expect(links.find { |l| l.match(/rel="first"/) }).to match(/page=1/)
-    expect(links.find { |l| l.match(/rel="last"/) }).to match(/page=3/)
+    expect(links.find { |l| l.include?('rel="prev"') }).to match(/page=2/)
+    expect(links.find { |l| l.include?('rel="first"') }).to match(/page=1/)
+    expect(links.find { |l| l.include?('rel="last"') }).to match(/page=3/)
   end
 
   describe "course level rubrics" do
@@ -177,7 +177,7 @@ describe "Rubrics API", type: :request do
       it "returns an array of all rubrics in a course" do
         create_rubric(@course)
         response = rubrics_api_call(@course)
-        expect(response[0].keys.sort).to eq ALLOWED_RUBRIC_FIELDS.sort
+        expect(response[0].keys.sort).to eq allowed_rubric_fields.sort
         expect(response.length).to eq 2
       end
 
@@ -201,7 +201,7 @@ describe "Rubrics API", type: :request do
 
       it "returns a rubric" do
         response = rubric_api_call(@course)
-        expect(response.keys.sort).to eq ALLOWED_RUBRIC_FIELDS.sort
+        expect(response.keys.sort).to eq allowed_rubric_fields.sort
       end
 
       it "returns not found status if the rubric is soft deleted" do
@@ -490,7 +490,7 @@ describe "Rubrics API", type: :request do
       it "returns an array of all rubrics in an account" do
         create_rubric(@account)
         response = rubrics_api_call(@account, {}, 'account')
-        expect(response[0].keys.sort).to eq ALLOWED_RUBRIC_FIELDS.sort
+        expect(response[0].keys.sort).to eq allowed_rubric_fields.sort
         expect(response.length).to eq 2
       end
     end
@@ -503,7 +503,7 @@ describe "Rubrics API", type: :request do
 
       it "returns a rubric" do
         response = rubric_api_call(@account, {}, 'account')
-        expect(response.keys.sort).to eq ALLOWED_RUBRIC_FIELDS.sort
+        expect(response.keys.sort).to eq allowed_rubric_fields.sort
       end
 
       it "returns account level rubric with course level association" do
@@ -512,7 +512,7 @@ describe "Rubrics API", type: :request do
         @rubric.associate_with(assignment, @course, :purpose => 'grading')
         response = rubric_api_call(@course, {})
 
-        expect(response.keys.sort).to eq ALLOWED_RUBRIC_FIELDS.sort
+        expect(response.keys.sort).to eq allowed_rubric_fields.sort
       end
 
       it "does not return account level rubric for a course, if the course isn't using it" do

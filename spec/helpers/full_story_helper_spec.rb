@@ -21,7 +21,7 @@
 describe "fullstory" do
   include FullStoryHelper
 
-  before :each do
+  before do
     @site_admin_account = Account.site_admin
     @session = {}
   end

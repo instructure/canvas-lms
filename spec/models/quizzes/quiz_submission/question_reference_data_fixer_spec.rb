@@ -223,20 +223,20 @@ describe Quizzes::QuizSubmission::QuestionReferenceDataFixer do
       # last_question_id for OQAAT + CantGoBack needs to be adjusted as well:
       it 'adjusts "last_question_id"' do
         run_with_submission_data({
-                                   "last_question_id" => "#{@aq.id}",
+                                   "last_question_id" => @aq.id.to_s,
                                  })
 
         expect(submission_data).to include({
-                                             "last_question_id" => "#{generated_quiz_question.id}"
+                                             "last_question_id" => generated_quiz_question.id.to_s
                                            })
       end
 
       it 'does nothing for a QuizQuestion reference' do
         run_with_submission_data({
-                                   "last_question_id" => "#{@qq.assessment_question_id}"
+                                   "last_question_id" => @qq.assessment_question_id.to_s
                                  })
         expect(submission_data).to include({
-                                             "last_question_id" => "#{@qq.assessment_question_id}"
+                                             "last_question_id" => @qq.assessment_question_id.to_s
                                            })
       end
     end # context: OQAAT + CantGoBack quizzes
@@ -249,7 +249,7 @@ describe Quizzes::QuizSubmission::QuestionReferenceDataFixer do
                                    "_question_#{@aq.id}_read" => true,
                                    "question_5" => "don't touch me",
                                    "_question_5_read" => true,
-                                   "last_question_id" => "#{@aq.id}",
+                                   "last_question_id" => @aq.id.to_s,
                                    "next_question_path" => "/courses/1/quizzes/1/take/questions/#{@aq.id}",
                                    "validation_token" => "abcd"
                                  })
@@ -260,7 +260,7 @@ describe Quizzes::QuizSubmission::QuestionReferenceDataFixer do
                                         "_question_#{generated_quiz_question.id}_read" => true,
                                         "question_5" => "don't touch me",
                                         "_question_5_read" => true,
-                                        "last_question_id" => "#{generated_quiz_question.id}",
+                                        "last_question_id" => generated_quiz_question.id.to_s,
                                         "next_question_path" => "/courses/1/quizzes/1/take/questions/#{generated_quiz_question.id}",
                                         "validation_token" => "abcd"
                                       })

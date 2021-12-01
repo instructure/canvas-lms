@@ -32,11 +32,9 @@ describe IncomingMailProcessor::ImapMailbox do
   end
 
   def mock_net_imap
-    @imap_mock = Object.new
-    class << @imap_mock
-      IncomingMailProcessor::ImapMailbox::UsedImapMethods.each do |method_name|
-        define_method(method_name) { |*args, &block| }
-      end
+    @imap_mock = double()
+    IncomingMailProcessor::ImapMailbox::UsedImapMethods.each do |method_name|
+      allow(@imap_mock).to receive(method_name)
     end
 
     expect(Net::IMAP).to receive(:new)

@@ -163,7 +163,7 @@ describe AnonymousOrModerationEvent do
       AnonymousOrModerationEvent.events_for_submission(assignment_id: assignment.id, submission_id: submission.id)
     end
 
-    before :each do
+    before do
       submission.submission_comments.create!(author: teacher, comment: "no")
     end
 

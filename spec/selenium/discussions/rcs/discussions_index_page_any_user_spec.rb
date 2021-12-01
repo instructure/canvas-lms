@@ -36,7 +36,7 @@ describe "discussions" do
     let(:url) { "/courses/#{course.id}/discussion_topics/" }
 
     context "as anyone" do # we actually use a student, but the idea is that it would work the same for a teacher or anyone else
-      before(:each) do
+      before do
         user_session(somebody)
         stub_rcs_config
       end

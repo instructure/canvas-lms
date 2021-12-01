@@ -19,7 +19,7 @@
 #
 
 describe Polling::PollChoice do
-  before(:each) do
+  before do
     course_factory
     teacher_in_course(course: @course, active_all: true)
     @poll = Polling::Poll.create!(user: @teacher, question: 'A Test Poll')

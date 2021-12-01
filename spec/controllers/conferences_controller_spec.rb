@@ -32,7 +32,7 @@ describe ConferencesController do
     student_in_course(active_all: true, user: user_with_pseudonym(active_all: true))
   end
 
-  before :each do
+  before do
     allow_any_instance_of(WimbaConference).to receive(:send_request).and_return('')
     allow_any_instance_of(WimbaConference).to receive(:get_auth_token).and_return('abc123')
   end
@@ -281,7 +281,7 @@ describe ConferencesController do
         @conference.users << @student
       end
 
-      before :each do
+      before do
         user_session(@student)
       end
 

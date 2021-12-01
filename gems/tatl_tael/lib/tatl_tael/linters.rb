@@ -7,7 +7,8 @@ module TatlTael
     class BaseLinter
       class << self
         def inherited(subclass)
-          Linters.linters << subclass unless subclass.name =~ /SimpleLinter/
+          super
+          Linters.linters << subclass unless subclass.name&.include?('SimpleLinter')
         end
       end
 

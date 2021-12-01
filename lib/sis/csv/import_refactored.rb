@@ -126,17 +126,15 @@ module SIS
       def number_of_rows(create_importers:)
         IMPORTERS.each do |importer|
           @csvs[importer].reject! do |csv|
-            begin
-              rows = count_rows(csv, importer, create_importers: create_importers)
-              unless create_importers
-                @rows[importer] += rows
-                @total_rows += rows
-              end
-              false
-            rescue ::CSV::MalformedCSVError
-              SisBatch.add_error(csv, I18n.t("Malformed CSV"), sis_batch: @batch, failure: true)
-              true
+            rows = count_rows(csv, importer, create_importers: create_importers)
+            unless create_importers
+              @rows[importer] += rows
+              @total_rows += rows
             end
+            false
+          rescue ::CSV::MalformedCSVError
+            SisBatch.add_error(csv, I18n.t("Malformed CSV"), sis_batch: @batch, failure: true)
+            true
           end
         end
       end

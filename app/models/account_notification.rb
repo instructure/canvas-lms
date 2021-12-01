@@ -96,38 +96,36 @@ class AccountNotification < ActiveRecord::Base
       end
 
       user_role_ids = {}
+      # because we are going through all the current announcements, we cache the
+      # results of the sub_account chain to not have to calculate ids again.
       sub_account_ids_map = {}
 
       current.select! do |announcement|
-        # need to have these variables to be able to access them outside of the
-        # announcement.shard.activate block
-        enrollments, account_users = nil
         # use role.id instead of role_id to trigger Role#id magic for built in
         # roles. try(:id) because the AccountNotificationRole may have an
         # explicitly nil role_id to indicate the announcement's intended for
         # users not enrolled in any courses
         role_ids = announcement.account_notification_roles.map { |anr| anr.role&.role_for_root_account_id(root_account.id)&.id }
+        global_account_id = Shard.global_id_for(announcement.account_id, announcement.shard)
 
         unless role_ids.empty? || user_role_ids.key?(announcement.account_id)
-          # choose enrollments and account users to inspect
-          if announcement.account.site_admin?
-            enrollments = user.enrollments.shard(user.in_region_associated_shards).active_or_pending_by_date.distinct.select(:role_id).to_a
-            account_users = user.account_users.shard(user.in_region_associated_shards).distinct.select(:role_id).to_a
-          else
+          unless announcement.account.root_account?
             announcement.shard.activate do
-              if announcement.account.root_account?
-                enrollments = Enrollment.where(user_id: user).active_or_pending_by_date
-                                        .where(root_account_id: announcement.account_id).select(:role_id).to_a
-              else
-                sub_account_ids_map[announcement.account_id] ||=
-                  Account.sub_account_ids_recursive(announcement.account_id) + [announcement.account_id]
-                enrollments = Enrollment.where(user_id: user).active_or_pending_by_date.joins(:course)
-                                        .where(:courses => { :account_id => sub_account_ids_map[announcement.account_id] }).select(:role_id).to_a
-              end
-              account_users = announcement.account.root_account.cached_all_account_users_for(user)
+              # we need to store the local account ids. The ids for the
+              # sub_accounts are relative to the announcements shard, but we use
+              # store the announcements for the user's shards which could be
+              # many. This also avoids storing the same local_id and using the
+              # wrong chain.
+              sub_account_ids_map[global_account_id] ||=
+                Account.sub_account_ids_recursive(announcement.account_id) + [announcement.account_id]
             end
           end
 
+          # choose enrollments and account users to inspect
+          account_users = announcement.account_user_roles(user)
+          enrollments = announcement.shard.activate do
+            announcement.enrollment_role_ids(user, account_ids: sub_account_ids_map[global_account_id])
+          end
           # preload role objects for those enrollments and account users
           ActiveRecord::Associations::Preloader.new.preload(enrollments, [:role])
           ActiveRecord::Associations::Preloader.new.preload(account_users, [:role])
@@ -175,6 +173,28 @@ class AccountNotification < ActiveRecord::Base
       end
 
       current.sort_by { |item| item[:end_at] }.reverse
+    end
+  end
+
+  def enrollment_role_ids(user, account_ids:)
+    if account.site_admin?
+      scope = user.enrollments.shard(user.in_region_associated_shards)
+    else
+      scope = account.root_account.all_enrollments.where(user_id: user)
+      unless account.root_account?
+        scope = scope.where(courses: { account_id: account_ids })
+                     .joins(:course)
+      end
+    end
+    scope.active_or_pending_by_date.distinct.select(:role_id).to_a
+  end
+
+  def account_user_roles(user)
+    if account.site_admin?
+      user.account_users.shard(user.in_region_associated_shards)
+          .distinct.select(:role_id).to_a
+    else
+      account.root_account.cached_all_account_users_for(user)
     end
   end
 
@@ -317,12 +337,10 @@ class AccountNotification < ActiveRecord::Base
 
     # don't try to send a message to an entire account in one job
     self.applicable_user_ids.each_slice(self.class.users_per_message_batch) do |sliced_user_ids|
-      begin
-        self.message_recipients = sliced_user_ids.map { |id| "user_#{id}" }
-        self.save # trigger the broadcast policy
-      ensure
-        self.message_recipients = nil
-      end
+      self.message_recipients = sliced_user_ids.map { |id| "user_#{id}" }
+      self.save # trigger the broadcast policy
+    ensure
+      self.message_recipients = nil
     end
     self.update_attribute(:messages_sent_at, Time.now.utc)
   end

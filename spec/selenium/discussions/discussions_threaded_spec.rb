@@ -31,7 +31,7 @@ describe "threaded discussions" do
     @student = student_in_course(course: @course, name: 'student', active_all: true).user
   end
 
-  before(:each) do
+  before do
     user_session(@teacher)
     stub_rcs_config
   end
@@ -227,7 +227,7 @@ describe "threaded discussions" do
     end
 
     context "student tray" do
-      before(:each) do
+      before do
         @account = Account.default
       end
 
@@ -293,7 +293,7 @@ describe "threaded discussions" do
     end
 
     context 'concluded student' do
-      before :each do
+      before do
         student_enrollment = course_with_student(
           :course => @course,
           :user => @student,

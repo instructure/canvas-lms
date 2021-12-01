@@ -28,7 +28,7 @@ describe "assignments/_submission_sidebar.html.erb" do
   let(:assignment) { course.assignments.create! }
   let(:submission) { assignment.submissions.find_by(user: student) }
 
-  before(:each) do
+  before do
     course.enroll_student(student)
     course.enroll_teacher(teacher)
     view_context(course, student)
@@ -37,7 +37,7 @@ describe "assignments/_submission_sidebar.html.erb" do
   end
 
   context "when assignment posts manually" do
-    before(:each) do
+    before do
       assignment.ensure_post_policy(post_manually: true)
     end
 
@@ -84,7 +84,7 @@ describe "assignments/_submission_sidebar.html.erb" do
   end
 
   context "when assignment posts automatically" do
-    before(:each) do
+    before do
       assignment.ensure_post_policy(post_manually: false)
     end
 

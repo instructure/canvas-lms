@@ -27,6 +27,9 @@ class Eportfolio < ActiveRecord::Base
   after_save :check_for_spam, if: -> { needs_spam_review? }
 
   belongs_to :user
+
+  SPAM_MODERATIONS = %w[marked_as_safe marked_as_spam].freeze
+
   validates_presence_of :user_id
   validates_length_of :name, maximum: maximum_string_length, allow_blank: true
   # flagged_as_possible_spam => our internal filters have flagged this as spam, but
@@ -34,7 +37,7 @@ class Eportfolio < ActiveRecord::Base
   # marked_as_safe => an admin has manually marked this as safe.
   # marked_as_spam => an admin has manually marked this as spam.
   validates :spam_status,
-            inclusion: %w[flagged_as_possible_spam marked_as_safe marked_as_spam], allow_nil: true
+            inclusion: ["flagged_as_possible_spam", *SPAM_MODERATIONS], allow_nil: true
 
   workflow do
     state :active
@@ -46,6 +49,12 @@ class Eportfolio < ActiveRecord::Base
   def destroy
     self.workflow_state = 'deleted'
     self.deleted_at = Time.now.utc
+    self.save
+  end
+
+  def restore
+    self.workflow_state = 'active'
+    self.deleted_at = nil
     self.save
   end
 
@@ -103,15 +112,14 @@ class Eportfolio < ActiveRecord::Base
     can :read
 
     given do |user|
-      self.active? && self.user != user && self.user&.grants_right?(user, :moderate_user_content)
+      self.user != user && self.active? && self.user&.grants_right?(user, :moderate_user_content)
     end
-    can :moderate
+    can :read and can :moderate and can :delete and can :restore
 
-    # The eportfolio is flagged or marked as spam and the user has permission to moderate it
     given do |user|
-      self.active? && self.spam? && self.user&.grants_right?(user, :moderate_user_content)
+      self.user != user && self.deleted? && self.user&.grants_right?(user, :moderate_user_content)
     end
-    can :read
+    can :restore
   end
 
   def ensure_defaults

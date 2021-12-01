@@ -143,7 +143,7 @@ describe "courses/settings.html.erb" do
       @course.root_account.enable_feature!(:filter_speed_grader_by_student_group)
     end
 
-    before :each do
+    before do
       @course.root_account.reload
       view_context(@course, @teacher)
     end
@@ -215,11 +215,9 @@ describe "courses/settings.html.erb" do
         select
         .search('option')
         .map do |c|
-          begin
-            c.attributes['value'].value.to_i
-          rescue StandardError
-            c.to_s
-          end
+          c.attributes['value'].value.to_i
+        rescue StandardError
+          c.to_s
         end
       expect(option_ids.sort).to eq [@subaccount.id, @sub_subaccount1.id, @sub_subaccount2.id].sort
     end

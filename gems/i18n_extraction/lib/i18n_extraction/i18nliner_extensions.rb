@@ -190,7 +190,7 @@ module I18nExtraction::Extensions
       remove_whitespace = true
       scope = case filename
               when /app\/messages\//
-                remove_whitespace = false unless filename =~ /html/
+                remove_whitespace = false unless filename.include?('html')
                 filename.gsub(/.*app\/|\.erb/, '').gsub(/\/_?/, '.')
               when /app\/views\//
                 filename.gsub(/.*app\/views\/|\.(html\.|fbml\.)?erb\z/, '').gsub(/\/_?/, '.')

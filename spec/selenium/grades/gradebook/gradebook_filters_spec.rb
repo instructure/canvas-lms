@@ -39,7 +39,7 @@ describe "Filter" do
       2.times { |i| @modules[i].add_item type: 'assignment', id: @assignments[i].id }
     end
 
-    before(:each) do
+    before do
       show_modules_filter(@teacher)
       user_session(@teacher)
     end
@@ -61,7 +61,7 @@ describe "Filter" do
       associate_course_to_term("Fall Term")
     end
 
-    before(:each) do
+    before do
       user_session(@teacher)
       show_grading_periods_filter(@teacher)
     end
@@ -84,7 +84,7 @@ describe "Filter" do
       show_sections_filter(@teacher)
     end
 
-    before(:each) { user_session(@teacher) }
+    before { user_session(@teacher) }
 
     it "handles multiple enrollments correctly" do
       @course.enroll_student(@student_1, section: @other_section, allow_multiple_enrollments: true)
@@ -131,7 +131,7 @@ describe "Filter" do
       @category.groups.second.add_user(@student_2)
     end
 
-    before(:each) { user_session(@teacher) }
+    before { user_session(@teacher) }
 
     it "allows showing only a specific student group", priority: "1" do
       Gradebook.visit(@course)

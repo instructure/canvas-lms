@@ -80,6 +80,37 @@ class ApplicationController < ActionController::Base
   after_action :update_enrollment_last_activity_at
   set_callback :html_render, :after, :add_csp_for_root
 
+  class << self
+    def instance_id
+      nil
+    end
+
+    def region
+      nil
+    end
+
+    def test_cluster_name
+      nil
+    end
+
+    def test_cluster?
+      false
+    end
+
+    def google_drive_timeout
+      Setting.get('google_drive_timeout', 30).to_i
+    end
+
+    private
+
+    def batch_jobs_in_actions(opts = {})
+      batch_opts = opts.delete(:batch)
+      around_action(opts) do |_controller, action|
+        Delayed::Batch.serial_batch(batch_opts || {}, &action)
+      end
+    end
+  end
+
   add_crumb(proc {
     title = I18n.t('links.dashboard', 'My Dashboard')
     crumb = <<-END
@@ -236,7 +267,8 @@ class ApplicationController < ActionController::Base
   JS_ENV_SITE_ADMIN_FEATURES = [
     :cc_in_rce_video_tray, :featured_help_links,
     :strip_origin_from_quiz_answer_file_references, :rce_buttons_and_icons, :important_dates, :feature_flag_filters, :k5_parent_support,
-    :conferencing_in_planner, :remember_settings_tab, :word_count_in_speed_grader, :observer_picker, :lti_platform_storage
+    :conferencing_in_planner, :remember_settings_tab, :word_count_in_speed_grader, :observer_picker, :lti_platform_storage,
+    :scale_equation_images
   ].freeze
   JS_ENV_ROOT_ACCOUNT_FEATURES = [
     :responsive_awareness, :responsive_misc, :product_tours, :files_dnd, :usage_rights_discussion_topics,
@@ -1454,23 +1486,21 @@ class ApplicationController < ActionController::Base
   end
 
   def log_page_view
-    begin
-      user = @current_user || (@accessed_asset && @accessed_asset[:user])
-      if user && @log_page_views != false
-        add_interaction_seconds
-        log_participation(user)
-        log_gets
-        finalize_page_view
-      else
-        @page_view.destroy if @page_view && !@page_view.new_record?
-      end
-    rescue StandardError, CassandraCQL::Error::InvalidRequestException => e
-      Canvas::Errors.capture_exception(:page_view, e)
-      logger.error "Pageview error!"
-      raise e if Rails.env.development?
-
-      true
+    user = @current_user || (@accessed_asset && @accessed_asset[:user])
+    if user && @log_page_views != false
+      add_interaction_seconds
+      log_participation(user)
+      log_gets
+      finalize_page_view
+    else
+      @page_view.destroy if @page_view && !@page_view.new_record?
     end
+  rescue StandardError, CassandraCQL::Error::InvalidRequestException => e
+    Canvas::Errors.capture_exception(:page_view, e)
+    logger.error "Pageview error!"
+    raise e if Rails.env.development?
+
+    true
   end
 
   def add_interaction_seconds
@@ -1517,7 +1547,7 @@ class ApplicationController < ActionController::Base
   end
 
   def log_gets
-    if @page_view && !request.xhr? && request.get? && (((response.media_type || "").to_s.match(/html/)) ||
+    if @page_view && !request.xhr? && request.get? && ((response.media_type || "").to_s.include?('html') ||
       ((Setting.get('create_get_api_page_views', 'true') == 'true') && api_request?))
       @page_view.render_time ||= (Time.now.utc - @page_before_render) rescue nil
       @page_view_update = true
@@ -1875,7 +1905,7 @@ class ApplicationController < ActionController::Base
           link_code: @opaque_id,
           overrides: { 'resource_link_title' => @resource_title },
           domain: HostUrl.context_host(@domain_root_account, request.host),
-          include_module_context: Account.site_admin.feature_enabled?(:new_quizzes_in_module_progression)
+          include_module_context: true
         }
         variable_expander = Lti::VariableExpander.new(@domain_root_account, @context, self, {
                                                         current_user: @current_user,
@@ -1985,7 +2015,7 @@ class ApplicationController < ActionController::Base
   def external_tool_redirect_display_type
     if params['display'].present?
       params['display']
-    elsif Account.site_admin.feature_enabled?(:new_quizzes_in_module_progression) && @assignment&.quiz_lti? && @module_tag
+    elsif @assignment&.quiz_lti? && @module_tag
       'in_nav_context'
     else
       @tool&.extension_setting(:assignment_selection)&.dig('display_type')
@@ -2112,31 +2142,27 @@ class ApplicationController < ActionController::Base
     feature = feature.to_sym
     return @features_enabled[feature] if @features_enabled[feature] != nil
 
-    @features_enabled[feature] ||= begin
-      if [:question_banks].include?(feature)
-        true
-      elsif feature == :twitter
-        !!Twitter::Connection.config
-      elsif feature == :diigo
-        !!Diigo::Connection.config
-      elsif feature == :google_drive
-        Canvas::Plugin.find(:google_drive).try(:enabled?)
-      elsif feature == :etherpad
-        !!EtherpadCollaboration.config
-      elsif feature == :kaltura
-        !!CanvasKaltura::ClientV3.config
-      elsif feature == :web_conferences
-        !!WebConference.config
-      elsif feature == :vericite
-        Canvas::Plugin.find(:vericite).try(:enabled?)
-      elsif feature == :lockdown_browser
-        Canvas::Plugin.all_for_tag(:lockdown_browser).any? { |p| p.settings[:enabled] }
-      elsif AccountServices.allowable_services[feature]
-        true
-      else
-        false
-      end
-    end
+    @features_enabled[feature] ||= if [:question_banks].include?(feature)
+                                     true
+                                   elsif feature == :twitter
+                                     !!Twitter::Connection.config
+                                   elsif feature == :diigo
+                                     !!Diigo::Connection.config
+                                   elsif feature == :google_drive
+                                     Canvas::Plugin.find(:google_drive).try(:enabled?)
+                                   elsif feature == :etherpad
+                                     !!EtherpadCollaboration.config
+                                   elsif feature == :kaltura
+                                     !!CanvasKaltura::ClientV3.config
+                                   elsif feature == :web_conferences
+                                     !!WebConference.config
+                                   elsif feature == :vericite
+                                     Canvas::Plugin.find(:vericite).try(:enabled?)
+                                   elsif feature == :lockdown_browser
+                                     Canvas::Plugin.all_for_tag(:lockdown_browser).any? { |p| p.settings[:enabled] }
+                                   else
+                                     !!AccountServices.allowable_services[feature]
+                                   end
   end
   helper_method :feature_enabled?
 
@@ -2276,7 +2302,7 @@ class ApplicationController < ActionController::Base
   end
 
   def json_as_text?
-    (request.headers['CONTENT_TYPE'].to_s =~ %r{multipart/form-data}) &&
+    request.headers['CONTENT_TYPE'].to_s.include?('multipart/form-data') &&
       (params[:format].to_s != 'json' || in_app?)
   end
 
@@ -2308,7 +2334,7 @@ class ApplicationController < ActionController::Base
   end
 
   def stringify_json_ids?
-    request.headers['Accept'] =~ %r{application/json\+canvas-string-ids}
+    request.headers['Accept']&.include?('application/json+canvas-string-ids')
   end
 
   def json_cast(obj)
@@ -2503,7 +2529,7 @@ class ApplicationController < ActionController::Base
   end
 
   def ms_office?
-    !!(request.user_agent.to_s =~ /ms-office/) ||
+    !!request.user_agent.to_s.include?('ms-office') ||
       !!(request.user_agent.to_s =~ %r{Word/\d+\.\d+})
   end
 
@@ -2550,13 +2576,6 @@ class ApplicationController < ActionController::Base
     end
 
     common_courses + common_groups
-  end
-
-  def self.batch_jobs_in_actions(opts = {})
-    batch_opts = opts.delete(:batch)
-    around_action(opts) do |_controller, action|
-      Delayed::Batch.serial_batch(batch_opts || {}, &action)
-    end
   end
 
   def not_found
@@ -2679,10 +2698,6 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  def self.google_drive_timeout
-    Setting.get('google_drive_timeout', 30).to_i
-  end
-
   def google_drive_connection
     return @google_drive_connection if @google_drive_connection
 
@@ -2713,31 +2728,13 @@ class ApplicationController < ActionController::Base
   end
 
   def user_has_google_drive
-    @user_has_google_drive ||= begin
-      if logged_in_user
-        Rails.cache.fetch_with_batched_keys('user_has_google_drive', batch_object: logged_in_user, batched_keys: :user_services) do
-          google_drive_connection.authorized?
-        end
-      else
-        google_drive_connection.authorized?
-      end
-    end
-  end
-
-  def self.instance_id
-    nil
-  end
-
-  def self.region
-    nil
-  end
-
-  def self.test_cluster_name
-    nil
-  end
-
-  def self.test_cluster?
-    false
+    @user_has_google_drive ||= if logged_in_user
+                                 Rails.cache.fetch_with_batched_keys('user_has_google_drive', batch_object: logged_in_user, batched_keys: :user_services) do
+                                   google_drive_connection.authorized?
+                                 end
+                               else
+                                 google_drive_connection.authorized?
+                               end
   end
 
   def setup_live_events_context

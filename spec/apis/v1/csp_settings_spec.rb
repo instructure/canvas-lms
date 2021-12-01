@@ -34,7 +34,7 @@ describe "CSP Settings API", type: :request do
     def get_csp_settings(context, expected_status = 200)
       api_call(:get, "/api/v1/#{context.class.name.pluralize.downcase}/#{context.id}/csp_settings",
                { :controller => "csp_settings", :action => "get_csp_settings", :format => "json",
-                 :"#{context.class.name.downcase}_id" => "#{context.id}" }, {}, {}, { :expected_status => expected_status })
+                 :"#{context.class.name.downcase}_id" => context.id.to_s }, {}, {}, { :expected_status => expected_status })
     end
 
     it "requires authorization" do
@@ -121,7 +121,7 @@ describe "CSP Settings API", type: :request do
     def set_csp_setting(context, csp_status, expected_status = 200)
       api_call(:put, "/api/v1/#{context.class.name.pluralize.downcase}/#{context.id}/csp_settings",
                { :controller => "csp_settings", :action => "set_csp_setting", :format => "json",
-                 :"#{context.class.name.downcase}_id" => "#{context.id}", :status => csp_status },
+                 :"#{context.class.name.downcase}_id" => context.id.to_s, :status => csp_status },
                {}, {}, { :expected_status => expected_status })
     end
 
@@ -196,7 +196,7 @@ describe "CSP Settings API", type: :request do
     def set_csp_lock(context, lock_status, expected_status = 200)
       api_call(:put, "/api/v1/#{context.class.name.pluralize.downcase}/#{context.id}/csp_settings/lock",
                { :controller => "csp_settings", :action => "set_csp_lock", :format => "json",
-                 :"#{context.class.name.downcase}_id" => "#{context.id}", :settings_locked => lock_status },
+                 :"#{context.class.name.downcase}_id" => context.id.to_s, :settings_locked => lock_status },
                {}, {}, { :expected_status => expected_status })
     end
 
@@ -224,7 +224,7 @@ describe "CSP Settings API", type: :request do
     def add_domain(account, domain, expected_status = 200)
       api_call(:post, "/api/v1/accounts/#{account.id}/csp_settings/domains",
                { :controller => "csp_settings", :action => "add_domain", :format => "json",
-                 :account_id => "#{account.id}", :domain => domain },
+                 :account_id => account.id.to_s, :domain => domain },
                {}, {}, { :expected_status => expected_status })
     end
 
@@ -245,7 +245,7 @@ describe "CSP Settings API", type: :request do
     def add_domains(account, domains, expected_status = 200)
       api_call(:post, "/api/v1/accounts/#{account.id}/csp_settings/domains/batch_create",
                { :controller => "csp_settings", :action => "add_multiple_domains", :format => "json",
-                 :account_id => "#{account.id}", :domains => domains },
+                 :account_id => account.id.to_s, :domains => domains },
                {}, {}, { :expected_status => expected_status })
     end
 
@@ -268,7 +268,7 @@ describe "CSP Settings API", type: :request do
     def remove_domain(account, domain, expected_status = 200)
       api_call(:delete, "/api/v1/accounts/#{account.id}/csp_settings/domains",
                { :controller => "csp_settings", :action => "remove_domain", :format => "json",
-                 :account_id => "#{account.id}", :domain => domain },
+                 :account_id => account.id.to_s, :domain => domain },
                {}, {}, { :expected_status => expected_status })
     end
 

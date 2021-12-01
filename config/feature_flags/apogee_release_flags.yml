@@ -72,11 +72,6 @@ use_cloudfront_for_docviewer:
   applies_to: SiteAdmin
   display_name: Use CloudFront for DocViewer
   description: Request that DocViewer use CloudFront for serving pdf assets.
-annotated_document_submissions:
-  state: hidden
-  applies_to: SiteAdmin
-  display_name: Student Annotation submissions
-  description: Ability to submit student annotation assignments.
 gradebook_csv_export_order_matches_gradebook_grid:
   state: hidden
   applies_to: SiteAdmin

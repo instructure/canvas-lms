@@ -299,7 +299,7 @@ describe GroupCategoriesController do
   end
 
   describe "GET users" do
-    before :each do
+    before do
       @category = @course.group_categories.create(:name => "Study Groups")
       group = @course.groups.create(:name => "some group", :group_category => @category)
       group.add_user(@student)

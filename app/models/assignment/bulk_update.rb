@@ -29,14 +29,14 @@ class Assignment::BulkUpdate
     @context.grading_periods?
   end
 
-  def run(progress, data)
-    # data looks like [:id, :all_dates => [:id, :base, :due_at, :unlock_at, :lock_at]]
-    assignment_data = data.index_by { |a| a['id'] }
-    assignments = @context.active_assignments.where(id: assignment_data.keys).preload(:assignment_overrides).index_by(&:id)
+  def run(progress, assignment_data)
+    # assignment_data looks like [:id, :all_dates => [:id, :base, :due_at, :unlock_at, :lock_at]]
+    assignment_data_hash = assignment_data.index_by { |a| a['id'] }
+    assignments = @context.active_assignments.where(id: assignment_data_hash.keys).preload(:assignment_overrides).index_by(&:id)
     assignments_to_save = Set.new
 
     # 1. update AR models (in memory!)
-    assignment_data.each do |id, data|
+    assignment_data_hash.each do |id, data|
       dates = data['all_dates']
       next unless dates.present?
 

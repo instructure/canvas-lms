@@ -51,7 +51,7 @@ describe "course settings/blueprint" do
   end
 
   describe "as admin" do
-    before :each do
+    before do
       user_session @admin
     end
 
@@ -140,7 +140,7 @@ describe "course settings/blueprint" do
   end
 
   describe "as teacher" do
-    before :each do
+    before do
       user_session @teacher
     end
 

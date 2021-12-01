@@ -31,6 +31,7 @@ module Lti
     # which is called as a delayed job during a course copy or export.
     class Exporter < Lti::ContentMigrationService::Migrator
       def initialize(course, tool, options)
+        super()
         @course = course
         @tool = tool
         @options = options

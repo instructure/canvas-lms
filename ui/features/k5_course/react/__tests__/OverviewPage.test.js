@@ -23,11 +23,25 @@ import OverviewPage from '../OverviewPage'
 describe('Overview Content', () => {
   const getProps = (overrides = {}) => ({
     content: '<h1>About this course <p>this is the course overview</p></h1>',
+    url: '/courses/12/pages/thehomepage/edit',
+    canEdit: true,
     ...overrides
   })
 
   it('renders overview content', () => {
     const {queryByText} = render(<OverviewPage {...getProps()} />)
     expect(queryByText('About this course')).toBeInTheDocument()
+  })
+
+  it('renders an edit button if canEdit is true', () => {
+    const {getByRole} = render(<OverviewPage {...getProps()} />)
+    const button = getByRole('link', {name: 'Edit home page'})
+    expect(button).toBeInTheDocument()
+    expect(button.href).toContain('/courses/12/pages/thehomepage/edit')
+  })
+
+  it('does not render edit button when canEdit is false', () => {
+    const {queryByRole} = render(<OverviewPage {...getProps({canEdit: false})} />)
+    expect(queryByRole('link', {name: 'Edit home page'})).not.toBeInTheDocument()
   })
 })

@@ -43,7 +43,16 @@ Bundler.require(*Rails.groups)
 #      ...
 #      CANVAS_ZEITWERK: 1
 unless defined?(CANVAS_ZEITWERK)
-  CANVAS_ZEITWERK = (ENV['CANVAS_ZEITWERK'] == '1')
+  # choose to force zeitwerk on
+  # unless overridden with
+  # an env var or file
+  CANVAS_ZEITWERK = if ENV['CANVAS_ZEITWERK']
+                      (ENV['CANVAS_ZEITWERK'] == '1')
+                    elsif Rails.root && (zw_settings = ConfigFile.load("zeitwerk"))
+                      zw_settings["enabled"]
+                    else
+                      true
+                    end
 end
 
 module CanvasRails
@@ -54,12 +63,6 @@ module CanvasRails
     # at which point the stuff inside this conditional block should remain.
     if CANVAS_ZEITWERK
       config.autoloader = :zeitwerk
-      # TODO: when we aren't finding copious errors
-      # anymore we can stop logging the autoloading paths.
-      # For now, this lets us figure out why constant loading
-      # is not behaving as expected quickly and easily:
-      Rails.autoloaders.logger = Logger.new("#{Rails.root}/log/autoloading.log")
-      # Rails.autoloaders.log!
 
       # TODO: someday we can use this line, which will NOT
       # add anything on the autoload paths the actual ruby
@@ -170,17 +173,15 @@ module CanvasRails
 
           hosts = Array(conn_params[:host]).presence || [nil]
           hosts.each_with_index do |host, index|
-            begin
-              conn_params[:host] = host
-              return super(conn_params)
-              # we _shouldn't_ be catching a NoDatabaseError, but that's what Rails raises
-              # for an error where the database name is in the message (i.e. a hostname lookup failure)
-              # CANVAS_RAILS6_0 rails 6.1 switches from PG::Error to ActiveRecord::ConnectionNotEstablished
-              # for any other error
-            rescue ::PG::Error, ::ActiveRecord::NoDatabaseError, ::ActiveRecord::ConnectionNotEstablished
-              raise if index == hosts.length - 1
-              # else try next host
-            end
+            conn_params[:host] = host
+            return super(conn_params)
+            # we _shouldn't_ be catching a NoDatabaseError, but that's what Rails raises
+            # for an error where the database name is in the message (i.e. a hostname lookup failure)
+            # CANVAS_RAILS6_0 rails 6.1 switches from PG::Error to ActiveRecord::ConnectionNotEstablished
+            # for any other error
+          rescue ::PG::Error, ::ActiveRecord::NoDatabaseError, ::ActiveRecord::ConnectionNotEstablished
+            raise if index == hosts.length - 1
+            # else try next host
           end
         end
       end
@@ -196,24 +197,22 @@ module CanvasRails
       def connect
         hosts = Array(@connection_parameters[:host]).presence || [nil]
         hosts.each_with_index do |host, index|
-          begin
-            connection_parameters = @connection_parameters.dup
-            connection_parameters[:host] = host
-            @connection = PG::Connection.connect(connection_parameters)
+          connection_parameters = @connection_parameters.dup
+          connection_parameters[:host] = host
+          @connection = PG::Connection.connect(connection_parameters)
 
-            configure_connection
+          configure_connection
 
-            raise "Canvas requires PostgreSQL 12 or newer" unless postgresql_version >= 12_00_00
+          raise "Canvas requires PostgreSQL 12 or newer" unless postgresql_version >= 12_00_00
 
-            break
-          rescue ::PG::Error => error
-            if error.message.include?("does not exist")
-              raise ActiveRecord::NoDatabaseError.new(error.message)
-            elsif index == hosts.length - 1
-              raise
-            end
-            # else try next host
+          break
+        rescue ::PG::Error => error
+          if error.message.include?("does not exist")
+            raise ActiveRecord::NoDatabaseError.new(error.message)
+          elsif index == hosts.length - 1
+            raise
           end
+          # else try next host
         end
       end
     end

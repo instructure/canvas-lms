@@ -119,7 +119,6 @@ def lintersImage() {
 def premergeCacheImage() {
   credentials.withStarlordCredentials {
     withEnv([
-      "BASE_RUNNER_PREFIX=${env.BASE_RUNNER_PREFIX}",
       "CACHE_LOAD_SCOPE=${env.IMAGE_CACHE_MERGE_SCOPE}",
       "CACHE_LOAD_FALLBACK_SCOPE=${env.IMAGE_CACHE_BUILD_SCOPE}",
       "CACHE_SAVE_SCOPE=${env.IMAGE_CACHE_MERGE_SCOPE}",
@@ -145,7 +144,6 @@ def premergeCacheImage() {
         ./build/new-jenkins/docker-with-flakey-network-protection.sh push $WEBPACK_BUILDER_PREFIX || true
         ./build/new-jenkins/docker-with-flakey-network-protection.sh push $YARN_RUNNER_PREFIX || true
         ./build/new-jenkins/docker-with-flakey-network-protection.sh push $RUBY_RUNNER_PREFIX || true
-        ./build/new-jenkins/docker-with-flakey-network-protection.sh push $BASE_RUNNER_PREFIX || true
         ./build/new-jenkins/docker-with-flakey-network-protection.sh push $WEBPACK_CACHE_PREFIX
       """, label: 'upload cache images')
     }
@@ -158,7 +156,6 @@ def patchsetImage() {
 
     slackSendCacheBuild {
       withEnv([
-        "BASE_RUNNER_PREFIX=${env.BASE_RUNNER_PREFIX}",
         "CACHE_LOAD_SCOPE=${env.IMAGE_CACHE_MERGE_SCOPE}",
         "CACHE_LOAD_FALLBACK_SCOPE=${env.IMAGE_CACHE_BUILD_SCOPE}",
         "CACHE_SAVE_SCOPE=${cacheScope}",
@@ -192,7 +189,6 @@ def patchsetImage() {
       ./build/new-jenkins/docker-with-flakey-network-protection.sh push $WEBPACK_BUILDER_PREFIX || true
       ./build/new-jenkins/docker-with-flakey-network-protection.sh push $YARN_RUNNER_PREFIX || true
       ./build/new-jenkins/docker-with-flakey-network-protection.sh push $RUBY_RUNNER_PREFIX || true
-      ./build/new-jenkins/docker-with-flakey-network-protection.sh push $BASE_RUNNER_PREFIX || true
       ./build/new-jenkins/docker-with-flakey-network-protection.sh push $WEBPACK_CACHE_PREFIX
     """, label: 'upload cache images')
   }

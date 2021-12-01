@@ -25,20 +25,20 @@ module Gradebook
   extend SeleniumDependencies
 
   # Student Headings
-  STUDENT_COLUMN_MENU_SELECTOR = '.container_0 .Gradebook__ColumnHeaderAction'.freeze
+  STUDENT_COLUMN_MENU_SELECTOR = '.container_0 .Gradebook__ColumnHeaderAction'
 
   # Gradebook Menu
-  GRADEBOOK_MENU_SELECTOR = '[data-component="GradebookMenu"]'.freeze
-  INDIVIDUAL_VIEW_ITEM_SELECTOR = 'individual-gradebook'.freeze
-  GRADE_HISTORY_ITEM_SELECTOR = 'gradebook-history'.freeze
-  LEARING_MASTERY_ITEM_SELECTOR = 'learning-mastery'.freeze
+  GRADEBOOK_MENU_SELECTOR = '[data-component="GradebookMenu"]'
+  INDIVIDUAL_VIEW_ITEM_SELECTOR = 'individual-gradebook'
+  GRADE_HISTORY_ITEM_SELECTOR = 'gradebook-history'
+  LEARING_MASTERY_ITEM_SELECTOR = 'learning-mastery'
 
   # Action Menu
-  ACTION_MENU_SELECTOR = '[data-component="ActionMenu"]'.freeze
-  ACTION_MENU_ITEM_SELECTOR = 'body [data-menu-id="%s"]'.freeze
+  ACTION_MENU_SELECTOR = '[data-component="ActionMenu"]'
+  ACTION_MENU_ITEM_SELECTOR = 'body [data-menu-id="%s"]'
 
   # Menu Items
-  MENU_ITEM_SELECTOR = 'span[data-menu-item-id="%s"]'.freeze
+  MENU_ITEM_SELECTOR = 'span[data-menu-item-id="%s"]'
 
   def self.gradebook_settings_cog
     f('#gradebook-settings-button')
@@ -670,6 +670,14 @@ module Gradebook
     f(assignment_header_cell_selector(title))
   end
 
+  def self.assignment_names
+    ff('.assignment-name')
+  end
+
+  def self.fetch_assignment_names
+    assignment_names.map(&:text)
+  end
+
   def self.assignment_header_menu_trigger_element(assignment_name)
     assignment_header_cell_element(assignment_name).find_element(:css, '.Gradebook__ColumnHeaderAction button')
   end
@@ -677,9 +685,9 @@ module Gradebook
   def self.assignment_header_menu_item_selector(item)
     menu_item_id = ""
 
-    if item =~ /curve(\-?\s?grade)?/i
+    if item =~ /curve(-?\s?grade)?/i
       menu_item_id = 'curve-grades'
-    elsif item =~ /set(\-?\s?default\-?\s?grade)?/i
+    elsif item =~ /set(-?\s?default-?\s?grade)?/i
       menu_item_id = 'set-default-grade'
     end
 
@@ -720,13 +728,13 @@ module Gradebook
     assignment_header_menu_element(assignment_id).click
     menu_item_id = ""
 
-    if menuitem =~ /(message(\-?\s?student)?)/i
+    if menuitem =~ /(message(-?\s?student)?)/i
       menu_item_id = 'message-students-who'
-    elsif menuitem =~ /(curve(\-?\s?grade)?)/i
+    elsif menuitem =~ /(curve(-?\s?grade)?)/i
       menu_item_id = 'curve-grades'
-    elsif menuitem =~ /(set(\-?\s?default\-?\s?grade)?)/i
+    elsif menuitem =~ /(set(-?\s?default-?\s?grade)?)/i
       menu_item_id = 'set-default-grade'
-    elsif menuitem =~ /(download(\-?\s?submission)?)/i
+    elsif menuitem =~ /(download(-?\s?submission)?)/i
       menu_item_id = 'download-submissions'
 
     end

@@ -138,6 +138,7 @@ const locale = {
   "creative_commons_license_725584ae": {
     "message": "Creative Commons-lisens:"
   },
+  "crop_image_807ebb08": { "message": "Beskjær bilde" },
   "current_image_f16c249c": { "message": "Nåværende bilde" },
   "custom_6979cd81": { "message": "Tilpasset" },
   "date_added_ed5ad465": { "message": "Lagt til dato" },
@@ -310,6 +311,7 @@ const locale = {
     "message": "Ikke funnet resultater for { term }."
   },
   "none_3b5e34d2": { "message": "Ingen" },
+  "none_selected_b93d56d2": { "message": "Ingen valgt" },
   "octagon_e48be9f": { "message": "Åttekant" },
   "open_this_keyboard_shortcuts_dialog_9658b83a": {
     "message": "Åpne denne tastatursnarveidialogen"
@@ -362,6 +364,7 @@ const locale = {
   },
   "search_280d00bd": { "message": "Søk" },
   "search_term_b2d2235": { "message": "Søkeord" },
+  "select_crop_shape_d441feeb": { "message": "Velg beskjæringsform" },
   "select_language_7c93a900": { "message": "Velg språk" },
   "selected_274ce24f": { "message": "Valgt" },
   "shift_o_to_open_the_pretty_html_editor_55ff5a31": {

@@ -48,6 +48,42 @@ describe SIS::UserImporter do
     end
   end
 
+  it 'populates the deleted_at property when user gets deleted and field is not stuck' do
+    account_model
+    Setting.set('sis_transaction_seconds', '1')
+    user1 = SIS::Models::User.new(user_id: "sis_id", login_id: "123456", status: 'deleted',
+                                  full_name: 'User One', email: 'user1@example.com')
+    SIS::UserImporter.new(@account, { batch: @account.sis_batches.create! }).process([]) do |importer|
+      importer.add_user(user1)
+    end
+
+    expect(Pseudonym.last.deleted_at).not_to be_nil
+  end
+
+  it 'does not update deleted_at property when user gets deleted but workflow_state is stuck' do
+    account_model
+    Setting.set('sis_transaction_seconds', '1')
+    active_user = SIS::Models::User.new(user_id: "sis_id", login_id: "123456", status: 'active',
+                                        full_name: 'User One', email: 'user1@example.com')
+    SIS::UserImporter.new(@account, { batch: @account.sis_batches.create! }).process([]) do |importer|
+      importer.add_user(active_user)
+    end
+
+    Pseudonym.where(unique_id: '123456').first.tap do |pseudonym|
+      pseudonym.workflow_state = 'suspended'
+      pseudonym.save!
+    end
+
+    deleted_user = SIS::Models::User.new(user_id: "sis_id", login_id: "123456", status: 'deleted',
+                                         full_name: 'User One', email: 'user1@example.com')
+    SIS::UserImporter.new(@account, { batch: @account.sis_batches.create! }).process([]) do |importer|
+      importer.add_user(deleted_user)
+    end
+
+    expect(Pseudonym.last.deleted_at).to be_nil
+    expect(Pseudonym.last.workflow_state).to eq 'suspended'
+  end
+
   it 'handles user_ids as integers just in case' do
     user1 = SIS::Models::User.new(user_id: 12345, login_id: 'user1', status: 'active',
                                   full_name: 'User One', email: 'user1@example.com')

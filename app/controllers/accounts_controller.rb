@@ -625,7 +625,7 @@ class AccountsController < ApplicationController
     sortable_name_col = User.sortable_name_order_by_clause('users')
 
     order = if params[:sort] == 'course_name'
-              "#{Course.best_unicode_collation_key('courses.name')}"
+              Course.best_unicode_collation_key('courses.name').to_s
             elsif params[:sort] == 'sis_course_id'
               "courses.sis_source_id"
             elsif params[:sort] == 'teacher'
@@ -768,7 +768,7 @@ class AccountsController < ApplicationController
       ActiveRecord::Associations::Preloader.new.preload(@courses, [:enrollment_term]) if includes.include?("term") || includes.include?('concluded')
 
       if includes.include?("total_students")
-        student_counts = StudentEnrollment.not_fake.where("enrollments.workflow_state NOT IN ('rejected', 'completed', 'deleted', 'inactive')")
+        student_counts = StudentEnrollment.shard(@account.shard).not_fake.where("enrollments.workflow_state NOT IN ('rejected', 'completed', 'deleted', 'inactive')")
                                           .where(:course_id => @courses).group(:course_id).distinct.count(:user_id)
         @courses.each { |c| c.student_count = student_counts[c.id] || 0 }
       end

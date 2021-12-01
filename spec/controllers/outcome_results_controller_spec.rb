@@ -291,7 +291,7 @@ describe OutcomeResultsController do
       create_result(@student2.id, @outcome, outcome_assignment, 1)
     end
 
-    before :each do
+    before do
       user_session(@teacher)
     end
 
@@ -351,6 +351,50 @@ describe OutcomeResultsController do
           create_result(@student.id, @outcome, outcome_assignment, 2, { :possible => 5 })
           json = parse_response(get_rollups(sort_by: 'student', sort_order: 'desc', per_page: 1, page: 1))
           expect(json['rollups'][0]['scores'][0]['score']).to eq 1.2 # ( score of 2 / possible 5) * outcome.points_possible
+        end
+      end
+    end
+
+    context 'with outcomes_friendly_description and improved_outcomes_management FFs' do
+      before do
+        OutcomeFriendlyDescription.create!(learning_outcome: @outcome, context: @course, description: 'A friendly description')
+      end
+
+      context 'enabled' do
+        before do
+          Account.site_admin.enable_feature!(:outcomes_friendly_description)
+          @course.root_account.enable_feature!(:improved_outcomes_management)
+        end
+
+        it 'returns outcomes with friendlly_description' do
+          create_result(@student.id, @outcome, outcome_assignment, 2, { :possible => 5 })
+          json = parse_response(get_rollups(include: ['outcomes']))
+          expect(json['linked']['outcomes'][0]['friendly_description']).to eq 'A friendly description'
+        end
+      end
+
+      context 'outcomes_friendly_description disabled' do
+        before do
+          Account.site_admin.disable_feature!(:outcomes_friendly_description)
+        end
+
+        it 'returns outcomes without friendlly_description' do
+          create_result(@student.id, @outcome, outcome_assignment, 2, { :possible => 5 })
+          json = parse_response(get_rollups(include: ['outcomes']))
+          expect(json['linked']['outcomes'][0]['friendly_description']).to be_nil
+        end
+      end
+
+      context 'outcomes_friendly_description enabled, but improved_outcomes_management disabled' do
+        before do
+          Account.site_admin.enable_feature!(:outcomes_friendly_description)
+          @course.root_account.disable_feature!(:improved_outcomes_management)
+        end
+
+        it 'returns outcomes without friendlly_description' do
+          create_result(@student.id, @outcome, outcome_assignment, 2, { :possible => 5 })
+          json = parse_response(get_rollups(include: ['outcomes']))
+          expect(json['linked']['outcomes'][0]['friendly_description']).to be_nil
         end
       end
     end

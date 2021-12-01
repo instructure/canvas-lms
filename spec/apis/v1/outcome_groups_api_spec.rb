@@ -1130,6 +1130,58 @@ describe "Outcome Groups API", type: :request do
         )
       end
     end
+
+    context 'with outcomes_friendly_description and improved_outcomes_management FFs' do
+      before do
+        create_outcome(:description => 'This is an outcome')
+        @fd_account = OutcomeFriendlyDescription.create!(learning_outcome: @outcome, context: @account, description: 'Description at the account')
+      end
+
+      let(:outcome_groups_outcomes_api_call) do
+        api_call(
+          :get, "/api/v1/accounts/#{@account.id}/outcome_groups/#{@account.root_outcome_group.id}/outcomes?outcome_style=full",
+          :controller => 'outcome_groups_api',
+          :action => 'outcomes',
+          :account_id => @account.id.to_s,
+          :id => @account.root_outcome_group.id.to_s,
+          :outcome_style => 'full',
+          :format => 'json'
+        )
+      end
+
+      context 'both enabled' do
+        before do
+          Account.site_admin.enable_feature!(:outcomes_friendly_description)
+          @account.enable_feature!(:improved_outcomes_management)
+        end
+
+        it 'returns outcomes with friendly_description' do
+          expect(outcome_groups_outcomes_api_call[0]['outcome']['friendly_description']).to eq @fd_account.description
+        end
+      end
+
+      context "outcomes_friendly_description on, improved_outcomes_management off" do
+        before do
+          Account.site_admin.enable_feature!(:outcomes_friendly_description)
+          @account.disable_feature!(:improved_outcomes_management)
+        end
+
+        it 'returns outcomes without friendly_description' do
+          expect(outcome_groups_outcomes_api_call[0]['outcome']['friendly_description']).to be_nil
+        end
+      end
+
+      context "outcomes_friendly_description off, improved_outcomes_management on" do
+        before do
+          Account.site_admin.disable_feature!(:outcomes_friendly_description)
+          @account.enable_feature!(:improved_outcomes_management)
+        end
+
+        it 'returns outcomes without friendly_description' do
+          expect(outcome_groups_outcomes_api_call[0]['outcome']['friendly_description']).to be_nil
+        end
+      end
+    end
   end
 
   describe "link existing" do
@@ -1600,7 +1652,7 @@ describe "Outcome Groups API", type: :request do
 
     it "fails (400) if this is the last link for an aligned outcome" do
       aqb = @account.assessment_question_banks.create!
-      exp_warning = /Outcome \'#{@outcome.short_description}\' cannot be deleted because it is aligned to content\./
+      exp_warning = /Outcome '#{@outcome.short_description}' cannot be deleted because it is aligned to content\./
       @outcome.align(aqb, @account, :mastery_type => "none")
       raw_api_call(:delete, "/api/v1/accounts/#{@account.id}/outcome_groups/#{@group.id}/outcomes/#{@outcome.id}",
                    :controller => 'outcome_groups_api',

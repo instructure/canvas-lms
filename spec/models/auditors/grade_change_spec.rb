@@ -27,7 +27,7 @@ describe Auditors::GradeChange do
 
   let(:request_id) { 42 }
 
-  before(:each) do
+  before do
     allow(RequestContextGenerator).to receive_messages(request_id: request_id)
 
     shard_class = Class.new {

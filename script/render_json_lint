@@ -20,7 +20,7 @@ def bad_to_json_in_render?(expr)
     expr[3].is_a?(Sexp) && expr[3].first == :hash &&
     expr[3][1].is_a?(Sexp) && expr[3][1].first == :lit && expr[3][1].last == :json &&
     expr[3][2].is_a?(Sexp) && expr[3][2].first == :call && expr[3][2][2] == :to_json &&
-    !(expr[3][2][1].is_a?(Sexp) && [:str, :lit, :true, :false, :nil].include?(expr[3][2][1].first))
+    !(expr[3][2][1].is_a?(Sexp) && [:str, :lit, :true, :false, :nil].include?(expr[3][2][1].first)) # rubocop:disable Lint/BooleanSymbol
 end
 
 errored = false

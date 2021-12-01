@@ -114,7 +114,7 @@ describe GradebookImporter do
 
     context 'when dealing with a file containing semicolon field separators' do
       context 'with interspersed commas to throw you off' do
-        before(:each) do
+        before do
           @rows = [
             'Student;ID;Section;Aufgabe 1;Aufgabe 2;Final Score',
             'Points Possible;;;10000,54;100,00;',
@@ -161,7 +161,7 @@ describe GradebookImporter do
       end
 
       context 'without any interspersed commas' do
-        before(:each) do
+        before do
           @rows = [
             'Student;ID;Section;Aufgabe 1;Aufgabe 2;Final Score',
             'Points Possible;;;10000,54;100,00;',
@@ -730,7 +730,7 @@ describe GradebookImporter do
   end
 
   context "anonymous assignments" do
-    before(:each) do
+    before do
       @student = User.create!
       course_with_student(user: @student, active_all: true)
       @assignment = @course.assignments.create!(name: "Assignment 1", anonymous_grading: true, points_possible: 10)
@@ -855,7 +855,7 @@ describe GradebookImporter do
     end
 
     context "with a deleted custom column" do
-      before(:each) do
+      before do
         @course.custom_gradebook_columns.find_by(title: "CustomColumn1").destroy
       end
 
@@ -929,7 +929,7 @@ describe GradebookImporter do
       end
 
       context "when importing override scores is enabled" do
-        before(:each) do
+        before do
           Account.site_admin.enable_feature!(:import_override_scores_in_gradebook)
 
           @course.enable_feature!(:final_grades_override)
@@ -968,7 +968,7 @@ describe GradebookImporter do
     end
     let(:progress) { Progress.create!(tag: "test", context: user) }
 
-    before :each do
+    before do
       @existing_moderated_assignment = Assignment.create!(
         context: course,
         name: 'An Assignment',
@@ -1485,7 +1485,7 @@ describe GradebookImporter do
     let(:student_with_override) { User.create!(name: "Cyrus") }
     let(:student_without_override) { User.create!(name: "Ophilia") }
 
-    before(:each) do
+    before do
       @course.enroll_student(student_with_override, enrollment_state: "active")
       @course.enroll_student(student_without_override, enrollment_state: "active")
 
@@ -1633,7 +1633,7 @@ describe GradebookImporter do
     end
 
     context "for a course with grading periods" do
-      before(:each) do
+      before do
         enrollment_term = @course.root_account.enrollment_terms.create!
         @course.update!(enrollment_term: enrollment_term)
 
@@ -1839,7 +1839,7 @@ describe GradebookImporter do
       let(:grading_period_1) { grading_period_group.grading_periods.first }
       let(:grading_period_2) { grading_period_group.grading_periods.second }
 
-      before(:each) do
+      before do
         @course.enrollment_term.update!(grading_period_group: grading_period_group)
       end
 

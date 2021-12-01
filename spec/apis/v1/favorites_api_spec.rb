@@ -112,7 +112,7 @@ describe "Favorites API", type: :request do
       course6 = course_with_student(:course_name => "Course 6", :user => @user, :active_all => true).course
       course_with_student(:course_name => "Course 7", :user => @user, :active_all => true).course
       json = api_call(:post, "/api/v1/users/self/favorites/courses/#{course6.id}",
-                      { :controller => "favorites", :action => "add_favorite_course", :format => "json", :id => "#{course6.id}" })
+                      { :controller => "favorites", :action => "add_favorite_course", :format => "json", :id => course6.id.to_s })
       expect(json["context_id"]).to eql(course6.id)
 
       # now favorites should include the implicit courses from before, plus the one we faved
@@ -125,7 +125,7 @@ describe "Favorites API", type: :request do
 
       # remove a course from favorites
       json = api_call(:delete, "/api/v1/users/self/favorites/courses/#{@courses[0].id}",
-                      { :controller => "favorites", :action => "remove_favorite_course", :format => "json", :id => "#{@courses[0].id}" })
+                      { :controller => "favorites", :action => "remove_favorite_course", :format => "json", :id => @courses[0].id.to_s })
       expect(json["context_id"]).to eql(@courses[0].id)
 
       # now favorites should include the implicit courses from before, minus the one we removed
@@ -138,7 +138,7 @@ describe "Favorites API", type: :request do
 
       # remove a course from favorites
       json = api_call(:delete, "/api/v1/users/self/favorites/courses/#{@courses[0].id}",
-                      { :controller => "favorites", :action => "remove_favorite_course", :format => "json", :id => "#{@courses[0].id}" })
+                      { :controller => "favorites", :action => "remove_favorite_course", :format => "json", :id => @courses[0].id.to_s })
       expect(json["context_id"]).to eql(@courses[0].id)
 
       # now favorites should include the implicit courses from before, minus the one we removed
@@ -150,7 +150,7 @@ describe "Favorites API", type: :request do
     it "does not create a duplicate by fav'ing an already faved course" do
       expect(@user.favorites.size).to eql(3)
       json = api_call(:post, "/api/v1/users/self/favorites/courses/#{@courses[0].id}",
-                      { :controller => "favorites", :action => "add_favorite_course", :format => "json", :id => "#{@courses[0].id}" })
+                      { :controller => "favorites", :action => "add_favorite_course", :format => "json", :id => @courses[0].id.to_s })
       expect(json["context_id"]).to eql(@courses[0].id)
       @user.reload
       expect(@user.favorites.size).to eql(3)
@@ -158,7 +158,7 @@ describe "Favorites API", type: :request do
 
     it "returns an empty hash when removing a non-faved course" do
       json = api_call(:delete, "/api/v1/users/self/favorites/courses/#{@courses[5].id}",
-                      { :controller => "favorites", :action => "remove_favorite_course", :format => "json", :id => "#{@courses[5].id}" })
+                      { :controller => "favorites", :action => "remove_favorite_course", :format => "json", :id => @courses[5].id.to_s })
       expect(json.size).to be_zero
     end
 
@@ -172,7 +172,7 @@ describe "Favorites API", type: :request do
   end
 
   context "group favorites" do
-    before :each do
+    before do
       @user = user_model
       @context = course_model
       @group_fave = Group.create!(:name => "group1", :context => @context)
@@ -184,17 +184,20 @@ describe "Favorites API", type: :request do
       @user.favorites.build(:context => @group_fave)
       @user.save
     end
+
     it "add favorite group" do
       api_call(:post, "/api/v1/users/self/favorites/groups/#{@group_not_yet_fave.id}",
                :controller => "favorites", :action => "add_favorite_groups", :format => "json", :id => @group_not_yet_fave.id)
       expect(@user.favorites.size).to eql(2) # Added one in before method, one in test
     end
+
     it "lists favorite groups" do
       json = api_call(:get, "/api/v1/users/self/favorites/groups",
                       :controller => "favorites", :action => "list_favorite_groups", :format => "json")
       expect(json[0]['id']).to eql @group_fave.id
       expect(@user.favorites.size).to eql(1)
     end
+
     it "clears favorite groups" do
       expect(@user.favorites.size).to eql(1)
       group_fave_2 = Group.create!(:name => "new_fave", :context => @context)
@@ -206,11 +209,13 @@ describe "Favorites API", type: :request do
                :controller => "favorites", :action => "reset_groups_favorites", :format => "json")
       expect(@user.favorites.size).to eql(0)
     end
+
     it "deletes one favorite group" do
       json = api_call(:delete, "/api/v1/users/self/favorites/groups/#{@group_fave.id}",
                       :controller => "favorites", :action => "remove_favorite_groups", :format => "json", :id => @group_fave.id)
       expect(json['context_type']).to eql("Group")
     end
+
     it "lists all groups if none are favorited" do
       api_call(:delete, "/api/v1/users/self/favorites/groups",
                :controller => "favorites", :action => "reset_groups_favorites", :format => "json")

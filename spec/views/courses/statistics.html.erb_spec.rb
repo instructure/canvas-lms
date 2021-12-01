@@ -43,7 +43,7 @@ describe "courses/statistics.html.erb" do
   end
 
   context "student annotation assignments" do
-    before(:each) do
+    before do
       @attachment = attachment_model(context: @course)
       @assignment = @course.assignments.create!(
         name: "annotated",

@@ -46,20 +46,18 @@ module Api::V1::Conferences
 
   def ui_conferences_json(conferences, context, user, session)
     cs = conferences.map do |c|
-      begin
-        c.as_json(
-          permissions: {
-            user: user,
-            session: session,
-          },
-          url: named_context_url(context, :context_conference_url, c)
-        )
-      rescue => e
-        Canvas::Errors.capture_exception(:web_conferences, e)
-        @errors ||= []
-        @errors << e
-        nil
-      end
+      c.as_json(
+        permissions: {
+          user: user,
+          session: session,
+        },
+        url: named_context_url(context, :context_conference_url, c)
+      )
+    rescue => e
+      Canvas::Errors.capture_exception(:web_conferences, e)
+      @errors ||= []
+      @errors << e
+      nil
     end
     cs.compact
   end

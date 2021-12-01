@@ -236,8 +236,8 @@ module GroupsCommon
   end
 
   def select_change_groups_option
-    (ff('#option_change_groups').last).click
-    (ff('#clone_category_submit_button').last).click
+    ff('#option_change_groups').last.click
+    ff('#clone_category_submit_button').last.click
     wait_for_ajaximations
   end
 
@@ -254,7 +254,7 @@ module GroupsCommon
     wait_for(method: nil, timeout: 1) { f(".ui-menu-item .edit-group-assignment").displayed? }
     ff('.edit-group-assignment')[student].click
     wait_for(method: nil, timeout: 2) { fxpath("//*[@data-cid='Tray']//*[@role='dialog']").displayed? }
-    click_option('.move-select .move-select__group select', "#{@testgroup[group_destination].name}")
+    click_option('.move-select .move-select__group select', @testgroup[group_destination].name)
     wait_for_animations
     button = f('.move-select button[type="submit"]')
     keep_trying_until { button.click; true }

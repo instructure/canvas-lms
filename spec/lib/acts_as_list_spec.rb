@@ -34,7 +34,7 @@ describe "acts_as_list" do
   end
 
   describe "#insert_at" do
-    before :each do
+    before do
       course_factory
       @module_1 = @course.context_modules.create!(:name => "another module")
       @module_2 = @course.context_modules.create!(:name => "another module")

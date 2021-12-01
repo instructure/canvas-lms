@@ -38,7 +38,7 @@ shared_examples 'home_page' do |context|
 
     expect('.coming_up').to be_present
     expect(ff('.coming_up .event a').size).to eq 1
-    expect(f('.coming_up .event a b')).to include_text("#{event.title}")
+    expect(f('.coming_up .event a b')).to include_text(event.title)
   end
 
   it "displays a view calendar link on the group home page", priority: pick_priority(context, student: "1", teacher: "2"), test_id: pick_test_id(context, student: 273603, teacher: 319910) do
@@ -136,7 +136,7 @@ shared_examples 'announcements_page_v2' do
   include SharedExamplesCommon
   include RCENextPage
 
-  before(:each) do
+  before do
     stub_rcs_config
   end
 
@@ -204,7 +204,7 @@ shared_examples 'pages_page' do |context|
   include GroupsCommon
   include SharedExamplesCommon
 
-  before(:each) do
+  before do
     stub_rcs_config
   end
 
@@ -264,7 +264,7 @@ shared_examples 'discussions_page' do |context|
   include SharedExamplesCommon
   include RCENextPage
 
-  before(:each) do
+  before do
     stub_rcs_config
   end
 

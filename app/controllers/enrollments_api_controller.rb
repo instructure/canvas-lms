@@ -350,8 +350,11 @@ class EnrollmentsApiController < ApplicationController
   # and a student or in multiple course sections), each enrollment will be
   # listed separately.
   #
-  # note: Currently, only a root level admin user can return other users' enrollments. A
-  # user can, however, return his/her own enrollments.
+  # note: Currently, only a root level admin user can return other users' enrollments.
+  # A user can, however, return his/her own enrollments.
+  #
+  # Enrollments scoped to a course context will include inactive states by default
+  # if the caller has account admin authorization and the state[] parameter is omitted.
   #
   # @argument type[] [String]
   #   A list of enrollment types to return. Accepted values are
@@ -428,7 +431,7 @@ class EnrollmentsApiController < ApplicationController
       enrollments = enrollments.joins(:user).select("enrollments.*")
 
       has_courses = enrollments.where_clause.instance_variable_get(:@predicates)
-                               .any? { |cond| cond.is_a?(String) && cond =~ /courses\./ }
+                               .any? { |cond| cond.is_a?(String) && cond.include?('courses.') }
       enrollments = enrollments.joins(:course) if has_courses
       enrollments = enrollments.shard(@shard_scope) if @shard_scope
 
@@ -730,23 +733,19 @@ class EnrollmentsApiController < ApplicationController
     @enrollment = @context.enrollments.find(params[:id])
     permission =
       case params[:task]
-      when 'conclude'
-        :can_be_concluded_by
       when 'delete', 'deactivate', 'inactivate'
         :can_be_deleted_by
-      else
+      else # 'conclude'
         :can_be_concluded_by
       end
 
     action =
       case params[:task]
-      when 'conclude'
-        :conclude
       when 'delete'
         :destroy
       when 'deactivate', 'inactivate'
         :deactivate
-      else
+      else # 'conclude'
         :conclude
       end
 

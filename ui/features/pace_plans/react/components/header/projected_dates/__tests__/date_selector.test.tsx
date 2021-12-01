@@ -39,7 +39,8 @@ describe('PacePlansDateSelector', () => {
       setStartDate,
       setEndDate,
       pacePlan: PRIMARY_PLAN,
-      planPublishing: false
+      planPublishing: false,
+      width: '14rem'
     }
 
     it('renders an editable "Projected Start Date" selector for primary pace plans', () => {
@@ -118,7 +119,8 @@ describe('PacePlansDateSelector', () => {
       planPublishing: false,
       projectedEndDate: '2021-11-03',
       setStartDate,
-      setEndDate
+      setEndDate,
+      width: '14rem'
     }
 
     it('renders read-only "Projected End Date" text for primary pace plans', () => {
@@ -139,6 +141,86 @@ describe('PacePlansDateSelector', () => {
       expect(getByText('End Date')).toBeInTheDocument()
       expect(getByText('October 15, 2021')).toBeInTheDocument()
       expect(queryByRole('combobox')).not.toBeInTheDocument()
+    })
+  })
+
+  describe('of end-selection type', () => {
+    const defaultProps: PacePlanDateSelectorProps = {
+      type: 'end-selection',
+      blackoutDates: BLACKOUT_DATES,
+      setStartDate,
+      setEndDate,
+      pacePlan: PRIMARY_PLAN,
+      planPublishing: false,
+      width: '100%',
+      label: 'End Date'
+    }
+
+    it('renders an editable "End Date" selector for primary pace plans', () => {
+      const {getByLabelText} = render(<PacePlanDateSelector {...defaultProps} />)
+      const endDateInput = getByLabelText('End Date') as HTMLInputElement
+      expect(endDateInput).toBeInTheDocument()
+      expect(endDateInput.value).toBe('December 15, 2021')
+
+      fireEvent.change(endDateInput, {target: {value: 'December 14, 2021'}})
+      fireEvent.blur(endDateInput)
+      expect(setEndDate).toHaveBeenCalledWith('2021-12-14')
+    })
+
+    it('renders read-only "End Date" text for student pace plans', () => {
+      const {getByText, queryByRole} = render(
+        <PacePlanDateSelector {...defaultProps} pacePlan={STUDENT_PLAN} />
+      )
+      expect(getByText('End Date')).toBeInTheDocument()
+      expect(getByText('December 15, 2021')).toBeInTheDocument()
+      expect(queryByRole('combobox')).not.toBeInTheDocument()
+    })
+
+    it('displays an error when weekends are disallowed and the date is on a weekend', () => {
+      const pacePlan = {...defaultProps.pacePlan, end_date: 'September 4, 2021'}
+      const {getByText} = render(
+        <PacePlanDateSelector {...defaultProps} pacePlan={pacePlan} weekendsDisabled />
+      )
+
+      expect(
+        getByText('The selected date is on a weekend. This pace plan skips weekends.')
+      ).toBeInTheDocument()
+    })
+
+    it('displays an error when the date is on a blackout date', () => {
+      const pacePlan = {...defaultProps.pacePlan, end_date: 'September 4, 2021'}
+      const blackoutDates = [
+        {
+          event_title: 'Student Break',
+          start_date: moment('September 2, 2021'),
+          end_date: moment('September 10, 2021')
+        }
+      ]
+      const {getByText} = render(
+        <PacePlanDateSelector {...defaultProps} pacePlan={pacePlan} blackoutDates={blackoutDates} />
+      )
+
+      expect(getByText('The selected date is on a blackout day.')).toBeInTheDocument()
+    })
+
+    it('displays an error when the date is before the start date', () => {
+      const pacePlan = {
+        ...defaultProps.pacePlan,
+        start_date: 'September 4, 2021',
+        end_date: 'September 2, 2021'
+      }
+      const {getByText} = render(<PacePlanDateSelector {...defaultProps} pacePlan={pacePlan} />)
+
+      expect(
+        getByText('The end date for the pace plan must be after the start date.')
+      ).toBeInTheDocument()
+    })
+
+    it('renders as disabled while publishing', () => {
+      const {getByLabelText} = render(<PacePlanDateSelector {...defaultProps} planPublishing />)
+      const endDateInput = getByLabelText('End Date') as HTMLInputElement
+
+      expect(endDateInput).toBeDisabled()
     })
   })
 })

@@ -30,13 +30,13 @@ describe 'Grading quizzes' do
       student_in_course(active_all: 1)
     end
 
-    before(:each) { user_session(@teacher) }
+    before { user_session(@teacher) }
 
     context 'when quiz needs review' do
       before(:once) { @quiz = seed_quiz_with_submission(1, student: @student) }
 
       context 'when on the course home page' do
-        before(:each) { get "/courses/#{@course.id}" }
+        before { get "/courses/#{@course.id}" }
 
         it 'To Do List includes quizzes with submissions that need grading', priority: "1", test_id: 140614 do
           expect(f('.right-side-list.to-do-list')).to include_text 'Grade Quiz Me!'
@@ -44,7 +44,7 @@ describe 'Grading quizzes' do
       end
 
       context 'after changing a quiz question\'s correct answer' do
-        before(:each) do
+        before do
           get "/courses/#{@course.id}/quizzes/#{@quiz.id}/edit"
           dismiss_flash_messages
           click_questions_tab

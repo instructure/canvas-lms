@@ -20,7 +20,7 @@
 
 class AuthenticationProvider::LDAP < AuthenticationProvider
   def self.sti_name
-    'ldap'.freeze
+    'ldap'
   end
 
   # if the config changes, clear out last_timeout_failure so another attempt can be made immediately

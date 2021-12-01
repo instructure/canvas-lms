@@ -23,7 +23,7 @@ describe CommunicationChannel do
     Messages::Partitioner.process
   end
 
-  before(:each) do
+  before do
     @pseudonym = double('Pseudonym')
     allow(@pseudonym).to receive(:destroyed?).and_return(false)
     allow(Pseudonym).to receive(:find_by_user_id).and_return(@pseudonym)
@@ -187,7 +187,7 @@ describe CommunicationChannel do
 
   it "does not update cache if workflow_state doesn't change" do
     cc = communication_channel_model
-    expect(cc.user).to receive(:clear_email_cache!).never
+    expect(cc.user).not_to receive(:clear_email_cache!)
     cc.save!
   end
 
@@ -326,9 +326,8 @@ describe CommunicationChannel do
       @user.register!
       communication_channel(@user, { username: 'user1@example.com' })
       account = Account.create!
-      allow(HostUrl).to receive(:context_host).with(account).and_return('someserver.com')
-      allow(HostUrl).to receive(:context_host).with(@cc).and_return('someserver.com')
-      allow(HostUrl).to receive(:context_host).with(nil).and_return('default')
+      allow(HostUrl).to receive(:context_host).with(account, any_args).and_return('someserver.com')
+      allow(HostUrl).to receive(:context_host).with(@cc, any_args).and_return('someserver.com')
       @cc.send_confirmation!(account)
       message = Message.where(:communication_channel_id => @cc, :notification_id => notification).first
       expect(message).not_to be_nil
@@ -746,7 +745,7 @@ describe CommunicationChannel do
         cc.e164_path,
         true
       )
-      expect(cc).to receive(:send_otp_via_sms_gateway!).never
+      expect(cc).not_to receive(:send_otp_via_sms_gateway!)
       cc.send_otp!('123456', account)
       expect(InstStatsd::Statsd).to have_received(:increment).with(
         "message.deliver.sms.one_time_password",
@@ -766,14 +765,14 @@ describe CommunicationChannel do
     end
 
     it "sends via email if not configured" do
-      expect(Services::NotificationService).to receive(:process).never
+      expect(Services::NotificationService).not_to receive(:process)
       expect(cc).to receive(:send_otp_via_sms_gateway!).once
       cc.send_otp!('123456')
     end
   end
 
   describe '#user_can_have_more_channels?' do
-    before(:each) do
+    before do
       @domain_root_account = Account.default
       @user = User.create!
     end
@@ -785,7 +784,7 @@ describe CommunicationChannel do
     end
 
     describe 'when :max_communication_channels is set' do
-      before(:each) do
+      before do
         @domain_root_account.settings[:max_communication_channels] = 2
         @domain_root_account.save!
       end
@@ -796,7 +795,7 @@ describe CommunicationChannel do
       end
 
       describe 'when there are more CCs then the setting' do
-        before(:each) do
+        before do
           @cc1 = communication_channel(@user, { username: 'cc1@test.com' })
           @cc2 = communication_channel(@user, { username: 'cc2@test.com' })
         end

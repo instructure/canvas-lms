@@ -56,7 +56,7 @@ module Lti
       end
 
       describe "Get #show" do
-        before(:each) do
+        before do
           allow(OAuth::Signature).to receive(:build).and_return(double(verify: true))
           allow(OAuth::Helper).to receive(:parse_header).and_return({ 'oauth_consumer_key' => 'key' })
         end
@@ -73,7 +73,7 @@ module Lti
       end
 
       describe "POST #create" do
-        before(:each) do
+        before do
           mock_oauth_sig = double('oauth_signature')
           allow(mock_oauth_sig).to receive(:verify).and_return(true)
           allow(OAuth::Signature).to receive(:build).and_return(mock_oauth_sig)
@@ -202,7 +202,7 @@ module Lti
       end
 
       describe "POST #reregistration" do
-        before(:each) do
+        before do
           mock_siq = double('signature')
           allow(mock_siq).to receive(:verify).and_return(true)
           allow(OAuth::Signature).to receive(:build).and_return(mock_siq)

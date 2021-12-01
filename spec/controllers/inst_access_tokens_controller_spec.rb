@@ -32,7 +32,7 @@ describe InstAccessTokensController do
     end
 
     context "with valid user session" do
-      before(:each) { user_session(user) }
+      before { user_session(user) }
 
       it "generates an InstAccess token for the requeting user" do
         post 'create', format: 'json'

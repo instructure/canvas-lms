@@ -66,7 +66,7 @@ describe WimbaConference do
     user_model
   end
 
-  before :each do
+  before do
     allow(WebConference).to receive(:plugins).and_return([web_conference_plugin_mock("wimba", { :domain => "wimba.test" })])
     email = "email@email.com"
     allow(@user).to receive(:email).and_return(email)

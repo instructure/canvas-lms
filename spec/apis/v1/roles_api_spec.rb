@@ -446,7 +446,7 @@ describe "Roles API", type: :request do
     end
 
     describe "json response" do
-      before :each do
+      before do
         @account.root_account.disable_feature!(:granular_permissions_manage_users)
         @account.root_account.disable_feature!(:granular_permissions_manage_courses)
         @account.root_account.disable_feature!(:granular_permissions_manage_groups)

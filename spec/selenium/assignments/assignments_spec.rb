@@ -44,7 +44,7 @@ describe "assignments" do
       @course.require_assignment_group
     end
 
-    before :each do
+    before do
       create_session(@pseudonym)
     end
 
@@ -434,7 +434,6 @@ describe "assignments" do
 
     context "student annotation" do
       before do
-        Account.site_admin.enable_feature!(:annotated_document_submissions)
         @course.account.settings[:usage_rights_required] = true
         @course.account.save!
         attachment = attachment_model(content_type: "application/pdf", context: @course)
@@ -564,7 +563,7 @@ describe "assignments" do
     end
 
     context "with Responsive fix" do
-      before :each do
+      before do
         Account.default.enable_feature!('responsive_misc')
       end
 

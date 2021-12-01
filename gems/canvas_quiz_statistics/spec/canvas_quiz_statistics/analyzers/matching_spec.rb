@@ -115,10 +115,10 @@ describe CanvasQuizStatistics::Analyzers::Matching do
                             {}
                           ])
 
-      set = stats[:answer_sets].detect { |set| set[:id] == '8796' }
-      lhs = set[:answers].detect { |lhs| lhs[:id] == 'none' }
-      expect(lhs).to be_present
-      expect(lhs[:responses]).to eq(1)
+      set = stats[:answer_sets].detect { |s| s[:id] == '8796' }
+      answer = set[:answers].detect { |a| a[:id] == 'none' }
+      expect(answer).to be_present
+      expect(answer[:responses]).to eq(1)
     end
   end
 

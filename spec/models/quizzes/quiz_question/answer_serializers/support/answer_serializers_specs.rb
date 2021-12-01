@@ -62,7 +62,7 @@ shared_examples_for 'Answer Serializers' do
   subject { described_class.new qq }
 
   context 'serialization' do
-    before :each do
+    before do
       if !respond_to?(:input) && !respond_to?(:inputs)
         raise 'missing :input or :outputs definition'
       elsif !respond_to?(:output) && !respond_to?(:outputs)

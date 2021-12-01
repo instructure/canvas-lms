@@ -136,3 +136,14 @@ export const ADD_CONVERSATION_MESSAGE = gql`
   ${Error.fragment}
   ${ConversationMessage.fragment}
 `
+
+export const DELETE_CONVERSATION_MESSAGES = gql`
+  mutation DeleteConversationMessages($ids: [ID!]!) {
+    deleteConversationMessages(input: {ids: $ids}) {
+      conversationMessageIds
+      errors {
+        message
+      }
+    }
+  }
+`

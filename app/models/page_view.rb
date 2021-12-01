@@ -286,7 +286,7 @@ class PageView < ActiveRecord::Base
     changes_applied
   end
 
-  scope :for_context, proc { |ctx| where(:context_type => ctx.class.name, :context_id => ctx) }
+  scope :for_context, ->(ctx) { where(context_type: ctx.class.name, context_id: ctx) }
   scope :for_users, lambda { |users| where(:user_id => users) }
 
   def self.pv4_client
@@ -407,8 +407,7 @@ class PageView < ActiveRecord::Base
     # if you interrupt and re-start the migrator, start_at cannot be changed,
     # since it's saved in cassandra to persist the migration state
     def initialize(skip_deleted_accounts = true, start_at = nil)
-      self.start_at = start_at || 52.weeks.ago
-      self.logger = Rails.logger
+      super(start_at || 52.weeks.ago, Rails.logger)
 
       if skip_deleted_accounts
         account_ids = Set.new(Account.root_accounts.active.pluck(:id))
@@ -458,32 +457,30 @@ class PageView < ActiveRecord::Base
       return false if rows.empty?
 
       inserted = rows.count do |attrs|
-        begin
-          created_at = attrs['created_at']
-          created_at = Time.zone.parse(created_at) unless created_at.is_a?(Time)
-          # if the created_at is the same as the last_created_at,
-          # we may have already inserted this page view
-          # use to_i here to avoid sub-second precision problems
-          if created_at.to_i == last_created_at.to_i
-            exists = !!cassandra.select_value("SELECT request_id FROM page_views WHERE request_id = ?", attrs['request_id'])
-          end
-
-          # now instantiate the AR object here, as a brand new record, so
-          # it's saved to cassandra as if it was just created (though
-          # created_at comes from the queried db attributes)
-          # we're bypassing the redis queue here, just saving directly to cassandra
-          if exists
-            false
-          else
-            # assumes PageView.cassandra? is true at this point
-            page_view = PageView.from_attributes(attrs, true)
-            page_view.save!
-            true
-          end
-        rescue
-          logger.error "failed migrating request id to cassandra: #{attrs['request_id']} : #{$!}"
-          false
+        created_at = attrs['created_at']
+        created_at = Time.zone.parse(created_at) unless created_at.is_a?(Time)
+        # if the created_at is the same as the last_created_at,
+        # we may have already inserted this page view
+        # use to_i here to avoid sub-second precision problems
+        if created_at.to_i == last_created_at.to_i
+          exists = !!cassandra.select_value("SELECT request_id FROM page_views WHERE request_id = ?", attrs['request_id'])
         end
+
+        # now instantiate the AR object here, as a brand new record, so
+        # it's saved to cassandra as if it was just created (though
+        # created_at comes from the queried db attributes)
+        # we're bypassing the redis queue here, just saving directly to cassandra
+        if exists
+          false
+        else
+          # assumes PageView.cassandra? is true at this point
+          page_view = PageView.from_attributes(attrs, true)
+          page_view.save!
+          true
+        end
+      rescue
+        logger.error "failed migrating request id to cassandra: #{attrs['request_id']} : #{$!}"
+        false
       end
 
       logger.info "account #{Shard.current.id}~#{account_id}: added #{inserted} page views starting at #{last_created_at}"

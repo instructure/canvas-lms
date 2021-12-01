@@ -21,7 +21,7 @@ module Canvas::OAuth
   class Provider
     OAUTH2_OOB_URI = 'urn:ietf:wg:oauth:2.0:oob'
 
-    attr_reader :client_id, :redirect_uri, :scopes, :purpose
+    attr_reader :client_id, :scopes, :purpose
 
     def initialize(client_id, redirect_uri = "", scopes = [], purpose = nil)
       @client_id = client_id
@@ -138,7 +138,7 @@ module Canvas::OAuth
       if is_oob?(redirect_uri)
         controller.oauth2_auth_url(opts)
       else
-        has_params = redirect_uri =~ %r{\?}
+        has_params = redirect_uri.include?('?')
         redirect_uri + (has_params ? "&" : "?") + opts.to_query
       end
     end

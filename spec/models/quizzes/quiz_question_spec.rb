@@ -29,7 +29,7 @@ describe Quizzes::QuizQuestion do
     expect(q.question_data).not_to be_nil
     expect(q.question_data.class).to eq Quizzes::QuizQuestion::QuestionData
     expect(q.assessment_question_id).to eql(a.id)
-    q.question_data == qd
+    q.question_data = qd
 
     data = q.data
     expect(data[:assessment_question_id]).to eql(a.id)
@@ -38,6 +38,7 @@ describe Quizzes::QuizQuestion do
     expect(data[:answers][0][:weight]).to eq 100
     expect(data[:answers][1][:weight]).to eql(0.0)
   end
+
   context "blank answers for fill_in[_multiple]_blank[s] questions" do
     before :once do
       answers = [{ "answer_text" => "True", 'id' => 1, }, { 'id' => 2, "answer_text" => "" }]
@@ -50,6 +51,7 @@ describe Quizzes::QuizQuestion do
                              :answers => answers }
       @question = @quiz.quiz_questions.create(:question_data => @short_answer_data)
     end
+
     it "clears blanks before saving" do
       expect(@question.question_data.answers.size).to eq 1
       expect(@question.question_data.answers.first['text']).to eq @short_answer_data[:answers].first["answer_text"]
@@ -197,7 +199,7 @@ describe Quizzes::QuizQuestion do
   end
 
   context 'root_account_id' do
-    before(:each) { quiz_with_graded_submission([]) }
+    before { quiz_with_graded_submission([]) }
 
     it "uses root_account value from account" do
       question = @quiz.quiz_questions.create!

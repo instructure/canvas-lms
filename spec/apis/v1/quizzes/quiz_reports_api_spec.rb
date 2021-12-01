@@ -154,12 +154,12 @@ describe Quizzes::QuizReportsController, type: :request do
         expect(Quizzes::QuizStatistics.count).to eq 1
 
         expect(json['quiz_reports']).to be_present
-        expect(json['quiz_reports'][0]['id']).to eq "#{Quizzes::QuizStatistics.first.id}"
+        expect(json['quiz_reports'][0]['id']).to eq Quizzes::QuizStatistics.first.id.to_s
       end
     end
 
     context 're-generation' do
-      JOB_TAG = Quizzes::QuizStatistics.csv_job_tag
+      let(:job_tag) { Quizzes::QuizStatistics.csv_job_tag }
       let(:report_type) { 'student_analysis' }
 
       it "works when a job had failed previously" do
@@ -173,7 +173,7 @@ describe Quizzes::QuizReportsController, type: :request do
 
           # keep a reference to the job before we run because it will get
           # migrated to the failed jobs table:
-          job = Delayed::Job.where(tag: JOB_TAG).first
+          job = Delayed::Job.where(tag: job_tag).first
 
           run_jobs
 
@@ -188,7 +188,7 @@ describe Quizzes::QuizReportsController, type: :request do
                      }]
                    }, { jsonapi: true })
 
-        new_job = Delayed::Job.where(tag: JOB_TAG).first
+        new_job = Delayed::Job.where(tag: job_tag).first
 
         expect(new_job).to be_present
         expect(original_job.id).not_to eq new_job.id
@@ -327,7 +327,7 @@ describe Quizzes::QuizReportsController, type: :request do
         it 'renders' do
           json = api_show({}, { jsonapi: true })
           expect(json['quiz_reports']).to be_present
-          expect(json['quiz_reports'][0]['id']).to eq "#{@report.id}"
+          expect(json['quiz_reports'][0]['id']).to eq @report.id.to_s
           expect(json['quiz_reports'][0]['report_type']).to eq 'student_analysis'
         end
 

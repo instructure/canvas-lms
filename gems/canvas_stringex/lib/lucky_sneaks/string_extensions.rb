@@ -35,12 +35,10 @@ module LuckySneaks
       if defined?(RedCloth)
         if lite_mode
           RedCloth.new(self, [:lite_mode]).to_html
+        elsif self.include?('<pre>')
+          RedCloth.new(self).to_html.tr("\t", "")
         else
-          if self =~ /<pre>/
-            RedCloth.new(self).to_html.tr("\t", "")
-          else
-            RedCloth.new(self).to_html.tr("\t", "").gsub(/\n\n/, "")
-          end
+          RedCloth.new(self).to_html.tr("\t", "").gsub(/\n\n/, "")
         end
       else
         self
@@ -70,7 +68,7 @@ module LuckySneaks
       value = /([A-Za-z0-9]+|('[^']*?'|"[^"]*?"))/
       attr = /(#{name}(\s*=\s*#{value})?)/
       rx = /<[!\/?\[]?(#{name}|--)(\s+(#{attr}(\s+#{attr})*))?\s*([!\/?\]]+|--)?>/
-      (leave_whitespace) ? gsub(rx, "").strip : gsub(rx, "").gsub(/\s+/, " ").strip
+      leave_whitespace ? gsub(rx, "").strip : gsub(rx, "").gsub(/\s+/, " ").strip
     end
 
     # Converts HTML entities into the respective non-accented letters. Examples:
@@ -142,7 +140,7 @@ module LuckySneaks
         /(\s|^)\$(\d+)\.(\d+)(\s|$)/ => '\2 dollars \3 cents',
         /(\s|^)£(\d+)\.(\d+)(\s|$)/u => '\2 pounds \3 pence',
       }.each do |found, replaced|
-        replaced = " #{replaced} " unless replaced =~ /\\1/
+        replaced = " #{replaced} " unless replaced.include?('\\1')
         dummy.gsub!(found, replaced)
       end
       # Back to normal rules
@@ -158,10 +156,10 @@ module LuckySneaks
         /\s*%\s*/ => "percent",
         /\s*(\\|\/)\s*/ => "slash",
       }.each do |found, replaced|
-        replaced = " #{replaced} " unless replaced =~ /\\1/
+        replaced = " #{replaced} " unless replaced.include?('\\1')
         dummy.gsub!(found, replaced)
       end
-      dummy = dummy.gsub(/(^|\w)'(\w|$)/, '\1\2').gsub(/[\.,:;()\[\]\/\?!\^'"_]/, " ")
+      dummy = dummy.gsub(/(^|\w)'(\w|$)/, '\1\2').gsub(/[.,:;()\[\]\/?!\^'"_]/, " ")
     end
 
     # Replace runs of whitespace in string. Defaults to a single space but any replacement

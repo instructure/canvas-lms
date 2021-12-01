@@ -26,7 +26,7 @@ describe 'quizzes with draft state' do
   include QuizzesCommon
   include AssignmentOverridesSeleniumHelper
 
-  before(:each) do
+  before do
     course_with_teacher_logged_in
     @course.update(name: 'teacher course')
     @course.save!
@@ -43,7 +43,7 @@ describe 'quizzes with draft state' do
   end
 
   context 'when there are multiple due dates' do
-    before(:each) { add_due_date_override(@quiz) }
+    before { add_due_date_override(@quiz) }
 
     it 'shows a due date summary', priority: "2", test_id: 210053 do
       # verify page

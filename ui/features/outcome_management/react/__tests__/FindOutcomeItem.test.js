@@ -16,13 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React from 'react'
-import {render, fireEvent} from '@testing-library/react'
+import {render as rtlRender, fireEvent} from '@testing-library/react'
 import FindOutcomeItem from '../FindOutcomeItem'
 import {
   IMPORT_COMPLETED,
   IMPORT_NOT_STARTED,
   IMPORT_PENDING
 } from '@canvas/outcomes/react/hooks/useOutcomesImport'
+import OutcomesContext from '@canvas/outcomes/react/contexts/OutcomesContext'
 
 jest.useFakeTimers()
 
@@ -41,6 +42,20 @@ describe('FindOutcomeItem', () => {
     importOutcomeHandler: onImportOutcomeHandlerMock,
     ...props
   })
+
+  const render = (children, {friendlyDescriptionFF = true, renderer = rtlRender} = {}) => {
+    return renderer(
+      <OutcomesContext.Provider
+        value={{
+          env: {
+            friendlyDescriptionFF
+          }
+        }}
+      >
+        {children}
+      </OutcomesContext.Provider>
+    )
+  }
 
   beforeEach(() => {
     onMenuHandlerMock = jest.fn()
@@ -151,5 +166,29 @@ describe('FindOutcomeItem', () => {
     })
     fireEvent.click(getByText('Add'))
     expect(onImportOutcomeHandlerMock).toHaveBeenCalled()
+  })
+
+  it('renders a friendly description when the caret is clicked and friendlyDescriptionFF is true', () => {
+    const {getByText} = render(
+      <FindOutcomeItem {...defaultProps({friendlyDescription: 'test friendly description'})} />,
+      {
+        friendlyDescriptionFF: true
+      }
+    )
+
+    fireEvent.click(getByText('Expand description for outcome Outcome Title'))
+    expect(getByText('test friendly description')).toBeInTheDocument()
+  })
+
+  it('doesnt render a friendly description when the caret is clicked and friendlyDescriptionFF is false', () => {
+    const {queryByText, getByText} = render(
+      <FindOutcomeItem {...defaultProps({friendlyDescription: 'test friendly description'})} />,
+      {
+        friendlyDescriptionFF: false
+      }
+    )
+
+    fireEvent.click(getByText('Expand description for outcome Outcome Title'))
+    expect(queryByText('test friendly description')).not.toBeInTheDocument()
   })
 })

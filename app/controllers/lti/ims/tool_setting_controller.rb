@@ -33,9 +33,9 @@ module Lti
         }, status: :not_found
       end
 
-      TOOL_SETTINGS_SERVICE = 'ToolProxySettings'.freeze
-      TOOL_PROXY_BINDING_SERVICE = 'ToolProxyBindingSettings'.freeze
-      LTI_LINK_SETTINGS = 'LtiLinkSettings'.freeze
+      TOOL_SETTINGS_SERVICE = 'ToolProxySettings'
+      TOOL_PROXY_BINDING_SERVICE = 'ToolProxyBindingSettings'
+      LTI_LINK_SETTINGS = 'LtiLinkSettings'
 
       skip_before_action :load_user
       before_action :authenticate_api_call
@@ -114,7 +114,7 @@ module Lti
           elsif bubble == 'distinct' && request.headers['accept'].include?('application/vnd.ims.lti.v2.toolsettings.simple+json')
             @content_type = 'application/vnd.ims.lti.v2.toolsettings.simple+json'
             custom = {}
-            graph.reverse_each { |tool_setting| custom.merge!(tool_setting.custom) }
+            graph.reverse_each { |ts| custom.merge!(ts.custom) }
             custom
           end
         else
@@ -138,7 +138,7 @@ module Lti
 
       def custom_settings(type, json)
         if request.content_type == 'application/vnd.ims.lti.v2.toolsettings+json'
-          setting = json['@graph'].find { |setting| setting['@type'] == type }
+          setting = json['@graph'].find { |s| s['@type'] == type }
           setting['custom']
         else
           json
@@ -178,7 +178,7 @@ module Lti
                  get_context
                  tool_proxy_guid = params[:tool_proxy_guid]
                  resource_link_id = params[:resource_link_id]
-                 render_unauthorized and return unless tool_proxy_guid == tool_proxy.guid
+                 render_unauthorized and return unless tool_proxy_guid == tool_proxy.guid # rubocop:disable Lint/NoReturnInBeginEndBlocks
 
                  tool_proxy.tool_settings.find_by(
                    context: @context,

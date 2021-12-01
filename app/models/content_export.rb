@@ -41,13 +41,13 @@ class ContentExport < ActiveRecord::Base
   before_create :set_global_identifiers
 
   # export types
-  COMMON_CARTRIDGE = 'common_cartridge'.freeze
-  COURSE_COPY = 'course_copy'.freeze
-  MASTER_COURSE_COPY = 'master_course_copy'.freeze
-  QTI = 'qti'.freeze
-  USER_DATA = 'user_data'.freeze
-  ZIP = 'zip'.freeze
-  QUIZZES2 = 'quizzes2'.freeze
+  COMMON_CARTRIDGE = 'common_cartridge'
+  COURSE_COPY = 'course_copy'
+  MASTER_COURSE_COPY = 'master_course_copy'
+  QTI = 'qti'
+  USER_DATA = 'user_data'
+  ZIP = 'zip'
+  QUIZZES2 = 'quizzes2'
   CC_EXPORT_TYPES = [COMMON_CARTRIDGE, COURSE_COPY, MASTER_COURSE_COPY, QTI, QUIZZES2].freeze
 
   workflow do

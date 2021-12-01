@@ -29,7 +29,7 @@ describe Loaders::AssociationLoader do
     @a3 = @c3.assignments.create! name: "zxcv"
   end
 
-  around(:each) do |example|
+  around do |example|
     @query_count = 0
     subscription = ActiveSupport::Notifications.subscribe('sql.active_record') do
       @query_count += 1

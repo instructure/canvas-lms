@@ -46,7 +46,7 @@ module Lti
   class SubscriptionsApiController < ApplicationController
     include Lti::IMS::AccessTokenHelper
 
-    WEBHOOK_SUBSCRIPTION_SERVICE = 'vnd.Canvas.webhooksSubscription'.freeze
+    WEBHOOK_SUBSCRIPTION_SERVICE = 'vnd.Canvas.webhooksSubscription'
 
     SERVICE_DEFINITIONS = [
       {

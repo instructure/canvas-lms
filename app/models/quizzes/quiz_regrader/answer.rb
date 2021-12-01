@@ -99,7 +99,7 @@ class Quizzes::QuizRegrader::Answer
 
     fake_submission_data = if question_data[:question_type] == 'multiple_answers_question'
                              hash = {}
-                             answer.each { |k, v| hash["question_#{question_id}_#{k}"] = v if /answer/ =~ k.to_s }
+                             answer.each { |k, v| hash["question_#{question_id}_#{k}"] = v if k.to_s.include?('answer') }
                              answer.merge(hash)
                            else
                              answer.merge("question_#{question_id}" => answer[:text])
@@ -109,11 +109,9 @@ class Quizzes::QuizRegrader::Answer
     newly_scored_data = Quizzes::SubmissionGrader.score_question(question_data, fake_submission_data)
 
     # always give full credit
-    if regrade_option == "full_credit"
-      newly_scored_data[:points] = points_possible
-
-      # give full credit if was previously correct or correct now
-    elsif regrade_option == "current_and_previous_correct" && previously_correct
+    if regrade_option == "full_credit" ||
+       # give full credit if it was previously correct or correct now
+       (regrade_option == "current_and_previous_correct" && previously_correct)
       newly_scored_data[:points] = points_possible
     end
 

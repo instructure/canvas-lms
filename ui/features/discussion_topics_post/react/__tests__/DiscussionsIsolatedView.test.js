@@ -44,6 +44,9 @@ describe('DiscussionsIsolatedView', () => {
 
   beforeAll(() => {
     window.ENV = {
+      per_page: 20,
+      isolated_view_initial_page_size: 5,
+      current_page: 0,
       discussion_topic_id: '1',
       course_id: '1',
       isolated_view: true,

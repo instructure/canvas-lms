@@ -37,7 +37,7 @@ describe "blueprint courses discussions" do
   end
 
   describe "as a blueprint's teacher" do
-    before :each do
+    before do
       user_session(@master_teacher)
     end
 

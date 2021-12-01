@@ -30,7 +30,7 @@ describe ContextExternalToolsHelper do
   end
 
   shared_examples "#external_tools_menu_items" do
-    before :each do
+    before do
       html = helper.external_tools_menu_items(@mock_tools_hash, @menu_item_options)
       @parsed_html = Nokogiri::HTML5.fragment(html)
     end
@@ -102,18 +102,17 @@ describe ContextExternalToolsHelper do
       settings_hash
     end
 
-    before :each do
-      @controller = DummyController.new
+    before do
+      klass = Class.new(ApplicationController) do
+        include ContextExternalToolsHelper
+      end
+      @controller = klass.new
       allow(@controller).to receive(:external_tool_url).and_return("http://stub.dev/tool_url")
       # allow(@controller).to receive(:request).and_return(ActionDispatch::TestRequest.new)
       # @controller.instance_variable_set(:@context, @course)
     end
 
     before :once do
-      class DummyController < ApplicationController
-        include ContextExternalToolsHelper
-      end
-
       course_model
       @root_account = @course.root_account
       @account = account_model(:root_account => @root_account, :parent_account => @root_account)

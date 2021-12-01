@@ -38,7 +38,7 @@ const DiscussionTopicManager = props => {
   const [searchTerm, setSearchTerm] = useState('')
   const [filter, setFilter] = useState('all')
   const [sort, setSort] = useState('desc')
-  const [pageNumber, setPageNumber] = useState(0)
+  const [pageNumber, setPageNumber] = useState(ENV.current_page)
   const [searchPageNumber, setSearchPageNumber] = useState(0)
   const searchContext = {
     searchTerm,
@@ -60,14 +60,16 @@ const DiscussionTopicManager = props => {
   }
 
   // Isolated View State
-  const [isolatedEntryId, setIsolatedEntryId] = useState(null)
+  const [isolatedEntryId, setIsolatedEntryId] = useState(ENV.discussions_deep_link?.root_entry_id)
   const [replyFromId, setReplyFromId] = useState(null)
-  const [isolatedViewOpen, setIsolatedViewOpen] = useState(false)
+  const [isolatedViewOpen, setIsolatedViewOpen] = useState(
+    !!ENV.discussions_deep_link?.root_entry_id
+  )
   const [editorExpanded, setEditorExpanded] = useState(false)
 
   // Highlight State
   const [isTopicHighlighted, setIsTopicHighlighted] = useState(false)
-  const [highlightEntryId, setHighlightEntryId] = useState(null)
+  const [highlightEntryId, setHighlightEntryId] = useState(ENV.discussions_deep_link?.entry_id)
   const [relativeEntryId, setRelativeEntryId] = useState(null)
 
   // Reset search to 0 when inactive
@@ -121,7 +123,7 @@ const DiscussionTopicManager = props => {
 
   const discussionTopicQuery = useQuery(DISCUSSION_QUERY, {
     variables,
-    fetchPolicy: searchTerm ? 'no-cache' : 'cache-and-network'
+    fetchPolicy: searchTerm ? 'network-only' : 'cache-and-network'
   })
 
   const updateDraftCache = (cache, result) => {
@@ -244,18 +246,26 @@ const DiscussionTopicManager = props => {
       (searchTerm || filter === 'unread') ? (
         <NoResultsFound />
       ) : (
-        <DiscussionTopicRepliesContainer
-          discussionTopic={discussionTopicQuery.data.legacyNode}
-          updateDraftCache={updateDraftCache}
-          removeDraftFromDiscussionCache={removeDraftFromDiscussionCache}
-          onOpenIsolatedView={(discussionEntryId, isolatedId, withRCE, relativeId, highlightId) => {
-            setHighlightEntryId(highlightId)
-            openIsolatedView(discussionEntryId, isolatedId, withRCE, relativeId)
-          }}
-          goToTopic={goToTopic}
-          highlightEntryId={highlightEntryId}
-          isSearchResults={!!searchTerm}
-        />
+        discussionTopicQuery.data.legacyNode.availableForUser && (
+          <DiscussionTopicRepliesContainer
+            discussionTopic={discussionTopicQuery.data.legacyNode}
+            updateDraftCache={updateDraftCache}
+            removeDraftFromDiscussionCache={removeDraftFromDiscussionCache}
+            onOpenIsolatedView={(
+              discussionEntryId,
+              isolatedId,
+              withRCE,
+              relativeId,
+              highlightId
+            ) => {
+              setHighlightEntryId(highlightId)
+              openIsolatedView(discussionEntryId, isolatedId, withRCE, relativeId)
+            }}
+            goToTopic={goToTopic}
+            highlightEntryId={highlightEntryId}
+            isSearchResults={!!searchTerm}
+          />
+        )
       )}
       {ENV.isolated_view && isolatedEntryId && (
         <IsolatedViewContainer

@@ -155,9 +155,8 @@ module VeriCite
         raise "Unsupported submission type for VeriCite integration: #{submission.submission_type}"
       end
 
-      responses.keys.each do |asset_string|
-        res = responses[asset_string]
-        responses[asset_string] = is_response_success?(res) ? { object_id: res[:returned_object_id] } : response_error_hash(res)
+      responses.transform_values! do |res|
+        is_response_success?(res) ? { object_id: res[:returned_object_id] } : response_error_hash(res)
       end
 
       responses
@@ -225,9 +224,9 @@ module VeriCite
           assignment_data = VeriCiteClient::AssignmentData.new()
           assignment_data.assignment_title = assignment.title != nil ? assignment.title : assignment_id
           assignment_data.assignment_instructions = assignment.description != nil ? assignment.description : ""
-          assignment_data.assignment_exclude_quotes = args["exclude_quoted"] != nil && args["exclude_quoted"] == '1' ? true : false
-          assignment_data.assignment_exclude_self_plag = args["exclude_self_plag"] != nil && args["exclude_self_plag"] == '1' ? true : false
-          assignment_data.assignment_store_in_index = args["store_in_index"] != nil && args["store_in_index"] == '1' ? true : false
+          assignment_data.assignment_exclude_quotes = args["exclude_quoted"] == '1'
+          assignment_data.assignment_exclude_self_plag = args["exclude_self_plag"] == '1'
+          assignment_data.assignment_store_in_index = args["store_in_index"] == '1'
           assignment_data.assignment_due_date = 0
           if assignment.due_at != nil
             # convert to epoch time in milli
@@ -287,10 +286,10 @@ module VeriCite
           user_score_cache_key_prefix = "vericite_scores/#{consumer}/#{context_id}/#{assignment_id}/"
           users_score_map = {}
           # first check if the cache already has the user's score and if we haven't looked up this assignment lately:
-          users_score_map["#{user_id}"] = Rails.cache.read("#{user_score_cache_key_prefix}#{user_id}")
-          if users_score_map["#{user_id}"].nil? && Rails.cache.read(user_score_cache_key_prefix) == nil
+          users_score_map[user_id.to_s] = Rails.cache.read("#{user_score_cache_key_prefix}#{user_id}")
+          if users_score_map[user_id.to_s].nil? && Rails.cache.read(user_score_cache_key_prefix) == nil
             # we already looked up this user in Redis, don't bother again (by setting {})
-            users_score_map["#{user_id}"] ||= {}
+            users_score_map[user_id.to_s] ||= {}
             # we need to look up the user scores in VeriCite for this course
             # @return [Array<ReportScoreReponse>]
             data, status_code, _headers = vericite_client.reports_scores_context_id_get(context_id, consumer, consumer_secret, { :assignment_id => assignment_id })
@@ -322,8 +321,8 @@ module VeriCite
           end
 
           # the user score map shouldn't be empty now (either grabbed from the cache or VeriCite)
-          unless users_score_map["#{user_id}"].nil?
-            users_score_map["#{user_id}"].each do |key, score|
+          unless users_score_map[user_id.to_s].nil?
+            users_score_map[user_id.to_s].each do |key, score|
               if key ==  args[:oid] && score >= 0
                 response[:similarity_score] = score
               end
@@ -379,11 +378,9 @@ module VeriCite
 
     SUCCESSFUL_RETURN_CODES = (200..299)
     def is_response_success?(response)
-      begin
-        response && response.key?(:return_code) && SUCCESSFUL_RETURN_CODES.cover?(Integer(response[:return_code]))
-      rescue
-        false
-      end
+      response && response.key?(:return_code) && SUCCESSFUL_RETURN_CODES.cover?(Integer(response[:return_code]))
+    rescue
+      false
     end
 
     def response_error_hash(response)

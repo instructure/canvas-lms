@@ -22,6 +22,7 @@ import MediaAttempt from '../MediaAttempt'
 import {MediaPlayer} from '@instructure/ui-media-player'
 import {mockAssignmentAndSubmission} from '@canvas/assignments/graphql/studentMocks'
 import React from 'react'
+import StudentViewContext from '../../Context'
 
 const submissionDraftOverrides = {
   Submission: {
@@ -67,6 +68,22 @@ describe.skip('MediaAttempt', () => {
       props.focusOnInit = true
       const {getByTestId} = render(<MediaAttempt {...props} />)
       expect(getByTestId('media-modal-launch-button')).toHaveFocus()
+    })
+
+    it('enables media modal button for students', async () => {
+      const props = await makeProps()
+      const {getByTestId} = render(<MediaAttempt {...props} />)
+      expect(getByTestId('media-modal-launch-button')).not.toBeDisabled()
+    })
+
+    it('disables media modal button for observers', async () => {
+      const props = await makeProps()
+      const {getByTestId} = render(
+        <StudentViewContext.Provider value={{allowChangesToSubmission: false, isObserver: true}}>
+          <MediaAttempt {...props} />
+        </StudentViewContext.Provider>
+      )
+      expect(getByTestId('media-modal-launch-button')).toBeDisabled()
     })
 
     it('does not move focus to the media modal button after render if focusOnInit is false', async () => {

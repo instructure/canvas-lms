@@ -782,7 +782,7 @@ class GroupsController < ApplicationController
     if (includes.include? 'active_status') && (@context.context.is_a? Course)
       enrollments = Enrollment.where(user_id: json_users.map { |u| u[:id] }, course_id: @context.context_id)
 
-      inactive_students = enrollments.group_by(&:user_id).select { |_id, enrollments| enrollments.all?(&:hard_inactive?) }.map(&:first)
+      inactive_students = enrollments.group_by(&:user_id).select { |_id, es| es.all?(&:hard_inactive?) }.map(&:first)
       json_users.each do |user|
         user[:is_inactive] = inactive_students.include?(user[:id])
       end
@@ -802,9 +802,9 @@ class GroupsController < ApplicationController
     end
     @entries = []
     @entries.concat @context.calendar_events.active
-    @entries.concat DiscussionTopic::ScopedToUser.new(@context, @current_user, @context.discussion_topics.published).scope.select { |dt|
-      !dt.locked_for?(@current_user, :check_policies => true)
-    }
+    @entries.concat(DiscussionTopic::ScopedToUser.new(@context, @current_user, @context.discussion_topics.published).scope.reject do |dt|
+      dt.locked_for?(@current_user, :check_policies => true)
+    end)
     @entries.concat WikiPages::ScopedToUser.new(@context, @current_user, @context.wiki_pages.published).scope
     @entries = @entries.sort_by { |e| e.updated_at }
     @entries.each do |entry|

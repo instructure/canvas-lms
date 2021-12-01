@@ -73,7 +73,7 @@ describe TokenScopes do
 
       it "does not include the optional format part of the route path" do
         generated_scopes.each do |scope|
-          expect(/\(\.:format\)/ =~ scope).to be_nil
+          expect(scope.include?('(.:format)')).to be false
         end
       end
     end

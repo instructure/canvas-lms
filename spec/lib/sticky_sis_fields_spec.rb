@@ -267,7 +267,7 @@ describe StickySisFields do
   it "doesn't write to the database when there's not a change" do
     ac = create_abstract_course
     expect(ac.stuck_sis_fields).to eq [].to_set
-    expect(ac).to receive(:write_attribute).with(:stuck_sis_fields, anything).never
+    expect(ac).not_to receive(:write_attribute).with(:stuck_sis_fields, anything)
     ac.save!
     ac.add_sis_stickiness(:name)
     ac.clear_sis_stickiness(:name)
@@ -520,14 +520,14 @@ describe StickySisFields do
       end
 
       it "doesn't fire processing_as_sis with default args" do
-        expect(@ac).to receive(:set_sis_stickiness).never
+        expect(@ac).not_to receive(:set_sis_stickiness)
         AbstractCourse.process_as_sis do
           @ac.save!
         end
       end
 
       it "doesn't fire processing_as_sis with sis_stickiness" do
-        expect(@ac).to receive(:set_sis_stickiness).never
+        expect(@ac).not_to receive(:set_sis_stickiness)
         AbstractCourse.process_as_sis override_sis_stickiness: true do
           @ac.save!
         end

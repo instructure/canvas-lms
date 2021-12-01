@@ -53,13 +53,12 @@ module Quizzes
     private
 
     def message
-      @message ||= (
+      @message ||=
         Conversation.build_message(
           sender,
           body,
           root_account_id: root_account_id
         )
-      )
     end
 
     def body

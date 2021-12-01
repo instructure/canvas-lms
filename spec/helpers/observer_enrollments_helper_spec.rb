@@ -35,7 +35,7 @@ describe ObserverEnrollmentsHelper do
     @course2.enroll_student(@student1)
   end
 
-  before :each do
+  before do
     instance_variable_set(:@current_user, @observer)
   end
 

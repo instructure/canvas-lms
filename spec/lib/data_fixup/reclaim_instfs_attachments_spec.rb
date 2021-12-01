@@ -24,7 +24,7 @@ describe DataFixup::ReclaimInstfsAttachments do
     let(:instfs_body) { StringIO.new(file_contents) }
     let(:attachment) { attachment_model(instfs_uuid: instfs_uuid) }
 
-    before :each do
+    before do
       # this method is only called during the `instfs_hosted?` branch of
       # attachment.open, so it'll be stubbed out when fetching the contents
       # from inst-fs, but note when checking the contents in s3 after reclaim

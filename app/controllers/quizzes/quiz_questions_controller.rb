@@ -399,13 +399,11 @@ class Quizzes::QuizQuestionsController < ApplicationController
   private
 
   def guard_against_big_fields
-    begin
-      yield
-    rescue Quizzes::QuizQuestion::RawFields::FieldTooLongError => ex
-      raise ex unless request.xhr?
+    yield
+  rescue Quizzes::QuizQuestion::RawFields::FieldTooLongError => ex
+    raise ex unless request.xhr?
 
-      render_xhr_exception(ex, ex.message)
-    end
+    render_xhr_exception(ex, ex.message)
   end
 
   def require_question

@@ -28,7 +28,7 @@ describe "calendar2" do
     Account.find_or_create_by!(id: 0).update_attributes(name: 'Dummy Root Account', workflow_state: 'deleted', root_account_id: nil)
   end
 
-  before(:each) do
+  before do
     # or some stuff we need to click is "below the fold"
 
     Account.default.tap do |a|
@@ -38,7 +38,7 @@ describe "calendar2" do
   end
 
   context "as a teacher" do
-    before(:each) do
+    before do
       course_with_teacher_logged_in
     end
 
@@ -96,8 +96,8 @@ describe "calendar2" do
 
       get "/calendar2"
       events = ff('.fc-event')
-      event1 = events.detect { |e| e.text =~ /Assignment 1/ }
-      event2 = events.detect { |e| e.text =~ /Assignment 2/ }
+      event1 = events.detect { |e| e.text.include?('Assignment 1') }
+      event2 = events.detect { |e| e.text.include?('Assignment 2') }
       expect(event1).not_to be_nil
       expect(event2).not_to be_nil
       expect(event1).not_to eq event2

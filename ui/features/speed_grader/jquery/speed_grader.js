@@ -3187,7 +3187,16 @@ EG = {
 
     // update the nested submission in submission_history if needed
     if (student.submission?.submission_history?.[historyIndex]?.submission) {
-      submission.submission_history[historyIndex].submission = $.extend(true, {}, submission)
+      const versionedAttachments =
+        submission.submission_history[historyIndex].submission?.versioned_attachments || []
+      submission.submission_history[historyIndex].submission = $.extend(
+        true,
+        {},
+        {
+          ...submission,
+          versioned_attachments: versionedAttachments
+        }
+      )
     }
 
     $.extend(true, student.submission, submission)

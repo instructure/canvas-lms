@@ -27,7 +27,7 @@ describe 'QR for mobile login' do
     expect(element.tag_name).to eq 'img'
 
     data_url = element.attribute('src')
-    byte_string = Base64.decode64(data_url.sub(%r{data\:image\/png\;base64\, }, ''))
+    byte_string = Base64.decode64(data_url.sub(%r{data:image/png;base64, }, ''))
 
     Tempfile.open('qr.png', encoding: 'ascii-8bit') do |file|
       file.write(byte_string)

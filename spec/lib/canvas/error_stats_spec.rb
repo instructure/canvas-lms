@@ -32,9 +32,10 @@ module Canvas
         raise OuterErrorStatsError, "so it's happening"
       end
 
-      before(:each) do
+      before do
         allow(InstStatsd::Statsd).to receive(:increment)
       end
+
       let(:data) { {} }
 
       it "increments the error level by default" do

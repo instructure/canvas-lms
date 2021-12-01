@@ -168,13 +168,13 @@ describe 'Submissions Comment API', type: :request do
 
     it 'does not send to other teachers for teacher annotation' do
       second_teacher
-      expect(BroadcastPolicy.notifier).to receive(:send_notification).with(*teacher_args).never
+      expect(BroadcastPolicy.notifier).not_to receive(:send_notification).with(*teacher_args)
       annotation_notification_call(author_id: @teacher.to_param)
       expect(response.status).to eq 200
     end
 
     it 'does not send to students when assignment is post_manually' do
-      expect(BroadcastPolicy.notifier).to receive(:send_notification).with(*student_args).never
+      expect(BroadcastPolicy.notifier).not_to receive(:send_notification).with(*student_args)
       annotation_notification_call(author_id: @teacher.to_param, assignment_id: manual_post_assignment.to_param)
       expect(response.status).to eq 200
     end
@@ -187,8 +187,8 @@ describe 'Submissions Comment API', type: :request do
     end
 
     it 'does not send to students when submission is not posted and author is teacher' do
-      expect(BroadcastPolicy.notifier).to receive(:send_notification).with(*student_args).never
-      expect(BroadcastPolicy.notifier).to receive(:send_notification).with(*teacher_args).never
+      expect(BroadcastPolicy.notifier).not_to receive(:send_notification).with(*student_args)
+      expect(BroadcastPolicy.notifier).not_to receive(:send_notification).with(*teacher_args)
       annotation_notification_call(author_id: @teacher.to_param, assignment_id: group_assignment_with_submission.to_param)
       expect(response.status).to eq 200
     end

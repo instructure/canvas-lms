@@ -139,6 +139,7 @@ describe "AuthenticationProviders API", type: :request do
       expect(aac.auth_decrypted_password).to eq 'password1'
       expect(aac.position).to eq 1
     end
+
     it "creates multiple ldap aacs" do
       call_create(@ldap_hash)
       call_create(@ldap_hash.merge('auth_host' => '127.0.0.2'))
@@ -149,6 +150,7 @@ describe "AuthenticationProviders API", type: :request do
       expect(aac2.auth_host).to eq '127.0.0.2'
       expect(aac2.position).to eq 2
     end
+
     it "defaults ldap auth_over_tls to 'start_tls'" do
       call_create(@ldap_hash)
       expect(@account.authentication_providers.first.auth_over_tls).to eq 'start_tls'

@@ -31,7 +31,7 @@ require_relative '../spec_helper'
 # shouldn't be used for massive files. Plain text, Javascript files, and
 # reasonably-sized images will be fine.
 
-MOCK_SITES_DIRECTORY = 'mock_static_sites'.freeze
+MOCK_SITES_DIRECTORY = 'mock_static_sites'
 
 class NonexistentMockSiteError < StandardError
 end

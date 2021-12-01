@@ -55,7 +55,7 @@ module Lti
     end
 
     describe '#custom_settings' do
-      before :each do
+      before do
         ToolSetting.create(tool_proxy: tool_proxy, context: account, resource_link_id: 'abc', custom: { link: :setting, a: 1, b: 2, c: 3 })
         ToolSetting.create(tool_proxy: tool_proxy, context: account, custom: { binding: :setting, a: 1, b: 2, d: 4 })
         ToolSetting.create(tool_proxy: tool_proxy, custom: { proxy: :setting, a: 1, c: 5, d: 4 })

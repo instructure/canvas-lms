@@ -296,7 +296,7 @@ describe WikiPage do
         course_with_teacher
       end
 
-      before :each do
+      before do
         user_session(@user)
       end
 
@@ -443,7 +443,7 @@ describe WikiPage do
       end
 
       context 'with editing roles' do
-        before :each do
+        before do
           @page.editing_roles = 'teachers,students'
         end
 
@@ -489,7 +489,7 @@ describe WikiPage do
       end
 
       context 'with course editing roles for teacher only page' do
-        before :each do
+        before do
           @course.default_wiki_editing_roles = 'teachers,students'
           @page.editing_roles = 'teachers'
         end
@@ -512,7 +512,7 @@ describe WikiPage do
       end
 
       context 'with course editing roles for unpublished pages' do
-        before :each do
+        before do
           @course.default_wiki_editing_roles = 'teachers,students'
           @page.workflow_state = 'unpublished'
         end

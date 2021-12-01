@@ -66,6 +66,14 @@ describe MathMan do
       Canvas::DynamicSettings.fallback_data = nil
       expect { MathMan.url_for(latex: latex, target: :mml) }.to raise_error MathMan::InvalidConfigurationError
     end
+
+    it 'includes scale param if present' do
+      expect(MathMan.url_for(latex: latex, target: :svg, scale: '2')).to match(/&scale=2/)
+    end
+
+    it 'excludes scale param if not present' do
+      expect(MathMan.url_for(latex: latex, target: :svg)).not_to match(/&scale=2/)
+    end
   end
 
   describe '.use_for_mml?' do

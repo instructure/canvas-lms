@@ -58,7 +58,7 @@ export default function AnnouncementRow({
     ) : null
 
   const sectionsToolTip = canHaveSections ? (
-    <SectionsTooltip sections={announcement.sections} />
+    <SectionsTooltip totalUserCount={announcement.user_count} sections={announcement.sections} />
   ) : null
 
   const replyButton = announcement.locked ? null : (

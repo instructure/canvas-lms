@@ -103,7 +103,7 @@ module Lti
       values.each { |value| memo[value] += [key] }
     end.reverse_merge({}).freeze
 
-    LIS_V2_LTI_ADVANTAGE_ROLE_NONE = 'http://purl.imsglobal.org/vocab/lis/v2/system/person#None'.freeze
+    LIS_V2_LTI_ADVANTAGE_ROLE_NONE = 'http://purl.imsglobal.org/vocab/lis/v2/system/person#None'
 
     def initialize(context, root_account, user, tool = nil)
       @context = context

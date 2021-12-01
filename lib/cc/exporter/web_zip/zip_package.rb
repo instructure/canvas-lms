@@ -19,7 +19,7 @@
 
 module CC::Exporter::WebZip
   class ZipPackage < CC::Exporter::Epub::FilesDirectory
-    def initialize(exporter, course, user, progress_key)
+    def initialize(exporter, course, user, progress_key) # rubocop:disable Lint/MissingSuper
       @global_identifiers = exporter.global_identifiers
       @files = exporter.unsupported_files + exporter.cartridge_json[:files]
       @pages = exporter.cartridge_json[:pages]

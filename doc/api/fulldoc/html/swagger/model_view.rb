@@ -25,6 +25,7 @@ class ModelView < HashView
   attr_reader :name, :properties, :description, :required
 
   def initialize(name, properties, description = "", required = [], deprecated: false, deprecation_description: '')
+    super()
     @name = name
     @properties = properties
     @description = description

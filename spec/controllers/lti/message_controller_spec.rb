@@ -124,13 +124,14 @@ module Lti
     end
 
     describe "GET #reregistration" do
-      before(:each) do
+      before do
         MessageHandler.create!(
           message_type: ::IMS::LTI::Models::Messages::ToolProxyUpdateRequest::MESSAGE_TYPE,
           launch_path: 'https://samplelaunch/rereg',
           resource_handler: default_resource_handler
         )
       end
+
       context 'course' do
         it 'initiates a tool proxy reregistration request' do
           course_with_teacher_logged_in(:active_all => true)
@@ -352,7 +353,7 @@ module Lti
     end
 
     describe "GET #basic_lti_launch_request" do
-      before(:each) do
+      before do
         course_with_student(account: account, active_all: true)
         user_session(@student)
       end
@@ -364,7 +365,7 @@ module Lti
           }
         end
 
-        before(:each) do
+        before do
           tool_proxy.raw_data['tool_profile'] = tool_profile
           tool_proxy.save!
         end

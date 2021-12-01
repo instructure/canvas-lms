@@ -19,7 +19,7 @@
 
 module Factories
   class GradingPeriodGroupHelper
-    TITLE = "Example Grading Period Group".freeze
+    TITLE = "Example Grading Period Group"
 
     def valid_attributes(attr = {})
       {

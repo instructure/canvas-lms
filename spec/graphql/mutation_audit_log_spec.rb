@@ -32,35 +32,38 @@ describe AuditLogFieldExtension do
     Canvas::DynamoDB::DevUtils.initialize_ddb_for_development!(:auditors, "graphql_mutations", recreate: true)
     course_with_student(active_all: true)
     @assignment = @course.assignments.create! name: "asdf"
-    MUTATION = <<~MUTATION
+  end
+
+  let(:mutation) do
+    <<~GRAPHQL
       mutation {
         updateAssignment(input: {id: "#{@assignment.id}"}) {
           assignment { name }
         }
       }
-    MUTATION
+    GRAPHQL
   end
 
   it "logs" do
     expect_any_instance_of(AuditLogFieldExtension::Logger).to receive(:log).once
-    CanvasSchema.execute(MUTATION, context: { current_user: @teacher })
+    CanvasSchema.execute(mutation, context: { current_user: @teacher })
   end
 
   it "creates a log for every item" do
     expect_any_instance_of(AuditLogFieldExtension::Logger).to receive(:log).twice
 
-    CanvasSchema.execute(<<~MUTATION, context: { current_user: @teacher })
+    CanvasSchema.execute(<<~GRAPHQL, context: { current_user: @teacher })
       mutation {
         hideAssignmentGrades(input: {assignmentId: "#{@assignment.id}"}) {
           assignment { _id }
         }
       }
-    MUTATION
+    GRAPHQL
   end
 
   it "doesn't log failed mutations" do
     expect_any_instance_of(AuditLogFieldExtension::Logger).not_to receive(:log)
-    CanvasSchema.execute(MUTATION, context: { current_user: @student })
+    CanvasSchema.execute(mutation, context: { current_user: @student })
   end
 
   it "fails gracefully when dynamo isn't working, with captured exception" do
@@ -77,7 +80,7 @@ describe AuditLogFieldExtension do
       expect(e.class).to eq(Aws::DynamoDB::Errors::ServiceError)
     end
     allow(Canvas::DynamoDB::DatabaseBuilder).to receive(:from_config).and_return(dynamo)
-    response = CanvasSchema.execute(MUTATION, context: { current_user: @teacher })
+    response = CanvasSchema.execute(mutation, context: { current_user: @teacher })
     expect(response.dig("data", "updateAssignment", "assignment", "name")).to eq "asdf"
     expect(response["error"]).to be_nil
   end

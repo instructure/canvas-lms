@@ -234,11 +234,9 @@ module DynamicSettings
       error = nil
       method = options[:recurse] ? :get_all : :get
       ms = 1000 * Benchmark.realtime do
-        begin
-          result = Diplomat::Kv.send(method, full_key, options)
-        rescue => e
-          error = e
-        end
+        result = Diplomat::Kv.send(method, full_key, options)
+      rescue => e
+        error = e
       end
       timing = format("CONSUL (%.2fms)", ms)
       status = 'OK'

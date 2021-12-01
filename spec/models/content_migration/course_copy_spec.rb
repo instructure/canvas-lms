@@ -21,7 +21,7 @@ require_relative 'course_copy_helper'
 
 describe ContentMigration do
   context "course copy" do
-    include_examples "course copy"
+    include_context "course copy"
 
     it "shows correct progress" do
       ce = @course.content_exports.build

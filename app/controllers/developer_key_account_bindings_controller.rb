@@ -116,11 +116,9 @@ class DeveloperKeyAccountBindingsController < ApplicationController
   end
 
   def existing_binding
-    @_existing_binding ||= begin
-      account.developer_key_account_bindings.find_by(
-        developer_key_id: params[:developer_key_id]
-      )
-    end
+    @_existing_binding ||= account.developer_key_account_bindings.find_by(
+      developer_key_id: params[:developer_key_id]
+    )
   end
 
   def developer_key

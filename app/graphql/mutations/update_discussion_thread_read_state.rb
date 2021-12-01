@@ -35,6 +35,12 @@ class Mutations::UpdateDiscussionThreadReadState < Mutations::BaseMutation
                                                                      new_state: read_state,
                                                                      forced: true)
 
+    topic = root_entry.discussion_topic
+    total_read_count = topic.discussion_entry_participants.read.where(
+      discussion_entry_participants: { user_id: current_user.id }
+    ).count
+    topic.update_or_create_participant(current_user: current_user, new_count: topic.default_unread_count - total_read_count)
+
     {
       discussion_entry: root_entry
     }

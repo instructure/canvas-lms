@@ -139,13 +139,12 @@ class NotificationPolicy < ActiveRecord::Base
         np = communication_channel.notification_policies.where(notification_id: notification).first
         if !np
           np = communication_channel.notification_policies.build(notification: notification)
-          frequency ||= begin
-            if communication_channel == communication_channel.user.communication_channel
-              notification.default_frequency(communication_channel.user)
-            else
-              'never'
-            end
-          end
+          frequency ||= if communication_channel == communication_channel.user.communication_channel
+                          notification.default_frequency(communication_channel.user)
+                        else
+                          'never'
+                        end
+
         end
         if frequency
           np.frequency = frequency
@@ -172,20 +171,18 @@ class NotificationPolicy < ActiveRecord::Base
         end
         np = nil
         NotificationPolicy.transaction(requires_new: true) do
-          begin
-            np = communication_channel.notification_policies.build(notification: notification)
-            np.frequency = if frequencies[notification]
-                             frequencies[notification]
-                           elsif communication_channel == communication_channel.user.communication_channel
-                             notification.default_frequency(communication_channel.user)
-                           else
-                             'never'
-                           end
-            np.save!
-          rescue ActiveRecord::RecordNotUnique
-            np = nil
-            raise ActiveRecord::Rollback
-          end
+          np = communication_channel.notification_policies.build(notification: notification)
+          np.frequency = if frequencies[notification]
+                           frequencies[notification]
+                         elsif communication_channel == communication_channel.user.communication_channel
+                           notification.default_frequency(communication_channel.user)
+                         else
+                           'never'
+                         end
+          np.save!
+        rescue ActiveRecord::RecordNotUnique
+          np = nil
+          raise ActiveRecord::Rollback
         end
         np ||= communication_channel.notification_policies.where(notification_id: notification).first
         policies << np

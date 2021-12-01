@@ -224,6 +224,7 @@ module Canvas::OAuth
 
     describe '.generate_code_for' do
       let(:code) { "brand_new_code" }
+
       before { allow(SecureRandom).to receive_messages(:hex => code) }
 
       it 'returns the new code' do

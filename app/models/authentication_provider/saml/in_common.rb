@@ -21,7 +21,7 @@
 require 'saml2'
 
 class AuthenticationProvider::SAML::InCommon < AuthenticationProvider::SAML::Federation
-  URN = 'urn:mace:incommon'.freeze
+  URN = 'urn:mace:incommon'
 
   class << self
     def endpoint

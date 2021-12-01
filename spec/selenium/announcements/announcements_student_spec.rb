@@ -24,12 +24,12 @@ describe "announcements" do
   include_context "in-process server selenium tests"
   include AnnouncementsCommon
 
-  before(:each) do
+  before do
     stub_rcs_config
   end
 
   context "should validate replies are not visible until after users post" do
-    before :each do
+    before do
       course_with_student_logged_in
       topic_title = 'new replies hidden until post topic'
       @announcement = @course.announcements.create!(
@@ -58,7 +58,7 @@ describe "announcements" do
   end
 
   context "announcements as a student" do
-    before(:each) do
+    before do
       course_with_student_logged_in
     end
 

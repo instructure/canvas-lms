@@ -71,7 +71,7 @@ describe GradingStandardsApiController, type: :request do
   end
 
   context "account admin" do
-    before(:each) do
+    before do
       account_admin_user
     end
 
@@ -235,7 +235,7 @@ describe GradingStandardsApiController, type: :request do
       ]
     end
 
-    before(:each) do
+    before do
       user_factory
       enrollment = course.enroll_teacher(@user)
       enrollment.accept!

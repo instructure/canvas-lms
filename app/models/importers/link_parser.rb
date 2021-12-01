@@ -63,8 +63,9 @@ module Importers
     def convert_link(node, attr, item_type, mig_id, field)
       return unless node[attr].present?
 
-      if attr == 'value'
-        return unless (node[attr] && node[attr] =~ %r{IMS(?:-|_)CC(?:-|_)FILEBASE}) || node[attr] =~ %r{CANVAS_COURSE_REFERENCE}
+      if attr == 'value' &&
+         !(node[attr] =~ %r{IMS(?:-|_)CC(?:-|_)FILEBASE} || node[attr].include?('CANVAS_COURSE_REFERENCE'))
+        return
       end
 
       url = node[attr].dup
@@ -92,6 +93,7 @@ module Importers
                 new_url = uri.to_s
               end
             rescue URI::InvalidURIError, URI::InvalidComponentError
+              nil
             end
           end
         end
@@ -130,12 +132,12 @@ module Importers
         unresolved(:wiki_page, :migration_id => $1)
       elsif url =~ /discussion_topic_migration_id=(.*)/
         unresolved(:discussion_topic, :migration_id => $1)
-      elsif url =~ %r{\$CANVAS_COURSE_REFERENCE\$/modules/items/([^\?]*)(\?.*)?}
+      elsif url =~ %r{\$CANVAS_COURSE_REFERENCE\$/modules/items/([^?]*)(\?.*)?}
         unresolved(:module_item, :migration_id => $1, :query => $2)
-      elsif url =~ %r{\$CANVAS_COURSE_REFERENCE\$/file_ref/([^/\?#]+)(.*)}
+      elsif url =~ %r{\$CANVAS_COURSE_REFERENCE\$/file_ref/([^/?#]+)(.*)}
         unresolved(:file_ref, :migration_id => $1, :rest => $2,
                               :in_media_iframe => attr == 'src' && node.name == 'iframe' && node['data-media-id'])
-      elsif url =~ %r{(?:\$CANVAS_OBJECT_REFERENCE\$|\$WIKI_REFERENCE\$)/([^/]*)/([^\?]*)(\?.*)?}
+      elsif url =~ %r{(?:\$CANVAS_OBJECT_REFERENCE\$|\$WIKI_REFERENCE\$)/([^/]*)/([^?]*)(\?.*)?}
         unresolved(:object, :type => $1, :migration_id => $2, :query => $3)
 
       elsif url =~ %r{\$CANVAS_COURSE_REFERENCE\$/(.*)}
@@ -143,37 +145,34 @@ module Importers
 
       elsif url =~ %r{\$IMS(?:-|_)CC(?:-|_)FILEBASE\$/(.*)}
         rel_path = URI.unescape($1)
-        if (attr == 'href' && node['class'] && node['class'] =~ /instructure_inline_media_comment/) ||
+        if (attr == 'href' && node['class']&.include?('instructure_inline_media_comment')) ||
            (attr == 'src' && node.name == 'iframe' && node['data-media-id'])
           unresolved(:media_object, :rel_path => rel_path)
         else
           unresolved(:file, :rel_path => rel_path)
         end
-      elsif (attr == 'href' && node['class'] && node['class'] =~ /instructure_inline_media_comment/) ||
+      elsif (attr == 'href' && node['class']&.include?('instructure_inline_media_comment')) ||
             (attr == 'src' && node.name == 'iframe' && node['data-media-id'])
         # Course copy media reference, leave it alone
         resolved
-      elsif attr == 'src' && (info_match = url.match(/\Adata:(?<mime_type>[-\w]+\/[-\w\+\.]+)?;base64,(?<image>.*)/m))
+      elsif attr == 'src' && (info_match = url.match(/\Adata:(?<mime_type>[-\w]+\/[-\w+.]+)?;base64,(?<image>.*)/m))
         link_embedded_image(info_match)
-      elsif attr == 'src' && node['class'] && node['class'] =~ /equation_image/
-        # Equation image, leave it alone
-        resolved
-      elsif url =~ %r{\A/assessment_questions/\d+/files/\d+}
-        # The file is in the context of an AQ, leave the link alone
-        resolved
-      elsif url =~ %r{\A/courses/\d+/files/\d+}
-        # This points to a specific file already, leave it alone
-        resolved
-      elsif @migration && @migration.for_course_copy?
-        # For course copies don't try to fix relative urls. Any url we can
-        # correctly alter was changed during the 'export' step
-        resolved
-      elsif url.start_with?('#')
-        # It's just a link to an anchor, leave it alone
+      elsif # rubocop:disable Lint/DuplicateBranch
+            # Equation image, leave it alone
+            (attr == 'src' && node['class'] && node['class'].include?("equation_image")) || # rubocop:disable Layout/ConditionPosition
+            # The file is in the context of an AQ, leave the link alone
+            url =~ %r{\A/assessment_questions/\d+/files/\d+} ||
+            # This points to a specific file already, leave it alone
+            url =~ %r{\A/courses/\d+/files/\d+} ||
+            # For course copies don't try to fix relative urls. Any url we can
+            # correctly alter was changed during the 'export' step
+            @migration&.for_course_copy? ||
+            # It's just a link to an anchor, leave it alone
+            url.start_with?('#')
         resolved
       elsif relative_url?(url)
         unresolved(:file, :rel_path => URI.unescape(url))
-      else
+      else # rubocop:disable Lint/DuplicateBranch
         resolved
       end
     end

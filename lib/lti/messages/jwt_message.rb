@@ -36,7 +36,7 @@ module Lti::Messages
   # Canvas, please see the inline documentation of
   # app/models/lti/lti_advantage_adapter.rb.
   class JwtMessage
-    EXTENSION_PREFIX = 'https://www.instructure.com/'.freeze
+    EXTENSION_PREFIX = 'https://www.instructure.com/'
 
     def initialize(tool:, context:, user:, expander:, return_url:, opts: {})
       @tool = tool
@@ -199,12 +199,10 @@ module Lti::Messages
       return nil unless @context.is_a?(Course)
       return nil if @user.blank?
 
-      @_current_observee_list ||= begin
-        @user.observer_enrollments.current
-             .where(course_id: @context.id)
-             .preload(:associated_user)
-             .map { |e| e.try(:associated_user).try(:lti_id) }.compact
-      end
+      @_current_observee_list ||= @user.observer_enrollments.current
+                                       .where(course_id: @context.id)
+                                       .preload(:associated_user)
+                                       .map { |e| e.try(:associated_user).try(:lti_id) }.compact
     end
 
     def custom_parameters

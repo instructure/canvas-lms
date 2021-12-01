@@ -35,6 +35,7 @@ describe I18nTimeZone do
 
   context "localization" do
     before { I18n.locale = I18n.default_locale }
+
     after  { I18n.locale = I18n.default_locale }
 
     it "presents a localized name with offset when responding to #to_s" do

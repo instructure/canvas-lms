@@ -25,7 +25,7 @@ class Lti::Result < ApplicationRecord
   ACCEPT_GIVEN_SCORE_TYPES = %w[FullyGraded PendingManual].freeze
   ACTIVITY_PROGRESS_TYPES = %w[Initialized Started InProgress Submitted Completed].freeze
 
-  AGS_EXT_SUBMISSION = 'https://canvas.instructure.com/lti/submission'.freeze
+  AGS_EXT_SUBMISSION = 'https://canvas.instructure.com/lti/submission'
 
   self.record_timestamps = false
 

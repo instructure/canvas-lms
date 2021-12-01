@@ -55,22 +55,22 @@ class AuthenticationProvider::Microsoft < AuthenticationProvider::OpenIDConnect
   end
 
   def self.login_attributes
-    ['sub'.freeze, 'email'.freeze, 'oid'.freeze, 'preferred_username'.freeze].freeze
+    ['sub', 'email', 'oid', 'preferred_username'].freeze
   end
   validates :login_attribute, inclusion: login_attributes
 
   def self.recognized_federated_attributes
     [
-      'email'.freeze,
-      'name'.freeze,
-      'preferred_username'.freeze,
-      'oid'.freeze,
-      'sub'.freeze,
+      'email',
+      'name',
+      'preferred_username',
+      'oid',
+      'sub',
     ].freeze
   end
 
   def login_attribute
-    super || 'id'.freeze
+    super || 'id'
   end
 
   protected

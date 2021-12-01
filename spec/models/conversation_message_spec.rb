@@ -58,7 +58,7 @@ describe ConversationMessage do
       user_factory
       @conversation = @teacher.initiate_conversation([@user])
       message = add_message
-      expect(message.author_short_name_with_shared_contexts(@user)).to eq "#{message.author.short_name}"
+      expect(message.author_short_name_with_shared_contexts(@user)).to eq message.author.short_name
     end
 
     it "creates appropriate notifications on new message", priority: "1", test_id: 186561 do
@@ -189,7 +189,7 @@ describe ConversationMessage do
       @submission = @assignment.submit_homework(@user, :body => 'some message')
       @submission.add_comment(:author => @user, :comment => "hello")
 
-      expect(StreamItem.all.select { |i| i.asset_string =~ /conversation_/ }).to be_empty
+      expect(StreamItem.all.select { |i| i.asset_string.include?('conversation_') }).to be_empty
     end
 
     it "does not create additional stream_items for additional messages in the same conversation" do

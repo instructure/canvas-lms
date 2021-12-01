@@ -104,7 +104,7 @@ export default class TextGradeInput extends Component {
     }
   }
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if (!this.isFocused()) {
       const {assignment, enterGradesAs, gradingScheme, pendingGradeInfo, submission} = nextProps
 

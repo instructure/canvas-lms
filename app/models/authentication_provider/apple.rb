@@ -43,7 +43,7 @@ class AuthenticationProvider::Apple < AuthenticationProvider::OpenIDConnect
   end
 
   def self.login_attributes
-    ['sub'.freeze, 'email'.freeze].freeze
+    ['sub', 'email'].freeze
   end
   validates :login_attribute, inclusion: login_attributes
 
@@ -53,10 +53,10 @@ class AuthenticationProvider::Apple < AuthenticationProvider::OpenIDConnect
 
   def self.recognized_federated_attributes
     [
-      'email'.freeze,
-      'firstName'.freeze,
-      'lastName'.freeze,
-      'sub'.freeze,
+      'email',
+      'firstName',
+      'lastName',
+      'sub',
     ].freeze
   end
 

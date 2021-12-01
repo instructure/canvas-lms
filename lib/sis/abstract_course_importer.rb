@@ -67,8 +67,8 @@ module SIS
 
         # only update the name/short_name on new records, and ones that haven't been changed
         # since the last sis import
-        course.name = long_name if long_name.present? && (course.new_record? || (!course.stuck_sis_fields.include?(:name)))
-        course.short_name = short_name if short_name.present? && (course.new_record? || (!course.stuck_sis_fields.include?(:short_name)))
+        course.name = long_name if long_name.present? && (course.new_record? || !course.stuck_sis_fields.include?(:name))
+        course.short_name = short_name if short_name.present? && (course.new_record? || !course.stuck_sis_fields.include?(:short_name))
 
         course.sis_source_id = abstract_course_id
         if status =~ /active/i

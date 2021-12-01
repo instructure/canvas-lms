@@ -290,7 +290,7 @@ describe AssignmentGroupsController do
 
         it 'does not check visibilities on individual assignemnts' do
           # ensures that check is not an N+1 from the gradebook
-          expect_any_instance_of(Assignment).to receive(:students_with_visibility).never
+          expect_any_instance_of(Assignment).not_to receive(:students_with_visibility)
           get 'index', params: { :course_id => @course.id, :include => ['assignments', 'assignment_visibility'] }, :format => :json
           expect(response).to be_successful
         end

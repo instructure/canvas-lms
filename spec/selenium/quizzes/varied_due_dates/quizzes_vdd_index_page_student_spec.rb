@@ -29,7 +29,7 @@ describe 'viewing a quiz with variable due dates on the quizzes index page' do
   context 'as a student in Section A' do
     before(:once) { prepare_vdd_scenario_for_first_student }
 
-    before(:each) do
+    before do
       user_session(@student1)
       get "/courses/#{@course.id}/quizzes"
     end
@@ -47,7 +47,7 @@ describe 'viewing a quiz with variable due dates on the quizzes index page' do
   context 'as a student in Section B' do
     before(:once) { prepare_vdd_scenario_for_second_student }
 
-    before(:each) do
+    before do
       user_session(@student2)
       get "/courses/#{@course.id}/quizzes"
     end

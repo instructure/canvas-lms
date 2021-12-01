@@ -54,7 +54,7 @@ describe 'as a student' do
         @rubric.associate_with(@assignment, @course, purpose: 'grading', use_for_grading: false)
       end
 
-      before(:each) do
+      before do
         user_session(@student)
         StudentAssignmentPageV2.visit(@course, @assignment)
         wait_for_ajaximations
@@ -101,7 +101,7 @@ describe 'as a student' do
         @assignment.submit_homework(@student, submission_type: 'online_upload', attachments: [@file_attachment])
       end
 
-      before(:each) do
+      before do
         user_session(@student)
         StudentAssignmentPageV2.visit(@course, @assignment)
         wait_for_ajaximations
@@ -137,7 +137,7 @@ describe 'as a student' do
         @assignment.grade_student(@student, grade: '4', grader: @teacher)
       end
 
-      before(:each) do
+      before do
         user_session(@student)
         StudentAssignmentPageV2.visit(@course, @assignment)
         wait_for_ajaximations
@@ -172,7 +172,7 @@ describe 'as a student' do
         )
       end
 
-      before(:each) do
+      before do
         user_session(@student)
         StudentAssignmentPageV2.visit(@course, @assignment)
         wait_for_tiny(StudentAssignmentPageV2.text_entry_area)
@@ -216,7 +216,7 @@ describe 'as a student' do
         )
       end
 
-      before(:each) do
+      before do
         user_session(@student)
         StudentAssignmentPageV2.visit(@course, @assignment)
         wait_for_ajaximations
@@ -274,7 +274,7 @@ describe 'as a student' do
         )
       end
 
-      before(:each) do
+      before do
         stub_kaltura
         user_session(@student)
         StudentAssignmentPageV2.visit(@course, @assignment)
@@ -299,7 +299,7 @@ describe 'as a student' do
         )
       end
 
-      before(:each) do
+      before do
         @filename, @fullpath, @data = get_file("testfile1.txt")
         user_session(@student)
         StudentAssignmentPageV2.visit(@course, @assignment)
@@ -339,7 +339,7 @@ describe 'as a student' do
         @module.save!
       end
 
-      before(:each) do
+      before do
         user_session(@student)
         StudentAssignmentPageV2.visit(@course, @assignment)
         wait_for_ajaximations
@@ -362,7 +362,7 @@ describe 'as a student' do
         )
       end
 
-      before(:each) do
+      before do
         user_session(@student)
         StudentAssignmentPageV2.visit(@course, @turnitin_assignment)
         wait_for_ajaximations

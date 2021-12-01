@@ -26,7 +26,7 @@ describe "interaction with differentiated assignments" do
   include AssignmentsCommon
 
   context "Student" do
-    before :each do
+    before do
       course_with_student_logged_in
       da_setup
       create_da_assignment
@@ -40,11 +40,13 @@ describe "interaction with differentiated assignments" do
         get "/courses/#{@course.id}/assignments"
         expect(f(".ig-empty-msg")).to include_text("No Assignment Groups found")
       end
+
       it "shows assignments with an override" do
         create_section_override_for_assignment(@da_assignment)
         get "/courses/#{@course.id}/assignments"
         expect(f("#assignment_group_upcoming")).to include_text(@da_assignment.title)
       end
+
       it "shows assignments with a graded submission" do
         @da_assignment.grade_student(@user, grade: 10, grader: @teacher)
         get "/courses/#{@course.id}/assignments"
@@ -59,16 +61,19 @@ describe "interaction with differentiated assignments" do
         expect(f("#flash_message_holder")).to include_text("The assignment you requested is not available to your course section.")
         expect(driver.current_url).to match %r{/courses/\d+/assignments}
       end
+
       it "shows the assignment page with an override" do
         create_section_override_for_assignment(@da_assignment)
         get "/courses/#{@course.id}/assignments/#{@da_assignment.id}"
         expect(driver.current_url).to match %r{/courses/\d+/assignments/#{@da_assignment.id}}
       end
+
       it "shows the assignment page with a graded submission" do
         @da_assignment.grade_student(@user, grade: 10, grader: @teacher)
         get "/courses/#{@course.id}/assignments/#{@da_assignment.id}"
         expect(driver.current_url).to match %r{/courses/\d+/assignments/#{@da_assignment.id}}
       end
+
       it "allows previous submissions to be accessed on an inaccessible assignment" do
         create_section_override_for_assignment(@da_assignment)
         @da_assignment.find_or_create_submission(@student)
@@ -88,11 +93,13 @@ describe "interaction with differentiated assignments" do
         get "/courses/#{@course.id}/grades"
         expect(f("#assignments")).to include_text(@da_assignment.title)
       end
+
       it "shows assignments with a graded submission" do
         @da_assignment.grade_student(@student, grade: 10, grader: @teacher)
         get "/courses/#{@course.id}/grades"
         expect(f("#assignments")).to include_text(@da_assignment.title)
       end
+
       it "does not show inaccessible assignments" do
         create_section_override_for_assignment(@da_assignment, course_section: @section1)
         get "/courses/#{@course.id}/grades"
@@ -102,7 +109,7 @@ describe "interaction with differentiated assignments" do
   end
 
   context "Observer with student" do
-    before :each do
+    before do
       observer_setup
       da_setup
       create_da_assignment
@@ -116,11 +123,13 @@ describe "interaction with differentiated assignments" do
         get "/courses/#{@course.id}/assignments"
         expect(f(".ig-empty-msg")).to include_text("No Assignment Groups found")
       end
+
       it "shows assignments with an override" do
         create_section_override_for_assignment(@da_assignment)
         get "/courses/#{@course.id}/assignments"
         expect(f("#assignment_group_upcoming")).to include_text(@da_assignment.title)
       end
+
       it "shows assignments with a graded submission" do
         @da_assignment.grade_student(@user, grade: 10, grader: @teacher)
         get "/courses/#{@course.id}/assignments"
@@ -135,16 +144,19 @@ describe "interaction with differentiated assignments" do
         expect(f("#flash_message_holder")).to include_text("The assignment you requested is not available to your course section.")
         expect(driver.current_url).to match %r{/courses/\d+/assignments}
       end
+
       it "shows the assignment page with an override" do
         create_section_override_for_assignment(@da_assignment)
         get "/courses/#{@course.id}/assignments/#{@da_assignment.id}"
         expect(driver.current_url).to match %r{/courses/\d+/assignments/#{@da_assignment.id}}
       end
+
       it "shows the assignment page with a graded submission" do
         @da_assignment.grade_student(@student, grade: 10, grader: @teacher)
         get "/courses/#{@course.id}/assignments/#{@da_assignment.id}"
         expect(driver.current_url).to match %r{/courses/\d+/assignments/#{@da_assignment.id}}
       end
+
       it "allows previous submissions to be accessed on an inaccessible assignment" do
         create_section_override_for_assignment(@da_assignment)
         @da_assignment.find_or_create_submission(@student)
@@ -164,11 +176,13 @@ describe "interaction with differentiated assignments" do
         get "/courses/#{@course.id}/grades"
         expect(f("#assignments")).to include_text(@da_assignment.title)
       end
+
       it "shows assignments with a graded submission" do
         @da_assignment.grade_student(@student, grade: 10, grader: @teacher)
         get "/courses/#{@course.id}/grades"
         expect(f("#assignments")).to include_text(@da_assignment.title)
       end
+
       it "does not show inaccessible assignments" do
         create_section_override_for_assignment(@da_assignment, course_section: @section1)
         get "/courses/#{@course.id}/grades"
@@ -178,11 +192,12 @@ describe "interaction with differentiated assignments" do
   end
 
   context "Teacher" do
-    before :each do
+    before do
       course_with_teacher_logged_in
       da_setup
       create_da_assignment
     end
+
     it "hides students from speedgrader if they don't have Differentiated assignment visibility or a graded submission" do
       @s1, @s2, @s3 = create_users_in_course(@course, 3, return_type: :record, section_id: @default_section.id)
       @s4, @s5 = create_users_in_course(@course, 2, return_type: :record, section_id: @section1.id)
@@ -193,10 +208,10 @@ describe "interaction with differentiated assignments" do
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@da_assignment.id}"
       f(".ui-selectmenu-icon").click
       [@s1, @s2].each do |student|
-        expect(f("#students_selectmenu-menu")).not_to include_text("#{student.name}")
+        expect(f("#students_selectmenu-menu")).not_to include_text(student.name.to_s)
       end
       [@s3, @s4, @s5].each do |student|
-        expect(f("#students_selectmenu-menu")).to include_text("#{student.name}")
+        expect(f("#students_selectmenu-menu")).to include_text(student.name.to_s)
       end
     end
   end

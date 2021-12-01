@@ -53,7 +53,7 @@ class CourseLinkValidator
   def initialize(course)
     self.course = course
     domain = course.root_account.domain
-    self.domain_regex = %r{\w+:?\/\/#{domain}\/} if domain
+    self.domain_regex = %r{\w+:?//#{domain}/} if domain
     self.issues = []
     self.visited_urls = {}
   end
@@ -122,9 +122,9 @@ class CourseLinkValidator
         (invalid_module_links[ct.context_module] ||= []) << invalid_link.merge(:link_text => ct.title)
       end
     end
-    invalid_module_links.each do |mod, invalid_module_links|
+    invalid_module_links.each do |mod, links|
       self.issues << { :name => mod.name, :type => :module,
-                       :content_url => "/courses/#{self.course.id}/modules#module_#{mod.id}" }.merge(:invalid_links => invalid_module_links)
+                       :content_url => "/courses/#{self.course.id}/modules#module_#{mod.id}" }.merge(:invalid_links => links)
     end
 
     progress.update_completion! 65
@@ -256,12 +256,12 @@ class CourseLinkValidator
   # makes sure that links to course objects exist and are in a visible state
   def check_object_status(url, object: nil)
     return :missing_item unless valid_route?(url)
-    return :missing_item if url =~ /\/test_error/
+    return :missing_item if url.include?('/test_error')
 
     object ||= Context.find_asset_by_url(url)
     unless object
       return :missing_item unless [nil, 'syllabus'].include?(url.match(/\/courses\/\d+\/\w+\/(.+)/)&.[](1))
-      return :missing_item if url =~ /\/media_objects_iframe\//
+      return :missing_item if url.include?('/media_objects_iframe/')
 
       return nil
     end
@@ -314,9 +314,7 @@ class CourseLinkValidator
       end
 
       case response.code
-      when /^2/ # 2xx code
-        true
-      when "401", "403", "429", "503"
+      when /^2/, "401", "403", "429", "503"
         # we accept unauthorized and forbidden codes here because sometimes servers refuse to serve our requests
         # and someone can link to a site that requires authentication anyway - doesn't necessarily make it invalid
         true

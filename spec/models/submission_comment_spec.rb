@@ -160,7 +160,7 @@ RSpec.describe SubmissionComment do
     end
 
     context 'draft comment' do
-      before(:each) do
+      before do
         @comment = @submission.add_comment(author: @teacher, comment: '42', draft_comment: true)
       end
 
@@ -204,7 +204,7 @@ This text has a http://www.google.com link in it...
 }
     @comment.save!
     body = @comment.formatted_body
-    expect(body).to match(/\<a/)
+    expect(body).to match(/<a/)
     expect(body).to match(/quoted_text/)
   end
 
@@ -699,6 +699,7 @@ This text has a http://www.google.com link in it...
 
   describe 'audit event logging' do
     before(:once) { @assignment.update!(anonymous_grading: true, grader_count: 2) }
+
     it 'creates exactly one AnonymousOrModerationEvent on creation' do
       expect { @submission.submission_comments.create!(author: @student, anonymous: false) }
         .to change { AnonymousOrModerationEvent.count }.by(1)

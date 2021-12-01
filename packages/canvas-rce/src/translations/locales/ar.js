@@ -134,6 +134,7 @@ const locale = {
   "course_navigation_dd035109": { "message": "التنقل عبر المساق" },
   "create_button_and_icon_5c089934": { "message": "إنشاء زر وأيقونة" },
   "creative_commons_license_725584ae": { "message": "ترخيص المشاع الإبداعي:" },
+  "crop_image_807ebb08": { "message": "قص صورة" },
   "current_image_f16c249c": { "message": "الصورة الحالية" },
   "custom_6979cd81": { "message": "مخصص" },
   "date_added_ed5ad465": { "message": "تاريخ الإضافة" },
@@ -304,6 +305,7 @@ const locale = {
     "message": "لم يتم العثور على نتائج لـ { term }."
   },
   "none_3b5e34d2": { "message": "بلا" },
+  "none_selected_b93d56d2": { "message": "لم يتم تحديد شيء" },
   "octagon_e48be9f": { "message": "ثماني" },
   "open_this_keyboard_shortcuts_dialog_9658b83a": {
     "message": "افتح مربع حوار اختصارات لوحة المفاتيح هذا"
@@ -352,6 +354,7 @@ const locale = {
   },
   "search_280d00bd": { "message": "بحث" },
   "search_term_b2d2235": { "message": "مصطلح البحث" },
+  "select_crop_shape_d441feeb": { "message": "حدد قص شكل" },
   "select_language_7c93a900": { "message": "اختر اللغة" },
   "selected_274ce24f": { "message": "تم التحديد" },
   "shift_o_to_open_the_pretty_html_editor_55ff5a31": {

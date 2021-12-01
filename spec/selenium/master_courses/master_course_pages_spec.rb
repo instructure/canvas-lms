@@ -29,7 +29,7 @@ describe "master courses - pages locking" do
     @tag = @template.create_content_tag_for!(@page)
   end
 
-  before :each do
+  before do
     user_session(@teacher)
   end
 

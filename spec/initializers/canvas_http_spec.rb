@@ -21,7 +21,7 @@ require_relative '../spec_helper'
 require_relative '../../config/initializers/canvas_http'
 
 describe "CanvasHttp Configuration" do
-  after(:each) do
+  after do
     CanvasHttpInitializer.configure_circuit_breaker!
   end
 

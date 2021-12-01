@@ -45,7 +45,7 @@ describe 'Screenreader Gradebook grading' do
   end
 
   context 'in Grades section' do
-    before(:each) do
+    before do
       course_setup
       login_to_srgb
     end
@@ -122,7 +122,7 @@ describe 'Screenreader Gradebook grading' do
   end
 
   context 'displays warning' do
-    before(:each) do
+    before do
       course_setup
     end
 

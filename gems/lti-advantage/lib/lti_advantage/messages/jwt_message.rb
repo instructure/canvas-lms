@@ -47,12 +47,9 @@ module LtiAdvantage::Messages
                   :custom,
                   :email,
                   :email_verified,
-                  :extensions,
                   :family_name,
                   :gender,
                   :given_name,
-                  :launch_presentation,
-                  :lis,
                   :locale,
                   :middle_name,
                   :name,
@@ -60,15 +57,18 @@ module LtiAdvantage::Messages
                   :phone_number,
                   :phone_number_verified,
                   :picture,
-                  :tool_platform,
                   :preferred_username,
                   :profile,
-                  :roles,
-                  :role_scope_mentor,
                   :updated_at,
                   :website,
                   :zoneinfo,
                   :id
+    attr_writer :extensions,
+                :launch_presentation,
+                :list,
+                :roles,
+                :role_scope_mentor,
+                :tool_platform
 
     def self.create_jws(body, private_key, alg = :RS256)
       JSON::JWT.new(body).sign(private_key, alg).to_s

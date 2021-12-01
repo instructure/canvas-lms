@@ -55,6 +55,7 @@ describe DataFixup::PopulateRootAccountIdOnModels do
     shared_examples_for 'a datafixup that populates root_account_id to 0' do
       let(:record) { raise 'set in examples' }
       before { record.update_columns(root_account_id: nil) }
+
       before do
         # Ensure dummy account exists (done in migration but may be undone by specs)
         Account.find_or_create_by!(id: 0)
@@ -71,6 +72,7 @@ describe DataFixup::PopulateRootAccountIdOnModels do
     shared_examples_for 'a datafixup that does not populate root_account_id' do
       let(:record) { raise 'set in examples' }
       before { record.update_columns(root_account_id: nil) }
+
       it 'populates the root_account_id to 0' do
         expect(record.reload.root_account_id).to be_nil
         DataFixup::PopulateRootAccountIdOnModels.run

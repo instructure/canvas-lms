@@ -57,7 +57,7 @@ describe "/submissions/show_preview" do
       course_with_student
     end
 
-    before(:each) do
+    before do
       @attachment = Attachment.create!(context: @student, uploaded_data: stub_png_data, filename: "homework.png")
       allow(Canvadocs).to receive(:enabled?).and_return(true)
       allow(Canvadocs).to receive(:config).and_return({ a: 1 })
@@ -127,7 +127,7 @@ describe "/submissions/show_preview" do
 
     let(:output) { Nokogiri::HTML5.fragment(response.body) }
 
-    before(:each) do
+    before do
       allow(assignment).to receive(:turnitin_enabled?).and_return(true)
       user_session(teacher)
 
@@ -138,7 +138,7 @@ describe "/submissions/show_preview" do
     end
 
     context "when the New Gradebook Plagiarism Indicator feature is enabled" do
-      before(:each) { course.root_account.enable_feature!(:new_gradebook_plagiarism_indicator) }
+      before { course.root_account.enable_feature!(:new_gradebook_plagiarism_indicator) }
 
       it "renders a similarity icon if the submission possesses similarity data" do
         submission.originality_reports.create!(

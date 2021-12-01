@@ -43,11 +43,9 @@ module CanvasTime
   end
 
   def self.try_parse(maybe_time, default = nil)
-    begin
-      Time.zone.parse(maybe_time) || default
-    rescue
-      default
-    end
+    Time.zone.parse(maybe_time) || default
+  rescue
+    default
   end
 
   def utc_datetime

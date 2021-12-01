@@ -57,6 +57,7 @@ module Utils
 
       describe 'on relative dates' do
         let(:today) { Date.parse("2014-10-1") }
+
         around do |example|
           Timecop.freeze(today, &example)
         end

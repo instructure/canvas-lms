@@ -45,6 +45,9 @@ describe('DiscussionFullPage', () => {
 
   beforeAll(() => {
     window.ENV = {
+      per_page: 20,
+      isolated_view_initial_page_size: 5,
+      current_page: 0,
       discussion_topic_id: '1',
       manual_mark_as_read: false,
       current_user: {
@@ -310,6 +313,51 @@ describe('DiscussionFullPage', () => {
     })
   })
 
+  describe('AvailableForUser', () => {
+    describe('Topic is unavailable', () => {
+      it('should show locked discussion topic', async () => {
+        const mocks = getDiscussionQueryMock()
+        mocks[0].result.data.legacyNode.availableForUser = false
+        const container = setup(mocks)
+        expect(await container.findByTestId('locked-discussion')).toBeInTheDocument()
+      })
+
+      it('should show available discussion topic alert', async () => {
+        const mocks = getDiscussionQueryMock()
+        mocks[0].result.data.legacyNode.availableForUser = false
+        const container = setup(mocks)
+        expect(await container.findByTestId('locked-for-user')).toBeInTheDocument()
+      })
+
+      it('should not show root replies', async () => {
+        const mocks = getDiscussionQueryMock()
+        mocks[0].result.data.legacyNode.availableForUser = false
+        const container = setup(mocks)
+        expect(container.queryByTestId('discussion-root-entry-container')).toBeNull()
+      })
+    })
+
+    describe('Topic is available', () => {
+      it('should not show locked discussion topic', async () => {
+        const mocks = getDiscussionQueryMock()
+        const container = setup(mocks)
+        expect(container.queryByTestId('locked-discussion')).toBeNull()
+      })
+
+      it('should not show available discussion topic alert', () => {
+        const mocks = getDiscussionQueryMock()
+        const container = setup(mocks)
+        expect(container.queryByTestId('locked-for-user')).toBeNull()
+      })
+
+      it('should show root replies', async () => {
+        const mocks = getDiscussionQueryMock()
+        const container = setup(mocks)
+        expect(await container.findByTestId('discussion-root-entry-container')).toBeInTheDocument()
+      })
+    })
+  })
+
   describe('error handling', () => {
     it('should render generic error page when DISCUSSION_QUERY returns errors', async () => {
       const container = setup(getDiscussionQueryMock({shouldError: true}))
@@ -456,6 +504,16 @@ describe('DiscussionFullPage', () => {
       // should be able to highlight the topic multiple times
       fireEvent.click(await container.findByTestId('thread-actions-menu'))
       fireEvent.click(await container.findByTestId('toTopic'))
+      expect(await container.findByTestId('isHighlighted')).toBeInTheDocument()
+    })
+
+    it('should highlight the deep linked discussion entry', async () => {
+      window.ENV.discussions_deep_link = {
+        entry_id: '1',
+        root_entry_id: null
+      }
+      const container = setup(getDiscussionQueryMock())
+
       expect(await container.findByTestId('isHighlighted')).toBeInTheDocument()
     })
   })

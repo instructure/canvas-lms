@@ -29,7 +29,7 @@ describe 'Account Reports API', type: :request do
     @report.user = @admin
     @report.progress = rand(100)
     @report.start_at = DateTime.now
-    @report.end_at = (Time.now + (rand(60 * 60 * 4))).to_datetime
+    @report.end_at = (Time.now + rand(60 * 60 * 4)).to_datetime
     @report.report_type = "student_assignment_outcome_map_csv"
     @report.parameters = HashWithIndifferentAccess['param' => 'test', 'error' => 'failed']
 

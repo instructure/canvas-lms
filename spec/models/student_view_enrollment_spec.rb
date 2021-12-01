@@ -19,7 +19,7 @@
 #
 
 describe StudentViewEnrollment do
-  before(:each) do
+  before do
     @student = User.create(:name => "some student")
     @course = Course.create(:name => "some course")
     @se = @course.enroll_student(@student)

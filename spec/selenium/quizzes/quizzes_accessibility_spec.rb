@@ -24,7 +24,7 @@ describe 'quizzes accessibility' do
   include_context "in-process server selenium tests"
   include QuizzesCommon
 
-  before(:each) do
+  before do
     course_with_teacher_logged_in
     @last_quiz = start_quiz_question
   end

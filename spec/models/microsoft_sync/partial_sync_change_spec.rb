@@ -146,6 +146,7 @@ describe MicrosoftSync::PartialSyncChange do
       # simulate updating a record that hasn't made it to the secondary by changing the updated_at
       # after we fetch the last updated record from the secondary
       orig_secondary_method = GuardRail.method(:activate)
+      allow(GuardRail).to receive(:activate).with(:primary)
       allow(GuardRail).to receive(:activate).with(:secondary) do |*args, &blk|
         res = orig_secondary_method.call(*args, &blk)
         pscs[2].update!(updated_at: 1.hour.from_now)

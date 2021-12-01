@@ -76,11 +76,9 @@ module ApplicationHelper
       Rails
       .cache
       .fetch(['short_name_lookup', code].cache_key) do
-        begin
-          Context.find_by_asset_string(code).short_name
-        rescue StandardError
-          ''
-        end
+        Context.find_by_asset_string(code).short_name
+      rescue StandardError
+        ''
       end
   end
 
@@ -992,7 +990,7 @@ module ApplicationHelper
   end
 
   def add_uri_scheme_name(uri)
-    noSchemeName = !uri.match(%r{^(.+):\/\/(.+)})
+    noSchemeName = !uri.match(%r{^(.+)://(.+)})
     uri = 'http://' + uri if noSchemeName
     uri
   end
@@ -1113,12 +1111,10 @@ module ApplicationHelper
 
   def csp_report_uri
     @csp_report_uri ||=
-      begin
-        if (host = csp_context.root_account.csp_logging_config['host'])
-          "; report-uri #{host}report/#{csp_context.root_account.global_id}"
-        else
-          ''
-        end
+      if (host = csp_context.root_account.csp_logging_config['host'])
+        "; report-uri #{host}report/#{csp_context.root_account.global_id}"
+      else
+        ''
       end
   end
 
@@ -1168,9 +1164,9 @@ module ApplicationHelper
         include_tools: false
       )
     if include_files_domain_in_csp
-      frame_domains = %w['self'] + frame_domains
-      object_domains = %w['self'] + script_domains
-      script_domains = %w['self' 'unsafe-eval' 'unsafe-inline'] + script_domains
+      frame_domains = ["'self'"] + frame_domains
+      object_domains = ["'self'"] + script_domains
+      script_domains = ["'self'", "'unsafe-eval'", "'unsafe-inline'"] + script_domains
     end
     "frame-src #{frame_domains.join(' ')}; script-src #{script_domains.join(' ')}; object-src #{object_domains.join(' ')}; "
   end
@@ -1187,7 +1183,7 @@ module ApplicationHelper
 
   # Determine if url is the current state for the groups sub-nav switcher
   def group_homepage_pathfinder(group)
-    request.fullpath =~ %r{groups\/#{group.id}}
+    request.fullpath =~ %r{groups/#{group.id}}
   end
 
   def link_to_parent_signup(auth_type)
@@ -1218,7 +1214,7 @@ module ApplicationHelper
   end
 
   def planner_enabled?
-    !!(@current_user&.has_student_enrollment?) ||
+    !!@current_user&.has_student_enrollment? ||
       (Account.site_admin.feature_enabled?(:k5_parent_support) && @current_user&.roles(@domain_root_account)&.include?('observer') && k5_user?)
   end
 

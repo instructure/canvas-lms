@@ -39,6 +39,7 @@ describe LiveAssessments::ResultsController, type: :request do
   end
 
   let(:assessed_at) { Time.now - 1.day }
+
   def result_hashes
     [student, another_student].map do |s|
       { passed: true, assessed_at: assessed_at, links: { user: s.id } }

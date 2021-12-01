@@ -41,7 +41,7 @@ describe 'RCE next tests', ignore_js_errors: true do
   include RCENextPage
 
   context 'WYSIWYG generic as a teacher' do
-    before(:each) do
+    before do
       course_with_teacher_logged_in
       stub_rcs_config
     end
@@ -595,7 +595,7 @@ describe 'RCE next tests', ignore_js_errors: true do
       end
 
       context 'without manage files permissions' do
-        before(:each) do
+        before do
           RoleOverride.create!(
             permission: 'manage_files_add',
             enabled: false,
@@ -1232,7 +1232,7 @@ describe 'RCE next tests', ignore_js_errors: true do
     end
 
     describe 'lti tool integration' do
-      before(:each) do
+      before do
         # set up the lti tool
         @tool =
           Account.default.context_external_tools.new(
@@ -1436,7 +1436,7 @@ describe 'RCE next tests', ignore_js_errors: true do
     end
 
     describe 'the content tray' do
-      after(:each) { driver.local_storage.clear }
+      after { driver.local_storage.clear }
 
       it 'shows course links after user files' do
         title = 'Assignment-Title'
@@ -1463,7 +1463,7 @@ describe 'RCE next tests', ignore_js_errors: true do
     end
 
     describe 'the html editors' do
-      after(:each) do
+      after do
         driver.execute_script('if (document.fullscreenElement) document.exitFullscreen()')
       end
 

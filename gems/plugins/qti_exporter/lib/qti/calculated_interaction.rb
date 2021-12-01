@@ -31,7 +31,7 @@ module Qti
       imported_formula = @doc.at_css('calculated formula')
       @question[:imported_formula] = CGI.unescape(imported_formula.text) if imported_formula
       get_calculated_property('answer_tolerance')
-      if @question[:answer_tolerance] && !@question[:answer_tolerance].to_s.match(/[^\d\.]/)
+      if @question[:answer_tolerance] && !@question[:answer_tolerance].to_s.match(/[^\d.]/)
         @question[:answer_tolerance] = @question[:answer_tolerance].to_f
       end
 
@@ -120,7 +120,7 @@ module Qti
         # substitute {var} for [var]
         @question[:question_text].gsub!("{#{v_name}}", "[#{v_name}]") if @question[:question_text]
         # substitute {var} for var
-        @question[:imported_formula].gsub!("{#{v_name}}", "#{v_name}") if @question[:imported_formula]
+        @question[:imported_formula].gsub!("{#{v_name}}", v_name.to_s) if @question[:imported_formula]
       end
       if @question[:imported_formula]
         method_substitutions = { "sqr" => "sqrt", "Factorial" => "fact", "exp" => "e" }

@@ -27,9 +27,9 @@ module Lti
     serialize :services
     serialize :capabilities
 
-    DEFAULT_TCP_UUID = "339b6700-e4cb-47c5-a54f-3ee0064921a9".freeze
+    DEFAULT_TCP_UUID = "339b6700-e4cb-47c5-a54f-3ee0064921a9"
 
-    WEBHOOK_GRANT_ALL_CAPABILITY = 'vnd.instructure.webhooks.root_account.all'.freeze
+    WEBHOOK_GRANT_ALL_CAPABILITY = 'vnd.instructure.webhooks.root_account.all'
     WEBHOOK_SUBSCRIPTION_CAPABILITIES = {
       all: [WEBHOOK_GRANT_ALL_CAPABILITY].freeze,
       quiz_submitted: %w(vnd.instructure.webhooks.root_account.quiz_submitted

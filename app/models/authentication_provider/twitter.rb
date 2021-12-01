@@ -28,21 +28,21 @@ class AuthenticationProvider::Twitter < AuthenticationProvider::OAuth
   end
 
   def self.login_attributes
-    ['user_id'.freeze, 'screen_name'.freeze].freeze
+    ['user_id', 'screen_name'].freeze
   end
   validates :login_attribute, inclusion: login_attributes
 
   def self.recognized_federated_attributes
     [
-      'name'.freeze,
-      'screen_name'.freeze,
-      'time_zone'.freeze,
-      'user_id'.freeze,
+      'name',
+      'screen_name',
+      'time_zone',
+      'user_id',
     ].freeze
   end
 
   def login_attribute
-    super || 'user_id'.freeze
+    super || 'user_id'
   end
 
   def unique_id(token)
@@ -61,8 +61,8 @@ class AuthenticationProvider::Twitter < AuthenticationProvider::OAuth
 
   def consumer_options
     {
-      site: 'https://api.twitter.com'.freeze,
-      authorize_path: '/oauth/authenticate'.freeze
+      site: 'https://api.twitter.com',
+      authorize_path: '/oauth/authenticate'
     }
   end
 end

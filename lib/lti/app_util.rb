@@ -28,7 +28,7 @@ module Lti
       'default' => { template: 'lti/framed_launch' }.freeze,
       'full_width_in_context' => { template: 'lti/full_width_in_context' }.freeze,
     }.freeze
-    BLACKLIST_WILDCARD = '*'.freeze # to set up 'deny all' rules
+    BLACKLIST_WILDCARD = '*' # to set up 'deny all' rules
 
     def self.display_template(display_type = nil, display_override: nil)
       unless TOOL_DISPLAY_TEMPLATES.key?(display_type)

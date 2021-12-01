@@ -28,7 +28,7 @@ module Lti
     let(:product_family) { ProductFamily.create(vendor_code: '123', product_code: 'abc', vendor_name: 'acme', root_account: account) }
 
     describe 'validations' do
-      before(:each) do
+      before do
         subject.message_type = 'message_type'
         subject.launch_path = 'launch_path'
         subject.resource_handler = ResourceHandler.new

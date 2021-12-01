@@ -120,7 +120,7 @@ export default class SubmissionCommentListItem extends React.Component {
                 <Button
                   href={this.props.authorUrl}
                   variant="link"
-                  theme={{mediumPadding: '0', mediumHeight: 'normal'}}
+                  theme={{mediumPaddingHorizontal: '0', mediumHeight: 'normal'}}
                   margin="none none xxx-small"
                 >
                   {TextHelper.truncateText(this.props.author, {max: 22})}

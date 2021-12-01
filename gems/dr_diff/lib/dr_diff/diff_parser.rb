@@ -67,15 +67,15 @@ module DrDiff
     end
 
     def line_gone?(line)
-      line =~ /^\-/
+      line =~ /^-/
     end
 
     def code_line?(line)
       return false if file_line?(line)
       return false if line_range?(line)
-      return false if line =~ /^\-\-\- a\/.*\./
+      return false if line =~ /^--- a\/.*\./
       return false if line =~ /^index .*\d\d\d$/
-      return false if line =~ /^diff \-\-git/
+      return false if line =~ /^diff --git/
 
       true
     end

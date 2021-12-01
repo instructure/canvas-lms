@@ -47,18 +47,14 @@ class NotificationEndpoint < ActiveRecord::Base
   end
 
   def endpoint_attributes
-    @endpoint_attributes ||= begin
-      sns_client.get_endpoint_attributes(endpoint_arn: self.arn).attributes
-    end
+    @endpoint_attributes ||= sns_client.get_endpoint_attributes(endpoint_arn: self.arn).attributes
   end
 
   def endpoint_exists?
-    begin
-      endpoint_attributes
-      true
-    rescue Aws::SNS::Errors::NotFound
-      false
-    end
+    endpoint_attributes
+    true
+  rescue Aws::SNS::Errors::NotFound
+    false
   end
 
   def own_endpoint?

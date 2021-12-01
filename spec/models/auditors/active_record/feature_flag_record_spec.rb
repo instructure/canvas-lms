@@ -22,7 +22,7 @@ describe Auditors::ActiveRecord::FeatureFlagRecord do
   let(:request_id) { 'abcde-12345' }
   let(:feature_name) { 'root_account_feature' }
 
-  before(:each) do
+  before do
     allow(RequestContextGenerator).to receive_messages(request_id: request_id)
     allow(Feature).to receive(:definitions).and_return({
                                                          feature_name => Feature.new(feature: feature_name, applies_to: 'RootAccount')

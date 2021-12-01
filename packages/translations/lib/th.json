@@ -329,6 +329,9 @@
     "creative_commons_license_725584ae": {
         "message": "สิทธิ์ใช้งาน Creative Commons:"
     },
+    "crop_image_807ebb08": {
+        "message": "ครอปภาพ"
+    },
     "current_image_f16c249c": {
         "message": "ภาพปัจจุบัน"
     },
@@ -896,6 +899,9 @@
     "none_3b5e34d2": {
         "message": "ไม่มี"
     },
+    "none_selected_b93d56d2": {
+        "message": "ไม่ได้เลือกรายการใด"
+    },
     "nothing_due_this_week_d45c9ef9": {
         "message": "ไม่มีงานสำหรับสัปดาห์นี้"
     },
@@ -1078,6 +1084,9 @@
     },
     "search_term_b2d2235": {
         "message": "คำค้นหา"
+    },
+    "select_crop_shape_d441feeb": {
+        "message": "เลือกรูปทรงการครอป"
     },
     "select_language_7c93a900": {
         "message": "เลือกภาษา"

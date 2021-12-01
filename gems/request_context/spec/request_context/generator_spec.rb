@@ -23,7 +23,7 @@ require 'timecop'
 
 describe "RequestContext::Generator" do
   let(:env) { {} }
-  let(:request) { double('Rack::Request', path_parameters: { controller: 'users', action: 'index' }) }
+  let(:request) { double('Rack::Request', path_parameters: { controller: 'users', action: 'index' }, request_parameters: { "operationName" => "GetDiscussionQuery" }) }
   let(:context) { double('Course', class: 'Course', id: 15) }
 
   it "generates the X-Canvas-Meta response header" do
@@ -42,7 +42,7 @@ describe "RequestContext::Generator" do
       RequestContext::Generator.store_request_meta(request, nil)
       [200, {}, []]
     }).call(env)
-    expect(headers['X-Canvas-Meta']).to eq "a1=test1;o=users;n=index;"
+    expect(headers['X-Canvas-Meta']).to eq "a1=test1;o=users;n=index;on=GetDiscussionQuery;"
   end
 
   it "adds request and context data to X-Canvas-Meta" do
@@ -51,7 +51,7 @@ describe "RequestContext::Generator" do
       RequestContext::Generator.store_request_meta(request, context)
       [200, {}, []]
     }).call(env)
-    expect(headers['X-Canvas-Meta']).to eq "a1=test1;o=users;n=index;t=Course;i=15;"
+    expect(headers['X-Canvas-Meta']).to eq "a1=test1;o=users;n=index;on=GetDiscussionQuery;t=Course;i=15;"
   end
 
   it "adds page view data to X-Canvas-Meta" do
@@ -136,7 +136,7 @@ describe "RequestContext::Generator" do
       CanvasSecurity.sign_hmac_sha512(remote_request_context_id, shared_secret)
     end
 
-    before(:each) do
+    before do
       # TODO: Probably shouldn't be stubbing this deep in a gem?
       # Maybe we should be passing in a config'd secret to CanvasSecurity
       # directly rather than monkeying with dynamic_settings.
@@ -155,7 +155,7 @@ describe "RequestContext::Generator" do
       env['HTTP_X_REQUEST_CONTEXT_SIGNATURE'] = CanvasSecurity.base64_encode(remote_signature)
     end
 
-    after(:each) { DynamicSettings.fallback_data = {} }
+    after { DynamicSettings.fallback_data = {} }
 
     def run_middleware
       _, headers, _msg = RequestContext::Generator.new(->(_) { [200, {}, []] }).call(env)

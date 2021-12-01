@@ -329,6 +329,9 @@
     "creative_commons_license_725584ae": {
         "message": "Lisans Creative Commons"
     },
+    "crop_image_807ebb08": {
+        "message": "Koupe Imaj"
+    },
     "current_image_f16c249c": {
         "message": "Imaj Aktyèl"
     },
@@ -896,6 +899,9 @@
     "none_3b5e34d2": {
         "message": "Okenn"
     },
+    "none_selected_b93d56d2": {
+        "message": "Anyen Seleksyone"
+    },
     "nothing_due_this_week_d45c9ef9": {
         "message": "Pa gen Anyen pou Remèt Semenn sa a"
     },
@@ -1078,6 +1084,9 @@
     },
     "search_term_b2d2235": {
         "message": "Tèm Rechèch"
+    },
+    "select_crop_shape_d441feeb": {
+        "message": "Seleksyone koupe fòm"
     },
     "select_language_7c93a900": {
         "message": "Seleksyone Lang"

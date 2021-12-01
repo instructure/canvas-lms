@@ -254,12 +254,9 @@ module DatesOverridable
         hash[:has_many_overrides] = true
       elsif self.multiple_due_dates_apply_to?(user)
         hash[:vdd_tooltip] = OverrideTooltipPresenter.new(self, user).as_json
-      else
-        if (due_date = self.overridden_for(user).due_at)
-          hash[:due_date] = due_date
-        elsif user_is_admin && (due_date = all_due_dates.dig(0, :due_at))
-          hash[:due_date] = due_date
-        end
+      elsif (due_date = self.overridden_for(user).due_at) ||
+            (user_is_admin && (due_date = all_due_dates.dig(0, :due_at)))
+        hash[:due_date] = due_date
       end
       hash
     end

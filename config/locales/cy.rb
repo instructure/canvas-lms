@@ -7,20 +7,13 @@
         ordinals: lambda do |_key, options|
           number = options[:number]
           case number
-          when 1; 'af'
-          when 2; 'ail'
-          when 3; 'ydd'
-          when 4; 'ydd'
-          when 5; 'ed'
-          when 6; 'ed'
-          when 11; 'eg'
-          when 13; 'eg'
-          when 14; 'eg'
-          when 16; 'eg'
-          when 17; 'eg'
-          when 19; 'eg'
+          when 1 then 'af'
+          when 2 then 'ail'
+          when 3, 4 then 'ydd'
+          when 5, 6 then 'ed'
+          when 11, 13, 14, 16, 17, 19 then 'eg'
           else
-            if number > 20 && number < 40 then
+            if number > 20 && number < 40
               'ain'
             else
               'fed'

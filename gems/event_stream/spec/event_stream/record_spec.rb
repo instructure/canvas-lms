@@ -24,14 +24,22 @@ require 'securerandom'
 
 describe EventStream::Failure do
   describe "Record" do
-    class EventRecord < ::EventStream::Record
-      attributes :attribute1,
-                 :attribute2
+    let(:event_record) do
+      Class.new(::EventStream::Record) do
+        class << self
+          def name
+            "EventRecord"
+          end
+        end
+
+        attributes :attribute1,
+                   :attribute2
+      end
     end
 
     before do
       @request_id = SecureRandom.uuid
-      @event = EventRecord.new(
+      @event = event_record.new(
         'attribute1' => 'value1',
         'attribute2' => 'value2',
         'request_id' => @request_id
@@ -57,7 +65,7 @@ describe EventStream::Failure do
         'request_id' => SecureRandom.uuid,
         'created_at' => Time.zone.now
       }
-      event = EventRecord.new(attributes)
+      event = event_record.new(attributes)
 
       expect(event.id).to eq attributes['id']
       expect(event.created_at).to eq Time.zone.at(attributes['created_at'].to_i)
@@ -82,7 +90,7 @@ describe EventStream::Failure do
         'request_id' => request_id,
         'created_at' => Time.zone.now
       }
-      event = EventRecord.new(attributes)
+      event = event_record.new(attributes)
       expect(event.request_id).to eq request_id.to_s
 
       event.request_id = request_id

@@ -115,7 +115,7 @@ describe "master courses - locked items" do
       account_admin_user(active_all: true)
     end
 
-    before :each do
+    before do
       user_session(@admin)
     end
 
@@ -236,7 +236,7 @@ describe "master courses - locked items" do
       account_admin_user(active_all: true)
     end
 
-    before :each do
+    before do
       user_session(@admin)
     end
 

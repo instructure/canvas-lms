@@ -329,6 +329,9 @@
     "creative_commons_license_725584ae": {
         "message": "Trwydded Creative Commons:"
     },
+    "crop_image_807ebb08": {
+        "message": "Tocio Delwedd"
+    },
     "current_image_f16c249c": {
         "message": "Delwedd Bresennol"
     },
@@ -896,6 +899,9 @@
     "none_3b5e34d2": {
         "message": "Dim"
     },
+    "none_selected_b93d56d2": {
+        "message": "Dim un wedi’i ddewis"
+    },
     "nothing_due_this_week_d45c9ef9": {
         "message": "Dim byd â dyddiad ar gyfer yr wythnos hon"
     },
@@ -1078,6 +1084,9 @@
     },
     "search_term_b2d2235": {
         "message": "Term Chwilio"
+    },
+    "select_crop_shape_d441feeb": {
+        "message": "Dewis siâp tocio"
     },
     "select_language_7c93a900": {
         "message": "Dewis Iaith"

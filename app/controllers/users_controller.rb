@@ -1224,26 +1224,24 @@ class UsersController < ApplicationController
   ServiceCredentials = Struct.new(:service_user_name, :decrypted_password)
 
   def create_user_service
-    begin
-      user_name = params[:user_service][:user_name]
-      password = params[:user_service][:password]
-      service = ServiceCredentials.new(user_name, password)
-      case params[:user_service][:service]
-      when 'delicious'
-        delicious_get_last_posted(service)
-      when 'diigo'
-        Diigo::Connection.diigo_get_bookmarks(service)
-      when 'skype'
-        true
-      else
-        raise "Unknown Service"
-      end
-      @service = UserService.register_from_params(@current_user, params[:user_service])
-      render :json => @service
-    rescue => e
-      Canvas::Errors.capture_exception(:user_service, e)
-      render :json => { :errors => true }, :status => :bad_request
+    user_name = params[:user_service][:user_name]
+    password = params[:user_service][:password]
+    service = ServiceCredentials.new(user_name, password)
+    case params[:user_service][:service]
+    when 'delicious'
+      delicious_get_last_posted(service)
+    when 'diigo'
+      Diigo::Connection.diigo_get_bookmarks(service)
+    when 'skype'
+      true
+    else
+      raise "Unknown Service"
     end
+    @service = UserService.register_from_params(@current_user, params[:user_service])
+    render :json => @service
+  rescue => e
+    Canvas::Errors.capture_exception(:user_service, e)
+    render :json => { :errors => true }, :status => :bad_request
   end
 
   def services
@@ -2248,9 +2246,9 @@ class UsersController < ApplicationController
     @context.courses.each do |context|
       @entries.concat Assignments::ScopedToUser.new(context, @current_user, context.assignments.published.where("assignments.updated_at>?", cutoff)).scope
       @entries.concat context.calendar_events.active.where("updated_at>?", cutoff)
-      @entries.concat DiscussionTopic::ScopedToUser.new(context, @current_user, context.discussion_topics.published.where("discussion_topics.updated_at>?", cutoff)).scope.select { |dt|
-        !dt.locked_for?(@current_user, :check_policies => true)
-      }
+      @entries.concat(DiscussionTopic::ScopedToUser.new(context, @current_user, context.discussion_topics.published.where("discussion_topics.updated_at>?", cutoff)).scope.reject do |dt|
+        dt.locked_for?(@current_user, :check_policies => true)
+      end)
       @entries.concat WikiPages::ScopedToUser.new(context, @current_user, context.wiki_pages.published.where("wiki_pages.updated_at>?", cutoff)).scope
     end
     @entries.each do |entry|
@@ -2763,8 +2761,6 @@ class UsersController < ApplicationController
 
     Canvas::ICU.collate_by(data.values) { |e| e[:enrollment].user.sortable_name }
   end
-
-  protected
 
   def require_self_registration
     get_context

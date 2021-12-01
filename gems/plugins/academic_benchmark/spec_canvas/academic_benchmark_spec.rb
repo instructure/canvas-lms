@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 describe AcademicBenchmark do
-  before(:each) do
+  before do
     @root_account = Account.site_admin
     account_admin_user(:account => @root_account, :active_all => true)
     @cm = ContentMigration.new(:context => @root_account)

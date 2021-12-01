@@ -21,7 +21,7 @@
 require 'webmock/rspec'
 
 describe InternetImageController do
-  around(:example) do |example|
+  around do |example|
     WebMock.disable_net_connect!(allow_localhost: true)
     example.run
     WebMock.enable_net_connect!
@@ -46,7 +46,7 @@ describe InternetImageController do
       @plugin.update_attribute(:settings, { access_key: 'key', application_name: 'canvas' }.with_indifferent_access)
     end
 
-    before :each do
+    before do
       user_model
       user_session(@user)
     end
@@ -89,15 +89,13 @@ describe InternetImageController do
     end
 
     it 'reads params back correctly' do
-      begin
-        WebMock::Config.instance.query_values_notation = :flat_array
-        stub_request(:get, "https://api.unsplash.com/search/photos?page=2&per_page=18&query=cats").with(headers: { Authorization: 'Client-ID key' })
-        get 'image_search', params: { "query" => 'cats', "per_page" => 18, "page" => 2, "orientation" => 'landscape' }
-        expect(WebMock).to have_requested(:get, "https://api.unsplash.com/search/photos?content_filter=high&page=2&per_page=18&query=cats&orientation=landscape")
-          .with(headers: { Authorization: 'Client-ID key' }).once
-      ensure
-        WebMock::Config.instance.query_values_notation = :subscript
-      end
+      WebMock::Config.instance.query_values_notation = :flat_array
+      stub_request(:get, "https://api.unsplash.com/search/photos?page=2&per_page=18&query=cats").with(headers: { Authorization: 'Client-ID key' })
+      get 'image_search', params: { "query" => 'cats', "per_page" => 18, "page" => 2, "orientation" => 'landscape' }
+      expect(WebMock).to have_requested(:get, "https://api.unsplash.com/search/photos?content_filter=high&page=2&per_page=18&query=cats&orientation=landscape")
+        .with(headers: { Authorization: 'Client-ID key' }).once
+    ensure
+      WebMock::Config.instance.query_values_notation = :subscript
     end
   end
 
@@ -108,7 +106,7 @@ describe InternetImageController do
       @plugin.update_attribute(:settings, { access_key: 'key' }.with_indifferent_access)
     end
 
-    before :each do
+    before do
       user_model
       user_session(@user)
     end

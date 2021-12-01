@@ -39,18 +39,18 @@ class AuthenticationProvider::Google < AuthenticationProvider::OpenIDConnect
   end
 
   def self.login_attributes
-    ['sub'.freeze, 'email'.freeze].freeze
+    ['sub', 'email'].freeze
   end
   validates :login_attribute, inclusion: login_attributes
 
   def self.recognized_federated_attributes
     [
-      'email'.freeze,
-      'family_name'.freeze,
-      'given_name'.freeze,
-      'locale'.freeze,
-      'name'.freeze,
-      'sub'.freeze,
+      'email',
+      'family_name',
+      'given_name',
+      'locale',
+      'name',
+      'sub',
     ].freeze
   end
 
@@ -72,7 +72,7 @@ class AuthenticationProvider::Google < AuthenticationProvider::OpenIDConnect
   protected
 
   def userinfo_endpoint
-    "https://www.googleapis.com/oauth2/v3/userinfo".freeze
+    "https://www.googleapis.com/oauth2/v3/userinfo"
   end
 
   def client_options
@@ -91,7 +91,7 @@ class AuthenticationProvider::Google < AuthenticationProvider::OpenIDConnect
 
   def scope
     scopes = []
-    scopes << 'email' if login_attribute == 'email'.freeze ||
+    scopes << 'email' if login_attribute == 'email' ||
                          hosted_domain ||
                          federated_attributes.any? { |(_k, v)| v['attribute'] == 'email' }
     scopes << 'profile' if federated_attributes.any? { |(_k, v)| v['attribute'] == 'name' }
@@ -99,11 +99,11 @@ class AuthenticationProvider::Google < AuthenticationProvider::OpenIDConnect
   end
 
   def authorize_url
-    'https://accounts.google.com/o/oauth2/auth'.freeze
+    'https://accounts.google.com/o/oauth2/auth'
   end
 
   def token_url
-    'https://accounts.google.com/o/oauth2/token'.freeze
+    'https://accounts.google.com/o/oauth2/token'
   end
 
   def hosted_domains

@@ -22,7 +22,7 @@ require 'nokogiri'
 
 module CC::Importer
   class BLTIConverter
-    class CCImportError < Exception; end
+    class CCImportError < RuntimeError; end
     include CC::Importer
 
     def get_blti_resources(manifest)
@@ -134,19 +134,17 @@ module CC::Importer
     end
 
     def check_for_unescaped_url(url)
-      if url =~ /(.*[^\=]*\?*\=)[^\&;]*\=/
+      if url =~ /(.*[^=]*\?*=)[^&;]*=/
         raise CCImportError.new(I18n.t(:invalid_url_in_xml, "Invalid url in xml. Ampersands must be escaped."))
       end
     end
 
     def retrieve_and_convert_blti_url(url)
-      begin
-        response = CanvasHttp.get(url, redirect_limit: 10)
-        config_xml = response.body
-        convert_blti_xml(config_xml)
-      rescue Timeout::Error
-        raise CCImportError.new(I18n.t(:retrieve_timeout, "could not retrieve configuration, the server response timed out"))
-      end
+      response = CanvasHttp.get(url, redirect_limit: 10)
+      config_xml = response.body
+      convert_blti_xml(config_xml)
+    rescue Timeout::Error
+      raise CCImportError.new(I18n.t(:retrieve_timeout, "could not retrieve configuration, the server response timed out"))
     end
 
     def get_custom_properties(node)

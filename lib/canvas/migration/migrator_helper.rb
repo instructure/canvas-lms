@@ -32,8 +32,6 @@ module Canvas::Migration
 
     QUIZ_FILE_DIRECTORY = "Quiz Files"
 
-    attr_reader :overview
-
     def self.get_utc_time_from_timestamp(timestamp)
       return nil if timestamp.nil?
 
