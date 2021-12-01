@@ -129,6 +129,19 @@ describe ConferencesController do
       expect(assigns[:js_env][:section_user_ids_map]).to be_truthy
     end
 
+    it "assigns only active sections in the js_env" do
+      @section = @course.course_sections.create!(name: "test section")
+      @section_deleted = @course.course_sections.create!(name: "test section deleted")
+      @section_deleted.destroy
+      @course.reload
+      group(context: @course)
+      user_session(@teacher)
+      get "index", params: { course_id: @course.id }
+
+      expect(@controller.js_env[:sections].include?({ id: @section.id, name: @section.display_name })).to be_truthy
+      expect(@controller.js_env[:sections].include?({ id: @section_deleted.id, name: @section_deleted.display_name })).to be_falsey
+    end
+
     context "sets render_alternatives variable" do
       it "sets to false by default" do
         user_session(@teacher)
