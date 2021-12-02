@@ -18,30 +18,30 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'aws-sdk-sqs'
+require "aws-sdk-sqs"
 
 class BounceNotificationProcessor
   attr_reader :config
 
-  POLL_PARAMS = %i{idle_timeout wait_time_seconds visibility_timeout}.freeze
+  POLL_PARAMS = %i[idle_timeout wait_time_seconds visibility_timeout].freeze
   DEFAULT_CONFIG = {
-    bounce_queue_name: 'canvas_notifications_bounces',
+    bounce_queue_name: "canvas_notifications_bounces",
     idle_timeout: 10
   }.freeze
 
   def self.config
-    ConfigFile.load('bounce_notifications').try(:symbolize_keys).try(:freeze)
+    ConfigFile.load("bounce_notifications").try(:symbolize_keys).try(:freeze)
   end
 
   def self.enabled?
-    !!self.config
+    !!config
   end
 
   def self.process
-    bounce = self.new
-    key = 'bounce_processors_for_region_' + bounce.config[:region].to_s
-    num_of_jobs = Setting.get(key, '0').to_i
-    num_of_jobs.times { self.new.delay(priority: Delayed::LOW_PRIORITY).process }
+    bounce = new
+    key = "bounce_processors_for_region_" + bounce.config[:region].to_s
+    num_of_jobs = Setting.get(key, "0").to_i
+    num_of_jobs.times { new.delay(priority: Delayed::LOW_PRIORITY).process }
     bounce.process
   end
 
@@ -59,7 +59,7 @@ class BounceNotificationProcessor
       if bounce_notification
         process_bounce_notification(bounce_notification)
       else
-        InstStatsd::Statsd.increment('bounce_notification_processor.processed.no_bounce')
+        InstStatsd::Statsd.increment("bounce_notification_processor.processed.no_bounce")
       end
 
       # this job gets scheduled every 5 minutes and then can queue additional
@@ -80,17 +80,17 @@ class BounceNotificationProcessor
 
   def parse_message(message)
     sqs_body = JSON.parse(message.body)
-    sns_body = JSON.parse(sqs_body['Message'])
-    sns_body['bounce']
+    sns_body = JSON.parse(sqs_body["Message"])
+    sns_body["bounce"]
   end
 
   def process_bounce_notification(bounce_notification)
     type = if is_suppression_bounce?(bounce_notification)
-             'suppression'
+             "suppression"
            elsif is_permanent_bounce?(bounce_notification)
-             'permanent'
+             "permanent"
            else
-             'transient'
+             "transient"
            end
     InstStatsd::Statsd.increment("bounce_notification_processor.processed.#{type}")
 
@@ -125,18 +125,18 @@ class BounceNotificationProcessor
   end
 
   def is_permanent_bounce?(bounce)
-    bounce['bounceType'] == 'Permanent'
+    bounce["bounceType"] == "Permanent"
   end
 
   def is_suppression_bounce?(bounce)
-    bounce['bounceSubType'] == 'Suppressed'
+    bounce["bounceSubType"] == "Suppressed"
   end
 
   def bounce_timestamp(bounce)
-    bounce['timestamp']
+    bounce["timestamp"]
   end
 
   def bouncy_addresses(bounce)
-    bounce['bouncedRecipients'].map { |r| r['emailAddress'] }
+    bounce["bouncedRecipients"].map { |r| r["emailAddress"] }
   end
 end

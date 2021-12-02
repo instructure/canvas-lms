@@ -51,7 +51,7 @@ describe EnrollmentTerm do
     end
   end
 
-  describe 'computation of course scores when updating the enrollment term' do
+  describe "computation of course scores when updating the enrollment term" do
     before(:once) do
       @root_account = Account.create!
       @term = @root_account.enrollment_terms.create!
@@ -59,23 +59,23 @@ describe EnrollmentTerm do
       @grading_period_set = @root_account.grading_period_groups.create!
     end
 
-    it 'recomputes course scores if the grading period set is changed' do
+    it "recomputes course scores if the grading period set is changed" do
       expect(Enrollment).to receive(:recompute_final_score).once
       @term.update!(grading_period_group_id: @grading_period_set)
     end
 
-    it 'does not recompute course scores if the grading period set is not changed' do
+    it "does not recompute course scores if the grading period set is not changed" do
       expect(Enrollment).not_to receive(:recompute_final_score)
-      @term.update!(name: 'The Best Term')
+      @term.update!(name: "The Best Term")
     end
 
-    it 'runs recompute jobs in an n-strand stranded by the enrollment term global ID' do
+    it "runs recompute jobs in an n-strand stranded by the enrollment term global ID" do
       delayed_job_args = {
         n_strand: "EnrollmentTerm#recompute_scores_for_batch:EnrollmentTerm:#{@term.global_id}",
         priority: Delayed::LOW_PRIORITY
       }
 
-      fake_term = double()
+      fake_term = double
       expect(@term).to receive(:delay_if_production).with(**delayed_job_args).and_return(fake_term)
       expect(fake_term).to receive(:recompute_scores_for_batch)
 
@@ -88,7 +88,7 @@ describe EnrollmentTerm do
     term = @account.default_enrollment_term
 
     translations = {
-      :'en-BACKW' => {
+      "en-BACKW": {
         account: {
           default_term_name: "mreT tluafeD"
         }
@@ -96,7 +96,7 @@ describe EnrollmentTerm do
     }
 
     I18n.backend.stub(translations) do
-      I18n.locale = 'en-BACKW'
+      I18n.locale = "en-BACKW"
 
       expect(term.name).to eq "mreT tluafeD"
       expect(term.read_attribute(:name)).to eq EnrollmentTerm::DEFAULT_TERM_NAME
@@ -115,22 +115,22 @@ describe EnrollmentTerm do
     end
 
     it "returns the dates for a single enrollment" do
-      @term.set_overrides(@account, 'StudentEnrollment' => { start_at: '2014-12-01', end_at: '2014-12-31' })
+      @term.set_overrides(@account, "StudentEnrollment" => { start_at: "2014-12-01", end_at: "2014-12-31" })
       enrollment = student_in_course
-      expect(@term.overridden_term_dates([enrollment])).to eq([Date.parse('2014-12-01'), Date.parse('2014-12-31')])
+      expect(@term.overridden_term_dates([enrollment])).to eq([Date.parse("2014-12-01"), Date.parse("2014-12-31")])
     end
 
     it "returns the most favorable dates given multiple enrollments" do
-      @term.set_overrides(@account, 'StudentEnrollment' => { start_at: '2014-12-01', end_at: '2015-01-31' },
-                                    'ObserverEnrollment' => { start_at: '2014-11-01', end_at: '2014-12-31' })
+      @term.set_overrides(@account, "StudentEnrollment" => { start_at: "2014-12-01", end_at: "2015-01-31" },
+                                    "ObserverEnrollment" => { start_at: "2014-11-01", end_at: "2014-12-31" })
       student_enrollment = student_in_course
-      observer_enrollment = @course.enroll_user(student_enrollment.user, 'ObserverEnrollment')
-      expect(@term.overridden_term_dates([student_enrollment, observer_enrollment])).to eq([Date.parse('2014-11-01'), Date.parse('2015-01-31')])
+      observer_enrollment = @course.enroll_user(student_enrollment.user, "ObserverEnrollment")
+      expect(@term.overridden_term_dates([student_enrollment, observer_enrollment])).to eq([Date.parse("2014-11-01"), Date.parse("2015-01-31")])
     end
 
     it "prioritizes nil (unrestricted) dates if present" do
-      @term.set_overrides(@account, 'StudentEnrollment' => { start_at: '2014-12-01', end_at: nil },
-                                    'TaEnrollment' => { start_at: nil, end_at: '2014-12-31' })
+      @term.set_overrides(@account, "StudentEnrollment" => { start_at: "2014-12-01", end_at: nil },
+                                    "TaEnrollment" => { start_at: nil, end_at: "2014-12-31" })
       student_enrollment = student_in_course
       ta_enrollment = course_with_ta course: @course, user: student_enrollment.user
       expect(@term.overridden_term_dates([student_enrollment, ta_enrollment])).to eq([nil, nil])
@@ -292,7 +292,7 @@ describe EnrollmentTerm do
     end
   end
 
-  describe '#recompute_course_scores_later' do
+  describe "#recompute_course_scores_later" do
     def course_with_graded_assignment(account:, teacher:, student:, term: nil, due:, grade:)
       course_opts = term ? { enrollment_term: term } : {}
       course = account.courses.create!(course_opts)
@@ -311,7 +311,7 @@ describe EnrollmentTerm do
       @grading_period_set = root_account.grading_period_groups.create!(weighted: true)
       @grading_period_set.enrollment_terms << @term
       @grading_period = @grading_period_set.grading_periods.create!(
-        title: 'A Grading Period',
+        title: "A Grading Period",
         start_date: 1.week.from_now(@now),
         end_date: 3.weeks.from_now(@now),
         weight: 100.0
@@ -333,26 +333,26 @@ describe EnrollmentTerm do
       )
     end
 
-    it 'runs recompute jobs in an n-strand stranded by the enrollment term global ID' do
+    it "runs recompute jobs in an n-strand stranded by the enrollment term global ID" do
       delayed_job_args = {
         n_strand: "EnrollmentTerm#recompute_scores_for_batch:EnrollmentTerm:#{@term.global_id}",
         priority: Delayed::LOW_PRIORITY
       }
 
-      fake_term = double()
+      fake_term = double
       expect(@term).to receive(:delay_if_production).with(**delayed_job_args).and_return(fake_term)
       expect(fake_term).to receive(:recompute_scores_for_batch)
 
       @term.recompute_course_scores_later
     end
 
-    it 'runs recompute jobs in an n-strand stranded by the grading period group global ID, if passed one' do
+    it "runs recompute jobs in an n-strand stranded by the grading period group global ID, if passed one" do
       delayed_job_args = {
         n_strand: "EnrollmentTerm#recompute_scores_for_batch:GradingPeriodGroup:#{@grading_period_set.global_id}",
         priority: Delayed::LOW_PRIORITY
       }
 
-      fake_term = double()
+      fake_term = double
       expect(@term).to receive(:delay_if_production).with(**delayed_job_args).and_return(fake_term)
       expect(fake_term).to receive(:recompute_scores_for_batch)
 
@@ -360,7 +360,7 @@ describe EnrollmentTerm do
       @term.recompute_course_scores_later(strand_identifier: strand_identifier)
     end
 
-    it 'recomputes scores for all courses in the enrollment term' do
+    it "recomputes scores for all courses in the enrollment term" do
       # update_columns to avoid triggering EnrollmentTerm#recompute_course_scores_later
       @grading_period.update_columns(start_date: 1.week.ago(@now))
       expect { @term.recompute_course_scores_later }.to change {
@@ -371,7 +371,7 @@ describe EnrollmentTerm do
                                                         }.from([nil, nil]).to([80.0, 50.0])
     end
 
-    it 'does not recomputes scores for courses not in the enrollment term' do
+    it "does not recomputes scores for courses not in the enrollment term" do
       # update_columns to avoid triggering EnrollmentTerm#recompute_course_scores_later
       @grading_period.update_columns(start_date: 1.week.ago(@now))
       expect { @term.recompute_course_scores_later }.not_to change {
@@ -380,7 +380,7 @@ describe EnrollmentTerm do
                                                             }
     end
 
-    it 're-caches due dates on submissions in courses in the enrollment term' do
+    it "re-caches due dates on submissions in courses in the enrollment term" do
       new_due_date = 2.weeks.from_now(@now)
       # update_all to avoid triggering DueDateCacher#recompute
       Assignment.where(id: [@first_course_assignment, @second_course_assignment, @not_in_term_assignment])
@@ -393,7 +393,7 @@ describe EnrollmentTerm do
                                                         }.from([@now, @now]).to([new_due_date, new_due_date])
     end
 
-    it 'does not re-cache due dates for courses not in the enrollment term' do
+    it "does not re-cache due dates for courses not in the enrollment term" do
       new_due_date = 2.weeks.from_now(@now)
       # update_all to avoid triggering DueDateCacher#recompute
       Assignment.where(id: [@first_course_assignment, @second_course_assignment, @not_in_term_assignment])
@@ -404,7 +404,7 @@ describe EnrollmentTerm do
                                                             }
     end
 
-    it 're-caches grading period IDs on submissions in courses in the enrollment term' do
+    it "re-caches grading period IDs on submissions in courses in the enrollment term" do
       new_due_date = 2.weeks.from_now(@now)
       # update_all to avoid triggering DueDateCacher#recompute
       Assignment.where(id: [@first_course_assignment, @second_course_assignment, @not_in_term_assignment])
@@ -417,7 +417,7 @@ describe EnrollmentTerm do
                                                         }.from([nil, nil]).to([@grading_period.id, @grading_period.id])
     end
 
-    it 'does not re-cache grading period IDs on submissions in courses not in the enrollment term' do
+    it "does not re-cache grading period IDs on submissions in courses not in the enrollment term" do
       new_due_date = 2.weeks.from_now(@now)
       # update_all to avoid triggering DueDateCacher#recompute
       Assignment.where(id: [@first_course_assignment, @second_course_assignment, @not_in_term_assignment])

@@ -30,13 +30,13 @@ module Quizzes::QuizRegrader
 
     def regrade!
       regrade = quiz.current_regrade
-      return true unless regrade && question_regrades.size > 0
+      return true unless regrade && !question_regrades.empty?
 
       Quizzes::QuizRegradeRun.perform(regrade) do
         submissions.each do |submission|
           Quizzes::QuizRegrader::Submission.new(
-            :submission => submission,
-            :question_regrades => question_regrades
+            submission: submission,
+            question_regrades: question_regrades
           ).regrade!
         end
       end
@@ -67,9 +67,7 @@ module Quizzes::QuizRegrader
 
     # quiz question regrades keyed by question id
     def question_regrades
-      @questions ||= @quiz.current_quiz_question_regrades.each_with_object({}) do |qr, hash|
-        hash[qr.quiz_question_id] = qr
-      end
+      @questions ||= @quiz.current_quiz_question_regrades.index_by(&:quiz_question_id)
     end
   end
 end

@@ -17,20 +17,20 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../../common'
+require_relative "../../common"
 
 module CalendarPage
   #------------------------- Selectors --------------------------
   def create_new_event_btn_selector
-    '#create_new_event_link'
+    "#create_new_event_link"
   end
 
   def edit_event_title_input_selector
-    '#edit_calendar_event_form #calendar_event_title'
+    "#edit_calendar_event_form #calendar_event_title"
   end
 
   def edit_event_modal_submit_btn_selector
-    '#edit_calendar_event_form button.event_button'
+    "#edit_calendar_event_form button.event_button"
   end
 
   #------------------------- Elements ---------------------------

@@ -37,18 +37,18 @@ module CC::Exporter::Epub::Converters
     def convert_object_paths!(html_node)
       html_node.tap do |node|
         node.search(object_path_selector).each do |tag|
-          tag['href'] = href_for_tag(tag)
-          replace_missing_content!(tag) unless tag['href'].present?
+          tag["href"] = href_for_tag(tag)
+          replace_missing_content!(tag) unless tag["href"].present?
         end
       end
     end
 
     def href_for_tag(tag)
-      match = tag['href'].match(/([a-z]+)\/(.+)/)
+      match = tag["href"].match(%r{([a-z]+)/(.+)})
       return nil unless match.present?
 
       if sort_by_content
-        match[1].include?('module') ? nil : "#{match[1]}.xhtml##{match[2]}"
+        match[1].include?("module") ? nil : "#{match[1]}.xhtml##{match[2]}"
       else
         item = get_item(match[1], match[2])
         item[:href]
@@ -56,23 +56,23 @@ module CC::Exporter::Epub::Converters
     end
 
     def replace_missing_content!(tag)
-      tag.replace(<<-SPAN)
+      tag.replace(<<~HTML)
         <span>
           #{tag.content}
-          #{I18n.t(<<-TEXT)
+          #{I18n.t(<<~TEXT)
             (Link has been removed because content is not present or cannot be resolved.)
           TEXT
           }
         </span>
-      SPAN
+      HTML
     end
 
     def object_path_selector
-      return [
+      [
         "a", [
-          "[href*='#{OBJECT_TOKEN.gsub('$', '')}']",
-          "[href*='#{WIKI_TOKEN.gsub('$', '')}']"
-        ].join(',')
+          "[href*='#{OBJECT_TOKEN.delete("$")}']",
+          "[href*='#{WIKI_TOKEN.delete("$")}']"
+        ].join(",")
       ].join
     end
 

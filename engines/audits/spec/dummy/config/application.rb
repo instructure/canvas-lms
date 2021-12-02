@@ -17,10 +17,10 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-require File.expand_path('../boot', __FILE__)
+require_relative "boot"
 
 # Pick the frameworks you want:
-require 'active_record/railtie'
+require "active_record/railtie"
 # require 'action_controller/railtie'
 # require 'action_mailer/railtie'
 # require "action_view/railtie"
@@ -30,13 +30,13 @@ require 'active_record/railtie'
 Bundler.require(*Rails.groups)
 
 # require the engine under test
-require 'audits'
+require "audits"
 
 module Dummy
   class Application < Rails::Application
     # config.secret_key_base = ENV['SECRET_KEY_BASE']
     # config.action_mailer.default_options = {from: 'audit_engine@instructure.com'}
-    config.domain = 'http://test.host'
+    config.domain = "http://test.host"
   end
 end
 

@@ -35,33 +35,33 @@ describe IncomingMail::MessageHandler do
   end
   let_once(:user) do
     user_model
-    communication_channel(@user, { username: 'lucy@example.com', active_cc: true })
+    communication_channel(@user, { username: "lucy@example.com", active_cc: true })
     @user
   end
   let(:context) { double("context", reply_from: nil) }
 
-  let(:original_message_attributes) {
+  let(:original_message_attributes) do
     {
-      :notification_id => 1,
-      :shard => shard,
-      :context => context,
-      :user => user,
-      :global_id => 1,
-      :to => "lucy@example.com"
+      notification_id: 1,
+      shard: shard,
+      context: context,
+      user: user,
+      global_id: 1,
+      to: "lucy@example.com"
     }
-  }
+  end
 
-  let(:incoming_message_attributes) {
+  let(:incoming_message_attributes) do
     {
       subject: "some subject",
       header: {
-        :subject => double("subject", :charset => "utf8")
+        subject: double("subject", charset: "utf8")
       },
       from: ["lucy@example.com"],
       reply_to: ["lucy@example.com"],
       message_id: 1,
     }
-  }
+  end
 
   let(:incoming_message) { double("incoming message", incoming_message_attributes) }
   let(:original_message) { double("original message", original_message_attributes) }
@@ -101,7 +101,7 @@ describe IncomingMail::MessageHandler do
     context "when a reply from error occurs" do
       context "silent failures" do
         it "silently fails on no message notification id" do
-          message = double("original message without notification id", original_message_attributes.merge(:notification_id => nil))
+          message = double("original message without notification id", original_message_attributes.merge(notification_id: nil))
           allow(subject).to receive(:get_original_message).with(original_message_id, timestamp).and_return(message)
           expect(Mailer).not_to receive(:create_message)
           expect(message.context).not_to receive(:reply_from)
@@ -138,12 +138,12 @@ describe IncomingMail::MessageHandler do
           expect(Account.site_admin).to receive(:feature_enabled?).with(:notification_service).and_return(false)
           expect(original_message.context).not_to receive(:reply_from)
           message = double("incoming message with bad from",
-                           incoming_message_attributes.merge(:from => ['not_lucy@example.com'],
-                                                             :reply_to => ['also_not_lucy@example.com']))
+                           incoming_message_attributes.merge(from: ["not_lucy@example.com"],
+                                                             reply_to: ["also_not_lucy@example.com"]))
           subject.handle(outgoing_from_address, body, html_body, message, tag)
         end
 
-        it 'raises BlankMessage for empty message' do
+        it "raises BlankMessage for empty message" do
           message = double("original message without notification id", original_message_attributes)
           allow(subject).to receive(:get_original_message).with(original_message_id, timestamp).and_return(message)
           expect(original_message.context).not_to receive(:reply_from)
@@ -153,22 +153,13 @@ describe IncomingMail::MessageHandler do
 
       context "bounced messages" do
         it "bounces if user is missing" do
-          message = double("original message without user", original_message_attributes.merge(:user => nil))
+          message = double("original message without user", original_message_attributes.merge(user: nil))
           allow(subject).to receive(:get_original_message).with(original_message_id, timestamp).and_return(message)
           expect_any_instance_of(Message).to receive(:deliver)
           subject.handle(outgoing_from_address, body, html_body, incoming_message, tag)
         end
 
         it "bounces the message on invalid context" do
-          message = double("original message with invalid context", original_message_attributes.merge({ context: double("context") }))
-          allow(subject).to receive(:get_original_message).with(original_message_id, timestamp).and_return(message)
-          expect_any_instance_of(Message).to receive(:save)
-          expect_any_instance_of(Message).to receive(:deliver)
-
-          subject.handle(outgoing_from_address, body, html_body, incoming_message, tag)
-        end
-
-        it "saves and delivers the message with proper input" do
           message = double("original message with invalid context", original_message_attributes.merge({ context: double("context") }))
           allow(subject).to receive(:get_original_message).with(original_message_id, timestamp).and_return(message)
           expect_any_instance_of(Message).to receive(:save)
@@ -187,26 +178,26 @@ describe IncomingMail::MessageHandler do
 
         context "with a generic generic_error" do
           it "constructs the message correctly" do
-            message = double("original message without user", original_message_attributes.merge(:context => nil))
+            message = double("original message without user", original_message_attributes.merge(context: nil))
             allow(subject).to receive(:get_original_message).with(original_message_id, timestamp).and_return(message)
 
             email_subject = "Undelivered message"
-            body = <<-BODY.strip_heredoc.strip
-            The message titled "some subject" could not be delivered.  The message was sent to an unknown mailbox address.  If you are trying to contact someone through Canvas you can try logging in to your account and sending them a message using the Inbox tool.
+            body = <<~TEXT.strip_heredoc.strip
+              The message titled "some subject" could not be delivered.  The message was sent to an unknown mailbox address.  If you are trying to contact someone through Canvas you can try logging in to your account and sending them a message using the Inbox tool.
 
-            Thank you,
-            Canvas Support
-            BODY
+              Thank you,
+              Canvas Support
+            TEXT
 
             message_attributes = {
-              :to => "lucy@example.com",
-              :from => "no-reply@example.com",
-              :subject => email_subject,
-              :body => body,
-              :delay_for => 0,
-              :context => nil,
-              :path_type => "email",
-              :from_name => "Instructure",
+              to: "lucy@example.com",
+              from: "no-reply@example.com",
+              subject: email_subject,
+              body: body,
+              delay_for: 0,
+              context: nil,
+              path_type: "email",
+              from_name: "Instructure",
             }
             expected_bounce_message = Message.new(message_attributes)
             expect(Message).to receive(:new).with(message_attributes).and_return(expected_bounce_message)
@@ -222,22 +213,22 @@ describe IncomingMail::MessageHandler do
             expect(context).to receive(:reply_from).and_raise(IncomingMail::Errors::ReplyToLockedTopic.new)
 
             email_subject = "Undelivered message"
-            body = <<-BODY.strip_heredoc.strip
-            The message titled "some subject" could not be delivered because the discussion topic is locked. If you are trying to contact someone through Canvas you can try logging in to your account and sending them a message using the Inbox tool.
+            body = <<~TEXT.strip_heredoc.strip
+              The message titled "some subject" could not be delivered because the discussion topic is locked. If you are trying to contact someone through Canvas you can try logging in to your account and sending them a message using the Inbox tool.
 
-            Thank you,
-            Canvas Support
-            BODY
+              Thank you,
+              Canvas Support
+            TEXT
 
             message_attributes = {
-              :to => "lucy@example.com",
-              :from => "no-reply@example.com",
-              :subject => email_subject,
-              :body => body,
-              :delay_for => 0,
-              :context => nil,
-              :path_type => "email",
-              :from_name => "Instructure",
+              to: "lucy@example.com",
+              from: "no-reply@example.com",
+              subject: email_subject,
+              body: body,
+              delay_for: 0,
+              context: nil,
+              path_type: "email",
+              from_name: "Instructure",
             }
             expected_bounce_message = Message.new(message_attributes)
             expect(Message).to receive(:new).with(message_attributes).and_return(expected_bounce_message)
@@ -253,22 +244,22 @@ describe IncomingMail::MessageHandler do
             expect(context).to receive(:reply_from).and_raise(IncomingMail::Errors::UnknownAddress.new)
 
             email_subject = "Undelivered message"
-            body = <<-BODY.strip_heredoc.strip
-            The message titled "some subject" could not be delivered.  The message was sent to an unknown mailbox address.  If you are trying to contact someone through Canvas you can try logging in to your account and sending them a message using the Inbox tool.
+            body = <<~TEXT.strip_heredoc.strip
+              The message titled "some subject" could not be delivered.  The message was sent to an unknown mailbox address.  If you are trying to contact someone through Canvas you can try logging in to your account and sending them a message using the Inbox tool.
 
-            Thank you,
-            Canvas Support
-            BODY
+              Thank you,
+              Canvas Support
+            TEXT
 
             message_attributes = {
-              :to => "lucy@example.com",
-              :from => "no-reply@example.com",
-              :subject => email_subject,
-              :body => body,
-              :delay_for => 0,
-              :context => nil,
-              :path_type => "email",
-              :from_name => "Instructure",
+              to: "lucy@example.com",
+              from: "no-reply@example.com",
+              subject: email_subject,
+              body: body,
+              delay_for: 0,
+              context: nil,
+              path_type: "email",
+              from_name: "Instructure",
             }
             expected_bounce_message = Message.new(message_attributes)
             expect(Message).to receive(:new).with(message_attributes).and_return(expected_bounce_message)
@@ -286,8 +277,8 @@ describe IncomingMail::MessageHandler do
             expect(Mailer).to receive(:create_message)
 
             message = double("incoming message with bad from",
-                             incoming_message_attributes.merge(:from => ['not_lucy@example.com'],
-                                                               :reply_to => ['also_not_lucy@example.com']))
+                             incoming_message_attributes.merge(from: ["not_lucy@example.com"],
+                                                               reply_to: ["also_not_lucy@example.com"]))
             subject.handle(outgoing_from_address, body, html_body, message, tag)
           end
         end

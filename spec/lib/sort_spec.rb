@@ -60,7 +60,7 @@ describe "CanvasSort::First" do
   end
 
   it "sorts with a few strings" do
-    expect([CanvasSort::Last, 'a', CanvasSort::First, 'b'].sort).to eq [CanvasSort::First, 'a', 'b', CanvasSort::Last]
+    expect([CanvasSort::Last, "a", CanvasSort::First, "b"].sort).to eq [CanvasSort::First, "a", "b", CanvasSort::Last]
   end
 
   it "sorts with a few numbers" do

@@ -18,17 +18,17 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../graphql_spec_helper'
+require_relative "../graphql_spec_helper"
 
 RSpec.describe Mutations::UpdateDiscussionEntry do
   before(:once) do
     course_with_teacher(active_all: true)
     student_in_course(active_all: true)
     discussion_topic_model({ context: @course })
-    @root_entry = @topic.discussion_entries.create!(message: 'I am root', user: @student)
-    @parent_entry = @topic.discussion_entries.create!(message: 'I am parent', user: @student, parent_id: @root_entry.id)
-    @child_entry = @topic.discussion_entries.create!(message: 'I am child', user: @student, parent_id: @parent_entry.id)
-    @topic.update!(discussion_type: 'threaded')
+    @root_entry = @topic.discussion_entries.create!(message: "I am root", user: @student)
+    @parent_entry = @topic.discussion_entries.create!(message: "I am parent", user: @student, parent_id: @root_entry.id)
+    @child_entry = @topic.discussion_entries.create!(message: "I am child", user: @student, parent_id: @parent_entry.id)
+    @topic.update!(discussion_type: "threaded")
   end
 
   def mutation_str(
@@ -43,7 +43,7 @@ RSpec.describe Mutations::UpdateDiscussionEntry do
         }) {
           discussionEntry {
             _id
-            entryParticipant {#{' '}
+            entryParticipant {#{" "}
               read
             }
           }
@@ -67,11 +67,11 @@ RSpec.describe Mutations::UpdateDiscussionEntry do
     result.to_h.with_indifferent_access
   end
 
-  it 'updates a discussion entry and its childred\'s read state' do
+  it "updates a discussion entry and its childred's read state" do
     expect(@root_entry.discussion_topic.unread_count(@student)).to eq 0
     result = run_mutation(discussion_entry_id: @root_entry.id, read: false)
     expect(@root_entry.discussion_topic.unread_count(@student)).to eq 3
-    expect(result.dig('errors')).to be nil
+    expect(result["errors"]).to be nil
     expect(@root_entry.reload.read?(@student)).to eq false
     expect(@root_entry.find_existing_participant(@student).forced_read_state).to be true
     expect(@parent_entry.reload.read?(@student)).to eq false
@@ -80,7 +80,7 @@ RSpec.describe Mutations::UpdateDiscussionEntry do
     expect(@child_entry.find_existing_participant(@student).forced_read_state).to be true
     result = run_mutation(discussion_entry_id: @root_entry.id, read: true)
     expect(@root_entry.discussion_topic.unread_count(@student)).to eq 0
-    expect(result.dig('errors')).to be nil
+    expect(result["errors"]).to be nil
     expect(@root_entry.reload.read?(@student)).to eq true
     expect(@parent_entry.reload.read?(@student)).to eq true
     expect(@child_entry.reload.read?(@student)).to eq true

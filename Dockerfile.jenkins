@@ -79,16 +79,3 @@ RUN if [ -e /var/lib/gems/$RUBY_MAJOR.0/gems/bundler-* ]; then BUNDLER_INSTALL="
 RUN npm install -g npm@latest && npm cache clean --force
 
 USER docker
-
-COPY --chown=docker:docker --from=local/cache-helper-collect-gems /tmp/dst ${APP_HOME}
-
-RUN set -eux; \
-  \
-  # set up bundle config options \
-  bundle config --global build.nokogiri --use-system-libraries \
-  && bundle config --global build.ffi --enable-system-libffi \
-  && mkdir -p \
-    /home/docker/.bundle \
-  # TODO: --without development \
-  && bundle install --jobs $(nproc) \
-  && rm -rf $GEM_HOME/cache

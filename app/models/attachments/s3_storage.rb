@@ -28,9 +28,7 @@ class Attachments::S3Storage
     @attachment = attachment
   end
 
-  def bucket
-    attachment.bucket
-  end
+  delegate :bucket, to: :attachment
 
   def exists?
     attachment.s3object.exists?
@@ -42,8 +40,8 @@ class Attachments::S3Storage
     # so there's a bit of a cost here
     return if attachment.instfs_hosted?
 
-    if !exists?
-      if !attachment.size
+    unless exists?
+      unless attachment.size
         attachment.size = bucket.object(old_full_filename).content_length
       end
       options = { acl: attachment.attachment_options[:s3_access] }
@@ -57,17 +55,17 @@ class Attachments::S3Storage
 
   def initialize_ajax_upload_params(_local_upload_url, s3_success_url, options)
     {
-      :upload_url => bucket.url,
-      :file_param => 'file',
-      :success_url => s3_success_url,
-      :upload_params => cred_params(options[:datetime])
+      upload_url: bucket.url,
+      file_param: "file",
+      success_url: s3_success_url,
+      upload_params: cred_params(options[:datetime])
     }
   end
 
   def amend_policy_conditions(policy, datetime:)
-    policy['conditions'].unshift({ 'bucket' => bucket.name })
+    policy["conditions"].unshift({ "bucket" => bucket.name })
     cred_params(datetime).each do |k, v|
-      policy['conditions'] << { k => v }
+      policy["conditions"] << { k => v }
     end
     policy
   end
@@ -78,15 +76,15 @@ class Attachments::S3Storage
     region = bucket.client.config.region
     credential = "#{access_key}/#{day_string}/#{region}/s3/aws4_request"
     {
-      'x-amz-credential' => credential,
-      'x-amz-algorithm' => "AWS4-HMAC-SHA256",
-      'x-amz-date' => datetime
+      "x-amz-credential" => credential,
+      "x-amz-algorithm" => "AWS4-HMAC-SHA256",
+      "x-amz-date" => datetime
     }
   end
 
   def shared_secret(datetime)
     config = bucket.client.config
-    sha256 = OpenSSL::Digest.new('SHA256')
+    sha256 = OpenSSL::Digest.new("SHA256")
     date_key = OpenSSL::HMAC.digest(sha256, "AWS4#{config.secret_access_key}", datetime[0, 8])
     date_region_key = OpenSSL::HMAC.digest(sha256, date_key, config.region)
     date_region_service_key = OpenSSL::HMAC.digest(sha256, date_region_key, "s3")
@@ -95,9 +93,9 @@ class Attachments::S3Storage
 
   def sign_policy(policy_encoded, datetime)
     signature = OpenSSL::HMAC.hexdigest(
-      OpenSSL::Digest.new('sha256'), shared_secret(datetime), policy_encoded
+      OpenSSL::Digest.new("sha256"), shared_secret(datetime), policy_encoded
     )
-    ['x-amz-signature', signature]
+    ["x-amz-signature", signature]
   end
 
   def open(opts)
@@ -114,11 +112,11 @@ class Attachments::S3Storage
     end
 
     if block_given?
-      File.open(tempfile.path, 'rb') do |file|
-        chunk = file.read(64000)
+      File.open(tempfile.path, "rb") do |file|
+        chunk = file.read(64_000)
         while chunk
           yield chunk
-          chunk = file.read(64000)
+          chunk = file.read(64_000)
         end
       end
     end

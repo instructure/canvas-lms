@@ -29,9 +29,9 @@ module CC
         rubrics_file = nil
         rel_path = nil
       else
-        rubrics_file = File.new(File.join(@canvas_resource_dir, CCHelper::RUBRICS), 'w')
+        rubrics_file = File.new(File.join(@canvas_resource_dir, CCHelper::RUBRICS), "w")
         rel_path = File.join(CCHelper::COURSE_SETTINGS_DIR, CCHelper::RUBRICS)
-        document = Builder::XmlMarkup.new(:target => rubrics_file, :indent => 2)
+        document = Builder::XmlMarkup.new(target: rubrics_file, indent: 2)
       end
 
       document.instruct!
@@ -44,7 +44,7 @@ module CC
           rubric = assoc.rubric
           next if rubric.nil? || !rubric.active? || imported_rubrics[rubric.id]
 
-          if !export_object?(rubric)
+          unless export_object?(rubric)
             next if assoc.association_type != "Assignment"
 
             assignment = assoc.association_object
@@ -52,25 +52,25 @@ module CC
           end
           imported_rubrics[rubric.id] = true
           rubric.learning_outcome_alignments.each do |align|
-            add_item_to_export(align.learning_outcome, 'learning_outcomes')
+            add_item_to_export(align.learning_outcome, "learning_outcomes")
           end
 
           add_exported_asset(rubric)
 
           migration_id = create_key(rubric)
-          rubrics_node.rubric(:identifier => migration_id) do |r_node|
-            atts = [:read_only, :title, :reusable, :public, :points_possible,
-                    :hide_score_total, :free_form_criterion_comments]
+          rubrics_node.rubric(identifier: migration_id) do |r_node|
+            atts = %i[read_only title reusable public points_possible
+                      hide_score_total free_form_criterion_comments]
             if rubric.context != @course
               r_node.external_identifier rubric.id
             end
             atts.each do |att|
-              r_node.tag!(att, rubric.send(att)) if rubric.send(att) == false || !rubric.send(att).blank?
+              r_node.tag!(att, rubric.send(att)) if rubric.send(att) == false || rubric.send(att).present?
             end
             r_node.description rubric.description if rubric.description
 
             r_node.criteria do |c_node|
-              if rubric.data && rubric.data.length > 0
+              if rubric.data.present?
                 rubric.data.each do |crit|
                   add_criterion(c_node, crit)
                 end
@@ -80,7 +80,7 @@ module CC
         end
       end
 
-      rubrics_file.close if rubrics_file
+      rubrics_file&.close
       rel_path
     end
 
@@ -93,17 +93,15 @@ module CC
         c_node.description criterion[:description]
         c_node.long_description criterion[:long_description] if criterion[:long_description].present?
         c_node.criterion_use_range criterion[:criterion_use_range] if criterion[:criterion_use_range].present?
-        if criterion[:learning_outcome_id].present?
-          if (lo = @course.available_outcome(criterion[:learning_outcome_id]))
-            if lo.context_type == "Course" && lo.context_id == @course.id
-              c_node.learning_outcome_identifierref create_key(lo)
-            else
-              c_node.learning_outcome_external_identifier lo.id
-            end
+        if criterion[:learning_outcome_id].present? && (lo = @course.available_outcome(criterion[:learning_outcome_id]))
+          if lo.context_type == "Course" && lo.context_id == @course.id
+            c_node.learning_outcome_identifierref create_key(lo)
+          else
+            c_node.learning_outcome_external_identifier lo.id
           end
         end
 
-        if criterion[:ratings] && criterion[:ratings].length > 0
+        if criterion[:ratings].present?
           c_node.ratings do |ratings_node|
             criterion[:ratings].each do |rating|
               ratings_node.rating do |rating_node|

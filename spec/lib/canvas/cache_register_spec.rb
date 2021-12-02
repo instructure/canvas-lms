@@ -90,7 +90,7 @@ describe Canvas::CacheRegister do
     context "for a single record" do
       it "updates specified cache types" do
         Timecop.freeze(time1) do
-          [:enrollments, :account_users, :groups].each do |k|
+          %i[enrollments account_users groups].each do |k|
             @user.cache_key(k)
           end
         end
@@ -147,7 +147,7 @@ describe Canvas::CacheRegister do
       end
 
       it "works with a relation" do
-        course_with_teacher(:active_all => true)
+        course_with_teacher(active_all: true)
         Timecop.freeze(time1) do
           @teacher.cache_key(:enrollments)
         end
@@ -219,14 +219,14 @@ describe Canvas::CacheRegister do
         end
 
         it "fails trying to clear things that aren't resolvable by to a global id" do
-          weird_hash = { :what => @users.first }
-          expect {
+          weird_hash = { what: @users.first }
+          expect do
             User.clear_cache_keys(weird_hash, :enrollments)
-          }.to raise_error("invalid argument for cache clearing #{weird_hash.to_a.first}")
+          end.to raise_error("invalid argument for cache clearing #{weird_hash.to_a.first}")
         end
 
         it "works with a multi-shard relation" do
-          User.where(:id => @users.map(&:global_id)).clear_cache_keys(:enrollments)
+          User.where(id: @users.map(&:global_id)).clear_cache_keys(:enrollments)
           Timecop.freeze(time2) do
             @users.each do |u|
               expect(u.cache_key(:enrollments)).to include(to_stamp(time2))
@@ -323,9 +323,9 @@ describe Canvas::CacheRegister do
     end
 
     it "checks the key types" do
-      expect {
+      expect do
         Rails.cache.fetch_with_batched_keys("k", batch_object: @user, batched_keys: :blah) { "v" }
-      }.to raise_error("invalid cache_key type 'blah' for User")
+      end.to raise_error("invalid cache_key type 'blah' for User")
     end
   end
 
@@ -371,7 +371,7 @@ describe Canvas::CacheRegister do
     end
 
     it "passes the object's shard when looking up node for cache_key" do
-      expect(Canvas::CacheRegister).to receive(:redis).with(@base_key, @user.shard, :prefer_multi_cache => false).and_call_original
+      expect(Canvas::CacheRegister).to receive(:redis).with(@base_key, @user.shard, prefer_multi_cache: false).and_call_original
       @user.cache_key(:enrollments)
     end
 
@@ -392,14 +392,14 @@ describe Canvas::CacheRegister do
     it "retrieves multi-cache redis when preferred" do
       allow(Canvas::CacheRegister).to receive(:can_use_multi_cache_redis?).and_return(true)
       mock_redis = double
-      cache = double(:redis => mock_redis)
+      cache = double(redis: mock_redis)
       allow(MultiCache).to receive(:cache).and_return(cache)
       expect(Canvas::CacheRegister.redis("key", Shard.default, prefer_multi_cache: true)).to eq mock_redis
     end
 
     it "prefers multi-cache when retreiving a configured key" do
       base_key = Account.base_cache_register_key_for(Account.default)
-      expect(Canvas::CacheRegister).to receive(:redis).with(base_key, Shard.default, :prefer_multi_cache => true).and_call_original
+      expect(Canvas::CacheRegister).to receive(:redis).with(base_key, Shard.default, prefer_multi_cache: true).and_call_original
       Account.default.cache_key(:feature_flags)
     end
 

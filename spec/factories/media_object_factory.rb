@@ -21,9 +21,9 @@ module Factories
   def media_object(opts = {})
     mo = MediaObject.new
     mo.context = opts[:context] || @course
-    mo.media_id = opts[:media_id] || '1234'
-    mo.media_type = opts[:media_type] || 'video'
-    mo.title = opts[:title] || 'media_title'
+    mo.media_id = opts[:media_id] || "1234"
+    mo.media_type = opts[:media_type] || "video"
+    mo.title = opts[:title] || "media_title"
     mo.user = opts[:user] || @user
     mo.save!
     mo

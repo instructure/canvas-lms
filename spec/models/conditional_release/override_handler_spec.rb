@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../../conditional_release_spec_helper'
+require_relative "../../conditional_release_spec_helper"
 require_dependency "conditional_release/override_handler"
 
 module ConditionalRelease
@@ -27,7 +27,7 @@ module ConditionalRelease
       setup_course_with_native_conditional_release
     end
 
-    context 'handle_grade_change' do
+    context "handle_grade_change" do
       it "checks that the assignment is actually a trigger assignment" do
         @rule.destroy!
         expect(ConditionalRelease::OverrideHandler).to_not receive(:handle_grade_change)
@@ -52,7 +52,7 @@ module ConditionalRelease
 
       it "reuses an existing override when assigning (and leave it be when unassigning)" do
         old_student = @student
-        student_in_course(:course => @course, :active_all => true)
+        student_in_course(course: @course, active_all: true)
         @trigger_assmt.grade_student(old_student, grade: 9, grader: @teacher)
         @trigger_assmt.grade_student(@student, grade: 9, grader: @teacher)
         expect(@set1_assmt1.assignment_overrides.count).to eq 1
@@ -72,7 +72,7 @@ module ConditionalRelease
 
       it "does not accidentally relock an assignment if the same item is in two ranges we're switching between" do
         @set2 = @set2_assmt1.conditional_release_associations.first.assignment_set
-        @set2.assignment_set_associations.create!(:assignment => @set1_assmt1) # add the set1 assignment to set2 for inexplicable reasons
+        @set2.assignment_set_associations.create!(assignment: @set1_assmt1) # add the set1 assignment to set2 for inexplicable reasons
 
         @trigger_assmt.grade_student(@student, grade: 9, grader: @teacher) # should automatically assign to top set
         visible_assmts = DifferentiableAssignment.scope_filter(@course.assignments, @student, @course).to_a
@@ -84,7 +84,7 @@ module ConditionalRelease
       end
     end
 
-    context 'handle_assignment_set_selection' do
+    context "handle_assignment_set_selection" do
       before :once do
         @trigger_assmt.grade_student(@student, grade: 2, grader: @teacher) # set up the choice
         @set_a = @set3a_assmt.conditional_release_associations.first.assignment_set
@@ -94,22 +94,22 @@ module ConditionalRelease
 
       it "checks that a rule exists for the assignment" do
         @rule.destroy!
-        expect {
+        expect do
           ConditionalRelease::OverrideHandler.handle_assignment_set_selection(@student, @trigger_assmt, @set_a.id)
-        }.to raise_error(ActiveRecord::RecordNotFound)
+        end.to raise_error(ActiveRecord::RecordNotFound)
       end
 
       it "checks that the submission is actually graded" do
-        Submission.where(:id => @sub).update_all(:posted_at => nil)
-        expect {
+        Submission.where(id: @sub).update_all(posted_at: nil)
+        expect do
           ConditionalRelease::OverrideHandler.handle_assignment_set_selection(@student, @trigger_assmt, @set_a.id)
-        }.to raise_error(ActiveRecord::RecordNotFound)
+        end.to raise_error(ActiveRecord::RecordNotFound)
       end
 
       it "checks that the assignment set is valid for the submissions core" do
-        expect {
+        expect do
           ConditionalRelease::OverrideHandler.handle_assignment_set_selection(@student, @trigger_assmt, @invalid_set.id)
-        }.to raise_error(ActiveRecord::RecordNotFound)
+        end.to raise_error(ActiveRecord::RecordNotFound)
       end
 
       it "creates the assignment override" do
@@ -131,7 +131,7 @@ module ConditionalRelease
       it "reuses an existing override when assigning (and leave it be when unassigning)" do
         old_student = @student
         ConditionalRelease::OverrideHandler.handle_assignment_set_selection(old_student, @trigger_assmt, @set_a.id)
-        student_in_course(:course => @course, :active_all => true)
+        student_in_course(course: @course, active_all: true)
         @trigger_assmt.grade_student(@student, grade: 3, grader: @teacher)
         ConditionalRelease::OverrideHandler.handle_assignment_set_selection(@student, @trigger_assmt, @set_a.id)
 

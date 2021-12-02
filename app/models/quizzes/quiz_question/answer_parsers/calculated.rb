@@ -25,7 +25,7 @@ module Quizzes::QuizQuestion::AnswerParsers
       question[:variables] = parse_variables(question[:variables])
 
       @answers.map_with_group! do |answer_group, answer|
-        answer_params = { :weight => 100, :variables => [] }
+        answer_params = { weight: 100, variables: [] }
         answer_params[:answer] = answer[:answer_text].to_f
 
         variables = hash_to_array(answer[:variables])
@@ -34,8 +34,8 @@ module Quizzes::QuizQuestion::AnswerParsers
           name = variable.fetch_with_enforced_length(:name)
 
           answer_params[:variables] << {
-            :name => name,
-            :value => format_value(variable.fetch_any(:value).to_f, @scale_lookup_dictionary[name])
+            name: name,
+            value: format_value(variable.fetch_any(:value).to_f, @scale_lookup_dictionary[name])
           }
         end
 
@@ -95,7 +95,7 @@ module Quizzes::QuizQuestion::AnswerParsers
     end
 
     def trim_padding(n)
-      n.to_s[9..-1].to_i
+      n.to_s[9..].to_i
     end
   end
 end

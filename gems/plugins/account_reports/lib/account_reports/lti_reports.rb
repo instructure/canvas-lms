@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'account_reports/report_helper'
+require "account_reports/report_helper"
 
 module AccountReports
   class LtiReports
@@ -31,16 +31,16 @@ module AccountReports
     end
 
     def lti_report
-      headers = ['context_type', 'context_id', 'account_name', 'course_name', 'tool_type_name',
-                 'tool_type_id', 'tool_created_at', 'privacy_level', 'launch_url', 'custom_fields']
+      headers = %w[context_type context_id account_name course_name tool_type_name
+                   tool_type_id tool_created_at privacy_level launch_url custom_fields]
 
       write_report headers do |csv|
         courses = add_course_sub_account_scope(root_account.all_courses).joins(:account).select(:id)
 
         if @include_deleted
-          course_join_condition = account_join_condition = ''
+          course_join_condition = account_join_condition = ""
         else
-          courses = courses.active.where.not(accounts: { workflow_state: 'deleted' })
+          courses = courses.active.where.not(accounts: { workflow_state: "deleted" })
           course_join_condition = "AND courses.workflow_state<>'deleted'"
           account_join_condition = "AND accounts.workflow_state<>'deleted'"
         end

@@ -38,7 +38,7 @@ describe Quizzes::QuizQuestionRegrade do
   describe "#question_data" do
     it "delegates to quiz question" do
       question = Quizzes::QuizQuestion.new
-      allow(question).to receive_messages(:question_data => "foo")
+      allow(question).to receive_messages(question_data: "foo")
 
       qq_regrade = Quizzes::QuizQuestionRegrade.new
       qq_regrade.quiz_question = question

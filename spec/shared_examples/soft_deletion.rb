@@ -113,7 +113,7 @@ shared_examples "has_one soft deletion" do
 
     it "marks deleted object workflow_state as deleted" do
       subject.destroy
-      expect(subject.workflow_state).to eq 'deleted'
+      expect(subject.workflow_state).to eq "deleted"
     end
 
     it "calls save!" do

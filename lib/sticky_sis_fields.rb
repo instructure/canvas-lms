@@ -29,7 +29,7 @@ module StickySisFields
                                      calculate_currently_stuck_sis_fields
                                    end
       if load_stuck_sis_fields_cache != currently_stuck_sis_fields
-        write_attribute(:stuck_sis_fields, currently_stuck_sis_fields.map(&:to_s).sort.join(','))
+        write_attribute(:stuck_sis_fields, currently_stuck_sis_fields.map(&:to_s).sort.join(","))
       end
       @stuck_sis_fields_cache = currently_stuck_sis_fields
       @sis_fields_to_stick = [].to_set
@@ -40,9 +40,9 @@ module StickySisFields
     def stuck_sis_fields
       self.class.sis_stickiness_options ||= {}
       if self.class.sis_stickiness_options[:override_sis_stickiness]
-        return [].to_set
+        [].to_set
       else
-        return calculate_currently_stuck_sis_fields
+        calculate_currently_stuck_sis_fields
       end
     end
 
@@ -80,14 +80,14 @@ module StickySisFields
     private
 
     def load_stuck_sis_fields_cache
-      @stuck_sis_fields_cache ||= (read_attribute(:stuck_sis_fields) || '').split(',').map(&:to_sym).to_set
+      @stuck_sis_fields_cache ||= (read_attribute(:stuck_sis_fields) || "").split(",").map(&:to_sym).to_set
     end
 
     def calculate_currently_stuck_sis_fields
       @sis_fields_to_stick ||= [].to_set
       @sis_fields_to_unstick ||= [].to_set
-      changed_sis_fields = self.class.sticky_sis_fields & (self.changed.map(&:to_sym).to_set | @sis_fields_to_stick)
-      return (load_stuck_sis_fields_cache | changed_sis_fields) - @sis_fields_to_unstick
+      changed_sis_fields = self.class.sticky_sis_fields & (changed.map(&:to_sym).to_set | @sis_fields_to_stick)
+      (load_stuck_sis_fields_cache | changed_sis_fields) - @sis_fields_to_unstick
     end
   end
 
@@ -111,7 +111,7 @@ module StickySisFields
     #   clear_sis_stickiness: default false,
     #       if true, the set_sis_stickiness callback is enabled and configured
     #       to write out an empty stickiness list on every save.
-    def process_as_sis(opts = {})
+    def process_as_sis(opts = {}, &block)
       self.sis_stickiness_options ||= {}
       old_options = self.sis_stickiness_options.clone
       self.sis_stickiness_options = opts
@@ -119,9 +119,7 @@ module StickySisFields
         if opts[:add_sis_stickiness] || opts[:clear_sis_stickiness]
           yield
         else
-          self.suspend_callbacks(:set_sis_stickiness) do
-            yield
-          end
+          suspend_callbacks(:set_sis_stickiness, &block)
         end
       ensure
         self.sis_stickiness_options = old_options

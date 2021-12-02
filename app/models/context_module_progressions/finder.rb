@@ -21,7 +21,7 @@
 module ContextModuleProgressions
   class Finder
     def self.find_or_create_for_context_and_user(context, user)
-      modules = context.context_modules.where(workflow_state: 'active').to_a
+      modules = context.context_modules.where(workflow_state: "active").to_a
 
       existing_progressions = ContextModuleProgression
                               .where(user_id: user)
@@ -29,11 +29,11 @@ module ContextModuleProgressions
                               .index_by(&:context_module_id)
 
       modules.map do |mod|
-        if existing_progressions.include?(mod.id)
-          progression = existing_progressions[mod.id]
-        else
-          progression = create_module_progression(mod, user)
-        end
+        progression = if existing_progressions.include?(mod.id)
+                        existing_progressions[mod.id]
+                      else
+                        create_module_progression(mod, user)
+                      end
         progression.context_module = mod
         progression
       end

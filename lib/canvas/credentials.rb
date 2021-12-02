@@ -50,7 +50,7 @@ module Canvas
 
     # Don't cache in redis since we are memoizing it in process memory too
     def vault_secrets
-      Canvas::Vault.read(Canvas::Vault.kv_mount + '/data/secrets', required: false, cache: false)&.[](:data) || {}
+      Canvas::Vault.read(Canvas::Vault.kv_mount + "/data/secrets", required: false, cache: false)&.[](:data) || {}
     end
   end
 end

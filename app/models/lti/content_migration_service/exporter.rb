@@ -43,12 +43,12 @@ module Lti
         end
         if response.code.to_i == 200
           parsed_response = JSON.parse(response.body)
-          @export_status = parsed_response['status']
+          @export_status = parsed_response["status"]
           case @export_status
           when SUCCESSFUL_STATUS
             true
           when FAILED_STATUS
-            raise parsed_response['message']
+            raise parsed_response["message"]
           else
             false
           end
@@ -78,7 +78,7 @@ module Lti
         response = Canvas.retriable(on: Timeout::Error) do
           case export_format
           when JSON_FORMAT
-            CanvasHttp.post(export_start_url, base_request_headers, body: start_export_post_body.to_json, content_type: 'application/json')
+            CanvasHttp.post(export_start_url, base_request_headers, body: start_export_post_body.to_json, content_type: "application/json")
           else
             CanvasHttp.post(export_start_url, base_request_headers, form_data: Rack::Utils.build_nested_query(start_export_post_body))
           end
@@ -87,8 +87,8 @@ module Lti
         when (200..201)
           parsed_response = JSON.parse(response.body)
           unless parsed_response.empty?
-            @status_url = parsed_response['status_url']
-            @fetch_url = parsed_response['fetch_url']
+            @status_url = parsed_response["status_url"]
+            @fetch_url = parsed_response["fetch_url"]
           end
         end
       rescue JSON::JSONError, Timeout::Error

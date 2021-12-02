@@ -17,9 +17,9 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../../common'
-require_relative '../../grades/pages/gradebook_page'
-require_relative '../../grades/pages/speedgrader_page'
+require_relative "../../common"
+require_relative "../../grades/pages/gradebook_page"
+require_relative "../../grades/pages/speedgrader_page"
 
 # total course enrollments = 1 teacher + student(s)
 # the following array =
@@ -32,8 +32,8 @@ student_assignments = [
   [200, 50]
 ]
 
-describe 'Gradebook performance' do
-  include_context 'in-process server selenium tests'
+describe "Gradebook performance" do
+  include_context "in-process server selenium tests"
 
   before :once do
     grades_sample = (60.0..100.0).step(0.01).map { |x| x.round(2) }
@@ -49,9 +49,9 @@ describe 'Gradebook performance' do
     @course4 = @courses[3]
 
     # enroll a teacher in each course
-    @teacher = course_with_teacher(course: @courses.first, name: 'Dedicated Teacher1', active_user: true, active_enrollment: true).user
+    @teacher = course_with_teacher(course: @courses.first, name: "Dedicated Teacher1", active_user: true, active_enrollment: true).user
     (1..3).each do |i|
-      @courses[i].enroll_user(@teacher, 'TeacherEnrollment', allow_multiple_enrollments: true, enrollment_state: 'active')
+      @courses[i].enroll_user(@teacher, "TeacherEnrollment", allow_multiple_enrollments: true, enrollment_state: "active")
     end
 
     @students = create_users(student_assignments[0][0], return_type: :record, name_prefix: "Jack")
@@ -64,7 +64,7 @@ describe 'Gradebook performance' do
 
       # create an assignment group for each course
       group = AssignmentGroup.suspend_callbacks(:update_student_grades) do
-        @courses[i].assignment_groups.create! name: 'assignments'
+        @courses[i].assignment_groups.create! name: "assignments"
       end
 
       # create no of assignments in each course:assignment_group
@@ -89,7 +89,7 @@ describe 'Gradebook performance' do
             user_id: student.id,
             body: "hello",
             workflow_state: "graded",
-            submission_type: 'online_text_entry',
+            submission_type: "online_text_entry",
             grader_id: @teacher.id,
             score: grade,
             grade: grade.to_s,
@@ -110,8 +110,8 @@ describe 'Gradebook performance' do
     user_session(@teacher)
   end
 
-  context '200,000 submissions' do
-    it 'gradebook loads in less than 25 seconds' do
+  context "200,000 submissions" do
+    it "gradebook loads in less than 25 seconds" do
       page_load_start_time = Time.zone.now
       Gradebook.visit(@course1)
       wait_for_ajaximations
@@ -121,8 +121,8 @@ describe 'Gradebook performance' do
       expect(load_time).to be < 25
     end
 
-    it 'speedgrader loads in less than 100 seconds' do
-      skip('load times are pretty inconsistent')
+    it "speedgrader loads in less than 100 seconds" do
+      skip("load times are pretty inconsistent")
       page_load_start_time = Time.zone.now
       Speedgrader.visit(@course1.id, @assignments1[0], 60)
       wait_for_ajaximations
@@ -133,8 +133,8 @@ describe 'Gradebook performance' do
     end
   end
 
-  context '100,000 submissions 2000x50' do
-    it 'gradebook loads in less than 25 seconds' do
+  context "100,000 submissions 2000x50" do
+    it "gradebook loads in less than 25 seconds" do
       page_load_start_time = Time.zone.now
       Gradebook.visit(@course2)
       wait_for_ajaximations
@@ -144,7 +144,7 @@ describe 'Gradebook performance' do
       expect(load_time).to be < 25
     end
 
-    it 'speedgrader loads in less than 45 seconds' do
+    it "speedgrader loads in less than 45 seconds" do
       page_load_start_time = Time.zone.now
       Speedgrader.visit(@course2.id, @assignments2[0], 60)
       wait_for_ajaximations
@@ -155,8 +155,8 @@ describe 'Gradebook performance' do
     end
   end
 
-  context '100,000 submissions 1000x100' do
-    it 'gradebook loads in less than 25 seconds' do
+  context "100,000 submissions 1000x100" do
+    it "gradebook loads in less than 25 seconds" do
       page_load_start_time = Time.zone.now
       Gradebook.visit(@course3)
       wait_for_ajaximations
@@ -167,7 +167,7 @@ describe 'Gradebook performance' do
       expect(load_time).to be < 25
     end
 
-    it 'speedgrader loads in less than 19 seconds' do
+    it "speedgrader loads in less than 19 seconds" do
       page_load_start_time = Time.zone.now
       Speedgrader.visit(@course3.id, @assignments3[0], 60)
       wait_for_ajaximations
@@ -178,8 +178,8 @@ describe 'Gradebook performance' do
     end
   end
 
-  context '10,000 submissions' do
-    it 'gradebook loads in less than 18 seconds' do
+  context "10,000 submissions" do
+    it "gradebook loads in less than 18 seconds" do
       page_load_start_time = Time.zone.now
       Gradebook.visit(@course4)
       wait_for_ajaximations
@@ -189,7 +189,7 @@ describe 'Gradebook performance' do
       expect(load_time).to be < 18
     end
 
-    it 'speedgrader loads in less than 10 seconds' do
+    it "speedgrader loads in less than 10 seconds" do
       page_load_start_time = Time.zone.now
       Speedgrader.visit(@course4.id, @assignments4[0], 60)
       wait_for_ajaximations

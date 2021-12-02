@@ -17,13 +17,13 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../../../spec_helper'
+require_relative "../../../spec_helper"
 
 class CategoryHarness
   include Api::V1::GroupCategory
 
   def polymorphic_url(data)
-    "http://www.example.com/api/#{data.join('/')}"
+    "http://www.example.com/api/#{data.join("/")}"
   end
 end
 
@@ -32,46 +32,46 @@ describe "Api::V1::GroupCategory" do
     let(:category) { GroupCategory.new(name: "mygroup", root_account: Account.new) }
 
     it "includes the auto_leader value" do
-      category.auto_leader = 'random'
+      category.auto_leader = "random"
       json = CategoryHarness.new.group_category_json(category, nil, nil)
-      expect(json['auto_leader']).to eq('random')
+      expect(json["auto_leader"]).to eq("random")
     end
 
-    describe 'groups_count' do
-      it 'is absent without the includes' do
+    describe "groups_count" do
+      it "is absent without the includes" do
         json = CategoryHarness.new.group_category_json(category, nil, nil, {})
-        expect(json.keys.include?("groups_count")).to be(false)
+        expect(json.key?("groups_count")).to be(false)
       end
 
-      it 'is present with the includes' do
-        allow(category).to receive_messages(:groups => double(active: double(size: 3)), :is_member? => false)
-        json = CategoryHarness.new.group_category_json(category, nil, nil, { :include => ['groups_count'] })
+      it "is present with the includes" do
+        allow(category).to receive_messages(groups: double(active: double(size: 3)), is_member?: false)
+        json = CategoryHarness.new.group_category_json(category, nil, nil, { include: ["groups_count"] })
         expect(json["groups_count"]).to eq(3)
       end
     end
 
-    describe 'progress_url' do
-      it 'is absent without the includes' do
+    describe "progress_url" do
+      it "is absent without the includes" do
         json = CategoryHarness.new.group_category_json(category, nil, nil, {})
-        expect(json.keys.include?("progress")).to be(false)
+        expect(json.key?("progress")).to be(false)
       end
 
-      it 'is present with the includes' do
-        allow(category).to receive_messages(current_progress: double(:pending? => true))
-        json = CategoryHarness.new.group_category_json(category, nil, nil, { :include => ['progress_url'] })
-        expect(json["progress"]['url']).to match(/example.com\/api\/api_v1/)
+      it "is present with the includes" do
+        allow(category).to receive_messages(current_progress: double(pending?: true))
+        json = CategoryHarness.new.group_category_json(category, nil, nil, { include: ["progress_url"] })
+        expect(json["progress"]["url"]).to match(%r{example.com/api/api_v1})
       end
     end
 
-    describe 'group_category_data' do
-      it 'sets protected with the category value' do
-        allow(category).to receive_messages(:protected? => true)
+    describe "group_category_data" do
+      it "sets protected with the category value" do
+        allow(category).to receive_messages(protected?: true)
         json = CategoryHarness.new.group_category_json(category, nil, nil)
         expect(json["protected"]).to eq(true)
       end
 
       it 'passes through "allows_multiple_memberships"' do
-        allow(category).to receive_messages(:allows_multiple_memberships? => false)
+        allow(category).to receive_messages(allows_multiple_memberships?: false)
         json = CategoryHarness.new.group_category_json(category, nil, nil)
         expect(json["allows_multiple_memberships"]).to eq(false)
       end
@@ -95,7 +95,7 @@ describe "Api::V1::GroupCategory" do
 
       context "when 'groups' is specified as an include key" do
         it "are included if active" do
-          json = CategoryHarness.new.group_category_json(category, user, nil, { include: ['groups'] })
+          json = CategoryHarness.new.group_category_json(category, user, nil, { include: ["groups"] })
           json_group_ids = json["groups"].map { |group| group["id"] }
 
           expect(json_group_ids).to match_array(category.groups.pluck(:id))
@@ -104,7 +104,7 @@ describe "Api::V1::GroupCategory" do
         it "are not included if deleted" do
           category.groups.second.destroy!
 
-          json = CategoryHarness.new.group_category_json(category, user, nil, { include: ['groups'] })
+          json = CategoryHarness.new.group_category_json(category, user, nil, { include: ["groups"] })
           json_group_ids = json["groups"].map { |group| group["id"] }
 
           expect(json_group_ids).to contain_exactly(category.groups.first.id)

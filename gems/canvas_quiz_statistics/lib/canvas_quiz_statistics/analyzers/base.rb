@@ -17,8 +17,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-require 'canvas_quiz_statistics/analyzers/base/dsl'
-require 'canvas_quiz_statistics/analyzers/base/constants'
+require "canvas_quiz_statistics/analyzers/base/dsl"
+require "canvas_quiz_statistics/analyzers/base/constants"
 
 module CanvasQuizStatistics::Analyzers
   class Base
@@ -48,7 +48,7 @@ module CanvasQuizStatistics::Analyzers
     end
 
     def self.question_type
-      (self.name.demodulize.underscore + '_question').to_sym
+      (name.demodulize.underscore + "_question").to_sym
     end
 
     private

@@ -18,12 +18,12 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'zlib'
-require 'config_file'
-require 'active_support/core_ext/object/blank'
-require 'inst_statsd'
-require 'guard_rail'
-require 'redis'
+require "zlib"
+require "config_file"
+require "active_support/core_ext/object/blank"
+require "inst_statsd"
+require "guard_rail"
+require "redis"
 
 # see https://github.com/redis/redis-rb/pull/739
 
@@ -33,24 +33,24 @@ module CanvasCache
       raise "Redis is not enabled for this install" unless CanvasCache::Redis.enabled?
 
       conf = CanvasCache::Redis.config
-      if conf == 'cache_store' || (conf.is_a?(Hash) && conf['servers'] == 'cache_store')
+      if conf == "cache_store" || (conf.is_a?(Hash) && conf["servers"] == "cache_store")
         return Rails.cache.redis
       end
 
       @redis ||= begin
         CanvasCache::Redis.patch
-        settings = ConfigFile.load('redis').dup
-        settings['url'] = settings['servers'] if settings['servers']
+        settings = ConfigFile.load("redis").dup
+        settings["url"] = settings["servers"] if settings["servers"]
         ActiveSupport::Cache::RedisCacheStore.build_redis(**settings.to_h.symbolize_keys)
       end
     end
 
     def self.config
-      @config ||= ConfigFile.load('redis')
+      @config ||= ConfigFile.load("redis")
     end
 
     def self.enabled?
-      @enabled ||= self.config.present?
+      @enabled ||= config.present?
     end
 
     def self.disconnect!
@@ -104,30 +104,30 @@ module CanvasCache
     end
 
     def self.ignore_redis_failures?
-      settings_store.get('ignore_redis_failures', 'true') == 'true'
+      settings_store.get("ignore_redis_failures", "true") == "true"
     end
 
     def self.ignore_redis_guards?
       return false unless CanvasCache::Redis.enabled?
 
-      @config['ignore_redis_guards'] && Rails.env.test?
+      @config["ignore_redis_guards"] && Rails.env.test?
     end
 
     COMPACT_LINE = "Redis (%{request_time_ms}ms) %{command} %{key} [%{host}]"
     def self.log_style
       # supported: 'off', 'compact', 'json'
-      @log_style ||= ConfigFile.load('redis')&.[]('log_style') || 'compact'
+      @log_style ||= ConfigFile.load("redis")&.[]("log_style") || "compact"
     end
 
     def self.redis_failure?(redis_name)
       return false unless last_redis_failure[redis_name]
       # i feel this dangling rescue is justifiable, given the try-to-be-failsafe nature of this code
-      if redis_name.include?('localhost')
+      if redis_name.include?("localhost")
         # talking to local redis should not short ciruit as long
-        return (Time.zone.now - last_redis_failure[redis_name]) < (settings_store.get('redis_local_failure_time', '2').to_i rescue 2)
+        return (Time.zone.now - last_redis_failure[redis_name]) < (settings_store.get("redis_local_failure_time", "2").to_i rescue 2)
       end
 
-      (Time.zone.now - last_redis_failure[redis_name]) < (settings_store.get('redis_failure_time', '300').to_i rescue 300)
+      (Time.zone.now - last_redis_failure[redis_name]) < (settings_store.get("redis_failure_time", "300").to_i rescue 300)
     end
 
     def self.last_redis_failure
@@ -167,12 +167,12 @@ module CanvasCache
 
       InstStatsd::Statsd.increment("redis.errors.all")
       InstStatsd::Statsd.increment("redis.errors.#{InstStatsd::Statsd.escape(redis_name)}",
-                                   short_stat: 'redis.errors',
+                                   short_stat: "redis.errors",
                                    tags: { redis_name: InstStatsd::Statsd.escape(redis_name) })
       Rails.logger.error "Failure handling redis command on #{redis_name}: #{e.inspect}"
 
       settings_store.skip_cache do
-        if self.ignore_redis_failures?
+        if ignore_redis_failures?
           CanvasCache.invoke_on_captured_error(e)
           last_redis_failure[redis_name] = Time.zone.now
           failure_retval
@@ -186,7 +186,7 @@ module CanvasCache
     end
 
     BoolifySet =
-      lambda { |value|
+      lambda do |value|
         if value && value == "OK"
           true
         elsif value && value == :failure
@@ -194,7 +194,7 @@ module CanvasCache
         else
           false
         end
-      }
+      end
 
     module Client
       def disconnect_if_idle(since_when)
@@ -219,18 +219,18 @@ module CanvasCache
         last_command_args = Array.wrap(last_command)
         last_command = (last_command.respond_to?(:first) ? last_command.first : last_command).to_s
         failure_val = case last_command
-                      when 'keys', 'hmget', 'mget'
+                      when "keys", "hmget", "mget"
                         []
-                      when 'scan'
+                      when "scan"
                         ["0", []]
-                      when 'del'
+                      when "del"
                         0
                       end
 
-        if last_command == 'set' && (last_command_args.include?('XX') || last_command_args.include?('NX'))
+        if last_command == "set" && (last_command_args.include?("XX") || last_command_args.include?("NX"))
           failure_val = :failure
         end
-        CanvasCache::Redis.handle_redis_failure(failure_val, self.location) do
+        CanvasCache::Redis.handle_redis_failure(failure_val, location) do
           super
         end
       end
@@ -249,10 +249,10 @@ module CanvasCache
         response
       end
 
-      SET_COMMANDS = %i{set setex}.freeze
+      SET_COMMANDS = %i[set setex].freeze
       def log_request_response(request, response, start_time)
         return if request.nil? # redis client does internal keepalives and connection commands
-        return if CanvasCache::Redis.log_style == 'off'
+        return if CanvasCache::Redis.log_style == "off"
         return unless Rails.logger
 
         command = request.shift
@@ -265,10 +265,11 @@ module CanvasCache
           host: location,
         }
         unless NON_KEY_COMMANDS.include?(command)
-          message[:key] = if command == :mset
+          message[:key] = case command
+                          when :mset
                             # This is an array with a single element: an array alternating key/values
-                            request.first { |v| v.first }.select.with_index { |_, i| i % 2 == 0 }
-                          elsif command == :mget
+                            request.first(&:first).select.with_index { |_, i| i.even? }
+                          when :mget
                             request
                           else
                             request.first
@@ -305,7 +306,7 @@ module CanvasCache
       end
 
       def format_log_message(message)
-        if CanvasCache::Redis.log_style == 'json'
+        if CanvasCache::Redis.log_style == "json"
           JSON.generate(message.compact)
         else
           message[:key] ||= "-"
@@ -360,7 +361,6 @@ module CanvasCache
       # one-off in script/console if you aren't using twemproxy, or in specs:
       ALLOWED_UNSUPPORTED = %w[
         keys
-        auth
         quit
         flushall
         flushdb
@@ -390,8 +390,8 @@ module CanvasCache
     end
 
     def self.patch
-      Bundler.require 'redis'
-      require 'redis/distributed'
+      Bundler.require "redis"
+      require "redis/distributed"
 
       ::Redis::Client.prepend(::CanvasCache::Redis::Client)
       ::Redis::Distributed.prepend(::CanvasCache::Redis::Distributed)

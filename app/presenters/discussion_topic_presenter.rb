@@ -62,7 +62,7 @@ class DiscussionTopicPresenter
   def peer_reviews_for(user)
     reviews = user.assigned_submission_assessments.shard(assignment.shard).for_assignment(assignment.id).to_a
     if reviews.any?
-      valid_student_ids = assignment.context.participating_students.where(:id => reviews.map(&:user_id)).pluck(:id).to_set
+      valid_student_ids = assignment.context.participating_students.where(id: reviews.map(&:user_id)).pluck(:id).to_set
       reviews = reviews.select { |r| valid_student_ids.include?(r.user_id) }
     end
     reviews
@@ -91,9 +91,7 @@ class DiscussionTopicPresenter
   # Public: Determine if comment feature is disabled for the context/announcement.
   #
   # Returns a boolean.
-  def comments_disabled?
-    topic.comments_disabled?
-  end
+  delegate :comments_disabled?, to: :topic
 
   # Public: Determine if the discussion's context has a large roster flag set.
   #
@@ -122,7 +120,7 @@ class DiscussionTopicPresenter
     if topic.context.is_a?(Course)
       student_enrollment = topic.user.enrollments.active.where(
         course_id: topic.context.id,
-        type: "StudentEnrollment",
+        type: "StudentEnrollment"
       ).first
 
       if student_enrollment

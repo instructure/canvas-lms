@@ -26,9 +26,9 @@ class Login::SamlIdpDiscoveryController < ApplicationController
 
   def new
     uri = URI.parse(aac.discovery_service_url)
-    params = URI.decode_www_form(uri.query || '')
-    params << ['entityID', AuthenticationProvider::SAML.saml_default_entity_id_for_account(@domain_root_account, persist: false)]
-    params << ['return', saml_login_base_url]
+    params = URI.decode_www_form(uri.query || "")
+    params << ["entityID", AuthenticationProvider::SAML.saml_default_entity_id_for_account(@domain_root_account, persist: false)]
+    params << ["return", saml_login_base_url]
     uri.query = URI.encode_www_form(params)
     redirect_to uri.to_s
   end
@@ -37,7 +37,7 @@ class Login::SamlIdpDiscoveryController < ApplicationController
 
   def aac
     @aac ||= begin
-      scope = @domain_root_account.authentication_providers.active.where(auth_type: 'saml_idp_discovery')
+      scope = @domain_root_account.authentication_providers.active.where(auth_type: "saml_idp_discovery")
       params[:id] ? scope.find(params[:id]) : scope.first!
     end
   end

@@ -17,14 +17,14 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-shared_examples 'essay [:responses]' do
-  it 'counts students who have written anything' do
-    expect(subject.run([{ text: 'foo' }])[:responses]).to eq(1)
+shared_examples "essay [:responses]" do
+  it "counts students who have written anything" do
+    expect(subject.run([{ text: "foo" }])[:responses]).to eq(1)
   end
 
-  it 'does not count students who have written a blank response' do
+  it "does not count students who have written a blank response" do
     expect(subject.run([{}])[:responses]).to eq(0)
     expect(subject.run([{ text: nil }])[:responses]).to eq(0)
-    expect(subject.run([{ text: '' }])[:responses]).to eq(0)
+    expect(subject.run([{ text: "" }])[:responses]).to eq(0)
   end
 end

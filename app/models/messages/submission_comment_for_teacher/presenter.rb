@@ -66,13 +66,13 @@ module Messages::SubmissionCommentForTeacher
     end
 
     def anonymous_author_id
-      if submission_comment.author != submission.user
+      if submission_comment.author == submission.user
+        submission.anonymous_id
+      else
         return @author_submission&.anonymous_id if defined?(@author_submission)
 
         @author_submission = Submission.find_by(assignment: assignment, user: submission_comment.author)
         @author_submission&.anonymous_id
-      else
-        submission.anonymous_id
       end
     end
   end

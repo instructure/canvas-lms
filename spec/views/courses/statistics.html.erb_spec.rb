@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../views_helper'
+require_relative "../views_helper"
 
 describe "courses/statistics.html.erb" do
   before do
@@ -55,7 +55,7 @@ describe "courses/statistics.html.erb" do
     it "includes counts for student annotation assignments" do
       view_context(@course, @user)
       render
-      expect(doc.at_css('#student-annotation-assignment-count').text).to eq "1"
+      expect(doc.at_css("#student-annotation-assignment-count").text).to eq "1"
     end
 
     it "includes counts for student annotation submissions" do
@@ -68,7 +68,7 @@ describe "courses/statistics.html.erb" do
 
       view_context(@course, @user)
       render
-      expect(doc.at_css('#student-annotation-submission-count').text).to eq "1"
+      expect(doc.at_css("#student-annotation-submission-count").text).to eq "1"
     end
   end
 end

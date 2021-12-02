@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'apis/api_spec_helper'
+require "apis/api_spec_helper"
 
 describe GradingPeriodsController, type: :request do
   let(:now) { Time.zone.now.change(usec: 0) }
@@ -26,25 +26,25 @@ describe GradingPeriodsController, type: :request do
   context "A grading period is associated with a course." do
     before :once do
       course_with_teacher active_all: true
-      grading_period_group = @course.grading_period_groups.create!(title: 'A Group')
+      grading_period_group = @course.grading_period_groups.create!(title: "A Group")
       @grading_period = grading_period_group.grading_periods.create! do |period|
-        period.title = 'A Period'
+        period.title = "A Period"
         period.start_date = 1.month.from_now(now)
         period.end_date   = 2.months.from_now(now)
         period.weight     = 33.33
       end
     end
 
-    describe 'GET show' do
+    describe "GET show" do
       def get_show(raw = false)
         helper = method(raw ? :raw_api_call : :api_call)
         helper.call(
           :get,
           "/api/v1/courses/#{@course.id}/grading_periods/#{@grading_period.id}",
           {
-            controller: 'grading_periods',
-            action: 'show',
-            format: 'json',
+            controller: "grading_periods",
+            action: "show",
+            format: "json",
             course_id: @course.id,
             id: @grading_period.id,
           },
@@ -54,11 +54,11 @@ describe GradingPeriodsController, type: :request do
 
       it "retrieves the grading period specified" do
         json = get_show
-        period = json['grading_periods'].first
-        expect(period['id']).to eq(@grading_period.id.to_s)
-        expect(period['weight']).to eq(@grading_period.weight)
-        expect(period['title']).to eq(@grading_period.title)
-        expect(period['permissions']).to include(
+        period = json["grading_periods"].first
+        expect(period["id"]).to eq(@grading_period.id.to_s)
+        expect(period["weight"]).to eq(@grading_period.weight)
+        expect(period["title"]).to eq(@grading_period.title)
+        expect(period["permissions"]).to include(
           "read" => true,
           "create" => false,
           "delete" => true,
@@ -73,7 +73,7 @@ describe GradingPeriodsController, type: :request do
       end
     end
 
-    describe 'PUT update' do
+    describe "PUT update" do
       def put_update(params, raw = false)
         helper = method(raw ? :raw_api_call : :api_call)
 
@@ -81,9 +81,9 @@ describe GradingPeriodsController, type: :request do
           :put,
           "/api/v1/courses/#{@course.id}/grading_periods/#{@grading_period.id}",
           {
-            controller: 'grading_periods',
-            action: 'update',
-            format: 'json',
+            controller: "grading_periods",
+            action: "update",
+            format: "json",
             course_id: @course.id,
             id: @grading_period.id
           },
@@ -104,25 +104,25 @@ describe GradingPeriodsController, type: :request do
       end
     end
 
-    describe 'DELETE destroy' do
+    describe "DELETE destroy" do
       def delete_destroy
         raw_api_call(
           :delete,
           "/api/v1/courses/#{@course.id}/grading_periods/#{@grading_period.id}",
           {
-            controller: 'grading_periods',
-            action: 'destroy',
-            format: 'json',
+            controller: "grading_periods",
+            action: "destroy",
+            format: "json",
             course_id: @course.id,
             id: @grading_period.id.to_s
-          },
+          }
         )
       end
 
       it "deletes a grading period successfully" do
         delete_destroy
 
-        expect(response.code).to eq '204'
+        expect(response.code).to eq "204"
         expect(@grading_period.reload).to be_deleted
       end
     end

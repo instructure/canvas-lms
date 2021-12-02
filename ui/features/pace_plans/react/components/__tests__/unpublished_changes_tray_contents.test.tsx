@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {render} from '@testing-library/react'
+import {act, render} from '@testing-library/react'
 import UnpublishedChangesTrayContents from '../unpublished_changes_tray_contents'
 import React from 'react'
 import userEvent from '@testing-library/user-event'
@@ -51,7 +51,7 @@ describe('UnpublishedChangesTrayContents', () => {
     const {getByText} = render(<UnpublishedChangesTrayContents handleTrayDismiss={onTrayDismiss} />)
 
     const closeButton = getByText('Close')
-    userEvent.click(closeButton)
+    act(() => userEvent.click(closeButton))
     expect(onTrayDismiss).toHaveBeenCalled()
   })
 })

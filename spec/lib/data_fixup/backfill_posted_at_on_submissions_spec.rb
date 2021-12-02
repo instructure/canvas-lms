@@ -19,7 +19,7 @@
 
 describe DataFixup::BackfillPostedAtOnSubmissions do
   let(:course) { Course.create! }
-  let(:assignment) { course.assignments.create!(title: 'fred') }
+  let(:assignment) { course.assignments.create!(title: "fred") }
   let(:student) { course.enroll_student(User.create!).user }
   let(:submission) { assignment.submission_for_student(student) }
 

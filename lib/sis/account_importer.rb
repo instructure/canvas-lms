@@ -28,7 +28,7 @@ module SIS
         end
       end
       importer.accounts_to_set_sis_batch_ids.to_a.in_groups_of(1000, false) do |batch|
-        Account.where(:id => batch).update_all(:sis_batch_id => @batch.id)
+        Account.where(id: batch).update_all(sis_batch_id: @batch.id)
       end
       SisBatchRollBackData.bulk_insert_roll_back_data(importer.roll_back_data)
 
@@ -53,7 +53,7 @@ module SIS
         return if @batch.skip_deletes? && status =~ /deleted/i
 
         parent = nil
-        if !parent_account_id.blank?
+        unless parent_account_id.blank?
           parent = @accounts_cache[parent_account_id]
           parent ||= @root_account.all_accounts.where(sis_source_id: parent_account_id).take
           raise ImportError, "Parent account didn't exist for #{account_id}" unless parent
@@ -65,14 +65,14 @@ module SIS
         account ||= @root_account.all_accounts.where(sis_source_id: account_id).take
         if account.nil?
           raise ImportError, "No name given for account #{account_id}, skipping" if name.blank?
-          raise ImportError, "Improper status \"#{status}\" for account #{account_id}, skipping" unless status =~ /\A(active|deleted)/i
+          raise ImportError, "Improper status \"#{status}\" for account #{account_id}, skipping" unless /\A(active|deleted)/i.match?(status)
         end
 
         account ||= @root_account.sub_accounts.new
 
         account.root_account = @root_account
         if account.new_record? || !account.stuck_sis_fields.include?(:parent_account_id) || Account.sis_stickiness_options[:add_sis_stickiness]
-          account.parent_account = parent ? parent : @root_account
+          account.parent_account = parent || @root_account
         end
 
         # only update the name on new records, and ones that haven't been changed since the last sis import
@@ -82,13 +82,14 @@ module SIS
         account.sis_source_id = account_id
 
         if status.present?
-          if status =~ /active/i
-            account.workflow_state = 'active'
-          elsif status =~ /deleted/i
+          case status
+          when /active/i
+            account.workflow_state = "active"
+          when /deleted/i
             raise ImportError, "Cannot delete the sub_account with ID: #{account_id} because it has active sub accounts." if account.sub_accounts.active.exists?
             raise ImportError, "Cannot delete the sub_account with ID: #{account_id} because it has active courses." if account.courses.active.exists?
 
-            account.workflow_state = 'deleted'
+            account.workflow_state = "deleted"
           end
         end
 
@@ -96,7 +97,7 @@ module SIS
 
         unless account.changed?
           @success_count += 1
-          self.accounts_to_set_sis_batch_ids << account.id unless account.sis_batch_id == @batch.try(:id)
+          accounts_to_set_sis_batch_ids << account.id unless account.sis_batch_id == @batch.try(:id)
           return
         end
 

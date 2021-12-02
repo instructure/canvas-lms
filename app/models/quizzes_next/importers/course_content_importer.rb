@@ -44,7 +44,7 @@ module QuizzesNext::Importers
         next unless assignment
 
         lti_assignment_quiz_set << [assignment.global_id, quiz.global_id]
-        assignment.workflow_state = 'importing'
+        assignment.workflow_state = "importing"
         assignment.importing_started_at = Time.zone.now
         if assignment.quiz_lti!
           assignment.quiz = nil
@@ -71,7 +71,7 @@ module QuizzesNext::Importers
     end
 
     def practice_quiz_assignment(quiz)
-      return unless quiz.quiz_type == 'practice_quiz'
+      return unless quiz.quiz_type == "practice_quiz"
 
       assignment = quiz.assignment
       unless assignment

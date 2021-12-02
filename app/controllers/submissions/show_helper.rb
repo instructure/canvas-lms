@@ -31,9 +31,11 @@ module Submissions
           end
         end
         format.json do
-          error = @assignment ?
-            t("The specified user (%{id}) is not a student in this course", { id: params[:id] }) :
-            t("The specified assignment (%{id}) could not be found", { id: params[:assignment_id] })
+          error = if @assignment
+                    t("The specified user (%{id}) is not a student in this course", { id: params[:id] })
+                  else
+                    t("The specified assignment (%{id}) could not be found", { id: params[:assignment_id] })
+                  end
           render json: {
             errors: error
           }
@@ -44,7 +46,7 @@ module Submissions
     def get_user_considering_section(user_id)
       students = @context.students_visible_to(@current_user, include: :priors)
       if @section
-        students = students.where(:enrollments => { :course_section_id => @section })
+        students = students.where(enrollments: { course_section_id: @section })
       end
       api_find(students, user_id)
     end

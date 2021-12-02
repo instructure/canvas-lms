@@ -17,12 +17,12 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../pages/gradebook_page'
-require_relative '../pages/gradebook_cells_page'
-require_relative '../pages/gradebook_grade_detail_tray_page'
-require_relative '../../helpers/gradebook_common'
+require_relative "../pages/gradebook_page"
+require_relative "../pages/gradebook_cells_page"
+require_relative "../pages/gradebook_grade_detail_tray_page"
+require_relative "../../helpers/gradebook_common"
 
-describe 'Grade Detail Tray:' do
+describe "Grade Detail Tray:" do
   include_context "in-process server selenium tests"
   include GradebookCommon
   include_context "late_policy_course_setup"
@@ -42,43 +42,66 @@ describe 'Grade Detail Tray:' do
       Gradebook.visit(@course)
     end
 
-    it 'missing submission has missing-radiobutton selected', priority: "1", test_id: 3337205 do
+    it "missing submission has missing-radiobutton selected", priority: "1" do
       Gradebook::Cells.open_tray(@course.students.first, @a2)
 
-      expect(Gradebook::GradeDetailTray.is_radio_button_selected('missing')).to be true
+      expect(Gradebook::GradeDetailTray.is_radio_button_selected("missing")).to be true
     end
 
-    it 'on-time submission has none-radiobutton selected', priority: "1", test_id: 3337203 do
+    context "remove_missing_status_when_graded enabled" do
+      before do
+        Account.site_admin.enable_feature!(:remove_missing_status_when_graded)
+        Gradebook.visit(@course)
+      end
+
+      it "missing submission has missing-radiobutton unselected", priority: "1" do
+        Gradebook::Cells.open_tray(@course.students.first, @a2)
+
+        expect(Gradebook::GradeDetailTray.is_radio_button_selected("missing")).to be false
+      end
+
+      it "updates status when none-option is selected", priority: "2" do
+        Gradebook::Cells.open_tray(@course.students.first, @a2)
+        Gradebook::GradeDetailTray.change_status_to("Missing")
+        Gradebook::GradeDetailTray.change_status_to("None")
+
+        late_policy_status = @course.students.first.submissions.find_by(assignment_id: @a2.id).late_policy_status
+
+        expect(late_policy_status).to eq "none"
+      end
+    end
+
+    it "on-time submission has none-radiobutton selected", priority: "1" do
       Gradebook::Cells.open_tray(@course.students.first, @a3)
 
-      expect(Gradebook::GradeDetailTray.is_radio_button_selected('none')).to be true
+      expect(Gradebook::GradeDetailTray.is_radio_button_selected("none")).to be true
     end
 
-    it 'excused submission has excused-radiobutton selected', priority: "1", test_id: 3337204 do
+    it "excused submission has excused-radiobutton selected", priority: "1" do
       Gradebook::Cells.open_tray(@course.students.first, @a4)
 
-      expect(Gradebook::GradeDetailTray.is_radio_button_selected('excused')).to be true
+      expect(Gradebook::GradeDetailTray.is_radio_button_selected("excused")).to be true
     end
 
-    it 'updates status when excused-option is selected', priority: "1", test_id: 3337207 do
+    it "updates status when excused-option is selected", priority: "1" do
       Gradebook::Cells.open_tray(@course.students.first, @a2)
-      Gradebook::GradeDetailTray.change_status_to('Excused')
+      Gradebook::GradeDetailTray.change_status_to("Excused")
 
       excuse_status = @course.students.first.submissions.find_by(assignment_id: @a2.id).excused
 
       expect(excuse_status).to be true
     end
 
-    it 'updates status when none-option is selected', priority: "2", test_id: 3337208 do
+    it "updates status when none-option is selected", priority: "2" do
       Gradebook::Cells.open_tray(@course.students.first, @a2)
-      Gradebook::GradeDetailTray.change_status_to('None')
+      Gradebook::GradeDetailTray.change_status_to("None")
 
       late_policy_status = @course.students.first.submissions.find_by(assignment_id: @a2.id).late_policy_status
 
-      expect(late_policy_status).to eq 'none'
+      expect(late_policy_status).to eq "none"
     end
 
-    it 'grade input is saved', priority: "1", test_id: 3369723 do
+    it "grade input is saved", priority: "1" do
       Gradebook::Cells.open_tray(@course.students.second, @a3)
       Gradebook::GradeDetailTray.edit_grade(7)
 
@@ -86,38 +109,38 @@ describe 'Grade Detail Tray:' do
     end
   end
 
-  context 'late status' do
+  context "late status" do
     before do
       user_session(@teacher)
       Gradebook.visit(@course)
       Gradebook::Cells.open_tray(@course.students.first, @a1)
     end
 
-    it 'late submission has late-radiobutton selected', test_id: 3337206, priority: '1' do
-      expect(Gradebook::GradeDetailTray.is_radio_button_selected('late')).to be true
+    it "late submission has late-radiobutton selected", priority: "1" do
+      expect(Gradebook::GradeDetailTray.is_radio_button_selected("late")).to be true
     end
 
-    it 'late submission has late-by days/hours', test_id: 3337209, priority: '1' do
+    it "late submission has late-by days/hours", priority: "1" do
       late_by_days_value = (@course.students.first.submissions.find_by(assignment_id: @a1.id)
-        .seconds_late / 86400.to_f).round(2)
+        .seconds_late / 86_400.to_f).round(2)
 
       expect(Gradebook::GradeDetailTray.fetch_late_by_value.to_f).to eq late_by_days_value
     end
 
-    it 'late submission has late penalty', test_id: 3337210, priority: '1' do
+    it "late submission has late penalty", priority: "1" do
       late_penalty_value = "-" + @course.students.first.submissions.find_by(assignment_id: @a1.id).points_deducted.to_s
 
       # the data from rails and data from ui are not in the same format
       expect(Gradebook::GradeDetailTray.late_penalty_text.to_f.to_s).to eq late_penalty_value
     end
 
-    it 'late submission has final grade', test_id: 3415931, priority: '2' do
+    it "late submission has final grade", priority: "2" do
       final_grade_value = @course.students.first.submissions.find_by(assignment_id: @a1.id).published_grade
 
       expect(Gradebook::GradeDetailTray.final_grade_text).to eq final_grade_value
     end
 
-    it 'updates score when late_by value changes', test_id: 3337212, priority: '1' do
+    it "updates score when late_by value changes", priority: "1" do
       Gradebook::GradeDetailTray.edit_late_by_input(3)
       final_grade_value = @course.students.first.submissions.find_by(assignment_id: @a1.id).published_grade
       expect(final_grade_value).to eq "60"
@@ -126,87 +149,97 @@ describe 'Grade Detail Tray:' do
     end
   end
 
-  context 'navigation within tray' do
+  context "navigation within tray" do
     before do
       user_session(@teacher)
     end
 
-    context 'with default ordering' do
+    context "with default ordering" do
       before do
         Gradebook.visit(@course)
       end
 
-      it 'speedgrader link navigates to speedgrader page', test_id: 3337215, priority: '1' do
+      it "speedgrader link navigates to speedgrader page", priority: "1" do
         Gradebook::Cells.open_tray(@course.students[0], @a1)
         Gradebook::GradeDetailTray.speedgrader_link.click
 
         expect(driver.current_url).to include "courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@a1.id}"
       end
 
-      it 'clicking assignment name navigates to assignment page', test_id: 3337214, priority: '2' do
+      it "clicking assignment name navigates to assignment page", priority: "2" do
         Gradebook::Cells.open_tray(@course.students.first, @a1)
         Gradebook::GradeDetailTray.assignment_link(@a1.name).click
 
         expect(driver.current_url).to include "courses/#{@course.id}/assignments/#{@a1.id}"
       end
 
-      it 'assignment right arrow loads the next assignment in the tray', test_id: 3337216, priority: '1' do
+      it "assignment right arrow loads the next assignment in the tray", priority: "1" do
         Gradebook::Cells.open_tray(@course.students.first, @a1)
         button = Gradebook::GradeDetailTray.next_assignment_button
-        keep_trying_until { button.click; true } # have to wait for InstUI animations
-
+        # have to wait for InstUI animations
+        keep_trying_until do
+          button.click
+          true
+        end
         expect(Gradebook::GradeDetailTray.assignment_link(@a2.name)).to be_displayed
       end
 
-      it 'assignment left arrow loads the previous assignment in the tray', test_id: 3337217, priority: '1' do
+      it "assignment left arrow loads the previous assignment in the tray", priority: "1" do
         Gradebook::Cells.open_tray(@course.students.first, @a2)
         button = Gradebook::GradeDetailTray.previous_assignment_button
         # have to wait for InstUI animations
-        keep_trying_until {
+        keep_trying_until do
           button.click
           true
-        }
+        end
 
         expect(Gradebook::GradeDetailTray.assignment_link(@a1.name)).to be_displayed
       end
 
-      it 'left arrow button is not present when leftmost assignment is selected', test_id: 3337219, priority: '2' do
+      it "left arrow button is not present when leftmost assignment is selected", priority: "2" do
         Gradebook::Cells.open_tray(@course.students.first, @a1)
 
         expect(Gradebook::GradeDetailTray.submission_tray_full_content)
-          .not_to contain_css('#assignment-carousel .left-arrow-button-container button')
+          .not_to contain_css("#assignment-carousel .left-arrow-button-container button")
       end
 
-      it 'right arrow button is not present when rightmost assignment is selected', test_id: 3337218, priority: '2' do
+      it "right arrow button is not present when rightmost assignment is selected", priority: "2" do
         Gradebook::Cells.open_tray(@course.students.first, @a4)
 
         expect(Gradebook::GradeDetailTray.submission_tray_full_content)
-          .not_to contain_css('#assignment-carousel .right-arrow-button-container button')
+          .not_to contain_css("#assignment-carousel .right-arrow-button-container button")
       end
 
-      it 'student right arrow navigates to next student', test_id: 3337223, priority: '1' do
+      it "student right arrow navigates to next student", priority: "1" do
         Gradebook::Cells.open_tray(@course.students.first, @a1)
         button = Gradebook::GradeDetailTray.next_student_button
-        keep_trying_until { button.click; true } # have to wait for instUI Tray animation
+        # have to wait for instUI Tray animation
+        keep_trying_until do
+          button.click
+          true
+        end
         expect(Gradebook::GradeDetailTray.student_link(@course.students.second.name)).to be_displayed
       end
 
-      it 'student left arrow navigates to previous student', test_id: 3337224, priority: '1' do
+      it "student left arrow navigates to previous student", priority: "1" do
         Gradebook::Cells.open_tray(@course.students.second, @a1)
         button = Gradebook::GradeDetailTray.previous_student_button
-        keep_trying_until { button.click; true } # have to wait for instUI Tray animation
-
+        # have to wait for instUI Tray animation
+        keep_trying_until do
+          button.click
+          true
+        end
         expect(Gradebook::GradeDetailTray.student_link(@course.students.first.name)).to be_displayed
       end
 
-      it 'first student does not have left arrow', test_id: 3337226, priority: '1' do
+      it "first student does not have left arrow", priority: "1" do
         Gradebook::Cells.open_tray(@course.students.first, @a1)
 
         expect(Gradebook::GradeDetailTray.submission_tray_full_content)
           .not_to contain_css(Gradebook::GradeDetailTray.navigate_to_previous_student_selector)
       end
 
-      it 'student name link navigates to student grades page', test_id: 3355448, priority: '2' do
+      it "student name link navigates to student grades page", priority: "2" do
         Gradebook::Cells.open_tray(@course.students.first, @a1)
         Gradebook::GradeDetailTray.student_link(@course.students.first.name).click
 
@@ -214,27 +247,30 @@ describe 'Grade Detail Tray:' do
       end
     end
 
-    context 'when the rightmost column is an assignment column' do
+    context "when the rightmost column is an assignment column" do
       before do
         @teacher.set_preference(:gradebook_column_order, @course.global_id, {
-                                  sortType: 'custom',
+                                  sortType: "custom",
                                   customOrder: [
                                     "assignment_#{@a1.id}",
                                     "assignment_#{@a2.id}",
                                     "assignment_group_#{@a1.assignment_group_id}",
                                     "assignment_#{@a3.id}",
-                                    'total_grade',
+                                    "total_grade",
                                     "assignment_#{@a4.id}"
                                   ]
                                 })
         Gradebook.visit(@course)
       end
 
-      it 'clicking the left arrow loads the previous assignment in the tray', test_id: 3337220, priority: '2' do
+      it "clicking the left arrow loads the previous assignment in the tray", priority: "2" do
         Gradebook::Cells.open_tray(@course.students.first, @a4)
         button = Gradebook::GradeDetailTray.previous_assignment_button
-        keep_trying_until { button.click; true } # have to wait for instUI Tray animation
-
+        # have to wait for instUI Tray animation
+        keep_trying_until do
+          button.click
+          true
+        end
         expect(Gradebook::GradeDetailTray.assignment_link(@a3.name)).to be_displayed
       end
     end
@@ -253,14 +289,14 @@ describe 'Grade Detail Tray:' do
       Gradebook.visit(@course)
     end
 
-    it "add a comment", test_id: 3339965, priority: '1' do
+    it "add a comment", priority: "1" do
       Gradebook::Cells.open_tray(@course.students.first, @a1)
       Gradebook::GradeDetailTray.add_new_comment(comment_2)
 
       expect(Gradebook::GradeDetailTray.comment(comment_2)).to be_displayed
     end
 
-    it "delete a comment", test_id: 3339966, priority: '1' do
+    it "delete a comment", priority: "1" do
       skip_if_safari(:alert)
       Gradebook::Cells.open_tray(@course.students.first, @a1)
       Gradebook::GradeDetailTray.delete_comment(comment_1)

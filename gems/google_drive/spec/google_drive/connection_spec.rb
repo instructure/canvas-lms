@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'spec_helper'
+require "spec_helper"
 
 describe GoogleDrive::Connection do
   let(:connection) { GoogleDrive::Connection.new(token, secret, retries: 1) }
@@ -38,10 +38,10 @@ describe GoogleDrive::Connection do
   describe "#file_extension from headers" do
     it "pulls the file extension from the response header" do
       headers = {
-        'content-disposition' => 'attachment;filename="Testing.docx"'
+        "content-disposition" => 'attachment;filename="Testing.docx"'
       }
 
-      entry = double('Entry', extension: "not")
+      entry = double("Entry", extension: "not")
       file_extension = connection.send(:file_extension_from_header, headers, entry)
 
       expect(file_extension).to eq("docx")
@@ -49,27 +49,27 @@ describe GoogleDrive::Connection do
 
     it "pulls the file extension from the entry if its not in the response header" do
       headers = {
-        'content-disposition' => 'attachment"'
+        "content-disposition" => 'attachment"'
       }
 
-      entry = double('Entry', extension: "not")
+      entry = double("Entry", extension: "not")
       file_extension = connection.send(:file_extension_from_header, headers, entry)
       expect(file_extension).to eq("not")
     end
 
     it "uses unknown as a last resort file extension" do
       headers = {
-        'content-disposition' => 'attachment"'
+        "content-disposition" => 'attachment"'
       }
 
-      entry = double('Entry', extension: "")
+      entry = double("Entry", extension: "")
       file_extension = connection.send(:file_extension_from_header, headers, entry)
       expect(file_extension).to eq("unknown")
     end
 
     it "uses unknown as file extension when extension is nil" do
       headers = {}
-      entry = double('Entry', extension: nil)
+      entry = double("Entry", extension: nil)
 
       file_extension = connection.send(:file_extension_from_header, headers, entry)
       expect(file_extension).to eq("unknown")
@@ -98,66 +98,66 @@ describe GoogleDrive::Connection do
     before do
       stub_request(:get, "https://www.googleapis.com/discovery/v1/apis/drive/v2/rest")
         .to_return(
-          :status => 200,
-          :body => load_fixture('discovered_api.json'),
-          :headers => { 'Content-Type' => 'application/json' }
+          status: 200,
+          body: load_fixture("discovered_api.json"),
+          headers: { "Content-Type" => "application/json" }
         )
     end
 
     describe "#list_with_extension_filter" do
       let(:http_status) { 200 }
-      let(:body) { load_fixture('list.json') }
-      let(:url) { 'https://www.googleapis.com/drive/v2/files?maxResults=0&q=trashed=false' }
+      let(:body) { load_fixture("list.json") }
+      let(:url) { "https://www.googleapis.com/drive/v2/files?maxResults=0&q=trashed=false" }
       let(:request) do
         stub_request(:get, url)
           .to_return(
             status: http_status,
             body: body,
-            headers: { 'Content-Type' => 'application/json' }
+            headers: { "Content-Type" => "application/json" }
           )
       end
 
       before { request }
 
-      context 'with 200 success response' do
+      context "with 200 success response" do
         it "submits `trashed = false` parameter" do
-          connection.list_with_extension_filter('txt')
+          connection.list_with_extension_filter("txt")
           expect(WebMock).to have_requested(:get, url)
         end
 
         it "returns allowed extension" do
-          returned_list = connection.list_with_extension_filter('png')
-          expect(returned_list.files.select { |a| a.entry["fileExtension"] == 'png' }).not_to be_empty
+          returned_list = connection.list_with_extension_filter("png")
+          expect(returned_list.files.select { |a| a.entry["fileExtension"] == "png" }).not_to be_empty
         end
 
         it "does not return other extension" do
-          returned_list = connection.list_with_extension_filter('txt')
+          returned_list = connection.list_with_extension_filter("txt")
           expect(returned_list.files).to be_empty
         end
 
         it "returns all extensions if no extension filter provided" do
-          returned_list = connection.list_with_extension_filter('')
-          expect(returned_list.files.select { |a| a.entry["fileExtension"] == 'png' }).not_to be_empty
+          returned_list = connection.list_with_extension_filter("")
+          expect(returned_list.files.select { |a| a.entry["fileExtension"] == "png" }).not_to be_empty
         end
       end
 
-      context 'with 429 throttling response' do
+      context "with 429 throttling response" do
         let(:http_status) { 429 }
-        let(:body) { '' }
+        let(:body) { "" }
 
-        it 'will retry on ClientError' do
-          expect { connection.list_with_extension_filter('txt') }.to raise_error Google::APIClient::ClientError
+        it "will retry on ClientError" do
+          expect { connection.list_with_extension_filter("txt") }.to raise_error Google::APIClient::ClientError
 
           expect(WebMock).to(have_requested(:get, url).times(2))
         end
       end
 
-      context 'with 503 gateway error response' do
+      context "with 503 gateway error response" do
         let(:http_status) { 503 }
-        let(:body) { '' }
+        let(:body) { "" }
 
-        it 'will retry on ServerError' do
-          expect { connection.list_with_extension_filter('txt') }.to raise_error Google::APIClient::ServerError
+        it "will retry on ServerError" do
+          expect { connection.list_with_extension_filter("txt") }.to raise_error Google::APIClient::ServerError
 
           expect(WebMock).to(have_requested(:get, url).times(2))
         end
@@ -165,23 +165,23 @@ describe GoogleDrive::Connection do
     end
 
     describe "#download" do
-      let(:export_url) { 'https://docs.google.com/feeds/download/documents/export/Export?exportFormat=docx&id=**file_id**' }
-      let(:files_url) { 'https://www.googleapis.com/drive/v2/files/42' }
-      let(:redirect_url) { 'https://docs.google.com/redirect/feeds/download/documents/export/Export?exportFormat=docx&id=**file_id**' }
+      let(:export_url) { "https://docs.google.com/feeds/download/documents/export/Export?exportFormat=docx&id=**file_id**" }
+      let(:files_url) { "https://www.googleapis.com/drive/v2/files/42" }
+      let(:redirect_url) { "https://docs.google.com/redirect/feeds/download/documents/export/Export?exportFormat=docx&id=**file_id**" }
       let(:http_status) { 200 }
 
       before do
         stub_request(:get, files_url).to_return(
-          :status => http_status,
-          body: load_fixture('file_data.json'),
-          headers: { 'Content-Type' => 'application/json' }
+          status: http_status,
+          body: load_fixture("file_data.json"),
+          headers: { "Content-Type" => "application/json" }
         )
 
         stub_request(:get, export_url).to_return(
           status: 200,
-          body: '',
+          body: "",
           headers: {
-            'Content-Type' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+            "Content-Type" => "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
           }
         )
       end
@@ -203,28 +203,28 @@ describe GoogleDrive::Connection do
 
       it "won't try to download a nil url" do
         stub_request(:get, files_url).to_return(
-          :status => http_status,
-          body: load_fixture('bad_file_data.json'),
-          headers: { 'Content-Type' => 'application/json' }
+          status: http_status,
+          body: load_fixture("bad_file_data.json"),
+          headers: { "Content-Type" => "application/json" }
         )
         expect { connection.download("42", nil) }.to raise_error(GoogleDrive::WorkflowError)
       end
 
-      context 'with 307 temporary redirect response' do
+      context "with 307 temporary redirect response" do
         before do
           stub_request(:get, redirect_url).to_return(
             status: 200,
-            body: '',
+            body: "",
             headers: {
-              'Content-Type' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+              "Content-Type" => "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
             }
           )
         end
 
-        it 'will follow redirect response' do
+        it "will follow redirect response" do
           stub_request(:get, export_url).to_return(
             status: 307,
-            headers: { 'Content-Type' => 'application/json', 'Location' => redirect_url }
+            headers: { "Content-Type" => "application/json", "Location" => redirect_url }
           ).times(1)
           connection.download("42", nil)
           output = connection.download("42", nil)
@@ -232,16 +232,16 @@ describe GoogleDrive::Connection do
           expect(output[2]).to eq("docx")
         end
 
-        it 'will retry on redirect response' do
+        it "will retry on redirect response" do
           stub_request(:get, export_url).to_return(
             status: 307,
-            headers: { 'Content-Type' => 'application/json', 'Location' => redirect_url }
+            headers: { "Content-Type" => "application/json", "Location" => redirect_url }
           )
           stub_request(:get, redirect_url).to_return(
             status: 307,
-            body: '',
+            body: "",
             headers: {
-              'Content-Type' => 'application/json', 'Location' => redirect_url
+              "Content-Type" => "application/json", "Location" => redirect_url
             }
           )
 
@@ -252,21 +252,21 @@ describe GoogleDrive::Connection do
         end
       end
 
-      context 'with 429 throttling response' do
+      context "with 429 throttling response" do
         let(:http_status) { 429 }
 
-        it 'will retry on ClientError' do
+        it "will retry on ClientError" do
           expect { connection.download("42", nil) }.to raise_error Google::APIClient::ClientError
 
           expect(WebMock).to(have_requested(:get, files_url).times(2))
         end
       end
 
-      context 'with 503 gateway error response' do
+      context "with 503 gateway error response" do
         let(:http_status) { 503 }
-        let(:body) { '' }
+        let(:body) { "" }
 
-        it 'will retry on ServerError' do
+        it "will retry on ServerError" do
           expect { connection.download("42", nil) }.to raise_error Google::APIClient::ServerError
 
           expect(WebMock).to(have_requested(:get, files_url).times(2))
@@ -288,7 +288,6 @@ describe GoogleDrive::Connection do
     describe "#authorized?" do
       it "returns false when there ConnectionException" do
         GoogleDrive::Connection.config = GoogleDrive::Connection.config = proc do
-          nil
         end
 
         expect(connection.authorized?).to be false
@@ -302,7 +301,7 @@ describe GoogleDrive::Connection do
 
       it "returns true when response is 200" do
         stub_request(:get, "https://www.googleapis.com/drive/v2/about")
-          .to_return(:status => 200, :body => "", :headers => {})
+          .to_return(status: 200, body: "", headers: {})
 
         expect(connection.authorized?).to be true
       end

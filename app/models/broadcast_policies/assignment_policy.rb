@@ -28,7 +28,7 @@ module BroadcastPolicies
 
     def should_dispatch_assignment_due_date_changed?
       accepting_messages? &&
-        assignment.changed_in_state(:published, :fields => :due_at) &&
+        assignment.changed_in_state(:published, fields: :due_at) &&
         !just_published? &&
         !AssignmentPolicy.due_dates_equal?(assignment.due_at, assignment.due_at_before_last_save)
     end

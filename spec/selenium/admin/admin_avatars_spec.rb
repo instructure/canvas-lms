@@ -17,10 +17,10 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../common'
-require_relative '../grades/pages/gradebook_page'
-require_relative '../grades/pages/gradebook_cells_page'
-require_relative 'pages/student_context_tray_page'
+require_relative "../common"
+require_relative "../grades/pages/gradebook_page"
+require_relative "../grades/pages/gradebook_cells_page"
+require_relative "pages/student_context_tray_page"
 
 # We have the funky indenting here because we will remove this once the granular
 # permission stuff is released, and I don't want to complicate the git history
@@ -35,7 +35,7 @@ RSpec.shared_examples "course_files" do
     before do
       course_with_admin_logged_in
       Account.default.enable_service(:avatars)
-      Account.default.settings[:avatars] = 'enabled_pending'
+      Account.default.settings[:avatars] = "enabled_pending"
       Account.default.save!
     end
 
@@ -58,7 +58,7 @@ RSpec.shared_examples "course_files" do
         f(opts.keys[0]).click
       end
       expect(f("#avatars .name")).to include_text user.name
-      expect(f(".avatar")).to have_attribute('style', /http/)
+      expect(f(".avatar")).to have_attribute("style", /http/)
     end
 
     def lock_avatar(user, element)
@@ -142,7 +142,7 @@ RSpec.shared_examples "course_files" do
         Gradebook::Cells.student_cell_name_link(@student).click
       end
 
-      it "displays student avatar in tray", priority: "1", test_id: 3299466 do
+      it "displays student avatar in tray", priority: "1" do
         wait_for_student_tray
 
         expect(student_avatar_link).to be_displayed
@@ -151,13 +151,13 @@ RSpec.shared_examples "course_files" do
   end
 end # End shared_example block
 
-RSpec.describe 'With granular permission on' do
+RSpec.describe "With granular permission on" do
   it_behaves_like "course_files" do
     let(:set_granular_permission) { Account.default.root_account.enable_feature!(:granular_permissions_manage_users) }
   end
 end
 
-RSpec.describe 'With granular permission off' do
+RSpec.describe "With granular permission off" do
   it_behaves_like "course_files" do
     let(:set_granular_permission) { Account.default.root_account.disable_feature!(:granular_permissions_manage_users) }
   end

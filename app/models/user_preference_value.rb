@@ -65,7 +65,7 @@ class UserPreferenceValue < ActiveRecord::Base
   module UserMethods
     # i could just stuff all this in user.rb directly but it's so full already
     def needs_preference_migration?
-      self.preferences.any? do |key, value|
+      preferences.any? do |key, value|
         UserPreferenceValue.settings[key] && value.present? && value != EXTERNAL
       end
     end
@@ -76,7 +76,7 @@ class UserPreferenceValue < ActiveRecord::Base
 
       reorganize_gradebook_preferences # may as well while we're at it
       UserPreferenceValue.settings.each do |key, settings|
-        value = self.preferences[key]
+        value = preferences[key]
         next unless value.present?
         next if value == EXTERNAL
 
@@ -87,22 +87,20 @@ class UserPreferenceValue < ActiveRecord::Base
         else
           create_user_preference_value(key, nil, value)
         end
-        self.preferences[key] = EXTERNAL
+        preferences[key] = EXTERNAL
       end
     end
 
     def get_preference(key, sub_key = nil)
-      value = self.preferences[key]
+      value = preferences[key]
       if value == EXTERNAL
-        id, value = self.user_preference_values.where(:key => key, :sub_key => sub_key).pluck(:id, :value).first
+        id, value = user_preference_values.where(key: key, sub_key: sub_key).pluck(:id, :value).first
         mark_preference_row(key, sub_key) if id # if we know there's a row
         value
+      elsif sub_key
+        value && value[sub_key]
       else
-        if sub_key
-          value && value[sub_key]
-        else
-          value
-        end
+        value
       end
     end
 
@@ -129,26 +127,26 @@ class UserPreferenceValue < ActiveRecord::Base
         else
           create_user_preference_value(key, sub_key, value)
         end
-        self.preferences[key] = EXTERNAL
+        preferences[key] = EXTERNAL
       else
-        self.preferences[key] = value # can keep a blank value in directly here
+        preferences[key] = value # can keep a blank value in directly here
       end
-      self.changed? ? self.save : true
+      changed? ? save : true
     end
 
     def clear_all_preferences_for(key)
       if UserPreferenceValue.settings[key]&.[](:use_sub_keys)
-        self.user_preference_values.where(:key => key).delete_all
+        user_preference_values.where(key: key).delete_all
         @existing_preference_rows&.clear
-        self.preferences[key] = {}
-        self.save! if self.changed?
+        preferences[key] = {}
+        save! if changed?
       else
         raise "invalid key `#{key}`"
       end
     end
 
     def preference_row_exists?(key, sub_key)
-      @existing_preference_rows&.include?([key, sub_key]) || self.user_preference_values.where(:key => key, :sub_key => sub_key).exists?
+      @existing_preference_rows&.include?([key, sub_key]) || user_preference_values.where(key: key, sub_key: sub_key).exists?
     end
 
     def mark_preference_row(key, sub_key)
@@ -159,7 +157,7 @@ class UserPreferenceValue < ActiveRecord::Base
     def create_user_preference_value(key, sub_key, value)
       UserPreferenceValue.unique_constraint_retry do |retry_count|
         if retry_count == 0
-          self.user_preference_values.create!(:key => key, :sub_key => sub_key, :value => value)
+          user_preference_values.create!(key: key, sub_key: sub_key, value: value)
         else
           update_user_preference_value(key, sub_key, value) # may already exist
         end
@@ -168,16 +166,16 @@ class UserPreferenceValue < ActiveRecord::Base
     end
 
     def update_user_preference_value(key, sub_key, value)
-      self.user_preference_values.where(:key => key, :sub_key => sub_key).update_all(:value => value)
+      user_preference_values.where(key: key, sub_key: sub_key).update_all(value: value)
     end
 
     def remove_user_preference_value(key, sub_key)
-      self.user_preference_values.where(:key => key, :sub_key => sub_key).delete_all
+      user_preference_values.where(key: key, sub_key: sub_key).delete_all
       @existing_preference_rows&.delete([key, sub_key])
     end
 
     # --- here are some hacks so we can split up the gradebook column size setting better ---
-    SHARED_GRADEBOOK_COLUMNS = %w{student secondary_identifier total_grade}.freeze
+    SHARED_GRADEBOOK_COLUMNS = %w[student secondary_identifier total_grade].freeze
     # whether we can split the column size setting into a per-course hash or in a shared one
     def shared_gradebook_column?(column)
       SHARED_GRADEBOOK_COLUMNS.include?(column)
@@ -206,24 +204,24 @@ class UserPreferenceValue < ActiveRecord::Base
 
         # none of these were set with any shard awareness so just go through all the possible shards and
         # even if we end up saving data for courses the user doesn't have any rights to it's better than potentially losing it
-        Shard.with_each_shard(self.associated_shards) do
+        Shard.with_each_shard(associated_shards) do
           # split up the other settings by course id
           if id_map["assignment"]
-            Assignment.where(:id => id_map["assignment"]).pluck(:id, :context_id).each do |a_id, course_id|
+            Assignment.where(id: id_map["assignment"]).pluck(:id, :context_id).each do |a_id, course_id|
               course_id = Shard.global_id_for(course_id)
               new_sizes[course_id] ||= {}
               new_sizes[course_id]["assignment_#{a_id}"] = sizes["assignment_#{a_id}"]
             end
           end
           if id_map["assignment_group"]
-            AssignmentGroup.where(:id => id_map["assignment_group"]).pluck(:id, :context_id).each do |ag_id, course_id|
+            AssignmentGroup.where(id: id_map["assignment_group"]).pluck(:id, :context_id).each do |ag_id, course_id|
               course_id = Shard.global_id_for(course_id)
               new_sizes[course_id] ||= {}
               new_sizes[course_id]["assignment_group_#{ag_id}"] = sizes["assignment_group_#{ag_id}"]
             end
           end
           if id_map["custom_col"]
-            CustomGradebookColumn.where(:id => id_map["custom_col"]).pluck(:id, :course_id).each do |cc_id, course_id|
+            CustomGradebookColumn.where(id: id_map["custom_col"]).pluck(:id, :course_id).each do |cc_id, course_id|
               course_id = Shard.global_id_for(course_id)
               new_sizes[course_id] ||= {}
               new_sizes[course_id]["custom_col_#{cc_id}"] = sizes["custom_col_#{cc_id}"]
@@ -241,7 +239,7 @@ class UserPreferenceValue < ActiveRecord::Base
         new_gb_prefs = {}
         current_gb_prefs.each do |local_course_id, value|
           # we don't know exactly which shard it was set for, so just set it for them all associated shards
-          self.associated_shards.each do |shard|
+          associated_shards.each do |shard|
             new_gb_prefs[Shard.global_id_for(local_course_id, shard)] = value
           end
         end

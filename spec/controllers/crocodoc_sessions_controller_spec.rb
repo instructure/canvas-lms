@@ -20,13 +20,13 @@
 
 describe CrocodocSessionsController do
   before :once do
-    Setting.set 'crocodoc_counter', 0
-    PluginSetting.create! :name => 'crocodoc',
-                          :settings => { :api_key => "blahblahblahblahblah" }
+    Setting.set "crocodoc_counter", 0
+    PluginSetting.create! name: "crocodoc",
+                          settings: { api_key: "blahblahblahblahblah" }
     @student_pseudonym = @pseudonym
-    course_with_teacher(:active_all => true)
-    student_in_course(:active_all => true)
-    attachment_model :content_type => 'application/pdf', :context => @student
+    course_with_teacher(active_all: true)
+    student_in_course(active_all: true)
+    attachment_model content_type: "application/pdf", context: @student
     @blob = { attachment_id: @attachment.global_id,
               user_id: @student.global_id,
               type: "crocodoc" }.to_json
@@ -34,8 +34,8 @@ describe CrocodocSessionsController do
   end
 
   before do
-    allow_any_instance_of(Crocodoc::API).to receive(:upload).and_return 'uuid' => '1234567890'
-    allow_any_instance_of(Crocodoc::API).to receive(:session).and_return 'session' => 'SESSION'
+    allow_any_instance_of(Crocodoc::API).to receive(:upload).and_return "uuid" => "1234567890"
+    allow_any_instance_of(Crocodoc::API).to receive(:session).and_return "session" => "SESSION"
     user_session(@student)
   end
 
@@ -46,7 +46,7 @@ describe CrocodocSessionsController do
 
     it "works for the user in the blob" do
       get :show, params: { blob: @blob, hmac: @hmac }
-      expect(response.body).to include 'https://crocodoc.com/view/SESSION'
+      expect(response.body).to include "https://crocodoc.com/view/SESSION"
     end
 
     it "doesn't work for others" do
@@ -72,7 +72,7 @@ describe CrocodocSessionsController do
 
     it "updates attachment.viewed_at if the owner (person in the user attribute of the attachment) views" do
       assignment = @course.assignments.create!(assignment_valid_attributes)
-      attachment = attachment_model content_type: 'application/pdf', context: assignment, user: @student
+      attachment = attachment_model content_type: "application/pdf", context: assignment, user: @student
       attachment.submit_to_crocodoc
       blob = { attachment_id: attachment.global_id,
                user_id: @student.global_id,
@@ -114,20 +114,20 @@ describe CrocodocSessionsController do
       allow(Canvadocs).to receive(:annotations_supported?).and_return true
       allow(Canvadocs).to receive(:hijack_crocodoc_sessions?).and_return false
 
-      allow_any_instance_of(Canvadocs::API).to receive(:session).and_return 'id' => 'SESSION'
-      PluginSetting.create! :name => 'canvadocs',
-                            :settings => { "base_url" => "https://canvadocs.instructure.docker" }
+      allow_any_instance_of(Canvadocs::API).to receive(:session).and_return "id" => "SESSION"
+      PluginSetting.create! name: "canvadocs",
+                            settings: { "base_url" => "https://canvadocs.instructure.docker" }
     end
 
     it "redirects to a canvadocs session instead of crocodoc when enabled" do
       allow(Canvadocs).to receive(:hijack_crocodoc_sessions?).and_return true
       get :show, params: { blob: @blob, hmac: @hmac }
-      expect(response.body).to include 'https://canvadocs.instructure.docker/sessions/SESSION/view'
+      expect(response.body).to include "https://canvadocs.instructure.docker/sessions/SESSION/view"
     end
 
     it "does not redirect to a canvadocs session instead of crocodoc when disabled" do
       get :show, params: { blob: @blob, hmac: @hmac }
-      expect(response.body).to_not include 'https://canvadocs.instructure.docker/sessions/SESSION/view'
+      expect(response.body).to_not include "https://canvadocs.instructure.docker/sessions/SESSION/view"
     end
   end
 end

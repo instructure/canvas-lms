@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../../api_spec_helper'
+require_relative "../../api_spec_helper"
 
 describe "Outcomes Import API", type: :request do
   let(:guid) { "A833C528-901A-11DF-A622-0C319DFF4B22" }
@@ -36,10 +36,10 @@ describe "Outcomes Import API", type: :request do
   def available_json(expected_status: 200)
     api_call(:get, "/api/v1/global/outcomes_import/available",
              {
-               controller: 'outcomes_academic_benchmark_import_api',
-               action: 'available',
+               controller: "outcomes_academic_benchmark_import_api",
+               action: "available",
                account_id: @account.id.to_s,
-               format: 'json',
+               format: "json",
              },
              {},
              {},
@@ -51,10 +51,10 @@ describe "Outcomes Import API", type: :request do
   def create_json(guid:, expected_status: 200)
     api_call(:post, "/api/v1/global/outcomes_import",
              {
-               controller: 'outcomes_academic_benchmark_import_api',
-               action: 'create',
+               controller: "outcomes_academic_benchmark_import_api",
+               action: "create",
                account_id: @account.id.to_s,
-               format: 'json',
+               format: "json",
              },
              {
                guid: guid
@@ -68,10 +68,10 @@ describe "Outcomes Import API", type: :request do
   def create_full_json(json:, expected_status: 200)
     api_call(:post, "/api/v1/global/outcomes_import",
              {
-               controller: 'outcomes_academic_benchmark_import_api',
-               action: 'create',
+               controller: "outcomes_academic_benchmark_import_api",
+               action: "create",
                account_id: @account.id.to_s,
-               format: 'json',
+               format: "json",
              },
              json,
              {},
@@ -83,10 +83,10 @@ describe "Outcomes Import API", type: :request do
   def status_json(migration_id:, expected_status: 200)
     api_call(:get, "/api/v1/global/outcomes_import/migration_status/#{migration_id}",
              {
-               controller: 'outcomes_academic_benchmark_import_api',
-               action: 'migration_status',
+               controller: "outcomes_academic_benchmark_import_api",
+               action: "migration_status",
                account_id: @account.id.to_s,
-               format: 'json',
+               format: "json",
                migration_id: migration_id
              },
              {},
@@ -101,7 +101,7 @@ describe "Outcomes Import API", type: :request do
       account_user.account,
       account_user.role,
       permission.to_s,
-      :override => false
+      override: false
     )
   end
 
@@ -110,19 +110,19 @@ describe "Outcomes Import API", type: :request do
   end
 
   before :once do
-    user_with_pseudonym(:active_all => true)
+    user_with_pseudonym(active_all: true)
     @account = Account.default
-    @account_user = @user.account_users.create(:account => Account.site_admin)
+    @account_user = @user.account_users.create(account: Account.site_admin)
   end
 
   shared_examples "academic benchmark config" do
     describe "config" do
       let(:request) do
-        ->(type:, guid: nil, expected_status: 200) do
+        lambda do |type:, guid: nil, expected_status: 200|
           case type
           when "available" then return available_json(expected_status: expected_status)
           when "create" then return create_json(guid: guid, expected_status: expected_status)
-          else fail "unknown request type"
+          else raise "unknown request type"
           end
         end
       end
@@ -302,22 +302,22 @@ describe "Outcomes Import API", type: :request do
                                                          ratings: "1"
                                                        }))).to have_key("error")
           expect(create_full_json(json: create_request({
-                                                         'ratings[][description]' => nil
+                                                         "ratings[][description]" => nil
                                                        }))).to have_key("error")
           expect(create_full_json(json: create_request({
-                                                         'ratings[][description]' => "stuff"
+                                                         "ratings[][description]" => "stuff"
                                                        }))).to have_key("error")
           expect(create_full_json(json: create_request({
-                                                         'ratings[][description]' => "stuff",
-                                                         'ratings[][points]' => nil
+                                                         "ratings[][description]" => "stuff",
+                                                         "ratings[][points]" => nil
                                                        }))).to have_key("error")
           expect(create_full_json(json: create_request({
-                                                         'ratings[][description]' => "stuff",
-                                                         'ratings[][points]' => ""
+                                                         "ratings[][description]" => "stuff",
+                                                         "ratings[][points]" => ""
                                                        }))).to have_key("error")
           expect(create_full_json(json: create_request({
-                                                         'ratings[][description]' => "stuff",
-                                                         'ratings[][points]' => "0.1"
+                                                         "ratings[][description]" => "stuff",
+                                                         "ratings[][points]" => "0.1"
                                                        }))).to have_key("error")
           expect(create_full_json(json: create_request({
                                                          ratings: [{ description: ["stuff", "more stuff"], points: 10 },
@@ -335,46 +335,46 @@ describe "Outcomes Import API", type: :request do
 
         it "accepts valid calculation methods" do
           expect(create_full_json(json: create_request({
-                                                         calculation_method: 'decaying_average',
+                                                         calculation_method: "decaying_average",
                                                          calculation_int: 60
                                                        }))).not_to have_key("error")
           expect(create_full_json(json: create_request({
-                                                         calculation_method: 'n_mastery',
+                                                         calculation_method: "n_mastery",
                                                          calculation_int: 3
                                                        }))).not_to have_key("error")
           expect(create_full_json(json: create_request({
-                                                         calculation_method: 'highest'
+                                                         calculation_method: "highest"
                                                        }))).not_to have_key("error")
           expect(create_full_json(json: create_request({
-                                                         calculation_method: 'latest'
+                                                         calculation_method: "latest"
                                                        }))).not_to have_key("error")
         end
 
         it "rejects malformed calculation methods" do
           expect(create_full_json(json: create_request({
-                                                         calculation_method: 'invalid calculation method',
+                                                         calculation_method: "invalid calculation method",
                                                          calculation_int: 60
                                                        }))).to have_key("error")
           expect(create_full_json(json: create_request({
-                                                         calculation_method: 'decaying_average'
+                                                         calculation_method: "decaying_average"
                                                        }))).to have_key("error")
           expect(create_full_json(json: create_request({
-                                                         calculation_method: 'decaying_average',
+                                                         calculation_method: "decaying_average",
                                                          calculation_int: 200
                                                        }))).to have_key("error")
           expect(create_full_json(json: create_request({
-                                                         calculation_method: 'n_mastery'
+                                                         calculation_method: "n_mastery"
                                                        }))).to have_key("error")
           expect(create_full_json(json: create_request({
-                                                         calculation_method: 'n_mastery',
+                                                         calculation_method: "n_mastery",
                                                          calculation_int: 100
                                                        }))).to have_key("error")
           expect(create_full_json(json: create_request({
-                                                         calculation_method: 'highest',
+                                                         calculation_method: "highest",
                                                          calculation_int: 1
                                                        }))).to have_key("error")
           expect(create_full_json(json: create_request({
-                                                         calculation_method: 'latest',
+                                                         calculation_method: "latest",
                                                          calculation_int: 1
                                                        }))).to have_key("error")
         end
@@ -396,7 +396,7 @@ describe "Outcomes Import API", type: :request do
                              migration_type: nil
                            })
           allow(cm_mock).to receive(:migration_issues).and_return([])
-          allow(ContentMigration).to receive(:find).with('2').and_return(cm_mock)
+          allow(ContentMigration).to receive(:find).with("2").and_return(cm_mock)
           expect(status_json(migration_id: 2)["migration_issues_count"]).to eq 0
         end
       end
@@ -416,15 +416,15 @@ describe "Outcomes Import API", type: :request do
         .and_return(filename_to_hash("available_authorities.json")
                 .map { |a| AcademicBenchmarks::Standards::Authority.from_hash(a) })
       allow(standards_mock).to receive(:authority_publications)
-        .with(not_eq('CC').and(not_eq('Achieve')))
+        .with(not_eq("CC").and(not_eq("Achieve")))
         .and_return(filename_to_hash("iste_authority_pubs.json")
                 .map { |d| AcademicBenchmarks::Standards::Document.from_hash(d) })
       allow(standards_mock).to receive(:authority_publications)
-        .with('Achieve')
+        .with("Achieve")
         .and_return(filename_to_hash("achieve_authority_pubs.json")
                 .map { |d| AcademicBenchmarks::Standards::Document.from_hash(d) })
       allow(standards_mock).to receive(:authority_publications)
-        .with('CC')
+        .with("CC")
         .and_return(filename_to_hash("common_core_authority_pubs.json")
                .map { |d| AcademicBenchmarks::Standards::Document.from_hash(d) })
       allow(AcademicBenchmarks::Api::Standards).to receive(:new).and_return(standards_mock)

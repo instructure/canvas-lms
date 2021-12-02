@@ -17,22 +17,22 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'active_support'
+require "active_support"
 
 describe Quizzes::QuizRegrader::AttemptVersion do
   let(:regrade_options) do
-    { 1 => 'no_regrade', 2 => 'full_credit', 3 => 'current_correct_only' }
+    { 1 => "no_regrade", 2 => "full_credit", 3 => "current_correct_only" }
   end
 
   let(:question_group) do
-    double(:pick_count => 1, :question_points => 25)
+    double(pick_count: 1, question_points: 25)
   end
 
   let(:question_regrades) do
-    1.upto(3).each_with_object({}) do |i, hash|
-      hash[i] = double(:quiz_question => double(:id => i, :question_data => { :id => i }, :quiz_group => question_group),
-                       :question_data => { :id => i },
-                       :regrade_option => regrade_options[i])
+    1.upto(3).index_with do |i|
+      double(quiz_question: double(id: i, question_data: { id: i }, quiz_group: question_group),
+             question_data: { id: i },
+             regrade_option: regrade_options[i])
     end
   end
 
@@ -41,7 +41,7 @@ describe Quizzes::QuizRegrader::AttemptVersion do
   end
 
   let(:submission_data) do
-    1.upto(3).map { |i| { :question_id => i } }
+    1.upto(3).map { |i| { question_id: i } }
   end
 
   let(:submission) do
@@ -55,12 +55,12 @@ describe Quizzes::QuizRegrader::AttemptVersion do
   end
 
   let(:version) do
-    double(:model => submission)
+    double(model: submission)
   end
 
   let(:attempt_version) do
-    Quizzes::QuizRegrader::AttemptVersion.new(:version => version,
-                                              :question_regrades => question_regrades)
+    Quizzes::QuizRegrader::AttemptVersion.new(version: version,
+                                              question_regrades: question_regrades)
   end
 
   describe "#initialize" do
@@ -82,7 +82,7 @@ describe Quizzes::QuizRegrader::AttemptVersion do
       end
 
       # submission data isn't called if not included in question_regrades
-      submission_data << { :question_id => 4 }
+      submission_data << { question_id: 4 }
       expect(Quizzes::QuizRegrader::Answer).not_to receive(:new).with(submission_data.last, nil)
 
       expect(submission).to receive(:score=).with(3)

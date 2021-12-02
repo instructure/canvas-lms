@@ -17,22 +17,23 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_dependency 'importers'
+require_dependency "importers"
 
 module Importers
   class RubricImporter < Importer
     self.item_class = Rubric
 
     def self.process_migration(data, migration)
-      rubrics = data['rubrics'] ? data['rubrics'] : []
+      rubrics = data["rubrics"] || []
       migration.outcome_to_id_map ||= {}
+      migration.copied_external_outcome_map ||= {}
       rubrics.each do |rubric|
-        if migration.import_object?("rubrics", rubric['migration_id'])
-          begin
-            self.import_from_migration(rubric, migration)
-          rescue
-            migration.add_import_warning(t('#migration.rubric_type', "Rubric"), rubric[:title], $!)
-          end
+        next unless migration.import_object?("rubrics", rubric["migration_id"])
+
+        begin
+          import_from_migration(rubric, migration)
+        rescue
+          migration.add_import_warning(t("#migration.rubric_type", "Rubric"), rubric[:title], $!)
         end
       end
     end
@@ -46,7 +47,7 @@ module Importers
       if !item && hash[:external_identifier]
         rubric = context.available_rubric(hash[:external_identifier]) unless migration.cross_institution?
 
-        if !rubric
+        unless rubric
           Rails.logger.warn("The external Rubric couldn't be found for \"#{hash[:title]}\", creating a copy.")
         end
       end
@@ -56,9 +57,9 @@ module Importers
       else
         item ||= Rubric.where(context_id: context, context_type: context.class.to_s, id: hash[:id]).first
         item ||= Rubric.where(context_id: context, context_type: context.class.to_s, migration_id: hash[:migration_id]).first if hash[:migration_id]
-        item ||= Rubric.new(:context => context)
+        item ||= Rubric.new(context: context)
         item.migration_id = hash[:migration_id]
-        item.workflow_state = 'active' if item.deleted?
+        item.workflow_state = "active" if item.deleted?
         item.title = hash[:title]
         item.populate_rubric_title # just in case
         item.description = hash[:description]
@@ -77,9 +78,17 @@ module Importers
             elsif (lo = context.created_learning_outcomes.where(migration_id: crit[:learning_outcome_migration_id]).first)
               crit[:learning_outcome_id] = lo.id
             end
-          elsif crit[:learning_outcome_external_identifier].present? && !migration.cross_institution? &&
-                (lo = context.available_outcome(crit[:learning_outcome_external_identifier]))
-            crit[:learning_outcome_id] = lo.id
+          elsif crit[:learning_outcome_external_identifier].present?
+            # link an account outcome
+            lo = context.available_outcome(crit[:learning_outcome_external_identifier]) unless migration.cross_institution?
+
+            # link the copy of an account outcome that isn't available in the destination context
+            unless lo
+              mig_id = migration.copied_external_outcome_map[crit[:learning_outcome_external_identifier]]
+              lo = context.created_learning_outcomes.find_by(migration_id: mig_id) if mig_id
+            end
+
+            crit[:learning_outcome_id] = lo.id if lo
           end
           crit.delete(:learning_outcome_migration_id)
           crit.delete(:learning_outcome_external_identifier)

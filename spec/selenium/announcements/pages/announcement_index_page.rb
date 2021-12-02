@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-require_relative '../../common'
+require_relative "../../common"
 
 class AnnouncementIndex
   class << self
@@ -26,9 +26,9 @@ class AnnouncementIndex
 
     def visit_announcements(course_id)
       get "/courses/#{course_id}/announcements"
-      wait_for(method: nil, timeout: 1) {
+      wait_for(method: nil, timeout: 1) do
         fj("title:contains('Loading Announcements')", announcements_main_content)
-      }
+      end
     end
 
     def visit_groups_index(group)
@@ -37,7 +37,7 @@ class AnnouncementIndex
     end
 
     def new_announcement_url
-      '/discussion_topics/new?is_announcement=true'
+      "/discussion_topics/new?is_announcement=true"
     end
 
     def individual_announcement_url(announcement)
@@ -58,29 +58,29 @@ class AnnouncementIndex
     end
 
     def lock_button
-      f('#lock_announcements')
+      f("#lock_announcements")
     end
 
     def delete_button
-      f('#delete_announcements')
+      f("#delete_announcements")
     end
 
     def confirm_delete_alert
-      f('button#confirm_delete_announcements')
+      f("button#confirm_delete_announcements")
     end
 
     def add_announcement_button
-      f('#add_announcement')
+      f("#add_announcement")
     end
 
     def open_external_feeds
-      f('#external_feed').click
+      f("#external_feed").click
     end
 
     # ---------------------- Announcement ----------------------
 
     def announcements_main_content
-      f('.announcements-v2__wrapper')
+      f(".announcements-v2__wrapper")
     end
 
     def announcement(title)
@@ -92,7 +92,7 @@ class AnnouncementIndex
     end
 
     def announcement_title(title)
-      f('h3', announcement(title))
+      f("h3", announcement(title))
     end
 
     def announcement_checkbox(title)
@@ -100,7 +100,7 @@ class AnnouncementIndex
     end
 
     def announcement_unread_pill(title)
-      f('.ic-unread-badge__unread-count', announcement(title))
+      f(".ic-unread-badge__unread-count", announcement(title))
     end
 
     def announcement_unread_number(title)
@@ -108,15 +108,15 @@ class AnnouncementIndex
     end
 
     def announcement_options_menu(title)
-      f('.ic-item-row__manage-menu button', announcement(title))
+      f(".ic-item-row__manage-menu button", announcement(title))
     end
 
     def delete_announcement_option
-      f('#delete-announcement-menu-option')
+      f("#delete-announcement-menu-option")
     end
 
     def lock_menu
-      f('#lock-announcement-menu-option')
+      f("#lock-announcement-menu-option")
     end
 
     # ---------------------- Actions ----------------------

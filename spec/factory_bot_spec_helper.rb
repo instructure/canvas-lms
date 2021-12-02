@@ -24,13 +24,13 @@
 # since absorbing the code into the hivemind is going to be hard enough
 # without having to rewrite all their specs into a canvas-y way
 
-require 'factory_bot'
+require "factory_bot"
 RSpec.configure do |config|
   config.include FactoryBot::Syntax::Methods
 
   config.before(:suite) do
-    unless FactoryBot.definition_file_paths == %w{spec/factory_bot} # already loaded
-      FactoryBot.definition_file_paths = %w{spec/factory_bot}
+    unless FactoryBot.definition_file_paths == %w[spec/factory_bot] # already loaded
+      FactoryBot.definition_file_paths = %w[spec/factory_bot]
       FactoryBot.find_definitions
     end
   end

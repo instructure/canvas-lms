@@ -29,15 +29,15 @@ module HasContentTags
 
   def check_if_associated_content_tags_need_updating
     @associated_content_tags_need_updating = false
-    return if self.new_record?
-    return if self.respond_to?(:context_type) && %w{SisBatch Folder}.include?(self.context_type)
+    return if new_record?
+    return if respond_to?(:context_type) && %w[SisBatch Folder].include?(context_type)
 
-    @associated_content_tags_need_updating = true if self.respond_to?(:title_changed?) && self.title_changed?
-    @associated_content_tags_need_updating = true if self.respond_to?(:name_changed?) && self.name_changed?
-    @associated_content_tags_need_updating = true if self.respond_to?(:display_name_changed?) && self.display_name_changed?
-    @associated_content_tags_need_updating = true if self.respond_to?(:points_possible_changed?) && self.points_possible_changed?
-    @associated_content_tags_need_updating = true if (self.respond_to?(:workflow_state_changed?) && self.workflow_state_changed?) || self.workflow_state == 'deleted'
-    @associated_content_tags_need_updating = true if self.is_a?(Attachment) && self.locked_changed?
+    @associated_content_tags_need_updating = true if respond_to?(:title_changed?) && title_changed?
+    @associated_content_tags_need_updating = true if respond_to?(:name_changed?) && name_changed?
+    @associated_content_tags_need_updating = true if respond_to?(:display_name_changed?) && display_name_changed?
+    @associated_content_tags_need_updating = true if respond_to?(:points_possible_changed?) && points_possible_changed?
+    @associated_content_tags_need_updating = true if (respond_to?(:workflow_state_changed?) && workflow_state_changed?) || workflow_state == "deleted"
+    @associated_content_tags_need_updating = true if is_a?(Attachment) && locked_changed?
   end
 
   def self.included(klass)
@@ -46,16 +46,16 @@ module HasContentTags
   end
 
   def locked_request_cache_key(user)
-    keys = ['_locked_for4', self, user]
-    unlocked_at = self.respond_to?(:unlock_at) ? self.unlock_at : nil
-    locked_at = self.respond_to?(:lock_at) ? self.lock_at : nil
+    keys = ["_locked_for4", self, user]
+    unlocked_at = respond_to?(:unlock_at) ? unlock_at : nil
+    locked_at = respond_to?(:lock_at) ? lock_at : nil
     keys << (unlocked_at ? unlocked_at > Time.zone.now : false)
     keys << (locked_at ? locked_at < Time.zone.now : false)
     keys
   end
 
   def relock_modules!(relocked_modules = [], student_ids = nil)
-    ContextModule.where(:id => ContentTag.where(:content_id => self, :content_type => self.class.to_s).not_deleted.select(:context_module_id)).each do |mod|
+    ContextModule.where(id: ContentTag.where(content_id: self, content_type: self.class.to_s).not_deleted.select(:context_module_id)).each do |mod|
       mod.relock_progressions(relocked_modules, student_ids)
     end
   end

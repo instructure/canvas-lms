@@ -16,16 +16,16 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative 'cc_spec_helper'
+require_relative "cc_spec_helper"
 
-require 'nokogiri'
+require "nokogiri"
 
 describe CC::AssignmentResources do
   let(:assignment) { assignment_model }
   let(:document) { Builder::XmlMarkup.new(target: xml, indent: 2) }
-  let(:xml) { +'' }
+  let(:xml) { +"" }
 
-  describe '#create_canvas_assignment' do
+  describe "#create_canvas_assignment" do
     subject do
       document.assignment(identifier: SecureRandom.uuid) do |a|
         CC::AssignmentResources.create_canvas_assignment(a, assignment)
@@ -33,21 +33,21 @@ describe CC::AssignmentResources do
       Nokogiri::XML(xml) { |c| c.nonet.strict }
     end
 
-    it 'does not set the resource link lookup uuid' do
-      expect(subject.at('resource_link_lookup_uuid')).to be_blank
+    it "does not set the resource link lookup uuid" do
+      expect(subject.at("resource_link_lookup_uuid")).to be_blank
     end
 
-    context 'with an associated LTI 1.3 tool' do
+    context "with an associated LTI 1.3 tool" do
       let(:assignment) do
         course.assignments.new(
-          name: 'test assignment',
-          submission_types: 'external_tool',
+          name: "test assignment",
+          submission_types: "external_tool",
           points_possible: 10
         )
       end
 
       let(:course) { course_model }
-      let(:custom_params) { { foo: 'bar ' } }
+      let(:custom_params) { { foo: "bar " } }
       let(:developer_key) { DeveloperKey.create!(account: course.root_account) }
       let(:tag) { ContentTag.create!(context: assignment, content: tool, url: tool.url) }
       let(:tool) { external_tool_model(context: course, opts: { use_1_3: true }) }
@@ -59,8 +59,8 @@ describe CC::AssignmentResources do
         assignment.primary_resource_link.update!(custom: custom_params)
       end
 
-      it 'sets the resource link lookup uuid' do
-        expect(subject.at('resource_link_lookup_uuid').text).to eq(
+      it "sets the resource link lookup uuid" do
+        expect(subject.at("resource_link_lookup_uuid").text).to eq(
           assignment.primary_resource_link.lookup_uuid
         )
       end

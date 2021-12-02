@@ -18,11 +18,11 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'nokogiri'
+require "nokogiri"
 
 describe WikiPagesController do
   before do
-    course_with_teacher_logged_in(:active_all => true)
+    course_with_teacher_logged_in(active_all: true)
   end
 
   def create_page(attrs)
@@ -32,33 +32,33 @@ describe WikiPagesController do
   end
 
   it "still works with periods in titles for new pages" do
-    course_with_teacher_logged_in(:active_all => true, :user => user_with_pseudonym)
+    course_with_teacher_logged_in(active_all: true, user: user_with_pseudonym)
 
     get "/courses/#{@course.id}/pages/windurs%203.won/edit?titleize=1"
     expect(response).to be_successful
   end
 
   it "does not render wiki page body at all if it was deleted" do
-    @wiki_page = create_page :title => "Some random wiki page",
-                             :body => "this is the content of the wikipage body asdfasdf"
+    @wiki_page = create_page title: "Some random wiki page",
+                             body: "this is the content of the wikipage body asdfasdf"
     @wiki_page.destroy
     get course_wiki_page_url(@course, @wiki_page)
     expect(response.body).not_to include(@wiki_page.body)
   end
 
   it "links correctly in the breadcrumbs for group wikis" do
-    course_with_teacher_logged_in(:active_all => true, :user => user_with_pseudonym)
-    group_category = @course.group_categories.build(:name => "mygroup")
-    @group = Group.create!(:name => "group1", :group_category => group_category, :context => @course)
-    @wiki_page = @group.wiki_pages.create :title => 'hello', :body => 'This is a wiki page.'
+    course_with_teacher_logged_in(active_all: true, user: user_with_pseudonym)
+    group_category = @course.group_categories.build(name: "mygroup")
+    @group = Group.create!(name: "group1", group_category: group_category, context: @course)
+    @wiki_page = @group.wiki_pages.create title: "hello", body: "This is a wiki page."
 
     def test_page(url)
       get url
       expect(response).to be_successful
 
       html = Nokogiri::HTML5(response.body)
-      html.css('#breadcrumbs a').each do |link|
-        href = link.attr('href')
+      html.css("#breadcrumbs a").each do |link|
+        href = link.attr("href")
         next if href == "/"
 
         expect(href).to match %r{/groups/#{@group.id}}
@@ -80,7 +80,7 @@ describe WikiPagesController do
 
   context "draft state forwarding" do
     before do
-      @wiki_page = create_page :title => "a-page", :body => "body"
+      @wiki_page = create_page title: "a-page", body: "body"
       @base_url = "/courses/#{@course.id}/"
       @course.reload
     end

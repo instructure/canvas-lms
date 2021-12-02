@@ -70,22 +70,18 @@ class Quizzes::QuizSubmissionZipper < ContentZipper
 
   def question_attachment_filename(question, attach, user)
     name = user.last_name_first.gsub(/_(\d+)_/, '-\1-')
-    name = name + user.id.to_s
-    name = name.gsub(/ /, "_").gsub(/[^-\w]/, "").downcase
+    name += user.id.to_s
+    name = name.tr(" ", "_").gsub(/[^-\w]/, "").downcase
     name = "#{name}_question_#{question[:question_id]}_#{attach.id}_#{attach.display_name}"
     [attach, name]
   end
 
   # TODO: Refactor me! This pattern is also used for Student Analysis CSVs.
   def find_attachments
-    ids = submissions.map(&:submission_data).compact.flatten.select do |submission|
+    ids = submissions.filter_map(&:submission_data).flatten.select do |submission|
       submission[:attachment_ids].present?
-    end.map do |submission|
-      submission[:attachment_ids]
-    end.flatten
-    Attachment.where(:id => ids).inject({}) do |hash, attachment|
-      hash[attachment.id] = attachment; hash
-    end
+    end.pluck(:attachment_ids).flatten
+    Attachment.where(id: ids).index_by(&:id)
   end
 
   def find_submissions
@@ -94,9 +90,9 @@ class Quizzes::QuizSubmissionZipper < ContentZipper
       visible_student_ids = quiz.context.apply_enrollment_visibility(
         quiz.context.student_enrollments, zip_attachment.user
       ).pluck(:user_id)
-      submissions = submissions.where(:user_id => visible_student_ids)
+      submissions = submissions.where(user_id: visible_student_ids)
     end
-    @submissions = submissions.reject(&:was_preview).map(&:latest_submitted_attempt).compact
+    @submissions = submissions.reject(&:was_preview).filter_map(&:latest_submitted_attempt)
   end
 
   def quiz_zip_filename(quiz)

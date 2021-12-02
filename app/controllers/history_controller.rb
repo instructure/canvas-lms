@@ -124,8 +124,8 @@ class HistoryController < ApplicationController
     return false unless pv.real_user_id.nil?
 
     url = URI.parse(pv.url)
-    return false if url.path =~ %r{^/api/v1/} # exclude API calls
-    return false if url.path =~ %r{/files/\d+/download} # exclude file downloads (not previews though)
+    return false if %r{^/api/v1/}.match?(url.path) # exclude API calls
+    return false if %r{/files/\d+/download}.match?(url.path) # exclude file downloads (not previews though)
 
     true
   rescue URI::InvalidURIError

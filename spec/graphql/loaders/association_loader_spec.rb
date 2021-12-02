@@ -31,7 +31,7 @@ describe Loaders::AssociationLoader do
 
   around do |example|
     @query_count = 0
-    subscription = ActiveSupport::Notifications.subscribe('sql.active_record') do
+    subscription = ActiveSupport::Notifications.subscribe("sql.active_record") do
       @query_count += 1
     end
 
@@ -46,16 +46,16 @@ describe Loaders::AssociationLoader do
 
     puts @query_count
 
-    expect {
+    expect do
       GraphQL::Batch.batch do
-        Loaders::AssociationLoader.for(Assignment, :context).load(a1).then { |course|
+        Loaders::AssociationLoader.for(Assignment, :context).load(a1).then do |course|
           expect(course).to eq @c1
-        }
-        Loaders::AssociationLoader.for(Assignment, :context).load(a2).then { |course|
+        end
+        Loaders::AssociationLoader.for(Assignment, :context).load(a2).then do |course|
           expect(course).to eq @c2
-        }
+        end
       end
-    }.to change { @query_count }.by(1)
+    end.to change { @query_count }.by(1)
   end
 
   it "batch loads when the association is already loaded on first object" do
@@ -69,10 +69,10 @@ describe Loaders::AssociationLoader do
     # determining whether or not to run)
     a1.course
 
-    expect {
+    expect do
       GraphQL::Batch.batch do
         Loaders::AssociationLoader.for(Assignment, :context).load_many([a1, a2, a3])
       end
-    }.to change { @query_count }.by(1)
+    end.to change { @query_count }.by(1)
   end
 end

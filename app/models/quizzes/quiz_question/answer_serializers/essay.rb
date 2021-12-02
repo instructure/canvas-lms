@@ -30,7 +30,7 @@ module Quizzes::QuizQuestion::AnswerSerializers
       rc = SerializedAnswer.new
 
       unless answer_html.is_a?(String)
-        return rc.reject :invalid_type, 'answer', String
+        return rc.reject :invalid_type, "answer", String
       end
 
       answer_html = Util.sanitize_html answer_html
@@ -48,9 +48,7 @@ module Quizzes::QuizQuestion::AnswerSerializers
     def deserialize(submission_data, full: false)
       text = submission_data[question_key]
 
-      if text.present?
-        text
-      end
+      text.presence
     end
   end
 end

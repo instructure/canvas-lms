@@ -22,7 +22,7 @@ class Mutations::DeleteConversations < Mutations::BaseMutation
   graphql_name "DeleteConversations"
 
   # input arguments
-  argument :ids, [ID], required: true, prepare: GraphQLHelpers.relay_or_legacy_ids_prepare_func('Conversation')
+  argument :ids, [ID], required: true, prepare: GraphQLHelpers.relay_or_legacy_ids_prepare_func("Conversation")
 
   field :conversation_ids, [ID], null: true
 
@@ -30,7 +30,7 @@ class Mutations::DeleteConversations < Mutations::BaseMutation
     errors = {}
     context[:deleted_models] = { conversations: {} }
     # rubocop:disable Style/BlockDelimiters
-    resolved_ids = input[:ids].map { |id|
+    resolved_ids = input[:ids].filter_map { |id|
       conversation = Conversation.find_by(id: id)
       if conversation.nil?
         errors[id] = "Unable to find Conversation"
@@ -46,7 +46,7 @@ class Mutations::DeleteConversations < Mutations::BaseMutation
       participant_record.remove_messages(:all)
       context[:deleted_models][:conversations][conversation.id] = conversation
       conversation.id
-    }.compact
+    }
     # rubocop:enable Style/BlockDelimiters
 
     response = {}

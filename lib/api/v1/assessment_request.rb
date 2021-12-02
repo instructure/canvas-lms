@@ -25,22 +25,22 @@ module Api::V1::AssessmentRequest
 
   def assessment_request_json(assessment_request, user, session, includes = Set.new)
     assignment = assessment_request.asset.assignment
-    json_attributes = %w(id user_id assessor_id asset_id asset_type workflow_state)
+    json_attributes = %w[id user_id assessor_id asset_id asset_type workflow_state]
     if assignment.anonymous_peer_reviews? && !assignment.grants_any_right?(user, session, :grade)
-      json_attributes.delete('assessor_id')
+      json_attributes.delete("assessor_id")
     end
 
-    hash = api_json(assessment_request, user, session, :only => json_attributes)
+    hash = api_json(assessment_request, user, session, only: json_attributes)
 
     if includes.include?("user")
-      hash['user'] = user_display_json(assessment_request.user, @context)
+      hash["user"] = user_display_json(assessment_request.user, @context)
       unless assignment.anonymous_peer_reviews? && !assignment.grants_any_right?(user, session, :grade)
-        hash['assessor'] = user_display_json(assessment_request.assessor, @context)
+        hash["assessor"] = user_display_json(assessment_request.assessor, @context)
       end
     end
 
     if includes.include?("submission_comments")
-      hash['submission_comments'] = assessment_request.asset.submission_comments.map { |sc| submission_comment_json(sc, user) }
+      hash["submission_comments"] = assessment_request.asset.submission_comments.map { |sc| submission_comment_json(sc, user) }
     end
     hash
   end

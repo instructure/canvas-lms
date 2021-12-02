@@ -19,19 +19,19 @@
 #
 
 describe BasicLTI::QuizzesNextVersionedSubmission do
+  subject { BasicLTI::QuizzesNextVersionedSubmission.new(assignment, @user) }
+
   before do
-    course_model(workflow_state: 'available')
+    course_model(workflow_state: "available")
     @root_account = @course.root_account
-    @account = account_model(:root_account => @root_account, :parent_account => @root_account)
+    @account = account_model(root_account: @root_account, parent_account: @root_account)
     @course.update_attribute(:account, @account)
-    @user = factory_with_protected_attributes(User, :name => "some user", :workflow_state => "registered")
+    @user = factory_with_protected_attributes(User, name: "some user", workflow_state: "registered")
     @course.enroll_student(@user)
   end
 
-  subject { BasicLTI::QuizzesNextVersionedSubmission.new(assignment, @user) }
-
   let(:tool) do
-    @course.context_external_tools.create(name: "a", url: "http://google.com", consumer_key: '12345', shared_secret: 'secret', tool_id: "Quizzes 2")
+    @course.context_external_tools.create(name: "a", url: "http://google.com", consumer_key: "12345", shared_secret: "secret", tool_id: "Quizzes 2")
   end
 
   let(:assignment) do
@@ -41,7 +41,7 @@ describe BasicLTI::QuizzesNextVersionedSubmission do
         description: "value for description",
         due_at: Time.zone.now + 1000,
         points_possible: "1.5",
-        submission_types: 'external_tool',
+        submission_types: "external_tool",
         external_tool_tag_attributes: { url: tool.url }
       }
     )
@@ -51,13 +51,13 @@ describe BasicLTI::QuizzesNextVersionedSubmission do
 
   def gen_source_id(t: tool, c: @course, a: assignment, u: @user)
     tool.shard.activate do
-      payload = [t.id, c.id, a.id, u.id].join('-')
+      payload = [t.id, c.id, a.id, u.id].join("-")
       "#{payload}-#{Canvas::Security.hmac_sha1(payload, tool.shard.settings[:encryption_key])}"
     end
   end
 
   def request_xml(source_id, launch_url, grade)
-    Nokogiri::XML.parse %{
+    Nokogiri::XML.parse <<~XML
       <?xml version="1.0" encoding="UTF-8"?>
       <imsx_POXEnvelopeRequest xmlns="http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0">
         <imsx_POXHeader>
@@ -85,7 +85,7 @@ describe BasicLTI::QuizzesNextVersionedSubmission do
           </replaceResultRequest>
         </imsx_POXBody>
       </imsx_POXEnvelopeRequest>
-    }
+    XML
   end
 
   describe "#grade_history" do
@@ -96,12 +96,12 @@ describe BasicLTI::QuizzesNextVersionedSubmission do
         grade, score = assignment.compute_grade_and_score(grade, nil)
         submission.grade = grade
         submission.score = score
-        submission.submission_type = 'basic_lti_launch'
-        submission.workflow_state = 'submitted'
+        submission.submission_type = "basic_lti_launch"
+        submission.workflow_state = "submitted"
         submission.submitted_at = Time.zone.now
         submission.url = h[:url]
         submission.grader_id = -1
-        submission.with_versioning(:explicit => true) { submission.save! }
+        submission.with_versioning(explicit: true) { submission.save! }
       end
     end
 
@@ -116,10 +116,10 @@ describe BasicLTI::QuizzesNextVersionedSubmission do
     context "with a version for each url" do
       let(:url_grades) do
         [
-          { url: 'https://abcdef.com/uuurrrlll00?p1=9&p2=11', grade: 0.11 },
-          { url: 'https://abcdef.com/uuurrrlll01?p1=10&p2=12', grade: 0.22 },
-          { url: 'https://abcdef.com/uuurrrlll02?p1=11&p2=13', grade: 0.33 },
-          { url: 'https://abcdef.com/uuurrrlll03?p1=12&p2=14', grade: 0.44 }
+          { url: "https://abcdef.com/uuurrrlll00?p1=9&p2=11", grade: 0.11 },
+          { url: "https://abcdef.com/uuurrrlll01?p1=10&p2=12", grade: 0.22 },
+          { url: "https://abcdef.com/uuurrrlll02?p1=11&p2=13", grade: 0.33 },
+          { url: "https://abcdef.com/uuurrrlll03?p1=12&p2=14", grade: 0.44 }
         ]
       end
 
@@ -138,12 +138,12 @@ describe BasicLTI::QuizzesNextVersionedSubmission do
 
     context "with multiple versions for each url" do
       let(:urls) do
-        %w(
+        %w[
           https://abcdef.com/uuurrrlll00?p1=9&p2=1
           https://abcdef.com/uuurrrlll01?p1=10&p2=2
           https://abcdef.com/uuurrrlll02?p1=11&p2=3
           https://abcdef.com/uuurrrlll03?p1=12&p2=4
-        )
+        ]
       end
 
       let(:url_grades) do
@@ -207,10 +207,10 @@ describe BasicLTI::QuizzesNextVersionedSubmission do
       context "when nils are mixed in history" do
         let(:url_grades) do
           [
-            { url: 'https://abcdef.com/uuurrrlll00?p1=9&p2=11', grade: 0.11 },
-            { url: 'https://abcdef.com/uuurrrlll01?p1=10&p2=12', grade: 0.22 },
+            { url: "https://abcdef.com/uuurrrlll00?p1=9&p2=11", grade: 0.11 },
+            { url: "https://abcdef.com/uuurrrlll01?p1=10&p2=12", grade: 0.22 },
             { url: nil, grade: 0.33 },
-            { url: 'https://abcdef.com/uuurrrlll03?p1=12&p2=14', grade: 0.44 },
+            { url: "https://abcdef.com/uuurrrlll03?p1=12&p2=14", grade: 0.44 },
             { url: nil, grade: 0.55 },
           ]
         end
@@ -221,11 +221,11 @@ describe BasicLTI::QuizzesNextVersionedSubmission do
               [submission[:url], submission[:score], submission[:grade]]
             end
           ).to eq(
-            url_grades.map do |x|
+            url_grades.filter_map do |x|
               next if x[:url].blank?
 
               [x[:url], assignment.points_possible * x[:grade], (assignment.points_possible * x[:grade]).to_s]
-            end.compact
+            end
           )
         end
       end
@@ -235,10 +235,10 @@ describe BasicLTI::QuizzesNextVersionedSubmission do
         let(:submission_version_data) do
           time_now = Time.zone.now
           [
-            { score: 50, url: 'http://url1', submitted_at: time_now - 10.days },
-            { score: 25, url: 'http://url2', submitted_at: time_now - 8.days },
-            { score: 55, url: 'http://url1', submitted_at: time_now - 9.days },
-            { score: nil, url: 'http://url1', submitted_at: time_now - 3.days }
+            { score: 50, url: "http://url1", submitted_at: time_now - 10.days },
+            { score: 25, url: "http://url2", submitted_at: time_now - 8.days },
+            { score: 55, url: "http://url1", submitted_at: time_now - 9.days },
+            { score: nil, url: "http://url1", submitted_at: time_now - 3.days }
           ]
         end
 
@@ -250,14 +250,14 @@ describe BasicLTI::QuizzesNextVersionedSubmission do
             s.submitted_at = d[:submitted_at]
             s.grader_id = -1
             s.url = d[:url]
-            s.with_versioning(:explicit => true) { s.save! }
+            s.with_versioning(explicit: true) { s.save! }
           end
           s
         end
 
         it "outputs only attempts without being masked by a (score) nil version" do
           expect(subject.grade_history.count).to be(1)
-          expect(subject.grade_history.first[:url]).to eq('http://url2')
+          expect(subject.grade_history.first[:url]).to eq("http://url2")
           expect(subject.grade_history.first[:score]).to eq(25)
         end
       end
@@ -265,11 +265,11 @@ describe BasicLTI::QuizzesNextVersionedSubmission do
   end
 
   describe "#commit_history" do
+    subject { BasicLTI::QuizzesNextVersionedSubmission.new(assignment, @user) }
+
     before do
       allow(Submission).to receive(:find_or_initialize_by).and_return(submission)
     end
-
-    subject { BasicLTI::QuizzesNextVersionedSubmission.new(assignment, @user) }
 
     let(:submission) do
       assignment.submissions.first || Submission.find_or_initialize_by(assignment: assignment, user: @user)
@@ -297,7 +297,7 @@ describe BasicLTI::QuizzesNextVersionedSubmission do
         any_args
       )
 
-      subject.commit_history('http://url', '77', -1)
+      subject.commit_history("http://url", "77", -1)
     end
 
     it "sends an 'Assignment Submitted' notification for each new attempt that is submitted" do
@@ -308,9 +308,9 @@ describe BasicLTI::QuizzesNextVersionedSubmission do
         any_args
       ).exactly(3).times
 
-      subject.commit_history('http://url', '77', -1)
-      subject.commit_history('http://url2', '100', -1)
-      subject.commit_history('http://url3', '90', -1)
+      subject.commit_history("http://url", "77", -1)
+      subject.commit_history("http://url2", "100", -1)
+      subject.commit_history("http://url3", "90", -1)
     end
 
     it "does not send an 'Assignment Submitted' notification when an existing attempt is regraded" do
@@ -321,9 +321,9 @@ describe BasicLTI::QuizzesNextVersionedSubmission do
         any_args
       ).exactly(1).time
 
-      subject.commit_history('http://url', '77', -1)
-      subject.commit_history('http://url', '100', -1)
-      subject.commit_history('http://url', '80', -1)
+      subject.commit_history("http://url", "77", -1)
+      subject.commit_history("http://url", "100", -1)
+      subject.commit_history("http://url", "80", -1)
     end
 
     it "sends a 'Submission Graded' notification when a submission is regraded" do
@@ -333,7 +333,7 @@ describe BasicLTI::QuizzesNextVersionedSubmission do
         subject: "No Subject",
         category: "TestImmediately"
       )
-      subject.commit_history('http://url', '77', -1)
+      subject.commit_history("http://url", "77", -1)
 
       expect(BroadcastPolicy.notifier).to receive(:send_notification).with(
         submission,
@@ -342,8 +342,8 @@ describe BasicLTI::QuizzesNextVersionedSubmission do
         any_args
       ).exactly(2).times
 
-      subject.commit_history('http://url', '100', -1)
-      subject.commit_history('http://url', '80', -1)
+      subject.commit_history("http://url", "100", -1)
+      subject.commit_history("http://url", "80", -1)
     end
 
     context "with prioritizeNonToolGrade details" do
@@ -353,7 +353,7 @@ describe BasicLTI::QuizzesNextVersionedSubmission do
         assignment.grade_student(@user, grader: @teacher, score: 1337)
         submission.reload
 
-        quiz_next_versioned_submission.commit_history('http://url', '80', -1)
+        quiz_next_versioned_submission.commit_history("http://url", "80", -1)
         expect(submission.reload.score).to eq(1337)
       end
 
@@ -361,31 +361,31 @@ describe BasicLTI::QuizzesNextVersionedSubmission do
         assignment.grade_student(@user, grader: @teacher, score: 1337)
         submission.reload
 
-        quiz_next_versioned_submission.commit_history('http://url', '80', -1)
+        quiz_next_versioned_submission.commit_history("http://url", "80", -1)
         expect(submission.grader_id).to eq(@teacher.id)
       end
 
       it "does update the score if a tool graded first" do
-        submission.update!(workflow_state: 'graded', grader_id: -1, score: 80)
+        submission.update!(workflow_state: "graded", grader_id: -1, score: 80)
 
-        quiz_next_versioned_submission.commit_history("http://url", '10', -1)
+        quiz_next_versioned_submission.commit_history("http://url", "10", -1)
         expect(submission.score).to eq(10)
       end
 
       it "does update the grader if a another tool graded first" do
-        submission.update!(workflow_state: 'graded', grader_id: -2, score: 80)
+        submission.update!(workflow_state: "graded", grader_id: -2, score: 80)
 
-        quiz_next_versioned_submission.commit_history("http://url", '10', -1)
+        quiz_next_versioned_submission.commit_history("http://url", "10", -1)
         expect(submission.grader_id).to eq(-1)
       end
     end
 
-    context 'when grading period is closed' do
+    context "when grading period is closed" do
       before do
         gpg = GradingPeriodGroup.create(
           course_id: @course.id,
-          workflow_state: 'active',
-          title: 'some school',
+          workflow_state: "active",
+          title: "some school",
           weighted: true,
           display_totals_for_all_grading_periods: true
         )
@@ -393,8 +393,8 @@ describe BasicLTI::QuizzesNextVersionedSubmission do
           weight: 40.0,
           start_date: Time.zone.now - 10.days,
           end_date: Time.zone.now - 1.day,
-          title: 'some title',
-          workflow_state: 'active',
+          title: "some title",
+          workflow_state: "active",
           grading_period_group_id: gpg.id,
           close_date: Time.zone.now - 1.day
         )
@@ -406,28 +406,28 @@ describe BasicLTI::QuizzesNextVersionedSubmission do
       it "returns without processing" do
         expect(subject).not_to receive(:valid?)
 
-        subject.commit_history('url', '77', -1)
+        subject.commit_history("url", "77", -1)
       end
     end
 
     describe "submission posting" do
       it "posts the submission when the assignment is automatically posted" do
-        subject.commit_history('url', '77', -1)
+        subject.commit_history("url", "77", -1)
         expect(submission.reload).to be_posted
       end
 
       it "does not post the submission when the assignment is manually posted" do
         assignment.ensure_post_policy(post_manually: true)
 
-        subject.commit_history('url', '77', -1)
+        subject.commit_history("url", "77", -1)
         expect(submission.reload).not_to be_posted
       end
 
       it "does not update the submission's posted_at date when it is already posted" do
         submission.update!(posted_at: 1.day.ago)
-        expect {
-          subject.commit_history('url', '77', -1)
-        }.not_to change { submission.reload.posted_at }
+        expect do
+          subject.commit_history("url", "77", -1)
+        end.not_to change { submission.reload.posted_at }
       end
     end
   end

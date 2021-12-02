@@ -18,9 +18,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative 'messages_helper'
+require_relative "messages_helper"
 
-describe 'conversation_created' do
+describe "conversation_created" do
   before :once do
     @teacher_enrollment = course_with_teacher
     user_enrollment = student_in_course

@@ -192,6 +192,24 @@ describe('OutcomeEditModal', () => {
       })
     })
 
+    it('displays flash confirmation message when removing existing description if update request succeeds', async () => {
+      const mocks = updateOutcomeMocks({description: '', title: 'Outcome'})
+      const {getByText, getByDisplayValue} = renderWithProvider({
+        mockOverrides: mocks,
+        overrides: {outcome: {...outcome, _id: '3'}}
+      })
+      await act(async () => jest.runOnlyPendingTimers())
+      fireEvent.change(getByDisplayValue('Outcome description'), {
+        target: {value: null}
+      })
+      fireEvent.click(getByText('Save'))
+      await act(async () => jest.runOnlyPendingTimers())
+      expect(showFlashAlertSpy).toHaveBeenCalledWith({
+        message: '"Outcome" was successfully updated.',
+        type: 'success'
+      })
+    })
+
     it('displays flash error if update request fails', async () => {
       const {getByText, getByLabelText} = renderWithProvider({
         overrides: {outcome: {...outcome, _id: '2'}}

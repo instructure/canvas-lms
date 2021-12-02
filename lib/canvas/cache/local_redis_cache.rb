@@ -71,7 +71,7 @@ module Canvas
             end
           end
         end
-        Rails.logger.debug("  #{"LOCAL REDIS (%.2fms)" % [ms]}  write_set {#{hash.keys.join(',')}}")
+        Rails.logger.debug("  #{"LOCAL REDIS (%.2fms)" % [ms]}  write_set {#{hash.keys.join(",")}}")
       end
     end
   end

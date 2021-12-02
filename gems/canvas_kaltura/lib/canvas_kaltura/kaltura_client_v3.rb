@@ -18,19 +18,19 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'rubygems'
-require 'csv'
-require 'net/http'
-require 'uri'
-require 'nokogiri'
-require 'multipart'
+require "rubygems"
+require "csv"
+require "net/http"
+require "uri"
+require "nokogiri"
+require "multipart"
 
 # Test Console and API Documentation at:
 # http://www.kaltura.com/api_v3/testmeDoc/index.php
 module CanvasKaltura
   class SessionType
-    USER = 0;
-    ADMIN = 2;
+    USER = 0
+    ADMIN = 2
   end
 
   class ClientV3
@@ -38,57 +38,57 @@ module CanvasKaltura
 
     def initialize
       config = CanvasKaltura::ClientV3.config
-      @host = config['domain']
-      @resource_domain = config['resource_domain']
-      @endpoint = config['endpoint']
-      @partnerId = config['partner_id']
-      @secret = config['secret_key']
-      @user_secret = config['user_secret_key']
+      @host = config["domain"]
+      @resource_domain = config["resource_domain"]
+      @endpoint = config["endpoint"]
+      @partnerId = config["partner_id"]
+      @secret = config["secret_key"]
+      @user_secret = config["user_secret_key"]
       @host ||= "www.kaltura.com"
       @endpoint ||= "/api_v3"
-      @cache_play_list_seconds = config['cache_play_list_seconds']&.to_i
-      @kaltura_sis = config['kaltura_sis']
+      @cache_play_list_seconds = config["cache_play_list_seconds"]&.to_i
+      @kaltura_sis = config["kaltura_sis"]
     end
 
     def self.config
       res = CanvasKaltura.plugin_settings.try(:settings)
-      return nil unless res && res['partner_id'] && res['subpartner_id']
+      return nil unless res && res["partner_id"] && res["subpartner_id"]
 
       # default settings
       res = res.dup
       # the kaltura flash widget's calculation is a bit off, so give a bit extra space
       # to make sure 500 mb files can be uploaded
-      res['max_file_size_bytes'] = 510.megabytes unless res['max_file_size_bytes'].to_i > 0
+      res["max_file_size_bytes"] = 510.megabytes unless res["max_file_size_bytes"].to_i > 0
 
       res.with_indifferent_access
     end
 
     CONTENT_TYPES = {
-      'mp4' => 'video/mp4',
-      'mp3' => 'audio/mp3',
-      'flv' => 'video/x-flv'
-    }
+      "mp4" => "video/mp4",
+      "mp3" => "audio/mp3",
+      "flv" => "video/x-flv"
+    }.freeze
     # FLVs are least desirable because the mediaelementjs does not stretch them to
     # fill the screen when you enter fullscreen mode
-    PREFERENCE = ['mp4', 'mp3', 'flv', '']
+    PREFERENCE = ["mp4", "mp3", "flv", ""].freeze
 
     # see http://www.kaltura.com/api_v3/testmeDoc/index.php?object=KalturaFlavorAssetStatus
     ASSET_STATUSES = {
-      '1' => :CONVERTING,
-      '3' => :DELETED,
-      '-1' => :ERROR,
-      '9' => :EXPORTING,
-      '7' => :IMPORTING,
-      '4' => :NOT_APPLICABLE,
-      '0' => :QUEUED,
-      '2' => :READY,
-      '5' => :TEMP,
-      '8' => :VALIDATING,
-      '6' => :WAIT_FOR_CONVERT
-    }
+      "1" => :CONVERTING,
+      "3" => :DELETED,
+      "-1" => :ERROR,
+      "9" => :EXPORTING,
+      "7" => :IMPORTING,
+      "4" => :NOT_APPLICABLE,
+      "0" => :QUEUED,
+      "2" => :READY,
+      "5" => :TEMP,
+      "8" => :VALIDATING,
+      "6" => :WAIT_FOR_CONVERT
+    }.freeze
 
     def media_sources(entryId)
-      cache_key = ['media_sources2', entryId, @cache_play_list_seconds].join('/')
+      cache_key = ["media_sources2", entryId, @cache_play_list_seconds].join("/")
       sources = CanvasKaltura.cache.read(cache_key)
 
       unless sources
@@ -98,7 +98,7 @@ module CanvasKaltura
         all_assets_are_done_converting = true
         assets&.each do |asset|
           if ASSET_STATUSES[asset[:status]] == :READY
-            keys = [:containerFormat, :width, :fileExt, :size, :bitrate, :height, :isOriginal]
+            keys = %i[containerFormat width fileExt size bitrate height isOriginal]
             hash = asset.select { |k| keys.member?(k) }
 
             hash[:url] = flavorAssetGetPlaylistUrl(entryId, asset[:id])
@@ -111,7 +111,7 @@ module CanvasKaltura
               next
             end
 
-            hash[:hasWarnings] = true if asset[:description] && asset[:description].include?("warnings")
+            hash[:hasWarnings] = true if asset[:description]&.include?("warnings")
 
             sources << hash
           else
@@ -127,7 +127,7 @@ module CanvasKaltura
         # @cache_play_list_seconds of nil means cache indefinitely
         if @cache_play_list_seconds != 0 && !sources.empty? && all_assets_are_done_converting
           if @cache_play_list_seconds
-            CanvasKaltura.cache.write(cache_key, sources, :expires_in => @cache_play_list_seconds)
+            CanvasKaltura.cache.write(cache_key, sources, expires_in: @cache_play_list_seconds)
           else
             CanvasKaltura.cache.write(cache_key, sources)
           end
@@ -147,8 +147,8 @@ module CanvasKaltura
       suspicious_bitrate_threshold = original_source ? original_source[:bitrate].to_i * 5 : 0
 
       sources = sources.sort_by do |a|
-        [a[:hasWarnings] || a[:isOriginal] != '0' ? CanvasSort::Last : CanvasSort::First,
-         a[:isOriginal] == '0' ? CanvasSort::First : CanvasSort::Last,
+        [a[:hasWarnings] || a[:isOriginal] != "0" ? CanvasSort::Last : CanvasSort::First,
+         a[:isOriginal] == "0" ? CanvasSort::First : CanvasSort::Last,
          PREFERENCE.index(a[:fileExt]) || (PREFERENCE.size + 1),
          a[:bitrate].to_i < suspicious_bitrate_threshold ? CanvasSort::First : CanvasSort::Last,
          0 - a[:bitrate].to_i]
@@ -160,19 +160,19 @@ module CanvasKaltura
 
     def thumbnail_url(entryId, opts = {})
       opts = {
-        :width => 140,
-        :height => 100,
-        :vid_sec => 5,
-        :bgcolor => "ffffff",
-        :type => "2",
+        width: 140,
+        height: 100,
+        vid_sec: 5,
+        bgcolor: "ffffff",
+        type: "2",
       }.merge(opts)
 
-      "https://#{@resource_domain}/p/#{@partnerId}/thumbnail" +
-        "/entry_id/#{entryId.gsub(/[^a-zA-Z0-9_-]/, '')}" +
-        "/width/#{opts[:width].to_i}" +
-        "/height/#{opts[:height].to_i}" +
-        "/bgcolor/#{opts[:bgcolor].gsub(/[^a-fA-F0-9]/, '')}" +
-        "/type/#{opts[:type].to_i}" +
+      "https://#{@resource_domain}/p/#{@partnerId}/thumbnail" \
+        "/entry_id/#{entryId.gsub(/[^a-zA-Z0-9_-]/, "")}" \
+        "/width/#{opts[:width].to_i}" \
+        "/height/#{opts[:height].to_i}" \
+        "/bgcolor/#{opts[:bgcolor].gsub(/[^a-fA-F0-9]/, "")}" \
+        "/type/#{opts[:type].to_i}" \
         "/vid_sec/#{opts[:vid_sec].to_i}"
     end
 
@@ -180,17 +180,17 @@ module CanvasKaltura
       partnerId = @partnerId
       secret = type == SessionType::USER ? @user_secret : @secret
       result = getRequest(:session, :start,
-                          :secret => secret,
-                          :partnerId => partnerId,
-                          :userId => userId,
-                          :type => type)
+                          secret: secret,
+                          partnerId: partnerId,
+                          userId: userId,
+                          type: type)
       @ks = result.content
     end
 
     def mediaGet(entryId)
       result = getRequest(:media, :get,
-                          :ks => @ks,
-                          :entryId => entryId)
+                          ks: @ks,
+                          entryId: entryId)
       return nil unless result
 
       item = {}
@@ -202,8 +202,8 @@ module CanvasKaltura
 
     def mediaUpdate(entryId, attributes)
       hash = {
-        :ks => @ks,
-        :entryId => entryId
+        ks: @ks,
+        entryId: entryId
       }
       attributes.each do |key, val|
         hash["mediaEntry:#{key}"] = val
@@ -220,8 +220,8 @@ module CanvasKaltura
 
     def mediaDelete(entryId)
       hash = {
-        :ks => @ks,
-        :entryId => entryId
+        ks: @ks,
+        entryId: entryId
       }
       getRequest(:media, :delete, hash)
     end
@@ -239,8 +239,8 @@ module CanvasKaltura
 
     def bulkUploadGet(id)
       result = getRequest(:bulkUpload, :get,
-                          :ks => @ks,
-                          :id => id)
+                          ks: @ks,
+                          id: id)
       return nil unless result
 
       parseBulkUpload(result)
@@ -249,30 +249,30 @@ module CanvasKaltura
     def parseBulkUpload(result)
       data = {}
       data[:result] = result
-      url = result.css('logFileUrl')[0].content
+      url = result.css("logFileUrl")[0].content
       csv = CSV.parse(CanvasHttp.get(url).body)
       data[:entries] = []
       csv.each do |row|
         data[:entries] << {
-          :name => row[0],
-          :entryId => row[-3],
-          :originalId => row[11]
+          name: row[0],
+          entryId: row[-3],
+          originalId: row[11]
         }
       end
-      data[:id] = result.css('id')[0].content
-      data[:status] = result.css('status')[0].content
+      data[:id] = result.css("id")[0].content
+      data[:status] = result.css("status")[0].content
       data[:ready] = !csv.empty? && csv[0][0] != "Log file is not ready"
       data
     end
 
     def bulkUploadCsv(csv)
       result = postRequest(:bulkUpload, :add,
-                           :ks => @ks,
-                           :conversionProfileId => -1,
-                           :csvFileData => KalturaStringIO.new(csv, "bulk_data.csv"))
-      unless result.css('logFileUrl').any?
-        code = result.css('error > code').first.try(:content)
-        message = result.css('error > message').first.try(:content)
+                           ks: @ks,
+                           conversionProfileId: -1,
+                           csvFileData: KalturaStringIO.new(csv, "bulk_data.csv"))
+      unless result.css("logFileUrl").any?
+        code = result.css("error > code").first.try(:content)
+        message = result.css("error > message").first.try(:content)
         message ||= result.to_xml
         raise "kaltura bulkUpload failed: #{message} (#{code})"
       end
@@ -283,10 +283,10 @@ module CanvasKaltura
     def bulkUploadAdd(files)
       rows = []
       files.each do |file|
-        filename = (file[:name] || "Media File").gsub(/,/, "")
-        description = (file[:description] || "no description").gsub(/,/, "")
+        filename = (file[:name] || "Media File").delete(",")
+        description = (file[:description] || "no description").delete(",")
         url = file[:url]
-        rows << [filename, description, file[:tags] || "", url, file[:media_type] || "video", '', '', '', '', '', '', file[:partner_data] || ''] if file[:url]
+        rows << [filename, description, file[:tags] || "", url, file[:media_type] || "video", "", "", "", "", "", "", file[:partner_data] || ""] if file[:url]
       end
       res = CSV.generate do |csv|
         rows.each do |row|
@@ -298,12 +298,12 @@ module CanvasKaltura
 
     def flavorAssetGetByEntryId(entryId)
       result = getRequest(:flavorAsset, :getByEntryId,
-                          :ks => @ks,
-                          :entryId => entryId)
+                          ks: @ks,
+                          entryId: entryId)
       return nil unless result
 
       items = []
-      result.css('item').each do |node|
+      result.css("item").each do |node|
         item = {}
         node.children.each do |child|
           item[child.name.to_sym] = child.content
@@ -322,8 +322,8 @@ module CanvasKaltura
 
     def flavorAssetGetDownloadUrl(assetId)
       result = getRequest(:flavorAsset, :getDownloadUrl,
-                          :ks => @ks,
-                          :id => assetId)
+                          ks: @ks,
+                          id: assetId)
       return result.content if result
     end
 
@@ -335,10 +335,10 @@ module CanvasKaltura
       playlist_url = "/p/#{@partnerId}/playManifest/entryId/#{entryId}/flavorId/#{flavorId}"
 
       res = sendRequest(Net::HTTP::Get.new(playlist_url))
-      return nil unless res.kind_of?(Net::HTTPSuccess)
+      return nil unless res.is_a?(Net::HTTPSuccess)
 
       doc = Nokogiri::XML(res.body)
-      mediaNode = doc.css('manifest media').first
+      mediaNode = doc.css("manifest media").first
       mediaNode ? mediaNode["url"] : nil
     end
 
@@ -346,7 +346,7 @@ module CanvasKaltura
       config = CanvasKaltura::ClientV3.config
       return nil unless config
 
-      "https://#{config['domain']}/kwidget/wid/_#{config['partner_id']}/uiconf_id/#{config['player_ui_conf']}/entry_id/#{assetId}"
+      "https://#{config["domain"]}/kwidget/wid/_#{config["partner_id"]}/uiconf_id/#{config["player_ui_conf"]}/entry_id/#{assetId}"
     end
 
     private
@@ -358,7 +358,7 @@ module CanvasKaltura
         Net::HTTP::Post.new("#{@endpoint}/?#{requestParams}", headers),
         multipart_body
       )
-      Nokogiri::XML(response.body).css('result').first
+      Nokogiri::XML(response.body).css("result").first
     end
 
     def getRequest(service, action, params)
@@ -369,7 +369,7 @@ module CanvasKaltura
         requestParams += "&#{URI.escape(key.to_s)}=#{URI.escape(value.to_s)}"
       end
       response = sendRequest(Net::HTTP::Get.new("#{@endpoint}/?#{requestParams}"))
-      Nokogiri::XML(response.body).css('result').first
+      Nokogiri::XML(response.body).css("result").first
     end
 
     # FIXME: SSL verifification should not be turned off, but since we're just

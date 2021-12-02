@@ -18,17 +18,17 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 begin
-  require '../../spec/coverage_tool.rb'
-  CoverageTool.start('i18n-tasks-gem')
+  require "../../spec/coverage_tool"
+  CoverageTool.start("i18n-tasks-gem")
 rescue LoadError => e
   puts "Error: #{e} "
 end
 
-require 'i18n_tasks'
+require "i18n_tasks"
 
 RSpec.configure do |config|
   config.run_all_when_everything_filtered = true
   config.filter_run :focus
 
-  config.order = 'random'
+  config.order = "random"
 end

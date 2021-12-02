@@ -28,7 +28,7 @@ class CspSettingsController < ApplicationController
   before_action :require_context, :require_user
   before_action :require_read_permissions, only: [:get_csp_settings, :csp_log]
   before_action :require_permissions, except: [:get_csp_settings, :csp_log]
-  before_action :get_domain, :only => [:add_domain, :remove_domain]
+  before_action :get_domain, only: [:add_domain, :remove_domain]
 
   # @API Get current settings for account or course
   #
@@ -45,7 +45,7 @@ class CspSettingsController < ApplicationController
   #   explicitly allowed by this account. (Note: this list will not take effect unless
   #   CSP is explicitly enabled on this account)
   def get_csp_settings
-    render :json => csp_settings_json
+    render json: csp_settings_json
   end
 
   # @API Enable, disable, or clear explicit CSP setting
@@ -66,7 +66,7 @@ class CspSettingsController < ApplicationController
   #
   def set_csp_setting
     if ["enabled", "disabled"].include?(params[:status]) && @context.csp_inherited? && @context.csp_locked?
-      return render :json => { :message => "cannot set when locked by parent account" }, :status => :bad_request
+      return render json: { message: "cannot set when locked by parent account" }, status: :bad_request
     end
 
     case params[:status]
@@ -75,7 +75,7 @@ class CspSettingsController < ApplicationController
         if @context.account.csp_enabled?
           @context.inherit_csp! # just un-disable
         else
-          return render :json => { :message => "must be enabled on account-level first" }, :status => :bad_request
+          return render json: { message: "must be enabled on account-level first" }, status: :bad_request
         end
       else
         @context.enable_csp!
@@ -85,10 +85,10 @@ class CspSettingsController < ApplicationController
     when "inherited"
       @context.inherit_csp!
     else
-      return render :json => { :message => "invalid setting" }, :status => :bad_request
+      return render json: { message: "invalid setting" }, status: :bad_request
     end
     RequestCache.clear # clear inherited account settings
-    render :json => csp_settings_json
+    render json: csp_settings_json
   end
 
   # @API Lock or unlock current CSP settings for sub-accounts and courses
@@ -100,7 +100,7 @@ class CspSettingsController < ApplicationController
   #
   def set_csp_lock
     if @context.csp_inherited?
-      return render :json => { :message => "CSP must be explicitly set on this account" }, :status => :bad_request
+      return render json: { message: "CSP must be explicitly set on this account" }, status: :bad_request
     end
 
     if value_to_boolean(params.require(:settings_locked))
@@ -108,7 +108,7 @@ class CspSettingsController < ApplicationController
     else
       @context.unlock_csp!
     end
-    render :json => csp_settings_json
+    render json: csp_settings_json
   end
 
   # @API Add an allowed domain to account
@@ -119,9 +119,9 @@ class CspSettingsController < ApplicationController
   # @argument domain [Required, String]
   def add_domain
     if @context.add_domain!(@domain)
-      render :json => { :current_account_whitelist => @context.csp_domains.active.pluck(:domain).sort }
+      render json: { current_account_whitelist: @context.csp_domains.active.pluck(:domain).sort }
     else
-      render :json => { :message => "invalid domain" }, :status => :bad_request
+      render json: { message: "invalid domain" }, status: :bad_request
     end
   end
 
@@ -136,7 +136,7 @@ class CspSettingsController < ApplicationController
 
     invalid_domains = domains.reject { |domain| URI.parse(domain) rescue nil }
     unless invalid_domains.empty?
-      render :json => { :message => "invalid domains: #{invalid_domains.join(", ")}" }, :status => :bad_request
+      render json: { message: "invalid domains: #{invalid_domains.join(", ")}" }, status: :bad_request
       return false
     end
 
@@ -146,9 +146,9 @@ class CspSettingsController < ApplicationController
     end
 
     if unsuccessful_domains.empty?
-      render :json => { :current_account_whitelist => @context.csp_domains.active.pluck(:domain).sort }
+      render json: { current_account_whitelist: @context.csp_domains.active.pluck(:domain).sort }
     else
-      render :json => { :message => "failed adding some domains: #{unsuccessful_domains.join(", ")}" }, :status => :bad_request
+      render json: { message: "failed adding some domains: #{unsuccessful_domains.join(", ")}" }, status: :bad_request
     end
   end
 
@@ -156,10 +156,10 @@ class CspSettingsController < ApplicationController
   #
   # Must be called on a root account.
   def csp_log
-    return render status: 400, json: { message: 'must be called on a root account' } unless @context.root_account?
-    return render status: 503, json: { message: 'CSP logging is not configured on the server' } unless (ss = @context.csp_logging_config['shared_secret'])
+    return render status: :bad_request, json: { message: "must be called on a root account" } unless @context.root_account?
+    return render status: :service_unavailable, json: { message: "CSP logging is not configured on the server" } unless (ss = @context.csp_logging_config["shared_secret"])
 
-    render json: CanvasHttp.get("#{@context.csp_logging_config['host']}report/#{@context.global_id}", 'Authorization' => "Bearer #{ss}").body
+    render json: CanvasHttp.get("#{@context.csp_logging_config["host"]}report/#{@context.global_id}", "Authorization" => "Bearer #{ss}").body
   end
 
   # @API Remove a domain from account
@@ -169,7 +169,7 @@ class CspSettingsController < ApplicationController
   # @argument domain [Required, String]
   def remove_domain
     @context.remove_domain!(@domain)
-    render :json => { :current_account_whitelist => @context.csp_domains.active.pluck(:domain).sort }
+    render json: { current_account_whitelist: @context.csp_domains.active.pluck(:domain).sort }
   end
 
   protected
@@ -186,7 +186,7 @@ class CspSettingsController < ApplicationController
   def get_domain
     @domain = params.require(:domain)
     unless @domain.is_a?(String) # could do stricter checking someday maybe
-      render :json => { :message => "invalid domain" }, :status => :bad_request
+      render json: { message: "invalid domain" }, status: :bad_request
       return false
     end
     @domain
@@ -194,16 +194,16 @@ class CspSettingsController < ApplicationController
 
   def csp_settings_json
     json = {
-      :enabled => @context.csp_enabled?,
-      :inherited => @context.csp_inherited?,
-      :settings_locked => @context.csp_locked?,
+      enabled: @context.csp_enabled?,
+      inherited: @context.csp_inherited?,
+      settings_locked: @context.csp_locked?,
     }
     json[:effective_whitelist] = @context.csp_whitelisted_domains(request, include_files: false, include_tools: true) if @context.csp_enabled?
     if @context.is_a?(Account)
       tools_whitelist = {}
       @context.csp_tools_grouped_by_domain.each do |domain, tools|
         tools_whitelist[domain] = tools.map do |tool|
-          { :id => tool.id, :name => tool.name, :account_id => tool.context_id }
+          { id: tool.id, name: tool.name, account_id: tool.context_id }
         end
       end
       json[:tools_whitelist] = tools_whitelist

@@ -108,15 +108,15 @@ module LiveAssessments
     def create
       return unless authorized_action(@assessment.results.new, @current_user, :create)
 
-      reject! 'missing required key :results' unless params[:results].is_a?(Array)
+      reject! "missing required key :results" unless params[:results].is_a?(Array)
 
       @results = []
       result_hashes_by_user_id = params[:results].group_by { |result| result[:links] and result[:links][:user] }
       Result.transaction do
         result_hashes_by_user_id.each do |user_id, result_hashes|
-          reject! 'missing required key :user' unless user_id
+          reject! "missing required key :user" unless user_id
           @user = @context.users.where(id: user_id).first
-          reject! 'user must be in the context' unless @user
+          reject! "user must be in the context" unless @user
 
           result_hashes.each do |result_hash|
             result = @assessment.results.build(

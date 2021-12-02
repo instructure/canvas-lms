@@ -19,14 +19,14 @@
 #
 
 describe Submissions::DownloadsController do
-  describe 'GET :show' do
+  describe "GET :show" do
     before do
       course_with_student_and_submitted_homework
       @context = @course
       user_session(@student)
     end
 
-    context 'with user id not present in course' do
+    context "with user id not present in course" do
       before do
         @attachment = @submission.attachment = attachment_model(context: @context)
         @submission.save!
@@ -34,7 +34,7 @@ describe Submissions::DownloadsController do
         user_session(@student)
       end
 
-      it 'sets flash error' do
+      it "sets flash error" do
         get :show, params: {
           course_id: @context.id,
           assignment_id: @assignment.id,
@@ -85,7 +85,7 @@ describe Submissions::DownloadsController do
           download: @submission.attachment_id
         },
                    format: :json
-        expect(JSON.parse(response.body)['attachment']['id']).to eq @submission.attachment_id
+        expect(JSON.parse(response.body)["attachment"]["id"]).to eq @submission.attachment_id
       end
     end
 
@@ -93,15 +93,15 @@ describe Submissions::DownloadsController do
       attachment = @submission.attachment = attachment_model(context: @context)
       @submission.submitted_at = 3.hours.ago
       @submission.save!
-      expect(@submission.attachment).not_to be_nil, 'precondition'
-      expect {
+      expect(@submission.attachment).not_to be_nil, "precondition"
+      expect do
         @submission.with_versioning(explicit: true) do
           @submission.attachment = nil
           @submission.submitted_at = 1.hour.ago
           @submission.save!
         end
-      }.to change(@submission.versions, :count), 'precondition'
-      expect(@submission.attachment).to be_nil, 'precondition'
+      end.to change(@submission.versions, :count), "precondition"
+      expect(@submission.attachment).to be_nil, "precondition"
 
       get :show, params: {
         course_id: @context.id,
@@ -139,8 +139,8 @@ describe Submissions::DownloadsController do
       end
 
       it "sets attachment from comment_id & download_id" do
-        expect(@assignment.attachments).to include(@attachment), 'precondition'
-        expect(@submission_comment.attachments).to include(@attachment), 'precondition'
+        expect(@assignment.attachments).to include(@attachment), "precondition"
+        expect(@submission_comment.attachments).to include(@attachment), "precondition"
 
         get :show, params: {
           course_id: @original_context.id,
@@ -163,7 +163,7 @@ describe Submissions::DownloadsController do
       course_with_teacher_logged_in
       assignment = assignment_model(course: @course)
       student_in_course
-      att = attachment_model(:uploaded_data => stub_file_data('test.txt', 'asdf', 'text/plain'), :context => @student)
+      att = attachment_model(uploaded_data: stub_file_data("test.txt", "asdf", "text/plain"), context: @student)
       submission_model(
         course: @course,
         assignment: assignment,

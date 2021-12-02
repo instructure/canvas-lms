@@ -17,13 +17,13 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'byebug'
-require 'canvas_cache'
-require 'action_controller'
-require 'active_record'
+require "byebug"
+require "canvas_cache"
+require "action_controller"
+require "active_record"
 
-Rails.env = 'test'
-Time.zone = 'UTC' # This is simplest, fight me.
+Rails.env = "test"
+Time.zone = "UTC" # This is simplest, fight me.
 
 # Right now Canvas injects the Setting class as the store.
 # It would be great to pull that one out to something we can
@@ -50,9 +50,9 @@ CanvasCache.settings_store = MemorySettings.new
 
 # give the logger some implementation since
 # we aren't initializing a full app in these specs
-Rails.logger = Logger.new(STDOUT)
+Rails.logger = Logger.new($stdout)
 
-RSpec.shared_context "caching_helpers", :shared_context => :metadata do
+RSpec.shared_context "caching_helpers", shared_context: :metadata do
   # provide a way to temporarily replace the rails
   # cache with one constructed in a spec.
   def override_cache(new_cache = :memory_store)
@@ -104,8 +104,8 @@ RSpec.shared_context "caching_helpers", :shared_context => :metadata do
         @captured_message_stack = []
       end
 
-      def add(_severity, message = nil, progname = nil, &block)
-        message = (message || (block && block.call) || progname).to_s
+      def add(_severity, message = nil, progname = nil)
+        message = (message || (block_given? && yield) || progname).to_s
         @captured_message_stack << message
       end
     end
@@ -113,7 +113,7 @@ RSpec.shared_context "caching_helpers", :shared_context => :metadata do
     lgr = collector_class.new
     Rails.logger = lgr
     yield
-    return lgr.captured_message_stack
+    lgr.captured_message_stack
   ensure
     Rails.logger = prev_logger
   end
@@ -124,12 +124,12 @@ RSpec.configure do |config|
     mocks.verify_partial_doubles = true
   end
 
-  config.order = 'random'
+  config.order = "random"
 
   config.before do
     # load config from local spec/fixtures/config/redis.yml
     # so that we have something for ConfigFile to parse.
-    target_location = Pathname.new(File.join(File.dirname(__FILE__), 'fixtures'))
+    target_location = Pathname.new(File.join(File.dirname(__FILE__), "fixtures"))
     allow(Rails).to receive(:root).and_return(target_location)
 
     # make sure redis is in a stable state before every spec

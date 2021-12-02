@@ -93,8 +93,8 @@ class ContentSharesController < ApplicationController
 
   before_action :require_user
   before_action :get_user_param
-  before_action :require_current_user, :except => %w(show index unread_count)
-  before_action :get_receivers, :only => %w(create add_users)
+  before_action :require_current_user, except: %w[show index unread_count]
+  before_action :get_receivers, only: %w[create add_users]
 
   def get_user_param
     @user = api_find(User, params[:user_id])
@@ -128,12 +128,12 @@ class ContentSharesController < ApplicationController
   # @returns ContentShare
   def create
     create_params = params.permit(:content_type, :content_id)
-    allowed_types = ['assignment', 'attachment', 'discussion_topic', 'page', 'quiz', 'module', 'module_item']
+    allowed_types = %w[assignment attachment discussion_topic page quiz module module_item]
     unless create_params[:content_type] && create_params[:content_id]
-      return render(json: { message: 'Content type and id required' }, status: :bad_request)
+      return render(json: { message: "Content type and id required" }, status: :bad_request)
     end
     unless allowed_types.include?(create_params[:content_type])
-      return render(json: { message: "Content type not allowed. Allowed types: #{allowed_types.join(',')}" }, status: :bad_request)
+      return render(json: { message: "Content type not allowed. Allowed types: #{allowed_types.join(",")}" }, status: :bad_request)
     end
 
     content_type = ContentShare::TYPE_TO_CLASS[create_params[:content_type]]
@@ -143,19 +143,19 @@ class ContentSharesController < ApplicationController
               elsif content_type.respond_to? :active
                 content&.active
               end
-    content = content&.where(tag_type: 'context_module') if content_type == ContentTag
+    content = content&.where(tag_type: "context_module") if content_type == ContentTag
     content = content&.take
-    return render(json: { message: 'Requested share content not found' }, status: :bad_request) unless content
+    return render(json: { message: "Requested share content not found" }, status: :bad_request) unless content
 
     export_params = ActionController::Parameters.new(skip_notifications: true,
                                                      select: { create_params[:content_type].pluralize => [create_params[:content_id]] },
                                                      export_type: ContentExport::COMMON_CARTRIDGE)
     export = create_content_export_from_api(export_params, content.context, @current_user)
-    return unless export.class == ContentExport
-    return render(json: { message: 'Unable to export content' }, status: :bad_request) unless export.id
+    return unless export.instance_of?(ContentExport)
+    return render(json: { message: "Unable to export content" }, status: :bad_request) unless export.id
 
     name = Context.asset_name(content)
-    sender_share = @current_user.sent_content_shares.create(content_export: export, name: name, read_state: 'read')
+    sender_share = @current_user.sent_content_shares.create(content_export: export, name: name, read_state: "read")
     create_receiver_shares(sender_share, @receivers)
     render json: content_share_json(sender_share, @current_user, session), status: :created
   end
@@ -172,7 +172,7 @@ class ContentSharesController < ApplicationController
   # @returns [ContentShare]
   def index
     if authorized_action(@user, @current_user, :read)
-      if params[:list] == 'received'
+      if params[:list] == "received"
         shares = Api.paginate(@user.received_content_shares.by_date, self, api_v1_user_received_content_shares_url)
         render json: received_content_shares_json(shares, @current_user, session)
       else
@@ -224,7 +224,7 @@ class ContentSharesController < ApplicationController
   def destroy
     @content_share = @current_user.content_shares.find(params[:id])
     @content_share.destroy
-    render json: { message: 'content share deleted' }
+    render json: { message: "content share deleted" }
   end
 
   # @API Add users to content share
@@ -240,7 +240,7 @@ class ContentSharesController < ApplicationController
   # @returns ContentShare
   def add_users
     @content_share = @current_user.content_shares.find(params[:id])
-    reject!('Content share not owned by you') unless @content_share.is_a?(SentContentShare)
+    reject!("Content share not owned by you") unless @content_share.is_a?(SentContentShare)
 
     create_receiver_shares(@content_share, @receivers - @content_share.receivers)
     @content_share.reload
@@ -264,7 +264,7 @@ class ContentSharesController < ApplicationController
     if @content_share.update(update_params)
       render json: content_share_json(@content_share, @current_user, session)
     else
-      render json: @content_share.errors.to_json, :status => 400
+      render json: @content_share.errors.to_json, status: :bad_request
     end
   end
 
@@ -275,11 +275,11 @@ class ContentSharesController < ApplicationController
     @receivers = api_find_all(User, Array(receiver_ids))
 
     unless @receivers.any?
-      render(json: { message: 'No valid receiving users found' }, status: :bad_request)
-      return false
+      render(json: { message: "No valid receiving users found" }, status: :bad_request)
+      false
     end
 
-    # TODO verify we're allowed to send content to these users, once we decide how to do that
+    # TODO: verify we're allowed to send content to these users, once we decide how to do that
   end
 
   def create_receiver_shares(sender_share, receivers)

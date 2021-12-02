@@ -16,13 +16,13 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'zip/filesystem'
+require "zip/filesystem"
 
 if Qti.migration_executable
 
   describe Qti::Converter do
     before do
-      course_with_teacher(:active_all => true)
+      course_with_teacher(active_all: true)
     end
 
     let(:respondus_questions) do
@@ -236,23 +236,23 @@ if Qti.migration_executable
       do_migration
 
       expect(@course.attachments.count).to eq 2
-      expect(@course.attachments.map(&:filename).sort).to eq ['header-logo.png', 'smiley.jpg']
-      attachment = @course.attachments.detect { |a| a.filename == 'header-logo.png' }
+      expect(@course.attachments.map(&:filename).sort).to eq ["header-logo.png", "smiley.jpg"]
+      attachment = @course.attachments.detect { |a| a.filename == "header-logo.png" }
       quiz = @course.quizzes.last
       expect(quiz).to be_present
       expect(quiz.quiz_questions.count).to eq 2
       quiz.quiz_questions.each do |q|
-        text = Nokogiri::HTML5.fragment(q.question_data['question_text'])
-        expect(text.css('img').first['src']).to eq "/courses/#{@course.id}/files/#{attachment.id}/preview"
+        text = Nokogiri::HTML5.fragment(q.question_data["question_text"])
+        expect(text.css("img").first["src"]).to eq "/courses/#{@course.id}/files/#{attachment.id}/preview"
 
         # verify that the associated assessment_question got links translated
         aq = q.assessment_question
-        text = Nokogiri::HTML5.fragment(aq.question_data['question_text'])
-        expect(text.css('img').first['src']).to match %r{/assessment_questions/#{aq.id}/files/\d+/download\?verifier=\w+}
+        text = Nokogiri::HTML5.fragment(aq.question_data["question_text"])
+        expect(text.css("img").first["src"]).to match %r{/assessment_questions/#{aq.id}/files/\d+/download\?verifier=\w+}
 
-        if aq.question_data['answers'][1]["comments_html"]&.include?("<img")
-          text = Nokogiri::HTML5.fragment(aq.question_data['answers'][1]["comments_html"])
-          expect(text.css('img').first['src']).to match %r{/assessment_questions/#{aq.id}/files/\d+/download\?verifier=\w+}
+        if aq.question_data["answers"][1]["comments_html"]&.include?("<img")
+          text = Nokogiri::HTML5.fragment(aq.question_data["answers"][1]["comments_html"])
+          expect(text.css("img").first["src"]).to match %r{/assessment_questions/#{aq.id}/files/\d+/download\?verifier=\w+}
         end
       end
       expect(quiz.assignment).to_not be_nil
@@ -267,20 +267,20 @@ if Qti.migration_executable
 
     describe "applying respondus settings" do
       before do
-        @copy = Tempfile.new(['spec-canvas', '.zip'])
+        @copy = Tempfile.new(["spec-canvas", ".zip"])
         FileUtils.cp(fname, @copy.path)
         Zip::File.open(@copy.path) do |zf|
-          zf.file.open("settings.xml", +'w') do |f|
-            f.write <<-XML
-          <settings>
-            <setting name='hasSettings'>true</setting>
-            <setting name='publishNow'>true</setting>
-          </settings>
+          zf.file.open("settings.xml", +"w") do |f|
+            f.write <<~XML
+              <settings>
+                <setting name='hasSettings'>true</setting>
+                <setting name='publishNow'>true</setting>
+              </settings>
             XML
           end
         end
         setup_migration(@copy.path)
-        @migration.update_migration_settings(:apply_respondus_settings_file => true)
+        @migration.update_migration_settings(apply_respondus_settings_file: true)
         @migration.save!
       end
 
@@ -298,7 +298,7 @@ if Qti.migration_executable
         do_migration
 
         setup_migration(@copy.path)
-        @migration.update_migration_settings(:apply_respondus_settings_file => true, :quiz_id_to_update => @course.quizzes.last.id)
+        @migration.update_migration_settings(apply_respondus_settings_file: true, quiz_id_to_update: @course.quizzes.last.id)
         @migration.save!
         do_migration
 
@@ -314,7 +314,7 @@ if Qti.migration_executable
       it "sets the assignment submission_type correctly" do
         do_migration
         assign = @course.assignments.last
-        expect(assign.submission_types).to eq 'online_quiz'
+        expect(assign.submission_types).to eq "online_quiz"
         expect(assign.quiz).to be_for_assignment
       end
     end
@@ -329,15 +329,15 @@ if Qti.migration_executable
       # various checks on the data
       qq = quiz.quiz_questions.first
       d = qq.question_data
-      expect(d['correct_comments']).to eq "I can't believe you got that right. Awesome!"
-      expect(d['correct_comments_html']).to eq "I can't <i>believe </i>you got that right. <b>Awesome!</b>"
-      expect(d['incorrect_comments_html']).to eq "<b>Wrong. </b>That's a bummer."
-      expect(d['points_possible']).to eq 3
-      expect(d['question_name']).to eq 'q1'
-      expect(d['answers'].map { |a| a['weight'] }).to eq [0, 100, 0]
-      expect(d['answers'].map { |a| a['comments'] }).to eq ['nope', 'yes!', nil]
-      attachment = @course.attachments.detect { |a| a.filename == 'smiley.jpg' }
-      expect(d['answers'].map { |a| a['comments_html'] }).to eq [nil, %{yes! <img src="/courses/#{@course.id}/files/#{attachment.id}/preview" alt="">}, nil]
+      expect(d["correct_comments"]).to eq "I can't believe you got that right. Awesome!"
+      expect(d["correct_comments_html"]).to eq "I can't <i>believe </i>you got that right. <b>Awesome!</b>"
+      expect(d["incorrect_comments_html"]).to eq "<b>Wrong. </b>That's a bummer."
+      expect(d["points_possible"]).to eq 3
+      expect(d["question_name"]).to eq "q1"
+      expect(d["answers"].map { |a| a["weight"] }).to eq [0, 100, 0]
+      expect(d["answers"].map { |a| a["comments"] }).to eq ["nope", "yes!", nil]
+      attachment = @course.attachments.detect { |a| a.filename == "smiley.jpg" }
+      expect(d["answers"].map { |a| a["comments_html"] }).to eq [nil, %(yes! <img src="/courses/#{@course.id}/files/#{attachment.id}/preview" alt="">), nil]
     end
 
     it "imports respondus question types" do
@@ -354,7 +354,7 @@ if Qti.migration_executable
 
     it "applies respondus settings" do
       setup_migration(File.expand_path("fixtures/canvas_respondus_question_types.zip", __dir__))
-      @migration.update_migration_settings(:apply_respondus_settings_file => true)
+      @migration.update_migration_settings(apply_respondus_settings_file: true)
       @migration.save!
       do_migration
 
@@ -365,8 +365,7 @@ if Qti.migration_executable
 
     it "is able to import directly into an assessment question bank" do
       setup_migration(File.expand_path("fixtures/canvas_respondus_question_types.zip", __dir__))
-      @migration.update_migration_settings(:migration_ids_to_import =>
-                                               { :copy => { :all_quizzes => false, :all_assessment_question_banks => true } })
+      @migration.update_migration_settings(migration_ids_to_import: { copy: { all_quizzes: false, all_assessment_question_banks: true } })
       @migration.save!
       do_migration
 
@@ -402,18 +401,18 @@ if Qti.migration_executable
     end
 
     def setup_migration(zip_path = fname)
-      @migration = ContentMigration.new(:context => @course,
-                                        :user => @user)
+      @migration = ContentMigration.new(context: @course,
+                                        user: @user)
       @migration.update_migration_settings({
-                                             :migration_type => 'qti_converter',
-                                             :flavor => Qti::Flavors::RESPONDUS
+                                             migration_type: "qti_converter",
+                                             flavor: Qti::Flavors::RESPONDUS
                                            })
       @migration.save!
 
       @attachment = Attachment.new
       @attachment.context = @migration
-      @attachment.uploaded_data = File.open(zip_path, 'rb')
-      @attachment.filename = 'qti_import_test1.zip'
+      @attachment.uploaded_data = File.open(zip_path, "rb")
+      @attachment.filename = "qti_import_test1.zip"
       @attachment.save!
 
       @migration.attachment = @attachment

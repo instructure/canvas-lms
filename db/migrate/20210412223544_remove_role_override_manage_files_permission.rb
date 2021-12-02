@@ -21,7 +21,7 @@ class RemoveRoleOverrideManageFilesPermission < ActiveRecord::Migration[6.0]
   disable_ddl_transaction!
 
   def up
-    RoleOverride.where(permission: 'manage_files').in_batches.delete_all
+    RoleOverride.where(permission: "manage_files").in_batches.delete_all
   end
 
   def down

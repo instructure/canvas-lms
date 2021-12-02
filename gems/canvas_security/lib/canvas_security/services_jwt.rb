@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class CanvasSecurity::ServicesJwt
-  KeyStorage = CanvasSecurity::KeyStorage.new('services-jwt')
+  KeyStorage = CanvasSecurity::KeyStorage.new("services-jwt")
 
   class InvalidRefresh < RuntimeError; end
 
@@ -156,8 +156,8 @@ class CanvasSecurity::ServicesJwt
 
   def self.decrypt(token, ignore_expiration: false)
     CanvasSecurity.decrypt_encrypted_jwt(token, {
-                                           'HS256' => [signing_secret, previous_signing_secret],
-                                           'RS256' => KeyStorage.public_keyset
+                                           "HS256" => [signing_secret, previous_signing_secret],
+                                           "RS256" => KeyStorage.public_keyset
                                          }, encryption_secret, ignore_expiration: ignore_expiration)
   end
 
@@ -193,11 +193,11 @@ class CanvasSecurity::ServicesJwt
     def refresh_invalid_for_user?(payload, domain, user, real_user)
       invalid_user = payload[:sub] != user.global_id
       invalid_domain = payload[:domain] != domain
-      if payload[:masq_sub].present?
-        invalid_real = real_user.nil? || payload[:masq_sub] != real_user.global_id
-      else
-        invalid_real = real_user.present?
-      end
+      invalid_real = if payload[:masq_sub].present?
+                       real_user.nil? || payload[:masq_sub] != real_user.global_id
+                     else
+                       real_user.present?
+                     end
       invalid_user || invalid_domain || invalid_real
     end
 

@@ -20,8 +20,8 @@
 describe PacePlansController, type: :controller do
   let(:valid_update_params) do
     {
-      end_date: 1.year.from_now.strftime('%Y-%m-%d'),
-      workflow_state: 'active',
+      end_date: 1.year.from_now.strftime("%Y-%m-%d"),
+      workflow_state: "active",
       pace_plan_module_items_attributes: [
         {
           id: @pace_plan.pace_plan_module_items.first.id,
@@ -43,16 +43,16 @@ describe PacePlansController, type: :controller do
     pace_plan_model(course: @course)
     @student_enrollment = @student.enrollments.first
 
-    @mod1 = @course.context_modules.create! name: 'M1'
-    @a1 = @course.assignments.create! name: 'A1', workflow_state: 'active'
-    @mod1.add_item id: @a1.id, type: 'assignment'
+    @mod1 = @course.context_modules.create! name: "M1"
+    @a1 = @course.assignments.create! name: "A1", workflow_state: "active"
+    @mod1.add_item id: @a1.id, type: "assignment"
 
-    @mod2 = @course.context_modules.create! name: 'M2'
-    @a2 = @course.assignments.create! name: 'A2', workflow_state: 'published'
-    @mod2.add_item id: @a2.id, type: 'assignment'
-    @a3 = @course.assignments.create! name: 'A3', workflow_state: 'published'
-    @mod2.add_item id: @a3.id, type: 'assignment'
-    @mod2.add_item type: 'external_url', title: 'External URL', url: 'http://localhost'
+    @mod2 = @course.context_modules.create! name: "M2"
+    @a2 = @course.assignments.create! name: "A2", workflow_state: "published"
+    @mod2.add_item id: @a2.id, type: "assignment"
+    @a3 = @course.assignments.create! name: "A3", workflow_state: "published"
+    @mod2.add_item id: @a3.id, type: "assignment"
+    @mod2.add_item type: "external_url", title: "External URL", url: "http://localhost"
 
     @course.context_module_tags.each_with_index do |tag, i|
       next unless tag.assignment
@@ -67,8 +67,8 @@ describe PacePlansController, type: :controller do
     @course_section = @course.course_sections.first
 
     @valid_params = {
-      end_date: 1.year.from_now.strftime('%Y-%m-%d'),
-      workflow_state: 'active',
+      end_date: 1.year.from_now.strftime("%Y-%m-%d"),
+      workflow_state: "active",
       pace_plan_module_items_attributes: [
         {
           id: @pace_plan.pace_plan_module_items.first.id,
@@ -92,7 +92,7 @@ describe PacePlansController, type: :controller do
     it "populates js_env with course, enrollment, sections, and pace_plan details" do
       @section = @course.course_sections.first
       @student_enrollment = @course.enrollments.find_by(user_id: @student.id)
-      @progress = Progress.create!(context: @pace_plan, tag: 'pace_plan_publish')
+      @progress = Progress.create!(context: @pace_plan, tag: "pace_plan_publish")
       get :index, { params: { course_id: @course.id } }
 
       expect(response).to be_successful
@@ -137,7 +137,7 @@ describe PacePlansController, type: :controller do
       expect(js_env[:PACE_PLAN][:modules][1][:items].length).to be(2)
       expect(js_env[:PACE_PLAN][:modules][1][:items][1]).to match(hash_including({
                                                                                    assignment_title: @a3.title,
-                                                                                   module_item_type: 'Assignment',
+                                                                                   module_item_type: "Assignment",
                                                                                    duration: 4
                                                                                  }))
 
@@ -192,8 +192,8 @@ describe PacePlansController, type: :controller do
     end
 
     it "renders the latest progress object associated with publishing" do
-      Progress.create!(context: @pace_plan, tag: 'pace_plan_publish', workflow_state: 'failed')
-      Progress.create!(context: @pace_plan, tag: 'pace_plan_publish', workflow_state: 'running')
+      Progress.create!(context: @pace_plan, tag: "pace_plan_publish", workflow_state: "failed")
+      Progress.create!(context: @pace_plan, tag: "pace_plan_publish", workflow_state: "running")
 
       get :api_show, params: { course_id: @course.id, id: @pace_plan.id }
       expect(response).to be_successful
@@ -201,8 +201,8 @@ describe PacePlansController, type: :controller do
     end
 
     it "renders a nil progress object if the most recent progress was completed" do
-      Progress.create!(context: @pace_plan, tag: 'pace_plan_publish', workflow_state: 'failed')
-      Progress.create!(context: @pace_plan, tag: 'pace_plan_publish', workflow_state: 'completed')
+      Progress.create!(context: @pace_plan, tag: "pace_plan_publish", workflow_state: "failed")
+      Progress.create!(context: @pace_plan, tag: "pace_plan_publish", workflow_state: "completed")
 
       get :api_show, params: { course_id: @course.id, id: @pace_plan.id }
       expect(response).to be_successful
@@ -229,7 +229,7 @@ describe PacePlansController, type: :controller do
       # Pace plan's publish should be queued
       progress = Progress.last
       expect(progress.context).to eq(@pace_plan)
-      expect(progress.workflow_state).to eq('queued')
+      expect(progress.workflow_state).to eq("queued")
       expect(response_body["progress"]["id"]).to eq(progress.id)
     end
   end
@@ -264,7 +264,7 @@ describe PacePlansController, type: :controller do
       # Pace plan's publish should be queued
       progress = Progress.last
       expect(progress.context).to eq(pace_plan)
-      expect(progress.workflow_state).to eq('queued')
+      expect(progress.workflow_state).to eq("queued")
       expect(response_body["progress"]["id"]).to eq(progress.id)
     end
   end

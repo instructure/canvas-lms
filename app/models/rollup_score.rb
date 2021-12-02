@@ -27,7 +27,7 @@ class RollupScore
   def initialize(outcome_results:, opts: {})
     @outcome_results = outcome_results
     @aggregate = opts[:aggregate_score]
-    @median = opts[:aggregate_stat] == 'median'
+    @median = opts[:aggregate_stat] == "median"
     @outcome = @outcome_results.first.learning_outcome
     @count = @outcome_results.size
     if opts[:points_possible].present?
@@ -60,18 +60,18 @@ class RollupScore
   def calculate_results
     # decaying average is default for new outcomes
     case @calculation_method
-    when 'decaying_average'
+    when "decaying_average"
       return nil if @outcome_results.empty?
 
       decaying_average_set
-    when 'n_mastery'
+    when "n_mastery"
       return nil if @outcome_results.length < @calculation_int
 
       n_mastery_set
-    when 'latest'
+    when "latest"
       latest_set = score_sets.first
       { score: latest_set[:score].round(PRECISION), results: [latest_set[:result]] }
-    when 'highest'
+    when "highest"
       highest_set = score_sets.max_by { |set| set[:score] }
       { score: highest_set[:score].round(PRECISION), results: [highest_set[:result]] }
     end

@@ -18,13 +18,13 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../views_helper'
+require_relative "../views_helper"
 
 describe "courses/_settings_sidebar.html.erb" do
   before do
-    course_with_teacher(:active_all => true)
+    course_with_teacher(active_all: true)
     @course.sis_source_id = "so_special_sis_id"
-    @course.workflow_state = 'claimed'
+    @course.workflow_state = "claimed"
     @course.save!
     assign(:context, @course)
     assign(:user_counts, {})
@@ -57,13 +57,13 @@ describe "courses/_settings_sidebar.html.erb" do
       assign(:current_user, @user)
       render
       doc = Nokogiri::HTML5(response.body)
-      expect(doc.at_css('#reset_course_content_dialog')['style']).to eq 'display:none;'
+      expect(doc.at_css("#reset_course_content_dialog")["style"]).to eq "display:none;"
     end
 
-    it 'does not display the dialog contents under the button (granular permissions)' do
+    it "does not display the dialog contents under the button (granular permissions)" do
       @course.account.enable_feature!(:granular_permissions_manage_courses)
       @course.root_account.role_overrides.create!(
-        permission: 'manage_courses_reset',
+        permission: "manage_courses_reset",
         role: teacher_role,
         enabled: true
       )
@@ -71,7 +71,7 @@ describe "courses/_settings_sidebar.html.erb" do
       assign(:current_user, @user)
       render
       doc = Nokogiri.HTML5(response.body)
-      expect(doc.at_css('#reset_course_content_dialog')['style']).to eq 'display:none;'
+      expect(doc.at_css("#reset_course_content_dialog")["style"]).to eq "display:none;"
     end
   end
 
@@ -86,10 +86,10 @@ describe "courses/_settings_sidebar.html.erb" do
       def create_course_settings_sub_navigation_tool(options = {})
         defaults = {
           name: options[:name] || "external tool",
-          consumer_key: 'test',
-          shared_secret: 'asdf',
-          url: 'http://example.com/ims/lti',
-          course_settings_sub_navigation: { icon_url: '/images/delete.png' },
+          consumer_key: "test",
+          shared_secret: "asdf",
+          url: "http://example.com/ims/lti",
+          course_settings_sub_navigation: { icon_url: "/images/delete.png" },
         }
         @course.context_external_tools.create!(defaults.merge(options))
       end
@@ -102,7 +102,7 @@ describe "courses/_settings_sidebar.html.erb" do
         assign(:course_settings_sub_navigation_tools, @course.context_external_tools.to_a)
         render
         doc = Nokogiri::HTML5(response.body)
-        expect(doc.css('.course-settings-sub-navigation-lti').size).to eq num_tools
+        expect(doc.css(".course-settings-sub-navigation-lti").size).to eq num_tools
       end
 
       it "includes the launch type parameter" do
@@ -110,8 +110,8 @@ describe "courses/_settings_sidebar.html.erb" do
         assign(:course_settings_sub_navigation_tools, @course.context_external_tools.to_a)
         render
         doc = Nokogiri::HTML5(response.body)
-        tool_link = doc.at_css('.course-settings-sub-navigation-lti')
-        expect(tool_link['href']).to include("launch_type=course_settings_sub_navigation")
+        tool_link = doc.at_css(".course-settings-sub-navigation-lti")
+        expect(tool_link["href"]).to include("launch_type=course_settings_sub_navigation")
       end
     end
   end

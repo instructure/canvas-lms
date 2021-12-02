@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-require 'inst_access'
+require "inst_access"
 
 class InstAccessSupport
   def self.configure_inst_access!

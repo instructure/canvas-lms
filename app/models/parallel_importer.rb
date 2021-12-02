@@ -21,11 +21,11 @@
 class ParallelImporter < ActiveRecord::Base
   belongs_to :sis_batch
   belongs_to :attachment
-  has_many :sis_batch_errors, foreign_key: :parallel_importer_id, inverse_of: :parallel_importer
+  has_many :sis_batch_errors, inverse_of: :parallel_importer
 
-  scope :running, -> { where(workflow_state: 'running') }
-  scope :completed, -> { where(workflow_state: 'completed') }
-  scope :not_completed, -> { where(workflow_state: %w{pending queued running retry}) }
+  scope :running, -> { where(workflow_state: "running") }
+  scope :completed, -> { where(workflow_state: "completed") }
+  scope :not_completed, -> { where(workflow_state: %w[pending queued running retry]) }
 
   include Workflow
   workflow do
@@ -39,23 +39,23 @@ class ParallelImporter < ActiveRecord::Base
   end
 
   def start
-    if workflow_state == 'retry'
-      self.update!(started_at: Time.now.utc)
+    if workflow_state == "retry"
+      update!(started_at: Time.now.utc)
     else
-      self.update!(:workflow_state => "running", :started_at => Time.now.utc)
+      update!(workflow_state: "running", started_at: Time.now.utc)
     end
   end
 
   def fail
-    self.update!(:workflow_state => "failed", :ended_at => Time.now.utc)
+    update!(workflow_state: "failed", ended_at: Time.now.utc)
   end
 
   def abort
-    self.update!(:workflow_state => "aborted", :ended_at => Time.now.utc)
+    update!(workflow_state: "aborted", ended_at: Time.now.utc)
   end
 
   def complete(opts = {})
-    updates = { :workflow_state => "completed", :ended_at => Time.now.utc }.merge(opts)
-    self.update!(updates)
+    updates = { workflow_state: "completed", ended_at: Time.now.utc }.merge(opts)
+    update!(updates)
   end
 end

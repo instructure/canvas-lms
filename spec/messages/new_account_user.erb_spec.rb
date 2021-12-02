@@ -18,11 +18,11 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative 'messages_helper'
+require_relative "messages_helper"
 
-describe 'new_account_user' do
+describe "new_account_user" do
   before :once do
-    account = Account.create!(:name => "some account", :settings => { :outgoing_email_default_name => "Custom From" })
+    account = Account.create!(name: "some account", settings: { outgoing_email_default_name: "Custom From" })
     user_model
     @account_user = account.account_users.create!(user: @user)
   end

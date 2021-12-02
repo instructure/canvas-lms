@@ -18,23 +18,23 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../graphql_spec_helper'
+require_relative "../graphql_spec_helper"
 
 describe Mutations::MarkSubmissionCommentsRead do
   before(:once) do
     @account = Account.create!
     @course = @account.courses.create!
-    @teacher = @course.enroll_teacher(User.create!, enrollment_state: 'active').user
-    @student = @course.enroll_student(User.create!, enrollment_state: 'active').user
-    @student2 = @course.enroll_student(User.create!, enrollment_state: 'active').user
-    @assignment = @course.assignments.create!(title: 'Example Assignment')
+    @teacher = @course.enroll_teacher(User.create!, enrollment_state: "active").user
+    @student = @course.enroll_student(User.create!, enrollment_state: "active").user
+    @student2 = @course.enroll_student(User.create!, enrollment_state: "active").user
+    @assignment = @course.assignments.create!(title: "Example Assignment")
     @submission = @assignment.submit_homework(
       @student,
-      submission_type: 'online_text_entry',
-      body: 'body'
+      submission_type: "online_text_entry",
+      body: "body"
     )
-    @student_comment = @submission.submission_comments.create!(author: @student, comment: 'whats up')
-    @teacher_comment = @submission.submission_comments.create!(author: @teacher, comment: 'teachers whats up')
+    @student_comment = @submission.submission_comments.create!(author: @student, comment: "whats up")
+    @teacher_comment = @submission.submission_comments.create!(author: @teacher, comment: "teachers whats up")
   end
 
   def mutation_str(submission_id: nil, submission_comment_ids: [])
@@ -61,7 +61,7 @@ describe Mutations::MarkSubmissionCommentsRead do
     result.to_h.with_indifferent_access
   end
 
-  it 'marks submission as read' do
+  it "marks submission as read" do
     result = run_mutation(submission_comment_ids: @student_comment.id.to_s)
     expect(
       result.dig(:data, :markSubmissionCommentsRead, :submissionComments).count
@@ -75,22 +75,22 @@ describe Mutations::MarkSubmissionCommentsRead do
     expect(@student_comment.read?(@teacher)).to eq true
   end
 
-  it 'requires permission to mark submission as read' do
+  it "requires permission to mark submission as read" do
     result = run_mutation({ submission_comment_ids: @student_comment.id.to_s }, @student2)
     expect(
       result.dig(:data, :markSubmissionCommentsRead, :submissionComments)
     ).to eq nil
   end
 
-  it 'will mark multiple submission comments as read' do
-    @student_comment = @submission.submission_comments.create!(author: @student, comment: 'whats up')
-    student_comment2 = @submission.submission_comments.create!(author: @student, comment: 'whats up')
+  it "will mark multiple submission comments as read" do
+    @student_comment = @submission.submission_comments.create!(author: @student, comment: "whats up")
+    student_comment2 = @submission.submission_comments.create!(author: @student, comment: "whats up")
     result = run_mutation(submission_comment_ids: [@student_comment.id.to_s, student_comment2.id.to_s])
     expect(
       result.dig(:data, :markSubmissionCommentsRead, :submissionComments).count
     ).to eq 2
     expect(
-      result.dig(:data, :markSubmissionCommentsRead, :submissionComments).map { |x| x[:_id] }
+      result.dig(:data, :markSubmissionCommentsRead, :submissionComments).pluck(:_id)
     ).to eq [@student_comment.id.to_s, student_comment2.id.to_s]
     expect(ViewedSubmissionComment.count).to eq 2
     expect(@student_comment.read?(@teacher)).to eq true

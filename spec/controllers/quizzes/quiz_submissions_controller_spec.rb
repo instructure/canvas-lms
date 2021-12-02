@@ -20,8 +20,8 @@
 
 describe Quizzes::QuizSubmissionsController do
   before :once do
-    course_with_teacher(:active_all => true)
-    student_in_course(:active_all => true)
+    course_with_teacher(active_all: true)
+    student_in_course(active_all: true)
     @teacher_enrollment = @enrollment
   end
 
@@ -29,13 +29,13 @@ describe Quizzes::QuizSubmissionsController do
     before :once do
       @quiz = @course.quizzes.create!
       @quiz.workflow_state = "available"
-      @quiz.quiz_data = [{ :correct_comments => "", :assessment_question_id => nil, :incorrect_comments => "", :question_name => "Question 1", :points_possible => 1, :question_text => "Which book(s) are required for this course?", :name => "Question 1", :id => 128, :answers => [{ :weight => 0, :text => "A", :comments => "", :id => 1490 }, { :weight => 0, :text => "B", :comments => "", :id => 1020 }, { :weight => 0, :text => "C", :comments => "", :id => 7051 }], :question_type => "multiple_choice_question" }]
+      @quiz.quiz_data = [{ correct_comments: "", assessment_question_id: nil, incorrect_comments: "", question_name: "Question 1", points_possible: 1, question_text: "Which book(s) are required for this course?", name: "Question 1", id: 128, answers: [{ weight: 0, text: "A", comments: "", id: 1490 }, { weight: 0, text: "B", comments: "", id: 1020 }, { weight: 0, text: "C", comments: "", id: 7051 }], question_type: "multiple_choice_question" }]
       @quiz.save!
     end
 
     it "allows previewing" do
       user_session(@teacher)
-      post 'create', params: { :course_id => @quiz.context_id, :quiz_id => @quiz.id, :preview => 1 }
+      post "create", params: { course_id: @quiz.context_id, quiz_id: @quiz.id, preview: 1 }
       expect(response).to be_redirect
     end
 
@@ -43,7 +43,7 @@ describe Quizzes::QuizSubmissionsController do
       user_session(@teacher)
       @quiz.access_code = "12345"
       @quiz.save!
-      post 'create', params: { :course_id => @quiz.context_id, :quiz_id => @quiz.id, :preview => 1 }
+      post "create", params: { course_id: @quiz.context_id, quiz_id: @quiz.id, preview: 1 }
       expect(response).to be_redirect
     end
 
@@ -54,7 +54,7 @@ describe Quizzes::QuizSubmissionsController do
       @quiz.save!
       @submission = Quizzes::SubmissionManager.new(@quiz).find_or_create_submission(@student)
       Quizzes::SubmissionGrader.new(@submission).grade_submission
-      post 'create', params: { :course_id => @quiz.context_id, :quiz_id => @quiz.id, :question_123 => 'hi', :validation_token => @submission.validation_token }
+      post "create", params: { course_id: @quiz.context_id, quiz_id: @quiz.id, question_123: "hi", validation_token: @submission.validation_token }
       expect(response).to be_redirect
     end
 
@@ -65,14 +65,14 @@ describe Quizzes::QuizSubmissionsController do
       session[:quiz_access_code] = {}
       Hash(session[:quiz_access_code])[@quiz.id] = @quiz.access_code
       @submission = Quizzes::SubmissionManager.new(@quiz).find_or_create_submission(@student)
-      post 'create', params: { :course_id => @quiz.context_id, :quiz_id => @quiz.id, :question_123 => 'hi', :validation_token => @submission.validation_token }
+      post "create", params: { course_id: @quiz.context_id, quiz_id: @quiz.id, question_123: "hi", validation_token: @submission.validation_token }
       expect(session[:quiz_access_code]).to be_empty
     end
 
     it "rejects a submission when the validation token does not match" do
       user_session(@student)
       @submission = Quizzes::SubmissionManager.new(@quiz).find_or_create_submission(@student)
-      post 'create', params: { :course_id => @quiz.context_id, :quiz_id => @quiz.id, :question_123 => 'hi', :validation_token => "xxx" }
+      post "create", params: { course_id: @quiz.context_id, quiz_id: @quiz.id, question_123: "hi", validation_token: "xxx" }
       expect(response).to be_redirect
       expect(flash[:error]).not_to be_blank
     end
@@ -81,11 +81,11 @@ describe Quizzes::QuizSubmissionsController do
       user_session(@student)
       @submission = Quizzes::SubmissionManager.new(@quiz).find_or_create_submission(@student)
       @submission.submission_data = {}
-      @submission.quiz_data = [{ :correct_comments => "", :assessment_question_id => nil, :incorrect_comments => "", :question_name => "Question 1", :points_possible => 1, :question_text => "Which book(s) are required for this course?", :name => "Question 1", 'id' => 128, :answers => [{ :weight => 0, :text => "A", :comments => "", :id => 1490 }, { :weight => 0, :text => "B", :comments => "", :id => 1020 }, { :weight => 0, :text => "C", :comments => "", :id => 7051 }], :question_type => "multiple_choice_question" }]
+      @submission.quiz_data = [{ :correct_comments => "", :assessment_question_id => nil, :incorrect_comments => "", :question_name => "Question 1", :points_possible => 1, :question_text => "Which book(s) are required for this course?", :name => "Question 1", "id" => 128, :answers => [{ weight: 0, text: "A", comments: "", id: 1490 }, { weight: 0, text: "B", comments: "", id: 1020 }, { weight: 0, text: "C", comments: "", id: 7051 }], :question_type => "multiple_choice_question" }]
       @submission.attempt = 1
       @submission.save!
 
-      post 'create', params: { course_id: @quiz.context_id, quiz_id: @quiz.id,
+      post "create", params: { course_id: @quiz.context_id, quiz_id: @quiz.id,
                                question_128: "bye", validation_token: @submission.validation_token,
                                attempt: 1 }
       events = Quizzes::QuizSubmissionEvent.where(quiz_submission_id: @submission.id)
@@ -94,17 +94,17 @@ describe Quizzes::QuizSubmissionsController do
   end
 
   describe "PUT 'update'" do
-    context 'quiz with submission' do
+    context "quiz with submission" do
       before(:once) { quiz_with_submission }
 
       it "requires authentication" do
-        put 'update', params: { :course_id => @quiz.context_id, :quiz_id => @quiz.id, :id => @qsub.id }
+        put "update", params: { course_id: @quiz.context_id, quiz_id: @quiz.id, id: @qsub.id }
         assert_unauthorized
       end
 
       it "allows updating scores if the teacher is logged in" do
         user_session(@teacher)
-        put 'update', params: { :course_id => @quiz.context_id, :quiz_id => @quiz.id, :id => @qsub.id, "question_score_128" => "2" }
+        put "update", params: { :course_id => @quiz.context_id, :quiz_id => @quiz.id, :id => @qsub.id, "question_score_128" => "2" }
         expect(response).to be_redirect
         expect(assigns[:submission]).not_to be_nil
         expect(assigns[:submission].submission_data[0][:points]).to eq 2
@@ -112,24 +112,24 @@ describe Quizzes::QuizSubmissionsController do
 
       it "does not allow updating if the course is concluded" do
         @teacher_enrollment.conclude
-        put 'update', params: { :course_id => @quiz.context_id, :quiz_id => @quiz.id, :id => @qsub.id }
+        put "update", params: { course_id: @quiz.context_id, quiz_id: @quiz.id, id: @qsub.id }
         assert_unauthorized
       end
 
       it "does not allow updating if the student is not assigned the quiz" do
         user_session(@teacher)
         allow_any_instance_of(Quizzes::Quiz).to receive(:visible_to_user?).and_return(false)
-        put 'update', params: { :course_id => @quiz.context_id, :quiz_id => @quiz.id, :id => @qsub.id }
+        put "update", params: { course_id: @quiz.context_id, quiz_id: @quiz.id, id: @qsub.id }
         assert_forbidden
       end
     end
 
-    context 'practice quiz with submission' do
+    context "practice quiz with submission" do
       before(:once) { practice_quiz_with_submission }
 
       it "allows updating scores for a practice quiz" do
         user_session(@teacher)
-        put 'update', params: { :course_id => @quiz.context_id, :quiz_id => @quiz.id, :id => @qsub.id, "question_score_128" => "2" }
+        put "update", params: { :course_id => @quiz.context_id, :quiz_id => @quiz.id, :id => @qsub.id, "question_score_128" => "2" }
         expect(response).to be_redirect
         expect(assigns[:submission]).not_to be_nil
         expect(assigns[:submission].submission_data[0][:points]).to eq 2
@@ -139,14 +139,14 @@ describe Quizzes::QuizSubmissionsController do
 
   describe "PUT 'backup'" do
     before :once do
-      quiz_model(:course => @course)
+      quiz_model(course: @course)
       @qs = @quiz.generate_submission(@student, false)
     end
 
     it "requires authentication" do
-      Quizzes::QuizSubmission.where(:id => @qs).update_all(:updated_at => 1.hour.ago)
+      Quizzes::QuizSubmission.where(id: @qs).update_all(updated_at: 1.hour.ago)
 
-      put 'backup', params: { :quiz_id => @quiz.id, :course_id => @course.id, :a => 'test', :validation_token => @qs.validation_token }
+      put "backup", params: { quiz_id: @quiz.id, course_id: @course.id, a: "test", validation_token: @qs.validation_token }
       assert_unauthorized
 
       expect(@qs.reload.submission_data[:a]).to be_nil
@@ -154,35 +154,35 @@ describe Quizzes::QuizSubmissionsController do
 
     it "backups to the user's quiz submission" do
       user_session(@student)
-      Quizzes::QuizSubmission.where(:id => @qs).update_all(:updated_at => 1.hour.ago)
+      Quizzes::QuizSubmission.where(id: @qs).update_all(updated_at: 1.hour.ago)
 
-      put 'backup', params: { :quiz_id => @quiz.id, :course_id => @course.id, :a => 'test', :validation_token => @qs.validation_token }
+      put "backup", params: { quiz_id: @quiz.id, course_id: @course.id, a: "test", validation_token: @qs.validation_token }
       expect(response).to be_successful
 
-      expect(@qs.reload.submission_data[:a]).to eq 'test'
+      expect(@qs.reload.submission_data[:a]).to eq "test"
     end
 
     it "returns the time left to finish a quiz" do
       user_session(@student)
       submission = @qs
       submission.update_attribute(:end_at, Time.now + 1.hour)
-      Quizzes::QuizSubmission.where(:id => submission).update_all(:updated_at => 1.hour.ago)
+      Quizzes::QuizSubmission.where(id: submission).update_all(updated_at: 1.hour.ago)
 
-      put 'backup', params: { :quiz_id => @quiz.id, :course_id => @course.id, :a => 'test', :validation_token => submission.validation_token }
+      put "backup", params: { quiz_id: @quiz.id, course_id: @course.id, a: "test", validation_token: submission.validation_token }
       json = JSON.parse(response.body)
 
-      expect(json).to have_key('time_left')
-      expect(json['time_left']).to be_within(5.0).of(60 * 60)
-      expect(json).to have_key('end_at')
-      expect(json).to have_key('hard_end_at')
-      expect(json).to have_key('hard_time_left')
+      expect(json).to have_key("time_left")
+      expect(json["time_left"]).to be_within(5.0).of(60 * 60)
+      expect(json).to have_key("end_at")
+      expect(json).to have_key("hard_end_at")
+      expect(json).to have_key("hard_time_left")
     end
 
     it "does not backup if no submission can be found" do
       user_session(@teacher)
-      put 'backup', params: { quiz_id: @quiz.id, course_id: @course.id, a: 'test', preview: 1 }
+      put "backup", params: { quiz_id: @quiz.id, course_id: @course.id, a: "test", preview: 1 }
       json = JSON.parse(response.body)
-      expect(json['backup']).to be_falsey
+      expect(json["backup"]).to be_falsey
     end
   end
 
@@ -195,7 +195,7 @@ describe Quizzes::QuizSubmissionsController do
     end
 
     it "requires authentication" do
-      post 'record_answer', params: { :quiz_id => @quiz.id, :course_id => @course.id, :id => @qsub.id, :a => 'test' }
+      post "record_answer", params: { quiz_id: @quiz.id, course_id: @course.id, id: @qsub.id, a: "test" }
       assert_unauthorized
 
       expect(@qsub.reload.submission_data[:a]).to be_nil
@@ -205,15 +205,15 @@ describe Quizzes::QuizSubmissionsController do
       # TODO: FIXME, this test doesn't appear to match its description
       user_session(@student)
 
-      post 'record_answer', params: { :quiz_id => @quiz.id, :course_id => @course.id, :id => @qsub.id, :a => 'test' }
+      post "record_answer", params: { quiz_id: @quiz.id, course_id: @course.id, id: @qsub.id, a: "test" }
       assert_status(401)
 
       expect(@qsub.reload.submission_data[:a]).to be_nil
     end
 
     it "redirects back to quiz after login if unauthorized" do
-      controller.request.env['HTTP_REFERER'] = 'http://test.host/'
-      post 'record_answer', params: { :quiz_id => @quiz.id, :course_id => @course.id, :id => @qsub.id, :a => 'test' }
+      controller.request.env["HTTP_REFERER"] = "http://test.host/"
+      post "record_answer", params: { quiz_id: @quiz.id, course_id: @course.id, id: @qsub.id, a: "test" }
       assert_unauthorized
       expect(session[:return_to]).not_to be_nil
     end
@@ -226,7 +226,7 @@ describe Quizzes::QuizSubmissionsController do
         quiz = course_quiz true
         expect(ContentZipper).to receive(:delay).and_return(ContentZipper)
         expect(ContentZipper).to receive(:process_attachment)
-        get 'index', params: { quiz_id: quiz.id, zip: '1', course_id: @course }
+        get "index", params: { quiz_id: quiz.id, zip: "1", course_id: @course }
       end
 
       it "still works even after the teacher can't actively grade anymore" do
@@ -240,7 +240,7 @@ describe Quizzes::QuizSubmissionsController do
         expect(quiz.grants_right?(@teacher, :review_grades)).to eq true
         expect(ContentZipper).to receive(:delay).and_return(ContentZipper)
         expect(ContentZipper).to receive(:process_attachment)
-        get 'index', params: { quiz_id: quiz.id, zip: '1', course_id: @course }
+        get "index", params: { quiz_id: quiz.id, zip: "1", course_id: @course }
       end
     end
   end
@@ -251,27 +251,27 @@ describe Quizzes::QuizSubmissionsController do
       it "is able to extend own extra attempts" do
         user_session(@teacher)
         request.accept = "application/json"
-        post 'extensions', params: { quiz_id: quiz.id, course_id: @course, user_id: @teacher.id, extra_attempts: 1 }
+        post "extensions", params: { quiz_id: quiz.id, course_id: @course, user_id: @teacher.id, extra_attempts: 1 }
         expect(response).to be_successful
         json = JSON.parse(response.body)
-        expect(json).to have_key('extra_attempts')
-        expect(json['extra_attempts']).to eq 1
+        expect(json).to have_key("extra_attempts")
+        expect(json["extra_attempts"]).to eq 1
       end
 
       it "is able to reset the result lockdown flag" do
         user_session(@teacher)
         request.accept = "application/json"
-        post 'extensions', params: { quiz_id: quiz.id, course_id: @course, user_id: @teacher.id, reset_has_seen_results: 1 }
+        post "extensions", params: { quiz_id: quiz.id, course_id: @course, user_id: @teacher.id, reset_has_seen_results: 1 }
         expect(response).to be_successful
         json = JSON.parse(response.body)
-        expect(json).to have_key('has_seen_results')
-        expect(json['has_seen_results']).to eq false
+        expect(json).to have_key("has_seen_results")
+        expect(json["has_seen_results"]).to eq false
       end
 
       it "requires a valid user id" do
         user_session(@teacher)
         request.accept = "application/json"
-        post 'extensions', params: { quiz_id: quiz.id, course_id: @course, user_id: 'foo', extra_attempts: 12 }
+        post "extensions", params: { quiz_id: quiz.id, course_id: @course, user_id: "foo", extra_attempts: 12 }
         expect(response).to be_not_found
       end
 
@@ -279,11 +279,11 @@ describe Quizzes::QuizSubmissionsController do
         user_session(@teacher)
         @student.enrollments.last.deactivate
         request.accept = "application/json"
-        post 'extensions', params: { quiz_id: quiz.id, course_id: @course, user_id: @student.id, extra_attempts: 12 }
+        post "extensions", params: { quiz_id: quiz.id, course_id: @course, user_id: @student.id, extra_attempts: 12 }
         expect(response).to be_successful
         json = JSON.parse(response.body)
-        expect(json).to have_key('extra_attempts')
-        expect(json['extra_attempts']).to eq 12
+        expect(json).to have_key("extra_attempts")
+        expect(json["extra_attempts"]).to eq 12
       end
     end
   end

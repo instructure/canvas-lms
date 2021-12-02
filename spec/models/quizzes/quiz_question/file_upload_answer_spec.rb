@@ -19,7 +19,7 @@
 
 describe Quizzes::QuizQuestion::FileUploadAnswer do
   let(:answer_data) do
-    { :question_1 => ["1"] }
+    { question_1: ["1"] }
   end
   let(:question_id) { 1 }
   let(:points_possible) { 100 }
@@ -37,7 +37,7 @@ describe Quizzes::QuizQuestion::FileUploadAnswer do
     end
 
     it "saves answer_details with attachment_ids" do
-      expect(answer.answer_details).to eq({ :attachment_ids => ["1"] })
+      expect(answer.answer_details).to eq({ attachment_ids: ["1"] })
     end
   end
 
@@ -48,7 +48,7 @@ describe Quizzes::QuizQuestion::FileUploadAnswer do
 
     it "returns nil if no attachment ids" do
       data = {
-        :question_1 => [""]
+        question_1: [""]
       }
       answer = Quizzes::QuizQuestion::FileUploadAnswer.new(question_id, points_possible, data)
       expect(answer.attachment_ids).to be_nil
@@ -59,9 +59,9 @@ describe Quizzes::QuizQuestion::FileUploadAnswer do
       data[question_id] = nil
       answer = Quizzes::QuizQuestion::FileUploadAnswer.new(question_id, points_possible, data)
       ids = nil
-      expect {
+      expect do
         ids = answer.attachment_ids
-      }.to_not raise_error
+      end.to_not raise_error
       expect(ids).to be_nil
     end
   end

@@ -31,26 +31,26 @@
 # @see AssessmentQuestionBank#select_for_submission()
 class Quizzes::QuizQuestion < ActiveRecord::Base
   extend RootAccountResolver
-  self.table_name = 'quiz_questions'
+  self.table_name = "quiz_questions"
 
   include Workflow
 
   attr_readonly :quiz_id
-  belongs_to :quiz, class_name: 'Quizzes::Quiz', inverse_of: :quiz_questions
+  belongs_to :quiz, class_name: "Quizzes::Quiz", inverse_of: :quiz_questions
   belongs_to :assessment_question
-  belongs_to :quiz_group, class_name: 'Quizzes::QuizGroup'
+  belongs_to :quiz_group, class_name: "Quizzes::QuizGroup"
 
-  Q_TEXT_ONLY = 'text_only_question'
-  Q_FILL_IN_MULTIPLE_BLANKS = 'fill_in_multiple_blanks_question'
-  Q_MULTIPLE_DROPDOWNS = 'multiple_dropdowns_question'
-  Q_CALCULATED = 'calculated_question'
+  Q_TEXT_ONLY = "text_only_question"
+  Q_FILL_IN_MULTIPLE_BLANKS = "fill_in_multiple_blanks_question"
+  Q_MULTIPLE_DROPDOWNS = "multiple_dropdowns_question"
+  Q_CALCULATED = "calculated_question"
 
   before_save :validate_blank_questions
   before_save :infer_defaults
   before_save :create_assessment_question, unless: :generated?
   before_destroy :delete_assessment_question, unless: :generated?
   before_destroy :update_quiz
-  validates_presence_of :quiz_id
+  validates :quiz_id, presence: true
   serialize :question_data
   after_save :update_quiz
 
@@ -58,7 +58,7 @@ class Quizzes::QuizQuestion < ActiveRecord::Base
 
   include MasterCourses::CollectionRestrictor
   self.collection_owner_association = :quiz
-  restrict_columns :content, [:question_data, :position, :quiz_group_id, :workflow_state]
+  restrict_columns :content, %i[question_data position quiz_group_id workflow_state]
 
   workflow do
     state :active
@@ -68,23 +68,23 @@ class Quizzes::QuizQuestion < ActiveRecord::Base
   end
 
   scope :active, -> { where("workflow_state='active' OR workflow_state IS NULL") }
-  scope :generated, -> { where(workflow_state: 'generated') }
-  scope :not_deleted, -> { where.not(workflow_state: 'deleted').or(where(workflow_state: nil)) }
+  scope :generated, -> { where(workflow_state: "generated") }
+  scope :not_deleted, -> { where.not(workflow_state: "deleted").or(where(workflow_state: nil)) }
 
   def infer_defaults
-    if !self.position && self.quiz
-      if self.quiz_group
-        self.position = (self.quiz_group.quiz_questions.active.map(&:position).compact.max || 0) + 1
-      else
-        self.position = self.quiz.root_entries_max_position + 1
-      end
+    if !position && quiz
+      self.position = if quiz_group
+                        (quiz_group.quiz_questions.active.filter_map(&:position).max || 0) + 1
+                      else
+                        quiz.root_entries_max_position + 1
+                      end
     end
   end
 
   protected :infer_defaults
 
   def update_quiz
-    Quizzes::Quiz.mark_quiz_edited(self.quiz_id)
+    Quizzes::Quiz.mark_quiz_edited(quiz_id)
   end
 
   # @param [Hash] data
@@ -99,9 +99,10 @@ class Quizzes::QuizQuestion < ActiveRecord::Base
   #  The user/teacher who's performing the regrade (e.g, updating the question).
   #  Note that this is NOT an id, but an actual instance of a User model.
   def question_data=(in_data)
-    data = if in_data.is_a?(String)
+    data = case in_data
+           when String
              ActiveSupport::JSON.decode(in_data)
-           elsif in_data.is_a?(Hash)
+           when Hash
              in_data.with_indifferent_access
            else
              in_data
@@ -111,16 +112,16 @@ class Quizzes::QuizQuestion < ActiveRecord::Base
       update_question_regrade(data[:regrade_option], data[:regrade_user])
     end
 
-    return if data == self.question_data
+    return if data == question_data
 
-    data = AssessmentQuestion.parse_question(data, self.assessment_question)
+    data = AssessmentQuestion.parse_question(data, assessment_question)
     data[:name] = data[:question_name]
 
     write_attribute(:question_data, data.to_hash)
   end
 
   def question_data
-    if (data = read_attribute(:question_data)) && data.class == Hash
+    if (data = read_attribute(:question_data)) && data.instance_of?(Hash)
       write_attribute(:question_data, data.with_indifferent_access)
       data = read_attribute(:question_data)
     end
@@ -129,68 +130,68 @@ class Quizzes::QuizQuestion < ActiveRecord::Base
       data = Quizzes::QuizQuestion::QuestionData.new(data || HashWithIndifferentAccess.new)
     end
 
-    unless data[:id].present? && !self.id
-      data[:id] = self.id
+    unless data[:id].present? && !id
+      data[:id] = id
     end
 
     data
   end
 
-  def assessment_question= aq
+  def assessment_question=(aq)
     self.assessment_question_version = aq.version_number
     super aq
   end
 
   def delete_assessment_question
-    if self.assessment_question && self.assessment_question.editable_by?(self)
-      self.assessment_question.destroy
+    if assessment_question&.editable_by?(self)
+      assessment_question.destroy
     end
   end
 
   def create_assessment_question
-    return if self.question_data && self.question_data.is_type?(:text_only)
+    return if question_data&.is_type?(:text_only)
 
-    aq = self.assessment_question || AssessmentQuestion.new
+    aq = assessment_question || AssessmentQuestion.new
 
     if aq.editable_by?(self)
-      aq.question_data = self.question_data
-      aq.initial_context = self.quiz.context if self.quiz && self.quiz.context
+      aq.question_data = question_data
+      aq.initial_context = quiz.context if quiz&.context
       aq.save! if aq.new_record?
     end
 
     self.assessment_question = aq
 
-    return true
+    true
   end
 
   def update_assessment_question!(aq, quiz_group_id, duplicate_index)
     if assessment_question_version.blank? || assessment_question_version < aq.version_number
       self.assessment_question = aq
-      self.write_attribute(:question_data, aq.question_data)
+      write_attribute(:question_data, aq.question_data)
     end
     self.quiz_group_id = quiz_group_id
     self.duplicate_index = duplicate_index
     save! if changed?
 
-    return self
+    self
   end
 
   def validate_blank_questions
-    return if self.question_data && !(self.question_data.is_type?(:fill_in_multiple_blanks) || self.question_data.is_type?(:short_answer))
+    return if question_data && !(question_data.is_type?(:fill_in_multiple_blanks) || question_data.is_type?(:short_answer))
 
-    qd = self.question_data
-    qd.answers = qd.answers.select { |answer| !answer['text'].empty? }
+    qd = question_data
+    qd.answers = qd.answers.reject { |answer| answer["text"].empty? }
     self.question_data = qd
-    self.question_data_will_change!
+    question_data_will_change!
     true
   end
 
   def clone_for(quiz, dup = nil, **)
     dup ||= Quizzes::QuizQuestion.new
-    self.attributes.except("id", "quiz_id", "quiz_group_id", "question_data").each do |key, val|
+    attributes.except("id", "quiz_id", "quiz_group_id", "question_data").each do |key, val|
       dup.send("#{key}=", val)
     end
-    data = self.question_data || HashWithIndifferentAccess.new
+    data = question_data || HashWithIndifferentAccess.new
     data.delete(:id)
     # if options[:old_context] && options[:new_context]
     #   data = Quizzes::QuizQuestion.migrate_question_hash(data, options)
@@ -206,10 +207,10 @@ class Quizzes::QuizQuestion < ActiveRecord::Base
   # be futzing with questions and groups and not affect
   # the quiz, as students see it.
   def data
-    res = (self.question_data || self.assessment_question.question_data) rescue Quizzes::QuizQuestion::QuestionData.new(HashWithIndifferentAccess.new)
-    res[:assessment_question_id] = self.assessment_question_id
-    res[:question_name] = t('#quizzes.quiz_question.defaults.question_name', "Question") if res[:question_name].blank?
-    res[:id] = self.id
+    res = (question_data || assessment_question.question_data) rescue Quizzes::QuizQuestion::QuestionData.new(HashWithIndifferentAccess.new)
+    res[:assessment_question_id] = assessment_question_id
+    res[:question_name] = t("#quizzes.quiz_question.defaults.question_name", "Question") if res[:question_name].blank?
+    res[:id] = id
 
     res.to_hash
   end
@@ -217,22 +218,22 @@ class Quizzes::QuizQuestion < ActiveRecord::Base
   # All questions will be assigned to the given quiz_group, and will be
   # assigned as part of the root quiz if no group is given
   def self.update_all_positions!(questions, quiz_group = nil)
-    return unless questions.size > 0
+    return if questions.empty?
 
-    group_id = quiz_group ? quiz_group.id : 'NULL'
+    group_id = quiz_group ? quiz_group.id : "NULL"
     updates = questions.map do |q|
       "WHEN id=#{q.id.to_i} THEN #{q.position.to_i}"
     end
 
     set = "quiz_group_id=#{group_id}, position=CASE #{updates.join(" ")} ELSE id END"
-    where(:id => questions).update_all(set)
+    where(id: questions).update_all(set)
   end
 
   alias_method :destroy_permanently!, :destroy
 
   def destroy
-    self.workflow_state = 'deleted'
-    self.save
+    self.workflow_state = "deleted"
+    save
   end
 
   private

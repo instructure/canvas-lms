@@ -24,8 +24,8 @@ if Canvas.redis_enabled?
   # we won't need this shim anymore, and can drop this test verifying it.
   describe "Canvas::Redis" do
     it "doesn't marshall" do
-      Canvas.redis.set('test', 1)
-      expect(Canvas.redis.get('test')).to eq '1'
+      Canvas.redis.set("test", 1)
+      expect(Canvas.redis.get("test")).to eq "1"
     end
   end
 

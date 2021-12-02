@@ -18,13 +18,13 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative 'messages_helper'
+require_relative "messages_helper"
 
-describe 'assignment_changed' do
+describe "assignment_changed" do
   include MessagesCommon
 
   before :once do
-    assignment_model(:title => "Quiz 1")
+    assignment_model(title: "Quiz 1")
   end
 
   let(:notification_name) { :assignment_changed }
@@ -38,8 +38,8 @@ describe 'assignment_changed' do
       expect(msg.subject).to match(/Quiz 1/)
       expect(msg.body).to match(/Quiz 1/)
       expect(msg.body).to match(Regexp.new(@course.name))
-      expect(msg.body).to match(/#{HostUrl.protocol}:\/\//)
-      expect(msg.body).to match(/courses\/#{@assignment.context_id}\/assignments\/#{@assignment.id}/)
+      expect(msg.body).to match(%r{#{HostUrl.protocol}://})
+      expect(msg.body).to match(%r{courses/#{@assignment.context_id}/assignments/#{@assignment.id}})
     end
   end
 

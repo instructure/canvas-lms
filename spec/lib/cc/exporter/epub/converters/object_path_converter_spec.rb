@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../../../cc_spec_helper'
+require_relative "../../../cc_spec_helper"
 
 describe "OjbectPathConverter" do
   let(:klass) do
@@ -32,7 +32,7 @@ describe "OjbectPathConverter" do
     let(:assignment_id) { "i5f4cd2e04f1089c1c5060e9761400516" }
     let(:wiki_id) { "page-1" }
     let(:doc) do
-      Nokogiri::HTML5.fragment(<<-HTML)
+      Nokogiri::HTML5.fragment(<<~HTML)
         <div>
           <a href="#{klass::OBJECT_TOKEN}/assignments/#{assignment_id}">
             Assignment Link
@@ -46,7 +46,7 @@ describe "OjbectPathConverter" do
 
     it "updates assignment link href" do
       expect(doc.search("a[href*='#{klass::OBJECT_TOKEN}']").any?).to be_truthy,
-                                                                      'precondition'
+                                                                      "precondition"
 
       test_instance.convert_object_paths!(doc)
       expect(doc.search("a[href*='#{klass::OBJECT_TOKEN}']").any?).to be_falsy
@@ -55,7 +55,7 @@ describe "OjbectPathConverter" do
 
     it "updates wiki link href" do
       expect(doc.search("a[href*='#{klass::WIKI_TOKEN}']").any?).to be_truthy,
-                                                                    'precondition'
+                                                                    "precondition"
 
       test_instance.convert_object_paths!(doc)
       expect(doc.search("a[href*='#{klass::WIKI_TOKEN}']").any?).to be_falsy

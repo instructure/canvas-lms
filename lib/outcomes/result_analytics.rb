@@ -34,13 +34,13 @@ module Outcomes
     #
     # Returns a relation of the results, suitably ordered.
     def find_outcome_results(user, opts)
-      required_opts = [:users, :context, :outcomes]
+      required_opts = %i[users context outcomes]
       required_opts.each { |p| raise "#{p} option is required" unless opts[p] }
       users, context, outcomes = opts.values_at(*required_opts)
       results = LearningOutcomeResult.active.with_active_link.where(
         context_code: context.asset_string,
         user_id: users.map(&:id),
-        learning_outcome_id: outcomes.map(&:id),
+        learning_outcome_id: outcomes.map(&:id)
       )
       unless context.grants_any_right?(user, :manage_grades, :view_all_grades)
         results = results.exclude_muted_associations
@@ -60,7 +60,7 @@ module Outcomes
     def order_results_for_rollup(relation)
       relation.joins(:user)
               .order(User.sortable_name_order_by_clause)
-              .order('users.id ASC, learning_outcome_results.learning_outcome_id ASC, learning_outcome_results.id ASC')
+              .order("users.id ASC, learning_outcome_results.learning_outcome_id ASC, learning_outcome_results.id ASC")
     end
 
     # Public: Generates a rollup of each outcome result for each user.
@@ -83,7 +83,7 @@ module Outcomes
       rollups = results.group_by(&:user_id).map do |_, user_results|
         Rollup.new(user_results.first.user, rollup_user_results(user_results, context))
       end
-      if excludes.include? 'missing_user_rollups'
+      if excludes.include? "missing_user_rollups"
         rollups
       else
         add_missing_user_rollups(rollups, users)
@@ -96,7 +96,7 @@ module Outcomes
     # context - The context to use for the resulting rollup.
     #
     # Returns a Rollup.
-    def aggregate_outcome_results_rollup(results, context, stat = 'mean')
+    def aggregate_outcome_results_rollup(results, context, stat = "mean")
       rollups = outcome_results_rollups(results: results, context: context)
       rollup_scores = rollups.map(&:scores).flatten
       outcome_results = rollup_scores.group_by(&:outcome).values
@@ -118,7 +118,7 @@ module Outcomes
     #
     # Returns an Array of RollupScore objects
     def rollup_user_results(user_results, context = nil)
-      filtered_results = user_results.select { |r| !r.score.nil? }
+      filtered_results = user_results.reject { |r| r.score.nil? }
       opts = mastery_scale_opts(context)
       filtered_results.group_by(&:learning_outcome_id).map do |_, outcome_results|
         RollupScore.new(outcome_results: outcome_results, opts: opts)

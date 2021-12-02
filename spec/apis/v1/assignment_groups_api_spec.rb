@@ -18,14 +18,14 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../api_spec_helper'
+require_relative "../api_spec_helper"
 
 module AssignmentGroupsApiSpecHelper
   def setup_groups
-    @group1 = @course.assignment_groups.create!(name: 'group1')
+    @group1 = @course.assignment_groups.create!(name: "group1")
     @group1.update_attribute(:position, 10)
     @group1.update_attribute(:group_weight, 40)
-    @group2 = @course.assignment_groups.create!(name: 'group2')
+    @group2 = @course.assignment_groups.create!(name: "group2")
     @group2.update_attribute(:position, 7)
     @group2.update_attribute(:group_weight, 60)
   end
@@ -36,7 +36,7 @@ module AssignmentGroupsApiSpecHelper
         title: "test1",
         assignment_group: @group1,
         points_possible: 10,
-        description: 'Assignment 1'
+        description: "Assignment 1"
       }.merge(assignment_opts)
     )
     @a2 = @course.assignments.create!(
@@ -44,7 +44,7 @@ module AssignmentGroupsApiSpecHelper
         title: "test2",
         assignment_group: @group1,
         points_possible: 12,
-        description: 'Assignment 2'
+        description: "Assignment 2"
       }.merge(assignment_opts)
     )
     @a3 = @course.assignments.create!(
@@ -52,7 +52,7 @@ module AssignmentGroupsApiSpecHelper
         title: "test3",
         assignment_group: @group2,
         points_possible: 8,
-        description: 'Assignment 3'
+        description: "Assignment 3"
       }.merge(assignment_opts)
     )
     @a4 = @course.assignments.create!(
@@ -60,7 +60,7 @@ module AssignmentGroupsApiSpecHelper
         title: "test4",
         assignment_group: @group2,
         points_possible: 9,
-        description: 'Assignment 4'
+        description: "Assignment 4"
       }.merge(assignment_opts)
     )
   end
@@ -72,13 +72,13 @@ module AssignmentGroupsApiSpecHelper
     @group2_assignment_today = @course.assignments.create!(assignment_group: @group2, due_at: Time.zone.now)
     gpg = Factories::GradingPeriodGroupHelper.new.legacy_create_for_course(@course)
     @gp_current = gpg.grading_periods.create!(
-      title: 'current',
+      title: "current",
       weight: 50,
       start_date: 1.month.ago,
       end_date: 1.month.from_now
     )
     @gp_future = gpg.grading_periods.create!(
-      title: 'future',
+      title: "future",
       weight: 50,
       start_date: 2.months.from_now,
       end_date: 4.months.from_now
@@ -98,45 +98,45 @@ describe AssignmentGroupsController, type: :request do
   it "sorts the returned list of assignment groups" do
     # the API returns the assignments sorted by
     # assignment_groups.position
-    group1 = @course.assignment_groups.create!(name: 'group1')
+    group1 = @course.assignment_groups.create!(name: "group1")
     group1.update_attribute(:position, 10)
-    group2 = @course.assignment_groups.create!(name: 'group2')
+    group2 = @course.assignment_groups.create!(name: "group2")
     group2.update_attribute(:position, 7)
-    group3 = @course.assignment_groups.create!(name: 'group3')
+    group3 = @course.assignment_groups.create!(name: "group3")
     group3.update_attribute(:position, 12)
 
     json = api_call(:get,
                     "/api/v1/courses/#{@course.id}/assignment_groups.json",
-                    { controller: 'assignment_groups', action: 'index',
-                      format: 'json', course_id: @course.id.to_s })
+                    { controller: "assignment_groups", action: "index",
+                      format: "json", course_id: @course.id.to_s })
 
     expect(json).to eq [
       {
-        'id' => group2.id,
-        'name' => 'group2',
-        'position' => 7,
-        'rules' => {},
-        'group_weight' => 0,
-        'sis_source_id' => nil,
-        'integration_data' => {}
+        "id" => group2.id,
+        "name" => "group2",
+        "position" => 7,
+        "rules" => {},
+        "group_weight" => 0,
+        "sis_source_id" => nil,
+        "integration_data" => {}
       },
       {
-        'id' => group1.id,
-        'name' => 'group1',
-        'position' => 10,
-        'rules' => {},
-        'group_weight' => 0,
-        'sis_source_id' => nil,
-        'integration_data' => {}
+        "id" => group1.id,
+        "name" => "group1",
+        "position" => 10,
+        "rules" => {},
+        "group_weight" => 0,
+        "sis_source_id" => nil,
+        "integration_data" => {}
       },
       {
-        'id' => group3.id,
-        'name' => 'group3',
-        'position' => 12,
-        'rules' => {},
-        'group_weight' => 0,
-        'sis_source_id' => nil,
-        'integration_data' => {}
+        "id" => group3.id,
+        "name" => "group3",
+        "position" => 12,
+        "rules" => {},
+        "group_weight" => 0,
+        "sis_source_id" => nil,
+        "integration_data" => {}
       }
     ]
   end
@@ -148,45 +148,45 @@ describe AssignmentGroupsController, type: :request do
     rubric_model(user: @user, context: @course, points_possible: 12,
                  data: larger_rubric_data)
 
-    @a3.create_rubric_association(rubric: @rubric, purpose: 'grading', use_for_grading: true)
+    @a3.create_rubric_association(rubric: @rubric, purpose: "grading", use_for_grading: true)
 
-    @a4.submission_types = 'discussion_topic'
+    @a4.submission_types = "discussion_topic"
     @a4.save!
     [@a1, @a2, @a3, @a4].each(&:reload)
 
-    @course.update_attribute(:group_weighting_scheme, 'percent')
+    @course.update_attribute(:group_weighting_scheme, "percent")
 
     json = api_call(:get,
                     "/api/v1/courses/#{@course.id}/assignment_groups.json?include[]=assignments",
-                    { controller: 'assignment_groups', action: 'index',
-                      format: 'json', course_id: @course.id.to_s,
-                      include: ['assignments'] })
+                    { controller: "assignment_groups", action: "index",
+                      format: "json", course_id: @course.id.to_s,
+                      include: ["assignments"] })
 
     expected = [
       {
-        'group_weight' => 60.0,
-        'id' => @group2.id,
-        'name' => 'group2',
-        'position' => 7,
-        'rules' => {},
-        'any_assignment_in_closed_grading_period' => false,
-        'integration_data' => {},
-        'sis_source_id' => nil,
-        'assignments' => [
+        "group_weight" => 60.0,
+        "id" => @group2.id,
+        "name" => "group2",
+        "position" => 7,
+        "rules" => {},
+        "any_assignment_in_closed_grading_period" => false,
+        "integration_data" => {},
+        "sis_source_id" => nil,
+        "assignments" => [
           controller.assignment_json(@a3, @user, session).as_json,
           controller.assignment_json(@a4, @user, session, include_discussion_topic: false).as_json
         ]
       },
       {
-        'group_weight' => 40.0,
-        'id' => @group1.id,
-        'name' => 'group1',
-        'position' => 10,
-        'rules' => {},
-        'any_assignment_in_closed_grading_period' => false,
-        'integration_data' => {},
-        'sis_source_id' => nil,
-        'assignments' => [
+        "group_weight" => 40.0,
+        "id" => @group1.id,
+        "name" => "group1",
+        "position" => 10,
+        "rules" => {},
+        "any_assignment_in_closed_grading_period" => false,
+        "integration_data" => {},
+        "sis_source_id" => nil,
+        "assignments" => [
           controller.assignment_json(@a1, @user, session).as_json,
           controller.assignment_json(@a2, @user, session).as_json
         ]
@@ -205,20 +205,20 @@ describe AssignmentGroupsController, type: :request do
   it "includes submissions for observed users when requested with all assignments" do
     course_with_observer(active_all: true)
     @observed_student = create_users(1, return_type: :record).first
-    @course.enroll_student(@observed_student, :enrollment_state => 'active')
-    @course.enroll_user(@observer, "ObserverEnrollment", :associated_user_id => @observed_student.id, :enrollment_state => 'active')
+    @course.enroll_student(@observed_student, enrollment_state: "active")
+    @course.enroll_user(@observer, "ObserverEnrollment", associated_user_id: @observed_student.id, enrollment_state: "active")
 
-    assignment = @course.assignments.create!(:title => "title", :submission_types => "online_url")
+    assignment = @course.assignments.create!(title: "title", submission_types: "online_url")
     assignment.grade_student(@observed_student, grade: 10, grader: @teacher)
 
     json = api_call_as_user(@observer, :get,
                             "/api/v1/courses/#{@course.id}/assignment_groups?include[]=assignments&include[]=observed_users&include[]=submission",
-                            { :controller => 'assignment_groups',
-                              :action => 'index', :format => 'json',
-                              :course_id => @course.id,
-                              :include => ["assignments", "observed_users", "submission"] })
+                            { controller: "assignment_groups",
+                              action: "index", format: "json",
+                              course_id: @course.id,
+                              include: %w[assignments observed_users submission] })
 
-    expect(json.first['assignments'].first['submission'].map { |s| s['user_id'] }).to eql [@observed_student.id]
+    expect(json.first["assignments"].first["submission"].map { |s| s["user_id"] }).to eql [@observed_student.id]
   end
 
   it "optionally includes 'grades_published' for moderated assignments" do
@@ -258,10 +258,10 @@ describe AssignmentGroupsController, type: :request do
       json = api_call(:get,
                       "/api/v1/courses/#{@course.id}/assignment_groups.json?" \
                       "include[]=assignments&exclude_response_fields[]=description",
-                      { controller: 'assignment_groups', action: 'index',
-                        format: 'json', course_id: @course.id.to_s,
-                        include: ['assignments'],
-                        exclude_response_fields: ['description'] })
+                      { controller: "assignment_groups", action: "index",
+                        format: "json", course_id: @course.id.to_s,
+                        include: ["assignments"],
+                        exclude_response_fields: ["description"] })
 
       json.each do |group|
         group["assignments"].each { |a| expect(a).not_to have_key "description" }
@@ -273,10 +273,10 @@ describe AssignmentGroupsController, type: :request do
       json = api_call(:get,
                       "/api/v1/courses/#{@course.id}/assignment_groups.json?" \
                       "include[]=assignments&exclude_response_fields[]=needs_grading_count",
-                      { controller: 'assignment_groups', action: 'index',
-                        format: 'json', course_id: @course.id.to_s,
-                        include: ['assignments'],
-                        exclude_response_fields: ['needs_grading_count'] })
+                      { controller: "assignment_groups", action: "index",
+                        format: "json", course_id: @course.id.to_s,
+                        include: ["assignments"],
+                        exclude_response_fields: ["needs_grading_count"] })
 
       json.each do |group|
         group["assignments"].each { |a| expect(a).not_to have_key "needs_grading_count" }
@@ -301,9 +301,9 @@ describe AssignmentGroupsController, type: :request do
 
       json = api_call(:get,
                       "/api/v1/courses/#{@course.id}/assignment_groups.json?include[]=assignments",
-                      { controller: 'assignment_groups', action: 'index',
-                        format: 'json', course_id: @course.id.to_s,
-                        include: ['assignments'] })
+                      { controller: "assignment_groups", action: "index",
+                        format: "json", course_id: @course.id.to_s,
+                        include: ["assignments"] })
 
       json.each do |ag_json|
         expect(ag_json["assignments"].length).to eq 1
@@ -318,9 +318,9 @@ describe AssignmentGroupsController, type: :request do
 
       json = api_call_as_user(@designer, :get,
                               "/api/v1/courses/#{@course.id}/assignment_groups.json?include[]=assignments",
-                              { controller: 'assignment_groups', action: 'index',
-                                format: 'json', course_id: @course.id.to_s,
-                                include: ['assignments'] })
+                              { controller: "assignment_groups", action: "index",
+                                format: "json", course_id: @course.id.to_s,
+                                include: ["assignments"] })
 
       json.each do |ag_json|
         expect(ag_json["assignments"].length).to eq 2
@@ -332,14 +332,12 @@ describe AssignmentGroupsController, type: :request do
       json = api_call(:get,
                       "/api/v1/courses/#{@course.id}/assignment_groups.json",
                       {
-                        controller: 'assignment_groups', action: 'index',
-                        format: 'json', course_id: @course.id.to_s
+                        controller: "assignment_groups", action: "index",
+                        format: "json", course_id: @course.id.to_s
                       },
-                      include: ['assignments', 'assignment_visibility'])
+                      include: ["assignments", "assignment_visibility"])
       json.each do |ag|
-        ag["assignments"].each do |a|
-          expect(a.has_key?("assignment_visibility")).to eq true
-        end
+        expect(ag["assignments"]).to all(have_key("assignment_visibility"))
       end
     end
   end
@@ -354,20 +352,20 @@ describe AssignmentGroupsController, type: :request do
       let(:api_path) { "/api/v1/courses/#{@course.id}/assignment_groups" }
       let(:api_settings) do
         {
-          controller: 'assignment_groups', action: 'index', format: 'json',
+          controller: "assignment_groups", action: "index", format: "json",
           course_id: @course.id.to_s, grading_period_id: @gp_future.id.to_s,
-          include: ['assignments']
+          include: ["assignments"]
         }
       end
 
       it "only returns assignments within the grading period" do
         json = api_call(:get, api_path, api_settings)
-        expect(json[1]['assignments'].length).to eq 1
+        expect(json[1]["assignments"].length).to eq 1
       end
 
       it "does not return assignments outside the grading period" do
         json = api_call(:get, api_path, api_settings)
-        expect(json[0]['assignments'].length).to eq 0
+        expect(json[0]["assignments"].length).to eq 0
       end
     end
 
@@ -377,9 +375,9 @@ describe AssignmentGroupsController, type: :request do
         @course.enroll_student(student)
         api_path = "/api/v1/courses/#{@course.id}/assignment_groups/#{@group1.id}"
         api_settings = {
-          controller: 'assignment_groups_api', action: 'show', format: 'json',
+          controller: "assignment_groups_api", action: "show", format: "json",
           course_id: @course.id, grading_period_id: @gp_future.id,
-          assignment_group_id: @group1.id, include: ['assignments', 'submission']
+          assignment_group_id: @group1.id, include: ["assignments", "submission"]
         }
         @group1_assignment_future.grade_student(student, grade: 10, grader: @teacher)
         @group1_assignment_today.grade_student(student, grade: 8, grader: @teacher)
@@ -390,33 +388,33 @@ describe AssignmentGroupsController, type: :request do
     end
   end
 
-  context 'when module_ids are requested' do
+  context "when module_ids are requested" do
     before do
       @mods = Array.new(2) { |i| @course.context_modules.create! name: "Mod#{i}" }
-      g = @course.assignment_groups.create! name: 'assignments'
-      a = @course.assignments.create! assignment_group: g, title: 'blah'
-      @mods.each { |m| m.add_item type: 'assignment', id: a.id }
+      g = @course.assignment_groups.create! name: "assignments"
+      a = @course.assignments.create! assignment_group: g, title: "blah"
+      @mods.each { |m| m.add_item type: "assignment", id: a.id }
 
       json = api_call(:get,
                       "/api/v1/courses/#{@course.id}/assignment_groups.json?include[]=assignments&include[]=module_ids",
-                      { controller: 'assignment_groups', action: 'index',
-                        format: 'json', course_id: @course.id.to_s,
+                      { controller: "assignment_groups", action: "index",
+                        format: "json", course_id: @course.id.to_s,
                         include: %w[assignments module_ids] })
 
       @assignment_json = json.first["assignments"].first
     end
 
-    it 'includes module_ids' do
-      expect(@assignment_json['module_ids'].sort).to eq @mods.map(&:id).sort
+    it "includes module_ids" do
+      expect(@assignment_json["module_ids"].sort).to eq @mods.map(&:id).sort
     end
 
-    it 'includes module_positions' do
-      expect(@assignment_json['module_positions']).to eq([1, 1])
+    it "includes module_positions" do
+      expect(@assignment_json["module_positions"]).to eq([1, 1])
     end
   end
 
   it "does not include all dates" do
-    group = @course.assignment_groups.build(name: 'group1')
+    group = @course.assignment_groups.build(name: "group1")
     group.position = 10
     group.group_weight = 40
     group.save!
@@ -437,21 +435,21 @@ describe AssignmentGroupsController, type: :request do
 
     json = api_call(:get,
                     "/api/v1/courses/#{@course.id}/assignment_groups.json?include[]=assignments",
-                    { controller: 'assignment_groups', action: 'index',
-                      format: 'json', course_id: @course.id.to_s,
-                      include: ['assignments'] })
+                    { controller: "assignment_groups", action: "index",
+                      format: "json", course_id: @course.id.to_s,
+                      include: ["assignments"] })
 
     expected = [
       {
-        'group_weight' => 40.0,
-        'id' => group.id,
-        'name' => 'group1',
-        'position' => 10,
-        'rules' => {},
-        'any_assignment_in_closed_grading_period' => false,
-        'integration_data' => {},
-        'sis_source_id' => nil,
-        'assignments' => [
+        "group_weight" => 40.0,
+        "id" => group.id,
+        "name" => "group1",
+        "position" => 10,
+        "rules" => {},
+        "any_assignment_in_closed_grading_period" => false,
+        "integration_data" => {},
+        "sis_source_id" => nil,
+        "assignments" => [
           controller.assignment_json(a1, @user, session).as_json,
           controller.assignment_json(a2, @user, session).as_json
         ]
@@ -462,7 +460,7 @@ describe AssignmentGroupsController, type: :request do
   end
 
   it "includes all dates" do
-    group = @course.assignment_groups.build(name: 'group1')
+    group = @course.assignment_groups.build(name: "group1")
     group.position = 10
     group.group_weight = 40
     group.save!
@@ -480,21 +478,21 @@ describe AssignmentGroupsController, type: :request do
 
     json = api_call(:get,
                     "/api/v1/courses/#{@course.id}/assignment_groups.json?include[]=assignments&include[]=all_dates&include[]=can_edit",
-                    { controller: 'assignment_groups', action: 'index',
-                      format: 'json', course_id: @course.id.to_s,
-                      include: ['assignments', 'all_dates', 'can_edit'] })
+                    { controller: "assignment_groups", action: "index",
+                      format: "json", course_id: @course.id.to_s,
+                      include: %w[assignments all_dates can_edit] })
 
     expected = [
       {
-        'group_weight' => 40.0,
-        'id' => group.id,
-        'name' => 'group1',
-        'position' => 10,
-        'rules' => {},
-        'any_assignment_in_closed_grading_period' => false,
-        'integration_data' => {},
-        'sis_source_id' => nil,
-        'assignments' => [
+        "group_weight" => 40.0,
+        "id" => group.id,
+        "name" => "group1",
+        "position" => 10,
+        "rules" => {},
+        "any_assignment_in_closed_grading_period" => false,
+        "integration_data" => {},
+        "sis_source_id" => nil,
+        "assignments" => [
           controller.assignment_json(a1, @user, session, include_all_dates: true, include_can_edit: true).as_json,
           controller.assignment_json(a2, @user, session, include_all_dates: true, include_can_edit: true).as_json
         ]
@@ -505,7 +503,7 @@ describe AssignmentGroupsController, type: :request do
   end
 
   it "excludes deleted assignments" do
-    group1 = @course.assignment_groups.create!(name: 'group1')
+    group1 = @course.assignment_groups.create!(name: "group1")
     group1.update_attribute(:position, 10)
 
     @course.assignments.create!(title: "test1", assignment_group: group1, points_possible: 10)
@@ -514,41 +512,41 @@ describe AssignmentGroupsController, type: :request do
 
     json = api_call(:get,
                     "/api/v1/courses/#{@course.id}/assignment_groups.json?include[]=assignments",
-                    { controller: 'assignment_groups', action: 'index',
-                      format: 'json', course_id: @course.id.to_s,
-                      include: ['assignments'] })
+                    { controller: "assignment_groups", action: "index",
+                      format: "json", course_id: @course.id.to_s,
+                      include: ["assignments"] })
 
     group = json.first
     expect(group).to be_present
-    expect(group['assignments'].size).to eq 1
-    expect(group['assignments'].first['name']).to eq 'test1'
+    expect(group["assignments"].size).to eq 1
+    expect(group["assignments"].first["name"]).to eq "test1"
   end
 
   it "returns weights that aren't being applied" do
-    @course.update_attribute(:group_weighting_scheme, 'equal')
+    @course.update_attribute(:group_weighting_scheme, "equal")
 
-    @course.assignment_groups.create!(name: 'group1', group_weight: 50)
-    @course.assignment_groups.create!(name: 'group2', group_weight: 50)
+    @course.assignment_groups.create!(name: "group1", group_weight: 50)
+    @course.assignment_groups.create!(name: "group2", group_weight: 50)
 
     json = api_call(:get, "/api/v1/courses/#{@course.id}/assignment_groups",
-                    { controller: 'assignment_groups', action: 'index',
-                      format: 'json', course_id: @course.to_param })
+                    { controller: "assignment_groups", action: "index",
+                      format: "json", course_id: @course.to_param })
 
-    json.each { |group| expect(group['group_weight']).to eq 50 }
+    json.each { |group| expect(group["group_weight"]).to eq 50 }
   end
 
   it "does not explode on assignments with <objects> with percentile widths" do
-    group = @course.assignment_groups.create!(name: 'group')
+    group = @course.assignment_groups.create!(name: "group")
     assignment = @course.assignments.create!(title: "test", assignment_group: group, points_possible: 10)
     assignment.description = '<object width="100%" />'
     assignment.save!
 
     api_call(:get, "/api/v1/courses/#{@course.id}/assignment_groups.json?include[]=assignments",
-             controller: 'assignment_groups',
-             action: 'index',
-             format: 'json',
+             controller: "assignment_groups",
+             action: "index",
+             format: "json",
              course_id: @course.id.to_s,
-             include: ['assignments'])
+             include: ["assignments"])
     assert_status(200)
   end
 
@@ -564,12 +562,12 @@ describe AssignmentGroupsController, type: :request do
     expect(assignment).to be_unpublished
 
     json = api_call(:get, "/api/v1/courses/#{@course.id}/assignment_groups.json?include[]=assignments",
-                    controller: 'assignment_groups',
-                    action: 'index',
-                    format: 'json',
+                    controller: "assignment_groups",
+                    action: "index",
+                    format: "json",
                     course_id: @course.id.to_s,
-                    include: ['assignments'])
-    expect(json.first['assignments']).to be_empty
+                    include: ["assignments"])
+    expect(json.first["assignments"]).to be_empty
   end
 end
 
@@ -584,51 +582,51 @@ describe AssignmentGroupsApiController, type: :request do
 
   let(:params) do
     {
-      'name' => name,
-      'position' => position,
-      'integration_data' => integration_data
+      "name" => name,
+      "position" => position,
+      "integration_data" => integration_data
     }
   end
 
-  let(:invalid_integration_data) { 'invalid integration data format' }
+  let(:invalid_integration_data) { "invalid integration data format" }
 
   let(:assignment_group) do
     rules_in_db = "drop_lowest:1\ndrop_highest:1\nnever_drop:1\nnever_drop:2\n"
-    @course.assignment_groups.create!(name: 'group', rules: rules_in_db)
+    @course.assignment_groups.create!(name: "group", rules: rules_in_db)
   end
 
-  context '#show' do
+  context "#show" do
     before :once do
       course_with_teacher(active_all: true)
       rules_in_db = "drop_lowest:1\ndrop_highest:1\nnever_drop:1\nnever_drop:2\n"
-      @group = @course.assignment_groups.create!(name: 'group', rules: rules_in_db)
+      @group = @course.assignment_groups.create!(name: "group", rules: rules_in_db)
     end
 
-    it 'succeeds' do
+    it "succeeds" do
       response = raw_api_call(:get, "/api/v1/courses/#{@course.id}/assignment_groups/#{assignment_group.id}",
-                              controller: 'assignment_groups_api',
-                              action: 'show',
-                              format: 'json',
+                              controller: "assignment_groups_api",
+                              action: "show",
+                              format: "json",
                               course_id: @course.id.to_s,
                               assignment_group_id: assignment_group.id.to_s)
 
       expect(response).to eq(200)
     end
 
-    it 'fails if the assignment group does not exist' do
+    it "fails if the assignment group does not exist" do
       non_existing_assignment_group_id = assignment_group.id + 1
       response = raw_api_call(:get,
                               "/api/v1/courses/#{@course.id}/assignment_groups/#{non_existing_assignment_group_id}",
-                              controller: 'assignment_groups_api',
-                              action: 'show',
-                              format: 'json',
+                              controller: "assignment_groups_api",
+                              action: "show",
+                              format: "json",
                               course_id: @course.id.to_s,
                               assignment_group_id: non_existing_assignment_group_id)
 
       expect(response).to eq(404)
     end
 
-    context 'with assignments' do
+    context "with assignments" do
       before(:once) do
         @assignment = @course.assignments.create!({
                                                     title: "test",
@@ -637,68 +635,68 @@ describe AssignmentGroupsApiController, type: :request do
                                                   })
       end
 
-      it 'includes assignments' do
+      it "includes assignments" do
         json = api_call(:get, "/api/v1/courses/#{@course.id}/assignment_groups/#{@group.id}?include[]=assignments",
-                        controller: 'assignment_groups_api',
-                        action: 'show',
-                        format: 'json',
+                        controller: "assignment_groups_api",
+                        action: "show",
+                        format: "json",
                         course_id: @course.id.to_s,
                         assignment_group_id: @group.id.to_s,
-                        include: ['assignments'])
+                        include: ["assignments"])
 
-        expect(json['assignments']).not_to be_empty
+        expect(json["assignments"]).not_to be_empty
       end
 
-      it 'includes submission when flag is present' do
+      it "includes submission when flag is present" do
         student_in_course(active_all: true)
         teacher_in_course(active_all: true, course: @course)
         @submission = bare_submission_model(@assignment, @student, {
-                                              score: '25',
-                                              grade: '25',
+                                              score: "25",
+                                              grade: "25",
                                               grader_id: @teacher.id,
                                               submitted_at: Time.zone.now
                                             })
 
         json = api_call_as_user(@student, :get,
                                 "/api/v1/courses/#{@course.id}/assignment_groups/#{@group.id}?include[]=assignments&include[]=submission",
-                                controller: 'assignment_groups_api',
-                                action: 'show',
-                                format: 'json',
+                                controller: "assignment_groups_api",
+                                action: "show",
+                                format: "json",
                                 course_id: @course.id.to_s,
                                 assignment_group_id: @group.id.to_s,
-                                include: ['assignments', 'submission'])
+                                include: ["assignments", "submission"])
 
-        expect(json['assignments'][0]['submission']).to be_present
-        expect(json['assignments'][0]['submission']['id']).to eq @submission.id
+        expect(json["assignments"][0]["submission"]).to be_present
+        expect(json["assignments"][0]["submission"]["id"]).to eq @submission.id
       end
     end
 
-    it 'only returns assignments in the given grading period with MGP on' do
+    it "only returns assignments in the given grading period with MGP on" do
       @course.enroll_student(User.create!)
       setup_grading_periods
 
       json = api_call(:get, "/api/v1/courses/#{@course.id}/assignment_groups/#{@group1.id}?include[]=assignments&grading_period_id=#{@gp_future.id}",
-                      controller: 'assignment_groups_api',
-                      action: 'show',
-                      format: 'json',
+                      controller: "assignment_groups_api",
+                      action: "show",
+                      format: "json",
                       course_id: @course.id.to_s,
                       assignment_group_id: @group1.id.to_s,
                       grading_period_id: @gp_future.id.to_s,
-                      include: ['assignments'])
+                      include: ["assignments"])
 
-      expect(json['assignments'].length).to eq 1
+      expect(json["assignments"].length).to eq 1
     end
 
-    it 'does not return an error when there are grading periods and no grading_period_id is passed in' do
+    it "does not return an error when there are grading periods and no grading_period_id is passed in" do
       setup_grading_periods
 
       api_call(:get, "/api/v1/courses/#{@course.id}/assignment_groups/#{@group1.id}?include[]=assignments",
-               controller: 'assignment_groups_api',
-               action: 'show',
-               format: 'json',
+               controller: "assignment_groups_api",
+               action: "show",
+               format: "json",
                course_id: @course.id.to_s,
                assignment_group_id: @group1.id.to_s,
-               include: ['assignments'])
+               include: ["assignments"])
 
       expect(response).to be_ok
     end
@@ -707,16 +705,14 @@ describe AssignmentGroupsApiController, type: :request do
       @course.assignments.create!(title: "test", assignment_group: @group, points_possible: 10)
       json = api_call(:get, "/api/v1/courses/#{@course.id}/assignment_groups/#{@group.id}.json",
                       {
-                        controller: 'assignment_groups_api',
-                        action: 'show',
-                        format: 'json',
+                        controller: "assignment_groups_api",
+                        action: "show",
+                        format: "json",
                         course_id: @course.id.to_s,
                         assignment_group_id: @group.id.to_s
                       },
-                      include: ['assignments', 'assignment_visibility'])
-      json['assignments'].each do |a|
-        expect(a.has_key?("assignment_visibility")).to eq true
-      end
+                      include: ["assignments", "assignment_visibility"])
+      expect(json["assignments"]).to all(have_key("assignment_visibility"))
     end
 
     it "does not include assignment_visibility when requested as a student" do
@@ -724,57 +720,57 @@ describe AssignmentGroupsApiController, type: :request do
       @course.assignments.create!(title: "test", assignment_group: @group, points_possible: 10)
       json = api_call(:get, "/api/v1/courses/#{@course.id}/assignment_groups/#{@group.id}.json",
                       {
-                        controller: 'assignment_groups_api',
-                        action: 'show',
-                        format: 'json',
+                        controller: "assignment_groups_api",
+                        action: "show",
+                        format: "json",
                         course_id: @course.id.to_s,
                         assignment_group_id: @group.id.to_s
                       },
-                      include: ['assignments', 'assignment_visibility'])
-      json['assignments'].each do |a|
-        expect(a.has_key?("assignment_visibility")).to eq false
+                      include: ["assignments", "assignment_visibility"])
+      json["assignments"].each do |a|
+        expect(a).not_to have_key("assignment_visibility")
       end
     end
 
-    it 'returns never_drop rules as strings with Accept header' do
-      rules = { 'never_drop' => ["1", "2"], 'drop_lowest' => 1, 'drop_highest' => 1 }
+    it "returns never_drop rules as strings with Accept header" do
+      rules = { "never_drop" => ["1", "2"], "drop_lowest" => 1, "drop_highest" => 1 }
       json = api_call(:get, "/api/v1/courses/#{@course.id}/assignment_groups/#{@group.id}", {
-                        controller: 'assignment_groups_api',
-                        action: 'show',
-                        format: 'json',
+                        controller: "assignment_groups_api",
+                        action: "show",
+                        format: "json",
                         course_id: @course.id.to_s,
                         assignment_group_id: @group.id.to_s
                       },
                       {},
-                      { 'Accept' => 'application/json+canvas-string-ids' })
+                      { "Accept" => "application/json+canvas-string-ids" })
 
-      expect(json['rules']).to eq rules
+      expect(json["rules"]).to eq rules
     end
 
-    it 'returns never_drop rules as ints without Accept header' do
-      rules = { 'never_drop' => [1, 2], 'drop_lowest' => 1, 'drop_highest' => 1 }
+    it "returns never_drop rules as ints without Accept header" do
+      rules = { "never_drop" => [1, 2], "drop_lowest" => 1, "drop_highest" => 1 }
       json = api_call(:get, "/api/v1/courses/#{@course.id}/assignment_groups/#{@group.id}", {
-                        controller: 'assignment_groups_api',
-                        action: 'show',
-                        format: 'json',
+                        controller: "assignment_groups_api",
+                        action: "show",
+                        format: "json",
                         course_id: @course.id.to_s,
                         assignment_group_id: @group.id.to_s
                       })
 
-      expect(json['rules']).to eq rules
+      expect(json["rules"]).to eq rules
     end
   end
 
-  context '#create' do
+  context "#create" do
     before do
       course_with_teacher(active_all: true)
     end
 
-    it 'creates an assignment_group' do
+    it "creates an assignment_group" do
       api_call(:post, "/api/v1/courses/#{@course.id}/assignment_groups", {
-                 controller: 'assignment_groups_api',
-                 action: 'create',
-                 format: 'json',
+                 controller: "assignment_groups_api",
+                 action: "create",
+                 format: "json",
                  course_id: @course.id.to_s
                },
                params)
@@ -784,27 +780,27 @@ describe AssignmentGroupsApiController, type: :request do
       expect(assignment_group.integration_data).to eq(integration_data)
     end
 
-    it 'does not create an assignment_group with invalid integration_data' do
-      params['integration_data'] = invalid_integration_data
+    it "does not create an assignment_group with invalid integration_data" do
+      params["integration_data"] = invalid_integration_data
 
       expect do
         raw_api_call(:post, "/api/v1/courses/#{@course.id}/assignment_groups", {
-                       controller: 'assignment_groups_api',
-                       action: 'create',
-                       format: 'json',
+                       controller: "assignment_groups_api",
+                       action: "create",
+                       format: "json",
                        course_id: @course.id.to_s
                      },
                      params)
       end.to change(AssignmentGroup, :count).by(0)
     end
 
-    it 'responds with a 400 when invalid integration_data is included' do
-      params['integration_data'] = invalid_integration_data
+    it "responds with a 400 when invalid integration_data is included" do
+      params["integration_data"] = invalid_integration_data
 
       response = raw_api_call(:post, "/api/v1/courses/#{@course.id}/assignment_groups", {
-                                controller: 'assignment_groups_api',
-                                action: 'create',
-                                format: 'json',
+                                controller: "assignment_groups_api",
+                                action: "create",
+                                format: "json",
                                 course_id: @course.id.to_s
                               },
                               params)
@@ -813,7 +809,7 @@ describe AssignmentGroupsApiController, type: :request do
     end
   end
 
-  context '#update' do
+  context "#update" do
     let(:assignment_group) do
       @course.assignment_groups.create!(params)
     end
@@ -824,9 +820,9 @@ describe AssignmentGroupsApiController, type: :request do
 
     let(:updated_params) do
       {
-        'name' => updated_name,
-        'position' => updated_position,
-        'integration_data' => updated_integration_data
+        "name" => updated_name,
+        "position" => updated_position,
+        "integration_data" => updated_integration_data
       }
     end
 
@@ -834,9 +830,9 @@ describe AssignmentGroupsApiController, type: :request do
 
     let(:api_details) do
       {
-        controller: 'assignment_groups_api',
-        action: 'update',
-        format: 'json',
+        controller: "assignment_groups_api",
+        action: "update",
+        format: "json",
         course_id: @course.id.to_s,
         assignment_group_id: assignment_group.id.to_s
       }
@@ -844,18 +840,18 @@ describe AssignmentGroupsApiController, type: :request do
 
     before :once do
       course_with_teacher(active_all: true)
-      @assignment_group = @course.assignment_groups.create!(name: 'Some group',
+      @assignment_group = @course.assignment_groups.create!(name: "Some group",
                                                             position: 1,
-                                                            integration_data: { "oh" => 'hello' })
+                                                            integration_data: { "oh" => "hello" })
     end
 
-    it 'updates an assignment group' do
+    it "updates an assignment group" do
       response = api_call(:put, put_url, api_details, updated_params)
 
       # Check the api response
-      expect(response['name']).to eq(updated_name)
-      expect(response['position']).to eq(updated_position)
-      expect(response['integration_data']).to eq(integration_data.merge(updated_integration_data))
+      expect(response["name"]).to eq(updated_name)
+      expect(response["position"]).to eq(updated_position)
+      expect(response["integration_data"]).to eq(integration_data.merge(updated_integration_data))
 
       # Check the db record
       assignment_group.reload
@@ -864,13 +860,13 @@ describe AssignmentGroupsApiController, type: :request do
       expect(assignment_group.integration_data).to eq(integration_data.merge(updated_integration_data))
     end
 
-    it 'updates an assignment group when integration_data is nil' do
-      updated_params['integration_data'] = nil
+    it "updates an assignment group when integration_data is nil" do
+      updated_params["integration_data"] = nil
       response = api_call(:put, put_url, api_details, updated_params)
 
       # Check the api response
-      expect(response['name']).to eq(updated_name)
-      expect(response['integration_data']).to eq(integration_data)
+      expect(response["name"]).to eq(updated_name)
+      expect(response["integration_data"]).to eq(integration_data)
 
       # Check the db record
       assignment_group.reload
@@ -878,13 +874,13 @@ describe AssignmentGroupsApiController, type: :request do
       expect(assignment_group.integration_data).to eq(integration_data)
     end
 
-    it 'updates an assignment group when integration_data is {}' do
-      updated_params['integration_data'] = {}
+    it "updates an assignment group when integration_data is {}" do
+      updated_params["integration_data"] = {}
       response = api_call(:put, put_url, api_details, updated_params)
 
       # Check the api response
-      expect(response['name']).to eq(updated_name)
-      expect(response['integration_data']).to eq(integration_data)
+      expect(response["name"]).to eq(updated_name)
+      expect(response["integration_data"]).to eq(integration_data)
 
       # Check the db record
       assignment_group.reload
@@ -892,13 +888,13 @@ describe AssignmentGroupsApiController, type: :request do
       expect(assignment_group.integration_data).to eq(integration_data)
     end
 
-    it 'updates an assignment group without integration_data' do
-      updated_params.delete('integration_data')
+    it "updates an assignment group without integration_data" do
+      updated_params.delete("integration_data")
       response = api_call(:put, put_url, api_details, updated_params)
 
       # Check the api response
-      expect(response['name']).to eq(updated_name)
-      expect(response['integration_data']).to eq(integration_data)
+      expect(response["name"]).to eq(updated_name)
+      expect(response["integration_data"]).to eq(integration_data)
 
       # Check the db record
       assignment_group.reload
@@ -906,8 +902,8 @@ describe AssignmentGroupsApiController, type: :request do
       expect(assignment_group.integration_data).to eq(integration_data)
     end
 
-    it 'does not update when integration_data is malformed' do
-      updated_params['integration_data'] = invalid_integration_data
+    it "does not update when integration_data is malformed" do
+      updated_params["integration_data"] = invalid_integration_data
       raw_api_call(:put, put_url, api_details, updated_params)
 
       # Check the db record
@@ -917,46 +913,46 @@ describe AssignmentGroupsApiController, type: :request do
       expect(assignment_group.integration_data).to eq(integration_data)
     end
 
-    it 'returns a 400 when integration data is malformed' do
-      updated_params['integration_data'] = invalid_integration_data
+    it "returns a 400 when integration data is malformed" do
+      updated_params["integration_data"] = invalid_integration_data
       response = raw_api_call(:put, put_url, api_details, updated_params)
       expect(response).to eq(400)
     end
 
-    it 'updates rules properly' do
-      rules = { 'never_drop' => ["1", "2"], 'drop_lowest' => 1, 'drop_highest' => 1 }
+    it "updates rules properly" do
+      rules = { "never_drop" => ["1", "2"], "drop_lowest" => 1, "drop_highest" => 1 }
       rules_in_db = "drop_lowest:1\ndrop_highest:1\nnever_drop:1\nnever_drop:2\n"
-      params = { 'rules' => rules }
+      params = { "rules" => rules }
       json = api_call(:put, "/api/v1/courses/#{@course.id}/assignment_groups/#{@assignment_group.id}", {
-                        controller: 'assignment_groups_api',
-                        action: 'update',
-                        format: 'json',
+                        controller: "assignment_groups_api",
+                        action: "update",
+                        format: "json",
                         course_id: @course.id.to_s,
                         assignment_group_id: @assignment_group.id.to_s
                       },
                       params,
-                      { 'Accept' => 'application/json+canvas-string-ids' })
+                      { "Accept" => "application/json+canvas-string-ids" })
 
-      expect(json['rules']).to eq rules
+      expect(json["rules"]).to eq rules
       @assignment_group.reload
       expect(@assignment_group.rules).to eq rules_in_db
     end
 
     context "when an assignment is due in a closed grading period" do
       let(:call_update) do
-        ->(params, expected_status) do
+        lambda do |params, expected_status|
           api_call_as_user(
             @current_user,
             :put, "/api/v1/courses/#{@course.id}/assignment_groups/#{@assignment_group.id}",
             {
-              controller: 'assignment_groups_api',
-              action: 'update',
-              format: 'json',
+              controller: "assignment_groups_api",
+              action: "update",
+              format: "json",
               course_id: @course.id.to_s,
               assignment_group_id: @assignment_group.id.to_s
             },
             params,
-            { 'Accept' => 'application/json+canvas-string-ids' },
+            { "Accept" => "application/json+canvas-string-ids" },
             { expected_status: expected_status }
           )
         end
@@ -976,10 +972,10 @@ describe AssignmentGroupsApiController, type: :request do
           @current_user = @teacher
           student_in_course(course: @course, active_all: true)
           @assignment = @course.assignments.create!({
-                                                      title: 'assignment',
+                                                      title: "assignment",
                                                       assignment_group: @assignment_group,
                                                       due_at: 1.week.ago,
-                                                      workflow_state: 'published'
+                                                      workflow_state: "published"
                                                     })
         end
 
@@ -1022,7 +1018,7 @@ describe AssignmentGroupsApiController, type: :request do
       context "as an admin" do
         it "can change group_weight" do
           @course.assignments.create!({
-                                        title: 'assignment', assignment_group: @assignment_group, due_at: 1.week.ago
+                                        title: "assignment", assignment_group: @assignment_group, due_at: 1.week.ago
                                       })
           @current_user = account_admin_user(account: @course.root_account)
           call_update.call({ group_weight: 75 }, 200)
@@ -1032,42 +1028,42 @@ describe AssignmentGroupsApiController, type: :request do
     end
   end
 
-  context '#destroy' do
+  context "#destroy" do
     before :once do
       course_with_teacher(active_all: true)
-      @assignment_group = @course.assignment_groups.create!(name: 'Some group', position: 1)
+      @assignment_group = @course.assignment_groups.create!(name: "Some group", position: 1)
     end
 
-    it 'destroys an assignment group' do
+    it "destroys an assignment group" do
       api_call(:delete, "/api/v1/courses/#{@course.id}/assignment_groups/#{@assignment_group.id}",
-               controller: 'assignment_groups_api',
-               action: 'destroy',
-               format: 'json',
+               controller: "assignment_groups_api",
+               action: "destroy",
+               format: "json",
                course_id: @course.id.to_s,
                assignment_group_id: @assignment_group.id.to_s)
 
-      expect(@assignment_group.reload.workflow_state).to eq 'deleted'
+      expect(@assignment_group.reload.workflow_state).to eq "deleted"
     end
 
-    it 'destroys assignments' do
+    it "destroys assignments" do
       a1 = @course.assignments.create!(title: "test1", assignment_group: @assignment_group, points_possible: 10)
       a2 = @course.assignments.create!(title: "test2", assignment_group: @assignment_group, points_possible: 12)
 
       api_call(:delete, "/api/v1/courses/#{@course.id}/assignment_groups/#{@assignment_group.id}",
-               controller: 'assignment_groups_api',
-               action: 'destroy',
-               format: 'json',
+               controller: "assignment_groups_api",
+               action: "destroy",
+               format: "json",
                course_id: @course.id.to_s,
                assignment_group_id: @assignment_group.id.to_s)
 
-      expect(@assignment_group.reload.workflow_state).to eq 'deleted'
-      expect(a1.reload.workflow_state).to eq 'deleted'
-      expect(a2.reload.workflow_state).to eq 'deleted'
+      expect(@assignment_group.reload.workflow_state).to eq "deleted"
+      expect(a1.reload.workflow_state).to eq "deleted"
+      expect(a2.reload.workflow_state).to eq "deleted"
     end
 
-    it 'moves assignments to a specified assignment group' do
-      @course.assignment_groups.create!(name: 'Another group', position: 2)
-      group3 = @course.assignment_groups.create!(name: 'Yet Another group', position: 3)
+    it "moves assignments to a specified assignment group" do
+      @course.assignment_groups.create!(name: "Another group", position: 2)
+      group3 = @course.assignment_groups.create!(name: "Yet Another group", position: 3)
 
       @course.assignments.create!(title: "test1", assignment_group: @assignment_group, points_possible: 10)
       @course.assignments.create!(title: "test2", assignment_group: @assignment_group, points_possible: 12)
@@ -1075,9 +1071,9 @@ describe AssignmentGroupsApiController, type: :request do
       @course.assignments.create!(title: "test4", assignment_group: @assignment_group, points_possible: 9)
 
       api_call(:delete, "/api/v1/courses/#{@course.id}/assignment_groups/#{@assignment_group.id}", {
-                 controller: 'assignment_groups_api',
-                 action: 'destroy',
-                 format: 'json',
+                 controller: "assignment_groups_api",
+                 action: "destroy",
+                 format: "json",
                  course_id: @course.id.to_s,
                  assignment_group_id: @assignment_group.id.to_s
                },
@@ -1085,12 +1081,12 @@ describe AssignmentGroupsApiController, type: :request do
 
       group3.reload
       expect(group3.assignments.count).to eq 4
-      expect(@assignment_group.reload.workflow_state).to eq 'deleted'
+      expect(@assignment_group.reload.workflow_state).to eq "deleted"
     end
 
-    it 'recalculates results if move_assignments_to is provided' do
-      @course.assignment_groups.create!(name: 'Another group', position: 2)
-      group3 = @course.assignment_groups.create!(name: 'Yet Another group', position: 3)
+    it "recalculates results if move_assignments_to is provided" do
+      @course.assignment_groups.create!(name: "Another group", position: 2)
+      group3 = @course.assignment_groups.create!(name: "Yet Another group", position: 3)
 
       @course.assignments.create!(title: "test1", assignment_group: @assignment_group, points_possible: 10)
       @course.assignments.create!(title: "test2", assignment_group: @assignment_group, points_possible: 12)
@@ -1099,9 +1095,9 @@ describe AssignmentGroupsApiController, type: :request do
 
       api_call(:delete, "/api/v1/courses/#{@course.id}/assignment_groups/#{@assignment_group.id}",
                {
-                 controller: 'assignment_groups_api',
-                 action: 'destroy',
-                 format: 'json',
+                 controller: "assignment_groups_api",
+                 action: "destroy",
+                 format: "json",
                  course_id: @course.id.to_s,
                  assignment_group_id: @assignment_group.id.to_s
                },

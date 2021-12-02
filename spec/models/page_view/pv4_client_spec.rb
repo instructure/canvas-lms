@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../../spec_helper'
+require_relative "../../spec_helper"
 
 describe PageView::Pv4Client do
   let(:pv4_object) do
@@ -45,7 +45,7 @@ describe PageView::Pv4Client do
       "user_id" => "31410000000000028",
       "vhost" => "canvas.instructure.com" }.freeze
   end
-  let(:client) { PageView::Pv4Client.new('http://pv4/', 'token') }
+  let(:client) { PageView::Pv4Client.new("http://pv4/", "token") }
 
   def stub_http_request(response)
     double = double(body: response.to_json)
@@ -54,21 +54,21 @@ describe PageView::Pv4Client do
 
   describe "#fetch" do
     it "returns page view objects" do
-      stub_http_request('page_views' => [pv4_object])
+      stub_http_request("page_views" => [pv4_object])
 
       response = client.fetch(1)
       expect(response.length).to eq 1
       expect(response.first).to be_a PageView
       pv = response.first
-      expect(pv.url).to eq 'http://canvas.instructure.com/accounts/2/users/1'
+      expect(pv.url).to eq "http://canvas.instructure.com/accounts/2/users/1"
       expect(pv.created_at).to eq Time.zone.parse("2015-11-05T17:01:20.306Z")
-      expect(pv.session_id).to eq 'c73d248f3e4cec530261c95232ba63fg'
-      expect(pv.context_id).to eq 120000000000002
-      expect(pv.context_type).to eq 'Account'
-      expect(pv.user_agent).to be_include('Safari')
-      expect(pv.account_id).to eq 120000000000002
-      expect(pv.user_id).to eq 31410000000000028
-      expect(pv.remote_ip).to eq '192.168.0.1'
+      expect(pv.session_id).to eq "c73d248f3e4cec530261c95232ba63fg"
+      expect(pv.context_id).to eq 120_000_000_000_002
+      expect(pv.context_type).to eq "Account"
+      expect(pv.user_agent).to be_include("Safari")
+      expect(pv.account_id).to eq 120_000_000_000_002
+      expect(pv.user_id).to eq 31_410_000_000_000_028
+      expect(pv.remote_ip).to eq "192.168.0.1"
       expect(pv.render_time).to eq 6.367549
     end
 
@@ -79,11 +79,11 @@ describe PageView::Pv4Client do
         start_time = Time.now.in_time_zone(zone)
         end_time = 5.minutes.from_now.in_time_zone(zone)
 
-        expect_params = '?start_time=2016-04-27T00:00:00.000Z&end_time=2016-04-27T00:05:00.000Z'
+        expect_params = "?start_time=2016-04-27T00:00:00.000Z&end_time=2016-04-27T00:05:00.000Z"
         expect_url = "http://pv4/users/1/page_views#{expect_params}"
-        expect_header = { 'Authorization' => 'Bearer token' }
+        expect_header = { "Authorization" => "Bearer token" }
 
-        res = double(body: { 'page_views' => [pv4_object] }.to_json)
+        res = double(body: { "page_views" => [pv4_object] }.to_json)
         expect(CanvasHttp).to receive(:get).with(expect_url, expect_header).and_return(res)
         client.fetch(1, start_time: start_time, end_time: end_time)
       end
@@ -92,7 +92,7 @@ describe PageView::Pv4Client do
 
   describe "#for_user" do
     it "returns a paginatable object" do
-      stub_http_request('page_views' => [pv4_object])
+      stub_http_request("page_views" => [pv4_object])
 
       result = client.for_user(1).paginate(per_page: 10)
       expect(result).to be_a(Array)
@@ -100,14 +100,14 @@ describe PageView::Pv4Client do
     end
 
     it "sends last_page_view_id when paginating" do
-      stub_http_request('page_views' => [pv4_object])
+      stub_http_request("page_views" => [pv4_object])
 
       now = Time.now.utc
       result = client.for_user(1).paginate(per_page: 10)
 
       double = double(body: '{ "page_views": [] }')
       expect(CanvasHttp).to receive(:get).with(
-        "http://pv4/users/1/page_views?start_time=#{now.iso8601(PageView::Pv4Client::PRECISION)}&end_time=#{pv4_object['timestamp']}&last_page_view_id=#{pv4_object['request_id']}&limit=10",
+        "http://pv4/users/1/page_views?start_time=#{now.iso8601(PageView::Pv4Client::PRECISION)}&end_time=#{pv4_object["timestamp"]}&last_page_view_id=#{pv4_object["request_id"]}&limit=10",
         "Authorization" => "Bearer token"
       ).and_return(double)
       client.for_user(1, oldest: now, newest: now)

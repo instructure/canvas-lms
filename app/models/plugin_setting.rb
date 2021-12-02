@@ -29,7 +29,7 @@
 #  updated_at :datetime
 #
 class PluginSetting < ActiveRecord::Base
-  validates_uniqueness_of :name, :if => :validate_uniqueness_of_name?
+  validates :name, uniqueness: { if: :validate_uniqueness_of_name? }
   before_save :validate_posted_settings
   serialize :settings
   attr_accessor :posted_settings
@@ -62,23 +62,23 @@ class PluginSetting < ActiveRecord::Base
   # it's set) and be able to tell when it gets blanked out.
   DUMMY_STRING = "~!?3NCRYPT3D?!~"
   def initialize_plugin_setting
-    return unless settings && self.plugin
+    return unless settings && plugin
 
     @valid_settings = true
-    if self.plugin.encrypted_settings
-      was_dirty = self.changed?
-      self.plugin.encrypted_settings.each do |key|
-        if settings["#{key}_enc".to_sym]
-          begin
-            settings["#{key}_dec".to_sym] = self.class.decrypt(settings["#{key}_enc".to_sym], settings["#{key}_salt".to_sym])
-          rescue
-            @valid_settings = false
-          end
-          settings[key] = DUMMY_STRING
+    if plugin.encrypted_settings
+      was_dirty = changed?
+      plugin.encrypted_settings.each do |key|
+        next unless settings["#{key}_enc".to_sym]
+
+        begin
+          settings["#{key}_dec".to_sym] = self.class.decrypt(settings["#{key}_enc".to_sym], settings["#{key}_salt".to_sym])
+        rescue
+          @valid_settings = false
         end
+        settings[key] = DUMMY_STRING
       end
       # We shouldn't consider a plugin setting to be dirty if all that changed were the decrypted/placeholder attributes
-      self.clear_changes_information unless was_dirty
+      clear_changes_information unless was_dirty
     end
   end
 
@@ -87,19 +87,19 @@ class PluginSetting < ActiveRecord::Base
   end
 
   def encrypt_settings
-    if settings && self.plugin && self.plugin.encrypted_settings
-      self.plugin.encrypted_settings.each do |key|
-        unless settings[key].blank?
-          value = settings.delete(key)
-          settings.delete("#{key}_dec".to_sym)
-          if value == DUMMY_STRING # no change, use what was there previously
-            unless settings_was.nil? # we wont have setting_was if we are a new plugin
-              settings["#{key}_enc".to_sym] = settings_was["#{key}_enc".to_sym]
-              settings["#{key}_salt".to_sym] = settings_was["#{key}_salt".to_sym]
-            end
-          else
-            settings["#{key}_enc".to_sym], settings["#{key}_salt".to_sym] = self.class.encrypt(value)
+    if settings && plugin && plugin.encrypted_settings
+      plugin.encrypted_settings.each do |key|
+        next if settings[key].blank?
+
+        value = settings.delete(key)
+        settings.delete("#{key}_dec".to_sym)
+        if value == DUMMY_STRING # no change, use what was there previously
+          unless settings_was.nil? # we wont have setting_was if we are a new plugin
+            settings["#{key}_enc".to_sym] = settings_was["#{key}_enc".to_sym]
+            settings["#{key}_salt".to_sym] = settings_was["#{key}_salt".to_sym]
           end
+        else
+          settings["#{key}_enc".to_sym], settings["#{key}_salt".to_sym] = self.class.encrypt(value)
         end
       end
     end
@@ -139,16 +139,16 @@ class PluginSetting < ActiveRecord::Base
 
   def clear_cache
     self.class.connection.after_transaction_commit do
-      MultiCache.delete(PluginSetting.settings_cache_key(self.name))
+      MultiCache.delete(PluginSetting.settings_cache_key(name))
     end
   end
 
   def self.encrypt(text)
-    Canvas::Security.encrypt_password(text, 'instructure_plugin_setting')
+    Canvas::Security.encrypt_password(text, "instructure_plugin_setting")
   end
 
   def self.decrypt(text, salt)
-    Canvas::Security.decrypt_password(text, salt, 'instructure_plugin_setting')
+    Canvas::Security.decrypt_password(text, salt, "instructure_plugin_setting")
   end
 
   def self.find_by_name(name)

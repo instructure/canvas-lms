@@ -20,7 +20,7 @@
 module DifferentiatedAssignments
   module HomeworkAssignee
     module Group
-      BASE    = 'Group'
+      BASE    = "Group"
       GROUP_X = "#{BASE} A"
       GROUP_Y = "#{BASE} B"
       GROUP_Z = "#{BASE} C"
@@ -30,7 +30,7 @@ module DifferentiatedAssignments
     end
 
     module Section
-      BASE      = 'Section'
+      BASE      = "Section"
       SECTION_A = "#{BASE} A"
       SECTION_B = "#{BASE} B"
       SECTION_C = "#{BASE} C"
@@ -40,7 +40,7 @@ module DifferentiatedAssignments
     end
 
     module Student
-      BASE           = 'Student'
+      BASE           = "Student"
       FIRST_STUDENT  = "#{BASE} 1"
       SECOND_STUDENT = "#{BASE} 2"
       THIRD_STUDENT  = "#{BASE} 3"
@@ -50,7 +50,7 @@ module DifferentiatedAssignments
                               .freeze
     end
 
-    EVERYONE  = 'Everyone'
+    EVERYONE  = "Everyone"
     ALL       = HomeworkAssignee.constants.map { |c| HomeworkAssignee.const_get(c) }
 
     ASSIGNEES = [

@@ -18,24 +18,24 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 describe Quizzes::QuizSubmissionEvent do
-  describe '#empty?' do
+  describe "#empty?" do
     context Quizzes::QuizSubmissionEvent::EVT_QUESTION_ANSWERED do
       before do
         subject.event_type = Quizzes::QuizSubmissionEvent::EVT_QUESTION_ANSWERED
       end
 
-      it 'is true if it has no answer records' do
+      it "is true if it has no answer records" do
         expect(subject).to be_empty
       end
 
-      it 'is not true if it has any answer record' do
+      it "is not true if it has any answer record" do
         subject.answers = [{}]
         expect(subject).not_to be_empty
       end
     end
   end
 
-  context 'root_account_id' do
+  context "root_account_id" do
     it "uses root_account value from quiz_subission" do
       course_factory
       quiz = @course.quizzes.create!

@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../../views_helper'
+require_relative "../../views_helper"
 
 describe "/quizzes/quizzes/_question_group" do
   it "renders" do
@@ -28,7 +28,7 @@ describe "/quizzes/quizzes/_question_group" do
     group = {}
     group[:id] = 5
     group[:questions] = []
-    render :partial => "quizzes/quizzes/question_group", :object => group, :locals => { :question_type => OpenObject.new }
+    render partial: "quizzes/quizzes/question_group", object: group, locals: { question_type: OpenObject.new }
     expect(response).not_to be_nil
   end
 end

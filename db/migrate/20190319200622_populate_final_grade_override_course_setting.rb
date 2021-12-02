@@ -25,7 +25,4 @@ class PopulateFinalGradeOverrideCourseSetting < ActiveRecord::Migration[5.1]
       raise "DataFixup::PopulateFinalGradeOverrideCourseSetting needs to be run on a previous release"
     end
   end
-
-  def down
-  end
 end

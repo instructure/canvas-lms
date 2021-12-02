@@ -25,8 +25,8 @@ module Api::V1::GroupCategory
   include Api::V1::Group
 
   API_GROUP_CATEGORY_JSON_OPTS = {
-    :only => %w(id name role self_signup group_limit auto_leader created_at)
-  }
+    only: %w[id name role self_signup group_limit auto_leader created_at]
+  }.freeze
 
   def group_category_json(group_category, user, session, options = {})
     api_json(group_category, user, session, API_GROUP_CATEGORY_JSON_OPTS)
@@ -40,19 +40,19 @@ module Api::V1::GroupCategory
 
   def group_category_data(group_category, user)
     {
-      'protected' => group_category.protected?,
-      'allows_multiple_memberships' => group_category.allows_multiple_memberships?,
-      'is_member' => group_category.is_member?(user)
+      "protected" => group_category.protected?,
+      "allows_multiple_memberships" => group_category.allows_multiple_memberships?,
+      "is_member" => group_category.is_member?(user)
     }
   end
 
   def group_category_sis(group_category, user)
     hash = {}
     if group_category.root_account.grants_any_right?(user, :read_sis, :manage_sis)
-      hash['sis_group_category_id'] = group_category.sis_source_id
+      hash["sis_group_category_id"] = group_category.sis_source_id
     end
     if group_category.root_account.grants_right?(user, :manage_sis)
-      hash['sis_import_id'] = group_category.sis_batch_id
+      hash["sis_import_id"] = group_category.sis_batch_id
     end
     hash
   end
@@ -60,17 +60,17 @@ module Api::V1::GroupCategory
   def included_data(group_category, user, session, includes)
     hash = {}
     if includes
-      if includes.include?('progress_url') && group_category.current_progress && group_category.current_progress.pending?
-        hash['progress'] = progress_json(group_category.current_progress, user, session)
+      if includes.include?("progress_url") && group_category.current_progress && group_category.current_progress.pending?
+        hash["progress"] = progress_json(group_category.current_progress, user, session)
       end
-      if includes.include?('groups_count')
-        hash['groups_count'] = group_category.groups.active.size
+      if includes.include?("groups_count")
+        hash["groups_count"] = group_category.groups.active.size
       end
-      if includes.include?('unassigned_users_count')
-        hash['unassigned_users_count'] = group_category.unassigned_users.count(:all)
+      if includes.include?("unassigned_users_count")
+        hash["unassigned_users_count"] = group_category.unassigned_users.count(:all)
       end
-      if includes.include?('groups')
-        hash['groups'] = group_category.groups.active.map { |group| group_json(group, user, session) }
+      if includes.include?("groups")
+        hash["groups"] = group_category.groups.active.map { |group| group_json(group, user, session) }
       end
     end
     hash

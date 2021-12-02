@@ -18,8 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../../../spec_helper'
-require_relative '../../views_helper'
+require_relative "../../../spec_helper"
+require_relative "../../views_helper"
 
 describe "login/canvas/new.html.erb" do
   before do
@@ -30,23 +30,23 @@ describe "login/canvas/new.html.erb" do
     render
     expect(response).not_to be_nil
     doc = Nokogiri::HTML5(response.body)
-    expect(doc.at_css('form#login_form')['action']).to eq '/login/canvas'
+    expect(doc.at_css("form#login_form")["action"]).to eq "/login/canvas"
   end
 
   it "uses ldap route for the ldap 'controller'" do
-    Account.default.authentication_providers.create!(:auth_type => 'ldap')
+    Account.default.authentication_providers.create!(auth_type: "ldap")
 
-    controller.request.path_parameters[:controller] = 'login/ldap'
+    controller.request.path_parameters[:controller] = "login/ldap"
     render
     expect(response).not_to be_nil
     doc = Nokogiri::HTML5(response.body)
-    expect(doc.at_css('form#login_form')['action']).to eq '/login/ldap'
+    expect(doc.at_css("form#login_form")["action"]).to eq "/login/ldap"
   end
 
   it "uses internal forgot password mechanism by default" do
     render
     page = Nokogiri(response.body)
-    expect(page.css("#login_forgot_password")[0]['href']).to eq '#'
+    expect(page.css("#login_forgot_password")[0]["href"]).to eq "#"
   end
 
   context "with external mechanism specified" do
@@ -54,7 +54,7 @@ describe "login/canvas/new.html.erb" do
     let(:config) { account.authentication_providers.build }
 
     before do
-      config.auth_type = 'ldap'
+      config.auth_type = "ldap"
       config.save!
       account.change_password_url = "http://www.instructure.com"
       account.save!
@@ -64,7 +64,7 @@ describe "login/canvas/new.html.erb" do
     it "uses external forgot password mechanism" do
       render
       page = Nokogiri(response.body)
-      expect(page.css("#login_forgot_password")[0]['href'])
+      expect(page.css("#login_forgot_password")[0]["href"])
         .to eq(account.change_password_url)
     end
   end

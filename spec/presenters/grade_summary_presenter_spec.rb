@@ -18,12 +18,12 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 describe GradeSummaryPresenter do
-  describe '#courses_with_grades' do
-    describe 'all on one shard' do
+  describe "#courses_with_grades" do
+    describe "all on one shard" do
       let(:course) { Course.create! }
       let(:presenter) { GradeSummaryPresenter.new(course, @user, nil) }
-      let(:assignment) { assignment_model(:course => course) }
-      let(:enrollment) { course.enroll_student(@user, enrollment_state: 'active') }
+      let(:assignment) { assignment_model(course: course) }
+      let(:enrollment) { course.enroll_student(@user, enrollment_state: "active") }
 
       before do
         user_factory
@@ -31,19 +31,19 @@ describe GradeSummaryPresenter do
         course.offer
       end
 
-      it 'preloads the enrollment term for each course' do
+      it "preloads the enrollment term for each course" do
         enrollment_terms = presenter.courses_with_grades.map { |c| c.association(:enrollment_term) }
 
         expect(enrollment_terms).to all be_loaded
       end
 
-      it 'preloads the legacy grading period groups for each course' do
+      it "preloads the legacy grading period groups for each course" do
         grading_period_groups = presenter.courses_with_grades.map { |c| c.association(:grading_period_groups) }
 
         expect(grading_period_groups).to all be_loaded
       end
 
-      it 'includes courses where the user is enrolled' do
+      it "includes courses where the user is enrolled" do
         expect(presenter.courses_with_grades).to include(course)
       end
 
@@ -67,25 +67,25 @@ describe GradeSummaryPresenter do
       end
     end
 
-    describe 'across shards' do
+    describe "across shards" do
       specs_require_sharding
 
-      it 'can find courses when the user and course are on the same shard' do
+      it "can find courses when the user and course are on the same shard" do
         user = course = enrollment = nil
         @shard1.activate do
           user = User.create!
           account = Account.create!
           course = account.courses.create!
-          enrollment = StudentEnrollment.create!(:course => course, :user => user)
-          enrollment.update_attribute(:workflow_state, 'active')
-          course.update_attribute(:workflow_state, 'available')
+          enrollment = StudentEnrollment.create!(course: course, user: user)
+          enrollment.update_attribute(:workflow_state, "active")
+          course.update_attribute(:workflow_state, "available")
         end
 
         presenter = GradeSummaryPresenter.new(course, user, user.id)
         expect(presenter.courses_with_grades).to include(course)
       end
 
-      it 'can find courses when the user and course are on different shards' do
+      it "can find courses when the user and course are on different shards" do
         user = course = nil
         @shard1.activate do
           user = User.create!
@@ -94,42 +94,42 @@ describe GradeSummaryPresenter do
         @shard2.activate do
           account = Account.create!
           course = account.courses.create!
-          enrollment = StudentEnrollment.create!(:course => course, :user => user)
-          enrollment.update_attribute(:workflow_state, 'active')
-          course.update_attribute(:workflow_state, 'available')
+          enrollment = StudentEnrollment.create!(course: course, user: user)
+          enrollment.update_attribute(:workflow_state, "active")
+          course.update_attribute(:workflow_state, "available")
         end
 
         presenter = GradeSummaryPresenter.new(course, user, user.id)
         expect(presenter.courses_with_grades).to include(course)
       end
 
-      describe 'courses for an observer across shards' do
+      describe "courses for an observer across shards" do
         before do
-          course_with_student(:active_all => true)
-          @observer = user_factory(:active_all => true)
-          @course.observer_enrollments.create!(:user_id => @observer, :associated_user_id => @student)
+          course_with_student(active_all: true)
+          @observer = user_factory(active_all: true)
+          @course.observer_enrollments.create!(user_id: @observer, associated_user_id: @student)
 
           @shard1.activate do
             account = Account.create!
-            @course2 = account.courses.create!(:workflow_state => "available")
-            StudentEnrollment.create!(:course => @course2, :user => @student, :workflow_state => 'active')
-            @course2.observer_enrollments.create!(:user_id => @observer, :associated_user_id => @student)
+            @course2 = account.courses.create!(workflow_state: "available")
+            StudentEnrollment.create!(course: @course2, user: @student, workflow_state: "active")
+            @course2.observer_enrollments.create!(user_id: @observer, associated_user_id: @student)
           end
 
           @presenter = GradeSummaryPresenter.new(@course, @observer, @student.id)
         end
 
-        it 'can find courses for an observer across shards' do
+        it "can find courses for an observer across shards" do
           expect(@presenter.courses_with_grades).to match_array([@course, @course2])
         end
 
-        it 'preloads the enrollment term for each course' do
+        it "preloads the enrollment term for each course" do
           enrollment_terms = @presenter.courses_with_grades.map { |c| c.association(:enrollment_term) }
 
           expect(enrollment_terms).to all be_loaded
         end
 
-        it 'preloads the legacy grading period groups for each course' do
+        it "preloads the legacy grading period groups for each course" do
           grading_period_groups = @presenter.courses_with_grades.map { |c| c.association(:grading_period_groups) }
 
           expect(grading_period_groups).to all be_loaded
@@ -138,7 +138,7 @@ describe GradeSummaryPresenter do
     end
   end
 
-  describe '#students' do
+  describe "#students" do
     before(:once) do
       @course = Course.create!
       @student = User.create!
@@ -147,7 +147,7 @@ describe GradeSummaryPresenter do
       @course.enroll_student(@student, active_all: true)
     end
 
-    it 'returns all of the observed students, if there are multiple' do
+    it "returns all of the observed students, if there are multiple" do
       student_two = User.create!
       @observer = User.create!
       @course.enroll_student(student_two, active_all: true)
@@ -158,23 +158,23 @@ describe GradeSummaryPresenter do
       expect(presenter.students.map(&:id)).to match_array [@student.id, student_two.id]
     end
 
-    it 'returns an array with a single student if there is only one student' do
+    it "returns an array with a single student if there is only one student" do
       presenter = GradeSummaryPresenter.new(@course, @teacher, @student.id)
       expect(presenter.students.map(&:id)).to match_array [@student.id]
     end
 
-    it 'returns an empty array if there are no students' do
+    it "returns an empty array if there are no students" do
       presenter = GradeSummaryPresenter.new(@course, @teacher, nil)
       expect(presenter.students).to be_empty
     end
   end
 
-  describe '#assignment_stats' do
+  describe "#assignment_stats" do
     before do
       teacher_in_course
     end
 
-    it 'works' do
+    it "works" do
       s1, s2, s3, s4 = n_students_in_course(4)
       a = @course.assignments.create! points_possible: 10
       a.grade_student s1, grade:  0, grader: @teacher
@@ -195,10 +195,10 @@ describe GradeSummaryPresenter do
       expect(assignment_stats.mean.to_f).to eq 5
     end
 
-    it 'filters out test students and inactive enrollments' do
+    it "filters out test students and inactive enrollments" do
       s1, s2, s3, removed_student = n_students_in_course(4, course: @course)
 
-      fake_student = course_with_user('StudentViewEnrollment', { :course => @course }).user
+      fake_student = course_with_user("StudentViewEnrollment", { course: @course }).user
       fake_student.preferences[:fake_student] = true
 
       a = @course.assignments.create! points_possible: 10
@@ -209,7 +209,7 @@ describe GradeSummaryPresenter do
       a.grade_student fake_student, grade: 100, grader: @teacher
 
       removed_student.enrollments.each do |enrollment|
-        enrollment.workflow_state = 'inactive'
+        enrollment.workflow_state = "inactive"
         enrollment.save!
       end
 
@@ -223,7 +223,7 @@ describe GradeSummaryPresenter do
       expect(assignment_stats.mean.to_f).to eq 5
     end
 
-    it 'doesnt factor nil grades into the average or min' do
+    it "doesnt factor nil grades into the average or min" do
       s1, s2, s3, s4 = n_students_in_course(4)
       a = @course.assignments.create! points_possible: 10
       a.grade_student s1, grade:  2, grader: @teacher
@@ -241,12 +241,12 @@ describe GradeSummaryPresenter do
       expect(assignment_stats.mean.to_f).to eq 6
     end
 
-    it 'returns a count of submissions ignoring test students and inactive enrollments' do
+    it "returns a count of submissions ignoring test students and inactive enrollments" do
       @course = Course.create!
       teacher_in_course
       s1, s2, s3, removed_student = n_students_in_course(4, course: @course)
 
-      fake_student = course_with_user('StudentViewEnrollment', { :course => @course }).user
+      fake_student = course_with_user("StudentViewEnrollment", { course: @course }).user
       fake_student.preferences[:fake_student] = true
 
       a = @course.assignments.create! points_possible: 10
@@ -257,7 +257,7 @@ describe GradeSummaryPresenter do
       a.grade_student fake_student, grade: 100, grader: @teacher
 
       removed_student.enrollments.each do |enrollment|
-        enrollment.workflow_state = 'inactive'
+        enrollment.workflow_state = "inactive"
         enrollment.save!
       end
 
@@ -268,7 +268,7 @@ describe GradeSummaryPresenter do
     end
   end
 
-  describe '#observed_students' do
+  describe "#observed_students" do
     before(:once) do
       @course = course_factory(active_all: true)
       @course.restrict_student_future_view = true
@@ -283,21 +283,21 @@ describe GradeSummaryPresenter do
 
       add_linked_observer(@student, observer)
       add_linked_observer(@student2, observer)
-      @student_enrollment = section.enroll_user(@student, 'StudentEnrollment')
-      @student_enrollment2 = @course.enroll_user(@student2, 'StudentEnrollment')
+      @student_enrollment = section.enroll_user(@student, "StudentEnrollment")
+      @student_enrollment2 = @course.enroll_user(@student2, "StudentEnrollment")
 
       @presenter = GradeSummaryPresenter.new(@course, observer, nil)
     end
 
-    it 'does not include students from future sections in a date restricted course' do
+    it "does not include students from future sections in a date restricted course" do
       expect(@presenter.observed_students).not_to have_key(@student)
     end
 
-    it 'includes students from current sections in a date restricted course' do
+    it "includes students from current sections in a date restricted course" do
       expect(@presenter.observed_students).to include(@student2 => [@student_enrollment2])
     end
 
-    it 'includes all students if course is not restricted by date' do
+    it "includes all students if course is not restricted by date" do
       @course.restrict_student_future_view = false
       @course.save!
       expect(@presenter.observed_students).to include(@student => [@student_enrollment])
@@ -305,16 +305,16 @@ describe GradeSummaryPresenter do
     end
   end
 
-  describe '#submissions' do
+  describe "#submissions" do
     before(:once) do
       teacher_in_course
       student_in_course
     end
 
     it "doesn't return submissions for deleted assignments" do
-      a1, a2 = 2.times.map {
+      a1, a2 = Array.new(2) do
         @course.assignments.create! points_possible: 10
-      }
+      end
       a1.grade_student @student, grade: 10, grader: @teacher
       a2.grade_student @student, grade: 10, grader: @teacher
 
@@ -334,7 +334,7 @@ describe GradeSummaryPresenter do
     end
   end
 
-  describe '#assignments' do
+  describe "#assignments" do
     before(:once) do
       teacher_in_course
       student_in_course
@@ -358,7 +358,7 @@ describe GradeSummaryPresenter do
     end
   end
 
-  describe '#sort_options' do
+  describe "#sort_options" do
     before(:once) do
       teacher_in_course
       student_in_course
@@ -401,35 +401,36 @@ describe GradeSummaryPresenter do
       expect(presenter.sort_options).to include module_option
     end
 
-    it 'localizes menu text' do
-      @course.assignments.create!(title: 'Math Assignment')
-      science_group = @course.assignment_groups.create!(name: 'Science Assignments')
-      @course.assignments.create!(title: 'Science Assignment', assignment_group: science_group)
-      @course.context_modules.create!(name: 'I <3 Modules')
+    it "localizes menu text" do
+      @course.assignments.create!(title: "Math Assignment")
+      science_group = @course.assignment_groups.create!(name: "Science Assignments")
+      @course.assignments.create!(title: "Science Assignment", assignment_group: science_group)
+      @course.context_modules.create!(name: "I <3 Modules")
 
-      expect(I18n).to receive(:t).with('Due Date')
-      expect(I18n).to receive(:t).with('Name')
-      expect(I18n).to receive(:t).with('Assignment Group')
-      expect(I18n).to receive(:t).with('Module')
+      expect(I18n).to receive(:t).with("Due Date")
+      expect(I18n).to receive(:t).with("Name")
+      expect(I18n).to receive(:t).with("Assignment Group")
+      expect(I18n).to receive(:t).with("Module")
+      allow(I18n).to receive(:t).with(any_args)
 
       presenter.sort_options
     end
 
-    it 'sorts menu items in a locale-aware way' do
-      expect(Canvas::ICU).to receive(:collate_by).with([['Due Date', 'due_at'], ['Name', 'title']], &:first)
+    it "sorts menu items in a locale-aware way" do
+      expect(Canvas::ICU).to receive(:collate_by).with([["Due Date", "due_at"], ["Name", "title"]], &:first)
       presenter.sort_options
     end
   end
 
-  describe '#sorted_assignments' do
+  describe "#sorted_assignments" do
     before(:once) do
       teacher_in_course
       student_in_course
     end
 
-    let!(:assignment1) { @course.assignments.create!(title: 'Jalapeno', due_at: 2.days.ago, position: 1) }
-    let!(:assignment2) { @course.assignments.create!(title: 'Jalapeño', due_at: 2.days.from_now, position: 2) }
-    let!(:assignment3) { @course.assignments.create!(title: 'Jalapezo', due_at: 5.days.ago, position: 3) }
+    let!(:assignment1) { @course.assignments.create!(title: "Jalapeno", due_at: 2.days.ago, position: 1) }
+    let!(:assignment2) { @course.assignments.create!(title: "Jalapeño", due_at: 2.days.from_now, position: 2) }
+    let!(:assignment3) { @course.assignments.create!(title: "Jalapezo", due_at: 5.days.ago, position: 3) }
     let(:ordered_assignment_ids) { presenter.assignments.map(&:id) }
 
     it "assignment order defaults to due_at" do
@@ -461,7 +462,7 @@ describe GradeSummaryPresenter do
 
       it "ignores case when comparing assignment titles" do
         assignment1.due_at = assignment3.due_at
-        assignment1.title = 'apple'
+        assignment1.title = "apple"
         assignment1.save!
         expected_id_order = [assignment1.id, assignment3.id, assignment2.id]
         expect(ordered_assignment_ids).to eq(expected_id_order)
@@ -477,7 +478,7 @@ describe GradeSummaryPresenter do
       end
 
       it "ignores case when sorting by title" do
-        assignment1.title = 'apple'
+        assignment1.title = "apple"
         assignment1.save!
         expected_id_order = [assignment1.id, assignment2.id, assignment3.id]
         expect(ordered_assignment_ids).to eq(expected_id_order)
@@ -500,19 +501,19 @@ describe GradeSummaryPresenter do
 
       context "assignments in modules" do
         let!(:assignment1_tag) do
-          a1_tag = assignment1.context_module_tags.new(context: @course, position: 1, tag_type: 'context_module')
+          a1_tag = assignment1.context_module_tags.new(context: @course, position: 1, tag_type: "context_module")
           a1_tag.context_module = second_context_module
           a1_tag.save!
         end
 
         let!(:assignment2_tag) do
-          a2_tag = assignment2.context_module_tags.new(context: @course, position: 3, tag_type: 'context_module')
+          a2_tag = assignment2.context_module_tags.new(context: @course, position: 3, tag_type: "context_module")
           a2_tag.context_module = first_context_module
           a2_tag.save!
         end
 
         let!(:assignment3_tag) do
-          a3_tag = assignment3.context_module_tags.new(context: @course, position: 2, tag_type: 'context_module')
+          a3_tag = assignment3.context_module_tags.new(context: @course, position: 2, tag_type: "context_module")
           a3_tag.context_module = first_context_module
           a3_tag.save!
         end
@@ -536,7 +537,7 @@ describe GradeSummaryPresenter do
             assignment = @course.assignments.create!
             quiz = quiz_model(course: @course, assignment_id: assignment.id)
             quiz_context_module_tag =
-              quiz.context_module_tags.build(context: @course, position: 4, tag_type: 'context_module')
+              quiz.context_module_tags.build(context: @course, position: 4, tag_type: "context_module")
             quiz_context_module_tag.context_module = first_context_module
             quiz_context_module_tag.save!
             assignment
@@ -548,7 +549,7 @@ describe GradeSummaryPresenter do
             assignment.discussion_topic = discussion
             assignment.save!
             discussion_context_module_tag =
-              discussion.context_module_tags.build(context: @course, position: 5, tag_type: 'context_module')
+              discussion.context_module_tags.build(context: @course, position: 5, tag_type: "context_module")
             discussion_context_module_tag.context_module = first_context_module
             discussion_context_module_tag.save!
             assignment
@@ -601,8 +602,8 @@ describe GradeSummaryPresenter do
     end
 
     let(:inactive_student_enrollment) do
-      enrollment = course_with_user('StudentEnrollment', { course: gspcourse })
-      enrollment.workflow_state = 'inactive'
+      enrollment = course_with_user("StudentEnrollment", { course: gspcourse })
+      enrollment.workflow_state = "inactive"
       enrollment.save!
       enrollment
     end
@@ -612,7 +613,7 @@ describe GradeSummaryPresenter do
     end
 
     let(:other_student_enrollment) do
-      course_with_user('StudentEnrollment', { course: gspcourse })
+      course_with_user("StudentEnrollment", { course: gspcourse })
     end
 
     let(:other_student) do

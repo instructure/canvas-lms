@@ -17,20 +17,20 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../qti_helper'
+require_relative "../qti_helper"
 if Qti.migration_executable
   describe "QTI Migration Tool" do
     it "gets assessment identifier if set" do
-      File.open(File.join(CANVAS_FIXTURE_DIR, 'empty_assessment.xml.qti'), 'r') do |file|
-        hash = Qti.convert_xml(file.read, :file_name => "not_the_identifier.xml.qti").last.first
-        expect(hash[:migration_id]).to eq 'i09d7615b43e5f35589cc1e2647dd345f'
+      File.open(File.join(CANVAS_FIXTURE_DIR, "empty_assessment.xml.qti"), "r") do |file|
+        hash = Qti.convert_xml(file.read, file_name: "not_the_identifier.xml.qti").last.first
+        expect(hash[:migration_id]).to eq "i09d7615b43e5f35589cc1e2647dd345f"
       end
     end
 
     it "uses filename as identifier if none set" do
-      File.open(File.join(CANVAS_FIXTURE_DIR, 'empty_assessment_no_ident.xml'), 'r') do |file|
-        hash = Qti.convert_xml(file.read, :file_name => "the_identifier.xml").last.first
-        expect(hash[:migration_id]).to eq 'the_identifier'
+      File.open(File.join(CANVAS_FIXTURE_DIR, "empty_assessment_no_ident.xml"), "r") do |file|
+        hash = Qti.convert_xml(file.read, file_name: "the_identifier.xml").last.first
+        expect(hash[:migration_id]).to eq "the_identifier"
       end
     end
   end

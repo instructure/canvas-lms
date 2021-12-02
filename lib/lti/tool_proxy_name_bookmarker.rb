@@ -28,7 +28,7 @@ module Lti
     def self.restrict_scope(scope, pager)
       restrict_scope_by_name_and_id_fields(
         scope: scope, pager: pager,
-        name_field: 'lti_tool_proxies.name', id_field: 'lti_tool_proxies.id'
+        name_field: "lti_tool_proxies.name", id_field: "lti_tool_proxies.id"
       )
     end
   end

@@ -36,7 +36,7 @@ module Api::V1::Conversation
 
   def conversation_json(conversation, current_user, session, options = {})
     options = {
-      :include_participant_contexts => true
+      include_participant_contexts: true
     }.merge(options)
     result = conversation.as_json(options)
     participants = conversation.participants(options.slice(:include_participant_contexts, :include_indirect_participants))
@@ -57,7 +57,7 @@ module Api::V1::Conversation
     # Changing to account context means users can reply to admins, even if the admin messages from a
     # course they aren't enrolled in
     result[:context_code] =
-      if conversation.conversation.context_type.eql?("Course") && AccountUser.exists?(user_id: current_user.id)
+      if conversation.conversation.context_type.eql?("Course") && AccountUser.where(user_id: current_user.id).exists?
         "account_#{@domain_root_account.id}"
       else
         conversation.conversation.context_code
@@ -74,10 +74,10 @@ module Api::V1::Conversation
 
   def conversation_message_json(message, current_user, session)
     result = message.as_json
-    result['participating_user_ids'] = message.conversation_message_participants.pluck(:user_id)
-    result['media_comment'] = media_comment_json(result['media_comment']) if result['media_comment']
-    result['attachments'] = result['attachments'].map { |attachment| attachment_json(attachment, current_user) }
-    result['forwarded_messages'] = result['forwarded_messages'].map { |m| conversation_message_json(m, current_user, session) }
+    result["participating_user_ids"] = message.conversation_message_participants.pluck(:user_id)
+    result["media_comment"] = media_comment_json(result["media_comment"]) if result["media_comment"]
+    result["attachments"] = result["attachments"].map { |attachment| attachment_json(attachment, current_user) }
+    result["forwarded_messages"] = result["forwarded_messages"].map { |m| conversation_message_json(m, current_user, session) }
     result
   end
 
@@ -90,20 +90,20 @@ module Api::V1::Conversation
   end
 
   def should_include_participant_avatars?(user_count)
-    user_count <= Setting.get('max_conversation_participant_count_for_avatars', '100').to_i
+    user_count <= Setting.get("max_conversation_participant_count_for_avatars", "100").to_i
   end
 
   def conversation_recipients_json(recipients, current_user, session)
     ActiveRecord::Associations::Preloader.new.preload(recipients.select { |r| r.is_a?(User) },
-                                                      { :pseudonym => :account }) # for avatar_url
+                                                      { pseudonym: :account }) # for avatar_url
 
     preload_common_contexts(current_user, recipients)
     include_avatars = should_include_participant_avatars?(recipients.count)
     recipients.map do |recipient|
       if recipient.is_a?(User)
         conversation_user_json(recipient, current_user, session,
-                               :include_participant_avatars => include_avatars,
-                               :include_participant_contexts => true)
+                               include_participant_avatars: include_avatars,
+                               include_participant_contexts: true)
       else
         # contexts are already json
         recipient
@@ -113,13 +113,13 @@ module Api::V1::Conversation
 
   def conversation_users_json(users, current_user, session, options = {})
     options = {
-      :include_participant_avatars => true,
-      :include_participant_contexts => true
+      include_participant_avatars: true,
+      include_participant_contexts: true
     }.merge(options)
     options[:include_participant_avatars] = false unless should_include_participant_avatars?(users.count)
 
     if options[:include_participant_avatars]
-      ActiveRecord::Associations::Preloader.new.preload(users, { :pseudonym => :account }) # for avatar_url
+      ActiveRecord::Associations::Preloader.new.preload(users, { pseudonym: :account }) # for avatar_url
     end
 
     preload_common_contexts(current_user, users) if options[:include_participant_contexts]
@@ -128,9 +128,9 @@ module Api::V1::Conversation
 
   def conversation_user_json(user, current_user, _session, options = {})
     result = {
-      :id => user.id,
-      :name => user.short_name,
-      :full_name => user.name,
+      id: user.id,
+      name: user.short_name,
+      full_name: user.name,
       pronouns: user.pronouns
     }
 
@@ -146,8 +146,8 @@ module Api::V1::Conversation
     result = api_json batch,
                       current_user,
                       session,
-                      :only => %w{id workflow_state},
-                      :methods => %w{completion recipient_count}
+                      only: %w[id workflow_state],
+                      methods: %w[completion recipient_count]
     result[:message] = conversation_message_json(batch.root_conversation_message, current_user, session)
     result[:tags] = batch.local_tags
     result
@@ -155,9 +155,9 @@ module Api::V1::Conversation
 
   def deleted_conversation_json(conversation_message_participant, current_user, session)
     hash = conversation_message_json(conversation_message_participant.conversation_message, current_user, session)
-    hash['deleted_at'] = conversation_message_participant.deleted_at
-    hash['user_id'] = conversation_message_participant.user_id
-    hash['conversation_id'] = conversation_message_participant.conversation_message.conversation_id
+    hash["deleted_at"] = conversation_message_participant.deleted_at
+    hash["user_id"] = conversation_message_participant.user_id
+    hash["conversation_id"] = conversation_message_participant.conversation_message.conversation_id
     hash
   end
 end

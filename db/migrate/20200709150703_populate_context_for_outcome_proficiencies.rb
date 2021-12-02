@@ -22,7 +22,7 @@ class PopulateContextForOutcomeProficiencies < ActiveRecord::Migration[5.2]
   tag :postdeploy
 
   def up
-    DataFixup::PopulateContextOnOutcomeProficiencies.delay_if_production(priority: Delayed::LOW_PRIORITY, n_strand: 'long_datafixups').run
+    DataFixup::PopulateContextOnOutcomeProficiencies.delay_if_production(priority: Delayed::LOW_PRIORITY, n_strand: "long_datafixups").run
   end
 
   def down; end

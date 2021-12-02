@@ -16,11 +16,11 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../common'
-require_relative 'page_objects/wiki_page'
+require_relative "../common"
+require_relative "page_objects/wiki_page"
 
-describe 'course wiki pages' do
-  include_context 'in-process server selenium tests'
+describe "course wiki pages" do
+  include_context "in-process server selenium tests"
   include CourseWikiPage
 
   before do
@@ -29,17 +29,17 @@ describe 'course wiki pages' do
 
   context "Index Page as a student" do
     before do
-      @page = @course.wiki_pages.create!(title: 'delete_deux')
+      @page = @course.wiki_pages.create!(title: "delete_deux")
       # sets the workflow_state = deleted to act as a deleted page
-      @page.update(workflow_state: 'deleted')
+      @page.update(workflow_state: "deleted")
     end
 
-    it "displays a warning alert to a student when accessing a deleted page", priority: "1", test_id: 126839 do
+    it "displays a warning alert to a student when accessing a deleted page", priority: "1" do
       visit_wiki_page_view(@course.id, @page.title)
       expect_flash_message :warning
     end
 
-    it "displays a warning alert when accessing a non-existant page", priority: "1", test_id: 126841 do
+    it "displays a warning alert when accessing a non-existant page", priority: "1" do
       visit_wiki_page_view(@course.id, "non-existant")
       expect_flash_message :warning
     end

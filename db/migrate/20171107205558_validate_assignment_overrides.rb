@@ -21,13 +21,10 @@ class ValidateAssignmentOverrides < ActiveRecord::Migration[5.0]
   tag :postdeploy
 
   def self.up
-    Assignment.find_ids_in_ranges(:batch_size => 10_000) do |start_at, end_at|
+    Assignment.find_ids_in_ranges(batch_size: 10_000) do |start_at, end_at|
       DataFixup::ValidateAssignmentOverrides
         .delay_if_production(priority: Delayed::LOW_PRIORITY, n_strand: ["DataFixup::ValidateAssignmentOverrides", Shard.current.database_server.id])
         .run(start_at, end_at)
     end
-  end
-
-  def self.down
   end
 end

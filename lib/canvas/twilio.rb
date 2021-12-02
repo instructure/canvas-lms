@@ -18,10 +18,10 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 # Utilities to send text messages via Twilio.
-require 'twilio-ruby'
+require "twilio-ruby"
 
 module Canvas::Twilio
-  DEFAULT_COUNTRY = 'US'
+  DEFAULT_COUNTRY = "US"
 
   def self.account_sid
     Rails.application.credentials.twilio_creds&.[](:account_sid)
@@ -43,7 +43,7 @@ module Canvas::Twilio
 
   # Look up the ISO country code for the specified phone number. Twilio must be enabled in order for this to work.
   def self.lookup_country(phone_number)
-    Rails.cache.fetch(['twilio_phone_number_country_2', phone_number].cache_key) do
+    Rails.cache.fetch(["twilio_phone_number_country_2", phone_number].cache_key) do
       client.lookups.phone_numbers(phone_number).fetch.country_code
     end
   end
@@ -53,7 +53,7 @@ module Canvas::Twilio
   def self.outbound_numbers
     return {} unless enabled?
 
-    Rails.cache.fetch('twilio_source_phone_numbers_3', expires_in: 1.day) do
+    Rails.cache.fetch("twilio_source_phone_numbers_3", expires_in: 1.day) do
       numbers = Canvas::Twilio.client.api.account.incoming_phone_numbers.stream.to_a
 
       numbers_by_country = Hash.new { |h, k| h[k] = [] }
@@ -61,7 +61,7 @@ module Canvas::Twilio
         numbers_by_country[lookup_country(number.phone_number)] << number.phone_number
       end
 
-      Hash[numbers_by_country]
+      numbers_by_country.to_h
     end
   end
 
@@ -86,11 +86,11 @@ module Canvas::Twilio
 
     # Ping StatsD about sending from this number
     InstStatsd::Statsd.increment("notifications.twilio.message_sent_from_number.#{outbound_country}.#{outbound_number}",
-                                 short_stat: 'notifications.twilio.message_sent',
+                                 short_stat: "notifications.twilio.message_sent",
                                  tags: { country: outbound_country, number: outbound_number })
     unless country == outbound_country
       InstStatsd::Statsd.increment("notifications.twilio.no_outbound_numbers_for.#{country}",
-                                   short_stat: 'notifications.twilio.no_outbound_numbers',
+                                   short_stat: "notifications.twilio.no_outbound_numbers",
                                    tags: { country: country })
     end
 

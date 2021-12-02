@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../spec_helper'
+require_relative "../spec_helper"
 
 # FIXME: these tests should all exist in a controller test,
 # since that's the context required to run any of them
@@ -61,7 +61,7 @@ describe AuthenticationMethods do
       end
 
       def cas_login_url
-        ''
+        ""
       end
 
       def zendesk_delegated_auth_pass_through_url(options)
@@ -81,9 +81,9 @@ describe AuthenticationMethods do
   describe "#load_user" do
     context "with active session" do
       before do
-        @request = double(:env => { 'encrypted_cookie_store.session_refreshed_at' => 5.minutes.ago },
-                          :format => double(:json? => false),
-                          :host_with_port => "")
+        @request = double(env: { "encrypted_cookie_store.session_refreshed_at" => 5.minutes.ago },
+                          format: double(json?: false),
+                          host_with_port: "")
         @controller = mock_controller_class.new(request: @request)
         allow(@controller).to receive(:load_pseudonym_from_access_token)
         allow(@controller).to receive(:api_request?).and_return(false)
@@ -109,7 +109,7 @@ describe AuthenticationMethods do
 
       it "destroys the session if the pseudonym was suspended" do
         @pseudonym.reload
-        @pseudonym.update!(workflow_state: 'suspended')
+        @pseudonym.update!(workflow_state: "suspended")
         expect(@controller).to receive(:destroy_session).once
         expect(@controller.send(:load_user)).to be_nil
         expect(@controller.instance_variable_get(:@current_user)).to be_nil
@@ -128,7 +128,7 @@ describe AuthenticationMethods do
 
       it "sets the CSRF cookie" do
         @controller.send(:load_user)
-        expect(@controller.cookies['_csrf_token']).not_to be nil
+        expect(@controller.cookies["_csrf_token"]).not_to be nil
       end
     end
 
@@ -157,7 +157,7 @@ describe AuthenticationMethods do
 
       def setup_with_jwt(token)
         request = double(authorization: "Bearer #{token}",
-                         format: double(:json? => true),
+                         format: double(json?: true),
                          host_with_port: "",
                          url: "",
                          method: "GET")
@@ -213,7 +213,7 @@ describe AuthenticationMethods do
 
       def setup_with_token(token)
         request = double(authorization: "Bearer #{token.full_token}",
-                         format: double(:json? => true),
+                         format: double(json?: true),
                          host_with_port: "",
                          url: "",
                          method: "GET")
@@ -306,35 +306,35 @@ describe AuthenticationMethods do
 
     it "does not set SSL-only explicitly if session_options doesn't specify" do
       @controller.send(:masked_authenticity_token)
-      expect(@controller.cookies['_csrf_token']).not_to be_has_key(:secure)
+      expect(@controller.cookies["_csrf_token"]).not_to be_has_key(:secure)
     end
 
     it "sets SSL-only if session_options specifies" do
       @session_options[:secure] = true
       @controller.send(:masked_authenticity_token)
-      expect(@controller.cookies['_csrf_token'][:secure]).to be true
+      expect(@controller.cookies["_csrf_token"][:secure]).to be true
     end
 
     it "sets httponly explicitly false on a non-files host" do
       @controller.send(:masked_authenticity_token)
-      expect(@controller.cookies['_csrf_token'][:httponly]).to be false
+      expect(@controller.cookies["_csrf_token"][:httponly]).to be false
     end
 
     it "sets httponly explicitly true on a files host" do
       expect(HostUrl).to receive(:is_file_host?).once.with(@request.host_with_port).and_return(true)
       @controller.send(:masked_authenticity_token)
-      expect(@controller.cookies['_csrf_token'][:httponly]).to be true
+      expect(@controller.cookies["_csrf_token"][:httponly]).to be true
     end
 
     it "does not set a cookie domain explicitly if session_options doesn't specify" do
       @controller.send(:masked_authenticity_token)
-      expect(@controller.cookies['_csrf_token']).not_to be_has_key(:domain)
+      expect(@controller.cookies["_csrf_token"]).not_to be_has_key(:domain)
     end
 
     it "sets a cookie domain explicitly if session_options specifies" do
       @session_options[:domain] = "cookie domain"
       @controller.send(:masked_authenticity_token)
-      expect(@controller.cookies['_csrf_token'][:domain]).to eq @session_options[:domain]
+      expect(@controller.cookies["_csrf_token"][:domain]).to eq @session_options[:domain]
     end
   end
 
@@ -342,7 +342,7 @@ describe AuthenticationMethods do
     let(:account) { Account.create! }
     let(:dev_key) { DeveloperKey.create!(account: account) }
     let(:access_token) { AccessToken.create!(developer_key: dev_key) }
-    let(:request) { double(format: double(:json? => false), host_with_port: "") }
+    let(:request) { double(format: double(json?: false), host_with_port: "") }
     let(:controller) { mock_controller_class.new(request: request, root_account: account) }
 
     it "doesn't call '#get_context' if the Dev key is owned by the domain root account" do

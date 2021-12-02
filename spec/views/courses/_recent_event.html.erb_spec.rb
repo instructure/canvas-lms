@@ -18,23 +18,23 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../views_helper'
+require_relative "../views_helper"
 
 describe "/courses/_recent_event" do
   it "renders" do
     course_with_student
-    assignment = @course.assignments.create!(:title => 'my assignment')
+    assignment = @course.assignments.create!(title: "my assignment")
     view_context
-    render :partial => "courses/recent_event", :object => assignment, :locals => { :is_hidden => false }
+    render partial: "courses/recent_event", object: assignment, locals: { is_hidden: false }
     expect(response).not_to be_nil
     expect(response.body).to match %r{<b class="event-details__title">my assignment</b>}
   end
 
   it "renders without a user" do
     course_factory
-    assignment = @course.assignments.create!(:title => 'my assignment')
+    assignment = @course.assignments.create!(title: "my assignment")
     view_context
-    render :partial => "courses/recent_event", :object => assignment, :locals => { :is_hidden => false }
+    render partial: "courses/recent_event", object: assignment, locals: { is_hidden: false }
     expect(response).not_to be_nil
     expect(response.body).to match %r{<b class="event-details__title">my assignment</b>}
   end
@@ -57,20 +57,20 @@ describe "/courses/_recent_event" do
     expect(response.body).to_not include(@course.name)
   end
 
-  context 'assignments' do
+  context "assignments" do
     before do
       course_with_student(active_all: true)
       submission_model
       assign(:current_user, @user)
     end
 
-    it 'shows points possible for an ungraded assignment' do
+    it "shows points possible for an ungraded assignment" do
       render partial: "courses/recent_event", object: @assignment, locals: { is_hidden: false }
 
       expect(response.body).to include("#{@assignment.points_possible} points")
     end
 
-    it 'shows the grade for a graded assignment' do
+    it "shows the grade for a graded assignment" do
       @assignment.grade_student(@user, grade: 7, grader: @teacher)
 
       render partial: "courses/recent_event", object: @assignment, locals: { is_hidden: false }
@@ -78,13 +78,13 @@ describe "/courses/_recent_event" do
       expect(response.body).to include("7 out of #{@assignment.points_possible}")
     end
 
-    it 'shows the due date' do
+    it "shows the due date" do
       render partial: "courses/recent_event", object: @assignment, locals: { is_hidden: false }
 
       expect(response.body).to include(view.datetime_string(@assignment.due_at))
     end
 
-    it 'shows overridden due date' do
+    it "shows overridden due date" do
       different_due_at = 2.days.from_now
       create_adhoc_override_for_assignment(@assignment, @user, due_at: different_due_at)
 
@@ -100,7 +100,7 @@ describe "/courses/_recent_event" do
       view_context
       @quiz = @course.quizzes.create!
       @quiz.generate_quiz_data
-      @quiz.workflow_state = 'available'
+      @quiz.workflow_state = "available"
       @quiz.published_at = Time.zone.now
       @quiz.save
 
@@ -108,21 +108,21 @@ describe "/courses/_recent_event" do
       Quizzes::SubmissionGrader.new(@quiz_submission).grade_submission
 
       @submission = @quiz_submission.submission
-      allow_any_instance_of(Submission).to receive(:grade).and_return('1234567890')
+      allow_any_instance_of(Submission).to receive(:grade).and_return("1234567890")
     end
 
     it "shows the grade for a non-muted assignment" do
-      render :partial => "courses/recent_event",
-             :object => @quiz.assignment,
-             :locals => { :is_hidden => false, :submissions => [@submission] }
+      render partial: "courses/recent_event",
+             object: @quiz.assignment,
+             locals: { is_hidden: false, submissions: [@submission] }
       expect(response.body).to match(/1,234,567,890/)
     end
 
     it "does not show the grade for a muted assignment" do
       @quiz.assignment.mute!
-      render :partial => "courses/recent_event",
-             :object => @quiz.assignment,
-             :locals => { :is_hidden => false, :submissions => [@submission] }
+      render partial: "courses/recent_event",
+             object: @quiz.assignment,
+             locals: { is_hidden: false, submissions: [@submission] }
       expect(response.body).not_to match(/1,234,567,890/)
     end
   end

@@ -18,9 +18,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative 'messages_helper'
+require_relative "messages_helper"
 
-describe 'new_discussion_entry' do
+describe "new_discussion_entry" do
   before :once do
     discussion_topic_model
     @object = @topic.discussion_entries.create!(user: user_model)
@@ -36,8 +36,8 @@ describe 'new_discussion_entry' do
 
     it "renders" do
       msg = generate_message(notification_name, path_type, asset)
-      expect(msg.url).to match(/\/courses\/\d+\/discussion_topics\/\d+/)
-      expect(msg.body).to match(/\/courses\/\d+\/discussion_topics\/\d+/)
+      expect(msg.url).to match(%r{/courses/\d+/discussion_topics/\d+})
+      expect(msg.body).to match(%r{/courses/\d+/discussion_topics/\d+})
     end
 
     it "renders correct footer if replys are enabled" do

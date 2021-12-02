@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../../../spec_helper'
+require_relative "../../../spec_helper"
 
 describe AuthenticationProvider::SAML::InCommon do
   let(:subject) { AuthenticationProvider::SAML::InCommon }
@@ -28,11 +28,11 @@ describe AuthenticationProvider::SAML::InCommon do
       allow_any_instance_of(AuthenticationProvider::SAML).to receive(:download_metadata).and_return(nil)
     end
 
-    let!(:saml) {
-      Account.default.authentication_providers.create!(auth_type: 'saml',
+    let!(:saml) do
+      Account.default.authentication_providers.create!(auth_type: "saml",
                                                        metadata_uri: subject::URN,
-                                                       idp_entity_id: 'urn:mace:incommon:myschool.edu')
-    }
+                                                       idp_entity_id: "urn:mace:incommon:myschool.edu")
+    end
 
     it "does nothing if there aren't any InCommon providers" do
       saml.destroy
@@ -47,7 +47,7 @@ describe AuthenticationProvider::SAML::InCommon do
     end
 
     it "records errors for missing metadata" do
-      expect(subject).to receive(:refresh_if_necessary).and_return('xml')
+      expect(subject).to receive(:refresh_if_necessary).and_return("xml")
       expect(subject).to receive(:validate_and_parse_metadata).and_return({})
 
       expect(Canvas::Errors).to receive(:capture_exception).once
@@ -57,30 +57,30 @@ describe AuthenticationProvider::SAML::InCommon do
     end
 
     it "continues after a failure" do
-      saml2 = Account.default.authentication_providers.create!(auth_type: 'saml',
+      saml2 = Account.default.authentication_providers.create!(auth_type: "saml",
                                                                metadata_uri: subject::URN,
-                                                               idp_entity_id: 'urn:mace:incommon:myschool2.edu')
-      expect(subject).to receive(:refresh_if_necessary).and_return('xml')
+                                                               idp_entity_id: "urn:mace:incommon:myschool2.edu")
+      expect(subject).to receive(:refresh_if_necessary).and_return("xml")
       expect(subject).to receive(:validate_and_parse_metadata).and_return({
-                                                                            'urn:mace:incommon:myschool.edu' => 'metadata1',
-                                                                            'urn:mace:incommon:myschool2.edu' => 'metadata2',
+                                                                            "urn:mace:incommon:myschool.edu" => "metadata1",
+                                                                            "urn:mace:incommon:myschool2.edu" => "metadata2",
                                                                           })
 
       expect(Canvas::Errors).to receive(:capture_exception).once
-      expect_any_instantiation_of(saml).to receive(:populate_from_metadata).with('metadata1').and_raise('error')
-      expect_any_instantiation_of(saml2).to receive(:populate_from_metadata).with('metadata2')
+      expect_any_instantiation_of(saml).to receive(:populate_from_metadata).with("metadata1").and_raise("error")
+      expect_any_instantiation_of(saml2).to receive(:populate_from_metadata).with("metadata2")
       expect_any_instantiation_of(saml2).not_to receive(:save!)
 
       subject.refresh_providers
     end
 
     it "populates and saves" do
-      expect(subject).to receive(:refresh_if_necessary).and_return('xml')
+      expect(subject).to receive(:refresh_if_necessary).and_return("xml")
       expect(subject).to receive(:validate_and_parse_metadata).and_return({
-                                                                            'urn:mace:incommon:myschool.edu' => 'metadata1'
+                                                                            "urn:mace:incommon:myschool.edu" => "metadata1"
                                                                           })
 
-      expect_any_instantiation_of(saml).to receive(:populate_from_metadata).with('metadata1')
+      expect_any_instantiation_of(saml).to receive(:populate_from_metadata).with("metadata1")
       expect_any_instantiation_of(saml).to receive(:changed?).and_return(true)
       expect_any_instantiation_of(saml).to receive(:save!).once
 

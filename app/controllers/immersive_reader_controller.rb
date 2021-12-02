@@ -28,11 +28,11 @@ class ImmersiveReaderController < ApplicationController
   before_action :require_config
 
   def ir_config
-    @ir_config ||= YAML.load(Canvas::DynamicSettings.find(tree: :private)['immersive_reader.yml'] || '{}')
+    @ir_config ||= YAML.safe_load(Canvas::DynamicSettings.find(tree: :private)["immersive_reader.yml"] || "{}")
   end
 
   def require_config
-    return render json: { message: 'Service not found' }, status: :not_found unless ir_config.present?
+    return render json: { message: "Service not found" }, status: :not_found unless ir_config.present?
   end
 
   def service_url
@@ -54,7 +54,7 @@ class ImmersiveReaderController < ApplicationController
 
   def authenticate
     response = CanvasHttp.post(service_url, headers, form_data: form)
-    if response && response.code == '200'
+    if response && response.code == "200"
       parsed = JSON.parse(response.body)
       render json: {
         token: parsed["access_token"],

@@ -18,11 +18,11 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 RSpec.describe CourseScoreStatistic, type: :model do
-  describe 'relationships' do
+  describe "relationships" do
     it { is_expected.to belong_to(:course).required }
   end
 
-  describe 'validations' do
+  describe "validations" do
     it { is_expected.to validate_presence_of(:course) }
     it { is_expected.to validate_presence_of(:average) }
     it { is_expected.to validate_presence_of(:score_count) }
@@ -31,7 +31,7 @@ RSpec.describe CourseScoreStatistic, type: :model do
     it { is_expected.to validate_numericality_of(:score_count) }
   end
 
-  describe '#grades_presenter_hash' do
+  describe "#grades_presenter_hash" do
     let(:course_score_statistic) { CourseScoreStatistic.new(course_id: 123, average: 12.23.to_d, score_count: 2) }
 
     it "returns the data in the grades presenter expected shape and keys" do

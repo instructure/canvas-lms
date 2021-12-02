@@ -240,7 +240,7 @@ describe('TextEntry', () => {
       expect(setModeSpy).not.toHaveBeenCalled()
     })
 
-    it('sets the content of the editor if the attempt has changed', async () => {
+    it('sets the content of the editor if the attempt and body draft has changed', async () => {
       const {rerender} = await doInitialRender()
 
       const newProps = await makeProps({
@@ -255,6 +255,23 @@ describe('TextEntry', () => {
       const setContentSpy = jest.spyOn(fakeEditor, 'setContent')
       rerender(<TextEntry {...newProps} />)
       expect(setContentSpy).toHaveBeenCalledWith('hello, again')
+    })
+
+    it('does not sets the content of the editor if the body draft has not changed', async () => {
+      const {rerender} = await doInitialRender()
+
+      const newProps = await makeProps({
+        submission: {
+          id: '1',
+          _id: '1',
+          attempt: 2,
+          state: 'unsubmitted',
+          submissionDraft: {body: 'hello'}
+        }
+      })
+      const setContentSpy = jest.spyOn(fakeEditor, 'setContent')
+      rerender(<TextEntry {...newProps} />)
+      expect(setContentSpy).not.toHaveBeenCalled()
     })
 
     it('does not set the content of the editor if the attempt has not changed', async () => {

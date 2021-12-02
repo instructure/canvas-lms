@@ -25,7 +25,7 @@ class ObserverPairingCode < ActiveRecord::Base
   scope :active, -> { where("workflow_state<>'deleted' AND expires_at > ?", Time.zone.now) }
 
   def destroy
-    self.workflow_state = 'deleted'
-    self.save!
+    self.workflow_state = "deleted"
+    save!
   end
 end

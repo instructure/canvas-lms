@@ -21,7 +21,7 @@ class FkForFfUserId < ActiveRecord::Migration[6.0]
   tag :postdeploy
 
   def change
-    add_foreign_key :auditor_feature_flag_records, :users, :delay_validation => true, if_not_exists: true
+    add_foreign_key :auditor_feature_flag_records, :users, delay_validation: true, if_not_exists: true
     add_index :auditor_feature_flag_records, :user_id, algorithm: :concurrently, if_not_exists: true
   end
 end

@@ -18,12 +18,13 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../../lti_1_3_spec_helper'
+require_relative "../../lti_1_3_spec_helper"
 
 RSpec.describe Lti::ToolConfigurationsApiController, type: :controller do
-  include_context 'lti_1_3_spec_helper'
-
   subject { response }
+
+  include_context "lti_1_3_spec_helper"
+
   let_once(:sub_account) { account_model(root_account: account) }
   let_once(:admin) { account_admin_user(account: account) }
   let_once(:student) do
@@ -31,7 +32,7 @@ RSpec.describe Lti::ToolConfigurationsApiController, type: :controller do
     @student
   end
   let(:config_from_response) do
-    Lti::ToolConfiguration.find(json_parse.dig('tool_configuration', 'id'))
+    Lti::ToolConfiguration.find(json_parse.dig("tool_configuration", "id"))
   end
   let_once(:account) { Account.default }
   let(:dev_key_params) do
@@ -40,15 +41,15 @@ RSpec.describe Lti::ToolConfigurationsApiController, type: :controller do
       email: "test@test.com",
       notes: "Some cool notes",
       test_cluster_only: true,
-      scopes: ['https://purl.imsglobal.org/spec/lti-ags/scope/lineitem'],
+      scopes: ["https://purl.imsglobal.org/spec/lti-ags/scope/lineitem"],
       require_scopes: true,
       redirect_uris: "http://www.test.com\r\nhttp://www.anothertest.com",
       public_jwk_url: "https://www.test.com"
     }
   end
-  let(:new_url) { 'https://www.new-url.com/test' }
+  let(:new_url) { "https://www.new-url.com/test" }
   let(:dev_key_id) { developer_key.id }
-  let(:privacy_level) { 'public' }
+  let(:privacy_level) { "public" }
   let(:params) do
     {
       developer_key: dev_key_params,
@@ -61,24 +62,24 @@ RSpec.describe Lti::ToolConfigurationsApiController, type: :controller do
     }.compact
   end
 
-  before {
+  before do
     user_session(admin)
-    settings['extensions'][0]['privacy_level'] = privacy_level
-  }
+    settings["extensions"][0]["privacy_level"] = privacy_level
+  end
 
-  shared_examples_for 'an action that requires manage developer keys' do |skip_404|
-    context 'when the user has manage_developer_keys' do
+  shared_examples_for "an action that requires manage developer keys" do |skip_404|
+    context "when the user has manage_developer_keys" do
       it { is_expected.to be_successful }
     end
 
-    context 'when the user is not an admin' do
+    context "when the user is not an admin" do
       before { user_session(student) }
 
       it { is_expected.to be_unauthorized }
     end
 
     unless skip_404
-      context 'when the developer key does not exist' do
+      context "when the developer key does not exist" do
         before { developer_key.destroy! }
 
         it { is_expected.to be_not_found }
@@ -86,22 +87,22 @@ RSpec.describe Lti::ToolConfigurationsApiController, type: :controller do
     end
   end
 
-  shared_examples_for 'an endpoint that requires an existing tool configuration' do
-    context 'when the tool configuration does not exist' do
+  shared_examples_for "an endpoint that requires an existing tool configuration" do
+    context "when the tool configuration does not exist" do
       it { is_expected.to be_not_found }
     end
   end
 
-  shared_examples_for 'an endpoint that accepts a settings_url' do
+  shared_examples_for "an endpoint that accepts a settings_url" do
     let(:ok_response) do
       double(
-        body: settings.to_json,
-        is_a?: true,
-        '[]' => 'application/json'
+        :body => settings.to_json,
+        :is_a? => true,
+        "[]" => "application/json"
       )
     end
-    let(:url) { 'https://www.mytool.com/config/json' }
-    let(:privacy_level) { 'public' }
+    let(:url) { "https://www.mytool.com/config/json" }
+    let(:privacy_level) { "public" }
     let(:params) do
       {
         developer_key: dev_key_params,
@@ -109,22 +110,22 @@ RSpec.describe Lti::ToolConfigurationsApiController, type: :controller do
         developer_key_id: developer_key.id,
         tool_configuration: {
           settings_url: url,
-          disabled_placements: ['course_navigation', 'account_navigation'],
+          disabled_placements: ["course_navigation", "account_navigation"],
           custom_fields: "foo=bar\r\nkey=value",
           privacy_level: privacy_level
         }
       }
     end
-    let(:make_request) { raise 'Override in spec' }
+    let(:make_request) { raise "Override in spec" }
 
-    context 'when the request does not time out' do
+    context "when the request does not time out" do
       before do
         allow(CanvasHttp).to receive(:get).and_return(ok_response)
       end
 
-      it 'uses the tool configuration JSON from the settings_url' do
+      it "uses the tool configuration JSON from the settings_url" do
         subject
-        expect(config_from_response.settings['target_link_uri']).to eq settings['target_link_uri']
+        expect(config_from_response.settings["target_link_uri"]).to eq settings["target_link_uri"]
       end
 
       it 'sets the "disabled_placements"' do
@@ -137,27 +138,27 @@ RSpec.describe Lti::ToolConfigurationsApiController, type: :controller do
       it 'sets the "custom_fields"' do
         subject
         expect(config_from_response.settings["custom_fields"]).to eq(
-          'foo' => 'bar',
-          'key' => 'value',
-          'has_expansion' => '$Canvas.user.id',
-          'no_expansion' => 'foo'
+          "foo" => "bar",
+          "key" => "value",
+          "has_expansion" => "$Canvas.user.id",
+          "no_expansion" => "foo"
         )
       end
 
-      context 'and `redirect_uris` is not sent at developer key parameter' do
-        it 'set `target_link_uri` to developer_key.redirect_uris' do
+      context "and `redirect_uris` is not sent at developer key parameter" do
+        it "set `target_link_uri` to developer_key.redirect_uris" do
           dev_key_params.delete(:redirect_uris)
 
           subject
 
-          expect(config_from_response.developer_key.redirect_uris).to eq [settings['target_link_uri']]
+          expect(config_from_response.developer_key.redirect_uris).to eq [settings["target_link_uri"]]
         end
       end
 
-      context 'and `redirect_uris` is sent at developer key parameter' do
+      context "and `redirect_uris` is sent at developer key parameter" do
         let(:redirect_uris) { dev_key_params[:redirect_uris].split(/[\r\n]+/) }
 
-        it 'set redirect_uris parameter to developer_key.redirect_uris' do
+        it "set redirect_uris parameter to developer_key.redirect_uris" do
           subject
 
           expect(config_from_response.developer_key.redirect_uris).to eq redirect_uris
@@ -165,63 +166,63 @@ RSpec.describe Lti::ToolConfigurationsApiController, type: :controller do
       end
     end
 
-    context 'when the request times out' do
+    context "when the request times out" do
       before do
         allow(CanvasHttp).to receive(:get).and_raise(Timeout::Error)
       end
 
       it { is_expected.to have_http_status :unprocessable_entity }
 
-      it 'responds with helpful error message' do
+      it "responds with helpful error message" do
         subject
-        expect(json_parse['errors'].first['message']).to eq 'Could not retrieve settings, the server response timed out.'
+        expect(json_parse["errors"].first["message"]).to eq "Could not retrieve settings, the server response timed out."
       end
     end
 
-    context 'when the response is not a success' do
-      subject { json_parse['errors'].first['message'] }
+    context "when the response is not a success" do
+      subject { json_parse["errors"].first["message"] }
 
-      let(:stubbed_response) { double() }
+      let(:stubbed_response) { double }
 
       before do
         allow(stubbed_response).to receive(:is_a?).with(Net::HTTPSuccess).and_return false
-        allow(stubbed_response).to receive('[]').and_return('application/json')
+        allow(stubbed_response).to receive("[]").and_return("application/json")
         allow(CanvasHttp).to receive(:get).and_return(stubbed_response)
       end
 
       context 'when the response is "not found"' do
         before do
-          allow(stubbed_response).to receive(:message).and_return('Not found')
-          allow(stubbed_response).to receive(:code).and_return('404')
+          allow(stubbed_response).to receive(:message).and_return("Not found")
+          allow(stubbed_response).to receive(:code).and_return("404")
           make_request
         end
 
-        it { is_expected.to eq 'Not found' }
+        it { is_expected.to eq "Not found" }
       end
 
       context 'when the response is "unauthorized"' do
         before do
-          allow(stubbed_response).to receive(:message).and_return('Unauthorized')
-          allow(stubbed_response).to receive(:code).and_return('401')
+          allow(stubbed_response).to receive(:message).and_return("Unauthorized")
+          allow(stubbed_response).to receive(:code).and_return("401")
           make_request
         end
 
-        it { is_expected.to eq 'Unauthorized' }
+        it { is_expected.to eq "Unauthorized" }
       end
 
       context 'when the response is "internal server error"' do
         before do
-          allow(stubbed_response).to receive(:message).and_return('Internal server error')
-          allow(stubbed_response).to receive(:code).and_return('500')
+          allow(stubbed_response).to receive(:message).and_return("Internal server error")
+          allow(stubbed_response).to receive(:code).and_return("500")
           make_request
         end
 
-        it { is_expected.to eq 'Internal server error' }
+        it { is_expected.to eq "Internal server error" }
       end
 
-      context 'when the response is not JSON' do
+      context "when the response is not JSON" do
         before do
-          allow(stubbed_response).to receive('[]').and_return('text/html')
+          allow(stubbed_response).to receive("[]").and_return("text/html")
           allow(stubbed_response).to receive(:is_a?).with(Net::HTTPSuccess).and_return true
           make_request
         end
@@ -231,59 +232,66 @@ RSpec.describe Lti::ToolConfigurationsApiController, type: :controller do
     end
   end
 
-  shared_examples_for 'an endpoint that accepts developer key parameters' do
+  shared_examples_for "an endpoint that accepts developer key parameters" do
     subject do
       make_request
-      DeveloperKey.find(json_parse.dig('developer_key', 'id'))
+      DeveloperKey.find(json_parse.dig("developer_key", "id"))
     end
 
-    let(:make_request) { raise 'set in example' }
-    let(:bad_scope_request) { raise 'set in example' }
+    let(:make_request) { raise "set in example" }
+    let(:bad_scope_request) { raise "set in example" }
 
-    it 'sets the developer key name' do
+    it "sets the developer key name" do
       expect(subject.name).to eq dev_key_params[:name]
     end
 
-    it 'sets the developer key email' do
+    it "sets the developer key email" do
       expect(subject.email).to eq dev_key_params[:email]
     end
 
-    it 'sets the developer key notes' do
+    it "sets the developer key notes" do
       expect(subject.notes).to eq dev_key_params[:notes]
     end
 
-    it 'sets the developer key test_cluster_only' do
+    it "sets the developer key test_cluster_only" do
       expect(subject.test_cluster_only).to eq dev_key_params[:test_cluster_only]
     end
 
-    it 'sets the developer key scopes' do
+    it "sets the developer key scopes" do
       expect(subject.scopes).to eq dev_key_params[:scopes]
     end
 
-    it 'sets the developer key require_scopes' do
+    it "sets the developer key require_scopes" do
       expect(subject.require_scopes).to eq dev_key_params[:require_scopes]
     end
 
-    it 'sets the developer key redirect_uris' do
+    it "sets the developer key redirect_uris" do
       expect(subject.redirect_uris).to eq dev_key_params[:redirect_uris].split
     end
 
-    it 'sets the developer key oidc_initiation_url' do
+    it "sets the developer key oidc_initiation_url" do
       expect(subject.oidc_initiation_url).to eq oidc_initiation_url
     end
 
-    context 'when scopes are invalid' do
+    context "when scopes are invalid" do
       subject do
         bad_scope_request
-        json_parse['errors'].first['message']
+        json_parse["errors"].first["message"]
       end
 
-      it { is_expected.to eq 'cannot contain invalid scope' }
+      it { is_expected.to eq "cannot contain invalid scope" }
     end
   end
 
-  shared_examples_for 'an endpoint that validates public_jwk and public_jwk_url' do
-    let(:make_request) { raise 'set in examples' }
+  shared_examples_for "an endpoint that validates public_jwk and public_jwk_url" do
+    subject do
+      make_request
+      return nil if json_parse["errors"].blank?
+
+      json_parse["errors"].first["message"]
+    end
+
+    let(:make_request) { raise "set in examples" }
     let(:tool_config_public_jwk) do
       {
         "kty" => "RSA",
@@ -296,45 +304,38 @@ RSpec.describe Lti::ToolConfigurationsApiController, type: :controller do
     end
     let(:settings) do
       s = super()
-      s['public_jwk_url'] = "https://test.com"
+      s["public_jwk_url"] = "https://test.com"
       s
     end
 
-    subject do
-      make_request
-      return nil if json_parse['errors'].blank?
-
-      json_parse['errors'].first['message']
-    end
-
-    context 'when the public jwk is missing' do
+    context "when the public jwk is missing" do
       let(:public_jwk) { nil }
 
       it { is_expected.to be_nil }
     end
 
-    context 'when the public jwk url is missing' do
+    context "when the public jwk url is missing" do
       let(:settings) do
         s = super()
-        s.delete('public_jwk_url')
+        s.delete("public_jwk_url")
         s
       end
 
       it { is_expected.to be_nil }
     end
 
-    context 'when both the public jwk and public jwk url are missing' do
+    context "when both the public jwk and public jwk url are missing" do
       let(:public_jwk) { nil }
       let(:settings) do
         s = super()
-        s.delete('public_jwk_url')
+        s.delete("public_jwk_url")
         s
       end
 
       it { is_expected.to be_present }
     end
 
-    context 'when the public jwk is missing keys' do
+    context "when the public jwk is missing keys" do
       let(:public_jwk) do
         {
           "e" => "AQAB",
@@ -346,7 +347,7 @@ RSpec.describe Lti::ToolConfigurationsApiController, type: :controller do
       it { is_expected.to be_present }
     end
 
-    context 'when the public jwk has an invalid alg' do
+    context "when the public jwk has an invalid alg" do
       let(:public_jwk) do
         {
           "kty" => "RSA",
@@ -361,7 +362,7 @@ RSpec.describe Lti::ToolConfigurationsApiController, type: :controller do
       it { is_expected.to be_present }
     end
 
-    context 'when the public jwk has an invalid kty' do
+    context "when the public jwk has an invalid kty" do
       let(:public_jwk) do
         {
           "kty" => "invalid",
@@ -377,48 +378,49 @@ RSpec.describe Lti::ToolConfigurationsApiController, type: :controller do
     end
   end
 
-  describe '#create' do
+  describe "#create" do
     subject { post :create, params: params }
+
     let(:dev_key_id) { nil }
 
-    it_behaves_like 'an action that requires manage developer keys', true
+    it_behaves_like "an action that requires manage developer keys", true
 
-    context 'when the tool configuration does not exist' do
+    context "when the tool configuration does not exist" do
       let(:dev_key_id) { developer_key.id }
 
       it { is_expected.to be_ok }
 
-      it 'creates a developer key on the correct account' do
+      it "creates a developer key on the correct account" do
         subject
-        key = DeveloperKey.find(json_parse.dig('tool_configuration', 'developer_key_id'))
+        key = DeveloperKey.find(json_parse.dig("tool_configuration", "developer_key_id"))
         expect(key.account).to eq sub_account
       end
     end
 
-    it_behaves_like 'an endpoint that accepts a settings_url' do
+    it_behaves_like "an endpoint that accepts a settings_url" do
       let(:make_request) { post :create, params: params }
     end
 
-    it_behaves_like 'an endpoint that validates public_jwk and public_jwk_url' do
+    it_behaves_like "an endpoint that validates public_jwk and public_jwk_url" do
       let(:make_request) { post :create, params: params }
     end
 
-    it_behaves_like 'an endpoint that accepts developer key parameters' do
-      let(:bad_scope_params) { { account_id: sub_account.id, developer_key: dev_key_params.merge(scopes: ['invalid scope']) } }
+    it_behaves_like "an endpoint that accepts developer key parameters" do
+      let(:bad_scope_params) { { account_id: sub_account.id, developer_key: dev_key_params.merge(scopes: ["invalid scope"]) } }
       let(:make_request) { post :create, params: params.merge({ developer_key: dev_key_params }) }
       let(:bad_scope_request) { post :create, params: params.merge(bad_scope_params) }
     end
 
-    context 'without a redirect_uri present' do
+    context "without a redirect_uri present" do
       let(:dev_key_params) { super().merge(redirect_uris: nil) }
 
-      it 'returns a 400' do
-        expect(post :create, params: params).to have_http_status :bad_request
+      it "returns a 400" do
+        expect(post(:create, params: params)).to have_http_status :bad_request
       end
     end
   end
 
-  describe '#update' do
+  describe "#update" do
     subject { put :update, params: params }
 
     let(:target_link_uri) { new_url }
@@ -430,20 +432,20 @@ RSpec.describe Lti::ToolConfigurationsApiController, type: :controller do
     context do
       it { is_expected.to be_ok }
 
-      it 'updates the tool configuration' do
+      it "updates the tool configuration" do
         subject
         new_settings = config_from_response.settings
-        expect(new_settings['target_link_uri']).to eq new_url
+        expect(new_settings["target_link_uri"]).to eq new_url
       end
 
-      it 'sets the privacy level' do
+      it "sets the privacy level" do
         subject
-        expect(config_from_response.privacy_level).to eq 'public'
+        expect(config_from_response.privacy_level).to eq "public"
       end
     end
 
-    context 'when there are associated tools' do
-      shared_examples_for 'an action that updates installed tools' do
+    context "when there are associated tools" do
+      shared_examples_for "an action that updates installed tools" do
         subject { installed_tool.reload.workflow_state }
 
         let(:installed_tool) do
@@ -451,8 +453,8 @@ RSpec.describe Lti::ToolConfigurationsApiController, type: :controller do
           t.save!
           t
         end
-        let(:context) { raise 'set in examples' }
-        let(:privacy_level) { 'anonymous' }
+        let(:context) { raise "set in examples" }
+        let(:privacy_level) { "anonymous" }
 
         before do
           installed_tool
@@ -463,49 +465,49 @@ RSpec.describe Lti::ToolConfigurationsApiController, type: :controller do
         it { is_expected.to eq privacy_level }
       end
 
-      context 'when tool in an account' do
-        it_behaves_like 'an action that updates installed tools' do
+      context "when tool in an account" do
+        it_behaves_like "an action that updates installed tools" do
           let(:context) { tool_configuration.developer_key.account }
         end
       end
 
-      context 'when tool is in a course' do
-        it_behaves_like 'an action that updates installed tools' do
+      context "when tool is in a course" do
+        it_behaves_like "an action that updates installed tools" do
           let(:context) { course_model }
         end
       end
     end
 
-    it_behaves_like 'an endpoint that validates public_jwk and public_jwk_url' do
+    it_behaves_like "an endpoint that validates public_jwk and public_jwk_url" do
       let(:make_request) { put :update, params: params }
     end
 
-    it_behaves_like 'an action that requires manage developer keys'
+    it_behaves_like "an action that requires manage developer keys"
 
-    it_behaves_like 'an endpoint that accepts developer key parameters' do
-      let(:bad_scope_params) { { developer_key: dev_key_params.merge(scopes: ['invalid scope']) } }
+    it_behaves_like "an endpoint that accepts developer key parameters" do
+      let(:bad_scope_params) { { developer_key: dev_key_params.merge(scopes: ["invalid scope"]) } }
       let(:make_request) { put :update, params: params.merge({ developer_key: dev_key_params }) }
       let(:bad_scope_request) { put :update, params: params.merge(bad_scope_params) }
     end
   end
 
-  describe '#show' do
+  describe "#show" do
     subject { get :show, params: params.except(:tool_configuration) }
 
     before do
       tool_configuration
       account.developer_key_account_bindings
              .find_by(developer_key: developer_key)
-             .update!(workflow_state: 'on')
+             .update!(workflow_state: "on")
     end
 
-    context 'when tool configuration does not exist' do
+    context "when tool configuration does not exist" do
       let(:tool_configuration) { nil }
 
-      it_behaves_like 'an endpoint that requires an existing tool configuration'
+      it_behaves_like "an endpoint that requires an existing tool configuration"
     end
 
-    context 'when the requested key is not enable in the context' do
+    context "when the requested key is not enable in the context" do
       let(:disabled_key) { DeveloperKey.create!(account: sub_account) }
       let(:dev_key_id) { disabled_key.id }
 
@@ -526,31 +528,31 @@ RSpec.describe Lti::ToolConfigurationsApiController, type: :controller do
       end
     end
 
-    context 'when the tool configuration exists and key is enabled' do
-      it 'renders the tool configuration' do
+    context "when the tool configuration exists and key is enabled" do
+      it "renders the tool configuration" do
         subject
         expect(config_from_response).to eq tool_configuration
       end
     end
   end
 
-  describe '#destroy' do
+  describe "#destroy" do
     subject { delete :destroy, params: params.except(:tool_configuration) }
 
     before do
       tool_configuration
     end
 
-    it_behaves_like 'an action that requires manage developer keys'
+    it_behaves_like "an action that requires manage developer keys"
 
     context do
       let(:tool_configuration) { nil }
 
-      it_behaves_like 'an endpoint that requires an existing tool configuration'
+      it_behaves_like "an endpoint that requires an existing tool configuration"
     end
 
-    context 'when the tool configuration exists' do
-      it 'destroys the tool configuration' do
+    context "when the tool configuration exists" do
+      it "destroys the tool configuration" do
         subject
         expect(Lti::ToolConfiguration.find_by(id: tool_configuration.id)).to be_nil
       end

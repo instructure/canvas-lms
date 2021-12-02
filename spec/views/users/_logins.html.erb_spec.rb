@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../views_helper'
+require_relative "../views_helper"
 
 describe "users/_logins.html.erb" do
   describe "sis_source_id edit box" do
@@ -30,7 +30,7 @@ describe "users/_logins.html.erb" do
       @pseudo.sis_user_id = "why_is_this_one_user_id_lame"
       @pseudo.integration_id = "and_this_one_even_lamer"
       @pseudo.save
-      @pseudo2 = @user.pseudonyms.create!(:unique_id => 'someone@somewhere.com') { |p| p.sis_user_id = 'more' }
+      @pseudo2 = @user.pseudonyms.create!(unique_id: "someone@somewhere.com") { |p| p.sis_user_id = "more" }
       assign(:context, @account)
       assign(:context_account, @account)
       assign(:account, @account)
@@ -55,21 +55,21 @@ describe "users/_logins.html.erb" do
       render
       expect(response).to have_tag("span#sis_user_id_#{@pseudo.id}", @pseudo.sis_user_id)
       expect(response).to have_tag("span#integration_id_#{@pseudo.id}", @pseudo.integration_id)
-      expect(response).to have_tag("div.can_edit_sis_user_id", 'true')
-      page = Nokogiri('<document>' + response.body + '</document>')
-      expect(page.css(".login .delete_pseudonym_link").first['style']).to eq ''
+      expect(response).to have_tag("div.can_edit_sis_user_id", "true")
+      page = Nokogiri("<document>" + response.body + "</document>")
+      expect(page.css(".login .delete_pseudonym_link").first["style"]).to eq ""
     end
 
     it "does not show to non-sis admin" do
-      admin = account_admin_user_with_role_changes(:role_changes => { 'manage_sis' => false }, :account => @account)
+      admin = account_admin_user_with_role_changes(role_changes: { "manage_sis" => false }, account: @account)
       view_context(@account, admin)
       assign(:current_user, admin)
       render
       expect(response).to have_tag("span#sis_user_id_#{@pseudo.id}", @pseudo.sis_user_id)
       expect(response).to have_tag("span#integration_id_#{@pseudo.id}", @pseudo.integration_id)
-      expect(response).to have_tag("div.can_edit_sis_user_id", 'false')
-      page = Nokogiri('<document>' + response.body + '</document>')
-      expect(page.css(".login .delete_pseudonym_link").first['style']).to eq 'display: none;'
+      expect(response).to have_tag("div.can_edit_sis_user_id", "false")
+      page = Nokogiri("<document>" + response.body + "</document>")
+      expect(page.css(".login .delete_pseudonym_link").first["style"]).to eq "display: none;"
     end
   end
 
@@ -102,7 +102,7 @@ describe "users/_logins.html.erb" do
 
     it "displays when user has permission to reset MFA" do
       pseudonym(bob, account: account)
-      bob.otp_secret_key = 'secret'
+      bob.otp_secret_key = "secret"
 
       assign(:domain_root_account, account)
       assign(:current_user, sally)
@@ -113,7 +113,7 @@ describe "users/_logins.html.erb" do
 
     it "does not display when user lacks permission to reset MFA" do
       pseudonym(sally, account: account)
-      sally.otp_secret_key = 'secret'
+      sally.otp_secret_key = "secret"
 
       assign(:domain_root_account, account)
       assign(:current_user, bob)
@@ -130,7 +130,7 @@ describe "users/_logins.html.erb" do
 
     it "displays when user can only reset MFA" do
       pseudonym(bob, account: account)
-      bob.otp_secret_key = 'secret'
+      bob.otp_secret_key = "secret"
 
       assign(:domain_root_account, account)
       assign(:current_user, bob)
@@ -141,7 +141,7 @@ describe "users/_logins.html.erb" do
 
     it "displays when user can only add pseudonym" do
       pseudonym(sally, account: account)
-      sally.otp_secret_key = 'secret'
+      sally.otp_secret_key = "secret"
       account.settings[:mfa_settings] = :required
       account.save!
 
@@ -154,7 +154,7 @@ describe "users/_logins.html.erb" do
 
     it "does not display when user lacks permission to do either" do
       pseudonym(bob, account: account)
-      bob.otp_secret_key = 'secret'
+      bob.otp_secret_key = "secret"
       account.settings[:mfa_settings] = :required
       account.save!
 
@@ -180,7 +180,7 @@ describe "users/_logins.html.erb" do
       render
 
       doc = Nokogiri::HTML5(response)
-      expect(doc.at_css('.screenreader-only')).to be_nil
+      expect(doc.at_css(".screenreader-only")).to be_nil
     end
   end
 end

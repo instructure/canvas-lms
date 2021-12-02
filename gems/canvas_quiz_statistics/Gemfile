@@ -1,13 +1,13 @@
 # frozen_string_literal: true
 
-source 'https://rubygems.org'
+source "https://rubygems.org"
 
 gemspec
 
-gem 'simplecov', '0.14.1', :require => false
-gem 'canvas_text_helper', :path => '../canvas_text_helper'
-gem 'html_text_helper', :path => '../html_text_helper'
+gem "canvas_text_helper", path: "../canvas_text_helper"
+gem "html_text_helper", path: "../html_text_helper"
+gem "simplecov", "0.14.1", require: false
 
 platforms :ruby_20, :ruby_21, :ruby_22 do
-  gem 'iconv', '1.0.4'
+  gem "iconv", "1.0.4"
 end

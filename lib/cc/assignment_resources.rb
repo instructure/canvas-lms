@@ -26,22 +26,22 @@ module CC
         next unless export_object?(assignment)
         next if @user && assignment.locked_for?(@user, check_policies: true)
 
-        title = assignment.title || I18n.t('course_exports.unknown_titles.assignment', "Unknown assignment")
+        title = assignment.title || I18n.t("course_exports.unknown_titles.assignment", "Unknown assignment")
 
-        if !assignment.can_copy?(@user)
-          add_error(I18n.t('course_exports.errors.assignment_is_locked', "The assignment \"%{title}\" could not be copied because it is locked.", :title => title))
+        unless assignment.can_copy?(@user)
+          add_error(I18n.t("course_exports.errors.assignment_is_locked", "The assignment \"%{title}\" could not be copied because it is locked.", title: title))
           next
         end
 
         begin
           add_assignment(assignment)
         rescue
-          add_error(I18n.t('course_exports.errors.assignment', "The assignment \"%{title}\" failed to export", :title => title), $!)
+          add_error(I18n.t("course_exports.errors.assignment", "The assignment \"%{title}\" failed to export", title: title), $!)
         end
       end
     end
 
-    VERSION_1_3 = Gem::Version.new('1.3')
+    VERSION_1_3 = Gem::Version.new("1.3")
 
     def add_assignment(assignment)
       add_exported_asset(assignment)
@@ -52,7 +52,7 @@ module CC
       migration_id = create_key(assignment)
 
       lo_folder = File.join(@export_dir, migration_id)
-      FileUtils::mkdir_p lo_folder
+      FileUtils.mkdir_p lo_folder
 
       file_name = "#{assignment.title.to_url}.html"
       path = File.join(lo_folder, file_name)
@@ -61,8 +61,8 @@ module CC
       # Write the assignment description as an .html file
       # That way at least the content of the assignment will appear
       # for agents that support neither CC 1.3 nor Canvas assignments
-      File.open(path, 'w') do |file|
-        file << @html_exporter.html_page(assignment.description || '', "Assignment: " + assignment.title)
+      File.open(path, "w") do |file|
+        file << @html_exporter.html_page(assignment.description || "", "Assignment: " + assignment.title)
       end
 
       if Gem::Version.new(@manifest.cc_version) >= VERSION_1_3
@@ -73,8 +73,8 @@ module CC
     end
 
     def add_cc_assignment(assignment, migration_id, lo_folder, html_path)
-      File.open(File.join(lo_folder, CCHelper::ASSIGNMENT_XML), 'w') do |assignment_file|
-        document = Builder::XmlMarkup.new(:target => assignment_file, :indent => 2)
+      File.open(File.join(lo_folder, CCHelper::ASSIGNMENT_XML), "w") do |assignment_file|
+        document = Builder::XmlMarkup.new(target: assignment_file, indent: 2)
         document.instruct!
 
         document.assignment("identifier" => migration_id,
@@ -86,25 +86,25 @@ module CC
       end
 
       xml_path = File.join(migration_id, CCHelper::ASSIGNMENT_XML)
-      @resources.resource(:identifier => migration_id,
-                          :type => CCHelper::ASSIGNMENT_TYPE,
-                          :href => xml_path) do |res|
-        res.file(:href => xml_path)
+      @resources.resource(identifier: migration_id,
+                          type: CCHelper::ASSIGNMENT_TYPE,
+                          href: xml_path) do |res|
+        res.file(href: xml_path)
       end
 
-      @resources.resource(:identifier => migration_id + "_fallback",
-                          :type => CCHelper::WEBCONTENT) do |res|
-        res.tag!('cpx:variant', :identifier => migration_id + "_variant",
-                                :identifierref => migration_id) do |var|
-          var.tag!('cpx:metadata')
+      @resources.resource(identifier: migration_id + "_fallback",
+                          type: CCHelper::WEBCONTENT) do |res|
+        res.tag!("cpx:variant", identifier: migration_id + "_variant",
+                                identifierref: migration_id) do |var|
+          var.tag!("cpx:metadata")
         end
-        res.file(:href => html_path)
+        res.file(href: html_path)
       end
     end
 
     def add_canvas_assignment(assignment, migration_id, lo_folder, html_path)
-      assignment_file = File.new(File.join(lo_folder, CCHelper::ASSIGNMENT_SETTINGS), 'w')
-      document = Builder::XmlMarkup.new(:target => assignment_file, :indent => 2)
+      assignment_file = File.new(File.join(lo_folder, CCHelper::ASSIGNMENT_SETTINGS), "w")
+      document = Builder::XmlMarkup.new(target: assignment_file, indent: 2)
       document.instruct!
 
       # Save all the meta-data into a canvas-specific xml schema
@@ -121,8 +121,8 @@ module CC
         "type" => CCHelper::LOR,
         :href => html_path
       ) do |res|
-        res.file(:href => html_path)
-        res.file(:href => File.join(migration_id, CCHelper::ASSIGNMENT_SETTINGS))
+        res.file(href: html_path)
+        res.file(href: File.join(migration_id, CCHelper::ASSIGNMENT_SETTINGS))
       end
     end
 
@@ -134,16 +134,16 @@ module CC
 
     def self.create_cc_assignment(node, assignment, migration_id, html_exporter, manifest = nil)
       node.title(assignment.title)
-      node.text(html_exporter.html_content(assignment.description), texttype: 'text/html')
+      node.text(html_exporter.html_content(assignment.description), texttype: "text/html")
       if assignment.points_possible
         node.gradable(assignment.graded?, points_possible: assignment.points_possible)
       else
         node.gradable(assignment.graded?)
       end
       node.submission_formats do |fmt|
-        assignment.submission_types.split(',').each do |st|
+        assignment.submission_types.split(",").each do |st|
           if (cc_type = SUBMISSION_TYPE_MAP[st])
-            fmt.format(:type => cc_type)
+            fmt.format(type: cc_type)
           end
         end
       end
@@ -186,14 +186,14 @@ module CC
     def self.create_canvas_assignment(node, assignment, manifest = nil)
       key_generator = manifest || CCHelper
       node.title assignment.title
-      node.due_at CCHelper::ims_datetime(assignment.due_at, nil)
-      node.lock_at CCHelper::ims_datetime(assignment.lock_at, nil)
-      node.unlock_at CCHelper::ims_datetime(assignment.unlock_at, nil)
+      node.due_at CCHelper.ims_datetime(assignment.due_at, nil)
+      node.lock_at CCHelper.ims_datetime(assignment.lock_at, nil)
+      node.unlock_at CCHelper.ims_datetime(assignment.unlock_at, nil)
       if manifest && manifest.try(:user).present?
         node.module_locked assignment.locked_by_module_item?(manifest.user, deep_check_if_needed: true).present?
       end
-      node.all_day_date CCHelper::ims_date(assignment.all_day_date) if assignment.all_day_date
-      node.peer_reviews_due_at CCHelper::ims_datetime(assignment.peer_reviews_due_at) if assignment.peer_reviews_due_at
+      node.all_day_date CCHelper.ims_date(assignment.all_day_date) if assignment.all_day_date
+      node.peer_reviews_due_at CCHelper.ims_datetime(assignment.peer_reviews_due_at) if assignment.peer_reviews_due_at
       node.assignment_group_identifierref key_generator.create_key(assignment.assignment_group) if assignment.assignment_group && (!manifest || manifest.export_object?(assignment.assignment_group))
       if assignment.grading_standard
         if assignment.grading_standard.context == assignment.context
@@ -217,7 +217,7 @@ module CC
           node.saved_rubric_comments do |sc_node|
             assoc.summary_data[:saved_comments].each_pair do |key, vals|
               vals.each do |val|
-                sc_node.comment(:criterion_id => key) { |a| a << val }
+                sc_node.comment(criterion_id: key) { |a| a << val }
               end
             end
           end
@@ -225,7 +225,7 @@ module CC
       end
       node.assignment_overrides do |ao_node|
         # Quizzes export their own overrides
-        assignment.assignment_overrides.active.where(set_type: 'Noop', quiz_id: nil).each do |o|
+        assignment.assignment_overrides.active.where(set_type: "Noop", quiz_id: nil).each do |o|
           override_attrs = o.slice(:set_type, :set_id, :title)
           AssignmentOverride.overridden_dates.each do |field|
             next unless o.send("#{field}_overridden")
@@ -236,20 +236,20 @@ module CC
         end
       end
       node.quiz_identifierref key_generator.create_key(assignment.quiz) if assignment.quiz
-      node.allowed_extensions assignment.allowed_extensions&.join(',')
+      node.allowed_extensions assignment.allowed_extensions&.join(",")
       node.has_group_category assignment.has_group_category?
       node.group_category assignment.group_category.try :name if assignment.group_category
-      atts = [:points_possible, :grading_type,
-              :all_day, :submission_types, :position, :turnitin_enabled, :vericite_enabled, :peer_review_count,
-              :peer_reviews, :automatic_peer_reviews,
-              :anonymous_peer_reviews, :grade_group_students_individually, :freeze_on_copy,
-              :omit_from_final_grade, :intra_group_peer_reviews, :only_visible_to_overrides, :post_to_sis,
-              :moderated_grading, :grader_count, :grader_comments_visible_to_graders,
-              :anonymous_grading, :graders_anonymous_to_graders, :grader_names_visible_to_final_grader,
-              :anonymous_instructor_annotations,
-              :allowed_attempts]
+      atts = %i[points_possible grading_type
+                all_day submission_types position turnitin_enabled vericite_enabled peer_review_count
+                peer_reviews automatic_peer_reviews
+                anonymous_peer_reviews grade_group_students_individually freeze_on_copy
+                omit_from_final_grade intra_group_peer_reviews only_visible_to_overrides post_to_sis
+                moderated_grading grader_count grader_comments_visible_to_graders
+                anonymous_grading graders_anonymous_to_graders grader_names_visible_to_final_grader
+                anonymous_instructor_annotations
+                allowed_attempts]
       atts.each do |att|
-        node.tag!(att, assignment.send(att)) if assignment.send(att) == false || !assignment.send(att).blank?
+        node.tag!(att, assignment.send(att)) if assignment.send(att) == false || assignment.send(att).present?
       end
       if assignment.external_tool_tag
         if (content = assignment.external_tool_tag.content) && content.is_a?(ContextExternalTool)

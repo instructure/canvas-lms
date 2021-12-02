@@ -20,7 +20,7 @@
 
 module Canvas::MessageHelper
   def self.default_message_path(filename)
-    File.join(Rails.root.to_s, 'app', 'messages', filename)
+    Rails.root.join("app/messages", filename).to_s
   end
 
   def self.add_message_path(path)
@@ -32,13 +32,11 @@ module Canvas::MessageHelper
 
   def self.find_message_path(filename)
     path = nil
-    if @message_paths
-      @message_paths.each do |mp|
-        test_path = File.join(mp, filename)
-        if File.exist?(test_path)
-          path = test_path
-          break
-        end
+    @message_paths&.each do |mp|
+      test_path = File.join(mp, filename)
+      if File.exist?(test_path)
+        path = test_path
+        break
       end
     end
     path || default_message_path(filename)
@@ -69,20 +67,20 @@ module Canvas::MessageHelper
   # * sms - ignored
   def self.create_notification(*args)
     values = args.extract_options!
-    using = { :delay_for => 0 }.with_indifferent_access.merge(values)
+    using = { delay_for: 0 }.with_indifferent_access.merge(values)
     using[:category] ||= args[1] # type
     using[:delay_for] ||= args[2] # delay
     # 'txt' is the legacy message body. Pull name from first line.
     if args[4].present?
       # txt
-      split_txt = args[4].strip.split("\n").map { |line| line.strip }
+      split_txt = args[4].strip.split("\n").map(&:strip)
       using[:name] ||= split_txt[0]
     end
-    raise 'Name is required' unless using[:name]
+    raise "Name is required" unless using[:name]
 
     n = Notification.where(name: using[:name]).first_or_initialize
     begin
-      n.update(:delay_for => using[:delay_for], :category => using[:category])
+      n.update(delay_for: using[:delay_for], category: using[:category])
     rescue => e
       if n.new_record?
         raise "New notification '#{using[:name]}' creation failed. Message: #{e.message}"

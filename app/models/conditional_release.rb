@@ -19,6 +19,6 @@
 
 module ConditionalRelease
   def self.table_name_prefix
-    'conditional_release_'
+    "conditional_release_"
   end
 end

@@ -47,10 +47,10 @@ module CanvasPartman
           break if id_dates.empty?
 
           id_dates.group_by { |_id, date| generate_name_for_partition(date) }.each do |partition_table, part_id_dates|
-            base_class.connection.execute(<<-SQL)
+            base_class.connection.execute(<<~SQL.squish)
               WITH x AS (
                 DELETE FROM ONLY #{base_class.quoted_table_name}
-                WHERE id IN (#{part_id_dates.map(&:first).join(', ')})
+                WHERE id IN (#{part_id_dates.map(&:first).join(", ")})
                 RETURNING *
               ) INSERT INTO #{base_class.connection.quote_table_name(partition_table)} SELECT * FROM x
             SQL
@@ -119,7 +119,7 @@ module CanvasPartman
       def generate_check_constraint(date)
         constraint_range = generate_date_constraint_range(date).map { |d| d.to_s(:db) }
 
-        <<~SQL
+        <<~SQL.squish
           #{base_class.partitioning_field} >= TIMESTAMP '#{constraint_range[0]}'
           AND
           #{base_class.partitioning_field} < TIMESTAMP '#{constraint_range[1]}'
@@ -133,7 +133,7 @@ module CanvasPartman
         if base_class.partitioning_interval == :weeks
           Time.utc(match[:year]).beginning_of_week + (match[:week].to_i - 1).weeks
         else
-          Time.utc(*match[1..-1])
+          Time.utc(*match[1..])
         end
       end
 
@@ -141,12 +141,12 @@ module CanvasPartman
         case base_class.partitioning_interval
         when :weeks
           [
-            0.week.from_now(date).beginning_of_week,
+            0.weeks.from_now(date).beginning_of_week,
             1.week.from_now(date).beginning_of_week
           ]
         when :months
           [
-            0.month.from_now(date).beginning_of_month,
+            0.months.from_now(date).beginning_of_month,
             1.month.from_now(date).beginning_of_month
           ]
         when :years

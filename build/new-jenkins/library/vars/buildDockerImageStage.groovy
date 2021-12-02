@@ -119,6 +119,7 @@ def lintersImage() {
 def premergeCacheImage() {
   credentials.withStarlordCredentials {
     withEnv([
+      "BASE_RUNNER_PREFIX=${env.BASE_RUNNER_PREFIX}",
       "CACHE_LOAD_SCOPE=${env.IMAGE_CACHE_MERGE_SCOPE}",
       "CACHE_LOAD_FALLBACK_SCOPE=${env.IMAGE_CACHE_BUILD_SCOPE}",
       "CACHE_SAVE_SCOPE=${env.IMAGE_CACHE_MERGE_SCOPE}",
@@ -144,6 +145,7 @@ def premergeCacheImage() {
         ./build/new-jenkins/docker-with-flakey-network-protection.sh push $WEBPACK_BUILDER_PREFIX || true
         ./build/new-jenkins/docker-with-flakey-network-protection.sh push $YARN_RUNNER_PREFIX || true
         ./build/new-jenkins/docker-with-flakey-network-protection.sh push $RUBY_RUNNER_PREFIX || true
+        ./build/new-jenkins/docker-with-flakey-network-protection.sh push $BASE_RUNNER_PREFIX || true
         ./build/new-jenkins/docker-with-flakey-network-protection.sh push $WEBPACK_CACHE_PREFIX
       """, label: 'upload cache images')
     }
@@ -156,6 +158,7 @@ def patchsetImage() {
 
     slackSendCacheBuild {
       withEnv([
+        "BASE_RUNNER_PREFIX=${env.BASE_RUNNER_PREFIX}",
         "CACHE_LOAD_SCOPE=${env.IMAGE_CACHE_MERGE_SCOPE}",
         "CACHE_LOAD_FALLBACK_SCOPE=${env.IMAGE_CACHE_BUILD_SCOPE}",
         "CACHE_SAVE_SCOPE=${cacheScope}",
@@ -189,7 +192,46 @@ def patchsetImage() {
       ./build/new-jenkins/docker-with-flakey-network-protection.sh push $WEBPACK_BUILDER_PREFIX || true
       ./build/new-jenkins/docker-with-flakey-network-protection.sh push $YARN_RUNNER_PREFIX || true
       ./build/new-jenkins/docker-with-flakey-network-protection.sh push $RUBY_RUNNER_PREFIX || true
+      ./build/new-jenkins/docker-with-flakey-network-protection.sh push $BASE_RUNNER_PREFIX || true
       ./build/new-jenkins/docker-with-flakey-network-protection.sh push $WEBPACK_CACHE_PREFIX
     """, label: 'upload cache images')
   }
+}
+
+def i18nGenerate() {
+  def dest = 's3://instructure-translations/sources/canvas-lms/en/en.yml'
+  def roleARN = 'arn:aws:iam::307761260553:role/translations-jenkins'
+
+  sh(
+    label: 'generate the source translations file (en.yml)',
+    script: """
+      docker run --name=transifreq \
+        -e RAILS_LOAD_ALL_LOCALES=1 \
+        -e COMPILE_ASSETS_CSS=0 \
+        -e COMPILE_ASSETS_STYLEGUIDE=0 \
+        -e COMPILE_ASSETS_BUILD_JS=0 \
+        $PATCHSET_TAG \
+          bundle exec rake canvas:compile_assets i18n:generate
+    """
+  )
+
+  sh(
+    label: 'stage the source translations file for uploading to s3',
+    script: ' \
+      docker cp \
+        transifreq:/usr/src/app/config/locales/generated/en.yml \
+        transifreq-en.yml \
+    '
+  )
+
+  sh(
+    label: 'upload the source translations file to s3',
+    script: """
+      aws configure set profile.transifreq.credential_source Ec2InstanceMetadata &&
+      aws configure set profile.transifreq.role_arn $roleARN &&
+      aws s3 cp --profile transifreq --acl bucket-owner-full-control \
+        ./transifreq-en.yml \
+        $dest
+    """
+  )
 }

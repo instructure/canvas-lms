@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 module ForceFailure
-  if ENV['FORCE_FAILURE'] == '1'
+  if ENV["FORCE_FAILURE"] == "1"
     describe "Forced Failure for CI" do
       it { expect(false).to be true } # rubocop:disable RSpec/ExpectActual
     end

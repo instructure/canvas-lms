@@ -18,6 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require "active_support/core_ext/enumerable"
+
 module AdheresToPolicy
   module InstanceMethods
     # Public: Gets the requested rights granted to a user.
@@ -68,9 +70,8 @@ module AdheresToPolicy
       session, sought_rights = parse_args(args)
       sought_rights ||= []
       sought_rights = self.class.policy.available_rights if sought_rights.empty?
-      sought_rights.inject({}) do |h, r|
-        h[r] = check_right?(user, session, r)
-        h
+      sought_rights.index_with do |r|
+        check_right?(user, session, r)
       end
     end
 
@@ -196,13 +197,13 @@ module AdheresToPolicy
     # of the sought rights.
     def parse_args(args)
       session = nil
-      if !args[0].is_a? Symbol
+      unless args[0].is_a? Symbol
         session = args.shift
       end
       args.compact!
       args.uniq!
 
-      return session, args
+      [session, args]
     end
 
     # Internal: Checks the right for a user based on session.
@@ -263,16 +264,15 @@ module AdheresToPolicy
             condition.rights.each do |condition_right|
               # Skip the condition_right if its the one we are looking for.
               # The Rails.cache.fetch will take care of caching it for us.
-              if condition_right != sought_right
+              next unless condition_right != sought_right
 
-                Thread.current[:last_cache_generate] = elapsed_time # so we can record it in the logs
-                # Cache the condition_right since we already know they have access.
-                Cache.write(
-                  permission_cache_key_for(user, session, condition_right),
-                  true,
-                  use_rails_cache: config.cache_permissions && config.cache_related_permissions
-                )
-              end
+              Thread.current[:last_cache_generate] = elapsed_time # so we can record it in the logs
+              # Cache the condition_right since we already know they have access.
+              Cache.write(
+                permission_cache_key_for(user, session, condition_right),
+                true,
+                use_rails_cache: config.cache_permissions && config.cache_related_permissions
+              )
             end
 
             true
@@ -307,8 +307,8 @@ module AdheresToPolicy
       # If you're going to add something to the user session that
       # affects permissions, you'd durn well better a :permissions_key
       # on the session as well
-      permissions_key = session ? (session[:permissions_key] || 'default') : nil # no session != no permissions_key
-      ['permissions', self, user, permissions_key, right].compact
+      permissions_key = session ? (session[:permissions_key] || "default") : nil # no session != no permissions_key
+      ["permissions", self, user, permissions_key, right].compact
                                                          .map { |element| ActiveSupport::Cache.expand_cache_key(element) }
                                                          .to_param
     end

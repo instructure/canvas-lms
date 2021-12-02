@@ -17,33 +17,33 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-require_relative '../common'
+require_relative "../common"
 
 describe "profile communication settings" do
   include_context "in-process server selenium tests"
 
   before :once do
-    Notification.create(:name => "DiscussionEntry", :category => "DiscussionEntry")
-    Notification.create(:name => "Conversation Message", :category => "Conversation Message")
-    Notification.create(:name => "Conversation Created", :category => "Conversation Created")
-    Notification.create(:name => "GradingStuff1", :category => "Grading")
-    @sub_comment = Notification.create(:name => "Submission Comment1", :category => "Submission Comment")
+    Notification.create(name: "DiscussionEntry", category: "DiscussionEntry")
+    Notification.create(name: "Conversation Message", category: "Conversation Message")
+    Notification.create(name: "Conversation Created", category: "Conversation Created")
+    Notification.create(name: "GradingStuff1", category: "Grading")
+    @sub_comment = Notification.create(name: "Submission Comment1", category: "Submission Comment")
   end
 
-  let(:sns_response) { double(data: { endpointarn: 'endpointarn' }) }
+  let(:sns_response) { double(data: { endpointarn: "endpointarn" }) }
   let(:sns_client) { double(create_platform_endpoint: sns_response) }
   let(:sns_developer_key_sns_field) { sns_client }
 
   let(:sns_developer_key) do
     allow(DeveloperKey).to receive(:sns).and_return(sns_developer_key_sns_field)
     dk = DeveloperKey.default
-    dk.sns_arn = 'apparn'
+    dk.sns_arn = "apparn"
     dk.save!
     dk
   end
 
   let(:sns_access_token) { @user.access_tokens.create!(developer_key: sns_developer_key) }
-  let(:sns_channel) { communication_channel(@user, { username: 'push', path_type: CommunicationChannel::TYPE_PUSH }) }
+  let(:sns_channel) { communication_channel(@user, { username: "push", path_type: CommunicationChannel::TYPE_PUSH }) }
 
   context "as teacher" do
     before do
@@ -60,7 +60,7 @@ describe "profile communication settings" do
 
     it "renders" do
       get "/profile/communication"
-      expect(f('#breadcrumbs')).to include_text('Notification Settings')
+      expect(f("#breadcrumbs")).to include_text("Notification Settings")
       expect(f("h1").text).to eq "Account Notification Settings"
       expect(fj("div:contains('Account-level notifications apply to all courses.')")).to be_present
       expect(fj("thead span:contains('Course Activities')")).to be_present
@@ -75,7 +75,7 @@ describe "profile communication settings" do
     end
 
     it "does not display a SMS number as channel" do
-      communication_channel(@user, { username: '8011235555@vtext.com', path_type: 'sms', active_cc: true })
+      communication_channel(@user, { username: "8011235555@vtext.com", path_type: "sms", active_cc: true })
 
       get "/profile/communication"
       expect(f("thead")).not_to contain_jqcss("span:contains('sms')")
@@ -103,19 +103,19 @@ describe "profile communication settings" do
       focus_button = ff("tr[data-testid='grading'] button")[1]
       focus_button.click
       wait_for_ajaximations
-      menu = ff("ul[aria-labelledby='#{focus_button.attribute('data-position-target')}'] li")
+      menu = ff("ul[aria-labelledby='#{focus_button.attribute("data-position-target")}'] li")
       expect(menu.size).to eq 2
       expect(menu[0].text).to eq "Notify immediately"
       expect(menu[1].text).to eq "Notifications off"
     end
 
     it "loads an existing frequency setting and save a change" do
-      channel = communication_channel(@user, { username: '8011235555@vtext.com', active_cc: true })
+      channel = communication_channel(@user, { username: "8011235555@vtext.com", active_cc: true })
       # Create a notification policy entry as an existing setting.
-      policy = NotificationPolicy.new(:communication_channel_id => channel.id, :notification_id => @sub_comment.id)
+      policy = NotificationPolicy.new(communication_channel_id: channel.id, notification_id: @sub_comment.id)
       policy.frequency = Notification::FREQ_DAILY
       policy.save!
-      desired_setting = 'Notify immediately'
+      desired_setting = "Notify immediately"
       get "/profile/communication"
       focus_button = ff("tr[data-testid='submission_comment'] button")[1]
       focus_button.click
@@ -140,7 +140,7 @@ describe "profile communication settings" do
   end
 
   it "renders for a user with no enrollments" do
-    user_logged_in(:username => 'somebody@example.com')
+    user_logged_in(username: "somebody@example.com")
     get "/profile/communication"
     expect(fj("th[scope='col'] span:contains('email')")).to be
     expect(fj("th[scope='col'] span:contains('somebody@example.com')")).to be

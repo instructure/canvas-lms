@@ -21,7 +21,7 @@ class CreatePg12Collations < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def self.runnable?
-    connection.postgresql_version >= 120000
+    connection.postgresql_version >= 12_00_00 # rubocop:disable Style/NumericLiterals
   end
 
   def up

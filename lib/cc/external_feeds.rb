@@ -26,9 +26,9 @@ module CC
         feed_file = nil
         rel_path = nil
       else
-        feed_file = File.new(File.join(@canvas_resource_dir, CCHelper::EXTERNAL_FEEDS), 'w')
+        feed_file = File.new(File.join(@canvas_resource_dir, CCHelper::EXTERNAL_FEEDS), "w")
         rel_path = File.join(CCHelper::COURSE_SETTINGS_DIR, CCHelper::EXTERNAL_FEEDS)
-        document = Builder::XmlMarkup.new(:target => feed_file, :indent => 2)
+        document = Builder::XmlMarkup.new(target: feed_file, indent: 2)
       end
 
       document.instruct!
@@ -41,7 +41,7 @@ module CC
           next unless export_object?(feed)
 
           migration_id = create_key(feed)
-          feeds_node.externalFeed(:identifier => migration_id) do |feed_node|
+          feeds_node.externalFeed(identifier: migration_id) do |feed_node|
             feed_node.title feed.title if feed.title
             feed_node.url feed.url
             feed_node.verbosity feed.verbosity
@@ -50,7 +50,7 @@ module CC
         end
       end
 
-      feed_file.close if feed_file
+      feed_file&.close
       rel_path
     end
   end

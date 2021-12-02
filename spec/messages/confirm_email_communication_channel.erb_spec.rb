@@ -18,15 +18,15 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative 'messages_helper'
+require_relative "messages_helper"
 
-describe 'confirm_email_communication_channel' do
+describe "confirm_email_communication_channel" do
   before :once do
     user_factory
-    @pseudonym = @user.pseudonyms.create!(unique_id: 'unique@example.com',
-                                          password: 'password',
-                                          password_confirmation: 'password')
-    @object = communication_channel(@user, { username: 'bob@example.com' })
+    @pseudonym = @user.pseudonyms.create!(unique_id: "unique@example.com",
+                                          password: "password",
+                                          password_confirmation: "password")
+    @object = communication_channel(@user, { username: "bob@example.com" })
   end
 
   let(:asset) { @object }

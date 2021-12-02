@@ -17,15 +17,15 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'byebug'
-require 'canvas_errors'
+require "byebug"
+require "canvas_errors"
 
-Time.zone = 'UTC' # This is simplest, fight me.
+Time.zone = "UTC" # This is simplest, fight me.
 
 RSpec.configure do |config|
   config.mock_with :rspec do |mocks|
     mocks.verify_partial_doubles = true
   end
 
-  config.order = 'random'
+  config.order = "random"
 end

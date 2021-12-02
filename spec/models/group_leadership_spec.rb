@@ -21,9 +21,9 @@ describe GroupLeadership do
   describe "member_changed_event" do
     before(:once) do
       course_factory
-      @category = @course.group_categories.build(:name => "category 1")
+      @category = @course.group_categories.build(name: "category 1")
       @category.save!
-      @group = @category.groups.create!(:context => @course)
+      @group = @category.groups.create!(context: @course)
     end
 
     describe "with auto assignment enabled" do
@@ -34,15 +34,15 @@ describe GroupLeadership do
 
       it "assigns the first student to join as the leader" do
         leader = user_model
-        @group.group_memberships.create!(:user => leader, :workflow_state => 'accepted')
+        @group.group_memberships.create!(user: leader, workflow_state: "accepted")
         expect(@group.reload.leader).to eq leader
       end
 
       it "picks a new leader if the leader leaves" do
         leader = user_model
         follower = user_model
-        leader_membership = @group.group_memberships.create!(:user => leader, :workflow_state => 'accepted')
-        @group.group_memberships.create!(:user => follower, :workflow_state => 'accepted')
+        leader_membership = @group.group_memberships.create!(user: leader, workflow_state: "accepted")
+        @group.group_memberships.create!(user: follower, workflow_state: "accepted")
         expect(@group.reload.leader).to eq leader
         leader_membership.destroy
         expect(@group.reload.leader).to eq follower
@@ -52,10 +52,10 @@ describe GroupLeadership do
     describe "revocation without auto leader assignment" do
       before(:once) do
         @leader = user_model
-        @leader_membership = @group.group_memberships.create!(:user => @leader, :workflow_state => 'accepted')
+        @leader_membership = @group.group_memberships.create!(user: @leader, workflow_state: "accepted")
         @group.leader = @leader
         @group.save!
-        @membership = @group.group_memberships.create!(:user => user_model, :workflow_state => 'accepted')
+        @membership = @group.group_memberships.create!(user: user_model, workflow_state: "accepted")
         @group.reload
         @leader_membership.reload
       end
@@ -75,7 +75,7 @@ describe GroupLeadership do
 
         it "revokes when group is changed" do
           expect(@group.leader).not_to be_nil
-          group2 = @category.groups.create!(:context => @course)
+          group2 = @category.groups.create!(context: @course)
           @leader_membership.update_attribute(:group_id, group2.id)
           expect(@group.reload.leader).to be_nil
         end
@@ -90,7 +90,7 @@ describe GroupLeadership do
 
         it "does not revoke when group is changed" do
           expect(@group.leader).not_to be_nil
-          group2 = @category.groups.create!(:context => @course)
+          group2 = @category.groups.create!(context: @course)
           @membership.update_attribute(:group_id, group2.id)
           expect(@group.reload.leader).not_to be_nil
         end

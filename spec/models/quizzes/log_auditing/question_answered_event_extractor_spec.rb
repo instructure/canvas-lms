@@ -18,64 +18,64 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 describe Quizzes::LogAuditing::QuestionAnsweredEventExtractor do
-  require_relative '../../../quiz_spec_helper'
+  require_relative "../../../quiz_spec_helper"
   def multiple_choice_question_data
-    JSON.parse <<-JSON
-    {
-      "id": 1,
-      "points_possible": 1,
-      "name": "MC Question",
-      "question_name": "MC Question",
-      "question_type": "multiple_choice_question",
-      "question_text": "A (hint: choose it!!), B, C, or D?",
-      "answers": [
-        {
-          "id": 11,
-          "text": "A",
-          "weight": 100
-        },
-        {
-          "id": 12,
-          "text": "B",
-          "weight": 0
-        },
-        {
-          "id": 13,
-          "text": "C",
-          "weight": 0
-        },
-        {
-          "id": 14,
-          "text": "D",
-          "weight": 0
-        }
-      ]
-    }
+    JSON.parse <<~JSON
+      {
+        "id": 1,
+        "points_possible": 1,
+        "name": "MC Question",
+        "question_name": "MC Question",
+        "question_type": "multiple_choice_question",
+        "question_text": "A (hint: choose it!!), B, C, or D?",
+        "answers": [
+          {
+            "id": 11,
+            "text": "A",
+            "weight": 100
+          },
+          {
+            "id": 12,
+            "text": "B",
+            "weight": 0
+          },
+          {
+            "id": 13,
+            "text": "C",
+            "weight": 0
+          },
+          {
+            "id": 14,
+            "text": "D",
+            "weight": 0
+          }
+        ]
+      }
     JSON
   end
 
   def true_false_question_data
-    JSON.parse <<-JSON
-    {
-      "id": 2,
-      "points_possible": 1,
-      "name": "T/F Question",
-      "question_name": "T/F Question",
-      "question_type": "true_false_question",
-      "question_text": "Yes (hint: probably!!!), or no?",
-      "answers": [
-        {
-          "id": 21,
-          "text": "Yes",
-          "weight": 100
-        },
-        {
-          "id": 22,
-          "text": "No",
-          "weight": 0
-        }
-      ]
-    }
+    JSON.parse <<~JSON
+      {
+        "id": 2,
+        "points_possible": 1,
+        "name": "T/F Question",
+        "question_name": "T/F Question",
+        "question_type": "true_false_question",
+        "question_text": "Yes (hint: probably!!!), or no?",
+        "answers": [
+          {
+            "id": 21,
+            "text": "Yes",
+            "weight": 100
+          },
+          {
+            "id": 22,
+            "text": "No",
+            "weight": 0
+          }
+        ]
+      }
     JSON
   end
 
@@ -83,7 +83,7 @@ describe Quizzes::LogAuditing::QuestionAnsweredEventExtractor do
     [multiple_choice_question_data, true_false_question_data]
   end
 
-  describe '#build_event' do
+  describe "#build_event" do
     it do
       quiz_submission = Quizzes::QuizSubmission.new
       quiz_submission.quiz_data = quiz_data
@@ -99,7 +99,7 @@ describe Quizzes::LogAuditing::QuestionAnsweredEventExtractor do
     end
   end
 
-  describe '#create_event!' do
+  describe "#create_event!" do
     before(:once) do
       course = Course.create
 
@@ -118,18 +118,18 @@ describe Quizzes::LogAuditing::QuestionAnsweredEventExtractor do
       described_class.new.create_event!(submission_data.stringify_keys, @quiz_submission)
     end
 
-    it 'creates an event' do
+    it "creates an event" do
       event = subject({ "attempt" => 1, "question_1" => "11" })
       expect(event).to be_truthy
     end
 
-    it 'does not save empty events' do
+    it "does not save empty events" do
       event = subject({ "attempt" => 1 })
       expect(event).to be_nil
     end
 
-    describe 'extracting answers' do
-      it 'extracts from flat submission_data using AnswerSerializers' do
+    describe "extracting answers" do
+      it "extracts from flat submission_data using AnswerSerializers" do
         event = subject({ "attempt" => 1, "question_1" => "11" })
 
         expect(event.answers.length).to eq 1
@@ -140,8 +140,8 @@ describe Quizzes::LogAuditing::QuestionAnsweredEventExtractor do
       end
     end
 
-    describe 'optimizing' do
-      it 'optimizes against all previous events' do
+    describe "optimizing" do
+      it "optimizes against all previous events" do
         event1 = subject({
                            "attempt" => 1,
                            "question_1" => "11",
@@ -158,7 +158,7 @@ describe Quizzes::LogAuditing::QuestionAnsweredEventExtractor do
         expect(event2.answers.length).to equal 1
       end
 
-      it 'does not save redundant events' do
+      it "does not save redundant events" do
         event1 = subject({
                            "attempt" => 1,
                            "question_1" => "11"
@@ -173,7 +173,7 @@ describe Quizzes::LogAuditing::QuestionAnsweredEventExtractor do
         expect(event2).to be_nil
       end
 
-      it 'does not explode on unknown question types' do
+      it "does not explode on unknown question types" do
         # This can happen on a failed QTI import
         @quiz_submission.quiz_data[0]["question_type"] = "Error"
         event1 = subject({
@@ -183,16 +183,16 @@ describe Quizzes::LogAuditing::QuestionAnsweredEventExtractor do
         expect(event1).to be_truthy
       end
 
-      describe '[integration] a quiz-taking scenario' do
+      describe "[integration] a quiz-taking scenario" do
         def answer_and_generate_event(submission_data, created_at)
-          submission_data['attempt'] = @quiz_submission.attempt
+          submission_data["attempt"] = @quiz_submission.attempt
 
           Timecop.freeze(created_at) do
             subject(submission_data)
           end
         end
 
-        it 'tracks only the things i did just now' do
+        it "tracks only the things i did just now" do
           one = answer_and_generate_event({
                                             question_1: 11
                                           }, Time.now)

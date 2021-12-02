@@ -20,7 +20,7 @@
 
 describe FileAuthenticator do
   before do
-    @oauth_host = 'http://oauth.host/'
+    @oauth_host = "http://oauth.host/"
     @user = user_model
     @access_token = @user.access_tokens.create!
     @acting_as = user_model
@@ -72,7 +72,7 @@ describe FileAuthenticator do
 
     describe "download_url" do
       it "constructs an instfs download url" do
-        download_url = 'http://downloadUrl'
+        download_url = "http://downloadUrl"
         expect(InstFS).to receive(:authenticated_url)
           .with(@attachment, include(download: true))
           .and_return(download_url)
@@ -94,7 +94,7 @@ describe FileAuthenticator do
 
     describe "inline_url" do
       it "constructs an instfs inline url" do
-        inline_url = 'http://inlineUrl'
+        inline_url = "http://inlineUrl"
         expect(InstFS).to receive(:authenticated_url)
           .with(@attachment, include(download: false))
           .and_return(inline_url)
@@ -127,7 +127,7 @@ describe FileAuthenticator do
       end
 
       it "constructs an instfs thumbnail url" do
-        thumbnail_url = 'http://thumbnailUrl'
+        thumbnail_url = "http://thumbnailUrl"
         allow(@attachment).to receive(:thumbnailable?).and_return(true)
         expect(InstFS).to receive(:authenticated_thumbnail_url)
           .with(@attachment, anything)
@@ -173,7 +173,7 @@ describe FileAuthenticator do
 
     it "delegates to attachment.thumbnail_url" do
       geometry = "640>"
-      thumbnail = double()
+      thumbnail = double
       expect(@attachment).to receive(:thumbnail_url)
         .with(include(size: geometry))
         .and_return(thumbnail)
@@ -181,13 +181,13 @@ describe FileAuthenticator do
     end
 
     it "delegates to attachment.public_download_url" do
-      download_url = 'http://downloadUrl'
+      download_url = "http://downloadUrl"
       expect(@attachment).to receive(:public_download_url).and_return(download_url)
       expect(@authenticator.download_url(@attachment)).to be(download_url)
     end
 
     it "delegates to attachment.public_inline_url" do
-      inline_url = 'http://inlineUrl'
+      inline_url = "http://inlineUrl"
       expect(@attachment).to receive(:public_inline_url).and_return(inline_url)
       expect(@authenticator.inline_url(@attachment)).to be(inline_url)
     end

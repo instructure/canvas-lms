@@ -38,8 +38,8 @@ module CanvasQuizStatistics::Analyzers
     inherit :responses, :full_credit, from: :essay
     inherit :correct, :incorrect, from: :fill_in_multiple_blanks
 
-    RANGE_ANSWER = 'range_answer'
-    PRECISION_ANSWER = 'precision_answer'
+    RANGE_ANSWER = "range_answer"
+    PRECISION_ANSWER = "precision_answer"
 
     # Statistics for the pre-defined answers.
     #
@@ -132,11 +132,11 @@ module CanvasQuizStatistics::Analyzers
     # Range answers will look like this: "[3.00..54.12]"
     # Precision answers will look like this: "1 (with precision: 2)"
     def generate_text_for_answer(answer, answer_type)
-      format = ->(value) { sprintf('%.2f', value) }
+      format = ->(value) { sprintf("%.2f", value) }
 
       case answer_type
       when RANGE_ANSWER
-        range = [answer[:start], answer[:end]].map(&format).join('..')
+        range = [answer[:start], answer[:end]].map(&format).join("..")
         "[#{range}]"
       when PRECISION_ANSWER
         "#{answer[:approximate]} (with precision: #{answer[:precision]})"

@@ -45,7 +45,7 @@ module AddressBook
 
     module Bookmarker
       def self.bookmark_for(_user)
-        'unused'
+        "unused"
       end
 
       def self.validate(_bookmark)

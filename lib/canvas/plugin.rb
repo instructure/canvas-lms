@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_dependency 'canvas'
+require_dependency "canvas"
 
 module Canvas
   class NoPluginError < StandardError; end
@@ -33,22 +33,22 @@ module Canvas
       @id = id.to_s
       @tag = tag.to_s if tag
       @meta = {
-        :name => id.to_s.humanize,
-        :description => nil,
-        :website => nil,
-        :author => nil,
-        :author_website => nil,
-        :version => nil,
-        :settings_partial => nil,
-        :settings => nil,
-        :encrypted_settings => nil,
-        :base => nil
+        name: id.to_s.humanize,
+        description: nil,
+        website: nil,
+        author: nil,
+        author_website: nil,
+        version: nil,
+        settings_partial: nil,
+        settings: nil,
+        encrypted_settings: nil,
+        base: nil
       }.with_indifferent_access
     end
 
     # custom serialization, since the meta can containt procs
     def _dump(_depth)
-      self.id.to_s
+      id.to_s
     end
 
     def self._load(str)
@@ -56,7 +56,7 @@ module Canvas
     end
 
     def encode_with(coder)
-      coder['id'] = self.id.to_s
+      coder["id"] = id.to_s
     end
 
     Psych.add_domain_type("ruby/object", "Canvas::Plugin") do |_type, val|
@@ -70,7 +70,7 @@ module Canvas
     end
 
     def saved_settings
-      PluginSetting.settings_for_plugin(self.id, self)
+      PluginSetting.settings_for_plugin(id, self)
     end
 
     def settings
@@ -78,7 +78,7 @@ module Canvas
     end
 
     def enabled?
-      ps = PluginSetting.cached_plugin_setting(self.id)
+      ps = PluginSetting.cached_plugin_setting(id)
       return false unless ps
 
       ps.valid_settings? && ps.enabled?
@@ -88,12 +88,12 @@ module Canvas
       @meta[:encrypted_settings]
     end
 
-    [:name, :description, :website, :author, :author_website].each do |method|
-      class_eval <<-METHOD
+    %i[name description website author author_website].each do |method|
+      class_eval <<~RUBY, __FILE__, __LINE__ + 1
         def #{method}
           t_if_proc(@meta[:#{method}]) || ''
         end
-      METHOD
+      RUBY
     end
 
     def setting(name)
@@ -117,7 +117,7 @@ module Canvas
     end
 
     def has_settings_partial?
-      !meta[:settings_partial].blank?
+      meta[:settings_partial].present?
     end
 
     def test_cluster_inherit?
@@ -135,8 +135,8 @@ module Canvas
     end
 
     def translate(key, default, options = {})
-      key = "canvas.plugins.#{@id}.#{key}" unless key =~ /\A#/
-      I18n.translate(key, default, options)
+      key = "canvas.plugins.#{@id}.#{key}" unless key.start_with?("#")
+      I18n.t(key, default, options)
     end
     alias_method :t, :translate
 
@@ -156,12 +156,12 @@ module Canvas
         end
         res = validator_module.validate(settings, plugin_setting)
         if res.is_a?(Hash)
-          plugin_setting.settings = (plugin_setting.settings || self.default_settings || {}).with_indifferent_access.merge(res || {})
+          plugin_setting.settings = (plugin_setting.settings || default_settings || {}).with_indifferent_access.merge(res || {})
         else
           false
         end
       else
-        plugin_setting.settings = (plugin_setting.settings || self.default_settings || {}).with_indifferent_access.merge(settings || {})
+        plugin_setting.settings = (plugin_setting.settings || default_settings || {}).with_indifferent_access.merge(settings || {})
       end
     end
 
@@ -193,13 +193,13 @@ module Canvas
 
     def self.value_to_boolean(value, ignore_unrecognized: false)
       if value.is_a?(String) || value.is_a?(Symbol)
-        return true if ["yes", "y", "true", "t", "on", "1"].include?(value.to_s.downcase)
-        return false if ["no", "n", "false", "f", "off", "0"].include?(value.to_s.downcase)
+        return true if %w[yes y true t on 1].include?(value.to_s.downcase)
+        return false if %w[no n false f off 0].include?(value.to_s.downcase)
       end
       return value if [true, false].include?(value)
       return nil if ignore_unrecognized
 
-      return value.to_i != 0
+      value.to_i != 0
     end
   end
 

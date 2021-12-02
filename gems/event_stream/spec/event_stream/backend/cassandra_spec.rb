@@ -18,17 +18,17 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'spec_helper'
+require "spec_helper"
 
 describe EventStream::Backend::Cassandra do
   let(:database) do
-    database = double('database')
+    database = double("database")
 
     def database.batch
       yield
     end
 
-    def database.update_record(*args); end
+    def database.update_record(*); end
 
     def database.insert_record(*args)
       @inserted ||= []
@@ -41,18 +41,18 @@ describe EventStream::Backend::Cassandra do
     end
     # rubocop:enable Style/TrivialAccessors
 
-    def database.update(*args); end
+    def database.update(*); end
 
     def database.available?
       true
     end
 
     def database.keyspace
-      'test_db'
+      "test_db"
     end
 
     def database.fingerprint
-      'fingerprint'
+      "fingerprint"
     end
 
     database
@@ -78,15 +78,15 @@ describe EventStream::Backend::Cassandra do
     it "proxies calls through provided cassandra db" do
       backend.execute(:insert, event_record)
       expect(database.inserted.size).to eq(1)
-      expect(database.inserted.first[1]['id']).to eq('big-uuid')
+      expect(database.inserted.first[1]["id"]).to eq("big-uuid")
     end
 
     it "pulls db fingerprint" do
-      expect(backend.database_fingerprint).to eq('fingerprint')
+      expect(backend.database_fingerprint).to eq("fingerprint")
     end
 
     it "uses keyspace for name" do
-      expect(backend.database_name).to eq('test_db')
+      expect(backend.database_name).to eq("test_db")
     end
   end
 end

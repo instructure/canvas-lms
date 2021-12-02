@@ -22,13 +22,11 @@ module Canvas::Plugins::Validators::WimbaValidator
   def self.validate(settings, plugin_setting)
     if settings.map(&:last).all?(&:blank?)
       {}
+    elsif settings.size != 3 || settings.map(&:last).any?(&:blank?)
+      plugin_setting.errors.add(:base, I18n.t("canvas.plugins.errors.all_fields_required", "All fields are required"))
+      false
     else
-      if settings.size != 3 || settings.map(&:last).any?(&:blank?)
-        plugin_setting.errors.add(:base, I18n.t('canvas.plugins.errors.all_fields_required', 'All fields are required'))
-        false
-      else
-        settings.slice(:domain, :user, :password, :timezone)
-      end
+      settings.slice(:domain, :user, :password, :timezone)
     end
   end
 end

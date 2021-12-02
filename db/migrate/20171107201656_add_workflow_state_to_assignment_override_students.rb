@@ -23,8 +23,8 @@ class AddWorkflowStateToAssignmentOverrideStudents < ActiveRecord::Migration[5.0
 
   def change
     add_column :assignment_override_students, :workflow_state, :string
-    change_column_default(:assignment_override_students, :workflow_state, 'active')
-    DataFixup::BackfillNulls.run(AssignmentOverrideStudent, :workflow_state, default_value: 'active')
+    change_column_default(:assignment_override_students, :workflow_state, "active")
+    DataFixup::BackfillNulls.run(AssignmentOverrideStudent, :workflow_state, default_value: "active")
     change_column_null(:assignment_override_students, :workflow_state, false)
     add_index :assignment_override_students, :workflow_state, algorithm: :concurrently
   end

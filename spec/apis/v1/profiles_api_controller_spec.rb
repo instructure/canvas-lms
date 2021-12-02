@@ -18,17 +18,17 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../api_spec_helper'
+require_relative "../api_spec_helper"
 
 def call_setting(opts)
-  status_assertion = opts[:assert_unauthorized] ? { :expected_status => 401 } : {}
+  status_assertion = opts[:assert_unauthorized] ? { expected_status: 401 } : {}
   api_call_as_user(opts[:as_user], :get,
                    "/api/v1/users/#{opts[:for_user].id}/profile.json",
-                   { :controller => 'profile', :action => 'settings',
-                     :format => 'json', :user_id => opts[:for_user].id }, {}, {}, status_assertion)
+                   { controller: "profile", action: "settings",
+                     format: "json", user_id: opts[:for_user].id }, {}, {}, status_assertion)
 end
 
-describe 'ProfileController', type: :request do
+describe "ProfileController", type: :request do
   context "setting permissions" do
     context "admin" do
       it "shows all profiles" do
@@ -42,7 +42,7 @@ describe 'ProfileController', type: :request do
 
     context "teacher" do
       it "shows profiles for their students" do
-        course_with_teacher(:active_all => true)
+        course_with_teacher(active_all: true)
         e = course_with_user("StudentEnrollment", course: @course, active_all: true)
         user = e.user
 
@@ -51,7 +51,7 @@ describe 'ProfileController', type: :request do
       end
 
       it "returns unauthorized profiles for other students" do
-        course_with_teacher(:active_all => true)
+        course_with_teacher(active_all: true)
         user = user_with_pseudonym
 
         call_setting(as_user: @teacher, for_user: user, assert_unauthorized: true)
@@ -60,15 +60,15 @@ describe 'ProfileController', type: :request do
 
     context "student" do
       it "shows a profile if it is theirs" do
-        user = user_with_pseudonym(:active_user => true)
+        user = user_with_pseudonym(active_user: true)
 
         json = call_setting(as_user: user, for_user: user)
         expect(json["short_name"]).to eq("User")
       end
 
       it "returns unauthorized when attempting to access another students profile" do
-        user_one = user_with_pseudonym(:active_user => true)
-        user_two = user_with_pseudonym(:active_user => true, :user => user_factory)
+        user_one = user_with_pseudonym(active_user: true)
+        user_two = user_with_pseudonym(active_user: true, user: user_factory)
 
         call_setting(as_user: user_one, for_user: user_two, assert_unauthorized: true)
       end

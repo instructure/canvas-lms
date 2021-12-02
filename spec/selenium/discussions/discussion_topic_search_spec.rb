@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-require_relative '../common'
+require_relative "../common"
 
 describe "Discussion Topic Search" do
   include_context "in-process server selenium tests"
@@ -24,11 +24,11 @@ describe "Discussion Topic Search" do
   context "when Discussions Redesign feature flag is ON" do
     before :once do
       Account.default.enable_feature!(:react_discussions_post)
-      course_with_teacher(active_course: true, active_all: true, name: 'teacher')
-      @topic_title = 'Our Discussion Topic'
+      course_with_teacher(active_course: true, active_all: true, name: "teacher")
+      @topic_title = "Our Discussion Topic"
       @topic = @course.discussion_topics.create!(
         title: @topic_title,
-        discussion_type: 'threaded',
+        discussion_type: "threaded",
         posted_at: "2017-07-09 16:32:34",
         user: @teacher
       )
@@ -36,7 +36,7 @@ describe "Discussion Topic Search" do
 
     it "search only replies that matches parameter" do
       @topic.discussion_entries.create!(
-        user: @teacher, message: 'bar'
+        user: @teacher, message: "bar"
       )
       (1..5).each do |number|
         @topic.discussion_entries.create!(
@@ -44,7 +44,7 @@ describe "Discussion Topic Search" do
           message: "foo #{number}"
         )
       end
-      student = student_in_course(course: @course, name: 'Jeff', active_all: true).user
+      student = student_in_course(course: @course, name: "Jeff", active_all: true).user
       user_session(student)
       get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
       f("input[placeholder='Search entries or author...']").send_keys("bar")
@@ -64,20 +64,16 @@ describe "Discussion Topic Search" do
       end
 
       @topic.discussion_entries.create!(
-        user: @teacher, message: 'bar'
+        user: @teacher, message: "bar"
       )
 
-      student = student_in_course(course: @course, name: 'Jeff', active_all: true).user
+      student = student_in_course(course: @course, name: "Jeff", active_all: true).user
       user_session(student)
 
-      # visit a fast loading page first to set localstorage
-      get "/courses/#{@course.id}/discussion_topics"
-      # rubocop:disable Specs/NoExecuteScript
-      driver.execute_script("window.localStorage.setItem('DISCUSSION_PER_PAGE', 1)")
-      # rubocop:enable Specs/NoExecuteScript
-
-      # load the intended page
       get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+      # rubocop:disable Specs/NoExecuteScript
+      driver.execute_script("ENV.per_page = 1")
+      # rubocop:enable Specs/NoExecuteScript
       f("input[placeholder='Search entries or author...']").send_keys("foo")
       wait_for_ajaximations
       expect(fj("span:contains('foo 2')")).to be_present

@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../../../common'
+require_relative "../../../common"
 
 module Gradebook
   module Settings
@@ -31,23 +31,23 @@ module Gradebook
     end
 
     def self.click_advanced_tab
-      tab(label: 'Advanced').click
+      tab(label: "Advanced").click
     end
 
     def self.click_late_policy_tab
-      tab(label: 'Late Policies').click
+      tab(label: "Late Policies").click
     end
 
     def self.click_post_policy_tab
-      tab(label: 'Grade Posting Policy').click
+      tab(label: "Grade Posting Policy").click
     end
 
     def self.cancel_button
-      f('#gradebook-settings-cancel-button')
+      f("#gradebook-settings-cancel-button")
     end
 
     def self.update_button
-      f('#gradebook-settings-update-button')
+      f("#gradebook-settings-update-button")
     end
 
     def self.click_cancel_button
@@ -68,7 +68,7 @@ module Gradebook
     end
 
     def self.missing_policy_percent_input
-      f('#missing-submission-grade')
+      f("#missing-submission-grade")
     end
 
     def self.late_policy_checkbox
@@ -76,15 +76,15 @@ module Gradebook
     end
 
     def self.late_policy_deduction_input
-      f('#late-submission-deduction')
+      f("#late-submission-deduction")
     end
 
     def self.late_policy_increment_combobox(increment)
-      click_INSTUI_Select_option(f('#late-submission-interval'), increment)
+      click_INSTUI_Select_option(f("#late-submission-interval"), increment)
     end
 
     def self.lowest_grade_percent_input
-      f('#late-submission-minimum-percent')
+      f("#late-submission-minimum-percent")
     end
 
     def self.select_late_policy_tab
@@ -92,20 +92,20 @@ module Gradebook
     end
 
     def self.create_missing_policy(percent_per_assignment)
-      unless missing_policy_checkbox.attribute('checked')
+      unless missing_policy_checkbox.attribute("checked")
         missing_policy_checkbox.click
       end
       set_value(missing_policy_percent_input, percent_per_assignment)
     end
 
     def self.disable_missing_policy
-      if missing_policy_checkbox.attribute('checked')
+      if missing_policy_checkbox.attribute("checked")
         missing_policy_checkbox.click
       end
     end
 
     def self.disable_late_policy
-      if late_policy_checkbox.attribute('checked')
+      if late_policy_checkbox.attribute("checked")
         late_policy_checkbox.click
       end
     end

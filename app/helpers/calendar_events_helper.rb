@@ -31,12 +31,12 @@ module CalendarEventsHelper
     cal_options = {}
     event = options.delete(:event)
     if event
-      cal_options[:anchor] = { :month => event.try_rescue(:start_at).try_rescue(:month),
-                               :year => event.try_rescue(:start_at).try_rescue(:year) }.to_json
+      cal_options[:anchor] = { month: event.try_rescue(:start_at).try_rescue(:month),
+                               year: event.try_rescue(:start_at).try_rescue(:year) }.to_json
     end
     # Use a explicit "return_to" option first, absent that, use calendar_url_for
     clean_return_to(
-      params[:return_to]&.include?('calendar') && params[:return_to]
+      params[:return_to]&.include?("calendar") && params[:return_to]
     ) ||
       calendar_url_for(options[:context], cal_options)
   end

@@ -17,15 +17,15 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'respondus_soap_endpoint/urn_RespondusAPI.rb'
-require 'benchmark'
+require "respondus_soap_endpoint/urn_RespondusAPI"
+require "benchmark"
 
 module RespondusSoapEndpoint
   class RespondusAPIPort
     attr_reader :session, :user
     attr_accessor :rack_env
 
-    OAUTH_TOKEN_USERNAME = 'oauth_access_token'
+    OAUTH_TOKEN_USERNAME = "oauth_access_token"
 
     def request
       # we want an actual rails request because it has logic to determine the
@@ -72,20 +72,20 @@ module RespondusSoapEndpoint
     def load_session(context)
       @verifier = ActiveSupport::MessageVerifier.new(
         Canvas::Security.encryption_key,
-        digest: 'SHA1'
+        digest: "SHA1"
       )
-      if context.blank?
-        @session = {}
-      else
-        @session = @verifier.verify(context)
-      end
+      @session = if context.blank?
+                   {}
+                 else
+                   @verifier.verify(context)
+                 end
 
       # verify that the session was created for this user
-      if self.user
-        if session['user_id']
-          raise(ActiveSupport::MessageVerifier::InvalidSignature) unless self.user.id == session['user_id']
+      if user
+        if session["user_id"]
+          raise(ActiveSupport::MessageVerifier::InvalidSignature) unless user.id == session["user_id"]
         else
-          session['user_id'] = self.user.id
+          session["user_id"] = user.id
         end
       end
     end
@@ -98,7 +98,7 @@ module RespondusSoapEndpoint
 
     def load_user_with_oauth(token)
       token = AccessToken.authenticate(token)
-      if !token.try(:user)
+      unless token.try(:user)
         raise(BadAuthError)
       end
 
@@ -107,9 +107,9 @@ module RespondusSoapEndpoint
     end
 
     def load_user(method, userName, password)
-      return nil if %w(identifyServer).include?(method.to_s)
+      return nil if %w[identifyServer].include?(method.to_s)
 
-      domain_root_account = rack_env['canvas.domain_root_account'] || Account.default
+      domain_root_account = rack_env["canvas.domain_root_account"] || Account.default
       if userName == OAUTH_TOKEN_USERNAME
         # password is the oauth token
         return load_user_with_oauth(password)
@@ -117,7 +117,7 @@ module RespondusSoapEndpoint
 
       Authlogic::Session::Base.controller = AuthlogicAdapter.new(self)
       domain_root_account.pseudonyms.scoping do
-        pseudonym_session = PseudonymSession.new(:unique_id => userName, :password => password)
+        pseudonym_session = PseudonymSession.new(unique_id: userName, password: password)
         pseudonym_session.remote_ip = request.remote_ip
         # don't actually want to create a session, so call `valid?` rather than `save`
         if pseudonym_session.valid?
@@ -140,14 +140,14 @@ module RespondusSoapEndpoint
       # all other arguments are strings
       args = args.map { |a| a.is_a?(String) ? a : nil }
       userName, password, context, *args = args
-      Rails.logger.debug "\nProcessing RespondusSoapApi##{method} (for #{rack_env['REMOTE_ADDR']} at #{Time.now}) [SOAP]"
+      Rails.logger.debug "\nProcessing RespondusSoapApi##{method} (for #{rack_env["REMOTE_ADDR"]} at #{Time.now}) [SOAP]"
       log_args = args.dup
-      log_args.pop if %w(publishServerItem replaceServerItem appendServerItem).include?(method.to_s)
+      log_args.pop if %w[publishServerItem replaceServerItem appendServerItem].include?(method.to_s)
       Rails.logger.debug "Parameters: #{([userName, "[FILTERED]", context] + log_args).inspect}"
       load_user(method, userName, password)
       load_session(context)
       return_args = send("_#{method}", userName, password, context, *args) || []
-      ["Success", '', dump_session] + return_args
+      ["Success", "", dump_session] + return_args
     rescue => e
       case e
       when NotImplementedError
@@ -161,7 +161,7 @@ module RespondusSoapEndpoint
       when CantReplaceError
         ["Item cannot be replaced"]
       when OtherError
-        [e.errorStatus, '']
+        [e.errorStatus, ""]
       else
         Rails.logger.error "Error in Respondus API call: #{e.inspect}\n#{e.backtrace.join("\n")}"
         ["Server failure"]
@@ -203,10 +203,10 @@ module RespondusSoapEndpoint
     #   identification  C_String - {http://www.w3.org/2001/XMLSchema}string
     #
     def identifyServer(_userName, _password, _context)
-      return [%{
+      [%(
 Respondus Generic Server API
 Contract version: 1
-Implemented for: Canvas LMS}]
+Implemented for: Canvas LMS)]
     end
 
     # SYNOPSIS
@@ -244,7 +244,7 @@ Implemented for: Canvas LMS}]
     #   itemList        NVPairList - {urn:RespondusAPI}NVPairList
     #
     def getServerItems(_userName, _password, _context, itemType)
-      selection_state = session['selection_state'] || []
+      selection_state = session["selection_state"] || []
 
       list = NVPairList.new
       case itemType
@@ -261,9 +261,9 @@ Implemented for: Canvas LMS}]
         list.item << NVPair.new("attachmentLinking", "resolve")
         list.item << NVPair.new("uploadTypes", "zipPackage")
       when "course"
-        raise(OtherError, 'Item type incompatible with selection state') unless selection_state.empty?
+        raise(OtherError, "Item type incompatible with selection state") unless selection_state.empty?
 
-        @user.cached_currentish_enrollments(preload_courses: true).select { |e| e.participating_admin? }.map(&:course).uniq.each do |course|
+        @user.cached_currentish_enrollments(preload_courses: true).select(&:participating_admin?).map(&:course).uniq.each do |course|
           list.item << NVPair.new(course.name, course.to_param)
         end
       when "quiz", "qdb"
@@ -276,7 +276,7 @@ Implemented for: Canvas LMS}]
       end
       raise(OtherError, "No items found") if list.item.empty? && !["quiz", "qdb"].include?(itemType)
 
-      return [list]
+      [list]
     end
 
     # SYNOPSIS
@@ -296,7 +296,7 @@ Implemented for: Canvas LMS}]
     #   context         C_String - {http://www.w3.org/2001/XMLSchema}string
     #
     def selectServerItem(userName, password, context, itemType, itemID, clearState)
-      selection_state = session['selection_state'] ||= []
+      selection_state = session["selection_state"] ||= []
       if clearState == "true"
         selection_state.clear
       end
@@ -318,7 +318,7 @@ Implemented for: Canvas LMS}]
         raise OtherError, "Invalid item type"
       end
 
-      return []
+      []
     end
 
     # SYNOPSIS
@@ -509,42 +509,42 @@ Implemented for: Canvas LMS}]
     protected
 
     def get_scope(session, itemType)
-      selection_state = session['selection_state'] || []
+      selection_state = session["selection_state"] || []
 
-      raise(OtherError, 'Item type incompatible with selection state') unless selection_state.size == 1
+      raise(OtherError, "Item type incompatible with selection state") unless selection_state.size == 1
 
       # selection_state comes from the session, which is safe from user modification
       course = Course.where(id: selection_state.first).first
-      raise(OtherError, 'Item type incompatible with selection state') unless course
+      raise(OtherError, "Item type incompatible with selection state") unless course
 
       case itemType
-      when "quiz"; course.quizzes.active
-      when "qdb"; course.assessment_question_banks.active
+      when "quiz" then course.quizzes.active
+      when "qdb" then course.assessment_question_banks.active
       end
     end
 
     ASSET_TYPES = {
-      'quiz' => /^quizzes:quiz_/,
-      'qdb' => /^assessment_question_bank_/,
-    }
+      "quiz" => /^quizzes:quiz_/,
+      "qdb" => /^assessment_question_bank_/,
+    }.freeze
 
-    ATTACHMENT_FOLDER_NAME = 'imported qti files'
+    ATTACHMENT_FOLDER_NAME = "imported qti files"
 
     def do_import(item, itemType, uploadType, _fileName, fileData)
-      if fileData == "\x0" && session['pending_migration_id']
-        return poll_for_completion()
+      if fileData == "\x0" && session["pending_migration_id"]
+        return poll_for_completion
       end
 
-      unless %w(quiz qdb).include?(itemType)
+      unless %w[quiz qdb].include?(itemType)
         raise OtherError, "Invalid item type"
       end
-      if uploadType != 'zipPackage'
+      if uploadType != "zipPackage"
         raise OtherError, "Invalid upload type"
       end
 
-      selection_state = session['selection_state'] || []
+      selection_state = session["selection_state"] || []
       course = Course.where(id: selection_state.first).first
-      raise(OtherError, 'Item type incompatible with selection state') unless course
+      raise(OtherError, "Item type incompatible with selection state") unless course
 
       # Make sure that the image import folder is hidden by default
       Folder.assert_path(ATTACHMENT_FOLDER_NAME, course) do |folder|
@@ -552,32 +552,32 @@ Implemented for: Canvas LMS}]
       end
 
       settings = {
-        :migration_type => 'qti_converter',
-        :apply_respondus_settings_file => (itemType != 'qdb'),
-        :skip_import_notification => true,
-        :files_import_allow_rename => true,
-        :files_import_root_path => ATTACHMENT_FOLDER_NAME,
-        :flavor => Qti::Flavors::RESPONDUS
+        migration_type: "qti_converter",
+        apply_respondus_settings_file: (itemType != "qdb"),
+        skip_import_notification: true,
+        files_import_allow_rename: true,
+        files_import_root_path: ATTACHMENT_FOLDER_NAME,
+        flavor: Qti::Flavors::RESPONDUS
       }
 
       if item
-        if !item.clear_for_replacement
+        unless item.clear_for_replacement
           raise CantReplaceError
         end
 
         item.save!
         case itemType
-        when 'quiz'
+        when "quiz"
           settings[:quiz_id_to_update] = item.id
         end
       end
 
-      migration = ContentMigration.new(:context => course,
-                                       :user => user)
+      migration = ContentMigration.new(context: course,
+                                       user: user)
       migration.update_migration_settings(settings)
-      if itemType == 'qdb'
+      if itemType == "qdb"
         # skip creating the quiz, just import the questions into the bank
-        migration.migration_ids_to_import = { :copy => { :all_quizzes => false, :all_assessment_question_banks => true } }
+        migration.migration_ids_to_import = { copy: { all_quizzes: false, all_assessment_question_banks: true } }
       end
       migration.save!
 
@@ -591,36 +591,36 @@ Implemented for: Canvas LMS}]
       migration.save!
       migration.export_content
 
-      session['pending_migration_id'] = migration.id
-      session['pending_migration_itemType'] = itemType
+      session["pending_migration_id"] = migration.id
+      session["pending_migration_itemType"] = itemType
 
-      if Setting.get('respondus_endpoint.polling_api', 'true') != 'false'
-        return poll_for_completion()
-      else
+      if Setting.get("respondus_endpoint.polling_api", "true") == "false"
         # Deprecated in-line waiting for the migration. We've worked with Respondus
         # to implement an asynchronous, polling solution now.
         timeout(5.minutes.to_i) do
           loop do
-            ret = poll_for_completion()
-            if ret == ['pending']
-              sleep(Setting.get('respondus_endpoint.polling_time', '2').to_f) # rubocop:disable Lint/NoSleep
+            ret = poll_for_completion
+            if ret == ["pending"]
+              sleep(Setting.get("respondus_endpoint.polling_time", "2").to_f) # rubocop:disable Lint/NoSleep
             else
               return ret
             end
           end
         end
+      else
+        poll_for_completion
       end
     end
 
     def poll_for_completion
-      migration = ContentMigration.uncached { ContentMigration.find(session['pending_migration_id']) }
+      migration = ContentMigration.uncached { ContentMigration.find(session["pending_migration_id"]) }
 
       unless migration.complete?
-        return ['pending']
+        return ["pending"]
       end
 
       assets = migration.migration_settings[:imported_assets] || []
-      a_type = ASSET_TYPES[session['pending_migration_itemType']]
+      a_type = ASSET_TYPES[session["pending_migration_itemType"]]
       asset = assets.find { |a| a =~ a_type }
       raise(OtherError, "Invalid file data") unless asset
 

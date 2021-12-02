@@ -22,17 +22,17 @@ module DataFixup::PopulateRootAccountIdOnAssetUserAccesses
     # all other context types are handled in PopulateRootAccountIdOnModels
     to_transform = AssetUserAccess.where(id: min..max, context_type: "User")
 
-    asset_types = %w(attachment calendar_event group course)
+    asset_types = %w[attachment calendar_event group course]
 
     # find any other asset types besides these and "user" (which the backfill fills with 0)
-    types_string = [*asset_types, "user"].map { |t| "'%#{t}%'" }.join(',')
+    types_string = [*asset_types, "user"].map { |t| "'%#{t}%'" }.join(",")
     other_asset_types = to_transform.where("asset_code NOT LIKE ALL (ARRAY[#{types_string}])")
                                     .distinct
                                     .pluck(Arel.sql("regexp_matches(asset_user_accesses.asset_code, '(\\w+)_\\d+') AS asset_type"))
                                     .flatten
 
     unless other_asset_types.empty?
-      Canvas::Errors.capture('new asset_user_accesses asset types', {
+      Canvas::Errors.capture("new asset_user_accesses asset types", {
                                shard_id: Shard.current.id,
                                asset_types: other_asset_types
                              })

@@ -17,8 +17,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../pages/gradebook_history_page'
-require_relative '../setup/gb_history_search_setup'
+require_relative "../pages/gradebook_history_page"
+require_relative "../setup/gb_history_search_setup"
 
 describe "Gradebook History Page" do
   include_context "in-process server selenium tests"
@@ -34,7 +34,7 @@ describe "Gradebook History Page" do
     GradeBookHistory.visit(@course)
   end
 
-  it "shows additional new rows on a new page scroll", test_id: 3308073, priority: "1" do
+  it "shows additional new rows on a new page scroll", priority: "1" do
     GradeBookHistory.click_filter_button
     initial_row_count = GradeBookHistory.fetch_results_table_row_count
     scroll_page_to_bottom

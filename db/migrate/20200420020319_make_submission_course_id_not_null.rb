@@ -6,8 +6,8 @@ class MakeSubmissionCourseIdNotNull < ActiveRecord::Migration[5.2]
 
   def up
     if Submission.where(course_id: nil).exists?
-      Submission.find_ids_in_ranges(:batch_size => 100_000) do |start_at, end_at|
-        next unless GuardRail.activate(:secondary) { Submission.where(:id => start_at..end_at, :course_id => nil).exists? }
+      Submission.find_ids_in_ranges(batch_size: 100_000) do |start_at, end_at|
+        next unless GuardRail.activate(:secondary) { Submission.where(id: start_at..end_at, course_id: nil).exists? }
 
         DataFixup::PopulateCourseIdOnSubmissions.run(start_at, end_at)
       end

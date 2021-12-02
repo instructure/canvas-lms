@@ -26,7 +26,7 @@ describe GradeCalculator do
   # We should keep this in sync with GradeCalculatorSpec.coffee
   context "GradeCalculatorSpec.coffee examples" do
     before do
-      @group = @group1 = @course.assignment_groups.create!(:name => 'group 1')
+      @group = @group1 = @course.assignment_groups.create!(name: "group 1")
     end
 
     def set_default_grades
@@ -36,9 +36,9 @@ describe GradeCalculator do
     def set_grades(grades, group = @group1)
       @grades = grades
       @assignments = @grades.map do |_score, possible|
-        @course.assignments.create! :title => 'homework',
-                                    :points_possible => possible,
-                                    :assignment_group => group
+        @course.assignments.create! title: "homework",
+                                    points_possible: possible,
+                                    assignment_group: group
       end
       @assignments.each_with_index do |a, i|
         score = @grades[i].first
@@ -83,9 +83,9 @@ describe GradeCalculator do
     end
 
     it "works without submissions" do
-      @course.assignments.create! :title => 'asdf',
-                                  :points_possible => 1,
-                                  :assignment_group => @group
+      @course.assignments.create! title: "asdf",
+                                  points_possible: 1,
+                                  assignment_group: @group
       check_grades(nil, 0.0)
     end
 
@@ -93,14 +93,14 @@ describe GradeCalculator do
       set_grades [[10, 0], [10, 10], [10, 10], [nil, 10]]
       check_grades(150.0, 100.0)
 
-      @group.update_attribute(:rules, 'drop_lowest:1')
+      @group.update_attribute(:rules, "drop_lowest:1")
       check_grades(200.0, 150.0)
     end
 
     it "muted assignments are not considered for the drop list when computing " \
        "current grade for students (they are just excluded from the computation entirely)" do
       set_grades([[4, 10], [3, 10], [9, 10]])
-      @group.update_attribute(:rules, 'drop_lowest:1')
+      @group.update_attribute(:rules, "drop_lowest:1")
       @assignments.first.mute!
       # 4/10 is excluded from the computation because it's muted
       # 3/10 is dropped for being the lowest
@@ -112,7 +112,7 @@ describe GradeCalculator do
     it "ungraded assignments are not considered for the drop list when computing " \
        "current grade for students (they are just excluded from the computation entirely)" do
       set_grades([[nil, 20], [3, 10], [9, 10]])
-      @group.update_attribute(:rules, 'drop_lowest:1')
+      @group.update_attribute(:rules, "drop_lowest:1")
       # nil/20 is excluded from the computation because it's not graded
       # 3/10 is dropped for being the lowest
       # 9/10 is included
@@ -123,7 +123,7 @@ describe GradeCalculator do
     it "ungraded + muted assignments are not considered for the drop list when " \
        "computing current grade for students (they are just excluded from the computation entirely)" do
       set_grades([[nil, 20], [4, 10], [3, 10], [9, 10]])
-      @group.update_attribute(:rules, 'drop_lowest:1')
+      @group.update_attribute(:rules, "drop_lowest:1")
       @assignments.second.mute!
       # nil/20 is excluded from the computation because it's not graded
       # 4/10 is exclued from the computation because it's muted
@@ -136,7 +136,7 @@ describe GradeCalculator do
     it "muted assignments are treated as 0/points_possible for the drop list when " \
        "computing final grade for students" do
       set_grades([[4, 10], [3, 10], [9, 10]])
-      @group.update_attribute(:rules, 'drop_lowest:1')
+      @group.update_attribute(:rules, "drop_lowest:1")
       @assignments.first.mute!
       # 4/10 is treated as 0/10 because it is muted. Since it's treated as 0/10,
       # it is dropped for being the lowest
@@ -149,7 +149,7 @@ describe GradeCalculator do
     it "ungraded assignments are treated as 0/points_possible for the drop list " \
        "when computing final grade for students" do
       set_grades([[nil, 20], [3, 10], [9, 10]])
-      @group.update_attribute(:rules, 'drop_lowest:1')
+      @group.update_attribute(:rules, "drop_lowest:1")
       # nil/20 is treated as 0/20 because it's not graded
       # 3/10 is included
       # 9/10 is included
@@ -160,7 +160,7 @@ describe GradeCalculator do
     it "ungraded are treated as 0/points_possible for the drop list and muted " \
        "assignments are ignored for the drop list when computing final grade for students" do
       set_grades([[nil, 20], [4, 10], [3, 10], [9, 10]])
-      @group.update_attribute(:rules, 'drop_lowest:1')
+      @group.update_attribute(:rules, "drop_lowest:1")
       @assignments.second.mute!
       # nil/20 is treated as 0/20 because it's not graded. it is dropped.
       # 4/10 is ignored for drop rules because it is muted. it is included.
@@ -172,7 +172,7 @@ describe GradeCalculator do
 
     it '"work"s when no submissions have points possible' do
       set_grades [[10, 0], [5, 0], [20, 0], [0, 0]]
-      @group.update_attribute(:rules, 'drop_lowest:1')
+      @group.update_attribute(:rules, "drop_lowest:1")
       check_grades(nil, nil)
     end
 
@@ -183,10 +183,10 @@ describe GradeCalculator do
 
     it "supports drop_lowest" do
       set_default_grades
-      @group.update_attribute(:rules, 'drop_lowest:1')
+      @group.update_attribute(:rules, "drop_lowest:1")
       check_grades(63.41, 55.99)
 
-      @group.update_attribute(:rules, 'drop_lowest:2')
+      @group.update_attribute(:rules, "drop_lowest:2")
       check_grades(74.64, 63.41)
     end
 
@@ -195,19 +195,19 @@ describe GradeCalculator do
                   [30, 30], [30, 30], [30, 30], [30, 30], [30, 30], [30, 30],
                   [30, 30], [30, 30], [30, 30], [30, 30], [29.3, 30], [30, 30],
                   [30, 30], [30, 30], [12, 0], [30, nil]]
-      @group.update_attribute(:rules, 'drop_lowest:2')
+      @group.update_attribute(:rules, "drop_lowest:2")
       check_grades(132.12, 132.12)
     end
 
     it "supports drop_highest" do
       set_default_grades
-      @group.update_attribute(:rules, 'drop_highest:1')
+      @group.update_attribute(:rules, "drop_highest:1")
       check_grades(32.07, 4.98)
 
-      @group.update_attribute(:rules, 'drop_highest:2')
+      @group.update_attribute(:rules, "drop_highest:2")
       check_grades(18.28, 1.56)
 
-      @group.update_attribute(:rules, 'drop_highest:3')
+      @group.update_attribute(:rules, "drop_highest:3")
       check_grades(7.89, 0.29)
     end
 
@@ -215,13 +215,13 @@ describe GradeCalculator do
       grades = [[0, 10], [10, 20], [28, 50], [91, 100]]
       set_grades(grades)
 
-      @group.update_attribute(:rules, 'drop_highest:1')
+      @group.update_attribute(:rules, "drop_highest:1")
       check_grades(47.5, 47.5)
 
-      @group.update_attribute(:rules, 'drop_highest:2')
+      @group.update_attribute(:rules, "drop_highest:2")
       check_grades(33.33, 33.33)
 
-      @group.update_attribute(:rules, 'drop_highest:3')
+      @group.update_attribute(:rules, "drop_highest:3")
       check_grades(0.0, 0.0)
     end
 
@@ -269,10 +269,10 @@ describe GradeCalculator do
 
     it "grade dropping should work even in ridiculous circumstances" do
       set_grades [[nil, 20], [3, 10], [nil, 10],
-                  [nil, 999999999],
+                  [nil, 999_999_999],
                   [nil, nil]]
 
-      @group.update_attribute(:rules, 'drop_lowest:2')
+      @group.update_attribute(:rules, "drop_lowest:2")
       check_grades(30.0, 15.0)
     end
 
@@ -280,12 +280,12 @@ describe GradeCalculator do
       before do
         @group1.group_weight = 50
         @group1.save!
-        @group2 = @course.assignment_groups.create! :name => 'group 2',
-                                                    :group_weight => 25
-        @group3 = @course.assignment_groups.create! :name => 'empty group',
-                                                    :group_weight => 25
-        @group4 = @course.assignment_groups.create! :name => 'extra credit',
-                                                    :group_weight => 10
+        @group2 = @course.assignment_groups.create! name: "group 2",
+                                                    group_weight: 25
+        @group3 = @course.assignment_groups.create! name: "empty group",
+                                                    group_weight: 25
+        @group4 = @course.assignment_groups.create! name: "extra credit",
+                                                    group_weight: 10
 
         set_grades [[9, 10]], @group1
         set_grades [[5, 10]], @group2
@@ -296,13 +296,13 @@ describe GradeCalculator do
       it "ignores them if the group_weighting_scheme is percent" do
         # NOTE: in addition to ignoring invalid assignment groups, we also
         # have to scale up the valid ones
-        @course.update_attribute :group_weighting_scheme, 'percent'
+        @course.update_attribute :group_weighting_scheme, "percent"
         grade = 76.67 # ((9/10)*50 + (5/10)*25) * (1/75)
         check_grades(grade, grade)
       end
 
       it "doesn't ignore them if the group_weighting_scheme is equal" do
-        @course.update_attribute :group_weighting_scheme, 'equal'
+        @course.update_attribute :group_weighting_scheme, "equal"
         grade = 145.0 # ((9 + 5 + 10 + 5) / (10 + 10)) * 100
         check_grades(grade, grade)
       end
@@ -378,7 +378,7 @@ describe GradeCalculator do
         end
 
         it "drops the lowest visible when that rule is in place" do
-          @group.update_attribute(:rules, 'drop_lowest:1')
+          @group.update_attribute(:rules, "drop_lowest:1")
           # 5 + 15 + 10 - 5
           expect(final_grade_info(@user, @course)[:total]).to equal 25.0
           expect(final_grade_info(@user, @course)[:possible]).to equal 40.0
@@ -386,7 +386,7 @@ describe GradeCalculator do
         end
 
         it "drops the highest visible when that rule is in place" do
-          @group.update_attribute(:rules, 'drop_highest:1')
+          @group.update_attribute(:rules, "drop_highest:1")
           # 5 + 15 + 10 - 15
           expect(final_grade_info(@user, @course)[:total]).to equal 15.0
           expect(final_grade_info(@user, @course)[:possible]).to equal 40.0
@@ -416,8 +416,8 @@ describe GradeCalculator do
           enrollment = Enrollment.find_by(user_id: @user.id, course_id: @course.id)
           score = enrollment.find_score(assignment_group: @group)
           expect(score.score_metadata.calculation_details).to eq({
-                                                                   'current' => { 'dropped' => [find_submission(@overridden_middle)] },
-                                                                   'final' => { 'dropped' => [find_submission(@overridden_middle)] }
+                                                                   "current" => { "dropped" => [find_submission(@overridden_middle)] },
+                                                                   "final" => { "dropped" => [find_submission(@overridden_middle)] }
                                                                  })
         end
 
@@ -428,8 +428,8 @@ describe GradeCalculator do
           enrollment = Enrollment.where(user_id: @user.id, course_id: @course.id).first
           score = enrollment.find_score(assignment_group: @group)
           expect(score.score_metadata.calculation_details).to eq({
-                                                                   'current' => { 'dropped' => [] },
-                                                                   'final' => { 'dropped' => [] }
+                                                                   "current" => { "dropped" => [] },
+                                                                   "final" => { "dropped" => [] }
                                                                  })
         end
 
@@ -439,8 +439,8 @@ describe GradeCalculator do
           enrollment = Enrollment.where(user_id: @user.id, course_id: @course.id).first
           score = enrollment.find_score(course_score: true)
           expect(score.score_metadata.calculation_details).to eq({
-                                                                   'current' => { 'dropped' => [find_submission(@overridden_middle)] },
-                                                                   'final' => { 'dropped' => [find_submission(@overridden_middle)] }
+                                                                   "current" => { "dropped" => [find_submission(@overridden_middle)] },
+                                                                   "final" => { "dropped" => [find_submission(@overridden_middle)] }
                                                                  })
         end
 
@@ -451,8 +451,8 @@ describe GradeCalculator do
           enrollment = Enrollment.where(user_id: @user.id, course_id: @course.id).first
           score = enrollment.find_score(course_score: true)
           expect(score.score_metadata.calculation_details).to eq({
-                                                                   'current' => { 'dropped' => [] },
-                                                                   'final' => { 'dropped' => [] }
+                                                                   "current" => { "dropped" => [] },
+                                                                   "final" => { "dropped" => [] }
                                                                  })
         end
 
@@ -463,12 +463,12 @@ describe GradeCalculator do
           score = enrollment.find_score(course_score: true)
           metadata = score.score_metadata
 
-          @group.update_attribute(:rules, 'drop_highest:1')
+          @group.update_attribute(:rules, "drop_highest:1")
           expect { GradeCalculator.new(@user.id, @course.id).compute_and_save_scores }.not_to change { ScoreMetadata.count }
           metadata.reload
           expect(metadata.calculation_details).to eq({
-                                                       'current' => { 'dropped' => [find_submission(@overridden_highest)] },
-                                                       'final' => { 'dropped' => [find_submission(@overridden_highest)] }
+                                                       "current" => { "dropped" => [find_submission(@overridden_highest)] },
+                                                       "final" => { "dropped" => [find_submission(@overridden_highest)] }
                                                      })
         end
       end

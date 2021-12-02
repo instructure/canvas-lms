@@ -21,9 +21,9 @@
 describe Canvas::Builders::EnrollmentDateBuilder do
   describe "#build" do
     before do
-      course_with_teacher(:active_all => true)
+      course_with_teacher(active_all: true)
       @teacher_enrollment = @enrollment
-      course_with_student(:active_all => true, :course => @course)
+      course_with_student(active_all: true, course: @course)
       @student_enrollment = @enrollment
 
       @section = @course.course_sections.first
@@ -39,7 +39,7 @@ describe Canvas::Builders::EnrollmentDateBuilder do
         @teacher_enrollment.start_at = 2.days.from_now
         @teacher_enrollment.end_at = 4.days.from_now
         @teacher_enrollment.save!
-        @student_enrollment.start_at = 1.days.from_now
+        @student_enrollment.start_at = 1.day.from_now
         @student_enrollment.end_at = 3.days.from_now
         @student_enrollment.save!
       end
@@ -56,7 +56,7 @@ describe Canvas::Builders::EnrollmentDateBuilder do
     context "has enrollment dates from section" do
       append_before do
         @section.restrict_enrollments_to_section_dates = true
-        @section.start_at = 1.days.ago
+        @section.start_at = 1.day.ago
         @section.end_at = 3.days.from_now
         @section.save!
 
@@ -134,7 +134,7 @@ describe Canvas::Builders::EnrollmentDateBuilder do
 
   describe ".preload" do
     it "works" do
-      course_with_teacher(:active_all => true)
+      course_with_teacher(active_all: true)
       @enrollment.reload
       loaded_course = @enrollment.association(:course).loaded?
       expect(loaded_course).to be_falsey
@@ -153,7 +153,7 @@ describe Canvas::Builders::EnrollmentDateBuilder do
 
     it "does not have to load stuff if already in cache" do
       enable_cache do
-        course_with_teacher(:active_all => true)
+        course_with_teacher(active_all: true)
         # prime the cache
         Canvas::Builders::EnrollmentDateBuilder.preload([@enrollment])
 

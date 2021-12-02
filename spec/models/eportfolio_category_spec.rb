@@ -28,7 +28,7 @@ describe EportfolioCategory do
     describe "#check_for_spam" do
       context "when the setting has a value" do
         before do
-          Setting.set('eportfolio_title_spam_keywords', 'bad, verybad, worse')
+          Setting.set("eportfolio_title_spam_keywords", "bad, verybad, worse")
         end
 
         it "marks the owning portfolio as possible spam when the title matches one or more keywords" do
@@ -37,24 +37,24 @@ describe EportfolioCategory do
         end
 
         it "does not mark as spam when the title matches no keywords" do
-          expect {
+          expect do
             category.update!(name: "my great and notbad category")
-          }.not_to change { spam_status }
+          end.not_to change { spam_status }
         end
 
         it "does not mark as spam if a spam_status already exists" do
           eportfolio.update!(spam_status: "marked_as_safe")
 
-          expect {
+          expect do
             category.update!(name: "actually a bad category")
-          }.not_to change { spam_status }
+          end.not_to change { spam_status }
         end
       end
 
       it "does not attempt to mark as spam when the setting is empty" do
-        expect {
+        expect do
           category.update!(name: "actually a bad category")
-        }.not_to change { spam_status }
+        end.not_to change { spam_status }
       end
     end
   end

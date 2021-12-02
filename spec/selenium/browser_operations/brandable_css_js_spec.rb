@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../common'
+require_relative "../common"
 
 describe "brandableCss JS integration specs" do
   include_context "in-process server selenium tests"
@@ -30,11 +30,11 @@ describe "brandableCss JS integration specs" do
 
   it "loads css from handlebars with variables correctly" do
     course_with_teacher_logged_in
-    get '/calendar'
-    data = BrandableCSS.cache_for('jst/calendar/calendarApp', 'new_styles_normal_contrast')
+    get "/calendar"
+    data = BrandableCSS.cache_for("jst/calendar/calendarApp", "new_styles_normal_contrast")
     expect(data[:includesNoVariables]).to be_falsy
-    expect(data[:combinedChecksum]).to match(/\A[a-f0-9]{10}\z/), '10 chars of an MD5'
+    expect(data[:combinedChecksum]).to match(/\A[a-f0-9]{10}\z/), "10 chars of an MD5"
     url = "#{app_url}/dist/brandable_css/new_styles_normal_contrast/jst/calendar/calendarApp-#{data[:combinedChecksum]}.css"
-    expect(f("head link[rel='stylesheet'][data-loaded-by-brandableCss][href*='calendarApp']")['href']).to eq(url)
+    expect(f("head link[rel='stylesheet'][data-loaded-by-brandableCss][href*='calendarApp']")["href"]).to eq(url)
   end
 end

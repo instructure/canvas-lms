@@ -18,8 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../../spec_helper'
-require 'rotp'
+require_relative "../../spec_helper"
+require "rotp"
 
 describe Login::CasController do
   def stubby(stub_response, use_mock = true)
@@ -39,17 +39,17 @@ describe Login::CasController do
     user_with_pseudonym(active_all: true, account: account)
 
     cas_ticket = CanvasUuid::Uuid.generate_securish_uuid
-    request_text = <<-REQUEST_TEXT.strip
-        <samlp:LogoutRequest
-          xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol"
-          xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion"
-          ID="42"
-          Version="2.0"
-          IssueInstant="#{Time.zone.now.in_time_zone}">
-          <saml:NameID>@NOT_USED@</saml:NameID>
-          <samlp:SessionIndex>#{cas_ticket}</samlp:SessionIndex>
-        </samlp:LogoutRequest>
-    REQUEST_TEXT
+    request_text = <<~XML.strip
+      <samlp:LogoutRequest
+        xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol"
+        xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion"
+        ID="42"
+        Version="2.0"
+        IssueInstant="#{Time.zone.now.in_time_zone}">
+        <saml:NameID>@NOT_USED@</saml:NameID>
+        <samlp:SessionIndex>#{cas_ticket}</samlp:SessionIndex>
+      </samlp:LogoutRequest>
+    XML
 
     session[:cas_session] = cas_ticket
     session[:login_aac] = Account.default.authentication_providers.first.id
@@ -61,15 +61,15 @@ describe Login::CasController do
   it "doesn't allow deleted users to login" do
     account = account_with_cas(account: Account.default)
     user_with_pseudonym(active_all: true, account: account)
-    @user.update!(workflow_state: 'deleted')
+    @user.update!(workflow_state: "deleted")
 
-    response_text = <<-RESPONSE_TEXT
-        <cas:serviceResponse xmlns:cas="http://www.yale.edu/tp/cas">
-          <cas:authenticationSuccess>
-            <cas:user>#{@user.email}</cas:user>
-          </cas:authenticationSuccess>
-        </cas:serviceResponse>
-    RESPONSE_TEXT
+    response_text = <<~XML
+      <cas:serviceResponse xmlns:cas="http://www.yale.edu/tp/cas">
+        <cas:authenticationSuccess>
+          <cas:user>#{@user.email}</cas:user>
+        </cas:authenticationSuccess>
+      </cas:serviceResponse>
+    XML
 
     controller.instance_variable_set(:@domain_root_account, Account.default)
     cas_client = controller.client
@@ -78,22 +78,22 @@ describe Login::CasController do
       type.new(@stub_response, @conf_options)
     end
 
-    get 'new', params: { :ticket => 'ST-abcd' }
+    get "new", params: { ticket: "ST-abcd" }
     expect(response).to redirect_to(login_url)
   end
 
   it "doesn't allow suspended users to login" do
     account = account_with_cas(account: Account.default)
     user_with_pseudonym(active_all: true, account: account)
-    @pseudonym.update!(workflow_state: 'suspended')
+    @pseudonym.update!(workflow_state: "suspended")
 
-    response_text = <<-RESPONSE_TEXT
-        <cas:serviceResponse xmlns:cas="http://www.yale.edu/tp/cas">
-          <cas:authenticationSuccess>
-            <cas:user>#{@user.email}</cas:user>
-          </cas:authenticationSuccess>
-        </cas:serviceResponse>
-    RESPONSE_TEXT
+    response_text = <<~XML
+      <cas:serviceResponse xmlns:cas="http://www.yale.edu/tp/cas">
+        <cas:authenticationSuccess>
+          <cas:user>#{@user.email}</cas:user>
+        </cas:authenticationSuccess>
+      </cas:serviceResponse>
+    XML
 
     controller.instance_variable_set(:@domain_root_account, Account.default)
     cas_client = controller.client
@@ -102,7 +102,7 @@ describe Login::CasController do
       type.new(@stub_response, @conf_options)
     end
 
-    get 'new', params: { :ticket => 'ST-abcd' }
+    get "new", params: { ticket: "ST-abcd" }
     expect(response).to redirect_to(login_url)
   end
 
@@ -110,19 +110,19 @@ describe Login::CasController do
     account = account_with_cas(account: Account.default)
     user_with_pseudonym(active_all: true, account: account)
 
-    response_text = <<-RESPONSE_TEXT
-        <cas:serviceResponse xmlns:cas="http://www.yale.edu/tp/cas">
-          <cas:authenticationSuccess>
-            <cas:user>#{@user.email}</cas:user>
-            <cas:attributes>
-              <cas:name>#{@user.name}</cas:name>
-              <cas:email><![CDATA[#{@user.email}]]></cas:email>
-              <cas:yaml><![CDATA[--- true]]></cas:yaml>
-              <cas:json><![CDATA[{"id":#{@user.id}]]></cas:json>
-            </cas:attributes>
-          </cas:authenticationSuccess>
-        </cas:serviceResponse>
-    RESPONSE_TEXT
+    response_text = <<~XML
+      <cas:serviceResponse xmlns:cas="http://www.yale.edu/tp/cas">
+        <cas:authenticationSuccess>
+          <cas:user>#{@user.email}</cas:user>
+          <cas:attributes>
+            <cas:name>#{@user.name}</cas:name>
+            <cas:email><![CDATA[#{@user.email}]]></cas:email>
+            <cas:yaml><![CDATA[--- true]]></cas:yaml>
+            <cas:json><![CDATA[{"id":#{@user.id}]]></cas:json>
+          </cas:attributes>
+        </cas:authenticationSuccess>
+      </cas:serviceResponse>
+    XML
 
     controller.instance_variable_set(:@domain_root_account, Account.default)
     cas_client = controller.client
@@ -131,46 +131,46 @@ describe Login::CasController do
       type.new(@stub_response, @conf_options)
     end
 
-    get 'new', params: { :ticket => 'ST-abcd' }
-    expect(response).to redirect_to(dashboard_url(:login_success => 1))
-    expect(session[:cas_session]).to eq 'ST-abcd'
+    get "new", params: { ticket: "ST-abcd" }
+    expect(response).to redirect_to(dashboard_url(login_success: 1))
+    expect(session[:cas_session]).to eq "ST-abcd"
     # the auth provider got set on the pseudonym
-    expect(assigns[:current_pseudonym].authentication_provider).to eq account.authentication_providers.active.find('cas')
+    expect(assigns[:current_pseudonym].authentication_provider).to eq account.authentication_providers.active.find("cas")
   end
 
   it "scopes logins to the correct domain root account" do
-    unique_id = 'foo@example.com'
+    unique_id = "foo@example.com"
 
     account1 = account_with_cas
-    user1 = user_with_pseudonym({ :active_all => true, :username => unique_id })
+    user1 = user_with_pseudonym({ active_all: true, username: unique_id })
     @pseudonym.account = account1
     @pseudonym.save!
 
     account2 = account_with_cas
-    user2 = user_with_pseudonym({ :active_all => true, :username => unique_id })
+    user2 = user_with_pseudonym({ active_all: true, username: unique_id })
     @pseudonym.account = account2
     @pseudonym.save!
 
     stubby("yes\n#{unique_id}\n")
 
-    controller.request.env['canvas.domain_root_account'] = account1
-    get 'new', params: { :ticket => 'ST-abcd' }
-    expect(response).to redirect_to(dashboard_url(:login_success => 1))
-    expect(session[:cas_session]).to eq 'ST-abcd'
-    expect(Pseudonym.find(session['pseudonym_credentials_id'])).to eq user1.pseudonyms.first
+    controller.request.env["canvas.domain_root_account"] = account1
+    get "new", params: { ticket: "ST-abcd" }
+    expect(response).to redirect_to(dashboard_url(login_success: 1))
+    expect(session[:cas_session]).to eq "ST-abcd"
+    expect(Pseudonym.find(session["pseudonym_credentials_id"])).to eq user1.pseudonyms.first
 
-    (controller.instance_variables.grep(/@[^_]/) - ['@mock_proxy']).each do |var|
+    (controller.instance_variables.grep(/@[^_]/) - ["@mock_proxy"]).each do |var|
       controller.send :remove_instance_variable, var
     end
     session.clear
 
     stubby("yes\n#{unique_id}\n")
 
-    controller.request.env['canvas.domain_root_account'] = account2
-    get 'new', params: { :ticket => 'ST-efgh' }
-    expect(response).to redirect_to(dashboard_url(:login_success => 1))
-    expect(session[:cas_session]).to eq 'ST-efgh'
-    expect(Pseudonym.find(session['pseudonym_credentials_id'])).to eq user2.pseudonyms.first
+    controller.request.env["canvas.domain_root_account"] = account2
+    get "new", params: { ticket: "ST-efgh" }
+    expect(response).to redirect_to(dashboard_url(login_success: 1))
+    expect(session[:cas_session]).to eq "ST-efgh"
+    expect(Pseudonym.find(session["pseudonym_credentials_id"])).to eq user2.pseudonyms.first
   end
 
   context "unknown user" do
@@ -186,7 +186,7 @@ describe Login::CasController do
 
       # Default to Login url with a nil value
       session[:sentinel] = true
-      get 'new', params: { :ticket => 'ST-abcd' }
+      get "new", params: { ticket: "ST-abcd" }
       expect(response).to redirect_to(login_url)
       expect(session[:cas_session]).to be_nil
       expect(flash[:delegated_message]).to match(/Canvas doesn't have an account for user/)
@@ -195,10 +195,10 @@ describe Login::CasController do
 
     it "sends to login page if unknown_user_url is blank" do
       # Default to Login url with an empty string value
-      account.unknown_user_url = ''
+      account.unknown_user_url = ""
       account.save!
 
-      get 'new', params: { :ticket => 'ST-abcd' }
+      get "new", params: { ticket: "ST-abcd" }
       expect(response).to redirect_to(login_url)
       expect(session[:cas_session]).to be_nil
       expect(flash[:delegated_message]).to match(/Canvas doesn't have an account for user/)
@@ -208,7 +208,7 @@ describe Login::CasController do
       unknown_user_url = "https://example.com/unknown_user"
       account.unknown_user_url = unknown_user_url
       account.save!
-      get 'new', params: { :ticket => 'ST-abcd' }
+      get "new", params: { ticket: "ST-abcd" }
       expect(response).to redirect_to(unknown_user_url)
       expect(session[:cas_session]).to be_nil
     end
@@ -216,27 +216,27 @@ describe Login::CasController do
     it "provisions automatically when enabled" do
       ap = account.authentication_providers.first
       ap.update_attribute(:jit_provisioning, true)
-      unique_id = 'foo@example.com'
+      unique_id = "foo@example.com"
 
       expect(account.pseudonyms.active.by_unique_id(unique_id)).to_not be_exists
-      get 'new', params: { :ticket => 'ST-abcd' }
-      expect(response).to redirect_to(dashboard_url(:login_success => 1))
-      expect(session[:cas_session]).to eq 'ST-abcd'
+      get "new", params: { ticket: "ST-abcd" }
+      expect(response).to redirect_to(dashboard_url(login_success: 1))
+      expect(session[:cas_session]).to eq "ST-abcd"
       p = account.pseudonyms.active.by_unique_id(unique_id).first!
       expect(p.authentication_provider).to eq ap
     end
   end
 
   it "times out correctly" do
-    Setting.set('cas_timelimit', 0.01)
+    Setting.set("cas_timelimit", 0.01)
     account_with_cas(account: Account.default)
 
-    cas_client = double()
+    cas_client = double
     allow(controller).to receive(:client).and_return(cas_client)
     start = Time.now.utc
     expect(cas_client).to receive(:validate_service_ticket) { sleep 5 }
     session[:sentinel] = true
-    get 'new', params: { :ticket => 'ST-abcd' }
+    get "new", params: { ticket: "ST-abcd" }
     expect(response).to redirect_to(login_url)
     expect(flash[:delegated_message]).to_not be_blank
     expect(Time.now.utc - start).to be < 1
@@ -248,11 +248,11 @@ describe Login::CasController do
     stubby("yes\n#{@pseudonym.unique_id}\n")
     account_with_cas(account: Account.site_admin)
 
-    controller.request.env['canvas.domain_root_account'] = Account.site_admin
-    get 'new', params: { :ticket => 'ST-efgh' }
-    expect(response).to redirect_to(dashboard_url(:login_success => 1))
-    expect(session[:cas_session]).to eq 'ST-efgh'
-    expect(cookies['canvas_sa_delegated']).to eq '1'
+    controller.request.env["canvas.domain_root_account"] = Account.site_admin
+    get "new", params: { ticket: "ST-efgh" }
+    expect(response).to redirect_to(dashboard_url(login_success: 1))
+    expect(session[:cas_session]).to eq "ST-efgh"
+    expect(cookies["canvas_sa_delegated"]).to eq "1"
   end
 
   it "redirects to site admin CAS if cookie set" do
@@ -260,11 +260,11 @@ describe Login::CasController do
     stubby("yes\n#{@pseudonym.unique_id}\n")
     account_with_cas(account: Account.site_admin)
     controller.instance_variable_set(:@domain_root_account, Account.site_admin)
-    expect(controller.client).to receive(:add_service_to_login_url).and_return('someurl')
+    expect(controller.client).to receive(:add_service_to_login_url).and_return("someurl")
 
-    cookies['canvas_sa_delegated'] = '1'
+    cookies["canvas_sa_delegated"] = "1"
     # *don't* double domain_root_account
-    get 'new'
+    get "new"
     expect(response).to be_redirect
   end
 
@@ -273,15 +273,15 @@ describe Login::CasController do
     Account.default.save!
     account_with_cas(account: Account.default)
 
-    user_with_pseudonym(active_all: 1, username: 'user')
+    user_with_pseudonym(active_all: 1, username: "user")
     @user.otp_secret_key = ROTP::Base32.random
     @user.save!
 
     stubby("yes\nuser\n")
 
-    get 'new', params: { :ticket => 'ST-efgh' }
+    get "new", params: { ticket: "ST-efgh" }
     expect(response).to redirect_to(otp_login_url)
-    expect(session[:cas_session]).to eq 'ST-efgh'
+    expect(session[:cas_session]).to eq "ST-efgh"
     expect(session[:pending_otp_secret_key]).to be_nil
   end
 end

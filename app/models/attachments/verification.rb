@@ -26,7 +26,7 @@ class Attachments::Verification
   # map from ctx_perm to a hash that maps from file permissions to context permissions
   PERMISSION_MAPS = {
     # e.g., grant :read and :download on the file if the context grants :read
-    :r_rd => { :read => :read, :download => :read }.freeze
+    r_rd: { read: :read, download: :read }.freeze
   }.freeze
 
   attr_reader :attachment
@@ -92,7 +92,7 @@ class Attachments::Verification
       return nil
     end
 
-    return body
+    body
   end
 
   # Decodes a verifier and checks the user of the verifier has permission to access

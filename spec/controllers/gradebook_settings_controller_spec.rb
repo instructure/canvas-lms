@@ -63,7 +63,7 @@ RSpec.describe GradebookSettingsController, type: :controller do
       end
 
       let(:gradebook_settings_massaged) do
-        gradebook_settings.merge('filter_rows_by' => { 'section_id' => nil, 'student_group_id' => nil })
+        gradebook_settings.merge("filter_rows_by" => { "section_id" => nil, "student_group_id" => nil })
       end
 
       let(:valid_params) do
@@ -76,46 +76,46 @@ RSpec.describe GradebookSettingsController, type: :controller do
       let(:expected_settings) do
         {
           @course.id => gradebook_settings_massaged.except("colors"),
-          colors: gradebook_settings_massaged.fetch("colors")
+          :colors => gradebook_settings_massaged.fetch("colors")
         }.as_json
       end
 
-      context 'given a valid PUT request' do
-        subject { json_parse.fetch('gradebook_settings').fetch(@course.global_id.to_s) }
+      context "given a valid PUT request" do
+        subject { json_parse.fetch("gradebook_settings").fetch(@course.global_id.to_s) }
 
         before { put :update, params: valid_params }
 
         it { expect(response).to be_ok }
-        it { is_expected.to include 'enter_grades_as' => { '2301' => 'points' } }
-        it { is_expected.to include 'filter_columns_by' => { 'grading_period_id' => '1401', 'assignment_group_id' => '888' } }
-        it { is_expected.to include 'filter_rows_by' => { 'section_id' => nil, 'student_group_id' => nil } }
-        it { is_expected.to include 'selected_view_options_filters' => ['assignmentGroups'] }
-        it { is_expected.to include 'show_inactive_enrollments' => 'true' }
-        it { is_expected.to include 'show_concluded_enrollments' => 'false' }
-        it { is_expected.to include 'show_unpublished_assignments' => 'true' }
-        it { is_expected.to include 'show_separate_first_last_names' => 'true' }
-        it { is_expected.to include 'student_column_display_as' => 'last_first' }
-        it { is_expected.to include 'student_column_secondary_info' => 'login_id' }
-        it { is_expected.to include 'sort_rows_by_column_id' => 'student' }
-        it { is_expected.to include 'sort_rows_by_setting_key' => 'sortable_name' }
-        it { is_expected.to include 'sort_rows_by_direction' => 'descending' }
-        it { is_expected.to include 'view_ungraded_as_zero' => 'true' }
-        it { is_expected.not_to include 'colors' }
+        it { is_expected.to include "enter_grades_as" => { "2301" => "points" } }
+        it { is_expected.to include "filter_columns_by" => { "grading_period_id" => "1401", "assignment_group_id" => "888" } }
+        it { is_expected.to include "filter_rows_by" => { "section_id" => nil, "student_group_id" => nil } }
+        it { is_expected.to include "selected_view_options_filters" => ["assignmentGroups"] }
+        it { is_expected.to include "show_inactive_enrollments" => "true" }
+        it { is_expected.to include "show_concluded_enrollments" => "false" }
+        it { is_expected.to include "show_unpublished_assignments" => "true" }
+        it { is_expected.to include "show_separate_first_last_names" => "true" }
+        it { is_expected.to include "student_column_display_as" => "last_first" }
+        it { is_expected.to include "student_column_secondary_info" => "login_id" }
+        it { is_expected.to include "sort_rows_by_column_id" => "student" }
+        it { is_expected.to include "sort_rows_by_setting_key" => "sortable_name" }
+        it { is_expected.to include "sort_rows_by_direction" => "descending" }
+        it { is_expected.to include "view_ungraded_as_zero" => "true" }
+        it { is_expected.not_to include "colors" }
         it { is_expected.to have(14).items } # ensure we add specs for new additions
 
-        context 'colors' do
-          subject { json_parse.fetch('gradebook_settings').fetch('colors') }
+        context "colors" do
+          subject { json_parse.fetch("gradebook_settings").fetch("colors") }
 
           it { is_expected.to have(5).items } # ensure we add specs for new additions
 
           it do
-            is_expected.to include({
-                                     'late' => '#000000',
-                                     'missing' => '#000001',
-                                     'resubmitted' => '#000002',
-                                     'dropped' => '#000003',
-                                     'excused' => '#000004'
-                                   })
+            expect(subject).to include({
+                                         "late" => "#000000",
+                                         "missing" => "#000001",
+                                         "resubmitted" => "#000002",
+                                         "dropped" => "#000003",
+                                         "excused" => "#000004"
+                                       })
           end
         end
       end
@@ -124,37 +124,37 @@ RSpec.describe GradebookSettingsController, type: :controller do
         put :update, params: valid_params
 
         section_id = teacher.get_preference(:gradebook_settings, @course.global_id)
-                            .fetch('filter_rows_by')
-                            .fetch('section_id')
+                            .fetch("filter_rows_by")
+                            .fetch("section_id")
 
         expect(section_id).to be_nil
       end
 
       it "allows saving gradebook settings for multiple courses" do
-        previous_course = Course.create!(name: 'Previous Course')
+        previous_course = Course.create!(name: "Previous Course")
         teacher.update!(preferences: {
                           gradebook_settings: {
                             previous_course.id => gradebook_settings_massaged.except("colors"),
-                            colors: gradebook_settings_massaged.fetch("colors")
+                            :colors => gradebook_settings_massaged.fetch("colors")
                           }
                         })
         put :update, params: valid_params
 
-        expect(json_parse.fetch('gradebook_settings')).to eql expected_settings
+        expect(json_parse.fetch("gradebook_settings")).to eql expected_settings
       end
 
       it "is allowed for courses in concluded enrollment terms" do
         @course.update!(enrollment_term: teacher.account.enrollment_terms.create!(start_at: 2.months.ago, end_at: 1.month.ago))
         put :update, params: valid_params
 
-        expect(json_parse.fetch('gradebook_settings')).to eql expected_settings
+        expect(json_parse.fetch("gradebook_settings")).to eql expected_settings
       end
 
       it "is allowed for courses with concluded workflow state" do
         @course.update!(workflow_state: "concluded")
         put :update, params: valid_params
 
-        expect(json_parse.fetch('gradebook_settings')).to eql expected_settings
+        expect(json_parse.fetch("gradebook_settings")).to eql expected_settings
       end
 
       context "given invalid status colors (but otherwise valid params)" do

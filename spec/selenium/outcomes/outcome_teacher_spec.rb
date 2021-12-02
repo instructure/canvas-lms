@@ -17,17 +17,17 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../helpers/outcome_common'
+require_relative "../helpers/outcome_common"
 
 describe "outcomes as a teacher" do
   include_context "in-process server selenium tests"
   include OutcomeCommon
 
-  let(:who_to_login) { 'teacher' }
+  let(:who_to_login) { "teacher" }
   let(:outcome_url) { "/courses/#{@course.id}/outcomes" }
 
   def goto_account_default_outcomes
-    f('.find_outcome').click
+    f(".find_outcome").click
     wait_for_ajaximations
     f(".ellipsis[title='Account Standards']").click
     wait_for_ajaximations
@@ -51,14 +51,14 @@ describe "outcomes as a teacher" do
 
     it "adds account outcomes to course" do
       f(".ellipsis[title='outcome 0']").click
-      import_account_level_outcomes()
+      import_account_level_outcomes
       expect(f(".ellipsis[title='outcome 0']")).to be_displayed
     end
 
     it "removes account outcomes from course" do
       skip("no delete button when seeding, functionality should be available")
       f(".ellipsis[title='outcome 0']").click
-      import_account_level_outcomes()
+      import_account_level_outcomes
       f(".ellipsis[title='outcome 0']").click
       wait_for_ajaximations
       msg = "redmine bug on this functionality"
@@ -77,19 +77,19 @@ describe "outcomes as a teacher" do
       get outcome_url
       wait_for_ajaximations
 
-      f('.find_outcome').click
+      f(".find_outcome").click
       wait_for_ajaximations
-      groups = ff('.outcome-group')
+      groups = ff(".outcome-group")
       expect(groups.size).to eq 1
       groups.each do |g|
         g.click
-        expect(f('.ui-dialog-buttonpane .btn-primary')).not_to be_displayed
+        expect(f(".ui-dialog-buttonpane .btn-primary")).not_to be_displayed
       end
     end
 
     it "updates the selected group when re-opened" do
-      group1 = outcome_group_model(title: 'outcome group 1', context: @course)
-      group2 = outcome_group_model(title: 'outcome group 2', context: @course)
+      group1 = outcome_group_model(title: "outcome group 1", context: @course)
+      group2 = outcome_group_model(title: "outcome group 2", context: @course)
 
       get outcome_url
       wait_for_ajaximations
@@ -102,12 +102,12 @@ describe "outcomes as a teacher" do
       f(".ellipsis[title='outcome 0']").click
       wait_for_ajaximations
 
-      f('.ui-dialog-buttonpane .btn-primary').click
+      f(".ui-dialog-buttonpane .btn-primary").click
       alert = driver.switch_to.alert
       expect(alert.text).to include "outcome group 1"
       alert.dismiss
 
-      f('.ui-dialog-buttonpane .ui-button').click
+      f(".ui-dialog-buttonpane .ui-button").click
       f(".outcomes-sidebar .outcome-group[data-id = '#{group2.id}']").click
       wait_for_ajaximations
 
@@ -116,7 +116,7 @@ describe "outcomes as a teacher" do
       f(".ellipsis[title='outcome 0']").click
       wait_for_ajaximations
 
-      f('.ui-dialog-buttonpane .btn-primary').click
+      f(".ui-dialog-buttonpane .btn-primary").click
       alert = driver.switch_to.alert
       expect(alert.text).to include "outcome group 2"
       alert.dismiss
@@ -159,7 +159,7 @@ describe "outcomes as a teacher" do
         course_bulk_outcome_groups_course(2, 2)
         get outcome_url
         wait_for_ajaximations
-        expect(ff('.outcomes-content').first.text).to include "Setting up Outcomes"
+        expect(ff(".outcomes-content").first.text).to include "Setting up Outcomes"
       end
     end
   end
@@ -167,7 +167,7 @@ describe "outcomes as a teacher" do
   context "moving outcomes tree" do
     before do
       course_with_teacher_logged_in
-      who_to_login == 'teacher' ? @context = @course : @context = account
+      @context = who_to_login == "teacher" ? @course : account
     end
 
     it "alerts user if attempting to move with no directory selected" do
@@ -175,65 +175,65 @@ describe "outcomes as a teacher" do
       get outcome_url
       wait_for_ajaximations
 
-      fj('.outcomes-sidebar .outcome-link').click
+      fj(".outcomes-sidebar .outcome-link").click
       wait_for_ajaximations
 
       # bring up modal
-      f(".move_button").click()
+      f(".move_button").click
       wait_for_ajaximations
 
-      fj('.form-controls .btn-primary').click
+      fj(".form-controls .btn-primary").click
       wait_for_ajaximations
 
-      expect(f('.ic-flash-error').text).to include "No directory is selected, please select a directory before clicking 'move'"
+      expect(f(".ic-flash-error").text).to include "No directory is selected, please select a directory before clicking 'move'"
     end
 
     it "moves a learning outcome via tree modal" do
       outcome = outcome_model
       group = outcome_group_model
       get outcome_url
-      f('.outcomes-sidebar .outcome-link').click
+      f(".outcomes-sidebar .outcome-link").click
 
-      f(".move_button").click()
+      f(".move_button").click
 
       # should show modal tree
-      expect(fj('.ui-dialog-titlebar span').text).to eq "Where would you like to move first new outcome?"
-      expect(ffj('.ui-dialog-content').length).to eq 1
+      expect(fj(".ui-dialog-titlebar span").text).to eq "Where would you like to move first new outcome?"
+      expect(ffj(".ui-dialog-content").length).to eq 1
 
       # move the outcome
-      f('.treeLabel').click
-      expect(ff('[role=treeitem] a span')).to have_size(2)
-      ff('[role=treeitem] a span')[1].click
-      f('.form-controls .btn-primary').click
+      f(".treeLabel").click
+      expect(ff("[role=treeitem] a span")).to have_size(2)
+      ff("[role=treeitem] a span")[1].click
+      f(".form-controls .btn-primary").click
 
       expect_flash_message :success, "Successfully moved #{outcome.title} to #{group.title}"
       dismiss_flash_messages # so they don't interfere with subsequent clicks
 
       scroll_page_to_top
       # check for proper updates in outcome group columns on page
-      fj('.outcomes-sidebar .outcome-level:first a').click
-      expect(ffj('.outcomes-sidebar .outcome-level:first li').length).to eq 1
-      expect(ffj('.outcomes-sidebar .outcome-level:last li').length).to eq 1
+      fj(".outcomes-sidebar .outcome-level:first a").click
+      expect(ffj(".outcomes-sidebar .outcome-level:first li").length).to eq 1
+      expect(ffj(".outcomes-sidebar .outcome-level:last li").length).to eq 1
 
       # confirm move in db
       expect(LearningOutcomeGroup.where(id: @outcome_group).first.child_outcome_links.first.content.id).to eq @outcome.id
 
       # confirm that error appears if moving into parent group it already belongs to
-      f('.outcomes-sidebar .outcome-link').click
-      f(".move_button").click()
+      f(".outcomes-sidebar .outcome-link").click
+      f(".move_button").click
 
-      f('.treeLabel').click
+      f(".treeLabel").click
       wait_for_ajaximations
 
-      ff('[role=treeitem] a span')[1].click
-      f('.form-controls .btn-primary').click
+      ff("[role=treeitem] a span")[1].click
+      f(".form-controls .btn-primary").click
 
-      expect(f('.ic-flash-error').text).to include "first new outcome is already located in new outcome group"
+      expect(f(".ic-flash-error").text).to include "first new outcome is already located in new outcome group"
     end
 
     it "moves a learning outcome group via tree modal" do
-      group1 = outcome_group_model(title: 'outcome group 1')
-      group2 = outcome_group_model(title: 'outcome group 2')
+      group1 = outcome_group_model(title: "outcome group 1")
+      group2 = outcome_group_model(title: "outcome group 2")
       get outcome_url
       wait_for_ajaximations
 
@@ -241,47 +241,47 @@ describe "outcomes as a teacher" do
       wait_for_ajaximations
 
       # bring up modal
-      f(".move_button").click()
+      f(".move_button").click
       wait_for_ajaximations
 
       # should show modal tree
-      expect(fj('.ui-dialog-titlebar span').text).to eq "Where would you like to move #{group1.title}?"
-      expect(ffj('.ui-dialog-content').length).to eq 1
+      expect(fj(".ui-dialog-titlebar span").text).to eq "Where would you like to move #{group1.title}?"
+      expect(ffj(".ui-dialog-content").length).to eq 1
 
       # move the outcome group
-      f('.treeLabel').click
+      f(".treeLabel").click
       wait_for_ajaximations
       f("[role=treeitem][data-id='#{group2.id}'] a span").click
       wait_for_ajaximations
-      f('.form-controls .btn-primary').click
+      f(".form-controls .btn-primary").click
 
       expect_flash_message :success, "Successfully moved #{group1.title} to #{group2.title}"
       dismiss_flash_messages # so they don't interfere with subsequent clicks
 
       # check for proper updates in outcome group columns on page
-      fj('.outcomes-sidebar .outcome-level:first li').click
+      fj(".outcomes-sidebar .outcome-level:first li").click
       wait_for_ajaximations
-      expect(ffj('.outcomes-sidebar .outcome-level:first li').length).to eq 1
-      expect(ffj('.outcomes-sidebar .outcome-level:last li').length).to eq 1
+      expect(ffj(".outcomes-sidebar .outcome-level:first li").length).to eq 1
+      expect(ffj(".outcomes-sidebar .outcome-level:last li").length).to eq 1
 
       # confirm move in db
       group2.reload
       expect(group2.child_outcome_groups.first.id).to eq group1.id
 
       # check that modal window properly updated
-      fj('.outcomes-sidebar .outcome-group').click
+      fj(".outcomes-sidebar .outcome-group").click
       wait_for_ajaximations
 
-      f(".move_button").click()
+      f(".move_button").click
       wait_for_ajaximations
 
-      fj('.treeLabel').click
+      fj(".treeLabel").click
       wait_for_ajaximations
 
-      ff('[role=treeitem] a span')[1].click
+      ff("[role=treeitem] a span")[1].click
       wait_for_ajaximations
 
-      expect(ff('[role=treeitem]')[1].find_elements(:class, "treeLabel").length).to eq 2
+      expect(ff("[role=treeitem]")[1].find_elements(:class, "treeLabel").length).to eq 2
     end
   end
 end

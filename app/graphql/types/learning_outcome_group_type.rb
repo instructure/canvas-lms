@@ -19,7 +19,7 @@
 #
 module Types
   class LearningOutcomeGroupType < ApplicationObjectType
-    description 'Learning Outcome Group'
+    description "Learning Outcome Group"
 
     implements GraphQL::Types::Relay::Node
     implements Interfaces::LegacyIDInterface

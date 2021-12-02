@@ -24,7 +24,7 @@ class SearchController < ApplicationController
   include SearchHelper
   include Api::V1::Conversation
 
-  before_action :require_user, :except => [:all_courses]
+  before_action :require_user, except: [:all_courses]
   before_action :get_context, except: :recipients
 
   def rubrics
@@ -43,7 +43,7 @@ class SearchController < ApplicationController
     end
     res += Rubric.publicly_reusable.matching(params[:q])
     res = res.select { |r| r.title.downcase.match(params[:q].downcase) }
-    render :json => res
+    render json: res
   end
 
   # @API Find recipients
@@ -128,7 +128,7 @@ class SearchController < ApplicationController
 
       permissions = params[:permissions] || []
       permissions << :send_messages if params[:messageable_only]
-      load_all_contexts :context => search_context, :permissions => permissions
+      load_all_contexts context: search_context, permissions: permissions
 
       params[:per_page] = nil if params[:per_page].to_i <= 0
 
@@ -147,7 +147,7 @@ class SearchController < ApplicationController
         recipients = Api.paginate(recipients, self, api_v1_search_recipients_url)
       end
 
-      render :json => conversation_recipients_json(recipients, @current_user, session)
+      render json: conversation_recipients_json(recipients, @current_user, session)
     end
   end
 
@@ -170,11 +170,11 @@ class SearchController < ApplicationController
 
     @courses = Course.where(root_account_id: @domain_root_account)
                      .where(indexed: true)
-                     .where(workflow_state: 'available')
-                     .order('created_at')
+                     .where(workflow_state: "available")
+                     .order("created_at")
     @search = params[:search]
     if @search.present?
-      @courses = @courses.where(@courses.wildcard('name', @search.to_s))
+      @courses = @courses.where(@courses.wildcard("name", @search.to_s))
     end
     @public_only = params[:public_only]
     if @public_only
@@ -186,12 +186,12 @@ class SearchController < ApplicationController
     end
     pagination_args = {}
     pagination_args[:per_page] = 12 unless request.format == :json
-    base_url = api_request? ? api_v1_search_all_courses_url : '/search/all_courses/'
+    base_url = api_request? ? api_v1_search_all_courses_url : "/search/all_courses/"
     ret = Api.paginate(@courses, self, base_url, pagination_args, { enhanced_return: true })
     @courses = ret[:collection]
 
     if request.format == :json
-      return render :json => @courses.as_json
+      return render json: @courses.as_json
     end
 
     @prevPage = ret[:hash][:prev]
@@ -200,7 +200,7 @@ class SearchController < ApplicationController
 
     if request.xhr?
       set_no_cache_headers
-      return render :html => @contentHTML
+      render html: @contentHTML
     end
   end
 end

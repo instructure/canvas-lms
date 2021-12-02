@@ -18,27 +18,27 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../spec_helper'
+require_relative "../spec_helper"
 
 describe GradebookFilter, type: :model do
-  describe 'associations' do
+  describe "associations" do
     it { is_expected.to belong_to(:user).required }
     it { is_expected.to belong_to(:course).required }
   end
 
-  describe 'validations' do
+  describe "validations" do
     it { is_expected.to validate_presence_of :user }
     it { is_expected.to validate_presence_of :course }
     it { is_expected.to validate_presence_of :name }
     it { is_expected.to validate_presence_of :payload }
-    it { is_expected.not_to allow_value('').for(:name) }
+    it { is_expected.not_to allow_value("").for(:name) }
     it { is_expected.to validate_length_of(:name).is_at_most(ActiveRecord::Base.maximum_string_length) }
   end
 
-  describe 'permissions' do
+  describe "permissions" do
     before :once do
       course_with_teacher(active_all: true)
-      @gradebook_filter = @course.gradebook_filters.create!(user: @teacher, course: @course, name: 'First filter', payload: { foo: :bar })
+      @gradebook_filter = @course.gradebook_filters.create!(user: @teacher, course: @course, name: "First filter", payload: { foo: :bar })
     end
 
     it "grants read access to the creator of the filter" do

@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../../common'
+require_relative "../../common"
 
 module PacePlansPageObject
   #------------------------- Selectors -------------------------------
@@ -33,16 +33,36 @@ module PacePlansPageObject
     "button:contains('Close')"
   end
 
+  def module_item_points_possible_selector
+    ".pace-plans-assignment-row-points-possible"
+  end
+
+  def module_item_publish_status_selector
+    "[name='IconPublish']"
+  end
+
+  def module_item_unpublish_status_selector
+    "[name='IconUnpublished']"
+  end
+
   def module_items_selector
     "[data-testid='pp-title-cell']"
+  end
+
+  def pace_plan_end_date_selector
+    "[data-testid='paceplan-date-text']"
   end
 
   def pace_plan_menu_selector
     "[data-position-target='pace-plan-menu']"
   end
 
+  def pace_plan_start_date_selector
+    "[data-testid='pace-plan-start-date']"
+  end
+
   def pace_plan_table_module_selector
-    'h2'
+    "h2"
   end
 
   def publish_button_selector
@@ -55,6 +75,18 @@ module PacePlansPageObject
 
   def publish_status_selector
     "[data-testid='publish-status']"
+  end
+
+  def require_end_date_checkbox_xpath_selector
+    "//label[..//input[@data-testid = 'require-end-date-toggle']]"
+  end
+
+  def require_end_date_checkbox_selector
+    "[data-testid='require-end-date-toggle']"
+  end
+
+  def required_end_date_input_selector
+    "#pace-plans-required-end-date-input [data-testid='pace-plan-start-date']"
   end
 
   def settings_button_selector
@@ -71,6 +103,10 @@ module PacePlansPageObject
 
   def skip_weekends_checkbox_xpath_selector
     "//label[..//input[@data-testid = 'skip-weekends-toggle']]"
+  end
+
+  def skip_weekends_checkbox_selector
+    "[data-testid='skip-weekends-toggle']"
   end
 
   def student_pace_plan_selector(student_name)
@@ -103,12 +139,36 @@ module PacePlansPageObject
     fj(edit_tray_close_button_selector)
   end
 
+  def module_item_points_possible
+    ff(module_item_points_possible_selector)
+  end
+
+  def module_item_publish_status
+    ff(module_item_publish_status_selector)
+  end
+
+  def module_item_unpublish_status
+    ff(module_item_unpublish_status_selector)
+  end
+
   def module_items
     ff(module_items_selector)
   end
 
+  def module_item_title(item_title)
+    flnpt(item_title)
+  end
+
+  def pace_plan_end_date
+    f(pace_plan_end_date_selector)
+  end
+
   def pace_plan_menu
     ff(pace_plan_menu_selector)
+  end
+
+  def pace_plan_start_date
+    f(pace_plan_start_date_selector)
   end
 
   def pace_plan_table_module_elements
@@ -125,6 +185,14 @@ module PacePlansPageObject
 
   def publish_status_button
     f(publish_status_button_selector)
+  end
+
+  def require_end_date_checkbox
+    fxpath(require_end_date_checkbox_xpath_selector)
+  end
+
+  def required_end_date_input
+    f(required_end_date_input_selector)
   end
 
   def settings_button
@@ -174,12 +242,20 @@ module PacePlansPageObject
     pace_plan_menu[1].click
   end
 
+  def click_require_end_date_checkbox
+    require_end_date_checkbox.click
+  end
+
   def click_settings_button
     settings_button.click
   end
 
   def click_show_hide_projections_button
     show_hide_pace_plans.click
+  end
+
+  def click_skip_weekends_toggle
+    skip_weekends_checkbox.click
   end
 
   def click_student_pace_plan(student_name)
@@ -196,6 +272,10 @@ module PacePlansPageObject
     publish_status_button.click
   end
 
+  def click_weekends_checkbox
+    skip_weekends_checkbox.click
+  end
+
   #------------------------------Retrieve Text------------------------
   #
   def module_item_title_text(item_number)
@@ -207,12 +287,25 @@ module PacePlansPageObject
   end
   #----------------------------Element Management---------------------
 
+  def add_required_end_date(required_end_date)
+    formatted_date = required_end_date.strftime("%m/%d/%Y")
+    required_end_date_input.send_keys(formatted_date, :enter)
+  end
+
   def module_item_exists?
     element_exists?(module_items_selector)
   end
 
+  def pace_plan_end_date_exists?
+    element_exists?(pace_plan_end_date_selector)
+  end
+
   def pace_plan_menu_value
     element_value_for_attr(pace_plan_menu[1], "value")
+  end
+
+  def pace_plan_start_date_exists?
+    element_exists?(pace_plan_start_date_selector)
   end
 
   def publish_status_exists?
@@ -221,6 +314,14 @@ module PacePlansPageObject
 
   def publish_status_button_exists?
     element_exists?(publish_status_button_selector)
+  end
+
+  def required_end_date_input_exists?
+    element_exists?(required_end_date_input_selector)
+  end
+
+  def required_end_date_value
+    element_value_for_attr(required_end_date_input, "value")
   end
 
   def show_hide_pace_plans_button_text
@@ -240,7 +341,7 @@ module PacePlansPageObject
   end
 
   def update_module_item_duration(duration)
-    duration_field.send_keys([:control, 'a'], :backspace, duration, :tab)
+    duration_field.send_keys([:control, "a"], :backspace, duration, :tab)
   end
 
   def unpublished_changes_tray_exists?

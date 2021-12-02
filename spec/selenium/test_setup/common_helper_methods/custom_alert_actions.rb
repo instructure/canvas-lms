@@ -48,7 +48,7 @@ module CustomAlertActions
   end
 
   def expect_fired_alert
-    driver.execute_script(<<-JS)
+    driver.execute_script(<<~JS)
       window.canvasTestSavedAlert = window.alert;
       window.canvasTestAlertFired = false;
       window.alert = function() {
@@ -59,15 +59,15 @@ module CustomAlertActions
 
     yield
 
-    keep_trying_until {
-      driver.execute_script(<<-JS)
+    keep_trying_until do
+      driver.execute_script(<<~JS)
         var value = window.canvasTestAlertFired;
         window.canvasTestAlertFired = false;
         return value;
       JS
-    }
+    end
 
-    driver.execute_script(<<-JS)
+    driver.execute_script(<<~JS)
       window.alert = window.canvasTestSavedAlert;
     JS
   end

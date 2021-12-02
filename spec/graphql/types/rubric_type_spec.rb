@@ -26,39 +26,39 @@ describe Types::RubricType do
   let(:rubric) { rubric_for_course }
   let(:rubric_type) { GraphQLTypeTester.new(rubric, current_user: student) }
 
-  it 'works' do
-    expect(rubric_type.resolve('_id')).to eq rubric.id.to_s
+  it "works" do
+    expect(rubric_type.resolve("_id")).to eq rubric.id.to_s
   end
 
-  it 'requires permission' do
+  it "requires permission" do
     user2 = User.create!
-    expect(rubric_type.resolve('_id', current_user: user2)).to eq nil
+    expect(rubric_type.resolve("_id", current_user: user2)).to eq nil
   end
 
-  describe 'works for the field' do
-    it 'criteria' do
+  describe "works for the field" do
+    it "criteria" do
       expect(
-        rubric_type.resolve('criteria { _id }')
+        rubric_type.resolve("criteria { _id }")
       ).to eq(rubric.criteria.map { |c| c[:id].to_s })
     end
 
-    it 'free_form_criterion_comments' do
+    it "free_form_criterion_comments" do
       expect(
-        rubric_type.resolve('freeFormCriterionComments')
+        rubric_type.resolve("freeFormCriterionComments")
       ).to eq false
     end
 
-    it 'hide_score_total' do
-      expect(rubric_type.resolve('hideScoreTotal')).to eq false
+    it "hide_score_total" do
+      expect(rubric_type.resolve("hideScoreTotal")).to eq false
     end
 
-    it 'points_possible' do
+    it "points_possible" do
       rubric.update!(points_possible: 10)
-      expect(rubric_type.resolve('pointsPossible')).to eq rubric.points_possible
+      expect(rubric_type.resolve("pointsPossible")).to eq rubric.points_possible
     end
 
-    it 'title' do
-      expect(rubric_type.resolve('title')).to eq rubric.title
+    it "title" do
+      expect(rubric_type.resolve("title")).to eq rubric.title
     end
   end
 end

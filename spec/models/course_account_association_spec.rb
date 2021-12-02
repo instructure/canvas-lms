@@ -19,8 +19,8 @@
 #
 
 describe CourseAccountAssociation do
-  context 'create' do
-    it 'sets root account id from account' do
+  context "create" do
+    it "sets root account id from account" do
       course_factory
       association = @course.course_account_associations.first
       expect(association.root_account_id).to eq @course.root_account_id

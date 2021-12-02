@@ -21,21 +21,24 @@
 require_relative "../graphql_spec_helper"
 
 describe Types::CourseType do
-  let_once(:course) { course_with_student(active_all: true); @course }
+  let_once(:course) do
+    course_with_student(active_all: true)
+    @course
+  end
   let(:course_type) { GraphQLTypeTester.new(course, current_user: @student) }
 
   let_once(:other_section) { course.course_sections.create! name: "other section" }
-  let_once(:other_teacher) {
+  let_once(:other_teacher) do
     course.enroll_teacher(user_factory, section: other_section, limit_privileges_to_course_section: true).user
-  }
+  end
 
   it "works" do
     expect(course_type.resolve("_id")).to eq course.id.to_s
     expect(course_type.resolve("name")).to eq course.name
   end
 
-  it 'works for root_outcome_group' do
-    expect(course_type.resolve('rootOutcomeGroup { _id }')).to eq course.root_outcome_group.id.to_s
+  it "works for root_outcome_group" do
+    expect(course_type.resolve("rootOutcomeGroup { _id }")).to eq course.root_outcome_group.id.to_s
   end
 
   context "top-level permissions" do
@@ -56,7 +59,10 @@ describe Types::CourseType do
   end
 
   context "sis fields" do
-    let_once(:sis_course) { course.update!(sis_course_id: "SIScourseID"); course }
+    let_once(:sis_course) do
+      course.update!(sis_course_id: "SIScourseID")
+      course
+    end
 
     let(:admin) { account_admin_user_with_role_changes(role_changes: { read_sis: false }) }
 
@@ -86,9 +92,9 @@ describe Types::CourseType do
   end
 
   describe "assignmentsConnection" do
-    let_once(:assignment) {
+    let_once(:assignment) do
       course.assignments.create! name: "asdf", workflow_state: "unpublished"
-    }
+    end
 
     it "only returns visible assignments" do
       expect(course_type.resolve("assignmentsConnection { edges { node { _id } } }", current_user: @teacher).size).to eq 1
@@ -102,7 +108,7 @@ describe Types::CourseType do
         course.enrollment_term.update grading_period_group: gpg
         @term1 = gpg.grading_periods.create! title: "past grading period",
                                              start_date: 2.weeks.ago,
-                                             end_date: 1.weeks.ago
+                                             end_date: 1.week.ago
         @term2 = gpg.grading_periods.create! title: "current grading period",
                                              start_date: 2.days.ago,
                                              end_date: 2.days.from_now
@@ -162,19 +168,19 @@ describe Types::CourseType do
   end
 
   describe "outcomeProficiency" do
-    it 'resolves to the account proficiency' do
+    it "resolves to the account proficiency" do
       outcome_proficiency_model(course.account)
       expect(
-        course_type.resolve('outcomeProficiency { _id }', current_user: @teacher)
+        course_type.resolve("outcomeProficiency { _id }", current_user: @teacher)
       ).to eq course.account.outcome_proficiency.id.to_s
     end
   end
 
   describe "outcomeCalculationMethod" do
-    it 'resolves to the account calculation method' do
+    it "resolves to the account calculation method" do
       outcome_calculation_method_model(course.account)
       expect(
-        course_type.resolve('outcomeCalculationMethod { _id }', current_user: @teacher)
+        course_type.resolve("outcomeCalculationMethod { _id }", current_user: @teacher)
       ).to eq course.account.outcome_calculation_method.id.to_s
     end
   end
@@ -344,12 +350,8 @@ describe Types::CourseType do
     before(:once) do
       @student1 = @student
       @student2 = student_in_course(active_all: true).user
-      @inactive_user = student_in_course.tap { |enrollment|
-        enrollment.invite
-      }.user
-      @concluded_user = student_in_course.tap { |enrollment|
-        enrollment.complete
-      }.user
+      @inactive_user = student_in_course.tap(&:invite).user
+      @concluded_user = student_in_course.tap(&:complete).user
     end
 
     describe "usersConnection" do
@@ -403,7 +405,7 @@ describe Types::CourseType do
         expect(
           course_type.resolve(
             "enrollmentsConnection { nodes { _id } }",
-            current_user: @teacher,
+            current_user: @teacher
           )
         ).to match_array @course.all_enrollments.map(&:to_param)
       end
@@ -457,7 +459,7 @@ describe Types::CourseType do
 
   describe "AssignmentGroupConnection" do
     it "returns assignment groups" do
-      ag = course.assignment_groups.create!(name: 'a group')
+      ag = course.assignment_groups.create!(name: "a group")
       expect(
         course_type.resolve("assignmentGroupsConnection { edges { node { _id } } }")
       ).to eq [ag.to_param]
@@ -574,37 +576,37 @@ describe Types::CourseType do
     end
   end
 
-  describe 'Account' do
-    it 'works' do
+  describe "Account" do
+    it "works" do
       expect(course_type.resolve("account { _id }")).to eq course.account.id.to_s
     end
   end
 
-  describe 'imageUrl' do
-    it 'returns a url from an uploaded image' do
+  describe "imageUrl" do
+    it "returns a url from an uploaded image" do
       course.image_id = attachment_model(context: @course).id
       course.save!
       expect(course_type.resolve("imageUrl")).to_not be_nil
     end
 
-    it 'returns a url from id when url is blank' do
-      course.image_url = ''
+    it "returns a url from id when url is blank" do
+      course.image_url = ""
       course.image_id = attachment_model(context: @course).id
       course.save!
       expect(course_type.resolve("imageUrl")).to_not be_nil
       expect(course_type.resolve("imageUrl")).to_not eq ""
     end
 
-    it 'returns a url from settings' do
+    it "returns a url from settings" do
       course.image_url = "http://some.cool/gif.gif"
       course.save!
       expect(course_type.resolve("imageUrl")).to eq "http://some.cool/gif.gif"
     end
   end
 
-  describe 'AssetString' do
-    it 'returns the asset string' do
-      result = course_type.resolve('assetString')
+  describe "AssetString" do
+    it "returns the asset string" do
+      result = course_type.resolve("assetString")
       expect(result).to eq @course.asset_string
     end
   end

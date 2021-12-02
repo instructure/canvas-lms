@@ -22,7 +22,7 @@ import pairingCodeTemplate from '../../jst/PairingCodeUserObservees.handlebars'
 import itemView from './UserObserveeView.coffee'
 import PaginatedCollectionView from '@canvas/pagination/backbone/views/PaginatedCollectionView.coffee'
 import '@canvas/jquery/jquery.disableWhileLoading'
-import {clearObservedId, savedObservedId} from '@canvas/k5/ObserverGetObservee'
+import {clearObservedId, savedObservedId} from '@canvas/observer-picker/ObserverGetObservee'
 
 export default class UserObserveesView extends PaginatedCollectionView
   autoFetch: true

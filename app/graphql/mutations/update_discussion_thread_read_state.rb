@@ -19,17 +19,17 @@
 #
 
 class Mutations::UpdateDiscussionThreadReadState < Mutations::BaseMutation
-  graphql_name 'UpdateDiscussionThreadReadState'
+  graphql_name "UpdateDiscussionThreadReadState"
 
-  argument :discussion_entry_id, ID, required: true, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func('DiscussionEntry')
+  argument :discussion_entry_id, ID, required: true, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("DiscussionEntry")
   argument :read, Boolean, required: true
 
   field :discussion_entry, Types::DiscussionEntryType, null: false
   def resolve(input:)
     root_entry = DiscussionEntry.find(input[:discussion_entry_id])
-    raise GraphQL::ExecutionError, 'not found' unless root_entry.grants_right?(current_user, session, :read)
+    raise GraphQL::ExecutionError, "not found" unless root_entry.grants_right?(current_user, session, :read)
 
-    read_state = input[:read] ? 'read' : 'unread'
+    read_state = input[:read] ? "read" : "unread"
 
     DiscussionEntryParticipant.upsert_for_root_entry_and_descendants(root_entry, current_user,
                                                                      new_state: read_state,
@@ -45,6 +45,6 @@ class Mutations::UpdateDiscussionThreadReadState < Mutations::BaseMutation
       discussion_entry: root_entry
     }
   rescue ActiveRecord::RecordNotFound
-    raise GraphQL::ExecutionError, 'not found'
+    raise GraphQL::ExecutionError, "not found"
   end
 end

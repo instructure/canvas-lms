@@ -19,6 +19,8 @@
 #
 
 describe Lti::ExternalToolTab do
+  subject { described_class.new(context, nil, [tool]) }
+
   let(:context) do
     account = Account.new
     allow(account).to receive(:id).and_return(1)
@@ -30,7 +32,7 @@ describe Lti::ExternalToolTab do
       text: "Course Placement",
       url: "http://example.com/ims/lti",
       default: false,
-      visibility: 'admins'
+      visibility: "admins"
     }
   end
 
@@ -38,8 +40,8 @@ describe Lti::ExternalToolTab do
     {
       text: "Account Placement",
       url: "http://example.com/ims/lti",
-      default: 'disabled',
-      visibility: 'members'
+      default: "disabled",
+      visibility: "members"
     }
   end
 
@@ -58,34 +60,32 @@ describe Lti::ExternalToolTab do
       name: "external tool",
       course_navigation: course_navigation,
       account_navigation: account_navigation,
-      user_navigation: user_navigation,
+      user_navigation: user_navigation
     )
     allow(tool).to receive(:id).and_return(2)
     tool
   end
 
-  subject { described_class.new(context, nil, [tool]) }
-
-  it 'sets the tab id to the tools asset_string' do
+  it "sets the tab id to the tools asset_string" do
     expect(subject.tabs.first[:id]).to eq tool.asset_string
   end
 
-  it 'sets the css_class' do
+  it "sets the css_class" do
     expect(subject.tabs.first[:css_class]).to eq tool.asset_string
   end
 
-  it 'sets the external value to true' do
+  it "sets the external value to true" do
     expect(subject.tabs.first[:external]).to eq true
   end
 
-  it 'sets the args to the context_id and tool_id' do
+  it "sets the args to the context_id and tool_id" do
     expect(subject.tabs.first[:args]).to eq [context.id, tool.id]
   end
 
-  it 'sets the target if windowTarget is set on the tool' do
+  it "sets the target if windowTarget is set on the tool" do
     tool[:settings][:windowTarget] = "_blank"
     subject = described_class.new(context, nil, [tool])
-    expect(subject.tabs.first[:target]).to eq '_blank'
+    expect(subject.tabs.first[:target]).to eq "_blank"
   end
 
   it "doesn't set the target if windowTarget is not set on the tool" do
@@ -101,7 +101,7 @@ describe Lti::ExternalToolTab do
   it "adds {dispaly: 'borderless'} if the windowTarget is present" do
     tool[:settings][:windowTarget] = "_blank"
     subject = described_class.new(context, nil, [tool])
-    expect(subject.tabs.first[:args]).to include({ display: 'borderless' })
+    expect(subject.tabs.first[:args]).to include({ display: "borderless" })
   end
 
   it "sorts by tool id" do
@@ -115,88 +115,88 @@ describe Lti::ExternalToolTab do
     )
     allow(tool2).to receive(:id).and_return(9)
     subject = described_class.new(context, nil, [tool2, tool])
-    expect(subject.tabs.map { |t| t[:id] }).to eq [tool.asset_string, tool2.asset_string]
+    expect(subject.tabs.pluck(:id)).to eq [tool.asset_string, tool2.asset_string]
   end
 
   describe "course_navigation" do
+    subject { described_class.new(context, :course_navigation, [tool]) }
+
     let(:context) do
       course = Course.new
       allow(course).to receive(:id).and_return(3)
       course
     end
 
-    subject { described_class.new(context, :course_navigation, [tool]) }
-
-    it 'sets the label based on placement' do
+    it "sets the label based on placement" do
       expect(subject.tabs.first[:label]).to eq course_navigation[:text]
     end
 
-    it 'sets the visibility' do
+    it "sets the visibility" do
       expect(subject.tabs.first[:visibility]).to eq course_navigation[:visibility]
     end
 
-    it 'sets the href' do
+    it "sets the href" do
       expect(subject.tabs.first[:href]).to eq :course_external_tool_path
     end
 
-    it 'sets hidden' do
+    it "sets hidden" do
       expect(subject.tabs.first[:hidden]).to eq course_navigation[:default]
     end
 
-    it 'sets the target if windowTarget is set on the tool' do
+    it "sets the target if windowTarget is set on the tool" do
       tool[:settings][:course_navigation][:windowTarget] = "_blank"
       subject = described_class.new(context, :course_navigation, [tool])
-      expect(subject.tabs.first[:target]).to eq '_blank'
+      expect(subject.tabs.first[:target]).to eq "_blank"
     end
   end
 
   describe "account_navigation" do
     subject { described_class.new(context, :account_navigation, [tool]) }
 
-    it 'sets the label based on placement' do
+    it "sets the label based on placement" do
       expect(subject.tabs.first[:label]).to eq account_navigation[:text]
     end
 
-    it 'sets the visibility' do
+    it "sets the visibility" do
       expect(subject.tabs.first[:visibility]).to eq account_navigation[:visibility]
     end
 
-    it 'sets the href' do
+    it "sets the href" do
       expect(subject.tabs.first[:href]).to eq :account_external_tool_path
     end
 
-    it 'sets hidden' do
+    it "sets hidden" do
       expect(subject.tabs.first[:hidden]).to eq true
     end
 
-    it 'sets the target if windowTarget is set on the tool' do
+    it "sets the target if windowTarget is set on the tool" do
       tool[:settings][:account_navigation][:windowTarget] = "_blank"
       subject = described_class.new(context, :account_navigation, [tool])
-      expect(subject.tabs.first[:target]).to eq '_blank'
+      expect(subject.tabs.first[:target]).to eq "_blank"
     end
   end
 
   describe "user_navigation" do
+    subject { described_class.new(context, :user_navigation, [tool]) }
+
     let(:context) do
       user = User.new
       allow(user).to receive(:id).and_return(4)
       user
     end
 
-    subject { described_class.new(context, :user_navigation, [tool]) }
-
-    it 'sets the label based on placement' do
+    it "sets the label based on placement" do
       expect(subject.tabs.first[:label]).to eq user_navigation[:text]
     end
 
-    it 'sets the href' do
+    it "sets the href" do
       expect(subject.tabs.first[:href]).to eq :user_external_tool_path
     end
 
-    it 'sets the target if windowTarget is set on the tool' do
+    it "sets the target if windowTarget is set on the tool" do
       tool[:settings][:user_navigation][:windowTarget] = "_blank"
       subject = described_class.new(context, :user_navigation, [tool])
-      expect(subject.tabs.first[:target]).to eq '_blank'
+      expect(subject.tabs.first[:target]).to eq "_blank"
     end
   end
 end

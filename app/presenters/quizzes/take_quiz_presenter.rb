@@ -63,7 +63,7 @@ class Quizzes::TakeQuizPresenter
     classes << (one_question_at_a_time? ? "one_question_at_a_time" : "all_questions")
     classes << "cant_go_back" if cant_go_back?
     classes << "last_page" if last_page?
-    classes.join(' ')
+    classes.join(" ")
   end
 
   def question_class(q)
@@ -73,7 +73,7 @@ class Quizzes::TakeQuizPresenter
     classes << "seen" if question_seen?(q)
     classes << "current_question" if one_question_at_a_time? && current_question?(q)
     classes << "text_only" if text_only?(q)
-    classes.join(' ')
+    classes.join(" ")
   end
 
   def marked?(q)
@@ -81,24 +81,24 @@ class Quizzes::TakeQuizPresenter
   end
 
   def text_only?(q)
-    q['question_type'] == "text_only_question"
+    q["question_type"] == "text_only_question"
   end
 
   def answered_icon(q)
-    question_answered?(q) ? 'icon-check' : 'icon-question'
+    question_answered?(q) ? "icon-check" : "icon-question"
   end
 
   def answered_text(q)
     if question_answered?(q)
-      I18n.t('question_answered', 'Answered')
+      I18n.t("question_answered", "Answered")
     else
-      I18n.t('question_unanswered', 'Haven\'t Answered Yet')
+      I18n.t("question_unanswered", "Haven't Answered Yet")
     end
   end
 
   def marked_text(q)
     if marked?(q)
-      I18n.t('titles.come_back_later', 'You marked this question to come back to later')
+      I18n.t("titles.come_back_later", "You marked this question to come back to later")
     end
   end
 
@@ -115,7 +115,7 @@ class Quizzes::TakeQuizPresenter
   end
 
   def question_answered?(question)
-    answers.has_key?(question[:id])
+    answers.key?(question[:id])
   end
 
   def question_index(question)
@@ -151,7 +151,7 @@ class Quizzes::TakeQuizPresenter
   end
 
   def question_path(id)
-    ps = { :course_id => quiz.context.id, :quiz_id => quiz.id, :question_id => id }
+    ps = { course_id: quiz.context.id, quiz_id: quiz.id, question_id: id }
     ps[:preview] = true if params[:preview]
     course_quiz_question_path(ps)
   end
@@ -171,7 +171,7 @@ class Quizzes::TakeQuizPresenter
   def next_question_form_action(session, user)
     record_answer_course_quiz_quiz_submission_path(
       quiz.context, quiz, submission, form_action_params(session, user).merge({
-                                                                                :next_question_path => next_question_path
+                                                                                next_question_path: next_question_path
                                                                               })
     )
   end
@@ -179,7 +179,7 @@ class Quizzes::TakeQuizPresenter
   def previous_question_form_action(session, user)
     record_answer_course_quiz_quiz_submission_path(
       quiz.context, quiz, submission, form_action_params(session, user).merge({
-                                                                                :next_question_path => previous_question_path
+                                                                                next_question_path: previous_question_path
                                                                               })
     )
   end
@@ -187,7 +187,7 @@ class Quizzes::TakeQuizPresenter
   private
 
   def first_unread_question
-    question_ids = all_questions.map { |question| question[:id] }
+    question_ids = all_questions.pluck(:id)
     first_unread = question_ids.detect do |question_id|
       !submission_data[:"_question_#{question_id}_read"]
     end
@@ -195,8 +195,8 @@ class Quizzes::TakeQuizPresenter
   end
 
   def form_action_params(session, user)
-    url_params = { :user_id => user && user.id }
-    if session['lockdown_browser_popup']
+    url_params = { user_id: user&.id }
+    if session["lockdown_browser_popup"]
       url_params.merge!(Canvas::LockdownBrowser.plugin.base.quiz_exit_params)
     end
     url_params
@@ -229,9 +229,9 @@ class Quizzes::TakeQuizPresenter
 
     answers.reject! do |_, status_entries|
       # an answer must not be falsy/empty
-      status_entries.any? { |status| !dataset[status].present? } ||
+      status_entries.any? { |status| dataset[status].blank? } ||
         # all zeroes for an answer is a no-answer
-        status_entries.all? { |status| dataset[status] == '0' }
+        status_entries.all? { |status| dataset[status] == "0" }
     end
 
     answers

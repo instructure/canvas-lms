@@ -21,15 +21,15 @@ PactConfig::Consumers::ALL.each do |consumer|
   Pact.provider_states_for consumer do
     # Course ID: 1
     # Quizzes ID: 1
-    provider_state 'a quiz in a course' do
+    provider_state "a quiz in a course" do
       set_up do
         @course = Pact::Canvas.base_state.course
-        @course.quizzes.create(title: 'Test Quiz', description: 'Its a Quiz figure it out', due_at: 'Whenever')
+        @course.quizzes.create(title: "Test Quiz", description: "Its a Quiz figure it out", due_at: "Whenever")
       end
     end
 
     # Course ID: 1
-    provider_state 'multiple sections in a course' do
+    provider_state "multiple sections in a course" do
       set_up do
         @course = Pact::Canvas.base_state.course
         add_section("section1", @course)
@@ -42,7 +42,7 @@ PactConfig::Consumers::ALL.each do |consumer|
     # Student ID: 5 || Name: Student1
     # Course ID: 1
     # Quizzes ID: 1
-    provider_state 'a student in a course with a submitted assignment' do
+    provider_state "a student in a course with a submitted assignment" do
       set_up do
         @student = Pact::Canvas.base_state.students.first
         @course = Pact::Canvas.base_state.course
@@ -52,7 +52,7 @@ PactConfig::Consumers::ALL.each do |consumer|
     end
 
     # Course ID: 1
-    provider_state 'a student in a course with a missing assignment' do
+    provider_state "a student in a course with a missing assignment" do
       set_up do
         @course = Pact::Canvas.base_state.course
         Assignment.create!(context: @course, title: "Missing Assignment", due_at: Time.zone.now - 2)
@@ -62,7 +62,7 @@ PactConfig::Consumers::ALL.each do |consumer|
     # broadly used provider state for mobile
     # Student ID: 8 || Name: "Mobile Student"
     # Course IDs: 2,3
-    provider_state 'a student with 2 courses' do
+    provider_state "a student with 2 courses" do
       set_up do
         # Add a graded assignment to each mobile course
         mcourses = Pact::Canvas.base_state.mobile_courses
@@ -79,21 +79,21 @@ PactConfig::Consumers::ALL.each do |consumer|
     # Student ID: 8 || Name: "Mobile Student"
     # Group ID: 1 for Course ID: 2
     # Group ID: 2 for Course ID: 3
-    provider_state 'mobile courses with groups' do
+    provider_state "mobile courses with groups" do
       set_up do
         # Add a group to each mobile course, and make sure that avatar_url gets populated for each
         mcourses = Pact::Canvas.base_state.mobile_courses
         mstudent = Pact::Canvas.base_state.mobile_student
 
-        group1 = Group.create(:name => "group1", :context => mcourses[0], :description => "description1")
-        attachment1 = attachment_model(filename: 'avatar1.jpg', context: group1, content_type: 'image/jpg')
+        group1 = Group.create(name: "group1", context: mcourses[0], description: "description1")
+        attachment1 = attachment_model(filename: "avatar1.jpg", context: group1, content_type: "image/jpg")
         group1.avatar_attachment = attachment1
         group1.add_user(mstudent)
         group1.save!
 
-        group2 = Group.create(:name => "group2", :context => mcourses[1], :description => "description2")
+        group2 = Group.create(name: "group2", context: mcourses[1], description: "description2")
         group2.add_user(mstudent)
-        attachment2 = attachment_model(filename: 'avatar2.jpg', context: group2, content_type: 'image/jpg')
+        attachment2 = attachment_model(filename: "avatar2.jpg", context: group2, content_type: "image/jpg")
         group2.avatar_attachment = attachment2
         group2.save!
       end

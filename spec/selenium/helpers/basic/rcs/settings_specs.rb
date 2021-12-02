@@ -17,9 +17,9 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../shared_examples_common'
+require_relative "../shared_examples_common"
 
-shared_examples_for "settings basic tests" do |account_type|
+shared_examples_for "settings basic tests" do
   include SharedExamplesCommon
   include_context "in-process server selenium tests"
 
@@ -51,11 +51,11 @@ shared_examples_for "settings basic tests" do |account_type|
       f("#tab-users-link").click
     end
 
-    it "adds an account admin", priority: "1", test_id: pick_test_id(account_type, sub_account: 249780, root_account: 251030) do
+    it "adds an account admin", priority: "1" do
       add_account_admin
     end
 
-    it "deletes an account admin", priority: "1", test_id: pick_test_id(account_type, sub_account: 249781, root_account: 251031) do
+    it "deletes an account admin", priority: "1" do
       skip_if_safari(:alert)
       admin_id = add_account_admin
       scroll_page_to_top # to get the flash alert out of the way
@@ -79,8 +79,8 @@ shared_examples_for "settings basic tests" do |account_type|
       wait_for_ajaximations
     end
 
-    it "changes the account name", priority: "1", test_id: pick_test_id(account_type, sub_account: 249782, root_account: 251032) do
-      new_account_name = 'new default account name'
+    it "changes the account name", priority: "1" do
+      new_account_name = "new default account name"
       replace_content(f("#account_name"), new_account_name)
       click_submit
       account.reload
@@ -88,8 +88,8 @@ shared_examples_for "settings basic tests" do |account_type|
       expect(f("#account_name")).to have_value(new_account_name)
     end
 
-    it "changes the default quotas", priority: "1", test_id: pick_test_id(account_type, sub_account: 250003, root_account: 251033) do
-      f('#tab-quotas-link').click
+    it "changes the default quotas", priority: "1" do
+      f("#tab-quotas-link").click
 
       # update the quotas
       course_quota = account.default_storage_quota_mb
@@ -105,15 +105,15 @@ shared_examples_for "settings basic tests" do |account_type|
       group_quota += 42
       replace_content(group_quota_input, group_quota.to_s)
 
-      submit_form('#default-quotas')
+      submit_form("#default-quotas")
       wait_for_ajax_requests
 
       # ensure the account was updated properly
       account.reload
       expect(account.default_storage_quota_mb).to eq course_quota
-      expect(account.default_storage_quota).to eq course_quota * 1048576
+      expect(account.default_storage_quota).to eq course_quota * 1_048_576
       expect(account.default_group_storage_quota_mb).to eq group_quota
-      expect(account.default_group_storage_quota).to eq group_quota * 1048576
+      expect(account.default_group_storage_quota).to eq group_quota * 1_048_576
 
       # ensure the new value is reflected after a refresh
       get account_settings_url
@@ -121,25 +121,25 @@ shared_examples_for "settings basic tests" do |account_type|
       expect(fj('[name="default_group_storage_quota_mb"]')).to have_value(group_quota.to_s) # fj to avoid selenium caching
     end
 
-    it "manuallies change a course quota", priority: "1", test_id: pick_test_id(account_type, sub_account: 250004, root_account: 251034) do
-      f('#tab-quotas-link').click
+    it "manuallies change a course quota", priority: "1" do
+      f("#tab-quotas-link").click
 
       # find the course by id
-      click_option('#manual_quotas_type', 'course', :value)
-      id_input = f('#manual_quotas_id')
+      click_option("#manual_quotas_type", "course", :value)
+      id_input = f("#manual_quotas_id")
       replace_content(id_input, @course.id.to_s)
-      f('#manual_quotas_find_button').click
+      f("#manual_quotas_find_button").click
 
       wait_for_ajaximations
 
-      link = f('#manual_quotas_link')
+      link = f("#manual_quotas_link")
       expect(link).to include_text(@course.name)
 
-      quota_input = f('#manual_quotas_quota')
+      quota_input = f("#manual_quotas_quota")
       expect(quota_input).to have_value(@course.storage_quota_mb.to_s)
-      replace_content(quota_input, '42')
+      replace_content(quota_input, "42")
 
-      f('#manual_quotas_submit_button').click
+      f("#manual_quotas_submit_button").click
 
       wait_for_ajax_requests
 
@@ -148,25 +148,25 @@ shared_examples_for "settings basic tests" do |account_type|
       expect(@course.storage_quota_mb).to eq 42
     end
 
-    it "manuallies change a group quota", priority: "1", test_id: pick_test_id(account_type, sub_account: 250005, root_account: 251035) do
-      f('#tab-quotas-link').click
+    it "manuallies change a group quota", priority: "1" do
+      f("#tab-quotas-link").click
 
       # find the course by id
-      click_option('#manual_quotas_type', 'group', :value)
-      id_input = f('#manual_quotas_id')
+      click_option("#manual_quotas_type", "group", :value)
+      id_input = f("#manual_quotas_id")
       replace_content(id_input, @group.id.to_s)
-      f('#manual_quotas_find_button').click
+      f("#manual_quotas_find_button").click
 
       wait_for_ajaximations
 
-      link = f('#manual_quotas_link')
+      link = f("#manual_quotas_link")
       expect(link).to include_text(@group.name)
 
-      quota_input = f('#manual_quotas_quota')
+      quota_input = f("#manual_quotas_quota")
       expect(quota_input).to have_value(@group.storage_quota_mb.to_s)
-      replace_content(quota_input, '42')
+      replace_content(quota_input, "42")
 
-      f('#manual_quotas_submit_button').click
+      f("#manual_quotas_submit_button").click
 
       wait_for_ajax_requests
 
@@ -175,12 +175,12 @@ shared_examples_for "settings basic tests" do |account_type|
       expect(@group.storage_quota_mb).to eq 42
     end
 
-    it "changes the default language to spanish", priority: "1", test_id: pick_test_id(account_type, sub_account: 250006, root_account: 251036) do
+    it "changes the default language to spanish", priority: "1" do
       f("#account_default_locale option[value='es']").click
       click_submit
       account.reload
       expect(account.default_locale).to eq "es"
-      expect(get_value('#account_default_locale')).to eq 'es'
+      expect(get_value("#account_default_locale")).to eq "es"
     end
   end
 end

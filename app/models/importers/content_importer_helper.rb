@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_dependency 'importers'
+require_dependency "importers"
 
 module Importers
   class ContentImporterHelper
@@ -45,12 +45,18 @@ module Importers
 
     def self.existing_migration_ids(context)
       existing_ids = {}
-      existing_ids[:assessments] = context.quizzes
-                                          .where("quizzes.migration_id IS NOT NULL").pluck(:migration_id) if context.respond_to?(:quizzes)
-      existing_ids[:assessment_questions] = context.assessment_questions
-                                                   .where("assessment_questions.migration_id IS NOT NULL").pluck(:migration_id) if context.respond_to?(:assessment_questions)
-      existing_ids[:assessment_question_banks] = context.assessment_question_banks
-                                                        .where("assessment_question_banks.migration_id IS NOT NULL").pluck(:migration_id) if context.respond_to?(:assessment_question_banks)
+      if context.respond_to?(:quizzes)
+        existing_ids[:assessments] = context.quizzes
+                                            .where.not(quizzes: { migration_id: nil }).pluck(:migration_id)
+      end
+      if context.respond_to?(:assessment_questions)
+        existing_ids[:assessment_questions] = context.assessment_questions
+                                                     .where.not(assessment_questions: { migration_id: nil }).pluck(:migration_id)
+      end
+      if context.respond_to?(:assessment_question_banks)
+        existing_ids[:assessment_question_banks] = context.assessment_question_banks
+                                                          .where.not(assessment_question_banks: { migration_id: nil }).pluck(:migration_id)
+      end
       existing_ids
     end
   end

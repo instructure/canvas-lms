@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 module GroupCategories
-  class Params < Struct.new(:name, :group_limit)
+  Params = Struct.new(:name, :group_limit) do
     attr_reader :raw_params
 
     def initialize(args, opts = {})
@@ -29,16 +29,16 @@ module GroupCategories
 
     def self_signup
       return _self_signup if _self_signup
-      return nil if !enable_self_signup
-      return 'restricted' if restrict_self_signup
+      return nil unless enable_self_signup
+      return "restricted" if restrict_self_signup
 
-      'enabled'
+      "enabled"
     end
 
     def auto_leader
       return nil if !enable_auto_leader.nil? && !enable_auto_leader
       return _auto_leader unless enable_auto_leader
-      return auto_leader_type if ['first', 'random'].include?(auto_leader_type)
+      return auto_leader_type if ["first", "random"].include?(auto_leader_type)
 
       raise(ArgumentError, "Invalid AutoLeader Type #{auto_leader_type}")
     end
@@ -86,15 +86,15 @@ module GroupCategories
     end
 
     def split_group_enabled?
-      raw_params[:split_groups] != '0'
+      raw_params[:split_groups] != "0"
     end
 
     def split_by_group_count_enabled?
-      raw_params[:split_groups] == '1'
+      raw_params[:split_groups] == "1"
     end
 
     def split_by_member_count_enabled?
-      raw_params[:split_groups] == '2'
+      raw_params[:split_groups] == "2"
     end
 
     def split_group_count
@@ -114,7 +114,7 @@ module GroupCategories
       return nil unless raw_value
 
       raw_value = raw_value.to_s.downcase
-      %w(enabled restricted).include?(raw_value) ? raw_value : nil
+      %w[enabled restricted].include?(raw_value) ? raw_value : nil
     end
 
     def _auto_leader
@@ -122,7 +122,7 @@ module GroupCategories
       return nil unless raw_value
 
       raw_value = raw_value.to_s.downcase
-      %w(random first).include?(raw_value) ? raw_value : nil
+      %w[random first].include?(raw_value) ? raw_value : nil
     end
 
     def auto_leader_type

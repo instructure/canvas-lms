@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../spec_helper'
+require_relative "../spec_helper"
 
 describe InstAccessTokensController do
   include_context "InstAccess setup"
@@ -26,7 +26,7 @@ describe InstAccessTokensController do
 
   describe "#create" do
     it "requires being logged in" do
-      post 'create'
+      post "create"
       expect(response).to be_redirect
       expect(response.status).to eq(302)
     end
@@ -34,26 +34,33 @@ describe InstAccessTokensController do
     context "with valid user session" do
       before { user_session(user) }
 
-      it "generates an InstAccess token for the requeting user" do
-        post 'create', format: 'json'
+      let(:deserialized_token) do
+        token = JSON.parse(response.body)["token"]
+        decrypt_and_deserialize_token(token)
+      end
+
+      it "generates an InstAccess token for the requesting user" do
+        post "create", format: "json"
         expect(response.status).to eq(201)
-        token = JSON.parse(response.body)['token']
-        access_token = decrypt_and_deserialize_token(token)
-        expect(access_token.user_uuid).to eq(user.uuid)
+        expect(deserialized_token.user_uuid).to eq(user.uuid)
       end
 
       it "has the user's domain in the token" do
-        post 'create', format: 'json'
-        token = JSON.parse(response.body)['token']
-        access_token = decrypt_and_deserialize_token(token)
-        expect(access_token.canvas_domain).to eq("test.host")
+        post "create", format: "json"
+        expect(deserialized_token.canvas_domain).to eq("test.host")
+      end
+
+      it "has the region in the token" do
+        expect(ApplicationController).to receive(:region).and_return "us-west-2"
+        post "create", format: "json"
+        expect(deserialized_token.region).to eq("us-west-2")
       end
     end
 
     it "doesn't allow using an InstAccess token to generate an InstAccess token" do
       token = InstAccess::Token.for_user(user_uuid: user.uuid, account_uuid: user.account.uuid).to_unencrypted_token_string
-      request.headers['Authorization'] = "Bearer #{token}"
-      get 'create', format: 'json'
+      request.headers["Authorization"] = "Bearer #{token}"
+      get "create", format: "json"
       expect(response.status).to eq(403)
       expect(response.body).to match(/cannot generate a JWT when authorized by a JWT/)
     end
@@ -63,8 +70,8 @@ describe InstAccessTokensController do
 
       it "doesn't allow you to create an InstAccess token" do
         token = build_wrapped_token(user.global_id)
-        @request.headers['Authorization'] = "Bearer #{token}"
-        get 'create', format: 'json'
+        @request.headers["Authorization"] = "Bearer #{token}"
+        get "create", format: "json"
         expect(response.status).to eq(403)
         expect(response.body).to match(/cannot generate a JWT when authorized by a JWT/)
       end

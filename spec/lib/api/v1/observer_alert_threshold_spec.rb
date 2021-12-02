@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../../../spec_helper'
+require_relative "../../../spec_helper"
 
 class ObserverAlertThresholdApiHarness
   include Api::V1::ObserverAlertThreshold
@@ -42,10 +42,10 @@ describe "Api::V1::ObserverAlertThreshold" do
 
     it "returns json" do
       json = api.observer_alert_threshold_json(observer_alert_threshold, user, session)
-      expect(json['alert_type']).to eq('course_announcement')
-      expect(json['workflow_state']).to eq('active')
-      expect(json['user_id']).to eq @student.id
-      expect(json['observer_id']).to eq @observer.id
+      expect(json["alert_type"]).to eq("course_announcement")
+      expect(json["workflow_state"]).to eq("active")
+      expect(json["user_id"]).to eq @student.id
+      expect(json["observer_id"]).to eq @observer.id
     end
   end
 end

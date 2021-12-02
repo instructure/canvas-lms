@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../../spec_helper'
+require_relative "../../spec_helper"
 
 describe OutcomesService::MigrationExtractor do
   before(:once) { course_with_teacher }
@@ -26,26 +26,26 @@ describe OutcomesService::MigrationExtractor do
   let(:cm) { ContentMigration.create!(context: @course, user: @teacher) }
   let(:subject) { described_class.new(cm) }
 
-  describe '.learning_outcomes' do
-    it 'returns no outcomes with an empty migration' do
+  describe ".learning_outcomes" do
+    it "returns no outcomes with an empty migration" do
       expect(subject.learning_outcomes(@course)).to eq []
     end
 
-    context 'with course outcome' do
+    context "with course outcome" do
       let(:course_outcome) do
         @course.created_learning_outcomes.create!(
-          title: 'course outcome',
-          migration_id: 'alpha'
+          title: "course outcome",
+          migration_id: "alpha"
         )
       end
 
-      it 'returns single course outcome' do
+      it "returns single course outcome" do
         cm.add_imported_item(course_outcome)
         outcomes = subject.learning_outcomes(@course)
         expect(outcomes.length).to eq 1
         outcome = outcomes[0]
         expect(outcome).to include(
-          '$canvas_learning_outcome_id': course_outcome.id,
+          "$canvas_learning_outcome_id": course_outcome.id,
           rubric_criterion: be_an_instance_of(Hash)
         )
         expect(outcome).to_not have_key(:migration_id_2)
@@ -55,14 +55,14 @@ describe OutcomesService::MigrationExtractor do
         expect(outcome).to_not have_key(:context_id)
       end
 
-      context 'with global outcome' do
+      context "with global outcome" do
         let(:global_outcome) do
-          LearningOutcome.create!(title: 'global outcome', migration_id: 'beta').tap do |outcome|
+          LearningOutcome.create!(title: "global outcome", migration_id: "beta").tap do |outcome|
             LearningOutcomeGroup.global_root_outcome_group.add_outcome(outcome)
           end
         end
 
-        it 'excludes the non-course outcome' do
+        it "excludes the non-course outcome" do
           cm.add_imported_item(course_outcome)
           cm.add_imported_item(global_outcome)
           outcomes = subject.learning_outcomes(@course)
@@ -73,13 +73,13 @@ describe OutcomesService::MigrationExtractor do
     end
   end
 
-  describe '.learning_outcome_groups' do
-    it 'returns only root group with an empty migration' do
+  describe ".learning_outcome_groups" do
+    it "returns only root group with an empty migration" do
       groups = subject.learning_outcome_groups(@course)
       expect(groups.count).to eq 1
       group = groups[0]
       expect(group).to include(
-        '$canvas_learning_outcome_group_id': @course.root_outcome_group.id,
+        "$canvas_learning_outcome_group_id": @course.root_outcome_group.id,
         parent_outcome_group_id: nil
       )
       expect(group).to_not have_key(:id)
@@ -91,38 +91,38 @@ describe OutcomesService::MigrationExtractor do
     end
   end
 
-  describe '.learning_outcome_links' do
-    it 'returns no links with an empty migration' do
+  describe ".learning_outcome_links" do
+    it "returns no links with an empty migration" do
       expect(subject.learning_outcome_links).to eq []
     end
 
-    context 'with course outcome' do
+    context "with course outcome" do
       let!(:course_outcome) do
         @course.created_learning_outcomes.create!(
-          title: 'course outcome',
-          migration_id: 'alpha'
+          title: "course outcome",
+          migration_id: "alpha"
         ).tap do |outcome|
-          @course.root_outcome_group.add_outcome(outcome, migration_id: 'charlie')
+          @course.root_outcome_group.add_outcome(outcome, migration_id: "charlie")
         end
       end
 
-      it 'returns single outcome link' do
+      it "returns single outcome link" do
         cm.add_imported_item(@course.root_outcome_group.child_outcome_links.first)
         links = subject.learning_outcome_links
         expect(links.length).to eq 1
         expect(links[0]).to eq(
-          '$canvas_learning_outcome_link_id': @course.root_outcome_group.child_outcome_links.first.id,
-          '$canvas_learning_outcome_group_id': @course.root_outcome_group.id,
-          '$canvas_learning_outcome_id': course_outcome.id,
+          "$canvas_learning_outcome_link_id": @course.root_outcome_group.child_outcome_links.first.id,
+          "$canvas_learning_outcome_group_id": @course.root_outcome_group.id,
+          "$canvas_learning_outcome_id": course_outcome.id
         )
       end
 
-      context 'with other content tags' do
+      context "with other content tags" do
         let!(:content_tag) do
-          ContentTag.create!(tag_type: 'fake', context: @course, migration_id: 'delta')
+          ContentTag.create!(tag_type: "fake", context: @course, migration_id: "delta")
         end
 
-        it 'excludes the non-link content tag' do
+        it "excludes the non-link content tag" do
           cm.add_imported_item(@course.root_outcome_group.child_outcome_links.first)
           cm.add_imported_item(content_tag)
           expect(subject.learning_outcome_links.length).to eq 1

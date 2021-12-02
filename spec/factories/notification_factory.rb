@@ -25,9 +25,9 @@ module Factories
 
   def notification_valid_attributes
     {
-      :name => "Show In Feed",
-      :subject => "value for subject",
-      :category => "TestImmediately"
+      name: "Show In Feed",
+      subject: "value for subject",
+      category: "TestImmediately"
     }
   end
 end

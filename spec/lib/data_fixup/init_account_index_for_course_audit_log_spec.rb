@@ -18,10 +18,10 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../../cassandra_spec_helper'
+require_relative "../../cassandra_spec_helper"
 
 describe DataFixup::InitAccountIndexForCourseAuditLog do
-  include_examples 'cassandra audit logs'
+  include_examples "cassandra audit logs"
 
   def insert_cql
     %{
@@ -38,19 +38,19 @@ describe DataFixup::InitAccountIndexForCourseAuditLog do
 
     @values = [
       [
-        '08d87bfc-a679-4f5d-9315-470a5fc7d7d0',
+        "08d87bfc-a679-4f5d-9315-470a5fc7d7d0",
         @course.global_id,
         2.days.ago,
-        'manual',
-        'published',
+        "manual",
+        "published",
         1.month
       ],
       [
-        'fc85afda-538e-4fcb-a7fb-45697c551b71',
+        "fc85afda-538e-4fcb-a7fb-45697c551b71",
         @course.global_id,
         1.day.ago,
-        'api',
-        'claimed',
+        "api",
+        "claimed",
         1.month
       ]
     ]
@@ -60,24 +60,24 @@ describe DataFixup::InitAccountIndexForCourseAuditLog do
     end
   end
 
-  it 'populates the account_id column' do
+  it "populates the account_id column" do
     DataFixup::InitAccountIndexForCourseAuditLog.run
 
-    cql = 'SELECT id, account_id FROM courses'
+    cql = "SELECT id, account_id FROM courses"
     account_ids = []
     @database.execute(cql).fetch do |row|
-      account_ids << row['account_id']
+      account_ids << row["account_id"]
     end
     expect(account_ids).to include(@course.global_account_id)
   end
 
-  it 'creates all the new indexes records' do
+  it "creates all the new indexes records" do
     DataFixup::InitAccountIndexForCourseAuditLog.run
 
-    cql = 'SELECT id FROM courses_by_account'
+    cql = "SELECT id FROM courses_by_account"
     ids = []
     @database.execute(cql).fetch do |row|
-      ids << row['id']
+      ids << row["id"]
     end
 
     expect(ids).to include(@values.first.first)

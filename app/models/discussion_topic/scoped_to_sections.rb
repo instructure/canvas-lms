@@ -27,7 +27,7 @@ class DiscussionTopic::ScopedToSections < ScopeFilter
   # prior to pagination, whereas previously we were paginating prior to filtering.
   # That allowed for some pages to end up blank. See https://instructure.atlassian.net/browse/KNO-372
   def self.for(consumer, context, user, relation)
-    raise "Invalid consumer #{consumer.class}" unless consumer.class == DiscussionTopicsController
+    raise "Invalid consumer #{consumer.class}" unless consumer.instance_of?(DiscussionTopicsController)
 
     DiscussionTopic::ScopedToSections.new(context, user, relation)
   end

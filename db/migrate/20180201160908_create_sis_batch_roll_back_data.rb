@@ -29,14 +29,14 @@ class CreateSisBatchRollBackData < ActiveRecord::Migration[5.0]
       t.string :previous_workflow_state, null: false, limit: 255
       t.string :updated_workflow_state, null: false, limit: 255
       t.boolean :batch_mode_delete, null: false, default: false
-      t.string :workflow_state, null: false, limit: 255, default: 'active'
+      t.string :workflow_state, null: false, limit: 255, default: "active"
       t.timestamps null: false
     end
 
     add_foreign_key :sis_batch_roll_back_data, :sis_batches
     add_index :sis_batch_roll_back_data, :sis_batch_id
     add_index :sis_batch_roll_back_data, :workflow_state
-    add_index :sis_batch_roll_back_data, %i(updated_workflow_state previous_workflow_state),
-              name: 'index_sis_batch_roll_back_context_workflow_states'
+    add_index :sis_batch_roll_back_data, %i[updated_workflow_state previous_workflow_state],
+              name: "index_sis_batch_roll_back_context_workflow_states"
   end
 end

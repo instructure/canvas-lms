@@ -21,7 +21,7 @@
 describe FileInContext do
   before do
     course_model
-    folder_model(:name => 'course files')
+    folder_model(name: "course files")
     @course.folders << @folder
     @course.save!
     @course.reload
@@ -36,7 +36,7 @@ describe FileInContext do
       allow(attachment).to receive(:filename=) do |new_name|
         write_attribute(:filename, sanitize_filename(new_name))
       end
-      expect(attachment.filename).to eq 'escaping_test%5B0%5D.txt'
+      expect(attachment.filename).to eq "escaping_test%5B0%5D.txt"
       expect(attachment).to be_published
     end
 
@@ -44,7 +44,7 @@ describe FileInContext do
       before do
         @course.usage_rights_required = true
         @course.save!
-        @filename = File.expand_path(File.join(File.dirname(__FILE__), %w(.. fixtures files a_file.txt)))
+        @filename = File.expand_path(File.join(File.dirname(__FILE__), %w[.. fixtures files a_file.txt]))
       end
 
       it "creates files in unpublished state" do

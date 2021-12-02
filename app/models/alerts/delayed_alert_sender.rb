@@ -24,7 +24,7 @@ module Alerts
         next unless account.settings[:enable_alerts]
 
         account.all_courses.active.find_ids_in_batches(batch_size: 200) do |batch|
-          delay_if_production(n_strand: ['delayed_alert_sender_evaluate_courses', account.global_id], priority: Delayed::LOW_PRIORITY)
+          delay_if_production(n_strand: ["delayed_alert_sender_evaluate_courses", account.global_id], priority: Delayed::LOW_PRIORITY)
             .evaluate_courses(batch)
         end
       end
@@ -34,7 +34,7 @@ module Alerts
       alerts_cache = {}
       Course.where(id: course_ids).find_each do |course|
         alerts_cache[course.account_id] ||= course.account.account_chain.map { |a| a.alerts.to_a }.flatten
-        self.evaluate_for_course(course, alerts_cache[course.account_id])
+        evaluate_for_course(course, alerts_cache[course.account_id])
       end
     end
 
@@ -81,11 +81,11 @@ module Alerts
               matches = last_sent + alert.repetition.days <= today
             end
           end
-          if matches
-            Rails.cache.write(cache_key, today)
+          next unless matches
 
-            send_alert(alert, alert.resolve_recipients(user_id, teacher_student_mapper.teachers_for_student(user_id)), student_enrollments.to_ary.find { |enrollment| enrollment.user_id == user_id })
-          end
+          Rails.cache.write(cache_key, today)
+
+          send_alert(alert, alert.resolve_recipients(user_id, teacher_student_mapper.teachers_for_student(user_id)), student_enrollments.to_ary.find { |enrollment| enrollment.user_id == user_id })
         end
       end
     end

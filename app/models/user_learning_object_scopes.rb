@@ -31,7 +31,7 @@ module UserLearningObjectScopes
   def _params_hash(parent_binding)
     caller_method = method(caller_locations(1, 1).first.base_label)
     caller_param_names = caller_method.parameters.map(&:last)
-    param_values = caller_param_names.each_with_object({}) { |v, h| h[v] = parent_binding.local_variable_get(v) }
+    param_values = caller_param_names.index_with { |v| parent_binding.local_variable_get(v) }
     opts = param_values[:opts]
     param_values = param_values.except(:opts).merge(opts) if opts
     param_values
@@ -40,7 +40,7 @@ module UserLearningObjectScopes
   def ignore_item!(asset, purpose, permanent = false)
     begin
       # more likely this doesn't exist, so try the create first
-      asset.ignores.create!(:user => self, :purpose => purpose, :permanent => permanent)
+      asset.ignores.create!(user: self, purpose: purpose, permanent: permanent)
     rescue ActiveRecord::RecordNotUnique
       asset.shard.activate do
         ignore = asset.ignores.where(user_id: self, purpose: purpose).first
@@ -48,7 +48,7 @@ module UserLearningObjectScopes
         ignore.save!
       end
     end
-    self.touch
+    touch
   end
 
   def assignments_visible_in_course(course)
@@ -56,9 +56,8 @@ module UserLearningObjectScopes
                                                                  *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS)
 
     published_visible_assignments = course.active_assignments.published
-    published_visible_assignments = DifferentiableAssignment.scope_filter(published_visible_assignments,
-                                                                          self, course, is_teacher: false)
-    published_visible_assignments
+    DifferentiableAssignment.scope_filter(published_visible_assignments,
+                                          self, course, is_teacher: false)
   end
 
   # everything is relative to the user's shard
@@ -129,13 +128,13 @@ module UserLearningObjectScopes
             return yield(*arguments_for_objects_needing(
               object_type, purpose, shard_course_ids, shard_group_ids, participation_type,
               include_ignored: include_ignored,
-              include_ungraded: include_ungraded,
+              include_ungraded: include_ungraded
             ))
           end
           return object_type.constantize.none # fallback
         end
       else
-        course_ids_cache_key = Digest::MD5.hexdigest(course_ids.sort.join('/'))
+        course_ids_cache_key = Digest::MD5.hexdigest(course_ids.sort.join("/"))
         params_cache_key = Digest::MD5.hexdigest(ActiveSupport::Cache.expand_cache_key(params))
         cache_key = [self, "#{object_type}_needing_#{purpose}", course_ids_cache_key, params_cache_key].cache_key
 
@@ -165,8 +164,8 @@ module UserLearningObjectScopes
   )
     scope = object_type.constantize
     scope = scope.not_ignored_by(self, purpose) unless include_ignored
-    scope = scope.for_course(shard_course_ids) if ['Assignment', 'Quizzes::Quiz'].include?(object_type)
-    if object_type == 'Assignment'
+    scope = scope.for_course(shard_course_ids) if ["Assignment", "Quizzes::Quiz"].include?(object_type)
+    if object_type == "Assignment"
       scope = participation_type == :student ? scope.published : scope.active
       scope = scope.expecting_submission unless include_ungraded
     end
@@ -183,13 +182,13 @@ module UserLearningObjectScopes
     **opts # arguments that are just forwarded to objects_needing
   )
     params = _params_hash(binding)
-    objects_needing('Assignment', purpose, :student, params, cache_timeout,
+    objects_needing("Assignment", purpose, :student, params, cache_timeout,
                     limit: limit, **opts) do |assignment_scope|
       assignments = assignment_scope.due_between_for_user(due_after, due_before, self)
-      assignments = assignments.need_submitting_info(id, limit) if purpose == 'submitting'
-      assignments = assignments.having_submissions_for_user(id) if purpose == 'submitted'
-      if purpose == 'submitting'
-        assignments = assignments.submittable.or(assignments.where('assignments.user_due_date > ?', Time.zone.now))
+      assignments = assignments.need_submitting_info(id, limit) if purpose == "submitting"
+      assignments = assignments.having_submissions_for_user(id) if purpose == "submitted"
+      if purpose == "submitting"
+        assignments = assignments.submittable.or(assignments.where("assignments.user_due_date > ?", Time.zone.now))
       end
       assignments = assignments.not_locked unless include_locked
       assignments
@@ -205,7 +204,7 @@ module UserLearningObjectScopes
   )
     opts[:cache_timeout] = 15.minutes
     params = _params_hash(binding)
-    assignments = assignments_for_student('submitting', **params)
+    assignments = assignments_for_student("submitting", **params)
     return assignments if scope_only
 
     select_available_assignments(assignments, include_concluded: include_concluded)
@@ -217,7 +216,7 @@ module UserLearningObjectScopes
     **opts # forward args to assignments_for_student
   )
     params = _params_hash(binding)
-    assignments = assignments_for_student('submitted', **params)
+    assignments = assignments_for_student("submitted", **params)
     return assignments if scope_only
 
     select_available_assignments(assignments, include_concluded: include_concluded)
@@ -235,7 +234,7 @@ module UserLearningObjectScopes
   )
     params = _params_hash(binding)
     opts.merge!(params.slice(:limit, :scope_only, :include_concluded))
-    objects_needing('Quizzes::Quiz', 'viewing', :student, params, 15.minutes, **opts) do |quiz_scope|
+    objects_needing("Quizzes::Quiz", "viewing", :student, params, 15.minutes, **opts) do |quiz_scope|
       quizzes = quiz_scope.available
       quizzes = quizzes.not_locked unless include_locked
       quizzes = quizzes
@@ -258,7 +257,7 @@ module UserLearningObjectScopes
   )
     params = _params_hash(binding)
     opts.merge!(params.slice(:limit, :scope_only, :include_ignored))
-    objects_needing('AssessmentRequest', 'reviewing', :student, params, 15.minutes, **opts) do |ar_scope, shard_course_ids|
+    objects_needing("AssessmentRequest", "reviewing", :student, params, 15.minutes, **opts) do |ar_scope, shard_course_ids|
       ar_scope = ar_scope.joins(submission: :assignment)
                          .joins("INNER JOIN #{Submission.quoted_table_name} AS assessor_asset ON assessment_requests.assessor_asset_id = assessor_asset.id
                AND assessor_asset.assignment_id = assignments.id")
@@ -304,13 +303,13 @@ module UserLearningObjectScopes
               .where(assignments: { context_id: course_ids })
               .merge(Assignment.expecting_submission)
               .merge(Assignment.published)
-              .where(grader_enrollments: { workflow_state: 'active', user_id: self, type: ['TeacherEnrollment', 'TaEnrollment'] })
+              .where(grader_enrollments: { workflow_state: "active", user_id: self, type: ["TeacherEnrollment", "TaEnrollment"] })
               .where("grader_enrollments.limit_privileges_to_course_section = 'f'
         OR grader_enrollments.course_section_id = enrollments.course_section_id")
               .where("NOT EXISTS (?)",
-                     Ignore.where(asset_type: 'Assignment',
+                     Ignore.where(asset_type: "Assignment",
                                   user_id: self,
-                                  purpose: 'grading').where('asset_id=submissions.assignment_id')).count
+                                  purpose: "grading").where("asset_id=submissions.assignment_id")).count
   end
 
   def assignments_needing_grading(limit: ULOS_DEFAULT_LIMIT, scope_only: false, **opts)
@@ -320,8 +319,8 @@ module UserLearningObjectScopes
 
     params = _params_hash(binding)
     # not really any harm in extending the expires_in since we touch the user anyway when grades change
-    objects_needing('Assignment', 'grading', :manage_grades, params, 120.minutes, **params) do |assignment_scope|
-      if Setting.get('assignments_needing_grading_new_style', 'true') == 'true'
+    objects_needing("Assignment", "grading", :manage_grades, params, 120.minutes, **params) do |assignment_scope|
+      if Setting.get("assignments_needing_grading_new_style", "true") == "true"
         submissions_needing_grading = Submission.select(:assignment_id, :user_id)
                                                 .joins("INNER JOIN (#{assignment_scope.to_sql}) assignments ON assignment_id=assignments.id")
                                                 .where(Submission.needs_grading_conditions)
@@ -337,9 +336,9 @@ module UserLearningObjectScopes
              .where("EXISTS (#{grader_visible_submissions_sql})")
       end
       as = as.joins("INNER JOIN #{Enrollment.quoted_table_name} ON enrollments.course_id = assignments.context_id")
-             .where(enrollments: { user_id: self, workflow_state: 'active', type: ['TeacherEnrollment', 'TaEnrollment'] })
-             .group('assignments.id')
-             .order('assignments.due_at')
+             .where(enrollments: { user_id: self, workflow_state: "active", type: ["TeacherEnrollment", "TaEnrollment"] })
+             .group("assignments.id")
+             .order("assignments.due_at")
              .preload(:context)
       if scope_only
         as # This needs the below `select` somehow to work
@@ -369,11 +368,11 @@ module UserLearningObjectScopes
     **opts # arguments that are just forwarded to objects_needing
   )
     params = _params_hash(binding)
-    objects_needing('Assignment', 'moderation', :select_final_grade, params, 120.minutes, **params) do |assignment_scope|
+    objects_needing("Assignment", "moderation", :select_final_grade, params, 120.minutes, **params) do |assignment_scope|
       scope = assignment_scope.active
                               .expecting_submission
                               .where(final_grader: self, moderated_grading: true)
-                              .where("assignments.grades_published_at IS NULL")
+                              .where(assignments: { grades_published_at: nil })
                               .where(id: ModeratedGrading::ProvisionalGrade.joins(:submission)
           .where("submissions.assignment_id=assignments.id")
           .where(Submission.needs_grading_conditions).distinct.select(:assignment_id))
@@ -392,7 +391,7 @@ module UserLearningObjectScopes
     **opts # arguments that are just forwarded to objects_needing
   )
     params = _params_hash(binding)
-    objects_needing('DiscussionTopic', 'viewing', :student, params, 120.minutes, **opts) do |topics_context, shard_course_ids, shard_group_ids|
+    objects_needing("DiscussionTopic", "viewing", :student, params, 120.minutes, **opts) do |topics_context, shard_course_ids, shard_group_ids|
       topics_context
         .active
         .published
@@ -408,7 +407,7 @@ module UserLearningObjectScopes
     **opts # arguments that are just forwarded to objects_needing
   )
     params = _params_hash(binding)
-    objects_needing('WikiPage', 'viewing', :student, params, 120.minutes, **opts) do |wiki_pages_context, shard_course_ids, shard_group_ids|
+    objects_needing("WikiPage", "viewing", :student, params, 120.minutes, **opts) do |wiki_pages_context, shard_course_ids, shard_group_ids|
       wiki_pages_context
         .available_to_planner
         .visible_to_user(self)

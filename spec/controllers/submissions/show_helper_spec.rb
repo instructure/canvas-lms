@@ -18,61 +18,61 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-describe 'Submissions::ShowHelper' do
-  describe 'included in a controller', type: :controller do
+describe "Submissions::ShowHelper" do
+  describe "included in a controller", type: :controller do
     controller do
       include Submissions::ShowHelper
 
       def show
         @context = Course.find(params[:context_id])
-        @assignment = Assignment.where(:id => params[:assignment_id]).first
+        @assignment = Assignment.where(id: params[:assignment_id]).first
         render_user_not_found
       end
     end
 
-    describe '#render_user_not_found' do
+    describe "#render_user_not_found" do
       before do
         course_factory
         assignment_model
-        routes.draw { get 'anonymous' => 'anonymous#show' }
+        routes.draw { get "anonymous" => "anonymous#show" }
       end
 
-      context 'with format html' do
+      context "with format html" do
         before do
           get :show, params: { context_id: @course.id, assignment_id: @assignment.id }
         end
 
-        it 'redirects to assignment url' do
+        it "redirects to assignment url" do
           expect(response).to redirect_to(course_assignment_url(@course, @assignment.id))
         end
 
-        it 'set flash error' do
+        it "set flash error" do
           expect(flash[:error]).to be_present
         end
       end
 
-      context 'with format json' do
+      context "with format json" do
         before do
           get :show, params: { context_id: @course.id, assignment_id: @assignment.id }, format: :json
         end
 
-        it 'render json with errors key' do
+        it "render json with errors key" do
           json = JSON.parse(response.body)
-          expect(json.key?('errors')).to be_truthy
+          expect(json).to have_key("errors")
         end
       end
 
-      context 'with no assignment' do
-        it 'shows a cromulent error' do
+      context "with no assignment" do
+        it "shows a cromulent error" do
           get :show, params: { context_id: @course.id, assignment_id: -9000 }
           expect(response).to redirect_to(course_url(@course))
           expect(flash[:error]).to eq "The specified assignment could not be found"
         end
 
-        it 'works with json too' do
+        it "works with json too" do
           get :show, params: { context_id: @course.id, assignment_id: -9000 }, format: :json
           json = JSON.parse(response.body)
-          expect(json['errors']).to eq "The specified assignment (-9000) could not be found"
+          expect(json["errors"]).to eq "The specified assignment (-9000) could not be found"
         end
       end
     end

@@ -17,21 +17,21 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../../spec_helper'
+require_relative "../../spec_helper"
 
 describe SupportHelpers::DueDateCache do
   describe "CourseFixer" do
-    let(:course) { Account.default.courses.create!(name: 'ddc') }
+    let(:course) { Account.default.courses.create!(name: "ddc") }
     let(:user) { User.create! }
 
-    it 'calls DueDateCacher recompute course for a given course' do
-      fixer = SupportHelpers::DueDateCache::CourseFixer.new('email', nil, course.id, user.id)
+    it "calls DueDateCacher recompute course for a given course" do
+      fixer = SupportHelpers::DueDateCache::CourseFixer.new("email", nil, course.id, user.id)
       expect(DueDateCacher).to receive(:recompute_course).with(course, update_grades: true, executing_user: user.id)
       fixer.fix
     end
 
-    it 'raises record not found for a bad course id' do
-      fixer = SupportHelpers::DueDateCache::CourseFixer.new('email', nil, 1234, user.id)
+    it "raises record not found for a bad course id" do
+      fixer = SupportHelpers::DueDateCache::CourseFixer.new("email", nil, 1234, user.id)
       expect { fixer.fix }.to raise_error(ActiveRecord::RecordNotFound)
     end
   end

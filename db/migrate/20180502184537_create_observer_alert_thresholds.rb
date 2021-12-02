@@ -21,10 +21,10 @@ class CreateObserverAlertThresholds < ActiveRecord::Migration[5.1]
   tag :predeploy
   def change
     create_table :observer_alert_thresholds do |t|
-      t.belongs_to :user_observation_link, :null => false, :foreign_key => { to_table: 'user_observers' }
-      t.string :alert_type, :null => false
+      t.belongs_to :user_observation_link, null: false, foreign_key: { to_table: "user_observers" }
+      t.string :alert_type, null: false
       t.string :threshold
-      t.string :workflow_state, :default => 'active', :null => false, :index => true
+      t.string :workflow_state, default: "active", null: false, index: true
 
       t.timestamps
     end

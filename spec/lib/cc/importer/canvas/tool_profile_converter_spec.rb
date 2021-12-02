@@ -17,11 +17,11 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../../../../import_helper'
+require_relative "../../../../import_helper"
 
 describe CC::Importer::Canvas::ToolProfileConverter do
-  let(:manifest) { ImportHelper.get_import_data_xml('unzipped', 'imsmanifest') }
-  let(:path) { File.expand_path(File.dirname(__FILE__) + '/../../../../fixtures/importer/unzipped') }
+  let(:manifest) { ImportHelper.get_import_data_xml("unzipped", "imsmanifest") }
+  let(:path) { File.expand_path(File.dirname(__FILE__) + "/../../../../fixtures/importer/unzipped") }
   let(:converter) do
     Class.new do
       include CC::Importer::Canvas::ToolProfileConverter
@@ -33,8 +33,8 @@ describe CC::Importer::Canvas::ToolProfileConverter do
     end.new(manifest, path)
   end
 
-  describe '#convert_tool_profiles' do
-    it 'unpacks tool profiles in the common cartridge' do
+  describe "#convert_tool_profiles" do
+    it "unpacks tool profiles in the common cartridge" do
       tool_profiles = converter.convert_tool_profiles
       expect(tool_profiles.size).to eq(1)
       expect(tool_profiles.first).to eq({

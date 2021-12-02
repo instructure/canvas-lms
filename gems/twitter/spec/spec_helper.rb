@@ -17,14 +17,14 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'twitter'
-require 'byebug'
+require "twitter"
+require "byebug"
 
-I18n.load_path += Dir[File.join('spec', 'locales', '*.yml')]
+I18n.load_path += Dir[File.join("spec", "locales", "*.yml")]
 
 RSpec.configure do |config|
   config.run_all_when_everything_filtered = true
   config.filter_run :focus
 
-  config.order = 'random'
+  config.order = "random"
 end

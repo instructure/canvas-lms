@@ -17,16 +17,16 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../common'
-require_relative '../helpers/quizzes_common'
-require_relative '../helpers/groups_common'
+require_relative "../common"
+require_relative "../helpers/quizzes_common"
+require_relative "../helpers/groups_common"
 
 describe "quizzes log auditing" do
   include_context "in-process server selenium tests"
   include QuizzesCommon
   include GroupsCommon
 
-  context 'as a teacher' do
+  context "as a teacher" do
     before :once do
       course_with_teacher(active_user: true, active_enrollment: true, active_course: true)
       Account.default.enable_feature!(:quiz_log_auditing)
@@ -36,19 +36,19 @@ describe "quizzes log auditing" do
       user_session(@teacher)
     end
 
-    context 'attempt numbers' do
-      it "lists the attempt number for a single attempt", priority: "2", test_id: 605103 do
-        @students = student_in_course(course: @course, name: 'student', active_all: true).user
+    context "attempt numbers" do
+      it "lists the attempt number for a single attempt", priority: "2" do
+        @students = student_in_course(course: @course, name: "student", active_all: true).user
         quiz = seed_quiz_with_submission
         sub = quiz.quiz_submissions.first
 
         get "/courses/#{@course.id}/quizzes/#{quiz.id}/submissions/#{sub.id}/log"
-        expect(f('.ic-AttemptController__Attempt')).to include_text('1')
+        expect(f(".ic-AttemptController__Attempt")).to include_text("1")
       end
 
-      context 'multiple attempts' do
+      context "multiple attempts" do
         before do
-          student = student_in_course(course: @course, name: 'student', active_all: true).user
+          student = student_in_course(course: @course, name: "student", active_all: true).user
           quiz_create
           @quiz.allowed_attempts = 2
           @quiz.save
@@ -60,80 +60,80 @@ describe "quizzes log auditing" do
           get "/courses/#{@course.id}/quizzes/#{@quiz.id}/submissions/#{@sub.id}/log"
         end
 
-        it "lists the attempt number for multiple attempts", priority: "2", test_id: 605106 do
-          expect(ff('.ic-AttemptController__Attempt')[0]).to include_text('1')
-          expect(ff('.ic-AttemptController__Attempt')[1]).to include_text('2')
+        it "lists the attempt number for multiple attempts", priority: "2" do
+          expect(ff(".ic-AttemptController__Attempt")[0]).to include_text("1")
+          expect(ff(".ic-AttemptController__Attempt")[1]).to include_text("2")
         end
 
-        it 'toggles between attempts when clicking on the attempt', priority: "2", test_id: 605107 do
-          ff('.ic-AttemptController__Attempt')[0].click
-          expect(driver.current_url).to include('attempt=1')
-          ff('.ic-AttemptController__Attempt')[1].click
-          expect(driver.current_url).to include('attempt=2')
+        it "toggles between attempts when clicking on the attempt", priority: "2" do
+          ff(".ic-AttemptController__Attempt")[0].click
+          expect(driver.current_url).to include("attempt=1")
+          ff(".ic-AttemptController__Attempt")[1].click
+          expect(driver.current_url).to include("attempt=2")
         end
       end
     end
 
-    context 'should list the attempt count for multiple attempts' do
+    context "should list the attempt count for multiple attempts" do
       before do
-        @quiz = @course.quizzes.create!(title: 'new quiz')
+        @quiz = @course.quizzes.create!(title: "new quiz")
         @quiz.quiz_questions.create!(
           question_data: {
-            name: 'test 3',
-            question_type: 'multiple_choice_question',
+            name: "test 3",
+            question_type: "multiple_choice_question",
             answers: {
-              answer_0: { answer_text: '0' },
-              answer_1: { answer_text: '1' }
+              answer_0: { answer_text: "0" },
+              answer_1: { answer_text: "1" }
             }
           }
         )
         @quiz.generate_quiz_data
-        @quiz.workflow_state = 'available'
+        @quiz.workflow_state = "available"
         @quiz.allowed_attempts = 2
         @quiz.save
 
-        @student = student_in_course(course: @course, name: 'student', active_all: true).user
+        @student = student_in_course(course: @course, name: "student", active_all: true).user
         user_session(@student)
         get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
 
-        f('#take_quiz_link').click
+        f("#take_quiz_link").click
         wait_for_ajaximations
       end
 
-      it 'shows that a session had started and that it is has been read', priority: "2", test_id: 605108 do
+      it "shows that a session had started and that it is has been read", priority: "2" do
         skip_if_safari(:alert)
         resize_screen_to_small
         scroll_page_to_bottom # the question viewed event is triggered by page scroll
         wait_for_ajax_requests
         submit_quiz
 
-        sub = @quiz.quiz_submissions.where(:user_id => @student).first
+        sub = @quiz.quiz_submissions.where(user_id: @student).first
         user_session(@teacher)
         resize_screen_to_standard
         get "/courses/#{@course.id}/quizzes/#{@quiz.id}/submissions/#{sub.id}/log"
-        expect(f('#ic-EventStream')).to include_text('Session started')
-        expect(f('#ic-EventStream')).to include_text('Viewed (and possibly read)')
+        expect(f("#ic-EventStream")).to include_text("Session started")
+        expect(f("#ic-EventStream")).to include_text("Viewed (and possibly read)")
       end
 
-      it 'shows that a question had been answered', priority: "2", test_id: 605109 do
+      it "shows that a question had been answered", priority: "2" do
         answer_questions_and_submit(@quiz, 1)
 
-        sub = @quiz.quiz_submissions.where(:user_id => @student).first
+        sub = @quiz.quiz_submissions.where(user_id: @student).first
         user_session(@teacher)
 
         get "/courses/#{@course.id}/quizzes/#{@quiz.id}/submissions/#{sub.id}/log"
-        expect(f('#ic-EventStream')).to include_text('Answered question')
+        expect(f("#ic-EventStream")).to include_text("Answered question")
       end
 
-      it 'takes you to a question when you click on the question number', priority: "2", test_id: 605111 do
+      it "takes you to a question when you click on the question number", priority: "2" do
         answer_questions_and_submit(@quiz, 1)
-        sub = @quiz.quiz_submissions.where(:user_id => @student).first
+        sub = @quiz.quiz_submissions.where(user_id: @student).first
         user_session(@teacher)
 
         get "/courses/#{@course.id}/quizzes/#{@quiz.id}/submissions/#{sub.id}/log"
-        expect(f('#ic-EventStream')).to include_text('#1')
-        fln('#1').click
-        expect(f('.ic-QuestionInspector__QuestionHeader')).to include_text('Question #1')
+        expect(f("#ic-EventStream")).to include_text("#1")
+        fln("#1").click
+        expect(f(".ic-QuestionInspector__QuestionHeader")).to include_text("Question #1")
       end
     end
   end

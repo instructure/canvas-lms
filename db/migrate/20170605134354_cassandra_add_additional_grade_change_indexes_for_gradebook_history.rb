@@ -24,11 +24,11 @@ class CassandraAddAdditionalGradeChangeIndexesForGradebookHistory < ActiveRecord
   include Canvas::Cassandra::Migration
 
   def self.cassandra_cluster
-    'auditors'
+    "auditors"
   end
 
   def self.indexes
-    %w(
+    %w[
       grade_changes_by_course_assignment
       grade_changes_by_course_assignment_grader
       grade_change_by_course_assignment_grader_student
@@ -36,7 +36,7 @@ class CassandraAddAdditionalGradeChangeIndexesForGradebookHistory < ActiveRecord
       grade_changes_by_course_grader
       grade_changes_by_course_grader_student
       grade_changes_by_course_student
-    )
+    ]
   end
 
   def self.up
@@ -59,7 +59,7 @@ class CassandraAddAdditionalGradeChangeIndexesForGradebookHistory < ActiveRecord
 
   def self.down
     indexes.each do |index_name|
-      cassandra.execute %{DROP TABLE #{index_name};}
+      cassandra.execute %(DROP TABLE #{index_name};)
     end
   end
 end

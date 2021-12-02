@@ -36,6 +36,7 @@ pipeline {
         }
       }
     }
+
     stage('Pull Redis Image') {
       steps {
         script {
@@ -43,6 +44,7 @@ pipeline {
         }
       }
     }
+
     stage('Tag Redis Image') {
       steps {
         script {

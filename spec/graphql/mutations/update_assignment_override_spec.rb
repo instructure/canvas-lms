@@ -20,7 +20,7 @@
 
 require "spec_helper"
 require_relative "../graphql_spec_helper"
-require 'set'
+require "set"
 
 describe Mutations::UpdateAssignment do
   before(:once) do
@@ -28,11 +28,11 @@ describe Mutations::UpdateAssignment do
     @course = @account.courses.create!
     @course.require_assignment_group
     @course.save!
-    @teacher = @course.enroll_teacher(User.create!, enrollment_state: 'active').user
-    @student = @course.enroll_student(User.create!, enrollment_state: 'active').user
+    @teacher = @course.enroll_teacher(User.create!, enrollment_state: "active").user
+    @student = @course.enroll_student(User.create!, enrollment_state: "active").user
     @assignment_group = @course.assignment_groups.first
-    group_category = GroupCategory.create(:name => "Example Group Category", :context => @course)
-    @group = @course.groups.create!(:group_category => group_category)
+    group_category = GroupCategory.create(name: "Example Group Category", context: @course)
+    @group = @course.groups.create!(group_category: group_category)
     @group.users << @student
     @assignment_id = @assignment_group.assignments.create!(context: @course, name: "Example Assignment", group_category: group_category).id
   end
@@ -119,10 +119,10 @@ describe Mutations::UpdateAssignment do
   end
 
   def assert_no_errors_and_get_overrides(result)
-    expect(result.dig('errors')).to be_nil
-    expect(result.dig('data', 'updateAssignment', 'errors')).to be_nil
-    expect(result.dig('data', 'updateAssignment', 'assignment', '_id')).to eq @assignment_id.to_s
-    result.dig('data', 'updateAssignment', 'assignment', 'assignmentOverrides', 'nodes')
+    expect(result["errors"]).to be_nil
+    expect(result.dig("data", "updateAssignment", "errors")).to be_nil
+    expect(result.dig("data", "updateAssignment", "assignment", "_id")).to eq @assignment_id.to_s
+    result.dig("data", "updateAssignment", "assignment", "assignmentOverrides", "nodes")
   end
 
   #
@@ -183,8 +183,8 @@ describe Mutations::UpdateAssignment do
         }
       ]
     GQL
-    expect(result.dig('errors')).to be_nil
-    expect(result.dig('data', 'updateAssignment', 'errors', 0, 'message')).to eq "one of student_ids, group_id, or course_section_id is required"
+    expect(result["errors"]).to be_nil
+    expect(result.dig("data", "updateAssignment", "errors", 0, "message")).to eq "one of student_ids, group_id, or course_section_id is required"
   end
 
   it "can create multiple overrides then remove one" do
@@ -206,11 +206,11 @@ describe Mutations::UpdateAssignment do
     result_overrides = assert_no_errors_and_get_overrides(result)
     expect(result_overrides.length).to eq 3
     expect(Assignment.find(@assignment_id).active_assignment_overrides.length).to eq 3
-    group_override = result_overrides.find { |ro| ro['title'] == @group.name }
+    group_override = result_overrides.find { |ro| ro["title"] == @group.name }
     group_override_id = assert_group_override(group_override, @group.id)
-    section_override = result_overrides.find { |ro| ro['title'] == section.name }
+    section_override = result_overrides.find { |ro| ro["title"] == section.name }
     assert_section_override(section_override, section.id)
-    adhoc_override = result_overrides.find { |ro| ro['title'] == '1 student' }
+    adhoc_override = result_overrides.find { |ro| ro["title"] == "1 student" }
     adhoc_override_id = assert_adhoc_override(adhoc_override, [@student.id])
 
     result = execute_with_input <<~GQL
@@ -249,8 +249,8 @@ describe Mutations::UpdateAssignment do
     expect(Assignment.find(@assignment_id).active_assignment_overrides.length).to eq 1
     override_id = assert_adhoc_override(result_overrides[0], [@student.id])
 
-    @new_student_1 = @course.enroll_student(User.create!, enrollment_state: 'active').user
-    @new_student_2 = @course.enroll_student(User.create!, enrollment_state: 'active').user
+    @new_student_1 = @course.enroll_student(User.create!, enrollment_state: "active").user
+    @new_student_2 = @course.enroll_student(User.create!, enrollment_state: "active").user
     result = execute_with_input <<~GQL
       id: "#{@assignment_id}"
       assignmentOverrides: [
@@ -353,8 +353,8 @@ describe Mutations::UpdateAssignment do
         }
       ]
     GQL
-    expect(result.dig('errors')).to be_nil
-    expect(result.dig('data', 'updateAssignment', 'errors', 0, 'message')).to eq "Validation failed: Set has already been taken"
+    expect(result["errors"]).to be_nil
+    expect(result.dig("data", "updateAssignment", "errors", 0, "message")).to eq "Validation failed: Set has already been taken"
   end
 
   it "invalid dates cause validation errors" do
@@ -373,6 +373,6 @@ describe Mutations::UpdateAssignment do
         }
       ]
     GQL
-    expect(result.dig('errors', 1, 'extensions', 'code')).to eq "argumentLiteralsIncompatible"
+    expect(result.dig("errors", 1, "extensions", "code")).to eq "argumentLiteralsIncompatible"
   end
 end

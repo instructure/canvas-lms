@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../common'
+require_relative "../common"
 
 describe "global announcements" do
   include_context "in-process server selenium tests"
@@ -26,8 +26,8 @@ describe "global announcements" do
     course_with_student_logged_in
   end
 
-  it 'shows empty message for both tabs' do
-    get '/account_notifications'
+  it "shows empty message for both tabs" do
+    get "/account_notifications"
     expect(fj("#tab-currentTab[aria-selected='true']:contains('Current')")).to be_truthy
     expect(fj("span:contains('Active Announcements')")).to be_displayed
     expect(fj("span:contains('No announcements to display')")).to be_displayed
@@ -37,10 +37,10 @@ describe "global announcements" do
     expect(fj("span:contains('No announcements to display')")).to be_displayed
   end
 
-  it 'shows notifications' do
-    account_notification(:start_at => 2.days.ago, :end_at => 5.days.from_now, :send_message => true)
-    account_notification(:message => 'from the past', :start_at => 6.days.ago, :end_at => 5.days.ago, :send_message => true)
-    get '/account_notifications'
+  it "shows notifications" do
+    account_notification(start_at: 2.days.ago, end_at: 5.days.from_now, send_message: true)
+    account_notification(message: "from the past", start_at: 6.days.ago, end_at: 5.days.ago, send_message: true)
+    get "/account_notifications"
     expect(fj("h2:contains('this is a subject')")).to be_displayed
     expect(fj("span:contains('hi there')")).to be_displayed
     f("#tab-pastTab").click

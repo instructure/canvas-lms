@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../../spec_helper'
+require_relative "../../spec_helper"
 require_relative "../graphql_spec_helper"
 
 describe Types::AccountType do
@@ -41,53 +41,53 @@ describe Types::AccountType do
     expect(account_type.resolve(:name, current_user: @student)).to be_nil
   end
 
-  it 'works for field outcome_proficiency' do
+  it "works for field outcome_proficiency" do
     outcome_proficiency_model(account)
-    expect(account_type.resolve('outcomeProficiency { _id }')).to eq account.outcome_proficiency.id.to_s
+    expect(account_type.resolve("outcomeProficiency { _id }")).to eq account.outcome_proficiency.id.to_s
   end
 
-  it 'works for field proficiency_ratings_connection' do
+  it "works for field proficiency_ratings_connection" do
     outcome_proficiency_model(account)
     expect(
-      account_type.resolve('proficiencyRatingsConnection { nodes { _id } }').sort
+      account_type.resolve("proficiencyRatingsConnection { nodes { _id } }").sort
     ).to eq OutcomeProficiencyRating.all.map { |r| r.id.to_s }.sort
   end
 
-  context 'outcome_calculation_method field' do
-    it 'works' do
+  context "outcome_calculation_method field" do
+    it "works" do
       outcome_calculation_method_model(account)
       expect(
-        account_type.resolve('outcomeCalculationMethod { _id }')
+        account_type.resolve("outcomeCalculationMethod { _id }")
       ).to eq account.outcome_calculation_method.id.to_s
     end
   end
 
-  it 'works for courses' do
-    expect(account_type.resolve('coursesConnection { nodes { _id } }', current_user: @admin)).to eq [@course.id.to_s]
+  it "works for courses" do
+    expect(account_type.resolve("coursesConnection { nodes { _id } }", current_user: @admin)).to eq [@course.id.to_s]
   end
 
-  it 'requires read_course_list permission' do
-    expect(account_type.resolve('coursesConnection { nodes { _id } }', current_user: @teacher)).to be_nil
+  it "requires read_course_list permission" do
+    expect(account_type.resolve("coursesConnection { nodes { _id } }", current_user: @teacher)).to be_nil
   end
 
-  it 'works for subaccounts' do
-    expect(account_type.resolve('subAccountsConnection { nodes { _id } }')).to eq [@sub_account.id.to_s]
+  it "works for subaccounts" do
+    expect(account_type.resolve("subAccountsConnection { nodes { _id } }")).to eq [@sub_account.id.to_s]
   end
 
-  it 'works for root_outcome_group' do
-    expect(account_type.resolve('rootOutcomeGroup { _id }')).to eq account.root_outcome_group.id.to_s
+  it "works for root_outcome_group" do
+    expect(account_type.resolve("rootOutcomeGroup { _id }")).to eq account.root_outcome_group.id.to_s
   end
 
-  context 'parent_accounts_connection field' do
-    it 'works' do
+  context "parent_accounts_connection field" do
+    it "works" do
       account_type = GraphQLTypeTester.new(@sub_account, current_user: @admin)
-      expect(account_type.resolve('parentAccountsConnection { nodes { _id } }')).to eq [account.id.to_s]
+      expect(account_type.resolve("parentAccountsConnection { nodes { _id } }")).to eq [account.id.to_s]
     end
   end
 
   context "sis field" do
     before(:once) do
-      @sub_account.update!(sis_source_id: 'sisAccount')
+      @sub_account.update!(sis_source_id: "sisAccount")
     end
 
     let(:manage_admin) { account_admin_user_with_role_changes(role_changes: { read_sis: false }) }

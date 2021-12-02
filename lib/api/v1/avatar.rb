@@ -25,35 +25,35 @@ module Api::V1::Avatar
   def avatars_json_for_user(user)
     avatars = []
     avatars << avatar_json(user, user.gravatar_url(50, "/images/dotted_pic.png", request), {
-                             :type => 'gravatar',
-                             :alt => 'gravatar pic'
+                             type: "gravatar",
+                             alt: "gravatar pic"
                            })
     user.profile_pics_folder.active_file_attachments.shard(user).preload(:thumbnail).select(&:has_thumbnail?).sort_by(&:id).reverse_each do |image|
       avatars << avatar_json(user, image, {
-                               :type => 'attachment',
-                               :alt => image.display_name,
-                               :pending => false
+                               type: "attachment",
+                               alt: image.display_name,
+                               pending: false
                              })
     end
     # send the dotted box as the last option
-    avatars << avatar_json(user, User.avatar_fallback_url('/images/dotted_pic.png', request), {
-                             :type => 'no_pic',
-                             :alt => 'no pic'
+    avatars << avatar_json(user, User.avatar_fallback_url("/images/dotted_pic.png", request), {
+                             type: "no_pic",
+                             alt: "no pic"
                            })
     avatars
   end
 
   def avatar_json(user, attachment_or_url, options = {})
-    json = if options[:type] == 'attachment'
-             attachment_json(attachment_or_url, user, {}, { :thumbnail_url => true })
+    json = if options[:type] == "attachment"
+             attachment_json(attachment_or_url, user, {}, { thumbnail_url: true })
            else
-             { 'url' => attachment_or_url }
+             { "url" => attachment_or_url }
            end
 
-    json['type'] = options[:type]
-    json['display_name'] ||= options[:alt]
-    json['pending'] = options[:pending] unless api_request?
-    json['token'] = construct_token(user, json['type'], json['url'])
+    json["type"] = options[:type]
+    json["display_name"] ||= options[:alt]
+    json["pending"] = options[:pending] unless api_request?
+    json["token"] = construct_token(user, json["type"], json["url"])
     json
   end
 
@@ -63,6 +63,6 @@ module Api::V1::Avatar
   end
 
   def avatar_for_token(user, token)
-    avatars_json_for_user(user).detect { |j| Canvas::Security.verify_hmac_sha1(token, "#{user.id}::#{j['type']}::#{j['url']}") }
+    avatars_json_for_user(user).detect { |j| Canvas::Security.verify_hmac_sha1(token, "#{user.id}::#{j["type"]}::#{j["url"]}") }
   end
 end

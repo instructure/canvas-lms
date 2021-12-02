@@ -32,15 +32,14 @@ class Lti::LineItem < ApplicationRecord
   belongs_to :resource_link,
              inverse_of: :line_items,
              foreign_key: :lti_resource_link_id,
-             class_name: 'Lti::ResourceLink'
+             class_name: "Lti::ResourceLink"
   belongs_to :assignment,
              inverse_of: :line_items
   belongs_to :root_account,
-             class_name: 'Account',
-             foreign_key: :root_account_id
+             class_name: "Account"
   has_many :results,
            inverse_of: :line_item,
-           class_name: 'Lti::Result',
+           class_name: "Lti::Result",
            foreign_key: :lti_line_item_id,
            dependent: :destroy
 
@@ -48,19 +47,19 @@ class Lti::LineItem < ApplicationRecord
   before_destroy :destroy_resource_link, if: :assignment_line_item? # assignment will destroy all the other line_items of a resourceLink
   before_destroy :destroy_assignment
 
-  AGS_EXT_SUBMISSION_TYPE = 'https://canvas.instructure.com/lti/submission_type'
+  AGS_EXT_SUBMISSION_TYPE = "https://canvas.instructure.com/lti/submission_type"
 
   def assignment_line_item?
-    assignment.line_items.order(:created_at).first.id == self.id
+    assignment.line_items.order(:created_at).first.id == id
   end
 
   def self.create_line_item!(assignment, context, tool, params)
-    self.transaction do
+    transaction do
       assignment_attr = {
         context: context,
         name: params[:label],
         points_possible: params[:score_maximum],
-        submission_types: 'none'
+        submission_types: "none"
       }
 
       submission_type = params[AGS_EXT_SUBMISSION_TYPE]
@@ -85,7 +84,7 @@ class Lti::LineItem < ApplicationRecord
         line_item = assignment.line_items.first
       end
 
-      line_item ||= self.new(assignment: assignment, root_account_id: assignment.root_account_id)
+      line_item ||= new(assignment: assignment, root_account_id: assignment.root_account_id)
       attrs = params.to_h.merge(coupled: false).compact
       attrs[:client_id] = tool.global_developer_key_id if tool
       line_item.update!(attrs)
@@ -109,7 +108,7 @@ class Lti::LineItem < ApplicationRecord
     return if ids.size.zero?
     return if ids.uniq.size == 1 && ids.first == assignment_id
 
-    errors.add(:assignment, 'does not match ltiLink')
+    errors.add(:assignment, "does not match ltiLink")
   end
 
   def set_client_id_if_possible
@@ -125,7 +124,7 @@ class Lti::LineItem < ApplicationRecord
 
   # this is to prevent orphaned (ie undeleted state) line_items when an assignment is destroyed
   def destroy_resource_link
-    self.resource_link&.destroy
+    resource_link&.destroy
   end
 
   # This is to delete assignments that were created with the line items API
@@ -133,7 +132,7 @@ class Lti::LineItem < ApplicationRecord
   def destroy_assignment
     return unless assignment_line_item? && !coupled
 
-    self.assignment.destroy
+    assignment.destroy
   end
 
   def set_root_account_id

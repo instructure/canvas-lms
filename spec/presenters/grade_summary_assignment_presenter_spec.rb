@@ -33,91 +33,91 @@ describe GradeSummaryAssignmentPresenter do
     @submission = @assignment.submit_homework(@student, attachments: [@attachment])
   end
 
-  let(:summary) {
+  let(:summary) do
     GradeSummaryPresenter.new :first, :second, :third
-  }
+  end
 
-  let(:presenter) {
+  let(:presenter) do
     GradeSummaryAssignmentPresenter.new(summary,
                                         @student,
                                         @assignment,
                                         @submission)
-  }
+  end
 
-  describe '#plagiarism_attachment?' do
-    it 'returns true if the submission has an OriginalityReport' do
+  describe "#plagiarism_attachment?" do
+    it "returns true if the submission has an OriginalityReport" do
       OriginalityReport.create(originality_score: 0.8,
                                attachment: @attachment,
                                submission: @submission,
-                               workflow_state: 'scored')
+                               workflow_state: "scored")
 
       expect(presenter.plagiarism_attachment?(@attachment)).to eq true
     end
 
-    it 'returns true when the attachment has a pending originality report' do
+    it "returns true when the attachment has a pending originality report" do
       OriginalityReport.create(attachment: @attachment,
                                submission: @submission)
 
       expect(presenter.plagiarism_attachment?(@attachment)).to eq true
     end
 
-    it 'returns when submission was automatically created by group assignment submission' do
+    it "returns when submission was automatically created by group assignment submission" do
       submission_two = @submission.dup
-      submission_two.update!(user: User.create!(name: 'second student'))
+      submission_two.update!(user: User.create!(name: "second student"))
       AttachmentAssociation.create!(context: @submission, attachment_id: @attachment)
       AttachmentAssociation.create!(context: submission_two, attachment_id: @attachment)
       OriginalityReport.create(originality_score: 0.8,
                                attachment: @attachment,
                                submission: @submission,
-                               workflow_state: 'pending')
+                               workflow_state: "pending")
       expect(presenter.plagiarism_attachment?(submission_two.attachments.first)).to eq true
     end
   end
 
-  describe '#upload_status' do
-    it 'returns attachment upload_status when upload_status is pending' do
-      allow(Rails.cache).to receive(:read).and_return('pending')
-      expect(presenter.upload_status).to eq('pending')
+  describe "#upload_status" do
+    it "returns attachment upload_status when upload_status is pending" do
+      allow(Rails.cache).to receive(:read).and_return("pending")
+      expect(presenter.upload_status).to eq("pending")
     end
 
-    it 'returns attachment upload_status when upload_status is failed' do
-      allow(Rails.cache).to receive(:read).and_return('failed')
-      expect(presenter.upload_status).to eq('failed')
+    it "returns attachment upload_status when upload_status is failed" do
+      allow(Rails.cache).to receive(:read).and_return("failed")
+      expect(presenter.upload_status).to eq("failed")
     end
 
-    it 'returns the proper attachment when there are multiple attachments in different states' do
+    it "returns the proper attachment when there are multiple attachments in different states" do
       attachment_1 = attachment_model(context: @student)
-      attachment_1.workflow_state = 'success'
+      attachment_1.workflow_state = "success"
       attachment_1.save!
       attachment_2 = attachment_model(context: @student)
-      attachment_2.workflow_state = 'errored'
+      attachment_2.workflow_state = "errored"
       attachment_2.save!
       attachment_3 = attachment_model(context: @student)
       @assignment.submit_homework @student, attachments: [attachment_1, attachment_2, attachment_3]
       AttachmentUploadStatus.success!(attachment_1)
-      AttachmentUploadStatus.failed!(attachment_2, 'bad things')
+      AttachmentUploadStatus.failed!(attachment_2, "bad things")
       AttachmentUploadStatus.pending!(attachment_3)
-      expect(presenter.upload_status).to eq('failed')
+      expect(presenter.upload_status).to eq("failed")
     end
   end
 
-  describe '#originality_report' do
-    it 'returns true when an originality report exists' do
+  describe "#originality_report" do
+    it "returns true when an originality report exists" do
       OriginalityReport.create(originality_score: 0.8,
                                attachment: @attachment,
                                submission: @submission,
-                               workflow_state: 'pending')
+                               workflow_state: "pending")
       expect(presenter.originality_report?).to be_truthy
     end
 
-    it 'returns true when an originality report exists with no attachment' do
+    it "returns true when an originality report exists with no attachment" do
       OriginalityReport.create(originality_score: 0.8,
                                submission: @submission,
-                               workflow_state: 'pending')
+                               workflow_state: "pending")
       expect(presenter.originality_report?).to be_truthy
     end
 
-    it 'returns false if no originailty report exists' do
+    it "returns false if no originailty report exists" do
       expect(presenter.originality_report?).not_to be_truthy
     end
   end
@@ -126,7 +126,7 @@ describe GradeSummaryAssignmentPresenter do
     context "when a summary's assignment_stats is empty" do
       before { allow(summary).to receive(:assignment_stats).and_return({}) }
 
-      it "does not raise an error " do
+      it "does not raise an error" do
         expect { presenter.grade_distribution }.to_not raise_error
       end
 
@@ -160,12 +160,12 @@ describe GradeSummaryAssignmentPresenter do
   describe "#original_points" do
     it "returns an empty string when grades are hidden" do
       allow(@submission).to receive(:hide_grade_from_student?).and_return(true)
-      expect(presenter.original_points).to eq ''
+      expect(presenter.original_points).to eq ""
     end
 
     it "returns an empty string when submission is nil" do
       test_presenter = GradeSummaryAssignmentPresenter.new(summary, @student, @assignment, nil)
-      expect(test_presenter.original_points).to eq ''
+      expect(test_presenter.original_points).to eq ""
     end
 
     it "returns the published score" do
@@ -173,50 +173,50 @@ describe GradeSummaryAssignmentPresenter do
     end
   end
 
-  describe '#deduction_present?' do
-    it 'returns true when submission has positive points_deducted' do
+  describe "#deduction_present?" do
+    it "returns true when submission has positive points_deducted" do
       allow(@submission).to receive(:points_deducted).and_return(10)
       expect(presenter.deduction_present?).to eq(true)
     end
 
-    it 'returns false when submission has zero points_deducted' do
+    it "returns false when submission has zero points_deducted" do
       allow(@submission).to receive(:points_deducted).and_return(0)
       expect(presenter.deduction_present?).to eq(false)
     end
 
-    it 'returns false when submission has nil points_deducted' do
+    it "returns false when submission has nil points_deducted" do
       allow(@submission).to receive(:points_deducted).and_return(nil)
       expect(presenter.deduction_present?).to eq(false)
     end
 
-    it 'returns false when submission is not present' do
+    it "returns false when submission is not present" do
       allow(presenter).to receive(:submission).and_return(nil)
       expect(presenter.deduction_present?).to eq(false)
     end
   end
 
-  describe '#entered_grade' do
-    it 'returns empty string when neither letter graded nor gpa scaled' do
-      @assignment.update(grading_type: 'points')
-      expect(presenter.entered_grade).to eq('')
+  describe "#entered_grade" do
+    it "returns empty string when neither letter graded nor gpa scaled" do
+      @assignment.update(grading_type: "points")
+      expect(presenter.entered_grade).to eq("")
     end
 
-    it 'returns empty string when ungraded' do
+    it "returns empty string when ungraded" do
       @submission.update(grade: nil)
-      expect(presenter.entered_grade).to eq('')
+      expect(presenter.entered_grade).to eq("")
     end
 
-    it 'returns entered grade in parentheses' do
-      @assignment.update(grading_type: 'letter_grade')
-      @submission.update(grade: 'A', score: 12)
+    it "returns entered grade in parentheses" do
+      @assignment.update(grading_type: "letter_grade")
+      @submission.update(grade: "A", score: 12)
 
-      expect(presenter.entered_grade).to eq('(A)')
+      expect(presenter.entered_grade).to eq("(A)")
     end
   end
 
   describe "#show_submission_details?" do
     before do
-      @submission_stub = double()
+      @submission_stub = double
       allow(@submission_stub).to receive(:originality_reports_for_display)
     end
 
@@ -247,15 +247,15 @@ describe GradeSummaryAssignmentPresenter do
 
   describe "#missing?" do
     it "returns the value of the submission method" do
-      expect(@submission).to receive(:missing?).and_return('foo')
-      expect(presenter.missing?).to eq('foo')
+      expect(@submission).to receive(:missing?).and_return("foo")
+      expect(presenter.missing?).to eq("foo")
     end
   end
 
   describe "#late?" do
     it "returns the value of the submission method" do
-      expect(@submission).to receive(:late?).and_return('foo')
-      expect(presenter.late?).to eq('foo')
+      expect(@submission).to receive(:late?).and_return("foo")
+      expect(presenter.late?).to eq("foo")
     end
   end
 

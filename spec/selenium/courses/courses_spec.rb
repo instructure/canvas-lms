@@ -17,8 +17,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../common'
-require_relative 'pages/courses_home_page'
+require_relative "../common"
+require_relative "pages/courses_home_page"
 
 describe "courses" do
   include_context "in-process server selenium tests"
@@ -27,16 +27,16 @@ describe "courses" do
   context "as a teacher" do
     before do
       account = Account.default
-      account.settings = { :open_registration => true, :no_enrollments_can_create_courses => true, :teachers_can_create_courses => true }
+      account.settings = { open_registration: true, no_enrollments_can_create_courses: true, teachers_can_create_courses: true }
       account.save!
       allow_any_instance_of(Account).to receive(:feature_enabled?).and_call_original
       allow_any_instance_of(Account).to receive(:feature_enabled?).with(:new_user_tutorial).and_return(false)
     end
 
-    context 'in draft state' do
+    context "in draft state" do
       before do
         course_with_student_submissions
-        @course.default_view = 'feed'
+        @course.default_view = "feed"
         @course.save
       end
 
@@ -44,16 +44,16 @@ describe "courses" do
         visit_course(@course)
         unpublish_btn.click
 
-        wait_for(method: nil, timeout: 5) {
-          assert_flash_notice_message('successfully updated')
-        }
-        expect(unpublish_btn).to have_class('disabled')
+        wait_for(method: nil, timeout: 5) do
+          assert_flash_notice_message("successfully updated")
+        end
+        expect(unpublish_btn).to have_class("disabled")
       end
 
       it "loads the users page using ajax", custom_timeout: 30 do
         # Set up the course with > 50 users (to test scrolling)
         create_users_in_course @course, 60
-        @course.enroll_user(user_factory, 'TaEnrollment')
+        @course.enroll_user(user_factory, "TaEnrollment")
         visit_course_people(@course)
         wait_for_ajaximations
 
@@ -65,8 +65,8 @@ describe "courses" do
 
   context "as a student" do
     before do
-      course_with_teacher(:active_all => true, :name => 'discussion course')
-      @student = User.create!(:name => "First Student")
+      course_with_teacher(active_all: true, name: "discussion course")
+      @student = User.create!(name: "First Student")
       @course.enroll_student(@student)
       user_session(@student)
     end

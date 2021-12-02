@@ -43,7 +43,7 @@ module CanvasQuizStatistics::Analyzers
     #
     # @return [Integer]
     metric :graded do |responses|
-      responses.select { |r| r[:correct] == 'defined' }.length
+      responses.select { |r| r[:correct] == "defined" }.length
     end
 
     # The number of students who got graded with a full score.
@@ -52,7 +52,7 @@ module CanvasQuizStatistics::Analyzers
     metric :full_credit do |responses|
       full_credit = @question_data[:points_possible].to_f
 
-      responses.select { |response| response[:points].to_f >= full_credit }.length
+      responses.count { |response| response[:points].to_f >= full_credit }
     end
 
     # A set of scores and the number of students who received them.
@@ -128,7 +128,7 @@ module CanvasQuizStatistics::Analyzers
 
       graded_responses = []
       ungraded_responses = []
-      responses.each { |r| r[:correct] == 'defined' ? graded_responses << r : ungraded_responses << r }
+      responses.each { |r| r[:correct] == "defined" ? graded_responses << r : ungraded_responses << r }
       ranked_responses_by_score = graded_responses.sort_by { |h| h[:points] }
 
       previous_floor = ranked_responses_by_score.length

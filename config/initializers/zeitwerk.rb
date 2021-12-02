@@ -24,7 +24,7 @@ if CANVAS_ZEITWERK
   # This is because the jsx folder does not contain ruby to
   # autoload.  You should NOT use this pattern as a workaround
   # for badly-named ruby code.
-  Rails.autoloaders.main.ignore(Rails.root.join('app', 'jsx'))
+  Rails.autoloaders.main.ignore(Rails.root.join("app/jsx"))
 
   Rails.autoloaders.main.ignore(
     # we don't want zeitwerk to try to eager_load some "Version" constant from any plugins
@@ -63,7 +63,7 @@ if CANVAS_ZEITWERK
       "turnitin_id" => "TurnitinID",
       "uk_federation" => "UKFederation",
       "vericite" => "VeriCite",
-      "xml_helper" => "XMLHelper",
+      "xml_helper" => "XMLHelper"
     )
   end
 end

@@ -45,32 +45,32 @@ describe GradingStandard do
     end
   end
 
-  describe 'validations' do
+  describe "validations" do
     it { is_expected.to belong_to(:context).required }
     it { is_expected.to validate_presence_of(:data) }
     it { is_expected.to serialize(:data) }
 
-    describe 'grading standard data' do
+    describe "grading standard data" do
       let(:standard) { GradingStandard.new(context: @course) }
 
-      it 'does not throw an error if `data` is not supplied' do
+      it "does not throw an error if `data` is not supplied" do
         expect { standard.valid? }.not_to raise_error
       end
 
-      it 'is invalid when there is no bucket with a floor value of 0.0' do
-        standard.data = [['A', 0.9], ['B', 0.8], ['C', 0.7]]
+      it "is invalid when there is no bucket with a floor value of 0.0" do
+        standard.data = [["A", 0.9], ["B", 0.8], ["C", 0.7]]
 
         expect(standard).not_to be_valid
       end
 
-      it 'is valid when there is a bucket with a floor value of 0.0' do
-        standard.data = [['A', 0.9], ['B', 0.8], ['C', 0.7], ['D', 0.0]]
+      it "is valid when there is a bucket with a floor value of 0.0" do
+        standard.data = [["A", 0.9], ["B", 0.8], ["C", 0.7], ["D", 0.0]]
 
         expect(standard).to be_valid
       end
 
-      it 'is valid even if the buckets are out of order' do
-        standard.data = [['B', 0.8], ['A', 0.9], ['D', 0.0], ['C', 0.7]]
+      it "is valid even if the buckets are out of order" do
+        standard.data = [["B", 0.8], ["A", 0.9], ["D", 0.0], ["C", 0.7]]
 
         expect(standard).to be_valid
       end
@@ -100,7 +100,7 @@ describe GradingStandard do
   end
 
   it "does not the argument to data=" do
-    input = [['A', 0.9999]]
+    input = [["A", 0.9999]]
     standard = GradingStandard.new
     standard.data = input
     expect(standard.data[0][1]).to be_within(0.00001).of(0.9999)
@@ -124,12 +124,12 @@ describe GradingStandard do
     compare_schemes(standard.data, GradingStandard.default_grading_standard)
   end
 
-  describe '#default_standard?' do
-    it 'returns true for the default instance' do
+  describe "#default_standard?" do
+    it "returns true for the default instance" do
       expect(GradingStandard.default_instance).to be_default_standard
     end
 
-    it 'returns false for a non-default instance' do
+    it "returns false for a non-default instance" do
       expect(GradingStandard.new).not_to be_default_standard
     end
   end
@@ -154,12 +154,12 @@ describe GradingStandard do
 
   context "sorted" do
     it "returns used grading standards before unused ones" do
-      gs = grading_standard_for(@course.root_account, :title => "zzz")
-      gs2 = grading_standard_for(@course.root_account, :title => "aaa")
+      gs = grading_standard_for(@course.root_account, title: "zzz")
+      gs2 = grading_standard_for(@course.root_account, title: "aaa")
 
       # Add this grading standard to 3 assignments, triggring the "used" condition
       3.times do
-        @course.assignments.create!(:title => "hi", :grading_standard_id => gs.id)
+        @course.assignments.create!(title: "hi", grading_standard_id: gs.id)
       end
 
       standards = GradingStandard.for(@course).sorted
@@ -168,8 +168,8 @@ describe GradingStandard do
     end
 
     it "returns standards with a title first" do
-      gs = grading_standard_for(@course.root_account, :title => "zzz")
-      gs2 = grading_standard_for(@course.root_account, :title => "aaa")
+      gs = grading_standard_for(@course.root_account, title: "zzz")
+      gs2 = grading_standard_for(@course.root_account, title: "aaa")
       gs2.title = nil
       gs2.save!
 
@@ -181,7 +181,7 @@ describe GradingStandard do
 
   context "score_to_grade" do
     it "computes correct grades" do
-      input = [['A', 0.90], ['B+', 0.886], ['B', 0.80], ['C', 0.695], ['D', 0.555], ['E', 0.545], ['M', 0.00]]
+      input = [["A", 0.90], ["B+", 0.886], ["B", 0.80], ["C", 0.695], ["D", 0.555], ["E", 0.545], ["M", 0.00]]
       standard = GradingStandard.new
       standard.data = input
       expect(standard.score_to_grade(1005)).to eql("A")
@@ -208,7 +208,7 @@ describe GradingStandard do
     end
 
     it "assigns the lowest grade to below-scale scores" do
-      input = [['A', 0.90], ['B', 0.80], ['C', 0.70], ['D', 0.60], ['E', 0.50]]
+      input = [["A", 0.90], ["B", 0.80], ["C", 0.70], ["D", 0.60], ["E", 0.50]]
       standard = GradingStandard.new
       standard.data = input
       expect(standard.score_to_grade(40)).to eql("E")
@@ -221,18 +221,18 @@ describe GradingStandard do
     end
 
     it "returns a score in the proper range for letter grades" do
-      score = @gs.grade_to_score('B')
+      score = @gs.grade_to_score("B")
       expect(score).to eql(86.0)
     end
 
     it "returns nil when no grade matches" do
-      score = @gs.grade_to_score('Z')
+      score = @gs.grade_to_score("Z")
       expect(score).to eql(nil)
     end
 
     it "does not return more than 3 decimal digits" do
-      score = @gs.grade_to_score('A-')
-      decimal_part = score.to_s.split('.')[1]
+      score = @gs.grade_to_score("A-")
+      decimal_part = score.to_s.split(".")[1]
       expect(decimal_part.length).to be <= 3
     end
   end
@@ -255,7 +255,7 @@ describe GradingStandard do
     end
 
     it "matches alphabetical keys regardless of case" do
-      idx = @gs.place_in_scheme('m')
+      idx = @gs.place_in_scheme("m")
       expect(idx).to eql(11)
     end
 
@@ -303,8 +303,8 @@ describe GradingStandard do
 
     context "with assignment link" do
       before(:once) do
-        @assignment = @course.assignments.create!(:title => "hi",
-                                                  :grading_type => 'letter_grade', :grading_standard_id => @gs.id, :submission_types => ["online_text_entry"])
+        @assignment = @course.assignments.create!(title: "hi",
+                                                  grading_type: "letter_grade", grading_standard_id: @gs.id, submission_types: ["online_text_entry"])
       end
 
       context "without submissions" do
@@ -315,7 +315,7 @@ describe GradingStandard do
 
       context "with submissions" do
         before(:once) do
-          @submission = @assignment.submit_homework(@student, :body => "done!")
+          @submission = @assignment.submit_homework(@student, body: "done!")
         end
 
         it "is false if no submissions are graded" do
@@ -392,6 +392,7 @@ describe GradingStandard do
         end
       end
     end
+
     context "course belonging to sub-account" do
       before(:once) do
         @root_account = Account.default

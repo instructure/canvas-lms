@@ -18,9 +18,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative 'messages_helper'
+require_relative "messages_helper"
 
-describe 'new_announcement' do
+describe "new_announcement" do
   include MessagesCommon
 
   before :once do
@@ -36,8 +36,8 @@ describe 'new_announcement' do
     it "renders" do
       generate_message(notification_name, path_type, asset)
       expect(@message.subject).to eq "value for title: value for name"
-      expect(@message.url).to match(/\/courses\/\d+\/announcements\/\d+/)
-      expect(@message.body).to match(/\/courses\/\d+\/announcements\/\d+/)
+      expect(@message.url).to match(%r{/courses/\d+/announcements/\d+})
+      expect(@message.body).to match(%r{/courses/\d+/announcements/\d+})
     end
   end
 
@@ -55,7 +55,7 @@ describe 'new_announcement' do
     it "renders" do
       generate_message(notification_name, path_type, asset)
       expect(@message.subject).to eq "value for title: value for name"
-      expect(@message.url).to match(/\/courses\/\d+\/announcements\/\d+/)
+      expect(@message.url).to match(%r{/courses/\d+/announcements/\d+})
       expect(@message.body.strip).to eq "value for message"
     end
   end
@@ -66,7 +66,7 @@ describe 'new_announcement' do
     it "renders" do
       generate_message(notification_name, path_type, asset)
       expect(@message.subject).to eq "Canvas Alert"
-      expect(@message.url).to match(/\/courses\/\d+\/announcements\/\d+/)
+      expect(@message.url).to match(%r{/courses/\d+/announcements/\d+})
       expect(@message.body).to include("Canvas Alert - Announcement: value for title")
     end
   end

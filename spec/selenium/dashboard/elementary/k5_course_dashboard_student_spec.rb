@@ -17,15 +17,15 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../../common'
-require_relative '../pages/k5_dashboard_page'
-require_relative '../pages/k5_dashboard_common_page'
-require_relative '../pages/k5_grades_tab_page'
-require_relative '../pages/k5_modules_tab_page'
-require_relative '../pages/k5_resource_tab_page'
-require_relative '../../../helpers/k5_common'
-require_relative '../shared_examples/k5_announcements_shared_examples'
-require_relative '../shared_examples/k5_navigation_tabs_shared_examples'
+require_relative "../../common"
+require_relative "../pages/k5_dashboard_page"
+require_relative "../pages/k5_dashboard_common_page"
+require_relative "../pages/k5_grades_tab_page"
+require_relative "../pages/k5_modules_tab_page"
+require_relative "../pages/k5_resource_tab_page"
+require_relative "../../../helpers/k5_common"
+require_relative "../shared_examples/k5_announcements_shared_examples"
+require_relative "../shared_examples/k5_navigation_tabs_shared_examples"
 
 describe "student k5 course dashboard" do
   include_context "in-process server selenium tests"
@@ -44,8 +44,8 @@ describe "student k5 course dashboard" do
     user_session @student
   end
 
-  context 'course dashboard standard' do
-    it 'lands on course dashboard when course card is clicked' do
+  context "course dashboard standard" do
+    it "lands on course dashboard when course card is clicked" do
       get "/"
 
       click_dashboard_card
@@ -57,7 +57,7 @@ describe "student k5 course dashboard" do
       expect(grades_tab).to be_displayed
     end
 
-    it 'saves tab information for refresh' do
+    it "saves tab information for refresh" do
       get "/courses/#{@subject_course.id}#home"
 
       select_schedule_tab
@@ -67,33 +67,33 @@ describe "student k5 course dashboard" do
       expect(driver.current_url).to match(/#schedule/)
     end
 
-    it 'has front page displayed if there is one' do
+    it "has front page displayed if there is one" do
       wiki_page_data = "Here's where we have content"
-      @subject_course.wiki_pages.create!(:title => "K5 Course Front Page", :body => wiki_page_data).set_as_front_page!
+      @subject_course.wiki_pages.create!(title: "K5 Course Front Page", body: wiki_page_data).set_as_front_page!
 
       get "/courses/#{@subject_course.id}#home"
 
       expect(front_page_info.text).to eq(wiki_page_data)
     end
 
-    it 'has an empty state graphic when there is no subject home content' do
+    it "has an empty state graphic when there is no subject home content" do
       get "/courses/#{@subject_course.id}#home"
 
       expect(empty_subject_home).to be_displayed
     end
 
-    it 'displays modules empty state if no published module exists' do
+    it "displays modules empty state if no published module exists" do
       get "/courses/#{@subject_course.id}#modules"
       expect(modules_tab).to be_displayed
       expect(empty_modules_image).to be_displayed
 
-      create_course_module('unpublished')
+      create_course_module("unpublished")
       get "/courses/#{@subject_course.id}#modules"
       expect(modules_tab).to be_displayed
       expect(empty_modules_image).to be_displayed
     end
 
-    it 'loads the dashboard for public courses even if unauthenticated' do
+    it "loads the dashboard for public courses even if unauthenticated" do
       @subject_course.is_public = true
       @subject_course.save!
       destroy_session
@@ -109,18 +109,18 @@ describe "student k5 course dashboard" do
     it_behaves_like "K5 Subject Home Tab"
   end
 
-  context 'course modules tab' do
+  context "course modules tab" do
     before :once do
       create_course_module
     end
 
-    it 'has module present when provisioned' do
+    it "has module present when provisioned" do
       get "/courses/#{@subject_course.id}#modules"
 
       expect(module_item(@module_title)).to be_displayed
     end
 
-    it 'allows for expand and collapse of module' do
+    it "allows for expand and collapse of module" do
       get "/courses/#{@subject_course.id}#modules"
 
       expect(module_assignment(@module_assignment_title)).to be_displayed
@@ -130,7 +130,7 @@ describe "student k5 course dashboard" do
       expect(module_assignment(@module_assignment_title)).not_to be_displayed
     end
 
-    it 'navigates to module tasks when clicked' do
+    it "navigates to module tasks when clicked" do
       get "/courses/#{@subject_course.id}#modules"
 
       click_module_assignment(@module_assignment_title)
@@ -140,8 +140,8 @@ describe "student k5 course dashboard" do
     end
   end
 
-  context 'subject resources tab' do
-    it 'shows the Important Info for subject resources tab' do
+  context "subject resources tab" do
+    it "shows the Important Info for subject resources tab" do
       important_info_text = "Show me what you can do"
       create_important_info_content(@subject_course, important_info_text)
       create_lti_resource("fake LTI")
@@ -151,28 +151,28 @@ describe "student k5 course dashboard" do
     end
   end
 
-  context 'subject groups tab existence' do
-    it 'has no groups tab when there are no groups' do
+  context "subject groups tab existence" do
+    it "has no groups tab when there are no groups" do
       get "/courses/#{@subject_course.id}"
 
       expect(groups_tab_exists?).to be_falsey
     end
   end
 
-  context 'subject groups tab functions for student' do
+  context "subject groups tab functions for student" do
     before :once do
-      category = @subject_course.group_categories.create!(name: 'category', self_signup: 'enabled')
+      category = @subject_course.group_categories.create!(name: "category", self_signup: "enabled")
       @group1 = @subject_course.groups.create!(name: "Test Group1", group_category: category)
       @group2 = @subject_course.groups.create!(name: "Test Group2", group_category: category)
     end
 
-    it 'has the groups tab available' do
+    it "has the groups tab available" do
       get "/courses/#{@subject_course.id}"
 
       expect(groups_tab_exists?).to be_truthy
     end
 
-    it 'shows the groups the student can join' do
+    it "shows the groups the student can join" do
       get "/courses/#{@subject_course.id}#groups"
 
       titles_list = group_titles_text_list
@@ -181,24 +181,24 @@ describe "student k5 course dashboard" do
       expect(titles_list.first).to match(@group1.category)
     end
 
-    it 'allows student to join group' do
+    it "allows student to join group" do
       get "/courses/#{@subject_course.id}#groups"
 
-      buttons_list = group_management_buttons('Join')
+      buttons_list = group_management_buttons("Join")
 
       click_group_join_button(buttons_list.first)
 
-      expect(group_management_buttons('Leave').count).to eq(1)
-      expect(group_management_buttons('Switch To').count).to eq(1)
+      expect(group_management_buttons("Leave").count).to eq(1)
+      expect(group_management_buttons("Switch To").count).to eq(1)
 
-      click_group_join_button(group_management_buttons('Switch To').first)
-      click_group_join_button(group_management_buttons('Leave').first)
+      click_group_join_button(group_management_buttons("Switch To").first)
+      click_group_join_button(group_management_buttons("Leave").first)
 
-      expect(group_management_buttons('Join').count).to eq(2)
+      expect(group_management_buttons("Join").count).to eq(2)
     end
   end
 
-  context 'subject tab navigation shared examples' do
-    it_behaves_like 'k5 subject navigation tabs'
+  context "subject tab navigation shared examples" do
+    it_behaves_like "k5 subject navigation tabs"
   end
 end

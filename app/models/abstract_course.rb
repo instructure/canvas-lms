@@ -21,12 +21,12 @@
 class AbstractCourse < ActiveRecord::Base
   include Workflow
 
-  belongs_to :root_account, :class_name => 'Account'
+  belongs_to :root_account, class_name: "Account"
   belongs_to :account
   belongs_to :enrollment_term
   has_many :courses
 
-  validates_presence_of :account_id, :root_account_id, :enrollment_term_id, :workflow_state
+  validates :account_id, :root_account_id, :enrollment_term_id, :workflow_state, presence: true
 
   workflow do
     state :active
@@ -35,7 +35,7 @@ class AbstractCourse < ActiveRecord::Base
 
   alias_method :destroy_permanently!, :destroy
   def destroy
-    self.workflow_state = 'deleted'
+    self.workflow_state = "deleted"
     save!
   end
 

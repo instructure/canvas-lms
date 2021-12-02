@@ -48,14 +48,14 @@ module LtiOutbound
       if resource_type && settings[resource_type.to_sym]
         fields << (settings[resource_type.to_sym][:custom_fields] || {})
       end
-      fields.each { |field_set| hash.merge!(format_lti_params('custom', field_set)) }
+      fields.each { |field_set| hash.merge!(format_lti_params("custom", field_set)) }
       nil
     end
 
     def format_lti_params(prefix, params)
       params.each_with_object({}) do |(k, v), hash|
-        key = k.to_s.gsub(/[^\w]/, '_').downcase
-        if key.match(/^#{prefix}_/)
+        key = k.to_s.gsub(/[^\w]/, "_").downcase
+        if key.match?(/^#{prefix}_/)
           hash[key] = v
         else
           hash["#{prefix}_#{key}"] = v

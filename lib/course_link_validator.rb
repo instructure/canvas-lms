@@ -17,34 +17,34 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'nokogiri'
+require "nokogiri"
 
 class CourseLinkValidator
   TAG = "link_validation"
 
   # retrieves the validation job
   def self.current_progress(course)
-    Progress.where(:tag => TAG, :context_type => 'Course', :context_id => course.id).last
+    Progress.where(tag: TAG, context_type: "Course", context_id: course.id).last
   end
 
   # creates a new validation job
   def self.queue_course(course)
     progress = current_progress(course)
-    return progress if progress && progress.pending?
+    return progress if progress&.pending?
 
-    progress ||= Progress.new(:tag => TAG, :context => course)
+    progress ||= Progress.new(tag: TAG, context: course)
     progress.reset!
     progress.process_job(self, :process, {})
     progress
   end
 
   def self.process(progress)
-    validator = self.new(progress.context)
+    validator = new(progress.context)
     validator.check_course(progress)
-    progress.set_results({ :issues => validator.issues, :completed_at => Time.now.utc, :version => 2 })
+    progress.set_results({ issues: validator.issues, completed_at: Time.now.utc, version: 2 })
   rescue
     report_id = Canvas::Errors.capture_exception(:course_link_validation, $ERROR_INFO)[:error_report]
-    progress.workflow_state = 'failed'
+    progress.workflow_state = "failed"
     progress.set_results({ error_report_id: report_id, completed_at: Time.now.utc })
   end
 
@@ -62,24 +62,24 @@ class CourseLinkValidator
   # this is where the magic happens
   def check_course(progress)
     # Course card image
-    if self.course.image_url.present?
-      find_invalid_link(self.course.image_url) do |link|
-        self.issues << { :name => I18n.t("Course Card Image"), :type => :course_card_image,
-                         :content_url => "/courses/#{self.course.id}/settings",
-                         :invalid_links => [link.merge(:image => true)] }
+    if course.image_url.present?
+      find_invalid_link(course.image_url) do |link|
+        issues << { name: I18n.t("Course Card Image"), type: :course_card_image,
+                    content_url: "/courses/#{course.id}/settings",
+                    invalid_links: [link.merge(image: true)] }
       end
       progress.update_completion! 1
     end
 
     # Syllabus
-    find_invalid_links(self.course.syllabus_body) do |links|
-      self.issues << { :name => I18n.t(:syllabus, "Course Syllabus"), :type => :syllabus,
-                       :content_url => "/courses/#{self.course.id}/assignments/syllabus" }.merge(:invalid_links => links)
+    find_invalid_links(course.syllabus_body) do |links|
+      issues << { name: I18n.t(:syllabus, "Course Syllabus"), type: :syllabus,
+                  content_url: "/courses/#{course.id}/assignments/syllabus" }.merge(invalid_links: links)
     end
     progress.update_completion! 5
 
     # Assessment questions
-    self.course.assessment_questions.active.each do |aq|
+    course.assessment_questions.active.each do |aq|
       next if aq.assessment_question_bank.deleted?
 
       check_question(aq)
@@ -87,53 +87,53 @@ class CourseLinkValidator
     progress.update_completion! 15
 
     # Assignments
-    self.course.assignments.active.each do |assignment|
+    course.assignments.active.each do |assignment|
       next if assignment.quiz || assignment.discussion_topic
 
       find_invalid_links(assignment.description) do |links|
-        self.issues << { :name => assignment.title, :type => :assignment,
-                         :content_url => "/courses/#{self.course.id}/assignments/#{assignment.id}" }.merge(:invalid_links => links)
+        issues << { name: assignment.title, type: :assignment,
+                    content_url: "/courses/#{course.id}/assignments/#{assignment.id}" }.merge(invalid_links: links)
       end
     end
     progress.update_completion! 25
 
     # Calendar events
-    self.course.calendar_events.active.each do |event|
+    course.calendar_events.active.each do |event|
       find_invalid_links(event.description) do |links|
-        self.issues << { :name => event.title, :type => :calendar_event,
-                         :content_url => "/courses/#{self.course.id}/calendar_events/#{event.id}" }.merge(:invalid_links => links)
+        issues << { name: event.title, type: :calendar_event,
+                    content_url: "/courses/#{course.id}/calendar_events/#{event.id}" }.merge(invalid_links: links)
       end
     end
     progress.update_completion! 35
 
     # Discussion topics
-    self.course.discussion_topics.active.each do |topic|
+    course.discussion_topics.active.each do |topic|
       find_invalid_links(topic.message) do |links|
-        self.issues << { :name => topic.title, :type => :discussion_topic,
-                         :content_url => "/courses/#{self.course.id}/discussion_topics/#{topic.id}" }.merge(:invalid_links => links)
+        issues << { name: topic.title, type: :discussion_topic,
+                    content_url: "/courses/#{course.id}/discussion_topics/#{topic.id}" }.merge(invalid_links: links)
       end
     end
     progress.update_completion! 55
 
     # External URL Module items (almost forgot about these)
     invalid_module_links = {}
-    self.course.context_module_tags.not_deleted.where(:content_type => "ExternalUrl").preload(:context_module).each do |ct|
+    course.context_module_tags.not_deleted.where(content_type: "ExternalUrl").preload(:context_module).each do |ct|
       find_invalid_link(ct.url) do |invalid_link|
-        (invalid_module_links[ct.context_module] ||= []) << invalid_link.merge(:link_text => ct.title)
+        (invalid_module_links[ct.context_module] ||= []) << invalid_link.merge(link_text: ct.title)
       end
     end
     invalid_module_links.each do |mod, links|
-      self.issues << { :name => mod.name, :type => :module,
-                       :content_url => "/courses/#{self.course.id}/modules#module_#{mod.id}" }.merge(:invalid_links => links)
+      issues << { name: mod.name, type: :module,
+                  content_url: "/courses/#{course.id}/modules#module_#{mod.id}" }.merge(invalid_links: links)
     end
 
     progress.update_completion! 65
 
     # Quizzes
-    self.course.quizzes.active.each do |quiz|
+    course.quizzes.active.each do |quiz|
       find_invalid_links(quiz.description) do |links|
-        self.issues << { :name => quiz.title, :type => :quiz,
-                         :content_url => "/courses/#{self.course.id}/quizzes/#{quiz.id}" }.merge(:invalid_links => links)
+        issues << { name: quiz.title, type: :quiz,
+                    content_url: "/courses/#{course.id}/quizzes/#{quiz.id}" }.merge(invalid_links: links)
       end
       quiz.quiz_questions.active.each do |qq|
         check_question(qq)
@@ -142,10 +142,10 @@ class CourseLinkValidator
     progress.update_completion! 85
 
     # Wiki pages
-    self.course.wiki_pages.not_deleted.each do |page|
+    course.wiki_pages.not_deleted.each do |page|
       find_invalid_links(page.body) do |links|
-        self.issues << { :name => page.title, :type => :wiki_page,
-                         :content_url => "/courses/#{self.course.id}/pages/#{page.url}" }.merge(:invalid_links => links)
+        issues << { name: page.title, type: :wiki_page,
+                    content_url: "/courses/#{course.id}/pages/#{page.url}" }.merge(invalid_links: links)
       end
     end
     progress.update_completion! 99
@@ -155,14 +155,14 @@ class CourseLinkValidator
     # Assessment/Quiz Questions
 
     links = []
-    [:question_text, :correct_comments_html, :incorrect_comments_html, :neutral_comments_html, :more_comments_html].each do |field|
+    %i[question_text correct_comments_html incorrect_comments_html neutral_comments_html more_comments_html].each do |field|
       find_invalid_links(question.question_data[field]) do |field_links|
         links += field_links
       end
     end
 
     (question.question_data[:answers] || []).each do |answer|
-      [:html, :comments_html, :left_html].each do |field|
+      %i[html comments_html left_html].each do |field|
         find_invalid_links(answer[field]) do |field_links|
           links += field_links
         end
@@ -170,14 +170,14 @@ class CourseLinkValidator
     end
 
     if links.any?
-      hash = { :name => question.question_data[:question_name] }.merge(:invalid_links => links)
+      hash = { name: question.question_data[:question_name] }.merge(invalid_links: links)
       case question
       when AssessmentQuestion
         hash[:type] = :assessment_question
-        hash[:content_url] = "/courses/#{self.course.id}/question_banks/#{question.assessment_question_bank_id}#question_#{question.id}_question_text"
+        hash[:content_url] = "/courses/#{course.id}/question_banks/#{question.assessment_question_bank_id}#question_#{question.id}_question_text"
       when Quizzes::QuizQuestion
         hash[:type] = :quiz_question
-        hash[:content_url] = "/courses/#{self.course.id}/quizzes/#{question.quiz_id}/take?preview=1#question_#{question.id}"
+        hash[:content_url] = "/courses/#{course.id}/quizzes/#{question.quiz_id}/take?preview=1#question_#{question.id}"
       end
       issues << hash
     end
@@ -187,21 +187,21 @@ class CourseLinkValidator
   def find_invalid_links(html)
     links = []
     doc = Nokogiri::HTML5(html || "")
-    attrs = ['href', 'src', 'data', 'value']
+    attrs = %w[href src data value]
 
     doc.search("*").each do |node|
       attrs.each do |attr|
         url = node[attr]
         next unless url.present?
 
-        if attr == 'value'
-          next unless node['name'] && node['name'] == 'src'
+        if attr == "value" && !(node["name"] && node["name"] == "src")
+          next
         end
 
         find_invalid_link(url) do |invalid_link|
           link_text = node.text.presence
           invalid_link[:link_text] = link_text if link_text
-          invalid_link[:image] = true if node.name == 'img'
+          invalid_link[:image] = true if node.name == "img"
           links << invalid_link
         end
       end
@@ -212,20 +212,20 @@ class CourseLinkValidator
 
   # yields a hash containing the url and an error type if the url is invalid
   def find_invalid_link(url)
-    return if url.start_with?('mailto:')
+    return if url.start_with?("mailto:")
 
-    unless (result = self.visited_urls[url])
+    unless (result = visited_urls[url])
       begin
-        if ImportedHtmlConverter.relative_url?(url) || (self.domain_regex && url.match(self.domain_regex))
-          if valid_route?(url)
-            if url.match(/\/courses\/(\d+)/) && self.course.id.to_s != $1
-              result = :course_mismatch
-            else
-              result = check_object_status(url)
-            end
-          else
-            result = :unreachable
-          end
+        if ImportedHtmlConverter.relative_url?(url) || (domain_regex && url.match(domain_regex))
+          result = if valid_route?(url)
+                     if url.match(%r{/courses/(\d+)}) && course.id.to_s != $1
+                       :course_mismatch
+                     else
+                       check_object_status(url)
+                     end
+                   else
+                     :unreachable
+                   end
         else
           unless reachable_url?(url)
             result = :unreachable
@@ -235,11 +235,11 @@ class CourseLinkValidator
         result = :unparsable
       end
       result ||= :success
-      self.visited_urls[url] = result
+      visited_urls[url] = result
     end
 
     unless result == :success
-      invalid_link = { :url => url, :reason => result }
+      invalid_link = { url: url, reason: result }
       yield invalid_link
     end
   end
@@ -249,19 +249,19 @@ class CourseLinkValidator
     path = URI.parse(url).path
     path = path.chomp("/")
 
-    @route_set ||= ::Rails.application.routes.set.routes.select { |r| r.verb === "GET" }
-    @route_set.any? { |r| r.path.match(path) } || (!Pathname(path).each_filename.include?('..') && File.exist?(File.join(Rails.root, "public", path)))
+    @route_set ||= ::Rails.application.routes.set.routes.select { |r| r.verb == "GET" }
+    @route_set.any? { |r| r.path.match(path) } || (!Pathname(path).each_filename.include?("..") && Rails.root.join("public", path[1..]).file?)
   end
 
   # makes sure that links to course objects exist and are in a visible state
   def check_object_status(url, object: nil)
     return :missing_item unless valid_route?(url)
-    return :missing_item if url.include?('/test_error')
+    return :missing_item if url.include?("/test_error")
 
     object ||= Context.find_asset_by_url(url)
     unless object
-      return :missing_item unless [nil, 'syllabus'].include?(url.match(/\/courses\/\d+\/\w+\/(.+)/)&.[](1))
-      return :missing_item if url.include?('/media_objects_iframe/')
+      return :missing_item unless [nil, "syllabus"].include?(url.match(%r{/courses/\d+/\w+/(.+)})&.[](1))
+      return :missing_item if url.include?("/media_objects_iframe/")
 
       return nil
     end
@@ -273,9 +273,9 @@ class CourseLinkValidator
     when Attachment
       return :unpublished_item if object.locked?
     when Quizzes::Quiz
-      return :unpublished_item if object.workflow_state == 'created' || object.workflow_state == 'unpublished'
+      return :unpublished_item if object.workflow_state == "created" || object.workflow_state == "unpublished"
     else
-      return :unpublished_item if object.workflow_state == 'unpublished'
+      return :unpublished_item if object.workflow_state == "unpublished"
     end
     nil
   rescue
@@ -284,7 +284,7 @@ class CourseLinkValidator
 
   # whitelisted hosts will never be flagged as unavailable
   def whitelisted?(url)
-    @whitelist ||= Setting.get('link_validator_whitelisted_hosts', '').split(',')
+    @whitelist ||= Setting.get("link_validator_whitelisted_hosts", "").split(",")
     return false if @whitelist.empty?
 
     host = URI.parse(url).host
@@ -297,17 +297,17 @@ class CourseLinkValidator
   def reachable_url?(url)
     return true if whitelisted?(url)
 
-    @unavailable_photo_redirect_pattern ||= Regexp.new(Setting.get('unavailable_photo_redirect_pattern', 'yimg\.com/.+/photo_unavailable.png$'))
+    @unavailable_photo_redirect_pattern ||= Regexp.new(Setting.get("unavailable_photo_redirect_pattern", "yimg\\.com/.+/photo_unavailable.png$"))
     redirect_proc = lambda do |response|
       # flickr does a redirect to this file when a photo is deleted/not found;
       # treat this as a broken image instead of following the redirect
-      url = response['Location']
-      raise RuntimeError("photo unavailable") if url =~ @unavailable_photo_redirect_pattern
+      url = response["Location"]
+      raise RuntimeError("photo unavailable") if url&.match?(@unavailable_photo_redirect_pattern)
     end
 
     begin
       response = CanvasHttp.head(url, { "Accept-Encoding" => "gzip" }, redirect_limit: 9, redirect_spy: redirect_proc)
-      if %w{404 405}.include?(response.code)
+      if %w[404 405].include?(response.code)
         response = CanvasHttp.get(url, { "Accept-Encoding" => "gzip" }, redirect_limit: 9, redirect_spy: redirect_proc) do
           # don't read the response body
         end

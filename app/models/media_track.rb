@@ -19,28 +19,28 @@
 
 class MediaTrack < ActiveRecord::Base
   belongs_to :user
-  belongs_to :media_object, :touch => true
+  belongs_to :media_object, touch: true
   before_save :convert_srt_to_wvtt
   validates :media_object_id, presence: true
-  validates :kind, inclusion: { in: %w(subtitles captions descriptions chapters metadata) }
+  validates :kind, inclusion: { in: %w[subtitles captions descriptions chapters metadata] }
   validates :locale, format: { with: /\A[A-Za-z\-]+\z/ }
   validates :content, presence: true
 
-  RE_LOOKS_LIKE_TTML = /<tt\s+xml/i
+  RE_LOOKS_LIKE_TTML = /<tt\s+xml/i.freeze
   validates :content, format: {
     without: RE_LOOKS_LIKE_TTML,
-    message: 'TTML tracks are not allowed because they are susceptible to xss attacks'
+    message: "TTML tracks are not allowed because they are susceptible to xss attacks"
   }
 
   def webvtt_content
-    self.read_attribute(:webvtt_content) || self.content
+    read_attribute(:webvtt_content) || content
   end
 
   def convert_srt_to_wvtt
-    if self.content.exclude?('WEBVTT') && (self.content_changed? || self.read_attribute(:webvtt_content).nil?)
-      srt_content = self.content.dup
+    if content.exclude?("WEBVTT") && (content_changed? || read_attribute(:webvtt_content).nil?)
+      srt_content = content.dup
       srt_content.gsub!(/(:|^)(\d)(,|:)/, '\10\2\3')
-      srt_content.gsub!(/([0-9]{2}:[0-9]{2}:[0-9]{2})([,])([0-9]{3})/, '\1.\3')
+      srt_content.gsub!(/([0-9]{2}:[0-9]{2}:[0-9]{2})(,)([0-9]{3})/, '\1.\3')
       srt_content.gsub!("\r\n", "\n")
       self.webvtt_content = "WEBVTT\n\n#{srt_content}".strip
     end

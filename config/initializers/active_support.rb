@@ -17,10 +17,10 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-ActiveSupport::TimeWithZone.delegate :to_yaml, :to => :utc
+ActiveSupport::TimeWithZone.delegate :to_yaml, to: :utc
 ActiveSupport::SafeBuffer.class_eval do
   def encode_with(coder)
-    coder.scalar("!str", self.to_str)
+    coder.scalar("!str", to_str)
   end
 end
 
@@ -36,7 +36,7 @@ module ActiveSupport::Cache
 
     def normalize_key(key, options)
       result = super
-      if options && options.has_key?(:use_new_rails) ? options[:use_new_rails] : !CANVAS_RAILS6_0
+      if options&.key?(:use_new_rails) ? options[:use_new_rails] : !CANVAS_RAILS6_0
         result = "rails61:#{result}"
       end
       result
@@ -44,7 +44,7 @@ module ActiveSupport::Cache
   end
   Store.prepend(RailsCacheShim)
 
-  require 'active_support/cache_register'
+  require "active_support/cache_register"
 
   Store.prepend(ActiveSupport::CacheRegister::Cache::Store)
 
@@ -68,10 +68,10 @@ module IgnoreMonkeyPatchesInDeprecations
   def extract_callstack(callstack)
     return _extract_callstack(callstack) if callstack.first.is_a?(String)
 
-    offending_line = callstack.find { |frame|
+    offending_line = callstack.find do |frame|
       # pass the whole frame to the filter function, so we can ignore specific methods
       !ignored_callstack(frame)
-    } || callstack.first
+    end || callstack.first
 
     [offending_line.path, offending_line.lineno, offending_line.label]
   end
@@ -91,12 +91,12 @@ module IgnoreMonkeyPatchesInDeprecations
     return true if path == File.expand_path(File.dirname(__FILE__) + "/../../spec/support/blank_slate_protection.rb")
     return true if path == File.expand_path(File.dirname(__FILE__) + "/../../spec/selenium/common.rb")
 
-    @switchman ||= File.expand_path(Gem.loaded_specs['switchman'].full_gem_path) + "/"
+    @switchman ||= File.expand_path(Gem.loaded_specs["switchman"].full_gem_path) + "/"
     return true if path&.start_with?(@switchman)
-    return true if label == 'render' && path&.end_with?("application_controller.rb")
-    return true if label == 'named_context_url' && path&.end_with?("application_controller.rb")
-    return true if label == 'redirect_to' && path&.end_with?("application_controller.rb")
-    return true if label == 'block in wrap_block_in_transaction' && path == File.expand_path(File.dirname(__FILE__) + "/../../spec/spec_helper.rb")
+    return true if label == "render" && path&.end_with?("application_controller.rb")
+    return true if label == "named_context_url" && path&.end_with?("application_controller.rb")
+    return true if label == "redirect_to" && path&.end_with?("application_controller.rb")
+    return true if label == "block in wrap_block_in_transaction" && path == File.expand_path(File.dirname(__FILE__) + "/../../spec/spec_helper.rb")
 
     return false unless path
 

@@ -21,7 +21,7 @@ class DisableNoTlsForLdap < ActiveRecord::Migration[5.0]
   tag :postdeploy
 
   class AuthenticationProvider < ActiveRecord::Base
-    self.table_name = 'account_authorization_configs'
+    self.table_name = "account_authorization_configs"
 
     def auth_over_tls
       ::AuthenticationProvider::LDAP.auth_over_tls_setting(read_attribute(:auth_over_tls))
@@ -29,8 +29,8 @@ class DisableNoTlsForLdap < ActiveRecord::Migration[5.0]
   end
 
   def up
-    AuthenticationProvider.where(auth_type: 'ldap', workflow_state: 'active').each do |ap|
-      ap.update_attribute(:auth_over_tls, 'start_tls') unless ap.auth_over_tls
+    AuthenticationProvider.where(auth_type: "ldap", workflow_state: "active").each do |ap|
+      ap.update_attribute(:auth_over_tls, "start_tls") unless ap.auth_over_tls
     end
   end
 end
