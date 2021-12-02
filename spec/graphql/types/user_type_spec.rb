@@ -389,6 +389,23 @@ describe Types::UserType do
         user_type.resolve("notificationPreferences { channels { notificationPolicies(contextType: Course) { notification { name } } } }").count
       ).to eq 0
     end
+
+    context "when the requesting user does not have permission to view the communication channels" do
+      let(:user_type) do
+        GraphQLTypeTester.new(
+          @student,
+          current_user: @other_student,
+          domain_root_account: @course.account.root_account,
+          request: ActionDispatch::TestRequest.create
+        )
+      end
+
+      it "returns nil" do
+        expect(
+          user_type.resolve("notificationPreferences { channels { notificationPolicies(contextType: Course) { notification { name } } } }")
+        ).to eq nil
+      end
+    end
   end
 
   context "conversations" do

@@ -148,6 +148,8 @@ module Types
 
     field :notification_preferences, NotificationPreferencesType, null: true
     def notification_preferences
+      return nil unless object.grants_all_rights?(context[:current_user], :read_profile, :read_email_addresses)
+
       Loaders::AssociationLoader.for(User, :communication_channels).load(object).then do |comm_channels|
         {
           channels: comm_channels.supported.unretired,
