@@ -26,7 +26,7 @@ export default class DeveloperKeyStateControl extends React.Component {
   setBindingState = newValue => {
     this.props.store.dispatch(
       this.props.actions.setBindingWorkflowState(
-        this.props.developerKey,
+        this.props.developerKey.id,
         this.props.ctx.params.contextId,
         newValue
       )
@@ -34,8 +34,7 @@ export default class DeveloperKeyStateControl extends React.Component {
   }
 
   disabled() {
-    const devKeyBinding = this.props.developerKey.developer_key_account_binding
-    if (!devKeyBinding || this.radioGroupValue() === 'allow') {
+    if (this.radioGroupValue() === 'allow') {
       return false
     }
     return !this.props.developerKey.developer_key_account_binding.account_owns_binding
@@ -54,11 +53,7 @@ export default class DeveloperKeyStateControl extends React.Component {
     if (devKeyBinding) {
       return devKeyBinding.workflow_state || 'allow'
     }
-    else if (!this.isSiteAdmin()) {
-      return 'off'
-    } else {
-      return 'allow'
-    }
+    return 'allow'
   }
 
   isSiteAdmin() {
@@ -95,7 +90,6 @@ export default class DeveloperKeyStateControl extends React.Component {
         onChange={(e, val) => this.setBindingState(val)}
         disabled={this.disabled()}
         name={this.props.developerKey.id}
-        value={this.radioGroupValue()}
       >
         <RadioInput ref={this.refOnToggle} label={I18n.t('On')} value="on" context="success" />
         {this.isSiteAdmin() && (

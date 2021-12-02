@@ -39,9 +39,9 @@ describe "GraphQL Token Scoping" do
 
   it "does not allow queries with a scoped developer key" do
     token = AccessToken.create!(developer_key: scoped_developer_key)
-    expect do
+    expect {
       course_type.resolve("_id", access_token: token)
-    end.to raise_error(/insufficient scopes/)
+    }.to raise_error(/insufficient scopes/)
   end
 
   it "does not allow mutations with a scoped developer key" do

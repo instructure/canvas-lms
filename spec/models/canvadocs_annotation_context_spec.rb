@@ -29,15 +29,15 @@ describe CanvadocsAnnotationContext do
   end
 
   it "requires an attachment" do
-    expect do
+    expect {
       CanvadocsAnnotationContext.create!(submission: @sub, attachment: nil, submission_attempt: 1)
-    end.to raise_error(ActiveRecord::RecordInvalid)
+    }.to raise_error(ActiveRecord::RecordInvalid)
   end
 
   it "requires a submission" do
-    expect do
+    expect {
       CanvadocsAnnotationContext.create!(submission: nil, attachment: @att, submission_attempt: 1)
-    end.to raise_error(ActiveRecord::RecordInvalid)
+    }.to raise_error(ActiveRecord::RecordInvalid)
   end
 
   it "sets a root_account_id automatically" do
@@ -63,9 +63,9 @@ describe CanvadocsAnnotationContext do
   it "is unique for a combination of attachment_id, submission_attempt, and submission_id" do
     CanvadocsAnnotationContext.create!(submission: @sub, attachment: @att, submission_attempt: 1)
 
-    expect do
+    expect {
       CanvadocsAnnotationContext.create!(submission: @sub, attachment: @att, submission_attempt: 1)
-    end.to raise_error(ActiveRecord::RecordInvalid)
+    }.to raise_error(ActiveRecord::RecordInvalid)
   end
 
   describe "permissions" do

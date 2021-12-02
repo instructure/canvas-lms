@@ -31,7 +31,7 @@ class DockerfileWriter
     @compose_files = compose_files
     @in_file = in_file
     @out_file = out_file
-    @out_file_suffix = ""
+    @out_file_suffix = ''
   end
 
   def production?
@@ -47,11 +47,11 @@ class DockerfileWriter
   end
 
   def generation_message
-    <<~RUBY
+    <<~STR
       # GENERATED FILE, DO NOT MODIFY!
       # To update this file please edit the relevant template and run the generation
-      # task `build/dockerfile_writer.rb --env #{env} --compose-file #{compose_files.join(",")} --in #{in_file} --out #{out_file}`
-    RUBY
+      # task `build/dockerfile_writer.rb --env #{env} --compose-file #{compose_files.join(',')} --in #{in_file} --out #{out_file}`
+    STR
   end
 
   def set_file_suffix(suffix)
@@ -68,7 +68,7 @@ class DockerfileWriter
 
     def <<(obj)
       if @contents[parent.out_file_suffix].nil?
-        @contents[parent.out_file_suffix] = +""
+        @contents[parent.out_file_suffix] = String.new
       end
 
       @contents[parent.out_file_suffix] << obj
@@ -76,7 +76,7 @@ class DockerfileWriter
   end
 
   def run
-    contents = eval(Erubi::Engine.new(File.read(in_file), { bufval: "SuffixedStringWriter.new(self)" }).src + ";_buf.contents") # rubocop:disable Security/Eval
+    contents = eval(Erubi::Engine.new(File.read(in_file), { :bufval => 'SuffixedStringWriter.new(self)' }).src + ";_buf.contents")
 
     contents.each do |k, v|
       File.open(k.empty? ? out_file : "#{out_file}.#{k}", "w") do |f|
@@ -86,12 +86,12 @@ class DockerfileWriter
   end
 
   def docker_compose_volume_paths
-    paths = (docker_compose_config["services"]["web"]["volumes"] || []).filter_map do |volume|
+    paths = (docker_compose_config["services"]["web"]["volumes"] || []).map do |volume|
       name, path = volume.split(":")
-      next unless /\A[a-z]/.match?(name)
+      next unless name =~ /\A[a-z]/
 
       path.sub("/usr/src/app/", "")
-    end
+    end.compact
     paths.sort_by { |path| [path[0] == "/" ? 1 : 0, path] }
   end
 
@@ -100,7 +100,7 @@ class DockerfileWriter
   end
 
   def yarn_packages
-    JSON.parse(File.read("package.json"))["workspaces"]["packages"]
+    JSON.load(File.open('package.json'))['workspaces']['packages']
   end
 end
 
@@ -126,4 +126,4 @@ OptionParser.new do |opts|
   end
 end.parse!
 
-DockerfileWriter.new(**options).run
+DockerfileWriter.new(**options).run()

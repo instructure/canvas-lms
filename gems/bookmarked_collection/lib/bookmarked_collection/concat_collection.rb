@@ -25,6 +25,6 @@ class BookmarkedCollection::ConcatCollection < BookmarkedCollection::CompositeCo
     _bookmark, index = decompose_bookmark(bookmark)
     return false if index.nil?
 
-    true
+    return true
   end
 end

@@ -40,7 +40,7 @@ function MultiSelectSearchInput(props) {
         onChange={handleInputChange}
         placeholder={props.placeholder}
         customRenderBeforeInput={tags => [<IconSearchLine key="search-icon" />].concat(tags || [])}
-        customMatcher={props.customMatcher}
+        matchStrategy="substring"
       >
         {props.options.map(option => (
           <CanvasMultiSelect.Option id={option.id} key={option.id} value={option.id}>
@@ -55,7 +55,6 @@ function MultiSelectSearchInput(props) {
 MultiSelectSearchInput.propTypes = {
   id: PropTypes.string.isRequired,
   label: PropTypes.string.isRequired,
-  customMatcher: PropTypes.func,
   disabled: PropTypes.bool.isRequired,
   options: PropTypes.arrayOf(
     PropTypes.shape({
@@ -65,10 +64,6 @@ MultiSelectSearchInput.propTypes = {
   ).isRequired,
   onChange: PropTypes.func.isRequired,
   placeholder: PropTypes.string.isRequired
-}
-
-MultiSelectSearchInput.defaultProps = {
-  customMatcher: null
 }
 
 export default MultiSelectSearchInput

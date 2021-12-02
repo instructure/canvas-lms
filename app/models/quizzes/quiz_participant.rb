@@ -59,6 +59,6 @@ class Quizzes::QuizParticipant
   # Note that this does not actually take the Quiz's public-participation status
   # into account, only the fact that the participant is authentic or not.
   def anonymous?
-    user.nil? && user_code.present?
+    self.user.nil? && self.user_code.present?
   end
 end

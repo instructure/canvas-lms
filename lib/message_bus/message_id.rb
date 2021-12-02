@@ -61,15 +61,15 @@ module MessageBus
     end
 
     def <=>(other)
-      if !other.is_a?(::MessageBus::MessageId) || other.partition_id != partition_id
+      if !other.is_a?(::MessageBus::MessageId) || other.partition_id != self.partition_id
         raise ArgumentError, "MessageID can only compare to other message IDs in the same partition"
       end
 
-      return ledger_id <=> other.ledger_id unless other.ledger_id == ledger_id
+      return self.ledger_id <=> other.ledger_id unless other.ledger_id == self.ledger_id
 
-      return entry_id <=> other.entry_id unless other.entry_id == entry_id
+      return self.entry_id <=> other.entry_id unless other.entry_id == self.entry_id
 
-      batch_index <=> other.batch_index
+      self.batch_index <=> other.batch_index
     end
 
     def to_s

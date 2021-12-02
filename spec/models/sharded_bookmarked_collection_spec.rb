@@ -22,11 +22,13 @@ describe ShardedBookmarkedCollection do
   before do
     @user = user_factory(active_user: true)
     @user.account_users.create! account: Account.create!
-    @user.account_users.create! account: Account.create! { |a| a.workflow_state = "deleted" }
+    @user.account_users.create! account: Account.create! { |a| a.workflow_state = 'deleted' }
   end
 
   it "returns a paginatable collection" do
-    collection = ShardedBookmarkedCollection.build(Account::Bookmarker, @user.adminable_accounts_scope, &:active)
+    collection = ShardedBookmarkedCollection.build(Account::Bookmarker, @user.adminable_accounts_scope) do |scope|
+      scope.active
+    end
     expect(collection.paginate(per_page: 10).size).to equal 1
     # only one sub-scope, so pass-through
     expect(collection).to be_is_a ActiveRecord::Relation
@@ -40,7 +42,9 @@ describe ShardedBookmarkedCollection do
         a = Account.create!
         a.account_users.create!(user: @user)
       end
-      collection = ShardedBookmarkedCollection.build(Account::Bookmarker, @user.adminable_accounts_scope, &:active)
+      collection = ShardedBookmarkedCollection.build(Account::Bookmarker, @user.adminable_accounts_scope) do |scope|
+        scope.active
+      end
       expect(collection.paginate(per_page: 10).size).to equal 2
       # only one sub-scope, so pass-through
       expect(collection).to be_is_a BookmarkedCollection::MergeProxy

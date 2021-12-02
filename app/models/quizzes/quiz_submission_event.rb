@@ -28,7 +28,7 @@ class Quizzes::QuizSubmissionEvent < ActiveRecord::Base
   # An event for every new submission created
   EVT_SUBMISSION_CREATED = "submission_created"
 
-  belongs_to :quiz_submission, class_name: "Quizzes::QuizSubmission"
+  belongs_to :quiz_submission, class_name: 'Quizzes::QuizSubmission'
   resolves_root_account through: :quiz_submission
 
   serialize :event_data, JSON
@@ -47,9 +47,9 @@ class Quizzes::QuizSubmissionEvent < ActiveRecord::Base
   #
   # If this returns true, you can safely skip storing this event.
   def empty?
-    case event_type
+    case self.event_type
     when EVT_QUESTION_ANSWERED
-      answers.blank?
+      self.answers.nil? || self.answers.empty?
     else
       false
     end

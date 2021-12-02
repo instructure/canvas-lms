@@ -59,16 +59,13 @@ describe Quizzes::QuizUserFinder do
   end
 
   it "doesn't duplicate the same user found in multiple sections" do
-    add_section("The Mother We Share")
+    add_section('The Mother We Share')
     student_in_section(@course_section, user: @submitted_student)
     expect(@finder.all_students).to match_array students
   end
 
   context "differentiated_assignments" do
-    before do
-      @quiz.only_visible_to_overrides = true
-      @quiz.save!
-    end
+    before { @quiz.only_visible_to_overrides = true; @quiz.save! }
 
     it "(#all_students_with_visibility) filters students if DA is on" do
       expect(@finder.unsubmitted_students).not_to include(@unsubmitted_student)

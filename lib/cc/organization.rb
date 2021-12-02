@@ -40,10 +40,10 @@ module CC
     def create_organizations
       @manifest_node.organizations do |orgs|
         orgs.organization(
-          identifier: "org_1",
-          structure: "rooted-hierarchy"
+          :identifier => 'org_1',
+          :structure => 'rooted-hierarchy'
         ) do |org|
-          org.item(identifier: "LearningModules") do |root_item|
+          org.item(:identifier => "LearningModules") do |root_item|
             @root_item = root_item
             @course.context_modules.not_deleted.each do |cm|
               next unless @manifest.export_object?(cm)
@@ -56,24 +56,23 @@ module CC
     end
 
     def add_module(cm)
-      @root_item.item(identifier: create_key(cm)) do |module_node|
+      @root_item.item(:identifier => create_key(cm)) do |module_node|
         module_node.title cm.name
         cm.content_tags.not_deleted.each do |ct|
-          attributes = { identifier: create_key(ct) }
-          unless ct.content_type == "ContextModuleSubHeader"
+          attributes = { :identifier => create_key(ct) }
+          unless ct.content_type == 'ContextModuleSubHeader'
             attributes[:identifierref] = create_key(ct.content)
           end
-          case ct.content_type
-          when "ExternalUrl"
+          if ct.content_type == 'ExternalUrl'
             # Need to create web link objects in the resources
             link = {
-              migration_id: create_key(ct, "weblink"),
-              title: ct.title,
-              url: ct.url
+              :migration_id => create_key(ct, 'weblink'),
+              :title => ct.title,
+              :url => ct.url
             }
             @manifest.weblinks << link
             attributes[:identifierref] = link[:migration_id]
-          when "ContextExternalTool"
+          elsif ct.content_type == 'ContextExternalTool'
             attributes[:identifierref] = attributes[:identifier]
             attributes[:identifier] = create_key(ct, "module_item")
           end

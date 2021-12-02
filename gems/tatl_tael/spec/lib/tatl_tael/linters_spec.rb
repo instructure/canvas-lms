@@ -1,11 +1,8 @@
 # frozen_string_literal: true
 
-require "spec_helper"
+require 'spec_helper'
 
 describe TatlTael::Linters do
-  let(:changes) { double }
-  let(:linters) { TatlTael::Linters }
-
   describe TatlTael::Linters::BaseLinter do
     describe ".inherited" do
       context "not a simple linter" do
@@ -138,6 +135,9 @@ describe TatlTael::Linters do
       end
     end
   end
+
+  let(:linters) { TatlTael::Linters }
+  let(:changes) { double }
 
   describe ".comments" do
     let(:bar_linter) do

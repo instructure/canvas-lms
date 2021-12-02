@@ -17,7 +17,6 @@
  */
 
 import NumberInputDriver from './NumberInputDriver'
-import {queryByLabelText, getByTestId} from '@testing-library/react'
 
 export default class DimensionsInputDriver {
   static find($parent) {
@@ -32,43 +31,25 @@ export default class DimensionsInputDriver {
     return new DimensionsInputDriver($fieldset)
   }
 
-  constructor($parent) {
-    this.$typeSelector = $parent.firstChild
-    this.$dimensionsInput = $parent.lastChild
+  constructor($element) {
+    this.$element = $element
   }
 
   get width() {
-    const $container = getByTestId(this.$dimensionsInput, 'input-number-container')
-    return NumberInputDriver.findByLabelText('Width', $container)
+    return NumberInputDriver.findByLabelText('Width', this.$element)
   }
 
   get height() {
-    const $container = getByTestId(this.$dimensionsInput, 'input-number-container')
-    return NumberInputDriver.findByLabelText('Height', $container)
-  }
-
-  get percentage() {
-    const $container = getByTestId(this.$dimensionsInput, 'input-number-container')
-    return NumberInputDriver.findByLabelText('Percentage', $container)
-  }
-
-  get pixelsRadioButton() {
-    const $parent = getByTestId(this.$typeSelector, 'dimension-type')
-    return queryByLabelText($parent, 'Pixels', {exact: false})
-  }
-
-  get percentageRadioButton() {
-    const $parent = getByTestId(this.$typeSelector, 'dimension-type')
-    return queryByLabelText($parent, 'Percentage', {exact: false})
+    return NumberInputDriver.findByLabelText('Height', this.$element)
   }
 
   get messageTexts() {
-    const messagesId = this.$dimensionsInput.getAttribute('aria-describedby')
+    const messagesId = this.$element.getAttribute('aria-describedby')
     if (messagesId == null) {
       return []
     }
 
-    return [...this.$dimensionsInput.querySelectorAll(`#${messagesId} > *`)].map($message =>
+    return [...this.$element.querySelectorAll(`#${messagesId} > *`)].map($message =>
       $message.textContent.trim()
     )
   }

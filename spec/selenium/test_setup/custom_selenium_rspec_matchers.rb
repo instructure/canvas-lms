@@ -30,22 +30,22 @@ module CustomSeleniumRSpecMatchers
   matcher :have_class do |class_name|
     match do |element|
       wait_for(method: :have_class) do
-        element.attribute("class").match(class_name)
+        element.attribute('class').match(class_name)
       end
     end
 
     match_when_negated do |element|
       wait_for(method: :have_class) do
-        !element.attribute("class").match(class_name)
+        !element.attribute('class').match(class_name)
       end
     end
 
     failure_message do |element|
-      "expected #{element.inspect} to have class #{class_name}, actual class names: #{element.attribute("class")}"
+      "expected #{element.inspect} to have class #{class_name}, actual class names: #{element.attribute('class')}"
     end
 
     failure_message_when_negated do |element|
-      "expected #{element.inspect} to NOT have class #{class_name}, actual class names: #{element.attribute("class")}"
+      "expected #{element.inspect} to NOT have class #{class_name}, actual class names: #{element.attribute('class')}"
     end
   end
 
@@ -57,11 +57,11 @@ module CustomSeleniumRSpecMatchers
     end
 
     failure_message do |element|
-      <<~TEXT
+      <<~FAILURE_MESSAGE
         Expected #{element.inspect} text to be absent but was instead present.
 
         Actual text was: "#{element.text}".
-      TEXT
+      FAILURE_MESSAGE
     end
   end
 
@@ -73,11 +73,11 @@ module CustomSeleniumRSpecMatchers
     end
 
     failure_message do |element|
-      <<~TEXT
+      <<~FAILURE_MESSAGE
         Expected #{element.inspect} text to be present but was instead blank.
 
         Actual text was: "#{element.text}".
-      TEXT
+      FAILURE_MESSAGE
     end
   end
 
@@ -95,19 +95,19 @@ module CustomSeleniumRSpecMatchers
     end
 
     failure_message do |element|
-      <<~TEXT
+      <<~FAILURE_MESSAGE
         Expected #{element.inspect} text to include "#{text}".
 
         Actual text was: "#{element.text}".
-      TEXT
+      FAILURE_MESSAGE
     end
 
     failure_message_when_negated do |element|
-      <<~TEXT
+      <<~FAILURE_MESSAGE
         Expected #{element.inspect} text not to include "#{text}".
 
         Actual text was: "#{element.text}".
-      TEXT
+      FAILURE_MESSAGE
     end
   end
 
@@ -120,30 +120,30 @@ module CustomSeleniumRSpecMatchers
   matcher :have_value do |value_attribute|
     match do |element|
       wait_for(method: :have_value) do
-        element.attribute("value").match(value_attribute)
+        element.attribute('value').match(value_attribute)
       end
     end
 
     match_when_negated do |element|
       wait_for(method: :have_value) do
-        !element.attribute("value").match(value_attribute)
+        !element.attribute('value').match(value_attribute)
       end
     end
 
     failure_message do |element|
-      <<~TEXT
+      <<~FAILURE_MESSAGE
         Expected #{element.inspect} to have value "#{value_attribute}".
 
-        Actual value was: "#{element.attribute("value")}".
-      TEXT
+        Actual value was: "#{element.attribute('value')}".
+      FAILURE_MESSAGE
     end
 
     failure_message_when_negated do |element|
-      <<~TEXT
+      <<~FAILURE_MESSAGE
         Expected #{element.inspect} not to have value "#{value_attribute}".
 
-        Actual value was: "#{element.attribute("value")}".
-      TEXT
+        Actual value was: "#{element.attribute('value')}".
+      FAILURE_MESSAGE
     end
   end
 
@@ -174,7 +174,7 @@ module CustomSeleniumRSpecMatchers
     expected_specified = args.size > 1
     expected = args[1]
 
-    attribute_matcher = lambda do |actual|
+    attribute_matcher = ->(actual) do
       if expected_specified
         actual.respond_to?(:match) ? actual.match(expected) : actual == expected
       else
@@ -195,12 +195,12 @@ module CustomSeleniumRSpecMatchers
     end
 
     failure_message do |element|
-      "expected #{element.inspect}'s #{attribute} attribute to have value of #{expected || "not nil"}, "\
+      "expected #{element.inspect}'s #{attribute} attribute to have value of #{expected || 'not nil'}, "\
         "actual #{attribute} attribute value: #{element.attribute(attribute.to_s)}"
     end
 
     failure_message_when_negated do |element|
-      "expected #{element.inspect}'s #{attribute} attribute to NOT have value of #{expected || "not nil"}, "\
+      "expected #{element.inspect}'s #{attribute} attribute to NOT have value of #{expected || 'not nil'}, "\
         "actual #{attribute} attribute type: #{element.attribute(attribute.to_s)}"
     end
   end
@@ -240,30 +240,30 @@ module CustomSeleniumRSpecMatchers
   matcher :be_aria_disabled do
     match do |element|
       wait_for(method: :be_aria_disabled) do
-        element.attribute("aria-disabled") == "true"
+        element.attribute('aria-disabled') == 'true'
       end
     end
 
     match_when_negated do |element|
       wait_for(method: :be_aria_disabled) do
-        element.attribute("aria-disabled") != "true"
+        element.attribute('aria-disabled') != 'true'
       end
     end
 
     failure_message do |element|
-      <<~TEXT
+      <<~FAILURE_MESSAGE
         Expected #{element.inspect}'s aria-disabled attribute to be true.
 
-        Actual aria-disabled attribute value: "#{element.attribute("aria-disabled")}".
-      TEXT
+        Actual aria-disabled attribute value: "#{element.attribute('aria-disabled')}".
+      FAILURE_MESSAGE
     end
 
     failure_message_when_negated do |element|
-      <<~TEXT
+      <<~FAILURE_MESSAGE
         Expected #{element.inspect}'s aria-disabled attribute to be false.
 
-        Actual aria-disabled attribute value: "#{element.attribute("aria-disabled")}"
-      TEXT
+        Actual aria-disabled attribute value: "#{element.attribute('aria-disabled')}"
+      FAILURE_MESSAGE
     end
   end
 
@@ -351,13 +351,13 @@ module CustomSeleniumRSpecMatchers
 
   # assert whether or not an element meets the desired contrast ratio.
   # will wait up to TIMEOUTS[:finder] seconds
-  require_relative "../helpers/color_common"
+  require_relative '../helpers/color_common'
   matcher :meet_contrast_ratio do |ratio = 3.5|
     match do |element|
       wait_for(method: :be_displayed) do
         LuminosityContrast.ratio(
-          ColorCommon.rgba_to_hex(element.style("background-color")),
-          ColorCommon.rgba_to_hex(element.style("color"))
+          ColorCommon.rgba_to_hex(element.style('background-color')),
+          ColorCommon.rgba_to_hex(element.style('color'))
         ) >= ratio
       end
     end
@@ -365,8 +365,8 @@ module CustomSeleniumRSpecMatchers
     match_when_negated do |element|
       wait_for(method: :be_displayed) do
         LuminosityContrast.ratio(
-          ColorCommon.rgba_to_hex(element.style("background-color")),
-          ColorCommon.rgba_to_hex(element.style("color"))
+          ColorCommon.rgba_to_hex(element.style('background-color')),
+          ColorCommon.rgba_to_hex(element.style('color'))
         ) < ratio
       end
     end
@@ -413,7 +413,7 @@ module CustomSeleniumRSpecMatchers
       true
     end
 
-    %i[== < <= >= > === =~].each do |operator|
+    [:==, :<, :<=, :>=, :>, :===, :=~].each do |operator|
       chain operator do |value|
         @operator = operator
         @value = value
@@ -423,10 +423,10 @@ module CustomSeleniumRSpecMatchers
     failure_message do |actual|
       actual_value = actual.call
 
-      if defined? @operator
-        "expected #{actual_value} to become #{@operator} #{@value}"
-      else
+      unless defined? @operator
         "expected #{actual_value} to become #{expected}"
+      else
+        "expected #{actual_value} to become #{@operator} #{@value}"
       end
     end
 
@@ -435,10 +435,10 @@ module CustomSeleniumRSpecMatchers
 
       wait_for(method: :become) do
         disable_implicit_wait do
-          if defined? @operator
-            actual.call.__send__ @operator, @value
-          else
+          unless defined? @operator
             actual.call == expected
+          else
+            actual.call.__send__ @operator, @value
           end
         end
       end
@@ -454,10 +454,7 @@ module CustomSeleniumRSpecMatchers
       raise "The `become` matcher expects a block, e.g. `expect { actual }.to become(value)`, NOT `expect(actual).to become(value)`" unless actual.is_a? Proc
 
       wait_for(method: :become) do
-        disable_implicit_wait do
-          a = actual.call
-          min < a && a < max
-        end
+        disable_implicit_wait { a = actual.call; min < a && a < max }
       end
     end
   end

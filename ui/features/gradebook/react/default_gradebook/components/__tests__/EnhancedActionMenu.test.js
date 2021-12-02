@@ -62,9 +62,7 @@ const workingMenuProps = () => ({
     isEnabled: false
   },
 
-  gradingPeriodId: '1234',
-
-  showStudentFirstLastName: true
+  gradingPeriodId: '1234'
 })
 
 const previousExportProps = () => ({
@@ -260,17 +258,6 @@ describe('EnhancedActionMenu', () => {
       })
       await waitFor(() => {
         expect(startExport.mock.calls[0][0]).toEqual('1234')
-      })
-    })
-
-    it('passes showStudentFirstLastName to the GradebookExportManager', async () => {
-      const exportResult = getPromise('resolved')
-      startExport.mockReturnValue(exportResult)
-      act(() => {
-        selectDropdownOption('New Export')
-      })
-      await waitFor(() => {
-        expect(startExport.mock.calls[0][2]).toEqual(true)
       })
     })
 

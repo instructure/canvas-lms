@@ -143,20 +143,20 @@ module AttachmentFu # :nodoc:
       mattr_reader :bucket
 
       def self.included(base) # :nodoc:
-        require "aws-sdk-s3"
+        require 'aws-sdk-s3'
 
         s3_config = load_s3_config(base.attachment_options[:s3_config_path])
         bucket_name = s3_config.delete(:bucket_name)
 
-        s3 = Aws::S3::Resource.new(Canvas::AWS.validate_v2_config(s3_config, "amazon_s3.yml"))
+        s3 = Aws::S3::Resource.new(Canvas::AWS.validate_v2_config(s3_config, 'amazon_s3.yml'))
         @@bucket = s3.bucket(bucket_name)
 
         base.before_update :rename_file
       end
 
       def self.load_s3_config(path = nil)
-        s3_config_path = path || Rails.root.join("config/amazon_s3.yml")
-        YAML.safe_load(ERB.new(File.read(s3_config_path)).result)[Rails.env].symbolize_keys
+        s3_config_path = path || (Rails.root + 'config/amazon_s3.yml')
+        YAML.load(ERB.new(File.read(s3_config_path)).result)[Rails.env].symbolize_keys
       end
 
       # Overwrites the base filename writer in order to store the old filename
@@ -166,13 +166,14 @@ module AttachmentFu # :nodoc:
       end
 
       def sanitize_filename(filename)
-        if respond_to?(:root_attachment) && root_attachment && root_attachment.filename
-          root_attachment.filename
+        if self.respond_to?(:root_attachment) && self.root_attachment && self.root_attachment.filename
+          filename = self.root_attachment.filename
         else
-          Attachment.truncate_filename(filename, 255) do |component, len|
+          filename = Attachment.truncate_filename(filename, 255) do |component, len|
             CanvasTextHelper.cgi_escape_truncate(component, len)
           end
         end
+        filename
       end
 
       # The attachment ID used in the full path of a file
@@ -182,7 +183,7 @@ module AttachmentFu # :nodoc:
 
       # INSTRUCTURE: fallback to old path style if there is no cluster attribute
       def namespaced_path
-        obj = (respond_to?(:root_attachment) && root_attachment) || self
+        obj = (respond_to?(:root_attachment) && self.root_attachment) || self
         if (namespace = obj.read_attribute(:namespace))
           File.join(namespace, obj.attachment_options[:path_prefix])
         else
@@ -201,7 +202,7 @@ module AttachmentFu # :nodoc:
       def full_filename(thumbnail = nil)
         # the old AWS::S3 gem would not encode +'s, causing S3 to interpret
         # them as spaces. Continue that behavior.
-        basename = thumbnail_name_for(thumbnail).tr("+", " ")
+        basename = thumbnail_name_for(thumbnail).gsub('+', ' ')
         File.join(base_path, basename)
       end
 
@@ -251,8 +252,10 @@ module AttachmentFu # :nodoc:
       def authenticated_s3_url(*args)
         thumbnail = args.first.is_a?(String) ? args.first : nil
         options   = args.last.is_a?(Hash)    ? args.last  : {}
-        if !options[:expires_in].nil? && options[:expires_in].is_a?(ActiveSupport::Duration)
-          options[:expires_in] = options[:expires_in].to_i
+        unless options[:expires_in].nil?
+          if options[:expires_in].is_a? ActiveSupport::Duration
+            options[:expires_in] = options[:expires_in].to_i
+          end
         end
         s3object(thumbnail).presigned_url(:get, options)
       end

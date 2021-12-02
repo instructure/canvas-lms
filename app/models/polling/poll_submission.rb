@@ -20,32 +20,32 @@
 
 module Polling
   class PollSubmission < ActiveRecord::Base
-    belongs_to :poll, class_name: "Polling::Poll"
-    belongs_to :poll_choice, class_name: "Polling::PollChoice"
-    belongs_to :poll_session, class_name: "Polling::PollSession"
+    belongs_to :poll, class_name: 'Polling::Poll'
+    belongs_to :poll_choice, class_name: 'Polling::PollChoice'
+    belongs_to :poll_session, class_name: 'Polling::PollSession'
     belongs_to :user
 
-    validates :poll, :poll_choice, :poll_session, :user, presence: true
-    validates :user_id,
-              uniqueness: { scope: :poll_session_id,
-                            message: lambda do
+    validates_presence_of :poll, :poll_choice, :poll_session, :user
+    validates_uniqueness_of :user_id,
+                            scope: :poll_session_id,
+                            message: -> {
                                        t(
-                                         "polling.poll_submissions.validations.user_and_poll_session_uniqueness",
-                                         "can only submit one choice per poll session."
+                                         'polling.poll_submissions.validations.user_and_poll_session_uniqueness',
+                                         'can only submit one choice per poll session.'
                                        )
-                                     end }
+                                     }
 
     validate :poll_choices_belong_to_poll
     validate :poll_is_published
 
     set_policy do
       given do |user, session|
-        poll.grants_right?(user, session, :update) || self.user == user
+        self.poll.grants_right?(user, session, :update) || self.user == user
       end
       can :read
 
       given do |user, session|
-        poll_session.grants_right?(user, session, :submit)
+        self.poll_session.grants_right?(user, session, :submit)
       end
       can :submit
     end
@@ -53,16 +53,20 @@ module Polling
     private
 
     def poll_is_published
-      if poll_session && !poll_session.is_published?
-        errors.add(:base, I18n.t("polling.poll_submissions.validations.poll_is_published",
-                                 "This poll session is not open for submissions."))
+      if self.poll_session
+        unless self.poll_session.is_published?
+          errors.add(:base, I18n.t('polling.poll_submissions.validations.poll_is_published',
+                                   'This poll session is not open for submissions.'))
+        end
       end
     end
 
     def poll_choices_belong_to_poll
-      if poll && !poll.poll_choices.include?(poll_choice)
-        errors.add(:base, I18n.t("polling.poll_submissions.validations.poll_choice_belongs_to_poll",
-                                 "That poll choice does not belong to the existing poll."))
+      if self.poll
+        unless self.poll.poll_choices.include?(poll_choice)
+          errors.add(:base, I18n.t('polling.poll_submissions.validations.poll_choice_belongs_to_poll',
+                                   'That poll choice does not belong to the existing poll.'))
+        end
       end
     end
   end

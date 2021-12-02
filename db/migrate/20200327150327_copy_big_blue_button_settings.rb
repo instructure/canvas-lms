@@ -24,4 +24,7 @@ class CopyBigBlueButtonSettings < ActiveRecord::Migration[5.2]
   def up
     DataFixup::CopyBigBlueButtonSettings.run
   end
+
+  def down
+  end
 end

@@ -16,11 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {CanvasInboxApp} from './react/index'
-import React from 'react'
-import ReactDOM from 'react-dom'
+import renderCanvasInboxApp from './react/index'
 import ready from '@instructure/ready'
 
 ready(() => {
-  ReactDOM.render(<CanvasInboxApp />, document.getElementById('content'))
+  renderCanvasInboxApp(ENV, document.getElementById('content'))
 })

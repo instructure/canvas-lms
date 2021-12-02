@@ -39,7 +39,7 @@ export const sortTodos = (t1, t2) => {
   return d1.localeCompare(d2)
 }
 
-export const TodosPage = ({timeZone, visible, openTodosInNewTab}) => {
+export const TodosPage = ({timeZone, visible}) => {
   const [loading, setLoading] = useState(true)
   const [todos, setTodos] = useState(null)
 
@@ -100,12 +100,7 @@ export const TodosPage = ({timeZone, visible, openTodosInNewTab}) => {
       >
         {todos?.length > 0 ? (
           todos.map(todo => (
-            <Todo
-              key={`todo-assignment-${todo.assignment?.id}`}
-              timeZone={timeZone}
-              openInNewTab={openTodosInNewTab}
-              {...todo}
-            />
+            <Todo key={`todo-assignment-${todo.assignment?.id}`} timeZone={timeZone} {...todo} />
           ))
         ) : (
           <EmptyTodos />
@@ -117,8 +112,7 @@ export const TodosPage = ({timeZone, visible, openTodosInNewTab}) => {
 
 TodosPage.propTypes = {
   timeZone: PropTypes.string.isRequired,
-  visible: PropTypes.bool.isRequired,
-  openTodosInNewTab: PropTypes.bool.isRequired
+  visible: PropTypes.bool.isRequired
 }
 
 export default TodosPage

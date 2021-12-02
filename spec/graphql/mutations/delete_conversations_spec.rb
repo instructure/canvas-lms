@@ -44,38 +44,38 @@ describe Mutations::DeleteConversations do
   end
 
   it "removes all messages from the participant's view" do
-    query = <<~GQL
+    query = <<~QUERY
       ids: [#{conv.id}]
-    GQL
+    QUERY
     expect(sender.all_conversations.find_by(conversation: conv).messages.length).to eq 1
     result = execute_with_input(query)
-    expect(result["errors"]).to be_nil
-    expect(result.dig("data", "deleteConversations", "errors")).to be_nil
-    expect(result.dig("data", "deleteConversations", "conversationIds")).to match_array %W[#{conv.id}]
+    expect(result.dig('errors')).to be_nil
+    expect(result.dig('data', 'deleteConversations', 'errors')).to be_nil
+    expect(result.dig('data', 'deleteConversations', 'conversationIds')).to match_array %W(#{conv.id})
     expect(sender.all_conversations.find_by(conversation: conv).messages.length).to eq 0
   end
 
   context "errors" do
     def expect_error(result, message)
-      errors = result["errors"] || result.dig("data", "deleteConversations", "errors")
+      errors = result.dig('errors') || result.dig('data', 'deleteConversations', 'errors')
       expect(errors).not_to be_nil
-      expect(errors[0]["message"]).to match(/#{message}/)
+      expect(errors[0]['message']).to match(/#{message}/)
     end
 
     it "fails if the conversation doesn't exist" do
-      query = <<~GQL
+      query = <<~QUERY
         ids: [#{Conversation.maximum(:id)&.next || 0}]
-      GQL
+      QUERY
       result = execute_with_input(query)
-      expect_error(result, "Unable to find Conversation")
+      expect_error(result, 'Unable to find Conversation')
     end
 
     it "fails if the requesting user is not a participant" do
-      query = <<~GQL
+      query = <<~QUERY
         ids: [#{conv.id}]
-      GQL
+      QUERY
       result = execute_with_input(query, user_executing: user_model)
-      expect_error(result, "Insufficient permissions")
+      expect_error(result, 'Insufficient permissions')
     end
   end
 
@@ -84,15 +84,15 @@ describe Mutations::DeleteConversations do
       let(:conv2) { conversation(sender, user_model).conversation }
 
       it "removes messages from each view" do
-        query = <<~GQL
+        query = <<~QUERY
           ids: [#{conv.id}, #{conv2.id}]
-        GQL
+        QUERY
         expect(sender.all_conversations.find_by(conversation: conv).messages.length).to eq 1
         expect(sender.all_conversations.find_by(conversation: conv2).messages.length).to eq 1
         result = execute_with_input(query)
-        expect(result["errors"]).to be_nil
-        expect(result.dig("data", "deleteConversations", "errors")).to be_nil
-        expect(result.dig("data", "deleteConversations", "conversationIds")).to match_array %W[#{conv.id} #{conv2.id}]
+        expect(result.dig('errors')).to be_nil
+        expect(result.dig('data', 'deleteConversations', 'errors')).to be_nil
+        expect(result.dig('data', 'deleteConversations', 'conversationIds')).to match_array %W(#{conv.id} #{conv2.id})
         expect(sender.all_conversations.find_by(conversation: conv).messages.length).to eq 0
         expect(sender.all_conversations.find_by(conversation: conv2).messages.length).to eq 0
       end
@@ -103,21 +103,21 @@ describe Mutations::DeleteConversations do
       let(:invalid_id) { Conversation.maximum(:id)&.next || 0 }
 
       def expect_error(result, id, message)
-        errors = result["errors"] || result.dig("data", "deleteConversations", "errors")
+        errors = result.dig('errors') || result.dig('data', 'deleteConversations', 'errors')
         expect(errors).not_to be_nil
         error = errors.find { |i| i["attribute"] == id.to_s }
-        expect(error["message"]).to match(/#{message}/)
+        expect(error['message']).to match(/#{message}/)
       end
 
       it "handles valid data and errors on invalid" do
-        query = <<~GQL
+        query = <<~QUERY
           ids: [#{conv.id}, #{another_conv.id}, #{invalid_id}]
-        GQL
+        QUERY
         expect(sender.all_conversations.find_by(conversation: conv).messages.length).to eq 1
         result = execute_with_input(query)
-        expect_error(result, another_conv.id, "Insufficient permissions")
-        expect_error(result, invalid_id, "Unable to find Conversation")
-        expect(result.dig("data", "deleteConversations", "conversationIds")).to match_array %W[#{conv.id}]
+        expect_error(result, another_conv.id, 'Insufficient permissions')
+        expect_error(result, invalid_id, 'Unable to find Conversation')
+        expect(result.dig('data', 'deleteConversations', 'conversationIds')).to match_array %W(#{conv.id})
         expect(sender.all_conversations.find_by(conversation: conv).messages.length).to eq 0
       end
     end

@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
-require_relative "lib/qti_exporter/version"
+$:.push File.expand_path("../lib", __FILE__)
+
+require 'qti_exporter/version'
 
 Gem::Specification.new do |spec|
   spec.name          = "qti_exporter"
@@ -8,7 +10,7 @@ Gem::Specification.new do |spec|
   spec.authors       = ["Cody Cutrer"]
   spec.email         = ["cody@instructure.com"]
   spec.homepage      = "http://www.instructure.com"
-  spec.summary       = "QTI Exporter"
+  spec.summary       = %q{QTI Exporter}
 
   spec.files = Dir["{app,lib}/**/*"]
   spec.test_files = Dir["spec_canvas/**/*"]

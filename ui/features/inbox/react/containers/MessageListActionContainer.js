@@ -29,7 +29,6 @@ import {useQuery, useMutation} from 'react-apollo'
 import React, {useContext} from 'react'
 import {reduceDuplicateCourses} from '../../util/courses_helper'
 import {View} from '@instructure/ui-view'
-import {AddressBookContainer} from './AddressBookContainer/AddressBookContainer'
 
 const MessageListActionContainer = props => {
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
@@ -407,9 +406,6 @@ const MessageListActionContainer = props => {
             shouldRenderMarkAsUnread={shouldRenderMarkAsUnread()}
             hasMultipleSelectedMessages={hasMultipleSelectedMessages()}
           />
-        </Flex.Item>
-        <Flex.Item padding="none none none x-small" shouldGrow shouldShrink>
-          <AddressBookContainer />
         </Flex.Item>
       </Flex>
     </View>

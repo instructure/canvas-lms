@@ -59,8 +59,8 @@ import usePlanner from '@canvas/k5/react/hooks/usePlanner'
 import useTabState from '@canvas/k5/react/hooks/useTabState'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import ImportantDates from './ImportantDates'
-import ObserverOptions, {ObserverListShape} from '@canvas/observer-picker'
-import {savedObservedId} from '@canvas/observer-picker/ObserverGetObservee'
+import ObserverOptions, {ObserverListShape} from '@canvas/k5/react/ObserverOptions'
+import {savedObservedId} from '@canvas/k5/ObserverGetObservee'
 
 const DASHBOARD_TABS = [
   {
@@ -141,9 +141,7 @@ export const K5Dashboard = ({
   selectedContextsLimit,
   parentSupportEnabled,
   observerList,
-  canAddObservee,
-  openTodosInNewTab,
-  loadingOpportunities
+  canAddObservee
 }) => {
   const initialObservedId = observerList.find(o => o.id === savedObservedId(currentUser.id))
     ? savedObservedId(currentUser.id)
@@ -284,7 +282,7 @@ export const K5Dashboard = ({
   const importantDates = (
     <ImportantDates
       timeZone={timeZone}
-      contexts={cards?.filter(c => c.isK5Subject || c.isHomeroom)}
+      contexts={cards?.filter(c => c.isK5Subject)}
       handleClose={useImportantDatesTray ? () => setTrayOpen(false) : undefined}
       selectedContextCodes={selectedContextCodes}
       selectedContextsLimit={selectedContextsLimit}
@@ -326,8 +324,7 @@ export const K5Dashboard = ({
               loadingAnnouncements,
               isStudent: plannerEnabled,
               responsiveSize,
-              subjectAnnouncements,
-              loadingOpportunities
+              subjectAnnouncements
             }}
           >
             {currentTab && (
@@ -375,11 +372,7 @@ export const K5Dashboard = ({
               />
             )}
             {currentUserRoles.includes('teacher') && (
-              <TodosPage
-                timeZone={timeZone}
-                openTodosInNewTab={openTodosInNewTab}
-                visible={currentTab === TAB_IDS.TODO}
-              />
+              <TodosPage timeZone={timeZone} visible={currentTab === TAB_IDS.TODO} />
             )}
           </K5DashboardContext.Provider>
         </Flex.Item>
@@ -410,7 +403,6 @@ K5Dashboard.propTypes = {
   assignmentsDueToday: PropTypes.object.isRequired,
   assignmentsMissing: PropTypes.object.isRequired,
   assignmentsCompletedForToday: PropTypes.object.isRequired,
-  loadingOpportunities: PropTypes.bool.isRequired,
   createPermission: PropTypes.oneOf(['admin', 'teacher', 'student', 'no_enrollments']),
   restrictCourseCreation: PropTypes.bool.isRequired,
   currentUser: PropTypes.shape({
@@ -429,8 +421,7 @@ K5Dashboard.propTypes = {
   selectedContextsLimit: PropTypes.number.isRequired,
   parentSupportEnabled: PropTypes.bool.isRequired,
   observerList: ObserverListShape.isRequired,
-  canAddObservee: PropTypes.bool.isRequired,
-  openTodosInNewTab: PropTypes.bool.isRequired
+  canAddObservee: PropTypes.bool.isRequired
 }
 
 const WrappedK5Dashboard = connect(mapStateToProps)(responsiviser()(K5Dashboard))

@@ -19,7 +19,6 @@
 import React from 'react'
 import {mount} from 'enzyme'
 import {merge} from 'lodash'
-import fakeENV from 'helpers/fakeENV'
 import {DiscussionRow} from 'ui/features/discussion_topics_index/react/components/DiscussionRow.js'
 
 QUnit.module('DiscussionRow component')
@@ -79,29 +78,6 @@ test('renders Correct Screenreader message for locked discussions', () => {
   equal(instance.makeLockedSuccessFailMessages().successMessage, 'Lock discussion blerp succeeded')
   equal(instance.makeLockedSuccessFailMessages().failMessage, 'Lock discussion blerp failed')
   tree.unmount()
-})
-
-test('renders title as a link', () => {
-  const discussion = {locked: false, title: 'blerp'}
-  const tree = mount(<DiscussionRow {...makeProps({discussion})} />)
-  const node = tree.find('Link')
-  ok(node.text().includes(discussion.title))
-  ok(node.exists())
-  tree.unmount()
-})
-
-test('when feature flag is off, anonymous title link is disabled ', () => {
-  fakeENV.setup()
-  ENV.discussion_anonymity_enabled = false
-  const discussion = {locked: false, title: 'blerp', anonymous_state: 'full_anonymity'}
-  const tree = mount(<DiscussionRow {...makeProps({discussion})} />)
-  const node = tree.find('Link')
-
-  ok(node.text().includes(discussion.title))
-  ok(node.exists())
-  equal(node.props().disabled, true)
-  tree.unmount()
-  fakeENV.teardown()
 })
 
 test('renders Correct Screenreader message for unlocked discussions', () => {
@@ -174,35 +150,6 @@ test('renders the publish ToggleIcon', () => {
   const node = tree.find('ToggleIcon')
   ok(node.exists())
   strictEqual(node.length, 2)
-})
-test('when feature flag is off, renders anonymous discussion lock explanation for read_as_admin', () => {
-  fakeENV.setup()
-  ENV.discussion_anonymity_enabled = false
-  const discussion = {locked: false, title: 'blerp', anonymous_state: 'full_anonymity'}
-  const tree = mount(<DiscussionRow {...makeProps({canReadAsAdmin: true, discussion})} />)
-  const node = tree.find('.discussion-availability')
-
-  ok(
-    node
-      .text()
-      .includes('Enable Discussions/Announcements Redesign to view anonymous discussion content')
-  )
-  ok(node.exists())
-  tree.unmount()
-  fakeENV.teardown()
-})
-
-test('when feature flag is off, renders anonymous discussion unavailable for students, etc.', () => {
-  fakeENV.setup()
-  ENV.discussion_anonymity_enabled = false
-  const discussion = {locked: false, title: 'blerp', anonymous_state: 'full_anonymity'}
-  const tree = mount(<DiscussionRow {...makeProps({canReadAsAdmin: false, discussion})} />)
-  const node = tree.find('.discussion-availability')
-
-  ok(node.text().includes('Unavailable'))
-  ok(node.exists())
-  tree.unmount()
-  fakeENV.teardown()
 })
 
 test('renders "Delayed until" date label if discussion is delayed', () => {
@@ -309,7 +256,13 @@ test('renders neither a due or to do date if neither are available', () => {
 test('renders the SectionsTooltip component', () => {
   const discussion = {user_count: 200}
   const tree = mount(<DiscussionRow {...makeProps({discussion})} />)
-  equal(tree.find('SectionsTooltip Text').at(0).text(), 'All Sections')
+  equal(
+    tree
+      .find('SectionsTooltip Text')
+      .at(0)
+      .text(),
+    'All Sections'
+  )
   tree.unmount()
 })
 
@@ -321,7 +274,13 @@ test('renders the SectionsTooltip component with sections', () => {
     ]
   }
   const tree = mount(<DiscussionRow {...makeProps({discussion})} />)
-  equal(tree.find('SectionsTooltip Text').at(0).text(), '2 Sectionssection 4section 2')
+  equal(
+    tree
+      .find('SectionsTooltip Text')
+      .at(0)
+      .text(),
+    '2 Sectionssection 4section 2'
+  )
   tree.unmount()
 })
 
@@ -434,7 +393,10 @@ test('manage menu items do appear upon click', () => {
 test('does not render sharing menu options if not DIRECT_SHARE_ENABLED', () => {
   const props = makeProps({displayManageMenu: true, DIRECT_SHARE_ENABLED: false})
   const tree = mount(<DiscussionRow {...props} />)
-  tree.find('DiscussionManageMenu').find('button').simulate('click')
+  tree
+    .find('DiscussionManageMenu')
+    .find('button')
+    .simulate('click')
   notOk(document.querySelector('#copyTo-discussion-menu-option'))
   notOk(document.querySelector('#sendTo-discussion-menu-option'))
   tree.unmount()
@@ -443,7 +405,10 @@ test('does not render sharing menu options if not DIRECT_SHARE_ENABLED', () => {
 test('renders sharing menu options if DIRECT_SHARE_ENABLED', () => {
   const props = makeProps({displayManageMenu: true, DIRECT_SHARE_ENABLED: true})
   const tree = mount(<DiscussionRow {...props} />)
-  tree.find('DiscussionManageMenu').find('button').simulate('click')
+  tree
+    .find('DiscussionManageMenu')
+    .find('button')
+    .simulate('click')
   ok(document.querySelector('#copyTo-discussion-menu-option'))
   ok(document.querySelector('#sendTo-discussion-menu-option'))
   tree.unmount()
@@ -457,7 +422,10 @@ test('opens the copyTo tray when menu item is selected', () => {
     setCopyTo: copySpy
   })
   const tree = mount(<DiscussionRow {...props} />)
-  tree.find('DiscussionManageMenu').find('button').simulate('click')
+  tree
+    .find('DiscussionManageMenu')
+    .find('button')
+    .simulate('click')
   document.querySelector('#copyTo-discussion-menu-option').click()
   deepEqual(copySpy.firstCall.args[0], {
     open: true,
@@ -474,7 +442,10 @@ test('opens the sendTo tray when menu item is selected', () => {
     setSendTo: sendSpy
   })
   const tree = mount(<DiscussionRow {...props} />)
-  tree.find('DiscussionManageMenu').find('button').simulate('click')
+  tree
+    .find('DiscussionManageMenu')
+    .find('button')
+    .simulate('click')
   document.querySelector('#sendTo-discussion-menu-option').click()
   deepEqual(sendSpy.firstCall.args[0], {
     open: true,

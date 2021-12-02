@@ -57,19 +57,15 @@ export default class OutcomesImporter extends Component {
     hide: PropTypes.func.isRequired,
     disableOutcomeViews: PropTypes.func.isRequired,
     resetOutcomeViews: PropTypes.func.isRequired,
-    learningOutcomeGroupId: PropTypes.string,
-    learningOutcomeGroupAncestorIds: PropTypes.array,
     file: PropTypes.instanceOf(File),
     importId: PropTypes.string,
     contextUrlRoot: PropTypes.string.isRequired,
-    invokedImport: PropTypes.bool.isRequired,
-    onSuccessfulOutcomesImport: PropTypes.func
+    invokedImport: PropTypes.bool.isRequired
   }
 
   static defaultProps = {
     file: null,
-    importId: null,
-    onSuccessfulOutcomesImport: () => {}
+    importId: null
   }
 
   componentDidMount() {
@@ -85,11 +81,7 @@ export default class OutcomesImporter extends Component {
       apiClient.queryImportStatus(this.props.contextUrlRoot, importId).then(response => {
         const workflowState = response.data.workflow_state
         if (workflowState === 'succeeded' || workflowState === 'failed') {
-          this.completeUpload(
-            importId,
-            response.data.processing_errors.length,
-            workflowState === 'succeeded'
-          )
+          this.completeUpload(response.data.processing_errors.length, workflowState === 'succeeded')
           clearInterval(this.pollStatus)
         }
       })
@@ -97,18 +89,11 @@ export default class OutcomesImporter extends Component {
   }
 
   beginUpload() {
-    const {
-      disableOutcomeViews,
-      resetOutcomeViews,
-      contextUrlRoot,
-      learningOutcomeGroupId,
-      file,
-      importId
-    } = this.props
+    const {disableOutcomeViews, resetOutcomeViews, contextUrlRoot, file, importId} = this.props
     disableOutcomeViews()
     if (file !== null) {
       apiClient
-        .createImport(contextUrlRoot, file, learningOutcomeGroupId)
+        .createImport(contextUrlRoot, file)
         .then(resp => this.pollImportStatus(resp.data.id))
         .catch(() => {
           showFlashAlert({
@@ -122,7 +107,7 @@ export default class OutcomesImporter extends Component {
     }
   }
 
-  completeUpload(importId, count, succeeded) {
+  completeUpload(count, succeeded) {
     const {hide, resetOutcomeViews, invokedImport} = this.props
     if (hide) hide()
     resetOutcomeViews()
@@ -144,26 +129,11 @@ export default class OutcomesImporter extends Component {
         )
       })
     } else {
-      apiClient
-        .queryImportCreatedGroupIds(this.props.contextUrlRoot, importId)
-        .then(response => {
-          this.successfulUpload(response.data)
-        })
-        .catch(err => {
-          throw err
-        })
+      showFlashAlert({
+        type: 'success',
+        message: I18n.t('Your outcomes were successfully imported.')
+      })
     }
-  }
-
-  successfulUpload(createdGroupIds) {
-    this.props.onSuccessfulOutcomesImport({
-      selectedGroupAncestorIds: [...this.props.learningOutcomeGroupAncestorIds, ...createdGroupIds]
-    })
-
-    showFlashAlert({
-      type: 'success',
-      message: I18n.t('Your outcomes were successfully imported.')
-    })
   }
 
   render() {

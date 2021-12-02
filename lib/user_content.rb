@@ -17,9 +17,9 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require "nokogiri"
-require "ritex"
-require "securerandom"
+require 'nokogiri'
+require 'ritex'
+require 'securerandom'
 
 module UserContent
   def self.escape(
@@ -31,28 +31,28 @@ module UserContent
     find_user_content(html) do |obj, uc|
       uuid = SecureRandom.uuid
       child = Nokogiri::XML::Node.new("iframe", html)
-      child["class"] = "user_content_iframe"
-      child["name"] = uuid
-      child["style"] = "width: #{uc.width}; height: #{uc.height}"
-      child["frameborder"] = "0"
+      child['class'] = 'user_content_iframe'
+      child['name'] = uuid
+      child['style'] = "width: #{uc.width}; height: #{uc.height}"
+      child['frameborder'] = '0'
 
       form = Nokogiri::XML::Node.new("form", html)
-      form["action"] = "//#{HostUrl.file_host(@domain_root_account || Account.default, current_host)}/object_snippet"
-      form["method"] = "post"
-      form["class"] = "user_content_post_form"
-      form["target"] = uuid
-      form["id"] = "form-#{uuid}"
+      form['action'] = "//#{HostUrl.file_host(@domain_root_account || Account.default, current_host)}/object_snippet"
+      form['method'] = 'post'
+      form['class'] = 'user_content_post_form'
+      form['target'] = uuid
+      form['id'] = "form-#{uuid}"
 
       input = Nokogiri::XML::Node.new("input", html)
-      input["type"] = "hidden"
-      input["name"] = "object_data"
-      input["value"] = uc.node_string
+      input['type'] = 'hidden'
+      input['name'] = 'object_data'
+      input['value'] = uc.node_string
       form.add_child(input)
 
       s_input = Nokogiri::XML::Node.new("input", html)
-      s_input["type"] = "hidden"
-      s_input["name"] = "s"
-      s_input["value"] = uc.node_hmac
+      s_input['type'] = 'hidden'
+      s_input['name'] = 's'
+      s_input['value'] = uc.node_hmac
       form.add_child(s_input)
 
       obj.replace(child)
@@ -60,16 +60,16 @@ module UserContent
     end
 
     find_equation_images(html) do |node|
-      equation = node["data-equation-content"] || node["alt"]
+      equation = node['data-equation-content'] || node['alt']
       next if equation.blank?
 
       # there are places in canvas (e.g. classic quizzes) that
       # inadvertently saved the hidden-readable span, causing
       # them to multiply everytime the entity is edited.
       # Strip the ones that shouldn't be there before adding a new one
-      node.next_element.remove while node.next_element && node.next_element["class"] == "hidden-readable"
+      node.next_element.remove while node.next_element && node.next_element['class'] == 'hidden-readable'
 
-      unless use_updated_math_rendering
+      if !use_updated_math_rendering
         mathml = UserContent.latex_to_mathml(equation)
         next if mathml.blank?
 
@@ -87,30 +87,31 @@ module UserContent
     Latex.to_math_ml(latex: latex)
   end
 
-  Node = Struct.new(:width, :height, :node_string, :node_hmac)
+  class Node < Struct.new(:width, :height, :node_string, :node_hmac)
+  end
 
   # for each user content in the nokogiri document, yields |nokogiri_node, UserContent::Node|
   def self.find_user_content(html)
-    html.css("object,embed").each do |obj|
+    html.css('object,embed').each do |obj|
       styles = {}
       params = {}
-      obj.css("param").each do |param|
-        params[param["key"]] = param["value"]
+      obj.css('param').each do |param|
+        params[param['key']] = param['value']
       end
-      (obj["style"] || "").split(";").each do |attr|
-        key, value = attr.split(":").map(&:strip)
+      (obj['style'] || '').split(/;/).each do |attr|
+        key, value = attr.split(/:/).map(&:strip)
         styles[key] = value
       end
-      width = css_size(obj["width"])
-      width ||= css_size(params["width"])
-      width ||= css_size(styles["width"])
-      width ||= "400px"
-      height = css_size(obj["height"])
-      height ||= css_size(params["height"])
-      height ||= css_size(styles["height"])
-      height ||= "300px"
+      width = css_size(obj['width'])
+      width ||= css_size(params['width'])
+      width ||= css_size(styles['width'])
+      width ||= '400px'
+      height = css_size(obj['height'])
+      height ||= css_size(params['height'])
+      height ||= css_size(styles['height'])
+      height ||= '300px'
 
-      snippet = Base64.encode64(obj.to_s).delete("\n")
+      snippet = Base64.encode64(obj.to_s).gsub("\n", '')
       hmac = Canvas::Security.hmac_sha1(snippet)
       uc = Node.new(width, height, snippet, hmac)
 
@@ -118,8 +119,10 @@ module UserContent
     end
   end
 
-  def self.find_equation_images(html, &block)
-    html.css("img.equation_image").each(&block)
+  def self.find_equation_images(html)
+    html.css('img.equation_image').each do |node|
+      yield node
+    end
   end
 
   # TODO: try and discover the motivation behind the "huhs"
@@ -144,25 +147,25 @@ module UserContent
 
   class HtmlRewriter
     AssetTypes = {
-      "assignments" => :Assignment,
-      "announcements" => :Announcement,
-      "calendar_events" => :CalendarEvent,
-      "courses" => :Course,
-      "discussion_topics" => :DiscussionTopic,
-      "collaborations" => :Collaboration,
-      "files" => :Attachment,
-      "conferences" => :WebConference,
-      "quizzes" => :"Quizzes::Quiz",
-      "groups" => :Group,
-      "wiki" => :WikiPage,
-      "pages" => :WikiPage,
-      "grades" => nil,
-      "users" => nil,
-      "external_tools" => nil,
-      "file_contents" => nil,
-      "modules" => :ContextModule,
-      "items" => :ContentTag
-    }.freeze
+      'assignments' => :Assignment,
+      'announcements' => :Announcement,
+      'calendar_events' => :CalendarEvent,
+      'courses' => :Course,
+      'discussion_topics' => :DiscussionTopic,
+      'collaborations' => :Collaboration,
+      'files' => :Attachment,
+      'conferences' => :WebConference,
+      'quizzes' => :"Quizzes::Quiz",
+      'groups' => :Group,
+      'wiki' => :WikiPage,
+      'pages' => :WikiPage,
+      'grades' => nil,
+      'users' => nil,
+      'external_tools' => nil,
+      'file_contents' => nil,
+      'modules' => :ContextModule,
+      'items' => :ContentTag
+    }
     DefaultAllowedTypes = AssetTypes.keys
 
     def initialize(context, user, contextless_types: [])
@@ -182,7 +185,7 @@ module UserContent
 
     attr_reader :user, :context
 
-    UriMatch = Struct.new(:url, :type, :obj_class, :obj_id, :rest, :prefix) do
+    class UriMatch < Struct.new(:url, :type, :obj_class, :obj_id, :rest, :prefix)
       def query
         rest && rest[/\?.*/]
       end
@@ -224,7 +227,7 @@ module UserContent
         end
 
         if (module_item = rest.try(:match, %r{/items/(\d+)}))
-          type   = "items"
+          type   = 'items'
           obj_id = module_item[1].to_i
         end
 
@@ -233,16 +236,16 @@ module UserContent
           klass = klass.to_s.constantize if klass
           match = UriMatch.new(url, type, klass, obj_id, rest, prefix)
           handler = @handlers[type] || @default_handler
-          handler&.call(match) || url
+          (handler && handler.call(match)) || url
         else
           match = UriMatch.new(url, type)
-          @unknown_handler&.call(match) || url
+          (@unknown_handler && @unknown_handler.call(match)) || url
         end
       end
     end
 
     # if content is nil, it'll query the block for the content if needed (lazy content load)
-    def user_can_view_content?(content = nil)
+    def user_can_view_content?(content = nil, &get_content)
       return false if user.blank? && content.respond_to?(:locked?) && content.locked?
       return true unless user
 
@@ -251,10 +254,10 @@ module UserContent
       @read_as_admin = context.grants_right?(user, :read_as_admin) if @read_as_admin.nil?
       return true if @read_as_admin
 
-      content ||= yield
+      content ||= get_content.call
       allow = true if content.respond_to?(:grants_right?) && content.grants_right?(user, :read)
       allow = false if allow && content.respond_to?(:locked_for?) && content.locked_for?(user)
-      allow
+      return allow
     end
   end
 end

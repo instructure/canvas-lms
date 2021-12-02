@@ -17,7 +17,7 @@
  */
 
 import PropTypes from 'prop-types'
-import React, {useEffect, useRef} from 'react'
+import React, {useState} from 'react'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {TruncateText} from '@instructure/ui-truncate-text'
@@ -28,50 +28,32 @@ export const AddressBookItem = ({
   id,
   iconBefore,
   iconAfter,
-  isKeyboardFocus,
   isSelected,
   hasPopup,
-  onSelect,
-  onHover,
-  menuRef
+  onSelect
 }) => {
-  const itemRef = useRef()
-
-  // Scroll individual item into view when its selected or navigated towards
-  useEffect(() => {
-    if (isSelected && itemRef.current && menuRef && isKeyboardFocus) {
-      const menuItemOffsetTop = itemRef.current?.offsetTop
-      const menuHeight = menuRef.current?.clientHeight
-      const itemHeight = itemRef.current?.clientHeight
-      menuRef.current.scrollTop = menuItemOffsetTop - (menuHeight - itemHeight) / 2
-    }
-  }, [isKeyboardFocus, isSelected, menuRef])
-
+  const [isHover, setHover] = useState(false)
   return (
     <View
       as="div"
-      background={isSelected ? 'brand' : null}
+      background={isHover || isSelected ? 'brand' : null}
       padding="xx-small"
       onMouseEnter={() => {
-        onHover(true)
+        setHover(true)
       }}
       onMouseLeave={() => {
-        onHover(false)
+        setHover(false)
       }}
-      onMouseDown={() => {
-        onSelect()
-      }}
-      elementRef={el => {
-        itemRef.current = el
-      }}
-      data-testid="address-book-item"
     >
       <li
         role="menuitem"
         id={id}
         style={{listStyle: 'none'}}
         aria-haspopup={hasPopup}
-        data-selected={isSelected}
+        onMouseDown={() => {
+          onSelect()
+        }}
+        data-selected={isSelected || isHover}
       >
         <Flex as="div" width="100%" margin="xxx-small none xxx-small xxx-small">
           {iconBefore && (
@@ -81,7 +63,7 @@ export const AddressBookItem = ({
           )}
           <Flex.Item align="center" shouldGrow shouldShrink>
             <TruncateText>
-              <Text color={isSelected ? 'primary-inverse' : null}>{children}</Text>
+              <Text color={isHover || isSelected ? 'primary-inverse' : null}>{children}</Text>
             </TruncateText>
           </Flex.Item>
           {iconAfter && (
@@ -123,19 +105,7 @@ AddressBookItem.propTypes = {
   /**
    * Function to be returned on click
    */
-  onSelect: PropTypes.func,
-  /**
-   * Function to execute on item hover
-   */
-  onHover: PropTypes.func,
-  /**
-   * Menu Ref is needed to scroll menu correctly
-   */
-  menuRef: PropTypes.object,
-  /**
-   * Boolean to determine if keyboard or mouse navigation is occuring
-   */
-  isKeyboardFocus: PropTypes.bool
+  onSelect: PropTypes.func
 }
 
 export default AddressBookItem

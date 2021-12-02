@@ -188,15 +188,6 @@ context of the tool launch is within a course.
 ```
 [ "Section 1", "Section 5", "TA Section"]
 ```
-## com.instructure.RCS.app_host
-Returns the host of the rich content service for the current region.
-
-**Availability**: *always*  
-**Launch Parameter**: *com_instructure_rcs_app_host*  
-
-```
-"rich-content-iad.inscloudgate.net"
-```
 ## com.instructure.Observee.sisIds
 returns all observee ids linked to this observer as an String separated by `,`.
 

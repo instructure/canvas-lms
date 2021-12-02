@@ -19,7 +19,7 @@
 #
 
 require "spec_helper"
-require_relative "../views_helper"
+require_relative "../views_helper.rb"
 
 describe "assignments/_submission_sidebar.html.erb" do
   let(:course) { Course.create! }
