@@ -28,8 +28,8 @@ class Quizzes::QuizRegrader::AttemptVersion
 
   def regrade!
     version.model = Quizzes::QuizRegrader::Submission.new(
-      :submission => version.model,
-      :question_regrades => question_regrades
+      submission: version.model,
+      question_regrades: question_regrades
     ).rescored_submission
     version.save!
   end

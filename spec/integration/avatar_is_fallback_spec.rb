@@ -28,8 +28,8 @@ describe UsersController do
       user_session @user
     end
 
-    it 'is absent when avatars are turned off' do
-      get '/'
+    it "is absent when avatars are turned off" do
+      get "/"
       expect(assigns(:js_env)[:current_user]).not_to have_key :avatar_is_fallback
     end
 
@@ -41,15 +41,16 @@ describe UsersController do
         end
       end
 
-      it 'is true when there is no real avatar image' do
-        get '/'
+      it "is true when there is no real avatar image" do
+        get "/"
         expect(assigns(:js_env)[:current_user][:avatar_image_url]).to include User.default_avatar_fallback
         expect(assigns(:js_env)[:current_user][:avatar_is_fallback]).to eq true
       end
 
-      it 'is false when there is a real avatar image' do
-        @user.avatar_image_url = 'https://canvas.instructure.com/avi.png'; @user.save!
-        get '/'
+      it "is false when there is a real avatar image" do
+        @user.avatar_image_url = "https://canvas.instructure.com/avi.png"
+        @user.save!
+        get "/"
         expect(assigns(:js_env)[:current_user][:avatar_image_url]).to eq @user.avatar_image_url
         expect(assigns(:js_env)[:current_user][:avatar_is_fallback]).to eq false
       end

@@ -25,12 +25,12 @@ module Factories
 
   def valid_group_attributes
     {
-      :name => 'value for name',
-      :context => Account.default
+      name: "value for name",
+      context: Account.default
     }
   end
 
-  VALID_GROUP_ATTRIBUTES = [:name, :context, :max_membership, :group_category, :join_level, :description, :is_public, :avatar_attachment]
+  VALID_GROUP_ATTRIBUTES = %i[name context max_membership group_category join_level description is_public avatar_attachment].freeze
 
   def group(opts = {})
     context = opts[:group_context] || opts[:context] || Account.default
@@ -40,7 +40,7 @@ module Factories
   def group_with_user(opts = {})
     group(opts)
     u = opts[:user] || user_factory(opts)
-    workflow_state = opts[:active_all] ? 'accepted' : nil
+    workflow_state = opts[:active_all] ? "accepted" : nil
     @group.add_user(u, workflow_state, opts[:moderator])
   end
 

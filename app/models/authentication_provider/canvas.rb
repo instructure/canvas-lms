@@ -20,7 +20,7 @@
 
 class AuthenticationProvider::Canvas < AuthenticationProvider
   def self.sti_name
-    'canvas'
+    "canvas"
   end
 
   def self.singleton?
@@ -38,35 +38,35 @@ class AuthenticationProvider::Canvas < AuthenticationProvider
   # Rename db field
   def self_registration=(val)
     case val
-    when 'none'
+    when "none"
       self.jit_provisioning = false
       self.auth_filter = nil
-    when 'observer'
+    when "observer"
       self.jit_provisioning = true
-      self.auth_filter = 'observer'
-    when 'all'
+      self.auth_filter = "observer"
+    when "all"
       self.jit_provisioning = true
-      self.auth_filter = 'all'
+      self.auth_filter = "all"
     else
       self.jit_provisioning = ::Canvas::Plugin.value_to_boolean(val)
-      self.auth_filter = jit_provisioning? ? 'all' : nil
+      self.auth_filter = jit_provisioning? ? "all" : nil
     end
   end
 
   def self_registration
-    jit_provisioning? ? auth_filter : 'none'
+    jit_provisioning? ? auth_filter : "none"
   end
 
   def enable_captcha=(val)
-    settings['enable_captcha'] = ::Canvas::Plugin.value_to_boolean(val)
+    settings["enable_captcha"] = ::Canvas::Plugin.value_to_boolean(val)
   end
 
   def enable_captcha
     if Account.site_admin.feature_enabled?(:default_recaptcha_registration_enable)
       # Default to true, as nil != false
-      settings['enable_captcha'] != false
+      settings["enable_captcha"] != false
     else
-      settings['enable_captcha'] == true
+      settings["enable_captcha"] == true
     end
   end
 

@@ -27,32 +27,32 @@ describe JobLiveEventsContext do
 
       def initialize
         @global_id = 1
-        @tag = 'foobar'
+        @tag = "foobar"
       end
     end
   end
 
   let(:fake_delayed_instance) { klass.new }
 
-  describe '#live_events_context' do
-    it 'yields a hash with job and default account details' do
+  describe "#live_events_context" do
+    it "yields a hash with job and default account details" do
       global_id = Account.default.global_id.to_s
       uuid = Account.default.uuid
       lti_guid = Account.default.lti_guid
 
       expect(fake_delayed_instance.live_events_context).to eq(
         {
-          job_id: '1',
-          job_tag: 'foobar',
+          job_id: "1",
+          job_tag: "foobar",
           root_account_id: global_id,
           root_account_uuid: uuid,
           root_account_lti_guid: lti_guid,
-          producer: 'canvas',
+          producer: "canvas",
         }
       )
     end
 
-    it 'stringifies all ids' do
+    it "stringifies all ids" do
       context_values = fake_delayed_instance.live_events_context.values
 
       context_values.each do |value|

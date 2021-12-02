@@ -32,7 +32,7 @@ class PacePlan < ActiveRecord::Base
 
   belongs_to :course_section
   belongs_to :user
-  belongs_to :root_account, class_name: 'Account'
+  belongs_to :root_account, class_name: "Account"
 
   validates :course_id, presence: true
   validate :valid_secondary_context
@@ -40,9 +40,9 @@ class PacePlan < ActiveRecord::Base
   scope :primary, -> { not_deleted.where(course_section_id: nil, user_id: nil) }
   scope :for_section, ->(section) { where(course_section_id: section) }
   scope :for_user, ->(user) { where(user_id: user) }
-  scope :not_deleted, -> { where.not(workflow_state: 'deleted') }
-  scope :unpublished, -> { where(workflow_state: 'unpublished') }
-  scope :published, -> { where(workflow_state: 'active').where.not(published_at: nil) }
+  scope :not_deleted, -> { where.not(workflow_state: "deleted") }
+  scope :unpublished, -> { where(workflow_state: "unpublished") }
+  scope :published, -> { where(workflow_state: "active").where.not(published_at: nil) }
 
   workflow do
     state :unpublished
@@ -51,7 +51,7 @@ class PacePlan < ActiveRecord::Base
   end
 
   set_policy do
-    given { |user, session| self.course.grants_right?(user, session, :manage) }
+    given { |user, session| course.grants_right?(user, session, :manage) }
     can :read
   end
 
@@ -59,7 +59,7 @@ class PacePlan < ActiveRecord::Base
 
   def valid_secondary_context
     if course_section_id.present? && user_id.present?
-      self.errors.add(:base, "Only one of course_section_id and user_id can be given")
+      errors.add(:base, "Only one of course_section_id and user_id can be given")
     end
   end
 
@@ -68,12 +68,12 @@ class PacePlan < ActiveRecord::Base
       course_section_id: nil,
       user_id: nil,
       published_at: nil,
-      workflow_state: 'unpublished'
+      workflow_state: "unpublished"
     }
-    pace_plan = self.dup
+    pace_plan = dup
     pace_plan.attributes = default_opts.merge(opts)
 
-    self.pace_plan_module_items.each do |pace_plan_module_item|
+    pace_plan_module_items.each do |pace_plan_module_item|
       pace_plan.pace_plan_module_items.new(
         module_item_id: pace_plan_module_item.module_item_id,
         duration: pace_plan_module_item.duration,
@@ -101,7 +101,7 @@ class PacePlan < ActiveRecord::Base
 
             # Check for an old override
             current_override = assignment.assignment_overrides.active
-                                         .where(set_type: 'ADHOC', due_at_overridden: true)
+                                         .where(set_type: "ADHOC", due_at_overridden: true)
                                          .joins(:assignment_override_students)
                                          .find_by(assignment_override_students: { user_id: user_id })
             next if current_override&.due_at&.to_date == due_at
@@ -110,7 +110,7 @@ class PacePlan < ActiveRecord::Base
             due_time = CanvasTime.fancy_midnight(due_at.to_datetime).to_time
             due_range = (due_time - 1.second).round..due_time.round
             correct_date_override = assignment.assignment_overrides.active
-                                              .find_by(set_type: 'ADHOC',
+                                              .find_by(set_type: "ADHOC",
                                                        due_at_overridden: true,
                                                        due_at: due_range)
 
@@ -123,7 +123,7 @@ class PacePlan < ActiveRecord::Base
             else
               current_override&.assignment_override_students&.find_by(user_id: user_id)&.destroy
               assignment.assignment_overrides.create!(
-                set_type: 'ADHOC',
+                set_type: "ADHOC",
                 due_at_overridden: true,
                 due_at: due_at.to_s,
                 assignment_override_students: [
@@ -145,7 +145,11 @@ class PacePlan < ActiveRecord::Base
     DueDateCacher.recompute_course(course, assignments: assignments_to_refresh, update_grades: true)
 
     # Mark as published
-    update(workflow_state: 'active', published_at: DateTime.current)
+    update(workflow_state: "active", published_at: DateTime.current)
+  end
+
+  def compress_dates!
+    PacePlanHardEndDateCompressor.compress(self, pace_plan_module_items, save: true)
   end
 
   def student_enrollments

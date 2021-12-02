@@ -18,21 +18,21 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../views_helper'
+require_relative "../views_helper"
 
 describe "/context_modules/url_show" do
   it "renders" do
     course_factory
     view_context(@course, @user)
-    @module = @course.context_modules.create!(:name => 'teh module')
-    @tag = @module.add_item(:type => 'external_url',
-                            :url => 'http://example.com/lolcats',
-                            :title => 'pls view')
+    @module = @course.context_modules.create!(name: "teh module")
+    @tag = @module.add_item(type: "external_url",
+                            url: "http://example.com/lolcats",
+                            title: "pls view")
     assign(:module, @module)
     assign(:tag, @tag)
-    render 'context_modules/url_show'
+    render "context_modules/url_show"
     doc = Nokogiri::HTML5(response.body)
-    expect(doc.at_css('iframe')['src']).to eq 'http://example.com/lolcats'
-    expect(doc.css('a').collect { |a| [a['href'], a.inner_text] }).to be_include ['http://example.com/lolcats', 'pls view']
+    expect(doc.at_css("iframe")["src"]).to eq "http://example.com/lolcats"
+    expect(doc.css("a").collect { |a| [a["href"], a.inner_text] }).to be_include ["http://example.com/lolcats", "pls view"]
   end
 end

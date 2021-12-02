@@ -21,10 +21,13 @@
 require_relative "../graphql_spec_helper"
 
 describe Types::ModuleItemType do
-  let_once(:course) { course_with_teacher(active_all: true); @course }
+  let_once(:course) do
+    course_with_teacher(active_all: true)
+    @course
+  end
   let_once(:module1) { course.context_modules.create! name: "module1" }
   let_once(:assign1) { course.assignments.create(title: "a1", workflow_state: "published") }
-  let_once(:module_item1) { module1.add_item({ type: 'assignment', id: assign1.id }, nil, position: 1) }
+  let_once(:module_item1) { module1.add_item({ type: "assignment", id: assign1.id }, nil, position: 1) }
 
   it "works" do
     resolver = GraphQLTypeTester.new(module_item1, current_user: @teacher)
@@ -58,8 +61,8 @@ describe Types::ModuleItemType do
   context "Module Progressions" do
     let_once(:assign2) { course.assignments.create(title: "a2", workflow_state: "published") }
     let_once(:assign3) { course.assignments.create(title: "a3", workflow_state: "published") }
-    let_once(:module_item2) { module1.add_item({ type: 'assignment', id: assign2.id }, nil, position: 2) }
-    let_once(:module_item3) { module1.add_item({ type: 'assignment', id: assign3.id }, nil, position: 3) }
+    let_once(:module_item2) { module1.add_item({ type: "assignment", id: assign2.id }, nil, position: 2) }
+    let_once(:module_item3) { module1.add_item({ type: "assignment", id: assign3.id }, nil, position: 3) }
 
     it "works" do
       resolver = GraphQLTypeTester.new(module_item2, current_user: @teacher)
@@ -89,66 +92,66 @@ describe Types::ModuleItemType do
 
     it "works for assignments" do
       assignment = assignment_model({ context: course })
-      module_item = module1.add_item({ type: 'Assignment', id: assignment.id }, nil, position: 1)
+      module_item = module1.add_item({ type: "Assignment", id: assignment.id }, nil, position: 1)
       verify_module_item_works(module_item)
     end
 
     it "works for discussions" do
       discussion = discussion_topic_model({ context: course })
-      module_item = module1.add_item({ type: 'DiscussionTopic', id: discussion.id }, nil, position: 1)
+      module_item = module1.add_item({ type: "DiscussionTopic", id: discussion.id }, nil, position: 1)
       verify_module_item_works(module_item)
     end
 
     it "works for quizzes" do
       quiz = quiz_model({ course: course })
-      module_item = module1.add_item({ type: 'Quiz', id: quiz.id }, nil, position: 1)
+      module_item = module1.add_item({ type: "Quiz", id: quiz.id }, nil, position: 1)
       verify_module_item_works(module_item)
     end
 
     it "works for pages" do
       page = wiki_page_model({ course: course })
-      module_item = module1.add_item({ type: 'WikiPage', id: page.id }, nil, position: 1)
+      module_item = module1.add_item({ type: "WikiPage", id: page.id }, nil, position: 1)
       verify_module_item_works(module_item)
     end
 
     it "works for files" do
       file = attachment_with_context(course)
-      module_item = module1.add_item({ type: 'Attachment', id: file.id }, nil, position: 1)
+      module_item = module1.add_item({ type: "Attachment", id: file.id }, nil, position: 1)
       verify_module_item_works(module_item)
     end
 
     it "works for external urls" do
       module_item = module1.content_tags.create!(
-        tag_type: 'context_module',
-        content_type: 'ExternalUrl',
+        tag_type: "context_module",
+        content_type: "ExternalUrl",
         context_id: course.id,
-        context_type: 'Course',
-        title: 'Test Title',
-        url: 'https://google.com'
+        context_type: "Course",
+        title: "Test Title",
+        url: "https://google.com"
       )
       verify_module_item_works(module_item)
     end
 
     it "works for external tools" do
       external_tool = external_tool_model(context: course)
-      module_item = module1.add_item({ type: 'ContextExternalTool', id: external_tool.id }, nil, position: 1)
+      module_item = module1.add_item({ type: "ContextExternalTool", id: external_tool.id }, nil, position: 1)
       verify_module_item_works(module_item)
     end
 
     it "works for module external tools" do
       module_item = module1.content_tags.create!(
-        tag_type: 'context_module',
-        content_type: 'ContextExternalTool',
+        tag_type: "context_module",
+        content_type: "ContextExternalTool",
         context_id: course.id,
-        context_type: 'Course',
-        title: 'Test Title',
-        url: 'https://google.com'
+        context_type: "Course",
+        title: "Test Title",
+        url: "https://google.com"
       )
       verify_module_item_works(module_item)
     end
 
     it "works for sub headings" do
-      module_item = module1.add_item({ type: 'SubHeader', title: "WHOA!" }, nil, position: 1)
+      module_item = module1.add_item({ type: "SubHeader", title: "WHOA!" }, nil, position: 1)
       expect(
         GraphQLTypeTester.new(module_item, current_user: @teacher)
            .resolve("content { ... on SubHeader { title } }")

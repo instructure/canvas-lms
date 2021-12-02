@@ -27,11 +27,11 @@ class CreateOutcomeCalculationMethods < ActiveRecord::Migration[5.2]
       t.integer :context_id, null: false, limit: 8
       t.integer :calculation_int, limit: 2
       t.string :calculation_method, null: false, limit: 255
-      t.string :workflow_state, null: false, default: 'active'
+      t.string :workflow_state, null: false, default: "active"
       t.references :root_account, index: true, foreign_key: { to_table: :accounts }
       t.timestamps null: false
     end
 
-    add_index :outcome_calculation_methods, [:context_type, :context_id], unique: true, name: 'index_outcome_calculation_methods_on_context'
+    add_index :outcome_calculation_methods, [:context_type, :context_id], unique: true, name: "index_outcome_calculation_methods_on_context"
   end
 end

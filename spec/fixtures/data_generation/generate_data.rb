@@ -25,12 +25,12 @@
 # In docker environment, run:
 #   docker-compose run web bundle exec rails runner spec/fixtures/data_generation/generate_data.rb [options]
 
-require_relative '../../factories/course_factory'
-require_relative '../../factories/user_factory'
-require_relative '../../factories/quiz_factory'
-require_relative '../../factories/outcome_factory'
-require 'securerandom'
-require 'optparse'
+require_relative "../../factories/course_factory"
+require_relative "../../factories/user_factory"
+require_relative "../../factories/quiz_factory"
+require_relative "../../factories/outcome_factory"
+require "securerandom"
+require "optparse"
 
 # rubocop:disable Specs/ScopeIncludes
 # rubocop:disable Style/MixinUsage
@@ -40,7 +40,7 @@ include Factories
 
 # rubocop:disable Specs/ScopeHelperModules
 def toggle_k5_setting(account, enable = true)
-  account.settings[:enable_as_k5_account] = { :value => enable, :locked => enable }
+  account.settings[:enable_as_k5_account] = { value: enable, locked: enable }
   account.root_account.settings[:k5_accounts] = enable ? [account.id] : []
   account.save!
 end
@@ -81,8 +81,8 @@ def course_with_teacher_enrolled
   @teacher = @user
   @teacher.pseudonyms.create!(
     unique_id: "newteacher#{@teacher.id}@example.com",
-    password: 'password',
-    password_confirmation: 'password'
+    password: "password",
+    password_confirmation: "password"
   )
   @teacher.email = "newteacher#{@teacher.id}@example.com"
   @teacher.accept_terms
@@ -104,8 +104,8 @@ def course_with_students_enrolled
     email = "playstudent#{index}@example.com"
     @user.pseudonyms.create!(
       unique_id: email,
-      password: 'password',
-      password_confirmation: 'password'
+      password: "password",
+      password_confirmation: "password"
     )
     @user.email = email
     @user.accept_terms
@@ -119,12 +119,12 @@ def create_assignment(course, title, points_possible = 10)
     title: "#{title} #{SecureRandom.alphanumeric(10)}",
     description: "General Assignment",
     points_possible: points_possible,
-    submission_types: 'online_text_entry',
-    workflow_state: 'published'
+    submission_types: "online_text_entry",
+    workflow_state: "published"
   )
 end
 
-def create_discussion(course, creator, workflow_state = 'published')
+def create_discussion(course, creator, workflow_state = "published")
   discussion_assignment = create_assignment(@course, "Discussion Assignment", 10)
   course.discussion_topics.create!(
     user: creator,
@@ -151,15 +151,15 @@ def create_quiz(course)
   @quiz.save!
   @quiz.quiz_questions.create!(
     question_data: {
-      name: 'Quiz Questions',
-      question_type: 'fill_in_multiple_blanks_question',
-      question_text: '[color1]',
-      answers: [{ text: 'one', id: 1 }, { text: 'two', id: 2 }, { text: 'three', id: 3 }],
+      name: "Quiz Questions",
+      question_type: "fill_in_multiple_blanks_question",
+      question_text: "[color1]",
+      answers: [{ text: "one", id: 1 }, { text: "two", id: 2 }, { text: "three", id: 3 }],
       points_possible: 1
     }
   )
   @quiz.generate_quiz_data
-  @quiz.workflow_state = 'available'
+  @quiz.workflow_state = "available"
   @quiz.save
   @quiz.reload
   @quiz
@@ -173,17 +173,17 @@ def create_announcement(course, announcement_title, announcement_message)
 end
 
 def create_wiki_page(course)
-  course.wiki_pages.create!(:title => "New Wiki Page #{SecureRandom.alphanumeric(10)}", :body => "Here's where we have content")
+  course.wiki_pages.create!(title: "New Wiki Page #{SecureRandom.alphanumeric(10)}", body: "Here's where we have content")
 end
 
-def create_module(course, workflow_state = 'active')
-  course.context_modules.create!(:name => "Module #{SecureRandom.alphanumeric(10)}", :workflow_state => workflow_state)
+def create_module(course, workflow_state = "active")
+  course.context_modules.create!(name: "Module #{SecureRandom.alphanumeric(10)}", workflow_state: workflow_state)
 end
 
 def create_outcome(course, outcome_description, outcome__short_description = "Another Outcome")
   outcome = course.created_learning_outcomes.create!(
-    :description => outcome_description,
-    :short_description => outcome__short_description
+    description: outcome_description,
+    short_description: outcome__short_description
   )
   course.root_outcome_group.add_outcome(outcome)
   course.root_outcome_group.save!
@@ -194,6 +194,9 @@ end
 def generate_course_with_students
   puts "Generate Course with Students"
   course_with_enrollments
+
+  puts "Course ID is #{@course.id}"
+  puts "Teacher ID is #{@teacher.id}"
 end
 
 def generate_fully_loaded_course(number_of_items = 2)
@@ -203,12 +206,15 @@ def generate_fully_loaded_course(number_of_items = 2)
     create_assignment(@course, "Assignment")
     create_discussion(@course, @teacher)
     create_quiz(@course)
-    create_announcement(@course, 'new announcement', 'new message')
+    create_announcement(@course, "new announcement", "new message")
     create_wiki_page(@course)
     course_module1 = create_module(@course)
-    assignment = create_assignment(course, "Module Assignment")
-    course_module1.add_item(:id => assignment.id, :type => 'assignment')
+    assignment = create_assignment(@course, "Module Assignment")
+    course_module1.add_item(id: assignment.id, type: "assignment")
   end
+
+  puts "Course ID is #{@course.id}"
+  puts "Teacher ID is #{@teacher.id}"
 end
 
 def generate_k5_dashboard
@@ -227,6 +233,9 @@ def generate_k5_dashboard
       student_in_course(student, @course)
     end
   end
+
+  puts "Homeroom Course ID is #{homeroom.id}"
+  puts "Teacher ID is #{@teacher.id}"
 end
 
 def generate_bp_course_and_associations
@@ -236,16 +245,24 @@ def generate_bp_course_and_associations
   @template = MasterCourses::MasterTemplate.set_as_master_course(@course)
   @minion = @template.add_child_course!(course_factory(account: @root_account, course_name: "Minion", active_all: true)).child_course
   @minion.enroll_teacher(@main_teacher).accept!
+
+  puts "Blueprint Course ID is #{@course.id}"
+  puts "Associated Course ID is #{@minion.id}"
+  puts "Teacher ID is #{@teacher.id}"
 end
 
 def generate_course_and_submissions
   puts "Generate Course with Student Submissions"
   student_list = course_with_enrollments
-  assignment = create_assignment(@course, 'Assignment to submit')
+  assignment = create_assignment(@course, "Assignment to submit")
   student_list.each do |student|
     assignment.submit_homework(student, { submission_type: "online_text_entry", body: "Here it is" })
     assignment.grade_student(student, grader: @teacher, score: 75, points_deducted: 0)
   end
+
+  puts "Course ID is #{@course.id}"
+  puts "Teacher ID is #{@teacher.id}"
+  puts "Assignment ID is #{assignment.id}"
 end
 
 def generate_mastery_path_course
@@ -262,55 +279,61 @@ def generate_mastery_path_course
 
   graded_discussion = create_discussion(@course, @teacher)
 
-  course_module = @course.context_modules.create!(:name => "Mastery Path Module")
-  course_module.add_item(:id => @trigger_assignment.id, :type => 'assignment')
-  course_module.add_item(:id => @set1_assmt1.id, :type => 'assignment')
-  course_module.add_item(:id => graded_discussion.id, :type => 'discussion_topic')
-  course_module.add_item(:id => @set2_assmt1.id, :type => 'assignment')
-  course_module.add_item(:id => @set2_assmt2.id, :type => 'assignment')
-  course_module.add_item(:id => @set3a_assmt.id, :type => 'assignment')
-  course_module.add_item(:id => @set3b_assmt.id, :type => 'assignment')
+  course_module = @course.context_modules.create!(name: "Mastery Path Module")
+  course_module.add_item(id: @trigger_assignment.id, type: "assignment")
+  course_module.add_item(id: @set1_assmt1.id, type: "assignment")
+  course_module.add_item(id: graded_discussion.id, type: "discussion_topic")
+  course_module.add_item(id: @set2_assmt1.id, type: "assignment")
+  course_module.add_item(id: @set2_assmt2.id, type: "assignment")
+  course_module.add_item(id: @set3a_assmt.id, type: "assignment")
+  course_module.add_item(id: @set3b_assmt.id, type: "assignment")
 
   ranges = [
-    ConditionalRelease::ScoringRange.new(:lower_bound => 0.7, :upper_bound => 1.0, :assignment_sets => [
-                                           ConditionalRelease::AssignmentSet.new(:assignment_set_associations => [
-                                                                                   ConditionalRelease::AssignmentSetAssociation.new(:assignment_id => @set1_assmt1.id),
-                                                                                   ConditionalRelease::AssignmentSetAssociation.new(:assignment_id => graded_discussion.assignment_id)
+    ConditionalRelease::ScoringRange.new(lower_bound: 0.7, upper_bound: 1.0, assignment_sets: [
+                                           ConditionalRelease::AssignmentSet.new(assignment_set_associations: [
+                                                                                   ConditionalRelease::AssignmentSetAssociation.new(assignment_id: @set1_assmt1.id),
+                                                                                   ConditionalRelease::AssignmentSetAssociation.new(assignment_id: graded_discussion.assignment_id)
                                                                                  ])
                                          ]),
-    ConditionalRelease::ScoringRange.new(:lower_bound => 0.4, :upper_bound => 0.7, :assignment_sets => [
-                                           ConditionalRelease::AssignmentSet.new(:assignment_set_associations => [
-                                                                                   ConditionalRelease::AssignmentSetAssociation.new(:assignment_id => @set2_assmt1.id),
-                                                                                   ConditionalRelease::AssignmentSetAssociation.new(:assignment_id => @set2_assmt2.id)
+    ConditionalRelease::ScoringRange.new(lower_bound: 0.4, upper_bound: 0.7, assignment_sets: [
+                                           ConditionalRelease::AssignmentSet.new(assignment_set_associations: [
+                                                                                   ConditionalRelease::AssignmentSetAssociation.new(assignment_id: @set2_assmt1.id),
+                                                                                   ConditionalRelease::AssignmentSetAssociation.new(assignment_id: @set2_assmt2.id)
                                                                                  ])
                                          ]),
-    ConditionalRelease::ScoringRange.new(:lower_bound => 0, :upper_bound => 0.4, :assignment_sets => [
+    ConditionalRelease::ScoringRange.new(lower_bound: 0, upper_bound: 0.4, assignment_sets: [
                                            ConditionalRelease::AssignmentSet.new(
-                                             :assignment_set_associations => [ConditionalRelease::AssignmentSetAssociation.new(
-                                               :assignment_id => @set3a_assmt.id
+                                             assignment_set_associations: [ConditionalRelease::AssignmentSetAssociation.new(
+                                               assignment_id: @set3a_assmt.id
                                              )]
                                            ),
                                            ConditionalRelease::AssignmentSet.new(
-                                             :assignment_set_associations => [ConditionalRelease::AssignmentSetAssociation.new(
-                                               :assignment_id => @set3b_assmt.id
+                                             assignment_set_associations: [ConditionalRelease::AssignmentSetAssociation.new(
+                                               assignment_id: @set3b_assmt.id
                                              )]
                                            )
                                          ])
   ]
-  @rule = @course.conditional_release_rules.create!(:trigger_assignment => @trigger_assignment, :scoring_ranges => ranges)
+  @rule = @course.conditional_release_rules.create!(trigger_assignment: @trigger_assignment, scoring_ranges: ranges)
+
+  puts "Course ID is #{@course.id}"
+  puts "Teacher ID is #{@teacher.id}"
+  puts "Trigger Assignment ID is #{@trigger_assignment.id}"
 end
 
 def generate_sections(number_of_sections = 2)
   puts "Generate Course with Students in Sections"
   course_with_teacher_enrolled
   number_of_sections.times do |iteration|
-    section = @course.course_sections.create!(:name => "Section #{iteration + 1}")
+    section = @course.course_sections.create!(name: "Section #{iteration + 1}")
     course_with_students_enrolled
     @enrollment_list.each do |student_enrollment|
       student_enrollment.course_section = section
       student_enrollment.save!
     end
   end
+
+  puts "Course ID is #{@course.id}"
 end
 
 def generate_course_with_outcome_rubric
@@ -319,7 +342,12 @@ def generate_course_with_outcome_rubric
   course_with_students_enrolled
   rubric = outcome_with_rubric(course: @course)
   assignment = create_assignment(@course, "Rubric Assignment")
-  rubric.associate_with(assignment, @course, purpose: 'grading', use_for_grading: true)
+  rubric.associate_with(assignment, @course, purpose: "grading", use_for_grading: true)
+
+  puts "Course ID is #{@course.id}"
+  puts "Teacher ID is #{@teacher.id}"
+  puts "Assignment ID is #{assignment.id}"
+  puts "Rubric ID is #{rubric.id}"
 end
 
 def generate_course_assignment_groups
@@ -336,6 +364,13 @@ def generate_course_assignment_groups
   assignment1.save!
   assignment2.assignment_group = assignment_group2
   assignment2.save!
+
+  puts "Course ID is #{@course.id}"
+  puts "Teacher ID is #{@teacher.id}"
+  puts "Assignment 1 ID is #{assignment1.id}"
+  puts "Assignment 2 ID is #{assignment2.id}"
+  puts "Assignment Group 1 ID is #{assignment_group1.id}"
+  puts "Assignment Group 2 ID is #{assignment_group2.id}"
 end
 
 def generate_course_with_dated_assignments
@@ -346,6 +381,9 @@ def generate_course_with_dated_assignments
     assignment.due_at = (iteration + 1).day.from_now(Time.zone.now)
     assignment.save!
   end
+
+  puts "Course ID is #{@course.id}"
+  puts "Teacher ID is #{@teacher.id}"
 end
 
 def generate_pace_plan_course
@@ -361,10 +399,17 @@ def generate_pace_plan_course
   assignment2 = create_assignment(@course, "Assignment 2")
   discussion1 = create_discussion(@course, @teacher)
   quiz1 = create_quiz(@course)
-  module1.add_item(:id => assignment1.id, :type => 'assignment')
-  module1.add_item(:id => assignment2.id, :type => 'assignment')
-  module1.add_item(:id => discussion1.id, :type => 'discussion_topic')
-  module1.add_item(:id => quiz1.id, :type => 'quiz')
+  module1.add_item(id: assignment1.id, type: "assignment")
+  module1.add_item(id: assignment2.id, type: "assignment")
+  module1.add_item(id: discussion1.id, type: "discussion_topic")
+  module1.add_item(id: quiz1.id, type: "quiz")
+
+  puts "Course ID is #{@course.id}"
+  puts "Teacher ID is #{@teacher.id}"
+  puts "Assignment 1 ID is #{assignment1.id}"
+  puts "Assignment 2 ID is #{assignment2.id}"
+  puts "Discussion ID is #{discussion1.id}"
+  puts "Module ID is #{module1.id}"
 end
 
 def create_all_the_available_data
@@ -389,11 +434,13 @@ def create_all_the_available_data
   generate_course_with_outcome_rubric
   @course_name = save_course_name + " (course with assignment groups)"
   generate_course_assignment_groups
+  @course_name = save_course_name + " (pace plan course)"
+  generate_pace_plan_course
 end
 # rubocop:enable Specs/ScopeHelperModules
 
 options = {}
-ARGV << '-h' if ARGV.empty?
+ARGV << "-h" if ARGV.empty?
 option_parser = OptionParser.new do |opts|
   opts.banner = "Usage: bin/rails runner spec/fixtures/data_generation/generate_data.rb [-abdgklmprsth] [-c course_name] [-n number_of_students]"
   opts.on("-a", "--all_data", "Create all the available data with defaults")
@@ -419,8 +466,8 @@ end
 
 begin
   option_parser.parse!(into: options)
-rescue OptionParser::InvalidOption => error
-  puts error.message
+rescue OptionParser::InvalidOption => e
+  puts e.message
   puts option_parser.help
   exit 1
 end
@@ -469,7 +516,7 @@ options.each_key do |key|
     generate_sections
   when :pace_plan
     generate_pace_plan_course
-  else raise 'should never get here -- BIG FAIL'
+  else raise "should never get here -- BIG FAIL"
   end
 end
 

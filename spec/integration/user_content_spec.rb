@@ -28,11 +28,11 @@ describe "User Content" do
       obj_data = "<div>test</div>"
       snippet = Base64.encode64 obj_data
       sig = Canvas::Security.hmac_sha1(snippet)
-      post "http://files.example.com/object_snippet", params: { :object_data => snippet, :s => sig }
+      post "http://files.example.com/object_snippet", params: { object_data: snippet, s: sig }
       expect(response).to be_successful
       expect(response.body).to be_include(obj_data)
 
-      post "http://canvas.example.com/object_snippet", params: { :object_data => snippet, :s => sig }
+      post "http://canvas.example.com/object_snippet", params: { object_data: snippet, s: sig }
       assert_status(400)
       expect(response.body).to be_blank
     end
@@ -44,7 +44,7 @@ describe "User Content" do
       obj_data = "<div>test</div>"
       snippet = Base64.encode64 obj_data
       sig = Canvas::Security.hmac_sha1(snippet)
-      post "http://files.example.com/object_snippet", params: { :object_data => snippet, :s => sig }
+      post "http://files.example.com/object_snippet", params: { object_data: snippet, s: sig }
       expect(response).to be_successful
       expect(response.body).to be_include(obj_data)
     end

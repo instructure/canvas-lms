@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-require_relative '../../common'
+require_relative "../../common"
 
 module UserProfilePage
   # ---------------------- Selectors ----------------------
@@ -24,20 +24,20 @@ module UserProfilePage
   # ---------------------- Elements ----------------------
 
   def merge_with_another_user_link
-    f('a.merge_user_link')
+    f("a.merge_user_link")
   end
 
   def search_username_input
-    f('.account_search input.user_name')
+    f(".account_search input.user_name")
   end
 
   def search_userid_input
-    f('#manual_user_id')
+    f("#manual_user_id")
   end
 
   def username_search_suggestions
     wait_for_ajaximations
-    f('ul.ui-autocomplete')
+    f("ul.ui-autocomplete")
   end
 
   def choose_suggested_username(user_name)
@@ -45,11 +45,11 @@ module UserProfilePage
   end
 
   def selected_user
-    f('#selected_name')
+    f("#selected_name")
   end
 
   def select_user_button
-    f('#select_name')
+    f("#select_name")
   end
 
   def merge_user_page_application_div

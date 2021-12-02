@@ -35,32 +35,32 @@ class UserMerge
   def into(target_user, merger: nil, source: nil)
     return unless target_user
     return if target_user == from_user
-    raise 'cannot merge a test student' if from_user.preferences[:fake_student] || target_user.preferences[:fake_student]
+    raise "cannot merge a test student" if from_user.preferences[:fake_student] || target_user.preferences[:fake_student]
 
     @target_user = target_user
     target_user.associate_with_shard(from_user.shard, :shadow)
     # we also store records for the from_user on the target shard for a split
     from_user.associate_with_shard(target_user.shard, :shadow)
     target_user.shard.activate do
-      @merge_data = UserMergeData.create!(user: target_user, from_user: from_user, workflow_state: 'merging')
-      @merge_data.items.create!(user: target_user, item_type: 'logs', item: { merger_id: merger.id, source: source }.to_s) if merger || source
+      @merge_data = UserMergeData.create!(user: target_user, from_user: from_user, workflow_state: "merging")
+      @merge_data.items.create!(user: target_user, item_type: "logs", item: { merger_id: merger.id, source: source }.to_s) if merger || source
 
       items = []
       if target_user.avatar_state == :none && from_user.avatar_state != :none
-        [:avatar_image_source, :avatar_image_url, :avatar_image_updated_at, :avatar_state].each do |attr|
+        %i[avatar_image_source avatar_image_url avatar_image_updated_at avatar_state].each do |attr|
           items << merge_data.items.new(user: from_user, item_type: attr.to_s, item: from_user[attr]) if from_user[attr]
           target_user[attr] = from_user[attr]
         end
       end
 
       # record the users names and preferences in case of split.
-      items << merge_data.items.new(user: from_user, item_type: 'user_name', item: from_user.name)
-      items << merge_data.items.new(user: target_user, item_type: 'user_name', item: target_user.name)
+      items << merge_data.items.new(user: from_user, item_type: "user_name", item: from_user.name)
+      items << merge_data.items.new(user: target_user, item_type: "user_name", item: target_user.name)
       UserMergeDataItem.bulk_insert_objects(items)
 
       # bulk insert doesn't play nice with the hash values of preferences.
-      merge_data.items.create!(user: from_user, item_type: 'user_preferences', item: from_user.preferences)
-      merge_data.items.create!(user: target_user, item_type: 'user_preferences', item: target_user.preferences)
+      merge_data.items.create!(user: from_user, item_type: "user_preferences", item: from_user.preferences)
+      merge_data.items.create!(user: target_user, item_type: "user_preferences", item: target_user.preferences)
 
       if from_user.needs_preference_migration?
         prefs = shard_aware_preferences
@@ -76,12 +76,12 @@ class UserMerge
         conversation_ids: from_user.all_conversations.shard(from_user).pluck(:id),
         ignore_ids: from_user.ignores.shard(from_user).pluck(:id),
         user_past_lti_id_ids: from_user.past_lti_ids.shard(from_user).pluck(:id),
-        'Polling::Poll_ids': from_user.polls.shard(from_user).pluck(:id) }.each do |k, ids|
+        "Polling::Poll_ids": from_user.polls.shard(from_user).pluck(:id) }.each do |k, ids|
         merge_data.items.create!(user: from_user, item_type: k, item: ids) unless ids.empty?
       end
     end
 
-    [:strong, :weak, :shadow].each do |strength|
+    %i[strong weak shadow].each do |strength|
       from_user.associated_shards(strength).each do |shard|
         target_user.associate_with_shard(shard, strength)
       end
@@ -101,7 +101,7 @@ class UserMerge
       pseudonyms_to_move.update_all(["updated_at=NOW(), user_id=?, position=position+?", target_user, max_position])
 
       target_user.communication_channels.email.unretired.each do |cc|
-        Rails.cache.delete([cc.path, 'invited_enrollments2'].cache_key)
+        Rails.cache.delete([cc.path, "invited_enrollments2"].cache_key)
       end
 
       handle_submissions
@@ -112,7 +112,7 @@ class UserMerge
       # flagged as updated so the materialized views update
       begin
         entries = DiscussionEntry.where(user_id: from_user)
-        DiscussionTopic.where(id: entries.select(['discussion_topic_id'])).touch_all
+        DiscussionTopic.where(id: entries.select(["discussion_topic_id"])).touch_all
         entries.update_all(user_id: target_user.id)
         DiscussionTopic.where(user_id: from_user).update_all(user_id: target_user.id, updated_at: Time.now.utc)
       rescue => e
@@ -128,17 +128,17 @@ class UserMerge
       Attachment.delay.migrate_attachments(from_user, target_user)
 
       updates = {}
-      %w(access_tokens asset_user_accesses calendar_events collaborations
+      %w[access_tokens asset_user_accesses calendar_events collaborations
          context_module_progressions group_memberships ignores
          page_comments Polling::Poll rubric_assessments user_services
-         web_conference_participants web_conferences wiki_pages).each do |key|
+         web_conference_participants web_conferences wiki_pages].each do |key|
         updates[key] = "user_id"
       end
-      updates['submission_comments'] = 'author_id'
-      updates['conversation_messages'] = 'author_id'
+      updates["submission_comments"] = "author_id"
+      updates["conversation_messages"] = "author_id"
       updates = updates.to_a
-      version_updates = ['rubric_assessments', 'wiki_pages']
-      touching_updates = ['access_tokens', 'group_memberships']
+      version_updates = ["rubric_assessments", "wiki_pages"]
+      touching_updates = ["access_tokens", "group_memberships"]
       updates.each do |table, column|
         klass = table.classify.constantize
         if klass.new.respond_to?("#{column}=".to_sym)
@@ -149,7 +149,7 @@ class UserMerge
             end
 
             update = { column => target_user.id }
-            if touching_updates.include?(table) && klass.column_names.include?('updated_at')
+            if touching_updates.include?(table) && klass.column_names.include?("updated_at")
               update[:updated_at] = Time.now.utc
             end
             scope.update_all(update)
@@ -159,10 +159,10 @@ class UserMerge
         Rails.logger.error "migrating #{table} column #{column} failed: #{e}"
       end
 
-      context_updates = ['calendar_events']
+      context_updates = ["calendar_events"]
       context_updates.each do |table|
         klass = table.classify.constantize
-        scope = klass.where(context_id: from_user, context_type: 'User')
+        scope = klass.where(context_id: from_user, context_type: "User")
         scope.update_all(context_id: target_user.id, context_code: target_user.asset_string)
       end
 
@@ -176,11 +176,11 @@ class UserMerge
     target_user.clear_caches
     from_user.update!(merged_into_user: target_user)
     from_user.destroy
-    @merge_data.workflow_state = 'active'
+    @merge_data.workflow_state = "active"
     @merge_data.save!
   rescue => e
-    @merge_data&.update_attribute(:workflow_state, 'failed')
-    @merge_data.items.create!(user: target_user, item_type: 'merge_error', item: e.backtrace.unshift(e.message)) if @merge_data
+    @merge_data&.update_attribute(:workflow_state, "failed")
+    @merge_data&.items&.create!(user: target_user, item_type: "merge_error", item: e.backtrace.unshift(e.message))
     Canvas::Errors.capture(e, type: :user_merge, merge_data_id: @merge_data&.id, from_user_id: from_user&.id, target_user_id: target_user&.id)
     raise
   end
@@ -192,9 +192,9 @@ class UserMerge
   end
 
   def translate_course_id_or_asset_string(key)
-    id = key.is_a?(String) ? key.split('_').last : key
+    id = key.is_a?(String) ? key.split("_").last : key
     new_id = Shard.relative_id_for(id, from_user.shard, target_user.shard)
-    key.is_a?(String) ? [key.split('_').first, new_id].join('_') : new_id
+    key.is_a?(String) ? [key.split("_").first, new_id].join("_") : new_id
   end
 
   # can remove when all preferences have been migrated
@@ -202,10 +202,10 @@ class UserMerge
     return from_user.preferences if from_user.shard == target_user.shard
 
     preferences = from_user.preferences.dup
-    %i{custom_colors course_nicknames}.each do |pref|
+    %i[custom_colors course_nicknames].each do |pref|
       preferences.delete(pref)
       new_pref = {}
-      from_user.preferences.dig(pref)&.each do |key, value|
+      from_user.preferences[pref]&.each do |key, value|
         new_key = translate_course_id_or_asset_string(key)
         new_pref[new_key] = value
       end
@@ -228,9 +228,10 @@ class UserMerge
       value = from_record.value
       if from_user.shard != target_user.shard
         # tl;dr do the same thing as shard_aware_preferences
-        if key == "custom_colors"
-          value = Hash[value.map { |id, color| [translate_course_id_or_asset_string(id), color] }]
-        elsif key == "course_nicknames"
+        case key
+        when "custom_colors"
+          value = value.transform_keys { |id| translate_course_id_or_asset_string(id) }
+        when "course_nicknames"
           sub_key = translate_course_id_or_asset_string(sub_key)
         end
       end
@@ -238,13 +239,13 @@ class UserMerge
       if (existing_record = target_values[[key, sub_key]])
         existing_record_updates[existing_record] = value
       else
-        new_record_hashes << { :user_id => target_user.id, :key => key, :sub_key => sub_key&.to_json, :value => value.to_yaml }
+        new_record_hashes << { user_id: target_user.id, key: key, sub_key: sub_key&.to_json, value: value.to_yaml }
       end
     end
     target_user.shard.activate do
       UserPreferenceValue.bulk_insert(new_record_hashes)
       existing_record_updates.each do |record, new_value|
-        UserPreferenceValue.where(:id => record).update_all(:value => new_value)
+        UserPreferenceValue.where(id: record).update_all(value: new_value)
       end
     end
   end
@@ -254,11 +255,11 @@ class UserMerge
     Shard.with_each_shard(from_user.associated_shards + from_user.associated_shards(:weak) + from_user.associated_shards(:shadow)) do
       lti_ids = []
       { enrollments: :course, group_memberships: :group, account_users: :account }.each do |klass, type|
-        klass.to_s.classify.constantize.where(user_id: from_user).distinct_on(type.to_s + '_id').each do |context|
-          next if UserPastLtiId.where(user: [target_user, from_user], context_id: context.send(type.to_s + '_id'), context_type: type.to_s.classify).exists?
+        klass.to_s.classify.constantize.where(user_id: from_user).distinct_on(type.to_s + "_id").each do |context|
+          next if UserPastLtiId.where(user: [target_user, from_user], context_id: context.send(type.to_s + "_id"), context_type: type.to_s.classify).exists?
 
           lti_ids << UserPastLtiId.new(user: target_user,
-                                       context_id: context.send(type.to_s + '_id'),
+                                       context_id: context.send(type.to_s + "_id"),
                                        context_type: type.to_s.classify,
                                        user_uuid: from_user.uuid,
                                        user_lti_id: from_user.lti_id,
@@ -272,7 +273,7 @@ class UserMerge
   def move_existing_past_lti_ids
     existing_past_ids = target_user.past_lti_ids.select(:context_id, :context_type).shard(target_user).group_by(&:context_type)
     if existing_past_ids.present?
-      ['Group', 'Account', 'Course'].each do |klass|
+      %w[Group Account Course].each do |klass|
         next unless existing_past_ids[klass]
 
         Shard.partition_by_shard(existing_past_ids[klass]) do |shard_past_ids|
@@ -299,17 +300,17 @@ class UserMerge
         User.clone_communication_channel(cc, target_user, max_position)
         new_cc = target_user.communication_channels.where.not(id: known_ccs).take
         known_ccs << new_cc.id
-        merge_data.build_more_data([new_cc], user: target_user, workflow_state: 'non_existent', data: data)
+        merge_data.build_more_data([new_cc], user: target_user, workflow_state: "non_existent", data: data)
       end
 
       next unless target_cc
 
       to_retire = identify_to_retire(cc, target_cc, max_position)
-      if to_retire
-        keeper = ([target_cc, cc] - [to_retire]).first
-        copy_notificaion_policies(to_retire, keeper)
-        to_retire_ids << to_retire.id
-      end
+      next unless to_retire
+
+      keeper = ([target_cc, cc] - [to_retire]).first
+      copy_notificaion_policies(to_retire, keeper)
+      to_retire_ids << to_retire.id
     end
 
     finish_ccs(max_position, to_retire_ids)
@@ -317,42 +318,42 @@ class UserMerge
 
   def detect_conflicting_cc(source_cc)
     target_user.communication_channels.detect do |c|
-      c.path.downcase == source_cc.path.downcase && c.path_type == source_cc.path_type
+      c.path.casecmp?(source_cc.path) && c.path_type == source_cc.path_type
     end
   end
 
   def finish_ccs(max_position, to_retire_ids)
-    if from_user.shard != target_user.shard
-      handle_cross_shard_cc
-    else
+    if from_user.shard == target_user.shard
       from_user.shard.activate do
-        ccs = CommunicationChannel.where(id: to_retire_ids).where.not(workflow_state: 'retired')
+        ccs = CommunicationChannel.where(id: to_retire_ids).where.not(workflow_state: "retired")
         merge_data.build_more_data(ccs, data: data) unless to_retire_ids.empty?
-        ccs.update_all(workflow_state: 'retired') unless to_retire_ids.empty?
+        ccs.update_all(workflow_state: "retired") unless to_retire_ids.empty?
       end
-      scope = from_user.communication_channels.where.not(workflow_state: 'retired')
+      scope = from_user.communication_channels.where.not(workflow_state: "retired")
       scope = scope.where.not(id: to_retire_ids) unless to_retire_ids.empty?
       unless scope.empty?
         merge_data.build_more_data(scope, data: data)
-        scope.touch_all()
+        scope.touch_all
         scope.update_all(["user_id=?, position=position+?, root_account_ids='{?}'", target_user, max_position, target_user.root_account_ids])
       end
+    else
+      handle_cross_shard_cc
     end
     merge_data.bulk_insert_merge_data(data) unless data.empty?
     @data = []
   end
 
   def handle_cross_shard_cc
-    ccs = from_user.communication_channels.where.not(workflow_state: 'retired')
+    ccs = from_user.communication_channels.where.not(workflow_state: "retired")
     merge_data.build_more_data(ccs, data: data) unless ccs.empty?
-    ccs.update_all(workflow_state: 'retired') unless ccs.empty?
+    ccs.update_all(workflow_state: "retired") unless ccs.empty?
 
     from_user.user_services.each do |us|
       new_us = us.clone
       new_us.shard = target_user.shard
       new_us.user = target_user
       new_us.save!
-      merge_data.build_more_data([new_us], user: target_user, workflow_state: 'non_existent', data: data)
+      merge_data.build_more_data([new_us], user: target_user, workflow_state: "non_existent", data: data)
     end
     merge_data.build_more_data(from_user.user_services, data: data)
     from_user.user_services.delete_all
@@ -395,7 +396,7 @@ class UserMerge
 
   def copy_notificaion_policies(to_retire, keeper)
     # if the communication_channel is already retired, don't bother.
-    return if to_retire.workflow_state == 'retired'
+    return if to_retire.workflow_state == "retired"
 
     time = Time.zone.now
     new_nps = []
@@ -421,7 +422,7 @@ class UserMerge
 
     Shard.partition_by_shard(observer_links) do |shard_observer_links|
       # restore user observation links that are deleted on the target user but active on the from_user
-      UserObservationLink.where(observer_id: target_user, workflow_state: 'deleted', user_id: shard_observer_links.map(&:user_id)).update_all(workflow_state: 'active')
+      UserObservationLink.where(observer_id: target_user, workflow_state: "deleted", user_id: shard_observer_links.map(&:user_id)).update_all(workflow_state: "active")
       # delete links that are now duplicates between the from_user and target_user
       UserObservationLink.where(id: shard_observer_links).where(user_id: target_user.as_observer_observation_links.select(:user_id)).destroy_all
       # delete what would be observing themselves.
@@ -459,7 +460,7 @@ class UserMerge
 
           # create the record on the target users shard.
           new_link = UserObservationLink.create_or_restore(student: target_user, observer: link.observer, root_account: link.root_account)
-          merge_data.build_more_data([new_link], user: target_user, workflow_state: 'non_existent', data: data)
+          merge_data.build_more_data([new_link], user: target_user, workflow_state: "non_existent", data: data)
         end
       end
     end
@@ -476,7 +477,7 @@ class UserMerge
     # find all the modules progressions and delete the most restrictive
     # context_module_progressions
     ContextModuleProgression
-      .where("context_module_progressions.user_id = ?", from_user.id)
+      .where(context_module_progressions: { user_id: from_user.id })
       .where("EXISTS (SELECT *
                      FROM #{ContextModuleProgression.quoted_table_name} cmp2
                      WHERE context_module_progressions.context_module_id=cmp2.context_module_id
@@ -506,11 +507,10 @@ class UserMerge
                    course_section_id: enrollment.course_section_id)
 
     if column == :user_id
-      scope = scope.where(user_id: users, associated_user_id: enrollment.associated_user_id)
+      scope.where(user_id: users, associated_user_id: enrollment.associated_user_id)
     else
-      scope = scope.where(user_id: enrollment.user_id, associated_user_id: users)
+      scope.where(user_id: enrollment.user_id, associated_user_id: users)
     end
-    scope
   end
 
   def enrollment_keeper(scope)
@@ -530,7 +530,7 @@ class UserMerge
   def update_enrollment_state(scope, keeper)
     # update the record on the target user to the better state of the from users enrollment
     enrollment_ids = Enrollment.where(id: scope).where.not(id: keeper).pluck(:id)
-    Enrollment.where(:id => enrollment_ids).update_all(workflow_state: keeper.workflow_state)
+    Enrollment.where(id: enrollment_ids).update_all(workflow_state: keeper.workflow_state)
     EnrollmentState.force_recalculation(enrollment_ids)
 
     # mark the would be keeper from the from_user as deleted so it will not be moved later
@@ -587,7 +587,7 @@ class UserMerge
           # upgrade to strong association if there are any enrollments
           target_user.associate_with_shard(from_user.shard) if to_move.exists?
           merge_data.build_more_data(to_move, data: data)
-          to_move.update_all(column => target_user.id, updated_at: Time.now.utc)
+          to_move.update_all(column => target_user.id, :updated_at => Time.now.utc)
         end
       end
     end
@@ -598,16 +598,17 @@ class UserMerge
   def handle_submissions
     [
       [:assignment_id, :submissions],
-      [:quiz_id, :'quizzes/quiz_submissions']
+      [:quiz_id, :"quizzes/quiz_submissions"]
     ].each do |unique_id, table|
       # Submissions are a special case since there's a unique index
       # on the table, and if both the old user and the new user
       # have a submission for the same assignment there will be
       # a conflict.
       model = table.to_s.classify.constantize
-      already_scope = model.where(:user_id => target_user)
-      scope = model.where(:user_id => from_user)
-      if model.name == "Submission"
+      already_scope = model.where(user_id: target_user)
+      scope = model.where(user_id: from_user)
+      case model.name
+      when "Submission"
         # we prefer submissions that have grades then submissions that have
         # a submission... that sort of makes sense.
         # we swap empty objects in cases of collision so that we don't
@@ -624,8 +625,8 @@ class UserMerge
         move_back = already_scope.where(unique_id => to_move.map(&unique_id)).to_a
         merge_data.build_more_data(to_move, data: data) unless to_move.empty?
         merge_data.build_more_data(move_back, data: data) unless move_back.empty?
-        swap_submission(model, move_back, table, to_move, to_move_ids, 'fk_rails_8d85741475')
-      elsif model.name == "Quizzes::QuizSubmission"
+        swap_submission(model, move_back, table, to_move, to_move_ids, "fk_rails_8d85741475")
+      when "Quizzes::QuizSubmission"
         subscope = already_scope.to_a
         to_move = model.where(user_id: from_user).joins(:submission).where(submissions: { user_id: target_user }).to_a
         move_back = model.where(user_id: target_user).joins(:submission).where(submissions: { user_id: from_user }).to_a
@@ -634,7 +635,7 @@ class UserMerge
         move_back += already_scope.where(unique_id => to_move.map(&unique_id)).to_a
         merge_data.build_more_data(to_move, data: data)
         merge_data.build_more_data(move_back, data: data)
-        swap_submission(model, move_back, table, to_move, to_move, 'fk_rails_04850db4b4')
+        swap_submission(model, move_back, table, to_move, to_move, "fk_rails_04850db4b4")
       end
     rescue => e
       Rails.logger.error "migrating #{table} column user_id failed: #{e}"
@@ -665,9 +666,9 @@ class UserMerge
     scope.find_ids_in_batches do |ids|
       versionable_type = table.to_s.classify
       # TODO: This is a hack to support namespacing
-      versionable_type = ['QuizSubmission', 'Quizzes::QuizSubmission'] if table.to_s == 'quizzes/quiz_submissions'
+      versionable_type = ["QuizSubmission", "Quizzes::QuizSubmission"] if table.to_s == "quizzes/quiz_submissions"
       version_ids = []
-      Version.where(:versionable_type => versionable_type, :versionable_id => ids).find_in_batches(strategy: :cursor) do |versions|
+      Version.where(versionable_type: versionable_type, versionable_id: ids).find_in_batches(strategy: :cursor) do |versions|
         versions.each do |version|
           version_attrs = YAML.load(version.yaml)
           if version_attrs[column.to_s] == from_user.id
@@ -680,7 +681,7 @@ class UserMerge
           end
           version.yaml = version_attrs.to_yaml
           version.save!
-          if versionable_type == 'Submission'
+          if versionable_type == "Submission"
             version_ids << version.id
           end
         rescue => e

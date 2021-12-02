@@ -19,7 +19,7 @@
 #
 
 class Mutations::CreateConversation < Mutations::BaseMutation
-  graphql_name 'CreateConversation'
+  graphql_name "CreateConversation"
 
   include ConversationsHelper
 
@@ -29,11 +29,11 @@ class Mutations::CreateConversation < Mutations::BaseMutation
   argument :bulk_message, Boolean, required: false
   argument :force_new, Boolean, required: false
   argument :group_conversation, Boolean, required: false
-  argument :attachment_ids, [ID], required: false, prepare: GraphQLHelpers.relay_or_legacy_ids_prepare_func('Attachment')
+  argument :attachment_ids, [ID], required: false, prepare: GraphQLHelpers.relay_or_legacy_ids_prepare_func("Attachment")
   argument :media_comment_id, ID, required: false
   argument :media_comment_type, String, required: false
   argument :context_code, String, required: false
-  argument :conversation_id, ID, required: false, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func('Conversation')
+  argument :conversation_id, ID, required: false, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Conversation")
   argument :user_note, Boolean, required: false
   argument :tags, [String], required: false
 
@@ -50,11 +50,11 @@ class Mutations::CreateConversation < Mutations::BaseMutation
     shard = context ? context.shard : Shard.current
 
     recipients.each do |recipient|
-      if recipient =~ /\A(course_\d+)(?:_([a-z]+))?$/ && [nil, 'students', 'observers'].include?(Regexp.last_match(2)) &&
+      if recipient =~ /\A(course_\d+)(?:_([a-z]+))?$/ && [nil, "students", "observers"].include?(Regexp.last_match(2)) &&
          !Context.find_by_asset_string(Regexp.last_match(1)).try(:grants_right?, @current_user, session, :send_messages_all)
         return validation_error(
-          I18n.t('Recipients restricted by role'),
-          attribute: 'recipients'
+          I18n.t("Recipients restricted by role"),
+          attribute: "recipients"
         )
       end
     end
@@ -73,8 +73,8 @@ class Mutations::CreateConversation < Mutations::BaseMutation
 
     if !batch_group_messages && recipients.size > Conversation.max_group_conversation_size
       return validation_error(
-        I18n.t('Too many recipients for group conversation'),
-        attribute: 'recipients'
+        I18n.t("Too many recipients for group conversation"),
+        attribute: "recipients"
       )
     end
 
@@ -94,7 +94,7 @@ class Mutations::CreateConversation < Mutations::BaseMutation
         )
 
         # reload and preload stuff
-        conversations = ConversationParticipant.where(:id => batch.conversations)
+        conversations = ConversationParticipant.where(id: batch.conversations)
                                                .preload(:conversation)
                                                .order("visible_last_authored_at DESC, last_message_at DESC, id DESC")
         Conversation.preload_participants(conversations.map(&:conversation))
@@ -118,29 +118,29 @@ class Mutations::CreateConversation < Mutations::BaseMutation
       end
     end
   rescue ActiveRecord::RecordNotFound
-    raise GraphQL::ExecutionError, 'not found'
+    raise GraphQL::ExecutionError, "not found"
   rescue ActiveRecord::RecordInvalid => e
     errors_for(e.record)
   rescue ConversationsHelper::InvalidContextError
     validation_error(
       I18n.t(
-        'No context found for the following context code: %{context_code}',
+        "No context found for the following context code: %{context_code}",
         { context_code: input[:context_code] }
       ),
-      attribute: 'context_code'
+      attribute: "context_code"
     )
   rescue ConversationsHelper::InvalidContextPermissionsError
     validation_error(
       I18n.t(
-        'Unable to send messages to users in %{context_name}',
+        "Unable to send messages to users in %{context_name}",
         { context_name: context.name }
       ),
-      attribute: 'permissions'
+      attribute: "permissions"
     )
   rescue ConversationsHelper::CourseConcludedError
-    validation_error(I18n.t('Course concluded, unable to send messages'))
+    validation_error(I18n.t("Course concluded, unable to send messages"))
   rescue ConversationsHelper::InvalidRecipientsError
-    validation_error(I18n.t('Invalid recipients'))
+    validation_error(I18n.t("Invalid recipients"))
   end
 
   def get_recipients(recipient_ids, context_code, conversation_id)

@@ -16,9 +16,9 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-require_relative '../../common'
-require_relative 'new_course_add_people_modal'
-require_relative 'new_course_add_course_modal'
+require_relative "../../common"
+require_relative "new_course_add_people_modal"
+require_relative "new_course_add_course_modal"
 
 module NewCourseSearchPage
   include NewCourseAddPeopleModal
@@ -47,7 +47,7 @@ module NewCourseSearchPage
   end
 
   def results_body
-    f('#content')
+    f("#content")
   end
 
   def results_list_css
@@ -55,7 +55,7 @@ module NewCourseSearchPage
   end
 
   def left_navigation
-    f('#left-side #section-tabs')
+    f("#left-side #section-tabs")
   end
 
   def rows
@@ -104,7 +104,7 @@ module NewCourseSearchPage
   end
 
   def select_term(term)
-    wait_for_spinner { click_INSTUI_Select_option('#termFilter', term.name) }
+    wait_for_spinner { click_INSTUI_Select_option("#termFilter", term.name) }
   end
 
   def search(search_text)
@@ -124,8 +124,8 @@ module NewCourseSearchPage
     wait_for_ajaximations
   end
 
-  def wait_for_spinner
-    wait_for_transient_element('svg[role="img"] circle') { yield }
+  def wait_for_spinner(&block)
+    wait_for_transient_element('svg[role="img"] circle', &block)
     wait_for_ajaximations
   end
 end

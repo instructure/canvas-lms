@@ -23,7 +23,7 @@ module OutcomesService
     class << self
       def url(context)
         settings = settings(context)
-        protocol = ENV.fetch('OUTCOMES_SERVICE_PROTOCOL', Rails.env.production? ? 'https' : 'http')
+        protocol = ENV.fetch("OUTCOMES_SERVICE_PROTOCOL", Rails.env.production? ? "https" : "http")
         domain = settings[domain_key]
         "#{protocol}://#{domain}" if domain.present?
       end
@@ -55,20 +55,20 @@ module OutcomesService
             scope: scope,
             exp: expiration
           }.merge(overrides)
-          JWT.encode(payload, jwt_secret, 'HS512')
+          JWT.encode(payload, jwt_secret, "HS512")
         end
       end
 
       def toggle_feature_flag(root_account, feature_flag, state)
-        feature_flag_url = "#{url(root_account)}/api/features/#{state ? 'enable' : 'disable'}"
+        feature_flag_url = "#{url(root_account)}/api/features/#{state ? "enable" : "disable"}"
         response = CanvasHttp.post(
           feature_flag_url,
-          headers_for(root_account, 'features.manage'),
+          headers_for(root_account, "features.manage"),
           form_data: {
             feature_flag: feature_flag
           }
         )
-        return unless response && response.code != '204'
+        return unless response && response.code != "204"
 
         Canvas::Errors.capture(
           "Unexpected response from Outcomes Service toggling feature flag",
@@ -81,12 +81,12 @@ module OutcomesService
 
       def headers_for(context, scope, overrides = {})
         {
-          'Authorization' => OutcomesService::Service.jwt(context, scope, overrides: overrides)
+          "Authorization" => OutcomesService::Service.jwt(context, scope, overrides: overrides)
         }
       end
 
       def settings(context)
-        context.root_account.settings.dig(:provision, 'outcomes') || {}
+        context.root_account.settings.dig(:provision, "outcomes") || {}
       end
     end
   end

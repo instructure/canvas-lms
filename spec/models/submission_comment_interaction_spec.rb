@@ -19,12 +19,12 @@
 #
 
 describe SubmissionCommentInteraction do
-  context '.in_course_between' do
-    it 'finds the date of the latest submission comment' do
+  context ".in_course_between" do
+    it "finds the date of the latest submission comment" do
       course_with_student_submissions
       sub = @course.assignments.first.submissions
                    .where(user_id: @student).first
-      comment = sub.add_comment(comment: 'hi', author: @teacher)
+      comment = sub.add_comment(comment: "hi", author: @teacher)
       res = SubmissionCommentInteraction.in_course_between(@course, @teacher, @student)
       expect(res.length).to eq 1
       expect(res[[@student.id, @teacher.id]].to_i).to eq comment.created_at.to_i

@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../common'
+require_relative "../common"
 
 describe "cross-listing" do
   include_context "in-process server selenium tests"
@@ -26,56 +26,56 @@ describe "cross-listing" do
     course_with_teacher_logged_in
     @course1       = @course
     @course2       = course_with_teacher(
-      :active_course => true,
-      :user => @user,
-      :active_enrollment => true
+      active_course: true,
+      user: @user,
+      active_enrollment: true
     ).course
 
-    @course2.update_attribute(:name, 'my course')
+    @course2.update_attribute(:name, "my course")
     @section = @course1.course_sections.first
     get "/courses/#{@course1.id}/sections/#{@section.id}"
   end
 
   it "allows cross-listing a section" do
-    f('.crosslist_link').click
-    form = f('#crosslist_course_form')
-    submit_btn = form.find_element(:css, '.submit_button')
+    f(".crosslist_link").click
+    form = f("#crosslist_course_form")
+    submit_btn = form.find_element(:css, ".submit_button")
     expect(form).not_to be_nil
-    expect(form.find_element(:css, '.submit_button')).to be_disabled
+    expect(form.find_element(:css, ".submit_button")).to be_disabled
 
-    course_id   = form.find_element(:id, 'course_id')
-    course_name = f('#course_autocomplete_name')
+    course_id   = form.find_element(:id, "course_id")
+    course_name = f("#course_autocomplete_name")
 
     # crosslist a valid course
     course_id.click
     course_id.clear
-    course_id.send_keys([:control, 'a'], @course2.id.to_s, "\n")
+    course_id.send_keys([:control, "a"], @course2.id.to_s, "\n")
     expect(course_name).to include_text(@course2.name)
-    expect(form.find_element(:id, 'course_autocomplete_id')).to have_attribute(:value, @course.id.to_s)
-    expect(submit_btn).not_to have_class('disabled')
+    expect(form.find_element(:id, "course_autocomplete_id")).to have_attribute(:value, @course.id.to_s)
+    expect(submit_btn).not_to have_class("disabled")
     submit_form(form)
     wait_for_ajaximations
-    keep_trying_until { driver.current_url.match(/courses\/#{@course2.id}/) }
+    keep_trying_until { driver.current_url.match(%r{courses/#{@course2.id}}) }
 
     # verify teacher doesn't have de-crosslist privileges
     get "/courses/#{@course2.id}/sections/#{@section.id}"
-    expect(f("#content")).not_to contain_css('.uncrosslist_link')
+    expect(f("#content")).not_to contain_css(".uncrosslist_link")
 
     # enroll teacher and de-crosslist
     @course1.enroll_teacher(@user).accept
     get "/courses/#{@course2.id}/sections/#{@section.id}"
-    f('.uncrosslist_link').click
-    expect(f('#uncrosslist_form')).to be_displayed
-    submit_form('#uncrosslist_form')
+    f(".uncrosslist_link").click
+    expect(f("#uncrosslist_form")).to be_displayed
+    submit_form("#uncrosslist_form")
     wait_for_ajaximations
-    keep_trying_until { expect(driver.current_url).to match(/courses\/#{@course1.id}/) }
+    keep_trying_until { expect(driver.current_url).to match(%r{courses/#{@course1.id}}) }
   end
 
   it "does not allow cross-listing an invalid section" do
-    f('.crosslist_link').click
-    form = f('#crosslist_course_form')
-    course_id   = form.find_element(:id, 'course_id')
-    course_name = f('#course_autocomplete_name')
+    f(".crosslist_link").click
+    form = f("#crosslist_course_form")
+    course_id   = form.find_element(:id, "course_id")
+    course_name = f("#course_autocomplete_name")
     course_id.click
     course_id.send_keys "-1\n"
     expect(course_name).to include_text 'Course ID "-1" not authorized for cross-listing'
@@ -85,9 +85,9 @@ describe "cross-listing" do
     # so, we have two courses with the teacher enrolled in both.
     course_with_teacher_logged_in
     course = @course
-    other_course = course_with_teacher(:active_course => true,
-                                       :user => @user,
-                                       :active_enrollment => true).course
+    other_course = course_with_teacher(active_course: true,
+                                       user: @user,
+                                       active_enrollment: true).course
     other_course.update_attribute(:name, "cool course")
     section = course.course_sections.first
 
@@ -107,7 +107,7 @@ describe "cross-listing" do
     # k, let's crosslist to the other course
     form.find_element(:css, "#course_id").click
     form.find_element(:css, "#course_id").clear
-    form.find_element(:css, "#course_id").send_keys([:control, 'a'], other_course.id.to_s, "\n")
+    form.find_element(:css, "#course_id").send_keys([:control, "a"], other_course.id.to_s, "\n")
     expect(f("#course_autocomplete_name")).to include_text other_course.name
     expect(form.find_element(:css, "#course_autocomplete_id")).to have_attribute(:value, other_course.id.to_s)
 
@@ -115,13 +115,13 @@ describe "cross-listing" do
     # expect(form.find_element(:css, ".submit_button")).to have_attribute(:disabled, 'false')
 
     submit_form(form)
-    keep_trying_until { driver.current_url.match(/courses\/#{other_course.id}/) }
+    keep_trying_until { driver.current_url.match(%r{courses/#{other_course.id}}) }
 
     # yay, so, now the teacher is not enrolled in the first course (the section
     # they were enrolled in got moved). they don't have the rights to
     # uncrosslist.
     get "/courses/#{other_course.id}/sections/#{section.id}"
-    expect(f("#content")).not_to contain_css('.uncrosslist_link')
+    expect(f("#content")).not_to contain_css(".uncrosslist_link")
 
     # enroll, and make sure the teacher can uncrosslist.
     course.enroll_teacher(@user).accept
@@ -129,6 +129,6 @@ describe "cross-listing" do
     f(".uncrosslist_link").click
     expect(f("#uncrosslist_form")).to be_displayed
     submit_form("#uncrosslist_form")
-    keep_trying_until { driver.current_url.match(/courses\/#{course.id}/) }
+    keep_trying_until { driver.current_url.match(%r{courses/#{course.id}}) }
   end
 end

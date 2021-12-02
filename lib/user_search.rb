@@ -47,11 +47,11 @@ module UserSearch
 
     def like_string_for(search_term)
       pattern_type = (gist_search_enabled? ? :full : :right)
-      wildcard_pattern(search_term, :type => pattern_type, :case_sensitive => false)
+      wildcard_pattern(search_term, type: pattern_type, case_sensitive: false)
     end
 
     def like_condition(value)
-      ActiveRecord::Base.like_condition(value, 'lower(:pattern)')
+      ActiveRecord::Base.like_condition(value, "lower(:pattern)")
     end
 
     def scope_for(context, searcher, options = {})
@@ -64,9 +64,10 @@ module UserSearch
       enrollment_states = Array(options[:enrollment_state]) if options[:enrollment_state]
       include_prior_enrollments = !options[:enrollment_state].nil?
       include_inactive_enrollments = !!options[:include_inactive_enrollments]
-      if context.is_a?(Account)
+      case context
+      when Account
         User.of_account(context).active
-      elsif context.is_a?(Course)
+      when Course
         context.users_visible_to(searcher, include_prior_enrollments,
                                  enrollment_state: enrollment_states, include_inactive: include_inactive_enrollments).distinct
       else
@@ -75,12 +76,13 @@ module UserSearch
     end
 
     def order_scope(users_scope, context, options = {})
-      order = ' DESC NULLS LAST, id DESC' if options[:order] == 'desc'
-      if options[:sort] == "last_login"
+      order = " DESC NULLS LAST, id DESC" if options[:order] == "desc"
+      case options[:sort]
+      when "last_login"
         users_scope.select("users.*").order(Arel.sql("last_login#{order}"))
-      elsif options[:sort] == "username"
-        users_scope.select("users.*").order_by_sortable_name(direction: options[:order] == 'desc' ? :descending : :ascending)
-      elsif options[:sort] == "email"
+      when "username"
+        users_scope.select("users.*").order_by_sortable_name(direction: options[:order] == "desc" ? :descending : :ascending)
+      when "email"
         users_scope = users_scope.select("users.*, (SELECT path FROM #{CommunicationChannel.quoted_table_name}
                           WHERE communication_channels.user_id = users.id AND
                             communication_channels.path_type = 'email' AND
@@ -89,7 +91,7 @@ module UserSearch
                           LIMIT 1)
                           AS email")
         users_scope.order(Arel.sql("email#{order}"))
-      elsif options[:sort] == "sis_id"
+      when "sis_id"
         users_scope = users_scope.select(User.send(:sanitize_sql, [
                                                      "users.*, (SELECT sis_user_id FROM #{Pseudonym.quoted_table_name}
           WHERE pseudonyms.user_id = users.id AND
@@ -113,21 +115,21 @@ module UserSearch
       if enrollment_role_ids || enrollment_roles
         users_scope = users_scope.joins(:not_removed_enrollments).distinct if context.is_a?(Account)
         roles = if enrollment_role_ids
-                  enrollment_role_ids.map { |id| Role.get_role_by_id(id) }.compact
+                  enrollment_role_ids.filter_map { |id| Role.get_role_by_id(id) }
                 else
-                  enrollment_roles.map do |name|
+                  enrollment_roles.filter_map do |name|
                     if context.is_a?(Account)
                       context.get_course_role_by_name(name)
                     else
                       context.account.get_course_role_by_name(name)
                     end
-                  end.compact
+                  end
                 end
-        users_scope = users_scope.where("role_id IN (?)", roles.map(&:id))
+        users_scope = users_scope.where(enrollments: { role_id: roles.map(&:id) })
       elsif enrollment_types
         enrollment_types = enrollment_types.map { |e| "#{e.camelize}Enrollment" }
-        if enrollment_types.any? { |et| !Enrollment.readable_types.keys.include?(et) }
-          raise ArgumentError, 'Invalid Enrollment Type'
+        if enrollment_types.any? { |et| !Enrollment.readable_types.key?(et) }
+          raise ArgumentError, "Invalid Enrollment Type"
         end
 
         if context.is_a?(Account)
@@ -136,9 +138,9 @@ module UserSearch
           users_scope = users_scope.where("EXISTS (?)", Enrollment.where("enrollments.user_id=users.id").active.where(type: enrollment_types)).distinct
         else
           if context.is_a?(Group) && context.context_type == "Course"
-            users_scope = users_scope.joins(:enrollments).where(:enrollments => { :course_id => context.context_id })
+            users_scope = users_scope.joins(:enrollments).where(enrollments: { course_id: context.context_id })
           end
-          users_scope = users_scope.where(:enrollments => { :type => enrollment_types })
+          users_scope = users_scope.where(enrollments: { type: enrollment_types })
         end
       end
 
@@ -177,7 +179,7 @@ module UserSearch
                  .joins("LEFT JOIN #{Pseudonym.quoted_table_name} ON pseudonyms.user_id = users.id
           AND pseudonyms.account_id = #{User.connection.quote(params[:account])}
           AND pseudonyms.workflow_state = 'active'")
-                 .where(like_condition('users.name'), pattern: params[:pattern])
+                 .where(like_condition("users.name"), pattern: params[:pattern])
     end
 
     def login_sql(users_scope, params)
@@ -186,8 +188,8 @@ module UserSearch
                  .joins("LEFT JOIN #{Pseudonym.quoted_table_name} AS logins ON logins.user_id = users.id
           AND logins.account_id = #{User.connection.quote(params[:account])}
           AND logins.workflow_state = 'active'")
-                 .where(pseudonyms: { account_id: params[:account], workflow_state: 'active' })
-                 .where(like_condition('pseudonyms.unique_id'), pattern: params[:pattern])
+                 .where(pseudonyms: { account_id: params[:account], workflow_state: "active" })
+                 .where(like_condition("pseudonyms.unique_id"), pattern: params[:pattern])
     end
 
     def sis_sql(users_scope, params)
@@ -196,8 +198,8 @@ module UserSearch
                  .joins("LEFT JOIN #{Pseudonym.quoted_table_name} AS logins ON logins.user_id = users.id
           AND logins.account_id = #{User.connection.quote(params[:account])}
           AND logins.workflow_state = 'active'")
-                 .where(pseudonyms: { account_id: params[:account], workflow_state: 'active' })
-                 .where(like_condition('pseudonyms.sis_user_id'), pattern: params[:pattern])
+                 .where(pseudonyms: { account_id: params[:account], workflow_state: "active" })
+                 .where(like_condition("pseudonyms.sis_user_id"), pattern: params[:pattern])
     end
 
     def email_sql(users_scope, params)
@@ -206,16 +208,16 @@ module UserSearch
                  .joins("LEFT JOIN #{Pseudonym.quoted_table_name} ON pseudonyms.user_id = users.id
           AND pseudonyms.account_id = #{User.connection.quote(params[:account])}
           AND pseudonyms.workflow_state = 'active'")
-                 .where(communication_channels: { workflow_state: ['active', 'unconfirmed'], path_type: params[:path_type] })
-                 .where(like_condition('communication_channels.path'), pattern: params[:pattern])
+                 .where(communication_channels: { workflow_state: ["active", "unconfirmed"], path_type: params[:path_type] })
+                 .where(like_condition("communication_channels.path"), pattern: params[:pattern])
     end
 
     def gist_search_enabled?
-      Setting.get('user_search_with_gist', 'true') == 'true'
+      Setting.get("user_search_with_gist", "true") == "true"
     end
 
     def complex_search_enabled?
-      Setting.get('user_search_with_full_complexity', 'true') == 'true'
+      Setting.get("user_search_with_full_complexity", "true") == "true"
     end
 
     def wildcard_pattern(value, options)

@@ -32,7 +32,7 @@ module SIS
       User.update_account_associations(importer.account_users_to_update_associations.to_a)
       user_ids = []
       importer.account_users_to_set_batch_id.to_a.in_groups_of(1000, false) do |admins|
-        user_ids += AccountUser.where(:id => admins).distinct.pluck(:user_id)
+        user_ids += AccountUser.where(id: admins).distinct.pluck(:user_id)
         AccountUser.where(id: admins).update_all(sis_batch_id: @batch.id, updated_at: Time.now.utc)
       end
       User.clear_cache_keys(user_ids, :account_users)
@@ -64,8 +64,8 @@ module SIS
         raise ImportError, "No role_id or role given for admin" if role.blank? && role_id.blank?
 
         state = status.downcase.strip
-        raise ImportError, "Invalid status #{status} for admin" unless %w(active deleted).include? state
-        return if @batch.skip_deletes? && state == 'deleted'
+        raise ImportError, "Invalid status #{status} for admin" unless %w[active deleted].include? state
+        return if @batch.skip_deletes? && state == "deleted"
 
         get_account(account_id)
         raise ImportError, "Invalid account_id given for admin" unless @account
@@ -82,7 +82,7 @@ module SIS
         user = get_user(user_id, the_root_account)
         raise ImportError, "Invalid or unknown user_id '#{user_id}' for admin" unless user
 
-        if state == 'deleted' && user.id == @batch&.user_id && @account == @root_account
+        if state == "deleted" && user.id == @batch&.user_id && @account == @root_account
           raise ImportError, "Can't remove yourself user_id '#{user_id}'"
         end
 
@@ -91,10 +91,11 @@ module SIS
       end
 
       def create_or_find_admin(user, state)
-        if state == 'active'
+        case state
+        when "active"
           admin = @account.account_users.where(user: user, role: @role).first_or_initialize
           admin.workflow_state = state
-        elsif state == 'deleted'
+        when "deleted"
           admin = @account.account_users.where(user: user, role: @role).where.not(sis_batch_id: nil).take
           return unless admin
 

@@ -17,18 +17,18 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../../helpers/gradebook_common'
-require_relative '../pages/gradebook_page'
-require_relative '../pages/gradebook_cells_page'
-require_relative '../setup/assignment_grade_type_setup'
+require_relative "../../helpers/gradebook_common"
+require_relative "../pages/gradebook_page"
+require_relative "../pages/gradebook_cells_page"
+require_relative "../setup/assignment_grade_type_setup"
 
 describe "Gradebook" do
   include_context "in-process server selenium tests"
   include AssignmentGradeTypeSetup
 
-  describe 'letter grade assignment grading' do
+  describe "letter grade assignment grading" do
     before :once do
-      assignments_with_grades_setup('letter_grade', 'B')
+      assignments_with_grades_setup("letter_grade", "B")
     end
 
     before do
@@ -36,15 +36,15 @@ describe "Gradebook" do
       Gradebook.visit(@course)
     end
 
-    it 'is maintained in editable mode', priority: "1", test_id: 3438379 do
-      Gradebook::Cells.select_scheme_grade(@students[0], @assignment, 'C')
-      expect(Gradebook::Cells.get_grade(@students[0], @assignment)).to eq('C')
+    it "is maintained in editable mode", priority: "1" do
+      Gradebook::Cells.select_scheme_grade(@students[0], @assignment, "C")
+      expect(Gradebook::Cells.get_grade(@students[0], @assignment)).to eq("C")
     end
 
-    it 'is maintained on page refresh post grade update', priority: "1", test_id: 3438380 do
-      Gradebook::Cells.select_scheme_grade(@students[0], @assignment, 'A-')
+    it "is maintained on page refresh post grade update", priority: "1" do
+      Gradebook::Cells.select_scheme_grade(@students[0], @assignment, "A-")
       refresh_page
-      expect(Gradebook::Cells.get_grade(@students[0], @assignment)).to eq('A-')
+      expect(Gradebook::Cells.get_grade(@students[0], @assignment)).to eq("A-")
     end
   end
 end

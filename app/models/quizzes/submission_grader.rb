@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-require 'bigdecimal/util'
+require "bigdecimal/util"
 module Quizzes
   class SubmissionGrader
     class AlreadyGradedError < RuntimeError; end
@@ -45,7 +45,7 @@ module Quizzes
       @submission.workflow_state = "complete"
       user_answers.each do |answer|
         if answer[:correct] == "undefined" && !@submission.quiz.survey?
-          @submission.workflow_state = 'pending_review'
+          @submission.workflow_state = "pending_review"
         end
       end
       @submission.score_before_regrade = nil
@@ -58,8 +58,8 @@ module Quizzes
       @submission.with_versioning(true) do |s|
         original_score = s.kept_score
         original_workflow_state = s.workflow_state
-        if s.save
-          track_outcomes(s.attempt) if outcomes_require_update(s, original_score, original_workflow_state)
+        if s.save && outcomes_require_update(s, original_score, original_workflow_state)
+          track_outcomes(s.attempt)
         end
       end
       @submission.context_module_action
@@ -95,9 +95,9 @@ module Quizzes
 
       user_answer = qq.score_question(params)
       result = {
-        :correct => user_answer.correctness,
-        :points => user_answer.score,
-        :question_id => user_answer.question_id,
+        correct: user_answer.correctness,
+        points: user_answer.score,
+        question_id: user_answer.question_id,
       }
       result[:answer_id] = user_answer.answer_id if user_answer.answer_id
       result.merge!(user_answer.answer_details)
@@ -112,7 +112,7 @@ module Quizzes
       return unless @submission.user_id
 
       versioned_submission = versioned_submission(@submission, attempt)
-      question_ids = (versioned_submission&.quiz_data || []).map { |q| q[:assessment_question_id] }.compact.uniq
+      question_ids = (versioned_submission&.quiz_data || []).filter_map { |q| q[:assessment_question_id] }.uniq
       questions, alignments = questions_and_alignments(question_ids)
       return if questions.empty? || alignments.empty?
 
@@ -144,11 +144,11 @@ module Quizzes
       # we'll need this method to return true. if the method is highest,
       # the kept score only updates if it's higher than the original score
       quiz = @submission.quiz
-      return true if quiz.scoring_policy != 'keep_highest' || quiz.points_possible.to_i == 0 || original_score.nil?
+      return true if quiz.scoring_policy != "keep_highest" || quiz.points_possible.to_i == 0 || original_score.nil?
       # when a submission is pending review, no outcome results are generated.
       # if the submission transitions to completed, then we need this method
       # to return true, even if the kept score isn't changing, so outcome results are generated.
-      return true if original_workflow_state == 'pending_review' && @submission.workflow_state == 'complete'
+      return true if original_workflow_state == "pending_review" && @submission.workflow_state == "complete"
 
       @submission.kept_score && @submission.kept_score > original_score
     end
@@ -161,11 +161,11 @@ module Quizzes
       return questions, [] if bank_ids.empty?
 
       # equivalent to AssessmentQuestionBank#learning_outcome_alignments, but for multiple banks at once
-      return questions, ContentTag.learning_outcome_alignments.active.where(
-        :content_type => 'AssessmentQuestionBank',
-        :content_id => bank_ids
+      [questions, ContentTag.learning_outcome_alignments.active.where(
+        content_type: "AssessmentQuestionBank",
+        content_id: bank_ids
       )
-                                  .preload(:learning_outcome, :context).to_a
+                            .preload(:learning_outcome, :context).to_a]
     end
   end
 end

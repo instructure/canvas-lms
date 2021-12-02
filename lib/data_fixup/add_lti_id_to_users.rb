@@ -19,10 +19,10 @@
 
 module DataFixup::AddLtiIdToUsers
   def self.run
-    User.where(lti_id: nil).find_ids_in_batches(:batch_size => 10_000) do |batch|
+    User.where(lti_id: nil).find_ids_in_batches(batch_size: 10_000) do |batch|
       updates = []
       batch.each { |id| updates << [id, SecureRandom.uuid] }
-      sql_updates = updates.map { |v| "(#{v.first},'#{v.last}')" }.join(',')
+      sql_updates = updates.map { |v| "(#{v.first},'#{v.last}')" }.join(",")
 
       User.connection.select_values(update_sql(sql_updates))
 
@@ -32,7 +32,7 @@ module DataFixup::AddLtiIdToUsers
   end
 
   def self.update_sql(sql_updates)
-    <<-SQL
+    <<~SQL.squish
       UPDATE #{User.quoted_table_name} AS t
       SET lti_id = x.lti_id
       FROM (VALUES #{sql_updates}) AS x(id, lti_id)

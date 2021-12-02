@@ -27,7 +27,7 @@ class AuthenticationProvider::Apple < AuthenticationProvider::OpenIDConnect
   SENSITIVE_PARAMS = [:client_secret].freeze
 
   def self.display_name
-    'Sign in with Apple'
+    "Sign in with Apple"
   end
 
   def self.login_message
@@ -35,7 +35,7 @@ class AuthenticationProvider::Apple < AuthenticationProvider::OpenIDConnect
   end
 
   def self.sti_name
-    'apple'
+    "apple"
   end
 
   def self.singleton?
@@ -43,7 +43,7 @@ class AuthenticationProvider::Apple < AuthenticationProvider::OpenIDConnect
   end
 
   def self.login_attributes
-    ['sub', 'email'].freeze
+    ["sub", "email"].freeze
   end
   validates :login_attribute, inclusion: login_attributes
 
@@ -52,19 +52,19 @@ class AuthenticationProvider::Apple < AuthenticationProvider::OpenIDConnect
   end
 
   def self.recognized_federated_attributes
-    [
-      'email',
-      'firstName',
-      'lastName',
-      'sub',
+    %w[
+      email
+      firstName
+      lastName
+      sub
     ].freeze
   end
 
   def get_token(_code, _redirect_uri, params)
-    jwt_string = params['id_token']
+    jwt_string = params["id_token"]
     debug_set(:id_token, jwt_string) if instance_debugging
     id_token = JSON::JWT.decode(jwt_string, apple_public_keys)
-    unless id_token[:iss] == 'https://appleid.apple.com' &&
+    unless id_token[:iss] == "https://appleid.apple.com" &&
            id_token[:aud] == client_id &&
            id_token[:sub].present? &&
            id_token[:exp] > Time.now.to_i
@@ -73,7 +73,7 @@ class AuthenticationProvider::Apple < AuthenticationProvider::OpenIDConnect
     end
 
     user = JSON.parse(params[:user]) if params[:user]
-    id_token.merge!(user['name'].slice('firstName', 'lastName')) if user['name']
+    id_token.merge!(user["name"].slice("firstName", "lastName")) if user["name"]
     id_token
   end
 
@@ -86,7 +86,7 @@ class AuthenticationProvider::Apple < AuthenticationProvider::OpenIDConnect
     # we _could_ update faraday, which has been fixed to deal with this as well,
     # but that's a long rabbit whole of other gems that would need updating and
     # have very large breaking changes, so far riskier
-    super.gsub('+', '%20')
+    super.gsub("+", "%20")
   end
 
   protected
@@ -96,21 +96,21 @@ class AuthenticationProvider::Apple < AuthenticationProvider::OpenIDConnect
   end
 
   def authorize_options
-    { scope: scope, response_type: 'code id_token', response_mode: 'form_post' }
+    { scope: scope, response_type: "code id_token", response_mode: "form_post" }
   end
 
   def scope
     result = []
-    requested_attributes = [login_attribute] + federated_attributes.values.map { |v| v['attribute'] }
-    result << 'name' unless (requested_attributes & ['firstName', 'lastName']).empty?
-    result << 'email' if requested_attributes.include?('email')
-    result.join(' ')
+    requested_attributes = [login_attribute] + federated_attributes.values.map { |v| v["attribute"] }
+    result << "name" unless (requested_attributes & ["firstName", "lastName"]).empty?
+    result << "email" if requested_attributes.include?("email")
+    result.join(" ")
   end
 
   # fetch from https://appleid.apple.com/auth/keys
   def apple_public_keys
-    keys_json = Setting.get('apple_public_key', nil).presence ||
-                CanvasHttp.get('https://appleid.apple.com/auth/keys').body
+    keys_json = Setting.get("apple_public_key", nil).presence ||
+                CanvasHttp.get("https://appleid.apple.com/auth/keys").body
     JSON::JWK::Set.new(JSON.parse(keys_json))
   end
 end

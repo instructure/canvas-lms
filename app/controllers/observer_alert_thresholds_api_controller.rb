@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'atom'
+require "atom"
 
 class ObserverAlertThresholdsApiController < ApplicationController
   include Api::V1::ObserverAlertThreshold
@@ -49,13 +49,13 @@ class ObserverAlertThresholdsApiController < ApplicationController
     begin
       user = api_find(User, attrs[:user_id])
     rescue
-      return render json: { errors: ['user_id is invalid'] }, status: :bad_request
+      return render json: { errors: ["user_id is invalid"] }, status: :bad_request
     end
 
     threshold = ObserverAlertThreshold.where(observer: @current_user, student: user, alert_type: attrs[:alert_type]).take
     if threshold
       # update if duplicate
-      threshold.update(threshold: attrs[:threshold], workflow_state: 'active')
+      threshold.update(threshold: attrs[:threshold], workflow_state: "active")
     else
       attrs = attrs.merge(observer: @current_user)
       threshold = ObserverAlertThreshold.create(attrs)

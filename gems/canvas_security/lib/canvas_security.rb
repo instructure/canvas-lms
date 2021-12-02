@@ -18,16 +18,16 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'active_support/core_ext/module'
-require 'json/jwt'
-require 'dynamic_settings'
-require 'canvas_errors'
-require 'canvas_security/jwk_key_pair'
-require 'canvas_security/jwt_workflow'
-require 'canvas_security/key_storage'
-require 'canvas_security/page_view_jwt'
-require 'canvas_security/rsa_key_pair'
-require 'canvas_security/services_jwt'
+require "active_support/core_ext/module"
+require "json/jwt"
+require "dynamic_settings"
+require "canvas_errors"
+require "canvas_security/jwk_key_pair"
+require "canvas_security/jwt_workflow"
+require "canvas_security/key_storage"
+require "canvas_security/page_view_jwt"
+require "canvas_security/rsa_key_pair"
+require "canvas_security/services_jwt"
 
 module CanvasSecurity
   class UnconfiguredError < StandardError; end
@@ -69,61 +69,61 @@ module CanvasSecurity
 
   def self.encryption_key
     @encryption_key ||= begin
-      res = config && config['encryption_key']
-      raise('encryption key required, see config/security.yml') unless res
-      raise('encryption key is too short, see config/security.yml') unless res.to_s.length >= 20
+      res = config && config["encryption_key"]
+      raise("encryption key required, see config/security.yml") unless res
+      raise("encryption key is too short, see config/security.yml") unless res.to_s.length >= 20
 
       res.to_s
     end
   end
 
   def self.encryption_keys
-    @encryption_keys ||= [encryption_key] + Array(config && config['previous_encryption_keys']).map(&:to_s)
+    @encryption_keys ||= [encryption_key] + Array(config && config["previous_encryption_keys"]).map(&:to_s)
   end
 
   def self.config
     @config ||= begin
-      path = Rails.root + 'config/security.yml'
-      raise('config/security.yml missing, see security.yml.example') unless File.exist?(path)
+      path = Rails.root.join("config/security.yml")
+      raise("config/security.yml missing, see security.yml.example") unless path.file?
 
-      YAML.safe_load(ERB.new(File.read(path)).result, aliases: true)[Rails.env]
+      YAML.safe_load(ERB.new(path.read).result, aliases: true)[Rails.env]
     end
   end
 
   def self.encrypt_data(data)
     nonce = SecureRandom.bytes(12)
-    encryptor = OpenSSL::Cipher.new('aes-256-gcm').encrypt
-    encryptor.key = Digest::SHA1.hexdigest(self.encryption_key)[0...32]
+    encryptor = OpenSSL::Cipher.new("aes-256-gcm").encrypt
+    encryptor.key = Digest::SHA1.hexdigest(encryption_key)[0...32]
     encryptor.iv = nonce
-    encryptor.auth_data = 'Canvas-v1.0.0'
+    encryptor.auth_data = "Canvas-v1.0.0"
     encrypted_data = encryptor.update(data) + encryptor.final
     tag = encryptor.auth_tag
     [encrypted_data, nonce, tag]
   end
 
   def self.decrypt_data(data, nonce, tag)
-    decipher = OpenSSL::Cipher.new('aes-256-gcm').decrypt
-    decipher.key = Digest::SHA1.hexdigest(self.encryption_key)[0...32]
+    decipher = OpenSSL::Cipher.new("aes-256-gcm").decrypt
+    decipher.key = Digest::SHA1.hexdigest(encryption_key)[0...32]
     decipher.iv = nonce
     decipher.auth_tag = tag
-    decipher.auth_data = 'Canvas-v1.0.0'
+    decipher.auth_data = "Canvas-v1.0.0"
     decipher.update(data) + decipher.final
   end
 
   def self.url_key_encrypt_data(data)
-    encryption_data = encrypt_data("#{data.encoding}~#{data.dup.force_encoding('ASCII-8BIT')}")
-    encryption_data.map { |item| Base64.urlsafe_encode64(item, padding: false) }.join('~')
+    encryption_data = encrypt_data("#{data.encoding}~#{data.dup.force_encoding("ASCII-8BIT")}")
+    encryption_data.map { |item| Base64.urlsafe_encode64(item, padding: false) }.join("~")
   end
 
   def self.url_key_decrypt_data(data)
-    encrypted_data, nonce, tag = data.split('~').map { |item| Base64.urlsafe_decode64(item) }
-    encoding, data = decrypt_data(encrypted_data, nonce, tag).split('~', 2)
+    encrypted_data, nonce, tag = data.split("~").map { |item| Base64.urlsafe_decode64(item) }
+    encoding, data = decrypt_data(encrypted_data, nonce, tag).split("~", 2)
     data.force_encoding(encoding)
   end
 
   def self.encrypt_password(secret, key)
-    require 'base64'
-    c = OpenSSL::Cipher.new('aes-256-cbc')
+    require "base64"
+    c = OpenSSL::Cipher.new("aes-256-cbc")
     c.encrypt
     c.key = Digest::SHA1.hexdigest(key + "_" + encryption_key)[0...32]
     c.iv = iv = c.random_iv
@@ -133,11 +133,11 @@ module CanvasSecurity
   end
 
   def self.decrypt_password(secret, salt, key, encryption_key = nil)
-    require 'base64'
+    require "base64"
     encryption_keys = Array(encryption_key) + self.encryption_keys
     last_error = nil
     encryption_keys.each do |single_encryption_key|
-      c = OpenSSL::Cipher.new('aes-256-cbc')
+      c = OpenSSL::Cipher.new("aes-256-cbc")
       c.decrypt
       c.key = Digest::SHA1.hexdigest(key + "_" + single_encryption_key)[0...32]
       c.iv = Base64.decode64(salt)
@@ -155,13 +155,13 @@ module CanvasSecurity
 
   def self.hmac_sha1(str, encryption_key = nil)
     OpenSSL::HMAC.hexdigest(
-      OpenSSL::Digest.new('sha1'), (encryption_key || self.encryption_key), str
+      OpenSSL::Digest.new("sha1"), (encryption_key || self.encryption_key), str
     )
   end
 
   def self.hmac_sha512(str, encryption_key = nil)
     OpenSSL::HMAC.hexdigest(
-      OpenSSL::Digest.new('sha512'), (encryption_key || self.encryption_key), str
+      OpenSSL::Digest.new("sha512"), (encryption_key || self.encryption_key), str
     )
   end
 
@@ -178,7 +178,7 @@ module CanvasSecurity
   end
 
   def self.sign_hmac_sha512(string_to_sign, signing_secret = services_signing_secret)
-    OpenSSL::HMAC.digest('sha512', signing_secret, string_to_sign)
+    OpenSSL::HMAC.digest("sha512", signing_secret, string_to_sign)
   end
 
   def self.verify_hmac_sha512(message, signature, signing_secret = services_signing_secret)
@@ -231,8 +231,8 @@ module CanvasSecurity
     jwt = JSON::JWT.new(payload)
     jws = jwt.sign(signing_secret, alg || :HS256)
     jwe = JSON::JWE.new(jws)
-    jwe.alg = 'dir'
-    jwe.enc = 'A256GCM'
+    jwe.alg = "dir"
+    jwe.enc = "A256GCM"
     jwe.header[:region] = region if region
     jwe.header[:environment] = environment if environment
     jwe.encrypt!(encryption_secret)
@@ -279,7 +279,7 @@ module CanvasSecurity
     end
 
     secrets_to_check = if signing_secret.is_a?(Hash)
-                         Array.wrap(signing_secret[JSON::JWT.decode(signed_coded_jwt.plain_text, :skip_verification).header['alg']])
+                         Array.wrap(signing_secret[JSON::JWT.decode(signed_coded_jwt.plain_text, :skip_verification).header["alg"]])
                        else
                          Array.wrap(signing_secret)
                        end
@@ -295,16 +295,16 @@ module CanvasSecurity
   end
 
   def self.base64_encode(token_string)
-    Base64.encode64(token_string).encode('utf-8').delete("\n")
+    Base64.encode64(token_string).encode("utf-8").delete("\n")
   end
 
   def self.base64_decode(token_string)
     utf8_string = token_string.dup.force_encoding(Encoding::UTF_8)
-    Base64.decode64(utf8_string.encode('ascii-8bit'))
+    Base64.decode64(utf8_string.encode("ascii-8bit"))
   end
 
   def self.validate_encryption_key(overwrite = false)
-    db_hash = settings_store.get('encryption_key_hash', nil) rescue return # in places like rake db:test:reset, we don't care that the db/table doesn't exist
+    db_hash = settings_store.get("encryption_key_hash", nil) rescue return # in places like rake db:test:reset, we don't care that the db/table doesn't exist
     return if encryption_keys.any? { |key| Digest::SHA1.hexdigest(key) == db_hash }
 
     if db_hash.nil? || overwrite
@@ -342,16 +342,15 @@ module CanvasSecurity
         end
       end
 
-      if body[:exp].present? && !ignore_expiration
-        if timestamp_as_integer(body[:exp]) < verification_time.to_i
-          raise CanvasSecurity::TokenExpired
-        end
+      if body[:exp].present? &&
+         !ignore_expiration &&
+         timestamp_as_integer(body[:exp]) < verification_time.to_i
+        raise CanvasSecurity::TokenExpired
       end
 
-      if body[:nbf].present?
-        if timestamp_as_integer(body[:nbf]) > verification_time.to_i
-          raise CanvasSecurity::InvalidToken
-        end
+      if body[:nbf].present? &&
+         timestamp_as_integer(body[:nbf]) > verification_time.to_i
+        raise CanvasSecurity::InvalidToken
       end
     end
 

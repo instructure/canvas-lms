@@ -28,7 +28,7 @@ module Lti
       ObserverEnrollment => LtiOutbound::LTIRoles::ContextNotNamespaced::OBSERVER,
       AccountUser => LtiOutbound::LTIRoles::Institution::ADMIN,
       StudentViewEnrollment => LtiOutbound::LTIRoles::ContextNotNamespaced::LEARNER
-    }
+    }.freeze
 
     def initialize(canvas_user, canvas_root_account, canvas_tool, canvas_context)
       @canvas_user = canvas_user
@@ -49,12 +49,12 @@ module Lti
       user.name = @canvas_user.name
       user.opaque_identifier = @opaque_identifier
       user.timezone = Time.zone.tzinfo.name
-      user.currently_active_in_course = -> { currently_active_in_course?() }
-      user.concluded_roles = -> { concluded_roles() }
+      user.currently_active_in_course = -> { currently_active_in_course? }
+      user.concluded_roles = -> { concluded_roles }
       user.login_id = -> { pseudonym ? pseudonym.unique_id : nil }
       user.sis_source_id = -> { pseudonym ? pseudonym.sis_user_id : nil }
-      user.current_observee_ids = -> { current_course_observee_lti_context_ids() }
-      user.current_roles = lti_helper.current_lis_roles.split(',')
+      user.current_observee_ids = -> { current_course_observee_lti_context_ids }
+      user.current_roles = lti_helper.current_lis_roles.split(",")
 
       user
     end
@@ -94,17 +94,15 @@ module Lti
                                                                .current
                                                                .where(course_id: @canvas_context)
                                                                .preload(:associated_user)
-                                                               .map { |e| e.try(:associated_user).try(:lti_context_id) }.compact
+                                                               .filter_map { |e| e.try(:associated_user).try(:lti_context_id) }
     end
 
-    def current_account_enrollments()
-      unless @current_account_enrollments
-        if @canvas_context.respond_to?(:account_chain) && !@canvas_context.account_chain.empty?
-          @current_account_enrollments = @canvas_user.account_users.active.where(account_id: @canvas_context.account_chain).distinct.to_a
-        else
-          @current_account_enrollments = []
-        end
-      end
+    def current_account_enrollments
+      @current_account_enrollments ||= if @canvas_context.respond_to?(:account_chain) && !@canvas_context.account_chain.empty?
+                                         @canvas_user.account_users.active.where(account_id: @canvas_context.account_chain).distinct.to_a
+                                       else
+                                         []
+                                       end
       @current_account_enrollments
     end
 

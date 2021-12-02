@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 Rails.configuration.to_prepare do
-  CanvasKaltura.timeout_protector_proc = Proc.new() do |options, &block|
+  CanvasKaltura.timeout_protector_proc = proc do |options, &block|
     Canvas.timeout_protection("kaltura", options, &block)
   end
   CanvasKaltura.logger = Rails.logger

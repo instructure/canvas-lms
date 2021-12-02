@@ -17,29 +17,29 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../common'
-require_relative '../helpers/blueprint_common'
+require_relative "../common"
+require_relative "../helpers/blueprint_common"
 
 shared_context "Blueprint Sync History Context" do
   def verify_sync_history
-    second_migration = f('.bcs__history-item:nth-of-type(2)')
+    second_migration = f(".bcs__history-item:nth-of-type(2)")
     expect(fj("span:contains('Created')", second_migration)).to be_displayed
-    first_migration = f('.bcs__history-item:nth-of-type(1)')
+    first_migration = f(".bcs__history-item:nth-of-type(1)")
     expect(fj("span:contains('Updated')", first_migration)).to be_displayed
   end
 
   def open_sync_history
     get "/courses/#{@master.id}"
-    f('.blueprint__root .bcs__wrapper .bcs__trigger').click
-    f('#mcSyncHistoryBtn').click
+    f(".blueprint__root .bcs__wrapper .bcs__trigger").click
+    f("#mcSyncHistoryBtn").click
   end
 
   def open_item_history
-    f('.bcs__history-item:nth-of-type(1) #exceptionPill').click
+    f(".bcs__history-item:nth-of-type(1) #exceptionPill").click
   end
 
   def exceptions_frame
-    f('.bcs__history-item__change-exceps')
+    f(".bcs__history-item__change-exceps")
   end
 end
 
@@ -65,7 +65,7 @@ describe "sync history modal" do
       user_session(@master_teacher)
     end
 
-    it "shows sync history modal for assignment", priority: "2", test_id: 3178864 do
+    it "shows sync history modal for assignment", priority: "2" do
       update_child_assignment(@minion, :points_possible, 8.0)
       update_master_assignment_and_migrate(@master, :points_possible, 15.0)
       open_sync_history
@@ -86,7 +86,7 @@ describe "sync history modal" do
       user_session(@master_teacher)
     end
 
-    it "shows sync history modal for discussions", priority: "2", test_id: 3179204 do
+    it "shows sync history modal for discussions", priority: "2" do
       update_child_discussion(@minion)
       update_master_discussion_and_migrate(@master)
       open_sync_history
@@ -107,7 +107,7 @@ describe "sync history modal" do
       user_session(@master_teacher)
     end
 
-    it "shows sync history for availability dates exception in assignments", priority: "2", test_id: 3179204 do
+    it "shows sync history for availability dates exception in assignments", priority: "2" do
       update_child_assignment(@minion, :unlock_at, Time.zone.now + 1.day)
       update_master_assignment_and_migrate(@master, :unlock_at, Time.zone.now + 3.days)
       open_sync_history
@@ -128,7 +128,7 @@ describe "sync history modal" do
       user_session(@master_teacher)
     end
 
-    it "shows sync history modal for pages", priority: "2", test_id: 3179205 do
+    it "shows sync history modal for pages", priority: "2" do
       update_child_page(@minion)
       update_master_page_and_migrate(@master)
       open_sync_history
@@ -149,7 +149,7 @@ describe "sync history modal" do
       user_session(@master_teacher)
     end
 
-    it "shows sync history modal for quizzes", priority: "2", test_id: 3179206 do
+    it "shows sync history modal for quizzes", priority: "2" do
       update_child_quiz(@minion)
       update_master_quiz_and_migrate(@master)
       open_sync_history

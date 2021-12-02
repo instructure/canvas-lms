@@ -18,11 +18,11 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../spec_helper'
+require_relative "../spec_helper"
 
 RSpec.describe AnonymousSubmissionsController do
-  it_behaves_like 'a submission update action', :anonymous_submissions
-  it_behaves_like 'a submission redo_submission action', :anonymous_submissions
+  it_behaves_like "a submission update action", :anonymous_submissions
+  it_behaves_like "a submission redo_submission action", :anonymous_submissions
 
   describe "GET show" do
     before do
@@ -34,32 +34,32 @@ RSpec.describe AnonymousSubmissionsController do
       @assignment.unmute!
     end
 
-    let(:body) { JSON.parse(response.body)['submission'] }
+    let(:body) { JSON.parse(response.body)["submission"] }
 
     it "renders show template" do
       get :show, params: { course_id: @context.id, assignment_id: @assignment.id, anonymous_id: @submission.anonymous_id }
-      expect(response).to render_template('submissions/show')
+      expect(response).to render_template("submissions/show")
     end
 
     it "renders json with scores for teachers" do
       request.accept = Mime[:json].to_s
       get :show, params: { course_id: @context.id, assignment_id: @assignment.id, anonymous_id: @submission.anonymous_id }, format: :json
-      expect(body['anonymous_id']).to eq @submission.anonymous_id
-      expect(body['score']).to eq 10
-      expect(body['grade']).to eq '10'
-      expect(body['published_grade']).to eq '10'
-      expect(body['published_score']).to eq 10
+      expect(body["anonymous_id"]).to eq @submission.anonymous_id
+      expect(body["score"]).to eq 10
+      expect(body["grade"]).to eq "10"
+      expect(body["published_grade"]).to eq "10"
+      expect(body["published_score"]).to eq 10
     end
 
     it "renders json with scores for students" do
       user_session(@student)
       request.accept = Mime[:json].to_s
       get :show, params: { course_id: @context.id, assignment_id: @assignment.id, anonymous_id: @submission.anonymous_id }, format: :json
-      expect(body['anonymous_id']).to eq @submission.anonymous_id
-      expect(body['score']).to eq 10
-      expect(body['grade']).to eq '10'
-      expect(body['published_grade']).to eq '10'
-      expect(body['published_score']).to eq 10
+      expect(body["anonymous_id"]).to eq @submission.anonymous_id
+      expect(body["score"]).to eq 10
+      expect(body["grade"]).to eq "10"
+      expect(body["published_grade"]).to eq "10"
+      expect(body["published_score"]).to eq 10
     end
 
     it "mark read if reading one's own submission" do
@@ -87,14 +87,14 @@ RSpec.describe AnonymousSubmissionsController do
     end
 
     it "renders json with a not-found error for teachers when the assignment is anonymous and grades are not posted" do
-      @student.update!(name: 'some student')
+      @student.update!(name: "some student")
       user_session(@teacher)
       @assignment.mute!
       request.accept = Mime[:json].to_s
       get :show, params: { course_id: @context.id, assignment_id: @assignment.id, anonymous_id: @submission.anonymous_id }, format: :json
 
       # render_user_not_found attempts to render the passed-in ID param and ignores anonymous_id
-      expect(JSON.parse(response.body)['errors']).to eq "The specified user () is not a student in this course"
+      expect(JSON.parse(response.body)["errors"]).to eq "The specified user () is not a student in this course"
     end
 
     it "renders json without scores for students whose grades have not posted" do
@@ -102,11 +102,11 @@ RSpec.describe AnonymousSubmissionsController do
       @assignment.mute!
       request.accept = Mime[:json].to_s
       get :show, params: { course_id: @context.id, assignment_id: @assignment.id, anonymous_id: @submission.anonymous_id }, format: :json
-      expect(body['anonymous_id']).to eq @submission.anonymous_id
-      expect(body['score']).to be nil
-      expect(body['grade']).to be nil
-      expect(body['published_grade']).to be nil
-      expect(body['published_score']).to be nil
+      expect(body["anonymous_id"]).to eq @submission.anonymous_id
+      expect(body["score"]).to be nil
+      expect(body["grade"]).to be nil
+      expect(body["published_grade"]).to be nil
+      expect(body["published_score"]).to be nil
     end
 
     it "shows rubric assessments to peer reviewers" do
@@ -114,11 +114,11 @@ RSpec.describe AnonymousSubmissionsController do
       @course.account.enable_service(:avatars)
       @assessor = @student
       outcome_with_rubric
-      @association = @rubric.associate_with @assignment, @context, :purpose => 'grading'
+      @association = @rubric.associate_with @assignment, @context, purpose: "grading"
       @assignment.peer_reviews = true
       @assignment.save!
       @assignment.assign_peer_review(@assessor, @submission.user)
-      @assessment = @association.assess(:assessor => @assessor, :user => @submission.user, :artifact => @submission, :assessment => { :assessment_type => 'grading' })
+      @assessment = @association.assess(assessor: @assessor, user: @submission.user, artifact: @submission, assessment: { assessment_type: "grading" })
       user_session(@assessor)
 
       get :show, params: { course_id: @context.id, assignment_id: @assignment.id, anonymous_id: @submission.anonymous_id }
@@ -129,7 +129,7 @@ RSpec.describe AnonymousSubmissionsController do
 
     it "redirects to the course page if the viewer may not view details for the submission" do
       course = Course.create!
-      assignment = course.assignments.create!(title: 'hi')
+      assignment = course.assignments.create!(title: "hi")
       student1 = course.enroll_student(User.create!, active_all: true).user
       student2 = course.enroll_student(User.create!, active_all: true).user
 
@@ -141,19 +141,19 @@ RSpec.describe AnonymousSubmissionsController do
     end
   end
 
-  context 'originality report' do
+  context "originality report" do
     let(:account) { Account.default }
     let(:course) do
       course = account.courses.create!
       course.account.enable_service(:avatars)
-      course.enroll_teacher(teacher, enrollment_state: 'active')
-      course.enroll_student(student, enrollment_state: 'active')
+      course.enroll_teacher(teacher, enrollment_state: "active")
+      course.enroll_student(student, enrollment_state: "active")
       course
     end
 
     let(:teacher) { User.create! }
     let(:student) { User.create! }
-    let(:assignment) { course.assignments.create!(title: 'test assignment') }
+    let(:assignment) { course.assignments.create!(title: "test assignment") }
     let(:attachment) { student.attachments.create!(filename: "submission.doc", uploaded_data: default_uploaded_data) }
     let(:submission) { assignment.submit_homework(student, attachments: [attachment]) }
     let!(:originality_report) do
@@ -161,15 +161,15 @@ RSpec.describe AnonymousSubmissionsController do
         attachment: attachment,
         submission: submission,
         originality_score: 0.5,
-        originality_report_url: 'http://www.instructure.com'
+        originality_report_url: "http://www.instructure.com"
       )
     end
 
     before { user_session(teacher) }
 
-    describe 'GET originality_report' do
-      it 'redirects to the originality report URL if it exists' do
-        get 'originality_report', params: {
+    describe "GET originality_report" do
+      it "redirects to the originality report URL if it exists" do
+        get "originality_report", params: {
           course_id: assignment.context_id,
           assignment_id: assignment.id,
           anonymous_id: submission.anonymous_id,
@@ -178,9 +178,9 @@ RSpec.describe AnonymousSubmissionsController do
         expect(response).to redirect_to originality_report.originality_report_url
       end
 
-      it 'shows a notice if no URL is present for the OriginalityReport' do
+      it "shows a notice if no URL is present for the OriginalityReport" do
         originality_report.update!(originality_report_url: nil)
-        get 'originality_report', params: {
+        get "originality_report", params: {
           course_id: assignment.context_id,
           assignment_id: assignment.id,
           anonymous_id: submission.anonymous_id,
@@ -189,9 +189,9 @@ RSpec.describe AnonymousSubmissionsController do
         expect(flash[:error]).to be_present
       end
 
-      it 'redirects to SpeedGrader if no URL is present for the OriginalityReport' do
+      it "redirects to SpeedGrader if no URL is present for the OriginalityReport" do
         originality_report.update!(originality_report_url: nil)
-        get 'originality_report', params: {
+        get "originality_report", params: {
           course_id: assignment.context_id,
           assignment_id: assignment.id,
           anonymous_id: submission.anonymous_id,
@@ -206,21 +206,21 @@ RSpec.describe AnonymousSubmissionsController do
         expect(response).to redirect_to(redirect_url)
       end
 
-      it 'returns an error if the assignment does not exist' do
-        get 'originality_report', params: {
+      it "returns an error if the assignment does not exist" do
+        get "originality_report", params: {
           course_id: assignment.context_id,
           assignment_id: -1,
-          anonymous_id: '{ user_id }',
+          anonymous_id: "{ user_id }",
           asset_string: attachment.asset_string
         }
         expect(response).to have_http_status(:not_found)
       end
 
-      it 'returns an error if anonymous_id is not valid' do
-        get 'originality_report', params: {
+      it "returns an error if anonymous_id is not valid" do
+        get "originality_report", params: {
           course_id: assignment.context_id,
           assignment_id: assignment.id,
-          anonymous_id: '{ user_id }',
+          anonymous_id: "{ user_id }",
           asset_string: attachment.asset_string
         }
         expect(response).to have_http_status(:bad_request)
@@ -229,7 +229,7 @@ RSpec.describe AnonymousSubmissionsController do
       it "returns unauthorized for users who can't read submission" do
         unauthorized_user = User.create
         user_session(unauthorized_user)
-        get 'originality_report', params: {
+        get "originality_report", params: {
           course_id: assignment.context_id,
           assignment_id: assignment.id,
           anonymous_id: submission.anonymous_id,
@@ -239,18 +239,18 @@ RSpec.describe AnonymousSubmissionsController do
       end
     end
 
-    describe 'POST resubmit_to_turnitin' do
-      it 'returns an error if assignment_id is not an integer' do
-        post 'resubmit_to_turnitin', params: {
+    describe "POST resubmit_to_turnitin" do
+      it "returns an error if assignment_id is not an integer" do
+        post "resubmit_to_turnitin", params: {
           course_id: assignment.context_id,
-          assignment_id: 'assignment-id',
+          assignment_id: "assignment-id",
           anonymous_id: submission.anonymous_id
         }
         expect(response).to have_http_status(:bad_request)
       end
 
       it "returns an error if the assignment does not exist" do
-        post 'resubmit_to_turnitin', params: {
+        post "resubmit_to_turnitin", params: {
           course_id: assignment.context_id,
           assignment_id: -1,
           anonymous_id: submission.anonymous_id,
@@ -259,17 +259,17 @@ RSpec.describe AnonymousSubmissionsController do
       end
 
       it "returns an error if the anonymous_id does not exist" do
-        post 'resubmit_to_turnitin', params: {
+        post "resubmit_to_turnitin", params: {
           course_id: assignment.context_id,
           assignment_id: assignment.id,
-          anonymous_id: '!?!?!',
+          anonymous_id: "!?!?!",
         }
         expect(response).to have_http_status(:bad_request)
       end
 
       it "emits a 'plagiarism_resubmit' live event if originality report exists" do
         expect(Canvas::LiveEvents).to receive(:plagiarism_resubmit)
-        post 'resubmit_to_turnitin', params: {
+        post "resubmit_to_turnitin", params: {
           course_id: assignment.context_id,
           assignment_id: assignment.id,
           anonymous_id: submission.anonymous_id
@@ -279,7 +279,7 @@ RSpec.describe AnonymousSubmissionsController do
       it "emits a 'plagiarism_resubmit' live event if originality report does not exist" do
         originality_report.destroy!
         expect(Canvas::LiveEvents).to receive(:plagiarism_resubmit)
-        post 'resubmit_to_turnitin', params: {
+        post "resubmit_to_turnitin", params: {
           course_id: assignment.context_id,
           assignment_id: assignment.id,
           anonymous_id: submission.anonymous_id
@@ -288,27 +288,27 @@ RSpec.describe AnonymousSubmissionsController do
     end
   end
 
-  describe 'GET turnitin_report' do
+  describe "GET turnitin_report" do
     let(:course) { Course.create! }
     let(:student) { course.enroll_student(User.create!).user }
     let(:teacher) { course.enroll_teacher(User.create!).user }
     let(:assignment) do
       course.assignments.create!(
         anonymous_grading: true,
-        submission_types: 'online_text_entry',
-        title: 'hi'
+        submission_types: "online_text_entry",
+        title: "hi"
       )
     end
-    let(:submission) { assignment.submit_homework(student, body: 'zzzzzzzzzz') }
+    let(:submission) { assignment.submit_homework(student, body: "zzzzzzzzzz") }
     let(:asset_string) { submission.id.to_s }
 
     before { user_session(teacher) }
 
-    it 'returns bad_request if anonymous_id is not valid' do
-      get 'turnitin_report', params: {
+    it "returns bad_request if anonymous_id is not valid" do
+      get "turnitin_report", params: {
         course_id: assignment.context_id,
         assignment_id: assignment.id,
-        anonymous_id: '{ anonymous_id }',
+        anonymous_id: "{ anonymous_id }",
         asset_string: asset_string
       }
       expect(response).to have_http_status(:bad_request)
@@ -316,11 +316,11 @@ RSpec.describe AnonymousSubmissionsController do
 
     context "when the submission's turnitin data contains a report URL" do
       before do
-        submission.update!(turnitin_data: { asset_string => { report_url: 'MY_GREAT_REPORT' } })
+        submission.update!(turnitin_data: { asset_string => { report_url: "MY_GREAT_REPORT" } })
       end
 
       it "redirects to the course tool retrieval URL" do
-        get 'turnitin_report', params: {
+        get "turnitin_report", params: {
           course_id: assignment.context_id,
           assignment_id: assignment.id,
           anonymous_id: submission.anonymous_id,
@@ -330,7 +330,7 @@ RSpec.describe AnonymousSubmissionsController do
       end
 
       it "includes the report URL in the redirect" do
-        get 'turnitin_report', params: {
+        get "turnitin_report", params: {
           course_id: assignment.context_id,
           assignment_id: assignment.id,
           anonymous_id: submission.anonymous_id,
@@ -341,7 +341,7 @@ RSpec.describe AnonymousSubmissionsController do
     end
 
     it "redirects the user to SpeedGrader if no turnitin URL exists" do
-      get 'turnitin_report', params: {
+      get "turnitin_report", params: {
         course_id: assignment.context_id,
         assignment_id: assignment.id,
         anonymous_id: submission.anonymous_id,
@@ -357,7 +357,7 @@ RSpec.describe AnonymousSubmissionsController do
     end
 
     it "displays a flash error if no turnitin URL exists" do
-      get 'turnitin_report', params: {
+      get "turnitin_report", params: {
         course_id: assignment.context_id,
         assignment_id: assignment.id,
         anonymous_id: submission.anonymous_id,

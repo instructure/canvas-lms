@@ -18,9 +18,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'hash_view'
-require 'method_view'
-require 'object_view'
+require "hash_view"
+require "method_view"
+require "object_view"
 
 class ControllerView < HashView
   attr_reader :controller
@@ -35,7 +35,7 @@ class ControllerView < HashView
   end
 
   def name
-    format(raw_name.sub(/controller$/i, '').sub(/api$/i, ''))
+    format(raw_name.sub(/controller$/i, "").sub(/api$/i, ""))
   end
 
   def objects
@@ -51,7 +51,7 @@ class ControllerView < HashView
   end
 
   def desc
-    if (tag = @controller.tags.find { |t| t.tag_name == 'API' })
+    if (tag = @controller.tags.find { |t| t.tag_name == "API" })
       tag.text
     else
       name
@@ -61,9 +61,9 @@ class ControllerView < HashView
   def raw_methods
     @controller.children.select do |method|
       method.tags.find do |tag|
-        tag.tag_name.downcase == "api"
-      end && !method.tags.any? do |tag|
-        tag.tag_name.downcase == "internal"
+        tag.tag_name.casecmp?("api")
+      end && method.tags.none? do |tag|
+        tag.tag_name.casecmp?("internal")
       end
     end
   end
@@ -77,7 +77,7 @@ class ControllerView < HashView
   def to_hash
     {
       "name" => name,
-      "methods" => methods.map { |m| m.to_hash },
+      "methods" => methods.map(&:to_hash),
     }
   end
 end

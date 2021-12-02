@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../../views_helper'
+require_relative "../../views_helper"
 
 describe "/quizzes/quizzes/history" do
   before do
@@ -27,7 +27,7 @@ describe "/quizzes/quizzes/history" do
     assign(:user, @user)
   end
 
-  context 'beta quiz navigation' do
+  context "beta quiz navigation" do
     before do
       quiz = assign(:quiz, @course.quizzes.create!)
       sub = assign(:submission, quiz.generate_submission(@user))
@@ -35,7 +35,7 @@ describe "/quizzes/quizzes/history" do
       assign(:version_instances, sub.submitted_attempts)
     end
 
-    it 'displays when configured' do
+    it "displays when configured" do
       @student.preferences[:enable_speedgrader_grade_by_question] = true
       @student.save!
       render "quizzes/quizzes/history"
@@ -50,13 +50,13 @@ describe "/quizzes/quizzes/history" do
     end
   end
 
-  context 'question group warning' do
+  context "question group warning" do
     before do
       @student.preferences[:enable_speedgrader_grade_by_question] = true
       @student.save!
     end
 
-    it 'displays when quiz has question groups' do
+    it "displays when quiz has question groups" do
       @quiz = @course.quizzes.create!
       @quiz.quiz_groups.create!
       assign(:quiz, @quiz)
@@ -68,7 +68,7 @@ describe "/quizzes/quizzes/history" do
       expect(response.body).to match(/grade-by-question-warning/)
     end
 
-    it 'does not display when quiz has only questions' do
+    it "does not display when quiz has only questions" do
       quiz = assign(:quiz, @course.quizzes.create!)
       sub = assign(:submission, quiz.generate_submission(@user))
       assign(:current_submission, sub)
@@ -79,13 +79,13 @@ describe "/quizzes/quizzes/history" do
     end
   end
 
-  context 'for an anonymous survey' do
+  context "for an anonymous survey" do
     it "doesn't display the user name" do
-      quiz = assign(:quiz, @course.quizzes.create!(quiz_type: 'survey', anonymous_submissions: true))
+      quiz = assign(:quiz, @course.quizzes.create!(quiz_type: "survey", anonymous_submissions: true))
       submission = assign(:submission, quiz.generate_submission(@user))
       assign(:current_submission, submission)
       assign(:version_instances, submission.submitted_attempts)
-      render 'quizzes/quizzes/history'
+      render "quizzes/quizzes/history"
       expect(response.body).not_to include(@user.name)
     end
   end

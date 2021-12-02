@@ -17,18 +17,18 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../common'
+require_relative "../common"
 
 describe "course sections" do
   include_context "in-process server selenium tests"
 
   def add_enrollment(enrollment_state, section)
-    enrollment = student_in_course(:workflow_state => enrollment_state, :course_section => section)
-    enrollment.accept! if enrollment_state == 'active' || enrollment_state == 'completed'
+    enrollment = student_in_course(workflow_state: enrollment_state, course_section: section)
+    enrollment.accept! if enrollment_state == "active" || enrollment_state == "completed"
   end
 
   def table_rows
-    ff('#enrollment_table tr')
+    ff("#enrollment_table tr")
   end
 
   before do
@@ -37,12 +37,12 @@ describe "course sections" do
   end
 
   it "validates the display when multiple enrollments exist" do
-    add_enrollment('active', @section)
+    add_enrollment("active", @section)
     get "/courses/#{@course.id}/sections/#{@section.id}"
 
     wait_for_ajaximations
     expect(table_rows.count).to eq 1
-    expect(table_rows[0]).to include_text('2 Active Enrollments')
+    expect(table_rows[0]).to include_text("2 Active Enrollments")
   end
 
   it "validates the display when only 1 enrollment exists" do
@@ -50,48 +50,48 @@ describe "course sections" do
 
     wait_for_ajaximations
     expect(table_rows.count).to eq 1
-    expect(table_rows[0]).to include_text('1 Active Enrollment')
+    expect(table_rows[0]).to include_text("1 Active Enrollment")
   end
 
   it "displays the correct pending enrollments count" do
-    add_enrollment('pending', @section)
-    add_enrollment('invited', @section)
+    add_enrollment("pending", @section)
+    add_enrollment("invited", @section)
     get "/courses/#{@course.id}/sections/#{@section.id}"
 
     wait_for_ajaximations
     expect(table_rows.count).to eq 2
-    expect(table_rows[0]).to include_text('2 Pending Enrollments')
+    expect(table_rows[0]).to include_text("2 Pending Enrollments")
   end
 
   it "displays the correct completed enrollments count" do
-    add_enrollment('completed', @section)
+    add_enrollment("completed", @section)
     @course.complete!
     get "/courses/#{@course.id}/sections/#{@section.id}"
 
     wait_for_ajaximations
     expect(table_rows.count).to eq 1
-    expect(table_rows[0]).to include_text('2 Completed Enrollments')
+    expect(table_rows[0]).to include_text("2 Completed Enrollments")
   end
 
   it "edits the section" do
-    edit_name = 'edited section name'
+    edit_name = "edited section name"
     get "/courses/#{@course.id}/sections/#{@section.id}"
 
-    f('.edit_section_link').click
-    edit_form = f('#edit_section_form')
-    replace_content(edit_form.find_element(:id, 'course_section_name'), edit_name)
+    f(".edit_section_link").click
+    edit_form = f("#edit_section_form")
+    replace_content(edit_form.find_element(:id, "course_section_name"), edit_name)
     submit_form(edit_form)
     wait_for_ajaximations
-    expect(f('#section_name')).to include_text(edit_name)
+    expect(f("#section_name")).to include_text(edit_name)
   end
 
   it "parses dates" do
     get "/courses/#{@course.id}/sections/#{@section.id}"
 
-    f('.edit_section_link').click
-    edit_form = f('#edit_section_form')
-    replace_and_proceed(edit_form.find_element(:id, 'course_section_start_at'), '1/2/15')
-    replace_and_proceed(edit_form.find_element(:id, 'course_section_end_at'), '04 Mar 2015')
+    f(".edit_section_link").click
+    edit_form = f("#edit_section_form")
+    replace_and_proceed(edit_form.find_element(:id, "course_section_start_at"), "1/2/15")
+    replace_and_proceed(edit_form.find_element(:id, "course_section_end_at"), "04 Mar 2015")
     submit_form(edit_form)
     wait_for_ajax_requests
     @section.reload
@@ -101,10 +101,10 @@ describe "course sections" do
 
   context "account admin" do
     before do
-      Account.default.role_overrides.create! role: admin_role, permission: 'manage_sis', enabled: true
-      @subaccount = Account.default.sub_accounts.create! name: 'sub'
+      Account.default.role_overrides.create! role: admin_role, permission: "manage_sis", enabled: true
+      @subaccount = Account.default.sub_accounts.create! name: "sub"
       course_factory account: @subaccount
-      @section = @course.course_sections.create! name: 'sec'
+      @section = @course.course_sections.create! name: "sec"
     end
 
     it "lets a root account admin modify the sis ID" do
@@ -112,9 +112,9 @@ describe "course sections" do
       user_session @admin
       get "/courses/#{@course.id}/sections/#{@section.id}"
 
-      f('.edit_section_link').click
-      edit_form = f('#edit_section_form')
-      expect(edit_form).to contain_css('input#course_section_sis_source_id')
+      f(".edit_section_link").click
+      edit_form = f("#edit_section_form")
+      expect(edit_form).to contain_css("input#course_section_sis_source_id")
     end
 
     it "does not let a subaccount admin modify the sis ID" do
@@ -122,9 +122,9 @@ describe "course sections" do
       user_session @admin
       get "/courses/#{@course.id}/sections/#{@section.id}"
 
-      f('.edit_section_link').click
-      edit_form = f('#edit_section_form')
-      expect(edit_form).not_to contain_css('input#course_section_sis_source_id')
+      f(".edit_section_link").click
+      edit_form = f("#edit_section_form")
+      expect(edit_form).not_to contain_css("input#course_section_sis_source_id")
     end
   end
 
@@ -133,7 +133,7 @@ describe "course sections" do
       @account = Account.default
     end
 
-    it "course section page should display student name in tray", priority: "1", test_id: 3022068 do
+    it "course section page should display student name in tray", priority: "1" do
       add_enrollment("active", @section)
       get("/courses/#{@course.id}/sections/#{@section.id}")
       f("a[data-student_id='#{@student.id}']").click

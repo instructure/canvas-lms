@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'fileutils'
+require "fileutils"
 
 module AttachmentFu # :nodoc:
   module Backends
@@ -44,7 +44,7 @@ module AttachmentFu # :nodoc:
 
       # Used as the base path that #public_filename strips off full_filename to create the public path
       def base_path
-        @base_path ||= Rails.root.join('public').to_s
+        @base_path ||= Rails.root.join("public").to_s
       end
 
       # The attachment ID used in the full path of a file
@@ -61,12 +61,12 @@ module AttachmentFu # :nodoc:
       # Gets the public path to the file
       # The optional thumbnail argument will output the thumbnail's filename.
       def public_filename(thumbnail = nil)
-        full_filename(thumbnail).gsub %r(^#{Regexp.escape(base_path)}), ''
+        full_filename(thumbnail).gsub(/^#{Regexp.escape(base_path)}/, "")
       end
 
       def authenticated_s3_url(*args)
         if args[0].is_a?(Hash) && !args[0][:secure].nil?
-          protocol = args[0][:secure] ? 'https://' : 'http://'
+          protocol = args[0][:secure] ? "https://" : "http://"
         end
         protocol ||= "#{HostUrl.protocol}://"
         "#{protocol}#{local_storage_path}"
@@ -74,25 +74,25 @@ module AttachmentFu # :nodoc:
 
       def filename=(value)
         value = sanitize_filename(value)
-        if self.new_record?
-          write_attribute :filename, value
-        else
-          @old_filename = full_filename unless filename.nil? || @old_filename
-          write_attribute :filename, value
+        if !new_record? && !(filename.nil? || @old_filename)
+          @old_filename = full_filename
         end
+        write_attribute :filename, value
       end
 
       def sanitize_filename(filename)
-        if self.respond_to?(:root_attachment) && self.root_attachment && self.root_attachment.filename
-          filename = self.root_attachment.filename
+        if respond_to?(:root_attachment) && root_attachment && root_attachment.filename
+          filename = root_attachment.filename
         else
           filename = Attachment.truncate_filename(filename, 255)
-          filename.gsub!(%r{/| }, '_')
+          filename.gsub!(%r{/| }, "_")
         end
         filename
       end
 
-      def bucket_name; "no-bucket"; end
+      def bucket_name
+        "no-bucket"
+      end
 
       # Creates a temp file from the currently saved file.
       def create_temp_file
@@ -105,7 +105,7 @@ module AttachmentFu # :nodoc:
       def destroy_file
         FileUtils.rm full_filename
         # remove directory also if it is now empty
-        Dir.rmdir(File.dirname(full_filename)) if (Dir.entries(File.dirname(full_filename)) - ['.', '..']).empty?
+        Dir.rmdir(File.dirname(full_filename)) if (Dir.entries(File.dirname(full_filename)) - [".", ".."]).empty?
       rescue
         logger.info "Exception destroying  #{full_filename.inspect}: [#{$!.class.name}] #{$!}"
         logger.warn $!.backtrace.collect { |b| " > #{b}" }.join("\n")
@@ -129,7 +129,7 @@ module AttachmentFu # :nodoc:
           # TODO: This overwrites the file if it exists, maybe have an allow_overwrite option?
           FileUtils.mkdir_p(File.dirname(full_filename))
           FileUtils.cp(temp_path, full_filename)
-          File.chmod(attachment_options[:chmod] || 0644, full_filename)
+          File.chmod(attachment_options[:chmod] || 0o644, full_filename)
         end
         @old_filename = nil
         true

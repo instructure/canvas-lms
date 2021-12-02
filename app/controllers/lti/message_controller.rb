@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-require 'ims/lti'
+require "ims/lti"
 
 module Lti
   class InvalidDomain < StandardError
@@ -42,29 +42,27 @@ module Lti
         )
 
         @lti_launch.params = message.post_params
-        @lti_launch.params['oauth2_access_token_url'] = polymorphic_url([@context, :lti_oauth2_authorize])
-        @lti_launch.params['ext_tool_consumer_instance_guid'] = @context.root_account.lti_guid
-        @lti_launch.params['ext_api_domain'] = HostUrl.context_host(@context, request.host)
-        @lti_launch.link_text = I18n.t('lti2.register_tool', 'Register Tool')
+        @lti_launch.params["oauth2_access_token_url"] = polymorphic_url([@context, :lti_oauth2_authorize])
+        @lti_launch.params["ext_tool_consumer_instance_guid"] = @context.root_account.lti_guid
+        @lti_launch.params["ext_api_domain"] = HostUrl.context_host(@context, request.host)
+        @lti_launch.link_text = I18n.t("lti2.register_tool", "Register Tool")
         @lti_launch.launch_type = message.launch_presentation_document_target
-        render Lti::AppUtil.display_template('borderless')
+        render Lti::AppUtil.display_template("borderless")
       end
     end
 
     def reregistration
-      if authorized_action(@context, @current_user, :update)
-        if (tp = ToolProxy.find(params['tool_proxy_id']))
-          mh = tp.reregistration_message_handler
-          return not_found unless mh.present?
+      if authorized_action(@context, @current_user, :update) && (tp = ToolProxy.find(params["tool_proxy_id"]))
+        mh = tp.reregistration_message_handler
+        return not_found unless mh.present?
 
-          message = reregistration_message(mh, tp)
-          @lti_launch = Launch.new
-          @lti_launch.resource_url = message.launch_url
-          @lti_launch.link_text = mh.resource_handler.name
-          @lti_launch.launch_type = message.launch_presentation_document_target
-          @lti_launch.params = launch_params(tool_proxy: tp, message: message, private_key: tp.shared_secret)
-          render Lti::AppUtil.display_template('borderless') and return
-        end
+        message = reregistration_message(mh, tp)
+        @lti_launch = Launch.new
+        @lti_launch.resource_url = message.launch_url
+        @lti_launch.link_text = mh.resource_handler.name
+        @lti_launch.launch_type = message.launch_presentation_document_target
+        @lti_launch.params = launch_params(tool_proxy: tp, message: message, private_key: tp.shared_secret)
+        render Lti::AppUtil.display_template("borderless") and return
       end
       not_found
     end
@@ -99,7 +97,7 @@ module Lti
     def registration_return
       @tool = ToolProxy.where(guid: params[:tool_proxy_guid]).first
       @data = {
-        subject: 'lti.lti2Registration',
+        subject: "lti.lti2Registration",
         status: params[:status],
         app_id: @tool&.id,
         name: @tool&.name,
@@ -113,7 +111,7 @@ module Lti
 
     def tool_consumer_url
       url = URI(params[:tool_consumer_url])
-      ['http', 'https'].include?(url.scheme) ? url.to_s : ''
+      ["http", "https"].include?(url.scheme) ? url.to_s : ""
     end
 
     def generate_resource_link_id(message_handler)
@@ -124,12 +122,12 @@ module Lti
     end
 
     def launch_params(tool_proxy:, message:, private_key:)
-      if tool_proxy.security_profiles.find { |sp| sp.security_profile_name == 'lti_jwt_message_security' }
-        message.roles = message.roles.split(',') if message.roles
+      if tool_proxy.security_profiles.find { |sp| sp.security_profile_name == "lti_jwt_message_security" }
+        message.roles = message.roles.split(",") if message.roles
         message.launch_url = Addressable::URI.escape(message.launch_url)
         { jwt: message.to_jwt(private_key: private_key, originating_domain: request.host, algorithm: :HS256) }
       else
-        message.oauth_callback = 'about:blank'
+        message.oauth_callback = "about:blank"
         message.signed_post_params(private_key)
       end
     end
@@ -139,7 +137,7 @@ module Lti
                          @context.try(:active_assignments)&.find(params[:assignment_id])
                        elsif params[:module_item_id].present?
                          tag = ContentTag.not_deleted.find_by(id: params[:module_item_id])
-                         (tag&.context_type == 'Assignment' && tag.context.context == @context) ? tag.context : nil
+                         (tag&.context_type == "Assignment" && tag.context.context == @context) ? tag.context : nil
                        elsif params[:secure_params].present?
                          assignment = Assignment.from_secure_lti_params(params[:secure_params])
                          assignment&.root_account == @context.root_account ? assignment : nil
@@ -163,14 +161,14 @@ module Lti
 
       not_found
     rescue InvalidDomain => e
-      return render json: { errors: { invalid_launch_url: { message: e.message } } }, status: 400
+      render json: { errors: { invalid_launch_url: { message: e.message } } }, status: :bad_request
     end
 
     def lti2_basic_launch(message_handler, lti_link = nil)
       resource_handler = message_handler.resource_handler
       tool_proxy = resource_handler.tool_proxy
       # TODO: create scope for query
-      if tool_proxy.workflow_state == 'active'
+      if tool_proxy.workflow_state == "active"
         lti_assignment_id = Lti::Security.decoded_lti_assignment_id(params[:secure_params])
         resource_link_id ||= lti_link&.resource_link_id || lti_assignment_id || generate_resource_link_id(message_handler)
         launch_attrs = {
@@ -220,15 +218,15 @@ module Lti
 
     def module_sequence(tag)
       env_hash = {}
-      @lti_launch.launch_type = 'window' if tag.new_tab
+      @lti_launch.launch_type = "window" if tag.new_tab
       tag.context_module_action(@current_user, :read)
       sequence_asset = tag.try(:content)
       if sequence_asset
         env_hash[:SEQUENCE] = {
-          :ASSET_ID => sequence_asset.id,
-          :COURSE_ID => @context.id,
+          ASSET_ID: sequence_asset.id,
+          COURSE_ID: @context.id,
         }
-        js_hash = { :LTI => env_hash }
+        js_hash = { LTI: env_hash }
         js_env(js_hash)
       end
     end
@@ -240,12 +238,12 @@ module Lti
 
     def find_binding(tool_proxy)
       if @context.is_a?(Course)
-        tp_binding = ToolProxyBinding.where(context_type: 'Course', context: @context.id, tool_proxy_id: tool_proxy.id)
+        tp_binding = ToolProxyBinding.where(context_type: "Course", context: @context.id, tool_proxy_id: tool_proxy.id)
         return tp_binding if tp_binding
       end
       account_ids = @context.account_chain.map(&:id)
-      bindings = ToolProxyBinding.where(context_type: 'Account', context_id: account_ids, tool_proxy_id: tool_proxy.id)
-      binding_lookup = bindings.each_with_object({}) { |binding, hash| hash[binding.context_id] = binding }
+      bindings = ToolProxyBinding.where(context_type: "Account", context_id: account_ids, tool_proxy_id: tool_proxy.id)
+      binding_lookup = bindings.index_by(&:context_id)
       sorted_bindings = account_ids.map { |account_id| binding_lookup[account_id] }
       sorted_bindings.first
     end
@@ -260,8 +258,8 @@ module Lti
     end
 
     def prep_tool_settings(parameters, tool_proxy, resource_link_id)
-      params = %w(LtiLink.custom.url ToolProxyBinding.custom.url ToolProxy.custom.url)
-      if parameters && (parameters.map { |p| p['variable'] }.compact & params).any?
+      params = %w[LtiLink.custom.url ToolProxyBinding.custom.url ToolProxy.custom.url]
+      if parameters && (parameters.filter_map { |p| p["variable"] } & params).any?
         link = ToolSetting.where(
           tool_proxy_id: tool_proxy.id,
           context_id: @context.id,

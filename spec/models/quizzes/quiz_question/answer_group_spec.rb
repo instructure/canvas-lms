@@ -131,7 +131,7 @@ describe Quizzes::QuizQuestion::AnswerGroup::Answer do
     end
 
     it "ignores any keys supplied that don't exist" do
-      expect(@answer.any_value_of([:blah, :weight, :answer_weight, :foo])).to eq 100
+      expect(@answer.any_value_of(%i[blah weight answer_weight foo])).to eq 100
     end
 
     it "returns the supplied default if none of the keys are found" do

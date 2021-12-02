@@ -25,23 +25,23 @@ describe "Account Reports", type: :request do
     # uncommented you can get a better error to work from, try looking at
     # ErrorReport.last.message or
     # puts  ErrorReport.last.backtrace;''
-    account_admin_user :account => Account.site_admin
+    account_admin_user account: Account.site_admin
     @admin = @user
     user_with_pseudonym(user: @admin,
-                        username: 'admin@example.com',
-                        password: 'password')
+                        username: "admin@example.com",
+                        password: "password")
     user_session(@admin)
     @account = Account.default
 
-    csv = Attachment.create!(filename: 'grades_export.csv',
-                             uploaded_data: StringIO.new('sometextgoeshere'),
+    csv = Attachment.create!(filename: "grades_export.csv",
+                             uploaded_data: StringIO.new("sometextgoeshere"),
                              context: @account)
     report = Account.default.account_reports.create!(user: @admin)
     report.workflow_state = "complete"
     report.progress = 100
     report.report_type = "student_assignment_outcome_map_csv"
     report.parameters = {}
-    report.parameters["extra_text"] = 'sometextgoeshere'
+    report.parameters["extra_text"] = "sometextgoeshere"
     report.attachment = csv
     report.save
     @account.save

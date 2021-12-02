@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../spec_helper'
+require_relative "../spec_helper"
 
 describe PlannerOverride do
   before :once do
@@ -35,27 +35,27 @@ describe PlannerOverride do
                                                         marked_complete: false)
   end
 
-  it 'links the planner override to the parent topic for a group discussion if given a child topic id' do
+  it "links the planner override to the parent topic for a group discussion if given a child topic id" do
     group_assignment_discussion(course: @course)
     override1 = PlannerOverride.create!(user: @student, plannable: @topic)
-    expect(override1.plannable_type).to eq 'DiscussionTopic'
+    expect(override1.plannable_type).to eq "DiscussionTopic"
     expect(override1.plannable_id).to eq @topic.root_topic_id
   end
 
   it "links the planner override to its submittable object instead of assignment if it has one" do
-    assignment_model(course: @course, submission_types: 'discussion_topic')
+    assignment_model(course: @course, submission_types: "discussion_topic")
     override1 = PlannerOverride.create!(user: @student, plannable: @assignment)
-    expect(override1.plannable_type).to eq 'DiscussionTopic'
+    expect(override1.plannable_type).to eq "DiscussionTopic"
     expect(override1.plannable_id).to eq @assignment.discussion_topic.id
 
     wiki_page_assignment_model(course: @course)
     override2 = PlannerOverride.create!(user: @student, plannable: @page.assignment)
-    expect(override2.plannable_type).to eq 'WikiPage'
+    expect(override2.plannable_type).to eq "WikiPage"
     expect(override2.plannable_id).to eq @page.id
 
-    assignment_model(course: @course, submission_types: 'online_quiz', quiz: quiz_model(course: @course))
+    assignment_model(course: @course, submission_types: "online_quiz", quiz: quiz_model(course: @course))
     override3 = PlannerOverride.create!(user: @student, plannable: @assignment)
-    expect(override3.plannable_type).to eq 'Quizzes::Quiz'
+    expect(override3.plannable_type).to eq "Quizzes::Quiz"
     expect(override3.plannable_id).to eq @assignment.quiz.id
   end
 
@@ -68,26 +68,32 @@ describe PlannerOverride do
           @deleted = opts[:deleted]
         end
 
-        def published?; !!@published; end
+        def published?
+          !!@published
+        end
 
-        def unpublished?; !@published; end
+        def unpublished?
+          !@published
+        end
 
-        def deleted?; @deleted; end
+        def deleted?
+          @deleted
+        end
       end
 
       it "returns 'deleted' for deleted assets" do
         a = mock_asset.new(deleted: true)
-        expect(PlannerOverride.plannable_workflow_state(a)).to eq 'deleted'
+        expect(PlannerOverride.plannable_workflow_state(a)).to eq "deleted"
       end
 
       it "returns 'active' for published assets" do
         a = mock_asset.new(published: true)
-        expect(PlannerOverride.plannable_workflow_state(a)).to eq 'active'
+        expect(PlannerOverride.plannable_workflow_state(a)).to eq "active"
       end
 
       it "returns 'unpublished' for unpublished assets" do
         a = mock_asset.new(published: false)
-        expect(PlannerOverride.plannable_workflow_state(a)).to eq 'unpublished'
+        expect(PlannerOverride.plannable_workflow_state(a)).to eq "unpublished"
       end
     end
 
@@ -101,32 +107,32 @@ describe PlannerOverride do
       end
 
       it "returns 'active' for 'active' workflow_state" do
-        a = mock_asset.new('active')
-        expect(PlannerOverride.plannable_workflow_state(a)).to eq 'active'
+        a = mock_asset.new("active")
+        expect(PlannerOverride.plannable_workflow_state(a)).to eq "active"
       end
 
       it "returns 'active' for 'available' workflow_state" do
-        a = mock_asset.new('available')
-        expect(PlannerOverride.plannable_workflow_state(a)).to eq 'active'
+        a = mock_asset.new("available")
+        expect(PlannerOverride.plannable_workflow_state(a)).to eq "active"
       end
 
       it "returns 'active' for 'published' workflow_state" do
-        a = mock_asset.new('published')
-        expect(PlannerOverride.plannable_workflow_state(a)).to eq 'active'
+        a = mock_asset.new("published")
+        expect(PlannerOverride.plannable_workflow_state(a)).to eq "active"
       end
 
       it "returns 'unpublished' for 'unpublished' workflow_state" do
-        a = mock_asset.new('unpublished')
-        expect(PlannerOverride.plannable_workflow_state(a)).to eq 'unpublished'
+        a = mock_asset.new("unpublished")
+        expect(PlannerOverride.plannable_workflow_state(a)).to eq "unpublished"
       end
 
       it "returns 'deleted' for 'deleted' workflow_state" do
-        a = mock_asset.new('deleted')
-        expect(PlannerOverride.plannable_workflow_state(a)).to eq 'deleted'
+        a = mock_asset.new("deleted")
+        expect(PlannerOverride.plannable_workflow_state(a)).to eq "deleted"
       end
 
       it "returns nil for other workflow_state" do
-        a = mock_asset.new('terrified')
+        a = mock_asset.new("terrified")
         expect(PlannerOverride.plannable_workflow_state(a)).to eq nil
       end
     end
@@ -147,11 +153,11 @@ describe PlannerOverride do
   describe "#update_for" do
     it "updates the PlannerOverride for the given object" do
       overrides = PlannerOverride.where(plannable_id: @assignment.id)
-      expect(overrides.all? { |o| o.workflow_state == 'active' }).to be_truthy
+      expect(overrides.all? { |o| o.workflow_state == "active" }).to be_truthy
 
       @assignment.destroy
       PlannerOverride.update_for(@assignment.reload)
-      expect(overrides.reload.all? { |o| o.workflow_state == 'deleted' }).to be_truthy
+      expect(overrides.reload.all? { |o| o.workflow_state == "deleted" }).to be_truthy
     end
   end
 end

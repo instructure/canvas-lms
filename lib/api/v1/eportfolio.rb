@@ -20,12 +20,12 @@
 module Api::V1::Eportfolio
   include Api::V1::Json
 
-  EPORTFOLIO_ATTRIBUTES = %w(id user_id name public created_at updated_at workflow_state deleted_at spam_status).freeze
-  ENTRY_ATTRIBUTES = %w(id eportfolio_id position name content created_at updated_at).freeze
+  EPORTFOLIO_ATTRIBUTES = %w[id user_id name public created_at updated_at workflow_state deleted_at spam_status].freeze
+  ENTRY_ATTRIBUTES = %w[id eportfolio_id position name content created_at updated_at].freeze
 
   def eportfolio_json(eportfolio, current_user, session)
     api_json(eportfolio, current_user, session, only: EPORTFOLIO_ATTRIBUTES).tap do |hash|
-      hash['public'] = !!hash['public']
+      hash["public"] = !!hash["public"]
     end
   end
 

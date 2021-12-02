@@ -24,7 +24,7 @@ class MasterCourses::ChildContentTag < ActiveRecord::Base
   # i.e. which objects were changed from their blueprint versions and what columns (and pseudo-columns)
   # so we don't overwrite intentional changes during a sync (unless the object gets locked)
 
-  belongs_to :child_subscription, :class_name => "MasterCourses::ChildSubscription"
+  belongs_to :child_subscription, class_name: "MasterCourses::ChildSubscription"
 
   belongs_to :content, polymorphic: [:assessment_question_bank,
                                      :assignment,
@@ -40,8 +40,8 @@ class MasterCourses::ChildContentTag < ActiveRecord::Base
                                      :rubric,
                                      :wiki,
                                      :wiki_page,
-                                     quiz: 'Quizzes::Quiz']
-  belongs_to :root_account, :class_name => 'Account'
+                                     quiz: "Quizzes::Quiz"]
+  belongs_to :root_account, class_name: "Account"
 
   validates_with MasterCourses::TagValidator
 
@@ -55,6 +55,6 @@ class MasterCourses::ChildContentTag < ActiveRecord::Base
   end
 
   def set_root_account_id
-    self.root_account_id ||= self.child_subscription.root_account_id
+    self.root_account_id ||= child_subscription.root_account_id
   end
 end

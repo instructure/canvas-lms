@@ -22,7 +22,7 @@ class AddAccountToTermsContent < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def change
-    add_column :terms_of_service_contents, :account_id, :integer, :limit => 8
+    add_column :terms_of_service_contents, :account_id, :integer, limit: 8
     add_index :terms_of_service_contents, :account_id, unique: true
 
     add_foreign_key :terms_of_service_contents, :accounts

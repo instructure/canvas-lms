@@ -15,26 +15,26 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-require_relative '../common'
-require_relative 'page_objects/wiki_page'
-require_relative 'page_objects/wiki_index_page'
-require_relative '../helpers/wiki_pages_shared_examples'
+require_relative "../common"
+require_relative "page_objects/wiki_page"
+require_relative "page_objects/wiki_index_page"
+require_relative "../helpers/wiki_pages_shared_examples"
 
-describe 'course wiki pages' do
-  include_context 'in-process server selenium tests'
+describe "course wiki pages" do
+  include_context "in-process server selenium tests"
   include CourseWikiPage
   include CourseWikiIndexPage
 
-  context 'As a teacher' do
+  context "As a teacher" do
     before do
       course_with_teacher_logged_in
-      @page = @course.wiki_pages.create!(title: 'han')
+      @page = @course.wiki_pages.create!(title: "han")
     end
 
     it "shows the bulk delete button" do
       visit_course_wiki_index_page(@course.id)
 
-      expect(bulk_delete_btn.attribute('disabled')).to eq('true')
+      expect(bulk_delete_btn.attribute("disabled")).to eq("true")
       expect(bulk_delete_btn).to be_displayed
     end
 
@@ -45,7 +45,7 @@ describe 'course wiki pages' do
       delete_selected_pages
 
       confirm_delete_pages
-      expect(@course.wiki_pages.first.workflow_state).to eq('deleted')
+      expect(@course.wiki_pages.first.workflow_state).to eq("deleted")
     end
 
     it "shows immersive Reader button whether page is published or unpublished" do
@@ -61,7 +61,7 @@ describe 'course wiki pages' do
       expect(immersive_reader_btn).to be_displayed
     end
 
-    context 'With granular permission on' do
+    context "With granular permission on" do
       it_behaves_like "course_pages_granular_permissions"
     end
   end

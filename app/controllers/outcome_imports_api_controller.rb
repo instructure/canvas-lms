@@ -111,7 +111,7 @@ class OutcomeImportsApiController < ApplicationController
   end
 
   rescue_from InvalidContentType do
-    render :json => { :error => t('Invalid content type, UTF-8 required') }, :status => 400
+    render json: { error: t("Invalid content type, UTF-8 required") }, status: :bad_request
   end
 
   # @API Import Outcomes
@@ -164,15 +164,14 @@ class OutcomeImportsApiController < ApplicationController
   # @returns OutcomeImport
   def create
     if authorized_action(@context, @current_user, :import_outcomes)
-      params[:import_type] ||= 'instructure_csv'
+      params[:import_type] ||= "instructure_csv"
       raise "invalid import type parameter" unless OutcomeImport.valid_import_type?(params[:import_type])
 
-      file_obj = nil
-      if params.key?(:attachment)
-        file_obj = params[:attachment]
-      else
-        file_obj = body_file
-      end
+      file_obj = if params.key?(:attachment)
+                   params[:attachment]
+                 else
+                   body_file
+                 end
 
       import = OutcomeImport.create_with_attachment(
         @context, params[:import_type], file_obj, @current_user, params[:learning_outcome_group_id]
@@ -196,9 +195,9 @@ class OutcomeImportsApiController < ApplicationController
   #
   # @returns OutcomeImport
   def show
-    if authorized_action(@context, @current_user, %i(import_outcomes manage_outcomes))
+    if authorized_action(@context, @current_user, %i[import_outcomes manage_outcomes])
       begin
-        @import = if params[:id] == 'latest'
+        @import = if params[:id] == "latest"
                     @context.latest_outcome_import or raise ActiveRecord::RecordNotFound
                   else
                     @context.outcome_imports.find(params[:id])
@@ -210,11 +209,43 @@ class OutcomeImportsApiController < ApplicationController
     end
   end
 
+  # @API Get IDs of outcome groups created after successful import
+  #
+  # Get the IDs of the outcome groups created after a successful import.
+  # Pass 'latest' for the outcome import id for the latest import.
+  #
+  #   Examples:
+  #     curl 'https://<canvas>/api/v1/accounts/<account_id>/outcome_imports/outcomes_group_ids/<outcome_import_id>' \
+  #         -H "Authorization: Bearer <token>"
+  #     curl 'https://<canvas>/api/v1/courses/<course_id>/outcome_imports/outcome_group_ids/<outcome_import_id>' \
+  #         -H "Authorization: Bearer <token>"
+  #
+  # @returns array of outcome ids
+  def created_group_ids
+    if authorized_action(@context, @current_user, %i[import_outcomes manage_outcomes])
+      begin
+        import = if params[:id] == "latest"
+                   @context.latest_outcome_import or raise ActiveRecord::RecordNotFound
+                 else
+                   @context.outcome_imports.find(params[:id])
+                 end
+
+        raise ActiveRecord::RecordNotFound, "Import has failed" if import.failed?
+        raise ActiveRecord::RecordNotFound, "Import is still being processed" unless import.succeeded?
+
+        render json: LearningOutcomeGroup.where(outcome_import_id: import.id).pluck(:id).map(&:to_s)
+      rescue ActiveRecord::RecordNotFound => e
+        render json: { message: e.message }, status: :not_found
+      end
+    end
+  end
+
   private
 
   def body_file
     file_obj = request.body
 
+    # rubocop:disable Style/TrivialAccessors not a Class
     file_obj.instance_exec do
       def set_file_attributes(filename, content_type)
         @original_filename = filename
@@ -229,17 +260,18 @@ class OutcomeImportsApiController < ApplicationController
         @original_filename
       end
     end
+    # rubocop:enable Style/TrivialAccessors
 
     if params[:extension]
       file_obj.set_file_attributes("outcome_import.#{params[:extension]}",
                                    Attachment.mimetype("outcome_import.#{params[:extension]}"))
     else
       env = request.env.dup
-      env['CONTENT_TYPE'] = env["ORIGINAL_CONTENT_TYPE"]
+      env["CONTENT_TYPE"] = env["ORIGINAL_CONTENT_TYPE"]
       # copy of request with original content type restored
       request2 = Rack::Request.new(env)
-      charset = request2.media_type_params['charset']
-      if charset.present? && charset.casecmp('utf-8') != 0
+      charset = request2.media_type_params["charset"]
+      if charset.present? && charset.casecmp("utf-8") != 0
         raise InvalidContentType
       end
 

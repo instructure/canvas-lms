@@ -21,68 +21,68 @@ class SplitUsers
   class UnsafeSplitError < StandardError; end
 
   ENROLLMENT_DATA_UPDATES = [
-    { table: 'asset_user_accesses',
-      scope: -> { where(context_type: 'Course') } }.freeze,
-    { table: 'asset_user_accesses',
-      scope: -> { joins(:context_group).where(groups: { context_type: 'Course' }) }, context_id: 'groups.context_id' }.freeze,
-    { table: 'calendar_events',
-      scope: -> { where(context_type: 'Course') } }.freeze,
-    { table: 'calendar_events',
-      scope: -> { joins(:context_group).where(groups: { context_type: 'Course' }) },
-      context_id: 'groups.context_id' }.freeze,
-    { table: 'collaborations',
-      scope: -> { where(context_type: 'Course') } }.freeze,
-    { table: 'collaborations',
-      scope: -> { joins(:group).where(groups: { context_type: 'Course' }) },
-      context_id: 'groups.context_id' }.freeze,
-    { table: 'context_module_progressions',
+    { table: "asset_user_accesses",
+      scope: -> { where(context_type: "Course") } }.freeze,
+    { table: "asset_user_accesses",
+      scope: -> { joins(:context_group).where(groups: { context_type: "Course" }) }, context_id: "groups.context_id" }.freeze,
+    { table: "calendar_events",
+      scope: -> { where(context_type: "Course") } }.freeze,
+    { table: "calendar_events",
+      scope: -> { joins(:context_group).where(groups: { context_type: "Course" }) },
+      context_id: "groups.context_id" }.freeze,
+    { table: "collaborations",
+      scope: -> { where(context_type: "Course") } }.freeze,
+    { table: "collaborations",
+      scope: -> { joins(:group).where(groups: { context_type: "Course" }) },
+      context_id: "groups.context_id" }.freeze,
+    { table: "context_module_progressions",
       scope: -> { joins(:context_module) },
-      context_id: 'context_modules.context_id' }.freeze,
-    { table: 'discussion_entries',
-      scope: -> { joins(:discussion_topic).where(discussion_topics: { context_type: 'Course' }) },
-      context_id: 'discussion_topics.context_id' }.freeze,
-    { table: 'discussion_entries',
-      scope: -> { joins({ discussion_topic: :group }).where(groups: { context_type: 'Course' }) },
-      context_id: 'groups.context_id' }.freeze,
-    { table: 'discussion_entries', foreign_key: :editor_id,
-      scope: -> { joins(:discussion_topic).where(discussion_topics: { context_type: 'Course' }) },
-      context_id: 'discussion_topics.context_id' }.freeze,
-    { table: 'discussion_entries', foreign_key: :editor_id,
-      scope: -> { joins({ discussion_topic: :group }).where(groups: { context_type: 'Course' }) },
-      context_id: 'groups.context_id' }.freeze,
-    { table: 'discussion_topics',
-      scope: -> { where(context_type: 'Course') } }.freeze,
-    { table: 'discussion_topics',
-      scope: -> { joins(:group).where(groups: { context_type: 'Course' }) },
-      context_id: 'groups.context_id' }.freeze,
-    { table: 'discussion_topics', foreign_key: :editor_id,
-      scope: -> { where(context_type: 'Course') } }.freeze,
-    { table: 'discussion_topics', foreign_key: :editor_id,
-      scope: -> { joins(:group).where(groups: { context_type: 'Course' }) },
-      context_id: 'groups.context_id' }.freeze,
-    { table: 'page_views',
-      scope: -> { where(context_type: 'Course') } }.freeze,
-    { table: 'rubric_assessments',
+      context_id: "context_modules.context_id" }.freeze,
+    { table: "discussion_entries",
+      scope: -> { joins(:discussion_topic).where(discussion_topics: { context_type: "Course" }) },
+      context_id: "discussion_topics.context_id" }.freeze,
+    { table: "discussion_entries",
+      scope: -> { joins({ discussion_topic: :group }).where(groups: { context_type: "Course" }) },
+      context_id: "groups.context_id" }.freeze,
+    { table: "discussion_entries", foreign_key: :editor_id,
+      scope: -> { joins(:discussion_topic).where(discussion_topics: { context_type: "Course" }) },
+      context_id: "discussion_topics.context_id" }.freeze,
+    { table: "discussion_entries", foreign_key: :editor_id,
+      scope: -> { joins({ discussion_topic: :group }).where(groups: { context_type: "Course" }) },
+      context_id: "groups.context_id" }.freeze,
+    { table: "discussion_topics",
+      scope: -> { where(context_type: "Course") } }.freeze,
+    { table: "discussion_topics",
+      scope: -> { joins(:group).where(groups: { context_type: "Course" }) },
+      context_id: "groups.context_id" }.freeze,
+    { table: "discussion_topics", foreign_key: :editor_id,
+      scope: -> { where(context_type: "Course") } }.freeze,
+    { table: "discussion_topics", foreign_key: :editor_id,
+      scope: -> { joins(:group).where(groups: { context_type: "Course" }) },
+      context_id: "groups.context_id" }.freeze,
+    { table: "page_views",
+      scope: -> { where(context_type: "Course") } }.freeze,
+    { table: "rubric_assessments",
       scope: -> { joins({ submission: :assignment }) },
-      context_id: 'assignments.context_id' }.freeze,
-    { table: 'rubric_assessments', foreign_key: :assessor_id,
+      context_id: "assignments.context_id" }.freeze,
+    { table: "rubric_assessments", foreign_key: :assessor_id,
       scope: -> { joins({ submission: :assignment }) },
-      context_id: 'assignments.context_id' }.freeze,
-    { table: 'submission_comments', foreign_key: :author_id }.freeze,
-    { table: 'web_conference_participants',
-      scope: -> { joins(:web_conference).where(web_conferences: { context_type: 'Course' }) },
-      context_id: 'web_conferences.context_id' }.freeze,
-    { table: 'web_conference_participants',
-      scope: -> { joins({ web_conference: :group }).where(web_conferences: { context_type: 'Course' }, groups: { context_type: 'Course' }) },
-      context_id: 'groups.context_id' }.freeze,
-    { table: 'web_conferences',
-      scope: -> { where(context_type: 'Course') } }.freeze,
-    { table: 'web_conferences',
-      scope: -> { joins(:group).where(web_conferences: { context_type: 'Course' }, groups: { context_type: 'Course' }) },
-      context_id: 'groups.context_id' }.freeze,
-    { table: 'wiki_pages',
+      context_id: "assignments.context_id" }.freeze,
+    { table: "submission_comments", foreign_key: :author_id }.freeze,
+    { table: "web_conference_participants",
+      scope: -> { joins(:web_conference).where(web_conferences: { context_type: "Course" }) },
+      context_id: "web_conferences.context_id" }.freeze,
+    { table: "web_conference_participants",
+      scope: -> { joins({ web_conference: :group }).where(web_conferences: { context_type: "Course" }, groups: { context_type: "Course" }) },
+      context_id: "groups.context_id" }.freeze,
+    { table: "web_conferences",
+      scope: -> { where(context_type: "Course") } }.freeze,
+    { table: "web_conferences",
+      scope: -> { joins(:group).where(web_conferences: { context_type: "Course" }, groups: { context_type: "Course" }) },
+      context_id: "groups.context_id" }.freeze,
+    { table: "wiki_pages",
       scope: -> { joins({ wiki: :course }) },
-      context_id: 'courses.id' }.freeze
+      context_id: "courses.id" }.freeze
   ].freeze
 
   attr_accessor :source_user, :restored_user, :merge_data
@@ -133,17 +133,17 @@ class SplitUsers
                        favorite: :user_id,
                        ignore: :user_id,
                        user_past_lti_id: :user_id,
-                       'Polling::Poll': :user_id }.freeze
+                       "Polling::Poll": :user_id }.freeze
 
   def restore_merge_items
     Shard.with_each_shard(restored_user.associated_shards + restored_user.associated_shards(:weak) + restored_user.associated_shards(:shadow)) do
       UserPastLtiId.where(user: source_user, user_lti_id: restored_user.lti_id).delete_all
     end
     source_user.shard.activate do
-      ConversationParticipant.where(id: merge_data.items.where(item_type: 'conversation_ids').take&.item).find_each { |c| c.move_to_user(restored_user) }
+      ConversationParticipant.where(id: merge_data.items.where(item_type: "conversation_ids").take&.item).find_each { |c| c.move_to_user(restored_user) }
     end
     MERGE_ITEM_TYPES.each do |klass, user_attr|
-      ids = merge_data.items.where(item_type: klass.to_s + '_ids').take&.item
+      ids = merge_data.items.where(item_type: klass.to_s + "_ids").take&.item
       Shard.partition_by_shard(ids) { |shard_ids| klass.to_s.classify.constantize.where(id: shard_ids).update_all(user_attr => restored_user.id) } if ids
     end
   end
@@ -159,18 +159,18 @@ class SplitUsers
   end
 
   def move_records_to_old_user(records, pseudonyms)
-    fix_communication_channels(records.where(context_type: 'CommunicationChannel'))
-    move_user_observers(records.where(context_type: ['UserObserver', 'UserObservationLink'], previous_user_id: restored_user))
-    move_attachments(records.where(context_type: 'Attachment'))
+    fix_communication_channels(records.where(context_type: "CommunicationChannel"))
+    move_user_observers(records.where(context_type: ["UserObserver", "UserObservationLink"], previous_user_id: restored_user))
+    move_attachments(records.where(context_type: "Attachment"))
     handle_submissions(records)
-    enrollment_ids = records.where(context_type: 'Enrollment', previous_user_id: restored_user).pluck(:context_id)
+    enrollment_ids = records.where(context_type: "Enrollment", previous_user_id: restored_user).pluck(:context_id)
     Shard.partition_by_shard(enrollment_ids) do |enrollments|
       restore_enrollments(enrollments)
     end
     Shard.partition_by_shard(pseudonyms) do |shard_pseudonyms|
       move_new_enrollments(enrollment_ids, shard_pseudonyms)
     end
-    account_users_ids = records.where(context_type: 'AccountUser').pluck(:context_id)
+    account_users_ids = records.where(context_type: "AccountUser").pluck(:context_id)
 
     Shard.partition_by_shard(account_users_ids) do |shard_account_user_ids|
       AccountUser.where(id: shard_account_user_ids).update_all(user_id: restored_user.id)
@@ -211,7 +211,7 @@ class SplitUsers
     if source_user.shard != restored_user.shard
       source_user.shard.activate do
         # remove communication channels that didn't exist prior to the merge
-        ccs = CommunicationChannel.where(id: cc_records.where(previous_workflow_state: 'non_existent').pluck(:context_id))
+        ccs = CommunicationChannel.where(id: cc_records.where(previous_workflow_state: "non_existent").pluck(:context_id))
         DelayedMessage.where(communication_channel_id: ccs).delete_all
         NotificationPolicy.where(communication_channel: ccs).delete_all
         NotificationPolicyOverride.where(communication_channel: ccs).delete_all
@@ -231,7 +231,7 @@ class SplitUsers
       next unless target_cc&.user_id == source_user.id
 
       conflict_cc = restored_user.communication_channels.detect do |c|
-        c.path.downcase == target_cc.path.downcase && c.path_type == target_cc.path_type
+        c.path.casecmp?(target_cc.path) && c.path_type == target_cc.path_type
       end
       if conflict_cc
         # we need to resolve before we can un-merge
@@ -250,10 +250,12 @@ class SplitUsers
     max_position = restored_user.communication_channels.last&.position&.+(1) || 0
     scope = source_user.communication_channels.where(id: cc_records.where(previous_user_id: restored_user).pluck(:context_id))
     # passing the array to update_all so we can get postgres to add the position for us.
-    scope.update_all(["user_id=?, position=position+?, root_account_ids='{?}'",
-                      restored_user.id, max_position, restored_user.root_account_ids]) unless scope.empty?
+    unless scope.empty?
+      scope.update_all(["user_id=?, position=position+?, root_account_ids='{?}'",
+                        restored_user.id, max_position, restored_user.root_account_ids])
+    end
 
-    cc_records.where.not(previous_workflow_state: 'non existent').each do |cr|
+    cc_records.where.not(previous_workflow_state: "non existent").each do |cr|
       CommunicationChannel.where(id: cr.context_id).update_all(workflow_state: cr.previous_workflow_state)
     end
   end
@@ -263,13 +265,13 @@ class SplitUsers
     not_obs = UserObservationLink.where(user_id: [source_user, restored_user], observer_id: [source_user, restored_user])
     obs = UserObservationLink.where(id: records.pluck(:context_id)).where.not(id: not_obs)
 
-    not_obs.update(workflow_state: 'active')
+    not_obs.update(workflow_state: "active")
     Shard.partition_by_shard(obs) do |shard_obs|
       UserObservationLink.where(user_id: source_user.id, id: shard_obs).update_all(user_id: restored_user.id)
       UserObservationLink.where(observer_id: source_user.id, id: shard_obs).update_all(observer_id: restored_user.id)
     end
 
-    delete_ids = merge_data.records.where(context_type: 'UserObservationLink', previous_workflow_state: 'non_existent', previous_user_id: source_user).pluck(:context_id)
+    delete_ids = merge_data.records.where(context_type: "UserObservationLink", previous_workflow_state: "non_existent", previous_user_id: source_user).pluck(:context_id)
     Shard.partition_by_shard(delete_ids) do |sharded_ids|
       UserObservationLink.where(user_id: source_user.id).where(id: sharded_ids).delete_all
       UserObservationLink.where(observer_id: source_user.id).where(id: sharded_ids).delete_all
@@ -283,17 +285,17 @@ class SplitUsers
 
   def restore_users
     restore_source_user
-    pseudonyms_ids = merge_data.records.where(context_type: 'Pseudonym').pluck(:context_id)
+    pseudonyms_ids = merge_data.records.where(context_type: "Pseudonym").pluck(:context_id)
     pseudonyms = Pseudonym.where(id: pseudonyms_ids)
     # the where.not needs to be used incase that user is actually deleted
     name =
-      merge_data.items.where.not(user_id: source_user).where(item_type: 'user_name').take&.item
+      merge_data.items.where.not(user_id: source_user).where(item_type: "user_name").take&.item
     prefs =
-      merge_data.items.where.not(user_id: source_user).where(item_type: 'user_preferences').take&.item
+      merge_data.items.where.not(user_id: source_user).where(item_type: "user_preferences").take&.item
     @restored_user ||= User.new
-    @restored_user.name = name || pseudonyms.first&.unique_id || 'restored user'
+    @restored_user.name = name || pseudonyms.first&.unique_id || "restored user"
     @restored_user.preferences = prefs if prefs
-    @restored_user.workflow_state = 'registered'
+    @restored_user.workflow_state = "registered"
     shard = Shard.shard_for(merge_data.from_user_id)
     shard ||= source_user.shard
     @restored_user.shard = shard if @restored_user.new_record?
@@ -305,18 +307,18 @@ class SplitUsers
   end
 
   def restore_source_user
-    [:avatar_image_source, :avatar_image_url, :avatar_image_updated_at, :avatar_state].each do |attr|
+    %i[avatar_image_source avatar_image_url avatar_image_updated_at avatar_state].each do |attr|
       avatar_item = merge_data.items.where.not(user_id: source_user).where(item_type: attr).take&.item
       # we only move avatar items if there were no avatar on the source_user,
       # so now we only restore it if they match what was on the from_user.
       source_user[attr] = avatar_item if source_user[attr] == avatar_item
     end
-    source_user.name = merge_data.items.where(user_id: source_user, item_type: 'user_name').take&.item
+    source_user.name = merge_data.items.where(user_id: source_user, item_type: "user_name").take&.item
     # we will leave the merged preferences on the user, most of them are for a
     # specific context that will not be there, but it will keep new
     # preferences except for terms_of_use.
     source_user.preferences[:accepted_terms] = merge_data.items
-                                                         .where(user_id: source_user).where(item_type: 'user_preferences').take&.item&.dig(:accepted_terms)
+                                                         .where(user_id: source_user).where(item_type: "user_preferences").take&.item&.dig(:accepted_terms)
     source_user.preferences = {} if source_user.preferences == { accepted_terms: nil }
     source_user.save! if source_user.changed?
   end
@@ -362,8 +364,8 @@ class SplitUsers
   end
 
   def handle_submissions(records)
-    [[:submissions, 'fk_rails_8d85741475'],
-     [:'quizzes/quiz_submissions', 'fk_rails_04850db4b4']].each do |table, foreign_key|
+    [[:submissions, "fk_rails_8d85741475"],
+     [:"quizzes/quiz_submissions", "fk_rails_04850db4b4"]].each do |table, foreign_key|
       model = table.to_s.classify.constantize
 
       ids_by_shard = records.where(context_type: model.to_s, previous_user_id: restored_user).pluck(:context_id).group_by { |id| Shard.shard_for(id) }
@@ -394,10 +396,10 @@ class SplitUsers
   def restore_workflow_states_from_records(records)
     records.each do |r|
       c = r.context
-      next unless c && c.class.columns_hash.key?('workflow_state')
+      next unless c && c.class.columns_hash.key?("workflow_state")
 
-      c.workflow_state = r.previous_workflow_state unless c.class == Attachment
-      c.file_state = r.previous_workflow_state if c.class == Attachment
+      c.workflow_state = r.previous_workflow_state unless c.instance_of?(Attachment)
+      c.file_state = r.previous_workflow_state if c.instance_of?(Attachment)
       c.save! if c.changed? && c.valid?
     end
   end

@@ -28,7 +28,7 @@ class TestableApiQuizQuestion
 end
 
 describe Api::V1::QuizQuestion do
-  describe '.question_json' do
+  describe ".question_json" do
     subject do
       TestableApiQuizQuestion.question_json(
         question, user, session, context, includes, censored, quiz_data, opts
@@ -64,7 +64,7 @@ describe Api::V1::QuizQuestion do
     it { is_expected.to include("matches") }
     it { is_expected.to include("matching_answer_incorrect_matches") }
 
-    context 'with bogus question data' do
+    context "with bogus question data" do
       let(:question_data) do
         {
           "answers" => answers,
@@ -75,7 +75,7 @@ describe Api::V1::QuizQuestion do
       it { is_expected.not_to include("bogus") }
     end
 
-    context 'with quiz_data' do
+    context "with quiz_data" do
       let(:quiz_data) do
         [{
           "id" => question[:id],
@@ -90,15 +90,15 @@ describe Api::V1::QuizQuestion do
     end
   end
 
-  describe 'as a student' do
+  describe "as a student" do
+    subject { TestableApiQuizQuestion.question_json(question, user, session, nil, [], true) }
+
     let(:answers) { [] }
     let(:question) { Quizzes::QuizQuestion.new(question_data: question_data) }
     let(:user) { User.new }
     let(:session) { nil }
 
-    subject { TestableApiQuizQuestion.question_json(question, user, session, nil, [], true) }
-
-    describe 'text_only_questions' do
+    describe "text_only_questions" do
       let(:question_data) { { "answers" => answers, "question_type" => "text_only_questions" } }
 
       it { is_expected.not_to include("answers") }
@@ -110,7 +110,6 @@ describe Api::V1::QuizQuestion do
       it { is_expected.not_to include("correct_comments_html") }
       it { is_expected.not_to include("incorrect_comments_html") }
       it { is_expected.not_to include("neutral_comments_html") }
-      it { is_expected.not_to include("answers") }
       it { is_expected.to include("variables") }
       it { is_expected.to include("answer_tolerance") }
       it { is_expected.to include("formula_decimal_places") }
@@ -121,7 +120,7 @@ describe Api::V1::QuizQuestion do
       it { is_expected.to include("matches") }
     end
 
-    describe 'calculated_questions' do
+    describe "calculated_questions" do
       let(:question_data) { { "answers" => answers, "question_type" => "calculated_question" } }
 
       it { is_expected.to include("answers") }
@@ -131,37 +130,37 @@ describe Api::V1::QuizQuestion do
       it { is_expected.to include("formula_decimal_places") }
     end
 
-    describe 'multiple_dropdowns_question' do
+    describe "multiple_dropdowns_question" do
       let(:question_data) { { "answers" => answers, "question_type" => "multiple_dropdowns_question" } }
 
       it { is_expected.to include("answers") }
     end
   end
 
-  describe 'regrade_option' do
+  describe "regrade_option" do
     let(:account) { Account.create! }
     let(:user) { User.create }
     let(:course) { Course.create!(account: account) }
     let(:quiz) do
-      quiz = course.quizzes.create!(title: 'Quiz')
+      quiz = course.quizzes.create!(title: "Quiz")
       quiz.publish!
       quiz
     end
 
     let(:question) do
-      quiz.quiz_questions.create!(question_data: { 'name' => 'test question 1', 'answers' => [{ 'id' => 1 }, { 'id' => 2 }], :position => 1 })
+      quiz.quiz_questions.create!(question_data: { "name" => "test question 1", "answers" => [{ "id" => 1 }, { "id" => 2 }], :position => 1 })
     end
 
-    context 'when a valid regrade_option is passed' do
-      it 'creates regrades with the regrade_option' do
-        question.question_data = { regrade_option: 'full_credit', regrade_user: user }
-        expect(quiz.current_quiz_question_regrades.first.regrade_option).to eq 'full_credit'
+    context "when a valid regrade_option is passed" do
+      it "creates regrades with the regrade_option" do
+        question.question_data = { regrade_option: "full_credit", regrade_user: user }
+        expect(quiz.current_quiz_question_regrades.first.regrade_option).to eq "full_credit"
       end
     end
 
-    context 'when an invalid regrade_option is passed' do
-      it 'creates no regrades' do
-        question.question_data = { regrade_option: 'false', regrade_user: user }
+    context "when an invalid regrade_option is passed" do
+      it "creates no regrades" do
+        question.question_data = { regrade_option: "false", regrade_user: user }
         expect(quiz.current_quiz_question_regrades.count).to be 0
       end
     end

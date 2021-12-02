@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'config_file'
+require "config_file"
 
 # make sure we drop the object and yaml caches so we force
 # config file reloads whenever we reset settings

@@ -23,10 +23,10 @@ describe "high_contrast" do
   include_context "in-process server selenium tests"
 
   context "InstUI components" do
-    before { course_with_teacher_logged_in(:active_all => true) }
+    before { course_with_teacher_logged_in(active_all: true) }
 
     context "WITHOUT high_contrast turned on" do
-      it 'meets 3.5:1 contrast for buttons' do
+      it "meets 3.5:1 contrast for buttons" do
         get "/courses/#{@course.id}/announcements"
 
         # just using the "Add announcement" button on the announcemnts page
@@ -38,7 +38,7 @@ describe "high_contrast" do
     context "WITH high_contrast turned on" do
       before { @user.enable_feature!(:high_contrast) }
 
-      it 'meets 4.5:1 contrast for buttons' do
+      it "meets 4.5:1 contrast for buttons" do
         get "/courses/#{@course.id}/announcements"
 
         expect(flnpt("Add announcement")).to meet_contrast_ratio(4.5)

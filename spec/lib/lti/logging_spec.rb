@@ -19,12 +19,12 @@
 #
 
 describe Lti::Logging do
-  describe '.lti_1_api_signature_verification_failed' do
-    it 'logs an info message' do
+  describe ".lti_1_api_signature_verification_failed" do
+    it "logs an info message" do
       expect(Rails.logger).to receive(:info).with(
         "[LTI 1.1] API request signature verification failed, expected base string 123abc"
       )
-      Lti::Logging.lti_1_api_signature_verification_failed('123abc')
+      Lti::Logging.lti_1_api_signature_verification_failed("123abc")
     end
   end
 end

@@ -23,29 +23,29 @@ class MicrosoftSync::PartialSyncChange < ApplicationRecord
   belongs_to :course
   belongs_to :user
 
-  validates_presence_of :user, :course, :enrollment_type
-  validates_uniqueness_of :user_id, scope: %i[course_id enrollment_type]
+  validates :user, :course, :enrollment_type, presence: true
+  validates :user_id, uniqueness: { scope: %i[course_id enrollment_type] }
 
   resolves_root_account through: :course
 
-  # Note: "enrollment_type" in a PartialSyncChange is not the type of Enrollment,
+  # NOTE: "enrollment_type" in a PartialSyncChange is not the type of Enrollment,
   # but rather "owner" or "member", also referred to as "MSFT role type"
   OWNER_ENROLLMENT_TYPE = MicrosoftSync::PartialMembershipDiff::OWNER_MSFT_ROLE_TYPE
   MEMBER_ENROLLMENT_TYPE = MicrosoftSync::PartialMembershipDiff::MEMBER_MSFT_ROLE_TYPE
 
   # filter to rows where all values match
   # e.g. with_values_in([:a,:b], [[1,2],[3,4]) -> WHERE (a=1 AND b=2) OR (a=3 AND b=4)
-  scope :with_values_in, ->(columns, values_arrays) do
+  scope :with_values_in, lambda { |columns, values_arrays|
     if values_arrays.empty?
       none
     else
       quoted_columns = columns.map { |col| connection.quote_column_name(col) }
       quoted_values_arrays = values_arrays.map do |arr|
-        '(' + arr.map { |val| connection.quote(val) }.join(',') + ')'
+        "(" + arr.map { |val| connection.quote(val) }.join(",") + ")"
       end
-      where("(#{quoted_columns.join(',')}) IN (#{quoted_values_arrays.join(',')})")
+      where("(#{quoted_columns.join(",")}) IN (#{quoted_values_arrays.join(",")})")
     end
-  end
+  }
 
   def self.upsert_for_enrollment(enrollment)
     e_type =
@@ -76,7 +76,7 @@ class MicrosoftSync::PartialSyncChange < ApplicationRecord
     end
 
     while where(course_id: course_id)
-          .where('updated_at <= ?', last_replicated_updated_at)
+          .where("updated_at <= ?", last_replicated_updated_at)
           .limit(batch_size).delete_all == batch_size
     end
   end

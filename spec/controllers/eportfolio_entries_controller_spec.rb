@@ -30,7 +30,7 @@ describe EportfolioEntriesController do
   end
 
   before :once do
-    eportfolio_with_user(:active_all => true)
+    eportfolio_with_user(active_all: true)
     @user.account_users.create!(account: Account.default, role: student_role)
     eportfolio_category
   end
@@ -39,18 +39,18 @@ describe EportfolioEntriesController do
     before(:once) { eportfolio_entry(@category) }
 
     it "requires authorization" do
-      get 'show', params: { :eportfolio_id => @portfolio.id, :id => @entry.id }
+      get "show", params: { eportfolio_id: @portfolio.id, id: @entry.id }
       assert_unauthorized
     end
 
     it "assigns variables" do
       user_session(@user)
-      attachment = @portfolio.user.attachments.build(:filename => 'some_file.pdf')
-      attachment.content_type = ''
+      attachment = @portfolio.user.attachments.build(filename: "some_file.pdf")
+      attachment.content_type = ""
       attachment.save!
-      @entry.content = [{ :section_type => 'attachment', :attachment_id => attachment.id }]
+      @entry.content = [{ section_type: "attachment", attachment_id: attachment.id }]
       @entry.save!
-      get 'show', params: { :eportfolio_id => @portfolio.id, :id => @entry.id }
+      get "show", params: { eportfolio_id: @portfolio.id, id: @entry.id }
       expect(response).to be_successful
       expect(assigns[:category]).to eql(@category)
       expect(assigns[:page]).to eql(@entry)
@@ -66,7 +66,7 @@ describe EportfolioEntriesController do
       @category.save!
       @entry.name = "some entry"
       @entry.save!
-      get 'show', params: { :eportfolio_id => @portfolio.id, :category_name => @category.slug, :entry_name => @entry.slug }
+      get "show", params: { eportfolio_id: @portfolio.id, category_name: @category.slug, entry_name: @entry.slug }
       expect(assigns[:category]).to eql(@category)
       expect(assigns[:page]).to eql(@entry)
       expect(assigns[:entries]).not_to be_nil
@@ -74,14 +74,28 @@ describe EportfolioEntriesController do
     end
 
     describe "js_env" do
-      it "sets SKIP_ENHANCING_USER_CONTENT to true" do
+      before do
         user_session(@user)
         @category.name = "some category"
         @category.save!
         @entry.name = "some entry"
         @entry.save!
-        get 'show', params: { eportfolio_id: @portfolio.id, category_name: @category.slug, entry_name: @entry.slug }
+      end
+
+      it "sets SKIP_ENHANCING_USER_CONTENT to true" do
+        get "show", params: { eportfolio_id: @portfolio.id, category_name: @category.slug, entry_name: @entry.slug }
         expect(assigns.dig(:js_env, :SKIP_ENHANCING_USER_CONTENT)).to be true
+      end
+
+      it "sets SECTION_COUNT_IDX before layout and templates are rendered" do
+        @entry.content = [
+          { section_type: "rich_text", content: "<p>1</p>" },
+          { section_type: "rich_text", content: "<p>2</p>" },
+          { section_type: "rich_text", content: "<p>3</p>" }
+        ]
+        @entry.save!
+        get "show", params: { eportfolio_id: @portfolio.id, category_name: @category.slug, entry_name: @entry.slug }
+        expect(assigns.dig(:js_env, :SECTION_COUNT_IDX)).to eq 3
       end
     end
 
@@ -94,7 +108,7 @@ describe EportfolioEntriesController do
 
       context "when the user is the author of the eportfolio" do
         it "renders the entry when the eportfolio is spam" do
-          @portfolio.update!(spam_status: 'marked_as_spam')
+          @portfolio.update!(spam_status: "marked_as_spam")
           user_session(@user)
           get :show, params: { eportfolio_id: @portfolio.id, id: @entry.id }
 
@@ -109,7 +123,7 @@ describe EportfolioEntriesController do
         end
 
         it "is unauthorized when the eportfolio is spam" do
-          @portfolio.update!(spam_status: 'marked_as_spam')
+          @portfolio.update!(spam_status: "marked_as_spam")
           user_session(@other_user)
           get :show, params: { eportfolio_id: @portfolio.id, id: @entry.id }
 
@@ -123,7 +137,7 @@ describe EportfolioEntriesController do
         end
 
         it "renders the entry when the eportfolio is spam and the admin has :moderate_user_content permissions" do
-          @portfolio.update!(spam_status: 'marked_as_spam')
+          @portfolio.update!(spam_status: "marked_as_spam")
           Account.default.role_overrides.create!(role: admin_role, enabled: true, permission: :moderate_user_content)
           user_session(@admin)
           get :show, params: { eportfolio_id: @portfolio.id, id: @entry.id }
@@ -132,7 +146,7 @@ describe EportfolioEntriesController do
         end
 
         it "is unauthorized when the eportfolio is spam and the admin does not have :moderate_user_content permissions" do
-          @portfolio.update!(spam_status: 'marked_as_spam')
+          @portfolio.update!(spam_status: "marked_as_spam")
           Account.default.role_overrides.create!(role: admin_role, enabled: false, permission: :moderate_user_content)
           user_session(@admin)
           get :show, params: { eportfolio_id: @portfolio.id, id: @entry.id }
@@ -145,13 +159,13 @@ describe EportfolioEntriesController do
 
   describe "POST 'create'" do
     it "requires authorization" do
-      post 'create', params: { :eportfolio_id => @portfolio.id }
+      post "create", params: { eportfolio_id: @portfolio.id }
       assert_unauthorized
     end
 
     it "creates entry" do
       user_session(@user)
-      post 'create', params: { :eportfolio_id => @portfolio.id, :eportfolio_entry => { :eportfolio_category_id => @category.id, :name => "some entry" } }
+      post "create", params: { eportfolio_id: @portfolio.id, eportfolio_entry: { eportfolio_category_id: @category.id, name: "some entry" } }
       expect(response).to be_redirect
       expect(assigns[:category]).to eql(@category)
       expect(assigns[:page]).not_to be_nil
@@ -163,13 +177,13 @@ describe EportfolioEntriesController do
     before(:once) { eportfolio_entry(@category) }
 
     it "requires authorization" do
-      put 'update', params: { :eportfolio_id => @portfolio.id, :id => @entry.id }
+      put "update", params: { eportfolio_id: @portfolio.id, id: @entry.id }
       assert_unauthorized
     end
 
     it "updates entry" do
       user_session(@user)
-      put 'update', params: { :eportfolio_id => @portfolio.id, :id => @entry.id, :eportfolio_entry => { :name => "new name" } }
+      put "update", params: { eportfolio_id: @portfolio.id, id: @entry.id, eportfolio_entry: { name: "new name" } }
       expect(response).to be_redirect
       expect(assigns[:entry]).not_to be_nil
       expect(assigns[:entry].name).to eql("new name")
@@ -180,13 +194,13 @@ describe EportfolioEntriesController do
     before(:once) { eportfolio_entry(@category) }
 
     it "requires authorization" do
-      delete 'destroy', params: { :eportfolio_id => @portfolio.id, :id => @entry.id }
+      delete "destroy", params: { eportfolio_id: @portfolio.id, id: @entry.id }
       assert_unauthorized
     end
 
     it "deletes entry" do
       user_session(@user)
-      delete 'destroy', params: { :eportfolio_id => @portfolio.id, :id => @entry.id }
+      delete "destroy", params: { eportfolio_id: @portfolio.id, id: @entry.id }
       expect(response).to be_redirect
       expect(assigns[:entry]).not_to be_nil
       expect(assigns[:entry]).to be_frozen
@@ -197,13 +211,13 @@ describe EportfolioEntriesController do
     before(:once) { eportfolio_entry(@category) }
 
     it "requires authorization" do
-      get 'attachment', params: { :eportfolio_id => @portfolio.id, :entry_id => @entry.id, :attachment_id => 1 }
+      get "attachment", params: { eportfolio_id: @portfolio.id, entry_id: @entry.id, attachment_id: 1 }
       assert_unauthorized
     end
 
     it "will 404 for bad IDs" do
       user_session(@user)
-      get 'attachment', params: { :eportfolio_id => @portfolio.id, :entry_id => @entry.id, :attachment_id => SecureRandom.uuid }
+      get "attachment", params: { eportfolio_id: @portfolio.id, entry_id: @entry.id, attachment_id: SecureRandom.uuid }
       expect(response.status).to eq(404)
     end
 
@@ -216,7 +230,7 @@ describe EportfolioEntriesController do
           @user.associate_with_shard(@shard1)
           @a1 = Attachment.create!(user: @user, context: @user, filename: "test.jpg", uploaded_data: StringIO.new("first"))
         end
-        get 'attachment', params: { :eportfolio_id => @portfolio.id, :entry_id => @entry.id, :attachment_id => @a1.uuid }
+        get "attachment", params: { eportfolio_id: @portfolio.id, entry_id: @entry.id, attachment_id: @a1.uuid }
       end
     end
   end
@@ -233,43 +247,43 @@ describe EportfolioEntriesController do
       @assignment.grade_student(@student, grader: teacher, score: 5)
     end
 
-    it 'requires authorization' do
-      get 'submission', params: { eportfolio_id: @portfolio.id, entry_id: @entry.id, submission_id: @submission.id }
+    it "requires authorization" do
+      get "submission", params: { eportfolio_id: @portfolio.id, entry_id: @entry.id, submission_id: @submission.id }
       assert_unauthorized
     end
 
-    it 'passes anonymize_students: false to the template if the assignment is not anonymous' do
+    it "passes anonymize_students: false to the template if the assignment is not anonymous" do
       user_session(@student)
       expect(controller).to receive(:render).with({
-                                                    template: 'submissions/show_preview',
+                                                    template: "submissions/show_preview",
                                                     locals: { anonymize_students: false }
                                                   }).and_call_original
 
-      get 'submission', params: { eportfolio_id: @portfolio.id, entry_id: @entry.id, submission_id: @submission.id }
+      get "submission", params: { eportfolio_id: @portfolio.id, entry_id: @entry.id, submission_id: @submission.id }
     end
 
-    it 'passes anonymize_students: false to the template if the assignment is anonymous and grades are posted' do
+    it "passes anonymize_students: false to the template if the assignment is anonymous and grades are posted" do
       user_session(@student)
       @assignment.update!(anonymous_grading: true)
       @assignment.post_submissions
       expect(controller).to receive(:render).with({
-                                                    template: 'submissions/show_preview',
+                                                    template: "submissions/show_preview",
                                                     locals: { anonymize_students: false }
                                                   }).and_call_original
 
-      get 'submission', params: { eportfolio_id: @portfolio.id, entry_id: @entry.id, submission_id: @submission.id }
+      get "submission", params: { eportfolio_id: @portfolio.id, entry_id: @entry.id, submission_id: @submission.id }
     end
 
-    it 'passes anonymize_students: true to the template if the assignment is anonymous and grades are unposted' do
+    it "passes anonymize_students: true to the template if the assignment is anonymous and grades are unposted" do
       user_session(@student)
       @assignment.update!(anonymous_grading: true)
       @assignment.hide_submissions
       expect(controller).to receive(:render).with({
-                                                    template: 'submissions/show_preview',
+                                                    template: "submissions/show_preview",
                                                     locals: { anonymize_students: true }
                                                   }).and_call_original
 
-      get 'submission', params: { eportfolio_id: @portfolio.id, entry_id: @entry.id, submission_id: @submission.id }
+      get "submission", params: { eportfolio_id: @portfolio.id, entry_id: @entry.id, submission_id: @submission.id }
     end
   end
 end

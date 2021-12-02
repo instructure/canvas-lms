@@ -22,7 +22,7 @@ module ContextExternalToolsHelper
     markup = tools.map do |tool|
       external_tool_menu_item_tag(tool, options)
     end
-    raw(markup.join(''))
+    raw(markup.join)
   end
 
   def external_tool_menu_item_tag(tool, options = {})
@@ -53,7 +53,7 @@ module ContextExternalToolsHelper
 
     link_attrs[:class] = options[:link_class] if options[:link_class]
     link = content_tag(:a, link_attrs) do
-      concat(render(partial: 'external_tools/helpers/icon', locals: { tool: tool })) if options[:show_icon]
+      concat(render(partial: "external_tools/helpers/icon", locals: { tool: tool })) if options[:show_icon]
       concat(tool[:title])
     end
 

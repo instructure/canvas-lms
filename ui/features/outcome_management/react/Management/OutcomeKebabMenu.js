@@ -27,7 +27,8 @@ import {
   IconTrashLine,
   IconMoveEndLine,
   IconInfoLine,
-  IconSearchLine
+  IconSearchLine,
+  IconImportLine
 } from '@instructure/ui-icons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import I18n from 'i18n!OutcomeManagement'
@@ -75,6 +76,12 @@ const OutcomeKebabMenu = ({
         <Menu.Item value="add_outcomes">
           <IconSearchLine size="x-small" />
           <View padding="0 small">{I18n.t('Add Outcomes')}</View>
+        </Menu.Item>
+      )}
+      {isGroup && (
+        <Menu.Item value="import_outcomes">
+          <IconImportLine size="x-small" />
+          <View padding="0 small">{I18n.t('Import Outcomes')}</View>
         </Menu.Item>
       )}
       {isGroup && <Menu.Separator />}

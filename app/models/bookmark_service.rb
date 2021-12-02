@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'nokogiri'
+require "nokogiri"
 
 class BookmarkService < UserService
   include Delicious
@@ -29,11 +29,12 @@ class BookmarkService < UserService
 
     title = opts[:title] || t(:default_title, "No Title")
     description = opts[:comments] || ""
-    tags = opts[:tags] || ['instructure']
+    tags = opts[:tags] || ["instructure"]
     begin
-      if self.service == 'delicious'
+      case service
+      when "delicious"
         delicious_post_bookmark(self, url, title, description, tags)
-      elsif self.service == 'diigo'
+      when "diigo"
         Diigo::Connection.diigo_post_bookmark(self, url, title, description, tags)
       end
     rescue
@@ -42,47 +43,48 @@ class BookmarkService < UserService
   end
 
   def find_bookmarks(query)
-    if self.service == 'diigo'
-      last_get = Rails.cache.fetch('last_diigo_lookup') { Time.now - 60 }
+    if service == "diigo"
+      last_get = Rails.cache.fetch("last_diigo_lookup") { Time.now - 60 }
       if Time.now - last_get < 8
-        Rails.cache.write('last_diigo_lookup', Time.now)
+        Rails.cache.write("last_diigo_lookup", Time.now)
         sleep Time.now - last_get
       end
-      Rails.cache.write('last_diigo_lookup', Time.now)
+      Rails.cache.write("last_diigo_lookup", Time.now)
     end
     bookmark_search(self, query)
   end
 
   def bookmark_search(service, query)
     bookmarks = []
-    if service.service == 'diigo'
+    case service.service
+    when "diigo"
       data = Diigo::Connection.diigo_get_bookmarks(service)
-      if data.class == Array and data.first.is_a?(Hash)
+      if data.instance_of?(Array) && data.first.is_a?(Hash)
         data.each do |bookmark|
           bookmarks << {
-            :title => bookmark['title'],
-            :url => bookmark['url'],
-            :description => bookmark['desc'],
-            :tags => bookmark['tags'].split(/\s/).join(",")
+            title: bookmark["title"],
+            url: bookmark["url"],
+            description: bookmark["desc"],
+            tags: bookmark["tags"].split(/\s/).join(",")
           }
         end
       else
         bookmarks
       end
-    elsif service.service == 'delicious'
+    when "delicious"
       # This needs to be rewritten with new API and moved into a gem. (Currently not working and no way to test without updating the API.)
       url = "https://api.del.icio.us/v1/posts/all?tag=#{query}"
-      http, request = delicious_generate_request(url, 'GET', service.service_user_name, service.decrypted_password)
+      http, request = delicious_generate_request(url, "GET", service.service_user_name, service.decrypted_password)
       response = http.request(request)
       case response
       when Net::HTTPSuccess
         document = Nokogiri::XML(response.body)
-        document.search('/posts/post').each do |post|
+        document.search("/posts/post").each do |post|
           bookmarks << {
-            :title => post['description'],
-            :url => post['href'],
-            :description => post['description'],
-            :tags => post['tags']
+            title: post["description"],
+            url: post["href"],
+            description: post["description"],
+            tags: post["tags"]
           }
         end
       else

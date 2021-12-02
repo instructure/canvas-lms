@@ -36,23 +36,23 @@ end
 def response_field
   return unless object.has_tag?(:response_field) || object.has_tag?(:deprecated_response_field)
 
-  response_field_tags = object.tags.select { |tag| tag.tag_name == 'response_field' || tag.tag_name == 'deprecated_response_field' }
+  response_field_tags = object.tags.select { |tag| tag.tag_name == "response_field" || tag.tag_name == "deprecated_response_field" }
   @response_fields = response_field_tags.map do |tag|
     ResponseFieldView.new(tag)
   end
 
-  erb('response_fields')
+  erb("response_fields")
 end
 
 def argument
   return unless object.has_tag?(:argument) || object.has_tag?(:deprecated_argument)
 
-  argument_tags = object.tags.select { |tag| tag.tag_name == 'argument' || tag.tag_name == 'deprecated_argument' }
+  argument_tags = object.tags.select { |tag| tag.tag_name == "argument" || tag.tag_name == "deprecated_argument" }
   @request_parameters = argument_tags.map do |tag|
-    ArgumentView.new(tag.text, deprecated: tag.tag_name == 'deprecated_argument')
+    ArgumentView.new(tag.text, deprecated: tag.tag_name == "deprecated_argument")
   end
 
-  erb('request_parameters')
+  erb("request_parameters")
 end
 
 def returns
@@ -60,7 +60,7 @@ def returns
 
   response_info = object.tag(:returns)
   case response_info.text
-  when %r{\[(.*)\]}
+  when /\[(.*)\]/
     @object_name = $1.strip
     @is_list = true
   else
@@ -80,7 +80,7 @@ def generic_tag(name, opts = {})
   @no_types = true if opts[:no_types]
   @label = opts[:label]
   @name = name
-  out = erb('generic_tag')
+  out = erb("generic_tag")
   @no_names, @no_types = nil, nil
   out
 end

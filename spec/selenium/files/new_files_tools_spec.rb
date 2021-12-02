@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-require_relative '../common'
+require_relative "../common"
 
 describe "files page with tools" do
   include_context "in-process server selenium tests"
@@ -26,8 +26,8 @@ describe "files page with tools" do
     before do
       course_with_teacher_logged_in
 
-      @tool = Account.default.context_external_tools.new(:name => "a", :domain => "google.com", :consumer_key => '12345', :shared_secret => 'secret')
-      @tool.file_index_menu = { :url => "http://www.example.com", :text => "Import Stuff" }
+      @tool = Account.default.context_external_tools.new(name: "a", domain: "google.com", consumer_key: "12345", shared_secret: "secret")
+      @tool.file_index_menu = { url: "http://www.example.com", text: "Import Stuff" }
       @tool.save!
 
       Account.default.enable_feature!(:commons_favorites)
@@ -44,13 +44,13 @@ describe "files page with tools" do
       tool_link.click
       wait_for_ajaximations
       tray = f("[role='dialog']")
-      expect(tray['aria-label']).to eq "Import Stuff"
+      expect(tray["aria-label"]).to eq "Import Stuff"
       iframe = tray.find_element(:css, "iframe")
-      expect(iframe['src']).to include("/courses/#{@course.id}/external_tools/#{@tool.id}")
-      query_params = Rack::Utils.parse_nested_query(URI.parse(iframe['src']).query)
+      expect(iframe["src"]).to include("/courses/#{@course.id}/external_tools/#{@tool.id}")
+      query_params = Rack::Utils.parse_nested_query(URI.parse(iframe["src"]).query)
       expect(query_params["launch_type"]).to eq "file_index_menu"
       expect(query_params["com_instructure_course_allow_canvas_resource_selection"]).to eq "false"
-      expect(query_params["com_instructure_course_accept_canvas_resource_types"]).to match_array(["audio", "document", "image", "video"])
+      expect(query_params["com_instructure_course_accept_canvas_resource_types"]).to match_array(%w[audio document image video])
       expect(query_params["com_instructure_course_canvas_resource_type"]).to eq "document"
       expect(query_params["com_instructure_course_available_canvas_resources"]).to be_blank
     end

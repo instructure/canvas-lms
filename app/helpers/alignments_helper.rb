@@ -42,9 +42,9 @@ module AlignmentsHelper
         url: outcome_alignment_url(
           context, outcome, alignment
         )
-      }.delete_if { |_, v|
-        !v.present?
-      }
+      }.delete_if do |_, v|
+        v.blank?
+      end
     }
     options[:style] = hidden unless alignment
 
@@ -56,7 +56,7 @@ module AlignmentsHelper
       [
         context_prefix(alignment.context_code), "outcomes",
         outcome.id, "alignments", alignment.id
-      ].join('/')
+      ].join("/")
     elsif !context.is_a?(Account)
       context_url(
         context, :context_outcome_alignment_redirect_url,

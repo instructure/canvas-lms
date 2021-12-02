@@ -22,7 +22,7 @@ module Api::V1::QuizGroup
   include Api::V1::Json
 
   API_ALLOWED_QUIZ_GROUP_OUTPUT_FIELDS = {
-    :only => %w(
+    only: %w[
       id
       quiz_id
       name
@@ -30,18 +30,18 @@ module Api::V1::QuizGroup
       question_points
       assessment_question_bank_id
       position
-    )
-  }
+    ]
+  }.freeze
 
   API_ALLOWED_QUIZ_INPUT_FIELDS = {
-    :only => %w(
+    only: %w[
       name
       pick_count
       question_points
       assessment_question_bank_id
       position
-    )
-  }
+    ]
+  }.freeze
 
   def quiz_groups_compound_json(quiz_groups, context, user, session)
     { quiz_groups: quiz_groups_json(quiz_groups, context, user, session) }

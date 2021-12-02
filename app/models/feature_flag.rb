@@ -25,7 +25,7 @@ class FeatureFlag < ActiveRecord::Base
   # the change.
   attr_writer :current_user
 
-  belongs_to :context, polymorphic: [:account, :course, :user]
+  belongs_to :context, polymorphic: %i[account course user]
 
   self.ignored_columns = %i[visibility manipulate]
 
@@ -88,7 +88,7 @@ class FeatureFlag < ActiveRecord::Base
   def audit_log_update(operation: :update)
     # kill switch in case something goes crazy in rolling this out.
     # TODO: we can yank this guard clause once we're happy with it's stability.
-    return unless Setting.get('write_feature_flag_audit_logs', 'true') == 'true'
+    return unless Setting.get("write_feature_flag_audit_logs", "true") == "true"
 
     # User feature flags only get changed by the target user,
     # are much higher volume than higher level flags, and are generally
@@ -113,15 +113,15 @@ class FeatureFlag < ActiveRecord::Base
   end
 
   def prior_flag_state(operation)
-    operation == :create ? self.default_for_flag : self.state_in_database
+    operation == :create ? default_for_flag : state_in_database
   end
 
   def post_flag_state(operation)
-    operation == :destroy ? self.default_for_flag : self.state
+    operation == :destroy ? default_for_flag : state
   end
 
   def default_for_flag
-    Feature.definitions[self.feature]&.state || 'undefined'
+    Feature.definitions[feature]&.state || "undefined"
   end
 
   private
@@ -141,6 +141,6 @@ class FeatureFlag < ActiveRecord::Base
   end
 
   def check_cache
-    clear_cache if self.changed?
+    clear_cache if changed?
   end
 end

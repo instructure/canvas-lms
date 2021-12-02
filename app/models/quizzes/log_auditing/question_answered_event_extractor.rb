@@ -23,9 +23,9 @@ module Quizzes::LogAuditing
   # Extracts EVT_QUESTION_ANSWERED events from a submission data construct.
   class QuestionAnsweredEventExtractor
     EVENT_TYPE = Quizzes::QuizSubmissionEvent::EVT_QUESTION_ANSWERED
-    RE_QUESTION_ANSWER_FIELD = /^question_(\d+)_?/
+    RE_QUESTION_ANSWER_FIELD = /^question_(\d+)_?/.freeze
     SQL_FIND_PREDECESSORS =
-      <<~SQL
+      <<~SQL.squish
             created_at >= :started_at
         AND created_at <= :created_at
         AND quiz_submission_id = :quiz_submission_id
@@ -55,7 +55,7 @@ module Quizzes::LogAuditing
                                                           attempt: event.attempt,
                                                           started_at: quiz_submission.started_at,
                                                           created_at: event.created_at
-                                                        }).order('created_at DESC')
+                                                        }).order("created_at DESC")
 
       if predecessors.any?
         optimizer = Quizzes::LogAuditing::QuestionAnsweredEventOptimizer.new
@@ -76,7 +76,7 @@ module Quizzes::LogAuditing
         event.event_data = extract_answers(submission_data, quiz_submission.quiz_data)
         event.created_at = Time.now
         event.quiz_submission = quiz_submission
-        event.attempt = submission_data['attempt']
+        event.attempt = submission_data["attempt"]
       end
     end
 
@@ -84,14 +84,14 @@ module Quizzes::LogAuditing
 
     def extract_answers(submission_data, quiz_data)
       quiz_questions = begin
-        quiz_question_ids = submission_data.keys.map do |key|
+        quiz_question_ids = submission_data.keys.filter_map do |key|
           if key =~ RE_QUESTION_ANSWER_FIELD
             $1
           end
-        end.compact.uniq
+        end.uniq
 
         quiz_data.select do |qq|
-          quiz_question_ids.include?(qq['id'].to_s)
+          quiz_question_ids.include?(qq["id"].to_s)
         end.map(&:symbolize_keys)
       end
 

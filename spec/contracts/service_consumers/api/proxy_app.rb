@@ -18,8 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class PactApiConsumerProxy
-  AUTH_HEADER = 'HTTP_AUTHORIZATION'
-  USER_HEADER = 'HTTP_AUTH_USER'
+  AUTH_HEADER = "HTTP_AUTHORIZATION"
+  USER_HEADER = "HTTP_AUTH_USER"
 
   def call(env)
     # Users calling the API will know the user name of the
@@ -53,12 +53,12 @@ class PactApiConsumerProxy
       begin
         JSON::JWT.decode(env[AUTH_HEADER].split.last) # Remove the "Bearer "
       rescue JSON::JWT::InvalidFormat
-        return true
+        true
       rescue
         # Other exceptions (like VerificationFailed) are OK -- we do not
         # expect a new token to be filled in if we get here. JWT
         # verification should be stubbed in the provider state.
-        return false
+        false
       end
     else
       false

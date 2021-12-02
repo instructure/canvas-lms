@@ -41,7 +41,7 @@ QUnit.module('EditAssignmentDetails', {
             asset_string: 'course_1',
             id: '1',
             concluded: false,
-            k5_subject: true,
+            k5_course: true,
             can_create_assignments: true,
             assignment_groups: [{id: '9', name: 'Assignments'}]
           },
@@ -50,7 +50,7 @@ QUnit.module('EditAssignmentDetails', {
             asset_string: 'course_2',
             id: '2',
             concluded: false,
-            k5_subject: false,
+            k5_course: false,
             can_create_assignments: true,
             assignment_groups: [{id: '9', name: 'Assignments'}]
           }
@@ -73,14 +73,14 @@ QUnit.module('EditAssignmentDetails', {
     tzInTest.restore()
   }
 })
-const createView = function(model, event) {
+const createView = function (model, event) {
   const view = new EditAssignmentDetails(fixtures, event, null, null)
   view.$el.appendTo(fixtures)
   return view.render()
 }
 const commonEvent = () =>
   commonEventFactory({assignment: {due_at: '2016-02-25T23:30:00Z'}}, ['course_1'])
-const nameLengthHelper = function(
+const nameLengthHelper = function (
   view,
   length,
   maxNameLengthRequiredForAccount,
@@ -100,24 +100,24 @@ const nameLengthHelper = function(
     []
   )
 }
-test('should initialize input with start date and time', function() {
+test('should initialize input with start date and time', function () {
   const view = createView(commonEvent(), this.event)
   equal(view.$('.datetime_field').val(), 'Fri Aug 7, 2015 5:00pm')
 })
 
-test('should have blank input when no start date', function() {
+test('should have blank input when no start date', function () {
   this.event.startDate = () => null
   const view = createView(commonEvent(), this.event)
   equal(view.$('.datetime_field').val(), '')
 })
 
-test('should include start date only if all day', function() {
+test('should include start date only if all day', function () {
   this.event.allDay = true
   const view = createView(commonEvent(), this.event)
   equal(view.$('.datetime_field').val(), 'Fri Aug 7, 2015')
 })
 
-test('should treat start date as fudged', function() {
+test('should treat start date as fudged', function () {
   tzInTest.configureAndRestoreLater({
     tz: timezone(detroit, 'America/Detroit'),
     tzData: {
@@ -129,7 +129,7 @@ test('should treat start date as fudged', function() {
   equal(view.$('.datetime_field').val(), 'Fri Aug 7, 2015 1:00pm')
 })
 
-test('should localize start date', function() {
+test('should localize start date', function () {
   tzInTest.configureAndRestoreLater({
     tz: timezone(french, 'fr_FR'),
     momentLocale: 'fr',
@@ -144,7 +144,7 @@ test('should localize start date', function() {
   equal(view.$('.datetime_field').val(), 'ven. 7 août 2015 17:00')
 })
 
-test('requires name to save assignment event', function() {
+test('requires name to save assignment event', function () {
   const view = createView(commonEvent(), this.event)
   const data = {
     assignment: {
@@ -158,7 +158,7 @@ test('requires name to save assignment event', function() {
   equal(errors['assignment[name]'][0].message, 'Name is required!')
 })
 
-test('has an error when a name has 257 chars', function() {
+test('has an error when a name has 257 chars', function () {
   const view = createView(commonEvent(), this.event)
   const errors = nameLengthHelper(view, 257, false, 30, '1')
   ok(errors['assignment[name]'])
@@ -166,20 +166,20 @@ test('has an error when a name has 257 chars', function() {
   equal(errors['assignment[name]'][0].message, 'Name is too long, must be under 257 characters')
 })
 
-test('allows assignment event to save when a name has 256 chars, MAX_NAME_LENGTH is not required and post_to_sis is true', function() {
+test('allows assignment event to save when a name has 256 chars, MAX_NAME_LENGTH is not required and post_to_sis is true', function () {
   const view = createView(commonEvent(), this.event)
   const errors = nameLengthHelper(view, 256, false, 30, '1')
   equal(errors.length, 0)
 })
 
-test('allows assignment event to save when a name has 15 chars, MAX_NAME_LENGTH is 10 and is required, post_to_sis is true and grading_type is not_graded', function() {
+test('allows assignment event to save when a name has 15 chars, MAX_NAME_LENGTH is 10 and is required, post_to_sis is true and grading_type is not_graded', function () {
   this.event.grading_type = 'not_graded'
   const view = createView(commonEvent(), this.event)
   const errors = nameLengthHelper(view, 15, true, 10, '1')
   equal(errors.length, 0)
 })
 
-test('has an error when a name has 11 chars, MAX_NAME_LENGTH is 10 and is required, and post_to_sis is true', function() {
+test('has an error when a name has 11 chars, MAX_NAME_LENGTH is 10 and is required, and post_to_sis is true', function () {
   const view = createView(commonEvent(), this.event)
   const errors = nameLengthHelper(view, 11, true, 10, '1')
   ok(errors['assignment[name]'])
@@ -190,19 +190,19 @@ test('has an error when a name has 11 chars, MAX_NAME_LENGTH is 10 and is requir
   )
 })
 
-test('allows assignment event to save when name has 11 chars, MAX_NAME_LENGTH is 10 and required, but post_to_sis is false', function() {
+test('allows assignment event to save when name has 11 chars, MAX_NAME_LENGTH is 10 and required, but post_to_sis is false', function () {
   const view = createView(commonEvent(), this.event)
   const errors = nameLengthHelper(view, 11, true, 10, '0')
   equal(errors.length, 0)
 })
 
-test('allows assignment event to save when name has 10 chars, MAX_NAME_LENGTH is 10 and required, and post_to_sis is true', function() {
+test('allows assignment event to save when name has 10 chars, MAX_NAME_LENGTH is 10 and required, and post_to_sis is true', function () {
   const view = createView(commonEvent(), this.event)
   const errors = nameLengthHelper(view, 10, true, 10, '1')
   equal(errors.length, 0)
 })
 
-test('requires due_at to save assignment event if there is no date and post_to_sis is true', function() {
+test('requires due_at to save assignment event if there is no date and post_to_sis is true', function () {
   ENV.DUE_DATE_REQUIRED_FOR_ACCOUNT = true
   const view = createView(commonEvent(), this.event)
   const data = {
@@ -218,7 +218,7 @@ test('requires due_at to save assignment event if there is no date and post_to_s
   equal(errors['assignment[due_at]'][0].message, 'Due Date is required!')
 })
 
-test('allows assignment event to save if there is no date and post_to_sis is false', function() {
+test('allows assignment event to save if there is no date and post_to_sis is false', function () {
   const view = createView(commonEvent(), this.event)
   const data = {
     assignment: {

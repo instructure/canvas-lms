@@ -18,16 +18,16 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'csv'
+require "csv"
 
-require_dependency 'sis'
+require_dependency "sis"
 
 module SIS
   module CSV
     class CSVBaseImporter
       PARSE_ARGS = {
         headers: :first_row,
-        encoding: 'bom|utf-8',
+        encoding: "bom|utf-8",
         skip_blanks: true,
         header_converters: :downcase,
         converters: ->(field) { field&.strip&.presence }
@@ -66,7 +66,7 @@ module SIS
           # we have to add two because we need to account for the header row and
           # our sis_errors are documented as a one based index including the
           # header row.
-          row['lineno'] = index ? lineno + 2 : nil
+          row["lineno"] = index ? lineno + 2 : nil
           yield row
         end
       end

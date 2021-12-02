@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'nokogiri'
+require "nokogiri"
 
 describe "varied due dates" do
   include TextHelper
@@ -48,32 +48,34 @@ describe "varied due dates" do
 
   before do
     # Create a course with a student
-    course_with_student(:active_all => true)
-    @student1 = user_with_pseudonym :user => @student
+    course_with_student(active_all: true)
+    @student1 = user_with_pseudonym user: @student
 
     # Enroll another student
-    @s2enrollment = student_in_course(:course => @course, :active_all => true)
-    @student2 = user_with_pseudonym :user => @user
+    @s2enrollment = student_in_course(course: @course, active_all: true)
+    @student2 = user_with_pseudonym user: @user
 
     # Create another section
     @section = @course.course_sections.create!
 
     # Add the second student to the new section
-    @s2enrollment.course_section = @section; @s2enrollment.save!
+    @s2enrollment.course_section = @section
+    @s2enrollment.save!
 
     # Let's enroll another student, this one in both sections
-    @s3enrollment1 = student_in_course(:course => @course, :active_all => true)
-    @student3 = user_with_pseudonym :user => @user
+    @s3enrollment1 = student_in_course(course: @course, active_all: true)
+    @student3 = user_with_pseudonym user: @user
 
     @s3enrollment2 = @s3enrollment1.clone
-    @s3enrollment2.course_section = @section; @s3enrollment2.save!
+    @s3enrollment2.course_section = @section
+    @s3enrollment2.save!
 
     # Create an assignment
     @course_due_date = 3.days.from_now
     @section_due_date = 5.days.from_now
 
-    course_with_teacher(:course => @course, :active_all => true)
-    @teacher = user_with_pseudonym :user => @user
+    course_with_teacher(course: @course, active_all: true)
+    @teacher = user_with_pseudonym user: @user
 
     create_coming_up_assignment
   end
@@ -81,21 +83,21 @@ describe "varied due dates" do
   def create_recent_feedback(student)
     @assignment.find_or_create_submission(student)
     @assignment.update_submission(student, {
-                                    :comment => 'you should turn this in ...',
-                                    :commenter => @teacher
+                                    comment: "you should turn this in ...",
+                                    commenter: @teacher
                                   })
   end
 
   def create_teacher_todo_assignment
     @teacher_todo_assignment = @course.assignments.create!(
-      :title => "Teacher Todo",
-      :due_at => @course_due_date,
-      :submission_types => "online_text_entry"
+      title: "Teacher Todo",
+      due_at: @course_due_date,
+      submission_types: "online_text_entry"
     )
     create_override_for(@teacher_todo_assignment, @section_due_date)
     @submission = @teacher_todo_assignment.submit_homework(@student1, {
-                                                             :submission_type => "online_text_entry",
-                                                             :body => "canvas ate my homework"
+                                                             submission_type: "online_text_entry",
+                                                             body: "canvas ate my homework"
                                                            })
     @submission.save!
   end
@@ -104,17 +106,17 @@ describe "varied due dates" do
     @student_todo_course_due_at = 1.day.from_now
     @student_todo_section_due_at = 2.days.from_now
     @student_todo_assignment = @course.assignments.create!(
-      :title => "Student Todo",
-      :due_at => @student_todo_course_due_at,
-      :submission_types => 'online_text_entry'
+      title: "Student Todo",
+      due_at: @student_todo_course_due_at,
+      submission_types: "online_text_entry"
     )
     @student_todo_override = create_override_for(@student_todo_assignment, @student_todo_section_due_at)
   end
 
   def create_coming_up_assignment
     @assignment = @course.assignments.create!(
-      :title => "Test Assignment",
-      :due_at => @course_due_date
+      title: "Test Assignment",
+      due_at: @course_due_date
     )
     @coming_up_override = create_override_for(@assignment, @section_due_date)
   end
@@ -138,14 +140,14 @@ describe "varied due dates" do
     context "as the teacher" do
       it "shows multiple due dates in 'coming up'" do
         user_session(@teacher)
-        get '/dashboard-sidebar'
+        get "/dashboard-sidebar"
         assert_coming_up_due_date wrap_partial(response), multiple_due_dates
       end
 
       it "shows multiple due dates in 'todo'" do
         create_teacher_todo_assignment
         user_session(@teacher)
-        get '/dashboard-sidebar'
+        get "/dashboard-sidebar"
         assert_todo_due_date wrap_partial(response), multiple_due_dates
       end
     end

@@ -20,10 +20,10 @@
 
 module SIS
   module CSV
-    # note these are account-level groups, not course groups
+    # NOTE: these are account-level groups, not course groups
     class LoginImporter < CSVBaseImporter
       def self.login_csv?(row)
-        (row & %w{existing_user_id existing_integration_id existing_canvas_user_id}).any?
+        (row & %w[existing_user_id existing_integration_id existing_canvas_user_id]).any?
       end
 
       def self.identifying_fields
@@ -39,7 +39,7 @@ module SIS
             p = create_user(row, csv)
             importer.add_user(p, login_only: true)
           rescue ImportError => e
-            messages << SisBatch.build_error(csv, e.to_s, sis_batch: @batch, row: row['lineno'], row_info: p.login_row_info)
+            messages << SisBatch.build_error(csv, e.to_s, sis_batch: @batch, row: row["lineno"], row_info: p.login_row_info)
           end
         end
         SisBatch.bulk_insert_sis_errors(messages)
@@ -50,21 +50,21 @@ module SIS
 
       def create_user(row, csv)
         SIS::Models::User.new(
-          user_id: row['user_id'],
-          login_id: row['login_id'],
-          status: 'active',
-          existing_user_id: row['existing_user_id'],
-          existing_integration_id: row['existing_integration_id'],
-          existing_canvas_user_id: row['existing_canvas_user_id'],
-          root_account_id: row['root_account'],
-          email: row['email'],
-          password: row['password'],
-          ssha_password: row['ssha_password'],
-          integration_id: row['integration_id'],
-          lineno: row['lineno'],
+          user_id: row["user_id"],
+          login_id: row["login_id"],
+          status: "active",
+          existing_user_id: row["existing_user_id"],
+          existing_integration_id: row["existing_integration_id"],
+          existing_canvas_user_id: row["existing_canvas_user_id"],
+          root_account_id: row["root_account"],
+          email: row["email"],
+          password: row["password"],
+          ssha_password: row["ssha_password"],
+          integration_id: row["integration_id"],
+          lineno: row["lineno"],
           csv: csv,
           row: row,
-          authentication_provider_id: row['authentication_provider_id']
+          authentication_provider_id: row["authentication_provider_id"]
         )
       end
     end

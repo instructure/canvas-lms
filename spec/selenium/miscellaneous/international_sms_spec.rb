@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../common'
+require_relative "../common"
 
 describe "international sms" do
   include_context "in-process server selenium tests"
@@ -29,45 +29,45 @@ describe "international sms" do
       @user.account.enable_feature!(:international_sms)
     end
 
-    it 'shows a disclaimer for international numbers', priority: "1", test_id: 443930 do
+    it "shows a disclaimer for international numbers", priority: "1" do
       # All selections except those in this array should include the text messaging rate disclaimer
       no_disclaimer = Array[
-          'Select Country or Region',
-          'United States'
+          "Select Country or Region",
+          "United States"
       ]
 
-      get '/profile/settings'
+      get "/profile/settings"
 
-      find('.add_contact_link').click
+      find(".add_contact_link").click
       wait_for_ajaximations
 
-      list_of_countries = find_all('.controls .user_selected.country option')
+      list_of_countries = find_all(".controls .user_selected.country option")
       list_of_countries.each do |country|
         fj(".controls .user_selected.country :contains(#{country.text})").click
         wait_for_ajaximations
 
         if no_disclaimer.any? { |w| country.text.include? w }
           # no text messaging rate disclaimer displayed
-          expect(find('.intl_rates_may_apply')).to have_attribute('style', "display: none\;")
+          expect(find(".intl_rates_may_apply")).to have_attribute("style", "display: none\;")
         else
           # display text messaging rate disclaimer
-          expect(find('.intl_rates_may_apply')).to have_attribute('style', "display: inline\;")
+          expect(find(".intl_rates_may_apply")).to have_attribute("style", "display: inline\;")
         end
       end
     end
 
-    it 'allows a phone number to be entered', priority: "1", test_id: 602158 do
-      get '/profile/settings'
+    it "allows a phone number to be entered", priority: "1" do
+      get "/profile/settings"
 
-      find('.add_contact_link').click
+      find(".add_contact_link").click
       wait_for_ajaximations
 
-      set_value f(".user_selected.country"), '54'
-      set_value f('#communication_channel_sms_number'), '12345'
+      set_value f(".user_selected.country"), "54"
+      set_value f("#communication_channel_sms_number"), "12345"
       fj('#register_sms_number button[type="submit"]').click
       wait_for_ajaximations
 
-      expect(f('#sms_confirmation_instructions')).to be_displayed
+      expect(f("#sms_confirmation_instructions")).to be_displayed
     end
   end
 end

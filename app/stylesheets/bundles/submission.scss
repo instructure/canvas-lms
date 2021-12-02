@@ -104,7 +104,11 @@
   .comments {
     height: 300px;
     overflow: auto;
-    background-color: $ic-bg-light-neutral;
+    @if $use_high_contrast {
+      background-color: #FFF;
+    } @else {
+      background-color: $ic-bg-light-neutral;
+    }
     @include breakpoint(desktop) { border-#{direction(left)}: 1px solid $ic-border-light; }
   }
 

@@ -43,6 +43,10 @@ async function loadMessageStudentsWhoDialog() {
   return (await import('../shared/MessageStudentsWhoDialog')).default
 }
 
+async function loadMessageStudentsWithObserversDialog() {
+  return (await import('@canvas/message-students-dialog/react/MessageStudentsWhoDialog')).default
+}
+
 async function loadPostAssignmentGradesTray() {
   return (await import('@canvas/post-assignment-grades-tray')).default
 }
@@ -58,6 +62,7 @@ const AsyncComponents = {
   loadGradebookSettingsModal,
   loadHideAssignmentGradesTray,
   loadMessageStudentsWhoDialog,
+  loadMessageStudentsWithObserversDialog,
   loadPostAssignmentGradesTray,
   loadSetDefaultGradeDialog,
 

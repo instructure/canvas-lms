@@ -18,44 +18,44 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../api_spec_helper'
+require_relative "../api_spec_helper"
 
 # https://github.com/adlnet/xAPI-Spec/blob/master/xAPI.md
 
 describe LtiApiController, type: :request do
   before :once do
-    course_with_student(:active_all => true)
+    course_with_student(active_all: true)
     @student = @user
-    @course.enroll_teacher(user_with_pseudonym(:active_all => true))
-    @tool = @course.context_external_tools.create!(:shared_secret => 'test_secret', :consumer_key => 'test_key', :name => 'my analytics test tool', :domain => 'example.com')
-    assignment_model(:course => @course, :name => 'tool assignment', :submission_types => 'external_tool', :points_possible => 20, :grading_type => 'points')
-    tag = @assignment.build_external_tool_tag(:url => "http://example.com/one")
-    tag.content_type = 'ContextExternalTool'
+    @course.enroll_teacher(user_with_pseudonym(active_all: true))
+    @tool = @course.context_external_tools.create!(shared_secret: "test_secret", consumer_key: "test_key", name: "my analytics test tool", domain: "example.com")
+    assignment_model(course: @course, name: "tool assignment", submission_types: "external_tool", points_possible: 20, grading_type: "points")
+    tag = @assignment.build_external_tool_tag(url: "http://example.com/one")
+    tag.content_type = "ContextExternalTool"
     tag.save!
     @token = Lti::AnalyticsService.create_token(@tool, @student, @course)
   end
 
   def make_call(opts = {})
-    opts['path'] ||= "/api/lti/v1/xapi/#{@token}"
-    opts['key'] ||= @tool.consumer_key
-    opts['secret'] ||= @tool.shared_secret
-    opts['content-type'] ||= 'application/json'
-    consumer = OAuth::Consumer.new(opts['key'], opts['secret'], :site => "https://www.example.com", :signature_method => "HMAC-SHA1")
-    req = consumer.create_signed_request(:post, opts['path'], nil, :scheme => 'header', :timestamp => opts['timestamp'], :nonce => opts['nonce'])
-    req.body = JSON.generate(opts['body']) if opts['body']
+    opts["path"] ||= "/api/lti/v1/xapi/#{@token}"
+    opts["key"] ||= @tool.consumer_key
+    opts["secret"] ||= @tool.shared_secret
+    opts["content-type"] ||= "application/json"
+    consumer = OAuth::Consumer.new(opts["key"], opts["secret"], site: "https://www.example.com", signature_method: "HMAC-SHA1")
+    req = consumer.create_signed_request(:post, opts["path"], nil, scheme: "header", timestamp: opts["timestamp"], nonce: opts["nonce"])
+    req.body = JSON.generate(opts["body"]) if opts["body"]
     post "https://www.example.com#{req.path}",
          params: req.body,
-         headers: { "CONTENT_TYPE" => opts['content-type'], "HTTP_AUTHORIZATION" => req['Authorization'] }
+         headers: { "CONTENT_TYPE" => opts["content-type"], "HTTP_AUTHORIZATION" => req["Authorization"] }
   end
 
-  context 'xAPI' do
+  context "xAPI" do
     it "requires a content-type of application/json" do
-      make_call('content-type' => 'application/xml')
+      make_call("content-type" => "application/xml")
       assert_status(415)
     end
 
     it "requires the correct shared secret" do
-      make_call('secret' => 'bad secret is bad')
+      make_call("secret" => "bad secret is bad")
       assert_status(401)
     end
 
@@ -66,7 +66,7 @@ describe LtiApiController, type: :request do
         actor: {
           account: {
             homePage: "http://www.instructure.com/",
-            name: '123somemagicguid'
+            name: "123somemagicguid"
           }
         },
         verb: {
@@ -88,7 +88,7 @@ describe LtiApiController, type: :request do
       e = Enrollment.where(user_id: @student, course_id: @course).first
       previous_time = e.total_activity_time
 
-      make_call('body' => xapi_body)
+      make_call("body" => xapi_body)
       expect(response).to be_successful
 
       expect(e.reload.total_activity_time).to eq previous_time + 600
@@ -98,20 +98,20 @@ describe LtiApiController, type: :request do
       accesses = AssetUserAccess.where(user_id: @student)
       previous_count = accesses.count
 
-      make_call('body' => xapi_body)
+      make_call("body" => xapi_body)
 
       expect(accesses.reload.count).to eq previous_count + 1
     end
 
     describe "page view creation" do
-      before { Setting.set 'enable_page_views', 'db' }
+      before { Setting.set "enable_page_views", "db" }
 
       it "includes url and interaction_seconds" do
-        page_views = PageView.where(user_id: @student, context_id: @course, context_type: 'Course')
+        page_views = PageView.where(user_id: @student, context_id: @course, context_type: "Course")
         previous_count = page_views.count
         body = xapi_body
 
-        make_call('body' => body)
+        make_call("body" => body)
 
         expect(page_views.reload.count).to eq previous_count + 1
 
@@ -124,14 +124,14 @@ describe LtiApiController, type: :request do
     it "handles requests without durations" do
       body = xapi_body
       body.delete(:result)
-      make_call('body' => body)
+      make_call("body" => body)
       expect(response).to be_successful
     end
   end
 
-  context 'caliper' do
+  context "caliper" do
     it "requires the correct shared secret" do
-      make_call('secret' => 'bad secret is bad', 'path' => "/api/lti/v1/caliper/#{@token}")
+      make_call("secret" => "bad secret is bad", "path" => "/api/lti/v1/caliper/#{@token}")
       assert_status(401)
     end
 
@@ -143,7 +143,7 @@ describe LtiApiController, type: :request do
         "startedAtTime" => Time.now.utc.to_i,
         "duration" => "PT10M0S",
         "actor" => {
-          "@id" => '123somemagicguid',
+          "@id" => "123somemagicguid",
           "@type" => "http://purl.imsglobal.org/caliper/v1/lis/Person"
         },
         "object" => {
@@ -165,7 +165,7 @@ describe LtiApiController, type: :request do
       e = Enrollment.where(user_id: @student, course_id: @course).first
       previous_time = e.total_activity_time
 
-      make_call('body' => caliper_body, 'path' => "/api/lti/v1/caliper/#{@token}")
+      make_call("body" => caliper_body, "path" => "/api/lti/v1/caliper/#{@token}")
       expect(response).to be_successful
 
       expect(e.reload.total_activity_time).to eq previous_time + 600
@@ -175,9 +175,9 @@ describe LtiApiController, type: :request do
       e = Enrollment.where(user_id: @student, course_id: @course).first
       previous_time = e.total_activity_time
       body = caliper_body
-      body['@type'] = 'did_not_view'
+      body["@type"] = "did_not_view"
 
-      make_call('body' => body, 'path' => "/api/lti/v1/caliper/#{@token}")
+      make_call("body" => body, "path" => "/api/lti/v1/caliper/#{@token}")
       expect(response).to be_successful
 
       expect(e.reload.total_activity_time).to eq previous_time
@@ -187,33 +187,33 @@ describe LtiApiController, type: :request do
       accesses = AssetUserAccess.where(user_id: @student)
       previous_count = accesses.count
 
-      make_call('body' => caliper_body, 'path' => "/api/lti/v1/caliper/#{@token}")
+      make_call("body" => caliper_body, "path" => "/api/lti/v1/caliper/#{@token}")
 
       expect(accesses.reload.count).to eq previous_count + 1
     end
 
     describe "page view creation" do
-      before { Setting.set 'enable_page_views', 'db' }
+      before { Setting.set "enable_page_views", "db" }
 
       it "includes url and interaction_seconds" do
-        page_views = PageView.where(user_id: @student, context_id: @course, context_type: 'Course')
+        page_views = PageView.where(user_id: @student, context_id: @course, context_type: "Course")
         previous_count = page_views.count
         body = caliper_body
 
-        make_call('body' => body, 'path' => "/api/lti/v1/caliper/#{@token}")
+        make_call("body" => body, "path" => "/api/lti/v1/caliper/#{@token}")
 
         expect(page_views.reload.count).to eq previous_count + 1
 
         page_view = page_views.last
-        expect(page_view.url).to eq body['object']['@id']
+        expect(page_view.url).to eq body["object"]["@id"]
         expect(page_view.interaction_seconds).to eq 600
       end
     end
 
     it "handles requests without durations" do
       body = caliper_body
-      body.delete('duration')
-      make_call('body' => body, 'path' => "/api/lti/v1/caliper/#{@token}")
+      body.delete("duration")
+      make_call("body" => body, "path" => "/api/lti/v1/caliper/#{@token}")
       expect(response).to be_successful
     end
   end

@@ -22,10 +22,11 @@ module MessagesCommon
   def generate_message(notification_name, path_type, *)
     message = super
     expect(message.body).not_to be_nil
-    if path_type == :email
+    case path_type
+    when :email
       expect(message.subject).not_to be_nil
       expect(message.url).not_to be_nil
-    elsif path_type == :twitter
+    when :twitter
       expect(message.main_link).to be_present
     end
     message
@@ -36,7 +37,7 @@ shared_examples_for "a message" do
   include MessagesCommon
 
   def message_data_with_default
-    if self.respond_to?(:message_data)
+    if respond_to?(:message_data)
       message_data
     else
       {}

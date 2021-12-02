@@ -27,7 +27,7 @@ module Api::V1::UserProfile
 
     user = profile.user
 
-    json = user_json(user, current_user, session, 'avatar_url', context)
+    json = user_json(user, current_user, session, "avatar_url", context)
     # don't unintentionally include stuff added to user_json
     json.slice! :id, :name, :short_name, :sortable_name, :sis_user_id,
                 :sis_login_id, :login_id, :avatar_url, :integration_id, :pronouns
@@ -43,25 +43,27 @@ module Api::V1::UserProfile
     json[:effective_locale] = I18n.locale if user == current_user
 
     if user == current_user
-      json[:calendar] = { :ics => "#{feeds_calendar_url(user.feed_code)}.ics" }
+      json[:calendar] = { ics: "#{feeds_calendar_url(user.feed_code)}.ics" }
       json[:lti_user_id] = user.lti_context_id if user.lti_context_id.present?
       json[:k5_user] = k5_user?
     end
 
-    if includes.include? 'user_services'
-      services = user == current_user ?
-        user.user_services :
-        user.user_services.visible
+    if includes.include? "user_services"
+      services = if user == current_user
+                   user.user_services
+                 else
+                   user.user_services.visible
+                 end
 
       services = services.select { |s| feature_and_service_enabled?(s.service) }
       json[:user_services] = services.map { |s| user_service_json(s, current_user, session) }
     end
 
-    if includes.include? 'links'
+    if includes.include? "links"
       json[:links] = profile.links.map { |l| user_profile_link_json(l, current_user, session) }
     end
 
-    if includes.include? 'uuid'
+    if includes.include? "uuid"
       past_uuid = UserPastLtiId.uuid_for_user_in_context(user, context)
       json[:past_uuid] = past_uuid unless past_uuid == user.uuid
       json[:uuid] = user.uuid
@@ -72,11 +74,11 @@ module Api::V1::UserProfile
 
   def user_service_json(user_service, current_user, session)
     api_json(user_service, current_user, session,
-             :only => %w(service visible),
-             :methods => %(service_user_link))
+             only: %w[service visible],
+             methods: %(service_user_link))
   end
 
   def user_profile_link_json(link, current_user, session)
-    api_json(link, current_user, session, :only => %w(url title))
+    api_json(link, current_user, session, only: %w[url title])
   end
 end

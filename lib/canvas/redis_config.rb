@@ -35,7 +35,7 @@ module Canvas
     end
 
     def self.factory
-      Bundler.require 'redis'
+      Bundler.require "redis"
       ::Redis::Store::Factory
     end
 
@@ -44,11 +44,11 @@ module Canvas
     end
 
     def self.from_servers(servers, options)
-      raw_conn = factory.create(servers.map { |s|
+      raw_conn = factory.create(servers.map do |s|
         # convert string addresses to options hash, and disable redis-cache's
         # built-in marshalling code
         url_to_redis_options(s).merge(options || {})
-      })
+      end)
       ::Canvas::RedisWrapper.new(raw_conn)
     end
   end

@@ -26,11 +26,11 @@ class DiscussionTopicsApiController < ApplicationController
 
   before_action :require_context_and_read_access
   before_action :require_topic
-  before_action :require_initial_post, except: [:add_entry, :mark_topic_read,
-                                                :mark_topic_unread, :show,
-                                                :unsubscribe_topic]
-  before_action only: [:replies, :entries, :add_entry, :add_reply, :show,
-                       :view, :entry_list, :subscribe_topic] do
+  before_action :require_initial_post, except: %i[add_entry mark_topic_read
+                                                  mark_topic_unread show
+                                                  unsubscribe_topic]
+  before_action only: %i[replies entries add_entry add_reply show
+                         view entry_list subscribe_topic] do
     check_differentiated_assignments(@topic)
   end
 
@@ -56,14 +56,16 @@ class DiscussionTopicsApiController < ApplicationController
   #     curl https://<canvas>/api/v1/courses/<course_id>/discussion_topics/<topic_id> \
   #         -H 'Authorization: Bearer <token>'
   def show
+    return unless is_not_anonymous
+
     include_params = Array(params[:include])
-    log_asset_access(@topic, 'topics', 'topics')
+    log_asset_access(@topic, "topics", "topics")
     render(json: discussion_topics_api_json([@topic], @context,
                                             @current_user, session,
-                                            include_all_dates: include_params.include?('all_dates'),
-                                            :include_sections => include_params.include?('sections'),
-                                            :include_sections_user_count => include_params.include?('sections_user_count'),
-                                            :include_overrides => include_params.include?('overrides'),).first)
+                                            include_all_dates: include_params.include?("all_dates"),
+                                            include_sections: include_params.include?("sections"),
+                                            include_sections_user_count: include_params.include?("sections_user_count"),
+                                            include_overrides: include_params.include?("overrides")).first)
   end
 
   # @API Get the full topic
@@ -123,13 +125,14 @@ class DiscussionTopicsApiController < ApplicationController
   #   }
   def view
     return unless authorized_action(@topic, @current_user, :read_replies)
+    return unless is_not_anonymous
 
-    log_asset_access(@topic, 'topics', 'topics')
+    log_asset_access(@topic, "topics", "topics")
 
     mobile_brand_config = !in_app? && @context.account.effective_brand_config
     opts = {
-      :include_new_entries => value_to_boolean(params[:include_new_entries]),
-      :include_mobile_overrides => !!mobile_brand_config
+      include_new_entries: value_to_boolean(params[:include_new_entries]),
+      include_mobile_overrides: !!mobile_brand_config
     }
     structure, participant_ids, entry_ids, new_entries = @topic.materialized_view(opts)
 
@@ -139,16 +142,14 @@ class DiscussionTopicsApiController < ApplicationController
       # we assume that json_structure will typically be served to users requesting string IDs
       if !stringify_json_ids? || mobile_brand_config
         entries = JSON.parse(structure)
-        StringifyIds.recursively_stringify_ids(entries, reverse: true) if !stringify_json_ids?
+        StringifyIds.recursively_stringify_ids(entries, reverse: true) unless stringify_json_ids?
         DiscussionTopic::MaterializedView.include_mobile_overrides(entries, mobile_brand_config.css_and_js_overrides) if mobile_brand_config
         structure = entries.to_json
       end
 
-      if new_entries
-        new_entries.each do |e|
-          e["message"] = resolve_placeholders(e["message"]) if e["message"]
-          e["attachments"].each { |att| att["url"] = resolve_placeholders(att["url"]) if att["url"] } if e["attachments"]
-        end
+      new_entries&.each do |e|
+        e["message"] = resolve_placeholders(e["message"]) if e["message"]
+        e["attachments"]&.each { |att| att["url"] = resolve_placeholders(att["url"]) if att["url"] }
       end
 
       participants = Shard.partition_by_shard(participant_ids) do |shard_ids|
@@ -165,7 +166,7 @@ class DiscussionTopicsApiController < ApplicationController
                                  @context.grants_right?(@current_user, session, :read_as_admin)
       if include_enrollment_state || include_context_card_info
         enrollment_context = @context.is_a?(Course) ? @context : @context.context
-        all_enrollments = enrollment_context.enrollments.where(:user_id => participants).to_a
+        all_enrollments = enrollment_context.enrollments.where(user_id: participants).to_a
         if include_enrollment_state
           Canvas::Builders::EnrollmentDateBuilder.preload_state(all_enrollments)
         end
@@ -197,24 +198,24 @@ class DiscussionTopicsApiController < ApplicationController
 
       if @topic.allow_rating?
         entry_ratings  = DiscussionEntryParticipant.entry_ratings(entry_ids, @current_user)
-        entry_ratings  = Hash[entry_ratings.map { |k, v| [k.to_s, v] }] if stringify_json_ids?
+        entry_ratings  = entry_ratings.transform_keys(&:to_s) if stringify_json_ids?
       end
 
       # as an optimization, the view structure is pre-serialized as a json
       # string, so we have to do a bit of manual json building here to fit it
       # into the response.
       fragments = {
-        :unread_entries => unread_entries.to_json,
-        :forced_entries => forced_entries.to_json,
-        :entry_ratings => entry_ratings.to_json,
-        :participants => json_cast(participant_info).to_json,
-        :view => structure,
-        :new_entries => json_cast(new_entries).to_json,
+        unread_entries: unread_entries.to_json,
+        forced_entries: forced_entries.to_json,
+        entry_ratings: entry_ratings.to_json,
+        participants: json_cast(participant_info).to_json,
+        view: structure,
+        new_entries: json_cast(new_entries).to_json,
       }
       fragments = fragments.map { |k, v| %("#{k}": #{v}) }
-      render :json => "{ #{fragments.join(', ')} }"
+      render json: "{ #{fragments.join(", ")} }"
     else
-      head 503
+      head :service_unavailable
     end
   end
 
@@ -257,40 +258,40 @@ class DiscussionTopicsApiController < ApplicationController
     # Require topic hook forbids duplicating of child, nonexistent, and deleted topics
     # The only extra check we need is to prevent duplicating announcements.
     if @topic.is_announcement
-      return render json: { error: t('announcements cannot be duplicated') }, status: :bad_request
+      return render json: { error: t("announcements cannot be duplicated") }, status: :bad_request
     end
 
     return unless authorized_action(@topic, @current_user, :duplicate)
 
-    new_topic = @topic.duplicate({ :user => @current_user })
+    new_topic = @topic.duplicate({ user: @current_user })
     if @topic.pinned
       new_topic.position = @topic.context.discussion_topics.maximum(:position) + 1
     end
     # People that can't moderate don't have power to publish separately, so
     # just publish their topics straightaway.
-    if !@context.grants_right?(@current_user, session, :moderate_forum)
+    unless @context.grants_right?(@current_user, session, :moderate_forum)
       new_topic.publish
     end
     if new_topic.save!
       result = discussion_topic_api_json(new_topic, @context, @current_user, session,
-                                         :include_sections => true)
+                                         include_sections: true)
       # If pinned, make the new topic show up just below the old one
       if new_topic.pinned
         new_topic.insert_at(@topic.position + 1)
         # Pass the new positions to the backend so the frontend can stay consistent
         # with the backend.  Rails doesn't like topic.context.discussion_topics.select(...).
         # We only care about the id and position here, so don't pull everything else up
-        positions_array = DiscussionTopic.select(:id, :position).where(:context => @context)
-                                         .active.where(:pinned => true).map { |t| [t.id, t.position] }
+        positions_array = DiscussionTopic.select(:id, :position).where(context: @context)
+                                         .active.where(pinned: true).map { |t| [t.id, t.position] }
         result[:new_positions] = positions_array.to_h
       end
       if new_topic.assignment
         new_topic.assignment.insert_at(@topic.assignment.position + 1)
         result[:set_assignment] = true
       end
-      render :json => result
+      render json: result
     else
-      render json: { error: t('unable to save new discussion topic') }, status: :bad_request
+      render json: { error: t("unable to save new discussion topic") }, status: :bad_request
     end
   end
 
@@ -374,8 +375,10 @@ class DiscussionTopicsApiController < ApplicationController
   #         } ],
   #       "has_more_replies": false } ]
   def entries
+    return unless is_not_anonymous
+
     @entries = Api.paginate(root_entries(@topic).newest_first, self, entry_pagination_url(@topic))
-    render :json => discussion_entry_api_json(@entries, @context, @current_user, session)
+    render json: discussion_entry_api_json(@entries, @context, @current_user, session)
   end
 
   # @API Post a reply
@@ -452,9 +455,11 @@ class DiscussionTopicsApiController < ApplicationController
   #       "forced_read_state": false,
   #       "created_at": "2011-11-03T21:26:44Z" } ]
   def replies
+    return unless is_not_anonymous
+
     @parent = root_entries(@topic).find(params[:entry_id])
     @replies = Api.paginate(reply_entries(@parent).newest_first, self, reply_pagination_url(@topic, @parent))
-    render :json => discussion_entry_api_json(@replies, @context, @current_user, session)
+    render json: discussion_entry_api_json(@replies, @context, @current_user, session)
   end
 
   # @API List entries
@@ -498,10 +503,12 @@ class DiscussionTopicsApiController < ApplicationController
   #     { ... entry 3 ... },
   #   ]
   def entry_list
+    return unless is_not_anonymous
+
     ids = Array(params[:ids])
     entries = @topic.discussion_entries.order(:id).find(ids)
     @entries = Api.paginate(entries, self, entry_pagination_url(@topic))
-    render :json => discussion_entry_api_json(@entries, @context, @current_user, session, [:display_user])
+    render json: discussion_entry_api_json(@entries, @context, @current_user, session, [:display_user])
   end
 
   # @API Mark topic as read
@@ -555,7 +562,7 @@ class DiscussionTopicsApiController < ApplicationController
   #        -H "Authorization: Bearer <token>" \
   #        -H "Content-Length: 0"
   def mark_all_read
-    change_topic_all_read_state('read')
+    change_topic_all_read_state("read")
   end
 
   # @API Mark all entries as unread
@@ -575,7 +582,7 @@ class DiscussionTopicsApiController < ApplicationController
   #        -X DELETE \
   #        -H "Authorization: Bearer <token>"
   def mark_all_unread
-    change_topic_all_read_state('unread')
+    change_topic_all_read_state("unread")
   end
 
   # @API Mark entry as read
@@ -636,7 +643,7 @@ class DiscussionTopicsApiController < ApplicationController
     require_entry
     rating = params[:rating].to_i
     unless [0, 1].include? rating
-      return render(:json => { :message => "Invalid rating given" }, :status => :bad_request)
+      return render(json: { message: "Invalid rating given" }, status: :bad_request)
     end
 
     if authorized_action(@entry, @current_user, :rate)
@@ -675,7 +682,7 @@ class DiscussionTopicsApiController < ApplicationController
 
   def require_topic
     @topic = @context.all_discussion_topics.active.find(params[:topic_id])
-    return authorized_action(@topic, @current_user, :read)
+    authorized_action(@topic, @current_user, :read)
   end
 
   def require_entry
@@ -683,28 +690,28 @@ class DiscussionTopicsApiController < ApplicationController
   end
 
   def require_initial_post
-    return true if !@topic.initial_post_required?(@current_user, session)
+    return true unless @topic.initial_post_required?(@current_user, session)
 
     # neither the current user nor the enrollment user (if any) has posted yet,
     # so give them the forbidden status
-    render :json => 'require_initial_post', :status => :forbidden
-    return false
+    render json: "require_initial_post", status: :forbidden
+    false
   end
 
   def build_entry(association)
     params[:message] = process_incoming_html_content(params[:message]) if params.key?(:message)
     @topic.save! if @topic.new_record?
-    association.build(:message => params[:message], :user => @current_user, :discussion_topic => @topic)
+    association.build(message: params[:message], user: @current_user, discussion_topic: @topic)
   end
 
   def save_entry
-    has_attachment = params[:attachment].present? && params[:attachment].size > 0 &&
+    has_attachment = params[:attachment].present? && !params[:attachment].empty? &&
                      @entry.grants_right?(@current_user, session, :attach)
     return if has_attachment && !@topic.for_assignment? && params[:attachment].size > 1.kilobytes &&
               quota_exceeded(@current_user, named_context_url(@context, :context_discussion_topic_url, @topic.id))
 
     if @entry.save
-      log_asset_access(@topic, 'topics', 'topics', 'participate')
+      log_asset_access(@topic, "topics", "topics", "participate")
 
       assignment_id = @topic.assignment_id
       submission_id = assignment_id && @topic.assignment.submission_for_student_id(@entry.user_id)&.id
@@ -716,9 +723,9 @@ class DiscussionTopicsApiController < ApplicationController
         @entry.attachment = @attachment
         @entry.save
       end
-      render :json => discussion_entry_api_json([@entry], @context, @current_user, session, [:user_name, :display_user]).first, :status => :created
+      render json: discussion_entry_api_json([@entry], @context, @current_user, session, [:user_name, :display_user]).first, status: :created
     else
-      render :json => @entry.errors, :status => :bad_request
+      render json: @entry.errors, status: :bad_request
     end
   end
 
@@ -726,7 +733,7 @@ class DiscussionTopicsApiController < ApplicationController
     context = (@current_user || @context)
     attachment_params = {}
     if @topic.for_assignment?
-      attachment_params.merge!(:folder_id => @current_user.submissions_folder(@context))
+      attachment_params[:folder_id] = @current_user.submissions_folder(@context)
       context = @current_user
     end
     attachment = context.attachments.new(attachment_params)
@@ -763,9 +770,9 @@ class DiscussionTopicsApiController < ApplicationController
     render_state_change_result @topic.change_read_state(new_state, @current_user)
   end
 
-  def get_forced_option()
+  def get_forced_option
     opts = {}
-    opts[:forced] = value_to_boolean(params[:forced_read_state]) if params.has_key?(:forced_read_state)
+    opts[:forced] = value_to_boolean(params[:forced_read_state]) if params.key?(:forced_read_state)
     opts
   end
 
@@ -773,7 +780,7 @@ class DiscussionTopicsApiController < ApplicationController
     opts = get_forced_option
 
     @topic.change_all_read_state(new_state, @current_user, opts)
-    render :json => {}, :status => :no_content
+    render json: {}, status: :no_content
   end
 
   def change_entry_read_state(new_state)
@@ -796,7 +803,17 @@ class DiscussionTopicsApiController < ApplicationController
     if result == true || result.try(:errors).blank?
       head :no_content
     else
-      render :json => result.try(:errors) || {}, :status => :bad_request
+      render json: result.try(:errors) || {}, status: :bad_request
     end
+  end
+
+  def is_not_anonymous
+    if @topic.anonymous?
+      render json: { errors: [{ message: "The specified resource does not exist." }] }, status: :not_found
+
+      return false
+    end
+
+    true
   end
 end

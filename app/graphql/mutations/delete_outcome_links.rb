@@ -19,9 +19,9 @@
 #
 
 class Mutations::DeleteOutcomeLinks < Mutations::BaseMutation
-  graphql_name 'DeleteOutcomeLinks'
+  graphql_name "DeleteOutcomeLinks"
 
-  argument :ids, [ID], required: true, prepare: GraphQLHelpers.relay_or_legacy_ids_prepare_func('ContentTag')
+  argument :ids, [ID], required: true, prepare: GraphQLHelpers.relay_or_legacy_ids_prepare_func("ContentTag")
 
   field :deleted_outcome_link_ids, [ID], null: false
 

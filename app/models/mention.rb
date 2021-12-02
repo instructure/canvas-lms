@@ -22,7 +22,7 @@ class Mention < ApplicationRecord
 
   belongs_to :user, inverse_of: :mentions
   belongs_to :discussion_entry, inverse_of: :mentions
-  belongs_to :root_account, class_name: 'Account'
+  belongs_to :root_account, class_name: "Account"
   has_one :discussion_topic, through: :discussion_entry
   delegate :context, to: :discussion_entry
 

@@ -19,7 +19,7 @@
 #
 
 module Types
-  # TODO - inherit from app-specific object
+  # TODO: inherit from app-specific object
   class QuizType < ApplicationObjectType
     graphql_name "Quiz"
 

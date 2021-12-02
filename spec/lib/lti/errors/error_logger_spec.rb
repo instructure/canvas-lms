@@ -19,26 +19,26 @@
 #
 
 describe Lti::Errors::ErrorLogger do
-  describe '#log_error' do
-    let(:message) { 'An error message!' }
+  describe "#log_error" do
+    let(:message) { "An error message!" }
     let(:error) { StandardError.new(message) }
 
     before do
-      allow(error).to receive(:backtrace) { ['afile.rb line 23', 'another_file.rb line 33'] }
+      allow(error).to receive(:backtrace) { ["afile.rb line 23", "another_file.rb line 33"] }
     end
 
-    it 'creates a new error report' do
+    it "creates a new error report" do
       expect { Lti::Errors::ErrorLogger.log_error(error) }.to change { ErrorReport.count }.from(0).to(1)
     end
 
-    it 'sets the error report message to the message of the error' do
+    it "sets the error report message to the message of the error" do
       Lti::Errors::ErrorLogger.log_error(error)
       expect(ErrorReport.last.message).to eq message
     end
 
-    it 'includes the backtrace in the exception message' do
+    it "includes the backtrace in the exception message" do
       Lti::Errors::ErrorLogger.log_error(error)
-      expect(ErrorReport.last.data['exception_message']).to eq message + "\n\n#{error.backtrace.join("\n")}"
+      expect(ErrorReport.last.data["exception_message"]).to eq message + "\n\n#{error.backtrace.join("\n")}"
     end
   end
 end

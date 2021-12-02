@@ -17,7 +17,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'spec_helper'
+require "spec_helper"
 
 describe HtmlTextHelper do
   let(:th) { Class.new.tap { |th| th.extend HtmlTextHelper } }
@@ -26,44 +26,44 @@ describe HtmlTextHelper do
     it "detects and linkify URLs" do
       str = th.format_message("click here: (http://www.instructure.com) to check things out\nnewline").first
       html = Nokogiri::HTML5.fragment(str)
-      link = html.css('a').first
-      expect(link['href']).to eq("http://www.instructure.com")
+      link = html.css("a").first
+      expect(link["href"]).to eq("http://www.instructure.com")
 
       str = th.format_message("click here: http://www.instructure.com\nnewline").first
       html = Nokogiri::HTML5.fragment(str)
-      link = html.css('a').first
-      expect(link['href']).to eq("http://www.instructure.com")
+      link = html.css("a").first
+      expect(link["href"]).to eq("http://www.instructure.com")
 
       str = th.format_message("click here: www.instructure.com/a/b?a=1&b=2\nnewline").first
       html = Nokogiri::HTML5.fragment(str)
-      link = html.css('a').first
-      expect(link['href']).to eq("http://www.instructure.com/a/b?a=1&b=2")
+      link = html.css("a").first
+      expect(link["href"]).to eq("http://www.instructure.com/a/b?a=1&b=2")
 
       str = th.format_message("click here: http://www.instructure.com/\nnewline").first
       html = Nokogiri::HTML5.fragment(str)
-      link = html.css('a').first
-      expect(link['href']).to eq("http://www.instructure.com/")
+      link = html.css("a").first
+      expect(link["href"]).to eq("http://www.instructure.com/")
 
       str = th.format_message("click here: http://www.instructure.com/courses/1/pages/informação").first
       html = Nokogiri::HTML5.fragment(str)
-      link = html.css('a').first
-      expect(link['href']).to eq("http://www.instructure.com/courses/1/pages/informação")
+      link = html.css("a").first
+      expect(link["href"]).to eq("http://www.instructure.com/courses/1/pages/informação")
 
       str = th.format_message("click here: http://www.instructure.com/courses/1/pages#anchor").first
       html = Nokogiri::HTML5.fragment(str)
-      link = html.css('a').first
-      expect(link['href']).to eq("http://www.instructure.com/courses/1/pages#anchor")
+      link = html.css("a").first
+      expect(link["href"]).to eq("http://www.instructure.com/courses/1/pages#anchor")
 
       str = th.format_message("click here: http://www.instructure.com/'onclick=alert(document.cookie)//\nnewline").first
       html = Nokogiri::HTML5.fragment(str)
-      link = html.css('a').first
-      expect(link['href']).to eq("http://www.instructure.com/%27onclick=alert(document.cookie)//")
+      link = html.css("a").first
+      expect(link["href"]).to eq("http://www.instructure.com/%27onclick=alert(document.cookie)//")
 
       # > ~15 chars in parens used to blow up the parser to take forever
       str = th.format_message("click here: http://www.instructure.com/(012345678901234567890123456789012345678901234567890)").first
       html = Nokogiri::HTML5.fragment(str)
-      link = html.css('a').first
-      expect(link['href']).to eq("http://www.instructure.com/(012345678901234567890123456789012345678901234567890)")
+      link = html.css("a").first
+      expect(link["href"]).to eq("http://www.instructure.com/(012345678901234567890123456789012345678901234567890)")
     end
 
     it "handles having the placeholder in the text body" do
@@ -91,7 +91,7 @@ describe HtmlTextHelper do
     end
 
     it "does not format src-less images" do
-      expect(th.html_to_text('<img alt="an image">')).to eq('')
+      expect(th.html_to_text('<img alt="an image">')).to eq("")
     end
 
     it "adds base urls to links" do
@@ -105,11 +105,11 @@ describe HtmlTextHelper do
     end
 
     it "does not format src-less images even with base urls" do
-      expect(th.html_to_text('<img alt="an image">', base_url: "http://example.com")).to eq('')
+      expect(th.html_to_text('<img alt="an image">', base_url: "http://example.com")).to eq("")
     end
 
     it "formats list elements" do
-      expect(th.html_to_text("<li>Item 1</li><li>Item 2</li>\n<li>Item 3</li> <li>Item 4\n<li>  Item 5")).to eq <<~EOS.strip
+      expect(th.html_to_text("<li>Item 1</li><li>Item 2</li>\n<li>Item 3</li> <li>Item 4\n<li>  Item 5")).to eq <<~MD.strip
         * Item 1
 
         * Item 2
@@ -119,11 +119,11 @@ describe HtmlTextHelper do
         * Item 4
 
         * Item 5
-      EOS
+      MD
     end
 
     it "formats headings" do
-      expect(th.html_to_text("<h1>heading 1</h1><h2>heading two<br>text\n</h2>\n<h3>heading 3 <br> through heading 6</h3>")).to eq <<~EOS.strip
+      expect(th.html_to_text("<h1>heading 1</h1><h2>heading two<br>text\n</h2>\n<h3>heading 3 <br> through heading 6</h3>")).to eq <<~MD.strip
         *********
         heading 1
         *********
@@ -136,11 +136,11 @@ describe HtmlTextHelper do
         heading 3
         through heading 6
         -----------------
-      EOS
+      MD
     end
 
     it "formats headings in a word wrap friendly way" do
-      expect(th.html_to_text("<h1>heading 1</h1><h2>heading two<br>text\n</h2>\n<h3>heading 3 through heading 6</h3>", line_width: 9)).to eq <<~EOS.strip
+      expect(th.html_to_text("<h1>heading 1</h1><h2>heading two<br>text\n</h2>\n<h3>heading 3 through heading 6</h3>", line_width: 9)).to eq <<~MD.strip
         *********
         heading 1
         *********
@@ -155,15 +155,15 @@ describe HtmlTextHelper do
         through
         heading 6
         ---------
-      EOS
+      MD
     end
 
     it "words wrap" do
-      expect(th.html_to_text("text that is a bit too long", line_width: 10)).to eq <<~EOS.strip
+      expect(th.html_to_text("text that is a bit too long", line_width: 10)).to eq <<~MD.strip
         text that
         is a bit
         too long
-      EOS
+      MD
     end
 
     it "squeezes whitespace" do
@@ -199,11 +199,11 @@ describe HtmlTextHelper do
     end
 
     it "returns a string with no html back unchanged" do
-      expect(th.html_to_text('String without HTML')).to eq('String without HTML')
+      expect(th.html_to_text("String without HTML")).to eq("String without HTML")
     end
 
     it "returns an empty string if passed a nil value" do
-      expect(th.html_to_text(nil)).to eq('')
+      expect(th.html_to_text(nil)).to eq("")
     end
 
     it "just uses the given link if it cannot be parsed" do
@@ -219,7 +219,7 @@ describe HtmlTextHelper do
 
   describe "simplify html" do
     before do
-      @body = <<~END.strip
+      @body = <<~HTML.strip
         <p><strong>This is a bold tag</strong></p>
         <p><em>This is an em tag</em></p>
         <h1>This is an h1 tag</h1>
@@ -230,7 +230,7 @@ describe HtmlTextHelper do
         <h6>This is an h6 tag</h6>
         <p><a href="http://foo.com">Link to Foo</a></p>
         <p><img src="http://google.com/someimage.png" width="50" height="50" alt="Some Image" title="Some Image" /></p>
-      END
+      HTML
     end
 
     it "converts simple tags to minimal html" do
@@ -239,41 +239,41 @@ describe HtmlTextHelper do
     end
 
     it "converts relative links to absolute links" do
-      original_html = %q{ <a href="/relative/link">Relative link</a> }
-      html          = th.html_to_simple_html(original_html, base_url: 'http://example.com')
+      original_html = ' <a href="/relative/link">Relative link</a> '
+      html          = th.html_to_simple_html(original_html, base_url: "http://example.com")
 
       expect(html).to match(%r{http://example.com/relative/link})
     end
 
     it "resolves doubleslashes" do
-      original_html = %q{ <a href="/relative/link">Relative link</a> }
-      html          = th.html_to_simple_html(original_html, base_url: 'http://example.com/')
+      original_html = ' <a href="/relative/link">Relative link</a> '
+      html          = th.html_to_simple_html(original_html, base_url: "http://example.com/")
 
       expect(html).to match(%r{http://example.com/relative/link})
     end
 
     it "respects passed in tags and attributes" do
       original_html =
-        %q{ <a href="/relative/link">Relative link</a><table border=1>foo</table><tr border=1>bar</tr></table> }
-      html = th.html_to_simple_html(original_html, base_url: 'http://example.com',
-                                                   :tags => ['table'], :attributes => { 'table' => ['border'] })
+        ' <a href="/relative/link">Relative link</a><table border=1>foo</table><tr border=1>bar</tr></table> '
+      html = th.html_to_simple_html(original_html, base_url: "http://example.com",
+                                                   tags: ["table"], attributes: { "table" => ["border"] })
       expect(html).to match(%r{http://example.com/relative/link})
-      expect(html).to match(%r{table border})
-      expect(html).not_to match(%r{tr border})
+      expect(html).to match(/table border/)
+      expect(html).not_to match(/tr border/)
     end
   end
 
   context "banner" do
     it "adds a banner above and below the text equal to text length" do
-      expect(th.banner('hi', char: '#')).to eq "##\nhi\n##"
+      expect(th.banner("hi", char: "#")).to eq "##\nhi\n##"
     end
 
     it "defaults to '*' if not char is passed" do
-      expect(th.banner('hi')).to eq "**\nhi\n**"
+      expect(th.banner("hi")).to eq "**\nhi\n**"
     end
 
     it "returns the input text if it is nil or empty" do
-      expect(th.banner('')).to eq ''
+      expect(th.banner("")).to eq ""
     end
   end
 
@@ -282,8 +282,8 @@ describe HtmlTextHelper do
       allow(HtmlTextHelper).to receive(:strip_tags) { "something else" }
       allow(CanvasTextHelper).to receive(:truncate_text) { true }
       expect(HtmlTextHelper.strip_and_truncate("some text")).to be_truthy
-      expect(HtmlTextHelper).to have_received(:strip_tags).with('some text')
-      expect(CanvasTextHelper).to have_received(:truncate_text).with('something else', {})
+      expect(HtmlTextHelper).to have_received(:strip_tags).with("some text")
+      expect(CanvasTextHelper).to have_received(:truncate_text).with("something else", {})
     end
   end
 end

@@ -23,7 +23,7 @@ class Quizzes::QuizQuestion::CalculatedQuestion < Quizzes::QuizQuestion::Numeric
     answer = @question_data.answers.first
     return [] unless answer
 
-    return [{ :id => answer[:id], :numerical_answer_type => "exact_answer", :exact => answer[:answer], :margin => @question_data[:answer_tolerance] }]
+    [{ id: answer[:id], numerical_answer_type: "exact_answer", exact: answer[:answer], margin: @question_data[:answer_tolerance] }]
   end
 
   # TODO: remove once new stats is on for everybody
@@ -61,15 +61,15 @@ class Quizzes::QuizQuestion::CalculatedQuestion < Quizzes::QuizQuestion::Numeric
 
       answer[:numbers] ||= {}
       answer_stats = answer[:numbers][r[:text].to_f] ||= {
-        :responses => 1,
-        :user_ids => [],
-        :correct => true,
+        responses: 1,
+        user_ids: [],
+        correct: true,
       }
       answer_stats[:responses] += 1
       answer_stats[:user_ids] << r[:user_id]
     end
 
-    stats = { :multiple_responses => true }
+    stats = { multiple_responses: true }
     @question_data.merge stats
   end
 end

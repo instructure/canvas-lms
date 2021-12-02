@@ -35,7 +35,7 @@ module AccountNotificationHelper
 
   # Return a valid icon font classname for a given notification type
   def notification_icon_classname(account_notification)
-    icon_prefix = 'icon-'
+    icon_prefix = "icon-"
     icon_type = notification_icon_type(account_notification)
     case icon_type
     when "information"
@@ -64,19 +64,19 @@ module AccountNotificationHelper
   def accessible_message_icon_text(icon_type)
     case icon_type
     when "information"
-      I18n.t('#global_message_icons.information', "information")
+      I18n.t("#global_message_icons.information", "information")
     when "error"
-      I18n.t('#global_message_icons.error', "error")
+      I18n.t("#global_message_icons.error", "error")
     when "question"
-      I18n.t('#global_message_icons.question', "question")
+      I18n.t("#global_message_icons.question", "question")
     when "calendar"
-      I18n.t('#global_message_icons.calendar', "calendar")
+      I18n.t("#global_message_icons.calendar", "calendar")
     when "announcement"
-      I18n.t('#global_message_icons.announcement', "announcement")
+      I18n.t("#global_message_icons.announcement", "announcement")
     when "invitation"
-      I18n.t('#global_message_icons.invitation', "invitation")
+      I18n.t("#global_message_icons.invitation", "invitation")
     else
-      I18n.t('#global_message_icons.warning', "warning")
+      I18n.t("#global_message_icons.warning", "warning")
     end
   end
 

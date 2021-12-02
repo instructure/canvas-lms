@@ -21,7 +21,7 @@
 module Canvas::Migration
   class Migrator
     include MigratorHelper
-    SCRAPE_ALL_HASH = { 'course_outline' => true, 'announcements' => true, 'assignments' => true, 'goals' => true, 'rubrics' => true, 'web_links' => true, 'learning_modules' => true, 'calendar_events' => true, 'calendar_start' => nil, 'calendar_end' => nil, 'discussions' => true, 'assessments' => true, 'question_bank' => true, 'all_files' => true, 'groups' => true, 'assignment_groups' => true, 'tasks' => true, 'wikis' => true }
+    SCRAPE_ALL_HASH = { "course_outline" => true, "announcements" => true, "assignments" => true, "goals" => true, "rubrics" => true, "web_links" => true, "learning_modules" => true, "calendar_events" => true, "calendar_start" => nil, "calendar_end" => nil, "discussions" => true, "assessments" => true, "question_bank" => true, "all_files" => true, "groups" => true, "assignment_groups" => true, "tasks" => true, "wikis" => true }.freeze
 
     attr_accessor :course, :extra_settings, :total_error_count, :package_root
     attr_reader :base_export_dir, :manifest, :import_objects, :settings
@@ -32,7 +32,7 @@ module Canvas::Migration
       @manifest = nil
       @error_count = 0
       @errors = []
-      @course = { :file_map => {}, :wikis => [] }
+      @course = { file_map: {}, wikis: [] }
       @course[:name] = @settings[:course_name]
 
       if @settings[:unzipped_file_path]
@@ -95,7 +95,7 @@ module Canvas::Migration
           if File.exist?(file_path)
             zipfile.add(val[:path_name], file_path)
           else
-            add_warning(I18n.t('canvas.migration.errors.file_does_not_exist', 'The file "%{file_path}" did not exist in the content package and could not be imported.', :file_path => val[:path_name]))
+            add_warning(I18n.t("canvas.migration.errors.file_does_not_exist", 'The file "%{file_path}" did not exist in the content package and could not be imported.', file_path: val[:path_name]))
           end
         end
       end
@@ -104,14 +104,14 @@ module Canvas::Migration
     end
 
     def get_all_resources(manifest)
-      manifest.css('resource').each do |r_node|
-        id = r_node['identifier']
+      manifest.css("resource").each do |r_node|
+        id = r_node["identifier"]
         resource = @resources[id]
-        resource ||= { :migration_id => id }
-        resource[:type] = r_node['type']
-        resource[:href] = r_node['href']
+        resource ||= { migration_id: id }
+        resource[:type] = r_node["type"]
+        resource[:href] = r_node["href"]
         if resource[:href]
-          resource[:href] = resource[:href].gsub('\\', '/')
+          resource[:href] = resource[:href].tr("\\", "/")
         else
           # it could be embedded in the manifest
           @resource_nodes_for_flat_manifest[id] = r_node
@@ -119,17 +119,17 @@ module Canvas::Migration
         # Should be "Learner", "Instructor", or "Mentor"
         resource[:intended_user_role] = get_node_val(r_node, "intendedEndUserRole value", nil)
         # Should be "assignment", "lessonplan", "syllabus", or "unspecified"
-        resource[:intended_use] = r_node['intendeduse']
+        resource[:intended_use] = r_node["intendeduse"]
         resource[:files] = []
-        r_node.css('file').each do |file_node|
-          resource[:files] << { :href => file_node[:href].gsub('\\', '/') }
+        r_node.css("file").each do |file_node|
+          resource[:files] << { href: file_node[:href].tr("\\", "/") }
         end
         resource[:dependencies] = []
-        r_node.css('dependency').each do |d_node|
+        r_node.css("dependency").each do |d_node|
           resource[:dependencies] << d_node[:identifierref]
         end
-        if (variant = r_node.at_css('variant'))
-          resource[:preferred_resource_id] = variant['identifierref']
+        if (variant = r_node.at_css("variant"))
+          resource[:preferred_resource_id] = variant["identifierref"]
         end
         @resources[id] = resource
       end
@@ -169,7 +169,7 @@ module Canvas::Migration
               end
       end
 
-      doc.remove_namespaces! if doc.respond_to?('remove_namespaces!')
+      doc.remove_namespaces! if doc.respond_to?("remove_namespaces!")
       doc
     end
   end

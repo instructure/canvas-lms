@@ -17,10 +17,10 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../common'
-require_relative '../helpers/quizzes_common'
+require_relative "../common"
+require_relative "../helpers/quizzes_common"
 
-describe 'quizzes observers' do
+describe "quizzes observers" do
   include_context "in-process server selenium tests"
   include QuizzesCommon
 
@@ -36,14 +36,14 @@ describe 'quizzes observers' do
   context "when 'show correct answers after last attempt setting' is on" do
     before do
       quiz_with_submission
-      @quiz.update(:show_correct_answers => true,
-                   :show_correct_answers_last_attempt => true, :allowed_attempts => 2)
+      @quiz.update(show_correct_answers: true,
+                   show_correct_answers_last_attempt: true, allowed_attempts: 2)
       @quiz.save!
     end
 
-    it "does not show correct answers on first attempt", priority: "1", test_id: 474288 do
+    it "does not show correct answers on first attempt", priority: "1" do
       get "/courses/#{@course.id}/quizzes/#{@quiz.id}/history?quiz_submission_id=#{@qsub.id}"
-      expect(f("#content")).not_to contain_css('.correct_answer')
+      expect(f("#content")).not_to contain_css(".correct_answer")
     end
   end
 

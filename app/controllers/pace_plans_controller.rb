@@ -22,7 +22,7 @@ class PacePlansController < ApplicationController
   before_action :load_course
   before_action :require_feature_flag
   before_action :authorize_action
-  before_action :load_pace_plan, only: [:api_show, :update, :publish]
+  before_action :load_pace_plan, only: %i[api_show update publish]
 
   include Api::V1::Course
   include Api::V1::Progress
@@ -134,7 +134,7 @@ class PacePlansController < ApplicationController
   private
 
   def latest_progress
-    progress = Progress.order(created_at: :desc).find_by(context: @pace_plan, tag: 'pace_plan_publish')
+    progress = Progress.order(created_at: :desc).find_by(context: @pace_plan, tag: "pace_plan_publish")
     progress&.workflow_state == "completed" ? nil : progress
   end
 
@@ -200,7 +200,7 @@ class PacePlansController < ApplicationController
       :exclude_weekends,
       :hard_end_dates,
       :workflow_state,
-      pace_plan_module_items_attributes: [:id, :duration, :module_item_id, :root_account_id]
+      pace_plan_module_items_attributes: %i[id duration module_item_id root_account_id]
     )
   end
 
@@ -213,12 +213,12 @@ class PacePlansController < ApplicationController
       :exclude_weekends,
       :hard_end_dates,
       :workflow_state,
-      pace_plan_module_items_attributes: [:duration, :module_item_id, :root_account_id]
+      pace_plan_module_items_attributes: %i[duration module_item_id root_account_id]
     )
   end
 
   def publish_pace_plan
-    @progress = Progress.create!(context: @pace_plan, tag: 'pace_plan_publish')
+    @progress = Progress.create!(context: @pace_plan, tag: "pace_plan_publish")
     @progress.process_job(@pace_plan, :publish, {})
   end
 end

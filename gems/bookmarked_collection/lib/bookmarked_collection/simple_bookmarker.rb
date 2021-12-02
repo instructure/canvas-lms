@@ -55,7 +55,7 @@
 module BookmarkedCollection
   class Bookmark < Array
     def <=>(other)
-      length = [self.size, other.size].min
+      length = [size, other.size].min
       length.times do |i|
         if self[i].nil? && other[i].nil?
           next
@@ -89,7 +89,7 @@ module BookmarkedCollection
             col_name = col_name.to_s
             @columns << col_name
             @column_definitions[col_name] = validate_definition(
-              existing_column_definition(col_name).merge(definition).merge(:custom => true)
+              existing_column_definition(col_name).merge(definition).merge(custom: true)
             )
           end
         else
@@ -118,15 +118,15 @@ module BookmarkedCollection
       string: ->(val) { val.is_a?(String) },
       integer: ->(val) { val.is_a?(Integer) },
       datetime: ->(val) { val.is_a?(DateTime) || val.is_a?(Time) || (val.is_a?(String) && !!(DateTime.parse(val) rescue false)) }
-    }
+    }.freeze
 
     def existing_column_definition(col_name)
       col = @model.columns_hash[col_name]
-      col ? { :type => col.type, :null => col.null } : {}
+      col ? { type: col.type, null: col.null } : {}
     end
 
     def validate_definition(definition)
-      raise "expected :type and :null to be specified" unless [:type, :null].all? { |k| definition.has_key?(k) }
+      raise "expected :type and :null to be specified" unless [:type, :null].all? { |k| definition.key?(k) }
 
       definition
     end
@@ -137,7 +137,7 @@ module BookmarkedCollection
         columns.each.with_index.all? do |col, i|
           type = TYPE_MAP[column_definitions[col][:type]]
           nullable = column_definitions[col][:null]
-          type && ((nullable && bookmark[i].nil?) || type.(bookmark[i]))
+          type && ((nullable && bookmark[i].nil?) || type.call(bookmark[i]))
         end
     end
 
@@ -151,18 +151,18 @@ module BookmarkedCollection
     def order_by
       @order_by ||= {}
       locale = defined?(Canvas::ICU) ? Canvas::ICU.locale_for_collation : :default
-      @order_by[locale] ||= Arel.sql(columns.map { |col| column_order(col) }.join(', '))
+      @order_by[locale] ||= Arel.sql(columns.map { |col| column_order(col) }.join(", "))
     end
 
     def column_order(col_name)
       order = column_comparand(col_name)
       if column_definitions[col_name][:null]
-        order = "#{column_comparand(col_name, '=')} IS NULL, #{order}"
+        order = "#{column_comparand(col_name, "=")} IS NULL, #{order}"
       end
       order
     end
 
-    def column_comparand(col_name, comparator = '>', placeholder = nil)
+    def column_comparand(col_name, comparator = ">", placeholder = nil)
       definition = column_definitions[col_name]
       col_name = placeholder ||
                  (definition[:custom] ? col_name : "#{@model.table_name}.#{col_name}")
@@ -181,14 +181,14 @@ module BookmarkedCollection
       elsif value.nil?
         # likewise only NULL values in column satisfy 'column = NULL' and
         # 'column >= NULL'
-        ["#{column_comparand(column, '=')} IS NULL"]
+        ["#{column_comparand(column, "=")} IS NULL"]
       else
-        sql = "#{column_comparand(column, comparator)} #{comparator} #{column_comparand(column, comparator, '?')}"
-        if column_definitions[column][:null] && comparator != '='
+        sql = "#{column_comparand(column, comparator)} #{comparator} #{column_comparand(column, comparator, "?")}"
+        if column_definitions[column][:null] && comparator != "="
           # our sort order wants "NULL > ?" to be universally true for non-NULL
           # values (we already handle NULL values above). but it is false in
           # SQL, so we need to include "column IS NULL" with > or >=
-          sql = "(#{sql} OR #{column_comparand(column, '=')} IS NULL)"
+          sql = "(#{sql} OR #{column_comparand(column, "=")} IS NULL)"
         end
         [sql, value]
       end
@@ -230,7 +230,7 @@ module BookmarkedCollection
       index_sql, *index_args = column_comparison(columns.first, ">=", bookmark.first)
       sql = [sql, index_sql].join(" AND ")
       args.concat(index_args)
-      return [sql, *args]
+      [sql, *args]
     end
   end
 end

@@ -22,7 +22,7 @@ module Types
   class FileType < ApplicationObjectType
     include ApplicationHelper
 
-    graphql_name 'File'
+    graphql_name "File"
 
     implements GraphQL::Types::Relay::Node
     implements Interfaces::ModuleItemInterface
@@ -57,8 +57,8 @@ module Types
       return if object.locked_for?(current_user, check_policies: true)
 
       opts = {
-        download: '1',
-        download_frd: '1',
+        download: "1",
+        download_frd: "1",
         host: context[:request].host_with_port,
         protocol: context[:request].protocol
       }

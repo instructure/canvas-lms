@@ -56,9 +56,9 @@ module Lti
         tool_consumer_instance_guid: domain_root_account.lti_guid,
         roles: lti_helper.current_lis_roles,
         launch_presentation_locale: I18n.locale.to_s || I18n.default_locale.to_s,
-        launch_presentation_document_target: 'iframe',
+        launch_presentation_document_target: "iframe",
         ext_roles: lti_helper.all_roles,
-        oauth_callback: 'about:blank'
+        oauth_callback: "about:blank"
       }
 
       params[:user_id] = Lti::Asset.opaque_identifier_for(user, context: context) if user
@@ -94,8 +94,8 @@ module Lti
     def message_params(content_item_return_url)
       {
         # required params
-        lti_message_type: 'ContentItemSelectionRequest',
-        lti_version: 'LTI-1p0',
+        lti_message_type: "ContentItemSelectionRequest",
+        lti_version: "LTI-1p0",
         content_item_return_url: content_item_return_url,
         context_title: @context.name,
         # optional params
@@ -115,7 +115,7 @@ module Lti
 
     def return_url(content_item_id)
       return_url_opts = {
-        service: 'external_tool_dialog',
+        service: "external_tool_dialog",
         host: @base_url.host,
         protocol: @base_url.scheme,
         port: @base_url.port
@@ -129,7 +129,7 @@ module Lti
       end
     end
 
-    INDEX_MENU_TOOL_TYPES = %w{
+    INDEX_MENU_TOOL_TYPES = %w[
       assignment_index_menu
       assignment_group_menu
       discussion_topic_index_menu
@@ -138,19 +138,19 @@ module Lti
       module_group_menu
       quiz_index_menu
       wiki_index_menu
-    }.freeze
+    ].freeze
 
     def placement_params(placement, assignment: nil)
       case placement
-      when 'migration_selection'
+      when "migration_selection"
         migration_selection_params
-      when 'editor_button'
+      when "editor_button"
         editor_button_params
-      when 'resource_selection', 'link_selection', 'assignment_selection', 'submission_type_selection'
+      when "resource_selection", "link_selection", "assignment_selection", "submission_type_selection"
         lti_launch_selection_params
-      when 'collaboration'
+      when "collaboration"
         collaboration_params
-      when 'homework_submission'
+      when "homework_submission"
         homework_submission_params(assignment)
       when *INDEX_MENU_TOOL_TYPES
         {}
@@ -161,19 +161,19 @@ module Lti
     end
 
     def migration_selection_params
-      accept_media_types = %w(
+      accept_media_types = %w[
         application/vnd.ims.imsccv1p1
         application/vnd.ims.imsccv1p2
         application/vnd.ims.imsccv1p3
         application/zip
         application/xml
-      )
+      ]
 
       {
-        accept_media_types: accept_media_types.join(','),
-        accept_presentation_document_targets: 'download',
+        accept_media_types: accept_media_types.join(","),
+        accept_presentation_document_targets: "download",
         accept_copy_advice: true,
-        ext_content_file_extensions: %w(zip imscc mbz xml).join(','),
+        ext_content_file_extensions: %w[zip imscc mbz xml].join(","),
         accept_unsigned: true,
         auto_create: false
       }
@@ -181,8 +181,8 @@ module Lti
 
     def editor_button_params
       {
-        accept_media_types: %w(image/* text/html application/vnd.ims.lti.v1.ltilink */*).join(','),
-        accept_presentation_document_targets: %w(embed frame iframe window).join(','),
+        accept_media_types: %w[image/* text/html application/vnd.ims.lti.v1.ltilink */*].join(","),
+        accept_presentation_document_targets: %w[embed frame iframe window].join(","),
         accept_unsigned: true,
         accept_multiple: true,
         auto_create: false
@@ -191,8 +191,8 @@ module Lti
 
     def lti_launch_selection_params
       {
-        accept_media_types: 'application/vnd.ims.lti.v1.ltilink',
-        accept_presentation_document_targets: %w(frame window).join(','),
+        accept_media_types: "application/vnd.ims.lti.v1.ltilink",
+        accept_presentation_document_targets: %w[frame window].join(","),
         accept_unsigned: true,
         auto_create: false
       }
@@ -200,8 +200,8 @@ module Lti
 
     def collaboration_params
       {
-        accept_media_types: 'application/vnd.ims.lti.v1.ltilink',
-        accept_presentation_document_targets: 'window',
+        accept_media_types: "application/vnd.ims.lti.v1.ltilink",
+        accept_presentation_document_targets: "window",
         accept_unsigned: false,
         auto_create: true,
       }
@@ -209,17 +209,17 @@ module Lti
 
     def homework_submission_params(assignment)
       params = {}
-      params[:accept_media_types] = '*/*'
+      params[:accept_media_types] = "*/*"
       accept_presentation_document_targets = []
-      accept_presentation_document_targets << 'window' if assignment.submission_types.include?('online_url')
-      accept_presentation_document_targets << 'none' if assignment.submission_types.include?('online_upload')
-      params[:accept_presentation_document_targets] = accept_presentation_document_targets.join(',')
-      params[:accept_copy_advice] = !!assignment.submission_types.include?('online_upload')
-      if assignment.submission_types.strip == 'online_upload' && assignment.allowed_extensions.present?
-        params[:ext_content_file_extensions] = assignment.allowed_extensions.compact.join(',')
-        params[:accept_media_types] = assignment.allowed_extensions.map do |ext|
+      accept_presentation_document_targets << "window" if assignment.submission_types.include?("online_url")
+      accept_presentation_document_targets << "none" if assignment.submission_types.include?("online_upload")
+      params[:accept_presentation_document_targets] = accept_presentation_document_targets.join(",")
+      params[:accept_copy_advice] = !!assignment.submission_types.include?("online_upload")
+      if assignment.submission_types.strip == "online_upload" && assignment.allowed_extensions.present?
+        params[:ext_content_file_extensions] = assignment.allowed_extensions.compact.join(",")
+        params[:accept_media_types] = assignment.allowed_extensions.filter_map do |ext|
           MimetypeFu::EXTENSIONS[ext]
-        end.compact.join(',')
+        end.join(",")
       end
       params
     end

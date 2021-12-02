@@ -31,7 +31,7 @@ class ApiRouteSet
   def self.draw(router, prefix = self.prefix, &block)
     @@prefixes ||= Set.new
     @@prefixes << prefix
-    route_set = self.new(prefix)
+    route_set = new(prefix)
     route_set.mapper = router
     route_set.instance_eval(&block)
   ensure
@@ -55,7 +55,7 @@ class ApiRouteSet
   end
 
   def self.api_methods_for_controller_and_action(controller, action)
-    @routes ||= self.prefixes.map { |pfx| self.routes_for(pfx) }.flatten
+    @routes ||= prefixes.map { |pfx| routes_for(pfx) }.flatten
     @routes.find_all { |r| matches_controller_and_action?(r, controller, action) }
   end
 
@@ -64,9 +64,9 @@ class ApiRouteSet
   end
 
   def method_missing(m, *a, &b)
-    mapper.__send__(m, *a) {
-      self.instance_eval(&b) if b
-    }
+    mapper.__send__(m, *a) do
+      instance_eval(&b) if b
+    end
   end
 
   def get(path, opts = {})
@@ -98,11 +98,11 @@ class ApiRouteSet
     only, except = opts.delete(:only), opts.delete(:except)
     maybe_action = ->(action) { (!only || Array(only).include?(action)) && (!except || !Array(except).include?(action)) }
 
-    get(path.to_s, opts.merge(:action => :index, :as => "#{name_prefix}#{resource_name}")) if maybe_action[:index]
-    get("#{path}/:#{resource_name.singularize}_id", opts.merge(:action => :show, :as => "#{name_prefix}#{resource_name.singularize}")) if maybe_action[:show]
-    post(path.to_s, opts.merge(:action => :create, :as => (maybe_action[:index] ? nil : "#{name_prefix}#{resource_name}"))) if maybe_action[:create]
-    put("#{path}/:#{resource_name.singularize}_id", opts.merge(:action => :update)) if maybe_action[:update]
-    delete("#{path}/:#{resource_name.singularize}_id", opts.merge(:action => :destroy)) if maybe_action[:destroy]
+    get(path.to_s, opts.merge(action: :index, as: "#{name_prefix}#{resource_name}")) if maybe_action[:index]
+    get("#{path}/:#{resource_name.singularize}_id", opts.merge(action: :show, as: "#{name_prefix}#{resource_name.singularize}")) if maybe_action[:show]
+    post(path.to_s, opts.merge(action: :create, as: (maybe_action[:index] ? nil : "#{name_prefix}#{resource_name}"))) if maybe_action[:create]
+    put("#{path}/:#{resource_name.singularize}_id", opts.merge(action: :update)) if maybe_action[:update]
+    delete("#{path}/:#{resource_name.singularize}_id", opts.merge(action: :destroy)) if maybe_action[:destroy]
   end
 
   def mapper_prefix
@@ -114,8 +114,8 @@ class ApiRouteSet
     opts[:as] ||= opts.delete(:path_name)
     opts[:as] = "#{mapper_prefix}#{opts[:as]}" if opts[:as]
     opts[:constraints] ||= {}
-    opts[:constraints][:format] = 'json' if opts[:constraints].is_a? Hash
-    opts[:format] = 'json'
+    opts[:constraints][:format] = "json" if opts[:constraints].is_a? Hash
+    opts[:format] = "json"
     mapper.send(method, "#{prefix}/#{path}", opts)
   end
 
@@ -125,8 +125,8 @@ class ApiRouteSet
     # unfortunately, this means that api v1 can't match a sis id that ends with
     # .json -- but see the api docs for info on sending hex-encoded sis ids,
     # which allows any string.
-    ID_REGEX = %r{(?:[^/?.]|\.(?!json(?:\z|[/?])))+}
-    ID_PARAM = %r{^:(id|[\w]+_id)$}
+    ID_REGEX = %r{(?:[^/?.]|\.(?!json(?:\z|[/?])))+}.freeze
+    ID_PARAM = /^:(id|\w+_id)$/.freeze
 
     def self.prefix
       "/api/v1"
@@ -138,7 +138,7 @@ class ApiRouteSet
 
     def route(method, path, opts)
       opts[:constraints] ||= {}
-      path.split('/').each { |segment| opts[:constraints][segment[1..-1].to_sym] = ID_REGEX if segment.match(ID_PARAM) }
+      path.split("/").each { |segment| opts[:constraints][segment[1..].to_sym] = ID_REGEX if segment.match(ID_PARAM) }
       super(method, path, opts)
     end
   end

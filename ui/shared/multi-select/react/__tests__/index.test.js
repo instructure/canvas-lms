@@ -91,11 +91,12 @@ describe('CanvasMultiSelect', () => {
     expect(queryByRole('option', {name: 'Broccoli'})).not.toBeInTheDocument()
   })
 
-  it('can be configured to perform substring matching on input', () => {
-    props.matchStrategy = 'substring'
-    const {getByRole} = renderComponent()
+  it('can be configured to perform custom matching', () => {
+    props.customMatcher = (option, _searchString) => option.label === 'Broccoli'
+    const {getByRole, queryByRole} = renderComponent()
     const combobox = getByRole('combobox', {name: 'Vegetables'})
-    fireEvent.input(combobox, {target: {value: 'occo'}})
+    fireEvent.input(combobox, {target: {value: '?'}})
     expect(getByRole('option', {name: 'Broccoli'})).toBeInTheDocument()
+    expect(queryByRole('option', {name: 'Cucumber'})).not.toBeInTheDocument()
   })
 })

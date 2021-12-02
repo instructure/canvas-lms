@@ -20,7 +20,7 @@
 
 module Types
   class RubricAssociationType < ApplicationObjectType
-    description 'How a rubric is being used in a context'
+    description "How a rubric is being used in a context"
 
     implements Interfaces::LegacyIDInterface
 

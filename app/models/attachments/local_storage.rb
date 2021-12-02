@@ -40,14 +40,14 @@ class Attachments::LocalStorage
 
   def initialize_ajax_upload_params(local_upload_url, _s3_success_url, options)
     {
-      :upload_url => local_upload_url,
-      :file_param => options[:file_param] || 'attachment[uploaded_data]', # uploadify ignores this and uses 'file'
-      :upload_params => options[:upload_params] || {}
+      upload_url: local_upload_url,
+      file_param: options[:file_param] || "attachment[uploaded_data]", # uploadify ignores this and uses 'file'
+      upload_params: options[:upload_params] || {}
     }
   end
 
   def amend_policy_conditions(policy, datetime: nil)
-    policy['attachment_id'] = attachment.id
+    policy["attachment_id"] = attachment.id
     policy
   end
 
@@ -58,15 +58,15 @@ class Attachments::LocalStorage
   def sign_policy(policy_encoded, datetime)
     signature = Base64.encode64(
       OpenSSL::HMAC.digest(
-        OpenSSL::Digest.new('sha1'), shared_secret(datetime), policy_encoded
+        OpenSSL::Digest.new("sha1"), shared_secret(datetime), policy_encoded
       )
-    ).gsub(/\n/, '')
-    ['Signature', signature]
+    ).delete("\n")
+    ["Signature", signature]
   end
 
   def open(**)
     if block_given?
-      File.open(attachment.full_filename, 'rb') do |file|
+      File.open(attachment.full_filename, "rb") do |file|
         chunk = file.read(4096)
         while chunk
           yield chunk
@@ -74,7 +74,7 @@ class Attachments::LocalStorage
         end
       end
     else
-      File.open(attachment.full_filename, 'rb')
+      File.open(attachment.full_filename, "rb")
     end
   end
 end

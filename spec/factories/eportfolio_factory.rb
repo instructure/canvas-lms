@@ -22,7 +22,7 @@ module Factories
   def eportfolio_model(opts = {})
     opts[:user] = user_model if opts[:user].nil?
     @eportfolio = Eportfolio.create!(opts)
-    @eportfolio_category = @eportfolio.eportfolio_categories.create!(:name => "category")
+    @eportfolio_category = @eportfolio.eportfolio_categories.create!(name: "category")
 
     @eportfolio_entry = EportfolioEntry.new(name: "page")
     @eportfolio_entry.eportfolio = @eportfolio

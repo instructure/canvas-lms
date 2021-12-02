@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'json'
+require "json"
 
 namespace :js do
   desc "Build development webpack js"
@@ -25,20 +25,20 @@ namespace :js do
     # needed for post-installation steps (like wsrun)
     #
     #  see https://classic.yarnpkg.com/en/docs/cli/install#toc-yarn-install-production-true-false
-    yarnopts = '--frozen-lockfile --pure-lockfile --production=false'
+    yarnopts = "--frozen-lockfile --pure-lockfile --production=false"
 
     system "yarn install #{yarnopts} || yarn install #{yarnopts} --network-concurrency 1"
     unless $?.success?
-      raise 'error running yarn install'
+      raise "error running yarn install"
     end
   end
 
   desc "Revision static assets"
   task :gulp_rev do
-    system 'yarn run gulp rev'
+    system "yarn run gulp rev"
 
     unless $?.success?
-      raise 'error running gulp rev'
+      raise "error running gulp rev"
     end
   end
 end

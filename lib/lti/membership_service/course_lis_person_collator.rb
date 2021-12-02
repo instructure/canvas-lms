@@ -25,7 +25,7 @@ module Lti
 
       def scope
         options = {
-          enrollment_type: ['teacher', 'ta', 'designer', 'observer', 'student'],
+          enrollment_type: %w[teacher ta designer observer student],
           include_inactive_enrollments: false
         }
 
@@ -38,20 +38,20 @@ module Lti
                       else
                         user.not_ended_enrollments.where(course: context)
                       end
-        enrollments.map do |enrollment|
+        enrollments.filter_map do |enrollment|
           case enrollment.type
-          when 'TeacherEnrollment'
+          when "TeacherEnrollment"
             ::IMS::LIS::Roles::Context::URNs::Instructor
-          when 'TaEnrollment'
+          when "TaEnrollment"
             ::IMS::LIS::Roles::Context::URNs::TeachingAssistant
-          when 'DesignerEnrollment'
+          when "DesignerEnrollment"
             ::IMS::LIS::Roles::Context::URNs::ContentDeveloper
-          when 'StudentEnrollment'
+          when "StudentEnrollment"
             ::IMS::LIS::Roles::Context::URNs::Learner
-          when 'ObserverEnrollment'
+          when "ObserverEnrollment"
             ::IMS::LIS::Roles::Context::URNs::Learner_NonCreditLearner
           end
-        end.compact.uniq
+        end.uniq
       end
     end
   end

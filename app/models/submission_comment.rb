@@ -41,24 +41,24 @@ class SubmissionComment < ActiveRecord::Base
   attr_writer :updating_user
   attr_accessor :grade_posting_in_progress
 
-  belongs_to :root_account, class_name: 'Account'
+  belongs_to :root_account, class_name: "Account"
   belongs_to :submission
-  belongs_to :author, :class_name => 'User'
+  belongs_to :author, class_name: "User"
   belongs_to :assessment_request
   belongs_to :context, polymorphic: [:course]
-  belongs_to :provisional_grade, :class_name => 'ModeratedGrading::ProvisionalGrade'
-  has_many :messages, :as => :context, :inverse_of => :context, :dependent => :destroy
+  belongs_to :provisional_grade, class_name: "ModeratedGrading::ProvisionalGrade"
+  has_many :messages, as: :context, inverse_of: :context, dependent: :destroy
   has_many :viewed_submission_comments, dependent: :destroy
 
-  validates_length_of :comment, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
-  validates_length_of :comment, :minimum => 1, :allow_nil => true, :allow_blank => true
+  validates :comment, length: { maximum: maximum_text_length, allow_blank: true }
+  validates :comment, length: { minimum: 1, allow_blank: true }
   validates_each :attempt do |record, attr, value|
     next if value.nil?
 
     submission_attempt = (record.submission.attempt || 0)
     submission_attempt = 1 if submission_attempt == 0
     if value > submission_attempt
-      record.errors.add(attr, 'attempt must not be larger than number of submission attempts')
+      record.errors.add(attr, "attempt must not be larger than number of submission attempts")
     end
   end
   validates :workflow_state, inclusion: { in: ["active"] }, allow_nil: true
@@ -80,14 +80,14 @@ class SubmissionComment < ActiveRecord::Base
 
   serialize :cached_attachments
 
-  scope :visible, -> { where(:hidden => false) }
+  scope :visible, -> { where(hidden: false) }
   scope :draft, -> { where(draft: true) }
   scope :published, -> { where(draft: false) }
-  scope :after, lambda { |date| where("submission_comments.created_at>?", date) }
-  scope :for_final_grade, -> { where(:provisional_grade_id => nil) }
-  scope :for_provisional_grade, ->(id) { where(:provisional_grade_id => id) }
+  scope :after, ->(date) { where("submission_comments.created_at>?", date) }
+  scope :for_final_grade, -> { where(provisional_grade_id: nil) }
+  scope :for_provisional_grade, ->(id) { where(provisional_grade_id: id) }
   scope :for_provisional_grades, -> { where.not(provisional_grade_id: nil) }
-  scope :for_assignment_id, lambda { |assignment_id| where(:submissions => { :assignment_id => assignment_id }).joins(:submission) }
+  scope :for_assignment_id, ->(assignment_id) { where(submissions: { assignment_id: assignment_id }).joins(:submission) }
   scope :for_groups, -> { where.not(group_comment_id: nil) }
   scope :not_for_groups, -> { where(group_comment_id: nil) }
 
@@ -137,38 +137,38 @@ class SubmissionComment < ActiveRecord::Base
   has_a_broadcast_policy
 
   def provisional
-    !!self.provisional_grade_id
+    !!provisional_grade_id
   end
 
   def read?(current_user)
-    self.submission.read?(current_user) || self.viewed_submission_comments.where(user: current_user).exists?
+    submission.read?(current_user) || viewed_submission_comments.where(user: current_user).exists?
   end
 
   def mark_read!(current_user)
     ViewedSubmissionComment.unique_constraint_retry do
-      self.viewed_submission_comments.where(user: current_user).first_or_create!
+      viewed_submission_comments.where(user: current_user).first_or_create!
     end
   end
 
   def media_comment?
-    self.media_comment_id && self.media_comment_type
+    media_comment_id && media_comment_type
   end
 
   def check_for_media_object
-    if self.media_comment? && self.saved_change_to_media_comment_id?
-      MediaObject.ensure_media_object(self.media_comment_id,
-                                      user: self.author,
-                                      context: self.author)
+    if media_comment? && saved_change_to_media_comment_id?
+      MediaObject.ensure_media_object(media_comment_id,
+                                      user: author,
+                                      context: author)
     end
   end
 
   on_create_send_to_streams do
-    if self.submission && self.provisional_grade_id.nil?
-      if self.author_id == self.submission.user_id
-        self.submission.context.instructors_in_charge_of(self.author_id)
+    if submission && provisional_grade_id.nil?
+      if author_id == submission.user_id
+        submission.context.instructors_in_charge_of(author_id)
       else
         # self.submission.context.instructors.map(&:id) + [self.submission.user_id] - [self.author_id]
-        self.submission.user_id
+        submission.user_id
       end
     end
   end
@@ -177,15 +177,15 @@ class SubmissionComment < ActiveRecord::Base
     given { |user, session| can_view_comment?(user, session) }
     can :read
 
-    given { |user| self.author == user }
+    given { |user| author == user }
     can :read and can :delete and can :update
 
     given { |user, session| submission.grants_right?(user, session, :grade) }
     can :delete
 
-    given { |user, session|
-      self.can_read_author?(user, session)
-    }
+    given do |user, session|
+      can_read_author?(user, session)
+    end
     can :read_author
   end
 
@@ -197,12 +197,12 @@ class SubmissionComment < ActiveRecord::Base
     p.dispatch :submission_comment
     p.to do
       active_participant =
-        Enrollment.where(user_id: submission.user.id, :course_id => submission.course_id).active_by_date.exists?
+        Enrollment.where(user_id: submission.user.id, course_id: submission.course_id).active_by_date.exists?
       if active_participant
         ([submission.user] + User.observing_students_in_course(submission.user, submission.assignment.context)) - [author]
       end
     end
-    p.whenever { |record|
+    p.whenever do |record|
       # allows broadcasting when this record is initially saved (assuming draft == false) and also when it gets updated
       # from draft to final
       (!record.draft? && (record.just_created || record.saved_change_to_draft?)) &&
@@ -212,16 +212,16 @@ class SubmissionComment < ActiveRecord::Base
         record.submission.posted? &&
         record.submission.assignment.context.grants_right?(record.submission.user, :read) &&
         (!record.submission.assignment.context.instructors.include?(author) || record.submission.assignment.published?)
-    }
+    end
     p.data { course_broadcast_data }
 
     p.dispatch :submission_comment_for_teacher
     p.to { submission.assignment.context.instructors_in_charge_of(author_id) - [author] }
-    p.whenever { |record|
+    p.whenever do |record|
       (!record.draft? && (record.just_created || record.saved_change_to_draft?)) &&
         record.provisional_grade_id.nil? &&
         record.submission.user_id == record.author_id
-    }
+    end
     p.data { course_broadcast_data }
   end
 
@@ -280,41 +280,41 @@ class SubmissionComment < ActiveRecord::Base
   end
 
   def can_read_author?(user, session)
-    RequestCache.cache('user_can_read_author', self, user, session) do
-      return false if user.nil? || (self.author_id != user.id && self.submission.assignment.anonymize_students?)
+    RequestCache.cache("user_can_read_author", self, user, session) do
+      return false if user.nil? || (author_id != user.id && submission.assignment.anonymize_students?)
 
-      self.author_id == user.id ||
-        (!self.anonymous? && !self.submission.assignment.anonymous_peer_reviews?) ||
-        self.submission.assignment.context.grants_right?(user, session, :view_all_grades) ||
-        self.submission.assignment.context.grants_right?(self.author, session, :view_all_grades)
+      author_id == user.id ||
+        (!anonymous? && !submission.assignment.anonymous_peer_reviews?) ||
+        submission.assignment.context.grants_right?(user, session, :view_all_grades) ||
+        submission.assignment.context.grants_right?(author, session, :view_all_grades)
     end
   end
 
   def reply_from(opts)
-    raise IncomingMail::Errors::UnknownAddress if self.context.root_account.deleted?
+    raise IncomingMail::Errors::UnknownAddress if context.root_account.deleted?
 
     user = opts[:user]
     message = opts[:text].strip
-    user = nil unless user && self.submission.grants_right?(user, :comment)
-    if !user
-      raise IncomingMail::Errors::InvalidParticipant
-    else
-      self.shard.activate do
-        self.submission.add_comment(
+    user = nil unless user && submission.grants_right?(user, :comment)
+    if user
+      shard.activate do
+        submission.add_comment(
           author: user,
           comment: message,
-          provisional: self.provisional_grade_id.present?
+          provisional: provisional_grade_id.present?
         )
       end
+    else
+      raise IncomingMail::Errors::InvalidParticipant
     end
   end
 
   def context
-    read_attribute(:context) || self.submission.assignment.context rescue nil
+    read_attribute(:context) || submission.assignment.context rescue nil
   end
 
   def parse_attachment_ids
-    (self.attachment_ids || "").split(",").map(&:to_i)
+    (attachment_ids || "").split(",").map(&:to_i)
   end
 
   def attachment_ids=(ids)
@@ -328,18 +328,18 @@ class SubmissionComment < ActiveRecord::Base
     # on the assignment for now.
     attachments ||= []
     old_ids = parse_attachment_ids
-    write_attribute(:attachment_ids, attachments.select { |a|
+    write_attribute(:attachment_ids, attachments.select do |a|
       old_ids.include?(a.id) ||
       a.recently_created ||
       a.ok_for_submission_comment
-    }.map { |a| a.id }.join(","))
+    end.map(&:id).join(","))
   end
 
   def infer_details
-    self.anonymous = self.submission.assignment.anonymous_peer_reviews
-    self.author_name ||= self.author.short_name rescue t(:unknown_author, "Someone")
-    self.cached_attachments = self.attachments.map { |a| OpenObject.build('attachment', a.attributes) }
-    self.context = self.read_attribute(:context) || self.submission.assignment.context rescue nil
+    self.anonymous = submission.assignment.anonymous_peer_reviews
+    self.author_name ||= author.short_name rescue t(:unknown_author, "Someone")
+    self.cached_attachments = attachments.map { |a| OpenObject.build("attachment", a.attributes) }
+    self.context = read_attribute(:context) || submission.assignment.context rescue nil
 
     self.workflow_state ||= "active"
   end
@@ -349,8 +349,8 @@ class SubmissionComment < ActiveRecord::Base
   end
 
   def force_reload_cached_attachments
-    self.cached_attachments = self.attachments.map { |a| OpenObject.build('attachment', a.attributes) }
-    self.save
+    self.cached_attachments = attachments.map { |a| OpenObject.build("attachment", a.attributes) }
+    save
   end
 
   def attachments
@@ -363,7 +363,7 @@ class SubmissionComment < ActiveRecord::Base
   def self.preload_attachments(comments)
     ActiveRecord::Associations::Preloader.new.preload(comments, [:submission])
     submissions = comments.map(&:submission).uniq
-    ActiveRecord::Associations::Preloader.new.preload(submissions, :assignment => :attachments)
+    ActiveRecord::Associations::Preloader.new.preload(submissions, assignment: :attachments)
   end
 
   def update_submission
@@ -385,16 +385,16 @@ class SubmissionComment < ActiveRecord::Base
     end
 
     res = format_message(comment).first
-    res = truncate_html(res, :max_length => truncate, :words => true) if truncate
+    res = truncate_html(res, max_length: truncate, words: true) if truncate
     res
   end
 
   def context_code
-    "#{self.context_type.downcase}_#{self.context_id}"
+    "#{context_type.downcase}_#{context_id}"
   end
 
   def avatar_path
-    "/images/users/#{User.avatar_key(self.author_id)}"
+    "/images/users/#{User.avatar_key(author_id)}"
   end
 
   def serialization_methods
@@ -418,9 +418,9 @@ class SubmissionComment < ActiveRecord::Base
         submission.user.clear_cache_key(:submissions)
 
         ContentParticipation.create_or_update({
-                                                :content => submission,
-                                                :user => submission.user,
-                                                :workflow_state => "unread",
+                                                content: submission,
+                                                user: submission.user,
+                                                workflow_state: "unread",
                                               })
       end
     end

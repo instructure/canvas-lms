@@ -27,19 +27,19 @@ module Lti::MembershipService
       group_model
     end
 
-    describe '.collator_instance' do
-      it 'returns a CourseLisPersonCollator instance by default when the context is a Course' do
+    describe ".collator_instance" do
+      it "returns a CourseLisPersonCollator instance by default when the context is a Course" do
         collator = MembershipCollatorFactory.collator_instance(@course, @teacher, {})
         expect(collator.class).to eq Lti::MembershipService::CourseLisPersonCollator
       end
 
-      it 'returns a CourseGroupCollator instance when group role is supplied and context is a Course' do
+      it "returns a CourseGroupCollator instance when group role is supplied and context is a Course" do
         role = [::IMS::LIS::ContextType::URNs::Group, ::IMS::LIS::Roles::Context::URNs::TeachingAssistant]
         collator = MembershipCollatorFactory.collator_instance(@course, @teacher, { role: role })
         expect(collator.class).to eq Lti::MembershipService::CourseGroupCollator
       end
 
-      it 'returns a GroupLisPersonCollator instance by default when the context is a Group' do
+      it "returns a GroupLisPersonCollator instance by default when the context is a Group" do
         collator = MembershipCollatorFactory.collator_instance(@group, @teacher, {})
         expect(collator.class).to eq Lti::MembershipService::GroupLisPersonCollator
       end

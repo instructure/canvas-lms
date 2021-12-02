@@ -27,7 +27,4 @@ class PopulateTermsOfService < ActiveRecord::Migration[4.2]
       TermsOfService.ensure_terms_for_account(ra)
     end
   end
-
-  def down
-  end
 end

@@ -47,7 +47,7 @@ module SIS
         raise ImportError, "No name given for group #{group_id}." if name.blank?
         # closed and completed are no longer valid states. Leaving these for
         # backwards compatibility. It is not longer a documented status
-        raise ImportError, "Improper status \"#{status}\" for group #{group_id}." unless status =~ /\A(available|closed|completed|deleted)/i
+        raise ImportError, "Improper status \"#{status}\" for group #{group_id}." unless /\A(available|closed|completed|deleted)/i.match?(status)
         return if @batch.skip_deletes? && status =~ /deleted/i
 
         if course_id && account_id
@@ -93,10 +93,10 @@ module SIS
         # no account_id, course_id, or group_category, assign context to root_account
         context ||= @root_account
 
-        if group && group.group_memberships.exists?
-          unless context.id == group.context_id && context.class.base_class.name == group.context_type
-            raise ImportError, "Cannot move group #{group_id} because it has group_memberships." if group.context.is_a?(Course) || context.is_a?(Course)
-          end
+        if group&.group_memberships&.exists? &&
+           !(context.id == group.context_id && context.class.base_class.name == group.context_type) &&
+           (group.context.is_a?(Course) || context.is_a?(Course))
+          raise ImportError, "Cannot move group #{group_id} because it has group_memberships."
         end
 
         group ||= context.groups.new(name: name, sis_source_id: group_id)
@@ -104,15 +104,15 @@ module SIS
         group.name = name if name.present? && !group.stuck_sis_fields.include?(:name)
         group.context = context
         group.sis_batch_id = @batch.id
-        group.workflow_state = status == 'deleted' ? 'deleted' : 'available'
+        group.workflow_state = status == "deleted" ? "deleted" : "available"
 
         if group.save
           data = SisBatchRollBackData.build_data(sis_batch: @batch, context: group)
           @roll_back_data << data if data
-          if status == 'deleted'
+          if status == "deleted"
             gms = SisBatchRollBackData.build_dependent_data(sis_batch: @batch,
                                                             contexts: group.group_memberships,
-                                                            updated_state: 'deleted')
+                                                            updated_state: "deleted")
           end
           @roll_back_data.push(*gms) if gms
           @success_count += 1

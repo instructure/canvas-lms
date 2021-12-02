@@ -25,7 +25,7 @@ describe Types::AssignmentGroupType do
     before(:once) do
       course_with_student(active_all: true)
       # adding another student
-      @student_enrollment = @course.enroll_student(User.create!, enrollment_state: 'active')
+      @student_enrollment = @course.enroll_student(User.create!, enrollment_state: "active")
       @group = @course.assignment_groups.create!(name: "a group")
       @assignment = @course.assignments.create!(name: "a assignment")
 
@@ -33,7 +33,7 @@ describe Types::AssignmentGroupType do
       @group.context.recompute_student_scores
       @other_assignment = @course.assignments.create!(
         name: "other",
-        assignment_group: @other_group,
+        assignment_group: @other_group
       )
 
       @group.scores.eager_load(:enrollment, :course).all.each do |score|
@@ -64,7 +64,7 @@ describe Types::AssignmentGroupType do
       end
     end
 
-    describe 'scores' do
+    describe "scores" do
       it "returns scores for the assignment group" do
         expect(@group_type.resolve("gradesConnection { nodes { finalScore } }", current_user: @student)).to eq [78.1]
       end
@@ -95,7 +95,7 @@ describe Types::AssignmentGroupType do
         .to eq @group.assignments.map(&:to_param)
     end
 
-    describe 'assignmentsGroupConnection' do
+    describe "assignmentsGroupConnection" do
       it "returns assignments in position order" do
         @assignment.update! position: 2
         assignment2 = @course.assignments.create! name: "a2", assignment_group: @group, position: 1

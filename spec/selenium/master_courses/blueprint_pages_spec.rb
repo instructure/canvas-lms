@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../helpers/blueprint_common'
+require_relative "../helpers/blueprint_common"
 
 describe "master courses banner" do
   include_context "in-process server selenium tests"
@@ -31,7 +31,7 @@ describe "master courses banner" do
     @minion.enroll_teacher(@master_teacher).accept!
 
     # sets up the page that gets blueprinted
-    @original_page = @master.wiki_pages.create! title: 'Unicorn', body: 'don\'t exist! Sorry James'
+    @original_page = @master.wiki_pages.create! title: "Unicorn", body: "don't exist! Sorry James"
     run_master_course_migration(@master)
     @copy_page = @minion.wiki_pages.last
   end
@@ -41,14 +41,14 @@ describe "master courses banner" do
       user_session(@master_teacher)
     end
 
-    it "can lock down associated course's page content", priority: "1", test_id: 3127591 do
+    it "can lock down associated course's page content", priority: "1" do
       change_blueprint_settings(@master, content: true)
       get "/courses/#{@master.id}/pages/#{@original_page.id}"
-      f('.bpc-lock-toggle button').click
-      expect { f('.bpc-lock-toggle__label').text }.to become('Locked')
+      f(".bpc-lock-toggle button").click
+      expect { f(".bpc-lock-toggle__label").text }.to become("Locked")
       run_master_course_migration(@master)
       get "/courses/#{@minion.id}/pages/#{@copy_page.id}/edit"
-      expect(f('#content-wrapper')).not_to contain_css('#tinymce')
+      expect(f("#content-wrapper")).not_to contain_css("#tinymce")
     end
   end
 end

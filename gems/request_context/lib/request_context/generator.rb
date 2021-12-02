@@ -18,13 +18,13 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'securerandom'
-require 'canvas_security'
+require "securerandom"
+require "canvas_security"
 
 # this adds the cookie_jar method to the
 # action dispatch request, if it's not loaded
 # then there is no "cookie_jar"
-require 'action_dispatch/middleware/cookies'
+require "action_dispatch/middleware/cookies"
 
 module RequestContext
   ##
@@ -66,16 +66,16 @@ module RequestContext
 
       # logged here to get as close to the beginning of the request being
       # processed as possible
-      RequestContext::Generator.store_request_queue_time(env['HTTP_X_REQUEST_START'])
+      RequestContext::Generator.store_request_queue_time(env["HTTP_X_REQUEST_START"])
 
       status, headers, body = @app.call(env)
 
       # The session id may have been reset in the request, in which case
       # we want to log the new one,
-      session_id = (env['rack.session.options'] || {})[:id]
-      headers['X-Session-Id'] = session_id if session_id
-      headers['X-Request-Context-Id'] = request_id
-      headers['X-Canvas-Meta'] = meta_headers if meta_headers.present?
+      session_id = (env["rack.session.options"] || {})[:id]
+      headers["X-Session-Id"] = session_id if session_id
+      headers["X-Request-Context-Id"] = request_id
+      headers["X-Canvas-Meta"] = meta_headers if meta_headers.present?
 
       [status, headers, body]
     end
@@ -88,7 +88,7 @@ module RequestContext
       return if value.blank?
 
       meta_headers = Thread.current[:context].try(:[], :meta_headers)
-      return if !meta_headers
+      return unless meta_headers
 
       meta_headers << "#{name}=#{value};"
     end
@@ -96,7 +96,7 @@ module RequestContext
     def self.store_interaction_seconds_update(token, interaction_seconds)
       data = CanvasSecurity::PageViewJwt.decode(token)
       if data
-        self.add_meta_header("r", "#{data[:request_id]}|#{data[:created_at]}|#{interaction_seconds}")
+        add_meta_header("r", "#{data[:request_id]}|#{data[:created_at]}|#{interaction_seconds}")
       end
     end
 
@@ -105,20 +105,20 @@ module RequestContext
         match = header_val.match(/t=(?<req_start>\d+)/)
         return unless match
 
-        delta = (Time.now.utc.to_f * 1000000).to_i - match['req_start'].to_i
+        delta = (Time.now.utc.to_f * 1_000_000).to_i - match["req_start"].to_i
         RequestContext::Generator.add_meta_header("q", delta)
       end
     end
 
     def self.store_request_meta(request, context)
-      self.add_meta_header("o", request.path_parameters[:controller])
-      self.add_meta_header("n", request.path_parameters[:action])
-      if request.request_parameters && request.request_parameters['operationName']
-        self.add_meta_header("on", request.request_parameters['operationName'])
+      add_meta_header("o", request.path_parameters[:controller])
+      add_meta_header("n", request.path_parameters[:action])
+      if request.request_parameters && request.request_parameters["operationName"]
+        add_meta_header("on", request.request_parameters["operationName"])
       end
       if context
-        self.add_meta_header("t", context.class)
-        self.add_meta_header("i", context.id)
+        add_meta_header("t", context.class)
+        add_meta_header("i", context.id)
       end
     end
 
@@ -136,10 +136,10 @@ module RequestContext
     #
     # @param [PageView] the bundle of attributes we want to map to meta headers
     def self.store_page_view_meta(page_view)
-      self.add_meta_header("x", page_view.interaction_seconds)
-      self.add_meta_header("p", page_view.participated? ? "t" : "f")
-      self.add_meta_header("e", page_view.asset_user_access_id)
-      self.add_meta_header("f", page_view.created_at.try(:utc).try(:iso8601, 2))
+      add_meta_header("x", page_view.interaction_seconds)
+      add_meta_header("p", page_view.participated? ? "t" : "f")
+      add_meta_header("e", page_view.asset_user_access_id)
+      add_meta_header("f", page_view.created_at.try(:utc).try(:iso8601, 2))
     end
 
     class << self
@@ -165,8 +165,8 @@ module RequestContext
     private
 
     def generate_request_id(env)
-      if env['HTTP_X_REQUEST_CONTEXT_ID']
-        request_context_id = CanvasSecurity.base64_decode(env['HTTP_X_REQUEST_CONTEXT_ID'])
+      if env["HTTP_X_REQUEST_CONTEXT_ID"]
+        request_context_id = CanvasSecurity.base64_decode(env["HTTP_X_REQUEST_CONTEXT_ID"])
         req_path = Rack::Request.new(env).path
         # we accept a request context id on some paths without requiring a
         # signature, e.g. because we already have some other means by which to
@@ -181,7 +181,7 @@ module RequestContext
     end
 
     def valid_signature?(request_context_id, env)
-      signature_b64 = env['HTTP_X_REQUEST_CONTEXT_SIGNATURE']
+      signature_b64 = env["HTTP_X_REQUEST_CONTEXT_SIGNATURE"]
       return false unless signature_b64
 
       signature = CanvasSecurity.base64_decode(signature_b64)

@@ -22,7 +22,7 @@ class SubmissionError < StandardError
 end
 
 class Mutations::CreateSubmissionDraft < Mutations::BaseMutation
-  graphql_name 'CreateSubmissionDraft'
+  graphql_name "CreateSubmissionDraft"
 
   # The attempt is passed in to prevent a possible race condition where a draft
   # could be created at the same time that an assignment was submitted, which
@@ -34,11 +34,11 @@ class Mutations::CreateSubmissionDraft < Mutations::BaseMutation
   argument :attempt, Integer, required: false
   argument :body, String, required: false
   argument :external_tool_id, ID, required: false
-  argument :file_ids, [ID], required: false, prepare: GraphQLHelpers.relay_or_legacy_ids_prepare_func('Attachment')
+  argument :file_ids, [ID], required: false, prepare: GraphQLHelpers.relay_or_legacy_ids_prepare_func("Attachment")
   argument :lti_launch_url, String, required: false
   argument :media_id, ID, required: false
   argument :resource_link_lookup_uuid, String, required: false
-  argument :submission_id, ID, required: true, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func('Submission')
+  argument :submission_id, ID, required: true, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Submission")
   argument :url, String, required: false
 
   field :submission_draft, Types::SubmissionDraftType, null: true
@@ -63,7 +63,7 @@ class Mutations::CreateSubmissionDraft < Mutations::BaseMutation
     #       the active submission.
     submission_draft.active_submission_type = input[:active_submission_type]
     case input[:active_submission_type]
-    when 'basic_lti_launch'
+    when "basic_lti_launch"
       raise SubmissionError if input[:lti_launch_url].blank? || input[:external_tool_id].blank?
 
       external_tool = ContextExternalTool.find_external_tool(
@@ -76,13 +76,13 @@ class Mutations::CreateSubmissionDraft < Mutations::BaseMutation
       submission_draft.context_external_tool_id = external_tool.id
       submission_draft.lti_launch_url = input[:lti_launch_url]
       submission_draft.resource_link_lookup_uuid = input[:resource_link_lookup_uuid]
-    when 'media_recording'
+    when "media_recording"
       submission_draft.media_object_id = input[:media_id]
-    when 'online_text_entry'
+    when "online_text_entry"
       submission_draft.body = input[:body]
-    when 'online_upload'
+    when "online_upload"
       submission_draft.attachments = attachments
-    when 'online_url'
+    when "online_url"
       submission_draft.url = input[:url]
     end
 
@@ -90,8 +90,8 @@ class Mutations::CreateSubmissionDraft < Mutations::BaseMutation
 
     { submission_draft: submission_draft }
   rescue ActiveRecord::RecordNotFound
-    raise GraphQL::ExecutionError, 'not found'
-  rescue ActiveRecord::RecordInvalid => invalid
+    raise GraphQL::ExecutionError, "not found"
+  rescue ActiveRecord::RecordInvalid => e
     # activerecord validation is not robust to race condition
     #   multiple concurrent requests may penetrate activerecord validations
     #   and save dup records for a combination of submission_id and attempt
@@ -109,9 +109,9 @@ class Mutations::CreateSubmissionDraft < Mutations::BaseMutation
         retry
       end
     end
-    errors_for(invalid.record)
+    errors_for(e.record)
   rescue SubmissionError => e
-    return validation_error(e.message)
+    validation_error(e.message)
   end
 
   def self.submission_draft_log_entry(draft, _ctx)
@@ -134,7 +134,7 @@ def get_and_verify_attachments!(file_ids)
   unless file_ids.size == attachments.size
     attachment_ids = attachments.map(&:id)
     raise SubmissionError, I18n.t(
-      'No attachments found for the following ids: %{ids}',
+      "No attachments found for the following ids: %{ids}",
       { ids: file_ids - attachment_ids.map(&:to_s) }
     )
   end
@@ -150,8 +150,8 @@ end
 def verify_allowed_extensions!(assignment, attachments)
   return if assignment.allowed_extensions.blank?
 
-  raise SubmissionError, I18n.t('Invalid file type') unless attachments.all? do |attachment|
-    attachment_extension = attachment.after_extension || ''
+  raise SubmissionError, I18n.t("Invalid file type") unless attachments.all? do |attachment|
+    attachment_extension = attachment.after_extension || ""
     assignment.allowed_extensions.include?(attachment_extension.downcase)
   end
 end

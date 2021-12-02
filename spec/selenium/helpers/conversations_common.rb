@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../common'
+require_relative "../common"
 
 module ConversationsCommon
   def modifier
@@ -25,7 +25,7 @@ module ConversationsCommon
   end
 
   def determine_modifier
-    if driver.execute_script('return !!window.navigator.userAgent.match(/Macintosh/)')
+    if driver.execute_script("return !!window.navigator.userAgent.match(/Macintosh/)")
       :meta
     else
       :control
@@ -39,64 +39,63 @@ module ConversationsCommon
   def conversation_setup
     course_with_teacher_logged_in
 
-    term = EnrollmentTerm.new :name => "Super Term"
+    term = EnrollmentTerm.new name: "Super Term"
     term.root_account_id = @course.root_account_id
     term.save!
 
-    @course.update! :enrollment_term => term
+    @course.update! enrollment_term: term
   end
 
   def conversation_elements
-    ff('.messages > li')
+    ff(".messages > li")
   end
 
   def view_filter
-    driver.find_element(:id, 'conversation_filter_select')
+    driver.find_element(:id, "conversation_filter_select")
   end
 
   def selected_view_filter
     select = view_filter
-    options = select.find_elements(tag_name: 'option')
+    options = select.find_elements(tag_name: "option")
     selected = options.select(&:selected?)
 
     # should be one filter applied i every situation
     expect(selected.size).to eq 1
-    value = selected[0].attribute('value')
-    value
+    selected[0].attribute("value")
   end
 
   def course_filter
-    skip('course filter selector fails intermittently (stale element reference), probably due to dynamic loading and refreshing')
+    skip("course filter selector fails intermittently (stale element reference), probably due to dynamic loading and refreshing")
     # try to make it load the courses first so it doesn't randomly refresh
-    selector = '.course-filter.bootstrap-select'
+    selector = ".course-filter.bootstrap-select"
     driver.execute_script(%{$('#{selector}').focus();})
     wait_for_ajaximations
     f(selector)
   end
 
   def message_course
-    f('.message_course.bootstrap-select')
+    f(".message_course.bootstrap-select")
   end
 
   def message_recipients_input
-    f('.compose_form #compose-message-recipients')
+    f(".compose_form #compose-message-recipients")
   end
 
   def message_subject_input
-    f('#compose-message-subject')
+    f("#compose-message-subject")
   end
 
   def message_body_input
-    f('.conversation_body')
+    f(".conversation_body")
   end
 
   def bootstrap_select_value(element)
-    f('.selected .text', element).attribute('data-value')
+    f(".selected .text", element).attribute("data-value")
   end
 
   def set_bootstrap_select_value(element, new_value)
-    f('.dropdown-toggle', element).click()
-    f(%{.text[data-value="#{new_value}"]}, element).click()
+    f(".dropdown-toggle", element).click
+    f(%(.text[data-value="#{new_value}"]), element).click
   end
 
   def select_view(new_view)
@@ -126,26 +125,26 @@ module ConversationsCommon
   end
 
   def click_star_toggle_menu_item
-    hover_and_click '#admin-btn'
-    hover_and_click '#star-toggle-btn:visible'
+    hover_and_click "#admin-btn"
+    hover_and_click "#star-toggle-btn:visible"
     wait_for_ajaximations
   end
 
   def click_unread_toggle_menu_item
-    hover_and_click '#admin-btn'
-    hover_and_click '#mark-unread-btn:visible'
+    hover_and_click "#admin-btn"
+    hover_and_click "#mark-unread-btn:visible"
     wait_for_ajaximations
   end
 
   def click_read_toggle_menu_item
-    hover_and_click '#admin-btn'
-    hover_and_click '#mark-read-btn:visible'
+    hover_and_click "#admin-btn"
+    hover_and_click "#mark-read-btn:visible"
     wait_for_ajaximations
   end
 
   def select_message_course(new_course, is_group = false)
     new_course = new_course.name if new_course.respond_to? :name
-    f('.dropdown-toggle', message_course).click
+    f(".dropdown-toggle", message_course).click
     wait_for_ajaximations
     if is_group
       fj("a:contains('Groups')", message_course).click
@@ -166,9 +165,9 @@ module ConversationsCommon
   end
 
   def reply_to_submission_comment(message = "test")
-    f('#submission-reply-btn').click
-    f('.reply_body').send_keys(message)
-    f('.submission-comment-reply-dialog .send-message').click
+    f("#submission-reply-btn").click
+    f(".reply_body").send_keys(message)
+    f(".submission-comment-reply-dialog .send-message").click
     wait_for_ajaximations
   end
 
@@ -181,17 +180,17 @@ module ConversationsCommon
   end
 
   def click_faculty_journal # if the checkbox is not visible then end otherwise check it
-    checkbox = 'div.message-header-row:nth-child(5) > div:nth-child(2) > label:nth-child(2)'
-    f('.user_note').click if fj("#{checkbox}:visible")
+    checkbox = "div.message-header-row:nth-child(5) > div:nth-child(2) > label:nth-child(2)"
+    f(".user_note").click if fj("#{checkbox}:visible")
   end
 
   def click_send
-    f('.compose-message-dialog .send-message').click
+    f(".compose-message-dialog .send-message").click
     wait_for_ajaximations
   end
 
   def compose(options = {})
-    f('#compose-btn').click
+    f("#compose-btn").click
     wait_for_ajaximations
     select_message_course(options[:course]) if options[:course]
 
@@ -203,7 +202,7 @@ module ConversationsCommon
   end
 
   def run_progress_job
-    return unless (progress = Progress.where(tag: 'conversation_batch_update').first)
+    return unless (progress = Progress.where(tag: "conversation_batch_update").first)
 
     job = Delayed::Job.find(progress.delayed_job_id)
     job.invoke_job
@@ -211,7 +210,7 @@ module ConversationsCommon
 
   def select_conversations(to_select = -1)
     driver.action.key_down(modifier).perform
-    messages = ff('.messages > li')
+    messages = ff(".messages > li")
     message_count = messages.length
 
     # default of -1 will select all messages. If you enter in too large of number, it defaults to selecting all
@@ -229,46 +228,46 @@ module ConversationsCommon
 
   # Allows you to select between
   def click_more_options(opts, message = 0)
-    case
     # First case is for clicking on message gear menu
-    when opts[:message]
+    if opts[:message]
       # The More Options gear menu only shows up on mouse over of message
-      driver.action.move_to(ff('.message-item-view')[message]).perform
+      driver.action.move_to(ff(".message-item-view")[message]).perform
       wait_for_ajaximations
-      f('.actions li .inline-block .al-trigger').click
+      f(".actions li .inline-block .al-trigger").click
     # This case is for clicking on gear menu at conversation heading level
-    when opts[:convo]
-      f('.message-header .al-trigger').click
+    elsif opts[:convo]
+      f(".message-header .al-trigger").click
     # Otherwise, it clicks the topmost gear menu
-    else f('#admin-btn.al-trigger').click
+    else
+      f("#admin-btn.al-trigger").click
     end
     wait_for_ajaximations
   end
 
   # Manually forwards a message. Thankfully, each More Option button has the same menu elements within
   def forward_message(recipient)
-    ffj('.ui-menu-item .ui-corner-all:visible')[1].click
+    ffj(".ui-menu-item .ui-corner-all:visible")[1].click
     wait_for_ajaximations
     add_message_recipient recipient
-    write_message_body('stuff')
-    f('.btn-primary.send-message').click
+    write_message_body("stuff")
+    f(".btn-primary.send-message").click
     wait_for_ajaximations
   end
 
   def add_students(count)
     @s = []
     count.times do |n|
-      @s << User.create!(:name => "Test Student #{n + 1}")
-      @course.enroll_student(@s.last).update_attribute(:workflow_state, 'active')
+      @s << User.create!(name: "Test Student #{n + 1}")
+      @course.enroll_student(@s.last).update_attribute(:workflow_state, "active")
     end
   end
 
   def click_reply
-    f('#reply-btn').click
+    f("#reply-btn").click
     wait_for_ajaximations
   end
 
-  def reply_to_message(body = 'stuff')
+  def reply_to_message(body = "stuff")
     click_reply
     write_message_body(body)
     click_send
@@ -282,7 +281,7 @@ module ConversationsCommon
 
   def click_star_icon(msg, star_btn = nil)
     if star_btn.nil?
-      star_btn = f('.star-btn', msg)
+      star_btn = f(".star-btn", msg)
     end
 
     star_btn.click
@@ -291,14 +290,14 @@ module ConversationsCommon
 
   # Clicks the admin archive/unarchive button
   def click_archive_button
-    f('#archive-btn').click
+    f("#archive-btn").click
     driver.switch_to.alert.accept
     wait_for_ajaximations
   end
 
   # Clicks star cog menu item
   def click_archive_menu_item
-    f('.archive-btn.ui-corner-all').click
+    f(".archive-btn.ui-corner-all").click
     driver.switch_to.alert.accept
     wait_for_ajaximations
   end

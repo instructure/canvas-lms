@@ -22,12 +22,12 @@ class Progress < ActiveRecord::Base
   belongs_to :context, polymorphic:
       [:content_migration, :course, :account, :group_category, :content_export,
        :assignment, :attachment, :epub_export, :sis_batch, :pace_plan,
-       { context_user: 'User', quiz_statistics: 'Quizzes::QuizStatistics' }]
+       { context_user: "User", quiz_statistics: "Quizzes::QuizStatistics" }]
   belongs_to :user
 
-  validates_presence_of :context_id
-  validates_presence_of :context_type
-  validates_presence_of :tag
+  validates :context_id, presence: true
+  validates :context_type, presence: true
+  validates :tag, presence: true
 
   serialize :results
   attr_reader :total
@@ -35,12 +35,12 @@ class Progress < ActiveRecord::Base
   include Workflow
   workflow do
     state :queued do
-      event :start, :transitions_to => :running
-      event :fail, :transitions_to => :failed
+      event :start, transitions_to: :running
+      event :fail, transitions_to: :failed
     end
     state :running do
-      event(:complete, :transitions_to => :completed) { self.completion = 100 }
-      event :fail, :transitions_to => :failed
+      event(:complete, transitions_to: :completed) { self.completion = 100 }
+      event :fail, transitions_to: :failed
     end
     state :completed
     state :failed
@@ -48,14 +48,14 @@ class Progress < ActiveRecord::Base
 
   def reset!
     self.results = nil
-    self.workflow_state = 'queued'
+    self.workflow_state = "queued"
     self.completion = 0
-    GuardRail.activate(:primary) { self.save! }
+    GuardRail.activate(:primary) { save! }
   end
 
   def set_results(results)
     self.results = results
-    self.save
+    save
   end
 
   def update_completion!(value)
@@ -94,7 +94,7 @@ class Progress < ActiveRecord::Base
   # so that you can update the completion percentage on it as the job runs.
   def process_job(target, method, enqueue_args, *method_args, **kwargs)
     enqueue_args = enqueue_args.reverse_merge(max_attempts: 1, priority: Delayed::LOW_PRIORITY)
-    method_args = method_args.unshift(self) unless enqueue_args.delete(:preserve_method_args)
+    method_args.unshift(self) unless enqueue_args.delete(:preserve_method_args)
     work = Progress::Work.new(self, target, method, args: method_args, kwargs: kwargs)
     GuardRail.activate(:primary) do
       ActiveRecord::Base.connection.after_transaction_commit do
@@ -111,7 +111,7 @@ class Progress < ActiveRecord::Base
     end
 
     def perform
-      self.args[0] = @progress if self.args[0] == @progress # maintain the same object reference
+      args[0] = @progress if args[0] == @progress # maintain the same object reference
       @progress.start
       super
       @progress.reload
@@ -122,7 +122,7 @@ class Progress < ActiveRecord::Base
       er_id = @progress.shard.activate do
         Canvas::Errors.capture_exception("Progress::Work", error)[:error_report]
       end
-      @progress.message = "Unexpected error, ID: #{er_id || 'unknown'}"
+      @progress.message = "Unexpected error, ID: #{er_id || "unknown"}"
       @progress.save
       @progress.fail
       @context.fail_with_error!(error) if @context.respond_to?(:fail_with_error!)

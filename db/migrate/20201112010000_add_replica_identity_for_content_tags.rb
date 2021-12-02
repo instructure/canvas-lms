@@ -22,13 +22,13 @@ class AddReplicaIdentityForContentTags < ActiveRecord::Migration[5.2]
   disable_ddl_transaction!
 
   def up
-    add_replica_identity 'ContentTag', :root_account_id, 0
-    remove_index :content_tags, name: 'index_content_tags_on_root_account_id', if_exists: true
+    add_replica_identity "ContentTag", :root_account_id, 0
+    remove_index :content_tags, name: "index_content_tags_on_root_account_id", if_exists: true
   end
 
   def down
     add_index :content_tags, :root_account_id, algorithm: :concurrently, if_not_exists: true
-    remove_replica_identity 'ContentTag'
+    remove_replica_identity "ContentTag"
     change_column_null :content_tags, :root_account_id, true
   end
 end

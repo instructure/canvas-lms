@@ -18,13 +18,13 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'csv'
+require "csv"
 
 class GradebookImporter
-  ASSIGNMENT_PRELOADED_FIELDS = %i/
+  ASSIGNMENT_PRELOADED_FIELDS = %i[
     id title points_possible grading_type updated_at context_id context_type group_category_id
     created_at due_at only_visible_to_overrides moderated_grading grades_published_at final_grader_id
-  /.freeze
+  ].freeze
 
   class NegativeId
     class << self
@@ -55,7 +55,7 @@ class GradebookImporter
               :submissions, :missing_assignments, :missing_students, :upload
 
   def self.create_from(progress, gradebook_upload, user, attachment)
-    self.new(gradebook_upload, attachment, user, progress).parse!
+    new(gradebook_upload, attachment, user, progress).parse!
   rescue CSV::MalformedCSVError => e
     Canvas::Errors.capture_exception(:gradebook_import, e, :info)
     # this isn't actually "retryable", but this error will make sure
@@ -87,8 +87,8 @@ class GradebookImporter
     e
   end
 
-  CSV::Converters[:decimal_comma_to_period] = ->(field) do
-    if field =~ /^-?[0-9.,]+%?$/
+  CSV::Converters[:decimal_comma_to_period] = lambda do |field|
+    if /^-?[0-9.,]+%?$/.match?(field)
       # This field is a pure number or percentage => let's normalize it
       number_parts = field.split(/[,.]/)
       last_number_part = number_parts.pop
@@ -96,7 +96,7 @@ class GradebookImporter
       if number_parts.empty?
         last_number_part
       else
-        [number_parts.join(), last_number_part].join('.')
+        [number_parts.join, last_number_part].join(".")
       end
     else
       field
@@ -116,7 +116,7 @@ class GradebookImporter
     Assignment.preload_unposted_anonymous_submissions(@all_assignments)
     @all_assignments = @all_assignments.index_by(&:id)
     @all_students = @context.all_students
-                            .select(['users.id', :name, :sortable_name, 'users.updated_at'])
+                            .select(["users.id", :name, :sortable_name, "users.updated_at"])
                             .index_by(&:id)
 
     @assignments = nil
@@ -135,6 +135,7 @@ class GradebookImporter
     @gradebook_importer_assignments = {}
     @gradebook_importer_custom_columns = {}
     @gradebook_importer_override_scores = {}
+    @has_student_first_last_names = false
 
     begin
       csv_stream do |row|
@@ -168,7 +169,7 @@ class GradebookImporter
 
     @original_submissions = @context.submissions
                                     .preload(:grading_period, assignment: { context: :account })
-                                    .select(['submissions.id', :assignment_id, :user_id, :grading_period_id, :score, :excused, :cached_due_date, :course_id, 'submissions.updated_at'])
+                                    .select(["submissions.id", :assignment_id, :user_id, :grading_period_id, :score, :excused, :cached_due_date, :course_id, "submissions.updated_at"])
                                     .where(assignment_id: assignment_ids, user_id: user_ids)
                                     .map do |submission|
       is_gradeable = gradeable?(submission: submission, is_admin: is_admin)
@@ -182,41 +183,40 @@ class GradebookImporter
     end
 
     # cache the score on the existing object
-    original_submissions_by_student = @original_submissions.inject({}) do |r, s|
+    original_submissions_by_student = @original_submissions.each_with_object({}) do |s, r|
       r[s[:user_id]] ||= {}
       r[s[:user_id]][s[:assignment_id]] ||= {}
       r[s[:user_id]][s[:assignment_id]][:score] = s[:score]
       r[s[:user_id]][s[:assignment_id]][:gradeable] = s[:gradeable]
-      r
     end
 
     @students.each do |student|
       @gradebook_importer_assignments[student.id].each do |submission|
-        submission_assignment_id = submission.fetch('assignment_id').to_i
+        submission_assignment_id = submission.fetch("assignment_id").to_i
         assignment = original_submissions_by_student
                      .fetch(student.id, {})
                      .fetch(submission_assignment_id, {})
-        submission['original_grade'] = assignment.fetch(:score, nil)
-        submission['gradeable'] = assignment.fetch(:gradable, nil)
+        submission["original_grade"] = assignment.fetch(:score, nil)
+        submission["gradeable"] = assignment.fetch(:gradable, nil)
 
-        if submission.fetch('gradeable').nil?
-          assignment = @all_assignments[submission['assignment_id']] || @context.assignments.build
-          new_submission = Submission.new
-          new_submission.user = student
-          new_submission.assignment = assignment
-          edd = effective_due_dates.find_effective_due_date(student.id, assignment.id)
-          new_submission.cached_due_date = edd.fetch(:due_at, nil)
-          new_submission.grading_period_id = edd.fetch(:grading_period_id, nil)
-          submission['gradeable'] = !edd.fetch(:in_closed_grading_period, false) && gradeable?(
-            submission: new_submission,
-            is_admin: is_admin
-          )
-        end
+        next unless submission.fetch("gradeable").nil?
+
+        assignment = @all_assignments[submission["assignment_id"]] || @context.assignments.build
+        new_submission = Submission.new
+        new_submission.user = student
+        new_submission.assignment = assignment
+        edd = effective_due_dates.find_effective_due_date(student.id, assignment.id)
+        new_submission.cached_due_date = edd.fetch(:due_at, nil)
+        new_submission.grading_period_id = edd.fetch(:grading_period_id, nil)
+        submission["gradeable"] = !edd.fetch(:in_closed_grading_period, false) && gradeable?(
+          submission: new_submission,
+          is_admin: is_admin
+        )
       end
       @gradebook_importer_custom_columns[student.id].each do |column_id, student_custom_column_cell|
         custom_column = custom_gradebook_columns.detect { |custom_col| custom_col.id == column_id }
         datum = custom_column.custom_gradebook_column_data.detect { |custom_column_datum| custom_column_datum.user_id == student.id }
-        student_custom_column_cell['current_content'] = datum&.content
+        student_custom_column_cell["current_content"] = datum&.content
       end
     end
 
@@ -234,12 +234,12 @@ class GradebookImporter
 
           # Have potentially mixed case excused in grade match case
           # expectations for the compare so it doesn't look changed
-          submission['grade'] = 'EX' if submission['grade'].to_s.casecmp('EX') == 0
+          submission["grade"] = "EX" if submission["grade"].to_s.casecmp("EX") == 0
           no_change = no_change_to_submission?(submission)
 
-          @warning_messages[:prevented_grading_ungradeable_submission] = true if !submission['gradeable'] && !no_change
+          @warning_messages[:prevented_grading_ungradeable_submission] = true if !submission["gradeable"] && !no_change
 
-          no_change || !submission['gradeable']
+          no_change || !submission["gradeable"]
         end
       end
 
@@ -272,7 +272,7 @@ class GradebookImporter
       end
 
       @students.each do |student|
-        @gradebook_importer_assignments[student.id].select! { |sub| sub['gradeable'] }
+        @gradebook_importer_assignments[student.id].select! { |sub| sub["gradeable"] }
       end
 
       @unchanged_assignments = !indexes_to_delete.empty?
@@ -300,7 +300,7 @@ class GradebookImporter
       end
     end
 
-    @upload.gradebook = self.as_json
+    @upload.gradebook = as_json
     @upload.save!
   end
 
@@ -310,16 +310,16 @@ class GradebookImporter
 
       students.each do |student|
         submission = gradebook_importer_assignments.fetch(student.id)[idx]
-        if submission['grade'].present? && (submission['grade'].to_s.casecmp('EX') != 0)
-          gradebook_importer_assignments.fetch(student.id)[idx]['grade'] = assignment.score_to_grade(submission['grade'], \
-                                                                                                     submission['grade'])
+        if submission["grade"].present? && (submission["grade"].to_s.casecmp("EX") != 0)
+          gradebook_importer_assignments.fetch(student.id)[idx]["grade"] = assignment.score_to_grade(submission["grade"], \
+                                                                                                     submission["grade"])
         end
-        if submission['original_grade'].present? && (submission['original_grade'] != 'EX')
-          gradebook_importer_assignments.fetch(student.id)[idx]['original_grade'] = assignment.score_to_grade(submission['original_grade'],\
-                                                                                                              submission['original_grade'])
+        if submission["original_grade"].present? && (submission["original_grade"] != "EX")
+          gradebook_importer_assignments.fetch(student.id)[idx]["original_grade"] = assignment.score_to_grade(submission["original_grade"],\
+                                                                                                              submission["original_grade"])
         end
-        if submission['grade'].to_s.casecmp('EX') == 0
-          submission['grade'] = 'EX'
+        if submission["grade"].to_s.casecmp("EX") == 0
+          submission["grade"] = "EX"
         end
       end
     end
@@ -379,7 +379,7 @@ class GradebookImporter
 
     update_column_count row
 
-    return false if last_student_info_column(row) !~ /Section/
+    return false unless /Section/.match?(last_student_info_column(row))
 
     true
   end
@@ -390,25 +390,31 @@ class GradebookImporter
   end
 
   def row_has_student_headers?(row)
-    row.length > 3 && row[0].include?('Student') && row[1].include?('ID')
+    (row.length > 3 && row[0].include?("Student") && row[1].include?("ID")) ||
+      (row.length > 4 && row[0].include?("LastName") && row[1].include?("FirstName") && row[2].include?("ID"))
   end
 
   def update_column_count(row)
     # A side effect that's necessary to finish validation, but needs to come
     # after the row.length check above.
-    @student_columns = 3 # name, user id, section
-    if row[2] =~ /SIS\s+Login\s+ID/
-      @sis_login_id_column = 2
+
+    # includes name, ID, section
+    @has_student_first_last_names = (row[0] == "LastName" && row[1] == "FirstName")
+    raise InvalidHeaderRow if @has_student_first_last_names && !allow_student_last_first_names?
+
+    @student_columns = student_name_column_count = @has_student_first_last_names ? 4 : 3
+    if /SIS\s+Login\s+ID/.match?(row[student_name_column_count - 1])
+      @sis_login_id_column = student_name_column_count - 1
       @student_columns += 1
-    elsif row[2] =~ /SIS\s+User\s+ID/ && row[3] =~ /SIS\s+Login\s+ID/
+    elsif row[student_name_column_count - 1] =~ /SIS\s+User\s+ID/ && row[student_name_column_count] =~ /SIS\s+Login\s+ID/
       # Integration id might be after sis id and login id, ignore it.
-      i = row[4] =~ /Integration\s+ID/ ? 1 : 0
-      @sis_user_id_column = 2
-      @sis_login_id_column = 3
+      i = /Integration\s+ID/.match?(row[student_name_column_count + 1]) ? 1 : 0
+      @sis_user_id_column = student_name_column_count - 1
+      @sis_login_id_column = student_name_column_count
       @student_columns += 2 + i
-      if row[4 + i] =~ /Root\s+Account/
+      if /Root\s+Account/.match?(row[student_name_column_count + 1 + i])
         @student_columns += 1
-        @root_account_column = 4 + i
+        @root_account_column = student_name_column_count + 1 + i
       end
     end
 
@@ -418,6 +424,8 @@ class GradebookImporter
 
   GRADEBOOK_IMPORTER_RESERVED_NAMES = [
     "Student",
+    "LastName",
+    "FirstName",
     "ID",
     "SIS User ID",
     "SIS Login ID",
@@ -442,8 +450,8 @@ class GradebookImporter
 
     # This regexp will also include columns for unposted scores, which
     # will be one of these values with "Unposted" prepended.
-    non_assignment_regex = Regexp.new(NON_ASSIGNMENT_COLUMN_HEADERS.join('|'))
-    stripped_row.reject { |header_name| non_assignment_regex.match?(header_name) }
+    non_assignment_regex = Regexp.new(NON_ASSIGNMENT_COLUMN_HEADERS.join("|"))
+    stripped_row.grep_v(non_assignment_regex)
   end
 
   def drop_student_information_columns(row)
@@ -452,20 +460,20 @@ class GradebookImporter
 
   # this method requires non-assignment columns to be stripped from the row
   def parse_assignments(stripped_row)
-    stripped_row.map do |name_and_id|
+    stripped_row.filter_map do |name_and_id|
       title, id = Assignment.title_and_id(name_and_id)
       assignment = @all_assignments[id.to_i] if id.present?
       # backward compat
       assignment ||= @all_assignments.find { |_id, a| a.title == name_and_id }
                                      .try(:last)
-      assignment ||= Assignment.new(:title => title || name_and_id)
+      assignment ||= Assignment.new(title: title || name_and_id)
       assignment.previous_id = assignment.id
       assignment.id ||= NegativeId.generate
 
       @missing_assignment ||= assignment.new_record?
 
       { assignment: assignment, header_name: name_and_id } if assignment
-    end.compact
+    end
   end
 
   def detect_override_columns(row)
@@ -510,7 +518,8 @@ class GradebookImporter
   end
 
   def process_student(row)
-    student_id = row[1] # the second column in the csv should have the student_id for each row
+    # second or third column in the csv should have the student_id for each row
+    student_id = @has_student_first_last_names ? row[2] : row[1]
     student = @all_students[student_id.to_i] if student_id.present?
     unless student
       ra_sis_id = row[@root_account_column].presence if @root_account_column
@@ -529,13 +538,15 @@ class GradebookImporter
       pseudonym = @pseudonyms_by_sis_id[sis_user_id] if sis_user_id
       pseudonym ||= @pseudonyms_by_login_id[sis_login_id] if sis_login_id
       student = @all_students[pseudonym.user_id] if pseudonym
+
+      unless student
+        name = @has_student_first_last_names ? "#{row[1]} #{row[0]}".strip : row[0]
+        student = @all_students.find do |_id, s|
+          s.name == name || s.sortable_name == name
+        end.try(:last)
+        student ||= User.new(name: name)
+      end
     end
-    if row[0].present?
-      student ||= @all_students.find do |_id, s|
-        s.name == row[0] || s.sortable_name == row[0]
-      end.try(:last)
-    end
-    student ||= User.new(:name => row[0])
     student.previous_id = student.id
     student.id ||= NegativeId.generate
     @missing_student ||= student.new_record?
@@ -548,12 +559,12 @@ class GradebookImporter
       assignment_id = assignment.new_record? ? assignment.id : assignment.previous_id
       assignment_index = @assignment_indices[assignment.id]
       grade = row[assignment_index]&.strip
-      if !assignment_visible_to_student(student, assignment, assignment_id, @visible_assignments)
-        grade = ''
+      unless assignment_visible_to_student(student, assignment, assignment_id, @visible_assignments)
+        grade = ""
       end
       new_submission = {
-        'grade' => grade,
-        'assignment_id' => assignment_id,
+        "grade" => grade,
+        "assignment_id" => assignment_id,
       }
       importer_submissions << new_submission
     end
@@ -564,8 +575,8 @@ class GradebookImporter
     @parsed_custom_column_data.each do |id, custom_column|
       column_index = custom_column[:index]
       new_custom_column_data = {
-        'new_content' => row[column_index],
-        'column_id' => id
+        "new_content" => row[column_index],
+        "column_id" => id
       }
       importer_custom_columns[id] = new_custom_column_data
     end
@@ -594,16 +605,16 @@ class GradebookImporter
 
   def as_json(_options = {})
     {
-      :students => @students.map { |s| student_to_hash(s) },
-      :assignments => @assignments.map { |a| assignment_to_hash(a) },
-      :missing_objects => {
-        :assignments => @missing_assignments.map { |a| assignment_to_hash(a) },
-        :students => @missing_students.map { |s| student_to_hash(s) }
+      students: @students.map { |s| student_to_hash(s) },
+      assignments: @assignments.map { |a| assignment_to_hash(a) },
+      missing_objects: {
+        assignments: @missing_assignments.map { |a| assignment_to_hash(a) },
+        students: @missing_students.map { |s| student_to_hash(s) }
       },
-      :original_submissions => @original_submissions,
-      :unchanged_assignments => @unchanged_assignments,
-      :warning_messages => @warning_messages,
-      :custom_columns => custom_gradebook_columns.map { |cc| custom_columns_to_hash(cc) },
+      original_submissions: @original_submissions,
+      unchanged_assignments: @unchanged_assignments,
+      warning_messages: @warning_messages,
+      custom_columns: custom_gradebook_columns.map { |cc| custom_columns_to_hash(cc) },
     }.tap do |hash|
       hash[:override_scores] = override_score_json if allow_override_scores?
     end
@@ -617,7 +628,7 @@ class GradebookImporter
 
     @gradebook_importer_override_scores.each_value do |changes_for_student|
       includes_course_scores ||= changes_for_student.any?(&:course_score?)
-      grading_period_ids = grading_period_ids.merge(changes_for_student.map(&:grading_period_id).compact)
+      grading_period_ids = grading_period_ids.merge(changes_for_student.filter_map(&:grading_period_id))
     end
 
     {
@@ -643,7 +654,7 @@ class GradebookImporter
       nil
     end
 
-    field_counts[';'] > field_counts[','] ? :semicolon : :comma
+    field_counts[";"] > field_counts[","] ? :semicolon : :comma
   end
 
   def semicolon_delimited?(csv_file)
@@ -666,7 +677,7 @@ class GradebookImporter
       return true
     end
 
-    if row[0]&.include?('Points Possible')
+    if row[0]&.include?("Points Possible")
       # this row is describing the assignment, has no student data
       process_pp(row)
       return true
@@ -681,11 +692,11 @@ class GradebookImporter
     false # nothing unusual, signal to process as a student row
   end
 
-  def csv_stream
+  def csv_stream(&block)
     csv_file = attachment.open(need_local_file: true)
     is_semicolon_delimited = semicolon_delimited?(csv_file)
     csv_parse_options = {
-      converters: %i(nil decimal_comma_to_period),
+      converters: %i[nil decimal_comma_to_period],
       skip_lines: /^[;, ]+$/,
       col_sep: is_semicolon_delimited ? ";" : ","
     }
@@ -693,17 +704,15 @@ class GradebookImporter
     # using "foreach" rather than "parse" processes a chunk of the
     # file at a time rather than loading the whole file into memory
     # at once, a boon for memory consumption
-    CSV.foreach(csv_file.path, **csv_parse_options) do |row|
-      yield row
-    end
+    CSV.foreach(csv_file.path, **csv_parse_options, &block)
   end
 
   def add_root_account_to_pseudonym_cache(root_account)
     pseudonyms = root_account.shard.activate do
       root_account.pseudonyms
                   .active
-                  .select([:id, :unique_id, :sis_user_id, :user_id])
-                  .where(:user_id => @all_students.values).to_a
+                  .select(%i[id unique_id sis_user_id user_id])
+                  .where(user_id: @all_students.values).to_a
     end
     pseudonyms.each do |pseudonym|
       @pseudonyms_by_sis_id[[root_account.id, pseudonym.sis_user_id]] = pseudonym
@@ -721,12 +730,12 @@ class GradebookImporter
 
   def student_to_hash(student)
     {
-      :last_name_first => student.last_name_first,
-      :name => student.name,
-      :previous_id => student.previous_id,
-      :id => student.id,
-      :submissions => @gradebook_importer_assignments[student.id],
-      :custom_column_data => @gradebook_importer_custom_columns[student.id]&.values
+      last_name_first: student.last_name_first,
+      name: student.name,
+      previous_id: student.previous_id,
+      id: student.id,
+      submissions: @gradebook_importer_assignments[student.id],
+      custom_column_data: @gradebook_importer_custom_columns[student.id]&.values
     }.tap do |hash|
       hash[:override_scores] = @gradebook_importer_override_scores[student.id]&.map(&:to_h) if allow_override_scores?
     end
@@ -734,22 +743,22 @@ class GradebookImporter
 
   def assignment_to_hash(assignment)
     {
-      :id => assignment.id,
-      :previous_id => assignment.previous_id,
-      :title => assignment.title,
-      :points_possible => assignment.points_possible,
-      :grading_type => assignment.grading_type
+      id: assignment.id,
+      previous_id: assignment.previous_id,
+      title: assignment.title,
+      points_possible: assignment.points_possible,
+      grading_type: assignment.grading_type
     }
   end
 
   def valid_context?(context = nil)
-    context && [
-      :students,
-      :assignments,
-      :submissions,
-      :students=,
-      :assignments=,
-      :submissions=
+    context && %i[
+      students
+      assignments
+      submissions
+      students=
+      assignments=
+      submissions=
     ].all? { |m| context.respond_to?(m) }
   end
 
@@ -773,9 +782,9 @@ class GradebookImporter
     @students.all? do |student|
       custom_column_datum = @gradebook_importer_custom_columns[student.id][column_id]
 
-      return true if custom_column_datum['current_content'].blank? && custom_column_datum['new_content'].blank?
+      return true if custom_column_datum["current_content"].blank? && custom_column_datum["new_content"].blank?
 
-      custom_column_datum['current_content'] == custom_column_datum['new_content']
+      custom_column_datum["current_content"] == custom_column_datum["new_content"]
     end
   end
 
@@ -789,9 +798,7 @@ class GradebookImporter
 
     return false unless current_value.present? && new_value.present?
 
-    if consider_excused
-      return false if new_value.to_s.casecmp('EX') == 0 || current_value.casecmp('EX') == 0
-    end
+    return false if consider_excused && (new_value.to_s.casecmp?("EX") || current_value.casecmp?("EX"))
 
     # The exporter exports scores rounded to two decimal places (which is also
     # the maximum level of precision shown in the gradebook), so 123.456 will
@@ -802,7 +809,7 @@ class GradebookImporter
   end
 
   def no_change_to_submission?(submission)
-    no_change_to_value?(new_value: submission['grade'], current_value: submission['original_grade'], consider_excused: true)
+    no_change_to_value?(new_value: submission["grade"], current_value: submission["original_grade"], consider_excused: true)
   end
 
   def set_current_override_scores
@@ -861,5 +868,9 @@ class GradebookImporter
 
   def allow_override_scores?
     @context.allow_final_grade_override? && Account.site_admin.feature_enabled?(:import_override_scores_in_gradebook)
+  end
+
+  def allow_student_last_first_names?
+    @context.root_account.allow_gradebook_show_first_last_names? && Account.site_admin.feature_enabled?(:gradebook_show_first_last_names)
   end
 end

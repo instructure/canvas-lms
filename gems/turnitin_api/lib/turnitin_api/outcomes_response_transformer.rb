@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'simple_oauth'
+require "simple_oauth"
 
 module TurnitinApi
   class OutcomesResponseTransformer
@@ -35,7 +35,7 @@ module TurnitinApi
     end
 
     def response
-      @response ||= make_call(outcomes_response_json['outcomes_tool_placement_url'])
+      @response ||= make_call(outcomes_response_json["outcomes_tool_placement_url"])
     end
 
     # download original
@@ -49,11 +49,11 @@ module TurnitinApi
     end
 
     def originality_data
-      response.body['outcome_originalityreport'].select { |k, _| %w(breakdown numeric).include?(k) }
+      response.body["outcome_originalityreport"].select { |k, _| %w[breakdown numeric].include?(k) }
     end
 
     def uploaded_at
-      response.body['meta']['date_uploaded']
+      response.body["meta"]["date_uploaded"]
     end
 
     def scored?
@@ -66,7 +66,7 @@ module TurnitinApi
       @connection ||= Faraday.new do |conn|
         conn.request :multipart
         conn.request :url_encoded
-        conn.response :json, :content_type => /\bjson$/
+        conn.response :json, content_type: /\bjson$/
         conn.use FaradayMiddleware::FollowRedirects
         conn.adapter :net_http
       end
@@ -74,14 +74,14 @@ module TurnitinApi
 
     def make_call(url)
       default_params = {
-        'roles' => 'Learner',
-        'lti_message_type' => 'basic-lti-launch-request',
-        'lti_version' => 'LTI-1p0',
-        'resource_link_id' => SecureRandom.hex(32),
+        "roles" => "Learner",
+        "lti_message_type" => "basic-lti-launch-request",
+        "lti_version" => "LTI-1p0",
+        "resource_link_id" => SecureRandom.hex(32),
       }
       params = default_params.merge(lti_params)
       header = SimpleOAuth::Header.new(:post, url, params, consumer_key: @key, consumer_secret: @secret,
-                                                           callback: 'about:blank')
+                                                           callback: "about:blank")
       connection.post url, params.merge(header.signed_attributes)
     end
   end

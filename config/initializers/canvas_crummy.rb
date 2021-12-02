@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'canvas_crummy'
+require "canvas_crummy"
 
 ActionController::Base.include CanvasCrummy::ControllerMethods
 ActionView::Base.include CanvasCrummy::ViewMethods

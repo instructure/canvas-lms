@@ -32,14 +32,14 @@ describe AddressBook::MessageableUser do
     it "includes only known users" do
       teacher = teacher_in_course(active_all: true).user
       student1 = student_in_course(active_all: true).user
-      student2 = student_in_course(course: course_factory(), active_all: true).user
+      student2 = student_in_course(course: course_factory, active_all: true).user
       address_book = AddressBook::MessageableUser.new(teacher)
       known_users = address_book.known_users([student1, student2])
       expect(known_users.map(&:id)).to include(student1.id)
       expect(known_users.map(&:id)).not_to include(student2.id)
     end
 
-    it 'includes group members from different sections' do
+    it "includes group members from different sections" do
       course = course_factory(active_all: true)
       section1 = course.course_sections.create!
       section2 = course.course_sections.create!
@@ -57,7 +57,7 @@ describe AddressBook::MessageableUser do
       expect(known_users.map(&:id)).not_to include(student3.id)
     end
 
-    it 'works for a discussion topic' do
+    it "works for a discussion topic" do
       course = course_factory(active_all: true)
       topic = course.discussion_topics.create!
 
@@ -69,7 +69,7 @@ describe AddressBook::MessageableUser do
       expect(known_users.map(&:id)).to include(student2.id)
     end
 
-    it 'works for a group discussion topic' do
+    it "works for a group discussion topic" do
       course = course_factory(active_all: true)
 
       student1 = student_in_course(user: @sender, course: course, active_all: true).user
@@ -95,7 +95,7 @@ describe AddressBook::MessageableUser do
 
     it "caches the failure for unknown users" do
       teacher = teacher_in_course(active_all: true).user
-      student = student_in_course(course: course_factory(), active_all: true).user
+      student = student_in_course(course: course_factory, active_all: true).user
       address_book = AddressBook::MessageableUser.new(teacher)
       expect(address_book.known_users([student])).to be_empty
       expect(address_book.cached?(student)).to be_truthy
@@ -118,14 +118,14 @@ describe AddressBook::MessageableUser do
 
     describe "with optional :context" do
       before do
-        @recipient = user_model(workflow_state: 'registered')
-        @sender = user_model(workflow_state: 'registered')
+        @recipient = user_model(workflow_state: "registered")
+        @sender = user_model(workflow_state: "registered")
         @address_book = AddressBook::MessageableUser.new(@sender)
 
         # recipient participates in three courses
-        @course1 = course_model(workflow_state: 'available')
-        @course2 = course_model(workflow_state: 'available')
-        @course3 = course_model(workflow_state: 'available')
+        @course1 = course_model(workflow_state: "available")
+        @course2 = course_model(workflow_state: "available")
+        @course3 = course_model(workflow_state: "available")
         student_in_course(user: @recipient, course: @course1, active_all: true)
         student_in_course(user: @recipient, course: @course2, active_all: true)
         student_in_course(user: @recipient, course: @course3, active_all: true)
@@ -243,7 +243,7 @@ describe AddressBook::MessageableUser do
       student = student_in_course(active_all: true).user
       address_book = AddressBook::MessageableUser.new(teacher)
       common_courses = address_book.common_courses(student)
-      expect(common_courses).to eql({ course.id => ['StudentEnrollment'] })
+      expect(common_courses).to eql({ course.id => ["StudentEnrollment"] })
     end
   end
 
@@ -252,11 +252,11 @@ describe AddressBook::MessageableUser do
       sender = user_factory(active_all: true)
       recipient = user_factory(active_all: true)
       group = group()
-      group.add_user(sender, 'accepted')
-      group.add_user(recipient, 'accepted')
+      group.add_user(sender, "accepted")
+      group.add_user(recipient, "accepted")
       address_book = AddressBook::MessageableUser.new(sender)
       common_groups = address_book.common_groups(recipient)
-      expect(common_groups).to eql({ group.id => ['Member'] })
+      expect(common_groups).to eql({ group.id => ["Member"] })
     end
   end
 
@@ -288,7 +288,7 @@ describe AddressBook::MessageableUser do
       enrollment = teacher_in_course(active_all: true)
       teacher = enrollment.user
       course1 = enrollment.course
-      student = student_in_course(course: course_factory(), active_all: true).user
+      student = student_in_course(course: course_factory, active_all: true).user
       address_book = AddressBook::MessageableUser.new(teacher)
       address_book.known_in_context(course1.asset_string)
       expect(address_book.cached?(student)).to be_falsey
@@ -349,29 +349,29 @@ describe AddressBook::MessageableUser do
   describe "search_users" do
     it "returns a paginatable collection" do
       teacher = teacher_in_course(active_all: true).user
-      student_in_course(active_all: true, name: 'Bob').user
-      student_in_course(active_all: true, name: 'Bobby').user
+      student_in_course(active_all: true, name: "Bob").user
+      student_in_course(active_all: true, name: "Bobby").user
       address_book = AddressBook::MessageableUser.new(teacher)
-      known_users = address_book.search_users(search: 'Bob')
+      known_users = address_book.search_users(search: "Bob")
       expect(known_users).to respond_to(:paginate)
       expect(known_users.paginate(per_page: 1).size).to eql(1)
     end
 
     it "finds matching known users" do
       teacher = teacher_in_course(active_all: true).user
-      student1 = student_in_course(active_all: true, name: 'Bob').user
-      student2 = student_in_course(active_all: true, name: 'Bobby').user
+      student1 = student_in_course(active_all: true, name: "Bob").user
+      student2 = student_in_course(active_all: true, name: "Bobby").user
       address_book = AddressBook::MessageableUser.new(teacher)
-      known_users = address_book.search_users(search: 'Bob').paginate(per_page: 10)
+      known_users = address_book.search_users(search: "Bob").paginate(per_page: 10)
       expect(known_users.map(&:id)).to include(student1.id)
       expect(known_users.map(&:id)).to include(student2.id)
     end
 
     it "excludes matching known user in optional :exclude_ids" do
       teacher = teacher_in_course(active_all: true).user
-      student = student_in_course(active_all: true, name: 'Bob').user
+      student = student_in_course(active_all: true, name: "Bob").user
       address_book = AddressBook::MessageableUser.new(teacher)
-      known_users = address_book.search_users(search: 'Bob', exclude_ids: [student.id]).paginate(per_page: 10)
+      known_users = address_book.search_users(search: "Bob", exclude_ids: [student.id]).paginate(per_page: 10)
       expect(known_users.map(&:id)).not_to include(student.id)
     end
 
@@ -380,65 +380,65 @@ describe AddressBook::MessageableUser do
       course2 = course_factory(active_all: true)
       teacher = teacher_in_course(course: course1, active_all: true).user
       teacher_in_course(user: teacher, course: course2, active_all: true)
-      student1 = student_in_course(course: course1, active_all: true, name: 'Bob').user
-      student2 = student_in_course(course: course2, active_all: true, name: 'Bobby').user
+      student1 = student_in_course(course: course1, active_all: true, name: "Bob").user
+      student2 = student_in_course(course: course2, active_all: true, name: "Bobby").user
       address_book = AddressBook::MessageableUser.new(teacher)
-      known_users = address_book.search_users(search: 'Bob', context: course1.asset_string).paginate(per_page: 10)
+      known_users = address_book.search_users(search: "Bob", context: course1.asset_string).paginate(per_page: 10)
       expect(known_users.map(&:id)).to include(student1.id)
       expect(known_users.map(&:id)).not_to include(student2.id)
     end
 
     it "finds users in an unassociated :context when an admin" do
       admin = account_admin_user(active_all: true)
-      enrollment = student_in_course(active_all: true, name: 'Bob')
+      enrollment = student_in_course(active_all: true, name: "Bob")
       student = enrollment.user
       course = enrollment.course
       address_book = AddressBook::MessageableUser.new(admin)
-      known_users = address_book.search_users(search: 'Bob', context: course.asset_string).paginate(per_page: 10)
+      known_users = address_book.search_users(search: "Bob", context: course.asset_string).paginate(per_page: 10)
       expect(known_users.map(&:id)).to include(student.id)
     end
 
     it "excludes users in an admined :context when also participating" do
       admin = account_admin_user(active_all: true)
-      enrollment = student_in_course(active_all: true, name: 'Bob')
+      enrollment = student_in_course(active_all: true, name: "Bob")
       student = enrollment.user
       course = enrollment.course
       section = course.course_sections.create!
       teacher_in_course(user: admin, course: course, active_all: true, section: section, limit_privileges_to_course_section: true)
       address_book = AddressBook::MessageableUser.new(admin)
-      known_users = address_book.search_users(search: 'Bob', context: course.asset_string).paginate(per_page: 10)
+      known_users = address_book.search_users(search: "Bob", context: course.asset_string).paginate(per_page: 10)
       expect(known_users.map(&:id)).not_to include(student.id)
     end
 
     it "excludes 'weak' users without :weak_checks" do
       teacher = teacher_in_course(active_all: true).user
-      student = student_in_course(user_state: 'creation_pending', enrollment_state: 'invited', name: 'Bob').user
+      student = student_in_course(user_state: "creation_pending", enrollment_state: "invited", name: "Bob").user
       address_book = AddressBook::MessageableUser.new(teacher)
-      known_users = address_book.search_users(search: 'Bob').paginate(per_page: 10)
+      known_users = address_book.search_users(search: "Bob").paginate(per_page: 10)
       expect(known_users.map(&:id)).not_to include(student.id)
     end
 
     it "excludes 'weak' enrollments without :weak_checks" do
       teacher = teacher_in_course(active_all: true).user
-      student = student_in_course(active_user: true, enrollment_state: 'creation_pending', name: 'Bob').user
+      student = student_in_course(active_user: true, enrollment_state: "creation_pending", name: "Bob").user
       address_book = AddressBook::MessageableUser.new(teacher)
-      known_users = address_book.search_users(search: 'Bob').paginate(per_page: 10)
+      known_users = address_book.search_users(search: "Bob").paginate(per_page: 10)
       expect(known_users.map(&:id)).not_to include(student.id)
     end
 
     it "expands to include 'weak' users and 'weak' enrollments when :weak_checks" do
       teacher = teacher_in_course(active_all: true).user
-      student = student_in_course(active_user: true, enrollment_state: 'creation_pending', name: 'Bob').user
+      student = student_in_course(active_user: true, enrollment_state: "creation_pending", name: "Bob").user
       address_book = AddressBook::MessageableUser.new(teacher)
-      known_users = address_book.search_users(search: 'Bob', weak_checks: true).paginate(per_page: 10)
+      known_users = address_book.search_users(search: "Bob", weak_checks: true).paginate(per_page: 10)
       expect(known_users.map(&:id)).to include(student.id)
     end
 
     it "caches the results for known users when a page is materialized" do
       teacher = teacher_in_course(active_all: true).user
-      student = student_in_course(active_all: true, name: 'Bob').user
+      student = student_in_course(active_all: true, name: "Bob").user
       address_book = AddressBook::MessageableUser.new(teacher)
-      collection = address_book.search_users(search: 'Bob')
+      collection = address_book.search_users(search: "Bob")
       expect(address_book.cached?(student)).to be_falsey
       collection.paginate(per_page: 10)
       expect(address_book.cached?(student)).to be_truthy
@@ -448,7 +448,7 @@ describe AddressBook::MessageableUser do
   describe "preload_users" do
     it "avoids db query with rails cache" do
       teacher = teacher_in_course(active_all: true).user
-      student = student_in_course(active_all: true, name: 'Bob').user
+      student = student_in_course(active_all: true, name: "Bob").user
       expect(Rails.cache).to receive(:fetch)
         .with(match(/address_book_preload/))
         .and_return(MessageableUser.where(id: student).to_a)
@@ -458,7 +458,7 @@ describe AddressBook::MessageableUser do
 
     it "caches all provided users" do
       teacher = teacher_in_course(active_all: true).user
-      student = student_in_course(active_all: true, name: 'Bob').user
+      student = student_in_course(active_all: true, name: "Bob").user
       address_book = AddressBook::MessageableUser.new(teacher)
       address_book.preload_users([student])
       expect(address_book.cached?(student)).to be_truthy

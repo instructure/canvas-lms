@@ -17,11 +17,11 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../../common'
-require_relative '../pages/k5_dashboard_page'
-require_relative '../pages/k5_dashboard_common_page'
-require_relative '../pages/k5_todo_tab_page'
-require_relative '../../../helpers/k5_common'
+require_relative "../../common"
+require_relative "../pages/k5_dashboard_page"
+require_relative "../pages/k5_dashboard_common_page"
+require_relative "../pages/k5_todo_tab_page"
+require_relative "../../../helpers/k5_common"
 
 describe "teacher k5 todo dashboard tab" do
   include_context "in-process server selenium tests"
@@ -38,14 +38,14 @@ describe "teacher k5 todo dashboard tab" do
     user_session @homeroom_teacher
   end
 
-  context 'todo tab basics' do
-    it 'provides the homeroom dashboard tabs on dashboard' do
+  context "todo tab basics" do
+    it "provides the homeroom dashboard tabs on dashboard" do
       get "/"
 
       expect(todo_tab).to be_displayed
     end
 
-    it 'saves tab information for refresh' do
+    it "saves tab information for refresh" do
       get "/"
 
       select_todo_tab
@@ -56,9 +56,9 @@ describe "teacher k5 todo dashboard tab" do
     end
   end
 
-  context 'todo tab actions' do
+  context "todo tab actions" do
     before :once do
-      course_with_student(course: @subject_course, name: 'Hardworking Student', active_all: true)
+      course_with_student(course: @subject_course, name: "Hardworking Student", active_all: true)
     end
 
     before do
@@ -66,7 +66,7 @@ describe "teacher k5 todo dashboard tab" do
       @assignment1 = create_and_submit_assignment(@subject_course, "assignment 1", "assignment 1 submission", 100)
     end
 
-    it 'shows a todo item for item needing grading' do
+    it "shows a todo item for item needing grading" do
       get "/#todo"
 
       todo_element = todo_items[0]
@@ -75,7 +75,7 @@ describe "teacher k5 todo dashboard tab" do
       expect(todo_element.text).to include(@subject_course.name.upcase)
     end
 
-    it 'removes item from todo list when x is clicked' do
+    it "removes item from todo list when x is clicked" do
       get "/#todo"
       todo_element = todo_items[0]
 
@@ -84,7 +84,7 @@ describe "teacher k5 todo dashboard tab" do
       expect(todo_item_exists?(todo_item_selector)).to be_falsey
     end
 
-    it 'removes item from list if item is graded', custom_timeout: 20 do
+    it "removes item from list if item is graded", custom_timeout: 20 do
       get "/#todo"
 
       expect(todo_items[0]).to be_displayed
@@ -95,7 +95,7 @@ describe "teacher k5 todo dashboard tab" do
       expect(todo_item_exists?(todo_item_selector)).to be_falsey
     end
 
-    it 'shows a todo item again when new submission is made' do
+    it "shows a todo item again when new submission is made" do
       @assignment1.grade_student(@student, grader: @homeroom_teacher, score: "90", points_deducted: 0)
       @assignment1.submit_homework(@student, { submission_type: "online_text_entry", body: "Here it is" })
 
@@ -104,7 +104,7 @@ describe "teacher k5 todo dashboard tab" do
       expect(todo_items[0]).to be_displayed
     end
 
-    it 'shows an empty state panda when there is nothing to grade' do
+    it "shows an empty state panda when there is nothing to grade" do
       @assignment1.grade_student(@student, grader: @homeroom_teacher, score: "90", points_deducted: 0)
 
       get "/#todo"

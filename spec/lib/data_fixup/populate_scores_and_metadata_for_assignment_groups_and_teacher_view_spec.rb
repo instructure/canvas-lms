@@ -33,7 +33,7 @@ describe DataFixup::PopulateScoresAndMetadataForAssignmentGroupsAndTeacherView d
     @concluded_student_enrollment = student_in_course(course: @course, active_all: true)
     @concluded_student = @student
 
-    @assignment_group_one = @course.assignment_groups.create!(:name => "some group")
+    @assignment_group_one = @course.assignment_groups.create!(name: "some group")
     @assignment1 = @course.assignments.create!(
       title: "Some Assignment",
       points_possible: 10,
@@ -52,31 +52,31 @@ describe DataFixup::PopulateScoresAndMetadataForAssignmentGroupsAndTeacherView d
     Score.where(enrollment: @concluded_student_enrollment).where.not(assignment_group_id: nil).delete_all
     Score.where(enrollment: @concluded_student_enrollment).preload(:enrollment).update(unposted_current_score: nil, unposted_final_score: nil)
 
-    @assignment_group_two = @course.assignment_groups.create!(:name => "some other group")
+    @assignment_group_two = @course.assignment_groups.create!(name: "some other group")
     @assignment2 = @course.assignments.create!(
-      :title => "Some Assignment2",
-      :points_possible => 10,
-      :assignment_group => @assignment_group_two,
+      title: "Some Assignment2",
+      points_possible: 10,
+      assignment_group: @assignment_group_two,
       due_at: 2.days.from_now
     )
     @assignment2.grade_student(@active_student, grade: "5", grader: @teacher)
   end
 
-  it 'updates unposted score for concluded students for the course score' do
+  it "updates unposted score for concluded students for the course score" do
     DataFixup::PopulateScoresAndMetadataForAssignmentGroupsAndTeacherView.run
 
     score = @concluded_student_enrollment.scores.find_by(course_score: true)
     expect([score.unposted_current_score, score.unposted_final_score]).to eq([50.0, 50.0])
   end
 
-  it 'updates unposted score for concluded students for the grading period scores' do
+  it "updates unposted score for concluded students for the grading period scores" do
     DataFixup::PopulateScoresAndMetadataForAssignmentGroupsAndTeacherView.run
 
     score = @concluded_student_enrollment.scores.find_by(grading_period: @first_period)
     expect([score.unposted_current_score, score.unposted_final_score]).to eq([50.0, 50.0])
   end
 
-  it 'does not update unposted score for concluded enrollments if it exists' do
+  it "does not update unposted score for concluded enrollments if it exists" do
     score = @concluded_student_enrollment.scores.find_by(course_score: true)
     score.update(unposted_current_score: 1, unposted_final_score: 23)
 
@@ -86,21 +86,21 @@ describe DataFixup::PopulateScoresAndMetadataForAssignmentGroupsAndTeacherView d
     expect([score.unposted_current_score, score.unposted_final_score]).to eq([1.0, 23.0])
   end
 
-  it 'creates score metadata for concluded students for the course score' do
+  it "creates score metadata for concluded students for the course score" do
     DataFixup::PopulateScoresAndMetadataForAssignmentGroupsAndTeacherView.run
 
     score = @concluded_student_enrollment.scores.find_by(course_score: true)
     expect(score.score_metadata).not_to be_nil
   end
 
-  it 'creates score metadata for concluded students for the grading period scores' do
+  it "creates score metadata for concluded students for the grading period scores" do
     DataFixup::PopulateScoresAndMetadataForAssignmentGroupsAndTeacherView.run
 
     score = @concluded_student_enrollment.scores.find_by(grading_period: @first_period)
     expect(score.score_metadata).not_to be_nil
   end
 
-  it 'creates assignment groups scores and metadata for concluded students' do
+  it "creates assignment groups scores and metadata for concluded students" do
     DataFixup::PopulateScoresAndMetadataForAssignmentGroupsAndTeacherView.run
 
     scores = @concluded_student_enrollment.scores.where.not(assignment_group_id: nil).preload(:score_metadata)
@@ -108,7 +108,7 @@ describe DataFixup::PopulateScoresAndMetadataForAssignmentGroupsAndTeacherView d
     scores.each { |score| expect(score.score_metadata).not_to be_nil }
   end
 
-  it 'does not update the posted course scores for concluded students' do
+  it "does not update the posted course scores for concluded students" do
     score = @concluded_student_enrollment.scores.find_by(course_score: true)
     score.update(current_score: 42, final_score: 21)
 
@@ -116,7 +116,7 @@ describe DataFixup::PopulateScoresAndMetadataForAssignmentGroupsAndTeacherView d
     expect([score.current_score, score.final_score]).to eq([42.0, 21.0])
   end
 
-  it 'does not update the posted grading period scores for concluded students' do
+  it "does not update the posted grading period scores for concluded students" do
     score = @concluded_student_enrollment.scores.find_by(grading_period: @first_period)
     score.update(current_score: 42, final_score: 21)
 
@@ -124,12 +124,12 @@ describe DataFixup::PopulateScoresAndMetadataForAssignmentGroupsAndTeacherView d
     expect([score.current_score, score.final_score]).to eq([42.0, 21.0])
   end
 
-  it 'calls the grade calculator for active students in active courses' do
+  it "calls the grade calculator for active students in active courses" do
     expect(GradeCalculator).to receive(:recompute_final_score).with([@active_student.id], @course)
     DataFixup::PopulateScoresAndMetadataForAssignmentGroupsAndTeacherView.run
   end
 
-  it 'handles concluded courses' do
+  it "handles concluded courses" do
     @course.enrollment_term.end_at = Time.now
     @course.soft_conclude!
     @course.save!

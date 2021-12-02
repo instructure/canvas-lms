@@ -16,8 +16,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../common'
-require_relative 'pages/user_profile_page'
+require_relative "../common"
+require_relative "pages/user_profile_page"
 
 describe "admin account people profile" do
   include_context "in-process server selenium tests"
@@ -26,15 +26,15 @@ describe "admin account people profile" do
   before(:once) do
     # set a default account
     @account = Account.default
-    account_admin_user(:account => @account, :active_all => true)
+    account_admin_user(account: @account, active_all: true)
 
     # add two users to account
-    @user1 = user_with_pseudonym(:account => @account, :name => "Test User1")
-    @user2 = user_with_pseudonym(:account => @account, :name => "Test User2")
-    @user3 = user_with_pseudonym(:account => @account, :name => "Random User")
+    @user1 = user_with_pseudonym(account: @account, name: "Test User1")
+    @user2 = user_with_pseudonym(account: @account, name: "Test User2")
+    @user3 = user_with_pseudonym(account: @account, name: "Random User")
   end
 
-  context 'in admin merge page' do
+  context "in admin merge page" do
     before do
       user_session(@admin)
       visit_merge_user_accounts(@user1.id)
@@ -42,19 +42,19 @@ describe "admin account people profile" do
       search_username_input.send_keys("Test")
     end
 
-    it "allow searching for a user to merge with another user", priority: "1", test_id: 3647794 do
+    it "allow searching for a user to merge with another user", priority: "1" do
       expect(username_search_suggestions).to include_text @user2.name
       expect(username_search_suggestions).not_to include_text @user3.name
     end
 
-    it "displays full user name when a user is selected from suggestions", priority: "1", test_id: 3647794 do
+    it "displays full user name when a user is selected from suggestions", priority: "1" do
       choose_suggested_username(@user2.name).click
 
       expect(selected_user.text).to eq "Test User2"
-      expect(select_user_button.attribute('href')).to include "/admin_merge?pending_user_id=#{@user2.id}"
+      expect(select_user_button.attribute("href")).to include "/admin_merge?pending_user_id=#{@user2.id}"
     end
 
-    it "navigates to user details page when user is selected", priority: "1", test_id: 3647794 do
+    it "navigates to user details page when user is selected", priority: "1" do
       choose_suggested_username(@user2.name).click
       select_user_button.click
 

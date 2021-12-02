@@ -29,23 +29,23 @@ module Utf8Cleaner
 
     string = String.new(string, encoding: Encoding::UTF_8) unless string.encoding == Encoding::UTF_8
 
-    string = string.encode("UTF-8", :undef => :replace, :invalid => :replace, :replace => '')
+    string = string.encode("UTF-8", undef: :replace, invalid: :replace, replace: "")
     # Strip ASCII backspace and delete characters
-    string.tr("\b\x7F", '')
+    string.tr("\b\x7F", "")
   end
 
   def self.recursively_strip_invalid_utf8!(object, force_utf8 = false)
     case object
     when Hash
-      object.each_value { |o| self.recursively_strip_invalid_utf8!(o, force_utf8) }
+      object.each_value { |o| recursively_strip_invalid_utf8!(o, force_utf8) }
     when Array
-      object.each { |o| self.recursively_strip_invalid_utf8!(o, force_utf8) }
+      object.each { |o| recursively_strip_invalid_utf8!(o, force_utf8) }
     when String
       if object.encoding == Encoding::ASCII_8BIT && force_utf8
         object.force_encoding(Encoding::UTF_8)
       end
-      if !object.valid_encoding?
-        object.replace(self.strip_invalid_utf8(object))
+      unless object.valid_encoding?
+        object.replace(strip_invalid_utf8(object))
       end
     end
   end

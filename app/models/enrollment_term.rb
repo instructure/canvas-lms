@@ -23,15 +23,15 @@ class EnrollmentTerm < ActiveRecord::Base
 
   include Workflow
 
-  belongs_to :root_account, :class_name => 'Account'
+  belongs_to :root_account, class_name: "Account"
   belongs_to :grading_period_group, inverse_of: :enrollment_terms
   has_many :grading_periods, through: :grading_period_group
   has_many :enrollment_dates_overrides
   has_many :courses
-  has_many :enrollments, :through => :courses
+  has_many :enrollments, through: :courses
   has_many :course_sections
 
-  validates_presence_of :root_account_id, :workflow_state
+  validates :root_account_id, :workflow_state, presence: true
   validate :prevent_default_term_name_change
   validate :check_if_deletable
   validate :consistent_account_associations
@@ -45,28 +45,28 @@ class EnrollmentTerm < ActiveRecord::Base
 
   def self.ensure_dummy_enrollment_term
     Account.ensure_dummy_root_account
-    create_with(root_account_id: 0, workflow_state: 'deleted').find_or_create_by!(id: 0)
+    create_with(root_account_id: 0, workflow_state: "deleted").find_or_create_by!(id: 0)
   end
 
   def prevent_default_term_name_change
-    if self.name_changed? && self.name_was == DEFAULT_TERM_NAME && self == self.root_account.default_enrollment_term
-      self.errors.add(:name, t("Cannot change the default term name"))
+    if name_changed? && name_was == DEFAULT_TERM_NAME && self == root_account.default_enrollment_term
+      errors.add(:name, t("Cannot change the default term name"))
     end
   end
 
   def check_if_deletable
-    if self.workflow_state_changed? && self.workflow_state == "deleted"
-      if self.default_term?
-        self.errors.add(:workflow_state, t('errors.delete_default_term', "Cannot delete the default term"))
-      elsif self.courses.active.exists?
-        self.errors.add(:workflow_state, t('errors.delete_term_with_courses', "Cannot delete a term with active courses"))
+    if workflow_state_changed? && workflow_state == "deleted"
+      if default_term?
+        errors.add(:workflow_state, t("errors.delete_default_term", "Cannot delete the default term"))
+      elsif courses.active.exists?
+        errors.add(:workflow_state, t("errors.delete_term_with_courses", "Cannot delete a term with active courses"))
       end
     end
   end
 
   def update_courses_later_if_necessary
-    if !self.new_record? && (self.saved_change_to_start_at? || self.saved_change_to_end_at?)
-      self.update_courses_and_states_later
+    if !new_record? && (saved_change_to_start_at? || saved_change_to_end_at?)
+      update_courses_and_states_later
     end
   end
 
@@ -76,21 +76,21 @@ class EnrollmentTerm < ActiveRecord::Base
   end
 
   def touch_all_courses
-    self.courses.touch_all
+    courses.touch_all
   end
 
   def update_courses_and_states_later(enrollment_type = nil)
     return if new_record?
 
-    delay_if_production(singleton: "EnrollmentTerm#touch_all_courses_#{self.global_id}").touch_all_courses unless @touched_courses
+    delay_if_production(singleton: "EnrollmentTerm#touch_all_courses_#{global_id}").touch_all_courses unless @touched_courses
     @touched_courses = true
 
-    EnrollmentState.delay_if_production(singleton: "EnrollmentState.invalidate_states_for_term_#{self.global_id}_#{enrollment_type}")
+    EnrollmentState.delay_if_production(singleton: "EnrollmentState.invalidate_states_for_term_#{global_id}_#{enrollment_type}")
                    .invalidate_states_for_term(self, enrollment_type)
   end
 
   def self.i18n_default_term_name
-    t '#account.default_term_name', "Default Term"
+    t "#account.default_term_name", "Default Term"
   end
 
   def recompute_course_scores_later(update_all_grading_period_scores: true, strand_identifier: "EnrollmentTerm:#{global_id}")
@@ -127,7 +127,7 @@ class EnrollmentTerm < ActiveRecord::Base
     params.map do |type, values|
       type = type.classify
       enrollment_type = Enrollment.typed_enrollment(type).to_s
-      override = self.enrollment_dates_overrides.where(enrollment_type: enrollment_type).first_or_initialize
+      override = enrollment_dates_overrides.where(enrollment_type: enrollment_type).first_or_initialize
       # preload the reverse association - VERY IMPORTANT so that @touched_enrollments is shared
       override.enrollment_term = self
       override.start_at = values[:start_at]
@@ -139,15 +139,15 @@ class EnrollmentTerm < ActiveRecord::Base
   end
 
   def verify_unique_sis_source_id
-    return true unless self.sis_source_id
+    return true unless sis_source_id
     return true if !root_account_id_changed? && !sis_source_id_changed?
 
-    scope = root_account.enrollment_terms.where(sis_source_id: self.sis_source_id)
-    scope = scope.where("id<>?", self) unless self.new_record?
+    scope = root_account.enrollment_terms.where(sis_source_id: sis_source_id)
+    scope = scope.where("id<>?", self) unless new_record?
 
     return true unless scope.exists?
 
-    self.errors.add(:sis_source_id, t('errors.not_unique', "SIS ID \"%{sis_source_id}\" is already in use", :sis_source_id => self.sis_source_id))
+    errors.add(:sis_source_id, t("errors.not_unique", "SIS ID \"%{sis_source_id}\" is already in use", sis_source_id: sis_source_id))
     throw :abort
   end
 
@@ -192,25 +192,23 @@ class EnrollmentTerm < ActiveRecord::Base
 
   alias_method :destroy_permanently!, :destroy
   def destroy
-    self.workflow_state = 'deleted'
+    self.workflow_state = "deleted"
     save!
   end
 
   def consistent_account_associations
-    if read_attribute(:grading_period_group_id).present?
-      if root_account_id != grading_period_group.account_id
-        errors.add(:grading_period_group, t("cannot be associated with a different account"))
-      end
+    if read_attribute(:grading_period_group_id).present? && (root_account_id != grading_period_group.account_id)
+      errors.add(:grading_period_group, t("cannot be associated with a different account"))
     end
   end
 
   scope :active, -> { where("enrollment_terms.workflow_state<>'deleted'") }
-  scope :ended, -> { where('enrollment_terms.end_at < ?', Time.now.utc) }
-  scope :started, -> { where('enrollment_terms.start_at IS NULL OR enrollment_terms.start_at < ?', Time.now.utc) }
-  scope :not_ended, -> { where('enrollment_terms.end_at IS NULL OR enrollment_terms.end_at >= ?', Time.now.utc) }
-  scope :not_started, -> { where('enrollment_terms.start_at IS NOT NULL AND enrollment_terms.start_at > ?', Time.now.utc) }
+  scope :ended, -> { where("enrollment_terms.end_at < ?", Time.now.utc) }
+  scope :started, -> { where("enrollment_terms.start_at IS NULL OR enrollment_terms.start_at < ?", Time.now.utc) }
+  scope :not_ended, -> { where("enrollment_terms.end_at IS NULL OR enrollment_terms.end_at >= ?", Time.now.utc) }
+  scope :not_started, -> { where("enrollment_terms.start_at IS NOT NULL AND enrollment_terms.start_at > ?", Time.now.utc) }
   scope :not_default, -> { where.not(name: EnrollmentTerm::DEFAULT_TERM_NAME) }
-  scope :by_name, -> { order(best_unicode_collation_key('name')) }
+  scope :by_name, -> { order(best_unicode_collation_key("name")) }
 
   private
 

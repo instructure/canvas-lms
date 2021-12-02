@@ -18,12 +18,12 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class ObserverAlert < ActiveRecord::Base
-  belongs_to :student, :class_name => 'User', inverse_of: :as_student_observer_alerts, :foreign_key => :user_id
-  belongs_to :observer, :class_name => 'User', inverse_of: :as_observer_observer_alerts
-  belongs_to :observer_alert_threshold, :inverse_of => :observer_alerts
-  belongs_to :context, polymorphic: [:discussion_topic, :assignment, :course, :account_notification, :submission]
+  belongs_to :student, class_name: "User", inverse_of: :as_student_observer_alerts, foreign_key: :user_id
+  belongs_to :observer, class_name: "User", inverse_of: :as_observer_observer_alerts
+  belongs_to :observer_alert_threshold, inverse_of: :observer_alerts
+  belongs_to :context, polymorphic: %i[discussion_topic assignment course account_notification submission]
 
-  ALERT_TYPES = %w(
+  ALERT_TYPES = %w[
     assignment_missing
     assignment_grade_high
     assignment_grade_low
@@ -31,13 +31,13 @@ class ObserverAlert < ActiveRecord::Base
     course_grade_low
     course_announcement
     institution_announcement
-  ).freeze
+  ].freeze
   validates :alert_type, inclusion: { in: ALERT_TYPES }
   validates :user_id, :observer_id, :observer_alert_threshold_id, :alert_type, :action_date, :title, presence: true
   validate :validate_users_link
 
-  scope :active, -> { where.not(workflow_state: ['dismissed', 'deleted']) }
-  scope :unread, -> { where(workflow_state: 'unread') }
+  scope :active, -> { where.not(workflow_state: ["dismissed", "deleted"]) }
+  scope :unread, -> { where(workflow_state: "unread") }
 
   def validate_users_link
     unless users_are_still_linked?
@@ -53,7 +53,7 @@ class ObserverAlert < ActiveRecord::Base
   end
 
   def self.clean_up_old_alerts
-    ObserverAlert.where('created_at < ?', 6.months.ago).delete_all
+    ObserverAlert.where("created_at < ?", 6.months.ago).delete_all
   end
 
   def self.create_assignment_missing_alerts
@@ -63,7 +63,7 @@ class ObserverAlert < ActiveRecord::Base
       now = Time.now.utc
       loop do
         scope = ObserverAlertThreshold
-                .where(alert_type: 'assignment_missing')
+                .where(alert_type: "assignment_missing")
                 .order(:user_id).limit(100)
         scope = scope.where("observer_alert_thresholds.user_id>?", last_user_id) if last_user_id
         user_ids = scope.distinct.pluck(:user_id)
@@ -76,7 +76,7 @@ class ObserverAlert < ActiveRecord::Base
                       .active
                       .joins(:assignment)
                       .joins("INNER JOIN #{ObserverAlertThreshold.quoted_table_name} ON observer_alert_thresholds.user_id=submissions.user_id")
-                      .where(observer_alert_thresholds: { alert_type: 'assignment_missing' })
+                      .where(observer_alert_thresholds: { alert_type: "assignment_missing" })
                       .where(user_id: user_ids)
                       .for_enrollments(Enrollment.all_active_or_pending).
                       # users_are_still_linked?
@@ -85,7 +85,7 @@ class ObserverAlert < ActiveRecord::Base
                       .merge(Assignment.submittable)
                       .merge(Assignment.published)
                       .where("late_policy_status = 'missing' OR cached_due_date > ?", 1.day.ago)
-                      .where("NOT EXISTS (?)", ObserverAlert.where(context_type: 'Submission', alert_type: 'assignment_missing').where("context_id=submissions.id"))
+                      .where("NOT EXISTS (?)", ObserverAlert.where(context_type: "Submission", alert_type: "assignment_missing").where("context_id=submissions.id"))
 
         submissions.find_in_batches do |batch|
           courses = Course.select(:id, :course_code).find(batch.map(&:course_id)).index_by(&:id)
@@ -94,12 +94,12 @@ class ObserverAlert < ActiveRecord::Base
                         user_id: submission.user_id,
                         observer_alert_threshold_id: submission.observer_alert_threshold_id,
                         alert_type: "assignment_missing",
-                        context_type: 'Submission',
+                        context_type: "Submission",
                         context_id: submission.id,
                         created_at: now,
                         updated_at: now,
                         action_date: now,
-                        title: I18n.t('Assignment missing: %{assignment_name} in %{course_code}', {
+                        title: I18n.t("Assignment missing: %{assignment_name} in %{course_code}", {
                                         assignment_name: submission.title,
                                         course_code: courses[submission.course_id].course_code
                                       }) }

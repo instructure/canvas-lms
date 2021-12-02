@@ -28,7 +28,9 @@ describe Profile do
       class Foo < ActiveRecord::Base
         self.table_name = :users
         prepend Profile::Association
-        def root_account; Account.default; end
+        def root_account
+          Account.default
+        end
       end
     end
     # rubocop:enable Lint/ConstantDefinitionInBlock, RSpec/LeakyConstantDeclaration
@@ -48,18 +50,18 @@ describe Profile do
       end
 
       it "has the correct class when found" do
-        Foo.new(:name => "foo", :workflow_state => 'registered').profile.save!
+        Foo.new(name: "foo", workflow_state: "registered").profile.save!
         expect(Profile.all.first.class).to eq FooProfile
       end
     end
 
     describe ".path" do
       it "is inferred from the title" do
-        profile = Foo.create!(:name => "My Foo!", :workflow_state => 'registered').profile
+        profile = Foo.create!(name: "My Foo!", workflow_state: "registered").profile
         expect(profile.path).to eq "my-foo"
         profile.save!
 
-        profile2 = Foo.create!(:name => "My Foo?!!!", :workflow_state => 'registered').profile
+        profile2 = Foo.create!(name: "My Foo?!!!", workflow_state: "registered").profile
         expect(profile2.path).to eq "my-foo-1"
       end
     end
@@ -67,14 +69,14 @@ describe Profile do
     describe "#data" do
       it "adds accessors" do
         FooProfile.class_eval do
-          data :bar, :default => []
+          data :bar, default: []
         end
         profile = FooProfile.new
         expect(profile.data).to eq({})
         expect(profile.bar).to eq []
-        expect(profile.data).to eq({ :bar => [] })
+        expect(profile.data).to eq({ bar: [] })
         profile.bar = ["lol"]
-        expect(profile.data).to eq({ :bar => ["lol"] })
+        expect(profile.data).to eq({ bar: ["lol"] })
       end
     end
   end

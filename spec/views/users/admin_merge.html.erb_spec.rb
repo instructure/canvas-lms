@@ -18,16 +18,16 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../views_helper'
+require_relative "../views_helper"
 
 describe "/users/admin_merge" do
   it "only lists accounts that the user can merge users in" do
     user_factory
-    @account = Account.create!(:name => "My Root Account")
-    @account2 = @account.sub_accounts.create!(:name => "Sub-Account")
+    @account = Account.create!(name: "My Root Account")
+    @account2 = @account.sub_accounts.create!(name: "Sub-Account")
     @account.account_users.create!(user: @user)
-    @course1 = Course.create!(:account => Account.default)
-    @course2 = Course.create!(:account => @account2)
+    @course1 = Course.create!(account: Account.default)
+    @course2 = Course.create!(account: @account2)
     @course1.enroll_teacher(@user)
     @course2.enroll_teacher(@user)
 

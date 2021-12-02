@@ -22,7 +22,7 @@ module Lti
     class AccessToken
       private_class_method :new
 
-      ISS = 'Canvas'
+      ISS = "Canvas"
 
       attr_reader :aud, :sub, :reg_key, :shard_id
 
@@ -34,14 +34,14 @@ module Lti
         decoded_jwt = Canvas::Security.decode_jwt(jwt)
         new(aud: aud, sub: decoded_jwt[:sub], jwt: jwt, shard_id: decoded_jwt[:shard_id])
       rescue Canvas::Security::TokenExpired => e
-        raise InvalidTokenError, 'token has expired', e.backtrace
-      rescue StandardError => e
+        raise InvalidTokenError, "token has expired", e.backtrace
+      rescue => e
         raise InvalidTokenError, e
       end
 
       def initialize(aud:, sub:, jwt: nil, reg_key: nil, shard_id: nil)
         @_jwt = jwt if jwt
-        @reg_key = reg_key || (jwt && decoded_jwt['reg_key'])
+        @reg_key = reg_key || (jwt && decoded_jwt["reg_key"])
         @aud = aud
         @sub = sub
         @shard_id = shard_id
@@ -50,16 +50,16 @@ module Lti
       def validate!
         decoded_jwt = Canvas::Security.decode_jwt(jwt)
         check_required_assertions(decoded_jwt.keys)
-        raise InvalidTokenError, 'invalid iss' if decoded_jwt['iss'] != ISS
-        raise InvalidTokenError, 'invalid aud' unless [*decoded_jwt[:aud]].include?(aud)
-        raise InvalidTokenError, 'iat must be in the past' unless Time.zone.at(decoded_jwt['iat']) < Time.zone.now
+        raise InvalidTokenError, "invalid iss" if decoded_jwt["iss"] != ISS
+        raise InvalidTokenError, "invalid aud" unless [*decoded_jwt[:aud]].include?(aud)
+        raise InvalidTokenError, "iat must be in the past" unless Time.zone.at(decoded_jwt["iat"]) < Time.zone.now
 
         true
       rescue InvalidTokenError
         raise
       rescue Canvas::Security::TokenExpired => e
-        raise InvalidTokenError, 'token has expired', e.backtrace
-      rescue StandardError => e
+        raise InvalidTokenError, "token has expired", e.backtrace
+      rescue => e
         raise InvalidTokenError, e
       end
 
@@ -78,10 +78,10 @@ module Lti
           body = {
             iss: ISS,
             sub: sub,
-            exp: Setting.get('lti.oauth2.access_token.exp', 1.hour).to_i.seconds.from_now,
+            exp: Setting.get("lti.oauth2.access_token.exp", 1.hour).to_i.seconds.from_now,
             aud: aud,
             iat: Time.zone.now.to_i,
-            nbf: Setting.get('lti.oauth2.access_token.nbf', 30.seconds).to_i.seconds.ago,
+            nbf: Setting.get("lti.oauth2.access_token.nbf", 30.seconds).to_i.seconds.ago,
             jti: SecureRandom.uuid,
             shard_id: shard_id
           }
@@ -91,9 +91,9 @@ module Lti
       end
 
       def check_required_assertions(assertion_keys)
-        missing_assertions = (%w(iss sub exp aud iat nbf jti) - assertion_keys)
+        missing_assertions = (%w[iss sub exp aud iat nbf jti] - assertion_keys)
         if missing_assertions.present?
-          raise InvalidTokenError, "the following assertions are missing: #{missing_assertions.join(',')}"
+          raise InvalidTokenError, "the following assertions are missing: #{missing_assertions.join(",")}"
         end
       end
     end

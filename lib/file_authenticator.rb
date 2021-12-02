@@ -46,7 +46,7 @@ class FileAuthenticator
   end
 
   def fingerprint
-    # note: this does _not_ incorporate the users' updated_at values like
+    # NOTE: this does _not_ incorporate the users' updated_at values like
     # putting the user object in the cache key would, because this fingerprint
     # is not intended to differentiate caches of information _about_ the user.
     # just to differentiate caches _across_ user identities.

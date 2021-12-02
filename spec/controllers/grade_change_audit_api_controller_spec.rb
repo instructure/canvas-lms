@@ -33,7 +33,7 @@ describe GradeChangeAuditApiController do
       event.fetch("links").fetch("assignment") == assignment.id
     end
   end
-  let(:student_ids) { events_for_assignment.map { |event| event.fetch("links").fetch("student") }.compact }
+  let(:student_ids) { events_for_assignment.filter_map { |event| event.fetch("links").fetch("student") } }
 
   before do
     user_session(admin)
@@ -78,7 +78,7 @@ describe GradeChangeAuditApiController do
           # unwanted and should be removed in a later patchset.
           expect(events_for_assignment.count).to be >= 2
           # should be UUIDs from cassandra
-          expect(events_for_assignment.first['id'].length > 16).to eq(true)
+          expect(events_for_assignment.first["id"].length > 16).to eq(true)
         end
 
         it "returns events without the student id included" do
@@ -93,7 +93,7 @@ describe GradeChangeAuditApiController do
         get :for_assignment, params: params
         expect(events_for_assignment.count).to eq(1)
         # should be sequence IDs from postgres
-        expect(events_for_assignment.first['id'].to_i).to be >= 1
+        expect(events_for_assignment.first["id"].to_i).to be >= 1
       end
 
       it "returns events with the student's id included" do
@@ -117,7 +117,7 @@ describe GradeChangeAuditApiController do
         get :for_course, params: { course_id: course.id }
         events = json_parse(response.body).fetch("events")
 
-        events.map { |event| event.dig('links', 'assignment') }.uniq
+        events.map { |event| event.dig("links", "assignment") }.uniq
       end
 
       it "includes override grade change events in the results if the feature flag is enabled and the course allows overrides" do
@@ -160,7 +160,7 @@ describe GradeChangeAuditApiController do
         get :for_course, params: { course_id: course.id, include: ["current_grade"] }
         json_parse(response.body).fetch("events")
       end
-      let(:current_grades) { returned_events.pluck('grade_current') }
+      let(:current_grades) { returned_events.pluck("grade_current") }
 
       context "for assignment grade changes" do
         before do
@@ -173,7 +173,7 @@ describe GradeChangeAuditApiController do
 
         it "is not present if there is no current grade" do
           assignment.grade_student(student, grader: teacher, score: nil)
-          expect(returned_events.any? { |event| event.key?('current_grade') }).to be false
+          expect(returned_events.any? { |event| event.key?("current_grade") }).to be false
         end
       end
 
@@ -413,7 +413,7 @@ describe GradeChangeAuditApiController do
     end
 
     describe "filtering by assignment" do
-      let(:returned_assignment_ids) { returned_events.map { |event| event.dig('links', 'assignment') } }
+      let(:returned_assignment_ids) { returned_events.map { |event| event.dig("links", "assignment") } }
 
       before(:once) do
         assignment.grade_student(student, score: 10, grader: teacher)
@@ -427,7 +427,7 @@ describe GradeChangeAuditApiController do
       end
 
       before do
-        # FIXME this should be in before(:once) but Auditors.write_to_postgres? isn't stubbed there
+        # FIXME: this should be in before(:once) but Auditors.write_to_postgres? isn't stubbed there
         Auditors::GradeChange.record(override_grade_change: @override_grade_change)
       end
 
@@ -478,7 +478,7 @@ describe GradeChangeAuditApiController do
     end
 
     describe "filtering by student" do
-      let(:returned_assignment_ids) { returned_events.map { |event| event.dig('links', 'assignment') } }
+      let(:returned_assignment_ids) { returned_events.map { |event| event.dig("links", "assignment") } }
 
       before do
         override_grade_change = Auditors::GradeChange::OverrideGradeChange.new(

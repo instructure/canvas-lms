@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-require_relative '../../common'
+require_relative "../../common"
 
 module AdminSettingsPage
   # ---------------------- Elements ----------------------
@@ -25,11 +25,11 @@ module AdminSettingsPage
   end
 
   def analytics_menu_item
-    f('a.analytics_plugin')
+    f("a.analytics_plugin")
   end
 
   def global_nav_profile_link
-    f('#global_nav_profile_link')
+    f("#global_nav_profile_link")
   end
 
   def profile_tray

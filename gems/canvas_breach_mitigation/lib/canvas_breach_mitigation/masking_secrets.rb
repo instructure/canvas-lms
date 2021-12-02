@@ -17,6 +17,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
+require "active_support/core_ext/object/blank"
+
 module CanvasBreachMitigation
   class MaskingSecrets
     class << self
@@ -27,26 +29,26 @@ module CanvasBreachMitigation
       # 3.4 of "BREACH: Reviving the CRIME attack".
       def masked_authenticity_token(cookies, options = {})
         # remask token
-        encoded_masked_token = masked_token(unmasked_token(cookies['_csrf_token']))
+        encoded_masked_token = masked_token(unmasked_token(cookies["_csrf_token"]))
 
         cookie = { value: encoded_masked_token }
-        [:domain, :httponly, :secure].each do |key|
-          next unless options.has_key?(key)
+        %i[domain httponly secure].each do |key|
+          next unless options.key?(key)
 
           cookie[key] = options[key]
         end
-        cookies['_csrf_token'] = cookie
+        cookies["_csrf_token"] = cookie
 
         encoded_masked_token
       end
 
       def reset_authenticity_token!(cookies, options = {})
-        cookies['_csrf_token'] = nil
+        cookies["_csrf_token"] = nil
         masked_authenticity_token(cookies, options)
       end
 
       def valid_authenticity_token?(cookies, encoded_masked_token)
-        unmasked_token(cookies['_csrf_token']) == unmasked_token(encoded_masked_token)
+        unmasked_token(cookies["_csrf_token"]) == unmasked_token(encoded_masked_token)
       end
 
       def masked_token(token)
@@ -59,20 +61,20 @@ module CanvasBreachMitigation
       private
 
       def unmasked_token(encoded_masked_token)
-        if encoded_masked_token.nil? || encoded_masked_token.length == 0
+        if encoded_masked_token.blank?
           return SecureRandom.base64(AUTHENTICITY_TOKEN_LENGTH)
         end
 
         masked_token = Base64.strict_decode64(encoded_masked_token)
         one_time_pad = masked_token[0...AUTHENTICITY_TOKEN_LENGTH]
-        encrypted_csrf_token = masked_token[AUTHENTICITY_TOKEN_LENGTH..-1]
+        encrypted_csrf_token = masked_token[AUTHENTICITY_TOKEN_LENGTH..]
         xor_byte_strings(one_time_pad, encrypted_csrf_token)
       rescue
         SecureRandom.base64(AUTHENTICITY_TOKEN_LENGTH)
       end
 
       def xor_byte_strings(s1, s2)
-        s1.bytes.zip(s2.bytes).map { |(c1, c2)| c1 ^ c2 }.pack('c*')
+        s1.bytes.zip(s2.bytes).map { |(c1, c2)| c1 ^ c2 }.pack("c*")
       end
     end
   end

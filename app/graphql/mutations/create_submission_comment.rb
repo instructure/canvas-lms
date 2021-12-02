@@ -19,12 +19,12 @@
 #
 
 class Mutations::CreateSubmissionComment < Mutations::BaseMutation
-  graphql_name 'CreateSubmissionComment'
+  graphql_name "CreateSubmissionComment"
 
-  argument :submission_id, ID, required: true, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func('Submission')
+  argument :submission_id, ID, required: true, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Submission")
   argument :attempt, Integer, required: false
   argument :comment, String, required: true
-  argument :file_ids, [ID], required: false, prepare: GraphQLHelpers.relay_or_legacy_ids_prepare_func('Attachment')
+  argument :file_ids, [ID], required: false, prepare: GraphQLHelpers.relay_or_legacy_ids_prepare_func("Attachment")
   argument :media_object_id, ID, required: false
   argument :media_object_type, String, required: false
 
@@ -42,7 +42,7 @@ class Mutations::CreateSubmissionComment < Mutations::BaseMutation
 
     if input[:media_object_id].present?
       media_objects = MediaObject.by_media_id(input[:media_object_id])
-      raise GraphQL::ExecutionError, 'not found' if media_objects.empty?
+      raise GraphQL::ExecutionError, "not found" if media_objects.empty?
 
       opts[:media_comment_id] = input[:media_object_id]
 
@@ -54,7 +54,7 @@ class Mutations::CreateSubmissionComment < Mutations::BaseMutation
     file_ids = (input[:file_ids] || []).uniq
     unless file_ids.empty?
       attachments = Attachment.where(id: file_ids).to_a
-      raise GraphQL::ExecutionError, 'not found' unless attachments.length == file_ids.length
+      raise GraphQL::ExecutionError, "not found" unless attachments.length == file_ids.length
 
       attachments.each do |a|
         verify_authorized_action!(a, :attach_to_submission_comment)
@@ -67,9 +67,9 @@ class Mutations::CreateSubmissionComment < Mutations::BaseMutation
     comment = assignment.add_submission_comment(submission.user, opts).first
     comment.mark_read!(current_user)
     { submission_comment: comment }
-  rescue ActiveRecord::RecordInvalid => invalid
-    errors_for(invalid.record)
+  rescue ActiveRecord::RecordInvalid => e
+    errors_for(e.record)
   rescue ActiveRecord::RecordNotFound
-    raise GraphQL::ExecutionError, 'not found'
+    raise GraphQL::ExecutionError, "not found"
   end
 end

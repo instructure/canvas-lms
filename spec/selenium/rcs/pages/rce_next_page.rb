@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-require_relative '../../common'
+require_relative "../../common"
 
 module RCENextPage
   # ---------------------- Controls ----------------------
@@ -50,31 +50,31 @@ module RCENextPage
   end
 
   def new_page_link
-    f('#rcs-LinkToNewPage-btn-link')
+    f("#rcs-LinkToNewPage-btn-link")
   end
 
   def new_page_name_input
-    f('#new-page-name-input')
+    f("#new-page-name-input")
   end
 
   def new_page_submit_button
-    f('#rcs-LinkToNewPage-submit')
+    f("#rcs-LinkToNewPage-submit")
   end
 
   def wiki_body
-    f('#tinymce')
+    f("#tinymce")
   end
 
   def wiki_body_paragraph
-    f('#tinymce p')
+    f("#tinymce p")
   end
 
   def wiki_body_anchor
-    f('#tinymce p a')
+    f("#tinymce p a")
   end
 
   def wiki_body_image
-    f('#tinymce p img')
+    f("#tinymce p img")
   end
 
   def sidebar_link(title)
@@ -130,7 +130,7 @@ module RCENextPage
   end
 
   def assignment_due_date_exists?(due_date)
-    modified_due_date = due_date.strftime('%B %-d, %Y')
+    modified_due_date = due_date.strftime("%B %-d, %Y")
     element_exists?("//*[contains(text(),'#{modified_due_date}')]", true)
   end
 
@@ -174,7 +174,7 @@ module RCENextPage
   end
 
   def validate_course_links_tray_closed
-    expect(f('body')).not_to contain_css('[role="dialog"][aria-label="Course Links"]')
+    expect(f("body")).not_to contain_css('[role="dialog"][aria-label="Course Links"]')
   end
 
   def link_options_button
@@ -308,11 +308,11 @@ module RCENextPage
   end
 
   def rce_page_body_ifr_id
-    f('iframe.tox-edit-area__iframe')['id']
+    f("iframe.tox-edit-area__iframe")["id"]
   end
 
   def rce_page_body_ifr_style
-    element_value_for_attr(f('iframe.tox-edit-area__iframe'), 'style')
+    element_value_for_attr(f("iframe.tox-edit-area__iframe"), "style")
   end
 
   def course_item_link(title)
@@ -352,7 +352,7 @@ module RCENextPage
   end
 
   def editor_window
-    f('form.edit-form .edit-content')
+    f("form.edit-form .edit-content")
   end
 
   def indent_toggle_button
@@ -438,7 +438,7 @@ module RCENextPage
   end
 
   def rce_next_toolbar
-    f('.tox-toolbar__primary')
+    f(".tox-toolbar__primary")
   end
 
   def a11y_checker_button
@@ -486,7 +486,7 @@ module RCENextPage
   end
 
   def overflow_toolbar_selector
-    '.tox-toolbar__overflow'
+    ".tox-toolbar__overflow"
   end
 
   def overflow_toolbar
@@ -526,7 +526,7 @@ module RCENextPage
   end
 
   def tiny_rce_ifr_id
-    f('.tox-editor-container iframe')['id']
+    f(".tox-editor-container iframe")["id"]
   end
 
   def insert_link_modal
@@ -542,19 +542,19 @@ module RCENextPage
   end
 
   def math_square_root_button
-    f('.sqrt-prefix')
+    f(".sqrt-prefix")
   end
 
   def editor_sqrt_textarea
-    f('#mathquill-container textarea')
+    f("#mathquill-container textarea")
   end
 
   def math_builder_insert_equation_button
-    find_button('Insert Equation')
+    find_button("Insert Equation")
   end
 
   def math_image
-    f('.equation_image')
+    f(".equation_image")
   end
 
   def edit_equation_button
@@ -562,19 +562,19 @@ module RCENextPage
   end
 
   def math_dialog_exists?
-    element_exists?('.math-dialog')
+    element_exists?(".math-dialog")
   end
 
   def math_rendering_exists?
-    element_exists?('.equation_image')
+    element_exists?(".equation_image")
   end
 
   def mathjax_element_exists_in_title?
-    element_exists?('.assignment-title .MathJax_Preview')
+    element_exists?(".assignment-title .MathJax_Preview")
   end
 
   def save_button
-    find_button('Save')
+    find_button("Save")
   end
 
   # ---- menubar items ---
@@ -592,19 +592,19 @@ module RCENextPage
   end
 
   def external_link_menubar_button
-    menu_option_by_name('External Links')
+    menu_option_by_name("External Links")
   end
 
   def image_menubar_button
-    menu_option_by_name('Upload Image')
+    menu_option_by_name("Upload Image")
   end
 
   def media_menubar_button
-    menu_option_by_name('Course Media')
+    menu_option_by_name("Course Media")
   end
 
   def document_menubar_button
-    menu_option_by_name('Upload Document')
+    menu_option_by_name("Upload Document")
   end
 
   def content_tray_close_button
@@ -620,13 +620,13 @@ module RCENextPage
   end
 
   def fullscreen_element
-    driver.execute_script('return document.fullscreenElement')
+    driver.execute_script("return document.fullscreenElement")
   end
 
   def change_content_tray_content_type(which)
     content_type = content_tray_content_type
     content_type.click
-    options_id = content_type.attribute('aria-owns')
+    options_id = content_type.attribute("aria-owns")
     options = f("##{options_id}")
     option = fj(":contains(#{which})", options)
     option.click
@@ -639,7 +639,7 @@ module RCENextPage
   def change_content_tray_content_subtype(subtype)
     content_subtype = content_tray_content_subtype
     content_subtype.click
-    options_id = content_subtype.attribute('aria-owns')
+    options_id = content_subtype.attribute("aria-owns")
     options = f("##{options_id}")
     option = fj(":contains(#{subtype})", options)
     option.click
@@ -681,7 +681,7 @@ module RCENextPage
 
   def click_link_for_options
     in_frame tiny_rce_ifr_id do
-      f('a').click
+      f("a").click
     end
   end
 
@@ -974,7 +974,7 @@ module RCENextPage
 
   def switch_to_raw_html_editor
     button = f('button[data-btn-id="rce-editormessage-btn"]')
-    if button.text == 'Raw HTML Editor'
+    if button.text == "Raw HTML Editor"
       button.click
     end
   end
@@ -983,9 +983,9 @@ module RCENextPage
     click_editor_view_button
   end
 
-  def insert_tiny_text(text = 'hello')
+  def insert_tiny_text(text = "hello")
     in_frame tiny_rce_ifr_id do
-      tinyrce_element = f('body')
+      tinyrce_element = f("body")
       tinyrce_element.click
       tinyrce_element.send_keys("#{text}\n") # newline guarantees a tinymce change event
     end
@@ -1009,51 +1009,51 @@ module RCENextPage
     if text
       linktext = f('input[name="linktext')
 
-      linktext.send_keys(:backspace) while linktext.property('value').length > 0
+      linktext.send_keys(:backspace) until linktext.property("value").empty?
       linktext.send_keys(text) if text
     end
     if href
       linklink = f('input[name="linklink"]')
-      linklink.send_keys(:backspace) while linklink.property('value').length > 0
+      linklink.send_keys(:backspace) until linklink.property("value").empty?
       linklink.send_keys(href)
     end
     fj('[role="dialog"] button:contains("Done")').click
   end
 
   def click_ltr
-    menu_item_by_name('Format').click
-    menu_option_by_name('Directionality').click
-    menu_option_by_name('Left-to-Right').click
+    menu_item_by_name("Format").click
+    menu_option_by_name("Directionality").click
+    menu_option_by_name("Left-to-Right").click
   end
 
   def click_rtl
-    menu_item_by_name('Format').click
-    menu_option_by_name('Directionality').click
-    menu_option_by_name('Right-to-Left').click
+    menu_item_by_name("Format").click
+    menu_option_by_name("Directionality").click
+    menu_option_by_name("Right-to-Left").click
   end
 
   def click_insert_menu_button
-    menu_item_by_name('Insert').click
+    menu_item_by_name("Insert").click
   end
 
   def click_link_menubar_button
     click_insert_menu_button
-    menu_option_by_name('Link').click
+    menu_option_by_name("Link").click
   end
 
   def click_image_menubar_button
     click_insert_menu_button
-    menu_option_by_name('Image').click
+    menu_option_by_name("Image").click
   end
 
   def click_media_menubar_button
     click_insert_menu_button
-    menu_option_by_name('Media').click
+    menu_option_by_name("Media").click
   end
 
   def click_document_menubar_button
     click_insert_menu_button
-    menu_option_by_name('Document').click
+    menu_option_by_name("Document").click
   end
 
   # Math toolbar and modal
@@ -1062,7 +1062,7 @@ module RCENextPage
   end
 
   def add_squareroot_value
-    editor_sqrt_textarea.send_keys('81')
+    editor_sqrt_textarea.send_keys("81")
   end
 
   def select_math_equation_from_toolbar
@@ -1086,15 +1086,15 @@ module RCENextPage
   end
 
   def select_text_of_element_by_id(id)
-    script = <<-JS
-    const id = arguments[0]
-    const win = document.querySelector('iframe.tox-edit-area__iframe').contentWindow
-    const rng = win.document.createRange()
-    rng.setStart(win.document.getElementById(id).firstChild, 0)
-    rng.setEnd(win.document.getElementById(id).firstChild, 9)
-    const sel = win.getSelection()
-    sel.removeAllRanges()
-    sel.addRange(rng)
+    script = <<~JS
+      const id = arguments[0]
+      const win = document.querySelector('iframe.tox-edit-area__iframe').contentWindow
+      const rng = win.document.createRange()
+      rng.setStart(win.document.getElementById(id).firstChild, 0)
+      rng.setEnd(win.document.getElementById(id).firstChild, 9)
+      const sel = win.getSelection()
+      sel.removeAllRanges()
+      sel.addRange(rng)
     JS
 
     driver.execute_script script, id
@@ -1102,13 +1102,13 @@ module RCENextPage
 
   def rce_validate_wiki_style_attrib(type, value, selectors)
     in_frame rce_page_body_ifr_id do
-      expect(f("#tinymce #{selectors}").attribute('style')).to match("#{type}: #{value}\;")
+      expect(f("#tinymce #{selectors}").attribute("style")).to match("#{type}: #{value}\;")
     end
   end
 
   def rce_validate_wiki_style_attrib_empty(selectors)
     in_frame rce_page_body_ifr_id do
-      expect(f("#tinymce #{selectors}").attribute('style')).to be_empty
+      expect(f("#tinymce #{selectors}").attribute("style")).to be_empty
     end
   end
 
@@ -1136,6 +1136,6 @@ module RCENextPage
     @text_file =
       @root_folder
       .attachments
-      .create!(filename: title, context: @course) { |a| a.content_type = 'text/plain' }
+      .create!(filename: title, context: @course) { |a| a.content_type = "text/plain" }
   end
 end

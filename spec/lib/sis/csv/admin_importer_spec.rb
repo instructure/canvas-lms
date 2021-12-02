@@ -23,24 +23,24 @@ describe SIS::CSV::AdminImporter do
     account_model
     sis = @account.sis_batches.create
     @sub_account = Account.create(parent_account: @account)
-    @sub_account.sis_source_id = 'sub1'
+    @sub_account.sis_source_id = "sub1"
     @sub_account.sis_batch_id = sis.id
     @sub_account.save!
   end
 
-  it 'skips bad content' do
-    user_with_managed_pseudonym(account: @account, sis_user_id: 'U001')
+  it "skips bad content" do
+    user_with_managed_pseudonym(account: @account, sis_user_id: "U001")
     before_count = AccountUser.active.count
     importer = process_csv_data(
-      'user_id,account_id,role_id,role,status',
-      ',sub1,,AccountAdmin,active',
-      'invalid,sub1,,AccountAdmin,active',
-      'U001,invalid,,AccountAdmin,active',
-      'U001,sub1,,invalid role,active',
-      'U001,sub1,invalid,,active',
-      'U001,sub1,,AccountAdmin,invalid',
-      'U001,sub1,,AccountAdmin,',
-      'U001,sub1,,,deleted'
+      "user_id,account_id,role_id,role,status",
+      ",sub1,,AccountAdmin,active",
+      "invalid,sub1,,AccountAdmin,active",
+      "U001,invalid,,AccountAdmin,active",
+      "U001,sub1,,invalid role,active",
+      "U001,sub1,invalid,,active",
+      "U001,sub1,,AccountAdmin,invalid",
+      "U001,sub1,,AccountAdmin,",
+      "U001,sub1,,,deleted"
     )
     expect(AccountUser.active.count).to eq before_count
 
@@ -55,13 +55,13 @@ describe SIS::CSV::AdminImporter do
                           "No role_id or role given for admin"]
   end
 
-  it 'adds and remove admins' do
-    u1 = user_with_managed_pseudonym(account: @account, sis_user_id: 'U001')
+  it "adds and remove admins" do
+    u1 = user_with_managed_pseudonym(account: @account, sis_user_id: "U001")
 
     before_count = AccountUser.active.count
     process_csv_data_cleanly(
-      'user_id,account_id,role,status',
-      'U001,sub1,AccountAdmin,active'
+      "user_id,account_id,role,status",
+      "U001,sub1,AccountAdmin,active"
     )
     expect(AccountUser.active.count).to eq before_count + 1
 
@@ -71,64 +71,64 @@ describe SIS::CSV::AdminImporter do
     AccountUser.where(account_id: @sub_account, user_id: u1).update_all(sis_batch_id: b1.id)
 
     process_csv_data_cleanly(
-      'user_id,account_id,role,status',
-      'U001,sub1,AccountAdmin,deleted',
-      'U001,,AccountAdmin,active'
+      "user_id,account_id,role,status",
+      "U001,sub1,AccountAdmin,deleted",
+      "U001,,AccountAdmin,active"
     )
     expect(AccountUser.active.count).to eq before_count + 1
-    expect(@sub_account.account_users.where(user_id: u1).take.workflow_state).to eq 'deleted'
+    expect(@sub_account.account_users.where(user_id: u1).take.workflow_state).to eq "deleted"
     expect(@account.account_users.where(user_id: u1).count).to eq 1
   end
 
-  it 'adds admins from other root_account' do
+  it "adds admins from other root_account" do
     account2 = Account.create!
-    user_with_managed_pseudonym(account: account2, sis_user_id: 'U001')
+    user_with_managed_pseudonym(account: account2, sis_user_id: "U001")
 
     before_count = @account.account_users.active.count
 
     work = SIS::AdminImporter::Work.new(@account.sis_batches.create!, @account, Rails.logger)
-    expect(work).to receive(:root_account_from_id).with('account2').once.and_return(account2)
+    expect(work).to receive(:root_account_from_id).with("account2").once.and_return(account2)
     expect(SIS::AdminImporter::Work).to receive(:new).with(any_args).and_return(work)
 
     process_csv_data_cleanly(
-      'user_id,account_id,role,status,root_account',
-      'U001,,AccountAdmin,active,account2'
+      "user_id,account_id,role,status,root_account",
+      "U001,,AccountAdmin,active,account2"
     )
     expect(@account.account_users.active.count).to eq before_count + 1
   end
 
-  it 'adds admins by role_id' do
-    user_with_managed_pseudonym(account: @account, sis_user_id: 'U001')
+  it "adds admins by role_id" do
+    user_with_managed_pseudonym(account: @account, sis_user_id: "U001")
 
     role = @sub_account.available_account_roles.first
 
     before_count = AccountUser.active.count
     process_csv_data_cleanly(
-      'user_id,account_id,role_id,status',
+      "user_id,account_id,role_id,status",
       "U001,sub1,#{role.id},active"
     )
     expect(AccountUser.active.count).to eq before_count + 1
   end
 
-  it 'creates rollback data' do
-    user_with_managed_pseudonym(account: @account, sis_user_id: 'U001')
+  it "creates rollback data" do
+    user_with_managed_pseudonym(account: @account, sis_user_id: "U001")
     batch1 = @account.sis_batches.create! { |sb| sb.data = {} }
     process_csv_data_cleanly(
-      'user_id,account_id,role,status',
-      'U001,,AccountAdmin,active',
+      "user_id,account_id,role,status",
+      "U001,,AccountAdmin,active",
       batch: batch1
     )
-    expect(batch1.roll_back_data.where(previous_workflow_state: 'non-existent').count).to eq 1
+    expect(batch1.roll_back_data.where(previous_workflow_state: "non-existent").count).to eq 1
     batch2 = @account.sis_batches.create! { |sb| sb.data = {} }
     process_csv_data_cleanly(
-      'user_id,account_id,role,status',
-      'U001,,AccountAdmin,deleted',
+      "user_id,account_id,role,status",
+      "U001,,AccountAdmin,deleted",
       batch: batch2
     )
-    expect(batch2.roll_back_data.first.updated_workflow_state).to eq 'deleted'
+    expect(batch2.roll_back_data.first.updated_workflow_state).to eq "deleted"
     batch2.restore_states_for_batch
-    user = @account.pseudonyms.where(sis_user_id: 'U001').take.user
+    user = @account.pseudonyms.where(sis_user_id: "U001").take.user
     admin = @account.account_users.where(user_id: user).take
-    expect(admin.workflow_state).to eq 'active'
+    expect(admin.workflow_state).to eq "active"
   end
 end

@@ -25,10 +25,10 @@ describe Switchman::Shard do
       allow(Shard).to receive(:non_existent_database_servers).and_return(["jobs4"])
 
       dbs = []
-      dbs << DatabaseServer.new("jobs1", { region: 'us-east-1' })
-      dbs << DatabaseServer.new("jobs2", { region: 'us-east-1' })
-      dbs << DatabaseServer.new("jobs3", { region: 'eu-west-1' })
-      dbs << DatabaseServer.new("jobs4", { region: 'us-east-1' })
+      dbs << DatabaseServer.new("jobs1", { region: "us-east-1" })
+      dbs << DatabaseServer.new("jobs2", { region: "us-east-1" })
+      dbs << DatabaseServer.new("jobs3", { region: "eu-west-1" })
+      dbs << DatabaseServer.new("jobs4", { region: "us-east-1" })
       allow(DatabaseServer).to receive(:all).and_return(dbs)
 
       s1 = Shard.create!(database_server_id: "jobs1")
@@ -36,8 +36,8 @@ describe Switchman::Shard do
       s3 = Shard.create!(database_server_id: "jobs3")
       Shard.create!(database_server_id: "jobs4")
 
-      expect(Shard.in_region('us-east-1')).to eq([s1, s2])
-      expect(Shard.in_region('eu-west-1')).to eq([s3])
+      expect(Shard.in_region("us-east-1")).to eq([s1, s2])
+      expect(Shard.in_region("eu-west-1")).to eq([s3])
     end
   end
 
@@ -62,68 +62,68 @@ describe Switchman::Shard do
       allow(Setting).to receive(:get).and_call_original
     end
 
-    it 'Returns an empty window if no start is defined' do
+    it "Returns an empty window if no start is defined" do
       allow(Setting).to receive(:get).with("maintenance_window_start_hour", anything).and_return(nil)
 
       expect(DatabaseServer.all.first.next_maintenance_window).to be(nil)
     end
 
-    it 'Returns a window of the correct duration' do
-      allow(Setting).to receive(:get).with("maintenance_window_start_hour", anything).and_return('0')
-      allow(Setting).to receive(:get).with("maintenance_window_duration", anything).and_return('PT3H')
+    it "Returns a window of the correct duration" do
+      allow(Setting).to receive(:get).with("maintenance_window_start_hour", anything).and_return("0")
+      allow(Setting).to receive(:get).with("maintenance_window_duration", anything).and_return("PT3H")
 
       window = DatabaseServer.all.first.next_maintenance_window
 
       expect(window[1] - window[0]).to eq(3.hours)
     end
 
-    it 'Returns a window starting at the correct time' do
-      allow(Setting).to receive(:get).with("maintenance_window_start_hour", anything).and_return('3')
+    it "Returns a window starting at the correct time" do
+      allow(Setting).to receive(:get).with("maintenance_window_start_hour", anything).and_return("3")
 
       window = DatabaseServer.all.first.next_maintenance_window
 
       expect(window[0].utc.hour).to eq(21)
 
-      allow(Setting).to receive(:get).with("maintenance_window_start_hour", anything).and_return('-7')
+      allow(Setting).to receive(:get).with("maintenance_window_start_hour", anything).and_return("-7")
 
       window = DatabaseServer.all.first.next_maintenance_window
 
       expect(window[0].utc.hour).to eq(7)
     end
 
-    it 'Returns a window on the correct day' do
-      allow(Setting).to receive(:get).with("maintenance_window_start_hour", anything).and_return('0')
-      allow(Setting).to receive(:get).with("maintenance_window_weekday", anything).and_return('Tuesday')
+    it "Returns a window on the correct day" do
+      allow(Setting).to receive(:get).with("maintenance_window_start_hour", anything).and_return("0")
+      allow(Setting).to receive(:get).with("maintenance_window_weekday", anything).and_return("Tuesday")
 
       window = DatabaseServer.all.first.next_maintenance_window
 
-      expect(window[0].wday).to eq(Date::DAYNAMES.index('Tuesday'))
+      expect(window[0].wday).to eq(Date::DAYNAMES.index("Tuesday"))
     end
 
-    context 'with a positive timezone' do
+    context "with a positive timezone" do
       before do
         @old_zone = ::Time.zone
-        ::Time.zone = ActiveSupport::TimeZone['Melbourne']
+        ::Time.zone = ActiveSupport::TimeZone["Melbourne"]
       end
 
       after do
         ::Time.zone = @old_zone
       end
 
-      it 'Returns a window on the correct day' do
-        allow(Setting).to receive(:get).with("maintenance_window_start_hour", anything).and_return('0')
-        allow(Setting).to receive(:get).with("maintenance_window_weekday", anything).and_return('Tuesday')
+      it "Returns a window on the correct day" do
+        allow(Setting).to receive(:get).with("maintenance_window_start_hour", anything).and_return("0")
+        allow(Setting).to receive(:get).with("maintenance_window_weekday", anything).and_return("Tuesday")
 
         window = DatabaseServer.all.first.next_maintenance_window
 
-        expect(window[0].wday).to eq(Date::DAYNAMES.index('Tuesday'))
+        expect(window[0].wday).to eq(Date::DAYNAMES.index("Tuesday"))
       end
     end
 
-    it 'Returns a window on the correct day of the month' do
-      allow(Setting).to receive(:get).with("maintenance_window_start_hour", anything).and_return('0')
-      allow(Setting).to receive(:get).with("maintenance_window_weekday", anything).and_return('Tuesday')
-      allow(Setting).to receive(:get).with("maintenance_window_weeks_of_month", anything).and_return('2,4')
+    it "Returns a window on the correct day of the month" do
+      allow(Setting).to receive(:get).with("maintenance_window_start_hour", anything).and_return("0")
+      allow(Setting).to receive(:get).with("maintenance_window_weekday", anything).and_return("Tuesday")
+      allow(Setting).to receive(:get).with("maintenance_window_weeks_of_month", anything).and_return("2,4")
 
       Timecop.freeze(Time.utc(2021, 3, 1, 12, 0)) do
         window = DatabaseServer.all.first.next_maintenance_window

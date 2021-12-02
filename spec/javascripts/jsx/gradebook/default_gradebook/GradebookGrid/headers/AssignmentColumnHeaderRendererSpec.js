@@ -856,6 +856,20 @@ QUnit.module('GradebookGrid AssignmentColumnHeaderRenderer', suiteHooks => {
       render()
       equal(component.props.sortBySetting.settingKey, 'grade')
     })
+
+    test('sets showMessageStudentsWithObserversDialog to true if enabled in gradebook', () => {
+      buildGradebook()
+      gradebook.options.show_message_students_with_observers_dialog = true
+      render()
+      strictEqual(component.props.showMessageStudentsWithObserversDialog, true)
+    })
+
+    test('sets showMessageStudentsWithObserversDialog to false if not enabled in gradebook', () => {
+      buildGradebook()
+      gradebook.options.show_message_students_with_observers_dialog = false
+      render()
+      strictEqual(component.props.showMessageStudentsWithObserversDialog, false)
+    })
   })
 
   QUnit.module('#destroy()', () => {

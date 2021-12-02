@@ -18,14 +18,14 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../../conditional_release_spec_helper'
+require_relative "../../conditional_release_spec_helper"
 require_dependency "conditional_release/assignment_set"
 
 module ConditionalRelease
-  describe AssignmentSet, :type => :model do
-    it_behaves_like 'a soft-deletable model'
+  describe AssignmentSet, type: :model do
+    it_behaves_like "a soft-deletable model"
 
-    it 'must have a scoring_range_id' do
+    it "must have a scoring_range_id" do
       assignment_set = build :assignment_set, scoring_range_id: nil
       expect(assignment_set.valid?).to eq false
     end

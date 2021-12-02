@@ -68,7 +68,7 @@ module AddressBook
     # known. if not known, returns an empty hash
     def common_courses(user)
       if user == @sender
-        return {}
+        {}
       else
         known = known_user(user)
         known ? @cache.common_courses(known) : {}
@@ -80,7 +80,7 @@ module AddressBook
     # known. if not known, returns an empty hash
     def common_groups(user)
       if user == @sender
-        return {}
+        {}
       else
         known = known_user(user)
         known ? @cache.common_groups(known) : {}
@@ -166,7 +166,7 @@ module AddressBook
 
       # if the context doesn't exist, or the sender does not have read_as_admin
       # permission, they don't get an admin view
-      return false unless context && context.grants_right?(@sender, :read_as_admin)
+      return false unless context&.grants_right?(@sender, :read_as_admin)
 
       # but even if they have read_as_admin permission, we need to check if the
       # context is part of a course they participate in. if so, they still
@@ -176,7 +176,7 @@ module AddressBook
         case context
         when Course then context.id
         when CourseSection then context.course_id
-        when Group then context.context_type == 'Course' && context.context_id
+        when Group then context.context_type == "Course" && context.context_id
         end
       return false if course_id && @sender.current_and_concluded_courses.where(id: course_id).exists?
 

@@ -17,9 +17,9 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'json/jwt'
+require "json/jwt"
 
-Oj.optimize_rails()
+Oj.optimize_rails
 
 Oj.default_options = { mode: :rails, escape_mode: :xss_safe, bigdecimal_as_decimal: true }
 

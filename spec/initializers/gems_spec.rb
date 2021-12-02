@@ -17,9 +17,9 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-describe 'Gemfile' do
-  it 'does not include libxml-ruby' do
-    libxml = Bundler.locked_gems.specs.find { |s| s.name == 'libxml-ruby' }
+describe "Gemfile" do
+  it "does not include libxml-ruby" do
+    libxml = Bundler.locked_gems.specs.find { |s| s.name == "libxml-ruby" }
     expect(libxml).to be_nil,
                       "libxml-ruby is incompatible with nokogiri and causes heap corruption"
   end

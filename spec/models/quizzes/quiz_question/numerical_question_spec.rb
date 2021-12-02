@@ -17,11 +17,11 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_dependency 'quizzes/quiz_question/base'
+require_dependency "quizzes/quiz_question/base"
 
 describe Quizzes::QuizQuestion::NumericalQuestion do
   let(:question_data) do
-    { :answers => [{ :id => 1, :weight => 100, :start => 2, :end => 3 }] }
+    { answers: [{ id: 1, weight: 100, start: 2, end: 3 }] }
   end
 
   let(:question) do
@@ -34,24 +34,24 @@ describe Quizzes::QuizQuestion::NumericalQuestion do
     end
   end
 
-  describe '#i18n_decimal' do
-    it 'works in english' do
-      expect(question.i18n_decimal('1234.56')).to eq BigDecimal('1234.56')
-      expect(question.i18n_decimal('1,234.56')).to eq BigDecimal('1234.56')
+  describe "#i18n_decimal" do
+    it "works in english" do
+      expect(question.i18n_decimal("1234.56")).to eq BigDecimal("1234.56")
+      expect(question.i18n_decimal("1,234.56")).to eq BigDecimal("1234.56")
     end
 
-    it 'works in french' do
-      I18n.locale = 'fr'
-      expect(question.i18n_decimal('1 234,56')).to eq BigDecimal('1234.56')
-      expect(question.i18n_decimal('1234,56')).to eq BigDecimal('1234.56')
+    it "works in french" do
+      I18n.locale = "fr"
+      expect(question.i18n_decimal("1 234,56")).to eq BigDecimal("1234.56")
+      expect(question.i18n_decimal("1234,56")).to eq BigDecimal("1234.56")
     end
 
-    it 'works for inputs of type Integer' do
-      expect(question.i18n_decimal(1234)).to eq BigDecimal('1234')
+    it "works for inputs of type Integer" do
+      expect(question.i18n_decimal(1234)).to eq BigDecimal("1234")
     end
 
-    it 'works for inputs of type Float' do
-      expect(question.i18n_decimal(123456e-2)).to eq BigDecimal('1234.56')
+    it "works for inputs of type Float" do
+      expect(question.i18n_decimal(123_456e-2)).to eq BigDecimal("1234.56")
     end
   end
 
@@ -61,14 +61,6 @@ describe Quizzes::QuizQuestion::NumericalQuestion do
 
     context "handles '' values without error" do
       it 'handles "answer[:exact]"' do
-        answer_data = {
-          numerical_answer_type: "exact_answer"
-        }
-        user_answer = Quizzes::QuizQuestion::UserAnswer.new(question_id, points_possible, answer_data)
-        expect { question.correct_answer_parts(user_answer) }.not_to raise_error
-      end
-
-      it 'handles "answer[:margin]"' do
         answer_data = {
           numerical_answer_type: "exact_answer"
         }
@@ -86,40 +78,40 @@ describe Quizzes::QuizQuestion::NumericalQuestion do
     end
 
     it "does not calculate margin of tolerance for answers if answer text is nil" do
-      answer_data = { :"question_#{question_id}" => nil }
+      answer_data = { "question_#{question_id}": nil }
       user_answer = Quizzes::QuizQuestion::UserAnswer.new(question_id, points_possible, answer_data)
       expect(question.correct_answer_parts(user_answer)).to be_nil
     end
 
     it "does not calculate margin of tolerance for answers if answer text is blank" do
-      answer_data = { :"question_#{question_id}" => "" }
+      answer_data = { "question_#{question_id}": "" }
       user_answer = Quizzes::QuizQuestion::UserAnswer.new(question_id, points_possible, answer_data)
       expect(question.correct_answer_parts(user_answer)).to be_falsey
     end
 
     it "calculates if answer falls within start/end range" do
-      answer_data = { :"question_#{question_id}" => "2.5" }
+      answer_data = { "question_#{question_id}": "2.5" }
       user_answer = Quizzes::QuizQuestion::UserAnswer.new(question_id, points_possible, answer_data)
 
       expect(question.correct_answer_parts(user_answer)).to be_truthy
     end
 
     it "calculates if answer falls out of start/end range" do
-      answer_data = { :"question_#{question_id}" => "4" }
+      answer_data = { "question_#{question_id}": "4" }
       user_answer = Quizzes::QuizQuestion::UserAnswer.new(question_id, points_possible, answer_data)
 
       expect(question.correct_answer_parts(user_answer)).to be_falsey
     end
 
-    describe 'flexible ranges' do # rubocop:disable RSpec/EmptyExampleGroup
+    describe "flexible ranges" do # rubocop:disable RSpec/EmptyExampleGroup
       # RuboCop can't detect the examples that are dynamically defined
       def self.test_range(range, answer, is_correct)
         desc = "should calculate if %s falls %s (%d,%d)" % [
-          answer, is_correct ? 'within' : 'out of', range[0], range[1]
+          answer, is_correct ? "within" : "out of", range[0], range[1]
         ]
 
         it desc do
-          answer_data = { :"question_#{question_id}" => answer.to_s }
+          answer_data = { "question_#{question_id}": answer.to_s }
           question = Quizzes::QuizQuestion::NumericalQuestion.new({
                                                                     answers: [{
                                                                       id: 1,

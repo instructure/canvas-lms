@@ -25,7 +25,7 @@ module Services
     before do
       allow(Canvas::DynamicSettings).to receive(:find).with(any_args).and_call_original
       allow(Canvas::DynamicSettings).to receive(:find)
-        .with('rich-content-service', default_ttl: 5.minutes)
+        .with("rich-content-service", default_ttl: 5.minutes)
         .and_return(DynamicSettings::FallbackProxy.new(
                       "app-host" => "rce-app",
                       "cdn-host" => "rce-cdn"
@@ -40,7 +40,7 @@ module Services
       end
 
       it "includes a generated JWT for the domain, user, context, and workflwos" do
-        user = double("user", global_id: 'global id')
+        user = double("user", global_id: "global id")
         domain = double("domain")
         ctx = double("ctx", grants_right?: true)
         jwt = double("jwt")
@@ -52,27 +52,27 @@ module Services
       end
 
       it "includes a masquerading user if provided" do
-        user = double("user", global_id: 'global id')
-        masq_user = double("masq_user", global_id: 'other global id')
+        user = double("user", global_id: "global id")
+        masq_user = double("masq_user", global_id: "other global id")
         domain = double("domain")
         jwt = double("jwt")
         allow(CanvasSecurity::ServicesJwt).to receive(:for_user).with(
           domain,
           user,
-          include(real_user: masq_user),
+          include(real_user: masq_user)
         ).and_return(jwt)
         env = described_class.env_for(user: user, domain: domain, real_user: masq_user)
         expect(env[:JWT]).to eql(jwt)
       end
 
       it "does not allow file uploading without context" do
-        user = double("user", global_id: 'global id')
+        user = double("user", global_id: "global id")
         env = described_class.env_for(user: user)
         expect(env[:RICH_CONTENT_CAN_UPLOAD_FILES]).to eq(false)
       end
 
       it "lets context decide if uploading is ok" do
-        user = double("user", global_id: 'global id')
+        user = double("user", global_id: "global id")
         context1 = double("allowed_context", grants_right?: true)
         context2 = double("forbidden_context", grants_right?: false)
         env1 = described_class.env_for(user: user, context: context1)

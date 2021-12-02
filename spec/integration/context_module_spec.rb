@@ -18,12 +18,12 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'nokogiri'
+require "nokogiri"
 
 describe ContextModule do
   def course_module
-    course_with_student_logged_in(:active_all => true)
-    @module = @course.context_modules.create!(:name => "some module")
+    course_with_student_logged_in(active_all: true)
+    @module = @course.context_modules.create!(name: "some module")
   end
 
   describe "index" do
@@ -31,27 +31,27 @@ describe ContextModule do
       course_with_teacher_logged_in active_all: true
       get "/courses/#{@course.id}/modules"
       doc = Nokogiri::HTML5(response.body)
-      expect(doc.at_css('.add_module_link')).not_to be_nil
+      expect(doc.at_css(".add_module_link")).not_to be_nil
 
-      @course.account.role_overrides.create! role: ta_role, permission: 'manage_content', enabled: false
+      @course.account.role_overrides.create! role: ta_role, permission: "manage_content", enabled: false
       course_with_ta course: @course
       user_session(@ta)
       get "/courses/#{@course.id}/modules"
       doc = Nokogiri::HTML5(response.body)
-      expect(doc.at_css('.add_module_link')).to be_nil
+      expect(doc.at_css(".add_module_link")).to be_nil
     end
   end
 
   it "clears the page cache on individual tag change" do
     enable_cache do
-      course_with_teacher_logged_in(:active_all => true)
+      course_with_teacher_logged_in(active_all: true)
       context_module = @course.context_modules.create!
-      content_tag = context_module.add_item :type => 'context_module_sub_header', :title => "My Sub Header Title"
-      ContextModule.where(:id => context_module).update_all(:updated_at => 1.hour.ago)
+      content_tag = context_module.add_item type: "context_module_sub_header", title: "My Sub Header Title"
+      ContextModule.where(id: context_module).update_all(updated_at: 1.hour.ago)
       get "/courses/#{@course.id}/modules"
       expect(response.body).to match(/My Sub Header Title/)
 
-      content_tag.update(:title => "My New Title")
+      content_tag.update(title: "My New Title")
 
       get "/courses/#{@course.id}/modules"
       expect(response.body).to match(/My New Title/)
@@ -66,7 +66,7 @@ describe ContextModule do
     end
 
     def before_after
-      @module.completion_requirements = { @tag.id => { :type => 'must_contribute' } }
+      @module.completion_requirements = { @tag.id => { type: "must_contribute" } }
       @module.save!
 
       @progression = @module.evaluate_for(@user)
@@ -81,27 +81,27 @@ describe ContextModule do
     end
 
     it "progresses for discussions" do
-      @discussion = @course.discussion_topics.create!(:title => "talk")
-      @tag = @module.add_item(:type => 'discussion_topic', :id => @discussion.id)
+      @discussion = @course.discussion_topics.create!(title: "talk")
+      @tag = @module.add_item(type: "discussion_topic", id: @discussion.id)
       before_after do
-        post "/courses/#{@course.id}/discussion_entries", params: { :discussion_entry => { :message => 'ohai', :discussion_topic_id => @discussion.id } }
+        post "/courses/#{@course.id}/discussion_entries", params: { discussion_entry: { message: "ohai", discussion_topic_id: @discussion.id } }
         expect(response).to be_redirect
       end
     end
 
     it "progresses for wiki pages" do
-      @page = @course.wiki_pages.create!(:title => "talk page", :body => 'ohai', :editing_roles => 'teachers,students')
-      @tag = @module.add_item(:type => 'wiki_page', :id => @page.id)
+      @page = @course.wiki_pages.create!(title: "talk page", body: "ohai", editing_roles: "teachers,students")
+      @tag = @module.add_item(type: "wiki_page", id: @page.id)
       before_after do
-        put "/api/v1/courses/#{@course.id}/pages/#{@page.url}", params: { :wiki_page => { :body => 'i agree', :title => 'talk page' } }
+        put "/api/v1/courses/#{@course.id}/pages/#{@page.url}", params: { wiki_page: { body: "i agree", title: "talk page" } }
       end
     end
 
     it "progresses for assignment discussions" do
-      @assignment = @course.assignments.create!(:title => 'talk assn', :submission_types => 'discussion_topic')
-      @tag = @module.add_item(:type => 'assignment', :id => @assignment.id)
+      @assignment = @course.assignments.create!(title: "talk assn", submission_types: "discussion_topic")
+      @tag = @module.add_item(type: "assignment", id: @assignment.id)
       before_after do
-        post "/courses/#{@course.id}/discussion_entries", params: { :discussion_entry => { :message => 'ohai', :discussion_topic_id => @assignment.discussion_topic.id } }
+        post "/courses/#{@course.id}/discussion_entries", params: { discussion_entry: { message: "ohai", discussion_topic_id: @assignment.discussion_topic.id } }
         expect(response).to be_redirect
       end
     end
@@ -111,22 +111,22 @@ describe ContextModule do
     def progression_testing(progress_by_item_link)
       enable_cache do
         @is_attachment = false
-        course_with_student_logged_in(:active_all => true)
-        @quiz = @course.quizzes.create!(:title => "new quiz", :shuffle_answers => true)
+        course_with_student_logged_in(active_all: true)
+        @quiz = @course.quizzes.create!(title: "new quiz", shuffle_answers: true)
         @quiz.publish!
 
         # separate timestamps so touch_context will actually invalidate caches
         Timecop.freeze(4.seconds.ago) do
-          @mod1 = @course.context_modules.create!(:name => "some module")
+          @mod1 = @course.context_modules.create!(name: "some module")
           @mod1.require_sequential_progress = true
           @mod1.save!
-          @tag1 = @mod1.add_item(:type => 'quiz', :id => @quiz.id)
-          @mod1.completion_requirements = { @tag1.id => { :type => 'min_score', :min_score => 1 } }
+          @tag1 = @mod1.add_item(type: "quiz", id: @quiz.id)
+          @mod1.completion_requirements = { @tag1.id => { type: "min_score", min_score: 1 } }
           @mod1.save!
         end
 
-        Timecop.freeze(2.second.ago) do
-          @mod2 = @course.context_modules.create!(:name => "dependant module")
+        Timecop.freeze(2.seconds.ago) do
+          @mod2 = @course.context_modules.create!(name: "dependant module")
           @mod2.prerequisites = "module_#{@mod1.id}"
           @mod2.save!
         end
@@ -142,29 +142,31 @@ describe ContextModule do
 
         # verify the second item is locked (doesn't display)
         get @test_url
-        if @test_url.match?('files')
+        if @test_url.match?("files")
           expect(response.status).to eq(403)
         else
           expect(response).to be_successful
         end
         html = Nokogiri::HTML5(response.body)
-        expect(html.css('#test_content').length).to eq(@test_content_length || 0)
+        expect(html.css("#test_content").length).to eq(@test_content_length || 0)
 
         # complete first module's requirements
         p1 = @mod1.evaluate_for(@student)
-        expect(p1.workflow_state).to eq 'unlocked'
+        expect(p1.workflow_state).to eq "unlocked"
 
         @quiz_submission = @quiz.generate_submission(@student)
         Quizzes::SubmissionGrader.new(@quiz_submission).grade_submission
-        @quiz_submission.workflow_state = 'complete'
+        @quiz_submission.workflow_state = "complete"
         @quiz_submission.manually_scored = true
         @quiz_submission.kept_score = 1
         @quiz_submission.save!
 
         # navigate to the second item (forcing update to progression)
-        next_link = progress_by_item_link ?
-          "/courses/#{@course.id}/modules/items/#{@tag2.id}" :
-          "/courses/#{@course.id}/modules/#{@mod2.id}/items/first"
+        next_link = if progress_by_item_link
+                      "/courses/#{@course.id}/modules/items/#{@tag2.id}"
+                    else
+                      "/courses/#{@course.id}/modules/#{@mod2.id}/items/first"
+                    end
         get next_link
         expect(response).to be_redirect
         expect(response.location.ends_with?("module_item_id=#{@tag2.id}")).to be_truthy
@@ -174,11 +176,11 @@ describe ContextModule do
         expect(response).to be_successful
         html = Nokogiri::HTML5(response.body)
         if @is_attachment
-          expect(html.at_css('#file_content')['src']).to match %r{#{@test_url.split("?").first}}
+          expect(html.at_css("#file_content")["src"]).to match(/#{@test_url.split("?").first}/)
         elsif @is_wiki_page
-          expect(html.css('#wiki_page_show').length).to eq 1
+          expect(html.css("#wiki_page_show").length).to eq 1
         else
-          expect(html.css('#test_content').length).to eq 1
+          expect(html.css("#test_content").length).to eq 1
         end
       end
     end
@@ -186,9 +188,9 @@ describe ContextModule do
     it "progresses to assignment" do
       [true, false].each do |progress_type|
         progression_testing(progress_type) do |content|
-          asmnt = @course.assignments.create!(:title => 'assignment', :description => content)
+          asmnt = @course.assignments.create!(title: "assignment", description: content)
           @test_url = "/courses/#{@course.id}/assignments/#{asmnt.id}"
-          @tag2 = @mod2.add_item(:type => 'assignment', :id => asmnt.id)
+          @tag2 = @mod2.add_item(type: "assignment", id: asmnt.id)
           expect(@tag2).to be_published
         end
       end
@@ -197,9 +199,9 @@ describe ContextModule do
     it "progresses to discussion topic" do
       [true, false].each do |progress_type|
         progression_testing(progress_type) do |content|
-          discussion = @course.discussion_topics.create!(:title => "topic", :message => content)
+          discussion = @course.discussion_topics.create!(title: "topic", message: content)
           @test_url = "/courses/#{@course.id}/discussion_topics/#{discussion.id}"
-          @tag2 = @mod2.add_item(:type => 'discussion_topic', :id => discussion.id)
+          @tag2 = @mod2.add_item(type: "discussion_topic", id: discussion.id)
           expect(@tag2).to be_published
         end
       end
@@ -208,10 +210,10 @@ describe ContextModule do
     it "progresses to a quiz" do
       [true, false].each do |progress_type|
         progression_testing(progress_type) do |content|
-          quiz = @course.quizzes.create!(:title => "quiz", :description => content)
+          quiz = @course.quizzes.create!(title: "quiz", description: content)
           quiz.publish!
           @test_url = "/courses/#{@course.id}/quizzes/#{quiz.id}"
-          @tag2 = @mod2.add_item(:type => 'quiz', :id => quiz.id)
+          @tag2 = @mod2.add_item(type: "quiz", id: quiz.id)
           expect(@tag2).to be_published
         end
       end
@@ -220,9 +222,9 @@ describe ContextModule do
     it "progresses to a wiki page" do
       [true, false].each do |progress_type|
         progression_testing(progress_type) do |content|
-          page = @course.wiki_pages.create!(:title => "wiki", :body => content)
+          page = @course.wiki_pages.create!(title: "wiki", body: content)
           @test_url = "/courses/#{@course.id}/pages/#{page.url}"
-          @tag2 = @mod2.add_item(:type => 'wiki_page', :id => page.id)
+          @tag2 = @mod2.add_item(type: "wiki_page", id: page.id)
           expect(@tag2).to be_published
           @is_wiki_page = true
         end
@@ -233,9 +235,9 @@ describe ContextModule do
       [true, false].each do |progress_type|
         progression_testing(progress_type) do |content|
           @is_attachment = true
-          att = Attachment.create!(:filename => 'test.html', :display_name => "test.html", :uploaded_data => StringIO.new(content), :folder => Folder.unfiled_folder(@course), :context => @course)
+          att = Attachment.create!(filename: "test.html", display_name: "test.html", uploaded_data: StringIO.new(content), folder: Folder.unfiled_folder(@course), context: @course)
           @test_url = "/courses/#{@course.id}/files/#{att.id}?fd_cookie_set=1"
-          @tag2 = @mod2.add_item(:type => 'attachment', :id => att.id)
+          @tag2 = @mod2.add_item(type: "attachment", id: att.id)
           expect(@tag2).to be_published
         end
       end
@@ -252,11 +254,11 @@ describe ContextModule do
         mod.save!
 
         teacher1 = teacher_in_course(active_all: true).user
-        teacher1.time_zone = 'America/Los_Angeles'
+        teacher1.time_zone = "America/Los_Angeles"
         teacher1.save!
 
         teacher2 = teacher_in_course(active_all: true).user
-        teacher2.time_zone = 'America/New_York'
+        teacher2.time_zone = "America/New_York"
         teacher2.save!
 
         user_session teacher1

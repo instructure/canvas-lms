@@ -57,7 +57,7 @@ module CanvasHttp
         redis_client.expire(key, window(domain))
         current_count = redis_client.incr(key)
         if current_count > threshold(domain)
-          redis_client.setex(tripped_key(domain), interval(domain), '1')
+          redis_client.setex(tripped_key(domain), interval(domain), "1")
           CanvasHttp.logger.warn("CANVAS_HTTP CB_TRIP ON #{domain} | interval: #{interval(domain)} | thresh: #{threshold(domain)} | window: #{window(domain)}")
         end
       end
@@ -71,7 +71,7 @@ module CanvasHttp
       end
 
       def redis_client
-        @redis.respond_to?(:call) ? @redis.call() : @redis || nil
+        @redis.respond_to?(:call) ? @redis.call : @redis || nil
       end
 
       def threshold(domain)

@@ -221,7 +221,7 @@ class GradebookHistoryApiController < ApplicationController
   # @returns [Day]
   def days
     days_hash = days_json(@context, api_context(api_v1_gradebook_history_url(@context)))
-    render :json => days_hash
+    render json: days_hash
   end
 
   # @API Details for a given date in gradebook history for this course
@@ -237,10 +237,10 @@ class GradebookHistoryApiController < ApplicationController
   #
   # @returns [Grader]
   def day_details
-    date = Date.strptime(params[:date], '%Y-%m-%d').in_time_zone
+    date = Date.strptime(params[:date], "%Y-%m-%d").in_time_zone
     path = api_v1_gradebook_history_for_day_url(@context, params[:date])
     day_hash = json_for_date(date, @context, api_context(path))
-    render :json => day_hash
+    render json: day_hash
   end
 
   # @API Lists submissions
@@ -260,10 +260,10 @@ class GradebookHistoryApiController < ApplicationController
   #
   # @returns [SubmissionHistory]
   def submissions
-    date = Date.strptime(params[:date], '%Y-%m-%d').in_time_zone
+    date = Date.strptime(params[:date], "%Y-%m-%d").in_time_zone
     path = api_v1_gradebook_history_submissions_url(@context, params[:date], params[:grader_id], params[:assignment_id])
     submissions_hash = submissions_for(@context, api_context(path), date, params[:grader_id], params[:assignment_id])
-    render :json => submissions_hash
+    render json: submissions_hash
   end
 
   # @API List uncollated submission versions
@@ -297,18 +297,18 @@ class GradebookHistoryApiController < ApplicationController
 
     # construct scope of interesting submission versions using index table
     indexed_versions = SubmissionVersion
-                       .where(:context_type => 'Course', :context_id => @context)
-                       .order(params[:ascending] ? :version_id : 'version_id DESC')
-    indexed_versions = indexed_versions.where(:assignment_id => assignment) if assignment
-    indexed_versions = indexed_versions.where(:user_id => student) if student
+                       .where(context_type: "Course", context_id: @context)
+                       .order(params[:ascending] ? :version_id : "version_id DESC")
+    indexed_versions = indexed_versions.where(assignment_id: assignment) if assignment
+    indexed_versions = indexed_versions.where(user_id: student) if student
 
     # paginate the indexed scope and then convert to actual Version records
     path = api_v1_gradebook_history_feed_url(@context, params.permit(:course_id, :assignment_id, :user_id, :ascending, :format))
     indexed_versions = Api.paginate(indexed_versions, self, path)
     ActiveRecord::Associations::Preloader.new.preload(indexed_versions, :version)
-    versions = indexed_versions.map(&:version).compact
+    versions = indexed_versions.filter_map(&:version)
 
-    render :json => versions_json(@context, versions, api_context(nil), :assignment => assignment, :student => student)
+    render json: versions_json(@context, versions, api_context(nil), assignment: assignment, student: student)
   end
 
   private

@@ -20,25 +20,25 @@
 
 module Types
   class ExternalToolStateType < Types::BaseEnum
-    graphql_name 'ExternalToolState'
-    description 'States that an External Tool can be in'
-    value 'anonymous'
-    value 'name_only'
-    value 'email_only'
-    value 'public'
+    graphql_name "ExternalToolState"
+    description "States that an External Tool can be in"
+    value "anonymous"
+    value "name_only"
+    value "email_only"
+    value "public"
   end
 
   # We can add additional placements to this filter as they are needed. Currently we
   # only need to filter to `homework_submission` as that is the only place that this
   # graphql type is being queried and used in.
   class ExternalToolPlacementType < Types::BaseEnum
-    graphql_name 'ExternalToolPlacement'
-    description 'Placements that an External Tool can have'
-    value 'homework_submission'
+    graphql_name "ExternalToolPlacement"
+    description "Placements that an External Tool can have"
+    value "homework_submission"
   end
 
   class ExternalToolFilterInputType < Types::BaseInputObject
-    graphql_name 'ExternalToolFilterInput'
+    graphql_name "ExternalToolFilterInput"
 
     argument :state, ExternalToolStateType, required: false, default_value: nil
 
@@ -51,7 +51,7 @@ module Types
   # types in graphql. ModuleExternalToolType is the one backed by `ContentTag`,
   # and `ExternalToolType` is backed by `ContextExternalTool`.
   class ExternalToolType < ApplicationObjectType
-    graphql_name 'ExternalTool'
+    graphql_name "ExternalTool"
 
     implements Interfaces::TimestampInterface
     implements Interfaces::ModuleItemInterface
@@ -59,7 +59,7 @@ module Types
 
     field :url, Types::UrlType, null: true
     def url
-      object.login_or_launch_url()
+      object.login_or_launch_url
     end
 
     field :name, String, null: true
@@ -77,9 +77,7 @@ module Types
 
     def modules
       load_association(:content_tags).then do |tags|
-        Loaders::AssociationLoader.for(ContentTag, :context_module).load_many(tags).then do |modules|
-          modules.uniq
-        end
+        Loaders::AssociationLoader.for(ContentTag, :context_module).load_many(tags).then(&:uniq)
       end
     end
   end

@@ -21,7 +21,7 @@ describe Lti::IMS::ResultsSerializer do
   subject { described_class.new(result, url).as_json }
 
   let(:result) { lti_result_model result_score: 10, result_maximum: 10 }
-  let(:url) { 'http://test.test' }
+  let(:url) { "http://test.test" }
   let(:expected) do
     {
       id: "#{url}/results/#{result.id}",
@@ -32,11 +32,11 @@ describe Lti::IMS::ResultsSerializer do
     }.compact
   end
 
-  describe '#as_json' do
+  describe "#as_json" do
     it { is_expected.to eq expected }
 
-    context 'with comment' do
-      let(:comment) { 'This is a comment' }
+    context "with comment" do
+      let(:comment) { "This is a comment" }
       let(:result) { lti_result_model comment: comment }
 
       it { is_expected.to eq expected.merge(comment: comment) }

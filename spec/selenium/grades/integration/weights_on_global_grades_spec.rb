@@ -17,11 +17,11 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../pages/global_grades_page'
-require_relative './weighting_setup'
-require_relative './a_gradebook_shared_example'
+require_relative "../pages/global_grades_page"
+require_relative "./weighting_setup"
+require_relative "./a_gradebook_shared_example"
 
-describe 'gradebook' do
+describe "gradebook" do
   include_context "in-process server selenium tests"
   include WeightingSetup
 
@@ -29,7 +29,7 @@ describe 'gradebook' do
     grading_period_titles = ["All Grading Periods", @gp1.title, @gp2.title]
 
     user_session(@student)
-    GlobalGrades.visit()
+    GlobalGrades.visit
 
     if @grading_period_index
       GlobalGrades.select_grading_period(@course, grading_period_titles[@grading_period_index])
@@ -44,5 +44,5 @@ describe 'gradebook' do
     weighted_grading_setup
   end
 
-  it_behaves_like 'a gradebook'
+  it_behaves_like "a gradebook"
 end

@@ -20,7 +20,7 @@
 
 module Factories
   def calendar_event_model(opts = {})
-    @course ||= course_model(:reusable => true)
+    @course ||= course_model(reusable: true)
     @event = @course.calendar_events.create!(valid_calendar_event_attributes.merge(opts))
   end
 
@@ -29,7 +29,7 @@ module Factories
     @course = opts[:course] ||= course_model
     @course.offer! unless @course.available?
     if participant.is_a?(User)
-      @course.enroll_student(participant).update_attribute(:workflow_state, 'active')
+      @course.enroll_student(participant).update_attribute(:workflow_state, "active")
     else
       opts[:sub_context] ||= participant.group_category
     end
@@ -41,8 +41,8 @@ module Factories
   end
 
   def appointment_model(opts = {})
-    appointment_group = opts[:appointment_group] || appointment_group_model(:sub_context => opts.delete(:sub_context))
-    appointment_group.update(:new_appointments => [[opts[:start_at] || (Time.now.utc + 1.hour), opts[:end_at] || (Time.now.utc + 1.hour)]])
+    appointment_group = opts[:appointment_group] || appointment_group_model(sub_context: opts.delete(:sub_context))
+    appointment_group.update(new_appointments: [[opts[:start_at] || (Time.now.utc + 1.hour), opts[:end_at] || (Time.now.utc + 1.hour)]])
     @appointment = appointment_group.new_appointments.first
     appointment_group.reload
     @appointment
@@ -59,14 +59,14 @@ module Factories
 
   def valid_calendar_event_attributes
     {
-      :title => "some title"
+      title: "some title"
     }
   end
 
   def valid_appointment_group_attributes
     {
-      :title => "some title",
-      :contexts => [@course]
+      title: "some title",
+      contexts: [@course]
     }
   end
 end

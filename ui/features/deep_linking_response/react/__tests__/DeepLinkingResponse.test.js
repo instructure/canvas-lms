@@ -17,78 +17,114 @@
  */
 
 import React from 'react'
-import {mount} from 'enzyme'
-import {Text} from '@instructure/ui-text'
+import {render, cleanup, fireEvent} from '@testing-library/react'
 import {RetrievingContent} from '../DeepLinkingResponse'
 
-let wrapper = 'empty wrapper'
-const env = {
-  content_items: [{type: 'link'}],
-  message: 'message',
-  log: 'log',
-  error_message: 'error message',
-  error_log: 'error log',
-  DEEP_LINKING_POST_MESSAGE_ORIGIN: '*',
-  lti_endpoint: 'https://www.test.com/retrieve',
-  close_dialog: false
-}
-let oldEnv = {}
+describe('RetrievingContent', () => {
+  let component
+  const windowMock = {}
+  let content_items = []
+  const env = () => ({
+    DEEP_LINKING_POST_MESSAGE_ORIGIN: '*',
+    deep_link_response: {
+      content_items,
+      msg: 'message',
+      log: 'log',
+      errormsg: 'error message',
+      errorlog: 'error log',
+      ltiEndpoint: 'https://www.test.com/retrieve',
+      reloadpage: false
+    }
+  })
 
-beforeEach(() => {
-  oldEnv = window.ENV
-  window.ENV = env
-})
-
-afterEach(() => {
-  wrapper.unmount()
-  window.ENV = oldEnv
-})
-
-it('renders an informative message', () => {
-  wrapper = mount(<RetrievingContent />)
-  expect(wrapper.find(Text).html()).toContain('Retrieving Content')
-})
-
-describe('post message', () => {
-  const oldPostMessage = window.postMessage
-  const postMessageDouble = jest.fn()
+  const renderComponent = () =>
+    render(<RetrievingContent environment={env()} parentWindow={windowMock} />)
 
   beforeEach(() => {
-    window.postMessage = postMessageDouble
-    wrapper = mount(<RetrievingContent />)
+    windowMock.postMessage = jest.fn()
   })
 
   afterEach(() => {
-    window.postMessage = oldPostMessage
+    cleanup()
   })
 
-  const messageData = () => postMessageDouble.mock.calls[0][0]
+  describe('with no content item errors', () => {
+    beforeEach(() => {
+      content_items = [{type: 'link'}]
+      component = renderComponent()
+    })
 
-  it('sends the correct message type', () => {
-    expect(messageData().messageType).toEqual('LtiDeepLinkingResponse')
+    it('renders an informative message', () => {
+      expect(component.getByTitle('Retrieving Content')).toBeInTheDocument()
+    })
+
+    it('immediately calls postMessage', () => {
+      expect(windowMock.postMessage).toHaveBeenCalled()
+    })
   })
 
-  it('sends the correct content items', () => {
-    expect(messageData().content_items).toMatchObject(env.content_items)
+  describe('with errored content items', () => {
+    beforeEach(() => {
+      content_items = [
+        {type: 'LtiResourceLink', title: 'all good'},
+        {
+          type: 'LtiResourceLink',
+          title: 'not happy',
+          errors: {fieldOne: 'error one', fieldTwo: 'error two'}
+        }
+      ]
+      component = renderComponent()
+    })
+
+    it('shows succeeded content items just for info', () => {
+      expect(component.getAllByText('Processed').length).toBe(1)
+      expect(component.getByText(content_items[0].title)).toBeInTheDocument()
+    })
+
+    it('shows one row per errored field', () => {
+      expect(component.getAllByText('Discarded').length).toBe(2)
+      expect(component.getAllByText(content_items[1].title).length).toBe(2)
+      expect(component.getByText(content_items[1].errors.fieldOne)).toBeInTheDocument()
+      expect(component.getByText(content_items[1].errors.fieldTwo)).toBeInTheDocument()
+    })
+
+    describe('after user clicks Continue', () => {
+      beforeEach(() => {
+        fireEvent.click(component.getByRole('button'))
+      })
+
+      it('only sends postMessage after user clicks Continue', () => {
+        expect(windowMock.postMessage).toHaveBeenCalled()
+      })
+
+      it('shows original informative message', () => {
+        expect(component.getByTitle('Retrieving Content')).toBeInTheDocument()
+      })
+    })
   })
 
-  it('sends the correct message', () => {
-    expect(messageData().msg).toEqual(env.message)
-  })
+  describe('post message', () => {
+    beforeEach(() => {
+      content_items = [{type: 'link'}]
+      component = renderComponent()
+    })
 
-  it('sends the correct log', () => {
-    expect(messageData().log).toEqual(env.log)
-  })
+    const messageData = () => windowMock.postMessage.mock.calls[0][0]
 
-  it('sends the correct error message', () => {
-    expect(messageData().errormsg).toEqual(env.error_message)
-  })
+    ;['content_items', 'msg', 'log', 'errormsg', 'errorlog', 'ltiEndpoint', 'reloadpage'].forEach(
+      attr => {
+        it(`sends the correct ${attr}`, () => {
+          expect(messageData()[attr]).toEqual(env().deep_link_response[attr])
+        })
+      }
+    )
 
-  it('sends the correct error log', () => {
-    expect(messageData().errorlog).toEqual(env.error_log)
-  })
+    it('sends the correct content items', () => {
+      expect(messageData().content_items).toMatchObject(env().deep_link_response.content_items)
+    })
 
-  it('sends the correct ltiEndpiont', () => {
-    expect(messageData().ltiEndpoint).toEqual('https://www.test.com/retrieve')
+    it('sends the correct message type', () => {
+      expect(messageData().messageType).toEqual('LtiDeepLinkingResponse')
+    })
   })
 })

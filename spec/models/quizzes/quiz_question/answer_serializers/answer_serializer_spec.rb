@@ -18,10 +18,10 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 describe Quizzes::QuizQuestion::AnswerSerializers::AnswerSerializer do
-  it 'automatically registers answer serializers' do
+  it "automatically registers answer serializers" do
     ases = Quizzes::QuizQuestion::AnswerSerializers
 
-    qq = { question_type: 'uber_hax_question' }
+    qq = { question_type: "uber_hax_question" }
 
     expect(ases.serializer_for(qq)).to be_kind_of(Quizzes::QuizQuestion::AnswerSerializers::Unknown)
 
@@ -33,7 +33,7 @@ describe Quizzes::QuizQuestion::AnswerSerializers::AnswerSerializer do
     expect(serializer.is_a?(ases::AnswerSerializer)).to be_truthy
   end
 
-  it 'has Error constant' do
-    expect { Quizzes::QuizQuestion::AnswerSerializers::Error.new('message') }.to_not raise_error
+  it "has Error constant" do
+    expect { Quizzes::QuizQuestion::AnswerSerializers::Error.new("message") }.to_not raise_error
   end
 end

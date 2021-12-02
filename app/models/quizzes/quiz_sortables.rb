@@ -48,12 +48,12 @@ class Quizzes::QuizSortables
   end
 
   def find_object_for_item(item)
-    all_objects_hash["quiz_#{item['type']}_#{item['id']}"]
+    all_objects_hash["quiz_#{item["type"]}_#{item["id"]}"]
   end
 
   def all_objects_hash
-    @quiz_objects_hash ||= all_objects.each_with_object({}) do |obj, hash|
-      hash["#{obj.class.name.demodulize.underscore}_#{obj.id}"] = obj
+    @quiz_objects_hash ||= all_objects.index_by do |obj|
+      "#{obj.class.name.demodulize.underscore}_#{obj.id}"
     end
   end
 
@@ -70,6 +70,6 @@ class Quizzes::QuizSortables
   end
 
   def quiz_group_id
-    group.id if group
+    group&.id
   end
 end

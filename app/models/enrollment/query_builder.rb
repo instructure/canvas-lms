@@ -75,10 +75,10 @@ class Enrollment
                    when :active
                      if @options[:strict_checks]
                        case @options[:course_workflow_state]
-                       when 'available'
+                       when "available"
                          # all active enrollments in a published and active course count
                          "enrollments.workflow_state='active'"
-                       when 'claimed'
+                       when "claimed"
                          # student and observer enrollments don't count as active if the
                          # course is unpublished
                          "enrollments.workflow_state='active' AND enrollments.type IN ('TeacherEnrollment','TaEnrollment','DesignerEnrollment','StudentViewEnrollment')"
@@ -93,7 +93,7 @@ class Enrollment
                        end
                      else
                        case @options[:course_workflow_state]
-                       when 'deleted'
+                       when "deleted"
                          # never include enrollments from deleted courses, even without
                          # strict checks
                          nil
@@ -109,10 +109,10 @@ class Enrollment
                    when :invited
                      if @options[:strict_checks]
                        case @options[:course_workflow_state]
-                       when 'available'
+                       when "available"
                          # all invited enrollments in a published and active course count
                          "enrollments.workflow_state='invited'"
-                       when 'deleted'
+                       when "deleted"
                          # never include enrollments from deleted courses
                          nil
                        when nil
@@ -126,7 +126,7 @@ class Enrollment
                        end
                      else
                        case @options[:course_workflow_state]
-                       when 'deleted'
+                       when "deleted"
                          # never include enrollments from deleted courses
                          nil
                        when nil
@@ -139,11 +139,11 @@ class Enrollment
                          "enrollments.workflow_state IN ('invited','creation_pending')"
                        end
                      end
-                   when :deleted;          "enrollments.workflow_state = 'deleted'"
-                   when :rejected;         "enrollments.workflow_state = 'rejected'"
-                   when :completed;        "enrollments.workflow_state = 'completed'"
-                   when :creation_pending; "enrollments.workflow_state = 'creation_pending'"
-                   when :inactive;         "enrollments.workflow_state = 'inactive'"
+                   when :deleted then          "enrollments.workflow_state = 'deleted'"
+                   when :rejected then         "enrollments.workflow_state = 'rejected'"
+                   when :completed then        "enrollments.workflow_state = 'completed'"
+                   when :creation_pending then "enrollments.workflow_state = 'creation_pending'"
+                   when :inactive then         "enrollments.workflow_state = 'inactive'"
                    end
 
       if conditions && @options[:course_workflow_state] && @options[:enforce_course_workflow_state]

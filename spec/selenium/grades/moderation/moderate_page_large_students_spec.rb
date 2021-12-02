@@ -17,29 +17,29 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../../common'
-require_relative '../pages/moderate_page'
-require_relative '../pages/speedgrader_page'
+require_relative "../../common"
+require_relative "../pages/moderate_page"
+require_relative "../pages/speedgrader_page"
 
-describe 'Moderation Page' do
-  include_context 'in-process server selenium tests'
+describe "Moderation Page" do
+  include_context "in-process server selenium tests"
 
   let(:grades) { [["10", "8"], ["9", "7"], ["5", "3"]] }
 
   before(:once) do
     @moderated_course = course_factory(course_name: "Moderated Course")
     # create and enroll 4 teachers in course
-    @teachers = create_users_in_course(@moderated_course, 4, return_type: :record, name_prefix: "Instructor", enrollment_type: 'TeacherEnrollment')
+    @teachers = create_users_in_course(@moderated_course, 4, return_type: :record, name_prefix: "Instructor", enrollment_type: "TeacherEnrollment")
     # create 25 students enrolled in moderated_course
     @students = create_users_in_course(@moderated_course, 25, return_type: :record, name_prefix: "Student")
 
     # create moderated assignment with teacher4 as final grader
     @assignment = @moderated_course.assignments.create!(
-      title: 'moderated assignment',
+      title: "moderated assignment",
       grader_count: 3,
       final_grader_id: @teachers[3].id,
-      submission_types: 'online_text_entry',
-      grading_type: 'points',
+      submission_types: "online_text_entry",
+      grading_type: "points",
       points_possible: 10,
       moderated_grading: true
     )
@@ -76,43 +76,43 @@ describe 'Moderation Page' do
     user_session(@teachers[3])
   end
 
-  it 'displays graders', priority: "1", test_id: 3505169 do
+  it "displays graders", priority: "1" do
     ModeratePage.visit(@moderated_course.id, @assignment.id)
     expect(ModeratePage.fetch_grader_count).to equal(3)
     expect(ModeratePage.grader_names).to contain_exactly(@teachers[0].name, @teachers[1].name, @teachers[2].name)
   end
 
-  it 'displays grades', priority: "1", test_id: 3505169 do
+  it "displays grades", priority: "1" do
     ModeratePage.visit(@moderated_course.id, @assignment.id)
-    expect(ModeratePage.fetch_grades(@students[0])).to contain_exactly(grades[1][0], grades[2][0], '–')
-    expect(ModeratePage.fetch_grades(@students[1])).to contain_exactly(grades[1][1], grades[2][1], '–')
+    expect(ModeratePage.fetch_grades(@students[0])).to contain_exactly(grades[1][0], grades[2][0], "–")
+    expect(ModeratePage.fetch_grades(@students[1])).to contain_exactly(grades[1][1], grades[2][1], "–")
   end
 
-  it 'displays first 20 students', priority: "1", test_id: 3505169 do
+  it "displays first 20 students", priority: "1" do
     ModeratePage.visit(@moderated_course.id, @assignment.id)
     expect(ModeratePage.fetch_student_count).to eq(20)
   end
 
-  it 'displays page 2 with remaining students', priority: "1", test_id: 3505169 do
+  it "displays page 2 with remaining students", priority: "1" do
     ModeratePage.visit(@moderated_course.id, @assignment.id)
     ModeratePage.click_page_number(2)
     expect(ModeratePage.fetch_student_count).to eq 5
   end
 
-  it 'navigates to the student submission in speedgrader', priority: "1", test_id: 3638363 do
+  it "navigates to the student submission in speedgrader", priority: "1" do
     ModeratePage.visit(@moderated_course.id, @assignment.id)
     ModeratePage.click_student_link(@students[1].name)
     expect(Speedgrader.selected_student).to include_text @students[1].name
   end
 
-  it 'navigates to an anonymous student submission in speedgrader', priority: "1", test_id: 3638364 do
+  it "navigates to an anonymous student submission in speedgrader", priority: "1" do
     @assignment.update!(anonymous_grading: true)
     ModeratePage.visit(@moderated_course.id, @assignment.id)
     ModeratePage.click_student_link("Student 2")
-    expect(Speedgrader.selected_student).to include_text 'Student 2'
+    expect(Speedgrader.selected_student).to include_text "Student 2"
   end
 
-  it 'accepts all grades for provisional grader', priority: "1", test_id: 3513993 do
+  it "accepts all grades for provisional grader", priority: "1" do
     ModeratePage.visit(@moderated_course.id, @assignment.id)
     ModeratePage.accept_grades_for_grader(@teachers[0])
 
@@ -121,7 +121,7 @@ describe 'Moderation Page' do
     end
   end
 
-  it 'will not accept grades when more than one grader', priority: "1", test_id: 3513993 do
+  it "will not accept grades when more than one grader", priority: "1" do
     ModeratePage.visit(@moderated_course.id, @assignment.id)
     expect(ModeratePage.accept_grades_button(@teachers[1])).to be_disabled
   end

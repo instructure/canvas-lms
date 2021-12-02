@@ -35,11 +35,11 @@ class NotificationPolicyOverride < ActiveRecord::Base
   belongs_to :context, polymorphic: [:account, :course]
   belongs_to :notification, inverse_of: :notification_policy_overrides
 
-  has_many :delayed_messages, inverse_of: :notification_policy_override, :dependent => :destroy
+  has_many :delayed_messages, inverse_of: :notification_policy_override, dependent: :destroy
 
   def self.enable_for_context(user, context, enable: true)
     user.shard.activate do
-      workflow_state = enable ? 'active' : 'disabled'
+      workflow_state = enable ? "active" : "disabled"
       cc_ids = user.communication_channels.pluck(:id)
       connection = NotificationPolicyOverride.connection
       values = cc_ids.map! do |cc_id|
@@ -51,12 +51,12 @@ class NotificationPolicyOverride < ActiveRecord::Base
           connection.quote(Time.zone.now),
           connection.quote(Time.zone.now)
         ]
-        "(#{vals.join(',')})"
+        "(#{vals.join(",")})"
       end
-      if values.size > 0
+      unless values.empty?
         # if the user has no communication channels, there really isn't anything
         # to do here for them.
-        connection.execute(<<~SQL)
+        connection.execute(<<~SQL.squish)
           INSERT INTO #{NotificationPolicyOverride.quoted_table_name}
             (context_id, context_type, communication_channel_id, workflow_state, created_at, updated_at)
             VALUES #{sanitize_sql(values.join(","))}
@@ -75,7 +75,7 @@ class NotificationPolicyOverride < ActiveRecord::Base
   end
 
   def self.enabled_for_all_contexts(user, contexts, channel: nil)
-    !(find_all_for(user, contexts, channel: channel).find { |npo| npo.notification_id.nil? && npo.workflow_state == 'disabled' })
+    !(find_all_for(user, contexts, channel: channel).find { |npo| npo.notification_id.nil? && npo.workflow_state == "disabled" })
   end
 
   def self.find_all_for(user, contexts, channel: nil)

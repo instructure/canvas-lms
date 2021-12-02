@@ -25,50 +25,50 @@ describe DashboardHelper do
     it "is true if the user has no current enrollments" do
       user_model
       @current_user = @user
-      expect(show_welcome_message?()).to be_truthy
+      expect(show_welcome_message?).to be_truthy
     end
 
     it "is false otherwise" do
-      course_with_student(:active_all => true)
+      course_with_student(active_all: true)
       @current_user = @student
-      expect(show_welcome_message?()).to be_falsey
+      expect(show_welcome_message?).to be_falsey
     end
   end
 
   context "user_dashboard_view" do
     before :once do
-      course_with_student(:active_all => true)
+      course_with_student(active_all: true)
       @current_user = @student
     end
 
     it "uses the account's default dashboard view setting if the user has not selected one" do
       @current_user.dashboard_view = nil
       @current_user.save!
-      @course.account.default_dashboard_view = 'activity'
+      @course.account.default_dashboard_view = "activity"
       @course.account.save!
-      expect(user_dashboard_view).to eq 'activity'
+      expect(user_dashboard_view).to eq "activity"
     end
 
     it "returns 'planner' if set" do
-      @current_user.dashboard_view = 'planner'
+      @current_user.dashboard_view = "planner"
       @current_user.save!
-      expect(user_dashboard_view).to eq 'planner'
+      expect(user_dashboard_view).to eq "planner"
     end
 
     it "is backwards compatible with the deprecated 'show_recent_activity' preference" do
       @current_user.preferences[:recent_activity_dashboard] = true
       @current_user.save!
-      expect(user_dashboard_view).to eq 'activity'
+      expect(user_dashboard_view).to eq "activity"
     end
 
     it "returns the correct value based on the user's setting" do
-      @current_user.dashboard_view = 'cards'
+      @current_user.dashboard_view = "cards"
       @current_user.save!
-      expect(user_dashboard_view).to eq 'cards'
+      expect(user_dashboard_view).to eq "cards"
 
-      @current_user.dashboard_view = 'activity'
+      @current_user.dashboard_view = "activity"
       @current_user.save!
-      expect(user_dashboard_view).to eq 'activity'
+      expect(user_dashboard_view).to eq "activity"
     end
   end
 
@@ -95,7 +95,7 @@ describe DashboardHelper do
         )
         @current_user = user
         mapped_courses = map_courses_for_menu(courses)
-        expect(mapped_courses.map { |h| h[:id] }).to eq [course3.id, course2.id, course1.id]
+        expect(mapped_courses.pluck(:id)).to eq [course3.id, course2.id, course1.id]
       end
 
       it "handles sorting even when positions are strings" do
@@ -114,7 +114,7 @@ describe DashboardHelper do
         )
         @current_user = user
         mapped_courses = map_courses_for_menu(courses)
-        expect(mapped_courses.map { |h| h[:id] }).to eq [course3.id, course2.id, course1.id]
+        expect(mapped_courses.pluck(:id)).to eq [course3.id, course2.id, course1.id]
       end
 
       it "handles sorting even when positions are nil" do
@@ -133,7 +133,7 @@ describe DashboardHelper do
         )
         @current_user = user
         mapped_courses = map_courses_for_menu(courses)
-        expect(mapped_courses.map { |h| h[:id] }).to eq [course3.id, course2.id, course1.id]
+        expect(mapped_courses.pluck(:id)).to eq [course3.id, course2.id, course1.id]
       end
     end
   end

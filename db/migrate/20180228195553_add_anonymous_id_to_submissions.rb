@@ -27,7 +27,7 @@ class AddAnonymousIdToSubmissions < ActiveRecord::Migration[5.0]
     add_index :submissions,
               %i[assignment_id anonymous_id],
               unique: true,
-              where: 'anonymous_id IS NOT NULL',
+              where: "anonymous_id IS NOT NULL",
               algorithm: :concurrently
   end
 end

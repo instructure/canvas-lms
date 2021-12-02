@@ -19,13 +19,13 @@
 #
 
 describe GradingPeriodsHelper do
-  describe '#grading_period_set_title' do
-    it 'uses the grading period set title when present' do
+  describe "#grading_period_set_title" do
+    it "uses the grading period set title when present" do
       group = GradingPeriodGroup.new(title: "Example Set")
       expect(helper.grading_period_set_title(group, "Account Name")).to eql("Example Set")
     end
 
-    it 'uses the given account name when the set has no title' do
+    it "uses the given account name when the set has no title" do
       group = GradingPeriodGroup.new
       expect(helper.grading_period_set_title(group, "Account Name")).to match(/Account Name/)
     end

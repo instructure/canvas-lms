@@ -48,7 +48,7 @@ module RollupScoreAggregatorHelper
   end
 
   def scaled_score_from_result(result)
-    if ['decaying_average', 'latest'].include?(@calculation_method)
+    if ["decaying_average", "latest"].include?(@calculation_method)
       result_aggregates = get_aggregates(result)
       alignment_aggregate_score(result_aggregates)
     else
@@ -72,17 +72,16 @@ module RollupScoreAggregatorHelper
   end
 
   def get_aggregates(result)
-    @outcome_results.reduce({ total: 0.0, weighted: 0.0 }) do |aggregate, lor|
-      if is_match?(result, lor) && lor.possible
-        aggregate[:total] += lor.possible
-        begin
-          aggregate[:weighted] += lor.possible * lor.percent
-        rescue NoMethodError, TypeError => e
-          Canvas::Errors.capture_exception(:missing_percent_or_points_possible, e)
-          raise e
-        end
+    @outcome_results.each_with_object({ total: 0.0, weighted: 0.0 }) do |lor, aggregate|
+      next unless is_match?(result, lor) && lor.possible
+
+      aggregate[:total] += lor.possible
+      begin
+        aggregate[:weighted] += lor.possible * lor.percent
+      rescue NoMethodError, TypeError => e
+        Canvas::Errors.capture_exception(:missing_percent_or_points_possible, e)
+        raise e
       end
-      aggregate
     end
   end
 
@@ -112,11 +111,11 @@ module RollupScoreAggregatorHelper
   def score_sets
     @score_sets || begin
       case @calculation_method
-      when 'decaying_average'
+      when "decaying_average"
         @score_sets = retrieve_scores(@aggregate ? @outcome_results : sorted_results)
-      when 'n_mastery', 'highest'
+      when "n_mastery", "highest"
         @score_sets = retrieve_scores(@outcome_results)
-      when 'latest'
+      when "latest"
         @score_sets = retrieve_scores(@aggregate ? @outcome_results : [sorted_results.last])
       end
     end

@@ -17,19 +17,19 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../common'
+require_relative "../common"
 
 describe "login logout test" do
   include_context "in-process server selenium tests"
 
   def should_show_message(message_text, selector)
     expect(fj(selector)).to include_text(message_text)
-    expect(f('#flash_screenreader_holder')).to have_attribute("textContent", message_text)
+    expect(f("#flash_screenreader_holder")).to have_attribute("textContent", message_text)
   end
 
   def go_to_forgot_password
     get "/"
-    f('#login_forgot_password').click
+    f("#login_forgot_password").click
   end
 
   before do
@@ -38,7 +38,7 @@ describe "login logout test" do
   end
 
   it "logins successfully with correct username and password", :xbrowser, priority: "2" do
-    user_with_pseudonym({ :active_user => true })
+    user_with_pseudonym({ active_user: true })
     login_as
     expect(f('[aria-label="Profile tray"] h2').text).to eq @user.primary_pseudonym.unique_id
   end
@@ -77,26 +77,26 @@ describe "login logout test" do
     expect(driver.current_url).to eq expected_url
   end
 
-  it "validates forgot my password functionality for email account", priority: "1", test_id: 126922 do
-    user_with_pseudonym({ :active_user => true })
+  it "validates forgot my password functionality for email account", priority: "1" do
+    user_with_pseudonym({ active_user: true })
     go_to_forgot_password
-    f('#pseudonym_session_unique_id_forgot').send_keys(@user.primary_pseudonym.unique_id)
-    submit_form('#forgot_password_form')
+    f("#pseudonym_session_unique_id_forgot").send_keys(@user.primary_pseudonym.unique_id)
+    submit_form("#forgot_password_form")
     wait_for_ajaximations
     assert_flash_notice_message "Your password recovery instructions will be sent to #{@user.primary_pseudonym.unique_id}"
   end
 
   it "validates back button works in forgot password page", priority: "2" do
     go_to_forgot_password
-    f('.login_link').click
-    expect(f('#login_form')).to be_displayed
+    f(".login_link").click
+    expect(f("#login_form")).to be_displayed
   end
 
   it "fails on an invalid authenticity token", priority: "1" do
-    user_with_pseudonym({ :active_user => true })
+    user_with_pseudonym({ active_user: true })
     get "/login"
     driver.execute_script "$.cookie('_csrf_token', '42')"
-    fill_in_login_form("nobody@example.com", 'asdfasdf')
+    fill_in_login_form("nobody@example.com", "asdfasdf")
     assert_flash_error_message "Invalid Authenticity Token"
   ensure
     driver.execute_script "$.cookie('_csrf_token', '', { expires: -1 })"
@@ -108,7 +108,7 @@ describe "login logout test" do
     get "/login"
     driver.execute_script "$.cookie('_csrf_token', '', { expires: -1 })"
     driver.execute_script "$('[name=authenticity_token]').remove()"
-    fill_in_login_form("nobody@example.com", 'asdfasdf')
+    fill_in_login_form("nobody@example.com", "asdfasdf")
     expect(displayed_username).to eq @user.primary_pseudonym.unique_id
   end
 end

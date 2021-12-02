@@ -110,7 +110,7 @@ class MigrationIssuesController < ApplicationController
   # @returns [MigrationIssue]
   def index
     @issues = Api.paginate(@content_migration.migration_issues.by_created_at, self, api_v1_course_content_migration_migration_issue_list_url(@context, @content_migration))
-    render :json => migration_issues_json(@issues, @content_migration, @current_user, session)
+    render json: migration_issues_json(@issues, @content_migration, @current_user, session)
   end
 
   # @API Get a migration issue
@@ -125,7 +125,7 @@ class MigrationIssuesController < ApplicationController
   # @returns MigrationIssue
   def show
     issue = @content_migration.migration_issues.find(params[:id])
-    render :json => migration_issue_json(issue, @content_migration, @current_user, session)
+    render json: migration_issue_json(issue, @content_migration, @current_user, session)
   end
 
   # @API Update a migration issue
@@ -144,15 +144,15 @@ class MigrationIssuesController < ApplicationController
   def update
     issue = @content_migration.migration_issues.find(params[:id])
 
-    if ['active', 'resolved'].member? params[:workflow_state]
+    if ["active", "resolved"].member? params[:workflow_state]
       issue.workflow_state = params[:workflow_state]
       if issue.save
-        render :json => migration_issue_json(issue, @content_migration, @current_user, session)
+        render json: migration_issue_json(issue, @content_migration, @current_user, session)
       else
-        render :json => issue.errors, :status => :bad_request
+        render json: issue.errors, status: :bad_request
       end
     else
-      render(:json => { :message => t('errors.valid_workflow_state', "Must send a valid workflow state") }, :status => 403)
+      render(json: { message: t("errors.valid_workflow_state", "Must send a valid workflow state") }, status: :forbidden)
     end
   end
 
@@ -160,6 +160,6 @@ class MigrationIssuesController < ApplicationController
 
   def require_content_migration
     @content_migration = @context.content_migrations.find(params[:content_migration_id])
-    return authorized_action(@context, @current_user, :manage_content)
+    authorized_action(@context, @current_user, :manage_content)
   end
 end

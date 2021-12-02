@@ -8,7 +8,7 @@ class AddDefaultShardIndex < ActiveRecord::Migration[4.2]
     Switchman::Shard.where(default: nil).update_all(default: false)
     change_column_default :switchman_shards, :default, false
     change_column_null :switchman_shards, :default, false
-    options = if connection.adapter_name == 'PostgreSQL'
+    options = if connection.adapter_name == "PostgreSQL"
                 { unique: true, where: "\"default\"" }
               else
                 {}

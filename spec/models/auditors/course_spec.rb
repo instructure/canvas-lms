@@ -18,17 +18,17 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../../cassandra_spec_helper'
+require_relative "../../cassandra_spec_helper"
 
 describe Auditors::Course do
   let(:request_id) { 42 }
 
   before do
-    allow(RequestContextGenerator).to receive_messages(:request_id => request_id)
+    allow(RequestContextGenerator).to receive_messages(request_id: request_id)
 
     @account = Account.default
-    @sub_account = Account.create!(:parent_account => @account)
-    @sub_sub_account = Account.create!(:parent_account => @sub_account)
+    @sub_account = Account.create!(parent_account: @account)
+    @sub_sub_account = Account.create!(parent_account: @sub_account)
 
     course_with_teacher(course_name: "Course 1", account: @sub_sub_account)
 
@@ -39,7 +39,7 @@ describe Auditors::Course do
 
   describe "with cassandra backend" do
     before do
-      allow(Audits).to receive(:config).and_return({ 'write_paths' => ['cassandra'], 'read_path' => 'cassandra' })
+      allow(Audits).to receive(:config).and_return({ "write_paths" => ["cassandra"], "read_path" => "cassandra" })
     end
 
     include_examples "cassandra audit logs"
@@ -47,8 +47,8 @@ describe Auditors::Course do
     context "nominal cases" do
       it "includes event" do
         @event = Auditors::Course.record_updated(@course, @teacher, @course.changes)
-        expect(Auditors::Course.for_course(@course).paginate(:per_page => 5)).to include(@event)
-        expect(Auditors::Course.for_account(@course.account).paginate(:per_page => 5)).to include(@event)
+        expect(Auditors::Course.for_course(@course).paginate(per_page: 5)).to include(@event)
+        expect(Auditors::Course.for_account(@course.account).paginate(per_page: 5)).to include(@event)
       end
 
       it "sets request_id" do
@@ -164,33 +164,33 @@ describe Auditors::Course do
         @event = Auditors::Course.record_updated(@course, @teacher, @course.changes)
 
         record = Auditors::Course::Record.new(
-          'course' => @course,
-          'user' => @teacher,
-          'event_type' => 'updated',
-          'event_data' => @course.changes,
-          'event_source' => 'manual',
-          'sis_batch_id' => nil,
-          'created_at' => 1.day.ago
+          "course" => @course,
+          "user" => @teacher,
+          "event_type" => "updated",
+          "event_data" => @course.changes,
+          "event_source" => "manual",
+          "sis_batch_id" => nil,
+          "created_at" => 1.day.ago
         )
         @event2 = Auditors::Course::Stream.insert(record)
       end
 
       it "recognizes :oldest" do
-        page = Auditors::Course.for_course(@course, oldest: 12.hours.ago).paginate(:per_page => 2)
+        page = Auditors::Course.for_course(@course, oldest: 12.hours.ago).paginate(per_page: 2)
         expect(page).to include(@event)
         expect(page).not_to include(@event2)
 
-        acct_page = Auditors::Course.for_account(@course.account, oldest: 12.hours.ago).paginate(:per_page => 2)
+        acct_page = Auditors::Course.for_account(@course.account, oldest: 12.hours.ago).paginate(per_page: 2)
         expect(acct_page).to include(@event)
         expect(acct_page).not_to include(@event2)
       end
 
       it "recognizes :newest" do
-        page = Auditors::Course.for_course(@course, newest: 12.hours.ago).paginate(:per_page => 2)
+        page = Auditors::Course.for_course(@course, newest: 12.hours.ago).paginate(per_page: 2)
         expect(page).to include(@event2)
         expect(page).not_to include(@event)
 
-        acct_page = Auditors::Course.for_account(@course.account, newest: 12.hours.ago).paginate(:per_page => 2)
+        acct_page = Auditors::Course.for_account(@course.account, newest: 12.hours.ago).paginate(per_page: 2)
         expect(acct_page).to include(@event2)
         expect(acct_page).not_to include(@event)
       end
@@ -199,13 +199,13 @@ describe Auditors::Course do
 
   describe "with dual writing enabled to postgres" do
     before do
-      allow(Audits).to receive(:config).and_return({ 'write_paths' => ['cassandra', 'active_record'], 'read_path' => 'cassandra' })
+      allow(Audits).to receive(:config).and_return({ "write_paths" => ["cassandra", "active_record"], "read_path" => "cassandra" })
     end
 
     it "writes to cassandra" do
       event = Auditors::Course.record_updated(@course, @teacher, @course.changes)
       expect(Audits.write_to_cassandra?).to eq(true)
-      expect(Auditors::Course.for_course(@course).paginate(:per_page => 5)).to include(event)
+      expect(Auditors::Course.for_course(@course).paginate(per_page: 5)).to include(event)
     end
 
     it "writes to postgres" do

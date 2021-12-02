@@ -40,7 +40,7 @@ module GraphQLNodeLoader
     when "SectionBySis"
       Loaders::SISIDLoader.for(CourseSection).load(id).then(check_read_permission)
     when "User"
-      Loaders::IDLoader.for(User).load(id).then(->(user) do
+      Loaders::IDLoader.for(User).load(id).then(lambda do |user|
         return nil unless user && ctx[:current_user]
 
         return user if user.grants_right?(ctx[:current_user], :read_full_profile)
@@ -92,13 +92,13 @@ module GraphQLNodeLoader
       end
     when "GradingPeriod"
       Loaders::IDLoader.for(GradingPeriod).load(id).then(check_read_permission)
-    when 'MediaObject'
+    when "MediaObject"
       Loaders::MediaObjectLoader.load(id)
     when "Module"
       Loaders::IDLoader.for(ContextModule).load(id).then do |mod|
         Loaders::AssociationLoader.for(ContextModule, :context)
                                   .load(mod)
-                                  .then { check_read_permission.(mod) }
+                                  .then { check_read_permission.call(mod) }
       end
     when "ModuleItem"
       Loaders::IDLoader.for(ContentTag).load(id).then do |tag|
@@ -118,7 +118,7 @@ module GraphQLNodeLoader
           Promise.all([
                         Loaders::AssociationLoader.for(Wiki, :course).load(wiki),
                         Loaders::AssociationLoader.for(Wiki, :group).load(wiki),
-                      ]).then { check_read_permission.(page) }
+                      ]).then { check_read_permission.call(page) }
         end
       end
     when "PostPolicy"
@@ -159,7 +159,7 @@ module GraphQLNodeLoader
           progress
         end
       end
-    when 'Rubric'
+    when "Rubric"
       Loaders::IDLoader.for(Rubric).load(id).then(check_read_permission)
     when "Term"
       Loaders::IDLoader.for(EnrollmentTerm).load(id).then do |enrollment_term|
@@ -235,9 +235,9 @@ module GraphQLNodeLoader
   end
 
   def self.make_permission_check(ctx, *permissions)
-    ->(o) {
+    lambda do |o|
       o&.grants_any_right?(ctx[:current_user], ctx[:session], *permissions) ? o : nil
-    }
+    end
   end
 
   class UnsupportedTypeError < StandardError; end

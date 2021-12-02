@@ -50,8 +50,8 @@ describe AssetUserAccessLog do
 
   describe "write path" do
     before(:once) do
-      @course = Account.default.courses.create!(name: 'My Course')
-      @assignment = @course.assignments.create!(title: 'My Assignment')
+      @course = Account.default.courses.create!(name: "My Course")
+      @assignment = @course.assignments.create!(title: "My Assignment")
       @user = User.create!
       @asset = factory_with_protected_attributes(AssetUserAccess, user: @user, context: @course, asset_code: @assignment.asset_string)
       @asset.display_name = @assignment.asset_string
@@ -152,11 +152,11 @@ describe AssetUserAccessLog do
       Setting.set("aua_log_batch_size", "100")
       Setting.set("aua_log_truncation_enabled", "true")
       ps = PluginSetting.find_or_initialize_by(name: "asset_user_access_logs", inheritance_scope: "shard")
-      ps.settings = { max_log_ids: [0, 0, 0, 0, 0, 0, 0], write_path: 'log' }
+      ps.settings = { max_log_ids: [0, 0, 0, 0, 0, 0, 0], write_path: "log" }
       ps.save!
       @account = Account.default
-      @course = @account.courses.create!(name: 'My Course')
-      @assignment = @course.assignments.create!(title: 'My Assignment')
+      @course = @account.courses.create!(name: "My Course")
+      @assignment = @course.assignments.create!(title: "My Assignment")
       @user_1 = User.create!
       @user_2 = User.create!
       @user_3 = User.create!
@@ -293,7 +293,7 @@ describe AssetUserAccessLog do
 
       it "can skip over gaps in the sequence" do
         Timecop.freeze do
-          Setting.set('aua_log_seq_jumps_allowed', 'true')
+          Setting.set("aua_log_seq_jumps_allowed", "true")
           model = AssetUserAccessLog.log_model(Time.now.utc)
           generate_log([@asset_1, @asset_2, @asset_3], 2)
           AssetUserAccessLog.compact
@@ -455,8 +455,8 @@ describe AssetUserAccessLog do
         @account1 = Account.default
         @account2 = account_model(root_account_id: nil)
 
-        @course2 = @account2.courses.create!(name: 'My Course')
-        @assignment2 = @course2.assignments.create!(title: 'My Other Assignment')
+        @course2 = @account2.courses.create!(name: "My Course")
+        @assignment2 = @course2.assignments.create!(title: "My Other Assignment")
         @user_6 = User.create!
         @user_7 = User.create!
         @user_8 = User.create!

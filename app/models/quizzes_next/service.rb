@@ -24,7 +24,7 @@ module QuizzesNext
 
     def self.active_lti_assignments_for_course(course, selected_assignment_ids: nil)
       scope = course.assignments.active.type_quiz_lti
-      scope = scope.where(:id => selected_assignment_ids) if selected_assignment_ids
+      scope = scope.where(id: selected_assignment_ids) if selected_assignment_ids
       scope.to_a
     end
 

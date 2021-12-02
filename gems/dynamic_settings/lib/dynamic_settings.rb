@@ -17,18 +17,18 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'logger'
-require 'active_support'
-require 'active_support/core_ext'
-require 'config_file'
-require 'diplomat'
-require 'dynamic_settings/circuit_breaker'
-require 'dynamic_settings/memory_cache'
-require 'dynamic_settings/fallback_proxy'
-require 'dynamic_settings/prefix_proxy'
+require "logger"
+require "active_support"
+require "active_support/core_ext"
+require "config_file"
+require "diplomat"
+require "dynamic_settings/circuit_breaker"
+require "dynamic_settings/memory_cache"
+require "dynamic_settings/fallback_proxy"
+require "dynamic_settings/prefix_proxy"
 
 module DynamicSettings
-  CONSUL_READ_OPTIONS = %i{recurse stale}.freeze
+  CONSUL_READ_OPTIONS = %i[recurse stale].freeze
   KV_NAMESPACE = "config/canvas"
   CACHE_KEY_PREFIX = "dynamic_settings/"
 
@@ -41,25 +41,25 @@ module DynamicSettings
       @config = conf_hash
       if conf_hash.present?
         Diplomat.configure do |config|
-          need_ssl = conf_hash.fetch('ssl', true)
-          config.url = "#{need_ssl ? 'https://' : 'http://'}#{conf_hash.fetch('host')}:#{conf_hash.fetch('port')}"
-          config.acl_token = conf_hash.fetch('acl_token', nil)
+          need_ssl = conf_hash.fetch("ssl", true)
+          config.url = "#{need_ssl ? "https://" : "http://"}#{conf_hash.fetch("host")}:#{conf_hash.fetch("port")}"
+          config.acl_token = conf_hash.fetch("acl_token", nil)
 
           options = { request: {} }
-          options[:request][:open_timeout] = conf_hash['connect_timeout'] if conf_hash['connect_timeout']
-          options[:request][:write_timeout] = conf_hash['send_timeout'] if conf_hash['send_timeout']
-          options[:request][:read_timeout] = conf_hash['receive_timeout'] if conf_hash['receive_timeout']
+          options[:request][:open_timeout] = conf_hash["connect_timeout"] if conf_hash["connect_timeout"]
+          options[:request][:write_timeout] = conf_hash["send_timeout"] if conf_hash["send_timeout"]
+          options[:request][:read_timeout] = conf_hash["receive_timeout"] if conf_hash["receive_timeout"]
           config.options = options
         end
 
-        @environment = conf_hash['environment']
+        @environment = conf_hash["environment"]
         @use_consul = true
-        @data_center = conf_hash.fetch('global_dc', nil)
-        @default_service = conf_hash.fetch('service', :canvas)
-        @cache = conf_hash.fetch('cache', ::DynamicSettings::MemoryCache.new)
-        @fallback_recovery_lambda = conf_hash.fetch('fallback_recovery_lambda', nil)
-        @retry_lambda = conf_hash.fetch('retry_lambda', nil)
-        @logger = conf_hash.fetch('logger', nil)
+        @data_center = conf_hash.fetch("global_dc", nil)
+        @default_service = conf_hash.fetch("service", :canvas)
+        @cache = conf_hash.fetch("cache", ::DynamicSettings::MemoryCache.new)
+        @fallback_recovery_lambda = conf_hash.fetch("fallback_recovery_lambda", nil)
+        @retry_lambda = conf_hash.fetch("retry_lambda", nil)
+        @logger = conf_hash.fetch("logger", nil)
       else
         @environment = nil
         @use_consul = false
@@ -135,10 +135,10 @@ module DynamicSettings
           cluster: cluster,
           default_ttl: default_ttl,
           data_center: data_center || @data_center,
-          query_logging: @config.fetch('query_logging', true),
-          retry_limit: @config.fetch('retry_limit', 1),
-          retry_base: @config.fetch('retry_base', 1.4),
-          circuit_breaker: @config.fetch('circuit_breaker', nil)
+          query_logging: @config.fetch("query_logging", true),
+          retry_limit: @config.fetch("retry_limit", 1),
+          retry_base: @config.fetch("retry_base", 1.4),
+          circuit_breaker: @config.fetch("circuit_breaker", nil)
         )
       else
         proxy = root_fallback_proxy
@@ -151,7 +151,7 @@ module DynamicSettings
     alias_method :kv_proxy, :find
 
     def reset_cache!
-      cache.delete_matched(/^#{CACHE_KEY_PREFIX}/)
+      cache.delete_matched(/^#{CACHE_KEY_PREFIX}/o)
     end
   end
 end

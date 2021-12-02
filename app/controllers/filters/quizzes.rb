@@ -22,10 +22,10 @@ module Filters::Quizzes
   protected
 
   def require_quiz
-    id = params.has_key?(:quiz_id) ? params[:quiz_id] : params[:id]
+    id = params.key?(:quiz_id) ? params[:quiz_id] : params[:id]
 
     unless (@quiz = @context.quizzes.find(id))
-      raise ActiveRecord::RecordNotFound.new('Quiz not found')
+      raise ActiveRecord::RecordNotFound, "Quiz not found"
     end
 
     @quiz
@@ -34,7 +34,7 @@ module Filters::Quizzes
   def require_course
     @course = api_find(Course.active, params[:course_id])
     params[:context_id] = params[:course_id]
-    params[:context_type] = 'Course'
+    params[:context_type] = "Course"
     authorized_action(@course, @current_user, :read)
   end
 end

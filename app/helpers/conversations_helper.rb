@@ -34,10 +34,10 @@ module ConversationsHelper
     user_note:
   )
     if conversation.conversation.replies_locked_for?(current_user)
-      raise ConversationsHelper::RepliesLockedForUser.new(message: I18n.t('Unauthorized, unable to add messages to conversation'), status: :unauthorized, attribute: "workflow_state")
+      raise ConversationsHelper::RepliesLockedForUser.new(message: I18n.t("Unauthorized, unable to add messages to conversation"), status: :unauthorized, attribute: "workflow_state")
     end
 
-    if context.is_a?(Course) && context.workflow_state == 'completed' && !context.grants_right?(current_user, session, :read_as_admin)
+    if context.is_a?(Course) && context.workflow_state == "completed" && !context.grants_right?(current_user, session, :read_as_admin)
       raise ConversationsHelper::Error.new(message: I18n.t("Course concluded, unable to send messages"), status: :unauthorized, attribute: "workflow_state")
     end
 
@@ -88,7 +88,7 @@ module ConversationsHelper
   end
 
   def contexts_for(audience, context_tags)
-    result = { :courses => {}, :groups => {} }
+    result = { courses: {}, groups: {} }
     return result if audience.empty?
 
     context_tags.each do |tag|
@@ -101,7 +101,7 @@ module ConversationsHelper
       enrollments = Shard.partition_by_shard(result[:courses].keys) do |course_ids|
         next unless audience.first.associated_shards.include?(Shard.current)
 
-        Enrollment.where(course_id: course_ids, user_id: audience.first.id, workflow_state: 'active').select([:course_id, :type]).to_a
+        Enrollment.where(course_id: course_ids, user_id: audience.first.id, workflow_state: "active").select([:course_id, :type]).to_a
       end
       enrollments.each do |enrollment|
         result[:courses][enrollment.course_id] << enrollment.type
@@ -110,10 +110,10 @@ module ConversationsHelper
       memberships = Shard.partition_by_shard(result[:groups].keys) do |group_ids|
         next unless audience.first.associated_shards.include?(Shard.current)
 
-        GroupMembership.where(group_id: group_ids, user_id: audience.first.id, workflow_state: 'accepted').select(:group_id).to_a
+        GroupMembership.where(group_id: group_ids, user_id: audience.first.id, workflow_state: "accepted").select(:group_id).to_a
       end
       memberships.each do |membership|
-        result[:groups][membership.group_id] = ['Member']
+        result[:groups][membership.group_id] = ["Member"]
       end
     end
     result
@@ -146,6 +146,17 @@ module ConversationsHelper
       conversation_id: conversation_id,
       strict_checks: !Account.site_admin.grants_right?(current_user, session, :send_messages)
     )
+
+    # include users that were already part of the given conversation
+    if conversation_id && conversation_id != ""
+      unknown_users = users - known.pluck(:id)
+      conversation_participant_ids = Conversation.find(conversation_id).participants.pluck(:id)
+      unknown_users = unknown_users.select do |unknown_user|
+        conversation_participant_ids.include?(unknown_user)
+      end
+      known.concat(unknown_users.map { |id| MessageableUser.find(id) })
+    end
+
     contexts.each { |c| known.concat(current_user.address_book.known_in_context(c)) }
     @recipients = known.uniq(&:id)
     @recipients.reject! { |u| u.id == current_user.id } unless @recipients == [current_user] && recipients.count == 1
@@ -269,7 +280,7 @@ module ConversationsHelper
       raise InvalidContextError
     end
 
-    if context.is_a?(Course) && context.workflow_state == 'completed' && !context.grants_right?(@current_user, session, :read_as_admin)
+    if context.is_a?(Course) && context.workflow_state == "completed" && !context.grants_right?(@current_user, session, :read_as_admin)
       raise CourseConcludedError
     end
   end

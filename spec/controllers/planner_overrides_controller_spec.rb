@@ -22,7 +22,7 @@ describe PlannerOverridesController do
   before :once do
     course_with_teacher(active_all: true)
     student_in_course(active_all: true)
-    @group = @course.assignment_groups.create(:name => "some group")
+    @group = @course.assignment_groups.create(name: "some group")
     @assignment = course_assignment
     @assignment2 = course_assignment
     @planner_override = PlannerOverride.create!(plannable_id: @assignment.id,
@@ -32,12 +32,11 @@ describe PlannerOverridesController do
   end
 
   def course_assignment
-    assignment = @course.assignments.create(
-      :title => "some assignment #{@course.assignments.count}",
-      :assignment_group => @group,
-      :due_at => Time.zone.now + 1.week
+    @course.assignments.create(
+      title: "some assignment #{@course.assignments.count}",
+      assignment_group: @group,
+      due_at: Time.zone.now + 1.week
     )
-    assignment
   end
 
   context "unauthenticated" do
@@ -45,9 +44,9 @@ describe PlannerOverridesController do
       get :index
       assert_unauthorized
 
-      post :create, params: { :plannable_type => "assignment",
-                              :plannable_id => @assignment.id,
-                              :marked_complete => false }
+      post :create, params: { plannable_type: "assignment",
+                              plannable_id: @assignment.id,
+                              marked_complete: false }
       assert_unauthorized
     end
   end
@@ -100,9 +99,9 @@ describe PlannerOverridesController do
 
       it "saves announcement overrides with a plannable_type of announcement" do
         announcement_model(context: @course)
-        post :create, params: { plannable_type: 'announcement', plannable_id: @a.id, user_id: @student.id, marked_complete: true }
+        post :create, params: { plannable_type: "announcement", plannable_id: @a.id, user_id: @student.id, marked_complete: true }
         json = json_parse(response.body)
-        expect(json["plannable_type"]).to eq 'announcement'
+        expect(json["plannable_type"]).to eq "announcement"
       end
 
       it "gracefully handles duplicate request race condition" do

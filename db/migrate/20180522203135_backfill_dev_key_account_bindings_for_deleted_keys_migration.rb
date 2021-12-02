@@ -21,6 +21,6 @@ class BackfillDevKeyAccountBindingsForDeletedKeysMigration < ActiveRecord::Migra
   tag :postdeploy
 
   def up
-    ::DataFixup::BackfillDevKeyAccountBindingsForDeletedKeys.delay_if_production(priority: Delayed::LOW_PRIORITY, n_strand: 'long_datafixups').run
+    ::DataFixup::BackfillDevKeyAccountBindingsForDeletedKeys.delay_if_production(priority: Delayed::LOW_PRIORITY, n_strand: "long_datafixups").run
   end
 end

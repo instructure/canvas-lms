@@ -33,7 +33,7 @@ if settings.present?
     config.silence_ready = true
     config.dsn = settings[:dsn]
     config.current_environment = Canvas.environment
-    config.tags = settings.fetch(:tags, {}).merge('canvas_revision' => Canvas.revision)
+    config.tags = settings.fetch(:tags, {}).merge("canvas_revision" => Canvas.revision)
     config.release = Canvas.revision
     config.sanitize_fields += Rails.application.config.filter_parameters.map(&:to_s)
     config.sanitize_credit_cards = false
@@ -41,7 +41,7 @@ if settings.present?
     # thrown to drive client facing behavior.  A good example
     # are login/auth exceptions.  Exceptions that are simply noisy/inconvenient
     # should probably be caught and solved...
-    config.excluded_exceptions += %w{
+    config.excluded_exceptions += %w[
       AuthenticationMethods::AccessTokenError
       AuthenticationMethods::AccessTokenScopeError
       AuthenticationMethods::LoggedOutError
@@ -50,11 +50,11 @@ if settings.present?
       Turnitin::Errors::SubmissionNotScoredError
       Rack::QueryParser::InvalidParameterError
       PG::UnableToSend
-    }
+    ]
   end
 
   Rails.configuration.to_prepare do
-    Setting.get('ignorable_errors', '').split(',').each do |error|
+    Setting.get("ignorable_errors", "").split(",").each do |error|
       SentryProxy.register_ignorable_error(error)
     end
 
@@ -62,8 +62,8 @@ if settings.present?
     SentryProxy.register_ignorable_error("Grade pass back failure")
 
     CanvasErrors.register!(:sentry_notification) do |exception, data, level|
-      setting = Setting.get("sentry_error_logging_enabled", 'true')
-      SentryProxy.capture(exception, data, level) if setting == 'true'
+      setting = Setting.get("sentry_error_logging_enabled", "true")
+      SentryProxy.capture(exception, data, level) if setting == "true"
     end
   end
 end

@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../../cassandra_spec_helper'
+require_relative "../../cassandra_spec_helper"
 
 describe Auditors::GradeChange do
   before(:all) do
@@ -30,22 +30,22 @@ describe Auditors::GradeChange do
   before do
     allow(RequestContextGenerator).to receive_messages(request_id: request_id)
 
-    shard_class = Class.new {
+    shard_class = Class.new do
       define_method(:activate) { |&b| b.call }
-    }
+    end
 
-    EventStream.current_shard_lookup = lambda {
+    EventStream.current_shard_lookup = lambda do
       shard_class.new
-    }
+    end
 
     @account = Account.default
-    @sub_account = Account.create!(:parent_account => @account)
-    @sub_sub_account = Account.create!(:parent_account => @sub_account)
+    @sub_account = Account.create!(parent_account: @account)
+    @sub_sub_account = Account.create!(parent_account: @sub_account)
 
     course_with_teacher(account: @sub_sub_account)
     student_in_course
 
-    @assignment = @course.assignments.create!(:title => 'Assignment', :points_possible => 10)
+    @assignment = @course.assignments.create!(title: "Assignment", points_possible: 10)
     @submission = @assignment.grade_student(@student, grade: 8, grader: @teacher).first
     @event_time = Time.zone.at(1.hour.ago.to_i) # cassandra doesn't remember microseconds
   end
@@ -53,7 +53,7 @@ describe Auditors::GradeChange do
   describe "with cassandra backend" do
     include_examples "cassandra audit logs"
     before do
-      allow(Audits).to receive(:config).and_return({ 'write_paths' => ['cassandra'], 'read_path' => 'cassandra' })
+      allow(Audits).to receive(:config).and_return({ "write_paths" => ["cassandra"], "read_path" => "cassandra" })
       Timecop.freeze(@event_time) { @event = Auditors::GradeChange.record(submission: @submission) }
     end
 
@@ -89,16 +89,16 @@ describe Auditors::GradeChange do
 
       it "includes event" do
         expect(@event.created_at).to eq @event_time
-        expect(Auditors::GradeChange.for_assignment(@assignment).paginate(:per_page => 5)).to include(@event)
-        expect(Auditors::GradeChange.for_course(@course).paginate(:per_page => 5)).to include(@event)
+        expect(Auditors::GradeChange.for_assignment(@assignment).paginate(per_page: 5)).to include(@event)
+        expect(Auditors::GradeChange.for_course(@course).paginate(per_page: 5)).to include(@event)
         expect(Auditors::GradeChange.for_root_account_student(@account, @student)
-                .paginate(:per_page => 5)).to include(@event)
+                .paginate(per_page: 5)).to include(@event)
         expect(Auditors::GradeChange.for_root_account_grader(@account, @teacher)
-                .paginate(:per_page => 5)).to include(@event)
+                .paginate(per_page: 5)).to include(@event)
 
         test_course_and_other_contexts do |contexts|
           expect(Auditors::GradeChange.for_course_and_other_arguments(@course, contexts)
-            .paginate(:per_page => 5)).to include(@event)
+            .paginate(per_page: 5)).to include(@event)
         end
       end
 
@@ -108,16 +108,16 @@ describe Auditors::GradeChange do
         @submission = @assignment.grade_student(@student, grade: 6, grader: @teacher).first
         @event = Auditors::GradeChange.record(submission: @submission)
 
-        expect(Auditors::GradeChange.for_assignment(@assignment).paginate(:per_page => 5)).to include(@event)
-        expect(Auditors::GradeChange.for_course(@course).paginate(:per_page => 5)).to include(@event)
+        expect(Auditors::GradeChange.for_assignment(@assignment).paginate(per_page: 5)).to include(@event)
+        expect(Auditors::GradeChange.for_course(@course).paginate(per_page: 5)).to include(@event)
         expect(Auditors::GradeChange.for_root_account_student(@account, @student)
-          .paginate(:per_page => 5)).to include(@event)
+          .paginate(per_page: 5)).to include(@event)
         expect(Auditors::GradeChange.for_course_and_other_arguments(@course, { assignment: @assignment })
-          .paginate(:per_page => 5)).to include(@event)
+          .paginate(per_page: 5)).to include(@event)
         expect(Auditors::GradeChange.for_course_and_other_arguments(@course, { assignment: @assignment,
-                                                                               student: @student }).paginate(:per_page => 5)).to include(@event)
+                                                                               student: @student }).paginate(per_page: 5)).to include(@event)
         expect(Auditors::GradeChange.for_course_and_other_arguments(@course, { student: @student })
-          .paginate(:per_page => 5)).to include(@event)
+          .paginate(per_page: 5)).to include(@event)
       end
 
       it "includes event for auto grader" do
@@ -127,16 +127,16 @@ describe Auditors::GradeChange do
         @submission.grader_id = -1
         @event = Auditors::GradeChange.record(submission: @submission)
 
-        expect(Auditors::GradeChange.for_assignment(@assignment).paginate(:per_page => 5)).to include(@event)
-        expect(Auditors::GradeChange.for_course(@course).paginate(:per_page => 5)).to include(@event)
+        expect(Auditors::GradeChange.for_assignment(@assignment).paginate(per_page: 5)).to include(@event)
+        expect(Auditors::GradeChange.for_course(@course).paginate(per_page: 5)).to include(@event)
         expect(Auditors::GradeChange.for_root_account_student(@account, @student)
-          .paginate(:per_page => 5)).to include(@event)
+          .paginate(per_page: 5)).to include(@event)
         expect(Auditors::GradeChange.for_course_and_other_arguments(@course, { assignment: @assignment })
-          .paginate(:per_page => 5)).to include(@event)
+          .paginate(per_page: 5)).to include(@event)
         expect(Auditors::GradeChange.for_course_and_other_arguments(@course, { assignment: @assignment,
-                                                                               student: @student }).paginate(:per_page => 5)).to include(@event)
+                                                                               student: @student }).paginate(per_page: 5)).to include(@event)
         expect(Auditors::GradeChange.for_course_and_other_arguments(@course, { student: @student })
-          .paginate(:per_page => 5)).to include(@event)
+          .paginate(per_page: 5)).to include(@event)
       end
 
       it "sets request_id" do
@@ -209,7 +209,7 @@ describe Auditors::GradeChange do
 
     it "records regraded submissions" do
       @submission.score = 5
-      @submission.with_versioning(:explicit => true, &:save!)
+      @submission.with_versioning(explicit: true, &:save!)
       @event = Auditors::GradeChange.record(submission: @submission)
 
       expect(@event.score_before).to eq 8
@@ -249,44 +249,44 @@ describe Auditors::GradeChange do
     describe "options forwarding" do
       before do
         record = Auditors::GradeChange::Record.new(
-          'submission' => @submission,
-          'created_at' => 1.day.ago
+          "submission" => @submission,
+          "created_at" => 1.day.ago
         )
         @event2 = Auditors::GradeChange::Stream.insert(record)
       end
 
       it "recognizes :oldest" do
-        page = Auditors::GradeChange.for_assignment(@assignment, oldest: 12.hours.ago).paginate(:per_page => 2)
+        page = Auditors::GradeChange.for_assignment(@assignment, oldest: 12.hours.ago).paginate(per_page: 2)
         expect(page).to include(@event)
         expect(page).not_to include(@event2)
 
-        page = Auditors::GradeChange.for_course(@course, oldest: 12.hours.ago).paginate(:per_page => 2)
+        page = Auditors::GradeChange.for_course(@course, oldest: 12.hours.ago).paginate(per_page: 2)
         expect(page).to include(@event)
         expect(page).not_to include(@event2)
 
-        page = Auditors::GradeChange.for_root_account_student(@account, @student, oldest: 12.hours.ago).paginate(:per_page => 2)
+        page = Auditors::GradeChange.for_root_account_student(@account, @student, oldest: 12.hours.ago).paginate(per_page: 2)
         expect(page).to include(@event)
         expect(page).not_to include(@event2)
 
-        page = Auditors::GradeChange.for_root_account_grader(@account, @teacher, oldest: 12.hours.ago).paginate(:per_page => 2)
+        page = Auditors::GradeChange.for_root_account_grader(@account, @teacher, oldest: 12.hours.ago).paginate(per_page: 2)
         expect(page).to include(@event)
         expect(page).not_to include(@event2)
       end
 
       it "recognizes :newest" do
-        page = Auditors::GradeChange.for_assignment(@assignment, newest: 12.hours.ago).paginate(:per_page => 2)
+        page = Auditors::GradeChange.for_assignment(@assignment, newest: 12.hours.ago).paginate(per_page: 2)
         expect(page).to include(@event2)
         expect(page).not_to include(@event)
 
-        page = Auditors::GradeChange.for_course(@course, newest: 12.hours.ago).paginate(:per_page => 2)
+        page = Auditors::GradeChange.for_course(@course, newest: 12.hours.ago).paginate(per_page: 2)
         expect(page).to include(@event2)
         expect(page).not_to include(@event)
 
-        page = Auditors::GradeChange.for_root_account_student(@account, @student, newest: 12.hours.ago).paginate(:per_page => 2)
+        page = Auditors::GradeChange.for_root_account_student(@account, @student, newest: 12.hours.ago).paginate(per_page: 2)
         expect(page).to include(@event2)
         expect(page).not_to include(@event)
 
-        page = Auditors::GradeChange.for_root_account_grader(@account, @teacher, newest: 12.hours.ago).paginate(:per_page => 2)
+        page = Auditors::GradeChange.for_root_account_grader(@account, @teacher, newest: 12.hours.ago).paginate(per_page: 2)
         expect(page).to include(@event2)
         expect(page).not_to include(@event)
       end
@@ -339,7 +339,7 @@ describe Auditors::GradeChange do
     end
 
     before do
-      allow(Audits).to receive(:config).and_return({ 'write_paths' => ['active_record'], 'read_path' => 'active_record' })
+      allow(Audits).to receive(:config).and_return({ "write_paths" => ["active_record"], "read_path" => "active_record" })
     end
 
     it "inserts submission grade change records" do
@@ -353,9 +353,9 @@ describe Auditors::GradeChange do
     end
 
     it "does not accept both a submission and an override in the same call" do
-      expect {
+      expect do
         Auditors::GradeChange.record(submission: @submission, override_grade_change: override_grade_change)
-      }.to raise_error(ArgumentError)
+      end.to raise_error(ArgumentError)
     end
 
     it "returns submission grade changes in results" do
@@ -375,9 +375,9 @@ describe Auditors::GradeChange do
     end
 
     it "stores override grade changes in the database" do
-      expect {
+      expect do
         Auditors::GradeChange.record(override_grade_change: override_grade_change)
-      }.to change {
+      end.to change {
         Auditors::ActiveRecord::GradeChangeRecord.where(
           context_id: @course.id,
           context_type: "Course"
@@ -463,19 +463,19 @@ describe Auditors::GradeChange do
           root_account_id: @account.id,
           student_id: @student.id,
           context_id: @course.id,
-          context_type: 'Course',
+          context_type: "Course",
           excused_after: false,
           excused_before: false,
-          event_type: 'grade'
+          event_type: "grade"
         }
         r1 = Auditors::ActiveRecord::GradeChangeRecord.create!(attributes.merge({
-                                                                                  uuid: 'asdf',
-                                                                                  request_id: 'asdf'
+                                                                                  uuid: "asdf",
+                                                                                  request_id: "asdf"
                                                                                 }))
         r2 = Auditors::ActiveRecord::GradeChangeRecord.create!(attributes.merge({
                                                                                   assignment_id: nil,
-                                                                                  uuid: 'fdsa',
-                                                                                  request_id: 'fdsa'
+                                                                                  uuid: "fdsa",
+                                                                                  request_id: "fdsa"
                                                                                 }))
         scope1 = Auditors::ActiveRecord::GradeChangeRecord.where(assignment_id: @assignment.id)
         scope2 = Auditors::ActiveRecord::GradeChangeRecord.where(assignment_id: Auditors::GradeChange::NULL_PLACEHOLDER)
@@ -492,13 +492,13 @@ describe Auditors::GradeChange do
 
   describe "with dual writing enabled to postgres" do
     before do
-      allow(Audits).to receive(:config).and_return({ 'write_paths' => ['cassandra', 'active_record'], 'read_path' => 'cassandra' })
+      allow(Audits).to receive(:config).and_return({ "write_paths" => ["cassandra", "active_record"], "read_path" => "cassandra" })
     end
 
     it "writes to cassandra" do
       event = Auditors::GradeChange.record(submission: @submission)
       expect(Audits.write_to_cassandra?).to eq(true)
-      expect(Auditors::GradeChange.for_assignment(@assignment).paginate(:per_page => 5)).to include(event)
+      expect(Auditors::GradeChange.for_assignment(@assignment).paginate(per_page: 5)).to include(event)
     end
 
     it "writes to postgres" do

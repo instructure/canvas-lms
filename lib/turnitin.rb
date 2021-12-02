@@ -18,16 +18,16 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_dependency 'turnitin/response'
+require_dependency "turnitin/response"
 
 module Turnitin
   def self.state_from_similarity_score(similarity_score)
-    return 'none' if similarity_score == 0
-    return 'acceptable' if similarity_score < 25
-    return 'warning' if similarity_score < 50
-    return 'problem' if similarity_score < 75
+    return "none" if similarity_score == 0
+    return "acceptable" if similarity_score < 25
+    return "warning" if similarity_score < 50
+    return "problem" if similarity_score < 75
 
-    'failure'
+    "failure"
   end
 
   class Client
@@ -43,23 +43,23 @@ module Turnitin
       @shared_secret = shared_secret
       @testing = testing
       @functions = {
-        :create_user => '1', # instructor or student
-        :create_course => '2', # instructor only
-        :enroll_student => '3', # student only
-        :create_assignment => '4', # instructor only
-        :submit_paper => '5', # student or teacher
-        :generate_report => '6',
-        :show_paper => '7',
-        :delete_paper => '8',
-        :change_password => '9',
-        :list_papers => '10',
-        :check_user_paper => '11',
-        :view_admin_statistics => '12',
-        :view_grade_mark => '13',
-        :report_turnaround_times => '14',
-        :submission_scores => '15',
-        :login_user => '17',
-        :logout_user => '18',
+        create_user: "1", # instructor or student
+        create_course: "2", # instructor only
+        enroll_student: "3", # student only
+        create_assignment: "4", # instructor only
+        submit_paper: "5", # student or teacher
+        generate_report: "6",
+        show_paper: "7",
+        delete_paper: "8",
+        change_password: "9",
+        list_papers: "10",
+        check_user_paper: "11",
+        view_admin_statistics: "12",
+        view_grade_mark: "13",
+        report_turnaround_times: "14",
+        submission_scores: "15",
+        login_user: "17",
+        logout_user: "18",
       }
     end
 
@@ -92,32 +92,32 @@ module Turnitin
     end
 
     def createStudent(user)
-      sendRequest(:create_user, 2, :user => user, :utp => '1')
+      sendRequest(:create_user, 2, user: user, utp: "1")
     end
 
     def createTeacher(user)
-      sendRequest(:create_user, 2, :user => user, :utp => '2')
+      sendRequest(:create_user, 2, user: user, utp: "2")
     end
 
     def createCourse(course)
-      sendRequest(:create_course, 2, :course => course, :user => course, :utp => '2')
+      sendRequest(:create_course, 2, course: course, user: course, utp: "2")
     end
 
     def enrollStudent(course, student)
-      sendRequest(:enroll_student, 2, :user => student, :course => course, :utp => '1', :tem => email(course))
+      sendRequest(:enroll_student, 2, user: student, course: course, utp: "1", tem: email(course))
     end
 
     def self.default_assignment_turnitin_settings
       {
-        :originality_report_visibility => 'immediate',
-        :s_paper_check => '1',
-        :internet_check => '1',
-        :journal_check => '1',
-        :exclude_biblio => '1',
-        :exclude_quoted => '1',
-        :exclude_type => '0',
-        :exclude_value => '',
-        :submit_papers_to => '1'
+        originality_report_visibility: "immediate",
+        s_paper_check: "1",
+        internet_check: "1",
+        journal_check: "1",
+        exclude_biblio: "1",
+        exclude_quoted: "1",
+        exclude_type: "0",
+        exclude_value: "",
+        submit_papers_to: "1"
       }
     end
 
@@ -127,19 +127,19 @@ module Turnitin
         valid_keys << :created
         settings = settings.slice(*valid_keys)
 
-        settings[:originality_report_visibility] = 'immediate' unless ['immediate', 'after_grading', 'after_due_date', 'never'].include?(settings[:originality_report_visibility])
+        settings[:originality_report_visibility] = "immediate" unless %w[immediate after_grading after_due_date never].include?(settings[:originality_report_visibility])
         settings[:s_view_report] = determine_student_visibility(settings[:originality_report_visibility])
 
-        [:s_paper_check, :internet_check, :journal_check, :exclude_biblio, :exclude_quoted, :submit_papers_to].each do |key|
+        %i[s_paper_check internet_check journal_check exclude_biblio exclude_quoted submit_papers_to].each do |key|
           bool = Canvas::Plugin.value_to_boolean(settings[key])
-          settings[key] = bool ? '1' : '0'
+          settings[key] = bool ? "1" : "0"
         end
         exclude_value = settings[:exclude_value].to_i
-        settings[:exclude_type] = '0' unless ['0', '1', '2'].include?(settings[:exclude_type])
+        settings[:exclude_type] = "0" unless %w[0 1 2].include?(settings[:exclude_type])
         settings[:exclude_value] = case settings[:exclude_type]
-                                   when '0'; ''
-                                   when '1'; [exclude_value, 1].max.to_s
-                                   when '2'; (0..100).include?(exclude_value) ? exclude_value.to_s : '0'
+                                   when "0" then ""
+                                   when "1" then [exclude_value, 1].max.to_s
+                                   when "2" then (0..100).cover?(exclude_value) ? exclude_value.to_s : "0"
                                    end
       end
       settings
@@ -147,9 +147,9 @@ module Turnitin
 
     def self.determine_student_visibility(originality_report_visibility)
       case originality_report_visibility
-      when 'immediate', 'after_grading', 'after_due_date'
+      when "immediate", "after_grading", "after_due_date"
         "1"
-      when 'never'
+      when "never"
         "0"
       end
     end
@@ -162,16 +162,16 @@ module Turnitin
       settings = Turnitin::Client.normalize_assignment_turnitin_settings(settings)
       # institution_check   - 1/0, check institution
       # submit_papers_to    - 0=none, 1=standard, 2=institution
-      response = sendRequest(:create_assignment, settings.delete(:created) ? '3' : '2', settings.merge!({
-                                                                                                          :user => course,
-                                                                                                          :course => course,
-                                                                                                          :assignment => assignment,
-                                                                                                          :utp => '2',
-                                                                                                          :dtstart => "#{today.strftime} 00:00:00",
-                                                                                                          :dtdue => "#{today.strftime} 00:00:00",
-                                                                                                          :dtpost => "#{today.strftime} 00:00:00",
-                                                                                                          :late_accept_flag => '1',
-                                                                                                          :post => true
+      response = sendRequest(:create_assignment, settings.delete(:created) ? "3" : "2", settings.merge!({
+                                                                                                          user: course,
+                                                                                                          course: course,
+                                                                                                          assignment: assignment,
+                                                                                                          utp: "2",
+                                                                                                          dtstart: "#{today.strftime} 00:00:00",
+                                                                                                          dtdue: "#{today.strftime} 00:00:00",
+                                                                                                          dtpost: "#{today.strftime} 00:00:00",
+                                                                                                          late_accept_flag: "1",
+                                                                                                          post: true
                                                                                                         }))
 
       response.success? ? { assignment_id: response.assignment_id } : response.error_hash
@@ -183,21 +183,21 @@ module Turnitin
       assignment = submission.assignment
       course = assignment.context
       opts = {
-        :post => true,
-        :utp => '1',
-        :user => student,
-        :course => course,
-        :assignment => assignment,
-        :tem => email(course)
+        post: true,
+        utp: "1",
+        user: student,
+        course: course,
+        assignment: assignment,
+        tem: email(course)
       }
       responses = {}
-      if submission.submission_type == 'online_upload'
+      if submission.submission_type == "online_upload"
         attachments = submission.attachments.select { |a| a.turnitinable? && (asset_string.nil? || a.asset_string == asset_string) }
         attachments.each do |a|
-          responses[a.asset_string] = sendRequest(:submit_paper, '2', { :ptl => a.display_name, :pdata => a.open(), :ptype => '2' }.merge!(opts))
+          responses[a.asset_string] = sendRequest(:submit_paper, "2", { ptl: a.display_name, pdata: a.open, ptype: "2" }.merge!(opts))
         end
-      elsif submission.submission_type == 'online_text_entry' && (asset_string.nil? || submission.asset_string == asset_string)
-        responses[submission.asset_string] = sendRequest(:submit_paper, '2', { :ptl => assignment.title, :pdata => submission.plaintext_body, :ptype => "1" }.merge!(opts))
+      elsif submission.submission_type == "online_text_entry" && (asset_string.nil? || submission.asset_string == asset_string)
+        responses[submission.asset_string] = sendRequest(:submit_paper, "2", { ptl: assignment.title, pdata: submission.plaintext_body, ptype: "1" }.merge!(opts))
       else
         raise "Unsupported submission type for turnitin integration: #{submission.submission_type}"
       end
@@ -214,7 +214,7 @@ module Turnitin
       course = assignment.context
       object_id = submission.turnitin_data[asset_string][:object_id] rescue nil
       res = nil
-      res = sendRequest(:generate_report, 2, :oid => object_id, :utp => '2', :user => course, :course => course, :assignment => assignment) if object_id
+      res = sendRequest(:generate_report, 2, oid: object_id, utp: "2", user: course, course: course, assignment: assignment) if object_id
       data = {}
       if res
         data[:similarity_score] = res.css("originalityscore").first.try(:content)
@@ -229,7 +229,7 @@ module Turnitin
       assignment = submission.assignment
       course = assignment.context
       object_id = submission.turnitin_data[asset_string][:object_id] rescue nil
-      sendRequest(:generate_report, 1, :oid => object_id, :utp => '2', :user => course, :course => course, :assignment => assignment)
+      sendRequest(:generate_report, 1, oid: object_id, utp: "2", user: course, course: course, assignment: assignment)
     end
 
     def submissionStudentReportUrl(submission, asset_string)
@@ -237,7 +237,7 @@ module Turnitin
       assignment = submission.assignment
       course = assignment.context
       object_id = submission.turnitin_data[asset_string][:object_id] rescue nil
-      sendRequest(:generate_report, 1, :oid => object_id, :utp => '1', :user => user, :course => course, :assignment => assignment, :tem => email(course))
+      sendRequest(:generate_report, 1, oid: object_id, utp: "1", user: user, course: course, assignment: assignment, tem: email(course))
     end
 
     def submissionPreviewUrl(submission, asset_string)
@@ -245,7 +245,7 @@ module Turnitin
       assignment = submission.assignment
       course = assignment.context
       object_id = submission.turnitin_data[asset_string][:object_id] rescue nil
-      sendRequest(:show_paper, 1, :oid => object_id, :utp => '1', :user => user, :course => course, :assignment => assignment, :tem => email(course))
+      sendRequest(:show_paper, 1, oid: object_id, utp: "1", user: user, course: course, assignment: assignment, tem: email(course))
     end
 
     def submissionDownloadUrl(submission, asset_string)
@@ -253,12 +253,12 @@ module Turnitin
       assignment = submission.assignment
       course = assignment.context
       object_id = submission.turnitin_data[asset_string][:object_id] rescue nil
-      sendRequest(:show_paper, 1, :oid => object_id, :utp => '1', :user => user, :course => course, :assignment => assignment, :tem => email(course))
+      sendRequest(:show_paper, 1, oid: object_id, utp: "1", user: user, course: course, assignment: assignment, tem: email(course))
     end
 
     def listSubmissions(assignment)
       course = assignment.context
-      sendRequest(:list_papers, 2, :assignment => assignment, :course => course, :user => course, :utp => '1', :tem => email(course))
+      sendRequest(:list_papers, 2, assignment: assignment, course: course, user: course, utp: "1", tem: email(course))
     end
 
     # From the turnitin api docs: To calculate the MD5, concatenate the data
@@ -276,9 +276,9 @@ module Turnitin
     def request_md5(params)
       keys_used = []
       str = ""
-      keys = [:aid, :assign, :assignid, :cid, :cpw, :ctl, :diagnostic, :dis, :dtdue, :dtstart, :dtpost, :encrypt, :fcmd, :fid, :gmtime, :newassign, :newupw, :oid, :pfn, :pln, :ptl, :ptype, :said, :tem, :uem, :ufn, :uid, :uln, :upw, :utp]
+      keys = %i[aid assign assignid cid cpw ctl diagnostic dis dtdue dtstart dtpost encrypt fcmd fid gmtime newassign newupw oid pfn pln ptl ptype said tem uem ufn uid uln upw utp]
       keys.each do |key|
-        keys_used << key if params[key] && !params[key].empty?
+        keys_used << key if params[key].present?
         str += (params[key] || "")
       end
       str += @shared_secret
@@ -288,14 +288,14 @@ module Turnitin
     def escape_params(params)
       escaped_params = {}
       params.each do |key, value|
-        if value.is_a?(String)
-          escaped_params[key] = CGI.escape(value).gsub("+", "%20")
-          # turnitin uses %20 to encode spaces (instead of +)
-        else
-          escaped_params[key] = value
-        end
+        escaped_params[key] = if value.is_a?(String)
+                                CGI.escape(value).gsub("+", "%20")
+                              # turnitin uses %20 to encode spaces (instead of +)
+                              else
+                                value
+                              end
       end
-      return escaped_params
+      escaped_params
     end
 
     def prepare_params(command, fcmd, args)
@@ -304,13 +304,13 @@ module Turnitin
       assignment = args.delete :assignment
       post = args.delete :post
       params = args.merge({
-                            :gmtime => Time.now.utc.strftime("%Y%m%d%H%M")[0, 11],
-                            :fid => @functions[command],
-                            :fcmd => fcmd.to_s,
-                            :encrypt => '0',
-                            :aid => @account_id,
-                            :src => '15',
-                            :dis => '1'
+                            gmtime: Time.now.utc.strftime("%Y%m%d%H%M")[0, 11],
+                            fid: @functions[command],
+                            fcmd: fcmd.to_s,
+                            encrypt: "0",
+                            aid: @account_id,
+                            src: "15",
+                            dis: "1"
                           })
       if user
         params[:uid] = id(user)
@@ -336,11 +336,11 @@ module Turnitin
 
       params[:md5] = request_md5(params)
       params = escape_params(params) if post
-      return params
+      params
     end
 
     def sendRequest(command, fcmd, args)
-      require 'net/http'
+      require "net/http"
 
       post = args[:post] # gets deleted in prepare_params
       params = prepare_params(command, fcmd, args)
@@ -350,7 +350,7 @@ module Turnitin
         query, headers = mp.prepare_query(params)
         http = Net::HTTP.new(@host, 443)
         http.use_ssl = true
-        http_response = http.start { |con|
+        http_response = http.start do |con|
           req = Net::HTTP::Post.new(@endpoint, headers)
           con.read_timeout = 30
           begin
@@ -359,7 +359,7 @@ module Turnitin
             Rails.logger.error("Turnitin API error for account_id #{@account_id}: POSTING FAILED")
             Rails.logger.error(params.to_json)
           end
-        }
+        end
       else
         requestParams = ""
         params.each do |key, value|
@@ -367,14 +367,14 @@ module Turnitin
 
           requestParams += "&#{URI.escape(key.to_s)}=#{CGI.escape(value.to_s)}"
         end
-        if params[:fcmd] == '1'
+        if params[:fcmd] == "1"
           return "https://#{@host}#{@endpoint}?#{requestParams}"
         else
           http = Net::HTTP.new(@host, 443)
           http.use_ssl = true
-          http_response = http.start { |conn|
+          http_response = http.start do |conn|
             conn.get("#{@endpoint}?#{requestParams}")
-          }
+          end
         end
       end
 

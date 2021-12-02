@@ -24,10 +24,10 @@ class CleanupInvalidObserverAlerts < ActiveRecord::Migration[5.2]
   def up
     # in production there are not a ton of ObserverAlerts, so doing a sub query
     # for each batch to delete is fine.
-    valid_ids = ObserverAlert.where(context_type: 'Submission')
+    valid_ids = ObserverAlert.where(context_type: "Submission")
                              .joins("INNER JOIN #{Submission.quoted_table_name} ON submissions.id=observer_alerts.context_id AND context_type='Submission'")
                              .select(:context_id)
-    ObserverAlert.where(context_type: 'Submission').where.not(context_id: valid_ids).in_batches.delete_all
+    ObserverAlert.where(context_type: "Submission").where.not(context_id: valid_ids).in_batches.delete_all
   end
 
   def down

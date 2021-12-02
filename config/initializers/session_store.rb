@@ -24,9 +24,9 @@
 # Make sure the secret is at least 30 characters and all random,
 # no regular words or you'll be exposed to dictionary attacks.
 config = {
-  :key => '_normandy_session',
-  :secret => (Setting.get("session_secret_key", SecureRandom.hex(64), set_if_nx: true) rescue SecureRandom.hex(64)),
-  legacy_key: '_legacy_normandy_session',
+  key: "_normandy_session",
+  secret: (Setting.get("session_secret_key", SecureRandom.hex(64), set_if_nx: true) rescue SecureRandom.hex(64)),
+  legacy_key: "_legacy_normandy_session",
   same_site: :none
 }.merge((ConfigFile.load("session_store").dup || {}).symbolize_keys)
 

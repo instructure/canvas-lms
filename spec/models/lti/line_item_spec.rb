@@ -18,10 +18,10 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../../spec_helper'
+require_relative "../../spec_helper"
 
 RSpec.describe Lti::LineItem, type: :model do
-  context 'when validating' do
+  context "when validating" do
     let(:line_item) { line_item_model }
 
     it 'requires "score_maximum"' do
@@ -46,18 +46,18 @@ RSpec.describe Lti::LineItem, type: :model do
     end
   end
 
-  context 'on create' do
-    it 'adds a root account id' do
+  context "on create" do
+    it "adds a root account id" do
       line_item = line_item_model
       expect(line_item.root_account).not_to be_nil
     end
   end
 
-  describe '#assignment_line_item?' do
+  describe "#assignment_line_item?" do
     let(:line_item) { line_item_model }
     let(:assignment) { assignment_model }
 
-    it 'returns true if the line item was created before all others in the assignment' do
+    it "returns true if the line item was created before all others in the assignment" do
       line_item_one = line_item_model(assignment: assignment)
       line_item_two = line_item_model(assignment: assignment)
       line_item_two.update!(created_at: line_item_one.created_at + 5.seconds)
@@ -65,7 +65,7 @@ RSpec.describe Lti::LineItem, type: :model do
       expect(line_item_one.assignment_line_item?).to eq true
     end
 
-    it 'returns false if the line item is not the first in the assignment' do
+    it "returns false if the line item is not the first in the assignment" do
       line_item_one = line_item_model(assignment: assignment)
       line_item_two = line_item_model(assignment: assignment)
       line_item_two.update!(created_at: line_item_one.created_at + 5.seconds)
@@ -74,12 +74,12 @@ RSpec.describe Lti::LineItem, type: :model do
     end
   end
 
-  context 'with lti_link not matching assignment' do
+  context "with lti_link not matching assignment" do
     let(:resource_link) { resource_link_model }
     let(:line_item) { line_item_model resource_link: resource_link }
     let(:line_item_two) { line_item_model resource_link: resource_link }
 
-    it 'returns true if the line item was created before all others in the resource' do
+    it "returns true if the line item was created before all others in the resource" do
       line_item
       expect do
         line_item_two
@@ -89,39 +89,40 @@ RSpec.describe Lti::LineItem, type: :model do
 
   it_behaves_like "soft deletion" do
     subject { Lti::LineItem }
+
     let(:creation_arguments) { base_line_item_params(assignment_model, DeveloperKey.create!) }
   end
 
-  context 'when destroying a line item' do
+  context "when destroying a line item" do
     let(:line_item) { line_item_model }
     let(:assignment) { assignment_model }
     let(:resource_link) { resource_link_model }
 
-    it 'destroys the assignment if it is the first line item and is not coupled' do
+    it "destroys the assignment if it is the first line item and is not coupled" do
       line_item_one = line_item_model(assignment: assignment, coupled: false)
       line_item_two = line_item_model(assignment: assignment)
       line_item_two.update!(created_at: line_item_one.created_at + 5.seconds)
-      expect {
+      expect do
         line_item_one.destroy!
-      }.to change(assignment, :workflow_state).from('published').to('deleted')
+      end.to change(assignment, :workflow_state).from("published").to("deleted")
     end
 
     it "doesn't destroy the assignment if the line item is not the first line item" do
       line_item_one = line_item_model(assignment: assignment)
       line_item_two = line_item_model(assignment: assignment, coupled: false)
       line_item_two.update!(created_at: line_item_one.created_at + 5.seconds)
-      expect {
+      expect do
         line_item_two.destroy!
-      }.not_to change(assignment, :workflow_state)
+      end.not_to change(assignment, :workflow_state)
     end
 
     it "doesn't destroy the assignment if the line item is coupled" do
       line_item_one = line_item_model(assignment: assignment, coupled: true)
       line_item_two = line_item_model(assignment: assignment)
       line_item_two.update!(created_at: line_item_one.created_at + 5.seconds)
-      expect {
+      expect do
         line_item_one.destroy!
-      }.not_to change(assignment, :workflow_state)
+      end.not_to change(assignment, :workflow_state)
     end
   end
 end
