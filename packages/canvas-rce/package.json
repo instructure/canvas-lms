@@ -132,7 +132,7 @@
     "redux-thunk": "^2",
     "scroll-into-view": "https://github.com/bkirkby/scroll-into-view.git#588b0ced98eeecf84e6fb2074aa076e80b7cffab",
     "tinymce": "^5",
-    "tinymce-a11y-checker": "^3.3.1"
+    "tinymce-a11y-checker": "^3.3.2"
   },
   "devDependencies": {
     "@babel/cli": "^7",
@@ -184,6 +184,6 @@
     "webpack-plugin-serve": "^1"
   },
   "resolutions": {
-    "format-message-estree-util": "../packages/format-message-estree-util"
+    "format-message-estree-util": "./packages/format-message-estree-util"
   }
 }
