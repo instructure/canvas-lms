@@ -350,28 +350,6 @@ describe DiscussionTopicsController, type: :request do
       expect(@topic.todo_date).to eq todo_date
     end
 
-    context "anonymous discussions" do
-      before do
-        api_call(:post, "/api/v1/courses/#{@course.id}/discussion_topics",
-                 { controller: "discussion_topics", action: "create", format: "json",
-                   course_id: @course.to_param },
-                 { title: "test title", message: "test <b>message</b>", discussion_type: "threaded",
-                   anonymous_state: "full_anonymity" })
-        @topic = @course.discussion_topics.order(:id).last
-      end
-
-      it "creates a fully anonymous discussion" do
-        expect(@topic["anonymous_state"]).to eq "full_anonymity"
-      end
-
-      it "not able to update the anonymous state of an existing topic" do
-        api_call(:put, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
-                 { controller: "discussion_topics", action: "update", format: "json", course_id: @course.to_param, topic_id: @topic.to_param },
-                 { anonymous_state: nil }, {}, expected_status: 200)
-        expect(@topic["anonymous_state"]).to eq "full_anonymity"
-      end
-    end
-
     context "publishing" do
       it "creates a draft state topic" do
         api_call(:post, "/api/v1/courses/#{@course.id}/discussion_topics",
@@ -430,6 +408,65 @@ describe DiscussionTopicsController, type: :request do
       @topic = @course.discussion_topics.order(:id).last
       expect(@topic.title).to eq "test title"
       expect(@topic.assignment).to be_nil
+    end
+  end
+
+  context "anonymous discussions" do
+    before do
+      allow(Account.site_admin).to receive(:feature_enabled?).with(:discussion_anonymity).and_return(true)
+      allow(Account.site_admin).to receive(:feature_enabled?).with(:react_discussions_post).and_return(true)
+      api_call(:post, "/api/v1/courses/#{@course.id}/discussion_topics",
+               { controller: "discussion_topics", action: "create", format: "json",
+                 course_id: @course.to_param },
+               { title: "test title", message: "test <b>message</b>", discussion_type: "threaded",
+                 anonymous_state: "full_anonymity" })
+      @topic = @course.discussion_topics.order(:id).last
+    end
+
+    it "creates a fully anonymous discussion" do
+      expect(@topic["anonymous_state"]).to eq "full_anonymity"
+    end
+
+    it "update to anonymous_state returns 403" do
+      api_call(:put, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
+               { controller: "discussion_topics", action: "update", format: "json", course_id: @course.to_param, topic_id: @topic.to_param },
+               { anonymous_state: nil }, {}, { expected_status: 400 })
+    end
+
+    it "not able to update the anonymous state of an existing topic" do
+      api_call(:put, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
+               { controller: "discussion_topics", action: "update", format: "json", course_id: @course.to_param, topic_id: @topic.to_param },
+               { anonymous_state: nil }, {}, { expected_status: 400 })
+      expect(@topic["anonymous_state"]).to eq "full_anonymity"
+    end
+
+    context "student permissions" do
+      before do
+        allow(Account.site_admin).to receive(:feature_enabled?).with(:discussion_anonymity).and_return(true)
+        allow(Account.site_admin).to receive(:feature_enabled?).with(:react_discussions_post).and_return(true)
+      end
+
+      it "unable to create an anonymous topic if course setting is turned off" do
+        @user = @student
+        @course.allow_student_anonymous_discussion_topics = false
+        @course.save!
+        api_call(:post, "/api/v1/courses/#{@course.id}/discussion_topics",
+                 { controller: "discussion_topics", action: "create", format: "json",
+                   course_id: @course.to_param },
+                 { title: "test title", message: "test <b>message</b>", discussion_type: "threaded",
+                   anonymous_state: "full_anonymity" }, {}, { expected_status: 400 })
+      end
+
+      it "able to create an anonymous topic if course setting is turned on" do
+        @user = @student
+        @course.allow_student_anonymous_discussion_topics = true
+        @course.save!
+        api_call(:post, "/api/v1/courses/#{@course.id}/discussion_topics",
+                 { controller: "discussion_topics", action: "create", format: "json",
+                   course_id: @course.to_param },
+                 { title: "test title", message: "test <b>message</b>", discussion_type: "threaded",
+                   anonymous_state: "full_anonymity" }, {}, { expected_status: 200 })
+      end
     end
   end
 
