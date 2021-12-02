@@ -219,9 +219,7 @@ export default class DeveloperKeyModal extends React.Component {
       this.setState({toolConfiguration: update})
     }
 
-    if (!this.state?.developerKey?.redirect_uris?.trim()) {
-      this.updateDeveloperKey('redirect_uris', update.target_link_uri || '')
-    }
+    this.updateDeveloperKey('redirect_uris', update.target_link_uri || '')
   }
 
   updateDeveloperKey = (field, update) => {

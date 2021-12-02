@@ -54,8 +54,8 @@ module EventStream::Backend
 
       send(operation, record)
       stream.run_callbacks(operation, record)
-    rescue => e
-      stream.run_callbacks(:error, operation, record, e)
+    rescue StandardError => exception
+      stream.run_callbacks(:error, operation, record, exception)
       raise if stream.raise_on_error
     end
 

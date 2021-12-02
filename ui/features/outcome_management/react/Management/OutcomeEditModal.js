@@ -79,8 +79,13 @@ const OutcomeEditModal = ({outcome, isOpen, onCloseHandler, onEditLearningOutcom
     ;(async () => {
       try {
         const promises = []
-        // description can be null/empty. no need to check if it is available only if it has changed
-        if ((title && titleChanged) || (displayName && displayNameChanged) || descriptionChanged) {
+        // See OUT-4889
+        // description is not required so no need to check if it is not null/empty like displayName & title
+        if (
+          (title && titleChanged) ||
+          (displayName && displayNameChanged) ||
+          (description && descriptionChanged)
+        ) {
           promises.push(
             updateLearningOutcomeMutation({
               variables: {

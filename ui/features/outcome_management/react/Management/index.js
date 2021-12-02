@@ -43,13 +43,11 @@ import ManageOutcomesBillboard from './ManageOutcomesBillboard'
 import GroupActionDrillDown from '../shared/GroupActionDrillDown'
 import useLhsTreeBrowserSelectParentGroup from '@canvas/outcomes/react/hooks/useLhsTreeBrowserSelectParentGroup'
 import FindOutcomesModal from '../FindOutcomesModal'
-import {showImportOutcomesModal} from '@canvas/outcomes/react/ImportOutcomesModal'
 
 const OutcomeManagementPanel = ({
   importNumber,
   createdOutcomeGroupIds,
-  onLhsSelectedGroupIdChanged,
-  handleFileDrop
+  onLhsSelectedGroupIdChanged
 }) => {
   const {isCourse, isMobileView, canManage} = useCanvasContext()
   const {setContainerRef, setLeftColumnRef, setDelimiterRef, setRightColumnRef, onKeyDownHandler} =
@@ -168,14 +166,6 @@ const OutcomeManagementPanel = ({
     closeFindOutcomesModal()
   }
 
-  const openImportOutcomesModal = useCallback(() => {
-    showImportOutcomesModal({
-      learningOutcomeGroup: group,
-      learningOutcomeGroupAncestorIds: Object.keys(collections),
-      onFileDrop: handleFileDrop
-    })
-  }, [group, collections, handleFileDrop])
-
   const groupMenuHandler = useCallback(
     (_arg, action) => {
       const actions = {
@@ -183,8 +173,7 @@ const OutcomeManagementPanel = ({
         remove: openGroupRemoveModal,
         edit: openGroupEditModal,
         description: openGroupDescriptionModal,
-        add_outcomes: openFindOutcomesModal,
-        import_outcomes: openImportOutcomesModal
+        add_outcomes: openFindOutcomesModal
       }
 
       const callback = actions[action] || function () {}
@@ -195,8 +184,7 @@ const OutcomeManagementPanel = ({
       openGroupDescriptionModal,
       openGroupEditModal,
       openGroupMoveModal,
-      openGroupRemoveModal,
-      openImportOutcomesModal
+      openGroupRemoveModal
     ]
   )
 
@@ -530,8 +518,7 @@ OutcomeManagementPanel.defaultProps = {
 OutcomeManagementPanel.propTypes = {
   createdOutcomeGroupIds: PropTypes.arrayOf(PropTypes.string),
   onLhsSelectedGroupIdChanged: PropTypes.func,
-  importNumber: PropTypes.number,
-  handleFileDrop: PropTypes.func
+  importNumber: PropTypes.number
 }
 
 export default OutcomeManagementPanel

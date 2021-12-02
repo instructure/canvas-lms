@@ -38,10 +38,10 @@ class GradebookSettingsController < ApplicationController
   def gradebook_settings_params
     gradebook_settings_params = params.require(:gradebook_settings).permit(
       {
-        filter_columns_by: %i[
-          context_module_id
-          grading_period_id
-          assignment_group_id
+        filter_columns_by: [
+          :context_module_id,
+          :grading_period_id,
+          :assignment_group_id
         ],
         filter_rows_by: [
           :section_id,
@@ -60,7 +60,7 @@ class GradebookSettingsController < ApplicationController
       :sort_rows_by_setting_key,
       :sort_rows_by_direction,
       :view_ungraded_as_zero,
-      { colors: %i[late missing resubmitted dropped excused] }
+      { colors: [:late, :missing, :resubmitted, :dropped, :excused] }
     )
     gradebook_settings_params[:enter_grades_as] = params[:gradebook_settings][:enter_grades_as]
     gradebook_settings_params.permit!
@@ -73,10 +73,9 @@ class GradebookSettingsController < ApplicationController
   def nilify_strings(hash)
     massaged_hash = {}
     hash.each do |key, value|
-      massaged_hash[key] = case value
-                           when "null"
+      massaged_hash[key] = if value == 'null'
                              nil
-                           when Hash
+                           elsif value.is_a? Hash
                              nilify_strings(value)
                            else
                              value
@@ -93,7 +92,7 @@ class GradebookSettingsController < ApplicationController
     {
       gradebook_settings: {
         @context.id => @course_settings,
-        :colors => @color_settings
+        colors: @color_settings
       }
     }
   end
@@ -103,7 +102,7 @@ class GradebookSettingsController < ApplicationController
     @course_settings.deep_merge!(nilify_strings(gradebook_settings_params.except(:colors).to_h))
 
     @color_settings = @current_user.get_preference(:gradebook_settings, :colors) || {}
-    @color_settings.deep_merge!(valid_colors(gradebook_settings_params.fetch("colors", {})).to_unsafe_h)
+    @color_settings.deep_merge!(valid_colors(gradebook_settings_params.fetch('colors', {})).to_unsafe_h)
 
     @current_user.set_preference(:gradebook_settings, @context.global_id, @course_settings) &&
       @current_user.set_preference(:gradebook_settings, :colors, @color_settings)

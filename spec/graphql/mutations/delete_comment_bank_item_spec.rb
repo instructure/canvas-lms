@@ -46,55 +46,55 @@ describe Mutations::DeleteCommentBankItem do
   end
 
   it "deletes a comment bank item with legacy id" do
-    query = <<~GQL
+    query = <<~QUERY
       id: #{@comment_bank_item.id}
-    GQL
+    QUERY
     result = execute_with_input(query)
-    expect(result["errors"]).to be_nil
-    expect(result.dig("data", "deleteCommentBankItem", "errors")).to be_nil
-    expect(result.dig("data", "deleteCommentBankItem", "commentBankItemId")).to eq @comment_bank_item.id.to_s
+    expect(result.dig('errors')).to be_nil
+    expect(result.dig('data', 'deleteCommentBankItem', 'errors')).to be_nil
+    expect(result.dig('data', 'deleteCommentBankItem', 'commentBankItemId')).to eq @comment_bank_item.id.to_s
   end
 
   it "deletes a comment bank item with relay id" do
-    query = <<~GQL
-      id: #{GraphQLHelpers.relay_or_legacy_id_prepare_func("CommentBankItem").call(@comment_bank_item.id.to_s)}
-    GQL
+    query = <<~QUERY
+      id: #{GraphQLHelpers.relay_or_legacy_id_prepare_func('CommentBankItem').call(@comment_bank_item.id.to_s)}
+    QUERY
     result = execute_with_input(query)
-    expect(result["errors"]).to be_nil
-    expect(result.dig("data", "deleteCommentBankItem", "errors")).to be_nil
-    expect(result.dig("data", "deleteCommentBankItem", "commentBankItemId")).to eq @comment_bank_item.id.to_s
+    expect(result.dig('errors')).to be_nil
+    expect(result.dig('data', 'deleteCommentBankItem', 'errors')).to be_nil
+    expect(result.dig('data', 'deleteCommentBankItem', 'commentBankItemId')).to eq @comment_bank_item.id.to_s
   end
 
-  context "errors" do
+  context 'errors' do
     def expect_error(result, message)
-      errors = result["errors"] || result.dig("data", "deleteCommentBankItem", "errors")
+      errors = result.dig('errors') || result.dig('data', 'deleteCommentBankItem', 'errors')
       expect(errors).not_to be_nil
-      expect(errors[0]["message"]).to match(/#{message}/)
+      expect(errors[0]['message']).to match(/#{message}/)
     end
 
     it "requires delete permission" do
-      query = <<~GQL
+      query = <<~QUERY
         id: #{@comment_bank_item.id}
-      GQL
+      QUERY
       result = execute_with_input(query, user_executing: user_model)
-      expect_error(result, "not found")
+      expect_error(result, 'not found')
     end
 
     it "invalid id" do
-      query = <<~GQL
+      query = <<~QUERY
         id: 0
-      GQL
+      QUERY
       result = execute_with_input(query)
-      expect_error(result, "Unable to find CommentBankItem")
+      expect_error(result, 'Unable to find CommentBankItem')
     end
 
     it "does not destroy a record twice" do
       @comment_bank_item.destroy
-      query = <<~GQL
+      query = <<~QUERY
         id: #{@comment_bank_item.id}
-      GQL
+      QUERY
       result = execute_with_input(query)
-      expect_error(result, "Unable to find CommentBankItem")
+      expect_error(result, 'Unable to find CommentBankItem')
     end
   end
 end

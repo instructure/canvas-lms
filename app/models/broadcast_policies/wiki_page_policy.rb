@@ -30,7 +30,7 @@ module BroadcastPolicies
         return false if wiki_page.context.concluded?
         return false if wiki_page.context.respond_to?(:unpublished?) && wiki_page.wiki.context.unpublished?
       end
-      return false unless created_before?(1.minute.ago)
+      return false unless created_before?(1.minutes.ago)
 
       changed_while_published? || wiki_page.changed_state(:active)
     end

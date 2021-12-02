@@ -64,7 +64,7 @@ module DatadogRumHelper
   end
 
   def randomly_include?
-    random <= sample_rate
+    self.random <= sample_rate
   end
 
   def sample_rate

@@ -18,15 +18,13 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "active_support/core_ext/module/delegation"
-
 module LtiOutbound
   class VariableSubstitutor
     attr_accessor :substitutions
 
     attr_reader :substitution_objects
 
-    def initialize
+    def initialize()
       self.substitutions = {}
     end
 
@@ -36,15 +34,16 @@ module LtiOutbound
 
     def substitute!(data_hash)
       data_hash.each do |k, v|
-        if key?(v)
+        if has_key?(v)
           data_hash[k] = substitution_value(v)
         end
       end
       data_hash
     end
 
-    delegate :key?, to: :substitutions
-    alias_method :has_key?, :key?
+    def has_key?(key)
+      substitutions.has_key? key
+    end
 
     private
 

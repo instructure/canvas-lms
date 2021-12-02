@@ -94,7 +94,6 @@ export default class GradebookSettingsModal extends React.Component {
   static propTypes = {
     allowSortingByModules: bool,
     allowViewUngradedAsZero: bool,
-    allowShowSeparateFirstLastNames: bool,
     anonymousAssignmentsPresent: bool,
     courseFeatures: shape({
       finalGradeOverrideEnabled: bool.isRequired
@@ -400,7 +399,6 @@ export default class GradebookSettingsModal extends React.Component {
                       }
                     }}
                     showSeparateFirstLastNames={{
-                      allowed: this.props.allowShowSeparateFirstLastNames,
                       checked: this.state.viewOptions.showSeparateFirstLastNames,
                       onChange: value => {
                         this.setViewOption('showSeparateFirstLastNames', value)
@@ -423,12 +421,7 @@ export default class GradebookSettingsModal extends React.Component {
               )}
             </Tabs>
           </Flex.Item>
-          <Flex.Item
-            id="gradebook-settings-modal-footer"
-            align="end"
-            as="footer"
-            overflowY="hidden"
-          >
+          <Flex.Item align="end" as="footer" margin="small" overflowY="hidden">
             <Button id="gradebook-settings-cancel-button" onClick={this.close} margin="0 small">
               {I18n.t('Cancel')}
             </Button>

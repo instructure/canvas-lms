@@ -17,8 +17,7 @@ WORKSPACE=${WORKSPACE:-$(pwd)}
 #    layers not being used, even when their contents have not changed.
 
 # Images:
-# $BASE_RUNNER_PREFIX: starlord.inscloudgate.net/jenkins/ruby-passenger + additional packages
-# $RUBY_RUNNER_PREFIX: $BASE_RUNNER_PREFIX + gems
+# $RUBY_RUNNER_PREFIX: starlord.inscloudgate.net/jenkins/ruby-passenger + gems
 # $YARN_RUNNER_PREFIX: $RUBY_RUNNER_PREFIX + yarn
 # $WEBPACK_BUILDER_PREFIX: $YARN_RUNNER_PREFIX + compiled packages/
 # $WEBPACK_CACHE_PREFIX: $RUBY_RUNNER_PREFIX + final compiled assets
@@ -36,7 +35,7 @@ WORKSPACE=${WORKSPACE:-$(pwd)}
 # $WEBPACK_BUILDER_TAG: additional tag for the webpack-builder image
 #   - set to patchset unique ID for builds to reference without knowing about the hash ID
 
-export CACHE_VERSION="2021-11-29.1"
+export CACHE_VERSION="2021-07-12.1"
 
 source ./build/new-jenkins/docker-build-helpers.sh
 
@@ -53,8 +52,7 @@ YARN_CACHE_MD5=$(docker run local/cache-helper-collect-yarn sh -c "find /tmp/dst
 PACKAGES_CACHE_MD5=$(docker run local/cache-helper-collect-packages sh -c "find /tmp/dst -type f -exec md5sum {} \; | sort -k 2 | md5sum")
 WEBPACK_CACHE_MD5=$(docker run local/cache-helper-collect-webpack sh -c "find /tmp/dst -type f -exec md5sum {} \; | sort -k 2 | md5sum")
 
-BASE_RUNNER_DOCKERFILE_MD5=$(cat Dockerfile.jenkins | md5sum)
-RUBY_RUNNER_DOCKERFILE_MD5=$(cat Dockerfile.jenkins.ruby-runner | md5sum)
+RUBY_RUNNER_DOCKERFILE_MD5=$(cat Dockerfile.jenkins | md5sum)
 YARN_RUNNER_DOCKERFILE_MD5=$(cat Dockerfile.jenkins.yarn-runner | md5sum)
 WEBPACK_BUILDER_DOCKERFILE_MD5=$(cat Dockerfile.jenkins.webpack-builder | md5sum)
 WEBPACK_CACHE_DOCKERFILE_MD5=$(cat Dockerfile.jenkins.webpack-cache | md5sum)
@@ -63,7 +61,7 @@ WEBPACK_CACHE_DOCKERFILE_MD5=$(cat Dockerfile.jenkins.webpack-cache | md5sum)
 
 BASE_IMAGE_ID=$(docker images --filter=reference=starlord.inscloudgate.net/jenkins/ruby-passenger:$RUBY --format '{{.ID}}')
 
-BASE_RUNNER_BUILD_ARGS=(
+RUBY_RUNNER_BUILD_ARGS=(
   --build-arg CANVAS_RAILS6_0=${CANVAS_RAILS6_0:-1}
   --build-arg POSTGRES_CLIENT="$POSTGRES_CLIENT"
   --build-arg RUBY="$RUBY"
@@ -72,13 +70,9 @@ WEBPACK_CACHE_BUILD_ARGS=(
   --build-arg JS_BUILD_NO_UGLIFY="$JS_BUILD_NO_UGLIFY"
   --build-arg RAILS_LOAD_ALL_LOCALES="$RAILS_LOAD_ALL_LOCALES"
 )
-BASE_RUNNER_PARTS=(
-  $BASE_IMAGE_ID
-  "${BASE_RUNNER_BUILD_ARGS[@]}"
-  $BASE_RUNNER_DOCKERFILE_MD5
-)
 RUBY_RUNNER_PARTS=(
-  "${BASE_RUNNER_PARTS[@]}"
+  $BASE_IMAGE_ID
+  "${RUBY_RUNNER_BUILD_ARGS[@]}"
   $RUBY_RUNNER_DOCKERFILE_MD5
   $RUBY_CACHE_MD5
 )
@@ -99,7 +93,6 @@ WEBPACK_CACHE_PARTS=(
   $WEBPACK_CACHE_MD5
 )
 
-declare -A BASE_RUNNER_TAGS; compute_tags "BASE_RUNNER_TAGS" $BASE_RUNNER_PREFIX ${BASE_RUNNER_PARTS[@]}
 declare -A RUBY_RUNNER_TAGS; compute_tags "RUBY_RUNNER_TAGS" $RUBY_RUNNER_PREFIX ${RUBY_RUNNER_PARTS[@]}
 declare -A YARN_RUNNER_TAGS; compute_tags "YARN_RUNNER_TAGS" $YARN_RUNNER_PREFIX ${YARN_RUNNER_PARTS[@]}
 declare -A WEBPACK_BUILDER_TAGS; compute_tags "WEBPACK_BUILDER_TAGS" $WEBPACK_BUILDER_PREFIX ${WEBPACK_BUILDER_PARTS[@]}
@@ -117,25 +110,10 @@ if [ -z "${WEBPACK_CACHE_SELECTED_TAG}" ]; then
       RUBY_RUNNER_SELECTED_TAG=""; pull_first_tag "RUBY_RUNNER_SELECTED_TAG" ${RUBY_RUNNER_TAGS[LOAD_TAG]} ${RUBY_RUNNER_TAGS[LOAD_FALLBACK_TAG]}
 
       if [ -z "${RUBY_RUNNER_SELECTED_TAG}" ]; then
-        BASE_RUNNER_SELECTED_TAG=""; pull_first_tag "BASE_RUNNER_SELECTED_TAG" ${BASE_RUNNER_TAGS[LOAD_TAG]} ${BASE_RUNNER_TAGS[LOAD_FALLBACK_TAG]}
-
-        if [ -z "${BASE_RUNNER_SELECTED_TAG}" ]; then
-          docker build \
-            "${BASE_RUNNER_BUILD_ARGS[@]}" \
-            --tag "${BASE_RUNNER_TAGS[SAVE_TAG]}" \
-            - < Dockerfile.jenkins
-
-          BASE_RUNNER_SELECTED_TAG=${BASE_RUNNER_TAGS[SAVE_TAG]}
-
-          add_log "built ${BASE_RUNNER_SELECTED_TAG}"
-        fi
-
-        tag_many $BASE_RUNNER_SELECTED_TAG local/base-runner ${BASE_RUNNER_TAGS[SAVE_TAG]}
-
         docker build \
-          --label "BASE_RUNNER_SELECTED_TAG=$BASE_RUNNER_SELECTED_TAG" \
+          "${RUBY_RUNNER_BUILD_ARGS[@]}" \
           --tag "${RUBY_RUNNER_TAGS[SAVE_TAG]}" \
-          - < Dockerfile.jenkins.ruby-runner
+          - < Dockerfile.jenkins
 
         RUBY_RUNNER_SELECTED_TAG=${RUBY_RUNNER_TAGS[SAVE_TAG]}
 

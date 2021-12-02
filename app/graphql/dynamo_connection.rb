@@ -32,11 +32,9 @@ class DynamoConnection < GraphQL::Pagination::Connection
   end
 
   def nodes
-    if first
-      sliced_nodes.limit(first)
-    else
+    first ?
+      sliced_nodes.limit(first) :
       sliced_nodes
-    end
   end
 
   private

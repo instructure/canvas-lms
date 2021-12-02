@@ -108,23 +108,23 @@ module Rake
 
     def ensure_all_nodes_are_defined!
       undefined = nodes.reduce([]) do |errors, (_node, deps)|
-        errors + deps.reject { |dep| nodes.key?(dep) }
+        errors + deps.select { |dep| !nodes.key?(dep) }
       end
 
       if undefined.any?
-        raise <<~TEXT
+        fail <<~ERR
 
           The following nodes are listed as dependents but were not defined:
 
             - #{undefined.uniq.join("\n  - ")}
 
-        TEXT
+        ERR
       end
     end
 
     def take_or_resolve(node, batch, to_take, visited = [])
       if visited.include?(node)
-        raise "node \"#{node}\" has a self or circular dependency"
+        fail "node \"#{node}\" has a self or circular dependency"
       end
 
       # don't dupe if we already took it this pass (e.g. as a dep):

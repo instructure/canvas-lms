@@ -97,7 +97,6 @@ const ManageOutcomeItem = ({
                   withBorder={false}
                   interaction={description || friendlyDescription ? 'enabled' : 'disabled'}
                   onClick={onClickHandler}
-                  data-testid="manage-outcome-item-expand-toggle"
                 >
                   <div style={{display: 'flex', alignSelf: 'center', fontSize: '0.875rem'}}>
                     {truncated ? (

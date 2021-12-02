@@ -26,14 +26,14 @@ describe DataFixup::DeleteExtraPlaceholderSubmissions do
 
   it "soft-deletes a submission that no longer has visibility" do
     @assignment.update_column(:only_visible_to_overrides, true)
-    expect do
+    expect {
       DataFixup::DeleteExtraPlaceholderSubmissions.run
-    end.to change { Submission.active.count }.from(1).to(0)
+    }.to change { Submission.active.count }.from(1).to(0)
   end
 
   it "does not soft-delete a submission that is still visible" do
-    expect do
+    expect {
       DataFixup::DeleteExtraPlaceholderSubmissions.run
-    end.not_to change { Submission.active.count }
+    }.not_to change { Submission.active.count }
   end
 end

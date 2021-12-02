@@ -72,7 +72,7 @@ describe Api::V1::SubmissionComment do
         current_user: teacher,
         submissions: [student_sub],
         submission_comments: student_sub.submission_comments
-      ).pluck(:anonymous_id)
+      ).map { |comment| comment[:anonymous_id] }
 
       expect(anonymous_ids).to match_array([student_sub.anonymous_id, student2_sub.anonymous_id])
     end

@@ -17,17 +17,17 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require "net/http"
+require 'net/http'
 
-require "cgi"
+require 'cgi'
 
-require "academic_benchmark/engine"
+require 'academic_benchmark/engine'
 
-require "academic_benchmark/ab_gem_extensions/authority"
-require "academic_benchmark/ab_gem_extensions/document"
-require "academic_benchmark/ab_gem_extensions/publication"
-require "academic_benchmark/ab_gem_extensions/section"
-require "academic_benchmark/ab_gem_extensions/standard"
+require 'academic_benchmark/ab_gem_extensions/authority'
+require 'academic_benchmark/ab_gem_extensions/document'
+require 'academic_benchmark/ab_gem_extensions/publication'
+require 'academic_benchmark/ab_gem_extensions/section'
+require 'academic_benchmark/ab_gem_extensions/standard'
 
 module AcademicBenchmark
   # The authorities have changed from v3 to v4.1, namely:
@@ -35,29 +35,29 @@ module AcademicBenchmark
   # NRC/NGSS -> Achieve
   # NGA Center/CCSSO -> CC
 
-  COMMON_CORE_AUTHORITY = "CC"
-  ISTE_AUTHORITY_CODE = "ISTE"
-  ACHIEVE_AUTHORITY = "Achieve" # code: -none-
+  COMMON_CORE_AUTHORITY = 'CC'
+  ISTE_AUTHORITY_CODE = 'ISTE'
+  ACHIEVE_AUTHORITY = 'Achieve' # code: -none-
   NATIONAL_STDS = [COMMON_CORE_AUTHORITY, ISTE_AUTHORITY_CODE, ACHIEVE_AUTHORITY].freeze
   COUNTRY_STDS = [
-    "Australian Curriculum, Assessment and Reporting Authority", # code: acara
-    "UK Department for Education" # code: -none-
+    'Australian Curriculum, Assessment and Reporting Authority', # code: acara
+    'UK Department for Education' # code: -none-
   ].freeze
 
   def self.config
     empty_settings = {}.freeze
-    p = Canvas::Plugin.find("academic_benchmark_importer")
+    p = Canvas::Plugin.find('academic_benchmark_importer')
     return empty_settings unless p
 
     p.settings || empty_settings
   end
 
   def self.check_config
-    if !config
+    if !self.config
       "(needs partner_key and partner_id)"
-    elsif config[:partner_key].blank?
+    elsif self.config[:partner_key].blank?
       "(needs partner_key)"
-    elsif config[:partner_id].blank?
+    elsif self.config[:partner_id].blank?
       "(needs partner_id)"
     end
   end
@@ -86,7 +86,7 @@ module AcademicBenchmark
   # browsed in order to retrieve specifics like NGSS and Common Core
   ##
   def self.retrieve_authorities(api)
-    sort_authorities(api.standards.authorities)
+    self.sort_authorities(api.standards.authorities)
   end
 
   # sort national standards at the top, followed by country standards,
@@ -95,9 +95,9 @@ module AcademicBenchmark
     national_stds, rest = authorities.partition { |a| NATIONAL_STDS.include?(a.code) || NATIONAL_STDS.include?(a.description) }
     country_stds, rest = rest.partition { |a| COUNTRY_STDS.include?(a.description) }
     [
-      sort_authorities_by_description(national_stds),
-      sort_authorities_by_description(country_stds),
-      sort_authorities_by_description(rest)
+      self.sort_authorities_by_description(national_stds),
+      self.sort_authorities_by_description(country_stds),
+      self.sort_authorities_by_description(rest)
     ].flatten
   end
 
@@ -110,12 +110,12 @@ module AcademicBenchmark
   # These can be passed to the `create` action
   ##
   def self.list_of_available_guids
-    api = api_handle
-    auth_list = retrieve_authorities(api)
+    api = self.api_handle
+    auth_list = self.retrieve_authorities(api)
 
     # prepend the common core, next gen science standards (Achieve),
     # and the ISTE (NETS) standards to the list
-    auth_list.unshift(extract_nat_stds(api, nat_stds_guid_from_auths(auth_list)))
+    auth_list.unshift(self.extract_nat_stds(api, self.nat_stds_guid_from_auths(auth_list)))
     auth_list.unshift(api.standards.authority_publications(ACHIEVE_AUTHORITY))
     auth_list.unshift(api.standards.authority_publications(COMMON_CORE_AUTHORITY))
 
@@ -133,24 +133,24 @@ module AcademicBenchmark
   class APIError < StandardError; end
 
   def self.import(guid, options = {})
-    is_auth = auth?(guid)
+    is_auth = self.auth?(guid)
     authority = is_auth ? guid : nil
     publication = is_auth ? nil : guid
     check_args(authority, publication)
-    ensure_ab_credentials
+    self.ensure_ab_credentials
 
     AcademicBenchmark.queue_migration_for(
       authority: authority,
       publication: publication,
-      user: authorized?,
+      user: self.authorized?,
       options: options
     ).first
   end
 
   def self.queue_migration_for(authority:, publication:, user:, options: {})
     cm = ContentMigration.new(context: Account.site_admin)
-    cm.converter_class = config["converter_class"]
-    cm.migration_settings[:migration_type] = "academic_benchmark_importer"
+    cm.converter_class = self.config['converter_class']
+    cm.migration_settings[:migration_type] = 'academic_benchmark_importer'
     cm.migration_settings[:import_immediately] = true
     cm.migration_settings[:authority] = authority
     cm.migration_settings[:publication] = publication
@@ -172,7 +172,7 @@ module AcademicBenchmark
   end
 
   def self.auth?(guid)
-    api_handle.standards.authorities.map(&:guid).include?(guid)
+    self.api_handle.standards.authorities.map(&:guid).include?(guid)
   end
 
   def self.check_args(authority, publication)
@@ -184,8 +184,8 @@ module AcademicBenchmark
 
   def self.ensure_ab_credentials
     err = nil
-    err ||= ensure_partner_id
-    err ||= ensure_partner_key
+    err ||= self.ensure_partner_id
+    err ||= self.ensure_partner_key
     if err
       raise Canvas::Migration::Error,
             "Not importing academic benchmark data because the Academic Benchmarks #{err}"
@@ -194,19 +194,19 @@ module AcademicBenchmark
 
   def self.ensure_partner_id
     unless AcademicBenchmark.config[:partner_id].present?
-      "Partner ID is not set"
+      return "Partner ID is not set"
     end
   end
 
   def self.ensure_partner_key
     unless AcademicBenchmark.config[:partner_key].present?
-      "Partner key is not set"
+      return "Partner key is not set"
     end
   end
 
   def self.authorized?
-    check_for_import_rights(
-      user: ensure_real_user(user_id: ensure_user_id_set)
+    self.check_for_import_rights(
+      user: self.ensure_real_user(user_id: self.ensure_user_id_set)
     )
   end
 
@@ -214,7 +214,7 @@ module AcademicBenchmark
     uid = Setting.get("academic_benchmark_migration_user_id", nil)
     unless uid.present?
       raise Canvas::Migration::Error,
-            "Not importing academic benchmark data because no user id set"
+            'Not importing academic benchmark data because no user id set'
     end
     uid
   end

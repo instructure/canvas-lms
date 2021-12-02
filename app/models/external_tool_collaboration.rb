@@ -19,9 +19,9 @@
 #
 
 class ExternalToolCollaboration < Collaboration
-  validates :url, presence: true
+  validates_presence_of :url
 
   def update_url
-    data["updateUrl"]
+    data['updateUrl']
   end
 end

@@ -20,7 +20,7 @@
 module CC::Exporter::Epub
   module Exportable
     def content_cartridge
-      attachment
+      self.attachment
     end
 
     def convert_to_epub

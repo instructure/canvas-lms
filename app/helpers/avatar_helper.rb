@@ -19,16 +19,16 @@
 
 module AvatarHelper
   def avatar_image_attrs(user_or_id)
-    return ["/images/messages/avatar-50.png", ""] unless user_or_id
+    return ["/images/messages/avatar-50.png", ''] unless user_or_id
 
     user_id = user_or_id.is_a?(User) ? user_or_id.id : user_or_id
     user = user_or_id.is_a?(User) && user_or_id
     account = @account || @domain_root_account
-    is_admin = account&.grants_right?(@current_user, session, :manage)
+    is_admin = account && account.grants_right?(@current_user, session, :manage)
     if session["reported_#{user_id}"] && !is_admin && !(user && user.avatar_state == :approved)
-      ["/images/messages/avatar-50.png", ""]
+      ["/images/messages/avatar-50.png", '']
     else
-      avatar_settings = (@domain_root_account && @domain_root_account.settings[:avatars]) || "enabled"
+      avatar_settings = (@domain_root_account && @domain_root_account.settings[:avatars]) || 'enabled'
       user_id = Shard.global_id_for(user_id)
       user_shard = Shard.shard_for(user_id)
       user_shard.activate do
@@ -36,12 +36,12 @@ module AvatarHelper
           if !user && user_id.to_i > 0
             user ||= User.find(user_id)
           end
-          url = if user
-                  avatar_url_for_user(user)
-                else
-                  "/images/messages/avatar-50.png"
-                end
-          alt = user ? user.short_name : ""
+          if user
+            url = avatar_url_for_user(user)
+          else
+            url = "/images/messages/avatar-50.png"
+          end
+          alt = user ? user.short_name : ''
           [url, alt]
         end
       end
@@ -55,32 +55,31 @@ module AvatarHelper
     avatar_url, display_name = avatar_image_attrs(user_or_id)
     context_code = opts[:context_code] if opts[:context_code]
     url = nil
-    if opts.key? :url
+    if opts.has_key? :url
       url = opts[:url]
     elsif user_or_id
-      url = if context_code
-              context_prefix(context_code) + user_path(user_or_id)
-            else
-              user_url(user_or_id)
-            end
+      if context_code
+        url = context_prefix(context_code) + user_path(user_or_id)
+      else
+        url = user_url(user_or_id)
+      end
     end
     link_opts = {}
-    link_opts[:class] = "fs-exclude avatar " + opts[:class].to_s
+    link_opts[:class] = 'fs-exclude avatar ' + opts[:class].to_s
     link_opts[:style] = "background-image: url(#{avatar_url})"
     link_opts[:style] += ";width: #{opts[:size]}px;height: #{opts[:size]}px" if opts[:size]
     link_opts[:href] = url if url
     link_opts[:title] = opts[:title] if opts[:title]
-    content = content_tag(:span, opts[:sr_content] || display_name, class: "screenreader-only")
-    content += (opts[:edit] ? content_tag(:i, nil, class: "icon-edit") : "")
-    content += (opts[:show_flag] ? content_tag(:i, nil, class: "icon-flag") : "")
+    content = content_tag(:span, opts[:sr_content] || display_name, class: 'screenreader-only')
+    content += (opts[:edit] ? content_tag(:i, nil, class: 'icon-edit') : '')
+    content += (opts[:show_flag] ? content_tag(:i, nil, class: 'icon-flag') : '')
     content_tag(url ? :a : :span, content, link_opts)
   end
 
   def avatar_url_for(conversation, participants = conversation.participants)
-    case participants.size
-    when 1
+    if participants.size == 1
       avatar_url_for_user(participants.first)
-    when 2
+    elsif participants.size == 2
       avatar_url_for_user(participants.find { |u| u.id != conversation.user_id })
     else
       avatar_url_for_group
@@ -104,7 +103,7 @@ module AvatarHelper
     default_avatar = use_fallback ? User.avatar_fallback_url(User.default_avatar_fallback, request) : nil
     url = if avatars_enabled_for_user?(user, root_account: root_account)
             user.avatar_url(nil,
-                            ((root_account && root_account.settings[:avatars]) || "enabled"),
+                            ((root_account && root_account.settings[:avatars]) || 'enabled'),
                             default_avatar,
                             request,
                             use_fallback)

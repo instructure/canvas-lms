@@ -193,16 +193,12 @@ actions.SET_BINDING_WORKFLOW_STATE_START = 'SET_BINDING_WORKFLOW_STATE_START'
 actions.setBindingWorkflowStateStart = () => ({type: actions.SET_BINDING_WORKFLOW_STATE_START})
 
 actions.SET_BINDING_WORKFLOW_STATE_SUCCESSFUL = 'SET_BINDING_WORKFLOW_STATE_SUCCESSFUL'
-actions.setBindingWorkflowStateSuccessful = (response) => ({
-  type: actions.SET_BINDING_WORKFLOW_STATE_SUCCESSFUL,
-  payload: response
+actions.setBindingWorkflowStateSuccessful = () => ({
+  type: actions.SET_BINDING_WORKFLOW_STATE_SUCCESSFUL
 })
 
 actions.SET_BINDING_WORKFLOW_STATE_FAILED = 'SET_BINDING_WORKFLOW_STATE_FAILED'
-actions.setBindingWorkflowStateFailed = (payload) => ({
-  type: actions.SET_BINDING_WORKFLOW_STATE_FAILED,
-  payload
-})
+actions.setBindingWorkflowStateFailed = () => ({type: actions.SET_BINDING_WORKFLOW_STATE_FAILED})
 
 actions.LIST_DEVELOPER_KEY_SCOPES_FAILED = 'LIST_DEVELOPER_KEY_SCOPES_FAILED'
 actions.listDeveloperKeyScopesFailed = () => ({type: actions.LIST_DEVELOPER_KEY_SCOPES_FAILED})
@@ -240,16 +236,10 @@ actions.listDeveloperKeyScopes = accountId => dispatch => {
     })
 }
 
-actions.setBindingWorkflowState = (developerKey, accountId, workflowState) => dispatch => {
+actions.setBindingWorkflowState = (developerKeyId, accountId, workflowState) => dispatch => {
   dispatch(actions.setBindingWorkflowStateStart())
-  const url = `/api/v1/accounts/${accountId}/developer_keys/${developerKey.id}/developer_key_account_bindings`
+  const url = `/api/v1/accounts/${accountId}/developer_keys/${developerKeyId}/developer_key_account_bindings`
 
-  const previousAccountBinding = developerKey.developer_key_account_binding || {}
-
-  dispatch(actions.listDeveloperKeysReplaceBindingState({
-    developerKeyId: developerKey.id,
-    newAccountBinding: {...previousAccountBinding, workflow_state: workflowState}
-  }))
   axios
     .post(url, {
       developer_key_account_binding: {
@@ -257,13 +247,11 @@ actions.setBindingWorkflowState = (developerKey, accountId, workflowState) => di
       }
     })
     .then(response => {
-      dispatch(actions.setBindingWorkflowStateSuccessful(response.data))
+      dispatch(actions.listDeveloperKeysReplaceBindingState(response.data))
+      dispatch(actions.setBindingWorkflowStateSuccessful())
     })
     .catch(error => {
-      dispatch(actions.setBindingWorkflowStateFailed({
-        developerKeyId: developerKey.id,
-        previousAccountBinding
-      }))
+      dispatch(actions.setBindingWorkflowStateFailed())
       $.flashError(error.message)
     })
 }
