@@ -164,6 +164,7 @@ class AssignmentsController < ApplicationController
              ASSIGNMENT_ID: params[:id],
              CONFETTI_ENABLED: @domain_root_account&.feature_enabled?(:confetti_for_assignments),
              COURSE_ID: @context.id,
+             ISOBSERVER: @context_enrollment&.observer?,
              PREREQS: assignment_prereqs,
              SUBMISSION_ID: graphql_submission_id
            })
