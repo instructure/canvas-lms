@@ -53,6 +53,7 @@ module Types
     field :posted_at, Types::DateTimeType, null: true
     field :podcast_has_student_posts, Boolean, null: true
     field :discussion_type, String, null: true
+    field :anonymous_state, String, null: true
     field :position, Int, null: true
     field :allow_rating, Boolean, null: true
     field :only_graders_can_rate, Boolean, null: true

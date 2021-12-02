@@ -167,6 +167,7 @@ RSpec.shared_examples "DiscussionType" do
 
   it "queries the attribute" do
     expect(discussion_type.resolve("title")).to eq discussion.title
+    expect(discussion_type.resolve("anonymousState")).to eq discussion.anonymous_state
     expect(discussion_type.resolve("podcastHasStudentPosts")).to eq discussion.podcast_has_student_posts
     expect(discussion_type.resolve("discussionType")).to eq discussion.discussion_type
     expect(discussion_type.resolve("position")).to eq discussion.position
