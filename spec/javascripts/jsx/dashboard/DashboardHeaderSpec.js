@@ -122,7 +122,7 @@ QUnit.skip('it waits for the erb html to be injected before rendering the ToDoSi
     status: 200,
     responseText: {}
   })
-  const promiseToGetNewCourseForm = import('ui/features/dashboard/jquery/util/newCourseForm.js')
+  const promiseToGetNewCourseForm = import('ui/features/dashboard/jquery/util/newCourseForm')
 
   ReactDOM.render(
     <FakeDashboard planner_enabled={false} dashboard_view="activity" showTodoList={null} />,
@@ -150,7 +150,8 @@ QUnit.skip('it waits for the erb html to be injected before rendering the ToDoSi
   })
 })
 
-test('it should switch dashboard view appropriately when changeDashboard is called', () => {
+test('it should switch dashboard view appropriately when changeDashboard is called', async assert => {
+  const done = assert.async()
   let dashboardHeader = null
   ReactDOM.render(
     <FakeDashboard
@@ -163,18 +164,20 @@ test('it should switch dashboard view appropriately when changeDashboard is call
     container
   )
 
-  dashboardHeader.changeDashboard('cards')
+  await dashboardHeader.changeDashboard('cards')
   strictEqual(document.getElementById('dashboard-activity').style.display, 'none')
   strictEqual(document.getElementById('DashboardCard_Container').style.display, 'block')
   strictEqual(saveDashboardViewStub.callCount, 1)
 
-  dashboardHeader.changeDashboard('activity')
+  await dashboardHeader.changeDashboard('activity')
   strictEqual(document.getElementById('dashboard-activity').style.display, 'block')
   strictEqual(document.getElementById('DashboardCard_Container').style.display, 'none')
   strictEqual(saveDashboardViewStub.callCount, 2)
+  done()
 })
 
-test('it should switch dashboard view appropriately with Student Planner enabled', () => {
+test('it should switch dashboard view appropriately with Student Planner enabled', async assert => {
+  const done = assert.async()
   let dashboardHeader = null
   ReactDOM.render(
     <FakeDashboard
@@ -187,7 +190,7 @@ test('it should switch dashboard view appropriately with Student Planner enabled
     container
   )
 
-  dashboardHeader.changeDashboard('cards')
+  await dashboardHeader.changeDashboard('cards')
   strictEqual(document.getElementById('dashboard-planner').style.display, 'none')
   strictEqual(document.getElementById('dashboard-planner-header').style.display, 'none')
   strictEqual(document.getElementById('dashboard-planner-header-aux').style.display, 'none')
@@ -195,7 +198,7 @@ test('it should switch dashboard view appropriately with Student Planner enabled
   strictEqual(document.getElementById('dashboard-activity').style.display, 'none')
   strictEqual(dashboardHeader.getActiveApp(), 'cards')
 
-  dashboardHeader.changeDashboard('planner')
+  await dashboardHeader.changeDashboard('planner')
   strictEqual(document.getElementById('dashboard-planner').style.display, 'block')
   strictEqual(document.getElementById('dashboard-planner-header').style.display, 'block')
   strictEqual(document.getElementById('dashboard-planner-header-aux').style.display, 'block')
@@ -203,7 +206,7 @@ test('it should switch dashboard view appropriately with Student Planner enabled
   strictEqual(document.getElementById('dashboard-activity').style.display, 'none')
   strictEqual(dashboardHeader.getActiveApp(), 'planner')
 
-  dashboardHeader.changeDashboard('activity')
+  await dashboardHeader.changeDashboard('activity')
   strictEqual(document.getElementById('dashboard-planner').style.display, 'none')
   strictEqual(document.getElementById('dashboard-planner-header').style.display, 'none')
   strictEqual(document.getElementById('dashboard-planner-header-aux').style.display, 'none')
@@ -215,6 +218,7 @@ test('it should switch dashboard view appropriately with Student Planner enabled
   dashboardHeader.changeDashboard('planner')
   strictEqual(cardLoadSpy.callCount, 1)
   strictEqual(plannerStub.callCount, 1)
+  done()
 })
 
 test('it should use the dashboard view endpoint when Student Planner is enabled', assert => {
