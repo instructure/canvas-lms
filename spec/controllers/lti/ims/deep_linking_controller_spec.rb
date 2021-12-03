@@ -725,6 +725,30 @@ module Lti
               expect(ContentTag.where(context: course).last.workflow_state).to eq("unpublished")
             end
           end
+
+          context "when on the new assignment page" do
+            let(:params) { super().merge({ placement: "assignment_selection" }) }
+            let(:content_items) do
+              [
+                { type: "ltiResourceLink", url: launch_url, title: "Item 1", lineItem: { scoreMaximum: 4 } },
+                { type: "ltiResourceLink", url: launch_url, title: "Item 2", lineItem: { scoreMaximum: 4 } },
+                { type: "ltiResourceLink", url: launch_url, title: "Item 3", lineItem: { scoreMaximum: 4 } }
+              ]
+            end
+
+            it "does not create a new module" do
+              expect { subject }.not_to change { course.context_modules.count }
+            end
+
+            it "only uses the first content item for a new assignment" do
+              expect { subject }.to change { course.assignments.count }.by 1
+            end
+
+            it "leaves assignment unpublished" do
+              subject
+              expect(course.assignments.last.workflow_state).to eq("unpublished")
+            end
+          end
         end
       end
     end
