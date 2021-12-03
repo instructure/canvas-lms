@@ -39,7 +39,9 @@ import {
 } from '../../../reducers/pace_plans'
 import {getBlackoutDates} from '../../../shared/reducers/blackout_dates'
 import {getShowProjections} from '../../../reducers/ui'
-import PacePlanDateInput from '../../../shared/components/pace_plan_date_input'
+import PacePlanDateInput, {
+  PacePlansDateInputProps
+} from '../../../shared/components/pace_plan_date_input'
 import SlideTransition from '../../../utils/slide_transition'
 
 interface StoreProps {
@@ -70,7 +72,9 @@ export const ProjectedDates: React.FC<ComponentProps> = ({
   blackoutDates,
   weekendsDisabled
 }) => {
-  const [startMessage, setStartMessage] = useState(undefined)
+  const [startMessage, setStartMessage] = useState<PacePlansDateInputProps['message'] | undefined>(
+    undefined
+  )
 
   // PacePlanDateInput.validateDay plays 2 roles
   // 1. validate the new date in response to a date change
@@ -80,7 +84,7 @@ export const ProjectedDates: React.FC<ComponentProps> = ({
   // See useEffect for that
   const validateStart = useCallback(
     (date: moment.Moment) => {
-      if (date < moment(ENV.VALID_DATE_RANGE.start_at.date)) {
+      if (ENV.VALID_DATE_RANGE.start_at.date && date < moment(ENV.VALID_DATE_RANGE.start_at.date)) {
         return I18n.t('Date is before the course start date')
       }
 
@@ -88,7 +92,11 @@ export const ProjectedDates: React.FC<ComponentProps> = ({
         return I18n.t('Date is after the specified end date')
       }
 
-      if (!pacePlan.hard_end_dates && date > moment(ENV.VALID_DATE_RANGE.end_at.date)) {
+      if (
+        !pacePlan.hard_end_dates &&
+        ENV.VALID_DATE_RANGE.end_at.date &&
+        date > moment(ENV.VALID_DATE_RANGE.end_at.date)
+      ) {
         return I18n.t('Date is after the course end date')
       }
     },
@@ -102,6 +110,7 @@ export const ProjectedDates: React.FC<ComponentProps> = ({
     // is called, do it here.
     if (
       !pacePlan.hard_end_dates &&
+      ENV.VALID_DATE_RANGE.end_at.date &&
       moment(projectedEndDate) > moment(ENV.VALID_DATE_RANGE.end_at.date)
     ) {
       // INSTUI FormFieldMessage doesn't support type: 'warning' yet.
@@ -130,7 +139,9 @@ export const ProjectedDates: React.FC<ComponentProps> = ({
     endHelpText = I18n.t('Required by specified end date')
   } else {
     endDateValue = projectedEndDate
-    endHelpText = I18n.t('Required by course end date')
+    endHelpText = ENV.VALID_DATE_RANGE.end_at.date
+      ? I18n.t('Required by course end date')
+      : I18n.t('Hypothetical end date')
   }
 
   let startInteraction: InputInteraction = 'enabled'
