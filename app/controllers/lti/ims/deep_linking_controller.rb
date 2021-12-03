@@ -55,10 +55,31 @@ module Lti
           return
         end
 
+        # create and validate assignments for content items with line items,
+        # which will be added to a module later if necessary
+        lti_resource_links.each do |content_item|
+          next unless allow_line_items? && content_item.key?(:lineItem)
+          next unless validate_line_item!(content_item)
+
+          assignment_id = create_assignment!(content_item)
+          content_item[:assignment_id] = assignment_id
+        end
+
+        # receiving only invalid content items should:
+        # * not create a new module
+        # * not create any assignments
+        # * show these errors to the user
+        # * reload the page
+        if lti_resource_links.all? { |item| item.key?(:errors) }
+          render_content_items
+          return
+        end
+
         # creating mixed content (module items and/or assignments) from the modules
         # or assignments pages should:
         # * create a new module or use existing one
-        # * add all content items to this module
+        # * add valid content items to this module
+        # * show any errors to the user
         # * reload the page
         context_module = if create_new_module?
                            @context.context_modules.create!(name: I18n.t("New Content From App"), workflow_state: "unpublished")
@@ -68,10 +89,9 @@ module Lti
 
         lti_resource_links.each do |content_item|
           if allow_line_items? && content_item.key?(:lineItem)
-            next unless validate_line_item!(content_item)
+            next if content_item[:errors]
 
-            assignment_id = create_assignment!(content_item)
-            context_module.add_item({ type: "assignment", id: assignment_id })
+            context_module.add_item({ type: "assignment", id: content_item[:assignment_id] })
           else
             context_module.add_item(build_module_item(content_item))
           end

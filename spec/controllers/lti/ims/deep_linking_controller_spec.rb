@@ -449,13 +449,13 @@ module Lti
                 course.root_account.enable_feature!(:lti_deep_linking_module_index_menu_modal)
               end
 
-              it "creates a new context module" do
-                expect { subject }.to change { course.context_modules.count }.by 1
-              end
-
               context "single item" do
                 let(:content_items) do
                   [{ type: "ltiResourceLink", url: launch_url, title: "Item 1" }]
+                end
+
+                it "creates a new context module" do
+                  expect { subject }.to change { course.context_modules.count }.by 1
                 end
 
                 it "creates a resource link" do
@@ -474,6 +474,10 @@ module Lti
                     { type: "ltiResourceLink", url: launch_url, title: "Item 2" },
                     { type: "ltiResourceLink", url: launch_url, title: "Item 3" }
                   ]
+                end
+
+                it "creates a new context module" do
+                  expect { subject }.to change { course.context_modules.count }.by 1
                 end
 
                 it "creates one resource link per item" do
@@ -553,6 +557,10 @@ module Lti
             it "sends error in content item response" do
               subject
               expect(assigns.dig(:js_env, :deep_link_response, :content_items).first).to have_key(:errors)
+            end
+
+            it "does not create a context module" do
+              expect { subject }.not_to change { course.context_modules.count }
             end
 
             context "when title is present in content item" do
