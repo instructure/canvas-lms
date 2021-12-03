@@ -517,6 +517,7 @@ module Lti
             user_session(@user)
             context_external_tool
             course.root_account.enable_feature! :lti_deep_linking_line_items
+            course.root_account.enable_feature! :lti_deep_linking_module_index_menu_modal
           end
 
           shared_examples_for "does nothing" do
@@ -540,7 +541,7 @@ module Lti
           end
 
           context "when placement is not allowed to create line items" do
-            let(:params) { super().merge({ placement: "assignment_selection" }) }
+            let(:params) { super().merge({ placement: "link_selection" }) }
 
             it_behaves_like "does nothing"
           end
