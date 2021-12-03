@@ -224,7 +224,6 @@ export const getOptimisticResponse = (
           courseRoles: [],
           __typename: 'User'
         },
-        anonymousAuthor: null,
         editor: null,
         lastReply: null,
         permissions: {

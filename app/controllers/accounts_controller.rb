@@ -753,10 +753,15 @@ class AccountsController < ApplicationController
     # sections, needs_grading_count, and total_score not valid as enrollments are needed
     includes -= %w[permissions sections needs_grading_count total_scores]
 
-    # don't calculate a total count for this endpoint. total_entries: nil
+    page_opts = {}
+    # don't calculate a total count for this endpoint.
+    if params[:search_term] || !@account.allow_last_page_on_account_courses?
+      page_opts[:total_entries] = nil
+    end
+
     all_precalculated_permissions = nil
     GuardRail.activate(:secondary) do
-      @courses = Api.paginate(@courses, self, api_v1_account_courses_url, { total_entries: nil })
+      @courses = Api.paginate(@courses, self, api_v1_account_courses_url, page_opts)
 
       ActiveRecord::Associations::Preloader.new.preload(@courses, [:account, :root_account, course_account_associations: :account])
       preload_teachers(@courses) if includes.include?("teachers")
