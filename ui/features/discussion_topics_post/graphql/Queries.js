@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {AnonymousUser} from './AnonymousUser'
 import {Discussion} from './Discussion'
 import {DiscussionEntry} from './DiscussionEntry'
 import {DiscussionEntryDraft} from './DiscussionEntryDraft'
@@ -46,6 +47,9 @@ export const DISCUSSION_QUERY = gql`
           ...User
           courseRoles(courseId: $courseID, roleTypes: $rolePillTypes)
         }
+        anonymousAuthor {
+          ...AnonymousUser
+        }
         discussionEntriesConnection(
           after: $page
           first: $perPage
@@ -63,6 +67,9 @@ export const DISCUSSION_QUERY = gql`
             author {
               ...User
               courseRoles(courseId: $courseID, roleTypes: $rolePillTypes)
+            }
+            anonymousAuthor {
+              ...AnonymousUser
             }
           }
           pageInfo {
@@ -88,6 +95,7 @@ export const DISCUSSION_QUERY = gql`
     }
   }
   ${User.fragment}
+  ${AnonymousUser.fragment}
   ${Discussion.fragment}
   ${DiscussionEntry.fragment}
   ${DiscussionEntryDraft.fragment}

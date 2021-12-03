@@ -147,12 +147,31 @@ module Types
 
     field :author, Types::UserType, null: true
     def author
-      load_association(:user)
+      if object.anonymous?
+        nil
+      else
+        load_association(:user)
+      end
+    end
+
+    field :anonymous_author, Types::AnonymousUserType, null: true
+    def anonymous_author
+      if object.anonymous?
+        Loaders::DiscussionTopicParticipantLoader.for(object.id).load(object.user_id).then do |participant|
+          { id: participant.id.to_s(36), short_name: participant.id.to_s(36), avatar_url: nil }
+        end
+      else
+        nil
+      end
     end
 
     field :editor, Types::UserType, null: true
     def editor
-      load_association(:editor)
+      if object.anonymous?
+        nil
+      else
+        load_association(:editor)
+      end
     end
 
     field :permissions, Types::DiscussionPermissionsType, null: true
