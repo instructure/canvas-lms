@@ -175,18 +175,14 @@ test('renders the publish ToggleIcon', () => {
   ok(node.exists())
   strictEqual(node.length, 2)
 })
+
 test('when feature flag is off, renders anonymous discussion lock explanation for read_as_admin', () => {
   fakeENV.setup()
   ENV.discussion_anonymity_enabled = false
   const discussion = {locked: false, title: 'blerp', anonymous_state: 'full_anonymity'}
   const tree = mount(<DiscussionRow {...makeProps({canReadAsAdmin: true, discussion})} />)
-  const node = tree.find('.discussion-availability')
-
-  ok(
-    node
-      .text()
-      .includes('Enable Discussions/Announcements Redesign to view anonymous discussion content')
-  )
+  const node = tree.find('.discussion-availability Link')
+  ok(node.text().includes('Discussions/Announcements Redesign'))
   ok(node.exists())
   tree.unmount()
   fakeENV.teardown()
