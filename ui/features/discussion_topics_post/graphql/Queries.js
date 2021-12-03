@@ -68,6 +68,9 @@ export const DISCUSSION_QUERY = gql`
               ...User
               courseRoles(courseId: $courseID, roleTypes: $rolePillTypes)
             }
+            anonymousAuthor {
+              ...AnonymousUser
+            }
           }
           pageInfo {
             ...PageInfo
