@@ -268,14 +268,18 @@ export class DiscussionRow extends Component {
   getAvailabilityString = () => {
     if (
       this.props.discussion.anonymous_state === 'full_anonymity' &&
-      !process.env.discussion_anonymity_enabled
+      !ENV.discussion_anonymity_enabled
     ) {
       return (
         <Text size="small">
           {this.props.canReadAsAdmin
-            ? I18n.t(
-                'Enable Discussions/Announcements Redesign to view anonymous discussion content'
-              )
+            ? [
+                I18n.t('Enable '),
+                <Link href={ENV.FEATURE_FLAGS_URL} key={this.props.discussion.id}>
+                  {I18n.t('Discussions/Announcements Redesign')}
+                </Link>,
+                I18n.t(' to view anonymous discussion')
+              ]
             : I18n.t('Unavailable')}
         </Text>
       )
@@ -657,7 +661,7 @@ export class DiscussionRow extends Component {
           data-testid={`discussion-link-${this.props.discussion.id}`}
           disabled={
             this.props.discussion.anonymous_state === 'full_anonymity' &&
-            !process.env.discussion_anonymity_enabled
+            !ENV.discussion_anonymity_enabled
           }
         >
           {this.props.discussion.read_state !== 'read' && (

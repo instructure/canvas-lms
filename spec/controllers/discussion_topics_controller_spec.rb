@@ -269,6 +269,7 @@ describe DiscussionTopicsController do
       get "index", params: { course_id: @course.id }
       expect(assigns[:js_env][:student_reporting_enabled]).to be(true)
       expect(assigns[:js_env][:discussion_anonymity_enabled]).to be(true)
+      expect(assigns[:js_env][:FEATURE_FLAGS_URL]).to eq("/courses/#{@course.id}/settings#tab-features")
     end
   end
 
@@ -300,14 +301,26 @@ describe DiscussionTopicsController do
       expect(response.status).to equal(401)
     end
 
-    it "redirects full_anonymity discussions to index when react_discussions_post is turned off" do
+    it "redirects full_anonymity discussions to index when react_discussions_post is turned off(teacher)" do
       anon_topic = @course.discussion_topics.build(title: "some topic", anonymous_state: "full_anonymity")
       user_session(@teacher)
       anon_topic.save
       anon_topic.reload
       Account.site_admin.disable_feature! :react_discussions_post
       get("show", params: { course_id: @course.id, id: anon_topic.id })
-      expect(flash[:info]).to match(/Redesign feature flag turned on/)
+      expect(flash[:info]).to match(%r{Anonymous topics cannot be accessed without Discussions/Announcements Redesign feature preview enabled.})
+      expect(response).to be_redirect
+      expect(response.location).to eq course_discussion_topics_url @course
+    end
+
+    it "redirects full_anonymity discussions to index when react_discussions_post is turned off(student)" do
+      anon_topic = @course.discussion_topics.build(title: "some topic", anonymous_state: "full_anonymity")
+      user_session(@student)
+      anon_topic.save
+      anon_topic.reload
+      Account.site_admin.disable_feature! :react_discussions_post
+      get("show", params: { course_id: @course.id, id: anon_topic.id })
+      expect(flash[:info]).to match(/Anonymous topics are not available at this time./)
       expect(response).to be_redirect
       expect(response.location).to eq course_discussion_topics_url @course
     end

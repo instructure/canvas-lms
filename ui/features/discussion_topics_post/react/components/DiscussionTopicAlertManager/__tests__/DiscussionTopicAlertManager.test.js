@@ -69,4 +69,14 @@ describe('DiscussionTopicAlertManager', () => {
     })
     expect(container.queryByTestId('locked-for-user')).toBeTruthy()
   })
+
+  it('should render anon aleft when status is present', async () => {
+    const {findByTestId} = setup({
+      discussionTopic: Discussion.mock({
+        anonymousState: 'full_anonymous'
+      })
+    })
+    const anonAlert = await findByTestId('anon-conversation')
+    expect(anonAlert).toBeTruthy()
+  })
 })
