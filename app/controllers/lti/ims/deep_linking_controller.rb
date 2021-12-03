@@ -75,6 +75,14 @@ module Lti
           return
         end
 
+        # creating only assignments from the assigments page should:
+        # * not create a new module
+        # * reload the page
+        if for_placement?(:course_assignments_menu) && allow_line_items? && lti_resource_links.all? { |item| item.key?(:lineItem) }
+          render_content_items
+          return
+        end
+
         # creating mixed content (module items and/or assignments) from the modules
         # or assignments pages should:
         # * create a new module or use existing one
@@ -101,6 +109,10 @@ module Lti
       end
 
       private
+
+      def for_placement?(placement)
+        params[:placement]&.to_sym == placement
+      end
 
       def render_content_items(items: content_items, reload_page: true)
         js_env({

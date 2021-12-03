@@ -590,6 +590,10 @@ module Lti
             expect { subject }.to change { course.assignments.count }.by 1
           end
 
+          it "does not create a context module" do
+            expect { subject }.not_to change { course.context_modules.count }
+          end
+
           context "when content item includes available dates" do
             let(:content_item) do
               super().merge({ available: { startDateTime: Time.zone.now.iso8601, endDateTime: Time.zone.now.iso8601 } })
@@ -679,8 +683,12 @@ module Lti
               course.root_account.enable_feature! :lti_deep_linking_module_index_menu_modal
             end
 
-            it "creates a module item" do
+            it "creates a new context module" do
               expect { subject }.to change { course.context_modules.count }.by 1
+            end
+
+            it "creates a module item for every content item" do
+              expect { subject }.to change { ContentTag.where(context: course).count }.by content_items.length
             end
 
             it "creates a link within the module item to the created assignment" do
