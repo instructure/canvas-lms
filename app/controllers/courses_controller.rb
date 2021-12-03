@@ -1087,12 +1087,9 @@ class CoursesController < ApplicationController
           users = users.where(uuid: user_uuids)
         end
 
-        page_opts = {}
         # don't calculate a total count/last page for this endpoint.
-        if search_term || !@domain_root_account.allow_last_page_on_course_users?
-          page_opts[:total_entries] = nil # doesn't calculate a total count
-        end
-        users = Api.paginate(users, self, api_v1_course_users_url, page_opts)
+        # total_entries: nil
+        users = Api.paginate(users, self, api_v1_course_users_url, { total_entries: nil })
         includes = Array(params[:include]).concat(["sis_user_id", "email"])
 
         # user_json_preloads loads both active/accepted and deleted
