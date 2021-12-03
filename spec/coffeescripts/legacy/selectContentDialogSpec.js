@@ -48,7 +48,7 @@ test('opens a dialog with the dialog_title option', () => {
   equal($.fn.dialog.getCall(0).args[0].title, dialogTitle)
 })
 
-QUnit.module('SelectContentDialog: deepLinkingListner', {
+QUnit.module('SelectContentDialog: deepLinkingListener', {
   setup() {
     $('#fixtures').html(`
       <div>
@@ -57,11 +57,22 @@ QUnit.module('SelectContentDialog: deepLinkingListner', {
         <input type='text' id='external_tool_create_url' />
         <input type='text' id='external_tool_create_title' />
         <input type='text' id='external_tool_create_custom_params' />
+        <input type='text' id='external_tool_create_assignment_id' />
         <div id='context_external_tools_select'>
           <span class='domain_message'"
         </div>
       </div>
     `)
+
+    const $selectContextContentDialog = $('#select_context_content_dialog')
+    const $resourceSelectionDialog = $('#resource_selection_dialog')
+    const options = {
+      autoOpen: false,
+      modal: true
+    }
+
+    $selectContextContentDialog.dialog(options).dialog('open')
+    $resourceSelectionDialog.dialog(options).dialog('open')
   },
   teardown() {
     $('.ui-dialog').remove()
@@ -90,6 +101,23 @@ const deepLinkingEvent = {
   }
 }
 
+const assignmentId = '42'
+const deepLinkingEventWithAssignmentId = {
+  data: {
+    messageType: 'LtiDeepLinkingResponse',
+    content_items: [
+      {
+        type: 'ltiResourceLink',
+        url: 'https://www.my-tool.com/launch-url',
+        title: 'My Tool',
+        new_tab: '0',
+        assignment_id: assignmentId
+      }
+    ],
+    ltiEndpoint: 'https://canvas.instructure.com/api/lti/deep_linking'
+  }
+}
+
 test('sets the tool url', async () => {
   await SelectContentDialog.deepLinkingListener(deepLinkingEvent)
   const {url} = deepLinkingEvent.data.content_items[0]
@@ -108,6 +136,11 @@ test('sets the tool custom params', async () => {
   equal($('#external_tool_create_custom_params').val(), JSON.stringify(customParams))
 })
 
+test('sets the content item assignment id if given', async () => {
+  await SelectContentDialog.deepLinkingListener(deepLinkingEventWithAssignmentId)
+  equal($('#external_tool_create_assignment_id').val(), assignmentId)
+})
+
 test('recover item data from context external tool item', async () => {
   await SelectContentDialog.deepLinkingListener(deepLinkingEvent)
 
@@ -122,33 +155,33 @@ test('recover item data from context external tool item', async () => {
   equal(data['item[custom_params]'], JSON.stringify(customParams))
 })
 
+test('recover assignment id from context external tool item data if given', async () => {
+  await SelectContentDialog.deepLinkingListener(deepLinkingEventWithAssignmentId)
+
+  const data = SelectContentDialog.extractContextExternalToolItemData()
+  equal(data['item[assignment_id]'], assignmentId)
+})
+
 test('reset external tool fields', async () => {
   $('#external_tool_create_url').val('Sample')
   $('#external_tool_create_title').val('Sample')
   $('#external_tool_create_custom_params').val('Sample')
+  $('#external_tool_create_assignment_id').val('Sample')
 
   equal($('#external_tool_create_url').val(), 'Sample')
   equal($('#external_tool_create_title').val(), 'Sample')
   equal($('#external_tool_create_custom_params').val(), 'Sample')
+  equal($('#external_tool_create_assignment_id').val(), 'Sample')
 
   SelectContentDialog.resetExternalToolFields()
 
   equal($('#external_tool_create_url').val(), '')
   equal($('#external_tool_create_title').val(), '')
   equal($('#external_tool_create_custom_params').val(), '')
+  equal($('#external_tool_create_assignment_id').val(), '')
 })
 
 test('close all dialogs when content items attribute is empty', async () => {
-  const $selectContextContentDialog = $('#select_context_content_dialog')
-  const $resourceSelectionDialog = $('#resource_selection_dialog')
-  const options = {
-    autoOpen: false,
-    modal: true
-  }
-
-  $selectContextContentDialog.dialog(options).dialog('open')
-  $resourceSelectionDialog.dialog(options).dialog('open')
-
   const deepLinkingEvent = {
     data: {
       messageType: 'LtiDeepLinkingResponse',
@@ -159,6 +192,13 @@ test('close all dialogs when content items attribute is empty', async () => {
 
   await SelectContentDialog.deepLinkingListener(deepLinkingEvent)
 
-  strictEqual($selectContextContentDialog.is(':visible'), false)
-  strictEqual($resourceSelectionDialog.is(':visible'), false)
+  strictEqual($('#select_context_content_dialog').is(':visible'), false)
+  strictEqual($('#resource_selection_dialog').is(':visible'), false)
+})
+
+test('close dialog when content item has assignment_id', async () => {
+  await SelectContentDialog.deepLinkingListener(deepLinkingEventWithAssignmentId)
+
+  strictEqual($('#select_context_content_dialog').is(':visible'), false)
+  strictEqual($('#resource_selection_dialog').is(':visible'), false)
 })
