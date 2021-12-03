@@ -31,6 +31,7 @@ import {Modal} from '@instructure/ui-modal'
 import {Popover} from '@instructure/ui-popover'
 import {View} from '@instructure/ui-view'
 
+import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import BlackoutDates from './blackout_dates'
 import * as PacePlanApi from '../../../api/pace_plan_api'
 import {StoreState, PacePlan} from '../../../types'
@@ -86,9 +87,15 @@ export class Settings extends React.Component<ComponentProps, LocalState> {
 
   republishAllPlans = () => {
     this.props.showLoadingOverlay('Publishing...')
-    PacePlanApi.republishAllPlansForCourse(this.props.courseId).then(
-      this.onCloseUpdateExistingPlansModal
-    )
+    PacePlanApi.republishAllPlansForCourse(this.props.courseId)
+      .then(this.onCloseUpdateExistingPlansModal)
+      .catch(err => {
+        showFlashAlert({
+          message: I18n.t('Failed publishing plan'),
+          err,
+          type: 'error'
+        })
+      })
   }
 
   onCloseBlackoutDatesModal = () => {
@@ -114,9 +121,12 @@ export class Settings extends React.Component<ComponentProps, LocalState> {
   validateEnd = (date: moment.Moment) => {
     let error: string | undefined
 
-    if (date < moment(ENV.VALID_DATE_RANGE.start_at.date)) {
+    if (ENV.VALID_DATE_RANGE.start_at.date && date < moment(ENV.VALID_DATE_RANGE.start_at.date)) {
       error = I18n.t('Date is before course start date')
-    } else if (date > moment(ENV.VALID_DATE_RANGE.end_at.date)) {
+    } else if (
+      ENV.VALID_DATE_RANGE.end_at.date &&
+      date > moment(ENV.VALID_DATE_RANGE.end_at.date)
+    ) {
       error = I18n.t('Date is after course end date')
     }
     return error
@@ -164,7 +174,7 @@ export class Settings extends React.Component<ComponentProps, LocalState> {
     return (
       <View as="div" margin="small 0 0" width="100%">
         <Checkbox
-          data-testid='require-end-date-toggle'
+          data-testid="require-end-date-toggle"
           label={I18n.t('Require Completion by Specified End Date')}
           checked={this.props.pacePlan.hard_end_dates}
           disabled={this.props.planPublishing}
