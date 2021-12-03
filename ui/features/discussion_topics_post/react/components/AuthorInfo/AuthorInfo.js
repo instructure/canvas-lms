@@ -25,6 +25,7 @@ import {SearchContext} from '../../utils/constants'
 import {SearchSpan} from '../SearchSpan/SearchSpan'
 import {User} from '../../../graphql/User'
 
+import {AnonymousUser} from '../../../graphql/AnonymousUser'
 import {Avatar} from '@instructure/ui-avatar'
 import {Badge} from '@instructure/ui-badge'
 import {Flex} from '@instructure/ui-flex'
@@ -35,6 +36,14 @@ import {Tooltip} from '@instructure/ui-tooltip'
 
 export const AuthorInfo = props => {
   const {searchTerm, filter} = useContext(SearchContext)
+
+  const isAnonymous = ENV.discussion_anonymity_enabled && props.anonymousAuthor != null
+  const hasAuthor = Boolean(props.author || props.anonymousAuthor)
+
+  const displayName = isAnonymous
+    ? 'Anonymous ' + props.anonymousAuthor.shortName
+    : props.author?.displayName
+  const avatarUrl = isAnonymous ? null : props.author?.avatarUrl // TODO: Change with Anonymous Avatar
 
   return (
     <Responsive
@@ -62,7 +71,7 @@ export const AuthorInfo = props => {
                 style={{
                   float: 'left',
                   marginLeft: responsiveProps.badgeMarginLeft,
-                  marginTop: props.author ? '11px' : '2px'
+                  marginTop: hasAuthor ? '11px' : '2px'
                 }}
                 data-testid="is-unread"
                 data-isforcedread={props.isForcedRead}
@@ -77,18 +86,13 @@ export const AuthorInfo = props => {
                 />
               </div>
             )}
-            {props.author && (
-              <Avatar
-                name={props.author.displayName}
-                src={props.author.avatarUrl}
-                margin="0"
-                data-testid="author_avatar"
-              />
+            {hasAuthor && (
+              <Avatar name={displayName} src={avatarUrl} margin="0" data-testid="author_avatar" />
             )}
           </Flex.Item>
           <Flex.Item shouldShrink>
             <Flex direction="column" margin="0 0 0 small">
-              {props.author && (
+              {hasAuthor && (
                 <Flex.Item>
                   <Flex direction={responsiveProps.nameAndRoleDirection}>
                     <Flex.Item padding="0 small 0 0">
@@ -101,7 +105,7 @@ export const AuthorInfo = props => {
                         <SearchSpan
                           isIsolatedView={props.isIsolatedView}
                           searchTerm={searchTerm}
-                          text={props.author.displayName}
+                          text={displayName}
                         />
                       </Text>
                     </Flex.Item>
@@ -109,7 +113,7 @@ export const AuthorInfo = props => {
                       <RolePillContainer
                         discussionRoles={resolveAuthorRoles(
                           props.isTopicAuthor,
-                          props.author.courseRoles
+                          props.author?.courseRoles
                         )}
                         data-testid="pill-container"
                       />
@@ -141,6 +145,10 @@ AuthorInfo.propTypes = {
    * Object containing author information
    */
   author: User.shape,
+  /**
+   * Object containing anonymous author information
+   */
+  anonymousAuthor: AnonymousUser.shape,
   /**
    * Object containing editor information
    */
