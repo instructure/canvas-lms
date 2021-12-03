@@ -402,8 +402,18 @@ class DiscussionTopicsController < ApplicationController
           prefetch_xhr(url, id: "prefetched_discussion_topic_page_#{i}")
         end
 
+        feature_flags_url = case @context
+                            when Course
+                              context_url(@context, :context_settings_url, anchor: "tab-features")
+                            when Group
+                              (@context.context&.is_a? Course) || (@context.context&.is_a? Account) ? context_url(@context.context, :context_settings_url, anchor: "tab-features") : nil
+                            else
+                              nil
+                            end
+
         hash = {
           USER_SETTINGS_URL: api_v1_user_settings_url(@current_user),
+          FEATURE_FLAGS_URL: feature_flags_url,
           totalDiscussions: scope.count,
           permissions: {
             create: @context.discussion_topics.temp_record.grants_right?(@current_user, session, :create),
@@ -654,7 +664,12 @@ class DiscussionTopicsController < ApplicationController
     end
 
     if @topic.anonymous? && !@context.feature_enabled?(:react_discussions_post)
-      flash[:info] = I18n.t :anonymous_topic_notice, "That topic requires the Discussions / Announcements Redesign feature flag turned on"
+      message = if @context.grants_right?(@current_user, session, :read_as_admin)
+                  I18n.t(:anonymous_topic_notice_teacher, "Anonymous topics cannot be accessed without Discussions/Announcements Redesign feature preview enabled.")
+                else
+                  I18n.t(:anonymous_topic_notice_student, "Anonymous topics are not available at this time.")
+                end
+      flash[:info] = message
       redirect_to named_context_url(@context, :context_discussion_topics_url)
       return
     end
