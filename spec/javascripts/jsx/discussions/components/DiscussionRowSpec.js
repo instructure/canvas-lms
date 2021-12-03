@@ -90,16 +90,14 @@ test('renders title as a link', () => {
   tree.unmount()
 })
 
-test('when feature flag is off, anonymous title link is disabled ', () => {
+test('when feature flag is off, anonymous title is plain text ', () => {
   fakeENV.setup()
   ENV.discussion_anonymity_enabled = false
   const discussion = {locked: false, title: 'blerp', anonymous_state: 'full_anonymity'}
   const tree = mount(<DiscussionRow {...makeProps({discussion})} />)
-  const node = tree.find('Link')
-
-  ok(node.text().includes(discussion.title))
+  const node = tree.find('[data-testid="discussion-title-1"]')
   ok(node.exists())
-  equal(node.props().disabled, true)
+  notOk(tree.find('Link').exists())
   tree.unmount()
   fakeENV.teardown()
 })

@@ -265,11 +265,15 @@ export class DiscussionRow extends Component {
     return result
   }
 
-  getAvailabilityString = () => {
-    if (
+  isInaccessibleDueToAnonymity = () => {
+    return (
       this.props.discussion.anonymous_state === 'full_anonymity' &&
       !ENV.discussion_anonymity_enabled
-    ) {
+    )
+  }
+
+  getAvailabilityString = () => {
+    if (this.isInaccessibleDueToAnonymity()) {
       return (
         <Text size="small">
           {this.props.canReadAsAdmin
@@ -655,21 +659,26 @@ export class DiscussionRow extends Component {
     const linkUrl = this.props.discussion.html_url
     return (
       <Heading as="h3" level="h4" margin="0">
-        <Link
-          href={linkUrl}
-          ref={refFn}
-          data-testid={`discussion-link-${this.props.discussion.id}`}
-          disabled={
-            this.props.discussion.anonymous_state === 'full_anonymity' &&
-            !ENV.discussion_anonymity_enabled
-          }
-        >
-          {this.props.discussion.read_state !== 'read' && (
-            <ScreenReaderContent>{I18n.t('unread,')}</ScreenReaderContent>
-          )}
-          <span aria-hidden="true">{this.props.discussion.title}</span>
-          <ScreenReaderContent>{this.getAccessibleTitle()}</ScreenReaderContent>
-        </Link>
+        {this.isInaccessibleDueToAnonymity() ? (
+          <>
+            <Text color="secondary" data-testid={`discussion-title-${this.props.discussion.id}`}>
+              <span aria-hidden="true">{this.props.discussion.title}</span>
+            </Text>
+            <ScreenReaderContent>{this.getAccessibleTitle()}</ScreenReaderContent>
+          </>
+        ) : (
+          <Link
+            href={linkUrl}
+            ref={refFn}
+            data-testid={`discussion-link-${this.props.discussion.id}`}
+          >
+            {this.props.discussion.read_state !== 'read' && (
+              <ScreenReaderContent>{I18n.t('unread,')}</ScreenReaderContent>
+            )}
+            <span aria-hidden="true">{this.props.discussion.title}</span>
+            <ScreenReaderContent>{this.getAccessibleTitle()}</ScreenReaderContent>
+          </Link>
+        )}
       </Heading>
     )
   }
@@ -680,9 +689,12 @@ export class DiscussionRow extends Component {
       return null
     }
     return (
-      <div className="ic-item-row__content-col ic-discussion-row__content last-reply-at">
+      <Text
+        className="ic-item-row__content-col ic-discussion-row__content last-reply-at"
+        color={this.isInaccessibleDueToAnonymity() ? 'secondary' : null}
+      >
         {I18n.t('Last post at %{date}', {date: datetimeString})}
-      </div>
+      </Text>
     )
   }
 
