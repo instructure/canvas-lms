@@ -196,7 +196,7 @@ export const DiscussionThreadContainer = props => {
     threadActions.push(
       <ThreadingToolbar.Reply
         key={`reply-${props.discussionEntry._id}`}
-        authorName={props.discussionEntry.author.displayName}
+        authorName={props.discussionEntry.author?.displayName}
         delimiterKey={`reply-delimiter-${props.discussionEntry._id}`}
         hasDraftEntry={!!findDraftMessage()}
         onClick={() => {
