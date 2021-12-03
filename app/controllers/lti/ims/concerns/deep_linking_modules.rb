@@ -79,6 +79,7 @@ module Lti::IMS::Concerns
         url: content_item[:url],
         title: content_item[:title],
         position: 1,
+        workflow_state: "unpublished",
         link_settings: launch_dimensions(content_item),
         custom_params: Lti::DeepLinkingUtil.validate_custom_params(content_item[:custom])
       }
@@ -109,6 +110,7 @@ module Lti::IMS::Concerns
               unlock_at: content_item.dig(:available, :startDateTime),
               lock_at: content_item.dig(:available, :endDateTime),
               due_at: content_item.dig(:submission, :endDateTime),
+              workflow_state: "unpublished",
               external_tool_tag_attributes: {
                 content_type: "ContextExternalTool",
                 content_id: tool.id,

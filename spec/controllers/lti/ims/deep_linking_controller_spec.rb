@@ -367,6 +367,11 @@ module Lti
                 expect(context_module.content_tags.count).to eq(3)
               end
 
+              it "leaves module items unpublished" do
+                subject
+                expect(context_module.content_tags.last.workflow_state).to eq("unpublished")
+              end
+
               it "creates all resource links" do
                 expect(course.lti_resource_links).to be_empty
                 expect(subject).to be_successful
@@ -465,6 +470,11 @@ module Lti
                 it "creates a module item" do
                   expect { subject }.to change { ContentTag.where(context: course).count }.by 1
                 end
+
+                it "leaves module items unpublished" do
+                  subject
+                  expect(ContentTag.where(context: course).last.workflow_state).to eq("unpublished")
+                end
               end
 
               context "multiple items" do
@@ -486,6 +496,11 @@ module Lti
 
                 it "creates one module item per item" do
                   expect { subject }.to change { ContentTag.where(context: course).count }.by 3
+                end
+
+                it "leaves module items unpublished" do
+                  subject
+                  expect(ContentTag.where(context: course).last.workflow_state).to eq("unpublished")
                 end
               end
             end
@@ -588,6 +603,11 @@ module Lti
 
           it "creates an assignment from lineItem data" do
             expect { subject }.to change { course.assignments.count }.by 1
+          end
+
+          it "leaves assignment unpublished" do
+            subject
+            expect(course.assignments.last.workflow_state).to eq("unpublished")
           end
 
           it "does not create a context module" do
@@ -697,6 +717,12 @@ module Lti
               content_tags = new_module.content_tags
 
               expect(content_tags.last.title).to eq(content_item[:title])
+            end
+
+            it "leaves assignment unpublished" do
+              subject
+              expect(course.assignments.last.workflow_state).to eq("unpublished")
+              expect(ContentTag.where(context: course).last.workflow_state).to eq("unpublished")
             end
           end
         end
