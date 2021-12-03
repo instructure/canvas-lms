@@ -53,7 +53,7 @@ function handleClick({title, content}, readerSDK) {
         .then(({token, subdomain}) => {
           const requestContent = {
             title,
-            chunks: [{content, mimeType: 'text/html'}]
+            chunks: [{content: content(), mimeType: 'text/html'}]
           }
           const options = {
             cookiePolicy: CookiePolicy.Disable
