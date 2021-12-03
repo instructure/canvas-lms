@@ -644,10 +644,21 @@ export class DiscussionRow extends Component {
       return null
     }
 
+    const anonText =
+      this.props.discussion.anonymous_state === 'full_anonymity'
+        ? I18n.t('Anonymous Discussion | ')
+        : null
+    const textColor =
+      this.props.discussion.anonymous_state === 'full_anonymity' &&
+      !ENV.discussion_anonymity_enabled
+        ? 'secondary'
+        : null
     return (
       <SectionsTooltip
         totalUserCount={this.props.discussion.user_count}
         sections={this.props.discussion.sections}
+        prefix={anonText}
+        textColor={textColor}
       />
     )
   }

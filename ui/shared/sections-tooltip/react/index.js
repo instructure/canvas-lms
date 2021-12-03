@@ -22,6 +22,7 @@ import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import I18n from 'i18n!sections_tooltip'
+import {string} from 'prop-types'
 
 function sectionsOrTotalCount(props, propName, componentName) {
   if (!props.totalUserCount && !props.sections) {
@@ -32,7 +33,7 @@ function sectionsOrTotalCount(props, propName, componentName) {
   return null
 }
 
-export default function SectionsTooltip({sections, totalUserCount}) {
+export default function SectionsTooltip({sections, totalUserCount, prefix, textColor}) {
   let tipContent = ''
   const nonNullSections = sections || []
   let sectionsCountText = ''
@@ -63,7 +64,8 @@ export default function SectionsTooltip({sections, totalUserCount}) {
   return (
     <span className="ic-section-tooltip">
       <Tooltip as="span" renderTip={tipContent} placement="bottom">
-        <Text size="small">
+        <Text size="small" color={textColor}>
+          {prefix}
           {sectionsCountText}
           {nonNullSections.map(sec => (
             <ScreenReaderContent key={sec.id}>{sec.name}</ScreenReaderContent>
@@ -76,7 +78,9 @@ export default function SectionsTooltip({sections, totalUserCount}) {
 
 SectionsTooltip.propTypes = {
   totalUserCount: sectionsOrTotalCount,
-  sections: sectionsOrTotalCount
+  sections: sectionsOrTotalCount,
+  prefix: string,
+  textColor: string
 }
 
 SectionsTooltip.defaultProps = {
