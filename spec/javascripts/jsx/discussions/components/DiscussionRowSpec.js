@@ -319,6 +319,24 @@ test('renders the SectionsTooltip component with sections', () => {
   tree.unmount()
 })
 
+test('includes Anonymous Discussion prefix when discussion is anonymous', () => {
+  fakeENV.setup()
+  ENV.discussion_anonymity_enabled = false
+  const discussion = {
+    sections: [
+      {id: 6, course_id: 1, name: 'section 4', user_count: 2},
+      {id: 5, course_id: 1, name: 'section 2', user_count: 1}
+    ],
+    anonymous_state: 'full_anonymity'
+  }
+  const tree = mount(<DiscussionRow {...makeProps({discussion})} />)
+  equal(
+    tree.find('SectionsTooltip Text').at(0).text(),
+    'Anonymous Discussion | 2 Sectionssection 4section 2'
+  )
+  tree.unmount()
+})
+
 test('does not render the SectionsTooltip component on a graded discussion', () => {
   const discussion = {user_count: 200, assignment: true}
   const tree = mount(<DiscussionRow {...makeProps({discussion})} />)
