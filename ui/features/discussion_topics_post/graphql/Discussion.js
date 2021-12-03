@@ -45,7 +45,6 @@ export const Discussion = {
       isSectionSpecific
       isAnnouncement
       discussionType
-      anonymousState
       allowRating
       onlyGradersCanRate
       delayedPostAt
@@ -102,7 +101,6 @@ export const Discussion = {
     isSectionSpecific: bool,
     isAnnouncement: bool,
     discussionType: string,
-    anonymousState: string,
     allowRating: bool,
     onlyGradersCanRate: bool,
     delayedPostAt: string,
@@ -142,7 +140,6 @@ export const Discussion = {
     isSectionSpecific = false,
     isAnnouncement = false,
     discussionType = 'threaded',
-    anonymousState = null,
     allowRating = true,
     onlyGradersCanRate = false,
     delayedPostAt = null,
@@ -190,7 +187,6 @@ export const Discussion = {
     isSectionSpecific,
     isAnnouncement,
     discussionType,
-    anonymousState,
     allowRating,
     onlyGradersCanRate,
     delayedPostAt,
