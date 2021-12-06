@@ -250,3 +250,11 @@ export const getOptimisticResponse = (
     }
   }
 }
+
+export const isAnonymous = discussionEntry =>
+  ENV.discussion_anonymity_enabled && discussionEntry.anonymousAuthor != null
+
+export const getDisplayName = discussionEntry =>
+  isAnonymous(discussionEntry)
+    ? 'Anonymous ' + discussionEntry.anonymousAuthor.shortName
+    : discussionEntry.author?.displayName

@@ -127,6 +127,9 @@ export const DISCUSSION_SUBENTRIES_QUERY = gql`
           ...User
           courseRoles(courseId: $courseID, roleTypes: $rolePillTypes)
         }
+        anonymousAuthor {
+          ...AnonymousUser
+        }
         discussionSubentriesConnection(
           after: $after
           before: $before
@@ -147,6 +150,9 @@ export const DISCUSSION_SUBENTRIES_QUERY = gql`
               ...User
               courseRoles(courseId: $courseID, roleTypes: $rolePillTypes)
             }
+            anonymousAuthor {
+              ...AnonymousUser
+            }
           }
           pageInfo {
             ...PageInfo
@@ -156,6 +162,7 @@ export const DISCUSSION_SUBENTRIES_QUERY = gql`
     }
   }
   ${User.fragment}
+  ${AnonymousUser.fragment}
   ${DiscussionEntry.fragment}
   ${PageInfo.fragment}
 `
