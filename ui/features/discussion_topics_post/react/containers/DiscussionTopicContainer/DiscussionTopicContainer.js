@@ -415,7 +415,6 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
                               />
                             }
                             author={props.discussionTopic.author}
-                            anonymousAuthor={props.discussionTopic.anonymousAuthor}
                             title={props.discussionTopic.title}
                             message={props.discussionTopic.message}
                             isIsolatedView={false}

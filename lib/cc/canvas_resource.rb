@@ -182,10 +182,6 @@ module CC
         if @course.default_post_policy.present?
           c.default_post_policy { |policy| policy.post_manually(@course.default_post_policy.post_manually?) }
         end
-
-        if @course.account.feature_enabled?(:final_grades_override)
-          c.allow_final_grade_override(@course.allow_final_grade_override?)
-        end
       end
       course_file&.close
       rel_path

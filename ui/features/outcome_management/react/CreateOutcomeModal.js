@@ -81,20 +81,6 @@ const CreateOutcomeModal = ({isOpen, onCloseHandler, onSuccess, starterGroupId})
     onCloseHandler()
   }
 
-  const friendlyDescriptionMessages = []
-  if (friendlyDescription.length > 255) {
-    friendlyDescriptionMessages.push({
-      text: I18n.t('Must be 255 characters or less'),
-      type: 'error'
-    })
-  }
-
-  const formValid =
-    !invalidTitle &&
-    !invalidDisplayName &&
-    selectedGroup &&
-    friendlyDescriptionMessages.length === 0
-
   const onCreateOutcomeHandler = () => {
     ;(async () => {
       try {
@@ -217,7 +203,6 @@ const CreateOutcomeModal = ({isOpen, onCloseHandler, onSuccess, starterGroupId})
                 placeholder={I18n.t('Enter your friendly description here')}
                 label={I18n.t('Friendly description (for parent/student display)')}
                 onChange={friendlyDescriptionChangeHandler}
-                messages={friendlyDescriptionMessages}
               />
             </View>
           )}
@@ -243,7 +228,9 @@ const CreateOutcomeModal = ({isOpen, onCloseHandler, onSuccess, starterGroupId})
             type="button"
             color="primary"
             margin="0 x-small 0 0"
-            interaction={formValid ? 'enabled' : 'disabled'}
+            interaction={
+              !invalidTitle && !invalidDisplayName && selectedGroup ? 'enabled' : 'disabled'
+            }
             onClick={onCreateOutcomeHandler}
           >
             {I18n.t('Create')}
