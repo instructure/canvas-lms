@@ -21,7 +21,8 @@ import {
   updateDiscussionEntryRootEntryCounts,
   addReplyToDiscussionEntry,
   getSpeedGraderUrl,
-  getOptimisticResponse
+  getOptimisticResponse,
+  getDisplayName
 } from '../../utils'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {CloseButton} from '@instructure/ui-buttons'
@@ -340,7 +341,7 @@ export const IsolatedViewContainer = props => {
     nodes.every(reply => {
       if (reply._id === previewId) {
         preview = {
-          author: {shortName: reply.author.displayName},
+          author: {shortName: getDisplayName(reply)},
           createdAt: reply.createdAt,
           previewMessage: reply.message.replace(/<[^>]*>?/gm, '')
         }
