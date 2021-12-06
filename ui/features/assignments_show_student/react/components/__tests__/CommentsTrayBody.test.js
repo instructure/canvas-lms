@@ -143,8 +143,7 @@ describe('CommentsTrayBody', () => {
       expect(getByTestId('svg-placeholder-container')).toBeInTheDocument()
     })
 
-    it.skip('renders a message (no image) if there are comments', async () => {
-      // unskip in EVAL-1903
+    it('renders a message (no image) if there are comments', async () => {
       const overrides = {
         SubmissionCommentConnection: {
           nodes: [{_id: '1'}, {_id: '2'}]
@@ -344,8 +343,7 @@ describe('CommentsTrayBody', () => {
     expect(await findByText('bob')).toBeTruthy()
   })
 
-  it.skip('renders the message when sent', async () => {
-    // unskip in EVAL-1903
+  it('renders the message when sent', async () => {
     const mocks = await Promise.all([mockSubmissionCommentQuery(), mockCreateSubmissionComment()])
     const props = await mockAssignmentAndSubmission()
     const {getByPlaceholderText, getByText, findByText} = render(
@@ -404,8 +402,7 @@ describe('CommentsTrayBody', () => {
     expect(await waitFor(() => getByText('Sorry, Something Broke'))).toBeInTheDocument()
   })
 
-  it.skip('marks submission comments as read after timeout', async () => {
-    // unskip in EVAL-1903
+  it('marks submission comments as read after timeout', async () => {
     jest.useFakeTimers()
 
     const props = await mockAssignmentAndSubmission({
@@ -437,7 +434,6 @@ describe('CommentsTrayBody', () => {
 
   it('does not mark submission comments as read for observers', async () => {
     jest.useFakeTimers()
-    window.ENV.current_user_roles = ['user', 'observer']
 
     const props = await mockAssignmentAndSubmission({
       Submission: {unreadCommentCount: 1}
@@ -454,9 +450,11 @@ describe('CommentsTrayBody', () => {
 
     render(
       mockContext(
-        <MockedProvider mocks={mocks}>
-          <CommentsTrayBody {...props} />
-        </MockedProvider>
+        <StudentViewContext.Provider value={{isObserver: true, allowChangesToSubmission: false}}>
+          <MockedProvider mocks={mocks}>
+            <CommentsTrayBody {...props} />
+          </MockedProvider>
+        </StudentViewContext.Provider>
       )
     )
 
@@ -537,8 +535,7 @@ describe('CommentsTrayBody', () => {
     ).toBeInTheDocument()
   })
 
-  it.skip('renders comment rows when provided', async () => {
-    // unskip in EVAL-1903
+  it('renders comment rows when provided', async () => {
     const overrides = {
       SubmissionCommentConnection: {
         nodes: [{_id: '1'}, {_id: '2'}]
@@ -554,8 +551,7 @@ describe('CommentsTrayBody', () => {
     expect(rows).toHaveLength(comments.length)
   })
 
-  it.skip('renders shortname when shortname is provided', async () => {
-    // unskip in EVAL-1903
+  it('renders shortname when shortname is provided', async () => {
     const overrides = {
       SubmissionCommentConnection: {nodes: [{}]},
       User: {shortName: 'bob builder'}
@@ -568,8 +564,7 @@ describe('CommentsTrayBody', () => {
     expect(getAllByText('bob builder')).toHaveLength(1)
   })
 
-  it.skip('renders Anonymous when author is not provided', async () => {
-    // unskip in EVAL-1903
+  it('renders Anonymous when author is not provided', async () => {
     const overrides = {
       SubmissionCommentConnection: {nodes: [{author: null}]}
     }
@@ -583,8 +578,7 @@ describe('CommentsTrayBody', () => {
     expect(getAllByText('Anonymous')).toHaveLength(1)
   })
 
-  it.skip('displays a single attachment', async () => {
-    // unskip in EVAL-1903
+  it('displays a single attachment', async () => {
     const overrides = {
       SubmissionCommentConnection: {nodes: [{}]},
       File: {url: 'test-url.com', displayName: 'Test Display Name'}
@@ -600,8 +594,7 @@ describe('CommentsTrayBody', () => {
     expect(renderedAttachment).toContainElement(getByText('Test Display Name'))
   })
 
-  it.skip('displays multiple attachments', async () => {
-    // unskip in EVAL-1903
+  it('displays multiple attachments', async () => {
     const overrides = {
       SubmissionCommentConnection: {
         nodes: [
@@ -629,8 +622,7 @@ describe('CommentsTrayBody', () => {
     expect(renderedAttachment2).toContainElement(getByText('attachment2'))
   })
 
-  it.skip('does not display attachments if there are none', async () => {
-    // unskip in EVAL-1903
+  it('does not display attachments if there are none', async () => {
     const overrides = {
       SubmissionCommentConnection: {nodes: [{attachments: []}]}
     }
@@ -644,8 +636,7 @@ describe('CommentsTrayBody', () => {
     expect(container.querySelector('a[href]')).toBeNull()
   })
 
-  it.skip('displays the comments in chronological order', async () => {
-    // unskip in EVAL-1903
+  it('displays the comments in chronological order', async () => {
     const overrides = {
       SubmissionCommentConnection: {
         nodes: [
@@ -673,8 +664,7 @@ describe('CommentsTrayBody', () => {
     expect(rows[2]).toHaveTextContent('Sun Mar 3, 2019 9:32pm')
   })
 
-  it.skip('includes an icon on an attachment', async () => {
-    // unskip in EVAL-1903
+  it('includes an icon on an attachment', async () => {
     const overrides = {
       SubmissionCommentConnection: {nodes: [{}]},
       File: {url: 'test-url.com', displayName: 'Test Display Name', mimeClass: 'pdf'}
