@@ -135,14 +135,14 @@ RSpec.describe ApplicationController do
       end
 
       describe "user flags" do
-        context "eventAlertTimeout" do
-          before do
-            user_factory
-            controller.instance_variable_set(:@domain_root_account, Account.default)
-            controller.instance_variable_set(:@current_user, @user)
-            allow(controller).to receive(:user_display_json).and_return({})
-          end
+        before do
+          user_factory
+          controller.instance_variable_set(:@domain_root_account, Account.default)
+          controller.instance_variable_set(:@current_user, @user)
+          allow(controller).to receive(:user_display_json).and_return({})
+        end
 
+        context "eventAlertTimeout" do
           it "is not set if the feature flag is off" do
             expect(controller.js_env[:flashAlertTimeout]).to be_nil
           end
@@ -150,6 +150,28 @@ RSpec.describe ApplicationController do
           it "is 86400000 (1 day in milliseconds) if the feature flag is on" do
             @user.enable_feature!(:disable_alert_timeouts)
             expect(controller.js_env[:flashAlertTimeout]).to eq(1.day.in_milliseconds)
+          end
+        end
+
+        context "current_user_is_student" do
+          before do
+            course_with_user("TeacherEnrollment", user: @user, active_all: true)
+            @course_with_user_as_teacher = @course
+
+            course_with_user("StudentEnrollment", user: @user, active_all: true)
+            @course_with_user_as_student = @course
+
+            allow(controller).to receive("api_v1_course_ping_url").and_return({})
+          end
+
+          it "for the course where user is enrolled as teacher" do
+            controller.instance_variable_set(:@context, @course_with_user_as_teacher)
+            expect(controller.js_env[:current_user_is_student]).to be_falsey
+          end
+
+          it "for the course where user is enrolled as student" do
+            controller.instance_variable_set(:@context, @course_with_user_as_student)
+            expect(controller.js_env[:current_user_is_student]).to be_truthy
           end
         end
       end
