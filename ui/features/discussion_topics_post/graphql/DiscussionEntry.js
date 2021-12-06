@@ -64,6 +64,9 @@ export const DiscussionEntry = {
         author {
           shortName
         }
+        anonymousAuthor {
+          shortName
+        }
         editor {
           shortName
         }

@@ -19,6 +19,7 @@
 import {DISCUSSION_SUBENTRIES_QUERY} from '../../graphql/Queries'
 import {Discussion} from '../../graphql/Discussion'
 import {DiscussionEntry} from '../../graphql/DiscussionEntry'
+import I18n from 'i18n!discussion_topics_post'
 
 export const isGraded = (assignment = null) => {
   return assignment !== null
@@ -256,5 +257,5 @@ export const isAnonymous = discussionEntry =>
 
 export const getDisplayName = discussionEntry =>
   isAnonymous(discussionEntry)
-    ? 'Anonymous ' + discussionEntry.anonymousAuthor.shortName
-    : discussionEntry.author?.displayName
+    ? I18n.t('Anonymous') + ' ' + discussionEntry.anonymousAuthor.shortName
+    : discussionEntry.author?.displayName || discussionEntry.author?.shortName
