@@ -90,14 +90,16 @@ test('renders title as a link', () => {
   tree.unmount()
 })
 
-test('when feature flag is off, anonymous title is plain text ', () => {
+test('when feature flag is off, anonymous title link is disabled ', () => {
   fakeENV.setup()
   ENV.discussion_anonymity_enabled = false
   const discussion = {locked: false, title: 'blerp', anonymous_state: 'full_anonymity'}
   const tree = mount(<DiscussionRow {...makeProps({discussion})} />)
-  const node = tree.find('[data-testid="discussion-title-1"]')
+  const node = tree.find('Link')
+
+  ok(node.text().includes(discussion.title))
   ok(node.exists())
-  notOk(tree.find('Link').exists())
+  equal(node.props().disabled, true)
   tree.unmount()
   fakeENV.teardown()
 })
@@ -173,14 +175,18 @@ test('renders the publish ToggleIcon', () => {
   ok(node.exists())
   strictEqual(node.length, 2)
 })
-
 test('when feature flag is off, renders anonymous discussion lock explanation for read_as_admin', () => {
   fakeENV.setup()
   ENV.discussion_anonymity_enabled = false
   const discussion = {locked: false, title: 'blerp', anonymous_state: 'full_anonymity'}
   const tree = mount(<DiscussionRow {...makeProps({canReadAsAdmin: true, discussion})} />)
-  const node = tree.find('.discussion-availability Link')
-  ok(node.text().includes('Discussions/Announcements Redesign'))
+  const node = tree.find('.discussion-availability')
+
+  ok(
+    node
+      .text()
+      .includes('Enable Discussions/Announcements Redesign to view anonymous discussion content')
+  )
   ok(node.exists())
   tree.unmount()
   fakeENV.teardown()
@@ -316,24 +322,6 @@ test('renders the SectionsTooltip component with sections', () => {
   }
   const tree = mount(<DiscussionRow {...makeProps({discussion})} />)
   equal(tree.find('SectionsTooltip Text').at(0).text(), '2 Sectionssection 4section 2')
-  tree.unmount()
-})
-
-test('includes Anonymous Discussion prefix when discussion is anonymous', () => {
-  fakeENV.setup()
-  ENV.discussion_anonymity_enabled = false
-  const discussion = {
-    sections: [
-      {id: 6, course_id: 1, name: 'section 4', user_count: 2},
-      {id: 5, course_id: 1, name: 'section 2', user_count: 1}
-    ],
-    anonymous_state: 'full_anonymity'
-  }
-  const tree = mount(<DiscussionRow {...makeProps({discussion})} />)
-  equal(
-    tree.find('SectionsTooltip Text').at(0).text(),
-    'Anonymous Discussion | 2 Sectionssection 4section 2'
-  )
   tree.unmount()
 })
 

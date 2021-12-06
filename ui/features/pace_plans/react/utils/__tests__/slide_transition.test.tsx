@@ -41,12 +41,12 @@ describe('SlideTransition', () => {
 
   it('shrinks vertically when collapsed', () => {
     const {getByTestId} = renderComponent({direction: 'vertical', expanded: false})
-    expect(getByTestId('pace-plans-collapse').style.getPropertyValue('max-height')).toBe('0')
+    expect(getByTestId('pace-plans-collapse').style.getPropertyValue('height')).toBe('0px')
   })
 
   it('restores height when expanded', () => {
     const {getByTestId} = renderComponent({direction: 'vertical', expanded: true})
-    expect(getByTestId('pace-plans-collapse').style.getPropertyValue('max-height')).toBe('100px')
+    expect(getByTestId('pace-plans-collapse').style.getPropertyValue('height')).toBe('100px')
   })
 
   it('shrinks horizontally when collapsed', () => {

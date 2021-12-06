@@ -33,13 +33,6 @@ const defaultProps = {
   unpublishedChanges: []
 }
 
-beforeAll(() => {
-  window.ENV.VALID_DATE_RANGE = {
-    end_at: {date: '2021-09-30', date_context: 'course'},
-    start_at: {date: '2021-09-01', date_context: 'course'}
-  }
-})
-
 afterEach(() => {
   jest.clearAllMocks()
 })

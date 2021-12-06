@@ -74,7 +74,6 @@ exports[`The CriterionInfo component renders the root component as expected 2`] 
     variant="default"
   >
     <ModalHeader
-      spacing="default"
       variant="default"
     >
       <CloseButton

@@ -21,8 +21,7 @@ import {
   getSpeedGraderUrl,
   updateDiscussionTopicEntryCounts,
   responsiveQuerySizes,
-  isTopicAuthor,
-  getDisplayName
+  isTopicAuthor
 } from '../../utils'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {CollapseReplies} from '../../components/CollapseReplies/CollapseReplies'
@@ -197,7 +196,7 @@ export const DiscussionThreadContainer = props => {
     threadActions.push(
       <ThreadingToolbar.Reply
         key={`reply-${props.discussionEntry._id}`}
-        authorName={getDisplayName(props.discussionEntry)}
+        authorName={props.discussionEntry.author.displayName}
         delimiterKey={`reply-delimiter-${props.discussionEntry._id}`}
         hasDraftEntry={!!findDraftMessage()}
         onClick={() => {
@@ -224,7 +223,7 @@ export const DiscussionThreadContainer = props => {
         key={`like-${props.discussionEntry._id}`}
         delimiterKey={`like-delimiter-${props.discussionEntry._id}`}
         onClick={toggleRating}
-        authorName={getDisplayName(props.discussionEntry)}
+        authorName={props.discussionEntry.author.displayName}
         isLiked={!!props.discussionEntry.entryParticipant?.rating}
         likeCount={props.discussionEntry.ratingSum || 0}
         interaction={props.discussionEntry.permissions.rate ? 'enabled' : 'disabled'}
@@ -385,7 +384,6 @@ export const DiscussionThreadContainer = props => {
                       ) : null
                     }
                     author={props.discussionEntry.author}
-                    anonymousAuthor={props.discussionEntry.anonymousAuthor}
                     message={props.discussionEntry.message}
                     isEditing={isEditing}
                     onSave={onUpdate}

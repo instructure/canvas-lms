@@ -146,28 +146,6 @@ describe('CreateOutcomeModal', () => {
         expect(getByText('Create').closest('button')).toHaveAttribute('disabled')
       })
 
-      it('shows error message if friendly description > 255 characters', async () => {
-        const {getByText, getByLabelText} = render(<CreateOutcomeModal {...defaultProps()} />, {
-          mocks: [...smallOutcomeTree()]
-        })
-        await act(async () => jest.runOnlyPendingTimers())
-        fireEvent.change(getByLabelText('Name'), {target: {value: 'Outcome 123'}})
-        fireEvent.change(getByLabelText('Friendly Name'), {target: {value: 'Display name'}})
-        fireEvent.change(getByLabelText('Friendly description (for parent/student display)'), {
-          target: {value: 'Friendly description'}
-        })
-        fireEvent.click(getByText('Root account folder'))
-        // make sure good FD doesnt disable
-        expect(getByText('Create').closest('button')).not.toBeDisabled()
-
-        // but a bad one does
-        fireEvent.change(getByLabelText('Friendly description (for parent/student display)'), {
-          target: {value: 'a'.repeat(256)}
-        })
-        expect(getByText('Must be 255 characters or less')).toBeInTheDocument()
-        expect(getByText('Create').closest('button')).toBeDisabled()
-      })
-
       it('calls onCloseHandler & onSuccess on Create button click', async () => {
         const {getByLabelText, getByText} = render(<CreateOutcomeModal {...defaultProps()} />, {
           mocks: [...smallOutcomeTree()]

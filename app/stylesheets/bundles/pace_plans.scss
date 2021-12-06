@@ -27,7 +27,7 @@
 // This allows us to animate on height and width, which InstUI Transitions don't
 // handle very well.
 .pace-plans-collapse {
-  transition: max-height 500ms ease, width 500ms ease;
+  transition: height 500ms ease, width 500ms ease;
   white-space: nowrap;
 }
 

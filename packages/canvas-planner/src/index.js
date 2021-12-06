@@ -176,65 +176,61 @@ function initializeCourseAndGroupColors(options) {
 // changeDashboardView,         <optional - method to change the current dashboard>
 // forCourse,                   <optional - course id if this is a sidebar for a specific course page>
 let initializedOptions = null
-export async function initializePlanner(options) {
-  await i18n.init(options.env.LOCALE)
-  return new Promise((resolve, reject) => {
-    try {
-      if (initializedOptions) throw new Error('initializePlanner may not be called more than once')
+export function initializePlanner(options) {
+  return new Promise(resolve => {
+    if (initializedOptions) throw new Error('initializePlanner may not be called more than once')
 
-      options = mergeDefaultOptions(options)
+    options = mergeDefaultOptions(options)
 
-      if (!(options.env.MOMENT_LOCALE && options.env.TIMEZONE)) {
-        throw new Error(
-          'env.MOMENT_LOCALE and env.TIMEZONE are required options for initializePlanner'
-        )
-      }
-
-      const {flashError, flashMessage, srFlashMessage} = options
-      if (!(flashError && flashMessage && srFlashMessage)) {
-        throw new Error('flash message callbacks are required options for initializePlanner')
-      }
-
-      if (!options.convertApiUserContent) {
-        throw new Error('convertApiUserContent is a required option for initializePlanner')
-      }
-
-      externalPlannerActive = () => options.getActiveApp() === 'planner'
-
-      moment.locale(options.env.MOMENT_LOCALE)
-      moment.tz.setDefault(options.env.TIMEZONE)
-      initializeAlerts({
-        visualSuccessCallback: flashMessage,
-        visualErrorCallback: flashError,
-        srAlertCallback: srFlashMessage
-      })
-      initializeContent(options)
-      initializeDateTimeFormatters(options.dateTimeFormatters)
-
-      options.plannerNewActivityButtonId = plannerNewActivityButtonId
-      if (options.env.K5_USER || options.env.K5_SUBJECT_COURSE) {
-        dynamicUiManager.setOffsetElementIds(weeklyPlannerHeaderId, null)
-      } else {
-        dynamicUiManager.setOffsetElementIds(plannerHeaderId, plannerNewActivityButtonId)
-      }
-
-      if (options.externalFallbackFocusable) {
-        dynamicUiManager.registerAnimatable(
-          'item',
-          externalFocusableWrapper(options.externalFallbackFocusable),
-          -1,
-          [specialFallbackFocusId('item')]
-        )
-      }
-
-      initializeCourseAndGroupColors(options)
-
-      initializedOptions = options
-      store.dispatch(initialOptions(options))
-      resolve(initializedOptions)
-    } catch (err) {
-      reject(err)
+    if (!(options.env.MOMENT_LOCALE && options.env.TIMEZONE)) {
+      throw new Error(
+        'env.MOMENT_LOCALE and env.TIMEZONE are required options for initializePlanner'
+      )
     }
+
+    const {flashError, flashMessage, srFlashMessage} = options
+    if (!(flashError && flashMessage && srFlashMessage)) {
+      throw new Error('flash message callbacks are required options for initializePlanner')
+    }
+
+    if (!options.convertApiUserContent) {
+      throw new Error('convertApiUserContent is a required option for initializePlanner')
+    }
+
+    externalPlannerActive = () => options.getActiveApp() === 'planner'
+
+    i18n.init(options.env.LOCALE)
+    moment.locale(options.env.MOMENT_LOCALE)
+    moment.tz.setDefault(options.env.TIMEZONE)
+    initializeAlerts({
+      visualSuccessCallback: flashMessage,
+      visualErrorCallback: flashError,
+      srAlertCallback: srFlashMessage
+    })
+    initializeContent(options)
+    initializeDateTimeFormatters(options.dateTimeFormatters)
+
+    options.plannerNewActivityButtonId = plannerNewActivityButtonId
+    if (options.env.K5_USER || options.env.K5_SUBJECT_COURSE) {
+      dynamicUiManager.setOffsetElementIds(weeklyPlannerHeaderId, null)
+    } else {
+      dynamicUiManager.setOffsetElementIds(plannerHeaderId, plannerNewActivityButtonId)
+    }
+
+    if (options.externalFallbackFocusable) {
+      dynamicUiManager.registerAnimatable(
+        'item',
+        externalFocusableWrapper(options.externalFallbackFocusable),
+        -1,
+        [specialFallbackFocusId('item')]
+      )
+    }
+
+    initializeCourseAndGroupColors(options)
+
+    initializedOptions = options
+    store.dispatch(initialOptions(options))
+    resolve(initializedOptions)
   })
 }
 
