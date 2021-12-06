@@ -60,6 +60,9 @@ module Types
     field :description, String, null: true
     field :display_name, String, null: true
     field :vendor_guid, String, null: true
+    field :calculation_method, String, null: true
+    field :calculation_int, Integer, null: true
+    field :rubric_criterion, Types::RubricCriterionType, null: true
 
     field :can_edit, Boolean, null: false
     def can_edit
