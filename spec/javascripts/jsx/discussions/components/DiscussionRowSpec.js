@@ -90,16 +90,14 @@ test('renders title as a link', () => {
   tree.unmount()
 })
 
-test('when feature flag is off, anonymous title link is disabled ', () => {
+test('when feature flag is off, anonymous title is plain text ', () => {
   fakeENV.setup()
   ENV.discussion_anonymity_enabled = false
   const discussion = {locked: false, title: 'blerp', anonymous_state: 'full_anonymity'}
   const tree = mount(<DiscussionRow {...makeProps({discussion})} />)
-  const node = tree.find('Link')
-
-  ok(node.text().includes(discussion.title))
+  const node = tree.find('[data-testid="discussion-title-1"]')
   ok(node.exists())
-  equal(node.props().disabled, true)
+  notOk(tree.find('Link').exists())
   tree.unmount()
   fakeENV.teardown()
 })
@@ -175,18 +173,14 @@ test('renders the publish ToggleIcon', () => {
   ok(node.exists())
   strictEqual(node.length, 2)
 })
+
 test('when feature flag is off, renders anonymous discussion lock explanation for read_as_admin', () => {
   fakeENV.setup()
   ENV.discussion_anonymity_enabled = false
   const discussion = {locked: false, title: 'blerp', anonymous_state: 'full_anonymity'}
   const tree = mount(<DiscussionRow {...makeProps({canReadAsAdmin: true, discussion})} />)
-  const node = tree.find('.discussion-availability')
-
-  ok(
-    node
-      .text()
-      .includes('Enable Discussions/Announcements Redesign to view anonymous discussion content')
-  )
+  const node = tree.find('.discussion-availability Link')
+  ok(node.text().includes('Discussions/Announcements Redesign'))
   ok(node.exists())
   tree.unmount()
   fakeENV.teardown()

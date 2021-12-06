@@ -219,8 +219,9 @@ QUnit.module('SpeedGrader', rootHooks => {
       func(elem, size, keepOriginalText)
     })
     SpeedGrader.EG.showDiscussion()
-    const screenreaderText = document.querySelector('.play_comment_link .screenreader-only')
-      .innerText
+    const screenreaderText = document.querySelector(
+      '.play_comment_link .screenreader-only'
+    ).innerText
     strictEqual(screenreaderText, 'Play media comment by An Author from Jul 12, 2016 at 11:47pm.')
     deferFake.restore()
     INST.kalturaSettings = originalKalturaSettings
@@ -1304,6 +1305,157 @@ QUnit.module('SpeedGrader', rootHooks => {
     equal(grade.pointsDeducted, '-15')
   })
 
+  QUnit.module('speed_grader#skipRelativeToCurrentIndex', suiteHooks => {
+    let originalStudent
+    let originalWindowJSONData
+
+    suiteHooks.beforeEach(() => {
+      originalStudent = SpeedGrader.EG.currentStudent
+      originalWindowJSONData = window.jsonData
+
+      window.jsonData = {}
+      window.jsonData.studentsWithSubmissions = [
+        {
+          index: 0,
+          id: 1101,
+          name: 'Victor McDade',
+          submission_state: 'not_graded',
+          anonymous_id: '1101'
+        },
+        {
+          index: 1,
+          id: 1102,
+          name: 'Jack Jarvis',
+          submission_state: 'graded',
+          anonymous_id: '1102'
+        },
+        {
+          index: 2,
+          id: 1103,
+          name: 'Isa Brennan',
+          submission_state: 'graded',
+          anonymous_id: '1103'
+        }
+      ]
+      window.jsonData.context = {
+        active_course_sections: ['2001'],
+        enrollments: [
+          {course_section_id: '2001', user_id: '1101', workflow_state: 'active'},
+          {course_section_id: '2001', user_id: '1102', workflow_state: 'active'},
+          {course_section_id: '2001', user_id: '1103', workflow_state: 'active'}
+        ],
+        students: [
+          {id: '1101', sortable_name: 'McDade, Victor'},
+          {id: '1102', sortable_name: 'Jarvis, Jack'},
+          {id: '1103', sortable_name: 'Brennan, Isa'}
+        ]
+      }
+      window.jsonData.submissions = [
+        {
+          grade: 'B',
+          grade_matches_current_submission: false,
+          id: '2503',
+          score: 0,
+          submission_history: [],
+          submitted_at: '2021-05-06T12:00:00Z',
+          user_id: '1101',
+          workflow_state: 'resubmitted'
+        },
+        {
+          grade: 'A',
+          grade_matches_current_submission: true,
+          id: '2504',
+          score: 10,
+          submission_history: [],
+          submitted_at: '2021-05-04T12:00:00Z',
+          user_id: '1102',
+          workflow_state: 'graded'
+        },
+        {
+          grade: 'C',
+          grade_matches_current_submission: true,
+          id: '2505',
+          score: 8,
+          submission_history: [],
+          submitted_at: '2021-05-04T12:00:00Z',
+          user_id: '1103',
+          workflow_state: 'graded'
+        }
+      ]
+
+      SpeedGrader.EG.jsonReady()
+      SpeedGrader.EG.currentStudent = window.jsonData.studentsWithSubmissions[1]
+      sinon.stub(SpeedGrader.EG, 'goToStudent')
+      sinon.stub(SpeedGrader.EG, 'anyUnpostedComment').returns(true)
+    })
+
+    suiteHooks.afterEach(() => {
+      SpeedGrader.teardown()
+      SpeedGrader.EG.currentStudent = originalStudent
+      window.jsonData = originalWindowJSONData
+      SpeedGrader.EG.goToStudent.restore()
+      SpeedGrader.EG.anyUnpostedComment.restore()
+    })
+
+    test('goToStudent is called with next student id', () => {
+      SpeedGrader.EG.skipRelativeToCurrentIndex(1)
+      deepEqual(SpeedGrader.EG.goToStudent.firstCall.args, ['1103', 'push'])
+    })
+
+    test('goToStudent is called with prev student id', () => {
+      SpeedGrader.EG.skipRelativeToCurrentIndex(-1)
+      deepEqual(SpeedGrader.EG.goToStudent.firstCall.args, ['1101', 'push'])
+    })
+
+    QUnit.module('speed_grader#skipRelativeToCurrentIndex#warning_dialog', hooks => {
+      let originalFlag
+
+      hooks.beforeEach(() => {
+        originalFlag = ENV.speedgrader_dialog_for_unposted_comments
+        ENV.speedgrader_dialog_for_unposted_comments = true
+      })
+
+      hooks.afterEach(() => {
+        ENV.speedgrader_dialog_for_unposted_comments = originalFlag
+      })
+
+      test('goToStudent is called with prev student id with user setting to not show dialog', () => {
+        sandbox.stub(userSettings, 'get').returns(true)
+
+        SpeedGrader.EG.skipRelativeToCurrentIndex(-1)
+        deepEqual(SpeedGrader.EG.goToStudent.firstCall.args, ['1101', 'push'])
+      })
+
+      test('goToStudent is called with prev student id on clicking proceed', () => {
+        sandbox.stub(userSettings, 'get').returns(false)
+        SpeedGrader.EG.skipRelativeToCurrentIndex(-1)
+        $(document).find('#unposted_comment_proceed').click()
+        deepEqual(SpeedGrader.EG.goToStudent.firstCall.args, ['1101', 'push'])
+      })
+
+      test('goToStudent is not called on clicking cancel', () => {
+        sandbox.stub(userSettings, 'get').returns(false)
+        SpeedGrader.EG.skipRelativeToCurrentIndex(-1)
+        $(document).find('#unposted_comment_cancel').click()
+        ok(SpeedGrader.EG.goToStudent.notCalled)
+      })
+
+      test('dialog does not show when instructor disables warning', () => {
+        // warning dialog shows and user selects the checkbox to not show the dialog again
+        sandbox.stub(userSettings, 'get').returns(false)
+        SpeedGrader.EG.skipRelativeToCurrentIndex(-1)
+        $(document).find('.do-not-show-again input').click()
+        $(document).find('#unposted_comment_cancel').click()
+
+        // dialog should not show up any more
+        userSettings.get.restore()
+        sandbox.stub(userSettings, 'get').returns(true)
+        SpeedGrader.EG.skipRelativeToCurrentIndex(-1)
+        deepEqual(SpeedGrader.EG.goToStudent.firstCall.args, ['1101', 'push'])
+      })
+    })
+  })
+
   QUnit.module('speed_grader#getStudentNameAndGrade', {
     setup() {
       this.originalStudent = SpeedGrader.EG.currentStudent
@@ -1929,8 +2081,9 @@ QUnit.module('SpeedGrader', rootHooks => {
       finishSetup()
       SpeedGrader.EG.handleSubmissionSelectionChange()
 
-      const viewedAtHTML = document.getElementById('submission_attachment_viewed_at_container')
-        .innerHTML
+      const viewedAtHTML = document.getElementById(
+        'submission_attachment_viewed_at_container'
+      ).innerHTML
 
       ok(viewedAtHTML.includes('Jan 1, 2011'))
     })
@@ -1941,8 +2094,9 @@ QUnit.module('SpeedGrader', rootHooks => {
       window.jsonData.anonymize_students = true
       SpeedGrader.EG.handleSubmissionSelectionChange()
 
-      const viewedAtHTML = document.getElementById('submission_attachment_viewed_at_container')
-        .innerHTML
+      const viewedAtHTML = document.getElementById(
+        'submission_attachment_viewed_at_container'
+      ).innerHTML
 
       ok(viewedAtHTML.includes('Jan 1, 2011'))
     })
@@ -1952,8 +2106,9 @@ QUnit.module('SpeedGrader', rootHooks => {
       window.jsonData.anonymize_students = true
       SpeedGrader.EG.handleSubmissionSelectionChange()
 
-      const viewedAtHTML = document.getElementById('submission_attachment_viewed_at_container')
-        .innerHTML
+      const viewedAtHTML = document.getElementById(
+        'submission_attachment_viewed_at_container'
+      ).innerHTML
 
       notOk(viewedAtHTML.includes('Jan 1, 2011'))
     })
@@ -1966,8 +2121,9 @@ QUnit.module('SpeedGrader', rootHooks => {
       SpeedGrader.EG.currentStudent = gradedStudentWithNoSubmission
       SpeedGrader.EG.handleSubmissionSelectionChange()
 
-      const viewedAtHTML = document.getElementById('submission_attachment_viewed_at_container')
-        .innerHTML
+      const viewedAtHTML = document.getElementById(
+        'submission_attachment_viewed_at_container'
+      ).innerHTML
 
       strictEqual(viewedAtHTML, '')
     })
@@ -1996,14 +2152,15 @@ QUnit.module('SpeedGrader', rootHooks => {
     test('submission files list template is populated with anonymous submission data', () => {
       finishSetup()
       SpeedGrader.EG.currentStudent.submission.currentSelectedIndex = 0
-      SpeedGrader.EG.currentStudent.submission.submission_history[0].submission.versioned_attachments = [
-        {
-          attachment: {
-            id: 1,
-            display_name: 'submission.txt'
+      SpeedGrader.EG.currentStudent.submission.submission_history[0].submission.versioned_attachments =
+        [
+          {
+            attachment: {
+              id: 1,
+              display_name: 'submission.txt'
+            }
           }
-        }
-      ]
+        ]
       SpeedGrader.EG.handleSubmissionSelectionChange()
       const {pathname} = new URL(document.querySelector('#submission_files_list a').href)
       const expectedPathname = `${courses}${assignments}/submissions/${SpeedGrader.EG.currentStudent.id}`
@@ -3638,9 +3795,8 @@ QUnit.module('SpeedGrader', rootHooks => {
           })
 
           concludedHooks.afterEach(() => {
-            window.jsonData.studentMap[
-              alphaStudent.id
-            ].enrollments[0].workflow_state = originalWorkflowState
+            window.jsonData.studentMap[alphaStudent.id].enrollments[0].workflow_state =
+              originalWorkflowState
           })
 
           test('button is hidden when comment is publishable', () => {
@@ -4943,12 +5099,8 @@ QUnit.module('SpeedGrader', rootHooks => {
           sinon.spy(window.rubricAssessment, 'populateNewRubricSummary')
           SpeedGrader.EG.showRubric()
 
-          const [
-            ,
-            ,
-            ,
-            editingData
-          ] = window.rubricAssessment.populateNewRubricSummary.firstCall.args
+          const [, , , editingData] =
+            window.rubricAssessment.populateNewRubricSummary.firstCall.args
           notStrictEqual(editingData, null)
           window.rubricAssessment.populateNewRubricSummary.restore()
         })
@@ -4957,12 +5109,8 @@ QUnit.module('SpeedGrader', rootHooks => {
           sinon.spy(window.rubricAssessment, 'populateNewRubricSummary')
           SpeedGrader.EG.showRubric({validateEnteredData: false})
 
-          const [
-            ,
-            ,
-            ,
-            editingData
-          ] = window.rubricAssessment.populateNewRubricSummary.firstCall.args
+          const [, , , editingData] =
+            window.rubricAssessment.populateNewRubricSummary.firstCall.args
           strictEqual(editingData, null)
           window.rubricAssessment.populateNewRubricSummary.restore()
         })

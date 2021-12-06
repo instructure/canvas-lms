@@ -17,6 +17,7 @@
  */
 
 import {arrayOf, bool, number, shape, string} from 'prop-types'
+import {AnonymousUser} from './AnonymousUser'
 import {Assignment} from './Assignment'
 import {Attachment} from './Attachment'
 import {Section} from './Section'
@@ -45,6 +46,7 @@ export const Discussion = {
       isSectionSpecific
       isAnnouncement
       discussionType
+      anonymousState
       allowRating
       onlyGradersCanRate
       delayedPostAt
@@ -101,6 +103,7 @@ export const Discussion = {
     isSectionSpecific: bool,
     isAnnouncement: bool,
     discussionType: string,
+    anonymousState: string,
     allowRating: bool,
     onlyGradersCanRate: bool,
     delayedPostAt: string,
@@ -115,6 +118,7 @@ export const Discussion = {
       repliesCount: number
     }),
     author: User.shape,
+    anonymousAuthor: AnonymousUser.shape,
     editor: User.shape,
     attachment: Attachment.shape,
     assignment: Assignment.shape,
@@ -140,6 +144,7 @@ export const Discussion = {
     isSectionSpecific = false,
     isAnnouncement = false,
     discussionType = 'threaded',
+    anonymousState = null,
     allowRating = true,
     onlyGradersCanRate = false,
     delayedPostAt = null,
@@ -155,6 +160,7 @@ export const Discussion = {
       __typename: 'DiscussionEntryCounts'
     },
     author = User.mock({_id: '1', displayName: 'Charles Xavier'}),
+    anonymousAuthor = null,
     editor = User.mock({_id: '1', displayName: 'Charles Xavier'}),
     attachment = Attachment.mock(),
     assignment = Assignment.mock(),
@@ -187,6 +193,7 @@ export const Discussion = {
     isSectionSpecific,
     isAnnouncement,
     discussionType,
+    anonymousState,
     allowRating,
     onlyGradersCanRate,
     delayedPostAt,
@@ -197,6 +204,7 @@ export const Discussion = {
     entryCounts,
     availableForUser,
     author,
+    anonymousAuthor,
     editor,
     attachment,
     assignment,

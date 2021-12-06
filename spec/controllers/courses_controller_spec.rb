@@ -3606,35 +3606,6 @@ describe CoursesController do
       expect(response.headers.to_a.find { |a| a.first == "Link" }.last).to_not include("last")
     end
 
-    it "sets pagination total_pages/last page link if account setting enabled" do
-      user_session(teacher)
-      # need two pages or the first page will also be the last_page
-      student1
-      student2
-      account = course.root_account
-      account.settings[:allow_last_page_on_course_users] = true
-      account.save!
-
-      get "users", params: {
-        course_id: course.id,
-        format: "json",
-        enrollment_role: "StudentEnrollment",
-        per_page: 1
-      }
-      expect(response).to be_successful
-      expect(response.headers.to_a.find { |a| a.first == "Link" }.last).to include("last")
-
-      get "users", params: {
-        search_term: "us",
-        course_id: course.id,
-        format: "json",
-        enrollment_role: "StudentEnrollment",
-        per_page: 1
-      }
-      expect(response).to be_successful
-      expect(response.headers.to_a.find { |a| a.first == "Link" }.last).to_not include("last")
-    end
-
     it "only returns group_ids for active group memberships when requested" do
       user_session(teacher)
       get "users", params: {

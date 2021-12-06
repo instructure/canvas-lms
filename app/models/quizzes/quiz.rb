@@ -636,6 +636,13 @@ class Quizzes::Quiz < ActiveRecord::Base
     all_question_types.uniq
   end
 
+  def assessment_question_bank_ids
+    quiz_groups
+      .pluck(:assessment_question_bank_id)
+      .compact
+      .uniq
+  end
+
   def has_access_code
     access_code.present?
   end
