@@ -26,7 +26,10 @@ const consoleMessagesToIgnore = {
     /Function components cannot be given refs\. Attempts to access this ref will fail[\s\S]*in (CanvasInstUIModal|PopoverTrigger)/,
     /Warning: \[themeable\] A theme registry has already been initialized.*/,
     // from an old discussions edit page
-    /Error: Not implemented: navigation \(except hash changes\)/
+    /Error: Not implemented: navigation \(except hash changes\)/,
+    // Until INSTUI updates FormPropTypes.message
+    // see https://github.com/instructure/instructure-ui/issues/815
+    'Invalid prop `messages[0].text` of type `object` supplied to'
   ],
   warn: [
     // Uncomment the following line if all the react 16.9 deprecations are cluttering up

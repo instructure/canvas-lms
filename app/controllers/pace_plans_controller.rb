@@ -49,7 +49,8 @@ class PacePlansController < ApplicationController
              ENROLLMENTS: enrollments_json(@context),
              SECTIONS: sections_json(@context),
              PACE_PLAN: PacePlanPresenter.new(@pace_plan).as_json,
-             PACE_PLAN_PROGRESS: progress_json
+             PACE_PLAN_PROGRESS: progress_json,
+             VALID_DATE_RANGE: CourseDateRange.new(@context)
            })
     js_bundle :pace_plans
     css_bundle :pace_plans
