@@ -46,6 +46,18 @@ def createDistribution(nestedStages) {
     "RSPECQ_UPDATE_TIMINGS=${env.GERRIT_EVENT_TYPE == 'change-merged' ? '1' : '0'}",
   ]
 
+  // Used only for crystalball map generation
+  def seleniumNodeTotal = configuration.getInteger('selenium-ci-node-total')
+  def seleniumEnvVars = baseEnvVars + [
+    "CI_NODE_TOTAL=$seleniumNodeTotal",
+    'COMPOSE_FILE=docker-compose.new-jenkins.yml:docker-compose.new-jenkins-selenium.yml',
+    'EXCLUDE_TESTS=.*/performance',
+    "FORCE_FAILURE=${configuration.isForceFailureSelenium() ? '1' : ''}",
+    "RERUNS_RETRY=${configuration.getInteger('selenium-rerun-retry')}",
+    "RSPEC_PROCESSES=${configuration.getInteger('selenium-processes')}",
+    'TEST_PATTERN=^./(spec|gems/plugins/.*/spec_canvas)/selenium',
+  ]
+
   def rspecNodeRequirements = [label: 'canvas-docker']
 
   extendedStage('RSpecQ Reporter for Rspec')
@@ -55,13 +67,24 @@ def createDistribution(nestedStages) {
       .timeout(15)
       .queue(nestedStages, this.&runReporter)
 
-  rspecqNodeTotal.times { index ->
-    extendedStage("RSpecQ Test Set ${(index + 1).toString().padLeft(2, '0')}")
-        .envVars(rspecqEnvVars + ["CI_NODE_INDEX=$index"])
-        .hooks(buildSummaryReportHooks.call() + [onNodeAcquired: setupNodeHook, onNodeReleasing: { tearDownNode('spec') }])
+  if (env.ENABLE_CRYSTALBALL != '1') {
+    rspecqNodeTotal.times { index ->
+      extendedStage("RSpecQ Test Set ${(index + 1).toString().padLeft(2, '0')}")
+          .envVars(rspecqEnvVars + ["CI_NODE_INDEX=$index"])
+          .hooks(buildSummaryReportHooks.call() + [onNodeAcquired: setupNodeHook, onNodeReleasing: { tearDownNode('spec') }])
+          .nodeRequirements(rspecNodeRequirements)
+          .timeout(15)
+          .queue(nestedStages, this.&runRspecqSuite)
+    }
+  } else {
+    seleniumNodeTotal.times { index ->
+      extendedStage("Selenium Test Set ${(index + 1).toString().padLeft(2, '0')}")
+        .envVars(seleniumEnvVars + ["CI_NODE_INDEX=$index"])
+        .hooks([onNodeAcquired: setupNodeHook, onNodeReleasing: { tearDownNode('selenium') }])
         .nodeRequirements(rspecNodeRequirements)
         .timeout(15)
-        .queue(nestedStages, this.&runRspecqSuite)
+        .queue(nestedStages, this.&runLegacySuite)
+    }
   }
 }
 
@@ -104,8 +127,7 @@ def tearDownNode(prefix) {
   sh 'build/new-jenkins/docker-copy-files.sh /usr/src/app/log/results tmp/rspec_results canvas_ --allow-error --clean-dir'
   sh "build/new-jenkins/docker-copy-files.sh /usr/src/app/log/spec_failures/ tmp/spec_failures/$prefix canvas_ --allow-error --clean-dir"
 
-  // Don't generate map pre-merge
-  if (env.ENABLE_CRYSTALBALL == '1' && env.RSPECQ_ENABLED != '1') {
+  if (env.ENABLE_CRYSTALBALL == '1') {
     sh 'build/new-jenkins/docker-copy-files.sh /usr/src/app/log/results/crystalball_results tmp/crystalball canvas_ --allow-error --clean-dir'
     sh 'ls tmp/crystalball'
     sh 'ls -R'

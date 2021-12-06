@@ -39,7 +39,7 @@ export default {
       .catch(err => {
         /* eslint-disable no-console */
         console.error(err)
-        console.warn('Falied loading locale "%s". Falling back to English', locale)
+        console.warn('Failed loading locale "%s". Falling back to English', locale)
         formatMessage.addLocale({
           locale: 'en'
         })

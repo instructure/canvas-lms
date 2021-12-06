@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {AnonymousUser} from './AnonymousUser'
 import {DiscussionEntry} from './DiscussionEntry'
 import {DiscussionEntryDraft} from './DiscussionEntryDraft'
 import {Discussion} from './Discussion'
@@ -151,12 +152,16 @@ export const CREATE_DISCUSSION_ENTRY = gql`
         author {
           ...User
         }
+        anonymousAuthor {
+          ...AnonymousUser
+        }
       }
       errors {
         ...Error
       }
     }
   }
+  ${AnonymousUser.fragment}
   ${User.fragment}
   ${DiscussionEntry.fragment}
   ${Error.fragment}
