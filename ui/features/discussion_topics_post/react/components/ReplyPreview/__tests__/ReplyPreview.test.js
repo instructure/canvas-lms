@@ -20,6 +20,7 @@ import React from 'react'
 import {render} from '@testing-library/react'
 
 import {ReplyPreview} from '../ReplyPreview'
+import {AnonymousUser} from '../../../../graphql/AnonymousUser'
 
 const mockProps = ({
   createdAt = '2021-08-10T12:10:38-06:00',
@@ -27,11 +28,12 @@ const mockProps = ({
   author = {
     shortName: 'Albus Dumbledore'
   },
+  anonymousAuthor = null,
   editor = {
     shortName: 'Harry Potter'
   },
   deleted = false
-} = {}) => ({createdAt, previewMessage, author, editor, deleted})
+} = {}) => ({createdAt, previewMessage, author, anonymousAuthor, editor, deleted})
 
 const setup = props => {
   return render(<ReplyPreview {...props} />)
@@ -85,5 +87,22 @@ describe('Reply Preview', () => {
       })
     )
     expect(container.queryByText('Read More')).toBeNull()
+  })
+
+  describe('anonymous author', () => {
+    beforeAll(() => {
+      window.ENV.discussion_anonymity_enabled = true
+    })
+
+    afterAll(() => {
+      window.ENV.discussion_anonymity_enabled = false
+    })
+
+    it('renders name', () => {
+      const container = setup(
+        mockProps({author: null, editor: null, anonymousAuthor: AnonymousUser.mock()})
+      )
+      expect(container.getByText('Anonymous 1')).toBeTruthy()
+    })
   })
 })
