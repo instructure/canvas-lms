@@ -42,7 +42,6 @@ import {isGraded, isPostable, similarityIcon} from '@canvas/grading/SubmissionHe
 import studentViewedAtTemplate from '../jst/student_viewed_at.handlebars'
 import submissionsDropdownTemplate from '../jst/submissions_dropdown.handlebars'
 import speechRecognitionTemplate from '../jst/speech_recognition.handlebars'
-import unsubmittedCommentsTemplate from '../jst/unsubmitted_comment.handlebars'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {
   IconUploadLine,
@@ -1391,80 +1390,11 @@ EG = {
     EG.goToStudent(resolvedId, HISTORY_REPLACE)
   },
 
-  anyUnpostedComment() {
-    return !!(
-      $.trim($add_a_comment_textarea.val()).length ||
-      $('#media_media_recording').data('comment_id') ||
-      $add_a_comment.find("input[type='file']:visible").length
-    )
-  },
-
   skipRelativeToCurrentIndex(offset) {
-    const nextStudent = offset => {
-      const {length: students} = jsonData.studentsWithSubmissions
-      const newIndex = (this.currentIndex() + offset + students) % students
-      this.goToStudent(jsonData.studentsWithSubmissions[newIndex][anonymizableId], HISTORY_PUSH)
-    }
+    const {length: students} = jsonData.studentsWithSubmissions
+    const newIndex = (this.currentIndex() + offset + students) % students
 
-    const doNotShowModalSetting = 'speedgrader.dont_show_unposted_comment_dialog.' + assignmentUrl
-
-    if (
-      ENV.speedgrader_dialog_for_unposted_comments &&
-      !userSettings.get(doNotShowModalSetting) &&
-      this.anyUnpostedComment()
-    ) {
-      const closeDialog = () => {
-        if ($(document).find('.do-not-show-again input').is(':checked')) {
-          userSettings.set(doNotShowModalSetting, true)
-        }
-        $dialog.dialog('close')
-        $dialog.dialog('destroy').remove() // this actually removes it from DOM
-      }
-
-      const $dialog = $(
-        unsubmittedCommentsTemplate({
-          message: I18n.t(
-            'You have created a comment that has not been posted. Do you want to proceed and save this comment as a draft? (You can post draft comments at any time.)'
-          )
-        })
-      ).dialog({
-        title: I18n.t('Your comment is not posted'),
-        minWidth: 500,
-        minHeight: 200,
-        resizable: false,
-        dialogClass: 'no-close',
-        modal: true,
-        create(e, ui) {
-          const pane = $(this).dialog('widget').find('.ui-dialog-buttonpane')
-          $(
-            `<label class='do-not-show-again'><input type='checkbox'/>&nbsp;${I18n.t(
-              'Do not show again for this assignment'
-            )}</label>`
-          ).prependTo(pane)
-        },
-        buttons: [
-          {
-            id: 'unposted_comment_cancel',
-            class: 'dialog_button',
-            text: I18n.t('Cancel'),
-            click: () => {
-              closeDialog()
-            }
-          },
-          {
-            id: 'unposted_comment_proceed',
-            class: 'dialog_button',
-            text: I18n.t('Proceed'),
-            click: () => {
-              closeDialog()
-              nextStudent(offset)
-            }
-          }
-        ]
-      })
-    } else {
-      nextStudent(offset)
-    }
+    this.goToStudent(jsonData.studentsWithSubmissions[newIndex][anonymizableId], HISTORY_PUSH)
   },
 
   next() {

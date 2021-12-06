@@ -115,19 +115,6 @@ describe ContentExport do
       expect(@ce.settings[:quizzes2][:qti_export][:url]).to eq(@ce.attachment.public_download_url)
     end
 
-    it "composes the payload with account banks flag if new_quizzes_bank_migration_enabled? returns true" do
-      @course.enable_feature!(:quizzes_next)
-      allow(@ce).to receive(:new_quizzes_bank_migration_enabled?).and_return(true)
-      @ce.export(synchronous: true)
-      expect(@ce.settings[:selected_content]["all_#{AssessmentQuestionBank.table_name}"]).to be true
-    end
-
-    it "composes the payload without account banks flag if new_quizzes_bank_migration_enabled? returns false" do
-      allow(@ce).to receive(:new_quizzes_bank_migration_enabled?).and_return(false)
-      @ce.export(synchronous: true)
-      expect(@ce.settings[:selected_content].class.to_s).to eq("Integer")
-    end
-
     it "completes with export_type of 'quizzes2'" do
       @course.enable_feature!(:quizzes_next)
       @ce.export(synchronous: true)

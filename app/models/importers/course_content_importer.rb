@@ -504,10 +504,6 @@ module Importers
         post_manually = Canvas::Plugin.value_to_boolean(settings.dig(:default_post_policy, :post_manually))
         course.default_post_policy.update!(post_manually: post_manually)
       end
-
-      if settings.key?(:allow_final_grade_override) && course.account.feature_enabled?(:final_grades_override)
-        course.allow_final_grade_override = settings[:allow_final_grade_override]
-      end
     end
 
     def self.shift_date_options(course, options = {})

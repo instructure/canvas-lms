@@ -364,7 +364,6 @@ const IsolatedThreadContainer = props => {
                       />
                     }
                     author={props.discussionEntry.author}
-                    anonymousAuthor={props.discussionEntry.anonymousAuthor}
                     message={props.discussionEntry.message}
                     isEditing={isEditing}
                     onSave={onUpdate}

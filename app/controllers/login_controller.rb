@@ -138,7 +138,7 @@ class LoginController < ApplicationController
     return render_unauthorized_action unless return_to.absolute?
 
     host = return_to.host
-    return render_unauthorized_action unless host.casecmp?(request.host)
+    return render_unauthorized_action unless host == request.host
 
     login_pseudonym = @real_current_pseudonym || @current_pseudonym
     token = SessionToken.new(login_pseudonym.global_id,
