@@ -332,7 +332,8 @@ export class DiscussionRow extends Component {
 
   readCount = () => {
     const readCount =
-      this.props.discussion.discussion_subentry_count > 0 ? (
+      this.props.discussion.discussion_subentry_count > 0 &&
+      !this.isInaccessibleDueToAnonymity() ? (
         <UnreadBadge
           key={`Badge_${this.props.discussion.id}`}
           unreadCount={this.props.discussion.unread_count}
@@ -376,33 +377,34 @@ export class DiscussionRow extends Component {
     }
   }
 
-  subscribeButton = () => (
-    <ToggleIcon
-      key={`Subscribe_${this.props.discussion.id}`}
-      toggled={this.props.discussion.subscribed}
-      OnIcon={
-        <Text color="success">
-          <IconBookmarkSolid
-            title={I18n.t('Unsubscribe from %{title}', {title: this.props.discussion.title})}
-          />
-        </Text>
-      }
-      OffIcon={
-        <Text color="brand">
-          <IconBookmarkLine
-            title={I18n.t('Subscribe to %{title}', {title: this.props.discussion.title})}
-          />
-        </Text>
-      }
-      onToggleOn={() => this.props.toggleSubscriptionState(this.props.discussion)}
-      onToggleOff={() => this.props.toggleSubscriptionState(this.props.discussion)}
-      disabled={this.props.discussion.subscription_hold !== undefined}
-      className="subscribe-button"
-    />
-  )
+  subscribeButton = () =>
+    !this.isInaccessibleDueToAnonymity() && (
+      <ToggleIcon
+        key={`Subscribe_${this.props.discussion.id}`}
+        toggled={this.props.discussion.subscribed}
+        OnIcon={
+          <Text color="success">
+            <IconBookmarkSolid
+              title={I18n.t('Unsubscribe from %{title}', {title: this.props.discussion.title})}
+            />
+          </Text>
+        }
+        OffIcon={
+          <Text color="brand">
+            <IconBookmarkLine
+              title={I18n.t('Subscribe to %{title}', {title: this.props.discussion.title})}
+            />
+          </Text>
+        }
+        onToggleOn={() => this.props.toggleSubscriptionState(this.props.discussion)}
+        onToggleOff={() => this.props.toggleSubscriptionState(this.props.discussion)}
+        disabled={this.props.discussion.subscription_hold !== undefined}
+        className="subscribe-button"
+      />
+    )
 
   publishButton = () =>
-    this.props.canPublish ? (
+    this.props.canPublish && !this.isInaccessibleDueToAnonymity() ? (
       <ToggleIcon
         key={`Publish_${this.props.discussion.id}`}
         toggled={this.props.discussion.published}
@@ -522,7 +524,7 @@ export class DiscussionRow extends Component {
       )
     }
 
-    if (this.props.onMoveDiscussion) {
+    if (this.props.onMoveDiscussion && !this.isInaccessibleDueToAnonymity()) {
       menuList.push(
         this.createMenuItem(
           'moveTo',
@@ -535,7 +537,7 @@ export class DiscussionRow extends Component {
       )
     }
 
-    if (this.props.displayDuplicateMenuItem) {
+    if (this.props.displayDuplicateMenuItem && !this.isInaccessibleDueToAnonymity()) {
       menuList.push(
         this.createMenuItem(
           'duplicate',
@@ -548,7 +550,7 @@ export class DiscussionRow extends Component {
       )
     }
 
-    if (this.props.DIRECT_SHARE_ENABLED) {
+    if (this.props.DIRECT_SHARE_ENABLED && !this.isInaccessibleDueToAnonymity()) {
       menuList.push(
         this.createMenuItem(
           'sendTo',
@@ -572,7 +574,7 @@ export class DiscussionRow extends Component {
     }
 
     // This returns an empty struct if assignment_id is falsey
-    if (this.props.displayMasteryPathsMenuItem) {
+    if (this.props.displayMasteryPathsMenuItem && !this.isInaccessibleDueToAnonymity()) {
       menuList.push(
         this.createMenuItem(
           'masterypaths',
@@ -582,7 +584,7 @@ export class DiscussionRow extends Component {
       )
     }
 
-    if (this.props.discussionTopicMenuTools.length > 0) {
+    if (this.props.discussionTopicMenuTools.length > 0 && !this.isInaccessibleDueToAnonymity()) {
       this.props.discussionTopicMenuTools.forEach(menuTool => {
         menuList.push(
           <Menu.Item
