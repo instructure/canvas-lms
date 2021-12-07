@@ -167,5 +167,10 @@ describe('AuthorInfo', () => {
       const container = setup({anonymousAuthor: AnonymousUser.mock()})
       expect(container.getByText('Anonymous 1')).toBeInTheDocument()
     })
+
+    it('renders avatar', () => {
+      const container = setup({anonymousAuthor: AnonymousUser.mock()})
+      expect(container.getByTestId('anonymous_avatar')).toBeInTheDocument()
+    })
   })
 })
