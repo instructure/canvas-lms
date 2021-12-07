@@ -39,7 +39,7 @@ describe('ContentChunker', () => {
     it('creates chunks of HTML and MathML', () => {
       expect(subject()).toMatchObject([
         {
-          content: '<div>\n        Some simple content\n        ',
+          content: '<div>\n        Some simple content\n        </div>',
           mimeType: 'text/html'
         },
         {
@@ -91,26 +91,81 @@ describe('ContentChunker', () => {
         content = `
           <div>
             Pre-math
-            <img src="something" class="MathJax_SVG" data-mathml="<mrow><apply><minus/><ci>a</ci><ci>b</ci></apply></mrow>" />
-            <img src="something" class="MathJax_SVG" data-mathml="<mrow><apply><minus/><ci>b</ci><ci>c</ci></apply></mrow>"/>
+            <p>
+              <span class="math_equation_latex fade-in-equation" style="null">
+                  <span class="MathJax_Preview" style="color: inherit;"></span>
+                  <span class="MathJax_SVG" id="MathJax-Element-2-Frame" tabindex="0" data-mathml="<math xmlns=&quot;http://www.w3.org/1998/Math/MathML&quot;><mi>A</mi><mo>=</mo><mi>&amp;#x03C0;</mi><msup><mi>r</mi><mn>2</mn></msup></math>" role="presentation">
+                     <svg xmlns:xlink="http://www.w3.org/1999/xlink" width="8.276ex" height="2.355ex" viewBox="0 -905.6 3563.5 1013.9" role="img" focusable="false" style="vertical-align: -0.252ex;" aria-hidden="true">
+                        <g stroke="currentColor" fill="currentColor" stroke-width="0" transform="matrix(1 0 0 -1 0 0)">
+                           <g transform="translate(2658,0)">
+                              <use xlink:href="#MJMATHI-72" x="0" y="0"></use>
+                           </g>
+                        </g>
+                     </svg>
+                     <span class="MJX_Assistive_MathML" role="presentation">
+                        <math xmlns="http://www.w3.org/1998/Math/MathML">
+                           <mi>A</mi>
+                           <mo>=</mo>
+                           <mi>π</mi>
+                           <msup>
+                              <mi>r</mi>
+                              <mn>2</mn>
+                           </msup>
+                        </math>
+                     </span>
+                  </span>
+                  <script type="math/tex" id="MathJax-Element-2">A=\pi r^2</script>
+              </span>
+            </p>
+            <p>
+              <span class="math_equation_latex fade-in-equation" style="null">
+                  <span class="MathJax_Preview" style="color: inherit;"></span>
+                  <span class="MathJax_SVG" id="MathJax-Element-2-Frame" tabindex="0" data-mathml="<math xmlns=&quot;http://www.w3.org/1998/Math/MathML&quot;><mi>A</mi><mo>=</mo><mi>&amp;#x03C0;</mi><msup><mi>r</mi><mn>2</mn></msup></math>" role="presentation">
+                     <svg xmlns:xlink="http://www.w3.org/1999/xlink" width="8.276ex" height="2.355ex" viewBox="0 -905.6 3563.5 1013.9" role="img" focusable="false" style="vertical-align: -0.252ex;" aria-hidden="true">
+                        <g stroke="currentColor" fill="currentColor" stroke-width="0" transform="matrix(1 0 0 -1 0 0)">
+                           <g transform="translate(2658,0)">
+                              <use xlink:href="#MJMATHI-72" x="0" y="0"></use>
+                           </g>
+                        </g>
+                     </svg>
+                     <span class="MJX_Assistive_MathML" role="presentation">
+                        <math xmlns="http://www.w3.org/1998/Math/MathML">
+                           <mi>A</mi>
+                           <mo>=</mo>
+                           <mi>π</mi>
+                           <msup>
+                              <mi>a</mi>
+                              <mn>3</mn>
+                           </msup>
+                        </math>
+                     </span>
+                  </span>
+                  <script type="math/tex" id="MathJax-Element-2">A=\pi r^2</script>
+              </span>
+            </p>
             Post-math
           </div>
         `
       })
 
-      it('returns a chunk for each piece of math', () => {
+      it('returns a chunk for each piece of math with empty math paragraphs removed', () => {
         expect(subject()).toMatchObject([
           {
-            content: '<div>\n            Pre-math\n            ',
+            content: '<div>\n            Pre-math\n            </div>',
             mimeType: 'text/html'
           },
           {
-            content: '<mrow><apply><minus/><ci>a</ci><ci>b</ci></apply></mrow>',
+            content:
+              '<math xmlns="http://www.w3.org/1998/Math/MathML"><mi>A</mi><mo>=</mo><mi>&#x03C0;</mi><msup><mi>r</mi><mn>2</mn></msup></math>',
             mimeType: 'application/mathml+xml'
           },
-          {content: '', mimeType: 'text/html'},
           {
-            content: '<mrow><apply><minus/><ci>b</ci><ci>c</ci></apply></mrow>',
+            content: '<p>\n              \n                  \n                  </p>',
+            mimeType: 'text/html'
+          },
+          {
+            content:
+              '<math xmlns="http://www.w3.org/1998/Math/MathML"><mi>A</mi><mo>=</mo><mi>&#x03C0;</mi><msup><mi>r</mi><mn>2</mn></msup></math>',
             mimeType: 'application/mathml+xml'
           },
           {content: 'Post-math\n          \n        ', mimeType: 'text/html'}
@@ -134,7 +189,7 @@ describe('ContentChunker', () => {
       it('returns a chunk for each html/math piece', () => {
         expect(subject()).toMatchObject([
           {
-            content: '<div>\n            Pre-math\n            ',
+            content: '<div>\n            Pre-math\n            </div>',
             mimeType: 'text/html'
           },
           {

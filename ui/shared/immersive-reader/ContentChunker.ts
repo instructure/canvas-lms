@@ -16,6 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import Formatter from './Formatter'
+import spacing from './formatters/spacing'
+
 enum MimeTypes {
   mathML = 'application/mathml+xml',
   html = 'text/html'
@@ -24,6 +27,7 @@ enum MimeTypes {
 type ChunkerOptions = {
   selector?: string
   mathMLAttr?: string
+  formatters?: Array<Formatter>
 }
 
 type Chunk = {
@@ -65,12 +69,14 @@ type Chunk = {
  */
 class ContentChunker {
   selector: string
-  parser: DOMParser
   mathMLAttr: string
+  formatters: Array<Formatter>
+  parser: DOMParser
 
   constructor(opts: ChunkerOptions = {}) {
     this.selector = opts.selector || '.MathJax_SVG'
     this.mathMLAttr = opts.mathMLAttr || 'data-mathml'
+    this.formatters = opts.formatters || [spacing]
     this.parser = new DOMParser()
   }
 
@@ -81,7 +87,7 @@ class ContentChunker {
     const [preMath, postMath] = body.innerHTML.split(mathElement?.outerHTML)
 
     // Add pre-math content
-    chunks.push({content: preMath, mimeType: MimeTypes.html})
+    chunks.push({content: this.applyFormatters(preMath), mimeType: MimeTypes.html})
 
     // Add the math
     if (mathElement) {
@@ -99,7 +105,17 @@ class ContentChunker {
     return chunks
   }
 
-  bodyFor(content: string): Element {
+  applyFormatters(content: string): string {
+    let formattedContent = content
+
+    this.formatters.forEach(formatter => {
+      formattedContent = formatter(formattedContent, this.parser)
+    })
+
+    return formattedContent
+  }
+
+  bodyFor(content: string): HTMLElement {
     return this.parser.parseFromString(content, 'text/html').body
   }
 }
