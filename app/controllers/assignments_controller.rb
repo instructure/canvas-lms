@@ -31,6 +31,7 @@ class AssignmentsController < ApplicationController
   include Api::V1::ContextModule
 
   include KalturaHelper
+  include ObserverEnrollmentsHelper
   include SyllabusHelper
   before_action :require_context
   include K5Mode
@@ -106,11 +107,13 @@ class AssignmentsController < ApplicationController
   def a2_active_student_and_enrollment
     return [@current_user, @context_enrollment] unless @context_enrollment&.observer?
 
+    # sets @selected_observed_user
+    observed_users(@current_user, session, @context.id)
+
     active_enrollment = ObserverEnrollment.active_or_pending
-                                          .preload(:associated_user)
-                                          .joins(:associated_user)
-                                          .where(course: @context, user: @current_user)
-                                          .order(User.sortable_name_order_by_clause("users"))
+                                          .where(course: @context,
+                                                 user: @current_user,
+                                                 associated_user: @selected_observed_user)
                                           .first
 
     [active_enrollment&.associated_user, active_enrollment]
@@ -230,8 +233,18 @@ class AssignmentsController < ApplicationController
             js_env({ enrollment_state: active_enrollment&.state_based_on_date })
             rce_js_env
 
+            # Initially we will not have any visual indicator of which
+            # student is observed so we will announce it in a flash notice.
+            unless student_to_view == @current_user
+              flash[:notice] = t "Observing %{student_name}. To select a different student, return to the dashboard.",
+                                 student_name: student_to_view.name
+            end
+
             render_a2_student_view(student: student_to_view)
             return
+          else
+            # This should not be reachable but leaving in place until we remove the old view
+            flash[:notice] = t "No student is being observed. To select a student, return to the dashboard."
           end
         end
 
