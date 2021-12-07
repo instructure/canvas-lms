@@ -32,6 +32,7 @@ import I18n from 'i18n!gradebook'
 import CourseGradeCalculator from '@canvas/grading/CourseGradeCalculator'
 import * as EffectiveDueDates from '@canvas/grading/EffectiveDueDates'
 import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
+import AssignmentOverrideHelper from '@canvas/due-dates/AssignmentOverrideHelper'
 import UserSettings from '@canvas/user-settings'
 import Spinner from 'spin.js'
 import GradeDisplayWarningDialog from '../../jquery/GradeDisplayWarningDialog.coffee'
@@ -884,6 +885,10 @@ class Gradebook extends React.Component {
       student.cssClass = `student_${student.id}`
       this.updateStudentRow(student)
     })
+    AssignmentOverrideHelper.setStudentDisplayNames([
+      ...Object.values(this.students),
+      ...Object.values(this.studentViewStudents)
+    ])
     this.gridReady.then(() => {
       return this.setupGrading(students)
     })
@@ -2435,7 +2440,7 @@ class Gradebook extends React.Component {
         label: I18n.t('Student Names'),
         customMatcher: this.studentSearchMatcher,
         onChange: this.onFilterToStudents,
-        options: students.map(student => ({id: student.id, text: student.name})),
+        options: students.map(student => ({id: student.id, text: student.displayName})),
         placeholder: I18n.t('Search Students')
       }
 
