@@ -6,7 +6,7 @@ ht:
   1_item_scores_examplescores_9736236: "1- Nòt Atik: %{exampleScores}"
   1_user_found_76399771: "1 itilizatè twouve."
   1st_reviewer_3c1d0119: "1ye Evalyatè"
-  25th_75th_ile_406a67bf: "25-75 %i"
+  25th_75th_ile_406a67bf: "25-75 Pousan"
   25th_75th_percentile_aa4c11f2: "25-75 Pousan"
   2_final_score_7b0fd15e: "2- Nòt final"
   2_final_score_exampleresult_922edf9c: "2- Nòt Final: %{exampleResult}"
@@ -302,6 +302,7 @@ ht:
     turnitin_pledge: "Soumisyon sesyon sa a se travay orijinal pa mwen"
   account_97b34646: Kont
   account_account_b6b3746b: "Kont: %{account}"
+  account_administrators_can_always_create_courses_926dc0cb: "Administratè Kont yo ka toujou kreye kou yo"
   account_and_course_level_outcome_mastery_scales_5bfe7a3b: "Echèl Metriz Rezilta Onivo Kont ak Kou"
   account_and_course_level_outcome_proficiencies_1cfa260: "Konpetans nan Rezilta onivo Kont ak Kou"
   account_and_subaccount_40c6430: "Kont ak Sou Kont"
@@ -414,6 +415,7 @@ ht:
       login_handle_name_description: "Etikèt ki itilize pou idantifyan koneksyon inik yo. Pa egzanp, Koneksyon, Non itilizatè, ID Elèv elatriye."
       unknown_user_url_description: "URL pou redirije yon itilizatè otantifye lè yo pa jwenn li nan Canvas."
   account_course_and_user_search_22bf297a: "Kont Kou ak Rechèch Itilizatè"
+  account_creation_still_in_progress_ac0e0a18: "Kreyasyon kont toujou an pwosesis"
   account_domain_78f43049: "Domèn Kont"
   account_domain_lookups_f9d1147e: "Rechèch Domèn Kont"
   account_groups_2f301732: "Gwoup Kont"
@@ -962,10 +964,10 @@ ht:
       custom_reports: 
         end: 
           parameters: 
-            header: "Eta Enskripsyon"
+            header: "Fini a:"
         start: 
           parameters: 
-            header: "Eta Enskripsyon"
+            header: "Kòmanse a:"
     default_account_quotas_not_updated: "Kont quota pa defo yo pa t aktyalize"
     default_account_quotas_updated: "Kont quota pa defo yo aktyalize"
     devry: 
@@ -1328,7 +1330,7 @@ ht:
         media_quota: "Quota Medya"
         site_admin_quotas: "Quota Administratè Sit"
         student_quota: "Quota Elèv"
-        update: "Aktyalize Aktivite"
+        update: Aktyalize
       account_settings_title: "Konfigirasyon Kont"
       add_admin_title: "Ajoute Administratè Kont"
       add_ip_filter_link: Filtè
@@ -10442,8 +10444,8 @@ ht:
   example_final_score_a92b30b9: "Egzanp nòt final]]"
   example_https_example_com_config_xml_be5f36ac: "Egzanp: https://example.com/config.xml"
   example_https_lti_tool_provider_example_herokuapp__e9802142: "Egzanp: https://lti-tool-provider-example.herokuapp.com/register"
-  example_https_schoolofrock_catalog_instructure_com_b7a35ab5: "egzanp: \"https://schoolofrock.catalog.instructure.com\""
-  example_https_schoolofrock_edu_d4326f03: "egzanp: \"https://schoolofrock.edu\""
+  example_https_schoolofrock_catalog_instructure_com_b7a35ab5: "example: \"https://schoolofrock.catalog.instructure.com\""
+  example_https_schoolofrock_edu_d4326f03: "example: \"https://schoolofrock.edu\""
   example_item_scores_6726c689: "Egzanp nòt atik"
   example_school_of_rock_41f32c31: "example: \"School of Rock\""
   exceeds_expectations_5910fc3a: "Depase Esperans"
@@ -14996,7 +14998,6 @@ ht:
             
             %{course}, kou w la sou rezo Canvas la te kòmanse sa gen kèk jou, e nou remake ou poko janm konekte. Nou te sèlman vle voye yon dènye rapèl pou ou pou si se bliye ou te bliye.
             
-            
             Pou w konekte ale nan %{site} epi antre non itilizatè ou ak modpas ou. Si w poko mete modpas ou, ou ka kreye yonn la a: %{password_url}
             
             Si w paka asiste a kou sa a an patikilye, konsilte katalòg nou an nan %{site} pou w ka jwenn yon lòt bagay ki enspire w. Yo toujou ap ajoute nouvo kou!
@@ -15043,7 +15044,6 @@ ht:
             Kisa w ka fè pou w prepare w?
             
             Si w poko kreye pwofil Rezo Canvas ou a, ou kapab konekte epi konfigire li sou Canvas.net. Pwofil ou ap pèmèt lòt patisipan nan kou a wè kiyès ou ye. la, ou ka konfigire preferans notifiksayon yo tou.
-            
             
             Finalman, ou ka konsilte materyèl nesesè yo ak posib enstriksyon pou kou w la isit la: %{url}
             
@@ -15961,6 +15961,7 @@ ht:
   mfa_required_ca66e177: "MFA Obligatwa"
   mfoster_708c21fb: mfoster@*
   mgp_grade_export_d29b471f: "Ekspòtasyon Nòt MGP"
+  miami_utilization_report_9c927880: "Rapò Itilizasyon Miami"
   mic_a7f3d311: Mikwo
   microsoft_365_allows_a_maximum_of_max_members_in_a_3acbd841: "Microsoft 365 otorize yon maksimòm %{max} manm nan yon ekip."
   microsoft_365_allows_a_maximum_of_max_owners_in_a__b448f5de: "Microsoft 365 otorize yon maksimòm %{max} pwopriyetè nan yon ekip."
@@ -16478,8 +16479,8 @@ ht:
       oswa pwodui asosye yo ta dwe aktive fonksyon sa a pou yo ka amelyore pwosesis
       validasyon done afektasyon yo. Lè l aktive, fonksyon sa a afiche nouvo paramèt entegrasyon SIS yo
       pou ka pèmèt Sync SIS (Nivo Afektasyon Retou Nòt) in
-      Paramèt Kont. Apèsi fonksyonalite Pibliye nan SIS la te entegre nan nouvo
-      paramèt sa a e l ap aktive pa defo.
+      Paramèt Kont. Yo te ajoute opsyon Pibliye nan SIS nan nouvo paramèt la epi l ap
+      aktive pou kont li otomatikmsn.
   new_slack_api_key_453d04d: "Nouvo Kle Api Slack"
   new_topic_for_course_3d98222a: "Nouvo Sijè pou %{course}"
   new_typography_4eaeca26: "Nouvo Tipografi"
@@ -18241,7 +18242,7 @@ ht:
         user_id: "ID Itilizatè"
         user_roles: "Wòl Itilizatè"
         user_severity: "Severite Itilizatè"
-        username: "Non itilizatè"
+        username: "Non Itilizatè"
   png_55cbb586: PNG
   points_bb475533: Pwen
   points_bceb5005: pwen
@@ -24108,7 +24109,6 @@ ht:
   this_report_shows_all_the_activity_from_users_enro_8f8e0ca1: |-
       Rapò sa a montre tout aktivite itilizatè ki enskri nan tout kou yo
         nan yon trimès. Fichye csv ou jwenn nan ap gen yon liy pou chak aktivite
-        
         elèv epi l ap gen antèt annapre yo; id seksyon, id sis seksyon,
         non seksyon, id kou, id sis kou, non kou, id itilizatè, id tèm, id sis tèm,
         non tèm, id itilizatè, id sis itilizatè, non itilizatè, tip kontni, kontni, nonm konsiltasyon,
