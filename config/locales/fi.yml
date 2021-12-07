@@ -4,7 +4,7 @@
 fi: 
   1_item_scores_5512cd03: "1 - kohteen pistemäärät"
   1_item_scores_examplescores_9736236: "1 - Kohteiden pistemäärät: %{exampleScores}"
-  25th_75th_ile_406a67bf: "25.-75. %i"
+  25th_75th_ile_406a67bf: "25.-75. prosenttipiste"
   25th_75th_percentile_aa4c11f2: "25.-75. prosenttipiste"
   2_final_score_7b0fd15e: "2 - lopullinen pistemäärä"
   2_final_score_exampleresult_922edf9c: "2 - Lopullinen pistemäärä: %{exampleResult}"
@@ -281,6 +281,7 @@ fi:
     tab_permissions: Käyttöoikeudet
     tab_plugins: Laajennukset
     tab_question_banks: Kysymyspankit
+    tab_root_accounts: Juuritilit
     tab_rubrics: Arviointitaulukot
     tab_settings: Asetukset
     tab_sis_import: SIS-tuonti
@@ -289,13 +290,18 @@ fi:
     tab_terms: Lukukaudet
   account_97b34646: Tili
   account_account_b6b3746b: "Tili: %{account}"
+  account_administrators_can_always_create_courses_926dc0cb: "Tilin pääkäyttäjät voivat aina luoda kursseja"
   account_and_course_level_outcome_mastery_scales_5bfe7a3b: "Tili- ja kurssitason tuloksen hallinnan asteikot."
   account_and_course_level_outcome_proficiencies_1cfa260: "Tili- ja kurssitason tuloksen pätevyydet."
   account_and_subaccount_40c6430: "Tili ja alatili"
   account_course_and_user_search_22bf297a: "Tilin kurssi ja käyttäjähaku"
+  account_creation_still_in_progress_ac0e0a18: "Tilin luonti yhä meneillään"
+  account_domain_78f43049: "Tilin verkkotunnus"
+  account_domain_lookups_f9d1147e: "Tilin verkkotunnuksen haut"
   account_groups_2f301732: Tiliryhmät
   account_id_2c3b4f15: "tilin tunnus"
   account_id_73966078: account_id
+  account_id_f6e26867: "Tilin tunnus"
   account_level_mastery_scales_a5bdff29: "Tilitason hallinnan suuruusluokat"
   account_level_notification_preferences_require_an__66467cd7: "Tilitason ilmoitusasetukset vaativat account_id päivittääkseen"
   account_level_notification_preferences_ui_update_f5e189a4: "Tilitason ilmoitusasetusten käyttöliittymän päivitys"
@@ -303,6 +309,8 @@ fi:
   account_level_settings_manage_4fca6f8e: "Tilin tason asetukset - hallitse"
   account_name_13ed649: "%{account_name}"
   account_name_7f63a13: "tilin nimi"
+  account_name_analytics_62bf60ae: "%{account.name} Analytiikka"
+  account_name_bff54ed5: "Tilin nimi"
   account_navigation_80bbefd4: "Tilin navigointi"
   account_navigation_menu_10c05bf9: "Tilin navigointivalikko"
   account_notification: 
@@ -796,10 +804,10 @@ fi:
       custom_reports: 
         end: 
           parameters: 
-            header: "Ilmoittautumisen tila"
+            header: "Päättyy:"
         start: 
           parameters: 
-            header: "Ilmoittautumisen tila"
+            header: "Alkaa:"
     default_account_quotas_not_updated: "Oletustilin kiintiöitä ei päivitetty"
     default_account_quotas_updated: "Oletustilin kiintiöt päivitetty"
     devry_u: 
@@ -1108,7 +1116,12 @@ fi:
       about_google_docs_tooltip: "Tietoja Google Docs-esikatseluista"
       account_admins_title: "Tilin pääkäyttäjät"
       account_quotas: 
-        update: "Päivitä tapahtuma"
+        file_quota: "Tiedostojen kiintiö"
+        gigabytes: gigatavut
+        media_quota: "Median kiintiö"
+        site_admin_quotas: "Sivuston pääkäyttäjän kiintiöt"
+        student_quota: "Opiskelijan kiintiö"
+        update: Päivitä
       account_settings_title: "Tilin asetukset"
       add_admin_title: "Lisää tilin pääkäyttäjiä"
       add_ip_filter_link: Suodatin
@@ -5845,7 +5858,7 @@ fi:
       get_courses: "Hae kursseja"
       password: Salasana
       select_school: "Valitse koulu"
-      username: Käyttäjänimi
+      username: Käyttäjätunnus
     web_ct_course_list: 
       course_list: Kurssit
       no_files_help_label: "Lisätietoja ”Älä lataa tiedostoja” -asetuksesta"
@@ -8744,7 +8757,7 @@ fi:
       formatting: "Muotoilu, valitse painamalla alas"
       rte_help: "Monipuolisen tekstieditorin sisältökenttä Saat apua painamalla ALT+F8"
   editor_button_6647db9c: "Editorin painike"
-  either_course_or_student_c42bb055: "Joko ”kurssi” tai opiskelija'"
+  either_course_or_student_c42bb055: "Joko ”kurssi” tai ”opiskelija”"
   either_groupid_or_outcomeid_values_are_required_1ea29e33: "Joko groupId- tai outcomeId-arvot vaaditaan"
   either_the_url_or_domain_should_be_set_c29cf8c1: "Joko url tai verkkotunnus pitäisi määrittää."
   either_you_re_a_new_user_or_the_terms_of_use_has_c_29797cc2: "Olet joko uusi käyttäjä tai *käyttöehdot* ovat muuttuneet sen jälkeen, kun viimeksi hyväksyit ne. Hyväksy *käyttöehdot* ennen kuin jatkat."
@@ -10884,15 +10897,15 @@ fi:
   hello_name_cabdd4ce: "Hei%{name}!"
   hello_name_your_outcomes_import_failed_due_to_an_e_385db5d3: |-
       Hei %{name},
-              
-              Tulostesi tuonti epäonnistui tuonnissasi tapahtuneen virheen vuoksi. Tarkista tiedostosi ja yritä ladata uudelleen kohteessa %{url}
-              
-              Ilmeni seuraava virhe: 
+            
+            Tulostesi tuonti epäonnistui tuonnissasi tapahtuneen virheen vuoksi. Tarkista tiedostosi ja yritä ladata uudelleen kohteessa %{url}
+            
+            Ilmeni seuraava virhe: 
             %{row}
             
             Voit tarkastella asianmukaista tuontimuotoa Canvas API -asiakirjoista kohdassa %{doc_url}
             
-              Kiitos,
+            Kiitos,
             Instructure
   hello_name_your_outcomes_were_successfully_importe_a510e0d: |-
       Hei %{name},
@@ -12186,8 +12199,8 @@ fi:
         result: "resultScore paikkaaminen epäonnistui: %{grade}"
         result_total: "resultTotalScore paikkaaminen epäonnistui: %{grade}"
       no_points_comment: |-
-          Ulkoinen työkalu yritti arvioida tätä tehtävää %{grade}, mutta ei onnistunut
-          , koska tehtävälle ei ole mahdollista antaa pisteitä.
+          Ulkoinen työkalu yritti arvioida tätä tehtävää %{grade}, mutta ei onnistunut,
+          koska tehtävälle ei ole mahdollista antaa pisteitä.
       no_points_possible: "Tehtävälle ei ole mahdollista antaa pisteitä."
       no_score: "Ei annettua pistemäärää"
       no_submission_created: "Tämä tulospyyntö ei onnistunut luomaan uutta kotitehtävän tehtäväpalautusta."
@@ -13553,7 +13566,6 @@ fi:
             
             %{course}, kurssisi Canvas-verkostossa alkoi pari päivää sitten, ja huomasimme, että et ole vielä kirjautunut sisään. Halusimme vain lähettää sinulle vielä yhden muistutuksen siltä varalta, että unohdit.
             
-            
             Jos haluat kirjautua sisään, siirry osoitteeseen %{site} ja syötä käyttäjätunnuksesi ja salasanasi. Jos et ole vielä määrittänyt salasanaasi, voit tehdä sen täällä: %{password_url}
             
             Jos yksnkertaisesti et pystynyt osallistumaan tälle erityiselle kurssille, selaa vapaasi kurssiluetteloa osoitteessa %{site} löytääksesi jotain, joka inspiroi sinua, Uusia kursseja lisätään koko ajan!
@@ -13600,7 +13612,6 @@ fi:
             Mitä voit tehdä valmistautuaksesi?
             
             Jos et ole jo luonut Canvas-verkkoprofiiliasi, voit kirjautua sisään ja määrittää sen Canvas.netissä. Profiilisi auttaa muita ihmisiä kurssilla tietämään, kuka olet. Siellä voit myös määrittää ilmoitusasetuksesi.
-            
             
             Lopuksi voit tarkastella vaaditut materiaalit ja kaikki kurssiasi koskevat ohjeet. %{url}
             
@@ -14483,6 +14494,7 @@ fi:
   mfa_required_ca66e177: "MFA vaaditaan"
   mfoster_708c21fb: mfoster@*
   mgp_grade_export_d29b471f: "MGP-arvosanan vienti"
+  miami_utilization_report_9c927880: Miami-käyttöraportti
   mic_a7f3d311: Mikrofoni
   microsoft_365_allows_a_maximum_of_max_members_in_a_3acbd841: "Microsoft 365 mahdollistaa enintään %{max} jäsentä tiimissä."
   microsoft_365_allows_a_maximum_of_max_owners_in_a__b448f5de: "Microsoft 365 mahdollistaa enintään %{max} omistajaa tiimissä."
@@ -14952,7 +14964,7 @@ fi:
       kumppanituotteissa, pitäisi ottaa tämä ominaisuus käyttöön, jotta tehtävien tietojen
       vahvistuksen työnkulut tehostuisivat. Kun käytössä, tämä ominaisuus näyttää uudet SIS
       Integraatioasetukset SIS-synkronoinnille (tehtävätason arvosanan takaisinsiirto) tilin
-      asetuksissa. Lähetä opiskelijatietojärjestelmään -ominaisuuden esikatselu on liitetty tähän uuteen
+      asetuksissa. Lähetä opiskelijatietojärjestelmään -ominaisuus on liitetty tähän uuteen 
       asetukseen ja se otetaan käyttöön oletuksena.
   new_slack_api_key_453d04d: "Uusi Slack API -avain"
   new_topic_for_course_3d98222a: "Uusi aihe kohteelle %{course}"
@@ -15161,14 +15173,14 @@ fi:
   not_yet_graded_40475341: "Ei vielä arvioitu"
   note_8b73ce09: Huomautus
   note_associated_tools_are_only_listed_once_even_if_ebae2aba: |-
-      NOTE: Liitetyt työkalut listataan vain kerran, vaikka ne 
+      HUOM.: Liitetyt työkalut listataan vain kerran, vaikka ne 
                       olisi asennettu useille alitileille.
   note_for_differentiated_group_topics_some_threads__90adbb21: "Huomautus: eriytetyissä ryhmän aiheissa ei kaikissa ketjuissa välttämättä ole niihin kohdistettuja opiskelijoita."
   note_grades_and_notes_will_be_saved_automatically__e3270872: "Huomautus: Arvosanat ja huomautukset tallennetaan automaattisesti sen jälkeen, kun tästä kentästä siirrytään pois."
   note_it_may_take_up_to_a_week_for_the_beta_url_to__d695bddc: "Huomautus: Saattaa kestää jopa viikon siihen, että Beta URLtuottaa (Beta-päivityssyklistä riippuen)."
   note_length_cannot_exceed_maxlength_characters_82798b1: "Huomautuksen pituus ei voi olla yli %{maxLength} merkkiä."
   note_question_details_not_available_when_more_than_93199f6d: "HUOM: Kysymyksen tiedot eivät ole saatavissa, kun niitä on enemmän kuin %{question_count}."
-  note_some_items_fall_outside_the_start_and_or_end__feab0642: "Huomautus: Jotkut kohteet osuvat kurssin aloitus- ja/tai päättymispäivämäärien ulkopuolelle "
+  note_some_items_fall_outside_the_start_and_or_end__feab0642: "Huomautus: Jotkut kohteet osuvat kurssin aloitus- ja/tai päättymispäivämäärien ulkopuolelle"
   note_students_have_submitted_work_for_these_assign_7bc34e28: "HUOM.: Opiskelijat ovat lähettäneet näiden tehtävien palautuksia, joita ei ole arvioitu. Jos lähetät nämä arvosanat nyt, sinun täytyy lähettää arvosanat uudelleen sen jälkeen, kun olet arvioinut heidän viimeisimmät tehtäväpalautuksensa."
   note_sub_account_themes_are_not_active_during_this_a5dd9da: "Huomautus: alatilin teemat eivät ole aktiivisia tämän esikatselun aikana."
   note_syncing_is_triggered_by_changes_to_course_enr_4fa83ef3: "Huomautus: Muutokset kurssi-ilmoittautumisissa käynnistävät synkronisaation. Kun otat Microsoft-synkronisaation käyttöön ensimmäistä kertaa, sinun täytyy ehkä käynnistää synkronisaatio manuaalisesti alla olevalla painikkeella."
@@ -15389,7 +15401,7 @@ fi:
     reminder_display: Muistutus
     student_appointment_description: |-
         *Vain opettaja ja pääkäyttäjä:*
-        
+                
                 Opiskelijan tapaamisen rekisteröiminen
     student_appointment_display: "Opiskelijatapaamisaikojen varaukset"
     submission_comment_description: "Tehtäväpalautuksen kommentti"
@@ -16612,7 +16624,7 @@ fi:
         user_id: Käyttäjätunnus
         user_roles: Käyttäjäroolit
         user_severity: "Käyttäjän vakavuus"
-        username: Käyttäjänimi
+        username: Käyttäjätunnus
   png_55cbb586: PNG
   points_bb475533: Pisteet
   points_bceb5005: pistettä
@@ -18457,8 +18469,8 @@ fi:
   rather_than_automatically_placing_manually_created_35195e72: |-
       Sen sijaan että sijoittaisit automaattisesti manuaalisesti luodut kurssit
       "Manuaallisesti luodut kurssit" -alatilille, kun tämä tili on käytössä, se avulla
-      ihmisillä, jotka voivat manuaalisesti luoda kursseja, on mahdollisuus panna kyseisiä kursseja alitilille
-      , jossa heillä on ilmoittautumisia.
+      ihmisillä, jotka voivat manuaalisesti luoda kursseja, on mahdollisuus panna kyseisiä kursseja alitilille,
+      jossa heillä on ilmoittautumisia.
   rating_description_db6adf39: "Luokituksen kuvaus"
   rating_max_score_eade1523: "Luokituksen maksimipistemäärä"
   rating_min_score_3d35a762: "Luokituksen minimipistemäärä"
@@ -22008,8 +22020,8 @@ fi:
   this_is_a_preview_of_the_draft_version_of_the_quiz_910a02e0: "Tämä on testin luonnosversion esikatselu"
   this_is_a_preview_of_the_published_version_of_the__70e0c8: "Tämä on testin julkaistun version esikatselu"
   this_is_a_report_of_all_students_enrolled_in_a_cou_d0137d3c: |-
-      Tämä on raportti kaikista määrätyllä lukukaudella kurssilla olevista  opiskelijoista, jotka
-        ovat palauttaneet tehtävän. Tämä raportti sisältää yhden rivin per sellainen opiskelija, jolla on
+      Tämä on raportti kaikista määrätyllä lukukaudella kurssilla olevista opiskelijoista, jotka
+      ovat palauttaneet tehtävän. Tämä raportti sisältää yhden rivin per sellainen opiskelija, jolla on
         palautus.
   this_is_a_siteadmin_test_feature_flag_3ab5184: "Tämä on SiteAdmin testiominaisuuden merkki"
   this_is_a_what_if_score_cbdc04f9: "Tämä on Mitä jos -pistemäärä"
@@ -22120,9 +22132,8 @@ fi:
   this_report_shows_all_the_activity_from_users_enro_8f8e0ca1: |-
       Tämä raportti näyttää kaikki en kaikille kursseille ilmoittautuneiden käyttäjäjien aktiviteetit
         määrätyllä lukukaudella. Tuloksena saadussa csv-tiedostossa on yksi rivi opiskelijan
-        
         aktiviteettia kohti ja siinä on seuraavat otsikot; osion tunnus,
-        osion nimi, osion sis tunnus,  kurssin tunnus, kurssin sis tunnus, kurssin nimi, lukukauden tunnus, lukukauden sis tunnus,
+        osion nimi, osion sis tunnus, kurssin tunnus, kurssin sis tunnus, kurssin nimi, lukukauden tunnus, lukukauden sis tunnus,
         lukukauden nimi, käyttäjän tunnus, käyttäjän sis id, käyttäjän nimi, sisällön tyyppi, sisältö, katselukerrat,
         osallistumiskerrat, viimeinen katselukerta. Tarkastellut kerrat ja osallistumiskerrat ovat
         laskureita ajan alusta aikaan, jolloin raportti luotiin.
@@ -23945,7 +23956,7 @@ fi:
   users_manage_login_details_9462b30f: "Käyttäjät - hallitse sisäänkirjautumistietoja"
   users_manage_observers_126f03a3: "Käyttäjät - hallitse havaitsijoita"
   users_manage_students_in_courses_d6168815: "Käyttäjät - hallitse opiskelijoita kurssilla"
-  users_matching_search_term_c604db9e: "Käyttäjät, jotka täsmäävät \"%{search_term}\" kanssa\""
+  users_matching_search_term_c604db9e: "Käyttäjät, jotka täsmäävät \"%{search_term}\" kanssa"
   users_moderate_content_36d6eed7: "Käyttäjät - moderoi sisältöä"
   users_observers_e0e66c52: "Käyttäjät - tarkkailijat"
   users_of_screen_readers_may_need_to_turn_off_the_v_98811cd: "Näytönlukijan käyttäjien täytyy ehkä kytkeä virtuaalinen kohdistin pois päältä voidakseen käyttää näitä näppäimistön pikakuvakkeita."
