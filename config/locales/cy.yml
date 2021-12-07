@@ -307,10 +307,12 @@ cy:
     tab_terms: Tymhorau
   account_97b34646: Cyfrif
   account_account_b6b3746b: "Cyfrif: %{account}"
+  account_administrators_can_always_create_courses_926dc0cb: "Mae Gweinyddwyr Cyfrif bob amser yn gallu creu cyrsiau"
   account_and_course_level_outcome_mastery_scales_5bfe7a3b: "Graddfa Feistroli Deilliannau Lefel Cwrs a Chyfrif"
   account_and_course_level_outcome_proficiencies_1cfa260: "Medrusrwydd Deilliannau Lefel Cwrs a Chyfrif"
   account_and_subaccount_40c6430: "Cyfrif ac Isgyfrif"
   account_course_and_user_search_22bf297a: "Chwilio am Ddefnyddiwr a Chwrs ar gyfer Cyfrif"
+  account_creation_still_in_progress_ac0e0a18: "Dal wrthi’n creu cyfrif"
   account_domain_78f43049: "Parth Cyfrif"
   account_domain_lookups_f9d1147e: "Chwilio am Barth Cyfrif"
   account_groups_2f301732: "Grwpiau Cyfrif"
@@ -838,10 +840,10 @@ cy:
       custom_reports: 
         end: 
           parameters: 
-            header: "Cyflwr Ymrestru"
+            header: "Gorffen:"
         start: 
           parameters: 
-            header: "Cyflwr Ymrestru"
+            header: "Dechrau:"
     default_account_quotas_not_updated: "Cwotâu cyfrif diofyn heb eu diweddaru"
     default_account_quotas_updated: "Cwotâu cyfrif diofyn wedi’u diweddaru"
     devry: 
@@ -1180,7 +1182,7 @@ cy:
         media_quota: "Cwota Cyfryngau"
         site_admin_quotas: "Cwotâu Gweinyddwr Safle"
         student_quota: "Cwota Myfyriwr"
-        update: "Diweddaru Digwyddiad"
+        update: Diweddaru
       account_settings_title: "Gosodiadau Cyfrif"
       add_admin_title: "Ychwanegu Gweinyddwyr Cyfrif"
       add_ip_filter_link: Hidlo
@@ -14475,7 +14477,6 @@ cy:
             
             %{course},, mae eich cwrs ar Canvas Network, wedi dechrau cwpl o ddyddiau’n ôl, ac rydym yn sylwi eich bod chi heb fewngofnodi eto. Roedden ni eisiau anfon un neges arall i’ch atgoffa rhag ofn eich bod wedi anghofio.
             
-            
             I fewngofnodi, ewch i %{site} a rhowch eich enw defnyddiwr a’ch cyfrinair. Os nad ydych chi wedi creu cyfrinair eto, gallwch greu un yma: %{password_url}
             
             Os na allwch fynychu'r cwrs penodol yma, mae croeso i chi bori drwy gatalog ein cyrsiau yn %{site} i weld a oes rhywbeth arall yn eich ysbrydoli. Mae cyrsiau newydd yn cael eu hychwanegu drwy'r amser!
@@ -14522,7 +14523,6 @@ cy:
             Beth allwch chi ei wneud i baratoi?
             
             Os nad ydych chi wedi creu eich proffil ar Canvas Network eto, gallwch fewngofnodi a chreu un ar Canvas.net. Bydd eich proffil yn helpu pobl eraill ar y cwrs i wybod pwy ydych chi. Yno, gallwch chi osod eich dewisiadau o ran hysbysiadau hefyd.
-            
             
             Yn olaf, gallwch chi edrych ar y deunyddiau gofynnol ac unrhyw gyfarwyddiadau ar gyfer eich cwrs yma: %{url}
             
@@ -15445,6 +15445,7 @@ cy:
   mfa_required_ca66e177: "Mae angen MFA"
   mfoster_708c21fb: mfoster@*
   mgp_grade_export_d29b471f: "Allgludo Gradd MGP"
+  miami_utilization_report_9c927880: "Adroddiad Gweithredu Miami"
   mic_a7f3d311: Meicroffon
   microsoft_365_allows_a_maximum_of_max_members_in_a_3acbd841: "Mae Microsoft 365 yn caniatáu uchafswm o %{max} aelod mewn tîm."
   microsoft_365_allows_a_maximum_of_max_owners_in_a__b448f5de: "Mae Microsoft 365 yn caniatáu uchafswm o %{max} perchennog mewn tîm."
@@ -15942,7 +15943,7 @@ cy:
       gynnyrch partneriaid alluogi’r nodwedd hon, er mwyn gwella llif gwaith ar gyfer
       dilysu data aseiniadau. Pan gaiff y nodwedd hon ei galluogi, bydd yn dangos gosodiadau'r Integreiddiad SIS newydd
       ar gyfer Cysoni SIS (Pasio Graddau’n ôl ar gyfer Lefel Aseiniad) yng ngosodiadau’r
-      Cyfrif. Mae rhagolwg nodwedd Postio i SIS wedi cael ei gynnwys yn y gosodiad
+      Cyfrif. Mae opsiwn nodwedd Postio i SIS wedi cael ei gynnwys yn y gosodiad
       newydd hwn, a bydd yn cael ei alluogi’n ddiofyn.
   new_slack_api_key_453d04d: "Allweddi Api Newydd Slack"
   new_topic_for_course_3d98222a: "Pwnc newydd ar gyfer %{course}"
@@ -20316,7 +20317,7 @@ cy:
   salesforce_account_id_eb5c78ad: "ID Cyfrif Salesforce"
   salesforce_has_a_different_login_host_for_sanbox_a_2d878ae9: "Mae gan Salesforce letywr mewngofnodi gwahanol ar gyfer cyfrifon sanbox na’r hyn sydd ganddo ar gyfer cyfrifon cynhyrchu, felly os ydych chi’n defnyddio cyfrif sanbox Salesforce a’ch bod yn anghofio rhoi tic yn y blwch hwn, ni fydd yn gallu dilysu (ac mae hyn yn gweithio i'r gwrthwyneb hefyd, os oes gennych chi gyfrif cynhyrchu a’ch BOD yn rhoi tic yn y blwch hwn, ni fydd yn dilysu)"
   salesforce_ticketing_webtocase_connector_80f75716: "Cysylltydd WebToCase Tocynnau Salesforce"
-  same_value_as_canvas_url__c_will_probably_be_going_37027686: "Yr un gwerth â ‘Canvas_URL__c', yn mynd i ffwrdd yn fuan, fwy na thebyg"
+  same_value_as_canvas_url__c_will_probably_be_going_37027686: "Yr un gwerth â 'Canvas_URL__c', yn mynd i ffwrdd yn fuan, fwy na thebyg"
   sample_data_e4fd01ff: "Data Enghreifftiol"
   saudi_arabia_966_d01ed717: "Sawdi Arabia (+966)"
   save_11a80ec3: Cadw
@@ -23466,7 +23467,6 @@ cy:
   this_report_shows_all_the_activity_from_users_enro_8f8e0ca1: |-
       Mae’r adroddiad hwn yn dangos gweithgarwch defnyddwyr sydd wedi ymrestru ar bob cwrs
         mewn tymor penodol. Bydd gan y ffeil csv un rhes ar gyfer pob gweithgaredd
-        
         myfyriwr a bydd ganddi’r penawdau canlynol: id yr adran,id sis yr adran,
         enw’r adran, id y cwrs, id sis y cwrs, enw’r cwrs, id y tymor, id sis y tymor,
         enw’r tymor, id y defnyddiwr, id sis y defnyddiwr, enw’r defnyddiwr, math o gynnwys, cynnwys, sawl gwaith mae wedi cael ei weld,
