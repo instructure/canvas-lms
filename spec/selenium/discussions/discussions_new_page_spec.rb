@@ -180,7 +180,7 @@ describe "discussions" do
         target_time = 1.day.from_now
         unlock_text = format_time_for_view(target_time)
         unlock_text_index_page = format_date_for_view(target_time, :short)
-        f("#delayed_post_at").send_keys(unlock_text)
+        replace_content(f("#delayed_post_at"), unlock_text, tab_out: true)
         expect_new_page_load { submit_form(".form-actions") }
         expect(f(".entry-content").text).to include("This topic is locked until #{unlock_text}")
         expect_new_page_load { f("#section-tabs .discussions").click }
