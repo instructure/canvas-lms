@@ -164,7 +164,7 @@ describe Types::DiscussionEntryType do
   it "allows querying for participant information" do
     expect(discussion_entry_type.resolve("entryParticipant { read }")).to eq true
     expect(discussion_entry_type.resolve("entryParticipant { forcedReadState }")).to be_nil
-    expect(discussion_entry_type.resolve("entryParticipant { rating }")).to be_nil
+    expect(discussion_entry_type.resolve("entryParticipant { rating }")).to eq false
     expect(discussion_entry_type.resolve("entryParticipant { reportType }")).to be_nil
   end
 
