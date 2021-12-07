@@ -315,6 +315,7 @@ es:
     turnitin_pledge: "Esta presentación de tarea, es mi propio trabajo"
   account_97b34646: Cuenta
   account_account_b6b3746b: "Cuenta: %{account}"
+  account_administrators_can_always_create_courses_926dc0cb: "Los administradores de cuentas siempre pueden crear cursos"
   account_and_course_level_outcome_mastery_scales_5bfe7a3b: "Escalas de dominio de competencias a nivel de la cuenta y del curso"
   account_and_course_level_outcome_proficiencies_1cfa260: "Dominio de las competencias a nivel del curso y de la cuenta"
   account_and_subaccount_40c6430: "Cuenta y subcuenta"
@@ -427,6 +428,7 @@ es:
       login_handle_name_description: "La etiqueta usada para identificadores de inicio de sesión únicos. Ejemplos: Inicio de sesión, Nombre de usuario, ID del alumno, etc."
       unknown_user_url_description: "La URL de redirección para cuando un usuario no autenticado no es encontrado en Canvas."
   account_course_and_user_search_22bf297a: "Búsqueda del curso y usuario de la cuenta"
+  account_creation_still_in_progress_ac0e0a18: "La creación de cuenta todavía está en progreso"
   account_domain_78f43049: "Dominio de la cuenta"
   account_domain_lookups_f9d1147e: "Búsquedas en el dominio de la cuenta"
   account_groups_2f301732: "Grupos de cuentas"
@@ -440,7 +442,7 @@ es:
   account_level_settings_manage_4fca6f8e: "Configuraciones del nivel de la cuenta: administrar"
   account_name_13ed649: "%{account_name}"
   account_name_7f63a13: "nombre de la cuenta"
-  account_name_analytics_62bf60ae: "Análisis de %{account.name} "
+  account_name_analytics_62bf60ae: "Analíticas de %{account.name}"
   account_name_bff54ed5: "Nombre de la cuenta"
   account_navigation_80bbefd4: "Navegación de la cuenta"
   account_navigation_menu_10c05bf9: "Menú de navegación de cuenta"
@@ -981,10 +983,10 @@ es:
       custom_reports: 
         end: 
           parameters: 
-            header: "Estado de la inscripción"
+            header: "Finaliza en:"
         start: 
           parameters: 
-            header: "Estado de la inscripción"
+            header: "Comienza en:"
     default_account_quotas_not_updated: "No se han actualizado las capacidades de almacenamiento de las cuentas predeterminadas"
     default_account_quotas_updated: "Se han actualizado las capacidades de almacenamiento de las cuentas predeterminadas"
     devry: 
@@ -1347,7 +1349,7 @@ es:
         media_quota: "Cupo del contenido de medios"
         site_admin_quotas: "Cupo del administrador del sitio"
         student_quota: "Cupo de alumnos"
-        update: "Actualizar evento"
+        update: Actualizar
       account_roles: "Funciones de cuenta:"
       account_settings_title: "Configuraciones de cuenta"
       add_a_custom_help_link: "Agregar un enlace de ayuda personalizado"
@@ -10307,7 +10309,7 @@ es:
       formatting: "Formato, pulse abajo para seleccionar"
       rte_help: "Área del texto enriquecido. Presione ALT+F8 para ayuda"
   editor_button_6647db9c: "Botón de editor"
-  either_course_or_student_c42bb055: "Ya sea 'curso' o 'estudiante''"
+  either_course_or_student_c42bb055: "Ya sea 'curso' o 'estudiante'"
   either_groupid_or_outcomeid_values_are_required_1ea29e33: "Se requieren valores de grupo o competencia"
   either_the_url_or_domain_should_be_set_c29cf8c1: "Deben establecerse la URL o el dominio."
   either_you_re_a_new_user_or_the_terms_of_use_has_c_29797cc2: "O es un usuario nuevo o los *términos de uso* han cambiado desde la última vez que los aceptó. Acepte los *términos de uso* antes de continuar."
@@ -16197,7 +16199,6 @@ es:
             
             %{course}, su curso sobre Canvas Network empezó hace un par de días y notamos que todavía no se ha registrado. Solo queremos enviarle un último recordatorio en caso de que se haya olvidado.
             
-            
             Para iniciar sesión, vaya a %{site} e ingrese su usuario y contraseña. Si no ha configurado una contraseña todavía, puede configurar una aquí: %{password_url}
             
             Si simplemente no puede hacer este curso específico, siéntase libre de explorar nuestro catálogo de cursos %{site} para encontrar algo más que lo inspire. ¡Se agregan cursos nuevos todo el tiempo!
@@ -16211,7 +16212,7 @@ es:
         body: |-
             Hola, %{user}
             
-            . ¡Buenas noticias! %{course}, el curso en el que está inscrito en Canvas Network, comenzará pronto.
+            ¡Buenas noticias! %{course}, el curso en el que está inscrito en Canvas Network, comenzará pronto.
             
             Para poder asegurarse de aprovechar al máximo su curso, debería controlar las instrucciones especiales o materiales del curso listados por el profesor.  Puede buscar esto en la página de detalles del curso en Canvas Network o solo hacer clic en el enlace de abajo.
             
@@ -16224,11 +16225,11 @@ es:
     course_started: 
       email: 
         body: |-
-            Hola %{user},
+            Hola, %{user}
             
             Este es un recordatorio de que %{course}, su curso en Canvas Network, comienza hoy. ¡Ahora puede iniciar sesión en %{site} y comenzar!
             
-            No olvide configurar su perfil de Canvas Network, así otros en el curso saben quién es. Puede actualizar su perfil en %{profile_url}.
+            No olvide configurar su perfil de Canvas Network, así otros en el curso saben quién es. Puede actualizar su perfil en %{profile_url}
             
             Siga aprendiendo,
             
@@ -16244,7 +16245,6 @@ es:
             ¿Qué puede hacer para estar listo?
             
             Si todavía no ha creado su perfil de Canvas Network, puede iniciar sesión y configurarlo en Canvas.net. Su perfil ayudará a otras personas en el curso a saber quién es. Allí también puede configurar sus preferencias de notificaciones.
-            
             
             Finalmente, puede revisar los materiales requeridos y las instrucciones de su curso aquí: %{url}
             
@@ -17276,6 +17276,7 @@ es:
   mfa_required_ca66e177: "MFA obligatorio"
   mfoster_708c21fb: mfoster@*
   mgp_grade_export_d29b471f: "Exportación de calificaciones MGP"
+  miami_utilization_report_9c927880: "Reporte de utilización de Miami"
   mic_a7f3d311: Micrófono
   microsoft_365_allows_a_maximum_of_max_members_in_a_3acbd841: "Microsoft 365 permite un máximo de %{max} miembros en un equipo."
   microsoft_365_allows_a_maximum_of_max_owners_in_a__b448f5de: "Microsoft 365 permite un máximo de %{max} propietarios en un equipo."
@@ -17929,8 +17930,8 @@ es:
       los productos asociados debe habilitar esta función para mejorar los flujos de trabajo de validación
       de los datos de asignación. Cuando está habilitada, esta funcionalidad muestra las nuevas configuraciones de
       integración del SIS para SIS Sync (Assignment Level Grade Passback, Transferencia de calificaciones de nivel de tarea) en Configuraciones de
-      cuentas. La vista previa de la función Publicar en SIS se ha incorporado a esta nueva
-      configuración y estará habilitada de forma predeterminada.
+      cuentas. La opción de la funcionalidad Publicar en el SIS se ha incorporado a esta nueva
+      configuración y se habilitará de forma predeterminada.
   new_slack_api_key_453d04d: "Nueva clave API de Slack"
   new_topic_for_course_3d98222a: "Nuevo tema para %{course}"
   new_typography_4eaeca26: "Nueva tipografía"
@@ -18154,7 +18155,7 @@ es:
   not_yet_graded_40475341: "Aún no calificado"
   note_8b73ce09: Nota
   note_associated_tools_are_only_listed_once_even_if_ebae2aba: |-
-      NOTE: "NOTA: Las herramientas asociadas solo se enumeran una vez, incluso si se han"
+      NOTA: Las herramientas asociadas solo se enumeran una vez, incluso si se han
                       instalado en varias subcuentas.
   note_for_differentiated_group_topics_some_threads__90adbb21: "Nota: para los temas de los grupos diferenciados, puede que algunos hilos no tengan ningún estudiante asignado."
   note_grades_and_notes_will_be_saved_automatically__e3270872: "Nota: las calificaciones y las notas se guardarán automáticamente tras salir del campo."
@@ -24621,7 +24622,7 @@ es:
   start_date_e937be8a: "Fecha de inicio"
   start_date_end_date_d809dd93: "%{start_date} - %{end_date}"
   start_date_field_for_styleguide_8a8ab1d6: "El campo de fecha de comienzo para la guía de estilo"
-  start_date_from_20503757: "Fecha de comienzo desde:"
+  start_date_from_20503757: "Fecha de inicio desde:"
   start_date_start_time_to_end_time_dc676ce1: "%{start_date}, %{start_time} a %{end_time}"
   start_date_to_1e6e6bbe: "Fecha de comienzo hasta:"
   start_dates_8f1c22a8: "Fechas de inicio:"
@@ -26145,7 +26146,6 @@ es:
   this_report_shows_all_the_activity_from_users_enro_8f8e0ca1: |-
       Este reporte muestra toda la actividad de los usuarios inscritos en todos los cursos en un período dado
         . El archivo de CSV resultante tendrá una fila por actividad de estudiante
-        
         y tendrá los siguientes encabezados: identificación de sección,
         identificación de SIS de la sección, nombre de la sección, identificación del curso, identificación de SIS del curso, nombre del curso, identificación del período, identificación de SIS del período,
         nombre del período, identificación del usuario, identificación de SIS del usuario, nombre de usuario, tipo de contenido, contenido, cantidad de veces visto,
