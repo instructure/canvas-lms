@@ -238,6 +238,9 @@ th:
     default_term_name: เทอมเริ่มต้น
     errors: 
       invalid_discovery_url: "URL การเรียนรู้ไม่ถูกต้อง"
+    feedback_coach: ถามกลุ่ม
+    feedback_coach_sub: "รับความช่วยเหลือจากผู้เชี่ยวชาญของ Canvas"
+    feedback_feature_request_sub: "มีข้อเสนอในการปรับปรุง Canvas หรือไม่"
     manually_created_courses: บทเรียนที่จัดทำด้วยตัวเอง
     root_account_cant_have_sis_id: "SIS ID ไม่สามารถกำหนดได้ในบัญชีราก"
     sis_id_in_use: "SIS ID \"%{sis_id}\" ถูกใช้งานอยู่"
@@ -253,6 +256,7 @@ th:
     tab_permissions: สิทธิ์อนุญาต
     tab_plugins: ปลั๊กอิน
     tab_question_banks: แถวคำถาม
+    tab_root_accounts: บัญชีราก
     tab_rubrics: เกณฑ์การให้คะแนน
     tab_settings: ค่าปรับตั้ง
     tab_sis_import: "การนำเข้า SIS"
@@ -261,15 +265,22 @@ th:
     tab_terms: เทอม
   account_97b34646: บัญชี
   account_account_b6b3746b: "บัญชี: %{account}"
+  account_administrators_can_always_create_courses_926dc0cb: ผู้ดูแลระบบบัญชีสามารถจัดทำบทเรียนได้ทุกเมื่อ
   account_and_course_level_outcome_mastery_scales_5bfe7a3b: ระดับความเชี่ยวชาญตามผลลัพธ์ในระดับบัญชีและบทเรียน
   account_and_subaccount_40c6430: บัญชีและบัญชีย่อย
+  account_creation_still_in_progress_ac0e0a18: กำลังจัดทำบัญชีผู้ใช้
+  account_domain_78f43049: โดเมนบัญชีผู้ใช้
+  account_domain_lookups_f9d1147e: การค้นหาโดเมนบัญชีผู้ใช้
   account_groups_2f301732: กลุ่มบัญชีผู้ใช้
   account_id_2c3b4f15: "ID บัญชี"
   account_id_73966078: account_id
+  account_id_f6e26867: "ID บัญชี"
   account_level_notification_preferences_require_an__66467cd7: "ค่าการแจ้งข้อมูลระดับบัญชีจะต้องใช้ account_id เพื่ออัพเดต"
   account_level_notifications_apply_to_all_courses_n_8b99c5b0: "การแจ้งข้อมูลระดับบัญชีมีผลกับบทเรียนทั้งหมด การแจ้งข้อมูลสำหรับแต่ละบทเรียนสามารถแก้ไขได้ในแต่ละบทเรียนและจะเป็นการบอกล้างการแจ้งข้อมูลเหล่านี้"
   account_level_settings_manage_4fca6f8e: "ค่าปรับตั้งระดับบัญชี - จัดการ"
   account_name_7f63a13: ชื่อบัญชี
+  account_name_analytics_62bf60ae: "ข้อมูลวิเคราะห์ของ %{account.name}"
+  account_name_bff54ed5: ชื่อบัญชี
   account_navigation_80bbefd4: การสืบค้นบัญชี
   account_navigation_menu_10c05bf9: เมนูการสืบค้นบัญชี
   account_notification: 
@@ -717,10 +728,10 @@ th:
       custom_reports: 
         end: 
           parameters: 
-            header: สถานะการลงทะเบียน
+            header: "สิ้นสุดเมื่อ:"
         start: 
           parameters: 
-            header: สถานะการลงทะเบียน
+            header: "เริ่มเมื่อ:"
     default_account_quotas_not_updated: ไม่ได้อัพเดตโควต้าบัญชีเริ่มต้น
     default_account_quotas_updated: อัพเดตโควต้าบัญชีเริ่มต้นแล้ว
     devry_u: 
@@ -1029,7 +1040,12 @@ th:
       about_google_docs_tooltip: "เกี่ยวกับ Google Docs Previews"
       account_admins_title: ผู้ดูแลระบบบัญชี
       account_quotas: 
-        update: อัพเดตกิจกรรม
+        file_quota: โควต้าไฟล์
+        gigabytes: กิกะไบต์
+        media_quota: โควต้าสื่อ
+        site_admin_quotas: โควต้าผู้ดูแลไซต์
+        student_quota: โควต้าผู้เรียน
+        update: อัพเดต
       account_settings_title: ค่าทางบัญชี
       add_admin_title: เพิ่มผู้ดูแลระบบบัญชี
       add_ip_filter_link: ตัวกรอง
@@ -7554,7 +7570,7 @@ th:
       formatting: "กำลังกำหนดรูปแบบ กดลงเพื่อเลือก"
       rte_help: "พื้นที่ Rich Text กด ALT+F8 เพื่อขอความช่วยเหลือ"
   editor_button_6647db9c: ปุ่มโปรแกรมแก้ไข
-  either_course_or_student_c42bb055: "“บทเรียน” หรือ “ผู้เรียน” อย่างหนึ่งอย่างใด'"
+  either_course_or_student_c42bb055: "“บทเรียน” หรือ “ผู้เรียน” อย่างหนึ่งอย่างใด"
   either_groupid_or_outcomeid_values_are_required_1ea29e33: "ต้องระบุ ID กลุ่มหรือ ID ผลลัพธ์"
   either_the_url_or_domain_should_be_set_c29cf8c1: "ต้องระบุ url หรือโดเมน"
   either_you_re_a_new_user_or_the_terms_of_use_has_c_29797cc2: "คุณอาจเป็นผู้ใช้ใหม่หรือ*เงื่อนไขการใช้งาน*เปลี่ยนแปลงนับตั้งแต่คุณตอบรับครั้งล่าสุด กรุณาตอบรับ*เงื่อนไขการใช้งาน*ก่อนดำเนินการต่อ"
@@ -11651,8 +11667,7 @@ th:
         body: |-
             สวัสดี %{user}
             
-            %{course} บทเรียนของคุณในเครือข่าย Canvas เริ่มต้นเมื่อสองวันก่อน และเราพบว่าคุณยังไม่ได้ทำการล็อกอิน  เราแค่ต้องการส่งการแจ้งเตือนครั้งสุดท้ายให้กับคุณเผื่อคุณลืม
-            
+            %{course} บทเรียนของคุณในเครือข่าย Canvas เริ่มต้นเมื่อสองวันก่อน และเราพบว่าคุณยังไม่ได้ทำการล็อกอิน เราแค่ต้องการส่งการแจ้งเตือนครั้งสุดท้ายให้กับคุณเผื่อคุณลืม
             
             ล็อกอินโดยไปที่ %{site} จากนั้นกรอกชื่อผู้ใช้และรหัสผ่านของคุณ หากคุณยังไม่ได้กำหนดรหัสผ่าน คุณสามารถกำหนดได้ที่นี่: %{password_url}
             
@@ -11700,7 +11715,6 @@ th:
             คุณสามารถเตรียมพร้อมได้อย่างไรบ้าง
             
             หากคุณยังไม่ได้จัดทำโพรไฟล์เครือข่าย Canvas ของคุณ คุณสามารถล็อกอินและตั้งค่าได้ที่ Canvas.net โพรไฟล์ของคุณช่วยให้บุคคลอื่น ๆ ในบทเรียนทราบว่าคุณเป็นใคร นอกจากนี้คุณยังสามารถตั้งค่าปรับแต่งในการแจ้งเตือนของคุณ
-            
             
             ท้ายสุดนี้คุณยังสามารถพิจารณาข้อมูลที่กำหนดและคำแนะนำต่าง ๆ สำหรับบทเรียนของคุณที่นี่: %{url}
             
@@ -12582,6 +12596,7 @@ th:
   mfa_required_ca66e177: "ต้องมี MFA"
   mfoster_708c21fb: mfoster@*
   mgp_grade_export_d29b471f: "การส่งออกเกรด MGP"
+  miami_utilization_report_9c927880: "รายงานการใช้งานของ Miami"
   mic_a7f3d311: ไมค์
   microsoft_365_allows_a_maximum_of_max_members_in_a_3acbd841: "Microsoft 365 รองรับสมาชิกสูงสุด %{max} รายในทีม"
   microsoft_365_allows_a_maximum_of_max_owners_in_a__b448f5de: "Microsoft 365 รองรับผู้ดูแลสูงสุด %{max} รายในทีม"
@@ -13022,7 +13037,7 @@ th:
       ผลิตภัณฑ์จากพันธมิตรควรเปิดใช้งานคุณสมบัตินี้เพื่อให้การยืนยัน
       ข้อมูลภารกิจมีประสิทธิภาพมากขึ้น ขณะเปิดใช้งาน คุณสมบัตินี้จะแสดงค่าปรับตั้งการผสานการทำงาน SIS ใหม่
       สำหรับการซิงค์ SIS (การส่งต่อเกรดระดับภารกิจ) ในค่าปรับตั้ง
-      ทางบัญชี การแสดงตัวอย่างคุณสมบัติ โพสต์ไปยัง SIS ถูกผสานเข้ากับค่าปรับตั้ง
+      ทางบัญชี ตัวเลือก โพสต์ไปยัง SIS ถูกผสานเข้ากับค่าปรับตั้ง
       ใหม่นี้แล้วและจะถูกเปิดใช้งานเป็นค่าเริ่มต้น
   new_slack_api_key_453d04d: "คีย์ Slack API ใหม่"
   new_topic_for_course_3d98222a: "หัวข้อใหม่สำหรับ %{course}"
@@ -19372,7 +19387,6 @@ th:
   this_report_shows_all_the_activity_from_users_enro_8f8e0ca1: |-
       รายงานนี้จะแสดงกิจกรรมทั้งหมดจากผู้ใช้ที่ลงทะเบียนในบทเรียนทั้งหมด
         ในเทอมที่ระบุ ไฟล์ csv ที่ได้จะมีหนึ่งแถวต่อหนึ่งกิจกรรมของผู้เรียน
-        
         และจะมีหัวเรื่องต่อไปนี้: id กลุ่มย่อย, sis id กลุ่มย่อย,
         ชื่อกลุ่มย่อย, id บทเรียน, sis id บทเรียน, ชื่อบทเรียน, id เทอม, sis id เทอม,
         ชื่อเทอม, id ผู้ใช้, sis id ผู้ใช้, ชื่อผู้ใช้, ประเภทเนื้อหา, เนื้อหา, เวลาที่เปิดดู,
