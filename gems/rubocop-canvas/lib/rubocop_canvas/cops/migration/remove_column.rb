@@ -22,18 +22,10 @@ module RuboCop
     module Migration
       class RemoveColumn < Cop
         include RuboCop::Canvas::MigrationTags
+        include RuboCop::Canvas::CurrentDef
+
         POSTDEPLOY_MSG = "column removal needs to be in a postdeploy migration"
         IGNORED_COLUMNS_MSG = "Please ensure removed column names are added to `self.ignored_columns` in the ActiveRecord model."
-
-        def on_def(node)
-          method_name, *_args = *node
-          @current_def = method_name
-        end
-
-        def on_defs(node)
-          _receiver, method_name, *_args = *node
-          @current_def = method_name
-        end
 
         def on_send(node)
           super
