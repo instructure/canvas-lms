@@ -250,6 +250,9 @@ ca:
     default_term_name: "Període acadèmic per defecte"
     errors: 
       invalid_discovery_url: "l'URL de descobriment no és vàlida"
+    feedback_coach: "Pregunteu a la comunitat"
+    feedback_coach_sub: "Obteniu ajuda d’un expert del Canvas"
+    feedback_feature_request_sub: "Teniu alguna idea per millorar el Canvas?"
     manually_created_courses: "Cursos creats manualment"
     root_account_cant_have_sis_id: "Els IDs del SIS no es poden establir en comptes arrel"
     sis_id_in_use: "L’ID del SIS \"%{sis_id}\" ja s'està utilitzant"
@@ -265,6 +268,7 @@ ca:
     tab_permissions: Permisos
     tab_plugins: Complements
     tab_question_banks: "Bancs de preguntes"
+    tab_root_accounts: "Comptes arrel"
     tab_rubrics: Rúbriques
     tab_settings: Configuració
     tab_sis_import: "Importació del SIS"
@@ -273,13 +277,18 @@ ca:
     tab_terms: "Períodes acadèmics"
   account_97b34646: Compte
   account_account_b6b3746b: "Compte: %{account}"
+  account_administrators_can_always_create_courses_926dc0cb: "Els administradors del compte sempre poden crear cursos"
   account_and_course_level_outcome_mastery_scales_5bfe7a3b: "Escales de domini dels resultats a nivell de compte i de curs"
   account_and_course_level_outcome_proficiencies_1cfa260: "Competències dels resultats a nivell de compte i de curs"
   account_and_subaccount_40c6430: "Compte i compte secundari"
   account_course_and_user_search_22bf297a: "Cerca de cursos i usuaris al compte"
+  account_creation_still_in_progress_ac0e0a18: "Encara s’està creant el compte"
+  account_domain_78f43049: "Domini del compte"
+  account_domain_lookups_f9d1147e: "Consultes de domini del compte"
   account_groups_2f301732: "Grups del compte"
   account_id_2c3b4f15: "ID del compte"
   account_id_73966078: account_id
+  account_id_f6e26867: "ID del compte"
   account_level_mastery_scales_a5bdff29: "Escales de domini a nivell del compte"
   account_level_notification_preferences_require_an__66467cd7: "Les preferències de notificació de nivell del compte requereixen un account_id per actualitzar"
   account_level_notification_preferences_ui_update_f5e189a4: "Actualització de la IU de les preferències de notificació de nivell del compte"
@@ -287,6 +296,8 @@ ca:
   account_level_settings_manage_4fca6f8e: "Configuració a nivell del compte - administra"
   account_name_13ed649: "%{account_name}"
   account_name_7f63a13: "nom del compte"
+  account_name_analytics_62bf60ae: "Analítica de %{account.name}"
+  account_name_bff54ed5: "Nom del compte"
   account_navigation_80bbefd4: "Navegació del compte"
   account_navigation_menu_10c05bf9: "Menú de navegació del compte"
   account_notification: 
@@ -778,10 +789,10 @@ ca:
       custom_reports: 
         end: 
           parameters: 
-            header: "Estat d'inscripció"
+            header: "Acaba el:"
         start: 
           parameters: 
-            header: "Estat d'inscripció"
+            header: "Comença el:"
     default_account_quotas_not_updated: "No s'han actualitzat les quotes del compte per defecte"
     default_account_quotas_updated: "S'han actualitzat les quotes del compte per defecte"
     devry_u: 
@@ -1090,7 +1101,12 @@ ca:
       about_google_docs_tooltip: "Quant a les visualitzacions prèvies de Google Docs"
       account_admins_title: "Administradors del compte"
       account_quotas: 
-        update: "Actualitza l'esdeveniment"
+        file_quota: "Quota de fitxers"
+        gigabytes: gigabytes
+        media_quota: "Quota dels elements multimèdia"
+        site_admin_quotas: "Quotes de l’administrador del lloc web"
+        student_quota: "Quota de l’estudiant"
+        update: Actualitza
       account_settings_title: "Configuració del compte"
       add_admin_title: "Afegeix administradors del compte"
       add_ip_filter_link: Filtre
@@ -2553,7 +2569,7 @@ ca:
       current: "Cursos actuals"
     page_title: 
       completed: "Analítica: %{account}: cursos completats"
-      current: "Analítica: %{account}:cursos actuals"
+      current: "Analítica: %{account}: cursos actuals"
       term: "Analítica: %{account}: %{term}"
     student_in_course: 
       analytics: Analítica
@@ -2571,9 +2587,9 @@ ca:
   and_more_not_shown_here_7842765e: "…i més que no es mostren aquí"
   ange_name: "Angel Converter"
   angel: 
-    file_copy_fail: "No s’ha pogut copiar la carpeta “%{base_path}”\""
-    file_copy_fail_message: "No s’ha pogut canviar el nom del directori a la ruta “%{path}”\""
-    file_import_fail: "No s’ha pogut importar el fitxer “%{file_path}”\""
+    file_copy_fail: "No s’ha pogut copiar la carpeta “%{base_path}”"
+    file_copy_fail_message: "No s’ha pogut canviar el nom del directori a la ruta “%{path}”"
+    file_import_fail: "No s’ha pogut importar el fitxer “%{file_path}”"
   angel_display: "ANGEL Learning"
   angel_file_description: "Format .zip d’exportació de l’Angel"
   annotated_document_submission_d9ff236a: "Entrega de document amb anotacions"
@@ -3876,7 +3892,7 @@ ca:
   bulk_course_migrations: 
     bulk_course_migration: 
       exporting: "S’està exportant des del Blackboard"
-      failed: "No s’ha pogut"
+      failed: "No s'ha pogut"
       finished: Finalitzat
       importing: "S’està important al Canvas"
       migration_cancelled_on: "S’ha cancel·lat el %{date}"
@@ -8185,7 +8201,7 @@ ca:
       formatting: "Format, premeu avall per seleccionar"
       rte_help: "Àrea de text enriquit. Premeu ALT+F8 per obtenir ajuda"
   editor_button_6647db9c: "Botó de l'editor"
-  either_course_or_student_c42bb055: "O “curs” o bé “estudiant”'"
+  either_course_or_student_c42bb055: "O “curs” o bé “estudiant”"
   either_groupid_or_outcomeid_values_are_required_1ea29e33: "Els valors groupId o outcomeId són obligatoris"
   either_the_url_or_domain_should_be_set_c29cf8c1: "S'ha de definir l'URL o el domini."
   either_you_re_a_new_user_or_the_terms_of_use_has_c_29797cc2: "O bé sou un usuari nou o les *condicions d'ús* han canviat des que les veu acceptar. Accepteu les *condicions d'ús* abans de continuar."
@@ -8826,10 +8842,10 @@ ca:
   example_final_score_a92b30b9: "Puntuació final d'exemple]]"
   example_https_example_com_config_xml_be5f36ac: "Exemple: https://example.com/config.xml"
   example_https_lti_tool_provider_example_herokuapp__e9802142: "Exemple: https://lti-tool-provider-example.herokuapp.com/register"
-  example_https_schoolofrock_catalog_instructure_com_b7a35ab5: "exemple: “https://schoolofrock.catalog.instructure.com”\""
+  example_https_schoolofrock_catalog_instructure_com_b7a35ab5: "exemple: “https://schoolofrock.catalog.instructure.com”"
   example_https_schoolofrock_edu_d4326f03: "exemple: “https://schoolofrock.edu”\""
   example_item_scores_6726c689: "Puntuacions dels elements d'exemple"
-  example_school_of_rock_41f32c31: "exemple: “School of Rock”\""
+  example_school_of_rock_41f32c31: "exemple: “School of Rock”"
   exceeds_expectations_5910fc3a: "Supera les expectatives"
   exceeds_mastery_1f995dce: "Supera el domini"
   excelsior_student_activity_tracking_7a1ba44d: "Seguiment de l’activitat dels estudiants d’Excelsior"
@@ -12580,7 +12596,6 @@ ca:
             
             %{course}El vostre curs a la Xarxa Canvas va començar fa un parell de dies i hem observat que encara no hi heu iniciat la sessió. Volem fer-vos arribar un darrer recordatori en cas que us n’hàgiu oblidat.
             
-            
             Per iniciar la sessió, aneu a %{site} i introduïu el vostre nom d’usuari i la vostra contrasenya. Si encara no heu establert cap contrasenya, podeu fer-ho aquí: %{password_url}
             
             Si simplement no podeu fer aquest curs en particular, podeu navegar pel nostre catàleg de cursos a %{site} per cercar alguna altra cosa que us inspiri. Hi afegim cursos nous en tot moment
@@ -12627,7 +12642,6 @@ ca:
             Què podeu fer per estar a punt?
             
             Si encara no heu creat el vostre perfil de la Xarxa Canvas, podeu iniciar-hi la sessió i configurar-lo a Canvas.net. El vostre perfil ajudarà altres persones del curs a saber qui sou. Allà també podeu configurar les vostres preferències de notificació.
-            
             
             Per acabar, podeu revisar els materials requerits i les instruccions per al curs aquí: %{url}
             
@@ -13510,6 +13524,7 @@ ca:
   mfa_required_ca66e177: "MFA obligatori"
   mfoster_708c21fb: mfoster@*
   mgp_grade_export_d29b471f: "Exportació de qualificacions MGP"
+  miami_utilization_report_9c927880: "Informe d’utilització de Miami"
   mic_a7f3d311: Micròfon
   microsoft_365_allows_a_maximum_of_max_members_in_a_3acbd841: "Microsoft 365 permet %{max} membres com a màxim en un equip."
   microsoft_365_allows_a_maximum_of_max_owners_in_a__b448f5de: "Microsoft 365 permet %{max} propietaris com a màxim en un equip."
@@ -13966,8 +13981,8 @@ ca:
       productes de socis, han d'habilitar aquesta característica per a uns millors fluxos de treball de validació
       de les dades de les tasques. Si s'habilita, aquesta característica mostra la nova configuració
       del sistema d'informació de l'estudiant (SIS) per a la sincronització del SIS (retorn de qualificacions a nivell de tasca) 
-      a la Configuració del compte. La visualització prèvia de la característica Publica al SIS s'ha incorporat en aquesta nova
-      configuració i s'habilitarà per defecte.
+      a la Configuració del compte. La característica opcional Publica al SIS s'ha incorporat en aquesta
+      nova configuració i s'habilitarà per defecte.
   new_slack_api_key_453d04d: "Clau d'API de l'Slack nova"
   new_topic_for_course_3d98222a: "Tema nou per a %{course}"
   new_user_s_name_909b6267: "Nom de l'usuari nou"
@@ -14167,7 +14182,7 @@ ca:
   not_yet_graded_40475341: "Encara no s'ha qualificat"
   note_8b73ce09: Nota
   note_associated_tools_are_only_listed_once_even_if_ebae2aba: |-
-      NOTE: Les eines associades només s'enumeren una vegada, fins i tot quan s'han
+      NOTA: Les eines associades només s'enumeren una vegada, fins i tot quan s'han
                       instal·lat en diversos comptes secundaris.
   note_for_differentiated_group_topics_some_threads__90adbb21: "Nota: per a temes de grup diferenciats, pot ser que alguns fils no tinguin cap estudiant assignat."
   note_grades_and_notes_will_be_saved_automatically__e3270872: "Nota: Les qualificacions i les notes es desaran automàticament quan se surti del camp."
@@ -15539,7 +15554,7 @@ ca:
         user_id: "ID d’usuari"
         user_roles: "Rols de l’usuari"
         user_severity: "User severity"
-        username: "Nom d'usuari"
+        username: "Nom d’usuari"
   png_55cbb586: PNG
   points_bb475533: Punts
   points_bceb5005: punts
@@ -20642,7 +20657,6 @@ ca:
   this_report_shows_all_the_activity_from_users_enro_8f8e0ca1: |-
       En aquest informe es mostra tota l’activitat dels usuaris inscrits en tots els cursos
         en un període acadèmic determinat. Al fitxer CSV resultant hi haurà una fila per activitat
-        
         d’estudiant i s’inclouran les capçaleres següents: id de secció, id del sis de secció,
         nom de secció, id de curs, id del sis de curs, nom de curs, id de període acadèmic, id del sis de període acadèmic,
         nom de període acadèmic, id d’usuari, id del sis d’usuari, nom d’usuari, tipus de contingut, contingut, nombre de vegades que s’ha vist,
@@ -22257,7 +22271,7 @@ ca:
   users_manage_login_details_9462b30f: "Usuaris - administra els detalls d'inici de sessió"
   users_manage_observers_126f03a3: "Usuaris - administra els observadors"
   users_manage_students_in_courses_d6168815: "Usuaris - administra els estudiants dels cursos"
-  users_matching_search_term_c604db9e: "Usuaris que coincideixen amb %{search_term}\""
+  users_matching_search_term_c604db9e: "Usuaris que coincideixen amb %{search_term}"
   users_moderate_content_36d6eed7: "Usuaris - modera el contingut"
   users_observers_e0e66c52: "Usuaris - Observadors"
   users_of_screen_readers_may_need_to_turn_off_the_v_98811cd: "Pot ser que els usuaris de lectors de pantalla hagin de desactivar el cursor virtual per utilitzar aquestes dreceres del teclat"
