@@ -6,7 +6,7 @@ it:
   1_item_scores_examplescores_9736236: "1- Punteggi elemento: %{exampleScores}"
   1_user_found_76399771: "1 utente trovato."
   1st_reviewer_3c1d0119: "1° revisore"
-  25th_75th_ile_406a67bf: "25°-75° %ile"
+  25th_75th_ile_406a67bf: "25°-75° percentile"
   25th_75th_percentile_aa4c11f2: "25°-75° percentile"
   2_final_score_7b0fd15e: "2- Punteggio finale"
   2_final_score_exampleresult_922edf9c: "2- Punteggio finale: %{exampleResult}"
@@ -300,6 +300,7 @@ it:
     turnitin_pledge: "La consegna di questo compito è il mio lavoro originale"
   account_97b34646: Account
   account_account_b6b3746b: "Account: %{account}"
+  account_administrators_can_always_create_courses_926dc0cb: "Gli amministratori dell'account possono creare corsi in qualsiasi momento"
   account_and_course_level_outcome_mastery_scales_5bfe7a3b: "Scale di padronanza risultato di livello account e corso"
   account_and_course_level_outcome_proficiencies_1cfa260: "Competenze dei risultati di livello corso e account"
   account_and_subaccount_40c6430: "Account e subaccount"
@@ -412,6 +413,7 @@ it:
       login_handle_name_description: "Etichetta utilizzata per identificatori di accesso univoci. Esempi: Accesso, nome utente, ID studente e così via."
       unknown_user_url_description: "L'URL a cui eseguire il reindirizzamento quando un utente autenticato non viene trovato in Canvas."
   account_course_and_user_search_22bf297a: "Corso account e ricerca utente"
+  account_creation_still_in_progress_ac0e0a18: "Creazione account ancora in corso"
   account_domain_78f43049: "Dominio account"
   account_domain_lookups_f9d1147e: "Ricerche dominio account"
   account_groups_2f301732: "Gruppi di account"
@@ -425,7 +427,7 @@ it:
   account_level_settings_manage_4fca6f8e: "Impostazioni a livello di account - gestisci"
   account_name_13ed649: "%{account_name}"
   account_name_7f63a13: "nome account"
-  account_name_analytics_62bf60ae: "%{account.name} Analisi"
+  account_name_analytics_62bf60ae: "Analisi %{account.name}"
   account_name_bff54ed5: "Nome account"
   account_navigation_80bbefd4: "Navigazione account"
   account_navigation_menu_10c05bf9: "Menu di navigazione account"
@@ -935,10 +937,10 @@ it:
       custom_reports: 
         end: 
           parameters: 
-            header: "Stato iscrizione"
+            header: "Data/Ora di fine:"
         start: 
           parameters: 
-            header: "Stato iscrizione"
+            header: "Data/Ora di inizio:"
     default_account_quotas_not_updated: "Le quote predefinite degli account non sono state aggiornate"
     default_account_quotas_updated: "Quote predefinite account aggiornate"
     devry: 
@@ -1277,7 +1279,7 @@ it:
         media_quota: "Quota multimediale"
         site_admin_quotas: "Quote amministratore sito"
         student_quota: "Quota studente"
-        update: "Aggiorna evento"
+        update: Aggiorna
       account_settings_title: "Impostazioni account"
       add_admin_title: "Aggiungi amministratori account"
       add_ip_filter_link: Filtra
@@ -6285,7 +6287,7 @@ it:
       course_list: Corso/i
       no_files_help_label: "Maggiori informazioni per l'opzione \"Non scaricare file\""
       no_files_help_text: "Il download dei file dai corsi WebCT può richiedere molto tempo e il processo di migrazione potrebbe non riuscire. Puoi copiare manualmente i file e scegliere questa opzione per eseguire la migrazione del resto del contenuto."
-      no_files_help_title: "Maggiori informazioni per l'opzione \"Non scaricare file\""
+      no_files_help_title: "\"Maggiori informazioni per l'opzione \"Non scaricare file\"\""
       no_files_help_title_icon: "Maggiori informazioni per l'opzione \"Non scaricare file\""
       options: Opzioni
       skip_all_files: "Non scaricare i file dal corso"
@@ -9465,7 +9467,7 @@ it:
       formatting: "Formattazione, premi per selezionare"
       rte_help: "Area di testo RTF. Premi ALT+F8 per la Guida"
   editor_button_6647db9c: "Pulsante Editor"
-  either_course_or_student_c42bb055: "“Corso” o “Studente”'"
+  either_course_or_student_c42bb055: "“Corso” o “Studente”"
   either_groupid_or_outcomeid_values_are_required_1ea29e33: "Necessari valori groupId o outcomeId"
   either_the_url_or_domain_should_be_set_c29cf8c1: "Devi impostare l'URL o il dominio."
   either_you_re_a_new_user_or_the_terms_of_use_has_c_29797cc2: "Sei un nuovo utente oppure i *Termini di utilizzo* sono cambiati dall'ultima volta in cui li hai accettati. Accetta i *Termini di utilizzo* prima di continuare."
@@ -14503,7 +14505,6 @@ it:
             
             %{course}, il tuo corso su Canvas Network è iniziato un paio di giorni fa e abbiamo notato che non hai ancora effettuato l'accesso. Volevamo inviarti un ultimo promemoria nel caso in cui l'avessi dimenticato.
             
-            
             Per accedere, vai in %{site} e inserisci il nome utente e la password. Se non hai ancora impostato una password, puoi impostarne una qui: %{password_url}
             
             Se non puoi partecipare a questo corso specifico, sfoglia il nostro catalogo dei corsi su %{site} per trovare un altro corso che risponda alle tue esigenze. Vengono aggiunti continuamente nuovi corsi!
@@ -14550,7 +14551,6 @@ it:
             Cosa puoi fare per prepararti?
             
             Se non hai già creato il tuo profilo Canvas Network, puoi eseguire l'accesso e impostarlo su Canvas.net. Il tuo profilo consentirà ad altre persone del corso di sapere chi sei. Lì puoi anche impostare le tue preferenze di notifica.
-            
             
             Infine, puoi esaminare i materiali necessari e le eventuali istruzioni per il tuo corso qui: %{url}
             
@@ -15468,6 +15468,7 @@ it:
   mfa_required_ca66e177: "MFA necessario"
   mfoster_708c21fb: mfoster@*
   mgp_grade_export_d29b471f: "Esporta voti MGP"
+  miami_utilization_report_9c927880: "Report di utilizzo Miami"
   mic_a7f3d311: Microfono
   microsoft_365_allows_a_maximum_of_max_members_in_a_3acbd841: "Microsoft 365 consente un massimo di %{max} membri in un team."
   microsoft_365_allows_a_maximum_of_max_owners_in_a__b448f5de: "Microsoft 365 consente un massimo di %{max} proprietari in un team."
@@ -15970,7 +15971,7 @@ it:
       nei prodotti dei partner deve abilitare questa funzione per migliorare i flussi di lavoro per la convalida
       dei dati dei compiti. Se abilitata, questa funzione mostra le nuove impostazioni
       di integrazione SIS per la sincronizzazione SIS (restituzione voti a livello di compiti) in Impostazioni
-      account. L’anteprima della funzione Pubblica in SIS è stata incorporata in questa nuova impostazione
+      account. La funzione Pubblica in SIS è stata incorporata in questa nuova impostazione
       e verrà abilitata per impostazione predefinita.
   new_slack_api_key_453d04d: "Nuova chiave Slack Api"
   new_topic_for_course_3d98222a: "Nuovo argomento per %{course}"
@@ -20310,7 +20311,7 @@ it:
   salesforce_account_id_eb5c78ad: "ID account Salesforce"
   salesforce_has_a_different_login_host_for_sanbox_a_2d878ae9: "Salesforce ha un host di accesso per gli account sandbox diverso da quello utilizzato per gli account di produzione. Pertanto, se stai utilizzando un account sandbox di Salesforce e non selezioni questa casella, l'account non potrà autenticarsi (è vero anche il contrario, se hai un account di produzione e SELEZIONI questa casella, l'account non potrà autenticarsi)"
   salesforce_ticketing_webtocase_connector_80f75716: "Connettore WebToCase di gestione ticket Salesforce"
-  same_value_as_canvas_url__c_will_probably_be_going_37027686: "Stesso valore di “Canvas_URL__c”, potrebbe scomparire presto"
+  same_value_as_canvas_url__c_will_probably_be_going_37027686: "Stesso valore di 'Canvas_URL__c', potrebbe scomparire presto"
   sample_data_e4fd01ff: "Dati campione"
   saudi_arabia_966_d01ed717: "Arabia Saudita (+966)"
   save_11a80ec3: Salva
@@ -23449,7 +23450,6 @@ it:
   this_report_shows_all_the_activity_from_users_enro_8f8e0ca1: |-
       Questo report mostra tutta l’attività degli utenti iscritti in
         tutti i corsi in determinato trimestre. Il file csv generato avrà una riga per attività studente
-        
         e avrà le seguenti intestazioni: ID sezione,ID SIS sezione,
         nome sezione, ID corso, ID SIS corso, nome corso, ID trimestre, ID SIS trimestre,
         nome trimestre, ID utente,ID SIS utente, nome utente, tipo di contenuto, contenuto, numero di visualizzazioni,
