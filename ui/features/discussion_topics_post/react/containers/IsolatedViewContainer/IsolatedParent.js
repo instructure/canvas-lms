@@ -57,10 +57,11 @@ export const IsolatedParent = props => {
     update: resetDiscussionCache
   })
 
-  const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
+  const {setOnSuccess} = useContext(AlertManagerContext)
   const [isEditing, setIsEditing] = useState(false)
   const [showReportModal, setShowReportModal] = useState(false)
   const [reportModalIsLoading, setReportModalIsLoading] = useState(false)
+  const [reportingError, setReportingError] = useState(false)
   const threadActions = []
 
   const [updateDiscussionEntryReported] = useMutation(UPDATE_DISCUSSION_ENTRY_PARTICIPANT, {
@@ -74,7 +75,10 @@ export const IsolatedParent = props => {
     },
     onError: () => {
       setReportModalIsLoading(false)
-      setOnFailure(I18n.t('We experienced an issue. This reply was not reported.'))
+      setReportingError(true)
+      setTimeout(() => {
+        setReportingError(false)
+      }, 3000)
     }
   })
 
@@ -283,6 +287,7 @@ export const IsolatedParent = props => {
                     }}
                     showReportModal={showReportModal}
                     isLoading={reportModalIsLoading}
+                    errorSubmitting={reportingError}
                   />
                 </Flex.Item>
               </Flex>
