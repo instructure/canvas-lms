@@ -67,7 +67,7 @@ Naming/HeredocDelimiterNaming:
     # negative regex - these are the _allowed_ delimiters
     # any you add should describe the format of the data, not describe
     # what the data is for. this allows editors to syntax highlight
-    - ^(?!AST|BASE64|CSV|GQL|HTML|JS|MD|PEM|REGEX|RUBY|SQL|SRT|TEXT|XML|YAML).+$
+    - ^(?!AST|BASE64|CSV|GQL|HTML|JS|MD|PEM|REGEX|RUBY|SQL|SRT|TEXT|XML|YAML|PATTERN).+$
 
 Performance:
   Severity: error
