@@ -315,6 +315,7 @@ pt-BR:
     turnitin_pledge: "Esta tarefa enviada é meu trabalho próprio e original"
   account_97b34646: Conta
   account_account_b6b3746b: "Conta: %{account}"
+  account_administrators_can_always_create_courses_926dc0cb: "Administradores de contas sempre podem criar cursos"
   account_and_course_level_outcome_mastery_scales_5bfe7a3b: "Escalas de domínio de resultado em nível de conta e curso"
   account_and_course_level_outcome_proficiencies_1cfa260: "Proficiências de resultado a nível de conta e curso"
   account_and_subaccount_40c6430: "Conta e subconta"
@@ -427,6 +428,7 @@ pt-BR:
       login_handle_name_description: "O rótulo usado para identificadores exclusivos de login. Exemplos: Login, nome de usuário, ID do aluno, etc."
       unknown_user_url_description: "A url para qual redireciona quando um usuário autenticado não é encontrado em Canvas."
   account_course_and_user_search_22bf297a: "Pesquisa de Conta do Curso e Usuário"
+  account_creation_still_in_progress_ac0e0a18: "A criação da conta ainda está em andamento"
   account_domain_78f43049: "Domínio da Conta"
   account_domain_lookups_f9d1147e: "Pesquisas do domínio da conta"
   account_groups_2f301732: "Grupos de conta"
@@ -440,7 +442,7 @@ pt-BR:
   account_level_settings_manage_4fca6f8e: "Configurações em nível da conta - gerenciar"
   account_name_13ed649: "%{account_name}"
   account_name_7f63a13: "nome da conta"
-  account_name_analytics_62bf60ae: "%{account.name} Analítica"
+  account_name_analytics_62bf60ae: "%{account.name} Analytics"
   account_name_bff54ed5: "Nome da conta"
   account_navigation_80bbefd4: "Navegação da conta"
   account_navigation_menu_10c05bf9: "Menu de Navegação da conta"
@@ -981,10 +983,10 @@ pt-BR:
       custom_reports: 
         end: 
           parameters: 
-            header: "Estado de matrícula"
+            header: "Fim em:"
         start: 
           parameters: 
-            header: "Estado de matrícula"
+            header: "Início em:"
     default_account_quotas_not_updated: "As cotas de conta padrão não foram atualizadas"
     default_account_quotas_updated: "As cotas de conta padrão foram atualizadas"
     devry: 
@@ -1347,7 +1349,7 @@ pt-BR:
         media_quota: "Cota de mídia"
         site_admin_quotas: "Cotas do administrador do site"
         student_quota: "Cota de aluno"
-        update: "Atualizar evento"
+        update: Atualizar
       account_roles: "Funções da conta:"
       account_settings_title: "Configurações da conta"
       add_a_custom_help_link: "Adicione um link de help customizado"
@@ -3169,9 +3171,9 @@ pt-BR:
   and_more_not_shown_here_7842765e: "... e mais não mostrado aqui"
   ange_name: "Conversor Angel"
   angel: 
-    file_copy_fail: "Não foi possível copiar a pasta “%{base_path}\""
-    file_copy_fail_message: "Não foi possível renomear o diretório para o caminho “%{path}\""
-    file_import_fail: "Não foi possível importar o arquivo “%{file_path}\""
+    file_copy_fail: "Não foi possível copiar a pasta “%{base_path}”"
+    file_copy_fail_message: "Não foi possível renomear o diretório para o caminho “%{path}”"
+    file_import_fail: "Não foi possível importar o arquivo “%{file_path}”"
   angel_display: "Aprendizado do ANGEL"
   angel_file_description: "Formato .zip da exportação do Angel"
   annotated_document_submission_d9ff236a: "Envio de documento anotado"
@@ -16193,7 +16195,6 @@ pt-BR:
             
             %{course}, seu curso no Canvas Network começou há alguns dias, e notamos que você ainda não fez login. Gostaríamos de lhe enviar um último lembrete, caso você se esqueça.
             
-            
             Para fazer login, vá para %{site} e digite seu nome de usuário e senha. Se você ainda não definiu uma senha, pode definir uma aqui: %{password_url}
             
             Se você simplesmente não pode fazer este curso em particular, sinta-se à vontade para navegar em nosso catálogo de cursos em %{site} para encontrar algo que o inspire. Novos cursos estão sendo adicionados o tempo todo!
@@ -16240,7 +16241,6 @@ pt-BR:
             O que você pode fazer para se preparar?
             
             Se você ainda não criou seu perfil do Canvas Network, pode fazer login e configurá-lo em Canvas.net. Seu perfil ajudará outras pessoas no curso a saber quem você é. Lá, você também pode configurar suas preferências de notificação.
-            
             
             Finalmente, você pode revisar os materiais necessários e quaisquer instruções para o seu curso aqui: %{url}
             
@@ -17272,6 +17272,7 @@ pt-BR:
   mfa_required_ca66e177: "MFA obrigatória"
   mfoster_708c21fb: mfoster@*
   mgp_grade_export_d29b471f: "Exportação de Notas MGP"
+  miami_utilization_report_9c927880: "Relatório de utilização de Miami"
   mic_a7f3d311: Mic
   microsoft_365_allows_a_maximum_of_max_members_in_a_3acbd841: "O Microsoft 365 permite no máximo %{max} membros em uma equipe."
   microsoft_365_allows_a_maximum_of_max_owners_in_a__b448f5de: "O Microsoft 365 permite no máximo %{max} proprietários em uma equipe."
@@ -17923,8 +17924,8 @@ pt-BR:
       produtos de parceiros devem habilitar esta funcionalidade para fluxos de trabalho aprimorados para a
       validação de dados de tarefas. Quando habilitada, esta funcionalidade exibe as novas configurações da Integração
       SIS para Sincronização SIS (Retorno de notas em nível de tarefa) nas Configurações
-      da conta. A visualização do recurso Postar no SIS foi incorporada a esta nova configuração
-      e será habilitada por padrão.
+      da conta. A opção de funcionalidade Postar em SIS foi incorporada a esta nova
+      configuração e estará habilitada por padrão.
   new_slack_api_key_453d04d: "Nova chave de API do Slack"
   new_topic_for_course_3d98222a: "Novo assunto para %{course}"
   new_typography_4eaeca26: "Nova tipografia"
@@ -18148,7 +18149,7 @@ pt-BR:
   not_yet_graded_40475341: "Não avaliado ainda"
   note_8b73ce09: Observação
   note_associated_tools_are_only_listed_once_even_if_ebae2aba: |-
-      NOTE: Ferramentas associadas são listadas apenas uma vez, mesmo se tiverem
+      NOTA: Ferramentas associadas são listadas apenas uma vez, mesmo se tiverem
                       sido instaladas em diversas subcontas.
   note_for_differentiated_group_topics_some_threads__90adbb21: "Observação: para assuntos para grupos diferenciados, alguns segmentos podem estar sem nenhum aluno atribuído."
   note_grades_and_notes_will_be_saved_automatically__e3270872: "Nota: Notas e observações serão salvas automaticamente após sair do campo."
@@ -26149,7 +26150,6 @@ pt-BR:
   this_report_shows_all_the_activity_from_users_enro_8f8e0ca1: |-
       Este relatório mostra todas as atividades de usuários matriculados em todos os cursos
         em um determinado período. O arquivo csv resultante terá uma linha por atividade
-        
         de aluno e terá os seguintes cabeçalhos: id da seção, id sis da seção,
         nome da seção, id do curso , id sis do curso, nome do curso, id do período, id sis do período,
         nome do período, id do usuário, id sis do usuário, nome do usuário, tipo de conteúdo, conteúdo, vezes visualizado,
@@ -28134,7 +28134,7 @@ pt-BR:
   users_manage_login_details_9462b30f: "Usuários - gerenciar detalhes de login"
   users_manage_observers_126f03a3: "Usuários - gerenciar observadores"
   users_manage_students_in_courses_d6168815: "Usuários - gerenciar alunos nos cursos"
-  users_matching_search_term_c604db9e: "Correspondência de usuários “%{search_term}\""
+  users_matching_search_term_c604db9e: "Correspondência de usuários “%{search_term}”"
   users_moderate_content_36d6eed7: "Usuários - moderar conteúdo"
   users_observers_e0e66c52: "Usuários - Observadores"
   users_of_screen_readers_may_need_to_turn_off_the_v_98811cd: "Usuários de leitores de telas podem precisar desligar o cursor virtual para utilizarem os atalhos de teclado"
