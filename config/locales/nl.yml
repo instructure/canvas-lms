@@ -6,7 +6,7 @@ nl:
   1_item_scores_examplescores_9736236: "1- Itemscores: %{exampleScores}"
   1_user_found_76399771: "1 gebruiker gevonden."
   1st_reviewer_3c1d0119: "1e Revisor"
-  25th_75th_ile_406a67bf: "25e-75e %iel"
+  25th_75th_ile_406a67bf: "25e-75e percentiel"
   25th_75th_percentile_aa4c11f2: "25e-75e percentiel"
   2_final_score_7b0fd15e: "2. Uiteindelijke score"
   2_final_score_exampleresult_922edf9c: "2- Eindscore: %{exampleResult}"
@@ -315,6 +315,7 @@ nl:
     turnitin_pledge: "Deze ingediende opdracht is mijn eigen originele werk."
   account_97b34646: Account
   account_account_b6b3746b: "Account: %{account}"
+  account_administrators_can_always_create_courses_926dc0cb: "Accountbeheerders kunnen altijd cursussen aanmaken"
   account_and_course_level_outcome_mastery_scales_5bfe7a3b: "Vakbeheersingsschalen voor leerdoelen op account- en cursusniveau"
   account_and_course_level_outcome_proficiencies_1cfa260: "Vaardigheidsberekeningen voor leerdoelen op account- en cursusniveau"
   account_and_subaccount_40c6430: "Account en subaccount"
@@ -427,12 +428,13 @@ nl:
       login_handle_name_description: "Het label dat wordt gebruikt voor unieke aanmeldings-ID's. Bijvoorbeeld: Login, Gebruikersnaam, cursist-ID, enzovoort."
       unknown_user_url_description: "De url om te door te geleiden wanneer een geverifieerde gebruiker niet in Canvas te vinden is."
   account_course_and_user_search_22bf297a: "Cursus en gebruiker in account zoeken"
+  account_creation_still_in_progress_ac0e0a18: "Nog bezig met aanmaken van account"
   account_domain_78f43049: Accountdomein
   account_domain_lookups_f9d1147e: "Zoekopdrachten voor accountdomein"
   account_groups_2f301732: Accountgroepen
   account_id_2c3b4f15: account-ID
   account_id_73966078: account_id
-  account_id_f6e26867: Account-id
+  account_id_f6e26867: Account-ID
   account_level_mastery_scales_a5bdff29: "Scoringscriteria op accountniveau"
   account_level_notification_preferences_require_an__66467cd7: "Voor meldingsvoorkeuren op accountniveau is een account_id nodig om bij te werken"
   account_level_notification_preferences_ui_update_f5e189a4: "Udate voor accountniveau meldingsvoorkeuren UI"
@@ -857,7 +859,7 @@ nl:
           assignment_count: 
             field: "# Opdrachten:"
           assignment_groups: 
-            label: "Op te nemen opdrachtgroepen:"
+            label: "Opdrachtgroepen bevatten:"
           assignments: 
             check_box: Opdrachten
           major: 
@@ -981,10 +983,10 @@ nl:
       custom_reports: 
         end: 
           parameters: 
-            header: "Status van inschrijving"
+            header: "Eindigen op:"
         start: 
           parameters: 
-            header: "Status van inschrijving"
+            header: "Beginnen op:"
     default_account_quotas_not_updated: "Accountquotas zijn niet bijgewerkt"
     default_account_quotas_updated: "Standaard accountquota's bijgewerkt"
     devry: 
@@ -1347,7 +1349,7 @@ nl:
         media_quota: Mediaquota
         site_admin_quotas: "Sitebeheerder quota's"
         student_quota: Cursistenquota
-        update: "Gebeurtenis bijwerken"
+        update: Bijwerken
       account_roles: "Account functies:"
       account_settings_title: Accountinstellingen
       add_a_custom_help_link: "Een aangepaste Help-link toevoegen"
@@ -3169,9 +3171,9 @@ nl:
   and_more_not_shown_here_7842765e: "... en nog meer die hier niet worden getoond"
   ange_name: "Angel Converter"
   angel: 
-    file_copy_fail: "Kan map \"%{base_path}\" niet kopiëren\""
+    file_copy_fail: "Kan map \"%{base_path}\" niet kopiëren"
     file_copy_fail_message: "Kan naam van directory niet wijzigen naar pad \"%{path}\""
-    file_import_fail: "Kan bestand \"%{file_path}\" niet importeren\""
+    file_import_fail: "Kan bestand \"%{file_path}\" niet importeren"
   angel_display: ANGEL-studie
   angel_file_description: "Angel export.zip formaat"
   annotated_document_submission_d9ff236a: "Inlevering van geannoteerd document"
@@ -6725,7 +6727,7 @@ nl:
       course_list: Cursus(sen)
       no_files_help_label: "Meer informatie over de optie 'Bestanden niet downloaden'"
       no_files_help_text: "Downloaden van bestanden van WebCT-cursussen kan erg lang duren en kan ertoe leiden dat het migratieproces mislukt. In plaats daarvan kun je de bestanden handmatig kopiëren en daarna deze optie kiezen om de rest van de inhoud te migreren."
-      no_files_help_title: "Meer informatie voor geen optie 'Bestanden niet downloaden'"
+      no_files_help_title: "\"Meer informatie voor geen optie 'Bestanden niet downloaden'\""
       no_files_help_title_icon: "Meer informatie over de optie 'Bestanden niet downloaden'"
       options: Opties
       skip_all_files: "Bestanden van deze cursus niet downloaden"
@@ -7546,7 +7548,7 @@ nl:
     other: "%{count} posts toegevoegd"
     zero: "%{count} posts toegevoegd"
   count_pts_e9de6268: 
-    one: "1 punt"
+    one: "1 pt"
     other: "%{count} punten"
   count_pushed_changes_6fe7fba: "%{count} gepushte wijzigingen"
   count_quizzes_found_e5e29bb4: 
@@ -16190,10 +16192,9 @@ nl:
             
             %{course}, je cursus op Canvas Network is een paar dagen geleden begonnen en we hebben gezien dat je nog niet hebt ingelogd. We willen je hierbij een laatste herinnering sturen voor het geval je het vergeten bent.
             
-            
             Om in te loggen, ga je naar %{site} en voert dan je gebruikersnaam en wachtwoord in. Als je nog geen wachtwoord hebt ingesteld, kun je dit hier doen: %{password_url}
             
-            Als je gewoonweg deze bepaalde cursus niet kunt doen, voel je dan vrij om door onze catalogus te bladeren op %{site} om iets anders te zoeken dat je interesseert.  Er worden voortdurend nieuwe cursussen toegevoegd!
+            Als je gewoonweg deze bepaalde cursus niet kunt doen, voel je dan vrij om door onze catalogus te bladeren op %{site} om iets anders te zoeken dat je interesseert. Er worden voortdurend nieuwe cursussen toegevoegd!
             
             We hopen je spoedig te zien,
             
@@ -16206,7 +16207,7 @@ nl:
             
             Goed nieuws! %{course}, de cursus waarvoor je hebt ingeschreven op Canvas Network, zal binnenkort van start gaan.
             
-            Om het meeste uit je cursus te kunnen halen, moet je controleren of de cursusleider speciale instructies of speciaal lesmateriaal vermeld heeft.   Je kunt hier ook naar zoeken op de pagina met cursusdetails op Canvas Network, of klik gewoon op de onderstaande link.
+            Om het meeste uit je cursus te kunnen halen, moet je controleren of de cursusleider speciale instructies of speciaal lesmateriaal vermeld heeft.  Je kunt hier ook naar zoeken op de pagina met cursusdetails op Canvas Network, of klik gewoon op de onderstaande link.
             
             %{url}
             
@@ -16232,12 +16233,11 @@ nl:
         body: |-
             %{user},
             
-            Het is bijna tijd! %{course}, een cursus in Canvas Network waar je voor hebt ingeschreven, begint de volgende week.  Je bent zeker even opgewonden als wij.
+            Het is bijna tijd! %{course}, een cursus in Canvas Network waar je voor hebt ingeschreven, begint de volgende week. Je bent zeker even opgewonden als wij.
             
             Wat kun je doen om je voor te bereiden?
             
             Als je nog geen Canvas Network-profiel hebt aangemaakt, kun je inloggen en je profiel op Canvas.net instellen. Op deze manier komen de anderen in de cursus te weten wie je bent. Daar kun je ook je meldingsvoorkeuren instellen.
-            
             
             Tenslotte kun je hier het benodigde lesmateriaal en eventuele cursusinstructies bekijken: %{url}
             
@@ -17269,6 +17269,7 @@ nl:
   mfa_required_ca66e177: "MFA vereist"
   mfoster_708c21fb: mfoster@*
   mgp_grade_export_d29b471f: "MGP Cijferexport"
+  miami_utilization_report_9c927880: Miami-gebruiksrapport
   mic_a7f3d311: Mic
   microsoft_365_allows_a_maximum_of_max_members_in_a_3acbd841: "Microsoft 365 staat maximaal %{max} leden in een team toe."
   microsoft_365_allows_a_maximum_of_max_owners_in_a__b448f5de: "Microsoft 365 staat maximaal %{max} eigenaren in een team toe."
@@ -17920,7 +17921,7 @@ nl:
       producten van partners, moeten deze functie inschakelen voor verbeterde werkstromen voor het
       valideren van opdrachtgegevens. Wanneer deze functie is ingeschakeld, worden de nieuwe instellingen voor 
       SIS-integratie voor SIS Sync (beoordelingsfeedback op opdrachtniveau) in 
-      Accountinstellingen weergegeven. Het functievoorbeeld voor Posten op SIS is inbegrepen in deze nieuwe
+      Accountinstellingen weergegeven. De functie Posten op SIS is inbegrepen in deze nieuwe
       instelling en is standaard ingeschakeld.
   new_slack_api_key_453d04d: "Nieuwe Slack Api Key"
   new_topic_for_course_3d98222a: "Nieuw onderwerp voor %{course}"
@@ -19812,7 +19813,7 @@ nl:
   possible_matches_for_address_select_the_correct_on_e206f972: "Mogelijke overeenkomsten voor \"%{address}\". Selecteer de juiste gebruiker hieronder of maak een nieuwe gebruiker."
   possible_pts_b63dff4c: "%{possible} ptn"
   possible_pts_f4681c49: "/ %{possible} ptn"
-  possible_score_5e0a328e: "Mogelijk:  %{score}"
+  possible_score_5e0a328e: "Mogelijk: %{score}"
   possiblepoints_points_possible_5217ce4a: "%{possiblePoints} Aantal punten mogelijk"
   post_1e445890: Posten
   post_comment_a5a430a6: "Opmerking plaatsen"
@@ -26149,7 +26150,6 @@ nl:
   this_report_shows_all_the_activity_from_users_enro_8f8e0ca1: |-
       Dit rapport toont alle activiteit van gebruikers ingeschreven in alle cursussen
         in een bepaalde periode. Het resulterende csv-bestand heeft één rij per cursist
-        
         activiteit en heeft de volgende koppen: sectie-ID, sectie-sis-ID,
         sectienaam, cursus-ID, cursus-sis-ID, cursusnaam, periode-ID, periode-sis-ID,
         periodenaam, gebruikers-ID, gebruikers-sis-ID, gebruikersnaam, inhoudstype, inhoud, aantal keren bekeken,
@@ -27498,7 +27498,7 @@ nl:
   updates_the_display_of_post_policy_icons_in_the_ne_eb9f3314: "Hiermee wordt de weergave van pictogrammen voor Beleid voor posten bijgewerkt in de kop van de toewijzingskolom in Nieuwe cijferlijst."
   updating_6edbab78: "Bezig met bijwerken"
   updating_discussion_failed_aadb2d35: "Bijwerken van discussie mislukt"
-  updating_the_catalog_url_will_make_your_old_url_in_b2030b: "Door de Catalog-URL bij te werken is je oude URL met onmiddellijke ingang niet meer toegankelijk voor gebruikers!  Als er een bestaande betalingsverwerker is geconfigureerd, is bij wijzigingen de hulp van een Catalog-engineer nodig."
+  updating_the_catalog_url_will_make_your_old_url_in_b2030b: "Door de Catalog-URL bij te werken is je oude URL met onmiddellijke ingang niet meer toegankelijk voor gebruikers! Als er een bestaande betalingsverwerker is geconfigureerd, is bij wijzigingen de hulp van een Catalog-engineer nodig."
   upload_8b403d05: Uploaden
   upload_a_css_file_ec22214b: "Een CSS bestand uploaden..."
   upload_a_file_228b8cf9: "Een bestand uploaden"
