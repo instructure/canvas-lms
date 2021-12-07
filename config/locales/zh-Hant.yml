@@ -6,7 +6,7 @@ zh-Hant:
   1_item_scores_examplescores_9736236: "1- 項目分數：%{exampleScores}"
   1_user_found_76399771: "找到 1 個使用者。"
   1st_reviewer_3c1d0119: "第 1 檢閲人"
-  25th_75th_ile_406a67bf: "第 25-75 %i 百分位數"
+  25th_75th_ile_406a67bf: "第 25-75 百分位數"
   25th_75th_percentile_aa4c11f2: "第 25-75 百分位數"
   2_final_score_7b0fd15e: "2- 最終分數"
   2_final_score_exampleresult_922edf9c: "2- 最終分數：%{exampleResult}"
@@ -315,6 +315,7 @@ zh-Hant:
     turnitin_pledge: 這個任務提交件是我自己的原創作品
   account_97b34646: 帳戶
   account_account_b6b3746b: "帳戶：%{account}"
+  account_administrators_can_always_create_courses_926dc0cb: 帳戶管理員可以隨時建立課程
   account_and_course_level_outcome_mastery_scales_5bfe7a3b: 帳戶及課程級別學習成果掌握程度
   account_and_course_level_outcome_proficiencies_1cfa260: 帳戶及課程級別學習成果能力
   account_and_subaccount_40c6430: 帳戶及子帳戶
@@ -427,6 +428,7 @@ zh-Hant:
       login_handle_name_description: "用於唯一登入識別符的標籤。例如：登入、使用者名稱、學生 ID 等。"
       unknown_user_url_description: "在 Canvas 中找不到使用者完成身份驗證之後將重定向到的 URL。"
   account_course_and_user_search_22bf297a: 帳戶課程和使用者搜尋
+  account_creation_still_in_progress_ac0e0a18: 建立帳戶仍進行中
   account_domain_78f43049: 帳戶網域
   account_domain_lookups_f9d1147e: 帳戶網域查詢
   account_groups_2f301732: 帳戶小組
@@ -440,7 +442,7 @@ zh-Hant:
   account_level_settings_manage_4fca6f8e: "帳戶級別設定 - 管理"
   account_name_13ed649: "%{account_name}"
   account_name_7f63a13: 帳戶名稱
-  account_name_analytics_62bf60ae: "%{account.name}分析數據"
+  account_name_analytics_62bf60ae: "%{account.name} 分析工具"
   account_name_bff54ed5: 帳戶名稱
   account_navigation_80bbefd4: 帳戶導航
   account_navigation_menu_10c05bf9: 帳戶導航工具選單
@@ -981,10 +983,10 @@ zh-Hant:
       custom_reports: 
         end: 
           parameters: 
-            header: 註冊狀態
+            header: 結束時間：
         start: 
           parameters: 
-            header: 註冊狀態
+            header: 開始時間：
     default_account_quotas_not_updated: 預設帳戶配額未更新
     default_account_quotas_updated: 預設帳戶配額已更新
     devry: 
@@ -1342,12 +1344,12 @@ zh-Hant:
       about_google_docs_tooltip: "關於 Google Docs Previews"
       account_admins_title: 帳戶管理員
       account_quotas: 
-        file_quota: 文檔配額
+        file_quota: 檔案配額
         gigabytes: GB
         media_quota: 媒體配額
         site_admin_quotas: 網站管理員配額
         student_quota: 學生配額
-        update: 更新事件
+        update: 更新
       account_roles: 帳戶角色：
       account_settings_title: 帳戶設置
       add_a_custom_help_link: 新增自訂説明連結
@@ -10306,7 +10308,7 @@ zh-Hant:
       formatting: 格式化，按下以選擇
       rte_help: "富文本區域。按 ALT+F8 求助"
   editor_button_6647db9c: 編輯器按鈕
-  either_course_or_student_c42bb055: 「課程」或「學生」'
+  either_course_or_student_c42bb055: 「課程」或「學生」
   either_groupid_or_outcomeid_values_are_required_1ea29e33: "需要 groupId 或 outcomeId 值"
   either_the_url_or_domain_should_be_set_c29cf8c1: "應該設置 URL 或網域。"
   either_you_re_a_new_user_or_the_terms_of_use_has_c_29797cc2: 無論您是新的使用者，或是自上次同意以來，*使用條款*都已經變更。請在您繼續使用前同意*使用條款*。
@@ -13576,7 +13578,7 @@ zh-Hant:
   id_del_alumno_bc4bcf8a: "ID del Alumno"
   id_del_curso_4ef15337: "ID del Curso"
   id_id_4e148481: "ID：%{id}"
-  id_of_the_term_you_want_to_run_the_report_for_you__603974dc: "您要執行報告的學期 ID。您也可以使用 'active_terms' 執行啟用學期的報告"
+  id_of_the_term_you_want_to_run_the_report_for_you__603974dc: "您要執行報告的學期 ID。您也可以使用 'active_terms' 執行啟用學期的報告 "
   id_token_fa5f144e: "ID 許可證"
   identification_values_86d9ffda: 識別值
   identifier_format_6ca23365: 標識符格式
@@ -16193,7 +16195,6 @@ zh-Hant:
             
             %{course}，您在 Canvas Network 上的課程在幾天前已開課，我們通知您尚未登入。我們想要傳送最後一次提供給您，以防您忘記。
             
-            
             若要登入，請前往 %{site}，然後輸入您的使用者名稱和密碼。如果您尚未設定密碼，您可以在此處設定一個：%{password_url}
             
             如果您只是無法上此特定課程，歡迎在 %{site} 瀏覽我們的課程，以找到可以激勵您的內容。隨時添加新課程中！
@@ -16240,7 +16241,6 @@ zh-Hant:
             您接下來可以做好什麼準備？
             
             如果您尚未建立您的 Canvas Network 個人檔案，您可以登入，然後在 Canvas.net 設定。您的個人檔案將協助課程中的其他人認識您。在那裏，您也可以設定您的通知偏好。
-            
             
             最後，您可以在此檢閱需要的資料和您的課程的任何說明：%{url}
             
@@ -17272,6 +17272,7 @@ zh-Hant:
   mfa_required_ca66e177: "MFA 必填"
   mfoster_708c21fb: mfoster@*
   mgp_grade_export_d29b471f: "MGP 成績導出"
+  miami_utilization_report_9c927880: "Miami 運用報告"
   mic_a7f3d311: 麥克風
   microsoft_365_allows_a_maximum_of_max_members_in_a_3acbd841: "Microsoft 365 允許團隊中最多 %{max} 個成員。"
   microsoft_365_allows_a_maximum_of_max_owners_in_a__b448f5de: "Microsoft 365 允許團隊中最多 %{max} 個擁有者。"
@@ -17923,7 +17924,7 @@ zh-Hant:
       合作夥伴產品客戶都應啟用此功能，以加強作業資料
       驗證工作流程。啟用後，此功能顯示在帳戶
       設定中的 SIS 同步（作業水平評分回傳）的新 SIS 
-      集成設定。「公佈至 SIS」功能預覽已整合至此新
+      集成設定。「公佈至 SIS」功能選項已整合至此新
       設定中，並將預設為啟用。
   new_slack_api_key_453d04d: "新的 Slack API 密鑰："
   new_topic_for_course_3d98222a: "%{course} 的新主題"
@@ -22716,7 +22717,7 @@ zh-Hant:
   salesforce_account_id_eb5c78ad: "銷售人員帳戶 ID"
   salesforce_has_a_different_login_host_for_sanbox_a_2d878ae9: "除了產品帳戶之外，Salesforce 有一個用於安全帳戶登入的不同主機。因此，如果您使用的是銷售人員的安全帳戶，並且而您沒有勾選此複選框，那麼您將無法進行身份驗證（同理，如果您有一個產品帳戶，並且您勾選了此複選框，也無法進行驗證）。"
   salesforce_ticketing_webtocase_connector_80f75716: "Salesforce 票務 WebToCase 連接器"
-  same_value_as_canvas_url__c_will_probably_be_going_37027686: "與 ‘Canvas_URL__c’ 相同的價值，將可能很快消失"
+  same_value_as_canvas_url__c_will_probably_be_going_37027686: 與『Canvas_URL__c』同值，將可能很快消失
   sample_data_e4fd01ff: 樣本資料
   saudi_arabia_1f0dcbdc: 沙特阿拉伯
   saudi_arabia_966_d01ed717: "沙特阿拉伯 (+966)"
@@ -23409,6 +23410,9 @@ zh-Hant:
   settings_for_title_label_e103bdd6: "的設定%{title_label}"
   settings_tutorial_tray_6f37761b: 設定教學列表
   setup_checklist_eb8b00b8: 設置清單
+  sftp_key_added_to_user_it_can_take_up_to_four_hour_8791e3c3: |-
+      添加到使用者的 SFTP 金鑰。此金鑰開始運作可能花費最多
+                                    四小時的時間。
   sftp_key_is_invalid_please_ensure_it_is_correctly__2d309e0b: "SFTP 金鑰無效。請確保其格式正確。"
   sftp_key_removed_from_user_42318725: "從使用者移除 SFTP 金鑰。"
   sftp_user_already_exists_or_is_disabled_please_rea_9554a53a: |-
@@ -26143,7 +26147,6 @@ zh-Hant:
   this_report_shows_all_the_activity_from_users_enro_8f8e0ca1: |-
       此報告顯示特定學期內
         所有課程的註冊使用者的所有活動。最終產生的 CSV 檔案將在每行顯示一項學生
-        
         活動，各標題如下；分班 ID、分班 SIS ID、
         分班名稱、課程 ID、課程 SIS ID、課程名稱、學期 ID、學期 SIS ID、
         學期名稱、使用者 ID、使用者 SIS ID、使用者名稱、內容類型、內容、查看次數、
