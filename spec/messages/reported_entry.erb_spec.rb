@@ -38,6 +38,7 @@ describe "reported_reply" do
       msg = generate_message(notification_name, path_type, asset)
       expect(msg.url).to match(%r{/courses/\d+/discussion_topics/\d+})
       expect(msg.body).to match(%r{/courses/\d+/discussion_topics/\d+})
+      expect(msg.html_body.include?("View the reply in the discussion: \n<a href=\"http://localhost/courses/#{@object.discussion_topic.course.id}/discussion_topics/#{@object.discussion_topic.id}?entry_id=#{@object.id}\">")).to eq(true)
     end
   end
 end
