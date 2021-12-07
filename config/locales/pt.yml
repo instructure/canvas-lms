@@ -316,6 +316,7 @@ pt:
     turnitin_pledge: "Esta tarefa enviada é o meu trabalho e é original"
   account_97b34646: Conta
   account_account_b6b3746b: "Conta: %{account}"
+  account_administrators_can_always_create_courses_926dc0cb: "Os administradores de conta podem sempre criar disciplinas"
   account_and_course_level_outcome_mastery_scales_5bfe7a3b: "Escalas de Domínio de Conta e Resultados de Nível de Disciplina"
   account_and_course_level_outcome_proficiencies_1cfa260: "Proficiências de Conta e de Resultado de Nível da Disciplina"
   account_and_subaccount_40c6430: "Conta e subconta"
@@ -428,6 +429,7 @@ pt:
       login_handle_name_description: "O rótulo utilizado para identificadores exclusivos de login. Exemplos: Login, nome de utilizador, ID do aluno, etc."
       unknown_user_url_description: "URL para o qual deve ser feito o redirecionamento quando um utilizador autenticado não é encontrado no Canvas."
   account_course_and_user_search_22bf297a: "Pesquisar Conta da Disciplina e Utilizador"
+  account_creation_still_in_progress_ac0e0a18: "A criação da conta ainda está em andamento"
   account_domain_78f43049: "Domínio da conta"
   account_domain_lookups_f9d1147e: "Pesquisas no domínio da conta"
   account_groups_2f301732: "Grupos de conta"
@@ -441,7 +443,7 @@ pt:
   account_level_settings_manage_4fca6f8e: "Configurações no nível da conta - gerir"
   account_name_13ed649: "%{account_name}"
   account_name_7f63a13: "nome da conta"
-  account_name_analytics_62bf60ae: "%{account.name} Análise"
+  account_name_analytics_62bf60ae: "%{account.name} Estatísticas"
   account_name_bff54ed5: "Nome da conta"
   account_navigation_80bbefd4: "Navegação de Conta"
   account_navigation_menu_10c05bf9: "Menu de navegação da conta"
@@ -982,10 +984,10 @@ pt:
       custom_reports: 
         end: 
           parameters: 
-            header: "Estado de inscrição"
+            header: "Fim em:"
         start: 
           parameters: 
-            header: "Estado de inscrição"
+            header: "Início em:"
     default_account_quotas_not_updated: "As quotas de contas predefinidas não foram atualizadas"
     default_account_quotas_updated: "Quotas de contas predefinidas atualizadas"
     devry: 
@@ -1348,7 +1350,7 @@ pt:
         media_quota: "Quota de multimédia"
         site_admin_quotas: "Quotas de administrador do site"
         student_quota: "Quota de alunos"
-        update: "Atualizar evento"
+        update: Atualizar
       account_roles: "Funções da conta:"
       account_settings_title: "Configurações de conta"
       add_a_custom_help_link: "Adicionar uma ligação de ajuda personalizada"
@@ -3171,7 +3173,7 @@ pt:
   and_more_not_shown_here_7842765e: "... e mais não mostrados aqui"
   ange_name: "Conversor Angel"
   angel: 
-    file_copy_fail: "Não foi possível copiar pasta “%{base_path}\""
+    file_copy_fail: "Não foi possível copiar pasta \"%{base_path}\""
     file_copy_fail_message: "Não foi possível renomear directório para caminho \"%{path}\""
     file_import_fail: "Não foi possível importar ficheiro \"%{file_path}\""
   angel_display: "Aprendizagem ANGEL"
@@ -16217,7 +16219,6 @@ pt:
             
             %{course}, a sua disciplina sobre Canvas Network, começou há alguns dias, e reparámos que ainda não fez o login. Quisemos apenas enviar-lhe um último lembrete no caso de se ter esquecido.
             
-            
             Para iniciar sessão, vá para %{site} e introduza o seu nome de utilizador e palavra-passe. Se ainda não tiver definido uma palavra-passe, pode definir uma aqui: %{password_url}
             
             Se simplesmente não conseguir fazer esta disciplina em particular, sinta-se à vontade para consultar o nosso catálogo de disciplinas em %{site} para encontrar outra coisa que o inspire. Novas disciplinas estão sempre a ser adicionadas!
@@ -16264,7 +16265,6 @@ pt:
             O que pode fazer para se preparar?
             
             Se ainda não criou o seu perfil no Canvas Network, pode iniciar sessão e configurá-lo em Canvas.net. O seu perfil ajudará outras pessoas na disciplina a saberem quem você é. Aí, pode também definir as suas preferências de notificação.
-            
             
             Finalmente, pode rever aqui os materiais necessários e quaisquer instruções para a sua disciplina: %{url}
             
@@ -17296,6 +17296,7 @@ pt:
   mfa_required_ca66e177: "MFA Requerido"
   mfoster_708c21fb: mfoster@*
   mgp_grade_export_d29b471f: "Exportação de notas MGP"
+  miami_utilization_report_9c927880: "Relatório de utilização de Miami"
   mic_a7f3d311: Mic
   microsoft_365_allows_a_maximum_of_max_members_in_a_3acbd841: "O Microsoft 365 permite um máximo de %{max} membros numa equipa."
   microsoft_365_allows_a_maximum_of_max_owners_in_a__b448f5de: "O Microsoft 365 permite um máximo de %{max} proprietários numa equipa."
@@ -17947,7 +17948,7 @@ pt:
       parceiros deve habilitar este recurso para fluxos de trabalho de validação de dados
       de tarefa aprimorados Quando ativado, esse recurso exibe as novas definições do SIS
       Integration para o SIS Sync (Assignment Level Grade Passback) em Definições de
-      Conta. A opção de Pré-visualização de recurso Post to SIS foi incorporada nesta nova
+      Conta. A opção de recurso Post to SIS foi incorporada nesta nova
       definição e será ativada por padrão.
   new_slack_api_key_453d04d: "Nova Chave da API Slack"
   new_topic_for_course_3d98222a: "Novo tópico para %{course}"
@@ -25968,9 +25969,9 @@ pt:
   this_assignment_submission_is_my_own_original_work_e820ce4b: "Esta tarefa enviada é o meu trabalho e é original"
   this_assignment_will_no_longer_count_towards_your__a6eb6778: "Esta tarefa já não irá contar para a sua nota."
   this_attachment_has_been_unpublished_by_the_author_37bff9c3: "Este anexo foi removido pelo autor."
-  this_canvas_installation_is_only_for_testing_and_w_12e52370: "Esta instalação no Canvas destina-se apenas a testes *e será reinicializada todas as semanas.*"
+  this_canvas_installation_is_only_for_testing_and_w_12e52370: "Esta instalação no Canvas destina-se apenas a testes e *será reinicializada todas as semanas.*"
   this_canvas_installation_is_only_for_testing_and_w_17ce8bc2: 
-    one: "Esta instalação no Canvas destina-se apenas a testes *e será reinicializada todas as semanas.*"
+    one: "Esta instalação no Canvas destina-se apenas a testes e *será reinicializada todas as semanas.*"
     other: "Esta instalação no Canvas destina-se apenas a testes *e será reinicializada todas as %{count} semanas.*"
   this_code_expires_in_timefromnow_ec7ccef4: "Este código expira em %{timeFromNow}."
   this_code_expires_timefromnow_877a5225: "Este código expira %{timeFromNow}."
@@ -26196,7 +26197,6 @@ pt:
   this_report_shows_all_the_activity_from_users_enro_8f8e0ca1: |-
       Este relatório mostra toda a atividade dos utilizadores inscritos em todas as disciplinas durante
         um determinado período. O ficheiro csv resultante terá uma fila por atividade
-        
         do aluno e terá os seguintes cabeçalho: id de seção, id sis seção,
         nome da seção, id da disciplina, id sis da disciplina, nome da disciplina, id do termo, id sis do termo,
         nome do termo, id do utilizador, id sis do utilizador, nome do utilizador, tipo de conteúdo, conteúdo, tempos visualizados,
