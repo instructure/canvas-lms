@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {Alert} from '@instructure/ui-alerts'
 import I18n from 'i18n!discussion_topics_post'
 import PropTypes from 'prop-types'
 import React, {useState} from 'react'
@@ -60,6 +61,11 @@ export const ReportReply = props => {
         <Heading>{I18n.t('Report Reply')}</Heading>
       </Modal.Header>
       <Modal.Body>
+        {props.errorSubmitting && (
+          <Alert margin="small" variant="error" timeout={2500}>
+            {I18n.t('We experienced an issue. This reply was not reported.')}
+          </Alert>
+        )}
         {props.isLoading ? (
           <LoadingIndicator />
         ) : (
@@ -115,10 +121,12 @@ ReportReply.propTypes = {
   onCloseReportModal: PropTypes.func.isRequired,
   onSubmit: PropTypes.func.isRequired,
   showReportModal: PropTypes.bool,
-  isLoading: PropTypes.bool
+  isLoading: PropTypes.bool,
+  errorSubmitting: PropTypes.bool
 }
 
 ReportReply.defaultProps = {
   showReportModal: false,
-  isLoading: false
+  isLoading: false,
+  errorSubmitting: false
 }

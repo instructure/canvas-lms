@@ -63,6 +63,7 @@ export const DiscussionThreadContainer = props => {
   const [threadRefCurrent, setThreadRefCurrent] = useState(null)
   const [showReportModal, setShowReportModal] = useState(false)
   const [reportModalIsLoading, setReportModalIsLoading] = useState(false)
+  const [reportingError, setReportingError] = useState(false)
 
   const updateCache = (cache, result) => {
     const newDiscussionEntry = result.data.createDiscussionEntry.discussionEntry
@@ -154,7 +155,10 @@ export const DiscussionThreadContainer = props => {
     },
     onError: () => {
       setReportModalIsLoading(false)
-      setOnFailure(I18n.t('We experienced an issue. This reply was not reported.'))
+      setReportingError(true)
+      setTimeout(() => {
+        setReportingError(false)
+      }, 3000)
     }
   })
 
@@ -443,6 +447,7 @@ export const DiscussionThreadContainer = props => {
                     }}
                     showReportModal={showReportModal}
                     isLoading={reportModalIsLoading}
+                    errorSubmitting={reportingError}
                   />
                 </Flex.Item>
               </Flex>
