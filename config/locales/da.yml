@@ -315,6 +315,7 @@ da:
     turnitin_pledge: "Denne opgaveaflevering er mit personlige, originale arbejde"
   account_97b34646: Konto
   account_account_b6b3746b: "Konto: %{account}"
+  account_administrators_can_always_create_courses_926dc0cb: "Kontoadministratorer kan altid oprette fag"
   account_and_course_level_outcome_mastery_scales_5bfe7a3b: "Skalaer for opfyldelse af læringsmål for læringsudbytter på konto- og fagniveau"
   account_and_course_level_outcome_proficiencies_1cfa260: "Færdigheder for læringsudbytter på konto- og fagniveau"
   account_and_subaccount_40c6430: "Konto og underkonto"
@@ -427,6 +428,7 @@ da:
       login_handle_name_description: "Det mærke, der bruges til unikke login-identifikatorer. Eksempler: Login, Brugernavn, elev-ID osv."
       unknown_user_url_description: "Den URL, der skal omdirigeres til, når en godkendt bruger ikke kan findes i Canvas."
   account_course_and_user_search_22bf297a: "Konto-, fag- og brugersøgning"
+  account_creation_still_in_progress_ac0e0a18: "Kontooprettelse er stadig i gang"
   account_domain_78f43049: Kontodomæne
   account_domain_lookups_f9d1147e: Kontodomæneopslag
   account_groups_2f301732: Kontogrupper
@@ -981,10 +983,10 @@ da:
       custom_reports: 
         end: 
           parameters: 
-            header: Tilmeldings-status
+            header: "Slut:"
         start: 
           parameters: 
-            header: Tilmeldings-status
+            header: "Start:"
     default_account_quotas_not_updated: "Standardkontoens kvoter blev ikke opdateret"
     default_account_quotas_updated: "Standardkontoens kvoter opdateret"
     devry: 
@@ -1347,7 +1349,7 @@ da:
         media_quota: Mediekvote
         site_admin_quotas: "Kvoter til sideadministratorer"
         student_quota: "Studerendes kvote"
-        update: "Opdater begivenhed"
+        update: Opdatering
       account_roles: "Kontoroller:"
       account_settings_title: Kontoindstillinger
       add_a_custom_help_link: "Opret et brugertilpasset hjælpelink"
@@ -16204,7 +16206,6 @@ da:
             
             %{course}, dit fag på Canvas Network startede for et par dage siden, og vi har bemærket, at du ikke har logget ind endnu. Vi ville bare sende dig en sidste påmindelse, hvis du har glemt det.
             
-            
             For at logge ind skal du gå til %{site} og indtaste dit brugernavn og adgangskode. Hvis du ikke har angivet en adgangskode endnu, kan du indstille en her: %{password_url}
             
             Hvis du simpelthen ikke kan deltage i netop dette fag, er du velkommen til at gennemse vores fagkatalog på %{site} for at finde noget andet, der inspirerer dig. Der kommer hele tiden flere fag!
@@ -16251,7 +16252,6 @@ da:
             Hvad kan du gøre for at blive klar?
             
             Hvis du ikke allerede har oprettet din Canvas Network-profil, kan du logge ind og konfigurere den på Canvas.net. Din profil hjælper andre på faget med at vide, hvem du er. Der kan du også konfigurere dine meddelelsespræferencer.
-            
             
             Og du kan gennemgå de nødvendige materialer og eventuelle instruktioner til dit fag her: %{url}
             
@@ -17283,6 +17283,7 @@ da:
   mfa_required_ca66e177: "MFA påkrævet"
   mfoster_708c21fb: mfoster@*
   mgp_grade_export_d29b471f: "MGP karakter-eksport"
+  miami_utilization_report_9c927880: "Miami udnyttelsesrapport"
   mic_a7f3d311: Mikrofon
   microsoft_365_allows_a_maximum_of_max_members_in_a_3acbd841: "Microsoft 365 tillader maksimalt %{max} medlemmer i et team."
   microsoft_365_allows_a_maximum_of_max_owners_in_a__b448f5de: "Microsoft 365 tillader maksimalt %{max} ejere i et team."
@@ -17934,7 +17935,7 @@ da:
       partnerprodukter, bør aktivere denne funktion for at forbedre valideringsarbejdsprocesserne for
       opgavedata. Når denne funktion er aktiveret, viser den de nye SIS
       -integrationsindstillinger for SIS Sync (karaktertilbagesendelse på opgaveniveau) i Konto-
-      indstillinger. Forhåndsvisning af funktionen Slå op til SIS er blevet indarbejdet i denne nye
+      indstillinger. Funktionen Slå op til SIS er blevet indarbejdet i denne nye
       indstilling og vil som standard blive aktiveret.
   new_slack_api_key_453d04d: "Ny Slack api-nøgle"
   new_topic_for_course_3d98222a: "Nyt emne for %{course}"
@@ -26162,7 +26163,6 @@ da:
   this_report_shows_all_the_activity_from_users_enro_8f8e0ca1: |-
       Denne rapport viser al aktivitet fra brugere, der er tilmeldt alle fag
         i en given periode. Den resulterende csv-fil har én række pr. studerendes
-        
         aktivitet og følgende overskrifter: sektion-ID, sektion SIS-ID,
         sektionsnavn, fag-ID, fag SIS-ID, fagets navn, semester-ID, semester SIS-ID,
         semestrets navn, bruger-ID, bruger SIS-ID, brugernavn, indholdstype, indhold, gange vist,
