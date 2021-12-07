@@ -19,7 +19,7 @@
 import I18n from 'i18n!discussion_posts'
 import PropTypes from 'prop-types'
 import React, {useContext, useMemo} from 'react'
-import {resolveAuthorRoles, responsiveQuerySizes} from '../../utils'
+import {getDisplayName, isAnonymous, resolveAuthorRoles, responsiveQuerySizes} from '../../utils'
 import {RolePillContainer} from '../RolePillContainer/RolePillContainer'
 import {SearchContext} from '../../utils/constants'
 import {SearchSpan} from '../SearchSpan/SearchSpan'
@@ -33,17 +33,13 @@ import {Responsive} from '@instructure/ui-responsive'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Text} from '@instructure/ui-text'
 import {Tooltip} from '@instructure/ui-tooltip'
+import {AnonymousAvatar} from '../AnonymousAvatar/AnonymousAvatar'
 
 export const AuthorInfo = props => {
   const {searchTerm, filter} = useContext(SearchContext)
 
-  const isAnonymous = ENV.discussion_anonymity_enabled && props.anonymousAuthor != null
   const hasAuthor = Boolean(props.author || props.anonymousAuthor)
-
-  const displayName = isAnonymous
-    ? 'Anonymous ' + props.anonymousAuthor.shortName
-    : props.author?.displayName
-  const avatarUrl = isAnonymous ? null : props.author?.avatarUrl // TODO: Change with Anonymous Avatar
+  const avatarUrl = isAnonymous(props) ? null : props.author?.avatarUrl
 
   return (
     <Responsive
@@ -86,8 +82,19 @@ export const AuthorInfo = props => {
                 />
               </div>
             )}
-            {hasAuthor && (
-              <Avatar name={displayName} src={avatarUrl} margin="0" data-testid="author_avatar" />
+            {hasAuthor && !isAnonymous(props) && (
+              <Avatar
+                name={getDisplayName(props)}
+                src={avatarUrl}
+                margin="0"
+                data-testid="author_avatar"
+              />
+            )}
+            {hasAuthor && isAnonymous(props) && (
+              <AnonymousAvatar
+                seedString={props.anonymousAuthor.id}
+                data-testid="anonymous_avatar"
+              />
             )}
           </Flex.Item>
           <Flex.Item shouldShrink>
@@ -105,7 +112,7 @@ export const AuthorInfo = props => {
                         <SearchSpan
                           isIsolatedView={props.isIsolatedView}
                           searchTerm={searchTerm}
-                          text={displayName}
+                          text={getDisplayName(props)}
                         />
                       </Text>
                     </Flex.Item>
