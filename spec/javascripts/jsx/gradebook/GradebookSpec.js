@@ -10395,6 +10395,74 @@ QUnit.module('Gradebook#saveSettings', () => {
   })
 })
 
+QUnit.module('Gradebook#allowApplyScoreToUngraded', () => {
+  test('returns true if the allow_apply_score_to_ungraded option is true', () => {
+    const gradebook = createGradebook({allow_apply_score_to_ungraded: true})
+    ok(gradebook.allowApplyScoreToUngraded())
+  })
+
+  test('returns false if the allow_apply_score_to_ungraded option is false', () => {
+    const gradebook = createGradebook({allow_apply_score_to_ungraded: false})
+    notOk(gradebook.allowApplyScoreToUngraded())
+  })
+})
+
+QUnit.module('Gradebook#onApplyScoreToUngradedRequested', hooks => {
+  let gradebook
+  let mountPoint
+
+  hooks.beforeEach(() => {
+    mountPoint = document.body.appendChild(document.createElement('div'))
+    sandbox.stub(ReactDOM, 'render')
+    sandbox.stub(React, 'createElement')
+  })
+
+  hooks.afterEach(() => {
+    ReactDOM.render.restore()
+    React.createElement.restore()
+    mountPoint.remove()
+  })
+
+  test('does not render the modal if the mount point is not present', () => {
+    gradebook = createGradebook({
+      allow_apply_score_to_ungraded: true
+    })
+    gradebook.onApplyScoreToUngradedRequested()
+    ok(ReactDOM.render.notCalled)
+  })
+
+  test('does not render the modal if the allow_apply_score_to_ungraded option is false', () => {
+    gradebook = createGradebook({
+      applyScoreToUngradedModalNode: mountPoint
+    })
+    gradebook.onApplyScoreToUngradedRequested()
+    ok(ReactDOM.render.notCalled)
+  })
+
+  test('renders the modal when the mount point is present and allow_apply_score_to_ungraded is true', () => {
+    gradebook = createGradebook({
+      allow_apply_score_to_ungraded: true,
+      applyScoreToUngradedModalNode: mountPoint
+    })
+    gradebook.onApplyScoreToUngradedRequested()
+
+    strictEqual(ReactDOM.render.callCount, 1)
+    strictEqual(ReactDOM.render.firstCall.args[1], mountPoint)
+  })
+
+  test('passes the supplied assignmentGroup to the render if present', () => {
+    gradebook = createGradebook({
+      allow_apply_score_to_ungraded: true,
+      applyScoreToUngradedModalNode: mountPoint
+    })
+
+    gradebook.onApplyScoreToUngradedRequested({id: '100', name: 'group'})
+
+    strictEqual(React.createElement.callCount, 1)
+    deepEqual(React.createElement.firstCall.args[1].assignmentGroup, {id: '100', name: 'group'})
+  })
+})
+
 QUnit.module('Gradebook', suiteHooks => {
   let $container
   let gradebook

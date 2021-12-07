@@ -1496,6 +1496,10 @@ describe Quizzes::Quiz do
     it "returns true when quiz was previously not an assignment, but about to become one" do
       expect(@quiz.update_cached_due_dates?("assignment")).to be true
     end
+
+    it "returns true when quiz was previously not a graded survey, but about to become one" do
+      expect(@quiz.update_cached_due_dates?("graded_survey")).to be true
+    end
   end
 
   describe "#published?" do

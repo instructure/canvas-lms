@@ -148,8 +148,8 @@ class PacePlan < ActiveRecord::Base
     update(workflow_state: "active", published_at: DateTime.current)
   end
 
-  def compress_dates!
-    PacePlanHardEndDateCompressor.compress(self, pace_plan_module_items, save: true)
+  def compress_dates(save: true, start_date: self.start_date)
+    PacePlanHardEndDateCompressor.compress(self, pace_plan_module_items, save: save, start_date: start_date)
   end
 
   def student_enrollments

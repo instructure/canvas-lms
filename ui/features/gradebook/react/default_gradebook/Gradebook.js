@@ -85,6 +85,7 @@ import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
 import {deferPromise} from 'defer-promise'
 import MultiSelectSearchInput from './components/MultiSelectSearchInput'
+import ApplyScoreToUngradedModal from './components/ApplyScoreToUngradedModal'
 import '@canvas/jquery/jquery.ajaxJSON'
 import '@canvas/datetime'
 import 'jqueryui/dialog'
@@ -4558,6 +4559,35 @@ class Gradebook extends React.Component {
     return !!(
       this.courseFeatures.allowViewUngradedAsZero && this.gridDisplaySettings.viewUngradedAsZero
     )
+  }
+
+  allowApplyScoreToUngraded() {
+    return this.options.allow_apply_score_to_ungraded
+  }
+
+  onApplyScoreToUngradedRequested(assignmentGroup) {
+    const mountPoint = this.props.applyScoreToUngradedModalNode
+    if (!this.allowApplyScoreToUngraded() || mountPoint == null) {
+      return null
+    }
+
+    const close = () => {
+      ReactDOM.unmountComponentAtNode(mountPoint)
+    }
+
+    const onApply = args => {
+      // TODO: actually apply the scores
+      close()
+    }
+
+    const props = {
+      assignmentGroup,
+      onApply,
+      onClose: close,
+      open: true
+    }
+
+    renderComponent(ApplyScoreToUngradedModal, mountPoint, props)
   }
 
   destroy() {
