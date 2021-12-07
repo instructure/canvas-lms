@@ -6,7 +6,7 @@ fr:
   1_item_scores_examplescores_9736236: "1- Score de l'élément : %{exampleScores}"
   1_user_found_76399771: "1 utilisateur trouvé."
   1st_reviewer_3c1d0119: "1er examinateur"
-  25th_75th_ile_406a67bf: "25e-75e %ile"
+  25th_75th_ile_406a67bf: "25e-75e Centile"
   25th_75th_percentile_aa4c11f2: "25e-75e Centile"
   2_final_score_7b0fd15e: "2- Note finale"
   2_final_score_exampleresult_922edf9c: "2- Score final : %{exampleResult}"
@@ -315,6 +315,7 @@ fr:
     turnitin_pledge: "Le devoir envoyé est le résultat de mon travail personnel et individuel."
   account_97b34646: Compte
   account_account_b6b3746b: "Compte : %{account}"
+  account_administrators_can_always_create_courses_926dc0cb: "Les administrateurs pourront toujours créer des cours"
   account_and_course_level_outcome_mastery_scales_5bfe7a3b: "Échelles de réussite basées sur les résultats au niveau du compte et du cours"
   account_and_course_level_outcome_proficiencies_1cfa260: "Compétences en matière de résultats au niveau des comptes et des cours"
   account_and_subaccount_40c6430: "Compte et sous-compte"
@@ -427,6 +428,7 @@ fr:
       login_handle_name_description: "Le libellé utilisé comme identifiants uniques de connexion. Exemples : nom de connexion, nom d’utilisateur, ID d’étudiant, etc."
       unknown_user_url_description: "L'URL de redirection à utiliser lorsqu’un utilisateur authentifié est introuvable dans Canvas."
   account_course_and_user_search_22bf297a: "Recherche de cours et d'utilisateur par compte"
+  account_creation_still_in_progress_ac0e0a18: "La création du compte est encore en cours"
   account_domain_78f43049: "Domaine du compte"
   account_domain_lookups_f9d1147e: "Recherche de domaines de comptes"
   account_groups_2f301732: "Groupes d’un compte"
@@ -440,7 +442,7 @@ fr:
   account_level_settings_manage_4fca6f8e: "Paramètres au niveau du compte - gérer"
   account_name_13ed649: "%{account_name}"
   account_name_7f63a13: "nom du compte"
-  account_name_analytics_62bf60ae: "Analytique de %{account.name}"
+  account_name_analytics_62bf60ae: "Analyses pour %{account.name}"
   account_name_bff54ed5: "Nom du compte"
   account_navigation_80bbefd4: "Navigation du compte"
   account_navigation_menu_10c05bf9: "Menu de navigation de comptes"
@@ -981,10 +983,10 @@ fr:
       custom_reports: 
         end: 
           parameters: 
-            header: "État d’inscription"
+            header: "Fin :"
         start: 
           parameters: 
-            header: "État d’inscription"
+            header: "Début :"
     default_account_quotas_not_updated: "Les quotas de compte par défaut n’ont pas été mis à jour."
     default_account_quotas_updated: "Les quotas de compte ont été mis à jour."
     devry: 
@@ -1347,7 +1349,7 @@ fr:
         media_quota: "Quota de supports"
         site_admin_quotas: "Quotas d’administrateurs de site"
         student_quota: "Quota d’étudiants"
-        update: "Mettre à jour l’événement"
+        update: "Mettre à jour"
       account_roles: "Rôles de compte :"
       account_settings_title: "Paramètres de compte"
       add_a_custom_help_link: "Ajouter un lien d'aide personnalisé"
@@ -3169,9 +3171,9 @@ fr:
   and_more_not_shown_here_7842765e: "... et d'autres non montrés ici"
   ange_name: "Convertisseur Angel"
   angel: 
-    file_copy_fail: "Impossible de copier le répertoire « %{base_path} »\""
-    file_copy_fail_message: "Impossible de renommer le répertoire vers le chemin « %{path} »\""
-    file_import_fail: "Impossible d’importer le fichier « %{file_path} »\""
+    file_copy_fail: "Impossible de copier le répertoire « %{base_path} »"
+    file_copy_fail_message: "Impossible de renommer le répertoire vers le chemin « %{path} »"
+    file_import_fail: "Impossible d’importer le fichier « %{file_path} »"
   angel_display: "Apprentissage ANGEL"
   angel_file_description: "Format d’exportation .zip Angel"
   annotated_document_submission_d9ff236a: "Soumission d'un document annoté"
@@ -10310,7 +10312,7 @@ fr:
       formatting: "Mise en forme. Appuyez pour sélectionner."
       rte_help: "Zone de texte enrichi. Presser ALT+F8 pour obtenir de l'aide"
   editor_button_6647db9c: "Touche de l'éditeur"
-  either_course_or_student_c42bb055: "Soit « cours », soit « élève »'"
+  either_course_or_student_c42bb055: "Soit « cours », soit « élève »"
   either_groupid_or_outcomeid_values_are_required_1ea29e33: "Les valeurs groupId ou outcomeId sont requises."
   either_the_url_or_domain_should_be_set_c29cf8c1: "Vous devez définir l’URL ou le domaine."
   either_you_re_a_new_user_or_the_terms_of_use_has_c_29797cc2: "Soit vous êtes un nouvel utilisateur, soit les *conditions d'utilisation* ont changé depuis la dernière fois que vous les avez acceptées. Veuillez accepter les *conditions d’utilisation* avant de poursuivre."
@@ -11012,10 +11014,10 @@ fr:
   example_final_score_a92b30b9: "Exemple de note finale]]"
   example_https_example_com_config_xml_be5f36ac: "Exemple : https://example.com/config.xml"
   example_https_lti_tool_provider_example_herokuapp__e9802142: "Exemple : https://lti-tool-provider-example.herokuapp.com/register"
-  example_https_schoolofrock_catalog_instructure_com_b7a35ab5: "par exemple : « https://schoolofrock.catalog.instructure.com »\""
-  example_https_schoolofrock_edu_d4326f03: "par exemple : « https://schoolofrock.edu »\""
+  example_https_schoolofrock_catalog_instructure_com_b7a35ab5: "par exemple : « https://schoolofrock.catalog.instructure.com »"
+  example_https_schoolofrock_edu_d4326f03: "par exemple : « https://schoolofrock.edu »"
   example_item_scores_6726c689: "Exemple de note d’élément"
-  example_school_of_rock_41f32c31: "par exemple : « School of Rock »\""
+  example_school_of_rock_41f32c31: "par exemple : « School of Rock »"
   exceeds_expectations_5910fc3a: "Dépasse les attentes"
   exceeds_mastery_1f995dce: "Surpasse le niveau de maîtrise"
   excelsior_student_activity_tracking_7a1ba44d: "Suivi d'activité de l’élève d’Excelsior"
@@ -13717,8 +13719,8 @@ fr:
   if_the_account_and_course_level_outcome_mastery_sc_95307d59: "Si l'option de fonctionnalité « Échelles de maîtrise des résultats de niveau cours et compte » est actif, l’onglet « Gestion » utilise une nouvelle interface. De plus, la page des résultats affichera deux onglets supplémentaires, séparant les calculs de compétence et les échelles de maîtrise du reste de la gestion des résultats."
   if_the_account_and_course_level_outcome_mastery_sc_a59cef30: "Si l'aperçu de fonctionnalité « Échelles de maîtrise des résultats de niveau cours et compte » est actif, l’onglet « Gestion » utilise une nouvelle interface. De plus, la page des résultats affichera deux onglets supplémentaires, séparant les calculs de compétence et les échelles de maîtrise du reste de la gestion des résultats."
   if_the_additional_permissions_are_enabled_but_this_619c2a4a: "Si les autorisations supplémentaires sont activées, mais que cette autorisation ne l'est pas, les paramètres de verrouillage peuvent être modifiés sur les discussions individuelles."
-  if_the_course_content_permission_enabled_and_web_c_85f91e32: "Si l'autorisation « Contenu de cours » est activée et « Conférences web – créer » est désactivée, l’utilisateur peut toujours gérer les conférences existantes."
-  if_the_feature_option_is_enabled_and_this_permissi_3f9424e2: "Si l'option de fonctionnalité est activé, et que cette autorisation l’est également, la page Résultats contient trois onglets : Gérer, Maîtrise et Calculs."
+  if_the_course_content_permission_enabled_and_web_c_85f91e32: "Si l’autorisation « Contenu de cours » est activée et « Conférences web – créer » est désactivée, l’utilisateur peut toujours gérer les conférences existantes."
+  if_the_feature_option_is_enabled_and_this_permissi_3f9424e2: "Si l’option de fonctionnalité est activé, et que cette autorisation l’est également, la page Résultats contient trois onglets : Gérer, Maîtrise et Calculs."
   if_the_feature_preview_is_enabled_and_this_permiss_e79925a7: "Si l'aperçu de fonctionnalité est activé, et que cette autorisation l’est également, la page Résultats contient trois onglets : Gérer, Maîtrise et Calculs."
   if_the_open_registration_account_setting_is_enable_10b1965c: "Si le paramètre « Inscription libre » est activé, les utilisateurs disposant de cette autorisation peuvent ajouter des concepteurs à un cours de la page des cours à l'aide de l'adresse e-mail ou de l'identifiant de connexion, même si le concepteur ne dispose pas de compte Canvas."
   if_the_open_registration_account_setting_is_enable_1994a971: "Si le paramètre « Inscription libre » est activé, les utilisateurs disposant de cette autorisation peuvent ajouter des AE à un cours à l'aide de l'adresse e-mail ou de l'identifiant de connexion, même si l'AE ne dispose pas de compte Canvas."
@@ -13781,7 +13783,7 @@ fr:
   if_the_option_requiring_users_to_post_before_seein_a9274f5f: "Si l’option obligeant les utilisateurs à publier avant de voir la réponses est sélectionnée dans une discussion, ceux-ci doivent publier une réponse pour voir tous les messages sauf si « Discussions – modérer » est également activé."
   if_the_pages_update_permission_is_disabled_the_use_3df16c25: "Si l’autorisation « Mise à jours des pages » est désactivée, l’utilisateur peut toujours ajuster les paramètres de verrouillage du contenu des pages individuelles dans cours Blueprint principal."
   if_these_additional_permissions_are_enabled_but_as_d264879d: "Si ces autorisations supplémentaires sont activées, mais que « Travaux » et « Questionnaires - ajouter / modifier / supprimer » ne le sont pas, les paramètres de verrouillage de Blueprint pour un travail peuvent être gérés à partir de la page de détails du travail."
-  if_this_account_already_uses_sftp_please_reach_out_377296d1: "Si ce compte utilise déjà SFTP, veuillez nous contacter sur Slack dans le canal #canvas-sre. Leur nom d'utilisateur ne correspond pas à nos règles pour la création de noms d'utilisateurs."
+  if_this_account_already_uses_sftp_please_reach_out_377296d1: "Si ce compte utilise déjà SFTP, veuillez nous contacter sur Slack dans le canal #canvas-sre. Leur nom d’utilisateur ne correspond pas à nos règles pour la création de noms d’utilisateurs."
   if_this_account_does_not_use_sftp_currently_press__eb1b3b88: "Si ce compte n’utilise pas encore SFTP, cliquez sur Activer pour créer un utilisateur SFTP."
   if_this_permission_is_disabled_and_courses_add_edi_5f31ce8f: "Si cette permission est désactivée et que Cours - ajouter / modifier / supprimer est activé, les utilisateurs peuvent ajouter un nouveau cours à l'aide du bouton Ajouter un nouveau cours dans les Paramètres du compte."
   if_this_permission_is_disabled_and_courses_add_edi_9bafd797: |-
@@ -15274,7 +15276,7 @@ fr:
   matching_left_side_900f860b: "Correspond au côté gauche"
   matching_right_side_80_character_limit_217edfe1: "Correspondant au côté droit (limite de 80 caractères)"
   matching_right_side_920e71b2: "Correspond au côté droit"
-  math_scale_equation_images_5555a954: "Maths : Mettre à l’échelle les images d'équations"
+  math_scale_equation_images_5555a954: "Maths : Mettre à l’échelle les images d’équations"
   math_support_latex_math_equations_almost_everywher_75545098: "Maths : Prendre en charge les équations mathématiques LaTex presque partout"
   math_updated_equation_handling_b08edab3: "Maths : Nouvelle gestion des équations"
   mathquill: 
@@ -16200,7 +16202,6 @@ fr:
             
             %{course}, votre cours sur Canvas Network a démarré il y a quelques jours, et nous avons remarqué que vous ne vous êtes pas encore connecté. Nous vous envoyons ce dernier rappel, au cas où vous auriez oublié.
             
-            
             Pour vous connecter, rendez-vous sur %{site} puis saisissez votre nom d’utilisateur et votre mot de passe. Si vous n'avez pas encore paramétré de mot de passe, vous pouvez le faire ici : %{password_url}
             
             Si vous n’êtes tout simplement pas en mesure de suivre ce cours en particulier, n’hésitez pas à visiter le catalogue des cours disponibles à l'adresse %{site} pour trouver quelque chose qui vous intéresse. De nouveaux cours sont ajoutés régulièrement !
@@ -16247,7 +16248,6 @@ fr:
             Que pouvez-vous faire pour vous préparer ?
             
             Si vous n’avez pas encore créé votre profil Canvas Network, vous pouvez vous connecter et le paramétrer sur Canvas.net. Votre profil aidera les autres membres du cours à mieux vous connaître. Vous pourrez également y paramétrer vos préférences de notifications.
-            
             
             Enfin, vous pouvez visualiser les supports requis et toutes les instructions pour votre cours : %{url}
             
@@ -17279,6 +17279,7 @@ fr:
   mfa_required_ca66e177: "MFA requis"
   mfoster_708c21fb: mfoster@*
   mgp_grade_export_d29b471f: "Exportation de note MGP"
+  miami_utilization_report_9c927880: "Rapport d’utilisation Miami"
   mic_a7f3d311: Micro
   microsoft_365_allows_a_maximum_of_max_members_in_a_3acbd841: "Microsoft 365 autorise au maximum %{max} membres dans une équipe."
   microsoft_365_allows_a_maximum_of_max_owners_in_a__b448f5de: "Microsoft 365 autorise au maximum %{max} propriétaires dans une équipe."
@@ -17930,8 +17931,8 @@ fr:
       produits partenaires dans Canvas devrait activer cette fonctionnalité pour améliorer le flux de travail de validation
       des données des devoirs. Lorsque cette fonction est activée, les nouveaux paramètres
       d’intégration pour SIS Sync (transmission des notes au niveau des devoirs) s'affichent dans les Paramètres
-      du compte. L'aperçu de fonctionnalité Publier sur SIS a été incorporée à ce nouveau
-      paramètre et sera activé par défaut.
+      du compte. La fonction « Post to SIS » (Envoyer vers SIS) a été incorporée à ce nouveau
+      paramètre, elle sera activée par défaut.
   new_slack_api_key_453d04d: "Nouvelle clé d’API Slack"
   new_topic_for_course_3d98222a: "Nouveau sujet pour %{course}"
   new_typography_4eaeca26: "Nouvelle typographie"
@@ -18614,7 +18615,7 @@ fr:
   on_courses_with_usage_rights_enabled_enforces_usag_8b8072a3: "Sur les cours où les droits d'utilisation sont activés, impose la sélection des droits d'utilisation sur les pièces jointes aux sujets de discussion"
   on_paper_46d0ba36: "Sur Papier"
   on_time_17ca5ad9: "À l’heure"
-  on_time_percent_eebffe38: "À l'heure : %{percent}"
+  on_time_percent_eebffe38: "À l’heure : %{percent}"
   on_whitelist_will_only_be_the_domains_which_have_b_c4c3a861: "Activé - La liste blanche ne concernera que les domaines qui ont été ajoutés explicitement à ce compte."
   once_a_grade_is_posted_manually_it_will_automatica_26aff290: "\n\
       \x20             Une fois une note publiée manuellement, les nouvelles notifications sont automatiquement envoyées et la note devient visible aux élèves.\n\
@@ -19756,7 +19757,7 @@ fr:
         user_id: "ID utilisateur"
         user_roles: "Rôles de l'utilisateur"
         user_severity: "Sévérité de l'utilisateur"
-        username: "Nom d’utilisateur"
+        username: "Nom d'utilisateur"
   png_55cbb586: PNG
   points_bb475533: Points
   points_bceb5005: points
@@ -26159,7 +26160,6 @@ fr:
   this_report_shows_all_the_activity_from_users_enro_8f8e0ca1: |-
       Ce rapport affiche toute l’activité des utilisateurs inscrits dans tous les cours
         d'une période donnée. Le fichier csv qui en résultera contiendra une ligne par activité
-        
         d'élève ainsi que les en-têtes suivantes : section id, section sis id,
         section name (nom de la section), course id (id du cours), course sis id (id sis du cours), course name (nom du cours), term id (id de la période), term sis id (id sis de la période),
         term name (nom de la période), user id (id de l’utilisateur), user sis id (id sis de l’utilisateur), user name (nom de l’utilisateur), content type (type de contenu), content (contenu), times viewed (nombre de consultations),
@@ -28149,7 +28149,7 @@ fr:
   users_manage_login_details_9462b30f: "Utilisateurs - gérer les détails de connexion"
   users_manage_observers_126f03a3: "Utilisateurs - gérer les observateurs"
   users_manage_students_in_courses_d6168815: "Utilisateurs - gérer les élèves dans les cours"
-  users_matching_search_term_c604db9e: "Utilisateurs correspondant à « %{search_term} »\""
+  users_matching_search_term_c604db9e: "Utilisateurs correspondant à « %{search_term} »"
   users_moderate_content_36d6eed7: "Utilisateurs - modérer le contenu"
   users_observers_e0e66c52: "Utilisateurs - Observateurs"
   users_of_screen_readers_may_need_to_turn_off_the_v_98811cd: "Les utilisateurs de lecteurs d'écran devront peut-être désactiver le curseur virtuel afin de pouvoir utiliser ces raccourcis clavier"

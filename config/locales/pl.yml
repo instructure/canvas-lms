@@ -328,6 +328,7 @@ pl:
     turnitin_pledge: "Przesyłane zadanie jest wynikiem mojej indywidualnej pracy"
   account_97b34646: Konto
   account_account_b6b3746b: "Konto: %{account}"
+  account_administrators_can_always_create_courses_926dc0cb: "Administratorzy kont mogą w dowolnym momencie tworzyć kursy"
   account_and_course_level_outcome_mastery_scales_5bfe7a3b: "Skale opanowania materiału na poziomie kursu i konta"
   account_and_course_level_outcome_proficiencies_1cfa260: "Biegłość dla wyników na poziomie kursu i konta"
   account_and_subaccount_40c6430: "Konto i podkonto"
@@ -440,6 +441,7 @@ pl:
       login_handle_name_description: "Etykieta używana do unikatowych identyfikatorów logowania. Przykłady: Login, nazwa użytkownika, identyfikator uczestnika itp."
       unknown_user_url_description: "Witryna, na którą następuje przekierowanie gdy nie znaleziono w Canvas uwierzytelnionego użytkownika."
   account_course_and_user_search_22bf297a: "Wyszukiwanie konta kursu i użytkownika"
+  account_creation_still_in_progress_ac0e0a18: "Tworzenie konta jest nadal w toku"
   account_domain_78f43049: "Domeny konta"
   account_domain_lookups_f9d1147e: "Kontrole domeny konta"
   account_groups_2f301732: "Przelicz grupy"
@@ -453,7 +455,7 @@ pl:
   account_level_settings_manage_4fca6f8e: "Ustawienia na poziomie konta - zarządzaj"
   account_name_13ed649: "%{account_name}"
   account_name_7f63a13: "nazwa konta"
-  account_name_analytics_62bf60ae: "%{account.name} Analityka"
+  account_name_analytics_62bf60ae: "Analityka %{account.name}"
   account_name_bff54ed5: "Nazwa konta"
   account_navigation_80bbefd4: "Nawigacja konta"
   account_navigation_menu_10c05bf9: "Menu nawigacji na koncie"
@@ -1000,10 +1002,10 @@ pl:
       custom_reports: 
         end: 
           parameters: 
-            header: "Stan zapisu"
+            header: "Data zakończenia:"
         start: 
           parameters: 
-            header: "Stan zapisu"
+            header: "Data rozpoczęcia:"
     default_account_quotas_not_updated: "Domyślne przydziały konta nie zostały zaktualizowane"
     default_account_quotas_updated: "Zaktualizowano domyślne przydziały konta"
     devry: 
@@ -1366,7 +1368,7 @@ pl:
         media_quota: "Przydział multimedialny"
         site_admin_quotas: "Przydziały administratora witryny"
         student_quota: "Przydział uczestnika"
-        update: "Zaktualizuj wydarzenie"
+        update: Zaktualizuj
       account_roles: "Role konta:"
       account_settings_title: "Ustawienia konta"
       add_a_custom_help_link: "Dodaj własne łącze pomocy"
@@ -5033,7 +5035,7 @@ pl:
   bulk_course_migrations: 
     bulk_course_migration: 
       exporting: "Eksportowanie z Blackboard"
-      failed: "Zakończono niepowodzeniem"
+      failed: "Nie powiodło się"
       finished: Zakończono
       importing: "Importowanie do systemu Canvas"
       migration_cancelled_on: "Anulowano w %{date}"
@@ -10578,7 +10580,7 @@ pl:
       formatting: "Formatowanie; naciskaj do dołu, aby wybrać"
       rte_help: "Obszar Rich Text. Wciśnij ALT+F8 po pomoc"
   editor_button_6647db9c: "Przycisk edytora"
-  either_course_or_student_c42bb055: "Kurs albo uczestnik'"
+  either_course_or_student_c42bb055: "Kurs albo uczestnik"
   either_groupid_or_outcomeid_values_are_required_1ea29e33: "Wymagana jest wartość groupId lub outcomeId"
   either_the_url_or_domain_should_be_set_c29cf8c1: "Musisz ustawić url albo domenę"
   either_you_re_a_new_user_or_the_terms_of_use_has_c_29797cc2: "Albo jesteś nowym użytkownikiem, albo *Warunki korzystania* uległy zmianie od momentu, gdy wyraziłeś na nie zgodę. Zaakceptuj *Warunki korzystania*, aby kontynuować."
@@ -16559,7 +16561,6 @@ pl:
             
             %{course}, Twój kurs w Canvas Network został rozpoczęty parę dni temu i zauważyliśmy, że nie logowałeś się jeszcze. Chcieliśmy tylko wysłać Ci przypomnienie na wypadek, jeśli o tym nie pamiętasz.
             
-            
             Aby się zalogować, przejdź do %{site} i wpisz swoje imię i nazwisko oraz hasło. Jeśli nie masz jeszcze hasła, możesz skonfigurować je tutaj: %{password_url}
             
             Jeśli nie możesz ukończyć tego kursu, zapoznaj się z katalogiem kursów pod adresem %{site}, aby odnaleźć coś, co Ciebie zainspiruje. Nowe kursy są dodawane cały czas!
@@ -16606,7 +16607,6 @@ pl:
             Jak możesz się przygotować?
             
             Jeśli nie masz jeszcze profilu w Canvas Network profile, możesz się zalogować i skonfigurować go na Canvas.net. Dzięki Twojemu profilowi inni uczestnicy kursu będą wiedzieli o Tobie więcej. Możesz także skonfigurować preferencje dotyczące powiadomień.
-            
             
             I wreszcie, możesz przejrzeć wymagane materiały i wszelkie instrukcje do kursu w tym miejscu: %{url}
             
@@ -17644,6 +17644,7 @@ pl:
   mfa_required_ca66e177: "Wymagane MFA"
   mfoster_708c21fb: mfoster@*
   mgp_grade_export_d29b471f: "Eksport ocen MPG"
+  miami_utilization_report_9c927880: "Raport użycia z Miami"
   mic_a7f3d311: Mikrofon
   microsoft_365_allows_a_maximum_of_max_members_in_a_3acbd841: "Microsoft 365 zezwala na maksymalnie %{max} członków w zespole."
   microsoft_365_allows_a_maximum_of_max_owners_in_a__b448f5de: "Microsoft 365 zezwala na maksymalnie %{max} właścicieli w zespole."
@@ -18307,7 +18308,7 @@ pl:
       partnera powinni włączyć tę funkcję dla usprawnienia weryfikacji
       danych zadania. Po włączeniu funkcja wyświetla nowe ustawienia integracji
       SIS dla synchronizacji SIS (zwrot ocen na poziomie zadania (ang. Assignment Level Grade Passback))
-      w Ustawieniach konta. Funkcja Publikuj w podglądzie SIS została zintegrowana w nowych
+      w Ustawieniach konta. Funkcja Publikuj w SIS została zintegrowana w nowych
       ustawieniach i będzie domyślnie włączona.
   new_slack_api_key_453d04d: "Nowy klucz Slack API"
   new_topic_for_course_3d98222a: "Nowy temat dla kursu %{course}"
@@ -26718,11 +26719,10 @@ pl:
   this_report_shows_all_the_activity_from_users_enro_8f8e0ca1: |-
       Ten raport pokazuje całą aktywność użytkowników zapisanych we wszystkich kursach
         w danym okresie. Uzyskany plik CSV będzie zawierać jeden wiersz na aktywność uczestnika
-        
-        oraz posiadać następujące nagłówki: identyfikator sekcji, identyfikator SIS sekcji, nazwę sekcji,
-        identyfikator kursu, identyfikator SIS kursu, nazwę kursu,identyfikator okresu, identyfikator SIS okresu,
-        nazwę okresu, identyfikator użytkownika, identyfikator SIS użytkownika, nazwę użytkownika, typ zawartości,
-        zawartość, liczbę wyświetleń, liczbę uczestnictw, ostatnie wyświetlenie. Liczba wyświetleń i liczba uczestnictw są
+        oraz posiadać następujące nagłówki; identyfikator sekcji,
+        identyfikator SIS sekcji, nazwę sekcji, identyfikator kursu, identyfikator SIS kursu, nazwę kursu,
+        identyfikator użytkownika, identyfikator SIS użytkownika, typ zawartości, zawartość, liczbę wyświetleń,
+        liczbę uczestnictw, ostatnie wyświetlenie. Liczba wyświetleń i liczba uczestnictw są
         zliczane od początku czas aż do chwili wygenerowania raportu.
         Pobrane zostaną maksymalnie dane z jednego miesiąca. Domyślnie zwrócone zostaną dane
         od początku poprzedniego tygodnia.
@@ -28135,7 +28135,7 @@ pl:
   uri_redirect_uri_d4aad2b9: "URI: %{redirect_uri}"
   url_22a5f3b8: URL
   url_8c4ff7d2: URL
-  url_cc9398ca: "Adres URL:"
+  url_cc9398ca: "URL:"
   url_is_required_4689ed84: "Wymagany jest adres URL"
   url_preview_5d1f4a4e: "Podgląd adresu URL"
   url_submission_f76327e3: "Adres URL przesłanego zadania"

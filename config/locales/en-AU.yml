@@ -6,7 +6,7 @@ en-AU:
   1_item_scores_examplescores_9736236: "1- Item Scores: %{exampleScores}"
   1_user_found_76399771: "1 user found."
   1st_reviewer_3c1d0119: "1st Reviewer"
-  25th_75th_ile_406a67bf: "25th-75th %ile"
+  25th_75th_ile_406a67bf: "25th-75th Percentile"
   25th_75th_percentile_aa4c11f2: "25th-75th Percentile"
   2_final_score_7b0fd15e: "2- Final score"
   2_final_score_exampleresult_922edf9c: "2- Final Score: %{exampleResult}"
@@ -316,6 +316,7 @@ en-AU:
     turnitin_pledge: "This assignment submission is my own, original work"
   account_97b34646: Account
   account_account_b6b3746b: "Account: %{account}"
+  account_administrators_can_always_create_courses_926dc0cb: "Account Administrators can always create courses"
   account_and_course_level_outcome_mastery_scales_5bfe7a3b: "Account and Course Level Outcome Mastery Scales"
   account_and_course_level_outcome_proficiencies_1cfa260: "Account and Course Level Outcome Proficiencies"
   account_and_subaccount_40c6430: "Account and Subaccount"
@@ -428,6 +429,7 @@ en-AU:
       login_handle_name_description: "The label used for unique login identifiers. Examples: Login, Username, Student ID, etc."
       unknown_user_url_description: "The URL to redirect to when an authenticated user is not found in Canvas."
   account_course_and_user_search_22bf297a: "Account Course and User Search"
+  account_creation_still_in_progress_ac0e0a18: "Account creation still in progress"
   account_domain_78f43049: "Account Domain"
   account_domain_lookups_f9d1147e: "Account Domain Lookups"
   account_groups_2f301732: "Account Groups"
@@ -982,10 +984,10 @@ en-AU:
       custom_reports: 
         end: 
           parameters: 
-            header: "Enrolment State"
+            header: "End at:"
         start: 
           parameters: 
-            header: "Enrolment State"
+            header: "Start at:"
     default_account_quotas_not_updated: "Default account quotas were not updated"
     default_account_quotas_updated: "Default account quotas updated"
     devry: 
@@ -1348,7 +1350,7 @@ en-AU:
         media_quota: "Media Quota"
         site_admin_quotas: "Site Admin Quotas"
         student_quota: "Student Quota"
-        update: "Update Event"
+        update: Update
       account_roles: "Account roles:"
       account_settings_title: "Account Settings"
       add_a_custom_help_link: "Add a custom help link"
@@ -16247,7 +16249,6 @@ en-AU:
             
             %{course}, your course on Canvas Network, started a couple days ago, and we noticed you haven't logged in yet. We just wanted to send you one last reminder in case you forgot.
             
-            
             To log in, go to %{site} and enter your username and password. If you haven't set a password yet, you can set one here: %{password_url}
             
             If you simply can't make this particular course, feel free to browse our course catalogue at %{site} to find something else that inspires you. New courses are being added all the time!
@@ -16294,7 +16295,6 @@ en-AU:
             What can you do to get ready?
             
             If you haven't already created your Canvas Network profile, you can log in and set it up at Canvas.net. Your profile will help other people in the course know who you are. There, you can also set up your notification preferences.
-            
             
             Finally, you can review the required materials and any instructions for your course here: %{url}
             
@@ -17326,6 +17326,7 @@ en-AU:
   mfa_required_ca66e177: "MFA Required"
   mfoster_708c21fb: mfoster@*
   mgp_grade_export_d29b471f: "MGP Grade Export"
+  miami_utilization_report_9c927880: "Miami Utilisation Report"
   mic_a7f3d311: Mic
   microsoft_365_allows_a_maximum_of_max_members_in_a_3acbd841: "Microsoft 365 allows a maximum of %{max} members in a team."
   microsoft_365_allows_a_maximum_of_max_owners_in_a__b448f5de: "Microsoft 365 allows a maximum of %{max} owners in a team."
@@ -17977,7 +17978,7 @@ en-AU:
       partner products should enable this feature for enhanced assignment data
       validation workflows. When enabled, this feature displays the new SIS
       Integration settings for SIS Sync (Assignment Level Mark Passback) in Account
-      Settings. The Post to SIS feature preview has been incorporated into this new
+      Settings. The Post to SIS feature option has been incorporated into this new
       setting and will be enabled by default.
   new_slack_api_key_453d04d: "New Slack Api Key"
   new_topic_for_course_3d98222a: "New Topic for %{course}"
@@ -26232,7 +26233,6 @@ en-AU:
   this_report_shows_all_the_activity_from_users_enro_8f8e0ca1: |-
       This report shows all the activity from users enrolled in all courses
         in a given term. The resulting csv file will have one row per student
-        
         activity and will have the following headers: section id, section sis id,
         section name, course id, course sis id, course name, term id, term sis id,
         term name, user id, user sis id, user name, content type, content, times viewed,

@@ -6,7 +6,7 @@ is:
   1_item_scores_examplescores_9736236: "1- Hlutastig: %{exampleScores}"
   1_user_found_76399771: "1 notandi fannst"
   1st_reviewer_3c1d0119: "1. matsaðili"
-  25th_75th_ile_406a67bf: "25.-75. %ile"
+  25th_75th_ile_406a67bf: "25-75 hundraðshlutar"
   25th_75th_percentile_aa4c11f2: "25-75 hundraðshlutar"
   2_final_score_7b0fd15e: 2-Lokaeinkunn
   2_final_score_exampleresult_922edf9c: "2- Lokastig: %{exampleResult}"
@@ -302,6 +302,7 @@ is:
     turnitin_pledge: "Þetta skilaverkefni er mín eigin hugarsmíð"
   account_97b34646: Reikningur
   account_account_b6b3746b: "Reikningur: %{account}"
+  account_administrators_can_always_create_courses_926dc0cb: "Reikningsstjórnendur geta alltaf búið til námskeið"
   account_and_course_level_outcome_mastery_scales_5bfe7a3b: "Leiknikvarðar fyrir niðurstöður reiknings- og námskeiðsstig"
   account_and_course_level_outcome_proficiencies_1cfa260: "Niðurstöðuhæfni fyrir reiknings- og námskeiðsstig"
   account_and_subaccount_40c6430: "Reikningur og undirreikningur"
@@ -414,6 +415,7 @@ is:
       login_handle_name_description: "Merki notað fyrir einkvæm innskráningarauðkenni: Dæmi: Innskrá, Notandanafn, Auðkenni nemanda, o.s.frv.."
       unknown_user_url_description: "Vefslóð sem vísað er á þegar vottaður notandi finnst ekki í Canvas."
   account_course_and_user_search_22bf297a: "Leit að notanda og reikningi"
+  account_creation_still_in_progress_ac0e0a18: "Enn er verið að búa til reikning"
   account_domain_78f43049: Reikningslén
   account_domain_lookups_f9d1147e: "Uppfletting reikningsléns"
   account_groups_2f301732: Hópareikningur
@@ -957,10 +959,10 @@ is:
       custom_reports: 
         end: 
           parameters: 
-            header: Innritunarstaða
+            header: "Endar á:"
         start: 
           parameters: 
-            header: Innritunarstaða
+            header: "Byrjar á:"
     default_account_quotas_not_updated: "Sjálfgildir reikningskvótar voru ekki uppfærðir"
     default_account_quotas_updated: "Sjálfgildir reikningskvótar uppfærðir"
     devry: 
@@ -1323,7 +1325,7 @@ is:
         media_quota: Miðlakvóti
         site_admin_quotas: "Kvóti stjórnanda"
         student_quota: "Kvóti nemenda"
-        update: "Uppfæra viðburð"
+        update: Uppfæra
       account_settings_title: "Stillingar reiknings"
       add_admin_title: "Bæta við reikningsstjórnendum"
       add_ip_filter_link: Sía
@@ -14653,7 +14655,6 @@ is:
             
             %{course}, námskeiðið þitt á Canvas Network byrjaði fyrir nokkrum dögum og við tókum eftir að þú hefur ekki skráð þig inn ennþá. Við vildum senda þér eina áminningu í lokin ef þú hefðir gleymt þessu.
             
-            
             Til að skrá þig inn farðu á %{site} og sláðu inn notendanafn og lykilorð. Ef þú hefur ekki valið lykilorð getur þú gert það hér: %{password_url}
             
             Ef þú kemst ekki í þetta námskeið er þér frjálst að skoða námskeiðsbæklinginn á %{site} til að finna eitthvað annað sem veitir þér innblástur. Nýjum námskeiðum er stöðugt bætt við!
@@ -14700,7 +14701,6 @@ is:
             Hvernig getur þú undirbúið þig?
             
             Ef þú hefur ekki ennþá útbúið persónuupplýsingar í Canvas Network, geturðu skráð þig inn og útbúið þær á Canvas netinu. Persónuupplýsingar þínar hjálpa öðrum í námskeiðinu að vita hver þú ert. Þar geturðu líka sett upp tilkynningastillingar þínar.
-            
             
             Að lokum geturðu skoðað nauðsynleg efni og allar leiðbeiningar fyrir námskeiðið þitt hér: %{url}
             
@@ -15618,6 +15618,7 @@ is:
   mfa_required_ca66e177: "Fjölþátta auðkenningar krafist"
   mfoster_708c21fb: mfoster@*
   mgp_grade_export_d29b471f: "MGP útflutningur einkunnar"
+  miami_utilization_report_9c927880: "Nýtingarskýrsla Miami"
   mic_a7f3d311: Hljóðnemi
   microsoft_365_allows_a_maximum_of_max_members_in_a_3acbd841: "Microsoft 365 leyfir að hámarki %{max} meðlimi í lið."
   microsoft_365_allows_a_maximum_of_max_owners_in_a__b448f5de: "Microsoft 365 leyfir að hámarki %{max} eigendur í lið."
@@ -16125,8 +16126,8 @@ is:
       vörum viðskiptafélaga okkar ættu að virkja þennan eiginleika fyrir betra staðfestingar verkflæði
       verkefnagagna. Þegar þetta er virkjað sýnir þessi eiginleiki nýju SIS
       samþættingarstillingarnar fyrir SIS-samstillingu (einkunn til baka á verkefnastigi) í reiknings
-      stillingum. Pósta til SIS forskoðunareiginleikinn hefur verið felldur inn í þessa nýju
-      stillingu og verður sjálfgefið virkjuð.
+      stillingum. Birta á SIS eiginleikinn hefur verið innlimaður í þessa nýju
+      stillingu og verður sjálfvalið virkjaður.
   new_slack_api_key_453d04d: "Nýr Slack API-lykill"
   new_topic_for_course_3d98222a: "Nýtt umræðuefni fyrir %{course}"
   new_typography_4eaeca26: "Ný leturfræði"
@@ -20495,7 +20496,7 @@ is:
   salesforce_account_id_eb5c78ad: "Auðkenni Salesforce-reiknings"
   salesforce_has_a_different_login_host_for_sanbox_a_2d878ae9: "Salesforce hefur aðra hýsitölvu fyrir innskráningu sanbox-reikninga en framleiðslureikninga og ef þú notar sanbox-reikning Salesforce og hakar ekki í þennan reit, er ekki hægt að auðkenna (og þetta virkar líka öfugt, ef þú hefur framleiðslureikning og hakar í reitinn er heldur ekki hægt að auðkenna)"
   salesforce_ticketing_webtocase_connector_80f75716: "Salesforce WebToCase beiðnatengill"
-  same_value_as_canvas_url__c_will_probably_be_going_37027686: "Sama gildi og 'Canvas_URL__c', verður líklega fjarlægt fljótlega"
+  same_value_as_canvas_url__c_will_probably_be_going_37027686: "Sama gildi og 'Canvas_URL__c', hverfur sjálfsagt fljótlega"
   sample_data_e4fd01ff: Sýnisgögn
   saudi_arabia_966_d01ed717: "Sádi Arabía (+966)"
   save_11a80ec3: Vista
@@ -23667,7 +23668,6 @@ is:
   this_report_shows_all_the_activity_from_users_enro_8f8e0ca1: |-
       Þessi skýrsla sýnir alla virkni notenda sem innritaðir eru í öllum námskeiðum
         á gefinni önn. CSV skrá sem myndast mun hafa eina línu á hverja nemanda
-        
         virkni og mun hafa eftirfarandi hausa: hluta auðkenni,sis auðkenni hluta,
         hlutanafn, námskeiðsauðkenni, sis auðkenni námskeiðs,
         nafn námskeiðs, notanda auðkenni, sis auðkenni notanda, efni, skipti skoðað,

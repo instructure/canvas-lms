@@ -286,7 +286,7 @@ sv:
     default_term_name: "Förinställd termin"
     errors: 
       invalid_discovery_url: "Discovery URL är inte giltig"
-    feedback_coach: "Fråga forumet"
+    feedback_coach: "Fråga communityn"
     feedback_coach_sub: "Be om hjälp från en Canvas expert"
     feedback_feature_request_sub: "Har du en idé om hur vi kan förbättra Canvas?"
     manually_created_courses: "Manuellt skapade kurser"
@@ -315,6 +315,7 @@ sv:
     turnitin_pledge: "Den inlämnade uppgiften är mitt egna originella arbete"
   account_97b34646: Konto
   account_account_b6b3746b: "Konto: %{account}"
+  account_administrators_can_always_create_courses_926dc0cb: "Kontoadministratörer kan alltid skapa kurser"
   account_and_course_level_outcome_mastery_scales_5bfe7a3b: "Måluppfyllelseskalor för lärandemål på konto- och kursnivå"
   account_and_course_level_outcome_proficiencies_1cfa260: "Lärandemålskompetenser på konto- och kursnivå"
   account_and_subaccount_40c6430: "Konto och underkonto"
@@ -424,12 +425,13 @@ sv:
       login_handle_name_description: "Etiketten som används för att identifiera unika inloggningar. Exempel: Login, Användarnamn, Elev ID, etc."
       unknown_user_url_description: "Url att omdirigera till när en godkänd användare inte hittas i Canvas."
   account_course_and_user_search_22bf297a: "Konto, kurs och användarsökning"
+  account_creation_still_in_progress_ac0e0a18: "Kontot skapas fortfarande"
   account_domain_78f43049: Kontodomän
-  account_domain_lookups_f9d1147e: "Domänsökningar för kontot"
+  account_domain_lookups_f9d1147e: "Uppslag för kontodomän"
   account_groups_2f301732: Kontogrupper
   account_id_2c3b4f15: konto-Id
   account_id_73966078: account_id
-  account_id_f6e26867: Konto-Id
+  account_id_f6e26867: Konto-ID
   account_level_mastery_scales_a5bdff29: "Skalor för måluppfyllelse på kontonivå"
   account_level_notification_preferences_require_an__66467cd7: "För uppdatering krävs ett account_id för aviseringsinställningar på kontonivå"
   account_level_notification_preferences_ui_update_f5e189a4: "Uppdatering av meddelandepreferenser för kontonivå"
@@ -437,7 +439,7 @@ sv:
   account_level_settings_manage_4fca6f8e: "Inställningar på kontonivå – hantera"
   account_name_13ed649: "%{account_name}"
   account_name_7f63a13: kontonamn
-  account_name_analytics_62bf60ae: "%{account.name} Analys"
+  account_name_analytics_62bf60ae: "%{account.name} Analytics"
   account_name_bff54ed5: Kontonamn
   account_navigation_80bbefd4: Kontonavigering
   account_navigation_menu_10c05bf9: "Navigeringsmeny för konto"
@@ -978,10 +980,10 @@ sv:
       custom_reports: 
         end: 
           parameters: 
-            header: Anmälningsstatus
+            header: "Sluta kl:"
         start: 
           parameters: 
-            header: Anmälningsstatus
+            header: "Börja kl:"
     default_account_quotas_not_updated: "Förinställda kontokvoter uppdaterades inte"
     default_account_quotas_updated: "Förinställda kontokvoter uppdaterades"
     devry: 
@@ -1323,7 +1325,7 @@ sv:
           quiz_id: 
             field: Quiz-ID
           section_id: 
-            field: Sektions-ID
+            field: "Sektions ID"
     settings: 
       about_google_docs: |-
           Med förhandsvisning av Google Dokument kan användare visa dokument från
@@ -1340,11 +1342,11 @@ sv:
       account_admins_title: Kontoadmin
       account_quotas: 
         file_quota: Filkvot
-        gigabytes: gigabytes
-        media_quota: Mediakvot
-        site_admin_quotas: Hemsida-administratörskvoter
-        student_quota: studentkvot
-        update: "Uppdatera händelse"
+        gigabytes: gigabyte
+        media_quota: Mediekvot
+        site_admin_quotas: "Kvoter för webbplatsadministratörer"
+        student_quota: Studentkvot
+        update: Uppdatera
       account_roles: "Roller på kontot:"
       account_settings_title: Kontoinställningar
       add_a_custom_help_link: "Lägg till en egen hjälplänk"
@@ -10309,7 +10311,7 @@ sv:
       formatting: "Formatering, tryck ner för att välja"
       rte_help: "RTF-område. Tryck ALT+F8 för hjälp"
   editor_button_6647db9c: Redigerarknapp
-  either_course_or_student_c42bb055: "Antingen ”kurs” eller ”student”'"
+  either_course_or_student_c42bb055: "Antingen ”kurs” eller ”student”"
   either_groupid_or_outcomeid_values_are_required_1ea29e33: "Antingen groupId- eller outcomeId-värden krävs"
   either_the_url_or_domain_should_be_set_c29cf8c1: "Antingen URL:en eller domänen måste ställas in."
   either_you_re_a_new_user_or_the_terms_of_use_has_c_29797cc2: "Antingen så är du en ny användare eller så har *användningsvillkoren* ändrats sedan du senast godkände dessa. Godkänn *användningsvillkoren* innan du fortsätter"
@@ -11011,10 +11013,10 @@ sv:
   example_final_score_a92b30b9: "Exempel på slutresultat]]"
   example_https_example_com_config_xml_be5f36ac: "Exempel: https://example.com/config.xml"
   example_https_lti_tool_provider_example_herokuapp__e9802142: "Exempel: https://lti-tool-provider-example.herokuapp.com/register"
-  example_https_schoolofrock_catalog_instructure_com_b7a35ab5: "exempel: https://schoolofrock.catalog.instructure.com\""
-  example_https_schoolofrock_edu_d4326f03: "exempel: https://schoolofrock.edu\""
+  example_https_schoolofrock_catalog_instructure_com_b7a35ab5: "exempel: https://schoolofrock.catalog.instructure.com"
+  example_https_schoolofrock_edu_d4326f03: "exempel: https://schoolofrock.edu"
   example_item_scores_6726c689: "Exempel på resultatpoäng"
-  example_school_of_rock_41f32c31: "exempel: School of Rock\""
+  example_school_of_rock_41f32c31: "exempel: School of Rock"
   exceeds_expectations_5910fc3a: "Överträffar förväntningarna"
   exceeds_mastery_1f995dce: "Överträffar måluppfyllelse"
   excelsior_student_activity_tracking_7a1ba44d: "Studentaktivitetsspårning för Excelsior"
@@ -16209,7 +16211,6 @@ sv:
             
             %{course} Din Canvas Network-kurs började för ett par dagar sedan och vi har upptäckt att du ännu inte har loggat in. Vill vill bara påminna dig en sista gång i fall du har glömt det.
             
-            
             Du loggar in genom att gå till %{site} och ange ditt användarnamn och lösenord. Om du inte har angett ett lösenord än kan du göra det här: %{password_url}
             
             Om du helt enkelt inte kan delta i den här kursen är du välkommen att söka i vår kurskatalog på %{site} efter något annat som kan inspirera dig. Nya kurser läggs till hela tiden!
@@ -16256,7 +16257,6 @@ sv:
             Hur kan du förbereda dig?
             
             Om du inte redan har skapat din Canvas Network-profil kan du logga in och konfigurera den på Canvas.net. Med din profil hjälper du andra kursdeltagare att se vem du är. Du kan samtidigt konfigurera dina aviseringsinställningar.
-            
             
             Och slutligen kan du granska material och instruktioner för din kurs här: %{url}
             
@@ -17288,6 +17288,7 @@ sv:
   mfa_required_ca66e177: "Flerfaktorsautentisering krävs"
   mfoster_708c21fb: mfoster@*
   mgp_grade_export_d29b471f: MGP-omdömesexport
+  miami_utilization_report_9c927880: "Användningsrapport för Miami"
   mic_a7f3d311: Mikrofon
   microsoft_365_allows_a_maximum_of_max_members_in_a_3acbd841: "Max %{max} medlemmar tillåts i ett Microsoft 365-team."
   microsoft_365_allows_a_maximum_of_max_owners_in_a__b448f5de: "Max %{max} ägare tillåts i ett Microsoft 365-team."
@@ -17939,8 +17940,8 @@ sv:
       partnerprodukter bör aktivera den här funktionen för att få förbättrade arbetsflöden för
       validering av uppgiftsdata. När denna är aktiverad visas de nya SIS
       Integration-inställningarna för SIS Sync (Assignment Level Grade Passback) i
-      Kontoinställningarna. Förhandsgranskningen av funktionen Publicera till SIS har införlivats i den här nya
-      inställningen och kommer att vara aktiverad som standard.
+      Kontoinställningarna. Funktionsalternativet att publicera till SIS har inkorporerats i den här nya
+      inställningen och är aktiverat som standard.
   new_slack_api_key_453d04d: "Ny API-nyckel för Slack:"
   new_topic_for_course_3d98222a: "Nytt ämne för %{course}"
   new_typography_4eaeca26: "Ny typografi"
@@ -18164,7 +18165,7 @@ sv:
   not_yet_graded_40475341: "Har inte bedömts ännu"
   note_8b73ce09: Anteckning
   note_associated_tools_are_only_listed_once_even_if_ebae2aba: |-
-      NOTE: De associerade verktygen listas bara en gång, även om de har
+      OBS! De associerade verktygen listas bara en gång, även om de har
                       installerats i flera underkonton.
   note_for_differentiated_group_topics_some_threads__90adbb21: "Obs! För differentierade gruppämnen kan det hända att vissa trådar inte har några tilldelade studenter."
   note_grades_and_notes_will_be_saved_automatically__e3270872: "Obs! Omdömen och anteckningar sparas automatiskt efter att man flyttar ut ur fältet."
@@ -26159,7 +26160,6 @@ sv:
   this_report_shows_all_the_activity_from_users_enro_8f8e0ca1: |-
       Den här rapporten visar alla aktiviteter för en användare som registrerat sig för alla kurser
         en viss termin. CSV-filen visar en rad per studentaktivitet
-        
         och har följande rubriker: sektions-ID, SIS-id för sektion, sektionsnamn,
         kurs-ID, SIS-ID för kurs, kursnamn, termin-ID, SIS-ID för termin, terminsnamn,
         användar-ID, SIS-ID för användare, användarnamn, innehållstyp, innehåll,

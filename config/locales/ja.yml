@@ -6,7 +6,7 @@ ja:
   1_item_scores_examplescores_9736236: "1- 項目スコア：%{exampleScores}"
   1_user_found_76399771: "1 人のユーザが見つかりました。"
   1st_reviewer_3c1d0119: 1番目の評価者
-  25th_75th_ile_406a67bf: "25パーセンタイル-75 %iタイル"
+  25th_75th_ile_406a67bf: 25パーセンタイル-75パーセンタイル
   25th_75th_percentile_aa4c11f2: 25パーセンタイル-75パーセンタイル
   2_final_score_7b0fd15e: "2- 最終スコア"
   2_final_score_exampleresult_922edf9c: "2- 最終スコア：%{exampleResult}"
@@ -315,6 +315,7 @@ ja:
     turnitin_pledge: この課題提出物は私自身のものであり、オリジナルの研究結果です
   account_97b34646: アカウント
   account_account_b6b3746b: "アカウント：%{account}"
+  account_administrators_can_always_create_courses_926dc0cb: アカウント管理者は常にコースを作成可能
   account_and_course_level_outcome_mastery_scales_5bfe7a3b: アカウントおよびコースレベルの成果の達成度スケール
   account_and_course_level_outcome_proficiencies_1cfa260: アカウントおよびコースレベルの成果の熟達度
   account_and_subaccount_40c6430: アカウントとサブアカウント
@@ -427,6 +428,7 @@ ja:
       login_handle_name_description: "一意のログイン ID に使用されるラベル。例:ログイン、ユーザ名、受講生 ID、など。"
       unknown_user_url_description: "認証されたユーザが Canvas で見つからないときにリダイレクトする URL。"
   account_course_and_user_search_22bf297a: アカウントコースとユーザーの検索
+  account_creation_still_in_progress_ac0e0a18: アカウント作成はまだ進行中
   account_domain_78f43049: "アカウント ドメイン"
   account_domain_lookups_f9d1147e: "アカウント ドメイン ルックアップ"
   account_groups_2f301732: アカウントグループ
@@ -981,10 +983,10 @@ ja:
       custom_reports: 
         end: 
           parameters: 
-            header: 登録状態
+            header: "終了日:"
         start: 
           parameters: 
-            header: 登録状態
+            header: "開始日:"
     default_account_quotas_not_updated: "デフォルトのアカウント クォータは更新されませんでした"
     default_account_quotas_updated: "デフォルトのアカウント クォータが更新されました"
     devry: 
@@ -1201,7 +1203,7 @@ ja:
       account_reports: 
         pearson: 
           outcome: 
-            text: "コース Sis ID"
+            text: "コース Sis ＩＤ"
     proserve_all_versions_submissions_csv_parameters: 
       account_reports: 
         proserv: 
@@ -1347,7 +1349,7 @@ ja:
         media_quota: "メディア クォータ"
         site_admin_quotas: サイト管理者のクォータ
         student_quota: 受講生のクォータ
-        update: イベントの更新
+        update: 更新
       account_roles: "アカウントの役割:"
       account_settings_title: アカウント設定
       add_a_custom_help_link: "カスタム ヘルプ リンクを追加する"
@@ -1737,7 +1739,7 @@ ja:
       account_reports: 
         pearson: 
           outcome: 
-            text: "コース Sis ID"
+            text: "コース Sis ＩＤ"
     students_with_no_submissions_csv_description: 
       account_reports: 
         default: 
@@ -1825,7 +1827,7 @@ ja:
       account_reports: 
         pearson: 
           outcome: 
-            text: "コース Sis ID"
+            text: "コース Sis ＩＤ"
     wssu: 
       user_access: 
         parameters: 
@@ -3171,9 +3173,9 @@ ja:
   and_more_not_shown_here_7842765e: "...そして、ここに掲載されていないものがさらに"
   ange_name: "Angel コンバータ"
   angel: 
-    file_copy_fail: "フォルダ 「%{base_path}」 をコピーできませんでした\""
-    file_copy_fail_message: "デイレクトリをパス 「%{path}」 に名前を変更できませんでした\""
-    file_import_fail: "ファイル 「%{file_path}」 をインポートできませんでした\""
+    file_copy_fail: "フォルダ 「%{base_path}」 をコピーできませんでした"
+    file_copy_fail_message: "デイレクトリをパス 「%{path}」 に名前を変更できませんでした"
+    file_import_fail: "ファイル 「%{file_path}」 をインポートできませんでした"
   angel_display: "ANGEL 学習"
   angel_file_description: "Angel から .zip 形式でエクスポート"
   annotated_document_submission_d9ff236a: 注釈付きドキュメントの提出
@@ -10301,7 +10303,7 @@ ja:
       formatting: 書式設定、押して選択
       rte_help: リッチテキストエリア。ヘルプへは、ALT+F8を押してください
   editor_button_6647db9c: エディタのボタン
-  either_course_or_student_c42bb055: 「コース」または「受講生」のいずれか'
+  either_course_or_student_c42bb055: 「コース」または「受講生」のいずれか
   either_groupid_or_outcomeid_values_are_required_1ea29e33: groupIdまたはoutcomeIdのいずれかの値が必要です
   either_the_url_or_domain_should_be_set_c29cf8c1: "URL またはドメインのどちらか一方を設定する必要があります。"
   either_you_re_a_new_user_or_the_terms_of_use_has_c_29797cc2: あなたは新しいユーザーであるか、最後に同意して以降、*利用規約*が変更されています。続行する前に*利用規約*に同意してください。
@@ -11005,10 +11007,10 @@ ja:
   example_final_score_a92b30b9: "最終スコアの例]]"
   example_https_example_com_config_xml_be5f36ac: "例: https://example.com/config.xml"
   example_https_lti_tool_provider_example_herokuapp__e9802142: "例: https://lti-tool-provider-example.herokuapp.com/register"
-  example_https_schoolofrock_catalog_instructure_com_b7a35ab5: "例：「https://schoolofrock.catalog.instructure.com」\""
-  example_https_schoolofrock_edu_d4326f03: "例：「https://schoolofrock.edu」\""
+  example_https_schoolofrock_catalog_instructure_com_b7a35ab5: "例：「https://schoolofrock.catalog.instructure.com」"
+  example_https_schoolofrock_edu_d4326f03: "例：「https://schoolofrock.edu」"
   example_item_scores_6726c689: アイテムのスコアの例
-  example_school_of_rock_41f32c31: 例：「ロックスクール」"
+  example_school_of_rock_41f32c31: 例：「ロックスクール」
   exceeds_expectations_5910fc3a: 期待値を超えている
   exceeds_mastery_1f995dce: 熟達を上回る
   excelsior_student_activity_tracking_7a1ba44d: 優秀な受講生アクティビティの追跡
@@ -14089,7 +14091,7 @@ ja:
   instructor_is_working_on_grades_135388d2: インストラクタが採点中です
   instructor_messages_a4c28674: インストラクターのメッセージ
   instructor_name_36bc0f39: 講師名
-  instructor_sis_id_899dd697: "講師 Sis ID"
+  instructor_sis_id_899dd697: "講師 Sis ＩＤ"
   instructors_4b491a07: 講師
   instructors_cdd595d0: 講師
   instructure: 
@@ -16197,7 +16199,6 @@ ja:
             
             %{course}さん、Canvas Network のあなたのコースが2，3日前に開始しましたが、あなたはまだログインしていないようです。忘れている場合を想定して、最後にいちどリマインダを送っています。
             
-            
             ログインするには、%{site}に進んでユーザ名とパスワードを入力してください。まだパスワードを設定していない場合は、ここで設定できます：%{password_url}
             
             もし、都合が合わずにこのコースを受講できない場合は、%{site}次のサイトでコースカタログを閲覧して、他のコースを探してみてください。常に新しいコースが追加されています！
@@ -16244,7 +16245,6 @@ ja:
             何か準備のためにできることはありますか？
             
             まだ Canvas Network のプロフィールを作成がまだなら、Canvas.net にログインして設定してください。プロフィールを用意しておくと、コースに参加している他の人があなたについて知るのに役立ちます。そこでは、通知の設定を行うこともできます。
-            
             
             最後に、あなたのコースに必要な教材や説明書をここで確認することができます。%{url}
             
@@ -17276,6 +17276,7 @@ ja:
   mfa_required_ca66e177: MFAは必須
   mfoster_708c21fb: mfoster@*
   mgp_grade_export_d29b471f: "MGP 成績のエクスポート"
+  miami_utilization_report_9c927880: "Miami Utilization のレポート"
   mic_a7f3d311: マイク
   microsoft_365_allows_a_maximum_of_max_members_in_a_3acbd841: "Microsoft 365 では、チームに最大%{max}名のメンバーが許可されます。"
   microsoft_365_allows_a_maximum_of_max_owners_in_a__b448f5de: "Microsoft 365では、チーム内に最大%{max}名の所有者が許可されます。"
@@ -17927,8 +17928,8 @@ ja:
       ているお客様は、割り当てデータ検証ワークフローを強化するよう、
       機能を有効にしてください。この機能を有効にすると、アカウント
       設定内にSIS Sync用の新しいSIS統合設定が表示されます
-      （課題レベルグレードパスバック）。SISへの投稿機能プレビューがこの新しい
-      設定に組み入れられ、デフォルトで有効になります。
+      （課題レベルグレードパスバック）。SISへの投稿機能オプショ
+      ンがこの新しい設定に組み入れられ、デフォルトで有効になります。
   new_slack_api_key_453d04d: "新しい Slack Api キー"
   new_topic_for_course_3d98222a: "%{course} の新しいトピック:"
   new_typography_4eaeca26: 新しいタイポグラフィー
@@ -23412,6 +23413,9 @@ ja:
   settings_for_title_label_e103bdd6: "～の設定%{title_label}"
   settings_tutorial_tray_6f37761b: セッティングのチュートリアルトレイ
   setup_checklist_eb8b00b8: 設定チェックリスト
+  sftp_key_added_to_user_it_can_take_up_to_four_hour_8791e3c3: |-
+      ユーザに SFTP キーが追加されました。このキーが使えるようになるまで、最大
+                                    4時間かかることがあります。
   sftp_key_is_invalid_please_ensure_it_is_correctly__2d309e0b: SFTPキーが無効です。正しくフォーマットされていることを確認してください。
   sftp_key_removed_from_user_42318725: SFTPキーがユーザから削除されました。
   sftp_user_already_exists_or_is_disabled_please_rea_9554a53a: |-
@@ -26148,7 +26152,6 @@ ja:
   this_report_shows_all_the_activity_from_users_enro_8f8e0ca1: |-
       このレポートは、全コースまたは
         指定された期間の全コースに登録されたユーザのすべてのアクティビティを表示します。結果の csv ファイルは、受講生の
-        
         アクティビティごとに1行となり、以下を持ちます：ヘッダー、セクション id、セクション sis id、
         セクション名、コース id、コース sis id、コース名、期間 id、期間 sis id、
         期間名、ユーザ id、ユーザ sis id、ユーザ名、コンテンツタイプ、コンテンツ、コンテンツ閲覧回数、
@@ -27557,7 +27560,7 @@ ja:
   uri_redirect_uri_d4aad2b9: "URI:%{redirect_uri}"
   url_22a5f3b8: URL
   url_8c4ff7d2: Url
-  url_cc9398ca: "URL:"
+  url_cc9398ca: URL：
   url_is_required_4689ed84: URLが必要です
   url_preview_5d1f4a4e: "URL のプレビュー"
   url_submission_f76327e3: "URL 提出"
@@ -28138,7 +28141,7 @@ ja:
   users_manage_login_details_9462b30f: "ユーザー - ログインの詳細を管理する"
   users_manage_observers_126f03a3: "ユーザー - オブザーバーを管理する"
   users_manage_students_in_courses_d6168815: "ユーザー - コースで受講生を管理する"
-  users_matching_search_term_c604db9e: "「%{search_term}」と一致するユーザ\""
+  users_matching_search_term_c604db9e: "「%{search_term}」と一致するユーザ"
   users_moderate_content_36d6eed7: "ユーザー - 中程度のコンテンツ"
   users_observers_e0e66c52: "ユーザー - オブザーバー"
   users_of_screen_readers_may_need_to_turn_off_the_v_98811cd: スクリーンリーダーのユーザーは、これらのキーボードショートカットを使用するために、バーチャルカーソルをオフにすることが必要になる可能性があります
