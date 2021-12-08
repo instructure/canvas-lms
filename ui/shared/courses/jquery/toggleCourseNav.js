@@ -45,6 +45,11 @@ const resizeStickyFrame = () => {
   }
 }
 
+const saveCourseNavCollapseState = () => {
+  const menuExpanded = $('body').hasClass('course-menu-expanded')
+  $.ajaxJSON('/api/v1/users/self/settings', 'PUT', {collapse_course_nav: !menuExpanded})
+}
+
 /**
  * should be called on page load
  */
@@ -61,10 +66,14 @@ const initialize = () => {
     '#courseMenuToggle',
     $stickyFrame
       ? () => {
-          $(toggleCourseNav)
-          $(resizeStickyFrame)
+          toggleCourseNav()
+          resizeStickyFrame()
+          saveCourseNavCollapseState()
         }
-      : toggleCourseNav
+      : () => {
+          toggleCourseNav()
+          saveCourseNavCollapseState()
+        }
   )
 }
 

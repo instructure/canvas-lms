@@ -1782,6 +1782,10 @@ class User < ActiveRecord::Base
     !!preferences[:comment_library_suggestions_enabled]
   end
 
+  def collapse_course_nav?
+    !!preferences[:collapse_course_nav]
+  end
+
   # ***** OHI If you're going to add a lot of data into `preferences` here maybe take a look at app/models/user_preference_value.rb instead ***
   # it will store the data in a separate table on the db and lighten the load on poor `users`
 
