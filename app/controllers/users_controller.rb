@@ -1606,7 +1606,7 @@ class UsersController < ApplicationController
     create_user
   end
 
-  BOOLEAN_PREFS = %i[manual_mark_as_read collapse_global_nav hide_dashcard_color_overlays release_notes_badge_disabled comment_library_suggestions_enabled elementary_dashboard_disabled].freeze
+  BOOLEAN_PREFS = %i[manual_mark_as_read collapse_global_nav collapse_course_nav hide_dashcard_color_overlays release_notes_badge_disabled comment_library_suggestions_enabled elementary_dashboard_disabled].freeze
 
   # @API Update user settings.
   # Update an existing user's settings.
@@ -1620,6 +1620,10 @@ class UsersController < ApplicationController
   #
   # @argument collapse_global_nav [Boolean]
   #   If true, the user's page loads with the global navigation collapsed
+  #
+  # @argument collapse_course_nav [Boolean]
+  #   If true, the user's course pages will load with the course navigation
+  #   collapsed.
   #
   # @argument hide_dashcard_color_overlays [Boolean]
   #   If true, images on course cards will be presented without being tinted
