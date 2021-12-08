@@ -2382,7 +2382,7 @@ CanvasRails::Application.routes.draw do
       get "courses/:course_id/pace_plans/:id", action: :api_show
       put "courses/:course_id/pace_plans/:id", action: :update
       post "courses/:course_id/pace_plans/:id/publish", action: :publish
-      get "courses/:course_id/pace_plans/compress_dates", action: :compress_dates
+      post "courses/:course_id/pace_plans/compress_dates", action: :compress_dates
     end
 
     scope(controller: :eportfolios_api) do
