@@ -21440,7 +21440,7 @@ nn:
   the_term_to_get_courses_from_f6af2678: "Semester å hente emne frå"
   the_term_to_report_on_5f586e7c: "Semesteret som rapporten gjeld for"
   the_term_to_report_on_needed_for_report_type_stude_623bffbc: "Semesteret som rapporten gjeld for (for rapporttype kun student)"
-  the_terms_to_report_submissions_on_60c250db: "Semestera rapporten skal vise innleveringar for"
+  the_terms_to_report_submissions_on_60c250db: "Dei semestera rapporten skal vise innleveringar for"
   the_title_cannot_be_longer_than_length_characters_7a822943: "Tittelen kan ikke vere lengre enn %{length} teikn"
   the_title_of_the_following_question_bank_was_trunc_b6c86975: "Tittelen til følgande spørsmålsbank er avkorta: \"%{title}\""
   the_tool_is_not_installed_in_the_course_or_account_1be7230b: "Verktøyet er ikkje installert for emnet eller konto"
