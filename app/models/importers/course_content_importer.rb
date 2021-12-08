@@ -496,6 +496,14 @@ module Importers
         course.image_id = image_att.id
         course.image_url = nil
       end
+      if (banner_image_url = settings[:banner_image_url])
+        course.banner_image_url = banner_image_url
+        course.banner_image_id = nil
+      elsif (image_ref = settings[:banner_image_identifier_ref]) &&
+            (image_att = course.attachments.where(migration_id: image_ref).active.first)
+        course.banner_image_id = image_att.id
+        course.banner_image_url = nil
+      end
       if settings[:lock_all_announcements]
         Announcement.lock_from_course(course)
       end
