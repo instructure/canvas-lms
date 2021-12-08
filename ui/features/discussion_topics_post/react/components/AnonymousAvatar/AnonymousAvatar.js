@@ -22,7 +22,7 @@ import React from 'react'
 import {string} from 'prop-types'
 import {View} from '@instructure/ui-view'
 
-export const AnonymousAvatar = ({seedString}) => {
+export const AnonymousAvatar = ({seedString, ...props}) => {
   return (
     <View
       display="inline-block"
@@ -31,6 +31,7 @@ export const AnonymousAvatar = ({seedString}) => {
       borderWidth="medium"
       width="50px"
       height="50px"
+      {...props}
     >
       <Flex width="100%" height="100%" alignItems="center" justifyItems="center">
         <Flex.Item>

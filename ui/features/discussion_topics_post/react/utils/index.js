@@ -186,6 +186,7 @@ export const getOptimisticResponse = (
         shortName: quotedEntry.author.shortName,
         __typename: 'User'
       },
+      anonymousAuthor: null,
       editor: null,
       deleted: false,
       __typename: 'DiscussionEntry'
