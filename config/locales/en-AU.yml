@@ -2340,6 +2340,7 @@ en-AU:
       Allows for discussion replies to be sorted according to creation
       timestamps. Default order is newest to oldest for root level replies.
   allows_help_links_to_be_tagged_as_featured_or_new__ed5742c2: "Allows Help Links to be tagged as Featured or New and prominently displays the Featured Help Link in the Help Menu."
+  allows_instructors_to_apply_scores_to_ungraded_sub_7e772795: "Allows instructors to apply scores to ungraded submissions en masse."
   allows_learning_outcomes_to_be_selectable_when_mig_acf15555: "Allows learning outcomes to be selectable when migrating course content"
   allows_modifying_notification_settings_for_any_cou_5004ac71: "Allows modifying notification settings for any course from within the account-level notification settings page."
   allows_setting_account_course_level_mastery_scales_1939e0fd: "Allows setting Account & Course Level mastery scales and calculation methods, replacing per-outcome criterion ratings & calculation methods"
@@ -3283,6 +3284,7 @@ en-AU:
   anonymous_submission_assignment_title_896654de: "Anonymous Submission: %{assignment_title}"
   anonymous_submission_comment_student_id_assignment_10ffe8c7: "Anonymous Submission Comment: Student (%{id}), %{assignment_title}, %{course_name}"
   anonymous_submission_comment_student_user_id_assig_96b99600: "Anonymous Submission Comment: Student (%{user_id}), %{assignment_title}, %{course_name}"
+  anonymous_topic_notice: "That topic requires the Discussions / Announcements Redesign feature flag turned on"
   anonymous_turned_off_8118a0b: "Anonymous turned off"
   anonymous_turned_on_fe56f997: "Anonymous turned on"
   anonymous_user: "Anonymous User"
@@ -3382,6 +3384,7 @@ en-AU:
   apply_date_range_selection_cc4351ed: "Apply date range selection"
   apply_filter_7e4f6113: "Apply filter"
   apply_filters_note_clicking_this_button_will_cause_753f04: "Apply filters. Note: clicking this button will cause the page to reload."
+  apply_score_to_ungraded_afd025d0: "Apply Score to Ungraded"
   apply_settings_10409ad9: "Apply Settings"
   apply_theme_7af08387: "Apply theme"
   applying_new_styles_to_subaccounts_e8aeeef2: "Applying new styles to sub-accounts"
@@ -7783,6 +7786,7 @@ en-AU:
       file_meta: "Failed to export file meta data"
       files: "Failed to export some files"
       grading_standards: "Failed to export grading standards"
+      late_policy: "Failed to export late policy"
       learning_outcomes: "Failed to export learning outcomes"
       lti_links: "Failed to export some web links"
       media_file: "A media file failed to export"
@@ -8668,6 +8672,7 @@ en-AU:
   create_an_ba36d171: "Create an"
   create_and_administer_online_quizzes_and_surveys_b_7d2fa85f: "Create and administer online quizzes and surveys, both graded and ungraded."
   create_announcements_above_1c36202b: "Create announcements above"
+  create_anonymous_discussion_topics_d573e88e: "Create anonymous discussion topics"
   create_as_many_discussion_topics_as_needed_as_assi_45ec1df: |-
       Create as many discussion topics as needed, as assignments
                 for grading or as a forum for shared ideas and information.
@@ -9902,6 +9907,7 @@ en-AU:
             discussions are perfect for keeping in-depth or long-term discussions
             organised, while Focused discussions are best suited for short-lived exchanges.
   discussions_announcements_redesign_901c5528: "Discussions/Announcements Redesign"
+  discussions_announcements_redesign_anonymity_bbe1e4a2: "Discussions/Announcements Redesign - Anonymity"
   discussions_create_94dff604: "Discussions - create"
   discussions_index_menu_42591bc9: "Discussions Index Menu"
   discussions_menu_f18eb4a2: "Discussions Menu"
@@ -11286,6 +11292,7 @@ en-AU:
   failed_to_load_apps_db37e651: "Failed to load apps."
   failed_to_load_apps_for_name_fc6ce1c: "Failed to load apps for %{name}."
   failed_to_load_assignments_in_important_dates_ce3b4227: "Failed to load assignments in important dates."
+  failed_to_load_conversation_messages_9b4546fc: "Failed to load conversation messages."
   failed_to_load_course_navigation_for_name_aded3650: "Failed to load course navigation for %{name}."
   failed_to_load_courses_refresh_the_page_to_try_aga_4248fa3f: "Failed to load courses. Refresh the page to try again."
   failed_to_load_csp_information_try_refreshing_the__4a056997: "Failed to load CSP information, try refreshing the page."
@@ -11368,6 +11375,7 @@ en-AU:
   feature_options_enable_disable_7e748054: "Feature Options - enable / disable"
   feature_options_view_a170e80c: "Feature Options - view"
   feature_preview_5e1216a0: "Feature Preview"
+  feature_preview_opting_in_includes_ongoing_updates_111627f2: "Feature preview — opting in includes ongoing updates outside the regular release schedule"
   feature_previews_2700a397: "Feature Previews"
   feature_previews_account_settings_274440bc: "Feature Previews (Account Settings)"
   feature_previews_enable_disable_707af910: "Feature Previews - enable / disable"
@@ -11734,6 +11742,7 @@ en-AU:
   full_name_23fdfb6d: "Full Name"
   full_name_83cf5453: "Full name"
   full_name_is_required_8efbdc84: "Full name is required"
+  full_student_names_and_profile_pictures_will_be_hi_ddfba94e: "Full: student names and profile pictures will be hidden"
   future_5416ea92: Future
   future_terms_7fba2ae6: "Future Terms"
   galician_7e4508b5: Galician
@@ -13261,6 +13270,7 @@ en-AU:
   handlebars_helpers: 
     time: 
       event: "%{date} at %{time}"
+  has_been_automatically_selected_based_upon_where_t_61f805c5: "has been automatically selected based upon where this account's Canvas instance resides. In some cases it can be a different region."
   has_similarity_score_d5f332b4: "Has similarity score"
   has_syllabus_body_6f250277: has_syllabus_body
   has_turnitin_score_3e1cacf6: "Has Turnitin score"
@@ -13667,6 +13677,7 @@ en-AU:
   if_disabled_user_will_still_have_access_to_course__d78fddc4: "If disabled, user will still have access to Course Settings. User cannot manage individual course content without the appropriate permission for that content item. If course visibility is limited to users enrolled in the course, this permission allows the user to view course content without being enrolled in the course."
   if_disabled_user_will_still_have_access_to_course__fbf32c87: "If disabled, user will still have access to Course Settings."
   if_enabled_access_to_lti_1_3_and_lti_advantage_wil_1013107c: "If enabled, access to LTI 1.3 and LTI Advantage will be enabled."
+  if_enabled_allows_deep_linking_from_the_module_ind_632bb221: "If enabled, allows deep linking from the module index via a modal."
   if_enabled_allows_deep_linking_from_the_module_ind_f2dcbddb: "If enabled, allows deep linking from the module index."
   if_enabled_allows_more_than_the_maximum_possible_s_5d79c0d5: "If enabled, allows more than the maximum possible score on an Outcome to be given on a rubric."
   if_enabled_allows_multiple_deep_link_support_for_a_5d2498ab: "If enabled, allows multiple deep link support for assignments and modules."
@@ -14027,7 +14038,7 @@ en-AU:
   include_scores_when_alerting_about_grades_89728ae1: "Include scores when alerting about grades."
   include_scores_when_alerting_about_grades_if_your__b221c2c8: |-
       Include scores when alerting about grades.
-      If your email is not an institution email, this means sensitive content will be sent outside of the institution.
+      If your email is not an institution email this means sensitive content will be sent outside of the institution.
   include_speedgrader_in_assignment_header_menu_69cd8656: "Include SpeedGrader in Assignment Header Menu"
   include_the_datadog_rum_js_agent_in_the_document_h_dab3570d: "Include the Datadog RUM JS Agent in the document HEAD."
   include_this_assignment_s_grades_when_posting_to_y_6bff3323: "Include this assignment's grades when posting to your school's Student Information System"
@@ -14306,6 +14317,8 @@ en-AU:
                                     Please reach out in #canvas-sre in Slack.
   invalid_restrictions_316cd740: "Invalid restrictions"
   invalid_score_3d247da7: "Invalid score"
+  invalid_sftp_username_we_were_unable_to_determin_t_9d769a7e: "Invalid sftp username. We were unable to determin the username to use due to no domain ending in .instructure.\n\
+      \x20                             Please reach out in #canvas-sre in Slack.   "
   invalid_sis_sync_status_b68db497: "Invalid SIS sync status"
   invalid_state_parameter_7a5aa108: "Invalid state parameter"
   invalid_submission_file_type_cda6742a: "Invalid submission file type"
@@ -14896,6 +14909,7 @@ en-AU:
   loading_comment_library_3131e5c6: "Loading comment library"
   loading_comments_32366acf: "Loading comments"
   loading_compose_modal_f6da0e8b: "Loading Compose Modal"
+  loading_conversation_messages_71e9050e: "Loading Conversation Messages"
   loading_courses_409a3641: "Loading Courses"
   loading_courses_bd1bffe: "Loading courses..."
   loading_courses_complete_count_courses_found_6768d9e1: 
@@ -14906,6 +14920,7 @@ en-AU:
   loading_discussions_8ed5fcd7: "Loading Discussions"
   loading_external_tool_d839042c: "Loading External Tool"
   loading_f99d93d4: "...Loading"
+  loading_feature_options_82e07ee4: "Loading feature options"
   loading_features_d26820f6: "Loading features"
   loading_folders_d8b5869e: "Loading folders"
   loading_graders_f6a76142: "Loading Graders"
@@ -17611,6 +17626,8 @@ en-AU:
   modules_group_menu_4aae0d5f: "Modules Group Menu"
   modules_home_page_568c6bb9: "Modules Home Page"
   modules_index_menu_c8748e7c: "Modules Index Menu"
+  modules_index_menu_modal_79123a19: "Modules Index Menu (Modal)"
+  modules_index_menu_tray_3f9975d9: "Modules Index Menu (Tray)"
   modules_item_controller: 
     max_score_complete: "scored no more than a *score*"
     max_score_incomplete: "must score no more than a *score*"
@@ -18633,6 +18650,7 @@ en-AU:
   of_students_5d1af0d2: "# of students"
   off_5385ef3f: "Off"
   off_policy_will_not_apply_to_this_sub_account_8b12386b: "Off - Policy will not apply to this sub-account"
+  off_student_names_and_profile_pictures_will_be_vis_6891e2cf: "Off: student names and profile pictures will be visible to other members of this course"
   offensive_abusive_c41dcb08: "Offensive, abusive"
   offline_score_8d7b4779: "Offline Score:"
   offline_web_export_dca67174: "Offline Web Export"
@@ -18744,6 +18762,7 @@ en-AU:
   open_this_keyboard_shortcuts_dialog_9658b83a: "Open this keyboard shortcuts dialog"
   open_title_in_a_new_window_b29fed77: "Open %{title} in a new window"
   open_to_comments_23d5585e: "Open to Comments"
+  open_to_do_items_in_a_new_tab_120ea5f4: "Open to-do items in a new tab"
   openid_connect_initiation_url_2be36b48: "OpenID Connect Initiation Url"
   openid_connect_initiation_url_d9037d30: "* OpenID Connect Initiation Url"
   opens_in_new_window_b4b99243: "opens in new window"
@@ -19313,6 +19332,7 @@ en-AU:
   please_provide_a_pairing_code_530d1e9d: "Please provide a pairing code."
   please_provide_a_valid_tenant_domain_check_your_az_7acb215b: "Please provide a valid tenant domain. Check your Azure Active Directory settings to find it."
   please_reach_out_in_slack_at_canvas_sre_if_this_ke_bfa853d7: "Please reach out in Slack at #canvas-sre if this keeps happening."
+  please_reach_out_in_slack_at_canvas_sre_the_region_85440d71: "Please reach out in Slack at #canvas-sre. The region that this customer's Canvas instance is located in doesn't support SFTP."
   please_reach_out_in_slack_at_canvas_sre_to_create__7ae1850c: "Please reach out in Slack at #canvas-sre to create SFTP for this account."
   please_select_a_group_set_for_this_assignment_e1da63d3: "Please select a group set for this assignment"
   please_select_a_reason_for_reporting_this_reply_51719e8d: "Please select a reason for reporting this reply"
@@ -21747,7 +21767,7 @@ en-AU:
           time_elapsed: "Time Elapsed"
           time_running: "Time Running"
         links: 
-          hide_time_running: Hide
+          hide_time_running: "Hide Time"
           keep_editing_quiz: "Keep Editing This Quiz"
           keep_editing_survey: "Keep Editing This Survey"
     retrieving_filters: "Retrieving Filters..."
@@ -21806,7 +21826,7 @@ en-AU:
       errors: 
         connection_lost: "Connection to %{host} was lost.  Please make sure you're connected to the Internet before continuing."
         only_numerical_values: "only numerical values are accepted"
-      hide_time_link: Hide
+      hide_time_link: "Hide Time"
       hours_count: 
         one: "1 Hour"
         other: "%{count} Hours"
@@ -21837,7 +21857,7 @@ en-AU:
       seconds_count: 
         one: "1 Second"
         other: "%{count} Seconds"
-      show_time_link: Show
+      show_time_link: "Show Time"
       titles: 
         come_back_later: "You marked this question to come back to later"
         times_up: "Time's Up!"
@@ -23485,6 +23505,7 @@ en-AU:
                                     four hours for this key to start working.
   sftp_key_is_invalid_please_ensure_it_is_correctly__2d309e0b: "SFTP key is invalid. Please ensure it is correctly formatted."
   sftp_key_removed_from_user_42318725: "SFTP key removed from user."
+  sftp_region_invalid_216caa40: "SFTP region invalid"
   sftp_user_already_exists_or_is_disabled_please_rea_9554a53a: |-
       SFTP user already exists or is disabled.
                                     Please reach out in #canvas-sre in Slack.
@@ -26037,6 +26058,7 @@ en-AU:
   this_eportfolio_has_been_identified_as_spam_it_is__f927947b: "This ePortfolio has been identified as spam. It is currently only visible to administrators and the author. If you're sure this content is not spam, you can mark it as safe."
   this_feature_affects_existing_data_for_all_courses_4fc75fe1: "This feature affects existing data for all courses in the account."
   this_feature_affects_existing_data_for_an_entire_a_2372dc52: "This feature affects existing data for an entire account."
+  this_feature_allows_teachers_to_create_anonymous_d_ea364dca: "This feature allows Teachers to create anonymous discussions and allows teachers to enable a course level setting for students to create anonymous discussions"
   this_feature_allows_teachers_to_easily_copy_single_9d4cdfe: "This feature allows teachers to easily copy single items from one course to another, and to share a single item of content with other users so they can import those items into their courses as well."
   this_feature_can_t_be_disabled_because_there_is_at_a015b943: "This feature can't be disabled because there is at least one sub-account or course with this feature enabled."
   this_feature_can_t_be_enabled_while_autodetection__a3552fb4: "This feature can't be enabled while autodetection of field separators is enabled"
@@ -26275,6 +26297,7 @@ en-AU:
   this_user_is_currently_not_able_to_access_the_cour_39cabed1: "This user is currently not able to access the course."
   this_user_is_currently_not_able_to_access_the_cour_b17d5df1: "\"This user is currently not able to access the course.\""
   this_user_performed_actions_while_anonymous_was_of_2f3c1de1: "This user performed actions while anonymous was off"
+  this_user_will_be_created_in_3b2a2b52: "This user will be created in:"
   this_version_of_gradebook_is_being_replaced_by_an__b5a174b2: "This version of Gradebook is being replaced by an updated Gradebook on or before January 18, 2020."
   this_was_already_happening_for_images_in_the_quest_58edf4fb: |-
       This was already happening for images in the question, but not answers
@@ -28289,6 +28312,7 @@ en-AU:
   view_description_b6d8e52b: "View Description"
   view_due_items_due_today_for_course_coursename_129e433: "View %{due} items due today for course %{courseName}"
   view_faculty_journals_ad0e8c8f: "View Faculty Journals"
+  view_feature_options_at_an_account_level_a84cedbe: "View feature options at an account level"
   view_feature_settings_at_an_account_level_ec7f5e10: "View feature settings at an account level"
   view_feedback_b88c99c: "View feedback"
   view_feedback_f2feabca: "View Feedback"
@@ -28495,6 +28519,7 @@ en-AU:
       When enabled, this flag shows a "Join" button on Canvas calendar
       events in the student planner
   when_enabled_this_flag_shows_a_student_picker_for__5353b8e2: "When enabled, this flag shows a student picker for observers on the dashboard."
+  when_enabled_this_setting_automatically_opens_teac_f93c16f0: "When enabled, this setting automatically opens teacher to-do items in a new tab."
   when_enabled_turns_on_mention_functionality_in_cou_ae490b21: "When enabled, turns on \"@mention\" functionality in course discussions."
   when_hiding_grades_for_anonymous_assignments_grade_1b0ef682: "When hiding grades for anonymous assignments, grades will be hidden for everyone in the course. Anonymity will be re-applied."
   when_people_visit_the_course_this_is_the_page_they_de94acc2: "When people visit the course, this is the page they'll see.  You can set it to show an activity stream, the list of course modules, a syllabus, or a custom page you write yourself.  The default is the course activity stream."
