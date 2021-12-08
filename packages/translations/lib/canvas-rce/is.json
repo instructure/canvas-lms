@@ -134,6 +134,8 @@
   "describe_the_image_e65d2e32": { "message": "(Lýstu myndinni)" },
   "describe_the_video_2fe8f46a": { "message": "(Lýsa myndbandinu)" },
   "details_98a31b68": { "message": "Upplýsingar" },
+  "diamond_b8dfe7ae": { "message": "Demantur" },
+  "dimension_type_55c83e4e": { "message": "Víddartegund" },
   "dimensions_45ddb7b7": { "message": "Mál" },
   "directionality_26ae9e08": { "message": "Lestrarátt" },
   "discussions_a5f96392": { "message": "Umræður" },
@@ -268,6 +270,9 @@
   "miscellaneous_e9818229": { "message": "Ýmislegt" },
   "modules_c4325335": { "message": "Námsefni" },
   "multi_color_image_63d7372f": { "message": "Fjöllita mynd" },
+  "must_be_at_least_percentage_22e373b6": {
+    "message": "Verður að vera að minnsta kosti { percentage }%"
+  },
   "must_be_at_least_width_x_height_px_41dc825e": {
     "message": "Verður að vera að minnsta kosti { width } x { height }pt"
   },
@@ -308,7 +313,10 @@
   },
   "pages_e5414c2c": { "message": "Síður" },
   "paragraph_5e5ad8eb": { "message": "Málsgrein" },
+  "pentagon_17d82ea3": { "message": "fimmhyrningur" },
   "people_b4ebb13c": { "message": "Fólk" },
+  "percentage_34ab7c2c": { "message": "Hlutfall" },
+  "pixels_52ece7d1": { "message": "Punktar" },
   "posted_when_a578f5ab": { "message": "Birt: { when }" },
   "preformatted_d0670862": { "message": "Forsniðnir" },
   "pretty_html_editor_28748756": { "message": "Pretty HTML ritlill" },

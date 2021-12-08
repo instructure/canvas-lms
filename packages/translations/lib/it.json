@@ -383,6 +383,12 @@
     "details_a6f427c3": {
         "message": "Dettagli:"
     },
+    "diamond_b8dfe7ae": {
+        "message": "Rombo"
+    },
+    "dimension_type_55c83e4e": {
+        "message": "Tipo di dimensione"
+    },
     "dimensions_45ddb7b7": {
         "message": "Dimensioni"
     },
@@ -553,6 +559,9 @@
     },
     "feedback_6dcc1991": {
         "message": "Feedback"
+    },
+    "file_name_8fd421ff": {
+        "message": "Nome file"
     },
     "file_url_c12b64be": {
         "message": "URL file"
@@ -839,6 +848,9 @@
     "multi_color_image_63d7372f": {
         "message": "Immagine multicolore"
     },
+    "must_be_at_least_percentage_22e373b6": {
+        "message": "Deve essere almeno { percentage }%"
+    },
     "must_be_at_least_width_x_height_px_41dc825e": {
         "message": "Deve essere almeno { width } x { height }px"
     },
@@ -974,8 +986,17 @@
     "peer_review_for_itemtitle_358cb413": {
         "message": "Riesame tra pari per { itemTitle }"
     },
+    "pentagon_17d82ea3": {
+        "message": "Pentagono"
+    },
     "people_b4ebb13c": {
         "message": "Persone"
+    },
+    "percentage_34ab7c2c": {
+        "message": "Percentuale"
+    },
+    "pixels_52ece7d1": {
+        "message": "Pixel"
     },
     "points_bceb5005": {
         "message": "punti"
