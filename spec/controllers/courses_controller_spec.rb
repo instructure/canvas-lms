@@ -2843,6 +2843,26 @@ describe CoursesController do
       expect(@course.default_wiki_editing_roles).to eq new_permissions
       expect(wiki_page.editing_roles).to eq new_permissions
     end
+
+    it "does not attempt to sync k5 homeroom to course if sync_enrollments_from_homeroom is falsey" do
+      teacher = @teacher
+      subject = @course
+      toggle_k5_setting(subject.account, true)
+      homeroom = course_factory(active_all: true, account: subject.account)
+      homeroom.enroll_teacher(teacher, enrollment_state: :active)
+      homeroom.homeroom_course = true
+      homeroom.restrict_enrollments_to_course_dates = true
+      homeroom.save!
+      subject.homeroom_course_id = homeroom.id
+      subject.save!
+
+      user_session(teacher)
+      put "update", params: { id: subject.id, course: { name: "something new", sync_enrollments_from_homeroom: "0", homeroom_course_id: homeroom.id } }
+      run_jobs
+
+      # if the sync job runs, we'll know because restrict_enrollments_to_course_dates will be synced as true
+      expect(subject.reload.restrict_enrollments_to_course_dates).to be_falsey
+    end
   end
 
   describe "POST 'unconclude'" do
