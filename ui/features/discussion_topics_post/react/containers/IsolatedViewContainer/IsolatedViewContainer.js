@@ -210,7 +210,8 @@ export const IsolatedViewContainer = props => {
         buildQuotedReply(
           isolatedEntryOlderDirection.data?.legacyNode?.discussionSubentriesConnection.nodes,
           props.replyFromId
-        )
+        ),
+        props.discussionTopic.anonymousState != null
       )
     })
   }

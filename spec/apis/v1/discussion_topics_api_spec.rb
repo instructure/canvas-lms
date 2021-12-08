@@ -2851,8 +2851,8 @@ describe DiscussionTopicsController, type: :request do
       expect(json["unread_entries"].sort).to eq (@topic.discussion_entries - [@root2, @reply3] - @topic.discussion_entries.select { |e| e.user == @user }).map(&:id).sort
 
       expect(json["participants"].sort_by { |h| h["id"] }).to eq([
-        { "id" => @student.id, "pronouns" => nil, "display_name" => @student.short_name, "avatar_image_url" => User.avatar_fallback_url(nil, request), "html_url" => "http://www.example.com/courses/#{@course.id}/users/#{@student.id}" },
-        { "id" => @teacher.id, "pronouns" => nil, "display_name" => @teacher.short_name, "avatar_image_url" => User.avatar_fallback_url(nil, request), "html_url" => "http://www.example.com/courses/#{@course.id}/users/#{@teacher.id}" },
+        { "id" => @student.id, "anonymous_id" => @student.id.to_s(36), "pronouns" => nil, "display_name" => @student.short_name, "avatar_image_url" => User.avatar_fallback_url(nil, request), "html_url" => "http://www.example.com/courses/#{@course.id}/users/#{@student.id}" },
+        { "id" => @teacher.id, "anonymous_id" => @teacher.id.to_s(36), "pronouns" => nil, "display_name" => @teacher.short_name, "avatar_image_url" => User.avatar_fallback_url(nil, request), "html_url" => "http://www.example.com/courses/#{@course.id}/users/#{@teacher.id}" },
       ].sort_by { |h| h["id"] })
 
       reply_reply1_attachment_json = {
