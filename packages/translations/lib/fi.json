@@ -383,6 +383,12 @@
     "details_a6f427c3": {
         "message": "Lisätiedot:"
     },
+    "diamond_b8dfe7ae": {
+        "message": "Diamond"
+    },
+    "dimension_type_55c83e4e": {
+        "message": "Ulottuvuuden tyyppi"
+    },
     "dimensions_45ddb7b7": {
         "message": "Mitat"
     },
@@ -553,6 +559,9 @@
     },
     "feedback_6dcc1991": {
         "message": "Palaute"
+    },
+    "file_name_8fd421ff": {
+        "message": "Tiedoston nimi"
     },
     "file_url_c12b64be": {
         "message": "Tiedoston URL"
@@ -839,6 +848,9 @@
     "multi_color_image_63d7372f": {
         "message": "Monivärinen kuva"
     },
+    "must_be_at_least_percentage_22e373b6": {
+        "message": "Täytyy olla vähintään { percentage }%"
+    },
     "must_be_at_least_width_x_height_px_41dc825e": {
         "message": "Täytyy olla vähintään { width } x { height }px."
     },
@@ -974,8 +986,17 @@
     "peer_review_for_itemtitle_358cb413": {
         "message": "Vertaisarviointi { itemTitle }"
     },
+    "pentagon_17d82ea3": {
+        "message": "Viisikulmio"
+    },
     "people_b4ebb13c": {
         "message": "Henkilöt"
+    },
+    "percentage_34ab7c2c": {
+        "message": "Prosenttimäärä"
+    },
+    "pixels_52ece7d1": {
+        "message": "Pikselit"
     },
     "points_bceb5005": {
         "message": "pisteet"

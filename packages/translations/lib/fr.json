@@ -383,6 +383,12 @@
     "details_a6f427c3": {
         "message": "Détails :"
     },
+    "diamond_b8dfe7ae": {
+        "message": "Diamant"
+    },
+    "dimension_type_55c83e4e": {
+        "message": "Type de dimension"
+    },
     "dimensions_45ddb7b7": {
         "message": "Dimensions"
     },
@@ -553,6 +559,9 @@
     },
     "feedback_6dcc1991": {
         "message": "Commentaire"
+    },
+    "file_name_8fd421ff": {
+        "message": "Nom du fichier"
     },
     "file_url_c12b64be": {
         "message": "URL du fichier"
@@ -839,6 +848,9 @@
     "multi_color_image_63d7372f": {
         "message": "Image multicolore"
     },
+    "must_be_at_least_percentage_22e373b6": {
+        "message": "Doit être au moins égal à { percentage }%"
+    },
     "must_be_at_least_width_x_height_px_41dc825e": {
         "message": "Doit faire au moins { width } x { height } px"
     },
@@ -974,8 +986,17 @@
     "peer_review_for_itemtitle_358cb413": {
         "message": "Correction par un pair pour { itemTitle }"
     },
+    "pentagon_17d82ea3": {
+        "message": "Pentagone"
+    },
     "people_b4ebb13c": {
         "message": "Personnes"
+    },
+    "percentage_34ab7c2c": {
+        "message": "Pourcentage"
+    },
+    "pixels_52ece7d1": {
+        "message": "Pixels"
     },
     "points_bceb5005": {
         "message": "points"
