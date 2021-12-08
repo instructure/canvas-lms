@@ -376,10 +376,10 @@ describe PacePlansController, type: :controller do
     end
   end
 
-  describe "GET #compress_dates" do
+  describe "POST #compress_dates" do
     it "returns a compressed list of dates" do
       pace_plan_params = @valid_params.merge(end_date: @pace_plan.start_date + 5.days)
-      get :compress_dates, params: { course_id: @course.id, pace_plan: pace_plan_params }
+      post :compress_dates, params: { course_id: @course.id, pace_plan: pace_plan_params }
       expect(response).to be_successful
       json_response = JSON.parse(response.body)
       expect(json_response.values).to eq(%w[2021-09-30 2021-10-03])
@@ -387,7 +387,7 @@ describe PacePlansController, type: :controller do
 
     it "supports changing durations and start dates" do
       pace_plan_params = @valid_params.merge(start_date: "2021-11-01", end_date: "2021-11-06")
-      get :compress_dates, params: { course_id: @course.id, pace_plan: pace_plan_params }
+      post :compress_dates, params: { course_id: @course.id, pace_plan: pace_plan_params }
       expect(response).to be_successful
       json_response = JSON.parse(response.body)
       expect(json_response.values).to eq(%w[2021-11-01 2021-11-06])
