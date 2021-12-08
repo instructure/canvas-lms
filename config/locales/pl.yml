@@ -2366,6 +2366,7 @@ pl:
       Pozwala sortować odpowiedzi do dyskusji zgodnie ze
       znacznikami czasowymi ich utworzenia. Domyślna kolejność na poziomie głównym to od najnowszej do najstarszej odpowiedzi.
   allows_help_links_to_be_tagged_as_featured_or_new__ed5742c2: "Umożliwia tagowanie łączy pomocy jako Polecane lub Nowe oraz podkreśla polecane łącze pomocy w menu pomocy."
+  allows_instructors_to_apply_scores_to_ungraded_sub_7e772795: "Zezwalaj instruktorom na wystawianie ocen za nieocenione przesyłki grupowo."
   allows_learning_outcomes_to_be_selectable_when_mig_acf15555: "Pozwala wybrać wyniki nauki podczas migracji zawartości kursu"
   allows_modifying_notification_settings_for_any_cou_5004ac71: "Umożliwia modyfikację ustawień powiadomień dla dowolnego kursu ze strony ustawień powiadomień na poziomie konta."
   allows_setting_account_course_level_mastery_scales_1939e0fd: "Zapewnia skale i metody obliczeń dla opanowania materiału na poziomie kursu i konta, zastępując metody oceny kryteriów i metody obliczeń dla poszczególnych wyników"
@@ -3318,6 +3319,7 @@ pl:
   anonymous_submission_assignment_title_896654de: "Anonimowa przesyłka: %{assignment_title}"
   anonymous_submission_comment_student_id_assignment_10ffe8c7: "Komentarz do anonimowej przesyłki: Uczestnik (%{id}), %{assignment_title}, %{course_name}"
   anonymous_submission_comment_student_user_id_assig_96b99600: "Komentarz do anonimowej przesyłki: Uczestnik (%{user_id}), %{assignment_title}, %{course_name}"
+  anonymous_topic_notice: "Ten temat wymaga włączenia flagi funkcji Przeprojektowane dyskusje / ogłoszenia"
   anonymous_turned_off_8118a0b: "Anonimizacja wyłączona"
   anonymous_turned_on_fe56f997: "Anonimizacja włączona"
   anonymous_user: "Anonimowy użytkownik"
@@ -3417,6 +3419,7 @@ pl:
   apply_date_range_selection_cc4351ed: "Zastosuj wybrany zakres dat"
   apply_filter_7e4f6113: "Zastosuj filtr"
   apply_filters_note_clicking_this_button_will_cause_753f04: "Zastosuj filtry! Uwaga: kliknięcie tego przycisku spowoduje ponowne wczytanie strony."
+  apply_score_to_ungraded_afd025d0: "Zastosuj ocenę do nieocenionych"
   apply_settings_10409ad9: "Zastosuj ustawienia"
   apply_theme_7af08387: "Zatwierdź motyw"
   applying_new_styles_to_subaccounts_e8aeeef2: "Zastosuj nowe style w subkontach"
@@ -7983,6 +7986,7 @@ pl:
       file_meta: "Eksportowanie metadanych pliku nie powiodło się"
       files: "Eksportowanie niektórych plików nie powiodło się"
       grading_standards: "Eksportowanie standardów oceniania nie powiodło się"
+      late_policy: "Eksportowanie zasad dotyczących spóźnień nie powiodło się"
       learning_outcomes: "Eksportowanie wyników nauczania nie powiodło się"
       lti_links: "Eksportowanie niektórych łączy sieci Web nie powiodło się"
       media_file: "Eksportowanie pliku multimedialnego nie powiodło się"
@@ -8873,6 +8877,7 @@ pl:
   create_an_ba36d171: Utwórz
   create_and_administer_online_quizzes_and_surveys_b_7d2fa85f: "Twórz oceniane i nieoceniane quizy i ankiety online oraz zarządzaj nimi."
   create_announcements_above_1c36202b: "Utwórz ogłoszenia powyżej"
+  create_anonymous_discussion_topics_d573e88e: "Utwórz tematy anonimowej dyskusji"
   create_as_many_discussion_topics_as_needed_as_assi_45ec1df: |-
       Twórz dowolną ilość tematów dyskusji, w postaci zadań
                 do oceniania lub forum, aby dzielić się pomysłami i informacjami.
@@ -10155,6 +10160,7 @@ pl:
             są idealne do prowadzenia szczegółowych lub długofalowych dyskusji
             , natomiast dyskusje fokusowe najlepiej się sprawdzają w przypadku krótkich wymian informacji.
   discussions_announcements_redesign_901c5528: "Przeprojektowane dyskusje/ogłoszenia"
+  discussions_announcements_redesign_anonymity_bbe1e4a2: "Przeprojektowane dyskusje / ogłoszenia - anonimowość"
   discussions_create_94dff604: "Dyskusje - utwórz"
   discussions_index_menu_42591bc9: "Menu indeksu rozmów"
   discussions_menu_f18eb4a2: "Menu rozmów"
@@ -11553,6 +11559,7 @@ pl:
   failed_to_load_apps_db37e651: "Nie udało się wczytać aplikacji."
   failed_to_load_apps_for_name_fc6ce1c: "Nie udało się wczytać aplikacji dla %{name}."
   failed_to_load_assignments_in_important_dates_ce3b4227: "Nie udało się wczytać zadań dla ważnych dat."
+  failed_to_load_conversation_messages_9b4546fc: "Nie udało się wczytać wiadomości dyskusji."
   failed_to_load_course_navigation_for_name_aded3650: "Nie udało się wczytać nawigacji kursu dla %{name}."
   failed_to_load_courses_refresh_the_page_to_try_aga_4248fa3f: "Nie udało się wczytać kursów. Odśwież stronę, aby spróbować ponownie."
   failed_to_load_csp_information_try_refreshing_the__4a056997: "Nie udało się wczytaj informacji o CSP, spróbuj odświeżyć stronę."
@@ -11635,6 +11642,7 @@ pl:
   feature_options_enable_disable_7e748054: "Opcje elementu - Włącz/wyłącz"
   feature_options_view_a170e80c: "Opcje funkcji - widok"
   feature_preview_5e1216a0: "Podgląd funkcji"
+  feature_preview_opting_in_includes_ongoing_updates_111627f2: "Podgląd funkcji – wybór opcji obejmuje bieżące aktualizacje poza normalnym harmonogramem wydania"
   feature_previews_2700a397: "Podgląd funkcji"
   feature_previews_account_settings_274440bc: "Podgląd funkcji (ustawienia konta)"
   feature_previews_enable_disable_707af910: "Podgląd funkcji - włącz / wyłącz"
@@ -12004,6 +12012,7 @@ pl:
   full_name_23fdfb6d: "Pełna nazwa"
   full_name_83cf5453: "Pełna nazwa"
   full_name_is_required_8efbdc84: "Wymagana jest pełna nazwa"
+  full_student_names_and_profile_pictures_will_be_hi_ddfba94e: "Pełny: imiona i nazwiska uczestników oraz zdjęcia profilowe zostaną ukryte"
   future_5416ea92: Przyszłe
   future_terms_7fba2ae6: "Przyszłe terminy"
   galician_7e4508b5: Galicyjski
@@ -13549,6 +13558,7 @@ pl:
   handlebars_helpers: 
     time: 
       event: "%{date} o godz. %{time}"
+  has_been_automatically_selected_based_upon_where_t_61f805c5: "wybrano automatycznie w zależności od lokalizacji instancji Canvas tego konta. W niektórych przypadkach może to być inny region."
   has_similarity_score_d5f332b4: "Ma stopień podobieństwa"
   has_syllabus_body_6f250277: has_syllabus_body
   has_turnitin_score_3e1cacf6: "Posiada wynik Turnitin"
@@ -13965,6 +13975,7 @@ pl:
   if_disabled_user_will_still_have_access_to_course__d78fddc4: "W przypadku wyłączenia, użytkownik nadal ma dostęp do Ustawień kursu. Użytkownik nie może zarządzać zawartością poszczególnych kursów bez odpowiedniego uprawnienia dla tego elementu zawartości. Jeśli widoczność kursu zostanie ograniczona do użytkowników zapisanych na kurs, dzięki temu uprawnieniu użytkownik może wyświetlać zawartość kursu bez zapisywania się na kurs."
   if_disabled_user_will_still_have_access_to_course__fbf32c87: "W przypadku wyłączenia, użytkownik nadal ma dostęp do Ustawień kursu."
   if_enabled_access_to_lti_1_3_and_lti_advantage_wil_1013107c: "Jeśli zostało włączone, dostęp do LTI 1.3 i LTI Advantage będzie możliwy."
+  if_enabled_allows_deep_linking_from_the_module_ind_632bb221: "Jeśli ta opcja jest włączona, możliwa jest obsługa Deep Linking z indeksu modułów za pomocą okna."
   if_enabled_allows_deep_linking_from_the_module_ind_f2dcbddb: "Jeśli ta opcja jest włączona, możliwa jest obsługa Deep Linking z indeksu modułów."
   if_enabled_allows_more_than_the_maximum_possible_s_5d79c0d5: "W przypadku włączenia, umożliwia wystawienie wyższej oceny niż maksymalna w rubryce wyników."
   if_enabled_allows_multiple_deep_link_support_for_a_5d2498ab: "Jeśli ta opcja jest włączona, możliwa jest obsługa Deep Linking dla zadań i modułów."
@@ -14325,7 +14336,7 @@ pl:
   include_scores_when_alerting_about_grades_89728ae1: "Przesyłaj wyniki punktowe w alertach o zmianach ocen."
   include_scores_when_alerting_about_grades_if_your__b221c2c8: |-
       Uwzględnienie ocen podczas alertu o ocenach.
-                Jeśli adres e-mail nie jest adresem e-mail instytucji, oznacza to, że poufna zawartość będzie wysyłana poza instytucję.
+      Jeśli adres e-mail nie jest adresem e-mail instytucji, oznacza to, że poufna zawartość będzie wysyłana poza instytucję.
   include_speedgrader_in_assignment_header_menu_69cd8656: "Uwzględnij SpeedGrader w menu Nagłówek zadania"
   include_the_datadog_rum_js_agent_in_the_document_h_dab3570d: "Uwzględnij agenta Datadog RUM JS w nagłówku dokumentu."
   include_this_assignment_s_grades_when_posting_to_y_6bff3323: "Uwzględnij oceny za zadanie podczas zamieszczania danych w Systemie informacji o uczestnikach szkoły."
@@ -14589,6 +14600,8 @@ pl:
                                     Skontaktuj się przez #canvas-sre w Slack.
   invalid_restrictions_316cd740: "Nieprawidłowe ograniczenia"
   invalid_score_3d247da7: "Nieprawidłowy wynik"
+  invalid_sftp_username_we_were_unable_to_determin_t_9d769a7e: "Nieprawidłowa nazwa użytkownika SFTP. Nie udało się określić nazwy użytkownika z powoduj braku domeny zakończonej na .instructure.\n\
+      \x20                             Skontaktuj się przez #canvas-sre w Slack.   "
   invalid_sis_sync_status_b68db497: "Nieprawidłowy status synchronizacji SIS"
   invalid_state_parameter_7a5aa108: "Nieprawidłowy parametr stanu"
   invalid_submission_file_type_cda6742a: "Nieprawidłowy typ pliku przesyłki"
@@ -15187,6 +15200,7 @@ pl:
   loading_comment_library_3131e5c6: "Wczytywanie biblioteki komentarzy"
   loading_comments_32366acf: "Wczytywanie komentarzy"
   loading_compose_modal_f6da0e8b: "Wczytywanie okna tworzenia wiadomości"
+  loading_conversation_messages_71e9050e: "Wczytywanie wiadomości w rozmowach"
   loading_courses_409a3641: "Wczytywanie kursów"
   loading_courses_bd1bffe: "Trwa ładowanie kursów..."
   loading_courses_complete_count_courses_found_6768d9e1: 
@@ -15199,6 +15213,7 @@ pl:
   loading_discussions_8ed5fcd7: "Wczytywanie dyskusji"
   loading_external_tool_d839042c: "Wczytywanie narzędzia zewnętrznego"
   loading_f99d93d4: "...wczytywanie"
+  loading_feature_options_82e07ee4: "Wczytywanie opcji funkcji"
   loading_features_d26820f6: "Wczytywanie funkcji"
   loading_folders_d8b5869e: "Wczytywanie folderów"
   loading_graders_f6a76142: "Wczytywanie oceniających"
@@ -17937,6 +17952,8 @@ pl:
   modules_group_menu_4aae0d5f: "Menu grupy modułów"
   modules_home_page_568c6bb9: "Strona główna modułów"
   modules_index_menu_c8748e7c: "Menu indeksu modułów"
+  modules_index_menu_modal_79123a19: "Menu indeksu modułów (okno)"
+  modules_index_menu_tray_3f9975d9: "Menu indeksu modułów (panel)"
   modules_item_controller: 
     max_score_complete: "zdobył nie więcej niż *wynik*"
     max_score_incomplete: "musi zdobyć nie więcej niż *wynik*"
@@ -18971,6 +18988,7 @@ pl:
   of_students_5d1af0d2: "Liczba uczestników"
   off_5385ef3f: Wył.
   off_policy_will_not_apply_to_this_sub_account_8b12386b: "Wył. – Zasady nie mają zastosowania do tego podkonta"
+  off_student_names_and_profile_pictures_will_be_vis_6891e2cf: "Wył.: imiona i nazwiska uczestników oraz zdjęcia profilowe będą widoczne dla innych uczestników tego kursu"
   offensive_abusive_c41dcb08: "Obraźliwa, napastliwa"
   offline_score_8d7b4779: "Wynik offline:"
   offline_web_export_dca67174: "Eksport strony internetowej"
@@ -19081,6 +19099,7 @@ pl:
   open_this_keyboard_shortcuts_dialog_9658b83a: "Otwórz to okno dialogowe skrótów klawiatury"
   open_title_in_a_new_window_b29fed77: "Otwórz %{title} w nowym oknie"
   open_to_comments_23d5585e: "Można dodawać komentarze"
+  open_to_do_items_in_a_new_tab_120ea5f4: "Otwórz elementy listy zadań w nowej karcie"
   openid_connect_initiation_url_2be36b48: "Otwórz adres inicjalizacji ID Connect"
   openid_connect_initiation_url_d9037d30: "* Otwórz adres inicjalizacji ID Connect"
   opens_in_new_window_b4b99243: "otwiera się w nowym oknie"
@@ -19654,6 +19673,7 @@ pl:
   please_provide_a_pairing_code_530d1e9d: "Podaj kod parowania."
   please_provide_a_valid_tenant_domain_check_your_az_7acb215b: "Prosimy podać prawidłową domenę lokatora. Aby ją odnaleźć, sprawdź ustawienia Azure Active Directory."
   please_reach_out_in_slack_at_canvas_sre_if_this_ke_bfa853d7: "Jeśli problem będzie się powtarzać, Skontaktuj się przez #canvas-sre w Slack."
+  please_reach_out_in_slack_at_canvas_sre_the_region_85440d71: "Skontaktuj się przez #canvas-sre w Slack. Region, w którym znajduje się instancja Canvas tego klienta, nie obsługuje protokołu SFTP."
   please_reach_out_in_slack_at_canvas_sre_to_create__7ae1850c: "Skontaktuj się przez #canvas-sre w Slack, aby utworzyć SFTP dla tego konta."
   please_select_a_group_set_for_this_assignment_e1da63d3: "Wybierz zestaw grup do tego zadania"
   please_select_a_reason_for_reporting_this_reply_51719e8d: "Wybierz powód zgłoszenia tej odpowiedzi"
@@ -22139,7 +22159,7 @@ pl:
           time_elapsed: "Czas, który upłynął"
           time_running: "Czas płynie"
         links: 
-          hide_time_running: Ukryj
+          hide_time_running: "Ukryj godzinę"
           keep_editing_quiz: "Kontynuuj edycję tego testu"
           keep_editing_survey: "Kontynuuj edycję tej ankiety"
     retrieving_filters: "Trwa pobieranie filtrów..."
@@ -22208,7 +22228,7 @@ pl:
       errors: 
         connection_lost: "Utracono połączenie z %{host}.  Przed podjęciem dalszych czynności upewnij się, że masz połączenie z Internetem."
         only_numerical_values: "dozwolone są tylko wartości numeryczne"
-      hide_time_link: Ukryj
+      hide_time_link: "Ukryj godzinę"
       hours_count: 
         few: "%{count} Godziny"
         many: "%{count} Godzin"
@@ -22247,7 +22267,7 @@ pl:
         many: " %{count} Sekund"
         one: "1 Sekunda"
         other: " %{count} Sekund"
-      show_time_link: Pokaż
+      show_time_link: "Pokaż godzinę"
       titles: 
         come_back_later: "Użytkownik oznaczył pytanie, aby można było do niego wrócić później"
         times_up: "Czas minął!"
@@ -23929,6 +23949,7 @@ pl:
                                     cztery godziny.
   sftp_key_is_invalid_please_ensure_it_is_correctly__2d309e0b: "Klucz SFTP jest nieprawidłowy, Upewnij się, że jego format jest poprawny."
   sftp_key_removed_from_user_42318725: "Usunięto klucz SFTP z użytkownika."
+  sftp_region_invalid_216caa40: "Nieprawidłowy region SFTP"
   sftp_user_already_exists_or_is_disabled_please_rea_9554a53a: |-
       Użytkownik SFTP już istnieje lub został wyłączony.
                                     Skontaktuj się przez #canvas-sre w Slack.
@@ -26521,6 +26542,7 @@ pl:
   this_eportfolio_has_been_identified_as_spam_it_is__f927947b: "To ePortfolio zidentyfikowano jako spam. Jest obecnie widoczne tylko dla administratorów i autora. Jeśli masz pewność, że ta zawartość nie jest spamem, możesz ją oznaczyć jako bezpieczną."
   this_feature_affects_existing_data_for_all_courses_4fc75fe1: "Funkcja ta wpływa na istniejące dane dla wszystkich kursów na koncie."
   this_feature_affects_existing_data_for_an_entire_a_2372dc52: "Funkcja ta wpływa na istniejące dane na całym koncie."
+  this_feature_allows_teachers_to_create_anonymous_d_ea364dca: "Funkcja ta pozwala nauczycielom tworzyć anonimowe dyskusje i włączać ustawienia poziomu kursu dla uczestników, tak aby mogli tworzyć anonimowe dyskusje."
   this_feature_allows_teachers_to_easily_copy_single_9d4cdfe: "Dzięki tej funkcji nauczyciele mogą łatwo kopiować pojedyncze elementy z jednego kursu do innego oraz udostępniać elementy zawartości innym użytkownikom, tak aby importowali je do swoich kursów."
   this_feature_can_t_be_disabled_because_there_is_at_a015b943: "Funkcji tej nie można wyłączyć, ponieważ została aktywowana w co najmniej jednym podkoncie lub kursie."
   this_feature_can_t_be_enabled_while_autodetection__a3552fb4: "Tej funkcji nie można włączyć, gdy włączone jest autowykrywanie separatorów pól"
@@ -26761,6 +26783,7 @@ pl:
   this_user_is_currently_not_able_to_access_the_cour_39cabed1: "Ten użytkownik nie ma obecnie dostępu do kursu"
   this_user_is_currently_not_able_to_access_the_cour_b17d5df1: "\"Ten użytkownik nie ma obecnie dostępu do kursu\""
   this_user_performed_actions_while_anonymous_was_of_2f3c1de1: "Ten użytkownik wykonał działania, gdy anonimizacja była wył."
+  this_user_will_be_created_in_3b2a2b52: "Ten użytkownik zostanie utworzony za:"
   this_version_of_gradebook_is_being_replaced_by_an__b5a174b2: "Ta wersja dziennika ocen zostanie zastąpiona uaktualnieniem najpóźniej w dniu 18 stycznia 2020 roku."
   this_was_already_happening_for_images_in_the_quest_58edf4fb: |-
       Miało to już miejsce w przypadku obrazów w pytaniu, ale nie odpowiedzi,
@@ -28799,6 +28822,7 @@ pl:
   view_description_b6d8e52b: "Wyświetl opis"
   view_due_items_due_today_for_course_coursename_129e433: "Wyświetl %{due} pozycje z terminem na dziś dla kursu %{courseName}"
   view_faculty_journals_ad0e8c8f: "Pokaż dziennik wydziałowy"
+  view_feature_options_at_an_account_level_a84cedbe: "Wyświetl opcje funkcji na poziomie konta"
   view_feature_settings_at_an_account_level_ec7f5e10: "Wyświetl ustawienia funkcji na poziomie konta"
   view_feedback_b88c99c: "Wyświetl opinię"
   view_feedback_f2feabca: "Wyświetl opinię"
@@ -29009,6 +29033,7 @@ pl:
       Jeśli funkcja ta jest włączona, flaga wyświetla przycisk „Dołącz” na wydarzeniach kalendarza Canvas
       w planerze uczestnika
   when_enabled_this_flag_shows_a_student_picker_for__5353b8e2: "Jeśli jest włączona, flaga pokazuje narzędzie wyboru uczestników dla obserwujących na panelu nawigacyjnym."
+  when_enabled_this_setting_automatically_opens_teac_f93c16f0: "Jeśli ta opcja jest włączona, lista zadań nauczyciela otwiera się automatycznie w nowej karcie."
   when_enabled_turns_on_mention_functionality_in_cou_ae490b21: "W przypadku włączenia, w dyskusjach kursu aktywna będzie funkcja \"@mention\"."
   when_hiding_grades_for_anonymous_assignments_grade_1b0ef682: "W przypadku ukrycia ocen dla anonimowych zadań, oceny zostaną ukryte dla każdego w kursie. Anonimowość zostanie ponownie włączona."
   when_people_visit_the_course_this_is_the_page_they_de94acc2: "To jest strona, którą zobaczą osoby odwiedzające kurs. Możesz ustawić ją tak, aby pokazywała strumień aktywności, listę modułów kursu, program kursu lub stronę niestandardową napisaną przez Ciebie. Wartością domyślną jest strumień aktywności kursu."
