@@ -279,7 +279,7 @@ export class DiscussionRow extends Component {
           {this.props.canReadAsAdmin
             ? [
                 I18n.t('Enable '),
-                <Link href={ENV.FEATURE_FLAGS_URL} key={this.props.discussion.id}>
+                <Link href={ENV.FEATURE_FLAGS_URL} key={this.props.discussion.id} target="_blank">
                   {I18n.t('Discussions/Announcements Redesign')}
                 </Link>,
                 I18n.t(' to view anonymous discussion')
