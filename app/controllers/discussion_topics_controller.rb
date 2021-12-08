@@ -1249,6 +1249,14 @@ class DiscussionTopicsController < ApplicationController
       params[:anonymous_state] = nil
     end
 
+    # only full_anonymity and partial_anonymity can be stored. the rest will be nil'ed out
+    if is_new &&
+       !params[:anonymous_state].nil? &&
+       !(params[:anonymous_state] == "full_anonymity" || params[:anonymous_state] == "partial_anonymity")
+
+      params[:anonymous_state] = nil
+    end
+
     if is_new &&
        !params[:anonymous_state].nil? &&
        !@context.settings[:allow_student_anonymous_discussion_topics] &&

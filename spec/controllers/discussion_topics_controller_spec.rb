@@ -1578,6 +1578,48 @@ describe DiscussionTopicsController do
       end
     end
 
+    describe "discussion anonymity" do
+      it "allows full_anonymity" do
+        Account.site_admin.enable_feature! :react_discussions_post
+        Account.site_admin.enable_feature! :discussion_anonymity
+        user_session @teacher
+        post "create", params: topic_params(@course, { anonymous_state: "full_anonymity" }), format: :json
+        expect(response).to be_successful
+        expect(DiscussionTopic.last.anonymous_state).to eq "full_anonymity"
+        expect(DiscussionTopic.last).to be_anonymous
+      end
+
+      it "allows partial_anonymity" do
+        Account.site_admin.enable_feature! :react_discussions_post
+        Account.site_admin.enable_feature! :discussion_anonymity
+        user_session @teacher
+        post "create", params: topic_params(@course, { anonymous_state: "partial_anonymity" }), format: :json
+        expect(response).to be_successful
+        expect(DiscussionTopic.last.anonymous_state).to eq "partial_anonymity"
+        expect(DiscussionTopic.last).to be_anonymous
+      end
+
+      it "nullifies anonymous_state when unaccounted for" do
+        Account.site_admin.enable_feature! :react_discussions_post
+        Account.site_admin.enable_feature! :discussion_anonymity
+        user_session @teacher
+        post "create", params: topic_params(@course, { anonymous_state: "thisisunaccountedfor" }), format: :json
+        expect(response).to be_successful
+        expect(DiscussionTopic.last.anonymous_state).to be_nil
+        expect(DiscussionTopic.last).not_to be_anonymous
+      end
+
+      it "nullifies anonymous_state when feature flag is OFF" do
+        Account.site_admin.disable_feature! :react_discussions_post
+        Account.site_admin.enable_feature! :discussion_anonymity
+        user_session @teacher
+        post "create", params: topic_params(@course, { anonymous_state: "full_anonymity" }), format: :json
+        expect(response).to be_successful
+        expect(DiscussionTopic.last.anonymous_state).to be_nil
+        expect(DiscussionTopic.last).not_to be_anonymous
+      end
+    end
+
     it "requires authorization to create a discussion" do
       @course.update_attribute(:is_public, true)
       post "create", params: topic_params(@course, { is_announcement: false }), format: :json
