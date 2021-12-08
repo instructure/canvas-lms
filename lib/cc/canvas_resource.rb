@@ -163,6 +163,14 @@ module CC
           end
         end
 
+        if @course.banner_image_url.present?
+          atts << :banner_image_url
+        elsif @course.banner_image_id.present?
+          if (image_att = @course.attachments.active.where(id: @course.banner_image_id).first)
+            c.banner_image_identifier_ref(create_key(image_att))
+          end
+        end
+
         @course.disable_setting_defaults do # so that we don't copy defaulted settings
           atts.uniq.each do |att|
             c.tag!(att, @course.send(att)) unless @course.send(att).nil? || @course.send(att) == ""
