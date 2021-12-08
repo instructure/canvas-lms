@@ -2341,6 +2341,7 @@ pt:
       Permite que as respostas para discussão sejam classificadas de acordo com os carimbos de
       tempo de criação. A ordem por defeito é a mais recente para a mais antiga para respostas de nível de raiz.
   allows_help_links_to_be_tagged_as_featured_or_new__ed5742c2: "Permite que as Ligações de Ajuda sejam marcadas como Destacadas ou Novas e exibe de forma proeminente a Ligação de Ajuda Destacado no Menu Ajuda."
+  allows_instructors_to_apply_scores_to_ungraded_sub_7e772795: "Permite aos instrutores aplicar pontuações às submissões não classificadas em massa."
   allows_learning_outcomes_to_be_selectable_when_mig_acf15555: "Permite que os resultados da aprendizagem sejam selecionáveis aquando da migração dos conteúdos da disciplina"
   allows_modifying_notification_settings_for_any_cou_5004ac71: "Permite modificar as definições de notificação para qualquer disciplina a partir da página de definições de notificação a nível de conta."
   allows_setting_account_course_level_mastery_scales_1939e0fd: "Permite definir escalas de domínio de Conta e Nível de Disciplina e métodos de cálculo, ao substituir os critérios de avaliação e métodos de cálculo por pessoa"
@@ -3280,6 +3281,7 @@ pt:
   anonymous_submission_assignment_title_896654de: "Submissão Anónima: %{assignment_title}"
   anonymous_submission_comment_student_id_assignment_10ffe8c7: "Comentário Submissão Anónima: Aluno (%{id}), %{assignment_title}, %{course_name}"
   anonymous_submission_comment_student_user_id_assig_96b99600: "Comentário Submissão Anónima: Aluno (%{user_id}), %{assignment_title}, %{course_name}"
+  anonymous_topic_notice: "Este tópico requer a bandeira de recurso Discussões / Anúncios de Redesenho ativada."
   anonymous_turned_off_8118a0b: "Anónimo desativado"
   anonymous_turned_on_fe56f997: "Anónimo ativado"
   anonymous_user: "Utilizador Anónimo"
@@ -3379,6 +3381,7 @@ pt:
   apply_date_range_selection_cc4351ed: "Aplicar seleção do intervalo de datas"
   apply_filter_7e4f6113: "Aplicar filtros"
   apply_filters_note_clicking_this_button_will_cause_753f04: "Aplicar filtros. Nota: clicar neste botão fará com que a página seja recarregada."
+  apply_score_to_ungraded_afd025d0: "Aplicar Pontuação a Não classificado"
   apply_settings_10409ad9: "Aplicar Definições"
   apply_theme_7af08387: "Aplicar tema"
   applying_new_styles_to_subaccounts_e8aeeef2: "Aplicando novos estilos às subcontas"
@@ -7779,6 +7782,7 @@ pt:
       file_meta: "Falha ao exportar metadados do arquivo"
       files: "Falha ao exportar alguns arquivos"
       grading_standards: "Falha ao exportar padrões de avaliação"
+      late_policy: "Falha na política de exportação tardia"
       learning_outcomes: "Falha ao exportar resultados de aprendizado"
       lti_links: "Falha ao exportar alguns links da web"
       media_file: "Falha ao exportar um arquivo de mídia"
@@ -8664,6 +8668,7 @@ pt:
   create_an_ba36d171: "Criar um"
   create_and_administer_online_quizzes_and_surveys_b_7d2fa85f: "Criar e administrar questionários e pesquisas on-line, classificados e não classificados."
   create_announcements_above_1c36202b: "Criar anúncios acima"
+  create_anonymous_discussion_topics_d573e88e: "Criar tópicos de discussão anónima"
   create_as_many_discussion_topics_as_needed_as_assi_45ec1df: |-
       Criar tantos tópicos de discussão quanto necessários, como atribuições
                 para classificação ou como um fórum para ideias e informações partilhadas.
@@ -9897,6 +9902,7 @@ pt:
             em linha são perfeitas para manter discussões em profundidade ou a longo prazo
             organizadas, enquanto discussões focalizadas são mais adequadas para trocas de curta duração.
   discussions_announcements_redesign_901c5528: "Redesenho de Discussões/Anúncios"
+  discussions_announcements_redesign_anonymity_bbe1e4a2: "Redesenho de Discussões/Anúncios - Anonimato"
   discussions_create_94dff604: "Discussões - criar"
   discussions_index_menu_42591bc9: "Menu Índice de Discussões"
   discussions_menu_f18eb4a2: "Menu Discussões"
@@ -11278,6 +11284,7 @@ pt:
   failed_to_load_apps_db37e651: "Falha no carregamento de aplicações."
   failed_to_load_apps_for_name_fc6ce1c: "Falha no carregamento de aplicações para %{name}."
   failed_to_load_assignments_in_important_dates_ce3b4227: "Falha no carregamento de tarefas em datas importantes."
+  failed_to_load_conversation_messages_9b4546fc: "Falha ao carregar mensagens de conversação."
   failed_to_load_course_navigation_for_name_aded3650: "Falha no carregamento da disciplina de navegação para %{name}."
   failed_to_load_courses_refresh_the_page_to_try_aga_4248fa3f: "Falha no carregamento das disciplinas. Atualizar a página para tentar novamente."
   failed_to_load_csp_information_try_refreshing_the__4a056997: "Falha ao carregar as informações do CSP, tente atualizar a página."
@@ -11360,6 +11367,7 @@ pt:
   feature_options_enable_disable_7e748054: "Opções de recursos - ativar/desativar"
   feature_options_view_a170e80c: "Opções de recursos - exibir"
   feature_preview_5e1216a0: "Visualização de recursos"
+  feature_preview_opting_in_includes_ongoing_updates_111627f2: "Pré-visualização de recursos - a opção de entrada inclui atualizações contínuas fora do calendário de lançamento regular"
   feature_previews_2700a397: "Visualização de recursos"
   feature_previews_account_settings_274440bc: "Visualização de recursos (definições da conta)"
   feature_previews_enable_disable_707af910: "Visualização de recursos - ativar / desativar"
@@ -11726,6 +11734,7 @@ pt:
   full_name_23fdfb6d: "Nome completo"
   full_name_83cf5453: "Nome completo"
   full_name_is_required_8efbdc84: "É necessário um nome completo"
+  full_student_names_and_profile_pictures_will_be_hi_ddfba94e: "Completo: nomes de alunos e imagens de perfil serão ocultados"
   future_5416ea92: Futuro
   future_terms_7fba2ae6: "Termos Futuros"
   galician_7e4508b5: Galego
@@ -13248,6 +13257,7 @@ pt:
   handlebars_helpers: 
     time: 
       event: "%{date} em %{time}"
+  has_been_automatically_selected_based_upon_where_t_61f805c5: "foi automaticamente selecionada com base no local onde reside a instância do Canvas desta conta. Em alguns casos, pode ser uma região diferente."
   has_similarity_score_d5f332b4: "Tem pontuação de similaridade"
   has_syllabus_body_6f250277: has_syllabus_body
   has_turnitin_score_3e1cacf6: "Tem pontuação de Turnitin"
@@ -13654,6 +13664,7 @@ pt:
   if_disabled_user_will_still_have_access_to_course__d78fddc4: "Se desativado, o utilizador ainda terá acesso às configurações da disciplina. O utilizador não pode gerir o conteúdo individual da disciplina sem a devida        permissão para esse item de conteúdo. Se a visibilidade da disciplina for limitada aos utilizadores inscritos na disciplina, esta permissão permite ao utilizador visualizar o conteúdo da disciplina sem estar inscrito na mesma."
   if_disabled_user_will_still_have_access_to_course__fbf32c87: "Se desativado, o utilizador ainda terá acesso às Definições da disciplina."
   if_enabled_access_to_lti_1_3_and_lti_advantage_wil_1013107c: "Se ativado, o acesso ao LTI 1.3 e ao LTI Advantage será ativado."
+  if_enabled_allows_deep_linking_from_the_module_ind_632bb221: "Se ativada, permite uma ligação profunda a partir do índice do módulo através de um modal."
   if_enabled_allows_deep_linking_from_the_module_ind_f2dcbddb: "Se ativado, permite uma ligação profunda a partir do índice do módulo."
   if_enabled_allows_more_than_the_maximum_possible_s_5d79c0d5: "Se ativado, permite que mais do que a pontuação máxima possível de um resultado seja fornecida em uma rubrica."
   if_enabled_allows_multiple_deep_link_support_for_a_5d2498ab: "Se ativado, permite suporte de múltiplas ligações profundas para tarefas e módulos."
@@ -14013,8 +14024,8 @@ pt:
   include_scores_when_alerting_about_grade_changes_623ec201: "Inclua as pontuações ao me alertar sobre alteração de notas."
   include_scores_when_alerting_about_grades_89728ae1: "Inclua as pontuações ao me alertar sobre alteração de notas."
   include_scores_when_alerting_about_grades_if_your__b221c2c8: |-
-      Inclui notas quando receber alertas acerca de classificações.
-                Se o seu email não é um email da instituição significa que conteúdo sensível vai ser enviado para fora da instituição.
+      Incluir pontuações ao alertar sobre as notas.
+      Se o seu e-mail não for um e-mail da instituição, isto significa que o conteúdo sensível será enviado para fora da instituição.
   include_speedgrader_in_assignment_header_menu_69cd8656: "Incluir no SpeedGrader menu Cabeçalho de Atribuição"
   include_the_datadog_rum_js_agent_in_the_document_h_dab3570d: "Incluir o agente JS RUM Datadog no documento HEAD."
   include_this_assignment_s_grades_when_posting_to_y_6bff3323: "Incluir as notas desta tarefa ao publicar no sistema de informações de alunos (SIS) da escola"
@@ -14278,6 +14289,8 @@ pt:
                                     Entre em contato no #canvas-sre no Slack.
   invalid_restrictions_316cd740: "Restrições inválidas"
   invalid_score_3d247da7: "Pontuação inválida"
+  invalid_sftp_username_we_were_unable_to_determin_t_9d769a7e: "Nome de utilizador inválido sftp. Não conseguimos determinar o nome de utilizador a utilizar devido a nenhum domínio terminado em .instructure.\n\
+      \x20                             Por favor contacte-nos em #canvas-sre em Slack.   "
   invalid_sis_sync_status_b68db497: "Estado de sincronização SIS inválido"
   invalid_state_parameter_7a5aa108: "Parâmetro de estado inválido"
   invalid_submission_file_type_cda6742a: "Tipo de ficheiro de submissão inválido"
@@ -14868,6 +14881,7 @@ pt:
   loading_comment_library_3131e5c6: "Carregar biblioteca de comentários"
   loading_comments_32366acf: "A carregar comentários"
   loading_compose_modal_f6da0e8b: "Carregamento Composto Modal"
+  loading_conversation_messages_71e9050e: "Carregamento de mensagens de conversação"
   loading_courses_409a3641: "A carregar Disciplinas"
   loading_courses_bd1bffe: "Carregando disciplinas..."
   loading_courses_complete_count_courses_found_6768d9e1: 
@@ -14878,6 +14892,7 @@ pt:
   loading_discussions_8ed5fcd7: "A carregar discussões"
   loading_external_tool_d839042c: "Carregamento de ferramenta externa"
   loading_f99d93d4: "...A carregar"
+  loading_feature_options_82e07ee4: "Opções de carregamento de recursos"
   loading_features_d26820f6: "A carregar recursos"
   loading_folders_d8b5869e: "A carregar pastas"
   loading_graders_f6a76142: "A carregar classificadores"
@@ -17581,6 +17596,8 @@ pt:
   modules_group_menu_4aae0d5f: "Menu Grupo de Módulos"
   modules_home_page_568c6bb9: "Módulos Página Inicial"
   modules_index_menu_c8748e7c: "Menu Índice de Módulos"
+  modules_index_menu_modal_79123a19: "Menu Índice de Módulos (Modal)"
+  modules_index_menu_tray_3f9975d9: "Menu Índice de Módulos (Bandeja)"
   modules_item_controller: 
     max_score_complete: "obteve não mais do que *score*"
     max_score_incomplete: "tem de obter não mais do que *score*"
@@ -18603,6 +18620,7 @@ pt:
   of_students_5d1af0d2: "N.º de alunos"
   off_5385ef3f: Desligada
   off_policy_will_not_apply_to_this_sub_account_8b12386b: "Off - a política não se aplica a esta subconta"
+  off_student_names_and_profile_pictures_will_be_vis_6891e2cf: "Desligado: nomes de alunos e imagens de perfil serão visíveis aos outros membros desta disciplina"
   offensive_abusive_c41dcb08: "Ofensivo, abusivo"
   offline_score_8d7b4779: "Pontuação Off-line:"
   offline_web_export_dca67174: "Exportação Web Offline"
@@ -18713,6 +18731,7 @@ pt:
   open_this_keyboard_shortcuts_dialog_9658b83a: "Abrir esta caixa de diálogo de atalhos do teclado"
   open_title_in_a_new_window_b29fed77: "Abrir %{title} numa nova janela"
   open_to_comments_23d5585e: "Abrir a comentários"
+  open_to_do_items_in_a_new_tab_120ea5f4: "Abrir itens num novo separador"
   openid_connect_initiation_url_2be36b48: "URL de início do OpenID Connect"
   openid_connect_initiation_url_d9037d30: "* URL de início do OpenID Connect"
   opens_in_new_window_b4b99243: "abre-se em nova janela"
@@ -19282,6 +19301,7 @@ pt:
   please_provide_a_pairing_code_530d1e9d: "Favor fornecer um código de emparelhamento."
   please_provide_a_valid_tenant_domain_check_your_az_7acb215b: "Por favor, forneça um domínio de inquilino válido. Verifique as definições do seu Azure Active Directory para o encontrar."
   please_reach_out_in_slack_at_canvas_sre_if_this_ke_bfa853d7: "Por favor, estendam a mão em Slack at #canvas-sre se isto continuar a acontecer."
+  please_reach_out_in_slack_at_canvas_sre_the_region_85440d71: "Por favor, contacte-nos em Slackem #canvas-sre. A região onde se encontra a instância do Canvas deste cliente não suporta SFTP."
   please_reach_out_in_slack_at_canvas_sre_to_create__7ae1850c: "Por favor, contactar em Slack at #canvas-sre para criar SFTP para esta conta."
   please_select_a_group_set_for_this_assignment_e1da63d3: "Seleccione um grupo para esta tarefa"
   please_select_a_reason_for_reporting_this_reply_51719e8d: "Por favor selecione um motivo para comunicar esta resposta"
@@ -21714,7 +21734,7 @@ pt:
           time_elapsed: "Tempo decorrido"
           time_running: "Tempo a correr"
         links: 
-          hide_time_running: Ocultar
+          hide_time_running: "Hide Time (Ocultar Hora)"
           keep_editing_quiz: "Continuar a editar este teste"
           keep_editing_survey: "Continuar a editar este questionário"
     retrieving_filters: "Recuperando filtros..."
@@ -21773,7 +21793,7 @@ pt:
       errors: 
         connection_lost: "A ligação a %{host} foi perdida.  Verifique se está ligado à Internet antes de prosseguir."
         only_numerical_values: "são aceitos somente valores numéricos"
-      hide_time_link: Ocultar
+      hide_time_link: "Ocultar Hora"
       hours_count: 
         one: "1 hora"
         other: "%{count} horas"
@@ -21804,7 +21824,7 @@ pt:
       seconds_count: 
         one: "1 segundo"
         other: "%{count} segundos"
-      show_time_link: Exibir
+      show_time_link: "Hora do espectáculo"
       titles: 
         come_back_later: "Marcou esta pergunta para voltar mais tarde"
         times_up: "O tempo acabou!"
@@ -23450,6 +23470,7 @@ pt:
                                     horas para começar a funcionar.
   sftp_key_is_invalid_please_ensure_it_is_correctly__2d309e0b: "A chave SFTP é inválida. Por favor, certifique-se de que está correctamente formatada."
   sftp_key_removed_from_user_42318725: "Chave SFTP removida do utilizador."
+  sftp_region_invalid_216caa40: "Região SFTP inválida"
   sftp_user_already_exists_or_is_disabled_please_rea_9554a53a: |-
       O utilizador SFTP já existe ou está desativado.
                                     Por favor, contate-nos em #canvas-sre em Slack.
@@ -26001,6 +26022,7 @@ pt:
   this_eportfolio_has_been_identified_as_spam_it_is__f927947b: "Este ePortfolio foi identificado como spam. No momento, ele só está visível para os administradores e para o autor. Se tem a certeza que este conteúdo não é spam, pode marcá-lo como seguro."
   this_feature_affects_existing_data_for_all_courses_4fc75fe1: "Este recurso afeta os dados existentes para todos as Disciplinas na conta."
   this_feature_affects_existing_data_for_an_entire_a_2372dc52: "Este recurso afeta os dados existentes para uma conta inteira."
+  this_feature_allows_teachers_to_create_anonymous_d_ea364dca: "Este recurso permite aos professores criar discussões anónimas e permite aos professores criar discussões anónimas a nível da disciplina"
   this_feature_allows_teachers_to_easily_copy_single_9d4cdfe: "Esse recurso permite que os professores copiem facilmente itens únicos de uma disciplina para outra e partilhem um único item de conteúdo com outros utilizadores para que eles possam importar esses itens para suas disciplinas também."
   this_feature_can_t_be_disabled_because_there_is_at_a015b943: "Este recurso não pode ser desativado porque há pelo menos uma sub-conta ou disciplina com este recurso habilitado."
   this_feature_can_t_be_enabled_while_autodetection__a3552fb4: "Este recurso não pode ser ativado enquanto a detecção automática de separadores de campo está ativada"
@@ -26239,6 +26261,7 @@ pt:
   this_user_is_currently_not_able_to_access_the_cour_39cabed1: "Este utilizador atualmente não consegue aceder à disciplina"
   this_user_is_currently_not_able_to_access_the_cour_b17d5df1: "Este utilizador atualmente não consegue aceder à disciplina"
   this_user_performed_actions_while_anonymous_was_of_2f3c1de1: "Este utilizador realizou ações enquanto o anónimo estava desativado"
+  this_user_will_be_created_in_3b2a2b52: "Este utilizador será criado em:"
   this_version_of_gradebook_is_being_replaced_by_an__b5a174b2: "Esta versão do Livro de classificação está sendo substituída por um Livro de classificação atualizado em ou antes de 18 de janeiro de 2020."
   this_was_already_happening_for_images_in_the_quest_58edf4fb: |-
       Isto já estava a acontecer para as imagens na pergunta, mas não para respostas
@@ -28251,6 +28274,7 @@ pt:
   view_description_b6d8e52b: "Ver descrição"
   view_due_items_due_today_for_course_coursename_129e433: "Ver %{due} itens a serem entregues hoje para disciplina %{courseName}"
   view_faculty_journals_ad0e8c8f: "Exibir diários da faculdade"
+  view_feature_options_at_an_account_level_a84cedbe: "Ver opções de recurso ao nível de uma conta"
   view_feature_settings_at_an_account_level_ec7f5e10: "Exibir configurações de recursos no nível da conta"
   view_feedback_b88c99c: "Ver feedback"
   view_feedback_f2feabca: "Ver observações"
@@ -28457,6 +28481,7 @@ pt:
       Quando ativada, esta bandeira mostra um botão "Unir-se" nos eventos do
       calendário do Canvas no planeador do estudante
   when_enabled_this_flag_shows_a_student_picker_for__5353b8e2: "Quando ativada, esta bandeira mostra no painel de instrumentos um aluno que escolhe os observadores."
+  when_enabled_this_setting_automatically_opens_teac_f93c16f0: "Quando ativada, esta definição abre automaticamente os itens do professor para fazer, num novo separador."
   when_enabled_turns_on_mention_functionality_in_cou_ae490b21: "Quando ativado, ativa a funcionalidade \"@mention\" nas discussões da disciplina."
   when_hiding_grades_for_anonymous_assignments_grade_1b0ef682: "Ao ocultar notas para tarefas anónimas, as notas serão ocultadas para todos na disciplina. O anonimato será reaplicado."
   when_people_visit_the_course_this_is_the_page_they_de94acc2: "Esta é a página que as pessoas verão quando visitarem a disciplina. Pode configurar a página para mostrar um fluxo de atividade, a lista de módulos da disciplina, um programa ou uma página personalizada criada por si. A predefinição é o fluxo de atividade da disciplina."
