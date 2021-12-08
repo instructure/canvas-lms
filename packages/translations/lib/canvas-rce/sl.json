@@ -144,6 +144,8 @@
   "describe_the_image_e65d2e32": { "message": "(Opiši sliko)" },
   "describe_the_video_2fe8f46a": { "message": "(Opišite videoposnetek)" },
   "details_98a31b68": { "message": "Podrobnosti" },
+  "diamond_b8dfe7ae": { "message": "Diamant" },
+  "dimension_type_55c83e4e": { "message": "Vrsta mere" },
   "dimensions_45ddb7b7": { "message": "Mere" },
   "directionality_26ae9e08": { "message": "Usmerjenost" },
   "discussions_a5f96392": { "message": "Razprave" },
@@ -280,6 +282,9 @@
   "miscellaneous_e9818229": { "message": "Drugo" },
   "modules_c4325335": { "message": "Moduli" },
   "multi_color_image_63d7372f": { "message": "Večbarvna slika" },
+  "must_be_at_least_percentage_22e373b6": {
+    "message": "Mora biti vsaj { percentage }%."
+  },
   "must_be_at_least_width_x_height_px_41dc825e": {
     "message": "Mora biti vsaj { width } x { height } px."
   },
@@ -322,7 +327,10 @@
   },
   "pages_e5414c2c": { "message": "Strani" },
   "paragraph_5e5ad8eb": { "message": "Odstavek" },
+  "pentagon_17d82ea3": { "message": "Peterokotnik" },
   "people_b4ebb13c": { "message": "Sodelujoči" },
+  "percentage_34ab7c2c": { "message": "Odstotek" },
+  "pixels_52ece7d1": { "message": "Slikovne pike" },
   "posted_when_a578f5ab": { "message": "Objavljeno: { when }" },
   "preformatted_d0670862": { "message": "Predoblikovano" },
   "pretty_html_editor_28748756": {
