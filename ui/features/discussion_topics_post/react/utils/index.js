@@ -176,7 +176,8 @@ export const getOptimisticResponse = (
   parentId = 'PLACEHOLDER',
   rootEntryId = null,
   isolatedEntryId = null,
-  quotedEntry = null
+  quotedEntry = null,
+  isAnonymous = false
 ) => {
   if (quotedEntry && Object.keys(quotedEntry).length !== 0) {
     quotedEntry = {
@@ -218,15 +219,24 @@ export const getOptimisticResponse = (
           repliesCount: 0,
           __typename: 'DiscussionEntryCounts'
         },
-        author: {
-          id: 'USER_PLACEHOLDER',
-          _id: ENV.current_user.id,
-          avatarUrl: ENV.current_user.avatar_image_url,
-          displayName: ENV.current_user.display_name,
-          courseRoles: [],
-          __typename: 'User'
-        },
-        anonymousAuthor: null,
+        author: !isAnonymous
+          ? {
+              id: 'USER_PLACEHOLDER',
+              _id: ENV.current_user.id,
+              avatarUrl: ENV.current_user.avatar_image_url,
+              displayName: ENV.current_user.display_name,
+              courseRoles: [],
+              __typename: 'User'
+            }
+          : null,
+        anonymousAuthor: isAnonymous
+          ? {
+              id: ENV.current_user.anonymous_id,
+              avatarUrl: null,
+              shortName: ENV.current_user.anonymous_id,
+              __typename: 'AnonymousUser'
+            }
+          : null,
         editor: null,
         lastReply: null,
         permissions: {

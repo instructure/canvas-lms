@@ -411,6 +411,7 @@ describe UsersController, type: :request do
           "comment" => "c1",
           "author" => {
             "id" => @teacher.id,
+            "anonymous_id" => @teacher.id.to_s(36),
             "display_name" => "teacher",
             "pronouns" => nil,
             "html_url" => "http://www.example.com/courses/#{@course.id}/users/#{@teacher.id}",
@@ -427,6 +428,7 @@ describe UsersController, type: :request do
           "comment" => "c2",
           "author" => {
             "id" => @user.id,
+            "anonymous_id" => @user.id.to_s(36),
             "display_name" => "User",
             "pronouns" => nil,
             "html_url" => "http://www.example.com/courses/#{@course.id}/users/#{@user.id}",
@@ -546,6 +548,7 @@ describe UsersController, type: :request do
           "comment" => "c1",
           "author" => {
             "id" => @teacher.id,
+            "anonymous_id" => @teacher.id.to_s(36),
             "display_name" => "teacher",
             "html_url" => "http://www.example.com/courses/#{@course.id}/users/#{@teacher.id}",
             "avatar_image_url" => User.avatar_fallback_url(nil, request),
@@ -562,6 +565,7 @@ describe UsersController, type: :request do
           "comment" => "c2",
           "author" => {
             "id" => @user.id,
+            "anonymous_id" => @user.id.to_s(36),
             "display_name" => "User",
             "html_url" => "http://www.example.com/courses/#{@course.id}/users/#{@user.id}",
             "pronouns" => nil,
