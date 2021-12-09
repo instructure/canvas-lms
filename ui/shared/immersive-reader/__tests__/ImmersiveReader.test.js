@@ -31,7 +31,7 @@ describe('#initializeReaderButton', () => {
   describe('ImmersiveReaderButton', () => {
     const fakeContent = {
       title: 'fake title',
-      content: '<p>Some fake content yay</p>'
+      content: () => '<p>Some fake content yay</p>'
     }
     describe('onClick', () => {
       it('calls to launch the Immersive Reader with the proper content', async () => {
