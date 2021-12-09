@@ -29,6 +29,7 @@
     "demo:build": "webpack -c ./webpack.demo.config.js",
     "demo:dev": "yarn demo:clean && mkdir -p ./github-pages/dist &&  cp ./github-pages/index.html ./github-pages/dist && webpack -c ./webpack.dev.config.js",
     "installTranslations": "scripts/installTranslations.js",
+    "commitTranslations": "scripts/commitTranslations.sh",
     "build:all": "scripts/build.js",
     "build:canvas": "scripts/build-canvas",
     "build:watch": "rm -rf es &&  ./node_modules/.bin/babel --out-dir es src --watch --verbose",
