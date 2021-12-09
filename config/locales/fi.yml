@@ -15241,7 +15241,7 @@ fi:
     blueprint_description: |-
         *Vain opettaja ja pääkäyttäjä:*
         
-                Sisältö synkronoitiin blueprint-kurssista liitettyihin kursseihin
+        Sisältö synkronoitiin blueprint-kurssista liitettyihin kursseihin
     blueprint_display: "Blueprintin synkronointi"
     calendar_description: "Uusia tai muuttuneita merkintöjä kurssikalenterissasi"
     calendar_display: Kalenteri
@@ -15276,7 +15276,7 @@ fi:
     content_link_error_description: |-
         *Vain opettaja ja pääkäyttäjä:*
         
-                Sellaisen virheellisen linkin sijaintipaikka ja sisältö, jonka kanssa opiskelija on ollut vuorovaikutuksessa
+        Sellaisen virheellisen linkin sijaintipaikka ja sisältö, jonka kanssa opiskelija on ollut vuorovaikutuksessa
     content_link_error_display: "Sisällön linkin virhe"
     conversation_created_description: "Loit keskustelun"
     conversation_created_display: "Luomani viestiketjut"
@@ -15285,9 +15285,9 @@ fi:
     course_content_description: |-
         Vaihda kurssin sisältöön: 
         
-                * Sivun sisältö
-                * Testin sisältö
-                * Tehtävän sisältö
+        * Sivun sisältö
+        * Testin sisältö
+        * Tehtävän sisältö
     course_content_display: "Kurssin sisältö"
     discussion_description: "Uusi keskustelun aihe kurssillasi"
     discussion_display: "Uusi aihe"
@@ -15298,31 +15298,31 @@ fi:
     files_description: "Uusi tiedosto lisätty kurssillesi"
     files_display: Tiedostot
     grading_description: |-
-        Includes: 
+        Sisällyttää: 
         
-                * Tehtävän/tehtäväpalautuksen arvosana syötetty/muutettu
-                * Arvosanan painotusta muutettu
+        * Tehtävän/tehtäväpalautuksen arvosana syötetty/muutettu
+        * Arvosanan painotusta muutettu
     grading_display: "Arvosanojen anto"
     grading_policies_description: "Kurssin arviointikäytännön muutos"
     grading_policies_display: "Arvosanojen antokäytäntö"
     invitation_description: |-
         Kutsu: 
         
-                * Verkkotapaaminen
-                * Ryhmä
-                * Yhteistyö
-                * Vertaisarviointi ja muistutus
+        * Verkkotapaaminen
+        * Ryhmä
+        * Yhteistyö
+        * Vertaisarviointi ja muistutus
     invitation_display: Kutsu
     late_grading_description: |-
         *Vain ohjaaja ja pääkäyttäjä:*
         
-                Myöhäinen tehtävän palautus
+        Myöhäinen tehtävän palautus
     late_grading_display: "Myöhäinen arvosanojen anto"
     membership_update_description: |-
         *Vain pääkäyttäjä: odottava ilmoittautuminen aktivoitu*
         
-                * Ryhmäilmoittautuminen
-                * hyväksytty/hylätty
+        * Ryhmäilmoittautuminen
+        * hyväksytty/hylätty
     membership_update_display: "Jäsenyyden päivitys"
     missing_description_description: "%{category} ilmoituksille"
     missing_display_display: "%{category} ilmoituksille"
@@ -15407,19 +15407,19 @@ fi:
     other_description: |-
         *Vain opettaja ja pääkäyttäjä:*
         
-                * Kurssin ilmoittautuminen
-                * Raportti luotu
-                * Sisällön vienti
-                * Siirtoraportti
-                * Uusi tilin käyttäjä
-                * Uusi opiskelijaryhmä
+        * Kurssin ilmoittautuminen
+        * Raportti luotu
+        * Sisällön vienti
+        * Siirtoraportti
+        * Uusi tilin käyttäjä
+        * Uusi opiskelijaryhmä
     other_display: "Pääkäyttäjän ilmoitukset"
     recording_ready_display: "Tallennus valmis"
     reminder_display: Muistutus
     student_appointment_description: |-
         *Vain opettaja ja pääkäyttäjä:*
-                
-                Opiskelijan tapaamisen rekisteröiminen
+        
+        Opiskelijan tapaamisen rekisteröiminen
     student_appointment_display: "Opiskelijatapaamisaikojen varaukset"
     submission_comment_description: "Tehtäväpalautuksen kommentti"
     submission_comment_display: "Tehtäväpalautuksen kommentti"
