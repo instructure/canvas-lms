@@ -1,11 +1,3 @@
-rce_auto_save:
-  state: hidden
-  display_name: RCE Auto-Save
-  description: |-
-    If RCE Enhancements are also enabled,
-    the RCE will auto-save your work as you go
-  applies_to: Course
-  root_opt_in: true
 cc_in_rce_video_tray:
   state: hidden
   display_name: RCE Edit Closed Captions

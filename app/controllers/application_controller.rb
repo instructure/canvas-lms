@@ -196,7 +196,6 @@ class ApplicationController < ActionController::Base
           DOMAIN_ROOT_ACCOUNT_ID: @domain_root_account&.global_id,
           k12: k12?,
           use_responsive_layout: use_responsive_layout?,
-          rce_auto_save: @context.try(:feature_enabled?, :rce_auto_save),
           use_rce_a11y_checker_notifications: @context.try(:feature_enabled?, :rce_a11y_checker_notifications),
           help_link_name: help_link_name,
           help_link_icon: help_link_icon,
@@ -249,7 +248,7 @@ class ApplicationController < ActionController::Base
         end
 
         @js_env[:lolcalize] = true if ENV["LOLCALIZE"]
-        @js_env[:rce_auto_save_max_age_ms] = Setting.get("rce_auto_save_max_age_ms", 1.day.to_i * 1000).to_i if @js_env[:rce_auto_save]
+        @js_env[:rce_auto_save_max_age_ms] = Setting.get("rce_auto_save_max_age_ms", 1.day.to_i * 1000).to_i
         @js_env[:FEATURES][:new_math_equation_handling] = use_new_math_equation_handling?
         @js_env[:K5_USER] = k5_user?
         @js_env[:K5_HOMEROOM_COURSE] = @context.is_a?(Course) && @context.elementary_homeroom_course?

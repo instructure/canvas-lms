@@ -170,7 +170,7 @@ const RCELoader = {
     // TODO: let client pass autosave_enabled in as a prop from the outside
     //       Assignmens2 student view is going to be doing their own autosave
     const autosave = {
-      enabled: ENV.rce_auto_save,
+      enabled: true,
       maxAge: Number.isNaN(ENV.rce_auto_save_max_age_ms) ? 3600000 : ENV.rce_auto_save_max_age_ms
     }
 
