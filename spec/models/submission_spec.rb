@@ -3830,6 +3830,107 @@ describe Submission do
     end
   end
 
+  describe "scope: in_current_grading_period_for_courses" do
+    before :once do
+      @term = Account.default.enrollment_terms.create!(start_at: 10.years.ago)
+      @course.enrollment_term_id = @term.id
+      @course.save!
+
+      period_group = Account.default.grading_period_groups.create!
+      period_group.enrollment_terms << @course.enrollment_term
+      now = Time.zone.now
+      period_group.grading_periods.create!(
+        title: "Closed Period",
+        start_date: 5.months.ago(now),
+        end_date: 2.months.ago(now),
+        close_date: 2.months.ago(now)
+      )
+      period_group.grading_periods.create!(
+        title: "Current Period",
+        start_date: 2.months.ago(now),
+        end_date: 2.months.from_now(now),
+        close_date: 2.months.from_now(now)
+      )
+
+      @course.assignments.create!(
+        name: "Assignment in closed period",
+        workflow_state: "published",
+        submission_types: "online_text_entry",
+        due_at: 4.months.ago(now)
+      )
+      @course.assignments.create!(
+        name: "Assignment in current period",
+        workflow_state: "published",
+        submission_types: "online_text_entry",
+        due_at: 1.month.ago
+      )
+    end
+
+    it "only returns submissions in the current grading period" do
+      submissions = Submission.in_current_grading_period_for_courses([@course.id])
+      expect(submissions.map { |s| s.assignment.name }.sort).to eq(["Assignment in current period", "some assignment"].sort)
+    end
+
+    it "includes assignments without a due date" do
+      @course.assignments.create!(
+        name: "Assignment without due date",
+        workflow_state: "published",
+        submission_types: "online_text_entry"
+      )
+      submissions = Submission.in_current_grading_period_for_courses([@course.id])
+      expect(submissions.count).to be(3)
+      expect(submissions.map { |s| s.assignment.name }).to include("Assignment without due date")
+    end
+
+    it "includes assignments from all specified courses" do
+      course1 = @course
+      course_factory(enrollment_term_id: @term.id, active_all: true)
+      @course.enroll_student(@student, enrollment_state: :active)
+      @course.assignments.create!(
+        name: "Another in current period",
+        workflow_state: "published",
+        submission_types: "online_text_entry",
+        due_at: 1.month.ago
+      )
+      submissions = Submission.in_current_grading_period_for_courses([course1.id, @course.id])
+      expect(submissions.count).to be(3)
+      expect(submissions.map { |s| s.assignment.name }).to include("Another in current period")
+    end
+
+    it "ignores courses not included in array" do
+      course_factory(enrollment_term_id: @term.id, active_all: true)
+      @course.enroll_student(@student, enrollment_state: :active)
+      @course.assignments.create!(
+        name: "Another in current period",
+        workflow_state: "published",
+        submission_types: "online_text_entry",
+        due_at: 1.month.ago
+      )
+      submissions = Submission.in_current_grading_period_for_courses([@course.id])
+      expect(submissions.count).to be(1)
+      expect(submissions.first.assignment.name).to eq("Another in current period")
+    end
+
+    it "includes all submissions from courses without grading periods" do
+      course1 = @course
+      course_factory(active_all: true)
+      @course.enroll_student(@student, enrollment_state: :active)
+      @course.assignments.create!(
+        name: "No GP 1",
+        workflow_state: "published",
+        submission_types: "online_text_entry",
+        due_at: 1.month.ago
+      )
+      @course.assignments.create!(
+        name: "No GP 2",
+        workflow_state: "published",
+        submission_types: "online_text_entry"
+      )
+      submissions = Submission.in_current_grading_period_for_courses([course1.id, @course.id])
+      expect(submissions.map { |s| s.assignment.name }.sort).to eq(["Assignment in current period", "No GP 1", "No GP 2", "some assignment"].sort)
+    end
+  end
+
   describe "#late?" do
     before(:once) do
       course = Course.create!
