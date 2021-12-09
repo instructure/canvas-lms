@@ -22,8 +22,7 @@ module RuboCop
     module Migration
       class RemoveColumn < Cop
         include RuboCop::Canvas::MigrationTags
-        POSTDEPLOY_MSG = "column removal needs to be in a postdeploy migration"
-        IGNORED_COLUMNS_MSG = "Please ensure removed column names are added to `self.ignored_columns` in the ActiveRecord model."
+        MSG = "column removal needs to be in a postdeploy migration"
 
         def on_def(node)
           method_name, *_args = *node
@@ -39,12 +38,8 @@ module RuboCop
           super
           _receiver, method_name, *_args = *node
 
-          if remove_column?(method_name)
-            if predeploy?
-              add_offense(node, message: POSTDEPLOY_MSG, severity: :error)
-            else
-              add_offense(node, message: IGNORED_COLUMNS_MSG, severity: :convention)
-            end
+          if remove_column_in_predeploy?(method_name)
+            add_offense(node, message: MSG, severity: :error)
           end
         end
 
@@ -60,12 +55,9 @@ module RuboCop
 
         private
 
-        def predeploy?
-          tags.include?(:predeploy)
-        end
-
-        def remove_column?(method_name)
-          DISALLOWED_METHOD_NAMES.include?(method_name) &&
+        def remove_column_in_predeploy?(method_name)
+          tags.include?(:predeploy) &&
+            DISALLOWED_METHOD_NAMES.include?(method_name) &&
             [:up, :change].include?(@current_def)
         end
       end

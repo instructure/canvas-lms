@@ -19,7 +19,6 @@
 import {DISCUSSION_SUBENTRIES_QUERY} from '../../graphql/Queries'
 import {Discussion} from '../../graphql/Discussion'
 import {DiscussionEntry} from '../../graphql/DiscussionEntry'
-import I18n from 'i18n!discussion_topics_post'
 
 export const isGraded = (assignment = null) => {
   return assignment !== null
@@ -176,8 +175,7 @@ export const getOptimisticResponse = (
   parentId = 'PLACEHOLDER',
   rootEntryId = null,
   isolatedEntryId = null,
-  quotedEntry = null,
-  isAnonymous = false
+  quotedEntry = null
 ) => {
   if (quotedEntry && Object.keys(quotedEntry).length !== 0) {
     quotedEntry = {
@@ -187,7 +185,6 @@ export const getOptimisticResponse = (
         shortName: quotedEntry.author.shortName,
         __typename: 'User'
       },
-      anonymousAuthor: null,
       editor: null,
       deleted: false,
       __typename: 'DiscussionEntry'
@@ -219,24 +216,14 @@ export const getOptimisticResponse = (
           repliesCount: 0,
           __typename: 'DiscussionEntryCounts'
         },
-        author: !isAnonymous
-          ? {
-              id: 'USER_PLACEHOLDER',
-              _id: ENV.current_user.id,
-              avatarUrl: ENV.current_user.avatar_image_url,
-              displayName: ENV.current_user.display_name,
-              courseRoles: [],
-              __typename: 'User'
-            }
-          : null,
-        anonymousAuthor: isAnonymous
-          ? {
-              id: ENV.current_user.anonymous_id,
-              avatarUrl: null,
-              shortName: ENV.current_user.anonymous_id,
-              __typename: 'AnonymousUser'
-            }
-          : null,
+        author: {
+          id: 'USER_PLACEHOLDER',
+          _id: ENV.current_user.id,
+          avatarUrl: ENV.current_user.avatar_image_url,
+          displayName: ENV.current_user.display_name,
+          courseRoles: [],
+          __typename: 'User'
+        },
         editor: null,
         lastReply: null,
         permissions: {
@@ -262,11 +249,3 @@ export const getOptimisticResponse = (
     }
   }
 }
-
-export const isAnonymous = discussionEntry =>
-  ENV.discussion_anonymity_enabled && discussionEntry.anonymousAuthor != null
-
-export const getDisplayName = discussionEntry =>
-  isAnonymous(discussionEntry)
-    ? I18n.t('Anonymous') + ' ' + discussionEntry.anonymousAuthor.shortName
-    : discussionEntry.author?.displayName || discussionEntry.author?.shortName

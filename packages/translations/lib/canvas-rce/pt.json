@@ -140,8 +140,6 @@
   "describe_the_image_e65d2e32": { "message": "(Descreva a imagem)" },
   "describe_the_video_2fe8f46a": { "message": "(Descreva o vídeo)" },
   "details_98a31b68": { "message": "Detalhes" },
-  "diamond_b8dfe7ae": { "message": "Diamante" },
-  "dimension_type_55c83e4e": { "message": "Tipo de dimensão" },
   "dimensions_45ddb7b7": { "message": "Dimensões" },
   "directionality_26ae9e08": { "message": "Direcionalidade" },
   "discussions_a5f96392": { "message": "Discussões" },
@@ -286,9 +284,6 @@
   "miscellaneous_e9818229": { "message": "Diversos" },
   "modules_c4325335": { "message": "Módulos" },
   "multi_color_image_63d7372f": { "message": "Imagem Multi-Cor" },
-  "must_be_at_least_percentage_22e373b6": {
-    "message": "Deve ser pelo menos { percentage }%"
-  },
   "must_be_at_least_width_x_height_px_41dc825e": {
     "message": "Deve ter pelo menos { width } x { height }px"
   },
@@ -329,10 +324,7 @@
   },
   "pages_e5414c2c": { "message": "Páginas" },
   "paragraph_5e5ad8eb": { "message": "Parágrafo" },
-  "pentagon_17d82ea3": { "message": "Pentágono" },
   "people_b4ebb13c": { "message": "Pessoas" },
-  "percentage_34ab7c2c": { "message": "Porcentagem" },
-  "pixels_52ece7d1": { "message": "Pixels" },
   "posted_when_a578f5ab": { "message": "Publicado: { when }" },
   "preformatted_d0670862": { "message": "Pré-formatado" },
   "pretty_html_editor_28748756": { "message": "Editor HTML Bonito" },

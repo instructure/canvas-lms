@@ -342,8 +342,7 @@ export default class SubmissionManager extends Component {
       context.isLatestAttempt &&
       context.allowChangesToSubmission &&
       !this.props.assignment.lockInfo.isLocked &&
-      !this.shouldRenderNewAttempt(context) &&
-      context.lastSubmittedSubmission?.gradingStatus !== 'excused'
+      !this.shouldRenderNewAttempt(context)
     )
   }
 

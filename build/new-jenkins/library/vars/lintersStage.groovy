@@ -128,7 +128,7 @@ def groovyStage(stages, buildConfig) {
     callableWithDelegate(queueTestStage())(stages,
       name: 'groovy',
       required: env.GERRIT_PROJECT == 'canvas-lms' && filesChangedStage.hasGroovyFiles(buildConfig),
-      command: 'npx npm-groovy-lint --path \".\" --ignorepattern \"**/node_modules/**\" --files \"**/*.groovy,**/Jenkinsfile*\" --config \".groovylintrc.json\" --loglevel info --failon warning',
+      command: 'npx npm-groovy-lint --path \".\" --ignorepattern \"**/node_modules/**\" --files \"**/*.groovy,**/Jenkinsfile*\" --config \".groovylintrc.json\" --loglevel info --failon info',
     )
   }
 }

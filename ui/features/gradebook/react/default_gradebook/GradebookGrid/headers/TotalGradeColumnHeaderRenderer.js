@@ -34,13 +34,6 @@ function getProps(column, gradebook, gridSupport, options) {
   const isInBack = columns.scrollable[columns.scrollable.length - 1].id === 'total_grade'
   const isInFront = columns.frozen.some(frozenColumn => frozenColumn.id === 'total_grade')
 
-  let onApplyScoreToUngraded
-  if (gradebook.allowApplyScoreToUngraded()) {
-    onApplyScoreToUngraded = () => {
-      gradebook.onApplyScoreToUngradedRequested(null)
-    }
-  }
-
   return {
     ref: options.ref,
     addGradebookElement: gradebook.keyboardNav.addGradebookElement,
@@ -67,7 +60,6 @@ function getProps(column, gradebook, gridSupport, options) {
       onMoveToFront: gradebook.freezeTotalGradeColumn
     },
 
-    onApplyScoreToUngraded,
     removeGradebookElement: gradebook.keyboardNav.removeGradebookElement,
 
     sortBySetting: {

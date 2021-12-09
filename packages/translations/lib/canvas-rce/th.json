@@ -132,8 +132,6 @@
   "describe_the_image_e65d2e32": { "message": "(ระบุรายละเอียดภาพ)" },
   "describe_the_video_2fe8f46a": { "message": "(ระบุรายละเอียดวิดีโอ)" },
   "details_98a31b68": { "message": "รายละเอียด" },
-  "diamond_b8dfe7ae": { "message": "เพชร" },
-  "dimension_type_55c83e4e": { "message": "ประเภทขนาด" },
   "dimensions_45ddb7b7": { "message": "ขนาด" },
   "directionality_26ae9e08": { "message": "ทิศทาง" },
   "discussions_a5f96392": { "message": "การพูดคุย" },
@@ -268,9 +266,6 @@
   "miscellaneous_e9818229": { "message": "เบ็ดเตล็ด" },
   "modules_c4325335": { "message": "หน่วยการเรียน" },
   "multi_color_image_63d7372f": { "message": "ภาพหลายสี" },
-  "must_be_at_least_percentage_22e373b6": {
-    "message": "จะต้องเท่ากับอย่างน้อย { percentage }%"
-  },
   "must_be_at_least_width_x_height_px_41dc825e": {
     "message": "จะต้องเท่ากับอย่างน้อย { width } x { height }px"
   },
@@ -313,10 +308,7 @@
   },
   "pages_e5414c2c": { "message": "เพจ" },
   "paragraph_5e5ad8eb": { "message": "ย่อหน้า" },
-  "pentagon_17d82ea3": { "message": "ห้าเหลี่ยม" },
   "people_b4ebb13c": { "message": "บุคคล" },
-  "percentage_34ab7c2c": { "message": "เปอร์เซ็นต์" },
-  "pixels_52ece7d1": { "message": "พิกเซล" },
   "posted_when_a578f5ab": { "message": "โพสต์เมื่อ: { when }" },
   "preformatted_d0670862": { "message": "กำหนดรูปแบบไว้ล่วงหน้า" },
   "pretty_html_editor_28748756": { "message": "HTML Editor ที่สวยงาม" },

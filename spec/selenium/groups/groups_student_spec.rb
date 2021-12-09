@@ -76,18 +76,16 @@ describe "student groups" do
       end
 
       it "has dropdown with two options", priority: "2" do
-        f("#join-level-select").click
-        expect(ff("span[role='option']").length).to eq 2
-        expect(f("#parent_context_auto_join")).to include_text("Course members are free to join")
-        expect(f("#invitation_only")).to include_text("Membership by invitation only")
+        expect(ff("#joinLevelSelect option").length).to eq 2
+        expect(ff("#joinLevelSelect option")[0]).to include_text("Course members are free to join")
+        expect(ff("#joinLevelSelect option")[1]).to include_text("Membership by invitation only")
       end
 
       it "shows students in the course", priority: "1" do
         expected_student_list = ["Test Student 1", "Test Student 2"]
-        f("#invite-filter").click
-        student_list = ff("span[role='option']")
-        # there should be no teachers in the list
-        expect(student_list).to have_size(expected_student_list.size)
+        student_list = ff(".checkbox")
+        expect(student_list).to have_size(expected_student_list.size) # there should be no teachers in the list
+
         # check the list of students for expected names
         expect(student_list[0].text).to eq "Test Student 1"
         expect(student_list[1].text).to eq "Test Student 2"

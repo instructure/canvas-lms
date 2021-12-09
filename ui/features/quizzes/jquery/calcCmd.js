@@ -708,11 +708,11 @@ const calcCmd = {}
     'range',
     function() {
       const args = make_list(arguments)
-      let list = []
+      var list = []
       for (let idx = 0; idx < args.length; idx++) {
         list.push(args[idx])
       }
-      list = list.sort((a, b) => a - b)
+      var list = list.sort()
       return list[list.length - 1] - list[0]
     },
     I18n.t('range.description', 'Returns the range for the list of values'),

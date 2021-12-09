@@ -2768,47 +2768,4 @@ describe UsersController do
       expect(user.access_tokens.take.permanent_expires_at).to be <= Time.zone.now
     end
   end
-
-  describe "PUT 'settings'" do
-    before :once do
-      user_factory(active_all: true)
-    end
-
-    before do
-      user_session(@user)
-    end
-
-    it "does not allow another user to update their preferences" do
-      @user1 = @user
-      @user2 = user_factory(active_all: true)
-      put "settings", params: { id: @user2.id, collapse_course_nav: true }, format: "json"
-      assert_unauthorized
-    end
-
-    it "updates collapse_course_nav preference to true" do
-      put "settings", params: { id: @user.id, collapse_course_nav: true }, format: "json"
-      @user.reload
-      expect(@user.collapse_course_nav?).to be_truthy
-    end
-
-    it "updates collapse_course_nav preference to false" do
-      @user.preferences[:collapse_course_nav] = true
-      @user.save!
-      put "settings", params: { id: @user.id, collapse_course_nav: false }, format: "json"
-      @user.reload
-      expect(@user.collapse_course_nav?).to be_falsey
-    end
-
-    it "does not update preferences not included in the params" do
-      @user.preferences[:collapse_global_nav] = true
-      @user.preferences[:collapse_course_nav] = true
-      @user.preferences[:elementary_dashboard_disabled] = true
-      @user.save!
-      put "settings", params: { id: @user.id, collapse_course_nav: false }, format: "json"
-      @user.reload
-      expect(@user.preferences[:collapse_global_nav]).to be_truthy
-      expect(@user.preferences[:collapse_course_nav]).to be_falsey
-      expect(@user.preferences[:elementary_dashboard_disabled]).to be_truthy
-    end
-  end
 end
