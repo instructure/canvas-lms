@@ -1532,7 +1532,7 @@ fr:
       open_registration_delegated_warning_tooltip: "Un fournisseur d'identités externe est activé"
       open_report_description: "Ouvrir la description du rapport"
       page_header_title: "Paramètres du compte"
-      page_title: "Contenu partagé"
+      page_title: "Paramètres du compte"
       quiz_ip_filters_delete: "Supprimer le filtrage des quiz par IP"
       quiz_ip_filters_help_message: |-
           Les filtres IP de questionnaire permettent de limiter l’accès aux questionnaires des ordinateurs appartenant à une plage IP spécifiée.
@@ -18230,7 +18230,7 @@ fr:
     blueprint_description: |-
         *Instructeur et administrateur uniquement :*
         
-              Le contenu a été synchronisé à partir d’un modèle de cours avec les cours associés
+        Le contenu a été synchronisé à partir d’un modèle de cours avec les cours associés
     blueprint_display: "Synchronisation du modèle"
     calendar_description: "Éléments nouveaux et modifiés dans le calendrier de votre cours"
     calendar_display: Calendrier
@@ -18265,7 +18265,7 @@ fr:
     content_link_error_description: |-
         *Instructeur et administrateur uniquement :*
         
-                Emplacement et contenu d'un lien en échec avec lequel l'élève a interagi
+        Emplacement et contenu d'un lien en échec avec lequel l'élève a interagi
     content_link_error_display: "Erreur de lien de contenu"
     conversation_created_description: "Vous avez créé une conversation"
     conversation_created_display: "Conversations créées par moi"
@@ -18274,9 +18274,9 @@ fr:
     course_content_description: |-
         Modifier le contenu du cours : 
         
-              * Contenu de la page
-              * Contenu du questionnaire
-              * Contenu du travail
+        * Contenu de la page
+        * Contenu du questionnaire
+        * Contenu du travail
     course_content_display: "Contenu du cours"
     discussion_description: "Nouveau sujet de discussion dans votre cours"
     discussion_display: "Nouveau sujet"
@@ -18289,8 +18289,8 @@ fr:
     grading_description: |-
         Inclus : 
         
-              * Note enregistrée/modifiée du devoir/de la soumission
-              * Changement du coefficient de la note
+        * Note enregistrée/modifiée du devoir/de la soumission
+        * Changement du coefficient de la note
     grading_display: Notation
     grading_notify_include_grade: "Inclure les résultats dans les alertes de modification de notes."
     grading_policies_description: "Modification des règles de notation du cours"
@@ -18298,21 +18298,21 @@ fr:
     invitation_description: |-
         Invitation à : 
         
-              * Conférence web
-              * Groupe
-              * Collaboration
-              * Revue par des pairs & rappel
+        * Conférence web
+        * Groupe
+        * Collaboration
+        * Revue par des pairs & rappel
     invitation_display: Invitation
     late_grading_description: |-
         *Formateur et administrateur uniquement :*
         
-              Dernier envoi d’activité
+        Dernier envoi d’activité
     late_grading_display: "Notation en retard"
     membership_update_description: |-
         *Administrateur uniquement : inscription en attente activée*
         
-              * Inscription de groupe
-              * acceptée/rejetée
+        * Inscription de groupe
+        * acceptée/rejetée
     membership_update_display: "Mise à jour de l’adhésion"
     missing_description_description: "Pour les notifications %{category}"
     missing_display_display: "Pour les notifications %{category}"
@@ -18397,19 +18397,19 @@ fr:
     other_description: |-
         *Instructeur et administrateur uniquement :*
         
-              * Inscription aux cours
-              * Rapport généré
-              * Contenu exporté
-              * Rapport de migration
-              * Nouveau compte d’utilisateur
-              * Nouveau groupe d’étudiants
+        * Inscription aux cours
+        * Rapport généré
+        * Contenu exporté
+        * Rapport de migration
+        * Nouveau compte d’utilisateur
+        * Nouveau groupe d’étudiants
     other_display: "Notifications administratives"
     recording_ready_display: "Enregistrement prêt"
     reminder_display: Rappel
     student_appointment_description: |-
         *Formateur et administrateur uniquement :*
         
-              Inscription de rendez-vous d’étudiant
+        Inscription de rendez-vous d’étudiant
     student_appointment_display: "Inscriptions des étudiants aux rendez-vous"
     submission_comment_description: "Commentaire sur l’envoi du travail"
     submission_comment_display: "Commentaire sur l’envoi"
