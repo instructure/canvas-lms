@@ -1589,6 +1589,16 @@ describe DiscussionTopicsController do
         expect(DiscussionTopic.last).to be_anonymous
       end
 
+      it "allows full_anonymity with course feature flag" do
+        @course.enable_feature! :react_discussions_post
+        Account.site_admin.enable_feature! :discussion_anonymity
+        user_session @teacher
+        post "create", params: topic_params(@course, { anonymous_state: "full_anonymity" }), format: :json
+        expect(response).to be_successful
+        expect(DiscussionTopic.last.anonymous_state).to eq "full_anonymity"
+        expect(DiscussionTopic.last).to be_anonymous
+      end
+
       it "allows partial_anonymity" do
         Account.site_admin.enable_feature! :react_discussions_post
         Account.site_admin.enable_feature! :discussion_anonymity
