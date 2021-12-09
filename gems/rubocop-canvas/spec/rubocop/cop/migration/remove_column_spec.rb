@@ -99,34 +99,4 @@ describe RuboCop::Cop::Migration::RemoveColumn do
       expect(cop.offenses.size).to eq(0)
     end
   end
-
-  context "postdeploy" do
-    it "gives ignored_columns note in `up`" do
-      inspect_source(<<~RUBY)
-        class MyMigration < ActiveRecord::Migration
-          tag :postdeploy
-
-          def up
-            remove_column :users, :favorite_color
-          end
-        end
-      RUBY
-      expect(cop.offenses.size).to eq(1)
-      expect(cop.messages.first).to include "ignored_columns"
-      expect(cop.offenses.first.severity.name).to eq(:convention)
-    end
-
-    it "says nothing about `down`" do
-      inspect_source(<<~RUBY)
-        class MyMigration < ActiveRecord::Migration
-          tag :postdeploy
-
-          def down
-            remove_column :users, :favorite_color
-          end
-        end
-      RUBY
-      expect(cop.offenses.size).to eq(0)
-    end
-  end
 end

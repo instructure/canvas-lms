@@ -182,7 +182,8 @@ export const getPacePlanDurationTotal = createDeepEqualSelector(
 export const getStartDate = createDeepEqualSelector(
   getPacePlan,
   getOriginalPlan,
-  (pacePlan: PacePlan): string | undefined => {
+  (pacePlan: PacePlan, originalPacePlan: PacePlan): string | undefined => {
+    if (pacePlan.hard_end_dates) return originalPacePlan.start_date
     return pacePlan.start_date
   }
 )

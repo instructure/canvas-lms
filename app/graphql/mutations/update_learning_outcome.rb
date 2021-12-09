@@ -26,9 +26,6 @@ class Mutations::UpdateLearningOutcome < Mutations::BaseMutation
   argument :display_name, String, required: false
   argument :description, String, required: false
   argument :vendor_guid, String, required: false
-  argument :calculation_method, String, required: false
-  argument :calculation_int, Integer, required: false
-  argument :rubric_criterion, Types::RubricCriterionInputType, required: false
 
   field :learning_outcome, Types::LearningOutcomeType, null: true
 
@@ -37,9 +34,7 @@ class Mutations::UpdateLearningOutcome < Mutations::BaseMutation
 
     validate!(record, input[:id])
 
-    outcome_input = attributes(input, record.context)
-
-    if record.update(outcome_input)
+    if record.update(attributes(input))
       { learning_outcome: record }
     else
       errors_for(record, { short_description: :title })
@@ -54,16 +49,8 @@ class Mutations::UpdateLearningOutcome < Mutations::BaseMutation
     raise GraphQL::ExecutionError, I18n.t("insufficient permissions") unless check_permission(outcome)
   end
 
-  def attributes(input, context)
-    outcome_input = input.to_h.slice(:title, :display_name, :description, :vendor_guid)
-    ratings_input = input.to_h.slice(:calculation_method, :calculation_int, :rubric_criterion)
-
-    if ratings_input.count.positive?
-      raise GraphQL::ExecutionError, I18n.t("individual ratings data input with invidual_outcome_rating_and_calculation FF disabled") unless context.root_account.feature_enabled?(:individual_outcome_rating_and_calculation)
-      raise GraphQL::ExecutionError, I18n.t("individual ratings data input with acount_level_mastery_scale FF enabled") if context.root_account.feature_enabled?(:account_level_mastery_scales)
-    end
-
-    outcome_input.merge(ratings_input)
+  def attributes(input)
+    input.to_h.slice(:title, :display_name, :description, :vendor_guid)
   end
 
   def check_permission(outcome)

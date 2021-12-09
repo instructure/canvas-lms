@@ -24,16 +24,10 @@ describe Types::LearningOutcomeType do
   before(:once) do
     account_admin_user
     @account_user = Account.default.account_users.first
-    outcome_with_rubric(context: Account.default)
+    outcome_model(context: Account.default)
   end
 
   let(:outcome_type) { GraphQLTypeTester.new(@outcome, current_user: @admin) }
-
-  let(:outcome_type_raw) do
-    outcome_type_raw = GraphQLTypeTester.new(@outcome, current_user: @admin)
-    outcome_type_raw.extract_result = false
-    outcome_type_raw
-  end
 
   it "works" do
     expect(outcome_type.resolve("_id")).to eq @outcome.id.to_s
@@ -44,14 +38,6 @@ describe Types::LearningOutcomeType do
     expect(outcome_type.resolve("assessed")).to eq @outcome.assessed?
     expect(outcome_type.resolve("displayName")).to eq @outcome.display_name
     expect(outcome_type.resolve("vendorGuid")).to eq @outcome.vendor_guid
-    expect(outcome_type.resolve("calculationMethod")).to eq @outcome.calculation_method
-    expect(outcome_type.resolve("calculationMethod")).not_to be_nil
-    expect(outcome_type.resolve("calculationInt")).to eq @outcome.calculation_int
-    expect(outcome_type.resolve("rubricCriterion { masteryPoints }")).to eq @outcome.rubric_criterion[:mastery_points]
-
-    raw = outcome_type_raw.resolve("rubricCriterion { ratings { description points } }")
-    expect(raw["rubricCriterion"]["ratings"].to_json).to eq @outcome.rubric_criterion[:ratings].to_json
-
     expect(outcome_type.resolve("canEdit")).to eq true
   end
 
@@ -119,9 +105,6 @@ describe Types::LearningOutcomeType do
     let(:course) { Course.create! }
 
     it "resolves friendly description correctly" do
-      Account.site_admin.enable_feature!(:outcomes_friendly_description)
-      course.account.enable_feature!(:improved_outcomes_management)
-
       course_fd = OutcomeFriendlyDescription.create!({
                                                        learning_outcome: @outcome,
                                                        context: course,

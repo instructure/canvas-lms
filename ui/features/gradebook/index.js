@@ -30,12 +30,8 @@ const settingsModalButtonContainer = document.getElementById(
 )
 const gridColorNode = document.querySelector('[data-component="GridColor"]')
 const viewOptionsMenuNode = document.querySelector("[data-component='ViewOptionsMenu']")
-const applyScoreToUngradedModalNode = document.querySelector(
-  '[data-component="ApplyScoreToUngradedModal"]'
-)
 
 const props = {
-  applyScoreToUngradedModalNode,
   currentUserId: ENV.current_user_id,
   locale: ENV.LOCALE,
   gradebookMenuNode,

@@ -268,7 +268,6 @@ module Api::V1::PlannerItem
       https:\/\/[\w-]+\.webex\.com\/meet\/[\w.\/\-=%]+(\?[\w\/\-=%]*)?
       https:\/\/[\w-]+\.webex\.com\/\w+\/j\.php(\?[\w\/\-=%]*)?
       https:\/\/meet\.google\.com\/[\w\/\-=%]+(\?[\w\/\-=%]*)?
-      https?:\/\/.*\/conferences\/\d+\/join
     REGEX
     url_regex_str = config["online-meeting-url-regex"] || default_regex
     url_regex_str = url_regex_str.split("\n").join("|")

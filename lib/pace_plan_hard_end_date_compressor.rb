@@ -29,13 +29,12 @@ class PacePlanHardEndDateCompressor
   # @param compress_items_after [integer] an optional integer representing the position of that you want to start at when
   #   compressing items, rather than compressing them all
   # @params save [boolean] set to yes if you want the items saved after being modified.
-  # @params start_date [Date] the start date of the plan. Used to calculate the number of days to the hard end date
-  def self.compress(pace_plan, items, enrollment: nil, compress_items_after: nil, save: false, start_date: nil)
+  def self.compress(pace_plan, items, enrollment: nil, compress_items_after: nil, save: false)
     return if compress_items_after && compress_items_after >= items.length - 1
-    return items if items.empty?
 
-    start_date_of_item_group = start_date || enrollment&.start_at || pace_plan.start_date
-    due_dates = PacePlanDueDatesCalculator.new(pace_plan).get_due_dates(items, enrollment, start_date: start_date_of_item_group)
+    start_date_of_item_group = enrollment&.start_at || pace_plan.start_date
+
+    due_dates = PacePlanDueDatesCalculator.new(pace_plan).get_due_dates(items, enrollment)
 
     if compress_items_after
       starting_item = items[compress_items_after]

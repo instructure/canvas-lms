@@ -86,38 +86,6 @@ describe Types::DiscussionEntryType do
     end
   end
 
-  context "anonymous discussions" do
-    let(:anon_discussion) do
-      DiscussionTopic.create!(title: "Welcome whoever you are",
-                              message: "anonymous discussion",
-                              anonymous_state: "fully_anonymous",
-                              context: @course,
-                              user: @teacher)
-    end
-    let(:anon_discussion_type) do
-      GraphQLTypeTester.new(
-        anon_discussion,
-        current_user: @teacher
-      )
-    end
-    let(:anon_discussion_entry) do
-      anon_discussion.discussion_entries.create!(message: "Hello!", user: @teacher, editor: @teacher)
-    end
-    let(:anon_discussion_entry_type) { GraphQLTypeTester.new(anon_discussion_entry, current_user: @teacher) }
-
-    it "author is nil" do
-      expect(anon_discussion_entry_type.resolve("author { shortName }")).to eq nil
-    end
-
-    it "editor is nil" do
-      expect(anon_discussion_entry_type.resolve("editor { shortName }")).to eq nil
-    end
-
-    it "anonymous_author is not nil" do
-      expect(anon_discussion_entry_type.resolve("anonymousAuthor { shortName }")).to eq DiscussionTopicParticipant.where(user_id: @teacher.id, discussion_topic_id: anon_discussion.id).first.id.to_s(36)
-    end
-  end
-
   it "does not query for discussion subentries on non legacy entries" do
     discussion_entry.discussion_topic.discussion_entries.create!(message: "sub entry", user: @teacher, parent_id: parent.id)
     DiscussionEntry.where(id: parent).update_all(legacy: false)
@@ -164,7 +132,7 @@ describe Types::DiscussionEntryType do
   it "allows querying for participant information" do
     expect(discussion_entry_type.resolve("entryParticipant { read }")).to eq true
     expect(discussion_entry_type.resolve("entryParticipant { forcedReadState }")).to be_nil
-    expect(discussion_entry_type.resolve("entryParticipant { rating }")).to eq false
+    expect(discussion_entry_type.resolve("entryParticipant { rating }")).to be_nil
     expect(discussion_entry_type.resolve("entryParticipant { reportType }")).to be_nil
   end
 

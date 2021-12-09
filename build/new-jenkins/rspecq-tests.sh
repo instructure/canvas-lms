@@ -7,7 +7,7 @@ PROCESSES=$((${RSPEC_PROCESSES:=1}-1))
 for i in $(seq 0 $PROCESSES); do
   WORKER_NAME="${JOB_NAME}_worker${CI_NODE_INDEX}-${i}"
 
-  commands+=("PARALLEL_INDEX=${i} RAILS_DB_NAME_TEST=canvas_test_${i} bundle exec rspecq \
+  commands+=("RAILS_DB_NAME_TEST=canvas_test_${i} bundle exec rspecq \
                                           --build ${JOB_NAME}_build${BUILD_NUMBER} \
                                           --worker ${WORKER_NAME} \
                                           --include-pattern '${TEST_PATTERN}'  \
