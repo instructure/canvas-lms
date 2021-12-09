@@ -46,7 +46,7 @@ class Loaders::OutcomeFriendlyDescriptionLoader < GraphQL::Batch::Loader
 
   def friendly_description_enabled?
     Account.site_admin.feature_enabled?(:outcomes_friendly_description) &&
-      @account.feature_enabled?(:improved_outcomes_management)
+      @account.root_account.feature_enabled?(:improved_outcomes_management)
   end
 
   def nullify_resting(outcome_ids)
