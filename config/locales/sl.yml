@@ -1233,7 +1233,7 @@ sl:
       open_registration_delegated_warning_tooltip: "Omogočen je zunanji ponudnik identitet."
       open_report_description: "Odpri opis poročila"
       page_header_title: "Nastavitve računa"
-      page_title: "Vsebina v skupni rabi"
+      page_title: "Nastavitve računa"
       quiz_ip_filters_delete: "Odstrani IP-filter za kvize"
       quiz_ip_filters_help_message: |-
           IP-filtri za kvize so način omejevanja dostopa do kvizov za računalnike v določenem razponu naslovov IP.
@@ -14553,7 +14553,7 @@ sl:
     blueprint_description: |-
         *Samo učitelj in skrbnik:*
         
-              Vsebina je bila sinhronizirana iz šablonskega predmeta v povezane predmete.
+        Vsebina je bila sinhronizirana iz šablonskega predmeta v povezane predmete.
     blueprint_display: "Sinhronizacija šablone"
     calendar_description: "Novi in spremenjeni elementi na koledarju vašega predmeta"
     calendar_display: Koledar
@@ -14588,7 +14588,7 @@ sl:
     content_link_error_description: |-
         *Samo za izvajalca in skrbnika:*
         
-                Lokacija in vsebina okvarjene povezave, ki jo je uporabil študent
+        Lokacija in vsebina okvarjene povezave, ki jo je uporabil študent
     content_link_error_display: "Napake pri referencah"
     conversation_created_description: "Ustvarili ste pogovor."
     conversation_created_display: "Pogovori, ki sem jih ustvaril"
@@ -14597,9 +14597,9 @@ sl:
     course_content_description: |-
         Spremeni v vsebino predmeta: 
         
-              * Vsebina predmeta
-              * Vsebina kviza
-              * Vsebina naloge
+        * Vsebina predmeta
+        * Vsebina kviza
+        * Vsebina naloge
     course_content_display: "Vsebina predmeta"
     discussion_description: "Nova tema razprave v vašem predmetu"
     discussion_display: "Nova tema"
@@ -14612,29 +14612,29 @@ sl:
     grading_description: |-
         Vključuje: 
         
-              * Vneseno/spremenjeno nalogo/oceno oddaje,
-              * spremenjeno utež ocene.
+        * Vneseno/spremenjeno nalogo/oceno oddaje,
+        * spremenjeno utež ocene.
     grading_display: Ocenjevanje
     grading_policies_description: "Sprememba politike ocenjevanja predmeta"
     grading_policies_display: "Politike ocenjevanja"
     invitation_description: |-
         Povabilo za: 
         
-              * spletno konferenco,
-              * skupino,
-              * skupinsko nalogo,
-              * ocenjevanje kolegov in opomnik.
+        * spletno konferenco,
+        * skupino,
+        * skupinsko nalogo,
+        * ocenjevanje kolegov in opomnik.
     invitation_display: Povabilo
     late_grading_description: |-
         *Samo učitelj in skrbnik:*
         
-              Oddaja zamujene naloge
+        Oddaja zamujene naloge
     late_grading_display: "Zamujen rok za ocenjevanje"
     membership_update_description: |-
         *Samo skrbnik: aktiviran vpis v čakanju*
         
-              * Sprejet/zavrnjen
-              * vpis skupine.
+        * Sprejet/zavrnjen
+        * vpis skupine.
     membership_update_display: "Posodobitev članstva"
     missing_description_description: "Za sporočila %{category}."
     missing_display_display: "Za sporočila %{category}."
@@ -14719,19 +14719,19 @@ sl:
     other_description: |-
         *Samo učitelj in skrbnik:*
         
-              * Vpis k predmetu
-              * Poročilo je generirano.
-              * Izvoz vsebine
-              * Poročilo o migraciji
-              * Nov uporabnik računa
-              * Nova skupina študentov
+        * Vpis k predmetu
+        * Poročilo je generirano.
+        * Izvoz vsebine
+        * Poročilo o migraciji
+        * Nov uporabnik računa
+        * Nova skupina študentov
     other_display: "Skrbniška obvestila"
     recording_ready_display: "Posnetek je pripravljen"
     reminder_display: Opomnik
     student_appointment_description: |-
         *Samo učitelj in skrbnik:*
         
-              Prijava študenta na sestanek
+        Prijava študenta na sestanek
     student_appointment_display: "Prijave študentov na sestanke"
     submission_comment_description: "Komentar k oddaji naloge"
     submission_comment_display: "Komentar k oddaji"
