@@ -18223,7 +18223,7 @@ pt-BR:
     blueprint_description: |-
         *Instrutor e Administrador somente:*
         
-                Conteúdo foi sincronizado a partir de um curso modelo a cursos associados
+        Conteúdo foi sincronizado a partir de um curso modelo a cursos associados
     blueprint_display: "Sincronização do modelo"
     calendar_description: "Itens novos e alterados no calendário do seu curso"
     calendar_display: Calendário
@@ -18258,7 +18258,7 @@ pt-BR:
     content_link_error_description: |-
         *Instrutor e Admin apenas:*
         
-                Localização e conteúdo de um link com falha com qual um aluno interagiu
+        Localização e conteúdo de um link com falha com qual um aluno interagiu
     content_link_error_display: "Erro de link do conteúdo"
     conversation_created_description: "Você criou uma conversa"
     conversation_created_display: "Caixa de Entrada criada por mim"
@@ -18267,9 +18267,9 @@ pt-BR:
     course_content_description: |-
         Alterações do conteúdo do curso: 
         
-                * Conteúdo da página
-                * Conteúdo do teste
-                * Conteúdo da tarefa
+        * Conteúdo da página
+        * Conteúdo do teste
+        * Conteúdo da tarefa
     course_content_display: "Conteúdo do curso"
     discussion_description: "Novo tópico de fórum em seu curso"
     discussion_display: "Novo topico"
@@ -18280,10 +18280,10 @@ pt-BR:
     files_description: "Novo arquivo adicionado ao seu curso"
     files_display: Arquivos
     grading_description: |-
-        Includes: 
+        Inclui: 
         
-                * Nota de tarefa/envio inserida/alterada
-                * Peso da nota mudou
+        * Nota de tarefa/envio inserida/alterada
+        * Peso da nota mudou
     grading_display: Avaliação
     grading_notify_include_grade: "Inclua as pontuações ao me alertar sobre alteração de notas."
     grading_policies_description: "Alteração na política de avaliação do curso"
@@ -18291,21 +18291,21 @@ pt-BR:
     invitation_description: |-
         Convite para: 
         
-                * Conferência Web
-                * Grupo
-                * Colaboração
-                * Revisão por pares e lembrete
+        * Conferência Web
+        * Grupo
+        * Colaboração
+        * Revisão por pares e lembrete
     invitation_display: Convite
     late_grading_description: |-
         *Instrutor e Administrador somente:*
         
-                Envio de tarefa atrasado
+        Envio de tarefa atrasado
     late_grading_display: "Avaliação atrasada"
     membership_update_description: |-
         *Administrador somente: matrícula pendente ativada*
         
-                * Matrícula de grupo
-                * aceito/recusado
+        * Matrícula de grupo
+        * aceito/recusado
     membership_update_display: "Atualização de associação"
     missing_description_description: "Para notificações de %{category}"
     missing_display_display: "Para notificações de %{category}"
@@ -18390,19 +18390,19 @@ pt-BR:
     other_description: |-
         *Apenas Instrutor e Admin:*
         
-                * Matrícula no curso
-                * Relatório gerado
-                * Exportação de conteúdo
-                * Relatório de migração
-                * Novo usuário de conta
-                * Novo grupo de alunos
+        * Matrícula no curso
+        * Relatório gerado
+        * Exportação de conteúdo
+        * Relatório de migração
+        * Novo usuário de conta
+        * Novo grupo de alunos
     other_display: "Notificações administrativas"
     recording_ready_display: "Gravação Pronta"
     reminder_display: Lembrete
     student_appointment_description: |-
         *Instrutor e Administrador somente:*
         
-                Registro em compromisso do aluno
+        Registro em compromisso do aluno
     student_appointment_display: "Registros em compromissos do aluno"
     submission_comment_description: "Comentário de envio da tarefa"
     submission_comment_display: "Comentário do envio"
