@@ -1080,8 +1080,9 @@ class UsersController < ApplicationController
   #                         These will be returned under a +planner_override+ key
   #   "course":: Optionally include the assignments' courses
   #
-  # @argument filter[] [String, "submittable"]
+  # @argument filter[] [String, "submittable"|"current_grading_period"]
   #   "submittable":: Only return assignments that the current user can submit (i.e. filter out locked assignments)
+  #   "current_grading_period":: Only return missing assignments that are in the current grading period
   #
   # @argument course_ids[] [String]
   #   Optionally restricts the list of past-due assignments to only those associated with the specified
@@ -1107,6 +1108,7 @@ class UsersController < ApplicationController
 
       filter = Array(params[:filter])
       only_submittable = filter.include?("submittable")
+      only_current_grading_period = filter.include?("current_grading_period")
 
       course_ids = user.participating_student_course_ids
       course_ids = course_ids.select { |id| included_course_ids.include?(id) } unless included_course_ids.empty?
@@ -1118,6 +1120,7 @@ class UsersController < ApplicationController
                                 assignments: { context_id: shard_course_ids })
                          .merge(Assignment.published)
         subs = subs.merge(Assignment.not_locked) if only_submittable
+        subs = subs.in_current_grading_period_for_courses(course_ids) if only_current_grading_period
         submissions = subs.order(:cached_due_date, :id)
       end
       assignments = Api.paginate(submissions, self, api_v1_user_missing_submissions_url).map(&:assignment)
