@@ -43,14 +43,6 @@ function getInitialState() {
   }
 }
 
-beforeEach(() => {
-  global.ENV = {
-    FEATURES: {
-      cc_in_rce_video_tray: true
-    }
-  }
-})
-
 describe('Media actions', () => {
   afterEach(() => {
     sinon.restore()
