@@ -13415,7 +13415,7 @@ es-ES:
     content_link_error_description: |-
         *Solo el instructor y el administrador:*
         
-                Ubicación y contenido de un enlace incorrecto con el que un alumno ha interactuado
+        Ubicación y contenido de un enlace incorrecto con el que un alumno ha interactuado
     content_link_error_display: "Error de enlace de contenido"
     conversation_created_description: "Ha creado una conversación"
     conversation_created_display: "Conversaciones que he creado"
@@ -13424,9 +13424,9 @@ es-ES:
     course_content_description: |-
         Cambiar a contenido del curso: 
         
-                * Contenido de la página
-                * Contenido del examen
-                * Contenido de la actividad
+        * Contenido de la página
+        * Contenido del examen
+        * Contenido de la actividad
     course_content_display: "Contenido del curso"
     discussion_description: "Nuevo tema del Foro de discusión en su curso"
     discussion_display: "Nuevo tema"
@@ -13437,31 +13437,31 @@ es-ES:
     files_description: "Nuevo archivo añadido a su curso"
     files_display: Archivos
     grading_description: |-
-        Includes: 
+        Incluye: 
         
-                * Nota de la actividad / entrega introducida / cambiada
-                * Peso de la nota cambiado
+        * Nota de la actividad / entrega introducida / cambiada
+        * Peso de la nota cambiado
     grading_display: Evaluación
     grading_policies_description: "Modificación de la política de evaluación del curso"
     grading_policies_display: "Políticas de evaluación"
     invitation_description: |-
         Invitación para: 
         
-                * Conferencia en línea
-                * Grupo
-                * Colaboración
-                * Revisión entre compañeros y recordatorios
+        * Conferencia en línea
+        * Grupo
+        * Colaboración
+        * Revisión entre compañeros y recordatorios
     invitation_display: Invitación
     late_grading_description: |-
         *Solo profesores y administradores:*
         
-                Retraso en la entrega de las actividades
+        Retraso en la entrega de las actividades
     late_grading_display: "Evaluación con retraso"
     membership_update_description: |-
         *Solo para administradores: activación de inscripciones pendientes*
         
-                * Inscripciones de grupos
-                * aceptadas/rechazadas
+        * Inscripciones de grupos
+        * aceptadas/rechazadas
     membership_update_display: "Actualización de membresía"
     missing_description_description: "Para notificaciones de %{category}"
     missing_display_display: "Para notificaciones de %{category}"
@@ -13546,19 +13546,19 @@ es-ES:
     other_description: |-
         *Solo para instructores y administradores:*
         
-                * Inscripción en los cursos
-                * Informes generados
-                * Exportación de contenido
-                * Informe de migraciones
-                * Nuevo usuario de cuenta
-                * Nuevo grupo de alumnos
+        * Inscripción en los cursos
+        * Informes generados
+        * Exportación de contenido
+        * Informe de migraciones
+        * Nuevo usuario de cuenta
+        * Nuevo grupo de alumnos
     other_display: "Notificaciones administrativas"
     recording_ready_display: "Grabación lista"
     reminder_display: Recordatorio
     student_appointment_description: |-
         *Solo profesores y administradores:*
         
-                Registros de citas para alumnos
+        Registros de citas para alumnos
     student_appointment_display: "Registros de citas para alumnos"
     submission_comment_description: "Comentario de la entrega de actividades"
     submission_comment_display: "Comentario de la entrega"
