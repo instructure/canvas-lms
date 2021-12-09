@@ -1532,7 +1532,7 @@ zh-Hant:
       open_registration_delegated_warning_tooltip: 外部身份識別提供方已啟用
       open_report_description: 公開報告說明
       page_header_title: 帳戶設置
-      page_title: 共用內容
+      page_title: 帳戶設置
       quiz_ip_filters_delete: "移除測驗 IP 篩選器"
       quiz_ip_filters_help_message: |-
           測驗 IP 篩選器是一種將對測驗的訪問限制在指定的 IP 範圍內的電腦的控制方法。
@@ -18223,7 +18223,7 @@ zh-Hant:
     blueprint_description: |-
         *只限導師及管理員：*
         
-              課程內容會由計劃課程同步至關聯課程
+        課程內容會由計劃課程同步至關聯課程
     blueprint_display: 計劃同步
     calendar_description: 您課程月曆上新的和更改的項目
     calendar_display: 月曆
@@ -18258,7 +18258,7 @@ zh-Hant:
     content_link_error_description: |-
         *只限導師和管理員：*
         
-                學生互動的失效連結的位置和內容
+        學生互動的失效連結的位置和內容
     content_link_error_display: 內容連結錯誤
     conversation_created_description: 您創建了一個交談
     conversation_created_display: 我創建的交談
@@ -18267,9 +18267,9 @@ zh-Hant:
     course_content_description: |-
         變更為課程內容：
         
-              * 頁面內容
-              * 測驗內容
-              * 作業內容
+        * 頁面內容
+        * 測驗內容
+        * 作業內容
     course_content_display: 課程內容
     discussion_description: 您課程中的新討論主題
     discussion_display: 新主题
@@ -18282,8 +18282,8 @@ zh-Hant:
     grading_description: |-
         包含: 
         
-              * 作業/提交件評分的輸入內容/更改內容
-              * 已更改的評分權重
+        * 作業/提交件評分的輸入內容/更改內容
+        * 已更改的評分權重
     grading_display: 評分
     grading_notify_include_grade: 包括當提示關於成績更改時的分數。
     grading_policies_description: 課程評分政策更改
@@ -18291,21 +18291,21 @@ zh-Hant:
     invitation_description: |-
         簡介：
         
-              * 網頁會議
-              * 群組
-              * 協作
-              * 同儕檢閱及提醒
+        * 網頁會議
+        * 群組
+        * 協作
+        * 同儕檢閱及提醒
     invitation_display: 邀請
     late_grading_description: |-
         *僅限導師和管理員：*
         
-              逾期作業提交件
+        逾期作業提交件
     late_grading_display: 逾期評分
     membership_update_description: |-
         *僅限管理員：擱置註冊已啟動*
         
-              * 群組註冊
-              * 已接受/已拒絕
+        * 群組註冊
+        * 已接受/已拒絕
     membership_update_display: 成員資格更新
     missing_description_description: "針對 %{category} 的通知"
     missing_display_display: "針對 %{category} 的通知"
@@ -18390,19 +18390,19 @@ zh-Hant:
     other_description: |-
         *僅限導師和管理員：*
         
-              * 課程註冊
-              * 已生成的報告
-              * 內容導出
-              * 遷移報告
-              * 新帳戶使用者
-              * 新學生群組
+        * 課程註冊
+        * 已生成的報告
+        * 內容導出
+        * 遷移報告
+        * 新帳戶使用者
+        * 新學生群組
     other_display: 管理通知
     recording_ready_display: 記錄就緒
     reminder_display: 提醒
     student_appointment_description: |-
         *僅限導師和管理員：*
         
-              學生登記預約
+        學生登記預約
     student_appointment_display: 學生登記預約
     submission_comment_description: 作業提交件評論
     submission_comment_display: 提交件評論
