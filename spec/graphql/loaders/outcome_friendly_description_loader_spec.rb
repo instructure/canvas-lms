@@ -26,6 +26,10 @@ describe Loaders::OutcomeFriendlyDescriptionLoader do
     @parent_account = account_model
     @course_account.parent_account = @parent_account
     @course_account.save!
+
+    Account.site_admin.enable_feature!(:outcomes_friendly_description)
+    @parent_account.enable_feature!(:improved_outcomes_management)
+    @course_account.enable_feature!(:improved_outcomes_management)
   end
 
   def create_course_fd
@@ -158,6 +162,38 @@ describe Loaders::OutcomeFriendlyDescriptionLoader do
       )
       fd_loader.load(@outcome.id).then do |fd|
         expect(fd).to be_nil
+      end
+    end
+  end
+
+  it "resolves to nil if OFD FF disabled" do
+    Account.site_admin.disable_feature!(:outcomes_friendly_description)
+
+    create_course_fd
+
+    GraphQL::Batch.batch do
+      fd_loader = Loaders::OutcomeFriendlyDescriptionLoader.for(
+        @course.id, "Course"
+      )
+      fd_loader.load(@outcome.id).then do |fd|
+        expect(fd).to eq nil
+      end
+    end
+  end
+
+  it "resolves to nil if IOM FF disabled" do
+    @parent_account.disable_feature!(:improved_outcomes_management)
+
+    create_course_fd
+    create_account_fd
+    create_parent_account_fd
+
+    GraphQL::Batch.batch do
+      fd_loader = Loaders::OutcomeFriendlyDescriptionLoader.for(
+        @course.id, "Course"
+      )
+      fd_loader.load(@outcome.id).then do |fd|
+        expect(fd).to eq nil
       end
     end
   end

@@ -128,6 +128,8 @@
   "describe_the_image_e65d2e32": { "message": "(وصف الصورة)" },
   "describe_the_video_2fe8f46a": { "message": "(وصف الفيديو)" },
   "details_98a31b68": { "message": "التفاصيل" },
+  "diamond_b8dfe7ae": { "message": "معيّن" },
+  "dimension_type_55c83e4e": { "message": "نوع البعد" },
   "dimensions_45ddb7b7": { "message": "الأبعاد" },
   "directionality_26ae9e08": { "message": "الاتجاهية" },
   "discussions_a5f96392": { "message": "النقاشات" },
@@ -262,6 +264,9 @@
   "miscellaneous_e9818229": { "message": "متنوعات" },
   "modules_c4325335": { "message": "الوحدات النمطية" },
   "multi_color_image_63d7372f": { "message": "صورة متعددة الألوان" },
+  "must_be_at_least_percentage_22e373b6": {
+    "message": "يجب أن يكون { percentage }% على الأقل"
+  },
   "must_be_at_least_width_x_height_px_41dc825e": {
     "message": "يجب أن تكون { width } x { height } بكسل على الأقل."
   },
@@ -302,7 +307,10 @@
   },
   "pages_e5414c2c": { "message": "الصفحات" },
   "paragraph_5e5ad8eb": { "message": "الفقرة" },
+  "pentagon_17d82ea3": { "message": "خماسي" },
   "people_b4ebb13c": { "message": "أشخاص" },
+  "percentage_34ab7c2c": { "message": "نسبة مئوية" },
+  "pixels_52ece7d1": { "message": "بكسل" },
   "posted_when_a578f5ab": { "message": "المنشور: { when }" },
   "preformatted_d0670862": { "message": "منسق مسبقًا" },
   "pretty_html_editor_28748756": { "message": "محرر HTML الأنيق" },

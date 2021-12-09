@@ -95,7 +95,12 @@ const addToDoSidebar = parent => {
     },
     forCourse: ENV.COURSE.id
   })
-  renderToDoSidebar(parent)
+    .then(() => {
+      renderToDoSidebar(parent)
+    })
+    .catch(() => {
+      showFlashAlert({message: I18n.t('Failed to load the To Do Sidebar'), type: 'error'})
+    })
 }
 
 $(() => {

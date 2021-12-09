@@ -51,6 +51,14 @@ module CoursesHomePage
     ".pace_plans"
   end
 
+  def course_menu_toggle_selector
+    "#courseMenuToggle"
+  end
+
+  def left_side_selector
+    "#left-side"
+  end
+
   #------------------------- Elements ---------------------------
   def secondary_content
     f(secondary_content_selector)
@@ -92,6 +100,14 @@ module CoursesHomePage
     f(course_pace_plan_selector)
   end
 
+  def course_menu_toggle
+    f(course_menu_toggle_selector)
+  end
+
+  def left_side
+    f(left_side_selector)
+  end
+
   #----------------------- Actions/Methods ----------------------
   def visit_course(course)
     get "/courses/#{course.id}"
@@ -117,5 +133,9 @@ module CoursesHomePage
 
   def pace_plans_nav_exists?
     element_exists?(course_pace_plan_selector)
+  end
+
+  def click_course_menu_toggle
+    course_menu_toggle.click
   end
 end

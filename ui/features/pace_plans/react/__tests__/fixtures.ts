@@ -39,7 +39,7 @@ export const COURSE: Course = {
   id: '30',
   name: 'Neuromancy 300',
   start_at: '2021-09-01',
-  end_at: '2021-12-15'
+  end_at: '2021-12-31'
 }
 
 export const ENROLLMENT_1: Enrollment = {

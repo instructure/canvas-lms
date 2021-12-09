@@ -188,6 +188,20 @@ describe('SubmissionManager', () => {
     expect(queryByText('Submit Assignment')).not.toBeInTheDocument()
   })
 
+  it('does not render submit button when the the submission is excused', async () => {
+    const props = await mockAssignmentAndSubmission({
+      Submission: {...SubmissionMocks.excused}
+    })
+
+    const {queryByRole} = renderInContext(
+      {lastSubmittedSubmission: props.submission},
+      <MockedProvider>
+        <SubmissionManager {...props} />
+      </MockedProvider>
+    )
+    expect(queryByRole('button', {name: 'Submit Assignment'})).not.toBeInTheDocument()
+  })
+
   function testConfetti(testName, {enabled, dueDate, inDocument}) {
     // eslint-disable-next-line jest/valid-describe
     describe(`confetti ${enabled ? 'enabled' : 'disabled'}`, () => {

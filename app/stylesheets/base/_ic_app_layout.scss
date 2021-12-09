@@ -298,6 +298,13 @@ body:not(.course-menu-expanded) {
   overscroll-behavior-y: contain;
 }
 
+.ic-sticky-frame.has-scrollbar {
+  padding: direction-sides($ic-sp*2 $ic-sp*0.2 $ic-breadcrumbs-height $ic-sp*2);
+  & .nav-icon{
+      padding: 0 3px;
+  }
+}
+
 .ic-app-nav-toggle-and-crumbs {
   display: flex;
   align-items: center;

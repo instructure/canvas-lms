@@ -55,6 +55,7 @@ class UserPreferenceValue < ActiveRecord::Base
   add_user_preference :send_scores_in_emails_override, use_sub_keys: true
   add_user_preference :unread_submission_annotations, use_sub_keys: true
   add_user_preference :unread_rubric_comments, use_sub_keys: true
+  add_user_preference :module_links_default_new_tab
 
   def self.settings
     @preference_settings ||= {}

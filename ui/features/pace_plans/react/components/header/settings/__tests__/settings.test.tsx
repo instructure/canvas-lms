@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {act, render, screen} from '@testing-library/react'
+import {act, screen} from '@testing-library/react'
 
 import {COURSE, PRIMARY_PLAN} from '../../../../__tests__/fixtures'
 import {renderConnected} from '../../../../__tests__/utils'
@@ -42,6 +42,12 @@ const defaultProps = {
   toggleHardEndDates
 }
 
+beforeAll(() => {
+  window.ENV.VALID_DATE_RANGE = {
+    end_at: {date: COURSE.start_at, date_context: 'course'},
+    start_at: {date: COURSE.end_at, date_context: 'course'}
+  }
+})
 afterEach(() => {
   jest.clearAllMocks()
 })
@@ -99,12 +105,14 @@ describe('Settings', () => {
   })
 
   it('displays end date selector when hard end dates is true', () => {
-    const {getByRole, queryByRole} = renderConnected(
+    const {getByRole, queryByRole, getByLabelText} = renderConnected(
       <Settings {...defaultProps} pacePlan={{...PRIMARY_PLAN, hard_end_dates: true}} />
     )
     const settingsButton = getByRole('button', {name: 'Modify Settings'})
     act(() => settingsButton.click())
-    expect(queryByRole('combobox', {name: 'End Date'})).toBeInTheDocument()
+    const requireCompletionCheckbox = getByLabelText('Require Completion by Specified End Date')
+    act(() => requireCompletionCheckbox.click())
+    expect(queryByRole('combobox', {name: /^End Date/})).toBeInTheDocument()
   })
 
   // Skipped since we're not implementing this feature yet
