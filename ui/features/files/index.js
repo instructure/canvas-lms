@@ -18,6 +18,9 @@
 
 import router from './router'
 import {monitorLtiMessages} from '@canvas/lti/jquery/messages'
+import ready from '@instructure/ready'
 
-router.start()
-monitorLtiMessages()
+ready(() => {
+  router.start()
+  monitorLtiMessages()
+})
