@@ -1532,7 +1532,7 @@ nl:
       open_registration_delegated_warning_tooltip: "Een externe ID-provider is ingeschakeld"
       open_report_description: "Rapport beschrijving openen"
       page_header_title: Accountinstellingen
-      page_title: "Gedeelde inhoud"
+      page_title: Accountinstellingen
       quiz_ip_filters_delete: "Toets IP-filter verwijderen"
       quiz_ip_filters_help_message: |-
           Met toets-IP-filters kun je de toegang tot toetsen beperken tot computers uit een bepaald IP-bereik.
@@ -18220,7 +18220,7 @@ nl:
     blueprint_description: |-
         *Alleen voor instructeur en Admin:*
         
-              De inhoud is gesynchroniseerd van een blauwdrukcursus naar gekoppelde cursussen
+        De inhoud is gesynchroniseerd van een blauwdrukcursus naar gekoppelde cursussen
     blueprint_display: "Synchronisatie blauwdruk"
     calendar_description: "Nieuwe en gewijzigde items op jouw cursuskalender"
     calendar_display: Kalender
@@ -18255,7 +18255,7 @@ nl:
     content_link_error_description: |-
         *Alleen cursusleider en beheerder:*
         
-                Locatie en inhoud van een mislukte link die een cursist heeft gebruikt
+        Locatie en inhoud van een mislukte link die een cursist heeft gebruikt
     content_link_error_display: "Fout met inhoudslink"
     conversation_created_description: "Je hebt een gesprek aangemaakt"
     conversation_created_display: "Gesprekken die ik heb aangemaakt"
@@ -18264,9 +18264,9 @@ nl:
     course_content_description: |-
         Wijziging aan cursusinhoud: 
         
-              * Pagina-inhoud
-              * Toetsinhoud
-              * Opdrachtinhoud
+        * Pagina-inhoud
+        * Toetsinhoud
+        * Opdrachtinhoud
     course_content_display: Cursusinhoud
     discussion_description: "Nieuw discussie-onderwerp in je cursus"
     discussion_display: "Nieuw onderwerp"
@@ -18279,8 +18279,8 @@ nl:
     grading_description: |-
         Bevat: 
         
-              * Opdracht/inzending ingevoerd/gewijzigd cijfer
-              * Cijferweging gewijzigd
+        * Opdracht/inzending ingevoerd/gewijzigd cijfer
+        * Cijferweging gewijzigd
     grading_display: Beoordeling
     grading_notify_include_grade: "Scores insluiten wanneer waarschuwingen over wijzigingen in cijfers worden verstuurd."
     grading_policies_description: "Gewijzigd beoordelingsbeleid van cursussen"
@@ -18288,21 +18288,21 @@ nl:
     invitation_description: |-
         Uitnodiging voor: 
         
-              * Onlinevergadering
-              * Groep
-              * Samenwerking
-              * Peer review en herinnering
+        * Onlinevergadering
+        * Groep
+        * Samenwerking
+        * Peer review en herinnering
     invitation_display: Uitnodiging
     late_grading_description: |-
         *Alleen cursusleider en beheerder:*
         
-              Inzending van opdracht te laat
+        Inzending van opdracht te laat
     late_grading_display: "Beoordeling te laat"
     membership_update_description: |-
         *Alleen beheerder: inschrijving geactiveerd*
         
-              * Inschrijving in groep
-              * geaccepteerd/afgewezen
+        * Inschrijving in groep
+        * geaccepteerd/afgewezen
     membership_update_display: "Lidmaatschap bijwerken"
     missing_description_description: "Voor %{category} meldingen"
     missing_display_display: "Voor %{category} meldingen"
@@ -18387,19 +18387,19 @@ nl:
     other_description: |-
         *Alleen voor cursusleider en admin:*
         
-              * Cursus inschrijving
-              * Gegenereerd rapport
-              * Export van inhoud
-              * Migratie rapport
-              * Nieuwe gebruiker van account
-              * Nieuwe groep cursisten
+        * Cursus inschrijving
+        * Gegenereerd rapport
+        * Export van inhoud
+        * Migratie rapport
+        * Nieuwe gebruiker van account
+        * Nieuwe groep cursisten
     other_display: "Administratieve meldingen"
     recording_ready_display: "Opname Gereed"
     reminder_display: Herinnering
     student_appointment_description: |-
         *Alleen cursusleider en beheerder:*
         
-              Aanmelding voor afspraak van cursist
+        Aanmelding voor afspraak van cursist
     student_appointment_display: "Aanmeldingen voor afspraak van cursist"
     submission_comment_description: "Opmerking op ingezonden opdracht"
     submission_comment_display: "Opmerking over inzending"
