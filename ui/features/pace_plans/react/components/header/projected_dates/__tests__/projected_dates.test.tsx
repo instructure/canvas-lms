@@ -32,7 +32,7 @@ const defaultProps = {
   showProjections: true
 }
 
-beforeAll(() => {
+beforeEach(() => {
   window.ENV.VALID_DATE_RANGE = {
     end_at: {date: COURSE.end_at, date_context: 'course'},
     start_at: {date: COURSE.start_at, date_context: 'course'}
@@ -89,6 +89,18 @@ describe('ProjectedDates', () => {
       )
       expect(await findByText('Not enough days for this hypothetical date')).toBeInTheDocument()
     })
+
+    it('copes with no course start date', () => {
+      window.ENV.VALID_DATE_RANGE = {
+        end_at: {date: null, date_context: 'course'},
+        start_at: {date: null, date_context: 'course'}
+      }
+      const plan = {...defaultProps.pacePlan, hard_end_dates: false}
+      const {getAllByText} = renderConnected(
+        <ProjectedDates {...defaultProps} pacePlan={plan} projectedEndDate="2022-01-02" />
+      )
+      expect(getAllByText('Hypothetical student enrollment date').length).toBeTruthy()
+    })
   })
 
   describe('end date messages', () => {
@@ -101,6 +113,16 @@ describe('ProjectedDates', () => {
     it('shows specified end date text', () => {
       const {getAllByText} = renderConnected(<ProjectedDates {...defaultProps} />)
       expect(getAllByText('Required by specified end date').length).toBeTruthy()
+    })
+
+    it('shows open-ended plan text', () => {
+      window.ENV.VALID_DATE_RANGE = {
+        end_at: {date: null, date_context: 'course'},
+        start_at: {date: null, date_context: 'course'}
+      }
+      const plan = {...defaultProps.pacePlan, hard_end_dates: false, start_sate: '2022-01-03'}
+      const {getAllByText} = renderConnected(<ProjectedDates {...defaultProps} pacePlan={plan} />)
+      expect(getAllByText('Hypothetical end date').length).toBeTruthy()
     })
   })
 })
