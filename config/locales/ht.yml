@@ -1462,7 +1462,7 @@ ht:
       open_registration_delegated_warning_tooltip: "Yon Founisè Idantite Ekstèn Aktive"
       open_report_description: "Ouvri Deskripsyon Rapò"
       page_header_title: "Konfigirasyon Kont"
-      page_title: "Pataje Kontni"
+      page_title: "Konfigirasyon Kont"
       quiz_ip_filters_delete: "Elimine Filtè IP Quiz"
       quiz_ip_filters_help_message: |-
           Filtè IP Quiz yo se fason pou limite aksè a quiz yo sou òdinatè nan yon ranje IP presize.
@@ -16766,7 +16766,7 @@ ht:
     blueprint_description: |-
         *Enstriktè ak Admin sèlman:*
         
-              Kontni an te sekwonize apati de yon kou blueprint a kou asosye yo
+        Kontni an te sekwonize apati de yon kou blueprint a kou asosye yo
     blueprint_display: "Senkwonizasyon Blueprint"
     calendar_description: "Eleman nouvo e sa ki chanje nan kalandriye kou ou a"
     calendar_display: Kalandriye
@@ -16801,7 +16801,7 @@ ht:
     content_link_error_description: |-
         *Enstriktè ak Admin sèlman:*
         
-                Anplasman ak kontni yon lyen ki echwe ke yon elèv te entèaji ak li
+        Anplasman ak kontni yon lyen ki echwe ke yon elèv te entèaji ak li
     content_link_error_display: "Erè Lyen Kontni"
     conversation_created_description: "Ou kreye yon konvèsasyon"
     conversation_created_display: "Konvèsasyon Kreye pa Mwen menm"
@@ -16810,9 +16810,9 @@ ht:
     course_content_description: |-
         Ale nan kontni kou: 
         
-              * Kontni paj
-              * Kontni quiz
-              * Kontni sesyon
+        * Kontni paj
+        * Kontni quiz
+        * Kontni sesyon
     course_content_display: "Kontni Kou"
     discussion_description: "Nouvo sijè Diskisyon nan kou w la"
     discussion_display: "Nouvo Sijè"
@@ -16825,29 +16825,29 @@ ht:
     grading_description: |-
         Enkli: 
         
-              * Nòt soumisyon/sesyon antre/chanje
-              * Notasyon Pondere Chanje
+        * Nòt soumisyon/sesyon antre/chanje
+        * Notasyon Pondere Chanje
     grading_display: Klasman
     grading_policies_description: "Chanjman politik notasyon kou"
     grading_policies_display: "Politik Klasman"
     invitation_description: |-
         Envitasyon pou: 
         
-              * Konferans web
-              * Gwoup
-              * Kolaborasyon
-              * Revizyon Kamarad & rapèl
+        * Konferans web
+        * Gwoup
+        * Kolaborasyon
+        * Revizyon Kamarad & rapèl
     invitation_display: Envitasyon
     late_grading_description: |-
         *Enstrikè ak Administratè sèlman:*
         
-              Sesyon soumisyon an reta
+        Sesyon soumisyon an reta
     late_grading_display: "Klasman an Reta"
     membership_update_description: |-
         *Admin sèlman: enskripsyon annatant aktive*
         
-              * Enskripsyon gwoup
-              * aksepte/rejte
+        * Enskripsyon gwoup
+        * aksepte/rejte
     membership_update_display: "Aktyalize Manm"
     missing_description_description: "Pou %{category} notifikasyon"
     missing_display_display: "Pou %{category} notifikasyon"
@@ -16932,19 +16932,19 @@ ht:
     other_description: |-
         *Enstriktè e Administratè sèlman:*
         
-              * Enskripsyon Kou
-              * Rapò Jenere
-              * Kontni Ekspòte
-              * Rapò migrasyon
-              * Nouvo kont itilizatè
-              * New gwoup elèv
+        * Enskripsyon Kou
+        * Rapò Jenere
+        * Kontni Ekspòte
+        * Rapò migrasyon
+        * Nouvo kont itilizatè
+        * New gwoup elèv
     other_display: "Notifikasyon Administratif"
     recording_ready_display: "Anrejistreman  Pare"
     reminder_display: Rapèl
     student_appointment_description: |-
         *Enstriktè e Administratè sèlman:*
         
-              Enskripsyon randevou elèv
+        Enskripsyon randevou elèv
     student_appointment_display: "Elèv Randevou Enskripsyon"
     submission_comment_description: "Kòmantè soumisyon sesyon"
     submission_comment_display: "Kòmantè Soumisyon"
