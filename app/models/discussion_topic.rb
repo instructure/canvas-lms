@@ -1374,7 +1374,7 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def active_participants_with_visibility
-    return active_participants unless for_assignment?
+    return active_participants_include_tas_and_teachers unless for_assignment?
 
     users_with_visibility = assignment.students_with_visibility.pluck(:id)
 
@@ -1382,7 +1382,7 @@ class DiscussionTopic < ActiveRecord::Base
     users_with_visibility.concat(admin_ids)
 
     # observers will not be returned, which is okay for the functions current use cases (but potentially not others)
-    active_participants.select { |p| users_with_visibility.include?(p.id) }
+    active_participants_include_tas_and_teachers.select { |p| users_with_visibility.include?(p.id) }
   end
 
   def participating_users(user_ids)
