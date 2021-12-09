@@ -15,12 +15,20 @@ development:
         signing-secret: "astringthatisactually32byteslong"
         # regexes for matching online meeting urls in calendar events
         # one per line. will get | or'd together to form the regex
-        # that's eventually used. overrides default values in
-        # lib/api/v1/planner_item.rb:online_meeting_url, if present
+        # that's eventually used.
+        # Values here override the default values in
+        # lib/api/v1/planner_item.rb:online_meeting_url
+        # The example values here match what is (currently) in planner_item.rb
         online-meeting-url-regex: |-
-          # https:\/\/[\w-]+\.zoom\.us\/\d+(\?[\w\/\-=%]*)?
-          # https:\/\/[\w-]+\.webex\.com\/meet\/[\w.\/\-=%]+(\?[\w\/\-=%]*)?
-          # (... and so on)
+          https:\/\/[\w-]+\.zoom\.us\/\d+(\?[\w\/\-=%]*)?
+          https:\/\/[\w-]+\.zoom\.us\/my\/[\w.]+(\?[\w\/\-=%]*)?
+          https:\/\/[\w-]+\.zoom\.us\/j\/\d+(\?[\w\/\-=%]*)?
+          https:\/\/teams\.microsoft\.com\/l\/meetup-join\/[\w.\/\-=%]+(\?[\w\/\-=%]*)?
+          https:\/\/teams\.live\.com\/meet\/\d+(\?[\w\/\-=%]*)?
+          https:\/\/[\w-]+\.webex\.com\/meet\/[\w.\/\-=%]+(\?[\w\/\-=%]*)?
+          https:\/\/[\w-]+\.webex\.com\/\w+\/j\.php(\?[\w\/\-=%]*)?
+          https:\/\/meet\.google\.com\/[\w\/\-=%]+(\?[\w\/\-=%]*)?
+          https?:\/\/.*\/conferences\/\d+\/join
       datadog-rum:
         application_id: "27627d1e-8a4f-4645-b390-bb396fc83c81"
         client_token: "a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r"

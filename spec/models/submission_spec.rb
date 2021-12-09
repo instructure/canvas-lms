@@ -68,6 +68,33 @@ describe Submission do
     end
   end
 
+  describe "#type_for_attempt" do
+    before(:once) do
+      @assignment.update!(submission_types: "online_text_entry,online_url")
+      now = Time.zone.now
+      Timecop.freeze(10.minutes.from_now(now)) do
+        @assignment.submit_homework(@student, body: "hi", submission_type: "online_text_entry")
+      end
+
+      Timecop.freeze(20.minutes.from_now(now)) do
+        @assignment.submit_homework(@student, url: "https://www.google.com", submission_type: "online_url")
+      end
+    end
+
+    let(:submission) { @assignment.submissions.find_by(user: @student) }
+
+    it "returns the correct submission type given the attempt number" do
+      aggregate_failures do
+        expect(submission.type_for_attempt(1)).to eq "online_text_entry"
+        expect(submission.type_for_attempt(2)).to eq "online_url"
+      end
+    end
+
+    it "returns nil if given a non-existent attempt number" do
+      expect(submission.type_for_attempt(3)).to be_nil
+    end
+  end
+
   describe ".anonymous_ids_for" do
     subject { Submission.anonymous_ids_for(@first_assignment) }
 

@@ -38,7 +38,7 @@ describe('K-5 theme', () => {
     const k5Theme = require('../k5-theme').default
     k5Theme.use()
 
-    expect(k5Theme.variables.colors.brand).toBe('#008EE2')
+    expect(k5Theme.variables.colors.brand).toBe('#0374B5')
     expect(defaultThemeSpy).toHaveBeenCalled()
     expect(highContrastThemeSpy).not.toHaveBeenCalled()
   })

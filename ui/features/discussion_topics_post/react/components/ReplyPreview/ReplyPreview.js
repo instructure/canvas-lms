@@ -20,7 +20,7 @@ import DateHelper from '../../../../../shared/datetime/dateHelper'
 import I18n from 'i18n!discussion_topics_post'
 import PropTypes from 'prop-types'
 import React, {useState} from 'react'
-import {responsiveQuerySizes} from '../../utils'
+import {getDisplayName, responsiveQuerySizes} from '../../utils'
 
 import {Flex} from '@instructure/ui-flex'
 import {Responsive} from '@instructure/ui-responsive'
@@ -72,7 +72,7 @@ export const ReplyPreview = ({...props}) => {
               <Flex.Item>
                 <View>
                   <Text weight="bold" size={responsiveProps.textSize}>
-                    {props.author.shortName}
+                    {getDisplayName(props)}
                   </Text>
                 </View>
               </Flex.Item>
@@ -111,6 +111,10 @@ ReplyPreview.propTypes = {
    * Quoted author
    */
   author: PropTypes.object,
+  /**
+   * Quoted anonymous author
+   */
+  anonymousAuthor: PropTypes.object,
   /**
    * Editor of the quoted message
    */

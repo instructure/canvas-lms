@@ -60,6 +60,8 @@ const locale = {
   "audio_and_video_recording_not_supported_please_use_5ce3f0d7": {
     "message": "Audio and video recording not supported; please use a different browser."
   },
+  "audio_options_feb58e2c": { "message": "Audio Options" },
+  "audio_options_tray_33a90711": { "message": "Audio Options Tray" },
   "audio_player_for_title_20cc70d": { "message": "Audio player for { title }" },
   "auto_saved_content_exists_would_you_like_to_load_t_fee528f2": {
     "message": "Auto-saved content exists. Would you like to load the auto-saved content instead?"
@@ -379,6 +381,7 @@ const locale = {
   "shift_o_to_open_the_pretty_html_editor_55ff5a31": {
     "message": "Shift-O to open the pretty html editor."
   },
+  "show_audio_options_b489926b": { "message": "Show audio options" },
   "show_embed_options_ef8d7ef": { "message": "Show embed options" },
   "show_image_options_1e2ecc6b": { "message": "Show image options" },
   "show_link_options_545338fd": { "message": "Show link options" },

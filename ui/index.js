@@ -38,6 +38,7 @@ import '@canvas/forms/jquery/jquery.instructure_forms'
 import './boot/initializers/ajax_errors'
 import './boot/initializers/activateKeyClicks'
 import './boot/initializers/activateTooltips'
+import './boot/initializers/injectAuthTokenIntoForms'
 
 window.canvasReadyState = 'loading'
 window.dispatchEvent(new CustomEvent('canvasReadyStateChange'))
