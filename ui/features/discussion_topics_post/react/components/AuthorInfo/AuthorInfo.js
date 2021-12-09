@@ -16,6 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {AnonymousAvatar} from '../AnonymousAvatar/AnonymousAvatar'
+import {AnonymousUser} from '../../../graphql/AnonymousUser'
 import I18n from 'i18n!discussion_posts'
 import PropTypes from 'prop-types'
 import React, {useContext, useMemo} from 'react'
@@ -25,7 +27,6 @@ import {SearchContext} from '../../utils/constants'
 import {SearchSpan} from '../SearchSpan/SearchSpan'
 import {User} from '../../../graphql/User'
 
-import {AnonymousUser} from '../../../graphql/AnonymousUser'
 import {Avatar} from '@instructure/ui-avatar'
 import {Badge} from '@instructure/ui-badge'
 import {Flex} from '@instructure/ui-flex'
@@ -33,7 +34,6 @@ import {Responsive} from '@instructure/ui-responsive'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Text} from '@instructure/ui-text'
 import {Tooltip} from '@instructure/ui-tooltip'
-import {AnonymousAvatar} from '../AnonymousAvatar/AnonymousAvatar'
 
 export const AuthorInfo = props => {
   const {searchTerm, filter} = useContext(SearchContext)
@@ -91,10 +91,7 @@ export const AuthorInfo = props => {
               />
             )}
             {hasAuthor && isAnonymous(props) && (
-              <AnonymousAvatar
-                seedString={props.anonymousAuthor.id}
-                data-testid="anonymous_avatar"
-              />
+              <AnonymousAvatar seedString={props.anonymousAuthor.id} />
             )}
           </Flex.Item>
           <Flex.Item shouldShrink>

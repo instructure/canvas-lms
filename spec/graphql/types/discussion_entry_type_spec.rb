@@ -105,16 +105,21 @@ describe Types::DiscussionEntryType do
     end
     let(:anon_discussion_entry_type) { GraphQLTypeTester.new(anon_discussion_entry, current_user: @teacher) }
 
-    it "author is nil" do
+    it "does not return the author" do
       expect(anon_discussion_entry_type.resolve("author { shortName }")).to eq nil
     end
 
-    it "editor is nil" do
+    it "does not return the editor" do
       expect(anon_discussion_entry_type.resolve("editor { shortName }")).to eq nil
     end
 
-    it "anonymous_author is not nil" do
-      expect(anon_discussion_entry_type.resolve("anonymousAuthor { shortName }")).to eq DiscussionTopicParticipant.where(user_id: @teacher.id, discussion_topic_id: anon_discussion.id).first.id.to_s(36)
+    it "returns current_user for anonymousAuthor when the current user created the entry" do
+      expect(anon_discussion_entry_type.resolve("anonymousAuthor { shortName }")).to eq "current_user"
+    end
+
+    it "returns anonymous short name for an anonymous author" do
+      student_in_course(active_all: true)
+      expect(GraphQLTypeTester.new(anon_discussion_entry, current_user: @student).resolve("anonymousAuthor { shortName }")).to eq anon_discussion.discussion_topic_participants.where(user_id: @teacher.id).first.id.to_s(36)
     end
   end
 

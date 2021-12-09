@@ -18,9 +18,9 @@
 
 import {AnonymousUser} from '../../../../graphql/AnonymousUser'
 import {AuthorInfo} from '../AuthorInfo'
+import {CURRENT_USER, SearchContext} from '../../../utils/constants'
 import {render} from '@testing-library/react'
 import React from 'react'
-import {SearchContext} from '../../../utils/constants'
 import {User} from '../../../../graphql/User'
 
 const setup = ({
@@ -171,6 +171,11 @@ describe('AuthorInfo', () => {
     it('renders avatar', () => {
       const container = setup({anonymousAuthor: AnonymousUser.mock()})
       expect(container.getByTestId('anonymous_avatar')).toBeInTheDocument()
+    })
+
+    it('renders you for the current user', () => {
+      const container = setup({anonymousAuthor: AnonymousUser.mock({shortName: CURRENT_USER})})
+      expect(container.getByText('You')).toBeInTheDocument()
     })
   })
 })
