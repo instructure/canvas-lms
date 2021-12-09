@@ -27,6 +27,11 @@ Migration/Delay:
   Include:
     - "**/db/migrate/*.rb"
 
+Migration/Execute:
+  Enabled: true
+  Include:
+    - "**/db/migrate/*.rb"
+
 Migration/PrimaryKey:
   Enabled: true
   Include:
