@@ -1505,7 +1505,7 @@ de:
       open_registration_delegated_warning_tooltip: "Ein externer Identitätsanbieter ist aktiviert"
       open_report_description: "Berichtsbeschreibung öffnen"
       page_header_title: Kontoeinstellungen
-      page_title: "Geteilter Content"
+      page_title: Kontoeinstellungen
       quiz_ip_filters_delete: "Quiz-IP-Filter entfernen"
       quiz_ip_filters_help_message: |-
           Mit Quiz-IP-Filtern lässt sich der Quizzugang auf Computer eines bestimmten IP-Bereichs beschränken.
@@ -18162,7 +18162,7 @@ de:
     blueprint_description: |-
         *Nur für Kursleiter und Admin:*
         
-              Der Content wurde aus einem Musterkurs in einen verknüpften Kurse synchronisiert.
+        Der Content wurde aus einem Musterkurs in einen verknüpften Kurse synchronisiert.
     blueprint_display: Mustersynchronisierung
     calendar_description: "Neue und geänderte Elemente in Ihrem Kurskalender"
     calendar_display: Kalender
@@ -18197,7 +18197,7 @@ de:
     content_link_error_description: |-
         *Nur für Kursleiter und Administrator:Freigabe von *
         
-                Ort und Content eines fehlgeschlagenen Links, den ein Student verwendet hat
+        Ort und Content eines fehlgeschlagenen Links, den ein Student verwendet hat
     content_link_error_display: Content-Link-Fehler
     conversation_created_description: "Sie haben eine Konversation erstellt"
     conversation_created_display: "Von mir erstellte Konversationen"
@@ -18206,9 +18206,9 @@ de:
     course_content_description: |-
         Änderung des Kursinhalts: 
         
-              * Seiteninhalt
-              * Quizinhalt
-              * Aufgabeninhalt
+        * Seiteninhalt
+        * Quizinhalt
+        * Aufgabeninhalt
     course_content_display: Kursinhalt
     discussion_description: "Neues Diskussionsthema in Ihrem Kurs"
     discussion_display: "Neues Thema"
@@ -18221,8 +18221,8 @@ de:
     grading_description: |-
         Enthält: 
         
-              * Note für Aufgabe/Abgabe eingegeben/geändert
-              * Notengewichtung geändert
+        * Note für Aufgabe/Abgabe eingegeben/geändert
+        * Notengewichtung geändert
     grading_display: Benotung
     grading_notify_include_grade: "Bei Benachrichtigungen über Notenänderungen Punktzahlen einfügen"
     grading_policies_description: "Änderung der Benotungsrichtlinien für den Kurs"
@@ -18230,21 +18230,21 @@ de:
     invitation_description: |-
         Einladung für: 
         
-              * Webkonferenz
-              * Gruppe
-              * Zusammenarbeit
-              * Peer-Korrektur und Erinnerung
+        * Webkonferenz
+        * Gruppe
+        * Zusammenarbeit
+        * Peer-Korrektur und Erinnerung
     invitation_display: Einladung
     late_grading_description: |-
         *Nur Dozent und Administrator:*
         
-              Verspätete Abgabe der Aufgabe
+        Verspätete Abgabe der Aufgabe
     late_grading_display: "Verspätete Benotung"
     membership_update_description: |-
         *Nur Administrator: ausstehende Einschreibung aktiviert*
         
-              * Gruppeneinschreibung
-              * akzeptiert/abgelehnt
+        * Gruppeneinschreibung
+        * akzeptiert/abgelehnt
     membership_update_display: "Aktualisierung der Mitgliedschaft"
     missing_description_description: "Für %{category}-Benachrichtigungen"
     missing_display_display: "Für %{category}-Benachrichtigungen"
@@ -18329,19 +18329,19 @@ de:
     other_description: |-
         *Nur Dozent und Administrator:*
         
-              * Kurseinschreibung
-              * Bericht erstellt
-              * Inhaltsexport
-              * Migrationsbericht
-              * Neuer Kontobenutzer
-              * Neue Studentengruppe
+        * Kurseinschreibung
+        * Bericht erstellt
+        * Inhaltsexport
+        * Migrationsbericht
+        * Neuer Kontobenutzer
+        * Neue Studentengruppe
     other_display: Verwaltungsbenachrichtigungen
     recording_ready_display: "Aufzeichnung fertig"
     reminder_display: Erinnerung
     student_appointment_description: |-
         *Nur Dozent und Administrator:*
         
-              Studentenanmeldung für Termin
+        Studentenanmeldung für Termin
     student_appointment_display: "Terminanmeldungen von Studenten"
     submission_comment_description: "Kommentar zu Aufgabenabgabe"
     submission_comment_display: Abgabekommentar
