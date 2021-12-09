@@ -1533,7 +1533,7 @@ en-AU:
       open_registration_delegated_warning_tooltip: "An External Identity Provider is Enabled"
       open_report_description: "Open Report Description"
       page_header_title: "Account Settings"
-      page_title: "Shared Content"
+      page_title: "Account Settings"
       quiz_ip_filters_delete: "Remove Quiz IP Filter"
       quiz_ip_filters_help_message: |-
           Quiz IP filters are a way to limit access to quizzes to computers in a specified IP range.
@@ -18277,7 +18277,7 @@ en-AU:
     blueprint_description: |-
         *Instructor and Admin only:*
         
-              Content was synced from a blueprint course to associated courses
+        Content was synced from a blueprint course to associated courses
     blueprint_display: "Blueprint Sync"
     calendar_description: "New and changed items on your course calendar"
     calendar_display: Calendar
@@ -18312,7 +18312,7 @@ en-AU:
     content_link_error_description: |-
         *Instructor and Admin only:*
         
-                Location and content of a failed link that a student has interacted with
+        Location and content of a failed link that a student has interacted with
     content_link_error_display: "Content Link Error"
     conversation_created_description: "You created a conversation"
     conversation_created_display: "Conversations Created By Me"
@@ -18321,9 +18321,9 @@ en-AU:
     course_content_description: |-
         Change to course content: 
         
-              * Page content
-              * Quiz content
-              * Assignment content
+        * Page content
+        * Quiz content
+        * Assignment content
     course_content_display: "Course Content"
     discussion_description: "New Discussion topic in your course"
     discussion_display: "New Topic"
@@ -18336,8 +18336,8 @@ en-AU:
     grading_description: |-
         Includes: 
         
-              * Assignment/submission grade entered/changed
-              * Grade weight changed
+        * Assignment/submission grade entered/changed
+        * Grade weight changed
     grading_display: Grading
     grading_notify_include_grade: "Include scores when alerting about mark changes."
     grading_policies_description: "Course grading policy change"
@@ -18345,21 +18345,21 @@ en-AU:
     invitation_description: |-
         Invitation for: 
         
-              * Web conference
-              * Group
-              * Collaboration
-              * Peer Review & reminder
+        * Web conference
+        * Group
+        * Collaboration
+        * Peer Review & reminder
     invitation_display: Invitation
     late_grading_description: |-
         *Instructor and Admin only:*
         
-              Late assignment submission
+        Late assignment submission
     late_grading_display: "Late Grading"
     membership_update_description: |-
         *Admin only: pending enrolment activated*
         
-              * Group enrolment
-              * accepted/rejected
+        * Group enrolment
+        * accepted/rejected
     membership_update_display: "Membership Update"
     missing_description_description: "For %{category} notifications"
     missing_display_display: "For %{category} notifications"
@@ -18444,19 +18444,19 @@ en-AU:
     other_description: |-
         *Instructor and Admin only:*
         
-              * Course enrolment
-              * Report generated
-              * Content export
-              * Migration report
-              * New account user
-              * New student group
+        * Course enrolment
+        * Report generated
+        * Content export
+        * Migration report
+        * New account user
+        * New student group
     other_display: "Administrative Notifications"
     recording_ready_display: "Recording Ready"
     reminder_display: Reminder
     student_appointment_description: |-
         *Instructor and Admin only:*
         
-              Student appointment sign-up
+        Student appointment sign-up
     student_appointment_display: "Student Appointment Signups"
     submission_comment_description: "Assignment submission comment"
     submission_comment_display: "Submission Comment"
