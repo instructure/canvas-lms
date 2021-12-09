@@ -14250,7 +14250,7 @@ ca:
     blueprint_description: |-
         *Només instructor i administrador:*
         
-                S'ha sincronitzat el contingut d'un curs plantilla als cursos associats
+        S'ha sincronitzat el contingut d'un curs plantilla als cursos associats
     blueprint_display: "Sincronització de plantilla"
     calendar_description: "Elements nous i modificats al vostre calendari del curs"
     calendar_display: Calendari
@@ -14285,7 +14285,7 @@ ca:
     content_link_error_description: |-
         *Només instructor i administrador:*
         
-                Ubicació i contingut d'un enllaç erroni amb el qual ha interactuat un estudiant
+        Ubicació i contingut d'un enllaç erroni amb el qual ha interactuat un estudiant
     content_link_error_display: "Error d'enllaç de contingut"
     conversation_created_description: "Heu creat una conversa"
     conversation_created_display: "Converses creades per mi"
@@ -14294,9 +14294,9 @@ ca:
     course_content_description: |-
         Canvi al contingut del curs: 
         
-                * Contingut de la pàgina
-                * Contingut del qüestionari
-                * Contingut de la tasca
+        * Contingut de la pàgina
+        * Contingut del qüestionari
+        * Contingut de la tasca
     course_content_display: "Contingut del curs"
     discussion_description: "Hi ha un tema de debat nou al vostre curs"
     discussion_display: "Tema nou"
@@ -14307,31 +14307,31 @@ ca:
     files_description: "S'han afegit un fitxer nou al vostre curs"
     files_display: Fitxers
     grading_description: |-
-        Includes: 
+        Inclou: 
         
-                * S'ha introduït/modificat la qualificació de la tasca/entrega
-                * S'ha canviat la ponderació de les qualificacions
+        * S'ha introduït/modificat la qualificació de la tasca/entrega
+        * S'ha canviat la ponderació de les qualificacions
     grading_display: Qualificació
     grading_policies_description: "Canvi a la política de qualificació del curs"
     grading_policies_display: "Normatives de qualificació"
     invitation_description: |-
         Invitació per a: 
         
-                * Conferència web
-                * Grup
-                * Col·laboració
-                * Revisió entre companys i recordatori
+        * Conferència web
+        * Grup
+        * Col·laboració
+        * Revisió entre companys i recordatori
     invitation_display: Invitació
     late_grading_description: |-
         *Només instructor i administrador:*
         
-                Entrega de tasca endarrerida
+        Entrega de tasca endarrerida
     late_grading_display: "Qualificació endarrerida"
     membership_update_description: |-
         *Només administrador: s'ha activat la inscripció pendent*
         
-                * Inscripció al grup
-                * acceptada/rebutjada
+        * Inscripció al grup
+        * acceptada/rebutjada
     membership_update_display: "Actualització de la pertinença"
     missing_description_description: "Per a notificacions de %{category}"
     missing_display_display: "Per a notificacions de %{category}"
@@ -14416,19 +14416,19 @@ ca:
     other_description: |-
         *Només instructor i administrador:*
         
-                * Inscripció al curs
-                * Informe generat
-                * Exportació de contingut
-                * Informe de migració
-                * Usuari del compte nou
-                * Grup d'estudiants nou
+        * Inscripció al curs
+        * Informe generat
+        * Exportació de contingut
+        * Informe de migració
+        * Usuari del compte nou
+        * Grup d'estudiants nou
     other_display: "Notificacions administratives"
     recording_ready_display: "Enregistrament a punt"
     reminder_display: Recordatori
     student_appointment_description: |-
         *Només instructor i administrador:*
         
-                Registre de cita amb un estudiant
+        Registre de cita amb un estudiant
     student_appointment_display: "Registres de cites d'estudiants"
     submission_comment_description: "Comentari sobre l'entrega de la tasca"
     submission_comment_display: "Comentari sobre l'entrega"
