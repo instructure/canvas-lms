@@ -1533,7 +1533,7 @@ pt:
       open_registration_delegated_warning_tooltip: "Está ativado um fornecedor de identidade externo"
       open_report_description: "Abrir descrição do relatório"
       page_header_title: "Configurações de conta"
-      page_title: "Conteúdo compartilhado"
+      page_title: "Configurações de conta"
       quiz_ip_filters_delete: "Remover o filtro IP do Teste"
       quiz_ip_filters_help_message: |-
           Os filtros IP de testes são uma forma de limitar o acesso aos testes aos computadores em uma série de IPs especificados.
@@ -18247,7 +18247,7 @@ pt:
     blueprint_description: |-
         *Instrutor e administrador apenas:*
         
-              O conteúdo foi sincronizado de uma disciplina de planos para disciplinas associadas
+        O conteúdo foi sincronizado de uma disciplina de planos para disciplinas associadas
     blueprint_display: "Sincronização do Blueprint"
     calendar_description: "Itens novos e alterados no seu calendário de disciplina"
     calendar_display: Calendário
@@ -18282,7 +18282,7 @@ pt:
     content_link_error_description: |-
         *Apenas instrutor e administrador:*
         
-                Localização e conteúdo de uma ligação com a qual um aluno tenha interagido e
+        Localização e conteúdo de uma ligação com a qual um aluno tenha interagido e
     content_link_error_display: "Erro de ligação de conteúdo"
     conversation_created_description: "Criou uma conversa"
     conversation_created_display: "Conversas criadas por mim"
@@ -18291,9 +18291,9 @@ pt:
     course_content_description: |-
         Mude para o conteúdo da disciplina: 
         
-              * Conteúdo da página
-              * Conteúdo do teste
-              * Conteúdo de tarefa
+        * Conteúdo da página
+        * Conteúdo do teste
+        * Conteúdo de tarefa
     course_content_display: "Conteúdo da disciplina"
     discussion_description: "Novo tópico de discussão na sua disciplina"
     discussion_display: "Novo Tópico"
@@ -18306,8 +18306,8 @@ pt:
     grading_description: |-
         Inclui: 
         
-              * Tarefas/entrega de notas inseridas/alteradas
-              * Avaliação alterada
+        * Tarefas/entrega de notas inseridas/alteradas
+        * Avaliação alterada
     grading_display: Pontuação
     grading_notify_include_grade: "Inclua as pontuações ao me alertar sobre alteração de notas."
     grading_policies_description: "Alteração da política de avaliação da disciplina"
@@ -18315,21 +18315,21 @@ pt:
     invitation_description: |-
         Convite para: 
         
-              * Conferência na Web
-              * Grupo
-              * Colaboração
-              * Revisão por pares e lembrete
+        * Conferência na Web
+        * Grupo
+        * Colaboração
+        * Revisão por pares e lembrete
     invitation_display: Convite
     late_grading_description: |-
         *Apenas Instrutor e Administrador:*
         
-              Envio de tarefa atrasado
+        Envio de tarefa atrasado
     late_grading_display: "Avaliação atrasada"
     membership_update_description: |-
         *Apenas Administrador: inscrição pendente ativada*
         
-              * Inscrição em grupo
-              * aceite/recusado
+        * Inscrição em grupo
+        * Aceite/recusado
     membership_update_display: "Atualização de associação"
     missing_description_description: "Para notificações de %{category}"
     missing_display_display: "Para notificações de %{category}"
@@ -18414,19 +18414,19 @@ pt:
     other_description: |-
         *Apenas Instrutor e Administrador:*
         
-              * Inscrição em disciplina
-              * Relatório criado
-              * Exportação de conteúdo
-              * Relatório de migração
-              * Novo utilizador de conta
-              * Novo grupo de alunos
+        * Inscrição em disciplina
+        * Relatório criado
+        * Exportação de conteúdo
+        * Relatório de migração
+        * Novo utilizador de conta
+        * Novo grupo de alunos
     other_display: "Notificações administrativas"
     recording_ready_display: "Gravação Pronta"
     reminder_display: Lembrete
     student_appointment_description: |-
         *Apenas Instrutor e Administrador:*
         
-              Inscrição de alunos para compromissos
+        Inscrição de alunos para compromissos
     student_appointment_display: "Inscrições para compromissos de alunos"
     submission_comment_description: "Comentário de envio de tarefa"
     submission_comment_display: "Comentário de envio"
