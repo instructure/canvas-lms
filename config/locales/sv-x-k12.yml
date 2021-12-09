@@ -15995,7 +15995,7 @@ sv-x-k12:
     content_link_error_description: |-
         *Endast lärare och admin:*
         
-                Plats och innehåll för en skadad länk som en elev har använt
+        Plats och innehåll för en skadad länk som en elev har använt
     content_link_error_display: "Fel på innehållslänk"
     conversation_created_description: "Du skapade en konversation"
     conversation_created_display: "Konversationer skapade av mig"
@@ -16004,9 +16004,9 @@ sv-x-k12:
     course_content_description: |-
         Ändringar i kursinnehållet: 
         
-                * Sidinnehåll
-                * Quiz-innehåll
-                * Uppgiftsinnehåll
+        * Sidinnehåll
+        * Quiz-innehåll
+        * Uppgiftsinnehåll
     course_content_display: Kursinnehåll
     discussion_description: "Nytt diskussionsämne i din kurs"
     discussion_display: "Nytt ämne"
@@ -16019,29 +16019,29 @@ sv-x-k12:
     grading_description: |-
         Inkluderar: 
         
-                * Uppgift/inlämningsomdöme angivet/ändrat
-                * Ändring av bedömningsvikt
+        * Uppgift/inlämningsomdöme angivet/ändrat
+        * Ändring av bedömningsvikt
     grading_display: Bedömning
     grading_policies_description: "Ändring av kursens bedömningsregler"
     grading_policies_display: Bedömningsregler
     invitation_description: |-
         Inbjudan till: 
         
-                * Webbkonferenser
-                * Grupper
-                * Samarbeten
-                * Kamratrespons och påminnelse
+        * Webbkonferenser
+        * Grupper
+        * Samarbeten
+        * Kamratrespons och påminnelse
     invitation_display: Inbjudan
     late_grading_description: |-
         *Endast lärare och administratörer:*
         
-                Sen uppgiftsinlämning
+        Sen uppgiftsinlämning
     late_grading_display: "Försenad bedömning"
     membership_update_description: |-
         *Endast admin: väntande registrering aktiverad*
         
-                * Gruppregistrering
-                * godkänd/avvisad
+        * Gruppregistrering
+        * godkänd/avvisad
     membership_update_display: "Uppdatering av medlemskap"
     missing_description_description: "För %{category}-aviseringar"
     missing_display_display: "För %{category}-aviseringar"
@@ -16126,19 +16126,19 @@ sv-x-k12:
     other_description: |-
         *Endast lärare och administratörer:*
         
-                * Kursregistrering
-                * Rapport genererad
-                * Innehållsexport
-                * Migreringsrapport
-                * Ny kontoanvändare
-                * Ny elevgrupp
+        * Kursregistrering
+        * Rapport genererad
+        * Innehållsexport
+        * Migreringsrapport
+        * Ny kontoanvändare
+        * Ny elevgrupp
     other_display: "Administrativa aviseringar"
     recording_ready_display: "Inspelning redo"
     reminder_display: Påminnelse
     student_appointment_description: |-
         *Endast lärare och administratörer:*
         
-                Bokning av elevmöte
+        Bokning av elevmöte
     student_appointment_display: "Ny bokning för mötestillfälle"
     submission_comment_description: "Kommentar på uppgiftsinlämning"
     submission_comment_display: Inlämningskommentar
