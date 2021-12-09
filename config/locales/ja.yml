@@ -1532,7 +1532,7 @@ ja:
       open_registration_delegated_warning_tooltip: "外部 ID プロバイダーが有効です"
       open_report_description: レポートの説明を開く
       page_header_title: アカウント設定
-      page_title: 共有コンテンツ
+      page_title: アカウント設定
       quiz_ip_filters_delete: クイズIPフィルターを削除
       quiz_ip_filters_help_message: |-
           クイズ IP フィルタは、クイズへのアクセスを、指定の IP 範囲内にあるコンピュータに制限するための一手段です。
@@ -18227,7 +18227,7 @@ ja:
     blueprint_description: |-
         *インストラクターと管理者のみ：*
         
-              コンテンツが青写真コースから関連コースに同期されました
+        コンテンツが青写真コースから関連コースに同期されました
     blueprint_display: 青写真同期
     calendar_description: "コース カレンダーの新しいアイテムおよび変更されたアイテム"
     calendar_display: カレンダー
@@ -18262,7 +18262,7 @@ ja:
     content_link_error_description: |-
         *講師と管理者のみ：*
         
-                受講生がやりとりしたに失敗したリンクの場所とコンテンツ
+        受講生がやりとりしたに失敗したリンクの場所とコンテンツ
     content_link_error_display: コンテンツリンクエラー
     conversation_created_description: 会話を作成しました
     conversation_created_display: 自分が作成した会話
@@ -18271,9 +18271,9 @@ ja:
     course_content_description: |-
         コース内容に変更：
         
-              * ページの内容
-              * クイズの内容
-              * 課題の内容
+        * ページの内容
+        * クイズの内容
+        * 課題の内容
     course_content_display: コースの内容
     discussion_description: コースの新しいディスカッショントピック
     discussion_display: 新規トピック
@@ -18286,8 +18286,8 @@ ja:
     grading_description: |-
         以下を含みます：
         
-              * 課題/提出物の成績入力済み/変更済み
-              * 成績の重み付けが変更されました
+        * 課題/提出物の成績入力済み/変更済み
+        * 成績の重み付けが変更されました
     grading_display: 採点
     grading_notify_include_grade: 成績変更に関するアラートには、スコアを記載してください。
     grading_policies_description: コースの採点方針の変更
@@ -18295,21 +18295,21 @@ ja:
     invitation_description: |-
         ～への招待：
         
-              * ウェブ会議
-              * グループ
-              * コラボレーション
-              * ピアレビュー＆リマインダ
+        * ウェブ会議
+        * グループ
+        * コラボレーション
+        * ピアレビュー＆リマインダ
     invitation_display: 招待
     late_grading_description: |-
         *インストラクタおよび管理者のみ:*
         
-              課題提出遅延
+        課題提出遅延
     late_grading_display: 遅延採点
     membership_update_description: |-
         *管理者のみ: 保留中登録のアクティブ化*
         
-              * グループ登録
-              * 受諾/拒否
+        * グループ登録
+        * 受諾/拒否
     membership_update_display: メンバーシップの更新
     missing_description_description: "%{category} のお知らせに対して"
     missing_display_display: "%{category} のお知らせに対して"
@@ -18394,19 +18394,19 @@ ja:
     other_description: |-
         *インストラクタおよび管理者のみ:*
         
-              * コース登録
-              * レポート生成
-              * コンテンツのエクスポート
-              * 移行レポート
-              * 新規アカウント ユーザ
-              * 新規受講生グループ
+        * コース登録
+        * レポート生成
+        * コンテンツのエクスポート
+        * 移行レポート
+        * 新規アカウント ユーザ
+        * 新規受講生グループ
     other_display: 管理のお知らせ
     recording_ready_display: 録音準備ができました
     reminder_display: 事前通知
     student_appointment_description: |-
         *インストラクタおよび管理者のみ:*
         
-              受講生の予定のサインアップ
+        受講生の予定のサインアップ
     student_appointment_display: 受講生の予定のサインアップ
     submission_comment_description: 課題提出物のコメント
     submission_comment_display: 提出コメント
