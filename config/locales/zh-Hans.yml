@@ -1532,7 +1532,7 @@ zh-Hans:
       open_registration_delegated_warning_tooltip: 已启用外部身份提供程序
       open_report_description: 打开报告说明
       page_header_title: 帐户设置
-      page_title: 共享内容
+      page_title: 帐户设置
       quiz_ip_filters_delete: "删除测验 IP 筛选器"
       quiz_ip_filters_help_message: |-
           可以使用测验 IP 过滤器，只允许指定 IP 范围的计算机访问测验。
@@ -18211,7 +18211,7 @@ zh-Hans:
     blueprint_description: |-
         *仅讲师和管理员：*
         
-              已将模板课程中的内容同步到关联课程
+        已将模板课程中的内容同步到关联课程
     blueprint_display: 模板同步
     calendar_description: 课程日历上的新项目和更改项目
     calendar_display: 日历
@@ -18246,7 +18246,7 @@ zh-Hans:
     content_link_error_description: |-
         *仅讲师和管理员：*
         
-                学生与之互动的失效链接的位置和内容
+        学生与之互动的失效链接的位置和内容
     content_link_error_display: 内容链接错误
     conversation_created_description: 您所创建的对话
     conversation_created_display: 我所创建的对话
@@ -18255,9 +18255,9 @@ zh-Hans:
     course_content_description: |-
         切换到课程内容：
         
-              * 页面内容
-              * 测验内容
-              * 作业内容
+        * 页面内容
+        * 测验内容
+        * 作业内容
     course_content_display: 课程内容
     discussion_description: 课程中的新讨论话题
     discussion_display: 新话题
@@ -18270,8 +18270,8 @@ zh-Hans:
     grading_description: |-
         包括：
         
-              * 作业/提交评分输入/改变
-              * 评分加权的改变
+        * 作业/提交评分输入/改变
+        * 评分加权的改变
     grading_display: 评分
     grading_notify_include_grade: 报警评分更改时包括分数。
     grading_policies_description: 课程评分细则更改
@@ -18279,21 +18279,21 @@ zh-Hans:
     invitation_description: |-
         邀请：
         
-              * Web 会议
-              * 小组
-              * 协作
-              * 同行评估和提醒
+        * Web 会议
+        * 小组
+        * 协作
+        * 同行评估和提醒
     invitation_display: 邀请
     late_grading_description: |-
         *仅适用于导师和管理员：*
         
-              上次作业提交文件
+        上次作业提交文件
     late_grading_display: 最近评分
     membership_update_description: |-
         *仅适用于管理员：已激活的待处理注册*
         
-              * 组注册
-              * 已接受/已拒绝
+        * 组注册
+        * 已接受/已拒绝
     membership_update_display: 成员资格更新
     missing_description_description: "有关 %{category} 通知"
     missing_display_display: "有关 %{category} 通知"
@@ -18378,19 +18378,19 @@ zh-Hans:
     other_description: |-
         *仅适用于导师和管理员：*
         
-              * 课程注册
-              * 已生成的报告
-              * 内容导出
-              * 迁移报告
-              * 新帐户用户
-              * 新学生组
+        * 课程注册
+        * 已生成的报告
+        * 内容导出
+        * 迁移报告
+        * 新帐户用户
+        * 新学生组
     other_display: 管理通知
     recording_ready_display: 录制准备
     reminder_display: 提醒
     student_appointment_description: |-
         *仅适用于导师和管理员：*
         
-              学生预约注册
+        学生预约注册
     student_appointment_display: 学生预约注册
     submission_comment_description: 作业提交评论
     submission_comment_display: 提交评论

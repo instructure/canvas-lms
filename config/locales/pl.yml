@@ -1551,7 +1551,7 @@ pl:
       open_registration_delegated_warning_tooltip: "Zewnętrzny dostawca tożsamości jest włączony"
       open_report_description: "Otwórz opis raportu"
       page_header_title: "Ustawienia konta"
-      page_title: "Udostępniona zawartość"
+      page_title: "Ustawienia konta"
       quiz_ip_filters_delete: "Usuń filtr IP testu"
       quiz_ip_filters_help_message: |-
           Filtry IP testu służą do ograniczania dostępu do testów dla komputerów z danego zakresu IP.
@@ -18607,7 +18607,7 @@ pl:
     blueprint_description: |-
         *Tylko instruktor i admin:*
         
-              Zawartość została zsynchronizowana z kursu Blueprint do powiązanych kursów
+        Zawartość została zsynchronizowana z kursu Blueprint do powiązanych kursów
     blueprint_display: "Synch. Blueprint"
     calendar_description: "Nowe i zmienione elementy w kalendarzu kursu"
     calendar_display: Kalendarz
@@ -18642,7 +18642,7 @@ pl:
     content_link_error_description: |-
         *Tylko instruktor i administrator:*
         
-                lokalizacja i zawartość uszkodzonego łącza, którego użył uczestnik
+        lokalizacja i zawartość uszkodzonego łącza, którego użył uczestnik
     content_link_error_display: "Błąd łącza do zawartości"
     conversation_created_description: "Utworzono konwersację"
     conversation_created_display: "Utworzone przez mnie konwersacje"
@@ -18651,9 +18651,9 @@ pl:
     course_content_description: |-
         Zmień na zawartość kursu: 
         
-              * Zawartość strony
-              * Zawartość testu
-              * Zawartość zadania
+        * Zawartość strony
+        * Zawartość testu
+        * Zawartość zadania
     course_content_display: "Zawartość kursu"
     discussion_description: "Nowy temat dyskusji na kursie"
     discussion_display: "Nowy temat"
@@ -18666,8 +18666,8 @@ pl:
     grading_description: |-
         Zawiera: 
         
-              * Wprowadzoną/zmienioną ocenę zadania/przesłanego zadania
-              * Zmianę wagi oceny
+        * Wprowadzoną/zmienioną ocenę zadania/przesłanego zadania
+        * Zmianę wagi oceny
     grading_display: Ocenianie
     grading_notify_include_grade: "Przesyłaj wyniki punktowe w alertach o zmianach ocen."
     grading_policies_description: "Zmiana polityki oceniania na kursie"
@@ -18675,21 +18675,21 @@ pl:
     invitation_description: |-
         Zaproszenie do: 
         
-              * Konferencja internetowa
-              * Grupa
-              * Współpraca
-              * Analiza i przypomnienia
+        * Konferencja internetowa
+        * Grupa
+        * Współpraca
+        * Analiza i przypomnienia
     invitation_display: Zaproszenie
     late_grading_description: |-
         *Jedynie instruktor i administrator:*
         
-              Przesłanie zadania po czasie
+        Przesłanie zadania po czasie
     late_grading_display: "Ocenianie po czasie"
     membership_update_description: |-
         *Jedynie administrator: aktywowano oczekujące zapisy*
         
-              * Zapis grupowy
-              * zaakceptowano/odrzucono
+        * Zapis grupowy
+        * zaakceptowano/odrzucono
     membership_update_display: "Aktualizacja członkostwa"
     missing_description_description: "Dla powiadomień %{category}"
     missing_display_display: "Dla powiadomień %{category}"
@@ -18774,19 +18774,19 @@ pl:
     other_description: |-
         *Jedynie instruktor i administrator:*
         
-              * Zapisy na kurs
-              * Raport wygenerowany
-              * Eksport zawartości
-              * Raport migracji
-              * Użytkownik nowego konta
-              * Grupa nowego uczestnika
+        * Zapisy na kurs
+        * Raport wygenerowany
+        * Eksport zawartości
+        * Raport migracji
+        * Użytkownik nowego konta
+        * Grupa nowego uczestnika
     other_display: "Powiadomienia administracyjne"
     recording_ready_display: "Zapis gotowy"
     reminder_display: Przypomnienie
     student_appointment_description: |-
         *Jedynie instruktor i administrator:*
         
-              Rejestracja zadania uczestnika
+        Rejestracja zadania uczestnika
     student_appointment_display: "Zapisy na spotkania uczestników"
     submission_comment_description: "Komentarz do przesłanego zadania"
     submission_comment_display: "Komentarz do przesłanego zadania"

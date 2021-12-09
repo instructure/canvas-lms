@@ -18229,7 +18229,7 @@ es:
     blueprint_description: |-
         *Solo profesor y administrador:*
         
-                El contenido ha sido sincronizado desde un curso de proyecto a cursos asociados
+        El contenido ha sido sincronizado desde un curso de proyecto a cursos asociados
     blueprint_display: "Sincronización de proyectos"
     calendar_description: "Items nuevos y modificados de su calendario de curso"
     calendar_display: Calendario
@@ -18264,7 +18264,7 @@ es:
     content_link_error_description: |-
         *Solo el profesor y el administrador:*
         
-                Ubicación y contenido de un vínculo incorrecto con el que un estudiante ha interactuado
+        Ubicación y contenido de un vínculo incorrecto con el que un estudiante ha interactuado
     content_link_error_display: "Error de vínculo de contenido"
     conversation_created_description: "Ha creado una conversación"
     conversation_created_display: "Mensajería que he creado"
@@ -18273,9 +18273,9 @@ es:
     course_content_description: |-
         Cambiar a contenido del curso: 
         
-                * Contenido de la página
-                * Contenido del examen
-                * Contenido de la tarea
+        * Contenido de la página
+        * Contenido del examen
+        * Contenido de la tarea
     course_content_display: "Contenido del curso"
     discussion_description: "Nuevo tema de foro en su curso"
     discussion_display: "Nuevo tema"
@@ -18286,10 +18286,10 @@ es:
     files_description: "Nuevo archivo añadido a su curso"
     files_display: Archivos
     grading_description: |-
-        Includes: 
+        Incluye: 
         
-                * Calificación de la tarea/entrega ingresada/cambiada
-                * Ponderación de la calificación cambiada
+        * Calificación de la tarea/entrega ingresada/cambiada
+        * Ponderación de la calificación cambiada
     grading_display: Calificación
     grading_notify_include_grade: "Incluír calificaciones al alertar acerca de cambios de calificaciones."
     grading_policies_description: "Modificación de la política de calificaciones del curso"
@@ -18297,21 +18297,21 @@ es:
     invitation_description: |-
         Invitación para: 
         
-                * Conferencia en línea
-                * Grupo
-                * Colaboración
-                * Revisión entre pares y recordatorios
+        * Conferencia en línea
+        * Grupo
+        * Colaboración
+        * Revisión entre pares y recordatorios
     invitation_display: Invitación
     late_grading_description: |-
         *Solo profesores y administradores:*
         
-                Retraso en la entrega de las tareas
+        Retraso en la entrega de las tareas
     late_grading_display: "Calificación con atraso"
     membership_update_description: |-
         *Solo para administradores: activación de inscripciones pendientes*
         
-                * Inscripciones de grupos
-                * aceptadas/rechazadas
+        * Inscripciones de grupos
+        * aceptadas/rechazadas
     membership_update_display: "Actualización de membresía"
     missing_description_description: "Para notificaciones de %{category}"
     missing_display_display: "Para notificaciones de %{category}"
@@ -18396,19 +18396,19 @@ es:
     other_description: |-
         *Solo para profesores y administradores:*
         
-                * Inscripción en los cursos
-                * Informes generados
-                * Exportación de contenido
-                * Reporte de migraciones
-                * Nuevo usuario de cuenta
-                * Nuevo grupo de estudiantes
+        * Inscripción en los cursos
+        * Informes generados
+        * Exportación de contenido
+        * Reporte de migraciones
+        * Nuevo usuario de cuenta
+        * Nuevo grupo de estudiantes
     other_display: "Notificaciones administrativas"
     recording_ready_display: "Grabación lista"
     reminder_display: Recordatorio
     student_appointment_description: |-
         *Solo profesores y administradores:*
         
-                Registros de citas de estudiantes
+        Registros de citas de estudiantes
     student_appointment_display: "Registros de citas para estudiantes"
     submission_comment_description: "Comentario de la entrega de tareas"
     submission_comment_display: "Comentario de la entrega"

@@ -1385,7 +1385,7 @@ da-x-k12:
       open_registration_delegated_warning_tooltip: "En ekstern identitetsudbyder er aktiveret"
       open_report_description: "Åbn rapportbeskrivelse"
       page_header_title: Kontoindstillinger
-      page_title: "Delt indhold"
+      page_title: Kontoindstillinger
       quiz_ip_filters_delete: "Fjern IP-filter for quiz"
       quiz_ip_filters_help_message: |-
           IP-filtre for quiz er en måde til at begrænse adgang til quizzer for computere i et specificeret IP-interval.
@@ -15963,7 +15963,7 @@ da-x-k12:
     blueprint_description: |-
         *Kun instruktør og admin:*
         
-              Indholdet blev synkroniseret fra et blueprint-fag til tilhørende fag
+        Indholdet blev synkroniseret fra et blueprint-fag til tilhørende fag
     blueprint_display: "Blueprint synkronisering"
     calendar_description: "Nye og ændrede elementer i dit fags kalender"
     calendar_display: Kalender
@@ -15998,7 +15998,7 @@ da-x-k12:
     content_link_error_description: |-
         *Kun instruktør og admin:*
         
-                Placering og indhold af et mislykket link, som en elev har interageret med
+        Placering og indhold af et mislykket link, som en elev har interageret med
     content_link_error_display: Indholdslinkfejl
     conversation_created_description: "Du oprettede en diskussion"
     conversation_created_display: "Diskussioner som jeg har oprettet"
@@ -16007,9 +16007,9 @@ da-x-k12:
     course_content_description: |-
         Skift til fagindhold: 
         
-              * Sideindhold
-              * Quizindhold
-              * Opgaveindhold
+        * Sideindhold
+        * Quizindhold
+        * Opgaveindhold
     course_content_display: Fagindhold
     discussion_description: "Nyt diskussionsemne i dit fag"
     discussion_display: "Nyt emne"
@@ -16022,29 +16022,29 @@ da-x-k12:
     grading_description: |-
         Inkluderer: 
         
-              * Opgaver / indtastet/ændret indsendelsesvurdering
-              * Ændret vurderingsvægt
+        * Opgaver / indtastet/ændret indsendelsesvurdering
+        * Ændret vurderingsvægt
     grading_display: Vurdering
     grading_policies_description: "Ændring i fagets vurderingspolitikker"
     grading_policies_display: Vureringspolitikker
     invitation_description: |-
         Invitation til: 
         
-              * Webkonference
-              * Gruppe
-              * Samarbejde
-              * Elev-elev vurdering og påmindelse
+        * Webkonference
+        * Gruppe
+        * Samarbejde
+        * Elev-elev vurdering og påmindelse
     invitation_display: Invitation
     late_grading_description: |-
         *Kun instruktør og admin:*
         
-              Sen opgaveindsendelse
+        Sen opgaveindsendelse
     late_grading_display: "Sen vurdering"
     membership_update_description: |-
         *Kun admin: afventende tilmelding aktiveret*
         
-              * Gruppetilmelding
-              * godkendt/afvist
+        * Gruppetilmelding
+        * godkendt/afvist
     membership_update_display: "Opdatering af medlemskab"
     missing_description_description: "Til %{category} meddelelser"
     missing_display_display: "Til %{category} meddelelser"
@@ -16129,19 +16129,19 @@ da-x-k12:
     other_description: |-
         *Kun instruktør og administrator:*
         
-              * Tilmelding til fag
-              * Rapport genereret
-              * Eksport af indhold
-              * Overførselsrapport
-              * Ny kontobruger
-              * Ny studiegruppe
+        * Tilmelding til fag
+        * Rapport genereret
+        * Eksport af indhold
+        * Overførselsrapport
+        * Ny kontobruger
+        * Ny studiegruppe
     other_display: "Administrative meddelelser"
     recording_ready_display: "Optagelse er klar"
     reminder_display: Påmindelse
     student_appointment_description: |-
         *Kun instruktør og administrator:*
         
-              Tilmelding til studieaftale
+        Tilmelding til studieaftale
     student_appointment_display: "Tilmeldinger til studieaftale"
     submission_comment_description: "Kommentar til opgaveaflevering"
     submission_comment_display: Afleveringskommentar

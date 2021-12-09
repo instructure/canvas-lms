@@ -1408,7 +1408,7 @@ it:
       open_registration_delegated_warning_tooltip: "Un provider di identità esterno è abilitato"
       open_report_description: "Apri descrizione report"
       page_header_title: "Impostazioni account"
-      page_title: "Contenuto condiviso"
+      page_title: "Impostazioni account"
       quiz_ip_filters_delete: "Rimuovi filtro IP quiz"
       quiz_ip_filters_help_message: |-
           I filtri IP dei quiz sono un metodo per limitare l'accesso ai quiz ai computer in un intervallo IP specificato.
@@ -16253,7 +16253,7 @@ it:
     blueprint_description: |-
         *Solo istruttore e amministratore:*
         
-              Il contenuto è stato sincronizzato da un corso modello base con i corsi associati
+        Il contenuto è stato sincronizzato da un corso modello base con i corsi associati
     blueprint_display: "Sincronizzazione modello base"
     calendar_description: "Elementi nuovi e modificati sul calendario del tuo corso"
     calendar_display: Calendario
@@ -16288,7 +16288,7 @@ it:
     content_link_error_description: |-
         *Solo istruttore e amministratore:*
         
-                Posizione e contenuto di un link non riuscito con cui uno studente ha interagito
+        Posizione e contenuto di un link non riuscito con cui uno studente ha interagito
     content_link_error_display: "Errore link contenuto"
     conversation_created_description: "Hai creato una conversazione"
     conversation_created_display: "Conversazioni create da me"
@@ -16297,9 +16297,9 @@ it:
     course_content_description: |-
         Passa a contenuto del corso: 
         
-              * Contenuto pagina
-              * Contenuto quiz
-              * Contenuto compito
+        * Contenuto pagina
+        * Contenuto quiz
+        * Contenuto compito
     course_content_display: "Contenuto corso"
     discussion_description: "Nuovo argomento di discussione nel tuo corso"
     discussion_display: "Nuovo argomento"
@@ -16312,29 +16312,29 @@ it:
     grading_description: |-
         Include: 
         
-              * Voto compito/consegna inserito/modificato
-              * Peso del voto modificato
+        * Voto compito/consegna inserito/modificato
+        * Peso del voto modificato
     grading_display: Valutazione
     grading_policies_description: "Criteri di valutazione corso modificati"
     grading_policies_display: "Criteri di valutazione"
     invitation_description: |-
         Invito per: 
         
-              * Conferenza web
-              * Gruppo
-              * Collaborazione
-              * Revisione paritaria e promemoria
+        * Conferenza web
+        * Gruppo
+        * Collaborazione
+        * Revisione paritaria e promemoria
     invitation_display: Invito
     late_grading_description: |-
         *Solo istruttore e amministratore:*
         
-              Consegna compito in ritardo
+        Consegna compito in ritardo
     late_grading_display: "Valutazione in ritardo"
     membership_update_description: |-
         *Solo amministratore: iscrizione in attesa attivata*
         
-              * Iscrizione gruppo
-              * accettata/rifiutata
+        * Iscrizione gruppo
+        * accettata/rifiutata
     membership_update_display: "Aggiornamento partecipazioni"
     missing_description_description: "Per notifiche %{category}"
     missing_display_display: "Per notifiche %{category}"
@@ -16419,19 +16419,19 @@ it:
     other_description: |-
         *Solo istruttore e amministratore:*
         
-              * Iscrizione corso
-              * Report generato
-              * Esportazione contenuto
-              * Report migrazione
-              * Nuovo utente account
-              * Nuovo gruppo studenti
+        * Iscrizione corso
+        * Report generato
+        * Esportazione contenuto
+        * Report migrazione
+        * Nuovo utente account
+        * Nuovo gruppo studenti
     other_display: "Notifiche amministrative"
     recording_ready_display: "Registrazione pronta"
     reminder_display: Promemoria
     student_appointment_description: |-
         *Solo istruttore e amministratore:*
         
-              Registrazione appuntamenti studenti
+        Registrazione appuntamenti studenti
     student_appointment_display: "Registrazioni appuntamenti studenti"
     submission_comment_description: "Commento consegna compito"
     submission_comment_display: "Commento consegna"
