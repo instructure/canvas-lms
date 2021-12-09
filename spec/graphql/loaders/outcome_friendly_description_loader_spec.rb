@@ -56,6 +56,20 @@ describe Loaders::OutcomeFriendlyDescriptionLoader do
                                                             })
   end
 
+  it "correctly detect IOM FF for manually created courses" do
+    course_model(account: Account.default.manually_created_courses_account)
+
+    expect(@course.account.feature_enabled?(:improved_outcomes_management)).to be_falsey
+
+    GraphQL::Batch.batch do
+      fd_loader = Loaders::OutcomeFriendlyDescriptionLoader.for(
+        @course.id, "Course"
+      )
+      fd_loader.valid_context? # this is needed to initialize @context
+      expect(fd_loader.friendly_description_enabled?).to be_truthy
+    end
+  end
+
   it "prioritizes course fd" do
     create_course_fd
     create_account_fd
