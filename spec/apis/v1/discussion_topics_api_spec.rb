@@ -3277,6 +3277,24 @@ describe DiscussionTopicsController, type: :request do
       expect(json["sections"][0]["id"]).to eq section1.id
     end
 
+    it "duplicate carries anonymous_state over" do
+      @user = @teacher
+      discussion_topic_model(context: @course, title: "Section Specific Topic", user: @teacher, anonymous_state: "fully_anonymous")
+      @topic.save!
+
+      json = api_call(:post, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/duplicate",
+                      { controller: "discussion_topics_api",
+                        action: "duplicate",
+                        format: "json",
+                        course_id: @course.to_param,
+                        topic_id: @topic.to_param },
+                      {},
+                      {},
+                      expected_status: 200)
+
+      expect(json["anonymous_state"]).to eq @topic.anonymous_state
+    end
+
     it "duplicate publishes group context discussions if its a student duplicating" do
       @user = @student
       group_category = @course.group_categories.create!(name: "group category")
