@@ -272,6 +272,10 @@ RSpec.shared_examples "DiscussionType" do
     it "anonymous_author is not nil" do
       expect(anon_discussion_type.resolve("anonymousAuthor { shortName }")).to eq "current_user"
     end
+
+    it "mentionableUsersConnection is nil" do
+      expect(anon_discussion_type.resolve("mentionableUsersConnection { nodes { _id } }")).to eq nil
+    end
   end
 
   context "allows filtering discussion entries by workflow_state" do
