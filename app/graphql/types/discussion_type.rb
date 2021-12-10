@@ -239,6 +239,8 @@ module Types
       argument :search_term, String, required: false
     end
     def mentionable_users_connection(search_term: nil)
+      return nil if object.anonymous?
+
       Loaders::MentionableUserLoader.for(
         current_user: current_user,
         search_term: search_term
