@@ -270,7 +270,7 @@ RSpec.shared_examples "DiscussionType" do
     end
 
     it "anonymous_author is not nil" do
-      expect(anon_discussion_type.resolve("anonymousAuthor { shortName }")).to eq DiscussionTopicParticipant.where(user_id: @teacher.id, discussion_topic_id: anon_discussion.id).first.id.to_s(36)
+      expect(anon_discussion_type.resolve("anonymousAuthor { shortName }")).to eq "current_user"
     end
   end
 

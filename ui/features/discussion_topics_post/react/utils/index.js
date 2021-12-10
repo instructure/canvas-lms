@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {CURRENT_USER} from './constants'
 import {DISCUSSION_SUBENTRIES_QUERY} from '../../graphql/Queries'
 import {Discussion} from '../../graphql/Discussion'
 import {DiscussionEntry} from '../../graphql/DiscussionEntry'
@@ -231,9 +232,9 @@ export const getOptimisticResponse = (
           : null,
         anonymousAuthor: isAnonymous
           ? {
-              id: ENV.current_user.anonymous_id,
+              id: CURRENT_USER,
               avatarUrl: null,
-              shortName: ENV.current_user.anonymous_id,
+              shortName: CURRENT_USER,
               __typename: 'AnonymousUser'
             }
           : null,
@@ -266,7 +267,11 @@ export const getOptimisticResponse = (
 export const isAnonymous = discussionEntry =>
   ENV.discussion_anonymity_enabled && discussionEntry.anonymousAuthor != null
 
-export const getDisplayName = discussionEntry =>
-  isAnonymous(discussionEntry)
-    ? I18n.t('Anonymous') + ' ' + discussionEntry.anonymousAuthor.shortName
-    : discussionEntry.author?.displayName || discussionEntry.author?.shortName
+export const getDisplayName = discussionEntry => {
+  if (isAnonymous(discussionEntry)) {
+    return discussionEntry.anonymousAuthor.shortName === CURRENT_USER
+      ? I18n.t('You')
+      : I18n.t('Anonymous') + ' ' + discussionEntry.anonymousAuthor.shortName
+  }
+  return discussionEntry.author?.displayName || discussionEntry.author?.shortName
+}

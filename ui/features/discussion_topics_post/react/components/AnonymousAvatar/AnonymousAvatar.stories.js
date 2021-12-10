@@ -18,6 +18,7 @@
 
 import React from 'react'
 import {AnonymousAvatar} from './AnonymousAvatar'
+import {CURRENT_USER} from '../../utils/constants'
 
 export default {
   title: 'Examples/Discussion Posts/Components/AnonymousAvatar',
@@ -30,4 +31,9 @@ const Template = args => <AnonymousAvatar {...args} />
 export const Default = Template.bind({})
 Default.args = {
   seedString: 'Rowdy Lemon'
+}
+
+export const WithCurrentUser = Template.bind({})
+WithCurrentUser.args = {
+  seedString: CURRENT_USER
 }

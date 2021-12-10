@@ -16,13 +16,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {Flex} from '@instructure/ui-flex'
+import {CURRENT_USER} from '../../utils/constants'
 import Identicon from 'react-identicons'
 import React from 'react'
 import {string} from 'prop-types'
+
+import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
 
-export const AnonymousAvatar = ({seedString, ...props}) => {
+export const AnonymousAvatar = ({seedString}) => {
   return (
     <View
       display="inline-block"
@@ -31,11 +33,17 @@ export const AnonymousAvatar = ({seedString, ...props}) => {
       borderWidth="medium"
       width="50px"
       height="50px"
-      {...props}
+      data-testid="anonymous_avatar"
+      background={seedString === CURRENT_USER ? 'primary-inverse' : undefined}
+      borderColor={seedString === CURRENT_USER ? 'info' : 'primary'}
     >
       <Flex width="100%" height="100%" alignItems="center" justifyItems="center">
-        <Flex.Item>
-          <Identicon string={seedString} size={30} />
+        <Flex.Item margin="xx-small 0 0 0">
+          <Identicon
+            string={seedString}
+            size={30}
+            fg={seedString === CURRENT_USER ? 'white' : undefined}
+          />
         </Flex.Item>
       </Flex>
     </View>
