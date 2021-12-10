@@ -21,23 +21,26 @@ import ReactDOM from 'react-dom'
 import {Alert} from '@instructure/ui-alerts'
 import {Text} from '@instructure/ui-text'
 import {Link} from '@instructure/ui-link'
+import ready from '@instructure/ready'
 
-const container = document.getElementById('content_notice_container')
-if (container && ENV.CONTENT_NOTICES.length > 0) {
-  const alerts = ENV.CONTENT_NOTICES.map(notice => {
-    let link = null
-    if (notice.link_text && notice.link_target) {
-      link = <Link href={notice.link_target}>{notice.link_text}</Link>
-    }
-    return (
-      <Alert
-        key={notice.tag}
-        variant={notice.variant}
-        liveRegion={() => document.getElementById('flash_screenreader_holder')}
-      >
-        <Text>{notice.text}</Text>&emsp;{link}
-      </Alert>
-    )
-  })
-  ReactDOM.render(alerts, container)
-}
+ready(() => {
+  const container = document.getElementById('content_notice_container')
+  if (container && ENV.CONTENT_NOTICES.length > 0) {
+    const alerts = ENV.CONTENT_NOTICES.map(notice => {
+      let link = null
+      if (notice.link_text && notice.link_target) {
+        link = <Link href={notice.link_target}>{notice.link_text}</Link>
+      }
+      return (
+        <Alert
+          key={notice.tag}
+          variant={notice.variant}
+          liveRegion={() => document.getElementById('flash_screenreader_holder')}
+        >
+          <Text>{notice.text}</Text>&emsp;{link}
+        </Alert>
+      )
+    })
+    ReactDOM.render(alerts, container)
+  }
+})

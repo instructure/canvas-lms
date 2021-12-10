@@ -19,8 +19,11 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import CourseTabContainer from './react/CourseTabContainer'
+import ready from '@instructure/ready'
 
-ReactDOM.render(
-  <CourseTabContainer hasGradingPeriods={ENV.HAS_GRADING_PERIODS} />,
-  document.getElementById('react_grading_tabs')
-)
+ready(() => {
+  ReactDOM.render(
+    <CourseTabContainer hasGradingPeriods={ENV.HAS_GRADING_PERIODS} />,
+    document.getElementById('react_grading_tabs')
+  )
+})

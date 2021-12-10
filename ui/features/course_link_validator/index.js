@@ -19,11 +19,15 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import LinkValidator from './react/LinkValidator'
+import ready from '@instructure/ready'
 
-const linkValidatorWrapper = document.getElementById('link_validator_wrapper')
-ReactDOM.render(
-  <LinkValidator
-    pollTimeout={ENV.validation_poll_timeout}
-    pollTimeoutInitial={ENV.validation_poll_timeout_initial}
-  />, linkValidatorWrapper
-)
+ready(() => {
+  const linkValidatorWrapper = document.getElementById('link_validator_wrapper')
+  ReactDOM.render(
+    <LinkValidator
+      pollTimeout={ENV.validation_poll_timeout}
+      pollTimeoutInitial={ENV.validation_poll_timeout_initial}
+    />,
+    linkValidatorWrapper
+  )
+})
