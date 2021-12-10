@@ -177,5 +177,10 @@ describe('AuthorInfo', () => {
       const container = setup({anonymousAuthor: AnonymousUser.mock({shortName: CURRENT_USER})})
       expect(container.getByText('You')).toBeInTheDocument()
     })
+
+    it('should not highlight terms in the author name', () => {
+      const container = setup({anonymousAuthor: AnonymousUser.mock(), searchTerm: 'Anonymous'})
+      expect(container.queryByTestId('highlighted-search-item')).toBeNull()
+    })
   })
 })
