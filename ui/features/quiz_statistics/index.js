@@ -17,16 +17,19 @@
  */
 
 import $ from 'jquery'
-import { configure, mount } from './react/index'
+import {configure, mount} from './react/index'
+import ready from '@instructure/ready'
 
-configure({
-  ajax: $.ajax,
-  loadOnStartup: true,
-  quizStatisticsUrl: ENV.quiz_statistics_url,
-  quizReportsUrl: ENV.quiz_reports_url,
-  courseSectionsUrl: ENV.course_sections_url
-})
+ready(() => {
+  configure({
+    ajax: $.ajax,
+    loadOnStartup: true,
+    quizStatisticsUrl: ENV.quiz_statistics_url,
+    quizReportsUrl: ENV.quiz_reports_url,
+    courseSectionsUrl: ENV.course_sections_url
+  })
 
-mount(document.body.querySelector('#content')).then(() => {
-  console.log('Yeah!!!')
+  mount(document.body.querySelector('#content')).then(() => {
+    console.log('Yeah!!!')
+  })
 })
