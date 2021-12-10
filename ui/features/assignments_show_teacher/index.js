@@ -17,6 +17,9 @@
  */
 
 import renderAssignmentsApp from './react/index'
+import ready from '@instructure/ready'
 
-const elt = document.getElementById('content')
-renderAssignmentsApp(ENV, elt)
+ready(() => {
+  const elt = document.getElementById('content')
+  renderAssignmentsApp(ENV, elt)
+})
