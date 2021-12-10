@@ -106,11 +106,15 @@ export const AuthorInfo = props => {
                         lineHeight="condensed"
                         data-testid="author_name"
                       >
-                        <SearchSpan
-                          isIsolatedView={props.isIsolatedView}
-                          searchTerm={searchTerm}
-                          text={getDisplayName(props)}
-                        />
+                        {isAnonymous(props) ? (
+                          getDisplayName(props)
+                        ) : (
+                          <SearchSpan
+                            isIsolatedView={props.isIsolatedView}
+                            searchTerm={searchTerm}
+                            text={getDisplayName(props)}
+                          />
+                        )}
                       </Text>
                     </Flex.Item>
                     <Flex.Item overflowY="hidden">
