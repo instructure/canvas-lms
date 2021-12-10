@@ -42,6 +42,7 @@ include Factories
 def toggle_k5_setting(account, enable = true)
   account.settings[:enable_as_k5_account] = { value: enable, locked: enable }
   account.root_account.settings[:k5_accounts] = enable ? [account.id] : []
+  account.root_account.save!
   account.save!
 end
 
