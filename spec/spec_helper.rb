@@ -66,6 +66,7 @@ require "sharding_spec_helper"
 # lifecycle, e.g. inside a describe/context block rather than a
 # let/before/example
 TestDatabaseUtils.reset_database!
+TestDatabaseUtils.check_migrations!
 BlankSlateProtection.install!
 GreatExpectations.install!
 
