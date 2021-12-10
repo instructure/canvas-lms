@@ -162,7 +162,7 @@ if ENV["ENABLE_AXE_SELENIUM"] == "1"
   end
 end
 
-if ENV["ENABLE_CRYSTALBALL"] == "1"
+if ENV["CRYSTALBALL_MAP"] == "1"
   Crystalball::MapGenerator.start! do |config|
     config.register Crystalball::MapGenerator::CoverageStrategy.new
     config.map_storage_path = "log/results/crystalball_results/#{ENV.fetch("PARALLEL_INDEX", "0")}_map.yml"
@@ -177,6 +177,11 @@ if ENV["ENABLE_CRYSTALBALL"] == "1"
           yield example_map, example
           after = Coverage.peek_result
           example_map.push(*execution_detector.detect(before, after))
+
+          # rubocop:disable Specs/NoExecuteScript
+          js_coverage = SeleniumDriverSetup.driver.execute_script("return window.__coverage__")&.keys&.uniq
+          # rubocop:enable Specs/NoExecuteScript
+          example_map.used_files.concat(js_coverage) if js_coverage
         end
       end
     end
