@@ -19,9 +19,11 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import GradebookData from './react/default_gradebook/GradebookData'
+import ready from '@instructure/ready'
 
 import('@canvas/context-cards/react/StudentContextCardTrigger')
 
+ready(() => {
 const mountPoint = document.querySelector('#gradebook_app')
 const filterNavNode = document.querySelector('#gradebook-filter-nav')
 const gradebookMenuNode = document.querySelector('[data-component="GradebookMenu"]')
@@ -44,3 +46,4 @@ const props = {
 
 const component = React.createElement(GradebookData, props)
 ReactDOM.render(component, mountPoint)
+})
