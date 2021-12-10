@@ -18,5 +18,8 @@
 
 import App from './react/apps/ChildCourse'
 import startApp from '@canvas/blueprint-courses/react/startApp'
+import ready from '@instructure/ready'
 
-startApp(App)
+ready(() => {
+  startApp(App)
+})
