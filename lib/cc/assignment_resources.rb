@@ -48,7 +48,9 @@ module CC
 
       # Student Annotation assignments need to include the attachment they're using
       add_item_to_export(assignment.annotatable_attachment) if assignment.annotated_document?
-
+      if assignment.external_tool?
+        add_item_to_export(ContextExternalTool.from_content_tag(assignment.external_tool_tag, assignment.context))
+      end
       migration_id = create_key(assignment)
 
       lo_folder = File.join(@export_dir, migration_id)
