@@ -22,28 +22,28 @@ import WikiPage from '@canvas/wiki/backbone/models/WikiPage.coffee'
 import WikiPageEditView from '@canvas/wiki/backbone/views/WikiPageEditView'
 import LockManager from '@canvas/blueprint-courses/react/components/LockManager/index'
 
-const lockManager = new LockManager()
-lockManager.init({itemType: 'wiki_page', page: 'edit'})
-
 $('body').addClass('edit')
 
-const wikiPage = new WikiPage(ENV.WIKI_PAGE, {
-  revision: ENV.WIKI_PAGE_REVISION,
-  contextAssetString: ENV.context_asset_string,
-  parse: true
-})
-
-const lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : {}
-
-const wikiPageEditView = new WikiPageEditView({
-  model: wikiPage,
-  wiki_pages_path: ENV.WIKI_PAGES_PATH,
-  WIKI_RIGHTS: ENV.WIKI_RIGHTS,
-  PAGE_RIGHTS: ENV.PAGE_RIGHTS,
-  lockedItems
-})
-
 ready(() => {
+  const lockManager = new LockManager()
+  lockManager.init({itemType: 'wiki_page', page: 'edit'})
+
+  const wikiPage = new WikiPage(ENV.WIKI_PAGE, {
+    revision: ENV.WIKI_PAGE_REVISION,
+    contextAssetString: ENV.context_asset_string,
+    parse: true
+  })
+
+  const lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : {}
+
+  const wikiPageEditView = new WikiPageEditView({
+    model: wikiPage,
+    wiki_pages_path: ENV.WIKI_PAGES_PATH,
+    WIKI_RIGHTS: ENV.WIKI_RIGHTS,
+    PAGE_RIGHTS: ENV.PAGE_RIGHTS,
+    lockedItems
+  })
+
   $('#content').append(wikiPageEditView.$el)
 
   wikiPageEditView.on('cancel', () => {

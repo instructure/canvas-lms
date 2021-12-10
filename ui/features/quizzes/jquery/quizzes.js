@@ -63,10 +63,6 @@ import AssignmentExternalTools from '@canvas/assignments/react/AssignmentExterna
 
 let dueDateList, overrideView, quizModel, sectionList, correctAnswerVisibility, scoreValidation
 
-const lockManager = new LockManager()
-lockManager.init({itemType: 'quiz', page: 'edit'})
-const lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : {}
-
 RichContentEditor.preloadRemoteModule()
 
 function adjustOverridesForFormParams(overrides) {
@@ -108,7 +104,7 @@ const isShowingResultsJustOnce = function () {
   return $('#quiz_one_time_results').prop('checked')
 }
 
-const renderDueDates = () => {
+const renderDueDates = lockedItems => {
   if (ENV.QUIZ && ENV.ASSIGNMENT_OVERRIDES != null) {
     ENV.QUIZ.assignment_overrides = ENV.ASSIGNMENT_OVERRIDES
     quizModel = new Quiz(ENV.QUIZ)
@@ -1898,11 +1894,15 @@ function toggleConditionalReleaseTab(quizType) {
 }
 
 $(document).ready(function () {
+  const lockManager = new LockManager()
+  lockManager.init({itemType: 'quiz', page: 'edit'})
+  const lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : {}
+
   quiz.init().updateDisplayComments()
   correctAnswerVisibility.init()
   scoreValidation.init()
   ipFilterValidation.init()
-  renderDueDates()
+  renderDueDates(lockedItems)
 
   if ($('#assignment_external_tools').length) {
     AssignmentExternalTools.attach(

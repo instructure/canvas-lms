@@ -30,11 +30,6 @@ import splitAssetString from '@canvas/util/splitAssetString'
 import LockManager from '@canvas/blueprint-courses/react/components/LockManager/index'
 import SectionsAutocomplete from './react/SectionsAutocomplete'
 
-const lockManager = new LockManager()
-lockManager.init({itemType: 'discussion_topic', page: 'edit'})
-
-const lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : {}
-
 const isAnnouncement =
   ENV.DISCUSSION_TOPIC.ATTRIBUTES != null
     ? ENV.DISCUSSION_TOPIC.ATTRIBUTES.is_announcement
@@ -87,30 +82,6 @@ function renderSectionsAutocomplete(view) {
   }
 }
 
-const view = new EditView({
-  model,
-  permissions: ENV.DISCUSSION_TOPIC.PERMISSIONS,
-  contextType,
-  views: {
-    'js-assignment-overrides': new OverrideView({
-      model: dueDateList,
-      views: {},
-      dueDatesReadonly: !!lockedItems.due_dates,
-      availabilityDatesReadonly: !!lockedItems.availability_dates
-    })
-  },
-  lockedItems: model.id ? lockedItems : {}, // if no id, creating a new discussion
-  announcementsLocked,
-  homeroomCourse: window.ENV.K5_HOMEROOM_COURSE,
-  isEditing: model.id,
-  anonymousState: ENV.DISCUSSION_TOPIC.ATTRIBUTES.anonymous_state,
-  anonymous_discussion_enabled: ENV.ANONYMOUS_DISCUSSIONS,
-  react_discussions_post: ENV.REACT_DISCUSSIONS_POST,
-  allow_student_anonymous_discussion_topics: ENV.allow_student_anonymous_discussion_topics,
-  context_is_not_group: ENV.context_is_not_group
-})
-view.setRenderSectionsAutocomplete(() => renderSectionsAutocomplete(view))
-
 function sectionSpecificEnabled() {
   if (!ENV.context_asset_string.startsWith('course')) {
     return false
@@ -120,18 +91,47 @@ function sectionSpecificEnabled() {
   return isAnnouncement || ENV.SECTION_SPECIFIC_DISCUSSIONS_ENABLED
 }
 
-if (
-  contextType === 'courses' &&
-  !isAnnouncement &&
-  ENV.DISCUSSION_TOPIC.PERMISSIONS.CAN_CREATE_ASSIGNMENT
-) {
-  const agc = new AssignmentGroupCollection()
-  agc.options.params = {}
-  agc.contextAssetString = ENV.context_asset_string
-  view.assignmentGroupCollection = agc
-}
-
 ready(() => {
+  const lockManager = new LockManager()
+  lockManager.init({itemType: 'discussion_topic', page: 'edit'})
+
+  const lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : {}
+
+  const view = new EditView({
+    model,
+    permissions: ENV.DISCUSSION_TOPIC.PERMISSIONS,
+    contextType,
+    views: {
+      'js-assignment-overrides': new OverrideView({
+        model: dueDateList,
+        views: {},
+        dueDatesReadonly: !!lockedItems.due_dates,
+        availabilityDatesReadonly: !!lockedItems.availability_dates
+      })
+    },
+    lockedItems: model.id ? lockedItems : {}, // if no id, creating a new discussion
+    announcementsLocked,
+    homeroomCourse: window.ENV.K5_HOMEROOM_COURSE,
+    isEditing: model.id,
+    anonymousState: ENV.DISCUSSION_TOPIC.ATTRIBUTES.anonymous_state,
+    anonymous_discussion_enabled: ENV.ANONYMOUS_DISCUSSIONS,
+    react_discussions_post: ENV.REACT_DISCUSSIONS_POST,
+    allow_student_anonymous_discussion_topics: ENV.allow_student_anonymous_discussion_topics,
+    context_is_not_group: ENV.context_is_not_group
+  })
+  view.setRenderSectionsAutocomplete(() => renderSectionsAutocomplete(view))
+
+  if (
+    contextType === 'courses' &&
+    !isAnnouncement &&
+    ENV.DISCUSSION_TOPIC.PERMISSIONS.CAN_CREATE_ASSIGNMENT
+  ) {
+    const agc = new AssignmentGroupCollection()
+    agc.options.params = {}
+    agc.contextAssetString = ENV.context_asset_string
+    view.assignmentGroupCollection = agc
+  }
+
   view.render().$el.appendTo('#content')
   document.querySelector('#discussion-title').focus()
 
@@ -140,5 +140,3 @@ ready(() => {
   // or group discussions.
   setTimeout(() => renderSectionsAutocomplete(view))
 })
-
-export default view
