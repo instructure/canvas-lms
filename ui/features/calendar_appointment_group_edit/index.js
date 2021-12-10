@@ -19,10 +19,13 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import EditPage from './react/EditPage'
+import ready from '@instructure/ready'
 
-ReactDOM.render(
-  <EditPage
-    appointment_group_id={ENV.APPOINTMENT_GROUP_ID && ENV.APPOINTMENT_GROUP_ID.toString()}
-  />,
-  document.getElementById('content')
-)
+ready(() => {
+  ReactDOM.render(
+    <EditPage
+      appointment_group_id={ENV.APPOINTMENT_GROUP_ID && ENV.APPOINTMENT_GROUP_ID.toString()}
+    />,
+    document.getElementById('content')
+  )
+})

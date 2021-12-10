@@ -17,6 +17,9 @@
  */
 
 import App from './react/index'
+import ready from '@instructure/ready'
 
-const root = document.getElementById('content')
-App.init(ENV.CHOOSE_MASTERY_PATH_DATA, root)
+ready(() => {
+  const root = document.getElementById('content')
+  App.init(ENV.CHOOSE_MASTERY_PATH_DATA, root)
+})
