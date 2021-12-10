@@ -84,6 +84,10 @@ export const getPublishingError = (state: StoreState): string | undefined => {
 }
 export const getEndDate = (state: StoreState): string | undefined => state.pacePlan.end_date
 export const isStudentPlan = (state: StoreState) => state.pacePlan.context_type === 'Enrollment'
+export const getIsPlanCompressed = (state: StoreState): boolean =>
+  !!state.pacePlan.compressed_due_dates
+export const getPlanCompressedDates = (state: StoreState): PacePlanItemDueDates | undefined =>
+  state.pacePlan.compressed_due_dates
 
 export const getPacePlanItems = createSelector(getPacePlanModules, getModuleItems)
 
@@ -193,6 +197,26 @@ export const getDueDates = createDeepEqualSelector(
   getExcludeWeekends,
   getBlackoutDates,
   getStartDate,
+  getPlanCompressedDates,
+  (
+    items: PacePlanItem[],
+    excludeWeekends: boolean,
+    blackoutDates: BlackoutDate[],
+    startDate?: string,
+    compressedDueDates?: PacePlanItemDueDates
+  ): PacePlanItemDueDates => {
+    if (compressedDueDates) {
+      return compressedDueDates
+    }
+    return PlanDueDatesCalculator.getDueDates(items, excludeWeekends, blackoutDates, startDate)
+  }
+)
+
+export const getUncompressedDueDates = createDeepEqualSelector(
+  getPacePlanItems,
+  getExcludeWeekends,
+  getBlackoutDates,
+  getStartDate,
   (
     items: PacePlanItem[],
     excludeWeekends: boolean,
@@ -212,7 +236,7 @@ export const getDueDate = createSelector(
 )
 
 export const getProjectedEndDate = createDeepEqualSelector(
-  getDueDates,
+  getUncompressedDueDates,
   getPacePlanItems,
   getStartDate,
   (
@@ -284,6 +308,20 @@ export const getActivePlanContext = createSelector(
   }
 )
 
+export const getIsCompressing = createSelector(
+  getPacePlan,
+  getHardEndDates,
+  getProjectedEndDate,
+  (
+    pacePlan: PacePlansState,
+    hardEndDates: boolean,
+    projectedEndDate: string | undefined
+  ): boolean => {
+    const realEnd = hardEndDates ? pacePlan.end_date : ENV.VALID_DATE_RANGE.end_at.date
+    return !!projectedEndDate && projectedEndDate > realEnd
+  }
+)
+
 /* Reducers */
 
 export default (
@@ -296,7 +334,10 @@ export default (
     case PacePlanConstants.SET_START_DATE:
       return {...state, start_date: DateHelpers.formatDate(action.payload)}
     case PacePlanConstants.SET_END_DATE:
-      return {...state, end_date: DateHelpers.formatDate(action.payload)}
+      return {
+        ...state,
+        end_date: action.payload ? DateHelpers.formatDate(action.payload) : undefined
+      }
     case PacePlanConstants.PLAN_CREATED:
       // Could use a *REFACTOR* to better handle new plans and updating the ui properly
       return {
@@ -324,6 +365,13 @@ export default (
       return {...state.originalPlan, originalPlan: state.originalPlan}
     case PacePlanConstants.SET_PROGRESS:
       return {...state, publishingProgress: action.payload}
+    case PacePlanConstants.SET_COMPRESSED_ITEM_DATES: {
+      const newState = {...state}
+      newState.compressed_due_dates = action.payload
+      return newState
+    }
+    case PacePlanConstants.UNCOMPRESS_DATES:
+      return {...state, compressed_due_dates: undefined}
     default:
       return {...state, modules: pacePlanItemsReducer(state.modules, action)}
   }

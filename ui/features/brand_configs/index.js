@@ -19,8 +19,11 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import CollectionView from './react/CollectionView'
+import ready from '@instructure/ready'
 
-ReactDOM.render(
-  <CollectionView {...window.ENV.brandConfigStuff} />,
-  document.getElementById('content')
-)
+ready(() => {
+  ReactDOM.render(
+    <CollectionView {...window.ENV.brandConfigStuff} />,
+    document.getElementById('content')
+  )
+})

@@ -121,7 +121,7 @@
     <% end %>
 
     <% if blueprint_subscription %>
-      <%= link_to "#!/blueprint/blueprint_subscriptions/#{blueprint_subscription.id}/#{blueprint_subscription.last_migration_id}", :onclick => 'gotoBlueprintInfo()', :class => 'Button Button--link Button--link--has-divider Button--course-settings blueprint_information_button' do %>
+      <%= link_to "#", :onclick => 'gotoBlueprintInfo()', :class => 'Button Button--link Button--link--has-divider Button--course-settings blueprint_information_button' do %>
         <i class="icon-blueprint"></i><%= t('Blueprint Information') %>
       <% end %>
     <% end %>

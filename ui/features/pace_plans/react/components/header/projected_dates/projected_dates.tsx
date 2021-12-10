@@ -57,6 +57,8 @@ interface StoreProps {
 
 type DispatchProps = {
   setStartDate: typeof actions.setStartDate
+  compressDates: typeof actions.compressDates
+  uncompressDates: typeof actions.uncompressDates
 }
 
 type ComponentProps = StoreProps & DispatchProps
@@ -68,6 +70,8 @@ export const ProjectedDates: React.FC<ComponentProps> = ({
   planWeeks,
   projectedEndDate,
   setStartDate,
+  compressDates,
+  uncompressDates,
   showProjections,
   blackoutDates,
   weekendsDisabled
@@ -109,22 +113,15 @@ export const ProjectedDates: React.FC<ComponentProps> = ({
     // Since we may not have a new projected end date yet when validateStart
     // is called, do it here.
     if (
-      !pacePlan.hard_end_dates &&
-      ENV.VALID_DATE_RANGE.end_at.date &&
+      (pacePlan.hard_end_dates && pacePlan.end_date && projectedEndDate > pacePlan.end_date) ||
       moment(projectedEndDate) > moment(ENV.VALID_DATE_RANGE.end_at.date)
     ) {
-      // INSTUI FormFieldMessage doesn't support type: 'warning' yet.
-      // when https://github.com/instructure/instructure-ui/issues/815
-      // is closed, update this.
-      // See also the shenanigans in pace_plan_date_input.tsx
-      setStartMessage({
-        type: 'warning',
-        text: I18n.t('Not enough days for this hypothetical date')
-      })
+      compressDates()
     } else {
+      uncompressDates()
       setStartMessage(undefined)
     }
-  }, [pacePlan.start_date, pacePlan.hard_end_dates, projectedEndDate])
+  }, [compressDates, pacePlan.end_date, pacePlan.hard_end_dates, projectedEndDate, uncompressDates])
 
   const enrollmentType = pacePlan.context_type === 'Enrollment'
 
@@ -137,11 +134,12 @@ export const ProjectedDates: React.FC<ComponentProps> = ({
   if (pacePlan.hard_end_dates) {
     endDateValue = pacePlan.end_date
     endHelpText = I18n.t('Required by specified end date')
+  } else if (ENV.VALID_DATE_RANGE.end_at.date) {
+    endDateValue = ENV.VALID_DATE_RANGE.end_at.date
+    endHelpText = I18n.t('Required by course end date')
   } else {
     endDateValue = projectedEndDate
-    endHelpText = ENV.VALID_DATE_RANGE.end_at.date
-      ? I18n.t('Required by course end date')
-      : I18n.t('Hypothetical end date')
+    endHelpText = I18n.t('Hypothetical end date')
   }
 
   let startInteraction: InputInteraction = 'enabled'
@@ -226,5 +224,7 @@ const mapStateToProps = (state: StoreState) => {
 }
 
 export default connect(mapStateToProps, {
-  setStartDate: actions.setStartDate
+  setStartDate: actions.setStartDate,
+  compressDates: actions.compressDates,
+  uncompressDates: actions.uncompressDates
 })(ProjectedDates)
