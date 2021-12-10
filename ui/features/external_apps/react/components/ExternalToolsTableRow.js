@@ -159,8 +159,10 @@ export default class ExternalToolsTableRow extends React.Component {
   }
 
   renderButtons = () => {
+    const permsToRenderSettingsCog =
+      this.props.canEdit || this.props.canDelete || this.props.canAddEdit
     const {tool} = this.props
-    if (tool.installed_locally && !tool.restricted_by_master_course) {
+    if (tool.installed_locally && !tool.restricted_by_master_course && permsToRenderSettingsCog) {
       let configureButton = null
       let updateBadge = null
 
