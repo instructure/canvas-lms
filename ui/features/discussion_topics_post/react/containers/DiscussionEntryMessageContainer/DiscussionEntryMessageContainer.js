@@ -37,8 +37,8 @@ export const DiscussionEntryMessageContainer = props => {
 
   if (props.discussionEntry.deleted) {
     const name = props.discussionEntry.editor
-      ? props.discussionEntry.editor.displayName
-      : props.discussionEntry.author.displayName
+      ? props.discussionEntry.editor?.displayName
+      : props.discussionEntry.author?.displayName
     return (
       <Flex padding="0 0 0 medium">
         <DeletedPostMessage

@@ -66,7 +66,7 @@ export const DiscussionEntryContainer = props => {
   if (props.deleted) {
     return (
       <DeletedPostMessage
-        deleterName={props.editor ? props.editor.displayName : props.author.displayName}
+        deleterName={props.editor ? props.editor?.displayName : props.author?.displayName}
         timingDisplay={props.timingDisplay}
         deletedTimingDisplay={props.editedTimingDisplay}
       >
