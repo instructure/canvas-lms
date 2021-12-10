@@ -2186,24 +2186,40 @@ RSpec.describe ApplicationController do
       controller.instance_variable_set(:@domain_root_account, root_account)
     end
 
-    it "puts false in ENV when disabled at site_admin" do
-      Account.site_admin.disable_feature!(:new_math_equation_handling)
-      expect(@controller.use_new_math_equation_handling?).to be_falsey
-      expect(@controller.js_env[:FEATURES][:new_math_equation_handling]).to be_falsey
-    end
-
-    it "puts false in ENV when enabled at site_admin but disabled at the root account" do
-      Account.site_admin.enable_feature!(:new_math_equation_handling)
-      root_account.disable_feature!(:new_math_equation_handling)
-      expect(@controller.use_new_math_equation_handling?).to be_falsey
-      expect(@controller.js_env[:FEATURES][:new_math_equation_handling]).to be_falsey
-    end
-
-    it "puts true in ENV when enabled at site_admin and the root account" do
-      Account.site_admin.enable_feature!(:new_math_equation_handling)
-      root_account.enable_feature!(:new_math_equation_handling)
+    it "sets new_math_equation_handling to true" do
       expect(@controller.use_new_math_equation_handling?).to be_truthy
       expect(@controller.js_env[:FEATURES][:new_math_equation_handling]).to be_truthy
+    end
+
+    context "with the quizzes#edit action" do
+      before do
+        allow(controller).to receive(:params).and_return(
+          {
+            controller: "quizzes/quizzes",
+            action: "edit"
+          }
+        )
+      end
+
+      it "sets new_math_equation_handling to false" do
+        expect(@controller.use_new_math_equation_handling?).to be_falsey
+        expect(@controller.js_env[:FEATURES][:new_math_equation_handling]).to be_falsey
+      end
+    end
+
+    context "with the question_banks controller" do
+      before do
+        allow(controller).to receive(:params).and_return(
+          {
+            controller: "question_banks"
+          }
+        )
+      end
+
+      it "sets new_math_equation_handling to false" do
+        expect(@controller.use_new_math_equation_handling?).to be_falsey
+        expect(@controller.js_env[:FEATURES][:new_math_equation_handling]).to be_falsey
+      end
     end
   end
 

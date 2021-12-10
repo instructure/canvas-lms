@@ -35,7 +35,6 @@ describe "RCE Next toolbar features", ignore_js_errors: true do
   context "WYSIWYG generic as a teacher" do
     before do
       course_with_teacher_logged_in
-      Account.site_admin.enable_feature!(:new_math_equation_handling)
       Account.site_admin.enable_feature!(:inline_math_everywhere)
       stub_rcs_config
     end

@@ -590,8 +590,7 @@ class ApplicationController < ActionController::Base
   # and other misadventures that caused 4 hotfixes in 3 days.
   # Let's just not use the new math handling there.
   def use_new_math_equation_handling?
-    @domain_root_account&.feature_enabled?(:new_math_equation_handling) &&
-      !(params[:controller] == "quizzes/quizzes" && params[:action] == "edit") &&
+    !(params[:controller] == "quizzes/quizzes" && params[:action] == "edit") &&
       params[:controller] != "question_banks"
   end
 
