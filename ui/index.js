@@ -73,43 +73,7 @@ require.include('./features/navigation_header')
 
 if (!window.bundles) window.bundles = []
 window.bundles.push = loadBundle
-// process any queued ones
-window.bundles.forEach(loadBundle)
-
-if (ENV.csp)
-  // eslint-disable-next-line promise/catch-or-return
-  import('./boot/initializers/setupCSP').then(({default: setupCSP}) => setupCSP(window.document))
-if (ENV.INCOMPLETE_REGISTRATION) import('./boot/initializers/warnOnIncompleteRegistration')
-if (ENV.badge_counts) import('./boot/initializers/showBadgeCounts')
-
 $('html').removeClass('scripts-not-loaded')
-
-$('.help_dialog_trigger').click(event => {
-  event.preventDefault()
-  // eslint-disable-next-line promise/catch-or-return
-  import('./boot/initializers/enableHelpDialog').then(({default: helpDialog}) => helpDialog.open())
-})
-
-// Backbone routes
-$('body').on(
-  'click',
-  '[data-pushstate]',
-  preventDefault(function () {
-    Backbone.history.navigate($(this).attr('href'), true)
-  })
-)
-
-if (
-  window.ENV.NEW_USER_TUTORIALS &&
-  window.ENV.NEW_USER_TUTORIALS.is_enabled &&
-  window.ENV.context_asset_string &&
-  splitAssetString(window.ENV.context_asset_string)[0] === 'courses'
-) {
-  // eslint-disable-next-line promise/catch-or-return
-  import('./features/new_user_tutorial/index').then(({default: initializeNewUserTutorials}) => {
-    initializeNewUserTutorials()
-  })
-}
 
 ;(window.requestIdleCallback || window.setTimeout)(() => {
   // eslint-disable-next-line promise/catch-or-return
@@ -134,6 +98,44 @@ import('intl-polyfills')
 /* eslint-enable no-console */
 
 ready(() => {
+  $('.help_dialog_trigger').click(event => {
+    event.preventDefault()
+    // eslint-disable-next-line promise/catch-or-return
+    import('./boot/initializers/enableHelpDialog').then(({default: helpDialog}) => helpDialog.open())
+  })
+
+  // process any queued ones
+  //
+  window.bundles.forEach(loadBundle)
+
+  if (ENV.csp)
+    // eslint-disable-next-line promise/catch-or-return
+    import('./boot/initializers/setupCSP').then(({default: setupCSP}) => setupCSP(window.document))
+  if (ENV.INCOMPLETE_REGISTRATION) import('./boot/initializers/warnOnIncompleteRegistration')
+  if (ENV.badge_counts) import('./boot/initializers/showBadgeCounts')
+
+
+  // Backbone routes
+  $('body').on(
+    'click',
+    '[data-pushstate]',
+    preventDefault(function () {
+      Backbone.history.navigate($(this).attr('href'), true)
+    })
+  )
+
+  if (
+    window.ENV.NEW_USER_TUTORIALS &&
+    window.ENV.NEW_USER_TUTORIALS.is_enabled &&
+    window.ENV.context_asset_string &&
+    splitAssetString(window.ENV.context_asset_string)[0] === 'courses'
+  ) {
+    // eslint-disable-next-line promise/catch-or-return
+    import('./features/new_user_tutorial/index').then(({default: initializeNewUserTutorials}) => {
+      initializeNewUserTutorials()
+    })
+  }
+
   // eslint-disable-next-line promise/catch-or-return
   Promise.all((window.deferredBundles || []).map(loadBundle)).then(() =>
     advanceReadiness('deferredBundles')
