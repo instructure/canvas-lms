@@ -17,14 +17,6 @@ assignments_2_teacher:
   environments:
     production:
       state: disabled
-new_math_equation_handling:
-  state: hidden
-  display_name: 'Math: Updated equation handling'
-  description: |-
-    Replaces the existing image of the math equation plus its hidden mathml
-    with a MathJax processed version. This change provides better accessibility
-    and many options for the reader to interact with the equation on the page.
-  applies_to: RootAccount
 inline_math_everywhere:
   state: hidden
   display_name: 'Math: Support LaTex math equations almost everywhere'
