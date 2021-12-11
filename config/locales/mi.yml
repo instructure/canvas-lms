@@ -17762,9 +17762,9 @@ mi:
     course_content_description: |-
         Huri ki te akoranga ihirangi: 
         
-        * Whārangi ihirangi
-        * Quiz ihirangi
-        * Whakataunga ihirangi
+              * Whārangi ihirangi
+              * Quiz ihirangi
+              * Whakataunga ihirangi
     course_content_display: "Ihirangi akoranga"
     discussion_description: "Kaupapa Kōrerorero hōu i roto i tō akoranga"
     discussion_display: "Kaupapa Hōu"
@@ -17777,8 +17777,8 @@ mi:
     grading_description: |-
         Kei:roto
         
-        * Whakataunga/tāpaetanga kōeke kua whakaurutia/huria kē
-        * Kōeke taimaha huria kē
+              * Whakataunga/tāpaetanga kōeke kua whakaurutia/huria kē
+              * Kōeke taimaha huria kē
     grading_display: kōeke
     grading_notify_include_grade: "Whakaurua ngä tatau ka mataara e pā ana ki ngā huringa kōeke."
     grading_policies_description: "Akoranga huringa kaupapa kōeke"
@@ -17786,21 +17786,21 @@ mi:
     invitation_description: |-
         Pōwhiri mō: 
         
-        * Paetukutuku hui
-        * Rōpū
-        * Mahi tahi
-        * Arotake ā-hoa & Whakamaumahara
+              * Paetukutuku hui
+              * Rōpū
+              * Mahi tahi
+              * Arotake ā-hoa & Whakamaumahara
     invitation_display: Pōwhiri
     late_grading_description: |-
         *Kaitohutohu  me Whakahaere anake:*
         
-        tāpaetanga whakataunga tūreiti
+              tāpaetanga whakataunga tūreiti
     late_grading_display: "kōeke tūreiti"
     membership_update_description: |-
         *Whakahaere anake: tārewa whakauru whakahohe*
         
-        * Whakaurunga Rōpū
-        * whakāetia / panahia
+              * Whakaurunga Rōpū
+              * whakāetia / panahia
     membership_update_display: "Whakahōu Mema"
     missing_description_description: "Moi %{category}ngā whakamōhiotanga"
     missing_display_display: "Moi %{category}ngā whakamōhiotanga"
@@ -17885,19 +17885,19 @@ mi:
     other_description: |-
         *Mā ngā kaitohutohu me ngā kaiwhakahaere anake:*
         
-        * Akoranga whakauru
-        * Pūrongo kua whakamahia
-        * Ihirangi Kaweatu
-        * Pūrongo hekenga
-        * Kaiwhakamahi pūkete hou
-        * Rōpū ākonga hou
+              * Akoranga whakauru
+              * Pūrongo kua whakamahia
+              * Ihirangi Kaweatu
+              * Pūrongo hekenga
+              * Kaiwhakamahi pūkete hou
+              * Rōpū ākonga hou
     other_display: "whakamōhiotanga whakahaere"
     recording_ready_display: "Tāhopu Reri"
     reminder_display: Whakamaumahara
     student_appointment_description: |-
         *Kaiitohutohu me Whakahaere anake:*
         
-        Ākonga whakarite hainatanga
+              Ākonga whakarite hainatanga
     student_appointment_display: "Hainatanga Ākonga Wāhui"
     submission_comment_description: "tāpaetanga whakataunga kōrero"
     submission_comment_display: "kōrero tāpaetanga"

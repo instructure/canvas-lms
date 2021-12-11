@@ -424,15 +424,23 @@ class User < ActiveRecord::Base
   after_save :update_account_associations_if_necessary
   after_save :self_enroll_if_necessary
 
-  def courses_for_enrollments(enrollment_scope, associated_user = nil)
+  def courses_for_enrollments(enrollment_scope, associated_user = nil, include_completed_courses = true)
     if associated_user && associated_user != self
-      Course.active.joins(:observer_enrollments)
-            .merge(enrollment_scope.except(:joins))
-            .where(enrollments: { associated_user_id: associated_user.id })
+      join = :observer_enrollments
+      scope = Course.active.joins(join)
+                    .merge(enrollment_scope.except(:joins))
+                    .where(enrollments: { associated_user_id: associated_user.id })
     else
-      enrollments_to_include = associated_user == self ? :non_observer_enrollments : :all_enrollments
-      Course.active.joins(enrollments_to_include).merge(enrollment_scope.except(:joins)).distinct
+      join = associated_user == self ? :non_observer_enrollments : :all_enrollments
+      scope = Course.active.joins(join).merge(enrollment_scope.except(:joins)).distinct
     end
+
+    unless include_completed_courses
+      scope = scope.joins(join => :enrollment_state)
+                   .where(enrollment_states: { restricted_access: false })
+                   .where("enrollment_states.state IN ('active', 'invited', 'pending_invited', 'pending_active')")
+    end
+    scope
   end
 
   def courses
@@ -1774,10 +1782,6 @@ class User < ActiveRecord::Base
     !!preferences[:comment_library_suggestions_enabled]
   end
 
-  def collapse_course_nav?
-    !!preferences[:collapse_course_nav]
-  end
-
   # ***** OHI If you're going to add a lot of data into `preferences` here maybe take a look at app/models/user_preference_value.rb instead ***
   # it will store the data in a separate table on the db and lighten the load on poor `users`
 
@@ -1821,15 +1825,54 @@ class User < ActiveRecord::Base
     pseudonym.account rescue Account.default
   end
 
+  # this finds the reverse account chain starting at in_root_account and ending
+  # at the lowest account such that all of the accounts to which the user is
+  # associated with, which descend from in_root_account, descend from one of the
+  # accounts in the chain.  In other words, if the users associated accounts
+  # made a tree, it would be the chain between the root and the first branching
+  # point.
+  def common_account_chain(in_root_account)
+    GuardRail.activate(:secondary) do
+      rid = in_root_account.id
+      accts = associated_accounts.where("accounts.id = ? OR accounts.root_account_id = ?", rid, rid)
+      return [] if accts.blank?
+
+      children = accts.each_with_object({}) do |acct, hash|
+        pid = acct.parent_account_id
+        if pid.present?
+          hash[pid] ||= []
+          hash[pid] << acct
+        end
+      end
+
+      enrollment_account_ids = in_root_account
+                               .all_enrollments
+                               .current_and_concluded
+                               .where(user_id: self)
+                               .joins(:course)
+                               .distinct
+                               .pluck(:account_id)
+
+      longest_chain = [in_root_account]
+      while true
+        break if enrollment_account_ids.include?(longest_chain.last.id)
+
+        next_children = children[longest_chain.last.id]
+        break unless next_children.present? && next_children.count == 1
+
+        longest_chain << next_children.first
+      end
+      longest_chain
+    end
+  end
+
   def courses_with_primary_enrollment(association = :current_and_invited_courses, enrollment_uuid = nil, options = {})
     cache_key = [association, enrollment_uuid, options].cache_key
     @courses_with_primary_enrollment ||= {}
     @courses_with_primary_enrollment.fetch(cache_key) do
       res = shard.activate do
         result = Rails.cache.fetch([self, "courses_with_primary_enrollment2", association, options, ApplicationController.region].cache_key, expires_in: 15.minutes) do
-          # Set the actual association based on if its asking for favorite courses or not.
-          actual_association = association == :favorite_courses ? :current_and_invited_courses : association
-          scope = send(actual_association, options[:observee_user])
+          scope = courses_for_enrollments(enrollments.current_and_invited, options[:observee_user], !!options[:include_completed_courses])
           shards = in_region_associated_shards
           # Limit favorite courses based on current shard.
           if association == :favorite_courses
@@ -1840,11 +1883,6 @@ class User < ActiveRecord::Base
               shards &= ids.map { |id| Shard.shard_for(id) }
               scope = scope.where(id: ids)
             end
-          end
-
-          unless options[:include_completed_courses]
-            scope = scope.joins(all_enrollments: :enrollment_state).where(enrollment_states: { restricted_access: false })
-                         .where("enrollment_states.state IN ('active', 'invited', 'pending_invited', 'pending_active')")
           end
 
           GuardRail.activate(:secondary) do

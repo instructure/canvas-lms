@@ -282,7 +282,6 @@ const locale = {
   "loading_failed_e6a9d8ef": { "message": "Lasting mislyktes." },
   "loading_folders_d8b5869e": { "message": "Laster mapper" },
   "loading_please_wait_d276220a": { "message": "Laster inn, vennligst vent" },
-  "loading_preview_9f077aa1": { "message": "Laster forhåndsvisning" },
   "locked_762f138b": { "message": "Låst" },
   "media_af190855": { "message": "Medie" },
   "medium_5a8e9ead": { "message": "Medium" },

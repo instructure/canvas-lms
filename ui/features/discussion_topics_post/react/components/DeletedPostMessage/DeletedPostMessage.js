@@ -42,13 +42,11 @@ export function DeletedPostMessage({...props}) {
       }}
       render={responsiveProps => (
         <>
-          {props.deleterName && (
-            <View as="div">
-              <Text size={responsiveProps.deletedByTextSize} weight="bold">
-                {I18n.t('Deleted by %{deleterName}', {deleterName: props.deleterName})}
-              </Text>
-            </View>
-          )}
+          <View as="div">
+            <Text size={responsiveProps.deletedByTextSize} weight="bold">
+              {I18n.t('Deleted by %{deleterName}', {deleterName: props.deleterName})}
+            </Text>
+          </View>
           <Tooltip
             renderTip={I18n.t('Created %{timingDisplay}', {timingDisplay: props.timingDisplay})}
           >
@@ -56,14 +54,7 @@ export function DeletedPostMessage({...props}) {
               // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
               tabIndex="0"
             >
-              <Text
-                size={
-                  props.deleterName
-                    ? responsiveProps.timestampTextSize
-                    : responsiveProps.deletedByTextSize
-                }
-                weight={props.deleterName ? undefined : 'bold'}
-              >
+              <Text size={responsiveProps.timestampTextSize}>
                 {I18n.t('Deleted %{deletedTimingDisplay}', {
                   deletedTimingDisplay: props.deletedTimingDisplay
                 })}

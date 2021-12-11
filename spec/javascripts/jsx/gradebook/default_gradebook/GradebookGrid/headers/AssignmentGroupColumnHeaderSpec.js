@@ -346,30 +346,6 @@ QUnit.module('GradebookGrid AssignmentGroupColumnHeader', suiteHooks => {
     })
   })
 
-  QUnit.module('"Apply Score to Ungraded" menu item', () => {
-    const applyScoreToUngradedItem = () => getMenuItem($menuContent, 'Apply Score to Ungraded')
-
-    test('is present when the onApplyScoreToUngraded prop is non-null', () => {
-      props.onApplyScoreToUngraded = sinon.stub()
-      mountAndOpenOptionsMenu()
-
-      ok(applyScoreToUngradedItem())
-    })
-
-    test('calls the onApplyScoreToUngraded prop when clicked', () => {
-      props.onApplyScoreToUngraded = sinon.stub()
-      mountAndOpenOptionsMenu()
-
-      applyScoreToUngradedItem().click()
-      strictEqual(props.onApplyScoreToUngraded.callCount, 1)
-    })
-
-    test('is not present when the onApplyScoreToUngraded prop is null', () => {
-      mountAndOpenOptionsMenu()
-      notOk(applyScoreToUngradedItem())
-    })
-  })
-
   QUnit.module('#handleKeyDown()', hooks => {
     let preventDefault
 

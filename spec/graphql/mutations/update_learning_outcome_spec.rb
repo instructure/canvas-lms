@@ -40,47 +40,6 @@ describe Mutations::UpdateLearningOutcome do
     YAML
   end
 
-  def default_rating_variables
-    {
-      calculation_method: "n_mastery",
-      calculation_int: 3,
-      rubric_criterion: {
-        mastery_points: 2,
-        ratings: [
-          {
-            description: "GraphQL Exceeds Expectations",
-            points: 3
-          },
-          {
-            description: "GraphQL Expectations",
-            points: 2
-          },
-          {
-            description: "GraphQL Does Not Meet Expectations",
-            points: 1
-          }
-        ]
-      }
-    }
-  end
-
-  def rating_variables(args = {})
-    args.merge!(default_rating_variables)
-
-    <<~GQL
-      calculationMethod: "#{args[:calculation_method]}",
-      calculationInt: #{args[:calculation_int]},
-      rubricCriterion: {
-        masteryPoints: #{args[:rubric_criterion][:mastery_points]}
-        ratings: #{
-          args[:rubric_criterion][:ratings]
-            .to_json
-            .gsub(/"([a-z]+)":/, '\1:')
-        }
-      }
-    GQL
-  end
-
   def execute_with_input(update_input, user_executing: @admin)
     mutation_command = <<~GQL
       mutation {
@@ -95,15 +54,6 @@ describe Mutations::UpdateLearningOutcome do
             displayName
             description
             vendorGuid
-            calculationMethod
-            calculationInt
-            rubricCriterion {
-              masteryPoints
-              ratings {
-                description
-                points
-              }
-            }
           }
           errors {
             attribute
@@ -125,34 +75,6 @@ describe Mutations::UpdateLearningOutcome do
     expect(result["displayName"]).to eq "Outcome display name 1"
     expect(result["description"]).to eq "Outcome description 1"
     expect(result["vendorGuid"]).to eq "vg--1"
-  end
-
-  it "updates a learning outcome with mastery scale" do
-    @course.root_account.enable_feature!(:individual_outcome_rating_and_calculation)
-    @course.root_account.disable_feature!(:account_level_mastery_scales)
-
-    calculation_method = default_rating_variables[:calculation_method]
-    calculation_int = default_rating_variables[:calculation_int]
-    rubric_criterion = default_rating_variables[:rubric_criterion]
-
-    result = execute_with_input "#{variables},#{rating_variables}"
-    expect(result["errors"]).to be_nil
-    expect(result.dig("data", "updateLearningOutcome", "errors")).to be_nil
-
-    result = result.dig("data", "updateLearningOutcome", "learningOutcome")
-    result_record = LearningOutcome.find(record.id)
-
-    expect(result["calculationMethod"]).to eq calculation_method
-    expect(result["calculationInt"]).to eq calculation_int
-    expect(result["rubricCriterion"]["masteryPoints"]).to eq rubric_criterion[:mastery_points]
-    expect(result["rubricCriterion"]["ratings"].count).to eq rubric_criterion[:ratings].count
-    expect(result["rubricCriterion"]["ratings"][0]["description"]).to eq rubric_criterion[:ratings][0][:description]
-
-    expect(result_record.calculation_method).to eq calculation_method
-    expect(result_record.calculation_int).to eq calculation_int
-    expect(result_record.mastery_points).to eq rubric_criterion[:mastery_points]
-    expect(result_record.rubric_criterion[:ratings].count).to eq rubric_criterion[:ratings].count
-    expect(result_record.rubric_criterion[:ratings][0][:description]).to eq rubric_criterion[:ratings][0][:description]
   end
 
   context "errors" do
@@ -180,22 +102,6 @@ describe Mutations::UpdateLearningOutcome do
     it "requires title to be present" do
       result = execute_with_input(variables(title: ""))
       expect_error(result, "can't be blank")
-    end
-
-    it "raises error when data includes individual ratings with IORC FF disabled" do
-      @course.root_account.disable_feature!(:individual_outcome_rating_and_calculation)
-      @course.root_account.disable_feature!(:account_level_mastery_scales)
-
-      result = execute_with_input "#{variables},#{rating_variables}"
-      expect_error(result, "individual ratings data input with invidual_outcome_rating_and_calculation FF disabled")
-    end
-
-    it "raises error when data includes individual ratings with both IORC and ALMS FFs enabled" do
-      @course.root_account.enable_feature!(:individual_outcome_rating_and_calculation)
-      @course.root_account.enable_feature!(:account_level_mastery_scales)
-
-      result = execute_with_input "#{variables},#{rating_variables}"
-      expect_error(result, "individual ratings data input with acount_level_mastery_scale FF enabled")
     end
   end
 end

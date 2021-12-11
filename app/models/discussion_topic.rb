@@ -439,8 +439,7 @@ class DiscussionTopic < ActiveRecord::Base
                           only_graders_can_rate: only_graders_can_rate,
                           sort_by_rating: sort_by_rating,
                           todo_date: todo_date,
-                          is_section_specific: is_section_specific,
-                          anonymous_state: anonymous_state
+                          is_section_specific: is_section_specific
                         })
   end
 

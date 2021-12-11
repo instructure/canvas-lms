@@ -61,30 +61,9 @@ module Types
       end
     end
 
-    field :author, Types::UserType, null: true
+    field :author, Types::UserType, null: false
     def author
-      load_association(:discussion_topic).then do |topic|
-        if topic.anonymous?
-          nil
-        else
-          load_association(:user)
-        end
-      end
-    end
-
-    field :anonymous_author, Types::AnonymousUserType, null: true
-    def anonymous_author
-      load_association(:discussion_topic).then do |topic|
-        if topic.anonymous?
-          if object.user_id == current_user.id
-            { id: "current_user", short_name: "current_user", avatar_url: nil }
-          else
-            Loaders::DiscussionTopicParticipantLoader.for(topic.id).load(object.user_id).then do |participant|
-              { id: participant.id.to_s(36), short_name: participant.id.to_s(36), avatar_url: nil }
-            end
-          end
-        end
-      end
+      load_association(:user)
     end
 
     field :deleted, Boolean, null: true
@@ -94,13 +73,7 @@ module Types
 
     field :editor, Types::UserType, null: true
     def editor
-      load_association(:discussion_topic).then do |topic|
-        if topic.anonymous?
-          nil
-        else
-          load_association(:editor)
-        end
-      end
+      load_association(:editor)
     end
 
     field :root_entry_participant_counts, Types::DiscussionEntryCountsType, null: true
