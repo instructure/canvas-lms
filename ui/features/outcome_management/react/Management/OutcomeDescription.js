@@ -30,8 +30,10 @@ const OutcomeDescription = ({description, friendlyDescription, truncated}) => {
   const shouldShowFriendlyDescription = friendlyDescriptionFF && friendlyDescription
   let fullDescription = description
   let truncatedDescription = stripHtmlTags(fullDescription || '')
+  let fullDescriptionIsFriendlyDescription = false
   if (shouldShowFriendlyDescription && (!description || isStudent)) {
     fullDescription = truncatedDescription = friendlyDescription
+    fullDescriptionIsFriendlyDescription = true
   }
   const shouldShowFriendlyDescriptionSection =
     !truncated &&
@@ -77,17 +79,24 @@ const OutcomeDescription = ({description, friendlyDescription, truncated}) => {
             background="secondary"
             data-testid="friendly-description-expanded"
           >
-            <Text>{friendlyDescription}</Text>
+            <Text wrap="break-word">{friendlyDescription}</Text>
           </View>
         </>
       )}
-      {!truncated && fullDescription && (
+
+      {!truncated && fullDescription && !fullDescriptionIsFriendlyDescription && (
         <View
           as="div"
           padding="0 small 0 0"
           data-testid="description-expanded"
           dangerouslySetInnerHTML={{__html: fullDescription}}
         />
+      )}
+
+      {!truncated && fullDescription && fullDescriptionIsFriendlyDescription && (
+        <View as="div" padding="0 small 0 0" data-testid="description-expanded">
+          <Text wrap="break-word">{fullDescription}</Text>
+        </View>
       )}
     </View>
   )

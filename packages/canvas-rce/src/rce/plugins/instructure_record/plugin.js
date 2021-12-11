@@ -19,11 +19,13 @@
 import clickCallback from './clickCallback'
 import bridge from '../../../bridge'
 import formatMessage from '../../../format-message'
-import TrayController from './VideoOptionsTray/TrayController'
-import {isVideoElement} from '../shared/ContentSelection'
+import VideoTrayController from './VideoOptionsTray/TrayController'
+import AudioTrayController from './AudioOptionsTray/TrayController'
+import {isAudioElement, isVideoElement} from '../shared/ContentSelection'
 import {isOKToLink} from '../../contentInsertionUtils'
 
-const trayController = new TrayController()
+const videoTrayController = new VideoTrayController()
+const audioTrayController = new AudioTrayController()
 
 const COURSE_PLUGIN_KEY = 'course_media'
 const USER_PLUGIN_KEY = 'user_media'
@@ -143,7 +145,7 @@ tinymce.create('tinymce.plugins.InstructureRecord', {
     ed.ui.registry.addButton('instructure-video-options', {
       onAction() {
         // show the tray
-        trayController.showTrayForEditor(ed)
+        videoTrayController.showTrayForEditor(ed)
       },
 
       text: formatMessage('Video Options'),
@@ -156,9 +158,25 @@ tinymce.create('tinymce.plugins.InstructureRecord', {
       predicate: isVideoElement,
       scope: 'node'
     })
+
+    ed.ui.registry.addButton('instructure-audio-options', {
+      onAction() {
+        audioTrayController.showTrayForEditor(ed)
+      },
+      text: formatMessage('Audio Options'),
+      tooltip: formatMessage('Show audio options')
+    })
+
+    ed.ui.registry.addContextToolbar('instructure-audio-toolbar', {
+      items: 'instructure-audio-options',
+      position: 'node',
+      predicate: isAudioElement,
+      scope: 'node'
+    })
   },
   remove(editor) {
-    trayController.hideTrayForEditor(editor)
+    audioTrayController.hideTrayForEditor(editor)
+    videoTrayController.hideTrayForEditor(editor)
   }
 })
 

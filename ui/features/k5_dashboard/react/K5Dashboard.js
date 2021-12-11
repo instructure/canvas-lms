@@ -159,7 +159,6 @@ export const K5Dashboard = ({
   const [tabsRef, setTabsRef] = useState(null)
   const [trayOpen, setTrayOpen] = useState(false)
   const [observedUserId, setObservedUserId] = useState(initialObservedId)
-  const [observedUsersCards, setObservedUsersCards] = useState([])
   const plannerInitialized = usePlanner({
     plannerEnabled,
     isPlannerActive: () => activeTab.current === TAB_IDS.SCHEDULE,
@@ -176,15 +175,11 @@ export const K5Dashboard = ({
     setTrayOpen(false)
   }
 
-  const loadCardDashboardCallBack = (dc, cardsFinishedLoading, observedUser) => {
+  const loadCardDashboardCallBack = (dc, cardsFinishedLoading) => {
     const activeCards = dc.filter(({enrollmentState}) => enrollmentState !== 'invited')
     setCards(activeCards)
-    setCardsSettled(cardsFinishedLoading)
-    if (cardsFinishedLoading && observedUser) {
-      setObservedUsersCards(cachedCards => ({
-        ...cachedCards,
-        [observedUser]: activeCards
-      }))
+    if (cardsFinishedLoading) {
+      setCardsSettled(true)
     }
     if (cardsFinishedLoading && activeCards?.length === 0) {
       setLoadingAnnouncements(false)
@@ -193,21 +188,20 @@ export const K5Dashboard = ({
     }
   }
 
-  useEffect(() => {
-    if (!cards && ((observerMode && observedUserId) || !observerMode)) {
-      loadCardDashboard(loadCardDashboardCallBack, observerMode ? observedUserId : undefined)
-    } else if (observerMode) {
-      const cachedCards = observedUsersCards[observedUserId]
-      if (cachedCards) {
-        setCards(cachedCards) // Using cards from state if the selected user has been requested already
-      } else if (cardsSettled) {
-        // fetching cards if the user hasn't been requested and there is not a request in progress
-        setCardsSettled(false)
-        resetDashboardCards() // Only reset the dashboard cards state if there is not a request in progress
-        loadCardDashboard(loadCardDashboardCallBack, observedUserId)
-      }
+  const handleChangeObservedUser = id => {
+    if (id !== observedUserId) {
+      resetDashboardCards()
+      setCardsSettled(false)
+      setObservedUserId(id)
     }
-  }, [cards, observedUserId, observedUsersCards, observerMode]) // eslint-disable-line react-hooks/exhaustive-deps
+  }
+
+  useEffect(() => {
+    // don't call on the initial load when we know we're in observer mode but don't have the ID yet
+    if (!observerMode || (observerMode && observedUserId)) {
+      loadCardDashboard(loadCardDashboardCallBack, observerMode ? observedUserId : undefined)
+    }
+  }, [observedUserId, observerMode])
 
   useFetchApi({
     path: '/api/v1/announcements',
@@ -311,7 +305,7 @@ export const K5Dashboard = ({
               <ObserverOptions
                 observerList={observerList}
                 currentUser={currentUser}
-                handleChangeObservedUser={setObservedUserId}
+                handleChangeObservedUser={handleChangeObservedUser}
                 margin="medium 0 xx-small 0"
                 canAddObservee={canAddObservee}
                 currentUserRoles={currentUserRoles}
@@ -357,7 +351,7 @@ export const K5Dashboard = ({
               visible={currentTab === TAB_IDS.SCHEDULE}
               singleCourse={false}
               observedUserId={observedUserId}
-              contextCodes={observedUsersCards[observedUserId]?.map(c => c.assetString)}
+              contextCodes={cardsSettled ? cards?.map(c => c.assetString) : undefined}
             />
             <GradesPage
               visible={currentTab === TAB_IDS.GRADES}

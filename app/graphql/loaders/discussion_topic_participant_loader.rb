@@ -25,7 +25,7 @@ class Loaders::DiscussionTopicParticipantLoader < GraphQL::Batch::Loader
   end
 
   def perform(user_ids)
-    participants = DiscussionTopicParticipant.where(id: @discussion_topic_id, user_id: user_ids)
+    participants = DiscussionTopicParticipant.where(discussion_topic_id: @discussion_topic_id, user_id: user_ids)
     user_ids.each do |user_id|
       fulfill(user_id, participants.find { |participant| user_id == participant.user_id })
     end

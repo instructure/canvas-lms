@@ -20,11 +20,15 @@ import {DiscussionEntryContainer} from '../DiscussionEntryContainer'
 import {PostToolbar} from '../../../components/PostToolbar/PostToolbar'
 import React from 'react'
 import {render} from '@testing-library/react'
-import {responsiveQuerySizes} from '../../../utils'
 import {User} from '../../../../graphql/User'
 import {Attachment} from '../../../../graphql/Attachment'
 
-jest.mock('../../../utils')
+jest.mock('../../../utils', () => ({
+  ...jest.requireActual('../../../utils'),
+  responsiveQuerySizes: () => ({
+    desktop: {maxWidth: '1000px'}
+  })
+}))
 
 beforeAll(() => {
   window.matchMedia = jest.fn().mockImplementation(() => {
@@ -36,12 +40,6 @@ beforeAll(() => {
       removeListener: jest.fn()
     }
   })
-})
-
-beforeEach(() => {
-  responsiveQuerySizes.mockImplementation(() => ({
-    desktop: {maxWidth: '1000px'}
-  }))
 })
 
 describe('DiscussionEntryContainer', () => {

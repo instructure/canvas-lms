@@ -19,6 +19,7 @@
 import PropTypes from 'prop-types'
 import React from 'react'
 import I18n from 'i18n!assignments_2_student_points_display'
+import numberFormat from '@canvas/i18n/numberFormat'
 
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Flex} from '@instructure/ui-flex'
@@ -28,13 +29,18 @@ import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
 export default function PointsDisplay(props) {
   const ungradedVisualString = () => {
     if (props.gradingType === 'points' && props.pointsPossible != null) {
+      const formattedPoints = numberFormat._format(props.pointsPossible, {
+        precision: 2,
+        strip_insignificant_zeros: true
+      })
       return I18n.t(
-        {one: '*1* Possible Point', other: '*%{count}* Possible Points'},
+        {one: '*1* Possible Point', other: '*%{formattedPoints}* Possible Points'},
         {
           count: props.pointsPossible,
+          formattedPoints,
           wrappers: ['<span class="points-value">$1</span>']
         }
-      ).string
+      )
     }
 
     return ''
@@ -42,9 +48,16 @@ export default function PointsDisplay(props) {
 
   const ungradedScreenreaderString = () => {
     if (props.gradingType === 'points' && props.pointsPossible != null) {
+      const formattedPoints = numberFormat._format(props.pointsPossible, {
+        precision: 2,
+        strip_insignificant_zeros: true
+      })
       return I18n.t(
-        {one: 'Ungraded, 1 Possible Point', other: 'Ungraded, %{count} Possible Points'},
-        {count: props.pointsPossible}
+        {one: 'Ungraded, 1 Possible Point', other: 'Ungraded, %{formattedPoints} Possible Points'},
+        {
+          count: props.pointsPossible,
+          formattedPoints
+        }
       )
     }
 

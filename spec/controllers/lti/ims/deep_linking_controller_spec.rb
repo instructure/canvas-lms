@@ -326,6 +326,31 @@ module Lti
               it "doesn't create a module item" do
                 expect { subject }.not_to change { context_module.content_tags.count }
               end
+
+              it "doesn't ask to reload page" do
+                subject
+                expect(assigns.dig(:js_env, :deep_link_response, :reloadpage)).to be false
+              end
+
+              context "with line item" do
+                let(:content_items) do
+                  [{ type: "ltiResourceLink", url: launch_url, title: "Item 1", lineItem: { scoreMaximum: 5 } }]
+                end
+
+                it "doesn't create a resource link" do
+                  # The resource links for these are rather created when the module item is created
+                  expect { subject }.not_to change { course.lti_resource_links.count }
+                end
+
+                it "doesn't create a module item" do
+                  expect { subject }.not_to change { context_module.content_tags.count }
+                end
+
+                it "doesn't ask to reload page" do
+                  subject
+                  expect(assigns.dig(:js_env, :deep_link_response, :reloadpage)).to be false
+                end
+              end
             end
 
             context "multiple items" do
@@ -333,7 +358,7 @@ module Lti
                 [
                   { type: "ltiResourceLink", url: launch_url, title: "Item 1" },
                   { type: "ltiResourceLink", url: launch_url, title: "Item 2", custom: { mycustom: "123" } },
-                  { type: "ltiResourceLink", url: launch_url, title: "Item 3" }
+                  { type: "ltiResourceLink", url: launch_url, title: "Item 3", lineItem: { scoreMaximum: 5 } }
                 ]
               end
 
@@ -367,6 +392,15 @@ module Lti
               it "does not pass launch dimensions" do
                 expect(subject).to be_successful
                 expect(context_module.content_tags[0][:link_settings]).to be(nil)
+              end
+
+              it "ignores line items from tool" do
+                expect { subject }.not_to change { course.assignments.count }
+              end
+
+              it "asks to reload page" do
+                subject
+                expect(assigns.dig(:js_env, :deep_link_response, :reloadpage)).to be true
               end
 
               context "when content items have iframe property" do

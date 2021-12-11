@@ -325,24 +325,25 @@ describe Quizzes::Quiz do
   end
 
   it "converts a date object to a time and set the time to 11:59pm" do
-    Time.zone = "Alaska"
-    params = { quiz: { title: "Test Quiz", due_at: Time.zone.today } }
-    quiz = @course.quizzes.create!(params[:quiz])
-    expect(quiz.due_at).to be_an_instance_of ActiveSupport::TimeWithZone
-    expect(quiz.due_at.zone).to eql Time.zone.now.dst? ? "AKDT" : "AKST"
-    expect(quiz.due_at.hour).to eql 23
-    expect(quiz.due_at.min).to eql 59
+    Time.use_zone("Alaska") do
+      params = { quiz: { title: "Test Quiz", due_at: Time.zone.today } }
+      quiz = @course.quizzes.create!(params[:quiz])
+      expect(quiz.due_at).to be_an_instance_of ActiveSupport::TimeWithZone
+      expect(quiz.due_at.zone).to eql Time.zone.now.dst? ? "AKDT" : "AKST"
+      expect(quiz.due_at.hour).to eql 23
+      expect(quiz.due_at.min).to eql 59
+    end
   end
 
   it "sets the due date time correctly" do
     time_string = "Dec 30, 2011 12:00 pm"
     expected = "2011-12-30 19:00:00 #{Time.now.utc.strftime("%Z")}"
-    Time.zone = "Mountain Time (US & Canada)"
-    quiz = @course.quizzes.create(title: "sad quiz", due_at: time_string, lock_at: time_string, unlock_at: time_string)
-    expect(quiz.due_at.utc.strftime("%Y-%m-%d %H:%M:%S %Z")).to eq expected
-    expect(quiz.lock_at.utc.strftime("%Y-%m-%d %H:%M:%S %Z")).to eq expected
-    expect(quiz.unlock_at.utc.strftime("%Y-%m-%d %H:%M:%S %Z")).to eq expected
-    Time.zone = nil
+    Time.use_zone("Mountain Time (US & Canada)") do
+      quiz = @course.quizzes.create(title: "sad quiz", due_at: time_string, lock_at: time_string, unlock_at: time_string)
+      expect(quiz.due_at.utc).to eq expected
+      expect(quiz.lock_at.utc).to eq expected
+      expect(quiz.unlock_at.utc).to eq expected
+    end
   end
 
   it "initializes with default settings" do
@@ -1008,18 +1009,7 @@ describe Quizzes::Quiz do
 
   describe "Quiz with QuestionGroup pointing to QuestionBank" do
     before(:once) do
-      course_with_student
-      @bank = @course.assessment_question_banks.create!(title: "Test Bank")
-      @bank.assessment_questions.create!(question_data: { "name" => "Group Question 1", :question_type => "essay_question", :question_text => "gq1", "answers" => [] })
-      @bank.assessment_questions.create!(question_data: { "name" => "Group Question 2", :question_type => "essay_question", :question_text => "gq2", "answers" => [] })
-      @quiz = @course.quizzes.create!(title: "i'm tired quiz")
-      @quiz.quiz_questions.create!(question_data: { :name => "Quiz Question 1", :question_type => "essay_question", :question_text => "qq1", "answers" => [], :points_possible => 5.0 })
-      @group = @quiz.quiz_groups.create!(name: "question group", pick_count: 3, question_points: 5.0)
-      @group.assessment_question_bank = @bank
-      @group.save!
-      @quiz.generate_quiz_data
-      @quiz.save!
-      @quiz.reload
+      quiz_with_question_group_pointing_to_question_bank
     end
 
     it "creates a submission" do
@@ -1505,6 +1495,10 @@ describe Quizzes::Quiz do
 
     it "returns true when quiz was previously not an assignment, but about to become one" do
       expect(@quiz.update_cached_due_dates?("assignment")).to be true
+    end
+
+    it "returns true when quiz was previously not a graded survey, but about to become one" do
+      expect(@quiz.update_cached_due_dates?("graded_survey")).to be true
     end
   end
 
@@ -2602,6 +2596,19 @@ describe Quizzes::Quiz do
     it "uses root_account value from account" do
       quiz = @course.quizzes.create!(title: "hello")
       expect(quiz.root_account_id).to eq Account.default.id
+    end
+  end
+
+  describe ".assessment_question_bank_ids" do
+    before :once do
+      quiz_with_question_group_pointing_to_question_bank
+    end
+
+    it "return existing assessment question bank ids" do
+      ids = @quiz.assessment_question_bank_ids
+      expect(ids.class).to eq Array
+      expect(ids.count).to eq 1
+      expect(ids.first).to eq @bank.id
     end
   end
 end

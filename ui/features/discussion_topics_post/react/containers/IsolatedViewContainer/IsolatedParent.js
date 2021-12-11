@@ -24,7 +24,7 @@ import {DiscussionEntry} from '../../../graphql/DiscussionEntry'
 import {Flex} from '@instructure/ui-flex'
 import {Highlight} from '../../components/Highlight/Highlight'
 import I18n from 'i18n!discussion_posts'
-import {isTopicAuthor, responsiveQuerySizes} from '../../utils'
+import {getDisplayName, isTopicAuthor, responsiveQuerySizes} from '../../utils'
 import {DiscussionEntryContainer} from '../DiscussionEntryContainer/DiscussionEntryContainer'
 import PropTypes from 'prop-types'
 import React, {useContext, useState} from 'react'
@@ -57,10 +57,11 @@ export const IsolatedParent = props => {
     update: resetDiscussionCache
   })
 
-  const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
+  const {setOnSuccess} = useContext(AlertManagerContext)
   const [isEditing, setIsEditing] = useState(false)
   const [showReportModal, setShowReportModal] = useState(false)
   const [reportModalIsLoading, setReportModalIsLoading] = useState(false)
+  const [reportingError, setReportingError] = useState(false)
   const threadActions = []
 
   const [updateDiscussionEntryReported] = useMutation(UPDATE_DISCUSSION_ENTRY_PARTICIPANT, {
@@ -74,7 +75,10 @@ export const IsolatedParent = props => {
     },
     onError: () => {
       setReportModalIsLoading(false)
-      setOnFailure(I18n.t('We experienced an issue. This reply was not reported.'))
+      setReportingError(true)
+      setTimeout(() => {
+        setReportingError(false)
+      }, 3000)
     }
   })
 
@@ -82,7 +86,7 @@ export const IsolatedParent = props => {
     threadActions.push(
       <ThreadingToolbar.Reply
         key={`reply-${props.discussionEntry.id}`}
-        authorName={props.discussionEntry.author.displayName}
+        authorName={getDisplayName(props.discussionEntry)}
         delimiterKey={`reply-delimiter-${props.discussionEntry._id}`}
         onClick={() => props.setRCEOpen(true)}
         isReadOnly={props.RCEOpen}
@@ -103,7 +107,7 @@ export const IsolatedParent = props => {
             props.onToggleRating()
           }
         }}
-        authorName={props.discussionEntry.author.displayName}
+        authorName={getDisplayName(props.discussionEntry)}
         isLiked={!!props.discussionEntry.entryParticipant?.rating}
         likeCount={props.discussionEntry.ratingSum || 0}
         interaction={props.discussionEntry.permissions.rate ? 'enabled' : 'disabled'}
@@ -229,6 +233,7 @@ export const IsolatedParent = props => {
                       />
                     }
                     author={props.discussionEntry.author}
+                    anonymousAuthor={props.discussionEntry.anonymousAuthor}
                     message={props.discussionEntry.message}
                     isEditing={isEditing}
                     onSave={message => {
@@ -282,6 +287,7 @@ export const IsolatedParent = props => {
                     }}
                     showReportModal={showReportModal}
                     isLoading={reportModalIsLoading}
+                    errorSubmitting={reportingError}
                   />
                 </Flex.Item>
               </Flex>
