@@ -277,11 +277,18 @@ module ApplicationHelper
       # execution is delayed until the DOM is ready.
       if new_js_bundles.present?
         concat javascript_tag new_js_bundles.map { |(bundle, plugin, defer)|
+                                defer ||= defer_js_bundle?(bundle)
                                 container = defer ? "window.deferredBundles" : "window.bundles"
                                 "(#{container} || (#{container} = [])).push('#{plugin ? "#{plugin}-" : ""}#{bundle}');"
                               }.join("\n")
       end
     end
+  end
+
+  def defer_js_bundle?(bundle)
+    @deferred_js_bundles ||= Setting.get("deferred_js_bundles", "").split(",")
+    @deferred_js_bundles.include?(bundle.to_s) ||
+      (@deferred_js_bundles.include?("*") && @deferred_js_bundles.exclude?("!#{bundle}"))
   end
 
   def include_css_bundles
