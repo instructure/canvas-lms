@@ -163,6 +163,41 @@ describe "discussions" do
           expect(is_checked("#assignment_post_to_sis")).to be_falsey
         end
       end
+
+      context "when discussion_anonymity feature_flag is on" do
+        before :once do
+          Account.site_admin.enable_feature! :discussion_anonymity
+        end
+
+        context "when react_discussions_post feature_flag is on" do
+          before do
+            course.enable_feature! :react_discussions_post
+          end
+
+          it "allows creating anonymous discussions" do
+            get url
+            replace_content(f("input[name=title]"), "my anonymous title")
+            f("input[value='full_anonymity']").click
+            expect_new_page_load { submit_form(".form-actions") }
+            expect(DiscussionTopic.last.anonymous_state).to eq "full_anonymity"
+            expect(f("span[data-testid='anon-conversation']").text).to(
+              eq("This is an anonymous Discussion, Your name and profile picture will be hidden from other course members.")
+            )
+            expect(f("span[data-testid='author_name']").text).to eq "You"
+          end
+        end
+
+        context "when react_discussions_post feature_flag is off" do
+          before do
+            course.disable_feature! :react_discussions_post
+          end
+
+          it "does not show anonymous discussion options" do
+            get url
+            expect(f("body")).not_to contain_jqcss "input[value='full_anonymity']"
+          end
+        end
+      end
     end
 
     context "as a student" do
