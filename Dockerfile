@@ -78,7 +78,7 @@ RUN if [ "x$WITH_PULSAR" = "x1" ]; then \
     rm ./apache-pulsar-client*.deb && \
     rm /usr/lib/libpulsarnossl.so* && \
     rm /usr/lib/libpulsar.a && \
-    rm /usr/lib/libpulsarwithdeps.a ;\
+    rm /usr/lib/libpulsarwithdeps.a ; \
   fi
 
 RUN if [ -e /var/lib/gems/$RUBY_MAJOR.0/gems/bundler-* ]; then BUNDLER_INSTALL="-i /var/lib/gems/$RUBY_MAJOR.0"; fi \
