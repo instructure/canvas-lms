@@ -1594,6 +1594,15 @@ class User < ActiveRecord::Base
     get_preference(:new_user_tutorial_statuses) || {}
   end
 
+  def apply_contrast(colors)
+    colors.each do |key, _v|
+      until WCAGColorContrast.ratio(colors[key].delete("#"), "ffffff") >= 4.5
+        rgb = colors[key].match(/^#(..)(..)(..)$/).captures.map { |c| (c.hex.to_i * 0.85).round }
+        colors[key] = "#%02x%02x%02x" % rgb
+      end
+    end
+  end
+
   def custom_colors
     colors_hash = get_preference(:custom_colors) || {}
     if Shard.current != shard
@@ -1607,6 +1616,9 @@ class User < ActiveRecord::Base
         ["#{opts.join("_")}_#{new_id}", value]
       end.to_h
     end
+
+    return apply_contrast colors_hash if prefers_high_contrast? && uses_high_contrast_course_colors?
+
     colors_hash
   end
 
@@ -1706,6 +1718,10 @@ class User < ActiveRecord::Base
 
   def prefers_high_contrast?
     !!feature_enabled?(:high_contrast)
+  end
+
+  def uses_high_contrast_course_colors?
+    Account.site_admin.feature_enabled?(:high_contrast_course_colors)
   end
 
   def auto_show_cc?
