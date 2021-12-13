@@ -36,6 +36,7 @@ import '@canvas/rails-flash-notifications'
 import '@canvas/util/templateData'
 import '@canvas/datetime'
 import renderConferenceAlternatives from './react/renderAlternatives'
+import ready from '@instructure/ready'
 
 if (ENV.can_create_conferences) {
   if (ENV.render_alternatives) {
@@ -127,5 +128,7 @@ const ConferencesRouter = Backbone.Router.extend({
   }
 })
 
-window.router = new ConferencesRouter()
-Backbone.history.start()
+ready(() => {
+  window.router = new ConferencesRouter()
+  Backbone.history.start()
+})
