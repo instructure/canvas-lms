@@ -53,8 +53,6 @@ Lint/UnusedMethodArgument:
 Metrics:
   Enabled: false # SnR is just too low to have this enabled
 
-Migration:
-  Severity: error
 Migration/Tagged:
   AllowedTags:
     - predeploy
@@ -69,7 +67,7 @@ Naming/HeredocDelimiterNaming:
     # negative regex - these are the _allowed_ delimiters
     # any you add should describe the format of the data, not describe
     # what the data is for. this allows editors to syntax highlight
-    - ^(?!AST|BASE64|CSV|GQL|HTML|JS|MD|PEM|REGEX|RUBY|SQL|SRT|TEXT|XML|YAML).+$
+    - ^(?!AST|BASE64|CSV|GQL|HTML|JS|MD|PEM|REGEX|RUBY|SQL|SRT|TEXT|XML|YAML|PATTERN).+$
 
 Performance:
   Severity: error
@@ -214,11 +212,6 @@ Layout/LineLength:
   AutoCorrect: false
 
 Lint/UriEscapeUnescape:
-  Severity: warning
-
-Migration/NonTransactional:
-  Severity: warning
-Migration/PrimaryKey:
   Severity: warning
 
 Naming/AccessorMethodName:

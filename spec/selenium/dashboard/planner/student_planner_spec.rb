@@ -549,7 +549,7 @@ describe "student planner" do
         get("/courses/#{@course.id}/pages/#{@wiki.id}/edit")
         f("#student_planner_checkbox").click
         wait_for_ajaximations
-        f('input[name="student_todo_at"]').send_keys(format_date_for_view(Time.zone.now).to_s)
+        replace_content(f('input[name="student_todo_at"]'), format_date_for_view(Time.zone.now).to_s, tab_out: true)
         expect_new_page_load { fj('button:contains("Save")').click }
         get("/courses/#{@course.id}/pages/#{@wiki.id}/edit")
         expect(get_value('input[name="student_todo_at"]')).to eq format_date_for_view(Time.zone.today, "%b %-d, %Y, 11:59 PM")
@@ -568,7 +568,7 @@ describe "student planner" do
       get("/courses/#{@course.id}/pages/#{@wiki.id}/edit")
       f("#student_planner_checkbox").click
       wait_for_ajaximations
-      f('input[name="student_todo_at"]').send_keys(format_date_for_view(Time.zone.now).to_s)
+      replace_content(f('input[name="student_todo_at"]'), format_date_for_view(Time.zone.now).to_s, tab_out: true)
       expect_new_page_load { fj('button:contains("Save")').click }
       expect(@wiki.reload.todo_date).to be_present
     end
@@ -584,7 +584,7 @@ describe "student planner" do
 
       get("/courses/#{@course.id}/pages/#{@wiki.id}/edit")
       f("#student_planner_checkbox").click
-      f('input[name="student_todo_at"]').send_keys(format_date_for_view(Time.zone.now).to_s)
+      replace_content(f('input[name="student_todo_at"]'), format_date_for_view(Time.zone.now).to_s, tab_out: true)
       expect_new_page_load { fj('button:contains("Save")').click }
       expect(@wiki.reload.todo_date).to be_present
     end
@@ -595,7 +595,7 @@ describe "student planner" do
         get("/courses/#{@course.id}/discussion_topics/#{@discussion.id}/edit")
         f("#allow_todo_date").click
         wait_for_ajaximations
-        f('input[name="todo_date"]').send_keys(format_date_for_view(Time.zone.now).to_s)
+        replace_content(f('input[name="todo_date"]'), format_date_for_view(Time.zone.now).to_s, tab_out: true)
         expect_new_page_load { submit_form(".form-actions") }
         get("/courses/#{@course.id}/discussion_topics/#{@discussion.id}/edit")
         expect(get_value('input[name="todo_date"]')).to eq format_date_for_view(Time.zone.today, "%b %-d, %Y, 11:59 PM")

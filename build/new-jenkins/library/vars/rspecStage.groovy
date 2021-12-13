@@ -30,8 +30,7 @@ def createDistribution(nestedStages) {
     "ENABLE_AXE_SELENIUM=${env.ENABLE_AXE_SELENIUM}",
     "ENABLE_CRYSTALBALL=${env.ENABLE_CRYSTALBALL}",
     'POSTGRES_PASSWORD=sekret',
-    'SELENIUM_VERSION=3.141.59-20201119',
-    "RSPECQ_ENABLED=${env.RSPECQ_ENABLED}"
+    'SELENIUM_VERSION=3.141.59-20210929'
   ]
 
   def rspecqEnvVars = baseEnvVars + [
@@ -46,22 +45,45 @@ def createDistribution(nestedStages) {
     "RSPECQ_UPDATE_TIMINGS=${env.GERRIT_EVENT_TYPE == 'change-merged' ? '1' : '0'}",
   ]
 
+  // Used only for crystalball map generation
+  def seleniumNodeTotal = configuration.getInteger('selenium-ci-node-total')
+  def seleniumEnvVars = baseEnvVars + [
+    "CI_NODE_TOTAL=$seleniumNodeTotal",
+    'COMPOSE_FILE=docker-compose.new-jenkins.yml:docker-compose.new-jenkins-selenium.yml',
+    'EXCLUDE_TESTS=.*/performance',
+    "FORCE_FAILURE=${configuration.isForceFailureSelenium() ? '1' : ''}",
+    "RERUNS_RETRY=${configuration.getInteger('selenium-rerun-retry')}",
+    "RSPEC_PROCESSES=${configuration.getInteger('selenium-processes')}",
+    'TEST_PATTERN=^./(spec|gems/plugins/.*/spec_canvas)/selenium',
+  ]
+
   def rspecNodeRequirements = [label: 'canvas-docker']
 
-  extendedStage('RSpecQ Reporter for Rspec')
+  if (env.ENABLE_CRYSTALBALL != '1') {
+    extendedStage('RSpecQ Reporter for Rspec')
       .envVars(rspecqEnvVars)
       .hooks(buildSummaryReportHooks.call() + [onNodeAcquired: setupNodeHook])
       .nodeRequirements(rspecNodeRequirements)
       .timeout(15)
       .queue(nestedStages, this.&runReporter)
 
-  rspecqNodeTotal.times { index ->
-    extendedStage("RSpecQ Test Set ${(index + 1).toString().padLeft(2, '0')}")
+    rspecqNodeTotal.times { index ->
+      extendedStage("RSpecQ Test Set ${(index + 1).toString().padLeft(2, '0')}")
         .envVars(rspecqEnvVars + ["CI_NODE_INDEX=$index"])
         .hooks(buildSummaryReportHooks.call() + [onNodeAcquired: setupNodeHook, onNodeReleasing: { tearDownNode('spec') }])
         .nodeRequirements(rspecNodeRequirements)
         .timeout(15)
         .queue(nestedStages, this.&runRspecqSuite)
+    }
+  } else {
+    seleniumNodeTotal.times { index ->
+      extendedStage("Selenium Test Set ${(index + 1).toString().padLeft(2, '0')}")
+        .envVars(seleniumEnvVars + ["CI_NODE_INDEX=$index"])
+        .hooks([onNodeAcquired: setupNodeHook, onNodeReleasing: { tearDownNode('selenium') }])
+        .nodeRequirements(rspecNodeRequirements)
+        .timeout(15)
+        .queue(nestedStages, this.&runLegacySuite)
+    }
   }
 }
 
@@ -69,23 +91,21 @@ def setupNode() {
   try {
     env.AUTO_CANCELLED = env.AUTO_CANCELLED ?: ''
     distribution.unstashBuildScripts()
-    if (env.RSPECQ_ENABLED == '1' && queue_empty()) {
+    if (queue_empty()) {
       env.AUTO_CANCELLED += "${env.CI_NODE_INDEX},"
       cancel_node(SUCCESS_NOT_BUILT, 'Test queue is empty, releasing node.')
       return
     }
     libraryScript.execute 'bash/print-env-excluding-secrets.sh'
-    if (env.RSPECQ_ENABLED == '1') {
-      def redisPassword = URLEncoder.encode("${env.RSPECQ_REDIS_PASSWORD ?: ''}", 'UTF-8')
-      env.RSPECQ_REDIS_URL = "redis://:${redisPassword}@${TEST_QUEUE_HOST}:6379"
-    }
+    def redisPassword = URLEncoder.encode("${env.RSPECQ_REDIS_PASSWORD ?: ''}", 'UTF-8')
+    env.RSPECQ_REDIS_URL = "redis://:${redisPassword}@${TEST_QUEUE_HOST}:6379"
     credentials.withStarlordCredentials { ->
       sh(script: 'build/new-jenkins/docker-compose-pull.sh', label: 'Pull Images')
     }
 
     sh(script: 'build/new-jenkins/docker-compose-build-up.sh', label: 'Start Containers')
   } catch (err) {
-    if (env.RSPECQ_ENABLED == '1' && !(err instanceof FlowInterruptedException)) {
+    if (!(err instanceof FlowInterruptedException)) {
       send_slack_alert(err)
       env.AUTO_CANCELLED += "${env.CI_NODE_INDEX},"
       cancel_node(SUCCESS_UNSTABLE, "RspecQ node setup failed!: ${err}")
@@ -104,8 +124,7 @@ def tearDownNode(prefix) {
   sh 'build/new-jenkins/docker-copy-files.sh /usr/src/app/log/results tmp/rspec_results canvas_ --allow-error --clean-dir'
   sh "build/new-jenkins/docker-copy-files.sh /usr/src/app/log/spec_failures/ tmp/spec_failures/$prefix canvas_ --allow-error --clean-dir"
 
-  // Don't generate map pre-merge
-  if (env.ENABLE_CRYSTALBALL == '1' && env.RSPECQ_ENABLED != '1') {
+  if (env.ENABLE_CRYSTALBALL == '1') {
     sh 'build/new-jenkins/docker-copy-files.sh /usr/src/app/log/results/crystalball_results tmp/crystalball canvas_ --allow-error --clean-dir'
     sh 'ls tmp/crystalball'
     sh 'ls -R'
@@ -159,7 +178,6 @@ def runRspecqSuite() {
     }
     sh(script: 'docker-compose exec -T -e ENABLE_AXE_SELENIUM \
                                        -e ENABLE_CRYSTALBALL \
-                                       -e RSPECQ_ENABLED \
                                        -e SENTRY_DSN \
                                        -e RSPECQ_UPDATE_TIMINGS \
                                        -e JOB_NAME \
