@@ -21,7 +21,7 @@ require "browser/browser"
 
 module Lti
   class Launch
-    FRAME_ALLOWANCES = %w[geolocation microphone camera midi encrypted-media autoplay clipboard-write].freeze
+    FRAME_ALLOWANCES = %w[geolocation microphone camera midi encrypted-media autoplay clipboard-write display-capture].freeze
 
     attr_writer :analytics_id, :analytics_message_type, :resource_url
     attr_accessor :link_text, :params, :launch_type, :tool_dimensions, :base_string
