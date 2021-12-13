@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require "browser/browser"
-
 module Lti
   class Launch
     FRAME_ALLOWANCES = %w[geolocation microphone camera midi encrypted-media autoplay clipboard-write display-capture].freeze
@@ -26,14 +24,8 @@ module Lti
     attr_writer :analytics_id, :analytics_message_type, :resource_url
     attr_accessor :link_text, :params, :launch_type, :tool_dimensions, :base_string
 
-    def self.iframe_allowances(user_agent = nil)
-      browser = Browser.new(user_agent)
-
-      if user_agent.blank? || browser.chrome? || browser.firefox?(">= 74") || browser.edge?(">= 79")
-        return FRAME_ALLOWANCES.map { |s| "#{s} *" }
-      end
-
-      FRAME_ALLOWANCES
+    def self.iframe_allowances
+      FRAME_ALLOWANCES.map { |s| "#{s} *" }
     end
 
     def initialize(options = {})
