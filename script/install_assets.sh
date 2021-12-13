@@ -44,13 +44,13 @@ while getopts ":c:p" opt; do
       fi
       ;;
     p )
-      WITH_PULSAR='n'
+      WITH_PULSAR='y'
       ;;
   esac
 done
 
 if [[ ${BUNDLE_CONFIG-n} = 'y' ]] || [[ ${ALL_COMMANDS-n} = 'y' ]]; then
-  bundle_config_and_install ${WITH_PULSAR-y}
+  bundle_config_and_install ${WITH_PULSAR-n}
 fi
 if [[ ${YARN_INSTALL-n} = 'y' ]] || [[ ${ALL_COMMANDS-n} = 'y' ]]; then
   yarn_install
