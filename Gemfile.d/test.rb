@@ -62,7 +62,7 @@ group :test do
   gem "json-schema", "~> 2.8.1"
 
   gem "parallel_tests"
-  gem "rspecq", github: "kyler-instructure/rspecq", ref: "9c6cb347db06ae64c4ec3f9002640f72f780e4a6"
+  gem "rspecq", github: "kyler-instructure/rspecq", ref: "f3a1c2fc06237caae6316f851ec387dee9ca8e44"
   gem "flakey_spec_catcher", "~> 0.11.2", require: false
   gem "factory_bot", "6.1.0", require: false
   gem "rspec_junit_formatter", require: false

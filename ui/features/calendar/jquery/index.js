@@ -1024,7 +1024,10 @@ export default class Calendar {
     // Get any custom colors that have been set
     $.getJSON(`/api/v1/users/${this.options.userId}/colors/`, data => {
       const customColors = data.custom_colors
-      const colors = colorSlicer.getColors(this.contextCodes.length, 275)
+      const colors = colorSlicer.getColors(this.contextCodes.length, 275, {
+        unsafe: !ENV.use_high_contrast
+      })
+
       const newCustomColors = {}
       const html = this.contextCodes
         .map((contextCode, index) => {

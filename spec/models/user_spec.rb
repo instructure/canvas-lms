@@ -806,8 +806,8 @@ describe User do
         observer_enrollment2.save!
 
         @teacher_course = course_factory(course_name: "English ", active_course: true)
-        teacher_enrollment = @teacher_course.enroll_user(@user, "TeacherEnrollment", enrollment_state: "active")
-        teacher_enrollment.save!
+        @teacher_enrollment = @teacher_course.enroll_user(@user, "TeacherEnrollment", enrollment_state: "active")
+        @teacher_enrollment.save!
 
         @student_course = course_factory(course_name: "Leadership", active_course: true)
         student_enrollment = @student_course.enroll_user(@user, "StudentEnrollment", enrollment_state: "active")
@@ -829,6 +829,22 @@ describe User do
           [@teacher_course.id, "TeacherEnrollment"],
           [@student_course.id, "StudentEnrollment"]
         ]
+      end
+
+      it "returns only own courses with active enrollments if the associated_user is the current user when there are other active enrollments" do
+        # In some cases, courses would be returned if there was at least one active enrollment
+        # even if the enrollment under test was not active.
+        # Ensure there is at least one active enrollment in the course.
+        @teacher_course.enroll_user(user_model, "StudentEnrollment", enrollment_state: "active")
+
+        # Marking the enrollment_state as completed instead of @teacher_enrollment.complete! because
+        # the query is done on enrollment_state
+        @teacher_enrollment.enrollment_state.update(state: "completed")
+        expect(@observer
+         .courses_with_primary_enrollment(:current_and_invited_courses, nil, observee_user: @observer)
+         .map { |c| [c.id, c.primary_enrollment_type] }).to eq [
+           [@student_course.id, "StudentEnrollment"]
+         ]
       end
 
       describe "with cross sharding" do
@@ -2329,13 +2345,15 @@ describe User do
       end
 
       it "sorts by the current locale" do
-        I18n.locale = :es
-        expect(User.sortable_name_order_by_clause).to match(/'es'/)
-        expect(User.sortable_name_order_by_clause).not_to match(/'root'/)
-        # english has no specific sorting rules, so use root
-        I18n.locale = :en
-        expect(User.sortable_name_order_by_clause).not_to match(/'es'/)
-        expect(User.sortable_name_order_by_clause).to match(/'root'/)
+        I18n.with_locale(:es) do
+          expect(User.sortable_name_order_by_clause).to match(/'es'/)
+          expect(User.sortable_name_order_by_clause).not_to match(/'root'/)
+        end
+        I18n.with_locale(:en) do
+          # english has no specific sorting rules, so use root
+          expect(User.sortable_name_order_by_clause).not_to match(/'es'/)
+          expect(User.sortable_name_order_by_clause).to match(/'root'/)
+        end
       end
     end
 
@@ -2377,6 +2395,75 @@ describe User do
     profile.bio = "bio!"
     profile.save!
     expect(user.profile).to eq profile
+  end
+
+  describe "common_account_chain" do
+    before :once do
+      user_with_pseudonym
+    end
+
+    let_once(:root_acct1) { Account.create! }
+    let_once(:root_acct2) { Account.create! }
+
+    it "work for just root accounts" do
+      @user.user_account_associations.create!(account_id: root_acct2.id)
+      @user.reload
+      expect(@user.common_account_chain(root_acct1)).to eq []
+      expect(@user.common_account_chain(root_acct2)).to eql [root_acct2]
+    end
+
+    it "works for one level of sub accounts" do
+      root_acct = root_acct1
+      sub_acct1 = Account.create!(parent_account: root_acct)
+      sub_acct2 = Account.create!(parent_account: root_acct)
+
+      @user.user_account_associations.create!(account_id: root_acct.id)
+      expect(@user.reload.common_account_chain(root_acct)).to eql [root_acct]
+
+      @user.user_account_associations.create!(account_id: sub_acct1.id)
+      expect(@user.reload.common_account_chain(root_acct)).to eql [root_acct, sub_acct1]
+
+      @user.user_account_associations.create!(account_id: sub_acct2.id)
+      expect(@user.reload.common_account_chain(root_acct)).to eql [root_acct]
+    end
+
+    context "two levels of sub accounts" do
+      let_once(:root_acct) { root_acct1 }
+      let_once(:sub_acct1) { Account.create!(parent_account: root_acct) }
+      let_once(:sub_sub_acct1) { Account.create!(parent_account: sub_acct1) }
+      let_once(:sub_sub_acct2) { Account.create!(parent_account: sub_acct1) }
+      let_once(:sub_acct2) { Account.create!(parent_account: root_acct) }
+
+      it "finds the correct branch point" do
+        @user.user_account_associations.create!(account_id: root_acct.id)
+        expect(@user.reload.common_account_chain(root_acct)).to eql [root_acct]
+
+        @user.user_account_associations.create!(account_id: sub_acct1.id)
+        expect(@user.reload.common_account_chain(root_acct)).to eql [root_acct, sub_acct1]
+
+        @user.user_account_associations.create!(account_id: sub_sub_acct1.id)
+        expect(@user.reload.common_account_chain(root_acct)).to eql [root_acct, sub_acct1, sub_sub_acct1]
+
+        @user.user_account_associations.create!(account_id: sub_sub_acct2.id)
+        expect(@user.reload.common_account_chain(root_acct)).to eql [root_acct, sub_acct1]
+
+        @user.user_account_associations.create!(account_id: sub_acct2.id)
+        expect(@user.reload.common_account_chain(root_acct)).to eql [root_acct]
+      end
+
+      it "breaks early if a user has an enrollment partway down the chain" do
+        course_with_student(user: @user, account: sub_acct1, active_all: true)
+        @user.user_account_associations.create!(account_id: sub_sub_acct1.id)
+        @user.reload
+
+        full_chain = [root_acct, sub_acct1, sub_sub_acct1]
+        overlap = @user.user_account_associations.map(&:account_id) & full_chain.map(&:id)
+        expect(overlap.sort).to eql full_chain.map(&:id)
+        expect(@user.common_account_chain(root_acct)).to(
+          eql([root_acct, sub_acct1])
+        )
+      end
+    end
   end
 
   describe "mfa_settings" do
@@ -3585,33 +3672,6 @@ describe User do
       @student.generate_observer_pairing_code
       pairing_code = @student.generate_observer_pairing_code
       expect(pairing_code.code).to eq "123abc"
-    end
-  end
-
-  describe "#custom_colors" do
-    context "user has high_contrast and high_contrast_course_colors enables" do
-      let(:user) { user_model }
-
-      before do
-        user.enable_feature!(:high_contrast)
-        Account.site_admin.enable_feature!(:high_contrast_course_colors)
-      end
-
-      it "sufficiently darkens colors with a contrast below 4.5" do
-        user.preferences[:custom_colors] = {
-          user_1: "#5a92de",
-          course_1: "#199eb7",
-          course_2: "#ffffff",
-          course_3: "#c8c8c8",
-          course_4: "#767777"
-        }
-        expect(user.custom_colors.map { |_k, v| WCAGColorContrast.ratio(v.delete("#"), "ffffff") }).to all(be >= 4.5)
-      end
-
-      it "leaves colors with enough contrast alone" do
-        user.preferences[:custom_colors] = { user_1: "#757777" }
-        expect(user.custom_colors[:user_1]).to be("#757777")
-      end
     end
   end
 

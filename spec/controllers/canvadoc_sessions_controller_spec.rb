@@ -514,42 +514,23 @@ describe CanvadocSessionsController do
 
       context "when annotation_context is present" do
         before do
-          @assignment.update!(annotatable_attachment: @attachment, submission_types: "online_text_entry,student_annotation")
-          @assignment.submit_homework(
-            @student,
-            submission_type: "student_annotation",
-            annotatable_attachment_id: @attachment.id
+          @assignment.update!(annotatable_attachment: @attachment, submission_types: "student_annotation")
+          @submission.update!(attempt: 2)
+          @annotation_context = @submission.canvadocs_annotation_contexts.find_or_create_by(
+            attachment: @attachment,
+            submission_attempt: @submission.attempt
           )
-
-          @submission.reload
-        end
-
-        let(:annotation_context) do
-          @submission.canvadocs_annotation_contexts.find_by(attachment: @attachment, submission_attempt: 1)
         end
 
         it "sends along the annotation_context" do
-          custom_blob = blob.merge(annotation_context: annotation_context.launch_id).to_json
+          custom_blob = blob.merge(annotation_context: @annotation_context.launch_id).to_json
           custom_hmac = Canvas::Security.hmac_sha1(custom_blob)
 
           expect(@attachment.canvadoc)
             .to receive(:session_url)
-            .with(hash_including(annotation_context: annotation_context.launch_id))
+            .with(hash_including(annotation_context: @annotation_context.launch_id))
 
           get :show, params: { blob: custom_blob, hmac: custom_hmac }
-        end
-
-        it "shows all annotations for past attempts when the most recent attempt is not an annotation" do
-          Timecop.freeze(10.minutes.from_now(@submission.submitted_at)) do
-            @assignment.submit_homework(@student, submission_type: "online_text_entry", body: "hi")
-            custom_blob = blob.merge(annotation_context: annotation_context.launch_id).to_json
-            custom_hmac = Canvas::Security.hmac_sha1(custom_blob)
-            expect(@attachment.canvadoc)
-              .to receive(:session_url)
-              .with(hash_including(restrict_annotations_to_user_filter: false, user_filter: []))
-
-            get :show, params: { blob: custom_blob, hmac: custom_hmac }
-          end
         end
 
         context "when the user is a student" do
@@ -558,7 +539,7 @@ describe CanvadocSessionsController do
           end
 
           it "sets read_only to true if the CanvadocsAnnotationContext is not a draft" do
-            custom_blob = blob.merge(annotation_context: annotation_context.launch_id).to_json
+            custom_blob = blob.merge(annotation_context: @annotation_context.launch_id).to_json
             custom_hmac = Canvas::Security.hmac_sha1(custom_blob)
 
             expect(@attachment.canvadoc)
@@ -584,7 +565,7 @@ describe CanvadocSessionsController do
         it "sets read_only to false when the teacher has permission to grade" do
           user_session(@teacher)
           custom_blob = blob.merge(
-            annotation_context: annotation_context.launch_id,
+            annotation_context: @annotation_context.launch_id,
             enrollment_type: "teacher",
             user_id: @teacher.global_id
           ).to_json
@@ -601,7 +582,7 @@ describe CanvadocSessionsController do
           @course.root_account.role_overrides.create!(permission: "manage_grades", role: teacher_role, enabled: false)
           user_session(@teacher)
           custom_blob = blob.merge(
-            annotation_context: annotation_context.launch_id,
+            annotation_context: @annotation_context.launch_id,
             enrollment_type: "teacher",
             user_id: @teacher.global_id
           ).to_json

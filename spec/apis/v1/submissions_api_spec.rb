@@ -740,7 +740,6 @@ describe "Submissions API", type: :request do
     expect(comment).to have_key("author")
     expect(comment["author"]).to eq({
                                       "id" => @student.id,
-                                      "anonymous_id" => @student.id.to_s(36),
                                       "display_name" => "User",
                                       "html_url" => "http://www.example.com/courses/#{@course.id}/users/#{@student.id}",
                                       "avatar_image_url" => User.avatar_fallback_url(nil, request),
@@ -1020,7 +1019,6 @@ describe "Submissions API", type: :request do
             "edited_at" => nil,
             "author" => {
               "id" => @teacher.id,
-              "anonymous_id" => @teacher.id.to_s(36),
               "display_name" => "User",
               "html_url" => "http://www.example.com/courses/#{@course.id}/users/#{@teacher.id}",
               "avatar_image_url" => User.avatar_fallback_url(nil, request),
@@ -1349,7 +1347,6 @@ describe "Submissions API", type: :request do
             "edited_at" => nil,
             "author" => {
               "id" => @teacher.id,
-              "anonymous_id" => @teacher.id.to_s(36),
               "display_name" => "User",
               "html_url" => "http://www.example.com/courses/#{@course.id}/users/#{@teacher.id}",
               "avatar_image_url" => User.avatar_fallback_url(nil, request),
@@ -5380,7 +5377,6 @@ describe "Submissions API", type: :request do
         json = api_call_as_user(@teacher, :get, @path, @params)
         expect(json).to match_array(
           [{ "id" => @student1.id,
-             "anonymous_id" => @student1.id.to_s(36),
              "display_name" => "User",
              "avatar_image_url" => "http://www.example.com/images/messages/avatar-50.png",
              "pronouns" => nil,
@@ -5400,7 +5396,6 @@ describe "Submissions API", type: :request do
                  "final" => false,
                  "speedgrader_url" => "http://www.example.com/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}&student_id=#{@student1.id}" }] },
            { "id" => @student2.id,
-             "anonymous_id" => @student2.id.to_s(36),
              "display_name" => "User",
              "avatar_image_url" => "http://www.example.com/images/messages/avatar-50.png",
              "pronouns" => nil,

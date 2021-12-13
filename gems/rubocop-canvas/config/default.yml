@@ -12,22 +12,12 @@ Lint/NoSleep:
   Exclude:
     - "**/spec/selenium/test_setup/**/*.rb"
 
-Migration/AddForeignKey:
-  Enable: true
-  Include:
-    - "**/db/migrate/*.rb"
-
 Migration/ConcurrentIndex:
   Enabled: true
   Include:
     - "**/db/migrate/*.rb"
 
 Migration/Delay:
-  Enabled: true
-  Include:
-    - "**/db/migrate/*.rb"
-
-Migration/Execute:
   Enabled: true
   Include:
     - "**/db/migrate/*.rb"

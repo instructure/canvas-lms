@@ -27,10 +27,8 @@ class ImmersiveReaderController < ApplicationController
   before_action :require_user
   before_action :require_config
 
-  class ServiceError < StandardError; end
-
   def ir_config
-    @ir_config ||= YAML.safe_load(Canvas::DynamicSettings.find(tree: :private)["immersive_reader.yml"] || "{}").with_indifferent_access
+    @ir_config ||= YAML.safe_load(Canvas::DynamicSettings.find(tree: :private)["immersive_reader.yml"] || "{}")
   end
 
   def require_config
@@ -56,7 +54,6 @@ class ImmersiveReaderController < ApplicationController
 
   def authenticate
     response = CanvasHttp.post(service_url, headers, form_data: form)
-
     if response && response.code == "200"
       parsed = JSON.parse(response.body)
       render json: {
@@ -64,16 +61,8 @@ class ImmersiveReaderController < ApplicationController
         subdomain: ir_config[:ir_subdomain]
       }
     else
-      body = begin
-        JSON.parse(response.body)
-      rescue JSON::ParserError
-        {}
-      end
-
-      message = "Error connecting to cognitive services #{body["error_description"]}"
+      message = "Error connecting to cognitive services #{response}"
       raise ServiceError, message
     end
-  rescue ServiceError => e
-    Canvas::Errors.capture_exception(:immersive_reader, e, :warn)
   end
 end

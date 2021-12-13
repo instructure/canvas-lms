@@ -1,7 +1,7 @@
 test:
   host: "localhost"
   browser: "chrome"
-  chromedriver_version: "94.0.4606.61"
+  chromedriver_version: "87.0.4280.20"
   # auto_open_devtools: true
   # headless: true
   # window_size: "1237,974"

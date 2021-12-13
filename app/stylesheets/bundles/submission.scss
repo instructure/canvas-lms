@@ -41,12 +41,6 @@
     display: flex;
     align-items: center;
   }
-
-  .submission-details-header__grade-summary {
-    label {
-      font-size: 1rem;
-    }
-  }
 }
 .submission-details-header__heading {
   margin: 0 0 $ic-sp * 0.5;
@@ -214,11 +208,5 @@
 
   .turnitin_similarity_score, .turnitin_similarity_score:hover {
     color: $ic-color-dark;
-  }
-}
-
-#add_comment_form {
-  label.add_a_comment {
-    font-size: 1rem;
   }
 }

@@ -54,8 +54,10 @@ export default function ComputerPanel({
   updateSubtitles,
   bounds
 }) {
-  const {ADD_CLOSED_CAPTIONS_OR_SUBTITLES, LOADING_MEDIA} =
-    uploadMediaTranslations.UploadMediaStrings
+  const {
+    ADD_CLOSED_CAPTIONS_OR_SUBTITLES,
+    LOADING_MEDIA
+  } = uploadMediaTranslations.UploadMediaStrings
   const [messages, setMessages] = useState([])
   const [mediaTracksCheckbox, setMediaTracksCheckbox] = useState(false)
   const [previewURL, setPreviewURL] = useState(null)
@@ -162,7 +164,7 @@ export default function ComputerPanel({
             }}
           />
         </View>
-        {(isVideo(theFile.type) || isAudio(theFile.type)) && (
+        {isVideo(theFile.type) && (
           <>
             <View display="block" padding="medium medium medium 0">
               <Checkbox
