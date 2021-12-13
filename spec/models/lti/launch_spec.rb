@@ -34,12 +34,13 @@ module Lti
 
         it 'sets allowed origin to "*"' do
           expect(subject).to match_array [
-            'geolocation *',
-            'microphone *',
-            'camera *',
-            'midi *',
-            'encrypted-media *',
-            'autoplay *'
+            "geolocation *",
+            "microphone *",
+            "camera *",
+            "midi *",
+            "encrypted-media *",
+            "autoplay *",
+            "display-capture *"
           ]
         end
       end
@@ -50,13 +51,14 @@ module Lti
         end
 
         it 'sets allowed origin to "*"' do
-          expect(subject).to match_array [
-            'geolocation',
-            'microphone',
-            'camera',
-            'midi',
-            'encrypted-media',
-            'autoplay'
+          expect(subject).to match_array %w[
+            geolocation
+            microphone
+            camera
+            midi
+            encrypted-media
+            autoplay
+            display-capture
           ]
         end
       end
@@ -68,12 +70,13 @@ module Lti
 
         it 'sets allowed origin to "*"' do
           expect(subject).to match_array [
-            'geolocation *',
-            'microphone *',
-            'camera *',
-            'midi *',
-            'encrypted-media *',
-            'autoplay *'
+            "geolocation *",
+            "microphone *",
+            "camera *",
+            "midi *",
+            "encrypted-media *",
+            "autoplay *",
+            "display-capture *"
           ]
         end
       end
@@ -84,13 +87,14 @@ module Lti
         end
 
         it 'does not set allowed origin to "*"' do
-          expect(subject).to match_array [
-            'geolocation',
-            'microphone',
-            'camera',
-            'midi',
-            'encrypted-media',
-            'autoplay'
+          expect(subject).to match_array %w[
+            geolocation
+            microphone
+            camera
+            midi
+            encrypted-media
+            autoplay
+            display-capture
           ]
         end
       end
@@ -102,12 +106,13 @@ module Lti
 
         it 'sets allowed origin to "*"' do
           expect(subject).to match_array [
-            'geolocation *',
-            'microphone *',
-            'camera *',
-            'midi *',
-            'encrypted-media *',
-            'autoplay *'
+            "geolocation *",
+            "microphone *",
+            "camera *",
+            "midi *",
+            "encrypted-media *",
+            "autoplay *",
+            "display-capture *"
           ]
         end
       end
@@ -118,13 +123,14 @@ module Lti
         end
 
         it 'does not set allowed origin to "*"' do
-          expect(subject).to match_array [
-            'geolocation',
-            'microphone',
-            'camera',
-            'midi',
-            'encrypted-media',
-            'autoplay'
+          expect(subject).to match_array %w[
+            geolocation
+            microphone
+            camera
+            midi
+            encrypted-media
+            autoplay
+            display-capture
           ]
         end
       end

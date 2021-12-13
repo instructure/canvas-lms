@@ -307,7 +307,8 @@ RSpec.describe ApplicationController do
         "camera *",
         "midi *",
         "encrypted-media *",
-        "autoplay *"
+        "autoplay *",
+        "display-capture *"
       ]
     end
 
