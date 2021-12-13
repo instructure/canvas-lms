@@ -17,6 +17,9 @@
  */
 
 import I18n from 'i18n!user_logins'
+import React from 'react'
+import ReactDOM from 'react-dom'
+import SuspendedIcon from '../react/SuspendedIcon'
 import $ from 'jquery'
 import Pseudonym from '@canvas/pseudonyms/backbone/models/Pseudonym.coffee'
 import '@canvas/forms/jquery/jquery.instructure_forms' /* formSubmit, fillFormData, formErrors */
@@ -25,7 +28,9 @@ import '@canvas/util/jquery/fixDialogButtons'
 import '@canvas/jquery/jquery.instructure_misc_plugins' /* confirmDelete, showIf */
 import '@canvas/util/templateData'
 
-$(document).ready(function() {
+const savedSSOIcons = {}
+
+$(function () {
   const $form = $('#edit_pseudonym_form')
   $form.formSubmit({
     disableWhileLoading: true,
@@ -39,20 +44,19 @@ $(document).ready(function() {
         delete data['pseudonym[password_confirmation]']
       }
     },
-    beforeSubmit(data) {
+    beforeSubmit() {
       const select = $(this).find('.account_id select')[0]
       const idx = select && select.selectedIndex
       $(this).data('account_name', null)
       $(this).data('account_name', select && select.options[idx] && select.options[idx].innerHTML)
     },
     success(data) {
+      let $login
       $(this).dialog('close')
       if ($(this).data('unique_id_text')) {
-        var $login = $(this)
-          .data('unique_id_text')
-          .parents('.login')
+        $login = $(this).data('unique_id_text').parents('.login')
       } else {
-        var $login = $('#login_information .login.blank').clone(true)
+        $login = $('#login_information .login.blank').clone(true)
         $('#login_information .add_holder').before($login)
         $login.removeClass('blank')
         $login.show()
@@ -74,32 +78,26 @@ $(document).ready(function() {
             'You do not have sufficient privileges to make the change requested'
           )
         )
-      const accountId = $(this)
-        .find('.account_id select')
-        .val()
+      const accountId = $(this).find('.account_id select').val()
       const policy =
         (ENV.PASSWORD_POLICIES && ENV.PASSWORD_POLICIES[accountId]) || ENV.PASSWORD_POLICY
       errors = Pseudonym.prototype.normalizeErrors(errors, policy)
       $(this).formErrors(errors)
     }
   })
-  $('#edit_pseudonym_form .cancel_button').click(() => {
+  $('#edit_pseudonym_form .cancel_button').on('click', () => {
     $form.dialog('close')
   })
   $('#login_information')
-    .delegate('.login_details_link', 'click', function(event) {
+    .delegate('.login_details_link', 'click', function (event) {
       event.preventDefault()
-      $(this)
-        .parents('tr')
-        .find('.login_details')
-        .show()
+      $(this).parents('tr').find('.login_details').show()
       $(this).hide()
     })
-    .delegate('.edit_pseudonym_link', 'click', function(event) {
+    .delegate('.edit_pseudonym_link', 'click', function (event) {
       event.preventDefault()
-      const $form = $('#edit_pseudonym_form'),
-        $sis_row = $form.find('.sis_user_id'),
-        $integration_id_row = $form.find('.integration_id')
+      const $sis_row = $form.find('.sis_user_id')
+      const $integration_id_row = $form.find('.integration_id')
       $sis_row.hide()
       $integration_id_row.hide()
       $form.attr('action', $(this).attr('rel')).attr('method', 'PUT')
@@ -111,21 +109,15 @@ $(document).ready(function() {
       data.password = ''
       data.password_confirmation = ''
       $form.fillFormData(data, {object_name: 'pseudonym'})
-      if (data.can_edit_sis_user_id == 'true') {
+      if (data.can_edit_sis_user_id === 'true') {
         $sis_row.show()
         $integration_id_row.show()
       } else {
         $sis_row.remove()
         $integration_id_row.remove()
       }
-      const passwordable = $(this)
-        .parents('.links')
-        .hasClass('passwordable')
-      const delegated =
-        passwordable &&
-        $(this)
-          .parents('.links')
-          .hasClass('delegated-auth')
+      const passwordable = $(this).parents('.links').hasClass('passwordable')
+      const delegated = passwordable && $(this).parents('.links').hasClass('delegated-auth')
       $form.toggleClass('passwordable', passwordable)
       $form.find('tr.password').showIf(passwordable)
       $form.find('tr.delegated').showIf(delegated)
@@ -140,15 +132,9 @@ $(document).ready(function() {
         close() {
           if (
             $form.data('unique_id_text') &&
-            $form
-              .data('unique_id_text')
-              .parents('.login')
-              .hasClass('blank')
+            $form.data('unique_id_text').parents('.login').hasClass('blank')
           ) {
-            $form
-              .data('unique_id_text')
-              .parents('.login')
-              .remove()
+            $form.data('unique_id_text').parents('.login').remove()
           }
         }
       })
@@ -157,29 +143,22 @@ $(document).ready(function() {
         .find('.submit_button')
         .text(I18n.t('buttons.update_login', 'Update Login'))
       $form.dialog('option', 'beforeClose', () => {
-        $('.error_box:visible').click()
+        $('.error_box:visible').trigger('click')
       })
-      const $unique_id = $(this)
-        .parents('.login')
-        .find('.unique_id')
+      const $unique_id = $(this).parents('.login').find('.unique_id')
       $form.data('unique_id_text', $unique_id)
-      $form
-        .find(':input:visible:first')
-        .focus()
-        .select()
+      $form.find(':input:visible:first').trigger('focus').trigger('select')
     })
-    .delegate('.delete_pseudonym_link', 'click', function(event) {
+    .delegate('.delete_pseudonym_link', 'click', function (event) {
       event.preventDefault()
       if ($('#login_information .login:visible').length < 2) {
+        // eslint-disable-next-line no-alert
         alert(
           I18n.t('notices.cant_delete_last_login', "You can't delete the last login for a user")
         )
         return
       }
-      const login = $(this)
-        .parents('.login')
-        .find('.unique_id')
-        .text()
+      const login = $(this).parents('.login').find('.unique_id').text()
       $(this)
         .parents('.login')
         .confirmDelete({
@@ -197,7 +176,7 @@ $(document).ready(function() {
           }
         })
     })
-    .delegate('.add_pseudonym_link', 'click', function(event) {
+    .delegate('.add_pseudonym_link', 'click', function (event) {
       event.preventDefault()
       $('#login_information .login.blank .edit_pseudonym_link').click()
       $form.attr('action', $(this).attr('rel')).attr('method', 'POST')
@@ -213,7 +192,7 @@ $(document).ready(function() {
       $form.data('unique_id_text', null)
     })
 
-  $('.reset_mfa_link').click(function(event) {
+  $('.reset_mfa_link').on('click', function (event) {
     event.preventDefault()
     const $disable_mfa_link = $(this)
     $.ajaxJSON($disable_mfa_link.attr('href'), 'DELETE', {}, () => {
@@ -221,4 +200,50 @@ $(document).ready(function() {
       $disable_mfa_link.parent().remove()
     })
   })
+
+  // TODO: the user's pseudonyms are listed in this bundle (user_logins) but the
+  // control of suspending/reactivating them is unfortunately in another bundle
+  // (user_name), and the two bundles have no way of directly communicating with
+  // each other. So for now we will just use a CustomEvent and use window as the
+  // communication bus. For the other end of this communication channel, see
+  // ui/features/user_name/react/UserSuspendLink.js
+  //
+  // Eventually both bundles should be rewritten into one larger tree of React
+  // components, and then this can be redone in more standard ways.
+
+  const pseuds = ENV.user_suspend_status?.pseudonyms
+
+  function setSuspend(id) {
+    const icon = document.querySelector(`.sso-icon[data-pseudonym-id="${id}"]`)
+    const login = pseuds.find(p => p.id === id).unique_id
+    if (typeof savedSSOIcons[id] === 'undefined') savedSSOIcons[id] = icon.cloneNode(true)
+    const innerDiv = document.createElement('div')
+    icon.replaceChildren(innerDiv)
+    ReactDOM.render(<SuspendedIcon login={login} />, innerDiv)
+  }
+
+  function unsetSuspend(id) {
+    const icon = document.querySelector(`.sso-icon[data-pseudonym-id="${id}"]`)
+    if (typeof savedSSOIcons[id] === 'undefined') return
+    icon.replaceWith(savedSSOIcons[id].cloneNode(true))
+    delete savedSSOIcons[id]
+  }
+
+  if (pseuds) {
+    // Replace the icon for any suspended pseudonym with the "suspended" component
+    pseuds
+      .filter(p => p.workflow_state === 'suspended')
+      .map(p => p.id)
+      .forEach(id => setSuspend(id))
+
+    // I don't THINK this ever has to be removed in this configuration
+    window.addEventListener('username:pseudonymstatuschange', function (event) {
+      const icons = document.querySelectorAll('.sso-icon[data-pseudonym-id]')
+      const iconIdOf = elt => elt.attributes.getNamedItem('data-pseudonym-id').value
+      const action = event.detail.action === 'suspend' ? setSuspend : unsetSuspend
+      for (const icon of icons) {
+        action(iconIdOf(icon))
+      }
+    })
+  }
 })
