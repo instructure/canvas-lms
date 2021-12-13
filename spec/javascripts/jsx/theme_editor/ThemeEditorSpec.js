@@ -76,7 +76,7 @@ QUnit.module('Theme Editor Theme Store', {
             {
               variable_name: 'ic-brand-primary',
               type: 'color',
-              default: '#008EE2',
+              default: '#0374B5',
               human_name: 'Primary Brand Color'
             },
             {

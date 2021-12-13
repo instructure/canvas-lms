@@ -23,7 +23,7 @@ import {PlannerItem_raw as PlannerItem} from '../index'
 
 const MY_TIMEZONE = 'America/Los_Angeles'
 const DEFAULT_DATE = moment.tz('2011-12-17T03:30:00', MY_TIMEZONE)
-const user = {id: '1', displayName: 'Jane', avatarUrl: '/picture/is/here', color: '#00AC18'}
+const user = {id: '1', displayName: 'Jane', avatarUrl: '/picture/is/here', color: '#0B874B'}
 
 function defaultProps(option = {}) {
   return {

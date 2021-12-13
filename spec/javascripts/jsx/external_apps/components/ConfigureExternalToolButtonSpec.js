@@ -71,7 +71,7 @@ test('shows beginning info alert and adds styles to iframe', () => {
   const wrapper = mount(<ConfigureExternalToolButton tool={tool} modalIsOpen />)
   wrapper.instance().handleAlertFocus({target: {className: 'before'}})
   equal(wrapper.state().beforeExternalContentAlertClass, '')
-  deepEqual(wrapper.state().iframeStyle, {border: '2px solid #008EE2', width: '300px'})
+  deepEqual(wrapper.state().iframeStyle, {border: '2px solid #0374B5', width: '300px'})
   wrapper.unmount()
 })
 
@@ -79,7 +79,7 @@ test('shows ending info alert and adds styles to iframe', () => {
   const wrapper = mount(<ConfigureExternalToolButton tool={tool} modalIsOpen />)
   wrapper.instance().handleAlertFocus({target: {className: 'after'}})
   equal(wrapper.state().afterExternalContentAlertClass, '')
-  deepEqual(wrapper.state().iframeStyle, {border: '2px solid #008EE2', width: '300px'})
+  deepEqual(wrapper.state().iframeStyle, {border: '2px solid #0374B5', width: '300px'})
   wrapper.unmount()
 })
 

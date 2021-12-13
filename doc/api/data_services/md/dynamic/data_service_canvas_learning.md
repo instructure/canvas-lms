@@ -621,7 +621,7 @@ Learning
         "description": "Mastery",
         "points": 3.0,
         "mastery": true,
-        "color": "00AC18",
+        "color": "0B874B",
         "workflow_state": "active"
       },
       {
@@ -645,7 +645,7 @@ Learning
         "description": "Well Below Mastery",
         "points": 0.0,
         "mastery": false,
-        "color": "EE0612",
+        "color": "E0061F",
         "workflow_state": "active"
       }
     ]
@@ -726,7 +726,7 @@ Learning
         "description": "Mastery",
         "points": 3.0,
         "mastery": true,
-        "color": "00AC18",
+        "color": "0B874B",
         "workflow_state": "active"
       },
       {
@@ -750,7 +750,7 @@ Learning
         "description": "Well Below Mastery",
         "points": 0.0,
         "mastery": false,
-        "color": "EE0612",
+        "color": "E0061F",
         "workflow_state": "active"
       }
     ]

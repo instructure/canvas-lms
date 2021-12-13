@@ -20,7 +20,7 @@ import {shallow, mount} from 'enzyme'
 import moment from 'moment-timezone'
 import {Day} from '../index'
 
-const user = {id: '1', displayName: 'Jane', avatarUrl: '/picture/is/here', color: '#00AC18'}
+const user = {id: '1', displayName: 'Jane', avatarUrl: '/picture/is/here', color: '#0B874B'}
 
 it('renders the base component with required props', () => {
   const wrapper = shallow(<Day timeZone="America/Denver" day="2017-04-25" />)
