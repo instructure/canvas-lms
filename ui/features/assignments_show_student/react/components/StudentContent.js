@@ -172,7 +172,7 @@ function StudentContent(props) {
         .then(ImmersiveReader => {
           mountPoints.forEach(mountPoint => {
             ImmersiveReader.initializeReaderButton(mountPoint, {
-              content:
+              content: () =>
                 description || I18n.t('No additional details were added for this assignment.'),
               title: name
             })

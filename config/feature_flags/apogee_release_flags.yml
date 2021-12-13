@@ -124,7 +124,14 @@ apply_score_to_ungraded:
   state: hidden
   applies_to: Account
   display_name: Apply Score to Ungraded
-  description: Allows instructors to apply scores to ungraded submissions en masse.
+  description: Allows instructors to apply scores to ungraded submissions en masse from assignment 
+    group and Total column menus in the Gradebook.
   environments:
     development:
       state: allowed
+speedgrader_dialog_for_unposted_comments:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Draft Comment Warning Modal in SpeedGrader
+  description: Enables modal to warn user when a draft comment is left unposted
+    in SpeedGrader.

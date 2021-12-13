@@ -53,8 +53,6 @@ Lint/UnusedMethodArgument:
 Metrics:
   Enabled: false # SnR is just too low to have this enabled
 
-Migration:
-  Severity: error
 Migration/Tagged:
   AllowedTags:
     - predeploy
@@ -214,11 +212,6 @@ Layout/LineLength:
   AutoCorrect: false
 
 Lint/UriEscapeUnescape:
-  Severity: warning
-
-Migration/NonTransactional:
-  Severity: warning
-Migration/PrimaryKey:
   Severity: warning
 
 Naming/AccessorMethodName:

@@ -709,7 +709,7 @@ describe Group do
 
         it "returns the plugin names" do
           tabs = @group.tabs_available(@user)
-          expect(tabs.find { |t| t[:css_class] == "conferences" }[:label]).to eq("Big blue button Wimba (Conferences)")
+          expect(tabs.find { |t| t[:css_class] == "conferences" }[:label]).to eq("Big blue button Wimba")
         end
       end
 

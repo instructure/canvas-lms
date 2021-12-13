@@ -394,6 +394,7 @@ class GradebooksController < ApplicationController
       active_grading_periods: active_grading_periods_json,
       allow_separate_first_last_names: root_account.allow_gradebook_show_first_last_names? && Account.site_admin.feature_enabled?(:gradebook_show_first_last_names),
       allow_view_ungraded_as_zero: allow_view_ungraded_as_zero?,
+      allow_apply_score_to_ungraded: allow_apply_score_to_ungraded?,
       attachment: last_exported_attachment,
       attachment_url: authenticated_download_url(last_exported_attachment),
       change_gradebook_version_url: context_url(@context, :change_gradebook_version_context_gradebook_url, version: 2),
@@ -893,7 +894,8 @@ class GradebooksController < ApplicationController
           update_submission_grade_url: context_url(@context, :update_submission_context_gradebook_url),
           can_delete_attachments: @domain_root_account.grants_right?(@current_user, session, :become_user),
           media_comment_asset_string: @current_user.asset_string,
-          late_policy: @context.late_policy&.as_json(include_root: false)
+          late_policy: @context.late_policy&.as_json(include_root: false),
+          speedgrader_dialog_for_unposted_comments: Account.site_admin.feature_enabled?(:speedgrader_dialog_for_unposted_comments)
         }
         if grading_role_for_user == :moderator
           env[:provisional_select_url] = api_v1_select_provisional_grade_path(@context.id, @assignment.id, "{{provisional_grade_id}}")
@@ -1429,5 +1431,9 @@ class GradebooksController < ApplicationController
 
   def allow_view_ungraded_as_zero?
     @context.account.feature_enabled?(:view_ungraded_as_zero)
+  end
+
+  def allow_apply_score_to_ungraded?
+    @context.account.feature_enabled?(:apply_score_to_ungraded)
   end
 end

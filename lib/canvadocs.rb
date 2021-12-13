@@ -223,7 +223,7 @@ module Canvadocs
     annotations_supported? && Canvas::Plugin.value_to_boolean(config["hijack_crocodoc_sessions"])
   end
 
-  def self.user_session_params(current_user, attachment: nil, submission: nil)
+  def self.user_session_params(current_user, attachment: nil, submission: nil, attempt: nil)
     if submission.nil?
       return {} if attachment.nil?
 
@@ -269,7 +269,8 @@ module Canvadocs
     # viewing user's annotations (default is in Canvadocs::Session). If we the
     # user_filter is nil here, then we know we didn't have any other reason to
     # be restrictive.
-    if session_params[:user_filter].nil? && submission.submission_type == "student_annotation"
+    submission_type = attempt ? submission.type_for_attempt(attempt) : submission.submission_type
+    if session_params[:user_filter].nil? && submission_type == "student_annotation"
       session_params[:restrict_annotations_to_user_filter] = false
       session_params[:user_filter] = []
     end

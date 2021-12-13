@@ -54,4 +54,8 @@
 <%= html_to_simple_html(asset.message, :base_url => dashboard_url) %>
 </p>
 
-<%= t("View the discussion: %{link}.", link: content(:link)) %>
+<%= t("View the reply in the discussion: ") %>
+<a href="<%= content(:link) %>">
+  <%= content(:link) %>
+</a>
+

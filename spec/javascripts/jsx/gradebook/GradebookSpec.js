@@ -1553,14 +1553,14 @@ test('renders Student Names label', function () {
 
 test('enables the input if there is at least one student to filter by', function () {
   sinon.stub(this.gradebook.gridReady, 'state').returns('resolved')
-  this.gradebook.renderStudentSearchFilter([{id: '1', name: 'Joe Dirt'}])
+  this.gradebook.renderStudentSearchFilter([{id: '1', displayName: 'Joe Dirt'}])
   const studentSearchInput = document.getElementById('student-names-filter')
   notOk(studentSearchInput.disabled)
 })
 
 test('disables the input if the grid has not yet rendered', function () {
   sinon.stub(this.gradebook.gridReady, 'state').returns('pending')
-  this.gradebook.renderStudentSearchFilter([{id: '1', name: 'Joe Dirt'}])
+  this.gradebook.renderStudentSearchFilter([{id: '1', displayName: 'Joe Dirt'}])
   const studentSearchInput = document.getElementById('student-names-filter')
   ok(studentSearchInput.disabled)
 })
@@ -1574,12 +1574,12 @@ test('disables the input if there are no students to filter by', function () {
 
 test('displays a select menu option for each student', function () {
   sinon.stub(this.gradebook.gridReady, 'state').returns('resolved')
-  const student = {id: '1', name: 'Joe Dirt', loaded: true, isPlaceholder: false}
+  const student = {id: '1', displayName: 'Joe Dirt', loaded: true, isPlaceholder: false}
   this.gradebook.renderStudentSearchFilter([student])
   const studentSearchInput = document.getElementById('student-names-filter')
   studentSearchInput.click()
   const options = [...document.querySelectorAll('ul[role="listbox"] li span[role="option"]')]
-  ok(options.some(option => option.textContent === student.name))
+  ok(options.some(option => option.textContent === student.displayName))
   studentSearchInput.click() // close the menu to avoid DOM test pollution
 })
 
@@ -10392,6 +10392,74 @@ QUnit.module('Gradebook#saveSettings', () => {
         strictEqual(error.message, '>:(')
       }
     })
+  })
+})
+
+QUnit.module('Gradebook#allowApplyScoreToUngraded', () => {
+  test('returns true if the allow_apply_score_to_ungraded option is true', () => {
+    const gradebook = createGradebook({allow_apply_score_to_ungraded: true})
+    ok(gradebook.allowApplyScoreToUngraded())
+  })
+
+  test('returns false if the allow_apply_score_to_ungraded option is false', () => {
+    const gradebook = createGradebook({allow_apply_score_to_ungraded: false})
+    notOk(gradebook.allowApplyScoreToUngraded())
+  })
+})
+
+QUnit.module('Gradebook#onApplyScoreToUngradedRequested', hooks => {
+  let gradebook
+  let mountPoint
+
+  hooks.beforeEach(() => {
+    mountPoint = document.body.appendChild(document.createElement('div'))
+    sandbox.stub(ReactDOM, 'render')
+    sandbox.stub(React, 'createElement')
+  })
+
+  hooks.afterEach(() => {
+    ReactDOM.render.restore()
+    React.createElement.restore()
+    mountPoint.remove()
+  })
+
+  test('does not render the modal if the mount point is not present', () => {
+    gradebook = createGradebook({
+      allow_apply_score_to_ungraded: true
+    })
+    gradebook.onApplyScoreToUngradedRequested()
+    ok(ReactDOM.render.notCalled)
+  })
+
+  test('does not render the modal if the allow_apply_score_to_ungraded option is false', () => {
+    gradebook = createGradebook({
+      applyScoreToUngradedModalNode: mountPoint
+    })
+    gradebook.onApplyScoreToUngradedRequested()
+    ok(ReactDOM.render.notCalled)
+  })
+
+  test('renders the modal when the mount point is present and allow_apply_score_to_ungraded is true', () => {
+    gradebook = createGradebook({
+      allow_apply_score_to_ungraded: true,
+      applyScoreToUngradedModalNode: mountPoint
+    })
+    gradebook.onApplyScoreToUngradedRequested()
+
+    strictEqual(ReactDOM.render.callCount, 1)
+    strictEqual(ReactDOM.render.firstCall.args[1], mountPoint)
+  })
+
+  test('passes the supplied assignmentGroup to the render if present', () => {
+    gradebook = createGradebook({
+      allow_apply_score_to_ungraded: true,
+      applyScoreToUngradedModalNode: mountPoint
+    })
+
+    gradebook.onApplyScoreToUngradedRequested({id: '100', name: 'group'})
+
+    strictEqual(React.createElement.callCount, 1)
+    deepEqual(React.createElement.firstCall.args[1].assignmentGroup, {id: '100', name: 'group'})
   })
 })
 

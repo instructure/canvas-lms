@@ -566,6 +566,17 @@ describe DiscussionTopic do
           expect(@topic.active_participants_with_visibility.include?(@student2)).to be_falsey
         end
 
+        it "includes teachers if a student creates a discussion topic" do
+          group_category = @course.group_categories.create(name: "new group")
+          @group = @course.groups.create(name: "group", group_category: group_category)
+          @group.add_user(@student1)
+          @topic = @group.discussion_topics.create(title: "Student topic", user: @student1)
+          @topic.save!
+
+          expect(@topic.context).to eq(@group)
+          expect(@topic.active_participants_with_visibility.include?(@teacher)).to be_truthy
+        end
+
         it "does not grant reply permissions to group if course is concluded" do
           @relevant_permissions = %i[read reply update delete read_replies]
           group_category = @course.group_categories.create(name: "new cat")

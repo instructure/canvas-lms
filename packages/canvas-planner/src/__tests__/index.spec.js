@@ -78,7 +78,7 @@ describe('with mock api', () => {
   describe('initializePlanner', () => {
     it('cannot be called twice', async () => {
       await initializePlanner(defaultPlannerOptions())
-      return expect(initializePlanner(defaultPlannerOptions())).rejects.toBeDefined()
+      return expect(initializePlanner(defaultPlannerOptions())).rejects.toThrow()
     })
 
     it('requires flash methods', async () => {

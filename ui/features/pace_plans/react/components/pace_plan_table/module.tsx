@@ -24,9 +24,10 @@ import {ApplyTheme} from '@instructure/ui-themeable'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
-import {IconMiniArrowDownLine, IconMiniArrowRightLine} from '@instructure/ui-icons'
+import {IconMiniArrowDownLine, IconMiniArrowRightLine, IconWarningLine} from '@instructure/ui-icons'
 import {Table} from '@instructure/ui-table'
 import {ToggleDetails} from '@instructure/ui-toggle-details'
+import {Tooltip} from '@instructure/ui-tooltip'
 import {View} from '@instructure/ui-view'
 
 import AssignmentRow from './assignment_row'
@@ -41,6 +42,7 @@ interface PassedProps {
   readonly pacePlan: PacePlan
   readonly responsiveSize: ResponsiveSizes
   readonly showProjections: boolean
+  readonly isCompressing: boolean
 }
 
 export const Module: React.FC<PassedProps> = props => {
@@ -74,12 +76,22 @@ export const Module: React.FC<PassedProps> = props => {
   const renderDateColHeader = () => {
     if (!props.showProjections && !actuallyExpanded && !datesVisible) return null
     return (
-      <ColHeader
-        width={actuallyExpanded ? '6.5rem' : '0'}
-        id={`module-${props.module.id}-duration`}
-      >
+      <ColHeader width={actuallyExpanded ? '9.5em' : '0'} id={`module-${props.module.id}-duration`}>
         <Flex as="div" alignItems="end" justifyItems="center" padding={headerPadding}>
           {I18n.t('Due Date')}
+          {!isStudentPlan && props.isCompressing && (
+            <View as="span" margin="0 0 0 x-small">
+              <Tooltip
+                renderTip={I18n.t(
+                  'Due Dates are being compressed based on your start and end dates'
+                )}
+                placement="top"
+                on={['click', 'hover']}
+              >
+                <IconWarningLine color="error" title={I18n.t('warning')} />
+              </Tooltip>
+            </View>
+          )}
         </Flex>
       </ColHeader>
     )
