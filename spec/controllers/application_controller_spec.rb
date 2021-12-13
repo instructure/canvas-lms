@@ -336,7 +336,8 @@ RSpec.describe ApplicationController do
           "midi *",
           "encrypted-media *",
           "autoplay *",
-          "clipboard-write *"
+          "clipboard-write *",
+          "display-capture *"
         ]
       end
 
