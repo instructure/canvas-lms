@@ -17,19 +17,6 @@ assignments_2_teacher:
   environments:
     production:
       state: disabled
-inline_math_everywhere:
-  state: hidden
-  display_name: 'Math: Support LaTex math equations almost everywhere'
-  description: |-
-    With this feature, LaTex math equations entered into most
-    text entry fields in Canvas will be processed by MathJax.
-    LaTex delimited by \(...\) become inline equations, while
-    $$...$$ will be rendered as a block.  For example,
-    you could choose to title an Assignment \(\sqrt{x}\), or
-    enter $$ax^2 + by + c = 0$$ in a submission comment.
-    This feature requires that the "Math: Updated equation handling"
-    flag is also on.
-  applies_to: RootAccount
 auto_show_cc:
   type: setting
   state: allowed
