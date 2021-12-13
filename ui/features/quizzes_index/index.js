@@ -27,6 +27,7 @@ import QuizCollection from './backbone/collections/QuizCollection'
 import QuizOverrideLoader from './backbone/models/QuizOverrideLoader.coffee'
 import vddTooltip from '@canvas/due-dates/jquery/vddTooltip'
 import {monitorLtiMessages} from '@canvas/lti/jquery/messages'
+import ready from '@instructure/ready'
 
 const QuizzesIndexRouter = Backbone.Router.extend({
   routes: {
@@ -113,9 +114,11 @@ const QuizzesIndexRouter = Backbone.Router.extend({
   }
 })
 
-// Start up the page
-const router = new QuizzesIndexRouter()
-Backbone.history.start()
+ready(() => {
+  // Start up the page
+  const router = new QuizzesIndexRouter()
+  Backbone.history.start()
 
-vddTooltip()
-monitorLtiMessages()
+  vddTooltip()
+  monitorLtiMessages()
+})
