@@ -204,7 +204,7 @@ class ApplicationController < ActionController::Base
           auto_show_cc: @current_user&.auto_show_cc?,
           disable_celebrations: @current_user&.prefers_no_celebrations?,
           disable_keyboard_shortcuts: @current_user&.prefers_no_keyboard_shortcuts?,
-          LTI_LAUNCH_FRAME_ALLOWANCES: Lti::Launch.iframe_allowances(request.user_agent),
+          LTI_LAUNCH_FRAME_ALLOWANCES: Lti::Launch.iframe_allowances,
           DEEP_LINKING_POST_MESSAGE_ORIGIN: request.base_url,
           DEEP_LINKING_LOGGING: Setting.get("deep_linking_logging", nil),
           comment_library_suggestions_enabled: @current_user&.comment_library_suggestions_enabled?,
