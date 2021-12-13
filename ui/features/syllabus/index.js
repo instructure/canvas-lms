@@ -26,6 +26,7 @@ import SyllabusAppointmentGroupsCollection from './backbone/collections/Syllabus
 import SyllabusPlannerCollection from './backbone/collections/SyllabusPlannerCollection'
 import SyllabusView from './backbone/views/SyllabusView'
 import {monitorLtiMessages} from '@canvas/lti/jquery/messages'
+import ready from '@instructure/ready'
 
 // Setup the collections
 const collections = [
@@ -71,66 +72,66 @@ const deferreds = _.map(collections, collection => {
   return deferred
 })
 
-// Create the aggregation collection and view
-const acollection = new SyllabusCollection(collections)
-const view = new SyllabusView({
-  el: '#syllabusTableBody',
-  collection: acollection,
-  can_read: ENV.CAN_READ,
-  is_valid_user: !!ENV.current_user_id
-})
-
-// Attach the immersive reader button if enabled
-const immersive_reader_mount_point = document.getElementById('immersive_reader_mount_point')
-const immersive_reader_mobile_mount_point = document.getElementById(
-  'immersive_reader_mobile_mount_point'
-)
-if (immersive_reader_mount_point || immersive_reader_mobile_mount_point) {
-  import('@canvas/immersive-reader/ImmersiveReader')
-    .then(ImmersiveReader => {
-      const courseSyllabusText = () => document.querySelector('#course_syllabus').innerHTML
-      const title = I18n.t('Course Syllabus')
-      let content
-
-      // We display a default message in #course_syllabus_details when the user
-      // hasn't set any text in the syllabus.
-      if ($.trim(courseSyllabusText())) {
-        content = courseSyllabusText
-      } else {
-        content = () => document.querySelector('#course_syllabus_details').innerHTML
-      }
-
-      if (immersive_reader_mount_point) {
-        ImmersiveReader.initializeReaderButton(immersive_reader_mount_point, {content, title})
-      }
-
-      if (immersive_reader_mobile_mount_point) {
-        ImmersiveReader.initializeReaderButton(immersive_reader_mobile_mount_point, {
-          content,
-          title
-        })
-      }
-    })
-    .catch(e => {
-      console.log('Error loading immersive readers.', e) // eslint-disable-line no-console
-    })
-}
-
-// When all of the fetches have completed, render the view and bind behaviors
-$.when
-  .apply(this, deferreds)
-  .then(() => {
-    view.render()
-    SyllabusBehaviors.bindToSyllabus()
+ready(() => {
+  // Create the aggregation collection and view
+  const acollection = new SyllabusCollection(collections)
+  const view = new SyllabusView({
+    el: '#syllabusTableBody',
+    collection: acollection,
+    can_read: ENV.CAN_READ,
+    is_valid_user: !!ENV.current_user_id
   })
-  .fail(() => {})
 
-// Add the loading indicator now that the collections are fetching
-$('#loading_indicator').replaceWith('<img src="/images/ajax-reload-animated.gif">')
+  // Attach the immersive reader button if enabled
+  const immersive_reader_mount_point = document.getElementById('immersive_reader_mount_point')
+  const immersive_reader_mobile_mount_point = document.getElementById(
+    'immersive_reader_mobile_mount_point'
+  )
+  if (immersive_reader_mount_point || immersive_reader_mobile_mount_point) {
+    import('@canvas/immersive-reader/ImmersiveReader')
+      .then(ImmersiveReader => {
+        const courseSyllabusText = () => document.querySelector('#course_syllabus').innerHTML
+        const title = I18n.t('Course Syllabus')
+        let content
 
-// Binding to the mini calendar must take place after sidebar initializes,
-// so this must be done on dom ready
-$(() => {
+        // We display a default message in #course_syllabus_details when the user
+        // hasn't set any text in the syllabus.
+        if ($.trim(courseSyllabusText())) {
+          content = courseSyllabusText
+        } else {
+          content = () => document.querySelector('#course_syllabus_details').innerHTML
+        }
+
+        if (immersive_reader_mount_point) {
+          ImmersiveReader.initializeReaderButton(immersive_reader_mount_point, {content, title})
+        }
+
+        if (immersive_reader_mobile_mount_point) {
+          ImmersiveReader.initializeReaderButton(immersive_reader_mobile_mount_point, {
+            content,
+            title
+          })
+        }
+      })
+      .catch(e => {
+        console.log('Error loading immersive readers.', e) // eslint-disable-line no-console
+      })
+  }
+
+  // When all of the fetches have completed, render the view and bind behaviors
+  $.when
+    .apply(this, deferreds)
+    .then(() => {
+      view.render()
+      SyllabusBehaviors.bindToSyllabus()
+    })
+    .fail(() => {})
+
+  // Add the loading indicator now that the collections are fetching
+  $('#loading_indicator').replaceWith('<img src="/images/ajax-reload-animated.gif">')
+
+  // Binding to the mini calendar must take place after sidebar initializes,
+  // so this must be done on dom ready
   SyllabusBehaviors.bindToEditSyllabus(true)
   SyllabusBehaviors.bindToMiniCalendar()
 })
