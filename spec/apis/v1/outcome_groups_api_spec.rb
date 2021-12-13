@@ -298,29 +298,10 @@ describe "Outcome Groups API", type: :request do
       expect(json.map { |j| j["outcome"]["id"] }).to eq expected_outcome_ids
     end
 
-    it "returns friendly description if friendly description is set on outcome for the given context and feature flag is on" do
-      Account.site_admin.enable_feature! :outcomes_friendly_description
-      friendly_description = "a friendly description"
-      OutcomeFriendlyDescription.create!({
-                                           learning_outcome: @outcome,
-                                           context: @account,
-                                           description: friendly_description
-                                         })
-      json = api_call(:get, "/api/v1/accounts/#{@account.id}/outcome_group_links",
-                      controller: "outcome_groups_api",
-                      action: "link_index",
-                      account_id: @account.id,
-                      outcome_style: "full",
-                      format: "json")
-
-      expected_outcome_descriptions = @links.take(2).map(&:content).map(&:description)
-      expected_outcome_descriptions.append(friendly_description)
-      expect(json.map { |j| j["outcome"]["friendly_description"] }).to eq expected_outcome_descriptions
-    end
-
     it "returns course friendly description if outcome has course and account-level friendly descriptions" do
       course_with_teacher(user: @user, active_all: true)
       Account.site_admin.enable_feature! :outcomes_friendly_description
+      @account.enable_feature!(:improved_outcomes_management)
       @course.root_outcome_group.add_outcome(@outcome)
       friendly_description = "a course level friendly description"
       OutcomeFriendlyDescription.create!({
@@ -469,6 +450,40 @@ describe "Outcome Groups API", type: :request do
             false
           )
         end
+      end
+    end
+
+    context "friendly description feature flag" do
+      def exec_call
+        friendly_description = "a friendly description"
+        OutcomeFriendlyDescription.create!({
+                                             learning_outcome: @outcome,
+                                             context: @account,
+                                             description: friendly_description
+                                           })
+        api_call(:get, "/api/v1/accounts/#{@account.id}/outcome_group_links",
+                 controller: "outcome_groups_api",
+                 action: "link_index",
+                 account_id: @account.id,
+                 outcome_style: "full",
+                 format: "json")
+      end
+
+      it "returns friendly description if friendly description is set on outcome for the given context and IOM and OFD FF is on" do
+        Account.site_admin.enable_feature! :outcomes_friendly_description
+        @account.enable_feature!(:improved_outcomes_management)
+
+        friendly_description = "a friendly description"
+        json = exec_call
+        expected_outcome_descriptions = @links.take(2).map(&:content).map(&:description)
+        expected_outcome_descriptions.append(friendly_description)
+        expect(json.map { |j| j["outcome"]["friendly_description"] }).to eq expected_outcome_descriptions
+      end
+
+      it "returns nil for friendly description if friendly description is set on outcome for the given context and improved outcome management feature flag is off" do
+        Account.site_admin.enable_feature! :outcomes_friendly_description
+        json = exec_call
+        expect(json.filter_map { |j| j["outcome"]["friendly_description"] }).to eql([])
       end
     end
 
