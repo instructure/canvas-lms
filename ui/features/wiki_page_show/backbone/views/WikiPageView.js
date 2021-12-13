@@ -116,7 +116,7 @@ export default class WikiPageView extends Backbone.View {
     if (immersive_reader_mount_point || immersive_reader_mobile_mount_point) {
       import('@canvas/immersive-reader/ImmersiveReader')
         .then(ImmersiveReader => {
-          const content = () => document.querySelector('.show-content').innerHTML
+          const content = document.querySelector('.show-content').innerHTML
           const title = document.querySelector('.page-title').textContent
 
           if (immersive_reader_mount_point) {

@@ -292,7 +292,6 @@ const locale = {
   "loading_failed_e6a9d8ef": { "message": "Det gick inte att läsa in." },
   "loading_folders_d8b5869e": { "message": "Läser in mappar" },
   "loading_please_wait_d276220a": { "message": "Läser in, vänta" },
-  "loading_preview_9f077aa1": { "message": "Läser in förhandsgranskning" },
   "locked_762f138b": { "message": "Låst" },
   "media_af190855": { "message": "Media" },
   "medium_5a8e9ead": { "message": "Medium" },

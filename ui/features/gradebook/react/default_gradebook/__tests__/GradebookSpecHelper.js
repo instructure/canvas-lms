@@ -32,7 +32,6 @@ export const defaultGradebookProps = {
   filterNavNode: document.createElement('div'),
   viewOptionsMenuNode: document.createElement('div'),
 
-  allow_apply_score_to_ungraded: false,
   allow_separate_first_last_names: true,
   api_max_per_page: 50,
   chunk_size: 50,

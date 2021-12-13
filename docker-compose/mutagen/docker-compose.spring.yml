@@ -16,7 +16,7 @@ services:
     command: bundle exec spring server
     volumes:
       - code:/usr/src/app
-      - bundle:/home/docker/.bundle/
+      - bundler:/home/docker/.bundler/
       - canvas-docker-gems:/home/docker/.gem/
       - yarn-cache:/home/docker/.cache/yarn
     environment:

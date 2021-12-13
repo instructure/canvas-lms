@@ -196,8 +196,7 @@ it('renders the grade for the currently selected attempt', async () => {
       ...SubmissionMocks.graded,
       attempt: 7,
       grade: '131',
-      enteredGrade: '131',
-      gradingStatus: 'graded'
+      enteredGrade: '131'
     }
   })
 
@@ -223,10 +222,7 @@ it('renders "N/A" for the currently selected attempt if it has no grade', async 
     Assignment: {pointsPossible: 150},
     Submission: {
       ...SubmissionMocks.submitted,
-      attempt: 7,
-      grade: '131',
-      enteredGrade: '131',
-      gradingStatus: 'needs_grading'
+      attempt: 7
     }
   })
 

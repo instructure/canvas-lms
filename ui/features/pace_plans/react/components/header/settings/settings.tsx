@@ -19,7 +19,6 @@
 import React from 'react'
 // @ts-ignore: TS doesn't understand i18n scoped imports
 import I18n from 'i18n!pace_plans_settings'
-import moment from 'moment-timezone'
 import {connect} from 'react-redux'
 
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
@@ -31,7 +30,6 @@ import {Modal} from '@instructure/ui-modal'
 import {Popover} from '@instructure/ui-popover'
 import {View} from '@instructure/ui-view'
 
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import BlackoutDates from './blackout_dates'
 import * as PacePlanApi from '../../../api/pace_plan_api'
 import {StoreState, PacePlan} from '../../../types'
@@ -39,7 +37,7 @@ import {getCourse} from '../../../reducers/course'
 import {getExcludeWeekends, getPacePlan, getPlanPublishing} from '../../../reducers/pace_plans'
 import {pacePlanActions} from '../../../actions/pace_plans'
 import {actions as uiActions} from '../../../actions/ui'
-import PacePlanDateInput from '../../../shared/components/pace_plan_date_input'
+import PacePlanDateSelector from '../projected_dates/date_selector'
 import UpdateExistingPlansModal from '../../../shared/components/update_existing_plans_modal'
 
 interface StoreProps {
@@ -52,7 +50,6 @@ interface StoreProps {
 interface DispatchProps {
   readonly loadLatestPlanByContext: typeof pacePlanActions.loadLatestPlanByContext
   readonly setEditingBlackoutDates: typeof uiActions.setEditingBlackoutDates
-  readonly setEndDate: typeof pacePlanActions.setEndDate
   readonly showLoadingOverlay: typeof uiActions.showLoadingOverlay
   readonly toggleExcludeWeekends: typeof pacePlanActions.toggleExcludeWeekends
   readonly toggleHardEndDates: typeof pacePlanActions.toggleHardEndDates
@@ -87,15 +84,9 @@ export class Settings extends React.Component<ComponentProps, LocalState> {
 
   republishAllPlans = () => {
     this.props.showLoadingOverlay('Publishing...')
-    PacePlanApi.republishAllPlansForCourse(this.props.courseId)
-      .then(this.onCloseUpdateExistingPlansModal)
-      .catch(err => {
-        showFlashAlert({
-          message: I18n.t('Failed publishing plan'),
-          err,
-          type: 'error'
-        })
-      })
+    PacePlanApi.republishAllPlansForCourse(this.props.courseId).then(
+      this.onCloseUpdateExistingPlansModal
+    )
   }
 
   onCloseBlackoutDatesModal = () => {
@@ -116,20 +107,6 @@ export class Settings extends React.Component<ComponentProps, LocalState> {
       this.props.pacePlan.context_id
     )
     this.props.setEditingBlackoutDates(false)
-  }
-
-  validateEnd = (date: moment.Moment) => {
-    let error: string | undefined
-
-    if (ENV.VALID_DATE_RANGE.start_at.date && date < moment(ENV.VALID_DATE_RANGE.start_at.date)) {
-      error = I18n.t('Date is before course start date')
-    } else if (
-      ENV.VALID_DATE_RANGE.end_at.date &&
-      date > moment(ENV.VALID_DATE_RANGE.end_at.date)
-    ) {
-      error = I18n.t('Date is after course end date')
-    }
-    return error
   }
 
   /* Renderers */
@@ -174,17 +151,11 @@ export class Settings extends React.Component<ComponentProps, LocalState> {
     return (
       <View as="div" margin="small 0 0" width="100%">
         <Checkbox
-          data-testid="require-end-date-toggle"
+          data-testid='require-end-date-toggle'
           label={I18n.t('Require Completion by Specified End Date')}
           checked={this.props.pacePlan.hard_end_dates}
           disabled={this.props.planPublishing}
-          onChange={() => {
-            this.props.toggleHardEndDates()
-            // this has the dual affect of setting the plan's end_date
-            // when unchecked and setting a default value for when it
-            // gets checked
-            this.props.setEndDate(ENV.VALID_DATE_RANGE.end_at.date)
-          }}
+          onChange={() => this.props.toggleHardEndDates()}
         />
       </View>
     )
@@ -195,22 +166,16 @@ export class Settings extends React.Component<ComponentProps, LocalState> {
 
     return (
       <View id="pace-plans-required-end-date-input" as="div" margin="small 0 0" width="100%">
-        <PacePlanDateInput
-          label={<ScreenReaderContent>{I18n.t('End Date')}</ScreenReaderContent>}
-          interaction="enabled"
-          dateValue={this.props.pacePlan.end_date}
-          onDateChange={this.props.setEndDate}
-          validateDay={this.validateEnd}
+        <PacePlanDateSelector
+          type="end-selection"
           width="100%"
+          label={<ScreenReaderContent>{I18n.t('End Date')}</ScreenReaderContent>}
         />
       </View>
     )
   }
 
   render() {
-    if (this.props.pacePlan.context_type === 'Enrollment') {
-      return null
-    }
     return (
       <div>
         {this.renderBlackoutDatesModal()}
@@ -278,7 +243,6 @@ const mapStateToProps = (state: StoreState): StoreProps => {
 export default connect(mapStateToProps, {
   loadLatestPlanByContext: pacePlanActions.loadLatestPlanByContext,
   setEditingBlackoutDates: uiActions.setEditingBlackoutDates,
-  setEndDate: pacePlanActions.setEndDate,
   showLoadingOverlay: uiActions.showLoadingOverlay,
   toggleExcludeWeekends: pacePlanActions.toggleExcludeWeekends,
   toggleHardEndDates: pacePlanActions.toggleHardEndDates

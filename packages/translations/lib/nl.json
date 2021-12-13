@@ -383,12 +383,6 @@
     "details_a6f427c3": {
         "message": "Details..."
     },
-    "diamond_b8dfe7ae": {
-        "message": "Diamant"
-    },
-    "dimension_type_55c83e4e": {
-        "message": "Afmetingstype"
-    },
     "dimensions_45ddb7b7": {
         "message": "Afmetingen"
     },
@@ -559,9 +553,6 @@
     },
     "feedback_6dcc1991": {
         "message": "Feedback"
-    },
-    "file_name_8fd421ff": {
-        "message": "Bestandsnaam"
     },
     "file_url_c12b64be": {
         "message": "Bestands-URL"
@@ -848,9 +839,6 @@
     "multi_color_image_63d7372f": {
         "message": "Veelkleurige afbeelding"
     },
-    "must_be_at_least_percentage_22e373b6": {
-        "message": "Moet ten minste { percentage }% zijn"
-    },
     "must_be_at_least_width_x_height_px_41dc825e": {
         "message": "Moet minstens { width } x { height }px zijn"
     },
@@ -986,17 +974,8 @@
     "peer_review_for_itemtitle_358cb413": {
         "message": "Peerbeoordeling voor { itemTitle }"
     },
-    "pentagon_17d82ea3": {
-        "message": "Vijfhoek"
-    },
     "people_b4ebb13c": {
         "message": "Personen"
-    },
-    "percentage_34ab7c2c": {
-        "message": "Percentage"
-    },
-    "pixels_52ece7d1": {
-        "message": "Pixels"
     },
     "points_bceb5005": {
         "message": "punten"

@@ -34,15 +34,11 @@ module Lti::IMS::Concerns
     ALLOW_LINE_ITEM_PLACEMENTS = %w[course_assignments_menu module_index_menu_modal].freeze
 
     def content_items_for_modules
-      @content_items_for_modules ||= lti_resource_links.reject { |item| item.key?(:lineItem) && allow_line_items? }
+      @content_items_for_modules ||= lti_resource_links.reject { |item| item.key? :lineItem }
     end
 
     def content_items_for_assignments
-      @content_items_for_assignments ||= lti_resource_links.select { |item| item.key?(:lineItem) && allow_line_items? }
-    end
-
-    def allow_line_items?
-      ALLOW_LINE_ITEM_PLACEMENTS.include?(params[:placement])
+      @content_items_for_assignments ||= lti_resource_links.select { |item| item.key? :lineItem }
     end
 
     def add_item_to_existing_module?
@@ -50,7 +46,7 @@ module Lti::IMS::Concerns
     end
 
     def add_assignment?
-      !content_items_for_assignments.empty? && allow_line_items?
+      !content_items_for_assignments.empty? && ALLOW_LINE_ITEM_PLACEMENTS.include?(params[:placement])
     end
 
     def add_module_items?

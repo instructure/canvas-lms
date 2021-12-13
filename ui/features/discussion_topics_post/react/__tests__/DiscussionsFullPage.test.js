@@ -30,17 +30,14 @@ import DiscussionTopicManager from '../DiscussionTopicManager'
 import {fireEvent, render, waitFor} from '@testing-library/react'
 import {MockedProvider} from '@apollo/react-testing'
 import React from 'react'
+import {responsiveQuerySizes} from '../utils'
 
 jest.mock('@canvas/rce/RichContentEditor')
 jest.mock('../utils/constants', () => ({
   ...jest.requireActual('../utils/constants'),
   HIGHLIGHT_TIMEOUT: 0
 }))
-jest.mock('../utils', () => ({
-  ...jest.requireActual('../utils'),
-  responsiveQuerySizes: () => ({desktop: {maxWidth: '1000'}}),
-  resolveAuthorRoles: () => []
-}))
+jest.mock('../utils')
 
 describe('DiscussionFullPage', () => {
   const setOnFailure = jest.fn()
@@ -78,6 +75,12 @@ describe('DiscussionFullPage', () => {
     liveRegion.id = 'flash_screenreader_holder'
     liveRegion.setAttribute('role', 'alert')
     document.body.appendChild(liveRegion)
+  })
+
+  beforeEach(() => {
+    responsiveQuerySizes.mockImplementation(() => ({
+      desktop: {maxWidth: '1000'}
+    }))
   })
 
   afterEach(() => {

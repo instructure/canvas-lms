@@ -19,7 +19,6 @@
 import {fromImageEmbed, fromVideoEmbed} from '../instructure_image/ImageEmbedOptions'
 import {isOnlyTextSelected} from '../../contentInsertionUtils'
 import * as url from 'url'
-import formatMessage from '../../../format-message'
 
 const FILE_DOWNLOAD_PATH_REGEX = /^\/(courses\/\d+\/)?files\/\d+\/download$/
 
@@ -91,7 +90,7 @@ export function asLink($element, editor) {
 // tinymce releases.
 // see https://github.com/tinymce/tinymce/issues/5181
 export function asVideoElement($element) {
-  const $videoElem = findMediaPlayerIframe($element)
+  const $videoElem = findVideoPlayerIframe($element)
 
   if (!isVideoElement($videoElem)) {
     return null
@@ -105,38 +104,6 @@ export function asVideoElement($element) {
       $videoElem.parentElement?.getAttribute('data-mce-p-data-media-id') ||
       $videoElem.getAttribute('data-mce-p-data-media-id')
   }
-}
-
-export function asAudioElement($element) {
-  if (!$element) {
-    return null
-  }
-  const $audioIframe = $element.tagName === 'IFRAME' ? $element : $element.firstElementChild
-  const $tinymceIframeShim = $audioIframe.parentElement
-
-  const title = (
-    $audioIframe.getAttribute('title') ||
-    $tinymceIframeShim.getAttribute('data-mce-p-title') ||
-    ''
-  ).replace(formatMessage('Video player for '), '')
-  const audioOptions = {
-    titleText: title,
-    id:
-      $element.parentElement?.getAttribute('data-mce-p-data-media-id') ||
-      $element.getAttribute('data-mce-p-data-media-id')
-  }
-
-  if ($audioIframe.tagName === 'IFRAME') {
-    const audioDoc = $audioIframe.contentDocument
-    try {
-      const trackSJson = audioDoc.querySelector('[data-tracks]')?.getAttribute('data-tracks')
-      if (trackSJson) {
-        audioOptions.tracks = JSON.parse(trackSJson)
-      }
-      // eslint-disable-next-line no-empty
-    } catch (e) {}
-  }
-  return audioOptions
 }
 
 function asText($element, editor) {
@@ -207,7 +174,7 @@ export function isImageEmbed($element) {
   return !!asImageEmbed($element) && !$element.getAttribute('data-placeholder-for')
 }
 
-function isMediaElement($element, mediaType) {
+export function isVideoElement($element) {
   // the video is hosted in an iframe, but tinymce
   // wraps it in a span with swizzled attribute names
   if (!$element?.getAttribute) {
@@ -226,18 +193,14 @@ function isMediaElement($element, mediaType) {
   }
 
   const media_type = tinymceIframeShim.getAttribute('data-mce-p-data-media-type')
-  return media_type === mediaType
+  if (media_type !== 'video') {
+    return false
+  }
+
+  return true
 }
 
-export function isVideoElement($element) {
-  return isMediaElement($element, 'video')
-}
-
-export function isAudioElement($element) {
-  return isMediaElement($element, 'audio')
-}
-
-export function findMediaPlayerIframe(elem) {
+export function findVideoPlayerIframe(elem) {
   if (elem.tagName === 'IFRAME') {
     // we have the iframe
     return elem

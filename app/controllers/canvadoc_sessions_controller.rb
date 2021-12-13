@@ -87,14 +87,7 @@ class CanvadocSessionsController < ApplicationController
       submission_id = blob["submission_id"]
       if submission_id
         submission = Submission.preload(:assignment).find(submission_id)
-        options = { submission: submission }
-
-        if blob["annotation_context"]
-          attempt = submission.canvadocs_annotation_contexts.find_by(launch_id: blob["annotation_context"])&.submission_attempt
-          options[:attempt] = attempt if attempt && attempt != submission.attempt
-        end
-
-        user_session_params = Canvadocs.user_session_params(@current_user, options)
+        user_session_params = Canvadocs.user_session_params(@current_user, submission: submission)
       else
         user_session_params = Canvadocs.user_session_params(@current_user, attachment: attachment)
       end

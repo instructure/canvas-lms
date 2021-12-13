@@ -113,6 +113,7 @@ describe "oauth2 flow" do
     end
 
     it "does not let developer keys expire if remember me was checked" do
+      skip("Fails in RSpecQ") if ENV["RSPECQ_ENABLED"] == "1"
       expiring_key = DeveloperKey.create!(
         name: "IExpire",
         redirect_uri: "http://www.example.com",

@@ -1,8 +1,5 @@
 ARG POSTGRES=12
-ARG POSTGIS=2.5
-ARG POSTGISIMAGE=postgis/postgis
-
-FROM $POSTGISIMAGE:$POSTGRES-$POSTGIS
+FROM postgis/postgis:$POSTGRES-2.5
 
 RUN echo "max_locks_per_transaction = 640" >> /usr/share/postgresql/$PG_MAJOR/postgresql.conf.sample \
  && echo "max_stack_depth = 5MB" >> /usr/share/postgresql/$PG_MAJOR/postgresql.conf.sample \
