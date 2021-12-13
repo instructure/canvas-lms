@@ -1159,6 +1159,19 @@ describe GradebooksController do
           expect(returned_section_ids).to contain_exactly(@course.default_section.id)
         end
       end
+
+      describe "allow_apply_score_to_ungraded" do
+        it "is set to true if the feature is enabled on the account" do
+          @course.account.enable_feature!(:apply_score_to_ungraded)
+          get :show, params: { course_id: @course.id }
+          expect(gradebook_options[:allow_apply_score_to_ungraded]).to be true
+        end
+
+        it "is set to false if the feature is not enabled on the account" do
+          get :show, params: { course_id: @course.id }
+          expect(gradebook_options[:allow_apply_score_to_ungraded]).to be false
+        end
+      end
     end
 
     describe "csv" do
@@ -2440,6 +2453,18 @@ describe GradebooksController do
 
     describe "js_env" do
       let(:js_env) { assigns[:js_env] }
+
+      it "sets speedgrader_dialog_for_unposted_comments in js_env as true if enabled" do
+        Account.site_admin.enable_feature!(:speedgrader_dialog_for_unposted_comments)
+        get "speed_grader", params: { course_id: @course, assignment_id: @assignment.id }
+        expect(assigns[:js_env][:speedgrader_dialog_for_unposted_comments]).to eq(true)
+      end
+
+      it "sets speedgrader_dialog_for_unposted_comments in js_env as false if disabled" do
+        Account.site_admin.disable_feature!(:speedgrader_dialog_for_unposted_comments)
+        get "speed_grader", params: { course_id: @course, assignment_id: @assignment.id }
+        expect(assigns[:js_env][:speedgrader_dialog_for_unposted_comments]).to eq(false)
+      end
 
       it "includes lti_retrieve_url" do
         get "speed_grader", params: { course_id: @course, assignment_id: @assignment.id }

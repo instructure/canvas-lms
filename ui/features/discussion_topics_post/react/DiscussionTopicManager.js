@@ -237,7 +237,14 @@ const DiscussionTopicManager = props => {
               discussionTopicId: ENV.discussion_topic_id,
               message: text
             },
-            optimisticResponse: getOptimisticResponse(text)
+            optimisticResponse: getOptimisticResponse(
+              text,
+              'PLACEHOLDER',
+              null,
+              null,
+              null,
+              discussionTopicQuery.data.legacyNode.anonymousState != null
+            )
           })
         }}
         isHighlighted={isTopicHighlighted}

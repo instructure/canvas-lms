@@ -107,8 +107,8 @@ ColumnHeaders.render = function() {
 
   return (
     <header className="ef-directory-header" role="row">
-      <div className="screenreader-only" role="columnheader">
-        {I18n.t('Select')}
+      <div className="ef-select-col" role="columnheader">
+        <span className="screenreader-only">{I18n.t('Select')}</span>
       </div>
       {this.renderColumns(sort, order)}
       <div className="ef-links-col" role="columnheader">

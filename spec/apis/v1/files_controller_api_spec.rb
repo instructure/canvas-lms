@@ -666,6 +666,7 @@ describe "Files API", type: :request do
         {},
         {
           "id" => @user.id,
+          "anonymous_id" => @user.id.to_s(36),
           "display_name" => @user.short_name,
           "avatar_image_url" => User.avatar_fallback_url(nil, request),
           "html_url" => "http://www.example.com/courses/#{@course.id}/users/#{@user.id}",
@@ -730,6 +731,7 @@ describe "Files API", type: :request do
         expect(subject.map { |f| f["user"] }).to eql [
           {
             "id" => user.id,
+            "anonymous_id" => user.id.to_s(36),
             "display_name" => user.short_name,
             "avatar_image_url" => User.avatar_fallback_url(nil, request),
             "html_url" => "http://www.example.com/about/#{user.id}",
@@ -1134,6 +1136,7 @@ describe "Files API", type: :request do
       json = api_call(:get, @file_path + "?include[]=user", @file_path_options.merge(include: ["user"]))
       expect(json["user"]).to eql({
                                     "id" => @user.id,
+                                    "anonymous_id" => @user.id.to_s(36),
                                     "display_name" => @user.short_name,
                                     "avatar_image_url" => User.avatar_fallback_url(nil, request),
                                     "html_url" => "http://www.example.com/courses/#{@course.id}/users/#{@user.id}",

@@ -383,6 +383,12 @@
     "details_a6f427c3": {
         "message": "Detalls:"
     },
+    "diamond_b8dfe7ae": {
+        "message": "Diamant"
+    },
+    "dimension_type_55c83e4e": {
+        "message": "Tipus de dimensió"
+    },
     "dimensions_45ddb7b7": {
         "message": "Mides"
     },
@@ -553,6 +559,9 @@
     },
     "feedback_6dcc1991": {
         "message": "Suggeriments"
+    },
+    "file_name_8fd421ff": {
+        "message": "Nom del fitxer"
     },
     "file_url_c12b64be": {
         "message": "URL del fitxer"
@@ -839,6 +848,9 @@
     "multi_color_image_63d7372f": {
         "message": "Imatge multicolor"
     },
+    "must_be_at_least_percentage_22e373b6": {
+        "message": "Ha de ser un { percentage }% com a mínim"
+    },
     "must_be_at_least_width_x_height_px_41dc825e": {
         "message": "Ha de ser de { width } × { height }píxels com a mínim"
     },
@@ -974,8 +986,17 @@
     "peer_review_for_itemtitle_358cb413": {
         "message": "Revisió entre companys per a { itemTitle }"
     },
+    "pentagon_17d82ea3": {
+        "message": "Pentàgon"
+    },
     "people_b4ebb13c": {
         "message": "Persones"
+    },
+    "percentage_34ab7c2c": {
+        "message": "Percentatge"
+    },
+    "pixels_52ece7d1": {
+        "message": "Píxels"
     },
     "points_bceb5005": {
         "message": "punts"
