@@ -9,7 +9,7 @@ function bundle_config_and_install() {
   echo "Running bundle config and bundle install..."
   bundle config --global build.nokogiri --use-system-libraries &&
   bundle config --global build.ffi --enable-system-libffi &&
-  if [ "x$PULSAR" = "xn" ]; then bundle config --global without pulsar; fi &&
+  if [ "x$PULSAR" = "xy" ]; then bundle config --global with pulsar; fi &&
   mkdir -p /home/docker/.bundle &&
   bundle install --jobs $(nproc)
 }
