@@ -921,7 +921,6 @@ describe CalendarEventsApiController, type: :request do
           expect(json).to eq [
             {
               "id" => @student1.id,
-              "anonymous_id" => @student1.id.to_s(36),
               "display_name" => @student1.short_name,
               "avatar_image_url" => "http://www.example.com/images/messages/avatar-50.png",
               "html_url" => "http://www.example.com/about/#{@student1.id}",
@@ -929,7 +928,6 @@ describe CalendarEventsApiController, type: :request do
             },
             {
               "id" => @student2.id,
-              "anonymous_id" => @student2.id.to_s(36),
               "display_name" => @student2.short_name,
               "avatar_image_url" => "http://www.example.com/images/messages/avatar-50.png",
               "html_url" => "http://www.example.com/users/#{@student2.id}",
@@ -944,7 +942,6 @@ describe CalendarEventsApiController, type: :request do
           expect(json).to eq [
             {
               "id" => @student1.id,
-              "anonymous_id" => @student1.id.to_s(36),
               "display_name" => @student1.short_name,
               "avatar_image_url" => "http://www.example.com/images/messages/avatar-50.png",
               "html_url" => "http://www.example.com/users/#{@student1.id}",
@@ -952,7 +949,6 @@ describe CalendarEventsApiController, type: :request do
             },
             {
               "id" => @student2.id,
-              "anonymous_id" => @student2.id.to_s(36),
               "display_name" => @student2.short_name,
               "avatar_image_url" => "http://www.example.com/images/messages/avatar-50.png",
               "html_url" => "http://www.example.com/users/#{@student2.id}",
@@ -986,7 +982,6 @@ describe CalendarEventsApiController, type: :request do
           expect(json).to eq [
             {
               "id" => @student1.id,
-              "anonymous_id" => @student1.id.to_s(36),
               "display_name" => @student1.short_name,
               "avatar_image_url" => "http://www.example.com/images/messages/avatar-50.png",
               "html_url" => "http://www.example.com/about/#{@student1.id}",
@@ -994,7 +989,6 @@ describe CalendarEventsApiController, type: :request do
             },
             {
               "id" => @student2.id,
-              "anonymous_id" => @student2.id.to_s(36),
               "display_name" => @student2.short_name,
               "avatar_image_url" => "http://www.example.com/images/messages/avatar-50.png",
               "html_url" => "http://www.example.com/users/#{@student2.id}",
@@ -1006,7 +1000,6 @@ describe CalendarEventsApiController, type: :request do
           expect(json).to eq [
             {
               "id" => @student.id,
-              "anonymous_id" => @student.id.to_s(36),
               "display_name" => @student.short_name,
               "avatar_image_url" => "http://www.example.com/images/messages/avatar-50.png",
               "html_url" => "http://www.example.com/about/#{@student.id}",

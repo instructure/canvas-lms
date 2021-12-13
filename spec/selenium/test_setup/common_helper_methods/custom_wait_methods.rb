@@ -163,7 +163,7 @@ module CustomWaitMethods
       var callback = arguments[arguments.length - 1];
 
       // If canvasReadyState isn't defined, we're likely in an IFrame (such as the RCE)
-      if (!window.location.href || !window.canvasReadyState || window.canvasReadyState === 'complete') {
+      if (!window.canvasReadyState || window.canvasReadyState === 'complete') {
         callback()
       }
       else {

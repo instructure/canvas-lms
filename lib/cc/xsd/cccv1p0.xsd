@@ -105,8 +105,6 @@
         <xs:element name="alt_name" type="xs:string" minOccurs="0"/>
         <xs:element name="image_url" type="xs:string" minOccurs="0"/>
         <xs:element name="image_identifier_ref" type="xs:string" minOccurs="0"/>
-        <xs:element name="banner_image_url" type="xs:string" minOccurs="0"/>
-        <xs:element name="banner_image_identifier_ref" type="xs:string" minOccurs="0"/>
         <xs:element name="default_view" minOccurs="0">
           <xs:simpleType>
             <xs:restriction base="xs:string">

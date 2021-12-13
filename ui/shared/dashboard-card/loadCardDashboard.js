@@ -25,7 +25,6 @@ import {asJson, getPrefetchedXHR} from '@instructure/js-utils'
 import buildURL from 'axios/lib/helpers/buildURL'
 
 let promiseToGetDashboardCards
-let observedUsersDashboardCards = {}
 
 export function createDashboardCards(dashboardCards, cardComponent = DashboardCard, extraProps) {
   const Box = getDroppableDashboardCardBox()
@@ -49,17 +48,13 @@ function renderIntoDOM(dashboardCards) {
   ReactDOM.render(createDashboardCards(dashboardCards), dashboardContainer)
 }
 
-export default function loadCardDashboard(renderFn = renderIntoDOM, observedUserId) {
-  if (observedUserId && observedUsersDashboardCards[observedUserId]) {
-    renderFn(observedUsersDashboardCards[observedUserId], true)
-  } else if (promiseToGetDashboardCards) {
-    promiseToGetDashboardCards.then(cards => renderFn(cards, true))
-  } else {
+export default function loadCardDashboard(renderFn = renderIntoDOM, observedUser) {
+  if (!promiseToGetDashboardCards) {
     let xhrHasReturned = false
     let sessionStorageTimeout
     const sessionStorageKey = `dashcards_for_user_${ENV && ENV.current_user_id}`
     const urlPrefix = '/api/v1/dashboard/dashboard_cards'
-    const url = buildURL(urlPrefix, {observed_user: observedUserId})
+    const url = buildURL(urlPrefix, {observed_user: observedUser})
     promiseToGetDashboardCards =
       asJson(getPrefetchedXHR(url)) || axios.get(url).then(({data}) => data)
     promiseToGetDashboardCards.then(() => (xhrHasReturned = true))
@@ -81,37 +76,23 @@ export default function loadCardDashboard(renderFn = renderIntoDOM, observedUser
         clearTimeout(sessionStorageTimeout)
         // calling the renderFn with `false` indicates to consumers that we're still waiting
         // on the follow-up xhr request to complete.
-        renderFn(dashboardCards, xhrHasReturned)
+        renderFn(dashboardCards, xhrHasReturned, observedUser)
         // calling it with `true` indicates that all outstanding card promises have settled.
-        if (!xhrHasReturned) return promiseToGetDashboardCards.then(cards => renderFn(cards, true))
+        if (!xhrHasReturned)
+          return promiseToGetDashboardCards.then(cards => renderFn(cards, true, observedUser))
       }
     )
 
     // Cache the fetched dashcards in sessionStorage so we can render instantly next
     // time they come to their dashboard (while still fetching the most current data)
-    // Also save the observed user's cards if observing so observer can switch between students
-    // without any delay
-    promiseToGetDashboardCards.then(dashboardCards => {
-      try {
-        sessionStorage.setItem(sessionStorageKey, JSON.stringify(dashboardCards))
-      } catch (_e) {
-        // If saving the cards to session storage fails, we can just ignore the exception; the cards
-        // will still be fetched and displayed on the next load. Telling the user probably doesn't
-        // make sense since it doesn't change the way the app works, nor does it make sense to log
-        // the error since it could happen in normal circumstances (like using Safari in private mode).
-      }
-      if (observedUserId) {
-        observedUsersDashboardCards[observedUserId] = dashboardCards
-      }
-    })
+    promiseToGetDashboardCards.then(dashboardCards =>
+      sessionStorage.setItem(sessionStorageKey, JSON.stringify(dashboardCards))
+    )
+  } else {
+    promiseToGetDashboardCards.then(cards => renderFn(cards, true, observedUser))
   }
 }
 
 export function resetDashboardCards() {
   promiseToGetDashboardCards = undefined
-}
-
-// Clears the cache for use in test suites
-export function resetCardCache() {
-  observedUsersDashboardCards = {}
 }

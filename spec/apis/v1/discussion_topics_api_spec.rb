@@ -413,8 +413,8 @@ describe DiscussionTopicsController, type: :request do
 
   context "anonymous discussions" do
     before do
-      Account.site_admin.enable_feature! :discussion_anonymity
-      Account.site_admin.enable_feature! :react_discussions_post
+      allow(Account.site_admin).to receive(:feature_enabled?).with(:discussion_anonymity).and_return(true)
+      allow(Account.site_admin).to receive(:feature_enabled?).with(:react_discussions_post).and_return(true)
       api_call(:post, "/api/v1/courses/#{@course.id}/discussion_topics",
                { controller: "discussion_topics", action: "create", format: "json",
                  course_id: @course.to_param },
@@ -2851,8 +2851,8 @@ describe DiscussionTopicsController, type: :request do
       expect(json["unread_entries"].sort).to eq (@topic.discussion_entries - [@root2, @reply3] - @topic.discussion_entries.select { |e| e.user == @user }).map(&:id).sort
 
       expect(json["participants"].sort_by { |h| h["id"] }).to eq([
-        { "id" => @student.id, "anonymous_id" => @student.id.to_s(36), "pronouns" => nil, "display_name" => @student.short_name, "avatar_image_url" => User.avatar_fallback_url(nil, request), "html_url" => "http://www.example.com/courses/#{@course.id}/users/#{@student.id}" },
-        { "id" => @teacher.id, "anonymous_id" => @teacher.id.to_s(36), "pronouns" => nil, "display_name" => @teacher.short_name, "avatar_image_url" => User.avatar_fallback_url(nil, request), "html_url" => "http://www.example.com/courses/#{@course.id}/users/#{@teacher.id}" },
+        { "id" => @student.id, "pronouns" => nil, "display_name" => @student.short_name, "avatar_image_url" => User.avatar_fallback_url(nil, request), "html_url" => "http://www.example.com/courses/#{@course.id}/users/#{@student.id}" },
+        { "id" => @teacher.id, "pronouns" => nil, "display_name" => @teacher.short_name, "avatar_image_url" => User.avatar_fallback_url(nil, request), "html_url" => "http://www.example.com/courses/#{@course.id}/users/#{@teacher.id}" },
       ].sort_by { |h| h["id"] })
 
       reply_reply1_attachment_json = {
@@ -3275,24 +3275,6 @@ describe DiscussionTopicsController, type: :request do
       expect(json["title"]).to eq "Section Specific Topic Copy"
       expect(json["sections"].length).to eq 1
       expect(json["sections"][0]["id"]).to eq section1.id
-    end
-
-    it "duplicate carries anonymous_state over" do
-      @user = @teacher
-      discussion_topic_model(context: @course, title: "Section Specific Topic", user: @teacher, anonymous_state: "fully_anonymous")
-      @topic.save!
-
-      json = api_call(:post, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/duplicate",
-                      { controller: "discussion_topics_api",
-                        action: "duplicate",
-                        format: "json",
-                        course_id: @course.to_param,
-                        topic_id: @topic.to_param },
-                      {},
-                      {},
-                      expected_status: 200)
-
-      expect(json["anonymous_state"]).to eq @topic.anonymous_state
     end
 
     it "duplicate publishes group context discussions if its a student duplicating" do

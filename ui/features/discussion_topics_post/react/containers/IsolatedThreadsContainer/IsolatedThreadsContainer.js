@@ -24,12 +24,7 @@ import {DiscussionEntry} from '../../../graphql/DiscussionEntry'
 import {Flex} from '@instructure/ui-flex'
 import {Highlight} from '../../components/Highlight/Highlight'
 import I18n from 'i18n!discussion_topics_post'
-import {
-  isTopicAuthor,
-  updateDiscussionTopicEntryCounts,
-  responsiveQuerySizes,
-  getDisplayName
-} from '../../utils'
+import {isTopicAuthor, updateDiscussionTopicEntryCounts, responsiveQuerySizes} from '../../utils'
 import {DiscussionEntryContainer} from '../DiscussionEntryContainer/DiscussionEntryContainer'
 import PropTypes from 'prop-types'
 import React, {useContext, useState, useEffect, useRef} from 'react'
@@ -189,7 +184,6 @@ const IsolatedThreadContainer = props => {
   const [isEditing, setIsEditing] = useState(false)
   const [showReportModal, setShowReportModal] = useState(false)
   const [reportModalIsLoading, setReportModalIsLoading] = useState(false)
-  const [reportingError, setReportingError] = useState(false)
 
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
   const {filter} = useContext(SearchContext)
@@ -246,10 +240,7 @@ const IsolatedThreadContainer = props => {
     },
     onError: () => {
       setReportModalIsLoading(false)
-      setReportingError(true)
-      setTimeout(() => {
-        setReportingError(false)
-      }, 3000)
+      setOnFailure(I18n.t('We experienced an issue. This reply was not reported.'))
     }
   })
 
@@ -266,7 +257,7 @@ const IsolatedThreadContainer = props => {
     threadActions.push(
       <ThreadingToolbar.Reply
         key={`reply-${props.discussionEntry.id}`}
-        authorName={getDisplayName(props.discussionEntry)}
+        authorName={props.discussionEntry.author.displayName}
         delimiterKey={`reply-delimiter-${props.discussionEntry.id}`}
         isIsolatedView
         onClick={() =>
@@ -288,7 +279,7 @@ const IsolatedThreadContainer = props => {
         key={`like-${props.discussionEntry.id}`}
         delimiterKey={`like-delimiter-${props.discussionEntry.id}`}
         onClick={() => props.onToggleRating(props.discussionEntry)}
-        authorName={getDisplayName(props.discussionEntry)}
+        authorName={props.discussionEntry.author.displayName}
         isLiked={!!props.discussionEntry.entryParticipant?.rating}
         likeCount={props.discussionEntry.ratingSum || 0}
         interaction={props.discussionEntry.permissions.rate ? 'enabled' : 'disabled'}
@@ -373,7 +364,6 @@ const IsolatedThreadContainer = props => {
                       />
                     }
                     author={props.discussionEntry.author}
-                    anonymousAuthor={props.discussionEntry.anonymousAuthor}
                     message={props.discussionEntry.message}
                     isEditing={isEditing}
                     onSave={onUpdate}
@@ -421,7 +411,6 @@ const IsolatedThreadContainer = props => {
                     }}
                     showReportModal={showReportModal}
                     isLoading={reportModalIsLoading}
-                    errorSubmitting={reportingError}
                   />
                 </Flex.Item>
               </Flex>

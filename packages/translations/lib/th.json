@@ -383,12 +383,6 @@
     "details_a6f427c3": {
         "message": "รายละเอียด:"
     },
-    "diamond_b8dfe7ae": {
-        "message": "เพชร"
-    },
-    "dimension_type_55c83e4e": {
-        "message": "ประเภทขนาด"
-    },
     "dimensions_45ddb7b7": {
         "message": "ขนาด"
     },
@@ -559,9 +553,6 @@
     },
     "feedback_6dcc1991": {
         "message": "ผลตอบรับ"
-    },
-    "file_name_8fd421ff": {
-        "message": "ชื่อไฟล์"
     },
     "file_url_c12b64be": {
         "message": "URL ไฟล์"
@@ -848,9 +839,6 @@
     "multi_color_image_63d7372f": {
         "message": "ภาพหลายสี"
     },
-    "must_be_at_least_percentage_22e373b6": {
-        "message": "จะต้องเท่ากับอย่างน้อย { percentage }%"
-    },
     "must_be_at_least_width_x_height_px_41dc825e": {
         "message": "จะต้องเท่ากับอย่างน้อย { width } x { height }px"
     },
@@ -986,17 +974,8 @@
     "peer_review_for_itemtitle_358cb413": {
         "message": "ความคิดเห็นจากผู้เกี่ยวข้องสำหรับ { itemTitle }"
     },
-    "pentagon_17d82ea3": {
-        "message": "ห้าเหลี่ยม"
-    },
     "people_b4ebb13c": {
         "message": "บุคคล"
-    },
-    "percentage_34ab7c2c": {
-        "message": "เปอร์เซ็นต์"
-    },
-    "pixels_52ece7d1": {
-        "message": "พิกเซล"
     },
     "points_bceb5005": {
         "message": "คะแนน"

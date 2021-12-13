@@ -368,26 +368,6 @@ describe Course do
         expect(@course.default_post_policy).to be_post_manually
       end
     end
-
-    describe "allow_final_grade_override" do
-      let(:migration) { build_migration(@course, {}, all_course_settings: true) }
-
-      it "is set to true when originally true" do
-        import_data = { course: { allow_final_grade_override: "true" } }.with_indifferent_access
-        Importers::CourseContentImporter.import_content(@course, import_data, nil, migration)
-
-        # Specifically check the setting instead of the "allow_final_grade_override?"
-        # method, since the method also checks for the feature flag (which isn't copied)
-        expect(@course.allow_final_grade_override).to eq "true"
-      end
-
-      it "is set to false when originally false" do
-        import_data = { course: { allow_final_grade_override: "false" } }.with_indifferent_access
-        Importers::CourseContentImporter.import_content(@course, import_data, nil, migration)
-
-        expect(@course.allow_final_grade_override).to eq "false"
-      end
-    end
   end
 
   describe "shift_date_options" do
