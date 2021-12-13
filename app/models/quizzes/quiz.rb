@@ -342,7 +342,7 @@ class Quizzes::Quiz < ActiveRecord::Base
     due_at_changed? ||
       workflow_state_changed? ||
       only_visible_to_overrides_changed? ||
-      (assignment.nil? && ["assignment", "graded_survey"].include?(next_quiz_type))
+      (assignment.nil? && next_quiz_type == "assignment")
   end
 
   def assignment?
@@ -634,13 +634,6 @@ class Quizzes::Quiz < ActiveRecord::Base
     end
 
     all_question_types.uniq
-  end
-
-  def assessment_question_bank_ids
-    quiz_groups
-      .pluck(:assessment_question_bank_id)
-      .compact
-      .uniq
   end
 
   def has_access_code

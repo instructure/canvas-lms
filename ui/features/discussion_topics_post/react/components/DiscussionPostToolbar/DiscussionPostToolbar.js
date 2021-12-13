@@ -29,7 +29,6 @@ import {
 } from '@instructure/ui-icons'
 import PropTypes from 'prop-types'
 
-import {CURRENT_USER} from '../../utils/constants'
 import React from 'react'
 import {Responsive} from '@instructure/ui-responsive'
 import {responsiveQuerySizes} from '../../utils'
@@ -38,7 +37,6 @@ import {SimpleSelect} from '@instructure/ui-simple-select'
 import {TextInput} from '@instructure/ui-text-input'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {View} from '@instructure/ui-view'
-import {AnonymousAvatar} from '../AnonymousAvatar/AnonymousAvatar'
 
 export const getMenuConfig = props => {
   const options = {
@@ -161,7 +159,7 @@ export const DiscussionPostToolbar = props => {
               </Flex>
             </Flex.Item>
 
-            <Flex.Item shouldGrow>
+            <Flex.Item>
               <Flex>
                 {/* Filter */}
                 <Flex.Item
@@ -219,11 +217,6 @@ export const DiscussionPostToolbar = props => {
                 </Flex.Item>
               </Flex>
             </Flex.Item>
-            {props.discussionAnonymousState && (
-              <Flex.Item align="end">
-                <AnonymousAvatar seedString={CURRENT_USER} />
-              </Flex.Item>
-            )}
           </Flex>
         </View>
       )}
@@ -240,8 +233,7 @@ DiscussionPostToolbar.propTypes = {
   onSearchChange: PropTypes.func,
   onViewFilter: PropTypes.func,
   onSortClick: PropTypes.func,
-  searchTerm: PropTypes.string,
-  discussionAnonymousState: PropTypes.string
+  searchTerm: PropTypes.string
 }
 
 DiscussionPostToolbar.defaultProps = {

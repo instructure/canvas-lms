@@ -20,7 +20,7 @@ import React from 'react'
 import moment from 'moment-timezone'
 import moxios from 'moxios'
 import {act, render, screen, waitFor} from '@testing-library/react'
-import {resetDashboardCards, resetCardCache} from '@canvas/dashboard-card'
+import {resetDashboardCards} from '@canvas/dashboard-card'
 import {resetPlanner} from '@instructure/canvas-planner'
 import fetchMock from 'fetch-mock'
 import {OBSERVER_COOKIE_PREFIX} from '@canvas/observer-picker/ObserverGetObservee'
@@ -301,7 +301,6 @@ afterEach(() => {
   window.location.hash = ''
   destroyContainer()
   document.cookie = `${observedUserCookieName}=`
-  resetCardCache()
 })
 
 describe('K-5 Dashboard', () => {
@@ -650,7 +649,8 @@ describe('K-5 Dashboard', () => {
         })
       ).toBeInTheDocument()
 
-      moxios.stubs.reset()
+      moxios.uninstall()
+      moxios.install()
       moxios.stubRequest('/api/v1/dashboard/dashboard_cards?observed_user=2', {
         status: 200,
         response: MOCK_CARDS_2
@@ -835,6 +835,19 @@ describe('K-5 Dashboard', () => {
       }
     ]
 
+    const getLastRequest = async () => {
+      const request = {}
+      await waitFor(() => {
+        const r = moxios.requests.mostRecent()
+        request.url = r.url
+        request.response = r.respondWith({
+          status: 200,
+          response: MOCK_CARDS
+        })
+      })
+      return request
+    }
+
     it('shows picker when user is an observer', () => {
       const {getByRole} = render(
         <K5Dashboard
@@ -851,7 +864,7 @@ describe('K-5 Dashboard', () => {
 
     it('prefetches dashboard cards with the correct url param', done => {
       moxios.withMock(async () => {
-        render(
+        const {getByRole} = render(
           <K5Dashboard
             {...defaultProps}
             currentUserRoles={['user', 'observer', 'teacher']}
@@ -859,61 +872,53 @@ describe('K-5 Dashboard', () => {
             parentSupportEnabled
           />
         )
-        moxios.wait(() => {
-          const preFetchedRequest = moxios.requests.mostRecent()
-          expect(preFetchedRequest.url).toBe('/api/v1/dashboard/dashboard_cards?observed_user=4')
-          expect(moxios.requests.count()).toBe(1)
-          done()
+        const select = getByRole('combobox', {name: 'Select a student to view'})
+        const preFetchedRequest = await getLastRequest()
+        expect(preFetchedRequest.url).toBe('/api/v1/dashboard/dashboard_cards?observed_user=4')
+        await preFetchedRequest.response.then(async () => {
+          const onLoadRequest = await getLastRequest()
+          expect(select.value).toBe('Student 4')
+          // Same request
+          expect(onLoadRequest.url).toBe('/api/v1/dashboard/dashboard_cards?observed_user=4')
         })
+        done()
       })
     })
 
-    it('does not make a request if the user has been already requested', async () => {
-      moxios.stubs.reset()
-      moxios.stubRequest('/api/v1/dashboard/dashboard_cards?observed_user=4', {
-        status: 200,
-        response: MOCK_CARDS
+    it('does not make a request if the user has been already requested', done => {
+      moxios.withMock(async () => {
+        const {getByRole, getByText} = render(
+          <K5Dashboard
+            {...defaultProps}
+            currentUserRoles={['user', 'observer', 'teacher']}
+            parentSupportEnabled
+            canAddObservee
+          />
+        )
+        const select = getByRole('combobox', {name: 'Select a student to view'})
+        const preFetchedRequest = await getLastRequest()
+        expect(preFetchedRequest.url).toBe('/api/v1/dashboard/dashboard_cards?observed_user=4')
+        await preFetchedRequest.response.then(async () => {
+          const onLoadRequest = await getLastRequest()
+          expect(select.value).toBe('Student 4')
+          act(() => select.click())
+          act(() => getByText('Student 2').click())
+          return onLoadRequest.response.then(async () => {
+            const onSelectRequest = await getLastRequest()
+            expect(onSelectRequest.url).toBe('/api/v1/dashboard/dashboard_cards?observed_user=2')
+            act(() => select.click())
+            act(() => getByText('Student 4').click())
+            return onSelectRequest.response.then(async () => {
+              // It should not request Student 4, as it is already fetched
+              const lastRequest = await getLastRequest()
+              expect(select.value).toBe('Student 4')
+              expect(lastRequest.url).toBe('/api/v1/dashboard/dashboard_cards?observed_user=2')
+              expect(moxios.requests.count()).toBe(2)
+            })
+          })
+        })
+        done()
       })
-      moxios.stubRequest('/api/v1/dashboard/dashboard_cards?observed_user=2', {
-        status: 200,
-        response: MOCK_CARDS_2
-      })
-
-      const {findByText, getByRole, getByText, queryByText} = render(
-        <K5Dashboard
-          {...defaultProps}
-          currentUserRoles={['user', 'observer', 'teacher']}
-          parentSupportEnabled
-          canAddObservee
-        />
-      )
-
-      expect(await findByText('Economics 101')).toBeInTheDocument()
-      expect(queryByText('Economics 203')).not.toBeInTheDocument()
-      const select = getByRole('combobox', {name: 'Select a student to view'})
-      expect(select.value).toBe('Student 4')
-      expect(moxios.requests.mostRecent().url).toBe(
-        '/api/v1/dashboard/dashboard_cards?observed_user=4'
-      )
-
-      act(() => select.click())
-      act(() => getByText('Student 2').click())
-      expect(await findByText('Economics 203')).toBeInTheDocument()
-      expect(queryByText('Economics 101')).not.toBeInTheDocument()
-      expect(moxios.requests.mostRecent().url).toBe(
-        '/api/v1/dashboard/dashboard_cards?observed_user=2'
-      )
-
-      act(() => select.click())
-      act(() => getByText('Student 4').click())
-      expect(await findByText('Economics 101')).toBeInTheDocument()
-      expect(queryByText('Economics 203')).not.toBeInTheDocument()
-      // Should not fetch student 4's cards again; they've been cached
-      expect(moxios.requests.mostRecent().url).toBe(
-        '/api/v1/dashboard/dashboard_cards?observed_user=2'
-      )
-      // 2 total requests - one for student 4, one for student 2
-      expect(moxios.requests.count()).toBe(2)
     })
 
     it('shows the observee missing items on dashboard cards', async () => {
@@ -926,7 +931,8 @@ describe('K-5 Dashboard', () => {
           plannerEnabled
         />
       )
-      moxios.stubs.reset()
+      moxios.uninstall()
+      moxios.install()
       moxios.stubRequest('/api/v1/dashboard/dashboard_cards?observed_user=4', {
         status: 200,
         response: MOCK_CARDS
@@ -949,6 +955,9 @@ describe('K-5 Dashboard', () => {
         response: opportunities2
       })
 
+      const observerSelect = getByRole('combobox', {name: 'Select a student to view'})
+      act(() => observerSelect.click())
+      act(() => getByText('Student 4').click())
       expect(
         await findByRole('link', {
           name: 'View 2 missing items for course Economics 101',
@@ -956,7 +965,6 @@ describe('K-5 Dashboard', () => {
         })
       ).toBeInTheDocument()
 
-      const observerSelect = getByRole('combobox', {name: 'Select a student to view'})
       act(() => observerSelect.click())
       act(() => getByText('Student 2').click())
       expect(

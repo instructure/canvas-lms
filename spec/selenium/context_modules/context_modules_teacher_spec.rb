@@ -588,53 +588,5 @@ describe "context modules" do
         expect(button.text).to eq("Expand All")
       end
     end
-
-    context "load in a new tab checkbox" do
-      before :once do
-        Account.site_admin.enable_feature!(:remember_module_links_default)
-        @course.context_modules.create!(name: "New Module")
-      end
-
-      it "is checked by default if module_links_default_new_tab is true for user" do
-        @teacher.set_preference(:module_links_default_new_tab, true)
-        get "/courses/#{@course.id}/modules"
-        f(".add_module_item_link").click
-        select_module_item("#add_module_item_select", "External URL")
-        expect(is_checked(f("#external_url_create_new_tab"))).to be_truthy
-        select_module_item("#add_module_item_select", "External Tool")
-        expect(is_checked(f("#external_tool_create_new_tab"))).to be_truthy
-      end
-
-      it "is unchecked by default if module_links_default_new_tab is false for user" do
-        @teacher.set_preference(:module_links_default_new_tab, false)
-        get "/courses/#{@course.id}/modules"
-        f(".add_module_item_link").click
-        select_module_item("#add_module_item_select", "External URL")
-        expect(is_checked(f("#external_url_create_new_tab"))).to be_falsey
-        select_module_item("#add_module_item_select", "External Tool")
-        expect(is_checked(f("#external_tool_create_new_tab"))).to be_falsey
-      end
-
-      it "is checked by default in new course after previously checking box" do
-        @teacher.set_preference(:module_links_default_new_tab, false)
-        get "/courses/#{@course.id}/modules"
-        f(".add_module_item_link").click
-        select_module_item("#add_module_item_select", "External URL")
-        f("#content_tag_create_url").send_keys("http://example.com")
-        f("#content_tag_create_title").send_keys("Example URL")
-        f("#external_url_create_new_tab").click
-        f(".add_item_button.ui-button").click
-        expect(@teacher.reload.get_preference(:module_links_default_new_tab)).to be_truthy
-
-        course_with_teacher(active_all: true, user: @teacher)
-        @course.context_modules.create!(name: "New Module")
-        get "/courses/#{@course.id}/modules"
-        f(".add_module_item_link").click
-        select_module_item("#add_module_item_select", "External URL")
-        expect(is_checked(f("#external_url_create_new_tab"))).to be_truthy
-        select_module_item("#add_module_item_select", "External Tool")
-        expect(is_checked(f("#external_tool_create_new_tab"))).to be_truthy
-      end
-    end
   end
 end

@@ -4,12 +4,10 @@ set -o nounset -o errexit -o errtrace
 
 
 function bundle_config_and_install() {
-  local PULSAR="$1"
   # set up bundle config options \
   echo "Running bundle config and bundle install..."
   bundle config --global build.nokogiri --use-system-libraries &&
   bundle config --global build.ffi --enable-system-libffi &&
-  if [ "x$PULSAR" = "xn" ]; then bundle config --global without pulsar; fi &&
   mkdir -p /home/docker/.bundle &&
   bundle install --jobs $(nproc)
 }
@@ -25,7 +23,7 @@ function compile_assets() {
 }
 
 ALL_COMMANDS='y'
-while getopts ":c:p" opt; do
+while getopts ":c:" opt; do
   case ${opt} in
     c )
       command=${OPTARG}
@@ -43,14 +41,11 @@ while getopts ":c:p" opt; do
         ALL_COMMANDS='n'
       fi
       ;;
-    p )
-      WITH_PULSAR='y'
-      ;;
   esac
 done
 
 if [[ ${BUNDLE_CONFIG-n} = 'y' ]] || [[ ${ALL_COMMANDS-n} = 'y' ]]; then
-  bundle_config_and_install ${WITH_PULSAR-n}
+  bundle_config_and_install
 fi
 if [[ ${YARN_INSTALL-n} = 'y' ]] || [[ ${ALL_COMMANDS-n} = 'y' ]]; then
   yarn_install

@@ -28,8 +28,6 @@ class ContextModulesController < ApplicationController
 
   include K5Mode
 
-  LINK_ITEM_TYPES = %w[ExternalUrl ContextExternalTool].freeze
-
   module ModuleIndexHelper
     include ContextModulesHelper
 
@@ -624,7 +622,6 @@ class ContextModulesController < ApplicationController
         body = @tag.nil? ? { error: "Could not find item to tag" } : @tag.errors
         return render json: body, status: :bad_request
       end
-      update_module_link_default_tab(@tag)
       json = @tag.as_json
       json["content_tag"].merge!(
         publishable: module_item_publishable?(@tag),
@@ -655,7 +652,7 @@ class ContextModulesController < ApplicationController
     @tag = @context.context_module_tags.not_deleted.find(params[:id])
     if authorized_action(@tag.context_module, @current_user, :update)
       @tag.title = params[:content_tag][:title] if params[:content_tag] && params[:content_tag][:title]
-      @tag.url = params[:content_tag][:url] if LINK_ITEM_TYPES.include?(@tag.content_type) && params[:content_tag] && params[:content_tag][:url]
+      @tag.url = params[:content_tag][:url] if %w[ExternalUrl ContextExternalTool].include?(@tag.content_type) && params[:content_tag] && params[:content_tag][:url]
       @tag.indent = params[:content_tag][:indent] if params[:content_tag] && params[:content_tag][:indent]
       @tag.new_tab = params[:content_tag][:new_tab] if params[:content_tag] && params[:content_tag][:new_tab]
 
@@ -663,7 +660,6 @@ class ContextModulesController < ApplicationController
         return render json: @tag.errors, status: :bad_request
       end
 
-      update_module_link_default_tab(@tag)
       @tag.update_asset_name!(@current_user) if params[:content_tag][:title]
       render json: @tag
     end
@@ -785,16 +781,5 @@ class ContextModulesController < ApplicationController
   def context_module_params
     params.require(:context_module).permit(:name, :unlock_at, :require_sequential_progress, :publish_final_grade, :requirement_count,
                                            completion_requirements: strong_anything, prerequisites: strong_anything)
-  end
-
-  def update_module_link_default_tab(tag)
-    if Account.site_admin.feature_enabled?(:remember_module_links_default) && LINK_ITEM_TYPES.include?(tag.content_type)
-      current_value = @current_user.get_preference(:module_links_default_new_tab)
-      if current_value && !tag.new_tab
-        @current_user.set_preference(:module_links_default_new_tab, false)
-      elsif !current_value && tag.new_tab
-        @current_user.set_preference(:module_links_default_new_tab, true)
-      end
-    end
   end
 end

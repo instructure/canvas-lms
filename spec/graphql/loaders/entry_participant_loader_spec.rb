@@ -22,7 +22,7 @@ describe Loaders::EntryParticipantLoader do
   before(:once) do
     @discussion = group_discussion_assignment
     @entry = @discussion.discussion_entries.create!(message: "peekaboo", user: @teacher, created_at: Time.zone.now)
-    @entry.update_or_create_participant(new_state: "read", current_user: @teacher, forced: true, report_type: "offensive", rating: 0)
+    @entry.update_or_create_participant(new_state: "read", current_user: @teacher, forced: true, report_type: "offensive")
   end
 
   it "works" do
@@ -31,53 +31,10 @@ describe Loaders::EntryParticipantLoader do
         current_user: @teacher
       )
       discussion_entry_participant_loader.load(@entry).then do |discussion_entry_participants|
-        expect(discussion_entry_participants["rating"]).to match false
+        expect(discussion_entry_participants["rating"]).to match @entry.discussion_entry_participants.first.rating
         expect(discussion_entry_participants["forced_read_state"]).to match @entry.discussion_entry_participants.first.forced_read_state
         expect(discussion_entry_participants["read"]).to match @entry.discussion_entry_participants.first.workflow_state == "read"
         expect(discussion_entry_participants["report_type"]).to match @entry.discussion_entry_participants.first.report_type
-      end
-    end
-  end
-
-  describe "rating" do
-    context "when 0" do
-      it "returns false" do
-        GraphQL::Batch.batch do
-          discussion_entry_participant_loader = Loaders::EntryParticipantLoader.for(
-            current_user: @teacher
-          )
-          discussion_entry_participant_loader.load(@entry).then do |discussion_entry_participants|
-            expect(discussion_entry_participants["rating"]).to match false
-          end
-        end
-      end
-    end
-
-    context "when nil" do
-      it "returns false" do
-        @entry.update_or_create_participant(new_state: "read", current_user: @teacher, forced: true, report_type: "offensive", rating: nil)
-        GraphQL::Batch.batch do
-          discussion_entry_participant_loader = Loaders::EntryParticipantLoader.for(
-            current_user: @teacher
-          )
-          discussion_entry_participant_loader.load(@entry).then do |discussion_entry_participants|
-            expect(discussion_entry_participants["rating"]).to match false
-          end
-        end
-      end
-    end
-
-    context "when 1" do
-      it "returns true" do
-        @entry.update_or_create_participant(new_state: "read", current_user: @teacher, forced: true, report_type: "offensive", rating: 1)
-        GraphQL::Batch.batch do
-          discussion_entry_participant_loader = Loaders::EntryParticipantLoader.for(
-            current_user: @teacher
-          )
-          discussion_entry_participant_loader.load(@entry).then do |discussion_entry_participants|
-            expect(discussion_entry_participants["rating"]).to match true
-          end
-        end
       end
     end
   end

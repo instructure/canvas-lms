@@ -115,7 +115,6 @@ QUnit.module('Gradebook PostPolicies', suiteHooks => {
         workflow_state: 'graded'
       }
       const student = {
-        name: 'John Doe',
         assignment_2301: submission,
         enrollments: [{type: 'StudentEnrollment', user_id: '441', course_section_id: '1'}]
       }
@@ -210,7 +209,6 @@ QUnit.module('Gradebook PostPolicies', suiteHooks => {
 
       onHiddenHooks.beforeEach(() => {
         student = {
-          name: 'John Doe',
           assignment_2301: {assignment_id: '2301', user_id: '1101'},
           enrollments: [{type: 'StudentEnrollment'}],
           id: '1101'
@@ -291,7 +289,6 @@ QUnit.module('Gradebook PostPolicies', suiteHooks => {
         workflow_state: 'graded'
       }
       const student = {
-        name: 'John Doe',
         assignment_2301: submission,
         enrollments: [{type: 'StudentEnrollment', user_id: '441', course_section_id: '1'}]
       }
@@ -397,7 +394,6 @@ QUnit.module('Gradebook PostPolicies', suiteHooks => {
 
       onPostedHooks.beforeEach(() => {
         student = {
-          name: 'John Doe',
           assignment_2301: {assignment_id: '2301', user_id: '1101'},
           enrollments: [{type: 'StudentEnrollment'}],
           id: '1101'

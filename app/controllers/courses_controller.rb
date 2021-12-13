@@ -1087,9 +1087,12 @@ class CoursesController < ApplicationController
           users = users.where(uuid: user_uuids)
         end
 
+        page_opts = {}
         # don't calculate a total count/last page for this endpoint.
-        # total_entries: nil
-        users = Api.paginate(users, self, api_v1_course_users_url, { total_entries: nil })
+        if search_term || !@domain_root_account.allow_last_page_on_course_users?
+          page_opts[:total_entries] = nil # doesn't calculate a total count
+        end
+        users = Api.paginate(users, self, api_v1_course_users_url, page_opts)
         includes = Array(params[:include]).concat(["sis_user_id", "email"])
 
         # user_json_preloads loads both active/accepted and deleted
@@ -3096,7 +3099,7 @@ class CoursesController < ApplicationController
           @course.wiki.update_default_wiki_page_roles(@course.default_wiki_editing_roles, @default_wiki_editing_roles_was)
         end
         # Sync homeroom enrollments and participation if enabled and course isn't a SIS import
-        if @course.elementary_enabled? && value_to_boolean(params[:course][:sync_enrollments_from_homeroom]) && params[:course][:homeroom_course_id] && @course.sis_batch_id.blank?
+        if @course.elementary_enabled? && params[:course][:sync_enrollments_from_homeroom] && params[:course][:homeroom_course_id] && @course.sis_batch_id.blank?
           progress = Progress.new(context: @course, tag: :sync_homeroom_enrollments)
           progress.user = @current_user
           progress.reset!

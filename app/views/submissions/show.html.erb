@@ -86,7 +86,7 @@
         <table class="grade-values">
           <tbody>
             <tr>
-              <th><label for="student_grading_<%= @assignment.id %>"><%= I18n.t('Grade:') %></label></th>
+              <th><%= I18n.t('Grade:') %></th>
               <td class="bold">
                 <% if can_do(@assignment, @current_user, :grade) %>
                   <%= render :partial => "gradebooks/grading_box", :object => @assignment, :locals => {:submission => @submission} %>
@@ -384,10 +384,8 @@
             </div>
           </div>
           <div style="padding: 10px; <%= hidden unless can_do(@submission, @current_user, :comment) %>" id="add_comment_form">
-            <label class="add_a_comment">
-              <strong><%= before_label('add_a_comment', 'Add a Comment') %></strong>
-              <textarea class="ic-Input grading_comment"></textarea>
-            </label>
+            <strong><%= before_label('add_a_comment', 'Add a Comment') %></strong>
+            <textarea class="ic-Input grading_comment"></textarea>
             <div class="comment_attachments">
             </div>
             <div class="clearfix" style="text-align: <%= direction('right') %>;">

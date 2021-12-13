@@ -181,6 +181,23 @@ def maybeSlackSendRetrigger() {
   }
 }
 
+def useRspecQ() {
+  if (configuration.isRspecqEnabled()) {
+    env.RSPECQ_ENABLED = '1'
+    return true
+  }
+  return env.RSPECQ_ENABLED == '1'
+}
+
+def getRspecProcesses() {
+  // Determine if this build is using RSpecQ and set RSPEC_PROCESSES
+  if (useRspecQ()) {
+    configuration.getInteger('rspecq-processes')
+  } else {
+    configuration.getInteger('rspec-processes')
+  }
+}
+
 @groovy.transform.Field final static GERRIT_CHANGE_ID_REGEX = /Change\-Id: (.*)/
 
 def getChangeId() {
@@ -254,7 +271,7 @@ pipeline {
     POSTGRES = configuration.postgres()
     POSTGRES_CLIENT = configuration.postgresClient()
     SKIP_CACHE = configuration.skipCache()
-    RSPEC_PROCESSES = configuration.getInteger('rspecq-processes')
+    RSPEC_PROCESSES = getRspecProcesses()
     GERRIT_CHANGE_ID = getChangeId()
 
     // e.g. postgres-12-ruby-2.6

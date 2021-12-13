@@ -180,7 +180,6 @@ describe "Developer Keys" do
         site_admin_developer_key.update(visible: true)
         get "/accounts/site_admin/developer_keys"
         fj("span:contains('On'):last").click
-        accept_alert
         get "/accounts/#{Account.default.id}/developer_keys"
         click_inherited_tab
         expect(fj("fieldset:last").attribute("aria-disabled")).to eq "true"
@@ -206,13 +205,10 @@ describe "Developer Keys" do
         get "/accounts/#{Account.default.id}/developer_keys"
         click_inherited_tab
         fj("span:contains('On'):last").click
-        accept_alert
         get "/accounts/site_admin/developer_keys"
         fj("span:contains('Off'):last").click
-        accept_alert
         expect(DeveloperKeyAccountBinding.where(account_id: Account.site_admin.id).first.workflow_state).to eq "off"
         fj("span:contains('Allow'):last").click
-        accept_alert
         get "/accounts/#{Account.default.id}/developer_keys"
         click_inherited_tab
         expect(DeveloperKeyAccountBinding.where(account_id: Account.default.id).first.workflow_state).to eq "on"
@@ -224,7 +220,6 @@ describe "Developer Keys" do
         root_developer_key
         get "/accounts/#{Account.default.id}/developer_keys"
         fj("span:contains('On'):last").click
-        accept_alert
         keep_trying_until { expect(current_active_element.attribute("value")).to eq "on" }
         expect(DeveloperKeyAccountBinding.last.reload.workflow_state).to eq "on"
       end
@@ -234,7 +229,6 @@ describe "Developer Keys" do
         DeveloperKeyAccountBinding.last.update(workflow_state: "on")
         get "/accounts/#{Account.default.id}/developer_keys"
         fj("span:contains('Off'):last").click
-        accept_alert
         keep_trying_until { expect(current_active_element.attribute("value")).to eq "off" }
         expect(DeveloperKeyAccountBinding.last.reload.workflow_state).to eq "off"
       end
@@ -243,7 +237,6 @@ describe "Developer Keys" do
         root_developer_key
         get "/accounts/#{Account.default.id}/developer_keys"
         fj("span:contains('On'):last").click
-        accept_alert
         click_inherited_tab
         click_account_tab
         expect(f("table[data-automation='devKeyAdminTable'] input[value='on']").attribute("tabindex")).to eq "0"

@@ -24,13 +24,6 @@ import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
 export default class DeveloperKeyStateControl extends React.Component {
   setBindingState = newValue => {
-    // eslint-disable-next-line no-alert
-    const confirmation = window.confirm(
-      I18n.t('Are you sure you want to change the state of this developer key?')
-    )
-    if (!confirmation) {
-      return
-    }
     this.props.store.dispatch(
       this.props.actions.setBindingWorkflowState(
         this.props.developerKey,
