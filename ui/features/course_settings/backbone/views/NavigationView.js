@@ -44,7 +44,7 @@ export default class NavigationView extends Backbone.View {
     $(e.currentTarget)
       .attr('class', '')
       .attr('class', 'icon-plus enable_nav_item_link')
-      .text('Enable')
+      .text(I18n.t('Enable'))
     return $targetItem.find('a.al-trigger').focus()
   }
 
@@ -54,7 +54,7 @@ export default class NavigationView extends Backbone.View {
     $(e.currentTarget)
       .attr('class', '')
       .attr('class', 'icon-x disable_nav_item_link')
-      .text('Disable')
+      .text(I18n.t('Disable'))
     return $targetItem.find('a.al-trigger').focus()
   }
 
