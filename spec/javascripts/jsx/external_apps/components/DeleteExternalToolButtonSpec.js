@@ -20,8 +20,8 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import TestUtils from 'react-dom/test-utils'
 import Modal from '@canvas/react-modal'
-import DeleteExternalToolButton from 'ui/features/external_apps/react/components/DeleteExternalToolButton.js'
-import store from 'ui/features/external_apps/react/lib/ExternalAppsStore.js'
+import DeleteExternalToolButton from 'ui/features/external_apps/react/components/DeleteExternalToolButton'
+import store from 'ui/features/external_apps/react/lib/ExternalAppsStore'
 import {mount} from 'enzyme'
 
 const {Simulate} = TestUtils
@@ -30,12 +30,13 @@ Modal.setAppElement(wrapper)
 const createElement = data => (
   <DeleteExternalToolButton
     tool={data.tool}
+    canDelete={data.canDelete}
     canAddEdit={data.canAddEdit}
     returnFocus={data.returnFocus}
   />
 )
 const renderComponent = data => ReactDOM.render(createElement(data), wrapper)
-const getDOMNodes = function(data) {
+const getDOMNodes = function (data) {
   const component = renderComponent(data)
   const btnTriggerDelete = component.refs.btnTriggerDelete
   return [component, btnTriggerDelete]
@@ -78,7 +79,7 @@ test('does not render when the canAddEdit permission is false', () => {
   notOk(node)
 })
 
-test('open and close modal', function() {
+test('open and close modal', function () {
   const data = {tool: this.tools[1], canAddEdit: true, returnFocus: () => {}}
   const [component, btnTriggerDelete] = Array.from(getDOMNodes(data))
   Simulate.click(btnTriggerDelete)
@@ -87,10 +88,37 @@ test('open and close modal', function() {
   ok(!component.state.modalIsOpen, 'modal is not open')
 })
 
-test('deletes a tool', function() {
+test('deletes a tool', function () {
   sinon.spy(store, 'delete')
   const wrapper = mount(
     <DeleteExternalToolButton tool={this.tools[0]} canAddEdit returnFocus={() => {}} />
+  )
+  wrapper.instance().deleteTool({preventDefault: () => {}})
+  ok(store.delete.called)
+  store.delete.restore()
+  wrapper.unmount()
+})
+
+test('does not render when the canDelete permission is false (granular)', () => {
+  const tool = {name: 'test tool'}
+  const component = renderComponent({tool, canDelete: false, returnFocus: () => {}})
+  const node = ReactDOM.findDOMNode(component)
+  notOk(node)
+})
+
+test('open and close modal (granular)', function () {
+  const data = {tool: this.tools[1], canDelete: true, returnFocus: () => {}}
+  const [component, btnTriggerDelete] = Array.from(getDOMNodes(data))
+  Simulate.click(btnTriggerDelete)
+  ok(component.state.modalIsOpen, 'modal is open')
+  component.closeModal()
+  ok(!component.state.modalIsOpen, 'modal is not open')
+})
+
+test('deletes a tool (granular)', function () {
+  sinon.spy(store, 'delete')
+  const wrapper = mount(
+    <DeleteExternalToolButton tool={this.tools[0]} canDelete returnFocus={() => {}} />
   )
   wrapper.instance().deleteTool({preventDefault: () => {}})
   ok(store.delete.called)
