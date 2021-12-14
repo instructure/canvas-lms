@@ -120,6 +120,6 @@ RUN set -eux; \
     public/javascripts/translations \
     reports \
     tmp \
-    /home/docker/.bundler/ \
+    /home/docker/.bundle/ \
     /home/docker/.cache/yarn \
     /home/docker/.gem/
