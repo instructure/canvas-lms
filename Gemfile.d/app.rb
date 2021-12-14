@@ -65,7 +65,6 @@ gem "canvas_connect", "0.3.14"
 gem "canvas_webex", "0.18.1"
 gem "crocodoc-ruby", "0.0.1", require: false
 gem "ddtrace", "0.42.0", require: false
-gem "docx", "0.6.2"
 gem "encrypted_cookie_store-instructure", "1.2.11", require: "encrypted_cookie_store"
 gem "folio-pagination", "0.0.12", require: "folio/rails"
 gem "ffi", "1.13.1", require: false
@@ -114,7 +113,6 @@ gem "oauth", "0.5.4", require: false
 gem "oauth2", "1.4.4", require: false
 gem "oj", "3.10.16"
 gem "outrigger", "3.0.0"
-gem "pdf-reader", "2.5.0"
 gem "prawn-rails", "1.3.0"
 gem "rack", "2.2.3"
 gem "rack-brotli", "1.0.0"
@@ -129,7 +127,6 @@ gem "rotp", "6.2.0", require: false
 gem "ruby-duration", "3.2.3", require: false
 gem "ruby2_keywords", "0.0.3"
 gem "rubycas-client", "2.3.9", require: false
-gem "ruby-rtf", "0.0.5"
 gem "rubyzip", "2.3.0", require: "zip"
 gem "saml2", "3.1.1"
   gem "nokogiri-xmlsec-instructure", "0.10.1", require: false
