@@ -6701,7 +6701,7 @@ zh-Hant:
         default_select_folder: 選擇文件夾
         upload_to: 上傳至
       import_quizzes_next_view: 
-        import_new_quizzes: "將評估內容匯入為 New Quizzes"
+        import_new_quizzes: "將評估內容匯入為 *New Quizzes*"
         import_new_quizzes_help_text: "新測驗是 Canvas 新的評估引擎。%{p_p}要深入了解更多資訊，請聯絡或訪問您的系統管理員"
         import_quizzesNext_help_label: "將評估匯入為 New Quizzes 支援圖示"
         import_quizzesNext_help_text: "Quizzes.Next 是 Canvas 新的評估引擎。%{p_p}要了解更多資訊，請聯絡或訪問您的系統管理員。"
