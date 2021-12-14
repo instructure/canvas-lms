@@ -6708,7 +6708,7 @@ pt:
         default_select_folder: "Selecionar pasta"
         upload_to: "Carregar para"
       import_quizzes_next_view: 
-        import_new_quizzes: "Importar conteúdo da avaliação como Novos testes"
+        import_new_quizzes: "Importar conteúdo da avaliação como *Novos testes*"
         import_new_quizzes_help_text: "New Quizzes é o novo mecanismo de avaliação para Canvas.%{p_p}Para saber mais, por favor contacte o administrador do seu sistema ou visite"
         import_quizzesNext_help_label: "Importar avaliação como novo Ícone de ajuda de testes"
         import_quizzesNext_help_text: "Quizzes.Next é o novo mecanismo de avaliação para Canvas.%{p_p}Para saber mais, entre em contato com o administrador do sistema ou visite"
