@@ -5010,7 +5010,7 @@ es-ES:
         default_select_folder: "Seleccionar carpeta"
         upload_to: "Cargar a"
       import_quizzes_next_view: 
-        import_new_quizzes: "Importar contenido de la evaluación como Nuevas evaluaciones"
+        import_new_quizzes: "Importar contenido de la evaluación como *Nuevas evaluaciones*"
         import_new_quizzes_help_text: "Nuevas evaluaciones es el nuevo motor de evaluación de Canvas.%{p_p}Para obtener más información, póngase en contacto con el administrador del sistema o visite"
         import_quizzesNext_help_label: "Importar evaluación como icono de ayuda de Nuevas evaluaciones"
         import_quizzesNext_help_title: "Nuevas evaluaciones"
