@@ -207,6 +207,32 @@ describe "discussions" do
         user_session(student)
       end
 
+      context "when all discussion anonymity feature flags are ON" do
+        before do
+          Account.site_admin.enable_feature! :discussion_anonymity
+          course.enable_feature! :react_discussions_post
+        end
+
+        it "lets students create anonymous discussions when allowed" do
+          course.allow_student_anonymous_discussion_topics = true
+          course.save!
+          get url
+          replace_content(f("input[name=title]"), "my anonymous title")
+          f("input[value='full_anonymity']").click
+          expect_new_page_load { submit_form(".form-actions") }
+          expect(DiscussionTopic.last.anonymous_state).to eq "full_anonymity"
+          expect(f("span[data-testid='anon-conversation']").text).to(
+            eq("This is an anonymous Discussion, Your name and profile picture will be hidden from other course members.")
+          )
+        end
+
+        it "does not let students create anonymous discussions when disallowed" do
+          get url
+          expect(course.allow_student_anonymous_discussion_topics).to be false
+          expect(f("body")).not_to contain_jqcss "input[value='full_anonymity']"
+        end
+      end
+
       it "creates a delayed discussion", priority: "1" do
         get url
         wait_for_tiny(f("textarea[name=message]"))
