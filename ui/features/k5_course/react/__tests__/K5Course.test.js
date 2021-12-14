@@ -114,7 +114,8 @@ const defaultProps = {
   assignmentsDueToday: {},
   assignmentsMissing: {},
   assignmentsCompletedForToday: {},
-  currentUserRoles: ['user', 'student', 'teacher']
+  currentUserRoles: ['user', 'student', 'teacher'],
+  isMasterCourse: false
 }
 const FETCH_IMPORTANT_INFO_URL = encodeURI('/api/v1/courses/30?include[]=syllabus_body')
 const FETCH_APPS_URL = '/api/v1/external_tools/visible_course_nav_tools?context_codes[]=course_30'

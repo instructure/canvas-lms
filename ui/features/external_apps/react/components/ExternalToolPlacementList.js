@@ -184,7 +184,9 @@ export default class ExternalToolPlacementList extends React.Component {
   shouldShowToggleButtons = () => {
     const tool = this.state.tool
     const is_1_1_tool = tool.version === '1.1'
-    const canUpdateTool = ENV.PERMISSIONS && ENV.PERMISSIONS.create_tool_manually
+    const canUpdateTool =
+      ENV.PERMISSIONS &&
+      (ENV.PERMISSIONS.create_tool_manually || ENV.PERMISSIONS.edit_tool_manually)
     const isEditableContext =
       ENV.CONTEXT_BASE_URL &&
       tool.context &&

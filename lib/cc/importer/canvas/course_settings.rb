@@ -64,7 +64,8 @@ module CC::Importer::Canvas
          turnitin_comments default_view license locale
          group_weighting_scheme storage_quota grading_standard_identifier_ref
          overridden_course_visibility root_account_uuid
-         image_url image_identifier_ref course_color alt_name].each do |string_type|
+         image_url image_identifier_ref banner_image_url banner_image_identifier_ref
+         course_color alt_name].each do |string_type|
         val = get_node_val(doc, string_type)
         course[string_type] = val unless val.nil?
       end
@@ -79,7 +80,7 @@ module CC::Importer::Canvas
          allow_student_discussion_editing show_announcements_on_home_page usage_rights_required
          restrict_student_future_view restrict_student_past_view show_total_grade_as_points
          organize_epub_by_content_type enable_offline_web_export restrict_enrollments_to_course_dates
-         homeroom_course].each do |bool_val|
+         homeroom_course allow_final_grade_override].each do |bool_val|
         val = get_bool_val(doc, bool_val)
         course[bool_val] = val unless val.nil?
       end

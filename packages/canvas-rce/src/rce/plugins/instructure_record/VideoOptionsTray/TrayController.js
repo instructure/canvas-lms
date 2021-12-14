@@ -20,7 +20,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 
 import bridge from '../../../../bridge'
-import {asVideoElement, findVideoPlayerIframe} from '../../shared/ContentSelection'
+import {asVideoElement, findMediaPlayerIframe} from '../../shared/ContentSelection'
 import VideoOptionsTray from '.'
 
 export const CONTAINER_ID = 'instructure-video-options-tray-container'
@@ -52,7 +52,7 @@ export default class TrayController {
 
   showTrayForEditor(editor) {
     this._editor = editor
-    this.$videoContainer = findVideoPlayerIframe(editor.selection.getNode())
+    this.$videoContainer = findMediaPlayerIframe(editor.selection.getNode())
     this._shouldOpen = true
 
     if (bridge.focusedEditor) {

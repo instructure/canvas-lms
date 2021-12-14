@@ -95,4 +95,26 @@ function effectiveDueDatesForAssignment(assignment, overrides, students) {
   return dates
 }
 
-export default {effectiveDueDatesForAssignment}
+function setStudentDisplayNames(students) {
+  const normalizedNameCounts = {}
+  const nameToNormalizedName = {}
+  students.forEach(student => {
+    const normalizedName = student.name
+      .replace(/\p{Punctuation}/gu, '')
+      .toLowerCase()
+      .trim()
+    nameToNormalizedName[student.name] = normalizedName
+    normalizedNameCounts[normalizedName] = (normalizedNameCounts[normalizedName] || 0) + 1
+  })
+
+  students.forEach(student => {
+    if (normalizedNameCounts[nameToNormalizedName[student.name]] > 1) {
+      const secondaryId = student.sis_user_id || student.email || student.login_id
+      student.displayName = secondaryId ? `${student.name} (${secondaryId})` : student.name
+    } else {
+      student.displayName = student.name
+    }
+  })
+}
+
+export default {effectiveDueDatesForAssignment, setStudentDisplayNames}

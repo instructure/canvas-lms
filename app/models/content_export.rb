@@ -284,7 +284,17 @@ class ContentExport < ActiveRecord::Base
     end
 
     begin
-      update(export_type: QTI)
+      if new_quizzes_bank_migration_enabled?
+        selected_content = self.selected_content || {}
+        selected_content["all_#{AssessmentQuestionBank.table_name}"] = true
+
+        update(
+          export_type: QTI,
+          selected_content: selected_content
+        )
+      else
+        update(export_type: QTI)
+      end
       @cc_exporter = CC::CCExporter.new(self)
 
       if @cc_exporter.export
@@ -321,8 +331,9 @@ class ContentExport < ActiveRecord::Base
           selected_content: {
             quizzes: {
               create_key(@quiz_exporter.quiz) => true
-            }
-          }
+            },
+            "all_#{AssessmentQuestionBank.table_name}": new_quizzes_bank_migration_enabled? || nil
+          }.compact
         )
         settings[:quizzes2] = @quiz_exporter.build_assignment_payload
         @cc_exporter = CC::CCExporter.new(self)
@@ -599,5 +610,9 @@ class ContentExport < ActiveRecord::Base
 
   def is_set?(option)
     Canvas::Plugin.value_to_boolean option
+  end
+
+  def new_quizzes_bank_migration_enabled?
+    context_type == "Course" && NewQuizzesFeaturesHelper.new_quizzes_bank_migrations_enabled?(context)
   end
 end

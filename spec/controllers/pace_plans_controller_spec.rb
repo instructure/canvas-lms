@@ -39,6 +39,7 @@ describe PacePlansController, type: :controller do
 
   before :once do
     course_with_teacher(active_all: true)
+    @course.update(start_at: "2021-09-30")
     student_in_course(active_all: true)
     pace_plan_model(course: @course)
     @student_enrollment = @student.enrollments.first
@@ -372,6 +373,24 @@ describe PacePlansController, type: :controller do
       json_response = JSON.parse(response.body)
       expect(json_response["context_type"]).to eq("PacePlan")
       expect(json_response["workflow_state"]).to eq("queued")
+    end
+  end
+
+  describe "POST #compress_dates" do
+    it "returns a compressed list of dates" do
+      pace_plan_params = @valid_params.merge(end_date: @pace_plan.start_date + 5.days)
+      post :compress_dates, params: { course_id: @course.id, pace_plan: pace_plan_params }
+      expect(response).to be_successful
+      json_response = JSON.parse(response.body)
+      expect(json_response.values).to eq(%w[2021-09-30 2021-10-03])
+    end
+
+    it "supports changing durations and start dates" do
+      pace_plan_params = @valid_params.merge(start_date: "2021-11-01", end_date: "2021-11-06")
+      post :compress_dates, params: { course_id: @course.id, pace_plan: pace_plan_params }
+      expect(response).to be_successful
+      json_response = JSON.parse(response.body)
+      expect(json_response.values).to eq(%w[2021-11-01 2021-11-06])
     end
   end
 end

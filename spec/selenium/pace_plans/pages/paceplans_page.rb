@@ -234,6 +234,10 @@ module PacePlansPageObject
 
   #----------------------- Click Items -------------------------------
 
+  def click_cancel_button
+    cancel_button.click
+  end
+
   def click_edit_tray_close_button
     edit_tray_close_button.click
   end

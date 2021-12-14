@@ -121,8 +121,9 @@ class Header extends React.Component {
     if (submission.gradingStatus === 'excused') {
       return null
     }
+    const attemptGrade = submission.gradingStatus !== 'needs_grading' ? submission.grade : null
 
-    const formattedGrade = GradeFormatHelper.formatGrade(submission.grade, {
+    const formattedGrade = GradeFormatHelper.formatGrade(attemptGrade, {
       defaultValue: I18n.t('N/A'),
       formatType: 'points_out_of_fraction',
       gradingType: assignment.gradingType,

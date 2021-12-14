@@ -19,7 +19,7 @@
 import React from 'react'
 import {render, fireEvent} from '@testing-library/react'
 import ColorPicker from '../index'
-import $ from 'jquery'
+import {destroyContainer} from '@canvas/alerts/react/FlashAlert'
 
 describe('ColorPicker', () => {
   function renderColorPicker(props) {
@@ -37,6 +37,10 @@ describe('ColorPicker', () => {
       container
     )
   }
+
+  afterEach(() => {
+    destroyContainer()
+  })
 
   it('returns name', () => {
     expect(ColorPicker.getColorName('#BD3C14')).toBe('Brick')
@@ -82,14 +86,13 @@ describe('ColorPicker', () => {
     expect(applyButton).toBeEnabled()
   })
 
-  it('shows a screenReaderFlashMessage when leaving input if hex is invalid', () => {
-    const {getByLabelText} = renderColorPicker({currentColor: '#ff0000'})
+  it('plays a screen reader alert when leaving input if hex is invalid', () => {
+    const {getByLabelText, getByText} = renderColorPicker({currentColor: '#ff0000'})
     const textInput = getByLabelText('Enter a hexcode here to use a custom color.')
-    $.screenReaderFlashMessage = jest.fn()
     fireEvent.change(textInput, {target: {value: '#hi'}})
     fireEvent.blur(textInput)
-    expect($.screenReaderFlashMessage).toHaveBeenCalledWith(
-      "'#hi' is not a valid color. Enter a valid hexcode before saving."
-    )
+    expect(
+      getByText("'#hi' is not a valid color. Enter a valid hexcode before saving.")
+    ).toBeInTheDocument()
   })
 })

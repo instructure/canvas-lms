@@ -20,19 +20,19 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import {Simulate} from 'react-dom/test-utils'
 import Modal from '@canvas/react-modal'
-import ReregisterExternalToolButton from 'ui/features/external_apps/react/components/ReregisterExternalToolButton.js'
-import store from 'ui/features/external_apps/react/lib/ExternalAppsStore.js'
+import ReregisterExternalToolButton from 'ui/features/external_apps/react/components/ReregisterExternalToolButton'
+import store from 'ui/features/external_apps/react/lib/ExternalAppsStore'
 
 const wrapper = document.getElementById('fixtures')
 Modal.setAppElement(wrapper)
 
 const createElement = data => (
-  <ReregisterExternalToolButton tool={data.tool} canAddEdit returnFocus={() => {}} />
+  <ReregisterExternalToolButton tool={data.tool} canAdd canAddEdit returnFocus={() => {}} />
 )
 
 const renderComponent = data => ReactDOM.render(createElement(data), wrapper)
 
-const getDOMNodes = function(data) {
+const getDOMNodes = function (data) {
   const component = renderComponent(data)
   const btnTriggerReregister = component.refs.reregisterExternalToolButton
   return [component, btnTriggerReregister]
@@ -60,7 +60,7 @@ QUnit.module('ExternalApps.ReregisterExternalToolButton', {
   }
 })
 
-test('open and close modal', function() {
+test('open and close modal', function () {
   const data = {tool: this.tools[0]}
   const [component, btnTriggerReregister] = Array.from(getDOMNodes(data))
   Simulate.click(btnTriggerReregister)
