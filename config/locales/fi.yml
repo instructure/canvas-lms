@@ -5828,7 +5828,7 @@ fi:
         default_select_folder: "Valitse kansio"
         upload_to: "Lataa kohteeseen"
       import_quizzes_next_view: 
-        import_new_quizzes: "Tuo arvioinnin sisältö Uusina testeinä"
+        import_new_quizzes: "Tuo arvioinnin sisältö *Uusina testeinä*"
         import_new_quizzes_help_text: "Uudet kyselyt on uusi arviointikone Canvasilta.%{p_p}Jos haluat lukea lisää, ota yhteyttä pääkäyttäjääsi tai käy"
         import_quizzesNext_help_label: "Tuo arviointi Uusina testeinä Ohje-kuvake"
         import_quizzesNext_help_text: "Quizzes.Next on uusi arviointikone Canvasille.%{p_p}Jos haluat lukea lisää, ota yhteyttä pääkäyttäjääsi tai käy"
