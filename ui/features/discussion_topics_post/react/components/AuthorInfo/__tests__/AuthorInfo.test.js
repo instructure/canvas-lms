@@ -175,7 +175,7 @@ describe('AuthorInfo', () => {
 
     it('renders you for the current user', () => {
       const container = setup({anonymousAuthor: AnonymousUser.mock({shortName: CURRENT_USER})})
-      expect(container.getByText('You')).toBeInTheDocument()
+      expect(container.getByText('Anonymous 1 (You)')).toBeInTheDocument()
     })
 
     it('should not highlight terms in the author name', () => {
