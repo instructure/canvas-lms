@@ -6400,7 +6400,7 @@ ht:
         default_select_folder: "Seleksyone Dosye"
         upload_to: "Transfere nan"
       import_quizzes_next_view: 
-        import_new_quizzes: "Enpòte kontni evalyasyon an tan ke Nouvo Quiz"
+        import_new_quizzes: "Enpòte kontni evalyasyon an tan ke *Nouvo Quiz*"
         import_new_quizzes_help_text: "Nouvo Quiz yo se nouvo motè evalyasyon pou Canvas.%{p_p}Pou konnen plis, kontakte administratè sistèm ou an oswa ale sou"
         import_quizzesNext_help_label: "Enpòte evalyasyon an tan ke Nouvo Quiz Èd Ikòn"
         import_quizzesNext_help_text: "Quizzes.Next se nouvo motè evalyasyon pou Canvas.%{p_p}Pou aprann plis tanpri kontakte administratè sistèm ou an oswa vizite"
