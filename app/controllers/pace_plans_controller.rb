@@ -22,7 +22,7 @@ class PacePlansController < ApplicationController
   before_action :load_course
   before_action :require_feature_flag
   before_action :authorize_action
-  before_action :load_pace_plan, only: %i[api_show publish update]
+  before_action :load_pace_plan, only: %i[api_show update publish]
 
   include Api::V1::Course
   include Api::V1::Progress
@@ -49,8 +49,7 @@ class PacePlansController < ApplicationController
              ENROLLMENTS: enrollments_json(@context),
              SECTIONS: sections_json(@context),
              PACE_PLAN: PacePlanPresenter.new(@pace_plan).as_json,
-             PACE_PLAN_PROGRESS: progress_json,
-             VALID_DATE_RANGE: CourseDateRange.new(@context)
+             PACE_PLAN_PROGRESS: progress_json
            })
     js_bundle :pace_plans
     css_bundle :pace_plans
@@ -130,25 +129,6 @@ class PacePlansController < ApplicationController
     else
       render json: { success: false, errors: @pace_plan.errors.full_messages }, status: :unprocessable_entity
     end
-  end
-
-  def compress_dates
-    @pace_plan = PacePlan.new(create_params)
-    @pace_plan.course = @course
-    start_date = params.dig(:pace_plan, :start_date).present? ? Date.parse(params.dig(:pace_plan, :start_date)) : @pace_plan.start_date
-    compressed_module_items = @pace_plan.compress_dates(save: false, start_date: start_date)
-                                        .sort do |a, b|
-                                          a.module_item.position <=> b.module_item.position
-                                        end
-
-    days_from_start_date = 0
-    compressed_dates = {}
-    compressed_module_items.each do |item|
-      days_from_start_date += item.duration
-      compressed_dates[item.module_item_id] = start_date + days_from_start_date.days
-    end
-
-    render json: compressed_dates.to_json
   end
 
   private

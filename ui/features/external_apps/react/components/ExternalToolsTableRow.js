@@ -38,9 +38,6 @@ const MAX_FAVS = 2
 export default class ExternalToolsTableRow extends React.Component {
   static propTypes = {
     tool: object.isRequired,
-    canAdd: bool.isRequired,
-    canEdit: bool.isRequired,
-    canDelete: bool.isRequired,
     canAddEdit: bool.isRequired,
     setFocusAbove: func.isRequired,
     favoriteCount: number.isRequired,
@@ -159,10 +156,8 @@ export default class ExternalToolsTableRow extends React.Component {
   }
 
   renderButtons = () => {
-    const permsToRenderSettingsCog =
-      this.props.canEdit || this.props.canDelete || this.props.canAddEdit
     const {tool} = this.props
-    if (tool.installed_locally && !tool.restricted_by_master_course && permsToRenderSettingsCog) {
+    if (tool.installed_locally && !tool.restricted_by_master_course) {
       let configureButton = null
       let updateBadge = null
 
@@ -203,7 +198,6 @@ export default class ExternalToolsTableRow extends React.Component {
               <ManageUpdateExternalToolButton tool={tool} returnFocus={this.returnFocus} />
               <EditExternalToolButton
                 tool={tool}
-                canEdit={this.props.canEdit && !this.is13Tool}
                 canAddEdit={this.props.canAddEdit && !this.is13Tool}
                 returnFocus={this.returnFocus}
               />
@@ -214,7 +208,6 @@ export default class ExternalToolsTableRow extends React.Component {
               />
               <ReregisterExternalToolButton
                 tool={tool}
-                canAdd={this.props.canAdd}
                 canAddEdit={this.props.canAddEdit}
                 returnFocus={this.returnFocus}
               />
@@ -223,7 +216,6 @@ export default class ExternalToolsTableRow extends React.Component {
               ) : null}
               <DeleteExternalToolButton
                 tool={tool}
-                canDelete={this.props.canDelete}
                 canAddEdit={this.props.canAddEdit}
                 returnFocus={this.returnFocus}
               />

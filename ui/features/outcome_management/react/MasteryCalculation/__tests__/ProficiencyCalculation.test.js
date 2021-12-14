@@ -355,43 +355,4 @@ describe('ProficiencyCalculation', () => {
       expect(getByText(/all student mastery results within this course/)).not.toBeNull()
     })
   })
-
-  describe('when individualOutcome is "display" and canManage is false', () => {
-    it('renders method and int', () => {
-      const {getByText} = render(
-        <ProficiencyCalculation {...makeProps({individualOutcome: 'display', canManage: false})} />
-      )
-      expect(getByText('Decaying Average')).toBeInTheDocument()
-      expect(getByText('75')).toBeInTheDocument()
-    })
-
-    it('renders method without int', () => {
-      const {queryByText} = render(
-        <ProficiencyCalculation
-          {...makeProps({
-            individualOutcome: 'display',
-            canManage: false,
-            method: {calculationMethod: 'latest', calculationInt: null}
-          })}
-        />
-      )
-      expect(queryByText('Most Recent Score')).toBeInTheDocument()
-      expect(queryByText('Parameter')).not.toBeInTheDocument()
-    })
-
-    it('does not render example', () => {
-      const {queryByText} = render(
-        <ProficiencyCalculation {...makeProps({individualOutcome: 'display', canManage: false})} />
-      )
-      expect(queryByText('Example')).not.toBeInTheDocument()
-      expect(queryByText(/Most recent result counts as/)).not.toBeInTheDocument()
-    })
-
-    it('does not render the save button', () => {
-      const {queryByText} = render(
-        <ProficiencyCalculation {...makeProps({individualOutcome: 'display', canManage: false})} />
-      )
-      expect(queryByText(/Save Mastery Calculation/)).not.toBeInTheDocument()
-    })
-  })
 })

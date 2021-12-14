@@ -177,8 +177,8 @@ describe "context modules" do
       go_to_modules
       fln("Non-graded Published Discussion").click
       f(".edit-btn").click
-      replace_content(f('input[type=text][name="delayed_post_at"]'), format_date_for_view(available_from), tab_out: true)
-      replace_content(f('input[type=text][name="lock_at"]'), format_date_for_view(available_until), tab_out: true)
+      f('input[type=text][name="delayed_post_at"]').send_keys(format_date_for_view(available_from))
+      f('input[type=text][name="lock_at"]').send_keys(format_date_for_view(available_until))
       expect_new_page_load { f(".form-actions button[type=submit]").click }
       go_to_modules
       expect(f(".context_module_item")).not_to include_text(available_from.to_s)

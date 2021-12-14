@@ -1772,13 +1772,6 @@ describe ContextExternalTool do
       tool.change_domain! new_host
       expect(tool.url).to eq "null"
     end
-
-    it "ignores boolean fields (enabled: true)" do
-      tool.account_navigation = { url: "#{prod_base_url}/launch?my_var=1", enabled: true }
-      tool.change_domain! new_host
-      expect(URI.parse(tool.account_navigation[:url]).host).to eq new_host
-      expect(tool.account_navigation[:enabled]).to eq(true)
-    end
   end
 
   describe "standardize_url" do

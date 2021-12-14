@@ -67,8 +67,7 @@ const editView = function (opts = {}, discussOpts = {}) {
     anonymousState: ENV?.DISCUSSION_TOPIC?.ATTRIBUTES?.anonymous_state,
     anonymous_discussion_enabled: ENV.ANONYMOUS_DISCUSSIONS,
     react_discussions_post: ENV.REACT_DISCUSSIONS_POST,
-    allow_student_anonymous_discussion_topics: ENV.allow_student_anonymous_discussion_topics,
-    context_is_not_group: ENV.context_is_not_group
+    allow_student_anonymous_discussion_topics: ENV.allow_student_anonymous_discussion_topics
   })
   ;(app.assignmentGroupCollection = new AssignmentGroupCollection()).contextAssetString =
     ENV.context_asset_string
@@ -308,20 +307,9 @@ test('does not save todo date if discussion is graded', function () {
   equal(formData.todo_date, null)
 })
 
-test('does not renders anonymous section if is a group discussion', function () {
-  ENV.ANONYMOUS_DISCUSSIONS = true
-  ENV.REACT_DISCUSSIONS_POST = true
-  ENV.context_is_not_group = false
-  const view = this.editView({
-    permissions: {CAN_MODERATE: true}
-  })
-  equal(view.$el.find('#anonymous_section_header').length, 0)
-})
-
 test('renders anonymous section if able to moderate', function () {
   ENV.ANONYMOUS_DISCUSSIONS = true
   ENV.REACT_DISCUSSIONS_POST = true
-  ENV.context_is_not_group = true
   const view = this.editView({
     permissions: {CAN_MODERATE: true}
   })
@@ -331,7 +319,6 @@ test('renders anonymous section if able to moderate', function () {
 test('renders anonymous section if student can create', function () {
   ENV.ANONYMOUS_DISCUSSIONS = true
   ENV.REACT_DISCUSSIONS_POST = true
-  ENV.context_is_not_group = true
   ENV.allow_student_anonymous_discussion_topics = true
   const view = this.editView({})
   equal(view.$el.find('#anonymous_section_header').length, 1)
@@ -340,7 +327,6 @@ test('renders anonymous section if student can create', function () {
 test('renders anonymous section with anonymous discussions off checked', function () {
   ENV.ANONYMOUS_DISCUSSIONS = true
   ENV.REACT_DISCUSSIONS_POST = true
-  ENV.context_is_not_group = true
   ENV.DISCUSSION_TOPIC = {ATTRIBUTES: {anonymous_state: null}}
   const view = this.editView({
     permissions: {CAN_MODERATE: true}
@@ -351,7 +337,6 @@ test('renders anonymous section with anonymous discussions off checked', functio
 test('renders anonymous section with full_anonymity checked', function () {
   ENV.ANONYMOUS_DISCUSSIONS = true
   ENV.REACT_DISCUSSIONS_POST = true
-  ENV.context_is_not_group = true
   ENV.DISCUSSION_TOPIC = {ATTRIBUTES: {anonymous_state: 'full_anonymity'}}
   const view = this.editView({
     permissions: {CAN_MODERATE: true}

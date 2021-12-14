@@ -31,16 +31,12 @@ describe('#initializeReaderButton', () => {
   describe('ImmersiveReaderButton', () => {
     const fakeContent = {
       title: 'fake title',
-      content: () => '<p>Some fake content yay</p>'
+      content: '<p>Some fake content yay</p>'
     }
-
     describe('onClick', () => {
-      beforeEach(() => {
-        fetch.mockResponseOnce(JSON.stringify({token: 'fakeToken', subdomain: 'fakeSubdomain'}))
-      })
-
       it('calls to launch the Immersive Reader with the proper content', async () => {
         expect.assertions(1)
+        fetch.mockResponseOnce(JSON.stringify({token: 'fakeToken', subdomain: 'fakeSubdomain'}))
         const fakeLaunchAsync = (...args) =>
           expect(args).toEqual([
             'fakeToken',
@@ -49,13 +45,13 @@ describe('#initializeReaderButton', () => {
               title: 'fake title',
               chunks: [
                 {
-                  content: fakeContent.content(),
+                  content: fakeContent.content,
                   mimeType: 'text/html'
                 }
               ]
             },
             {
-              cookiePolicy: 0
+              cookiePolicy: 1
             }
           ])
         const fakeReaderLib = Promise.resolve({
@@ -66,52 +62,6 @@ describe('#initializeReaderButton', () => {
         )
         const button = await findByText(/Immersive Reader/)
         fireEvent.click(button)
-      })
-
-      describe('with MathML content', () => {
-        const fakeContentWithMath = {
-          title: 'fake title',
-          content: () => `
-            <div>
-              Some simple content
-              <img src="something"
-                class="MathJax_SVG"
-                data-mathml="<mrow><apply><minus/><ci>a</ci><ci>b</ci></apply></mrow>"
-              />
-              Some post math content
-            </div>
-          `
-        }
-
-        it('sends the HTML and MathML as chunks', async () => {
-          const fakeLaunchAsync = (...args) => {
-            expect(args[2].chunks).toMatchObject([
-              {
-                content: '<div>\n              Some simple content\n              ',
-                mimeType: 'text/html'
-              },
-              {
-                content: '<mrow><apply><minus/><ci>a</ci><ci>b</ci></apply></mrow>',
-                mimeType: 'application/mathml+xml'
-              },
-              {
-                content: 'Some post math content\n            \n          ',
-                mimeType: 'text/html'
-              }
-            ])
-          }
-
-          const fakeReaderLib = Promise.resolve({
-            launchAsync: fakeLaunchAsync
-          })
-
-          const {findByText} = render(
-            <ImmersiveReaderButton content={fakeContentWithMath} readerSDK={fakeReaderLib} />
-          )
-
-          const button = await findByText(/^Immersive Reader$/)
-          fireEvent.click(button)
-        })
       })
     })
   })

@@ -16,12 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {AnonymousAvatar} from '../AnonymousAvatar/AnonymousAvatar'
-import {AnonymousUser} from '../../../graphql/AnonymousUser'
 import I18n from 'i18n!discussion_posts'
 import PropTypes from 'prop-types'
 import React, {useContext, useMemo} from 'react'
-import {getDisplayName, isAnonymous, resolveAuthorRoles, responsiveQuerySizes} from '../../utils'
+import {resolveAuthorRoles, responsiveQuerySizes} from '../../utils'
 import {RolePillContainer} from '../RolePillContainer/RolePillContainer'
 import {SearchContext} from '../../utils/constants'
 import {SearchSpan} from '../SearchSpan/SearchSpan'
@@ -37,9 +35,6 @@ import {Tooltip} from '@instructure/ui-tooltip'
 
 export const AuthorInfo = props => {
   const {searchTerm, filter} = useContext(SearchContext)
-
-  const hasAuthor = Boolean(props.author || props.anonymousAuthor)
-  const avatarUrl = isAnonymous(props) ? null : props.author?.avatarUrl
 
   return (
     <Responsive
@@ -67,7 +62,7 @@ export const AuthorInfo = props => {
                 style={{
                   float: 'left',
                   marginLeft: responsiveProps.badgeMarginLeft,
-                  marginTop: hasAuthor ? '11px' : '2px'
+                  marginTop: props.author ? '11px' : '2px'
                 }}
                 data-testid="is-unread"
                 data-isforcedread={props.isForcedRead}
@@ -82,21 +77,18 @@ export const AuthorInfo = props => {
                 />
               </div>
             )}
-            {hasAuthor && !isAnonymous(props) && (
+            {props.author && (
               <Avatar
-                name={getDisplayName(props)}
-                src={avatarUrl}
+                name={props.author.displayName}
+                src={props.author.avatarUrl}
                 margin="0"
                 data-testid="author_avatar"
               />
             )}
-            {hasAuthor && isAnonymous(props) && (
-              <AnonymousAvatar seedString={props.anonymousAuthor.shortName} />
-            )}
           </Flex.Item>
           <Flex.Item shouldShrink>
             <Flex direction="column" margin="0 0 0 small">
-              {hasAuthor && (
+              {props.author && (
                 <Flex.Item>
                   <Flex direction={responsiveProps.nameAndRoleDirection}>
                     <Flex.Item padding="0 small 0 0">
@@ -106,22 +98,18 @@ export const AuthorInfo = props => {
                         lineHeight="condensed"
                         data-testid="author_name"
                       >
-                        {isAnonymous(props) ? (
-                          getDisplayName(props)
-                        ) : (
-                          <SearchSpan
-                            isIsolatedView={props.isIsolatedView}
-                            searchTerm={searchTerm}
-                            text={getDisplayName(props)}
-                          />
-                        )}
+                        <SearchSpan
+                          isIsolatedView={props.isIsolatedView}
+                          searchTerm={searchTerm}
+                          text={props.author.displayName}
+                        />
                       </Text>
                     </Flex.Item>
                     <Flex.Item overflowY="hidden">
                       <RolePillContainer
                         discussionRoles={resolveAuthorRoles(
                           props.isTopicAuthor,
-                          props.author?.courseRoles
+                          props.author.courseRoles
                         )}
                         data-testid="pill-container"
                       />
@@ -153,10 +141,6 @@ AuthorInfo.propTypes = {
    * Object containing author information
    */
   author: User.shape,
-  /**
-   * Object containing anonymous author information
-   */
-  anonymousAuthor: AnonymousUser.shape,
   /**
    * Object containing editor information
    */

@@ -1313,14 +1313,6 @@ class Account < ActiveRecord::Base
   end
 
   set_policy do
-    #################### Begin legacy permission block #########################
-    given do |user|
-      user && !root_account.feature_enabled?(:granular_permissions_manage_lti) &&
-        grants_right?(user, :lti_add_edit)
-    end
-    can :create_tool_manually
-    ##################### End legacy permission block ##########################
-
     RoleOverride.permissions.each do |permission, _details|
       given { |user| cached_account_users_for(user).any? { |au| au.has_permission_to?(self, permission) } }
       can permission
@@ -1351,6 +1343,9 @@ class Account < ActiveRecord::Base
     # any user with an admin enrollment in one of the courses can read
     given { |user| user && courses.where(id: user.enrollments.active.admin.pluck(:course_id)).exists? }
     can :read
+
+    given { |user| grants_right?(user, :lti_add_edit) }
+    can :create_tool_manually
 
     given { |user| !site_admin? && root_account? && grants_right?(user, :manage_site_settings) }
     can :manage_privacy_settings

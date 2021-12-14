@@ -8,7 +8,7 @@ services:
       - .:/usr/src/app
       - api_docs:/usr/src/app/public/doc/api
       - brandable_css_brands:/usr/src/app/app/stylesheets/brandable_css_brands
-      - bundler:/home/docker/.bundle/
+      - bundler:/home/docker/.bundler/
       - canvas-docker-gems:/home/docker/.gem/
       - canvas-media_es:/usr/src/app/packages/canvas-media/es
       - canvas-media_lib:/usr/src/app/packages/canvas-media/lib

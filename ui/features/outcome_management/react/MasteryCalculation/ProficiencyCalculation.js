@@ -88,51 +88,24 @@ const CalculationIntInput = ({updateCalculationInt, calculationMethod, calculati
   )
 }
 
-const Display = ({calculationInt, currentMethod, individualOutcome}) => {
-  const individualOutcomeDisplay = individualOutcome === 'display'
+const Display = ({calculationInt, currentMethod}) => {
   return (
-    <View as="div" padding="small none none">
-      <Flex
-        wrap="wrap"
-        direction={individualOutcomeDisplay ? 'row' : 'column'}
-        padding={individualOutcomeDisplay ? 'none small small none' : 'none small none none'}
-      >
-        <Flex.Item as="div" padding="none xx-small none none">
-          {individualOutcomeDisplay ? (
-            <Text weight="bold">{I18n.t('Proficiency Calculation:')}</Text>
-          ) : (
-            <Heading level="h4">{I18n.t('Mastery Calculation')}</Heading>
-          )}
-        </Flex.Item>
-        <Flex.Item>
-          <Text color="primary" weight="normal">
-            {currentMethod.friendlyCalculationMethod}
-          </Text>
-        </Flex.Item>
-      </Flex>
+    <>
+      <Heading level="h4">{I18n.t('Mastery Calculation')}</Heading>
+      <Text color="primary" weight="normal">
+        {currentMethod.friendlyCalculationMethod}
+      </Text>
       {currentMethod.validRange && (
-        <Flex
-          wrap="wrap"
-          direction={individualOutcomeDisplay ? 'row' : 'column'}
-          padding={individualOutcomeDisplay ? 'none small small none' : 'none small none none'}
-        >
-          <Flex.Item as="div" padding="none xx-small none none">
-            {individualOutcomeDisplay ? (
-              <Text weight="bold">{I18n.t('Parameter:')}</Text>
-            ) : (
-              <Heading margin="medium none none" level="h4">
-                {I18n.t('Parameter')}
-              </Heading>
-            )}
-          </Flex.Item>
-          <Flex.Item>
-            <Text color="primary" weight="normal">
-              {calculationInt}
-            </Text>
-          </Flex.Item>
-        </Flex>
+        <>
+          <Heading margin="medium none none" level="h4">
+            {I18n.t('Parameter')}
+          </Heading>
+          <Text color="primary" weight="normal">
+            {calculationInt}
+          </Text>
+        </>
       )}
-    </View>
+    </>
   )
 }
 
@@ -212,8 +185,7 @@ const ProficiencyCalculation = ({
   update,
   updateError,
   canManage,
-  onNotifyPendingChanges,
-  individualOutcome
+  onNotifyPendingChanges
 }) => {
   const {contextType} = useCanvasContext()
   const {calculationMethod: initialMethodKey, calculationInt: initialInt} = method
@@ -275,12 +247,10 @@ const ProficiencyCalculation = ({
     setAllowSave(false)
   }
 
-  const individualOutcomeDisplay = individualOutcome === 'display'
-
   return (
     <View as="div">
       <Flex alignItems="start" direction="column">
-        <Flex.Item padding={individualOutcomeDisplay ? 'none' : 'small'}>
+        <Flex.Item padding="small">
           {canManage ? (
             <Form
               calculationMethodKey={calculationMethodKey}
@@ -291,18 +261,12 @@ const ProficiencyCalculation = ({
               setCalculationInt={updateCalculationInt}
             />
           ) : (
-            <Display
-              currentMethod={currentMethod}
-              calculationInt={calculationInt}
-              individualOutcome={individualOutcome}
-            />
+            <Display currentMethod={currentMethod} calculationInt={calculationInt} />
           )}
         </Flex.Item>
-        {!individualOutcomeDisplay && (
-          <Flex.Item padding="small">
-            <Example currentMethod={currentMethod} />
-          </Flex.Item>
-        )}
+        <Flex.Item padding="small">
+          <Example currentMethod={currentMethod} />
+        </Flex.Item>
       </Flex>
       {canManage && (
         <div className="save">
@@ -336,10 +300,9 @@ ProficiencyCalculation.propTypes = {
     calculationInt: PropTypes.number
   }),
   canManage: PropTypes.bool,
-  update: PropTypes.func,
+  update: PropTypes.func.isRequired,
   onNotifyPendingChanges: PropTypes.func,
-  updateError: PropTypes.string,
-  individualOutcome: PropTypes.oneOf(['display'])
+  updateError: PropTypes.string
 }
 
 ProficiencyCalculation.defaultProps = {
@@ -347,8 +310,7 @@ ProficiencyCalculation.defaultProps = {
     calculationMethod: 'decaying_average',
     calculationInt: 65
   },
-  updateError: null,
-  update: () => {}
+  updateError: null
 }
 
 export default ProficiencyCalculation

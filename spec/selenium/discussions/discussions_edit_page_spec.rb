@@ -108,9 +108,9 @@ describe "discussions" do
           lock_at = Time.zone.now + 4.days
 
           # set due_at, lock_at, unlock_at
-          replace_content(f(".date_field[data-date-type='due_at']"), format_date_for_view(due_at), tab_out: true)
-          replace_content(f(".date_field[data-date-type='unlock_at']"), format_date_for_view(unlock_at), tab_out: true)
-          replace_content(f(".date_field[data-date-type='lock_at']"), format_date_for_view(lock_at), tab_out: true)
+          f(".date_field[data-date-type='due_at']").send_keys(format_date_for_view(due_at))
+          f(".date_field[data-date-type='unlock_at']").send_keys(format_date_for_view(unlock_at))
+          f(".date_field[data-date-type='lock_at']").send_keys(format_date_for_view(lock_at))
           wait_for_ajaximations
 
           expect_new_page_load { f(".form-actions button[type=submit]").click }
@@ -268,8 +268,8 @@ describe "discussions" do
           delayed_post_at = Time.zone.now - 10.days
           lock_at = Time.zone.now - 5.days
 
-          replace_content(f('input[type=text][name="delayed_post_at"]'), format_date_for_view(delayed_post_at), tab_out: true)
-          replace_content(f('input[type=text][name="lock_at"]'), format_date_for_view(lock_at), tab_out: true)
+          f('input[type=text][name="delayed_post_at"]').send_keys(format_date_for_view(delayed_post_at))
+          f('input[type=text][name="lock_at"]').send_keys(format_date_for_view(lock_at))
 
           expect_new_page_load { f(".form-actions button[type=submit]").click }
           wait_for_ajaximations
@@ -292,7 +292,8 @@ describe "discussions" do
 
           delayed_post_at = Time.zone.now - 5.days
 
-          replace_content(f('input[type=text][name="delayed_post_at"]'), format_date_for_view(delayed_post_at), tab_out: true)
+          f('input[type=text][name="delayed_post_at"]').clear
+          f('input[type=text][name="delayed_post_at"]').send_keys(format_date_for_view(delayed_post_at))
 
           expect_new_page_load { f(".form-actions button[type=submit]").click }
           wait_for_ajaximations

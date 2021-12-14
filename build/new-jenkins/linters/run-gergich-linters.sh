@@ -12,11 +12,11 @@ if [ "$GERRIT_PROJECT" == "canvas-lms" ]; then
   ruby build/dockerfile_writer.rb --env development --compose-file docker-compose.yml,docker-compose.override.yml --in build/Dockerfile.template --out Dockerfile
   ruby build/dockerfile_writer.rb --env jenkins --compose-file docker-compose.yml,docker-compose.override.yml --in build/Dockerfile.template --out Dockerfile.jenkins
   if ! git diff --exit-code Dockerfile; then
-    message="Dockerfile and build/Dockerfile.template need to be kept in sync. Update Dockerfile by running the command given at the top.\\n"
+    message="This commit makes changes to Dockerfile but does not update the Dockerfile.template. Ensure your changes are included in build/Dockerfile.template.\\n"
     gergich comment "{\"path\":\"\Dockerfile\",\"position\":1,\"severity\":\"error\",\"message\":\"$message\"}"
   fi
   if ! git diff --exit-code Dockerfile.jenkins; then
-    message="Dockerfile.jenkins and build/Dockerfile.template need to be kept in sync. Update Dockerfile.jenkins by running the command given at the top.\\n"
+    message="This commit makes changes to Dockerfile.jenkins but does not update the Dockerfile.template. Ensure your changes are included in build/Dockerfile.template.\\n"
     gergich comment "{\"path\":\"\Dockerfile.jenkins\",\"position\":1,\"severity\":\"error\",\"message\":\"$message\"}"
   fi
 fi

@@ -35,8 +35,6 @@ yarn split
 yarn lint
 popd
 
-yarn wsrun --exclude-missing installTranslations
-
 git config --global user.name "Jenkins"
 git config --global user.email "svc.cloudjenkins@instructure.com"
 
@@ -48,5 +46,3 @@ git checkout -B sync-translations-tmp && \
   git commit -m "[i18n] Update package translations" && \
   git push origin sync-translations-tmp:refs/for/master%submit,l=Verified+1 && \
   git checkout "$CURRENT_BRANCH"
-
-yarn wsrun --exclude-missing commitTranslations

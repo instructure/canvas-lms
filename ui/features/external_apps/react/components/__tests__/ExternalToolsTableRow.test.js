@@ -30,9 +30,7 @@ const tools = [
     description: 'This is tool 1',
     name: 'Tool 1',
     is_rce_favorite: false,
-    editor_button_settings: {enabled: true},
-    installed_locally: true,
-    restricted_by_master_course: false
+    editor_button_settings: {enabled: true}
   },
   {
     app_id: 2,
@@ -83,9 +81,6 @@ function renderRow(props) {
   return render(
     <ExternalToolsTableRow
       tool={tools[0]}
-      canAdd
-      canEdit
-      canDelete
       canAddEdit
       setFocusAbove={() => {}}
       favoriteCount={0}
@@ -99,24 +94,6 @@ function renderRow(props) {
 }
 
 describe('ExternalToolsTableRow', () => {
-  describe('with permissions to render', () => {
-    it('shows the settings COG dropdown button', () => {
-      const {queryByText} = renderRow()
-      expect(queryByText(`${tools[0].name} Settings`)).toBeInTheDocument()
-    })
-  })
-
-  describe('without permissions to render', () => {
-    it('shows the external tool placement in replace of the settings COG', () => {
-      const {queryByText} = renderRow({
-        canEdit: false,
-        canDelete: false,
-        canAddEdit: false
-      })
-      expect(queryByText(`${tools[0].name} Settings`)).not.toBeInTheDocument()
-    })
-  })
-
   describe('without lti_favorites', () => {
     it('does not show the toggle', () => {
       const {queryByLabelText} = renderRow({showLTIFavoriteToggles: false})

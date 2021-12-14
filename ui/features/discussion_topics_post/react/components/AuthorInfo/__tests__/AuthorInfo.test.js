@@ -16,16 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {AnonymousUser} from '../../../../graphql/AnonymousUser'
 import {AuthorInfo} from '../AuthorInfo'
-import {CURRENT_USER, SearchContext} from '../../../utils/constants'
 import {render} from '@testing-library/react'
 import React from 'react'
+import {SearchContext} from '../../../utils/constants'
 import {User} from '../../../../graphql/User'
 
 const setup = ({
   author = User.mock({displayName: 'Harry Potter', courseRoles: ['Student', 'TA']}),
-  anonymousAuthor = null,
   editor = User.mock({_id: '1', displayName: 'Severus Snape'}),
   isUnread = false,
   isForcedRead = false,
@@ -41,7 +39,6 @@ const setup = ({
     <SearchContext.Provider value={{searchTerm}}>
       <AuthorInfo
         author={author}
-        anonymousAuthor={anonymousAuthor}
         editor={editor}
         isUnread={isUnread}
         isForcedRead={isForcedRead}
@@ -151,36 +148,6 @@ describe('AuthorInfo', () => {
     it('renders the created date if showCreatedAsTooltip is true but there is no edit info', () => {
       const container = setup({editedTimingDisplay: null, editor: null})
       expect(container.getByText('Jan 1 1:00pm')).toBeInTheDocument()
-    })
-  })
-
-  describe('anonymous author', () => {
-    beforeAll(() => {
-      window.ENV.discussion_anonymity_enabled = true
-    })
-
-    afterAll(() => {
-      window.ENV.discussion_anonymity_enabled = false
-    })
-
-    it('renders name', () => {
-      const container = setup({anonymousAuthor: AnonymousUser.mock()})
-      expect(container.getByText('Anonymous 1')).toBeInTheDocument()
-    })
-
-    it('renders avatar', () => {
-      const container = setup({anonymousAuthor: AnonymousUser.mock()})
-      expect(container.getByTestId('anonymous_avatar')).toBeInTheDocument()
-    })
-
-    it('renders you for the current user', () => {
-      const container = setup({anonymousAuthor: AnonymousUser.mock({shortName: CURRENT_USER})})
-      expect(container.getByText('Anonymous 1 (You)')).toBeInTheDocument()
-    })
-
-    it('should not highlight terms in the author name', () => {
-      const container = setup({anonymousAuthor: AnonymousUser.mock(), searchTerm: 'Anonymous'})
-      expect(container.queryByTestId('highlighted-search-item')).toBeNull()
     })
   })
 })

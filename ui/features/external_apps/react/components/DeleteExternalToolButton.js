@@ -27,7 +27,6 @@ export default class DeleteExternalToolButton extends React.Component {
   static propTypes = {
     tool: PropTypes.shape({name: PropTypes.string}).isRequired,
     returnFocus: PropTypes.func.isRequired,
-    canDelete: PropTypes.bool.isRequired,
     canAddEdit: PropTypes.bool.isRequired
   }
 
@@ -66,7 +65,7 @@ export default class DeleteExternalToolButton extends React.Component {
   }
 
   render() {
-    if (this.props.canDelete || this.props.canAddEdit) {
+    if (this.props.canAddEdit) {
       return (
         <li role="presentation" className="DeleteExternalToolButton">
           <a

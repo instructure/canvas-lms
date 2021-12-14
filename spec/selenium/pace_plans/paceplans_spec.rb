@@ -265,19 +265,4 @@ describe "pace plan page" do
       expect(required_end_date_value).to eq(later_date.strftime("%B %-d, %Y"))
     end
   end
-
-  context "Published Pace Plan Status" do
-    let(:pace_module_title) { "Pace Module" }
-    let(:module_assignment_title) { "Module Assignment 1" }
-
-    before :once do
-      create_published_pace_plan(pace_module_title, module_assignment_title)
-    end
-
-    it "shows publish status on when PP is published" do
-      visit_pace_plans_page
-
-      expect { publish_status.text }.to become("All changes published")
-    end
-  end
 end

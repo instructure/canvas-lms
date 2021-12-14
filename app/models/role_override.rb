@@ -81,7 +81,6 @@ class RoleOverride < ActiveRecord::Base
   # Common set of granular permissions for checking rights against
   GRANULAR_FILE_PERMISSIONS = %i[manage_files_add manage_files_edit manage_files_delete].freeze
   GRANULAR_MANAGE_GROUPS_PERMISSIONS = %i[manage_groups_add manage_groups_manage manage_groups_delete].freeze
-  GRANULAR_MANAGE_LTI_PERMISSIONS = %i[manage_lti_add manage_lti_edit manage_lti_delete].freeze
   GRANULAR_MANAGE_USER_PERMISSIONS = %i[
     allow_course_admin_actions
     add_student_to_course
@@ -566,84 +565,11 @@ class RoleOverride < ActiveRecord::Base
           AccountAdmin
         ]
       },
-      # lagacy role override
       lti_add_edit: {
         label: -> { t("LTI add and edit") },
         label_v2: -> { t("LTI - add / edit / delete") },
-        available_to: %w[
-          TeacherEnrollment
-          TaEnrollment
-          DesignerEnrollment
-          AccountAdmin
-          AccountMembership
-        ],
-        true_for: %w[
-          TeacherEnrollment
-          TaEnrollment
-          DesignerEnrollment
-          AccountAdmin
-        ],
-        account_allows: ->(a) { !a.root_account.feature_enabled?(:granular_permissions_manage_lti) }
-      },
-      manage_lti_add: {
-        label: -> { t("Add LTI") },
-        label_v2: -> { t("LTI - add") },
-        group: "manage_lti",
-        group_label: -> { t("Manage LTI") },
-        available_to: %w[
-          TeacherEnrollment
-          TaEnrollment
-          DesignerEnrollment
-          AccountAdmin
-          AccountMembership
-        ],
-        true_for: %w[
-          TeacherEnrollment
-          TaEnrollment
-          DesignerEnrollment
-          AccountAdmin
-        ],
-        account_allows: ->(a) { a.root_account.feature_enabled?(:granular_permissions_manage_lti) }
-      },
-      manage_lti_edit: {
-        label: -> { t("Edit LTI") },
-        label_v2: -> { t("LTI - edit") },
-        group: "manage_lti",
-        group_label: -> { t("Manage LTI") },
-        available_to: %w[
-          TeacherEnrollment
-          TaEnrollment
-          DesignerEnrollment
-          AccountAdmin
-          AccountMembership
-        ],
-        true_for: %w[
-          TeacherEnrollment
-          TaEnrollment
-          DesignerEnrollment
-          AccountAdmin
-        ],
-        account_allows: ->(a) { a.root_account.feature_enabled?(:granular_permissions_manage_lti) }
-      },
-      manage_lti_delete: {
-        label: -> { t("Delete LTI") },
-        label_v2: -> { t("LTI - delete") },
-        group: "manage_lti",
-        group_label: -> { t("Manage LTI") },
-        available_to: %w[
-          TeacherEnrollment
-          TaEnrollment
-          DesignerEnrollment
-          AccountAdmin
-          AccountMembership
-        ],
-        true_for: %w[
-          TeacherEnrollment
-          TaEnrollment
-          DesignerEnrollment
-          AccountAdmin
-        ],
-        account_allows: ->(a) { a.root_account.feature_enabled?(:granular_permissions_manage_lti) }
+        true_for: %w[TeacherEnrollment TaEnrollment DesignerEnrollment AccountAdmin],
+        available_to: %w[TeacherEnrollment TaEnrollment DesignerEnrollment AccountAdmin AccountMembership]
       },
       manage_admin_users: {
         label: -> { t("permissions.manage_admin_users", "Add/remove other teachers, course designers or TAs to the course") },

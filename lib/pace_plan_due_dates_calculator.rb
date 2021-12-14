@@ -24,9 +24,9 @@ class PacePlanDueDatesCalculator
     @pace_plan = pace_plan
   end
 
-  def get_due_dates(items, enrollment = nil, start_date: nil)
+  def get_due_dates(items, enrollment = nil)
     due_dates = {}
-    start_date = start_date || enrollment&.start_at&.to_date || pace_plan.start_date
+    start_date = enrollment&.start_at&.to_date || pace_plan.start_date
 
     # We have to make sure we start counting from one day before the plan start, so that the first day is inclusive.
     # If the plan start date is enabled (i.e., not on a blackout date) we can just subtract one working day.

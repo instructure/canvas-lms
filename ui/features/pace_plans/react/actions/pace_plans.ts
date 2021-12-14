@@ -22,7 +22,7 @@ import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 // @ts-ignore: TS doesn't understand i18n scoped imports
 import I18n from 'i18n!pace_plans_actions'
 
-import {PacePlanItemDueDates, PacePlan, PlanContextTypes, Progress, StoreState} from '../types'
+import {PacePlan, PlanContextTypes, Progress, StoreState} from '../types'
 import {createAction, ActionsUnion} from '../shared/types'
 import {actions as uiActions} from './ui'
 import * as Api from '../api/pace_plan_api'
@@ -39,9 +39,7 @@ export enum Constants {
   PLAN_CREATED = 'PACE_PLAN/PLAN_CREATED',
   TOGGLE_HARD_END_DATES = 'PACE_PLAN/TOGGLE_HARD_END_DATES',
   RESET_PLAN = 'PACE_PLAN/RESET_PLAN',
-  SET_PROGRESS = 'PACE_PLAN/SET_PROGRESS',
-  SET_COMPRESSED_ITEM_DATES = 'PACE_PLAN/SET_COMPRESSED_ITEM_DATES',
-  UNCOMPRESS_DATES = 'PACE_PLAN/UNCOMPRESS_ITEM_DATES'
+  SET_PROGRESS = 'PACE_PLAN/SET_PROGRESS'
 }
 
 /* Action creators */
@@ -55,9 +53,6 @@ const regularActions = {
     createAction(Constants.SET_PACE_PLAN, {...plan, originalPlan: plan}),
   setStartDate: (date: string) => createAction(Constants.SET_START_DATE, date),
   setEndDate: (date: string): SetEndDate => createAction(Constants.SET_END_DATE, date),
-  setCompressedItemDates: (compressedItemDates: PacePlanItemDueDates) =>
-    createAction(Constants.SET_COMPRESSED_ITEM_DATES, compressedItemDates),
-  uncompressDates: () => createAction(Constants.UNCOMPRESS_DATES),
   planCreated: (plan: PacePlan) => createAction(Constants.PLAN_CREATED, plan),
   toggleExcludeWeekends: () => createAction(Constants.TOGGLE_EXCLUDE_WEEKENDS),
   toggleHardEndDates: () => createAction(Constants.TOGGLE_HARD_END_DATES),
@@ -83,6 +78,7 @@ const thunkActions = {
         .catch(error => {
           dispatch(uiActions.hideLoadingOverlay())
           dispatch(uiActions.setCategoryError('publish', error?.toString()))
+          console.log(error) // eslint-disable-line no-console
         })
     }
   },
@@ -187,25 +183,6 @@ const thunkActions = {
           dispatch(uiActions.hideLoadingOverlay())
           dispatch(uiActions.setCategoryError('relinkToParent', error?.toString()))
           console.error(error) // eslint-disable-line no-console
-        })
-    }
-  },
-  compressDates: (): ThunkAction<Promise<void>, StoreState, void, Action> => {
-    return (dispatch, getState) => {
-      dispatch(uiActions.showLoadingOverlay(I18n.t('Compressing...')))
-      dispatch(uiActions.clearCategoryError('compress'))
-
-      return Api.compress(getState().pacePlan)
-        .then(responseBody => {
-          if (!responseBody) throw new Error(I18n.t('Response body was empty'))
-          const compressedItemDates = responseBody
-          dispatch(pacePlanActions.setCompressedItemDates(compressedItemDates))
-          dispatch(uiActions.hideLoadingOverlay())
-        })
-        .catch(error => {
-          dispatch(uiActions.hideLoadingOverlay())
-          dispatch(uiActions.setCategoryError('compress', error?.toString()))
-          console.log(error) // eslint-disable-line no-console
         })
     }
   }

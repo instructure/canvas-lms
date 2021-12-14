@@ -1132,7 +1132,6 @@ describe Course do
 
       it "grants create_tool_manually to the proper individuals" do
         course_with_teacher(active_all: true)
-        @course.root_account.disable_feature!(:granular_permissions_manage_lti)
         @teacher = user_factory(active_all: true)
         @course.enroll_teacher(@teacher).accept!
 
@@ -1150,36 +1149,6 @@ describe Course do
         expect(@course.grants_right?(@ta, :create_tool_manually)).to be_truthy
         expect(@course.grants_right?(@designer, :create_tool_manually)).to be_truthy
         expect(@course.grants_right?(@student, :create_tool_manually)).to be_falsey
-      end
-
-      it "grants manage_lti_* to the proper individuals (granular permissions)" do
-        course_with_teacher(active_all: true)
-        @course.root_account.enable_feature!(:granular_permissions_manage_lti)
-        @teacher = user_factory(active_all: true)
-        @course.enroll_teacher(@teacher).accept!
-
-        @ta = user_factory(active_all: true)
-        @course.enroll_ta(@ta).accept!
-
-        @designer = user_factory(active_all: true)
-        @course.enroll_designer(@designer).accept!
-
-        @student = user_factory(active_all: true)
-        @course.enroll_student(@student).accept!
-
-        clear_permissions_cache
-        expect(@course.grants_right?(@teacher, :manage_lti_add)).to be_truthy
-        expect(@course.grants_right?(@ta, :manage_lti_add)).to be_truthy
-        expect(@course.grants_right?(@designer, :manage_lti_add)).to be_truthy
-        expect(@course.grants_right?(@student, :manage_lti_add)).to be_falsey
-        expect(@course.grants_right?(@teacher, :manage_lti_edit)).to be_truthy
-        expect(@course.grants_right?(@ta, :manage_lti_edit)).to be_truthy
-        expect(@course.grants_right?(@designer, :manage_lti_edit)).to be_truthy
-        expect(@course.grants_right?(@student, :manage_lti_edit)).to be_falsey
-        expect(@course.grants_right?(@teacher, :manage_lti_delete)).to be_truthy
-        expect(@course.grants_right?(@ta, :manage_lti_delete)).to be_truthy
-        expect(@course.grants_right?(@designer, :manage_lti_delete)).to be_truthy
-        expect(@course.grants_right?(@student, :manage_lti_delete)).to be_falsey
       end
 
       def make_date_completed
@@ -2699,7 +2668,7 @@ describe Course do
 
           it "returns the plugin names" do
             tabs = @course.tabs_available(@user)
-            expect(tabs.find { |t| t[:css_class] == "conferences" }[:label]).to eq("Big blue button Wimba")
+            expect(tabs.find { |t| t[:css_class] == "conferences" }[:label]).to eq("Big blue button Wimba (Conferences)")
           end
         end
 
