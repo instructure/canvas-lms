@@ -6788,7 +6788,7 @@ pl:
         default_select_folder: "Wybierz folder"
         upload_to: "Przekaż do"
       import_quizzes_next_view: 
-        import_new_quizzes: "Importuj zawartość testu jako New Quizzes"
+        import_new_quizzes: "Importuj zawartość testu jako *New Quizzes*"
         import_new_quizzes_help_text: "New Quizzes to nowy mechanizm testów dla Canvas.%{p_p}Aby uzyskać więcej informacji, skontaktuj się z administratorem systemu lub odwiedź stronę"
         import_quizzesNext_help_label: "Importuj test jako ikonę pomocy New Quizzes"
         import_quizzesNext_help_text: "Quizzes.Next to nowy mechanizm testów dla Canvas.%{p_p}Aby uzyskać więcej informacji, skontaktuj się z administratorem systemu lub odwiedź stronę"
