@@ -5412,7 +5412,7 @@ ca:
         default_select_folder: "Selecciona la carpeta"
         upload_to: "Carrega a"
       import_quizzes_next_view: 
-        import_new_quizzes: "Importa el contingut de l'avaluació com a Qüestionaris nous"
+        import_new_quizzes: "Importa el contingut de l'avaluació com a *Qüestionaris nous*"
         import_new_quizzes_help_text: "Qüestionaris nous és el nou motor d'avaluació del Canvas.%{p_p}Per obtenir més informació, poseu-vos en contacte amb l’administrador del sistema o visiteu"
         import_quizzesNext_help_label: "Importa l'avaluació com a icona d'ajuda de Qüestionaris nous"
         import_quizzesNext_help_title: "Qüestionaris nous"
