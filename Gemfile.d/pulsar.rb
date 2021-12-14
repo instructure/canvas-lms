@@ -27,6 +27,6 @@
 # If you're looking here because you're having trouble installing
 # this gem and you don't think you need pulsar, then you should actually
 # be running `bundle install --without pulsar` to just skip it.
-group :pulsar, optional: true do
+group :pulsar do
   gem "pulsar-client", "2.6.1.pre.beta.2"
 end
