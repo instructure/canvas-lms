@@ -6692,7 +6692,7 @@ pt-BR:
         default_select_folder: "Selecionar pasta"
         upload_to: "Upload para"
       import_quizzes_next_view: 
-        import_new_quizzes: "Importar conteúdo de avaliações como Novos Testes"
+        import_new_quizzes: "Importar conteúdo de avaliações como *Novos Testes*"
         import_new_quizzes_help_text: "New Quizzes é o novo motor de avaliação para o Canvas.%{p_p}Para saber mais, contate o administrador do seu sistema ou visite"
         import_quizzesNext_help_label: "Importar avaliação como Ícone de Ajuda Novos Testes"
         import_quizzesNext_help_text: "Quizzes.Next é o novo motor de avaliação para o Canvas.%{p_p}Para saber mais, contate o administrador do seu sistema ou visite"
