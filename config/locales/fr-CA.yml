@@ -6412,7 +6412,7 @@ fr-CA:
         default_select_folder: "Sélectionner le dossier"
         upload_to: "Téléverser vers"
       import_quizzes_next_view: 
-        import_new_quizzes: "Importation de contenu d’évaluation comme nouveaux questionnaires"
+        import_new_quizzes: "Importation de contenu d’évaluation comme *nouveaux questionnaires*"
         import_new_quizzes_help_text: "Nouveaux questionnaires est le nouveau moteur d’évaluation pour Canvas.%{p_p}Pour en apprendre plus, veuillez communiquer avec votre administrateur de système"
         import_quizzesNext_help_label: "Importation d’évaluation comme icône d’aide de nouveaux questionnaires"
         import_quizzesNext_help_text: "Quizzes.Next est le nouveau moteur d’évaluation pour Canvas.%{p_p}Pour en apprendre plus, veuillez communiquer avec votre administrateur de système ou visitez"
