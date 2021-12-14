@@ -5510,7 +5510,7 @@ sl:
         default_select_folder: "Izberi mapo"
         upload_to: "Naloži v"
       import_quizzes_next_view: 
-        import_new_quizzes: "Uvozi vsebino ocenjevanja kot New Quizzes"
+        import_new_quizzes: "Uvozi vsebino ocenjevanja kot *New Quizzes*"
         import_new_quizzes_help_text: "New Quizzes je novi mehanizem ocenjevanja za sistem Canvas.%{p_p}Če želite izvedeti več, se obrnite na skrbnika svojega sistema ali obiščite spletno mesto"
         import_quizzesNext_help_label: "Uvozi ocenjevanje kot ikono pomoči za New Quizzes"
         import_quizzesNext_help_text: "Quizzes.Next je novi mehanizem ocenjevanja za sistem Canvas.%{p_p}Če želite izvedeti več, se obrnite na skrbnika svojega sistema ali obiščite spletno mesto"
