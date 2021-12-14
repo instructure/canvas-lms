@@ -6114,7 +6114,7 @@ cy:
         default_select_folder: "Dewiswch Ffolder"
         upload_to: "Llwytho i fyny i"
       import_quizzes_next_view: 
-        import_new_quizzes: "Mewngludo cynnwys asesu fel New Quizzes"
+        import_new_quizzes: "Mewngludo cynnwys asesu fel *New Quizzes*"
         import_new_quizzes_help_text: "New Quizzes yw peiriant asesu newydd Canvas.%{p_p} I ddysgu rhagor, cysylltwch â gweinyddwr eich system neu ewch i"
         import_quizzesNext_help_label: "Mewngludo asesiad fel Eicon Help New Quizzes"
         import_quizzesNext_help_text: "Quizzes.Next yw peiriant asesu newydd Canvas.%{p_p}I ddysgu rhagor, cysylltwch â gweinyddwr eich system neu ewch i"
