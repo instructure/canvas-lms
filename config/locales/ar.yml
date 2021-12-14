@@ -6864,7 +6864,7 @@ ar:
         default_select_folder: "تحديد مجلد"
         upload_to: "تحميل إلى"
       import_quizzes_next_view: 
-        import_new_quizzes: "استيراد محتوى التقييم في صورة New Quizzes"
+        import_new_quizzes: "استيراد محتوى التقييم في صورة *New Quizzes*"
         import_new_quizzes_help_text: "New Quizzes هو محرك التقييم الجديد لـ Canvas.%{p_p}لمعرفة المزيد يرجى الاتصال بمسؤول النظام أو زيارة"
         import_quizzesNext_help_label: "استيراد تقييم كأيقونة مساعدة New Quizzes"
         import_quizzesNext_help_text: "Quizzes.Next هو محرك التقييم الجديد لـ Canvas.%{p_p}لمعرفة المزيد يرجى الاتصال بمسؤول النظام أو زيارة"
