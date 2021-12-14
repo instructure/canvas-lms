@@ -63,7 +63,7 @@ describe "assignment groups" do
     end
 
     it "edits a due date", priority: "2" do
-      skip("flaky spec, LA-749")
+      # skip("flaky spec, LA-749")
       assignment = create_assignment!
       visit_assignment_edit_page(assignment)
 
