@@ -87,14 +87,14 @@ describe('AssignmentRow', () => {
 
   it('renders the projected due date if projections are being shown', () => {
     const {getByText} = renderConnected(<AssignmentRow {...defaultProps} />)
-    expect(getByText('Wed, Jan 1, 2020')).toBeInTheDocument()
+    expect(getByText('1/1/2020')).toBeInTheDocument()
   })
 
   it('does not show the projected due date if projections are being hidden', async () => {
     const {queryByText} = renderConnected(
       <AssignmentRow {...defaultProps} datesVisible={false} showProjections={false} />
     )
-    await waitFor(() => expect(queryByText('Wed, Jan 1, 2020')).not.toBeInTheDocument())
+    await waitFor(() => expect(queryByText('1/1/2020')).not.toBeInTheDocument())
   })
 
   it('renders an icon showing whether or not the module item is published', () => {

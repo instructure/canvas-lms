@@ -26,9 +26,6 @@ require "rubocop_canvas/version"
 require "rubocop_canvas/helpers/consts"
 require "rubocop_canvas/helpers/file_meta"
 require "rubocop_canvas/helpers/migration_tags"
-require "rubocop_canvas/helpers/new_tables"
-require "rubocop_canvas/helpers/current_def"
-require "rubocop_canvas/helpers/non_transactional"
 
 # cops
 ## datafixup
@@ -41,8 +38,6 @@ require "rubocop_canvas/cops/migration/non_transactional"
 require "rubocop_canvas/cops/migration/primary_key"
 require "rubocop_canvas/cops/migration/remove_column"
 require "rubocop_canvas/cops/migration/delay"
-require "rubocop_canvas/cops/migration/add_foreign_key"
-require "rubocop_canvas/cops/migration/execute"
 ## specs
 require "rubocop_canvas/cops/specs/no_before_once_stubs"
 require "rubocop_canvas/cops/specs/no_disable_implicit_wait"

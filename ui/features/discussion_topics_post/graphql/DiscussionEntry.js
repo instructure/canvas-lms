@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {AnonymousUser} from './AnonymousUser'
 import {bool, number, shape, string} from 'prop-types'
 import {DiscussionEntryPermissions} from './DiscussionEntryPermissions'
 import gql from 'graphql-tag'
@@ -64,9 +63,6 @@ export const DiscussionEntry = {
         author {
           shortName
         }
-        anonymousAuthor {
-          shortName
-        }
         editor {
           shortName
         }
@@ -89,7 +85,6 @@ export const DiscussionEntry = {
     subentriesCount: number,
     attachment: Attachment.shape,
     author: User.shape,
-    anonymousAuthor: AnonymousUser.shape,
     editor: User.shape,
     entryParticipant: shape({
       rating: bool,
@@ -133,7 +128,6 @@ export const DiscussionEntry = {
     subentriesCount = 2,
     attachment = Attachment.mock(),
     author = User.mock(),
-    anonymousAuthor = null,
     editor = User.mock(),
     entryParticipant = {
       rating: false,
@@ -173,7 +167,6 @@ export const DiscussionEntry = {
     subentriesCount,
     attachment,
     author,
-    anonymousAuthor,
     editor,
     entryParticipant,
     rootEntryParticipantCounts,

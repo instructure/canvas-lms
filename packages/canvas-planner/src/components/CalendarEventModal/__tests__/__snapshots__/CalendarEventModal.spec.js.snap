@@ -27,7 +27,6 @@ exports[`renders 1`] = `
   variant="default"
 >
   <ModalHeader
-    spacing="default"
     variant="default"
   >
     <Heading
@@ -293,7 +292,6 @@ exports[`renders with allDay 1`] = `
   variant="default"
 >
   <ModalHeader
-    spacing="default"
     variant="default"
   >
     <Heading
@@ -559,7 +557,6 @@ exports[`renders with only the startTime 1`] = `
   variant="default"
 >
   <ModalHeader
-    spacing="default"
     variant="default"
   >
     <Heading
@@ -825,7 +822,6 @@ exports[`renders with user displayName for calendar 1`] = `
   variant="default"
 >
   <ModalHeader
-    spacing="default"
     variant="default"
   >
     <Heading
@@ -1091,7 +1087,6 @@ exports[`renders without address 1`] = `
   variant="default"
 >
   <ModalHeader
-    spacing="default"
     variant="default"
   >
     <Heading
@@ -1319,7 +1314,6 @@ exports[`renders without details 1`] = `
   variant="default"
 >
   <ModalHeader
-    spacing="default"
     variant="default"
   >
     <Heading
@@ -1560,7 +1554,6 @@ exports[`renders without location 1`] = `
   variant="default"
 >
   <ModalHeader
-    spacing="default"
     variant="default"
   >
     <Heading

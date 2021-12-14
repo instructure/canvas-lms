@@ -139,24 +139,4 @@ describe('DiscussionPostToolbar', () => {
       expect(container.queryByTestId('groups-menu-button')).toBeTruthy()
     })
   })
-
-  describe('Anonymous Indicator Avatar', () => {
-    describe('discussion is anonymous', () => {
-      it('should render discussionAnonymousState is not null', () => {
-        const container = setup({
-          discussionAnonymousState: 'full_anonymity'
-        })
-        expect(container.queryByTestId('anonymous_avatar')).toBeTruthy()
-      })
-    })
-
-    describe('discussion is not anonymous', () => {
-      it('should render discussionAnonymousState is null', () => {
-        const container = setup({
-          discussionAnonymousState: null
-        })
-        expect(container.queryByTestId('anonymous_avatar')).toBeNull()
-      })
-    })
-  })
 })

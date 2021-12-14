@@ -1087,9 +1087,12 @@ class CoursesController < ApplicationController
           users = users.where(uuid: user_uuids)
         end
 
+        page_opts = {}
         # don't calculate a total count/last page for this endpoint.
-        # total_entries: nil
-        users = Api.paginate(users, self, api_v1_course_users_url, { total_entries: nil })
+        if search_term || !@domain_root_account.allow_last_page_on_course_users?
+          page_opts[:total_entries] = nil # doesn't calculate a total count
+        end
+        users = Api.paginate(users, self, api_v1_course_users_url, page_opts)
         includes = Array(params[:include]).concat(["sis_user_id", "email"])
 
         # user_json_preloads loads both active/accepted and deleted
@@ -1468,6 +1471,7 @@ class CoursesController < ApplicationController
         can_manage_courses: @context.account.grants_any_right?(@current_user, session, :manage_courses, :manage_courses_admin),
         manage_students: @context.grants_right?(@current_user, session, :manage_students),
         manage_account_settings: @context.account.grants_right?(@current_user, session, :manage_account_settings),
+        create_tool_manually: @context.grants_right?(@current_user, session, :create_tool_manually),
         manage_feature_flags: @context.grants_right?(@current_user, session, :manage_feature_flags),
         manage: @context.grants_right?(@current_user, session, :manage)
       }
@@ -1475,13 +1479,6 @@ class CoursesController < ApplicationController
         js_permissions[:can_allow_course_admin_actions] = @context.grants_right?(@current_user, session, :allow_course_admin_actions)
       else
         js_permissions[:manage_admin_users] = @context.grants_right?(@current_user, session, :manage_admin_users)
-      end
-      if @context.root_account.feature_enabled?(:granular_permissions_manage_lti)
-        js_permissions[:add_tool_manually] = @context.grants_right?(@current_user, session, :manage_lti_add)
-        js_permissions[:edit_tool_manually] = @context.grants_right?(@current_user, session, :manage_lti_edit)
-        js_permissions[:delete_tool_manually] = @context.grants_right?(@current_user, session, :manage_lti_delete)
-      else
-        js_permissions[:create_tool_manually] = @context.grants_right?(@current_user, session, :create_tool_manually)
       end
       js_env({
                COURSE_ID: @context.id,
@@ -3102,7 +3099,7 @@ class CoursesController < ApplicationController
           @course.wiki.update_default_wiki_page_roles(@course.default_wiki_editing_roles, @default_wiki_editing_roles_was)
         end
         # Sync homeroom enrollments and participation if enabled and course isn't a SIS import
-        if @course.elementary_enabled? && value_to_boolean(params[:course][:sync_enrollments_from_homeroom]) && params[:course][:homeroom_course_id] && @course.sis_batch_id.blank?
+        if @course.elementary_enabled? && params[:course][:sync_enrollments_from_homeroom] && params[:course][:homeroom_course_id] && @course.sis_batch_id.blank?
           progress = Progress.new(context: @course, tag: :sync_homeroom_enrollments)
           progress.user = @current_user
           progress.reset!

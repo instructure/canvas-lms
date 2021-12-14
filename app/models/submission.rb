@@ -1503,13 +1503,6 @@ class Submission < ActiveRecord::Base
     end
   end
 
-  def type_for_attempt(attempt)
-    return submission_type if attempt == self.attempt
-
-    submission = submission_history.find { |sub| sub.attempt == attempt }
-    submission&.submission_type
-  end
-
   def submission_history
     @submission_histories ||= begin
       res = []

@@ -277,7 +277,6 @@ const locale = {
   "loading_failed_e6a9d8ef": { "message": "Loading failed." },
   "loading_folders_d8b5869e": { "message": "Loading folders" },
   "loading_please_wait_d276220a": { "message": "Loading, please wait" },
-  "loading_preview_9f077aa1": { "message": "Loading preview" },
   "locked_762f138b": { "message": "Locked" },
   "media_af190855": { "message": "Media" },
   "medium_5a8e9ead": { "message": "Medium" },

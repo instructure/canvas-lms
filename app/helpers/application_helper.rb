@@ -847,12 +847,7 @@ module ApplicationHelper
         # user profile, show the branding for the lowest account where all my enrollments are. eg:
         # if I'm at saltlakeschooldistrict.instructure.com, but I'm only enrolled in classes at
         # Highland High, show Highland's branding even on the dashboard.
-        GuardRail.activate(:secondary) do
-          @brand_account = BrandAccountChainResolver.new(
-            user: @current_user,
-            root_account: @domain_root_account
-          ).resolve
-        end
+        @brand_account = @current_user.common_account_chain(@domain_root_account).last
       end
 
       # If we're not logged in, or we have no enrollments anywhere in domain_root_account,

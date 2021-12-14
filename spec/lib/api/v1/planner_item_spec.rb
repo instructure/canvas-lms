@@ -143,7 +143,6 @@ describe Api::V1::PlannerItem do
             https://meet146.webex.com/meet146/j.php?MTID=mb0f63c6586178c903f161b109886066b
             https://meet-146.webex.com/meet/pr-._25535050184
             https://meet.google.com/sbs-ycbe-yhu
-            https://myschool.instructure.com/courses/17/conferences/19/join
           ]
         end
 
@@ -165,7 +164,6 @@ describe Api::V1::PlannerItem do
             https://tea-ms.microsoft.com/l/meetup-join/19%3ameeting_MjAyMjU4Y2QtZTc0Mi00OTI1LTllYTUtNjEzNTBhMjY3OTZi%40thread.v2/0?context=%7B%22Tid%22%3A%22b8e866dc-ae4d-482d-8ebb-6ef626b97a42%22%2C%22Oid%22%3A%22ac200842-2ec5-494e-83db-dfddc8939907%22%7D
             https://teams.micro-soft.com/l/meetup-join/19%3ameeting_MjAyMjU4Y2QtZTc0Mi00OTI1LTllYTUtNjEzNTBhMjY3OTZi%40thread.v2/0?context=%7B%22Tid%22%3A%22b8e866dc-ae4d-482d-8ebb-6ef626b97a42%22%2C%22Oid%22%3A%22ac200842-2ec5-494e-83db-dfddc8939907%22%7D
             https://tea-ms.live.com/meet/93298311589140
-            https://myschool.instructure.com/courses/17/conferences
           ]
         end
 

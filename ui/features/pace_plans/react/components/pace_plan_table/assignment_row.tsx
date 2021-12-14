@@ -264,9 +264,7 @@ export class AssignmentRow extends React.Component<ComponentProps, LocalState> {
   }
 
   renderDate = () => {
-    // change the date format and you'll probably have to change
-    // the column width in AssignmentRow
-    return moment(this.props.dueDate).format('ddd, MMM D, YYYY')
+    return moment(this.props.dueDate).format('l')
   }
 
   renderTitle() {
