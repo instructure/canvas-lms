@@ -468,6 +468,15 @@ describe DiscussionTopicsController, type: :request do
                    anonymous_state: "full_anonymity" }, {}, { expected_status: 200 })
       end
     end
+
+    it "unable to create an anonymous topic for a group discussion" do
+      group_category = @course.group_categories.create(name: "Group")
+      api_call(:post, "/api/v1/courses/#{@course.id}/discussion_topics",
+               { controller: "discussion_topics", action: "create", format: "json",
+                 course_id: @course.to_param },
+               { title: "test title", message: "test <b>message</b>", discussion_type: "threaded",
+                 anonymous_state: "full_anonymity", group_category_id: group_category.id }, {}, { expected_status: 400 })
+    end
   end
 
   context "With item" do
