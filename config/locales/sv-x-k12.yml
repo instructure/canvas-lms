@@ -6140,7 +6140,7 @@ sv-x-k12:
         default_select_folder: "Välj en mapp"
         upload_to: "Ladda upp till"
       import_quizzes_next_view: 
-        import_new_quizzes: "Importera bedömningsinnehåll som New Quizzes"
+        import_new_quizzes: "Importera bedömningsinnehåll som *New Quizzes*"
         import_new_quizzes_help_text: "New Quizzes är den Canvas-bedömningsmotorn.%{p_p}Kontakta din systemadministratör om du vill veta mer eller besök"
         import_quizzesNext_help_label: "Importera bedömning som New Quizzes-hjälpikon"
         import_quizzesNext_help_text: "Quizzes.Next är den nya bedömningsmotorn för Canvas.%{p_p}För att få veta mer kontakta din systemadministratör eller gå till"
