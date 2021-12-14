@@ -222,7 +222,7 @@ module CC
 
       tracks = {}
       html_content_exporter.used_media_objects.each do |obj|
-        migration_id = create_key(obj)
+        migration_id = create_key(obj.attachment)
         info = html_content_exporter.media_object_infos[obj.id]
         next unless info && info[:asset]
 

@@ -21,6 +21,7 @@ import createStore from '@canvas/util/createStore'
 import $ from 'jquery'
 import DefaultUrlMixin from '@canvas/backbone/DefaultUrlMixin'
 import parseLinkHeader from 'link-header-parsing/parseLinkHeaderFromXHR'
+import AssignmentOverrideHelper from '../AssignmentOverrideHelper'
 
 // -------------------
 //     Initialize
@@ -58,7 +59,7 @@ function sectionIDs(enrollments) {
 
 // ---- by ID ----
 
-OverrideStudentStore.fetchStudentsByID = function(givenIds) {
+OverrideStudentStore.fetchStudentsByID = function (givenIds) {
   if (typeof givenIds === 'undefined' || givenIds.length === 0) {
     return null
   }
@@ -75,7 +76,7 @@ OverrideStudentStore.fetchStudentsByID = function(givenIds) {
   )
 }
 
-OverrideStudentStore._fetchStudentsByIDSuccessHandler = function(opts, items, status, xhr) {
+OverrideStudentStore._fetchStudentsByIDSuccessHandler = function (opts, items, status, xhr) {
   this.addStudents(items)
 
   const links = parseLinkHeader(xhr)
@@ -86,7 +87,7 @@ OverrideStudentStore._fetchStudentsByIDSuccessHandler = function(opts, items, st
 
 // ---- by name ----
 
-OverrideStudentStore.fetchStudentsByName = function(nameString) {
+OverrideStudentStore.fetchStudentsByName = function (nameString) {
   if (
     $.trim(nameString) === '' ||
     this.allStudentsFetched() ||
@@ -114,17 +115,17 @@ OverrideStudentStore.fetchStudentsByName = function(nameString) {
   )
 }
 
-OverrideStudentStore.allStudentsFetched = function() {
+OverrideStudentStore.allStudentsFetched = function () {
   return this.getState().allStudentsFetched
 }
 
-OverrideStudentStore._fetchStudentsByNameSuccessHandler = function(opts, items, status, xhr) {
+OverrideStudentStore._fetchStudentsByNameSuccessHandler = function (opts, items, status, xhr) {
   this.doneSearching()
   this.markNameSearched(opts.nameString)
   this.addStudents(items)
 }
 
-OverrideStudentStore._fetchStudentsByNameErrorHandler = function(opts) {
+OverrideStudentStore._fetchStudentsByNameErrorHandler = function (opts) {
   this.doneSearching()
 }
 
@@ -133,7 +134,7 @@ OverrideStudentStore._fetchStudentsByNameErrorHandler = function(opts) {
 const PAGES_OF_STUDENTS_TO_FETCH = 4
 const STUDENTS_FETCHED_PER_PAGE = 50
 
-OverrideStudentStore.fetchStudentsForCourse = function() {
+OverrideStudentStore.fetchStudentsForCourse = function () {
   if (this.getState().requestedStudentsForCourse) {
     return
   }
@@ -153,7 +154,7 @@ OverrideStudentStore.fetchStudentsForCourse = function() {
   )
 }
 
-OverrideStudentStore._fetchStudentsForCourseSuccessHandler = function(
+OverrideStudentStore._fetchStudentsForCourseSuccessHandler = function (
   {pageNumber},
   items,
   status,
@@ -179,37 +180,8 @@ OverrideStudentStore._fetchStudentsForCourseSuccessHandler = function(
 //   Set & Get State
 // -------------------
 
-OverrideStudentStore.getStudents = function() {
+OverrideStudentStore.getStudents = function () {
   return OverrideStudentStore.getState().students
-}
-
-function nameWithSecondaryInfo(student) {
-  const secondaryId = student.sis_user_id || student.email || student.login_id
-  return secondaryId ? `${student.name} (${secondaryId})` : student.name
-}
-
-const normalizeName = name =>
-  name
-    .replace(/\p{Punctuation}/gu, '')
-    .toLowerCase()
-    .trim()
-
-const addSecondaryNameInfoIfDuplicate = students => {
-  const normalizedNameCounts = {}
-  const nameToNormalizedName = {}
-  students.forEach(student => {
-    const normalizedName = normalizeName(student.name)
-    nameToNormalizedName[student.name] = normalizedName
-    normalizedNameCounts[normalizedName] = (normalizedNameCounts[normalizedName] || 0) + 1
-  })
-
-  return students.map(student => ({
-    ...student,
-    displayName:
-      normalizedNameCounts[nameToNormalizedName[student.name]] > 1
-        ? nameWithSecondaryInfo(student)
-        : student.name
-  }))
 }
 
 OverrideStudentStore.addStudents = function (newlyFetchedStudents) {
@@ -223,22 +195,17 @@ OverrideStudentStore.addStudents = function (newlyFetchedStudents) {
     ..._.keyBy(newlyFetchedStudents, student => student.id)
   })
 
-  // If there are duplicate student names, show secondary info
-  const studentsWithSecondaryInfo = addSecondaryNameInfoIfDuplicate(allStudents)
-  const studentsWithSecondaryInfoHash = _.keyBy(studentsWithSecondaryInfo, student => student.id)
-
-  this.setState({
-    students: studentsWithSecondaryInfoHash
-  })
+  AssignmentOverrideHelper.setStudentDisplayNames(allStudents)
+  this.setState({students: _.keyBy(allStudents, student => student.id)})
 }
 
-OverrideStudentStore.doneSearching = function() {
+OverrideStudentStore.doneSearching = function () {
   this.setState({
     currentlySearching: false
   })
 }
 
-OverrideStudentStore.currentlySearching = function() {
+OverrideStudentStore.currentlySearching = function () {
   return this.getState().currentlySearching
 }
 
@@ -246,12 +213,12 @@ OverrideStudentStore.currentlySearching = function() {
 //       Helpers
 // -------------------
 
-OverrideStudentStore.getContextPath = function() {
+OverrideStudentStore.getContextPath = function () {
   return '/api/v1/' + DefaultUrlMixin._contextPath()
 }
 
 // test helper
-OverrideStudentStore.reset = function() {
+OverrideStudentStore.reset = function () {
   this.setState($.extend(true, {}, initialStoreState))
 }
 
@@ -259,15 +226,15 @@ OverrideStudentStore.reset = function() {
 // Marking Name Searched
 // ----------------------
 
-OverrideStudentStore.alreadySearchedForName = function(name) {
+OverrideStudentStore.alreadySearchedForName = function (name) {
   return !!this.getState().searchedNames[name]
 }
 
-OverrideStudentStore.alreadySearchingForName = function(name) {
+OverrideStudentStore.alreadySearchingForName = function (name) {
   return _.includes(this.getState().activeNameSearches, name)
 }
 
-OverrideStudentStore.markNameSearched = function(name) {
+OverrideStudentStore.markNameSearched = function (name) {
   const searchedNames = this.getState().searchedNames
   searchedNames[name] = true
   this.setState({

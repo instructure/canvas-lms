@@ -246,6 +246,38 @@ RSpec.shared_examples "DiscussionType" do
     end
   end
 
+  context "anonymous discussions" do
+    let(:anon_discussion) do
+      DiscussionTopic.create!(title: "Welcome whoever you are",
+                              message: "anonymous discussion",
+                              anonymous_state: "fully_anonymous",
+                              context: @course,
+                              user: @teacher)
+    end
+    let(:anon_discussion_type) do
+      GraphQLTypeTester.new(
+        anon_discussion,
+        current_user: @teacher
+      )
+    end
+
+    it "author is nil" do
+      expect(anon_discussion_type.resolve("author { shortName }")).to eq nil
+    end
+
+    it "editor is nil" do
+      expect(anon_discussion_type.resolve("editor { shortName }")).to eq nil
+    end
+
+    it "anonymous_author is not nil" do
+      expect(anon_discussion_type.resolve("anonymousAuthor { shortName }")).to eq "current_user"
+    end
+
+    it "mentionableUsersConnection is nil" do
+      expect(anon_discussion_type.resolve("mentionableUsersConnection { nodes { _id } }")).to eq nil
+    end
+  end
+
   context "allows filtering discussion entries by workflow_state" do
     before do
       @de = discussion.discussion_entries.create!(message: "find me", user: @teacher)

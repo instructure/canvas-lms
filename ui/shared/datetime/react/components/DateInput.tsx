@@ -30,9 +30,13 @@ import {nanoid} from 'nanoid'
 import {log} from '@canvas/datetime-natural-parsing-instrument'
 import {DateInputInteraction, DateInputLayout} from '@instructure/ui-date-input/types'
 
-export type CanvasDateInputMessage = {
-  text: string
-  type: 'error' | 'hint' | 'success' | 'screenreader-only'
+// can use INSTUI definition of the message type once
+// https://github.com/instructure/instructure-ui/issues/815 is closed
+// import {FormPropTypes} from '@instructure/ui-form-field'
+// export type CanvasDateInputMessageType = FormPropTypes.message
+export type CanvasDateInputMessageType = {
+  text: string | JSX.Element
+  type: 'error' | 'warning' | 'hint' | 'success' | 'screenreader-only'
 }
 
 export type CanvasDateInputProps = {
@@ -48,7 +52,7 @@ export type CanvasDateInputProps = {
    * Passed along to `DateInput`, can be used to describe messages and validation for the input. Note that this
    * component may display its own messages as well.
    */
-  messages?: CanvasDateInputMessage[]
+  messages?: CanvasDateInputMessageType[]
   /**
    * Specifies the time zone that the `DateInput` picker is operating in. Defaults to either `ENV.TIMEZONE` if present,
    * or the browser's timezone otherwise. It also depends on moment.js's default locale being set (always the case in
@@ -216,7 +220,7 @@ export default function CanvasDateInput({
     if (isShowingCalendar && withRunningValue) handleHideCalendar()
     const newDate = tz.parse(value)
     if (newDate) {
-      const msgs: CanvasDateInputMessage[] = withRunningValue
+      const msgs: CanvasDateInputMessageType[] = withRunningValue
         ? [{type: 'success', text: formatDate(newDate)}]
         : []
       setRenderedMoment(moment.tz(newDate, timezone))

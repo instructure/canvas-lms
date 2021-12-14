@@ -2843,6 +2843,26 @@ describe CoursesController do
       expect(@course.default_wiki_editing_roles).to eq new_permissions
       expect(wiki_page.editing_roles).to eq new_permissions
     end
+
+    it "does not attempt to sync k5 homeroom to course if sync_enrollments_from_homeroom is falsey" do
+      teacher = @teacher
+      subject = @course
+      toggle_k5_setting(subject.account, true)
+      homeroom = course_factory(active_all: true, account: subject.account)
+      homeroom.enroll_teacher(teacher, enrollment_state: :active)
+      homeroom.homeroom_course = true
+      homeroom.restrict_enrollments_to_course_dates = true
+      homeroom.save!
+      subject.homeroom_course_id = homeroom.id
+      subject.save!
+
+      user_session(teacher)
+      put "update", params: { id: subject.id, course: { name: "something new", sync_enrollments_from_homeroom: "0", homeroom_course_id: homeroom.id } }
+      run_jobs
+
+      # if the sync job runs, we'll know because restrict_enrollments_to_course_dates will be synced as true
+      expect(subject.reload.restrict_enrollments_to_course_dates).to be_falsey
+    end
   end
 
   describe "POST 'unconclude'" do
@@ -3597,35 +3617,6 @@ describe CoursesController do
       student2
 
       get "users", params: {
-        course_id: course.id,
-        format: "json",
-        enrollment_role: "StudentEnrollment",
-        per_page: 1
-      }
-      expect(response).to be_successful
-      expect(response.headers.to_a.find { |a| a.first == "Link" }.last).to_not include("last")
-    end
-
-    it "sets pagination total_pages/last page link if account setting enabled" do
-      user_session(teacher)
-      # need two pages or the first page will also be the last_page
-      student1
-      student2
-      account = course.root_account
-      account.settings[:allow_last_page_on_course_users] = true
-      account.save!
-
-      get "users", params: {
-        course_id: course.id,
-        format: "json",
-        enrollment_role: "StudentEnrollment",
-        per_page: 1
-      }
-      expect(response).to be_successful
-      expect(response.headers.to_a.find { |a| a.first == "Link" }.last).to include("last")
-
-      get "users", params: {
-        search_term: "us",
         course_id: course.id,
         format: "json",
         enrollment_role: "StudentEnrollment",

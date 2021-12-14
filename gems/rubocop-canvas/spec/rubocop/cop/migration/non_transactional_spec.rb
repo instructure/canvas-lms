@@ -89,6 +89,21 @@ describe RuboCop::Cop::Migration::NonTransactional do
     expect(cop.offenses.first.severity.name).to eq(:warning)
   end
 
+  it "complains about missing if_not_exists for add_reference" do
+    inspect_source(<<~RUBY)
+      class TestMigration < ActiveRecord::Migration
+        disable_ddl_transaction!
+
+        def up
+          add_reference :courses, :homeroom_course, foreign_key: { to_table: :courses }
+        end
+      end
+    RUBY
+    expect(cop.offenses.size).to eq 1
+    expect(cop.messages.first).to match(/if_not_exists/)
+    expect(cop.offenses.first.severity.name).to eq :warning
+  end
+
   it "is ok about missing if_not_exists for add_index when transactional" do
     inspect_source(<<~RUBY)
       class TestMigration < ActiveRecord::Migration

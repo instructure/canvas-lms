@@ -277,7 +277,7 @@ describe('loadAllOpportunitiesSaga', () => {
       call(sendBasicFetchRequest, '/api/v1/users/self/missing_submissions', {
         course_ids: undefined,
         include: ['planner_overrides'],
-        filter: ['submittable'],
+        filter: ['submittable', 'current_grading_period'],
         per_page: 100
       })
     )
@@ -356,7 +356,7 @@ describe('loadAllOpportunitiesSaga', () => {
         observed_user_id: '12',
         course_ids: ['1', '569'],
         include: ['planner_overrides'],
-        filter: ['submittable'],
+        filter: ['submittable', 'current_grading_period'],
         per_page: 100
       })
     )

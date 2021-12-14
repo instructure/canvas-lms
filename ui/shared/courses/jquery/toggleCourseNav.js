@@ -33,14 +33,48 @@ const resetMenuItemTabIndexes = () => {
     $sectionTabLinks.attr('tabIndex', tabIndex)
   }
 }
+const resizeStickyFrame = () => {
+  const $stickyFrame = $('#left-side #sticky-container')
+  const menuPaddingBottom = parseInt($stickyFrame.css('padding-bottom'), 10)
+  const menuPaddingTop = parseInt($stickyFrame.css('padding-top'), 10)
+  const menuHeight = $stickyFrame.get(0).scrollHeight - menuPaddingBottom - menuPaddingTop
+  if (menuHeight > $stickyFrame.height()) {
+    $stickyFrame.addClass('has-scrollbar')
+  } else {
+    $stickyFrame.removeClass('has-scrollbar')
+  }
+}
+
+const saveCourseNavCollapseState = () => {
+  const menuExpanded = $('body').hasClass('course-menu-expanded')
+  $.ajaxJSON('/api/v1/users/self/settings', 'PUT', {collapse_course_nav: !menuExpanded})
+}
 
 /**
  * should be called on page load
  */
 const initialize = () => {
+  const $stickyFrame = $('#left-side #sticky-container').get(0)
+  if ($stickyFrame) {
+    $(resizeStickyFrame)
+    $(window).on('resize', _.debounce(resizeStickyFrame, 20))
+  }
   $(resetMenuItemTabIndexes)
   $(window).on('resize', _.debounce(resetMenuItemTabIndexes, 50))
-  $('body').on('click', '#courseMenuToggle', toggleCourseNav)
+  $('body').on(
+    'click',
+    '#courseMenuToggle',
+    $stickyFrame
+      ? () => {
+          toggleCourseNav()
+          resizeStickyFrame()
+          saveCourseNavCollapseState()
+        }
+      : () => {
+          toggleCourseNav()
+          saveCourseNavCollapseState()
+        }
+  )
 }
 
 /**

@@ -142,6 +142,8 @@
   "describe_the_image_e65d2e32": { "message": "(Опишите изображение)" },
   "describe_the_video_2fe8f46a": { "message": "(опишите видео)" },
   "details_98a31b68": { "message": "Подробные сведения" },
+  "diamond_b8dfe7ae": { "message": "Ромб" },
+  "dimension_type_55c83e4e": { "message": "Тип измерения" },
   "dimensions_45ddb7b7": { "message": "Размеры" },
   "directionality_26ae9e08": { "message": "Направленность" },
   "discussions_a5f96392": { "message": "Обсуждения" },
@@ -286,6 +288,9 @@
   "miscellaneous_e9818229": { "message": "Разное" },
   "modules_c4325335": { "message": "Модули" },
   "multi_color_image_63d7372f": { "message": "Многоцветное изображение" },
+  "must_be_at_least_percentage_22e373b6": {
+    "message": "Должен быть как минимум { percentage }%"
+  },
   "must_be_at_least_width_x_height_px_41dc825e": {
     "message": "Должно быть как минимум { width } x { height }пикселов"
   },
@@ -328,7 +333,10 @@
   },
   "pages_e5414c2c": { "message": "Страницы" },
   "paragraph_5e5ad8eb": { "message": "Параграф" },
+  "pentagon_17d82ea3": { "message": "Пятиугольник" },
   "people_b4ebb13c": { "message": "Люди" },
+  "percentage_34ab7c2c": { "message": "Процент" },
+  "pixels_52ece7d1": { "message": "Пиксели" },
   "posted_when_a578f5ab": { "message": "Размещено: { when }" },
   "preformatted_d0670862": { "message": "Предварительно форматированный" },
   "pretty_html_editor_28748756": { "message": "Редактор Pretty HTML" },

@@ -24,8 +24,9 @@ const mockProps = ({
   onCloseReportModal = jest.fn(),
   onSubmit = jest.fn(),
   showReportModal = true,
-  isLoading = false
-} = {}) => ({onCloseReportModal, onSubmit, showReportModal, isLoading})
+  isLoading = false,
+  errorSubmitting = false
+} = {}) => ({onCloseReportModal, onSubmit, showReportModal, isLoading, errorSubmitting})
 
 const setup = props => {
   return render(<ReportReply {...props} />)
@@ -35,6 +36,22 @@ describe('Report Reply', () => {
   it('should render', () => {
     const container = setup(mockProps())
     expect(container).toBeTruthy()
+  })
+
+  describe('errorSubmitting is true', () => {
+    it('should render an alert with a timeout', () => {
+      const container = setup(mockProps({errorSubmitting: true}))
+
+      expect(
+        container.findByText('We experienced an issue. This reply was not reported.')
+      ).toBeTruthy()
+
+      setTimeout(() => {
+        expect(
+          container.findByText('We experienced an issue. This reply was not reported.')
+        ).toBeFalsy()
+      }, 5000)
+    })
   })
 
   it('should call onCloseReportModal from the cancel button', async () => {

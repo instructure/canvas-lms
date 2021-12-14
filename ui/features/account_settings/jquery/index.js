@@ -187,8 +187,8 @@ $(document).ready(function () {
 
             $('.open_report_description_link').click(openReportDescriptionLink)
 
-            $('.run_report_link').click(function (_event) {
-              event.preventDefault()
+            $('.run_report_link').click(function (clickEvent) {
+              clickEvent.preventDefault()
               $(this).parent('form').submit()
             })
 

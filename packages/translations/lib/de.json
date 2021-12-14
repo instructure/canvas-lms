@@ -383,6 +383,12 @@
     "details_a6f427c3": {
         "message": "Details:"
     },
+    "diamond_b8dfe7ae": {
+        "message": "Diamond"
+    },
+    "dimension_type_55c83e4e": {
+        "message": "Dimensionstyp"
+    },
     "dimensions_45ddb7b7": {
         "message": "Abmessungen"
     },
@@ -553,6 +559,9 @@
     },
     "feedback_6dcc1991": {
         "message": "Feedback"
+    },
+    "file_name_8fd421ff": {
+        "message": "Dateiname"
     },
     "file_url_c12b64be": {
         "message": "Datei-URL"
@@ -839,6 +848,9 @@
     "multi_color_image_63d7372f": {
         "message": "Mehrfarbiges Bild"
     },
+    "must_be_at_least_percentage_22e373b6": {
+        "message": "Mindestens { percentage }%"
+    },
     "must_be_at_least_width_x_height_px_41dc825e": {
         "message": "Mindestgröße ist { width } x { height } px."
     },
@@ -974,8 +986,17 @@
     "peer_review_for_itemtitle_358cb413": {
         "message": "Kollegenüberprüfung für { itemTitle }"
     },
+    "pentagon_17d82ea3": {
+        "message": "Pentagon"
+    },
     "people_b4ebb13c": {
         "message": "Teilnehmer"
+    },
+    "percentage_34ab7c2c": {
+        "message": "Prozentsatz"
+    },
+    "pixels_52ece7d1": {
+        "message": "Pixel"
     },
     "points_bceb5005": {
         "message": "Punkte"

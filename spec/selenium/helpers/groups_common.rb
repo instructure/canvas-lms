@@ -74,16 +74,21 @@ module GroupsCommon
   end
 
   def create_default_student_group(group_name = "Windfury")
-    fj("#groupName").send_keys(group_name.to_s)
-    fj("button.confirm-dialog-confirm-btn").click
+    f("#group-name").send_keys(group_name.to_s)
+    f('button[type="submit"]').click
     wait_for_ajaximations
   end
 
   def create_group_and_add_all_students(group_name = "Windfury")
-    fj("#groupName").send_keys(group_name.to_s)
-    students = ffj(".checkbox")
-    students.each(&:click)
-    fj("button.confirm-dialog-confirm-btn").click
+    f("#group-name").send_keys(group_name.to_s)
+    f("#invite-filter").click
+    students = ff("span[role='option']")
+    students.each do
+      option = ff("span[role='option']").first
+      option.click
+      f("#invite-filter").click
+    end
+    f('button[type="submit"]').click
     wait_for_ajaximations
   end
 
