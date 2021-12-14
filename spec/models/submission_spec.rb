@@ -7917,15 +7917,6 @@ describe Submission do
         <p>A couple paragraphs, and maybe super<sup>script</sup>.&nbsp;</p>')
       expect(submission.word_count).to eq 18
     end
-
-    it "sums word counts of attachments if there are any" do
-      student_in_course(active_all: true)
-      submission_text = "Text based submission with some words"
-      attachment1 = attachment_model(uploaded_data: stub_file_data("submission.txt", submission_text, "text/plain"), context: @student)
-      attachment2 = attachment_model(uploaded_data: stub_file_data("submission.txt", submission_text, "text/plain"), context: @student)
-      sub = @assignment.submit_homework(@student, attachments: [attachment1, attachment2])
-      expect(sub.word_count).to eq 12
-    end
   end
 
   context "Assignment Cache" do
