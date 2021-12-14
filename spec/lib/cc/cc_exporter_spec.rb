@@ -581,11 +581,13 @@ describe "Common Cartridge exporting" do
       @ce.export_type = ContentExport::COMMON_CARTRIDGE
       @ce.save!
       run_export
+      mo_node_key = CC::CCHelper.create_key(obj.attachment, global: true)
       key = CC::CCHelper.create_key(track.content, global: true)
       file_node = @manifest_doc.at_css("resource[identifier='#{key}'] file[href$='/blah.flv.tlh.subtitles']")
       expect(file_node).to be_present
       expect(@zip_file.read(file_node["href"])).to eql(track.content)
       track_doc = Nokogiri::XML(@zip_file.read("course_settings/media_tracks.xml"))
+      expect(track_doc.at_css("media_tracks media[identifierref=#{mo_node_key}]")).to be_present
       expect(track_doc.at_css("media_tracks media track[locale=tlh][kind=subtitles][identifierref=#{key}]")).to be_present
       expect(ccc_schema.validate(track_doc)).to be_empty
     end

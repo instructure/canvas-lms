@@ -64,10 +64,13 @@ describe "courses" do
   end
 
   context "as a student" do
-    before do
+    before :once do
       course_with_teacher(active_all: true, name: "discussion course")
       @student = User.create!(name: "First Student")
       @course.enroll_student(@student)
+    end
+
+    before do
       user_session(@student)
     end
 
@@ -99,6 +102,34 @@ describe "courses" do
       wait_for_ajaximations
 
       assert_flash_notice_message "Invitation canceled."
+    end
+
+    describe "course navigation menu" do
+      before :once do
+        Account.site_admin.enable_feature!(:remember_course_nav_collapsed_state)
+      end
+
+      it "collapses and persists when clicking the collapse/expand button" do
+        visit_course(@course)
+        expect(left_side).to be_displayed
+        click_course_menu_toggle
+        wait_for_ajax_requests
+        expect(left_side).not_to be_displayed
+        refresh_page
+        expect(left_side).not_to be_displayed
+      end
+
+      it "can be expanded when collapsed" do
+        @student.preferences[:collapse_course_nav] = true
+        @student.save!
+        visit_course(@course)
+        expect(left_side).not_to be_displayed
+        click_course_menu_toggle
+        wait_for_ajax_requests
+        expect(left_side).to be_displayed
+        refresh_page
+        expect(left_side).to be_displayed
+      end
     end
   end
 end

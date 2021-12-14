@@ -17,6 +17,7 @@
  */
 
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import {AnonymousUser} from '../../../../graphql/AnonymousUser'
 import {Discussion} from '../../../../graphql/Discussion'
 import {DiscussionEntry} from '../../../../graphql/DiscussionEntry'
 import {DiscussionEntryPermissions} from '../../../../graphql/DiscussionEntryPermissions'
@@ -440,6 +441,25 @@ describe('DiscussionThreadContainer', () => {
           expect(onSuccessStub).toHaveBeenCalledWith('You have reported this reply.', false)
         })
       })
+    })
+  })
+
+  describe('anonymous author', () => {
+    beforeAll(() => {
+      window.ENV.discussion_anonymity_enabled = true
+    })
+
+    afterAll(() => {
+      window.ENV.discussion_anonymity_enabled = false
+    })
+
+    it('renders name', () => {
+      const props = defaultProps({
+        discussionEntryOverrides: {anonymousAuthor: AnonymousUser.mock()}
+      })
+      const container = setup(props)
+      expect(container.queryByText('Sorry, Something Broke')).toBeNull()
+      expect(container.getByText('Anonymous 1')).toBeInTheDocument()
     })
   })
 })

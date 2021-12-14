@@ -314,7 +314,9 @@ export const CourseHeaderOptions = forwardRef(
       currentUser,
       handleChangeObservedUser,
       showingMobileNav,
-      showObserverOptions
+      showObserverOptions,
+      isMasterCourse,
+      windowWidth
     },
     ref
   ) => {
@@ -328,7 +330,15 @@ export const CourseHeaderOptions = forwardRef(
 
     const collapseManageButton = showingMobileNav && showObserverOptions
     const sideItemsWidth = '200px'
-
+    const isFullWidthBody = document.body.classList?.contains('full-width')
+    let studentViewBtnPosition = 'end'
+    if (isMasterCourse) {
+      if (isFullWidthBody || windowWidth < 1480) {
+        studentViewBtnPosition = 'start'
+      } else if (windowWidth < 1500) {
+        studentViewBtnPosition = 'center'
+      }
+    }
     const manageButton = (
       <Flex.Item
         size={collapseManageButton ? undefined : sideItemsWidth}
@@ -361,7 +371,11 @@ export const CourseHeaderOptions = forwardRef(
     )
 
     const studentViewButton = (
-      <Flex.Item textAlign="end" size={sideItemsWidth} key="course-header-student-view">
+      <Flex.Item
+        textAlign={studentViewBtnPosition}
+        size={sideItemsWidth}
+        key="course-header-student-view"
+      >
         <Button
           id="student-view-btn"
           href={studentViewPath}
@@ -412,7 +426,9 @@ CourseHeaderOptions.propTypes = {
   handleChangeObservedUser: PropTypes.func.isRequired,
   currentUser: PropTypes.object.isRequired,
   showingMobileNav: PropTypes.bool.isRequired,
-  showObserverOptions: PropTypes.bool.isRequired
+  showObserverOptions: PropTypes.bool.isRequired,
+  isMasterCourse: PropTypes.bool.isRequired,
+  windowWidth: PropTypes.number.isRequired
 }
 
 export function K5Course({
@@ -450,7 +466,8 @@ export function K5Course({
   observerList,
   selfEnrollment,
   tabContentOnly,
-  currentUserRoles
+  currentUserRoles,
+  isMasterCourse
 }) {
   const initialObservedId = observerList.find(o => o.id === savedObservedId(currentUser.id))
     ? savedObservedId(currentUser.id)
@@ -616,6 +633,8 @@ export function K5Course({
           showingMobileNav={showingMobileNav}
           showObserverOptions={showObserverOptions}
           ref={headerOptionsRef}
+          isMasterCourse={isMasterCourse}
+          windowWidth={windowSize?.width}
         />
         {!tabContentOnly && courseTabs}
         {!renderTabs?.length && <EmptyCourse name={name} id={id} canManage={canManage} />}
@@ -724,7 +743,8 @@ K5Course.propTypes = {
   observerList: ObserverListShape.isRequired,
   selfEnrollment: PropTypes.object,
   tabContentOnly: PropTypes.bool,
-  currentUserRoles: PropTypes.array.isRequired
+  currentUserRoles: PropTypes.array.isRequired,
+  isMasterCourse: PropTypes.bool.isRequired
 }
 
 const WrappedK5Course = connect(mapStateToProps)(K5Course)

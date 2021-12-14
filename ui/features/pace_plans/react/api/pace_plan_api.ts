@@ -19,6 +19,11 @@
 import {PacePlan, PlanContextTypes, Progress, WorkflowStates} from '../types'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 
+enum ApiMode {
+  PUBLISH,
+  COMPRESS
+}
+
 /* API helpers */
 
 /*
@@ -125,6 +130,16 @@ export const relinkToParentPlan = (planId: string) =>
     method: 'POST'
   }).then(({json}) => json?.pace_plan)
 
+export const compress = (pacePlan: PacePlan, extraSaveParams = {}) =>
+  doFetchApi<{pace_plan: PacePlan; progress: Progress}>({
+    path: `/api/v1/courses/${pacePlan.course_id}/pace_plans/compress_dates`,
+    method: 'POST',
+    body: {
+      ...extraSaveParams,
+      pace_plan: transformPacePlanForApi(pacePlan, ApiMode.COMPRESS)
+    }
+  }).then(({json}) => json)
+
 /* API transformers
  * functions and interfaces to transform the frontend formatted objects
  * to the format required for backend consumption
@@ -140,18 +155,23 @@ interface ApiPacePlanModuleItemsAttributes {
   readonly module_item_id: string
 }
 
-interface ApiFormattedPacePlan {
+interface CompressApiFormattedPacePlan {
   readonly start_date?: string
   readonly end_date?: string
-  readonly workflow_state: WorkflowStates
   readonly exclude_weekends: boolean
+  readonly pace_plan_module_items_attributes: ApiPacePlanModuleItemsAttributes[]
+}
+interface PublishApiFormattedPacePlan extends CompressApiFormattedPacePlan {
+  readonly workflow_state: WorkflowStates
   readonly context_type: PlanContextTypes
   readonly context_id: string
   readonly hard_end_dates: boolean
-  readonly pace_plan_module_items_attributes: ApiPacePlanModuleItemsAttributes[]
 }
 
-const transformPacePlanForApi = (pacePlan: PacePlan): ApiFormattedPacePlan => {
+const transformPacePlanForApi = (
+  pacePlan: PacePlan,
+  mode: ApiMode = ApiMode.PUBLISH
+): PublishApiFormattedPacePlan | CompressApiFormattedPacePlan => {
   const pacePlanItems: ApiPacePlanModuleItemsAttributes[] = []
   pacePlan.modules.forEach(module => {
     module.items.forEach(item => {
@@ -163,14 +183,21 @@ const transformPacePlanForApi = (pacePlan: PacePlan): ApiFormattedPacePlan => {
     })
   })
 
-  return {
-    start_date: pacePlan.start_date,
-    end_date: pacePlan.end_date,
-    workflow_state: pacePlan.workflow_state,
-    exclude_weekends: pacePlan.exclude_weekends,
-    context_type: pacePlan.context_type,
-    context_id: pacePlan.context_id,
-    hard_end_dates: !!pacePlan.hard_end_dates,
-    pace_plan_module_items_attributes: pacePlanItems
-  }
+  return mode === ApiMode.COMPRESS
+    ? {
+        start_date: pacePlan.start_date,
+        end_date: pacePlan.end_date,
+        exclude_weekends: pacePlan.exclude_weekends,
+        pace_plan_module_items_attributes: pacePlanItems
+      }
+    : {
+        start_date: pacePlan.start_date,
+        end_date: pacePlan.end_date,
+        workflow_state: pacePlan.workflow_state,
+        exclude_weekends: pacePlan.exclude_weekends,
+        context_type: pacePlan.context_type,
+        context_id: pacePlan.context_id,
+        hard_end_dates: !!pacePlan.hard_end_dates,
+        pace_plan_module_items_attributes: pacePlanItems
+      }
 }

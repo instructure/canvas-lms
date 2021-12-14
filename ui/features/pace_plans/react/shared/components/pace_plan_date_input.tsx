@@ -23,8 +23,12 @@ import tz from '@canvas/timezone'
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
+import {ScreenReaderContent, PresentationContent} from '@instructure/ui-a11y-content'
+import {IconWarningLine} from '@instructure/ui-icons'
 
-import CanvasDateInput from '@canvas/datetime/react/components/DateInput'
+import CanvasDateInput, {
+  CanvasDateInputMessageType
+} from '@canvas/datetime/react/components/DateInput'
 import {BlackoutDate, InputInteraction} from '../types'
 import {weekendIntegers} from '../api/backend_serializer'
 // @ts-ignore: TS doesn't understand i18n scoped imports
@@ -34,6 +38,8 @@ import * as DateHelpers from '../../utils/date_stuff/date_helpers'
 export type PacePlansDateInputProps = {
   dateValue?: string
   label: string | JSX.Element
+  helpText?: string
+  message?: CanvasDateInputMessageType
   onDateChange: (rawDate: string) => void
   /**
    * Callback that takes a date and returns a truthy error message if it is invalid (or a falsy value if it is valid).
@@ -70,6 +76,8 @@ const formatDate = date => tz.format(date, 'date.formats.long')
 const PacePlanDateInput = ({
   dateValue,
   label,
+  helpText,
+  message,
   onDateChange,
   validateDay,
   interaction = 'enabled',
@@ -84,10 +92,10 @@ const PacePlanDateInput = ({
   const calculateErrors = (date: Moment = moment(dateValue)): string[] => {
     const errors: string[] = []
 
-    if (!date.isValid()) return [I18n.t('The date entered is invalid.')]
+    if (!date.isValid()) return [I18n.t('The date entered was invalid.')]
 
     if (weekendsDisabled && weekendIntegers.includes(date.weekday()))
-      errors.push(I18n.t('The selected date is on a weekend. This pace plan skips weekends.'))
+      errors.push(I18n.t('The selected date is on a weekend and this pace plan skips weekends.'))
     if (DateHelpers.inBlackoutDate(date, blackoutDates))
       errors.push(I18n.t('The selected date is on a blackout day.'))
     if (startDate && date.isBefore(startDate))
@@ -116,29 +124,79 @@ const PacePlanDateInput = ({
       <div style={{display: 'inline-block', lineHeight: '1.125rem'}}>
         <View as="div" margin="0 0 small">
           <Text weight="bold">{label}</Text>
+          {helpText && <ScreenReaderContent>{helpText}</ScreenReaderContent>}
         </View>
         <Flex data-testid="paceplan-date-text" as="div" height="2.25rem" alignItems="center">
           {formatDate(dateValue)}
         </Flex>
+        {helpText && (
+          <div style={{whiteSpace: 'nowrap', marginTop: '.75rem'}}>
+            <PresentationContent>
+              <Text fontStyle="italic">
+                <span style={{whiteSpace: 'nowrap'}}>{helpText}</span>
+              </Text>
+            </PresentationContent>
+          </div>
+        )}
       </div>
     )
   }
 
+  const messages = (customErrors?.length ? customErrors : calculateErrors()).map(e => ({
+    type: 'error',
+    text: (
+      <Flex>
+        <Flex.Item margin="0 x-small 0 0" align="start">
+          <IconWarningLine />
+        </Flex.Item>
+        {e}
+      </Flex>
+    )
+  }))
+  if (messages.length === 0 && message) {
+    messages.push({
+      type: message.type === 'warning' ? 'hint' : message.type,
+      text: (
+        <Flex>
+          <Flex.Item margin="0 x-small 0 0" align="start">
+            <IconWarningLine color={message.type} />
+          </Flex.Item>
+          <Text color={message.type}>{message.text}</Text>
+        </Flex>
+      )
+    })
+  }
+
+  const dateInputLabel = (
+    <>
+      {label}
+      <ScreenReaderContent>{helpText}</ScreenReaderContent>
+    </>
+  )
+
   return (
-    <CanvasDateInput
-      dataTestid="pace-plan-start-date"
-      renderLabel={label}
-      formatDate={formatDate}
-      onSelectedDateChange={handleDateChange}
-      selectedDate={dateValue}
-      dateIsDisabled={d => !!calculateErrors(d).length}
-      width={width}
-      messages={(customErrors.length ? customErrors : calculateErrors()).map(e => ({
-        type: 'error',
-        text: e
-      }))}
-      interaction={interaction}
-    />
+    <>
+      <Flex direction="column">
+        <CanvasDateInput
+          dataTestid="pace-plan-start-date"
+          renderLabel={dateInputLabel}
+          formatDate={formatDate}
+          onSelectedDateChange={handleDateChange}
+          selectedDate={dateValue}
+          dateIsDisabled={d => !!calculateErrors(d).length}
+          width={width}
+          messages={messages}
+          interaction={interaction}
+        />
+        {messages.length === 0 && helpText && (
+          <div style={{whiteSpace: 'nowrap', marginTop: '.5rem'}}>
+            <PresentationContent>
+              <Text fontStyle="italic">{helpText}</Text>
+            </PresentationContent>
+          </div>
+        )}
+      </Flex>
+    </>
   )
 }
 

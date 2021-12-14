@@ -147,12 +147,35 @@ module Types
 
     field :author, Types::UserType, null: true
     def author
-      load_association(:user)
+      if object.anonymous?
+        nil
+      else
+        load_association(:user)
+      end
+    end
+
+    field :anonymous_author, Types::AnonymousUserType, null: true
+    def anonymous_author
+      if object.anonymous?
+        if object.user_id == current_user.id
+          { id: "current_user", short_name: "current_user", avatar_url: nil }
+        else
+          Loaders::DiscussionTopicParticipantLoader.for(object.id).load(object.user_id).then do |participant|
+            { id: participant.id.to_s(36), short_name: participant.id.to_s(36), avatar_url: nil }
+          end
+        end
+      else
+        nil
+      end
     end
 
     field :editor, Types::UserType, null: true
     def editor
-      load_association(:editor)
+      if object.anonymous?
+        nil
+      else
+        load_association(:editor)
+      end
     end
 
     field :permissions, Types::DiscussionPermissionsType, null: true
@@ -216,6 +239,8 @@ module Types
       argument :search_term, String, required: false
     end
     def mentionable_users_connection(search_term: nil)
+      return nil if object.anonymous?
+
       Loaders::MentionableUserLoader.for(
         current_user: current_user,
         search_term: search_term

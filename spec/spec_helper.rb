@@ -157,23 +157,22 @@ if ENV["ENABLE_AXE_SELENIUM"] == "1"
   end
 end
 
-# Don't do map generation in pre-merge, which runs rspecq
-if ENV["ENABLE_CRYSTALBALL"] == "1" && ENV["RSPECQ_ENABLED"] != "1"
+if ENV["ENABLE_CRYSTALBALL"] == "1"
   Crystalball::MapGenerator.start! do |config|
     config.register Crystalball::MapGenerator::CoverageStrategy.new
     config.map_storage_path = "log/results/crystalball_results/#{ENV.fetch("PARALLEL_INDEX", "0")}_map.yml"
   end
-end
 
-module Crystalball
-  class MapGenerator
-    class CoverageStrategy
-      def call(example_map, example)
-        puts "Calling Coverage Strategy for #{example.inspect}"
-        before = Coverage.peek_result
-        yield example_map, example
-        after = Coverage.peek_result
-        example_map.push(*execution_detector.detect(before, after))
+  module Crystalball
+    class MapGenerator
+      class CoverageStrategy
+        def call(example_map, example)
+          puts "Calling Coverage Strategy for #{example.inspect}"
+          before = Coverage.peek_result
+          yield example_map, example
+          after = Coverage.peek_result
+          example_map.push(*execution_detector.detect(before, after))
+        end
       end
     end
   end
@@ -404,6 +403,9 @@ RSpec.configure do |config|
 
   # The Pact specs have prerequisite setup steps so we exclude them by default
   config.filter_run_excluding :pact_live_events if ENV.fetch("RUN_LIVE_EVENTS_CONTRACT_TESTS", "0") == "0"
+  # The Pact build needs RspecJunitFormatter and does not run RSpecQ
+  file = "log/results/results-#{ENV.fetch("PARALLEL_INDEX", "0").to_i}.xml"
+  config.add_formatter "RspecJunitFormatter", file if ENV["PACT_BROKER"] && ENV["JENKINS_HOME"]
 
   config.include Helpers
   config.include Factories
@@ -411,13 +413,6 @@ RSpec.configure do |config|
   config.include Onceler::BasicHelpers
   config.include PGCollkeyHelper
   config.project_source_dirs << "gems" # so that failures here are reported properly
-
-  # RSPEC_PROCESSES is only used on Jenkins and we only care to have RspecJunitFormatter on Jenkins.
-  if ENV["RSPEC_PROCESSES"] && ENV["RSPECQ_ENABLED"] != "1"
-    file = "log/results/results-#{ENV.fetch("PARALLEL_INDEX", "0").to_i}.xml"
-    # if file already exists this is a rerun of a failed spec, don't generate new xml.
-    config.add_formatter "RspecJunitFormatter", file unless File.file?(file)
-  end
 
   if ENV["RSPEC_LOG"]
     config.add_formatter "ParallelTests::RSpec::RuntimeLogger", "log/parallel_runtime/parallel_runtime_rspec_tests-#{ENV.fetch("PARALLEL_INDEX", "0").to_i}.log"

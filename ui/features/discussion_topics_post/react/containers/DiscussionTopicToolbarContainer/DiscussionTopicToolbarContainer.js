@@ -73,6 +73,7 @@ export const DiscussionTopicToolbarContainer = props => {
         onCollapseRepliesToggle={() => {}}
         onTopClick={() => {}}
         searchTerm={currentSearchValue}
+        discussionAnonymousState={props.discussionTopic.anonymousState}
       />
     </View>
   )

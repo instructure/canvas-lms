@@ -37,6 +37,7 @@ exports[`FileBrowser renders 1`] = `
       selectionType="single"
       showRootCollection={false}
       size="medium"
+      sortOrder={[Function]}
       treeLabel="Folder tree"
       variant="folderTree"
     />
