@@ -6701,7 +6701,7 @@ es:
         default_select_folder: "Seleccionar carpeta"
         upload_to: "Cargar a"
       import_quizzes_next_view: 
-        import_new_quizzes: "Importar contenido de la evaluación como Nuevos Exámenes"
+        import_new_quizzes: "Importar contenido de la evaluación como *Nuevos Exámenes*"
         import_new_quizzes_help_text: "Nuevos exámenes es el nuevo motor de evaluación de Canvas.%{p_p}Para obtener más información, comuníquese con su administrador del sistema o visite"
         import_quizzesNext_help_label: "Importar evaluación como Icono de Ayuda de Nuevos Exámenes"
         import_quizzesNext_help_text: "Quizzes.Next es el nuevo motor de evaluación para Canvas.%{p_p}Para obtener más información, póngase en contacto con el administrador del sistema o visite"
