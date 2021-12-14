@@ -24,15 +24,15 @@ import {string} from 'prop-types'
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
 
-export const AnonymousAvatar = ({seedString}) => {
+export const AnonymousAvatar = ({seedString, size}) => {
   return (
     <View
       display="inline-block"
       textAlign="center"
       borderRadius="circle"
       borderWidth="medium"
-      width="50px"
-      height="50px"
+      width={size === 'medium' ? '50px' : '20px'}
+      height={size === 'medium' ? '50px' : '20px'}
       data-testid="anonymous_avatar"
       background={seedString === CURRENT_USER ? 'primary-inverse' : undefined}
       borderColor={seedString === CURRENT_USER ? 'info' : 'primary'}
@@ -41,7 +41,7 @@ export const AnonymousAvatar = ({seedString}) => {
         <Flex.Item margin="xx-small 0 0 0">
           <Identicon
             string={seedString}
-            size={30}
+            size={size === 'medium' ? 30 : 10}
             fg={seedString === CURRENT_USER ? 'white' : undefined}
           />
         </Flex.Item>
@@ -51,5 +51,10 @@ export const AnonymousAvatar = ({seedString}) => {
 }
 
 AnonymousAvatar.propTypes = {
-  seedString: string
+  seedString: string,
+  size: string
+}
+
+AnonymousAvatar.defaultProps = {
+  size: 'medium'
 }
