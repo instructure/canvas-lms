@@ -91,7 +91,7 @@ export const AuthorInfo = props => {
               />
             )}
             {hasAuthor && isAnonymous(props) && (
-              <AnonymousAvatar seedString={props.anonymousAuthor.id} />
+              <AnonymousAvatar seedString={props.anonymousAuthor.shortName} />
             )}
           </Flex.Item>
           <Flex.Item shouldShrink>

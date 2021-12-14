@@ -183,7 +183,7 @@ describe "discussions" do
             expect(f("span[data-testid='anon-conversation']").text).to(
               eq("This is an anonymous Discussion, Your name and profile picture will be hidden from other course members.")
             )
-            expect(f("span[data-testid='author_name']").text).to eq "You"
+            expect(f("span[data-testid='author_name']").text).to eq "Anonymous #{DiscussionTopic.last.discussion_topic_participants.where(user_id: teacher).first.id.to_s(36)} (You)"
           end
         end
 

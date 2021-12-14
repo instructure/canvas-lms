@@ -270,8 +270,8 @@ export const isAnonymous = discussionEntry =>
 export const getDisplayName = discussionEntry => {
   if (isAnonymous(discussionEntry)) {
     return discussionEntry.anonymousAuthor.shortName === CURRENT_USER
-      ? I18n.t('You')
-      : I18n.t('Anonymous') + ' ' + discussionEntry.anonymousAuthor.shortName
+      ? I18n.t('Anonymous %{id} (You)', {id: discussionEntry.anonymousAuthor.id})
+      : I18n.t('Anonymous %{id}', {id: discussionEntry.anonymousAuthor.id})
   }
   return discussionEntry.author?.displayName || discussionEntry.author?.shortName
 }

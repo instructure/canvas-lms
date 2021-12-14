@@ -76,12 +76,12 @@ module Types
     def anonymous_author
       load_association(:discussion_topic).then do |topic|
         if topic.anonymous?
-          if object.user_id == current_user.id
-            { id: "current_user", short_name: "current_user", avatar_url: nil }
-          else
-            Loaders::DiscussionTopicParticipantLoader.for(topic.id).load(object.user_id).then do |participant|
-              { id: participant.id.to_s(36), short_name: participant.id.to_s(36), avatar_url: nil }
-            end
+          Loaders::DiscussionTopicParticipantLoader.for(topic.id).load(object.user_id).then do |participant|
+            {
+              id: participant.id.to_s(36),
+              short_name: object.user_id == current_user.id ? "current_user" : participant.id.to_s(36),
+              avatar_url: nil
+            }
           end
         end
       end
