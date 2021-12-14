@@ -6167,7 +6167,7 @@ nb-x-k12:
         default_select_folder: "Velg mappe"
         upload_to: "Last opp til"
       import_quizzes_next_view: 
-        import_new_quizzes: "Importer innhold fra vurderinger som Ny Quizzes"
+        import_new_quizzes: "Importer innhold fra vurderinger som *Ny Quizzes*"
         import_new_quizzes_help_text: "Nye tester er den nye vurderingsmotoren for Canvas.%{p_p}For å lær mer, ta kontkat med systemadminstratoren din eller se"
         import_quizzesNext_help_label: "Importer vurdering som Ny Quizzes hjelpeikon"
         import_quizzesNext_help_text: "Quizzes.Next er det nye vurderingsprogrammet til Canvas.%{p_p}For å lære mer om dette, ta kontakt med din systemadministrator, eller gå til"
