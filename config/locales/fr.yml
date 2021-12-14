@@ -6701,7 +6701,7 @@ fr:
         default_select_folder: "Sélectionner le dossier"
         upload_to: "Télécharger vers"
       import_quizzes_next_view: 
-        import_new_quizzes: "Importer du contenu d'évaluations en tant que Nouveaux quiz"
+        import_new_quizzes: "Importer du contenu d'évaluations en tant que *Nouveaux quiz*"
         import_new_quizzes_help_text: "New Quizzes (Nouveaux Questionnaires) est le nouveau moteur d'évaluation de Canvas.%{p_p}Pour en savoir plus, veuillez contacter votre administrateur système ou vous rendre sur"
         import_quizzesNext_help_label: "Icône d'aide sur Importer du contenu d'évaluations en tant que Nouveaux quiz"
         import_quizzesNext_help_text: "Quizzes.Next est le nouveau moteur d'évaluation de Canvas.%{p_p}Pour en savoir plus, veuillez contacter votre administrateur système ou vous rendre sur"

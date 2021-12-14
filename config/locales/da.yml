@@ -6695,7 +6695,7 @@ da:
         default_select_folder: "Vælg mappe"
         upload_to: "Upload til"
       import_quizzes_next_view: 
-        import_new_quizzes: "Importér vurderingsindhold som New Quizzes"
+        import_new_quizzes: "Importér vurderingsindhold som *New Quizzes*"
         import_new_quizzes_help_text: "New Quizzes er den nye vurderingsfunktion i Canvas.%{p_p}For at lære mere skal du kontakte din systemadministrator eller besøge"
         import_quizzesNext_help_label: "Importér vurdering som New Quizzes-hjælpeikon"
         import_quizzesNext_help_text: "Quizzes.Next er den nye vurderingsmotor til Canvas.%{p_p}For at få flere oplysninger skal du kontakte din systemadministrator eller besøge"

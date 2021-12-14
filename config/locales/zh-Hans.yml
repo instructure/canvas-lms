@@ -6690,7 +6690,7 @@ zh-Hans:
         default_select_folder: 选择文件夹
         upload_to: 上传至
       import_quizzes_next_view: 
-        import_new_quizzes: "将评估内容导入为 New Quizzes"
+        import_new_quizzes: "将评估内容导入为 *New Quizzes*"
         import_new_quizzes_help_text: "新测验是 Canvas 的新评估引擎。%{p_p}如需了解更多详情，请联系系统管理员或访问"
         import_quizzesNext_help_label: "将评估导入为 New Quizzes 帮助图标"
         import_quizzesNext_help_text: "Quizzes.Next 是用于 Canvas 的一个新的评估引擎。%{p_p}要了解详情，请联系您的系统管理员或访问"

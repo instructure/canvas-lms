@@ -6692,7 +6692,7 @@ nl:
         default_select_folder: "Map selecteren"
         upload_to: "Uploaden naar"
       import_quizzes_next_view: 
-        import_new_quizzes: "Opdrachtinhoud importeren als New Quizzes"
+        import_new_quizzes: "Opdrachtinhoud importeren als *New Quizzes*"
         import_new_quizzes_help_text: "New Quizzes is de nieuwe beoordelingsengine voor Canvas.%{p_p}Voor meer informatie kun je contact opnemen met de systeembeheerder of ga je naar"
         import_quizzesNext_help_label: "Beoordeling importeren als New Quizzes Help-pictogram"
         import_quizzesNext_help_text: "Quizzes.Next is de nieuwe opdrachtengine voor Canvas.%{p_p}Voor meer informatie kun je contact opnemen met de systeembeheerder of ga je naar"

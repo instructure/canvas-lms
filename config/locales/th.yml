@@ -4971,7 +4971,7 @@ th:
         default_select_folder: เลือกโฟลเดอร์
         upload_to: อัพโหลดไปยัง
       import_quizzes_next_view: 
-        import_new_quizzes: นำเข้าเนื้อหาการประเมินเป็นแบบทดสอบใหม่
+        import_new_quizzes: นำเข้าเนื้อหาการประเมินเป็น*แบบทดสอบใหม่*
         import_new_quizzes_help_text: "แบบทดสอบใหม่คือเอนจินการประเมินสำหรับ Canvas%{p_p}ตรวจสอบรายละเอียดเพิ่มเติมโดยติดต่อผู้ดูแลระบบของคุณหรือเข้าไปที่"
         import_quizzesNext_help_label: นำเข้าการประเมินเป็นไอคอนความช่วยเหลือใหม่สำหรับแบบทดสอบ
         import_quizzesNext_help_title: แบบทดสอบใหม่

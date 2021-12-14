@@ -6252,7 +6252,7 @@ it:
         default_select_folder: "Seleziona cartella"
         upload_to: "Carica in"
       import_quizzes_next_view: 
-        import_new_quizzes: "Importa contenuto della valutazione come New Quizzes"
+        import_new_quizzes: "Importa contenuto della valutazione come *New Quizzes*"
         import_new_quizzes_help_text: "Nuovi quiz è il nuovo motore di valutazione per Canvas.%{p_p}Per saperne di più, contatta l'amministratore di sistema o visita"
         import_quizzesNext_help_label: "Importa valutazione come icona della Guida di New Quizzes"
         import_quizzesNext_help_text: "Quizzes.Next è il nuovo motore di valutazione per Canvas.%{p_p}Per saperne di più, contatta l'amministratore di sistema o visita"

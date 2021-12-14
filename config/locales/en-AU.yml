@@ -6712,7 +6712,7 @@ en-AU:
         default_select_folder: "Select Folder"
         upload_to: "Upload to"
       import_quizzes_next_view: 
-        import_new_quizzes: "Import assessment content as New Quizzes"
+        import_new_quizzes: "Import assessment content as *New Quizzes*"
         import_new_quizzes_help_text: "New Quizzes is the new assessment engine for Canvas.%{p_p}To learn more, please contact your system administrator or visit"
         import_quizzesNext_help_label: "Import assessment as New Quizzes Help Icon"
         import_quizzesNext_help_text: "Quizzes.Next is the new assessment engine for Canvas.%{p_p}To learn more please contact your system administrator or visit"
