@@ -2824,56 +2824,6 @@ describe "Users API", type: :request do
       expect(json.map { |i| i["id"] }).not_to be_include a.id
     end
 
-    context "current_grading_period filter" do
-      before :once do
-        term = Account.default.enrollment_terms.create!(start_at: 10.years.ago)
-        course_factory(active_all: true, enrollment_term_id: term.id)
-        @course.enroll_student(@student, enrollment_state: :active)
-
-        period_group = Account.default.grading_period_groups.create!
-        period_group.enrollment_terms << @course.enrollment_term
-        now = Time.zone.now
-        period_group.grading_periods.create!(
-          title: "Closed Period",
-          start_date: 5.months.ago(now),
-          end_date: 2.months.ago(now),
-          close_date: 2.months.ago(now)
-        )
-        period_group.grading_periods.create!(
-          title: "Current Period",
-          start_date: 2.months.ago(now),
-          end_date: 2.months.from_now(now),
-          close_date: 2.months.from_now(now)
-        )
-
-        @course.assignments.create!(
-          name: "Assignment in closed period",
-          workflow_state: "published",
-          submission_types: "online_text_entry",
-          due_at: 4.months.ago(now)
-        )
-        @course.assignments.create!(
-          name: "Assignment in current period",
-          workflow_state: "published",
-          submission_types: "online_text_entry",
-          due_at: 1.month.ago
-        )
-      end
-
-      it "returns all missing submissions when not applied" do
-        json = api_call(:get, @path, @params)
-        expect(json.length).to eql 4
-      end
-
-      it "returns only missing submissions in the current grading period when applied" do
-        json = api_call(:get, @path, @params.merge(filter: ["current_grading_period"]))
-        expect(json.length).to eql 3
-        json.each do |assignment|
-          expect(assignment["name"]).not_to eq "Assignment in closed period"
-        end
-      end
-    end
-
     context "as observer" do
       before :once do
         @observer = user_factory(active_all: true)

@@ -156,7 +156,7 @@ export function* loadAllOpportunitiesSaga() {
   try {
     let loadingUrl = '/api/v1/users/self/missing_submissions'
     const items = []
-    const {courses, singleCourse, selectedObservee, currentUser, weeklyDashboard} = yield select()
+    const {courses, singleCourse, selectedObservee, currentUser} = yield select()
     const observed_user_id = observedUserId({selectedObservee, currentUser})
     let course_ids
     if (observed_user_id) {
@@ -165,15 +165,11 @@ export function* loadAllOpportunitiesSaga() {
       course_ids = singleCourse ? courses.map(({id}) => id) : undefined
     }
     while (loadingUrl != null) {
-      const filter = ['submittable']
-      if (weeklyDashboard) {
-        filter.push('current_grading_period')
-      }
       const response = yield call(sendBasicFetchRequest, loadingUrl, {
         observed_user_id,
         course_ids,
         include: ['planner_overrides'],
-        filter,
+        filter: ['submittable'],
         per_page: MAX_PAGE_SIZE
       })
       items.push(...response.data)

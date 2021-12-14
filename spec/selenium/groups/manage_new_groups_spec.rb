@@ -258,13 +258,12 @@ describe "manage groups" do
     get "/courses/#{@course.id}/groups"
     f('button[data-test-id="add-group-button"]').click
     wait_for_ajaximations
-    f("#group-name").send_keys("group name")
-    click_option("#join-level-select", "invitation_only", :value)
-    f("#invite-filter").click
-    f("#invite-filter").send_keys(:arrow_down, :return)
+    f("#groupName").send_keys("group name")
+    click_option("#joinLevelSelect", "invitation_only", :value)
+    ff("#add_group_form input[type=checkbox]").each(&:click)
     wait_for_ajaximations
 
-    f('button[type="submit"]').click
+    submit_form(f("#add_group_form"))
     wait_for_ajaximations
     new_group = @course.groups.first
     expect(new_group.name).to eq "group name"

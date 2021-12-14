@@ -34,12 +34,6 @@
 
   sticky_enabled = Account.site_admin.feature_enabled?(:sticky_left_nav)
 
-  if Account.site_admin.feature_enabled?(:remember_course_nav_collapsed_state)
-    # Collapse the course menu according to user preference, unless a certain action
-    # requests that it default to collapsed for that page
-    @collapse_course_menu ||= @current_user&.reload&.collapse_course_nav?
-  end
-
   if @collapse_course_menu
     subnav_menu_text = t('Show Navigation Menu')
     subnav_menu_text = t('Show Courses Navigation Menu') if active_path?('/courses')
@@ -163,7 +157,7 @@
           style="display: <%= @collapse_course_menu ? "none" : "block" %>"
           >
           <% if sticky_enabled %>
-            <div id="sticky-container" class="ic-sticky-frame">
+            <div class="ic-sticky-frame">
           <% end %>
             <% if left_side %>
               <%= left_side %>

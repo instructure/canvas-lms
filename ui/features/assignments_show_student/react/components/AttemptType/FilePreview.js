@@ -211,12 +211,7 @@ export default class FilePreview extends Component {
     return (
       <div style={iframeContainerStyle} data-testid="assignments_2_submission_preview">
         <ScreenReaderContent>{selectedFile.displayName}</ScreenReaderContent>
-        <iframe
-          src={selectedFile.submissionPreviewUrl}
-          title="preview"
-          style={iframeStyle}
-          allowFullScreen
-        />
+        <iframe src={selectedFile.submissionPreviewUrl} title="preview" style={iframeStyle} />
       </div>
     )
   }

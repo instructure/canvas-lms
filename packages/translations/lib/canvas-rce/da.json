@@ -134,8 +134,6 @@
   "describe_the_image_e65d2e32": { "message": "(Beskriv billedet)" },
   "describe_the_video_2fe8f46a": { "message": "(Beskriv videoen)" },
   "details_98a31b68": { "message": "Nærmere oplysninger" },
-  "diamond_b8dfe7ae": { "message": "Diamant" },
-  "dimension_type_55c83e4e": { "message": "Dimensionstype" },
   "dimensions_45ddb7b7": { "message": "Dimensioner" },
   "directionality_26ae9e08": { "message": "Retningsbestemthed" },
   "discussions_a5f96392": { "message": "Diskussioner" },
@@ -274,9 +272,6 @@
   "miscellaneous_e9818229": { "message": "Diverse" },
   "modules_c4325335": { "message": "Moduler" },
   "multi_color_image_63d7372f": { "message": "Billede i flere farver" },
-  "must_be_at_least_percentage_22e373b6": {
-    "message": "Skal være mindst { percentage }%"
-  },
   "must_be_at_least_width_x_height_px_41dc825e": {
     "message": "Skal være mindst { width } x { height } px"
   },
@@ -317,10 +312,7 @@
   },
   "pages_e5414c2c": { "message": "Sider" },
   "paragraph_5e5ad8eb": { "message": "Paragraf" },
-  "pentagon_17d82ea3": { "message": "Femkant" },
   "people_b4ebb13c": { "message": "Deltagere" },
-  "percentage_34ab7c2c": { "message": "Procentdel" },
-  "pixels_52ece7d1": { "message": "Pixels" },
   "posted_when_a578f5ab": { "message": "Slået op: { when }" },
   "preformatted_d0670862": { "message": "Præformatteret" },
   "pretty_html_editor_28748756": { "message": "Pænt HTML-redigeringsværktøj" },

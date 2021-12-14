@@ -707,9 +707,9 @@ class ContextExternalTool < ActiveRecord::Base
 
       case settings[setting]
       when Hash
-        settings[setting].each do |property, value|
-          if value.try(:match?, URI::DEFAULT_PARSER.make_regexp)
-            settings[setting][property] = replace_host.call(value, new_domain)
+        settings[setting].each_key do |property|
+          if settings[setting][property].match?(URI::DEFAULT_PARSER.make_regexp)
+            settings[setting][property] = replace_host.call(settings[setting][property], new_domain)
           end
         end
       when URI::DEFAULT_PARSER.make_regexp

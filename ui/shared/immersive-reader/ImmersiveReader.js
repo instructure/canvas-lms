@@ -25,7 +25,6 @@ import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {defaultFetchOptions} from '@instructure/js-utils'
 import {CookiePolicy} from '@microsoft/immersive-reader-sdk'
 import WithBreakpoints from 'with-breakpoints'
-import ContentChunker from './ContentChunker'
 
 /**
  * This comes from https://github.com/microsoft/immersive-reader-sdk/blob/master/assets/icon.svg
@@ -52,10 +51,9 @@ function handleClick({title, content}, readerSDK) {
       fetch('/api/v1/immersive_reader/authenticate', defaultFetchOptions)
         .then(response => response.json())
         .then(({token, subdomain}) => {
-          const chunks = new ContentChunker().chunk(content())
           const requestContent = {
             title,
-            chunks
+            chunks: [{content, mimeType: 'text/html'}]
           }
           const options = {
             cookiePolicy: CookiePolicy.Disable

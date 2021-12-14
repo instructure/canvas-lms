@@ -40,7 +40,7 @@
     <%= prefetch_xhr("/api/v1/planner/items?start_date=#{last_year}&order=asc&per_page=1") %>
     <%= prefetch_xhr("/api/v1/planner/items?end_date=#{next_year}&order=desc&per_page=1") %>
     <%= prefetch_xhr("/api/v1/planner/items?start_date=#{beginning_of_week}&end_date=#{end_of_week}&per_page=100") %>
-    <%= prefetch_xhr('/api/v1/users/self/missing_submissions?include[]=planner_overrides&filter[]=submittable&filter[]=current_grading_period&per_page=100') %>
+    <%= prefetch_xhr('/api/v1/users/self/missing_submissions?include[]=planner_overrides&filter[]=submittable&per_page=100') %>
   <% else %>
     <%= prefetch_xhr("/api/v1/planner/items?start_date=#{six_months_ago}&filter=new_activity&order=asc") %>
     <%= prefetch_xhr("/api/v1/planner/items?end_date=#{beginning_of_day}&order=desc&per_page=1") %>

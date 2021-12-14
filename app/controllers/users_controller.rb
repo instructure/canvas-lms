@@ -405,23 +405,26 @@ class UsersController < ApplicationController
     return unless authorized_action(@context, @current_user, :read_roster)
 
     search_term = params[:search_term].presence
+    page_opts = {}
     if search_term
       users = UserSearch.for_user_in_context(search_term, @context, @current_user, session,
                                              {
                                                order: params[:order], sort: params[:sort], enrollment_role_id: params[:role_filter_id],
                                                enrollment_type: params[:enrollment_type]
                                              })
+      page_opts[:total_entries] = nil # doesn't calculate a total count
     else
       users = UserSearch.scope_for(@context, @current_user,
                                    { order: params[:order], sort: params[:sort], enrollment_role_id: params[:role_filter_id],
                                      enrollment_type: params[:enrollment_type] })
       users = users.with_last_login if params[:sort] == "last_login"
     end
+    page_opts[:total_entries] = nil unless @context.root_account.allow_last_page_on_users?
 
     includes = (params[:include] || []) & %w[avatar_url email last_login time_zone uuid]
     includes << "last_login" if params[:sort] == "last_login" && !includes.include?("last_login")
     GuardRail.activate(:secondary) do
-      users = Api.paginate(users, self, api_v1_account_users_url, { total_entries: nil })
+      users = Api.paginate(users, self, api_v1_account_users_url, page_opts)
       user_json_preloads(users, includes.include?("email"))
       User.preload_last_login(users, @context.resolved_root_account_id) if includes.include?("last_login") && params[:sort] != "last_login"
       render json: users.map { |u| user_json(u, @current_user, session, includes) }
@@ -1080,9 +1083,8 @@ class UsersController < ApplicationController
   #                         These will be returned under a +planner_override+ key
   #   "course":: Optionally include the assignments' courses
   #
-  # @argument filter[] [String, "submittable"|"current_grading_period"]
+  # @argument filter[] [String, "submittable"]
   #   "submittable":: Only return assignments that the current user can submit (i.e. filter out locked assignments)
-  #   "current_grading_period":: Only return missing assignments that are in the current grading period
   #
   # @argument course_ids[] [String]
   #   Optionally restricts the list of past-due assignments to only those associated with the specified
@@ -1108,7 +1110,6 @@ class UsersController < ApplicationController
 
       filter = Array(params[:filter])
       only_submittable = filter.include?("submittable")
-      only_current_grading_period = filter.include?("current_grading_period")
 
       course_ids = user.participating_student_course_ids
       course_ids = course_ids.select { |id| included_course_ids.include?(id) } unless included_course_ids.empty?
@@ -1120,7 +1121,6 @@ class UsersController < ApplicationController
                                 assignments: { context_id: shard_course_ids })
                          .merge(Assignment.published)
         subs = subs.merge(Assignment.not_locked) if only_submittable
-        subs = subs.in_current_grading_period_for_courses(course_ids) if only_current_grading_period
         submissions = subs.order(:cached_due_date, :id)
       end
       assignments = Api.paginate(submissions, self, api_v1_user_missing_submissions_url).map(&:assignment)
@@ -1609,7 +1609,7 @@ class UsersController < ApplicationController
     create_user
   end
 
-  BOOLEAN_PREFS = %i[manual_mark_as_read collapse_global_nav collapse_course_nav hide_dashcard_color_overlays release_notes_badge_disabled comment_library_suggestions_enabled elementary_dashboard_disabled].freeze
+  BOOLEAN_PREFS = %i[manual_mark_as_read collapse_global_nav hide_dashcard_color_overlays release_notes_badge_disabled comment_library_suggestions_enabled elementary_dashboard_disabled].freeze
 
   # @API Update user settings.
   # Update an existing user's settings.
@@ -1623,10 +1623,6 @@ class UsersController < ApplicationController
   #
   # @argument collapse_global_nav [Boolean]
   #   If true, the user's page loads with the global navigation collapsed
-  #
-  # @argument collapse_course_nav [Boolean]
-  #   If true, the user's course pages will load with the course navigation
-  #   collapsed.
   #
   # @argument hide_dashcard_color_overlays [Boolean]
   #   If true, images on course cards will be presented without being tinted

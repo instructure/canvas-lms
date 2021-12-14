@@ -32,7 +32,6 @@ import {
 const CREATE_API = `/api/v1/courses/${COURSE.id}/pace_plans`
 const UPDATE_API = `/api/v1/courses/${COURSE.id}/pace_plans/${PRIMARY_PLAN.id}`
 const PROGRESS_API = `/api/v1/progress/${PROGRESS_RUNNING.id}`
-const COMPRESS_API = `/api/v1/courses/${COURSE.id}/pace_plans/compress_dates`
 
 const dispatch = jest.fn()
 
@@ -170,71 +169,6 @@ describe('Pace plans actions', () => {
         [uiActions.setCategoryError('checkPublishStatus', error?.toString())]
       ])
       expect(setTimeout).not.toHaveBeenCalled()
-    })
-  })
-
-  describe('compressDates', () => {
-    it('Updates plan and manages loading state', async () => {
-      const updatedPlan = {...PRIMARY_PLAN}
-      const getState = mockGetState(updatedPlan, PRIMARY_PLAN)
-      const compressResponse = {
-        1: 'a date',
-        2: 'another date'
-      }
-      fetchMock.post(COMPRESS_API, compressResponse)
-
-      const thunkedAction = pacePlanActions.compressDates()
-      await thunkedAction(dispatch, getState)
-
-      expect(dispatch.mock.calls[0]).toEqual([uiActions.showLoadingOverlay('Compressing...')])
-      expect(dispatch.mock.calls[1]).toEqual([uiActions.clearCategoryError('compress')])
-      expect(dispatch.mock.calls[2]).toEqual([
-        pacePlanActions.setCompressedItemDates(compressResponse)
-      ])
-      // Compare dispatched functions by name since they won't be directly equal
-      expect(dispatch.mock.calls[3]).toEqual([uiActions.hideLoadingOverlay()])
-      // compress() POSTs a flattened and stripped-down version of the pace plan
-      expect(fetchMock.calls()[0][1].body).toEqual(
-        JSON.stringify({
-          pace_plan: {
-            start_date: updatedPlan.start_date,
-            end_date: updatedPlan.end_date,
-            exclude_weekends: updatedPlan.exclude_weekends,
-            pace_plan_module_items_attributes: updatedPlan.modules.reduce(
-              (runningValue: Array<any>, module) => {
-                return runningValue.concat(
-                  module.items.map(item => ({
-                    id: item.id,
-                    duration: item.duration,
-                    module_item_id: item.module_item_id
-                  }))
-                )
-              },
-              []
-            )
-          }
-        })
-      )
-      expect(fetchMock.called(COMPRESS_API, 'POST')).toBe(true)
-    })
-
-    it('Sets an error message if compression fails', async () => {
-      const updatedPlan = {...PRIMARY_PLAN}
-      const error = new Error('Whoops!')
-      const getState = mockGetState(updatedPlan, PRIMARY_PLAN)
-      fetchMock.post(COMPRESS_API, {
-        throws: error
-      })
-
-      const thunkedAction = pacePlanActions.compressDates()
-      await thunkedAction(dispatch, getState)
-
-      expect(dispatch.mock.calls).toEqual([
-        [uiActions.showLoadingOverlay('Compressing...')],
-        [uiActions.clearCategoryError('compress')],
-        [uiActions.hideLoadingOverlay()],
-        [uiActions.setCategoryError('compress', error.toString())]
-      ])
     })
   })
 })

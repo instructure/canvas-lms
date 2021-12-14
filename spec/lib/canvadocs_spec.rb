@@ -817,7 +817,7 @@ describe Canvadocs do
 
         context "for a student annotation assignment" do
           before do
-            assignment.update!(submission_types: "student_annotation,online_text_entry", annotatable_attachment: attachment)
+            assignment.update!(submission_types: "student_annotation", annotatable_attachment: attachment)
             assignment.submit_homework(
               submission.user,
               submission_type: "student_annotation",
@@ -833,15 +833,6 @@ describe Canvadocs do
 
             it "sets the user_filter to empty if submission is posted" do
               expect(user_filter).to be_empty
-            end
-
-            it "sets the user_filter to empty for past student annotation attempts" do
-              Timecop.freeze(10.minutes.from_now(submission.submitted_at)) do
-                assignment.submit_homework(submission.user, body: "hi", submission_type: "online_text_entry")
-                submission.reload
-                params = Canvadocs.user_session_params(@current_user, submission: submission, attempt: 1)
-                expect(params[:user_filter]).to be_empty
-              end
             end
 
             it "sets restrict_annotations_to_user_filter to false if submission is posted" do

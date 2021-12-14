@@ -42,6 +42,23 @@ describe "pace plans edit tray" do
     user_session @teacher
   end
 
+  context "unpublished pace plan" do
+    let(:module_title) { "First Module" }
+    let(:module_assignment_title) { "Module Assignment" }
+
+    before :once do
+      @course_module = create_course_module(module_title, "active")
+      @assignment = create_assignment(@course, module_assignment_title, "Module Assignment Description", 10, "published")
+      @course_module.add_item(id: @assignment.id, type: "assignment")
+    end
+
+    it "shows no publishing status when pace plan not published yet" do
+      visit_pace_plans_page
+
+      expect(publish_status_exists?).to be_falsey
+    end
+  end
+
   context "edit tray contents" do
     let(:pace_module_title) { "Pace Module" }
     let(:module_assignment_title) { "Module Assignment 1" }

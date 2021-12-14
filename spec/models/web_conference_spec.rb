@@ -42,7 +42,7 @@ describe WebConference do
   describe ".conference_tab_name" do
     context "when there are plugins enabled" do
       it "returns the plugin names" do
-        expect(WebConference.conference_tab_name).to eq("Big blue button Wimba")
+        expect(WebConference.conference_tab_name).to eq("Big blue button Wimba (Conferences)")
       end
     end
 
