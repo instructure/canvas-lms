@@ -6341,7 +6341,7 @@ is:
         default_select_folder: "Velja möppu"
         upload_to: "Hlaða upp til"
       import_quizzes_next_view: 
-        import_new_quizzes: "Flyttu inn matsefni sem Ný próf"
+        import_new_quizzes: "Flyttu inn matsefni sem *Ný próf*"
         import_new_quizzes_help_text: "„Ný próf“ er nýtt matskerfi fyrir Canvas.%{p_p}Ef þú vilt fá frekari upplýsingar skaltu hafa samband við kerfisstjórann þinn eða fara á"
         import_quizzesNext_help_label: "Flyttu inn möt sem Ný próf hjálpar tákn"
         import_quizzesNext_help_text: "Quizzes.Next er nýja matsvélin fyrir Canvas.%{p_p}Til að fá að vita meira skaltu hafa samband við kerfisstjóra þinn eða heimsækja"
