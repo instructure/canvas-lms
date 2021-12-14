@@ -6658,7 +6658,7 @@ de:
         default_select_folder: "Ordner auswählen"
         upload_to: "Hochladen nach"
       import_quizzes_next_view: 
-        import_new_quizzes: "Bewertungsinhalte als Neue Quizze importieren"
+        import_new_quizzes: "Bewertungsinhalte als *Neue Quizze* importieren"
         import_new_quizzes_help_text: "Neue Quizzes ist das neue Bewertungssystem für Canvas. %{p_p}Für weitere Informationen, wenden Sie sich an Ihren Systemadministrator, oder besuchen Sie"
         import_quizzesNext_help_label: "Bewertung als Hilfesymbol für „Neue Quizze“ importieren"
         import_quizzesNext_help_text: "Quizzes.Next ist das neue Bewertungssystem für Canvas.%{p_p}Für weitere Informationen wenden Sie sich an Ihren Systemadministrator, oder besuchen Sie"
