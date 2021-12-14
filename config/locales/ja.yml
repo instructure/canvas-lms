@@ -6697,7 +6697,7 @@ ja:
         default_select_folder: フォルダの選択
         upload_to: アップロード先
       import_quizzes_next_view: 
-        import_new_quizzes: 評価コンテンツを新クイズとしてインポートする
+        import_new_quizzes: 評価コンテンツを*新クイズ*としてインポートする
         import_new_quizzes_help_text: "新しいクイズは Canvas の新しい評価エンジンです。%{p_p}詳しくは、システム管理者にお問い合わせいただくか、こちらをご覧ください："
         import_quizzesNext_help_label: 評価を新クイズヘルプアイコンとしてインポートする
         import_quizzesNext_help_text: "Quizzes.Next は Canvas の新しい評価エンジンです。%{p_p}詳しくは、システム管理者にお問い合わせいただくか、こちらをご覧ください："
