@@ -7003,7 +7003,7 @@ nn:
         choose_home_page: "Vel startside"
         course_setup: "Sjekkliste for emneoppsett"
         drop_course: "Vel bort dette emnet"
-        import: "Importer innhald"
+        import: "Importer eksisterande innhald"
         join_course: "Ta del i dette emnet"
         new_announcement: "Ny kunngjering"
         student_view: Studentvising
