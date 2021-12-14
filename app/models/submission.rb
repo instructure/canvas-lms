@@ -241,6 +241,16 @@ class Submission < ActiveRecord::Base
   scope :posted, -> { where.not(posted_at: nil) }
   scope :unposted, -> { where(posted_at: nil) }
 
+  scope :in_current_grading_period_for_courses, lambda { |course_ids|
+    current_period_clause = ""
+    course_ids.uniq.each_with_index do |course_id, i|
+      grading_period_id = GradingPeriod.current_period_for(Course.find(course_id))&.id
+      current_period_clause += grading_period_id.nil? ? sanitize_sql(["course_id = ?", course_id]) : sanitize_sql(["(course_id = ? AND grading_period_id = ?)", course_id, grading_period_id])
+      current_period_clause += " OR " if i < course_ids.length - 1
+    end
+    where(current_period_clause)
+  }
+
   workflow do
     state :submitted do
       event :grade_it, :transitions_to => :graded
