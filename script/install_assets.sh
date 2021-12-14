@@ -9,7 +9,7 @@ function bundle_config_and_install() {
   echo "Running bundle config and bundle install..."
   bundle config --global build.nokogiri --use-system-libraries &&
   bundle config --global build.ffi --enable-system-libffi &&
-  if [ "x$PULSAR" = "xy" ]; then bundle config --global with pulsar; fi &&
+  if [ "x$PULSAR" = "xn" ]; then bundle config --global without pulsar; fi &&
   mkdir -p /home/docker/.bundle &&
   bundle install --jobs $(nproc)
 }
@@ -44,13 +44,13 @@ while getopts ":c:p" opt; do
       fi
       ;;
     p )
-      WITH_PULSAR='y'
+      WITH_PULSAR='n'
       ;;
   esac
 done
 
 if [[ ${BUNDLE_CONFIG-n} = 'y' ]] || [[ ${ALL_COMMANDS-n} = 'y' ]]; then
-  bundle_config_and_install ${WITH_PULSAR-n}
+  bundle_config_and_install ${WITH_PULSAR-y}
 fi
 if [[ ${YARN_INSTALL-n} = 'y' ]] || [[ ${ALL_COMMANDS-n} = 'y' ]]; then
   yarn_install
