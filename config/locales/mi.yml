@@ -16127,15 +16127,15 @@ mi:
     course_already_started: 
       email: 
         body: |-
-            kia ora%{user},
+            Kia ora %{user},
             
-            %{course}, tō akoranga i runga i Whatunga Canvas, tīmata te rā tokorua i mua, a i kite mātou kaore i takiuru koe i roto. Tatou I hiahia noa mātou ki te tuku atu ki  a koe tētahi whakamahara whakamutunga i roto i te take wareware koe.
+            %{course}, tō akoranga i runga i Whatunga Canvas i timata ngā rā o mua ana ka kite mātou kaore anō koe i takiuru mai. Kō tā mātou hiahia ki te tuku atu kotahi whakamaumahara i roto i te take i wareware koe.
             
-            Hei te takiuru i roto , haere ki %{site} me te whakauru i tō ingoa, me te kupuhipa. Ki te mea kua kore whakaturia e koe he kupuhipa anō, ka taea e whakaturia e koe tētahi konei: %{password_url}
+            Hei te takiuru i roto, haere ki %{site} me te whakauru i tō ingoa, me te kupuhipa. Mehemea kaore anō koe i whakatau i tō kupuhipa ka taea e koe te whakatau i tētahi ki konei: %{password_url}
             
-            Noa ki te taea e koe te kore e hanga i tēnei akoranga, āhei noa ki te tirotiro i tō mātou rārangi akoranga i %{site} ki te kitea tētahi mea atu e whakahihiko ia koe. Akoranga hou kei te tapiritia te wa katoa!
+            Mehemea kaore e taea e koe ki te tae ki te akoranga ite noa tirohia tā matou akoranga pukapuka i %{site} ki te kimi tētahi atu mea hei whakahīhiko ia koe. Akoranga hou kei te tāpiritia i ngā wā katoa!
             
-            Te tūmanako nei ka kite wawe ia koe,
+            Ko te tūmanako ki te kite ia koe tata tonu,
             
             Whatunga Canvas
         course_already_started: "Kua tīmata kē tō akoranga"
