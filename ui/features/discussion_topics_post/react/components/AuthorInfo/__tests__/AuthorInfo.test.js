@@ -163,24 +163,32 @@ describe('AuthorInfo', () => {
       window.ENV.discussion_anonymity_enabled = false
     })
 
-    it('renders name', () => {
-      const container = setup({anonymousAuthor: AnonymousUser.mock()})
+    it('renders the anonymous name', () => {
+      const container = setup({author: null, anonymousAuthor: AnonymousUser.mock()})
       expect(container.getByText('Anonymous 1')).toBeInTheDocument()
     })
 
-    it('renders avatar', () => {
-      const container = setup({anonymousAuthor: AnonymousUser.mock()})
+    it('renders the anonymous avatar', () => {
+      const container = setup({author: null, anonymousAuthor: AnonymousUser.mock()})
       expect(container.getByTestId('anonymous_avatar')).toBeInTheDocument()
     })
 
-    it('renders you for the current user', () => {
-      const container = setup({anonymousAuthor: AnonymousUser.mock({shortName: CURRENT_USER})})
+    it('renders you for the current user if anonymous', () => {
+      const container = setup({
+        author: null,
+        anonymousAuthor: AnonymousUser.mock({shortName: CURRENT_USER})
+      })
       expect(container.getByText('Anonymous 1 (You)')).toBeInTheDocument()
     })
 
     it('should not highlight terms in the author name', () => {
       const container = setup({anonymousAuthor: AnonymousUser.mock(), searchTerm: 'Anonymous'})
       expect(container.queryByTestId('highlighted-search-item')).toBeNull()
+    })
+
+    it('renders the author instead of the anonymous author if present', () => {
+      const container = setup({anonymousAuthor: AnonymousUser.mock()})
+      expect(container.getByText('Harry Potter')).toBeInTheDocument()
     })
   })
 })
