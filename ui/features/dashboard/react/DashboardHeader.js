@@ -66,8 +66,9 @@ class DashboardHeader extends React.Component {
 
   constructor(...args) {
     super(...args)
-    if (ENV.STUDENT_PLANNER_ENABLED) {
-      initializePlanner({
+    this.planner_init_promise = undefined
+    if (this.props.planner_enabled) {
+      this.planner_init_promise = initializePlanner({
         changeDashboardView: this.changeDashboard,
         getActiveApp: this.getActiveApp,
         flashError: message => showFlashAlert({message, type: 'error'}),
@@ -96,6 +97,14 @@ class DashboardHeader extends React.Component {
 
   componentDidMount() {
     this.showDashboard(this.state.currentDashboard)
+  }
+
+  ready = () => {
+    if (this.props.planner_enabled) {
+      return this.planner_init_promise
+    } else {
+      return Promise.resolve()
+    }
   }
 
   getActiveApp = () => this.state.currentDashboard
@@ -139,7 +148,13 @@ class DashboardHeader extends React.Component {
     if (this.state.loadedViews.includes(newView)) return
 
     if (newView === 'planner' && this.props.planner_enabled) {
-      this.loadPlannerComponent()
+      this.planner_init_promise
+        .then(() => {
+          this.loadPlannerComponent()
+        })
+        .catch(() =>
+          showFlashAlert({message: I18n.t('Failed initializing dashboard'), type: 'error'})
+        )
     } else if (newView === 'cards') {
       this.loadCardDashboard()
     } else if (newView === 'activity') {
@@ -183,6 +198,7 @@ class DashboardHeader extends React.Component {
       this.saveDashboardView(newView)
       this.switchDashboard(newView)
     }
+    return this.ready()
   }
 
   switchDashboard = newView => {

@@ -29,7 +29,6 @@ import preventDefault from 'prevent-default'
 import '@canvas/media-comments'
 import './activateReminderControls'
 import '../../features/navigation_header/jquery/instructure'
-import './injectAuthTokenIntoForms'
 import './ujsLinks'
 import './expandAdminLinkMenusOnClick'
 import './activateElementToggler'
@@ -53,9 +52,7 @@ if (ENV.page_view_update_url) import('./trackPageViews')
 // this will make nested apps that use the hash happy
 $('#skip_navigation_link').on(
   'click',
-  preventDefault(function() {
-    $($(this).attr('href'))
-      .attr('tabindex', -1)
-      .focus()
+  preventDefault(function () {
+    $($(this).attr('href')).attr('tabindex', -1).focus()
   })
 )

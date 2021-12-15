@@ -90,16 +90,16 @@ ready(() => {
   if (immersive_reader_mount_point || immersive_reader_mobile_mount_point) {
     import('@canvas/immersive-reader/ImmersiveReader')
       .then(ImmersiveReader => {
-        const courseSyllabusText = document.querySelector('#course_syllabus').innerHTML
+        const courseSyllabusText = () => document.querySelector('#course_syllabus').innerHTML
         const title = I18n.t('Course Syllabus')
         let content
 
         // We display a default message in #course_syllabus_details when the user
         // hasn't set any text in the syllabus.
-        if ($.trim(courseSyllabusText)) {
+        if ($.trim(courseSyllabusText())) {
           content = courseSyllabusText
         } else {
-          content = document.querySelector('#course_syllabus_details').innerHTML
+          content = () => document.querySelector('#course_syllabus_details').innerHTML
         }
 
         if (immersive_reader_mount_point) {

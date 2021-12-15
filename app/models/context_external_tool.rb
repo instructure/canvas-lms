@@ -73,8 +73,25 @@ class ContextExternalTool < ActiveRecord::Base
   end
 
   set_policy do
-    given { |user, session| context.grants_right?(user, session, :lti_add_edit) }
+    #################### Begin legacy permission block #########################
+    given do |user, session|
+      !context.root_account.feature_enabled?(:granular_permissions_manage_lti) &&
+        context.grants_right?(user, session, :lti_add_edit)
+    end
     can :read and can :update and can :delete and can :update_manually
+    ##################### End legacy permission block ##########################
+
+    given do |user, session|
+      context.root_account.feature_enabled?(:granular_permissions_manage_lti) &&
+        context.grants_right?(user, session, :manage_lti_edit)
+    end
+    can :read and can :update and can :update_manually
+
+    given do |user, session|
+      context.root_account.feature_enabled?(:granular_permissions_manage_lti) &&
+        context.grants_right?(user, session, :manage_lti_delete)
+    end
+    can :read and can :delete
   end
 
   class << self
@@ -707,9 +724,9 @@ class ContextExternalTool < ActiveRecord::Base
 
       case settings[setting]
       when Hash
-        settings[setting].each_key do |property|
-          if settings[setting][property].match?(URI::DEFAULT_PARSER.make_regexp)
-            settings[setting][property] = replace_host.call(settings[setting][property], new_domain)
+        settings[setting].each do |property, value|
+          if value.try(:match?, URI::DEFAULT_PARSER.make_regexp)
+            settings[setting][property] = replace_host.call(value, new_domain)
           end
         end
       when URI::DEFAULT_PARSER.make_regexp

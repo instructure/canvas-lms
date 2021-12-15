@@ -19,7 +19,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import TestUtils from 'react-dom/test-utils'
-import Configurations from 'ui/features/external_apps/react/components/Configurations.js'
+import Configurations from 'ui/features/external_apps/react/components/Configurations'
 
 const wrapper = document.getElementById('fixtures')
 const createElement = (data = {}) => <Configurations {...data} />
@@ -37,7 +37,7 @@ test('renders', () => {
   ok(TestUtils.isCompositeComponentWithType(component, Configurations))
 })
 
-test('canAddEdit', () => {
+test('canNotAddEdit', () => {
   const component = renderComponent({
     env: {
       PERMISSIONS: {create_tool_manually: false},
@@ -55,4 +55,64 @@ test('canAddEdit', () => {
     }
   })
   ok(component.canAddEdit())
+})
+
+test('canAdd', () => {
+  const component = renderComponent({
+    env: {
+      PERMISSIONS: {add_tool_manually: true},
+      APP_CENTER: {enabled: true}
+    }
+  })
+  ok(component.canAdd())
+})
+
+test('canNotAdd', () => {
+  const component = renderComponent({
+    env: {
+      PERMISSIONS: {add_tool_manually: false},
+      APP_CENTER: {enabled: true}
+    }
+  })
+  notOk(component.canAdd())
+})
+
+test('canEdit', () => {
+  const component = renderComponent({
+    env: {
+      PERMISSIONS: {edit_tool_manually: true},
+      APP_CENTER: {enabled: true}
+    }
+  })
+  ok(component.canEdit())
+})
+
+test('canNotEdit', () => {
+  const component = renderComponent({
+    env: {
+      PERMISSIONS: {edit_tool_manually: false},
+      APP_CENTER: {enabled: true}
+    }
+  })
+  notOk(component.canEdit())
+})
+
+test('canDelete', () => {
+  const component = renderComponent({
+    env: {
+      PERMISSIONS: {delete_tool_manually: true},
+      APP_CENTER: {enabled: true}
+    }
+  })
+  ok(component.canDelete())
+})
+
+test('canNotDelete', () => {
+  const component = renderComponent({
+    env: {
+      PERMISSIONS: {delete_tool_manually: false},
+      APP_CENTER: {enabled: true}
+    }
+  })
+  notOk(component.canDelete())
 })

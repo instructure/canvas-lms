@@ -215,6 +215,7 @@ module Api::V1::User
                       end
     hash = {
       id: user.id,
+      anonymous_id: user.id.to_s(36),
       display_name: user.short_name,
       avatar_image_url: avatar_url_for_user(user),
       html_url: participant_url,

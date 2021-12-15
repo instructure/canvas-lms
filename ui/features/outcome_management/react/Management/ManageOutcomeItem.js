@@ -43,8 +43,15 @@ const ManageOutcomeItem = ({
   onCheckboxHandler,
   canUnlink
 }) => {
-  const {contextType, contextId, friendlyDescriptionFF, canManage, isAdmin, isCourse} =
-    useCanvasContext()
+  const {
+    contextType,
+    contextId,
+    friendlyDescriptionFF,
+    individualOutcomeRatingAndCalculationFF,
+    canManage,
+    isAdmin,
+    isCourse
+  } = useCanvasContext()
   const [truncated, setTruncated] = useState(true)
   const onClickHandler = () => setTruncated(prevState => !prevState)
   const onChangeHandler = () => onCheckboxHandler({linkId})
@@ -57,6 +64,8 @@ const ManageOutcomeItem = ({
     friendlyDescriptionFF ||
     (outcomeContextType === contextType && outcomeContextId === contextId) ||
     allowAdminEdit
+  const shouldShowDescription =
+    description || friendlyDescription || individualOutcomeRatingAndCalculationFF
 
   if (!title) return null
 
@@ -95,7 +104,7 @@ const ManageOutcomeItem = ({
                   }
                   withBackground={false}
                   withBorder={false}
-                  interaction={description || friendlyDescription ? 'enabled' : 'disabled'}
+                  interaction={shouldShowDescription ? 'enabled' : 'disabled'}
                   onClick={onClickHandler}
                   data-testid="manage-outcome-item-expand-toggle"
                 >
@@ -132,7 +141,7 @@ const ManageOutcomeItem = ({
       <Flex as="div" alignItems="start">
         <Flex.Item size="4.125rem" />
         <Flex.Item size="50%" shouldGrow>
-          {(description || friendlyDescription) && (
+          {shouldShowDescription && (
             <View as="div" padding="0 0 x-small">
               <OutcomeDescription
                 description={description}

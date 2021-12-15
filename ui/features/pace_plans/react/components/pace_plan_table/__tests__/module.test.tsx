@@ -29,7 +29,8 @@ const defaultProps = {
   module: PLAN_MODULE_1,
   pacePlan: PRIMARY_PLAN,
   responsiveSize: 'large' as const,
-  showProjections: true
+  showProjections: true,
+  isCompressing: false
 }
 
 describe('Module', () => {
@@ -59,17 +60,25 @@ describe('Module', () => {
   })
 
   it('displays headers and values in stacked format when at small screen sizes', () => {
-    const {debug, queryAllByRole, queryByRole} = renderConnected(
+    const {queryAllByRole, queryByRole} = renderConnected(
       <Module {...defaultProps} responsiveSize="small" showProjections />
     )
-    debug()
     expect(queryByRole('button', {name: '1. How 2 B A H4CK32'})).toBeInTheDocument()
     expect(queryByRole('columnheader')).not.toBeInTheDocument()
     expect(
       queryByRole('cell', {name: 'Assignments : Basic encryption/decryption 100 pts'})
     ).toBeInTheDocument()
     expect(queryAllByRole('cell', {name: /Days :/})[0]).toBeInTheDocument()
-    expect(queryByRole('cell', {name: 'Due Date : 9/3/2021'})).toBeInTheDocument()
+    expect(queryByRole('cell', {name: 'Due Date : Fri, Sep 3, 2021'})).toBeInTheDocument()
     expect(queryAllByRole('cell', {name: 'Status : Published'})[0]).toBeInTheDocument()
+  })
+
+  it('includes the compressed dates warning tooltip if compressing', () => {
+    const {getByRole} = renderConnected(<Module {...defaultProps} isCompressing />)
+    expect(
+      getByRole('tooltip', {
+        name: 'Due Dates are being compressed based on your start and end dates'
+      })
+    ).toBeInTheDocument()
   })
 })

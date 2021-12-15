@@ -25,120 +25,19 @@ module Lti
     let(:launch) { Launch.new }
 
     describe "#iframe_allowances" do
-      subject { Launch.iframe_allowances(user_agent) }
+      subject { Launch.iframe_allowances }
 
-      context "when Chrome is used" do
-        let(:user_agent) do
-          "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.81 Safari/537.36"
-        end
-
-        it 'sets allowed origin to "*"' do
-          expect(subject).to match_array [
-            "geolocation *",
-            "microphone *",
-            "camera *",
-            "midi *",
-            "encrypted-media *",
-            "autoplay *",
-            "clipboard-write *",
-            "display-capture *"
-          ]
-        end
-      end
-
-      context "when Chrome is not used" do
-        let(:user_agent) do
-          "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/11.1.2 Safari/605.1.15"
-        end
-
-        it 'sets allowed origin to "*"' do
-          expect(subject).to match_array %w[
-            geolocation
-            microphone
-            camera
-            midi
-            encrypted-media
-            autoplay
-            clipboard-write
-            display-capture
-          ]
-        end
-      end
-
-      context "when FF >= 74 is used" do
-        let(:user_agent) do
-          "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:63.0) Gecko/20100101 Firefox/74.0"
-        end
-
-        it 'sets allowed origin to "*"' do
-          expect(subject).to match_array [
-            "geolocation *",
-            "microphone *",
-            "camera *",
-            "midi *",
-            "encrypted-media *",
-            "autoplay *",
-            "clipboard-write *",
-            "display-capture *"
-          ]
-        end
-      end
-
-      context "when FF < 74 is used" do
-        let(:user_agent) do
-          "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:63.0) Gecko/20100101 Firefox/73.0"
-        end
-
-        it 'does not set allowed origin to "*"' do
-          expect(subject).to match_array %w[
-            geolocation
-            microphone
-            camera
-            midi
-            encrypted-media
-            autoplay
-            clipboard-write
-            display-capture
-          ]
-        end
-      end
-
-      context "when Edge >= 79 is used" do
-        let(:user_agent) do
-          "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Edg/86.0.622.31"
-        end
-
-        it 'sets allowed origin to "*"' do
-          expect(subject).to match_array [
-            "geolocation *",
-            "microphone *",
-            "camera *",
-            "midi *",
-            "encrypted-media *",
-            "autoplay *",
-            "clipboard-write *",
-            "display-capture *"
-          ]
-        end
-      end
-
-      context "when Edge < 79 is used" do
-        let(:user_agent) do
-          "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Edge/12.10136"
-        end
-
-        it 'does not set allowed origin to "*"' do
-          expect(subject).to match_array %w[
-            geolocation
-            microphone
-            camera
-            midi
-            encrypted-media
-            autoplay
-            clipboard-write
-            display-capture
-          ]
-        end
+      it 'sets allowed origin to "*"' do
+        expect(subject).to match_array [
+          "geolocation *",
+          "microphone *",
+          "camera *",
+          "midi *",
+          "encrypted-media *",
+          "autoplay *",
+          "clipboard-write *",
+          "display-capture *"
+        ]
       end
     end
 

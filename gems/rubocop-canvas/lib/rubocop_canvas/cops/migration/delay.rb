@@ -33,13 +33,13 @@ module RuboCop
 
           return unless %i[delay delay_if_production].include?(method_name)
 
-          return add_offense(node, message: PREDEPLOY_MSG, severity: :warning) if tags.include?(:predeploy)
+          return add_offense(node, message: PREDEPLOY_MSG, severity: :error) if tags.include?(:predeploy)
 
           return unless method_name == :delay
 
           add_offense(node,
                       message: "All `delay`s in migrations should be `delay_if_production`",
-                      severity: :warning)
+                      severity: :error)
         end
       end
     end
