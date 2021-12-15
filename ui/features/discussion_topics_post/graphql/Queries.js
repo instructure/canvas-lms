@@ -39,11 +39,11 @@ export const DISCUSSION_QUERY = gql`
     legacyNode(_id: $discussionID, type: Discussion) {
       ... on Discussion {
         ...Discussion
-        editor {
+        editor(courseId: $courseID, roleTypes: $rolePillTypes) {
           ...User
           courseRoles(courseId: $courseID, roleTypes: $rolePillTypes)
         }
-        author {
+        author(courseId: $courseID, roleTypes: $rolePillTypes) {
           ...User
           courseRoles(courseId: $courseID, roleTypes: $rolePillTypes)
         }
@@ -60,11 +60,11 @@ export const DISCUSSION_QUERY = gql`
         ) {
           nodes {
             ...DiscussionEntry
-            editor {
+            editor(courseId: $courseID, roleTypes: $rolePillTypes) {
               ...User
               courseRoles(courseId: $courseID, roleTypes: $rolePillTypes)
             }
-            author {
+            author(courseId: $courseID, roleTypes: $rolePillTypes) {
               ...User
               courseRoles(courseId: $courseID, roleTypes: $rolePillTypes)
             }
@@ -119,11 +119,11 @@ export const DISCUSSION_SUBENTRIES_QUERY = gql`
     legacyNode(_id: $discussionEntryID, type: DiscussionEntry) {
       ... on DiscussionEntry {
         ...DiscussionEntry
-        editor {
+        editor(courseId: $courseID, roleTypes: $rolePillTypes) {
           ...User
           courseRoles(courseId: $courseID, roleTypes: $rolePillTypes)
         }
-        author {
+        author(courseId: $courseID, roleTypes: $rolePillTypes) {
           ...User
           courseRoles(courseId: $courseID, roleTypes: $rolePillTypes)
         }
@@ -142,11 +142,11 @@ export const DISCUSSION_SUBENTRIES_QUERY = gql`
         ) {
           nodes {
             ...DiscussionEntry
-            editor {
+            editor(courseId: $courseID, roleTypes: $rolePillTypes) {
               ...User
               courseRoles(courseId: $courseID, roleTypes: $rolePillTypes)
             }
-            author {
+            author(courseId: $courseID, roleTypes: $rolePillTypes) {
               ...User
               courseRoles(courseId: $courseID, roleTypes: $rolePillTypes)
             }
