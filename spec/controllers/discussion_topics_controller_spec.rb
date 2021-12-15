@@ -441,6 +441,26 @@ describe DiscussionTopicsController do
         user_session(user)
       end
 
+      it "sets ATTACHMENTS_FOLDER_ID" do
+        subject
+
+        expect(discussion).not_to be_for_assignment
+        expect(assigns[:js_env][:DISCUSSION][:ATTACHMENTS_FOLDER_ID]).to eq Folder.unfiled_folder(discussion.course).id
+      end
+
+      context "for_assignment" do
+        it "sets ATTACHMENTS_FOLDER_ID" do
+          discussion.assignment = course.assignments.build(submission_types: "discussion_topic", title: discussion.title)
+          discussion.assignment.infer_times
+          discussion.assignment.saved_by = :discussion_topic
+          discussion.save
+
+          subject
+          expect(discussion).to be_for_assignment
+          expect(assigns[:js_env][:DISCUSSION][:ATTACHMENTS_FOLDER_ID]).to eq user.submissions_folder(discussion.course).id
+        end
+      end
+
       context 'and "rce_mentions_in_discussions" enabled' do
         before { Account.site_admin.enable_feature! :rce_mentions_in_discussions }
 
