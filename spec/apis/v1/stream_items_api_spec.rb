@@ -787,4 +787,24 @@ describe UsersController, type: :request do
       expect(json).to eq({ "hidden" => true })
     end
   end
+
+  it "returns DiscussionEntry stream item with correct data" do
+    @user = user_factory
+    @teacher = user_factory
+
+    dt = discussion_topic_model
+
+    entry = dt.discussion_entries.new(user_id: @user, message: "you've been mentioned")
+    entry.mentions.new(user_id: @teacher, root_account_id: dt.root_account_id)
+    entry.save!
+
+    dt.generate_stream_items([@user])
+
+    json = api_call(:get, "/api/v1/users/self/activity_stream?only_active_courses=1",
+                    { controller: "users", action: "activity_stream", format: "json", only_active_courses: "1" })
+
+    expect(json.last["type"]).to eq("DiscussionEntry")
+    expect(json.last["message"]).to eq("you've been mentioned")
+    expect(json.last["author_name"]).to eq("value for name")
+  end
 end

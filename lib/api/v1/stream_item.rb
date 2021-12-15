@@ -114,6 +114,10 @@ module Api::V1::StreamItem
         hash["assessment_request_id"] = assessment_request.id
         hash["html_url"] = course_assignment_submission_url(assignment.context_id, assignment.id, assessment_request.user_id)
         hash["title"] = I18n.t("stream_items_api.assessment_request_title", "Peer Review for %{title}", title: assignment.title)
+      when /DiscussionEntry/
+        discussion_entry = stream_item.data
+        hash["author_name"] = discussion_entry.author_name
+        hash["message"] = discussion_entry.message
       else
         raise("Unexpected stream item type: #{stream_item.asset_type}")
       end
