@@ -62,6 +62,15 @@ describe Types::DiscussionEntryType do
     expect(type.resolve("discussionTopic { _id }")).to eq parent_entry.discussion_topic.id.to_s
   end
 
+  it "has an attachment" do
+    a = attachment_model
+    discussion_entry.attachment = a
+    discussion_entry.save!
+
+    expect(discussion_entry_type.resolve("attachment { _id }")).to eq discussion_entry.attachment.id.to_s
+    expect(discussion_entry_type.resolve("attachment { displayName }")).to eq discussion_entry.attachment.display_name
+  end
+
   it "queries the isolated entry id" do
     expect(discussion_sub_entry_type.resolve("isolatedEntryId")).to eq sub_entry.parent_id.to_s
     sub_entry.update!(legacy: false)
