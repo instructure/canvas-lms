@@ -37,9 +37,12 @@ import SpeedGraderLink from '@canvas/speed-grader-link'
 import DirectShareUserModal from '@canvas/direct-sharing/react/components/DirectShareUserModal'
 import DirectShareCourseTray from '@canvas/direct-sharing/react/components/DirectShareCourseTray'
 import {setupSubmitHandler} from '@canvas/assignments/jquery/reuploadSubmissionsHelper'
+import ready from '@instructure/ready'
 
-const lockManager = new LockManager()
-lockManager.init({itemType: 'assignment', page: 'show'})
+ready(() => {
+  const lockManager = new LockManager()
+  lockManager.init({itemType: 'assignment', page: 'show'})
+})
 
 let studentGroupSelectionRequestTrackers = []
 
@@ -106,32 +109,34 @@ function renderStudentGroupFilter() {
   }
 }
 
-// Attach the immersive reader button if enabled
-const immersive_reader_mount_point = document.getElementById('immersive_reader_mount_point')
-const immersive_reader_mobile_mount_point = document.getElementById(
-  'immersive_reader_mobile_mount_point'
-)
-if (immersive_reader_mount_point || immersive_reader_mobile_mount_point) {
-  import('../../shared/immersive-reader/ImmersiveReader')
-    .then(ImmersiveReader => {
-      const content = () => document.querySelector('.description')?.innerHTML
-      const title = document.querySelector('.title')?.textContent
+ready(() => {
+  // Attach the immersive reader button if enabled
+  const immersive_reader_mount_point = document.getElementById('immersive_reader_mount_point')
+  const immersive_reader_mobile_mount_point = document.getElementById(
+    'immersive_reader_mobile_mount_point'
+  )
+  if (immersive_reader_mount_point || immersive_reader_mobile_mount_point) {
+    import('../../shared/immersive-reader/ImmersiveReader')
+      .then(ImmersiveReader => {
+        const content = () => document.querySelector('.description')?.innerHTML
+        const title = document.querySelector('.title')?.textContent
 
-      if (immersive_reader_mount_point) {
-        ImmersiveReader.initializeReaderButton(immersive_reader_mount_point, {content, title})
-      }
+        if (immersive_reader_mount_point) {
+          ImmersiveReader.initializeReaderButton(immersive_reader_mount_point, {content, title})
+        }
 
-      if (immersive_reader_mobile_mount_point) {
-        ImmersiveReader.initializeReaderButton(immersive_reader_mobile_mount_point, {
-          content,
-          title
-        })
-      }
-    })
-    .catch(e => {
-      console.log('Error loading immersive readers.', e) // eslint-disable-line no-console
-    })
-}
+        if (immersive_reader_mobile_mount_point) {
+          ImmersiveReader.initializeReaderButton(immersive_reader_mobile_mount_point, {
+            content,
+            title
+          })
+        }
+      })
+      .catch(e => {
+        console.log('Error loading immersive readers.', e) // eslint-disable-line no-console
+      })
+  }
+})
 
 const promiseToGetModuleSequenceFooter = import('@canvas/module-sequence-footer')
 $(() => {
@@ -257,10 +262,12 @@ $(() => {
   }
 })
 
-$('#accessibility_warning').on('focus', function () {
-  $('#accessibility_warning').removeClass('screenreader-only')
-})
+ready(() => {
+  $('#accessibility_warning').on('focus', function () {
+    $('#accessibility_warning').removeClass('screenreader-only')
+  })
 
-$('#accessibility_warning').on('blur', function () {
-  $('#accessibility_warning').addClass('screenreader-only')
+  $('#accessibility_warning').on('blur', function () {
+    $('#accessibility_warning').addClass('screenreader-only')
+  })
 })
