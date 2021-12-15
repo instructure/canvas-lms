@@ -19,6 +19,21 @@
 
 module TestDatabaseUtils
   class << self
+    def check_migrations!
+      if ENV["SKIP_MIGRATION_CHECK"] != "1"
+        migrations = ActiveRecord::Base.connection.migration_context.migrations
+        skipped_migrations = ActiveRecord::Migrator.new(:up, migrations, ActiveRecord::Base.connection.schema_migration).skipped_migrations
+
+        # total migration - all run migrations - all skipped migrations
+        needs_migration =
+          ActiveRecord::Base.connection.migration_context.migrations.collect(&:version).size -
+          ActiveRecord::Base.connection.migration_context.get_all_versions.size -
+          skipped_migrations.size
+
+        raise ActiveRecord::PendingMigrationError if needs_migration > 0
+      end
+    end
+
     def reset_database!
       return unless truncate_all_tables? || randomize_sequences?
 
