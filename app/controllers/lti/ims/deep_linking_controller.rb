@@ -33,38 +33,113 @@ module Lti
       before_action :require_tool
 
       def deep_linking_response
-        # multiple content items meant for creating module items, or module items destined
-        # for a new module should create the module items and associate resource links here
-        # before passing them to the UI and reloading the modules page
-        add_module_items if add_module_items?
+        # one single content item for an existing module should:
+        # * not create a resource link
+        # * not reload the page
+        if add_item_to_existing_module? && lti_resource_links.length == 1
+          render_content_items(reload_page: false)
+          return
+        end
 
-        # any content items that contain line items should be handled here, and create
-        # assignments, content tags, line items, and resource links
-        add_assignments if add_assignment?
+        # to prepare for further UI processing, content items that don't need resources
+        # like module items or assignments created now should:
+        # * have resource links associated with them
+        # * not reload the page
+        unless create_resources_from_content_items?
+          lti_resource_links.each do |content_item|
+            resource_link = Lti::ResourceLink.create_with(context, tool, content_item[:custom])
+            content_item[:lookup_uuid] = resource_link&.lookup_uuid
+          end
 
-        # content items not meant for creating module items should have resource links
-        # associated with them here before passing them to the UI for further processing
-        create_lti_resource_links unless add_item_to_existing_module? || create_new_module?
+          render_content_items(reload_page: false)
+          return
+        end
 
-        # one content item meant for creating a module item in an existing module
-        # should be ignored, since the add module item modal in the UI will handle it
+        # create and validate assignments for content items with line items,
+        # which will be added to a module later if necessary
+        lti_resource_links.each do |content_item|
+          next unless allow_line_items? && content_item.key?(:lineItem)
+          next unless validate_line_item!(content_item)
 
-        # Pass content items and messaging values in JS env. these will be sent via
-        # window.postMessage to the main Canvas window, which can choose to do what
-        # it will with the content items
+          assignment_id = create_assignment!(content_item)
+          content_item[:assignment_id] = assignment_id
+        end
+
+        # receiving only invalid content items should:
+        # * not create a new module
+        # * not create any assignments
+        # * show these errors to the user
+        # * reload the page
+        if lti_resource_links.all? { |item| item.key?(:errors) }
+          render_content_items
+          return
+        end
+
+        # creating only assignments from the assigments page should:
+        # * not create a new module
+        # * reload the page
+        if for_placement?(:course_assignments_menu) && allow_line_items? && lti_resource_links.all? { |item| item.key?(:lineItem) }
+          render_content_items
+          return
+        end
+
+        # creating mixed content (module items and/or assignments) from the modules
+        # or assignments pages should:
+        # * create a new module or use existing one
+        # * add valid content items to this module
+        # * show any errors to the user
+        # * reload the page
+        context_module = if create_new_module?
+                           @context.context_modules.create!(name: I18n.t("New Content From App"), workflow_state: "unpublished")
+                         else
+                           @context.context_modules.not_deleted.find(params[:context_module_id])
+                         end
+
+        lti_resource_links.each do |content_item|
+          if allow_line_items? && content_item.key?(:lineItem)
+            next if content_item[:errors]
+
+            context_module.add_item({ type: "assignment", id: content_item[:assignment_id] })
+          else
+            context_module.add_item(build_module_item(content_item))
+          end
+        end
+
+        render_content_items
+      end
+
+      private
+
+      def for_placement?(placement)
+        params[:placement]&.to_sym == placement
+      end
+
+      def render_content_items(items: content_items, reload_page: true)
         js_env({
-          deep_link_response: {
-            content_items: content_items,
-            msg: messaging_value("msg"),
-            log: messaging_value("log"),
-            errormsg: messaging_value("errormsg"),
-            errorlog: messaging_value("errorlog"),
-            ltiEndpoint: polymorphic_url([:retrieve, @context, :external_tools]),
-            reloadpage: multiple_items_for_existing_module?
-          }
-        }.compact)
+                 deep_link_response: {
+                   content_items: items,
+                   msg: messaging_value("msg"),
+                   log: messaging_value("log"),
+                   errormsg: messaging_value("errormsg"),
+                   errorlog: messaging_value("errorlog"),
+                   ltiEndpoint: polymorphic_url([:retrieve, @context, :external_tools]),
+                   reloadpage: reload_page
+                 }.compact
+               })
 
         render layout: "bare"
+      end
+
+      def require_context_update_rights
+        return unless create_resources_from_content_items?
+
+        authorized_action(@context, @current_user, %i[manage_content update])
+      end
+
+      def require_tool
+        return unless create_resources_from_content_items?
+
+        render_unauthorized_action if tool.blank?
       end
     end
   end

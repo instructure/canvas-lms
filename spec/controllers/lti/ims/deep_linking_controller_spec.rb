@@ -367,6 +367,11 @@ module Lti
                 expect(context_module.content_tags.count).to eq(3)
               end
 
+              it "leaves module items unpublished" do
+                subject
+                expect(context_module.content_tags.last.workflow_state).to eq("unpublished")
+              end
+
               it "creates all resource links" do
                 expect(course.lti_resource_links).to be_empty
                 expect(subject).to be_successful
@@ -449,13 +454,13 @@ module Lti
                 course.root_account.enable_feature!(:lti_deep_linking_module_index_menu_modal)
               end
 
-              it "creates a new context module" do
-                expect { subject }.to change { course.context_modules.count }.by 1
-              end
-
               context "single item" do
                 let(:content_items) do
                   [{ type: "ltiResourceLink", url: launch_url, title: "Item 1" }]
+                end
+
+                it "creates a new context module" do
+                  expect { subject }.to change { course.context_modules.count }.by 1
                 end
 
                 it "creates a resource link" do
@@ -464,6 +469,11 @@ module Lti
 
                 it "creates a module item" do
                   expect { subject }.to change { ContentTag.where(context: course).count }.by 1
+                end
+
+                it "leaves module items unpublished" do
+                  subject
+                  expect(ContentTag.where(context: course).last.workflow_state).to eq("unpublished")
                 end
               end
 
@@ -476,12 +486,21 @@ module Lti
                   ]
                 end
 
+                it "creates a new context module" do
+                  expect { subject }.to change { course.context_modules.count }.by 1
+                end
+
                 it "creates one resource link per item" do
                   expect { subject }.to change { course.lti_resource_links.count }.by 3
                 end
 
                 it "creates one module item per item" do
                   expect { subject }.to change { ContentTag.where(context: course).count }.by 3
+                end
+
+                it "leaves module items unpublished" do
+                  subject
+                  expect(ContentTag.where(context: course).last.workflow_state).to eq("unpublished")
                 end
               end
             end
@@ -517,6 +536,7 @@ module Lti
             user_session(@user)
             context_external_tool
             course.root_account.enable_feature! :lti_deep_linking_line_items
+            course.root_account.enable_feature! :lti_deep_linking_module_index_menu_modal
           end
 
           shared_examples_for "does nothing" do
@@ -540,7 +560,7 @@ module Lti
           end
 
           context "when placement is not allowed to create line items" do
-            let(:params) { super().merge({ placement: "assignment_selection" }) }
+            let(:params) { super().merge({ placement: "link_selection" }) }
 
             it_behaves_like "does nothing"
           end
@@ -552,6 +572,10 @@ module Lti
             it "sends error in content item response" do
               subject
               expect(assigns.dig(:js_env, :deep_link_response, :content_items).first).to have_key(:errors)
+            end
+
+            it "does not create a context module" do
+              expect { subject }.not_to change { course.context_modules.count }
             end
 
             context "when title is present in content item" do
@@ -579,6 +603,15 @@ module Lti
 
           it "creates an assignment from lineItem data" do
             expect { subject }.to change { course.assignments.count }.by 1
+          end
+
+          it "leaves assignment unpublished" do
+            subject
+            expect(course.assignments.last.workflow_state).to eq("unpublished")
+          end
+
+          it "does not create a context module" do
+            expect { subject }.not_to change { course.context_modules.count }
           end
 
           context "when content item includes available dates" do
@@ -670,8 +703,12 @@ module Lti
               course.root_account.enable_feature! :lti_deep_linking_module_index_menu_modal
             end
 
-            it "creates a module item" do
+            it "creates a new context module" do
               expect { subject }.to change { course.context_modules.count }.by 1
+            end
+
+            it "creates a module item for every content item" do
+              expect { subject }.to change { ContentTag.where(context: course).count }.by content_items.length
             end
 
             it "creates a link within the module item to the created assignment" do
@@ -680,6 +717,12 @@ module Lti
               content_tags = new_module.content_tags
 
               expect(content_tags.last.title).to eq(content_item[:title])
+            end
+
+            it "leaves assignment unpublished" do
+              subject
+              expect(course.assignments.last.workflow_state).to eq("unpublished")
+              expect(ContentTag.where(context: course).last.workflow_state).to eq("unpublished")
             end
           end
         end
