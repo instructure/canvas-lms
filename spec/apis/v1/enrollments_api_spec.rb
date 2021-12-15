@@ -1085,6 +1085,12 @@ describe EnrollmentsApiController, type: :request do
         Account.default.account_users.create!(user: @user)
       end
 
+      it "is able to request enrollments for a specific user in a course" do
+        @params[:user_id] = @student.id
+        api_call_as_user(@user, :get, @path, @params)
+        expect(response).to be_successful
+      end
+
       it "is able to return an enrollment object by id" do
         json = api_call(:get, "#{@enroll_path}/#{@enrollment.id}", @enroll_params)
         expect(json).to eq({
@@ -2156,6 +2162,18 @@ describe EnrollmentsApiController, type: :request do
           observer.observer_enrollments.destroy_all
           api_call_as_user(observer, :get, "/api/v1/courses/#{course.id}/enrollments", request_params)
           expect(response.code).to eq "401"
+        end
+      end
+
+      context "when the observer is requesting enrollments for a specific user in a course" do
+        before do
+          course.enroll_user(observer, "ObserverEnrollment", associated_user_id: observed_student.id)
+        end
+
+        it "returns a successful response" do
+          request_params[:user_id] = observed_student.id
+          api_call_as_user(observer, :get, "/api/v1/courses/#{course.id}/enrollments", request_params)
+          expect(response.code).to eq "200"
         end
       end
 
