@@ -17,6 +17,7 @@
  */
 
 import React from 'react'
+import moment from 'moment-timezone'
 import {act, screen} from '@testing-library/react'
 
 import {COURSE, PRIMARY_PLAN} from '../../../../__tests__/fixtures'
@@ -32,6 +33,7 @@ const toggleHardEndDates = jest.fn()
 const setEndDate = jest.fn()
 
 const defaultProps = {
+  course: COURSE,
   courseId: COURSE.id,
   excludeWeekends: PRIMARY_PLAN.exclude_weekends,
   pacePlan: PRIMARY_PLAN,
