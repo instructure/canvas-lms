@@ -33,7 +33,7 @@ tasks.withType<Test> {
   }
 }
 
-val log4jVersion = "2.11.2"
+val log4jVersion = "2.16.0"
 val slf4jVersion = "1.7.26"
 val declarativePluginsVersion = "1.3.9"
 
