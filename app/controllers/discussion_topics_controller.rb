@@ -1265,9 +1265,15 @@ class DiscussionTopicsController < ApplicationController
                                     "You are not able to create an anonymous discussion")
     end
 
-    if is_new && params[:anonymous_state] && params[:group_category_id]
-      @errors[:anonymous_state] = t(:error_anonymous_state_groups_create,
-                                    "Group discussions cannot be anonymous.")
+    if is_new && params[:anonymous_state]
+      if params[:group_category_id]
+        @errors[:anonymous_state] = t(:error_anonymous_state_groups_create,
+                                      "Group discussions cannot be anonymous.")
+      end
+      if params[:assignment]
+        @errors[:anonymous_state] = t(:error_graded_anonymous,
+                                      "Anonymous discussions cannot be graded")
+      end
     end
 
     model_type = if value_to_boolean(params[:is_announcement]) &&

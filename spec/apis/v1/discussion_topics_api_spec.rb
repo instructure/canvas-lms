@@ -477,6 +477,43 @@ describe DiscussionTopicsController, type: :request do
                { title: "test title", message: "test <b>message</b>", discussion_type: "threaded",
                  anonymous_state: "full_anonymity", group_category_id: group_category.id }, {}, { expected_status: 400 })
     end
+
+    it "unable to create a graded anonymous topic" do
+      api_call(:post, "/api/v1/courses/#{@course.id}/discussion_topics",
+               { controller: "discussion_topics", action: "create", format: "json",
+                 course_id: @course.to_param },
+               { title: "test title", message: "test <b>message</b>", discussion_type: "threaded",
+                 anonymous_state: "full_anonymity", assignment: {
+                   assignment_overrides: [],
+                   turnitin_settings: {
+                     s_paper_check: false,
+                     originality_report_visibility: "immediate",
+                     internet_check: false,
+                     exclude_biblio: false,
+                     exclude_quoted: false,
+                     journal_check: false,
+                     exclude_small_matches_value: 0,
+                     submit_papers_to: true
+                   },
+                   publishable: true,
+                   hidden: false,
+                   unpublishable: true,
+                   only_visible_to_overrides: false,
+                   set_assignment: "1",
+                   points_possible: 0,
+                   grading_type: "points",
+                   grading_standard_id: "",
+                   assignment_group_id: "1",
+                   peer_reviews: "0",
+                   automatic_peer_reviews: "0",
+                   peer_review_count: 0,
+                   peer_reviews_assign_at: nil,
+                   intra_group_peer_reviews: "0",
+                   lock_at: nil,
+                   unlock_at: nil,
+                   due_at: nil
+                 } }, {}, { expected_status: 400 })
+    end
   end
 
   context "With item" do

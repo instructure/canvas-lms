@@ -24,6 +24,7 @@ import {buildText, buildTextBackground, getContainerWidth, getContainerHeight} f
 
 export function buildSvg(settings, options = DEFAULT_OPTIONS) {
   settings = {...DEFAULT_SETTINGS, ...settings}
+
   const mainContainer = buildSvgContainer(settings)
   const shapeWrapper = buildSvgWrapper(settings)
 

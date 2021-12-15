@@ -472,6 +472,8 @@ export default class EditView extends ValidatedFormView
   validateBeforeSave: (data, errors) =>
     if data.delay_posting == "0"
       data.delayed_post_at = null
+    if data.anonymous_state != 'full_anonymity' && data.anonymous_state != 'partial_anonymity'
+      data.anonymous_state = null
     if @isTopic() && data.set_assignment is '1'
       if @assignmentGroupSelector?
         errors = @assignmentGroupSelector.validateBeforeSave(data, errors)
@@ -481,6 +483,8 @@ export default class EditView extends ValidatedFormView
       errors = @dueDateOverrideView.validateBeforeSave(validateBeforeSaveData, errors)
       errors = @_validatePointsPossible(data, errors)
       errors = @_validateTitle(data, errors)
+      if data.anonymous_state != null
+        errors['anonymous_state'] = [{message: I18n.t("You are not allowed to create an anonymous graded discussion")}]
     else
       @model.set 'assignment', @model.createAssignment(set_assignment: false)
 
