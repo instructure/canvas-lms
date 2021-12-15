@@ -226,6 +226,14 @@ describe "discussions" do
           )
         end
 
+        it "does not allow creation of anonymous group discussions" do
+          course.allow_student_anonymous_discussion_topics = true
+          course.save!
+          get url
+          f("input[value='full_anonymity']").click
+          expect(f("span[data-testid=groups_grading_not_allowed]")).to be_displayed
+        end
+
         it "does not let students create anonymous discussions when disallowed" do
           get url
           expect(course.allow_student_anonymous_discussion_topics).to be false
