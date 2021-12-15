@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {AnonymousResponseSelector} from '../AnonymousResponseSelector/AnonymousResponseSelector'
 import I18n from 'i18n!discussion_posts'
 import React, {useRef, useState, useEffect} from 'react'
 import {Flex} from '@instructure/ui-flex'
@@ -114,6 +115,12 @@ export const DiscussionEdit = props => {
           </View>
           <ReplyPreview {...props.quotedEntry} />
         </>
+      )}
+      {props.discussionAnonymousState && ENV.current_user_roles?.includes('student') && (
+        <AnonymousResponseSelector
+          username={ENV.current_user.display_name}
+          discussionAnonymousState={props.discussionAnonymousState}
+        />
       )}
       <View display="block">
         <span>
@@ -243,6 +250,7 @@ export const DiscussionEdit = props => {
 
 DiscussionEdit.propTypes = {
   show: PropTypes.bool,
+  discussionAnonymousState: PropTypes.string,
   draftSaved: PropTypes.bool,
   value: PropTypes.string,
   onCancel: PropTypes.func.isRequired,
