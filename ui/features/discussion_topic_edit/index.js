@@ -29,6 +29,9 @@ import SectionCollection from '@canvas/sections/backbone/collections/SectionColl
 import splitAssetString from '@canvas/util/splitAssetString'
 import LockManager from '@canvas/blueprint-courses/react/components/LockManager/index'
 import SectionsAutocomplete from './react/SectionsAutocomplete'
+import {Alert} from '@instructure/ui-alerts'
+import {View} from '@instructure/ui-view'
+import I18n from 'i18n!discussions'
 
 const isAnnouncement =
   ENV.DISCUSSION_TOPIC.ATTRIBUTES != null
@@ -139,4 +142,35 @@ ready(() => {
   // properly created/rendered thus can be used to checked if this is a graded
   // or group discussions.
   setTimeout(() => renderSectionsAutocomplete(view))
+
+  setTimeout(() => {
+    const container = document.querySelector('#sections_groups_not_allowed_root')
+
+    const radioButtons = document.querySelectorAll('input[name=anonymous_state]')
+    radioButtons.forEach(radioButton => {
+      radioButton.addEventListener('change', () => {
+        const anonymousState = document.querySelector('input[name=anonymous_state]:checked').value
+        const hasGroupCategory = document.querySelector(
+          'input[name=has_group_category][type=checkbox]'
+        )
+        const isAnonymous = anonymousState === 'full_anonymity'
+
+        document.querySelector('#group_category_options').hidden = isAnonymous
+        container.style.display = isAnonymous ? 'inline' : 'none'
+
+        if (isAnonymous && hasGroupCategory) {
+          hasGroupCategory.checked = false
+        }
+      })
+    })
+
+    ReactDOM.render(
+      <View width="580px" display="block" data-testid="groups_grading_not_allowed">
+        <Alert variant="info" margin="small">
+          {I18n.t('Grading and Groups are not supported in Anonymous Discussions.')}
+        </Alert>
+      </View>,
+      container
+    )
+  })
 })
