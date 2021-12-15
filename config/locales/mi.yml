@@ -6692,7 +6692,7 @@ mi:
         default_select_folder: "Tīpako Kōpaki"
         upload_to: "Tukuake ki"
       import_quizzes_next_view: 
-        import_new_quizzes: "Ko te aromatawai kawemai ihirangi ko Quizzes Hou"
+        import_new_quizzes: "Ko te aromatawai kawemai ihirangi ko *Quizzes Hou*"
         import_new_quizzes_help_text: "Ko te Quizzes Hou ko te mīhini aromatawai hou mo Canvas.%{p_p}Ki te ako nui atu tēnā koa whakapā atu ki to kaiwhakahaere pūnaha, toro atu rānei"
         import_quizzesNext_help_label: "Ko te aromatawai kawemai ko Quizzes Hou Āwhina Icon"
         import_quizzesNext_help_text: "Ko te Quizzes.Next ko te mīhini aromatawai hou mo Canvas.%{p_p}Ki te ako nui atu tēnā koa whakapā atu ki to kaiwhakahaere pūnaha, toro atu rānei"
