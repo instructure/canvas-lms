@@ -455,7 +455,7 @@ describe('DiscussionThreadContainer', () => {
 
     it('renders name', () => {
       const props = defaultProps({
-        discussionEntryOverrides: {anonymousAuthor: AnonymousUser.mock()}
+        discussionEntryOverrides: {author: null, anonymousAuthor: AnonymousUser.mock()}
       })
       const container = setup(props)
       expect(container.queryByText('Sorry, Something Broke')).toBeNull()
