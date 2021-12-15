@@ -22,7 +22,7 @@ module Lti::IMS::Concerns
     extend ActiveSupport::Concern
 
     CREATE_NEW_MODULE_PLACEMENTS = %w[course_assignments_menu module_index_menu_modal].freeze
-    ALLOW_LINE_ITEM_PLACEMENTS = %w[course_assignments_menu module_index_menu_modal].freeze
+    ALLOW_LINE_ITEM_PLACEMENTS = %w[course_assignments_menu module_index_menu_modal assignment_selection].freeze
 
     def create_resources_from_content_items?
       add_module_items? || add_assignment?
@@ -140,7 +140,7 @@ module Lti::IMS::Concerns
 
         content_item[:errors] = assignment.errors unless assignment.valid?
 
-        assignment.id
+        content_item[:assignment_id] = assignment.id
       end
     end
   end
