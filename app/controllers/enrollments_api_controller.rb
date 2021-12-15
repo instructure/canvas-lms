@@ -922,9 +922,13 @@ class EnrollmentsApiController < ApplicationController
       enrollments = enrollments.where(course_id: course) if course
     else
       if course
-        render_unauthorized_action and return false unless course.user_has_been_observer?(@current_user)
-
-        enrollments = user.enrollments.where(enrollment_index_conditions).where(course_id: course)
+        # if current user is requesting enrollments for themselves or a specific user
+        # with params[:user_id] in a course context we want to follow the
+        # course_index_enrollments construct
+        if course.user_has_been_observer?(@current_user) ||
+           authorized_action(course, @current_user, %i[read_roster view_all_grades manage_grades])
+          enrollments = user.enrollments.where(enrollment_index_conditions).where(course_id: course)
+        end
       else
         is_approved_parent = user.grants_right?(@current_user, :read_as_parent)
         # otherwise check for read_roster rights on all of the requested
