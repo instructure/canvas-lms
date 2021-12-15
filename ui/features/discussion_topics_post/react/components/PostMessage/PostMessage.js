@@ -66,6 +66,7 @@ export function PostMessage({...props}) {
           {props.isEditing ? (
             <View display="inline-block" margin="small none none none" width="100%">
               <DiscussionEdit
+                discussionAnonymousState={props.discussionAnonymousState}
                 onCancel={props.onCancel}
                 value={props.draftMessage || props.message}
                 onSubmit={props.onSave}
@@ -132,6 +133,7 @@ PostMessage.propTypes = {
   onCreateDiscussionEntryDraft: PropTypes.func,
   draftMessage: PropTypes.string,
   onSetDraftSaved: PropTypes.func,
+  discussionAnonymousState: PropTypes.string,
   draftSaved: PropTypes.bool
 }
 
